@@ -1,9 +1,8 @@
 |resources|<http://guiseframework.com/namespaces/resources>,
 |dc|<http://purl.org/dc/elements/1.1/>,
-(resources:Resources)
-{
-	dc:description="Root Guise™ theme resources (en).",
-	dc:creator="Garret Wilson",
+(resources·Resources):
+	dc·description="Root Guise™ theme resources (en).",
+	dc·creator="Garret Wilson",
 
 	*Notification*
 		*notification severity*
@@ -298,4 +297,4 @@
 	theme.cursor.resize.page.near=<cursors/resize_page_near.png>,
 	theme.cursor.text=<cursors/text.png>,
 	theme.cursor.wait=<cursors/wait.png>,
-}
+;

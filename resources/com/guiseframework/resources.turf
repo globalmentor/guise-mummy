@@ -1,9 +1,8 @@
 |resources|<http://guiseframework.com/namespaces/resources>,
 |dc|<http://purl.org/dc/elements/1.1/>,
-(resources:Resources)
-{
-	dc:description="Default Guise™ Resources (en).",
-	dc:creator="Garret Wilson",
+(resources·Resources):
+	dc·description="Default Guise™ Resources (en).",
+	dc·creator="Garret Wilson",
 
 	*general application labels*
 	application.name="Unnamed Guise™ Application",
@@ -35,4 +34,4 @@
 	text.directory.vcard.n.honorific.suffix.label="Suffix",
 	text.directory.vcard.n.honorific.suffix.info="Any honorific suffix. Separate multiple honorific suffixes with commas.",
 	text.directory.vcard.n.honorific.suffix.choices=["I", "II", "III", "Jr.", "Sr."]
-}
+;
