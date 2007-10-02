@@ -6,7 +6,7 @@ import java.net.URI;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.garretwilson.rdf.*;
-import com.garretwilson.rdf.ploop.PLOOPProcessor;
+import com.garretwilson.urf.ploop.PLOOPProcessor;
 
 import static com.guiseframework.theme.Theme.*;
 

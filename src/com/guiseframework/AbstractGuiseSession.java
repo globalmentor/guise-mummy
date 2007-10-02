@@ -21,7 +21,8 @@ import com.garretwilson.io.BOMInputStreamReader;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.net.URIPath;
 import com.garretwilson.rdf.*;
-import com.garretwilson.rdf.ploop.PLOOPProcessor;
+import com.garretwilson.urf.*;
+import com.garretwilson.urf.ploop.PLOOPProcessor;
 import com.garretwilson.util.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
@@ -131,16 +132,16 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		}
 
 	/**The non-thread-safe document builder that parses XML documents for input to RDF.*/
-	private final DocumentBuilder documentBuilder;
+//TODO del	private final DocumentBuilder documentBuilder;
 
 		/**@return The non-thread-safe document builder that parses XML documents for input to RDF.*/
-		private DocumentBuilder getDocumentBuilder() {return documentBuilder;}
+		//TODO del private DocumentBuilder getDocumentBuilder() {return documentBuilder;}
 
 	/**The cache of components keyed to component destinations.*/
 	private final Map<ComponentDestination, Component> destinationComponentMap=synchronizedMap(new HashMap<ComponentDestination, Component>());
 
 	/**The map of preference resource descriptions keyed to classes. This is a temporary implementation that will later be replaced with a backing store based upon the current principal.*/
-	private final ReadWriteLockMap<Class<?>, RDFResource> classPreferencesMap=new DecoratorReadWriteLockMap<Class<?>, RDFResource>(new HashMap<Class<?>, RDFResource>());
+	private final ReadWriteLockMap<Class<?>, URFResource> classPreferencesMap=new DecoratorReadWriteLockMap<Class<?>, URFResource>(new HashMap<Class<?>, URFResource>());
 
 		/**Retrieves the saved preference properties for a given class.
 		@param objectClass The class for which preference properties should be returned.
@@ -148,12 +149,12 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@exception NullPointerException if the given class is <code>null</code>.
 		@exception IOException if there was an error retrieving preferences.
 		*/
-		public RDFResource getPreferences(final Class<?> objectClass) throws IOException
+		public URFResource getPreferences(final Class<?> objectClass) throws IOException
 		{
-			RDFResource preferences=classPreferencesMap.get(checkInstance(objectClass, "Class cannot be null."));	//get the preferences stored in the map
+			URFResource preferences=classPreferencesMap.get(checkInstance(objectClass, "Class cannot be null."));	//get the preferences stored in the map
 			if(preferences==null)	//if no preferences are stored in the map
 			{
-				preferences=new DefaultRDFResource();	//create a default set of preference properties				
+				preferences=new DefaultURFResource();	//create a default set of preference properties				
 /*TODO del if we decide to store resource copies; change map to concurrent map
 				classPreferencesMap.writeLock().lock();	//get a write lock on the preferences map
 				try
@@ -180,9 +181,9 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@exception NullPointerException if the given class and/or preferences is <code>null</code>.
 		@exception IOException if there was an error storing preferences.
 		*/
-		public void setPreferences(final Class<?> objectClass, final RDFResource preferences) throws IOException
+		public void setPreferences(final Class<?> objectClass, final URFResource preferences) throws IOException
 		{
-			classPreferencesMap.put(checkInstance(objectClass, "Class cannot be null."), new DefaultRDFResource(checkInstance(preferences, "Preferences cannot be null.")));	//store a copy of the preferences in the map
+			classPreferencesMap.put(checkInstance(objectClass, "Class cannot be null."), new DefaultURFResource(checkInstance(preferences, "Preferences cannot be null.")));	//store a copy of the preferences in the map
 		}
 
 	/**The platform on which Guise objects are depicted.*/
@@ -762,6 +763,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		this.uuid=UUID.randomUUID();	//create a UUID for the session
 		this.application=checkInstance(application, "Application cannot be null.");	//save the application
 		this.baseURI=application.getContainer().getBaseURI().resolve(application.getBasePath().toURI());	//default to a base URI calculated from the application base path resolved to the container's base URI
+/*TODO del
 		try
 		{
 			documentBuilder=createDocumentBuilder(true);	//create a new namespace-aware document builder
@@ -769,7 +771,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		catch(final ParserConfigurationException parserConfigurationException)	//if we can't find an XML parser
 		{
 			throw new AssertionError(parserConfigurationException);
-		}	
+		}
+*/
 		this.platform=checkInstance(platform, "Platform cannot be null.");	//save the platform
 		this.themeURI=application.getThemeURI();	//default to the application theme
 		this.locale=application.getLocales().get(0);	//default to the first application locale
@@ -958,9 +961,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	{
 		try
 		{
-			synchronized(getDocumentBuilder())	//synchronize because the document builder is not thread-safe
+//TODO del			synchronized(getDocumentBuilder())	//synchronize because the document builder is not thread-safe
 			{
 				final URI BASE_URI=URI.create("guise:/");	//TODO fix
+				final URF urf=AbstractTURFIO.readTURF(new URF(), descriptionInputStream, baseURI);	//read TURF from the input stream
+/*TODO del
 				final Document document=getDocumentBuilder().parse(descriptionInputStream);	//parse the description document
 		//TODO del Debug.trace("just parsed XML:", XMLUtilities.toString(document));
 				final RDFXMLProcessor rdfProcessor=new RDFXMLProcessor();	//create a new RDF processor
@@ -970,12 +975,16 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 //TODO delDebug.trace("just read RDF", RDFUtilities.toString(rdf));
 				final URI componentResourceTypeURI=new URI(JAVA_SCHEME, component.getClass().getName(), null);	//create a new URI that indicates the type of the resource description we expect
 				final RDFResource componentResource=RDFUtilities.getResourceByType(rdf, componentResourceTypeURI);	//try to locate the description of the given component
+*/
+				final URI componentResourceTypeURI=createInfoJavaURI(component.getClass());	//create a new URI that indicates the type of the resource description we expect
+				final URFResource componentResource=urf.getResourceByTypeURI(componentResourceTypeURI);	//try to locate the description of the given component
 				if(componentResource!=null)	//if there is a resource description of a matching type
 				{
-					final PLOOPProcessor ploopProcessor=new PLOOPProcessor(this);	//create a new PLOOP processor, passing the Guise session to use as a default constructor argument
+//TODO del					final PLOOPProcessor ploopProcessor=new PLOOPProcessor(this);	//create a new PLOOP processor, passing the Guise session to use as a default constructor argument
+					final PLOOPProcessor ploopProcessor=new PLOOPProcessor();	//create a new PLOOP processor
 					ploopProcessor.setObjectProperties(component, componentResource);	//initialize the component from this resource
 					component.initialize();	//initialize the component
-					final List<Object> objects=ploopProcessor.getObjects(rdf);	//make sure all described Java objects in the RDF instance have been created
+					final List<Object> objects=ploopProcessor.getObjects(urf);	//make sure all described Java objects in the URF instance have been created
 				}
 				else	//if there is no resource of the appropriate type
 				{
@@ -983,6 +992,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				}
 			}
 		}
+/*TODO del
 		catch(final SAXException saxException)	//we don't expect parsing errors
 		{
 			throw new AssertionError(saxException);	//TODO maybe change to throwing an IOException
@@ -991,6 +1001,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		{
 			throw new AssertionError(uriSyntaxException);	//TODO fix better
 		}
+*/
 		catch(final IOException ioException)	//if there is an I/O exception
 		{
 			throw new AssertionError(ioException);	//TODO fix better

@@ -13,11 +13,15 @@ import static java.util.Collections.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Arrays.*;
+import static net.marmox.content.MarmoxContent.MARMOX_CONTENT_NAMESPACE_URI;
 
 import javax.mail.internet.ContentType;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.xml.parsers.*;
+
+import net.marmox.content.MarmoxContent;
+import net.marmox.content.Page;
 
 import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -80,7 +84,6 @@ import com.garretwilson.rdf.*;
 import com.garretwilson.rdf.dublincore.DCUtilities;
 import com.garretwilson.rdf.maqro.Activity;
 import com.garretwilson.rdf.maqro.MAQROUtilities;
-import com.garretwilson.rdf.ploop.PLOOPProcessor;
 import com.garretwilson.security.Nonce;
 import com.garretwilson.servlet.ServletUtilities;
 import com.garretwilson.servlet.http.HttpServletConstants;
@@ -90,6 +93,11 @@ import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 
 import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 import com.garretwilson.text.xml.xpath.*;
+import com.garretwilson.urf.JavaURFResourceFactory;
+import com.garretwilson.urf.URFIO;
+import com.garretwilson.urf.URFResourceTURFIO;
+import com.garretwilson.urf.ploop.PLOOPProcessor;
+import com.garretwilson.urf.ploop.PLOOPTURFIO;
 import com.garretwilson.util.*;
 import com.globalmentor.marmot.Marmot;
 import com.guiseframework.*;
@@ -100,17 +108,7 @@ import com.guiseframework.geometry.*;
 import com.guiseframework.input.Key;
 import com.guiseframework.model.FileItemResourceImport;
 import com.guiseframework.model.TaskState;
-import com.guiseframework.platform.AbstractDepictor;
-import com.guiseframework.platform.DefaultProduct;
-import com.guiseframework.platform.DepictContext;
-import com.guiseframework.platform.DepictEvent;
-import com.guiseframework.platform.DepictedObject;
-import com.guiseframework.platform.Environment;
-import com.guiseframework.platform.PlatformDropEvent;
-import com.guiseframework.platform.PlatformFocusEvent;
-import com.guiseframework.platform.Platform;
-import com.guiseframework.platform.PlatformEvent;
-import com.guiseframework.platform.Product;
+import com.guiseframework.platform.*;
 import com.guiseframework.platform.web.css.*;
 import com.guiseframework.theme.Theme;
 
@@ -151,7 +149,19 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 
 	/**The ID of the viewport to use for sending resources.*/
 	public static String SEND_RESOURCE_VIEWPORT_ID="guiseDownload";
-	
+
+	/**The I/O implementation that reads a Guise application description from TURF.*/
+	private final static IO<AbstractGuiseApplication> applicationIO;
+
+		/**@return The I/O implementation that reads a Guise application description from TURF.*/
+		public static IO<AbstractGuiseApplication> getApplicationIO() {return applicationIO;}
+
+	static
+	{
+		applicationIO=new PLOOPTURFIO<AbstractGuiseApplication>(AbstractGuiseApplication.class);	//create the Guise application I/O
+//TODO del if not needed		pageIO.registerResourceFactory(MARMOX_CONTENT_NAMESPACE_URI, new JavaURFResourceFactory(MarmoxContent.class.getPackage()));	//register a resource factory for Marmox content classes
+	}
+
 	/**The Guise container that owns the applications.*/
 	private HTTPServletGuiseContainer guiseContainer=null;
 
@@ -293,7 +303,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 				final InputStream guiseApplicationDescriptionBufferedInputStream=new BufferedInputStream(guiseApplicationDescriptionInputStream);	//get a buffered input stream to the application description 
 				try
 				{
-					
+					guiseApplication=getApplicationIO().read(guiseApplicationDescriptionBufferedInputStream, guiseApplicationDescriptionURL.toURI());	//read the application description from the PLOOP TURF, using the URI of the application description as the base URI
+/*TODO del when works
 						//TODO change to use new PLOOPResourceIO
 					final DocumentBuilder documentBuilder=createDocumentBuilder(true);	//create a new namespace-aware document builder
 					final Document document=documentBuilder.parse(guiseApplicationDescriptionBufferedInputStream);	//parse the description document
@@ -306,6 +317,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 					{
 						throw new ServletException("Guise application description document did not describe a Guise application.");
 					}
+*/
 /*TODO del					
 Debug.trace("checking for categories");
 					for(final Destination destination:guiseApplication.getDestinations())	//for each destination
@@ -329,21 +341,9 @@ Debug.trace("checking for categories");
 					throw new ServletException(exception);
 				}
 */
-				catch(final ParserConfigurationException parserConfigurationException)	//if we can't find an XML parser
-				{
-					throw new ServletException(parserConfigurationException);
-				}	
-				catch(final SAXException saxException)
-				{
-					throw new ServletException(saxException);
-				}
 				catch(final URISyntaxException uriSyntaxException)
 				{
 					throw new ServletException(uriSyntaxException);
-				}
-				catch(final InvocationTargetException invocationTargetException)
-				{
-					throw new ServletException(invocationTargetException);
 				}
 				finally
 				{

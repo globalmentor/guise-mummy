@@ -12,8 +12,9 @@ import javax.mail.internet.ContentType;
 import com.garretwilson.beans.TargetedEvent;
 import com.garretwilson.lang.*;
 import com.garretwilson.rdf.RDFResource;
-import com.garretwilson.rdf.ploop.PLOOPProcessor;
 import com.garretwilson.rdf.ploop.PLOOPRDFGenerator;
+import com.garretwilson.urf.URFResource;
+import com.garretwilson.urf.ploop.PLOOPProcessor;
 import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.GuiseSession;
@@ -1083,7 +1084,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		final Iterator<String> preferencePropertyIterator=getPreferenceProperties().iterator();	//get an iterator to all preferences properties
 		if(preferencePropertyIterator.hasNext())	//if there are preference properties
 		{
-			final RDFResource preferences=getSession().getPreferences(getClass());	//get existing preferences for this class
+			final URFResource preferences=getSession().getPreferences(getClass());	//get existing preferences for this class
 //TODO del Debug.traceStack("ready to load preferences; view:", ((ResourceChildrenPanel)this).getView(), "thumbnail size:", ((ResourceChildrenPanel)this).getThumbnailSize(), "preferences", RDFUtilities.toString(preferences));
 			final PLOOPProcessor ploopProcessor=new PLOOPProcessor();	//create a new PLOOP processor for retrieving the properties
 			do	//for each property
@@ -1115,7 +1116,8 @@ Debug.trace("now valid of", this, "is", isValid());
 		{
 			final GuiseSession session=getSession();	//get the current session
 			final Class<?> componentClass=getClass();	//get this component's class
-			final RDFResource preferences=session.getPreferences(componentClass);	//get existing preferences for this class
+			final URFResource preferences=session.getPreferences(componentClass);	//get existing preferences for this class
+/*TODO convert to URF
 			final PLOOPRDFGenerator ploopRDFGenerator=new PLOOPRDFGenerator();	//create a new PLOOP RDF generator for storing the properties
 			do	//for each property
 			{
@@ -1132,6 +1134,7 @@ Debug.trace("now valid of", this, "is", isValid());
 			while(preferencePropertyIterator.hasNext());	//keep saving properties while there are more preference properties
 //TODO del Debug.trace("ready to save preferences; view:", ((ResourceChildrenPanel)this).getView(), "thumbnail size:", ((ResourceChildrenPanel)this).getThumbnailSize(), "preferences", RDFUtilities.toString(preferences));
 			session.setPreferences(componentClass, preferences);	//set the new preferences
+*/
 		}
 	}
 

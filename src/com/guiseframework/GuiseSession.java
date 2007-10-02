@@ -9,7 +9,7 @@ import java.util.*;
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.event.PostponedEvent;
 import com.garretwilson.net.URIPath;
-import com.garretwilson.rdf.RDFResource;
+import com.garretwilson.urf.URFResource;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.event.*;
@@ -63,7 +63,7 @@ public interface GuiseSession extends PropertyBindable
 	@exception NullPointerException if the given class is <code>null</code>.
 	@exception IOException if there was an error retrieving preferences.
 	*/
-	public RDFResource getPreferences(final Class<?> objectClass) throws IOException;
+	public URFResource getPreferences(final Class<?> objectClass) throws IOException;
 
 	/**Saves preference properties for a given class.
 	@param objectClass The class for which preference properties should be saved.
@@ -71,7 +71,7 @@ public interface GuiseSession extends PropertyBindable
 	@exception NullPointerException if the given class and/or preferences is <code>null</code>.
 	@exception IOException if there was an error storing preferences.
 	*/
-	public void setPreferences(final Class<?> objectClass, final RDFResource preferences) throws IOException;
+	public void setPreferences(final Class<?> objectClass, final URFResource preferences) throws IOException;
 
 	/**Reports the base URI of the session.
 	The base URI is an absolute URI that ends with the base path of the application, which ends with a slash ('/').

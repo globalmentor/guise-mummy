@@ -3,15 +3,15 @@ package com.guiseframework.theme;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
-import com.garretwilson.rdf.*;
-import com.garretwilson.rdf.ploop.PLOOPProcessor;
+import com.garretwilson.urf.AbstractClassTypedURFResource;
+import com.garretwilson.urf.ploop.PLOOPProcessor;
 
 import static com.guiseframework.theme.Theme.*;
 
 /**An application template of a rule.
 @author Garret Wilson
 */
-public class Template extends ClassTypedRDFResource
+public class Template extends AbstractClassTypedURFResource
 {
 
 	/**Default constructor.*/
