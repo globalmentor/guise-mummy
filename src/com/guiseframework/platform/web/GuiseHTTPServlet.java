@@ -94,6 +94,7 @@ import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 import com.garretwilson.text.xml.xpath.*;
 import com.garretwilson.urf.JavaURFResourceFactory;
+import com.garretwilson.urf.URF;
 import com.garretwilson.urf.URFIO;
 import com.garretwilson.urf.URFResourceTURFIO;
 import com.garretwilson.urf.ploop.PLOOPProcessor;
@@ -253,6 +254,9 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	{
 		super.init(servletConfig);	//do the default initialization
 		Debug.log("initializing servlet", servletConfig.getServletName(), Guise.GUISE_NAME, Guise.BUILD_ID);
+		
+Debug.trace("this is a test trace");
+		
 		setReadOnly(true);	//make this servlet read-only
 		//TODO turn off directory listings, and/or fix them
 		try
@@ -282,7 +286,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		final String guiseApplicationDescriptionPath=servletConfig.getInitParameter(APPLICATION_INIT_PARAMETER);	//get name of the guise application description file
 		if(guiseApplicationDescriptionPath!=null)	//if there is a Guise application description file specified
 		{
-//TODO del Debug.trace("found path to application description:", guiseApplicationDescriptionPath);
+Debug.trace("found path to application description:", guiseApplicationDescriptionPath);
 			final String normalizedGuiseApplicationDescriptionPath=normalizePath(guiseApplicationDescriptionPath);	//normalize the path
 			if(isAbsolutePath(normalizedGuiseApplicationDescriptionPath))	//if the given path is absolute
 			{
@@ -290,9 +294,17 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 			}
 			final String absoluteGuiseApplicationDescriptionPath=WEB_INF_DIRECTORY_PATH+normalizedGuiseApplicationDescriptionPath;	//determine the context-relative absolute path of the description file
 //		TODO del Debug.trace("determined absolute path to application description:", absoluteGuiseApplicationDescriptionPath);
+			final URL guiseApplicationDescriptionURL;
 			try
 			{
-				final URL guiseApplicationDescriptionURL=servletContext.getResource(absoluteGuiseApplicationDescriptionPath);	//get the URL to the application description
+				guiseApplicationDescriptionURL=servletContext.getResource(absoluteGuiseApplicationDescriptionPath);	//get the URL to the application description
+			}
+			catch(final MalformedURLException malformedURLException)
+			{
+				throw new ServletException(malformedURLException);
+			}
+			try
+			{
 //			TODO del Debug.trace("found URL to application description", guiseApplicationDescriptionURL);
 				if(guiseApplicationDescriptionURL==null)	//if we can't find the resource
 				{
@@ -303,7 +315,11 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 				final InputStream guiseApplicationDescriptionBufferedInputStream=new BufferedInputStream(guiseApplicationDescriptionInputStream);	//get a buffered input stream to the application description 
 				try
 				{
+Debug.trace("ready ro read application description");
+Debug.trace("but first, try to convert locale URI");
+Debug.trace("succeeded", URF.asObject(URI.create("info:lang/en/US")));
 					guiseApplication=getApplicationIO().read(guiseApplicationDescriptionBufferedInputStream, guiseApplicationDescriptionURL.toURI());	//read the application description from the PLOOP TURF, using the URI of the application description as the base URI
+Debug.trace("read application description");
 /*TODO del when works
 						//TODO change to use new PLOOPResourceIO
 					final DocumentBuilder documentBuilder=createDocumentBuilder(true);	//create a new namespace-aware document builder
@@ -352,7 +368,7 @@ Debug.trace("checking for categories");
 			}
 			catch(final IOException ioException)	//if there is an I/O error
 			{
-				throw new ServletException(ioException);
+				throw new ServletException("Error in application description ("+guiseApplicationDescriptionURL+"): "+ioException.getMessage(), ioException);
 			}		
 		}
 		else	//if no application description is specified, indicate an error TODO allow Guise to support overlays in the future with default Guise applications
