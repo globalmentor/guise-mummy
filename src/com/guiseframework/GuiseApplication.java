@@ -55,7 +55,7 @@ public interface GuiseApplication extends PropertyBindable
 	/**The base path of the default Guise theme, relative to the application.*/
 	public final static URIPath GUISE_ROOT_THEME_BASE_PATH=GUISE_PUBLIC_THEMES_PATH.resolve("root/");
 	/**The path of the root Guise theme, relative to the application.*/
-	public final static URIPath GUISE_ROOT_THEME_PATH=GUISE_ROOT_THEME_BASE_PATH.resolve("root.theme.rdf");
+	public final static URIPath GUISE_ROOT_THEME_PATH=GUISE_ROOT_THEME_BASE_PATH.resolve("root.theme.turf");
 	/**The base path of the default Guise theme cursors, relative to the application.*/
 	public final static URIPath GUISE_ROOT_THEME_CURSORS_PATH=GUISE_ROOT_THEME_BASE_PATH.resolve("cursors/");
 
@@ -316,16 +316,17 @@ public interface GuiseApplication extends PropertyBindable
 	public URIPath resolvePath(final URIPath path);
 
 	/**Resolves a URI against the application base path.
-	Relative paths will be resolved relative to the application base path. Absolute paths will be considered already resolved, as will absolute URIs.
-	For an application path "/path/to/application/", resolving "relative/path" will yield "/path/to/application/relative/path",
-	while resolving "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".
+	Relative paths and relative <code>info:path/</code> URIs will be resolved relative to the application base path.
+	Absolute paths will be considered already resolved, as will absolute URIs.
+	For an application base path "/path/to/application/", resolving "info:path/relative/path" or "relative/path" will yield "/path/to/application/relative/path",
+	while resolving "info:path//absolute/path" or "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".
 	@param uri The URI to be resolved.
 	@return The URI resolved against the application base path.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	@see #getBasePath()
 	@see #resolvePath(URIPath)
 	*/
-	public URI resolveURI(final URI uri);
+	public URI resolveURI(URI uri);
 
 	/**Changes an absolute path to an application-relative path.
 	For an application base path "/path/to/application/", relativizing "/path/to/application/relative/path" will yield "relative/path"

@@ -6,7 +6,6 @@ import java.net.URL;
 import java.security.Principal;
 import java.text.DateFormat;
 import java.util.*;
-
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 import java.util.concurrent.*;
@@ -16,21 +15,20 @@ import javax.mail.Message;
 
 import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.io.*;
-import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.mail.MailManager;
-
-import static com.garretwilson.lang.ThreadUtilities.*;
-
-import com.garretwilson.net.URIPath;
-import com.garretwilson.rdf.*;
-import com.garretwilson.text.W3CDateFormat;
-import com.garretwilson.urf.TypedURFResourceTURFIO;
-import com.garretwilson.util.*;
-
 import static com.garretwilson.io.FileConstants.*;
 import static com.garretwilson.io.FileUtilities.*;
+import com.garretwilson.lang.ObjectUtilities;
 import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.ThreadUtilities.*;
+import com.garretwilson.mail.MailManager;
+import static com.garretwilson.net.URIConstants.*;
+import static com.garretwilson.net.URIUtilities.*;
+import com.garretwilson.net.URIPath;
+import com.garretwilson.text.W3CDateFormat;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
+import com.garretwilson.urf.*;
+import static com.garretwilson.urf.URF.*;
+import com.garretwilson.util.*;
 import static com.garretwilson.util.CalendarUtilities.*;
 import static com.garretwilson.util.LocaleUtilities.*;
 
@@ -39,7 +37,7 @@ import static com.guiseframework.GuiseResourceConstants.*;
 import com.guiseframework.component.*;
 import static com.guiseframework.Resources.*;
 import com.guiseframework.theme.Theme;
-import static com.guiseframework.theme.Theme.THEME_NAMESPACE_URI;
+import static com.guiseframework.theme.Theme.*;
 
 import com.guiseframework.platform.DefaultEnvironment;
 import com.guiseframework.platform.Environment;
@@ -53,7 +51,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 {
 
 	/**I/O for loading themes.*/
-	private final static IO<Theme> themeIO=new TypedRDFResourceIO<Theme>(Theme.class, THEME_NAMESPACE_URI);	//create I/O for loading the theme
+	private final static IO<Theme> themeIO=new TypedURFResourceTURFIO<Theme>(Theme.class, THEME_NAMESPACE_URI);	//create I/O for loading the theme
 
 		/**@return I/O for loading themes.*/
 		protected static IO<Theme> getThemeIO() {return themeIO;}
@@ -749,17 +747,22 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	}
 
 	/**Resolves a URI against the application base path.
-	Relative paths will be resolved relative to the application base path. Absolute paths will be considered already resolved, as will absolute URIs.
-	For an application base path "/path/to/application/", resolving "relative/path" will yield "/path/to/application/relative/path",
-	while resolving "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".
+	Relative paths and relative <code>info:path/</code> URIs will be resolved relative to the application base path.
+	Absolute paths will be considered already resolved, as will absolute URIs.
+	For an application base path "/path/to/application/", resolving "info:path/relative/path" or "relative/path" will yield "/path/to/application/relative/path",
+	while resolving "info:path//absolute/path" or "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".
 	@param uri The URI to be resolved.
 	@return The URI resolved against the application base path.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	@see #getBasePath()
 	@see #resolvePath(URIPath)
 	*/
-	public URI resolveURI(final URI uri)
+	public URI resolveURI(URI uri)
 	{
+		if(isInfoNamespace(uri, INFO_SCHEME_PATH_NAMESPACE))	//if this is an info:path/ URI
+		{
+			uri=URI.create(getInfoRawIdentifier(uri));	//get the raw info identifier, which will be the path
+		}
 		return getBasePath().resolve(checkInstance(uri, "URI cannot be null."));	//resolve the given URI against the base path
 	}
 
@@ -1121,7 +1124,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	{
 		final ClassLoader loader=getClass().getClassLoader();	//get our class loader
 			//default resources
-		ResourceBundle resourceBundle=ResourceBundleUtilities.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null, resourcesIO, Resources.RESOURCES_NAMESPACE_URI, null, null);	//load the default resource bundle
+		ResourceBundle resourceBundle=ResourceBundleUtilities.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null, resourcesIO, STRING_NAMESPACE_URI, null, null);	//load the default resource bundle
 			//theme resources
 		resourceBundle=loadResourceBundle(theme, locale, resourceBundle);	//load any resources for this theme and resolving parents
 			//application resources
@@ -1129,7 +1132,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 //TODO del Debug.trace("ready to load application resources; resource bundle base name:", resourceBundleBaseName);
 		if(resourceBundleBaseName!=null && !resourceBundleBaseName.equals(DEFAULT_RESOURCE_BUNDLE_BASE_NAME))	//if a distinct resource bundle base name was specified
 		{
-			resourceBundle=ResourceBundleUtilities.getResourceBundle(resourceBundleBaseName, locale, loader, resourceBundle, resourcesIO, Resources.RESOURCES_NAMESPACE_URI, null, null);	//load the new resource bundle, specifying the current resource bundle as the parent					
+			resourceBundle=ResourceBundleUtilities.getResourceBundle(resourceBundleBaseName, locale, loader, resourceBundle, resourcesIO, STRING_NAMESPACE_URI, null, null);	//load the new resource bundle, specifying the current resource bundle as the parent					
 		}
 		return resourceBundle;	//return the resource bundle
 	}
@@ -1152,23 +1155,17 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		{
 			resourceBundle=loadResourceBundle(parentTheme, locale, parentResourceBundle);	//get the parent resource bundle first and use that as the parent
 		}
-		for(final RDFObject resourcesObject:theme.getResourcesObjects(locale))	//for each resources object in the theme
+		for(final URFResource resourceResource:theme.getResourceResources(locale))	//for each resources object in the theme
 		{
-			if(resourcesObject instanceof RDFResource)	//if this is a RDFResource
+			final URI resourcesURI=resourceResource.getURI();	//get the resources reference URI if any
+			if(resourcesURI!=null)	//if there are external resources specified
 			{
-				final RDFResource resources=(RDFResource)resourcesObject;	//get the resource RDFResource
-				final URI resourcesURI=resources.getURI();	//get the resources reference URI if any
-				if(resourcesURI!=null)	//if there are external resources specified
-				{
-					resourceBundle=loadResourceBundle(resourcesURI, resourceBundle);	//load the resources and insert it into the chain
-				}
-				final Map<String, Object> resourceMap=ResourceBundleUtilities.toMap(resources, URI.create("http://guiseframework.com/namespaces/resource#"));	//TODO del when switched to URF
-//TODO bring back after switching to URF				final Map<String, Object> resourceMap=ResourceBundleUtilities.toMap(resources, Resources.RESOURCES_NAMESPACE_URI);	//generate a map from the local resources TODO cache this if possible
-				if(!resourceMap.isEmpty())	//if any resources are defined locally
-				{
-					resourceBundle=new HashMapResourceBundle(resourceMap, resourceBundle);	//create a new hash map resource bundle with resources and the given parent and insert it into the chain
-					
-				}
+				resourceBundle=loadResourceBundle(resourcesURI, resourceBundle);	//load the resources and insert it into the chain
+			}
+			final Map<String, Object> resourceMap=ResourceBundleUtilities.toMap(resourceResource, STRING_NAMESPACE_URI);	//generate a map from the local resources TODO cache this if possible
+			if(!resourceMap.isEmpty())	//if any resources are defined locally
+			{
+				resourceBundle=new HashMapResourceBundle(resourceMap, resourceBundle);	//create a new hash map resource bundle with resources and the given parent and insert it into the chain				
 			}
 		}
 		return resourceBundle;	//return the end of the resource bundle chain
@@ -1194,8 +1191,12 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			try
 			{
 				final Resources resources=getResourcesIO().read(resourcesInputStream, resourceBundleURI);	//load the resources
-				resourceMap=ResourceBundleUtilities.toMap(resources, Resources.RESOURCES_NAMESPACE_URI);	//generate a map from the resources
+				resourceMap=ResourceBundleUtilities.toMap(resources, STRING_NAMESPACE_URI);	//generate a map from the resources
 				cachedResourceMapMap.put(resourceBundleURI, resourceMap);	//cache the map for later
+			}
+			catch(final IOException ioException)	//if there was an error loading the resource bundle
+			{
+				throw new IOException("Error loading resource bundle ("+resourceBundleURI+"): "+ioException.getMessage(), ioException);
 			}
 			finally
 			{
@@ -1248,6 +1249,10 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 				throw (IOException)new IOException(classNotFoundException.getMessage()).initCause(classNotFoundException);
 			}
 			return theme;	//return the theme
+		}
+		catch(final IOException ioException)	//if there was an error loading the theme
+		{
+			throw new IOException("Error loading theme ("+themeURI+"): "+ioException.getMessage(), ioException);
 		}
 		finally
 		{

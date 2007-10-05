@@ -5,33 +5,33 @@
 	dc.creator="Garret Wilson",
 
 	*general application labels*
-	application_name="Unnamed Guise™ Application",
-	application_name_short="\“application_name\”",
-	application_label="\“application_name\” \“application_version\”",
-	application_description="This application uses the Guise™ framework.",
-	application_copyright="",
-	application_version="0.0.0",
+	"application.name"="Unnamed Guise™ Application",
+	"application.name.short"="\“application.name\”",
+	"application.label"="\“application.name\” \“application.version\”",
+	"application.description"="This application uses the Guise™ framework.",
+	"application.copyright"="",
+	"application.version"="0.0.0",
 
 	*Guise converters*
-	converter_invalid_value_message="Invalid value: \"{0}\".",
+	"converter.invalid.value.message"="Invalid value: \"{0}\".",
 	
 	*Guise validators*
-	validator_value_required_message="Value required.",
-	validator_invalid_value_message="Invalid value: \"{0}\".",
+	"validator.value.required.message"="Value required.",
+	"validator.invalid.value.message"="Invalid value: \"{0}\".",
 	*general validation errors*
-	validation_false_message="One or more values you entered are invalid.",
+	"validation.false.message"="One or more values you entered are invalid.",
 
 	*vCard*
-	text_directory_vcard_n_family_name_label="Last",
-	text_directory_vcard_n_family_name_info="The last or family name. Separate multiple family names with commas.",
-	text_directory_vcard_n_given_name_label="First",
-	text_directory_vcard_n_given_name_info="The first or given name. Separate multiple given names with commas.",
-	text_directory_vcard_n_additional_name_label="Middle",
-	text_directory_vcard_n_additional_name_info="The middle or additional name. Separate multiple additional names with commas.",
-	text_directory_vcard_n_honorific_prefix_label="Prefix",
-	text_directory_vcard_n_honorific_prefix_info="Any honorific prefix. Separate multiple honorific prefixes with commas.",
-	text_directory_vcard_n_honorific_prefix_choices=["Dr.", "Miss.", "Mr.", "Mrs.", "Ms.", "Prof."],
-	text_directory_vcard_n_honorific_suffix_label="Suffix",
-	text_directory_vcard_n_honorific_suffix_info="Any honorific suffix. Separate multiple honorific suffixes with commas.",
-	text_directory_vcard_n_honorific_suffix_choices=["I", "II", "III", "Jr.", "Sr."]
+	"text.directory.vcard.n.family.name.label"="Last",
+	"text.directory.vcard.n.family.name.info"="The last or family name. Separate multiple family names with commas.",
+	"text.directory.vcard.n.given.name.label"="First",
+	"text.directory.vcard.n.given.name.info"="The first or given name. Separate multiple given names with commas.",
+	"text.directory.vcard.n.additional.name.label"="Middle",
+	"text.directory.vcard.n.additional.name.info"="The middle or additional name. Separate multiple additional names with commas.",
+	"text.directory.vcard.n.honorific.prefix.label"="Prefix",
+	"text.directory.vcard.n.honorific.prefix.info"="Any honorific prefix. Separate multiple honorific prefixes with commas.",
+	"text.directory.vcard.n.honorific.prefix.choices"=["Dr.", "Miss.", "Mr.", "Mrs.", "Ms.", "Prof."],
+	"text.directory.vcard.n.honorific.suffix.label"="Suffix",
+	"text.directory.vcard.n.honorific.suffix.info"="Any honorific suffix. Separate multiple honorific suffixes with commas.",
+	"text.directory.vcard.n.honorific.suffix.choices"=["I", "II", "III", "Jr.", "Sr."]
 ;

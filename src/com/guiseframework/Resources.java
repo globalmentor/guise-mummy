@@ -26,12 +26,12 @@ public class Resources extends AbstractClassTypedURFResource
 	public final static char STRING_VALUE_REFERENCE_PREFIX_CHAR='=';
 
 		//standard labels
-	public final static String APPLICATION_NAME=createStringResourceReference("application_name");
-	public final static String APPLICATION_NAME_SHORT=createStringResourceReference("application_name_short");
-	public final static String APPLICATION_LABEL=createStringResourceReference("application_label");
-	public final static String APPLICATION_DESCRIPTION=createStringResourceReference("application_description");
-	public final static String APPLICATION_COPYRIGHT=createStringResourceReference("application_copyright");
-	public final static String APPLICATION_VERSION=createStringResourceReference("application_version");
+	public final static String APPLICATION_NAME=createStringResourceReference("application.name");
+	public final static String APPLICATION_NAME_SHORT=createStringResourceReference("application.name.short");
+	public final static String APPLICATION_LABEL=createStringResourceReference("application.label");
+	public final static String APPLICATION_DESCRIPTION=createStringResourceReference("application.description");
+	public final static String APPLICATION_COPYRIGHT=createStringResourceReference("application.copyright");
+	public final static String APPLICATION_VERSION=createStringResourceReference("application.version");
 
 	/**Default constructor.*/
 	public Resources()

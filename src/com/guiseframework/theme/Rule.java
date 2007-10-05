@@ -4,8 +4,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
-
-import com.garretwilson.rdf.*;
+import com.garretwilson.urf.AbstractClassTypedURFResource;
+import com.garretwilson.urf.select.Selector;
+import static com.garretwilson.urf.select.Select.*;
 import com.garretwilson.urf.ploop.PLOOPProcessor;
 
 import static com.guiseframework.theme.Theme.*;
@@ -13,7 +14,7 @@ import static com.guiseframework.theme.Theme.*;
 /**A rule for specifying part of a theme.
 @author Garret Wilson
 */
-public class Rule extends ClassTypedRDFResource
+public class Rule extends AbstractClassTypedURFResource
 {
 
 	/**Default constructor.*/
@@ -30,18 +31,16 @@ public class Rule extends ClassTypedRDFResource
 		super(referenceURI, THEME_NAMESPACE_URI);  //construct the parent class
 	}
 
-	/**@return This rule's select declaration, or <code>null</code> if this rule has no <code>theme:select</code> property.
-	@exception ClassCastException if the value of the <code>theme:select</code> property is not a {@link Selector}.
-	*/
+	/**@return This rule's select declaration, or <code>null</code> if this rule has no <code>select.select</code> property or the value is not a {@link Selector}.*/
 	public Selector getSelect() throws ClassCastException
 	{
-		return (Selector)getPropertyValue(THEME_NAMESPACE_URI, SELECT_PROPERTY_NAME);	//return the theme:select value
+		return asInstance(getPropertyValue(SELECT_PROPERTY_URI), Selector.class);	//return the select.select value
 	}
 
-	/**@return This rule's apply declaration, or <code>null</code> if this rule has no <code>theme:apply</code> selector or the value is not of the correct type.*/
+	/**@return This rule's apply declaration, or <code>null</code> if this rule has no <code>theme.apply</code> selector or the value is not a {@link Template}.*/
 	public Template getApply()
 	{
-		return asInstance(getPropertyValue(THEME_NAMESPACE_URI, APPLY_PROPERTY_NAME), Template.class);	//return the theme:apply value if it is a Template
+		return asInstance(getPropertyValue(APPLY_PROPERTY_URI), Template.class);	//return the theme.apply value if it is a Template
 	}
 
 	/**Applies this rule to the given object.

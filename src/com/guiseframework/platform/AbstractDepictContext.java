@@ -6,7 +6,7 @@ import java.util.*;
 import static java.util.Collections.*;
 
 import com.garretwilson.beans.BoundPropertyObject;
-import com.garretwilson.rdf.RDFResource;
+import com.garretwilson.urf.URFResource;
 import com.guiseframework.*;
 import com.guiseframework.theme.Theme;
 
@@ -63,11 +63,11 @@ public abstract class AbstractDepictContext extends BoundPropertyObject implemen
 		this.platform=session.getPlatform();	//save the platform
 		final GuiseApplication application=session.getApplication();	//get the application
 		final List<URI> styleURIs=new ArrayList<URI>();	//create a new list to hold styles
-				//theme styles
+			//theme styles
 		Theme theme=session.getTheme();	//get the current session theme TODO this currently can't be null; finalize the API
 		while(theme!=null)	//while there are themes
 		{
-			for(final RDFResource style:theme.getStyles())	//get the styles
+			for(final URFResource style:theme.getStyles())	//get the styles
 			{
 				final URI styleURI=style.getURI();	//get this style's URI
 				if(styleURI!=null)	//if this style has a URI

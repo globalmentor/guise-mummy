@@ -286,7 +286,6 @@ Debug.trace("this is a test trace");
 		final String guiseApplicationDescriptionPath=servletConfig.getInitParameter(APPLICATION_INIT_PARAMETER);	//get name of the guise application description file
 		if(guiseApplicationDescriptionPath!=null)	//if there is a Guise application description file specified
 		{
-Debug.trace("found path to application description:", guiseApplicationDescriptionPath);
 			final String normalizedGuiseApplicationDescriptionPath=normalizePath(guiseApplicationDescriptionPath);	//normalize the path
 			if(isAbsolutePath(normalizedGuiseApplicationDescriptionPath))	//if the given path is absolute
 			{
@@ -315,48 +314,8 @@ Debug.trace("found path to application description:", guiseApplicationDescriptio
 				final InputStream guiseApplicationDescriptionBufferedInputStream=new BufferedInputStream(guiseApplicationDescriptionInputStream);	//get a buffered input stream to the application description 
 				try
 				{
-Debug.trace("ready ro read application description");
-Debug.trace("but first, try to convert locale URI");
-Debug.trace("succeeded", URF.asObject(URI.create("info:lang/en/US")));
 					guiseApplication=getApplicationIO().read(guiseApplicationDescriptionBufferedInputStream, guiseApplicationDescriptionURL.toURI());	//read the application description from the PLOOP TURF, using the URI of the application description as the base URI
-Debug.trace("read application description");
-/*TODO del when works
-						//TODO change to use new PLOOPResourceIO
-					final DocumentBuilder documentBuilder=createDocumentBuilder(true);	//create a new namespace-aware document builder
-					final Document document=documentBuilder.parse(guiseApplicationDescriptionBufferedInputStream);	//parse the description document
-//				TODO del Debug.trace("application description:", XMLUtilities.toString(document));
-					final RDFXMLProcessor rdfProcessor=new RDFXMLProcessor();	//create a new RDF processor
-					final RDF rdf=rdfProcessor.processRDF(document, guiseApplicationDescriptionURL.toURI());	//process the RDF from the XML, using the URI o the application description as the base URI
-					final PLOOPProcessor ploopProcessor=new PLOOPProcessor();	//create a new PLOOP processor
-					guiseApplication=ploopProcessor.getObject(rdf, AbstractGuiseApplication.class);	//create and retrieve the Guise application from the RDF instance
-					if(guiseApplication==null)	//if there is no Guise application described
-					{
-						throw new ServletException("Guise application description document did not describe a Guise application.");
-					}
-*/
-/*TODO del					
-Debug.trace("checking for categories");
-					for(final Destination destination:guiseApplication.getDestinations())	//for each destination
-					{
-						Debug.trace("looking at destination", destination.getPath());
-						for(final Category category:destination.getCategories())
-						{
-							Debug.trace("destination has category", category.getID());
-							for(final Category subcategory:category.getCategories())
-							{
-								Debug.trace("category has subcategory", subcategory.getID());
-							}
-						}
-					}
-*/
 				}
-/*TODO del
-				catch(Exception exception)
-				{
-					Debug.error(exception);
-					throw new ServletException(exception);
-				}
-*/
 				catch(final URISyntaxException uriSyntaxException)
 				{
 					throw new ServletException(uriSyntaxException);
