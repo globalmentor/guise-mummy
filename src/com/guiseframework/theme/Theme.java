@@ -1,17 +1,14 @@
 package com.guiseframework.theme;
 
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import static java.util.Collections.*;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
-
 import com.garretwilson.urf.*;
 import static com.garretwilson.urf.URF.*;
-import static com.garretwilson.urf.select.Select.SELECTOR_PROPERTY_URI;
-
 import com.garretwilson.urf.ploop.PLOOPProcessor;
 import com.garretwilson.urf.select.*;
 import com.garretwilson.urf.xml.XML;
@@ -42,16 +39,10 @@ public class Theme extends AbstractClassTypedURFResource
 		//properties
 	/**The apply property name.*/
 	public final static URI APPLY_PROPERTY_URI=createResourceURI(THEME_NAMESPACE_URI, "apply");
-	/**The class property name; the local name of <code>theme:class</code>.*/
-//TODO del	public final static String CLASS_PROPERTY_NAME="class";
-	/**The declarations property name; the local name of <code>theme:declarations</code>.*/
-//TODO del	public final static String DECLARATIONS_PROPERTY_NAME="declarations";
-	/**The property property name; the local name of <code>theme:property</code>.*/
-//TODO del	public final static String PROPERTY_PROPERTY_NAME="property";
-	/**The resources property name; the local name of <code>theme:resources</code>.*/
+	/**The property for the URI of the theme's parent.*/
+	public final static URI PARENT_URI_PROPERTY_URI=createResourceURI(THEME_NAMESPACE_URI, "parentURI");
+	/**The resources property name.*/
 	public final static URI RESOURCES_PROPERTY_URI=createResourceURI(THEME_NAMESPACE_URI, "resources");
-	/**The select property name; the local name of <code>theme:select</code>.*/
-//TODO del	public final static String SELECT_PROPERTY_NAME="select";
 
 	/**The theme parent, or <code>null</code> if there is no resolving parent.*/
 	private Theme parent=null;
@@ -105,6 +96,14 @@ public class Theme extends AbstractClassTypedURFResource
 	public Theme(final URI referenceURI)
 	{
 		super(referenceURI, THEME_NAMESPACE_URI);  //construct the parent class
+	}
+
+	/**Retrieves the URI indicating the parent theme.
+	@return The URI indicating the parent theme, or <code>null</code> if no parent theme is indicated or the value is not a URI.
+	*/
+	public URI getParentURI()
+	{
+		return asURI(getPropertyValue(PARENT_URI_PROPERTY_URI));	//return the theme.parent property as a URI
 	}
 
 	/**Retrieves the resources URF resources.

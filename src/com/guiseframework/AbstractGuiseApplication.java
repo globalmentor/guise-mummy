@@ -568,28 +568,28 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		}
 
 	/**The absolute or application-relative URI of the application style, or <code>null</code> if the default style should be used.*/
-	private URI style;
+	private URI styleURI;
 
 		/**@return The absolute or application-relative URI of the application style, or <code>null</code> if the default style should be used.*/
-		public URI getStyle() {return style;}
+		public URI getStyleURI() {return styleURI;}
 
 		/**Sets the URI of the style of the application.
 		This is a bound property.
 		@param newStyle The URI of the application style, or <code>null</code> if the default style should be used.
-		@see GuiseApplication#STYLE_PROPERTY
+		@see GuiseApplication#STYLE_URI_PROPERTY
 		*/
-		public void setStyle(final URI newStyle)
+		public void setStyleURI(final URI newStyle)
 		{
-			if(!ObjectUtilities.equals(style, newStyle))	//if the value is really changing (compare their values, rather than identity)
+			if(!ObjectUtilities.equals(styleURI, newStyle))	//if the value is really changing (compare their values, rather than identity)
 			{
-				final URI oldStyle=style;	//get the old value
-				style=newStyle;	//actually change the value
-				firePropertyChange(STYLE_PROPERTY, oldStyle, newStyle);	//indicate that the value changed
+				final URI oldStyle=styleURI;	//get the old value
+				styleURI=newStyle;	//actually change the value
+				firePropertyChange(STYLE_URI_PROPERTY, oldStyle, newStyle);	//indicate that the value changed
 			}
 		}
 
 	/**The URI of the application theme, to be resolved against the application base path.*/
-	private URI themeURI=GUISE_ROOT_THEME_PATH.toURI();
+	private URI themeURI=GUISE_BASIC_THEME_PATH.toURI();
 
 		/**@return The URI of the application theme, to be resolved against the application base path.*/
 		public URI getThemeURI() {return themeURI;}
@@ -1222,23 +1222,27 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	*/
 	public Theme loadTheme(final URI themeURI) throws IOException
 	{
-		final InputStream themeInputStream=getInputStream(themeURI);	//ask the application to get the input stream, so that the resource can be loaded directly if possible
+		final URI resolvedThemeURI=resolveURI(themeURI);	//resolve the theme URI against the application path; getInputStream() will do this to, but we will need this resolved URI later in this method
+		final InputStream themeInputStream=getInputStream(resolvedThemeURI);	//ask the application to get the input stream, so that the resource can be loaded directly if possible
 		if(themeInputStream==null)	//if there is no such theme
 		{
-			throw new FileNotFoundException("Missing theme resource: "+themeURI);	//indicate that the theme cannot be found
+			throw new FileNotFoundException("Missing theme resource: "+resolvedThemeURI);	//indicate that the theme cannot be found
 		}
 		final InputStream bufferedThemeInputStream=new BufferedInputStream(themeInputStream);	//get a buffered input stream to the theme
 		try
 		{
-			final Theme theme=getThemeIO().read(bufferedThemeInputStream, themeURI);	//read this theme
-				//TODO check for a specified parent theme
-			final URI resolvedThemeURI=resolveURI(themeURI);	//resolve the theme URI against the application path
+			final Theme theme=getThemeIO().read(bufferedThemeInputStream, resolvedThemeURI);	//read this theme
 			final URI rootThemeURI=GUISE_ROOT_THEME_PATH.toURI();	//get the application-relative URI to the root theme
 			final URI resolvedRootThemeURI=resolveURI(rootThemeURI);	//get the resolved path URI to the root theme
-			if(!resolvedThemeURI.equals(resolvedRootThemeURI))	//if this is not the root theme, load the default theme and set it as parent
+			if(!resolvedThemeURI.equals(resolvedRootThemeURI))	//if this is not the root theme, load the parent theme
 			{
-				final Theme parentTheme=loadTheme(rootThemeURI);	//load the root theme
-				theme.setParent(parentTheme);	//set the default theme as the parent theme
+				URI parentURI=theme.getParentURI();	//get the parent designation, if any TODO detect circular references
+				if(parentURI==null)	//if no parent was designated
+				{
+					parentURI=rootThemeURI;	//use the root theme for the parent theme
+				}
+				final Theme parentTheme=loadTheme(parentURI);	//load the parent theme
+				theme.setParent(parentTheme);	//set the parent theme
 			}
 			try
 			{
@@ -1252,7 +1256,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		}
 		catch(final IOException ioException)	//if there was an error loading the theme
 		{
-			throw new IOException("Error loading theme ("+themeURI+"): "+ioException.getMessage(), ioException);
+			throw new IOException("Error loading theme ("+resolvedThemeURI+"): "+ioException.getMessage(), ioException);
 		}
 		finally
 		{

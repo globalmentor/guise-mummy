@@ -1,0 +1,225 @@
+|select|<http://urf.name/select>,
+|theme|<http://guiseframework.com/namespaces/theme>,
+|component|<info:java/com/guiseframework/component>,
+|layout|<info:java/com/guiseframework/component/layout>,
+|geometry|<info:java/com/guiseframework/geometry>,
+|resources|<http://guiseframework.com/namespaces/resources>,
+|style|<info:java/com/guiseframework/style>,
+|dc|<http://purl.org/dc/elements/1.1/>,
+
+(theme.Theme):
+	dc.title="Guise™ Basic Theme",
+	dc.description="The bland, basic, default Guise™ theme.",
+	dc.rights="Copyright © 2007 GlobalMentor, Inc.",
+	dc.creator="Garret Wilson"
+
+	resources=(resources.Resources):
+		*<resource:theme.color.text>slategray</resource:theme.color.text>*
+		"theme.color.subordinateA"="whitesmoke",
+		"theme.color.menu"="whitesmoke",
+		"theme.color.border"="gainsboro",
+		*<resource:theme.color.border>&#x0098;theme.color.subordinateA&#x009C;</resource:theme.color.border>*
+		"theme.color.link"="cornflowerblue"
+	;
+;
+[
+	*ActionControl*
+	(theme.Rule):
+		select.selector=(ObjectClassSelector):
+			selectClass=component.ActionControl
+		;,
+		apply=(Template):
+			cursor=<resource:theme.cursor.action>
+		;
+	;,
+	*CheckControl*
+	(theme.Rule):
+		select.selector=(ObjectClassSelector):
+			selectClass=component.CheckControl
+		;,
+		apply=(Template):
+			cursor=<resource:theme.cursor.pointer>
+		;
+	;,
+	*Frame*
+	(theme.Rule):
+		select.selector=(ObjectClassSelector):
+			selectClass=component.Frame
+		;,
+		apply=(Template):
+			fontFamilies=["Arial", "sans-serif"],
+			fontSize=(geometry.Extent)[#10, "point"]
+		;
+	;,
+	*Heading*
+	(theme.Rule):
+		select.selector=(ObjectClassSelector):
+			selectClass=component.Heading
+		;,
+		apply=(Template):
+			fontFamilies=["Tahoma", "Arial", "sans-serif"]
+		;
+	;,
+	*Link*
+	(theme.Rule):	*Link not a child of Menu*
+		select.selector=(IntersectionSelector):
+			selector=(ObjectClassSelector):
+				selectClass=component.Link
+			;,
+			select.selector=(NegationSelector):
+				selector=(ObjectPropertySelector):
+					selectPropertyName="parent",
+					selector=(ObjectClassSelector):
+						selectClass=component.Menu
+					;,
+				;
+			;
+		;,
+		apply=(Template):
+			color=(style.ResourceColor)["theme.color.link"],
+		;
+	;,
+	*SectionPanel*
+	(theme.Rule):
+		select.selector=(ObjectClassSelector):
+			selectClass=component.SectionPanel
+		;,
+		apply=(Template):
+			backgroundColor=(style.ResourceColor)["theme.color.subordinateA"],
+			borderStyle="solid",
+			borderExtent=(geometry.Extent)[#1, "pixel"],
+			borderColor=(style.ResourceColor)["theme.color.border"],
+			marginExtent=(geometry.Extent)[#0.5, "em"],
+			paddingExtent=(geometry.Extent)[#0.5, "em"]
+		;
+	;,
+	*Menu*
+	(theme.Rule): * all menus *
+		select.selector=(ObjectClassSelector):
+			selectClass=component.Menu
+		;,
+		apply=(Template):
+			paddingExtent=(geometry.Extent)[#0.5, "em"]
+		;
+	;,
+	*Menu*
+	(theme.Rule):	*root menu*
+		select.selector=(IntersectionSelector):
+			selector=(ObjectClassSelector):
+				selectClass=component.Menu
+			;,
+			select.selector=(NegationSelector):
+				selector=(ObjectPropertySelector):
+					selectPropertyName="parent",
+					selector=(ObjectClassSelector):
+						selectClass=component.Menu
+					;,
+				;
+			;
+		;,
+		apply=(Template):
+			borderPageFarStyle="groove",
+			borderPageFarExtent=(geometry.Extent)[#2, "pixel"]
+			borderPageFarColor=(style.ResourceColor)["theme.color.border"],
+			fontFamilies=["Tahoma", "Arial", "sans-serif"],
+			fontSize=(geometry.Extent)[#8, "point"]
+		;
+	;,
+	(theme.Rule):	*submenu*
+		select.selector=(IntersectionSelector):
+			selector=(ObjectClassSelector):
+				selectClass=component.Menu
+			;,
+			selector=(ObjectPropertySelector):
+				selectPropertyName="parent",
+				selector=(ObjectClassSelector):
+					selectClass=component.Menu
+				;,
+			;
+		;,
+		apply=(Template):
+			borderStyle="solid",
+			borderExtent=(geometry.Extent)[#1, "pixel"]
+			borderColor=(style.ResourceColor)["theme.color.border"],
+			fontSize=(geometry.Extent)[#8, "point"]
+		;
+	;,
+	*SliderControl*
+	(theme.Rule):
+		select.selector=(ObjectClassSelector):
+			selectClass=component.SliderControl
+		;,
+		apply=(Template):
+			cursor=<resource:theme.cursor.pointer>
+		;
+	;,
+	*Table*
+	(theme.Rule):
+		select.selector=(ObjectClassSelector):
+			selectClass=component.Table
+		;,
+		apply=(Template):
+			columnLabelFontWeight=#0.75,
+			columnPaddingLineNearExtent=(geometry.Extent)[#0.5, "em"],
+			columnPaddingLineFarExtent=(geometry.Extent)[#0.5, "em"]
+		;
+	;,
+	*Toolbar*
+	(theme.Rule):
+		select.selector=(ObjectClassSelector):
+			selectClass=component.Toolbar
+		;,
+		apply=(Template):
+			borderPageFarStyle="groove",
+			borderPageFarExtent=(geometry.Extent)[#2, "pixel"],
+			columnPaddingLineFarExtent=(geometry.Extent)[#0.5, "em"],
+			borderPageFarColor=(style.ResourceColor)["theme.color.border"],
+			fontFamilies=["Tahoma", "Arial", "sans-serif"],
+			fontSize=(geometry.Extent)[#8, "point"],
+			paddingExtent=(geometry.Extent)[#0.5, "em"]
+		;
+	;,
+
+	(theme.Rule): *flow layout*
+		select.selector=(ObjectClassSelector):
+			selectClass=layout.FlowLayout
+		;,
+		apply=(Template):
+			gap=(geometry.Extent)[#0.25, "em"]
+		;
+	;,
+
+	(theme.Rule): *menu layout*
+		select.selector=(ObjectClassSelector):
+			selectClass=layout.MenuLayout
+		;,
+		apply=(Template):
+			gap=(geometry.Extent)[#0.25, "em"]
+		;
+	;,
+
+	(theme.Rule):	*region layout of a frame's content component*
+		select.selector=(IntersectionSelector):
+			selector=(ObjectClassSelector):
+				selectClass=layout.RegionLayout
+			;,
+			selector=(ObjectPropertySelector):
+				selectPropertyName="owner",
+				selector=(IntersectionSelector):
+					selector=(ObjectClassSelector):
+						selectClass=«info:java/com/guiseframework/component#Component»
+					;,
+					selector=(ObjectPropertySelector):
+						selectPropertyName="parent",
+						selector=(ObjectClassSelector):
+							selectClass=«info:java/com/guiseframework/component#Menu»
+						;,
+					;
+				;
+			;
+		;,
+		apply=(Template):
+			paddingExtent=(geometry.Extent)[#0.5, "em"]
+		;
+	;
+]

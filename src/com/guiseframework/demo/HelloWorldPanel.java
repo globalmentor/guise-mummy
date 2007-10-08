@@ -4,7 +4,7 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.RegionLayout;
 
 /**Hello World Guise demonstration panel.
-Copyright © 2005-2007 GlobalMentor, Inc.
+Copyright â„¢ 2005-2007 GlobalMentor, Inc.
 Demonstrates layout panels, region layouts, and headings.
 @author Garret Wilson
 */

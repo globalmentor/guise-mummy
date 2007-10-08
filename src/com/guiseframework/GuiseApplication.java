@@ -27,8 +27,8 @@ public interface GuiseApplication extends PropertyBindable
 	public final static String LOCALES_PROPERTY=getPropertyName(GuiseApplication.class, "locales");
 	/**The resource bundle base name bound property.*/
 	public final static String RESOURCE_BUNDLE_BASE_NAME_PROPERTY=getPropertyName(GuiseApplication.class, "resourceBundleBaseName");
-	/**The style bound property.*/
-	public final static String STYLE_PROPERTY=getPropertyName(GuiseApplication.class, "style");
+	/**The style URI bound property.*/
+	public final static String STYLE_URI_PROPERTY=getPropertyName(GuiseApplication.class, "styleURI");
 	/**The theme URI bound property.*/
 	public final static String THEME_URI_PROPERTY=getPropertyName(GuiseApplication.class, "themeURI");
 	/**The bound property of whether this application applies themes.*/
@@ -52,10 +52,14 @@ public interface GuiseApplication extends PropertyBindable
 	public final static URIPath GUISE_PUBLIC_JAVASCRIPT_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH.resolve("javascript/");
 	/**The base path of public themes, relative to the application.*/
 	public final static URIPath GUISE_PUBLIC_THEMES_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH.resolve("themes/");
-	/**The base path of the default Guise theme, relative to the application.*/
-	public final static URIPath GUISE_ROOT_THEME_BASE_PATH=GUISE_PUBLIC_THEMES_PATH.resolve("root/");
-	/**The path of the root Guise theme, relative to the application.*/
-	public final static URIPath GUISE_ROOT_THEME_PATH=GUISE_ROOT_THEME_BASE_PATH.resolve("root.theme.turf");
+		/**The base path of the default Guise theme, relative to the application.*/
+		public final static URIPath GUISE_ROOT_THEME_BASE_PATH=GUISE_PUBLIC_THEMES_PATH.resolve("root/");
+			/**The path of the root Guise theme, relative to the application.*/
+			public final static URIPath GUISE_ROOT_THEME_PATH=GUISE_ROOT_THEME_BASE_PATH.resolve("root.theme.turf");
+		/**The base path of the basic Guise theme, relative to the application.*/
+		public final static URIPath GUISE_BASIC_THEME_BASE_PATH=GUISE_PUBLIC_THEMES_PATH.resolve("basic/");
+			/**The path of the basic Guise theme, relative to the application.*/
+			public final static URIPath GUISE_BASIC_THEME_PATH=GUISE_BASIC_THEME_BASE_PATH.resolve("basic.theme.turf");
 	/**The base path of the default Guise theme cursors, relative to the application.*/
 	public final static URIPath GUISE_ROOT_THEME_CURSORS_PATH=GUISE_ROOT_THEME_BASE_PATH.resolve("cursors/");
 
@@ -135,14 +139,14 @@ public interface GuiseApplication extends PropertyBindable
 	public void setThemed(final boolean newThemed);
 
 	/**@return The absolute or application-relative URI of the application style, or <code>null</code> if the default style should be used.*/
-	public URI getStyle();
+	public URI getStyleURI();
 
 	/**Sets the URI of the style of the application.
 	This is a bound property.
 	@param newStyle The URI of the application style, or <code>null</code> if the default style should be used.
-	@see #STYLE_PROPERTY
+	@see #STYLE_URI_PROPERTY
 	*/
-	public void setStyle(final URI newStyle);
+	public void setStyleURI(final URI newStyle);
 
 	/**@return The URI of the application theme, to be resolved against the application base path.*/
 	public URI getThemeURI();

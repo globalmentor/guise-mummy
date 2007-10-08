@@ -78,7 +78,7 @@ public abstract class AbstractDepictContext extends BoundPropertyObject implemen
 			theme=theme.getParent();	//get the theme's parent, if any
 		}
 				//application style
-		final URI applicationStyleURI=application.getStyle();	//get the application style
+		final URI applicationStyleURI=application.getStyleURI();	//get the application style
 		if(applicationStyleURI!=null)	//if there is a style TODO make sure the style is a CSS style
 		{
 			styleURIs.add(applicationStyleURI);	//add the application style
