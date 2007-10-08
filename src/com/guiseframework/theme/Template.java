@@ -37,7 +37,7 @@ public class Template extends AbstractClassTypedURFResource
 	*/
 	public void apply(final Object object, final PLOOPProcessor ploopProcessor) throws ClassNotFoundException, InvocationTargetException
 	{
-		ploopProcessor.setObjectProperties(object, this);	//initialize the object from the template
+		ploopProcessor.setObjectProperties(object, this, THEME_NAMESPACE_URI);	//initialize the object from the template, using the theme namespace to find the properties
 	}
 
 }

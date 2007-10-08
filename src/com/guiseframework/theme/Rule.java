@@ -31,10 +31,10 @@ public class Rule extends AbstractClassTypedURFResource
 		super(referenceURI, THEME_NAMESPACE_URI);  //construct the parent class
 	}
 
-	/**@return This rule's select declaration, or <code>null</code> if this rule has no <code>select.select</code> property or the value is not a {@link Selector}.*/
-	public Selector getSelect() throws ClassCastException
+	/**@return This rule's selector declaration, or <code>null</code> if this rule has no <code>select.selector</code> property or the value is not a {@link Selector}.*/
+	public Selector getSelector()
 	{
-		return asInstance(getPropertyValue(SELECT_PROPERTY_URI), Selector.class);	//return the select.select value
+		return asInstance(getPropertyValue(SELECTOR_PROPERTY_URI), Selector.class);	//return the select.selector value
 	}
 
 	/**@return This rule's apply declaration, or <code>null</code> if this rule has no <code>theme.apply</code> selector or the value is not a {@link Template}.*/
@@ -53,7 +53,7 @@ public class Rule extends AbstractClassTypedURFResource
 	*/
 	public boolean apply(final Object object, final PLOOPProcessor ploopProcessor) throws ClassNotFoundException, InvocationTargetException
 	{
-		final Selector selector=getSelect();	//get the selector, if any
+		final Selector selector=getSelector();	//get the selector, if any
 		if(selector!=null && selector.selects(object))	//if this selector selects the object
 		{
 			final Template template=getApply();	//get the template to apply, if any

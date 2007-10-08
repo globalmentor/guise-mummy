@@ -84,15 +84,15 @@ public class Resources extends AbstractClassTypedURFResource
 	}
 
 	/**Returns a form of the enum name appropriate for a resource key.
-	The name is converted to lowercase.
-	For example, <code>FILE_NOT_FOUND</code> would produce <code>file_not_found</code>.
+	The name is converted to lowercaes and all underscore characters ('_') are replaced by periods ('.').
+	For example, <code>FILE_NOT_FOUND</code> would produce <code>file.not.found</code>.
 	@param e The enum instance to convert to a resource key.
 	@return A string representing the enum instance in a style appropriate for use as a resource key.
 	@see Enum#name()
 	*/
 	public static String getResourceKeyName(final Enum<?> e)
 	{
-		return e.name().toLowerCase();	//convert the name to lowercase
+		return e.name().toLowerCase().replace('_', '.');	//convert the name to lowercase and replace underscores with periods
 	}
 
 }

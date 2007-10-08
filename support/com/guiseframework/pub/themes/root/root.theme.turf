@@ -9,57 +9,57 @@
 [
 	*Frame*
 	(theme.Rule):
-		select.select=(ObjectClassSelector):
+		select.selector=(ObjectClassSelector):
 			selectClass=component.Frame
 		;,
 		apply=(Template):
-			color=(style.ResourceColor)["theme_color_text"],
-			backgroundColor=(style.ResourceColor)["theme_color_background"],
+			color=(style.ResourceColor)["theme.color.text"],
+			backgroundColor=(style.ResourceColor)["theme.color.background"],
 		;
 	;,
 	*Menu*
 	(theme.Rule):	*root menu*
-		select.select=(InterSectionSelector):
-			select=(ObjectClassSelector):
+		select.selector=(IntersectionSelector):
+			selector=(ObjectClassSelector):
 				selectClass=component.Menu
 			;,
-			select.select=(NegationSelector):
-				select=(ObjectPropertySelector):
+			select.selector=(NegationSelector):
+				selector=(ObjectPropertySelector):
 					selectPropertyName="parent",
-					select=(ObjectClassSelector):
+					selector=(ObjectClassSelector):
 						selectClass=component.Menu
 					;,
 				;
 			;
 		;,
 		apply=(Template):
-			backgroundColor=(style.ResourceColor)["theme_color_menu"],
+			backgroundColor=(style.ResourceColor)["theme.color.menu"],
 		;
 	;,
 	(theme.Rule):	*submenu*
-		select.select=(InterSectionSelector):
-			select=(ObjectClassSelector):
+		select.selector=(IntersectionSelector):
+			selector=(ObjectClassSelector):
 				selectClass=component.Menu
 			;,
-			select=(ObjectPropertySelector):
+			selector=(ObjectPropertySelector):
 				selectPropertyName="parent",
-				select=(ObjectClassSelector):
+				selector=(ObjectClassSelector):
 					selectClass=component.Menu
 				;,
 			;
 		;,
 		apply=(Template):
-			backgroundColor=(style.ResourceColor)["theme_color_submenu"],
-			borderColor=(style.ResourceColor)["theme_color_neutralA"],
+			backgroundColor=(style.ResourceColor)["theme.color.submenu"],
+			borderColor=(style.ResourceColor)["theme.color.neutralA"],
 		;
 	;,
 	*Toolbar*
 	(theme.Rule):
-		select.select=(ObjectClassSelector):
+		select.selector=(ObjectClassSelector):
 			selectClass=component.Toolbar
 		;,
 		apply=(Template):
-			backgroundColor=(style.ResourceColor)["theme_color_toolbar"],
+			backgroundColor=(style.ResourceColor)["theme.color.toolbar"],
 		;
 	;
 ]

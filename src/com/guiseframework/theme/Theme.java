@@ -7,8 +7,11 @@ import static java.util.Collections.*;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
+
 import com.garretwilson.urf.*;
 import static com.garretwilson.urf.URF.*;
+import static com.garretwilson.urf.select.Select.SELECTOR_PROPERTY_URI;
+
 import com.garretwilson.urf.ploop.PLOOPProcessor;
 import com.garretwilson.urf.select.*;
 import com.garretwilson.urf.xml.XML;
@@ -132,12 +135,16 @@ public class Theme extends AbstractClassTypedURFResource
 		for(final URFProperty declarationProperty:getNamespaceProperties(ORDINAL_NAMESPACE_URI))	//get all of the ordinal properties; these are the declaratioons
 		{
 			final URFResource declaration=declarationProperty.getValue();	//get this declaration
+//Debug.trace("looking at declaration", declaration);
 			if(declaration instanceof Rule)	//if this is a rule
 			{
 				final Rule rule=(Rule)declaration;	//get the rule
-				final Selector selector=rule.getSelect();	//get what this rule selects
+//Debug.trace("got rule", rule);
+//Debug.trace("actual rule selector", rule.getPropertyValue(SELECT_PROPERTY_URI));	//return the select.select value
+				final Selector selector=rule.getSelector();	//get what this rule selects
 				if(selector!=null)	//if there is a selector for this rule
 				{
+//Debug.trace("got selector", selector);
 					updateRules(rule, selector);	//update the rules with this selector
 				}
 			}
@@ -167,7 +174,7 @@ public class Theme extends AbstractClassTypedURFResource
 		}
 		else if(selector instanceof OperatorSelector)	//if this is an operator selector
 		{
-			for(final Selector subselector:((OperatorSelector)selector).getSelects())	//for each subselector
+			for(final Selector subselector:((OperatorSelector)selector).getSelectors())	//for each subselector
 			{
 				updateRules(rule, subselector);	//update the rules for each subselector
 			}
