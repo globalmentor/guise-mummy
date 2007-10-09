@@ -198,10 +198,8 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 			{
 				depictContext.writeAttribute(null, ELEMENT_TEXTAREA_ATTRIBUTE_COLS, Integer.toString(columnCount));	//cols="columnCount"							
 			}
-/*TODO bring back after adding to DTD
-			final boolean lineWrap=textAreaControl.isLineWrap();	//see if we should wrap lines
-			writeAttribute(context, null, ELEMENT_TEXTAREA_ATTRIBUTE_WRAP, lineWrap ? TEXTAREA_WRAP_VIRTUAL : TEXTAREA_WRAP_OFF);	//wrap="virtual|off"
-*/			
+			final boolean lineWrap=component.isLineWrap();	//see if we should wrap lines
+			depictContext.writeAttribute(null, ELEMENT_TEXTAREA_ATTRIBUTE_WRAP, lineWrap ? TEXTAREA_WRAP_SOFT : TEXTAREA_WRAP_OFF);	//wrap="soft|off"
 		}
 		else	//if we don't recognize the type of element we are rendering
 		{

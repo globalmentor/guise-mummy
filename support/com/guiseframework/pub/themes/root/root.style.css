@@ -65,7 +65,7 @@ Drag and Drop classes
 /*global presets to meet Guise theme default expectations*/
 
 /*remove borders, padding, and margins; initialize default fonts and colors*/
-a, caption, div, img, label, table, th, td, span
+a.component, caption.component, div.component, img.component, label.component, table.component, th.component, td.component, span.component
 {
 	border: 0;
 	border-style: none;
@@ -75,27 +75,27 @@ a, caption, div, img, label, table, th, td, span
 	padding: 0;
 }
 
-a
+a.component
 {
 	color: black;	
 }
 
-a:link
+a.component:link
 {
 	text-decoration: none;
 }
 
-a:visited
+a.component:visited
 {
 	text-decoration: none;
 }
 
-a:hover
+a.component:hover
 {
 	text-decoration: none;
 }
 
-a:active
+a.component:active
 {
 	text-decoration: none;
 }

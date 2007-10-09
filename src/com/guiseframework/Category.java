@@ -24,7 +24,7 @@ public class Category extends IDNameObject<String, String>
 		{
 			this.categories=unmodifiableList(new ArrayList<Category>(categories));	//create a copy of the list and save the list
 		}
-	
+
 	/**Constructor for a category with the same ID and name.
 	@param id The ID of the category, which will also be used as the category's name.
 	*/

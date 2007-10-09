@@ -14,7 +14,7 @@ import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
 /**Text Search Guise demonstration panel.
-Copyright © 2005-2007 GlobalMentor, Inc.
+Copyright Â© 2005-2007 GlobalMentor, Inc.
 Demonstrates resource input (file upload) controls, file upload content type and size validation,
 	manual component error specification, custom model validation, and text area controls.
 This demonstration assumes text files are encoded using the system default character encoding.

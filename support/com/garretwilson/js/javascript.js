@@ -348,7 +348,7 @@ var JSON=
 			switch(typeof object)	//see what type this object is
 			{
 				case "string":
-					return "\""+object+"\"";	//return the string surrounded by quotes
+					return "\""+object.replace(/["\\\b\f\n\r\t]/g, this.escapeStringChar)+"\"";	//return the string surrounded by quotes
 				case "boolean":
 				case "number":
 					return object.toString();	//return the string version of the
@@ -388,6 +388,29 @@ var JSON=
 		else	//if the object is null
 		{
 			return "null";		
+		}
+	},
+
+	/**Escapes a character of a JSON string.
+	@param restricted The restricted character as a string.
+	@return The escaped form of the given character string.
+	*/
+	escapeStringChar:function(restricted)
+	{
+		switch(restricted)
+		{
+			case "\b":
+				return "\\b";
+			case "\f":
+				return "\\f";
+			case "\n":
+				return "\\n";
+			case "\r":
+				return "\\r";
+			case "\t":
+				return "\\t";
+			default:	//for all other characters
+				return "\\"+restricted;	//escape the character with a backslash
 		}
 	}
 }

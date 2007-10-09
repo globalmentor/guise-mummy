@@ -917,27 +917,6 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 			if(!this.processingAJAXResponses)	//if we aren't processing AJAX responses TODO fix small race condition in determining whether processing is occurring
 			{
 				this.processingAJAXResponses=true;	//we are processing AJAX responses now
-/*TODO del when works; the server now takes care of this
-					//pre-process the responses to check for a navigation request, so that we can skip updates and immediately navigate
-				for(var responseIndex=0; responseIndex<this.ajaxResponses.length; ++responseIndex)	//for each response
-				{
-					var childNodeList=this.ajaxResponses[responseIndex].documentElement.childNodes;	//get all the child nodes of the document element
-					var childNodeCount=childNodeList.length;	//find out how many children there are
-					for(var i=0; i<childNodeCount; ++i)	//for each child node
-					{
-						var childNode=childNodeList[i];	//get this child node
-						if(childNode.nodeType==Node.ELEMENT_NODE && elementName==this.ResponseElement.NAVIGATE)	//if this is a navigation element
-						{
-							var navigateURI=this._processNavigate(childNode);	//navigate to the specified request
-							if(navigateURI!=null)	//if a new navigation URI was requested
-							{
-								this.setEnabled(false);	//turn off AJAX processing
-								window.location.href=navigateURI;	//go to the new location
-							}
-						}
-					}
-				}
-*/
 				var newHRef=null;	//we'll see if a new URI was requested at any point
 				try
 				{

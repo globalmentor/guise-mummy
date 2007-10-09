@@ -48,5 +48,8 @@
   guise:patchType						CDATA          #IMPLIED
 >
 
+<!ATTLIST textarea
+  wrap    									CDATA          #IMPLIED
+>
+
 <!--TODO: add guise:contentHash and guise:attributeHash to all elements-->
-<!--TODO: add guise:attributeHash to all elements-->
