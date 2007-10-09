@@ -97,7 +97,7 @@ import com.garretwilson.urf.JavaURFResourceFactory;
 import com.garretwilson.urf.URF;
 import com.garretwilson.urf.URFIO;
 import com.garretwilson.urf.URFResourceTURFIO;
-import com.garretwilson.urf.ploop.PLOOPProcessor;
+import com.garretwilson.urf.ploop.PLOOPURFProcessor;
 import com.garretwilson.urf.ploop.PLOOPTURFIO;
 import com.garretwilson.util.*;
 import com.globalmentor.marmot.Marmot;

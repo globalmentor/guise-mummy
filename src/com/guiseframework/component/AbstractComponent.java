@@ -13,7 +13,7 @@ import com.garretwilson.beans.TargetedEvent;
 import com.garretwilson.lang.*;
 import com.garretwilson.rdf.RDFResource;
 import com.garretwilson.urf.URFResource;
-import com.garretwilson.urf.ploop.PLOOPProcessor;
+import com.garretwilson.urf.ploop.PLOOPURFProcessor;
 import com.garretwilson.urf.ploop.PLOOPURFGenerator;
 import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseApplication;
@@ -1086,7 +1086,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		{
 			final URFResource preferences=getSession().getPreferences(getClass());	//get existing preferences for this class
 //TODO del Debug.traceStack("ready to load preferences; view:", ((ResourceChildrenPanel)this).getView(), "thumbnail size:", ((ResourceChildrenPanel)this).getThumbnailSize(), "preferences", RDFUtilities.toString(preferences));
-			final PLOOPProcessor ploopProcessor=new PLOOPProcessor();	//create a new PLOOP processor for retrieving the properties
+			final PLOOPURFProcessor ploopProcessor=new PLOOPURFProcessor();	//create a new PLOOP processor for retrieving the properties
 			do	//for each property
 			{
 				final String propertyName=preferencePropertyIterator.next();	//get the name of the next property

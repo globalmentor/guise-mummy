@@ -9,7 +9,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.urf.*;
 import static com.garretwilson.urf.URF.*;
-import com.garretwilson.urf.ploop.PLOOPProcessor;
+import com.garretwilson.urf.ploop.PLOOPURFProcessor;
 import com.garretwilson.urf.select.*;
 import com.garretwilson.urf.xml.XML;
 import com.garretwilson.util.*;
@@ -196,7 +196,7 @@ public class Theme extends AbstractClassTypedURFResource
 			{
 				parent.apply(object);	//first apply the ancestor hierarchy to this object
 			}
-			final PLOOPProcessor ploopProcessor=new PLOOPProcessor();	//use the same PLOOP processor for all the rules of this theme
+			final PLOOPURFProcessor ploopProcessor=new PLOOPURFProcessor();	//use the same PLOOP processor for all the rules of this theme
 			final Set<Rule> classRules=getClassRules(object);	//get all the rules applying to the object class
 			for(final Rule rule:classRules)	//for each rule
 			{

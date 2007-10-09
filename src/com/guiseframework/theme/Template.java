@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
 import com.garretwilson.urf.AbstractClassTypedURFResource;
-import com.garretwilson.urf.ploop.PLOOPProcessor;
+import com.garretwilson.urf.ploop.PLOOPURFProcessor;
 
 import static com.guiseframework.theme.Theme.*;
 
@@ -35,7 +35,7 @@ public class Template extends AbstractClassTypedURFResource
 	@exception ClassNotFoundException if a class was specified and the indicated class cannot be found.
 	@exception InvocationTargetException if the given RDF object indicates a Java class the constructor of which throws an exception.
 	*/
-	public void apply(final Object object, final PLOOPProcessor ploopProcessor) throws ClassNotFoundException, InvocationTargetException
+	public void apply(final Object object, final PLOOPURFProcessor ploopProcessor) throws ClassNotFoundException, InvocationTargetException
 	{
 		ploopProcessor.setObjectProperties(object, this, THEME_NAMESPACE_URI);	//initialize the object from the template, using the theme namespace to find the properties
 	}

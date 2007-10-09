@@ -2,8 +2,12 @@ package com.guiseframework.demo;
 
 import java.beans.PropertyVetoException;
 import java.io.*;
+import java.net.URI;
 
+import static com.garretwilson.text.CharacterEncodingConstants.*;
+import static com.garretwilson.text.xml.XMLConstants.*;
 import com.garretwilson.urf.*;
+
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
@@ -55,11 +59,25 @@ public class URFProcessPanel extends DefaultNavigationPanel
 						{
 							try
 							{
-								final URFTURFProcessor turfProcessor=new URFTURFProcessor();	//create a new TURF processor
-								final URF urf=turfProcessor.process(new LineNumberReader(new StringReader(input)), null);	//process the TURF
+								final URI baseURI=URI.create("info:example/");	//use a default base URI
+								final InputStream inputStream=new ByteArrayInputStream(input.getBytes(UTF_8));	//get an input stream to the input string
+								final AbstractURFProcessor urfProcessor;	//we don't yet know which URF processor we'll use
+								final URF urf;	//we'll store the resulting URF data model here
+								if(input.startsWith(XML_DECL_START))	//if this is XML
+								{
+									final URFRDFXMLProcessor urfRDFXMLProcessor=new URFRDFXMLProcessor();	//create a new URF RDF/XML processor
+									urf=new DefaultURFRDFXMLIO().readRDFXML(urfRDFXMLProcessor, inputStream, baseURI);	//read URF
+									urfProcessor=urfRDFXMLProcessor;	//show which URF processor we used
+								}
+								else	//otherwise, assume this is TURF
+								{
+									final URFTURFProcessor urfTURFProcessor=new URFTURFProcessor();	//create a new TURF processor
+									urf=DefaultURFTURFIO.readTURF(urfTURFProcessor, inputStream, baseURI);	//read URF
+									urfProcessor=urfTURFProcessor;	//show which URF processor we used
+								}
 								final StringBuilder assertionStringBuilder=new StringBuilder();	//create a string builder for showiong the assertions
 									//assertions
-								for(final URFTURFProcessor.Assertion assertion:turfProcessor.getAssertions())	//for each assertion
+								for(final URFTURFProcessor.Assertion assertion:urfProcessor.getAssertions())	//for each assertion
 								{
 									assertionStringBuilder.append(assertion).append('\n');	//add this assertion
 								}

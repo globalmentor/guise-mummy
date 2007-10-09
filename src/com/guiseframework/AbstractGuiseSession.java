@@ -17,7 +17,7 @@ import com.garretwilson.io.BOMInputStreamReader;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.net.URIPath;
 import com.garretwilson.urf.*;
-import com.garretwilson.urf.ploop.PLOOPProcessor;
+import com.garretwilson.urf.ploop.PLOOPURFProcessor;
 import com.garretwilson.util.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
@@ -976,7 +976,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				if(componentResource!=null)	//if there is a resource description of a matching type
 				{
 //TODO del					final PLOOPProcessor ploopProcessor=new PLOOPProcessor(this);	//create a new PLOOP processor, passing the Guise session to use as a default constructor argument
-					final PLOOPProcessor ploopProcessor=new PLOOPProcessor();	//create a new PLOOP processor
+					final PLOOPURFProcessor ploopProcessor=new PLOOPURFProcessor();	//create a new PLOOP processor
 					ploopProcessor.setObjectProperties(component, componentResource);	//initialize the component from this resource
 					component.initialize();	//initialize the component
 					final List<Object> objects=ploopProcessor.getObjects(urf);	//make sure all described Java objects in the URF instance have been created

@@ -7,7 +7,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.urf.AbstractClassTypedURFResource;
 import com.garretwilson.urf.select.Selector;
 import static com.garretwilson.urf.select.Select.*;
-import com.garretwilson.urf.ploop.PLOOPProcessor;
+import com.garretwilson.urf.ploop.PLOOPURFProcessor;
 
 import static com.guiseframework.theme.Theme.*;
 
@@ -51,7 +51,7 @@ public class Rule extends AbstractClassTypedURFResource
 	@exception ClassNotFoundException if a class was specified and the indicated class cannot be found.
 	@exception InvocationTargetException if the given RDF object indicates a Java class the constructor of which throws an exception.
 	*/
-	public boolean apply(final Object object, final PLOOPProcessor ploopProcessor) throws ClassNotFoundException, InvocationTargetException
+	public boolean apply(final Object object, final PLOOPURFProcessor ploopProcessor) throws ClassNotFoundException, InvocationTargetException
 	{
 		final Selector selector=getSelector();	//get the selector, if any
 		if(selector!=null && selector.selects(object))	//if this selector selects the object
