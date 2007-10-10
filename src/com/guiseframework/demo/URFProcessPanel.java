@@ -10,7 +10,10 @@ import com.garretwilson.urf.*;
 
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
+import com.guiseframework.component.urf.DefaultURFResourceTreeNodeRepresentationStrategy;
 import com.guiseframework.event.*;
+import com.guiseframework.model.DummyTreeNodeModel;
+import com.guiseframework.model.urf.URFDynamicTreeNodeModel;
 
 /**URF Process Guise demonstration panel.
 Copyright © 2005-2007 GlobalMentor, Inc.
@@ -29,7 +32,7 @@ public class URFProcessPanel extends DefaultNavigationPanel
 		final LayoutPanel mainPanel=new LayoutPanel();	//create a main panel for the input/output
 			//input text
 		final TextControl<String> inputTextControl=new TextControl<String>(String.class, 15, 80, false);	//create a text area with no line wrap for input
-		inputTextControl.setLabel("Input TURF");	//set the label of the text area
+		inputTextControl.setLabel("Input TURF or RDF/XML");	//set the label of the text area
 		mainPanel.add(inputTextControl);
 			//assertion output text
 		final TextControl<String> assertionOutputTextControl=new TextControl<String>(String.class, 10, 80, false);	//create a text area with no line wrap for output of assertions
@@ -42,11 +45,15 @@ public class URFProcessPanel extends DefaultNavigationPanel
 		turfOutputTextControl.setEditable(false);	//don't allow the TURF output to be edited
 		mainPanel.add(turfOutputTextControl);
 
-		final LayoutPanel controlPanel=new LayoutPanel();	//create a panel for URF input/output
+		final LayoutPanel controlPanel=new LayoutPanel();	//create a panel for controls
 			//process button
 		final Button processButton=new Button();	//create a button for processing the input
 		processButton.setLabel("Process");	//set the button label
 		controlPanel.add(processButton);	//add the process button to the control panel
+			//tree control
+		final TreeControl urfTreeControl=new TreeControl();	//create a tree control in which to place URF resources
+		urfTreeControl.setTreeNodeRepresentationStrategy(URFResource.class, new DefaultURFResourceTreeNodeRepresentationStrategy());	//add a representation strategy for URF resources
+		controlPanel.add(urfTreeControl);	//add the tree control to the control panel
 		
 		processButton.addActionListener(new ActionListener()
 				{
@@ -54,6 +61,7 @@ public class URFProcessPanel extends DefaultNavigationPanel
 					{
 						assertionOutputTextControl.clearValue();	//clear the assertions
 						turfOutputTextControl.clearValue();	//clear the TURF
+						urfTreeControl.setRootNode(new DummyTreeNodeModel());	//clear the tree control
 						final String input=inputTextControl.getValue();	//get the input text
 						if(input!=null)	//if there is input
 						{
@@ -87,6 +95,9 @@ public class URFProcessPanel extends DefaultNavigationPanel
 								final StringWriter turfStringWriter=new StringWriter();	//create a new string writer
 								turfGenerator.generateResources(turfStringWriter, urf);	//generate the URF to TURF
 								turfOutputTextControl.setValue(turfStringWriter.toString());	//show the output TURF
+									//resource tree
+								urfTreeControl.setRootNode(new URFDynamicTreeNodeModel(urf));	//show the URF in the tree
+								urfTreeControl.getRootNode().setExpanded(true);	//expand the root node of the tree
 							}
 							catch(final IOException ioException)	//if an I/O error occurs
 							{

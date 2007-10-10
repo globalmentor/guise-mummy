@@ -3,24 +3,13 @@ package com.guiseframework.component;
 import java.util.*;
 import java.util.concurrent.*;
 
-import javax.mail.internet.ContentType;
-
-import static com.garretwilson.lang.ClassUtilities.getPropertyName;
+import com.garretwilson.beans.*;
+import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.util.ArrayUtilities.createArray;
-
-import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
-import com.garretwilson.beans.GenericPropertyChangeEvent;
-import com.garretwilson.beans.TargetedEvent;
 import com.garretwilson.util.Debug;
-import com.guiseframework.component.AbstractLabel.DefaultTransferable;
-import com.guiseframework.component.transfer.AbstractObjectTransferable;
-import com.guiseframework.component.transfer.AbstractTransferable;
-import com.guiseframework.component.transfer.ExportStrategy;
-import com.guiseframework.component.transfer.Transferable;
-import com.guiseframework.converter.AbstractStringLiteralConverter;
-import com.guiseframework.converter.Converter;
-import com.guiseframework.converter.DefaultStringLiteralConverter;
+
+import com.guiseframework.component.transfer.*;
+import com.guiseframework.converter.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 
@@ -118,12 +107,11 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	@SuppressWarnings("unchecked")	//we check the generic types before putting them in the map, so it's fine to cast the retrieved values
 	public <V> TreeNodeRepresentationStrategy<? super V> setTreeNodeRepresentationStrategy(final Class<V> valueClass, TreeNodeRepresentationStrategy<? super V> treeNodeRepresentationStrategy)
 	{
+Debug.trace("ready to set tree node representation strategy for class", valueClass, "strategy", treeNodeRepresentationStrategy);
 		return (TreeNodeRepresentationStrategy<? super V>)classTreeNodeRepresentationStrategyMap.put(valueClass, treeNodeRepresentationStrategy);	//associate the strategy with the value class in the map
 	}
 
 	/**Returns the given tree node representation strategy assigned to produce representation components for the given value class.
-	If there is no associated representation strategy, the default representation strategy (associated with the {@link Object} class) will be returned, if present.
-	If there is no representation strategy associated with the{@link Object} class, a default representation strategy will be created and installed for this type.
 	@param <V> The type of value to represent.
 	@param valueClass The class of value with which the strategy should be associated.
 	@return The strategy for generating components to represent values of the given type, or <code>null</code> if there is no associated representation strategy.
@@ -132,15 +120,16 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	@SuppressWarnings("unchecked")	//we check the generic types before putting them in the map, so it's fine to cast the retrieved values
 	public <V> TreeNodeRepresentationStrategy<? super V> getTreeNodeRepresentationStrategy(final Class<V> valueClass)
 	{
-		TreeNodeRepresentationStrategy<? super V> treeNodeRepresentationStrategy=(TreeNodeRepresentationStrategy<? super V>)classTreeNodeRepresentationStrategyMap.get(valueClass);	//get the strategy linked to the value class in the map
-			//TODO instead of directly trying Object.class, work up the hierarchy
-		if(treeNodeRepresentationStrategy==null && !Object.class.equals(valueClass))	//if there is no associated representation strategy and this isn't the object class
+		TreeNodeRepresentationStrategy<? super V> treeNodeRepresentationStrategy=(TreeNodeRepresentationStrategy<? super V>)classTreeNodeRepresentationStrategyMap.get(valueClass);	//for fastest results. try to get the strategy linked directly to the value class in the map
+		if(treeNodeRepresentationStrategy==null)	//if there is no associated representation strategy, work our way up the hierarchy
 		{
-			treeNodeRepresentationStrategy=(TreeNodeRepresentationStrategy<? super V>)classTreeNodeRepresentationStrategyMap.get(Object.class);	//get the default strategy (the one associated with Object.class)
-			if(treeNodeRepresentationStrategy==null)	//if there is no representation strategy associated with Object.class
+			for(final Class<?> ancestorClass:getProperAncestorClasses(valueClass))	//look at each ancestor class of the value class, ignoring the current class
 			{
-				treeNodeRepresentationStrategy=new DefaultValueRepresentationStrategy<V>(valueClass);	//create a default representation strategy for this class
-				classTreeNodeRepresentationStrategyMap.put(valueClass, treeNodeRepresentationStrategy);	//store the representation strategy in the map for the next time; there is a race condition here, but it is benign as it will at worst create several duplicate value representation strategies
+				treeNodeRepresentationStrategy=(TreeNodeRepresentationStrategy<? super V>)classTreeNodeRepresentationStrategyMap.get(ancestorClass);	//try to get the representation strategy for this ancestor class
+				if(treeNodeRepresentationStrategy!=null)	//if we found a representation strategy
+				{
+					break;	//stop searching
+				}
 			}
 		}
 		return treeNodeRepresentationStrategy;	//return the tree node representation strategy
@@ -178,6 +167,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	private <T> TreeNodeComponentState createTypedComponentState(final TreeNodeModel<T> treeNode)
 	{
 		final boolean editable=false;	//TODO fix
+			//TODO the API currently allows the returned tree node representation strategy to be null; add a check
 		final Component treeNodeComponent=getTreeNodeRepresentationStrategy(treeNode.getValueClass()).createComponent(this, getTreeModel(), treeNode, editable, false, false);	//create a new component for the tree node
 
 
@@ -213,7 +203,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		this.treeModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the tree model
 		this.treeModel.addActionListener(repeatActionListener);	//listen and repeat all actions of the tree model
 			//TODO listen for and repeat tree model-specific events
-//TODO del		setTreeNodeRepresentationStrategy(Object.class, new DefaultValueRepresentationStrategy<Object>());	//create a default representation strategy and set it as the default by associating it with the Object class
+		setTreeNodeRepresentationStrategy(Object.class, new DefaultValueRepresentationStrategy<Object>(Object.class));	//create a default representation strategy and set it as the default by associating it with the Object class
 		setTreeNodeRepresentationStrategy(LabelModel.class, new LabelModelTreeNodeRepresentationStrategy());	//create and associate a label model representation strategy
 //TODO fix		setTreeNodeRepresentationStrategy(MessageModel.class, new MessageModelRepresentationStrategy(session));	//create and associate a message model representation strategy
 		setTreeNodeRepresentationStrategy(TextModel.class, new TextModelTreeNodeRepresentationStrategy());	//create and associate a text model representation strategy

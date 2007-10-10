@@ -11,7 +11,7 @@ import com.guiseframework.model.*;
 /**Abstract functionality for a tree node representation strategy representing an RDF resource.
 @author Garret Wilson
 */
-public class AbstractRDFResourceTreeNodeRepresentationStrategy<V extends RDFResource> extends AbstractRDFObjectTreeNodeRepresentationStrategy<V>
+public abstract class AbstractRDFResourceTreeNodeRepresentationStrategy<V extends RDFResource> extends AbstractRDFObjectTreeNodeRepresentationStrategy<V>
 {
 
 	/**Whether the resource reference URI should be included.*/

@@ -204,6 +204,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		final boolean editable=isEditable() && column.isEditable();	//see if the cell is editable (a cell is only editable if both its table and column are editable)
 //TODO del		final TableModel.Cell<T> cell=new TableModel.Cell<T>(rowIndex, column);	//create a cell object representing this row and column
 //TODO fix editable		if(cellComponentState==null || cellComponentState.isEditable()!=editable)	//if there is no component for this cell, or the component has a different editable status
+			//TODO fix; the cell representation strategy can currently be null
 		final Component valueComponent=getCellRepresentationStrategy(column).createComponent(this, tableModel, rowIndex, column, editable, false, false);	//create a new component for the cell
 		return new CellComponentState(valueComponent, editable);	//create a new component state for the cell's component and metadata
 	}
