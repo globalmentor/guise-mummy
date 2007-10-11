@@ -2,11 +2,11 @@ package com.guiseframework.component;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
-/**A navigation panel that supports modal interaction.
+/**A panel that supports modal navigation.
 @param <R> The type of modal result this modal navigation panel produces.
 @author Garret Wilson
 */
-public interface ModalNavigationPanel<R> extends NavigationPanel
+public interface ModalNavigationPanel<R> extends Panel
 {
 	/**The modal state bound property.*/
 	public final static String MODAL_PROPERTY=getPropertyName(ModalNavigationPanel.class, "modal");

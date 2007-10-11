@@ -11,10 +11,9 @@ import javax.mail.internet.ContentType;
 
 import com.garretwilson.beans.TargetedEvent;
 import com.garretwilson.lang.*;
-import com.garretwilson.rdf.RDFResource;
 import com.garretwilson.urf.URFResource;
 import com.garretwilson.urf.ploop.PLOOPURFProcessor;
-import com.garretwilson.urf.ploop.PLOOPURFGenerator;
+import com.garretwilson.util.DataException;
 import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.GuiseSession;
@@ -1094,7 +1093,11 @@ Debug.trace("now valid of", this, "is", isValid());
 				{
 					ploopProcessor.setObjectProperty(this, preferences, propertyName);	//retrieve this property from the preferences
 				}
-				catch(final InvocationTargetException invocationTargetException)	//if there was an error accessing this resource
+				catch(final DataException dataException)	//if there was a data error
+				{
+					throw (IOException)new IOException(dataException.getMessage()).initCause(dataException);
+				}
+				catch(final InvocationTargetException invocationTargetException)	//if there was an error accessing a Java class
 				{
 					throw (IOException)new IOException(invocationTargetException.getMessage()).initCause(invocationTargetException);
 				}

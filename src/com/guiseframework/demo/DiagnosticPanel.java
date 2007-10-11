@@ -9,11 +9,10 @@ import com.guiseframework.converter.NumberStringLiteralConverter.Style;
 import com.guiseframework.event.*;
 
 /**Diagnostic Guise demonstration panel.
-Copyright © 2006 GlobalMentor, Inc.
-Demonstrates
+Copyright Â© 2006 GlobalMentor, Inc.
 @author Garret Wilson
 */
-public class DiagnosticPanel extends DefaultNavigationPanel
+public class DiagnosticPanel extends LayoutPanel
 {
 
 	final TextControl<Long> maxMemoryTextControl;

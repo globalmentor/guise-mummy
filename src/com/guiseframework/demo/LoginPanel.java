@@ -9,12 +9,12 @@ import com.guiseframework.model.Notification;
 import com.guiseframework.validator.*;
 
 /**Login Guise demonstration panel.
-Copyright © 2005 GlobalMentor, Inc.
+Copyright Â© 2005 GlobalMentor, Inc.
 Demonstrates on-the-fly validation, on-the-fly error reporting,
 	resetting control values, and setting Guise session user.
 @author Garret Wilson
 */
-public class LoginPanel extends DefaultNavigationPanel
+public class LoginPanel extends LayoutPanel
 {
 
 	/**Default constructor.*/

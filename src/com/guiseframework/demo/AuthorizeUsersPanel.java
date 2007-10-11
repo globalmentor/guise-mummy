@@ -11,12 +11,12 @@ import com.guiseframework.platform.DepictContext;
 import com.guiseframework.validator.RegularExpressionStringValidator;
 
 /**Authorize Users Guise demonstration panel.
-Copyright © 2005-2007 GlobalMentor, Inc.
+Copyright Â© 2005-2007 GlobalMentor, Inc.
 Demonstrates custom table models, editable string table cells, editable boolean table cells,
 	table column validators, tables, and the session notification mechanism.
 @author Garret Wilson
 */
-public class AuthorizeUsersPanel extends DefaultNavigationPanel
+public class AuthorizeUsersPanel extends LayoutPanel
 {
 
 		//the table columns

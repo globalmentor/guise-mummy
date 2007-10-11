@@ -119,7 +119,7 @@ import static com.garretwilson.util.UUIDUtilities.*;
 import static com.guiseframework.Guise.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
 
-/**The servlet that controls a Guise web applications. 
+/**The servlet that controls a Guise web applications.
 Each Guise session's platform will be locked during normal web page generation context will be active at one one time.
 This implementation only works with Guise applications that descend from {@link AbstractGuiseApplication}.
 <p>For all {@link ResourceReadDestination}s, this servlet recognizes a query parameter named {@value #GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER}
@@ -133,10 +133,10 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 
 	/**The init parameter prefix, "guise-environment:", used to indicate a Guise environment property.*/
 	public final static String GUISE_ENVIRONMENT_INIT_PARAMETER_PREFIX="guise-environment:";
-	
+
 	/**The init parameter suffix, ".uri", used to indicate that a Guise environment property should be processed as a URI.*/
 	public final static String GUISE_ENVIRONMENT_URI_INIT_PARAMETER_SUFFIX=".uri";
-	
+
 	/**The content type of a Guise AJAX request, <code>application/x-guise-ajax-request</code>.*/
 	public final static ContentType GUISE_AJAX_REQUEST_CONTENT_TYPE=new ContentType(ContentTypeConstants.APPLICATION, ContentTypeConstants.EXTENSION_PREFIX+"guise-ajax-request"+ContentTypeConstants.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
 
@@ -245,7 +245,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 				Field.CLIENT_SERVER_REFERER_HEADER_FIELD, Field.DCS_ID_FIELD);
 		elff.setDirective(ELFF.SOFTWARE_DIRECTIVE, Guise.GUISE_NAME+' '+Guise.BUILD_ID);	//set the software directive of the ELFF log
 	}
-		
+
 	/**Initializes the servlet.
 	@param servletConfig The servlet configuration.
 	@exception ServletException if there is a problem initializing.
@@ -254,9 +254,9 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	{
 		super.init(servletConfig);	//do the default initialization
 		Debug.log("initializing servlet", servletConfig.getServletName(), Guise.GUISE_NAME, Guise.BUILD_ID);
-		
+
 Debug.trace("this is a test trace");
-		
+
 		setReadOnly(true);	//make this servlet read-only
 		//TODO turn off directory listings, and/or fix them
 		try
@@ -271,7 +271,7 @@ Debug.trace("this is a test trace");
 
 	/**Initializes bindings between paths and associated navigation frame classes.
 	@param servletConfig The servlet configuration.
-	@return The new initialized application. 
+	@return The new initialized application.
 	@exception IllegalArgumentException if the one of the frame bindings is not expressed in correct format.
 	@exception IllegalArgumentException if the one of the classes specified as a frame binding could not be found.
 	@exception IllegalArgumentException if the one of the classes specified as a frame binding could not be found.
@@ -311,7 +311,7 @@ Debug.trace("this is a test trace");
 				}
 				final InputStream guiseApplicationDescriptionInputStream=servletContext.getResourceAsStream(absoluteGuiseApplicationDescriptionPath);	////get an input stream to the application description
 				assert guiseApplicationDescriptionInputStream!=null : "Could not get an input stream to Guise application description path "+absoluteGuiseApplicationDescriptionPath+" even though earlier retrieval of URL succeeded.";
-				final InputStream guiseApplicationDescriptionBufferedInputStream=new BufferedInputStream(guiseApplicationDescriptionInputStream);	//get a buffered input stream to the application description 
+				final InputStream guiseApplicationDescriptionBufferedInputStream=new BufferedInputStream(guiseApplicationDescriptionInputStream);	//get a buffered input stream to the application description
 				try
 				{
 					guiseApplication=getApplicationIO().read(guiseApplicationDescriptionBufferedInputStream, guiseApplicationDescriptionURL.toURI());	//read the application description from the PLOOP TURF, using the URI of the application description as the base URI
@@ -328,7 +328,7 @@ Debug.trace("this is a test trace");
 			catch(final IOException ioException)	//if there is an I/O error
 			{
 				throw new ServletException("Error in application description ("+guiseApplicationDescriptionURL+"): "+ioException.getMessage(), ioException);
-			}		
+			}
 		}
 		else	//if no application description is specified, indicate an error TODO allow Guise to support overlays in the future with default Guise applications
 		{
@@ -391,7 +391,7 @@ Debug.trace("this is a test trace");
 				final URIPath containerBasePath=new URIPath(getContextPath()+PATH_SEPARATOR);	//determine the base path of the container TODO important: determine if getContextPath() returns the raw path, as we want; otherwise, this will not work correctly for context paths with encoded path characters
 				final URI containerBaseURI=changeRawPath(requestURI, containerBasePath.toString());	//determine the container base URI
 //			TODO del	Debug.trace("containerURI", containerBaseURI);
-	
+
 				final ServletContext servletContext=getServletContext();	//get the servlet context
 				guiseContainer=HTTPServletGuiseContainer.getGuiseContainer(servletContext, containerBaseURI);	//get a reference to the Guise container, creating it if needed
 //			TODO del	Debug.trace("guise container: ", guiseContainer, "for servlet context", getServletContext());
@@ -403,7 +403,7 @@ Debug.trace("this is a test trace");
 				final URIPath guiseApplicationRelativePath=containerBasePath.relativize(guiseApplicationBasePath);	//get the application path relative to the container path
 
 //TODO del Debug.trace("context path", request.getContextPath(), "servlet path", request.getServletPath(), "container base path", containerBasePath, "application base path", guiseApplicationBasePath, "application relative path", guiseApplicationRelativePath);
-				
+
 				final File guiseApplicationHomeDirectory=getDataDirectory(servletContext, DATA_DIRECTORY_INIT_PARAMETER, "guise/home/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
 				final File guiseApplicationLogDirectory=getDataDirectory(servletContext, LOG_DIRECTORY_INIT_PARAMETER, "guise/logs/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
 				final File guiseApplicationTempDirectory=getDataDirectory(servletContext, TEMP_DIRECTORY_INIT_PARAMETER, "guise/temp/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
@@ -426,7 +426,7 @@ Debug.trace("this is a test trace");
 		{
 			final String guiseApplicationContextPath=request.getContextPath()+request.getServletPath()+PATH_SEPARATOR;	//construct the Guise application context path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
 //		TODO delDebug.trace("ready to install application into container with context path", guiseApplicationContextPath);
-			guiseContainer.installApplication(guiseApplication, guiseApplicationContextPath);	//install the application			
+			guiseContainer.installApplication(guiseApplication, guiseApplicationContextPath);	//install the application
 		}
 */
 	}
@@ -473,7 +473,7 @@ Debug.trace("found destination:", destination);
 	Debug.info("content length:", request.getContentLength());
 	Debug.info("content type:", request.getContentType());
 	*/
-			
+
 				//make sure the environment has the WebTrends ID
 			final Environment environment=guiseSession.getPlatform().getEnvironment();	//get the session's environment
 			if(!environment.hasProperty(WEBTRENDS_ID_COOKIE_NAME))	//if the environment doesn't have a WebTrends ID
@@ -492,14 +492,14 @@ Debug.trace("found destination:", destination);
 			}
 	//TODO del Debug.info("supports Flash: ", guiseSession.getEnvironment().getProperty(GuiseEnvironment.CONTENT_APPLICATION_SHOCKWAVE_FLASH_ACCEPTED_PROPERTY));
 
-			
+
 			final String httpMethod=request.getMethod();	//get the current HTTP method being used
 			if(destination instanceof ResourceReadDestination && GET_METHOD.equals(httpMethod))	//if this is a resource read destination (but only if this is a GET request; the ResourceReadDestination may also be a ResourceWriteDestination)
 			{
 				super.doGet(request, response);	//let the default functionality take over, which will take care of accessing the resource destination by creating a specialized access resource
 				return;	//don't service the Guise request normally
 			}
-			
+
 			final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
 			try
 			{
@@ -515,7 +515,7 @@ Debug.trace("found destination:", destination);
 								{
 									throw new UndeclaredThrowableException(ioException);	//let it pass to the calling thread
 								}
-							}					
+							}
 						});
 			}
 			catch(final UndeclaredThrowableException undeclaredThrowableException)	//if an exception was thrown
@@ -537,7 +537,7 @@ Debug.trace("found destination:", destination);
 		}
 		else	//if there is no Guise destination for the requested path
 		{
-			super.doGet(request, response);	//let the default functionality take over			
+			super.doGet(request, response);	//let the default functionality take over
 		}
 	}
 
@@ -554,7 +554,7 @@ Debug.trace("found destination:", destination);
 	private void serviceGuiseRequest(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final Destination destination) throws IOException
 	{
 		final WebPlatform guisePlatform=(WebPlatform)guiseSession.getPlatform();	//get the web platform
-		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
+		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
 //TODO del Debug.trace("servicing Guise request with request URI:", requestURI);
 Debug.trace("servicing Guise request with request URI:", requestURI);
 		final String contentTypeString=request.getContentType();	//get the request content type
@@ -577,7 +577,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 			{
 				redirect(requestURI, bookmark, newPath, guiseApplication, true);	//redirecting the user agent to the preferred path
 			}
-			else if(!destination.exists(guiseSession, navigationPath, bookmark, referrerURI))	//if this destination doesn't exist	
+			else if(!destination.exists(guiseSession, navigationPath, bookmark, referrerURI))	//if this destination doesn't exist
 			{
 				throw new HTTPNotFoundException("Path does not exist at Guise destination: "+navigationPath);
 			}
@@ -637,8 +637,8 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 									Marmot.setContentType(resourceDescription, createContentType(itemContentType));	//set the resource's content type
 								}
 								final String name=getFilename(itemName);	//removing any extraneous path information a browser such as IE or Opera might have given
-								Marmot.setName(resourceDescription, name);	//specify the name provided to us 
-								
+								Marmot.setName(resourceDescription, name);	//specify the name provided to us
+
 								try
 								{
 									final InputStream inputStream=new BufferedInputStream(fileItemStream.openStream());	//get an input stream to the item
@@ -710,7 +710,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 						//TODO do something interesting with the error so that the ResourceCollectControl will learn of it
 					throw (IOException)new IOException(fileUploadException.getMessage()).initCause(fileUploadException);
 				}
-//TODO del if not needed				response.getOutputStream().write("testupload posted\n".getBytes());	//TODO del 
+//TODO del if not needed				response.getOutputStream().write("testupload posted\n".getBytes());	//TODO del
 			}
 		}
 		else if(destination instanceof RedirectDestination)	//if we have a component destination associated with the requested path
@@ -729,7 +729,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 		}
 */
 	}
-	
+
 	/**Services a Guise request meant for a component destination.
   A Guise context is assigned to the Guise session while the request is processed.
   @param request The HTTP request.
@@ -744,7 +744,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
   */
 	private void serviceGuiseComponentDestinationRequest(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ComponentDestination componentDestination, final URI requestURI, final URIPath navigationPath) throws IOException
 	{
-		final HTTPServletWebPlatform guisePlatform=(HTTPServletWebPlatform)guiseSession.getPlatform();	//get the web platform		
+		final HTTPServletWebPlatform guisePlatform=(HTTPServletWebPlatform)guiseSession.getPlatform();	//get the web platform
 		final String contentTypeString=request.getContentType();	//get the request content type
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
 		final boolean isAJAX=contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType);	//see if this is a Guise AJAX request
@@ -764,7 +764,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 					final URI modalNavigationURI=modalNavigation.getNewNavigationURI();	//get the modal navigation URI
 					if(!requestURI.getRawPath().equals(modalNavigationURI.getRawPath()))		//if this request was for a different path than our current modal navigation path (we wouldn't be here if the domain, application, etc. weren't equivalent)
 					{
-						throw new HTTPMovedTemporarilyException(modalNavigationURI);	//redirect to the modal navigation location				
+						throw new HTTPMovedTemporarilyException(modalNavigationURI);	//redirect to the modal navigation location
 					}
 				}
 			}
@@ -790,7 +790,7 @@ Debug.trace("got control events");
 			{
 //TODO del Debug.trace("this is not AJAX, with method:", request.getMethod(), "content type", contentType, "guise POST?", isGuisePOST);
 				applicationFrame.setContent(destinationComponent);	//place the component in the application frame
-				setNoCache(request, response);	//make sure the response is not cached TODO should we do this for AJAX responses as well?				
+				setNoCache(request, response);	//make sure the response is not cached TODO should we do this for AJAX responses as well?
 				final String referrer=getReferer(request);	//get the request referrer, if any
 				final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
 					//see if there is non-Guise HTTP POST data, and if so, set that bookmark navigation temporarily
@@ -854,7 +854,7 @@ Debug.trace("got control events");
 								for(final Map.Entry<String, List<Object>> parameterListMapEntry:parameterListMap.entrySet())	//for each entry in the map of parameter lists
 								{
 									final String parameterName=parameterListMapEntry.getKey();	//get the parameter name
-			
+
 									if(parameterName.equals(WebApplicationFrameDepictor.getActionInputID(applicationFrame)) && parameterListMapEntry.getValue().size()>0)	//if this parameter is for an action
 									{
 										final Component actionComponent=AbstractComponent.getComponentByID(applicationFrame, guisePlatform.getDepictID(parameterListMapEntry.getValue().get(0).toString()));	//get an action component
@@ -865,7 +865,7 @@ Debug.trace("got control events");
 									}
 									else	//if this parameter is not a special action parameter
 									{
-										//TODO don't re-update nested components (less important for controls, which don't have nested components) 
+										//TODO don't re-update nested components (less important for controls, which don't have nested components)
 						//TODO del Debug.trace("looking for component with name", parameterName);
 										getComponentsByDepictName(applicationFrame, parameterName, requestedComponents);	//get all components with depictions using the given name
 			//TODO del; test new method; tidy; comment							getControlsByName(guiseContext, navigationPanel, parameterName, requestedComponents);	//get all components identified by this name
@@ -941,7 +941,7 @@ Debug.trace("got control events");
 							ELFF.appendURIQueryParameter(queryParametersStringBuilder, USER_LANGUAGE_QUERY_ATTRIBUTE_NAME, initControlEvent.getLanguage()).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.ul as a query parameter
 								//content groups and subgroups
 							final List<String> destinationCategoryIDs=new ArrayList<String>();	//we'll look for all the categories available
-							final List<String> destinationSubcategoryIDs=new ArrayList<String>();	//we'll look for all the subcategories available, in whatever category (because WebTrends doesn't distinguish among categories for subcategories)								
+							final List<String> destinationSubcategoryIDs=new ArrayList<String>();	//we'll look for all the subcategories available, in whatever category (because WebTrends doesn't distinguish among categories for subcategories)
 							for(final Category category:componentDestination.getCategories())	//look at each category
 							{
 //TODO del									Debug.trace("destination has category", category.getID());
@@ -963,7 +963,7 @@ Debug.trace("got control events");
 								//WT.cg_n
 							if(!destinationCategoryIDs.isEmpty())	//if there are destination categories
 							{
-/*TODO fix									
+/*TODO fix
 TODO: find out why sometimes ELFF can't be loaded because the application isn't installed into the container
 */
 								ELFF.appendURIQueryParameter(queryParametersStringBuilder, CONTENT_GROUP_NAME_QUERY_ATTRIBUTE_NAME, destinationCategoryIDs.toArray(new String[destinationCategoryIDs.size()])).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.cg_n as a query parameter
@@ -979,7 +979,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 //TODO del when works								entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, appendQueryParameters(request.getQueryString(), queryParameterArray));	//append the new parameters and set the log field
 							entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, queryParametersStringBuilder.toString());	//set the log field to be the parameters we determined
 //TODO del entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, request.getQueryString());
-							
+
 //							TODO fix				entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, request.getQueryString());
 							entry.setFieldValue(Field.SERVER_CLIENT_STATUS_FIELD, new Integer(200));	//TODO fix with real HTTP status
 //							TODO fix cs-status
@@ -1071,7 +1071,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 							}
 							else	//if this is not an AJAX request
 							{
-								throw new HTTPMovedTemporarilyException(redirectURI);	//redirect to the new navigation location TODO fix to work with other viewports						
+								throw new HTTPMovedTemporarilyException(redirectURI);	//redirect to the new navigation location TODO fix to work with other viewports
 							}
 							//TODO if !AJAX						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
 							//TODO store a flag or something---if we're navigating, we probably should flush the other queued events
@@ -1108,7 +1108,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 					else	//if this is ano an AJAX request
 					{
 						throw runtimeException;	//pass the error back to the servlet TODO improve; pass to Guise
-					}						
+					}
 				}
 
 				if(isAJAX && !isNavigating && requestEvent instanceof WebInitializeEvent)	//if this is an AJAX initialization event (if we're navigating, there's no need to initialize this page) TODO maybe just dirty all the frames so this happens automatically
@@ -1146,20 +1146,20 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 				}
 			}
 
-			
-			
+
+
 				//TODO move this to the bottom of the processing, as cookies only need to be updated before they go back
 			synchronizeCookies(request, response, guiseSession);	//synchronize the cookies going out in the response; do this before anything is written back to the client
-			
+
 			if(!isNavigating)	//we'll only update the views if we're not navigating (if we're navigating, we're changing pages, anyway)
 			{
 				if(isAJAX)	//if this is an AJAX request
 				{
 					final Collection<Component> dirtyComponents=AbstractComponent.getDirtyComponents(guiseSession.getApplicationFrame());	//get all dirty components
-	
+
 					CollectionUtilities.removeAll(removedFrames, guiseSession.getApplicationFrame().getChildFrames().iterator());	//remove all the ending frames, leaving us the frames that were removed TODO improve all this
 	//TODO fix					dirtyComponents.addAll(frames);	//add all the frames that were removed
-					
+
 					Debug.trace("we now have dirty components:", dirtyComponents.size());
 					for(final Component affectedComponent:dirtyComponents)
 					{
@@ -1191,10 +1191,10 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						}
 						for(final Frame frame:removedFrames)	//for each removed frame
 						{
-							depictContext.writeElementBegin(XHTML_NAMESPACE_URI, "remove");	//<xhtml:remove>	//TODO use a constant TODO don't use the XHTML namespace if we can help it								
+							depictContext.writeElementBegin(XHTML_NAMESPACE_URI, "remove");	//<xhtml:remove>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
 							depictContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 							depictContext.writeAttribute(null, "id", guisePlatform.getDepictIDString(frame.getDepictID()));	//TODO fix
-							depictContext.writeElementEnd(XHTML_NAMESPACE_URI, "remove");	//</xhtml:remove>							
+							depictContext.writeElementEnd(XHTML_NAMESPACE_URI, "remove");	//</xhtml:remove>
 						}
 					}
 						//send any platform events
@@ -1214,15 +1214,15 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 							depictContext.writeElementEnd(XHTML_NAMESPACE_URI, "command");	//</xhtml:command>
 						}
 						platformEvent=sendEventQueue.poll();	//get the next event to send to the platform
-					}						
+					}
 				}
 				else	//if this is not an AJAX request
 				{
 					applicationFrame.updateTheme();	//make sure a theme has been applied to the application frame
-					applicationFrame.depict();		//tell the application frame to update its view						
+					applicationFrame.depict();		//tell the application frame to update its view
 				}
 			}
-			
+
 			String text=depictContext.getDepictText();	//get the text to output
 			if(isAJAX)	//if this is an AJAX request
 			{
@@ -1234,7 +1234,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 			final byte[] bytes=text.getBytes(UTF_8);	//write the content we collected in the context as series of bytes encoded in UTF-8
 			final OutputStream outputStream=getCompressedOutputStream(request, response);	//get a compressed output stream, if possible
 			outputStream.write(bytes);	//write the bytes
-			outputStream.close();	//close the output stream, finishing writing the compressed contents (don't put this in a finally block, as it will attempt to write more data and raise another exception)						
+			outputStream.close();	//close the output stream, finishing writing the compressed contents (don't put this in a finally block, as it will attempt to write more data and raise another exception)
 		}
 		finally
 		{
@@ -1242,7 +1242,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 			guisePlatform.getDepictLock().unlock();	//always release the platform depict lock
 		}
 	}
-	
+
 	/**Processes a redirect from a redirect destination.
 	This method will unconditionally throw an exception.
 	Under normal circumstances, an {@link HTTPRedirectException} will be thrown.
@@ -1278,7 +1278,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 		}
 		else	//if we don't recognize the type of redirect
 		{
-			throw new AssertionError("Unsupported redirect destination type "+redirectDestination.getClass().getName());			
+			throw new AssertionError("Unsupported redirect destination type "+redirectDestination.getClass().getName());
 		}
 	}
 
@@ -1308,7 +1308,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 			throw new HTTPMovedTemporarilyException(redirectURI);	//redirect temporarily
 		}
 	}
-	
+
 	/**Synchronizes the cookies in a request with the environment properties in a Guise session.
   Any cookies missing from the request will be added from the environment to the response.
   @param request The HTTP request.
@@ -1317,7 +1317,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
   */
 	protected void synchronizeCookies(final HttpServletRequest request, final HttpServletResponse response, final GuiseSession guiseSession)
 	{
-			//remove unneeded cookies from the request						
+			//remove unneeded cookies from the request
 		final URIPath applicationBasePath=guiseSession.getApplication().getBasePath();	//get the application's base path
 		assert applicationBasePath!=null : "Application not yet installed during cookie synchronization.";
 		final String applicationBasePathString=applicationBasePath.toString();	//we'll need the string version of the base path for later
@@ -1353,7 +1353,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						cookie.setMaxAge(0);	//tell the cookie to expire immediately
 						response.addCookie(cookie);	//add the cookie to the response to delete it
 					}
-					cookieMap.put(cookieName, cookie);	//store the cookie in the map to show that there's no need to copy over the environment variable					
+					cookieMap.put(cookieName, cookie);	//store the cookie in the map to show that there's no need to copy over the environment variable
 				}
 			}
 		}
@@ -1365,14 +1365,14 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 			{
 				final String environmentPropertyValue=asInstance(environmentPropertyEntry.getValue(), String.class);	//get the environment property value as a string
 				if(environmentPropertyValue!=null)	//if there is a non-null environment property value
-				{									
+				{
 					final Cookie cookie=new Cookie(environmentPropertyName, encode(environmentPropertyValue));	//create a new cookie with the encoded property value
 					cookie.setPath(applicationBasePathString);	//set the cookie path to the application base path
 					cookie.setMaxAge(Integer.MAX_VALUE);	//don't allow the cookie to expire for a very long time
 					response.addCookie(cookie);	//add the cookie to the response
 				}
 			}
-		}		
+		}
 	}
 
 	/**Serves a resource that has been verified to exist
@@ -1423,7 +1423,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 			final String description=descriptionRDFObject instanceof RDFLiteral ? ((RDFLiteral)descriptionRDFObject).getLexicalForm() : null;	//get the description string, if any
 			if(description!=null)	//if this resource provides a description
 			{
-				setContentDescription(response, description);	//resport the description back to the client				
+				setContentDescription(response, description);	//resport the description back to the client
 			}
 		}
 		super.serveResource(request, response, resource, serveContent);	//serve the resource normally
@@ -1451,16 +1451,16 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 		}
 	}
 
-	private final PathExpression AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION=new PathExpression("request", "events", "*");	//TODO use constants; comment 
-	private final PathExpression AJAX_REQUEST_CONTROL_XPATH_EXPRESSION=new PathExpression("control");	//TODO use constants; comment 
-//TODO del	private final PathExpression AJAX_REQUEST_CONTROL_NAME_XPATH_EXPRESSION=new PathExpression("control", "name");	//TODO use constants; comment 
-//TODO del	private final PathExpression AJAX_REQUEST_CONTROL_VALUE_XPATH_EXPRESSION=new PathExpression("control", "value");	//TODO use constants; comment 
-	private final PathExpression AJAX_REQUEST_SOURCE_XPATH_EXPRESSION=new PathExpression("source");	//TODO use constants; comment 
-	private final PathExpression AJAX_REQUEST_TARGET_XPATH_EXPRESSION=new PathExpression("target");	//TODO use constants; comment 
-	private final PathExpression AJAX_REQUEST_COMPONENT_XPATH_EXPRESSION=new PathExpression("component");	//TODO use constants; comment 
-	private final PathExpression AJAX_REQUEST_MOUSE_XPATH_EXPRESSION=new PathExpression("mouse");	//TODO use constants; comment 
-	private final PathExpression AJAX_REQUEST_VIEWPORT_XPATH_EXPRESSION=new PathExpression("viewport");	//TODO use constants; comment 
-	
+	private final PathExpression AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION=new PathExpression("request", "events", "*");	//TODO use constants; comment
+	private final PathExpression AJAX_REQUEST_CONTROL_XPATH_EXPRESSION=new PathExpression("control");	//TODO use constants; comment
+//TODO del	private final PathExpression AJAX_REQUEST_CONTROL_NAME_XPATH_EXPRESSION=new PathExpression("control", "name");	//TODO use constants; comment
+//TODO del	private final PathExpression AJAX_REQUEST_CONTROL_VALUE_XPATH_EXPRESSION=new PathExpression("control", "value");	//TODO use constants; comment
+	private final PathExpression AJAX_REQUEST_SOURCE_XPATH_EXPRESSION=new PathExpression("source");	//TODO use constants; comment
+	private final PathExpression AJAX_REQUEST_TARGET_XPATH_EXPRESSION=new PathExpression("target");	//TODO use constants; comment
+	private final PathExpression AJAX_REQUEST_COMPONENT_XPATH_EXPRESSION=new PathExpression("component");	//TODO use constants; comment
+	private final PathExpression AJAX_REQUEST_MOUSE_XPATH_EXPRESSION=new PathExpression("mouse");	//TODO use constants; comment
+	private final PathExpression AJAX_REQUEST_VIEWPORT_XPATH_EXPRESSION=new PathExpression("viewport");	//TODO use constants; comment
+
 	/**Retrieves events from the HTTP request.
   @param request The HTTP request.
 	@param guiseSession The Guise session object.
@@ -1479,7 +1479,7 @@ Debug.trace("getting request events");
 //		TODO del Debug.trace("Guise AJAX request");
 			try
 			{
-				final DocumentBuilderFactory documentBuilderFactory=DocumentBuilderFactory.newInstance();	//create a document builder factory TODO create a shared document builder factory, maybe---but make sure it is used by only one thread			
+				final DocumentBuilderFactory documentBuilderFactory=DocumentBuilderFactory.newInstance();	//create a document builder factory TODO create a shared document builder factory, maybe---but make sure it is used by only one thread
 				final DocumentBuilder documentBuilder=documentBuilderFactory.newDocumentBuilder();	//create a new document builder
 				final Document document=documentBuilder.parse(request.getInputStream());	//read the document from the request
 //Debug.trace("request XML:", XMLUtilities.toString(document));
@@ -1506,7 +1506,7 @@ Debug.trace("getting request events");
 										if(depictedObject!=null)	//if we know the depicted object
 										{
 											final String targetID=eventElement.getAttribute("targetID");	//get the ID of the target element TODO use a constant
-											final String actionID=eventElement.getAttribute("actionID");	//get the action identifier TODO use a constant								
+											final String actionID=eventElement.getAttribute("actionID");	//get the action identifier TODO use a constant
 											final int option=Integer.parseInt(eventElement.getAttribute("option"));	//TODO tidy; improve; check for errors; comment
 											requestEventList.add(new WebActionEvent(depictedObject, targetID, actionID, option));	//create and add the event to the list
 										}
@@ -1613,7 +1613,7 @@ Debug.trace("getting request events");
 									if(Boolean.valueOf(eventElement.getAttribute("shiftKey")).booleanValue())	//if Shiftwas pressed TODO use a constant
 									{
 										keys.add(Key.SHIFT_LEFT);	//note the Shift key
-									}							
+									}
 									final KeyboardEvent keyEvent;
 									switch(eventType)	//see which type of keypress this is
 									{
@@ -1646,24 +1646,24 @@ Debug.trace("getting request events");
 									final int componentY=Integer.parseInt(((Element)componentNode).getAttribute("y"));	//TODO tidy; improve; check for errors; comment
 									final int componentWidth=Integer.parseInt(((Element)componentNode).getAttribute("width"));	//TODO tidy; improve; check for errors; comment
 									final int componentHeight=Integer.parseInt(((Element)componentNode).getAttribute("height"));	//TODO tidy; improve; check for errors; comment
-		
+
 									final Node targetNode=XPath.getNode(eventNode, AJAX_REQUEST_TARGET_XPATH_EXPRESSION);	//get the target node
 									final String targetID=((Element)targetNode).getAttribute("id");	//TODO tidy; improve; comment
 									final int targetX=Integer.parseInt(((Element)targetNode).getAttribute("x"));	//TODO tidy; improve; check for errors; comment
 									final int targetY=Integer.parseInt(((Element)targetNode).getAttribute("y"));	//TODO tidy; improve; check for errors; comment
 									final int targetWidth=Integer.parseInt(((Element)targetNode).getAttribute("width"));	//TODO tidy; improve; check for errors; comment
 									final int targetHeight=Integer.parseInt(((Element)targetNode).getAttribute("height"));	//TODO tidy; improve; check for errors; comment
-									
+
 									final Node viewportNode=XPath.getNode(eventNode, AJAX_REQUEST_VIEWPORT_XPATH_EXPRESSION);	//get the viewport node
 									final int viewportX=Integer.parseInt(((Element)viewportNode).getAttribute("x"));	//TODO tidy; improve; check for errors; comment
 									final int viewportY=Integer.parseInt(((Element)viewportNode).getAttribute("y"));	//TODO tidy; improve; check for errors; comment
 									final int viewportWidth=Integer.parseInt(((Element)viewportNode).getAttribute("width"));	//TODO tidy; improve; check for errors; comment
 									final int viewportHeight=Integer.parseInt(((Element)viewportNode).getAttribute("height"));	//TODO tidy; improve; check for errors; comment
-		
+
 									final Node mouseNode=XPath.getNode(eventNode, AJAX_REQUEST_MOUSE_XPATH_EXPRESSION);	//get the mouse node
 									final int mouseX=Integer.parseInt(((Element)mouseNode).getAttribute("x"));	//TODO tidy; improve; check for errors; comment
 									final int mouseY=Integer.parseInt(((Element)mouseNode).getAttribute("y"));	//TODO tidy; improve; check for errors; comment
-		
+
 									final Set<Key> keys=EnumSet.noneOf(Key.class);	//we'll find any keys that were pressed
 									if(Boolean.valueOf(eventElement.getAttribute("altKey")).booleanValue())	//if Alt was pressed TODO use a constant
 									{
@@ -1719,7 +1719,7 @@ Debug.trace("getting request events");
 							case POLL:
 								{
 									final WebPollEvent pollEvent=new WebPollEvent(platform);	//create a new poll event
-									requestEventList.add(pollEvent);	//add the event to the list									
+									requestEventList.add(pollEvent);	//add the event to the list
 								}
 								break;
 							default:
@@ -1772,7 +1772,7 @@ Debug.trace("getting request events");
 			{
 				final boolean exhaustive=POST_METHOD.equals(request.getMethod());	//if this is an HTTP post, the form event is exhaustive of all controls on the form
 				if(!exhaustive || request.getParameter(WebApplicationFrameDepictor.getActionInputID(guiseSession.getApplicationFrame()))!=null)	//if this is a POST, only use the data if it is a Guise POST
-				{				
+				{
 					final WebFormEvent formSubmitEvent=new WebFormEvent(platform, exhaustive);	//create a new form submission event
 					final CollectionMap<String, Object, List<Object>> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
 					final Iterator<Map.Entry<String, String[]>> parameterEntryIterator=((Map<String, String[]>)request.getParameterMap()).entrySet().iterator();	//get an iterator to the parameter entries
@@ -1794,7 +1794,7 @@ Debug.trace("getting request events");
 			Debug.info("Received Request Events:");
 			for(final GuiseEvent requestEvent:requestEventList)	//for each control event
 			{
-				Debug.info("  Event:", requestEvent.getClass(), requestEvent);				
+				Debug.info("  Event:", requestEvent.getClass(), requestEvent);
 			}
 		}
 
@@ -1912,7 +1912,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
 		final Principal guiseSessionPrincipal=guiseSession.getPrincipal();	//get the current principal of the Guise session
 		final String guiseSessionPrincipalID=guiseSessionPrincipal!=null ? guiseSessionPrincipal.getName() : null;	//get the current guise session principal ID
-//	TODO del Debug.trace("checking to see if nonce principal ID", getNoncePrincipalID(nonce), "matches Guise session principal ID", guiseSessionPrincipalID); 
+//	TODO del Debug.trace("checking to see if nonce principal ID", getNoncePrincipalID(nonce), "matches Guise session principal ID", guiseSessionPrincipalID);
 		if(!ObjectUtilities.equals(getNoncePrincipalID(nonce), guiseSessionPrincipalID))	//if this nonce was for a different principal
 		{
 			return false;	//the user must have logged out or have been changed
@@ -1961,7 +1961,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 //TODO del Debug.trace("just got null query string from request");
 			return null;	//indicate that there is no bookmark information
 		}
-	}	
+	}
 
 	/**Determines if another URI can be substituted for the requested URI.
 	This usually occurs when a request for "path/to/collection" should really be to "path/to/collection/", the former doesn't exist yet the latter is a collection,
@@ -2019,7 +2019,7 @@ Debug.trace("this is a destination");
  			final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
  			final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
 			final String referrer=getReferer(request);	//get the request referrer, if any
-			final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer	 			
+			final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
  			final ObjectHolder<Boolean> resourceExistsHolder=new ObjectHolder<Boolean>();	//create an object holder to receive the existence result
 			final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
 			try
@@ -2057,14 +2057,14 @@ Debug.trace("this is a destination");
  		return super.exists(request, resourceURI);	//see if a physical resource exists at the location, if we can't find a virtual resource (a Guise public resource or a navigation path component)
   }
 
-  /**The thread-safe map of references to cached stylesheets fixed for IE6.*/ 
+  /**The thread-safe map of references to cached stylesheets fixed for IE6.*/
   private final Map<URI, Reference<HTTPServletResource>> cachedIE6FixedStylesheetResources=new ConcurrentHashMap<URI, Reference<HTTPServletResource>>();
 
 	/**Determines the requested resource.
   This version adds support for Guise public and temporary resources; and destination resources.
 	@param request The HTTP request in response to which the resource is being retrieved.
 	@param resourceURI The URI of the requested resource.
-  @return An object providing an encapsulation of the requested resource, but not necessarily the contents of the resource. 
+  @return An object providing an encapsulation of the requested resource, but not necessarily the contents of the resource.
 	@exception IllegalArgumentException if the given resource URI does not represent a valid resource.
 	@exception IOException if there is an error accessing the resource.
 	@see #isGuisePublicResourceURI(URI)
@@ -2110,7 +2110,7 @@ Debug.trace("this is a destination");
 						throw new HTTPNotFoundException("No such Guise temporary resource: "+resourceURI);
 					}
 				}
-				catch(final IllegalStateException illegalStateException)	//if we cannot access the resource from the current session  
+				catch(final IllegalStateException illegalStateException)	//if we cannot access the resource from the current session
 				{
 					throw new HTTPForbiddenException(illegalStateException.getMessage(), illegalStateException);	//forbid the user from accessing the resource TODO should the Throwable constructor only use Throwable.getMessage() instead of the Throwable.toString()
 				}
@@ -2127,7 +2127,7 @@ Debug.trace("this is a destination");
 		 			final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
 		 			final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
 					final String referrer=getReferer(request);	//get the request referrer, if any
-					final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer	 			
+					final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
 					final ObjectHolder<RDFResource> destinationResourceDescriptionHolder=new ObjectHolder<RDFResource>();	//create an object holder to receive the result of asking for the resource description
 					final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
 					try
@@ -2189,7 +2189,7 @@ Debug.trace("this is a destination");
 					}
 					else
 					{
-//TODO del Debug.trace("IE6 stylesheet was cached");						
+//TODO del Debug.trace("IE6 stylesheet was cached");
 					}
 					return ie6CSSResource;	//use the cached IE6 CSS resource so we won't have to process it all over again
 //TODO del								Debug.trace("fixed stylesheet for IE6", cssStylesheet);
@@ -2235,7 +2235,7 @@ Debug.trace("this is a destination");
 		protected byte[] loadBytes(final HttpServletRequest request) throws IOException
 		{
 			return loadStylesheet(request, new GuiseCSSProcessor()).toString().getBytes(UTF_8);	//load the stylesheet and return its bytes
-		}		
+		}
 
 		/**HTTP servlet resource constructor.
 		@param resource The decorated HTTP servlet resource.
@@ -2248,7 +2248,7 @@ Debug.trace("this is a destination");
 	}
 
 	/**A resource that represents an IE6 CSS file, decorating an existing resource.
-	This version processes resources of type <code>text/css</code> to work around IE6 bugs, if IE6 is the user agent.	
+	This version processes resources of type <code>text/css</code> to work around IE6 bugs, if IE6 is the user agent.
 	@author Garret Wilson
 	*/
 	protected static class IE6CSSResource extends CSSResource
@@ -2283,7 +2283,7 @@ Debug.trace("this is a destination");
 	*/
 	protected class DestinationResource extends AbstractDescriptionResource
 	{
-	
+
 		final GuiseContainer guiseContainer;
 		final GuiseApplication guiseApplication;
 		final GuiseSession guiseSession;
@@ -2334,7 +2334,7 @@ Debug.trace("this is a destination");
 			assert inputStreamHolder.getObject()!=null : "Return value from thread unexpectedly missing.";
 			return inputStreamHolder.getObject();	//return the input stream we received from the resource destination
 		}
-	
+
 		/**Constructs a resource with a reference URI and resource description, along with the Guise container, application, session, and resource destination.
 		@param referenceURI The reference URI for the new resource.
 		@param resourceDescription The description of the resource.
@@ -2358,7 +2358,7 @@ Debug.trace("this is a destination");
 			this.bookmark=checkInstance(bookmark, "Boomark cannot be null.");
 			this.referrerURI=referrerURI;
 		}
-	
+
 	}
 
 	/**Determines whether the given URI references a Guise public resource.

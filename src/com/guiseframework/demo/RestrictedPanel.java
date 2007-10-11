@@ -8,11 +8,11 @@ import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
 
 /**Restricted Guise demonstration panel.
-Copyright © 2005 GlobalMentor, Inc.
+Copyright Â© 2005 GlobalMentor, Inc.
 Demonstrates restricted access to navigation paths and user logout.
 @author Garret Wilson
 */
-public class RestrictedPanel extends DefaultNavigationPanel
+public class RestrictedPanel extends LayoutPanel
 {
 
 	/**The notice to display on the restricted panel.*/

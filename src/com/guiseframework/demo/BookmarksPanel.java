@@ -11,11 +11,11 @@ import com.guiseframework.event.*;
 import com.guiseframework.model.ValueModel;
 
 /**Bookmark Guise demonstration panel.
-Copyright © 2005-2006 GlobalMentor, Inc.
+Copyright Â© 2005-2006 GlobalMentor, Inc.
 Demonstrates saving bookmarks and updating state based upon bookmark navigation.
 @author Garret Wilson
 */
-public class BookmarksPanel extends DefaultNavigationPanel implements NavigationListener
+public class BookmarksPanel extends LayoutPanel implements NavigationListener
 {
 
 	/**The number of tabs.*/

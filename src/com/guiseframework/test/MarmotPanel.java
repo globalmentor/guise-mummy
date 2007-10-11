@@ -41,7 +41,7 @@ import com.guiseframework.validator.ValidationException;
 /**Test panel for Marmot
 @author Garret Wilson
 */
-public class MarmotPanel extends DefaultNavigationPanel
+public class MarmotPanel extends LayoutPanel
 {
 
 	/**Default constructor.*/

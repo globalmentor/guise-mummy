@@ -14,13 +14,13 @@ import com.guiseframework.converter.DateStringLiteralStyle;
 import com.guiseframework.model.*;
 
 /**Internationalization Guise demonstration panel.
-Copyright © 2005-2006 GlobalMentor, Inc.
+Copyright Â© 2005-2006 GlobalMentor, Inc.
 Demonstrates locale label models, date label models,
 	application supported locales, current session locale, menus,
 	localized resource bundle resources, and localized resource files.
 @author Garret Wilson
 */
-public class InternationalizationPanel extends DefaultNavigationPanel
+public class InternationalizationPanel extends LayoutPanel
 {
 
 	/**The key to the UN Charter Preamble resource.*/

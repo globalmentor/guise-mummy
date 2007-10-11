@@ -41,12 +41,8 @@ import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.text.CharacterConstants.*;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.garretwilson.text.FormatUtilities.*;
-import static com.garretwilson.text.xml.XMLUtilities.*;
 import static com.guiseframework.Resources.*;
 import static com.guiseframework.theme.Theme.*;
-
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 /**An abstract implementation that keeps track of the components of a user session.
 @author Garret Wilson
@@ -125,12 +121,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			}
 			return applicationFrame;	//return the application frame
 		}
-
-	/**The non-thread-safe document builder that parses XML documents for input to RDF.*/
-//TODO del	private final DocumentBuilder documentBuilder;
-
-		/**@return The non-thread-safe document builder that parses XML documents for input to RDF.*/
-		//TODO del private DocumentBuilder getDocumentBuilder() {return documentBuilder;}
 
 	/**The cache of components keyed to component destinations.*/
 	private final Map<ComponentDestination, Component> destinationComponentMap=synchronizedMap(new HashMap<ComponentDestination, Component>());
@@ -649,6 +639,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			}
 			else	//if the resource is not a string, assume it is a URI
 			{
+Debug.trace("ready to cast object to a URI", resource);
 				return (URI)resource;	//return the resource as a URI object, throwing a ClassCastException if it isn't an instance of URI
 			}
 		}
@@ -870,28 +861,28 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		{
 			throw new IllegalStateException(instantiationException);
 		}
-		initializeComponent(component);	//initialize the component from an RDF description, if possible
+		initializeComponent(component);	//initialize the component from a TURF description, if possible
 		return component;	//return the component
 	}
 	
-	/**Initializes a component, optionally with a description in an RDF resource file.
-	This method first tries to load a PLOOP RDF description of the component in an RDF file in the classpath in the same directory with the same name as the class file, with an <code>.rdf</code> extension.
-	That is, for the class <code>MyComponent.class</code> this method first tries to load <code>MyComponent.rdf</code> from the same directory in the classpath.
-	If this is successful, the component is initialized from this RDF description.
+	/**Initializes a component, optionally with a description in a TURF resource file.
+	This method first tries to load a PLOOP URF description of the component in a TURF file in the classpath in the same directory with the same name as the class file, with an <code>.turf</code> extension.
+	That is, for the class <code>MyComponent.class</code> this method first tries to load <code>MyComponent.turf</code> from the same directory in the classpath.
+	If this is successful, the component is initialized from this URF description.
 	This implementation calls {@link #initializeComponent(Component, InputStream)}.
-	The component's {@link Component#initialize()} is called whether there is an RDF description.
+	The component's {@link Component#initialize()} is called whether there is an URF description.
 	This method synchronizes on {@link #getDocumentBuilder()}.
 	@param component The component to initialize.
 	@exception MissingResourceException if no resource could be found associated with the given key.
-	@exception IllegalArgumentException if the RDF description does not provide a resource description of the same type as the specified component.
-	@exception IllegalStateException if the given component has already been initialized.
+	@exception IllegalArgumentException if the URF description does not provide a resource description of the same type as the specified component.
+	@exception IllegalStateException if the given component has already been initialized, or there was some other problem initializing the component.
 	@see Component#initialize()
 	@see <a href="http://www.ploop.org/">PLOOP</a>
 	*/
 	public void initializeComponent(final Component component)
 	{
 		final Class<?> componentClass=component.getClass();	//get the class of the component
-		final String descriptionFilename=addExtension(getLocalName(componentClass), RDF_EXTENSION);	//create a name in the form ClassName.rdf
+		final String descriptionFilename=addExtension(getLocalName(componentClass), TURF_EXTENSION);	//create a name in the form ClassName.turf
 		//TODO del Debug.trace("Trying to load description file:", descriptionFilename);
 		final InputStream descriptionInputStream=componentClass.getResourceAsStream(descriptionFilename);	//get an input stream to the description file
 		if(descriptionInputStream!=null)	//if we have a description file
@@ -909,7 +900,15 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			}
 			catch(final IOException ioException)	//if there is an I/O exception
 			{
-				throw new AssertionError(ioException);	//TODO fix better
+				throw new IllegalStateException(ioException);	//TODO fix better
+			}		
+			catch(final DataException dataException)
+			{
+				throw new IllegalStateException(dataException);	//TODO fix better
+			}		
+			catch(final InvocationTargetException invocationTargetException)
+			{
+				throw new IllegalStateException(invocationTargetException);	//TODO fix better
 			}		
 		}
 		else	//if there is no description file
@@ -918,18 +917,20 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		}
 	}
 
-	/**Initializes a component with a description in an RDF resource file.
+	/**Initializes a component with a description in an TURF resource file.
 	This method calls {@link Component#initialize()} after initializing the component from the description.
 	This implementation calls {@link #initializeComponent(Component, InputStream)}.
 	This method synchronizes on {@link #getDocumentBuilder()}.
 	@param component The component to initialize.
-	@param resourceKey The key to an RDF description resource file.
+	@param resourceKey The key to a TURF description resource file.
 	@exception MissingResourceException if no resource could be found associated with the given key.
-	@exception IllegalArgumentException if the RDF description does not provide a resource description of the same type as the specified component.
+	@exception IllegalArgumentException if the URF description does not provide a resource description of the same type as the specified component.
 	@exception IllegalStateException if the given component has already been initialized.
+	@exception DataException if the data was incorrect for component initialization.
+	@exception InvocationTargetException if a given resource indicates a Java class the constructor of which throws an exception.
 	@see Component#initialize()
 	*/
-	public void initializeComponentFromResource(final Component component, final String resourceKey)
+	public void initializeComponentFromResource(final Component component, final String resourceKey) throws DataException, InvocationTargetException
 	{
 		final String descriptionResource=getStringResource(resourceKey);	//get the description resource
 		try
@@ -941,69 +942,41 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		{
 			throw new AssertionError(unsupportedEncodingException);
 		}
+		catch(final IOException ioException)	//we should never have an I/O exception reading from a byte array input stream
+		{
+			throw new AssertionError(ioException);
+		}
 	}
 	
-	/**Initializes a component from the contents of an RDF description input stream.
+	/**Initializes a component from the contents of an URF description input stream.
 	This method calls {@link Component#initialize()} after initializing the component from the description.
 	This method synchronizes on {@link #getDocumentBuilder()}.
 	@param component The component to initialize.
-	@param descriptionInputStream The input stream containing an RDF description.
-	@exception IllegalArgumentException if the RDF description does not provide a resource description of the same type as the specified component.
+	@param descriptionInputStream The input stream containing an URF description.
+	@exception IllegalArgumentException if the URF description does not provide a resource description of the same type as the specified component.
 	@exception IllegalStateException if the given component has already been initialized.
+	@exception IOException if there is an error reading from the input stream.
+	@exception DataException if the data was incorrect for component initialization.
+	@exception InvocationTargetException if a given resource indicates a Java class the constructor of which throws an exception.
 	@see Component#initialize()
 	*/
-	public void initializeComponent(final Component component, final InputStream descriptionInputStream)
+	public void initializeComponent(final Component component, final InputStream descriptionInputStream) throws IOException, DataException, InvocationTargetException
 	{
-		try
+		final URI BASE_URI=URI.create("guise:/");	//TODO fix
+		final URF urf=AbstractTURFIO.readTURF(new URF(), descriptionInputStream, baseURI);	//read TURF from the input stream
+		final URI componentResourceTypeURI=createInfoJavaURI(component.getClass());	//create a new URI that indicates the type of the resource description we expect
+		final URFResource componentResource=urf.getResourceByTypeURI(componentResourceTypeURI);	//try to locate the description of the given component
+		if(componentResource!=null)	//if there is a resource description of a matching type
 		{
-//TODO del			synchronized(getDocumentBuilder())	//synchronize because the document builder is not thread-safe
-			{
-				final URI BASE_URI=URI.create("guise:/");	//TODO fix
-				final URF urf=AbstractTURFIO.readTURF(new URF(), descriptionInputStream, baseURI);	//read TURF from the input stream
-/*TODO del
-				final Document document=getDocumentBuilder().parse(descriptionInputStream);	//parse the description document
-		//TODO del Debug.trace("just parsed XML:", XMLUtilities.toString(document));
-				final RDFXMLProcessor rdfProcessor=new RDFXMLProcessor();	//create a new RDF processor
-				final RDF rdf=rdfProcessor.processRDF(document, BASE_URI);	//process the RDF from the XML
-				//integrate the structure into the RDF
-//TODO del					Debug.trace("just read RDF", RDFUtilities.toString(rdf));
-//TODO delDebug.trace("just read RDF", RDFUtilities.toString(rdf));
-				final URI componentResourceTypeURI=new URI(JAVA_SCHEME, component.getClass().getName(), null);	//create a new URI that indicates the type of the resource description we expect
-				final RDFResource componentResource=RDFUtilities.getResourceByType(rdf, componentResourceTypeURI);	//try to locate the description of the given component
-*/
-				final URI componentResourceTypeURI=createInfoJavaURI(component.getClass());	//create a new URI that indicates the type of the resource description we expect
-				final URFResource componentResource=urf.getResourceByTypeURI(componentResourceTypeURI);	//try to locate the description of the given component
-				if(componentResource!=null)	//if there is a resource description of a matching type
-				{
 //TODO del					final PLOOPProcessor ploopProcessor=new PLOOPProcessor(this);	//create a new PLOOP processor, passing the Guise session to use as a default constructor argument
-					final PLOOPURFProcessor ploopProcessor=new PLOOPURFProcessor();	//create a new PLOOP processor
-					ploopProcessor.setObjectProperties(component, componentResource);	//initialize the component from this resource
-					component.initialize();	//initialize the component
-					final List<Object> objects=ploopProcessor.getObjects(urf);	//make sure all described Java objects in the URF instance have been created
-				}
-				else	//if there is no resource of the appropriate type
-				{
-					throw new IllegalArgumentException("No resource description found of type "+componentResourceTypeURI);
-				}
-			}
+			final PLOOPURFProcessor ploopProcessor=new PLOOPURFProcessor();	//create a new PLOOP processor
+			ploopProcessor.setObjectProperties(component, componentResource);	//initialize the component from this resource
+			component.initialize();	//initialize the component
+			final List<Object> objects=ploopProcessor.getObjects(urf);	//make sure all described Java objects in the URF instance have been created
 		}
-/*TODO del
-		catch(final SAXException saxException)	//we don't expect parsing errors
+		else	//if there is no resource of the appropriate type
 		{
-			throw new AssertionError(saxException);	//TODO maybe change to throwing an IOException
-		}
-		catch(final URISyntaxException uriSyntaxException)
-		{
-			throw new AssertionError(uriSyntaxException);	//TODO fix better
-		}
-*/
-		catch(final IOException ioException)	//if there is an I/O exception
-		{
-			throw new AssertionError(ioException);	//TODO fix better
-		}		
-		catch(final InvocationTargetException invocationTargetException)
-		{
-			throw new AssertionError(invocationTargetException);	//TODO fix better
+			throw new IllegalArgumentException("No resource description found of type "+componentResourceTypeURI);
 		}
 	}
 

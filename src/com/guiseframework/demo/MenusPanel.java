@@ -10,11 +10,11 @@ import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 
 /**Menus Guise demonstration panel.
-Copyright © 2005 GlobalMentor, Inc.
+Copyright Â© 2005 GlobalMentor, Inc.
 Demonstrates drop menus, accordion menus, menu rollovers, and menu actions. 
 @author Garret Wilson
 */
-public class MenusPanel extends DefaultNavigationPanel
+public class MenusPanel extends LayoutPanel
 {
 
 	/**Default constructor.*/

@@ -12,7 +12,7 @@ import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
 /**Edit Users Guise demonstration panel.
-Copyright © 2005-2007 GlobalMentor, Inc.
+Copyright Â© 2005-2007 GlobalMentor, Inc.
 Demonstrates list controls with default representation, thread-safe select model access,
 	sorting list control models, listening for select model list changes,
 	retrieving navigation panels, invoking modal panels, retrieving modal panel results,
@@ -20,7 +20,7 @@ Demonstrates list controls with default representation, thread-safe select model
 	and accessing a custom Guise application.
 @author Garret Wilson
 */
-public class EditUsersPanel extends DefaultNavigationPanel
+public class EditUsersPanel extends LayoutPanel
 {
 
 	/**Default constructor.*/

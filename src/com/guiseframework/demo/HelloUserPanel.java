@@ -6,7 +6,7 @@ import com.guiseframework.event.*;
 import com.guiseframework.validator.RegularExpressionStringValidator;
 
 /**Hello User Guise demonstration panel.
-Copyright © 2005-2007 GlobalMentor, Inc.
+Copyright Â© 2005-2007 GlobalMentor, Inc.
 Demonstrates flow layouts, hidden components, text controls, control labels,
 	tooltips, text control regular expression validators, buttons,
 	form validation, and action listeners.

@@ -11,12 +11,12 @@ import com.guiseframework.validator.RegularExpressionStringValidator;
 import com.guiseframework.validator.ValueRequiredValidator;
 
 /**Event wizard Guise demonstration panel.
-Copyright © 2006-2007 GlobalMentor, Inc.
+Copyright Â© 2006-2007 GlobalMentor, Inc.
 Demonstrates sequence card panels, task card constraints, task status select links,
 	action card couplers, link select card couplers, and action prototypes.
 @author Garret Wilson
 */
-public class EventWizardPanel extends DefaultNavigationPanel
+public class EventWizardPanel extends LayoutPanel
 {
 
 	/**Default constructor.*/

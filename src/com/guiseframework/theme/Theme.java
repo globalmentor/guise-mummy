@@ -185,7 +185,10 @@ public class Theme extends AbstractClassTypedURFResource
 	Any parent theme is first applied to the object before this theme is applied.
 	@param object The object to which this theme should be applied.
 	@exception NullPointerException if the given object is <code>null</code>.
-	@exception IllegalStateException if a class was specified and the indicated class cannot be found, or if a theme object a Java class the constructor of which throws an exception.
+ 	@exception IllegalStateException if a resource is a Java-typed resource the class of which cannot be found.
+	@exception IllegalStateException if a particular value is not an appropriate argument for the corresponding property.
+	@exception IllegalStateException If a particular property could not be accessed.
+	@exception IllegalStateException if a resource indicates a Java class the constructor of which throws an exception.
 	*/
 	public void apply(final Object object)
 	{
@@ -203,9 +206,9 @@ public class Theme extends AbstractClassTypedURFResource
 				rule.apply(object, ploopProcessor);	//apply the rule to the component, if the rule is applicable
 			}
 		}
-		catch(final ClassNotFoundException classNotFoundException)
+		catch(final DataException dataException)
 		{
-			throw new IllegalStateException(classNotFoundException);
+			throw new IllegalStateException(dataException);
 		}
 		catch(final InvocationTargetException invocationTargetException)
 		{

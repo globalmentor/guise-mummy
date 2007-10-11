@@ -4,13 +4,13 @@ import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.component.*;
 
-/**Event wizard Guise demonstration panel using PLOOP+RDF+XML.
-Copyright © 2006 GlobalMentor, Inc.
+/**Event wizard Guise demonstration panel using URF PLOOP.
+Copyright Â© 2006 GlobalMentor, Inc.
 Demonstrates sequence card panels, task card constraints, task status select links,
 	action card couplers, link select card couplers, and action prototypes.
 @author Garret Wilson
 */
-public class EventWizardPanel2 extends DefaultNavigationPanel
+public class EventWizardPanel2 extends LayoutPanel
 {
 
 	/**Initializes the component after construction.*/

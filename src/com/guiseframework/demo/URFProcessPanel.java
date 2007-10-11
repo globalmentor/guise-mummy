@@ -16,11 +16,11 @@ import com.guiseframework.model.DummyTreeNodeModel;
 import com.guiseframework.model.urf.URFDynamicTreeNodeModel;
 
 /**URF Process Guise demonstration panel.
-Copyright © 2005-2007 GlobalMentor, Inc.
-Demonstrates URF processing.
+Copyright © 2007 GlobalMentor, Inc.
+Demonstrates URF processing and tree controls.
 @author Garret Wilson
 */
-public class URFProcessPanel extends DefaultNavigationPanel
+public class URFProcessPanel extends LayoutPanel
 {
 
 	/**Default constructor.*/

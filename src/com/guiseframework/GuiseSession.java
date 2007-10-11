@@ -1,6 +1,7 @@
 package com.guiseframework;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.security.Principal;
 import java.text.MessageFormat;
@@ -10,6 +11,7 @@ import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.event.PostponedEvent;
 import com.garretwilson.net.URIPath;
 import com.garretwilson.urf.URFResource;
+import com.garretwilson.util.DataException;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.event.*;
@@ -144,45 +146,50 @@ public interface GuiseSession extends PropertyBindable
 	*/
 	public void setOrientation(final Orientation newOrientation);
 
-	/**Initializes a component, optionally with a description in an RDF resource file.
-	This method first tries to load a PLOOP RDF description of the component in an RDF file with the same name as the class file in the same directory, with an <code>.rdf</code> extension.
-	That is, for the class <code>MyComponent.class</code> this method first tries to load <code>MyComponent.rdf</code> from the same directory.
-	If this is successful, the component is initialized from this RDF description.
+	/**Initializes a component, optionally with a description in a TURF resource file.
+	This method first tries to load a PLOOP URF description of the component in a TURF file with the same name as the class file in the same directory, with an <code>.turf</code> extension.
+	That is, for the class <code>MyComponent.class</code> this method first tries to load <code>MyComponent.turf</code> from the same directory.
+	If this is successful, the component is initialized from this URF description.
 	This implementation calls {@link #initializeComponent(Component, InputStream)}.
-	The component's {@link Component#initialize()} is called whether there is an RDF description.
+	The component's {@link Component#initialize()} is called whether there is an URF description.
 	This method synchronizes on {@link #getDocumentBuilder()}.
 	@param component The component to initialize.
 	@exception MissingResourceException if no resource could be found associated with the given key.
-	@exception IllegalArgumentException if the RDF description does not provide a resource description of the same type as the specified component.
-	@exception IllegalStateException if the given component has already been initialized.
+	@exception IllegalArgumentException if the URF description does not provide a resource description of the same type as the specified component.
+	@exception IllegalStateException if the given component has already been initialized, or there was some other problem initializing the component.
 	@see Component#initialize()
 	@see <a href="http://www.ploop.org/">PLOOP</a>
 	*/
 	public void initializeComponent(final Component component);
 	
-	/**Initializes a component with a description in an RDF resource file.
+	/**Initializes a component with a description in a TURF resource file.
 	This method calls {@link Component#initialize()} after initializing the component from the description.
 	This implementation calls {@link #initializeComponent(Component, InputStream)}.
 	This method synchronizes on {@link #getDocumentBuilder()}.
 	@param component The component to initialize.
-	@param resourceKey The key to an RDF description resource file.
+	@param resourceKey The key to a TURF description resource file.
 	@exception MissingResourceException if no resource could be found associated with the given key.
-	@exception IllegalArgumentException if the RDF description does not provide a resource description of the same type as the specified component.
+	@exception IllegalArgumentException if the URF description does not provide a resource description of the same type as the specified component.
 	@exception IllegalStateException if the given component has already been initialized.
+	@exception DataException if the data was incorrect for component initialization.
+	@exception InvocationTargetException if a given resource indicates a Java class the constructor of which throws an exception.
 	@see Component#initialize()
 	*/
-	public void initializeComponentFromResource(final Component component, final String resourceKey);
+	public void initializeComponentFromResource(final Component component, final String resourceKey) throws DataException, InvocationTargetException;
 	
-	/**Initializes a component from the contents of an RDF description input stream.
+	/**Initializes a component from the contents of an URF description input stream.
 	This method calls {@link Component#initialize()} after initializing the component from the description.
 	This method synchronizes on {@link #getDocumentBuilder()}.
 	@param component The component to initialize.
-	@param descriptionInputStream The input stream containing an RDF description.
-	@exception IllegalArgumentException if the RDF description does not provide a resource description of the same type as the specified component.
+	@param descriptionInputStream The input stream containing an URF description.
+	@exception IllegalArgumentException if the URF description does not provide a resource description of the same type as the specified component.
 	@exception IllegalStateException if the given component has already been initialized.
+	@exception IOException if there is an error reading from the input stream.
+	@exception DataException if the data was incorrect for component initialization.
+	@exception InvocationTargetException if a given resource indicates a Java class the constructor of which throws an exception.
 	@see Component#initialize()
 	*/
-	public void initializeComponent(final Component component, final InputStream descriptionInputStream);
+	public void initializeComponent(final Component component, final InputStream descriptionInputStream) throws IOException, DataException, InvocationTargetException;
 
 	/**Retrieves a resource bundle to be used by this session.
 	One of the <code>getXXXResource()</code> should be used in preference to using this method directly.

@@ -7,7 +7,7 @@ import com.guiseframework.component.layout.Layout;
 @param <R> The type of modal result this modal navigation panel produces.
 @author Garret Wilson
 */
-public abstract class AbstractModalNavigationPanel<R> extends AbstractNavigationPanel implements ModalNavigationPanel<R>
+public abstract class AbstractModalNavigationPanel<R> extends AbstractPanel implements ModalNavigationPanel<R>
 {
 
 	/**The result of this navigation panel's modal interaction, or <code>null</code> if no result is given.*/

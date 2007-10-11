@@ -14,12 +14,12 @@ import com.guiseframework.event.ActionListener;
 import com.guiseframework.validator.RegularExpressionStringValidator;
 
 /**Generate Content Guise demonstration panel.
-Copyright � 2007 GlobalMentor, Inc.
+Copyright © 2007 GlobalMentor, Inc.
 Demonstrates generation of temporary content, navigating with a viewport ID,
 	and notifying the user of errors.
 @author Garret Wilson
 */
-public class GenerateContentPanel extends DefaultNavigationPanel
+public class GenerateContentPanel extends LayoutPanel
 {
 
 	/**Default constructor.*/

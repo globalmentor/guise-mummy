@@ -10,12 +10,12 @@ import com.guiseframework.component.layout.*;
 import com.guiseframework.component.transfer.*;
 
 /**Drop Details Guise demonstration panel.
-Copyright � 2005-2007 GlobalMentor, Inc.
+Copyright © 2005-2007 GlobalMentor, Inc.
 Demonstrates images, drag enabling, drop enabling,
 	default drop support, and custom import strategies. 
 @author Garret Wilson
 */
-public class DropDetailsPanel extends DefaultNavigationPanel
+public class DropDetailsPanel extends LayoutPanel
 {
 
 	/**Default constructor.*/

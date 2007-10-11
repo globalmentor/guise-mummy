@@ -10,7 +10,7 @@ import com.guiseframework.model.Notification;
 import com.guiseframework.validator.*;
 
 /**Edit User Guise demonstration panel.
-Copyright © 2005 GlobalMentor, Inc.
+Copyright Â© 2005 GlobalMentor, Inc.
 Demonstrates modal panels, component validity checks, masked text controls, ending modality, and modal cancel functionality.
 @author Garret Wilson
 */

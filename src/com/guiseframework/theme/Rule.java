@@ -8,6 +8,7 @@ import com.garretwilson.urf.AbstractClassTypedURFResource;
 import com.garretwilson.urf.select.Selector;
 import static com.garretwilson.urf.select.Select.*;
 import com.garretwilson.urf.ploop.PLOOPURFProcessor;
+import com.garretwilson.util.DataException;
 
 import static com.guiseframework.theme.Theme.*;
 
@@ -48,10 +49,13 @@ public class Rule extends AbstractClassTypedURFResource
 	@param object The object on which this rule should be applied.
 	@param ploopProcessor The PLOOP processor for setting object properties.
 	@return <code>true</code> if the rule selected the given object.
-	@exception ClassNotFoundException if a class was specified and the indicated class cannot be found.
-	@exception InvocationTargetException if the given RDF object indicates a Java class the constructor of which throws an exception.
+	@exception NullPointerException if the given object and/or PLOOP processor is <code>null</code>.
+ 	@exception DataException if a resource is a Java-typed resource the class of which cannot be found.
+	@exception DataException if a particular value is not an appropriate argument for the corresponding property.
+	@exception DataException If a particular property could not be accessed.
+	@exception InvocationTargetException if a resource indicates a Java class the constructor of which throws an exception.
 	*/
-	public boolean apply(final Object object, final PLOOPURFProcessor ploopProcessor) throws ClassNotFoundException, InvocationTargetException
+	public boolean apply(final Object object, final PLOOPURFProcessor ploopProcessor) throws DataException, InvocationTargetException
 	{
 		final Selector selector=getSelector();	//get the selector, if any
 		if(selector!=null && selector.selects(object))	//if this selector selects the object

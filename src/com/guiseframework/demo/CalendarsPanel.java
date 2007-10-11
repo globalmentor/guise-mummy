@@ -13,12 +13,12 @@ import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
 /**Calendars Guise demonstration panel.
-Copyright © 2005 GlobalMentor, Inc.
+Copyright Â© 2005 GlobalMentor, Inc.
 Demonstrates calendar month table models, calendar controls,
 	calendar dialog frames, and text controls with date value models. 
 @author Garret Wilson
 */
-public class CalendarsPanel extends DefaultNavigationPanel
+public class CalendarsPanel extends LayoutPanel
 {
 
 	/**Default constructor.*/

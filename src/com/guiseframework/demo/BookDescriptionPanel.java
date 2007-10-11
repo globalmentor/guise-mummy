@@ -7,7 +7,7 @@ import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.Extent;
 
 /**Drop Details Guise demonstration panel.
-Copyright � 2005 GlobalMentor, Inc.
+Copyright © 2005 GlobalMentor, Inc.
 Demonstrates image description visibility, flyover frames,
 	preferred widths and heights, extents, and units.
 <p>Contextual flyover tethers can be specified using the following resource keys,
@@ -26,7 +26,7 @@ Demonstrates image description visibility, flyover frames,
 @see com.guiseframework.component.FlyoverFrame
 @see com.guiseframework.geometry.CompassPoint
 */
-public class BookDescriptionPanel extends DefaultNavigationPanel
+public class BookDescriptionPanel extends LayoutPanel
 {
 
 	/**Default constructor.*/

@@ -4,11 +4,11 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 
 /**Tabs Guise demonstration panel.
-Copyright © 2005 GlobalMentor, Inc.
+Copyright Â© 2005 GlobalMentor, Inc.
 Demonstrates tabbed panels, tab controls, and card panels. 
 @author Garret Wilson
 */
-public class TabsPanel extends DefaultNavigationPanel
+public class TabsPanel extends LayoutPanel
 {
 
 	/**Default constructor.*/

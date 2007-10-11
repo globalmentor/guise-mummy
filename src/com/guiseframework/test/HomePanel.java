@@ -44,7 +44,7 @@ import com.guiseframework.validator.ValueRequiredValidator;
 /**Test panel for a home page.
 @author Garret Wilson
 */
-public class HomePanel extends DefaultNavigationPanel
+public class HomePanel extends LayoutPanel
 {
 
 	private TestFrame frame=null;

@@ -20,7 +20,7 @@ Demonstrates resource input (file upload) controls, file upload content type and
 This demonstration assumes text files are encoded using the system default character encoding.
 @author Garret Wilson
 */
-public class TextSearchPanel extends DefaultNavigationPanel
+public class TextSearchPanel extends LayoutPanel
 {
 
 	/**Instructions for the this demo.*/

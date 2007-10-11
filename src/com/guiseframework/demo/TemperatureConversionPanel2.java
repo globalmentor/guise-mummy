@@ -9,14 +9,14 @@ import com.guiseframework.component.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 
-/**Temperature Conversion Guise demonstration panel using PLOOP+RDF+XML.
-Copyright © 2005-2006 GlobalMentor, Inc.
+/**Temperature Conversion Guise demonstration panel using URF PLOOP.
+Copyright Â© 2005-2006 GlobalMentor, Inc.
 Demonstrates layout panels, group panels, float input controls, float input validation,
 	radio button controls, dynamic updates (e.g. AJAX on the web platform),
 	required value validation, and read-only controls.
 @author Garret Wilson
 */
-public class TemperatureConversionPanel2 extends DefaultNavigationPanel
+public class TemperatureConversionPanel2 extends LayoutPanel
 {
 	private TextControl<Float> temperatureInput;
 	private TextControl<Float> temperatureOutput;

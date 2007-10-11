@@ -6,12 +6,12 @@ import com.guiseframework.event.*;
 import com.guiseframework.validator.*;
 
 /**Multiplication Table Guise demonstration panel.
-Copyright © 2005 GlobalMentor, Inc.
+Copyright Â© 2005 GlobalMentor, Inc.
 Demonstrates dynamic tabbed panels, model info/tooltips, integer range validators,
 	and table components with default table models and columns.
 @author Garret Wilson
 */
-public class MultiplicationTablePanel extends DefaultNavigationPanel
+public class MultiplicationTablePanel extends LayoutPanel
 {
 
 	/**The maximum number of tabs.*/
