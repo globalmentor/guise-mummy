@@ -1,0 +1,69 @@
+|demo|<info:java/com/guiseframework/demo>,
+|property|<http://ploop.org/namespaces/property>,
+|component|<info:java/com/guiseframework/component>,
+|layout|<info:java/com/guiseframework/component/layout>,
+|validator|<info:java/com/guiseframework/validator>,
+(demo.TemperatureConversionPanel2):
+	label="Guise™ Demonstration: Temperature Conversion",
+	layout=(layout.FlowLayout):
+		flow="line"
+	;,
+	name="temperatureConversionPanel",
+	children=
+	[
+		(component.LayoutPanel):
+			layout=(layout.FlowLayout):
+				flow="page"
+			;,
+			name="inputPanel",
+			children=
+			[
+				(component.TextControl):
+					label="Input Temperature",
+					name="temperatureInput",
+					validator=(validator.ValueRequiredValidator),
+					valueClass=«info:java/java/lang#Float»
+				;,
+				(component.TextControl):
+					editable=&false,
+					label="Output Temperature",
+					name="temperatureOutput",
+					valueClass=«info:java/java/lang#Float»
+				;
+			]
+		;,
+		(component.LayoutPanel):
+			layout=(layout.FlowLayout):
+				flow="page"
+			;,
+			name="conversionPanel",
+			children=
+			[
+				(component.GroupPanel):
+					label="Input Scale",
+					layout=(layout.FlowLayout):
+						flow="page"
+					;,
+					name="scalePanel",
+					children=
+					[
+						(component.CheckControl):
+							checkType="ellipse",
+							label="Calsius",
+							name="celsiusCheckControl"
+						;,
+						(component.CheckControl):
+							checkType="ellipse",
+							label="Fahrenheit",
+							name="fahrenheitCheckControl"
+						;
+					]
+				;,
+				(component.Button):
+					label="Convert",
+					name="conversionButton"
+				;
+			]
+		;
+	]
+;

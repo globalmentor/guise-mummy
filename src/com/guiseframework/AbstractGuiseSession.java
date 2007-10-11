@@ -639,7 +639,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			}
 			else	//if the resource is not a string, assume it is a URI
 			{
-Debug.trace("ready to cast object to a URI", resource);
 				return (URI)resource;	//return the resource as a URI object, throwing a ClassCastException if it isn't an instance of URI
 			}
 		}
@@ -968,7 +967,6 @@ Debug.trace("ready to cast object to a URI", resource);
 		final URFResource componentResource=urf.getResourceByTypeURI(componentResourceTypeURI);	//try to locate the description of the given component
 		if(componentResource!=null)	//if there is a resource description of a matching type
 		{
-//TODO del					final PLOOPProcessor ploopProcessor=new PLOOPProcessor(this);	//create a new PLOOP processor, passing the Guise session to use as a default constructor argument
 			final PLOOPURFProcessor ploopProcessor=new PLOOPURFProcessor();	//create a new PLOOP processor
 			ploopProcessor.setObjectProperties(component, componentResource);	//initialize the component from this resource
 			component.initialize();	//initialize the component
@@ -976,7 +974,7 @@ Debug.trace("ready to cast object to a URI", resource);
 		}
 		else	//if there is no resource of the appropriate type
 		{
-			throw new IllegalArgumentException("No resource description found of type "+componentResourceTypeURI);
+			throw new IllegalArgumentException("No resource description found of type "+componentResourceTypeURI);	//TODO do we want to change to DataException?
 		}
 	}
 

@@ -129,21 +129,16 @@ public class Theme extends AbstractClassTypedURFResource
 	*/
 	public void updateRules() throws ClassNotFoundException
 	{
-//Debug.trace("updating rules for theme", this);
 		classRuleMap.clear();	//clear the map of rules
 		for(final URFProperty declarationProperty:getNamespaceProperties(ORDINAL_NAMESPACE_URI))	//get all of the ordinal properties; these are the declaratioons
 		{
 			final URFResource declaration=declarationProperty.getValue();	//get this declaration
-//Debug.trace("looking at declaration", declaration);
 			if(declaration instanceof Rule)	//if this is a rule
 			{
 				final Rule rule=(Rule)declaration;	//get the rule
-//Debug.trace("got rule", rule);
-//Debug.trace("actual rule selector", rule.getPropertyValue(SELECT_PROPERTY_URI));	//return the select.select value
 				final Selector selector=rule.getSelector();	//get what this rule selects
 				if(selector!=null)	//if there is a selector for this rule
 				{
-//Debug.trace("got selector", selector);
 					updateRules(rule, selector);	//update the rules with this selector
 				}
 			}
@@ -165,7 +160,6 @@ public class Theme extends AbstractClassTypedURFResource
 		if(selector instanceof ObjectClassSelector)	//if this is a class selector
 		{
 			final Class<?> selectClass=((ObjectClassSelector)selector).getSelectClass();	//get the class selected by the selector
-//Debug.trace("selected class", selectedClass);
 			if(selectClass!=null)	//if we have a selected class
 			{
 				classRuleMap.addItem(selectClass, rule);	//add this rule to our map

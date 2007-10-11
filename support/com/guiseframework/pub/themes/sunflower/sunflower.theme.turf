@@ -11,7 +11,7 @@
 	dc.title="Guise™ Sunflower Theme",
 	dc.description="The experiemental sunflower Guise™ theme.",
 	dc.rights="Copyright © 2007 GlobalMentor, Inc.",
-	dc.creator="Garret Wilson"
+	dc.creator="Garret Wilson",
 
 	parentURI=<info:path/~guise/resources/themes/basic/basic.theme.turf>,
 

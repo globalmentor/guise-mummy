@@ -1250,7 +1250,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			}
 			catch(final ClassNotFoundException classNotFoundException)	//if a class specified by a rule selector cannot be found
 			{
-				throw (IOException)new IOException(classNotFoundException.getMessage()).initCause(classNotFoundException);
+				throw new IOException("Error loading theme ("+resolvedThemeURI+"): "+classNotFoundException.getMessage(), classNotFoundException);
 			}
 			return theme;	//return the theme
 		}

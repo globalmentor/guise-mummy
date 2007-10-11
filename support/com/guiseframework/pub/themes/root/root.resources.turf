@@ -296,5 +296,5 @@
 	"theme.cursor.resize.page.far"=<cursors/resize_page_far.png>,
 	"theme.cursor.resize.page.near"=<cursors/resize_page_near.png>,
 	"theme.cursor.text"=<cursors/text.png>,
-	"theme.cursor.wait"=<cursors/wait.png>,
+	"theme.cursor.wait"=<cursors/wait.png>
 ;

@@ -11,7 +11,7 @@
 	dc.title="Guise™ Root Theme",
 	dc.description="The theme that is the root parent of all Guise™ themes.",
 	dc.rights="Copyright © 2007 GlobalMentor, Inc.",
-	dc.creator="Garret Wilson"
+	dc.creator="Garret Wilson",
 
 	xml.style=«root.style.css»,
 
@@ -40,22 +40,22 @@
 
 		"theme.color.border"="\“theme.color.neutralA\”",
 
-		"theme.color.selected.background"="royalblue",
+		"theme.color.selected.background"="royalblue"
 	;
 ;
 [
 	*Frame*
-	(theme.Rule):
+	(Rule):
 		select.selector=(ObjectClassSelector):
 			selectClass=component.Frame
 		;,
 		apply=(Template):
-			color=(style.ResourceColor)["theme.color.text"],
-			backgroundColor=(style.ResourceColor)["theme.color.background"],
+			color=(style.ResourceColor)¡"theme.color.text"!,
+			backgroundColor=(style.ResourceColor)¡"theme.color.background"!
 		;
 	;,
 	*Menu*
-	(theme.Rule):	*root menu*
+	(Rule):	*root menu*
 		select.selector=(IntersectionSelector):
 			selector=(ObjectClassSelector):
 				selectClass=component.Menu
@@ -65,15 +65,15 @@
 					selectPropertyName="parent",
 					selector=(ObjectClassSelector):
 						selectClass=component.Menu
-					;,
+					;
 				;
 			;
 		;,
 		apply=(Template):
-			backgroundColor=(style.ResourceColor)["theme.color.menu"],
+			backgroundColor=(style.ResourceColor)¡"theme.color.menu"!
 		;
 	;,
-	(theme.Rule):	*submenu*
+	(Rule):	*submenu*
 		select.selector=(IntersectionSelector):
 			selector=(ObjectClassSelector):
 				selectClass=component.Menu
@@ -82,21 +82,21 @@
 				selectPropertyName="parent",
 				selector=(ObjectClassSelector):
 					selectClass=component.Menu
-				;,
+				;
 			;
 		;,
 		apply=(Template):
-			backgroundColor=(style.ResourceColor)["theme.color.submenu"],
-			borderColor=(style.ResourceColor)["theme.color.neutralA"],
+			backgroundColor=(style.ResourceColor)¡"theme.color.submenu"!,
+			borderColor=(style.ResourceColor)¡"theme.color.neutralA"!
 		;
 	;,
 	*Toolbar*
-	(theme.Rule):
+	(Rule):
 		select.selector=(ObjectClassSelector):
 			selectClass=component.Toolbar
 		;,
 		apply=(Template):
-			backgroundColor=(style.ResourceColor)["theme.color.toolbar"],
+			backgroundColor=(style.ResourceColor)¡"theme.color.toolbar"!
 		;
 	;
 ]
