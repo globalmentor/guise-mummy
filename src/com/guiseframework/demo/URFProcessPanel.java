@@ -23,11 +23,23 @@ Demonstrates URF processing and tree controls.
 public class URFProcessPanel extends LayoutPanel
 {
 
+	/**Instructions for the this demo.*/
+	protected final static String INSTRUCTIONS=
+		"<?xml version='1.0'?>"+
+		"<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>"+
+		"<html xmlns='http://www.w3.org/1999/xhtml'>"+
+		"<head><title>Instructions</title></head>"+
+		"<body>"+
+		"	<p>This is a Guise\u2122 demonstration of the <a href=\"http://www.urf.name/\">Uniform Resource Framework (URF)</a></p>"+
+		"	<p>Input either URF as TURF or RDF as RDF/XML and select \"Process\". The resulting assertions will be listed, along with a TURF representation of the URF instance. The tree control will allow you to dynamically explore the URF graph.</p>"+
+		"</body>"+
+		"</html>";
+
 	/**Default constructor.*/
 	public URFProcessPanel()
 	{
 		super(new RegionLayout());	//construct the parent class with a region layout
-		setLabel("Guise\u2122 Demonstration: URF Processing");	//set the panel title	
+		setLabel("Guise\u2122 Demonstration: URF Processing");	//set the panel title
 
 		final LayoutPanel mainPanel=new LayoutPanel();	//create a main panel for the input/output
 			//input text
@@ -46,15 +58,25 @@ public class URFProcessPanel extends LayoutPanel
 		mainPanel.add(turfOutputTextControl);
 
 		final LayoutPanel controlPanel=new LayoutPanel();	//create a panel for controls
+		final Heading heading=new Heading(0);	//create a top-level heading
+		heading.setLabel("Guise\u2122 URF Processing Demo");	//set the heading text
+		controlPanel.add(heading);	//add the heading to the control panel
+			//instructions
+		final Text text=new Text();	//create new text
+		text.setLabel("Instructions");	//give a label to the text
+		text.setTextContentType(XHTML_CONTENT_TYPE);	//indicate that the message will be of the "application/xhtml+xml" content type
+		text.setText(INSTRUCTIONS);	//set the instructions
+		controlPanel.add(text);	//add the text message to the control panel
 			//process button
 		final Button processButton=new Button();	//create a button for processing the input
 		processButton.setLabel("Process");	//set the button label
 		controlPanel.add(processButton);	//add the process button to the control panel
 			//tree control
 		final TreeControl urfTreeControl=new TreeControl();	//create a tree control in which to place URF resources
+		urfTreeControl.setLabel("URF Resource Tree");	//set the tree control label
 		urfTreeControl.setTreeNodeRepresentationStrategy(URFResource.class, new DefaultURFResourceTreeNodeRepresentationStrategy());	//add a representation strategy for URF resources
 		controlPanel.add(urfTreeControl);	//add the tree control to the control panel
-		
+
 		processButton.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(final ActionEvent actionEvent)
@@ -107,7 +129,7 @@ public class URFProcessPanel extends LayoutPanel
 							{
 								throw new AssertionError(propertyVetoException);
 							}
-						}						
+						}
 					}
 				});
 
