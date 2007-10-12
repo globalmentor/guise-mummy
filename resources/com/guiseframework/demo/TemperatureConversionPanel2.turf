@@ -1,8 +1,7 @@
-|demo|<info:java/com/guiseframework/demo>,
-|property|<http://ploop.org/namespaces/property>,
 |component|<info:java/com/guiseframework/component>,
 |layout|<info:java/com/guiseframework/component/layout>,
 |validator|<info:java/com/guiseframework/validator>,
+|demo|<info:java/com/guiseframework/demo>,
 (demo.TemperatureConversionPanel2):
 	label="Guise™ Demonstration: Temperature Conversion",
 	layout=(layout.FlowLayout):

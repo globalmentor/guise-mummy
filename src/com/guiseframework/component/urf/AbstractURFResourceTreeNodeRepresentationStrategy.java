@@ -4,6 +4,8 @@ import java.net.URI;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.urf.*;
+import com.garretwilson.util.Debug;
+
 import static com.garretwilson.urf.URF.*;
 
 import com.guiseframework.component.*;
@@ -102,14 +104,24 @@ public abstract class AbstractURFResourceTreeNodeRepresentationStrategy<V extend
 //TODO fix	protected StringBuilder buildLabelText(final StringBuilder stringBuilder, final TreeControl treeControl, final TreeModel model, final TreeNodeModel<? extends V> treeNode, final V value)	//TODO later put this method hierarchy in a custom label model
 	{
 			//TODO shouldn't we make sure the resource is not null?
+		final URI parentContextURI;	//determine the context URI of the parent
+		final TreeNodeModel<?> parentTreeNode=treeNode.getParent();	//get the parent tree node, if any
+		if(parentTreeNode!=null && URFResource.class.isAssignableFrom(parentTreeNode.getValueClass()))	//if there is a parent holding an URF resource
+		{
+			final URFResource parentTreeNodeResource=(URFResource)parentTreeNode.getValue();	//get the resoure from the parent tree node
+			parentContextURI=parentTreeNodeResource!=null ? parentTreeNodeResource.getTypeURI() : null;	//if the parent tree node has an URF resource, get its type URI
+		}
+		else	//if there is no parent URF resource context
+		{
+			parentContextURI=null;	//there is no parent context URI
+		}
 		final URI propertyURI;
 		if(treeNode instanceof URFResourceDynamicTreeNodeModel)	//if the tree node is an URF tree node
 		{
 			propertyURI=((URFResourceDynamicTreeNodeModel<?>)treeNode).getPropertyURI();	//get the property URI, if any, associated with the URF resource
 			if(propertyURI!=null)  //if resource is the object of a property
 			{
-					//TODO check the parent and see if there is a context URI from the parent's type
-				stringBuilder.append(URFTURFGenerator.createReferenceString(propertyURI, null, getNamespaceLabelManager(), null)); //append a reference to the property URI
+				stringBuilder.append(URFTURFGenerator.createReferenceString(propertyURI, parentContextURI, getNamespaceLabelManager(), null)); //append a reference to the property URI
 			}
 		}
 		else	//if this is not an URF tree node
@@ -137,22 +149,22 @@ public abstract class AbstractURFResourceTreeNodeRepresentationStrategy<V extend
 					//TODO update algorithm to probably check up the tree node hierarchy for an URF tree node, and check to see if the namespace URI actually exist in the data model
 				getNamespaceLabelManager().getNamespaceLabel(namespaceURI);	//ask the namespace label manager for a label for this namespace, so that one will be there
 			}
-			if(typeURI!=null)	//if we still have a type URI
+			if(typeURI!=null)	//if we have a type URI
 			{
 				if(typeURI.equals(lexicalTypeURI))	//if this resource has a lexical URI of the same type as we just found
 				{
 					typeURI=null;	//don't use the type URI; the type inherent in the lexical URI is sufficient
 				}
-				if(typeURI!=null)	//if we still have a type URI
-				{
-					final URI typeNamespaceURI=getNamespaceURI(typeURI);	//get the namespace of the type URI
-					if(typeNamespaceURI!=null)	//if the type is in a namesapce
-					{
-							//TODO update algorithm to probably check up the tree node hierarchy for an URF tree node, and check to see if the namespace URI actually exist in the data model
-						getNamespaceLabelManager().getNamespaceLabel(typeNamespaceURI);	//ask the namespace label manager for a label for this namespace, so that one will be there
-					}				
-				}
 			}
+		}
+		if(typeURI!=null)	//if we still have a type URI
+		{
+			final URI typeNamespaceURI=getNamespaceURI(typeURI);	//get the namespace of the type URI
+			if(typeNamespaceURI!=null)	//if the type is in a namesapce
+			{
+					//TODO update algorithm to probably check up the tree node hierarchy for an URF tree node, and check to see if the namespace URI actually exist in the data model
+				getNamespaceLabelManager().getNamespaceLabel(typeNamespaceURI);	//ask the namespace label manager for a label for this namespace, so that one will be there
+			}				
 		}
 		boolean hasPredicateToken=false;	//we'll note whether we ever have something to represent the predicate of the statement
 		if(isResourceTypeIncluded() && typeURI!=null) //if we should indicate the resource type and we have a type
@@ -187,7 +199,8 @@ public abstract class AbstractURFResourceTreeNodeRepresentationStrategy<V extend
 			{
 				stringBuilder.append(' '); //append a space to separate the rest
 			}
-			stringBuilder.append(URFTURFGenerator.createReferenceString(resourceURI, propertyURI, getNamespaceLabelManager(), null));  //append reference
+				//if there is no property URI, this is an element in a collection, so use the type of the parent, if any, as the context
+			stringBuilder.append(URFTURFGenerator.createReferenceString(resourceURI, propertyURI!=null ? propertyURI : parentContextURI, getNamespaceLabelManager(), null));  //append reference
 			hasPredicateToken=true;	//show that we have something to represent the predicate
 		}
 		return stringBuilder;	//return the string builder

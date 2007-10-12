@@ -1,0 +1,295 @@
+|component|<info:java/com/guiseframework/component>,
+|coupler|<info:java/com/guiseframework/coupler>,
+|layout|<info:java/com/guiseframework/component/layout>,
+|validator|<info:java/com/guiseframework/validator>,
+|demo|<info:java/com/guiseframework/demo>,
+(demo.EventWizardPanel2):
+	label="Guise™ Demonstration: Event Wizard",
+	layout=(layout.FlowLayout):
+		flow="page"
+	;,
+	children=
+	[
+		(component.Heading):
+			label="Event Planner Wizard",
+			level=#0
+		;,
+		(component.LayoutPanel):
+			layout=(layout.RegionLayout),
+			children=
+			[
+				(component.SequenceCardPanel): *cards*
+					bookmarkEnabled=&true,
+					constraints=(layout.RegionConstraints):
+						region="center"
+					;,
+					name="wizardCardPanel",
+					children=
+					[
+						|personalNamePanel|,
+						|personalAgePanel|,
+						|personalEmailPanel|,
+						|businessNamePanel|,
+						|businessAddressPanel|,
+						|eventNamePanel|
+					]
+				;,
+				(component.LayoutPanel): *links*
+					constraints=(layout.RegionConstraints):
+						region="line-start"
+					;,
+					children=
+					[
+						|personalLink10|(component.Link):
+							label="1. Personal"
+						;,
+						|personalLink11|(component.TaskStateSelectLink):
+							label="Name"
+						;,
+						|personalLink12|(component.TaskStateSelectLink):
+							label="Age"
+						;,
+						|personalLink13|(component.TaskStateSelectLink):
+							label="Email"
+						;,
+						|businessLink20|(component.Link):
+							label="2. Business"
+						;,
+						|businessLink21|(component.TaskStateSelectLink):
+							label="Name"
+						;,
+						|businessLink22|(component.TaskStateSelectLink):
+							label="Address"
+						;,
+						|eventLink30|(component.Link):
+							label="3. Event"
+						;,
+						|eventLink31|(component.TaskStateSelectLink):
+							label="Name"
+						;
+					]
+				;,
+				|wizardTabContainerControl|(component.TabContainerControl): *tabs*
+					axis="line",
+					constraints=(layout.RegionConstraints):
+						region="page-start"
+					;,
+					children=
+					[
+						|personalTabLabel|(component.Label):
+							label="Personal"
+						;,
+						|businessTabLabel|(component.Label):
+							label="Business"
+						;,
+						|eventTabLabel|(component.Label):
+							label="Event"
+						;
+					]
+				;,
+				(component.LayoutPanel): *buttons*
+					constraints=(layout.RegionConstraints):
+						region="page-end"
+					;,
+					layout=(layout.FlowLayout):
+						flow="line"
+					;,
+					name="wizardButtonPanel"
+				;
+			]
+		;
+	]
+;,
+|personalNamePanel|(component.LayoutPanel):
+	constraints=(layout.TaskCardConstraints),
+	name="personalNamePanel",
+	children=
+	[
+		(component.Heading):
+			label="Personal Information: Name",
+			level=#1
+		;,
+		(component.TextControl):
+			label="First Name",
+			validator=(validator.RegularExpressionStringValidator):
+				pattern="\\S+.*",
+				valueRequired=&true
+			;,
+			valueClass=«info:java/java/lang#String»
+		;,
+		(component.TextControl):
+			label="Last Name",
+			validator=(validator.RegularExpressionStringValidator):
+				pattern="\\S+.*",
+				valueRequired=&true
+			;,
+			valueClass=«info:java/java/lang#String»
+		;,
+		(component.CheckControl):
+			label="I want to tell you my age",
+			name="ageCheckControl",
+			value=&true
+		;
+	]
+;,
+|personalAgePanel|(component.LayoutPanel):
+	constraints=(layout.TaskCardConstraints),
+	name="personalAgePanel",
+	children=
+	[
+		(component.Heading):
+			label="Personal Information: Age",
+			level=#1
+		;,
+		(component.TextControl):
+			label="Age",
+			validator=(validator.ValueRequiredValidator),
+			valueClass=«info:java/java/lang#Integer»
+		;
+	]
+;,
+|personalEmailPanel|(component.LayoutPanel):
+	constraints=(layout.TaskCardConstraints),
+	name="personalEmailPanel",
+	children=
+	[
+		(component.Heading):
+			label="Personal Information: Email",
+			level=#1
+		;,
+		(component.TextControl):
+			label="Email",
+			validator=(validator.RegularExpressionStringValidator):
+				pattern=".+@.+\\.[a-z]+",
+				valueRequired=&true
+			;,
+			valueClass=«info:java/java/lang#String»
+		;
+	]
+;,
+|businessNamePanel|(component.LayoutPanel):
+	constraints=(layout.TaskCardConstraints),
+	name="businessNamePanel",
+	children=
+	[
+		(component.Heading):
+			label="Business Information: Name",
+			level=#1
+		;,
+		(component.TextControl):
+			label="Business Name",
+			validator=(validator.RegularExpressionStringValidator):
+				pattern="\\S+.*",
+				valueRequired=&true
+			;,
+			valueClass=«info:java/java/lang#String»
+		;
+	]
+;,
+|businessAddressPanel|(component.LayoutPanel):
+	constraints=(layout.TaskCardConstraints),
+	name="businessAddressPanel",
+	children=
+	[
+		(component.Heading):
+			label="Business Information: Address",
+			level=#1
+		;,
+		(component.TextControl):
+			columnCount="40",
+			label="Business Address",
+			rowCount="4",
+			validator=(validator.RegularExpressionStringValidator):
+				pattern="\\S+.*",
+				valueRequired=&true
+			;,
+			valueClass=«info:java/java/lang#String»
+		;
+	]
+;,
+|eventNamePanel|(component.LayoutPanel):
+	constraints=(layout.TaskCardConstraints),
+	name="eventNamePanel",
+	children=
+	[
+		(component.Heading):
+			label="Event Information: Name",
+			level=#1
+		;,
+		(component.TextControl):
+			label="Event Name",
+			validator=(validator.RegularExpressionStringValidator):
+				pattern="\\S+.*",
+				valueRequired=&true
+			;,
+			valueClass=«info:java/java/lang#String»
+		;
+	]
+;,
+
+*wizard link couplers*
+(coupler.ActionCardCoupler):
+	action=|personalLink10|,
+	card=|personalNamePanel|
+;,
+(coupler.ActionCardCoupler):
+	action=|personalLink11|,
+	card=|personalNamePanel|
+;,
+(coupler.ActionCardCoupler):
+	action=|personalLink12|,
+	card=|personalAgePanel|
+;,
+(coupler.ActionCardCoupler):
+	action=|personalLink13|,
+	card=|personalEmailPanel|
+;,
+(coupler.ActionCardCoupler):
+	action=|businessLink20|,
+	card=|businessNamePanel|
+;,
+(coupler.ActionCardCoupler):
+	action=|businessLink21|,
+	card=|businessNamePanel|
+;,
+(coupler.ActionCardCoupler):
+	action=|businessLink22|,
+	card=|businessAddressPanel|
+;,
+(coupler.ActionCardCoupler):
+	action=|eventLink30|,
+	card=|eventNamePanel|
+;,
+(coupler.ActionCardCoupler):
+	action=|eventLink31|,
+	card=|eventNamePanel|
+;,
+
+*wizard tab couplers*
+(coupler.ListSelectCardCoupler):
+	cards=
+	[
+		|personalNamePanel|,
+		|personalAgePanel|,
+		|personalEmailPanel|
+	],
+	listSelect=|wizardTabContainerControl|,
+	value=|personalTabLabel|
+;,
+(coupler.ListSelectCardCoupler):
+	cards=
+	[
+		|businessNamePanel|,
+		|businessAddressPanel|
+	],
+	listSelect=|wizardTabContainerControl|,
+	value=|businessTabLabel|
+;,
+(coupler.ListSelectCardCoupler):
+	cards=
+	[
+		|eventNamePanel|
+	],
+	listSelect=|wizardTabContainerControl|,
+	value=|eventTabLabel|
+;

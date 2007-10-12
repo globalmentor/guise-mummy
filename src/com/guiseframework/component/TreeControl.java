@@ -107,7 +107,6 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	@SuppressWarnings("unchecked")	//we check the generic types before putting them in the map, so it's fine to cast the retrieved values
 	public <V> TreeNodeRepresentationStrategy<? super V> setTreeNodeRepresentationStrategy(final Class<V> valueClass, TreeNodeRepresentationStrategy<? super V> treeNodeRepresentationStrategy)
 	{
-Debug.trace("ready to set tree node representation strategy for class", valueClass, "strategy", treeNodeRepresentationStrategy);
 		return (TreeNodeRepresentationStrategy<? super V>)classTreeNodeRepresentationStrategyMap.put(valueClass, treeNodeRepresentationStrategy);	//associate the strategy with the value class in the map
 	}
 
@@ -534,7 +533,7 @@ Debug.trace("ready to set tree node representation strategy for class", valueCla
 			if(target instanceof TreeNodeModel)	//if this action was on a tree node
 			{
 				final TreeNodeModel<?> treeNode=(TreeNodeModel<?>)target;	//get the tree node
-Debug.trace("selecting tree node", treeNode);
+//Debug.trace("selecting tree node", treeNode);
 				treeNode.setSelected(true);	//select the tree node
 /*TODO fix
 				final Component component=getComponent(treeNode);	//TODO testing
