@@ -49,6 +49,7 @@
 >
 
 <!ATTLIST textarea
+  guise:multiline						CDATA          #IMPLIED
   wrap    									CDATA          #IMPLIED
 >
 

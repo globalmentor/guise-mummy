@@ -200,6 +200,8 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 			}
 			final boolean lineWrap=component.isLineWrap();	//see if we should wrap lines
 			depictContext.writeAttribute(null, ELEMENT_TEXTAREA_ATTRIBUTE_WRAP, lineWrap ? TEXTAREA_WRAP_SOFT : TEXTAREA_WRAP_OFF);	//wrap="soft|off"
+			final boolean multiline=component.isMultiline();	//see if we should allow multiple lines of input
+			depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ELEMENT_TEXTAREA_ATTRIBUTE_MULTILINE, Boolean.toString(multiline));	//guise:multiline="true|false"
 		}
 		else	//if we don't recognize the type of element we are rendering
 		{

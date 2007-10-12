@@ -15,6 +15,8 @@ import com.guiseframework.model.*;
 
 /**Control to accept text input from the user representing a particular value type.
 This control keeps track of literal text entered by the user, distinct from the value stored in the model.
+If line wrap is not specified in the constructor, it defaults to <code>true</code>.
+If multiline is not specified in the constructor, it defaults to <code>true</code> only when there is more than one row and line wrap is turned off.
 Default converters are available for the following types:
 <ul>
 	<li><code>char[]</code></li>
@@ -43,6 +45,8 @@ public class TextControl<V> extends AbstractTextControl<V>
 	public final static String MASKED_PROPERTY=getPropertyName(TextControl.class, "masked");
 	/**The maximum length bound property.*/
 	public final static String MAXIMUM_LENGTH_PROPERTY=getPropertyName(TextControl.class, "maximumLength");
+	/**The multiline bound property.*/
+	public final static String MULTILINE_PROPERTY=getPropertyName(TextControl.class, "multiline");
 	/**The row count bound property.*/
 	public final static String ROW_COUNT_PROPERTY=getPropertyName(TextControl.class, "rowCount");
 
@@ -64,7 +68,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 				final boolean oldEnabled=masked;	//get the old value
 				masked=newMasked;	//actually change the value
 				firePropertyChange(MASKED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newMasked));	//indicate that the value changed
-			}			
+			}
 		}
 
 	/**The maximum number of input characters to allow, or -1 if there is no maximum length.*/
@@ -76,7 +80,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 		/**Sets the maximum number of input characters to allow.
 		This is a bound property of type <code>Integer</code>.
 		@param newMaximumLength The new maximum number of input characters to allow, or -1 if there is no maximum length.
-		@see #MAXIMUM_LENGTH_PROPERTY 
+		@see #MAXIMUM_LENGTH_PROPERTY
 		*/
 		public void setMaximumLength(final int newMaximumLength)
 		{
@@ -85,19 +89,19 @@ public class TextControl<V> extends AbstractTextControl<V>
 				final int oldMaximumLength=maximumLength;	//get the old value
 				maximumLength=newMaximumLength;	//actually change the value
 				firePropertyChange(MAXIMUM_LENGTH_PROPERTY, new Integer(oldMaximumLength), new Integer(newMaximumLength));	//indicate that the value changed
-			}			
+			}
 		}
 
-	/**Whether lines will be wrapped if needed in the view.*/
+	/**Whether lines will be logically wrapped if needed in the view.*/
 	private boolean lineWrap;
 
-		/**@return Whether lines will be wrapped in the view if needed.*/
+		/**@return Whether lines will be logically wrapped in the view if needed.*/
 		public boolean isLineWrap() {return lineWrap;}
 
-		/**Sets whether lines will be wrapped in the view if needed.
+		/**Sets whether lines will be logically wrapped in the view if needed.
 		This is a bound property of type <code>Boolean</code>.
-		@param newLineWrap Whether lines should be wrapped in the view if needed.
-		@see #LINE_WRAP_PROPERTY 
+		@param newLineWrap Whether lines should be logically wrapped in the view if needed.
+		@see #LINE_WRAP_PROPERTY
 		*/
 		public void setLineWrap(final boolean newLineWrap)
 		{
@@ -106,7 +110,28 @@ public class TextControl<V> extends AbstractTextControl<V>
 				final boolean oldLineWrap=lineWrap;	//get the old value
 				lineWrap=newLineWrap;	//actually change the value
 				firePropertyChange(LINE_WRAP_PROPERTY, oldLineWrap, newLineWrap);	//indicate that the value changed
-			}			
+			}
+		}
+
+	/**Whether the user is allowed to enter multiple physical lines if the control has multiple rows.*/
+	private boolean multiline;
+
+		/**@return Whether the user is allowed to enter multiple physical lines if the control has multiple rows.*/
+		public boolean isMultiline() {return multiline;}
+
+		/**Sets whether the user is allowed to enter multiple physical lines if the control has multiple rows.
+		This is a bound property of type <code>Boolean</code>.
+		@param newMultiline Whether the user should be allowed to enter multiple physical lines if the control has multiple rows.
+		@see #MULTILINE_PROPERTY
+		*/
+		public void setMultiline(final boolean newMultiline)
+		{
+			if(multiline!=newMultiline)	//if the value is really changing
+			{
+				final boolean oldMultiline=multiline;	//get the old value
+				multiline=newMultiline;	//actually change the value
+				firePropertyChange(MULTILINE_PROPERTY, oldMultiline, newMultiline);	//indicate that the value changed
+			}
 		}
 
 	/**The estimated number of rows requested to be visible, or -1 if no row count is specified.*/
@@ -127,7 +152,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 				final int oldRowCount=rowCount;	//get the old value
 				rowCount=newRowCount;	//actually change the value
 				firePropertyChange(ROW_COUNT_PROPERTY, new Integer(oldRowCount), new Integer(newRowCount));	//indicate that the value changed
-			}			
+			}
 		}
 
 	/**The default export strategy for this component type.*/
@@ -145,7 +170,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 
 	/**The default import strategy for this component type.*/
 	protected final static ImportStrategy<TextControl<?>> DEFAULT_IMPORT_STRATEGY=new ImportStrategy<TextControl<?>>()	//add a new import strategy for this component
-			{		
+			{
 				/**Determines whether this strategy can import the given transferable object.
 				This implementation accepts all transferables providing <code>text/*</code> data.
 				@param component The component into which the object will be transferred.
@@ -209,7 +234,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 							component.setNotification(new Notification(cause!=null ? cause : propertyVetoException));	//add notification of the error to the component
 							imported=false;	//transfer was unsuccessful
 						}
-					}					
+					}
 					return imported;	//indicate whether we were able to find any information to transfer
 				}
 
@@ -272,7 +297,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	*/
 	public TextControl(final Class<V> valueClass, final int columnCount)
 	{
-		this(valueClass, 1, columnCount);	//construct the class with one row		
+		this(valueClass, 1, columnCount);	//construct the class with one row
 	}
 
 	/**Value class, row count, and column count constructor with a default converter.
@@ -283,7 +308,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	*/
 	public TextControl(final Class<V> valueClass, final int rowCount, final int columnCount)
 	{
-		this(valueClass, null, rowCount, columnCount);	//construct the class with a null default value		
+		this(valueClass, null, rowCount, columnCount);	//construct the class with a null default value
 	}
 
 	/**Value class, defaultValue, and column count constructor with one row a default converter.
@@ -294,7 +319,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	*/
 	public TextControl(final Class<V> valueClass, final V defaultValue, final int columnCount)
 	{
-		this(valueClass, defaultValue, 1, columnCount);	//construct the class with one row		
+		this(valueClass, defaultValue, 1, columnCount);	//construct the class with one row
 	}
 
 	/**Value class, defaultValue, row count, and column count constructor with a default converter.
@@ -306,7 +331,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	*/
 	public TextControl(final Class<V> valueClass, final V defaultValue, final int rowCount, final int columnCount)
 	{
-		this(valueClass, defaultValue, rowCount, columnCount, true);	//default to line-wrapping		
+		this(valueClass, defaultValue, rowCount, columnCount, true);	//default to line-wrapping
 	}
 
 	/**Value class, row count, column count, and line wrap constructor with a default converter.
@@ -354,7 +379,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	*/
 	public TextControl(final ValueModel<V> valueModel, final int rowCount, final int columnCount, final boolean lineWrap)
 	{
-		this(valueModel, AbstractStringLiteralConverter.getInstance(valueModel.getValueClass()), rowCount, columnCount, lineWrap);	//construct the class with a default converter		
+		this(valueModel, AbstractStringLiteralConverter.getInstance(valueModel.getValueClass()), rowCount, columnCount, lineWrap);	//construct the class with a default converter
 	}
 
 	/**Value model constructor with a default converter.
@@ -375,7 +400,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	{
 		this(valueModel, converter, 1, -1, true);	//construct the class with one row, defaulting to line wrap
 	}
-	
+
 	/**Value model, converter, row count, column count, and line wrap constructor.
 	@param valueModel The component value model.
 	@param converter The converter for this component.
@@ -386,12 +411,27 @@ public class TextControl<V> extends AbstractTextControl<V>
 	*/
 	public TextControl(final ValueModel<V> valueModel, final Converter<V, String> converter, final int rowCount, final int columnCount, final boolean lineWrap)
 	{
+		this(valueModel, converter, rowCount, columnCount, lineWrap, rowCount>1 && !lineWrap);	//only turn on multiline initially if there are multiple rows and line wrap is off
+	}
+
+	/**Value model, converter, row count, column count, and line wrap constructor.
+	@param valueModel The component value model.
+	@param converter The converter for this component.
+	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
+	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
+	@param lineWrap Whether lines should be wrapped in the view if needed.
+	@param multiline Whether the user should be allowed to enter multiple physical lines if the control has multiple rows.
+	@exception NullPointerException if the given value model and/or converter is <code>null</code>.
+	*/
+	public TextControl(final ValueModel<V> valueModel, final Converter<V, String> converter, final int rowCount, final int columnCount, final boolean lineWrap, final boolean multiline)
+	{
 		super(valueModel, converter);	//construct the parent class
 		this.rowCount=rowCount;
 		setColumnCount(columnCount);
 		this.lineWrap=lineWrap;
-		addExportStrategy(DEFAULT_EXPORT_STRATEGY);	//install a default export strategy 
-		addImportStrategy(DEFAULT_IMPORT_STRATEGY);	//install a default import strategy 
+		this.multiline=multiline;
+		addExportStrategy(DEFAULT_EXPORT_STRATEGY);	//install a default export strategy
+		addImportStrategy(DEFAULT_IMPORT_STRATEGY);	//install a default import strategy
 	}
 
 	/**The default transferable object for a text control.

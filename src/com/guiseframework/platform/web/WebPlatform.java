@@ -26,12 +26,15 @@ public interface WebPlatform extends Platform
 	/**The URI query parameter used to indicate the Guise version to prevent caching between versions.*/ 
 	public final static String GUISE_VERSION_URI_QUERY_PARAMETER="guiseVersion";
 
-		//Guise-specific elements
+		//Guise-specific element attributes
 			//img
 	/**The Guise image attribute indicating the original source location of the image.*/
 	public final static String ELEMENT_IMG_ATTRIBUTE_ORIGINAL_SRC="originalSrc";
 	/**The Guise image attribute indicating the source location of the image to be used for rollovers.*/
 	public final static String ELEMENT_IMG_ATTRIBUTE_ROLLOVER_SRC="rolloverSrc";
+			//textarea
+	/**The Guise textarea attribute indicating whether the user should be allowed to enter multiple physical lines; value is "true" or "false".*/
+	public final static String ELEMENT_TEXTAREA_ATTRIBUTE_MULTILINE="multiline";
 			//all elements 
 	/**The Guise attribute containing the hash of the element attributes.*/
 	public final static String ATTRIBUTE_ATTRIBUTE_HASH="attributeHash";

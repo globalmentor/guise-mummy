@@ -2890,6 +2890,8 @@ function onKey(event)
 /**Called when a key is pressed in a text input.
 This implementation checks to see if the Enter key was pressed, and if so commits the input by sending it to the server and canceling the default action.
 The Enter keypress is allowed to bubble so that it may be reported to the server.
+If the Enter key was pressed for a textinput with guise:multiline="true", the Enter key is stopped from propagating so that it won't be sent back to the server,
+but the browser is allowed to process the key normally multiple lines can be entered.
 @param event The object describing the event.
 @see http://www.quirksmode.org/js/keys.html
 @see http://support.microsoft.com/kb/298498
@@ -2900,24 +2902,19 @@ function onTextInputKeyDown(event)
 	var keyCode=event.keyCode;	//get the code of the pressed key
 	if(keyCode==KEY_CODE.ENTER)	//if Enter/Return was pressed
 	{
+		var textInput=event.currentTarget;	//get the control in which text changed
+		if(textInput.nodeName.toLowerCase()=="textarea" && textInput.getAttribute("guise:multiline")=="true")	//if this is a multiline text area
+		{
+			event.stopPropagation();	//tell the event to stop bubbling, so that it won't be sent back to the server, but allow the browser to process the key normally, so that multiple lines can be created in a text area
+			return;	//don't do anything; allow the Enter key to function normally
+		}
 		if(guise.isEnabled())	//if AJAX is enabled
 		{
-		//TODO del alert("an input changed! "+textInput.id);
-			var textInput=event.currentTarget;	//get the control in which text changed
 			textInput.removeAttribute("guise:attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
 			guise.invalidateAncestorContent(textInput);	//indicate that the ancestors now have different content
 			var ajaxRequest=new ChangeAJAXEvent(textInput.name, new Map("value", textInput.value));	//create a new property change event with the control ID and the new value
 			guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
-/*TODO fix; sometimes we want Enter to commit; other times we want Enter to make a newline
-			if(textInput.nodeName.toLowerCase()=="textarea")	//if this is a text area
-			{
-				event.stopPropagation();	//tell the event to stop bubbling, so that it won't be sent back to the server, but allow the browser to process the key normally, so that multiple lines can be created in a text area
-			}
-			else	//if this is not a text area
-			{
-*/
-				event.preventDefault();	//prevent the default functionality from occurring, but allow it to keep bubbling so that it can be reported back to the server
-//TODO fix			}
+			event.preventDefault();	//prevent the default functionality from occurring, but allow it to keep bubbling so that it can be reported back to the server
 		}
 		else	//TODO submit the form
 		{
