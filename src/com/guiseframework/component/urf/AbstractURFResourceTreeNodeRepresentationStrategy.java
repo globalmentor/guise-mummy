@@ -121,7 +121,7 @@ public abstract class AbstractURFResourceTreeNodeRepresentationStrategy<V extend
 			propertyURI=((URFResourceDynamicTreeNodeModel<?>)treeNode).getPropertyURI();	//get the property URI, if any, associated with the URF resource
 			if(propertyURI!=null)  //if resource is the object of a property
 			{
-				stringBuilder.append(URFTURFGenerator.createReferenceString(propertyURI, parentContextURI, getNamespaceLabelManager(), null)); //append a reference to the property URI
+				stringBuilder.append(URFTURFGenerator.createReferenceString(propertyURI, getNamespaceLabelManager(), null, parentContextURI)); //append a reference to the property URI
 			}
 		}
 		else	//if this is not an URF tree node
@@ -174,7 +174,7 @@ public abstract class AbstractURFResourceTreeNodeRepresentationStrategy<V extend
 				stringBuilder.append('='); //separate the property from the rest
 			}
 					//TODO important: check for type URI null here and elsewhere
-			stringBuilder.append('(').append(URFTURFGenerator.createReferenceString(typeURI, propertyURI, getNamespaceLabelManager(), null)).append(')'); //append "(type)"
+			stringBuilder.append('(').append(URFTURFGenerator.createReferenceString(typeURI, getNamespaceLabelManager(), null, propertyURI)).append(')'); //append "(type)"
 			hasPredicateToken=true;	//show that we have something to represent the predicate
 		}
 /*TODO fix if desired
@@ -200,7 +200,7 @@ public abstract class AbstractURFResourceTreeNodeRepresentationStrategy<V extend
 				stringBuilder.append(' '); //append a space to separate the rest
 			}
 				//if there is no property URI, this is an element in a collection, so use the type of the parent, if any, as the context
-			stringBuilder.append(URFTURFGenerator.createReferenceString(resourceURI, propertyURI!=null ? propertyURI : parentContextURI, getNamespaceLabelManager(), null));  //append reference
+			stringBuilder.append(URFTURFGenerator.createReferenceString(resourceURI, getNamespaceLabelManager(), null, propertyURI!=null ? propertyURI : parentContextURI));  //append reference
 			hasPredicateToken=true;	//show that we have something to represent the predicate
 		}
 		return stringBuilder;	//return the string builder
