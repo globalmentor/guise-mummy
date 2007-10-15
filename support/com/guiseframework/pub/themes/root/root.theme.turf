@@ -1,10 +1,10 @@
 |select|<http://urf.name/select>,
 |xml|<http://urf.name/xml>,
 |theme|<http://guiseframework.com/namespaces/theme>,
-|component|<info:java/com/guiseframework/component>,
-|geometry|<info:java/com/guiseframework/geometry>,
+|component|<java:/com/guiseframework/component/>,
+|geometry|<java:/com/guiseframework/geometry/>,
 |resources|<http://guiseframework.com/namespaces/resources>,
-|style|<info:java/com/guiseframework/style>,
+|style|<java:/com/guiseframework/style/>,
 |dc|<http://purl.org/dc/elements/1.1/>,
 
 (theme.Theme):

@@ -1,8 +1,8 @@
-|component|<info:java/com/guiseframework/component>,
-|coupler|<info:java/com/guiseframework/coupler>,
-|layout|<info:java/com/guiseframework/component/layout>,
-|validator|<info:java/com/guiseframework/validator>,
-|demo|<info:java/com/guiseframework/demo>,
+|component|<java:/com/guiseframework/component/>,
+|coupler|<java:/com/guiseframework/coupler/>,
+|layout|<java:/com/guiseframework/component/layout/>,
+|validator|<java:/com/guiseframework/validator/>,
+|demo|<java:/com/guiseframework/demo/>,
 (demo.EventWizardPanel2):
 	label="Guise™ Demonstration: Event Wizard",
 	layout=(layout.FlowLayout):
@@ -115,7 +115,7 @@
 				pattern="\\S+.*",
 				valueRequired=&true
 			;,
-			valueClass=«info:java/java/lang#String»
+			valueClass=«java:/java/lang/String»
 		;,
 		(component.TextControl):
 			label="Last Name",
@@ -123,7 +123,7 @@
 				pattern="\\S+.*",
 				valueRequired=&true
 			;,
-			valueClass=«info:java/java/lang#String»
+			valueClass=«java:/java/lang/String»
 		;,
 		(component.CheckControl):
 			label="I want to tell you my age",
@@ -144,7 +144,7 @@
 		(component.TextControl):
 			label="Age",
 			validator=(validator.ValueRequiredValidator),
-			valueClass=«info:java/java/lang#Integer»
+			valueClass=«java:/java/lang/Integer»
 		;
 	]
 ;,
@@ -163,7 +163,7 @@
 				pattern=".+@.+\\.[a-z]+",
 				valueRequired=&true
 			;,
-			valueClass=«info:java/java/lang#String»
+			valueClass=«java:/java/lang/String»
 		;
 	]
 ;,
@@ -182,7 +182,7 @@
 				pattern="\\S+.*",
 				valueRequired=&true
 			;,
-			valueClass=«info:java/java/lang#String»
+			valueClass=«java:/java/lang/String»
 		;
 	]
 ;,
@@ -203,7 +203,7 @@
 				pattern="\\S+.*",
 				valueRequired=&true
 			;,
-			valueClass=«info:java/java/lang#String»
+			valueClass=«java:/java/lang/String»
 		;
 	]
 ;,
@@ -222,7 +222,7 @@
 				pattern="\\S+.*",
 				valueRequired=&true
 			;,
-			valueClass=«info:java/java/lang#String»
+			valueClass=«java:/java/lang/String»
 		;
 	]
 ;,

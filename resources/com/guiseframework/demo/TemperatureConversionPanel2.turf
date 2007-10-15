@@ -1,7 +1,7 @@
-|component|<info:java/com/guiseframework/component>,
-|layout|<info:java/com/guiseframework/component/layout>,
-|validator|<info:java/com/guiseframework/validator>,
-|demo|<info:java/com/guiseframework/demo>,
+|component|<java:/com/guiseframework/component/>,
+|layout|<java:/com/guiseframework/component/layout/>,
+|validator|<java:/com/guiseframework/validator/>,
+|demo|<java:/com/guiseframework/demo/>,
 (demo.TemperatureConversionPanel2):
 	label="Guise™ Demonstration: Temperature Conversion",
 	layout=(layout.FlowLayout):
@@ -21,13 +21,13 @@
 					label="Input Temperature",
 					name="temperatureInput",
 					validator=(validator.ValueRequiredValidator),
-					valueClass=«info:java/java/lang#Float»
+					valueClass=«java:/java/lang/Float»
 				;,
 				(component.TextControl):
 					editable=&false,
 					label="Output Temperature",
 					name="temperatureOutput",
-					valueClass=«info:java/java/lang#Float»
+					valueClass=«java:/java/lang/Float»
 				;
 			]
 		;,
