@@ -121,6 +121,12 @@ public abstract class AbstractURFResourceTreeNodeRepresentationStrategy<V extend
 			propertyURI=((URFResourceDynamicTreeNodeModel<?>)treeNode).getPropertyURI();	//get the property URI, if any, associated with the URF resource
 			if(propertyURI!=null)  //if resource is the object of a property
 			{
+				final URI propertyNamespaceURI=getNamespaceURI(propertyURI);	//get the namespace of the property URI
+				if(propertyNamespaceURI!=null)	//if the property is in a namesapce
+				{
+						//TODO update algorithm to probably check up the tree node hierarchy for an URF tree node, and check to see if the namespace URI actually exist in the data model
+					getNamespaceLabelManager().getNamespaceLabel(propertyNamespaceURI);	//ask the namespace label manager for a label for this namespace, so that one will be there
+				}				
 				stringBuilder.append(URFTURFGenerator.createReferenceString(propertyURI, getNamespaceLabelManager(), null, parentContextURI)); //append a reference to the property URI
 			}
 		}
@@ -202,6 +208,10 @@ public abstract class AbstractURFResourceTreeNodeRepresentationStrategy<V extend
 				//if there is no property URI, this is an element in a collection, so use the type of the parent, if any, as the context
 			stringBuilder.append(URFTURFGenerator.createReferenceString(resourceURI, getNamespaceLabelManager(), null, propertyURI!=null ? propertyURI : parentContextURI));  //append reference
 			hasPredicateToken=true;	//show that we have something to represent the predicate
+		}
+		if(stringBuilder.length()==0)	//if we haven't constructed any string
+		{
+			stringBuilder.append('?');	//identify the anonymous resource with a question mark
 		}
 		return stringBuilder;	//return the string builder
 	}
