@@ -963,7 +963,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	{
 		final URI BASE_URI=URI.create("guise:/");	//TODO fix
 		final URF urf=AbstractTURFIO.readTURF(new URF(), descriptionInputStream, baseURI);	//read TURF from the input stream
-		final URI componentResourceTypeURI=createInfoJavaURI(component.getClass());	//create a new URI that indicates the type of the resource description we expect
+		final URI componentResourceTypeURI=createJavaURI(component.getClass());	//create a new URI that indicates the type of the resource description we expect
 		final URFResource componentResource=urf.getResourceByTypeURI(componentResourceTypeURI);	//try to locate the description of the given component
 		if(componentResource!=null)	//if there is a resource description of a matching type
 		{
