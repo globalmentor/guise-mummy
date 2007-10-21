@@ -5,7 +5,8 @@ import java.net.URI;
 
 import com.garretwilson.net.ResourceIOException;
 import com.garretwilson.net.URIPath;
-import com.garretwilson.rdf.RDFResource;
+import com.garretwilson.urf.URFResource;
+import com.garretwilson.urf.content.*;;
 
 /**A navigation point that retrieves a resource description and/or contents.
 @author Garret Wilson
@@ -16,9 +17,9 @@ public interface ResourceReadDestination extends Destination
 	/**Returns a description of the resource.
 	The resource should include valid values for the following properties:
 	<ul>
-		<li><code>mime:contentType</code></li>
-		<li><code>file:size</code></li>
-		<li><code>file:modifiedTime</code></li>
+		<li>{@value Content#TYPE_PROPERTY_URI}</li>
+		<li>{@value Content#LENGTH_PROPERTY_URI}</li>
+		<li>{@value Content#MODIFIED_PROPERTY_URI}</li>
 	</ul>
 	@param session The current Guise Session. 
 	@param navigationPath The navigation path relative to the application context path.
@@ -28,7 +29,7 @@ public interface ResourceReadDestination extends Destination
 	@exception NullPointerException if the given navigation path is <code>null</code>.
 	@exception ResourceIOException if there is an error retrieving the resource description.
 	*/
-	public RDFResource getResourceDescription(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException;
+	public URFResource getResourceDescription(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException;
 
 	/**Retrieves an input stream to the resource.
 	@param session The current Guise Session. 

@@ -6,7 +6,9 @@ import java.net.URI;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.urf.AbstractClassTypedURFResource;
 import com.garretwilson.urf.select.Selector;
+import com.garretwilson.urf.select.Select;
 import static com.garretwilson.urf.select.Select.*;
+
 import com.garretwilson.urf.ploop.PLOOPURFProcessor;
 import com.garretwilson.util.DataException;
 
@@ -32,10 +34,21 @@ public class Rule extends AbstractClassTypedURFResource
 		super(referenceURI, THEME_NAMESPACE_URI);  //construct the parent class
 	}
 
-	/**@return This rule's selector declaration, or <code>null</code> if this rule has no <code>select.selector</code> property or the value is not a {@link Selector}.*/
+	/**Return this rule's selector, or <code>null</code> if this rule has no selector property or the value is not a {@link Selector}.
+	@return This rule's selector, or <code>null</code> if this rule has no selector property or the value is not a {@link Selector}.
+	@see Select#SELECTOR_PROPERTY_URI
+	*/
 	public Selector getSelector()
 	{
 		return asInstance(getPropertyValue(SELECTOR_PROPERTY_URI), Selector.class);	//return the select.selector value
+	}
+
+	/**Sets this rule's selector.
+	@param selector This rule's selector, or <code>null</code> if this rule should have no selector property.
+	*/
+	public void setSelector(final Selector selector)
+	{
+		setPropertyValue(SELECTOR_PROPERTY_URI, selector);	//set the select.select property
 	}
 
 	/**@return This rule's apply declaration, or <code>null</code> if this rule has no <code>theme.apply</code> selector or the value is not a {@link Template}.*/

@@ -2,107 +2,55 @@ package com.guiseframework.platform.web;
 
 import java.io.*;
 import java.lang.ref.*;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.*;
 import java.security.Principal;
-import java.text.DateFormat;
 import java.util.*;
-
 import static java.util.Collections.*;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static java.util.Arrays.*;
-import static net.marmox.content.MarmoxContent.MARMOX_CONTENT_NAMESPACE_URI;
 
 import javax.mail.internet.ContentType;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.xml.parsers.*;
 
-import net.marmox.content.MarmoxContent;
-import net.marmox.content.Page;
-
-import org.apache.commons.fileupload.*;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.FilenameUtils;
-import org.w3c.dom.*;
-import org.w3c.dom.css.CSSStyleSheet;
-import org.xml.sax.SAXException;
-
-import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIUtilities.*;
-
 import com.garretwilson.event.ProgressEvent;
 import com.garretwilson.event.ProgressListener;
 import static com.garretwilson.flash.Flash.*;
 import com.garretwilson.io.*;
-import com.garretwilson.javascript.JSON;
-
-import static com.garretwilson.io.OutputStreamUtilities.*;
-import com.garretwilson.lang.ClassUtilities;
-import static com.garretwilson.lang.EnumUtilities.*;
-import com.garretwilson.lang.ObjectUtilities;
-
 import static com.garretwilson.io.ContentTypeUtilities.*;
 import static com.garretwilson.io.FileUtilities.*;
-import static com.garretwilson.lang.ClassUtilities.*;
+import static com.garretwilson.io.OutputStreamUtilities.*;
+import com.garretwilson.lang.ObjectUtilities;
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.lang.StringBuilderUtilities.*;
 import static com.garretwilson.lang.ThreadUtilities.*;
-
-import com.garretwilson.net.DefaultResource;
-import com.garretwilson.net.Resource;
-import com.garretwilson.net.ResourceIOException;
-import com.garretwilson.net.ResourceNotFoundException;
-import com.garretwilson.net.URIConstants;
-import com.garretwilson.net.URIPath;
-import com.garretwilson.net.URIUtilities;
+import com.garretwilson.javascript.JSON;
+import static com.garretwilson.lang.EnumUtilities.*;
+import com.garretwilson.net.*;
+import static com.garretwilson.net.URIConstants.*;
+import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.net.http.*;
 import com.garretwilson.net.mime.ContentDispositionType;
-
 import static com.garretwilson.net.http.HTTPConstants.*;
-import static com.garretwilson.net.http.HTTPFormatter.formatList;
-
+import com.garretwilson.security.Nonce;
 import static com.garretwilson.servlet.ServletConstants.*;
 import static com.garretwilson.servlet.http.HttpServletConstants.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
-import static com.garretwilson.text.CharacterConstants.*;
+import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
-import static com.garretwilson.text.xml.XMLUtilities.createDocumentBuilder;
-
-import com.garretwilson.text.FormatUtilities;
-import com.garretwilson.text.W3CDateFormat;
 import com.garretwilson.text.elff.*;
-
 import static com.garretwilson.text.elff.WebTrendsConstants.*;
-import com.garretwilson.text.xml.XMLUtilities;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
-
-import com.garretwilson.rdf.*;
-import com.garretwilson.rdf.dublincore.DCUtilities;
-import com.garretwilson.rdf.maqro.Activity;
-import com.garretwilson.rdf.maqro.MAQROUtilities;
-import com.garretwilson.security.Nonce;
-import com.garretwilson.servlet.ServletUtilities;
-import com.garretwilson.servlet.http.HttpServletConstants;
-import com.garretwilson.servlet.http.HttpServletUtilities;
-
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
-
-import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 import com.garretwilson.text.xml.xpath.*;
-import com.garretwilson.urf.JavaURFResourceFactory;
-import com.garretwilson.urf.URF;
-import com.garretwilson.urf.URFIO;
-import com.garretwilson.urf.URFResourceTURFIO;
-import com.garretwilson.urf.ploop.PLOOPURFProcessor;
-import com.garretwilson.urf.ploop.PLOOPTURFIO;
+import com.garretwilson.urf.*;
+import static com.garretwilson.urf.content.Content.*;
+import static com.garretwilson.urf.dcmi.DCMI.*;
+import com.garretwilson.urf.ploop.*;
 import com.garretwilson.util.*;
-import com.globalmentor.marmot.Marmot;
+
 import com.guiseframework.*;
-import com.guiseframework.Bookmark.Parameter;
+import static com.guiseframework.Guise.*;
 import com.guiseframework.component.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
@@ -110,14 +58,14 @@ import com.guiseframework.input.Key;
 import com.guiseframework.model.FileItemResourceImport;
 import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.*;
-import com.guiseframework.platform.web.css.*;
-import com.guiseframework.theme.Theme;
-
-import static com.garretwilson.text.CharacterEncodingConstants.*;
-import static com.garretwilson.util.LocaleUtilities.*;
-import static com.garretwilson.util.UUIDUtilities.*;
-import static com.guiseframework.Guise.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
+import com.guiseframework.platform.web.css.*;
+
+import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
 
 /**The servlet that controls a Guise web applications.
 Each Guise session's platform will be locked during normal web page generation context will be active at one one time.
@@ -627,14 +575,14 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 										progressComponent.processEvent(new WebProgressEvent(progressComponent, null, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for all transfers
 									}
 								}
-								final RDFResource resourceDescription=new DefaultRDFResource();	//create a new resource description
+								final URFResource resourceDescription=new DefaultURFResource();	//create a new resource description
 								final String itemContentType=fileItemStream.getContentType();	//get the item content type, if any
 								if(itemContentType!=null)	//if we know the item's content type
 								{
-									Marmot.setContentType(resourceDescription, createContentType(itemContentType));	//set the resource's content type
+									setContentType(resourceDescription, createContentType(itemContentType));	//set the resource's content type
 								}
 								final String name=getFilename(itemName);	//removing any extraneous path information a browser such as IE or Opera might have given
-								Marmot.setName(resourceDescription, name);	//specify the name provided to us
+								resourceDescription.setName(name);	//specify the name provided to us
 
 								try
 								{
@@ -1416,8 +1364,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 					}
 				}
 			}
-			final RDFObject descriptionRDFObject=DCUtilities.getDescription(destinationResource.getResourceDescription());	//get the dc:description
-			final String description=descriptionRDFObject instanceof RDFLiteral ? ((RDFLiteral)descriptionRDFObject).getLexicalForm() : null;	//get the description string, if any
+			final String description=getDescription(destinationResource.getResourceDescription());	//get the dc.description
 			if(description!=null)	//if this resource provides a description
 			{
 				setContentDescription(response, description);	//resport the description back to the client
@@ -2125,7 +2072,7 @@ Debug.trace("this is a destination");
 		 			final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
 					final String referrer=getReferer(request);	//get the request referrer, if any
 					final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
-					final ObjectHolder<RDFResource> destinationResourceDescriptionHolder=new ObjectHolder<RDFResource>();	//create an object holder to receive the result of asking for the resource description
+					final ObjectHolder<URFResource> destinationResourceDescriptionHolder=new ObjectHolder<URFResource>();	//create an object holder to receive the result of asking for the resource description
 					final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
 					try
 					{
@@ -2344,7 +2291,7 @@ Debug.trace("this is a destination");
 		@param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 		@exception NullPointerException if the reference URI, resource description, Guise container, Guise application, Guise session, resource destination, navigation path, and/or bookmark is <code>null</code>.
 		*/
-		public DestinationResource(final URI referenceURI, final RDFResource resourceDescription, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ResourceReadDestination resourceDestination, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI)
+		public DestinationResource(final URI referenceURI, final URFResource resourceDescription, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ResourceReadDestination resourceDestination, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI)
 		{
 			super(referenceURI, resourceDescription);	//construct the parent class
 			this.guiseContainer=checkInstance(guiseContainer, "Guise container cannot be null.");

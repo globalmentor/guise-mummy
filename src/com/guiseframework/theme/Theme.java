@@ -3,12 +3,14 @@ package com.guiseframework.theme;
 import java.net.URI;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+
 import static java.util.Collections.*;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.urf.*;
 import static com.garretwilson.urf.URF.*;
+
 import com.garretwilson.urf.ploop.PLOOPURFProcessor;
 import com.garretwilson.urf.select.*;
 import com.garretwilson.urf.xml.XML;
@@ -20,7 +22,7 @@ import static com.guiseframework.Resources.*;
 /**Guise theme specification.
 @author Garret Wilson
 */
-public class Theme extends AbstractClassTypedURFResource
+public class Theme extends URFListResource<Rule>
 {
 
 	/**The recommended prefix to the theme ontology namespace.*/
@@ -87,7 +89,7 @@ public class Theme extends AbstractClassTypedURFResource
 	/**Default constructor.*/
 	public Theme()
 	{
-		this(null);	//construct the class with no reference URI
+		this((URI)null);	//construct the class with no reference URI
 	}
 
 	/**Reference URI constructor.
@@ -95,7 +97,29 @@ public class Theme extends AbstractClassTypedURFResource
 	*/
 	public Theme(final URI referenceURI)
 	{
-		super(referenceURI, THEME_NAMESPACE_URI);  //construct the parent class
+		super(referenceURI, createResourceURI(THEME_NAMESPACE_URI, getLocalName(Theme.class)));  //construct the parent class, using a type based upon the name of this class
+	}
+
+	/**Collection constructor with no URI.
+	The elements of the specified collection will be added to this list in the order they are returned by the collection's iterator.
+	@param collection The collection whose elements are to be placed into this list.
+	@exception NullPointerException if the specified collection is <code>null</code>.
+	*/
+	public Theme(final Collection<? extends Rule> collection)
+	{
+		this(null, collection);	//construct the class with no URI
+	}
+
+	/**URI and collection constructor.
+	The elements of the specified collection will be added to this list in the order they are returned by the collection's iterator.
+	@param uri The URI for the resource, or <code>null</code> if the resource should have no URI.
+	@param collection The collection whose elements are to be placed into this list.
+	@exception NullPointerException if the specified collection is <code>null</code>.
+	*/
+	public Theme(final URI uri, final Collection<? extends Rule> collection)
+	{
+		this(uri);	//construct the class with the URI
+		addAll(collection);	//add all the collection elements to the list
 	}
 
 	/**Retrieves the URI indicating the parent theme.
@@ -130,17 +154,12 @@ public class Theme extends AbstractClassTypedURFResource
 	public void updateRules() throws ClassNotFoundException
 	{
 		classRuleMap.clear();	//clear the map of rules
-		for(final URFProperty declarationProperty:getNamespaceProperties(ORDINAL_NAMESPACE_URI))	//get all of the ordinal properties; these are the declaratioons
+		for(final Rule rule:this)	//for each rule in this theme
 		{
-			final URFResource declaration=declarationProperty.getValue();	//get this declaration
-			if(declaration instanceof Rule)	//if this is a rule
+			final Selector selector=rule.getSelector();	//get what this rule selects
+			if(selector!=null)	//if there is a selector for this rule
 			{
-				final Rule rule=(Rule)declaration;	//get the rule
-				final Selector selector=rule.getSelector();	//get what this rule selects
-				if(selector!=null)	//if there is a selector for this rule
-				{
-					updateRules(rule, selector);	//update the rules with this selector
-				}
+				updateRules(rule, selector);	//update the rules with this selector
 			}
 		}
 	}

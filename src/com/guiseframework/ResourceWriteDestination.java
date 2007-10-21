@@ -5,7 +5,8 @@ import java.net.URI;
 
 import com.garretwilson.net.ResourceIOException;
 import com.garretwilson.net.URIPath;
-import com.garretwilson.rdf.RDFResource;
+import com.garretwilson.urf.*;
+import com.garretwilson.urf.content.Content;
 
 /**A navigation point that sets a resource description and/or contents.
 @author Garret Wilson
@@ -16,10 +17,10 @@ public interface ResourceWriteDestination extends Destination
 	/**Retrieves an output stream to the resource.
 	The resource may include any of the following properties:
 	<ul>
-		<li><code>mime:contentType</code></li>
-		<li><code>file:name</code></li>
-		<li><code>file:size</code></li>
-		<li><code>file:modifiedTime</code></li>
+		<li>{@value URF#NAME_PROPERTY_URI}</li>
+		<li>{@value Content#TYPE_PROPERTY_URI}</li>
+		<li>{@value Content#LENGTH_PROPERTY_URI}</li>
+		<li>{@value Content#MODIFIED_PROPERTY_URI}</li>
 	</ul>
 	@param session The current Guise Session. 
 	@param navigationPath The navigation path relative to the application context path.
@@ -29,6 +30,6 @@ public interface ResourceWriteDestination extends Destination
 	@exception NullPointerException if the given navigation path is <code>null</code>.
 	@exception ResourceIOException Thrown if there is an error writing to the resource.
 	*/
-	public OutputStream getOutputStream(final RDFResource resourceDescription, final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException;
+	public OutputStream getOutputStream(final URFResource resourceDescription, final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException;
 
 }
