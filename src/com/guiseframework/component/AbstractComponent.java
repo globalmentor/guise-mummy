@@ -11,12 +11,15 @@ import javax.mail.internet.ContentType;
 
 import com.garretwilson.beans.TargetedEvent;
 import com.garretwilson.lang.*;
+import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.text.TextUtilities.*;
 import com.garretwilson.urf.URFResource;
-import com.garretwilson.urf.ploop.PLOOPURFProcessor;
+import com.garretwilson.urf.ploop.*;
 import com.garretwilson.util.DataException;
 import com.garretwilson.util.Debug;
-import com.guiseframework.GuiseApplication;
-import com.guiseframework.GuiseSession;
+import static com.garretwilson.util.ArrayUtilities.*;
+
+import com.guiseframework.*;
 import com.guiseframework.component.effect.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.component.transfer.*;
@@ -28,10 +31,6 @@ import com.guiseframework.model.ui.AbstractPresentationModel;
 import com.guiseframework.platform.*;
 import com.guiseframework.prototype.PrototypeConsumer;
 import com.guiseframework.theme.Theme;
-
-import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.text.TextUtilities.*;
-import static com.garretwilson.util.ArrayUtilities.*;
 
 /**An abstract implementation of a component.
 <p>A component should never fire a property event directly. It should rather create a postponed event and queue that event with the session.
@@ -1095,15 +1094,15 @@ Debug.trace("now valid of", this, "is", isValid());
 				}
 				catch(final DataException dataException)	//if there was a data error
 				{
-					throw (IOException)new IOException(dataException.getMessage()).initCause(dataException);
+					throw new IOException(dataException);
 				}
 				catch(final InvocationTargetException invocationTargetException)	//if there was an error accessing a Java class
 				{
-					throw (IOException)new IOException(invocationTargetException.getMessage()).initCause(invocationTargetException);
+					throw new IOException(invocationTargetException);
 				}
 			}
 			while(preferencePropertyIterator.hasNext());	//keep saving properties while there are more preference properties
-//TODO del Debug.trace("loaded preferences; view:", ((ResourceChildrenPanel)this).getView(), "thumbnail size:", ((ResourceChildrenPanel)this).getThumbnailSize());
+//Debug.trace("loaded preferences; view:", ((ResourceChildrenPanel)this).getView(), "thumbnail size:", ((ResourceChildrenPanel)this).getThumbnailSize());
 		}
 	}
 
@@ -1114,30 +1113,29 @@ Debug.trace("now valid of", this, "is", isValid());
 	*/
 	public void savePreferences(final boolean includeDescendants) throws IOException
 	{
+//Debug.trace("ready to save preferences for component", this, "have preference properties", preferenceProperties);
 		final Iterator<String> preferencePropertyIterator=getPreferenceProperties().iterator();	//get an iterator to all preferences properties
 		if(preferencePropertyIterator.hasNext())	//if there are preference properties
 		{
 			final GuiseSession session=getSession();	//get the current session
 			final Class<?> componentClass=getClass();	//get this component's class
 			final URFResource preferences=session.getPreferences(componentClass);	//get existing preferences for this class
-/*TODO convert to URF
-			final PLOOPRDFGenerator ploopRDFGenerator=new PLOOPRDFGenerator();	//create a new PLOOP RDF generator for storing the properties
+			final PLOOPURFGenerator ploopURFGenerator=new PLOOPURFGenerator();	//create a new PLOOP URF generator for storing the properties
 			do	//for each property
 			{
 				final String propertyName=preferencePropertyIterator.next();	//get the name of the next property
 				try
 				{
-					ploopRDFGenerator.setRDFResourceProperty(preferences, this, propertyName);	//store this property in the preferences
+					ploopURFGenerator.setURFResourceProperty(preferences, this, propertyName);	//store this property in the preferences
 				}
 				catch(final InvocationTargetException invocationTargetException)	//if there was an error accessing this resource
 				{
-					throw (IOException)new IOException(invocationTargetException.getMessage()).initCause(invocationTargetException);
+					throw new IOException(invocationTargetException);
 				}
 			}
 			while(preferencePropertyIterator.hasNext());	//keep saving properties while there are more preference properties
-//TODO del Debug.trace("ready to save preferences; view:", ((ResourceChildrenPanel)this).getView(), "thumbnail size:", ((ResourceChildrenPanel)this).getThumbnailSize(), "preferences", RDFUtilities.toString(preferences));
+//Debug.trace("ready to save preferences; view:", ((ResourceChildrenPanel)this).getView(), "thumbnail size:", ((ResourceChildrenPanel)this).getThumbnailSize(), "preferences", URF.toString(preferences));
 			session.setPreferences(componentClass, preferences);	//set the new preferences
-*/
 		}
 	}
 

@@ -151,7 +151,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	{
 		try
 		{
-			savePreferences(true);	//save preferences for the entire component tree
+			childComponent.savePreferences(true);	//save preferences for the entire child component tree
 		}
 		catch(final IOException ioException)	//if there was an error saving preferences
 		{
