@@ -13,7 +13,7 @@
 	dc.rights="Copyright © 2007 GlobalMentor, Inc.",
 	dc.creator="Garret Wilson",
 
-	parentURI=<info:path/~guise/resources/themes/basic/basic.theme.turf>,
+	parentURI=<info:path/~guise/assets/themes/basic/basic.theme.turf>,
 
 	xml.style=«sunflower.style.css»,
 

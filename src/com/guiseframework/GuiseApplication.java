@@ -36,28 +36,28 @@ public interface GuiseApplication extends PropertyBindable
 
 	/**The application-relative base path reserved for exclusive Guise use.*/
 	public final static URIPath GUISE_RESERVED_BASE_PATH=new URIPath("~guise/");
-	/**The application-relative base path to access all Guise public resources.*/
-	public final static URIPath GUISE_PUBLIC_RESOURCE_BASE_PATH=GUISE_RESERVED_BASE_PATH.resolve("resources/");
-	/**The application-relative base path to access all Guise temp files.*/
-	public final static URIPath GUISE_PUBLIC_TEMP_BASE_PATH=GUISE_RESERVED_BASE_PATH.resolve("temp/");
-	/**The base path of public audio, relative to the application.*/
-	public final static URIPath GUISE_PUBLIC_AUDIO_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH.resolve("audio/");
-	/**The base path of public documents, relative to the application.*/
-	public final static URIPath GUISE_PUBLIC_DOCUMENTS_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH.resolve("documents/");
-	/**The base path of public DTDs, relative to the application.*/
-	public final static URIPath GUISE_PUBLIC_DTD_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH.resolve("dtd/");
-	/**The base path of public Flash files, relative to the application.*/
-	public final static URIPath GUISE_PUBLIC_FLASH_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH.resolve("flash/");
-	/**The base path of public JavaScript files, relative to the application.*/
-	public final static URIPath GUISE_PUBLIC_JAVASCRIPT_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH.resolve("javascript/");
-	/**The base path of public themes, relative to the application.*/
-	public final static URIPath GUISE_PUBLIC_THEMES_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH.resolve("themes/");
+	/**The application-relative base path to access all Guise assets.*/
+	public final static URIPath GUISE_ASSETS_BASE_PATH=GUISE_RESERVED_BASE_PATH.resolve("assets/");
+	/**The application-relative base path to access all Guise temporary files.*/
+	public final static URIPath GUISE_TEMP_BASE_PATH=GUISE_RESERVED_BASE_PATH.resolve("temp/");
+	/**The base path of audio assets, relative to the application.*/
+	public final static URIPath GUISE_ASSETS_AUDIO_PATH=GUISE_ASSETS_BASE_PATH.resolve("audio/");
+	/**The base path of document assets, relative to the application.*/
+	public final static URIPath GUISE_ASSETS_DOCUMENTS_PATH=GUISE_ASSETS_BASE_PATH.resolve("documents/");
+	/**The base path of DTD assets, relative to the application.*/
+	public final static URIPath GUISE_ASSETS_DTD_PATH=GUISE_ASSETS_BASE_PATH.resolve("dtd/");
+	/**The base path of Flash assets, relative to the application.*/
+	public final static URIPath GUISE_ASSETS_FLASH_PATH=GUISE_ASSETS_BASE_PATH.resolve("flash/");
+	/**The base path of JavaScript assets, relative to the application.*/
+	public final static URIPath GUISE_ASSETS_JAVASCRIPT_PATH=GUISE_ASSETS_BASE_PATH.resolve("javascript/");
+	/**The base path of theme assets, relative to the application.*/
+	public final static URIPath GUISE_ASSETS_THEMES_PATH=GUISE_ASSETS_BASE_PATH.resolve("themes/");
 		/**The base path of the default Guise theme, relative to the application.*/
-		public final static URIPath GUISE_ROOT_THEME_BASE_PATH=GUISE_PUBLIC_THEMES_PATH.resolve("root/");
+		public final static URIPath GUISE_ROOT_THEME_BASE_PATH=GUISE_ASSETS_THEMES_PATH.resolve("root/");
 			/**The path of the root Guise theme, relative to the application.*/
 			public final static URIPath GUISE_ROOT_THEME_PATH=GUISE_ROOT_THEME_BASE_PATH.resolve("root.theme.turf");
 		/**The base path of the basic Guise theme, relative to the application.*/
-		public final static URIPath GUISE_BASIC_THEME_BASE_PATH=GUISE_PUBLIC_THEMES_PATH.resolve("basic/");
+		public final static URIPath GUISE_BASIC_THEME_BASE_PATH=GUISE_ASSETS_THEMES_PATH.resolve("basic/");
 			/**The path of the basic Guise theme, relative to the application.*/
 			public final static URIPath GUISE_BASIC_THEME_PATH=GUISE_BASIC_THEME_BASE_PATH.resolve("basic.theme.turf");
 	/**The base path of the default Guise theme cursors, relative to the application.*/

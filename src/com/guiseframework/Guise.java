@@ -2,16 +2,12 @@ package com.guiseframework;
 
 import java.io.*;
 import java.lang.ref.*;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.garretwilson.util.Debug;
-
 import static com.garretwilson.io.InputStreamUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
-
 import static com.garretwilson.text.CharacterConstants.*;
 
 /**The singleton Guise class.
@@ -27,11 +23,11 @@ public final class Guise
 	/**The web address of Guise.*/
 	public final static URI GUISE_WEB_URI=URI.create("http://www.guiseframework.com/");
 
-	/**The base key to Guise public resources bundled in the Guise distributable.*/
-	public final static String GUISE_PUBLIC_RESOURCE_BASE_KEY="pub/";
+	/**The base key to Guise assets bundled in the Guise distributable.*/
+	public final static String GUISE_ASSETS_BASE_KEY="assets/";
 
 	/**The identifier of this build.*/
-	public final static String BUILD_ID="2007-10-15";
+	public final static String BUILD_ID="2007-10-27";
 
 		//Guise ontology
 	
@@ -59,94 +55,94 @@ public final class Guise
 		/**@return Whether this deployment of Guise is licensed.*/
 		public boolean isLicensed() {return licensed;}
 
-	/**The cache of public resource references keyed to resource strings.*/
-	private Map<String, Reference<byte[]>> publicResourceMap=new ConcurrentHashMap<String, Reference<byte[]>>();
+	/**The cache of asset references keyed to asset strings.*/
+	private Map<String, Reference<byte[]>> assetMap=new ConcurrentHashMap<String, Reference<byte[]>>();
 
-	/**Retrieves a Guise public resource keyed to its location.
-	Resources are cached for quick future retrieval.
-	Due to race conditions, a resource may initially be loaded more than once in this implementation before its final value is placed in the cache.
-	@param guisePublicResourceKey The location of the resource.
-	@return The resource, or <code>null</code> if there is no such resource.
-	@exception IllegalArgumentException if the resource key does not begin with the public resource path.
-	@exception IOException if there is an error loading the resource.
-	@see #GUISE_PUBLIC_RESOURCE_BASE_KEY
+	/**Retrieves a Guise asset keyed to its location.
+	Assets are cached for quick future retrieval.
+	Due to race conditions, an asset may initially be loaded more than once in this implementation before its final value is placed in the cache.
+	@param guiseAssetKey The location of the asset.
+	@return The asset, or <code>null</code> if there is no such asset.
+	@exception IllegalArgumentException if the asset key does not begin with {@value #GUISE_ASSETS_BASE_KEY}.
+	@exception IOException if there is an error loading the aset.
+	@see #GUISE_ASSETS_BASE_KEY
 	*/
-	public byte[] getGuisePublicResource(final String guisePublicResourceKey) throws IOException
+	public byte[] getGuiseAsset(final String guiseAssetKey) throws IOException
 	{
-		final String key=normalizePath(guisePublicResourceKey);	//normalize the resource key
-		if(!key.startsWith(GUISE_PUBLIC_RESOURCE_BASE_KEY))	//if this isn't a public resource key
+		final String key=normalizePath(guiseAssetKey);	//normalize the asset key
+		if(!key.startsWith(GUISE_ASSETS_BASE_KEY))	//if this isn't an asset key
 		{
-			throw new IllegalArgumentException(guisePublicResourceKey);
+			throw new IllegalArgumentException("String "+guiseAssetKey+" is not a Guise asset key.");
 		}
-		final Reference<byte[]> reference=publicResourceMap.get(key);	//get a reference to the resource
-		byte[] resource=reference!=null ? reference.get() : null;	//dereference the reference, if there is a reference
-		if(resource==null)	//if we haven't yet loaded the resource, or it has been dereferenced
+		final Reference<byte[]> reference=assetMap.get(key);	//get a reference to the asset
+		byte[] asset=reference!=null ? reference.get() : null;	//dereference the reference, if there is a reference
+		if(asset==null)	//if we haven't yet loaded the asset, or it has been dereferenced
 		{
-			final InputStream resourceInputStream=getClass().getResourceAsStream(key);	//get an input stream to the resource
-			if(resourceInputStream!=null)	//if we got an input stream to the resource
+			final InputStream assetInputStream=getClass().getResourceAsStream(key);	//get an input stream to the asset
+			if(assetInputStream!=null)	//if we got an input stream to the asset
 			{
-				resource=getBytes(resourceInputStream);	//load the resource
-				publicResourceMap.put(key, new SoftReference<byte[]>(resource));	//cache the resource
+				asset=getBytes(assetInputStream);	//load the asset
+				assetMap.put(key, new SoftReference<byte[]>(asset));	//cache the asset
 			}
 		}
-		return resource;	//return whatever resource we found
+		return asset;	//return whatever asset we found
 	}
 
-	/**Determines if a URL specifies an existing Guise public resource.
-	This version delegates to {@link #getGuisePublicResourceURL(String)}.
-	@param guisePublicResourceKey The location of the resource.
-	@return <code>true</code> if the URL references an existing Guise public resource, else <code>false</code>.
-	@exception IllegalArgumentException if the resource key does not begin with the public resource path.
-	@exception IOException if there is an error accessing the resource.
-	@see #GUISE_PUBLIC_RESOURCE_BASE_KEY
+	/**Determines if a URL specifies an existing Guise asset.
+	This version delegates to {@link #getGuiseAssetURL(String)}.
+	@param guiseAssetKey The location of the asset.
+	@return <code>true</code> if the URL references an existing Guise asset, else <code>false</code>.
+	@exception IllegalArgumentException if the asset key does not begin with {@value #GUISE_ASSETS_BASE_KEY}.
+	@exception IOException if there is an error accessing the asset.
+	@see #GUISE_ASSETS_BASE_KEY
 	*/
-	public boolean hasGuisePublicResourceURL(final String guisePublicResourceKey) throws IOException
+	public boolean hasGuiseAssetURL(final String guiseAssetKey) throws IOException
 	{
-		return getGuisePublicResourceURL(guisePublicResourceKey)!=null;	//see if there is actually a resource at the given location
+		return getGuiseAssetURL(guiseAssetKey)!=null;	//see if there is actually an asset at the given location
 	}
 
-	/**Retrieves a URL to a Guise public resource keyed to its location.
-	The URL allows connections to the resource.
-	@param guisePublicResourceKey The location of the resource.
-	@return A URL to the resource, or <code>null</code> if there is no such resource.
-	@exception IllegalArgumentException if the resource key does not begin with the public resource path.
-	@exception IOException if there is an error loading the resource.
-	@see #GUISE_PUBLIC_RESOURCE_BASE_KEY
+	/**Retrieves a URL to a Guise asset keyed to its location.
+	The URL allows connections to the asset.
+	@param guiseAssetKey The location of the asset.
+	@return A URL to the asset, or <code>null</code> if there is no such asset.
+	@exception IllegalArgumentException if the asset key does not begin with {@value #GUISE_ASSETS_BASE_KEY}.
+	@exception IOException if there is an error loading the asset.
+	@see #GUISE_ASSETS_BASE_KEY
 	*/
-	public URL getGuisePublicResourceURL(final String guisePublicResourceKey) throws IOException
+	public URL getGuiseAssetURL(final String guiseAssetKey) throws IOException
 	{
-		final String key=normalizePath(guisePublicResourceKey);	//normalize the resource key
-		if(!key.startsWith(GUISE_PUBLIC_RESOURCE_BASE_KEY))	//if this isn't a public resource key
+		final String key=normalizePath(guiseAssetKey);	//normalize the asset key
+		if(!key.startsWith(GUISE_ASSETS_BASE_KEY))	//if this isn't an asset key
 		{
-			throw new IllegalArgumentException(guisePublicResourceKey);
+			throw new IllegalArgumentException("String "+guiseAssetKey+" is not a Guise asset key.");
 		}
-		return getClass().getResource(key);	//get a URL to the resource
+		return getClass().getResource(key);	//get a URL to the asset
 	}
 
-	/**Retrieves an input stream to a Guise public resource keyed to its location.
-	This method will use cached resources if possible, but will not cache new resources.
-	@param guisePublicResourceKey The location of the resource.
-	@return An input stream to a resource, or <code>null</code> if there is no such resource.
-	@exception IllegalArgumentException if the resource key does not begin with the public resource path.
-	@exception IOException if there is an error loading the resource.
-	@see #GUISE_PUBLIC_RESOURCE_BASE_KEY
+	/**Retrieves an input stream to a Guise asset keyed to its location.
+	This method will use cached assets if possible, but will not cache new assets.
+	@param guiseAssetKey The location of the asset.
+	@return An input stream to an asset, or <code>null</code> if there is no such asset.
+	@exception IllegalArgumentException if the asset key does not begin with {@value #GUISE_ASSETS_BASE_KEY}.
+	@exception IOException if there is an error loading the asset.
+	@see #GUISE_ASSETS_BASE_KEY
 	*/
-	public InputStream getGuisePublicResourceInputStream(final String guisePublicResourceKey) throws IOException
+	public InputStream getGuiseAssetInputStream(final String guiseAssetKey) throws IOException
 	{
-		final String key=normalizePath(guisePublicResourceKey);	//normalize the resource key
-		if(!key.startsWith(GUISE_PUBLIC_RESOURCE_BASE_KEY))	//if this isn't a public resource key
+		final String key=normalizePath(guiseAssetKey);	//normalize the asset key
+		if(!key.startsWith(GUISE_ASSETS_BASE_KEY))	//if this isn't an asset key
 		{
-			throw new IllegalArgumentException(guisePublicResourceKey);
+			throw new IllegalArgumentException("String "+guiseAssetKey+" is not a Guise asset key.");
 		}
-		final Reference<byte[]> reference=publicResourceMap.get(key);	//get a reference to the resource
-		byte[] resource=reference!=null ? reference.get() : null;	//dereference the reference, if there is a reference
-		if(resource!=null)	//if the resource is already loaded
+		final Reference<byte[]> reference=assetMap.get(key);	//get a reference to the asset
+		byte[] asset=reference!=null ? reference.get() : null;	//dereference the reference, if there is a reference
+		if(asset!=null)	//if the asset is already loaded
 		{
-			return new ByteArrayInputStream(resource);	//return an input stream to the cached resource
+			return new ByteArrayInputStream(asset);	//return an input stream to the cached asset
 		}
-		else	//if we haven't yet loaded the resource, or it has been dereferenced
+		else	//if we haven't yet loaded the asset, or it has been dereferenced
 		{
-			return getClass().getResourceAsStream(key);	//get an input stream to the resource
+			return getClass().getResourceAsStream(key);	//get an input stream to the asset
 		}
 	}
 

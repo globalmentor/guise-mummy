@@ -42,25 +42,25 @@ public interface WebPlatform extends Platform
 	public final static String ATTRIBUTE_CONTENT_HASH="contentHash";
 
 	/**The path of the blank MP3 file, relative to the application.*/
-	public final static URIPath BLANK_MP3_PATH=GuiseApplication.GUISE_PUBLIC_AUDIO_PATH.resolve("blank.mp3");	
+	public final static URIPath BLANK_MP3_PATH=GuiseApplication.GUISE_ASSETS_AUDIO_PATH.resolve("blank.mp3");	
 
 	/**The path of the empty HTML document, relative to the application.*/
-	public final static URIPath GUISE_EMPTY_HTML_DOCUMENT_PATH=GuiseApplication.GUISE_PUBLIC_DOCUMENTS_PATH.resolve("empty.html");
+	public final static URIPath GUISE_EMPTY_HTML_DOCUMENT_PATH=GuiseApplication.GUISE_ASSETS_DOCUMENTS_PATH.resolve("empty.html");
 
 	/**The path of the AJAX JavaScript file, relative to the application.*/
-	public final static URIPath AJAX_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH.resolve("ajax.js");
+	public final static URIPath AJAX_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("ajax.js");
 	/**The path of the DOM JavaScript file, relative to the application.*/
-	public final static URIPath DOM_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH.resolve("dom.js");
+	public final static URIPath DOM_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("dom.js");
 	/**The path of the Guise JavaScript file, relative to the application.*/
-	public final static URIPath GUISE_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH.resolve("guise.js");
+	public final static URIPath GUISE_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("guise.js");
 	/**The path of the JavaScript JavaScript file, relative to the application.*/
-	public final static URIPath JAVASCRIPT_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH.resolve("javascript.js");
+	public final static URIPath JAVASCRIPT_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("javascript.js");
 
 	/**The path of the Guise DTD, relative to the application.*/
-	public final static URIPath GUISE_DTD_PATH=GuiseApplication.GUISE_PUBLIC_DTD_PATH.resolve("guise.dtd");
+	public final static URIPath GUISE_DTD_PATH=GuiseApplication.GUISE_ASSETS_DTD_PATH.resolve("guise.dtd");
 	
 	/**The path of the Guise Flash file, relative to the application.*/
-	public final static URIPath GUISE_FLASH_PATH=GuiseApplication.GUISE_PUBLIC_FLASH_PATH.resolve("guise.swf");
+	public final static URIPath GUISE_FLASH_PATH=GuiseApplication.GUISE_ASSETS_FLASH_PATH.resolve("guise.swf");
 
 	/**Generates an ID for the given depicted object appropriate for using on the platform.
 	@param depictID The depict ID to be converted to a platform ID.

@@ -1937,15 +1937,15 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   @return <code>true</code> if the resource exists, else <code>false</code>.
 	@exception IOException if there is an error accessing the resource.
 	@see GuiseApplication#hasDestination(String)
-	@see #isGuisePublicResourceURI(URI)
+	@see #isGuiseAssetURI(URI)
   */
   protected boolean exists(final HttpServletRequest request, final URI resourceURI) throws IOException
   {
   		//see if this is a Guise public resource
-  	if(isGuisePublicResourceURI(resourceURI))	//if this URI represents a Guise public resource
+  	if(isGuiseAssetURI(resourceURI))	//if this URI represents a Guise public resource
   	{
-  		final String publicResourceKey=getGuisePublicResourceKey(resourceURI);	//get the Guise public resource key
-  		return Guise.getInstance().hasGuisePublicResourceURL(publicResourceKey);	//see if there is a public resource for this key
+  		final String publicResourceKey=getGuiseAssetKey(resourceURI);	//get the Guise public resource key
+  		return Guise.getInstance().hasGuiseAssetURL(publicResourceKey);	//see if there is a public resource for this key
   	}
   	final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
   	final URIPath path=guiseApplication.relativizeURI(resourceURI);	//get the application-relative path TODO probably change this to be the same logic as for getting the navigation path
@@ -2011,9 +2011,9 @@ Debug.trace("this is a destination");
   @return An object providing an encapsulation of the requested resource, but not necessarily the contents of the resource.
 	@exception IllegalArgumentException if the given resource URI does not represent a valid resource.
 	@exception IOException if there is an error accessing the resource.
-	@see #isGuisePublicResourceURI(URI)
-	@see #getGuisePublicResourceKey(URI)
-	@see Guise#getGuisePublicResourceURL(String)
+	@see #isGuiseAssetURI(URI)
+	@see #getGuiseAssetKey(URI)
+	@see Guise#getGuiseAssetURL(String)
 	@see GuiseApplication#hasTempPublicResource(URIPath)
 	@see GuiseApplication#getInputStream(URIPath)
 	@see ResourceReadDestination
@@ -2022,11 +2022,11 @@ Debug.trace("this is a destination");
 	{
 //TODO del Debug.trace("getting resource for URI: ", resourceURI);
 		final HTTPServletResource resource;	//we'll create a resource for this resource URI
-  	if(isGuisePublicResourceURI(resourceURI))	//if this URI represents a Guise public resource
+  	if(isGuiseAssetURI(resourceURI))	//if this URI represents a Guise public resource
   	{
-  		final String publicResourceKey=getGuisePublicResourceKey(resourceURI);	//get the Guise public resource key
+  		final String publicResourceKey=getGuiseAssetKey(resourceURI);	//get the Guise public resource key
 //  	TODO del Debug.trace("this is a public resource with key: ", publicResourceKey);
-			final URL publicResourceURL=Guise.getInstance().getGuisePublicResourceURL(publicResourceKey);	//get a URL to the resource
+			final URL publicResourceURL=Guise.getInstance().getGuiseAssetURL(publicResourceKey);	//get a URL to the resource
 //		TODO del Debug.trace("found URL to resource: ", publicResourceURL);
 			if(publicResourceURL==null)	//if there is no such resource
 			{
@@ -2041,7 +2041,7 @@ Debug.trace("this is a destination");
 			final URIPath applicationBasePath=guiseApplication.getBasePath();	//get the application base path
   		final String rawPath=resourceURI.getRawPath();	//get the raw path of the requested resource
 			final URIPath relativePath=rawPath!=null ? applicationBasePath.relativize(rawPath) : null;	//relativize the raw path to the base path
-			if(relativePath!=null && relativePath.toString().startsWith(GuiseApplication.GUISE_PUBLIC_TEMP_BASE_PATH.toString()))	//if this is a path to a Guise temporary public resource
+			if(relativePath!=null && relativePath.toString().startsWith(GuiseApplication.GUISE_TEMP_BASE_PATH.toString()))	//if this is a path to a Guise temporary public resource
 			{
 				final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 				final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request TODO see if we can request a session without forcing one to be created, if that's useful
@@ -2305,46 +2305,46 @@ Debug.trace("this is a destination");
 
 	}
 
-	/**Determines whether the given URI references a Guise public resource.
-	The URI references a public resource if the path, relative to the application base path, begins with {@value GuiseApplication#GUISE_PUBLIC_RESOURCE_BASE_PATH}.
-	@param uri The reference URI, which is assumed to have this servlet's domain.
-	@return <code>true</code> if the given URI references a Guise public resource.
+	/**Determines whether the given URI references a Guise asset.
+	The URI references an asset if the path, relative to the application base path, begins with {@value GuiseApplication#GUISE_ASSETS_BASE_PATH}.
+	@param uri The URI, which is assumed to have this servlet's domain.
+	@return <code>true</code> if the given URI references a Guise asset.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	*/
-	public boolean isGuisePublicResourceURI(final URI uri)
+	public boolean isGuiseAssetURI(final URI uri)
 	{
 			//TODO do we need to ensure that the given URI has a non-null raw path, like we used to, and return false if not?
 		final URIPath path=new URIPath(uri.getRawPath());	//get the URI path TODO check this assumption of the domain when that gets rewritten
-//		TODO del 	Debug.trace("is public resource URI?", uri);
+//		TODO del 	Debug.trace("is assetURI?", uri);
 		final URIPath applicationBasePath=getGuiseApplication().getBasePath();	//get the application base path
 //		TODO del Debug.trace("application base path", applicationBasePath);
 		final URIPath relativePath=applicationBasePath.relativize(path);	//relativize the raw path to the base path
 //		TODO del Debug.trace("relativePath", relativePath);
-		return relativePath.toString().startsWith(GuiseApplication.GUISE_PUBLIC_RESOURCE_BASE_PATH.toString());	//see if the relative path starts with the Guise public resource base path
+		return relativePath.toString().startsWith(GuiseApplication.GUISE_ASSETS_BASE_PATH.toString());	//see if the relative path starts with the Guise public resource base path
 	}
 
-	/**Determines the Guise public resource key for the given URI.
-	The path of the given URI, relative to the application base path, must begin with {@value GuiseApplication#GUISE_PUBLIC_RESOURCE_BASE_PATH}.
-	This path prefix will be replaced with {@value Guise#GUISE_PUBLIC_RESOURCE_BASE_KEY}.
-	@param uri The URI of the public resource, which is assumed to have this servlet's domain.
-	@return The key to a Guise public resource.
-	@exception IllegalArgumentException if the raw path of the URI is <code>null</code> or does not start with {@value GuiseApplication#GUISE_PUBLIC_RESOURCE_BASE_PATH}.
-	@see Guise#hasGuisePublicResourceURL(String)
-	@see Guise#getGuisePublicResource(String)
-	@see Guise#getGuisePublicResourceInputStream(String)
-	@see Guise#getGuisePublicResourceURL(String)
+	/**Determines the Guise asset key for the given URI.
+	The path of the given URI, relative to the application base path, must begin with {@value GuiseApplication#GUISE_ASSETS_BASE_PATH}.
+	This path prefix will be replaced with {@value Guise#GUISE_ASSETS_BASE_KEY}.
+	@param uri The URI of the asset, which is assumed to have this servlet's domain.
+	@return The key to a Guise asset.
+	@exception IllegalArgumentException if the raw path of the URI is <code>null</code> or does not start with {@value GuiseApplication#GUISE_ASSETS_BASE_PATH}.
+	@see Guise#hasGuiseAssetURL(String)
+	@see Guise#getGuiseAsset(String)
+	@see Guise#getGuiseAssetInputStream(String)
+	@see Guise#getGuiseAssetURL(String)
 	*/
-	public String getGuisePublicResourceKey(final URI uri)
+	public String getGuiseAssetKey(final URI uri)
 	{
 		final URIPath rawPath=new URIPath(uri.getRawPath());	//get the raw path of the URI
 		final URIPath applicationBasePath=getGuiseApplication().getBasePath();	//get the application base path
 		final URIPath relativePath=applicationBasePath.relativize(rawPath);	//relativize the raw path to the base path
 		final String relativePathString=relativePath.toString();	//get the relative path as a string
-		final String guisePublicResourceBasePathString=GuiseApplication.GUISE_PUBLIC_RESOURCE_BASE_PATH.toString();	//get the Guise public resource base path as a string
-		if(!relativePathString.startsWith(guisePublicResourceBasePathString))	//if this isn't a public resource URI
+		final String guiseAssetBasePathString=GuiseApplication.GUISE_ASSETS_BASE_PATH.toString();	//get the Guise asset base path as a string
+		if(!relativePathString.startsWith(guiseAssetBasePathString))	//if this isn't an asset URI
 		{
-			throw new IllegalArgumentException("URI "+uri+ " does not identify a Guise public resource.");
+			throw new IllegalArgumentException("URI "+uri+ " does not identify a Guise asset.");
 		}
-		return GUISE_PUBLIC_RESOURCE_BASE_KEY+relativePathString.substring(guisePublicResourceBasePathString.length());	//replace the beginning of the relative path with the resource base path
+		return GUISE_ASSETS_BASE_KEY+relativePathString.substring(guiseAssetBasePathString.length());	//replace the beginning of the relative path with the resource base path
 	}
 }

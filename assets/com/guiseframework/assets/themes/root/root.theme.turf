@@ -1,0 +1,105 @@
+^URF
+[
+	|select|<http://urf.name/select>,
+	|xml|<http://urf.name/xml>,
+	|theme|<http://guiseframework.com/namespaces/theme>,
+	|component|<java:/com/guiseframework/component/>,
+	|geometry|<java:/com/guiseframework/geometry/>,
+	|resources|<http://guiseframework.com/namespaces/resources>,
+	|style|<java:/com/guiseframework/style/>,
+	|dc|<http://purl.org/dc/elements/1.1/>,
+	
+	(theme.Theme):
+		dc.title="Guise™ Root Theme",
+		dc.description="The theme that is the root parent of all Guise™ themes.",
+		dc.rights="Copyright © 2007 GlobalMentor, Inc.",
+		dc.creator="Garret Wilson",
+	
+		xml.style=«root.style.css»,
+	
+		theme.resources=«root.resources.turf»(resources.Resources):
+			*standard colors*
+			"theme.color.main"="black",
+			"theme.color.main1"="\“theme.color.main\”",
+			"theme.color.main2"="\“theme.color.main\”",
+			"theme.color.subordinate"="white",
+			"theme.color.subordinateA"="\“theme.color.subordinate\”",
+			"theme.color.subordinateB"="\“theme.color.subordinate\”",
+			"theme.color.subordinate1A"="\“theme.color.subordinateA\”",
+			"theme.color.subordinate1B"="\“theme.color.subordinateB\”",
+			"theme.color.subordinate2A"="\“theme.color.subordinateA\”",
+			"theme.color.subordinate2B"="\“theme.color.subordinateB\”",
+			"theme.color.neutralA"="\“theme.color.main\”",
+			"theme.color.neutralB"="\“theme.color.subordinate\”",
+	
+			"theme.color.text"="\“theme.color.neutralA\”",
+			"theme.color.background"="\“theme.color.neutralB\”",
+	
+			"theme.color.menu"="\“theme.color.subordinateB\”",
+			"theme.color.submenu"="\“theme.color.background\”",
+			"theme.color.toolbar"="\“theme.color.menu\”",
+			"theme.color.link"="royalblue",
+	
+			"theme.color.border"="\“theme.color.neutralA\”",
+	
+			"theme.color.selected.background"="royalblue"
+		;
+	;
+	[
+		*Frame*
+		(Rule):
+			select.selector=(ObjectClassSelector):
+				selectClass=component.Frame
+			;,
+			apply=(Template):
+				color=(style.ResourceColor)¡"theme.color.text"!,
+				backgroundColor=(style.ResourceColor)¡"theme.color.background"!
+			;
+		;,
+		*Menu*
+		(Rule):	*root menu*
+			select.selector=(IntersectionSelector):
+				selector=(ObjectClassSelector):
+					selectClass=component.Menu
+				;,
+				select.selector=(NegationSelector):
+					selector=(ObjectPropertySelector):
+						selectPropertyName="parent",
+						selector=(ObjectClassSelector):
+							selectClass=component.Menu
+						;
+					;
+				;
+			;,
+			apply=(Template):
+				backgroundColor=(style.ResourceColor)¡"theme.color.menu"!
+			;
+		;,
+		(Rule):	*submenu*
+			select.selector=(IntersectionSelector):
+				selector=(ObjectClassSelector):
+					selectClass=component.Menu
+				;,
+				selector=(ObjectPropertySelector):
+					selectPropertyName="parent",
+					selector=(ObjectClassSelector):
+						selectClass=component.Menu
+					;
+				;
+			;,
+			apply=(Template):
+				backgroundColor=(style.ResourceColor)¡"theme.color.submenu"!,
+				borderColor=(style.ResourceColor)¡"theme.color.neutralA"!
+			;
+		;,
+		*Toolbar*
+		(Rule):
+			select.selector=(ObjectClassSelector):
+				selectClass=component.Toolbar
+			;,
+			apply=(Template):
+				backgroundColor=(style.ResourceColor)¡"theme.color.toolbar"!
+			;
+		;
+	]
+]

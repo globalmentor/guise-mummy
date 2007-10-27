@@ -219,7 +219,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			//empty HTML document path variable
 		depictContext.write("\t\t");
 //TODO del		context.writeLiteral("var GUISE_EMPTY_HTML_DOCUMENT_PATH=\""+application.resolvePath(GUISE_EMPTY_HTML_DOCUMENT_PATH)+"\";");	//write the path to the Guise empty HTML document
-		depictContext.writeLiteral("var GUISE_PUBLIC_RESOURCE_BASE_PATH=\""+application.resolvePath(GUISE_PUBLIC_RESOURCE_BASE_PATH)+"\";");	//write the path to the Guise base path for public resources TODO use a constant
+		depictContext.writeLiteral("var GUISE_ASSETS_BASE_PATH=\""+application.resolvePath(GUISE_ASSETS_BASE_PATH)+"\";");	//write the path to the Guise base path for assets TODO use a constant
 		depictContext.write("\n\t\t");
 		depictContext.writeLiteral("var GUISE_VERSION=\""+Guise.BUILD_ID+"\";");	//write the path to the Guise base path for public resources TODO use a constant
 		depictContext.write('\n');
