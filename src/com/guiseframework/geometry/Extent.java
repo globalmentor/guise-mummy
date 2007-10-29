@@ -14,32 +14,6 @@ public class Extent
 	/**A convenience one-dimensional extent of zero pixels.*/
 	public final static Extent ZERO_EXTENT1=new Extent(0, Unit.PIXEL, 1);
 
-	/*The unit of measurement.*/
-	public enum Unit
-	{
-			//relative units
-		/**The size of a font.*/
-		EM,
-		/**The x-height of a font.*/
-		EX,
-		/**Pixels relative to the viewing device.*/
-		PIXEL,
-			//absolute units
-		/**Inches.*/
-		INCH,
-		/**Centimeters.*/
-		CENTIMETER,
-		/**Millimeters.*/
-		MILLIMETER,
-		/**Points, or 1/72 of an inch.*/
-		POINT,
-		/**Picas, or 12 points.*/
-		PICA,
-			//pure relative units
-		/**Pure relative units (i.e. the fractional form of a percentage).*/
-		RELATIVE;
-	}
-
 	/**The value of the extent.*/
 	private final double value;
 
@@ -52,10 +26,10 @@ public class Extent
 		/**@return The unit with which the extent is measured.*/
 		public Unit getUnit() {return unit;}
 
-	/**The degree of dimensions of the measurement.*/ 
+	/**The degree of dimensions of the measurement.*/
 	private final int degree;
 
-		/**@return The degree of dimensions of the measurement.*/ 
+		/**@return The degree of dimensions of the measurement.*/
 		public int getDegree() {return degree;}
 
 	/**Value constructor for a one-dimensional pixel extent.
@@ -91,7 +65,7 @@ public class Extent
 		}
 		this.value=value;	//save the value
 		this.unit=checkInstance(unit, "Unit cannot be null.");	//save the unit
-		this.degree=degree;	//save the degree		
+		this.degree=degree;	//save the degree
 	}
 
 	/**@return A hash code value for the object.*/

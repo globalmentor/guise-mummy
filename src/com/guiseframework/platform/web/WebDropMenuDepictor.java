@@ -9,6 +9,7 @@ import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.*;
+
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 
@@ -82,8 +83,8 @@ public class WebDropMenuDepictor<C extends Menu> extends AbstractWebMenuDepictor
 					throw new UnsupportedOperationException("Support not yet added for horizontal menus.");
 				case Y:
 						//TODO check the flow of the parent menu to determine positioning
-					styles.put(CSS_PROP_LEFT, CSSUtilities.toString(new Extent(0, Extent.Unit.RELATIVE)));	//left:0%
-					styles.put(CSS_PROP_TOP, CSSUtilities.toString(new Extent(1, Extent.Unit.RELATIVE)));	//top:100%
+					styles.put(CSS_PROP_LEFT, CSSUtilities.toString(new Extent(0, Unit.RELATIVE)));	//left:0%
+					styles.put(CSS_PROP_TOP, CSSUtilities.toString(new Extent(1, Unit.RELATIVE)));	//top:100%
 					break;
 				default:
 					throw new AssertionError("Unrecognized axis: "+flowAxis);
@@ -127,17 +128,17 @@ public class WebDropMenuDepictor<C extends Menu> extends AbstractWebMenuDepictor
 					switch(parentFlowAxis)	//see what axis the parent is flowing on
 					{
 						case X:
-							containerStyles.put(CSS_PROP_LEFT, CSSUtilities.toString(new Extent(0, Extent.Unit.RELATIVE)));	//left:0%
-							containerStyles.put(CSS_PROP_TOP, CSSUtilities.toString(new Extent(1, Extent.Unit.RELATIVE)));	//top:100%
+							containerStyles.put(CSS_PROP_LEFT, CSSUtilities.toString(new Extent(0, Unit.RELATIVE)));	//left:0%
+							containerStyles.put(CSS_PROP_TOP, CSSUtilities.toString(new Extent(1, Unit.RELATIVE)));	//top:100%
 							break;
 						case Y:
-							containerStyles.put(CSS_PROP_LEFT, CSSUtilities.toString(new Extent(1, Extent.Unit.RELATIVE)));	//left:100%
-							containerStyles.put(CSS_PROP_TOP, CSSUtilities.toString(new Extent(0, Extent.Unit.RELATIVE)));	//top:0%
+							containerStyles.put(CSS_PROP_LEFT, CSSUtilities.toString(new Extent(1, Unit.RELATIVE)));	//left:100%
+							containerStyles.put(CSS_PROP_TOP, CSSUtilities.toString(new Extent(0, Unit.RELATIVE)));	//top:0%
 							break;
 						default:
 							throw new AssertionError("Unrecognized axis: "+parentFlowAxis);
 					}
-					containerStyles.put(CSS_PROP_WIDTH, CSSUtilities.toString(new Extent(10, Extent.Unit.RELATIVE)));	//width:1000%
+					containerStyles.put(CSS_PROP_WIDTH, CSSUtilities.toString(new Extent(10, Unit.RELATIVE)));	//width:1000%
 					break;
 				default:
 					throw new AssertionError("Unrecognized axis: "+flowAxis);

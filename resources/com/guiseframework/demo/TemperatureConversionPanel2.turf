@@ -5,35 +5,33 @@
 (demo.TemperatureConversionPanel2):
 	label="Guise™ Demonstration: Temperature Conversion",
 	layout=(layout.FlowLayout):
-		flow="line"
+		flow=«"LINE"(Flow)»
 	;,
 	name="temperatureConversionPanel",
 	children=
 	[
 		(component.LayoutPanel):
 			layout=(layout.FlowLayout):
-				flow="page"
+				flow=«"PAGE"(Flow)»
 			;,
 			name="inputPanel",
 			children=
 			[
-				(component.TextControl):
+				(component.TextControl)¡«java:/java/lang/Double»!:
 					label="Input Temperature",
 					name="temperatureInput",
-					validator=(validator.ValueRequiredValidator),
-					valueClass=«java:/java/lang/Float»
+					validator=(validator.ValueRequiredValidator)
 				;,
-				(component.TextControl):
+				(component.TextControl)¡«java:/java/lang/Double»!:
 					editable=&false,
 					label="Output Temperature",
-					name="temperatureOutput",
-					valueClass=«java:/java/lang/Float»
+					name="temperatureOutput"
 				;
 			]
 		;,
 		(component.LayoutPanel):
 			layout=(layout.FlowLayout):
-				flow="page"
+				flow=«"PAGE"(Flow)»
 			;,
 			name="conversionPanel",
 			children=
@@ -41,7 +39,7 @@
 				(component.GroupPanel):
 					label="Input Scale",
 					layout=(layout.FlowLayout):
-						flow="page"
+						flow=«"PAGE"(Flow)»
 					;,
 					name="scalePanel",
 					children=

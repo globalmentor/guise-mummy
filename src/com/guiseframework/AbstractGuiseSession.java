@@ -23,6 +23,7 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.Extent;
+import com.guiseframework.geometry.Unit;
 import com.guiseframework.input.*;
 import com.guiseframework.model.*;
 import com.guiseframework.platform.Platform;
@@ -1658,7 +1659,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			icon=severity.getGlyph();	//set the icon based upon the severity
 		}		
 		optionDialogFrame.setGlyphURI(icon);	//set the icon
-		optionDialogFrame.setLineExtent(new Extent(0.33, Extent.Unit.RELATIVE));	//set the preferred dimensions		
+		optionDialogFrame.setLineExtent(new Extent(0.33, Unit.RELATIVE));	//set the preferred dimensions		
 		optionDialogFrame.open(new AbstractGenericPropertyChangeListener<Frame.Mode>()	//show the dialog and listen for the frame closing
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> genericPropertyChangeEvent)	//listen for the dialog mode changing

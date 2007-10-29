@@ -46,7 +46,7 @@ public class Point
 	*/
 	public Point(final double x, double y, double z)
 	{
-		this(x, y, z, Extent.Unit.PIXEL);	//construct the point using pixels
+		this(x, y, z, Unit.PIXEL);	//construct the point using pixels
 	}
 
 	/**Two-dimensional primitive coordinate and unit constructor.
@@ -54,7 +54,7 @@ public class Point
 	@param y The Y coordinate.
 	@param unit The unit in which the point is measured.
 	*/
-	public Point(final double x, double y, final Extent.Unit unit)
+	public Point(final double x, double y, final Unit unit)
 	{
 		this(x, y, 0, unit);	//construct the point in the zero Z plane
 	}
@@ -65,7 +65,7 @@ public class Point
 	@param z The Z coordinate.
 	@param unit The unit in which the point is measured.
 	*/
-	public Point(final double x, double y, double z, final Extent.Unit unit)
+	public Point(final double x, double y, double z, final Unit unit)
 	{
 		this(new Extent(x, unit, 1), new Extent(y, unit, 1), new Extent(z, unit, 1));	//create extents and construct the point
 	}

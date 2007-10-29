@@ -18,6 +18,7 @@ import com.guiseframework.event.NavigateActionListener;
 import com.guiseframework.geometry.Axis;
 import com.guiseframework.geometry.Dimensions;
 import com.guiseframework.geometry.Extent;
+import com.guiseframework.geometry.Unit;
 
 /**Strategy for rendering an action control as an XHTML <code>&lt;a&gt;</code> element styled as a button.
 This view recognizes {@link Button} controls and can render their images.
@@ -138,7 +139,7 @@ public class WebCustomButtonDepictor<C extends ActionControl> extends AbstractWe
 */
 	}
 
-	private final static Extent[] CORNER_MARGINS=new Extent[]{new Extent(5, Extent.Unit.PIXEL), new Extent(3, Extent.Unit.PIXEL), new Extent(2, Extent.Unit.PIXEL), new Extent(1, Extent.Unit.PIXEL), new Extent(1, Extent.Unit.PIXEL)};
+	private final static Extent[] CORNER_MARGINS=new Extent[]{new Extent(5, Unit.PIXEL), new Extent(3, Unit.PIXEL), new Extent(2, Unit.PIXEL), new Extent(1, Unit.PIXEL), new Extent(1, Unit.PIXEL)};
 	
 	/**Renders corners for the given component.
 	@param direction Which physical end of the vertical flow the corner is on (decreasing for top or increasing for bottom). 
@@ -180,13 +181,13 @@ public class WebCustomButtonDepictor<C extends ActionControl> extends AbstractWe
 			writeClassAttribute(getBaseStyleIDs(null, "-corner"));	//write the base style IDs with a "-corner" suffix	TODO use a constant
 			final Map<String, Object> cornerStyles=new HashMap<String, Object>();	//create a new map of styles
 			cornerStyles.put(CSS_PROP_DISPLAY, CSS_DISPLAY_BLOCK);	//display: block
-			cornerStyles.put(CSS_PROP_HEIGHT, CSSUtilities.toString(new Extent(1, Extent.Unit.PIXEL)));	//height: 1px
+			cornerStyles.put(CSS_PROP_HEIGHT, CSSUtilities.toString(new Extent(1, Unit.PIXEL)));	//height: 1px
 			cornerStyles.put(CSS_PROP_OVERFLOW, CSS_OVERFLOW_HIDDEN);	//overflow: hidden
 /*TODO add the background color once we implement this on the component proper
 			final back
 			cornerStyles.put(CSS_PROP_BACKGROUND, CSSUtilities.toString(new RGBColor(0xF5F5F5)));	//background: backgroundColor
 */
-			cornerStyles.put(CSS_PROP_FONT_SIZE, CSSUtilities.toString(new Extent(1, Extent.Unit.PIXEL)));	//font-size: 1px
+			cornerStyles.put(CSS_PROP_FONT_SIZE, CSSUtilities.toString(new Extent(1, Unit.PIXEL)));	//font-size: 1px
 			if(!Dimensions.ZERO_DIMENSIONS.equals(component.getCornerArcSize(leftCorner)))	//if there is a left corner arc size
 			{
 				cornerStyles.put(CSS_PROP_MARGIN_LEFT, CSSUtilities.toString(cornerMargin));	//add the appropriate margin for the left side

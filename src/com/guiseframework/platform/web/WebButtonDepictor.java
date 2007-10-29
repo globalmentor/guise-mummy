@@ -10,6 +10,7 @@ import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.geometry.Extent;
 import com.guiseframework.geometry.Side;
+import com.guiseframework.geometry.Unit;
 import com.guiseframework.style.LineStyle;
 
 import static com.guiseframework.platform.web.CSSUtilities.*;
@@ -66,7 +67,7 @@ public class WebButtonDepictor<C extends ActionControl> extends AbstractWebActio
 			for(final Side side:Side.values())	//for each side
 			{
 //TODO del when works				styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), Extent.ZERO_EXTENT1);	//set the border to zero
-				styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), new Extent(1, Extent.Unit.PIXEL));	//set the border to 1 TODO change to a constant value 
+				styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), new Extent(1, Unit.PIXEL));	//set the border to 1 TODO change to a constant value 
 				styles.put(CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(LineStyle.INSET));	//show the button as inset
 			}
 		}

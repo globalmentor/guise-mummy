@@ -5,6 +5,7 @@ import java.net.URI;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.Extent;
+import com.guiseframework.geometry.Unit;
 
 /**Drop Details Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
@@ -61,8 +62,8 @@ public class BookDescriptionPanel extends LayoutPanel
 			
 			//optional flyover specifications (use after setting flyoverEnabled to true, which installs a flyover strategy) 
 		book1.getFlyoverStrategy().setStyleID("bookFlyover");	//set the style ID to use for the flyover frame
-		book1.getFlyoverStrategy().setLineExtent(new Extent(30, Extent.Unit.EM));	//set the preferred flyover frame width
-		book1.getFlyoverStrategy().setPageExtent(new Extent(20, Extent.Unit.EM));	//set the preferred flyover frame height
+		book1.getFlyoverStrategy().setLineExtent(new Extent(30, Unit.EM));	//set the preferred flyover frame width
+		book1.getFlyoverStrategy().setPageExtent(new Extent(20, Unit.EM));	//set the preferred flyover frame height
 
 		bookPanel.add(book1);	//add the image to the book panel
 

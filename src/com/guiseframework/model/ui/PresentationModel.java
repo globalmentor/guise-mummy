@@ -101,7 +101,7 @@ public interface PresentationModel extends Model, Displayable
 	public final static String VISIBLE_PROPERTY=getPropertyName(PresentationModel.class, "visible");
 
 	/*The constant value representing a general rounded corner.*/
-	public final static Dimensions ROUNDED_CORNER_ARC_SIZE=new Dimensions(0.25, 0.25, Extent.Unit.EM);
+	public final static Dimensions ROUNDED_CORNER_ARC_SIZE=new Dimensions(0.25, 0.25, Unit.EM);
 
 	/**The normal font weight.
 	@see #setFontWeight(double)

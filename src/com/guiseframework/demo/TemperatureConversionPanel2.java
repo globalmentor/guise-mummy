@@ -11,30 +11,31 @@ import com.guiseframework.model.*;
 
 /**Temperature Conversion Guise demonstration panel using URF PLOOP.
 Copyright © 2005-2006 GlobalMentor, Inc.
-Demonstrates layout panels, group panels, float input controls, float input validation,
-	radio button controls, dynamic updates (e.g. AJAX on the web platform),
-	required value validation, and read-only controls.
+Demonstrates layout panels, group panels, double value input controls,
+	double value input validation, radio button controls, dynamic updates
+	(e.g. AJAX on the web platform), required value validation,
+	and read-only controls.
 @author Garret Wilson
 */
 public class TemperatureConversionPanel2 extends LayoutPanel
 {
-	private TextControl<Float> temperatureInput;
-	private TextControl<Float> temperatureOutput;
+	private TextControl<Double> temperatureInput;
+	private TextControl<Double> temperatureOutput;
 	private CheckControl celsiusCheckControl;
 	private CheckControl fahrenheitCheckControl;
 
 	/**Initializes the component after construction.*/
 	public void initialize()
 	{
-		temperatureInput=(TextControl<Float>)AbstractComponent.getComponentByName(this, "temperatureInput");	//get a reference to the temperature input
-		temperatureInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Float>()	//listen for temperature changes
+		temperatureInput=(TextControl<Double>)AbstractComponent.getComponentByName(this, "temperatureInput");	//get a reference to the temperature input
+		temperatureInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Double>()	//listen for temperature changes
 				{
-					public void propertyChange(final GenericPropertyChangeEvent<Float> propertyChangeEvent)	//if the input temperature changes
+					public void propertyChange(final GenericPropertyChangeEvent<Double> propertyChangeEvent)	//if the input temperature changes
 					{
 						convertTemperature();	//convert the temperature						
 					}
 				});		
-		temperatureOutput=(TextControl<Float>)AbstractComponent.getComponentByName(this, "temperatureOutput");	//get a reference to the temperature output for displaying results
+		temperatureOutput=(TextControl<Double>)AbstractComponent.getComponentByName(this, "temperatureOutput");	//get a reference to the temperature output for displaying results
 		celsiusCheckControl=(CheckControl)AbstractComponent.getComponentByName(this, "celsiusCheckControl");	//get the check control for the Celsius scale
 		try
 		{
@@ -76,8 +77,8 @@ public class TemperatureConversionPanel2 extends LayoutPanel
 	{
 		if(isValid())	//if this panel and all of its components have valid model values
 		{
-			final float inputValue=temperatureInput.getValue().floatValue();	//get the input value from the control
-			final float outputValue;	//we'll convert the value and store it here
+			final double inputValue=temperatureInput.getValue().doubleValue();	//get the input value from the control
+			final double outputValue;	//we'll convert the value and store it here
 			if(celsiusCheckControl.getValue())	//if the Celsius radio button is selected
 			{
 				outputValue=(inputValue*9)/5+32;	//convert: (9c/5)+32
@@ -92,7 +93,7 @@ public class TemperatureConversionPanel2 extends LayoutPanel
 			}
 			try
 			{
-				temperatureOutput.setValue(new Float(outputValue));	//store the conversion result in the temperature output control
+				temperatureOutput.setValue(Double.valueOf(outputValue));	//store the conversion result in the temperature output control
 			}
 			catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 			{

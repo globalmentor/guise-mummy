@@ -13,16 +13,17 @@ import com.guiseframework.validator.ValueRequiredValidator;
 
 /**Temperature Conversion Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
-Demonstrates layout panels, group panels, float input controls, float input validation,
-	radio button controls, dynamic updates (e.g. AJAX on the web platform),
-	required value validation, and read-only controls.
+Demonstrates layout panels, group panels, double value input controls,
+	double value input validation, radio button controls, dynamic updates
+	(e.g. AJAX on the web platform), required value validation,
+	and read-only controls.
 @author Garret Wilson
 */
 public class TemperatureConversionPanel extends LayoutPanel
 {
 
-	private final TextControl<Float> temperatureInput;
-	private final TextControl<Float> temperatureOutput;
+	private final TextControl<Double> temperatureInput;
+	private final TextControl<Double> temperatureOutput;
 	private final CheckControl celsiusCheckControl;
 	private final CheckControl fahrenheitCheckControl;
 
@@ -34,18 +35,18 @@ public class TemperatureConversionPanel extends LayoutPanel
 
 			//input panel
 		final LayoutPanel inputPanel=new LayoutPanel(new FlowLayout(Flow.PAGE));	//create the input panel flowing vertically
-		temperatureInput=new TextControl<Float>(Float.class);	//create a text input control to receive a float
+		temperatureInput=new TextControl<Double>(Double.class);	//create a text input control to receive a double
 		temperatureInput.setLabel("Input Temperature");	//add a label to the text input control
-		temperatureInput.setValidator(new ValueRequiredValidator<Float>());	//install a validator requiring a value
-		temperatureInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Float>()	//listen for temperature changes
+		temperatureInput.setValidator(new ValueRequiredValidator<Double>());	//install a validator requiring a value
+		temperatureInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Double>()	//listen for temperature changes
 				{
-					public void propertyChange(final GenericPropertyChangeEvent<Float> propertyChangeEvent)	//if the input temperature changes
+					public void propertyChange(final GenericPropertyChangeEvent<Double> propertyChangeEvent)	//if the input temperature changes
 					{
 						convertTemperature();	//convert the temperature						
 					}
 				});		
 		inputPanel.add(temperatureInput);	//add the input control to the input panel
-		temperatureOutput=new TextControl<Float>(Float.class);	//create a text input control to display the result
+		temperatureOutput=new TextControl<Double>(Double.class);	//create a text input control to display the result
 		temperatureOutput.setLabel("Output Temperature");	//add a label to the text output control
 		temperatureOutput.setEditable(false);	//set the text output control to read-only so that the user cannot modify it
 		inputPanel.add(temperatureOutput);	//add the output control to the input panel
@@ -109,8 +110,8 @@ public class TemperatureConversionPanel extends LayoutPanel
 	{
 		if(isValid())	//if this panel and all of its components have valid model values
 		{
-			final float inputValue=temperatureInput.getValue().floatValue();	//get the input value from the control
-			final float outputValue;	//we'll convert the value and store it here
+			final double inputValue=temperatureInput.getValue().doubleValue();	//get the input value from the control
+			final double outputValue;	//we'll convert the value and store it here
 			if(celsiusCheckControl.getValue())	//if the Celsius radio button is selected
 			{
 				outputValue=(inputValue*9)/5+32;	//convert: (9c/5)+32
@@ -125,7 +126,7 @@ public class TemperatureConversionPanel extends LayoutPanel
 			}
 			try
 			{
-				temperatureOutput.setValue(new Float(outputValue));	//store the conversion result in the temperature output control
+				temperatureOutput.setValue(Double.valueOf(outputValue));	//store the conversion result in the temperature output control
 			}
 			catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 			{

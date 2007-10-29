@@ -3,6 +3,7 @@ package com.guiseframework.component;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.guiseframework.geometry.Extent;
+import com.guiseframework.geometry.Unit;
 import com.guiseframework.model.Notification;
 
 /**An option dialog frame displaying a message.
@@ -64,8 +65,8 @@ public class MessageOptionDialogFrame extends NotificationOptionDialogFrame	//TO
 	{
 		super(messageComponent, options);	//construct the parent class
 		this.message=checkInstance(messageComponent, "Message component cannot be null");
-		setLineExtent(new Extent(25, Extent.Unit.EM));	//set the default preferred size
-		setPageExtent(new Extent(10, Extent.Unit.EM));
+		setLineExtent(new Extent(25, Unit.EM));	//set the default preferred size
+		setPageExtent(new Extent(10, Unit.EM));
 	}
 
 	/**Creates a message component with a message.

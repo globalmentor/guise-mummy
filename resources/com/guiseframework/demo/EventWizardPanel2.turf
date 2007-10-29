@@ -6,7 +6,7 @@
 (demo.EventWizardPanel2):
 	label="Guise™ Demonstration: Event Wizard",
 	layout=(layout.FlowLayout):
-		flow="page"
+		flow=«"PAGE"(Flow)»
 	;,
 	children=
 	[
@@ -20,9 +20,7 @@
 			[
 				(component.SequenceCardPanel): *cards*
 					bookmarkEnabled=&true,
-					constraints=(layout.RegionConstraints):
-						region="center"
-					;,
+					constraints=(layout.RegionConstraints)¡«"CENTER"(Region)»!,
 					name="wizardCardPanel",
 					children=
 					[
@@ -35,9 +33,7 @@
 					]
 				;,
 				(component.LayoutPanel): *links*
-					constraints=(layout.RegionConstraints):
-						region="line-start"
-					;,
+					constraints=(layout.RegionConstraints)¡«"LINE_START"(Region)»!,
 					children=
 					[
 						|personalLink10|(component.Link):
@@ -71,9 +67,7 @@
 				;,
 				|wizardTabContainerControl|(component.TabContainerControl): *tabs*
 					axis="line",
-					constraints=(layout.RegionConstraints):
-						region="page-start"
-					;,
+					constraints=(layout.RegionConstraints)¡«"PAGE_START"(Region)»!,
 					children=
 					[
 						|personalTabLabel|(component.Label):
@@ -88,11 +82,9 @@
 					]
 				;,
 				(component.LayoutPanel): *buttons*
-					constraints=(layout.RegionConstraints):
-						region="page-end"
-					;,
+					constraints=(layout.RegionConstraints)¡«"PAGE_END"(Region)»!,
 					layout=(layout.FlowLayout):
-						flow="line"
+						flow=«"LINE"(Flow)»
 					;,
 					name="wizardButtonPanel"
 				;
@@ -109,21 +101,17 @@
 			label="Personal Information: Name",
 			level=#1
 		;,
-		(component.TextControl):
+		(component.TextControl)¡«java:/java/lang/String»!:
 			label="First Name",
-			validator=(validator.RegularExpressionStringValidator):
-				pattern="\\S+.*",
+			validator=(validator.RegularExpressionStringValidator)¡/\\S+.*/!:
 				valueRequired=&true
-			;,
-			valueClass=«java:/java/lang/String»
+			;
 		;,
-		(component.TextControl):
+		(component.TextControl)¡«java:/java/lang/String»!:
 			label="Last Name",
-			validator=(validator.RegularExpressionStringValidator):
-				pattern="\\S+.*",
+			validator=(validator.RegularExpressionStringValidator)¡/\\S+.*/!:
 				valueRequired=&true
-			;,
-			valueClass=«java:/java/lang/String»
+			;
 		;,
 		(component.CheckControl):
 			label="I want to tell you my age",
@@ -141,10 +129,9 @@
 			label="Personal Information: Age",
 			level=#1
 		;,
-		(component.TextControl):
+		(component.TextControl)¡«java:/java/lang/Integer»!:
 			label="Age",
-			validator=(validator.ValueRequiredValidator),
-			valueClass=«java:/java/lang/Integer»
+			validator=(validator.ValueRequiredValidator)
 		;
 	]
 ;,
@@ -157,13 +144,11 @@
 			label="Personal Information: Email",
 			level=#1
 		;,
-		(component.TextControl):
+		(component.TextControl)¡«java:/java/lang/String»!:
 			label="Email",
-			validator=(validator.RegularExpressionStringValidator):
-				pattern=".+@.+\\.[a-z]+",
+			validator=(validator.RegularExpressionStringValidator)¡/.+@.+\\.[a-z]+/!:
 				valueRequired=&true
-			;,
-			valueClass=«java:/java/lang/String»
+			;
 		;
 	]
 ;,
@@ -176,13 +161,11 @@
 			label="Business Information: Name",
 			level=#1
 		;,
-		(component.TextControl):
+		(component.TextControl)¡«java:/java/lang/String»!:
 			label="Business Name",
-			validator=(validator.RegularExpressionStringValidator):
-				pattern="\\S+.*",
+			validator=(validator.RegularExpressionStringValidator)¡/\\S+.*/!:
 				valueRequired=&true
-			;,
-			valueClass=«java:/java/lang/String»
+			;
 		;
 	]
 ;,
@@ -195,15 +178,13 @@
 			label="Business Information: Address",
 			level=#1
 		;,
-		(component.TextControl):
+		(component.TextControl)¡«java:/java/lang/String»!:
 			columnCount="40",
 			label="Business Address",
 			rowCount="4",
-			validator=(validator.RegularExpressionStringValidator):
-				pattern="\\S+.*",
+			validator=(validator.RegularExpressionStringValidator)¡/\\S+.*/!:
 				valueRequired=&true
-			;,
-			valueClass=«java:/java/lang/String»
+			;
 		;
 	]
 ;,
@@ -216,13 +197,11 @@
 			label="Event Information: Name",
 			level=#1
 		;,
-		(component.TextControl):
+		(component.TextControl)¡«java:/java/lang/String»!:
 			label="Event Name",
-			validator=(validator.RegularExpressionStringValidator):
-				pattern="\\S+.*",
+			validator=(validator.RegularExpressionStringValidator)¡/\\S+.*/!:
 				valueRequired=&true
-			;,
-			valueClass=«java:/java/lang/String»
+			;
 		;
 	]
 ;,

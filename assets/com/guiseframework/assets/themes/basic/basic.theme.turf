@@ -48,7 +48,7 @@
 		;,
 		apply=(Template):
 			fontFamilies=["Arial", "sans-serif"],
-			fontSize=(geometry.Extent)¡#10, "point"!
+			fontSize=(geometry.Extent)¡#10, «"POINT"(Unit)»!
 		;
 	;,
 	*Heading*
@@ -87,10 +87,10 @@
 		apply=(Template):
 			backgroundColor=(style.ResourceColor)¡"theme.color.subordinateA"!,
 			borderStyle="solid",
-			borderExtent=(geometry.Extent)¡#1, "pixel"!,
+			borderExtent=(geometry.Extent)¡#1, «"PIXEL"(Unit)»!,
 			borderColor=(style.ResourceColor)¡"theme.color.border"!,
-			marginExtent=(geometry.Extent)¡#0.5, "em"!,
-			paddingExtent=(geometry.Extent)¡#0.5, "em"!
+			marginExtent=(geometry.Extent)¡#0.5, «"EM"(Unit)»!,
+			paddingExtent=(geometry.Extent)¡#0.5, «"EM"(Unit)»!
 		;
 	;,
 	*Menu*
@@ -99,7 +99,7 @@
 			selectClass=component.Menu
 		;,
 		apply=(Template):
-			paddingExtent=(geometry.Extent)¡#0.5, "em"!
+			paddingExtent=(geometry.Extent)¡#0.5, «"EM"(Unit)»!
 		;
 	;,
 	*Menu*
@@ -119,10 +119,10 @@
 		;,
 		apply=(Template):
 			borderPageFarStyle="groove",
-			borderPageFarExtent=(geometry.Extent)¡#2, "pixel"!,
+			borderPageFarExtent=(geometry.Extent)¡#2, «"PIXEL"(Unit)»!,
 			borderPageFarColor=(style.ResourceColor)¡"theme.color.border"!,
 			fontFamilies=["Tahoma", "Arial", "sans-serif"],
-			fontSize=(geometry.Extent)¡#8, "point"!
+			fontSize=(geometry.Extent)¡#8, «"POINT"(Unit)»!
 		;
 	;,
 	(Rule):	*submenu*
@@ -139,9 +139,9 @@
 		;,
 		apply=(Template):
 			borderStyle="solid",
-			borderExtent=(geometry.Extent)¡#1, "pixel"!,
+			borderExtent=(geometry.Extent)¡#1, «"PIXEL"(Unit)»!,
 			borderColor=(style.ResourceColor)¡"theme.color.border"!,
-			fontSize=(geometry.Extent)¡#8, "point"!
+			fontSize=(geometry.Extent)¡#8, «"POINT"(Unit)»!
 		;
 	;,
 	*SliderControl*
@@ -160,8 +160,8 @@
 		;,
 		apply=(Template):
 			columnLabelFontWeight=#0.75,
-			columnPaddingLineNearExtent=(geometry.Extent)¡#0.5, "em"!,
-			columnPaddingLineFarExtent=(geometry.Extent)¡#0.5, "em"!
+			columnPaddingLineNearExtent=(geometry.Extent)¡#0.5, «"EM"(Unit)»!,
+			columnPaddingLineFarExtent=(geometry.Extent)¡#0.5, «"EM"(Unit)»!
 		;
 	;,
 	*Toolbar*
@@ -171,12 +171,12 @@
 		;,
 		apply=(Template):
 			borderPageFarStyle="groove",
-			borderPageFarExtent=(geometry.Extent)¡#2, "pixel"!,
-			columnPaddingLineFarExtent=(geometry.Extent)¡#0.5, "em"!,
+			borderPageFarExtent=(geometry.Extent)¡#2, «"PIXEL"(Unit)»!,
+			columnPaddingLineFarExtent=(geometry.Extent)¡#0.5, «"EM"(Unit)»!,
 			borderPageFarColor=(style.ResourceColor)¡"theme.color.border"!,
 			fontFamilies=["Tahoma", "Arial", "sans-serif"],
-			fontSize=(geometry.Extent)¡#8, "point"!,
-			paddingExtent=(geometry.Extent)¡#0.5, "em"!
+			fontSize=(geometry.Extent)¡#8, «"POINT"(Unit)»!,
+			paddingExtent=(geometry.Extent)¡#0.5, «"EM"(Unit)»!
 		;
 	;,
 
@@ -185,7 +185,7 @@
 			selectClass=layout.FlowLayout
 		;,
 		apply=(Template):
-			gap=(geometry.Extent)¡#0.25, "em"!
+			gap=(geometry.Extent)¡#0.25, «"EM"(Unit)»!
 		;
 	;,
 
@@ -194,7 +194,7 @@
 			selectClass=layout.MenuLayout
 		;,
 		apply=(Template):
-			gap=(geometry.Extent)¡#0.25, "em"!
+			gap=(geometry.Extent)¡#0.25, «"EM"(Unit)»!
 		;
 	;,
 
@@ -219,7 +219,7 @@
 			;
 		;,
 		apply=(Template):
-			paddingExtent=(geometry.Extent)¡#0.5, "em"!
+			paddingExtent=(geometry.Extent)¡#0.5, «"EM"(Unit)»!
 		;
 	;
 ]

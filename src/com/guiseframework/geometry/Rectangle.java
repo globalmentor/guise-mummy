@@ -45,7 +45,7 @@ public class Rectangle
 	*/
 	public Rectangle(final double x, final double y, final double z, final double width, final double height)
 	{
-		this(x, y, z, width, height, Extent.Unit.PIXEL);	//construct the rectangle using pixel units
+		this(x, y, z, width, height, Unit.PIXEL);	//construct the rectangle using pixel units
 	}
 
 	/**Two-dimensional primitive coordinates, dimensions, and unit constructor.
@@ -55,7 +55,7 @@ public class Rectangle
 	@param height The height of the rectangle.
 	@param unit The unit in which the point is measured.
 	*/
-	public Rectangle(final double x, final double y, final double width, final double height, final Extent.Unit unit)
+	public Rectangle(final double x, final double y, final double width, final double height, final Unit unit)
 	{
 		this(x, y, 0, width, height, unit);	//construct the rectangle on the zero plane
 	}
@@ -68,7 +68,7 @@ public class Rectangle
 	@param height The height of the rectangle.
 	@param unit The unit in which the point is measured.
 	*/
-	public Rectangle(final double x, final double y, final double z, final double width, final double height, final Extent.Unit unit)
+	public Rectangle(final double x, final double y, final double z, final double width, final double height, final Unit unit)
 	{
 		this(new Point(x, y, z, unit), new Dimensions(width, height, 0, unit));	//construct a rectangle from created point and dimensions
 	}

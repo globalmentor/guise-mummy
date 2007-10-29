@@ -11,7 +11,7 @@ public class Dimensions
 {
 
 	/**A convenience dimensions of zero pixel size.*/
-	public final static Dimensions ZERO_DIMENSIONS=new Dimensions(0, 0, 0, Extent.Unit.PIXEL);
+	public final static Dimensions ZERO_DIMENSIONS=new Dimensions(0, 0, 0, Unit.PIXEL);
 
 	/**The width extent.*/
 	private final Extent width;
@@ -40,7 +40,7 @@ public class Dimensions
 	@param unit The unit with which the extent is measured.
 	@exception NullPointerException if the given unit is <code>null</code>.
 	*/
-	public Dimensions(final double width, final double height, final Extent.Unit unit)
+	public Dimensions(final double width, final double height, final Unit unit)
 	{
 		this(new Extent(width, unit, 1), new Extent(height, unit, 1), new Extent(0, unit, 1));	//create extents and construct the class with a zero depth
 	}
@@ -52,7 +52,7 @@ public class Dimensions
 	@param unit The unit with which the extent is measured.
 	@exception NullPointerException if the given unit is <code>null</code>.
 	*/
-	public Dimensions(final double width, final double height, final double depth, final Extent.Unit unit)
+	public Dimensions(final double width, final double height, final double depth, final Unit unit)
 	{
 		this(new Extent(width, unit, 1), new Extent(height, unit, 1), new Extent(depth, unit, 1));	//create extents and construct the class
 	}

@@ -15,6 +15,7 @@ import com.guiseframework.Bookmark;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.Extent;
+import com.guiseframework.geometry.Unit;
 import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.*;
 import com.guiseframework.prototype.ActionPrototype;
@@ -188,7 +189,7 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 		super(new FlowLayout(Flow.PAGE));	//construct the parent class
 		platformFileListControl=new ListControl<PlatformFile>(PlatformFile.class, PLATFORM_FILE_DISPLAY_COUNT);	//create a list in which to show the platform files
 //TODO del if not needed; bring back if we make the list control editable		platformFileListControl.setEditable(false);	//don't allow the list to be edited
-		platformFileListControl.setLineExtent(new Extent(30, Extent.Unit.EM));
+		platformFileListControl.setLineExtent(new Extent(30, Unit.EM));
 		add(platformFileListControl);
 
 		platformFileStatusLabel=new Label();	//current status label

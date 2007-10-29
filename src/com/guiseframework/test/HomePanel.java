@@ -33,6 +33,7 @@ import com.guiseframework.demo.DemoUser;
 import com.guiseframework.demo.EditUserPanel;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.Extent;
+import com.guiseframework.geometry.Unit;
 import com.guiseframework.model.*;
 import com.guiseframework.style.RGBColor;
 import com.guiseframework.validator.IntegerRangeValidator;
@@ -241,8 +242,8 @@ catch(final ConversionException conversionException)
 		inputTextControl.setDescription("This is a description of the first text control.");
 		inputTextControl.setFlyoverEnabled(true);	//turn on flyovers
 
-		inputTextControl.getFlyoverStrategy().setLineExtent(new Extent(15, Extent.Unit.EM));
-		inputTextControl.getFlyoverStrategy().setPageExtent(new Extent(10, Extent.Unit.EM));
+		inputTextControl.getFlyoverStrategy().setLineExtent(new Extent(15, Unit.EM));
+		inputTextControl.getFlyoverStrategy().setPageExtent(new Extent(10, Unit.EM));
 		
 //TODO del when works		inputTextControl.addMouseListener(new TextControl.DefaultFlyoverStrategy<TextControl>(inputTextControl));
 
@@ -502,8 +503,8 @@ Debug.trace("list control changed value to", newValue);
 		frameLink.setLabel("Frame");
 		frameLink.setDescription("This is a flyover for the frame link.");
 		frameLink.setFlyoverEnabled(true);	//turn on flyovers
-		frameLink.getFlyoverStrategy().setLineExtent(new Extent(15, Extent.Unit.EM));
-		frameLink.getFlyoverStrategy().setPageExtent(new Extent(10, Extent.Unit.EM));
+		frameLink.getFlyoverStrategy().setLineExtent(new Extent(15, Unit.EM));
+		frameLink.getFlyoverStrategy().setPageExtent(new Extent(10, Unit.EM));
 //TODO del		frameLink.getFlyoverStrategy().setOpenEffect(new OpacityFadeEffect(1500));	//TODO testing openEffect
 		frameLink.addActionListener(new ActionListener()
 				{
