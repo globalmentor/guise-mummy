@@ -999,6 +999,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						{
 							if(isAJAX)	//if this is an AJAX request
 							{
+								isNavigating=true;	//show that we're going to navigate; process the other events to make sure the data model is up-to-date (and in case the navigation gets overridden)
 								depictContext.clearDepictText();	//clear all the response data (which at this point should only be navigation information, anyway) TODO improve; this will discard any resources to send
 								depictContext.writeElementBegin(null, "navigate");	//<navigate>	//TODO use a constant
 								depictContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
@@ -1008,11 +1009,11 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 									if(viewportID!=null)	//if a viewport was requested
 									{
 										depictContext.writeAttribute(null, "viewportID", viewportID);	//specify the viewport ID TODO use a constant
+										isNavigating=false;	//don't consider a viewport-specific navigation to be true navigation, as we still want the main page to be updated (e.g. closed frames still need to be removed)
 									}
 								}
 								depictContext.write(redirectURI.toString());	//write the navigation URI
 								depictContext.writeElementEnd(null, "navigate");	//</navigate>
-								isNavigating=true;	//show that we're going to navigate; process the other events to make sure the data model is up-to-date (and in case the navigation gets overridden)
 							}
 							else	//if this is not an AJAX request
 							{
