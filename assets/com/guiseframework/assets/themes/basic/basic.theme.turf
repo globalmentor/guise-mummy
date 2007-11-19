@@ -1,225 +1,229 @@
-|select|<http://urf.name/select>,
-|theme|<http://guiseframework.com/namespaces/theme>,
-|component|<java:/com/guiseframework/component/>,
-|layout|<java:/com/guiseframework/component/layout/>,
-|geometry|<java:/com/guiseframework/geometry/>,
-|resources|<http://guiseframework.com/namespaces/resources>,
-|style|<java:/com/guiseframework/style/>,
-|dc|<http://purl.org/dc/elements/1.1/>,
-
-(theme.Theme):
-	dc.title="Guise™ Basic Theme",
-	dc.description="The bland, basic, default Guise™ theme.",
-	dc.rights="Copyright © 2007 GlobalMentor, Inc.",
-	dc.creator="Garret Wilson",
-
-	resources=(resources.Resources):
-		*<resource:theme.color.text>slategray</resource:theme.color.text>*
-		"theme.color.subordinateA"="whitesmoke",
-		"theme.color.menu"="whitesmoke",
-		"theme.color.border"="gainsboro",
-		*<resource:theme.color.border>&#x0098;theme.color.subordinateA&#x009C;</resource:theme.color.border>*
-		"theme.color.link"="cornflowerblue"
+`URF
+$
+	"select"=<http://urf.name/select>,
+	"theme"=<http://guiseframework.com/namespaces/theme>,
+	"component"=<java:/com/guiseframework/component/>,
+	"layout"=<java:/com/guiseframework/component/layout/>,
+	"geometry"=<java:/com/guiseframework/geometry/>,
+	"resources"=<http://guiseframework.com/namespaces/resources>,
+	"style"=<java:/com/guiseframework/style/>,
+	"dc"=<http://purl.org/dc/elements/1.1/>
+$
+¤
+	(theme.Theme):
+		dc.title="Guise™ Basic Theme",
+		dc.description="The bland, basic, default Guise™ theme.",
+		dc.rights="Copyright © 2007 GlobalMentor, Inc.",
+		dc.creator="Garret Wilson",
+	
+		theme.resources=(resources.Resources):
+			†<resource:theme.color.text>slategray</resource:theme.color.text>‡
+			"theme.color.subordinateA"="whitesmoke",
+			"theme.color.menu"="whitesmoke",
+			"theme.color.border"="gainsboro",
+			†<resource:theme.color.border>&#x0098;theme.color.subordinateA&#x009C;</resource:theme.color.border>‡
+			"theme.color.link"="cornflowerblue"
+		;
 	;
-;
-[
-	*ActionControl*
-	(Rule):
-		select.selector=(ObjectClassSelector):
-			selectClass=component.ActionControl
-		;,
-		apply=(Template):
-			cursor=<resource:theme.cursor.action>
-		;
-	;,
-	*CheckControl*
-	(Rule):
-		select.selector=(ObjectClassSelector):
-			selectClass=component.CheckControl
-		;,
-		apply=(Template):
-			cursor=<resource:theme.cursor.pointer>
-		;
-	;,
-	*Frame*
-	(Rule):
-		select.selector=(ObjectClassSelector):
-			selectClass=component.Frame
-		;,
-		apply=(Template):
-			fontFamilies=["Arial", "sans-serif"],
-			fontSize=(geometry.Extent)¡#10, «"POINT"(Unit)»!
-		;
-	;,
-	*Heading*
-	(Rule):
-		select.selector=(ObjectClassSelector):
-			selectClass=component.Heading
-		;,
-		apply=(Template):
-			fontFamilies=["Tahoma", "Arial", "sans-serif"]
-		;
-	;,
-	*Link*
-	(Rule):	*Link not a child of Menu*
-		select.selector=(IntersectionSelector):
-			selector=(ObjectClassSelector):
-				selectClass=component.Link
+	[
+		†ActionControl‡
+		(theme.Rule):
+			select.selector=(select.ObjectClassSelector):
+				select.selectClass=component.ActionControl
 			;,
-			select.selector=(NegationSelector):
-				selector=(ObjectPropertySelector):
-					selectPropertyName="parent",
-					selector=(ObjectClassSelector):
-						selectClass=component.Menu
-					;
-				;
+			theme.apply=(theme.Template):
+				cursor=<resource:theme.cursor.action>
 			;
 		;,
-		apply=(Template):
-			color=(style.ResourceColor)¡"theme.color.link"!
-		;
-	;,
-	*SectionPanel*
-	(Rule):
-		select.selector=(ObjectClassSelector):
-			selectClass=component.SectionPanel
-		;,
-		apply=(Template):
-			backgroundColor=(style.ResourceColor)¡"theme.color.subordinateA"!,
-			borderStyle="solid",
-			borderExtent=(geometry.Extent)¡#1, «"PIXEL"(Unit)»!,
-			borderColor=(style.ResourceColor)¡"theme.color.border"!,
-			marginExtent=(geometry.Extent)¡#0.5, «"EM"(Unit)»!,
-			paddingExtent=(geometry.Extent)¡#0.5, «"EM"(Unit)»!
-		;
-	;,
-	*Menu*
-	(Rule): * all menus *
-		select.selector=(ObjectClassSelector):
-			selectClass=component.Menu
-		;,
-		apply=(Template):
-			paddingExtent=(geometry.Extent)¡#0.5, «"EM"(Unit)»!
-		;
-	;,
-	*Menu*
-	(Rule):	*root menu*
-		select.selector=(IntersectionSelector):
-			selector=(ObjectClassSelector):
-				selectClass=component.Menu
+		†CheckControl‡
+		(theme.Rule):
+			select.selector=(select.ObjectClassSelector):
+				select.selectClass=component.CheckControl
 			;,
-			select.selector=(NegationSelector):
-				selector=(ObjectPropertySelector):
-					selectPropertyName="parent",
-					selector=(ObjectClassSelector):
-						selectClass=component.Menu
-					;
-				;
+			theme.apply=(theme.Template):
+				cursor=<resource:theme.cursor.pointer>
 			;
 		;,
-		apply=(Template):
-			borderPageFarStyle="groove",
-			borderPageFarExtent=(geometry.Extent)¡#2, «"PIXEL"(Unit)»!,
-			borderPageFarColor=(style.ResourceColor)¡"theme.color.border"!,
-			fontFamilies=["Tahoma", "Arial", "sans-serif"],
-			fontSize=(geometry.Extent)¡#8, «"POINT"(Unit)»!
-		;
-	;,
-	(Rule):	*submenu*
-		select.selector=(IntersectionSelector):
-			selector=(ObjectClassSelector):
-				selectClass=component.Menu
+		†Frame‡
+		(theme.Rule):
+			select.selector=(select.ObjectClassSelector):
+				select.selectClass=component.Frame
 			;,
-			selector=(ObjectPropertySelector):
-				selectPropertyName="parent",
-				selector=(ObjectClassSelector):
-					selectClass=component.Menu
-				;
+			theme.apply=(theme.Template):
+				fontFamilies=["Arial", "sans-serif"],
+				fontSize=(geometry.Extent)¡#10, «"POINT"(geometry.Unit)»!
 			;
 		;,
-		apply=(Template):
-			borderStyle="solid",
-			borderExtent=(geometry.Extent)¡#1, «"PIXEL"(Unit)»!,
-			borderColor=(style.ResourceColor)¡"theme.color.border"!,
-			fontSize=(geometry.Extent)¡#8, «"POINT"(Unit)»!
-		;
-	;,
-	*SliderControl*
-	(Rule):
-		select.selector=(ObjectClassSelector):
-			selectClass=component.SliderControl
-		;,
-		apply=(Template):
-			cursor=<resource:theme.cursor.pointer>
-		;
-	;,
-	*Table*
-	(Rule):
-		select.selector=(ObjectClassSelector):
-			selectClass=component.Table
-		;,
-		apply=(Template):
-			columnLabelFontWeight=#0.75,
-			columnPaddingLineNearExtent=(geometry.Extent)¡#0.5, «"EM"(Unit)»!,
-			columnPaddingLineFarExtent=(geometry.Extent)¡#0.5, «"EM"(Unit)»!
-		;
-	;,
-	*Toolbar*
-	(Rule):
-		select.selector=(ObjectClassSelector):
-			selectClass=component.Toolbar
-		;,
-		apply=(Template):
-			borderPageFarStyle="groove",
-			borderPageFarExtent=(geometry.Extent)¡#2, «"PIXEL"(Unit)»!,
-			columnPaddingLineFarExtent=(geometry.Extent)¡#0.5, «"EM"(Unit)»!,
-			borderPageFarColor=(style.ResourceColor)¡"theme.color.border"!,
-			fontFamilies=["Tahoma", "Arial", "sans-serif"],
-			fontSize=(geometry.Extent)¡#8, «"POINT"(Unit)»!,
-			paddingExtent=(geometry.Extent)¡#0.5, «"EM"(Unit)»!
-		;
-	;,
-
-	(Rule): *flow layout*
-		select.selector=(ObjectClassSelector):
-			selectClass=layout.FlowLayout
-		;,
-		apply=(Template):
-			gap=(geometry.Extent)¡#0.25, «"EM"(Unit)»!
-		;
-	;,
-
-	(Rule): *menu layout*
-		select.selector=(ObjectClassSelector):
-			selectClass=layout.MenuLayout
-		;,
-		apply=(Template):
-			gap=(geometry.Extent)¡#0.25, «"EM"(Unit)»!
-		;
-	;,
-
-	(Rule):	*region layout of a frame's content component*
-		select.selector=(IntersectionSelector):
-			selector=(ObjectClassSelector):
-				selectClass=layout.RegionLayout
+		†Heading‡
+		(theme.Rule):
+			select.selector=(select.ObjectClassSelector):
+				select.selectClass=component.Heading
 			;,
-			selector=(ObjectPropertySelector):
-				selectPropertyName="owner",
-				selector=(IntersectionSelector):
-					selector=(ObjectClassSelector):
-						selectClass=component.Component
-					;,
-					selector=(ObjectPropertySelector):
-						selectPropertyName="parent",
-						selector=(ObjectClassSelector):
-							selectClass=component.Menu
+			theme.apply=(theme.Template):
+				fontFamilies=["Tahoma", "Arial", "sans-serif"]
+			;
+		;,
+		†Link‡
+		(theme.Rule):	†Link not a child of Menu‡
+			select.selector=(select.IntersectionSelector):
+				select.selector=(select.ObjectClassSelector):
+					select.selectClass=component.Link
+				;,
+				select.selector=(select.NegationSelector):
+					select.selector=(select.ObjectPropertySelector):
+						select.selectPropertyName="parent",
+						select.selector=(select.ObjectClassSelector):
+							select.selectClass=component.Menu
 						;
 					;
 				;
+			;,
+			theme.apply=(theme.Template):
+				color=(style.ResourceColor)¡"theme.color.link"!
 			;
 		;,
-		apply=(Template):
-			paddingExtent=(geometry.Extent)¡#0.5, «"EM"(Unit)»!
+		†SectionPanel‡
+		(theme.Rule):
+			select.selector=(select.ObjectClassSelector):
+				selectClass=component.SectionPanel
+			;,
+			theme.apply=(theme.Template):
+				backgroundColor=(style.ResourceColor)¡"theme.color.subordinateA"!,
+				borderStyle=«"SOLID"(style.LineStyle)»,
+				borderExtent=(geometry.Extent)¡#1, «"PIXEL"(geometry.Unit)»!,
+				borderColor=(style.ResourceColor)¡"theme.color.border"!,
+				marginExtent=(geometry.Extent)¡#0.5, «"EM"(geometry.Unit)»!,
+				paddingExtent=(geometry.Extent)¡#0.5, «"EM"(geometry.Unit)»!
+			;
+		;,
+		†Menu‡
+		(theme.Rule): † all menus ‡
+			select.selector=(select.ObjectClassSelector):
+				select.selectClass=component.Menu
+			;,
+			theme.apply=(theme.Template):
+				paddingExtent=(geometry.Extent)¡#0.5, «"EM"(geometry.Unit)»!
+			;
+		;,
+		†Menu‡
+		(theme.Rule):	†root menu‡
+			select.selector=(select.IntersectionSelector):
+				select.selector=(select.ObjectClassSelector):
+					selectClass=component.Menu
+				;,
+				select.selector=(select.NegationSelector):
+					select.selector=(select.ObjectPropertySelector):
+						select.selectPropertyName="parent",
+						select.selector=(select.ObjectClassSelector):
+							select.selectClass=component.Menu
+						;
+					;
+				;
+			;,
+			theme.apply=(theme.Template):
+				borderPageFarStyle=«"GROOVE"(style.LineStyle)»,
+				borderPageFarExtent=(geometry.Extent)¡#2, «"PIXEL"(geometry.Unit)»!,
+				borderPageFarColor=(style.ResourceColor)¡"theme.color.border"!,
+				fontFamilies=["Tahoma", "Arial", "sans-serif"],
+				fontSize=(geometry.Extent)¡#8, «"POINT"(geometry.Unit)»!
+			;
+		;,
+		(theme.Rule):	†submenu‡
+			select.selector=(select.IntersectionSelector):
+				select.selector=(select.ObjectClassSelector):
+					select.selectClass=component.Menu
+				;,
+				select.selector=(select.ObjectPropertySelector):
+					select.selectPropertyName="parent",
+					select.selector=(select.ObjectClassSelector):
+						select.selectClass=component.Menu
+					;
+				;
+			;,
+			theme.apply=(theme.Template):
+				borderStyle=«"SOLID"(style.LineStyle)»,
+				borderExtent=(geometry.Extent)¡#1, «"PIXEL"(geometry.Unit)»!,
+				borderColor=(style.ResourceColor)¡"theme.color.border"!,
+				fontSize=(geometry.Extent)¡#8, «"POINT"(geometry.Unit)»!
+			;
+		;,
+		†SliderControl‡
+		(theme.Rule):
+			select.selector=(select.ObjectClassSelector):
+				select.selectClass=component.SliderControl
+			;,
+			theme.apply=(theme.Template):
+				cursor=<resource:theme.cursor.pointer>
+			;
+		;,
+		†Table‡
+		(theme.Rule):
+			select.selector=(select.ObjectClassSelector):
+				theme.selectClass=component.Table
+			;,
+			theme.apply=(theme.Template):
+				columnLabelFontWeight=#0.75,
+				columnPaddingLineNearExtent=(geometry.Extent)¡#0.5, «"EM"(geometry.Unit)»!,
+				columnPaddingLineFarExtent=(geometry.Extent)¡#0.5, «"EM"(geometry.Unit)»!
+			;
+		;,
+		†Toolbar‡
+		(theme.Rule):
+			select.selector=(select.ObjectClassSelector):
+				select.selectClass=component.Toolbar
+			;,
+			theme.apply=(theme.Template):
+				borderPageFarStyle=«"GROOVE"(style.LineStyle)»,
+				borderPageFarExtent=(geometry.Extent)¡#2, «"PIXEL"(geometry.Unit)»!,
+				columnPaddingLineFarExtent=(geometry.Extent)¡#0.5, «"EM"(geometry.Unit)»!,
+				borderPageFarColor=(style.ResourceColor)¡"theme.color.border"!,
+				fontFamilies=["Tahoma", "Arial", "sans-serif"],
+				fontSize=(geometry.Extent)¡#8, «"POINT"(geometry.Unit)»!,
+				paddingExtent=(geometry.Extent)¡#0.5, «"EM"(geometry.Unit)»!
+			;
+		;,
+	
+		(theme.Rule): †flow layout‡
+			select.selector=(select.ObjectClassSelector):
+				select.selectClass=layout.FlowLayout
+			;,
+			theme.apply=(theme.Template):
+				gap=(geometry.Extent)¡#0.25, «"EM"(geometry.Unit)»!
+			;
+		;,
+	
+		(theme.Rule): †menu layout‡
+			select.selector=(select.ObjectClassSelector):
+				select.selectClass=layout.MenuLayout
+			;,
+			theme.apply=(theme.Template):
+				gap=(geometry.Extent)¡#0.25, «"EM"(geometry.Unit)»!
+			;
+		;,
+	
+		(theme.Rule):	†region layout of a frame's content component‡
+			select.selector=(select.IntersectionSelector):
+				select.selector=(select.ObjectClassSelector):
+					select.selectClass=layout.RegionLayout
+				;,
+				select.selector=(select.ObjectPropertySelector):
+					select.selectPropertyName="owner",
+					select.selector=(select.IntersectionSelector):
+						select.selector=(select.ObjectClassSelector):
+							select.selectClass=component.Component
+						;,
+						select.selector=(select.ObjectPropertySelector):
+							select.selectPropertyName="parent",
+							select.selector=(select.ObjectClassSelector):
+								select.selectClass=component.Menu
+							;
+						;
+					;
+				;
+			;,
+			theme.apply=(theme.Template):
+				paddingExtent=(geometry.Extent)¡#0.5, «"EM"(geometry.Unit)»!
+			;
 		;
-	;
-]
+	]
+.

@@ -1,37 +1,42 @@
-|resources|<http://guiseframework.com/namespaces/resources>,
-|dc|<http://purl.org/dc/elements/1.1/>,
-(resources.Resources):
-	dc.description="Default Guise™ Resources (en).",
-	dc.creator="Garret Wilson",
-
-	*general application labels*
-	"application.name"="Unnamed Guise™ Application",
-	"application.name.short"="\“application.name\”",
-	"application.label"="\“application.name\” \“application.version\”",
-	"application.description"="This application uses the Guise™ framework.",
-	"application.copyright"="",
-	"application.version"="0.0.0",
-
-	*Guise converters*
-	"converter.invalid.value.message"="Invalid value: \"{0}\".",
+`URF
+$
+	"resources"=<http://guiseframework.com/namespaces/resources>,
+	"dc"=<http://purl.org/dc/elements/1.1/>
+$
+¤
+	(resources.Resources):
+		dc.description="Default Guise™ Resources (en).",
+		dc.creator="Garret Wilson",
 	
-	*Guise validators*
-	"validator.value.required.message"="Value required.",
-	"validator.invalid.value.message"="Invalid value: \"{0}\".",
-	*general validation errors*
-	"validation.false.message"="One or more values you entered are invalid.",
-
-	*vCard*
-	"text.directory.vcard.n.family.name.label"="Last",
-	"text.directory.vcard.n.family.name.info"="The last or family name. Separate multiple family names with commas.",
-	"text.directory.vcard.n.given.name.label"="First",
-	"text.directory.vcard.n.given.name.info"="The first or given name. Separate multiple given names with commas.",
-	"text.directory.vcard.n.additional.name.label"="Middle",
-	"text.directory.vcard.n.additional.name.info"="The middle or additional name. Separate multiple additional names with commas.",
-	"text.directory.vcard.n.honorific.prefix.label"="Prefix",
-	"text.directory.vcard.n.honorific.prefix.info"="Any honorific prefix. Separate multiple honorific prefixes with commas.",
-	"text.directory.vcard.n.honorific.prefix.choices"=["Dr.", "Miss.", "Mr.", "Mrs.", "Ms.", "Prof."],
-	"text.directory.vcard.n.honorific.suffix.label"="Suffix",
-	"text.directory.vcard.n.honorific.suffix.info"="Any honorific suffix. Separate multiple honorific suffixes with commas.",
-	"text.directory.vcard.n.honorific.suffix.choices"=["I", "II", "III", "Jr.", "Sr."]
-;
+		†general application labels‡
+		"application.name"="Unnamed Guise™ Application",
+		"application.name.short"="\“application.name\”",
+		"application.label"="\“application.name\” \“application.version\”",
+		"application.description"="This application uses the Guise™ framework.",
+		"application.copyright"="",
+		"application.version"="0.0.0",
+	
+		†Guise converters‡
+		"converter.invalid.value.message"="Invalid value: \"{0}\".",
+		
+		†Guise validators‡
+		"validator.value.required.message"="Value required.",
+		"validator.invalid.value.message"="Invalid value: \"{0}\".",
+		†general validation errors‡
+		"validation.false.message"="One or more values you entered are invalid.",
+	
+		†vCard‡
+		"text.directory.vcard.n.family.name.label"="Last",
+		"text.directory.vcard.n.family.name.info"="The last or family name. Separate multiple family names with commas.",
+		"text.directory.vcard.n.given.name.label"="First",
+		"text.directory.vcard.n.given.name.info"="The first or given name. Separate multiple given names with commas.",
+		"text.directory.vcard.n.additional.name.label"="Middle",
+		"text.directory.vcard.n.additional.name.info"="The middle or additional name. Separate multiple additional names with commas.",
+		"text.directory.vcard.n.honorific.prefix.label"="Prefix",
+		"text.directory.vcard.n.honorific.prefix.info"="Any honorific prefix. Separate multiple honorific prefixes with commas.",
+		"text.directory.vcard.n.honorific.prefix.choices"=["Dr.", "Miss.", "Mr.", "Mrs.", "Ms.", "Prof."],
+		"text.directory.vcard.n.honorific.suffix.label"="Suffix",
+		"text.directory.vcard.n.honorific.suffix.info"="Any honorific suffix. Separate multiple honorific suffixes with commas.",
+		"text.directory.vcard.n.honorific.suffix.choices"=["I", "II", "III", "Jr.", "Sr."]
+	;
+.

@@ -1,21 +1,25 @@
-|select|<http://urf.name/select>,
-|xml|<http://urf.name/xml>,
-|theme|<http://guiseframework.com/namespaces/theme>,
-|component|<java:/com/guiseframework/component/>,
-|geometry|<java:/com/guiseframework/geometry/>,
-|resources|<http://guiseframework.com/namespaces/resources>,
-|style|<java:/com/guiseframework/style/>,
-|dc|<http://purl.org/dc/elements/1.1/>,
-
-(theme.Theme):
-	dc.title="Guise™ Sunflower Theme",
-	dc.description="The experiemental sunflower Guise™ theme.",
-	dc.rights="Copyright © 2007 GlobalMentor, Inc.",
-	dc.creator="Garret Wilson",
-
-	parentURI=<info:path/~guise/assets/themes/basic/basic.theme.turf>,
-
-	xml.style=«sunflower.style.css»,
-
-	theme.resources=«sunflower.resources.turf»
-;
+`URF
+$
+	"select"=<http://urf.name/select>,
+	"xml"=<http://urf.name/xml>,
+	"theme"=<http://guiseframework.com/namespaces/theme>,
+	"component"=<java:/com/guiseframework/component/>,
+	"geometry"=<java:/com/guiseframework/geometry/>,
+	"resources"=<http://guiseframework.com/namespaces/resources>,
+	"style"=<java:/com/guiseframework/style/>,
+	"dc"=<http://purl.org/dc/elements/1.1/>
+$
+¤
+	(theme.Theme):
+		dc.title="Guise™ Sunflower Theme",
+		dc.description="The experiemental sunflower Guise™ theme.",
+		dc.rights="Copyright © 2007 GlobalMentor, Inc.",
+		dc.creator="Garret Wilson",
+	
+		theme.parentURI=<info:path/~guise/assets/themes/basic/basic.theme.turf>,
+	
+		xml.style=«sunflower.style.css»,
+	
+		theme.resources=«sunflower.resources.turf»
+	;
+.
