@@ -11,6 +11,7 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
+import com.guiseframework.model.Notification;
 import com.guiseframework.validator.RegularExpressionStringValidator;
 
 /**Generate Content Guise demonstration panel.
@@ -61,33 +62,44 @@ public class GenerateContentPanel extends LayoutPanel
 				{
 					public void actionPerformed(ActionEvent actionEvent)	//if the button was pressed
 					{
-						if(GenerateContentPanel.this.validate())	//validate the form; if validation succeeds
+						final Notification notification=new Notification("ready to generate?");
+						getSession().notify(new Runnable()
 						{
-							try
+@Override
+							public void run()
 							{
-									//see if we should restrict access to the current session
-								final boolean sessionRestricted=sessionRestrictedCheckControl.getValue().booleanValue();
-									//generate a temporary file, restricting access to the file to the current session if requested
-									//if we knew ahead of time we would want access restriction to the current session,
-									//	we could call the convenience method getSession().createTempPublicResource("generated-text", "txt")
-								final URIPath tempPath=getSession().getApplication().createTempPublicResource("generated-text", "txt", sessionRestricted ? getSession() : null);
-									//get a UTF-8 writer to the application-relative path to the temporary public resource
-								final Writer tempWriter=new BufferedWriter(new OutputStreamWriter(getSession().getApplication().getOutputStream(tempPath), "UTF-8"));
-								try
-								{
-									tempWriter.write(textInput.getValue());	//write the provided text to the temporary file
-								}
-								finally
-								{
-									tempWriter.close();	//always close the writer, which will flush the buffered contents
-								}
-								getSession().navigate(tempPath, "generatedContentViewport");	//navigate to the generated content in a separate viewpoert
-							}
-							catch(final IOException ioException)	//if there was an error generating the content
-							{
-								getSession().notify(ioException);	//inform the user of the error
-							}
-						}
+	if(GenerateContentPanel.this.validate())	//validate the form; if validation succeeds
+	{
+		try
+		{
+				//see if we should restrict access to the current session
+			final boolean sessionRestricted=sessionRestrictedCheckControl.getValue().booleanValue();
+				//generate a temporary file, restricting access to the file to the current session if requested
+				//if we knew ahead of time we would want access restriction to the current session,
+				//	we could call the convenience method getSession().createTempPublicResource("generated-text", "txt")
+			final URIPath tempPath=getSession().getApplication().createTempPublicResource("generated-text", "txt", sessionRestricted ? getSession() : null);
+				//get a UTF-8 writer to the application-relative path to the temporary public resource
+			final Writer tempWriter=new BufferedWriter(new OutputStreamWriter(getSession().getApplication().getOutputStream(tempPath), "UTF-8"));
+			try
+			{
+				tempWriter.write(textInput.getValue());	//write the provided text to the temporary file
+			}
+			finally
+			{
+				tempWriter.close();	//always close the writer, which will flush the buffered contents
+			}
+			getSession().navigate(tempPath, "generatedContentViewport");	//navigate to the generated content in a separate viewpoert
+		}
+		catch(final IOException ioException)	//if there was an error generating the content
+		{
+			getSession().notify(ioException);	//inform the user of the error
+		}
+	}
+								
+							}							
+						}, notification);
+						
+						
 					}
 				});
 		add(generateButton);	//add the generate button to the panel

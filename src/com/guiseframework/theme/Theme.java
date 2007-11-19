@@ -31,12 +31,8 @@ public class Theme extends URFListResource<Rule>
 	public final static URI THEME_NAMESPACE_URI=URI.create("http://guiseframework.com/namespaces/theme");
 
 		//classes
-	/**The rule class name.*/
-	public final static String RULE_CLASS_NAME="Rule";
-	/**The selector class name.*/
-	public final static String SELECTOR_CLASS_NAME="Selector";
-	/**The template class name.*/
-	public final static String TEMPLATE_CLASS_NAME="Template";
+	/**The URI of the template class.*/
+	public final static URI TEMPLATE_CLASS_URI=createResourceURI(THEME_NAMESPACE_URI, getLocalName(Template.class));
 
 		//properties
 	/**The apply property name.*/

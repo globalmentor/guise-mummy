@@ -7,12 +7,15 @@ import java.net.URI;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
 import com.garretwilson.urf.*;
+import static com.garretwilson.urf.TURF.*;
 
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.component.urf.DefaultURFResourceTreeNodeRepresentationStrategy;
 import com.guiseframework.event.*;
 import com.guiseframework.model.DummyTreeNodeModel;
+import com.guiseframework.model.Notification;
+import com.guiseframework.model.Notification.Severity;
 import com.guiseframework.model.urf.URFDynamicTreeNodeModel;
 
 /**URF Process Guise demonstration panel.
@@ -30,8 +33,13 @@ public class URFProcessPanel extends LayoutPanel
 		"<html xmlns='http://www.w3.org/1999/xhtml'>"+
 		"<head><title>Instructions</title></head>"+
 		"<body>"+
-		"	<p>This is a Guise\u2122 demonstration of the <a href=\"http://www.urf.name/\">Uniform Resource Framework (URF)</a></p>"+
-		"	<p>Input either URF as TURF or RDF as RDF/XML and select \"Process\". The resulting assertions will be listed, along with a TURF representation of the URF instance. The tree control will allow you to dynamically explore the URF graph.</p>"+
+		"	<p>This is a Guise\u2122 demonstration of the <a href=\"http://www.urf.name/\">Uniform Resource Framework (URF)</a>.</p>"+
+		"	<p>Input one of the following and select \"Process\":</p>"+
+		"	<ul>"+
+		"	  <li>TURF (beginning with \"`URF\")</li>"+
+		"	  <li>RDF/XML (beginning with \"&lt;XML\")</li>"+
+		"	</ul>"+
+		"	<p>The resulting assertions will be listed, along with a TURF representation of the URF instance. The tree control will allow you to dynamically explore the URF graph.</p>"+
 		"</body>"+
 		"</html>";
 
@@ -44,7 +52,7 @@ public class URFProcessPanel extends LayoutPanel
 		final LayoutPanel mainPanel=new LayoutPanel();	//create a main panel for the input/output
 			//input text
 		final TextControl<String> inputTextControl=new TextControl<String>(String.class, 15, 80, false);	//create a text area with no line wrap for input
-		inputTextControl.setLabel("Input TURF or RDF/XML");	//set the label of the text area
+		inputTextControl.setLabel("Input TURF (beginning with \"`URF\") or RDF/XML (beginning with \"<XML\")");	//set the label of the text area
 		mainPanel.add(inputTextControl);
 			//assertion output text
 		final TextControl<String> assertionOutputTextControl=new TextControl<String>(String.class, 10, 80, false);	//create a text area with no line wrap for output of assertions
@@ -93,17 +101,22 @@ public class URFProcessPanel extends LayoutPanel
 								final InputStream inputStream=new ByteArrayInputStream(input.getBytes(UTF_8));	//get an input stream to the input string
 								final AbstractURFProcessor urfProcessor;	//we don't yet know which URF processor we'll use
 								final URF urf;	//we'll store the resulting URF data model here
-								if(input.startsWith(XML_DECL_START))	//if this is XML
+								if(input.startsWith(TURF_SIGNATURE))	//if this is TURF
+								{
+									final URFTURFProcessor urfTURFProcessor=new URFTURFProcessor();	//create a new TURF processor
+									urf=DefaultURFTURFIO.readTURF(urfTURFProcessor, inputStream, baseURI);	//read URF
+									urfProcessor=urfTURFProcessor;	//show which URF processor we used
+								}
+								else if(input.startsWith(XML_DECL_START))	//if this is XML
 								{
 									final URFRDFXMLProcessor urfRDFXMLProcessor=new URFRDFXMLProcessor();	//create a new URF RDF/XML processor
 									urf=new DefaultURFRDFXMLIO().readRDFXML(urfRDFXMLProcessor, inputStream, baseURI);	//read URF
 									urfProcessor=urfRDFXMLProcessor;	//show which URF processor we used
 								}
-								else	//otherwise, assume this is TURF
+								else	//if this is unrecognized content
 								{
-									final URFTURFProcessor urfTURFProcessor=new URFTURFProcessor();	//create a new TURF processor
-									urf=DefaultURFTURFIO.readTURF(urfTURFProcessor, inputStream, baseURI);	//read URF
-									urfProcessor=urfTURFProcessor;	//show which URF processor we used
+									getSession().notify(new Notification("Input must start with "+TURF_SIGNATURE+" or "+XML_DECL_START+".", Severity.ERROR));	//notify the user
+									return;	//don't process the input further
 								}
 								final StringBuilder assertionStringBuilder=new StringBuilder();	//create a string builder for showiong the assertions
 									//assertions
@@ -129,6 +142,10 @@ public class URFProcessPanel extends LayoutPanel
 							{
 								throw new AssertionError(propertyVetoException);
 							}
+						}
+						else	//if there is no input
+						{
+							getSession().notify(new Notification("There is no input to process."));	//notify the user of the lack of input							
 						}
 					}
 				});
