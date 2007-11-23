@@ -1,5 +1,5 @@
 `URF
-$
+*
 	"select"=<http://urf.name/select>,
 	"xml"=<http://urf.name/xml>,
 	"theme"=<http://guiseframework.com/namespaces/theme>,
@@ -8,7 +8,7 @@ $
 	"resources"=<http://guiseframework.com/namespaces/resources>,
 	"style"=<java:/com/guiseframework/style/>,
 	"dc"=<http://purl.org/dc/elements/1.1/>
-$
+*
 ¤
 	(theme.Theme):
 		dc.title="Guise™ Root Theme",

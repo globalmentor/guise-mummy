@@ -179,6 +179,10 @@ public class Theme extends URFListResource<Rule>
 			{
 				classRuleMap.addItem(selectClass, rule);	//add this rule to our map
 			}
+			else
+			{
+				throw new IllegalStateException("Objcect class selector missing class selection property.");
+			}
 		}
 		else if(selector instanceof OperatorSelector)	//if this is an operator selector
 		{

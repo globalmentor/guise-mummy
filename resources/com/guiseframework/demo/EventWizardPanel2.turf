@@ -1,11 +1,11 @@
 `URF
-$
+*
 	"component"=<java:/com/guiseframework/component/>,
 	"coupler"=<java:/com/guiseframework/coupler/>,
 	"layout"=<java:/com/guiseframework/component/layout/>,
 	"validator"=<java:/com/guiseframework/validator/>,
 	"demo"=<java:/com/guiseframework/demo/>
-$
+*
 ¤
 	(demo.EventWizardPanel2):
 		label="Guise™ Demonstration: Event Wizard",

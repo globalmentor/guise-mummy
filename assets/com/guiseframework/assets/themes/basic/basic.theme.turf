@@ -1,5 +1,5 @@
 `URF
-$
+*
 	"select"=<http://urf.name/select>,
 	"theme"=<http://guiseframework.com/namespaces/theme>,
 	"component"=<java:/com/guiseframework/component/>,
@@ -8,7 +8,7 @@ $
 	"resources"=<http://guiseframework.com/namespaces/resources>,
 	"style"=<java:/com/guiseframework/style/>,
 	"dc"=<http://purl.org/dc/elements/1.1/>
-$
+*
 ¤
 	(theme.Theme):
 		dc.title="Guise™ Basic Theme",
@@ -85,7 +85,7 @@ $
 		†SectionPanel‡
 		(theme.Rule):
 			select.selector=(select.ObjectClassSelector):
-				selectClass=component.SectionPanel
+				select.selectClass=component.SectionPanel
 			;,
 			theme.apply=(theme.Template):
 				backgroundColor=(style.ResourceColor)¡"theme.color.subordinateA"!,
@@ -109,7 +109,7 @@ $
 		(theme.Rule):	†root menu‡
 			select.selector=(select.IntersectionSelector):
 				select.selector=(select.ObjectClassSelector):
-					selectClass=component.Menu
+					select.selectClass=component.Menu
 				;,
 				select.selector=(select.NegationSelector):
 					select.selector=(select.ObjectPropertySelector):
@@ -159,7 +159,7 @@ $
 		†Table‡
 		(theme.Rule):
 			select.selector=(select.ObjectClassSelector):
-				theme.selectClass=component.Table
+				select.selectClass=component.Table
 			;,
 			theme.apply=(theme.Template):
 				columnLabelFontWeight=#0.75,
