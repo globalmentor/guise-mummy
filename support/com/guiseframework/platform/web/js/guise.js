@@ -1731,6 +1731,10 @@ if(elementName=="select")
 		*/ 
 		proto._synchronizeElementStyle=function(oldElement, attributeValue)	//TODO del comment: do extra checks for attributeValue; sometimes when the server sends all border widths of 0px, the browser will change this to a single shortcut border width of 0px
 		{
+			if(dragState && dragState.dragging && dragState.dragSource==oldElement)	//if this element is being dragged
+			{
+				return;	//don't update the style of the element while it is being dragged TODO improve to update all the styles bug position-related styles
+			}
 			if(attributeValue==null)	//if there is no attribute value
 			{
 				attributeValue="";	//use the empty string
@@ -3419,9 +3423,11 @@ function onSliderThumbDragBegin(event)
 			dragState.dragCopy=false;	//drag the actual element, not a copy
 			if(isHorizontal)	//if this is a horizontal slider
 			{
+//console.log("This is a horizontal slider.");
 				dragState.allowY=false;	//only allow horizontal dragging
 				var min=0;	//calculate the minimum
 				var max=track.offsetWidth-thumb[GUISE_STATE_WIDTH_ATTRIBUTE]+1;	//calculate the maximum
+//console.log("This is a horizontal slider", min, max);
 				dragState.minX=min;	//set the minimum
 				dragState.maxX=max;	//set the maximum
 			}
@@ -3434,14 +3440,17 @@ function onSliderThumbDragBegin(event)
 				dragState.maxY=max;	//set the maximum
 			}
 			var span=max-min;	//find the available range of the values
+//console.log("using drag span", span);
 			dragState.onDragBegin=function(element)	//when dragging begins, send a slideBegin action event
 					{
+//console.log("drag begin");
 						updateSlider(slider);	//update the slider view
 						var ajaxRequest=new ActionAJAXEvent(slider.id, thumb.id, "slideBegin", 0);	//create a new action request for sliding begin TODO use a constant TODO why are we sending an event back here?
 						guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 					}
 			dragState.onDrag=function(element, x, y)	//when dragging occurs, update the slider value
 					{
+//console.log("on drag begin");
 						var coordinate=isHorizontal ? x.toString() : y.toString();	//get the new slider position
 						var position=(coordinate-min)/span;	//determine the position as a fraction of the total track available
 						if(!isHorizontal)	//if this is a vertical slider
@@ -3462,6 +3471,7 @@ if(isNaN(position))	//TODO del; fixed; change to assertion
 					};
 			dragState.onDragEnd=function(element)	//when dragging ends, update the slider view to make sure it is synchronized with the updated value
 					{
+//console.log("drag end");
 						var ajaxRequest=new ActionAJAXEvent(slider.id, thumb.id, "slideEnd", 0);	//create a new action request for sliding end TODO use a constant	//why are we sending back an action event here?
 						guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 						updateSlider(slider);	//update the slider view
@@ -3487,7 +3497,7 @@ function updateSlider(slider)	//TODO maybe rename to updateSliderView
 	}
 	var track=Node.getDescendantElementByClassName(slider, STYLES.SLIDER_CONTROL_TRACK);	//find the slider track
 	var thumb=Node.getDescendantElementByClassName(slider, STYLES.SLIDER_CONTROL_THUMB);	//find the slider thumb
-	if(dragState && dragState.dragging && dragState.dragSource==thumb)	//if the slider thumb is being dragged (i.e. the browser things the slider is being dragged)
+	if(dragState && dragState.dragging && dragState.dragSource==thumb)	//if the slider thumb is being dragged (i.e. the browser thinks the slider is being dragged)
 	{
 		return;	//don't update the slider while a drag is occurring
 	}
@@ -3552,6 +3562,7 @@ if(isNaN(newCoordinate))
 }
 */		
 			thumb.style.left=newCoordinate+"px";	//update the horizontal position of the slider
+//alert("thumb.style.left: "+thumb.style.left);
 		}
 		else	//if this is a vertical slider
 		{

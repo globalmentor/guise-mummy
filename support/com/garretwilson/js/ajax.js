@@ -210,6 +210,8 @@ var onEnd(element): The method called when dragging ends, or null if no addition
 */
 function DragState(dragSource, mouseX, mouseY)
 {
+	
+//console.log("creating drag state mouse X", mouseX, "mouse Y", mouseY);
 	this.dragging=false;	//initially we are not dragging
 	this.dragSource=dragSource;
 
@@ -254,12 +256,14 @@ function DragState(dragSource, mouseX, mouseY)
 		DragState.prototype.beginDrag=function(mouseX, mouseY)
 		{		
 			this.element=this._getDragElement();	//create an element for dragging
+//console.log("beginning drag; element has X", this.element.style.left, "Y", this.element.style.top);
 /*TODO del when works
 			this.width=this.element.offsetWidth;	//store the size of the element, because IE6 can sometimes reset the width and height to zero during AJAX calls for some unknown reason
 			this.height=this.element.offsetHeight;
 */
 
 			this.drag(mouseX, mouseY);	//drag the element to the current mouse position
+//console.log("after initial drag; element has X", this.element.style.left, "Y", this.element.style.top);
 			if(this.element!=this.dragSource)	//if we have a new element to drag
 			{
 				this.oldVisibility=this.dragSource.style.visibility;	//get the old visibility status				
@@ -279,7 +283,7 @@ function DragState(dragSource, mouseX, mouseY)
 			}
 		};
 
-		/*Drags the component to the location indicated by the mouse coordinates.
+		/**Drags the component to the location indicated by the mouse coordinates.
 		The mouse/component deltas are taken into consideration when calculating the new component position.
 		@param mouseX The horizontal position of the mouse.
 		@param mouseY The vertical position of the mouse.
@@ -340,9 +344,9 @@ function DragState(dragSource, mouseX, mouseY)
 					newY=this.maxY;	//stop at the ceiling
 				}
 			}
+//console.log("oldX:", oldX, "oldY:", oldY, "newX:", newX, "newY:", newY);
 			if(newX!=oldX || newY!=oldY)	//if one of the coordinates has changed
 			{
-//TODO del alert("oldX: "+oldX+" oldY: "+oldY+" newX: "+newX+" newY: "+newY);
 				if(newX!=oldX)	//if the horizontal position has changed
 				{
 					this.element.style.left=newX.toString()+"px";	//update the horizontal position of the dragged element
@@ -386,6 +390,7 @@ function DragState(dragSource, mouseX, mouseY)
 			if(this.dragCopy)	//if we should make a copy of the element
 			{
 				this.initialPosition=GUIUtilities.getElementCoordinates(this.dragSource);	//get the absolute element coordinates, as we'll be positioning the element absolutely
+//console.log("getting drag element; initial position:", this.initialPosition);
 
 				element=this.dragSource.cloneNode(true);	//create a clone of the original element TODO be careful about this---probably use our own copy method, because IE will clone event handlers as well
 				DOMUtilities.cleanNode(element);	//clean the clone
@@ -418,6 +423,8 @@ function DragState(dragSource, mouseX, mouseY)
 					this.initialPosition=this.initialOffsetPosition;	//the initial position is the offset position TODO check for fixed position, which would also mean using fixed coordinates
 				}
 			}
+//console.log("got drag element; initial position:", this.initialPosition);
+
 //TODO del alert("element: "+element.nodeName+" class: "+element.className);
 			this.mouseDeltaX=this.initialMouseFixedPosition.x-this.initialPosition.x;	//calculate the mouse position relative to the drag source
 			this.mouseDeltaY=this.initialMouseFixedPosition.y-this.initialPosition.y;
