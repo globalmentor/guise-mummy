@@ -2,7 +2,7 @@ package com.guiseframework.component;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
-import com.guiseframework.model.DefaultLabelModel;
+import com.guiseframework.model.*;
 
 /**An image component that displays an associated label and description, if present.
 @author Garret Wilson
@@ -70,8 +70,18 @@ public class Picture extends AbstractImageComponent
 	/**Default constructor.*/
 	public Picture()
 	{
-		super(new DefaultLabelModel());	//construct the parent class with a default label model
+		this(new DefaultLabelModel(), new DefaultImageModel());	//construct the parent class with default models
 	}
+
+	/**Label model and image model constructor.
+	@param labelModel The component label model.
+	@param imageModel The component image model.
+	@exception NullPointerException if the given label model and/or image model is <code>null</code>.
+	*/
+	public Picture(final LabelModel labelModel, final ImageModel imageModel)
+	{
+		super(labelModel, imageModel);	//construct the parent class
+		}
 
 	/**Whether the component has image dragging enabled.*/
 //TODO del if not needed	private boolean imageDragEnabled=false;

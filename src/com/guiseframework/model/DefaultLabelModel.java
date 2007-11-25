@@ -15,24 +15,24 @@ import com.garretwilson.lang.ObjectUtilities;
 public class DefaultLabelModel extends AbstractModel implements LabelModel
 {
 
-	/**The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.*/
-	private URI icon;
+	/**The glyph URI, which may be a resource URI, or <code>null</code> if there is no glyph URI.*/
+	private URI glyphURI;
 
-		/**@return The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.*/
-		public URI getGlyphURI() {return icon;}
+		/**@return The glyph URI, which may be a resource URI, or <code>null</code> if there is no glyph URI.*/
+		public URI getGlyphURI() {return glyphURI;}
 
 		/**Sets the URI of the icon.
 		This is a bound property.
-		@param newIcon The new URI of the icon, which may be a resource URI.
+		@param newGlyphURI The new URI of the icon, which may be a resource URI.
 		@see #GLYPH_URI_PROPERTY
 		*/
-		public void setGlyphURI(final URI newIcon)
+		public void setGlyphURI(final URI newGlyphURI)
 		{
-			if(!ObjectUtilities.equals(icon, newIcon))	//if the value is really changing
+			if(!ObjectUtilities.equals(glyphURI, newGlyphURI))	//if the value is really changing
 			{
-				final URI oldIcon=icon;	//get the old value
-				icon=newIcon;	//actually change the value
-				firePropertyChange(GLYPH_URI_PROPERTY, oldIcon, newIcon);	//indicate that the value changed
+				final URI oldIcon=glyphURI;	//get the old value
+				glyphURI=newGlyphURI;	//actually change the value
+				firePropertyChange(GLYPH_URI_PROPERTY, oldIcon, newGlyphURI);	//indicate that the value changed
 			}
 		}
 
@@ -99,14 +99,14 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 		this(label, null);	//construct the label model with no icon
 	}
 
-	/**Label and icon constructor.
+	/**Label and glyph URI constructor.
 	@param label The text of the label, or <code>null</code> if there should be no label.
-	@param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
+	@param glyphURI The glyph URI, which may be a resource URI, or <code>null</code> if there is no glyph URI.
 	*/
-	public DefaultLabelModel(final String label, final URI icon)
+	public DefaultLabelModel(final String label, final URI glyphURI)
 	{
 		this.label=label;	//save the label
-		this.icon=icon;	//save the icon
+		this.glyphURI=glyphURI;	//save the glyph URI
 	}
 
 	/**@return A string representation of this label model.*/

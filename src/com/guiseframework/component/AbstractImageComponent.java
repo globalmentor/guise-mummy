@@ -6,12 +6,12 @@ import javax.mail.internet.ContentType;
 
 import static com.garretwilson.io.ContentTypeConstants.*;
 import static com.garretwilson.io.ContentTypeUtilities.*;
+import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 
-import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.component.transfer.*;
-import com.guiseframework.model.LabelModel;
+import com.guiseframework.model.*;
 
 /**An abstract implementation of an image component.
 This component installs a default export strategy supporting export of the following content types:
@@ -37,37 +37,41 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 				}
 			};
 
+	/**The image model used by this component.*/
+	private final ImageModel imageModel;
+
+		/**@return The image model used by this component.*/
+		protected ImageModel getImageModel() {return imageModel;}
+
 	/**The image URI, which may be a resource URI, or <code>null</code> if there is no image URI.*/
-	private URI image=null;
+	private URI imageURI=null;
 
 		/**@return The image URI, which may be a resource URI, or <code>null</code> if there is no image URI.*/
-		public URI getImageURI() {return image;}
+		public URI getImageURI() {return getImageModel().getImageURI();}
 
 		/**Sets the URI of the image.
 		This is a bound property of type <code>URI</code>.
-		@param newImage The new URI of the image, which may be a resource URI.
+		@param newImageURI The new URI of the image, which may be a resource URI.
 		@see #IMAGE_URI_PROPERTY
 		*/
-		public void setImageURI(final URI newImage)
-		{
-			if(!ObjectUtilities.equals(image, newImage))	//if the value is really changing
-			{
-				final URI oldImage=image;	//get the old value
-				image=newImage;	//actually change the value
-				firePropertyChange(IMAGE_URI_PROPERTY, oldImage, newImage);	//indicate that the value changed
-			}
-		}
+		public void setImageURI(final URI newImageURI) {getImageModel().setImageURI(newImageURI);}
 
-	/**Label model constructor.
+	/**Label model and image model constructor.
 	@param labelModel The component label model.
-	@exception NullPointerException if the given label or model is <code>null</code>.
+	@param imageModel The component image model.
+	@exception NullPointerException if the given label model and/or iamge model is <code>null</code>.
 	*/
-	public AbstractImageComponent(final LabelModel labelModel)
+	public AbstractImageComponent(final LabelModel labelModel, final ImageModel imageModel)
 	{
 		super(labelModel);	//construct the parent class
-		addExportStrategy(DEFAULT_EXPORT_STRATEGY);	//install a default export strategy 
+		this.imageModel=checkInstance(imageModel, "Image model cannot be null.");	//save the image model
+		if(imageModel!=labelModel)	//if the models are different (we'll already be listening to the label model
+		{
+			this.imageModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the image model
+			this.imageModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the image model
+		}
 	}
-
+	
 	/**The default transferable object for an image.
 	@author Garret Wilson
 	*/

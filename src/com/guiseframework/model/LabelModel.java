@@ -18,12 +18,12 @@ public interface LabelModel extends Model
 	/**The label content type bound property.*/
 	public final static String LABEL_CONTENT_TYPE_PROPERTY=getPropertyName(LabelModel.class, "labelContentType");
 
-	/**@return The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.*/
+	/**@return The glyph URI, which may be a resource URI, or <code>null</code> if there is no glyph URI.*/
 	public URI getGlyphURI();
 
 	/**Sets the URI of the icon.
 	This is a bound property.
-	@param newIcon The new URI of the icon, which may be a resource URI.
+	@param newIconURI The new URI of the icon, which may be a resource URI.
 	@see #GLYPH_URI_PROPERTY
 	*/
 	public void setGlyphURI(final URI newIcon);

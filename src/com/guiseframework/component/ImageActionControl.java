@@ -120,20 +120,29 @@ public class ImageActionControl extends AbstractImageComponent implements Action
 	/**Default constructor.*/
 	public ImageActionControl()
 	{
-		this(new DefaultLabelModel(), new DefaultActionModel(), new DefaultEnableable());	//construct the class with default models
+		this(new DefaultLabelModel(), new DefaultImageModel(), new DefaultActionModel(), new DefaultEnableable());	//construct the class with default models
 	}
 
-	/**Label model, action model, and enableable object constructor.
+	/**Image model constructor.
+	@param imageModel The component image model.
+	*/
+	public ImageActionControl(final ImageModel imageModel)
+	{
+		this(new DefaultLabelModel(), imageModel, new DefaultActionModel(), new DefaultEnableable());	//construct the class with an image model and other default models
+	}
+
+	/**Label model, image model, action model, and enableable object constructor.
 	@param labelModel The component label model.
+	@param imageModel The component image model.
 	@param actionModel The component action model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given label model, action model, and/or enableable object is <code>null</code>.
+	@exception NullPointerException if the given label model, image model, action model, and/or enableable object is <code>null</code>.
 	*/
-	public ImageActionControl(final LabelModel labelModel, final ActionModel actionModel, final Enableable enableable)
+	public ImageActionControl(final LabelModel labelModel, final ImageModel imageModel, final ActionModel actionModel, final Enableable enableable)
 	{
-		super(labelModel);	//construct the parent class
+		super(labelModel, imageModel);	//construct the parent class
 		this.actionModel=checkInstance(actionModel, "Action model cannot be null.");	//save the action model
-		if(actionModel!=labelModel)	//if the action model and the label model are two different objects (we don't want to repeat property change events twice) TODO eventually just listen to specific events for each object
+		if(actionModel!=labelModel && actionModel!=imageModel)	//if the action model isn't the same as another model (we don't want to repeat property change events twice) TODO eventually just listen to specific events for each object
 		{
 			this.actionModel.addActionListener(new ActionListener()	//create an action repeater to forward events to this component's listeners
 					{
@@ -165,7 +174,7 @@ public class ImageActionControl extends AbstractImageComponent implements Action
 	*/
 	public ImageActionControl(final ActionPrototype actionPrototype)
 	{
-		this(actionPrototype, actionPrototype, actionPrototype);	//use the action prototype as every needed model
+		this(actionPrototype, new DefaultImageModel(), actionPrototype, actionPrototype);	//use the action prototype as every needed model except the image model TODO see if we need a separate image action prototype
 	}
 
 	/**Adds an action listener.
