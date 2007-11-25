@@ -8,10 +8,32 @@ import java.util.*;
 public class Components
 {
 
+	/**Retrieves all components, including the given component and all descendant components.
+	@param component The component to search.
+	@exception NullPointerException if the given component is <code>null</code>.
+	@return The collection of components.
+	*/
+	public static Collection<Component> getComponents(final Component component)
+	{
+		return getComponents(component, new HashSet<Component>());	//return all components in a hash set
+	}
+
+	/**Retrieves all components, including the given component and all descendant components.
+	@param component The component to search.
+	@param componentCollection The collection into which the components will be collected.
+	@exception NullPointerException if the given component and/or collection is <code>null</code>.
+	@return The component collection.
+	*/
+	public static <T extends Collection<Component>> T getComponents(final Component component, final T componentCollection)
+	{
+		return getComponents(component, Component.class, componentCollection, true, true);	//get all components deeply
+	}
+
 	/**Retrieves all components, including the given component, that are instances of the of the given class.
 	If <var>deep</var> is set to <code>true</code>, the component's child components are recursively searched if the component is a composite component.
 	If <var>below</var> is set to <code>true</code>, the child components of any composite component that is an instance of the given class are also recursively searched.
 	@param component The component to search.
+	@param componentClass The type of component to retrieve.
 	@param componentCollection The collection into which the components will be collected.
 	@param deep <code>true</code> if the children of composite components should resursively be searched.
 	@param below <code>true</code> if the children of composite components that are instances of the given class should resursively be searched, if <var>deep</var> is set to <code>true</code>.
@@ -32,10 +54,32 @@ public class Components
 		return componentCollection;	//return the collection
 	}
 
+	/**Retrieves all descendant components.
+	@param component The component to search.
+	@exception NullPointerException if the given component is <code>null</code>.
+	@return The collection of components.
+	*/
+	public static Collection<Component> getDescendantComponents(final CompositeComponent compositeComponent)
+	{
+		return getDescendantComponents(compositeComponent, new HashSet<Component>());	//return all descendant components in a hash set
+	}
+
+	/**Retrieves all descendant components.
+	@param compositeComponent The component to search.
+	@param componentCollection The collection into which the components will be collected.
+	@exception NullPointerException if the given component and/or collection is <code>null</code>.
+	@return The component collection.
+	*/
+	public static <T extends Collection<Component>> T getDescendantComponents(final CompositeComponent compositeComponent, final T componentCollection)
+	{
+		return getChildComponents(compositeComponent, Component.class, componentCollection, true, true);	//get all child components deeply
+	}
+
 	/**Retrieves all child components that are instances of the of the given class.
 	If <var>deep</var> is set to <code>true</code>, a component's child components are recursively searched if that component is a composite component.
 	If <var>below</var> is set to <code>true</code>, the child components of any composite component that is an instance of the given class are also recursively searched.
-	@param component The component to search.
+	@param compositeComponent The component to search.
+	@param componentClass The type of component to retrieve.
 	@param componentCollection The collection into which the components will be collected.
 	@param deep <code>true</code> if the children of composite components should resursively be searched.
 	@param below <code>true</code> if the children of composite components that are instances of the given class should resursively be searched, if <var>deep</var> is set to <code>true</code>.
@@ -51,39 +95,78 @@ public class Components
 		return componentCollection;	//return the collection
 	}
 
-	/**Sets the component's editable status if the component is an {@link EditComponent}.
-	Otherwise, if <var>deep</var> is specified, recursively sets the editable status of all child components.
-	Edit components are assumed to manage their own children if needed, so this method never changes the editable status of child components of edit components.
-	@param component The component the editable status of which to set.
-	@param editable <code>true</code> if the component should allow the user to change the value.
-	@param deep <code>true</code> if all non-edit components child components should resursively have their editable status set.
+	/**Determines if the given component is or has as a descendant the given other component.
+	@param component The component to search.
+	@param hasComponent The component to find.
+	@exception NullPointerException if one of the given components is <code>null</code>.
+	@return <code>true</code> if the given component is the composite component or is a descendant of the given composite component.
 	*/
-/*TODO del; slightly-slower getComponents() methods can be used equivalently
-	public static void setEditable(final Component component, final boolean editable, final boolean deep)
+	public static boolean hasComponent(final Component component, final Component hasComponent)
 	{
-		if(component instanceof EditComponent)	//if the component is an edit component
-		{
-			((EditComponent)component).setEditable(editable);	//set the editable status
-		}
-		else if(deep && component instanceof CompositeComponent)	//if this is not an edit component, if we should go deep and this is a composite component
-		{
-			setChildComponentsEditable((CompositeComponent)component, editable, deep);	//set the editable status of the child components
-		}
+		return hasComponent(component, hasComponent, true);	//do a deep search for the component
 	}
-*/
-	/**Sets the editable status of each child component that is an {@link EditComponent}.
-	@param compositeComponent The component the editable status of the children of which to set.
-	@param editable <code>true</code> if the component should allow the user to change the value.
-	@param deep <code>true</code> if all child components should resursively have their editable status set.
+
+	/**Determines if the given component is or has as a descendant the given other component.
+	@param component The component to search.
+	@param hasComponent The component to find.
+	@param deep <code>true</code> if the children of composite components should resursively be searched.
+	@exception NullPointerException if one of the given components is <code>null</code>.
+	@return <code>true</code> if the given component is the composite component or is a descendant of the given composite component.
 	*/
-/*TODO del; slightly-slower getChildComponents() methods can be used equivalently
-	public static void setChildComponentsEditable(final CompositeComponent compositeComponent, final boolean editable, final boolean deep)
+	public static boolean hasComponent(final Component component, final Component hasComponent, final boolean deep)
 	{
-		for(final Component childComponent:compositeComponent.getChildComponents())	//for each child component
+		if(component.equals(hasComponent))	//if the components are equal
 		{
-			setEditable(childComponent, editable, deep);	//set the editable status of the child component
+			return true;	//we found the component
 		}
+		else if(deep && component instanceof CompositeComponent)	//if we should search deeply and this is a composite component
+		{
+			return hasChildComponent((CompositeComponent)component, hasComponent, deep);	//check the children
+		}
+		return false;	//this is not the component, and we were asked not to check deeply
 	}
-*/
+
+	/**Determines if the given composite component has the given component as one of its descendants.
+	@param compositeComponent The component to search.
+	@param component The component to find.
+	@exception NullPointerException if the given composite component or component is <code>null</code>.
+	@return Whether the given component is a descendant of the given composite component.
+	*/
+	public static boolean hasChildComponent(final CompositeComponent compositeComponent, final Component component)
+	{
+		return hasChildComponent(compositeComponent, component, true);	//do a deep search on the children
+	}
+
+	/**Determines if the given composite component has the given component as one of its descendants.
+	@param compositeComponent The component to search.
+	@param component The component to find.
+	@param deep <code>true</code> if the children of composite components should resursively be searched.
+	@exception NullPointerException if the given composite component or component is <code>null</code>.
+	@return Whether the given component is a descendant of the given composite component.
+	*/
+	public static boolean hasChildComponent(final CompositeComponent compositeComponent, final Component component, final boolean deep)
+	{
+		if(deep)	//if we should search deeply, do this a tree at a time so as not to redundantly iterate
+		{
+			for(final Component childComponent:compositeComponent.getChildComponents())	//for each child component
+			{
+				if(hasComponent(childComponent, component, deep))	//if this child is or has the component
+				{
+					return true;	//we found the component
+				}
+			}
+		}
+		else	//if we should not search deeply
+		{
+			for(final Component childComponent:compositeComponent.getChildComponents())	//for each child component
+			{
+				if(compositeComponent.equals(component))	//if the components are equal
+				{
+					return true;	//we found the component
+				}
+			}
+		}
+		return false;	//we couldn't find the component
+	}
 
 }

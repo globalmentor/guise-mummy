@@ -108,4 +108,11 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 		this.label=label;	//save the label
 		this.icon=icon;	//save the icon
 	}
+
+	/**@return A string representation of this label model.*/
+	public String toString()
+	{
+		final String label=getLabel();	//get the label, if any
+		return label!=null ? getClass().getName()+": "+label : super.toString();	//return the class and label, or the default string if there is no label
+	}
 }

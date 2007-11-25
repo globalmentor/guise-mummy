@@ -289,19 +289,19 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	/**Gathers prototypes from all known {@link PrototypeProducer}s.
 	This implementation gathers the produced prototypes of this frame and the current content, if either or both implement {@link PrototypeProducer}.
 	*/
-	public Iterable<PrototypeInfo> gatherPrototypes()
+	public Iterable<PrototypePublication<?>> gatherPrototypes()
 	{
-		final Set<PrototypeInfo> prototypeInfos=new TreeSet<PrototypeInfo>();	//create a sorted set of produced prototypes
+		final Set<PrototypePublication<?>> prototypePublications=new TreeSet<PrototypePublication<?>>();	//create a sorted set of produced prototypes
 		if(this instanceof PrototypeProducer)	//if this frame produces prototypes
 		{
-			addAll(prototypeInfos, ((PrototypeProducer)this).producePrototypes());	//collect produced prototypes from the frame
+			addAll(prototypePublications, ((PrototypeProducer)this).producePrototypes());	//collect produced prototypes from the frame
 		}
 		final Component content=getContent();	//get the current content
 		if(content instanceof PrototypeProducer)	//if the content produces prototypes
 		{
-			addAll(prototypeInfos, ((PrototypeProducer)content).producePrototypes());	//collect produced prototypes from the content
+			addAll(prototypePublications, ((PrototypeProducer)content).producePrototypes());	//collect produced prototypes from the content
 		}
-		return prototypeInfos;	//return the gathered prototypes
+		return prototypePublications;	//return the gathered prototypes
 	}
 	
 	/**The action listener for closing the frame.*/
