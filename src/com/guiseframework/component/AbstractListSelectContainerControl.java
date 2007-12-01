@@ -7,6 +7,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.util.*;
 
+import com.garretwilson.event.EventListenerManager;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
@@ -483,10 +484,14 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	*/
 	protected void fireSelectionChanged(final Integer addedIndex, final Integer removedIndex)
 	{
-		if(getEventListenerManager().hasListeners(ListSelectionListener.class))	//if there are appropriate listeners registered
+		final EventListenerManager eventListenerManager=getEventListenerManager();	//get the event listener manager
+		if(eventListenerManager.hasListeners(ListSelectionListener.class))	//if there are appropriate listeners registered
 		{
 			final ListSelectionEvent<Component> selectionEvent=new ListSelectionEvent<Component>(this, addedIndex, removedIndex);	//create a new event
-			getSession().queueEvent(new PostponedListSelectionEvent<Component>(getEventListenerManager(), selectionEvent));	//tell the Guise session to queue the event
+			for(final ListSelectionListener<Component> listener:eventListenerManager.getListeners(ListSelectionListener.class))	//for each registered event listeners
+			{
+				listener.listSelectionChanged(selectionEvent);	//dispatch the event
+			}			
 		}
 	}
 

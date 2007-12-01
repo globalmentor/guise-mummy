@@ -7,5 +7,4 @@ import com.guiseframework.model.ImageModel;
 */
 public interface ImageComponent extends Component, ImageModel
 {
-
 }

@@ -419,7 +419,7 @@ public interface GuiseSession extends PropertyBindable
 	If no Guise context is currently processing events, the event will be fired immediately.
 	@param postponedEvent The event to fire at a later time.
 	*/
-	public void queueEvent(final PostponedEvent<?> postponedEvent);	//TODO complete conversion
+//TODO del	public void queueEvent(final PostponedEvent<?> postponedEvent);	//TODO complete conversion
 
 	/**Retrieves the component bound to the given destination.
 	If a component has already been created and cached, it will be be returned; otherwise, one will be created and cached. 

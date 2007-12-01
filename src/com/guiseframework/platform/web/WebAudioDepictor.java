@@ -20,10 +20,11 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 {
 
 	/**The web commands for controlling audio.*/
-	public enum AudioCommand implements WebCommand
+	public enum AudioCommand implements WebPlatformCommand
 	{
+
 		/**The command to start the audio.
-		parameters: <code>{audioURI:"<var>uri</var>"}</code>
+		parameters: <code>{{@value #AUDIO_URI_PROPERTY}:"<var>uri</var>"}</code>
 		*/
 		AUDIO_PLAY,
 
@@ -34,15 +35,16 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 		AUDIO_STOP,
 
 		/**The command to set the position of the audio.
-		parameters: <code>{position:"<var>millisecondPosition</var>"}</code>
+		parameters: <code>{{@value #POSITION_PROPERTY}:"<var>millisecondPosition</var>"}</code>
 		*/
 		AUDIO_POSITION;
-	}
 
-	/**The property for specifying the URI of the audio.*/
-	public final static String AUDIO_URI_PROPERTY="audioURI";
-	/**The property for specifying the position of the audio.*/
-	public final static String POSITION_PROPERTY="position";
+		/**The property for specifying the URI of the audio.*/
+		public final static String AUDIO_URI_PROPERTY="audioURI";
+		/**The property for specifying the position of the audio.*/
+		public final static String POSITION_PROPERTY="position";
+	
+	}
 
 	/**Requests that the audio start.*/
 	@SuppressWarnings("unchecked")
@@ -53,21 +55,21 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 		if(audioURI!=null)	//if there is an audio URI
 		{
 			final URI resolvedAudioURI=getDepictedObject().getSession().resolveURI(audioURI);	//resolve the audio URI
-			getPlatform().getSendEventQueue().add(new WebCommandEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_PLAY,
-					new NameValuePair<String, Object>(AUDIO_URI_PROPERTY, resolvedAudioURI)));	//send an audio start command to the platform
+			getPlatform().getSendMessageQueue().add(new WebCommandDepictEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_PLAY,
+					new NameValuePair<String, Object>(AudioCommand.AUDIO_URI_PROPERTY, resolvedAudioURI)));	//send an audio start command to the platform
 		}
 	}
 
 	/**Requests that the audio pause.*/
 	public void pause()
 	{
-		getPlatform().getSendEventQueue().add(new WebCommandEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_PAUSE));	//send an audio pause command to the platform
+		getPlatform().getSendMessageQueue().add(new WebCommandDepictEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_PAUSE));	//send an audio pause command to the platform
 	}
 
 	/**Requests that the audio stop.*/
 	public void stop()
 	{
-		getPlatform().getSendEventQueue().add(new WebCommandEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_STOP));	//send an audio stop command to the platform
+		getPlatform().getSendMessageQueue().add(new WebCommandDepictEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_STOP));	//send an audio stop command to the platform
 	}
 
 	/**Requests a new time-based play position.
@@ -81,8 +83,8 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 		{
 			throw new IllegalArgumentException("Time position cannot be negative: "+newTimePosition);
 		}
-		getPlatform().getSendEventQueue().add(new WebCommandEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_POSITION,
-				new NameValuePair<String, Object>(POSITION_PROPERTY, Long.valueOf(newTimePosition/1000))));	//send an audio position command to the platform, converting the time to milliseconds
+		getPlatform().getSendMessageQueue().add(new WebCommandDepictEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_POSITION,
+				new NameValuePair<String, Object>(AudioCommand.POSITION_PROPERTY, Long.valueOf(newTimePosition/1000))));	//send an audio position command to the platform, converting the time to milliseconds
 	}
 
 	/**Processes an event from the platform.
@@ -91,9 +93,9 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 	*/
 	public void processEvent(final PlatformEvent event)
 	{
-		if(event instanceof WebChangeEvent)	//if a property changed
+		if(event instanceof WebChangeDepictEvent)	//if a property changed
 		{
-			final WebChangeEvent webChangeEvent=(WebChangeEvent)event;	//get the web change event
+			final WebChangeDepictEvent webChangeEvent=(WebChangeDepictEvent)event;	//get the web change event
 			final Audio audio=getDepictedObject();	//get the depicted object
 			if(webChangeEvent.getDepictedObject()!=audio)	//if the event was meant for another depicted object
 			{

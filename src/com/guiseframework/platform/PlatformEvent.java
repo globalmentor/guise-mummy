@@ -1,8 +1,10 @@
 package com.guiseframework.platform;
 
-/**An event to or from the platform on which objects are being depicted.
+import com.garretwilson.event.Event;
+
+/**An event message to or from the platform on which objects are being depicted.
 @author Garret Wilson
 */
-public interface PlatformEvent
+public interface PlatformEvent extends PlatformMessage, Event
 {
 }

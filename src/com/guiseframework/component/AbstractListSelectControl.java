@@ -7,6 +7,7 @@ import java.util.*;
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.garretwilson.event.EventListenerManager;
 import com.guiseframework.converter.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
@@ -409,10 +410,14 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	*/
 	protected void fireListModified(final int index, final V addedElement, final V removedElement)
 	{
-		if(getEventListenerManager().hasListeners(ListListener.class))	//if there are appropriate listeners registered
+		final EventListenerManager eventListenerManager=getEventListenerManager();	//get the event listener manager
+		if(eventListenerManager.hasListeners(ListListener.class))	//if there are appropriate listeners registered
 		{
 			final ListEvent<V> listEvent=new ListEvent<V>(this, index, addedElement, removedElement);	//create a new event
-			getSession().queueEvent(new PostponedListEvent<V>(getEventListenerManager(), listEvent));	//tell the Guise session to queue the event
+			for(final ListListener<V> listener:eventListenerManager.getListeners(ListListener.class))	//for each registered event listeners
+			{
+				listener.listModified(listEvent);	//dispatch the event
+			}			
 		}
 	}
 
@@ -424,10 +429,14 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	*/
 	protected void fireSelectionChanged(final Integer addedIndex, final Integer removedIndex)
 	{
-		if(getEventListenerManager().hasListeners(ListSelectionListener.class))	//if there are appropriate listeners registered
+		final EventListenerManager eventListenerManager=getEventListenerManager();	//get the event listener manager
+		if(eventListenerManager.hasListeners(ListSelectionListener.class))	//if there are appropriate listeners registered
 		{
 			final ListSelectionEvent<V> selectionEvent=new ListSelectionEvent<V>(this, addedIndex, removedIndex);	//create a new event
-			getSession().queueEvent(new PostponedListSelectionEvent<V>(getEventListenerManager(), selectionEvent));	//tell the Guise session to queue the event
+			for(final ListSelectionListener<V> listener:eventListenerManager.getListeners(ListSelectionListener.class))	//for each registered event listeners
+			{
+				listener.listSelectionChanged(selectionEvent);	//dispatch the event
+			}			
 		}
 	}
 

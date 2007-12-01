@@ -8,7 +8,7 @@ import com.guiseframework.platform.DepictedObject;
 /**Indicates that some sort of progress has been made on the web platform.
 @author Garret Wilson
 */
-public class WebProgressEvent extends AbstractWebDepictEvent
+public class WebProgressDepictEvent extends AbstractWebDepictEvent
 {
 	/**The task being performed, or <code>null</code> if not indicated.*/
 	private String task;
@@ -41,7 +41,7 @@ public class WebProgressEvent extends AbstractWebDepictEvent
 	@param progress The amount of progress that has been made, or -1 if the progress is unknown.
 	@exception NullPointerException if the given depicted object and/or task state is <code>null</code>.
 	*/
-	public WebProgressEvent(final DepictedObject depictedObject, final String task, final TaskState taskState, final long progress)
+	public WebProgressDepictEvent(final DepictedObject depictedObject, final String task, final TaskState taskState, final long progress)
 	{
 		this(depictedObject, task, taskState, progress, -1);	//construct the class with an unknown goal
 	}
@@ -54,7 +54,7 @@ public class WebProgressEvent extends AbstractWebDepictEvent
 	@param goal The total amount of progress that will have been made upon completion, or -1 if the goal is unknown.
 	@exception NullPointerException if the given depicted object and/or task state is <code>null</code>.
 	*/
-	public WebProgressEvent(final DepictedObject depictedObject, final String task, final TaskState taskState, final long progress, final long goal)
+	public WebProgressDepictEvent(final DepictedObject depictedObject, final String task, final TaskState taskState, final long progress, final long goal)
 	{
 		super(depictedObject);	//construct the parent class
 		this.task=task;

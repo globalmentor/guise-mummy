@@ -64,9 +64,9 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 	*/
 	public void processEvent(final PlatformEvent event)
 	{
-		if(event instanceof WebChangeEvent)	//if a property changed
+		if(event instanceof WebChangeDepictEvent)	//if a property changed
 		{
-			final WebChangeEvent webChangeEvent=(WebChangeEvent)event;	//get the web change event
+			final WebChangeDepictEvent webChangeEvent=(WebChangeDepictEvent)event;	//get the web change event
 			final C component=getDepictedObject();	//get the depicted object
 			if(webChangeEvent.getDepictedObject()!=component)	//if the event was meant for another depicted object
 			{

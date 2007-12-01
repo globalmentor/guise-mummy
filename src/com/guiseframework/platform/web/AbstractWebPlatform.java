@@ -1,11 +1,16 @@
 package com.guiseframework.platform.web;
 
+import java.util.*;
+import static java.util.Collections.*;
+
+import static com.garretwilson.lang.IntegerUtilities.*;
+import static com.garretwilson.lang.MathUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.garretwilson.util.Debug;
+import com.garretwilson.util.NameValuePair;
 import com.guiseframework.GuiseApplication;
-import com.guiseframework.platform.AbstractPlatform;
-import com.guiseframework.platform.DefaultEnvironment;
-import com.guiseframework.platform.Environment;
+import com.guiseframework.platform.*;
 
 /**An abstract implementation of a web platform for Guise.
 This class registers no depictors.
@@ -23,6 +28,96 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 		/**@return The user local environment.*/
 		public Environment getEnvironment() {return environment;}
 
+	/**@return The thread-safe queue of messages to be delivered to the platform.*/
+	@SuppressWarnings("unchecked")
+	public Queue<WebPlatformMessage> getSendMessageQueue() {return (Queue<WebPlatformMessage>)super.getSendMessageQueue();}
+
+	/**The map of poll intervals requested for depicted objects.*/
+	private final Map<DepictedObject, Integer> requestedPollIntervalMap=synchronizedMap(new HashMap<DepictedObject, Integer>());
+
+	/**The default polling interval in milleseconds.*/
+	public final static int DEFAULT_POLL_INTERVAL=5*60*1000;
+
+	/**The current polling interval in milleseconds.*/
+	private int pollInterval=DEFAULT_POLL_INTERVAL;
+
+		/**@return The current polling interval in milleseconds.*/
+		public int getPollInterval() {return pollInterval;}
+
+		/**Sets the polling interval in millseconds.
+		@param newPollInterval The polling interval in millseconds.
+		@exception IllegalArgumentException if the given polling interval is less than zero.
+		*/
+		@SuppressWarnings("unchecked")
+		public void setPollInterval(final int newPollInterval)
+		{
+			if(pollInterval!=checkMinimum(newPollInterval, 0))	//if the value is really changing
+			{
+				pollInterval=newPollInterval;	//actually change the value
+				getSendMessageQueue().add(new WebCommandMessage<PollCommand>(PollCommand.POLL_INTERVAL,
+						new NameValuePair<String, Object>(PollCommand.INTERVAL_PROPERTY, Integer.valueOf(pollInterval))));	//send a poll command to the platform with the new interval
+			}			
+		}
+
+		/**Requests a polling interval for a given depicted object.
+		The actual polling interval will be updated if the given polling interval is smaller than the current actual polling interval.
+		@param depictedObject The depicted object requesting a polling interval.
+		@param pollInterval The polling interval in milleseconds.
+		@return <code>true</code> if the polling interval changed as a result of this request.
+		@exception NullPointerException if the given depicted object is <code>null</code>.
+		@exception IllegalArgumentException if the value is less than zero.
+		@see #discontinuePollInterval(DepictedObject)
+		@see #getPollInterval()
+		@see #setPollInterval()
+		*/ 
+		public boolean requestPollInterval(final DepictedObject depictedObject, final int pollInterval)
+		{
+			checkMinimum(pollInterval, 0);
+			synchronized(requestedPollIntervalMap)	//synchronize to ensure the that race conditions don't cause the actual poll interval to be out of synch with the requested poll intervals
+			{
+				final int oldPollInterval=getPollInterval();	//get the current polling interval
+				requestedPollIntervalMap.put(checkInstance(depictedObject, "Depicted object cannot be null."), Integer.valueOf(pollInterval));	//indicate that this depicted object requests a certain poll interval
+				if(pollInterval<oldPollInterval)	//if this poll interval is lower than the current poll interval
+				{
+					setPollInterval(pollInterval);	//switch to the lower polling interval
+					return true;	//indicate that we changed the polling interval
+				}
+			}
+			return false;	//indicate that the polling interval did not change
+		}
+
+		/**Indicates that a depicted object no longer requests a particular polling interval.
+		The actual polling interval will be updated if the relinquished poll interval is less than or equal to the current poll interval.
+		@param depictedObject The depicted object that is relinquishing a polling interval.
+		@return <code>true</code> if the polling interval changed as a result of this relinquishment.
+		@exception NullPointerException if the given depicted object is <code>null</code>.
+		@see #requestPollInterval(DepictedObject, int)
+		@see #getPollInterval()
+		@see #setPollInterval()
+		*/ 
+		public boolean discontinuePollInterval(final DepictedObject depictedObject)
+		{
+//Debug.trace("ready to discontinue poll interval for", depictedObject);
+			synchronized(requestedPollIntervalMap)	//synchronize to ensure the that race conditions don't cause the actual poll interval to be out of synch with the requested poll intervals
+			{
+				final int oldPollInterval=getPollInterval();	//get the current polling interval
+				final Integer relinquishedPollInterval=requestedPollIntervalMap.remove(checkInstance(depictedObject, "Depicted object cannot be null."));
+//Debug.trace("got relinquished poll interval", relinquishedPollInterval, "old poll interval", oldPollInterval);
+				if(relinquishedPollInterval!=null && relinquishedPollInterval.intValue()<=oldPollInterval)	//if a poll interval was relinquished that was less than or equal to our current poll interval
+				{
+//Debug.trace("now there are remaining poll intervals:", requestedPollIntervalMap.size());
+					final int newPollInterval=min(requestedPollIntervalMap.values(), DEFAULT_POLL_INTERVAL);	//determine the new poll interval
+//Debug.trace("we want to change to new poll interval", newPollInterval);
+					if(oldPollInterval!=newPollInterval)	//if the poll interval is different
+					{
+						setPollInterval(newPollInterval);	//update the polling interval
+						return true;	//indicate that the polling interval changed
+					}
+				}
+			}
+			return false;	//indicate that the polling interval did not change
+		}
+	
 	/**Application.
 	This version copies the current application environment to a new environment for this platform.
 	@param application The Guise application running on this platform.

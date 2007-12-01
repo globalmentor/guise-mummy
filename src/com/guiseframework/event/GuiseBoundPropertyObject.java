@@ -1,7 +1,5 @@
 package com.guiseframework.event;
 
-import java.beans.PropertyChangeEvent;
-
 import com.garretwilson.beans.BoundPropertyObject;
 import com.guiseframework.Guise;
 import com.guiseframework.GuiseSession;
@@ -29,9 +27,11 @@ public class GuiseBoundPropertyObject extends BoundPropertyObject
 	@param propertyChangeEvent The event to fire.
 	@see GuiseSession#queueEvent(com.garretwilson.event.PostponedEvent)
 	*/
+/*TODO del when postponed property change events are removed
 	protected void firePropertyChange(final PropertyChangeEvent propertyChangeEvent)
 	{
 		getSession().queueEvent(createPostponedPropertyChangeEvent(propertyChangeEvent));	//create and queue a postponed property change event
 	}
+*/
 
 }

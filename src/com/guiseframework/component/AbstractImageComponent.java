@@ -43,18 +43,15 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 		/**@return The image model used by this component.*/
 		protected ImageModel getImageModel() {return imageModel;}
 
-	/**The image URI, which may be a resource URI, or <code>null</code> if there is no image URI.*/
-	private URI imageURI=null;
+	/**@return The image URI, which may be a resource URI, or <code>null</code> if there is no image URI.*/
+	public URI getImageURI() {return getImageModel().getImageURI();}
 
-		/**@return The image URI, which may be a resource URI, or <code>null</code> if there is no image URI.*/
-		public URI getImageURI() {return getImageModel().getImageURI();}
-
-		/**Sets the URI of the image.
-		This is a bound property of type <code>URI</code>.
-		@param newImageURI The new URI of the image, which may be a resource URI.
-		@see #IMAGE_URI_PROPERTY
-		*/
-		public void setImageURI(final URI newImageURI) {getImageModel().setImageURI(newImageURI);}
+	/**Sets the URI of the image.
+	This is a bound property of type <code>URI</code>.
+	@param newImageURI The new URI of the image, which may be a resource URI.
+	@see #IMAGE_URI_PROPERTY
+	*/
+	public void setImageURI(final URI newImageURI) {getImageModel().setImageURI(newImageURI);}
 
 	/**Label model and image model constructor.
 	@param labelModel The component label model.
@@ -65,7 +62,7 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 	{
 		super(labelModel);	//construct the parent class
 		this.imageModel=checkInstance(imageModel, "Image model cannot be null.");	//save the image model
-		if(imageModel!=labelModel)	//if the models are different (we'll already be listening to the label model
+		if(imageModel!=labelModel)	//if the models are different (we'll already be listening to the label model)
 		{
 			this.imageModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the image model
 			this.imageModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the image model

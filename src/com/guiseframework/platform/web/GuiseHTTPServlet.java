@@ -59,6 +59,8 @@ import com.guiseframework.model.FileItemResourceImport;
 import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
+
+import com.guiseframework.platform.web.WebPlatform.PollCommand;
 import com.guiseframework.platform.web.css.*;
 
 import org.apache.commons.fileupload.*;
@@ -572,7 +574,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 //Debug.trace("sending progress with no task for starting");
 									synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
 									{
-										progressComponent.processEvent(new WebProgressEvent(progressComponent, null, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for all transfers
+										progressComponent.processEvent(new WebProgressDepictEvent(progressComponent, null, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for all transfers
 									}
 								}
 								final URFResource resourceDescription=new DefaultURFResource();	//create a new resource description
@@ -598,7 +600,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 												{
 													if(progressComponent!=null)	//if there is a progress component
 													{
-														progressComponent.processEvent(new WebProgressEvent(progressComponent, name, TaskState.INCOMPLETE, progressEvent.getValue()));	//indicate to the component that progress is starting for this file
+														progressComponent.processEvent(new WebProgressDepictEvent(progressComponent, name, TaskState.INCOMPLETE, progressEvent.getValue()));	//indicate to the component that progress is starting for this file
 													}
 												}
 											}
@@ -610,7 +612,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 											{
 												synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
 												{
-													progressComponent.processEvent(new WebProgressEvent(progressComponent, name, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for this file
+													progressComponent.processEvent(new WebProgressDepictEvent(progressComponent, name, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for this file
 												}
 											}
 											progressOutputStream.addProgressListener(progressListener);	//start listening for progress events from the output stream
@@ -626,7 +628,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 										{
 											synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
 											{
-												progressComponent.processEvent(new WebProgressEvent(progressComponent, name, TaskState.COMPLETE, 0));	//indicate to the component that progress is finished for this file
+												progressComponent.processEvent(new WebProgressDepictEvent(progressComponent, name, TaskState.COMPLETE, 0));	//indicate to the component that progress is finished for this file
 											}
 										}
 									}
@@ -646,7 +648,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 					{
 						synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
 						{
-							progressComponent.processEvent(new WebProgressEvent(progressComponent, null, TaskState.COMPLETE, 0));	//indicate to the component that progress is finished for all transfers
+							progressComponent.processEvent(new WebProgressDepictEvent(progressComponent, null, TaskState.COMPLETE, 0));	//indicate to the component that progress is finished for all transfers
 						}
 					}
 				}
@@ -940,6 +942,11 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 							final Writer elffWriter=guiseApplication.getLogWriter("elff.log", elffWriterInitializer, elffWriterUninitializer);	//get the ELFF log writer for this application TODO use a constant
 							elffWriter.write(getELFF().serializeEntry(entry));	//serialize the ELFF entry to the ELFF writer
 							elffWriter.flush();	//flush the ELFF writer
+							final WebPlatform platform=(WebPlatform)guiseSession.getPlatform();	//get the current platform
+							final int pollInterval=platform.getPollInterval();	//get the current polling interval
+							final Queue<WebPlatformMessage> sendMessageQueue=platform.getSendMessageQueue();	//get the queue for sending messages
+							sendMessageQueue.add(new WebCommandMessage<PollCommand>(PollCommand.POLL_INTERVAL,
+									new NameValuePair<String, Object>(PollCommand.INTERVAL_PROPERTY, Integer.valueOf(pollInterval))));	//send a poll command to the platform with the new interval
 						}
 						if(!requestedComponents.isEmpty())	//if components were requested
 						{
@@ -1145,21 +1152,25 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 					}
 						//send any platform events
 					final WebPlatform platform=(WebPlatform)guiseSession.getPlatform();	//get the current platform
-					final Queue<PlatformEvent> sendEventQueue=platform.getSendEventQueue();	//get the queue for sending events
-					PlatformEvent platformEvent=sendEventQueue.poll();	//get any event to send to the platform
-					while(platformEvent!=null)	//while there are events to send to the platform
+					final Queue<WebPlatformMessage> sendMessageQueue=platform.getSendMessageQueue();	//get the queue for sending messages
+					WebPlatformMessage webPlatformMessage=sendMessageQueue.poll();	//get any message to send to the platform
+					while(webPlatformMessage!=null)	//while there are messages to send to the platform
 					{
-						if(platformEvent instanceof WebCommandEvent)	//if this is a web command
+						if(webPlatformMessage instanceof WebPlatformCommandMessage)	//if this is a web command message
 						{
-							final WebCommandEvent<?> webCommandEvent=(WebCommandEvent<?>)platformEvent;	//get the web command
+							final WebPlatformCommandMessage<?> webCommandMessage=(WebPlatformCommandMessage<?>)webPlatformMessage;	//get the web command
 							depictContext.writeElementBegin(XHTML_NAMESPACE_URI, "command");	//<xhtml:command>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
 							depictContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
-							depictContext.writeAttribute(null, "objectID", platform.getDepictIDString(webCommandEvent.getDepictedObject().getDepictID()));	//objectID="depictedObjectID" TODO use a constant
-							depictContext.writeAttribute(null, "command", getSerializationName(webCommandEvent.getCommand()));	//command="webCommand" TODO use a constant
-							depictContext.write(JSON.serialize(webCommandEvent.getParameters()));	//{parameters...}
+							if(webCommandMessage instanceof WebDepictEvent)	//if this is a depict message
+							{
+								final WebDepictEvent webDepictEvent=(WebDepictEvent)webCommandMessage;	//get the depict event
+								depictContext.writeAttribute(null, "objectID", platform.getDepictIDString(webDepictEvent.getDepictedObject().getDepictID()));	//objectID="depictedObjectID" TODO use a constant
+							}
+							depictContext.writeAttribute(null, "command", getSerializationName(webCommandMessage.getCommand()));	//command="webCommand" TODO use a constant
+							depictContext.write(JSON.serialize(webCommandMessage.getParameters()));	//{parameters...}
 							depictContext.writeElementEnd(XHTML_NAMESPACE_URI, "command");	//</xhtml:command>
 						}
-						platformEvent=sendEventQueue.poll();	//get the next event to send to the platform
+						webPlatformMessage=sendMessageQueue.poll();	//get the next event to send to the platform
 					}
 				}
 				else	//if this is not an AJAX request
@@ -1453,7 +1464,7 @@ Debug.trace("getting request events");
 											final String targetID=eventElement.getAttribute("targetID");	//get the ID of the target element TODO use a constant
 											final String actionID=eventElement.getAttribute("actionID");	//get the action identifier TODO use a constant
 											final int option=Integer.parseInt(eventElement.getAttribute("option"));	//TODO tidy; improve; check for errors; comment
-											requestEventList.add(new WebActionEvent(depictedObject, targetID, actionID, option));	//create and add the event to the list
+											requestEventList.add(new WebActionDepictEvent(depictedObject, targetID, actionID, option));	//create and add the event to the list
 										}
 									}
 								}
@@ -1475,7 +1486,7 @@ Debug.trace("getting request events");
 												final Object propertyValue=JSON.parseValue(propertyElement.getTextContent());	//get the value of the property
 												properties.put(propertyName, propertyValue);	//add this property name and value to the event
 											}
-											requestEventList.add(new WebChangeEvent(depictedObject, properties));	//create and add a change event to the list
+											requestEventList.add(new WebChangeDepictEvent(depictedObject, properties));	//create and add a change event to the list
 										}
 									}
 								}

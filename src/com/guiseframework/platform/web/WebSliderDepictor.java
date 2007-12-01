@@ -41,9 +41,9 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 	*/
 	public void processEvent(final PlatformEvent event)
 	{
-		if(event instanceof WebChangeEvent)	//if a property changed
+		if(event instanceof WebChangeDepictEvent)	//if a property changed
 		{
-			final WebChangeEvent webChangeEvent=(WebChangeEvent)event;	//get the web change event
+			final WebChangeDepictEvent webChangeEvent=(WebChangeDepictEvent)event;	//get the web change event
 			final C component=getDepictedObject();	//get the depicted object
 			if(webChangeEvent.getDepictedObject()!=component)	//if the event was meant for another depicted object
 			{
@@ -69,9 +69,9 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 				}
 			}
 		}
-		else if(event instanceof WebActionEvent)	//if this is an action
+		else if(event instanceof WebActionDepictEvent)	//if this is an action
 		{
-			final WebActionEvent webActionEvent=(WebActionEvent)event;	//get the action control event
+			final WebActionDepictEvent webActionEvent=(WebActionDepictEvent)event;	//get the action control event
 			final C component=getDepictedObject();	//get the component
 			if(webActionEvent.getDepictedObject()!=component)	//if the event was meant for another depicted object
 			{

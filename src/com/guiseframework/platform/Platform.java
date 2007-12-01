@@ -57,8 +57,8 @@ public interface Platform
 	/**@return The client software being used to access Guise on this platform.*/
 	public ClientProduct getClientProduct();
 	
-	/**@return The thread-safe queue of events to be delivered to the platform.*/
-	public Queue<PlatformEvent> getSendEventQueue();
+	/**@return The thread-safe queue of messages to be delivered to the platform.*/
+	public Queue<? extends PlatformMessage> getSendMessageQueue();
 
 	/**@return The lock used for exclusive depiction on the platform.*/
 	public Lock getDepictLock();

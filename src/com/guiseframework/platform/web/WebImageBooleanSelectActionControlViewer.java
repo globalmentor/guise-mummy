@@ -21,24 +21,24 @@ If a link has a {@link NavigateActionListener} as one of its action listeners, t
 public class WebImageBooleanSelectActionControlViewer<C extends ImageBooleanSelectActionControl> extends WebImageActionControlDepictor<C>
 {
 
-	/**Determines the image to use for this component.
+	/**Determines the image URI to use for this component.
 	This implementation returns the selected image if the component is selected and there is a selected image.
 	@return The image to use for the component, or <code>null</code> if there should not be an image.
 	@see ImageComponent#getImageURI()
 	@see ImageBooleanSelectActionControl#isSelected()
-	@see ImageBooleanSelectActionControl#getRolloverImage()
+	@see ImageBooleanSelectActionControl#getRolloverImageURI()
 	*/
-	protected URI getImage()
+	protected URI getImageURI()
 	{
 		final C component=getDepictedObject();	//get the component
 		URI image=null;	//we'll determine the image
 		final boolean isSelected=component.getValue().booleanValue();	//see if the component is selected
 		if(isSelected)	//if the component is selected
 		{
-			image=component.getSelectedImage();	//use the selected image
+			image=component.getSelectedImageURI();	//use the selected image
 			if(image==null)	//if there is no selected image
 			{
-				image=component.getRolloverImage();	//use the rollover image
+				image=component.getRolloverImageURI();	//use the rollover image
 			}
 		}
 		if(image==null)	//if the component is not selected, or there is no selected or rollover image image
@@ -48,14 +48,14 @@ public class WebImageBooleanSelectActionControlViewer<C extends ImageBooleanSele
 		return image;	//return the image we determined
 	}
 	
-	/**Determines the rollover image to use for this component.
+	/**Determines the rollover image URI to use for this component.
 	This implementation returns the component's rollover image.
 	@return The rollover image to use for the component, or <code>null</code> if there should be no rollover image.
-	@see ImageBooleanSelectActionControl#getRolloverImage()
+	@see ImageBooleanSelectActionControl#getRolloverImageURI()
 	*/
-	protected URI getRolloverImage()
+	protected URI getRolloverImageURI()
 	{
-		return getDepictedObject().getRolloverImage();	//get the component rollover image
+		return getDepictedObject().getRolloverImageURI();	//get the component rollover image
 	}
 	
 	/**Begins the rendering process.

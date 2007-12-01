@@ -5,7 +5,7 @@ import com.guiseframework.platform.DepictedObject;
 /**Indicates that an action has been initiated on the web platform.
 @author Garret Wilson
 */
-public class WebActionEvent extends AbstractWebDepictEvent
+public class WebActionDepictEvent extends AbstractWebDepictEvent
 {
 	/**The ID of the component target site, or <code>null</code> if there was no component target.*/
 	private final String targetID;
@@ -32,7 +32,7 @@ public class WebActionEvent extends AbstractWebDepictEvent
 	@param option The zero-based option, such as 0 for a left click or 1 for a right click.
 	@exception NullPointerException if the given context and/or component ID is <code>null</code>.
 	*/
-	public WebActionEvent(final DepictedObject depictedObject, final String targetID, final String actionID, final int option)
+	public WebActionDepictEvent(final DepictedObject depictedObject, final String targetID, final String actionID, final int option)
 	{
 		super(depictedObject);	//construct the parent class
 		this.targetID=targetID;

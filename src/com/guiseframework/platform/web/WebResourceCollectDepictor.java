@@ -24,9 +24,11 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 {
 
 	/**The web commands for controlling a resource collect control.*/
-	public enum ResourceCollectCommand implements WebCommand
+	public enum ResourceCollectCommand implements WebPlatformCommand
 	{
-		/**The command to start receiving resources.*/
+		/**The command to start receiving resources.
+		parameters: <code>{{@value #DESTINATION_URI_PROPERTY}:"<var>destinationURI</var>"}</code>
+		*/
 		RESOURCE_COLLECT_RECEIVE,
 
 		/**The command to complete receiving resources.*/
@@ -34,10 +36,10 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 
 		/**The command to cancel a resource transfer.*/
 		RESOURCE_COLLECT_CANCEL;
-	}
 
-	/**The property for specifying the destination URI of the resources to receive.*/
-	public final static String DESTINATION_URI_PROPERTY="destionationURI";
+		/**The property for specifying the destination URI of the resources to receive.*/
+		public final static String DESTINATION_URI_PROPERTY="destinationURI";
+	}
 
 	/**Default constructor using the XHTML <code>&lt;input&gt;</code> element.*/
 	public WebResourceCollectDepictor()
@@ -58,15 +60,15 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 		{
 			receiveResourceURI=URI.create(receiveResourceURI.toString()+destinationBookmark.toString());	//append the bookmark query
 		}
-		getPlatform().getSendEventQueue().add(new WebCommandEvent<ResourceCollectCommand>(getDepictedObject(), ResourceCollectCommand.RESOURCE_COLLECT_RECEIVE,
-				new NameValuePair<String, Object>(DESTINATION_URI_PROPERTY, receiveResourceURI)));	//send a command for the control to start receiving		
+		getPlatform().getSendMessageQueue().add(new WebCommandDepictEvent<ResourceCollectCommand>(getDepictedObject(), ResourceCollectCommand.RESOURCE_COLLECT_RECEIVE,
+				new NameValuePair<String, Object>(ResourceCollectCommand.DESTINATION_URI_PROPERTY, receiveResourceURI)));	//send a command for the control to start receiving		
 	}	
 
 	/**Requests that resource collection be canceled.*/
 	public void cancel()
 	{
 		final C control=getDepictedObject();	//get the resource collect control
-		getPlatform().getSendEventQueue().add(new WebCommandEvent<ResourceCollectCommand>(getDepictedObject(), ResourceCollectCommand.RESOURCE_COLLECT_CANCEL));	//send a resource collect cancel command to the platform
+		getPlatform().getSendMessageQueue().add(new WebCommandDepictEvent<ResourceCollectCommand>(getDepictedObject(), ResourceCollectCommand.RESOURCE_COLLECT_CANCEL));	//send a resource collect cancel command to the platform
 		control.setState(TaskState.CANCELED);	//tell the control that the transfer has been cancelled
 		control.clearResourcePaths();	//clear all the resource paths
 	}
@@ -77,9 +79,9 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 	*/
 	public void processEvent(final PlatformEvent event)
 	{
-		if(event instanceof WebChangeEvent)	//if a property changed
+		if(event instanceof WebChangeDepictEvent)	//if a property changed
 		{
-			final WebChangeEvent webChangeEvent=(WebChangeEvent)event;	//get the web change event
+			final WebChangeDepictEvent webChangeEvent=(WebChangeDepictEvent)event;	//get the web change event
 			final C component=getDepictedObject();	//get the depicted object
 			if(webChangeEvent.getDepictedObject()!=component)	//if the event was meant for another depicted object
 			{
@@ -95,9 +97,9 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 				}
 			}
 		}
-		else if(event instanceof WebProgressEvent)	//if this is a progress event
+		else if(event instanceof WebProgressDepictEvent)	//if this is a progress event
 		{
-			final WebProgressEvent webProgressEvent=(WebProgressEvent)event;	//get the progress event
+			final WebProgressDepictEvent webProgressEvent=(WebProgressDepictEvent)event;	//get the progress event
 			final C component=getDepictedObject();	//get the depicted object
 			if(webProgressEvent.getDepictedObject()!=component)	//if the event was meant for another depicted object
 			{
@@ -128,7 +130,7 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 				&& ResourceCollectControl.STATE_PROPERTY.equals(propertyChangeEvent.getPropertyName())	//if the state property changed
 				&& TaskState.COMPLETE==propertyChangeEvent.getNewValue())	//if the control completed a transfer
 		{
-			getPlatform().getSendEventQueue().add(new WebCommandEvent<ResourceCollectCommand>(getDepictedObject(), ResourceCollectCommand.RESOURCE_COLLECT_COMPLETE));	//send a resource collect complete command to the platform
+			getPlatform().getSendMessageQueue().add(new WebCommandDepictEvent<ResourceCollectCommand>(getDepictedObject(), ResourceCollectCommand.RESOURCE_COLLECT_COMPLETE));	//send a resource collect complete command to the platform
 		}
 	}
 

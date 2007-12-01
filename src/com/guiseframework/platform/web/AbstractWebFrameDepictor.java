@@ -47,12 +47,12 @@ public class AbstractWebFrameDepictor<C extends Frame> extends AbstractWebCompon
 	@param component The component into which this view is being installed.
 	@exception NullPointerException if the given component is <code>null</code>.
 	@exception IllegalStateException if this view is already installed in a component.
-	@see #getChangeListener()
+	@see #getDepictedPropertyChangeListener()
 	*/
 	public void installed(final C component)
 	{
 		super.installed(component);	//install ourselves normally
-		component.getSession().addPropertyChangeListener(getChangeListener());	//listen for session changes
+		component.getSession().addPropertyChangeListener(getDepictedPropertyChangeListener());	//listen for session changes
 		getIgnoredProperties().add(GuiseSession.INPUT_STRATEGY_PROPERTY);	//ignore changes to GuiseSession.inputStrategy, because changes to the input strategy does not affect the frame's view
 	}
 
@@ -61,12 +61,12 @@ public class AbstractWebFrameDepictor<C extends Frame> extends AbstractWebCompon
 	@param component The component from which this view is being uninstalled.
 	@exception NullPointerException if the given component is <code>null</code>.
 	@exception IllegalStateException if this view is not installed in a component.
-	@see #getChangeListener()
+	@see #getDepictedPropertyChangeListener()
 	*/
 	public void uninstalled(final C component)
 	{
 		super.uninstalled(component);	//uninstall ourselves normally
-		component.getSession().removePropertyChangeListener(getChangeListener());	//stop listening for session changes
+		component.getSession().removePropertyChangeListener(getDepictedPropertyChangeListener());	//stop listening for session changes
 	}
 
 	/**Renders the body of the component.

@@ -1371,13 +1371,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		}		
 
 	/**The synchronized list of postponed model events.*/
-	private final List<PostponedEvent<?>> queuedModelEventList=synchronizedList(new LinkedList<PostponedEvent<?>>());	//use a linked list because we'll be removing items from the front of the list as we process the events TODO fix; this doesn't seem to be the case anymore, so we can use a synchronized array list
+//TODO del	private final List<PostponedEvent<?>> queuedModelEventList=synchronizedList(new LinkedList<PostponedEvent<?>>());	//use a linked list because we'll be removing items from the front of the list as we process the events TODO fix; this doesn't seem to be the case anymore, so we can use a synchronized array list
 
 		/**Queues a postponed event to be fired after the context has finished processing events.
 		If a Guise context is currently processing events, the event will be queued for later.
 		If no Guise context is currently processing events, the event will be fired immediately.
 		@param postponedEvent The event to fire at a later time.
 		*/
+/*TODO del
 		public synchronized void queueEvent(final PostponedEvent<?> postponedEvent)
 		{
 //TODO fix; decide if we want to allow delayed events			if(context!=null && (context.getState()==GuiseContext.State.PROCESS_EVENT))	//if the context is processing an event
@@ -1390,8 +1391,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				postponedEvent.fireEvent();	//go ahead and fire the event immediately
 			}
 		}
+*/
 
 		/**Fires any postponed model events that are queued.*/
+/*TODO del
 		protected void fireQueuedModelEvents()
 		{
 			synchronized(queuedModelEventList)	//don't allow any changes to the postponed model event list while we access it
@@ -1412,6 +1415,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				queuedModelEventList.clear();	//remove all pending model events
 			}
 		}
+*/
 
 	/**Called when the session is initialized.
 	@exception IllegalStateException if the session is already initialized.
@@ -1458,10 +1462,12 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@param propertyChangeEvent The event to fire.
 	@see GuiseSession#queueEvent(com.garretwilson.event.PostponedEvent)
 	*/
+/*TODO del when postponed property change events are removed
 	protected void firePropertyChange(final PropertyChangeEvent propertyChangeEvent)
 	{
 		queueEvent(createPostponedPropertyChangeEvent(propertyChangeEvent));	//create and queue a postponed property change event
 	}
+*/
 
 	/**Creates a component to indicate Guise busy status.
 	@return A component to indicate Guise busy status.

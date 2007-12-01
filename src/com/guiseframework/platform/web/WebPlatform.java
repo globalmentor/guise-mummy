@@ -1,10 +1,12 @@
 package com.guiseframework.platform.web;
 
 import java.net.URI;
+import java.util.Queue;
 
 import com.garretwilson.net.URIPath;
 
 import com.guiseframework.GuiseApplication;
+import com.guiseframework.platform.DepictedObject;
 import com.guiseframework.platform.Platform;
 
 /**The web platform for Guise.
@@ -62,6 +64,18 @@ public interface WebPlatform extends Platform
 	/**The path of the Guise Flash file, relative to the application.*/
 	public final static URIPath GUISE_FLASH_PATH=GuiseApplication.GUISE_ASSETS_FLASH_PATH.resolve("guise.swf");
 
+	/**The web commands for controlling polling.*/
+	public enum PollCommand implements WebPlatformCommand
+	{
+		/**The command to set the polling interval.
+		parameters: <code>{{@value #INTERVAL}:"<var>interval</var>"}</code>
+		*/
+		POLL_INTERVAL;
+
+		/**The property for specifying the poll interval in milliseconds.*/
+		public final static String INTERVAL_PROPERTY="interval";
+	}
+
 	/**Generates an ID for the given depicted object appropriate for using on the platform.
 	@param depictID The depict ID to be converted to a platform ID.
 	@return The form of the depict ID appropriate for using on the platform.
@@ -85,5 +99,41 @@ public interface WebPlatform extends Platform
 	@exception IllegalStateException if no depict context can be returned in the current depiction state.
 	*/
 	public WebDepictContext getDepictContext();
+
+	/**@return The thread-safe queue of messages to be delivered to the platform.*/
+	public Queue<WebPlatformMessage> getSendMessageQueue();
+
+	/**@return The current polling interval in milleseconds.*/
+	public int getPollInterval();
+
+	/**Sets the polling interval in millseconds.
+	@param newPollInterval The polling interval in millseconds.
+	@exception IllegalArgumentException if the given polling interval is less than zero.
+	*/
+	public void setPollInterval(final int newPollInterval);
+
+	/**Requests a polling interval for a given depicted object.
+	The actual polling interval will be updated if the given polling interval is smaller than the current actual polling interval.
+	@param depictedObject The depicted object requesting a polling interval.
+	@param pollInterval The polling interval in milleseconds.
+	@return <code>true</code> if the polling interval changed as a result of this request.
+	@exception NullPointerException if the given depicted object is <code>null</code>.
+	@exception IllegalArgumentException if the value is less than zero.
+	@see #discontinuePollInterval(DepictedObject)
+	@see #getPollInterval()
+	@see #setPollInterval()
+	*/ 
+	public boolean requestPollInterval(final DepictedObject depictedObject, final int pollInterval);
+
+	/**Indicates that a depicted object no longer requests a particular polling interval.
+	The actual polling interval will be updated if the relinquished poll interval is less than or equal to the current poll interval.
+	@param depictedObject The depicted object that is relinquishing a polling interval.
+	@return <code>true</code> if the polling interval changed as a result of this relinquishment.
+	@exception NullPointerException if the given depicted object is <code>null</code>.
+	@see #requestPollInterval(DepictedObject, int)
+	@see #getPollInterval()
+	@see #setPollInterval()
+	*/ 
+	public boolean discontinuePollInterval(final DepictedObject depictedObject);
 
 }

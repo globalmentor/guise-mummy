@@ -9,6 +9,7 @@ import com.guiseframework.component.layout.Layout;
 import com.guiseframework.component.transfer.Transferable;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
+import com.guiseframework.platform.AbstractDepictor.DepictedPropertyChangeListener;
 
 /**An abstract implementation of a component depictor.
 If the component has a model, this implementation will automatically register to listen to its properties being changed.
@@ -22,11 +23,14 @@ This implementation only dirties the depictors of containers, not composite comp
 public abstract class AbstractComponentDepictor<C extends Component> extends AbstractDepictor<C> implements ComponentDepictor<C>
 {
 
-	/**@return The listener that marks this depiction as dirty if a change occurs.*/
-	protected ChangeListener getChangeListener() {return (ChangeListener)super.getChangeListener();}
+	/**The listener that marks this depiction as dirty if direct children are added or removed, or <code>null</code> if the depicted component is not a container or is not installed.*/
+	private DepictedCompositeComponentListener depictedCompositeComponentListener=null;
+
+		/**@return The listener that marks this depiction as dirty if direct children are added or removed, or <code>null</code> if the depicted component is not a container or is not installed.*/
+		protected DepictedCompositeComponentListener getDepictedCompositeComponentListener() {return depictedCompositeComponentListener;}
 
 	/**The listener that listens for the change of a child's property, such as a value model's value, and marks the view as dirty.*/
-	protected final PropertyChangeListener childPropertyChangeListener=new PropertyChangeListener()
+	protected final PropertyChangeListener childPropertyChangeListener=new PropertyChangeListener()	//TODO only create this if needed
 		{
 			public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//if a property changes
 			{
@@ -38,48 +42,48 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 	/**Default constructor.*/
 	public AbstractComponentDepictor()
 	{
-		changeListener=new ChangeListener();	//create our own type of change listener to replace the old one TODO improve this so that an object doesn't get created twice
 		getIgnoredProperties().add(Component.INPUT_STRATEGY_PROPERTY);	//ignore Component.inputStrategy, because changes to the input strategy does not affect the component's view
 		getIgnoredProperties().add(Component.VALID_PROPERTY);	//ignore Component.valid, because we don't want to mark composite components as dirty just because a child does not have valid input
 	}
 		
 	/**Called when the depictor is installed in a component.
 	If the component is a container, this version listens for container events and marks the view as needing updated.
-	@param component The component into which this view is being installed.
+	@param component The component into which this depictor is being installed.
 	@exception NullPointerException if the given component is <code>null</code>.
-	@exception IllegalStateException if this view is already installed in a component.
-	@see #changeListener
+	@exception IllegalStateException if this depictor is already installed in a component.
+	@see #depictedPropertyChangeListener
 	*/
 	public void installed(final C component)
 	{
 		super.installed(component);	//perform the default installation
 //TODO fix; dirtying the view of all composite components would make web pages reload when frames are added to the application frame; find a way to make this more consistent		if(component instanceof CompositeComponent)	//if the component is a composite component
-		if(component instanceof Container)	//if the component is a container
+		if(component instanceof Container)	//if the component is a container TODO why aren't we checking for a composite component?
 		{
+			depictedCompositeComponentListener=new DepictedCompositeComponentListener();	//create a change listener to listen for composite components changing
 			final CompositeComponent compositeComponent=(CompositeComponent)component;	//cast the component to a composite component
-			compositeComponent.addCompositeComponentListener(getChangeListener());	//listen for composite component events
+			compositeComponent.addCompositeComponentListener(depictedCompositeComponentListener);	//listen for composite component events
 		}
 		if(component instanceof LayoutComponent)	//if the component is a layout component
 		{
 			final LayoutComponent layoutComponent=(LayoutComponent)component;	//cast the component to a layout component
-			layoutComponent.getLayout().addPropertyChangeListener(getChangeListener());	//listen for layout property change events (including layout constraint property change events)
+			layoutComponent.getLayout().addPropertyChangeListener(getDepictedPropertyChangeListener());	//listen for layout property change events (including layout constraint property change events)
 		}
 		if(component instanceof ValueModel)	//if the component holds a value, listen for the value's properties changing
 		{
 			final Object value=((ValueModel<?>)component).getValue();	//get the current value
 			if(value instanceof PropertyBindable)	//if there is a value that supports bound properties
 			{
-				((PropertyBindable)value).addPropertyChangeListener(getChangeListener());	//listen for changes in the properties of the value
+				((PropertyBindable)value).addPropertyChangeListener(getDepictedPropertyChangeListener());	//listen for changes in the properties of the value
 			}
 		}
 	}
 
-	/**Called when the view is uninstalled from a component.
+	/**Called when the depictor is uninstalled from a component.
 	If the component is a container, this version stops listening for container events.
-	@param component The component from which this view is being uninstalled.
+	@param component The component from which this depictor is being uninstalled.
 	@exception NullPointerException if the given component is <code>null</code>.
-	@exception IllegalStateException if this view is not installed in a component.
-	@see #changeListener
+	@exception IllegalStateException if this depictor is not installed in a component.
+	@see #depictedPropertyChangeListener
 	*/
 	public void uninstalled(final C component)
 	{
@@ -88,19 +92,20 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 		if(component instanceof Container)	//if the component is a container
 		{
 			final CompositeComponent compositeComponent=(CompositeComponent)component;	//cast the component to a composite component
-			compositeComponent.removeCompositeComponentListener(getChangeListener());	//stop listening for composite component events
+			compositeComponent.removeCompositeComponentListener(getDepictedCompositeComponentListener());	//stop listening for composite component events
+			depictedCompositeComponentListener=null;	//release the comopsite component listener
 		}
 		if(component instanceof LayoutComponent)	//if the component is a layout component
 		{
 			final LayoutComponent layoutComponent=(LayoutComponent)component;	//cast the component to a layout component
-			layoutComponent.getLayout().removePropertyChangeListener(changeListener);	//stop listening for layout property change events (including layout constraint property change events)
+			layoutComponent.getLayout().removePropertyChangeListener(getDepictedPropertyChangeListener());	//stop listening for layout property change events (including layout constraint property change events)
 		}
 		if(component instanceof ValueModel)	//if the component holds a value, stop listening for the value's properties changing
 		{
 			final Object value=((ValueModel<?>)component).getValue();	//get the current value
 			if(value instanceof PropertyBindable)	//if there is a value that supports bound properties
 			{
-				((PropertyBindable)value).removePropertyChangeListener(getChangeListener());	//stop listening for changes in the properties of the value
+				((PropertyBindable)value).removePropertyChangeListener(getDepictedPropertyChangeListener());	//stop listening for changes in the properties of the value
 			}
 		}
 	}
@@ -163,23 +168,6 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 		}
 		super.processEvent(event);	//do the default processing of the event
 	}
-
-	/**Processes the given event for any children.
-	@param component The controlled component.
-	@param event The event to be processed.
-	*/
-/*TODO del if not needed
-	protected void processChildEvents(final C component, final WebPlatformEvent event)
-	{
-		if(component instanceof CompositeComponent)	//if this is a composite component
-		{
-			for(final Component childComponent:((CompositeComponent)component).getChildren())	//for each child component
-			{
-				childComponent.processEvent(event);	//process the event for the child
-			}
-		}
-	}
-*/
 
 	/**Updates the depiction of the object.
 	This implementation updates child components, if any.
@@ -252,36 +240,36 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 		}
 	}
 
-	/**A listener that marks this depiction as dirty if changes occur.
-	This class implements various event listeners and marks the depiction as dirty accordingly.
-	@author Garret Wilson
-	*/
-	protected class ChangeListener extends AbstractDepictor.ChangeListener implements CompositeComponentListener
+	/**Called when a depicted object bound property is changed.
+	This method may also be called for objects related to the depicted object, so if specific properties are checked the event source should be verified to be the depicted object.
+	This implementation marks the property as being modified if the property is not an ignored property.
+	@param propertyChangeEvent An event object describing the event source and the property that has changed.
+	@see #getIgnoredProperties()
+	@see #setPropertyModified(String, boolean)
+	*/ 
+	protected void depictedObjectPropertyChange(final PropertyChangeEvent propertyChangeEvent)
 	{
-
-		/**Called when a bound property is changed.
-		@param propertyChangeEvent An event object describing the event source and the property that has changed.
-		*/ 
-		public void propertyChange(final PropertyChangeEvent propertyChangeEvent)
-		{
-			super.propertyChange(propertyChangeEvent);	//do the default property change functionality
-			final Object source=propertyChangeEvent.getSource();	//get the source of the event
-			final String propertyName=propertyChangeEvent.getPropertyName();	//get the name of the changing property
-			final Object oldValue=propertyChangeEvent.getOldValue();	//get the old value
-			final Object newValue=propertyChangeEvent.getOldValue();	//get the new value
+		super.depictedObjectPropertyChange(propertyChangeEvent);	//do the default property change functionality
+		final C depictedObject=getDepictedObject();	//get the depicted object
+		final Object source=propertyChangeEvent.getSource();	//get the source of the event
+		final String propertyName=propertyChangeEvent.getPropertyName();	//get the name of the changing property
+		final Object oldValue=propertyChangeEvent.getOldValue();	//get the old value
+		final Object newValue=propertyChangeEvent.getOldValue();	//get the new value
 //Debug.trace("property", propertyChangeEvent.getPropertyName(), "of source", source, "ID", source instanceof Component ? ((Component)source).getID() : "(non-component)", "change from", propertyChangeEvent.getOldValue(), "to", propertyChangeEvent.getNewValue());
+		if(source==depictedObject)	//if this property change was on the depicted object
+		{
 			if(source instanceof Container && Container.LAYOUT_PROPERTY.equals(propertyName))	//if the source is a container and the container layout changed
 			{
 				if(oldValue instanceof Layout)	//if we know the old layout
 				{
-					((Layout<?>)oldValue).removePropertyChangeListener(this);	//stop listening for layout property change events on the old layout (including layout constraint property change events)
+					((Layout<?>)oldValue).removePropertyChangeListener(getDepictedPropertyChangeListener());	//stop listening for layout property change events on the old layout (including layout constraint property change events)
 				}
 				if(newValue instanceof Layout)	//if we know the new layout
 				{
-					((Layout<?>)newValue).addPropertyChangeListener(this);	//listen for layout property change events on the new layout (including layout constraint property change events)
+					((Layout<?>)newValue).addPropertyChangeListener(getDepictedPropertyChangeListener());	//listen for layout property change events on the new layout (including layout constraint property change events)
 				}
 			}
-			if(getDepictedObject() instanceof ValueModel && ValueModel.VALUE_PROPERTY.equals(propertyName))	//if the component holds a value and its value is changing
+			if(depictedObject instanceof ValueModel && ValueModel.VALUE_PROPERTY.equals(propertyName))	//if the component holds a value and its value is changing
 			{
 				if(oldValue instanceof PropertyBindable)	//if the old value supported bound properties
 				{
@@ -293,6 +281,14 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 				}
 			}
 		}
+	}
+
+	/**A listener that marks this depiction as dirty if direct children are added or deleted.
+	@author Garret Wilson
+	*/
+	protected class DepictedCompositeComponentListener implements CompositeComponentListener
+	{
+
 
 		/**Called when a child component is added to a composite component.
 		@param childComponentEvent The event indicating the added child component and the target parent composite component.

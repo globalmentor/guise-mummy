@@ -147,18 +147,12 @@ public abstract class AbstractPlatform implements Platform
 			return depictIDCounter.incrementAndGet();	//atomically get the next counter value
 		}	
 
-	/**The thread-safe queue of events to be delivered to the platform.*/
-	private final Queue<PlatformEvent> sendEventQueue=new ConcurrentLinkedQueue<PlatformEvent>();
+	/**The thread-safe queue of messages to be delivered to the platform.*/
+	private final Queue<? extends PlatformMessage> sendMessageQueue=new ConcurrentLinkedQueue<PlatformMessage>();
 
-		/**@return The thread-safe queue of events to be delivered to the platform.*/
-		public Queue<PlatformEvent> getSendEventQueue() {return sendEventQueue;}
+		/**@return The thread-safe queue of messages to be delivered to the platform.*/
+		public Queue<? extends PlatformMessage> getSendMessageQueue() {return sendMessageQueue;}
 	
-		/**Offers an event to be sent to the platform.
-		@param event The event to be queued for sending.
-		@return <code>true</code> if the event was successfully queued for sending to the platform.
-		*/
-//TODO del if not needed		public boolean offerSendEvent(final PlatformEvent event) {return sendEventQueue.offer(event);}
-
 	/**Application constructor.
 	@param application The Guise application running on this platform.
 	@param environment The initial environment of the session.

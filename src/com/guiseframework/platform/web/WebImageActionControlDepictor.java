@@ -1,9 +1,11 @@
 package com.guiseframework.platform.web;
 
+import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
+import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
@@ -19,6 +21,7 @@ import static com.guiseframework.platform.web.WebPlatform.*;
 /**Strategy for rendering an image action control as an XHTML <code>&lt;img&gt;</code> inside a <code>&lt;a&gt;</code> element.
 If a link has a {@link NavigateActionListener} as one of its action listeners, the generated <code>href</code> URI will be that of the listener,
 	and a <code>target</code> attribute will be set of the listener specifies a viewport ID.
+This depictor supports {@link PendingImageComponent}.
 <p>This view uses the following attributes which are not in XHTML:
 	<ul>
 		<li><code>guise:originalSrc</code></li>
@@ -31,21 +34,76 @@ If a link has a {@link NavigateActionListener} as one of its action listeners, t
 public class WebImageActionControlDepictor<C extends ImageComponent & ActionControl> extends WebLinkDepictor<C>
 {
 
-	/**Determines the image to use for this component.
-	This implementation returns the component's image.
-	@return The image to use for the component, or <code>null</code> if there should not be an image.
-	@see ImageComponent#getImageURI()
+	/**Called when the depictor is installed in a depicted object.
+	This version requests a poll interval if the image is pending.
+	@param component The component into which this depictor is being installed.
+	@exception NullPointerException if the given depicted object is <code>null</code>.
+	@exception IllegalStateException if this depictor is already installed in a depicted object.
 	*/
-	protected URI getImage()
+	public void installed(final C component)
 	{
-		return getDepictedObject().getImageURI();	//return the component's normal image
+		super.installed(component);	//perform the default installation
+		if(component instanceof PendingImageComponent && ((PendingImageComponent)component).isImagePending())	//if the image is pending
+		{
+			getPlatform().requestPollInterval(component, 2000);	//indicate that polling should occur for this image TODO use a constant			
+		}
+	}
+
+	/**Called when the depictor is uninstalled from a depicted object.
+	This version requests any poll interval.
+	@param component The component from which this depictor is being uninstalled.
+	@exception NullPointerException if the given depicted object is <code>null</code>.
+	@exception IllegalStateException if this depictor is not installed in a depicted object.
+	*/
+	public void uninstalled(final C component)
+	{
+		if(component instanceof PendingImageComponent && ((PendingImageComponent)component).isImagePending())	//if the image is pending
+		{
+			getPlatform().discontinuePollInterval(component);	//indicate that polling should no longer occur for this image; another depictor can request polling if necessary
+		}
+		super.uninstalled(component);	//perform the default uninstallation
+	}
+
+	/**Called when a depicted object bound property is changed.
+	This method may also be called for objects related to the depicted object, so if specific properties are checked the event source should be verified to be the depicted object.
+	This implementation requests or discontinues a poll interval when the pending state changes. 
+	@param propertyChangeEvent An event object describing the event source and the property that has changed.
+	@see PendingImageComponent#isImagePending()
+	*/
+	protected void depictedObjectPropertyChange(final PropertyChangeEvent propertyChangeEvent)
+	{
+		super.depictedObjectPropertyChange(propertyChangeEvent);	//do the default property change functionality
+		final C component=getDepictedObject();	//get the depicted object
+		if(propertyChangeEvent.getSource()==getDepictedObject() && component instanceof PendingImageComponent && PendingImageComponent.IMAGE_PENDING_PROPERTY.equals(propertyChangeEvent.getPropertyName()))	//if the image pending property is changing
+		{
+			final WebPlatform webPlatform=getPlatform();	//get the web platform
+			if(Boolean.TRUE.equals(propertyChangeEvent.getNewValue()))	//if the image is now pending
+			{
+				webPlatform.requestPollInterval(component, 2000);	//indicate that polling should occur for this image TODO use a constant
+			}
+			else	//if the image is no longer pending
+			{
+				webPlatform.discontinuePollInterval(component);	//indicate that polling should no longer occur for this image
+			}
+		}
+	}
+
+	/**Determines the image URI to use for this component.
+	If the delegate image is a {@link PendingImageComponent} with a pending image, this version return the {@link PendingImageComponent#getPendingImageURI()} value.
+	Otherwise, this version returns the delegate image's {@link ImageComponent#getImageURI()} value.
+	@return The image to use for the component, or <code>null</code> if there should not be an image.
+	*/
+	protected URI getImageURI()
+	{
+		final C component=getDepictedObject();	//get the component
+		return component instanceof PendingImageComponent && ((PendingImageComponent)component).isImagePending() ? ((PendingImageComponent)component).getPendingImageURI() : component.getImageURI();	//get the image URI to use, using the pending image URI if appropriate
 	}
 	
-	/**Determines the rollover image to use for this component.
+	/**Determines the rollover image URI to use for this component.
 	This implementation returns <code>null</code>.
 	@return The rollover image to use for the component, or <code>null</code> if there should be no rollover image.
 	*/
-	protected URI getRolloverImage()
+	protected URI getRolloverImageURI()
 	{
 		return null;	//by default don't use a rollover image
 	}
@@ -110,20 +168,20 @@ public class WebImageActionControlDepictor<C extends ImageComponent & ActionCont
 		final C component=getDepictedObject();	//get the component
 		final String label=component.getLabel();	//get the component label, if there is one
 		final String resolvedLabel=label!=null ? session.resolveString(label) : null;	//resolve the label, if there is one
-		final URI image=getImage();	//get the image to use
-		if(image!=null)	//if there is an image
+		final URI imageURI=getImageURI();	//get the image URI to use
+		if(imageURI!=null)	//if there is an image URI
 		{
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IMG, true);	//<xhtml:img>
 			writeBodyIDClassAttributes(null, COMPONENT_BODY_CLASS_SUFFIX);	//write the ID and class for the main element
 			writeStyleAttribute(getBodyStyles());	//write the component's body styles
-			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, session.resolveURI(image).toString());	//src="image"
+			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, session.resolveURI(imageURI).toString());	//src="image"
 			//TODO fix to use description or something else, and always write an alt, even if there is no information
 			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_ALT, resolvedLabel!=null ? AbstractModel.getPlainText(resolvedLabel, component.getLabelContentType()) : "");	//alt="label"
 				//TODO determine which rollover image we want to use if the image is selected
-			final URI rolloverImage=getRolloverImage();	//get the rollover image to use
+			final URI rolloverImage=getRolloverImageURI();	//get the rollover image to use
 			if(rolloverImage!=null)	//if there is a rollover image
 			{
-				depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ELEMENT_IMG_ATTRIBUTE_ORIGINAL_SRC, session.resolveURI(image).toString());	//guise:originalSrc="image"
+				depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ELEMENT_IMG_ATTRIBUTE_ORIGINAL_SRC, session.resolveURI(imageURI).toString());	//guise:originalSrc="image"
 				depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ELEMENT_IMG_ATTRIBUTE_ROLLOVER_SRC, session.getApplication().resolveURI(rolloverImage).toString());	//guise:rolloverSrc="image"
 			}
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IMG);	//</html:img>

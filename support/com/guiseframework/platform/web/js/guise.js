@@ -109,6 +109,8 @@ is notified of the change in state.)
 
 /**See if the browser is Firefox.*/
 var isUserAgentFirefox=navigator.userAgentName=="Firefox";
+/**See if the browser is Firefox less than 3.*/
+var isUserAgentFirefoxLessThan3=isUserAgentFirefox && navigator.userAgentVersionNumber<3;
 /**See if the browser is IE.*/
 var isUserAgentIE=navigator.userAgentName=="MSIE";
 /**See if the browser is IE6.*/
@@ -117,7 +119,7 @@ var isUserAgentIE6=isUserAgentIE && navigator.userAgentVersionNumber<7;
 /**Whether Guise AJAX communication is initially enabled.*/
 var GUISE_AJAX_ENABLED=true;
 /**The interval, in milliseconds, for polling the server under normal conditions, or -1 if no polling should occur.*/
-var GUISE_AJAX_POLL_INTERVAL=60000;
+var GUISE_AJAX_POLL_INTERVAL=-1;	//TODO del when new server-directed poll interval works
 /**The interval, in milliseconds, for polling the server during file uploads, or -1 if no polling should occur.*/
 var GUISE_AJAX_UPLOAD_POLL_INTERVAL=3000;
 
@@ -1011,11 +1013,8 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 		proto._processCommand=function(element)
 		{
 			var objectID=element.getAttribute(this.ResponseElement.OBJECT_ID);	//get the object ID, if there is one
-				//assert objectID
 			var command=element.getAttribute(this.ResponseElement.COMMAND);	//get the command
-				//assert commandName
 			var parameters=JSON.evaluate(DOMUtilities.getNodeText(element));	//parse the parameters
-				//assert parameters
 //			alert("received command "+command+" for object "+objectID+" with audioURI "+parameters["audioURI"]);
 			switch(command)	//see which command this is
 			{
@@ -1040,6 +1039,10 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 					break;
 				case "file-upload":
 					this._flash.uploadFile(objectID, parameters["id"], parameters["destinationURI"]);	//upload the identified file to the specified destination URI
+					break;
+				case "poll-interval":
+//console.log("received poll interval request:", parameters["interval"]);
+					this.setPollInterval(parameters["interval"]);	//poll at the requested interval
 					break;
 				case "resource-collect-receive":
 					var element=document.getElementById(objectID);	//get the component element
@@ -1135,8 +1138,9 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 						{
 							this._synchronizeElement(oldElement, childNode, true);	//synchronize this element tree, indicating that this is the root of a synchronization subtree
 							this._updateComponents(oldElement, true);	//now that we've patched the old element, update any components that rely on the old element
-							if(isUserAgentFirefox)	//if we're running Firefox and we just patched an element inside a Mozilla inline box, Firefox won't correctly update the flow so we'll have to do that manually TODO fix for Firefox 3
+							if(isUserAgentFirefoxLessThan3)	//if we're running Firefox <3 and we just patched an element inside a Mozilla inline box, Firefox won't correctly update the flow so we'll have to do that manually
 							{
+//console.debug("patched element", oldElement, "on Moz<3");
 									//TODO at some point we may need to check the patched descendants, too---this only works if the root of the patched tree or one of its ancestors was a Mozilla inline box
 								var mozInlineBoxAncestor=Node.getAncestorElementByStyle(oldElement, "display", "-moz-inline-box");	//see if there is a Mozilla inline box element ancestor (including this element)
 								if(mozInlineBoxAncestor)	//if there is a Mozilla inline box element, we'll have to do special reflowing after all patching is done
@@ -1166,12 +1170,16 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 			}
 			if(mozInlineBoxParentIDSet)	//if we have a set of inline box parent IDs to fix for Mozilla
 			{
+//console.debug("need to do some parent moz inline box updates");
 				for(var mozInlineBoxParentID in mozInlineBoxParentIDSet)	//for each parent of a Mozilla inline box
 				{
+//console.debug("ready to find ID", mozInlineBoxParentID);
 					var mozInlineBoxParent=document.getElementById(mozInlineBoxParentID);	//get the Mozilla inline box parent element
+//console.debug("got inline box parent", mozInlineBoxParent, "ready to refresh");
 					if(mozInlineBoxParent)	//if we have a parent to a Mozilla inline box that was updated
 					{
 						Node.refresh(mozInlineBoxParent);	//refresh the Mozilla inline box container by removing it from the tree and putting it back
+						window.setTimeout(Node.refresh.bind(this, mozInlineBoxParent), 100);	//refresh the inline box container again in another thread; this is a horribly inefficient hack, but it is needed by Moxilla 2.x in some cases when the image source is updated
 					}
 				}
 			}
@@ -2476,7 +2484,7 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 									}
 		//TODO del							alert("rollover source: "+node.getAttribute("guise:rolloverSrc"));
 								}
-								if(isUserAgentFirefox)	//if we're running Firefox, check for the inline box layout bug that doesn't show images that have not yet been cached TODO fix for Firefox 3
+								if(isUserAgentFirefoxLessThan3)	//if we're running Firefox <3, check for the inline box layout bug that doesn't show images that have not yet been cached
 								{
 									if(node.offsetWidth==0 && node.offsetHeight==0)	//if this image has no dimensions
 									{

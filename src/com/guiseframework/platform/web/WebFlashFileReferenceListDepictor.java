@@ -21,38 +21,38 @@ public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<Flash
 {
 
 	/**The web commands for controlling audio.*/
-	public enum FlashFileReferenceCommand implements WebCommand
+	public enum FlashFileReferenceCommand implements WebPlatformCommand
 	{
 		/**The command to allow the user to browse to select a file.
-		parameters: <code>{multiple:"<var>multiple</var>"}</code>
+		parameters: <code>{@value #MULTIPLE_PROPERTY}:"<var>multiple</var>"}</code>
 		*/
 		FILE_BROWSE,
 
 		/**The command to cancel a transfer.
-		parameters: <code>{id:"<var>fileReferenceID</var>"}</code>
+		parameters: <code>{{@value #ID_PROPERTY}:"<var>fileReferenceID</var>"}</code>
 		*/
 		FILE_CANCEL,
 
 		/**The command to initiate an upload.
-		parameters: <code>{id:"<var>fileReferenceID</var>", destinationURI:<var>destinationURI</var>}</code>
+		parameters: <code>{{@value #ID_PROPERTY}:"<var>fileReferenceID</var>", {@value #DESTINATION_URI_PROPERTY}:<var>destinationURI</var>}</code>
 		*/
 		FILE_UPLOAD;
 
+		/**The property for specifying the destination URI of a file upload.*/
+		public final static String DESTINATION_URI_PROPERTY="destinationURI";
+		/**The property for specifying the ID of a file.*/
+		public final static String ID_PROPERTY="id";
+		/**The property for specifying whether multiple files should be selected.*/
+		public final static String MULTIPLE_PROPERTY="multiple";
+
 	}
 	
-	/**The property for specifying the destination URI of a file upload.*/
-	public final static String DESTINATION_URI_PROPERTY="destinationURI";
-	/**The property for specifying the ID of a file.*/
-	public final static String ID_PROPERTY="id";
-	/**The property for specifying whether multiple files should be selected.*/
-	public final static String MULTIPLE_PROPERTY="multiple";
-
 	/**Requests that the user be presented with a dialog to browse.*/
 	@SuppressWarnings("unchecked")
 	public void browse()
 	{
-		getPlatform().getSendEventQueue().add(new WebCommandEvent<FlashFileReferenceCommand>(getDepictedObject(), FlashFileReferenceCommand.FILE_BROWSE,
-				new NameValuePair<String, Object>(MULTIPLE_PROPERTY, Boolean.TRUE)));	//send a file browse command to the platform TODO fix single/multiple
+		getPlatform().getSendMessageQueue().add(new WebCommandDepictEvent<FlashFileReferenceCommand>(getDepictedObject(), FlashFileReferenceCommand.FILE_BROWSE,
+				new NameValuePair<String, Object>(FlashFileReferenceCommand.MULTIPLE_PROPERTY, Boolean.TRUE)));	//send a file browse command to the platform TODO fix single/multiple
 	}
 
 	/**Cancels a platform file upload or download.
@@ -63,8 +63,8 @@ public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<Flash
 	@SuppressWarnings("unchecked")
 	public void cancel(final FlashPlatformFile platformFile)
 	{
-		getPlatform().getSendEventQueue().add(new WebCommandEvent<FlashFileReferenceCommand>(getDepictedObject(), FlashFileReferenceCommand.FILE_CANCEL,	//send a file cancel command to the platform
-				new NameValuePair<String, Object>(ID_PROPERTY, platformFile.getID())));	//send the ID of the file
+		getPlatform().getSendMessageQueue().add(new WebCommandDepictEvent<FlashFileReferenceCommand>(getDepictedObject(), FlashFileReferenceCommand.FILE_CANCEL,	//send a file cancel command to the platform
+				new NameValuePair<String, Object>(FlashFileReferenceCommand.ID_PROPERTY, platformFile.getID())));	//send the ID of the file
 	}	
 
 	/**Initiates a platform file upload.
@@ -81,9 +81,9 @@ public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<Flash
 		final URI destinationURI=destinationBookmark!=null ? URI.create(resolvedDestinationPath.toString()+destinationBookmark.toString()) : resolvedDestinationPath.toURI();	//construct a destination URI
 			//add an identification of the Guise session to the URI if needed, as Flash 8 on FireFox sends the wrong HTTP session ID cookie value
 		final URI sessionedDestinationURI=appendQueryParameters(destinationURI, new NameValuePair<String, String>(WebPlatform.GUISE_SESSION_UUID_URI_QUERY_PARAMETER, getSession().getUUID().toString()));
-		getPlatform().getSendEventQueue().add(new WebCommandEvent<FlashFileReferenceCommand>(getDepictedObject(), FlashFileReferenceCommand.FILE_UPLOAD,	//send a file upload command to the platform
-				new NameValuePair<String, Object>(ID_PROPERTY, platformFile.getID()),	//send the ID of the file
-				new NameValuePair<String, Object>(DESTINATION_URI_PROPERTY, sessionedDestinationURI)));	//indicate the destination
+		getPlatform().getSendMessageQueue().add(new WebCommandDepictEvent<FlashFileReferenceCommand>(getDepictedObject(), FlashFileReferenceCommand.FILE_UPLOAD,	//send a file upload command to the platform
+				new NameValuePair<String, Object>(FlashFileReferenceCommand.ID_PROPERTY, platformFile.getID()),	//send the ID of the file
+				new NameValuePair<String, Object>(FlashFileReferenceCommand.DESTINATION_URI_PROPERTY, sessionedDestinationURI)));	//indicate the destination
 	}	
 
 	/**Processes an event from the platform.
@@ -92,9 +92,9 @@ public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<Flash
 	*/
 	public void processEvent(final PlatformEvent event)
 	{
-		if(event instanceof WebChangeEvent)	//if a property changed
+		if(event instanceof WebChangeDepictEvent)	//if a property changed
 		{
-			final WebChangeEvent webChangeEvent=(WebChangeEvent)event;	//get the web change event
+			final WebChangeDepictEvent webChangeEvent=(WebChangeDepictEvent)event;	//get the web change event
 			final FlashFileReferenceList flashFileReferenceList=getDepictedObject();	//get the depicted object
 			if(webChangeEvent.getDepictedObject()!=flashFileReferenceList)	//if the event was meant for another depicted object
 			{

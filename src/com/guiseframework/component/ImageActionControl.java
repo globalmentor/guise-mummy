@@ -1,9 +1,9 @@
 package com.guiseframework.component;
 
-import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
-import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.garretwilson.beans.*;
 import com.garretwilson.lang.ObjectUtilities;
 import static com.garretwilson.lang.ObjectUtilities.*;
+
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 import com.guiseframework.prototype.ActionPrototype;

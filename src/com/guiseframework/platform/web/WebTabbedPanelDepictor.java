@@ -36,9 +36,9 @@ public class WebTabbedPanelDepictor<C extends AbstractCardPanel> extends Abstrac
 	*/
 	public void processEvent(final PlatformEvent event)
 	{
-		if(event instanceof WebActionEvent)	//if this is an action event
+		if(event instanceof WebActionDepictEvent)	//if this is an action event
 		{
-			final WebActionEvent webActionEvent=(WebActionEvent)event;	//get the web action event
+			final WebActionDepictEvent webActionEvent=(WebActionDepictEvent)event;	//get the web action event
 			final C component=getDepictedObject();	//get the depicted object
 			if(webActionEvent.getDepictedObject()!=component)	//if the event was meant for another depicted object
 			{

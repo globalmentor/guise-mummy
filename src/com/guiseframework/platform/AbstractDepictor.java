@@ -74,10 +74,10 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 		}
 	
 	/**The listener that marks this depiction as dirty if a change occurs.*/
-	protected ChangeListener changeListener;
+	private final DepictedPropertyChangeListener depictedPropertyChangeListener=new DepictedPropertyChangeListener();
 
 		/**@return The listener that marks this depiction as dirty if a change occurs.*/
-		protected ChangeListener getChangeListener() {return changeListener;}
+		protected DepictedPropertyChangeListener getDepictedPropertyChangeListener() {return depictedPropertyChangeListener;}
 
 	/**The object being depicted.*/
 	private O depictedObject=null;
@@ -114,7 +114,6 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	{
 		this.session=Guise.getInstance().getGuiseSession();	//store a reference to the current Guise session
 		this.platform=this.session.getPlatform();	//store a reference to the platform
-		changeListener=new ChangeListener();	//create the change listener
 	}
 
 	/**Called when the depictor is installed in a depicted object.
@@ -123,7 +122,7 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	@param depictedObject The depictedObject into which this depictor is being installed.
 	@exception NullPointerException if the given depicted object is <code>null</code>.
 	@exception IllegalStateException if this depictor is already installed in a depicted object.
-	@see #changeListener
+	@see #depictedPropertyChangeListener
 	*/
 	public void installed(final O depictedObject)
 	{
@@ -134,11 +133,11 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 		this.depictedObject=depictedObject;	//change depicted objects
 		if(depictedObject instanceof PropertyBindable)	//if the depicted object allows bound properties
 		{
-			((PropertyBindable)depictedObject).addPropertyChangeListener(getChangeListener());	//listen for property changes
+			((PropertyBindable)depictedObject).addPropertyChangeListener(getDepictedPropertyChangeListener());	//listen for property changes
 		}
 		if(depictedObject instanceof ListListenable)	//if the depicted object notifies of list changes
 		{
-			((ListListenable<Object>)depictedObject).addListListener(getChangeListener());	//listen for list changes
+			((ListListenable<Object>)depictedObject).addListListener(getDepictedPropertyChangeListener());	//listen for list changes
 		}
 	}
 
@@ -148,7 +147,7 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	@param depictedObject The depicted object from which this depictor is being uninstalled.
 	@exception NullPointerException if the given depicted object is <code>null</code>.
 	@exception IllegalStateException if this depictor is not installed in a depicted object.
-	@see #changeListener
+	@see #depictedPropertyChangeListener
 	*/
 	public void uninstalled(final O depictedObject)
 	{
@@ -159,11 +158,11 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 		this.depictedObject=null;	//remove the depicted object
 		if(depictedObject instanceof PropertyBindable)	//if the depicted object allows bound properties
 		{
-			((PropertyBindable)depictedObject).removePropertyChangeListener(changeListener);	//stop listening for property changes
+			((PropertyBindable)depictedObject).removePropertyChangeListener(depictedPropertyChangeListener);	//stop listening for property changes
 		}
 		if(depictedObject instanceof ListListenable)	//if the depicted object notifies of list changes
 		{
-			((ListListenable<Object>)depictedObject).removeListListener(changeListener);	//stop listening for list changes
+			((ListListenable<Object>)depictedObject).removeListListener(depictedPropertyChangeListener);	//stop listening for list changes
 		}
 	}
 
@@ -185,6 +184,7 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	}
 
 	/**Called when a depicted object bound property is changed.
+	This method may also be called for objects related to the depicted object, so if specific properties are checked the event source should be verified to be the depicted object.
 	This implementation marks the property as being modified if the property is not an ignored property.
 	@param propertyChangeEvent An event object describing the event source and the property that has changed.
 	@see #getIgnoredProperties()
@@ -204,7 +204,7 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	Property changes are delegated to {@link AbstractDepictor#depictedObjectPropertyChange(PropertyChangeEvent)}.
 	@author Garret Wilson
 	*/
-	protected class ChangeListener implements PropertyChangeListener, ListListener<Object>
+	protected class DepictedPropertyChangeListener implements PropertyChangeListener, ListListener<Object>
 	{
 
 		/**Called when a bound property is changed.

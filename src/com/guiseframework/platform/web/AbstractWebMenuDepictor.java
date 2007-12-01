@@ -47,9 +47,9 @@ public abstract class AbstractWebMenuDepictor<C extends Menu> extends AbstractWe
 	*/
 	public void processEvent(final PlatformEvent event)	//TODO combine with AbstractWebActionDepictor
 	{
-		if(event instanceof WebActionEvent)	//if this is an action event
+		if(event instanceof WebActionDepictEvent)	//if this is an action event
 		{
-			final WebActionEvent webActionEvent=(WebActionEvent)event;	//get the web action event
+			final WebActionDepictEvent webActionEvent=(WebActionDepictEvent)event;	//get the web action event
 			final C component=getDepictedObject();	//get the depicted object
 			if(webActionEvent.getDepictedObject()!=component)	//if the event was meant for another depicted object
 			{

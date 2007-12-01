@@ -124,9 +124,9 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 	*/
 	public void processEvent(final PlatformEvent event)
 	{
-		if(event instanceof WebActionEvent)	//if this is an action control event
+		if(event instanceof WebActionDepictEvent)	//if this is an action control event
 		{
-			final WebActionEvent webActionEvent=(WebActionEvent)event;	//get the action control event
+			final WebActionDepictEvent webActionEvent=(WebActionDepictEvent)event;	//get the action control event
 			final TreeControl treeControl=getDepictedObject();	//get the depicted object
 			if(webActionEvent.getDepictedObject()!=treeControl)	//if the event was meant for another depicted object
 			{
@@ -244,7 +244,7 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 		context.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//<xhtml:div> (treeNode-toggle)
 		context.writeAttribute(null, ATTRIBUTE_CLASS, TREE_NODE_TOGGLE_CLASS);	//write the style class attribute		
 		writeDirectionAttribute(context, component);	//write the component direction, if this component specifies a direction
-		final char toggleChar=treeNode.hasChildren() ? (treeNode.isExpanded() ? HYPHEN_MINUS_CHAR : PLUS_SIGN_CHAR) : MIDDLE_DOT_CHAR;	//use +, -, or · depending on the circumstances
+		final char toggleChar=treeNode.hasChildren() ? (treeNode.isExpanded() ? HYPHEN_MINUS_CHAR : PLUS_SIGN_CHAR) : MIDDLE_DOT_CHAR;	//use +, -, or ï¿½ depending on the circumstances
 		context.write(toggleChar);	//write the toggle character
 		context.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//</xhtml:div>
 */
