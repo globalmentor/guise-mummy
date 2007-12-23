@@ -1,30 +1,29 @@
-`URF
-*
-	"component"=<java:/com/guiseframework/component/>,
-	"coupler"=<java:/com/guiseframework/coupler/>,
-	"layout"=<java:/com/guiseframework/component/layout/>,
-	"validator"=<java:/com/guiseframework/validator/>,
-	"demo"=<java:/com/guiseframework/demo/>
-*
+`URF:
+	"component"~<java:/com/guiseframework/component/>,
+	"coupler"~<java:/com/guiseframework/coupler/>,
+	"layout"~<java:/com/guiseframework/component/layout/>,
+	"validator"~<java:/com/guiseframework/validator/>,
+	"demo"~<java:/com/guiseframework/demo/>
+;
 ¤
 	(demo.EventWizardPanel2):
 		label="Guise™ Demonstration: Event Wizard",
 		layout=(layout.FlowLayout):
-			flow=«"PAGE"(layout.Flow)»
+			flow=«(layout.Flow)"PAGE"»
 		;,
 		children=
 		[
 			(component.Heading):
 				label="Event Planner Wizard",
-				level=#0
+				level=#0#
 			;,
 			(component.LayoutPanel):
 				layout=(layout.RegionLayout),
 				children=
 				[
 					(component.SequenceCardPanel): †cards‡
-						bookmarkEnabled=&true,
-						constraints=(layout.RegionConstraints)¡«"CENTER"(Region)»!,
+						bookmarkEnabled=*true*,
+						constraints=(layout.RegionConstraints)¡«(layout.Region)"CENTER"»!,
 						name="wizardCardPanel",
 						children=
 						[
@@ -37,7 +36,7 @@
 						]
 					;,
 					(component.LayoutPanel): †links‡
-						constraints=(layout.RegionConstraints)¡«"LINE_START"(Region)»!,
+						constraints=(layout.RegionConstraints)¡«(layout.Region)"LINE_START"»!,
 						children=
 						[
 							|personalLink10|(component.Link):
@@ -71,7 +70,7 @@
 					;,
 					|wizardTabContainerControl|(component.TabContainerControl): †tabs‡
 						axis="line",
-						constraints=(layout.RegionConstraints)¡«"PAGE_START"(Region)»!,
+						constraints=(layout.RegionConstraints)¡«(layout.Region)"PAGE_START"»!,
 						children=
 						[
 							|personalTabLabel|(component.Label):
@@ -86,9 +85,9 @@
 						]
 					;,
 					(component.LayoutPanel): †buttons‡
-						constraints=(layout.RegionConstraints)¡«"PAGE_END"(Region)»!,
+						constraints=(layout.RegionConstraints)¡«(layout.Region)"PAGE_END"»!,
 						layout=(layout.FlowLayout):
-							flow=«"LINE"(layout.Flow)»
+							flow=«(layout.Flow)"LINE"»
 						;,
 						name="wizardButtonPanel"
 					;
@@ -103,24 +102,24 @@
 		[
 			(component.Heading):
 				label="Personal Information: Name",
-				level=#1
+				level=#1#
 			;,
 			(component.TextControl)¡«java:/java/lang/String»!:
 				label="First Name",
 				validator=(validator.RegularExpressionStringValidator)¡/\\S+.*/!:
-					valueRequired=&true
+					valueRequired=*true*
 				;
 			;,
 			(component.TextControl)¡«java:/java/lang/String»!:
 				label="Last Name",
 				validator=(validator.RegularExpressionStringValidator)¡/\\S+.*/!:
-					valueRequired=&true
+					valueRequired=*true*
 				;
 			;,
 			(component.CheckControl):
 				label="I want to tell you my age",
 				name="ageCheckControl",
-				value=&true
+				value=*true*
 			;
 		]
 	;,
@@ -131,7 +130,7 @@
 		[
 			(component.Heading):
 				label="Personal Information: Age",
-				level=#1
+				level=#1#
 			;,
 			(component.TextControl)¡«java:/java/lang/Integer»!:
 				label="Age",
@@ -146,12 +145,12 @@
 		[
 			(component.Heading):
 				label="Personal Information: Email",
-				level=#1
+				level=#1#
 			;,
 			(component.TextControl)¡«java:/java/lang/String»!:
 				label="Email",
 				validator=(validator.RegularExpressionStringValidator)¡/.+@.+\\.[a-z]+/!:
-					valueRequired=&true
+					valueRequired=*true*
 				;
 			;
 		]
@@ -163,12 +162,12 @@
 		[
 			(component.Heading):
 				label="Business Information: Name",
-				level=#1
+				level=#1#
 			;,
 			(component.TextControl)¡«java:/java/lang/String»!:
 				label="Business Name",
 				validator=(validator.RegularExpressionStringValidator)¡/\\S+.*/!:
-					valueRequired=&true
+					valueRequired=*true*
 				;
 			;
 		]
@@ -180,14 +179,14 @@
 		[
 			(component.Heading):
 				label="Business Information: Address",
-				level=#1
+				level=#1#
 			;,
 			(component.TextControl)¡«java:/java/lang/String»!:
 				columnCount="40",
 				label="Business Address",
 				rowCount="4",
 				validator=(validator.RegularExpressionStringValidator)¡/\\S+.*/!:
-					valueRequired=&true
+					valueRequired=*true*
 				;
 			;
 		]
@@ -199,12 +198,12 @@
 		[
 			(component.Heading):
 				label="Event Information: Name",
-				level=#1
+				level=#1#
 			;,
 			(component.TextControl)¡«java:/java/lang/String»!:
 				label="Event Name",
 				validator=(validator.RegularExpressionStringValidator)¡/\\S+.*/!:
-					valueRequired=&true
+					valueRequired=*true*
 				;
 			;
 		]

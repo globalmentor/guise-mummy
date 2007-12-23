@@ -1,6 +1,6 @@
 package com.guiseframework.platform.web.css;
 
-import static com.garretwilson.lang.StringUtilities.*;
+import static com.garretwilson.lang.Strings.*;
 import static com.garretwilson.text.CharacterConstants.NULL_CHAR;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 

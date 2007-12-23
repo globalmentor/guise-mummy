@@ -1,8 +1,7 @@
-`URF
-*
-	"resources"=<http://guiseframework.com/namespaces/resources>,
-	"dc"=<http://purl.org/dc/elements/1.1/>
-*
+`URF:
+	"resources"~<http://guiseframework.com/namespaces/resources>,
+	"dc"~<http://purl.org/dc/elements/1.1/>
+;
 ¤
 	(resources.Resources):
 		dc.description="Root Guise™ theme resources (en).",

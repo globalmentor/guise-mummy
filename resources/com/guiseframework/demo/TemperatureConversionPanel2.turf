@@ -1,22 +1,21 @@
-`URF
-*
-	"component"=<java:/com/guiseframework/component/>,
-	"layout"=<java:/com/guiseframework/component/layout/>,
-	"validator"=<java:/com/guiseframework/validator/>,
-	"demo"=<java:/com/guiseframework/demo/>
-*
+`URF:
+	"component"~<java:/com/guiseframework/component/>,
+	"layout"~<java:/com/guiseframework/component/layout/>,
+	"validator"~<java:/com/guiseframework/validator/>,
+	"demo"~<java:/com/guiseframework/demo/>
+;
 ¤
 	(demo.TemperatureConversionPanel2):
 		label="Guise™ Demonstration: Temperature Conversion",
 		layout=(layout.FlowLayout):
-			flow=«"LINE"(layout.Flow)»
+			flow=«(layout.Flow)"LINE"»
 		;,
 		name="temperatureConversionPanel",
 		children=
 		[
 			(component.LayoutPanel):
 				layout=(layout.FlowLayout):
-					flow=«"PAGE"(layout.Flow)»
+					flow=«(layout.Flow)"PAGE"»
 				;,
 				name="inputPanel",
 				children=
@@ -27,7 +26,7 @@
 						validator=(validator.ValueRequiredValidator)
 					;,
 					(component.TextControl)¡«java:/java/lang/Double»!:
-						editable=&false,
+						editable=*false*,
 						label="Output Temperature",
 						name="temperatureOutput"
 					;
@@ -35,7 +34,7 @@
 			;,
 			(component.LayoutPanel):
 				layout=(layout.FlowLayout):
-					flow=«"PAGE"(layout.Flow)»
+					flow=«(layout.Flow)"PAGE"»
 				;,
 				name="conversionPanel",
 				children=
@@ -43,7 +42,7 @@
 					(component.GroupPanel):
 						label="Input Scale",
 						layout=(layout.FlowLayout):
-							flow=«"PAGE"(layout.Flow)»
+							flow=«(layout.Flow)"PAGE"»
 						;,
 						name="scalePanel",
 						children=

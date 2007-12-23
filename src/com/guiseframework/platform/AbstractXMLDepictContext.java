@@ -8,7 +8,7 @@ import java.util.*;
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.lang.StringUtilities;
+import com.garretwilson.lang.Strings;
 import com.garretwilson.text.xml.QualifiedName;
 import com.garretwilson.text.xml.XMLNamespacePrefixManager;
 import com.garretwilson.text.xml.XMLUtilities;
@@ -17,7 +17,7 @@ import com.guiseframework.GuiseSession;
 import com.guiseframework.platform.web.WebPlatform;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.lang.StringUtilities.*;
+import static com.garretwilson.lang.Strings.*;
 import static com.garretwilson.security.MessageDigestUtilities.*;
 import static com.garretwilson.security.SecurityConstants.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
@@ -469,7 +469,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 		}
 */
 		writeCommentOpen();	//open the comment
-		final String encodedComment=StringUtilities.replace(comment, COMMENT_END_PART1, XML_COMMENT_ENCODED_HYPHENS);	//replace any illegal sequence with its encoded counterpart
+		final String encodedComment=Strings.replace(comment, COMMENT_END_PART1, XML_COMMENT_ENCODED_HYPHENS);	//replace any illegal sequence with its encoded counterpart
 		getDepictStringBuilder().append(encodedComment);	//write the comment with no other encoding
 		writeCommentClose();	//close the comment
 	}

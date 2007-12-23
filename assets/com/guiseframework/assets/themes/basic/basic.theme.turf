@@ -1,14 +1,13 @@
-`URF
-*
-	"select"=<http://urf.name/select>,
-	"theme"=<http://guiseframework.com/namespaces/theme>,
-	"component"=<java:/com/guiseframework/component/>,
-	"layout"=<java:/com/guiseframework/component/layout/>,
-	"geometry"=<java:/com/guiseframework/geometry/>,
-	"resources"=<http://guiseframework.com/namespaces/resources>,
-	"style"=<java:/com/guiseframework/style/>,
-	"dc"=<http://purl.org/dc/elements/1.1/>
-*
+`URF:
+	"select"~<http://urf.name/select>,
+	"theme"~<http://guiseframework.com/namespaces/theme>,
+	"component"~<java:/com/guiseframework/component/>,
+	"layout"~<java:/com/guiseframework/component/layout/>,
+	"geometry"~<java:/com/guiseframework/geometry/>,
+	"resources"~<http://guiseframework.com/namespaces/resources>,
+	"style"~<java:/com/guiseframework/style/>,
+	"dc"~<http://purl.org/dc/elements/1.1/>
+;
 ¤
 	(theme.Theme):
 		dc.title="Guise™ Basic Theme",
@@ -51,7 +50,7 @@
 			;,
 			theme.apply=(theme.Template):
 				fontFamilies=["Arial", "sans-serif"],
-				fontSize=(geometry.Extent)¡#10, «"POINT"(geometry.Unit)»!
+				fontSize=(geometry.Extent)¡#10#, «(geometry.Unit)"POINT"»!
 			;
 		;,
 		†Heading‡
@@ -89,11 +88,11 @@
 			;,
 			theme.apply=(theme.Template):
 				backgroundColor=(style.ResourceColor)¡"theme.color.subordinateA"!,
-				borderStyle=«"SOLID"(style.LineStyle)»,
-				borderExtent=(geometry.Extent)¡#1, «"PIXEL"(geometry.Unit)»!,
+				borderStyle=«(style.LineStyle)"SOLID"»,
+				borderExtent=(geometry.Extent)¡#1#, «(geometry.Unit)"PIXEL"»!,
 				borderColor=(style.ResourceColor)¡"theme.color.border"!,
-				marginExtent=(geometry.Extent)¡#0.5, «"EM"(geometry.Unit)»!,
-				paddingExtent=(geometry.Extent)¡#0.5, «"EM"(geometry.Unit)»!
+				marginExtent=(geometry.Extent)¡#0.5#, «(geometry.Unit)"EM"»!,
+				paddingExtent=(geometry.Extent)¡#0.5#, «(geometry.Unit)"EM"»!
 			;
 		;,
 		†Menu‡
@@ -102,7 +101,7 @@
 				select.selectClass=component.Menu
 			;,
 			theme.apply=(theme.Template):
-				paddingExtent=(geometry.Extent)¡#0.5, «"EM"(geometry.Unit)»!
+				paddingExtent=(geometry.Extent)¡#0.5#, «(geometry.Unit)"EM"»!
 			;
 		;,
 		†Menu‡
@@ -121,11 +120,11 @@
 				;
 			;,
 			theme.apply=(theme.Template):
-				borderPageFarStyle=«"GROOVE"(style.LineStyle)»,
-				borderPageFarExtent=(geometry.Extent)¡#2, «"PIXEL"(geometry.Unit)»!,
+				borderPageFarStyle=«(style.LineStyle)"GROOVE"»,
+				borderPageFarExtent=(geometry.Extent)¡#2#, «(geometry.Unit)"PIXEL"»!,
 				borderPageFarColor=(style.ResourceColor)¡"theme.color.border"!,
 				fontFamilies=["Tahoma", "Arial", "sans-serif"],
-				fontSize=(geometry.Extent)¡#8, «"POINT"(geometry.Unit)»!
+				fontSize=(geometry.Extent)¡#8#, «(geometry.Unit)"POINT"»!
 			;
 		;,
 		(theme.Rule):	†submenu‡
@@ -141,10 +140,10 @@
 				;
 			;,
 			theme.apply=(theme.Template):
-				borderStyle=«"SOLID"(style.LineStyle)»,
-				borderExtent=(geometry.Extent)¡#1, «"PIXEL"(geometry.Unit)»!,
+				borderStyle=«(style.LineStyle)"SOLID"»,
+				borderExtent=(geometry.Extent)¡#1#, «(geometry.Unit)"PIXEL"»!,
 				borderColor=(style.ResourceColor)¡"theme.color.border"!,
-				fontSize=(geometry.Extent)¡#8, «"POINT"(geometry.Unit)»!
+				fontSize=(geometry.Extent)¡#8#, «(geometry.Unit)"POINT"»!
 			;
 		;,
 		†SliderControl‡
@@ -162,9 +161,9 @@
 				select.selectClass=component.Table
 			;,
 			theme.apply=(theme.Template):
-				columnLabelFontWeight=#0.75,
-				columnPaddingLineNearExtent=(geometry.Extent)¡#0.5, «"EM"(geometry.Unit)»!,
-				columnPaddingLineFarExtent=(geometry.Extent)¡#0.5, «"EM"(geometry.Unit)»!
+				columnLabelFontWeight=#0.75#,
+				columnPaddingLineNearExtent=(geometry.Extent)¡#0.5#, «(geometry.Unit)"EM"»!,
+				columnPaddingLineFarExtent=(geometry.Extent)¡#0.5#, «(geometry.Unit)"EM"»!
 			;
 		;,
 		†Toolbar‡
@@ -173,13 +172,13 @@
 				select.selectClass=component.Toolbar
 			;,
 			theme.apply=(theme.Template):
-				borderPageFarStyle=«"GROOVE"(style.LineStyle)»,
-				borderPageFarExtent=(geometry.Extent)¡#2, «"PIXEL"(geometry.Unit)»!,
-				columnPaddingLineFarExtent=(geometry.Extent)¡#0.5, «"EM"(geometry.Unit)»!,
+				borderPageFarStyle=«(style.LineStyle)"GROOVE"»,
+				borderPageFarExtent=(geometry.Extent)¡#2#, «(geometry.Unit)"PIXEL"»!,
+				columnPaddingLineFarExtent=(geometry.Extent)¡#0.5#, «(geometry.Unit)"EM"»!,
 				borderPageFarColor=(style.ResourceColor)¡"theme.color.border"!,
 				fontFamilies=["Tahoma", "Arial", "sans-serif"],
-				fontSize=(geometry.Extent)¡#8, «"POINT"(geometry.Unit)»!,
-				paddingExtent=(geometry.Extent)¡#0.5, «"EM"(geometry.Unit)»!
+				fontSize=(geometry.Extent)¡#8#, «(geometry.Unit)"POINT"»!,
+				paddingExtent=(geometry.Extent)¡#0.5#, «(geometry.Unit)"EM"»!
 			;
 		;,
 	
@@ -188,7 +187,7 @@
 				select.selectClass=layout.FlowLayout
 			;,
 			theme.apply=(theme.Template):
-				gap=(geometry.Extent)¡#0.25, «"EM"(geometry.Unit)»!
+				gap=(geometry.Extent)¡#0.25#, «(geometry.Unit)"EM"»!
 			;
 		;,
 	
@@ -197,7 +196,7 @@
 				select.selectClass=layout.MenuLayout
 			;,
 			theme.apply=(theme.Template):
-				gap=(geometry.Extent)¡#0.25, «"EM"(geometry.Unit)»!
+				gap=(geometry.Extent)¡#0.25#, «(geometry.Unit)"EM"»!
 			;
 		;,
 	
@@ -222,7 +221,7 @@
 				;
 			;,
 			theme.apply=(theme.Template):
-				paddingExtent=(geometry.Extent)¡#0.5, «"EM"(geometry.Unit)»!
+				paddingExtent=(geometry.Extent)¡#0.5#, «(geometry.Unit)"EM"»!
 			;
 		;
 	]

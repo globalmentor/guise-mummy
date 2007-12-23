@@ -5,7 +5,7 @@ import static java.util.Collections.*;
 
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.io.FileUtilities.*;
+import static com.garretwilson.io.Files.*;
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.util.CollectionUtilities.*;
 import com.garretwilson.util.Debug;

@@ -32,7 +32,7 @@ import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
 
 import static com.garretwilson.io.FileConstants.*;
-import static com.garretwilson.io.FileUtilities.*;
+import static com.garretwilson.io.Files.*;
 import static com.garretwilson.io.WriterUtilities.*;
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.CharSequenceUtilities.*;

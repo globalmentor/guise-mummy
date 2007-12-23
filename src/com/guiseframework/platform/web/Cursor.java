@@ -8,7 +8,7 @@ import static com.garretwilson.lang.EnumUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import static com.garretwilson.io.FileConstants.*;
-import static com.garretwilson.io.FileUtilities.*;
+import static com.garretwilson.io.Files.*;
 import com.garretwilson.text.xml.stylesheets.css.XMLCSSCursor;
 
 import com.guiseframework.component.layout.*;
