@@ -148,13 +148,17 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			}
 		}
 
-	public URIPath getLogicalPath(final URI uri, final URIPath path, final Bookmark bookmark)
+	/**Determines the logical path based upon a literal requested path.
+	This version returns the path unmodified.
+	@param uri The requested URI.
+	@param path The requested application-relative path
+	@param bookmark The requested bookmark, or <code>null</code> if there was no bookmark requested.
+	@param referrerURI The URI of the referring location, or <code>null</code> if there is no referrer URI.
+	@return The application-relative logical path.
+	*/
+	public URIPath getLogicalPath(final URI uri, final URIPath path, final Bookmark bookmark, final URI referrerURI)
 	{
-		if("demo.marmox.test".equals(uri.getHost()))	//TODO testing
-		{
-			return new URIPath("demo/"+path.toString());
-		}
-		return path;
+		return path;	//by default the logical path and the literal path are the same
 	}
 
 	/**Creates a new session for the application on the given platform.

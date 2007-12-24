@@ -168,7 +168,14 @@ public interface GuiseApplication extends PropertyBindable
 	public void setDCSID(final String dcsID);
 
 	
-	public URIPath getLogicalPath(final URI uri, final URIPath path, final Bookmark bookmark);	//TODO testing
+	/**Determines the logical path based upon a literal requested path.
+	@param uri The requested URI.
+	@param path The requested application-relative path
+	@param bookmark The requested bookmark, or <code>null</code> if there was no bookmark requested.
+	@param referrerURI The URI of the referring location, or <code>null</code> if there is no referrer URI.
+	@return The application-relative logical path.
+	*/
+	public URIPath getLogicalPath(final URI uri, final URIPath path, final Bookmark bookmark, final URI referrerURI);
 	
 	/**Associates multiple destinations with application context-relative paths or path patterns.
 	All destinations are first cleared.
