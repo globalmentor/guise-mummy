@@ -1,6 +1,5 @@
 package com.guiseframework;
 
-import java.beans.PropertyChangeEvent;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -12,7 +11,6 @@ import java.util.*;
 import static java.util.Collections.*;
 
 import com.garretwilson.beans.*;
-import com.garretwilson.event.PostponedEvent;
 import com.garretwilson.io.BOMInputStreamReader;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.net.URIPath;
@@ -38,7 +36,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.CharSequenceUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.text.CharacterConstants.*;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.garretwilson.text.FormatUtilities.*;
@@ -98,7 +96,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		{
 			if(!this.baseURI.equals(checkInstance(baseURI, "Session base URI cannot be null.")))	//if a new base URI is given
 			{
-				if(!baseURI.getRawPath().equals(getApplication().getBasePath()))	//if the path of the base URI is not the application base path
+				if(!getPath(baseURI).equals(getApplication().getBasePath()))	//if the path of the base URI is not the application base path
 				{
 					throw new IllegalArgumentException("Session base URI path "+baseURI.getRawPath()+" does not equal application base path "+getApplication().getBasePath());				
 				}
@@ -963,7 +961,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	public void initializeComponent(final Component component, final InputStream descriptionInputStream) throws IOException, DataException, InvocationTargetException
 	{
 		final URI BASE_URI=URI.create("guise:/");	//TODO fix
-		final URF urf=AbstractTURFIO.readTURF(new URF(), descriptionInputStream, baseURI);	//read TURF from the input stream
+		final URF urf=AbstractTURFIO.readTURF(new URF(), descriptionInputStream, BASE_URI);	//read TURF from the input stream
 		final URI componentResourceTypeURI=createJavaURI(component.getClass());	//create a new URI that indicates the type of the resource description we expect
 		final URFResource componentResource=urf.getResourceByTypeURI(componentResourceTypeURI);	//try to locate the description of the given component
 		if(componentResource!=null)	//if there is a resource description of a matching type
@@ -1442,19 +1440,19 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	/**Creates a temporary resource available at a public application navigation path but with access restricted to this session.
 	The file will be created in the application's temporary file directory.
 	If the resource is restricted to the current Guise session, the resource will be deleted when the current Guise session ends.
-	This is a convenience method that delegates to {@link GuiseApplication#createTempPublicResource(String, String, GuiseSession)}.
+	This is a convenience method that delegates to {@link GuiseApplication#createTempAsset(String, String, GuiseSession)}.
 	@param baseName The base filename to be used in generating the filename.
 	@param extension The extension to use for the temporary file.
 	@return A public application navigation path that can be used to access the resource only from this session.
 	@exception NullPointerException if the given base name and/or extension is <code>null</code>.
 	@exception IllegalArgumentException if the base name is the empty string.
 	@exception IOException if there is a problem creating the public resource.
-	@see GuiseApplication#createTempPublicResource(String, String, GuiseSession)
+	@see GuiseApplication#createTempAsset(String, String, GuiseSession)
 	@see GuiseApplication#getTempDirectory()
 	*/
 	public URIPath createTempPublicResource(final String baseName, final String extension) throws IOException
 	{
-		return getApplication().createTempPublicResource(baseName, extension, this);	//delegate to the application with a reference to this session
+		return getApplication().createTempAsset(baseName, extension, this);	//delegate to the application with a reference to this session
 	}
 	
 	/**Reports that a bound property has changed.

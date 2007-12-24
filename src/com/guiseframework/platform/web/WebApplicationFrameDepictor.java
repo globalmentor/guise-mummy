@@ -7,7 +7,7 @@ import java.util.*;
 
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.javascript.JavaScriptConstants.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;

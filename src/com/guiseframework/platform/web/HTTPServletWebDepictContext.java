@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.util.Collections.*;
 
 import javax.mail.internet.ContentType;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServletResponse;
 
 import static com.garretwilson.io.ContentTypeConstants.*;
 import static com.garretwilson.io.ContentTypeUtilities.*;
@@ -40,23 +40,23 @@ Quirks mode is only used with IE6 in some configurations.
 public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 {
 
-	/**The HTTP servlet request.*/
-	private final HttpServletRequest request;
+	/**The Guise HTTP request.*/
+	private final HTTPServletGuiseRequest guiseRequest;
 
-		/**@return The HTTP servlet request.*/
-		protected HttpServletRequest getRequest() {return request;}
+		/**@return The Guise HTTP request.*/
+		protected HTTPServletGuiseRequest getGuiseRequest() {return guiseRequest;}
 
 	/**The HTTP servlet response.*/
 	private final HttpServletResponse response;
 
 		/**@return The HTTP servlet response.*/
 		protected HttpServletResponse getResponse() {return response;}
-
 	/**The current absolute URI for this depiction.*/
-	private final URI depictURI;
+
+//TODO del	private final URI depictURI;
 
 		/**@return The current absolute URI for this depiction.*/
-		public URI getDepictURI() {return depictURI;}
+		public URI getDepictURI() {return getGuiseRequest().getRequestURI();}
 
 	/**Whether quirks mode is being used.*/
 	private final boolean isQuirksMode;
@@ -80,26 +80,28 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 		protected String getContentHashAttributeQualifiedName() {return contentHashAttributeQualifiedName;}
 
 	/**Constructor.
+	@param guiseRequest Guise request information.
+	@param response The HTTP servlet response. 
 	@param session The Guise user session of which this context is a part.
 	@param destination The destination with which this context is associated.
-	@param request The HTTP servlet request.
-	@param response The HTTP servlet response.
-	@exception NullPointerException if the given session, destination, request or response is <code>null</code>.
+	@exception NullPointerException if the given Guise request, session, and/or destination is <code>null</code>.
 	@exception IOException If there was an I/O error loading a needed resource.
 	*/
-	public HTTPServletWebDepictContext(final GuiseSession session, final Destination destination, final HttpServletRequest request, final HttpServletResponse response) throws IOException
+	public HTTPServletWebDepictContext(final HTTPServletGuiseRequest guiseRequest, final HttpServletResponse response, final GuiseSession session, final Destination destination) throws IOException
 	{
 		super(session, destination);	//construct the parent class
-		this.request=checkInstance(request, "Request cannot be null.");
+		this.guiseRequest=checkInstance(guiseRequest, "Guise request cannot be null.");
 		this.response=checkInstance(response, "Response cannot be null.");
 //TODO decide if we want this to include parameters or not		this.navigationURI=URI.create(request.getRequestURL().toString());	//create the absolute navigation URI from the HTTP requested URL
-		this.depictURI=HttpServletUtilities.getRequestURI(request);	//get the absolute navigation URI from the HTTP requested URL
+//TODO decide on whether we need parameters		this.depictURI=HttpServletUtilities.getRequestURI(request);	//get the absolute navigation URI from the HTTP requested URL
 /*TODO del if not needed
 		final String referrer=getReferer(request);	//get the request referrer, if any
 		referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
 */
+/*TODO del
 		final String contentTypeString=request.getContentType();	//get the request content type
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
+*/
 		setHashAttributesGenerated(true);	//always generate hash attributes
 		final ContentType defaultContentType=createContentType(outputContentType.getPrimaryType(), outputContentType.getSubType(), new NameValuePair<String, String>(CHARSET_PARAMETER, UTF_8));	//default to text/plain encoded in UTF-8
 		response.setContentType(defaultContentType.toString());	//initialize the default content type and encoding

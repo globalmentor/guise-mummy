@@ -5,7 +5,7 @@ import java.util.*;
 
 import static com.garretwilson.lang.EnumUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.net.URIs.*;
 
 import com.garretwilson.net.URIPath;
 import com.garretwilson.util.*;

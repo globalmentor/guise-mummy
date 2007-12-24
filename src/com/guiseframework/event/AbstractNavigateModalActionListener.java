@@ -3,7 +3,7 @@ package com.guiseframework.event;
 import java.net.URI;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.net.URIs.*;
 
 /**A abstract object that listens for action events and keeps information for modally navigating in response.
 @author Garret Wilson

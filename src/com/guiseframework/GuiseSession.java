@@ -645,14 +645,14 @@ public interface GuiseSession extends PropertyBindable
 	/**Creates a temporary resource available at a public application navigation path but with access restricted to this session.
 	The file will be created in the application's temporary file directory.
 	If the resource is restricted to the current Guise session, the resource will be deleted when the current Guise session ends.
-	This is a convenience method that delegates to {@link GuiseApplication#createTempPublicResource(String, String, GuiseSession)}.
+	This is a convenience method that delegates to {@link GuiseApplication#createTempAsset(String, String, GuiseSession)}.
 	@param baseName The base filename to be used in generating the filename.
 	@param extension The extension to use for the temporary file.
 	@return A public application navigation path that can be used to access the resource only from this session.
 	@exception NullPointerException if the given base name and/or extension is <code>null</code>.
 	@exception IllegalArgumentException if the base name is the empty string.
 	@exception IOException if there is a problem creating the public resource.
-	@see GuiseApplication#createTempPublicResource(String, String, GuiseSession)
+	@see GuiseApplication#createTempAsset(String, String, GuiseSession)
 	@see GuiseApplication#getTempDirectory()
 	*/
 	public URIPath createTempPublicResource(final String baseName, final String extension) throws IOException;

@@ -27,8 +27,8 @@ public class HTTPServletGuiseSessionManager implements HttpSessionListener
 	private static final Map<HttpSession, HTTPServletGuiseContainer> guiseContainerMap=synchronizedMap(new HashMap<HttpSession, HTTPServletGuiseContainer>());
 
 	private static HttpSession spiderSession=null;	//TODO fix to be separate for each application; testing
-	
-	/**Retrieves a session for the given HTTP session.
+
+	/**Retrieves a session for the given HTTP request, creating a session if necessary.
 	If a {@link WebPlatform#GUISE_SESSION_UUID_URI_QUERY_PARAMETER} parameter is present in the HTTP request, it will be used to directly look up a Guise session, ignoring any identified HTTP session.
 	If there is no Guise session matching a specified UUID, the Guise session will be retrieved normally.
 	@param guiseContainer The Guise container that owns the application. 
@@ -38,6 +38,21 @@ public class HTTPServletGuiseSessionManager implements HttpSessionListener
 	@exception IllegalArgumentException if the provided HTTP session is not a session from this web application or the HTTP session has been invalidated, and there is therefore no corresponding Guise session.
 	*/
 	protected static GuiseSession getGuiseSession(final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final HttpServletRequest httpRequest)
+	{
+		return getGuiseSession(guiseContainer, guiseApplication, httpRequest, true);	//get a Guise session, creating one if necessary
+	}
+
+	/**Retrieves a session for the given HTTP request.
+	If a {@link WebPlatform#GUISE_SESSION_UUID_URI_QUERY_PARAMETER} parameter is present in the HTTP request, it will be used to directly look up a Guise session, ignoring any identified HTTP session.
+	If there is no Guise session matching a specified UUID, the Guise session will be retrieved normally.
+	@param guiseContainer The Guise container that owns the application. 
+	@param guiseApplication The application to install to own the created session..
+	@param httpRequest The HTTP request with which the Guise session is to be associated.
+	@param createSession Whether a Guise session should be created if one does not already exist. 
+	@return The Guise session associated with the provided HTTP request, or <code>null</code> if there is no Guise session and session creation was not requested.
+	@exception IllegalArgumentException if the provided HTTP session is not a session from this web application or the HTTP session has been invalidated, and there is therefore no corresponding Guise session.
+	*/
+	protected static GuiseSession getGuiseSession(final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final HttpServletRequest httpRequest, final boolean createSession)
 	{
 		final String guiseSessionUUIDString=httpRequest.getParameter(WebPlatform.GUISE_SESSION_UUID_URI_QUERY_PARAMETER);	//see if a Guise session UUID is specified
 		if(guiseSessionUUIDString!=null)	//if a Guise session UUID is specified

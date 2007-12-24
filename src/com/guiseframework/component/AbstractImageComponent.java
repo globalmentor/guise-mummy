@@ -7,7 +7,7 @@ import javax.mail.internet.ContentType;
 import static com.garretwilson.io.ContentTypeConstants.*;
 import static com.garretwilson.io.ContentTypeUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 
 import com.guiseframework.component.transfer.*;

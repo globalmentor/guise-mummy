@@ -10,7 +10,7 @@ import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.net.URIPath;
 
 import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.net.URIs.*;
 import com.guiseframework.component.layout.*;
 
 /**A panel displaying a URI as a series of links for each path segment,

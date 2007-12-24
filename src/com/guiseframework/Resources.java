@@ -7,7 +7,7 @@ import com.garretwilson.urf.AbstractClassTypedURFResource;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.text.TextUtilities.*;
 
 /**Guise resources description in RDF.

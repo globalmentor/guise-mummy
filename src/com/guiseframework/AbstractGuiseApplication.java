@@ -22,7 +22,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.lang.ThreadUtilities.*;
 import com.garretwilson.mail.MailManager;
 import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.net.URIs.*;
 import com.garretwilson.net.URIPath;
 import com.garretwilson.text.W3CDateFormat;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
@@ -147,6 +147,15 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 				firePropertyChange(THEMED_PROPERTY, Boolean.valueOf(oldThemed), Boolean.valueOf(newThemed));
 			}
 		}
+
+	public URIPath getLogicalPath(final URI uri, final URIPath path, final Bookmark bookmark)
+	{
+		if("demo.marmox.test".equals(uri.getHost()))	//TODO testing
+		{
+			return new URIPath("demo/"+path.toString());
+		}
+		return path;
+	}
 
 	/**Creates a new session for the application on the given platform.
  	This version creates and returns a default session.
@@ -888,10 +897,10 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 //	TODO del Debug.trace("resourceURI:", resourceURI);		
 		if(!publicResourceRelativeURI.isAbsolute())	//if the URI is relative to the application's public resources
 		{
-			return Guise.getInstance().getGuiseAssetInputStream(GUISE_ASSETS_BASE_KEY+publicResourceRelativeURI.getPath());	//return an input stream to the resource directly, rather than going through the server
+			return Guise.getInstance().getAssetInputStream(GUISE_ASSETS_BASE_KEY+publicResourceRelativeURI.getPath());	//return an input stream to the resource directly, rather than going through the server
 		}
 			//check for Guise public temp resources
-		final URI publicTempBaseURI=container.getBaseURI().resolve(getBasePath().resolve(GUISE_TEMP_BASE_PATH).toURI());	//get the base URI of Guise public temporary resources
+		final URI publicTempBaseURI=container.getBaseURI().resolve(getBasePath().resolve(GUISE_ASSETS_TEMP_BASE_PATH).toURI());	//get the base URI of Guise public temporary resources
 //	TODO del Debug.trace("publicResourcesBaseURI:", publicResourcesBaseURI);
 		final URI publicTempRelativeURI=publicTempBaseURI.relativize(absoluteResolvedURI);	//see if the absolute URI is in the application public temporary path
 //	TODO del Debug.trace("resourceURI:", resourceURI);		
@@ -934,6 +943,37 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	public InputStream getInputStream(final URIPath path) throws IOException
 	{
 		return getInputStream(path.toURI());	//create a URI, verifying that it is a path, and return an input stream to the URI		
+/*TODO fix; reverse delegation
+		final URIPath basePath=getBasePath();	//get the application base path
+		final URIPath resolvedPath=basePath.resolve(path);	//resolve the path against the application base URI
+		final URIPath publicTempBasePath=basePath.resolve(GUISE_TEMP_BASE_PATH);	//get the base path of the Guise temp resources
+		final URIPath publicTempRelativePath=publicTempBasePath.relativize(resolvedPath);	//see if the resolved path is in the application public path
+		if(!publicTempRelativePath.isAbsolute())	//if the path is relative to the application's temp resources
+		{
+			final String filename=publicTempRelativePath.toString();	//get the filename of the temp file; all temporary files are stored in the same directory, so if this is not a plain filename no file will be found
+			final TempFileInfo tempFileInfo=filenameTempFileInfoMap.get(filename);	//get the info for this temp file
+			if(tempFileInfo!=null)	//if we found the temporary file
+			{
+				final GuiseSession restrictionSession=tempFileInfo.getRestrictionSession();	//get the restriction session, if any
+				if(restrictionSession!=null)	//if this file is restricted to a Guise session
+				{
+					if(!restrictionSession.equals(Guise.getInstance().getGuiseSession()))	//compare the restricted session with the current Guise session, throwing an exception if there is Guise session
+					{
+						throw new IllegalStateException("Guise public temporary resource "+path+" cannot be accessed from the current Guise session.");
+					}
+				}
+				return new FileOutputStream(tempFileInfo.getTempFile());	//create an output stream to the temp file
+			}
+			else	//if there is no such temp file
+			{
+				throw new FileNotFoundException("No such Guise public temp file: "+filename);
+			}
+		}
+		else	//if the URI is not an application-relative public temporary resource URI
+		{
+			throw new UnsupportedOperationException("Access to non-temporary resource URI "+path+" is unsupported.");	//TODO fix
+		}
+*/
 	}
 
 	/**Retrieves an output stream to the entity at the given URI.
@@ -944,10 +984,10 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@return An output stream to the entity at the given resource URI.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	@exception IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made from the required session.
-	@exception FileNotFoundException if a URI to a temporary file was passed before the file was created using {@link #createTempPublicResource(String, String, boolean)}.
+	@exception FileNotFoundException if a URI to a temporary file was passed before the file was created using {@link #createTempAsset(String, String, boolean)}.
 	@exception IOException if there was an error connecting to the entity at the given URI.
 	@see #resolveURI(URI)
-	@see #createTempPublicResource(String, String, boolean)
+	@see #createTempAsset(String, String, boolean)
 	*/
 	public OutputStream getOutputStream(final URI uri) throws IOException
 	{
@@ -957,7 +997,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 //	TODO del Debug.trace("resolved URI:", resolvedURI);
 		final URI absoluteResolvedURI=container.getBaseURI().resolve(resolvedURI);	//resolve the URI against the container base URI
 //	TODO del Debug.trace("absolute resolved URI:", absoluteResolvedURI);
-		final URI publicTempBaseURI=container.getBaseURI().resolve(getBasePath().resolve(GUISE_TEMP_BASE_PATH).toURI());	//get the base URI of the Guise temp resources
+		final URI publicTempBaseURI=container.getBaseURI().resolve(getBasePath().resolve(GUISE_ASSETS_TEMP_BASE_PATH).toURI());	//get the base URI of the Guise temp resources
 //	TODO del Debug.trace("publicResourcesBaseURI:", publicResourcesBaseURI);
 		final URI publicTempRelativeURI=publicTempBaseURI.relativize(absoluteResolvedURI);	//see if the absolute URI is in the application public path
 //	TODO del Debug.trace("resourceURI:", resourceURI);		
@@ -996,10 +1036,10 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made from the required session.
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #getOutputStream(URI)} should be used instead).
-	@exception FileNotFoundException if a path to a temporary file was passed before the file was created using {@link #createTempPublicResource(String, String, boolean)}.
+	@exception FileNotFoundException if a path to a temporary file was passed before the file was created using {@link #createTempAsset(String, String, boolean)}.
 	@exception IOException if there was an error connecting to the entity at the given URI.
 	@see #getOutputStream(URI)
-	@see #createTempPublicResource(String, String, boolean)
+	@see #createTempAsset(String, String, boolean)
 	*/
 	public OutputStream getOutputStream(final URIPath path) throws IOException
 	{
@@ -1018,21 +1058,21 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	}
 */
 
-	/**Creates a temporary resource available at a public application navigation path.
+	/**Creates a temporary asset available at an application navigation path.
 	The file will be created in the application's temporary file directory.
-	If the resource is restricted to the current Guise session, the resource will be deleted when the current Guise session ends.
+	If the asset is restricted to the current Guise session, the asset will be deleted when the current Guise session ends.
 	@param baseName The base filename to be used in generating the filename.
 	@param extension The extension to use for the temporary file.
 	@param restrictionSession The Guise session to which access access to the temporary file should be restricted, or <code>null</code> if there should be no access restriction.
-	@return A public application navigation path that can be used to access the resource.
+	@return An application navigation path that can be used to access the asset.
 	@exception NullPointerException if the given base name and/or extension is <code>null</code>.
 	@exception IllegalArgumentException if the base name is the empty string.
 	@exception IllegalStateException if the given restriction session is not registered with this application.
-	@exception IOException if there is a problem creating the public resource.
+	@exception IOException if there is a problem creating the asset.
 	@see #getTempDirectory()
-	@see #hasTempPublicResource(URIPath)
+	@see #hasAsset(URIPath)
 	*/
-	public URIPath createTempPublicResource(String baseName, final String extension, final GuiseSession restrictionSession) throws IOException
+	public URIPath createTempAsset(String baseName, final String extension, final GuiseSession restrictionSession) throws IOException
 	{
 		final File tempFile=createTempFile(baseName, checkInstance(extension, "Extension cannot be null."), getTempDirectory(), true);	//create a temporary file in the application's temporary directory, specifying that it should be deleted on JVM exit
 		final String filename=tempFile.getName();	//get the name of the file
@@ -1048,62 +1088,90 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			}
 			guiseSessionInfo.getTempFileInfos().add(tempFileInfo);	//indicate that this temp file is associated with the given session
 		}
-		return GUISE_TEMP_BASE_PATH.resolve(filename);	//create and return a path for the temp resource under the Guise temp path
+		return GUISE_ASSETS_TEMP_BASE_PATH.resolve(filename);	//create and return a path for the temp asset under the Guise temp path
 	}
 
-	/**Determines whether this application has a temporary public resource at the given path.
-	@param path The application-relative path of the resource.
-	@return <code>true</code> if a temporary public resource exists at the given path.
-	@exception IOException if there was an error accessing the temporary public resource.
-	@see #createTempPublicResource(String, String, boolean)
+	//TODO rename all these to XXXAsset() and check both for normal and temp assets, delegating to the Guise class for non-temp assets
+
+	/**The string form of the assets base path.*/
+	private final static String GUISE_ASSETS_BASE_PATH_STRING=GUISE_ASSETS_BASE_PATH.toString();
+
+	/**The string form of the temp assets base path.*/
+	private final static String GUISE_ASSETS_TEMP_BASE_PATH_STRING=GUISE_ASSETS_TEMP_BASE_PATH.toString();
+	
+	/**Determines whether this application has an asset at the given path.
+	The path is first normalized. 
+	This method supports Guise assets and temporary application assets.
+	@param path The application-relative path of the asset.
+	@return <code>true</code> if an asset exists at the given path.
+	@exception IOException if there was an error accessing the asset.
+	@see #createTempAsset(String, String, boolean)
+	@see Guise#hasAsset(String)
 	*/
-	public boolean hasTempPublicResource(final URIPath path) throws IOException
+	public boolean hasAsset(final URIPath path) throws IOException
 	{
-		final String pathString=path.toString();	//get the string form of the path
-		final String guisePublicTempBasePathString=GUISE_TEMP_BASE_PATH.toString();	//get the string form of the public temp base path
-		if(pathString.startsWith(guisePublicTempBasePathString))	//if the path is in the public temporary tree
+		final String pathString=path.normalize().toString();	//get the string form of the normalized path
+		if(pathString.startsWith(GUISE_ASSETS_BASE_PATH_STRING))	//if the path is in the Guise asset tree
 		{
-			final String filename=pathString.substring(guisePublicTempBasePathString.length());	//get the filename TODO it would be better to resolve the path, which would fix "../..", etc.
-			final TempFileInfo tempFileInfo=filenameTempFileInfoMap.get(filename);	//get the info for this temp file
-			if(tempFileInfo!=null)	//if we found the temporary file
+			if(pathString.startsWith(GUISE_ASSETS_TEMP_BASE_PATH_STRING))	//if the path is in the Guise temporary asset tree
 			{
-				return tempFileInfo.getTempFile().exists();	//return whether the temporary file exists
+				final String filename=pathString.substring(GUISE_ASSETS_TEMP_BASE_PATH_STRING.length());	//determine the filename
+				final TempFileInfo tempFileInfo=filenameTempFileInfoMap.get(filename);	//get the info for this temp file
+				return tempFileInfo!=null && tempFileInfo.getTempFile().exists();	//return whether there is a temporary file that exists
+			}
+			else	//if the path is for a normal Guise asset
+			{
+				final String guiseAssetKey=GUISE_ASSETS_BASE_KEY+pathString.substring(GUISE_ASSETS_BASE_PATH_STRING.length());	//determine the Guise asset key
+				return Guise.getInstance().hasAsset(guiseAssetKey);	//see whether the Guise asset exists
 			}
 		}
-		return false;	//indicate we couldn't find a public temporary resource at the given path
+			//TODO add support for normal application assets
+		return false;	//indicate we couldn't find an asset at the given path
 	}
 
-	/**Returns a URL to the temporary public resource at the given path.
-	The given URL represents internal access to the resource and should normally not be presented to users. 
-	@param path The application-relative path of the resource.
-	@param session The Guise session requesting the resource, or <code>null</code> if there is no session associated with the request.
-	@return A URL to the temporary public resource, or <code>null</code> if there is no such temporary public resource.
-	@exception IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session different from the given Guise session.
-	@exception IOException if there was an error accessing the temporary public resource.
-	@see #createTempPublicResource(String, String, boolean)
+	/**Returns a URL to the asset at the given path.
+	The path is first normalized. 
+	This method supports Guise assets and temporary application assets.
+	The returned URL represents internal access to the asset and should normally not be presented to users. 
+	@param path The application-relative path of the asset.
+	@param session The Guise session requesting the asset, or <code>null</code> if there is no session associated with the request.
+	@return A URL to the asset, or <code>null</code> if there is no such asset.
+	@exception IllegalStateException if an asset was requested that requires a particular Guise session different from the given Guise session.
+	@exception IOException if there was an error accessing the asset.
+	@see #createTempAsset(String, String, boolean)
+	@see Guise#getAssetURL(String)
 	*/
-	public URL getTempPublicResourceURL(final URIPath path, final GuiseSession guiseSession) throws IOException
+	public URL getAssetURL(final URIPath path, final GuiseSession guiseSession) throws IOException
 	{
-		final String pathString=path.toString();	//get the string form of the path
-		final String guisePublicTempBasePathString=GUISE_TEMP_BASE_PATH.toString();	//get the string form of the public temp base path
-		if(pathString.startsWith(guisePublicTempBasePathString))	//if the path is in the public temporary tree
+		final String pathString=path.normalize().toString();	//get the string form of the normalized path
+		if(pathString.startsWith(GUISE_ASSETS_BASE_PATH_STRING))	//if the path is in the Guise asset tree
 		{
-			final String filename=pathString.substring(guisePublicTempBasePathString.length());	//get the filename TODO it would be better to resolve the path, which would fix "../..", etc.
-			final TempFileInfo tempFileInfo=filenameTempFileInfoMap.get(filename);	//get the info for this temp file
-			if(tempFileInfo!=null)	//if we found the temporary file
+			if(pathString.startsWith(GUISE_ASSETS_TEMP_BASE_PATH_STRING))	//if the path is in the Guise temporary asset tree
 			{
+				final String filename=pathString.substring(GUISE_ASSETS_TEMP_BASE_PATH_STRING.length());	//determine the filename
+				final TempFileInfo tempFileInfo=filenameTempFileInfoMap.get(filename);	//get the info for this temp file
+				if(tempFileInfo==null)	//if there is no temporary file
+				{
+					return null;	//there is no temporary asset
+				}
 				final GuiseSession restrictionSession=tempFileInfo.getRestrictionSession();	//get the restriction session, if any
 				if(restrictionSession!=null)	//if this file is restricted to a Guise session
 				{
 					if(!restrictionSession.equals(guiseSession))	//compare the restricted session with the given Guise session
 					{
-						throw new IllegalStateException("Guise public temporary resource "+path+" cannot be accessed from the current Guise session.");
+						throw new IllegalStateException("Guise temporary asset "+path+" cannot be accessed from the current Guise session.");
 					}
 				}
-				return tempFileInfo.getTempFile().toURI().toURL();	//return a URL to the given temporary public resource
+				return tempFileInfo.getTempFile().toURI().toURL();	//return a URL to the given temporary asset
+			}
+			else	//if the path is for a normal Guise asset
+			{
+				final String guiseAssetKey=GUISE_ASSETS_BASE_KEY+pathString.substring(GUISE_ASSETS_BASE_PATH_STRING.length());	//determine the Guise asset key
+				return Guise.getInstance().getAssetURL(guiseAssetKey);	//return a URL to the Guise asset
 			}
 		}
-		return null;	//indicate we couldn't find a public temporary resource at the given path
+			//TODO add support for normal application assets
+		return null;	//indicate we couldn't find an asset at the given path
 	}
 
 	/**Retrieves a resource bundle for the given theme in the given locale.

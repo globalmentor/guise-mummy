@@ -77,7 +77,7 @@ public class GenerateContentPanel extends LayoutPanel
 				//generate a temporary file, restricting access to the file to the current session if requested
 				//if we knew ahead of time we would want access restriction to the current session,
 				//	we could call the convenience method getSession().createTempPublicResource("generated-text", "txt")
-			final URIPath tempPath=getSession().getApplication().createTempPublicResource("generated-text", "txt", sessionRestricted ? getSession() : null);
+			final URIPath tempPath=getSession().getApplication().createTempAsset("generated-text", "txt", sessionRestricted ? getSession() : null);
 				//get a UTF-8 writer to the application-relative path to the temporary public resource
 			final Writer tempWriter=new BufferedWriter(new OutputStreamWriter(getSession().getApplication().getOutputStream(tempPath), "UTF-8"));
 			try

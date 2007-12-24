@@ -3,11 +3,13 @@ package com.guiseframework.platform.web;
 import java.net.URI;
 import java.util.Queue;
 
+import javax.mail.internet.ContentType;
+
+import com.garretwilson.io.ContentTypeConstants;
 import com.garretwilson.net.URIPath;
 
 import com.guiseframework.GuiseApplication;
-import com.guiseframework.platform.DepictedObject;
-import com.guiseframework.platform.Platform;
+import com.guiseframework.platform.*;
 
 /**The web platform for Guise.
 @author Garret Wilson
@@ -27,6 +29,12 @@ public interface WebPlatform extends Platform
 	public final static String GUISE_SESSION_UUID_URI_QUERY_PARAMETER="guiseSessionUUID";
 	/**The URI query parameter used to indicate the Guise version to prevent caching between versions.*/ 
 	public final static String GUISE_VERSION_URI_QUERY_PARAMETER="guiseVersion";
+
+	/**The content type of a Guise AJAX request, <code>application/x-guise-ajax-request</code>.*/
+	public final static ContentType GUISE_AJAX_REQUEST_CONTENT_TYPE=new ContentType(ContentTypeConstants.APPLICATION, ContentTypeConstants.EXTENSION_PREFIX+"guise-ajax-request"+ContentTypeConstants.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
+
+	/**The content type of a Guise AJAX response, <code>application/x-guise-ajax-response</code>.*/
+	public final static ContentType GUISE_AJAX_RESPONSE_CONTENT_TYPE=new ContentType(ContentTypeConstants.APPLICATION, ContentTypeConstants.EXTENSION_PREFIX+"guise-ajax-response"+ContentTypeConstants.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
 
 		//Guise-specific element attributes
 			//img

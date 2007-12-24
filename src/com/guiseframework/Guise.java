@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.garretwilson.io.InputStreamUtilities.*;
-import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.text.CharacterConstants.*;
 
 /**The singleton Guise class.
@@ -88,28 +88,29 @@ public final class Guise
 		return asset;	//return whatever asset we found
 	}
 
-	/**Determines if a URL specifies an existing Guise asset.
-	This version delegates to {@link #getGuiseAssetURL(String)}.
+	/**Determines if a specified Guise asset exists.
+	This version delegates to {@link #getAssetURL(String)}.
 	@param guiseAssetKey The location of the asset.
 	@return <code>true</code> if the URL references an existing Guise asset, else <code>false</code>.
 	@exception IllegalArgumentException if the asset key does not begin with {@value #GUISE_ASSETS_BASE_KEY}.
 	@exception IOException if there is an error accessing the asset.
 	@see #GUISE_ASSETS_BASE_KEY
 	*/
-	public boolean hasGuiseAssetURL(final String guiseAssetKey) throws IOException
+	public boolean hasAsset(final String guiseAssetKey) throws IOException
 	{
-		return getGuiseAssetURL(guiseAssetKey)!=null;	//see if there is actually an asset at the given location
+		return getAssetURL(guiseAssetKey)!=null;	//see if there is actually an asset at the given location
 	}
 
 	/**Retrieves a URL to a Guise asset keyed to its location.
 	The URL allows connections to the asset.
+	The returned URL represents internal access to the asset and should normally not be presented to users. 
 	@param guiseAssetKey The location of the asset.
 	@return A URL to the asset, or <code>null</code> if there is no such asset.
 	@exception IllegalArgumentException if the asset key does not begin with {@value #GUISE_ASSETS_BASE_KEY}.
 	@exception IOException if there is an error loading the asset.
 	@see #GUISE_ASSETS_BASE_KEY
 	*/
-	public URL getGuiseAssetURL(final String guiseAssetKey) throws IOException
+	public URL getAssetURL(final String guiseAssetKey) throws IOException
 	{
 		final String key=normalizePath(guiseAssetKey);	//normalize the asset key
 		if(!key.startsWith(GUISE_ASSETS_BASE_KEY))	//if this isn't an asset key
@@ -127,7 +128,7 @@ public final class Guise
 	@exception IOException if there is an error loading the asset.
 	@see #GUISE_ASSETS_BASE_KEY
 	*/
-	public InputStream getGuiseAssetInputStream(final String guiseAssetKey) throws IOException
+	public InputStream getAssetInputStream(final String guiseAssetKey) throws IOException
 	{
 		final String key=normalizePath(guiseAssetKey);	//normalize the asset key
 		if(!key.startsWith(GUISE_ASSETS_BASE_KEY))	//if this isn't an asset key

@@ -6,10 +6,10 @@ import java.util.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.net.URIs.*;
 
 import static com.garretwilson.lang.EnumUtilities.*;
-import com.garretwilson.net.URIUtilities;
+import com.garretwilson.net.URIs;
 import com.garretwilson.text.ArgumentSyntaxException;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.NameValuePair;
@@ -75,7 +75,7 @@ public class Bookmark implements Cloneable
 		{
 			throw new ArgumentSyntaxException("Bookmark string "+bookmark+" must being with '?'.");
 		}
-		final NameValuePair<String, String>[] parameters=URIUtilities.getParameters(bookmark.subSequence(1, bookmarkLength).toString());	//get the parameters from the string following the query character
+		final NameValuePair<String, String>[] parameters=URIs.getParameters(bookmark.subSequence(1, bookmarkLength).toString());	//get the parameters from the string following the query character
 		final Parameter[] bookmarkParameters=new Parameter[parameters.length];	//create a new array of bookmark parameters
 		for(int i=parameters.length-1; i>=0; --i)	//for each parameter
 		{

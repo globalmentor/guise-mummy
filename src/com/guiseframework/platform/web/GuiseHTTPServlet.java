@@ -28,7 +28,7 @@ import com.garretwilson.javascript.JSON;
 import static com.garretwilson.lang.EnumUtilities.*;
 import com.garretwilson.net.*;
 import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.net.URIs.*;
 import com.garretwilson.net.http.*;
 import com.garretwilson.net.mime.ContentDispositionType;
 import static com.garretwilson.net.http.HTTPConstants.*;
@@ -50,7 +50,6 @@ import com.garretwilson.urf.ploop.*;
 import com.garretwilson.util.*;
 
 import com.guiseframework.*;
-import static com.guiseframework.Guise.*;
 import com.guiseframework.component.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
@@ -86,12 +85,6 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 
 	/**The init parameter suffix, ".uri", used to indicate that a Guise environment property should be processed as a URI.*/
 	public final static String GUISE_ENVIRONMENT_URI_INIT_PARAMETER_SUFFIX=".uri";
-
-	/**The content type of a Guise AJAX request, <code>application/x-guise-ajax-request</code>.*/
-	public final static ContentType GUISE_AJAX_REQUEST_CONTENT_TYPE=new ContentType(ContentTypeConstants.APPLICATION, ContentTypeConstants.EXTENSION_PREFIX+"guise-ajax-request"+ContentTypeConstants.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
-
-	/**The content type of a Guise AJAX response, <code>application/x-guise-ajax-response</code>.*/
-	public final static ContentType GUISE_AJAX_RESPONSE_CONTENT_TYPE=new ContentType(ContentTypeConstants.APPLICATION, ContentTypeConstants.EXTENSION_PREFIX+"guise-ajax-response"+ContentTypeConstants.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
 
 	/**The URI query parameter indicating that the content disposition of the content of a {@link ResourceReadDestination}.
 	The value will be the serialize version of a {@link ContentDispositionType} value.
@@ -388,13 +381,21 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
   */
 	public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
 	{
+		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
+		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+		final HTTPServletGuiseRequest guiseRequest=new HTTPServletGuiseRequest(request, /*TODO del response, */guiseContainer, guiseApplication);	//get Guise request information
+/*TODO del		
+		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
+*/
 //Debug.info("method:", request.getMethod(), "raw path info:", rawPathInfo);
 //TODO del Debug.info("user agent:", getUserAgent(request));
 //	TODO del final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
 //	TODO del Debug.info("before service request: memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
+/*TODO del
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
-		final URIPath navigationPath=new URIPath(rawPathInfo.substring(1));	//remove the beginning slash to get the navigation path from the path info
+		URIPath navigationPath=new URIPath(rawPathInfo.substring(1));	//remove the beginning slash to get the navigation path from the path info
+*/
 /*TODO del
 final Enumeration headerNames=request.getHeaderNames();	//TODO del
 while(headerNames.hasMoreElements())
@@ -403,14 +404,13 @@ while(headerNames.hasMoreElements())
 	Debug.info("request header:", headerName, request.getHeader(headerName));
 }
 */
-		if(navigationPath.toString().startsWith(GuiseApplication.GUISE_RESERVED_BASE_PATH.toString()))	//if this is a request for a Guise reserved path (e.g. a public resource or a temporary resource)
+		if(guiseRequest.isRequestPathReserved())	//if this is a request for a Guise reserved path (e.g. a public resource or a temporary resource)
 		{
 			super.doGet(request, response);	//go ahead and retrieve the resource immediately
 			return;	//don't try to see if there is a navigation path for this path
 		}
-		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
-		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-		final Destination destination=guiseApplication.getDestination(navigationPath);	//try to get a destination associated with the requested path
+
+		final Destination destination=guiseApplication.getDestination(guiseRequest.getRequestPath());	//try to get a destination associated with the requested path
 		if(destination!=null)	//if we have a destination associated with the requested path
 		{
 Debug.trace("found destination:", destination);
@@ -456,7 +456,7 @@ Debug.trace("found destination:", destination);
 							{
 								try
 								{
-									serviceGuiseRequest(request, response, guiseContainer, guiseApplication, guiseSession, destination);	//service the Guise request to the given destination
+									serviceGuiseRequest(guiseRequest, response, guiseContainer, guiseApplication, guiseSession, destination);	//service the Guise request to the given destination
 								}
 								catch(final IOException ioException)	//if an exception is thrown
 								{
@@ -498,57 +498,70 @@ Debug.trace("found destination:", destination);
   @param destination The Guise session destination being accessed.
   @exception IOException if there is an error reading or writing data.
   */
-	private void serviceGuiseRequest(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final Destination destination) throws IOException
+	private void serviceGuiseRequest(/*TODO del when works final HttpServletRequest request,*/final HTTPServletGuiseRequest guiseRequest, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final Destination destination) throws IOException
 	{
 		final WebPlatform guisePlatform=(WebPlatform)guiseSession.getPlatform();	//get the web platform
+/*TODO del
 		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
 //TODO del Debug.trace("servicing Guise request with request URI:", requestURI);
 Debug.trace("servicing Guise request with request URI:", requestURI);
 		final String contentTypeString=request.getContentType();	//get the request content type
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
-		final boolean isAJAX=contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType);	//see if this is a Guise AJAX request
+*/
+		final URI requestURI=guiseRequest.getRequestURI();	//get the request URI
+		final ContentType contentType=guiseRequest.getRequestContentType();	//get the request content type
+		final URIPath path=guiseRequest.getRequestPath();	//get the path
+		final Bookmark bookmark=guiseRequest.getBookmark();	//get the bookmark, if any
+		final URI referrerURI=guiseRequest.getReferrerURI();	//get the referrer URI, if any
+//TODO del		final boolean isAJAX=contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType);	//see if this is a Guise AJAX request
+		final String requestMethod=guiseRequest.getHTTPServletRequest().getMethod();	//get the request method
 			//TODO verify; does this work with file uploads?
 			//this is a non-AJAX Guise POST if there is an XHTML action input ID field TODO add a better field; stop using a view
-		final boolean isGuisePOST=POST_METHOD.equals(request.getMethod()) && request.getParameter(WebApplicationFrameDepictor.getActionInputID(guiseSession.getApplicationFrame()))!=null;
-
+		final boolean isGuisePOST=POST_METHOD.equals(requestMethod) && guiseRequest.getHTTPServletRequest().getParameter(WebApplicationFrameDepictor.getActionInputID(guiseSession.getApplicationFrame()))!=null;
+/*TODO del
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
-		final URIPath navigationPath=new URIPath(rawPathInfo.substring(1));	//remove the beginning slash to get the navigation path from the path info
-		if(!isAJAX && (GET_METHOD.equals(request.getMethod()) || !(destination instanceof ResourceWriteDestination)))	//if this is not an AJAX request, verify that the destination exists (doing this with AJAX requests would be too costly; we can assume that AJAX requests are for existing destinations) (but don't check if this is a POST to a ResourceWriteDestination, which probably won't exist; TODO clarify exist() semantics for ResourceWriteDestinations)
+		URIPath navigationPath=new URIPath(rawPathInfo.substring(1));	//remove the beginning slash to get the navigation path from the path info
+*/
+		if(!guiseRequest.isAJAX() && (GET_METHOD.equals(requestMethod) || !(destination instanceof ResourceWriteDestination)))	//if this is not an AJAX request, verify that the destination exists (doing this with AJAX requests would be too costly; we can assume that AJAX requests are for existing destinations) (but don't check if this is a POST to a ResourceWriteDestination, which probably won't exist; TODO clarify exist() semantics for ResourceWriteDestinations)
 		{
+/*TODO del
 			final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
 			final String referrer=getReferer(request);	//get the request referrer, if any
 			final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
-			final URIPath newPath=destination.getPath(guiseSession, navigationPath, bookmark, referrerURI);	//see if we should use another path
-			if(!newPath.equals(navigationPath))	//if we should use another path
+*/
+			final URIPath newPath=destination.getPath(guiseSession, path, bookmark, referrerURI);	//see if we should use another path
+			if(!newPath.equals(path))	//if we should use another path
 			{
+					//TODO fix logicalpath
 				redirect(requestURI, bookmark, newPath, guiseApplication, true);	//redirecting the user agent to the preferred path
 			}
-			else if(!destination.exists(guiseSession, navigationPath, bookmark, referrerURI))	//if this destination doesn't exist
+			else if(!destination.exists(guiseSession, path, bookmark, referrerURI))	//if this destination doesn't exist
 			{
-				throw new HTTPNotFoundException("Path does not exist at Guise destination: "+navigationPath);
+				throw new HTTPNotFoundException("Path does not exist at Guise destination: "+path);
 			}
 		}
 		if(destination instanceof ComponentDestination)	//if we have a component destination associated with the requested path
 		{
-			serviceGuiseComponentDestinationRequest(request, response, guiseContainer, guiseApplication, guiseSession, (ComponentDestination)destination, requestURI, navigationPath);	//service the request for the component destination TODO eventually maybe create an HTTPServletComponentDestination and pass everything there
+			serviceGuiseComponentDestinationRequest(guiseRequest, response, guiseContainer, guiseApplication, guiseSession, (ComponentDestination)destination);	//service the request for the component destination TODO eventually maybe create an HTTPServletComponentDestination and pass everything there
 		}
 		else if(destination instanceof ResourceWriteDestination)	//if we should be writing to this destination
 		{
-			if(ServletFileUpload.isMultipartContent(request))	//if the request is multipart content, as we expect
+			if(ServletFileUpload.isMultipartContent(guiseRequest.getHTTPServletRequest()))	//if the request is multipart content, as we expect
 			{
 				final ResourceWriteDestination resourceWriteDestination=(ResourceWriteDestination)destination;	//get the destination for writing the resource
+/*TODO del
 				final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
 				final String referrer=getReferer(request);	//get the request referrer, if any
 				final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
-
+*/
 					//TODO del and tidy
-				final HTTPServletWebDepictContext depictContext=new HTTPServletWebDepictContext(guiseSession, resourceWriteDestination, request, response);	//create a new Guise context
+				final HTTPServletWebDepictContext depictContext=new HTTPServletWebDepictContext(guiseRequest, response, guiseSession, resourceWriteDestination);	//create a new Guise context
 				try
 				{
 					final ServletFileUpload servletFileUpload=new ServletFileUpload();	//create a new servlet file upload object
 					final Set<Component> progressComponents=new HashSet<Component>();	//keep track of which components need to know about progress
-					final FileItemIterator itemIterator=servletFileUpload.getItemIterator(request);	//get an iterator to the file items
+					final FileItemIterator itemIterator=servletFileUpload.getItemIterator(guiseRequest.getHTTPServletRequest());	//get an iterator to the file items
 					while(itemIterator.hasNext())	//while there are more items
 					{
 						final FileItemStream fileItemStream=itemIterator.next();	//get the current file item
@@ -605,7 +618,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 												}
 											}
 										};
-										final ProgressOutputStream progressOutputStream=new ProgressOutputStream(resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, navigationPath, bookmark, referrerURI));	//get an output stream to the destination; don't buffer the output stream (our copy method essentially does this) so that progress events will be accurate
+										final ProgressOutputStream progressOutputStream=new ProgressOutputStream(resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, path, bookmark, referrerURI));	//get an output stream to the destination; don't buffer the output stream (our copy method essentially does this) so that progress events will be accurate
 										try
 										{
 											if(progressComponent!=null)	//if we know the component that wants to know progress
@@ -662,7 +675,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 		}
 		else if(destination instanceof RedirectDestination)	//if we have a component destination associated with the requested path
 		{
-			redirect(requestURI, getBookmark(request), guiseApplication, (RedirectDestination)destination);	//perform the redirect; this should never return
+			redirect(requestURI, bookmark, guiseApplication, (RedirectDestination)destination);	//perform the redirect; this should never return
 			throw new AssertionError("Redirect not expected to allow processing to continue.");
 		}
 		else	//if we don't recognize the destination type
@@ -689,21 +702,24 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
   @param navigationPath The navigation path relative to the application base path.
   @exception IOException if there is an error reading or writing data.
   */
-	private void serviceGuiseComponentDestinationRequest(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ComponentDestination componentDestination, final URI requestURI, final URIPath navigationPath) throws IOException
+	private void serviceGuiseComponentDestinationRequest(/*TODO del final HttpServletRequest request, */final HTTPServletGuiseRequest guiseRequest, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ComponentDestination componentDestination/*TODO del , final URI requestURI, final URIPath navigationPath*/) throws IOException
 	{
 		final HTTPServletWebPlatform guisePlatform=(HTTPServletWebPlatform)guiseSession.getPlatform();	//get the web platform
+/*TODO del
 		final String contentTypeString=request.getContentType();	//get the request content type
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
-		final boolean isAJAX=contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType);	//see if this is a Guise AJAX request
+*/
+		final boolean isAJAX=guiseRequest.isAJAX();	//see if this is a Guise AJAX request
 		//this is a non-AJAX Guise POST if there is an XHTML action input ID field TODO add a better field; stop using a view
-		final boolean isGuisePOST=POST_METHOD.equals(request.getMethod()) && request.getParameter(WebApplicationFrameDepictor.getActionInputID(guiseSession.getApplicationFrame()))!=null;
-		final HTTPServletWebDepictContext depictContext=new HTTPServletWebDepictContext(guiseSession, componentDestination, request, response);	//create a new Guise context
+		final boolean isGuisePOST=POST_METHOD.equals(guiseRequest.getHTTPServletRequest().getMethod()) && guiseRequest.getHTTPServletRequest().getParameter(WebApplicationFrameDepictor.getActionInputID(guiseSession.getApplicationFrame()))!=null;
+		final HTTPServletWebDepictContext depictContext=new HTTPServletWebDepictContext(guiseRequest, response, guiseSession, componentDestination);	//create a new Guise context
 //Debug.trace("setting context");
 		guisePlatform.getDepictLock().lock();	//get the platform depict lock
 		guisePlatform.setDepictContext(depictContext);	//set the depict context for this platform
 		try
 		{
-			if(!isAJAX)	//if this is not an AJAX request, see if we need to enforce modal navigation (only do this after we find a navigation panel, as this request might be for a stylesheet or some other non-panel resource, which shouldn't be redirected)
+/*TODO del modal navigation
+			if(!guiseRequest.isAJAX())	//if this is not an AJAX request, see if we need to enforce modal navigation (only do this after we find a navigation panel, as this request might be for a stylesheet or some other non-panel resource, which shouldn't be redirected)
 			{
 				final ModalNavigation modalNavigation=guiseSession.getModalNavigation();	//see if we are currently doing modal navigation
 				if(modalNavigation!=null)	//if we are currently in the middle of modal navigation, make sure the correct panel was requested
@@ -715,7 +731,9 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 					}
 				}
 			}
-			final Bookmark navigationBookmark=getBookmark(request);	//get the bookmark from this request
+*/
+			final URIPath navigationPath=guiseRequest.getRequestPath();	//get the logical path for this request
+			final Bookmark navigationBookmark=guiseRequest.getBookmark();	//get the bookmark from this request
 //TODO fix to recognize navigation, bookmark, and principal changes when the navigation panel is created		final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
 			final Bookmark oldBookmark=isAJAX ? guiseSession.getBookmark() : navigationBookmark;	//get the original bookmark, which will be the one requested in navigation (which we'll soon set) if this is a normal HTTP GET/POST
 //TODO del Debug.trace("navigation bookmark:", navigationBookmark, "old bookmark:", oldBookmark, "session bookmark:", guiseSession.getBookmark(), "is AJAX:", isAJAX);
@@ -724,7 +742,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 			assert destinationComponent!=null : "No component found, even though we found a valid destination.";
 			final ApplicationFrame applicationFrame=guiseSession.getApplicationFrame();	//get the application frame
 //TODO del Debug.trace("ready to get request events");
-			final List<GuiseEvent> requestEvents=getRequestEvents(request, guiseSession, depictContext);	//get all events from the request
+			final List<GuiseEvent> requestEvents=getRequestEvents(guiseRequest, guiseSession, depictContext);	//get all events from the request
 Debug.trace("got control events");
 			if(isAJAX)	//if this is an AJAX request
 			{
@@ -737,16 +755,20 @@ Debug.trace("got control events");
 			{
 //TODO del Debug.trace("this is not AJAX, with method:", request.getMethod(), "content type", contentType, "guise POST?", isGuisePOST);
 				applicationFrame.setContent(destinationComponent);	//place the component in the application frame
-				setNoCache(request, response);	//make sure the response is not cached TODO should we do this for AJAX responses as well?
+				setNoCache(guiseRequest.getHTTPServletRequest(), response);	//make sure the response is not cached TODO should we do this for AJAX responses as well?
+/*TODO del
 				final String referrer=getReferer(request);	//get the request referrer, if any
 				final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
+*/
+				final URI referrerURI=guiseRequest.getReferrerURI();	//get the referrer URI, if any
+				final ContentType contentType=guiseRequest.getRequestContentType();	//get the request content type
 					//see if there is non-Guise HTTP POST data, and if so, set that bookmark navigation temporarily
 					//a non-Guise form HTTP POST, get the servlet parameters (which will include the URL query information)
-				if(POST_METHOD.equals(request.getMethod()) && contentType!=null && APPLICATION_X_WWW_FORM_URLENCODED_CONTENT_TYPE.match(contentType) && !isGuisePOST)
+				if(POST_METHOD.equals(guiseRequest.getHTTPServletRequest().getMethod()) && contentType!=null && APPLICATION_X_WWW_FORM_URLENCODED_CONTENT_TYPE.match(contentType) && !isGuisePOST)
 				{
 //TODO del Debug.trace("using servlet parameter methods");
 					final List<Bookmark.Parameter> bookmarkParameterList=new ArrayList<Bookmark.Parameter>();	//create a new list of bookmark parameters
-					final Iterator<Map.Entry<String, String[]>> parameterEntryIterator=(Iterator<Map.Entry<String, String[]>>)request.getParameterMap().entrySet().iterator();	//get an iterator to the parameter entries
+					final Iterator<Map.Entry<String, String[]>> parameterEntryIterator=(Iterator<Map.Entry<String, String[]>>)guiseRequest.getHTTPServletRequest().getParameterMap().entrySet().iterator();	//get an iterator to the parameter entries
 					while(parameterEntryIterator.hasNext())	//while there are more parameter entries
 					{
 						final Map.Entry<String, String[]> parameterEntry=parameterEntryIterator.next();	//get the next parameter entry
@@ -823,6 +845,7 @@ Debug.trace("got control events");
 						else if(controlEvent instanceof WebInitializeEvent)	//if this is an initialization event
 						{
 							final WebInitializeEvent initControlEvent=(WebInitializeEvent)controlEvent;	//get the init control event
+							final HttpServletRequest request=guiseRequest.getHTTPServletRequest();	//get the HTTP servlet request
 							final String javascriptVersion=initControlEvent.getJavaScriptVersion();	//get the JavaScript version reported
 							if(javascriptVersion!=null)	//if JavaScript is supported
 							{
@@ -981,6 +1004,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						depictContext.writeElementEnd(null, "navigate");	//</navigate>
 						guisePlatform.clearSendResourceURI();	//clear the address of the resource to send so that we won't send it again
 					}
+					final URI requestURI=guiseRequest.getRequestURI();	//get the request URI
 					final Bookmark newBookmark=guiseSession.getBookmark();	//see if the bookmark has changed
 //TODO del Debug.trace("navigation bookmark:", navigationBookmark, "new bookmark", newBookmark);
 					final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
@@ -1000,7 +1024,8 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						}
 						else	//if navigation is not requested, request a navigation to the new bookmark location
 						{
-							redirectURI=URI.create(request.getRequestURL().append(newBookmark).toString());	//save the string form of the constructed bookmark URI
+								//TODO fix logicalpath
+							redirectURI=appendRawQuery(requestURI, newBookmark.toString());	//save the constructed bookmark URI	TODO fix the confusion about whether there is a query on the URIs
 						}
 						if(!requestURI.equals(requestURI.resolve(redirectURI)))	//resolve the redirect URI against the current URI to see if the navigation is really changing (i.e. they didn't request to go to where they already were)
 						{
@@ -1102,7 +1127,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 
 
 				//TODO move this to the bottom of the processing, as cookies only need to be updated before they go back
-			synchronizeCookies(request, response, guiseSession);	//synchronize the cookies going out in the response; do this before anything is written back to the client
+			synchronizeCookies(guiseRequest.getHTTPServletRequest(), response, guiseSession);	//synchronize the cookies going out in the response; do this before anything is written back to the client
 
 			if(!isNavigating)	//we'll only update the views if we're not navigating (if we're navigating, we're changing pages, anyway)
 			{
@@ -1189,7 +1214,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 //Debug.trace("response length:", text.length());
 //Debug.trace("response text:", text);
 			final byte[] bytes=text.getBytes(UTF_8);	//write the content we collected in the context as series of bytes encoded in UTF-8
-			final OutputStream outputStream=getCompressedOutputStream(request, response);	//get a compressed output stream, if possible
+			final OutputStream outputStream=getCompressedOutputStream(guiseRequest.getHTTPServletRequest(), response);	//get a compressed output stream, if possible
 			outputStream.write(bytes);	//write the bytes
 			outputStream.close();	//close the output stream, finishing writing the compressed contents (don't put this in a finally block, as it will attempt to write more data and raise another exception)
 		}
@@ -1354,7 +1379,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 			final String queryString=request.getQueryString();	//get the query string from the request
 			if(queryString!=null && queryString.length()>0)	//if there is a query string (Tomcat 5.5.16 returns an empty string for no query, even though the Java Servlet specification 2.4 says that it should return null; this is fixed in Tomcat 6)
 			{
-				final NameValuePair<String, String>[] parameters=URIUtilities.getParameters(queryString);	//get the parameters from the query
+				final NameValuePair<String, String>[] parameters=URIs.getParameters(queryString);	//get the parameters from the query
 				for(final NameValuePair<String, String> parameter:parameters)	//look at each parameter
 				{
 					if(GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER.equals(parameter.getName()))	//if this is a content-disposition parameter
@@ -1423,21 +1448,23 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 	@param depictContext The platform depict object.
   @exception IOException if there is an error reading or writing data.
   */
-	protected List<GuiseEvent> getRequestEvents(final HttpServletRequest request, final GuiseSession guiseSession, final DepictContext depictContext) throws IOException
+	protected List<GuiseEvent> getRequestEvents(/*TODO del final HttpServletRequest request,*/final HTTPServletGuiseRequest guiseRequest, final GuiseSession guiseSession, final DepictContext depictContext) throws IOException
 	{
 Debug.trace("getting request events");
 		final WebPlatform platform=(WebPlatform)guiseSession.getPlatform();	//get the web platform
 		final List<GuiseEvent> requestEventList=new ArrayList<GuiseEvent>();	//create a new list for storing request events
+/*TODO del
 		final String contentTypeString=request.getContentType();	//get the request content type
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
-		if(contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType))	//if this is a Guise AJAX request
+*/
+		if(guiseRequest.isAJAX())	//if this is a Guise AJAX request
 		{
 //		TODO del Debug.trace("Guise AJAX request");
 			try
 			{
 				final DocumentBuilderFactory documentBuilderFactory=DocumentBuilderFactory.newInstance();	//create a document builder factory TODO create a shared document builder factory, maybe---but make sure it is used by only one thread
 				final DocumentBuilder documentBuilder=documentBuilderFactory.newDocumentBuilder();	//create a new document builder
-				final Document document=documentBuilder.parse(request.getInputStream());	//read the document from the request
+				final Document document=documentBuilder.parse(guiseRequest.getHTTPServletRequest().getInputStream());	//read the document from the request
 //Debug.trace("request XML:", XMLUtilities.toString(document));
 				final List<Node> eventNodes=(List<Node>)XPath.evaluatePathExpression(document, AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION);	//get all the events
 				for(final Node eventNode:eventNodes)	//for each event node
@@ -1699,6 +1726,7 @@ Debug.trace("getting request events");
 		}
 		else	//if this is not a Guise AJAX request
 		{
+			final HttpServletRequest request=guiseRequest.getHTTPServletRequest();	//get the HTTP servlet request
 				//populate our parameter map
 			if(ServletFileUpload.isMultipartContent(request))	//if this is multipart/form-data content
 			{
@@ -1904,6 +1932,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	@param request The HTTP request object.
 	@return The bookmark represented by the request, or <code>null</code> if no bookmark is contained in the request.
 	*/
+/*TODO del if not needed
 	protected static Bookmark getBookmark(final HttpServletRequest request)
 	{
 		final String queryString=request.getQueryString();	//get the query string from the request
@@ -1918,6 +1947,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 			return null;	//indicate that there is no bookmark information
 		}
 	}
+*/
 
 	/**Determines if another URI can be substituted for the requested URI.
 	This usually occurs when a request for "path/to/collection" should really be to "path/to/collection/", the former doesn't exist yet the latter is a collection,
@@ -1948,34 +1978,33 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   @param resourceURI The URI of the requested resource.
   @return <code>true</code> if the resource exists, else <code>false</code>.
 	@exception IOException if there is an error accessing the resource.
-	@see GuiseApplication#hasDestination(String)
-	@see #isGuiseAssetURI(URI)
+	@see GuiseApplication#hasAsset(URIPath)
+	@see GuiseApplication#hasDestination(URIPath)
   */
   protected boolean exists(final HttpServletRequest request, final URI resourceURI) throws IOException
   {
-  		//see if this is a Guise public resource
-  	if(isGuiseAssetURI(resourceURI))	//if this URI represents a Guise public resource
-  	{
-  		final String publicResourceKey=getGuiseAssetKey(resourceURI);	//get the Guise public resource key
-  		return Guise.getInstance().hasGuiseAssetURL(publicResourceKey);	//see if there is a public resource for this key
-  	}
-  	final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-  	final URIPath path=guiseApplication.relativizeURI(resourceURI);	//get the application-relative path TODO probably change this to be the same logic as for getting the navigation path
-  		//check for a temporary public resource
-  	if(guiseApplication.hasTempPublicResource(path))	//if the URI represents a valid temporary public resource
+Debug.trace("checking exists for", resourceURI);
+		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+  	final HTTPServletGuiseRequest guiseRequest=new HTTPServletGuiseRequest(request, /*TODO del response, */guiseContainer, guiseApplication);	//get Guise request information
+  	final URIPath path=guiseRequest.getRequestPath();	//get the application-relative logical path
+  	if(guiseApplication.hasAsset(path))	//if the path represents a valid application asset
   	{
   		return true;	//the resource exists
   	}
-Debug.trace("checking exists for", resourceURI);
+//TODO del  	final URIPath path=guiseApplication.relativizeURI(resourceURI);	//get the application-relative path TODO probably change this to be the same logic as for getting the navigation path
 		final Destination destination=guiseApplication.getDestination(path);	//get the destination for the given path
   	if(destination!=null)	//if the URI represents a valid navigation path
   	{
 Debug.trace("this is a destination");
   		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
  			final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
+ 			final Bookmark bookmark=guiseRequest.getBookmark();	//get the bookmark, if any
+ 			final URI referrerURI=guiseRequest.getReferrerURI();	//get the referrer URI, if any
+/*TODO del
  			final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
 			final String referrer=getReferer(request);	//get the request referrer, if any
 			final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
+*/
  			final ObjectHolder<Boolean> resourceExistsHolder=new ObjectHolder<Boolean>();	//create an object holder to receive the existence result
 			final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
 			try
@@ -2023,106 +2052,88 @@ Debug.trace("this is a destination");
   @return An object providing an encapsulation of the requested resource, but not necessarily the contents of the resource.
 	@exception IllegalArgumentException if the given resource URI does not represent a valid resource.
 	@exception IOException if there is an error accessing the resource.
-	@see #isGuiseAssetURI(URI)
-	@see #getGuiseAssetKey(URI)
-	@see Guise#getGuiseAssetURL(String)
-	@see GuiseApplication#hasTempPublicResource(URIPath)
+	@see GuiseApplication#hasAsset(URIPath)
 	@see GuiseApplication#getInputStream(URIPath)
 	@see ResourceReadDestination
   */
 	protected HTTPServletResource getResource(final HttpServletRequest request, final URI resourceURI) throws IllegalArgumentException, IOException
 	{
 //TODO del Debug.trace("getting resource for URI: ", resourceURI);
+		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+  	final HTTPServletGuiseRequest guiseRequest=new HTTPServletGuiseRequest(request, /*TODO del response, */guiseContainer, guiseApplication);	//get Guise request information
+  	final URIPath path=guiseRequest.getRequestPath();	//get the application-relative logical path
 		final HTTPServletResource resource;	//we'll create a resource for this resource URI
-  	if(isGuiseAssetURI(resourceURI))	//if this URI represents a Guise public resource
+  	if(guiseApplication.hasAsset(path))	//if the path represents an application asset
   	{
-  		final String publicResourceKey=getGuiseAssetKey(resourceURI);	//get the Guise public resource key
-//  	TODO del Debug.trace("this is a public resource with key: ", publicResourceKey);
-			final URL publicResourceURL=Guise.getInstance().getGuiseAssetURL(publicResourceKey);	//get a URL to the resource
-//		TODO del Debug.trace("found URL to resource: ", publicResourceURL);
-			if(publicResourceURL==null)	//if there is no such resource
+			final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request, false);	//retrieve the Guise session, if any, for this container and request, but don't create one if there isn't one already
+			try
 			{
-				throw new HTTPNotFoundException("No such Guise public resource: "+resourceURI);
+	  		final URL assetURL=guiseApplication.getAssetURL(path, guiseSession);	//get the URL of the asset
+				if(assetURL==null)	//if there is no such asset (it could have been removed after we checked)
+				{
+					throw new HTTPNotFoundException("No such Guise asset: "+resourceURI);
+				}
+				resource=new DefaultHTTPServletResource(resourceURI, assetURL);	//create a new default resource with a URL to the asset
 			}
-			resource=new DefaultHTTPServletResource(resourceURI, publicResourceURL);	//create a new default resource with a URL to the public resource
+			catch(final IllegalStateException illegalStateException)	//if we cannot access the asset from the current session
+			{
+				throw new HTTPForbiddenException(illegalStateException.getMessage(), illegalStateException);	//forbid the user from accessing the resource
+			}
 //		TODO del Debug.trace("constructed a resource with length:", resource.getContentLength(), "and last modified", resource.getLastModified());
   	}
-  	else	//if this is not a Guise public resource, see if it is a temporary public resource of the application, or a Guise resource destination
+  	else	//if this is not a Guise asset, see if it is a Guise resource destination
   	{
-  		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-			final URIPath applicationBasePath=guiseApplication.getBasePath();	//get the application base path
-  		final String rawPath=resourceURI.getRawPath();	//get the raw path of the requested resource
-			final URIPath relativePath=rawPath!=null ? applicationBasePath.relativize(rawPath) : null;	//relativize the raw path to the base path
-			if(relativePath!=null && relativePath.toString().startsWith(GuiseApplication.GUISE_TEMP_BASE_PATH.toString()))	//if this is a path to a Guise temporary public resource
-			{
-				final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
-				final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request TODO see if we can request a session without forcing one to be created, if that's useful
-				final URL tempResourceURL;	//we'll store here the URL to the temporary resource
+			final Destination destination=guiseApplication.getDestination(path);	//get the destination for the given path
+  		if(destination instanceof ResourceReadDestination)	//if this is a request for a resource destination
+  		{
+  			final ResourceReadDestination resourceDestination=(ResourceReadDestination)destination;	//get the resource destination
+	  		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
+	 			final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
+	 			final Bookmark bookmark=guiseRequest.getBookmark();	//get the bookmark, if any
+	 			final URI referrerURI=guiseRequest.getReferrerURI();	//get the referrer URI, if any
+/*TODO del
+	 			final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
+				final String referrer=getReferer(request);	//get the request referrer, if any
+				final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
+*/
+				final ObjectHolder<URFResource> destinationResourceDescriptionHolder=new ObjectHolder<URFResource>();	//create an object holder to receive the result of asking for the resource description
+				final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
 				try
 				{
-					tempResourceURL=guiseApplication.getTempPublicResourceURL(relativePath, guiseSession);	//get a URL to the temporary resource, if there is one
-					if(tempResourceURL==null)	//if there is no such resource
-					{
-						throw new HTTPNotFoundException("No such Guise temporary resource: "+resourceURI);
-					}
-				}
-				catch(final IllegalStateException illegalStateException)	//if we cannot access the resource from the current session
-				{
-					throw new HTTPForbiddenException(illegalStateException.getMessage(), illegalStateException);	//forbid the user from accessing the resource TODO should the Throwable constructor only use Throwable.getMessage() instead of the Throwable.toString()
-				}
-				resource=new DefaultHTTPServletResource(resourceURI, tempResourceURL);	//create a new default resource with a URL to the temporary resource
-			}
-			else	//if this is not a Guise public resource or a temporary resource, see if it is a destination resource
-			{
-		  	final URIPath path=guiseApplication.relativizeURI(resourceURI);	//get the application-relative path TODO is this correct? what if it's a different base URI than was created by the application? check all this---this may even be made redundant by code above; fix in exists() as well
-				final Destination destination=guiseApplication.getDestination(path);	//get the destination for the given path
-	  		if(destination instanceof ResourceReadDestination)	//if this is a request for a resource destination
-	  		{
-	  			final ResourceReadDestination resourceDestination=(ResourceReadDestination)destination;	//get the resource destination
-		  		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
-		 			final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
-		 			final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
-					final String referrer=getReferer(request);	//get the request referrer, if any
-					final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
-					final ObjectHolder<URFResource> destinationResourceDescriptionHolder=new ObjectHolder<URFResource>();	//create an object holder to receive the result of asking for the resource description
-					final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
-					try
-					{
-						call(guiseSessionThreadGroup, new Runnable()	//call the method in a new thread inside the thread group
+					call(guiseSessionThreadGroup, new Runnable()	//call the method in a new thread inside the thread group
+							{
+								public void run()
 								{
-									public void run()
+									try
 									{
-										try
-										{
-											destinationResourceDescriptionHolder.setObject(resourceDestination.getResourceDescription(guiseSession, path, bookmark, referrerURI));	//ask the resource destination for the resource description
-										}
-										catch(final ResourceIOException resourceIOException)	//if an exception is thrown
-										{
-											throw new UndeclaredThrowableException(resourceIOException);	//let it pass to the calling thread
-										}
+										destinationResourceDescriptionHolder.setObject(resourceDestination.getResourceDescription(guiseSession, path, bookmark, referrerURI));	//ask the resource destination for the resource description
 									}
-								});
-					}
-					catch(final UndeclaredThrowableException undeclaredThrowableException)	//if an exception was thrown
+									catch(final ResourceIOException resourceIOException)	//if an exception is thrown
+									{
+										throw new UndeclaredThrowableException(resourceIOException);	//let it pass to the calling thread
+									}
+								}
+							});
+				}
+				catch(final UndeclaredThrowableException undeclaredThrowableException)	//if an exception was thrown
+				{
+					final Throwable cause=undeclaredThrowableException.getCause();	//see what exception was thrown
+					if(cause instanceof ResourceIOException)	//if a ResourceIOException was thrown
 					{
-						final Throwable cause=undeclaredThrowableException.getCause();	//see what exception was thrown
-						if(cause instanceof ResourceIOException)	//if a ResourceIOException was thrown
-						{
-							throw HTTPException.createHTTPException((ResourceIOException)cause);	//pass back an equivalent HTTP exception
-						}
-						else	//we don't expect any other types of exceptions
-						{
-							throw new AssertionError(cause);
-						}
+						throw HTTPException.createHTTPException((ResourceIOException)cause);	//pass back an equivalent HTTP exception
 					}
-					assert destinationResourceDescriptionHolder.getObject()!=null : "Return value from thread unexpectedly missing.";
-					resource=new DestinationResource(resourceURI, destinationResourceDescriptionHolder.getObject(), guiseContainer, guiseApplication, guiseSession, resourceDestination, path, bookmark, referrerURI);	//create an object to access the resource at the given resource destination
-	  		}
-				else	//if this is not a Guise public resource, a temporary resource, or a destination resource, access the resource normally
-		  	{
-		  		resource=super.getResource(request, resourceURI);	//return a default resource
-		  	}
-			}
+					else	//we don't expect any other types of exceptions
+					{
+						throw new AssertionError(cause);
+					}
+				}
+				assert destinationResourceDescriptionHolder.getObject()!=null : "Return value from thread unexpectedly missing.";
+				resource=new DestinationResource(resourceURI, destinationResourceDescriptionHolder.getObject(), guiseContainer, guiseApplication, guiseSession, resourceDestination, path, bookmark, referrerURI);	//create an object to access the resource at the given resource destination
+  		}
+			else	//if this is not a Guise asset or a resource destination, access the resource normally
+	  	{
+	  		resource=super.getResource(request, resourceURI);	//return a default resource
+	  	}
   	}
 		final ContentType contentType=getContentType(resource);	//get the content type of the resource
 //TODO del Debug.trace("got content type", contentType, "for resource", resource);
@@ -2317,46 +2328,4 @@ Debug.trace("this is a destination");
 
 	}
 
-	/**Determines whether the given URI references a Guise asset.
-	The URI references an asset if the path, relative to the application base path, begins with {@value GuiseApplication#GUISE_ASSETS_BASE_PATH}.
-	@param uri The URI, which is assumed to have this servlet's domain.
-	@return <code>true</code> if the given URI references a Guise asset.
-	@exception NullPointerException if the given URI is <code>null</code>.
-	*/
-	public boolean isGuiseAssetURI(final URI uri)
-	{
-			//TODO do we need to ensure that the given URI has a non-null raw path, like we used to, and return false if not?
-		final URIPath path=new URIPath(uri.getRawPath());	//get the URI path TODO check this assumption of the domain when that gets rewritten
-//		TODO del 	Debug.trace("is assetURI?", uri);
-		final URIPath applicationBasePath=getGuiseApplication().getBasePath();	//get the application base path
-//		TODO del Debug.trace("application base path", applicationBasePath);
-		final URIPath relativePath=applicationBasePath.relativize(path);	//relativize the raw path to the base path
-//		TODO del Debug.trace("relativePath", relativePath);
-		return relativePath.toString().startsWith(GuiseApplication.GUISE_ASSETS_BASE_PATH.toString());	//see if the relative path starts with the Guise public resource base path
-	}
-
-	/**Determines the Guise asset key for the given URI.
-	The path of the given URI, relative to the application base path, must begin with {@value GuiseApplication#GUISE_ASSETS_BASE_PATH}.
-	This path prefix will be replaced with {@value Guise#GUISE_ASSETS_BASE_KEY}.
-	@param uri The URI of the asset, which is assumed to have this servlet's domain.
-	@return The key to a Guise asset.
-	@exception IllegalArgumentException if the raw path of the URI is <code>null</code> or does not start with {@value GuiseApplication#GUISE_ASSETS_BASE_PATH}.
-	@see Guise#hasGuiseAssetURL(String)
-	@see Guise#getGuiseAsset(String)
-	@see Guise#getGuiseAssetInputStream(String)
-	@see Guise#getGuiseAssetURL(String)
-	*/
-	public String getGuiseAssetKey(final URI uri)
-	{
-		final URIPath rawPath=new URIPath(uri.getRawPath());	//get the raw path of the URI
-		final URIPath applicationBasePath=getGuiseApplication().getBasePath();	//get the application base path
-		final URIPath relativePath=applicationBasePath.relativize(rawPath);	//relativize the raw path to the base path
-		final String relativePathString=relativePath.toString();	//get the relative path as a string
-		final String guiseAssetBasePathString=GuiseApplication.GUISE_ASSETS_BASE_PATH.toString();	//get the Guise asset base path as a string
-		if(!relativePathString.startsWith(guiseAssetBasePathString))	//if this isn't an asset URI
-		{
-			throw new IllegalArgumentException("URI "+uri+ " does not identify a Guise asset.");
-		}
-		return GUISE_ASSETS_BASE_KEY+relativePathString.substring(guiseAssetBasePathString.length());	//replace the beginning of the relative path with the resource base path
-	}
 }

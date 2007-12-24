@@ -38,8 +38,8 @@ public interface GuiseApplication extends PropertyBindable
 	public final static URIPath GUISE_RESERVED_BASE_PATH=new URIPath("~guise/");
 	/**The application-relative base path to access all Guise assets.*/
 	public final static URIPath GUISE_ASSETS_BASE_PATH=GUISE_RESERVED_BASE_PATH.resolve("assets/");
-	/**The application-relative base path to access all Guise temporary files.*/
-	public final static URIPath GUISE_TEMP_BASE_PATH=GUISE_RESERVED_BASE_PATH.resolve("temp/");
+	/**The application-relative base path to access all Guise temporary assets.*/
+	public final static URIPath GUISE_ASSETS_TEMP_BASE_PATH=GUISE_ASSETS_BASE_PATH.resolve("temp/");
 	/**The base path of audio assets, relative to the application.*/
 	public final static URIPath GUISE_ASSETS_AUDIO_PATH=GUISE_ASSETS_BASE_PATH.resolve("audio/");
 	/**The base path of document assets, relative to the application.*/
@@ -167,6 +167,9 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public void setDCSID(final String dcsID);
 
+	
+	public URIPath getLogicalPath(final URI uri, final URIPath path, final Bookmark bookmark);	//TODO testing
+	
 	/**Associates multiple destinations with application context-relative paths or path patterns.
 	All destinations are first cleared.
 	Any existing destinations for the given context-relative paths are replaced.
@@ -422,10 +425,10 @@ public interface GuiseApplication extends PropertyBindable
 	@return An output stream to the entity at the given resource URI.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	@exception IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made from the required session.
-	@exception FileNotFoundException if a URI to a temporary file was passed before the file was created using {@link #createTempPublicResource(String, String, boolean)}.
+	@exception FileNotFoundException if a URI to a temporary file was passed before the file was created using {@link #createTempAsset(String, String, boolean)}.
 	@exception IOException if there was an error connecting to the entity at the given URI.
 	@see #resolveURI(URI)
-	@see #createTempPublicResource(String, String, boolean)
+	@see #createTempAsset(String, String, boolean)
 	*/
 	public OutputStream getOutputStream(final URI uri) throws IOException;
 
@@ -437,47 +440,53 @@ public interface GuiseApplication extends PropertyBindable
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #getOutputStream(URI)} should be used instead).
 	@exception IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made from the required session.
-	@exception FileNotFoundException if a path to a temporary file was passed before the file was created using {@link #createTempPublicResource(String, String, boolean)}.
+	@exception FileNotFoundException if a path to a temporary file was passed before the file was created using {@link #createTempAsset(String, String, boolean)}.
 	@exception IOException if there was an error connecting to the entity at the given URI.
 	@see #getOutputStream(URI)
-	@see #createTempPublicResource(String, String, boolean)
+	@see #createTempAsset(String, String, boolean)
 	*/
 	public OutputStream getOutputStream(final URIPath path) throws IOException;
 
-	/**Creates a temporary resource available at a public application navigation path.
+	/**Creates a temporary asset available at an application navigation path.
 	The file will be created in the application's temporary file directory.
-	If the resource is restricted to the current Guise session, the resource will be deleted when the current Guise session ends.
+	If the asset is restricted to the current Guise session, the asset will be deleted when the current Guise session ends.
 	@param baseName The base filename to be used in generating the filename.
 	@param extension The extension to use for the temporary file.
 	@param restrictionSession The Guise session to which access access to the temporary file should be restricted, or <code>null</code> if there should be no access restriction.
-	@return A public application navigation path that can be used to access the resource.
+	@return An application navigation path that can be used to access the asset.
 	@exception NullPointerException if the given base name and/or extension is <code>null</code>.
 	@exception IllegalArgumentException if the base name is the empty string.
 	@exception IllegalStateException if the given restriction session is not registered with this application.
-	@exception IOException if there is a problem creating the public resource.
+	@exception IOException if there is a problem creating the temporary asset.
 	@see #getTempDirectory()
-	@see #hasTempPublicResource(URIPath)
+	@see #hasAsset(URIPath)
 	*/
-	public URIPath createTempPublicResource(final String baseName, final String extension, final GuiseSession restrictionSession) throws IOException;
+	public URIPath createTempAsset(final String baseName, final String extension, final GuiseSession restrictionSession) throws IOException;
 
-	/**Determines whether this application has a temporary public resource at the given path.
-	@param path The application-relative path of the resource.
-	@return <code>true</code> if a temporary public resource exists at the given path.
-	@exception IOException if there was an error accessing the temporary public resource.
-	@see #createTempPublicResource(String, String, boolean)
+	/**Determines whether this application has an asset at the given path.
+	The path is first normalized. 
+	This method supports Guise assets and temporary application assets.
+	@param path The application-relative path of the asset.
+	@return <code>true</code> if an asset exists at the given path.
+	@exception IOException if there was an error accessing the asset.
+	@see #createTempAsset(String, String, boolean)
+	@see Guise#hasAsset(String)
 	*/
-	public boolean hasTempPublicResource(final URIPath path) throws IOException;
+	public boolean hasAsset(final URIPath path) throws IOException;
 
-	/**Returns a URL to the temporary public resource at the given path.
-	The given URL represents internal access to the resource and should normally not be presented to users. 
-	@param path The application-relative path of the resource.
-	@param session The Guise session requesting the resource, or <code>null</code> if there is no session associated with the request.
-	@return A URL to the temporary public resource, or <code>null</code> if there is no such temporary public resource.
-	@exception IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session different from the given Guise session.
-	@exception IOException if there was an error accessing the temporary public resource.
-	@see #createTempPublicResource(String, String, boolean)
+	/**Returns a URL to the asset at the given path.
+	The path is first normalized. 
+	This method supports Guise assets and temporary application assets.
+	The returned URL represents internal access to the asset and should normally not be presented to users. 
+	@param path The application-relative path of the asset.
+	@param session The Guise session requesting the asset, or <code>null</code> if there is no session associated with the request.
+	@return A URL to the asset, or <code>null</code> if there is no such asset.
+	@exception IllegalStateException if an asset was requested that requires a particular Guise session different from the given Guise session.
+	@exception IOException if there was an error accessing the asset.
+	@see #createTempAsset(String, String, boolean)
+	@see Guise#getAssetURL(String)
 	*/
-	public URL getTempPublicResourceURL(final URIPath path, final GuiseSession guiseSession) throws IOException;
+	public URL getAssetURL(final URIPath path, final GuiseSession guiseSession) throws IOException;
 
 	/**Retrieves a resource bundle for the given theme in the given locale.
 	The resource bundle retrieved will allow hierarchical resolution in the following priority:
