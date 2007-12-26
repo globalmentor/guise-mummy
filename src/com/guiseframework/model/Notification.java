@@ -259,6 +259,6 @@ public class Notification extends DefaultLabelModel
 	/**@return A string representation of this notification.*/
 	public String toString()
 	{
-		return getSeverity()+": "+AbstractModel.getPlainText(Guise.getInstance().getGuiseSession().resolveString(getMessage()), getMessageContentType());	//severity: message (resolve the message and get its plain text form)
+		return getSeverity()+": "+AbstractModel.getPlainText(Guise.getInstance().getGuiseSession().dereferenceString(getMessage()), getMessageContentType());	//severity: message (resolve the message and get its plain text form)
 	}
 }

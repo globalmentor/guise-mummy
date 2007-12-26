@@ -22,7 +22,7 @@ public class BooleanStringLiteralConverter extends AbstractStringLiteralConverte
 		}
 		catch(final NumberFormatException numberFormatException)	//if the string does not contain a valid Boolean
 		{
-			throw new ConversionException(format(getSession().resolveString(getInvalidValueMessage()), literal), literal);
+			throw new ConversionException(format(getSession().dereferenceString(getInvalidValueMessage()), literal), literal);
 		}
 	}
 }

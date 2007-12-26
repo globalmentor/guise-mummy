@@ -59,7 +59,7 @@ public class DefaultStringLiteralConverter<V> extends AbstractStringLiteralConve
 					final Throwable cause=invocationTargetException.getCause();	//get the cause of the exception
 					if(cause instanceof IllegalArgumentException)	//if there was something incorrect about the string literal argument
 					{
-						throw new ConversionException(format(getSession().resolveString(getInvalidValueMessage()), literal), literal);	//indicate that the value was invalid
+						throw new ConversionException(format(getSession().dereferenceString(getInvalidValueMessage()), literal), literal);	//indicate that the value was invalid
 					}
 					else	//if there is some other constructor error
 					{

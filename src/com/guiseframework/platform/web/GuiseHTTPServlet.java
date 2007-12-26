@@ -410,7 +410,7 @@ while(headerNames.hasMoreElements())
 			return;	//don't try to see if there is a navigation path for this path
 		}
 
-		final Destination destination=guiseApplication.getDestination(guiseRequest.getRequestPath());	//try to get a destination associated with the requested path
+		final Destination destination=guiseApplication.getDestination(guiseRequest.getNavigationPath());	//try to get a destination associated with the requested path
 		if(destination!=null)	//if we have a destination associated with the requested path
 		{
 Debug.trace("found destination:", destination);
@@ -439,10 +439,13 @@ Debug.trace("found destination:", destination);
 			}
 	//TODO del Debug.info("supports Flash: ", guiseSession.getEnvironment().getProperty(GuiseEnvironment.CONTENT_APPLICATION_SHOCKWAVE_FLASH_ACCEPTED_PROPERTY));
 
-
 			final String httpMethod=request.getMethod();	//get the current HTTP method being used
+Debug.trace("method", httpMethod);
+Debug.trace("destination", destination, "is resource read destination?", (destination instanceof ResourceReadDestination));
+Debug.trace("is GET with resource destination?", (destination instanceof ResourceReadDestination && GET_METHOD.equals(httpMethod)));
 			if(destination instanceof ResourceReadDestination && GET_METHOD.equals(httpMethod))	//if this is a resource read destination (but only if this is a GET request; the ResourceReadDestination may also be a ResourceWriteDestination)
 			{
+Debug.trace("ready to delegate to super");
 				super.doGet(request, response);	//let the default functionality take over, which will take care of accessing the resource destination by creating a specialized access resource
 				return;	//don't service the Guise request normally
 			}
@@ -500,6 +503,7 @@ Debug.trace("found destination:", destination);
   */
 	private void serviceGuiseRequest(/*TODO del when works final HttpServletRequest request,*/final HTTPServletGuiseRequest guiseRequest, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final Destination destination) throws IOException
 	{
+Debug.trace("servicing Guise request with request", guiseRequest);
 		final WebPlatform guisePlatform=(WebPlatform)guiseSession.getPlatform();	//get the web platform
 /*TODO del
 		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
@@ -508,9 +512,9 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 		final String contentTypeString=request.getContentType();	//get the request content type
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
 */
-		final URI requestURI=guiseRequest.getRequestURI();	//get the request URI
+		final URI requestURI=guiseRequest.getDepictURI();	//get the request URI
 		final ContentType contentType=guiseRequest.getRequestContentType();	//get the request content type
-		final URIPath path=guiseRequest.getRequestPath();	//get the path
+		final URIPath path=guiseRequest.getNavigationPath();	//get the path
 		final Bookmark bookmark=guiseRequest.getBookmark();	//get the bookmark, if any
 		final URI referrerURI=guiseRequest.getReferrerURI();	//get the referrer URI, if any
 //TODO del		final boolean isAJAX=contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType);	//see if this is a Guise AJAX request
@@ -533,8 +537,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 			final URIPath newPath=destination.getPath(guiseSession, path, bookmark, referrerURI);	//see if we should use another path
 			if(!newPath.equals(path))	//if we should use another path
 			{
-					//TODO fix logicalpath
-				redirect(requestURI, bookmark, newPath, guiseApplication, true);	//redirecting the user agent to the preferred path
+				redirect(guiseRequest, guiseApplication, newPath.toURI(), bookmark, true);	//redirect the user agent to the preferred path
 			}
 			else if(!destination.exists(guiseSession, path, bookmark, referrerURI))	//if this destination doesn't exist
 			{
@@ -675,7 +678,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 		}
 		else if(destination instanceof RedirectDestination)	//if we have a component destination associated with the requested path
 		{
-			redirect(requestURI, bookmark, guiseApplication, (RedirectDestination)destination);	//perform the redirect; this should never return
+			redirect(guiseRequest, guiseApplication, (RedirectDestination)destination, bookmark);	//perform the redirect; this should never return
 			throw new AssertionError("Redirect not expected to allow processing to continue.");
 		}
 		else	//if we don't recognize the destination type
@@ -732,7 +735,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 				}
 			}
 */
-			final URIPath navigationPath=guiseRequest.getRequestPath();	//get the logical path for this request
+			final URIPath navigationPath=guiseRequest.getNavigationPath();	//get the logical path for this request
 			final Bookmark navigationBookmark=guiseRequest.getBookmark();	//get the bookmark from this request
 //TODO fix to recognize navigation, bookmark, and principal changes when the navigation panel is created		final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
 			final Bookmark oldBookmark=isAJAX ? guiseSession.getBookmark() : navigationBookmark;	//get the original bookmark, which will be the one requested in navigation (which we'll soon set) if this is a normal HTTP GET/POST
@@ -903,7 +906,7 @@ Debug.trace("got control events");
 							final String title=destinationComponent.getLabel();	//get the title of the page, if there is a title
 							if(title!=null)	//if there is a title
 							{
-								ELFF.appendURIQueryParameter(queryParametersStringBuilder, TITLE_QUERY_ATTRIBUTE_NAME, guiseSession.resolveString(title)).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.ti as a query parameter
+								ELFF.appendURIQueryParameter(queryParametersStringBuilder, TITLE_QUERY_ATTRIBUTE_NAME, guiseSession.dereferenceString(title)).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.ti as a query parameter
 							}
 								//WT.tz
 							ELFF.appendURIQueryParameter(queryParametersStringBuilder, TIMEZONE_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getTimeZone())).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.tz as a query parameter
@@ -1000,34 +1003,38 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						depictContext.writeAttribute(null, "viewportID", SEND_RESOURCE_VIEWPORT_ID);	//specify the viewport ID for sending resources
 							//append the "guiseContentDisposition=attachment" query parameter to the URI
 						final URI sendResourceAttachmentURI=appendQueryParameters(sendResourceURI, new NameValuePair<String, String>(GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER, getSerializationName(ContentDispositionType.ATTACHMENT)));
-						depictContext.write(sendResourceAttachmentURI.toString());	//write the URI of the resource to send
+						depictContext.write(depictContext.getDepictURI(sendResourceAttachmentURI).toString());	//write the depict URI of the resource to send
 						depictContext.writeElementEnd(null, "navigate");	//</navigate>
 						guisePlatform.clearSendResourceURI();	//clear the address of the resource to send so that we won't send it again
 					}
-					final URI requestURI=guiseRequest.getRequestURI();	//get the request URI
+					final URI requestDepictURI=guiseRequest.getDepictURI();	//get the request URI
 					final Bookmark newBookmark=guiseSession.getBookmark();	//see if the bookmark has changed
 //TODO del Debug.trace("navigation bookmark:", navigationBookmark, "new bookmark", newBookmark);
 					final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
+//Debug.trace("requested navigation:", requestedNavigation);
 					if(requestedNavigation!=null || !ObjectUtilities.equals(navigationBookmark, newBookmark))	//if navigation is requested or the bookmark has changed, redirect the browser
 					{
-						final URI redirectURI;	//we'll determine where to direct to; this may not be an absolute URI
+						final URI redirectNavigationURI;	//we'll determine where to direct to in navigation terms; this may not be an absolute URI
 						if(requestedNavigation!=null)	//if navigation is requested
 						{
 							final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
-		//TODO del Debug.trace("navigation requested to", requestedNavigationURI);
+//Debug.trace("navigation requested to", requestedNavigationURI);
 							guiseSession.clearRequestedNavigation();	//remove any navigation requests
+/*TODO remove modal navigation
 							if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
 							{
 								beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation)requestedNavigation);	//begin the modal navigation
 							}
-							redirectURI=requestedNavigationURI;	//we already have the destination URI
+*/
+							redirectNavigationURI=requestedNavigationURI;	//we already have the destination URI
 						}
 						else	//if navigation is not requested, request a navigation to the new bookmark location
 						{
-								//TODO fix logicalpath
-							redirectURI=appendRawQuery(requestURI, newBookmark.toString());	//save the constructed bookmark URI	TODO fix the confusion about whether there is a query on the URIs
+							redirectNavigationURI=appendRawQuery(navigationPath.toURI(), newBookmark.toString());	//save the constructed bookmark URI	TODO fix the confusion about whether there is a query on the URIs
 						}
-						if(!requestURI.equals(requestURI.resolve(redirectURI)))	//resolve the redirect URI against the current URI to see if the navigation is really changing (i.e. they didn't request to go to where they already were)
+						final URI redirectDepictURI=requestDepictURI.resolve(guiseApplication.resolveURI(guiseApplication.getDepictURI(requestDepictURI, redirectNavigationURI)));	//get the absolute redirect URI in depiction terms
+//Debug.trace("depict version of requested navigation:", redirectDepictURI);
+						if(!requestDepictURI.equals(redirectDepictURI))	//if the navigation is really changing (i.e. they didn't request to go to where they already were)
 						{
 							if(isAJAX)	//if this is an AJAX request
 							{
@@ -1044,12 +1051,14 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 										isNavigating=false;	//don't consider a viewport-specific navigation to be true navigation, as we still want the main page to be updated (e.g. closed frames still need to be removed)
 									}
 								}
-								depictContext.write(redirectURI.toString());	//write the navigation URI
+//Debug.trace("telling AJAX to redirect to:", redirectDepictURI);
+								depictContext.write(redirectDepictURI.toString());	//write the redirect URI
 								depictContext.writeElementEnd(null, "navigate");	//</navigate>
 							}
 							else	//if this is not an AJAX request
 							{
-								throw new HTTPMovedTemporarilyException(redirectURI);	//redirect to the new navigation location TODO fix to work with other viewports
+//Debug.trace("HTTP redirecting to:", redirectDepictURI);
+								throw new HTTPMovedTemporarilyException(redirectDepictURI);	//redirect to the new location TODO fix to work with other viewports
 							}
 							//TODO if !AJAX						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
 							//TODO store a flag or something---if we're navigating, we probably should flush the other queued events
@@ -1059,7 +1068,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 					{
 						if(!isNavigating)	//if we're not navigating to a new location, fire a navigation event anyway to indicate that the principal has changed
 						{
-							guiseSession.fireNavigated(requestURI);	//tell the session that navigation has essentially occurred again from the same URI so that it can update things based upon the new principal
+							guiseSession.fireNavigated(navigationPath.toURI());	//tell the session that navigation has essentially occurred again from the same URI so that it can update things based upon the new principal TODO decide whether this is in depict or logical space
 						}
 						if(isAJAX)	//if this is an AJAX request
 						{
@@ -1072,7 +1081,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						}
 						else	//if this is not an AJAX request
 						{
-							throw new HTTPMovedTemporarilyException(depictContext.getDepictURI());	//redirect to the same page, which will generate a new request with no POST parameters, which would likely change the principal again)
+							throw new HTTPMovedTemporarilyException(depictContext.getDepictURI());	//redirect to the same page with the same query, which will generate a new request with no POST parameters, which would likely change the principal again)
 						}
 					}
 				}
@@ -1192,6 +1201,19 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 								depictContext.writeAttribute(null, "objectID", platform.getDepictIDString(webDepictEvent.getDepictedObject().getDepictID()));	//objectID="depictedObjectID" TODO use a constant
 							}
 							depictContext.writeAttribute(null, "command", getSerializationName(webCommandMessage.getCommand()));	//command="webCommand" TODO use a constant
+/*TODO del if not needed
+							final Map<String, Object> depictParameters=new HashMap<String, Object>(webCommandMessage.getParameters().size());	//create a new map of depiction parameters
+							for(final Map.Entry<String, Object> parameterEntry:webCommandMessage.getParameters().entrySet())	//look at all the parameters
+							{
+								Object value=parameterEntry.getValue();	//get the parameter value
+								if(value instanceof URI)	//if this is a URI
+								{
+									value=depictContext.getDepictURI((URI)value);	//get the depict URI
+								}
+								depictParameters.put(parameterEntry.getKey(), value);	//store the parameter in the depict parameter map
+							}
+							depictContext.write(JSON.serialize(depictParameters));	//{parameters...}
+*/
 							depictContext.write(JSON.serialize(webCommandMessage.getParameters()));	//{parameters...}
 							depictContext.writeElementEnd(XHTML_NAMESPACE_URI, "command");	//</xhtml:command>
 						}
@@ -1235,6 +1257,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 	@throws IllegalArgumentException if the referenced destination does not specify a path (instead specifying a path pattern, for example).
 	@throws HTTPRedirectException unconditionally to indicate how and to where redirection should occur.
 	*/
+/*TODO del when works
 	protected void redirect(final URI requestURI, final Bookmark bookmark, final GuiseApplication guiseApplication, final RedirectDestination redirectDestination) throws HTTPRedirectException
 	{
 		final URIPath redirectPath;	//the path to which direction should occur
@@ -1263,6 +1286,46 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 			throw new AssertionError("Unsupported redirect destination type "+redirectDestination.getClass().getName());
 		}
 	}
+*/
+
+	/**Processes a redirect from a redirect destination.
+	This method will unconditionally throw an exception.
+	Under normal circumstances, an {@link HTTPRedirectException} will be thrown.
+	@param guiseRequest The Guise request information.
+	@param guiseApplication The Guise application.
+	@param redirectDestination The destination indicating how and to where redirection should occur.
+	@param bookmark The requested bookmark, or <code>null</code> if no bookmark is requested
+	@throws IllegalArgumentException if the referenced destination does not specify a path (instead specifying a path pattern, for example).
+	@throws HTTPRedirectException unconditionally to indicate how and to where redirection should occur.
+	*/
+	protected void redirect(final HTTPServletGuiseRequest guiseRequest, final GuiseApplication guiseApplication, final RedirectDestination redirectDestination, final Bookmark bookmark) throws HTTPRedirectException
+	{
+		final URIPath redirectPath;	//the path to which direction should occur
+		if(redirectDestination instanceof ReferenceDestination)	//if the destination references another destination
+		{
+			redirectPath=((ReferenceDestination)redirectDestination).getDestination().getPath();	//get the path of the referenced destination TODO what if the referenced destination is itself a redirect? should we support that, too? probably
+			if(redirectPath==null)	//if there is no redirect path
+			{
+				throw new IllegalArgumentException("Redirect destination "+redirectDestination+" does not have a valid path.");
+			}
+		}
+		else	//we don't yet support non-reference redirects
+		{
+			throw new AssertionError("Unsupported redirect destination type "+redirectDestination.getClass().getName());
+		}
+		if(redirectDestination instanceof TemporaryRedirectDestination)	//if this is a temporary redirect
+		{
+			redirect(guiseRequest, guiseApplication, redirectPath.toURI(), bookmark, false);	//redirect temporarily
+		}
+		else if(redirectDestination instanceof PermanentRedirectDestination)	//if this is a permanent redirect
+		{
+			redirect(guiseRequest, guiseApplication, redirectPath.toURI(), bookmark, true);	//redirect permanently
+		}
+		else	//if we don't recognize the type of redirect
+		{
+			throw new AssertionError("Unsupported redirect destination type "+redirectDestination.getClass().getName());
+		}
+	}
 
 	/**Redirects to the given navigation path, preserving the given bookmark.
 	This method will unconditionally throw an exception.
@@ -1274,6 +1337,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 	@param permanent <code>true</code> if the redirect should be permanent.
 	@throws HTTPRedirectException unconditionally to indicate how and to where redirection should occur.
 	*/
+/*TODO del when works
 	protected void redirect(final URI requestURI, final Bookmark bookmark, final URIPath redirectPath, final GuiseApplication guiseApplication, final boolean permanent) throws HTTPRedirectException
 	{
 		URI redirectURI=requestURI.resolve(guiseApplication.resolvePath(redirectPath).toURI());	//resolve the path to the application and resolve that against the request URI
@@ -1288,6 +1352,35 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 		else	//if this is a temporary redirect
 		{
 			throw new HTTPMovedTemporarilyException(redirectURI);	//redirect temporarily
+		}
+	}
+*/
+
+	/**Redirects to the given navigation path, preserving the given bookmark.
+	This method will unconditionally throw an exception.
+	Under normal circumstances, an {@link HTTPRedirectException} will be thrown.
+	@param guiseRequest The Guise request information.
+	@param guiseApplication The Guise application.
+	@param redirectNavigationURI The absolute or application-relative URI to which redirection should occur in navigation space.
+	@param bookmark The requested bookmark, or <code>null</code> if no bookmark is requested
+	@param permanent <code>true</code> if the redirect should be permanent.
+	@throws HTTPRedirectException unconditionally to indicate how and to where redirection should occur.
+	*/
+	protected void redirect(final HTTPServletGuiseRequest guiseRequest, final GuiseApplication guiseApplication, final URI redirectNavigationURI, final Bookmark bookmark, final boolean permanent) throws HTTPRedirectException
+	{
+		final URI requestDepictURI=guiseRequest.getDepictURI();	//get the request depict URI
+		URI redirectDepictURI=requestDepictURI.resolve(guiseApplication.resolveURI(guiseApplication.getDepictURI(requestDepictURI, redirectNavigationURI)));	//convert the redirect URI to a depict URI, resolve it to the application, and resolve it to the original depict URI
+		if(bookmark!=null)	//if a bookmark was given
+		{
+			redirectDepictURI=appendRawQuery(redirectDepictURI, bookmark.toString().substring(1));	//append the bookmark to the redirect URI TODO use a better way of extracting the bookmark query information
+		}
+		if(permanent)	//if this is a permanent redirect
+		{
+			throw new HTTPMovedPermanentlyException(redirectDepictURI);	//redirect permanently
+		}
+		else	//if this is a temporary redirect
+		{
+			throw new HTTPMovedTemporarilyException(redirectDepictURI);	//redirect temporarily
 		}
 	}
 
@@ -1986,7 +2079,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 Debug.trace("checking exists for", resourceURI);
 		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
   	final HTTPServletGuiseRequest guiseRequest=new HTTPServletGuiseRequest(request, /*TODO del response, */guiseContainer, guiseApplication);	//get Guise request information
-  	final URIPath path=guiseRequest.getRequestPath();	//get the application-relative logical path
+  	final URIPath path=guiseRequest.getNavigationPath();	//get the application-relative logical path
   	if(guiseApplication.hasAsset(path))	//if the path represents a valid application asset
   	{
   		return true;	//the resource exists
@@ -2061,7 +2154,7 @@ Debug.trace("this is a destination");
 //TODO del Debug.trace("getting resource for URI: ", resourceURI);
 		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
   	final HTTPServletGuiseRequest guiseRequest=new HTTPServletGuiseRequest(request, /*TODO del response, */guiseContainer, guiseApplication);	//get Guise request information
-  	final URIPath path=guiseRequest.getRequestPath();	//get the application-relative logical path
+  	final URIPath path=guiseRequest.getNavigationPath();	//get the application-relative logical path
 		final HTTPServletResource resource;	//we'll create a resource for this resource URI
   	if(guiseApplication.hasAsset(path))	//if the path represents an application asset
   	{

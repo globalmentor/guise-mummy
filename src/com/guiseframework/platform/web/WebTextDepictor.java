@@ -62,7 +62,7 @@ public class WebTextDepictor<C extends Text> extends AbstractSimpleWebComponentD
 //TODO del Debug.trace("text loaded");
 		if(text!=null)	//if the component has text
 		{
-			final String resolvedText=component.getSession().resolveString(text);	//resolve the text
+			final String resolvedText=component.getSession().dereferenceString(text);	//resolve the text
 			final ContentType contentType=component.getTextContentType();	//get the content type of the text
 			final boolean isXML=isXML(contentType);	//see if the content type is for XML
 			final boolean isXMLExternalParsedEntity=isXMLExternalParsedEntity(contentType);	//see if the content type is for an XML external parsed entity

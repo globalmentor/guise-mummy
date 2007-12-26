@@ -227,10 +227,10 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 */
 	}
 
-	/**The URI of the resource to sent to the platform, or <code>null</code> if there is no resource to be sent.*/
+	/**The absolute or application-relative URI of the resource to sent to the platform, or <code>null</code> if there is no resource to be sent.*/
 	private URI sendResourceURI=null;
 
-		/**@return The URI of the resource to sent to the platform, or <code>null</code> if there is no resource to be sent.*/
+		/**@return The absolute or application-relative URI of the resource to sent to the platform, or <code>null</code> if there is no resource to be sent.*/
 		URI getSendResourceURI() {return sendResourceURI;}
 
 		/**Clears the record of the resource to be sent.*/
@@ -273,7 +273,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	*/
 	public void sendResource(final URI resourceURI, final Bookmark bookmark)
 	{
-		sendResourceURI=getApplication().resolveURI(checkInstance(resourceURI, "Resource URI cannot be null."));	//resolve the URI and save the resource
+		sendResourceURI=checkInstance(resourceURI, "Resource URI cannot be null.");	//save the resource; it will be resolved when depicted
 		if(bookmark!=null)	//if a bookmark was provided
 		{
 			sendResourceURI=URI.create(sendResourceURI.toString()+bookmark.toString());	//append the bookmark query

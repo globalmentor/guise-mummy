@@ -758,8 +758,8 @@ Debug.trace("list control changed value to", newValue);
 						final Integer newValue=propertyChangeEvent.getNewValue();	//get the new value
 						if(newValue!=null)	//if there is a new value
 						{
-							testLabel.setOpacity(newValue.floatValue()/100);	//update the label opacity
-							image.setOpacity(newValue.floatValue()/100);	//update the image opacity
+							testLabel.setOpacity(newValue.doubleValue()/100);	//update the label opacity
+							image.setOpacity(newValue.doubleValue()/100);	//update the image opacity
 						}
 					}
 				});

@@ -17,7 +17,7 @@ import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.Axis;
 import com.guiseframework.geometry.Extent;
 import com.guiseframework.geometry.Side;
-import static com.guiseframework.platform.web.CSSUtilities.*;
+import com.guiseframework.platform.XHTMLDepictContext;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**The abstract base class for all <code>application/xhtml+xml</code> composite components that use layouts.
@@ -89,7 +89,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 							useMozInlineBoxFixup=true;	//note that we're using the -moz-inline-box fixup
 							depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//<xhtml:div>
 							final Map<String, Object> styles=new HashMap<String, Object>();	//create a new map of styles
-							styles.put(CSS_PROP_WIDTH, CSSUtilities.toString(width));	//indicate the width to keep text contained if possible
+							styles.put(CSS_PROP_WIDTH, width);	//indicate the width to keep text contained if possible
 							styles.put(CSS_PROP_OVERFLOW, CSS_OVERFLOW_HIDDEN);	//hide the text if it can't wrap and goes outside the box
 							writeStyleAttribute(styles);	//write the styles
 						}
@@ -139,11 +139,11 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 					final Extent gapAfter=childComponentIterator.hasNext() ? Extent.ZERO_EXTENT1 : flowLayout.getGapAfter();	//if this is the last component, we'll add the requested amount of space after the component as well
 					if(gapBefore.getValue()!=0)	//if there is a gap before (the stylesheet should set the default to zero)
 					{
-						styles.put(CSS_PROP_PADDING_LEFT, CSSUtilities.toString(gapBefore));	//insert padding before the components
+						styles.put(CSS_PROP_PADDING_LEFT, gapBefore);	//insert padding before the components
 					}
 					if(gapAfter.getValue()!=0)	//if there is a gap after (the stylesheet should set the default to zero)
 					{
-						styles.put(CSS_PROP_PADDING_RIGHT, CSSUtilities.toString(gapAfter));	//insert padding after the components
+						styles.put(CSS_PROP_PADDING_RIGHT, gapAfter);	//insert padding after the components
 					}
 					writeStyleAttribute(styles);	//write the styles
 					styles.put(CSS_PROP_DISPLAY, CSS_DISPLAY_INLINE_BLOCK);	//set each child to act as an inline block so that it will flow
@@ -187,11 +187,11 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 							final Extent gapAfter=childComponentIterator.hasNext() ? Extent.ZERO_EXTENT1 : flowLayout.getGapAfter();	//if this is the last component, we'll add the requested amount of space after the component as well
 							if(gapBefore.getValue()!=0)	//if there is a gap before (the stylesheet should set the default to zero)
 							{
-								styles.put(CSS_PROP_PADDING_LEFT, CSSUtilities.toString(gapBefore));	//insert padding before the components
+								styles.put(CSS_PROP_PADDING_LEFT, gapBefore);	//insert padding before the components
 							}
 							if(gapAfter.getValue()!=0)	//if there is a gap after (the stylesheet should set the default to zero)
 							{
-								styles.put(CSS_PROP_PADDING_RIGHT, CSSUtilities.toString(gapAfter));	//insert padding after the components
+								styles.put(CSS_PROP_PADDING_RIGHT, gapAfter);	//insert padding after the components
 							}
 							writeStyleAttribute(styles);	//write the styles							
 							updateFlowChildView(childComponent, flowAxis);	//update this child's view
@@ -223,11 +223,11 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 							final Extent gapAfter=childComponentIterator.hasNext() ? Extent.ZERO_EXTENT1 : flowLayout.getGapAfter();	//if this is the last component, we'll add the requested amount of space after the component as well
 							if(gapBefore.getValue()!=0)	//if there is a gap before (the stylesheet should set the default to zero)
 							{
-								styles.put(CSS_PROP_PADDING_TOP, CSSUtilities.toString(gapBefore));	//insert padding before the components
+								styles.put(CSS_PROP_PADDING_TOP, gapBefore);	//insert padding before the components
 							}
 							if(gapAfter.getValue()!=0)	//if there is a gap after (the stylesheet should set the default to zero)
 							{
-								styles.put(CSS_PROP_PADDING_BOTTOM, CSSUtilities.toString(gapAfter));	//insert padding after the components
+								styles.put(CSS_PROP_PADDING_BOTTOM, gapAfter);	//insert padding after the components
 							}
 							writeStyleAttribute(styles);	//write the styles							
 							updateFlowChildView(childComponent, flowAxis);	//update this child's view
@@ -592,7 +592,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 				final Extent extent=regionConstraints.getExtent(flow);	//get the extent for this flow
 				if(extent!=null)	//if this region has a requested extent for this flow
 				{
-					styles.put(axis==Axis.X ? CSS_PROP_WIDTH : CSS_PROP_HEIGHT, CSSUtilities.toString(extent));	//indicate the width or height				
+					styles.put(axis==Axis.X ? CSS_PROP_WIDTH : CSS_PROP_HEIGHT, extent);	//indicate the width or height				
 				}
 			}
 		}
@@ -604,7 +604,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 				final Extent paddingExtent=regionConstraints.getPaddingExtent(border);	//get the padding extent for this border
 				if(paddingExtent.getValue()!=0)	//if a non-zero padding extent is specified (the stylesheet specifies a zero default padding)
 				{
-					styles.put(CSS_PROPERTY_PADDING_X_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(paddingExtent));	//set the padding extent
+					styles.put(XHTMLDepictContext.CSS_PROPERTY_PADDING_X_TEMPLATE.apply(getSerializationName(side)), paddingExtent);	//set the padding extent
 				}
 			}
 		}

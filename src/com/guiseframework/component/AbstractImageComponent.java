@@ -105,7 +105,7 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 			else if(contentType.match(image.getLabelContentType()))	//if the label has the content type requested
 			{
 				final String label=image.getLabel();	//get the image label, if any
-				return label!=null ? image.getSession().resolveString(image.getLabel()) : null;	//return the resolved label text, if any
+				return label!=null ? image.getSession().dereferenceString(image.getLabel()) : null;	//return the resolved label text, if any
 			}
 			else	//if we don't support this content type
 			{

@@ -139,10 +139,10 @@ public class WebImageDepictor<C extends ImageComponent> extends AbstractSimpleWe
 		final URI imageURI=getImageURI();	//get the component image URI
 		if(imageURI!=null)	//if there is an image URI
 		{
-			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, session.resolveURI(imageURI).toString());	//src="imageURI"
+			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictURI(imageURI).toString());	//src="imageURI"
 		}
 		final String label=component.getLabel();	//get the component label, if there is one
-		String resolvedLabel=label!=null ? session.resolveString(label) : null;	//resolve the label, if there is one
+		String resolvedLabel=label!=null ? session.dereferenceString(label) : null;	//resolve the label, if there is one
 		if(resolvedLabel==null)
 		{
 			resolvedLabel="";	//TODO fix

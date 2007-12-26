@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 
 import static com.garretwilson.javascript.JavaScriptConstants.*;
-
 import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
@@ -40,7 +39,7 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 	{
 		writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT, false);	//<xhtml:script> (explicitly don't create an empty <xhtml:script> element, otherwise IE wouldn't recognize it)
 		writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_TYPE, JAVASCRIPT_CONTENT_TYPE.toString());	//type="text/javascript"
-		writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_SRC, getSession().getApplication().resolveURI(javascriptURI).toString());	//src="javascript.js"	(resolved to the application)
+		writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_SRC, getDepictURI(javascriptURI).toString());	//src="javascript.js"
 		return writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT);	//</xhtml:script>	
 	}
 

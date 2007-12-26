@@ -52,7 +52,7 @@ public class Resources extends AbstractClassTypedURFResource
 	A control string begins with the Start of String control character (U+0098) and ends with a String Terminator control character (U+009C).
 	ECMA-48 publication is also approved as ISO/IEC 6429.
 	@param resourceKey The resource key to a string in the resources which could be retrieved using {@link GuiseSession#getStringResource(String)}.
-	@return A string containing a reference to the given resource key, an ECMA-48 control string with the given resource key as its content, which can be resolved using {@link GuiseSession#resolveString(String)}.
+	@return A string containing a reference to the given resource key, an ECMA-48 control string with the given resource key as its content, which can be resolved using {@link GuiseSession#dereferenceString(String)}.
 	@exception NullPointerException if the given resource key is <code>null</code>.
 	@see <a href="http://www.ecma-international.org/publications/standards/Ecma-048.htm">ECMA-48: Control Functions for Coded Character Sets</a>
 	*/

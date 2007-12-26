@@ -36,7 +36,7 @@ public enum Cursor
 	MOVE(XMLCSSCursor.MOVE),
 	/**The cursor is a pointer that indicates a link.*/
 	POINTER(XMLCSSCursor.POINTER),
-	/**A progress indicator. The program is performing some processing, but is different from {@link #WAIT} in that the user may still interact with the program. Often rendered as a spinning beach ball, or an arrow with a watch or hourglass.
+	/**A progress indicator. The program is performing some processing, but is different from {@link #WAIT} in that the user may still interact with the program. Often rendered as a spinning beach ball, or an arrow with a watch or hourglass.*/
 	PROGRESS(XMLCSSCursor.PROGRESS),
 	/**Indicate that some edge is to be moved from the east of the box in left-to-right top-to-bottom orientation.*/
 	RESIZE_LINE_FAR(XMLCSSCursor.E_RESIZE),
@@ -90,7 +90,6 @@ public enum Cursor
 		final CompassPoint resizeCompassPoint;	//we'll determine a esize compass point if needed
 		switch(this)
 		{
-
 			case RESIZE_LINE_NEAR:
 				resizeCompassPoint=orientation.getCompassPoint(Flow.End.NEAR, null);
 				break;

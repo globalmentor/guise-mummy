@@ -189,7 +189,7 @@ Debug.trace("ready to set selected indexes to", Arrays.toString(selectedIndices)
 				final String valueLabel=representationComponent.getLabel();	//get the component label, if there is one
 				if(valueLabel!=null)	//if there is a label for this value
 				{
-					depictContext.write(representationComponent.getSession().resolveString(valueLabel));	//write the label for this item
+					depictContext.write(representationComponent.getSession().dereferenceString(valueLabel));	//write the label for this item
 //TODO del if causing problems					representationComponent.getView().setUpdated(true);	//because the child component view isn't updating itself, tell that the view is updated so that the view won't be sent back during page initialization
 				}
 				depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_OPTION);	//</xhtml:option>
@@ -214,7 +214,7 @@ Debug.trace("ready to set selected indexes to", Arrays.toString(selectedIndices)
 				final String valueLabel=representationComponent.getLabel();	//get the component label, if there is one
 				if(valueLabel!=null)	//if there is a label for this value
 				{
-					depictContext.write(representationComponent.getSession().resolveString(valueLabel));	//write the label for this item					
+					depictContext.write(representationComponent.getSession().dereferenceString(valueLabel));	//write the label for this item					
 				}
 				//TODO do error handling here if the model is not a label model
 				depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_OPTION);	//</xhtml:option>

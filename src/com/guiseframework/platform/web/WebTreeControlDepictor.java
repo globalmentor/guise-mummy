@@ -278,7 +278,8 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IMG, true);	//<xhtml:img> (component-action)
 		depictContext.writeAttribute(null, ATTRIBUTE_ID, decorateID(treeNodeIDString, null, "-treeNode-action"/*TODO fix FRAME_CLOSE_CLASS_SUFFIX*/));	//write the ID with the correct suffix
 		writeClassAttribute(actionStyleIDs);	//write the title style IDs
-		depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, getSession().getApplication().resolveURI(treeNodeImageURI).toString());	//src="treenode-XXX.gif"
+			//TODO why aren't we using the suffix version of getting the depict URI?
+		depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictURI(treeNodeImageURI).toString());	//src="treenode-XXX.gif"
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IMG);	//</xhtml:img> (component-close)
 
 		depictContext.write(" ");	//separate the icon and the component

@@ -51,12 +51,12 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 
 		/**@return The HTTP servlet response.*/
 		protected HttpServletResponse getResponse() {return response;}
-	/**The current absolute URI for this depiction.*/
 
-//TODO del	private final URI depictURI;
+		/**The current full absolute URI for this depiction, including any query.*/
+		private final URI depictURI;
 
-		/**@return The current absolute URI for this depiction.*/
-		public URI getDepictURI() {return getGuiseRequest().getRequestURI();}
+		/**@return The current full absolute URI for this depiction, including any query.*/
+		public URI getDepictURI() {return depictURI;}
 
 	/**Whether quirks mode is being used.*/
 	private final boolean isQuirksMode;
@@ -93,7 +93,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 		this.guiseRequest=checkInstance(guiseRequest, "Guise request cannot be null.");
 		this.response=checkInstance(response, "Response cannot be null.");
 //TODO decide if we want this to include parameters or not		this.navigationURI=URI.create(request.getRequestURL().toString());	//create the absolute navigation URI from the HTTP requested URL
-//TODO decide on whether we need parameters		this.depictURI=HttpServletUtilities.getRequestURI(request);	//get the absolute navigation URI from the HTTP requested URL
+		this.depictURI=HttpServletUtilities.getRequestURI(guiseRequest.getHTTPServletRequest());	//get the depiction URI, containing any query
 /*TODO del if not needed
 		final String referrer=getReferer(request);	//get the request referrer, if any
 		referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer

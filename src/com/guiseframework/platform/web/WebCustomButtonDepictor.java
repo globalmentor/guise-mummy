@@ -93,7 +93,7 @@ public class WebCustomButtonDepictor<C extends ActionControl> extends AbstractWe
 		if(imageURI!=null)	//if we have an image for this button
 		{
 			context.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IMG, true);	//<xhtml:img>
-			context.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, context.getSession().getApplication().resolveURI(imageURI).toString());	//src="imageURI"
+			context.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictURI(imageURI).toString());	//src="imageURI"
 			String label=model.getLabel();	//get the component label, if there is one
 			if(label==null)
 			{
@@ -181,20 +181,20 @@ public class WebCustomButtonDepictor<C extends ActionControl> extends AbstractWe
 			writeClassAttribute(getBaseStyleIDs(null, "-corner"));	//write the base style IDs with a "-corner" suffix	TODO use a constant
 			final Map<String, Object> cornerStyles=new HashMap<String, Object>();	//create a new map of styles
 			cornerStyles.put(CSS_PROP_DISPLAY, CSS_DISPLAY_BLOCK);	//display: block
-			cornerStyles.put(CSS_PROP_HEIGHT, CSSUtilities.toString(new Extent(1, Unit.PIXEL)));	//height: 1px
+			cornerStyles.put(CSS_PROP_HEIGHT, new Extent(1, Unit.PIXEL));	//height: 1px
 			cornerStyles.put(CSS_PROP_OVERFLOW, CSS_OVERFLOW_HIDDEN);	//overflow: hidden
 /*TODO add the background color once we implement this on the component proper
 			final back
-			cornerStyles.put(CSS_PROP_BACKGROUND, CSSUtilities.toString(new RGBColor(0xF5F5F5)));	//background: backgroundColor
+			cornerStyles.put(CSS_PROP_BACKGROUND, new RGBColor(0xF5F5F5));	//background: backgroundColor
 */
-			cornerStyles.put(CSS_PROP_FONT_SIZE, CSSUtilities.toString(new Extent(1, Unit.PIXEL)));	//font-size: 1px
+			cornerStyles.put(CSS_PROP_FONT_SIZE, new Extent(1, Unit.PIXEL));	//font-size: 1px
 			if(!Dimensions.ZERO_DIMENSIONS.equals(component.getCornerArcSize(leftCorner)))	//if there is a left corner arc size
 			{
-				cornerStyles.put(CSS_PROP_MARGIN_LEFT, CSSUtilities.toString(cornerMargin));	//add the appropriate margin for the left side
+				cornerStyles.put(CSS_PROP_MARGIN_LEFT, cornerMargin);	//add the appropriate margin for the left side
 			}
 			if(!Dimensions.ZERO_DIMENSIONS.equals(component.getCornerArcSize(rightCorner)))	//if there is a right corner arc size
 			{
-				cornerStyles.put(CSS_PROP_MARGIN_RIGHT, CSSUtilities.toString(cornerMargin));	//add the appropriate margin for the right side
+				cornerStyles.put(CSS_PROP_MARGIN_RIGHT, cornerMargin);	//add the appropriate margin for the right side
 			}
 			writeStyleAttribute(cornerStyles);	//write the corner style
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//</xhtml:div>

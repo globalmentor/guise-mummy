@@ -29,7 +29,7 @@ public class WebMessageDepictor<C extends Message> extends AbstractDecoratedWebC
 		final String message=component.getMessage();	//get the component message, if any
 		if(message!=null)	//if the component has a message
 		{
-			writeText(getSession().resolveString(message), component.getMessageContentType());	//write the resolved message appropriately for its content type
+			writeText(getSession().dereferenceString(message), component.getMessageContentType());	//write the resolved message appropriately for its content type
 		}
 	}
 }

@@ -887,18 +887,18 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 		}
 		
 	/**The opacity of the entire component in the range (0.0-1.0), with a default of 1.0.*/
-	private float opacity=1.0f;
+	private double opacity=1.0f;
 
 		/**@return The opacity of the entire component in the range (0.0-1.0), with a default of 1.0.*/
-		public float getOpacity() {return opacity;}
+		public double getOpacity() {return opacity;}
 
 		/**Sets the opacity of the entire component.
-		This is a bound property of type <code>Float</code>.
+		This is a bound property of type {@link Double}.
 		@param newOpacity The new opacity of the entire component in the range (0.0-1.0).
 		@exception IllegalArgumentException if the given opacity is not within the range (0.0-1.0).
 		@see #OPACITY_PROPERTY 
 		*/
-		public void setOpacity(final float newOpacity)
+		public void setOpacity(final double newOpacity)
 		{
 			if(newOpacity<0.0f || newOpacity>1.0f)	//if the new opacity is out of range
 			{
@@ -906,9 +906,9 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 			}
 			if(opacity!=newOpacity)	//if the value is really changing
 			{
-				final float oldOpacity=opacity;	//get the old value
+				final double oldOpacity=opacity;	//get the old value
 				opacity=newOpacity;	//actually change the value
-				firePropertyChange(OPACITY_PROPERTY, new Float(oldOpacity), new Float(newOpacity));	//indicate that the value changed
+				firePropertyChange(OPACITY_PROPERTY, Double.valueOf(oldOpacity), Double.valueOf(newOpacity));	//indicate that the value changed
 			}			
 		}
 

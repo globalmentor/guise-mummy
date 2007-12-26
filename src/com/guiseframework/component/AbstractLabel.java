@@ -77,7 +77,7 @@ public abstract class AbstractLabel extends AbstractComponent implements LabelCo
 			if(contentType.match(source.getLabelContentType()))	//if we have the content type requested
 			{
 				final String label=source.getLabel();	//get the label
-				return label!=null ? source.getSession().resolveString(source.getLabel()) : null;	//return the label text, if any
+				return label!=null ? source.getSession().dereferenceString(source.getLabel()) : null;	//return the label text, if any
 			}
 			else	//if we don't support this content type
 			{

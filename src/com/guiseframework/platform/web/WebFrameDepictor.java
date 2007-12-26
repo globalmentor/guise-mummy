@@ -127,7 +127,7 @@ public class WebFrameDepictor<C extends Frame> extends AbstractWebFrameDepictor<
 				writeStyleAttribute(context, tetherStyles);	//write the body style
 */
 					//look up the tether URI, using the tether compass point abbreviation as a suffix
-				depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, session.resolveURI(tetherImage, tetherCompassPoint.getAbbreviation()).toString());	//src="tetherImage.gif"
+				depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictURI(tetherImage, tetherCompassPoint.getAbbreviation()).toString());	//src="tetherImage.gif"
 				depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IMG);	//</xhtml:img> (component-tether)
 			}
 		}

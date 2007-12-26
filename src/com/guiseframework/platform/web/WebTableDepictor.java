@@ -13,9 +13,8 @@ import com.guiseframework.geometry.*;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.PresentationModel;
 import com.guiseframework.platform.DepictContext;
-
+import com.guiseframework.platform.XHTMLDepictContext;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
-import static com.guiseframework.platform.web.CSSUtilities.CSS_PROPERTY_PADDING_X_TEMPLATE;
 
 /**Strategy for rendering a table component as an XHTML <code>&lt;table&gt;</code> element.
 @param <C> The type of component being depicted.
@@ -160,46 +159,46 @@ public class WebTableDepictor<C extends Table> extends AbstractWebComponentDepic
 				final Extent borderExtent=component.getBorderExtent(border);	//get the border extent for this border
 				if(borderExtent.getValue()!=0)	//if there is a border on this side (to save bandwidth, only include border properties if there is a border; the stylesheet defaults to no border)
 				{
-					styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(borderExtent));	//set the border extent
-					styles.put(CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(component.getBorderStyle(border)));	//indicate the border style for this side
+					styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), borderExtent);	//set the border extent
+					styles.put(CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), component.getBorderStyle(border));	//indicate the border style for this side
 					final Color<?> borderColor=component.getBorderColor(border);	//get the border color for this border
 					if(borderColor!=null)	//if a border color is specified
 					{
-						styles.put(CSS_PROPERTY_BORDER_X_COLOR_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(borderColor));	//set the border color
+						styles.put(CSS_PROPERTY_BORDER_X_COLOR_TEMPLATE.apply(getSerializationName(side)), borderColor);	//set the border color
 					}
 				}
 				final Extent marginExtent=component.getMarginExtent(border);	//get the margin extent for this border
 				if(marginExtent.getValue()!=0)	//if a non-zero margin extent is specified (the stylesheet specifies a zero default margin)
 				{
-					styles.put(CSS_PROPERTY_MARGIN_X_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(marginExtent));	//set the margin extent
+					styles.put(CSS_PROPERTY_MARGIN_X_TEMPLATE.apply(getSerializationName(side)), marginExtent);	//set the margin extent
 				}
 	*/
 				final Extent paddingExtent=uiModel.getPaddingExtent(border);	//get the padding extent for this border of the current column
 				if(paddingExtent.getValue()!=0)	//if a non-zero padding extent is specified (the stylesheet specifies a zero default padding)
 				{
-					labelStyles.put(CSS_PROPERTY_PADDING_X_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(paddingExtent));	//set the padding extent
+					labelStyles.put(XHTMLDepictContext.CSS_PROPERTY_PADDING_X_TEMPLATE.apply(getSerializationName(side)), paddingExtent);	//set the padding extent
 				}
 			}
 	/*TODO fix
 			final List<String> fontFamilies=component.getFontFamilies();	//get the component's font prioritized list of font families
 			if(fontFamilies!=null)	//if this component has specified font families 
 			{
-				styles.put(CSS_PROP_FONT_FAMILY, CSSUtilities.toString(fontFamilies));	//indicate the font families
+				styles.put(CSS_PROP_FONT_FAMILY, fontFamilies);	//indicate the font families
 			}
 			final Extent fontSize=component.getFontSize();	//get the component's font size
 			if(fontSize!=null)	//if this component has a font size 
 			{
-				styles.put(CSS_PROP_FONT_SIZE, CSSUtilities.toString(fontSize));	//indicate the font size
+				styles.put(CSS_PROP_FONT_SIZE, fontSize);	//indicate the font size
 			}
 			final Extent width=orientation.getAxis(Flow.LINE)==Axis.X ? component.getLineExtent() : component.getPageExtent();	//get the component's requested width
 			if(width!=null)	//if this component has a requested width 
 			{
-				styles.put(CSS_PROP_WIDTH, CSSUtilities.toString(width));	//indicate the width
+				styles.put(CSS_PROP_WIDTH, width);	//indicate the width
 			}
 			final Extent height=orientation.getAxis(Flow.PAGE)==Axis.Y ? component.getPageExtent() : component.getLineExtent();	//get the component's requested width
 			if(height!=null)	//if this component has a requested height 
 			{
-				styles.put(CSS_PROP_HEIGHT, CSSUtilities.toString(height));	//indicate the height
+				styles.put(CSS_PROP_HEIGHT, height);	//indicate the height
 			}
 	*/
 		}
@@ -232,46 +231,46 @@ public class WebTableDepictor<C extends Table> extends AbstractWebComponentDepic
 			final Extent borderExtent=component.getBorderExtent(border);	//get the border extent for this border
 			if(borderExtent.getValue()!=0)	//if there is a border on this side (to save bandwidth, only include border properties if there is a border; the stylesheet defaults to no border)
 			{
-				styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(borderExtent));	//set the border extent
-				styles.put(CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(component.getBorderStyle(border)));	//indicate the border style for this side
+				styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), borderExtent);	//set the border extent
+				styles.put(CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), component.getBorderStyle(border));	//indicate the border style for this side
 				final Color<?> borderColor=component.getBorderColor(border);	//get the border color for this border
 				if(borderColor!=null)	//if a border color is specified
 				{
-					styles.put(CSS_PROPERTY_BORDER_X_COLOR_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(borderColor));	//set the border color
+					styles.put(CSS_PROPERTY_BORDER_X_COLOR_TEMPLATE.apply(getSerializationName(side)), borderColor);	//set the border color
 				}
 			}
 			final Extent marginExtent=component.getMarginExtent(border);	//get the margin extent for this border
 			if(marginExtent.getValue()!=0)	//if a non-zero margin extent is specified (the stylesheet specifies a zero default margin)
 			{
-				styles.put(CSS_PROPERTY_MARGIN_X_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(marginExtent));	//set the margin extent
+				styles.put(CSS_PROPERTY_MARGIN_X_TEMPLATE.apply(getSerializationName(side)), marginExtent);	//set the margin extent
 			}
 */
 			final Extent paddingExtent=component.getColumnPaddingExtent(column, border);	//get the padding extent for this border of the current column
 			if(paddingExtent.getValue()!=0)	//if a non-zero padding extent is specified (the stylesheet specifies a zero default padding)
 			{
-				styles.put(CSS_PROPERTY_PADDING_X_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(paddingExtent));	//set the padding extent
+				styles.put(XHTMLDepictContext.CSS_PROPERTY_PADDING_X_TEMPLATE.apply(getSerializationName(side)), paddingExtent);	//set the padding extent
 			}
 		}
 /*TODO fix
 		final List<String> fontFamilies=component.getFontFamilies();	//get the component's font prioritized list of font families
 		if(fontFamilies!=null)	//if this component has specified font families 
 		{
-			styles.put(CSS_PROP_FONT_FAMILY, CSSUtilities.toString(fontFamilies));	//indicate the font families
+			styles.put(CSS_PROP_FONT_FAMILY, fontFamilies);	//indicate the font families
 		}
 		final Extent fontSize=component.getFontSize();	//get the component's font size
 		if(fontSize!=null)	//if this component has a font size 
 		{
-			styles.put(CSS_PROP_FONT_SIZE, CSSUtilities.toString(fontSize));	//indicate the font size
+			styles.put(CSS_PROP_FONT_SIZE, fontSize);	//indicate the font size
 		}
 		final Extent width=orientation.getAxis(Flow.LINE)==Axis.X ? component.getLineExtent() : component.getPageExtent();	//get the component's requested width
 		if(width!=null)	//if this component has a requested width 
 		{
-			styles.put(CSS_PROP_WIDTH, CSSUtilities.toString(width));	//indicate the width
+			styles.put(CSS_PROP_WIDTH, width);	//indicate the width
 		}
 		final Extent height=orientation.getAxis(Flow.PAGE)==Axis.Y ? component.getPageExtent() : component.getLineExtent();	//get the component's requested width
 		if(height!=null)	//if this component has a requested height 
 		{
-			styles.put(CSS_PROP_HEIGHT, CSSUtilities.toString(height));	//indicate the height
+			styles.put(CSS_PROP_HEIGHT, height);	//indicate the height
 		}
 */
 		writeStyleAttribute(styles);	//write the cell styles

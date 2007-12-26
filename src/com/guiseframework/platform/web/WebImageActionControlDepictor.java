@@ -167,22 +167,22 @@ public class WebImageActionControlDepictor<C extends ImageComponent & ActionCont
 		final GuiseSession session=getSession();	//get the session
 		final C component=getDepictedObject();	//get the component
 		final String label=component.getLabel();	//get the component label, if there is one
-		final String resolvedLabel=label!=null ? session.resolveString(label) : null;	//resolve the label, if there is one
+		final String resolvedLabel=label!=null ? session.dereferenceString(label) : null;	//resolve the label, if there is one
 		final URI imageURI=getImageURI();	//get the image URI to use
 		if(imageURI!=null)	//if there is an image URI
 		{
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IMG, true);	//<xhtml:img>
 			writeBodyIDClassAttributes(null, COMPONENT_BODY_CLASS_SUFFIX);	//write the ID and class for the main element
 			writeStyleAttribute(getBodyStyles());	//write the component's body styles
-			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, session.resolveURI(imageURI).toString());	//src="image"
+			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictURI(imageURI).toString());	//src="image"
 			//TODO fix to use description or something else, and always write an alt, even if there is no information
 			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_ALT, resolvedLabel!=null ? AbstractModel.getPlainText(resolvedLabel, component.getLabelContentType()) : "");	//alt="label"
 				//TODO determine which rollover image we want to use if the image is selected
 			final URI rolloverImage=getRolloverImageURI();	//get the rollover image to use
 			if(rolloverImage!=null)	//if there is a rollover image
 			{
-				depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ELEMENT_IMG_ATTRIBUTE_ORIGINAL_SRC, session.resolveURI(imageURI).toString());	//guise:originalSrc="image"
-				depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ELEMENT_IMG_ATTRIBUTE_ROLLOVER_SRC, session.getApplication().resolveURI(rolloverImage).toString());	//guise:rolloverSrc="image"
+				depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ELEMENT_IMG_ATTRIBUTE_ORIGINAL_SRC, depictContext.getDepictURI(imageURI).toString());	//guise:originalSrc="image"
+				depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ELEMENT_IMG_ATTRIBUTE_ROLLOVER_SRC, depictContext.getDepictURI(rolloverImage).toString());	//guise:rolloverSrc="image"
 			}
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IMG);	//</html:img>
 		}		

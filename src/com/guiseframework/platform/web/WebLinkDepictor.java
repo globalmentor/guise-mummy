@@ -44,7 +44,7 @@ public class WebLinkDepictor<C extends ActionControl> extends AbstractWebActionC
 			depictContext.writeAttribute(null, ELEMENT_A_ATTRIBUTE_TARGET, target);	//write the target attribute
 		}
 		final String info=component.getInfo();	//get the component info, if any
-		final String resolvedInfo=info!=null ? getSession().resolveString(info) : null;	//resolve the info, if there is any
+		final String resolvedInfo=info!=null ? getSession().dereferenceString(info) : null;	//resolve the info, if there is any
 		if(resolvedInfo!=null)	//if there is info
 		{
 			depictContext.writeAttribute(null, ATTRIBUTE_TITLE, AbstractModel.getPlainText(resolvedInfo, component.getInfoContentType()));	//title="info"

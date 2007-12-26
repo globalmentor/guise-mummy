@@ -10,6 +10,8 @@ import java.util.regex.*;
 import javax.mail.internet.ContentType;
 
 import static com.garretwilson.lang.EnumUtilities.*;
+
+import com.garretwilson.util.Debug;
 import com.garretwilson.util.NameValuePair;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
@@ -18,6 +20,7 @@ import com.guiseframework.geometry.*;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.PresentationModel;
 import com.guiseframework.platform.AbstractComponentDepictor;
+import com.guiseframework.platform.XHTMLDepictContext;
 
 import static com.guiseframework.model.ui.PresentationModel.*;
 import com.guiseframework.style.Color;
@@ -30,7 +33,6 @@ import static com.garretwilson.text.xml.XMLUtilities.*;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLUtilities.*;
-import static com.guiseframework.platform.web.CSSUtilities.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**The abstract base class for all <code>application/xhtml+xml</code> depictions.
@@ -164,7 +166,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 				}
 				if(info!=null)	//if we have advisory information
 				{
-					final String resolvedInfo=component.getSession().resolveString(info);	//resolve the info
+					final String resolvedInfo=component.getSession().dereferenceString(info);	//resolve the info
 					depictContext.writeAttribute(null, ATTRIBUTE_TITLE, AbstractModel.getPlainText(resolvedInfo, infoContentType));	//write the advisory information in the HTML title attribute					
 				}
 			}
@@ -395,14 +397,14 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 		final Extent preferredWidth=component.getPreferredWidth();	//get the component's preferred width
 		if(preferredWidth!=null)	//if this component has a preferred width 
 		{
-			styles.put(CSS_PROP_WIDTH, CSSUtilities.toString(preferredWidth));	//indicate the width
+			styles.put(CSS_PROP_WIDTH, preferredWidth);	//indicate the width
 		}
 */
 /**TODO
 		if(preferredDimensions!=null)	//if this component has preferred dimensions
 		{
-			styles.put(CSS_PROP_WIDTH, CSSUtilities.toString(preferredDimensions.getWidth()));	//indicate the width
-			styles.put(CSS_PROP_HEIGHT, CSSUtilities.toString(preferredDimensions.getHeight()));	//indicate the height
+			styles.put(CSS_PROP_WIDTH, preferredDimensions.getWidth());	//indicate the width
+			styles.put(CSS_PROP_HEIGHT, preferredDimensions.getHeight());	//indicate the height
 //TODO fix			styles.put(CSS_PROP_OVERFLOW, CSS_OVERFLOW_HIDDEN);	//TODO fix
 		}
 */
@@ -410,19 +412,19 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 		final Extent preferredHeight=component.getPreferredHeight();	//get the component's preferred width
 		if(preferredHeight!=null)	//if this component has a preferred height 
 		{
-			styles.put(CSS_PROP_HEIGHT, CSSUtilities.toString(preferredHeight));	//indicate the height
+			styles.put(CSS_PROP_HEIGHT, preferredHeight);	//indicate the height
 		}
 */
 //TODO del if not needed		final Color color=component.determineColor();	//determine the component color
 		final Color color=getColor();	//get the component color to use
 		if(color!=null)	//if the component has a color
 		{
-			setColor(styles, color);	//set the color
+			styles.put(CSS_PROP_COLOR, color);	//indicate the color
 		}
-		final float opacity=component.getOpacity();	//get the component's opacity
-		if(opacity<1.0f || styles.containsKey(CSS_PROP_OPACITY))	//if the opacity isn't 100%, or if some opacity has already been set
+		final double opacity=component.getOpacity();	//get the component's opacity
+		if(opacity<1.0)	//if the opacity isn't 100%
 		{
-			setOpacity(styles, opacity);	//add opacity to the styles
+			styles.put(CSS_PROP_OPACITY, Double.valueOf(opacity));	//indicate the opacity
 		}
 		return styles;	//return the styles
 	}
@@ -457,13 +459,13 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 		final Color backgroundColor=getBackgroundColor();	//get the component background color to use
 		if(backgroundColor!=null)	//if the component has a background color
 		{
-			styles.put(CSS_PROP_BACKGROUND_COLOR, CSSUtilities.toString(backgroundColor));	//set the background color
+			styles.put(CSS_PROP_BACKGROUND_COLOR, backgroundColor);	//set the background color
 		}
 /**TODO
 		if(preferredDimensions!=null)	//if this component has preferred dimensions
 		{
-			styles.put(CSS_PROP_WIDTH, CSSUtilities.toString(preferredDimensions.getWidth()));	//indicate the width
-			styles.put(CSS_PROP_HEIGHT, CSSUtilities.toString(preferredDimensions.getHeight()));	//indicate the height
+			styles.put(CSS_PROP_WIDTH, preferredDimensions.getWidth());	//indicate the width
+			styles.put(CSS_PROP_HEIGHT, preferredDimensions.getHeight());	//indicate the height
 //TODO fix			styles.put(CSS_PROP_OVERFLOW, CSS_OVERFLOW_HIDDEN);	//TODO fix
 		}
 */
@@ -474,60 +476,70 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 			final Extent borderExtent=component.getBorderExtent(border);	//get the border extent for this border
 			if(borderExtent.getValue()!=0)	//if there is a border on this side (to save bandwidth, only include border properties if there is a border; the stylesheet defaults to no border)
 			{
-				styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(borderExtent));	//set the border extent
-				styles.put(CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(component.getBorderStyle(border)));	//indicate the border style for this side
+				styles.put(XHTMLDepictContext.CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), borderExtent);	//set the border extent
+				styles.put(XHTMLDepictContext.CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), component.getBorderStyle(border));	//indicate the border style for this side
 				final Color borderColor=component.getBorderColor(border);	//get the border color for this border
 				if(borderColor!=null)	//if a border color is specified
 				{
-					styles.put(CSS_PROPERTY_BORDER_X_COLOR_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(borderColor));	//set the border color
+					styles.put(XHTMLDepictContext.CSS_PROPERTY_BORDER_X_COLOR_TEMPLATE.apply(getSerializationName(side)), borderColor);	//set the border color
 				}
 			}
 			final Extent marginExtent=component.getMarginExtent(border);	//get the margin extent for this border
 			if(marginExtent.getValue()!=0)	//if a non-zero margin extent is specified (the stylesheet specifies a zero default margin)
 			{
-				styles.put(CSS_PROPERTY_MARGIN_X_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(marginExtent));	//set the margin extent
+				styles.put(XHTMLDepictContext.CSS_PROPERTY_MARGIN_X_TEMPLATE.apply(getSerializationName(side)), marginExtent);	//set the margin extent
 			}
 			final Extent paddingExtent=component.getPaddingExtent(border);	//get the padding extent for this border
 			if(paddingExtent.getValue()!=0)	//if a non-zero padding extent is specified (the stylesheet specifies a zero default padding)
 			{
-				styles.put(CSS_PROPERTY_PADDING_X_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(paddingExtent));	//set the padding extent
+				styles.put(XHTMLDepictContext.CSS_PROPERTY_PADDING_X_TEMPLATE.apply(getSerializationName(side)), paddingExtent);	//set the padding extent
 			}
 		}
+		final URI cursorURI=component.getCursor();	//get the URI for the cursor
+
+
 		final URI resolvedCursorURI=session.resolveURI(component.getCursor());	//get the URI for the cursor and resolve it against the application, resolving resources in the process
-		final URI relativeCursorURI=session.getApplication().getBasePath().toURI().relativize(resolvedCursorURI);	//get the relative cursor URI with all resource references resolved 
+		final URI relativeCursorURI=session.getApplication().getBasePath().toURI().relativize(resolvedCursorURI);	//get the relative cursor URI with all resource references resolved
 		if(!Cursor.DEFAULT.getURI().equals(relativeCursorURI))	//if this isn't the default cursor (the stylesheet sets all cursors to the default)
 		{
+/*TODO fix all this by using a "path:" URI in the theme
 			styles.put(CSS_PROP_CURSOR, CSSUtilities.toCursorString(session.getApplication(), orientation, relativeCursorURI));	//indicate the cursor
+		}
+		if(!Cursor.DEFAULT.getURI().equals(session.dereferenceURI(cursorURI)))	//if this isn't the default cursor (the stylesheet sets all cursors to the default)
+		{
+			styles.put(CSS_PROP_CURSOR, cursorURI);	//indicate the cursor
+*/
+			styles.put(CSS_PROP_CURSOR, relativeCursorURI);	//indicate the cursor
 		}
 		final List<String> fontFamilies=component.getFontFamilies();	//get the component's font prioritized list of font families
 		if(fontFamilies!=null)	//if this component has specified font families
 		{
-			styles.put(CSS_PROP_FONT_FAMILY, CSSUtilities.toString(fontFamilies));	//indicate the font families
+			styles.put(CSS_PROP_FONT_FAMILY, fontFamilies);	//indicate the font families
 		}
 		final Extent fontSize=component.getFontSize();	//get the component's font size
 		if(fontSize!=null)	//if this component has a font size
 		{
-			styles.put(CSS_PROP_FONT_SIZE, CSSUtilities.toString(fontSize));	//indicate the font size
+			styles.put(CSS_PROP_FONT_SIZE, fontSize);	//indicate the font size
 		}
 		final FontStyle fontStyle=component.getFontStyle();	//get the component's font style
 		if(fontStyle!=FontStyle.NORMAL)	//if this component has something besides a normal font style (the stylesheet defaults to normal)
 		{
-			styles.put(CSS_PROP_FONT_STYLE, CSSUtilities.toString(fontStyle));	//indicate the font style
+			styles.put(CSS_PROP_FONT_STYLE, fontStyle);	//indicate the font style
 		}
 		final double fontWeight=component.getFontWeight();	//get the component's font weight
 		if(fontWeight!=FONT_WEIGHT_NORMAL)	//if this component has a non-normal font weight (the stylesheet defaults to normal)
 		{
-			styles.put(CSS_PROP_FONT_WEIGHT, CSSUtilities.toFontWeightString(fontWeight));	//indicate the font weight
+			styles.put(CSS_PROP_FONT_WEIGHT, Double.valueOf(fontWeight));	//indicate the font weight
 		}
 		final Extent width=orientation.getAxis(Flow.LINE)==Axis.X ? component.getLineExtent() : component.getPageExtent();	//get the component's requested width
 		if(width!=null)	//if this component has a requested width 
 		{
-			styles.put(CSS_PROP_WIDTH, CSSUtilities.toString(width));	//indicate the width
+			styles.put(CSS_PROP_WIDTH, width);	//indicate the width
 		}
 		final Extent height=orientation.getAxis(Flow.PAGE)==Axis.Y ? component.getPageExtent() : component.getLineExtent();	//get the component's requested width
 		if(height!=null)	//if this component has a requested height 
 		{
-			styles.put(CSS_PROP_HEIGHT, CSSUtilities.toString(height));	//indicate the height
+			styles.put(CSS_PROP_HEIGHT, height);	//indicate the height
 		}
 		return styles;	//return the styles
 	}
@@ -586,7 +598,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 			writeIDClassAttributes(null, COMPONENT_ERROR_CLASS_SUFFIX);	//write the error ID and class
 			if(errorMessage!=null)	//if the component has errors
 			{
-				depictContext.write(getSession().resolveString(errorMessage));	//write the error information
+				depictContext.write(getSession().dereferenceString(errorMessage));	//write the error information
 			}
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//</xhtml:div>
 		}
@@ -614,7 +626,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	{
 		if(!styles.isEmpty())	//if there is at least one style
 		{
-			getDepictContext().writeAttribute(null, ATTRIBUTE_STYLE, CSSUtilities.toString(getPlatform(), styles));	//construct the style and write the style attribute			
+			getDepictContext().writeAttribute(null, ATTRIBUTE_STYLE, getDepictContext().getCSSStyleString(styles, getDepictedObject().getComponentOrientation()));	//construct the style and write the style attribute
 		}
 	}
 
@@ -805,14 +817,14 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 			writeStyleAttribute(getLabelStyles(labelModel, uiModel));	//write the label's styles
 			final GuiseSession session=getSession();	//get the session
 			final String label=labelModel.getLabel();	//determine the label text, if there is any
-			final String resolvedLabel=label!=null ? session.resolveString(label) : null;	//resolve the label, if there is a label
+			final String resolvedLabel=label!=null ? session.dereferenceString(label) : null;	//resolve the label, if there is a label
 			final ContentType labelContentType=labelModel.getLabelContentType();	//get the label content type
 			final URI icon=labelModel.getGlyphURI();	//get the label icon, if any
 			if(includeIcon && icon!=null)	//if there is an icon
 			{
 				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IMG, true);	//<xhtml:img>
 	//			TODO fix			writeClassAttribute(context, getBaseStyleIDs(component, null, COMPONENT_BODY_CLASS_POSTFIX));	//write the base style IDs with a "-body" suffix
-				depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, session.resolveURI(icon).toString());	//src="icon"
+				depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictURI(icon).toString());	//src="icon"
 				//TODO fix to use description or something else, and always write an alt, even if there is no information
 				depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_ALT, resolvedLabel!=null ? AbstractModel.getPlainText(resolvedLabel, labelContentType) : "");	//alt="label"
 				depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IMG);	//</html:img>
@@ -849,7 +861,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 			{
 				context.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IMG, true);	//<xhtml:img>
 	//			TODO fix			writeClassAttribute(context, getBaseStyleIDs(component, null, COMPONENT_BODY_CLASS_POSTFIX));	//write the base style IDs with a "-body" suffix
-				context.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, context.getSession().getApplication().resolveURI(icon).toString());	//src="icon"
+				context.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictURI(icon).toString());	//src="icon"
 				//TODO fix to use description or something else, and always write an alt, even if there is no information
 				context.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_ALT, label!=null ? AbstractModel.getPlainText(label, labelModel.getLabelContentType()) : "");	//alt="label"
 				context.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IMG);	//</html:img>
@@ -897,22 +909,22 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 		final List<String> labelFontFamilies=uiModel.getLabelFontFamilies();	//get the label's font prioritized list of font families
 		if(labelFontFamilies!=null)	//if this label has specified font families 
 		{
-			labelStyles.put(CSS_PROP_FONT_FAMILY, CSSUtilities.toString(labelFontFamilies));	//indicate the font families
+			labelStyles.put(CSS_PROP_FONT_FAMILY, labelFontFamilies);	//indicate the font families
 		}
 		final Extent labelFontSize=uiModel.getLabelFontSize();	//get the label's font size
 		if(labelFontSize!=null)	//if this label has a font size 
 		{
-			labelStyles.put(CSS_PROP_FONT_SIZE, CSSUtilities.toString(labelFontSize));	//indicate the font size
+			labelStyles.put(CSS_PROP_FONT_SIZE, labelFontSize);	//indicate the font size
 		}
 		final FontStyle fontStyle=uiModel.getLabelFontStyle();	//get the label's font style
 		if(fontStyle!=FontStyle.NORMAL)	//if this label has something besides a normal font style (the stylesheet defaults to normal)
 		{
-			labelStyles.put(CSS_PROP_FONT_STYLE, CSSUtilities.toString(fontStyle));	//indicate the font style
+			labelStyles.put(CSS_PROP_FONT_STYLE, fontStyle);	//indicate the font style
 		}
 		final double fontWeight=uiModel.getLabelFontWeight();	//get the label's font weight
 		if(fontWeight!=FONT_WEIGHT_NORMAL)	//if this label has a non-normal font weight (the stylesheet defaults to normal)
 		{
-			labelStyles.put(CSS_PROP_FONT_WEIGHT, CSSUtilities.toFontWeightString(fontWeight));	//indicate the font weight
+			labelStyles.put(CSS_PROP_FONT_WEIGHT, Double.valueOf(fontWeight));	//indicate the font weight
 		}
 		return labelStyles;	//return the styles
 	}

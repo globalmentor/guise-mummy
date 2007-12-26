@@ -3,6 +3,7 @@ package com.guiseframework.platform;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
+
 import static java.util.Collections.*;
 
 import com.garretwilson.beans.BoundPropertyObject;
@@ -93,6 +94,21 @@ public abstract class AbstractDepictContext extends BoundPropertyObject implemen
 			}
 		}
 		this.styles=unmodifiableList(styleURIs);	//save an unmodifiable version of the style URIs
+	}
+
+	/**Determines the URI to use for depiction based upon a logical URI.
+	The URI will first be dereferenced for the current session and then resolved to the application.
+	@param uri The logical URI, which may be absolute or relative to the application.
+	@param suffixes The suffixes, if any, to append to a resource key in a URI reference.
+	@return A URI suitable for depiction, deferenced and resolved to the application.
+	@see GuiseSession#dereferenceURI(URI, String...)
+	@see GuiseApplication#getDepictURI(URI, URI)
+	*/
+	public URI getDepictURI(final URI uri, final String... suffixes)
+	{
+		final GuiseSession guiseSession=getSession();	//ge the session
+		final GuiseApplication guiseApplication=session.getApplication();	//get the application
+		return guiseApplication.resolveURI(guiseApplication.getDepictURI(getDepictURI(), guiseSession.dereferenceURI(uri, suffixes)));	//determine the depict URI and resolve it to the application
 	}
 
 }

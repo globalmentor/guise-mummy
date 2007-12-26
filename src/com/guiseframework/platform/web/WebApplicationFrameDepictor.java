@@ -184,7 +184,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			//<xhtml:title>
 			depictContext.write('\t');
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TITLE);	//<xhtml:title>
-			depictContext.write(AbstractModel.getPlainText(session.resolveString(title), content.getLabelContentType()));	//write the title
+			depictContext.write(AbstractModel.getPlainText(session.dereferenceString(title), content.getLabelContentType()));	//write the title
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TITLE);	//</xhtml:title>
 			depictContext.write('\n');
 		}
@@ -196,7 +196,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_LINK);	//<xhtml:link>
 			depictContext.writeAttribute(null, ELEMENT_LINK_ATTRIBUTE_REL, LINK_REL_STYLESHEET);	//rel="stylesheet"
 			depictContext.writeAttribute(null, ELEMENT_LINK_ATTRIBUTE_TYPE, TEXT_CSS_CONTENT_TYPE.toString());	//type="text/css"
-			depictContext.writeAttribute(null, ELEMENT_LINK_ATTRIBUTE_HREF, application.resolveURI(styleURI).toString());	//href="styleURI"	(resolved to context)
+			depictContext.writeAttribute(null, ELEMENT_LINK_ATTRIBUTE_HREF, depictContext.getDepictURI(styleURI).toString());	//href="styleURI"
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_LINK);	//</xhtml:link>		
 			depictContext.write('\n');
 		}

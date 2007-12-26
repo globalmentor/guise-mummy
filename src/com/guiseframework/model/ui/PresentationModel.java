@@ -686,15 +686,15 @@ public interface PresentationModel extends Model, Displayable
 	public void setMarginExtent(final Extent newMarginExtent);
 
 	/**@return The opacity of the entire component in the range (0.0-1.0), with a default of 1.0.*/
-	public float getOpacity();
+	public double getOpacity();
 
 	/**Sets the opacity of the entire component.
-	This is a bound property of type <code>Float</code>.
+	This is a bound property of type {@link Double}.
 	@param newOpacity The new opacity of the entire component in the range (0.0-1.0).
 	@exception IllegalArgumentException if the given opacity is not within the range (0.0-1.0).
 	@see #OPACITY_PROPERTY 
 	*/
-	public void setOpacity(final float newOpacity);
+	public void setOpacity(final double newOpacity);
 
 	/**Returns the padding extent of the indicated border.
 	@param border The border for which a padding extent should be returned.

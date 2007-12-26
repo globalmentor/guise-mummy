@@ -8,13 +8,10 @@ import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
-import com.guiseframework.geometry.Extent;
-import com.guiseframework.geometry.Side;
-import com.guiseframework.geometry.Unit;
-import com.guiseframework.style.LineStyle;
-
-import static com.guiseframework.platform.web.CSSUtilities.*;
+import com.guiseframework.geometry.*;
+import com.guiseframework.platform.XHTMLDepictContext;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
+import com.guiseframework.style.LineStyle;
 
 /**Strategy for rendering an action control as an XHTML <code>&lt;button&gt;</code> element.
 This depictor renders a selected {@link SelectActionControl} with a depressed border.
@@ -67,8 +64,8 @@ public class WebButtonDepictor<C extends ActionControl> extends AbstractWebActio
 			for(final Side side:Side.values())	//for each side
 			{
 //TODO del when works				styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), Extent.ZERO_EXTENT1);	//set the border to zero
-				styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), new Extent(1, Unit.PIXEL));	//set the border to 1 TODO change to a constant value 
-				styles.put(CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(LineStyle.INSET));	//show the button as inset
+				styles.put(XHTMLDepictContext.CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), new Extent(1, Unit.PIXEL));	//set the border to 1 TODO change to a constant value 
+				styles.put(XHTMLDepictContext.CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), LineStyle.INSET);	//show the button as inset
 			}
 		}
 /*TODO to fix to make a depressed border
@@ -79,12 +76,12 @@ public class WebButtonDepictor<C extends ActionControl> extends AbstractWebActio
 				final Extent borderExtent=component.getBorderExtent(border);	//get the border extent for this border
 				if(borderExtent.getValue()!=0)	//if there is a border on this side (to save bandwidth, only include border properties if there is a border; the stylesheet defaults to no border)
 				{
-					styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(borderExtent));	//set the border extent
-					styles.put(CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(component.getBorderStyle(border)));	//indicate the border style for this side
+					styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), borderExtent);	//set the border extent
+					styles.put(CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), component.getBorderStyle(border));	//indicate the border style for this side
 					final Color borderColor=component.getBorderColor(border);	//get the border color for this border
 					if(borderColor!=null)	//if a border color is specified
 					{
-						styles.put(CSS_PROPERTY_BORDER_X_COLOR_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(borderColor));	//set the border color
+						styles.put(CSS_PROPERTY_BORDER_X_COLOR_TEMPLATE.apply(getSerializationName(side)), borderColor);	//set the border color
 					}
 				}
 		}

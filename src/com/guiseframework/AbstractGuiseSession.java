@@ -13,6 +13,7 @@ import static java.util.Collections.*;
 import com.garretwilson.beans.*;
 import com.garretwilson.io.BOMInputStreamReader;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.net.URIConstants;
 import com.garretwilson.net.URIPath;
 import com.garretwilson.urf.*;
 import com.garretwilson.urf.ploop.PLOOPURFProcessor;
@@ -488,7 +489,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			final Object resource=getResource(resourceKey);	//retrieve a resource from the resource bundle
 			if(resource instanceof String)	//if the resource is a string
 			{
-				return Boolean.valueOf(resolveString((String)resource));	//get the Boolean value of the resource string
+				return Boolean.valueOf(dereferenceString((String)resource));	//get the Boolean value of the resource string
 			}
 			else	//if the resource is not a string, assume it is a Boolean
 			{
@@ -537,7 +538,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			final Object resource=getResource(resourceKey);	//retrieve a resource from the resource bundle
 			if(resource instanceof String)	//if the resource is a string
 			{
-				return AbstractModeledColor.valueOf(resolveString((String)resource));	//create a color from the resolved string
+				return AbstractModeledColor.valueOf(dereferenceString((String)resource));	//create a color from the resolved string
 			}
 			else	//if the resource is not a string, assume it is a color
 			{
@@ -586,7 +587,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			final Object resource=getResource(resourceKey);	//retrieve a resource from the resource bundle
 			if(resource instanceof String)	//if the resource is a string
 			{
-				return Integer.valueOf(resolveString((String)resource));	//get the Integer value of the resource string
+				return Integer.valueOf(dereferenceString((String)resource));	//get the Integer value of the resource string
 			}
 			else	//if the resource is not a string, assume it is an Integer
 			{
@@ -634,7 +635,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			final Object resource=getResource(resourceKey);	//retrieve a resource from the resource bundle
 			if(resource instanceof String)	//if the resource is a string
 			{
-				return URI.create(resolveString((String)resource));	//create a URI from the resource string
+				return URI.create(dereferenceString((String)resource));	//create a URI from the resource string
 			}
 			else	//if the resource is not a string, assume it is a URI
 			{
@@ -1323,7 +1324,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void navigate(final URI uri, final String viewportID)
 		{
-			requestedNavigation=new Navigation(getApplication().resolveURI(getNavigationPath().toURI()), getApplication().resolveURI(checkInstance(uri, "URI cannot be null.")), viewportID);	//resolve the URI against the application context path
+			requestedNavigation=new Navigation(getNavigationPath().toURI(), checkInstance(uri, "URI cannot be null."), viewportID);	//create new requested navigation
 		}
 
 		/**Requests modal navigation to the specified path.
@@ -1732,14 +1733,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	/**The set of string reference delimiters, <code>SOS</code> and <code>ST</code>.*/
 	private final static String STRING_REFERENCE_DELIMITERS=new StringBuilder().append(START_OF_STRING_CHAR).append(STRING_TERMINATOR_CHAR).toString();
 	
-	/**Resolves a string by replacing any string references with a string from the resources.
+	/**Dereferences a string by replacing any string references with a string from the resources.
 	A string reference begins with the Start of String (<code>SOS</code>) control character (U+0098) and ends with a String Terminator (<code>ST</code>) control character (U+009C).
 	The string between these delimiters will be used to look up a string resource using {@link #getStringResource(String)}.
-	Strings retrieved from resources will be recursively resolved.
+	Strings retrieved from resources will be recursively dereferenced.
 	<p>String references appearing between an <code>SOS</code>/<code>ST</code> pair that that begin with the character {@value Resources#STRING_VALUE_REFERENCE_PREFIX_CHAR}
-	will be considered string values and, after they are recursively resolved, will be applied as formatting arguments to the remaining resolved text using {@link MessageFormat#format(String, Object...)}.</p>
-	@param string The string to be resolved.
-	@return The resolved string with any string references replaced with the appropriate string from the resources.
+	will be considered string values and, after they are recursively dereferenced, will be applied as formatting arguments to the remaining dereferenced text using {@link MessageFormat#format(String, Object...)}.</p>
+	@param string The string to be dereferenced.
+	@return The dereferenced string with any string references replaced with the appropriate string from the resources.
 	@exception NullPointerException if the given string is <code>null</code>.
 	@exception IllegalArgumentException if a string reference has no ending String Terminator control character (U+009C).
 	@exception MissingResourceException if no resource could be found associated with a string reference.
@@ -1748,7 +1749,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@see Resources#createStringValueReference(String)
 	@see #getStringResource(String)
 	*/
-	public String resolveString(final String string) throws MissingResourceException
+	public String dereferenceString(final String string) throws MissingResourceException
 	{
 //TODO add later if we create a Guise-specific parameter feature; for now we use {}		int parameterCount=0;	//keep track of how many parameters have appeared
 		List<String> argumentList=null;	//the lazily-created list of arguments
@@ -1791,7 +1792,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				final String stringReference=string.substring(stringStartIndex+1, stringEndIndex);	//get the string reference
 				if(startsWith(stringReference, STRING_VALUE_REFERENCE_PREFIX_CHAR))	//if this is a value reference
 				{
-					final String stringValue=resolveString(stringReference.substring(1));	//resolve the actual reference (i.e. ignore the string value reference prefix character)
+					final String stringValue=dereferenceString(stringReference.substring(1));	//dereference the actual reference (i.e. ignore the string value reference prefix character)
 					if(argumentList==null)	//if we don't yet have an argument list
 					{
 						argumentList=new ArrayList<String>();	//create a new argument list
@@ -1801,7 +1802,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				else	//if this is not a value reference, it must be a resource reference
 				{
 					final String stringResource=getStringResource(stringReference);	//look up the string resource, using the reference as a resource key
-					stringBuilder.append(resolveString(stringResource));	//resolve and append the value of the string reference
+					stringBuilder.append(dereferenceString(stringResource));	//dereference and append the value of the string reference
 				}
 				fromIndex=stringEndIndex+1;	//show the new search location
 				stringStartIndex=string.indexOf(START_OF_STRING_CHAR, fromIndex);	//see if there is another string reference in the string
@@ -1812,38 +1813,35 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			{
 				stringBuilder.append(string.substring(fromIndex, length));	//append the remaining text
 			}
-			String resolvedString=stringBuilder.toString();	//get the string we constructed
+			String dereferencedString=stringBuilder.toString();	//get the string we constructed
 			if(argumentList!=null)	//if we have string value arguments
 			{
-				resolvedString=format(resolvedString, (Object[])argumentList.toArray());	//use the string as a format pattern, formatted using the collected arguments
+				dereferencedString=format(dereferencedString, (Object[])argumentList.toArray());	//use the string as a format pattern, formatted using the collected arguments
 			}
-			return resolvedString;	//return the string we resolved
+			return dereferencedString;	//return the string we dereferenced
 		}
 		else	//if there is no string reference
 		{
 			return string;	//return the string as-is
 		}
 	}
-
-	/**Resolves a URI against the application base path, looking up the URI from the resources if necessary.
-	If the URI has the "resource" scheme, its scheme-specific part will be used to look up the actual URI using {@link #getURIResource(String)}.
+	
+	/**Dereferences a URI by looking up any references from the resources if necessary.
+	If the URI has the {@value URIConstants#RESOURCE_SCHEME} scheme, its scheme-specific part will be used to look up the actual URI using {@link #getURIResource(String)}.
 	If suffixes are given, they will be appended to the resource key in order, separated by '.'.
 	If no resource is associated with that resource key, a resource will be retrieved using the unadorned resource key.
-	URIs retrieved from resources will be recursively resolved without suffixes.
-	Relative paths will be resolved relative to the application base path. Absolute paths will be considered already resolved, as will absolute URIs.
-	For an application base path "/path/to/application/", resolving "relative/path" will yield "/path/to/application/relative/path",
-	while resolving "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".
-	@param uri The URI to be resolved.
-	@return The uri resolved against resources the application base path.
+	URIs retrieved from resources will be recursively dereferenced without suffixes.
+	@param uri The URI to be dereferenced.
+	@param suffixes The suffixes, if any, to append to a resource key in a URI reference.
+	@return The URI dereferenced from the resources.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	@exception MissingResourceException if no resource could be found associated with a string reference.
 	@see Resources#createURIResourceReference(String)
 	@see #getURIResource(String)
-	@see GuiseApplication#resolveURI(URI)
 	*/
-	public URI resolveURI(final URI uri, final String... suffixes) throws MissingResourceException
+	public URI dereferenceURI(URI uri, final String... suffixes) throws MissingResourceException
 	{
-		if(RESOURCE_SCHEME.equals(uri.getScheme()))	//if this is a resource reference
+		while(RESOURCE_SCHEME.equals(uri.getScheme()))	//if this is a resource reference
 		{
 			final String resourceKey=uri.getSchemeSpecificPart();	//get the resource key from the URI
 			URI resourceURI=null;	//we'll try to determine the resource URI
@@ -1862,12 +1860,27 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			{
 				resourceURI=getURIResource(resourceKey);	//look up the resource using the plain resource key				
 			}
-			return resolveURI(resourceURI);	//recursively resolve the URI
+			uri=resourceURI;	//switch to the dereferenced URI in case we need to dereference it again
 		}
-		else	//if this is not a resource reference
-		{
-			return getApplication().resolveURI(uri);	//ask the application to resolve this URI normally
-		}
+		return uri;	//return the URI which has been dereferenced
+	}
+	
+	/**Resolves a URI against the application base path, looking up the URI from the resources if necessary.
+	The URI will be dereferenced before it is resolved.
+	Relative paths will be resolved relative to the application base path. Absolute paths will be considered already resolved, as will absolute URIs.
+	For an application base path "/path/to/application/", resolving "relative/path" will yield "/path/to/application/relative/path",
+	while resolving "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".
+	@param uri The URI to be resolved.
+	@param suffixes The suffixes, if any, to append to a resource key in a URI reference.
+	@return The uri resolved against resources the application base path.
+	@exception NullPointerException if the given URI is <code>null</code>.
+	@exception MissingResourceException if no resource could be found associated with a string reference.
+	@see #dereferenceURI(URI, String...)
+	@see GuiseApplication#resolveURI(URI)
+	*/
+	public URI resolveURI(final URI uri, final String... suffixes) throws MissingResourceException
+	{
+		return getApplication().resolveURI(dereferenceURI(uri, suffixes));	//dereference and then resolve the URI
 	}
 
 }

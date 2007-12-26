@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
+import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.model.AbstractModel;
-import static com.guiseframework.platform.web.CSSUtilities.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**Strategy for rendering a pictures as a series of XHTML elements along with label and description.
@@ -32,10 +32,10 @@ public class WebPictureDepictor<C extends Picture> extends AbstractWebComponentD
 	protected Map<String, Object> getBodyStyles()
 	{
 		final Map<String, Object> styles=super.getBodyStyles();	//get the default body styles
-		final float opacity=getDepictedObject().getImageOpacity();	//get the image opacity
-		if(opacity<1.0f)	//if the opacity isn't 100% TODO combine with component opacity
+		final double opacity=getDepictedObject().getImageOpacity();	//get the image opacity
+		if(opacity<1.0)	//if the opacity isn't 100% TODO combine with component opacity
 		{
-			setOpacity(styles, opacity);	//add opacity to the styles
+			styles.put(CSS_PROP_OPACITY, Double.valueOf(opacity));	//indicate the opacity
 		}
 		return styles;	//return the updated body styles
 	}
@@ -58,10 +58,10 @@ public class WebPictureDepictor<C extends Picture> extends AbstractWebComponentD
 		final URI image=component.getImageURI();	//get the component image
 		if(image!=null)	//if there is an image
 		{
-			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, session.resolveURI(image).toString());	//src="image"
+			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictURI(image).toString());	//src="image"
 		}
 		final String label=component.getLabel();	//get the component label, if there is one
-		String resolvedLabel=label!=null ? session.resolveString(label) : null;	//resolve the label, if there is one
+		String resolvedLabel=label!=null ? session.dereferenceString(label) : null;	//resolve the label, if there is one
 		if(resolvedLabel==null)
 		{
 			resolvedLabel="";	//TODO fix
@@ -99,7 +99,7 @@ public class WebPictureDepictor<C extends Picture> extends AbstractWebComponentD
 			{
 				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_SPAN);	//<xhtml:span> (component-description)
 				writeIDClassAttributes(null, COMPONENT_DESCRIPTION_CLASS_SUFFIX);	//write the ID and class attributes for the description
-				writeText(session.resolveString(description), component.getDescriptionContentType());	//write the resolved description appropriately for its content type
+				writeText(session.dereferenceString(description), component.getDescriptionContentType());	//write the resolved description appropriately for its content type
 				depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_SPAN);	//</xhtml:span> (component-description)
 			}
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//</xhtml:div> (component-caption)

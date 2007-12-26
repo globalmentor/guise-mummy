@@ -167,15 +167,25 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public void setDCSID(final String dcsID);
 
-	
-	/**Determines the logical path based upon a literal requested path.
-	@param uri The requested URI.
-	@param path The requested application-relative path
-	@param bookmark The requested bookmark, or <code>null</code> if there was no bookmark requested.
-	@param referrerURI The URI of the referring location, or <code>null</code> if there is no referrer URI.
-	@return The application-relative logical path.
+	/**Determines the logical navigation path based upon a requested depict path.
+	This method must preserve paths beginning with {@value #GUISE_RESERVED_BASE_PATH}.
+	@param depictURI The plain absolute depict URI.
+	@param depictPath The application-relative depict path.
+	@return The application-relative logical navigation path.
+	@throws NullPointerException if the given depict URI and/or depict path is <code>null</code>.
+	@see #GUISE_RESERVED_BASE_PATH
 	*/
-	public URIPath getLogicalPath(final URI uri, final URIPath path, final Bookmark bookmark, final URI referrerURI);
+	public URIPath getNavigationPath(final URI depictURI, final URIPath depictPath);
+
+	/**Determines the depict URI based upon a navigation URI.
+	This method must preserve paths beginning with {@value #GUISE_RESERVED_BASE_PATH}.
+	@param depictURI The plain absolute depict URI.
+	@param navigationURI The logical navigation URI, either absolute or relative to the application.
+	@return The depict URI, either absolute or relative to the application.
+	@throws NullPointerException if the given depict URI and/or logical URI is <code>null</code>.
+	@see #GUISE_RESERVED_BASE_PATH
+	*/
+	public URI getDepictURI(final URI depictURI, final URI navigationURI);
 	
 	/**Associates multiple destinations with application context-relative paths or path patterns.
 	All destinations are first cleared.

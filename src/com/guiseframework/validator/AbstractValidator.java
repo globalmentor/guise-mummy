@@ -85,7 +85,7 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 		*/
 		public void throwInvalidValueValidationException(final V value) throws ValidationException
 		{
-			final String invalidValueMessage=getSession().resolveString(getInvalidValueMessage());	//get the invalid value message to use
+			final String invalidValueMessage=getSession().dereferenceString(getInvalidValueMessage());	//get the invalid value message to use
 			throw new ValidationException(format(invalidValueMessage, toString(value)), value);	//format the message based upon the value			
 		}
 
@@ -96,7 +96,7 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 		*/
 		public void throwValueRequiredValidationException(final V value) throws ValidationException
 		{
-			final String valueRequiredMessage=getSession().resolveString(getValueRequiredMessage());	//get the value required message to use
+			final String valueRequiredMessage=getSession().dereferenceString(getValueRequiredMessage());	//get the value required message to use
 			throw new ValidationException(valueRequiredMessage, value);
 		}
 

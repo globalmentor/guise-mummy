@@ -1,8 +1,8 @@
 package com.guiseframework;
 
 import java.net.URI;
+
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.net.URIs.*;
 
 /**The encapsulation of a point of navigation.
 @author Garret Wilson
@@ -10,16 +10,16 @@ import static com.garretwilson.net.URIs.*;
 public class Navigation
 {
 
-	/**The old point of navigation, with an absolute path.*/
+	/**The old point of navigation, either absolute or application-relative.*/
 	private final URI oldNavigationURI;
 
-		/**@return The old point of navigation, with an absolute path.*/
+		/**@return The old point of navigation, either absolute or application-relative.*/
 		public URI getOldNavigationURI() {return oldNavigationURI;}
 
-	/**The new point of navigation, with an absolute path.*/
+	/**The new point of navigation, either absolute or application-relative.*/
 	private final URI newNavigationURI;
 
-		/**@return The new point of navigation, with an absolute path.*/
+		/**@return The new point of navigation, either absolute or application-relative.*/
 		public URI getNewNavigationURI() {return newNavigationURI;}
 
 	/**The ID of the viewport in which navigation should occur, or <code>null</code> if navigation should occur in the current viewport.*/
@@ -29,10 +29,9 @@ public class Navigation
 		public String getViewportID() {return viewportID;}
 
 	/**Creates an object encapsulating a point of navigation.
-	@param oldNavigationURI The old point of navigation, with an absolute path.
-	@param newNavigationURI The new point of navigation, with an absolute path.
+	@param oldNavigationURI The old point of navigation, either absolute or application-relative.
+	@param newNavigationURI The new point of navigation, either absolute or application-relative.
 	@exception NullPointerException if one of the navigation URIs is <code>null</code>, or does not contain a path.
-	@exception IllegalArgumentException if one of the given navigation URIs contains a relative path.
 	*/
 	public Navigation(final URI oldNavigationURI, final URI newNavigationURI)
 	{
@@ -40,26 +39,15 @@ public class Navigation
 	}
 
 	/**Creates an object encapsulating a point of navigation.
-	@param oldNavigationURI The old point of navigation, with an absolute path.
-	@param newNavigationURI The new point of navigation, with an absolute path.
+	@param oldNavigationURI The old point of navigation, either absolute or application-relative.
+	@param newNavigationURI The new point of navigation, either absolute or application-relative.
 	@param viewportID The ID of the viewport in which navigation should occur, or <code>null</code> if navigation should occur in the current viewport.
 	@exception NullPointerException if one of the navigation URIs is <code>null</code>, or does not contain a path.
-	@exception IllegalArgumentException if one of the given navigation URIs contains a relative path.
 	*/
 	public Navigation(final URI oldNavigationURI, final URI newNavigationURI, final String viewportID)
 	{
-		checkInstance(oldNavigationURI, "Old navigation URI cannot be null.");
-		checkInstance(newNavigationURI, "New navigation URI cannot be null.");
-		if(!oldNavigationURI.isAbsolute() && !isAbsolutePath(oldNavigationURI))	//make sure the old navigation URI has an absolute path or is itself absolute
-		{
-			throw new IllegalArgumentException("Old navigation URI must have an absolute path: "+oldNavigationURI);
-		}
-		if(!newNavigationURI.isAbsolute() && !isAbsolutePath(newNavigationURI))	//make sure the new navigation URI has an absolute path
-		{
-			throw new IllegalArgumentException("New navigation URI must have an absolute path: "+newNavigationURI);
-		}
-		this.oldNavigationURI=oldNavigationURI;
-		this.newNavigationURI=newNavigationURI;
+		this.oldNavigationURI=checkInstance(oldNavigationURI, "Old navigation URI cannot be null.");
+		this.newNavigationURI=checkInstance(newNavigationURI, "New navigation URI cannot be null.");
 		this.viewportID=viewportID;
 	}
 }

@@ -30,7 +30,7 @@ public class EmailAddressStringLiteralConverter extends AbstractStringLiteralCon
 			}
 			catch(final ArgumentSyntaxException argumentSyntaxException)	//if the email addrss is not in the correct syntax
 			{
-				throw new ConversionException(format(getSession().resolveString(getInvalidValueMessage()), literal), literal);	//indicate that the value was invalid				
+				throw new ConversionException(format(getSession().dereferenceString(getInvalidValueMessage()), literal), literal);	//indicate that the value was invalid				
 			}
 		}
 	}

@@ -9,7 +9,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 /**The encapsulation of a point of modal navigation.
 @author Garret Wilson
 */
-public class ModalNavigation extends Navigation
+public class ModalNavigation extends Navigation	//TODO del class; if kept, update API to allow relative navigation paths
 {
 
 	/**The listener to respond to the end of modal interaction.*/

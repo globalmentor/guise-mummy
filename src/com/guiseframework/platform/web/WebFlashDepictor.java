@@ -80,7 +80,7 @@ public class WebFlashDepictor<C extends Flash> extends AbstractSimpleWebComponen
 		final GuiseSession session=getSession();	//get the session
 		final C component=getDepictedObject();	//get the component
 		final URI flashURI=component.getFlashURI();	//get the Flash URI
-		final URI resolvedFlashURI=flashURI!=null ? session.resolveURI(flashURI) : null;	//the resolved Flash URI, if any
+		final URI flashDepictURI=flashURI!=null ? depictContext.getDepictURI(flashURI) : null;	//the Flash depict URI, if any
 		if(getPlatform().getClientProduct().getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER)	//if the user agent is IE, use the special attributes
 		{
 			depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CLASSID, FLASH_CLASS_ID);	//classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"; only write the classid attributes for IE, because it will prevent the Flash from being loaded in Firefox
@@ -90,17 +90,17 @@ public class WebFlashDepictor<C extends Flash> extends AbstractSimpleWebComponen
 		else	//if the user agent is not IE, specify the object content type
 		{
 			depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_TYPE, FLASH_CONTENT_TYPE.toString());	//type="application/x-shockwave-flash"; don't write the type Type attribute in IE, because this will prevent IE from loading the Flash movie 			
-			if(resolvedFlashURI!=null)	//if there is a flash URI
+			if(flashDepictURI!=null)	//if there is a flash URI
 			{
-				depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_DATA, resolvedFlashURI.toString());	//data="flashURI"; don't write the data attribute in IE, because it will prevent the Flash movie from showing its preloader
+				depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_DATA, flashDepictURI.toString());	//data="flashURI"; don't write the data attribute in IE, because it will prevent the Flash movie from showing its preloader
 			}
 		}
-		if(resolvedFlashURI!=null)	//if there is a flash URI
+		if(flashDepictURI!=null)	//if there is a flash URI
 		{
 				//param movie="flashURI" (necessary for IE)
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_PARAM);	//<xhtml:param>
 			depictContext.writeAttribute(null, ELEMENT_PARAM_ATTRIBUTE_NAME, MOVIE_PARAMETER);	//name="movie"
-			depictContext.writeAttribute(null, ELEMENT_PARAM_ATTRIBUTE_VALUE, resolvedFlashURI.toString());	//value="flashURI"
+			depictContext.writeAttribute(null, ELEMENT_PARAM_ATTRIBUTE_VALUE, flashDepictURI.toString());	//value="flashURI"
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_PARAM);	//</xhtml:param>
 		}
 			//param quality="high" TODO allow customization

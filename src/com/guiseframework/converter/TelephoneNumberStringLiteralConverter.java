@@ -80,7 +80,7 @@ public class TelephoneNumberStringLiteralConverter extends AbstractStringLiteral
 			}
 			catch(final ArgumentSyntaxException argumentSyntaxException)	//if the phone number is not in the correct syntax
 			{
-				throw new ConversionException(format(getSession().resolveString(getInvalidValueMessage()), literal), literal);	//indicate that the value was invalid				
+				throw new ConversionException(format(getSession().dereferenceString(getInvalidValueMessage()), literal), literal);	//indicate that the value was invalid				
 			}
 		}
 	}

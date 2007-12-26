@@ -9,6 +9,7 @@ import java.util.*;
 
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.event.PostponedEvent;
+import com.garretwilson.net.URIConstants;
 import com.garretwilson.net.URIPath;
 import com.garretwilson.urf.URFResource;
 import com.garretwilson.util.DataException;
@@ -745,14 +746,14 @@ public interface GuiseSession extends PropertyBindable
 	*/
 	public void notify(final Runnable afterNotify, final Throwable... errors);
 
-	/**Resolves a string by replacing any string references with a string from the resources.
+	/**Dereferences a string by replacing any string references with a string from the resources.
 	A string reference begins with the Start of String (<code>SOS</code>) control character (U+0098) and ends with a String Terminator (<code>ST</code>) control character (U+009C).
 	The string between these delimiters will be used to look up a string resource using {@link #getStringResource(String)}.
-	Strings retrieved from resources will be recursively resolved.
+	Strings retrieved from resources will be recursively dereferenced.
 	<p>String references appearing between an <code>SOS</code>/<code>ST</code> pair that that begin with the character {@value Resources#STRING_VALUE_REFERENCE_PREFIX_CHAR}
-	will be considered string values and, after they are recursively resolved, will be applied as formatting arguments to the remaining resolved text using {@link MessageFormat#format(String, Object...)}.</p>
-	@param string The string to be resolved.
-	@return The resolved string with any string references replaced with the appropriate string from the resources.
+	will be considered string values and, after they are recursively dereferenced, will be applied as formatting arguments to the remaining dereferenced text using {@link MessageFormat#format(String, Object...)}.</p>
+	@param string The string to be dereferenced.
+	@return The dereferenced string with any string references replaced with the appropriate string from the resources.
 	@exception NullPointerException if the given string is <code>null</code>.
 	@exception IllegalArgumentException if a string reference has no ending String Terminator control character (U+009C).
 	@exception MissingResourceException if no resource could be found associated with a string reference.
@@ -761,21 +762,34 @@ public interface GuiseSession extends PropertyBindable
 	@see Resources#createStringValueReference(String)
 	@see #getStringResource(String)
 	*/
-	public String resolveString(final String string) throws MissingResourceException;
+	public String dereferenceString(final String string) throws MissingResourceException;
 
-	/**Resolves a URI against the application base path, looking up the URI from the resources if necessary.
-	If the URI has the "resource" scheme, its scheme-specific part will be used to look up the actual URI using {@link #getURIResource(String)}.
+	/**Dereferences a URI by looking up any references from the resources if necessary.
+	If the URI has the {@value URIConstants#RESOURCE_SCHEME} scheme, its scheme-specific part will be used to look up the actual URI using {@link #getURIResource(String)}.
 	If suffixes are given, they will be appended to the resource key in order, separated by '.'.
-	URIs retrieved from resources will be recursively resolved without suffixes.
-	Relative paths will be resolved relative to the application base path. Absolute paths will be considered already resolved, as will absolute URIs.
-	For an application base path "/path/to/application/", resolving "relative/path" will yield "/path/to/application/relative/path",
-	while resolving "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".
-	@param uri The URI to be resolved.
-	@return The uri resolved against resources the application base path.
+	If no resource is associated with that resource key, a resource will be retrieved using the unadorned resource key.
+	URIs retrieved from resources will be recursively dereferenced without suffixes.
+	@param uri The URI to be dereferenced.
+	@param suffixes The suffixes, if any, to append to a resource key in a URI reference.
+	@return The URI dereferenced from the resources.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	@exception MissingResourceException if no resource could be found associated with a string reference.
 	@see Resources#createURIResourceReference(String)
 	@see #getURIResource(String)
+	*/
+	public URI dereferenceURI(URI uri, final String... suffixes) throws MissingResourceException;
+
+	/**Resolves a URI against the application base path, looking up the URI from the resources if necessary.
+	The URI will be dereferenced before it is resolved.
+	Relative paths will be resolved relative to the application base path. Absolute paths will be considered already resolved, as will absolute URIs.
+	For an application base path "/path/to/application/", resolving "relative/path" will yield "/path/to/application/relative/path",
+	while resolving "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".
+	@param uri The URI to be resolved.
+	@param suffixes The suffixes, if any, to append to a resource key in a URI reference.
+	@return The uri resolved against resources the application base path.
+	@exception NullPointerException if the given URI is <code>null</code>.
+	@exception MissingResourceException if no resource could be found associated with a string reference.
+	@see #dereferenceURI(URI, String...)
 	@see GuiseApplication#resolveURI(URI)
 	*/
 	public URI resolveURI(final URI uri, final String... suffixes) throws MissingResourceException;

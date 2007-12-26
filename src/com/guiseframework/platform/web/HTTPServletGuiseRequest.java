@@ -35,17 +35,17 @@ public class HTTPServletGuiseRequest
 		/**@return The HTTP servlet response.*/
 //TODO del		public HttpServletResponse getHTTPServletResponse() {return httpServletResponse;}
 
-	/**The requested plain URI.*/
-	private final URI requestURI;
+	/**The requested plain depict URI.*/
+	private final URI depictURI;
 
-		/**@return The requested plain URI.*/
-		public URI getRequestURI() {return requestURI;}
+		/**@return The requested plain depict URI.*/
+		public URI getDepictURI() {return depictURI;}
 
-	/**The requested path in its canonical form (which may be different than that which appears in the request URI).*/
-	private final URIPath requestPath;
+	/**The requested path in its logical form (which may be different than that which appears in the request URI).*/
+	private final URIPath navigationPath;
 
-		/**@return The requested path in its canonical form (which may be different than that which appears in the request URI).*/
-		public URIPath getRequestPath() {return requestPath;}
+		/**@return The requested path in its logical form (which may be different than that which appears in the request URI).*/
+		public URIPath getNavigationPath() {return navigationPath;}
 
 	/**Whether the request is for a Guise reserved path.*/
 	private final boolean requestPathReserved;
@@ -110,10 +110,10 @@ public class HTTPServletGuiseRequest
 	{
 		this.httpServletRequest=checkInstance(request, "HTTP servlet request cannot be null.");
 //TODO del		this.httpServletResponse=checkInstance(response, "HTTP servlet request cannot be null.");
-		requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
+		depictURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
 		final String queryString=request.getQueryString();	//get the query string from the request
 		bookmark=queryString!=null && queryString.length()>0 ? new Bookmark(String.valueOf(QUERY_SEPARATOR)+queryString) : null; 	//create a bookmark if there is a query string (Tomcat 5.5.16 returns an empty string for no query, even though the Java Servlet specification 2.4 says that it should return null; this is fixed in Tomcat 6)
-		Debug.info("servicing Guise request with request URI:", requestURI, "bookmark:", bookmark);
+		Debug.info("servicing Guise request with request URI:", depictURI, "bookmark:", bookmark);
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 		URI referrerURI=getRefererURI(request);	//get the referring URI, if any
@@ -124,15 +124,15 @@ public class HTTPServletGuiseRequest
 		this.referrerURI=referrerURI;	//save the referring URI
 		URIPath requestPath=new URIPath(rawPathInfo.substring(1));	//remove the beginning slash to get the request path from the path info
 		requestPathReserved=requestPath.toString().startsWith(GuiseApplication.GUISE_RESERVED_BASE_PATH.toString());	//see if this is a request for a Guise reserved path (e.g. a public resource or a temporary resource)
-		if(!requestPathReserved)	//if this is not a request for a Guise reserved path
-		{
-Debug.trace("got literal path:", requestPath);
-			requestPath=guiseApplication.getLogicalPath(requestURI, requestPath, bookmark, referrerURI);	//get the logical version of the the path
-Debug.trace("got logical path:", requestPath);
-		}
-		this.requestPath=requestPath;	//save the request path
+		navigationPath=guiseApplication.getNavigationPath(depictURI, requestPath);	//get the logical version of the the path
 		final String contentTypeString=request.getContentType();	//get the request content type
 		requestContentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
 		ajax=requestContentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(requestContentType);	//see if this is a Guise AJAX request
-	}		
+	}
+
+	/**@return A string representation of the request.*/
+	public String toString()
+	{
+		return getDepictURI().toString()+" ("+getNavigationPath()+") "+getBookmark();
+	}
 }
