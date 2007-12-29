@@ -80,12 +80,12 @@ public class WebFlashDepictor<C extends Flash> extends AbstractSimpleWebComponen
 		final GuiseSession session=getSession();	//get the session
 		final C component=getDepictedObject();	//get the component
 		final URI flashURI=component.getFlashURI();	//get the Flash URI
-		final URI flashDepictURI=flashURI!=null ? depictContext.getDepictURI(flashURI) : null;	//the Flash depict URI, if any
+		final URI flashDepictURI=flashURI!=null ? depictContext.getDepictionURI(flashURI) : null;	//the Flash depict URI, if any
 		if(getPlatform().getClientProduct().getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER)	//if the user agent is IE, use the special attributes
 		{
 			depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CLASSID, FLASH_CLASS_ID);	//classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"; only write the classid attributes for IE, because it will prevent the Flash from being loaded in Firefox
 				//create a codebase URI in the form "http[s]://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0", making sure we use the same scheme so that IE6 won't complain if a secure page references a non-secure codebase
-			depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CODEBASE, getSWFlashCabURI("6,0,40,0", HTTPS_SCHEME.equals(depictContext.getDepictURI().getScheme())).toString());	//codebase="http[s]://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0" TODO allow version to be specified
+			depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CODEBASE, getSWFlashCabURI("6,0,40,0", HTTPS_SCHEME.equals(depictContext.getDepictionURI().getScheme())).toString());	//codebase="http[s]://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0" TODO allow version to be specified
 		}
 		else	//if the user agent is not IE, specify the object content type
 		{

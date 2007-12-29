@@ -164,7 +164,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.write("\n\t");
 		final StringBuilder headerCommentStringBuilder=new StringBuilder();	//create a new string builder for constructing the header comment (don't put the comment before the <html> element, or it will break IE6)
 		headerCommentStringBuilder.append("\n");
-		headerCommentStringBuilder.append("\tDocument: ").append(depictContext.getDepictURI()).append('\n');
+		headerCommentStringBuilder.append("\tDocument: ").append(depictContext.getDepictionURI()).append('\n');
 		headerCommentStringBuilder.append("\tCreated: ").append(DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG, locale).format(new Date())).append('\n');
 		headerCommentStringBuilder.append("\n");
 		headerCommentStringBuilder.append("\tXHTML produced by ");
@@ -196,7 +196,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_LINK);	//<xhtml:link>
 			depictContext.writeAttribute(null, ELEMENT_LINK_ATTRIBUTE_REL, LINK_REL_STYLESHEET);	//rel="stylesheet"
 			depictContext.writeAttribute(null, ELEMENT_LINK_ATTRIBUTE_TYPE, TEXT_CSS_CONTENT_TYPE.toString());	//type="text/css"
-			depictContext.writeAttribute(null, ELEMENT_LINK_ATTRIBUTE_HREF, depictContext.getDepictURI(styleURI).toString());	//href="styleURI"
+			depictContext.writeAttribute(null, ELEMENT_LINK_ATTRIBUTE_HREF, depictContext.getDepictionURI(styleURI).toString());	//href="styleURI"
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_LINK);	//</xhtml:link>		
 			depictContext.write('\n');
 		}
@@ -327,7 +327,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeAttribute(null, ELEMENT_FORM_ATTRIBUTE_METHOD, FORM_METHOD_POST);	//method="post"
 		final ContentType encodingType=hasResourceImportControl(component) ? MULTIPART_FORM_DATA_CONTENT_TYPE : APPLICATION_X_WWW_FORM_URLENCODED_CONTENT_TYPE;	//if we have a file upload component, use a multipart form data content type; otherwise, use the default
 		depictContext.writeAttribute(null, ELEMENT_FORM_ATTRIBUTE_ENCTYPE, encodingType.toString());	//enctype="application/x-www-form-urlencoded" (default) or "multipart/form-data" (for file uploads)
-		depictContext.writeAttribute(null, ELEMENT_FORM_ATTRIBUTE_ACTION, depictContext.getDepictURI().getRawPath());	//action="navigationURIPath" (submit to same path)
+		depictContext.writeAttribute(null, ELEMENT_FORM_ATTRIBUTE_ACTION, depictContext.getDepictionURI().getRawPath());	//action="navigationURIPath" (submit to same path)
 		writeStyleAttribute(getBodyStyles());	//write the component's body styles
 		depictContext.write("\n");
 			//create a dummy input element within the form that will hold whether this button was pressed;

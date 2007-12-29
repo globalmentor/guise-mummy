@@ -58,7 +58,7 @@ public class WebPictureDepictor<C extends Picture> extends AbstractWebComponentD
 		final URI image=component.getImageURI();	//get the component image
 		if(image!=null)	//if there is an image
 		{
-			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictURI(image).toString());	//src="image"
+			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictionURI(image).toString());	//src="image"
 		}
 		final String label=component.getLabel();	//get the component label, if there is one
 		String resolvedLabel=label!=null ? session.dereferenceString(label) : null;	//resolve the label, if there is one

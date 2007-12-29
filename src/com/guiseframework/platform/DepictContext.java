@@ -3,9 +3,7 @@ package com.guiseframework.platform;
 import java.net.URI;
 
 import com.garretwilson.beans.PropertyBindable;
-import com.guiseframework.Destination;
-import com.guiseframework.GuiseApplication;
-import com.guiseframework.GuiseSession;
+import com.guiseframework.*;
 
 /**Encapsulation of information related to the current depiction.
 @author Garret Wilson
@@ -23,17 +21,17 @@ public interface DepictContext extends PropertyBindable
 	public Destination getDestination();
 
 	/**@return The current full absolute URI for this depiction, including any query.*/
-	public URI getDepictURI();
+	public URI getDepictionURI();
 
-	/**Determines the URI to use for depiction based upon a logical URI.
+	/**Determines the URI to use for depiction based upon a navigation URI.
 	The URI will first be dereferenced for the current session and then resolved to the application.
-	@param uri The logical URI, which may be absolute or relative to the application.
+	This method delegates to {@link GuiseSession#getDepictionURI(URI, String...)}.
+	@param navigationURI The navigation URI, which may be absolute or relative to the application.
 	@param suffixes The suffixes, if any, to append to a resource key in a URI reference.
 	@return A URI suitable for depiction, deferenced and resolved to the application.
-	@see GuiseSession#dereferenceURI(URI, String...)
-	@see GuiseApplication#getDepictURI(URI, URI)
+	@see GuiseSession#getDepictionURI(URI, String...)
 	*/
-	public URI getDepictURI(final URI uri, final String... suffixes);
+	public URI getDepictionURI(final URI navigationURI, final String... suffixes);
 
 	/**Retrieves styles for this context.
 	Styles appear in the following order:

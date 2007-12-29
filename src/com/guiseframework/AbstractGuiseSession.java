@@ -77,33 +77,42 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			this.logWriter=checkInstance(logWriter, "Log writer cannot be null.");
 		}
 
-	/**The base URI of the session.*/
-	private URI baseURI;
+	/**The depiction base URI of the session.*/
+	private URI depictionBaseURI;
 
-		/**Reports the base URI of the session.
-		The base URI is an absolute URI that ends with the base path of the application, which ends with a slash ('/').
-		The session base URI may be different for different sessions, and may not be equal to the application base path resolved to the container's base URI.
-		@return The base URI representing the Guise session.
+		/**Reports the current depiction base URI of the session.
+		The depiction base URI is an absolute plain URI that ends with the session's depiction base path of the application, ending with a slash ('/').
+		The session depiction base URI may be different for different sessions, and may not be equal to the application navigation base path resolved to the container's base URI.
+		@return The depiction base URI currently representing the Guise session.
 		*/
-		public URI getBaseURI() {return baseURI;}
+		public URI getDepictionBaseURI() {return depictionBaseURI;}
 
-		/**Sets the base URI of the session.
-		The raw path of the base URI must be equal to the application base path.
-		@param baseURI The new base URI of the session.
-		@exception NullPointerException if the given base URI is <code>null</code>.
-		@exception IllegalArgumentException if the raw path of the given base URI is not equal to the application base path.
+		/**Sets the depiction base URI of the session.
+		@param depictionBaseURI The new depiction base URI of the session.
+		@exception NullPointerException if the given depiction base URI is <code>null</code>.
 		*/
-		public void setBaseURI(final URI baseURI)
+		public void setDepictionBaseURI(final URI depictionBaseURI)
 		{
-			if(!this.baseURI.equals(checkInstance(baseURI, "Session base URI cannot be null.")))	//if a new base URI is given
+			if(!this.depictionBaseURI.equals(checkInstance(depictionBaseURI, "Session depiction base URI cannot be null.")))	//if a new base URI is given
 			{
-				if(!getPath(baseURI).equals(getApplication().getBasePath()))	//if the path of the base URI is not the application base path
-				{
-					throw new IllegalArgumentException("Session base URI path "+baseURI.getRawPath()+" does not equal application base path "+getApplication().getBasePath());				
-				}
-				this.baseURI=baseURI;	//save the new base URI
+				this.depictionBaseURI=depictionBaseURI;	//save the new base URI
 			}
 		}
+
+	/**Determines the URI to use for depiction based upon a navigation URI.
+	The URI will first be dereferenced for the current session and then resolved to the depiction base URI.
+	@param navigationURI The navigation URI, which may be absolute or relative to the application.
+	@param suffixes The suffixes, if any, to append to a resource key in a URI reference.
+	@return A URI suitable for depiction, deferenced and resolved to the application.
+	@see #dereferenceURI(URI, String...)
+	@see #getDepictionBaseURI()
+	@see GuiseApplication#getDepictURI(URI, URI)
+	*/
+	public URI getDepictionURI(final URI navigationURI, final String... suffixes)
+	{
+		final GuiseApplication guiseApplication=getApplication();	//get the application
+		return guiseApplication.resolveURI(guiseApplication.getDepictURI(getDepictionBaseURI(), dereferenceURI(navigationURI, suffixes)));	//determine the depict URI and resolve it to the application
+	}
 
 	/**The application frame, initialized during {@link #initialize()}.*/
 	private ApplicationFrame applicationFrame=null;
@@ -747,7 +756,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	{
 		this.uuid=UUID.randomUUID();	//create a UUID for the session
 		this.application=checkInstance(application, "Application cannot be null.");	//save the application
-		this.baseURI=application.getContainer().getBaseURI().resolve(application.getBasePath().toURI());	//default to a base URI calculated from the application base path resolved to the container's base URI
+		this.depictionBaseURI=application.getContainer().getBaseURI().resolve(application.getBasePath().toURI());	//default to a base URI calculated from the application base path resolved to the container's base URI TODO fix to convert from navigation to depiction path
 /*TODO del
 		try
 		{

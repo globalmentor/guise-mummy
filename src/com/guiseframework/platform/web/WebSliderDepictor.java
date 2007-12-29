@@ -296,7 +296,7 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 //TODO fix			context.writeAttribute(null, ATTRIBUTE_ID, decorateID(component.getID(), null, FRAME_CLOSE_CLASS_SUFFIX));	//write the absolute unique ID with the correct suffix
 //TODO fix			writeClassAttribute(context, closeStyleIDs);	//write the title style IDs
 				//use the correct flow axis suffix when resolving URIs
-			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictURI(trackImageURI).toString());	//src="trackImageURI"
+			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictionURI(trackImageURI).toString());	//src="trackImageURI"
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IMG);	//</xhtml:img>
 		}		
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//<xhtml:div> (component-thumb)
@@ -309,7 +309,7 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 //TODO fix			context.writeAttribute(null, ATTRIBUTE_ID, decorateID(component.getID(), null, FRAME_CLOSE_CLASS_SUFFIX));	//write the absolute unique ID with the correct suffix
 //TODO fix			writeClassAttribute(context, closeStyleIDs);	//write the title style IDs
 				//use the correct flow axis suffix when resolving URIs
-			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictURI(thumbImageURI).toString());	//src="thumbImageURI"
+			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictionURI(thumbImageURI).toString());	//src="thumbImageURI"
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IMG);	//</xhtml:img>
 		}
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//</xhtml:div> (component-thumb)

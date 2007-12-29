@@ -56,7 +56,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 		private final URI depictURI;
 
 		/**@return The current full absolute URI for this depiction, including any query.*/
-		public URI getDepictURI() {return depictURI;}
+		public URI getDepictionURI() {return depictURI;}
 
 	/**Whether quirks mode is being used.*/
 	private final boolean isQuirksMode;

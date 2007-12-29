@@ -141,9 +141,6 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 	//TODO del if not needed				final String relativeApplicationPath=relativizePath(getBasePath(), guiseApplication.getBasePath());	//get the application path relative to the container path
 */
 					guiseSession=guiseApplication.createSession(new HTTPServletWebPlatform(guiseApplication, httpSession, httpRequest));	//ask the application to create a new Guise session for the given platform
-					final URI requestURI=URI.create(httpRequest.getRequestURL().toString());	//get the URI of the current request
-					final URI sessionBaseURI=requestURI.resolve(guiseApplication.getBasePath().toURI());	//resolve the application base path to the request URI
-					guiseSession.setBaseURI(sessionBaseURI);	//update the base URI to the one specified by the request, in case we can create a session from different URLs
 					addGuiseSession(guiseSession);	//add and initialize the Guise session
 					final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client
 					guiseSession.requestLocale(asList(clientAcceptedLanguages));	//ask the Guise session to change to one of the accepted locales, if the application supports one
@@ -161,8 +158,12 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 		}
 		if(isNewGuiseSession)	//if we created a new Guise session, associate the Guise application with the new Guise session so that when the HTTP session expires we'll know which Guise sessions went with it (it is important to do this outside the synchronized block, because there are nested synchronizations when the HTTP session expires, but that won't happen until later so there's no need to synchronize now)
 		{		
-			httpSessionGuiseSessionSetMap.addItem(httpSession, guiseSession);	//indicate that this Guise session is for this HTTP setssion
+			httpSessionGuiseSessionSetMap.addItem(httpSession, guiseSession);	//indicate that this Guise session is for this HTTP session
 		}
+		final URI requestDepictionURI=URI.create(httpRequest.getRequestURL().toString());	//get the depiction URI of the current request
+		final URI sessionDepictionBaseURI=requestDepictionURI.resolve(guiseApplication.getDepictURI(requestDepictionURI, guiseApplication.getBasePath().toURI()));	//resolve the depiction form of the application base path to the request depiction URI
+			//TODO currently changing the depiction base URI doesn't fire any events; if it did, we might want first to create a session thread group; but can the depiction base URI actually even change within the current session?
+		guiseSession.setDepictionBaseURI(sessionDepictionBaseURI);	//update the depiction base URI to the one specified by the request, in case the session is created from a different URL
 		return guiseSession;	//return the Guise session
 	}
 

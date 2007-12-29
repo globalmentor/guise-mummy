@@ -174,15 +174,15 @@ public class WebImageActionControlDepictor<C extends ImageComponent & ActionCont
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IMG, true);	//<xhtml:img>
 			writeBodyIDClassAttributes(null, COMPONENT_BODY_CLASS_SUFFIX);	//write the ID and class for the main element
 			writeStyleAttribute(getBodyStyles());	//write the component's body styles
-			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictURI(imageURI).toString());	//src="image"
+			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictionURI(imageURI).toString());	//src="image"
 			//TODO fix to use description or something else, and always write an alt, even if there is no information
 			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_ALT, resolvedLabel!=null ? AbstractModel.getPlainText(resolvedLabel, component.getLabelContentType()) : "");	//alt="label"
 				//TODO determine which rollover image we want to use if the image is selected
 			final URI rolloverImage=getRolloverImageURI();	//get the rollover image to use
 			if(rolloverImage!=null)	//if there is a rollover image
 			{
-				depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ELEMENT_IMG_ATTRIBUTE_ORIGINAL_SRC, depictContext.getDepictURI(imageURI).toString());	//guise:originalSrc="image"
-				depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ELEMENT_IMG_ATTRIBUTE_ROLLOVER_SRC, depictContext.getDepictURI(rolloverImage).toString());	//guise:rolloverSrc="image"
+				depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ELEMENT_IMG_ATTRIBUTE_ORIGINAL_SRC, depictContext.getDepictionURI(imageURI).toString());	//guise:originalSrc="image"
+				depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ELEMENT_IMG_ATTRIBUTE_ROLLOVER_SRC, depictContext.getDepictionURI(rolloverImage).toString());	//guise:rolloverSrc="image"
 			}
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IMG);	//</html:img>
 		}		

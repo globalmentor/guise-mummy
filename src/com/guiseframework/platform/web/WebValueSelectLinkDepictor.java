@@ -30,7 +30,7 @@ public class WebValueSelectLinkDepictor<V, C extends SelectActionControl & Actio
 		if(valueIcon!=null)	//if there is a selected icon
 		{
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IMG, true);	//<xhtml:img>
-			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictURI(valueIcon).toString());	//src="icon"
+			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictionURI(valueIcon).toString());	//src="icon"
 			//TODO fix to use description or something else, and always write an alt, even if there is no information
 			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_ALT, "value");	//alt="value" TODO i18n
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IMG);	//</html:img>

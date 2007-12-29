@@ -28,7 +28,7 @@ public class WebSelectLinkDepictor<C extends SelectActionControl> extends WebLin
 		if(selectedIcon!=null)	//if there is a selected icon
 		{
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IMG, true);	//<xhtml:img>
-			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictURI(selectedIcon).toString());	//src="icon"
+			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictionURI(selectedIcon).toString());	//src="icon"
 			//TODO fix to use description or something else, and always write an alt, even if there is no information
 			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_ALT, "selected");	//alt="selected" TODO i18n
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IMG);	//</html:img>

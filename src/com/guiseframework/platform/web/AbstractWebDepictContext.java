@@ -318,11 +318,11 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 	@param stringBuilder The string builder to which the style will be added
 	@param uri The URI to be represented in CSS.
 	@return The provided string builder.
-	@see #getDepictURI(URI, String...)
+	@see #getDepictionURI(URI, String...)
 	*/
 	protected StringBuilder appendCSSValue(final StringBuilder stringBuilder, final URI uri)
 	{
-		return stringBuilder.append("url(").append(getDepictURI(uri)).append(')');	//append the CSS form of the URI
+		return stringBuilder.append("url(").append(getDepictionURI(uri)).append(')');	//append the CSS form of the URI
 	}
 
 	/**The pre-filled CSS unit strings mapped to extent unit ordinal indices.

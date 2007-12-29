@@ -37,7 +37,7 @@ public class WebLinkDepictor<C extends ActionControl> extends AbstractWebActionC
 			//write the href attribute, using the navigation URI if available
 			//resolve the URI against the application, because navigation, when it occurs, will do the same
 			//use at least an empty string so that the link will be recognized as such by all browsers
-		depictContext.writeAttribute(null, ELEMENT_A_ATTRIBUTE_HREF, navigateActionListener!=null ? navigateActionListener.getNavigationURI().toString() : "");
+		depictContext.writeAttribute(null, ELEMENT_A_ATTRIBUTE_HREF, navigateActionListener!=null ? depictContext.getDepictionURI(navigateActionListener.getNavigationURI()).toString() : "");
 		final String target=navigateActionListener!=null ? navigateActionListener.getViewportID() : null;	//if there is a navigate action listener, get it's viewport ID, if any
 		if(target!=null)	//if a target is given
 		{

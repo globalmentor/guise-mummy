@@ -49,7 +49,7 @@ public class WebCustomButtonDepictor<C extends ActionControl> extends AbstractWe
 			if(actionListener instanceof NavigateActionListener || actionListener instanceof ModalNavigationListener)	//if this is a navigate action listener TODO create a common parent type
 			{
 				final URI navigationURI=((NavigateActionListener)actionListener).getNavigationURI();	//get the navigation URI
-				href=navigationURI.toString();	//use the navigation URI for our href; if JavaScript and AJAX are installed, they will contact the server themselves; if not, the links will continue to work, albeit without communication with Guise
+				href=depictContext.getDepictionURI(navigationURI).toString();	//use the navigation URI for our href; if JavaScript and AJAX are installed, they will contact the server themselves; if not, the links will continue to work, albeit without communication with Guise
 				break;	//we can't go to two places at once, so it can't be helped if there are unexpectedly multiple navigate action listeners
 			}
 		}

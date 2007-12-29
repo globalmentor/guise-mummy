@@ -824,7 +824,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 			{
 				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IMG, true);	//<xhtml:img>
 	//			TODO fix			writeClassAttribute(context, getBaseStyleIDs(component, null, COMPONENT_BODY_CLASS_POSTFIX));	//write the base style IDs with a "-body" suffix
-				depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictURI(icon).toString());	//src="icon"
+				depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictionURI(icon).toString());	//src="icon"
 				//TODO fix to use description or something else, and always write an alt, even if there is no information
 				depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_ALT, resolvedLabel!=null ? AbstractModel.getPlainText(resolvedLabel, labelContentType) : "");	//alt="label"
 				depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IMG);	//</html:img>
