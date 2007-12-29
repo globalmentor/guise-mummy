@@ -13,7 +13,7 @@ import com.guiseframework.platform.PlatformEvent;
 import com.guiseframework.validator.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.text.CharacterConstants.*;
+import static com.garretwilson.text.Characters.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
 /**Strategy for rendering a resource import control as an XHTML <code>&lt;input&gt;</code> element with type="file".

@@ -9,7 +9,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.net.URIPath;
 
-import static com.garretwilson.text.CharacterConstants.*;
+import static com.garretwilson.text.Characters.*;
 
 import com.guiseframework.Bookmark;
 import com.guiseframework.component.layout.*;

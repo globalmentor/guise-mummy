@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.garretwilson.io.InputStreamUtilities.*;
 import static com.garretwilson.net.URIs.*;
-import static com.garretwilson.text.CharacterConstants.*;
+import static com.garretwilson.text.Characters.*;
 
 /**The singleton Guise class.
 There will only be one instance of Guise per JVM.

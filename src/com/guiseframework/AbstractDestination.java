@@ -95,14 +95,14 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	/**Determines if the given location does indeed exist for this destination.
 	This version assumes that all paths exist at this destination and returns <code>true</code>.
 	@param session The current Guise session. 
-	@param path The application-relative path.
+	@param navigationPath The navigation path relative to the application context path.
 	@param bookmark The bookmark for which navigation should occur at this navigation path, or <code>null</code> if there is no bookmark involved in navigation.
 	@param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 	@return Whether the requested path exists.
 	@exception NullPointerException if the given navigation path is <code>null</code>.
 	@exception ResourceIOException if there is an error accessing the resource.
 	*/
-	public boolean exists(final GuiseSession session, final URIPath path, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException
+	public boolean exists(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException
 	{
 		return true;	//make it easy for simple resource destinations by assuming the resource exists
 	}

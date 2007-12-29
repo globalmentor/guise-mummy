@@ -6,7 +6,7 @@ import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 
 import static com.garretwilson.lang.StringBuilderUtilities.*;
-import static com.garretwilson.text.CharacterConstants.*;
+import static com.garretwilson.text.Characters.*;
 
 /**Abstract encapsulation of text information related to the current depiction.
 @author Garret Wilson

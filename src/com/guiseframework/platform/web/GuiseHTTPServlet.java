@@ -2415,7 +2415,7 @@ Debug.trace("this is a destination");
 			this.guiseSession=checkInstance(guiseSession, "Guise session cannot be null.");
 			this.resourceDestination=checkInstance(resourceDestination, "Resource destination cannot be null.");
 			this.navigationPath=checkInstance(navigationPath, "Navigation path cannot be null.");
-			this.bookmark=checkInstance(bookmark, "Boomark cannot be null.");
+			this.bookmark=bookmark;
 			this.referrerURI=referrerURI;
 		}
 

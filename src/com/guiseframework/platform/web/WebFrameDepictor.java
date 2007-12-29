@@ -6,7 +6,7 @@ import java.util.*;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
-import static com.garretwilson.text.CharacterConstants.*;
+import static com.garretwilson.text.Characters.*;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.NameValuePair;
 

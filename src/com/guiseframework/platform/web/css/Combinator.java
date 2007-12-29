@@ -1,8 +1,8 @@
 package com.guiseframework.platform.web.css;
 
-import static com.garretwilson.text.CharacterConstants.GREATER_THAN_CHAR;
-import static com.garretwilson.text.CharacterConstants.PLUS_SIGN_CHAR;
-import static com.garretwilson.text.CharacterConstants.TILDE_CHAR;
+import static com.garretwilson.text.Characters.GREATER_THAN_CHAR;
+import static com.garretwilson.text.Characters.PLUS_SIGN_CHAR;
+import static com.garretwilson.text.Characters.TILDE_CHAR;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 
 /**A combinator separating sequences of simple selectors.

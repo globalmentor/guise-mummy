@@ -38,7 +38,7 @@ import static com.garretwilson.lang.CharSequenceUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
-import static com.garretwilson.text.CharacterConstants.*;
+import static com.garretwilson.text.Characters.*;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.garretwilson.text.FormatUtilities.*;
 import static com.guiseframework.Resources.*;

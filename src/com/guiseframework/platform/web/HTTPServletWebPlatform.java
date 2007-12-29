@@ -90,7 +90,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 //			TODO del Debug.trace("Looking at cookie", cookieName, "with value", cookie.getValue());
 				if(!SESSION_ID_COOKIE_NAME.equals(cookieName))	//ignore the session ID
 				{
-					environment.setProperty(cookieName, decode(cookie.getValue()));	//put this cookie's decoded value into the session's environment
+					environment.setProperty(cookieName, uriDecode(cookie.getValue()));	//put this cookie's decoded value into the session's environment
 				}
 			}
 		}

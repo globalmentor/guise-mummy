@@ -7,7 +7,7 @@ import java.util.*;
 import static com.garretwilson.lang.EnumUtilities.*;
 import com.garretwilson.lang.IntegerUtilities;
 import static com.garretwilson.lang.StringBuilderUtilities.*;
-import static com.garretwilson.text.CharacterConstants.*;
+import static com.garretwilson.text.Characters.*;
 import com.garretwilson.text.xml.stylesheets.css.*;
 import com.garretwilson.util.Debug;
 
