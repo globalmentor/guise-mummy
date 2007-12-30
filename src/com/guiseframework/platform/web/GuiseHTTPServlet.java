@@ -445,6 +445,14 @@ Debug.trace("destination", destination, "is resource read destination?", (destin
 Debug.trace("is GET with resource destination?", (destination instanceof ResourceReadDestination && GET_METHOD.equals(httpMethod)));
 			if(destination instanceof ResourceReadDestination && GET_METHOD.equals(httpMethod))	//if this is a resource read destination (but only if this is a GET request; the ResourceReadDestination may also be a ResourceWriteDestination)
 			{
+				final URIPath path=guiseRequest.getNavigationPath();	//get the path
+				final Bookmark bookmark=guiseRequest.getBookmark();	//get the bookmark, if any
+				final URI referrerURI=guiseRequest.getReferrerURI();	//get the referrer URI, if any
+				final URIPath newPath=destination.getPath(guiseSession, path, bookmark, referrerURI);	//see if we should use another path
+				if(!newPath.equals(path))	//if we should use another path
+				{
+					redirect(guiseRequest, guiseApplication, newPath.toURI(), bookmark, true);	//redirect the user agent to the preferred path
+				}
 Debug.trace("ready to delegate to super");
 				super.doGet(request, response);	//let the default functionality take over, which will take care of accessing the resource destination by creating a specialized access resource
 				return;	//don't service the Guise request normally
@@ -2228,7 +2236,7 @@ Debug.trace("this is a destination");
 	  		resource=super.getResource(request, resourceURI);	//return a default resource
 	  	}
   	}
-		final ContentType contentType=getContentType(resource);	//get the content type of the resource
+		final ContentType contentType=getContentType(request, resource);	//get the content type of the resource
 //TODO del Debug.trace("got content type", contentType, "for resource", resource);
 		if(contentType!=null && TEXT_CSS_CONTENT_TYPE.match(contentType))	//if this is a CSS stylesheet
 		{
