@@ -664,10 +664,23 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 		/**Registers a destination so that it can be matched against one or more paths.
 		Any existing destinations for the path or path pattern is replaced.
+		Existing destinations will take priority if a path matches multiple destination path patterns.
 		@param destination The description of the destination at the appplication context-relative path or path pattern.
 		@exception NullPointerException if the destination is <code>null</code>.
 		*/
 		public void addDestination(final Destination destination)
+		{
+			addDestination(destination, false);	//add this destination with subordinate priority
+		}
+
+		/**Registers a destination so that it can be matched against one or more paths.
+		Any existing destinations for the path or path pattern is replaced.
+		@param destination The description of the destination at the appplication context-relative path or path pattern.
+		@param priority Whether this destination takes priority over other destinations when there are multiple matches;
+			if this destination has no path pattern, this parameter is ignored.
+		@exception NullPointerException if the destination is <code>null</code>.
+		*/
+		public void addDestination(final Destination destination, final boolean priority)
 		{
 			final URIPath path=destination.getPath();	//get the destination's path, if there is one
 			if(path!=null)	//if this destination has a path
@@ -677,7 +690,14 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			else	//if the destination has no path
 			{
 				assert destination.getPathPattern()!=null : "Destination should have had either a path or a path pattern.";
-				pathPatternDestinations.add(destination);	//add this destination to the list of destinations with path patterns
+				if(priority)	//if this destination has priority
+				{
+					pathPatternDestinations.add(0, destination);	//add this destination to the beginning of the list of destinations with path patterns
+				}
+				else	//if this destination should not have priority
+				{
+					pathPatternDestinations.add(destination);	//add this destination to the list of destinations with path patterns
+				}
 			}
 		}
 

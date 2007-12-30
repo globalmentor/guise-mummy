@@ -186,7 +186,24 @@ public interface GuiseApplication extends PropertyBindable
 	@see #GUISE_RESERVED_BASE_PATH
 	*/
 	public URI getDepictURI(final URI depictURI, final URI navigationURI);
-	
+
+	/**Registers a destination so that it can be matched against one or more paths.
+	Any existing destinations for the path or path pattern is replaced.
+	Existing destinations will take priority if a path matches multiple destination path patterns.
+	@param destination The description of the destination at the appplication context-relative path or path pattern.
+	@exception NullPointerException if the destination is <code>null</code>.
+	*/
+	public void addDestination(final Destination destination);
+
+	/**Registers a destination so that it can be matched against one or more paths.
+	Any existing destinations for the path or path pattern is replaced.
+	@param destination The description of the destination at the appplication context-relative path or path pattern.
+	@param priority Whether this destination takes priority over other destinations when there are multiple matches;
+		if this destination has no path pattern, this parameter is ignored.
+	@exception NullPointerException if the destination is <code>null</code>.
+	*/
+	public void addDestination(final Destination destination, final boolean priority);
+
 	/**Associates multiple destinations with application context-relative paths or path patterns.
 	All destinations are first cleared.
 	Any existing destinations for the given context-relative paths are replaced.
