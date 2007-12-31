@@ -12,7 +12,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static java.util.Collections.*;
 
 import com.garretwilson.beans.*;
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.garretwilson.util.Debug;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
@@ -119,7 +119,7 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 		*/
 		public void setCards(final List<Component> newCards)
 		{			
-			if(!ObjectUtilities.equals(cards, newCards))	//if the value is really changing
+			if(!Objects.equals(cards, newCards))	//if the value is really changing
 			{
 				final List<Component> oldCards=cards;	//get the old value
 				for(final Component oldCard:oldCards)	//for each old card

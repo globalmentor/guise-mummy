@@ -4,7 +4,7 @@ import java.util.*;
 import static java.util.Collections.*;
 
 import com.garretwilson.util.NameValuePair;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 /**A CSS stylesheet processor that handles Guise-specific manipulations.
 @author Garret Wilson

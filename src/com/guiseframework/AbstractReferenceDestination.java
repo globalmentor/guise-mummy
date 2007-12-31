@@ -2,7 +2,7 @@ package com.guiseframework;
 
 import java.util.regex.Pattern;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import com.garretwilson.net.URIPath;
 
 /**Abstract implementation of a destination referencing another destination.

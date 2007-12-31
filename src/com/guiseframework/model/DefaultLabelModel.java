@@ -1,13 +1,13 @@
 package com.guiseframework.model;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.TextUtilities.*;
 
 import java.net.URI;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 
 /**A default implementation of a model for an identifier such as text and/or an icon.
 @author Garret Wilson
@@ -28,7 +28,7 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 		*/
 		public void setGlyphURI(final URI newGlyphURI)
 		{
-			if(!ObjectUtilities.equals(glyphURI, newGlyphURI))	//if the value is really changing
+			if(!Objects.equals(glyphURI, newGlyphURI))	//if the value is really changing
 			{
 				final URI oldIcon=glyphURI;	//get the old value
 				glyphURI=newGlyphURI;	//actually change the value
@@ -49,7 +49,7 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 		*/
 		public void setLabel(final String newLabelText)
 		{
-			if(!ObjectUtilities.equals(label, newLabelText))	//if the value is really changing
+			if(!Objects.equals(label, newLabelText))	//if the value is really changing
 			{
 				final String oldLabel=label;	//get the old value
 				label=newLabelText;	//actually change the value

@@ -1,7 +1,7 @@
 package com.guiseframework.input;
 
-import com.garretwilson.lang.ObjectUtilities;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import com.garretwilson.lang.Objects;
+import static com.garretwilson.lang.Objects.*;
 
 /**An encapsulation of key stroke input.
 @author Garret Wilson
@@ -32,7 +32,7 @@ public class KeystrokeInput extends AbstractGestureInput implements KeyboardInpu
 	*/
 	public int hashCode()
 	{
-		return ObjectUtilities.hashCode(super.hashCode(), key);	//extend the hash code with the key
+		return Objects.hashCode(super.hashCode(), key);	//extend the hash code with the key
 	}
 	
 	/**Determines if this object equals another object.

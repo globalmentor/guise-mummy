@@ -3,7 +3,7 @@ package com.guiseframework.component;
 import java.net.URI;
 
 import com.garretwilson.beans.*;
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 
 import com.guiseframework.model.*;
 import static com.guiseframework.theme.Theme.*;
@@ -29,7 +29,7 @@ public class PendingImageActionControl extends ImageActionControl implements Pen
 		*/
 		public void setPendingImageURI(final URI newPendingImageURI)
 		{
-			if(!ObjectUtilities.equals(pendingImageURI, newPendingImageURI))	//if the value is really changing
+			if(!Objects.equals(pendingImageURI, newPendingImageURI))	//if the value is really changing
 			{
 				final URI oldPendingImageURI=pendingImageURI;	//get the old value
 				pendingImageURI=newPendingImageURI;	//actually change the value

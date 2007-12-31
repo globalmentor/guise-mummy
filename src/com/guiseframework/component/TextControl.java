@@ -5,7 +5,7 @@ import java.beans.PropertyVetoException;
 import javax.mail.internet.ContentType;
 
 import static com.garretwilson.io.ContentTypeConstants.*;
-import static com.garretwilson.io.ContentTypeUtilities.*;
+import static com.garretwilson.io.ContentTypes.*;
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.text.TextConstants.*;
 

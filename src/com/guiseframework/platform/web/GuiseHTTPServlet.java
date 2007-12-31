@@ -18,11 +18,11 @@ import com.garretwilson.event.ProgressEvent;
 import com.garretwilson.event.ProgressListener;
 import static com.garretwilson.flash.Flash.*;
 import com.garretwilson.io.*;
-import static com.garretwilson.io.ContentTypeUtilities.*;
+import static com.garretwilson.io.ContentTypes.*;
 import static com.garretwilson.io.Files.*;
 import static com.garretwilson.io.OutputStreamUtilities.*;
-import com.garretwilson.lang.ObjectUtilities;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import com.garretwilson.lang.Objects;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.lang.ThreadUtilities.*;
 import com.garretwilson.javascript.JSON;
 import static com.garretwilson.lang.EnumUtilities.*;
@@ -36,8 +36,9 @@ import com.garretwilson.security.Nonce;
 import static com.garretwilson.servlet.ServletConstants.*;
 import static com.garretwilson.servlet.http.HttpServletConstants.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
-import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
+
+import com.garretwilson.text.CharacterEncoding;
 import com.garretwilson.text.elff.*;
 import static com.garretwilson.text.elff.WebTrendsConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
@@ -1020,7 +1021,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 //TODO del Debug.trace("navigation bookmark:", navigationBookmark, "new bookmark", newBookmark);
 					final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
 //Debug.trace("requested navigation:", requestedNavigation);
-					if(requestedNavigation!=null || !ObjectUtilities.equals(navigationBookmark, newBookmark))	//if navigation is requested or the bookmark has changed, redirect the browser
+					if(requestedNavigation!=null || !Objects.equals(navigationBookmark, newBookmark))	//if navigation is requested or the bookmark has changed, redirect the browser
 					{
 						final URI redirectNavigationURI;	//we'll determine where to direct to in navigation terms; this may not be an absolute URI
 						if(requestedNavigation!=null)	//if navigation is requested
@@ -1072,7 +1073,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 							//TODO store a flag or something---if we're navigating, we probably should flush the other queued events
 						}
 					}
-					if(!isNavigating && !ObjectUtilities.equals(oldPrincipal, guiseSession.getPrincipal()))	//if the principal has changed after updating the model (if we're navigating there's no need to reload)
+					if(!isNavigating && !Objects.equals(oldPrincipal, guiseSession.getPrincipal()))	//if the principal has changed after updating the model (if we're navigating there's no need to reload)
 					{
 						if(!isNavigating)	//if we're not navigating to a new location, fire a navigation event anyway to indicate that the principal has changed
 						{
@@ -1243,7 +1244,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 			}
 //Debug.trace("response length:", text.length());
 //Debug.trace("response text:", text);
-			final byte[] bytes=text.getBytes(UTF_8);	//write the content we collected in the context as series of bytes encoded in UTF-8
+			final byte[] bytes=text.getBytes(CharacterEncoding.UTF_8);	//write the content we collected in the context as series of bytes encoded in UTF-8
 			final OutputStream outputStream=getCompressedOutputStream(guiseRequest.getHTTPServletRequest(), response);	//get a compressed output stream, if possible
 			outputStream.write(bytes);	//write the bytes
 			outputStream.close();	//close the output stream, finishing writing the compressed contents (don't put this in a finally block, as it will attempt to write more data and raise another exception)
@@ -1423,7 +1424,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 
 					if(environmentPropertyValue!=null)	//if a value in the environment matches the cookie's name
 					{
-						if(!ObjectUtilities.equals(cookie.getValue(), encode(environmentPropertyValue)))	//if the cookie's value doesn't match the encoded environment property value
+						if(!Objects.equals(cookie.getValue(), encode(environmentPropertyValue)))	//if the cookie's value doesn't match the encoded environment property value
 						{
 							cookie.setValue(encode(environmentPropertyValue));	//update the cookie's value, making sure the value is encoded
 							response.addCookie(cookie);	//add the cookie to the response to change its value
@@ -1998,7 +1999,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		final Principal guiseSessionPrincipal=guiseSession.getPrincipal();	//get the current principal of the Guise session
 		final String guiseSessionPrincipalID=guiseSessionPrincipal!=null ? guiseSessionPrincipal.getName() : null;	//get the current guise session principal ID
 //	TODO del Debug.trace("checking to see if nonce principal ID", getNoncePrincipalID(nonce), "matches Guise session principal ID", guiseSessionPrincipalID);
-		if(!ObjectUtilities.equals(getNoncePrincipalID(nonce), guiseSessionPrincipalID))	//if this nonce was for a different principal
+		if(!Objects.equals(getNoncePrincipalID(nonce), guiseSessionPrincipalID))	//if this nonce was for a different principal
 		{
 			return false;	//the user must have logged out or have been changed
 		}
@@ -2285,7 +2286,7 @@ Debug.trace("this is a destination");
 			final InputStream inputStream=getResource().getInputStream(request);	//get an input stream to the resource
 			try
 			{
-				final ParseReader cssReader=new ParseReader(new InputStreamReader(inputStream, UTF_8));
+				final ParseReader cssReader=new ParseReader(new InputStreamReader(inputStream, CharacterEncoding.UTF_8));
 				final CSSStylesheet cssStylesheet=cssProcessor.process(cssReader);	//parse the stylesheet
 				return cssStylesheet;	//return the stylesheet
 			}
@@ -2302,7 +2303,7 @@ Debug.trace("this is a destination");
 		*/
 		protected byte[] loadBytes(final HttpServletRequest request) throws IOException
 		{
-			return loadStylesheet(request, new GuiseCSSProcessor()).toString().getBytes(UTF_8);	//load the stylesheet and return its bytes
+			return loadStylesheet(request, new GuiseCSSProcessor()).toString().getBytes(CharacterEncoding.UTF_8);	//load the stylesheet and return its bytes
 		}
 
 		/**HTTP servlet resource constructor.

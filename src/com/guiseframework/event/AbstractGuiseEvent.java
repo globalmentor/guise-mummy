@@ -5,7 +5,7 @@ import java.util.EventObject;
 import com.guiseframework.Guise;
 import com.guiseframework.GuiseSession;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 /**The base class for custom Guise events.
 @author Garret Wilson

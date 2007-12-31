@@ -3,7 +3,7 @@ package com.guiseframework.model.ui;
 import java.net.URI;
 import java.util.*;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
@@ -12,7 +12,7 @@ import com.guiseframework.style.FontStyle;
 import com.guiseframework.style.LineStyle;
 import static com.guiseframework.theme.Theme.*;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 
 /**An abstract implementation of presentation-related information.
@@ -34,7 +34,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 		*/
 		public void setBackgroundColor(final Color newBackgroundColor)
 		{
-			if(!ObjectUtilities.equals(backgroundColor, newBackgroundColor))	//if the value is really changing
+			if(!Objects.equals(backgroundColor, newBackgroundColor))	//if the value is really changing
 			{
 				final Color oldBackgroundColor=backgroundColor;	//get the old value
 				backgroundColor=newBackgroundColor;	//actually change the value
@@ -97,7 +97,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 		{
 			final int borderOrdinal=checkInstance(border, "Border cannot be null").ordinal();	//get the ordinal of the border
 			final Color oldBorderColor=borderColors[borderOrdinal];	//get the old value
-			if(!ObjectUtilities.equals(oldBorderColor, newBorderColor))	//if the value is really changing
+			if(!Objects.equals(oldBorderColor, newBorderColor))	//if the value is really changing
 			{
 				borderColors[borderOrdinal]=newBorderColor;	//actually change the value
 				firePropertyChange(BORDER_COLOR_PROPERTIES[borderOrdinal], oldBorderColor, newBorderColor);	//indicate that the value changed
@@ -386,7 +386,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 		*/
 		public void setColor(final Color newColor)
 		{
-			if(!ObjectUtilities.equals(color, newColor))	//if the value is really changing
+			if(!Objects.equals(color, newColor))	//if the value is really changing
 			{
 				final Color oldColor=color;	//get the old value
 				color=newColor;	//actually change the value
@@ -449,7 +449,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 		{
 			final int cornerOrdinal=checkInstance(corner, "Corner cannot be null").ordinal();	//get the ordinal of the corner
 			final Dimensions oldCornerArcSize=cornerArcSizes[cornerOrdinal];	//get the old value
-			if(!ObjectUtilities.equals(oldCornerArcSize, checkInstance(newCornerArcSize, "Corner arc size cannot be null")))	//if the value is really changing TODO decide if null dimensions should be accepted
+			if(!Objects.equals(oldCornerArcSize, checkInstance(newCornerArcSize, "Corner arc size cannot be null")))	//if the value is really changing TODO decide if null dimensions should be accepted
 			{
 				cornerArcSizes[cornerOrdinal]=newCornerArcSize;	//actually change the value
 				firePropertyChange(CORNER_ARC_SIZE_PROPERTIES[cornerOrdinal], oldCornerArcSize, newCornerArcSize);	//indicate that the value changed
@@ -571,7 +571,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 		{
 			final int flowOrdinal=checkInstance(flow, "Flow cannot be null").ordinal();	//get the ordinal of the flow
 			final Extent oldExtent=extents[flowOrdinal];	//get the old value
-			if(!ObjectUtilities.equals(oldExtent, newExtent))	//if the value is really changing
+			if(!Objects.equals(oldExtent, newExtent))	//if the value is really changing
 			{
 				extents[flowOrdinal]=newExtent;	//actually change the value
 				firePropertyChange(EXTENT_PROPERTIES[flowOrdinal], oldExtent, newExtent);	//indicate that the value changed
@@ -607,7 +607,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 		*/
 		public void setFontFamilies(final List<String> newFontFamilies)
 		{
-			if(!ObjectUtilities.equals(fontFamilies, newFontFamilies))	//if the value is really changing
+			if(!Objects.equals(fontFamilies, newFontFamilies))	//if the value is really changing
 			{
 				final List<String> oldFontFamilies=fontFamilies;	//get the old value
 				fontFamilies=newFontFamilies;	//actually change the value
@@ -628,7 +628,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 		*/
 		public void setFontSize(final Extent newFontSize)
 		{
-			if(!ObjectUtilities.equals(fontSize, newFontSize))	//if the value is really changing
+			if(!Objects.equals(fontSize, newFontSize))	//if the value is really changing
 			{
 				final Extent oldFontSize=fontSize;	//get the old value
 				fontSize=newFontSize;	//actually change the value
@@ -697,7 +697,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 		*/
 		public void setLabelFontFamilies(final List<String> newLabelFontFamilies)
 		{
-			if(!ObjectUtilities.equals(labelFontFamilies, newLabelFontFamilies))	//if the value is really changing
+			if(!Objects.equals(labelFontFamilies, newLabelFontFamilies))	//if the value is really changing
 			{
 				final List<String> oldLabelFontFamilies=labelFontFamilies;	//get the old value
 				labelFontFamilies=newLabelFontFamilies;	//actually change the value
@@ -718,7 +718,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 		*/
 		public void setLabelFontSize(final Extent newLabelFontSize)
 		{
-			if(!ObjectUtilities.equals(labelFontSize, newLabelFontSize))	//if the value is really changing
+			if(!Objects.equals(labelFontSize, newLabelFontSize))	//if the value is really changing
 			{
 				final Extent oldLabelFontSize=labelFontSize;	//get the old value
 				labelFontSize=newLabelFontSize;	//actually change the value
@@ -1037,7 +1037,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 		*/
 		public void setStyleID(final String newStyleID)
 		{
-			if(!ObjectUtilities.equals(styleID, newStyleID))	//if the value is really changing
+			if(!Objects.equals(styleID, newStyleID))	//if the value is really changing
 			{
 				final String oldStyleID=styleID;	//get the current value
 				styleID=newStyleID;	//update the value

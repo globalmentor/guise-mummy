@@ -7,7 +7,7 @@ import java.net.URI;
 import java.util.*;
 
 import static com.garretwilson.lang.NumberUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 import com.garretwilson.util.Debug;

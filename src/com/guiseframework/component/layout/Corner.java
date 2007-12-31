@@ -1,6 +1,6 @@
 package com.guiseframework.component.layout;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 /**The four logical flow corners.
 @author Garret Wilson

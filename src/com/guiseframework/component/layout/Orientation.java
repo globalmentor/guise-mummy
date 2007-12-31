@@ -2,12 +2,12 @@ package com.guiseframework.component.layout;
 
 import java.util.*;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.guiseframework.geometry.Axis;
 import com.guiseframework.geometry.CompassPoint;
 import com.guiseframework.geometry.Side;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.util.LanguageConstants.*;
 
 /**Encapsulates internationalized orientation of objects.
@@ -256,6 +256,6 @@ public class Orientation
 	/**@return A hash code for the cell.*/
   public int hashCode()
   {
-  	return ObjectUtilities.hashCode((Object[])orientations);	//generate a hash code
+  	return Objects.hashCode((Object[])orientations);	//generate a hash code
   }
 }

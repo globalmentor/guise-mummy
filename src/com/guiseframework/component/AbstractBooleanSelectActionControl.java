@@ -5,7 +5,7 @@ import java.net.URI;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.guiseframework.model.*;
 import static com.guiseframework.theme.Theme.*;
 
@@ -80,7 +80,7 @@ public abstract class AbstractBooleanSelectActionControl extends AbstractActionV
 		*/
 		public void setSelectedGlyphURI(final URI newSelectedIcon)
 		{
-			if(!ObjectUtilities.equals(selectedGlyphURI, newSelectedIcon))	//if the value is really changing
+			if(!Objects.equals(selectedGlyphURI, newSelectedIcon))	//if the value is really changing
 			{
 				final URI oldSelectedGlyphURI=selectedGlyphURI;	//get the old value
 				selectedGlyphURI=newSelectedIcon;	//actually change the value
@@ -122,7 +122,7 @@ public abstract class AbstractBooleanSelectActionControl extends AbstractActionV
 		*/
 		public void setUnselectedGlyphURI(final URI newUnselectedIcon)
 		{
-			if(!ObjectUtilities.equals(unselectedGlyphURI, newUnselectedIcon))	//if the value is really changing
+			if(!Objects.equals(unselectedGlyphURI, newUnselectedIcon))	//if the value is really changing
 			{
 				final URI oldUnselectedGlyphURI=unselectedGlyphURI;	//get the old value
 				unselectedGlyphURI=newUnselectedIcon;	//actually change the value

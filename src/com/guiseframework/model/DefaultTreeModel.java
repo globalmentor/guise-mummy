@@ -1,8 +1,8 @@
 package com.guiseframework.model;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.guiseframework.event.*;
 
 /**A default implementation of a tree model.
@@ -52,7 +52,7 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel	//TODO 
 		*/
 		public void setRootNode(final TreeNodeModel<?> newRootNode)
 		{
-			if(!ObjectUtilities.equals(rootNode, checkInstance(newRootNode, "Root node cannot be null.")))	//if the value is really changing
+			if(!Objects.equals(rootNode, checkInstance(newRootNode, "Root node cannot be null.")))	//if the value is really changing
 			{
 				final TreeNodeModel<?> oldRootNode=rootNode;	//get the old value
 //TODO del when works				oldRootNode.removePropertyChangeListener(treeNodePropertyChangeListener);	//stop listening for bubbled property change events from tree nodes in the old hierarchy

@@ -1,7 +1,7 @@
 package com.guiseframework.event;
 
 import com.garretwilson.beans.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import com.guiseframework.model.Displayable;
 
 /**A {@link Boolean} property change listener that synchronizes a {@link Displayable} source's {@link Displayable#DISPLAYED_PROPERTY}

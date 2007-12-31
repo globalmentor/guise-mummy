@@ -1,6 +1,6 @@
 package com.guiseframework.component;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 
 /**Abstract implementation of a modal frame.
 @param <R> The type of modal result this modal frame produces.
@@ -22,7 +22,7 @@ public abstract class AbstractModalFrame<R> extends AbstractFrame implements Mod
 		*/
 		public void setResult(final R newResult)
 		{
-			if(!ObjectUtilities.equals(result, newResult))	//if the value is really changing (compare their values, rather than identity)
+			if(!Objects.equals(result, newResult))	//if the value is really changing (compare their values, rather than identity)
 			{
 				final R oldResult=result;	//get the old value
 				result=newResult;	//actually change the value

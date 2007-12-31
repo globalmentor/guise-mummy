@@ -1,8 +1,8 @@
 package com.guiseframework.geometry;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 
 /**A measurement of an object's width, height, and depth along the X, Y, and Z dimensions, respectively.
 @author garret
@@ -92,7 +92,7 @@ public class Dimensions
 		this.width=checkInstance(width, "Width cannot be null.");
 		this.height=checkInstance(height, "Height cannot be null.");
 		this.depth=checkInstance(depth, "Depth cannot be null.");
-		this.hashCode=ObjectUtilities.hashCode(width, height, depth);	//precalculate the hash code
+		this.hashCode=Objects.hashCode(width, height, depth);	//precalculate the hash code
 	}
 
 	/**@return A hash code value for the object.*/

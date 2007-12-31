@@ -1,6 +1,6 @@
 package com.guiseframework.component;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.guiseframework.component.layout.Layout;
 
 /**Abstract implementation of a modal navigation panel.
@@ -23,7 +23,7 @@ public abstract class AbstractModalNavigationPanel<R> extends AbstractPanel impl
 		*/
 		public void setResult(final R newResult)
 		{
-			if(!ObjectUtilities.equals(result, newResult))	//if the value is really changing (compare their values, rather than identity)
+			if(!Objects.equals(result, newResult))	//if the value is really changing (compare their values, rather than identity)
 			{
 				final R oldResult=result;	//get the old value
 				result=newResult;	//actually change the value

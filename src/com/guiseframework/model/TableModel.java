@@ -2,8 +2,8 @@ package com.guiseframework.model;
 
 import java.util.*;
 
-import com.garretwilson.lang.ObjectUtilities;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import com.garretwilson.lang.Objects;
+import static com.garretwilson.lang.Objects.*;
 
 /**A model of a table.
 The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class. 
@@ -118,7 +118,7 @@ public interface TableModel extends Model	//TODO maybe specify row count to be a
 		/**@return A hash code for the cell.*/
     public int hashCode()
     {
-    	return ObjectUtilities.hashCode(rowIndex, column);	//generate a hash code
+    	return Objects.hashCode(rowIndex, column);	//generate a hash code
     }
 
 	}

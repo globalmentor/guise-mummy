@@ -27,7 +27,7 @@ import com.guiseframework.style.Color;
 import com.guiseframework.style.FontStyle;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.FormatUtilities.*;
 import static com.garretwilson.text.xml.XMLUtilities.*;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;

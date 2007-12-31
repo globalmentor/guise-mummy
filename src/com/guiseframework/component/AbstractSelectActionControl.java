@@ -1,10 +1,10 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 import java.net.URI;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 
@@ -69,7 +69,7 @@ public abstract class AbstractSelectActionControl extends AbstractActionControl 
 		*/
 		public void setSelectedGlyphURI(final URI newSelectedIcon)
 		{
-			if(!ObjectUtilities.equals(selectedIcon, newSelectedIcon))	//if the value is really changing
+			if(!Objects.equals(selectedIcon, newSelectedIcon))	//if the value is really changing
 			{
 				final URI oldSelectedIcon=selectedIcon;	//get the old value
 				selectedIcon=newSelectedIcon;	//actually change the value
@@ -111,7 +111,7 @@ public abstract class AbstractSelectActionControl extends AbstractActionControl 
 		*/
 		public void setUnselectedGlyphURI(final URI newUnselectedIcon)
 		{
-			if(!ObjectUtilities.equals(unselectedIcon, newUnselectedIcon))	//if the value is really changing
+			if(!Objects.equals(unselectedIcon, newUnselectedIcon))	//if the value is really changing
 			{
 				final URI oldUnselectedIcon=unselectedIcon;	//get the old value
 				unselectedIcon=newUnselectedIcon;	//actually change the value

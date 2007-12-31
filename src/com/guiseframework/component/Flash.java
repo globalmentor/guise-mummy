@@ -4,7 +4,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 
 import java.net.URI;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 
 /**A component representing a Macromedia Flash object.
 @author Garret Wilson
@@ -28,7 +28,7 @@ public class Flash extends AbstractComponent
 		*/
 		public void setFlashURI(final URI newFlashURI)
 		{
-			if(!ObjectUtilities.equals(flashURI, newFlashURI))	//if the value is really changing
+			if(!Objects.equals(flashURI, newFlashURI))	//if the value is really changing
 			{
 				final URI oldFlashURI=flashURI;	//get the old value
 				flashURI=newFlashURI;	//actually change the value

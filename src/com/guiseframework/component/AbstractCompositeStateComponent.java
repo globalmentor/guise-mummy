@@ -1,6 +1,6 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 import java.io.IOException;
 import java.util.*;

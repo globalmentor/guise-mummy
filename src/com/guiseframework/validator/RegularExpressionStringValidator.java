@@ -2,7 +2,7 @@ package com.guiseframework.validator;
 
 import java.util.regex.Pattern;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 /**A string validator that can validate against regular expressions.
 @author Garret Wilson

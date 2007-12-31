@@ -6,7 +6,7 @@ import java.net.URI;
 import java.util.StringTokenizer;
 
 import com.garretwilson.lang.CharSequenceUtilities;
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.garretwilson.net.URIPath;
 import com.garretwilson.net.URIs;
 import com.garretwilson.util.Debug;
@@ -42,7 +42,7 @@ public class NavigationURIPathSegmentLinkPanel extends AbstractPanel
 		*/
 		public void setNavigationURI(final URI newNavigationURI)
 		{
-			if(!ObjectUtilities.equals(navigationURI, newNavigationURI))	//if the value is really changing
+			if(!Objects.equals(navigationURI, newNavigationURI))	//if the value is really changing
 			{
 				final URI oldNavigationURI=navigationURI;	//get the old value
 				navigationURI=newNavigationURI;	//actually change the value

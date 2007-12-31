@@ -1,13 +1,13 @@
 package com.guiseframework.prototype;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.TextUtilities.*;
 
 import java.net.URI;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.guiseframework.model.*;
 
 /**Contains prototype information for a value control.
@@ -51,7 +51,7 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 		*/
 		public void setGlyphURI(final URI newIcon)
 		{
-			if(!ObjectUtilities.equals(glyphURI, newIcon))	//if the value is really changing
+			if(!Objects.equals(glyphURI, newIcon))	//if the value is really changing
 			{
 				final URI oldGlyphURI=glyphURI;	//get the old value
 				glyphURI=newIcon;	//actually change the value
@@ -72,7 +72,7 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 		*/
 		public void setLabel(final String newLabelText)
 		{
-			if(!ObjectUtilities.equals(label, newLabelText))	//if the value is really changing
+			if(!Objects.equals(label, newLabelText))	//if the value is really changing
 			{
 				final String oldLabel=label;	//get the old value
 				label=newLabelText;	//actually change the value

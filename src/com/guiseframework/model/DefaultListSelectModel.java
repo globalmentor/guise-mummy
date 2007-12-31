@@ -3,14 +3,14 @@ package com.guiseframework.model;
 import java.beans.PropertyVetoException;
 import java.util.*;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.garretwilson.util.*;
 import com.guiseframework.event.*;
 import com.guiseframework.validator.ValidationException;
 import com.guiseframework.validator.Validator;
 
 import static com.garretwilson.lang.IntegerUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 
 /**The default implementation of a model for selecting one or more values from a list.
@@ -1162,7 +1162,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 		*/
 		public boolean equals(final Object object)
 		{
-			return (object instanceof DefaultListSelectModel.ValueState) && ObjectUtilities.equals(getValue(), ((DefaultListSelectModel.ValueState)object).getValue()); 
+			return (object instanceof DefaultListSelectModel.ValueState) && Objects.equals(getValue(), ((DefaultListSelectModel.ValueState)object).getValue()); 
 		}
 	}
 }

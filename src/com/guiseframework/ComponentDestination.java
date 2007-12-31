@@ -4,8 +4,8 @@ import java.net.URI;
 import java.util.regex.Pattern;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
-import com.garretwilson.lang.ObjectUtilities;
+import static com.garretwilson.lang.Objects.*;
+import com.garretwilson.lang.Objects;
 import com.garretwilson.net.URIPath;
 import com.guiseframework.component.Component;
 
@@ -37,7 +37,7 @@ public class ComponentDestination extends AbstractDestination
 		*/
 		public void setStyle(final URI newStyle)
 		{
-			if(!ObjectUtilities.equals(style, newStyle))	//if the value is really changing
+			if(!Objects.equals(style, newStyle))	//if the value is really changing
 			{
 				final URI oldStyle=style;	//get the old value
 				style=newStyle;	//actually change the value

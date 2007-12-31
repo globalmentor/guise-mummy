@@ -1,7 +1,7 @@
 package com.guiseframework.geometry;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
-import com.garretwilson.lang.ObjectUtilities;
+import static com.garretwilson.lang.Objects.*;
+import com.garretwilson.lang.Objects;
 
 /**A point in three-dimensional space.
 @author Garret Wilson
@@ -149,7 +149,7 @@ public class Point
 	/**@return A hash code value for the object.*/
 	public int hashCode()
 	{
-		return ObjectUtilities.hashCode(getX(), getY(), getZ());	//determine the hash code
+		return Objects.hashCode(getX(), getY(), getZ());	//determine the hash code
 	}
 
 	/**Indicates whether some other object is "equal to" this one.

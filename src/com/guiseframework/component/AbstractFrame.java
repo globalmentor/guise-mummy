@@ -4,12 +4,12 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.util.*;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import com.garretwilson.beans.GenericPropertyChangeListener;
 
 import static com.garretwilson.util.CollectionUtilities.*;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.garretwilson.util.Debug;
 
 import static com.guiseframework.GuiseResourceConstants.*;
@@ -375,7 +375,7 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 		*/
 		public void setInputFocusedComponent(final InputFocusableComponent newInputFocusedComponent) throws PropertyVetoException 
 		{
-			if(!ObjectUtilities.equals(inputFocusedComponent, newInputFocusedComponent))	//if the value is really changing
+			if(!Objects.equals(inputFocusedComponent, newInputFocusedComponent))	//if the value is really changing
 			{
 				final InputFocusStrategy oldInputFocusedComponent=inputFocusStrategy;	//get the old value
 				inputFocusedComponent=newInputFocusedComponent;	//actually change the value

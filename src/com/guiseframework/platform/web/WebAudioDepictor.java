@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.Map;
 
 import static com.garretwilson.lang.EnumUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 import com.garretwilson.util.*;
 

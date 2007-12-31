@@ -4,7 +4,7 @@ import static java.text.MessageFormat.*;
 
 import java.beans.*;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.garretwilson.util.Debug;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.Container;
@@ -208,7 +208,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	public void setValue(final Component newValue) throws PropertyVetoException
 	{
 		final Component oldValue=getValue();	//get the old value
-		if(!ObjectUtilities.equals(oldValue, newValue))	//if a new component is given
+		if(!Objects.equals(oldValue, newValue))	//if a new component is given
 		{
 			final Container container=getOwner();	//get the layout's container
 			if(container==null)	//if we haven't been installed into a container

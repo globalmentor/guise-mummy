@@ -1,7 +1,7 @@
 package com.guiseframework.component.layout;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 import com.guiseframework.component.Component;
 import com.guiseframework.component.LayoutComponent;

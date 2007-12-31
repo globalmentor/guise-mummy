@@ -4,7 +4,7 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.*;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
 import com.garretwilson.util.Debug;

@@ -5,8 +5,8 @@ import java.net.URI;
 import javax.mail.internet.ContentType;
 
 import static com.garretwilson.io.ContentTypeConstants.*;
-import static com.garretwilson.io.ContentTypeUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.io.ContentTypes.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 

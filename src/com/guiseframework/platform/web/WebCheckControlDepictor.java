@@ -6,7 +6,7 @@ import java.util.*;
 import static java.util.Collections.*;
 
 import static com.garretwilson.lang.BooleanUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
 import com.guiseframework.component.*;

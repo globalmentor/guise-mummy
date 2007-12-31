@@ -7,7 +7,7 @@ import java.util.*;
 import static java.util.Collections.*;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import com.garretwilson.urf.*;
 import static com.garretwilson.urf.URF.*;
 

@@ -1,6 +1,6 @@
 package com.guiseframework;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 /**A thread group allocated to a Guise session.
 All threads accessing a Guise session should be part of the session's thread group.

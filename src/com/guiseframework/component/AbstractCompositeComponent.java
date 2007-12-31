@@ -4,7 +4,7 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
 import com.garretwilson.beans.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import com.garretwilson.util.Debug;
 
 import com.guiseframework.event.*;

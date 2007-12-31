@@ -3,8 +3,8 @@ package com.guiseframework.component;
 import java.net.URI;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import com.garretwilson.lang.ObjectUtilities;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import com.garretwilson.lang.Objects;
+import static com.garretwilson.lang.Objects.*;
 
 import com.guiseframework.component.layout.*;
 import com.guiseframework.converter.AbstractStringLiteralConverter;
@@ -95,7 +95,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 		*/
 		public void setInterval(final V newInterval) throws ValidationException
 		{
-			if(!ObjectUtilities.equals(interval, newInterval))	//if the value is really changing (compare their values, rather than identity)
+			if(!Objects.equals(interval, newInterval))	//if the value is really changing (compare their values, rather than identity)
 			{
 				final V oldInterval=interval;	//get the old value
 				interval=newInterval;	//actually change the value

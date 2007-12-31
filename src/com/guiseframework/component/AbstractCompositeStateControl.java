@@ -2,8 +2,8 @@ package com.guiseframework.component;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
-import com.garretwilson.lang.ObjectUtilities;
-import static com.garretwilson.lang.ObjectUtilities.checkInstance;
+import com.garretwilson.lang.Objects;
+import static com.garretwilson.lang.Objects.checkInstance;
 
 import com.guiseframework.model.*;
 
@@ -93,7 +93,7 @@ public abstract class AbstractCompositeStateControl<T, S extends AbstractComposi
 	{
 		final Notification oldNotification=getNotification();	//get the old notification
 		super.setNotification(newNotification);	//update the old notification normally
-		if(!ObjectUtilities.equals(oldNotification, newNotification))	//if the notification changed
+		if(!Objects.equals(oldNotification, newNotification))	//if the notification changed
 		{
 			updateStatus();	//update the status			
 		}

@@ -5,7 +5,7 @@ import java.lang.reflect.*;
 import java.util.*;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 import com.garretwilson.event.EventListenerManager;
 import com.guiseframework.converter.*;

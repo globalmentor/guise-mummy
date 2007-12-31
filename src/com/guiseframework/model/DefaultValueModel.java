@@ -2,7 +2,7 @@ package com.guiseframework.model;
 
 import java.beans.PropertyVetoException;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.guiseframework.validator.*;
 
 /**A default implementation of a model representing a value.
@@ -49,7 +49,7 @@ public class DefaultValueModel<V> extends AbstractValueModel<V>
 					throw createPropertyVetoException(this, validationException, VALUE_PROPERTY, oldValue, newValue);	//throw a property veto exception representing the validation error
 				}
 			}
-			if(!ObjectUtilities.equals(value, newValue))	//if the value is really changing (compare their values, rather than identity)
+			if(!Objects.equals(value, newValue))	//if the value is really changing (compare their values, rather than identity)
 			{
 				fireVetoableChange(VALUE_PROPERTY, oldValue, newValue);	//notify vetoable change listeners of the impending change
 				value=newValue;	//actually change the value, of the change wasn't vetoed
@@ -63,7 +63,7 @@ public class DefaultValueModel<V> extends AbstractValueModel<V>
 		*/
 		public void clearValue()
 		{
-			if(!ObjectUtilities.equals(value, null))	//if the value is really changing (compare their values, rather than identity)
+			if(!Objects.equals(value, null))	//if the value is really changing (compare their values, rather than identity)
 			{
 				final V oldValue=value;	//get the old value
 				value=null;	//actually change the value
@@ -78,7 +78,7 @@ public class DefaultValueModel<V> extends AbstractValueModel<V>
 		public void resetValue()
 		{
 			final V defaultValue=getDefaultValue();	//get the default value
-			if(!ObjectUtilities.equals(value, defaultValue))	//if the value is really changing (compare their values, rather than identity)
+			if(!Objects.equals(value, defaultValue))	//if the value is really changing (compare their values, rather than identity)
 			{
 				final V oldValue=value;	//get the old value
 				value=defaultValue;	//actually change the value

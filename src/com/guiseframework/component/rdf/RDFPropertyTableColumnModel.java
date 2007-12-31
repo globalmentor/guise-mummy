@@ -2,7 +2,7 @@ package com.guiseframework.component.rdf;
 
 import java.net.URI;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 import com.garretwilson.rdf.*;
 import com.guiseframework.model.DefaultTableColumnModel;

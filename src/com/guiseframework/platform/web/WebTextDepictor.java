@@ -8,7 +8,7 @@ import javax.mail.internet.ContentType;
 import javax.xml.parsers.*;
 
 import static com.garretwilson.io.ContentTypeConstants.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
 import static com.garretwilson.text.xml.XMLUtilities.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;

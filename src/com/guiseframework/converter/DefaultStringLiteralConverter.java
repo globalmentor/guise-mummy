@@ -1,7 +1,7 @@
 package com.guiseframework.converter;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static java.text.MessageFormat.format;
 
 import java.lang.reflect.Constructor;

@@ -11,18 +11,16 @@ import javax.mail.internet.ContentType;
 import javax.servlet.http.HttpServletResponse;
 
 import static com.garretwilson.io.ContentTypeConstants.*;
-import static com.garretwilson.io.ContentTypeUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.io.ContentTypes.*;
+import static com.garretwilson.lang.Objects.*;
 
 import com.garretwilson.io.ParseReader;
 import com.garretwilson.servlet.http.HttpServletUtilities;
 import com.garretwilson.text.CharacterEncoding;
 import static com.garretwilson.text.FormatUtilities.*;
 import com.garretwilson.text.xml.QualifiedName;
+import static com.garretwilson.text.CharacterEncoding.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
-
-import static com.garretwilson.text.CharacterEncodingConstants.*;
-
 import com.garretwilson.util.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 
@@ -126,7 +124,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 	public void setOutputContentType(final ContentType contentType)
 	{
 			//default to text/plain encoded in UTF-8 replace the charset parameter with the currently set character set TODO change to really just replace one parameter, instead of removing all others
-		this.outputContentType=createContentType(contentType.getPrimaryType(), contentType.getSubType(), new NameValuePair<String, String>(CHARSET_PARAMETER, getOutputCharacterEncoding().getEncoding()));
+		this.outputContentType=createContentType(contentType.getPrimaryType(), contentType.getSubType(), new NameValuePair<String, String>(CHARSET_PARAMETER, getOutputCharacterEncoding().toString()));
 		getResponse().setContentType(this.outputContentType.toString());	//set the content type of the response, including the current character set
 	}
 

@@ -7,14 +7,14 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.util.regex.Pattern;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.converter.*;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.ValidationException;
 import com.guiseframework.validator.Validator;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 /**Control to accept text input from the user representing a particular value type.
 This control keeps track of literal text entered by the user, distinct from the value stored in the model.
@@ -55,7 +55,7 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V>
 		*/
 		public void setAutoCommitPattern(final Pattern newAutoCommitPattern)
 		{
-			if(!ObjectUtilities.equals(autoCommitPattern, newAutoCommitPattern))	//if the value is really changing (compare their values, rather than identity)
+			if(!Objects.equals(autoCommitPattern, newAutoCommitPattern))	//if the value is really changing (compare their values, rather than identity)
 			{
 				final Pattern oldAutoCommitPattern=autoCommitPattern;	//get the old value
 				autoCommitPattern=newAutoCommitPattern;	//actually change the value
@@ -121,7 +121,7 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V>
 		*/
 		public void setProvisionalText(final String newProvisionalText)
 		{
-			if(!ObjectUtilities.equals(provisionalText, newProvisionalText))	//if the value is really changing (compare their values, rather than identity)
+			if(!Objects.equals(provisionalText, newProvisionalText))	//if the value is really changing (compare their values, rather than identity)
 			{
 				final String oldProvisionalText=provisionalText;	//get the old value
 				provisionalText=newProvisionalText;	//actually change the value
@@ -144,12 +144,12 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V>
 		*/
 		public void setText(final String newText)
 		{
-			if(!ObjectUtilities.equals(text, newText))	//if the value is really changing (compare their values, rather than identity)
+			if(!Objects.equals(text, newText))	//if the value is really changing (compare their values, rather than identity)
 			{
 				final String oldText=text;	//get the old value
 				text=newText;	//actually change the value
 				final String oldProvisionalText=getProvisionalText();	//get the current provisional text
-				final boolean provisionalTextAlreadyMatched=ObjectUtilities.equals(text, getProvisionalText());	//see if the provisional text already matches our new text value
+				final boolean provisionalTextAlreadyMatched=Objects.equals(text, getProvisionalText());	//see if the provisional text already matches our new text value
 				setProvisionalText(text);	//update the provisional text before firing a text change property so that the valid state will be updated 
 				if(provisionalTextAlreadyMatched)	//if the provisional text already matched the new text, it didn't update validity, so we need to do that here
 				{
@@ -301,14 +301,14 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V>
 			{
 				final String provisionalText=getProvisionalText();	//get the provisional literal text
 				final V value=getConverter().convertLiteral(provisionalText);	//see if the provisional literal text can correctly be converted
-				if(!ObjectUtilities.equals(value, getDefaultValue()))	//don't count the value as invalid if it is equal to the default value
+				if(!Objects.equals(value, getDefaultValue()))	//don't count the value as invalid if it is equal to the default value
 				{
 					final Validator<V> validator=getValidator();	//see if there is a validator installed
 					if(validator!=null)	//if there is a validator installed
 					{
 						if(!validator.isValid(value))	//if the value represented by the provisional literal text is not valid
 						{
-							if(ObjectUtilities.equals(provisionalText, getText()))	//if the invalid provisional literal text is equal to the current literal test
+							if(Objects.equals(provisionalText, getText()))	//if the invalid provisional literal text is equal to the current literal test
 							{
 								status=Status.ERROR;	//the invalid value has already been committed, so mark it as an error
 							}

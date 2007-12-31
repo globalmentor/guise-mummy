@@ -5,7 +5,7 @@ import com.guiseframework.converter.AbstractStringLiteralConverter;
 import com.guiseframework.model.*;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 /**Control to allow selection of one or more values from a list using a tabbed interface.
 @param <V> The type of values to select.

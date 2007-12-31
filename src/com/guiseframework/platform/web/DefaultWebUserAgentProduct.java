@@ -5,7 +5,7 @@ import java.util.Locale;
 
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 
 import com.guiseframework.platform.AbstractBrandedProduct;

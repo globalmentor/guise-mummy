@@ -12,9 +12,10 @@ import static java.util.Collections.*;
 
 import com.garretwilson.beans.*;
 import com.garretwilson.io.BOMInputStreamReader;
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.garretwilson.net.URIConstants;
 import com.garretwilson.net.URIPath;
+import com.garretwilson.text.CharacterEncoding;
 import com.garretwilson.urf.*;
 import com.garretwilson.urf.ploop.PLOOPURFProcessor;
 import com.garretwilson.util.*;
@@ -35,11 +36,11 @@ import static com.garretwilson.io.Files.*;
 import static com.garretwilson.io.WriterUtilities.*;
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.CharSequenceUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
+import static com.garretwilson.text.CharacterEncoding.*;
 import static com.garretwilson.text.Characters.*;
-import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.garretwilson.text.FormatUtilities.*;
 import static com.guiseframework.Resources.*;
 import static com.guiseframework.theme.Theme.*;
@@ -199,7 +200,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void setInputStrategy(final InputStrategy newInputStrategy)
 		{
-			if(!ObjectUtilities.equals(inputStrategy, newInputStrategy))	//if the value is really changing
+			if(!Objects.equals(inputStrategy, newInputStrategy))	//if the value is really changing
 			{
 				final InputStrategy oldInputStrategy=inputStrategy;	//get the current value
 				inputStrategy=newInputStrategy;	//update the value
@@ -223,7 +224,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void setLocale(final Locale newLocale)
 		{
-			if(!ObjectUtilities.equals(locale, newLocale))	//if the value is really changing (compare their values, rather than identity)
+			if(!Objects.equals(locale, newLocale))	//if the value is really changing (compare their values, rather than identity)
 			{
 				final Locale oldLocale=locale;	//get the old value
 				locale=checkInstance(newLocale, "Guise session locale cannot be null.");	//actually change the value
@@ -291,7 +292,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void setOrientation(final Orientation newOrientation)
 		{
-			if(!ObjectUtilities.equals(orientation, newOrientation))	//if the value is really changing
+			if(!Objects.equals(orientation, newOrientation))	//if the value is really changing
 			{
 				final Orientation oldOrientation=checkInstance(orientation, "Orientation cannot be null");	//get the old value
 				orientation=newOrientation;	//actually change the value
@@ -688,7 +689,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void setPrincipal(final Principal newPrincipal)
 		{
-			if(!ObjectUtilities.equals(principal, newPrincipal))	//if the value is really changing (compare their values, rather than identity)
+			if(!Objects.equals(principal, newPrincipal))	//if the value is really changing (compare their values, rather than identity)
 			{
 				final Principal oldPrincipal=principal;	//get the old value
 				principal=newPrincipal;	//actually change the value
@@ -730,7 +731,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void setThemeURI(final URI newThemeURI)
 		{
-			if(!ObjectUtilities.equals(themeURI, newThemeURI))	//if the value is really changing
+			if(!Objects.equals(themeURI, newThemeURI))	//if the value is really changing
 			{
 				final URI oldThemeURI=themeURI;	//get the old value
 				themeURI=checkInstance(newThemeURI, "Theme URI cannot be null.");	//actually change the value
@@ -1148,7 +1149,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void setNavigationPath(final URIPath navigationPath)
 		{
-			if(!ObjectUtilities.equals(this.navigationPath, checkInstance(navigationPath, "Navigation path cannot be null.")))	//if the navigation path is really changing
+			if(!Objects.equals(this.navigationPath, checkInstance(navigationPath, "Navigation path cannot be null.")))	//if the navigation path is really changing
 			{
 				if(!getApplication().hasDestination(navigationPath))	//if no destination is associated with the given navigation path
 				{
@@ -1175,7 +1176,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void setBookmark(final Bookmark bookmark)
 		{
-			if(!ObjectUtilities.equals(this.bookmark, bookmark))	//if the bookmark is really changing
+			if(!Objects.equals(this.bookmark, bookmark))	//if the bookmark is really changing
 			{
 				this.bookmark=bookmark;	//change the bookmark TODO fire an event, but make sure that doesn't make the page reload
 				log(null, "guise-bookmark", bookmark!=null ? bookmark.toString() : null, null, null);	//TODO improve; use a constant
@@ -1198,8 +1199,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		{
 //TODO del Debug.trace("setting naviation; navigation path:", navigationPath, "bookmark:", bookmark, "referrerURI:", referrerURI);
 				//if the navigation path or the bookmark is changing
-			if(!ObjectUtilities.equals(this.navigationPath, navigationPath)	//see if the navigation path is changing (the old navigation path will be null if this session has not yet navigated anywhere; don't call getNavigationPath(), which might throw an exception)
-					|| !ObjectUtilities.equals(this.bookmark, bookmark))	//see if the bookmark is changing
+			if(!Objects.equals(this.navigationPath, navigationPath)	//see if the navigation path is changing (the old navigation path will be null if this session has not yet navigated anywhere; don't call getNavigationPath(), which might throw an exception)
+					|| !Objects.equals(this.bookmark, bookmark))	//see if the bookmark is changing
 			{
 				setNavigationPath(navigationPath);	//make sure the Guise session has the correct navigation path
 				setBookmark(bookmark);	//make sure the Guise session has the correct bookmark

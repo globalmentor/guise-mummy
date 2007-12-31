@@ -7,7 +7,7 @@ import java.beans.PropertyVetoException;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.garretwilson.util.Debug;
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;
@@ -38,7 +38,7 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler
 		public void propertyChange(final GenericPropertyChangeEvent<V> propertyChangeEvent)	//if the list select value changed
 		{
 			final V newValue=propertyChangeEvent.getNewValue();	//get the new selected value
-			if(newValue!=null && ObjectUtilities.equals(newValue, getValue()))	//if the connected value was selected
+			if(newValue!=null && Objects.equals(newValue, getValue()))	//if the connected value was selected
 			{
 //TODO del				Debug.trace("tab changed to", getListSelect().indexOf(newValue), " trying to select new card to match; is reverting list select?", isRevertingListSelect);
 				try
@@ -116,7 +116,7 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler
 		*/
 		public void setValue(final V newValue)
 		{
-			if(!ObjectUtilities.equals(value, newValue))	//if the value is really changing
+			if(!Objects.equals(value, newValue))	//if the value is really changing
 			{
 				final V oldValue=value;	//get the old value
 				value=newValue;	//actually change the value

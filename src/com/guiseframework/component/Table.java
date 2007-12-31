@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.guiseframework.theme.Theme.*;
 
 import com.garretwilson.beans.*;

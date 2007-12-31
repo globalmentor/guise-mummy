@@ -1,6 +1,6 @@
 package com.guiseframework.platform.web;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.DepictedObject;

@@ -2,7 +2,7 @@ package com.guiseframework.component.urf;
 
 import java.net.URI;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 import com.garretwilson.urf.*;
 import com.guiseframework.model.DefaultTableColumnModel;

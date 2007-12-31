@@ -5,7 +5,7 @@ import static java.util.Collections.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 import com.guiseframework.input.*;
 

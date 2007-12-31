@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.garretwilson.beans.*;
 import static com.garretwilson.lang.IntegerUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import com.garretwilson.util.*;
 
 import com.guiseframework.GuiseApplication;

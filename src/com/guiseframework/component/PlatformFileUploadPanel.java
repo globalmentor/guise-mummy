@@ -6,7 +6,7 @@ import java.util.Collection;
 import com.garretwilson.itu.SIUnit;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.garretwilson.net.URIPath;
 
 import static com.garretwilson.text.Characters.*;
@@ -62,7 +62,7 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 		*/
 		public void setDestinationPath(final URIPath newDestinationPath)
 		{
-			if(!ObjectUtilities.equals(destinationPath, newDestinationPath.checkRelative()))	//if the value is really changing
+			if(!Objects.equals(destinationPath, newDestinationPath.checkRelative()))	//if the value is really changing
 			{
 				final URIPath oldDestinationPath=destinationPath;	//get the old value
 				destinationPath=newDestinationPath;	//actually change the value
@@ -83,7 +83,7 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 		*/
 		public void setDestinationBookmark(final Bookmark newDestinationBookmark)
 		{
-			if(!ObjectUtilities.equals(destinationBookmark, newDestinationBookmark))	//if the value is really changing
+			if(!Objects.equals(destinationBookmark, newDestinationBookmark))	//if the value is really changing
 			{
 				final Bookmark oldDestinationBookmark=destinationBookmark;	//get the old value
 				destinationBookmark=newDestinationBookmark;	//actually change the value

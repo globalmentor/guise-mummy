@@ -1,6 +1,6 @@
 package com.guiseframework.platform;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 import com.guiseframework.event.EventListenerManager;
 import com.guiseframework.event.ProgressEvent;

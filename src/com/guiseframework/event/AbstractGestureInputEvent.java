@@ -6,7 +6,7 @@ import java.util.Set;
 import com.guiseframework.input.Key;
 
 import static com.garretwilson.lang.EnumUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 /**An abstract event providing information on input from a user gesture.
 @author Garret Wilson

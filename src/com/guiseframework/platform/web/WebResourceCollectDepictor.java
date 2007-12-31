@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.NameValuePair;

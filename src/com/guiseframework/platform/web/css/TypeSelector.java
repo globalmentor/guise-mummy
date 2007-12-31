@@ -1,6 +1,6 @@
 package com.guiseframework.platform.web.css;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 /**A type simple selector.
 This implementation represents the universal selector by an instance of a type selector with the type "*".

@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.net.URI;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import com.garretwilson.lang.ObjectUtilities;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import com.garretwilson.lang.Objects;
+import static com.garretwilson.lang.Objects.*;
 import com.garretwilson.util.*;
 
 /**An image model that can initiate retrieval of an image from a cache and update the image when fetching succeeds.
@@ -46,7 +46,7 @@ public class CachedImageModel<K, V> extends DefaultImageModel implements Pending
 		*/
 		public void setCachedImageURI(final URI newCachedImageURI)
 		{
-			if(!ObjectUtilities.equals(cachedImageURI, newCachedImageURI))	//if the value is really changing
+			if(!Objects.equals(cachedImageURI, newCachedImageURI))	//if the value is really changing
 			{
 				if(isImagePending())	//if the image is pending
 				{
@@ -74,7 +74,7 @@ public class CachedImageModel<K, V> extends DefaultImageModel implements Pending
 		*/
 		public void setCachedImageKey(final K newCachedImageKey)
 		{
-			if(!ObjectUtilities.equals(cachedImageKey, newCachedImageKey))	//if the value is really changing
+			if(!Objects.equals(cachedImageKey, newCachedImageKey))	//if the value is really changing
 			{
 				if(isImagePending())	//if the image is pending
 				{

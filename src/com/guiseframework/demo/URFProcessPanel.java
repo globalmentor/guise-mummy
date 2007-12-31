@@ -4,7 +4,7 @@ import java.beans.PropertyVetoException;
 import java.io.*;
 import java.net.URI;
 
-import static com.garretwilson.text.CharacterEncodingConstants.*;
+import static com.garretwilson.text.CharacterEncoding.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
 import com.garretwilson.urf.*;
 import static com.garretwilson.urf.TURF.*;

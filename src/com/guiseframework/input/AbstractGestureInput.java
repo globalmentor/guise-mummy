@@ -6,7 +6,7 @@ import java.util.Set;
 import com.garretwilson.util.AbstractHashObject;
 
 import static com.garretwilson.lang.EnumUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 /**An abstract encapsulation of user input from a gesture.
 @author Garret Wilson

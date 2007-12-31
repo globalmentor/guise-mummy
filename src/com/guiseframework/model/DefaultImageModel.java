@@ -2,7 +2,7 @@ package com.guiseframework.model;
 
 import java.net.URI;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 
 /**A default implementation of a model for an image.
 @author Garret Wilson
@@ -23,7 +23,7 @@ public class DefaultImageModel extends AbstractModel implements ImageModel
 		*/
 		public void setImageURI(final URI newImageURI)
 		{
-			if(!ObjectUtilities.equals(imageURI, newImageURI))	//if the value is really changing
+			if(!Objects.equals(imageURI, newImageURI))	//if the value is really changing
 			{
 				final URI oldImageURI=imageURI;	//get the old value
 				imageURI=newImageURI;	//actually change the value

@@ -2,7 +2,7 @@ package com.guiseframework.component;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.guiseframework.model.*;
 import com.guiseframework.style.Color;
 import com.guiseframework.theme.Theme;
@@ -56,7 +56,7 @@ public class SelectableLabel extends Label implements Selectable
 		*/
 		public void setSelectedBackgroundColor(final Color newSelectedBackgroundColor)
 		{
-			if(!ObjectUtilities.equals(selectedBackgroundColor, newSelectedBackgroundColor))	//if the value is really changing
+			if(!Objects.equals(selectedBackgroundColor, newSelectedBackgroundColor))	//if the value is really changing
 			{
 				final Color oldSelectedBackgroundColor=selectedBackgroundColor;	//get the old value
 				selectedBackgroundColor=newSelectedBackgroundColor;	//actually change the value

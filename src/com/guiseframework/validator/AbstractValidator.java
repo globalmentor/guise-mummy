@@ -3,7 +3,7 @@ package com.guiseframework.validator;
 import static java.text.MessageFormat.*;
 import static com.guiseframework.GuiseResourceConstants.*;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import com.guiseframework.event.GuiseBoundPropertyObject;
 
 /**An abstract implementation of an object that can determine whether a value is valid.

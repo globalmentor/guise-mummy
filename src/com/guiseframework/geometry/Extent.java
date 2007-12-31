@@ -1,7 +1,7 @@
 package com.guiseframework.geometry;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
-import com.garretwilson.lang.ObjectUtilities;
+import static com.garretwilson.lang.Objects.*;
+import com.garretwilson.lang.Objects;
 import com.garretwilson.util.ArrayUtilities;
 
 /**A measurement such as a length, area, or volume.
@@ -71,7 +71,7 @@ public class Extent
 	/**@return A hash code value for the object.*/
 	public int hashCode()
 	{
-		return ObjectUtilities.hashCode(getValue(), getUnit(), getDegree());	//determine the hash code
+		return Objects.hashCode(getValue(), getUnit(), getDegree());	//determine the hash code
 	}
 
 	/**Indicates whether some other object is "equal to" this one.

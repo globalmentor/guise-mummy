@@ -5,7 +5,7 @@ import java.net.URI;
 import com.garretwilson.rdf.*;
 import com.garretwilson.urf.AbstractClassTypedURFResource;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.text.TextUtilities.*;

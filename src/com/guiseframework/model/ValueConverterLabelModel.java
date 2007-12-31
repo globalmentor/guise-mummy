@@ -3,7 +3,7 @@ package com.guiseframework.model;
 import com.guiseframework.converter.ConversionException;
 import com.guiseframework.converter.Converter;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 /**A label model that converts a value to a string for the label.
 If no label is explicitly set, the label will represent the given value converted to a string using the given converter.

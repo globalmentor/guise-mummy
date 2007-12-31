@@ -11,7 +11,7 @@ import javax.mail.internet.ContentType;
 
 import com.garretwilson.beans.TargetedEvent;
 import com.garretwilson.lang.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.TextUtilities.*;
 import com.garretwilson.urf.URFResource;
 import com.garretwilson.urf.ploop.*;
@@ -99,7 +99,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		*/
 		public void setName(final String newName)
 		{
-			if(!ObjectUtilities.equals(name, newName))	//if the value is really changing
+			if(!Objects.equals(name, newName))	//if the value is really changing
 			{
 				if(newName!=null && newName.length()==0)	//if the empty string was passed
 				{
@@ -156,7 +156,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		*/
 		public void setInfo(final String newInfo)
 		{
-			if(!ObjectUtilities.equals(info, newInfo))	//if the value is really changing
+			if(!Objects.equals(info, newInfo))	//if the value is really changing
 			{
 				final String oldInfo=info;	//get the old value
 				info=newInfo;	//actually change the value
@@ -205,7 +205,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		*/
 		public void setDescription(final String newDescription)
 		{
-			if(!ObjectUtilities.equals(description, newDescription))	//if the value is really changing
+			if(!Objects.equals(description, newDescription))	//if the value is really changing
 			{
 				final String oldDescription=description;	//get the old value
 				description=newDescription;	//actually change the value
@@ -283,7 +283,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		*/
 		public void setInputStrategy(final InputStrategy newInputStrategy)
 		{
-			if(!ObjectUtilities.equals(inputStrategy, newInputStrategy))	//if the value is really changing
+			if(!Objects.equals(inputStrategy, newInputStrategy))	//if the value is really changing
 			{
 				final InputStrategy oldInputStrategy=inputStrategy;	//get the current value
 				inputStrategy=newInputStrategy;	//update the value
@@ -306,7 +306,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		*/
 		public void setNotification(final Notification newNotification)
 		{
-			if(!ObjectUtilities.equals(notification, newNotification))	//if the value is really changing
+			if(!Objects.equals(notification, newNotification))	//if the value is really changing
 			{
 				final Notification oldNotification=notification;	//get the old value
 				notification=newNotification;	//actually change the value
@@ -500,7 +500,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		*/
 		public void setOrientation(final Orientation newOrientation)
 		{
-			if(!ObjectUtilities.equals(orientation, newOrientation))	//if the value is really changing
+			if(!Objects.equals(orientation, newOrientation))	//if the value is really changing
 			{
 				final Orientation oldOrientation=orientation;	//get the old value
 				orientation=newOrientation;	//actually change the value
@@ -1579,7 +1579,7 @@ Debug.trace("now valid of", this, "is", isValid());
 			{
 				final int flowOrdinal=checkInstance(flow, "Flow cannot be null").ordinal();	//get the ordinal of the flow
 				final Extent oldExtent=extents[flowOrdinal];	//get the old value
-				if(!ObjectUtilities.equals(oldExtent, newExtent))	//if the value is really changing
+				if(!Objects.equals(oldExtent, newExtent))	//if the value is really changing
 				{
 					extents[flowOrdinal]=newExtent;	//actually change the value
 				}			
@@ -1610,7 +1610,7 @@ Debug.trace("now valid of", this, "is", isValid());
 			*/
 			public void setStyleID(final String newStyleID)
 			{
-				if(ObjectUtilities.equals(styleID, newStyleID))	//if the value is really changing
+				if(Objects.equals(styleID, newStyleID))	//if the value is really changing
 				{
 					final String oldStyleID=styleID;	//get the current value
 					styleID=newStyleID;	//update the value

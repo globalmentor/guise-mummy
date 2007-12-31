@@ -2,7 +2,7 @@ package com.guiseframework.validator;
 
 import java.util.regex.Pattern;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 /**An abstract validator that can validate against regular expressions.
 @param <V> The value type this validator supports.

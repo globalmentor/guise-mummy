@@ -1,7 +1,7 @@
 package com.guiseframework.input;
 
-import com.garretwilson.lang.ObjectUtilities;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import com.garretwilson.lang.Objects;
+import static com.garretwilson.lang.Objects.*;
 
 /**An encapsulation of mouse click input.
 @author Garret Wilson
@@ -45,7 +45,7 @@ public class MouseClickInput extends AbstractMouseInput
 	*/
 	public int hashCode()
 	{
-		return ObjectUtilities.hashCode(super.hashCode(), button, count);	//extend the hash code with the button and count
+		return Objects.hashCode(super.hashCode(), button, count);	//extend the hash code with the button and count
 	}
 	
 	/**Determines if this object equals another object.

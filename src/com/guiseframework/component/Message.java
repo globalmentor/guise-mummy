@@ -1,12 +1,12 @@
 package com.guiseframework.component;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.TextUtilities.*;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 
 /**A message component showing the message and any label.
 The message only supports text content types, including:
@@ -39,7 +39,7 @@ public class Message extends AbstractComponent	//TODO del component if not neede
 		*/
 		public void setMessage(final String newMessage)
 		{
-			if(!ObjectUtilities.equals(message, newMessage))	//if the value is really changing
+			if(!Objects.equals(message, newMessage))	//if the value is really changing
 			{
 				final String oldMessage=message;	//get the old value
 				message=newMessage;	//actually change the value

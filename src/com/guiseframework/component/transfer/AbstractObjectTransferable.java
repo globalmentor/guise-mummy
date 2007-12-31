@@ -5,9 +5,9 @@ import javax.mail.internet.*;
 import com.garretwilson.io.ContentTypeConstants;
 
 import static com.garretwilson.io.ContentTypeConstants.*;
-import static com.garretwilson.io.ContentTypeUtilities.*;
+import static com.garretwilson.io.ContentTypes.*;
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 /**A abstract transferable that carries one or more Java objects.
 A subclass must implement {@link #transfer(Class)}.

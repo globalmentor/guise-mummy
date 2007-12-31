@@ -1,10 +1,10 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.guiseframework.model.*;
 
 /**An abstract implementation of a model component that allows user interaction to modify the model.
@@ -95,7 +95,7 @@ public abstract class AbstractControl extends AbstractComponent implements Contr
 	{
 		final Notification oldNotification=getNotification();	//get the old notification
 		super.setNotification(newNotification);	//update the old notification normally
-		if(!ObjectUtilities.equals(oldNotification, newNotification))	//if the notification changed
+		if(!Objects.equals(oldNotification, newNotification))	//if the notification changed
 		{
 			updateStatus();	//update the status			
 		}

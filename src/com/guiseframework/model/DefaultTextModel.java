@@ -2,9 +2,9 @@ package com.guiseframework.model;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.TextUtilities.*;
 
 /**The default implementation of a model for text and an associated label.
@@ -26,7 +26,7 @@ public class DefaultTextModel extends AbstractModel implements TextModel
 		*/
 		public void setText(final String newText)
 		{
-			if(!ObjectUtilities.equals(text, newText))	//if the value is really changing
+			if(!Objects.equals(text, newText))	//if the value is really changing
 			{
 				final String oldText=text;	//get the old value
 				text=newText;	//actually change the value

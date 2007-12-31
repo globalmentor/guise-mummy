@@ -3,7 +3,7 @@ package com.guiseframework.theme;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import com.garretwilson.urf.AbstractClassTypedURFResource;
 import com.garretwilson.urf.select.Selector;
 import com.garretwilson.urf.select.Select;

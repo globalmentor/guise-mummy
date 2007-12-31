@@ -7,7 +7,7 @@ import java.util.*;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.garretwilson.lang.Strings;
 import com.garretwilson.text.xml.QualifiedName;
 import com.garretwilson.text.xml.XMLNamespacePrefixManager;
@@ -16,7 +16,7 @@ import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.platform.web.WebPlatform;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.lang.Strings.*;
 import static com.garretwilson.security.MessageDigestUtilities.*;
 import static com.garretwilson.security.SecurityConstants.*;
@@ -312,7 +312,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 			stringBuilder.append(ENCODINGDECL_NAME);	//encoding
 			stringBuilder.append(EQUAL_CHAR);	//=
 			stringBuilder.append(DOUBLE_QUOTE_CHAR);	//"
-			stringBuilder.append(getOutputCharacterEncoding().getEncoding());	//encoding
+			stringBuilder.append(getOutputCharacterEncoding().toString());	//encoding
 			stringBuilder.append(DOUBLE_QUOTE_CHAR);	//"
 				//G***fix standalone writing here
 			stringBuilder.append(XML_DECL_END);	//?>
@@ -396,7 +396,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	public ElementState writeElementEnd(final URI namespaceURI, final String localName) throws IOException
 	{
 		final ElementState elementState=popElementState();	//pop the current element state from the stack
-		if(!ObjectUtilities.equals(elementState.getNamespaceURI(), namespaceURI!=null ? namespaceURI.toString() : null) || !elementState.getLocalName().equals(localName))	//if the namespace and/or local name is not what we expect
+		if(!Objects.equals(elementState.getNamespaceURI(), namespaceURI!=null ? namespaceURI.toString() : null) || !elementState.getLocalName().equals(localName))	//if the namespace and/or local name is not what we expect
 		{
 			throw new IllegalStateException("Ending namespace "+namespaceURI+" and local name "+localName+" do not match currently open element with namespace "+elementState.getNamespaceURI()+" and local name "+elementState.getLocalName());
 		}

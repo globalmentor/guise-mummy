@@ -1,10 +1,10 @@
 package com.guiseframework.component.layout;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.util.ArrayUtilities.fill;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.LayoutComponent;
 import com.guiseframework.geometry.Extent;
@@ -182,7 +182,7 @@ public class RegionLayout extends AbstractLayout<RegionConstraints>
 		{
 			final int flowOrdinal=checkInstance(flow, "Flow cannot be null").ordinal();	//get the ordinal of the flow
 			final Extent oldExtent=extents[flowOrdinal];	//get the old value
-			if(!ObjectUtilities.equals(oldExtent, newExtent))	//if the value is really changing
+			if(!Objects.equals(oldExtent, newExtent))	//if the value is really changing
 			{
 				extents[flowOrdinal]=newExtent;	//actually change the value
 				firePropertyChange(EXTENT_PROPERTIES[flowOrdinal], oldExtent, newExtent);	//indicate that the value changed

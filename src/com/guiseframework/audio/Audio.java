@@ -3,7 +3,7 @@ package com.guiseframework.audio;
 import java.net.URI;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.guiseframework.event.EventListenerManager;
 import com.guiseframework.event.ProgressEvent;
 import com.guiseframework.event.ProgressListenable;
@@ -44,7 +44,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 		*/
 		public void setAudioURI(final URI newAudioURI)
 		{
-			if(!ObjectUtilities.equals(audioURI, newAudioURI))	//if the value is really changing
+			if(!Objects.equals(audioURI, newAudioURI))	//if the value is really changing
 			{
 				stop();	//make sure the current audio is stopped
 				final URI oldAudio=audioURI;	//get the old value

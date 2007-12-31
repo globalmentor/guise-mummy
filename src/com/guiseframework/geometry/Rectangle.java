@@ -1,8 +1,8 @@
 package com.guiseframework.geometry;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 
 /**A rectangle on a plane.
 @author Garret Wilson
@@ -115,7 +115,7 @@ public class Rectangle
 	/**@return A hash code value for the object.*/
 	public int hashCode()
 	{
-		return ObjectUtilities.hashCode(getPosition(), getSize());	//determine the hash code
+		return Objects.hashCode(getPosition(), getSize());	//determine the hash code
 	}
 
 	/**Indicates whether some other object is "equal to" this one.

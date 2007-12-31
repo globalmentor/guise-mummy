@@ -17,15 +17,15 @@ import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.io.*;
 import static com.garretwilson.io.FileConstants.*;
 import static com.garretwilson.io.Files.*;
-import com.garretwilson.lang.ObjectUtilities;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import com.garretwilson.lang.Objects;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.lang.ThreadUtilities.*;
 import com.garretwilson.mail.MailManager;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
 import com.garretwilson.net.URIPath;
+import static com.garretwilson.text.CharacterEncoding.*;
 import com.garretwilson.text.W3CDateFormat;
-import static com.garretwilson.text.CharacterEncodingConstants.*;
 import com.garretwilson.urf.*;
 import static com.garretwilson.urf.URF.*;
 import com.garretwilson.util.*;
@@ -83,7 +83,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		*/
 		public void setEnvironment(final Environment newEnvironment)
 		{
-			if(!ObjectUtilities.equals(environment, newEnvironment))	//if the value is really changing (compare their values, rather than identity)
+			if(!Objects.equals(environment, newEnvironment))	//if the value is really changing (compare their values, rather than identity)
 			{
 				final Environment oldEnvironment=environment;	//get the old value
 				environment=checkInstance(newEnvironment, "Guise session environment cannot be null.");	//actually change the value
@@ -587,7 +587,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		*/
 		public void setResourceBundleBaseName(final String newResourceBundleBaseName)
 		{
-			if(!ObjectUtilities.equals(resourceBundleBaseName, newResourceBundleBaseName))	//if the value is really changing
+			if(!Objects.equals(resourceBundleBaseName, newResourceBundleBaseName))	//if the value is really changing
 			{
 				final String oldResourceBundleBaseName=resourceBundleBaseName;	//get the old value
 				resourceBundleBaseName=newResourceBundleBaseName;	//actually change the value
@@ -608,7 +608,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		*/
 		public void setStyleURI(final URI newStyle)
 		{
-			if(!ObjectUtilities.equals(styleURI, newStyle))	//if the value is really changing (compare their values, rather than identity)
+			if(!Objects.equals(styleURI, newStyle))	//if the value is really changing (compare their values, rather than identity)
 			{
 				final URI oldStyle=styleURI;	//get the old value
 				styleURI=newStyle;	//actually change the value
@@ -630,7 +630,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		*/
 		public void setThemeURI(final URI newThemeURI)
 		{
-			if(!ObjectUtilities.equals(themeURI, newThemeURI))	//if the value is really changing
+			if(!Objects.equals(themeURI, newThemeURI))	//if the value is really changing
 			{
 				final URI oldThemeURI=themeURI;	//get the old value
 				themeURI=checkInstance(newThemeURI, "Theme URI cannot be null.");	//actually change the value

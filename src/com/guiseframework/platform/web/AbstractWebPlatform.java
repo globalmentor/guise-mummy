@@ -5,7 +5,7 @@ import static java.util.Collections.*;
 
 import static com.garretwilson.lang.IntegerUtilities.*;
 import static com.garretwilson.lang.MathUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.NameValuePair;

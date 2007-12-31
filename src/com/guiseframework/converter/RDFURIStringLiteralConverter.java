@@ -2,7 +2,7 @@ package com.guiseframework.converter;
 
 import java.net.URI;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 import com.garretwilson.rdf.RDFName;
 import com.garretwilson.rdf.RDFXMLGenerator;

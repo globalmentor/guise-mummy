@@ -4,7 +4,7 @@ import java.util.*;
 import static java.util.Collections.*;
 
 import com.garretwilson.javascript.JSON;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.util.MapUtilities.*;
 import com.garretwilson.util.NameValuePair;
 

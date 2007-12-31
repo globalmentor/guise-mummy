@@ -1,6 +1,6 @@
 package com.guiseframework.component.layout;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 /**The points at which the four logical flows end.
 @author Garret Wilson

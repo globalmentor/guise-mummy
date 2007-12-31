@@ -7,10 +7,10 @@ import java.util.Set;
 
 import static java.util.Collections.*;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.guiseframework.geometry.CompassPoint;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.guiseframework.Resources.*;
 
 /**Abstract implementation of a frame for flyovers.
@@ -131,7 +131,7 @@ public abstract class AbstractFlyoverFrame extends AbstractFrame implements Flyo
 		*/
 		public void setTetherImage(final URI newTetherImage)
 		{
-			if(!ObjectUtilities.equals(tetherImage, newTetherImage))	//if the value is really changing
+			if(!Objects.equals(tetherImage, newTetherImage))	//if the value is really changing
 			{
 				final URI oldTetherImage=tetherImage;	//get the old value
 				tetherImage=newTetherImage;	//actually change the value

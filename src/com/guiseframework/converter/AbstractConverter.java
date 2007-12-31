@@ -1,7 +1,7 @@
 package com.guiseframework.converter;
 
-import com.garretwilson.lang.ObjectUtilities;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import com.garretwilson.lang.Objects;
+import static com.garretwilson.lang.Objects.*;
 import com.guiseframework.event.GuiseBoundPropertyObject;
 
 import static com.guiseframework.GuiseResourceConstants.*;
@@ -64,7 +64,7 @@ public abstract class AbstractConverter<V, L> extends GuiseBoundPropertyObject i
 	{
 		try
 		{
-			return ObjectUtilities.equals(value, convertLiteral(literal));	//see if the literal value converted to the value space matches the given value
+			return Objects.equals(value, convertLiteral(literal));	//see if the literal value converted to the value space matches the given value
 		}
 		catch(final ConversionException conversionException)	//if the literal value couldn't be converted
 		{

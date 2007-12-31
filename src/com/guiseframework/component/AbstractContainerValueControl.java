@@ -2,7 +2,7 @@ package com.guiseframework.component;
 
 import java.beans.PropertyVetoException;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 import com.guiseframework.component.layout.Layout;
 import com.guiseframework.model.*;

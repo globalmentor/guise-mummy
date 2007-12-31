@@ -3,8 +3,8 @@ package com.guiseframework.component;
 import java.net.URI;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import com.garretwilson.lang.ObjectUtilities;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import com.garretwilson.lang.Objects;
+import static com.garretwilson.lang.Objects.*;
 import com.guiseframework.model.*;
 import com.guiseframework.prototype.ValuePrototype;
 
@@ -48,7 +48,7 @@ public class ImageBooleanSelectActionControl extends AbstractBooleanSelectAction
 		*/
 		public void setRolloverImageURI(final URI newRolloverImageURI)
 		{
-			if(!ObjectUtilities.equals(rolloverImageURI, newRolloverImageURI))	//if the value is really changing
+			if(!Objects.equals(rolloverImageURI, newRolloverImageURI))	//if the value is really changing
 			{
 				final URI oldRolloverURIImage=rolloverImageURI;	//get the old value
 				rolloverImageURI=newRolloverImageURI;	//actually change the value
@@ -69,7 +69,7 @@ public class ImageBooleanSelectActionControl extends AbstractBooleanSelectAction
 		*/
 		public void setSelectedImageURI(final URI newSelectedImageURI)
 		{
-			if(!ObjectUtilities.equals(selectedImageURI, newSelectedImageURI))	//if the value is really changing
+			if(!Objects.equals(selectedImageURI, newSelectedImageURI))	//if the value is really changing
 			{
 				final URI oldSelectedImageURI=selectedImageURI;	//get the old value
 				selectedImageURI=newSelectedImageURI;	//actually change the value

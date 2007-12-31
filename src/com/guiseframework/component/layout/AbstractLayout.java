@@ -3,7 +3,7 @@ package com.guiseframework.component.layout;
 import java.beans.PropertyChangeEvent;
 
 import com.garretwilson.beans.*;
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.LayoutComponent;
 import com.guiseframework.event.*;
@@ -216,7 +216,7 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 	{
 		if(hasPropertyChangeListeners(propertyName)) //if we have listeners registered for this property
 		{
-			if(!ObjectUtilities.equals(oldValue, newValue))	//if the values are different
+			if(!Objects.equals(oldValue, newValue))	//if the values are different
 			{					
 				firePropertyChange(new LayoutConstraintsPropertyChangeEvent<T, V>(this, component, constraints, propertyName, oldValue, newValue));	//create and fire a layout constraints property change event
 			}

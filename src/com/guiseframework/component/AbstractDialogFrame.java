@@ -2,8 +2,8 @@ package com.guiseframework.component;
 
 import java.beans.PropertyVetoException;
 
-import com.garretwilson.lang.ObjectUtilities;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import com.garretwilson.lang.Objects;
+import static com.garretwilson.lang.Objects.*;
 
 import com.guiseframework.input.*;
 import com.guiseframework.model.*;
@@ -143,7 +143,7 @@ public abstract class AbstractDialogFrame<V> extends AbstractFrame implements Di
 	{
 		final Notification oldNotification=getNotification();	//get the old notification
 		super.setNotification(newNotification);	//update the old notification normally
-		if(!ObjectUtilities.equals(oldNotification, newNotification))	//if the notification changed
+		if(!Objects.equals(oldNotification, newNotification))	//if the notification changed
 		{
 			updateStatus();	//update the status			
 		}

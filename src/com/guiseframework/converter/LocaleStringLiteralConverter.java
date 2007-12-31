@@ -2,7 +2,7 @@ package com.guiseframework.converter;
 
 import java.util.*;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.util.LocaleUtilities.*;
 
 /**An object that can convert a locale to a string using the current locale.

@@ -2,7 +2,7 @@ package com.guiseframework.validator;
 
 import static java.util.Collections.*;
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 import java.util.*;
 
@@ -11,7 +11,7 @@ import com.garretwilson.util.ArrayUtilities;
 
 /**A validator to validate a Primary Account Number (PAN) of an identification card
 	as defined in ISO/IEC 7812-1:2000(E),
-	"Identification cards — Identification of issuers — Part 1: Numbering system".
+	"Identification cards ï¿½ Identification of issuers ï¿½ Part 1: Numbering system".
 The validator ensures that the PAN represents one of the allowed ID card products.
 PANs for unknown products are considered invalid.
 @see IDCard

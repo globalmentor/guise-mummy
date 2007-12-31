@@ -5,7 +5,7 @@ import java.util.*;
 import static java.util.Collections.*;
 
 import static com.garretwilson.lang.EnumUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.Objects.*;
 
 import static com.garretwilson.io.FileConstants.*;
 import static com.garretwilson.io.Files.*;

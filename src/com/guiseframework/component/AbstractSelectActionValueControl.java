@@ -2,7 +2,7 @@ package com.guiseframework.component;
 
 import java.net.URI;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.Objects;
 import com.guiseframework.model.*;
 
 /**Selectable action value control for which the selected state is distinct from the contained value.
@@ -67,7 +67,7 @@ public abstract class AbstractSelectActionValueControl<V> extends AbstractAction
 		*/
 		public void setSelectedGlyphURI(final URI newSelectedIcon)
 		{
-			if(!ObjectUtilities.equals(selectedIcon, newSelectedIcon))	//if the value is really changing
+			if(!Objects.equals(selectedIcon, newSelectedIcon))	//if the value is really changing
 			{
 				final URI oldSelectedIcon=selectedIcon;	//get the old value
 				selectedIcon=newSelectedIcon;	//actually change the value
@@ -109,7 +109,7 @@ public abstract class AbstractSelectActionValueControl<V> extends AbstractAction
 		*/
 		public void setUnselectedGlyphURI(final URI newUnselectedIcon)
 		{
-			if(!ObjectUtilities.equals(unselectedIcon, newUnselectedIcon))	//if the value is really changing
+			if(!Objects.equals(unselectedIcon, newUnselectedIcon))	//if the value is really changing
 			{
 				final URI oldUnselectedIcon=unselectedIcon;	//get the old value
 				unselectedIcon=newUnselectedIcon;	//actually change the value
