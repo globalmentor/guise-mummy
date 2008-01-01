@@ -1,6 +1,6 @@
 package com.guiseframework.component.urf;
 
-import com.garretwilson.urf.*;
+import com.globalmentor.urf.*;
 
 /**A default tree node representation strategy representing an URF resource.
 @author Garret Wilson

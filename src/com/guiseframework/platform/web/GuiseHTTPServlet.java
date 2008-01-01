@@ -44,12 +44,10 @@ import static com.garretwilson.text.elff.WebTrendsConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import com.garretwilson.text.xml.xpath.*;
-import com.garretwilson.urf.*;
-import static com.garretwilson.urf.content.Content.*;
-import static com.garretwilson.urf.dcmi.DCMI.*;
-import com.garretwilson.urf.ploop.*;
 import com.garretwilson.util.*;
 
+import com.globalmentor.urf.*;
+import com.globalmentor.urf.ploop.*;
 import com.guiseframework.*;
 import com.guiseframework.component.*;
 import com.guiseframework.event.*;
@@ -58,6 +56,9 @@ import com.guiseframework.input.Key;
 import com.guiseframework.model.FileItemResourceImport;
 import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.*;
+
+import static com.globalmentor.urf.content.Content.*;
+import static com.globalmentor.urf.dcmi.DCMI.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
 
 import com.guiseframework.platform.web.WebPlatform.PollCommand;

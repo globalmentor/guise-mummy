@@ -26,14 +26,15 @@ import static com.garretwilson.net.URIs.*;
 import com.garretwilson.net.URIPath;
 import static com.garretwilson.text.CharacterEncoding.*;
 import com.garretwilson.text.W3CDateFormat;
-import com.garretwilson.urf.*;
-import static com.garretwilson.urf.URF.*;
 import com.garretwilson.util.*;
 import static com.garretwilson.util.CalendarUtilities.*;
 import static com.garretwilson.util.LocaleUtilities.*;
 
+import static com.globalmentor.urf.URF.*;
 import static com.guiseframework.Guise.*;
 import static com.guiseframework.GuiseResourceConstants.*;
+
+import com.globalmentor.urf.*;
 import com.guiseframework.component.*;
 import static com.guiseframework.Resources.*;
 import com.guiseframework.theme.Theme;

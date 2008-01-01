@@ -3,11 +3,11 @@ package com.guiseframework.component.urf;
 import java.net.URI;
 
 import static com.garretwilson.lang.Objects.*;
-import com.garretwilson.urf.*;
 import com.garretwilson.util.Debug;
 
-import static com.garretwilson.urf.URF.*;
+import static com.globalmentor.urf.URF.*;
 
+import com.globalmentor.urf.*;
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;
 import com.guiseframework.model.urf.URFResourceDynamicTreeNodeModel;

@@ -2,7 +2,7 @@ package com.guiseframework.component.urf;
 
 import java.net.URI;
 
-import com.garretwilson.urf.*;
+import com.globalmentor.urf.*;
 import com.guiseframework.model.*;
 
 /**A table model based upon a list of URF resource.

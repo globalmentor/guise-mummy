@@ -5,8 +5,8 @@ import java.net.URI;
 
 import com.garretwilson.net.ResourceIOException;
 import com.garretwilson.net.URIPath;
-import com.garretwilson.urf.URFResource;
-import com.garretwilson.urf.content.*;;
+import com.globalmentor.urf.URFResource;
+import com.globalmentor.urf.content.*;
 
 /**A navigation point that retrieves a resource description and/or contents.
 @author Garret Wilson

@@ -1,7 +1,8 @@
 package com.guiseframework.model.urf;
 
 import java.net.URI;
-import com.garretwilson.urf.*;
+
+import com.globalmentor.urf.*;
 import com.guiseframework.model.*;
 
 /**Abstract dynamic functionality for all tree node models representing URF.

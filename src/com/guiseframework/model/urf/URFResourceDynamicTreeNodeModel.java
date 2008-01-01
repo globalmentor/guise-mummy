@@ -5,8 +5,9 @@ import static com.garretwilson.lang.ClassUtilities.*;
 import java.net.URI;
 import java.util.*;
 
-import com.garretwilson.urf.*;
-import static com.garretwilson.urf.URF.*;
+import static com.globalmentor.urf.URF.*;
+
+import com.globalmentor.urf.*;
 import com.guiseframework.model.*;
 
 /**A dynamic tree node model that represents an URF resource.

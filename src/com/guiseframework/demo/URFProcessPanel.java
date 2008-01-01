@@ -6,9 +6,9 @@ import java.net.URI;
 
 import static com.garretwilson.text.CharacterEncoding.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
-import com.garretwilson.urf.*;
-import static com.garretwilson.urf.TURF.*;
+import static com.globalmentor.urf.TURF.*;
 
+import com.globalmentor.urf.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.component.urf.DefaultURFResourceTreeNodeRepresentationStrategy;

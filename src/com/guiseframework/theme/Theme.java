@@ -8,15 +8,16 @@ import static java.util.Collections.*;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.Objects.*;
-import com.garretwilson.urf.*;
-import static com.garretwilson.urf.URF.*;
 
-import com.garretwilson.urf.ploop.PLOOPURFProcessor;
-import com.garretwilson.urf.select.*;
-import com.garretwilson.urf.xml.XML;
 import com.garretwilson.util.*;
 
+import com.globalmentor.urf.*;
+import com.globalmentor.urf.ploop.PLOOPURFProcessor;
+import com.globalmentor.urf.select.*;
+import com.globalmentor.urf.xml.XML;
 import com.guiseframework.style.*;
+
+import static com.globalmentor.urf.URF.*;
 import static com.guiseframework.Resources.*;
 
 /**Guise theme specification.

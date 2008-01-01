@@ -13,12 +13,12 @@ import com.garretwilson.beans.TargetedEvent;
 import com.garretwilson.lang.*;
 import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.TextUtilities.*;
-import com.garretwilson.urf.URFResource;
-import com.garretwilson.urf.ploop.*;
 import com.garretwilson.util.DataException;
 import com.garretwilson.util.Debug;
 import static com.garretwilson.util.ArrayUtilities.*;
 
+import com.globalmentor.urf.URFResource;
+import com.globalmentor.urf.ploop.*;
 import com.guiseframework.*;
 import com.guiseframework.component.effect.*;
 import com.guiseframework.component.layout.*;

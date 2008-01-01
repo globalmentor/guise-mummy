@@ -4,7 +4,7 @@ import java.net.URI;
 
 import static com.garretwilson.lang.Objects.*;
 
-import com.garretwilson.urf.*;
+import com.globalmentor.urf.*;
 import com.guiseframework.model.DefaultTableColumnModel;
 
 /**A model for a table column representing an URF property.

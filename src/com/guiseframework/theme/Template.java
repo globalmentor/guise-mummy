@@ -3,9 +3,9 @@ package com.guiseframework.theme;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
-import com.garretwilson.urf.AbstractClassTypedURFResource;
-import com.garretwilson.urf.ploop.PLOOPURFProcessor;
 import com.garretwilson.util.DataException;
+import com.globalmentor.urf.AbstractClassTypedURFResource;
+import com.globalmentor.urf.ploop.PLOOPURFProcessor;
 
 import static com.guiseframework.theme.Theme.*;
 

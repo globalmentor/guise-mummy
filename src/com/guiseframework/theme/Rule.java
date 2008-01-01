@@ -4,14 +4,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
 import static com.garretwilson.lang.Objects.*;
-import com.garretwilson.urf.AbstractClassTypedURFResource;
-import com.garretwilson.urf.select.Selector;
-import com.garretwilson.urf.select.Select;
-import static com.garretwilson.urf.select.Select.*;
 
-import com.garretwilson.urf.ploop.PLOOPURFProcessor;
 import com.garretwilson.util.DataException;
+import com.globalmentor.urf.AbstractClassTypedURFResource;
+import com.globalmentor.urf.ploop.PLOOPURFProcessor;
+import com.globalmentor.urf.select.Select;
+import com.globalmentor.urf.select.Selector;
 
+import static com.globalmentor.urf.select.Select.*;
 import static com.guiseframework.theme.Theme.*;
 
 /**A rule for specifying part of a theme.
