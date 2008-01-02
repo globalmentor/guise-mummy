@@ -991,7 +991,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 				final ValueModel<C> valueModel=new DefaultCellValueModel<C>(model, cell);	//create a new value model for the cell
 				if(Boolean.class.isAssignableFrom(valueClass))	//if the value class is subclass of Boolean
 				{
-					return new CheckControl((ValueModel<Boolean>)valueModel);	//create a new check control for the Boolean value model
+					return new CheckControl((ValueModel<Boolean>)(Object)valueModel);	//create a new check control for the Boolean value model	(intermediate cast needed for Sun JDK 1.6.0_03-b05, which complains of incompatible types; not required for Eclipse 3.4M3)
 				}
 				else	//for all other values
 				{

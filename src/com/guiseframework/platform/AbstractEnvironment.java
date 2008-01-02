@@ -29,9 +29,10 @@ public class AbstractEnvironment implements Environment
 	@param name The name of the property to retrieve.
 	@return The property value, or <code>null</code> if there is no such property.
 	*/
+	@SuppressWarnings("unchecked")	//cast needed so that Sun JDK 1.6.0_03-b05 will know which type we want; not required for Eclipse 3.4M3
 	public <T> T getProperty(final String name)
 	{
-		return getProperty(name, null);	//return the value with no default value
+		return (T)getProperty(name, null);	//return the value with no default value
 	}
 
 	/**Retrieves an environment property by its name, returning a default value if no value is available.
@@ -55,9 +56,10 @@ public class AbstractEnvironment implements Environment
 	@return The property value.
 	@exception IllegalStateException if no such property exists.
 	*/
+	@SuppressWarnings("unchecked")	//cast needed so that Sun JDK 1.6.0_03-b05 will know which type we want; not required for Eclipse 3.4M3
 	public <T> T getRequiredProperty(final String name)
 	{
-		final T value=getProperty(name);	//get the property value, if there is one
+		final T value=(T)getProperty(name);	//get the property value, if there is one
 		if(value==null)	//if there is no value
 		{
 			throw new IllegalStateException("Missing environment property: "+name);

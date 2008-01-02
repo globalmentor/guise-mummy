@@ -14,7 +14,7 @@ public class ScrollControl extends AbstractEnumCompositeComponent<ScrollControl.
 {
 
 	/**The enumeration of frame components.*/
-	private enum ScrollComponent{CONTENT_COMPONENT};
+	protected enum ScrollComponent{CONTENT_COMPONENT};
 
 	/**The enableable object decorated by this component.*/
 	private final Enableable enableable;

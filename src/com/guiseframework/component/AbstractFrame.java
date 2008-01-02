@@ -28,7 +28,7 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 {
 
 	/**The enumeration of frame components.*/
-	private enum FrameComponent
+	protected enum FrameComponent
 	{
 		/**The component, if any, that comprises the content of the frame.*/
 		CONTENT_COMPONENT,
