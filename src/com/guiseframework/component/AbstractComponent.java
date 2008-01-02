@@ -1504,7 +1504,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	/**@return A hash code value for the object.*/
 	public int hashCode()
 	{
-		return LongUtilities.hashCode(getDepictID());	//return the hash code of the ID
+		return Longs.hashCode(getDepictID());	//return the hash code of the ID
 	}
 
 	/**Indicates whether some other object is "equal to" this one.

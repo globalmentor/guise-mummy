@@ -11,7 +11,7 @@ import com.guiseframework.geometry.Axis;
 import com.guiseframework.model.*;
 import com.guiseframework.prototype.ValuePrototype;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.theme.Theme.*;
 import com.guiseframework.validator.ValidationException;

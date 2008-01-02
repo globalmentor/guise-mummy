@@ -3,7 +3,7 @@ package com.guiseframework.platform.web;
 import java.net.URI;
 import java.util.Map;
 
-import static com.globalmentor.java.EnumUtilities.*;
+import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 
 import com.garretwilson.util.*;

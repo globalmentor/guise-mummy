@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 
 import com.garretwilson.beans.*;

@@ -4,7 +4,7 @@ import com.guiseframework.component.layout.Flow;
 import com.guiseframework.converter.AbstractStringLiteralConverter;
 import com.guiseframework.model.*;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 
 /**Control to allow selection of one or more values from a list using a tabbed interface.

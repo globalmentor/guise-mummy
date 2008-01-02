@@ -5,7 +5,7 @@ import java.util.Set;
 
 import com.garretwilson.util.AbstractHashObject;
 
-import static com.globalmentor.java.EnumUtilities.*;
+import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 
 /**An abstract encapsulation of user input from a gesture.

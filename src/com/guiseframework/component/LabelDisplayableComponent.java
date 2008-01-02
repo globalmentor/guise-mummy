@@ -1,6 +1,6 @@
 package com.guiseframework.component;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 
 /**A component that allows its label to be displayed.
 @author Garret Wilson

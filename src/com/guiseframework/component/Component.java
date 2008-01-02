@@ -6,7 +6,7 @@ import javax.mail.internet.ContentType;
 
 import com.garretwilson.beans.TargetedEvent;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.GuiseSession;

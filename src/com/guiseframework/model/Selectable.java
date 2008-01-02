@@ -1,6 +1,6 @@
 package com.guiseframework.model;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 
 /**An object that can be selected.
 @author Garret Wilson

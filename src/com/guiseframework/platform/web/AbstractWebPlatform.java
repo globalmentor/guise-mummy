@@ -3,8 +3,8 @@ package com.guiseframework.platform.web;
 import java.util.*;
 import static java.util.Collections.*;
 
-import static com.globalmentor.java.IntegerUtilities.*;
-import static com.globalmentor.java.MathUtilities.*;
+import static com.globalmentor.java.Integers.*;
+import static com.globalmentor.java.Maths.*;
 import static com.globalmentor.java.Objects.*;
 
 import com.garretwilson.util.Debug;

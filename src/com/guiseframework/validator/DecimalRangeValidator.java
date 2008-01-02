@@ -2,7 +2,7 @@ package com.guiseframework.validator;
 
 import java.math.BigDecimal;
 
-import static com.globalmentor.java.NumberUtilities.*;
+import static com.globalmentor.java.Numbers.*;
 
 /**A range validator for decimal numbers such as floating point numbers that uses {@link java.math.BigInteger} for validation accuracy.
 The step value is considered relative either to the minimum value, if available, the maximum value, if available, or zero, in that order or priority.

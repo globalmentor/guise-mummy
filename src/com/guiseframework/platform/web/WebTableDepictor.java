@@ -14,7 +14,7 @@ import com.guiseframework.model.ui.PresentationModel;
 import com.guiseframework.platform.DepictContext;
 import com.guiseframework.platform.XHTMLDepictContext;
 
-import static com.globalmentor.java.EnumUtilities.*;
+import static com.globalmentor.java.Enums.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**Strategy for rendering a table component as an XHTML <code>&lt;table&gt;</code> element.

@@ -15,7 +15,7 @@ import com.globalmentor.urf.select.*;
 import com.globalmentor.urf.xml.XML;
 import com.guiseframework.style.*;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.urf.URF.*;
 import static com.guiseframework.Resources.*;

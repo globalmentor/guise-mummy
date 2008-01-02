@@ -6,7 +6,7 @@ import com.guiseframework.model.*;
 import com.guiseframework.style.Color;
 import com.guiseframework.theme.Theme;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 import static com.guiseframework.theme.Theme.*;
 
 /**A label component that is able to indicate a selected state.

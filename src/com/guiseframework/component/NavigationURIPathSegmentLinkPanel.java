@@ -10,9 +10,9 @@ import com.garretwilson.util.Debug;
 
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 
-import com.globalmentor.java.CharSequenceUtilities;
+import com.globalmentor.java.CharSequences;
 import com.globalmentor.java.Objects;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.*;
@@ -73,7 +73,7 @@ public class NavigationURIPathSegmentLinkPanel extends AbstractPanel
 					{
 						final String token=navigationPathTokenizer.nextToken();	//get the next token
 						navigationPathStringBuilder.append(token);	//add the token to the path string builder
-						if(CharSequenceUtilities.equals(token, PATH_SEPARATOR))	//if this is the path separator
+						if(CharSequences.equals(token, PATH_SEPARATOR))	//if this is the path separator
 						{
 							final Label pathSeparaterLabel=new Label();	//create a new label for the path separator
 							pathSeparaterLabel.setLabel(String.valueOf(PATH_SEPARATOR));	//set the label

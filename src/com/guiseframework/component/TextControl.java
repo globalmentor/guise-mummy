@@ -7,7 +7,7 @@ import javax.mail.internet.ContentType;
 import static com.garretwilson.io.ContentTypeConstants.*;
 import static com.garretwilson.io.ContentTypes.*;
 import static com.garretwilson.text.TextConstants.*;
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 
 import com.guiseframework.component.transfer.*;
 import com.guiseframework.converter.*;

@@ -25,7 +25,7 @@ import com.guiseframework.prototype.ActionPrototype;
 import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 
 /**Represents a session with a user.
 A Swing-based client application may have only one session, while a web server application will likely have multiple sessions.

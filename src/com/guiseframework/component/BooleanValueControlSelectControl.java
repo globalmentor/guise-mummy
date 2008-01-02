@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.garretwilson.beans.*;
 
-import static com.globalmentor.java.IntegerUtilities.*;
+import static com.globalmentor.java.Integers.*;
 import static com.globalmentor.java.Objects.*;
 
 import com.garretwilson.util.*;

@@ -12,7 +12,7 @@ import com.guiseframework.model.*;
 import com.guiseframework.platform.DepictEvent;
 import com.guiseframework.platform.PlatformEvent;
 
-import static com.globalmentor.java.BooleanUtilities.*;
+import static com.globalmentor.java.Booleans.*;
 import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 

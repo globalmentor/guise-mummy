@@ -10,7 +10,7 @@ import com.garretwilson.util.Debug;
 
 import com.guiseframework.Bookmark;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 import static com.guiseframework.GuiseResourceConstants.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.ActionEvent;

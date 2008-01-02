@@ -10,15 +10,15 @@ import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 import com.garretwilson.util.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 
+import static com.globalmentor.java.Enums.*;
+import static com.globalmentor.java.Numbers.*;
+
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.Axis;
 import com.guiseframework.geometry.Extent;
 import com.guiseframework.geometry.Side;
 import com.guiseframework.platform.XHTMLDepictContext;
-
-import static com.globalmentor.java.EnumUtilities.*;
-import static com.globalmentor.java.Numbers.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**The abstract base class for all <code>application/xhtml+xml</code> composite components that use layouts.

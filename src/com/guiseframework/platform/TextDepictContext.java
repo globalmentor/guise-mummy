@@ -4,8 +4,8 @@ import java.io.*;
 
 import javax.mail.internet.ContentType;
 
-import static com.globalmentor.java.ClassUtilities.*;
-import static com.globalmentor.java.StringBuilderUtilities.*;
+import static com.globalmentor.java.Classes.*;
+import static com.globalmentor.java.StringBuilders.*;
 
 import com.garretwilson.text.CharacterEncoding;
 

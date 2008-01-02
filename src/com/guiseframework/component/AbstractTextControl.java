@@ -13,7 +13,7 @@ import com.guiseframework.model.*;
 import com.guiseframework.validator.ValidationException;
 import com.guiseframework.validator.Validator;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 
 /**Control to accept text input from the user representing a particular value type.

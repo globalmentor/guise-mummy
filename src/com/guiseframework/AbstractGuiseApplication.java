@@ -28,7 +28,7 @@ import static com.garretwilson.util.CalendarUtilities.*;
 import static com.garretwilson.util.LocaleUtilities.*;
 
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.java.ThreadUtilities.*;
+import static com.globalmentor.java.Threads.*;
 import static com.globalmentor.urf.URF.*;
 import static com.guiseframework.Guise.*;
 import static com.guiseframework.GuiseResourceConstants.*;

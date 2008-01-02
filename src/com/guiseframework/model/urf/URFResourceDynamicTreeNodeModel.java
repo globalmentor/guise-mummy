@@ -4,7 +4,7 @@ package com.guiseframework.model.urf;
 import java.net.URI;
 import java.util.*;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.urf.URF.*;
 
 import com.globalmentor.urf.*;

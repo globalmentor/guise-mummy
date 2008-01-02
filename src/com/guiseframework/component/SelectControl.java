@@ -1,6 +1,6 @@
 package com.guiseframework.component;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 
 /**A control to allow selection by the user of a value from a collection.
 @param <V> The type of values to select.

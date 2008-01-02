@@ -9,7 +9,7 @@ import com.guiseframework.geometry.*;
 import com.guiseframework.model.*;
 import com.guiseframework.style.*;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 
 /**Encapsulation of presentation-related information.
 @author Garret Wilson

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.*;
 
-import static com.globalmentor.java.MathUtilities.*;
+import static com.globalmentor.java.Maths.*;
 import static com.globalmentor.java.Numbers.*;
 
 import com.garretwilson.text.ArgumentSyntaxException;

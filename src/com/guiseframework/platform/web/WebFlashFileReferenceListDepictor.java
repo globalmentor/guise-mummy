@@ -4,7 +4,7 @@ import java.net.URI;
 import java.util.*;
 
 import static com.garretwilson.net.URIs.*;
-import static com.globalmentor.java.EnumUtilities.*;
+import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 
 import com.garretwilson.net.URIPath;

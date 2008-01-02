@@ -2,7 +2,7 @@ package com.guiseframework.audio;
 
 import java.net.URI;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 
 import com.globalmentor.java.Objects;
 import com.guiseframework.event.EventListenerManager;

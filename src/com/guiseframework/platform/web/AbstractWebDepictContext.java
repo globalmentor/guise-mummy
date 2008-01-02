@@ -10,14 +10,14 @@ import com.garretwilson.util.Debug;
 
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 
-import com.globalmentor.java.IntegerUtilities;
+import com.globalmentor.java.Integers;
 import com.guiseframework.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.geometry.*;
 import com.guiseframework.model.ui.PresentationModel;
 
-import static com.globalmentor.java.EnumUtilities.*;
-import static com.globalmentor.java.StringBuilderUtilities.*;
+import static com.globalmentor.java.Enums.*;
+import static com.globalmentor.java.StringBuilders.*;
 import static com.guiseframework.model.ui.PresentationModel.*;
 import com.guiseframework.platform.AbstractXHTMLDepictContext;
 import com.guiseframework.platform.web.WebPlatform;
@@ -223,9 +223,9 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 	{
 		final RGBColor rgbColor=color.asRGB();	//get the color as RGB
 		stringBuilder.append(RGB_NUMBER_CHAR);	//#
-		stringBuilder.append(IntegerUtilities.toHexString(rgbColor.getAbsoluteRed8(), 2));	//red
-		stringBuilder.append(IntegerUtilities.toHexString(rgbColor.getAbsoluteGreen8(), 2));	//green
-		stringBuilder.append(IntegerUtilities.toHexString(rgbColor.getAbsoluteBlue8(), 2));	//blue
+		stringBuilder.append(Integers.toHexString(rgbColor.getAbsoluteRed8(), 2));	//red
+		stringBuilder.append(Integers.toHexString(rgbColor.getAbsoluteGreen8(), 2));	//green
+		stringBuilder.append(Integers.toHexString(rgbColor.getAbsoluteBlue8(), 2));	//blue
 		return stringBuilder;	//return the string builder
 	}
 

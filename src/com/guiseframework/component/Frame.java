@@ -4,7 +4,7 @@ import java.beans.PropertyChangeListener;
 
 import com.garretwilson.beans.GenericPropertyChangeListener;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.prototype.ActionPrototype;

@@ -3,7 +3,7 @@ package com.guiseframework.platform;
 import java.io.IOException;
 
 
-import com.globalmentor.java.LongUtilities;
+import com.globalmentor.java.Longs;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.transfer.Transferable;
 import com.guiseframework.event.EventListenerManager;
@@ -97,7 +97,7 @@ public abstract class AbstractDepictedObject extends GuiseBoundPropertyObject im
 	/**@return A hash code value for the object.*/
 	public int hashCode()
 	{
-		return LongUtilities.hashCode(getDepictID());	//return the hash code of the ID
+		return Longs.hashCode(getDepictID());	//return the hash code of the ID
 	}
 
 	/**Indicates whether some other object is "equal to" this one.

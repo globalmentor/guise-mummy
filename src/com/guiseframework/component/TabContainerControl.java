@@ -1,6 +1,6 @@
 package com.guiseframework.component;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 
 import com.guiseframework.component.layout.Flow;

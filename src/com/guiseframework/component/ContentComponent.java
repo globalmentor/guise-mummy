@@ -1,6 +1,6 @@
 package com.guiseframework.component;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 
 /**A composite component that holds a child content component. 
 The component's content is specified using {@link #setContent(Component)}.

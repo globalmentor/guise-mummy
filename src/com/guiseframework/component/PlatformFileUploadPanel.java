@@ -19,7 +19,7 @@ import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.*;
 import com.guiseframework.prototype.ActionPrototype;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 import static com.guiseframework.theme.Theme.*;
 
 /**Panel to browse platform files and upload them to the specified destination.

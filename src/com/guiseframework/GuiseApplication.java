@@ -13,7 +13,7 @@ import com.guiseframework.component.ApplicationFrame;
 import com.guiseframework.platform.*;
 import com.guiseframework.theme.Theme;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 
 /**An application running Guise.
 @author Garret Wilson

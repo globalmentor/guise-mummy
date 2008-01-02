@@ -21,8 +21,8 @@ import com.guiseframework.model.ui.PresentationModel;
 import com.guiseframework.platform.AbstractComponentDepictor;
 import com.guiseframework.platform.XHTMLDepictContext;
 
-import static com.globalmentor.java.ClassUtilities.*;
-import static com.globalmentor.java.EnumUtilities.*;
+import static com.globalmentor.java.Classes.*;
+import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.model.ui.PresentationModel.*;
 import com.guiseframework.style.Color;

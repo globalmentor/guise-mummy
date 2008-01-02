@@ -10,7 +10,7 @@ import com.guiseframework.validator.ValidationException;
 import com.guiseframework.validator.Validator;
 
 import static com.garretwilson.util.ArrayUtilities.*;
-import static com.globalmentor.java.IntegerUtilities.*;
+import static com.globalmentor.java.Integers.*;
 import static com.globalmentor.java.Objects.*;
 
 /**The default implementation of a model for selecting one or more values from a list.

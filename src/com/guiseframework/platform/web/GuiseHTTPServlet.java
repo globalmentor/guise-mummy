@@ -54,9 +54,9 @@ import com.guiseframework.model.FileItemResourceImport;
 import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.*;
 
-import static com.globalmentor.java.EnumUtilities.*;
+import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.java.ThreadUtilities.*;
+import static com.globalmentor.java.Threads.*;
 import static com.globalmentor.urf.content.Content.*;
 import static com.globalmentor.urf.dcmi.DCMI.*;
 import static com.guiseframework.platform.web.WebPlatform.*;

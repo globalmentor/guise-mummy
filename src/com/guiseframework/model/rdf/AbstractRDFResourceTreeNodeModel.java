@@ -9,7 +9,7 @@ import com.garretwilson.util.Debug;
 import com.guiseframework.model.*;
 
 import static com.garretwilson.rdf.RDFConstants.*;
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 
 /**Abstract functionality for a tree node model that represents an RDF resource.
 <p>Any properties will be dynamically loaded</p>

@@ -3,7 +3,7 @@ package com.guiseframework.style;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.globalmentor.java.IntegerUtilities.*;
+import static com.globalmentor.java.Integers.*;
 import static com.globalmentor.java.Numbers.*;
 
 import com.garretwilson.text.ArgumentSyntaxException;

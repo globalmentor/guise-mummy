@@ -2,7 +2,7 @@ package com.guiseframework.model;
 
 import java.net.URI;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 
 /**A model for an image.
 @author Garret Wilson

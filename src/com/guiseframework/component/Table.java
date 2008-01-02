@@ -4,7 +4,7 @@ import java.beans.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.theme.Theme.*;
 

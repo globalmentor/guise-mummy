@@ -4,7 +4,7 @@ import java.util.*;
 import static java.util.Collections.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 
 import com.garretwilson.net.URIPath;

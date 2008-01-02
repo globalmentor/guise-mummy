@@ -1,6 +1,6 @@
 package com.guiseframework.component;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 
 /**A frame that supports modal interaction.
 @param <R> The type of modal result this modal frame produces.

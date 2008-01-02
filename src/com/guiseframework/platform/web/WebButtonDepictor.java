@@ -10,7 +10,7 @@ import com.guiseframework.component.*;
 import com.guiseframework.geometry.*;
 import com.guiseframework.platform.XHTMLDepictContext;
 
-import static com.globalmentor.java.EnumUtilities.*;
+import static com.globalmentor.java.Enums.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 import com.guiseframework.style.LineStyle;
 

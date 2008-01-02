@@ -14,7 +14,7 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.geometry.CompassPoint;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**Strategy for rendering a frame as a series of XHTML elements.

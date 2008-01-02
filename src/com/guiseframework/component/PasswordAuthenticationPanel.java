@@ -7,7 +7,7 @@ import java.util.Arrays;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.model.Notification;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 import static com.guiseframework.theme.Theme.*;
 import com.guiseframework.validator.*;
 

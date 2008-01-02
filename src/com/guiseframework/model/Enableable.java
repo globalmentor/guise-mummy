@@ -1,6 +1,6 @@
 package com.guiseframework.model;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 
 import com.garretwilson.beans.PropertyBindable;
 

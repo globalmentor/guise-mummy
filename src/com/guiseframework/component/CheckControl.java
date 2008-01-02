@@ -6,7 +6,7 @@ import com.guiseframework.model.*;
 import com.guiseframework.prototype.ValuePrototype;
 import com.guiseframework.validator.ValueRequiredValidator;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 
 /**Control accepting boolean input rendered as a check, either a checked square or a circle. 
 <p>If no check type is specified, the check type will automatically determined dynamically.

@@ -18,7 +18,7 @@ import com.guiseframework.model.Notification;
 import com.guiseframework.platform.*;
 import com.guiseframework.validator.*;
 
-import static com.globalmentor.java.NumberUtilities.*;
+import static com.globalmentor.java.Numbers.*;
 import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 

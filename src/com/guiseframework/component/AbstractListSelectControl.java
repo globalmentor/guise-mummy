@@ -4,7 +4,7 @@ import java.beans.PropertyVetoException;
 import java.lang.reflect.*;
 import java.util.*;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 
 import com.garretwilson.event.EventListenerManager;

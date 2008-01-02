@@ -1,6 +1,6 @@
 package com.guiseframework.component.layout;
 
-import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Classes.*;
 
 /**Abstract constraints on individual component flow.
 @author Garret Wilson

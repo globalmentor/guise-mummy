@@ -13,7 +13,7 @@ import com.garretwilson.net.http.HTTPResource;
 import static com.garretwilson.io.Files.*;
 import static com.garretwilson.net.URIs.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.java.ThreadUtilities.*;
+import static com.globalmentor.java.Threads.*;
 
 /**An abstract base class for a Guise instance.
 This implementation only works with Guise applications that descend from {@link AbstractGuiseApplication}.
