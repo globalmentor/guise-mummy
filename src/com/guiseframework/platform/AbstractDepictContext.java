@@ -11,7 +11,7 @@ import com.globalmentor.urf.URFResource;
 import com.guiseframework.*;
 import com.guiseframework.theme.Theme;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 /**Abstract encapsulation of information related to the current depiction.
 @author Garret Wilson

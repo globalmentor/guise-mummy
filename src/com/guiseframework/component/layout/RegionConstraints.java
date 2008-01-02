@@ -1,10 +1,10 @@
 package com.guiseframework.component.layout;
 
-import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.util.ArrayUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 import com.guiseframework.geometry.Extent;
 
 /**Constraints on individual component region layout.

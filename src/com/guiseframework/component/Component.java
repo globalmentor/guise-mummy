@@ -5,7 +5,8 @@ import java.io.IOException;
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.beans.TargetedEvent;
-import static com.garretwilson.lang.ClassUtilities.*;
+
+import static com.globalmentor.java.ClassUtilities.*;
 
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.GuiseSession;

@@ -3,7 +3,7 @@ package com.guiseframework.model;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 /**An abstract implementation of a group of similar models for providing such functions as communication or mutual exclusion.
 This class is thread safe.

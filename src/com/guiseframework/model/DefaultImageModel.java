@@ -2,7 +2,7 @@ package com.guiseframework.model;
 
 import java.net.URI;
 
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 
 /**A default implementation of a model for an image.
 @author Garret Wilson

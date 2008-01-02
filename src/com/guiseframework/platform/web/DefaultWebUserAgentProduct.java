@@ -5,8 +5,8 @@ import java.util.Locale;
 
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
+import static com.globalmentor.java.Objects.*;
 
 import com.guiseframework.platform.AbstractBrandedProduct;
 

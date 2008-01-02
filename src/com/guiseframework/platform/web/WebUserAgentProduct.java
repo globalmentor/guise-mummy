@@ -3,9 +3,9 @@ package com.guiseframework.platform.web;
 import java.util.*;
 import static java.util.Collections.*;
 
-import static com.garretwilson.lang.Objects.*;
 import com.garretwilson.net.http.HTTPConstants;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
+import static com.globalmentor.java.Objects.*;
 
 import com.guiseframework.platform.BrandedProduct;
 import com.guiseframework.platform.ClientProduct;

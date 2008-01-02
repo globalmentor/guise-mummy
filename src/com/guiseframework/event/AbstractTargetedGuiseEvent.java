@@ -1,6 +1,7 @@
 package com.guiseframework.event;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
+
 import com.garretwilson.beans.TargetedEvent;
 
 /**An abstract implementation of a Guise event that is targeted.

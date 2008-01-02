@@ -1,7 +1,7 @@
 package com.guiseframework.model;
 
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.TextUtilities.*;
+import static com.globalmentor.java.Objects.*;
 
 import javax.mail.internet.ContentType;
 

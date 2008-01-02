@@ -5,8 +5,8 @@ import java.util.Set;
 
 import com.guiseframework.input.Key;
 
-import static com.garretwilson.lang.EnumUtilities.*;
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.EnumUtilities.*;
+import static com.globalmentor.java.Objects.*;
 
 /**An abstract event providing information on input from a user gesture.
 @author Garret Wilson

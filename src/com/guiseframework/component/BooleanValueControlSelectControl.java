@@ -6,8 +6,10 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.garretwilson.beans.*;
-import static com.garretwilson.lang.IntegerUtilities.*;
-import static com.garretwilson.lang.Objects.*;
+
+import static com.globalmentor.java.IntegerUtilities.*;
+import static com.globalmentor.java.Objects.*;
+
 import com.garretwilson.util.*;
 
 import com.guiseframework.GuiseApplication;

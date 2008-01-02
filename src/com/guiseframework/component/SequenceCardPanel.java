@@ -6,10 +6,11 @@ import java.io.IOException;
 import java.util.List;
 
 import com.garretwilson.beans.*;
-import static com.garretwilson.lang.ClassUtilities.*;
 import com.garretwilson.util.Debug;
 
 import com.guiseframework.Bookmark;
+
+import static com.globalmentor.java.ClassUtilities.*;
 import static com.guiseframework.GuiseResourceConstants.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.ActionEvent;

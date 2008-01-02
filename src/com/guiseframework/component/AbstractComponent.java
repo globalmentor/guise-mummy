@@ -10,13 +10,13 @@ import java.util.concurrent.*;
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.beans.TargetedEvent;
-import com.garretwilson.lang.*;
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.TextUtilities.*;
 import com.garretwilson.util.DataException;
 import com.garretwilson.util.Debug;
 import static com.garretwilson.util.ArrayUtilities.*;
+import static com.globalmentor.java.Objects.*;
 
+import com.globalmentor.java.*;
 import com.globalmentor.urf.URFResource;
 import com.globalmentor.urf.ploop.*;
 import com.guiseframework.*;

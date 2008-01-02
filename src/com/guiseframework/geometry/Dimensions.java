@@ -1,8 +1,8 @@
 package com.guiseframework.geometry;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 
 /**A measurement of an object's width, height, and depth along the X, Y, and Z dimensions, respectively.
 @author garret

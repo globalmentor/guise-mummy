@@ -2,7 +2,7 @@ package com.guiseframework.component;
 
 import java.net.URI;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
 
 import com.guiseframework.model.PendingImageModel;
 

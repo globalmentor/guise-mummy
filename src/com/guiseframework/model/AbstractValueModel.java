@@ -6,7 +6,7 @@ import java.beans.PropertyVetoException;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.validator.*;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 /**An abstract implementation of a model representing a value.
 A derived class need only implement the value access methods.

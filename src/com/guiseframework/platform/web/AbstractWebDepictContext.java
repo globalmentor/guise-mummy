@@ -4,19 +4,20 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import static com.garretwilson.lang.EnumUtilities.*;
-import com.garretwilson.lang.IntegerUtilities;
-import static com.garretwilson.lang.StringBuilderUtilities.*;
 import static com.garretwilson.text.Characters.*;
 import com.garretwilson.text.xml.stylesheets.css.*;
 import com.garretwilson.util.Debug;
 
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 
+import com.globalmentor.java.IntegerUtilities;
 import com.guiseframework.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.geometry.*;
 import com.guiseframework.model.ui.PresentationModel;
+
+import static com.globalmentor.java.EnumUtilities.*;
+import static com.globalmentor.java.StringBuilderUtilities.*;
 import static com.guiseframework.model.ui.PresentationModel.*;
 import com.guiseframework.platform.AbstractXHTMLDepictContext;
 import com.guiseframework.platform.web.WebPlatform;

@@ -9,7 +9,6 @@ import java.util.regex.*;
 
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.lang.EnumUtilities.*;
 
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.NameValuePair;
@@ -22,12 +21,13 @@ import com.guiseframework.model.ui.PresentationModel;
 import com.guiseframework.platform.AbstractComponentDepictor;
 import com.guiseframework.platform.XHTMLDepictContext;
 
+import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.EnumUtilities.*;
+import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.model.ui.PresentationModel.*;
 import com.guiseframework.style.Color;
 import com.guiseframework.style.FontStyle;
 
-import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.FormatUtilities.*;
 import static com.garretwilson.text.xml.XMLUtilities.*;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;

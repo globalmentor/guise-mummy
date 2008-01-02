@@ -4,7 +4,7 @@ import java.net.URI;
 
 import com.garretwilson.net.URIPath;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 /**An abstract that listens for action events and keeps information for navigating in response.
 @author Garret Wilson

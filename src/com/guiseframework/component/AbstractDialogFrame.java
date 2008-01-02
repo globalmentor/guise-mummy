@@ -2,9 +2,9 @@ package com.guiseframework.component;
 
 import java.beans.PropertyVetoException;
 
-import com.garretwilson.lang.Objects;
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
+import com.globalmentor.java.Objects;
 import com.guiseframework.input.*;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.*;

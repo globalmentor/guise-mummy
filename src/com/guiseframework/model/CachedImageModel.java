@@ -3,10 +3,11 @@ package com.guiseframework.model;
 import java.io.IOException;
 import java.net.URI;
 
-import static com.garretwilson.lang.ClassUtilities.*;
-import com.garretwilson.lang.Objects;
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Objects.*;
+
 import com.garretwilson.util.*;
+import com.globalmentor.java.Objects;
 
 /**An image model that can initiate retrieval of an image from a cache and update the image when fetching succeeds.
 @param <K> The type of key used to lookup data in the cache.

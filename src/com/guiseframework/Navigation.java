@@ -2,7 +2,7 @@ package com.guiseframework;
 
 import java.net.URI;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 /**The encapsulation of a point of navigation.
 @author Garret Wilson

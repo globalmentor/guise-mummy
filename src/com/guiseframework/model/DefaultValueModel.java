@@ -2,7 +2,7 @@ package com.guiseframework.model;
 
 import java.beans.PropertyVetoException;
 
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 import com.guiseframework.validator.*;
 
 /**A default implementation of a model representing a value.

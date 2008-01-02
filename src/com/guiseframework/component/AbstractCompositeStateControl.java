@@ -2,9 +2,10 @@ package com.guiseframework.component;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
-import com.garretwilson.lang.Objects;
-import static com.garretwilson.lang.Objects.checkInstance;
 
+import static com.globalmentor.java.Objects.checkInstance;
+
+import com.globalmentor.java.Objects;
 import com.guiseframework.model.*;
 
 /**An abstract implementation of a composite control that represents the state of its child components.

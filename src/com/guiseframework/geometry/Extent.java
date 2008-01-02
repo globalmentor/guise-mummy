@@ -1,8 +1,9 @@
 package com.guiseframework.geometry;
 
-import static com.garretwilson.lang.Objects.*;
-import com.garretwilson.lang.Objects;
+import static com.globalmentor.java.Objects.*;
+
 import com.garretwilson.util.ArrayUtilities;
+import com.globalmentor.java.Objects;
 
 /**A measurement such as a length, area, or volume.
 All zero extents are considered equal, regardless of the unit of measurement.

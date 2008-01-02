@@ -3,16 +3,17 @@ package com.guiseframework.model.ui;
 import java.net.URI;
 import java.util.*;
 
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
 import com.guiseframework.style.Color;
 import com.guiseframework.style.FontStyle;
 import com.guiseframework.style.LineStyle;
+
+import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.theme.Theme.*;
 
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 
 /**An abstract implementation of presentation-related information.

@@ -2,7 +2,7 @@ package com.guiseframework.component;
 
 import com.guiseframework.component.layout.*;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
 
 /**Composite component that allows for layout of its children.
 @author Garret Wilson

@@ -1,8 +1,9 @@
 package com.guiseframework.event;
 
-import static com.garretwilson.lang.Objects.*;
 
 import com.guiseframework.geometry.*;
+
+import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.geometry.Point.*;
 import static com.guiseframework.geometry.Rectangle.*;
 import com.guiseframework.input.*;

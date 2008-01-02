@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.garretwilson.lang.EnumUtilities.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
 import com.guiseframework.component.*;
@@ -14,6 +13,8 @@ import com.guiseframework.model.*;
 import com.guiseframework.model.ui.PresentationModel;
 import com.guiseframework.platform.DepictContext;
 import com.guiseframework.platform.XHTMLDepictContext;
+
+import static com.globalmentor.java.EnumUtilities.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**Strategy for rendering a table component as an XHTML <code>&lt;table&gt;</code> element.

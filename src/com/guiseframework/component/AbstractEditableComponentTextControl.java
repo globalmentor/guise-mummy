@@ -3,7 +3,9 @@ package com.guiseframework.component;
 import java.beans.*;
 
 import com.garretwilson.beans.*;
-import static com.garretwilson.lang.Objects.*;
+
+import static com.globalmentor.java.Objects.*;
+
 import com.garretwilson.util.Debug;
 
 import com.guiseframework.component.layout.*;

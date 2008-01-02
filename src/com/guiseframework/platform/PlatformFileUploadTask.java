@@ -3,7 +3,7 @@ package com.guiseframework.platform;
 import java.util.*;
 import static java.util.Collections.*;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
 
 import com.garretwilson.net.URIPath;
 import com.guiseframework.Bookmark;

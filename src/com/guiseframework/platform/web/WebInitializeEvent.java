@@ -4,7 +4,7 @@ import java.net.URI;
 
 import com.guiseframework.platform.DepictContext;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 /**A web platform event indicating that initialization should occur.
 @author Garret Wilson

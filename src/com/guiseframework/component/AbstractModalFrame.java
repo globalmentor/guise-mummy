@@ -1,6 +1,6 @@
 package com.guiseframework.component;
 
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 
 /**Abstract implementation of a modal frame.
 @param <R> The type of modal result this modal frame produces.

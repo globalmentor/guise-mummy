@@ -3,13 +3,14 @@ package com.guiseframework.platform.web;
 import java.io.*;
 import java.util.Map;
 
-import static com.garretwilson.lang.EnumUtilities.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.geometry.*;
 import com.guiseframework.platform.XHTMLDepictContext;
+
+import static com.globalmentor.java.EnumUtilities.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 import com.guiseframework.style.LineStyle;
 

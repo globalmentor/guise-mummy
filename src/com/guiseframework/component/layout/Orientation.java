@@ -2,13 +2,13 @@ package com.guiseframework.component.layout;
 
 import java.util.*;
 
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 import com.guiseframework.geometry.Axis;
 import com.guiseframework.geometry.CompassPoint;
 import com.guiseframework.geometry.Side;
 
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.util.LanguageConstants.*;
+import static com.globalmentor.java.Objects.*;
 
 /**Encapsulates internationalized orientation of objects.
 Static preinstantiated orientation objects are provided for common orientations.

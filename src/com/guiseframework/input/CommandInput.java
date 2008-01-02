@@ -2,7 +2,7 @@ package com.guiseframework.input;
 
 import com.garretwilson.util.AbstractHashObject;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 /**User input in the form of a command.
 @author Garret Wilson

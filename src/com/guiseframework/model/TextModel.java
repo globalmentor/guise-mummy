@@ -2,7 +2,7 @@ package com.guiseframework.model;
 
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
 
 /**A model for text and an associated label.
 This model only supports text content types, including:

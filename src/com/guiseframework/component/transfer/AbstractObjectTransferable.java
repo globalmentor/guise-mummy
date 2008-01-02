@@ -6,8 +6,8 @@ import com.garretwilson.io.ContentTypeConstants;
 
 import static com.garretwilson.io.ContentTypeConstants.*;
 import static com.garretwilson.io.ContentTypes.*;
-import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Objects.*;
 
 /**A abstract transferable that carries one or more Java objects.
 A subclass must implement {@link #transfer(Class)}.

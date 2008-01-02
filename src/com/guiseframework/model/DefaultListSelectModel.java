@@ -3,15 +3,15 @@ package com.guiseframework.model;
 import java.beans.PropertyVetoException;
 import java.util.*;
 
-import com.garretwilson.lang.Objects;
 import com.garretwilson.util.*;
+import com.globalmentor.java.Objects;
 import com.guiseframework.event.*;
 import com.guiseframework.validator.ValidationException;
 import com.guiseframework.validator.Validator;
 
-import static com.garretwilson.lang.IntegerUtilities.*;
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.util.ArrayUtilities.*;
+import static com.globalmentor.java.IntegerUtilities.*;
+import static com.globalmentor.java.Objects.*;
 
 /**The default implementation of a model for selecting one or more values from a list.
 The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class.

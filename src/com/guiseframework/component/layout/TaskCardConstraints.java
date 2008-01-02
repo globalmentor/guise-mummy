@@ -1,6 +1,6 @@
 package com.guiseframework.component.layout;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
 
 import com.guiseframework.model.DefaultLabelModel;
 import com.guiseframework.model.LabelModel;

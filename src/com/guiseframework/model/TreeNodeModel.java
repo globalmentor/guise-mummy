@@ -1,6 +1,6 @@
 package com.guiseframework.model;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
 
 import com.garretwilson.beans.TargetedEvent;
 

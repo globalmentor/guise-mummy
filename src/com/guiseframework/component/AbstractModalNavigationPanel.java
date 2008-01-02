@@ -1,6 +1,6 @@
 package com.guiseframework.component;
 
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 import com.guiseframework.component.layout.Layout;
 
 /**Abstract implementation of a modal navigation panel.

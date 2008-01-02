@@ -1,12 +1,12 @@
 package com.guiseframework.component.layout;
 
-import static com.garretwilson.lang.Objects.*;
 
 import java.net.URI;
 
 import com.garretwilson.util.StringTemplate;
 import com.guiseframework.geometry.*;
 
+import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.Resources.*;
 
 /**The orientation of a particular flow; its axis and direction.

@@ -1,7 +1,8 @@
 package com.guiseframework.input;
 
-import com.garretwilson.lang.Objects;
-import static com.garretwilson.lang.Objects.*;
+import com.globalmentor.java.Objects;
+
+import static com.globalmentor.java.Objects.*;
 
 /**An encapsulation of mouse click input.
 @author Garret Wilson

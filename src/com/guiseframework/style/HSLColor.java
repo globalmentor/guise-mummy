@@ -3,8 +3,9 @@ package com.guiseframework.style;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.garretwilson.lang.IntegerUtilities.*;
-import static com.garretwilson.lang.Numbers.*;
+import static com.globalmentor.java.IntegerUtilities.*;
+import static com.globalmentor.java.Numbers.*;
+
 import com.garretwilson.text.ArgumentSyntaxException;
 
 /**Encapsulates a color value of the HSL color space.

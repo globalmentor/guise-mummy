@@ -5,12 +5,11 @@ import java.util.Collection;
 
 import com.garretwilson.itu.SIUnit;
 
-import static com.garretwilson.lang.ClassUtilities.*;
-import com.garretwilson.lang.Objects;
 import com.garretwilson.net.URIPath;
 
 import static com.garretwilson.text.Characters.*;
 
+import com.globalmentor.java.Objects;
 import com.guiseframework.Bookmark;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
@@ -20,6 +19,7 @@ import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.*;
 import com.guiseframework.prototype.ActionPrototype;
 
+import static com.globalmentor.java.ClassUtilities.*;
 import static com.guiseframework.theme.Theme.*;
 
 /**Panel to browse platform files and upload them to the specified destination.

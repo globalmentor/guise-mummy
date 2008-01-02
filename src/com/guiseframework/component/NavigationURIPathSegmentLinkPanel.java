@@ -1,19 +1,19 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ClassUtilities.*;
 
 import java.net.URI;
 import java.util.StringTokenizer;
 
-import com.garretwilson.lang.CharSequenceUtilities;
-import com.garretwilson.lang.Objects;
 import com.garretwilson.net.URIPath;
 import com.garretwilson.net.URIs;
 import com.garretwilson.util.Debug;
 
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
+import static com.globalmentor.java.ClassUtilities.*;
 
+import com.globalmentor.java.CharSequenceUtilities;
+import com.globalmentor.java.Objects;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.*;
 

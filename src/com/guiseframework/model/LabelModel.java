@@ -4,7 +4,7 @@ import java.net.URI;
 
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
 
 /**A model for an identifier such as text and/or an icon.
 @author Garret Wilson

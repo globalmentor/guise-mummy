@@ -3,7 +3,7 @@ package com.guiseframework.component.layout;
 import java.beans.PropertyChangeEvent;
 
 import com.garretwilson.beans.*;
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.LayoutComponent;
 import com.guiseframework.event.*;

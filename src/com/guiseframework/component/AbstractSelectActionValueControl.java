@@ -2,7 +2,7 @@ package com.guiseframework.component;
 
 import java.net.URI;
 
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 import com.guiseframework.model.*;
 
 /**Selectable action value control for which the selected state is distinct from the contained value.

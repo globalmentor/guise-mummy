@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import static com.garretwilson.io.ContentTypeConstants.*;
 import static com.garretwilson.io.ContentTypes.*;
-import static com.garretwilson.lang.Objects.*;
 
 import com.garretwilson.io.ParseReader;
 import com.garretwilson.servlet.http.HttpServletUtilities;
@@ -26,6 +25,8 @@ import static com.garretwilson.util.ArrayUtilities.*;
 
 import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
+
+import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
 import com.guiseframework.platform.web.css.*;
 import com.guiseframework.platform.web.css.GuiseCSSProcessor.IE6FixClass;

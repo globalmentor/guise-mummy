@@ -1,12 +1,12 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.TextUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Objects.*;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 
 /**A message component showing the message and any label.
 The message only supports text content types, including:

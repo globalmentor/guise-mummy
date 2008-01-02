@@ -2,7 +2,7 @@ package com.guiseframework.validator;
 
 import java.util.regex.Pattern;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 /**A character array validator that can validate against regular expressions.
 @author Garret Wilson

@@ -3,10 +3,11 @@ package com.guiseframework.component;
 import java.beans.PropertyVetoException;
 import java.util.Arrays;
 
-import static com.garretwilson.lang.ClassUtilities.*;
 
 import com.guiseframework.component.layout.*;
 import com.guiseframework.model.Notification;
+
+import static com.globalmentor.java.ClassUtilities.*;
 import static com.guiseframework.theme.Theme.*;
 import com.guiseframework.validator.*;
 

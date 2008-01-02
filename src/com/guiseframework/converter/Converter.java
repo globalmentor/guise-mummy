@@ -1,6 +1,6 @@
 package com.guiseframework.converter;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
 
 import com.garretwilson.beans.PropertyBindable;
 import com.guiseframework.GuiseSession;

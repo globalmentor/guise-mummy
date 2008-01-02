@@ -1,12 +1,12 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ClassUtilities.*;
 
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 import com.guiseframework.model.*;
 import com.guiseframework.style.Color;
 import com.guiseframework.theme.Theme;
 
+import static com.globalmentor.java.ClassUtilities.*;
 import static com.guiseframework.theme.Theme.*;
 
 /**A label component that is able to indicate a selected state.

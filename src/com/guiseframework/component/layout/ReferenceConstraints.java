@@ -1,6 +1,6 @@
 package com.guiseframework.component.layout;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 /**Constraints on individual component layout.
 These constraints specify an identifier to which a component should be bound.

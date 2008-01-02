@@ -4,8 +4,10 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import com.garretwilson.beans.*;
-import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.Objects.*;
+
+import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Objects.*;
+
 import com.garretwilson.util.Debug;
 
 import com.guiseframework.component.transfer.*;

@@ -17,9 +17,6 @@ import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.io.*;
 import static com.garretwilson.io.FileConstants.*;
 import static com.garretwilson.io.Files.*;
-import com.garretwilson.lang.Objects;
-import static com.garretwilson.lang.Objects.*;
-import static com.garretwilson.lang.ThreadUtilities.*;
 import com.garretwilson.mail.MailManager;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
@@ -30,10 +27,13 @@ import com.garretwilson.util.*;
 import static com.garretwilson.util.CalendarUtilities.*;
 import static com.garretwilson.util.LocaleUtilities.*;
 
+import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.java.ThreadUtilities.*;
 import static com.globalmentor.urf.URF.*;
 import static com.guiseframework.Guise.*;
 import static com.guiseframework.GuiseResourceConstants.*;
 
+import com.globalmentor.java.Objects;
 import com.globalmentor.urf.*;
 import com.guiseframework.component.*;
 import static com.guiseframework.Resources.*;

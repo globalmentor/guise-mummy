@@ -4,7 +4,7 @@ import com.guiseframework.component.layout.CardLayout;
 import com.guiseframework.component.layout.Flow;
 import com.guiseframework.model.*;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 /**Convenience tab control that automatically controls the selected card of a card control.
 @author Garret Wilson

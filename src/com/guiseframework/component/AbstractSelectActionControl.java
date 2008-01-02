@@ -1,10 +1,10 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 import java.net.URI;
 
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 

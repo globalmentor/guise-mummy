@@ -3,10 +3,11 @@ package com.guiseframework;
 import java.net.URI;
 import java.util.regex.Pattern;
 
-import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.Objects.*;
-import com.garretwilson.lang.Objects;
+import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Objects.*;
+
 import com.garretwilson.net.URIPath;
+import com.globalmentor.java.Objects;
 import com.guiseframework.component.Component;
 
 /**Default implementation of a navigation point based upon a component.

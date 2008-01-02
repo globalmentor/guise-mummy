@@ -1,6 +1,6 @@
 package com.guiseframework.platform;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 /**Indicates that a drop action has occurred after a drag on the platform.
 The drag target serves as the source of the event.

@@ -7,10 +7,10 @@ import java.util.Set;
 
 import static java.util.Collections.*;
 
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 import com.guiseframework.geometry.CompassPoint;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.Resources.*;
 
 /**Abstract implementation of a frame for flyovers.

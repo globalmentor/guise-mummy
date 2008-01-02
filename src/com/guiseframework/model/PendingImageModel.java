@@ -1,6 +1,6 @@
 package com.guiseframework.model;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
 
 /**A model for an image that is pending.
 @author Garret Wilson

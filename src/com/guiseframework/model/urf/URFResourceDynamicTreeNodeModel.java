@@ -1,10 +1,10 @@
 package com.guiseframework.model.urf;
 
-import static com.garretwilson.lang.ClassUtilities.*;
 
 import java.net.URI;
 import java.util.*;
 
+import static com.globalmentor.java.ClassUtilities.*;
 import static com.globalmentor.urf.URF.*;
 
 import com.globalmentor.urf.*;

@@ -4,8 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.*;
 
-import static com.garretwilson.lang.MathUtilities.*;
-import static com.garretwilson.lang.Numbers.*;
+import static com.globalmentor.java.MathUtilities.*;
+import static com.globalmentor.java.Numbers.*;
+
 import com.garretwilson.text.ArgumentSyntaxException;
 
 /**Encapsulates a color value of the sRGB color space.

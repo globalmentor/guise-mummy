@@ -1,8 +1,8 @@
 package com.guiseframework.platform.web.css;
 
-import static com.garretwilson.lang.Objects.*;
 
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
+import static com.globalmentor.java.Objects.*;
 
 /**An ID simple selector.
 @author Garret Wilson

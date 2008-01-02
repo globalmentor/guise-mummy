@@ -1,6 +1,6 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
 
 /**A panel that supports modal navigation.
 @param <R> The type of modal result this modal navigation panel produces.

@@ -4,17 +4,17 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.util.*;
 
-import static com.garretwilson.lang.Objects.*;
 import com.garretwilson.beans.GenericPropertyChangeListener;
 
 import static com.garretwilson.util.CollectionUtilities.*;
 
-import com.garretwilson.lang.Objects;
 import com.garretwilson.util.Debug;
 
+import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.GuiseResourceConstants.*;
 import static com.guiseframework.theme.Theme.*;
 
+import com.globalmentor.java.Objects;
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.event.*;
 import com.guiseframework.model.Notification;

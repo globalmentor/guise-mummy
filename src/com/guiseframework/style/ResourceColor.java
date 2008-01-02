@@ -3,7 +3,7 @@ package com.guiseframework.style;
 import com.guiseframework.Guise;
 import com.guiseframework.GuiseSession;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 /**A color that retrieves its values from the Guise session resources based upon a resource key.
 When color-related access methods are called the calling thread must have access to the current Guise session.

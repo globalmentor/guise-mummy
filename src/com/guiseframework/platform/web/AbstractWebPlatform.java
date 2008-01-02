@@ -3,9 +3,9 @@ package com.guiseframework.platform.web;
 import java.util.*;
 import static java.util.Collections.*;
 
-import static com.garretwilson.lang.IntegerUtilities.*;
-import static com.garretwilson.lang.MathUtilities.*;
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.IntegerUtilities.*;
+import static com.globalmentor.java.MathUtilities.*;
+import static com.globalmentor.java.Objects.*;
 
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.NameValuePair;

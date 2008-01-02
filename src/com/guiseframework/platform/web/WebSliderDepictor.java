@@ -6,8 +6,6 @@ import java.math.*;
 import java.net.URI;
 import java.util.*;
 
-import static com.garretwilson.lang.NumberUtilities.*;
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 import com.garretwilson.util.Debug;
@@ -19,6 +17,9 @@ import com.guiseframework.geometry.Axis;
 import com.guiseframework.model.Notification;
 import com.guiseframework.platform.*;
 import com.guiseframework.validator.*;
+
+import static com.globalmentor.java.NumberUtilities.*;
+import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**Strategy for rendering a slider component as an XHTML <code>&lt;slider&gt;</code> element.

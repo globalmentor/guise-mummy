@@ -3,7 +3,6 @@ package com.guiseframework.theme;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
-import static com.garretwilson.lang.Objects.*;
 
 import com.garretwilson.util.DataException;
 import com.globalmentor.urf.AbstractClassTypedURFResource;
@@ -11,6 +10,7 @@ import com.globalmentor.urf.ploop.PLOOPURFProcessor;
 import com.globalmentor.urf.select.Select;
 import com.globalmentor.urf.select.Selector;
 
+import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.urf.select.Select.*;
 import static com.guiseframework.theme.Theme.*;
 

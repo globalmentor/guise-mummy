@@ -1,10 +1,10 @@
 package com.guiseframework.platform.web;
 
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.servlet.ServletConstants.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
+import static com.globalmentor.java.Objects.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 

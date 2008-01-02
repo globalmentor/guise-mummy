@@ -1,6 +1,6 @@
 package com.guiseframework.component.layout;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.component.Component;

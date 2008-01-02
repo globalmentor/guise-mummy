@@ -1,8 +1,8 @@
 package com.guiseframework.geometry;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 
 /**A rectangle on a plane.
 @author Garret Wilson

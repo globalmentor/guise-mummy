@@ -1,6 +1,6 @@
 package com.guiseframework.coupler;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
 
 import static java.util.Arrays.*;
 
@@ -12,8 +12,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static java.util.Collections.*;
 
 import com.garretwilson.beans.*;
-import com.garretwilson.lang.Objects;
 import com.garretwilson.util.Debug;
+import com.globalmentor.java.Objects;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;

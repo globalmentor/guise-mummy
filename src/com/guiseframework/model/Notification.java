@@ -7,10 +7,11 @@ import static java.util.Collections.*;
 
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.TextUtilities.*;
 
 import com.guiseframework.Guise;
+
+import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.Resources.*;
 
 /**A notification to the user of some event or state, such as an error or invalid user input.

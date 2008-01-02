@@ -7,23 +7,23 @@ import java.util.*;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.lang.Objects;
-import com.garretwilson.lang.Strings;
 import com.garretwilson.text.xml.QualifiedName;
 import com.garretwilson.text.xml.XMLNamespacePrefixManager;
 import com.garretwilson.text.xml.XMLUtilities;
+import com.globalmentor.java.Objects;
+import com.globalmentor.java.Strings;
 import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.platform.web.WebPlatform;
 
-import static com.garretwilson.lang.Objects.*;
-import static com.garretwilson.lang.Strings.*;
 import static com.garretwilson.security.MessageDigestUtilities.*;
 import static com.garretwilson.security.SecurityConstants.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
 import static com.garretwilson.text.xml.XMLUtilities.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 import static com.garretwilson.util.Base64.*;
+import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.java.Strings.*;
 
 /**Abstract encapsulation of text/xml information related to the current depiction.
 @author Garret Wilson

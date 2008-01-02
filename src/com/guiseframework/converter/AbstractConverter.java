@@ -1,9 +1,9 @@
 package com.guiseframework.converter;
 
-import com.garretwilson.lang.Objects;
-import static com.garretwilson.lang.Objects.*;
+import com.globalmentor.java.Objects;
 import com.guiseframework.event.GuiseBoundPropertyObject;
 
+import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.GuiseResourceConstants.*;
 
 /**An abstract implementation an object that can convert a value from and to its lexical form.

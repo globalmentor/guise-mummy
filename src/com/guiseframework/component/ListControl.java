@@ -3,7 +3,7 @@ package com.guiseframework.component;
 import com.guiseframework.converter.AbstractStringLiteralConverter;
 import com.guiseframework.model.*;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
 
 /**Control to allow selection of one or more values from a list.
 @param <V> The type of values to select.

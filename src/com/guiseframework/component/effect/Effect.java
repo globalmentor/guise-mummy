@@ -1,6 +1,6 @@
 package com.guiseframework.component.effect;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
 
 /**Encapsulates information for a component effect.
 @author Garret Wilson

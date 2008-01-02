@@ -1,9 +1,10 @@
 package com.guiseframework.component;
 
 import com.garretwilson.beans.*;
-import com.garretwilson.lang.Objects;
-import static com.garretwilson.lang.Objects.*;
 
+import static com.globalmentor.java.Objects.*;
+
+import com.globalmentor.java.Objects;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 import com.guiseframework.prototype.ActionPrototype;

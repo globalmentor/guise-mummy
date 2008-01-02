@@ -2,10 +2,10 @@ package com.guiseframework.model;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.TextUtilities.*;
+import static com.globalmentor.java.Objects.*;
 
 /**The default implementation of a model for text and an associated label.
 @author Garret Wilson

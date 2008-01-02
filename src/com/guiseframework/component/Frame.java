@@ -3,7 +3,8 @@ package com.guiseframework.component;
 import java.beans.PropertyChangeListener;
 
 import com.garretwilson.beans.GenericPropertyChangeListener;
-import static com.garretwilson.lang.ClassUtilities.*;
+
+import static com.globalmentor.java.ClassUtilities.*;
 
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.prototype.ActionPrototype;

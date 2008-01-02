@@ -2,8 +2,10 @@ package com.guiseframework.component;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
-import com.garretwilson.lang.Objects;
-import static com.garretwilson.lang.Objects.*;
+
+import static com.globalmentor.java.Objects.*;
+
+import com.globalmentor.java.Objects;
 import com.guiseframework.component.layout.Layout;
 import com.guiseframework.model.DefaultEnableable;
 import com.guiseframework.model.DefaultLabelModel;

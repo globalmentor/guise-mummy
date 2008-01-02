@@ -5,10 +5,10 @@ import java.net.URI;
 import com.garretwilson.rdf.*;
 import com.globalmentor.urf.AbstractClassTypedURFResource;
 
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.text.TextUtilities.*;
+import static com.globalmentor.java.Objects.*;
 
 /**Guise resources description in RDF.
 This implementation considers property value resources with reference URIs to establish resource properties of type URI, using the resource's reference URI as the value.

@@ -1,10 +1,10 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
 
 import java.net.URI;
 
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 
 /**A component representing a Macromedia Flash object.
 @author Garret Wilson

@@ -2,8 +2,8 @@ package com.guiseframework.component.transfer;
 
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Objects.*;
 
 /**An abstract object that can be transferred, such as between components using drag and drop.
 @param <S> The source of the transfer.

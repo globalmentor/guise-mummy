@@ -3,12 +3,13 @@ package com.guiseframework.model;
 import java.beans.PropertyVetoException;
 
 import com.garretwilson.beans.*;
-import static com.garretwilson.lang.Objects.*;
 
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.FlowOrientation;
 import com.guiseframework.event.*;
 import com.guiseframework.prototype.ActionPrototype;
+
+import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.theme.Theme.*;
 
 /**An abstract class for editing values in a list model.

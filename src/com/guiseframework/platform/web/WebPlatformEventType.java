@@ -1,6 +1,6 @@
 package com.guiseframework.platform.web;
 
-import com.garretwilson.lang.EnumUtilities;
+import com.globalmentor.java.EnumUtilities;
 
 /**The type of event received from the web platform.
 The name of the XML element in which the event is serialized will be the serialized from of the event type name.

@@ -3,10 +3,10 @@ package com.guiseframework.model;
 import java.text.DateFormat;
 import java.util.*;
 
-import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.IntegerUtilities.*;
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.util.CalendarConstants.*;
+import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.IntegerUtilities.*;
+import static com.globalmentor.java.Objects.*;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;

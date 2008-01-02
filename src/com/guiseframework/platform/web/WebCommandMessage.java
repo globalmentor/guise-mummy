@@ -3,9 +3,9 @@ package com.guiseframework.platform.web;
 import java.util.*;
 import static java.util.Collections.*;
 
-import static com.garretwilson.lang.Objects.*;
 import com.garretwilson.util.NameValuePair;
 import static com.garretwilson.util.MapUtilities.*;
+import static com.globalmentor.java.Objects.*;
 
 /**A command message to or from the web platform.
 @param <C> The type of command.

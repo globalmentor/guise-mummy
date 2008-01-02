@@ -5,7 +5,7 @@ import java.util.Locale;
 import com.guiseframework.Guise;
 import com.guiseframework.GuiseSession;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 /**A label model that provides a localized version of a locale name.
 @author Garret Wilson

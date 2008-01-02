@@ -8,7 +8,7 @@ import com.guiseframework.model.DefaultLabelModel;
 import com.guiseframework.model.LabelModel;
 import com.guiseframework.theme.Theme;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 /**Abstract implementation of a layout component.
 Iterating over child components is thread safe.

@@ -5,8 +5,8 @@ import java.io.IOException;
 import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 
-import static com.garretwilson.lang.StringBuilderUtilities.*;
 import static com.garretwilson.text.Characters.*;
+import static com.globalmentor.java.StringBuilderUtilities.*;
 
 /**Abstract encapsulation of text information related to the current depiction.
 @author Garret Wilson

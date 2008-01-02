@@ -1,13 +1,13 @@
 package com.guiseframework.model;
 
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.TextUtilities.*;
+import static com.globalmentor.java.Objects.*;
 
 import java.net.URI;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.lang.Objects;
+import com.globalmentor.java.Objects;
 
 /**A default implementation of a model for an identifier such as text and/or an icon.
 @author Garret Wilson

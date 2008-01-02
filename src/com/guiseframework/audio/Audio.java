@@ -2,8 +2,9 @@ package com.guiseframework.audio;
 
 import java.net.URI;
 
-import static com.garretwilson.lang.ClassUtilities.*;
-import com.garretwilson.lang.Objects;
+import static com.globalmentor.java.ClassUtilities.*;
+
+import com.globalmentor.java.Objects;
 import com.guiseframework.event.EventListenerManager;
 import com.guiseframework.event.ProgressEvent;
 import com.guiseframework.event.ProgressListenable;

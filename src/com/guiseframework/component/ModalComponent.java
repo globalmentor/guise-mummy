@@ -1,6 +1,6 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
 
 /**A component that supports different modes of interaction, such as an editable label or a modal frame.
 @param <M> The type of mode this modal component supports.

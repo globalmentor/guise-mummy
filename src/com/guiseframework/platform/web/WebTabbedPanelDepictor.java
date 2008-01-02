@@ -4,7 +4,6 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Set;
 
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.net.URIs.*;
 import com.garretwilson.util.NameValuePair;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
@@ -15,6 +14,7 @@ import com.guiseframework.model.Notification;
 import com.guiseframework.platform.DepictEvent;
 import com.guiseframework.platform.PlatformEvent;
 
+import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**Strategy for rendering a tabbed panel as a series of XHTML elements.

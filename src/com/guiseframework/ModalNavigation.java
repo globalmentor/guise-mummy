@@ -4,7 +4,7 @@ import java.net.URI;
 
 import com.guiseframework.event.ModalNavigationListener;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 /**The encapsulation of a point of modal navigation.
 @author Garret Wilson

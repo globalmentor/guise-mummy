@@ -4,8 +4,6 @@ import java.net.URI;
 import java.util.*;
 import static java.util.Collections.*;
 
-import static com.garretwilson.lang.EnumUtilities.*;
-import static com.garretwilson.lang.Objects.*;
 
 import static com.garretwilson.io.FileConstants.*;
 import static com.garretwilson.io.Files.*;
@@ -15,6 +13,9 @@ import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.CompassPoint;
 
 import com.guiseframework.GuiseApplication;
+
+import static com.globalmentor.java.EnumUtilities.*;
+import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.GuiseApplication.*;
 
 /**Standard Guise cursors that are converted to predefined CSS cursors.

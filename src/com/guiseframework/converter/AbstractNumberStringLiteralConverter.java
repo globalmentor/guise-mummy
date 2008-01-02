@@ -5,8 +5,8 @@ import static java.text.MessageFormat.*;
 import java.text.*;
 import java.util.*;
 
-import static com.garretwilson.lang.Objects.*;
 import static com.garretwilson.text.Characters.*;
+import static com.globalmentor.java.Objects.*;
 
 /**An abstract implementation an object that can convert a number from and to a string.
 If the currency style is chosen, care should be taken to indicate a specific constant currency unless it is desired that the currency type change whenever the locale changes. 

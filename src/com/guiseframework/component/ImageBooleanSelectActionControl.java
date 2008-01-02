@@ -2,9 +2,10 @@ package com.guiseframework.component;
 
 import java.net.URI;
 
-import static com.garretwilson.lang.ClassUtilities.*;
-import com.garretwilson.lang.Objects;
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Objects.*;
+
+import com.globalmentor.java.Objects;
 import com.guiseframework.model.*;
 import com.guiseframework.prototype.ValuePrototype;
 

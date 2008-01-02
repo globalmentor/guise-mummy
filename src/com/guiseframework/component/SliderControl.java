@@ -2,10 +2,8 @@ package com.guiseframework.component;
 
 import java.net.URI;
 
-import static com.garretwilson.lang.ClassUtilities.*;
-import com.garretwilson.lang.Objects;
-import static com.garretwilson.lang.Objects.*;
 
+import com.globalmentor.java.Objects;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.converter.AbstractStringLiteralConverter;
 import com.guiseframework.converter.Converter;
@@ -13,6 +11,8 @@ import com.guiseframework.geometry.Axis;
 import com.guiseframework.model.*;
 import com.guiseframework.prototype.ValuePrototype;
 
+import static com.globalmentor.java.ClassUtilities.*;
+import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.theme.Theme.*;
 import com.guiseframework.validator.ValidationException;
 

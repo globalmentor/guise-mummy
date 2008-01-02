@@ -2,8 +2,9 @@ package com.guiseframework.model;
 
 import java.util.*;
 
-import com.garretwilson.lang.Objects;
-import static com.garretwilson.lang.Objects.*;
+import com.globalmentor.java.Objects;
+
+import static com.globalmentor.java.Objects.*;
 
 /**A model of a table.
 The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class. 

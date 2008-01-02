@@ -1,6 +1,7 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
+
 import com.guiseframework.model.*;
 
 /**A heading component.

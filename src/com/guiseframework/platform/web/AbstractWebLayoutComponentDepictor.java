@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import static com.garretwilson.lang.EnumUtilities.*;
-import static com.garretwilson.lang.Numbers.*;
 import com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
@@ -18,6 +16,9 @@ import com.guiseframework.geometry.Axis;
 import com.guiseframework.geometry.Extent;
 import com.guiseframework.geometry.Side;
 import com.guiseframework.platform.XHTMLDepictContext;
+
+import static com.globalmentor.java.EnumUtilities.*;
+import static com.globalmentor.java.Numbers.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**The abstract base class for all <code>application/xhtml+xml</code> composite components that use layouts.

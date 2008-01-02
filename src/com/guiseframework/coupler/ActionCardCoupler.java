@@ -1,6 +1,6 @@
 package com.guiseframework.coupler;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import static com.globalmentor.java.ClassUtilities.*;
 
 import java.beans.PropertyVetoException;
 

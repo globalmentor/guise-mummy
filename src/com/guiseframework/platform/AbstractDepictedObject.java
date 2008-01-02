@@ -2,8 +2,8 @@ package com.guiseframework.platform;
 
 import java.io.IOException;
 
-import com.garretwilson.lang.LongUtilities;
 
+import com.globalmentor.java.LongUtilities;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.transfer.Transferable;
 import com.guiseframework.event.EventListenerManager;

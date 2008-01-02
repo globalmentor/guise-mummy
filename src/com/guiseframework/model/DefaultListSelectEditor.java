@@ -1,6 +1,6 @@
 package com.guiseframework.model;
 
-import static com.garretwilson.lang.Objects.*;
+import static com.globalmentor.java.Objects.*;
 
 import com.guiseframework.component.*;
 
