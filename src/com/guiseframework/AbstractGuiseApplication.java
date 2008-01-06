@@ -18,9 +18,10 @@ import com.garretwilson.io.*;
 import static com.garretwilson.io.FileConstants.*;
 import static com.garretwilson.io.Files.*;
 import com.garretwilson.mail.MailManager;
-import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
 import com.garretwilson.net.URIPath;
+import com.garretwilson.net.URIs;
+
 import static com.garretwilson.text.CharacterEncoding.*;
 import com.garretwilson.text.W3CDateFormat;
 import com.garretwilson.util.*;
@@ -796,10 +797,10 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	}
 
 	/**Resolves a URI against the application base path.
-	Relative paths and relative <code>info:path/</code> URIs will be resolved relative to the application base path.
+	Relative paths and {@value URIs#PATH_SCHEME} scheme URIs with relative paths will be resolved relative to the application base path.
 	Absolute paths will be considered already resolved, as will absolute URIs.
-	For an application base path "/path/to/application/", resolving "info:path/relative/path" or "relative/path" will yield "/path/to/application/relative/path",
-	while resolving "info:path//absolute/path" or "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".
+	For an application base path "/path/to/application/", resolving "path:relative/path" or "relative/path" will yield "/path/to/application/relative/path",
+	while resolving "path:/absolute/path" or "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".
 	@param uri The URI to be resolved.
 	@return The URI resolved against the application base path.
 	@exception NullPointerException if the given URI is <code>null</code>.
@@ -808,9 +809,9 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	*/
 	public URI resolveURI(URI uri)
 	{
-		if(isInfoNamespace(uri, INFO_SCHEME_PATH_NAMESPACE))	//if this is an info:path/ URI
+		if(PATH_SCHEME.equals(uri.getScheme()))	//if this ia a path: URI
 		{
-			uri=URI.create(getInfoRawIdentifier(uri));	//get the raw info identifier, which will be the path
+			uri=getPathURIPath(uri).toURI();	//get the URI form of the raw path of the path URI
 		}
 		return getBasePath().resolve(checkInstance(uri, "URI cannot be null."));	//resolve the given URI against the base path
 	}

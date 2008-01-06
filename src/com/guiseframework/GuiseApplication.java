@@ -9,6 +9,7 @@ import javax.mail.*;
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.io.IOOperation;
 import com.garretwilson.net.URIPath;
+import com.garretwilson.net.URIs;
 import com.guiseframework.component.ApplicationFrame;
 import com.guiseframework.platform.*;
 import com.guiseframework.theme.Theme;
@@ -357,10 +358,10 @@ public interface GuiseApplication extends PropertyBindable
 	public URIPath resolvePath(final URIPath path);
 
 	/**Resolves a URI against the application base path.
-	Relative paths and relative <code>info:path/</code> URIs will be resolved relative to the application base path.
+	Relative paths and {@value URIs#PATH_SCHEME} scheme URIs with relative paths will be resolved relative to the application base path.
 	Absolute paths will be considered already resolved, as will absolute URIs.
-	For an application base path "/path/to/application/", resolving "info:path/relative/path" or "relative/path" will yield "/path/to/application/relative/path",
-	while resolving "info:path//absolute/path" or "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".
+	For an application base path "/path/to/application/", resolving "path:relative/path" or "relative/path" will yield "/path/to/application/relative/path",
+	while resolving "path:/absolute/path" or "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".
 	@param uri The URI to be resolved.
 	@return The URI resolved against the application base path.
 	@exception NullPointerException if the given URI is <code>null</code>.
