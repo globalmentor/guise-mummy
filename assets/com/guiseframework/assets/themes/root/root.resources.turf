@@ -3,10 +3,11 @@
 	"dc"~<http://purl.org/dc/elements/1.1/>
 ;
 ¤
-	(resources.Resources):
+	*resources.Resources:
 		dc.description="Root Guise™ theme resources (en).",
-		dc.creator="Garret Wilson",
-	
+		dc.creator="Garret Wilson"
+	;
+	〔
 		†Notification‡
 			†notification severity‡
 		"theme.notification.severity.trace.label"="Trace",
@@ -300,5 +301,5 @@
 		"theme.cursor.resize.page.near"=<cursors/resize_page_near.png>,
 		"theme.cursor.text"=<cursors/text.png>,
 		"theme.cursor.wait"=<cursors/wait.png>
-	;
+	〕
 .

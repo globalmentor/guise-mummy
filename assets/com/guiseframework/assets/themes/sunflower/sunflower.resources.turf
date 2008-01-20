@@ -2,6 +2,7 @@
 	"resources"~<http://guiseframework.com/namespaces/resources>
 ;
 ¤
-	(resources.Resources):
-	;
+	*resources.Resources
+	〔
+	〕
 .

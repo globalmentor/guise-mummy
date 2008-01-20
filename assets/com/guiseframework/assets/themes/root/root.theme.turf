@@ -9,7 +9,7 @@
 	"dc"~<http://purl.org/dc/elements/1.1/>
 ;
 ¤
-	(theme.Theme):
+	*theme.Theme:
 		dc.title="Guise™ Root Theme",
 		dc.description="The theme that is the root parent of all Guise™ themes.",
 		dc.rights="Copyright © 2007 GlobalMentor, Inc.",
@@ -17,7 +17,8 @@
 	
 		xml.style=«root.style.css»,
 	
-		theme.resources=«root.resources.turf»(resources.Resources):
+		theme.resources=«root.resources.turf»*resources.Resources
+		〔
 			†standard colors‡
 			"theme.color.main"="black",
 			"theme.color.main1"="\“theme.color.main\”",
@@ -43,62 +44,62 @@
 			"theme.color.border"="\“theme.color.neutralA\”",
 	
 			"theme.color.selected.background"="royalblue"
-		;
+		〕
 	;
 	[
 		†Frame‡
-		(theme.Rule):
-			select.selector=(select.ObjectClassSelector):
+		*theme.Rule:
+			select.selector=*select.ObjectClassSelector:
 				select.selectClass=component.Frame
 			;,
-			theme.apply=(theme.Template):
-				color=(style.ResourceColor)¡"theme.color.text"!,
-				backgroundColor=(style.ResourceColor)¡"theme.color.background"!
+			theme.apply=*theme.Template:
+				color=*style.ResourceColor("theme.color.text"),
+				backgroundColor=*style.ResourceColor("theme.color.background")
 			;
 		;,
 		†Menu‡
-		(theme.Rule):	†root menu‡
-			select.selector=(select.IntersectionSelector):
-				select.selector=(select.ObjectClassSelector):
+		*theme.Rule:	†root menu‡
+			select.selector=*select.IntersectionSelector:
+				select.selector=*select.ObjectClassSelector:
 					select.selectClass=component.Menu
 				;,
-				select.selector=(select.NegationSelector):
-					select.selector=(select.ObjectPropertySelector):
+				select.selector=*select.NegationSelector:
+					select.selector=*select.ObjectPropertySelector:
 						select.selectPropertyName="parent",
-						select.selector=(select.ObjectClassSelector):
+						select.selector=*select.ObjectClassSelector:
 							select.selectClass=component.Menu
 						;
 					;
 				;
 			;,
-			theme.apply=(theme.Template):
-				backgroundColor=(style.ResourceColor)¡"theme.color.menu"!
+			theme.apply=*theme.Template:
+				backgroundColor=*style.ResourceColor("theme.color.menu")
 			;
 		;,
-		(theme.Rule):	†submenu‡
-			select.selector=(select.IntersectionSelector):
-				select.selector=(select.ObjectClassSelector):
+		*theme.Rule:	†submenu‡
+			select.selector=*select.IntersectionSelector:
+				select.selector=*select.ObjectClassSelector:
 					select.selectClass=component.Menu
 				;,
-				select.selector=(select.ObjectPropertySelector):
+				select.selector=*select.ObjectPropertySelector:
 					select.selectPropertyName="parent",
-					select.selector=(select.ObjectClassSelector):
+					select.selector=*select.ObjectClassSelector:
 						select.selectClass=component.Menu
 					;
 				;
 			;,
-			theme.apply=(theme.Template):
-				backgroundColor=(style.ResourceColor)¡"theme.color.submenu"!,
-				borderColor=(style.ResourceColor)¡"theme.color.neutralA"!
+			theme.apply=*theme.Template:
+				backgroundColor=*style.ResourceColor("theme.color.submenu"),
+				borderColor=*style.ResourceColor("theme.color.neutralA")
 			;
 		;,
 		†Toolbar‡
-		(theme.Rule):
-			select.selector=(select.ObjectClassSelector):
+		*theme.Rule:
+			select.selector=*select.ObjectClassSelector:
 				select.selectClass=component.Toolbar
 			;,
-			theme.apply=(theme.Template):
-				backgroundColor=(style.ResourceColor)¡"theme.color.toolbar"!
+			theme.apply=*theme.Template:
+				backgroundColor=*style.ResourceColor("theme.color.toolbar")
 			;
 		;
 	]

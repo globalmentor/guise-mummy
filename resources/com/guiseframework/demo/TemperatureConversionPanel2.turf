@@ -5,61 +5,61 @@
 	"demo"~<java:/com/guiseframework/demo/>
 ;
 ¤
-	(demo.TemperatureConversionPanel2):
+	*demo.TemperatureConversionPanel2:
 		label="Guise™ Demonstration: Temperature Conversion",
-		layout=(layout.FlowLayout):
-			flow=«(layout.Flow)"LINE"»
+		layout=*layout.FlowLayout:
+			flow=«*layout.Flow("LINE")»
 		;,
 		name="temperatureConversionPanel",
 		children=
 		[
-			(component.LayoutPanel):
-				layout=(layout.FlowLayout):
-					flow=«(layout.Flow)"PAGE"»
+			*component.LayoutPanel:
+				layout=*layout.FlowLayout:
+					flow=«*layout.Flow("PAGE")»
 				;,
 				name="inputPanel",
 				children=
 				[
-					(component.TextControl)¡«java:/java/lang/Double»!:
+					*component.TextControl(«java:/java/lang/Double»):
 						label="Input Temperature",
 						name="temperatureInput",
-						validator=(validator.ValueRequiredValidator)
+						validator=*validator.ValueRequiredValidator
 					;,
-					(component.TextControl)¡«java:/java/lang/Double»!:
-						editable=*false*,
+					*component.TextControl(«java:/java/lang/Double»):
+						editable=_false_,
 						label="Output Temperature",
 						name="temperatureOutput"
 					;
 				]
 			;,
-			(component.LayoutPanel):
-				layout=(layout.FlowLayout):
-					flow=«(layout.Flow)"PAGE"»
+			*component.LayoutPanel:
+				layout=*layout.FlowLayout:
+					flow=«*layout.Flow("PAGE")»
 				;,
 				name="conversionPanel",
 				children=
 				[
-					(component.GroupPanel):
+					*component.GroupPanel:
 						label="Input Scale",
-						layout=(layout.FlowLayout):
-							flow=«(layout.Flow)"PAGE"»
+						layout=*layout.FlowLayout:
+							flow=«*layout.Flow("PAGE")»
 						;,
 						name="scalePanel",
 						children=
 						[
-							(component.CheckControl):
+							*component.CheckControl:
 								checkType="ellipse",
 								label="Calsius",
 								name="celsiusCheckControl"
 							;,
-							(component.CheckControl):
+							*component.CheckControl:
 								checkType="ellipse",
 								label="Fahrenheit",
 								name="fahrenheitCheckControl"
 							;
 						]
 					;,
-					(component.Button):
+					*component.Button:
 						label="Convert",
 						name="conversionButton"
 					;

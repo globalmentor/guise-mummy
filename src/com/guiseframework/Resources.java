@@ -2,19 +2,19 @@ package com.guiseframework;
 
 import java.net.URI;
 
-import com.garretwilson.rdf.*;
-import com.globalmentor.urf.AbstractClassTypedURFResource;
-
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.text.TextUtilities.*;
+import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
+import com.globalmentor.urf.*;
+import static com.globalmentor.urf.URF.*;
 
 /**Guise resources description in RDF.
 This implementation considers property value resources with reference URIs to establish resource properties of type URI, using the resource's reference URI as the value.
 @author Garret Wilson
 */
-public class Resources extends AbstractClassTypedURFResource
+public class Resources extends URFMapResource<URFResource, URFResource>
 {
 
 	/**The recommended prefix to the resources key ontology namespace.*/
@@ -44,7 +44,7 @@ public class Resources extends AbstractClassTypedURFResource
 	*/
 	public Resources(final URI referenceURI)
 	{
-		super(referenceURI, RESOURCES_NAMESPACE_URI);  //construct the parent class
+		super(referenceURI, createResourceURI(RESOURCES_NAMESPACE_URI, getLocalName(Resources.class)));  //construct the parent class
 	}
 
 	/**Creates a string containing a reference to the given string resource key.

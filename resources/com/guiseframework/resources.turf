@@ -3,10 +3,11 @@
 	"dc"~<http://purl.org/dc/elements/1.1/>
 ;
 ¤
-	(resources.Resources):
+	*resources.Resources:
 		dc.description="Default Guise™ Resources (en).",
-		dc.creator="Garret Wilson",
-	
+		dc.creator="Garret Wilson"
+	;
+	〔
 		†general application labels‡
 		"application.name"="Unnamed Guise™ Application",
 		"application.name.short"="\“application.name\”",
@@ -37,5 +38,5 @@
 		"text.directory.vcard.n.honorific.suffix.label"="Suffix",
 		"text.directory.vcard.n.honorific.suffix.info"="Any honorific suffix. Separate multiple honorific suffixes with commas.",
 		"text.directory.vcard.n.honorific.suffix.choices"=["I", "II", "III", "Jr.", "Sr."]
-	;
+	〕
 .

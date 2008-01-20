@@ -55,6 +55,11 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	/**I/O for loading themes.*/
 	private final static IO<Theme> themeIO=new TypedURFResourceTURFIO<Theme>(Theme.class, THEME_NAMESPACE_URI);	//create I/O for loading the theme
 
+	static
+	{
+		((TypedURFResourceTURFIO<Theme>)themeIO).registerResourceFactory(RESOURCES_NAMESPACE_URI, new JavaURFResourceFactory(Resources.class.getPackage()));	//add support for resource declarations within a theme
+	}
+
 		/**@return I/O for loading themes.*/
 		protected static IO<Theme> getThemeIO() {return themeIO;}
 
@@ -1233,7 +1238,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	{
 		final ClassLoader loader=getClass().getClassLoader();	//get our class loader
 			//default resources
-		ResourceBundle resourceBundle=ResourceBundleUtilities.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null, resourcesIO, STRING_NAMESPACE_URI, null, null);	//load the default resource bundle
+		ResourceBundle resourceBundle=ResourceBundleUtilities.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null, resourcesIO, null, null);	//load the default resource bundle
 			//theme resources
 		resourceBundle=loadResourceBundle(theme, locale, resourceBundle);	//load any resources for this theme and resolving parents
 			//application resources
@@ -1241,7 +1246,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 //TODO del Debug.trace("ready to load application resources; resource bundle base name:", resourceBundleBaseName);
 		if(resourceBundleBaseName!=null && !resourceBundleBaseName.equals(DEFAULT_RESOURCE_BUNDLE_BASE_NAME))	//if a distinct resource bundle base name was specified
 		{
-			resourceBundle=ResourceBundleUtilities.getResourceBundle(resourceBundleBaseName, locale, loader, resourceBundle, resourcesIO, STRING_NAMESPACE_URI, null, null);	//load the new resource bundle, specifying the current resource bundle as the parent					
+			resourceBundle=ResourceBundleUtilities.getResourceBundle(resourceBundleBaseName, locale, loader, resourceBundle, resourcesIO, null, null);	//load the new resource bundle, specifying the current resource bundle as the parent					
 		}
 		return resourceBundle;	//return the resource bundle
 	}
@@ -1264,17 +1269,21 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		{
 			resourceBundle=loadResourceBundle(parentTheme, locale, parentResourceBundle);	//get the parent resource bundle first and use that as the parent
 		}
-		for(final URFResource resourceResource:theme.getResourceResources(locale))	//for each resources object in the theme
+		for(final URFResource resourcesResource:theme.getResourceResources(locale))	//for each resources object in the theme
 		{
-			final URI resourcesURI=resourceResource.getURI();	//get the resources reference URI if any
+			final URI resourcesURI=resourcesResource.getURI();	//get the resources reference URI if any
 			if(resourcesURI!=null)	//if there are external resources specified
 			{
 				resourceBundle=loadResourceBundle(resourcesURI, resourceBundle);	//load the resources and insert it into the chain
 			}
-			final Map<String, Object> resourceMap=ResourceBundleUtilities.toMap(resourceResource, STRING_NAMESPACE_URI);	//generate a map from the local resources TODO cache this if possible
-			if(!resourceMap.isEmpty())	//if any resources are defined locally
+//TODO del when works			final Map<String, Object> resourceMap=ResourceBundleUtilities.toMap(resourceResource, STRING_NAMESPACE_URI);	//generate a map from the local resources TODO cache this if possible
+			if(resourcesResource instanceof Resources)	//if this is a Guise reosurces object
 			{
-				resourceBundle=new HashMapResourceBundle(resourceMap, resourceBundle);	//create a new hash map resource bundle with resources and the given parent and insert it into the chain				
+				final Map<String, Object> resourceMap=ResourceBundleUtilities.getResourceValue(resourcesResource);	//generate a map from the local resources TODO cache this if possible
+				if(!resourceMap.isEmpty())	//if any resources are defined locally
+				{
+					resourceBundle=new HashMapResourceBundle(resourceMap, resourceBundle);	//create a new hash map resource bundle with resources and the given parent and insert it into the chain				
+				}
 			}
 		}
 		return resourceBundle;	//return the end of the resource bundle chain
@@ -1300,7 +1309,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			try
 			{
 				final Resources resources=getResourcesIO().read(resourcesInputStream, resourceBundleURI);	//load the resources
-				resourceMap=ResourceBundleUtilities.toMap(resources, STRING_NAMESPACE_URI);	//generate a map from the resources
+//TODO del when works				resourceMap=ResourceBundleUtilities.toMap(resources, STRING_NAMESPACE_URI);	//generate a map from the resources
+				resourceMap=ResourceBundleUtilities.getResourceValue(resources);	//generate a map from the resources
 				cachedResourceMapMap.put(resourceBundleURI, resourceMap);	//cache the map for later
 			}
 			catch(final IOException ioException)	//if there was an error loading the resource bundle
