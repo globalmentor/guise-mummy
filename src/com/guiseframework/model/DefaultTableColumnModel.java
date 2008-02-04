@@ -1,5 +1,7 @@
 package com.guiseframework.model;
 
+import java.net.URI;
+
 import com.guiseframework.validator.Validator;
 
 /**The default implementation of a column in a table.
@@ -120,17 +122,25 @@ public class DefaultTableColumnModel<V> extends DefaultLabelModel implements Tab
 	{
 		this(valueClass, null);	//construct the class with no label
 	}
-	
+
 	/**Value class and label constructor.
 	@param valueClass The class indicating the type of values held in the model.
-	@param labelText The text of the label.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@param label The text of the label, or <code>null</code> if there should be no label.
 	*/
-	public DefaultTableColumnModel(final Class<V> valueClass, final String labelText)
+	public DefaultTableColumnModel(final Class<V> valueClass, final String label)
 	{
-		super();	//construct the parent class
+		this(valueClass, label, null);	//construct the label model with no icon
+	}
+
+	/**Value class, label, and glyph URI constructor.
+	@param valueClass The class indicating the type of values held in the model.
+	@param label The text of the label, or <code>null</code> if there should be no label.
+	@param glyphURI The glyph URI, which may be a resource URI, or <code>null</code> if there is no glyph URI.
+	*/
+	public DefaultTableColumnModel(final Class<V> valueClass, final String label, final URI glyphURI)
+	{
+		super(label, glyphURI);	//construct the parent class
 		this.valueClass=valueClass;	//save the value class
-		setLabel(labelText);	//save the label text
 	}
 	
 }

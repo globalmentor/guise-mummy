@@ -141,14 +141,46 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 				}
 			};
 
+	/**The map of cell representation strategies for value classes.*/
+	private final Map<Class<?>, CellRepresentationStrategy<?>> valueClassCellRepresentationStrategyMap=new ConcurrentHashMap<Class<?>, CellRepresentationStrategy<?>>();
+
+	/**Installs the given cell representation strategy to produce representation components for the given value class.
+	The specified representation strategy will only be used if there is no representation strategy for a given column.
+	@param <V> The type of value represented.
+	@param valueClass The value class with which the strategy should be associated.
+	@param cellRepresentationStrategy The strategy for generating components to represent values of the given type.
+	@return The representation strategy previously associated with the given value class.
+	@see #setCellRepresentationStrategy(TableColumnModel, CellRepresentationStrategy)
+	*/	
+	@SuppressWarnings("unchecked")	//we check the generic types before putting them in the map, so it's fine to cast the retrieved values
+	public <V> CellRepresentationStrategy<? super V> setCellRepresentationStrategy(final Class<V> valueClass, CellRepresentationStrategy<V> cellRepresentationStrategy)
+	{
+		return (CellRepresentationStrategy<? super V>)valueClassCellRepresentationStrategyMap.put(valueClass, cellRepresentationStrategy);	//associate the strategy with the value class in the map
+	}
+
+	/**Returns the given cell representation strategy assigned to produce representation components for the given value class.
+	The returned representation strategy can be overridden by a representation strategy associated with a particular column.
+	@param <V> The type of value represented.
+	@param valueClass The value class with which the strategy should be associated.
+	@return The strategy for generating components to represent values of the given type, or <code>null</code> if there is no associated representation strategy.
+	@see #getCellRepresentationStrategy(TableColumnModel)
+	*/	
+	@SuppressWarnings("unchecked")	//we check the generic types before putting them in the map, so it's fine to cast the retrieved values
+	public <V> CellRepresentationStrategy<? super V> getCellRepresentationStrategy(final Class<V> valueClass)
+	{
+		return (CellRepresentationStrategy<? super V>)valueClassCellRepresentationStrategyMap.get(valueClass);	//return the strategy linked to the value class in the map
+	}
+			
 	/**The map of cell representation strategies for columns.*/
 	private final Map<TableColumnModel<?>, CellRepresentationStrategy<?>> columnCellRepresentationStrategyMap=new ConcurrentHashMap<TableColumnModel<?>, CellRepresentationStrategy<?>>();
 
 	/**Installs the given cell representation strategy to produce representation components for the given column.
+	A cell representation strategy for a particular column will override a cell representation strategy registered for a given type.
 	@param <V> The type of value the column represents.
 	@param column The column with which the strategy should be associated.
 	@param cellRepresentationStrategy The strategy for generating components to represent values in the given column.
 	@return The representation strategy previously associated with the given column.
+	@see #setCellRepresentationStrategy(Class, CellRepresentationStrategy)
 	*/	
 	@SuppressWarnings("unchecked")	//we check the generic types before putting them in the map, so it's fine to cast the retrieved values
 	public <V> CellRepresentationStrategy<? super V> setCellRepresentationStrategy(final TableColumnModel<V> column, CellRepresentationStrategy<V> cellRepresentationStrategy)
@@ -157,9 +189,11 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	}
 
 	/**Returns the given cell representation strategy assigned to produce representation components for the given column.
+	A cell representation strategy for a particular column will override a cell representation strategy registered for a given type.
 	@param <V> The type of value the column represents.
 	@param column The column with which the strategy should be associated.
 	@return The strategy for generating components to represent values in the given column, or <code>null</code> if there is no associated representation strategy.
+	@see #getCellRepresentationStrategy(Class)
 	*/	
 	@SuppressWarnings("unchecked")	//we check the generic types before putting them in the map, so it's fine to cast the retrieved values
 	public <V> CellRepresentationStrategy<? super V> getCellRepresentationStrategy(final TableColumnModel<V> column)
@@ -180,6 +214,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	}
 
 	/**Creates a component state to represent the given object.
+	This implementation delegates to {@link #createTypedComponentState(com.guiseframework.model.TableModel.Cell)}.
 	@param cell The object with which the component state is to be associated.
 	@return The component state to represent the given object.
 	@exception IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
@@ -190,11 +225,11 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	}
 
 	/**Creates a component state to represent the given object.
-	This implementation delegates to {@link #createTypedComponentState(com.guiseframework.model.TableModel.Cell)}.
 	@param <T> The type of value contained in the cell.
 	@param cell The object with which the component state is to be associated.
 	@return The component state to represent the given object.
 	@exception IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
+	@exception IllegalStateException if there is no registered cell representation strategy appropriate for the cell. 
 	*/
 	protected <T> CellComponentState createTypedComponentState(final TableModel.Cell<T> cell)
 	{
@@ -204,8 +239,22 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		final boolean editable=isEditable() && column.isEditable();	//see if the cell is editable (a cell is only editable if both its table and column are editable)
 //TODO del		final TableModel.Cell<T> cell=new TableModel.Cell<T>(rowIndex, column);	//create a cell object representing this row and column
 //TODO fix editable		if(cellComponentState==null || cellComponentState.isEditable()!=editable)	//if there is no component for this cell, or the component has a different editable status
-			//TODO fix; the cell representation strategy can currently be null
-		final Component valueComponent=getCellRepresentationStrategy(column).createComponent(this, tableModel, rowIndex, column, editable, false, false);	//create a new component for the cell
+		CellRepresentationStrategy<? super T> cellRepresentationStrategy=getCellRepresentationStrategy(column);	//see if there is a cell representation strategy registered for the column
+		if(cellRepresentationStrategy==null)	//if there is no cell representation strategy for the column
+		{
+			final Class<T> valueClass=column.getValueClass();	//get the value class of the column
+			final Iterator<Class<?>> valueAncestorClassIterator=getAncestorClasses(valueClass).iterator();	//get all the ancestor classes of the value class, in increasing order of distance and abstractness
+			while(cellRepresentationStrategy==null && valueAncestorClassIterator.hasNext())	//keep iterating until we find a cell representation strategy
+			{
+				final Class<? super T> valueAncestorClass=(Class<? super T>)valueAncestorClassIterator.next();	//get the next ancestor class
+				cellRepresentationStrategy=getCellRepresentationStrategy(valueAncestorClass);	//see if there is a cell representation strategy registered for the value class ancestor
+			}				
+			if(cellRepresentationStrategy==null)	//if there is no cell representation strategy for the value class, either
+			{
+				throw new IllegalStateException("No cell representation strategy registered for value class "+valueClass);
+			}
+		}
+		final Component valueComponent=cellRepresentationStrategy.createComponent(this, tableModel, rowIndex, column, editable, false, false);	//create a new component for the cell
 		return new CellComponentState(valueComponent, editable);	//create a new component state for the cell's component and metadata
 	}
 
@@ -570,6 +619,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	}
 	
 	/**Value class and column names constructor with a default data model.
+	Default cell representation strategies will be installed for the value classes of the indicated columns.
 	@param <C> The type of values in all the cells in the table.
 	@param valueClass The class indicating the type of values held in the model.
 	@param columnNames The names to serve as label headers for the columns.
@@ -581,6 +631,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	}
 
 	/**Columns constructor with a default data model.
+	Default cell representation strategies will be installed for the value classes of the given columns.
 	@param columns The models representing the table columns.
 	*/
 	public Table(final TableColumnModel<?>... columns)
@@ -589,6 +640,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	}
 
 	/**Value class, table data, and column names constructor with a default data model.
+	Default cell representation strategies will be installed for the value classes of the indicated columns.
 	@param <C> The type of values in all the cells in the table.
 	@param valueClass The class indicating the type of values held in the model.
 	@param rowValues The two-dimensional list of values, where the first index represents the row and the second represents the column, or <code>null</code> if no default values should be given.
@@ -603,6 +655,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	}
 
 	/**Table data and columns constructor with a default data model.
+	Default cell representation strategies will be installed for the value classes of the given columns.
 	@param rowValues The two-dimensional list of values, where the first index represents the row and the second represents the column, or <code>null</code> if no default values should be given.
 	@param columns The models representing the table columns.
 	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
@@ -614,6 +667,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	}
 
 	/**Table model constructor.
+	Default cell representation strategies will be installed for the value classes of all the model's columns.
 	@param tableModel The component data model.
 	@exception NullPointerException if the given table model is <code>null</code>.
 	*/
@@ -623,9 +677,9 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		this.tableModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the table model
 		this.tableModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the table model
 			//TODO listen to and repeat table model events
-		for(final TableColumnModel<?> column:tableModel.getColumns())	//install a default cell representation strategy for each column
+		for(final TableColumnModel<?> column:tableModel.getColumns())	//install a default cell representation strategy for each column's value class
 		{
-			installDefaultCellRepresentationStrategy(column);	//create and install a default representation strategy for this column
+			installDefaultCellRepresentationStrategy(column);	//create and install a default representation strategy for this column's value class
 		}
 		getSession().addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGenericPropertyChangeListener<Locale>()	//listen for the session locale changing
 				{
@@ -865,13 +919,17 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	{
 	}
 
-	/**Installs a default cell representation strategy for the given column.
+	/**Installs a default cell representation strategy for the value class of the given column if no cell representation strategy is registered for that value class.
 	@param <T> The type of value contained in the column.
-	@param column The table column for which a default cell representation strategy should be installed.
+	@param column The table column for the value class of which a default cell representation strategy should be installed.
 	*/
 	private <T> void installDefaultCellRepresentationStrategy(final TableColumnModel<T> column)
 	{
-		setCellRepresentationStrategy(column, new DefaultCellRepresentationStrategy<T>(AbstractStringLiteralConverter.getInstance(column.getValueClass())));	//create a default cell representation strategy
+		final Class<T> valueClass=column.getValueClass();	//get the column's value class
+		if(getCellRepresentationStrategy(valueClass)==null)	//if there is not cell representation strategy installed for this value class
+		{
+			setCellRepresentationStrategy(valueClass, new DefaultCellRepresentationStrategy<T>(AbstractStringLiteralConverter.getInstance(valueClass)));	//create a default cell representation strategy for the value class and register it with the value class
+		}
 	}
 
 		//TODO fix the edit event to actually be fired

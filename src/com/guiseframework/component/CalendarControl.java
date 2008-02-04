@@ -357,10 +357,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date>
 						final CalendarMonthTableModel calendarMonthTableModel=new CalendarMonthTableModel(monthCalendar.getTime());	//create a table model for this month
 						calendarMonthTableModel.setColumnLabelDateStyle(DateStringLiteralStyle.DAY_OF_WEEK_SHORT);	//show the short day of the week in each column
 						final Table calendarMonthTable=new Table(calendarMonthTableModel);	//create a table to hold the calendar month
-						for(final TableColumnModel<?> tableColumn:calendarMonthTable.getTableModel().getColumns())	//for each table column
-						{
-							calendarMonthTable.setCellRepresentationStrategy((TableColumnModel<Date>)tableColumn, dayRepresentationStrategy);	//install the representation strategy for this column
-						}
+						calendarMonthTable.setCellRepresentationStrategy(Date.class, dayRepresentationStrategy);	//install the representation strategy for dates
 						calendarContainer.add(calendarMonthTable);	//add the month table to the calendar container
 						calendarTables.add(calendarMonthTable);	//add this table to the list of calendar tables
 						monthCalendar.add(Calendar.MONTH, 1);	//go to the next month
