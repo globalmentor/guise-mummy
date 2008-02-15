@@ -6,7 +6,7 @@ import java.util.Set;
 
 import static com.garretwilson.net.URIs.*;
 import com.garretwilson.util.NameValuePair;
-import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
+import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;

@@ -11,8 +11,8 @@ import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.javascript.JavaScriptConstants.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
-import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
-import com.garretwilson.text.xml.xhtml.XHTMLConstants;
+import static com.garretwilson.text.xml.xhtml.XHTML.*;
+import com.garretwilson.text.xml.xhtml.XHTML;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.NameValuePair;
 import com.guiseframework.*;
@@ -155,7 +155,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
 		depictContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 //	TODO del; not present in XHTML		context.writeAttribute(null, XHTMLConstants.ATTRIBUTE_LANG, getLanguageTag(locale));	//lang="locale"
-		depictContext.writeAttribute(null, XHTMLConstants.ATTRIBUTE_LANG, getLanguageTag(locale));	//lang="locale"
+		depictContext.writeAttribute(null, XHTML.ATTRIBUTE_LANG, getLanguageTag(locale));	//lang="locale"
 		final Orientation componentOrientation=component.getComponentOrientation();	//get the orientation used by the frame
 		writeDirectionAttribute(componentOrientation, componentOrientation.getFlow(Axis.X));	//always write the direction for the <xhtml:html> element
 		depictContext.write('\n');

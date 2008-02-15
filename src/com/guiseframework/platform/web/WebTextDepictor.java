@@ -10,8 +10,7 @@ import javax.xml.parsers.*;
 import static com.garretwilson.io.ContentTypeConstants.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
 import static com.garretwilson.text.xml.XMLUtilities.*;
-import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
-import static com.garretwilson.text.xml.xhtml.XHTMLUtilities.*;
+import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.java.Objects.*;
 
 import com.garretwilson.util.*;

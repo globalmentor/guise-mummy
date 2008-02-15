@@ -20,7 +20,7 @@ import static com.garretwilson.security.MessageDigestUtilities.*;
 import static com.garretwilson.security.SecurityConstants.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
 import static com.garretwilson.text.xml.XMLUtilities.*;
-import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
+import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import static com.garretwilson.util.Base64.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Strings.*;

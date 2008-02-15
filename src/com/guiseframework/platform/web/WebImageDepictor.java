@@ -6,7 +6,7 @@ import java.net.URI;
 import java.util.Map;
 
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
-import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
+import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;

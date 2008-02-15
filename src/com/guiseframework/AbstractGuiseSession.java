@@ -42,6 +42,8 @@ import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.urf.TURF.*;
+
 import static com.guiseframework.Resources.*;
 import static com.guiseframework.theme.Theme.*;
 
@@ -891,7 +893,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	public void initializeComponent(final Component component)
 	{
 		final Class<?> componentClass=component.getClass();	//get the class of the component
-		final String descriptionFilename=addExtension(getLocalName(componentClass), TURF_EXTENSION);	//create a name in the form ClassName.turf
+		final String descriptionFilename=addExtension(getLocalName(componentClass), TURF_NAME_EXTENSION);	//create a name in the form ClassName.turf
 		//TODO del Debug.trace("Trying to load description file:", descriptionFilename);
 		final InputStream descriptionInputStream=componentClass.getResourceAsStream(descriptionFilename);	//get an input stream to the description file
 		if(descriptionInputStream!=null)	//if we have a description file

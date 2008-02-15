@@ -37,7 +37,7 @@ import static com.garretwilson.text.xml.XMLConstants.*;
 import com.garretwilson.text.CharacterEncoding;
 import com.garretwilson.text.elff.*;
 import static com.garretwilson.text.elff.WebTrendsConstants.*;
-import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
+import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import com.garretwilson.text.xml.xpath.*;
 import com.garretwilson.util.*;

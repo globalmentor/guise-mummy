@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.*;
 import static java.util.Collections.*;
 
-import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
+import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;

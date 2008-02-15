@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
+import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.NameValuePair;
 

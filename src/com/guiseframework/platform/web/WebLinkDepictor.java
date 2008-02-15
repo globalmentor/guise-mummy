@@ -2,7 +2,7 @@ package com.guiseframework.platform.web;
 
 import java.io.IOException;
 
-import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
+import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import com.guiseframework.component.*;
 import com.guiseframework.event.*;

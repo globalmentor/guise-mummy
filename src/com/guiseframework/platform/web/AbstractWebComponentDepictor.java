@@ -10,6 +10,7 @@ import java.util.regex.*;
 import javax.mail.internet.ContentType;
 
 
+import com.garretwilson.text.xml.xhtml.XHTML;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.NameValuePair;
 import com.guiseframework.GuiseSession;
@@ -31,8 +32,7 @@ import com.guiseframework.style.FontStyle;
 import static com.garretwilson.text.FormatUtilities.*;
 import static com.garretwilson.text.xml.XMLUtilities.*;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
-import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
-import static com.garretwilson.text.xml.xhtml.XHTMLUtilities.*;
+import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**The abstract base class for all <code>application/xhtml+xml</code> depictions.

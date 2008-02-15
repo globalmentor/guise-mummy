@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.guiseframework.component.*;
 
-import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
+import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 /**Strategy for rendering a {@link LayoutComponent} as an XHTML <code>&lt;div&gt;</code> element.
 Changes to {@link LayoutComponent#NOTIFICATION_PROPERTY} are ignored.

@@ -19,7 +19,7 @@ import com.garretwilson.text.CharacterEncoding;
 import static com.garretwilson.text.FormatUtilities.*;
 import com.garretwilson.text.xml.QualifiedName;
 import static com.garretwilson.text.CharacterEncoding.*;
-import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
+import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import com.garretwilson.util.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 

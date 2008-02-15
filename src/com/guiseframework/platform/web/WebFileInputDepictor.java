@@ -12,7 +12,7 @@ import com.guiseframework.platform.DepictEvent;
 import com.guiseframework.platform.PlatformEvent;
 import com.guiseframework.validator.*;
 
-import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
+import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Objects.*;
 

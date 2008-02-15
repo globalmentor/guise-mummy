@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.net.URI;
 
 import static com.garretwilson.javascript.JavaScriptConstants.*;
-import com.garretwilson.text.xml.xhtml.XHTMLConstants;
-import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
+import com.garretwilson.text.xml.xhtml.XHTML;
+import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 
 /**Abstract encapsulation of application/xhtml+xml information related to the current depiction.
-This implementation maps the XHTML namespace {@value XHTMLConstants#XHTML_NAMESPACE_URI} to the <code>null</code> prefix.
+This implementation maps the XHTML namespace {@value XHTML#XHTML_NAMESPACE_URI} to the <code>null</code> prefix.
 @author Garret Wilson
 */
 public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContext implements XHTMLDepictContext
