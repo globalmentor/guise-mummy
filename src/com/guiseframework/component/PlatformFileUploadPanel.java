@@ -7,7 +7,6 @@ import com.garretwilson.itu.SIUnit;
 
 import com.garretwilson.net.URIPath;
 
-import static com.garretwilson.text.Characters.*;
 
 import com.globalmentor.java.Objects;
 import com.guiseframework.Bookmark;
@@ -19,6 +18,7 @@ import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.*;
 import com.guiseframework.prototype.ActionPrototype;
 
+import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Classes.*;
 import static com.guiseframework.theme.Theme.*;
 

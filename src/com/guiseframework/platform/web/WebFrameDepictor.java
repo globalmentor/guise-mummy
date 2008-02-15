@@ -5,7 +5,6 @@ import java.net.URI;
 import java.util.*;
 
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
-import static com.garretwilson.text.Characters.*;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.NameValuePair;
 
@@ -14,6 +13,7 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.geometry.CompassPoint;
 
+import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Classes.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 

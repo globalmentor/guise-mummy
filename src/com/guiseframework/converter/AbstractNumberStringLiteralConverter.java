@@ -5,7 +5,7 @@ import static java.text.MessageFormat.*;
 import java.text.*;
 import java.util.*;
 
-import static com.garretwilson.text.Characters.*;
+import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Objects.*;
 
 /**An abstract implementation an object that can convert a number from and to a string.

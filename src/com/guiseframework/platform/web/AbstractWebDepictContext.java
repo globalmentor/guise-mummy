@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import static com.garretwilson.text.Characters.*;
 import com.garretwilson.text.xml.stylesheets.css.*;
 import com.garretwilson.util.Debug;
 
@@ -16,6 +15,7 @@ import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.geometry.*;
 import com.guiseframework.model.ui.PresentationModel;
 
+import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.StringBuilders.*;
 import static com.guiseframework.model.ui.PresentationModel.*;
