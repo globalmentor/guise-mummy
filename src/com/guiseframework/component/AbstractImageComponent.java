@@ -10,6 +10,7 @@ import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 import static com.globalmentor.java.Objects.*;
 
+import com.garretwilson.io.ContentTypes;
 import com.guiseframework.component.transfer.*;
 import com.guiseframework.model.*;
 
@@ -87,7 +88,7 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 		This implementation returns a URI-list content type and the content type of the label.
 		@return The content types available for this transfer.
 		*/
-		public ContentType[] getContentTypes() {return createArray(new ContentType(TEXT, URI_LIST_SUBTYPE, null), getSource().getLabelContentType());}
+		public ContentType[] getContentTypes() {return createArray(new ContentType(ContentTypes.TEXT_PRIMARY_TYPE, URI_LIST_SUBTYPE, null), getSource().getLabelContentType());}
 
 		/**Transfers data using the given content type.
 		@param contentType The type of data expected.
@@ -97,7 +98,7 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 		public Object transfer(final ContentType contentType)
 		{
 			final ImageComponent image=getSource();	//get the image
-			if(match(contentType, TEXT, URI_LIST_SUBTYPE))	//if this is a text/uri-list type
+			if(match(contentType, ContentTypes.TEXT_PRIMARY_TYPE, URI_LIST_SUBTYPE))	//if this is a text/uri-list type
 			{
 				final URI imageURI=image.getImageURI();	//get the image URI
 				return imageURI!=null ? createURIList(image.getSession().resolveURI(imageURI)) : null;	//return the image URI, if there is one

@@ -4,11 +4,12 @@ import static com.globalmentor.java.Objects.*;
 
 import javax.mail.internet.ContentType;
 
+import com.guiseframework.component.layout.ReferenceConstraints;
 import com.guiseframework.component.layout.ReferenceLayout;
 import com.guiseframework.model.*;
 
 /**A text component with an associated label.
-This component may have child components, each bound to a specific ID in the text.
+This component may have child components, each bound to a specific ID in the text using {@link ReferenceConstraints}.
 When the text is rendered, XML elements with IDs referencing child components will be replaced with representations of those child components.
 Child element ID reference replacement can only occur if the text has an XML-based content type (such as XHTML).
 <p>This component only supports text content types, including:</p>
@@ -19,6 +20,7 @@ Child element ID reference replacement can only occur if the text has an XML-bas
 </ul>
 <p>The component defaults to a content type of <code>text/plain</code>.</p>
 @author Garret Wilson
+@see ReferenceLayout
 */
 public class Text extends AbstractContainer implements TextModel	//TODO probably change to a LayoutComponent
 {

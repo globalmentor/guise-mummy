@@ -10,6 +10,7 @@ import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
+import com.garretwilson.io.ContentTypes;
 import com.garretwilson.util.NameValuePair;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.Flash;
@@ -22,7 +23,7 @@ public class WebFlashDepictor<C extends Flash> extends AbstractSimpleWebComponen
 {
 
 	/**The content type for Flash objects.*/
-	public final static ContentType FLASH_CONTENT_TYPE=new ContentType(APPLICATION, X_SHOCKWAVE_FLASH_SUBTYPE, null);
+	public final static ContentType FLASH_CONTENT_TYPE=new ContentType(ContentTypes.APPLICATION_PRIMARY_TYPE, X_SHOCKWAVE_FLASH_SUBTYPE, null);
 
 	/**The "allowScriptAccess" parameter.
 	@see <a href="http://www.adobe.com/devnet/flash/articles/fplayer8_security_09.html">Security Changes in Flash Player 8</a>

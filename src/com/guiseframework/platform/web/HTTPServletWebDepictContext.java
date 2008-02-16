@@ -64,7 +64,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 		public boolean isQuirksMode() {return isQuirksMode;}
 
 	/**The current content type of the output.*/
-	private ContentType outputContentType=createContentType(TEXT, PLAIN_SUBTYPE);	//default to text/plain
+	private ContentType outputContentType=createContentType(TEXT_PRIMARY_TYPE, PLAIN_SUBTYPE);	//default to text/plain
 
 	/**The qualified name to use for the attribute hash attribute.*/
 	private final String attributeHashAttributeQualifiedName=getQualifiedName(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_ATTRIBUTE_HASH);

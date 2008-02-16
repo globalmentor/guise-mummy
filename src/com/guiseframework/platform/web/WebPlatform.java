@@ -6,6 +6,7 @@ import java.util.Queue;
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.io.ContentTypeConstants;
+import com.garretwilson.io.ContentTypes;
 import com.garretwilson.net.URIPath;
 
 import com.guiseframework.GuiseApplication;
@@ -31,10 +32,10 @@ public interface WebPlatform extends Platform
 	public final static String GUISE_VERSION_URI_QUERY_PARAMETER="guiseVersion";
 
 	/**The content type of a Guise AJAX request, <code>application/x-guise-ajax-request</code>.*/
-	public final static ContentType GUISE_AJAX_REQUEST_CONTENT_TYPE=new ContentType(ContentTypeConstants.APPLICATION, ContentTypeConstants.EXTENSION_PREFIX+"guise-ajax-request"+ContentTypeConstants.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
+	public final static ContentType GUISE_AJAX_REQUEST_CONTENT_TYPE=new ContentType(ContentTypes.APPLICATION_PRIMARY_TYPE, ContentTypes.SUBTYPE_EXTENSION_PREFIX+"guise-ajax-request"+ContentTypes.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
 
 	/**The content type of a Guise AJAX response, <code>application/x-guise-ajax-response</code>.*/
-	public final static ContentType GUISE_AJAX_RESPONSE_CONTENT_TYPE=new ContentType(ContentTypeConstants.APPLICATION, ContentTypeConstants.EXTENSION_PREFIX+"guise-ajax-response"+ContentTypeConstants.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
+	public final static ContentType GUISE_AJAX_RESPONSE_CONTENT_TYPE=new ContentType(ContentTypes.APPLICATION_PRIMARY_TYPE, ContentTypes.SUBTYPE_EXTENSION_PREFIX+"guise-ajax-response"+ContentTypes.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
 
 		//Guise-specific element attributes
 			//img

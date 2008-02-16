@@ -9,6 +9,7 @@ import static com.garretwilson.io.ContentTypes.*;
 import static com.garretwilson.text.TextConstants.*;
 import static com.globalmentor.java.Classes.*;
 
+import com.garretwilson.io.ContentTypes;
 import com.guiseframework.component.transfer.*;
 import com.guiseframework.converter.*;
 import com.guiseframework.model.*;
@@ -179,7 +180,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 				*/
 				public boolean canImportTransfer(final TextControl<?> component, final Transferable<?> transferable)
 				{
-					return transferable.canTransfer(new ContentType(TEXT, WILDCARD_SUBTYPE, null));	//we can import any text
+					return transferable.canTransfer(new ContentType(ContentTypes.TEXT_PRIMARY_TYPE, WILDCARD_SUBTYPE, null));	//we can import any text
 				}
 
 				/**Imports the given data into the given component.
@@ -201,7 +202,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 					{
 						for(final ContentType contentType:transferable.getContentTypes())	//for each available content type
 						{
-							if(match(contentType, TEXT, WILDCARD_SUBTYPE))	//if this is a text content type
+							if(match(contentType, ContentTypes.TEXT_PRIMARY_TYPE, WILDCARD_SUBTYPE))	//if this is a text content type
 							{
 								data=transferable.transfer(contentType);	//transfer the data
 								imported=true;	//indicate that we transported data
