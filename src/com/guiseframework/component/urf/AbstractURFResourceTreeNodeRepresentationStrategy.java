@@ -124,7 +124,7 @@ public abstract class AbstractURFResourceTreeNodeRepresentationStrategy<V extend
 				if(propertyNamespaceURI!=null)	//if the property is in a namesapce
 				{
 						//TODO update algorithm to probably check up the tree node hierarchy for an URF tree node, and check to see if the namespace URI actually exist in the data model
-					getNamespaceLabelManager().getNamespaceLabel(propertyNamespaceURI);	//ask the namespace label manager for a label for this namespace, so that one will be there
+					getNamespaceLabelManager().determineNamespaceLabel(propertyNamespaceURI);	//ask the namespace label manager for a label for this namespace, so that one will be there
 				}				
 				stringBuilder.append(URFTURFGenerator.createReferenceString(propertyURI, getNamespaceLabelManager(), null, parentTypeURI)); //append a reference to the property URI
 			}
@@ -152,7 +152,7 @@ public abstract class AbstractURFResourceTreeNodeRepresentationStrategy<V extend
 			if(namespaceURI!=null)	//if there is some related namespace
 			{
 					//TODO update algorithm to probably check up the tree node hierarchy for an URF tree node, and check to see if the namespace URI actually exist in the data model
-				getNamespaceLabelManager().getNamespaceLabel(namespaceURI);	//ask the namespace label manager for a label for this namespace, so that one will be there
+				getNamespaceLabelManager().determineNamespaceLabel(namespaceURI);	//ask the namespace label manager for a label for this namespace, so that one will be there
 			}
 			if(typeURI!=null)	//if we have a type URI
 			{
@@ -168,7 +168,7 @@ public abstract class AbstractURFResourceTreeNodeRepresentationStrategy<V extend
 			if(typeNamespaceURI!=null)	//if the type is in a namesapce
 			{
 					//TODO update algorithm to probably check up the tree node hierarchy for an URF tree node, and check to see if the namespace URI actually exist in the data model
-				getNamespaceLabelManager().getNamespaceLabel(typeNamespaceURI);	//ask the namespace label manager for a label for this namespace, so that one will be there
+				getNamespaceLabelManager().determineNamespaceLabel(typeNamespaceURI);	//ask the namespace label manager for a label for this namespace, so that one will be there
 			}				
 		}
 		boolean hasPredicateToken=false;	//we'll note whether we ever have something to represent the predicate of the statement

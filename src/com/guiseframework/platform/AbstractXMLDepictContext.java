@@ -18,7 +18,7 @@ import com.guiseframework.platform.web.WebPlatform;
 
 import static com.garretwilson.security.MessageDigestUtilities.*;
 import static com.garretwilson.security.SecurityConstants.*;
-import static com.garretwilson.text.xml.XMLConstants.*;
+import static com.garretwilson.text.xml.XML.*;
 import static com.garretwilson.text.xml.XMLUtilities.*;
 import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import static com.garretwilson.util.Base64.*;

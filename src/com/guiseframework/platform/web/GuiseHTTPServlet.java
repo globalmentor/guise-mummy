@@ -32,7 +32,7 @@ import com.garretwilson.security.Nonce;
 import static com.garretwilson.servlet.ServletConstants.*;
 import static com.garretwilson.servlet.http.HttpServletConstants.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
-import static com.garretwilson.text.xml.XMLConstants.*;
+import static com.garretwilson.text.xml.XML.*;
 
 import com.garretwilson.text.CharacterEncoding;
 import com.garretwilson.text.elff.*;

@@ -9,7 +9,7 @@ import javax.mail.internet.ContentType;
 
 import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.javascript.JavaScriptConstants.*;
-import static com.garretwilson.text.xml.XMLConstants.*;
+import static com.garretwilson.text.xml.XML.*;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import com.garretwilson.text.xml.xhtml.XHTML;
