@@ -21,18 +21,18 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 		/**@return The glyph URI, which may be a resource URI, or <code>null</code> if there is no glyph URI.*/
 		public URI getGlyphURI() {return glyphURI;}
 
-		/**Sets the URI of the icon.
+		/**Sets the URI of the glyph.
 		This is a bound property.
-		@param newGlyphURI The new URI of the icon, which may be a resource URI.
+		@param newGlyphURI The new URI of the glyph, which may be a resource URI.
 		@see #GLYPH_URI_PROPERTY
 		*/
 		public void setGlyphURI(final URI newGlyphURI)
 		{
 			if(!Objects.equals(glyphURI, newGlyphURI))	//if the value is really changing
 			{
-				final URI oldIcon=glyphURI;	//get the old value
+				final URI oldGlyphURI=glyphURI;	//get the old value
 				glyphURI=newGlyphURI;	//actually change the value
-				firePropertyChange(GLYPH_URI_PROPERTY, oldIcon, newGlyphURI);	//indicate that the value changed
+				firePropertyChange(GLYPH_URI_PROPERTY, oldGlyphURI, newGlyphURI);	//indicate that the value changed
 			}
 		}
 
@@ -96,7 +96,7 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 	*/
 	public DefaultLabelModel(final String label)
 	{
-		this(label, null);	//construct the label model with no icon
+		this(label, null);	//construct the label model with no glyph
 	}
 
 	/**Label and glyph URI constructor.

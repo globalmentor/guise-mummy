@@ -40,7 +40,7 @@ public class Components
 	@exception NullPointerException if the given component, component class, and/or collection is <code>null</code>.
 	@return The component collection.
 	*/
-	public static <C extends Component, T extends Collection<C>> T getComponents(final Component component, final Class<C> componentClass, final T componentCollection, final boolean deep, final boolean below)
+	public static <C, T extends Collection<C>> T getComponents(final Component component, final Class<C> componentClass, final T componentCollection, final boolean deep, final boolean below)
 	{
 		final boolean match=componentClass.isInstance(component);	//determine if this component is an instance of the given class
 		if(match)	//if the component is an instance of the given class
@@ -86,11 +86,11 @@ public class Components
 	@exception NullPointerException if the given component, component class, and/or collection is <code>null</code>.
 	@return The component collection.
 	*/
-	public static <C extends Component, T extends Collection<C>> T getChildComponents(final CompositeComponent compositeComponent, final Class<C> componentClass, final T componentCollection, final boolean deep, final boolean below)
+	public static <C, T extends Collection<C>> T getChildComponents(final CompositeComponent compositeComponent, final Class<C> componentClass, final T componentCollection, final boolean deep, final boolean below)
 	{
 		for(final Component childComponent:compositeComponent.getChildComponents())	//for each child component
 		{
-			getComponents(childComponent, componentClass, componentCollection, deep, below);	//set the editable status of the child component
+			getComponents(childComponent, componentClass, componentCollection, deep, below);	//get the components under the child component
 		}
 		return componentCollection;	//return the collection
 	}

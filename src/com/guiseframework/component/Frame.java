@@ -7,7 +7,7 @@ import com.garretwilson.beans.GenericPropertyChangeListener;
 import static com.globalmentor.java.Classes.*;
 
 import com.guiseframework.component.effect.Effect;
-import com.guiseframework.prototype.ActionPrototype;
+import com.guiseframework.prototype.*;
 
 /**A root-level component such as a window or an HTML page.
 The frame's contents are specified using {@link #setContent(Component)}.

@@ -6,10 +6,6 @@ import java.util.*;
 
 import com.garretwilson.beans.GenericPropertyChangeListener;
 
-import static com.garretwilson.util.CollectionUtilities.*;
-
-import com.garretwilson.util.Debug;
-
 import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.GuiseResourceConstants.*;
 import static com.guiseframework.theme.Theme.*;
@@ -24,7 +20,7 @@ import com.guiseframework.prototype.*;
 This implementation notifies the user when the frame does not validate in {@link #validate()}.
 @author Garret Wilson
 */
-public abstract class AbstractFrame extends AbstractEnumCompositeComponent<AbstractFrame.FrameComponent> implements Frame, PrototypeConsumer
+public abstract class AbstractFrame extends AbstractEnumCompositeComponent<AbstractFrame.FrameComponent> implements Frame
 {
 
 	/**The enumeration of frame components.*/
@@ -228,7 +224,6 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 		if(oldContent!=newContent)	//if the component really changed
 		{
 			firePropertyChange(CONTENT_PROPERTY, oldContent, newContent);	//indicate that the value changed
-			consumePrototypes();	//merge the produced prototypes of the new content
 		}
 	}
 
@@ -249,6 +244,7 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 		if(oldMenu!=newMenu)	//if the component really changed
 		{
 			firePropertyChange(MENU_PROPERTY, oldMenu, newMenu);	//indicate that the value changed
+			prototypeProvisionStrategy.processPrototypeProvisions();	//process the prototype provisions again, now that we have a new menu
 		}
 	}
 
@@ -269,41 +265,16 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 		if(oldToolbar!=newToolbar)	//if the component really changed
 		{
 			firePropertyChange(TOOLBAR_PROPERTY, oldToolbar, newToolbar);	//indicate that the value changed
+			prototypeProvisionStrategy.processPrototypeProvisions();	//process the prototype provisions again, now that we have a new toolbar
 		}
 	}
 
-	/**The strategy for consuming prototypes.*/
-	private final DefaultMenuToolPrototypeConsumerStrategy prototypeConsumerStrategy=new DefaultMenuToolPrototypeConsumerStrategy();
+	/**The internal prototype provider that provides the default prototypes provided by this frame.*/
+	private final DefaultPrototypeProvider defaultPrototypeProvider=new DefaultPrototypeProvider();
 
-	/**Consumes and processes the produced prototypes of all known {@link PrototypeProducer}s.
-	This implementation consumes the produced prototypes of this frame and the current content, if either or both implement {@link PrototypeProducer}.
-	The produced prototypes will be integrated into the current menu and toolbar, if present.
-	@see #getMenu()
-	@see #getToolbar()
-	*/
-	public void consumePrototypes()	//TODO change to combine produced prototypes in producePrototype(), if we decide to make the frame a prototype producer as well
-	{
-		prototypeConsumerStrategy.consumePrototypes(getMenu(), getToolbar(), gatherPrototypes());	//gather prototypes and consume them
-	}
+	/**The strategy for processing prototypes provisions from child prototype providers, along with this frame's prototype provisions.*/
+	private final FrameMenuToolPrototypeProvisionStrategy prototypeProvisionStrategy=new FrameMenuToolPrototypeProvisionStrategy(this, defaultPrototypeProvider);
 
-	/**Gathers prototypes from all known {@link PrototypeProducer}s.
-	This implementation gathers the produced prototypes of this frame and the current content, if either or both implement {@link PrototypeProducer}.
-	*/
-	public Iterable<PrototypePublication<?>> gatherPrototypes()
-	{
-		final Set<PrototypePublication<?>> prototypePublications=new TreeSet<PrototypePublication<?>>();	//create a sorted set of produced prototypes
-		if(this instanceof PrototypeProducer)	//if this frame produces prototypes
-		{
-			addAll(prototypePublications, ((PrototypeProducer)this).producePrototypes());	//collect produced prototypes from the frame
-		}
-		final Component content=getContent();	//get the current content
-		if(content instanceof PrototypeProducer)	//if the content produces prototypes
-		{
-			addAll(prototypePublications, ((PrototypeProducer)content).producePrototypes());	//collect produced prototypes from the content
-		}
-		return prototypePublications;	//return the gathered prototypes
-	}
-	
 	/**The action listener for closing the frame.*/
 	private final ActionListener closeActionListener;
 		
@@ -402,7 +373,6 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 						close();	//close the frame
 					}
 				};
-		setComponent(FrameComponent.CONTENT_COMPONENT, component);	//set the component directly, because child classes may prevent the setContent() method from changing the component 
 
 			//close action prototype
 		closeActionPrototype=new ActionPrototype(LABEL_CLOSE, GLYPH_CLOSE);	//create the prototype for the close action
@@ -411,6 +381,8 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 		final Link closeActionControl=new Link(closeActionPrototype);	//create a close action control from the prototype
 		closeActionControl.setLabelDisplayed(false);	//don't display the label
 		setComponent(FrameComponent.CLOSE_ACTION_CONTROL, closeActionControl);	//set our default close action control; don't use setCloseActionControl(), as this will result in the action listener being installed twice TODO maybe just remove the listener altogether, and require the new control be created from the prototype
+		setComponent(FrameComponent.CONTENT_COMPONENT, component);	//set the component directly, because child classes may prevent the setContent() method from changing the component 
+		updateDefaultPrototypeProvisions();	//update the prototype provisions
 	}
 
 	/**Opens the frame with the currently set modality.
@@ -526,6 +498,53 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 			getSession().notify(notification);	//indicate that there was a validation error
 		}
 		return isValid();	//return the current valid state
+	}
+
+	/**Updates the default prototype provisions.
+	@see #provideDefaultPrototypes()
+	*/
+	protected final void updateDefaultPrototypeProvisions()
+	{
+		defaultPrototypeProvider.updateDefaultPrototypeProvisions();	//update the default prototype provisions			
+	}
+
+	/**Provides default prototype provisions to be integrated into the menu and/or toolbar.
+	The default prototype provisions are separate from those provided by any child component prototype producers.
+	Subclasses may override this method to add or modify the default provided prototype provisions.
+	@return A mutable set of default prototype provisions.
+	*/
+	protected Set<PrototypeProvision<?>> provideDefaultPrototypes()
+	{
+		return new HashSet<PrototypeProvision<?>>();	//this version provides no default prototypes
+	}
+
+
+	/**The default implementation of a prototype provider for a frame.
+	@author Garret Wilson
+	*/
+	protected class DefaultPrototypeProvider extends AbstractPrototypeProvider
+	{
+
+		/**Provides prototype provisions.
+		This method is usually used internally to provide prototype provisions to be set using {@link #setPrototypeProvisions(Set)}.
+		Subclasses may override this method to add or modify the provided prototype provisions.
+		This method delegates to {@link AbstractFrame#provideDefaultPrototypes()}.
+		@return A mutable set of prototype provisions.
+		*/
+		protected Set<PrototypeProvision<?>> providePrototypes()
+		{
+			return provideDefaultPrototypes();	//return the frame's default prototypes
+		}
+
+		/**Updates the available prototype provisions.
+		This method is provided to allow class access to the {@link #updatePrototypeProvisions()} method,
+		to which this method delegates.
+		*/
+		protected final void updateDefaultPrototypeProvisions()
+		{
+			updatePrototypeProvisions();	//update the prototype previsions			
+		}
+
 	}
 
 }

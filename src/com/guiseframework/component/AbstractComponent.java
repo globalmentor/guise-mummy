@@ -29,7 +29,6 @@ import com.guiseframework.input.*;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.AbstractPresentationModel;
 import com.guiseframework.platform.*;
-import com.guiseframework.prototype.PrototypeConsumer;
 import com.guiseframework.theme.Theme;
 
 /**An abstract implementation of a component.
@@ -1267,28 +1266,6 @@ Debug.trace("now valid of", this, "is", isValid());
 	}
 */
 
-	/**Searches up the component hierarchy (including this one) and tells the first prototype consumer to consume prototypes.
-	@param component The component on which to start the search for a prototype consumer.
-	@exception NullPointerException if the given component is <code>null</code>.
-	*/
-	public static void initiatePrototypeConsumption(Component component)	//TODO improve prototype producer/consumer framework to allow consumers to be registered and send events when there is more information to publish
-	{
-		checkInstance(component, "Component cannot be null.");
-		do	//tell the first prototype consumer ancestor, if any, to consumer prototypes
-		{
-			if(component instanceof PrototypeConsumer)	//if this is a prototype consumer
-			{
-				((PrototypeConsumer)component).consumePrototypes();	//tell the prototype consumer to consumer the prototypes we produce
-				break;	//stop looking for a prototype consumer
-			}
-			else	//if this is not a prototype consumer
-			{
-				component=component.getParent();	//climb the tree
-			}
-		}
-		while(component!=null);	//keep looking for a prototype consumer until we run out of ancestors		
-	}
-	
 	/**Determines the root parent of the given component.
 	@param component The component for which the root should be found.
 	@return The root component (the component or ancestor which has no parent).
