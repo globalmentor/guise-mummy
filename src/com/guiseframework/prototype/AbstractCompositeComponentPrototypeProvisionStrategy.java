@@ -4,8 +4,6 @@ import static com.globalmentor.java.Objects.*;
 
 import java.util.ArrayList;
 
-import net.marmox.resource.ResourceComponent;
-
 import com.guiseframework.component.*;
 import com.guiseframework.event.*;
 
@@ -25,7 +23,10 @@ public abstract class AbstractCompositeComponentPrototypeProvisionStrategy exten
 		/**@return The composite component the top-level prototype provider children of which will be monitored.*/
 		protected CompositeComponent getParentComponent() {return parentComponent;}
 
-	/**The listener that listens for prototype producers being added and removed and manages those that are top-level prototype producers under the parent component.*/
+	/**The listener that listens for prototype producers being added and removed and manages those that are top-level prototype producers under the parent component.
+	If one or more prototypes provider is added or removed, prototype provisions are processed.
+	@see #processPrototypeProvisions()
+	*/
 	private final CompositeComponentListener compositeComponentListener=new CompositeComponentListener()
 		{
 			/**Called when a child component is added to a composite component.
@@ -33,7 +34,8 @@ public abstract class AbstractCompositeComponentPrototypeProvisionStrategy exten
 			*/
 			public void childComponentAdded(final ComponentEvent childComponentEvent)
 			{
-				Component component=(Component)childComponentEvent.getSource();	//get the added component
+				boolean modifiedPrototypeProviders=false;	//keep track of whether we modified prototype providers; if so, we'll need to reprocess the prototype provisions
+				Component component=childComponentEvent.getComponent();	//get the added component
 				if(component instanceof PrototypeProvider)	//if the added child is a prototype provider
 				{
 					final PrototypeProvider prototypeProvider=(PrototypeProvider)component;	//get the component as a prototype provider
@@ -48,14 +50,21 @@ public abstract class AbstractCompositeComponentPrototypeProvisionStrategy exten
 						}
 						component=component.getParent();	//go up another level
 					}
-					addPrototypeProvider(prototypeProvider);	//the added component is a top-level prototype provider, so add it to the set of managed prototype providers
+					modifiedPrototypeProviders=addPrototypeProvider(prototypeProvider);	//the added component is a top-level prototype provider, so add it to the set of managed prototype providers; see if we actually changed the known prototype providers
 				}
 				else if(component instanceof CompositeComponent)	//if the added child is not a prototype provider, if it is a composite component it may have child prototype providers already added; make sure those are managed
 				{
 					for(final PrototypeProvider prototypeProvider:Components.getChildComponents((CompositeComponent)component, PrototypeProvider.class, new ArrayList<PrototypeProvider>(), true, false))	//get all the top-level descendant prototype provider components of the component
 					{
-						addPrototypeProvider(prototypeProvider);	//manage this prototype provider
+						if(addPrototypeProvider(prototypeProvider))	//manage this prototype provider; if this is a new prototype provider
+						{
+							modifiedPrototypeProviders=true;	//show that we now need to process prototype provisions
+						}
 					}
+				}
+				if(modifiedPrototypeProviders)	//if we added one or more prototype providers
+				{
+					processPrototypeProvisions();	//process the prototype provisions, now that we have different prototype providers
 				}
 			}
 
@@ -64,10 +73,28 @@ public abstract class AbstractCompositeComponentPrototypeProvisionStrategy exten
 			*/
 			public void childComponentRemoved(final ComponentEvent childComponentEvent)
 			{
-				final Object source=(Component)childComponentEvent.getSource();	//get the removed component
-				if(source instanceof PrototypeProvider)	//if the removed child is a prototype provider
+				boolean modifiedPrototypeProviders=false;	//keep track of whether we modified prototype providers; if so, we'll need to reprocess the prototype provisions
+				final Object component=childComponentEvent.getComponent();	//get the removed component
+				if(component instanceof PrototypeProvider)	//if the removed child is a prototype provider
 				{
-					removePrototypeProvider((PrototypeProvider)source);	//remove the prototype provider; this will have no effect if we weren't managing it to begin with, so it's not worth it to check ahead of time
+					if(removePrototypeProvider((PrototypeProvider)component))	//remove the prototype provider; this will have no effect if we weren't managing it to begin with, so it's not worth it to check ahead of time; if this was one of our prototype providers
+					{
+						modifiedPrototypeProviders=true;	//show that we now need to process prototype provisions
+					}
+				}
+				else if(component instanceof CompositeComponent)	//if the removed child is not a prototype provider, if it is a composite component it may have child prototype providers; make sure those are removed
+				{
+					for(final PrototypeProvider prototypeProvider:Components.getChildComponents((CompositeComponent)component, PrototypeProvider.class, new ArrayList<PrototypeProvider>(), true, false))	//get all the top-level descendant prototype provider components of the component
+					{
+						if(removePrototypeProvider(prototypeProvider))	//remove this prototype provider; if this is a new prototype provider
+						{
+							modifiedPrototypeProviders=true;	//show that we now need to process prototype provisions
+						}
+					}
+				}
+				if(modifiedPrototypeProviders)	//if we removed one or more prototype providers
+				{
+					processPrototypeProvisions();	//process the prototype provisions, now that we have different prototype providers
 				}
 			}
 		};

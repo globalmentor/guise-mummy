@@ -176,6 +176,7 @@
 		"theme.label.submit"="Submit",
 		"theme.label.subtract"="Subtract",
 		"theme.label.total"="Total",
+		"theme.label.type"="Type",
 		"theme.label.unknown"="Unknown",
 		"theme.label.upload"="Upload",
 		"theme.label.upload.to.x"="\“theme.label.upload\” to {0}",

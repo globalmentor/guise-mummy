@@ -280,6 +280,7 @@ public class Theme extends URFListResource<Rule>
 	public final static String LABEL_SUBMIT=createStringResourceReference("theme.label.submit");
 	public final static String LABEL_SUBTRACT=createStringResourceReference("theme.label.subtract");
 	public final static String LABEL_TOTAL=createStringResourceReference("theme.label.total");
+	public final static String LABEL_TYPE=createStringResourceReference("theme.label.type");
 	public final static String LABEL_UNKNOWN=createStringResourceReference("theme.label.unknown");
 	public final static String LABEL_UPLOAD=createStringResourceReference("theme.label.upload");
 	public final static String LABEL_UPLOAD_TO_X=createStringResourceReference("theme.label.upload.to.x");

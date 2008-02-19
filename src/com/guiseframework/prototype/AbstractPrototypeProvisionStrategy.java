@@ -29,16 +29,19 @@ public abstract class AbstractPrototypeProvisionStrategy extends ReentrantReadWr
 		/**Add a prototoype provider to be managed.
 		If the prototype provider is already being managed, no action occurs. 
 		@param prototypeProvider The prototype provider to add.
+		@return <code>true</code> if the prototype provider was not already being managed.
 		*/
-		protected void addPrototypeProvider(final PrototypeProvider prototypeProvider)
+		protected boolean addPrototypeProvider(final PrototypeProvider prototypeProvider)
 		{
 			writeLock().lock();	//get a write lock
 			try
 			{
-				if(prototypeProviders.add(prototypeProvider))	//add this prototype provider to our set; if we weren't already managing it
+				final boolean result=prototypeProviders.add(prototypeProvider);	//add this prototype provider to our set
+				if(result)	//if we weren't already managing it
 				{
 					prototypeProvider.addPropertyChangeListener(PrototypeProvider.PROTOTYPE_PROVISIONS_PROPERTY, prototypeProvisionsChangeListener);	//listen for changes to this prototype producer's prototype provisions
 				}
+				return result;	//return whether we actually added a prototype provider
 			}
 			finally
 			{
@@ -49,16 +52,19 @@ public abstract class AbstractPrototypeProvisionStrategy extends ReentrantReadWr
 		/**Removes a prototoype provider being managed.
 		If the prototype provider is not being managed, no action occurs. 
 		@param prototypeProvider The prototype provider to remove.
+		@return <code>true</code> if the prototype provider was not already being managed.
 		*/
-		protected void removePrototypeProvider(final PrototypeProvider prototypeProvider)
+		protected boolean removePrototypeProvider(final PrototypeProvider prototypeProvider)
 		{
 			writeLock().lock();	//get a write lock
 			try
 			{
-				if(prototypeProviders.remove(prototypeProvider))	//remove this prototype provider from our set; if we were managing it
+				final boolean result=prototypeProviders.remove(prototypeProvider);	//remove this prototype provider from our set
+				if(result)	//if we were managing it
 				{
 					prototypeProvider.removePropertyChangeListener(PrototypeProvider.PROTOTYPE_PROVISIONS_PROPERTY, prototypeProvisionsChangeListener);	//stop listening for changes to this prototype producer's prototype provisions
 				}
+				return result;	//return whether we actually removed a prototype provider
 			}
 			finally
 			{
