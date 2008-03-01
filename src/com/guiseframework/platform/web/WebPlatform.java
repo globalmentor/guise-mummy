@@ -5,10 +5,10 @@ import java.util.Queue;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.io.ContentTypeConstants;
-import com.garretwilson.io.ContentTypes;
 import com.garretwilson.net.URIPath;
 
+import com.globalmentor.io.ContentTypeConstants;
+import com.globalmentor.io.ContentTypes;
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.platform.*;
 

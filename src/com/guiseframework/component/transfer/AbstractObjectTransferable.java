@@ -2,11 +2,11 @@ package com.guiseframework.component.transfer;
 
 import javax.mail.internet.*;
 
-import com.garretwilson.io.ContentTypeConstants;
-import com.garretwilson.io.ContentTypes;
+import com.globalmentor.io.ContentTypeConstants;
+import com.globalmentor.io.ContentTypes;
 
-import static com.garretwilson.io.ContentTypeConstants.*;
-import static com.garretwilson.io.ContentTypes.*;
+import static com.globalmentor.io.ContentTypeConstants.*;
+import static com.globalmentor.io.ContentTypes.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 

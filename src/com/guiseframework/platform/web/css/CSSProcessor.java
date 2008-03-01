@@ -7,7 +7,7 @@ import static com.globalmentor.java.Strings.*;
 import java.io.*;
 import java.util.*;
 
-import com.garretwilson.io.*;
+import com.globalmentor.io.*;
 import com.globalmentor.util.NameValuePair;
 
 /**Class to parse CSS stylesheets in order to manipulate them within Guise.

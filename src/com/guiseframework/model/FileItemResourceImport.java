@@ -4,8 +4,8 @@ import java.io.*;
 
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.io.ContentTypes.*;
-import static com.garretwilson.io.Files.*;
+import static com.globalmentor.io.ContentTypes.*;
+import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Objects.*;
 
 import org.apache.commons.fileupload.FileItem;

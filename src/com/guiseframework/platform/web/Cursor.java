@@ -5,8 +5,6 @@ import java.util.*;
 import static java.util.Collections.*;
 
 
-import static com.garretwilson.io.FileConstants.*;
-import static com.garretwilson.io.Files.*;
 import com.garretwilson.text.xml.stylesheets.css.XMLCSSCursor;
 
 import com.guiseframework.component.layout.*;
@@ -14,6 +12,8 @@ import com.guiseframework.geometry.CompassPoint;
 
 import com.guiseframework.GuiseApplication;
 
+import static com.globalmentor.io.FileConstants.*;
+import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.GuiseApplication.*;

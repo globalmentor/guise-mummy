@@ -6,8 +6,8 @@ import java.net.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.garretwilson.io.InputStreamUtilities.*;
 import static com.garretwilson.net.URIs.*;
+import static com.globalmentor.io.InputStreamUtilities.*;
 import static com.globalmentor.java.Characters.*;
 
 /**The singleton Guise class.

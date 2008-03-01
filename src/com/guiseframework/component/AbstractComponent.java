@@ -13,7 +13,7 @@ import static com.garretwilson.text.TextUtilities.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.util.Arrays.*;
 
-import com.globalmentor.beans.TargetedEvent;
+import com.globalmentor.event.TargetedEvent;
 import com.globalmentor.java.*;
 import com.globalmentor.urf.URFResource;
 import com.globalmentor.urf.ploop.*;

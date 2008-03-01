@@ -4,12 +4,12 @@ import java.beans.PropertyVetoException;
 
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.io.ContentTypeConstants.*;
-import static com.garretwilson.io.ContentTypes.*;
 import static com.garretwilson.text.TextConstants.*;
+import static com.globalmentor.io.ContentTypeConstants.*;
+import static com.globalmentor.io.ContentTypes.*;
 import static com.globalmentor.java.Classes.*;
 
-import com.garretwilson.io.ContentTypes;
+import com.globalmentor.io.ContentTypes;
 import com.guiseframework.component.transfer.*;
 import com.guiseframework.converter.*;
 import com.guiseframework.model.*;

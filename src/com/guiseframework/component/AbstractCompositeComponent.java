@@ -8,6 +8,7 @@ import static com.globalmentor.java.Objects.*;
 
 
 import com.globalmentor.beans.*;
+import com.globalmentor.event.TargetedEvent;
 import com.globalmentor.util.Debug;
 import com.guiseframework.event.*;
 import com.guiseframework.input.*;

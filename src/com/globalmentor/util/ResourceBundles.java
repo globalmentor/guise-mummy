@@ -20,17 +20,17 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import com.garretwilson.io.IO;
-import static com.garretwilson.io.FileConstants.*;
-import static com.garretwilson.io.Files.*;
 import static com.garretwilson.net.URIConstants.*;
 
 import com.garretwilson.net.Resource;
 import com.garretwilson.rdf.*;
+import com.globalmentor.io.IO;
 import com.globalmentor.urf.*;
 
 import static com.garretwilson.rdf.RDFUtilities.*;
 
+import static com.globalmentor.io.FileConstants.*;
+import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Java.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.urf.TURF.*;

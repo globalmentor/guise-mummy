@@ -10,10 +10,7 @@ import static java.util.Collections.*;
 import javax.mail.internet.ContentType;
 import javax.servlet.http.HttpServletResponse;
 
-import static com.garretwilson.io.ContentTypeConstants.*;
-import static com.garretwilson.io.ContentTypes.*;
 
-import com.garretwilson.io.ParseReader;
 import com.garretwilson.servlet.http.HttpServletUtilities;
 import com.garretwilson.text.CharacterEncoding;
 import static com.garretwilson.text.FormatUtilities.*;
@@ -21,10 +18,13 @@ import com.garretwilson.text.xml.QualifiedName;
 import static com.garretwilson.text.CharacterEncoding.*;
 import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
+import com.globalmentor.io.ParseReader;
 import com.globalmentor.util.*;
 import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 
+import static com.globalmentor.io.ContentTypeConstants.*;
+import static com.globalmentor.io.ContentTypes.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.util.Arrays.*;
 import static com.guiseframework.platform.web.WebPlatform.*;

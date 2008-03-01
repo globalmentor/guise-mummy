@@ -5,7 +5,7 @@ import static java.util.Collections.*;
 
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.io.Files.*;
+import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.util.Collections.*;
 

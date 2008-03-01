@@ -2,7 +2,7 @@ package net.marmox.guise.component;
 
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.io.ContentTypes.*;
+import static com.globalmentor.io.ContentTypes.*;
 
 import com.guiseframework.component.Component;
 

@@ -10,8 +10,8 @@ import com.garretwilson.net.URIPath;
 import com.garretwilson.net.http.HTTPNotFoundException;
 import com.garretwilson.net.http.HTTPResource;
 
-import static com.garretwilson.io.Files.*;
 import static com.garretwilson.net.URIs.*;
+import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
 
