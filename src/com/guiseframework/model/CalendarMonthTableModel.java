@@ -3,13 +3,14 @@ package com.guiseframework.model;
 import java.text.DateFormat;
 import java.util.*;
 
-import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
-import com.garretwilson.beans.GenericPropertyChangeEvent;
 
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Integers.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.util.Calendars.*;
+
+import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
+import com.globalmentor.beans.GenericPropertyChangeEvent;
 import com.globalmentor.util.Debug;
 
 import com.guiseframework.Guise;

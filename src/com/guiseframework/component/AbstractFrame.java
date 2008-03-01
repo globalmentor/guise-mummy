@@ -4,12 +4,12 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.util.*;
 
-import com.garretwilson.beans.GenericPropertyChangeListener;
 
 import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.GuiseResourceConstants.*;
 import static com.guiseframework.theme.Theme.*;
 
+import com.globalmentor.beans.GenericPropertyChangeListener;
 import com.globalmentor.java.Objects;
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.event.*;

@@ -13,7 +13,6 @@ import java.util.concurrent.*;
 import javax.mail.*;
 import javax.mail.Message;
 
-import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.io.*;
 import static com.garretwilson.io.FileConstants.*;
 import static com.garretwilson.io.Files.*;
@@ -33,6 +32,7 @@ import static com.globalmentor.util.Locales.*;
 import static com.guiseframework.Guise.*;
 import static com.guiseframework.GuiseResourceConstants.*;
 
+import com.globalmentor.beans.BoundPropertyObject;
 import com.globalmentor.java.Objects;
 import com.globalmentor.urf.*;
 import com.globalmentor.util.*;

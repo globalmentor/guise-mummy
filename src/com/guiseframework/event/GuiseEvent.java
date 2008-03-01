@@ -1,6 +1,6 @@
 package com.guiseframework.event;
 
-import com.garretwilson.event.Event;
+import com.globalmentor.event.Event;
 import com.guiseframework.GuiseSession;
 
 /**A Guise event.

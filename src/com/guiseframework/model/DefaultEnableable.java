@@ -1,6 +1,6 @@
 package com.guiseframework.model;
 
-import com.garretwilson.beans.BoundPropertyObject;
+import com.globalmentor.beans.BoundPropertyObject;
 
 /**A default implementation of an object that can be enabled or disabled.
 @author Garret Wilson

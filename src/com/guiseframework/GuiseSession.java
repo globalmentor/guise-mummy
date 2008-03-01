@@ -7,10 +7,10 @@ import java.security.Principal;
 import java.text.MessageFormat;
 import java.util.*;
 
-import com.garretwilson.beans.PropertyBindable;
-import com.garretwilson.event.PostponedEvent;
 import com.garretwilson.net.URIConstants;
 import com.garretwilson.net.URIPath;
+import com.globalmentor.beans.PropertyBindable;
+import com.globalmentor.event.PostponedEvent;
 import com.globalmentor.urf.URFResource;
 import com.globalmentor.util.DataException;
 import com.guiseframework.component.*;

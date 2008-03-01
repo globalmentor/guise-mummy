@@ -3,7 +3,7 @@ package com.guiseframework.model;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 
-import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.globalmentor.beans.GenericPropertyChangeEvent;
 import com.guiseframework.validator.*;
 
 import static com.globalmentor.java.Objects.*;

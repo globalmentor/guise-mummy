@@ -8,8 +8,8 @@ import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.theme.Theme.*;
 
-import com.garretwilson.beans.*;
 
+import com.globalmentor.beans.*;
 import com.globalmentor.util.*;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.Border;

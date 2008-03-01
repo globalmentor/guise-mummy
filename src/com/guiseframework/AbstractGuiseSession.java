@@ -10,11 +10,11 @@ import static java.text.MessageFormat.*;
 import java.util.*;
 import static java.util.Collections.*;
 
-import com.garretwilson.beans.*;
 import com.garretwilson.io.BOMInputStreamReader;
 import com.garretwilson.net.URIConstants;
 import com.garretwilson.net.URIPath;
 import com.garretwilson.text.CharacterEncoding;
+import com.globalmentor.beans.*;
 import com.globalmentor.java.Objects;
 import com.globalmentor.urf.*;
 import com.globalmentor.urf.ploop.PLOOPURFProcessor;

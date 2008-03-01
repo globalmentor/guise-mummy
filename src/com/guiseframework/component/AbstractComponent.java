@@ -9,11 +9,11 @@ import java.util.concurrent.*;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.beans.TargetedEvent;
 import static com.garretwilson.text.TextUtilities.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.util.Arrays.*;
 
+import com.globalmentor.beans.TargetedEvent;
 import com.globalmentor.java.*;
 import com.globalmentor.urf.URFResource;
 import com.globalmentor.urf.ploop.*;

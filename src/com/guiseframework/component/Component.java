@@ -4,10 +4,10 @@ import java.io.IOException;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.beans.TargetedEvent;
 
 import static com.globalmentor.java.Classes.*;
 
+import com.globalmentor.beans.TargetedEvent;
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.effect.Effect;

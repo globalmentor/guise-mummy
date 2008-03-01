@@ -2,7 +2,7 @@ package com.guiseframework.model;
 
 import java.beans.PropertyChangeEvent;
 
-import com.garretwilson.beans.*;
+import com.globalmentor.beans.*;
 
 /**An abstract implementation of a group of value models implementing a value policy across several models, such as mutual exclusion.
 When value models are added to the list, the group adds itself as a property value change listeners to the model, listening for changes in the value.

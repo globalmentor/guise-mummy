@@ -2,10 +2,10 @@ package com.guiseframework.component;
 
 import java.beans.PropertyChangeListener;
 
-import com.garretwilson.beans.GenericPropertyChangeListener;
 
 import static com.globalmentor.java.Classes.*;
 
+import com.globalmentor.beans.GenericPropertyChangeListener;
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.prototype.*;
 

@@ -1,9 +1,9 @@
 package com.guiseframework.component;
 
-import com.garretwilson.beans.*;
 
 import static com.globalmentor.java.Objects.*;
 
+import com.globalmentor.beans.*;
 import com.globalmentor.java.Objects;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;

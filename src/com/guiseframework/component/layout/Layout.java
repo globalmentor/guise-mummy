@@ -1,6 +1,6 @@
 package com.guiseframework.component.layout;
 
-import com.garretwilson.beans.PropertyBindable;
+import com.globalmentor.beans.PropertyBindable;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.LayoutComponent;

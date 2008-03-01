@@ -2,7 +2,7 @@ package com.guiseframework.prototype;
 
 import java.util.Set;
 
-import com.garretwilson.beans.PropertyBindable;
+import com.globalmentor.beans.PropertyBindable;
 
 import static com.globalmentor.java.Classes.*;
 

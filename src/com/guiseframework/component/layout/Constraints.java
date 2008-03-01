@@ -1,6 +1,6 @@
 package com.guiseframework.component.layout;
 
-import com.garretwilson.beans.PropertyBindable;
+import com.globalmentor.beans.PropertyBindable;
 
 /**Constraint information about individual component layout.
 @author Garret Wilson

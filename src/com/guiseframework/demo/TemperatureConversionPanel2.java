@@ -2,9 +2,9 @@ package com.guiseframework.demo;
 
 import java.beans.PropertyVetoException;
 
-import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
-import com.garretwilson.beans.GenericPropertyChangeEvent;
-import com.garretwilson.beans.GenericPropertyChangeListener;
+import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
+import com.globalmentor.beans.GenericPropertyChangeEvent;
+import com.globalmentor.beans.GenericPropertyChangeListener;
 import com.guiseframework.component.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;

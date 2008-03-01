@@ -2,8 +2,8 @@ package com.guiseframework.model;
 
 import java.beans.PropertyVetoException;
 
-import com.garretwilson.beans.*;
 
+import com.globalmentor.beans.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.FlowOrientation;
 import com.guiseframework.event.*;

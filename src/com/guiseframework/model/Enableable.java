@@ -2,7 +2,7 @@ package com.guiseframework.model;
 
 import static com.globalmentor.java.Classes.*;
 
-import com.garretwilson.beans.PropertyBindable;
+import com.globalmentor.beans.PropertyBindable;
 
 /**An object that can be enabled or disabled.
 @author Garret Wilson

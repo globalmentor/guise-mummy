@@ -2,8 +2,8 @@ package com.guiseframework.component;
 
 import java.beans.PropertyVetoException;
 
-import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
-import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
+import com.globalmentor.beans.GenericPropertyChangeEvent;
 import com.globalmentor.util.Debug;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseSession;

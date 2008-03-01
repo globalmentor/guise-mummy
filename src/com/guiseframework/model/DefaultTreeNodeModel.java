@@ -3,7 +3,7 @@ package com.guiseframework.model;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.garretwilson.beans.TargetedEvent;
+import com.globalmentor.beans.TargetedEvent;
 import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
 import com.guiseframework.event.EventListenerManager;

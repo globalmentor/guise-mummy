@@ -5,7 +5,7 @@ import static com.globalmentor.java.Objects.*;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.beans.BoundPropertyObject;
+import com.globalmentor.beans.BoundPropertyObject;
 import com.guiseframework.event.*;
 
 /**A base abstract class implementing helpful functionality for models.

@@ -7,7 +7,7 @@ import java.util.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.event.EventListenerManager;
+import com.globalmentor.event.EventListenerManager;
 import com.guiseframework.converter.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;

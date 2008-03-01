@@ -1,6 +1,6 @@
 package com.guiseframework.event;
 
-import com.garretwilson.beans.BoundPropertyObject;
+import com.globalmentor.beans.BoundPropertyObject;
 import com.guiseframework.Guise;
 import com.guiseframework.GuiseSession;
 

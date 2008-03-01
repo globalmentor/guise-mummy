@@ -4,8 +4,8 @@ import java.util.*;
 
 import static java.util.Collections.*;
 
-import com.garretwilson.beans.BoundPropertyObject;
 
+import com.globalmentor.beans.BoundPropertyObject;
 import com.globalmentor.java.Objects;
 
 /**An abstract implementation of a prototype provider.

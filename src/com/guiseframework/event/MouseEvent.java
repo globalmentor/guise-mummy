@@ -1,6 +1,6 @@
 package com.guiseframework.event;
 
-import com.garretwilson.beans.TargetedEvent;
+import com.globalmentor.beans.TargetedEvent;
 import com.guiseframework.geometry.*;
 
 /**An event providing mouse information.

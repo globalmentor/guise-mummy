@@ -6,7 +6,7 @@ import java.util.*;
 
 import static java.util.Collections.*;
 
-import com.garretwilson.beans.BoundPropertyObject;
+import com.globalmentor.beans.BoundPropertyObject;
 import com.globalmentor.urf.URFResource;
 import com.guiseframework.*;
 import com.guiseframework.theme.Theme;

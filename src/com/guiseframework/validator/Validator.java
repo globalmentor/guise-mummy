@@ -2,7 +2,7 @@ package com.guiseframework.validator;
 
 import static com.globalmentor.java.Classes.*;
 
-import com.garretwilson.beans.PropertyBindable;
+import com.globalmentor.beans.PropertyBindable;
 import com.guiseframework.GuiseResourceConstants;
 import com.guiseframework.GuiseSession;
 

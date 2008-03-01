@@ -1,7 +1,7 @@
 package com.guiseframework.component;
 
-import com.garretwilson.beans.*;
 
+import com.globalmentor.beans.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 

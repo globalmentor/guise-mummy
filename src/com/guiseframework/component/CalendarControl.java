@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.beans.*;
+import com.globalmentor.beans.*;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.Table.CellRepresentationStrategy;
 import com.guiseframework.component.layout.Flow;

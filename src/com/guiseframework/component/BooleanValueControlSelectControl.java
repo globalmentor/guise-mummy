@@ -5,10 +5,11 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.garretwilson.beans.*;
 
 import static com.globalmentor.java.Integers.*;
 import static com.globalmentor.java.Objects.*;
+
+import com.globalmentor.beans.*;
 import com.globalmentor.util.Arrays;
 
 import com.guiseframework.GuiseApplication;

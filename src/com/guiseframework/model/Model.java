@@ -2,9 +2,9 @@ package com.guiseframework.model;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.beans.*;
 import com.garretwilson.text.TextConstants;
 import com.garretwilson.text.xml.xhtml.XHTML;
+import com.globalmentor.beans.*;
 
 /**Base interface for all component models.
 @author Garret Wilson

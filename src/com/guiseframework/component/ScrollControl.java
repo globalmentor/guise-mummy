@@ -2,8 +2,8 @@ package com.guiseframework.component;
 
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
-import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
+import com.globalmentor.beans.GenericPropertyChangeEvent;
 import com.guiseframework.model.*;
 
 /**A control that allows the user to scroll its contents

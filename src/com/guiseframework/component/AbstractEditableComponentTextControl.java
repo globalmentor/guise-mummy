@@ -2,11 +2,11 @@ package com.guiseframework.component;
 
 import java.beans.*;
 
-import com.garretwilson.beans.*;
 
 import static com.globalmentor.java.Objects.*;
 
 
+import com.globalmentor.beans.*;
 import com.globalmentor.util.Debug;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;

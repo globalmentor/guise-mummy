@@ -6,10 +6,10 @@ import java.util.*;
 
 import javax.mail.*;
 
-import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.io.IOOperation;
 import com.garretwilson.net.URIPath;
 import com.garretwilson.net.URIs;
+import com.globalmentor.beans.PropertyBindable;
 import com.guiseframework.component.ApplicationFrame;
 import com.guiseframework.platform.*;
 import com.guiseframework.theme.Theme;

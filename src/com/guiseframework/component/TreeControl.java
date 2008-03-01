@@ -3,12 +3,12 @@ package com.guiseframework.component;
 import java.util.*;
 import java.util.concurrent.*;
 
-import com.garretwilson.beans.*;
 
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 
 
+import com.globalmentor.beans.*;
 import com.globalmentor.util.Debug;
 import com.guiseframework.component.transfer.*;
 import com.guiseframework.converter.*;

@@ -5,8 +5,8 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.List;
 
-import com.garretwilson.beans.*;
 
+import com.globalmentor.beans.*;
 import com.globalmentor.util.Debug;
 import com.guiseframework.Bookmark;
 

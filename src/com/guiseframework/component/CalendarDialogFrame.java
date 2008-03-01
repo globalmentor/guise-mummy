@@ -3,8 +3,8 @@ package com.guiseframework.component;
 import java.beans.PropertyVetoException;
 import java.util.Date;
 
-import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
-import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
+import com.globalmentor.beans.GenericPropertyChangeEvent;
 import com.guiseframework.model.DefaultValueModel;
 import com.guiseframework.model.ValueModel;
 import com.guiseframework.validator.ValidationException;

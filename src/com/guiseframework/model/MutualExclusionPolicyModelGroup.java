@@ -3,7 +3,7 @@ package com.guiseframework.model;
 import java.beans.PropertyVetoException;
 import java.util.*;
 
-import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.globalmentor.beans.GenericPropertyChangeEvent;
 
 /**A group that ensures that only one boolean model in the group is set to <code>true</code> at the same time.
 This class is declared final because it represents a particular defined semantics, no more and no less.

@@ -2,7 +2,7 @@ package com.guiseframework.platform;
 
 import java.net.URI;
 
-import com.garretwilson.beans.PropertyBindable;
+import com.globalmentor.beans.PropertyBindable;
 import com.guiseframework.*;
 
 /**Encapsulation of information related to the current depiction.

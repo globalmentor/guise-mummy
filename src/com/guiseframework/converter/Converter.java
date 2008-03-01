@@ -2,7 +2,7 @@ package com.guiseframework.converter;
 
 import static com.globalmentor.java.Classes.*;
 
-import com.garretwilson.beans.PropertyBindable;
+import com.globalmentor.beans.PropertyBindable;
 import com.guiseframework.GuiseSession;
 
 /**Indicates an object that can convert a value from and to its lexical form.

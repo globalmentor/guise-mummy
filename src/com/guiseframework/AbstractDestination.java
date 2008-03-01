@@ -5,8 +5,8 @@ import java.util.*;
 import static java.util.Collections.*;
 import java.util.regex.Pattern;
 
-import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.net.*;
+import com.globalmentor.beans.BoundPropertyObject;
 import com.globalmentor.java.Objects;
 
 import static com.garretwilson.net.URIConstants.PATH_SEPARATOR;

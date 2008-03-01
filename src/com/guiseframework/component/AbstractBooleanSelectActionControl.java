@@ -3,8 +3,8 @@ package com.guiseframework.component;
 import java.beans.PropertyVetoException;
 import java.net.URI;
 
-import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
-import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
+import com.globalmentor.beans.GenericPropertyChangeEvent;
 import com.globalmentor.java.Objects;
 import com.guiseframework.model.*;
 import static com.guiseframework.theme.Theme.*;

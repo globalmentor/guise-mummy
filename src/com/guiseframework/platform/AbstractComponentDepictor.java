@@ -3,7 +3,7 @@ package com.guiseframework.platform;
 import java.beans.*;
 import java.io.IOException;
 
-import com.garretwilson.beans.PropertyBindable;
+import com.globalmentor.beans.PropertyBindable;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Layout;
 import com.guiseframework.component.transfer.Transferable;

@@ -5,8 +5,8 @@ import static com.globalmentor.java.Classes.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 
-import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
-import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
+import com.globalmentor.beans.GenericPropertyChangeEvent;
 import com.globalmentor.java.Objects;
 import com.globalmentor.util.Debug;
 import com.guiseframework.component.*;

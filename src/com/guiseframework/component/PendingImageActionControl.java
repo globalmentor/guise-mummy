@@ -2,8 +2,8 @@ package com.guiseframework.component;
 
 import java.net.URI;
 
-import com.garretwilson.beans.*;
 
+import com.globalmentor.beans.*;
 import com.globalmentor.java.Objects;
 import com.guiseframework.model.*;
 import static com.guiseframework.theme.Theme.*;

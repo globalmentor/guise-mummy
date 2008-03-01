@@ -2,7 +2,7 @@ package com.guiseframework.component.layout;
 
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.globalmentor.beans.GenericPropertyChangeEvent;
 import com.guiseframework.component.Component;
 
 /**An event indicating that a property of layout constraints changed.

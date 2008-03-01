@@ -2,7 +2,7 @@ package com.guiseframework.model;
 
 import static com.globalmentor.java.Classes.*;
 
-import com.garretwilson.beans.TargetedEvent;
+import com.globalmentor.beans.TargetedEvent;
 
 /**A node in a tree model.
 Property change events and action events on one tree node will be bubbled up the hierarchy, with the tree node initiating the event accessible via {@link TargetedEvent#getTarget()}.
