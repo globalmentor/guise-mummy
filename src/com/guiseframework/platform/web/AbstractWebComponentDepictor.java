@@ -11,8 +11,8 @@ import javax.mail.internet.ContentType;
 
 
 import com.garretwilson.text.xml.xhtml.XHTML;
-import com.garretwilson.util.Debug;
-import com.garretwilson.util.NameValuePair;
+import com.globalmentor.util.Debug;
+import com.globalmentor.util.NameValuePair;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;

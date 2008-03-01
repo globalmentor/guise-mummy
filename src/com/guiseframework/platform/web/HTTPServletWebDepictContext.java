@@ -20,13 +20,13 @@ import static com.garretwilson.text.FormatUtilities.*;
 import com.garretwilson.text.xml.QualifiedName;
 import static com.garretwilson.text.CharacterEncoding.*;
 import static com.garretwilson.text.xml.xhtml.XHTML.*;
-import com.garretwilson.util.*;
-import static com.garretwilson.util.ArrayUtilities.*;
 
+import com.globalmentor.util.*;
 import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.util.Arrays.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
 import com.guiseframework.platform.web.css.*;
 import com.guiseframework.platform.web.css.GuiseCSSProcessor.IE6FixClass;

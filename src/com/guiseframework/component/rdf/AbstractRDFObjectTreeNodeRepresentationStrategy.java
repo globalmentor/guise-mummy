@@ -3,7 +3,7 @@ package com.guiseframework.component.rdf;
 import static com.globalmentor.java.Objects.*;
 
 import com.garretwilson.rdf.*;
-import com.garretwilson.util.Debug;
+import com.globalmentor.util.Debug;
 import com.guiseframework.component.Label;
 import com.guiseframework.component.SelectableLabel;
 import com.guiseframework.component.TreeControl;

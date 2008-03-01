@@ -2,8 +2,8 @@ package com.guiseframework.prototype;
 
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.util.AbstractHashObject;
-import com.garretwilson.util.Debug;
+import com.globalmentor.util.AbstractHashObject;
+import com.globalmentor.util.Debug;
 
 /**Prototype provision information indicating order, hierarchy, and location for generated components.
 This description is usually used to generate components and place them in menus and/or toolbars. 

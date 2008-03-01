@@ -5,7 +5,7 @@ import java.util.*;
 import static java.util.Collections.*;
 
 import com.garretwilson.rdf.*;
-import com.garretwilson.util.Debug;
+import com.globalmentor.util.Debug;
 import com.guiseframework.model.*;
 
 import static com.garretwilson.rdf.RDFConstants.*;

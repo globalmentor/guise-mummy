@@ -7,7 +7,7 @@ import static com.globalmentor.java.Objects.*;
 import java.util.*;
 
 import com.garretwilson.iso.idcard.*;
-import com.garretwilson.util.ArrayUtilities;
+import com.globalmentor.util.Arrays;
 
 /**A validator to validate a Primary Account Number (PAN) of an identification card
 	as defined in ISO/IEC 7812-1:2000(E),
@@ -107,7 +107,7 @@ public class PANValidator extends AbstractValidator<PAN>	//TODO add http://www.d
 			{
 				throwInvalidValueValidationException(value);	//this isn't one of the values we accept TODO create specific message
 			}
-			if(!ArrayUtilities.contains(product.getPANLengths(), value.toString().length()))	//if this product doesn't accept this PAN length
+			if(!Arrays.contains(product.getPANLengths(), value.toString().length()))	//if this product doesn't accept this PAN length
 			{
 				throwInvalidValueValidationException(value);	//indicate that the PAN is invalid for this product TODO create specific message
 			}

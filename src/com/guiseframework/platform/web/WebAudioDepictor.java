@@ -6,8 +6,8 @@ import java.util.Map;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.util.*;
 
+import com.globalmentor.util.*;
 import com.guiseframework.audio.Audio;
 import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.DepictEvent;

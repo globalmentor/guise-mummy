@@ -12,8 +12,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static java.util.Collections.*;
 
 import com.garretwilson.beans.*;
-import com.garretwilson.util.Debug;
 import com.globalmentor.java.Objects;
+import com.globalmentor.util.Debug;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;

@@ -3,7 +3,8 @@ package com.guiseframework.platform.web;
 import java.util.*;
 
 import static com.garretwilson.text.FormatUtilities.*;
-import com.garretwilson.util.*;
+
+import com.globalmentor.util.*;
 
 /**Indicates the submission of a full or partial form on the web platform
 @author Garret Wilson

@@ -9,7 +9,7 @@ import javax.servlet.http.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.util.Debug;
+import com.globalmentor.util.Debug;
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.GuiseSession;
 

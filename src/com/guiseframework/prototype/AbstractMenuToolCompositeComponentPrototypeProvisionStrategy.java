@@ -2,8 +2,8 @@ package com.guiseframework.prototype;
 
 import java.util.*;
 
-import com.garretwilson.util.*;
 
+import com.globalmentor.util.*;
 import com.guiseframework.component.*;
 import static com.guiseframework.component.Components.*;
 

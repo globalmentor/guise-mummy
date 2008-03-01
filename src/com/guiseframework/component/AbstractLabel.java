@@ -2,7 +2,7 @@ package com.guiseframework.component;
 
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.util.ArrayUtilities.*;
+import static com.globalmentor.util.Arrays.*;
 
 import com.guiseframework.component.transfer.*;
 import com.guiseframework.model.*;

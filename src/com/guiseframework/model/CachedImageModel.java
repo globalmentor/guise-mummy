@@ -6,8 +6,8 @@ import java.net.URI;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.util.*;
 import com.globalmentor.java.Objects;
+import com.globalmentor.util.*;
 
 /**An image model that can initiate retrieval of an image from a cache and update the image when fetching succeeds.
 @param <K> The type of key used to lookup data in the cache.

@@ -3,9 +3,9 @@ package com.guiseframework.model;
 import java.util.*;
 import static java.util.Collections.*;
 
-import static com.garretwilson.util.ArrayUtilities.*;
+import static com.globalmentor.util.Arrays.*;
 
-import com.garretwilson.util.SynchronizedListDecorator;
+import com.globalmentor.util.SynchronizedListDecorator;
 
 /**The default implementation of a table model.
 The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class. 

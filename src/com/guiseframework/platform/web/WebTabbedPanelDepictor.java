@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.util.Set;
 
 import static com.garretwilson.net.URIs.*;
-import com.garretwilson.util.NameValuePair;
 import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
+import com.globalmentor.util.NameValuePair;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.model.Notification;

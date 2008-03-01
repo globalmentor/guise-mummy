@@ -13,16 +13,17 @@ import static com.garretwilson.text.xml.XML.*;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import com.garretwilson.text.xml.xhtml.XHTML;
-import com.garretwilson.util.Debug;
-import com.garretwilson.util.NameValuePair;
+import com.globalmentor.util.Debug;
+import com.globalmentor.util.NameValuePair;
 import com.guiseframework.*;
+
+import static com.globalmentor.util.Locales.*;
 import static com.guiseframework.GuiseApplication.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.Axis;
 import com.guiseframework.model.*;
 
-import static com.garretwilson.util.LocaleUtilities.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
 

@@ -3,7 +3,7 @@ package com.guiseframework.platform;
 import java.io.IOException;
 import java.net.URI;
 
-import com.garretwilson.util.StringTemplate;
+import com.globalmentor.util.StringTemplate;
 
 /**Encapsulation of application/xhtml+xml information related to the current depiction.
 @author Garret Wilson

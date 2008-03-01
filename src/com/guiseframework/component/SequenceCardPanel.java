@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.util.List;
 
 import com.garretwilson.beans.*;
-import com.garretwilson.util.Debug;
 
+import com.globalmentor.util.Debug;
 import com.guiseframework.Bookmark;
 
 import static com.globalmentor.java.Classes.*;

@@ -4,11 +4,11 @@ import java.util.*;
 import static java.util.Collections.*;
 
 import com.garretwilson.javascript.JSON;
-import static com.garretwilson.util.MapUtilities.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.util.Maps.*;
 
-import com.garretwilson.util.NameValuePair;
 
+import com.globalmentor.util.NameValuePair;
 import com.guiseframework.platform.DepictedObject;
 
 /**Indicates that one or more properties of a depicted object have changed on the web platform.

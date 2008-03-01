@@ -8,8 +8,8 @@ import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 
 import com.garretwilson.net.URIPath;
-import com.garretwilson.util.*;
 
+import com.globalmentor.util.*;
 import com.guiseframework.Bookmark;
 import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.PlatformEvent;

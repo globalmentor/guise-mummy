@@ -6,7 +6,7 @@ import static java.util.Collections.*;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.garretwilson.util.SynchronizedListDecorator;
+import com.globalmentor.util.SynchronizedListDecorator;
 
 /**An abstract implementation of a table model representing selectable list values.
 The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class. 

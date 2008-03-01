@@ -6,8 +6,8 @@ import java.util.*;
 import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
-import com.garretwilson.util.NameValuePair;
 
+import com.globalmentor.util.NameValuePair;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Flow;
 import com.guiseframework.platform.*;

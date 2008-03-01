@@ -7,7 +7,7 @@ import java.util.*;
 import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.util.Debug;
+import com.globalmentor.util.Debug;
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;
 import com.guiseframework.platform.*;

@@ -8,8 +8,8 @@ import java.util.*;
 
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTML.*;
-import com.garretwilson.util.Debug;
 
+import com.globalmentor.util.Debug;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;

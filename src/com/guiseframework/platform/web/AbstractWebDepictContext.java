@@ -5,11 +5,11 @@ import java.net.URI;
 import java.util.*;
 
 import com.garretwilson.text.xml.stylesheets.css.*;
-import com.garretwilson.util.Debug;
 
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 
 import com.globalmentor.java.Integers;
+import com.globalmentor.util.Debug;
 import com.guiseframework.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.geometry.*;

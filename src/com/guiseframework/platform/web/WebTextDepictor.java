@@ -13,7 +13,7 @@ import static com.garretwilson.text.xml.XMLUtilities.*;
 import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.util.*;
+import com.globalmentor.util.*;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.Text;
 

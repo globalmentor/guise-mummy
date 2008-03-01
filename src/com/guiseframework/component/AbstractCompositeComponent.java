@@ -7,8 +7,8 @@ import com.garretwilson.beans.*;
 
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.util.Debug;
 
+import com.globalmentor.util.Debug;
 import com.guiseframework.event.*;
 import com.guiseframework.input.*;
 import com.guiseframework.model.LabelModel;

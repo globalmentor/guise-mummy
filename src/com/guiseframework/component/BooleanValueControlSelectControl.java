@@ -9,8 +9,7 @@ import com.garretwilson.beans.*;
 
 import static com.globalmentor.java.Integers.*;
 import static com.globalmentor.java.Objects.*;
-
-import com.garretwilson.util.*;
+import com.globalmentor.util.Arrays;
 
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.component.layout.*;
@@ -362,7 +361,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 					{
 						try
 						{
-							((ValueControl<Boolean>)component).setValue(Boolean.valueOf(ArrayUtilities.contains(selectedIndexes, i)));	//select or unselect this control, based upon whether this index is selected
+							((ValueControl<Boolean>)component).setValue(Boolean.valueOf(Arrays.contains(selectedIndexes, i)));	//select or unselect this control, based upon whether this index is selected
 						}
 						catch(final PropertyVetoException propertyVetoException)	//we must ignore any problems setting the new value, because transitioning between boolean controls may result in a temporary state with no controls selected or with two controls selected, temporarily violating a validator, and there's no way to know if the change is transitory
 						{

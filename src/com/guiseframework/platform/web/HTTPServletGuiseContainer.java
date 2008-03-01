@@ -17,7 +17,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import com.garretwilson.net.URIPath;
-import com.garretwilson.util.*;
+import com.globalmentor.util.*;
 import com.guiseframework.*;
 
 /**A Guise container for Guise HTTP servlets.

@@ -40,11 +40,11 @@ import static com.garretwilson.text.elff.WebTrendsConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import com.garretwilson.text.xml.xpath.*;
-import com.garretwilson.util.*;
 
 import com.globalmentor.java.Objects;
 import com.globalmentor.urf.*;
 import com.globalmentor.urf.ploop.*;
+import com.globalmentor.util.*;
 import com.guiseframework.*;
 import com.guiseframework.component.*;
 import com.guiseframework.event.*;
@@ -59,8 +59,9 @@ import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
 import static com.globalmentor.urf.content.Content.*;
 import static com.globalmentor.urf.dcmi.DCMI.*;
-import static com.guiseframework.platform.web.WebPlatform.*;
+import com.globalmentor.util.Collections;
 
+import static com.guiseframework.platform.web.WebPlatform.*;
 import com.guiseframework.platform.web.WebPlatform.PollCommand;
 import com.guiseframework.platform.web.css.*;
 
@@ -804,7 +805,7 @@ Debug.trace("got control events");
 				guiseSession.setNavigation(navigationPath, navigationBookmark, referrerURI);	//set the session navigation with the navigation bookmark, firing any navigation events if appropriate
 			}
 			final Set<Frame> removedFrames=new HashSet<Frame>();	//create a set of frames so that we can know which ones were removed TODO testing
-			CollectionUtilities.addAll(removedFrames, guiseSession.getApplicationFrame().getChildFrames().iterator());	//get all the current frames; we'll determine which ones were removed, later TODO improve all this
+			Collections.addAll(removedFrames, guiseSession.getApplicationFrame().getChildFrames().iterator());	//get all the current frames; we'll determine which ones were removed, later TODO improve all this
 			boolean isNavigating=false;	//we'll check this later to see if we're navigating so we won't have to update all the components
 			for(final GuiseEvent requestEvent:requestEvents)	//for each request event
 			{
@@ -1154,7 +1155,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 				{
 					final Collection<Component> dirtyComponents=AbstractComponent.getDirtyComponents(guiseSession.getApplicationFrame());	//get all dirty components
 
-					CollectionUtilities.removeAll(removedFrames, guiseSession.getApplicationFrame().getChildFrames().iterator());	//remove all the ending frames, leaving us the frames that were removed TODO improve all this
+					Collections.removeAll(removedFrames, guiseSession.getApplicationFrame().getChildFrames().iterator());	//remove all the ending frames, leaving us the frames that were removed TODO improve all this
 	//TODO fix					dirtyComponents.addAll(frames);	//add all the frames that were removed
 
 					Debug.trace("we now have dirty components:", dirtyComponents.size());

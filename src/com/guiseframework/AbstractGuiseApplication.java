@@ -24,18 +24,18 @@ import com.garretwilson.net.URIs;
 
 import static com.garretwilson.text.CharacterEncoding.*;
 import com.garretwilson.text.W3CDateFormat;
-import com.garretwilson.util.*;
-import static com.garretwilson.util.CalendarUtilities.*;
-import static com.garretwilson.util.LocaleUtilities.*;
 
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
 import static com.globalmentor.urf.URF.*;
+import static com.globalmentor.util.Calendars.*;
+import static com.globalmentor.util.Locales.*;
 import static com.guiseframework.Guise.*;
 import static com.guiseframework.GuiseResourceConstants.*;
 
 import com.globalmentor.java.Objects;
 import com.globalmentor.urf.*;
+import com.globalmentor.util.*;
 import com.guiseframework.component.*;
 import static com.guiseframework.Resources.*;
 import com.guiseframework.theme.Theme;
@@ -1238,7 +1238,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	{
 		final ClassLoader loader=getClass().getClassLoader();	//get our class loader
 			//default resources
-		ResourceBundle resourceBundle=ResourceBundleUtilities.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null, resourcesIO, null, null);	//load the default resource bundle
+		ResourceBundle resourceBundle=ResourceBundles.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null, resourcesIO, null, null);	//load the default resource bundle
 			//theme resources
 		resourceBundle=loadResourceBundle(theme, locale, resourceBundle);	//load any resources for this theme and resolving parents
 			//application resources
@@ -1246,7 +1246,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 //TODO del Debug.trace("ready to load application resources; resource bundle base name:", resourceBundleBaseName);
 		if(resourceBundleBaseName!=null && !resourceBundleBaseName.equals(DEFAULT_RESOURCE_BUNDLE_BASE_NAME))	//if a distinct resource bundle base name was specified
 		{
-			resourceBundle=ResourceBundleUtilities.getResourceBundle(resourceBundleBaseName, locale, loader, resourceBundle, resourcesIO, null, null);	//load the new resource bundle, specifying the current resource bundle as the parent					
+			resourceBundle=ResourceBundles.getResourceBundle(resourceBundleBaseName, locale, loader, resourceBundle, resourcesIO, null, null);	//load the new resource bundle, specifying the current resource bundle as the parent					
 		}
 		return resourceBundle;	//return the resource bundle
 	}
@@ -1279,7 +1279,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 //TODO del when works			final Map<String, Object> resourceMap=ResourceBundleUtilities.toMap(resourceResource, STRING_NAMESPACE_URI);	//generate a map from the local resources TODO cache this if possible
 			if(resourcesResource instanceof Resources)	//if this is a Guise reosurces object
 			{
-				final Map<String, Object> resourceMap=ResourceBundleUtilities.getResourceValue(resourcesResource);	//generate a map from the local resources TODO cache this if possible
+				final Map<String, Object> resourceMap=ResourceBundles.getResourceValue(resourcesResource);	//generate a map from the local resources TODO cache this if possible
 				if(!resourceMap.isEmpty())	//if any resources are defined locally
 				{
 					resourceBundle=new HashMapResourceBundle(resourceMap, resourceBundle);	//create a new hash map resource bundle with resources and the given parent and insert it into the chain				
@@ -1310,7 +1310,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			{
 				final Resources resources=getResourcesIO().read(resourcesInputStream, resourceBundleURI);	//load the resources
 //TODO del when works				resourceMap=ResourceBundleUtilities.toMap(resources, STRING_NAMESPACE_URI);	//generate a map from the resources
-				resourceMap=ResourceBundleUtilities.getResourceValue(resources);	//generate a map from the resources
+				resourceMap=ResourceBundles.getResourceValue(resources);	//generate a map from the resources
 				cachedResourceMapMap.put(resourceBundleURI, resourceMap);	//cache the map for later
 			}
 			catch(final IOException ioException)	//if there was an error loading the resource bundle

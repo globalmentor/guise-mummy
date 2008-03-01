@@ -2,7 +2,7 @@ package com.guiseframework.model;
 
 import java.net.URI;
 
-import com.garretwilson.util.StringTemplate;
+import com.globalmentor.util.StringTemplate;
 
 import static com.guiseframework.Resources.*;
 

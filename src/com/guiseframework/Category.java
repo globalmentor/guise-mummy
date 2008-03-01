@@ -3,12 +3,12 @@ package com.guiseframework;
 import java.util.*;
 import static java.util.Collections.*;
 
-import com.garretwilson.util.IDNameObject;
+import com.globalmentor.util.DefaultIDNamed;
 
 /**A general category used in Guise.
 @author Garret Wilson
 */
-public class Category extends IDNameObject<String, String>
+public class Category extends DefaultIDNamed<String, String>
 {
 
 	/**The map of sub-categories; it is not thread-safe, but any changes will simply create a new list.*/

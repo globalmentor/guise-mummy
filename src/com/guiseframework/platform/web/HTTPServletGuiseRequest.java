@@ -11,8 +11,8 @@ import com.garretwilson.net.URIPath;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
-import com.garretwilson.util.Debug;
 
+import com.globalmentor.util.Debug;
 import com.guiseframework.*;
 
 import static com.globalmentor.java.Objects.*;

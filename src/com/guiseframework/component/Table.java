@@ -9,8 +9,8 @@ import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.theme.Theme.*;
 
 import com.garretwilson.beans.*;
-import com.garretwilson.util.*;
 
+import com.globalmentor.util.*;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.Border;
 import com.guiseframework.converter.*;

@@ -4,8 +4,8 @@ import static java.text.MessageFormat.*;
 
 import java.beans.*;
 
-import com.garretwilson.util.Debug;
 import com.globalmentor.java.Objects;
+import com.globalmentor.util.Debug;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.Container;
 import com.guiseframework.component.LayoutComponent;

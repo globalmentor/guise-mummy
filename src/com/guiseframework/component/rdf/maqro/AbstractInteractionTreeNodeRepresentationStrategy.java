@@ -5,8 +5,8 @@ import java.util.List;
 import com.garretwilson.rdf.*;
 import static com.garretwilson.rdf.dublincore.DCUtilities.*;
 import com.garretwilson.rdf.maqro.*;
-import com.garretwilson.util.Debug;
 
+import com.globalmentor.util.Debug;
 import com.guiseframework.component.TreeControl;
 import com.guiseframework.component.rdf.AbstractRDFResourceTreeNodeRepresentationStrategy;
 import com.guiseframework.model.*;

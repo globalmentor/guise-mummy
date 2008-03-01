@@ -7,8 +7,8 @@ import java.beans.PropertyVetoException;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
-import com.garretwilson.util.Debug;
 import com.globalmentor.java.Objects;
+import com.globalmentor.util.Debug;
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;
 

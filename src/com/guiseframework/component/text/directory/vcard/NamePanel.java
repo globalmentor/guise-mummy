@@ -7,10 +7,11 @@ import java.util.Locale;
 import static com.garretwilson.text.FormatUtilities.*;
 import com.garretwilson.text.directory.vcard.*;
 import static com.garretwilson.text.directory.vcard.VCardConstants.*;
-import static com.garretwilson.util.ArrayUtilities.*;
 
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
+
+import static com.globalmentor.util.Arrays.*;
 import static com.guiseframework.Resources.*;
 
 /**A panel allowing entry of the {@value VCardConstants#N_TYPE} type of a vCard <code>text/directory</code>

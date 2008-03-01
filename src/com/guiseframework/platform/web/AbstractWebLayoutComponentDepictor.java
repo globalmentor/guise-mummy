@@ -7,12 +7,12 @@ import java.util.*;
 import com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTML.*;
-import com.garretwilson.util.*;
-import static com.garretwilson.util.ArrayUtilities.*;
 
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Numbers.*;
+import static com.globalmentor.util.Arrays.*;
 
+import com.globalmentor.util.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.Axis;

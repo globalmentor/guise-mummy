@@ -12,9 +12,9 @@ import com.guiseframework.style.FontStyle;
 import com.guiseframework.style.LineStyle;
 
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.util.Arrays.*;
 import static com.guiseframework.theme.Theme.*;
 
-import static com.garretwilson.util.ArrayUtilities.*;
 
 /**An abstract implementation of presentation-related information.
 @author Garret Wilson

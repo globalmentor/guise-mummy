@@ -6,7 +6,6 @@ import java.util.StringTokenizer;
 
 import com.garretwilson.net.URIPath;
 import com.garretwilson.net.URIs;
-import com.garretwilson.util.Debug;
 
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
@@ -14,6 +13,7 @@ import static com.globalmentor.java.Classes.*;
 
 import com.globalmentor.java.CharSequences;
 import com.globalmentor.java.Objects;
+import com.globalmentor.util.Debug;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.*;
 

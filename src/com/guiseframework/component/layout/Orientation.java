@@ -7,7 +7,7 @@ import com.guiseframework.geometry.Axis;
 import com.guiseframework.geometry.CompassPoint;
 import com.guiseframework.geometry.Side;
 
-import static com.garretwilson.util.LanguageConstants.*;
+import static com.garretwilson.iso.ISO639.*;
 import static com.globalmentor.java.Objects.*;
 
 /**Encapsulates internationalized orientation of objects.
@@ -218,11 +218,11 @@ public class Orientation
 		if(rightToLeftTopToBottomLanguages==null)	//if we haven't yet created our language lookup set
 		{
 			rightToLeftTopToBottomLanguages=new HashSet<String>();	//create a new set for holding language strings
-			rightToLeftTopToBottomLanguages.add(ARABIC);	//populate the set with appropriate languages
-			rightToLeftTopToBottomLanguages.add(FARSI);
-			rightToLeftTopToBottomLanguages.add(HEBREW);
-			rightToLeftTopToBottomLanguages.add(HEBREW_OBSOLETE);
-			rightToLeftTopToBottomLanguages.add(URDU);
+			rightToLeftTopToBottomLanguages.add(ARABIC_CODE);	//populate the set with appropriate languages
+			rightToLeftTopToBottomLanguages.add(FARSI_CODE);
+			rightToLeftTopToBottomLanguages.add(HEBREW_CODE);
+			rightToLeftTopToBottomLanguages.add(HEBREW_OBSOLETE_CODE);
+			rightToLeftTopToBottomLanguages.add(URDU_CODE);
 		}
 		final String language=locale.getLanguage();	//get the locale language
 		if(rightToLeftTopToBottomLanguages.contains(language))	//if our right-to-left, top-to-bottom language set contains this language

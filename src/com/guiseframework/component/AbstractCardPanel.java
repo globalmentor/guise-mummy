@@ -4,7 +4,7 @@ import java.beans.PropertyVetoException;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
-import com.garretwilson.util.Debug;
+import com.globalmentor.util.Debug;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.CardLayout;

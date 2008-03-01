@@ -3,10 +3,10 @@ package com.guiseframework.platform.web;
 import java.util.*;
 import static java.util.Collections.*;
 
-import com.garretwilson.util.NameValuePair;
-import static com.garretwilson.util.MapUtilities.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.util.Maps.*;
 
+import com.globalmentor.util.NameValuePair;
 import com.guiseframework.platform.DepictedObject;
 
 /**A command to or from a depicted object on the web platform.

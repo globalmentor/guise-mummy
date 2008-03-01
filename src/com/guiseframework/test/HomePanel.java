@@ -17,7 +17,7 @@ import com.garretwilson.iso.idcard.Product;
 import com.garretwilson.itu.TelephoneNumber;
 import com.garretwilson.net.URIPath;
 import com.garretwilson.text.TextUtilities;
-import com.garretwilson.util.Debug;
+import com.globalmentor.util.Debug;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.Resources;

@@ -7,12 +7,12 @@ import java.util.*;
 import static java.util.Collections.*;
 
 
-import com.garretwilson.util.*;
 
 import com.globalmentor.urf.*;
 import com.globalmentor.urf.ploop.PLOOPURFProcessor;
 import com.globalmentor.urf.select.*;
 import com.globalmentor.urf.xml.XML;
+import com.globalmentor.util.*;
 import com.guiseframework.style.*;
 
 import static com.globalmentor.java.Classes.*;

@@ -11,7 +11,7 @@ import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import com.garretwilson.io.ContentTypes;
-import com.garretwilson.util.NameValuePair;
+import com.globalmentor.util.NameValuePair;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.Flash;
 

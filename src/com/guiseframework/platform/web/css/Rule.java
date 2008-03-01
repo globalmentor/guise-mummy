@@ -5,7 +5,7 @@ import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import java.util.*;
 import static java.util.Collections.*;
 
-import com.garretwilson.util.NameValuePair;
+import com.globalmentor.util.NameValuePair;
 
 /**A CSS rule, consisting of one or more selectors and a declaration.
 @author Garret Wilson

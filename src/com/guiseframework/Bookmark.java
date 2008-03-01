@@ -12,8 +12,8 @@ import static com.globalmentor.java.Objects.*;
 
 import com.garretwilson.net.URIs;
 import com.garretwilson.text.ArgumentSyntaxException;
-import com.garretwilson.util.Debug;
-import com.garretwilson.util.NameValuePair;
+import com.globalmentor.util.Debug;
+import com.globalmentor.util.NameValuePair;
 
 /**An identification of a saved state at a navigation point. The bookmark is relative to the navigation path.
 @author Garret Wilson

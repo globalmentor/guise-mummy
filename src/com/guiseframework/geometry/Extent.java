@@ -2,7 +2,8 @@ package com.guiseframework.geometry;
 
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.util.ArrayUtilities;
+import java.util.Arrays;
+
 import com.globalmentor.java.Objects;
 
 /**A measurement such as a length, area, or volume.
@@ -100,6 +101,6 @@ public class Extent
 	/**@return A string representation of this extent.*/
 	public String toString()
 	{
-		return ArrayUtilities.toString(new Object[]{getValue(), getUnit(), getDegree()});
+		return Arrays.toString(new Object[]{getValue(), getUnit(), getDegree()});
 	}
 }

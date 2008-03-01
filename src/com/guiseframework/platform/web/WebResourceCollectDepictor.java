@@ -6,9 +6,9 @@ import java.net.URI;
 import java.util.Map;
 
 import static com.garretwilson.text.xml.xhtml.XHTML.*;
-import com.garretwilson.util.Debug;
-import com.garretwilson.util.NameValuePair;
 
+import com.globalmentor.util.Debug;
+import com.globalmentor.util.NameValuePair;
 import com.guiseframework.Bookmark;
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;

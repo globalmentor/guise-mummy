@@ -3,9 +3,10 @@ package com.guiseframework.platform.web;
 import java.util.*;
 import static java.util.Collections.*;
 
-import com.garretwilson.util.NameValuePair;
-import static com.garretwilson.util.MapUtilities.*;
+import com.globalmentor.util.NameValuePair;
+
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.util.Maps.*;
 
 /**A command message to or from the web platform.
 @param <C> The type of command.

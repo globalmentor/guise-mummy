@@ -8,7 +8,7 @@ import java.util.concurrent.locks.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.util.*;
+import com.globalmentor.util.*;
 import com.guiseframework.GuiseApplication;
 
 /**The platform on which Guise objects are being depicted.

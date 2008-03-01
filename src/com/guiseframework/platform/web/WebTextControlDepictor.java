@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
-import com.garretwilson.util.Debug;
+import com.globalmentor.util.Debug;
 import com.guiseframework.component.*;
 import com.guiseframework.converter.*;
 import com.guiseframework.model.Notification;

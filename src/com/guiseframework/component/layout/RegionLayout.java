@@ -1,8 +1,8 @@
 package com.guiseframework.component.layout;
 
-import static com.garretwilson.util.ArrayUtilities.fill;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.util.Arrays.fill;
 
 import com.globalmentor.java.Objects;
 import com.guiseframework.component.Component;

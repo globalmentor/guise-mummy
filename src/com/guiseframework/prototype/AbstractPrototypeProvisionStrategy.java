@@ -6,7 +6,7 @@ import static java.util.Collections.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.garretwilson.beans.*;
-import com.garretwilson.util.*;
+import com.globalmentor.util.*;
 
 /**Abstract strategy for keeping track of prototype providers and working with provisioned prototypes.
 When the prototype providers change provided prototypes, those provided prototypes are processed.

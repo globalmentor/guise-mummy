@@ -3,7 +3,7 @@ package com.guiseframework.component.layout;
 
 import java.net.URI;
 
-import com.garretwilson.util.StringTemplate;
+import com.globalmentor.util.StringTemplate;
 import com.guiseframework.geometry.*;
 
 import static com.globalmentor.java.Objects.*;

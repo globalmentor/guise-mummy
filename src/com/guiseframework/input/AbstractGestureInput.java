@@ -3,7 +3,7 @@ package com.guiseframework.input;
 import static java.util.Collections.*;
 import java.util.Set;
 
-import com.garretwilson.util.AbstractHashObject;
+import com.globalmentor.util.AbstractHashObject;
 
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
