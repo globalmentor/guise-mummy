@@ -21,7 +21,6 @@ import static com.garretwilson.net.URIs.*;
 import com.garretwilson.net.http.*;
 import com.garretwilson.net.mime.ContentDispositionType;
 import static com.garretwilson.net.http.HTTPConstants.*;
-import com.garretwilson.security.Nonce;
 import static com.garretwilson.servlet.ServletConstants.*;
 import static com.garretwilson.servlet.http.HttpServletConstants.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
@@ -38,6 +37,7 @@ import com.globalmentor.event.ProgressEvent;
 import com.globalmentor.event.ProgressListener;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Objects;
+import com.globalmentor.security.Nonce;
 import com.globalmentor.urf.*;
 import com.globalmentor.urf.ploop.*;
 import com.globalmentor.util.*;
@@ -53,7 +53,7 @@ import com.guiseframework.platform.*;
 import static com.globalmentor.flash.Flash.*;
 import static com.globalmentor.io.ContentTypes.*;
 import static com.globalmentor.io.Files.*;
-import static com.globalmentor.io.OutputStreamUtilities.*;
+import static com.globalmentor.io.OutputStreams.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
@@ -643,7 +643,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 												}
 											}
 											progressOutputStream.addProgressListener(progressListener);	//start listening for progress events from the output stream
-											InputStreamUtilities.copy(inputStream, progressOutputStream);	//copy the uploaded file to the destination
+											InputStreams.copy(inputStream, progressOutputStream);	//copy the uploaded file to the destination
 											progressOutputStream.removeProgressListener(progressListener);	//stop listening for progress events from the output stream
 												//TODO catch and send errors here
 										}

@@ -16,13 +16,12 @@ import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.platform.web.WebPlatform;
 
-import static com.garretwilson.security.MessageDigestUtilities.*;
-import static com.garretwilson.security.SecurityConstants.*;
 import static com.garretwilson.text.xml.XML.*;
 import static com.garretwilson.text.xml.XMLUtilities.*;
 import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Strings.*;
+import static com.globalmentor.security.MessageDigestUtilities.*;
 import static com.globalmentor.util.Base64.*;
 
 /**Abstract encapsulation of text/xml information related to the current depiction.
