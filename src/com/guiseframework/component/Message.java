@@ -2,7 +2,7 @@ package com.guiseframework.component;
 
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.text.TextUtilities.*;
+import static com.globalmentor.text.Text.*;
 
 import javax.mail.internet.ContentType;
 

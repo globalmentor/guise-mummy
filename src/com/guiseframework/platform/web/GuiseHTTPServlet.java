@@ -54,7 +54,7 @@ import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
 import static com.globalmentor.text.elff.WebTrendsConstants.*;
-import static com.globalmentor.text.xml.XML.*;
+import static com.globalmentor.text.xml.XMLUtilities.*;
 import static com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.urf.content.Content.*;

@@ -11,7 +11,6 @@ import com.globalmentor.java.Objects;
 import com.globalmentor.java.Strings;
 import com.globalmentor.text.xml.QualifiedName;
 import com.globalmentor.text.xml.XMLNamespacePrefixManager;
-import com.globalmentor.text.xml.XMLUtilities;
 import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.platform.web.WebPlatform;
@@ -19,7 +18,6 @@ import com.guiseframework.platform.web.WebPlatform;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Strings.*;
 import static com.globalmentor.security.MessageDigests.*;
-import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.text.xml.XMLUtilities.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.util.Base64.*;
@@ -275,7 +273,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 		{
 			if(publicID!=null)	//if there is a document type public ID
 			{
-				contentType=XMLUtilities.getContentType(publicID);	//get the content type for this doctype public ID
+				contentType=getContentType(publicID);	//get the content type for this doctype public ID
 			}
 			if(contentType==null)	//if we still couldn't find a content type
 			{

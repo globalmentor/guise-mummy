@@ -9,7 +9,7 @@ import com.globalmentor.text.directory.vcard.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 
-import static com.globalmentor.text.FormatUtilities.*;
+import static com.globalmentor.text.TextFormatter.*;
 import static com.globalmentor.text.directory.vcard.VCardConstants.*;
 import static com.globalmentor.util.Arrays.*;
 import static com.guiseframework.Resources.*;

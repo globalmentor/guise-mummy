@@ -9,7 +9,7 @@ import static com.globalmentor.io.ContentTypes.*;
 import static com.globalmentor.java.Classes.*;
 
 import com.globalmentor.io.ContentTypes;
-import static com.globalmentor.text.TextUtilities.*;
+import static com.globalmentor.text.Text.*;
 import com.guiseframework.component.transfer.*;
 import com.guiseframework.converter.*;
 import com.guiseframework.model.*;

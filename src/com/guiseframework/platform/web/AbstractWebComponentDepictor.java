@@ -9,8 +9,7 @@ import java.util.regex.*;
 
 import javax.mail.internet.ContentType;
 
-
-import com.globalmentor.text.xml.xhtml.XHTML;
+import com.globalmentor.text.xml.XMLUtilities;
 import com.globalmentor.util.Debug;
 import com.globalmentor.util.NameValuePair;
 import com.guiseframework.GuiseSession;
@@ -25,8 +24,7 @@ import com.guiseframework.platform.XHTMLDepictContext;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.text.FormatUtilities.*;
-import static com.globalmentor.text.xml.XMLUtilities.*;
+import static com.globalmentor.text.TextFormatter.*;
 import static com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.model.ui.PresentationModel.*;
@@ -941,7 +939,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 		checkInstance(text, "Text cannot be null");
 		checkInstance(contentType, "Content type cannot be null");
 		final WebDepictContext depictContext=getDepictContext();	//get the depict context
-		final boolean isXML=isXML(contentType);	//see if this is XML
+		final boolean isXML=XMLUtilities.isXML(contentType);	//see if this is XML
 		final boolean isHTML=isHTML(contentType);	//see if this is HTML
 		if(isXML || isHTML)	//if this is XML or HTML
 		{

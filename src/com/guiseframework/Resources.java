@@ -8,7 +8,7 @@ import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 import com.globalmentor.urf.*;
 
-import static com.globalmentor.text.TextUtilities.*;
+import static com.globalmentor.text.Text.*;
 import static com.globalmentor.urf.URF.*;
 
 /**Guise resources description in RDF.

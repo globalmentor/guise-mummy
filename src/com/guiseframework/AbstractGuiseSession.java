@@ -41,7 +41,7 @@ import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.text.CharacterEncoding.*;
-import static com.globalmentor.text.FormatUtilities.*;
+import static com.globalmentor.text.TextFormatter.*;
 import static com.globalmentor.urf.TURF.*;
 
 import static com.guiseframework.Resources.*;

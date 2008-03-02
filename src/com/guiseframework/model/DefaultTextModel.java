@@ -5,7 +5,7 @@ import javax.mail.internet.ContentType;
 import com.globalmentor.java.Objects;
 
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.text.TextUtilities.*;
+import static com.globalmentor.text.Text.*;
 
 /**The default implementation of a model for text and an associated label.
 @author Garret Wilson

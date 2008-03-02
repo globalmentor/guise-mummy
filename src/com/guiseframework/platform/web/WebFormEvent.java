@@ -2,7 +2,7 @@ package com.guiseframework.platform.web;
 
 import java.util.*;
 
-import static com.globalmentor.text.FormatUtilities.*;
+import static com.globalmentor.text.TextFormatter.*;
 
 import com.globalmentor.util.*;
 

@@ -16,7 +16,6 @@ import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
 import com.globalmentor.beans.GenericPropertyChangeEvent;
 import com.globalmentor.country.us.RTN;
 import com.globalmentor.country.us.SSN;
-import com.globalmentor.text.TextUtilities;
 import com.globalmentor.util.Debug;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseSession;

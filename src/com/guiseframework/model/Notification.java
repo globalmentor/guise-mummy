@@ -11,7 +11,7 @@ import javax.mail.internet.ContentType;
 import com.guiseframework.Guise;
 
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.text.TextUtilities.*;
+import static com.globalmentor.text.Text.*;
 import static com.guiseframework.Resources.*;
 
 /**A notification to the user of some event or state, such as an error or invalid user input.
