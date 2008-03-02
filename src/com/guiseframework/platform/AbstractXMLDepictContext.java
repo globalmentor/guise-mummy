@@ -7,21 +7,21 @@ import java.util.*;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.text.xml.QualifiedName;
-import com.garretwilson.text.xml.XMLNamespacePrefixManager;
-import com.garretwilson.text.xml.XMLUtilities;
 import com.globalmentor.java.Objects;
 import com.globalmentor.java.Strings;
+import com.globalmentor.text.xml.QualifiedName;
+import com.globalmentor.text.xml.XMLNamespacePrefixManager;
+import com.globalmentor.text.xml.XMLUtilities;
 import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.platform.web.WebPlatform;
 
-import static com.garretwilson.text.xml.XML.*;
-import static com.garretwilson.text.xml.XMLUtilities.*;
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Strings.*;
 import static com.globalmentor.security.MessageDigests.*;
+import static com.globalmentor.text.xml.XML.*;
+import static com.globalmentor.text.xml.XMLUtilities.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.util.Base64.*;
 
 /**Abstract encapsulation of text/xml information related to the current depiction.

@@ -5,7 +5,7 @@ import java.net.URI;
 
 import com.guiseframework.component.*;
 
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 
 /**Strategy for rendering an action model control as an XHTML <code>&lt;a&gt;</code> element that can be selected, with values represented by icons.
 @param <V> The type of value represented by the component.

@@ -3,7 +3,7 @@ package com.guiseframework.platform.web;
 import java.io.IOException;
 import java.net.URI;
 
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 
 import com.guiseframework.component.*;
 

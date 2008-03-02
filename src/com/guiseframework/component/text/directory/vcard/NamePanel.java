@@ -4,13 +4,13 @@ import java.beans.PropertyVetoException;
 import java.util.Collection;
 import java.util.Locale;
 
-import static com.garretwilson.text.FormatUtilities.*;
-import com.garretwilson.text.directory.vcard.*;
-import static com.garretwilson.text.directory.vcard.VCardConstants.*;
 
+import com.globalmentor.text.directory.vcard.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 
+import static com.globalmentor.text.FormatUtilities.*;
+import static com.globalmentor.text.directory.vcard.VCardConstants.*;
 import static com.globalmentor.util.Arrays.*;
 import static com.guiseframework.Resources.*;
 

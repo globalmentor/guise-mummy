@@ -2,7 +2,7 @@ package com.guiseframework.style;
 
 import java.util.Arrays;
 
-import com.garretwilson.text.ArgumentSyntaxException;
+import com.globalmentor.text.ArgumentSyntaxException;
 
 /**Abstract representation of a color value in a color space.
 @param <C> The type of color component for this color space.

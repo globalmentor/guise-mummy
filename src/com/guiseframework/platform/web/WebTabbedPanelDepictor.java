@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Set;
 
 import static com.garretwilson.net.URIs.*;
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import com.globalmentor.util.NameValuePair;
 import com.guiseframework.component.*;
@@ -15,6 +14,7 @@ import com.guiseframework.platform.DepictEvent;
 import com.guiseframework.platform.PlatformEvent;
 
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**Strategy for rendering a tabbed panel as a series of XHTML elements.

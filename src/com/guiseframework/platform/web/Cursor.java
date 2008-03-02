@@ -5,8 +5,8 @@ import java.util.*;
 import static java.util.Collections.*;
 
 
-import com.garretwilson.text.xml.stylesheets.css.XMLCSSCursor;
 
+import com.globalmentor.text.xml.stylesheets.css.XMLCSSCursor;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.CompassPoint;
 

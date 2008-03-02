@@ -2,11 +2,12 @@ package com.guiseframework.platform.web;
 
 import java.io.IOException;
 
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import com.guiseframework.component.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.AbstractModel;
+
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**Strategy for rendering an action model control as an XHTML <code>&lt;a&gt;</code> element.

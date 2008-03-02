@@ -1,8 +1,8 @@
 package com.guiseframework.platform.web.css;
 
-import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import static com.globalmentor.java.Characters.NULL_CHAR;
 import static com.globalmentor.java.Strings.*;
+import static com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants.*;
 
 import java.io.*;
 import java.util.*;

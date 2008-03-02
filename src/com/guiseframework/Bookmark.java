@@ -11,7 +11,7 @@ import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 
 import com.garretwilson.net.URIs;
-import com.garretwilson.text.ArgumentSyntaxException;
+import com.globalmentor.text.ArgumentSyntaxException;
 import com.globalmentor.util.Debug;
 import com.globalmentor.util.NameValuePair;
 

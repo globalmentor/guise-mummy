@@ -12,13 +12,11 @@ import javax.servlet.http.HttpServletResponse;
 
 
 import com.garretwilson.servlet.http.HttpServletUtilities;
-import com.garretwilson.text.CharacterEncoding;
-import static com.garretwilson.text.FormatUtilities.*;
-import com.garretwilson.text.xml.QualifiedName;
-import static com.garretwilson.text.CharacterEncoding.*;
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import com.globalmentor.io.ParseReader;
+import com.globalmentor.text.CharacterEncoding;
+import com.globalmentor.text.TextUtilities;
+import com.globalmentor.text.xml.QualifiedName;
 import com.globalmentor.util.*;
 import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
@@ -26,6 +24,9 @@ import com.guiseframework.GuiseSession;
 import static com.globalmentor.io.ContentTypeConstants.*;
 import static com.globalmentor.io.ContentTypes.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.text.CharacterEncoding.*;
+import static com.globalmentor.text.FormatUtilities.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.util.Arrays.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
 import com.guiseframework.platform.web.css.*;
@@ -64,7 +65,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 		public boolean isQuirksMode() {return isQuirksMode;}
 
 	/**The current content type of the output.*/
-	private ContentType outputContentType=createContentType(TEXT_PRIMARY_TYPE, PLAIN_SUBTYPE);	//default to text/plain
+	private ContentType outputContentType=createContentType(TEXT_PRIMARY_TYPE, TextUtilities.PLAIN_SUBTYPE);	//default to text/plain
 
 	/**The qualified name to use for the attribute hash attribute.*/
 	private final String attributeHashAttributeQualifiedName=getQualifiedName(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_ATTRIBUTE_HASH);

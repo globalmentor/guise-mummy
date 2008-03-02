@@ -3,8 +3,8 @@ package com.guiseframework.platform.web;
 import java.net.URI;
 import java.util.*;
 
-import com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants;
 
+import com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.geometry.Extent;
 import com.guiseframework.model.ui.PresentationModel;

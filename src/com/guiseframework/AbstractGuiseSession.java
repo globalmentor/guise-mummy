@@ -12,10 +12,10 @@ import static java.util.Collections.*;
 
 import com.garretwilson.net.URIConstants;
 import com.garretwilson.net.URIPath;
-import com.garretwilson.text.CharacterEncoding;
 import com.globalmentor.beans.*;
 import com.globalmentor.io.BOMInputStreamReader;
 import com.globalmentor.java.Objects;
+import com.globalmentor.text.CharacterEncoding;
 import com.globalmentor.urf.*;
 import com.globalmentor.urf.ploop.PLOOPURFProcessor;
 import com.globalmentor.util.*;
@@ -33,8 +33,6 @@ import com.guiseframework.theme.Theme;
 
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
-import static com.garretwilson.text.CharacterEncoding.*;
-import static com.garretwilson.text.FormatUtilities.*;
 import static com.globalmentor.io.FileConstants.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.io.Writers.*;
@@ -42,6 +40,8 @@ import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.text.CharacterEncoding.*;
+import static com.globalmentor.text.FormatUtilities.*;
 import static com.globalmentor.urf.TURF.*;
 
 import static com.guiseframework.Resources.*;

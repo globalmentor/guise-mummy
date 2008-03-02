@@ -7,7 +7,7 @@ import java.util.regex.*;
 import static com.globalmentor.java.Maths.*;
 import static com.globalmentor.java.Numbers.*;
 
-import com.garretwilson.text.ArgumentSyntaxException;
+import com.globalmentor.text.ArgumentSyntaxException;
 
 /**Encapsulates a color value of the sRGB color space.
 @author Garret Wilson

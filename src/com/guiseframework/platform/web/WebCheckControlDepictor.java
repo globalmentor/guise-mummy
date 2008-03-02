@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.*;
 import static java.util.Collections.*;
 
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;
@@ -14,6 +13,7 @@ import com.guiseframework.platform.PlatformEvent;
 
 import static com.globalmentor.java.Booleans.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**Strategy for rendering a check control as an XHTML <code>&lt;input&gt;</code> element with type <code>checkbox</code> or <code>radio</code>.

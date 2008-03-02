@@ -3,7 +3,6 @@ package com.guiseframework.platform.web;
 import java.io.*;
 import java.util.Map;
 
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
@@ -11,6 +10,7 @@ import com.guiseframework.geometry.*;
 import com.guiseframework.platform.XHTMLDepictContext;
 
 import static com.globalmentor.java.Enums.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 import com.guiseframework.style.LineStyle;
 

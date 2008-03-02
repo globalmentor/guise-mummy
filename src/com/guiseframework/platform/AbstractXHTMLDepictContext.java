@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.net.URI;
 
 import static com.garretwilson.javascript.JavaScriptConstants.*;
-import com.garretwilson.text.xml.xhtml.XHTML;
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 
+import com.globalmentor.text.xml.xhtml.XHTML;
 import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 

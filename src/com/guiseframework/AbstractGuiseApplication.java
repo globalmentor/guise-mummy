@@ -18,13 +18,12 @@ import static com.garretwilson.net.URIs.*;
 import com.garretwilson.net.URIPath;
 import com.garretwilson.net.URIs;
 
-import static com.garretwilson.text.CharacterEncoding.*;
-import com.garretwilson.text.W3CDateFormat;
 
 import static com.globalmentor.io.FileConstants.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
+import static com.globalmentor.text.CharacterEncoding.*;
 import static com.globalmentor.urf.URF.*;
 import static com.globalmentor.util.Calendars.*;
 import static com.globalmentor.util.Locales.*;
@@ -34,6 +33,7 @@ import static com.guiseframework.GuiseResourceConstants.*;
 import com.globalmentor.beans.BoundPropertyObject;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Objects;
+import com.globalmentor.text.W3CDateFormat;
 import com.globalmentor.urf.*;
 import com.globalmentor.util.*;
 import com.guiseframework.component.*;

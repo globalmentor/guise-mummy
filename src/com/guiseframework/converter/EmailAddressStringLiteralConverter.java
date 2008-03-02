@@ -3,7 +3,7 @@ package com.guiseframework.converter;
 import static java.text.MessageFormat.format;
 
 import com.garretwilson.net.EmailAddress;
-import com.garretwilson.text.ArgumentSyntaxException;
+import com.globalmentor.text.ArgumentSyntaxException;
 
 /**A converter that converts an {@link EmailAddress} from and to a string literal.
 @author Garret Wilson

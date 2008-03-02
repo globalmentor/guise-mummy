@@ -1,9 +1,9 @@
 package com.guiseframework.platform.web.css;
 
-import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import static com.globalmentor.java.Characters.GREATER_THAN_CHAR;
 import static com.globalmentor.java.Characters.PLUS_SIGN_CHAR;
 import static com.globalmentor.java.Characters.TILDE_CHAR;
+import static com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants.*;
 
 /**A combinator separating sequences of simple selectors.
 @author Garret Wilson

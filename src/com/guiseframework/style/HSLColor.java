@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import static com.globalmentor.java.Integers.*;
 import static com.globalmentor.java.Numbers.*;
 
-import com.garretwilson.text.ArgumentSyntaxException;
+import com.globalmentor.text.ArgumentSyntaxException;
 
 /**Encapsulates a color value of the HSL color space.
 @author Garret Wilson

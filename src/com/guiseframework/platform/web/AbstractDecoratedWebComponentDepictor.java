@@ -5,7 +5,7 @@ import java.net.URI;
 
 import com.guiseframework.component.*;
 
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**An abstract XHTML component depictor that writes component decorations such as label and error.

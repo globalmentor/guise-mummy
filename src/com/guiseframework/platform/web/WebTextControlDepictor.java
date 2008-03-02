@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import com.globalmentor.util.Debug;
 import com.guiseframework.component.*;
@@ -14,6 +13,7 @@ import com.guiseframework.model.Notification;
 import com.guiseframework.platform.*;
 
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
 
 /**Strategy for rendering a text control as an XHTML <code>&lt;input&gt;</code> element or an XHTML <code>&lt;textarea&gt;</code> element.

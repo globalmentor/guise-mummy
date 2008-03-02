@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.model.AbstractModel;
+
+import static com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**Strategy for rendering a pictures as a series of XHTML elements along with label and description.

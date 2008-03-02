@@ -4,8 +4,8 @@ import java.beans.PropertyVetoException;
 import java.io.*;
 import java.net.URI;
 
-import static com.garretwilson.text.CharacterEncoding.*;
-import static com.garretwilson.text.xml.XML.*;
+import static com.globalmentor.text.CharacterEncoding.*;
+import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.urf.TURF.*;
 
 import com.globalmentor.urf.*;

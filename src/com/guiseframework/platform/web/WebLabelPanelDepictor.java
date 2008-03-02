@@ -2,9 +2,10 @@ package com.guiseframework.platform.web;
 
 import java.io.IOException;
 
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import com.guiseframework.component.LayoutComponent;
+
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**Strategy for rendering a labeled panel as a series of XHTML elements.

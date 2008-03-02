@@ -7,7 +7,7 @@ import javax.mail.internet.ContentType;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.StringBuilders.*;
 
-import com.garretwilson.text.CharacterEncoding;
+import com.globalmentor.text.CharacterEncoding;
 
 /**Encapsulation of text information related to the current depiction.
 Text is collected in a {@link StringBuilder} until it is ready to be depicted.

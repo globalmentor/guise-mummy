@@ -3,13 +3,13 @@ package com.guiseframework.platform.web;
 import java.io.IOException;
 import java.util.*;
 
-import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.*;
 
+import static com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**Strategy for rendering a menu as a drop menu.

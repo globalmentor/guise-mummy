@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import com.globalmentor.util.Debug;
 import com.globalmentor.util.NameValuePair;
@@ -15,6 +14,7 @@ import com.guiseframework.model.*;
 import com.guiseframework.platform.*;
 
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
 
 /**Strategy for rendering a resource collect control as an XHTML <code>&lt;input&gt;</code> element with type="file".

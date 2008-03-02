@@ -6,7 +6,7 @@ import java.util.Locale;
 
 import com.garretwilson.itu.CountryCode;
 import com.garretwilson.itu.TelephoneNumber;
-import com.garretwilson.text.ArgumentSyntaxException;
+import com.globalmentor.text.ArgumentSyntaxException;
 import com.guiseframework.GuiseSession;
 
 /**A converter that converts a {@link TelephoneNumber} from and to a string literal.

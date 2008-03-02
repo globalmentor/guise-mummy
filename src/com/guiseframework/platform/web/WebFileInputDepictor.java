@@ -12,9 +12,9 @@ import com.guiseframework.platform.DepictEvent;
 import com.guiseframework.platform.PlatformEvent;
 import com.guiseframework.validator.*;
 
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 
 /**Strategy for rendering a resource import control as an XHTML <code>&lt;input&gt;</code> element with type="file".
 @param <C> The type of component being depicted.

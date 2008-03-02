@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import com.guiseframework.component.Message;
 
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 
 /**Strategy for rendering a message component as an XHTML <code>&lt;div&gt;</code> element.
 @param <C> The type of component being depicted.

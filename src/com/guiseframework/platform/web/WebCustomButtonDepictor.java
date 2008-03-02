@@ -5,8 +5,8 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Corner;

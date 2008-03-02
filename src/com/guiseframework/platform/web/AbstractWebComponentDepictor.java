@@ -10,7 +10,7 @@ import java.util.regex.*;
 import javax.mail.internet.ContentType;
 
 
-import com.garretwilson.text.xml.xhtml.XHTML;
+import com.globalmentor.text.xml.xhtml.XHTML;
 import com.globalmentor.util.Debug;
 import com.globalmentor.util.NameValuePair;
 import com.guiseframework.GuiseSession;
@@ -25,14 +25,14 @@ import com.guiseframework.platform.XHTMLDepictContext;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.text.FormatUtilities.*;
+import static com.globalmentor.text.xml.XMLUtilities.*;
+import static com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.model.ui.PresentationModel.*;
 import com.guiseframework.style.Color;
 import com.guiseframework.style.FontStyle;
 
-import static com.garretwilson.text.FormatUtilities.*;
-import static com.garretwilson.text.xml.XMLUtilities.*;
-import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**The abstract base class for all <code>application/xhtml+xml</code> depictions.

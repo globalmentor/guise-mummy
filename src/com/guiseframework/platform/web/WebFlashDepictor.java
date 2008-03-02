@@ -7,8 +7,8 @@ import javax.mail.internet.ContentType;
 
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.io.ContentTypeConstants.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 
 import com.globalmentor.io.ContentTypes;
 import com.globalmentor.util.NameValuePair;

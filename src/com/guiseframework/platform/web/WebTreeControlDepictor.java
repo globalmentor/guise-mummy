@@ -4,13 +4,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import com.globalmentor.util.*;
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;
 import com.guiseframework.platform.*;
+
+import static com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**Strategy for rendering a tree component as an XHTML <code>&lt;div&gt;</code> element.

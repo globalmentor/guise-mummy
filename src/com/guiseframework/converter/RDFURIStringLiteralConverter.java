@@ -6,7 +6,7 @@ import static com.globalmentor.java.Objects.*;
 
 import com.garretwilson.rdf.RDFName;
 import com.garretwilson.rdf.RDFXMLGenerator;
-import com.garretwilson.text.xml.XMLNamespacePrefixManager;
+import com.globalmentor.text.xml.XMLNamespacePrefixManager;
 
 //TODO update to look up labels and definitions in some external OWL definition or something
 //TODO update to parse the namespace prefix and look up a namespace URI fromt he RDF XML generator when converting back to URI

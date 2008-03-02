@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants;
-import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Numbers.*;
+import static com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.util.Arrays.*;
 
+import com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants;
 import com.globalmentor.util.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;

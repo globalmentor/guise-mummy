@@ -9,14 +9,15 @@ import javax.mail.internet.ContentType;
 
 import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.javascript.JavaScriptConstants.*;
-import static com.garretwilson.text.xml.XML.*;
-import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
-import com.garretwilson.text.xml.xhtml.XHTML;
+
+import com.globalmentor.text.xml.xhtml.XHTML;
 import com.globalmentor.util.Debug;
 import com.globalmentor.util.NameValuePair;
 import com.guiseframework.*;
 
+import static com.globalmentor.text.xml.XML.*;
+import static com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.util.Locales.*;
 import static com.guiseframework.GuiseApplication.*;
 import com.guiseframework.component.*;

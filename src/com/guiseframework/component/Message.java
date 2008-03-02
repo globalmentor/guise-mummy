@@ -1,8 +1,8 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.text.TextUtilities.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.text.TextUtilities.*;
 
 import javax.mail.internet.ContentType;
 

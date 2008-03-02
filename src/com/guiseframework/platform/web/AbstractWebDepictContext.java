@@ -4,11 +4,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import com.garretwilson.text.xml.stylesheets.css.*;
 
-import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 
 import com.globalmentor.java.Integers;
+import com.globalmentor.text.xml.stylesheets.css.*;
 import com.globalmentor.util.Debug;
 import com.guiseframework.*;
 import com.guiseframework.component.layout.Orientation;
@@ -18,6 +17,7 @@ import com.guiseframework.model.ui.PresentationModel;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.StringBuilders.*;
+import static com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants.*;
 import static com.guiseframework.model.ui.PresentationModel.*;
 import com.guiseframework.platform.AbstractXHTMLDepictContext;
 import com.guiseframework.platform.web.WebPlatform;

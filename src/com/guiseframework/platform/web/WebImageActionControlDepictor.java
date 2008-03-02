@@ -13,8 +13,8 @@ import com.guiseframework.event.NavigateActionListener;
 import com.guiseframework.geometry.*;
 import com.guiseframework.model.AbstractModel;
 
-import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
 

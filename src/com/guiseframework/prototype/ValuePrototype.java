@@ -1,7 +1,7 @@
 package com.guiseframework.prototype;
 
-import static com.garretwilson.text.TextUtilities.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.text.TextUtilities.*;
 
 import java.net.URI;
 

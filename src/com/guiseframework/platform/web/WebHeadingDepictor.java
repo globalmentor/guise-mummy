@@ -1,6 +1,6 @@
 package com.guiseframework.platform.web;
 
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 
 import com.guiseframework.component.*;
 

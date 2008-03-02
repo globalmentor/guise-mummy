@@ -6,7 +6,7 @@ import java.util.*;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.text.xml.QualifiedName;
+import com.globalmentor.text.xml.QualifiedName;
 
 /**Encapsulation of text/xml information related to the current depiction.
 @author Garret Wilson

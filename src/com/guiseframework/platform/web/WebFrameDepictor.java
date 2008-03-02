@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import static com.garretwilson.text.xml.xhtml.XHTML.*;
 
 import com.globalmentor.util.Debug;
 import com.globalmentor.util.NameValuePair;
@@ -15,6 +14,7 @@ import com.guiseframework.geometry.CompassPoint;
 
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Classes.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**Strategy for rendering a frame as a series of XHTML elements.

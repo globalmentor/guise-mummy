@@ -9,8 +9,8 @@ import java.util.concurrent.*;
 
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.text.TextUtilities.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.text.TextUtilities.*;
 import static com.globalmentor.util.Arrays.*;
 
 import com.globalmentor.event.TargetedEvent;
