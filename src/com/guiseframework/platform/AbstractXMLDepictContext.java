@@ -21,7 +21,7 @@ import static com.garretwilson.text.xml.XMLUtilities.*;
 import static com.garretwilson.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Strings.*;
-import static com.globalmentor.security.MessageDigestUtilities.*;
+import static com.globalmentor.security.MessageDigests.*;
 import static com.globalmentor.util.Base64.*;
 
 /**Abstract encapsulation of text/xml information related to the current depiction.
