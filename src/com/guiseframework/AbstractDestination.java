@@ -5,12 +5,11 @@ import java.util.*;
 import static java.util.Collections.*;
 import java.util.regex.Pattern;
 
-import com.garretwilson.net.*;
 import com.globalmentor.beans.BoundPropertyObject;
 import com.globalmentor.java.Objects;
-
-import static com.garretwilson.net.URIConstants.PATH_SEPARATOR;
 import static com.globalmentor.java.Objects.*;
+import com.globalmentor.net.*;
+import static com.globalmentor.net.URIs.*;
 
 /**Abstract implementation of a navigation point, its properties, and its restrictions.
 Destinations of identical types with identical paths and path patterns are considered equal.

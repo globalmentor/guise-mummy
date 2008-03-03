@@ -14,12 +14,6 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.xml.parsers.*;
 
-import com.garretwilson.net.*;
-import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIs.*;
-import com.garretwilson.net.http.*;
-import com.garretwilson.net.mime.ContentDispositionType;
-import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.servlet.ServletConstants.*;
 import static com.garretwilson.servlet.http.HttpServletConstants.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
@@ -30,6 +24,9 @@ import com.globalmentor.event.ProgressListener;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Objects;
 import com.globalmentor.javascript.JSON;
+import com.globalmentor.net.*;
+import com.globalmentor.net.http.*;
+import com.globalmentor.net.mime.ContentDispositionType;
 import com.globalmentor.security.Nonce;
 import com.globalmentor.text.CharacterEncoding;
 import com.globalmentor.text.elff.*;
@@ -49,10 +46,11 @@ import com.guiseframework.platform.*;
 import static com.globalmentor.flash.Flash.*;
 import static com.globalmentor.io.ContentTypes.*;
 import static com.globalmentor.io.Files.*;
-import static com.globalmentor.io.OutputStreams.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
+import static com.globalmentor.net.URIs.*;
+import static com.globalmentor.net.http.HTTPConstants.*;
 import static com.globalmentor.text.elff.WebTrendsConstants.*;
 import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
@@ -1483,7 +1481,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 			final String queryString=request.getQueryString();	//get the query string from the request
 			if(queryString!=null && queryString.length()>0)	//if there is a query string (Tomcat 5.5.16 returns an empty string for no query, even though the Java Servlet specification 2.4 says that it should return null; this is fixed in Tomcat 6)
 			{
-				final NameValuePair<String, String>[] parameters=URIs.getParameters(queryString);	//get the parameters from the query
+				final NameValuePair<String, String>[] parameters=getParameters(queryString);	//get the parameters from the query
 				for(final NameValuePair<String, String> parameter:parameters)	//look at each parameter
 				{
 					if(GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER.equals(parameter.getName()))	//if this is a content-disposition parameter

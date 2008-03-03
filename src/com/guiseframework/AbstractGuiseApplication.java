@@ -13,15 +13,13 @@ import java.util.concurrent.*;
 import javax.mail.*;
 import javax.mail.Message;
 
-import static com.garretwilson.net.URIs.*;
-import com.garretwilson.net.URIPath;
-import com.garretwilson.net.URIs;
 
 
 import static com.globalmentor.io.FileConstants.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
+import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.CharacterEncoding.*;
 import static com.globalmentor.urf.URF.*;
 import static com.globalmentor.util.Calendars.*;
@@ -33,6 +31,8 @@ import com.globalmentor.beans.BoundPropertyObject;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Objects;
 import com.globalmentor.mail.MailManager;
+import com.globalmentor.net.URIPath;
+import com.globalmentor.net.URIs;
 import com.globalmentor.text.W3CDateFormat;
 import com.globalmentor.urf.*;
 import com.globalmentor.util.*;

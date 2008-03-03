@@ -4,7 +4,7 @@ import java.net.URI;
 
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.net.URIPath;
+import com.globalmentor.net.URIPath;
 import com.guiseframework.Bookmark;
 
 /**An event indicating that navigation has occurred.

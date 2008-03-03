@@ -6,8 +6,8 @@ import java.util.regex.Pattern;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.net.URIPath;
 import com.globalmentor.java.Objects;
+import com.globalmentor.net.URIPath;
 import com.guiseframework.component.Component;
 
 /**Default implementation of a navigation point based upon a component.

@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 
-import com.garretwilson.net.URIPath;
+import com.globalmentor.net.URIPath;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.event.ValueSelectListener;

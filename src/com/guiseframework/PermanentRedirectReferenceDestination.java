@@ -2,7 +2,7 @@ package com.guiseframework;
 
 import java.util.regex.Pattern;
 
-import com.garretwilson.net.URIPath;
+import com.globalmentor.net.URIPath;
 
 /**A destination that permanently redirects to another referenced destination.
 @author Garret Wilson

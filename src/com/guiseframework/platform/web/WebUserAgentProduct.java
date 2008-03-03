@@ -3,10 +3,10 @@ package com.guiseframework.platform.web;
 import java.util.*;
 import static java.util.Collections.*;
 
-import com.garretwilson.net.http.HTTPConstants;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import static com.globalmentor.java.Objects.*;
 
+import com.globalmentor.net.http.HTTPConstants;
 import com.guiseframework.platform.BrandedProduct;
 import com.guiseframework.platform.ClientProduct;
 

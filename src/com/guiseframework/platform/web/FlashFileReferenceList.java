@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.net.URIPath;
+import com.globalmentor.net.URIPath;
 import com.guiseframework.Bookmark;
 import com.guiseframework.platform.*;
 

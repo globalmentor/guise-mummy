@@ -3,7 +3,6 @@ package com.guiseframework.platform.web;
 import java.io.IOException;
 import java.util.*;
 
-import static com.garretwilson.net.URIs.*;
 
 
 import com.globalmentor.util.NameValuePair;
@@ -11,6 +10,7 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Flow;
 import com.guiseframework.platform.*;
 
+import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 

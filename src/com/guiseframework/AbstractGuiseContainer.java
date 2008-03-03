@@ -6,14 +6,14 @@ import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.garretwilson.net.URIPath;
-import com.garretwilson.net.http.HTTPNotFoundException;
-import com.garretwilson.net.http.HTTPResource;
+import com.globalmentor.net.URIPath;
+import com.globalmentor.net.http.HTTPNotFoundException;
+import com.globalmentor.net.http.HTTPResource;
 
-import static com.garretwilson.net.URIs.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
+import static com.globalmentor.net.URIs.*;
 
 /**An abstract base class for a Guise instance.
 This implementation only works with Guise applications that descend from {@link AbstractGuiseApplication}.

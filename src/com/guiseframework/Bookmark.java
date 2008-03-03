@@ -4,13 +4,11 @@ import static java.util.Collections.*;
 
 import java.util.*;
 
-import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIs.*;
-
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.net.URIs.*;
 
-import com.garretwilson.net.URIs;
+import com.globalmentor.net.URIs;
 import com.globalmentor.text.ArgumentSyntaxException;
 import com.globalmentor.util.Debug;
 import com.globalmentor.util.NameValuePair;

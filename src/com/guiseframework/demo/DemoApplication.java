@@ -3,7 +3,7 @@ package com.guiseframework.demo;
 import java.security.Principal;
 import java.util.*;
 
-import com.garretwilson.net.URIPath;
+import com.globalmentor.net.URIPath;
 import com.guiseframework.AbstractGuiseApplication;
 
 /**Demonstration Guise application.

@@ -4,7 +4,7 @@ import java.util.regex.Pattern;
 
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.net.URIPath;
+import com.globalmentor.net.URIPath;
 
 /**Abstract implementation of a destination referencing another destination.
 @author Garret Wilson

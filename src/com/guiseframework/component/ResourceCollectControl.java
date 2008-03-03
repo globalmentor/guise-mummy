@@ -1,6 +1,5 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.net.URIs.*;
 
 import java.net.URI;
 import java.util.*;
@@ -10,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.net.URIs.*;
 
 import com.globalmentor.util.Debug;
 import com.guiseframework.*;

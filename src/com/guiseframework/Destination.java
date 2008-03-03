@@ -4,8 +4,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import com.garretwilson.net.*;
 import com.globalmentor.beans.PropertyBindable;
+import com.globalmentor.net.*;
 
 /**Description of a navigation point, its properties, and its restrictions.
 @author Garret Wilson

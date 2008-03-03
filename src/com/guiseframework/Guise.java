@@ -6,9 +6,9 @@ import java.net.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.garretwilson.net.URIs.*;
 import static com.globalmentor.io.InputStreams.*;
 import static com.globalmentor.java.Characters.*;
+import static com.globalmentor.net.URIs.*;
 
 /**The singleton Guise class.
 There will only be one instance of Guise per JVM.

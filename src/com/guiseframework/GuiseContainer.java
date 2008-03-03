@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
-import com.garretwilson.net.URIPath;
+import com.globalmentor.net.URIPath;
 
 /**The interface for a Guise container.
 @author Garret Wilson

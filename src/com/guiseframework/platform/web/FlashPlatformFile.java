@@ -2,7 +2,7 @@ package com.guiseframework.platform.web;
 
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.net.URIPath;
+import com.globalmentor.net.URIPath;
 import com.guiseframework.Bookmark;
 import com.guiseframework.event.ProgressEvent;
 import com.guiseframework.event.ProgressListener;

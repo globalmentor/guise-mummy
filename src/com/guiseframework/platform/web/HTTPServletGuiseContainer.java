@@ -1,10 +1,5 @@
 package com.guiseframework.platform.web;
 
-import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIs.*;
-import static com.garretwilson.servlet.ServletConstants.*;
-import static com.garretwilson.servlet.http.HttpServletUtilities.*;
-import static com.globalmentor.java.Objects.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
@@ -16,8 +11,14 @@ import java.util.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import com.garretwilson.net.URIPath;
+import static com.garretwilson.servlet.ServletConstants.*;
+import static com.garretwilson.servlet.http.HttpServletUtilities.*;
+
+import static com.globalmentor.java.Objects.*;
+import com.globalmentor.net.URIPath;
+import static com.globalmentor.net.URIs.*;
 import com.globalmentor.util.*;
+
 import com.guiseframework.*;
 
 /**A Guise container for Guise HTTP servlets.

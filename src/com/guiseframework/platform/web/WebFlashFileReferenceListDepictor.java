@@ -3,12 +3,12 @@ package com.guiseframework.platform.web;
 import java.net.URI;
 import java.util.*;
 
-import static com.garretwilson.net.URIs.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.net.URIs.*;
 
-import com.garretwilson.net.URIPath;
 
+import com.globalmentor.net.URIPath;
 import com.globalmentor.util.*;
 import com.guiseframework.Bookmark;
 import com.guiseframework.model.TaskState;

@@ -5,13 +5,12 @@ import java.net.URI;
 
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIs.*;
-import static com.globalmentor.io.ContentTypeConstants.*;
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
-
 import com.globalmentor.io.ContentTypes;
+import static com.globalmentor.io.ContentTypeConstants.*;
+import static com.globalmentor.net.URIs.*;
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import com.globalmentor.util.NameValuePair;
+
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.Flash;
 

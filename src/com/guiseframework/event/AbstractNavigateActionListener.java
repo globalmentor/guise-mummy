@@ -2,7 +2,7 @@ package com.guiseframework.event;
 
 import java.net.URI;
 
-import com.garretwilson.net.URIPath;
+import com.globalmentor.net.URIPath;
 
 import static com.globalmentor.java.Objects.*;
 

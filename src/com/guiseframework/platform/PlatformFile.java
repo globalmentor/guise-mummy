@@ -1,6 +1,6 @@
 package com.guiseframework.platform;
 
-import com.garretwilson.net.URIPath;
+import com.globalmentor.net.URIPath;
 import com.guiseframework.Bookmark;
 import com.guiseframework.event.ProgressListenable;
 

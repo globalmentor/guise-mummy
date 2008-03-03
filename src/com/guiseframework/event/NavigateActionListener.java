@@ -2,7 +2,7 @@ package com.guiseframework.event;
 
 import java.net.URI;
 
-import com.garretwilson.net.URIPath;
+import com.globalmentor.net.URIPath;
 
 /**An object that listens for action events and in response changes the navigation.
 This class if declared final because it encapsulates a set of known, bounded functionality that may be deferred to the client if possible.

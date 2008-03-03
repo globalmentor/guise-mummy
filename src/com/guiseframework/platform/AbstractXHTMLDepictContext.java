@@ -3,7 +3,7 @@ package com.guiseframework.platform;
 import java.io.IOException;
 import java.net.URI;
 
-import static com.globalmentor.javascript.JavaScriptConstants.*;
+import static com.globalmentor.javascript.JavaScript.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 
 import com.globalmentor.text.xml.xhtml.XHTML;

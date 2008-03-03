@@ -2,7 +2,7 @@ package com.guiseframework.component;
 
 import java.net.URI;
 
-import com.garretwilson.net.URIPath;
+import com.globalmentor.net.URIPath;
 import com.guiseframework.event.NavigateActionListener;
 import com.guiseframework.model.*;
 import com.guiseframework.prototype.ActionPrototype;

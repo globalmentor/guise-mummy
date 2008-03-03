@@ -7,10 +7,10 @@ import java.security.Principal;
 import java.text.MessageFormat;
 import java.util.*;
 
-import com.garretwilson.net.URIConstants;
-import com.garretwilson.net.URIPath;
 import com.globalmentor.beans.PropertyBindable;
 import com.globalmentor.event.PostponedEvent;
+import com.globalmentor.net.URIPath;
+import com.globalmentor.net.URIs;
 import com.globalmentor.urf.URFResource;
 import com.globalmentor.util.DataException;
 import com.guiseframework.component.*;
@@ -774,7 +774,7 @@ public interface GuiseSession extends PropertyBindable
 	public String dereferenceString(final String string) throws MissingResourceException;
 
 	/**Dereferences a URI by looking up any references from the resources if necessary.
-	If the URI has the {@value URIConstants#RESOURCE_SCHEME} scheme, its scheme-specific part will be used to look up the actual URI using {@link #getURIResource(String)}.
+	If the URI has the {@value URIs#RESOURCE_SCHEME} scheme, its scheme-specific part will be used to look up the actual URI using {@link #getURIResource(String)}.
 	If suffixes are given, they will be appended to the resource key in order, separated by '.'.
 	If no resource is associated with that resource key, a resource will be retrieved using the unadorned resource key.
 	URIs retrieved from resources will be recursively dereferenced without suffixes.

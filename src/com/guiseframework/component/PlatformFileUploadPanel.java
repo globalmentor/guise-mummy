@@ -4,11 +4,11 @@ import java.math.BigDecimal;
 import java.util.Collection;
 
 
-import com.garretwilson.net.URIPath;
 
 
 import com.globalmentor.itu.SIUnit;
 import com.globalmentor.java.Objects;
+import com.globalmentor.net.URIPath;
 import com.guiseframework.Bookmark;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;

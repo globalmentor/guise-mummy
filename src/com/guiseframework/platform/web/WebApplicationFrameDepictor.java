@@ -7,9 +7,9 @@ import java.util.*;
 
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.net.URIs.*;
 
-import static com.globalmentor.javascript.JavaScriptConstants.*;
+import static com.globalmentor.javascript.JavaScript.*;
+import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.xml.XML.*;
 import com.globalmentor.text.xml.xhtml.XHTML;
 import com.globalmentor.util.Debug;

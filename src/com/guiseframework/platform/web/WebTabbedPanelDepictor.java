@@ -4,7 +4,6 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Set;
 
-import static com.garretwilson.net.URIs.*;
 
 import com.globalmentor.util.NameValuePair;
 import com.guiseframework.component.*;
@@ -14,6 +13,7 @@ import com.guiseframework.platform.DepictEvent;
 import com.guiseframework.platform.PlatformEvent;
 
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 

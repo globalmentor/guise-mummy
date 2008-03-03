@@ -11,14 +11,14 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import static com.garretwilson.net.URIs.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import static com.garretwilson.servlet.http.HttpServletConstants.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.net.URIs.*;
 
-import com.garretwilson.net.URIPath;
 import com.globalmentor.beans.*;
 import com.globalmentor.event.ProgressListener;
+import com.globalmentor.net.URIPath;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.audio.Audio;

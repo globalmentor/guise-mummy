@@ -10,11 +10,11 @@ import static java.text.MessageFormat.*;
 import java.util.*;
 import static java.util.Collections.*;
 
-import com.garretwilson.net.URIConstants;
-import com.garretwilson.net.URIPath;
 import com.globalmentor.beans.*;
 import com.globalmentor.io.BOMInputStreamReader;
 import com.globalmentor.java.Objects;
+import com.globalmentor.net.URIPath;
+import com.globalmentor.net.URIs;
 import com.globalmentor.text.CharacterEncoding;
 import com.globalmentor.urf.*;
 import com.globalmentor.urf.ploop.PLOOPURFProcessor;
@@ -31,8 +31,6 @@ import com.guiseframework.prototype.*;
 import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
 
-import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIs.*;
 import static com.globalmentor.io.FileConstants.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.io.Writers.*;
@@ -40,6 +38,7 @@ import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.CharacterEncoding.*;
 import static com.globalmentor.text.TextFormatter.*;
 import static com.globalmentor.urf.TURF.*;
@@ -1839,7 +1838,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	}
 	
 	/**Dereferences a URI by looking up any references from the resources if necessary.
-	If the URI has the {@value URIConstants#RESOURCE_SCHEME} scheme, its scheme-specific part will be used to look up the actual URI using {@link #getURIResource(String)}.
+	If the URI has the {@value URIs#RESOURCE_SCHEME} scheme, its scheme-specific part will be used to look up the actual URI using {@link #getURIResource(String)}.
 	If suffixes are given, they will be appended to the resource key in order, separated by '.'.
 	If no resource is associated with that resource key, a resource will be retrieved using the unadorned resource key.
 	URIs retrieved from resources will be recursively dereferenced without suffixes.

@@ -3,8 +3,8 @@ package com.guiseframework;
 import java.io.InputStream;
 import java.net.URI;
 
-import com.garretwilson.net.ResourceIOException;
-import com.garretwilson.net.URIPath;
+import com.globalmentor.net.ResourceIOException;
+import com.globalmentor.net.URIPath;
 import com.globalmentor.urf.URFResource;
 import com.globalmentor.urf.content.*;
 

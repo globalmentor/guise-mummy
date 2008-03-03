@@ -2,13 +2,11 @@ package com.guiseframework;
 
 import java.net.URI;
 
-import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIs.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
-import com.globalmentor.urf.*;
-
+import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.Text.*;
+import com.globalmentor.urf.*;
 import static com.globalmentor.urf.URF.*;
 
 /**Guise resources description in RDF.

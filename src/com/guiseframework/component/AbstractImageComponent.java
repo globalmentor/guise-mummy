@@ -4,10 +4,10 @@ import java.net.URI;
 
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.net.URIs.*;
 import static com.globalmentor.io.ContentTypeConstants.*;
 import static com.globalmentor.io.ContentTypes.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.util.Arrays.*;
 
 import com.globalmentor.io.ContentTypes;
