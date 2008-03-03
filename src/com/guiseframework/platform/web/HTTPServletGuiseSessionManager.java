@@ -6,8 +6,8 @@ import static java.util.Collections.*;
 
 import javax.servlet.http.*;
 
-import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.net.http.HTTPServlets.*;
 
 import com.globalmentor.util.Debug;
 import com.guiseframework.GuiseApplication;

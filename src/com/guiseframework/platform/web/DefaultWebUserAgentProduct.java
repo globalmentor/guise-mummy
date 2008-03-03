@@ -6,7 +6,7 @@ import java.util.Locale;
 import javax.mail.internet.ContentType;
 
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.net.http.HTTPConstants.*;
+import static com.globalmentor.net.http.HTTP.*;
 
 import com.guiseframework.platform.AbstractBrandedProduct;
 

@@ -3,10 +3,10 @@ package com.guiseframework.platform.web;
 import java.util.*;
 import static java.util.Collections.*;
 
-import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.net.http.HTTPServlets.*;
 
-import com.globalmentor.net.http.HTTPConstants;
+import com.globalmentor.net.http.HTTP;
 import com.guiseframework.platform.BrandedProduct;
 import com.guiseframework.platform.ClientProduct;
 
@@ -75,7 +75,7 @@ public interface WebUserAgentProduct extends ClientProduct, BrandedProduct<WebUs
 		}
 
 		/**Retrieves a brand from a given user agent name.
-		@param userAgentName The user agent name as reported by the HTTP {@value HTTPConstants#USER_AGENT_HEADER} header.
+		@param userAgentName The user agent name as reported by the HTTP {@value HTTP#USER_AGENT_HEADER} header.
 		@return The brand corresponding to the given user agent name, or <code>null</code> if the given user agent name was not recognized.
 		@exception NullPointerException if the given user agent name is <code>null</code>.
 		*/

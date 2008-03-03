@@ -11,9 +11,9 @@ import javax.mail.internet.ContentType;
 import javax.servlet.http.HttpServletResponse;
 
 
-import com.garretwilson.servlet.http.HttpServletUtilities;
 
 import com.globalmentor.io.ParseReader;
+import com.globalmentor.net.http.HTTPServlets;
 import com.globalmentor.text.CharacterEncoding;
 import com.globalmentor.text.Text;
 import com.globalmentor.text.xml.QualifiedName;
@@ -93,7 +93,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 		this.guiseRequest=checkInstance(guiseRequest, "Guise request cannot be null.");
 		this.response=checkInstance(response, "Response cannot be null.");
 //TODO decide if we want this to include parameters or not		this.navigationURI=URI.create(request.getRequestURL().toString());	//create the absolute navigation URI from the HTTP requested URL
-		this.depictURI=HttpServletUtilities.getRequestURI(guiseRequest.getHTTPServletRequest());	//get the depiction URI, containing any query
+		this.depictURI=HTTPServlets.getRequestURI(guiseRequest.getHTTPServletRequest());	//get the depiction URI, containing any query
 /*TODO del if not needed
 		final String referrer=getReferer(request);	//get the request referrer, if any
 		referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
@@ -105,7 +105,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 		setHashAttributesGenerated(true);	//always generate hash attributes
 		final ContentType defaultContentType=createContentType(outputContentType.getPrimaryType(), outputContentType.getSubType(), new NameValuePair<String, String>(CHARSET_PARAMETER, UTF_8));	//default to text/plain encoded in UTF-8
 		response.setContentType(defaultContentType.toString());	//initialize the default content type and encoding
-		HttpServletUtilities.setContentLanguage(response, session.getLocale());	//set the response content language
+		HTTPServlets.setContentLanguage(response, session.getLocale());	//set the response content language
 		final WebUserAgentProduct webUserAgent=getPlatform().getClientProduct();	//get the web user agent
 		this.isQuirksMode=webUserAgent.getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER && webUserAgent.getVersionNumber()<7 && !session.getApplication().isThemed();	//only use quirks mode for certain legacy (non-themed) applications using IE6
 	}

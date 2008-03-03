@@ -11,12 +11,12 @@ import java.util.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import static com.garretwilson.servlet.ServletConstants.*;
-import static com.garretwilson.servlet.http.HttpServletUtilities.*;
-
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.net.Servlets.*;
 import com.globalmentor.net.URIPath;
 import static com.globalmentor.net.URIs.*;
+import static com.globalmentor.net.http.HTTPServlets.*;
+
 import com.globalmentor.util.*;
 
 import com.guiseframework.*;

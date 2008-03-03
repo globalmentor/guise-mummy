@@ -11,10 +11,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import static com.garretwilson.servlet.http.HttpServletUtilities.*;
-import static com.garretwilson.servlet.http.HttpServletConstants.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
+import static com.globalmentor.net.http.HTTPServlets.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.event.ProgressListener;

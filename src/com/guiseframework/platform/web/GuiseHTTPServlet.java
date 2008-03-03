@@ -14,10 +14,6 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.xml.parsers.*;
 
-import static com.garretwilson.servlet.ServletConstants.*;
-import static com.garretwilson.servlet.http.HttpServletConstants.*;
-import static com.garretwilson.servlet.http.HttpServletUtilities.*;
-
 
 import com.globalmentor.event.ProgressEvent;
 import com.globalmentor.event.ProgressListener;
@@ -34,6 +30,7 @@ import com.globalmentor.text.xml.xpath.*;
 import com.globalmentor.urf.*;
 import com.globalmentor.urf.ploop.*;
 import com.globalmentor.util.*;
+
 import com.guiseframework.*;
 import com.guiseframework.component.*;
 import com.guiseframework.event.*;
@@ -49,8 +46,10 @@ import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
+import static com.globalmentor.net.Servlets.*;
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.net.http.HTTPConstants.*;
+import static com.globalmentor.net.http.HTTP.*;
+import static com.globalmentor.net.http.HTTPServlets.*;
 import static com.globalmentor.text.elff.WebTrendsConstants.*;
 import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;

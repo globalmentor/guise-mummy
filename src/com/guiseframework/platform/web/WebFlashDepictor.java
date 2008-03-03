@@ -6,6 +6,8 @@ import java.net.URI;
 import javax.mail.internet.ContentType;
 
 import com.globalmentor.io.ContentTypes;
+import com.globalmentor.net.http.HTTP;
+
 import static com.globalmentor.io.ContentTypeConstants.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
@@ -85,7 +87,7 @@ public class WebFlashDepictor<C extends Flash> extends AbstractSimpleWebComponen
 		{
 			depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CLASSID, FLASH_CLASS_ID);	//classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"; only write the classid attributes for IE, because it will prevent the Flash from being loaded in Firefox
 				//create a codebase URI in the form "http[s]://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0", making sure we use the same scheme so that IE6 won't complain if a secure page references a non-secure codebase
-			depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CODEBASE, getSWFlashCabURI("6,0,40,0", HTTPS_SCHEME.equals(depictContext.getDepictionURI().getScheme())).toString());	//codebase="http[s]://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0" TODO allow version to be specified
+			depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CODEBASE, getSWFlashCabURI("6,0,40,0", HTTP.HTTPS_SCHEME.equals(depictContext.getDepictionURI().getScheme())).toString());	//codebase="http[s]://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0" TODO allow version to be specified
 		}
 		else	//if the user agent is not IE, specify the object content type
 		{

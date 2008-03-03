@@ -6,7 +6,6 @@ import java.net.URI;
 import javax.mail.internet.ContentType;
 import javax.servlet.http.*;
 
-import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 
 import com.globalmentor.net.URIPath;
 import com.globalmentor.util.Debug;
@@ -15,6 +14,7 @@ import com.guiseframework.*;
 import static com.globalmentor.io.ContentTypes.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
+import static com.globalmentor.net.http.HTTPServlets.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
 
 /**Information about the Guise request of an HTTP servlet.
