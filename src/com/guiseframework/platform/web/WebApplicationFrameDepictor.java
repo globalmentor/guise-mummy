@@ -8,8 +8,8 @@ import java.util.*;
 import javax.mail.internet.ContentType;
 
 import static com.garretwilson.net.URIs.*;
-import static com.garretwilson.javascript.JavaScriptConstants.*;
 
+import static com.globalmentor.javascript.JavaScriptConstants.*;
 import static com.globalmentor.text.xml.XML.*;
 import com.globalmentor.text.xml.xhtml.XHTML;
 import com.globalmentor.util.Debug;
@@ -207,7 +207,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			//this script sets up the extended navigator properties, as well as the initial JavaScript version indicator 
 		depictContext.write("\t");
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT, false);	//<xhtml:script> (explicitly don't create an empty <xhtml:script> element, otherwise IE wouldn't recognize it)
-		depictContext.writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_TYPE, JAVASCRIPT_CONTENT_TYPE.toString());	//type="text/javascript"
+		depictContext.writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_TYPE, JAVASCRIPT_OBSOLETE_CONTENT_TYPE.toString());	//type="text/javascript"
 		depictContext.write('\n');
 		depictContext.write("\t\t");
 		depictContext.writeLiteral("navigator.userAgentName=\""+userAgent.getName()+"\";");	//navigator.userAgentName=USER_AGENT_NAME TODO use a constant for the variable name
@@ -436,7 +436,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		final int bodyLength=depictContext.getDepictStringBuilder().length();	//get the length of the body
 		depictContext.write("\t");
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT, false);	//<xhtml:script> (explicitly don't create an empty <xhtml:script> element, otherwise IE wouldn't recognize it)
-		depictContext.writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_TYPE, JAVASCRIPT_CONTENT_TYPE.toString());	//type="text/javascript"
+		depictContext.writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_TYPE, JAVASCRIPT_OBSOLETE_CONTENT_TYPE.toString());	//type="text/javascript"
 		depictContext.write('\n');
 		depictContext.write("\t\t");
 		depictContext.writeLiteral("document.bodyLength="+bodyLength+";");	//document.bodyLength=bodyLength TODO use a constant for the variable name

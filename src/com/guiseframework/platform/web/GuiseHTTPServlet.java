@@ -14,7 +14,6 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.xml.parsers.*;
 
-import com.garretwilson.javascript.JSON;
 import com.garretwilson.net.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIs.*;
@@ -30,6 +29,7 @@ import com.globalmentor.event.ProgressEvent;
 import com.globalmentor.event.ProgressListener;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Objects;
+import com.globalmentor.javascript.JSON;
 import com.globalmentor.security.Nonce;
 import com.globalmentor.text.CharacterEncoding;
 import com.globalmentor.text.elff.*;

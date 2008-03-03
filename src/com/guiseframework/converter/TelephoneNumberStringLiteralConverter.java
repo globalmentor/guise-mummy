@@ -4,8 +4,8 @@ import static java.text.MessageFormat.format;
 
 import java.util.Locale;
 
-import com.garretwilson.itu.CountryCode;
-import com.garretwilson.itu.TelephoneNumber;
+import com.globalmentor.itu.CountryCode;
+import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.text.ArgumentSyntaxException;
 import com.guiseframework.GuiseSession;
 

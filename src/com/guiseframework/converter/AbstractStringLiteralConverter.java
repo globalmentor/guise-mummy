@@ -7,7 +7,7 @@ import java.util.Locale;
 import static com.globalmentor.java.Objects.*;
 
 import com.garretwilson.net.EmailAddress;
-import com.garretwilson.itu.TelephoneNumber;
+import com.globalmentor.itu.TelephoneNumber;
 
 /**An abstract implementation an object that can convert a value from and to a string.
 @param <V> The value type this converter supports.

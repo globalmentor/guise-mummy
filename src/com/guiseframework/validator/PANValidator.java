@@ -6,7 +6,7 @@ import static com.globalmentor.java.Objects.*;
 
 import java.util.*;
 
-import com.garretwilson.iso.idcard.*;
+import com.globalmentor.iso.idcard.*;
 import com.globalmentor.util.Arrays;
 
 /**A validator to validate a Primary Account Number (PAN) of an identification card

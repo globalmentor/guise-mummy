@@ -3,11 +3,11 @@ package com.guiseframework.platform.web;
 import java.util.*;
 import static java.util.Collections.*;
 
-import com.garretwilson.javascript.JSON;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.util.Maps.*;
 
 
+import com.globalmentor.javascript.JSON;
 import com.globalmentor.util.NameValuePair;
 import com.guiseframework.platform.DepictedObject;
 

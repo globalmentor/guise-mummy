@@ -7,7 +7,7 @@ import com.guiseframework.geometry.Axis;
 import com.guiseframework.geometry.CompassPoint;
 import com.guiseframework.geometry.Side;
 
-import static com.garretwilson.iso.ISO639.*;
+import static com.globalmentor.iso.ISO639.*;
 import static com.globalmentor.java.Objects.*;
 
 /**Encapsulates internationalized orientation of objects.

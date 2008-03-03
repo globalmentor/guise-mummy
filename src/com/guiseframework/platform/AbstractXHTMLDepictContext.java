@@ -3,7 +3,7 @@ package com.guiseframework.platform;
 import java.io.IOException;
 import java.net.URI;
 
-import static com.garretwilson.javascript.JavaScriptConstants.*;
+import static com.globalmentor.javascript.JavaScriptConstants.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 
 import com.globalmentor.text.xml.xhtml.XHTML;
@@ -38,7 +38,7 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 	public ElementState writeJavaScriptElement(final URI javascriptURI) throws IOException
 	{
 		writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT, false);	//<xhtml:script> (explicitly don't create an empty <xhtml:script> element, otherwise IE wouldn't recognize it)
-		writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_TYPE, JAVASCRIPT_CONTENT_TYPE.toString());	//type="text/javascript"
+		writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_TYPE, JAVASCRIPT_OBSOLETE_CONTENT_TYPE.toString());	//type="text/javascript"
 		writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_SRC, getDepictionURI(javascriptURI).toString());	//src="javascript.js"
 		return writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT);	//</xhtml:script>	
 	}

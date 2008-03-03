@@ -8,14 +8,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import com.garretwilson.iso.idcard.PAN;
-import com.garretwilson.iso.idcard.Product;
-import com.garretwilson.itu.TelephoneNumber;
 import com.garretwilson.net.URIPath;
 import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
 import com.globalmentor.beans.GenericPropertyChangeEvent;
 import com.globalmentor.country.us.RTN;
 import com.globalmentor.country.us.SSN;
+import com.globalmentor.iso.idcard.PAN;
+import com.globalmentor.iso.idcard.Product;
+import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.util.Debug;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseSession;
