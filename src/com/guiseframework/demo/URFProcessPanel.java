@@ -7,7 +7,7 @@ import java.net.URI;
 import static com.globalmentor.text.CharacterEncoding.*;
 import static com.globalmentor.urf.TURF.*;
 
-import static com.globalmentor.text.xml.XMLUtilities.*;
+import static com.globalmentor.text.xml.XML.*;
 import com.globalmentor.urf.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;

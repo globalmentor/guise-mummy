@@ -17,7 +17,7 @@ import com.guiseframework.model.ui.PresentationModel;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.StringBuilders.*;
-import static com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants.*;
+import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
 import static com.guiseframework.model.ui.PresentationModel.*;
 import com.guiseframework.platform.AbstractXHTMLDepictContext;
 import com.guiseframework.platform.web.WebPlatform;
@@ -49,14 +49,14 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 	/**Returns a string representation of the provided style declarations.
 	This method performs special processing on the following properties, including generating user-agent-specific styles to allow proper display on certain browsers:
 	<ul>
-		<li>{@value XMLCSSConstants#CSS_PROP_COLOR} with a value of {@link Color} and an alpha less than 1.0.</li>
-		<li>{@value XMLCSSConstants#CSS_PROP_CURSOR} with a value of {@link URI}, interpreted as a predefined cursor (one of {@link Cursor#getURI()}) or as a URI to a custom cursor; URI references are allowed in either.</li>
-		<li>{@value XMLCSSConstants#CSS_PROP_DISPLAY} with a value of {@value XMLCSSConstants#CSS_DISPLAY_INLINE_BLOCK}.</li>
-		<li>{@value XMLCSSConstants#CSS_PROP_FONT_WEIGHT} with a value of {@link Number}, interpreted in terms of {@link PresentationModel#FONT_WEIGHT_NORMAL} and {@link PresentationModel#FONT_WEIGHT_BOLD}.</li>
-		<li>{@value XMLCSSConstants#CSS_PROP_MAX_WIDTH} or {@value XMLCSSConstants#CSS_PROP_MAX_HEIGHT} with a pixel value of {@link Extent}.</li>
-		<li>{@value XMLCSSConstants#CSS_PROP_OPACITY} with a value of {@link Number}.</li>
+		<li>{@value XMLCSS#CSS_PROP_COLOR} with a value of {@link Color} and an alpha less than 1.0.</li>
+		<li>{@value XMLCSS#CSS_PROP_CURSOR} with a value of {@link URI}, interpreted as a predefined cursor (one of {@link Cursor#getURI()}) or as a URI to a custom cursor; URI references are allowed in either.</li>
+		<li>{@value XMLCSS#CSS_PROP_DISPLAY} with a value of {@value XMLCSS#CSS_DISPLAY_INLINE_BLOCK}.</li>
+		<li>{@value XMLCSS#CSS_PROP_FONT_WEIGHT} with a value of {@link Number}, interpreted in terms of {@link PresentationModel#FONT_WEIGHT_NORMAL} and {@link PresentationModel#FONT_WEIGHT_BOLD}.</li>
+		<li>{@value XMLCSS#CSS_PROP_MAX_WIDTH} or {@value XMLCSS#CSS_PROP_MAX_HEIGHT} with a pixel value of {@link Extent}.</li>
+		<li>{@value XMLCSS#CSS_PROP_OPACITY} with a value of {@link Number}.</li>
 	</ul>
-	These styles include the CSS property {@value XMLCSSConstants#CSS_PROP_DISPLAY} with a value of {@value XMLCSSConstants#CSS_DISPLAY_INLINE_BLOCK}.
+	These styles include the CSS property {@value XMLCSS#CSS_PROP_DISPLAY} with a value of {@value XMLCSS#CSS_DISPLAY_INLINE_BLOCK}.
 	This implementation supports values of the following types:
 	<ul>
 		<li>{@link Color}</li>
@@ -197,8 +197,8 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 		return stringBuilder.toString();	//return the string we constructed
 	}
 
-	/**Appends a CSS {@value XMLCSSConstants#CSS_PROP_OPACITY} property designation.
-	If the user agent is IE 6, the appropriate {@value XMLCSSConstants#CSS_PROP_FILTER} property will also be added.
+	/**Appends a CSS {@value XMLCSS#CSS_PROP_OPACITY} property designation.
+	If the user agent is IE 6, the appropriate {@value XMLCSS#CSS_PROP_FILTER} property will also be added.
 	@param stringBuilder The string builder to which the style will be added
 	@param opacity The opacity value to add.
 	@return The provided string builder.

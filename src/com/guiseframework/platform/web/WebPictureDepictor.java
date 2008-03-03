@@ -9,7 +9,7 @@ import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.model.AbstractModel;
 
-import static com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants.*;
+import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 

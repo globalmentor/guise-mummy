@@ -7,9 +7,8 @@ import java.util.*;
 import javax.mail.internet.ContentType;
 import javax.xml.parsers.*;
 
-import static com.globalmentor.io.ContentTypeConstants.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.text.xml.XMLUtilities.*;
+import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 
 import com.globalmentor.util.*;

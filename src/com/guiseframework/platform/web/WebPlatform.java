@@ -8,7 +8,7 @@ import javax.mail.internet.ContentType;
 import com.garretwilson.net.URIPath;
 
 import static com.globalmentor.io.ContentTypes.*;
-import static com.globalmentor.text.xml.XMLUtilities.*;
+import static com.globalmentor.text.xml.XML.*;
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.platform.*;
 

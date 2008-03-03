@@ -7,11 +7,11 @@ import java.util.*;
 
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Numbers.*;
-import static com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants.*;
+import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.util.Arrays.*;
 
-import com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants;
+import com.globalmentor.text.xml.stylesheets.css.XMLCSS;
 import com.globalmentor.util.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
@@ -614,7 +614,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 
 	/**Determines the alignment string for an alignment on a particular axis.
  	This implementation converts the alignment to a value by determining into which third the alignment value falls.
-	Note that these values also work on the {@link Axis#Y} axis for the CSS {@link XMLCSSConstants#CSS_PROP_VERTICAL_ALIGN} property.
+	Note that these values also work on the {@link Axis#Y} axis for the CSS {@link XMLCSS#CSS_PROP_VERTICAL_ALIGN} property.
 	@param alignment The alignment value to convert.
 	@param axis The axis of alignment.
 	@param direction The direction of flow along the axis.

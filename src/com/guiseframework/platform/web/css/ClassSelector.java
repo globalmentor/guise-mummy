@@ -2,7 +2,7 @@ package com.guiseframework.platform.web.css;
 
 
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.text.xml.stylesheets.css.XMLCSSConstants.*;
+import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
 
 /**A class simple selector.
 @author Garret Wilson
