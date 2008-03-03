@@ -2,7 +2,7 @@ package com.guiseframework.component.rdf.maqro;
 
 import java.util.List;
 
-import static com.globalmentor.rdf.dublincore.DCUtilities.*;
+import static com.globalmentor.rdf.dublincore.RDFDublinCore.*;
 
 import com.globalmentor.rdf.*;
 import com.globalmentor.rdf.maqro.*;

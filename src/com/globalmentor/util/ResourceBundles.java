@@ -31,7 +31,7 @@ import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Java.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.rdf.RDFUtilities.*;
+import static com.globalmentor.rdf.RDFResources.*;
 import static com.globalmentor.urf.TURF.*;
 import static com.globalmentor.util.Locales.*;
 
