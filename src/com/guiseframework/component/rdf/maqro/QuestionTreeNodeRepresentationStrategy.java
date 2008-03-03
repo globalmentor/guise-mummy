@@ -1,7 +1,7 @@
 package com.guiseframework.component.rdf.maqro;
 
-import com.garretwilson.rdf.*;
-import com.garretwilson.rdf.maqro.Question;
+import com.globalmentor.rdf.*;
+import com.globalmentor.rdf.maqro.Question;
 import com.guiseframework.component.TreeControl;
 import com.guiseframework.model.TreeModel;
 import com.guiseframework.model.TreeNodeModel;

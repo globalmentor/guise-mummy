@@ -1,6 +1,6 @@
 package com.guiseframework.model.rdf;
 
-import com.garretwilson.rdf.*;
+import com.globalmentor.rdf.*;
 
 /**A tree node model that represents an RDF resource.
 <p>Any properties will be dynamically loaded</p>

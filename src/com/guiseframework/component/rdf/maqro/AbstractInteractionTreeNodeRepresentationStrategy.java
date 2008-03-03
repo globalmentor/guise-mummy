@@ -2,10 +2,10 @@ package com.guiseframework.component.rdf.maqro;
 
 import java.util.List;
 
-import com.garretwilson.rdf.*;
-import static com.garretwilson.rdf.dublincore.DCUtilities.*;
-import com.garretwilson.rdf.maqro.*;
+import static com.globalmentor.rdf.dublincore.DCUtilities.*;
 
+import com.globalmentor.rdf.*;
+import com.globalmentor.rdf.maqro.*;
 import com.globalmentor.util.Debug;
 import com.guiseframework.component.TreeControl;
 import com.guiseframework.component.rdf.AbstractRDFResourceTreeNodeRepresentationStrategy;

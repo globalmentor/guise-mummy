@@ -138,10 +138,6 @@ Debug.info("cache miss for text", xmlTextHash);
 					updateElementContent(rootElement);	//update the contents of the root element
 //				TODO del Debug.trace("text rendered");
 				}
-				catch(final ParserConfigurationException parserConfigurationException)	//we don't expect parser configuration errors
-				{
-					throw new AssertionError(parserConfigurationException);
-				}
 				catch(final SAXException saxException)	//we don't expect parsing errors
 				{
 					throw new AssertionError(saxException);	//TODO maybe change to throwing an IOException

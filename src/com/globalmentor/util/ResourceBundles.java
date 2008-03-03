@@ -20,18 +20,18 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import com.garretwilson.rdf.*;
 import com.globalmentor.io.IO;
 import com.globalmentor.net.Resource;
+import com.globalmentor.rdf.*;
 import com.globalmentor.urf.*;
 
-import static com.garretwilson.rdf.RDFUtilities.*;
 
 import static com.globalmentor.io.FileConstants.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Java.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
+import static com.globalmentor.rdf.RDFUtilities.*;
 import static com.globalmentor.urf.TURF.*;
 import static com.globalmentor.util.Locales.*;
 

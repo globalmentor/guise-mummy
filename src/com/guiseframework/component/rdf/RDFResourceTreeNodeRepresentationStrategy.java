@@ -1,6 +1,6 @@
 package com.guiseframework.component.rdf;
 
-import com.garretwilson.rdf.*;
+import com.globalmentor.rdf.*;
 
 /**A default tree node representation strategy representing an RDF resource.
 @author Garret Wilson

@@ -1,6 +1,6 @@
 package com.guiseframework.model.rdf.maqro;
 
-import com.garretwilson.rdf.maqro.*;
+import com.globalmentor.rdf.maqro.*;
 
 /**A tree node model that represents a general interaction.
 @param <V> The type of value contained in the tree node.

@@ -1,10 +1,10 @@
 package com.guiseframework.component.rdf;
 
-import com.garretwilson.rdf.*;
 
-import static com.garretwilson.rdf.RDFUtilities.*;
-import static com.garretwilson.rdf.rdfs.RDFSUtilities.*;
+import static com.globalmentor.rdf.RDFUtilities.*;
+import static com.globalmentor.rdf.rdfs.RDFSUtilities.*;
 
+import com.globalmentor.rdf.*;
 import com.guiseframework.component.TreeControl;
 import com.guiseframework.model.*;
 

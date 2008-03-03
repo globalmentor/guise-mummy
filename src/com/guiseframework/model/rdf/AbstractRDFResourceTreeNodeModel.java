@@ -1,15 +1,12 @@
 package com.guiseframework.model.rdf;
 
-
 import java.util.*;
-import static java.util.Collections.*;
 
-import com.garretwilson.rdf.*;
-import com.globalmentor.util.Debug;
-import com.guiseframework.model.*;
-
-import static com.garretwilson.rdf.RDFConstants.*;
 import static com.globalmentor.java.Classes.*;
+import com.globalmentor.rdf.*;
+import static com.globalmentor.rdf.RDF.*;
+
+import com.guiseframework.model.*;
 
 /**Abstract functionality for a tree node model that represents an RDF resource.
 <p>Any properties will be dynamically loaded</p>

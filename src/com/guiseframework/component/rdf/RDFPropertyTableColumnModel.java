@@ -4,7 +4,7 @@ import java.net.URI;
 
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.rdf.*;
+import com.globalmentor.rdf.*;
 import com.guiseframework.model.DefaultTableColumnModel;
 
 /**A model for a table column representing an RDF property.

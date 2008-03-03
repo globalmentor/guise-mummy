@@ -1,7 +1,7 @@
 package com.guiseframework.model.rdf.maqro;
 
-import com.garretwilson.rdf.maqro.FollowupEvaluation;
-import com.garretwilson.rdf.maqro.Interaction;
+import com.globalmentor.rdf.maqro.FollowupEvaluation;
+import com.globalmentor.rdf.maqro.Interaction;
 import com.guiseframework.model.rdf.AbstractRDFResourceTreeNodeModel;
 
 /**Abstract functionality for a tree node model that represents an interaction.

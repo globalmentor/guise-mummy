@@ -1,6 +1,6 @@
 package com.guiseframework.model.rdf;
 
-import com.garretwilson.rdf.*;
+import com.globalmentor.rdf.*;
 import com.guiseframework.model.TreeNodeModel;
 
 /**A tree node model that represents an object described in RDF.

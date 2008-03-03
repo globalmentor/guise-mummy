@@ -4,8 +4,8 @@ import java.net.URI;
 
 import static com.globalmentor.java.Objects.*;
 
-import com.garretwilson.rdf.RDFName;
-import com.garretwilson.rdf.RDFXMLGenerator;
+import com.globalmentor.rdf.RDFName;
+import com.globalmentor.rdf.RDFXMLGenerator;
 import com.globalmentor.text.xml.XMLNamespacePrefixManager;
 
 //TODO update to look up labels and definitions in some external OWL definition or something

@@ -2,7 +2,7 @@ package com.guiseframework.component.rdf;
 
 import java.net.URI;
 
-import com.garretwilson.rdf.*;
+import com.globalmentor.rdf.*;
 import com.guiseframework.model.*;
 
 /**A table model based upon a list of RDF resource.
