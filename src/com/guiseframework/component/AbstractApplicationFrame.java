@@ -1,12 +1,17 @@
 package com.guiseframework.component;
 
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import static java.util.Collections.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.mail.internet.ContentType;
+
 import static com.globalmentor.java.Objects.*;
 
+import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
+import com.globalmentor.beans.GenericPropertyChangeEvent;
 import com.guiseframework.input.*;
 
 /**Abstract implementation of an application frame.
@@ -77,6 +82,16 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 			}
 		}
 
+	/**Listener that listens for the current content component's label to change, and updates the application frame label in response.
+	@see #updateLabel()
+	*/
+	private final PropertyChangeListener contentLabelChangeUpdateLabelListener=new AbstractGenericPropertyChangeListener<String>() {
+		public void propertyChange(final GenericPropertyChangeEvent<String> genericPropertyChangeEvent)	//if the content title changes
+		{
+			updateLabel();	//update the label
+		};
+	};
+
 	/**Component constructor.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
 	*/
@@ -88,6 +103,54 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 		bindingInputStrategy.bind(new KeystrokeInput(Key.ENTER), new CommandInput(ProcessCommand.CONTINUE));	//map the Enter key to the "continue" command
 		bindingInputStrategy.bind(new KeystrokeInput(Key.ESCAPE), new CommandInput(ProcessCommand.ABORT));	//map the Escape key to the "abort" command
 		setInputStrategy(bindingInputStrategy);	//switch to our new input strategy
+	}
+
+	/**Sets the content child component.
+	This is a bound property.
+	This version updates the frame label by calling {@link #updateLabel()}.
+	@param newContent The content child component, or <code>null</code> if this frame does not have a content child component.
+	*/
+	public void setContent(final Component newContent)
+	{
+		final Component oldContent=getContent();	//set the previous content
+		if(oldContent!=newContent)	//if the content will really change
+		{
+			if(oldContent!=null)	//if we had a content component
+			{
+				oldContent.removePropertyChangeListener(Component.LABEL_PROPERTY, contentLabelChangeUpdateLabelListener);	//stop listening for its label to change
+			}
+			if(newContent!=null)	//if we have a new content component
+			{
+				newContent.addPropertyChangeListener(Component.LABEL_PROPERTY, contentLabelChangeUpdateLabelListener);	//listen for the content's label changing, and update our label in response
+			}
+			super.setContent(newContent);	//set the new content
+			updateLabel();	//update the label
+		}
+	}
+
+	/**Called when the content changes so that the label can be updated.
+	This version simply sets the application frame label to match the label of the content, if any.
+	@see #getContent()
+	@see #setLabel(String)
+	@see #setLabelContentType(ContentType)
+	*/
+	protected void updateLabel()	//TODO update to prefix everything with the base title, which in the default application should be the application name
+	{
+		final Component content=getContent();	//set the content, if any
+		final String label;
+		final ContentType labelContentType;
+		if(content!=null)	//if we have content
+		{
+			label=content.getLabel();	//use the content label
+			labelContentType=content.getLabelContentType();	//use the content label content type
+		}
+		else	//if we have no content
+		{
+			label=null;	//don't use a label
+			labelContentType=null;
+		}
+		setLabel(label);	//set the application frame label
+		setLabelContentType(labelContentType);	//set the application frame label content type
 	}
 
 	/**Determines whether the frame should be allowed to close.

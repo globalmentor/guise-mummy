@@ -180,14 +180,13 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		headerCommentStringBuilder.append(" or contact <info@globalmentor.com>.\n\t");
 		depictContext.writeComment(headerCommentStringBuilder.toString());	//write the header comment
 		depictContext.write("\n");
-		final Component content=component.getContent();	//get the child component
-		final String title=content.getLabel();	//get the child component title
+		final String title=component.getLabel();	//get the frame title
 		if(title!=null)	//if a title is given
 		{
 			//<xhtml:title>
 			depictContext.write('\t');
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TITLE);	//<xhtml:title>
-			depictContext.write(AbstractModel.getPlainText(session.dereferenceString(title), content.getLabelContentType()));	//write the title
+			depictContext.write(AbstractModel.getPlainText(session.dereferenceString(title), component.getLabelContentType()));	//write the title
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TITLE);	//</xhtml:title>
 			depictContext.write('\n');
 		}
