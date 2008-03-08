@@ -9,9 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.mail.internet.ContentType;
 
 import static com.globalmentor.java.Objects.*;
-
-import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
-import com.globalmentor.beans.GenericPropertyChangeEvent;
+import com.globalmentor.beans.*;
 import com.guiseframework.input.*;
 
 /**Abstract implementation of an application frame.
@@ -128,21 +126,65 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 		}
 	}
 
+	/**The delimiter to use when constructing the label from its various segments.*/
+	public final static String LABEL_SEPARATOR=" > ";
+
+	/**Retrieves the plain-text base title to use when constructing a label.
+	@return A base plain-text string to use when constructing a label, or <code>null</code> if there is no base label.
+	@see #updateLabel()
+	*/
+	protected abstract String getBasePlainLabel();
+
 	/**Called when the content changes so that the label can be updated.
-	This version simply sets the application frame label to match the label of the content, if any.
+	This version sets the application frame label to match the label of the content, if any,
+	prefixed with a base label, if any.
+	If the label content type is not plain text, the base label is ignored.
 	@see #getContent()
+	@see #getBasePlainLabel()
 	@see #setLabel(String)
 	@see #setLabelContentType(ContentType)
 	*/
-	protected void updateLabel()	//TODO update to prefix everything with the base title, which in the default application should be the application name
+	protected void updateLabel()
 	{
 		final Component content=getContent();	//set the content, if any
 		final String label;
 		final ContentType labelContentType;
 		if(content!=null)	//if we have content
 		{
-			label=content.getLabel();	//use the content label
-			labelContentType=content.getLabelContentType();	//use the content label content type
+			final String contentLabel=content.getLabel();	//get the content label, if any
+			final ContentType contentLabelContentType=content.getLabelContentType();	//get the content label content type
+			if(contentLabel==null || PLAIN_TEXT_CONTENT_TYPE.match(contentLabelContentType) || contentLabel==null)	//if there is no content label or the content label is plain text, we can use plain text for the entire label
+			{
+				final String basePlainLabel=getBasePlainLabel();	//see if there is a base label
+				if(basePlainLabel!=null || contentLabel!=null)	//if we have a base label or content label
+				{
+					final StringBuilder labelStringBuilder=new StringBuilder();
+					if(basePlainLabel!=null)	//if there is a base label
+					{
+						labelStringBuilder.append(basePlainLabel);	//start with the base label
+					}
+					if(contentLabel!=null)	//if the content has a label
+					{
+						if(labelStringBuilder.length()>0)	//if there is already label content
+						{
+							labelStringBuilder.append(LABEL_SEPARATOR);	//separate the label components
+						}
+						labelStringBuilder.append(contentLabel);	//append the content label
+					}
+					label=labelStringBuilder.toString();	//use the label we constructed
+					labelContentType=PLAIN_TEXT_CONTENT_TYPE;	//we'll use plain text for the label
+				}
+				else	//if we have no label text at all
+				{
+					label=null;	//don't use a label
+					labelContentType=getLabelContentType();	//stay with the current content type
+				}
+			}
+			else	//if we can't use plain text
+			{
+				label=contentLabel;	//use the content label
+				labelContentType=contentLabelContentType;	//use the content label content type
+			}
 		}
 		else	//if we have no content
 		{
