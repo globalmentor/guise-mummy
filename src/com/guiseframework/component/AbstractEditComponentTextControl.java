@@ -2,9 +2,7 @@ package com.guiseframework.component;
 
 import java.beans.*;
 
-
 import static com.globalmentor.java.Objects.*;
-
 
 import com.globalmentor.beans.*;
 import com.globalmentor.util.Debug;
@@ -15,14 +13,14 @@ import com.guiseframework.prototype.*;
 import com.guiseframework.theme.Theme;
 
 /**Control that allows some component text property to be edited in-place.
-Editing can be started by calling {@link #setMode(AbstractEditableComponentTextControl.Mode)} with {@link Mode#EDIT}.
+Editing can be started by calling {@link #setMode(AbstractEditComponentTextControl.Mode)} with {@link Mode#EDIT}.
 <p>This class binds a single left mouse click input to {@link #getEditActionPrototype()},
 the command {@link ProcessCommand#CONTINUE} to {@link #getAcceptActionPrototype()},
 and the command {@link ProcessCommand#ABORT} to {@link #getRejectActionPrototype()}.</p>
 @param <EC> The type of component being edited.
 @author Garret Wilson
 */
-public abstract class AbstractEditableComponentTextControl<EC extends Component> extends AbstractContainerControl implements ModalComponent<AbstractEditableComponentTextControl.Mode>, EditComponent
+public abstract class AbstractEditComponentTextControl<EC extends Component> extends AbstractContainerControl implements ModalComponent<AbstractEditComponentTextControl.Mode>, EditComponent
 {
 
 	/**The mode of this component; whether the component is being edited.*/
@@ -177,7 +175,7 @@ public abstract class AbstractEditableComponentTextControl<EC extends Component>
 	@param flow The logical axis (line or page) along which information is flowed.
 	@exception NullPointerException if the edited component, value control, text property, and/or flow axis is <code>null</code>.
 	*/
-	public AbstractEditableComponentTextControl(final EC editedComponent, final String editedProperty, final ValueControl<String> editControl, final Flow flow)
+	public AbstractEditComponentTextControl(final EC editedComponent, final String editedProperty, final ValueControl<String> editControl, final Flow flow)
 	{
 		super(new FlowLayout(flow));	//construct the parent class with a flow layout
 		this.editedComponent=checkInstance(editedComponent, "Edited component cannot be null.");

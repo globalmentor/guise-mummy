@@ -5,11 +5,11 @@ import com.guiseframework.component.layout.*;
 /**Control that allows a component's label to be edited in-place.
 @author Garret Wilson
 */
-public class EditableComponentLabelControl extends AbstractEditableComponentTextControl<Component>  
+public class EditComponentLabelControl extends AbstractEditComponentTextControl<Component>  
 {
 
 	/**Default constructor with a default label component, default text edit control, and {@link Flow#LINE} layout.*/
-	public EditableComponentLabelControl()
+	public EditComponentLabelControl()
 	{
 		this(Flow.LINE);	//construct the class with line flow layout
 	}
@@ -18,7 +18,7 @@ public class EditableComponentLabelControl extends AbstractEditableComponentText
 	@param flow The logical axis (line or page) along which information is flowed.
 	@exception NullPointerException if the flow axis is <code>null</code>.
 	*/
-	public EditableComponentLabelControl(final Flow flow)
+	public EditComponentLabelControl(final Flow flow)
 	{
 		this(new Label(), flow);	//construct the parent class with a default label component
 	}
@@ -27,7 +27,7 @@ public class EditableComponentLabelControl extends AbstractEditableComponentText
 	@param labelComponent The component the label of which is to be edited.
 	@exception NullPointerException if the label component is <code>null</code>.
 	*/
-	public EditableComponentLabelControl(final Component labelComponent)
+	public EditComponentLabelControl(final Component labelComponent)
 	{
 		this(labelComponent, new TextControl<String>(String.class));	//construct the class with a default text control
 	}
@@ -37,7 +37,7 @@ public class EditableComponentLabelControl extends AbstractEditableComponentText
 	@param flow The logical axis (line or page) along which information is flowed.
 	@exception NullPointerException if the label component and/or flow is <code>null</code>.
 	*/
-	public EditableComponentLabelControl(final Component labelComponent, final Flow flow)
+	public EditComponentLabelControl(final Component labelComponent, final Flow flow)
 	{
 		this(labelComponent, new TextControl<String>(String.class), flow);	//construct the class with a default text control
 	}
@@ -47,7 +47,7 @@ public class EditableComponentLabelControl extends AbstractEditableComponentText
 	@param editControl The control used to edit the label.
 	@exception NullPointerException if the label component and/or edit control is <code>null</code>.
 	*/
-	public EditableComponentLabelControl(final Component labelComponent, final ValueControl<String> editControl)
+	public EditComponentLabelControl(final Component labelComponent, final ValueControl<String> editControl)
 	{
 		this(labelComponent, editControl, Flow.LINE);	//construct the class with line flow
 	}
@@ -58,7 +58,7 @@ public class EditableComponentLabelControl extends AbstractEditableComponentText
 	@param flow The logical axis (line or page) along which information is flowed.
 	@exception NullPointerException if the label component, value control, and/or flow axis is <code>null</code>.
 	*/
-	public EditableComponentLabelControl(final Component labelComponent, final ValueControl<String> editControl, final Flow flow)
+	public EditComponentLabelControl(final Component labelComponent, final ValueControl<String> editControl, final Flow flow)
 	{
 		super(labelComponent, Component.LABEL_PROPERTY, editControl, flow);	//construct the parent class with a flow layout
 	}
