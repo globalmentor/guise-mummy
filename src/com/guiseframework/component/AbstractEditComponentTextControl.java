@@ -255,12 +255,31 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 		setMode(Mode.EDIT);	//switch to edit mode, updating the component
 	}
 
-	/**Accepts edits.*/
+	/**Accepts edits.
+	If the component is not in edit mode, no action occurs.
+	This implementation defers to {@link #acceptEdit(String)}.
+	@see #getMode()
+	*/
 	public void acceptEdit()
 	{
-		setText(getEditedComponent(), getEditControl().getValue());	//update the edited component's text with the contents of the edit control
-		setMode(null);	//switch out of edit mode, updating the component
-		fireEdited();	//inform listeners that an edit has occurred
+		acceptEdit(getEditControl().getValue());	//update the edited component's text with the contents of the edit control
+	}
+
+	/**Accepts edits with the given text.
+	If the component is not in edit mode, no action occurs.
+	This implementation sets the edit component text to the given text and fires and edited event.
+	@param text The edited text to accept.
+	@see #getMode()
+	@see #setText(Component, String)
+	*/
+	protected void acceptEdit(final String text)
+	{
+		if(getMode()==Mode.EDIT)	//if we are in edit mode
+		{
+			setText(getEditedComponent(), text);	//update the edited component's text with the given text
+			setMode(null);	//switch out of edit mode, updating the component
+			fireEdited();	//inform listeners that an edit has occurred
+		}
 	}
 
 	/**Cancels edits.*/
