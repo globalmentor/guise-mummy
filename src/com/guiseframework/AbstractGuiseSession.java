@@ -8,10 +8,12 @@ import java.text.MessageFormat;
 
 import static java.text.MessageFormat.*;
 import java.util.*;
+
 import static java.util.Collections.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.io.BOMInputStreamReader;
+import com.globalmentor.java.CharSequences;
 import com.globalmentor.java.Objects;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.net.URIs;
@@ -1263,7 +1265,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		Later requested navigation before navigation occurs will override this request.
 		@param path A path that is either relative to the application context path or is absolute.
 		@exception NullPointerException if the given path is <code>null</code>.
-		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 		@see #navigate(URI)
 		*/
 		public void navigate(final URIPath path)
@@ -1277,7 +1278,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@param path A path that is either relative to the application context path or is absolute.
 		@param viewportID The ID of the viewport in which navigation should occur, or <code>null</code> if navigation should occur in the current viewport.
 		@exception NullPointerException if the given path is <code>null</code>.
-		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 		@see #navigate(URI, String)
 		*/
 		public void navigate(final URIPath path, final String viewportID)
@@ -1291,7 +1291,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@param path A path that is either relative to the application context path or is absolute.
 		@param bookmark The bookmark at the given path, or <code>null</code> if no bookmark should be included in the navigation.
 		@exception NullPointerException if the given path is <code>null</code>.
-		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 		@see #navigate(URI)
 		*/
 		public void navigate(final URIPath path, final Bookmark bookmark)
@@ -1306,7 +1305,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@param bookmark The bookmark at the given path, or <code>null</code> if no bookmark should be included in the navigation.
 		@param viewportID The ID of the viewport in which navigation should occur, or <code>null</code> if navigation should occur in the current viewport.
 		@exception NullPointerException if the given path is <code>null</code>.
-		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 		@see #navigate(URI, String)
 		*/
 		public void navigate(final URIPath path, final Bookmark bookmark, final String viewportID)
@@ -1344,7 +1342,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@param path A path that is either relative to the application context path or is absolute.
 		@param modalListener The listener to respond to the end of modal interaction.
 		@exception NullPointerException if the given path is <code>null</code>.
-		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 		@see #navigateModal(URI, ModalNavigationListener)
 		*/
 		public void navigateModal(final URIPath path, final ModalNavigationListener modalListener)
@@ -1359,7 +1356,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@param bookmark The bookmark at the given path, or <code>null</code> if no bookmark should be included in the navigation.
 		@param modalListener The listener to respond to the end of modal interaction.
 		@exception NullPointerException if the given path is <code>null</code>.
-		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 		@see #navigateModal(URI, ModalNavigationListener)
 		*/
 		public void navigateModal(final URIPath path, final Bookmark bookmark, final ModalNavigationListener modalListener)
@@ -1378,54 +1374,46 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		public void navigateModal(final URI uri, final ModalNavigationListener modalListener)
 		{
 			requestedNavigation=new ModalNavigation(getApplication().resolveURI(getNavigationPath().toURI()), getApplication().resolveURI(checkInstance(uri, "URI cannot be null.")), modalListener);	//resolve the URI against the application context path
-		}		
-
-	/**The synchronized list of postponed model events.*/
-//TODO del	private final List<PostponedEvent<?>> queuedModelEventList=synchronizedList(new LinkedList<PostponedEvent<?>>());	//use a linked list because we'll be removing items from the front of the list as we process the events TODO fix; this doesn't seem to be the case anymore, so we can use a synchronized array list
-
-		/**Queues a postponed event to be fired after the context has finished processing events.
-		If a Guise context is currently processing events, the event will be queued for later.
-		If no Guise context is currently processing events, the event will be fired immediately.
-		@param postponedEvent The event to fire at a later time.
-		*/
-/*TODO del
-		public synchronized void queueEvent(final PostponedEvent<?> postponedEvent)
+		}
+		
+	/**Retrieves a breadcrumb for a particular navigation path.
+	This implementation uses the name of the resulting depiction URI for the breadcrumb label.
+	This implementation returns a default breadcrumb;
+	subclasses may override this method and provide customized breadcrumb information.
+	@param navigationPath The navigation path which a breadcrumb should be returned.
+	@return A breadcrumb for the given navigation URI.
+	@throws NullPointerException if the given navigation path is <code>null</code>.
+	@see #getDepictionURI(URI, String...)
+	*/
+	public Breadcrumb getBreadcrumb(final URIPath navigationPath)
+	{
+		final URI depictionURI=getDepictionURI(navigationPath.toURI());	//get the depiction URI to show
+		return new Breadcrumb(navigationPath, URIs.getName(depictionURI));	//create a default breadcrumb with the decoded depiction name of this navigation path
+	}
+		
+	/**Retrieves breadcrumbs for all the segments of a particular navigation path.
+	This method delegates to {@link #getBreadcrumb(URIPath)} to create each segment breadcrumb.
+	@param navigationPath The navigation path which breadcrumbs should be returned.
+	@return A list of breadcrumbs for the given navigation URI.
+	@throws NullPointerException if the given navigation path is <code>null</code>.
+	*/
+	public List<Breadcrumb> getBreadcrumbs(final URIPath navigationPath)
+	{
+		final List<Breadcrumb> breadcrumbs=new ArrayList<Breadcrumb>();	//create a list in which to store the breadcrumbs
+		final StringBuilder navigationPathStringBuilder=new StringBuilder();	//create a string builder to collect the segments of the URI
+		final StringTokenizer navigationPathTokenizer=new StringTokenizer(navigationPath.toString(), String.valueOf(PATH_SEPARATOR), true);	//tokenize the navigation path
+		while(navigationPathTokenizer.hasMoreTokens())	//while there are more tokens
 		{
-//TODO fix; decide if we want to allow delayed events			if(context!=null && (context.getState()==GuiseContext.State.PROCESS_EVENT))	//if the context is processing an event
-			if(false)	//TODO fix; testing
+			final String token=navigationPathTokenizer.nextToken();	//get the next token
+			navigationPathStringBuilder.append(token);	//add the token to the path string builder
+			if(!CharSequences.equals(token, PATH_SEPARATOR))	//if this is not the path separator
 			{
-				queuedModelEventList.add(postponedEvent);	//add the postponed event to our list of postponed events					
-			}
-			else	//if no context is changing the model
-			{
-				postponedEvent.fireEvent();	//go ahead and fire the event immediately
+				final URIPath segmentNavigationPath=new URIPath(navigationPathTokenizer.hasMoreTokens() ? navigationPathStringBuilder.toString()+PATH_SEPARATOR : navigationPathStringBuilder.toString());	//append a path separator to the segment string if there is a path separator following this path segment (that's all that can follow this segment, as the path separator is the delimiter)
+				breadcrumbs.add(getBreadcrumb(segmentNavigationPath));	//add a breadcrumb for this segment of the navigation path
 			}
 		}
-*/
-
-		/**Fires any postponed model events that are queued.*/
-/*TODO del
-		protected void fireQueuedModelEvents()
-		{
-			synchronized(queuedModelEventList)	//don't allow any changes to the postponed model event list while we access it
-			{
-				final Iterator<PostponedEvent<?>> postponedModelEventIterator=queuedModelEventList.iterator();	//get an iterator to all the model events
-				while(postponedModelEventIterator.hasNext())	//while there are more postponed model events
-				{
-					final PostponedEvent<?> postponedModelEvent=postponedModelEventIterator.next();	//get the next postponed event
-					try
-					{
-						postponedModelEvent.fireEvent();	//fire the event
-					}
-					finally	//there could be an exception while we're firing the event
-					{
-						postponedModelEventIterator.remove();	//always remove the event we fired, even if there's an exception, so it won't be fired again if there is an exception
-					}
-				}
-				queuedModelEventList.clear();	//remove all pending model events
-			}
-		}
-*/
+		return breadcrumbs;	//return the breadcrumbs we collected
+	}
 
 	/**Called when the session is initialized.
 	@exception IllegalStateException if the session is already initialized.

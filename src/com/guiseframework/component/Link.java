@@ -24,7 +24,16 @@ public class Link extends AbstractLinkControl
 	*/
 	public Link(final String label)
 	{
-		this(new DefaultLabelModel(label), new DefaultActionModel(), new DefaultEnableable());	//construct the class with default models
+		this(new DefaultLabelModel(label));	//construct the class with a default label model
+	}
+
+	/**Label model constructor.
+	@param labelModel The component label model.
+	@exception NullPointerException if the given label model is <code>null</code>.
+	*/
+	public Link(final LabelModel labelModel)
+	{
+		super(labelModel, new DefaultActionModel(), new DefaultEnableable());	//construct the parent class with the given label model and default other models
 	}
 
 	/**Label model, action model, and enableable object constructor.

@@ -552,7 +552,6 @@ public interface GuiseSession extends PropertyBindable
 	Later requested navigation before navigation occurs will override this request.
 	@param path A path that is either relative to the application context path or is absolute.
 	@exception NullPointerException if the given path is <code>null</code>.
-	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 	@see #navigate(URI)
 	*/
 	public void navigate(final URIPath path);
@@ -563,7 +562,6 @@ public interface GuiseSession extends PropertyBindable
 	@param path A path that is either relative to the application context path or is absolute.
 	@param viewportID The ID of the viewport in which navigation should occur, or <code>null</code> if navigation should occur in the current viewport.
 	@exception NullPointerException if the given path is <code>null</code>.
-	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 	@see #navigate(URI, String)
 	*/
 	public void navigate(final URIPath path, final String viewportID);
@@ -574,7 +572,6 @@ public interface GuiseSession extends PropertyBindable
 	@param path A path that is either relative to the application context path or is absolute.
 	@param bookmark The bookmark at the given path, or <code>null</code> if no bookmark should be included in the navigation.
 	@exception NullPointerException if the given path is <code>null</code>.
-	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 	@see #navigate(URI)
 	*/
 	public void navigate(final URIPath path, final Bookmark bookmark);
@@ -586,7 +583,6 @@ public interface GuiseSession extends PropertyBindable
 	@param bookmark The bookmark at the given path, or <code>null</code> if no bookmark should be included in the navigation.
 	@param viewportID The ID of the viewport in which navigation should occur, or <code>null</code> if navigation should occur in the current viewport.
 	@exception NullPointerException if the given path is <code>null</code>.
-	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 	@see #navigate(URI, String)
 	*/
 	public void navigate(final URIPath path, final Bookmark bookmark, final String viewportID);
@@ -614,7 +610,6 @@ public interface GuiseSession extends PropertyBindable
 	@param path A path that is either relative to the application context path or is absolute.
 	@param modalListener The listener to respond to the end of modal interaction.
 	@exception NullPointerException if the given path is <code>null</code>.
-	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 	@see #navigateModal(URI, ModalNavigationListener)
 	*/
 	public void navigateModal(final URIPath path, final ModalNavigationListener modalListener);
@@ -626,7 +621,6 @@ public interface GuiseSession extends PropertyBindable
 	@param bookmark The bookmark at the given path, or <code>null</code> if no bookmark should be included in the navigation.
 	@param modalListener The listener to respond to the end of modal interaction.
 	@exception NullPointerException if the given path is <code>null</code>.
-	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 	@see #navigateModal(URI, ModalNavigationListener)
 	*/
 	public void navigateModal(final URIPath path, final Bookmark bookmark, final ModalNavigationListener modalListener);
@@ -639,6 +633,21 @@ public interface GuiseSession extends PropertyBindable
 	@exception NullPointerException if the given URI is <code>null</code>.
 	*/
 	public void navigateModal(final URI uri, final ModalNavigationListener modalListener);
+
+	/**Retrieves a breadcrumb for a particular navigation path.
+	@param navigationPath The navigation path which a breadcrumb should be returned.
+	@return A breadcrumb for the given navigation URI.
+	@throws NullPointerException if the given navigation path is <code>null</code>.
+	*/
+	public Breadcrumb getBreadcrumb(final URIPath navigationPath);
+		
+	/**Retrieves breadcrumbs for all the segments of a particular navigation path.
+	This method delegates to {@link #getBreadcrumb(URIPath)} to create each segment breadcrumb.
+	@param navigationPath The navigation path which breadcrumbs should be returned.
+	@return A list of breadcrumbs for the given navigation URI.
+	@throws NullPointerException if the given navigation path is <code>null</code>.
+	*/
+	public List<Breadcrumb> getBreadcrumbs(final URIPath navigationPath);
 
 	/**Called when the session is initialized.
 	@exception IllegalStateException if the session is already initialized.
