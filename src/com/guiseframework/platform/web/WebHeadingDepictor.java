@@ -17,14 +17,33 @@ public class WebHeadingDepictor<C extends LabelComponent> extends WebLabelDepict
 	protected final static String[] HEADING_LOCAL_NAMES=new String[]{ELEMENT_H1, ELEMENT_H2, ELEMENT_H3, ELEMENT_H4, ELEMENT_H5, ELEMENT_H6};
 
 	/**Determines the local name of the component.
-	This version returns one of the XHTML heading element local names if a valid level is specified, otherwise the local name of the XHTML <code>&lt;span&gt;</code> element.
-	@return The appropriate XHTML heading element name if a level is specified, otherwise the XHTML span element name.
+	This version returns one of the XHTML heading element local names if the component is a {@link HeadingComponent} and a valid level is specified, otherwise the default local name is returned.
+	@return The appropriate XHTML heading element name if a valie {@link HeadingComponent} level is specified, otherwise the default local name.
+	@see Heading#getLevel()
+	@see #getHeadingLocalName(int)
 	*/
 	public String getLocalName()
 	{
 		final C component=getDepictedObject();	//get the component		
-		final int level=component instanceof Heading ? ((Heading)component).getLevel() : -1;	//get the heading level, if this is a heading
-		return level>=0 && level<HEADING_LOCAL_NAMES.length ? HEADING_LOCAL_NAMES[level] : super.getLocalName();	//if this is a valid level, retrieve the local name from the array; otherwise, use the default value
+		if(component instanceof HeadingComponent)	//if this is a heading
+		{
+			final String localName=getHeadingLocalName(((HeadingComponent)component).getLevel());	//get the heading local name for this heading level
+			if(localName!=null)	//if there is a local name
+			{
+				return localName;	//return the local name
+			}
+		}
+		return super.getLocalName();	//return the default local name
+	}
+
+	/**Determines the local name to use for a heading based upon a heading level.
+	This method returns one of the XHTML heading element local names if a valid level is specified.
+	@param headingLevel The zero-based level of the heading, or {@link #NO_HEADING_LEVEL} if no level is specified.
+	@return The appropriate XHTML heading element name if a level is specified, or <code>null</code> if there is no heading local name for the given heading level.
+	*/
+	public static String getHeadingLocalName(final int headingLevel)
+	{
+		return headingLevel>=0 && headingLevel<HEADING_LOCAL_NAMES.length ? HEADING_LOCAL_NAMES[headingLevel] : null;	//if this is a valid level, retrieve the local name from the array
 	}
 
 }

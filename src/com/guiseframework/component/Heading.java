@@ -1,7 +1,5 @@
 package com.guiseframework.component;
 
-import static com.globalmentor.java.Classes.*;
-
 import com.guiseframework.model.*;
 
 /**A heading component.
@@ -11,25 +9,19 @@ This component installs a default export strategy supporting export of the follo
 </ul>
 @author Garret Wilson
 */
-public class Heading extends AbstractLabel
+public class Heading extends AbstractLabel implements HeadingComponent
 {
-
-	/**The heading level value indicating no heading level.*/
-	public final static int NO_HEADING_LEVEL=-1;
 	
-	/**The level bound property.*/
-	public final static String LEVEL_PROPERTY=getPropertyName(Heading.class, "level");
-
-	/**The zero-based level of the heading, or {@link #NO_HEADING_LEVEL} if no level is specified.*/
+	/**The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.*/
 	private int level;
 
-		/**@return The zero-based level of the heading, or {@link #NO_HEADING_LEVEL} if no level is specified.*/
+		/**@return The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.*/
 		public int getLevel() {return level;}
 
 		/**Sets the level of the heading.
 		This is a bound property of type <code>Integer</code>.
-		@param newLevel The new zero-based heading level, or {@link #NO_HEADING_LEVEL} if no level is specified.
-		@see #LEVEL_PROPERTY
+		@param newLevel The new zero-based heading level, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
+		@see HeadingComponent#LEVEL_PROPERTY
 		*/
 		public void setLevel(final int newLevel)
 		{
@@ -48,7 +40,7 @@ public class Heading extends AbstractLabel
 	}
 
 	/**Heading level constructor with a default label model.
-	@param level The zero-based level of the heading, or {@link #NO_HEADING_LEVEL} if no level is specified.
+	@param level The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
 	*/
 	public Heading(final int level)
 	{
@@ -74,7 +66,7 @@ public class Heading extends AbstractLabel
 
 	/**Label and level constructor.
 	@param label The text of the label, or <code>null</code> if there should be no label.
-	@param level The zero-based level of the heading, or {@link #NO_HEADING_LEVEL} if no level is specified.
+	@param level The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
 	*/
 	public Heading(final String label, final int level)
 	{
@@ -83,7 +75,7 @@ public class Heading extends AbstractLabel
 
 	/**Label model and level constructor.
 	@param labelModel The component label model.
-	@param level The zero-based level of the heading, or {@link #NO_HEADING_LEVEL} if no level is specified.
+	@param level The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
 	@exception NullPointerException if the given session label model is <code>null</code>.
 	*/
 	public Heading(final LabelModel labelModel, final int level)

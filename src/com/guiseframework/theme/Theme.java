@@ -270,6 +270,7 @@ public class Theme extends URFListResource<Rule>
 	public final static String LABEL_PASSWORD_VERIFICATION=createStringResourceReference("theme.label.password_verification");
 	public final static String LABEL_PREVIOUS=createStringResourceReference("theme.label.previous");
 	public final static String LABEL_RAISE=createStringResourceReference("theme.label.raise");
+	public final static String LABEL_READ=createStringResourceReference("theme.label.read");
 	public final static String LABEL_REFRESH=createStringResourceReference("theme.label.refresh");
 	public final static String LABEL_REJECT=createStringResourceReference("theme.label.reject");
 	public final static String LABEL_REMOVE=createStringResourceReference("theme.label.remove");

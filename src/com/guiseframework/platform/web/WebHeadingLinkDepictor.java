@@ -1,0 +1,51 @@
+package com.guiseframework.platform.web;
+
+import java.io.IOException;
+
+import static com.globalmentor.text.xml.xhtml.XHTML.*;
+
+import com.guiseframework.component.*;
+import com.guiseframework.event.*;
+
+/**Strategy for rendering an action model control as an XHTML <code>&lt;a&gt;</code> element containing a heading.
+For the component to be rendered at the correct heading level it must be a {@link HeadingComponent}.
+If a link has a {@link NavigateActionListener} as one of its action listeners, the generated <code>href</code> URI will be that of the listener,
+	and a <code>target</code> attribute will be set of the listener specifies a viewport ID.
+@param <C> The type of component being depicted.
+@author Garret Wilson
+@see WebHeadingDepictor
+*/
+public class WebHeadingLinkDepictor<C extends ActionControl> extends WebLinkDepictor<C>
+{
+
+	/**Default constructor using the XHTML <code>&lt;a&gt;</code> element.*/
+	public WebHeadingLinkDepictor()
+	{
+	}
+
+	/**Begins the rendering process.
+	This version starts the inner heading element.
+	@exception IOException if there is an error rendering the component.
+	@see WebHeadingDepictor#getHeadingLocalName(int)
+	*/
+	protected void depictBegin() throws IOException
+	{
+		super.depictBegin();	//do the default beginning rendering
+		final C component=getDepictedObject();	//get the component
+		final String localName=component instanceof HeadingComponent ? WebHeadingDepictor.getHeadingLocalName(((HeadingComponent)component).getLevel()) : null;	//if this is a heading, try to get a local name for its specified heading level
+		getDepictContext().writeElementBegin(XHTML_NAMESPACE_URI, localName!=null ? localName : ELEMENT_LABEL);	//start the element, using a default element if there isn't an appropriate heading level
+	}
+
+	/**Ends the depiction process.
+	This version ends the inner heading element.
+	@exception IOException if there is an error updating the depiction.
+	@see WebHeadingDepictor#getHeadingLocalName(int)
+	*/
+	protected void depictEnd() throws IOException
+	{
+		final C component=getDepictedObject();	//get the component
+		final String localName=component instanceof HeadingComponent ? WebHeadingDepictor.getHeadingLocalName(((HeadingComponent)component).getLevel()) : null;	//if this is a heading, try to get a local name for its specified heading level
+		getDepictContext().writeElementEnd(XHTML_NAMESPACE_URI, localName!=null ? localName : ELEMENT_LABEL);	//end the element, using a default element if there isn't an appropriate heading level
+		super.depictEnd();	//do the default ending rendering
+	}
+}

@@ -111,6 +111,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 		registerDepictorClass(Frame.class, WebFrameDepictor.class);
 		registerDepictorClass(GroupPanel.class, WebFieldsetDepictor.class);
 		registerDepictorClass(Heading.class, WebHeadingDepictor.class);
+		registerDepictorClass(HeadingLink.class, WebHeadingLinkDepictor.class);
 		registerDepictorClass(ImageComponent.class, WebImageDepictor.class);
 		registerDepictorClass(ImageActionControl.class, WebImageActionControlDepictor.class);
 		registerDepictorClass(ImageBooleanSelectActionControl.class, WebImageBooleanSelectActionControlViewer.class);
