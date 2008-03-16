@@ -39,7 +39,9 @@ public class AbstractWebFrameDepictor<C extends Frame> extends AbstractWebCompon
 	{
 		super(namespaceURI, localName, isEmptyElementAllowed);	//construct the parent class
 		getIgnoredProperties().add(Frame.INPUT_FOCUS_STRATEGY_PROPERTY);	//ignore changes in the focus strategy, because that shouldn't change the way information is updated 
-		getIgnoredProperties().add(Frame.INPUT_FOCUSED_COMPONENT_PROPERTY);	//ignore the focused component changing, because this doesn't make the frame as a whole dirty---this is more of a book-keeping property 
+		getIgnoredProperties().add(Frame.INPUT_FOCUSED_COMPONENT_PROPERTY);	//ignore the focused component changing, because this doesn't make the frame as a whole dirty---this is more of a book-keeping property
+		//TODO eventually optimize frame label changing as we do for application frames
+		getIgnoredProperties().add(GuiseSession.INPUT_STRATEGY_PROPERTY);	//ignore changes to GuiseSession.inputStrategy, because changes to the input strategy does not affect the frame's view
 	}
 
 	/**Called when the depictor is installed in a component.
@@ -53,7 +55,6 @@ public class AbstractWebFrameDepictor<C extends Frame> extends AbstractWebCompon
 	{
 		super.installed(component);	//install ourselves normally
 		component.getSession().addPropertyChangeListener(getDepictedPropertyChangeListener());	//listen for session changes
-		getIgnoredProperties().add(GuiseSession.INPUT_STRATEGY_PROPERTY);	//ignore changes to GuiseSession.inputStrategy, because changes to the input strategy does not affect the frame's view
 	}
 
 	/**Called when the depictor is uninstalled from a component.

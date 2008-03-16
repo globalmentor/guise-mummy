@@ -126,6 +126,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 	public WebApplicationFrameDepictor()
 	{
 		super(XHTML_NAMESPACE_URI, ELEMENT_BODY);	//represent <xhtml:body>
+		getIgnoredProperties().add(ApplicationFrame.LABEL_PROPERTY);	//ignore ApplicationFrame.label by default, because we don't want to reload the page just because its title changed; we'll send a special platform event instead
 	}
 
 	/**Begins the rendering process.
