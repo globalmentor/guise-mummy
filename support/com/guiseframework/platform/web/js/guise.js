@@ -38,7 +38,10 @@ GUISE_VERSION The build ID of the current Guise version.
 		/>
 		<init	<!--initializes the page, requesting all frames to be resent-->
 			jsVersion=""	<!--version of JavaScript supported by the browser-->
-			timezone=""
+			utcOffset=""	<!--the current UTC offset in milliseconds-->
+			utcOffset01=""	<!--the UTC offset of January in milliseconds-->
+			utcOffset06=""	<!--the UTC offset of June in milliseconds-->
+//TODO del			timezone="" <!--will vary according to DST-->
 			hour=""
 			language=""
 			colorDepth=""
@@ -170,22 +173,67 @@ var STYLES=
 
 /**A class indicating an initialization AJAX request.
 var jsVersion The version of JavaScript.
-var timezone=date.getTimezoneOffset();	//get the time zone offset
-var hour=date.getHours();	//get the current hours
-var language=navigator.language | navigator.userLanguage;	//get the user language
-var colorDepth=screen.colorDepth;	//get the color depth
-var screenWidth=screen.width;	//get the screen width
-var screenHeight=screen.height;	//get the screen height
-var javaEnabled=navigator.javaEnabled();	//see if java is enabled
-var browserWidth=document.body.offsetWidth;	//get the browser width
-var browserHeight=document.body.offsetHeight;	//get the browser height
+var utcOffset The current UTC offset in milliseconds.
+var utcOffset01 The UTC offset of January in milliseconds.
+var utcOffset06 The UTC offset of June in milliseconds.
+//TODO del var timezone The time zone offset.
+var hour The current hours.
+var language The user language.
+var colorDepth The color depth.
+var screenWidth The screen width.
+var screenHeight The screen height.
+var javaEnabled Whether java is enabled.
+var browserWidth The browser width.
+var browserHeight The browser height
 var referrer=document.referrer;	//get the document referrer
 */
 function InitAJAXEvent()
 {
 	this.javascriptVersion=javascriptVersion;	//save the JavaScript version
 	var date=new Date();	//create a new date
-	this.timezone=date.getTimezoneOffset()/-60;	//get the time zone offset
+	
+	//TODO fix; see http://www.breakingpar.com/bkp/home.nsf/0/87256B280015193F87256CFB006C45F7 and http://developer.mozilla.org/en/docs/Core_JavaScript_1.5_Reference:Global_Objects:Date:getTimezoneOffset and http://devblog.redfin.com/2007/08/getting_the_time_zone_from_a_web_browser.html
+	
+		//calculate the time zone, accounting for daylight saving time (modified from http://onlineaspect.com/2007/06/08/auto-detect-a-time-zone-with-javascript/)
+/*TODO del if not needed; this seems to give the absolute time zone without adjusting for DST
+	var dateString=date.toUTCString();	//create a string of the current date in UTC
+	var dateLocal=new Date(dateString.substring(0, dateString.lastIndexOf(" ")-1));	//get the date as if it were local to GMT
+	this.utcOffset=(date-dateLocal);	//get the current UTC offset in milliseconds
+*/
+	
+	this.utcOffset=-date.getTimezoneOffset()*60*1000;	//get the current UTC offset in milliseconds
+	var januaryUTC=new Date(date.getFullYear(), 0, 1, 0, 0, 0, 0);  //get January of this year in UTC
+	var januaryUTCString=januaryUTC.toUTCString();	//get the string form of the January UTC date
+	var januaryLocal=new Date(januaryUTCString.substring(0, januaryUTCString.lastIndexOf(" ")-1));	//get January of this year in local time
+	var juneUTC=new Date(date.getFullYear(), 6, 1, 0, 0, 0, 0); //get June of this year in UTC
+	var juneUTCString=juneUTC.toUTCString();	//get the string form of the June UTC date
+	var juneLocal=new Date(juneUTCString.substring(0, juneUTCString.lastIndexOf(" ")-1));	//get January of this year in local time
+	this.utcOffset01=(januaryUTC-januaryLocal);	//get the UTC offset of January in milliseconds
+	this.utcOffset06=(juneUTC-juneLocal);	//get the UTC offset of June in milliseconds
+/*TODO del if not needed
+	var offsetDelta=januaryUTCOffset-juneUTCOffset;	//determine the difference in offset
+	if(offsetDelta>0)
+	if(januaryUTCOffset!=juneUTCOffset)	//if the offsets are different
+	{
+	   		// positive is southern, negative is northern hemisphere
+			if (hemisphere >= 0)
+				std_time_offset = daylight_time_offset;
+			dst = "1"; // daylight savings time is observed
+	   }
+	   var i;
+	   for (i = 0; i < document.getElementById('timezone').options.length; i++) {
+			if (document.getElementById('timezone').options[i].value == convert(std_time_offset)+","+dst) {
+				document.getElementById('timezone').selectedIndex = i;
+				break;
+			}
+	   }
+	}	
+	else	//if both offsets are the same
+	{
+		dst=false; //daylight savings time is *not* observed
+	}
+*/
+//TODO del	this.timezone=date.getTimezoneOffset()/-60;	//get the time zone offset
 	this.hour=date.getHours();	//get the current hours
 	this.language=navigator.language || navigator.userLanguage;	//get the user language
 	this.colorDepth=screen.colorDepth;	//get the color depth
@@ -824,7 +872,10 @@ com.guiseframework.js.Guise=function()
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.INIT,	//<init
 					new Map("javascriptVersion", ajaxInitEvent.javascriptVersion,
-						"timezone", ajaxInitEvent.timezone,
+						"utcOffset", ajaxInitEvent.utcOffset,
+						"utcOffset01", ajaxInitEvent.utcOffset01,
+						"utcOffset06", ajaxInitEvent.utcOffset06,
+//TODO del						"timezone", ajaxInitEvent.timezone,
 						"hour", ajaxInitEvent.hour,
 						"language", ajaxInitEvent.language,
 						"colorDepth", ajaxInitEvent.colorDepth,

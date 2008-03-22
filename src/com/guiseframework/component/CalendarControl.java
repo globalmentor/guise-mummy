@@ -23,7 +23,7 @@ If the model used by the calendar control uses a {@link RangeValidator} with a d
 Otherwise, a text input will be used for year selection.
 @author Garret Wilson
 */
-public class CalendarControl extends AbstractContainerValueControl<Date>
+public class CalendarControl extends AbstractLayoutValueControl<Date>
 {
 
 	/**The visible date bound property.*/
@@ -103,7 +103,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date>
 			{
 				final Date oldDate=date;	//get the old value
 				date=(Date)newDate.clone();	//clone the new date and actually change the value
-				updateCalendars();	//update the calendars based upon the new value
+				updateDateControls();	//update the calendars based upon the new value
 				firePropertyChange(DATE_PROPERTY, oldDate, newDate);	//indicate that the value changed
 			}
 		}
@@ -114,8 +114,8 @@ public class CalendarControl extends AbstractContainerValueControl<Date>
 		this(new DefaultValueModel<Date>(Date.class));	//construct the class with a default value model
 	}
 
-	/**The property change listener that updates the calendars when a property changes.*/
-	protected final GenericPropertyChangeListener<?> updateModelPropertyChangeListener;
+	/**The property change listener that updates the date controls when a property changes.*/
+	protected final GenericPropertyChangeListener<?> updateDateControlsPropertyChangeListener;
 
 	/**The property change listener that updates the visible dates if the year is different than the last one.*/
 	protected final GenericPropertyChangeListener<Integer> yearPropertyChangeListener;
@@ -130,11 +130,10 @@ public class CalendarControl extends AbstractContainerValueControl<Date>
 		final Date selectedDate=valueModel.getValue();	//get the selected date
 		date=selectedDate!=null ? selectedDate : new Date();	//set the currently visible date to the selected date, or the current date if no date is selected
 		controlContainer=new LayoutPanel(new FlowLayout(Flow.LINE));	//create the control panel
-		add(controlContainer);	//add the control panel
+		addComponent(controlContainer);	//add the control panel
 		calendarContainer=new LayoutPanel(new FlowLayout(Flow.LINE));	//create the calendar panel
-		add(calendarContainer);	//add the calendar panel
+		addComponent(calendarContainer);	//add the calendar panel
 		monthListControl=new ListControl<Date>(Date.class, new SingleListSelectionPolicy<Date>());	//create a list control allowing only single selections of a month
-//TODO fix if needed		monthListControl.setStyleID("month");	//TODO use a constant
 		monthListControl.setLabel("Month");	//set the month control label TODO get from resources
 		monthListControl.setValidator(new ValueRequiredValidator<Date>());	//require a locale to be selected in the list control
 		monthListControl.setRowCount(1);	//make this a drop-down list
@@ -149,7 +148,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date>
 						final Integer newYear=propertyChangeEvent.getNewValue();	//get the new selected year
 						if(newYear!=null)	//if a new year was selected (a null value can be sent when the model is cleared)
 						{
-							final Calendar calendar=Calendar.getInstance(getSession().getLocale());	//create a new calendar
+							final Calendar calendar=Calendar.getInstance(getSession().getTimeZone(), getSession().getLocale());	//create a new calendar
 							calendar.setTime(getDate());	//set the calendar date to our currently displayed date
 							if(calendar.get(Calendar.YEAR)!=newYear)	//if the currently visible date is in another year
 							{
@@ -172,15 +171,15 @@ public class CalendarControl extends AbstractContainerValueControl<Date>
 		}
 */
 		updateYearControl();	//create and install an appropriate year control
-		updateCalendars();	//update the calendars
-		updateModelPropertyChangeListener=new AbstractGenericPropertyChangeListener<Object>()	//create a property change listener to update the calendars
+		updateDateControls();	//update the date controls
+		updateDateControlsPropertyChangeListener=new AbstractGenericPropertyChangeListener<Object>()	//create a property change listener to update the calendars
 		{
 			public void propertyChange(final GenericPropertyChangeEvent<Object> propertyChangeEvent)	//if the model value value changed
 			{
-				updateCalendars();	//update the calendars based upon the new selected date
+				updateDateControls();	//update the date controls based upon the new selected date
 			}
 		};
-		valueModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, updateModelPropertyChangeListener);	//update the calendars if the selected date changes
+		valueModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, updateDateControlsPropertyChangeListener);	//update the calendars if the selected date changes
 		valueModel.addPropertyChangeListener(ValueModel.VALIDATOR_PROPERTY, new AbstractGenericPropertyChangeListener<Validator<Date>>()	//create a property change listener to listen for our validator changing, so that we can update the date control if needed
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<Validator<Date>> propertyChangeEvent)	//if the model's validator changed
@@ -189,7 +188,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date>
 					}
 				});
 			//TODO important: this is a memory leak---make sure we uninstall the listener when the session goes away
-		getSession().addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, updateModelPropertyChangeListener);	//update the calendars if the locale changes
+		getSession().addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, updateDateControlsPropertyChangeListener);	//update the calendars if the locale changes
 		monthListControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Date>()	//create a property change listener to listen for the month changing
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<Date> propertyChangeEvent)	//if the selected month changed
@@ -197,10 +196,10 @@ public class CalendarControl extends AbstractContainerValueControl<Date>
 						final Date newDate=propertyChangeEvent.getNewValue();	//get the new selected date
 						if(newDate!=null)	//if a new month was selected (a null value can be sent when the model is cleared)
 						{
-							final Calendar newCalendar=Calendar.getInstance(getSession().getLocale());	//create a new calendar
+							final Calendar newCalendar=Calendar.getInstance(getSession().getTimeZone(), getSession().getLocale());	//create a new calendar
 							newCalendar.setTime(newDate);	//set the new calendar date to the newly selected month
 							final int newMonth=newCalendar.get(Calendar.MONTH);	//get the new requested month
-							final Calendar calendar=Calendar.getInstance(getSession().getLocale());	//create a new calendar
+							final Calendar calendar=Calendar.getInstance(getSession().getTimeZone(), getSession().getLocale());	//create a new calendar
 							calendar.setTime(getDate());	//set the calendar date to our currently displayed date
 							if(calendar.get(Calendar.MONTH)!=newMonth)	//if the currently visible date is in another month
 							{
@@ -218,7 +217,9 @@ public class CalendarControl extends AbstractContainerValueControl<Date>
 	*/
 	protected void updateYearControl()
 	{
-		final Locale locale=getSession().getLocale();	//get the current locale
+		final GuiseSession session=getSession();	//get the current session
+		final Locale locale=session.getLocale();	//get the current locale
+		final TimeZone timeZone=session.getTimeZone();	//get the current time zone
 		if(yearControl!=null)	//if there is a year control already in use
 		{
 			controlContainer.remove(yearControl);	//remove our year control TODO later use controlContainer.replace() when that method is available
@@ -232,7 +233,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date>
 		if(validator instanceof RangeValidator)	//if there is a range validator installed
 		{
 			final RangeValidator<Date> rangeValidator=(RangeValidator<Date>)validator;	//get the validator as a range validator
-			final Calendar calendar=Calendar.getInstance(locale);	//create a new calendar for determining the year of the restricted dates
+			final Calendar calendar=Calendar.getInstance(timeZone, locale);	//create a new calendar for determining the year of the restricted dates
 			final Date minDate=rangeValidator.getMinimum();	//get the minimum date
 			if(minDate!=null)	//if there is a minimum date specified
 			{
@@ -252,7 +253,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date>
 			yearListControl.setRowCount(1);	//make the list control a drop-down list
 			for(int year=minYear; year<=maxYear; ++year)	//for each valid year
 			{
-				yearListControl.add(new Integer(year));	//add this year to the choices
+				yearListControl.add(Integer.valueOf(year));	//add this year to the choices
 			}
 			yearListControl.setValidator(new ValueRequiredValidator<Integer>());	//require a value in the year drop-down
 			yearControl=yearListControl;	//use the year list control for the year control
@@ -269,12 +270,12 @@ public class CalendarControl extends AbstractContainerValueControl<Date>
 		assert yearControl!=null : "Failed to create a year control";
 //TODO fix if needed		yearControl.setStyleID("year");	//TODO use a constant
 		yearControl.setLabel("Year");	//set the year control label TODO get from resources
-		final Calendar calendar=Calendar.getInstance(locale);	//create a new calendar for setting the year
+		final Calendar calendar=Calendar.getInstance(timeZone, locale);	//create a new calendar for setting the year
 		calendar.setTime(getDate());	//set the calendar date to our displayed date
 		final int year=calendar.get(Calendar.YEAR);	//get the current year
 		try
 		{
-			yearControl.setValue(new Integer(year));	//show the selected year in the text box
+			yearControl.setValue(Integer.valueOf(year));	//show the selected year in the text box
 		}
 		catch(final PropertyVetoException propertyVetoException)	//we should never have a problem selecting a year or a month
 		{
@@ -290,26 +291,29 @@ public class CalendarControl extends AbstractContainerValueControl<Date>
 	/**The month calendar used the last time the calendars were updated, or <code>null</code> if no calendar was known.*/
 	private Calendar oldCalendar=null;	
 	
-	/**Whether we're currently updating calendars, to avoid reentry from control events.*/
-	private boolean updatingCalendars=false;
+	/**Whether we're currently updating the date controls, to avoid reentry from control events.*/
+	private boolean updatingDateControls=false;
 	
-	/**Updates the calendars on the calendar panel.*/
-	protected synchronized void updateCalendars()
+	/**Updates the controls representing the date.
+	This implementation updates the calendars on the calendar panel.
+	*/
+	protected synchronized void updateDateControls()
 	{
-		if(!updatingCalendars)	//if we're not already updating the calendars
+		if(!updatingDateControls)	//if we're not already updating the calendars
 		{
-			updatingCalendars=true;	//show that we're updating the calendars
+			updatingDateControls=true;	//show that we're updating the calendars
 			try
 			{
 //TODO del		Debug.trace("*** Updating calendars");
 				final Locale locale=getSession().getLocale();	//get the current locale
+				final TimeZone timeZone=getSession().getTimeZone();	//get the current time zone
 				final boolean localeChanged=!locale.equals(oldLocale);	//see if the locale changed		
 				final Calendar calendar;	//determine which calendar to use
 				final Date date=getDate();	//get the visible date
 				final boolean dateChanged=oldCalendar==null || !oldCalendar.getTime().equals(date);	//we'll have to calculate all new dates if there was no calendar before or the dates diverged		
 				if(localeChanged || dateChanged)	//if the locale changed or the date changed
 				{
-					calendar=Calendar.getInstance(locale);	//create a new calendar
+					calendar=Calendar.getInstance(timeZone, locale);	//create a new calendar
 					calendar.setTime(date);	//set the calendar date to our displayed date
 				}
 				else	//if we can keep the old calendar
@@ -320,11 +324,11 @@ public class CalendarControl extends AbstractContainerValueControl<Date>
 				final boolean yearChanged=localeChanged || oldCalendar==null || oldCalendar.get(Calendar.YEAR)!=year;	//the year should be updated if the locale changed, there was no calendar, or the years are different
 				final int month=calendar.get(Calendar.MONTH);	//get the current month
 				final boolean monthChanged=yearChanged || oldCalendar.get(Calendar.MONTH)!=month;	//the month should be updated if the the year or month changed
-				if(yearChanged)	//if the year changed (different years can have different months with some calendars
+				if(yearChanged)	//if the year changed (different years can have different months with some calendars)
 				{
 					try
 					{
-						yearControl.setValue(new Integer(year));	//show the selected year in the text box
+						yearControl.setValue(Integer.valueOf(year));	//show the selected year in the text box
 						monthListControl.clear();	//clear the values in the month list control
 						final Calendar monthNameCalendar=(Calendar)calendar.clone();	//clone the month calendar as we step through the months
 						final int minMonth=monthNameCalendar.getActualMinimum(Calendar.MONTH);	//get the minimum month
@@ -368,7 +372,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date>
 			}
 			finally
 			{
-				updatingCalendars=false;	//show that we're no longer updating calendars
+				updatingDateControls=false;	//show that we're no longer updating calendars
 			}
 		}
 	}
@@ -405,7 +409,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date>
 		*/
 		public <C extends Date> Component createComponent(final Table table, final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused)
 		{
-			final Calendar calendar=Calendar.getInstance(getSession().getLocale());	//create a calendar TODO cache the calendar and only change it if the locale has changed
+			final Calendar calendar=Calendar.getInstance(getSession().getTimeZone(), getSession().getLocale());	//create a calendar TODO cache the calendar and only change it if the locale has changed
 			calendar.setTime(getDate());	//set the calendar date to the date of the calendar
 			final int calendarMonth=calendar.get(Calendar.MONTH);	//get the month of the calendar
 			final Date date=model.getCellValue(rowIndex, column);	//get the date for this cell

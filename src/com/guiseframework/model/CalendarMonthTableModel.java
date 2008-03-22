@@ -145,7 +145,7 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 	*/
 	protected void updateColumnLabelDateFormat()
 	{
-		columnLabelDateFormat=AbstractDateStringLiteralConverter.createDateFormat(getColumnLabelDateStyle(), null, getSession().getLocale());	//create a new date format based upon the style and locale		
+		columnLabelDateFormat=AbstractDateStringLiteralConverter.createDateFormat(getColumnLabelDateStyle(), null, getSession().getLocale(), getSession().getTimeZone());	//create a new date format based upon the style, locale, and time zone		
 	}
 
 	/**Default constructor for current month using the current date.*/

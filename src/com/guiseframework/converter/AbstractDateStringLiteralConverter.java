@@ -5,6 +5,10 @@ import static java.text.MessageFormat.*;
 import java.text.*;
 import java.util.*;
 
+import static com.globalmentor.java.Objects.*;
+
+import com.guiseframework.GuiseSession;
+
 /**An object that can convert a date object from and to a string.
 This implementation caches a date format and only creates a new one if the locale has changed.
 This implementation synchronizes all conversions on the {@link DateFormat} object.
@@ -38,13 +42,22 @@ public abstract class AbstractDateStringLiteralConverter<V> extends AbstractConv
 	/**The lazily-assigned locale for which a date format was generated.*/
 	private Locale locale=null;
 
-	/**@return A date format object appropriate for the session's current locale.*/
+	/**The lazily-assigned time zone for which a date format was generated.*/
+	private Locale timeZone=null;
+
+	/**Determines a date format object appropriate for the session's current locale and time zone.
+	@return A date format object appropriate for the session's current locale.
+	@see GuiseSession#getLocale()
+	@see GuiseSession#getTimeZone()
+	*/
 	protected synchronized DateFormat getDateFormat()
 	{
-		final Locale sessionLocale=getSession().getLocale();	//get the current session locale
-		if(dateFormat==null || !sessionLocale.equals(locale))	//if we haven't yet generated a date format or the locale has changed
+		final GuiseSession session=getSession();	//get the Guise session
+		final Locale sessionLocale=session.getLocale();	//get the current session locale
+		final TimeZone sessionTimeZone=session.getTimeZone();	//get the current session time zone
+		if(dateFormat==null || !sessionLocale.equals(locale) || !sessionTimeZone.equals(timeZone))	//if we haven't yet generated a date format, locale, and/or time zone has changed
 		{
-			dateFormat=createDateFormat(getDateStyle(), getTimeStyle(), sessionLocale);	//create a new date format
+			dateFormat=createDateFormat(getDateStyle(), getTimeStyle(), sessionLocale, sessionTimeZone);	//create a new date format
 			locale=sessionLocale;	//update the locale			
 		}
 		return dateFormat;	//return the date format
@@ -102,11 +115,12 @@ public abstract class AbstractDateStringLiteralConverter<V> extends AbstractConv
 	@param dateStyle The date representation style, or <code>null</code> if the date should not be represented.
 	@param timeStyle The date representation style, or <code>null</code> if the date should not be represented.
 	@param locale The locale for which a date format should be created.
+	@param timeZone The time zone for which a date format should be created.
 	@return A date format object appropriate for the given locale.
-	@exception NullPointerException if the both the date style and time style is <code>null</code>.
+	@exception NullPointerException if the both the date style and time style is <code>null</code>, or if the locale and/or time zone is <code>null</code>.
 	@exception IllegalArgumentException if both date style and time style is given and one of the styles specifies other than short/medium/long/full format.
 	*/
-	public static DateFormat createDateFormat(final DateStringLiteralStyle dateStyle, final TimeStringLiteralStyle timeStyle, final Locale locale)
+	public static DateFormat createDateFormat(final DateStringLiteralStyle dateStyle, final TimeStringLiteralStyle timeStyle, final Locale locale, final TimeZone timeZone)
 	{
 		final int dateFormatStyle=dateStyle!=null ? DATE_FORMAT_STYLES[dateStyle.ordinal()] : -1;	//get the date format style
 		final int timeFormatStyle=timeStyle!=null ? TIME_FORMAT_STYLES[timeStyle.ordinal()] : -1;	//get the time format style
@@ -172,6 +186,7 @@ public abstract class AbstractDateStringLiteralConverter<V> extends AbstractConv
 				simpleDateFormat.applyPattern(patternBuilder.toString());	//apply the new pattern
 			}
 		}
+		dateFormat.setTimeZone(checkInstance(timeZone, "Time zone cannot be null."));	//show that time zone to use for formatting the date and/or time
 		return dateFormat;	//return the date format we created
 	}
 	

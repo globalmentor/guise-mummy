@@ -42,6 +42,7 @@ public class AbstractWebFrameDepictor<C extends Frame> extends AbstractWebCompon
 		getIgnoredProperties().add(Frame.INPUT_FOCUSED_COMPONENT_PROPERTY);	//ignore the focused component changing, because this doesn't make the frame as a whole dirty---this is more of a book-keeping property
 		//TODO eventually optimize frame label changing as we do for application frames
 		getIgnoredProperties().add(GuiseSession.INPUT_STRATEGY_PROPERTY);	//ignore changes to GuiseSession.inputStrategy, because changes to the input strategy does not affect the frame's view
+		getIgnoredProperties().add(GuiseSession.TIME_ZONE_PROPERTY);	//ignore changes to the UTC offset, because this will get initialized from JavaScript after loading the first time and we don't want to reload everything on the initial load
 	}
 
 	/**Called when the depictor is installed in a component.

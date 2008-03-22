@@ -4,13 +4,14 @@ import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.java.Objects;
+
 import com.guiseframework.component.layout.Layout;
 import com.guiseframework.model.*;
 
-/**An abstract implementation of a container that is also a control.
+/**An abstract implementation of a layout component that is also a control.
 @author Garret Wilson
 */
-public abstract class AbstractContainerControl extends AbstractContainer implements ContainerControl
+public abstract class AbstractLayoutControl extends AbstractLayoutComponent implements LayoutControl
 {
 
 	/**The enableable object decorated by this component.*/
@@ -107,10 +108,10 @@ public abstract class AbstractContainerControl extends AbstractContainer impleme
 	}
 
 	/**Layout constructor with a default label model and enableable.
-	@param layout The layout definition for the container.
+	@param layout The layout definition for the layout component.
 	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
-	public AbstractContainerControl(final Layout<?> layout)
+	public AbstractLayoutControl(final Layout<?> layout)
 	{
 		this(new DefaultLabelModel(), new DefaultEnableable(), layout);	//construct the class with a default label model and enableable
 	}
@@ -118,10 +119,10 @@ public abstract class AbstractContainerControl extends AbstractContainer impleme
 	/**Label model, enableable, and layout constructor.
 	@param labelModel The component label model.
 	@param enableable The enableable object in which to store enabled status.
-	@param layout The layout definition for the container.
+	@param layout The layout definition for the layout component.
 	@exception NullPointerException if the given label model, enableable, and/or layout is <code>null</code>.
 	*/
-	public AbstractContainerControl(final LabelModel labelModel, final Enableable enableable, final Layout<?> layout)
+	public AbstractLayoutControl(final LabelModel labelModel, final Enableable enableable, final Layout<?> layout)
 	{
 		super(labelModel, layout);	//construct the parent class
 		this.enableable=checkInstance(enableable, "Enableable object cannot be null.");	//save the enableable object

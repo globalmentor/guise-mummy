@@ -56,6 +56,7 @@ import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.urf.content.Content.*;
 import static com.globalmentor.urf.dcmi.DCMI.*;
+import static com.globalmentor.util.TimeZones.*;
 import com.globalmentor.util.Collections;
 
 import static com.guiseframework.platform.web.WebPlatform.*;
@@ -860,9 +861,34 @@ Debug.trace("got control events");
 							final String javascriptVersion=initControlEvent.getJavaScriptVersion();	//get the JavaScript version reported
 							if(javascriptVersion!=null)	//if JavaScript is supported
 							{
-								guisePlatform.setJavaScriptProduct(new DefaultProduct(null, "JavaScript", javascriptVersion, Double.parseDouble(javascriptVersion)));	//set the JavaScript product for the platform
+								guisePlatform.setJavaScriptProduct(new DefaultProduct(null, "JavaScript", javascriptVersion, Double.parseDouble(javascriptVersion)));	//set the JavaScript product for the platform TODO use a constant
 							}
+//TODO del if not needed							TimeZone timeZone=null;	//we'll try to determine a time zone from the initialization information
+							final int utcOffset=initControlEvent.getUTCOffset();	//get the current UTC offset in milliseconds
+							final TimeZone timeZone=guiseSession.getTimeZone();	//get the session time zone
 							final Date now=new Date();
+							if(timeZone.getOffset(now.getTime())!=utcOffset)	//if the session time zone doesn't match the client UTC offset
+							{
+								
+								guiseSession.setTimeZone(getTimeZone(now, utcOffset));	//get a time zone for this offset and update the sesson's time zone TODO improve to check DST
+								
+							}
+/*TODO fix or del
+							final String[] timeZoneIDs=TimeZone.getAvailableIDs(utcOffset);	//get the available time zone IDs for the UTC offset
+							if(timeZoneIDs.length>0)	//if there are time zone IDs that match the given offset
+							{
+								for(final String timeZoneID:timeZoneIDs)	//look at each available time zone ID
+								{
+									timeZone=TimeZone.getTimeZone(timeZoneID);	//try this time zone
+										//TODO finish
+								}
+							}
+							else
+							{
+								timeZone=TimeZone.getTimeZone(GMT_ID);	//default to GMT
+							}
+*/
+								//perform ELFF logging
 							final Entry entry=new Entry();
 							entry.setFieldValue(Field.DATE_FIELD, now);
 							entry.setFieldValue(Field.TIME_FIELD, now);
@@ -917,7 +943,7 @@ Debug.trace("got control events");
 								ELFF.appendURIQueryParameter(queryParametersStringBuilder, TITLE_QUERY_ATTRIBUTE_NAME, guiseSession.dereferenceString(title)).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.ti as a query parameter
 							}
 								//WT.tz
-							ELFF.appendURIQueryParameter(queryParametersStringBuilder, TIMEZONE_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getTimeZone())).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.tz as a query parameter
+							ELFF.appendURIQueryParameter(queryParametersStringBuilder, TIMEZONE_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getUTCOffset()/(60*60*1000))).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.tz as a query parameter
 								//WT.ul
 							ELFF.appendURIQueryParameter(queryParametersStringBuilder, USER_LANGUAGE_QUERY_ATTRIBUTE_NAME, initControlEvent.getLanguage()).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.ul as a query parameter
 								//content groups and subgroups
@@ -1650,6 +1676,9 @@ Debug.trace("getting request events");
 							case INIT:
 								{
 									final String hour=eventElement.getAttribute("hour");
+									final String utcOffset=eventElement.getAttribute("utcOffset");
+									final String utcOffset01=eventElement.getAttribute("utcOffset01");
+									final String utcOffset06=eventElement.getAttribute("utcOffset06");
 									final String timezone=eventElement.getAttribute("timezone");
 									final String language=eventElement.getAttribute("language");
 									final String colorDepth=eventElement.getAttribute("colorDepth");
@@ -1673,11 +1702,13 @@ Debug.trace("getting request events");
 										}
 									}
 									final WebInitializeEvent initEvent=new WebInitializeEvent(depictContext,
-											hour.length()>0 ? Integer.parseInt(hour) : 0, timezone.length()>0 ? Integer.parseInt(timezone) : 0, language.length()>0 ? language : "en-US",
+											hour.length()>0 ? Integer.parseInt(hour) : 0, /*TODO del timezone.length()>0 ? Integer.parseInt(timezone) : 0,*/
+											utcOffset.length()>0 ? Integer.parseInt(utcOffset) : 0, utcOffset.length()>0 ? Integer.parseInt(utcOffset01) : 0, utcOffset06.length()>0 ? Integer.parseInt(utcOffset06) : 0,
+											language.length()>0 ? language : "en-US",
 											colorDepth.length()>0 ? Integer.parseInt(colorDepth) : 24, screenWidth.length()>0 ? Integer.parseInt(screenWidth) : 1024, screenHeight.length()>0 ? Integer.parseInt(screenHeight) : 768,
 											browserWidth.length()>0 ? Integer.parseInt(browserWidth) : 1024, browserHeight.length()>0 ? Integer.parseInt(browserHeight) : 768,
 											javascriptVersion.length()>0 ? javascriptVersion : null, javaEnabled.length()>0 ? Boolean.valueOf(javaEnabled) : false,
-													referrerURI);	//create a new initialization event TODO check for NumberFormatException
+											referrerURI);	//create a new initialization event TODO check for NumberFormatException
 									requestEventList.add(initEvent);	//add the event to the list
 								}
 								break;

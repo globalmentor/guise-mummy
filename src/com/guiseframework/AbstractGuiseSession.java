@@ -33,7 +33,6 @@ import com.guiseframework.prototype.*;
 import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
 
-import static com.globalmentor.io.FileConstants.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.io.Writers.*;
 import static com.globalmentor.java.CharSequences.*;
@@ -211,6 +210,28 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			}
 		}
 
+	/**The current session time zone.*/
+	private TimeZone timeZone;
+
+		/**@return The current session time zone.*/
+		public TimeZone getTimeZone() {return timeZone;}
+
+		/**Sets the current session time zone.
+		This is a bound property.
+		@param newTimeZone The new session time zone.
+		@exception NullPointerException if the given time zone is <code>null</code>.
+		@see GuiseSession#TIME_ZONE_PROPERTY
+		*/
+		public void setTimeZone(final TimeZone newTimeZone)
+		{
+			if(!timeZone.equals(newTimeZone))	//if the value is really changing (compare their values, rather than identity)
+			{
+				final TimeZone oldTimeZone=timeZone;	//get the old value
+				timeZone=checkInstance(newTimeZone, "Guise session time zone cannot be null.");	//actually change the value
+				firePropertyChange(TIME_ZONE_PROPERTY, oldTimeZone, newTimeZone);	//indicate that the value changed
+			}
+		}
+
 	/**The current session locale.*/
 	private Locale locale;
 
@@ -227,7 +248,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void setLocale(final Locale newLocale)
 		{
-			if(!Objects.equals(locale, newLocale))	//if the value is really changing (compare their values, rather than identity)
+			if(!Objects.equals(locale, newLocale))	//if the value is really changing (compare their values, rather than identity) TODO locale should never be null, so no need to use Objects.equals()
 			{
 				final Locale oldLocale=locale;	//get the old value
 				locale=checkInstance(newLocale, "Guise session locale cannot be null.");	//actually change the value
@@ -774,6 +795,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		this.platform=checkInstance(platform, "Platform cannot be null.");	//save the platform
 		this.themeURI=application.getThemeURI();	//default to the application theme
 		this.locale=application.getLocales().get(0);	//default to the first application locale
+		this.timeZone=TimeZone.getDefault();	//default to the default time zone
 //TODO del when works		this.locale=application.getDefaultLocale();	//default to the application locale
 		this.orientation=Orientation.getOrientation(locale);	//set the orientation default based upon the locale
 		logWriter=new OutputStreamWriter(System.err);	//default to logging to the error output; this will be replaced after the session is created

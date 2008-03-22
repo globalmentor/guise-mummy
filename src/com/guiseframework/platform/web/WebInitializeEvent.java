@@ -18,11 +18,29 @@ public class WebInitializeEvent extends AbstractWebPlatformEvent
 		/**@return The hour of the browser.*/
 		public int getHour() {return hour;}
 
-	/**The time zone offset from GMT.*/
-	private final int timezone;
+	/**The current offset, in milliseconds, from UTC.*/
+	private final int utcOffset;
 
-		/**@return The time zone offset from GMT.*/
-		public int getTimeZone() {return timezone;}
+		/**@return The current offset, in milliseconds, from UTC.*/
+		public int getUTCOffset() {return utcOffset;}
+
+	/**The offset, in milliseconds, from UTC in January of the current year.*/
+	private final int utcOffset01;
+
+		/**@return The offset, in milliseconds, from UTC in January of the current year.*/
+		public int getUTCOffset01() {return utcOffset01;}
+
+	/**The offset, in milliseconds, from UTC in June of the current year.*/
+	private final int utcOffset06;
+
+		/**@return The offset, in milliseconds, from UTC in June of the current year.*/
+		public int getUTCOffset06() {return utcOffset06;}
+
+	/**The time zone offset from GMT, which will vary according to DST.*/
+//TODO del	private final int timezone;
+
+		/**@return The time zone offset from GMT, which will vary according to DST.*/
+//TODO del		public int getTimeZone() {return timezone;}
 
 	/**The user language.*/
 	private final String language;
@@ -81,7 +99,10 @@ public class WebInitializeEvent extends AbstractWebPlatformEvent
 	/**Constructor.
 	@param context The context in which this control event was produced.
 	@param hour The hour of the browser.
-	@param timezone The time zone offset from GMT.
+//TODO del	@param timezone The time zone offset from GMT.
+	@param utcOffset The current offset, in milliseconds, from UTC.
+	@param utcOffset01 The offset, in milliseconds, from UTC in January of the current year.
+	@param utcOffset06 The offset, in milliseconds, from UTC in June of the current year.
 	@param language The user language.
 	@param colorDepth The user color depth.
 	@param screenWidth The width of the screen.
@@ -93,13 +114,16 @@ public class WebInitializeEvent extends AbstractWebPlatformEvent
 	@param referrerURI The referring URI of the document, or <code>null</code> if there is no referrer.
 	@exception NullPointerException if the given context and/or language is <code>null</code>.
 	*/
-	public WebInitializeEvent(final DepictContext context, final int hour, final int timezone, final String language,
-			final int colorDepth, final int screenWidth, final int screenHeight, final int browserWidth, final int browserHeight,
+	public WebInitializeEvent(final DepictContext context, final int hour, /*TODO del final int timezone, */final int utcOffset, final int utcOffset01, final int utcOffset06,
+			final String language, final int colorDepth, final int screenWidth, final int screenHeight, final int browserWidth, final int browserHeight,
 			final String javascriptVersion, final boolean javaEnabled, final URI referrerURI)
 	{
 		super(context);	//construct the parent class
 		this.hour=hour;
-		this.timezone=timezone;
+		this.utcOffset=utcOffset;
+		this.utcOffset01=utcOffset01;
+		this.utcOffset06=utcOffset06;
+//TODO del		this.timezone=timezone;
 		this.language=checkInstance(language, "Language cannot be null.");
 		this.colorDepth=colorDepth;
 		this.screenWidth=screenWidth;

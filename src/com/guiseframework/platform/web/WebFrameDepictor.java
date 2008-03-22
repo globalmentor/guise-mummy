@@ -41,7 +41,6 @@ public class WebFrameDepictor<C extends Frame> extends AbstractWebFrameDepictor<
 	public void installed(final C component)
 	{
 		super.installed(component);	//install ourselves normally
-		component.getSession().addPropertyChangeListener(getDepictedPropertyChangeListener());	//listen for session changes
 	}
 
 	/**Called when the depictor is uninstalled from a component.
@@ -54,7 +53,6 @@ public class WebFrameDepictor<C extends Frame> extends AbstractWebFrameDepictor<
 	public void uninstalled(final C component)
 	{
 		super.uninstalled(component);	//uninstall ourselves normally
-		component.getSession().removePropertyChangeListener(getDepictedPropertyChangeListener());	//stop listening for session changes
 	}
 
 	/**Retrieves the styles for the outer element of the component.

@@ -8,24 +8,19 @@ import java.text.MessageFormat;
 import java.util.*;
 
 import com.globalmentor.beans.PropertyBindable;
-import com.globalmentor.event.PostponedEvent;
-import com.globalmentor.net.URIPath;
-import com.globalmentor.net.URIs;
+import static com.globalmentor.java.Classes.*;
+import com.globalmentor.net.*;
 import com.globalmentor.urf.URFResource;
 import com.globalmentor.util.DataException;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.event.*;
-import com.guiseframework.input.Input;
-import com.guiseframework.input.InputStrategy;
-import com.guiseframework.model.InformationLevel;
-import com.guiseframework.model.Notification;
+import com.guiseframework.input.*;
+import com.guiseframework.model.*;
 import com.guiseframework.platform.Platform;
 import com.guiseframework.prototype.ActionPrototype;
 import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
-
-import static com.globalmentor.java.Classes.*;
 
 /**Represents a session with a user.
 A Swing-based client application may have only one session, while a web server application will likely have multiple sessions.
@@ -44,6 +39,8 @@ public interface GuiseSession extends PropertyBindable
 	public final static String PRINCIPAL_PROPERTY=getPropertyName(GuiseSession.class, "principal");
 	/**The theme URI bound property.*/
 	public final static String THEME_URI_PROPERTY=getPropertyName(GuiseSession.class, "themeURI");
+	/**The time zone bound property.*/
+	public final static String TIME_ZONE_PROPERTY=getPropertyName(GuiseSession.class, "timeZone");
 
 	/**@return The unique identifier of this session.*/
 	public UUID getUUID();
@@ -121,6 +118,17 @@ public interface GuiseSession extends PropertyBindable
 	@see Component#dispatchInputEvent(InputEvent)
 	*/
 	public void setInputStrategy(final InputStrategy newInputStrategy);
+
+	/**@return The current session time zone.*/
+	public TimeZone getTimeZone();
+
+	/**Sets the current session time zone.
+	This is a bound property.
+	@param newTimeZone The new session time zone.
+	@exception NullPointerException if the given time zone is <code>null</code>.
+	@see GuiseSession#TIME_ZONE_PROPERTY
+	*/
+	public void setTimeZone(final TimeZone newTimeZone);
 
 	/**@return The current session locale.*/
 	public Locale getLocale();
