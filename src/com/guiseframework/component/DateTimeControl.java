@@ -24,13 +24,13 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>	//TODO imp
 	private final TextControl<Date> dateControl;
 
 		/**@return The control containing the date.*/
-		protected TextControl<Date> getYearControl() {return dateControl;}
+		public TextControl<Date> getYearControl() {return dateControl;}
 
 	/**The control containing the date.*/
 	private final TextControl<Date> timeControl;
 
 		/**@return The control containing the date.*/
-		protected TextControl<Date> getTimeControl() {return timeControl;}
+	public TextControl<Date> getTimeControl() {return timeControl;}
 
 	/**@return Whether the current value represented in the control has a specified time component.*/
 	public boolean hasTime()
@@ -93,7 +93,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>	//TODO imp
 						Date date=dateControl.getValue();	//get the date value, if there is one
 						if(date!=null)	//if there is a date value
 						{
-Debug.trace("got date", date, "milliseconds", date.getTime());
+//Debug.trace("got date", date, "milliseconds", date.getTime());
 							final GuiseSession session=getSession();	//get the current session
 							final Locale locale=session.getLocale();	//get the current locale
 							final TimeZone timeZone=session.getTimeZone();	//get the current time zone
@@ -102,7 +102,7 @@ Debug.trace("got date", date, "milliseconds", date.getTime());
 							final Date time=timeControl.getValue();	//get the time date
 							if(time!=null)	//if there is a time, we'll need to update our date
 							{
-Debug.trace("got time", time, "milliseconds", time.getTime());
+//Debug.trace("got time", time, "milliseconds", time.getTime());
 								final Calendar timeCalendar=Calendar.getInstance(timeZone, locale);	//get a calendar to manipulate the time
 								timeCalendar.setTime(time);	//set the time in the calendar
 								setTime(dateCalendar, timeCalendar);	//set the time of the date calendar
@@ -112,7 +112,7 @@ Debug.trace("got time", time, "milliseconds", time.getTime());
 								clearTime(dateCalendar);	//remove the time from the date calendar
 							}
 							date=dateCalendar.getTime();	//update the date to include or not include the time
-Debug.trace("using date", date, "milliseconds", date.getTime());
+//Debug.trace("using date", date, "milliseconds", date.getTime());
 						}
 						setValue(date);	//update our value with the date
 					}
@@ -149,7 +149,7 @@ Debug.trace("using date", date, "milliseconds", date.getTime());
 				final Date date=getValue();
 				if(date!=null)	//if there is a date
 				{
-Debug.trace("updating controls with date", date, "milliseconds", date.getTime());
+//Debug.trace("updating controls with date", date, "milliseconds", date.getTime());
 					final GuiseSession session=getSession();	//get the current session
 					final Locale locale=session.getLocale();	//get the current locale
 					final TimeZone timeZone=session.getTimeZone();	//get the current time zone
