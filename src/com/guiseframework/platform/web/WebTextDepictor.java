@@ -7,6 +7,7 @@ import java.util.*;
 import javax.mail.internet.ContentType;
 import javax.xml.parsers.*;
 
+import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
@@ -28,7 +29,7 @@ public class WebTextDepictor<C extends Text> extends AbstractSimpleWebComponentD
 	/**The document prefix to wrap around an XHTML fragment.*/
 	private final static String XHTML11_FRAGMENT_DOCUMENT_PREFIX=	//TODO fix; this doesn't create valid XHTML; it needs an internal DIV, but we need to then get the contents of the DIV rather than the BODY, which we could do using an ID
 		"<?xml version='1.0'?>"+
-		"<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>"+
+/*TODO del; we don't validate, so why do we need a doctype?		"<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>"+*/
 		"<html xmlns='http://www.w3.org/1999/xhtml'>"+
 		"<head><title>XHTML Fragment Document</title></head>"+
 		"<body>";
@@ -104,17 +105,14 @@ Debug.info("cache hit for text", xmlTextHash);
 Debug.info("cache miss for text", xmlTextHash);
 	//				TODO del Debug.trace("ready to parse text");
 	//				TODO del Debug.trace("creating document builder factory");
-						final DocumentBuilderFactory documentBuilderFactory=DocumentBuilderFactory.newInstance();	//create a document builder factory TODO create a shared document builder factory, maybe---but make sure it is used by only one thread			
-	//				TODO del Debug.trace("setting namespace aware");
-						documentBuilderFactory.setNamespaceAware(true);	//be aware of namespaces when working with XML documents
-	//				TODO del Debug.trace("creating document builder");
+					
 						final DocumentBuilder documentBuilder=createDocumentBuilder(true);	//create a new namespace-aware document builder
 	//				TODO del Debug.trace("getting bytes");
-						final byte[] bytes=xmlText.getBytes("UTF-8");	//TODO fix to check encoding
+						final byte[] bytes=xmlText.getBytes(UTF_8_CHARSET);
 	//				TODO del Debug.trace("creating input stream");
 						final InputStream inputStream=new ByteArrayInputStream(bytes);
 	//				TODO del Debug.trace("parsing input stream");
-						document=documentBuilder.parse(inputStream);
+						document=documentBuilder.parse(inputStream);	//parse the document; this goes *very* quickly after removing the "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>" from the wrapper
 						cachedDocumentMap.put(xmlTextHash, new CachedDocument(xmlText, document));	//cache this parsed XML document along with its text
 					}
 //				TODO del Debug.trace("text parsed");
