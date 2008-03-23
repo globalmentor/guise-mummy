@@ -19,7 +19,7 @@ public class ActionPrototype extends AbstractActionPrototype
 	*/
 	public ActionPrototype(final String label)
 	{
-		this(label, null);	//construct the label model with no icon
+		this(label, null);	//construct the class with no icon
 	}
 
 	/**Label and icon constructor.

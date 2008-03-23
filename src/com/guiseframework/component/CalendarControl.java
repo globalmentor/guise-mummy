@@ -115,7 +115,7 @@ public class CalendarControl extends AbstractLayoutValueControl<Date>
 	}
 
 	/**The property change listener that updates the date controls when a property changes.*/
-	protected final GenericPropertyChangeListener<?> updateDateControlsPropertyChangeListener;
+//TODO del	protected final GenericPropertyChangeListener<?> updateDateControlsPropertyChangeListener;
 
 	/**The property change listener that updates the visible dates if the year is different than the last one.*/
 	protected final GenericPropertyChangeListener<Integer> yearPropertyChangeListener;
@@ -158,29 +158,21 @@ public class CalendarControl extends AbstractLayoutValueControl<Date>
 						}
 					}
 				};
-/*TODO del
-		if(model.getValidator()==null)	//TODO del; this is a temporary default for testing the date control based upon the model validator 
-		{
-			final Date maxDate=new Date();	//the current date will be the maximum date
-			final Date minDate=new GregorianCalendar(1940, 0, 1).getTime();	//the first day of 1940 in the Gregorian calendar will be the minimum date
-//TODO del			final Calendar calendar=Calendar.getInstance(session.getLocale());	//create a new calendar for determining the minimum and maximum year
-//TODO del			final Date maxDate=calendar.getTime();	//the current date will be the maximum date
-//TODO del			calendar.set(1940, 0, 1);	//set the calendar to the first day of 1940
-//TODO del			final Date minDate=calendar.getTime();	//the first day of 1940 will be the minimum date
-			model.setValidator(new DateRangeValidator(minDate, maxDate));	//restrict the date range
-		}
-*/
 		updateYearControl();	//create and install an appropriate year control
 		updateDateControls();	//update the date controls
-		updateDateControlsPropertyChangeListener=new AbstractGenericPropertyChangeListener<Object>()	//create a property change listener to update the calendars
-		{
-			public void propertyChange(final GenericPropertyChangeEvent<Object> propertyChangeEvent)	//if the model value value changed
-			{
-				updateDateControls();	//update the date controls based upon the new selected date
-			}
-		};
-		valueModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, updateDateControlsPropertyChangeListener);	//update the calendars if the selected date changes
-		valueModel.addPropertyChangeListener(ValueModel.VALIDATOR_PROPERTY, new AbstractGenericPropertyChangeListener<Validator<Date>>()	//create a property change listener to listen for our validator changing, so that we can update the date control if needed
+			//update the calendars if the selected date changes
+		addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Date>()	//create a property change listener to listen for our value changing, so that we can update the date control if needed
+				{
+					public void propertyChange(final GenericPropertyChangeEvent<Date> propertyChangeEvent)	//if the value changed
+					{
+						final Date newDate=propertyChangeEvent.getNewValue();	//get the new date value
+						if(newDate!=null)	//we can't display a null date; if they set the date to null, just continue showing what we were showing
+						{
+							setDate(newDate);	//update the currently-displayed date
+						}
+					}
+				});	
+		addPropertyChangeListener(ValueModel.VALIDATOR_PROPERTY, new AbstractGenericPropertyChangeListener<Validator<Date>>()	//create a property change listener to listen for our validator changing, so that we can update the date control if needed
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<Validator<Date>> propertyChangeEvent)	//if the model's validator changed
 					{
@@ -188,7 +180,16 @@ public class CalendarControl extends AbstractLayoutValueControl<Date>
 					}
 				});
 			//TODO important: this is a memory leak---make sure we uninstall the listener when the session goes away
+/*TODO fix
 		getSession().addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, updateDateControlsPropertyChangeListener);	//update the calendars if the locale changes
+		updateDateControlsPropertyChangeListener=new AbstractGenericPropertyChangeListener<Object>()	//create a property change listener to update the calendars
+		{
+			public void propertyChange(final GenericPropertyChangeEvent<Object> propertyChangeEvent)	//if the model value value changed
+			{
+				updateDateControls();	//update the date controls based upon the new selected date
+			}
+		};
+*/
 		monthListControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Date>()	//create a property change listener to listen for the month changing
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<Date> propertyChangeEvent)	//if the selected month changed
@@ -324,9 +325,9 @@ public class CalendarControl extends AbstractLayoutValueControl<Date>
 				final boolean yearChanged=localeChanged || oldCalendar==null || oldCalendar.get(Calendar.YEAR)!=year;	//the year should be updated if the locale changed, there was no calendar, or the years are different
 				final int month=calendar.get(Calendar.MONTH);	//get the current month
 				final boolean monthChanged=yearChanged || oldCalendar.get(Calendar.MONTH)!=month;	//the month should be updated if the the year or month changed
-				if(yearChanged)	//if the year changed (different years can have different months with some calendars)
+				try
 				{
-					try
+					if(yearChanged)	//if the year changed (different years can have different months with some calendars)
 					{
 						yearControl.setValue(Integer.valueOf(year));	//show the selected year in the text box
 						monthListControl.clear();	//clear the values in the month list control
@@ -345,12 +346,16 @@ public class CalendarControl extends AbstractLayoutValueControl<Date>
 							}
 						}
 					}
-					catch(final PropertyVetoException propertyVetoException)	//we should never have a problem selecting a year or a month
+					else if(monthChanged)	//if the month changed, but not the year, we still need to update the month control
 					{
-						throw new AssertionError(propertyVetoException);
+						monthListControl.setSelectedIndexes(month);	//select the month (we assume that, because the year hasn't changed, the list of months are still correct)
 					}
 				}
-				if(monthChanged)	//if the month needs updating
+				catch(final PropertyVetoException propertyVetoException)	//we should never have a problem selecting a year or a month
+				{
+					throw new AssertionError(propertyVetoException);
+				}
+				if(monthChanged)	//if the month needs updating (whether or not the year changed)
 				{
 					final Calendar monthCalendar=(Calendar)calendar.clone();	//clone the calendar for stepping through the months
 					final Container calendarContainer=getCalendarContainer();	//get the calendar container

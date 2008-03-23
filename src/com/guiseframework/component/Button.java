@@ -1,5 +1,7 @@
 package com.guiseframework.component;
 
+import java.net.URI;
+
 import com.guiseframework.model.*;
 import com.guiseframework.prototype.ActionPrototype;
 
@@ -13,6 +15,23 @@ public class Button extends AbstractButtonControl
 	public Button()
 	{
 		this(new DefaultLabelModel(), new DefaultActionModel(), new DefaultEnableable());	//construct the class with default models
+	}
+
+	/**Label constructor.
+	@param label The text of the label, or <code>null</code> if there should be no label.
+	*/
+	public Button(final String label)
+	{
+		this(label, null);	//construct the class with no icon
+	}
+
+	/**Label and icon constructor.
+	@param label The text of the label, or <code>null</code> if there should be no label.
+	@param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
+	*/
+	public Button(final String label, final URI icon)
+	{
+		this(new DefaultLabelModel(label, icon), new DefaultActionModel(), new DefaultEnableable());	//construct the class  with a default label model and the given label text
 	}
 
 	/**Label model, action model, and enableable object constructor.

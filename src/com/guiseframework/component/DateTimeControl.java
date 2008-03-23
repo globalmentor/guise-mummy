@@ -4,13 +4,18 @@ import java.beans.PropertyVetoException;
 import java.util.*;
 
 import com.globalmentor.beans.*;
+import static com.globalmentor.java.Characters.*;
+
 import static com.globalmentor.util.Calendars.*;
 import com.globalmentor.util.Debug;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.converter.*;
+import com.guiseframework.event.ActionEvent;
+import com.guiseframework.event.ActionListener;
 import com.guiseframework.model.*;
+import static com.guiseframework.theme.Theme.*;
 
 /**Control that allows selection of a date and/or a time, providing separate inputs for date and time with the option of a calendar popup.
 This implementation always represents the date and time in terms of the current session's time zone.
@@ -65,6 +70,39 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>	//TODO imp
 //TODO del		dateControl.setValidator(new ValueRequiredValidator<Date>());	//require a date
 		dateControl.setColumnCount(10);	//provide for sufficient characters for the most common date format
 		addComponent(dateControl);	//add the date control
+		final Button calendarButton=new Button(LABEL_CALENDAR+HORIZONTAL_ELLIPSIS_CHAR, GLYPH_CALENDAR);	//create a button for the calendar
+		calendarButton.setLabelDisplayed(false);
+		calendarButton.addActionListener(new ActionListener() 
+				{
+					public void actionPerformed(final ActionEvent actionEvent)	//if the calendar button is clicked
+					{
+						final Date date=dateControl.getValue();	//get the current date value, if any
+						final CalendarDialogFrame calendarDialogFrame=new CalendarDialogFrame(date);	//create a new calendar popup for the current date
+//TODO fix						calendarDialogFrame.setLabel("Select a date");
+						calendarDialogFrame.setRelatedComponent(calendarButton);	//associate the popup with the button
+						calendarDialogFrame.open();	//show the calendar popup
+						calendarDialogFrame.open(new AbstractGenericPropertyChangeListener<Frame.Mode>()	//ask for the date to be selected
+								{		
+									public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> propertyChangeEvent)	//when the modal dialog mode changes
+									{
+										final Date newDate=calendarDialogFrame.getValue();	//get the value of the frame's model
+										if(newDate!=null)	//if a new date was selected (i.e. the calendar dialog frame was not closed without a selection)
+										{
+											try
+											{
+Debug.trace("ready to put new date in control:", newDate);
+												dateControl.setValue(newDate);	//show the date in the date control
+											}
+											catch(final PropertyVetoException propertyVetoException)	//we should never have a problem selecting a date
+											{
+												throw new AssertionError(propertyVetoException);
+											}
+										}
+									}
+								});
+					}
+				});
+		addComponent(calendarButton);	//add the calendar button
 			//time
 		timeControl=new TextControl<Date>(Date.class);	//create a control for the time
 		timeControl.setLabel("Time");	//set the date control label TODO get from resources
@@ -93,7 +131,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>	//TODO imp
 						Date date=dateControl.getValue();	//get the date value, if there is one
 						if(date!=null)	//if there is a date value
 						{
-//Debug.trace("got date", date, "milliseconds", date.getTime());
+Debug.trace("got date", date, "milliseconds", date.getTime());
 							final GuiseSession session=getSession();	//get the current session
 							final Locale locale=session.getLocale();	//get the current locale
 							final TimeZone timeZone=session.getTimeZone();	//get the current time zone
@@ -102,7 +140,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>	//TODO imp
 							final Date time=timeControl.getValue();	//get the time date
 							if(time!=null)	//if there is a time, we'll need to update our date
 							{
-//Debug.trace("got time", time, "milliseconds", time.getTime());
+Debug.trace("got time", time, "milliseconds", time.getTime());
 								final Calendar timeCalendar=Calendar.getInstance(timeZone, locale);	//get a calendar to manipulate the time
 								timeCalendar.setTime(time);	//set the time in the calendar
 								setTime(dateCalendar, timeCalendar);	//set the time of the date calendar
@@ -112,7 +150,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>	//TODO imp
 								clearTime(dateCalendar);	//remove the time from the date calendar
 							}
 							date=dateCalendar.getTime();	//update the date to include or not include the time
-//Debug.trace("using date", date, "milliseconds", date.getTime());
+Debug.trace("using date", date, "milliseconds", date.getTime());
 						}
 						setValue(date);	//update our value with the date
 					}
@@ -167,7 +205,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>	//TODO imp
 					timeControl.clearValue();
 				}
 			}
-			catch(final PropertyVetoException propertyVetoException)	//we should never have a problem selecting a year or a month
+			catch(final PropertyVetoException propertyVetoException)	//we should never have a problem selecting a date
 			{
 				throw new AssertionError(propertyVetoException);
 			}

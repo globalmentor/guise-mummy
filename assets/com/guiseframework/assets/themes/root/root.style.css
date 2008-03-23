@@ -1,4 +1,4 @@
-/*Root Guise Stylesheet Copyright © 2005-2007 GlobalMentor, Inc.
+/*Root Guise Stylesheet Copyright ï¿½ 2005-2007 GlobalMentor, Inc.
 @author Garret Wilson
 
 Styles:
@@ -346,13 +346,6 @@ a.button:active
 	position: absolute;
 	left: 0;
 	bottom: 100%;
-}
-
-.calendarDialogFrame
-{
-	width: 16em;
-	height: 16em;
-	/*TODO center the dialog frame contents*/
 }
 
 /*busy component*/

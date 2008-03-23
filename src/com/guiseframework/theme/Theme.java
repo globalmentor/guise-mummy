@@ -242,6 +242,7 @@ public class Theme extends URFListResource<Rule>
 	public final static String LABEL_ADD=createStringResourceReference("theme.label.add");
 	public final static String LABEL_AUDIO=createStringResourceReference("theme.label.audio");
 	public final static String LABEL_BROWSE=createStringResourceReference("theme.label.browse");
+	public final static String LABEL_CALENDAR=createStringResourceReference("theme.label.calendar");
 	public final static String LABEL_CANCEL=createStringResourceReference("theme.label.cancel");
 	public final static String LABEL_CLOSE=createStringResourceReference("theme.label.close");
 	public final static String LABEL_DEFAULT=createStringResourceReference("theme.label.default");
@@ -306,6 +307,7 @@ public class Theme extends URFListResource<Rule>
 	public final static URI GLYPH_BLANK=createURIResourceReference("theme.glyph.blank");
 	public final static URI GLYPH_BROWSE=createURIResourceReference("theme.glyph.browse");
 	public final static URI GLYPH_BUSY=createURIResourceReference("theme.glyph.busy");
+	public final static URI GLYPH_CALENDAR=createURIResourceReference("theme.glyph.calendar");
 	public final static URI GLYPH_CANCEL=createURIResourceReference("theme.glyph.cancel");
 	public final static URI GLYPH_CLOSE=createURIResourceReference("theme.glyph.close");
 	public final static URI GLYPH_DELETE=createURIResourceReference("theme.glyph.delete");

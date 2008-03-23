@@ -34,6 +34,7 @@ This component installs a default import strategy supporting import of the follo
 <ul>
 	<li><code>text/*</code></li>
 </ul>
+This control uses a single line feed character to represent each line break.
 @param <V> The type of value the input text is to represent.
 @author Garret Wilson
 */

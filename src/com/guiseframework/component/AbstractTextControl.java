@@ -27,6 +27,7 @@ Default converters are available for the following types:
 	<li><code>java.lang.Integer</code></li>
 	<li><code>java.lang.String</code></li>
 </ul>
+This control uses a single line feed character to represent each line break.
 @param <V> The type of value the input text is to represent.
 @author Garret Wilson
 */

@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
-
+import static com.globalmentor.text.Text.*;
 import com.globalmentor.util.Debug;
 import com.guiseframework.component.*;
 import com.guiseframework.converter.*;
@@ -18,6 +18,7 @@ import static com.guiseframework.platform.web.WebPlatform.*;
 
 /**Strategy for rendering a text control as an XHTML <code>&lt;input&gt;</code> element or an XHTML <code>&lt;textarea&gt;</code> element.
 This view will change the XHTML element rendered based upon the number of rows requested by the text control.
+This implementation automatically converts between the controls LF end-of-line representation and the CRLF required by HTML &lt;textarea&gt;.
 @param <V> The type of value represented in the control.
 @param <C> The type of component being depicted.
 @author Garret Wilson
@@ -74,9 +75,10 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 			}
 			final Map<String, Object> properties=webChangeEvent.getProperties();	//get the new properties
 			String valueText=null;	//we'll get a new value to use if needed
-			final String provisionalText=asInstance(properties.get("provisionalValue"), String.class);	//get the provisional value, if any; a provisional value will never be null TODO use a constant
+			String provisionalText=asInstance(properties.get("provisionalValue"), String.class);	//get the provisional value, if any; a provisional value will never be null TODO use a constant
 			if(provisionalText!=null)	//if there is a provisional value
 			{
+				provisionalText=normalizeEOL(provisionalText, LINE_FEED_STRING).toString();	//normalize the provisional text to LF ends of lines
 				final Pattern autoCommitPattern=component.getAutoCommitPattern();	//get the auto-commit pattern, if any
 				if(autoCommitPattern!=null && autoCommitPattern.matcher(provisionalText).matches())	//if there is an auto-commit pattern and the text patches that pattern
 				{
@@ -94,6 +96,7 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 				if(valueSpecified)	//if a value was specified, it will always override any specified provisional value
 				{
 					valueText=asInstance(properties.get("value"), String.class);	//get the new value; this will incorrectly use a new value of null if the given value isn't a string TODO use a constant					
+					valueText=normalizeEOL(valueText, LINE_FEED_STRING).toString();	//normalize the value text to LF ends of lines
 				}
 				component.setNotification(null);	//clear the component errors; this method may generate new errors if the change is not provisional
 				try
@@ -223,7 +226,7 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 			final String text=getDepictedObject().getText();	//see what literal text representation we are using
 			if(text!=null)	//if there is a value
 			{
-				getDepictContext().write(text);	//write the value			
+				getDepictContext().write(normalizeEOL(text, CRLF_STRING).toString());	//normalize the text ends of lines to CRLF and write the value			
 			}
 		}
 	}
