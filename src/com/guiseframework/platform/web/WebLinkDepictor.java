@@ -92,10 +92,12 @@ public class WebLinkDepictor<C extends ActionControl> extends AbstractWebActionC
 		}
 		if(hasLabelContent(isIconDisplayed, isIconDisplayed))	//if there is label content
 		{
+/*TODO del if no longer needed
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_SPAN);	//<xhtml:span>	//use a span element inside the link instead of a label, so that IE will use a link mouse icon
 			writeClassAttribute(getBaseStyleIDs(null, COMPONENT_LABEL_CLASS_SUFFIX));	//write the base style IDs with a "-label" suffix
+*/
 			writeLabelContent(isIconDisplayed, isLabelDisplayed);	//write the content of the label
-			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_SPAN);	//</xhtml:span>			
+//TODO del if no longer needed			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_SPAN);	//</xhtml:span>			
 		}
 		super.depictBody();	//update the body normally
 	}

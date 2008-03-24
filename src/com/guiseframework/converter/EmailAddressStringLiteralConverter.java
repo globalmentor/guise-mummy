@@ -1,6 +1,6 @@
 package com.guiseframework.converter;
 
-import static java.text.MessageFormat.format;
+import static java.text.MessageFormat.*;
 
 import com.globalmentor.net.EmailAddress;
 import com.globalmentor.text.ArgumentSyntaxException;

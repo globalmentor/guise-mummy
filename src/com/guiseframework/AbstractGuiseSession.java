@@ -1685,37 +1685,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			icon=severity.getGlyph();	//set the icon based upon the severity
 		}		
 		optionDialogFrame.setGlyphURI(icon);	//set the icon
-		optionDialogFrame.setLineExtent(new Extent(0.33, Unit.RELATIVE));	//set the preferred dimensions		
-		optionDialogFrame.open(new AbstractGenericPropertyChangeListener<Frame.Mode>()	//show the dialog and listen for the frame closing
-				{
-					public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> genericPropertyChangeEvent)	//listen for the dialog mode changing
-					{
-						if(genericPropertyChangeEvent.getNewValue()==null && afterNotify!=null)	//if the dialog is now nonmodal and there is logic that should take place after notification
-						{
-							final Notification.Option selectedOption=optionDialogFrame.getValue();	//get the selected option, if any
-								//we'll determine if the user selection is fatal and therefore we should not perform the given logic
-							if(selectedOption!=null)	//if an option was selected
-							{
-								if(selectedOption.isFatal())	//if a fatal option was selected
-								{
-									return;	//don't perform the given logic
-								}
-							}
-							else	//if no option was selected, determine if this should be considered fatal
-							{
-								for(final Notification.Option option:notification.getOptions())	//look at the given options; if there is a fatal option available, consider the absence of an option selected to be fatal
-								{
-									if(option.isFatal())	//if a fatal option is available
-									{
-										return;	//don't perform the given logic										
-									}
-								}
-							}
-							afterNotify.run();	//run the code that takes place after notification
-						}
-					}
-				}
-		);
+		optionDialogFrame.setLineExtent(new Extent(0.33, Unit.RELATIVE));	//set the preferred dimensions
+		optionDialogFrame.open(afterNotify);	//show the dialog and perform the given notification afterwards if appropriate
 	}
 
 	/**Notifies the user of the given errors in sequence.

@@ -254,6 +254,7 @@ public class Theme extends URFListResource<Rule>
 	public final static String LABEL_FINISH=createStringResourceReference("theme.label.finish");
 	public final static String LABEL_FIRST=createStringResourceReference("theme.label.first");
 	public final static String LABEL_FOLDER=createStringResourceReference("theme.label.folder");
+	public final static String LABEL_GENERAL=createStringResourceReference("theme.label.general");
 	public final static String LABEL_HELP=createStringResourceReference("theme.label.help");
 	public final static String LABEL_HOME=createStringResourceReference("theme.label.home");
 	public final static String LABEL_IMAGE=createStringResourceReference("theme.label.image");
@@ -288,6 +289,7 @@ public class Theme extends URFListResource<Rule>
 	public final static String LABEL_UNKNOWN=createStringResourceReference("theme.label.unknown");
 	public final static String LABEL_UPLOAD=createStringResourceReference("theme.label.upload");
 	public final static String LABEL_UPLOAD_TO_X=createStringResourceReference("theme.label.upload.to.x");
+	public final static String LABEL_URI=createStringResourceReference("theme.label.uri");
 	public final static String LABEL_USERNAME=createStringResourceReference("theme.label.username");
 	public final static String LABEL_VERIFTY=createStringResourceReference("theme.label.verify");
 	public final static String LABEL_VERSION=createStringResourceReference("theme.label.version");

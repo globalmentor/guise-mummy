@@ -4,10 +4,9 @@ import java.beans.PropertyVetoException;
 
 import javax.mail.internet.ContentType;
 
+import com.globalmentor.beans.*;
 import com.guiseframework.event.*;
-import com.guiseframework.input.BindingInputStrategy;
-import com.guiseframework.input.CommandInput;
-import com.guiseframework.input.ProcessCommand;
+import com.guiseframework.input.*;
 import com.guiseframework.model.*;
 import com.guiseframework.model.Notification.Option;
 
@@ -102,6 +101,48 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	public NotificationOptionDialogFrame(final ValueModel<Option> valueModel, final Component component, final Option... options)
 	{
 		super(valueModel, component, options);	//construct the parent class
+	}
+
+	/**Opens the frame as modal with a {@link Runnable} to be performed after modality ends successfully.
+	When the frame closes, if a non-fatal option was chosen the given runnable is executed.
+	This is a convenience method that delegates to {@link Frame#open(com.globalmentor.beans.GenericPropertyChangeListener)}.
+	If the selected option to any notification is fatal, the specified logic, if any, will not be performed.
+	The absence of an option selection is considered fatal only if a fatal option was presented for a given notification.  
+	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
+	@see Frame#open(com.globalmentor.beans.GenericPropertyChangeListener) 
+	@see Option#isFatal()
+	*/
+	public void open(final Runnable afterNotify)
+	{
+		open(new AbstractGenericPropertyChangeListener<Frame.Mode>()	//open modally
+	  		{
+			  	public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> genericPropertyChangeEvent)	//if the frame modal state changes
+			  	{
+						if(genericPropertyChangeEvent.getNewValue()==null && afterNotify!=null)	//if the dialog is now nonmodal and there is logic that should take place after notification
+						{
+							final Notification.Option selectedOption=getValue();	//get the selected option, if any
+								//we'll determine if the user selection is fatal and therefore we should not perform the given logic
+							if(selectedOption!=null)	//if an option was selected
+							{
+								if(selectedOption.isFatal())	//if a fatal option was selected
+								{
+									return;	//don't perform the given logic
+								}
+							}
+							else	//if no option was selected, determine if this should be considered fatal
+							{
+								for(final Notification.Option option:getOptions())	//look at the given options; if there is a fatal option available, consider the absence of an option selected to be fatal
+								{
+									if(option.isFatal())	//if a fatal option is available
+									{
+										return;	//don't perform the given logic										
+									}
+								}
+							}
+							afterNotify.run();	//run the code that takes place after notification
+						}
+			  	}
+	  		});
 	}
 
 	/**Creates a component to represent the given option.
