@@ -34,7 +34,7 @@ public class Dimensions
 	/**The precalculated hash code of the dimensions.*/
 	private final int hashCode;
 
-	/**Width and height unit constructor.
+	/**Width and height unit constructor with a depth of one.
 	@param width The width.
 	@param height The height.
 	@param unit The unit with which the extent is measured.
@@ -42,7 +42,19 @@ public class Dimensions
 	*/
 	public Dimensions(final double width, final double height, final Unit unit)
 	{
-		this(new Extent(width, unit, 1), new Extent(height, unit, 1), new Extent(0, unit, 1));	//create extents and construct the class with a zero depth
+		this(width, unit, height, unit);	//create the dimensions with the same unit
+	}
+
+	/**Width unit and height unit constructor with a depth of one.
+	@param width The width.
+	@param widthUnit The unit with which the width is measured.
+	@param height The height.
+	@param heightUnit The unit with which the height is measured.
+	@exception NullPointerException if the given width unit and/or height unit is <code>null</code>.
+	*/
+	public Dimensions(final double width, final Unit widthUnit, final double height, final Unit heightUnit)
+	{
+		this(new Extent(width, widthUnit, 1), new Extent(height, heightUnit, 1), Extent.ZERO_EXTENT1);	//create extents and construct the class with a zero depth
 	}
 
 	/**Width, height, and depth unit constructor.
@@ -93,6 +105,51 @@ public class Dimensions
 		this.height=checkInstance(height, "Height cannot be null.");
 		this.depth=checkInstance(depth, "Depth cannot be null.");
 		this.hashCode=Objects.hashCode(width, height, depth);	//precalculate the hash code
+	}
+
+	/**Constrains these inner dimensions within the given outer dimensions by scaling these dimensions so that no part lies outside the given outer dimensiona.
+	This implementation currently only supports two dimensions.
+	@param constrainingDimensions The outer constraining dimensions.
+	@return A dimension representing the constrained dimension.
+	@throws NullPointerException if the given constraining dimensions is <code>null</code>.
+	@throws IllegalArgumentException if the given constraining dimensions use different units than these dimensions.
+	*/
+	public Dimensions constrain(final Dimensions constrainingDimensions)
+	{
+		final Extent width=getWidth();
+		final double widthValue=width.getValue();
+		final Unit widthUnit=width.getUnit();
+		final Extent height=getHeight();
+		final double heightValue=height.getValue();
+		final Unit heightUnit=height.getUnit();
+		final Extent constrainingWidth=constrainingDimensions.getWidth();
+		final double constrainingWidthValue=constrainingWidth.getValue();
+		final Extent constrainingHeight=constrainingDimensions.getHeight();
+		final double constrainingHeightValue=constrainingHeight.getValue();
+		if(widthUnit!=constrainingWidth.getUnit() || heightUnit!=constrainingHeight.getUnit())	//if the units don't match
+		{
+			throw new IllegalArgumentException("Units of dimensions "+this+" and "+constrainingDimensions+" do not match.");
+		}
+		if(widthValue<=constrainingWidthValue && heightValue<=constrainingHeightValue)	//if nothing needs to be constrained
+		{
+			return this;	//return this dimension unchanged
+		}
+		final double relation=(double)widthValue/heightValue;	//determine the relationship of the sides
+//TODO del Debug.trace("relation of sides is:", relation);
+		double newWidthValue, newHeightValue;
+		newHeightValue=constrainingWidthValue/relation;	//get the matching height for a constrained width
+//TODO del Debug.trace("trying to constrain width to", constrainingWidth, "height to ", newHeight);
+		if(newHeightValue<=constrainingHeightValue)	//if the height has been constrained
+		{
+			newWidthValue=constrainingWidthValue;	//constrain the width to the edges
+		}
+		else	//if the height needs to be constrained
+		{
+			newWidthValue=constrainingHeightValue*relation;	//get the matching width for a constrained height
+			newHeightValue=constrainingHeightValue;	//constrain the height to the edges
+//TODO del Debug.trace("that didn't work; trying to constrain width to", newWidth, "height to ", newHeight);
+		}
+		return new Dimensions(newWidthValue, widthUnit, newHeightValue, heightUnit);	//return the new constrained dimensions
 	}
 
 	/**@return A hash code value for the object.*/

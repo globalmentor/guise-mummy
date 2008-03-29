@@ -8,9 +8,10 @@ import com.globalmentor.java.Objects;
 
 /**A measurement such as a length, area, or volume.
 All zero extents are considered equal, regardless of the unit of measurement.
+For this implementation only extents of the same unit and degree should be compared, although consistent, if inaccurate, values will still be obtained otherwise. 
 @author Garret Wilson
 */
-public class Extent
+public class Extent implements Comparable<Extent>
 {
 
 	/**A convenience one-dimensional extent of zero pixels.*/
@@ -83,6 +84,10 @@ public class Extent
 	*/
 	public boolean equals(final Object object)
 	{
+		if(this==object)	//if the objects are the same
+		{
+			return true;	//identical objects are always equal
+		}
 		if(object instanceof Extent)	//if the object is an extent
 		{
 			final Extent extent=(Extent)object;	//get the object as an extent
@@ -97,6 +102,30 @@ public class Extent
 		}
 		return false;	//the object did not match this extent
 	}
+
+	/**Compares this object with the specified object for order.
+	Returns a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+	This implementation is meant to compare extents of identical units; non-identical units will be compared by unit ordinal.
+	This implementation is meant to compare extents of identical degrees; non-identical degrees will be compared by degrees.
+	@param extent The object to be compared.
+	@return A negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+	*/
+  public int compareTo(final Extent extent)
+  {
+  	final Unit unit=getUnit();	//get this extent's unit
+  	final Unit extentUnit=extent.getUnit();	//get the other extent's unit
+  	if(unit!=extentUnit)	//if units are different
+  	{
+  		return unit.ordinal()-extentUnit.ordinal();	//extents shouldn't be compared with different units; do something reasonable by sorting based upon the unit
+  	}
+		final int degree=getDegree();	//get this extent's degree
+		final int extentDegree=getDegree();	//get the other extent's degree
+  	if(degree!=extentDegree)	//if the degrees are different
+  	{
+  		return degree-extentDegree;	//extents shouldn't be compared with different degrees; do something reasonable by sorting based upon the degree
+  	}
+ 		return Double.compare(getValue(), extent.getValue());	//compare values
+  }
 
 	/**@return A string representation of this extent.*/
 	public String toString()
