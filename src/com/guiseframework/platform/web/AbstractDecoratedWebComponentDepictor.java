@@ -108,6 +108,7 @@ public abstract class AbstractDecoratedWebComponentDepictor<C extends Component>
 
 	/**Ends the rendering process.
 	This version writes the end of the body element, if there is one, and the ending decorator items, such as the error, if any.
+	This version calls {@link #writeDecoratorEnd()}.
 	@exception IOException if there is an error rendering the component.
 	*/
 	protected void depictEnd() throws IOException
@@ -118,8 +119,17 @@ public abstract class AbstractDecoratedWebComponentDepictor<C extends Component>
 			getDepictContext().writeElementEnd(bodyNamespaceURIString!=null ? URI.create(bodyNamespaceURIString) : null, bodyElementState.getLocalName());	//end the element
 		}
 		bodyElementState=null;	//release the element state
-		writeErrorMessage();	//write the error message, if any
+		writeDecoratorEnd();	//write the decorator ending elements
 		super.depictEnd();	//do the default ending rendering
 	}
 
+	/**Writes the ending part of the outer decorator element.
+	This version writes the ending decorator items, such as the error message, if any.
+	@exception IOException if there is an error rendering the component.
+	@see #writeErrorMessage()
+	*/
+	protected void writeDecoratorEnd() throws IOException
+	{
+		writeErrorMessage();	//write the error message, if any
+	}
 }

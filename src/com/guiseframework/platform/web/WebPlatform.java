@@ -52,6 +52,16 @@ public interface WebPlatform extends Platform
 	public final static String ATTRIBUTE_ATTRIBUTE_HASH="attributeHash";
 	/**The Guise attribute containing the hash of the element content.*/
 	public final static String ATTRIBUTE_CONTENT_HASH="contentHash";
+	/**The Guise attribute indicating the content type of an element's contents.*/
+	public final static String ATTRIBUTE_CONTENT_TYPE="contentType";
+	/**The Guise attribute indicating the type of patching that should occur.*/
+	public final static String ATTRIBUTE_PATCH_TYPE="patchType";
+		/**The Guise attribute value indicating that no patching should occur on the value.*/
+		public final static String ATTRIBUTE_PATCH_TYPE_NO_VALUE="novalue";
+		/**The Guise attribute value indicating that no patching should occur.*/
+		public final static String ATTRIBUTE_PATCH_TYPE_NONE="none";
+		/**The Guise attribute value indicating that the element is a temporary element that will be replaced later; functions just like "none" for patching except that this element will be removed from the original hierarchy.*/
+		public final static String ATTRIBUTE_PATCH_TYPE_TEMP="temp";
 
 	/**The path of the blank MP3 file, relative to the application.*/
 	public final static URIPath BLANK_MP3_PATH=GuiseApplication.GUISE_ASSETS_AUDIO_PATH.resolve("blank.mp3");	

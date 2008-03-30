@@ -1,5 +1,5 @@
 <!-- Guise XHTML DTD -->
-<!-- Copyright (c) 2006-2007 GlobalMentor, Inc. -->
+<!-- Copyright (c) 2006-2008 GlobalMentor, Inc. -->
 <!--
 	Public and System Identifiers:
 		PUBLIC "-//Guise//DTD XHTML Guise 1.0//EN"
@@ -50,6 +50,7 @@
 
 <!ATTLIST textarea
   guise:multiline						CDATA          #IMPLIED
+  guise:contentType					CDATA          #IMPLIED
   wrap    									CDATA          #IMPLIED
 >
 

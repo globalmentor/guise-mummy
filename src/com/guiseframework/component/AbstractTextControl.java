@@ -1,20 +1,19 @@
 package com.guiseframework.component;
 
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyVetoException;
+import java.beans.*;
 import java.util.regex.Pattern;
+
+import javax.mail.internet.ContentType;
 
 import com.globalmentor.java.Objects;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.converter.*;
 import com.guiseframework.model.*;
-import com.guiseframework.validator.ValidationException;
-import com.guiseframework.validator.Validator;
+import com.guiseframework.validator.*;
 
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.text.Text.*;
 
 /**Control to accept text input from the user representing a particular value type.
 This control keeps track of literal text entered by the user, distinct from the value stored in the model.
@@ -42,6 +41,8 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V>
 	public final static String PROVISIONAL_TEXT_PROPERTY=getPropertyName(AbstractTextControl.class, "provisionalText");
 	/**The text literal bound property.*/
 	public final static String TEXT_PROPERTY=getPropertyName(AbstractTextControl.class, "text");
+	/**The value content type bound property.*/
+	public final static String VALUE_CONTENT_TYPE_PROPERTY=getPropertyName(AbstractTextControl.class, "valueContentType");
 
 	/**The regular expression pattern that will cause the text automatically to be committed immediately, or <code>null</code> if text should not be committed during entry.*/
 	private Pattern autoCommitPattern=null;
@@ -178,6 +179,34 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V>
 			setValue(value);	//store the value in the model, throwing an exception if the value is invalid
 		}
 
+	/**The content type of the value.*/
+	private ContentType valueContentType;
+
+		/**@return The content type of the value.*/
+		public ContentType getValueContentType() {return valueContentType;}
+
+		/**Sets the content type of the value.
+		This is a bound property.
+		@param newValueContentType The new value content type.
+		@exception NullPointerException if the given content type is <code>null</code>.
+		@exception IllegalArgumentException if the given content type is not a text content type.
+		@see #VALUE_CONTENT_TYPE_PROPERTY
+		*/
+		public void setValueContentType(final ContentType newValueContentType)
+		{
+			checkInstance(newValueContentType, "Content type cannot be null.");
+			if(valueContentType!=newValueContentType)	//if the value is really changing
+			{
+				final ContentType oldValueContentType=valueContentType;	//get the old value
+				if(!isText(newValueContentType))	//if the new content type is not a text content type
+				{
+					throw new IllegalArgumentException("Content type "+newValueContentType+" is not a text content type.");
+				}
+				valueContentType=newValueContentType;	//actually change the value
+				firePropertyChange(VALUE_CONTENT_TYPE_PROPERTY, oldValueContentType, newValueContentType);	//indicate that the value changed
+			}			
+		}
+		
 	/**The property change listener that updates the text in response to a property changing.*/
 	private final PropertyChangeListener updateTextPropertyChangeListener=new PropertyChangeListener()	//create a listener to update the text in response to a property changing
 			{
@@ -213,6 +242,7 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V>
 	public AbstractTextControl(final ValueModel<V> valueModel, final Converter<V, String> converter)
 	{
 		super(new DefaultLabelModel(), valueModel, new DefaultEnableable());	//construct the parent class
+		this.valueContentType=PLAIN_TEXT_CONTENT_TYPE;
 		this.converter=checkInstance(converter, "Converter cannot be null");	//save the converter
 		updateText();	//initialize the text with the literal form of the initial model value
 		addPropertyChangeListener(VALUE_PROPERTY, updateTextPropertyChangeListener);	//listen for the value changing, and update the text in response

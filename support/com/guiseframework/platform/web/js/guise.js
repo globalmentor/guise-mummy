@@ -1394,7 +1394,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 			}
 */
 			var patchType=Element.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "patchType");	//get the patch type TODO use a constant
-			if(patchType=="none")	//if we should not do any patching
+			if(patchType=="none" || patchType=="temp")	//if we should not do any patching
 			{
 				return;	//stop synchronization
 			}
@@ -1579,7 +1579,10 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 					//patch in the new child element hierarchy
 				if(elementName=="textarea")	//if this is a text area, do special-case value changing (restructuring won't work in IE and Mozilla) TODO check for other similar types TODO use a constant
 				{
-					oldElement.value=DOMUtilities.getNodeText(element);	//set the new value to be the text of the new element
+					if(patchType!="novalue")	//if we shouldn't ignore the value attribute
+					{
+						oldElement.value=DOMUtilities.getNodeText(element);	//set the new value to be the text of the new element
+					}
 				}
 				else	//for other elements, restructure the DOM tree normally
 				{
@@ -1607,12 +1610,14 @@ if(elementName=="select")
 						{
 							if(childNode.nodeType==Node.ELEMENT_NODE)	//if this is an element, check the name and ID
 							{
-								
 								if(oldChildNode.nodeName.toLowerCase()!=childNode.nodeName.toLowerCase())	//if these are elements with different node names
 								{
 //alert("child" +i+" found different node names; old: "+oldChildNode.nodeName+" and new: "+childNode.nodeName);
 //alert("old node structure of parent is: "+DOMUtilities.getNodeString(oldElement));
-									isChildrenCompatible=false;	//these child elements aren't compatible because they have different node name
+//TODO del									if(Element.getAttributeNS(newChildNode, GUISE_ML_NAMESPACE_URI, "patchType")!="dummy")	//dummy-patched elements are considered compatible, even with different names TODO this is just to allow a TinyMCE <iframe>; maybe do more extensive checking to make sure this is the 
+									{
+										isChildrenCompatible=false;	//these child elements aren't compatible because they have different node name
+									}
 								}
 								else	//if the names are the same but the IDs are different, assume that the entire child should be replaced rather than synchronized---the event listeners would probably be different anyway
 								{
@@ -1894,6 +1899,33 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 			com.garretwilson.js.EventManager.addEvent(window, "resize", this._onWindowResize.bind(this), false);	//add a resize listener
 		//TODO del	com.garretwilson.js.EventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
 			com.garretwilson.js.EventManager.addEvent(window, "unload", this.onUnload.bind(this), false);	//do the appropriate uninitialization when the window unloads
+
+			
+			
+			
+/*TODO del
+			tinymce.create('tinymce.plugins.GuisePlugin',	//create a new TinyMCE plugin class; see http://wiki.moxiecode.com/index.php/TinyMCE:API/tinymce.Plugin
+					{
+						init:function(editor, url)
+						{
+//				var tinyMCEFrame=tinyMCE.get(node.id);	//TODO see http://wiki.moxiecode.com/index.php/TinyMCE:Migration_guide
+				console.log(editor);
+//							alert("tiny startup");
+						}
+			    });
+			tinymce.PluginManager.add('guise', tinymce.plugins.GuisePlugin);	//register the Guise plugin for TinyMCE
+*/
+			tinyMCE.init(
+				{
+			    mode: "none",
+			    theme: "simple",
+			    entity_encoding: "raw"	//don't entity encoding except for necessary XML characters; XHTML by default doesn't understand HTML entities, and numeric encoding would encur an unnecessary slowdown
+//TODO del			    plugins: "-guise" //specify the Guise plugin, telling TinyMCE not to try to load it
+				});
+			
+			
+			
+			
 			this._initializeNode(document.documentElement, true, true);	//initialize the document tree, indicating that this is the first initialization
 			this._updateComponents(document.documentElement, true);	//update all components represented by elements within the document
 		//TODO del when works	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
@@ -1916,6 +1948,10 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 				focusable.focus();	//focus on the node
 			}
 			this.setPollInterval(GUISE_AJAX_POLL_INTERVAL);	//turn on polling at the normal level
+			
+//TODO del			jQuery(".wymeditor-body").wymeditor();
+
+			
 		};
 
 		/**Creates the appropriate modal layers, initializes document-related variables, and installs event handlers.
@@ -2475,6 +2511,7 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 		@param node The node to initialize.
 		@param deep true if the entire hierarchy should be initialized.
 		@param initialInitialization true if this is the first initialization of the entire page.
+		@return true if initialization was successful, else false if the node should be deleted.
 		*/
 		proto._initializeNode=function(node, deep, initialInitialization)
 		{
@@ -2491,6 +2528,7 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 							guiseIE6Fix.fixElementClassName(node);	//fix the class name of this element
 						}
 		*/
+
 						var elementName=node.nodeName.toLowerCase();	//get the element name
 						var elementClassName=node.className;	//get the element class name
 						var elementClassNames=elementClassName ? elementClassName.split(/\s/) : EMPTY_ARRAY;	//split out the class names
@@ -2523,6 +2561,16 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 									}
 								}
 								break;
+/*TODO del
+							case "div":	//TODO maybe use a custom element
+								if(elementClassNames.contains("textControl-body"))	//if this is a Guise text control TODO use constant
+								{
+										//TODO check content type, maybe
+									jQuery(node).wymeditor();	//TODO testing
+									return;
+								}
+								break;
+*/
 							case "img":
 								var rolloverSrc=node.getAttribute("guise:rolloverSrc");	//get the image rollover, if there is one TODO use a constant
 								if(rolloverSrc)	//if the image has a rollover TODO use a constant; maybe use hasAttributeNS()
@@ -2595,9 +2643,48 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 		*/	
 								
 								break;
+							case "span":
+								if(node.getAttribute("guise:patchType")=="temp")	//if this is just a temporary element that should be removed (in anticipation of a later replacement, such as the TinyMCE editor, for example) (IE doesn't let us check this attribute for all elements)
+								{
+									return false;	//stop initializing and indicate that the element should be deleted
+								}
+								break;
 							case "textarea":
-								com.garretwilson.js.EventManager.addEvent(node, "change", onTextInputChange, false);
-								com.garretwilson.js.EventManager.addEvent(node, "keydown", onTextInputKeyDown, false);	//commit the text area on Enter TODO decide whether we want real-time checking with onTextInpuKeyUp, which would be very expensive for text areas
+								var contentType=node.getAttribute("guise:contentType");	//get the content type TODO use a constant
+								if(contentType=="application/xhtml+xml-external-parsed-entity")	//if this is an XHTML fragment
+								{
+//TODO del; may not be needed now									tinyMCE.idCounter=0;	//several sites indicate that this is needed in order to have multiple editors on the same page
+//TODO testing									tinyMCE.execCommand('mceAddControl', false, node.id);
+									var component=Node.getAncestorElementByClassName(node, STYLES.COMPONENT);	//get the component element
+									if(component)	//if there is a component
+									{
+										var componentID=component.id;	//get the component ID
+										if(componentID)	//if there is a component ID
+										{
+											var editor=new tinymce.Editor(node.id, tinyMCE.settings);
+											editor.componentID=componentID;	//indicate the Guise component ID of the editor
+											editor.onChange.add(this._onTinyMCEChange.bind(this));
+											editor.render();
+										}
+									}
+									
+//									var tinyMCEFrame=tinyMCE.get(node.id);	//TODO see http://wiki.moxiecode.com/index.php/TinyMCE:Migration_guide
+//console.log(tinyMCEFrame);
+//TODO del									alert("IFrame ID: "+document.getElementById(node.id+"_ifr").id);
+/*TODO testing WYMEditor
+							    var wym=jQuery(node).wymeditor(
+							    		{
+								        skin: 'minimal'
+							    		});
+							    WYMeditor.INSTANCES[0].status("This is the status bar.");
+//TODO fix									window.setTimeout(function(){jQuery(node).wymeditor()}, 1);	//send the AJAX request later; in Firefox 2.0.0.3, sending the request from within the key event will cause the AJAX response to disappear
+*/
+								}
+								else	//if this is a normal text area TODO maybe require text/plain
+								{
+									com.garretwilson.js.EventManager.addEvent(node, "change", onTextInputChange, false);
+									com.garretwilson.js.EventManager.addEvent(node, "keydown", onTextInputKeyDown, false);	//commit the text area on Enter TODO decide whether we want real-time checking with onTextInpuKeyUp, which would be very expensive for text areas
+								}
 								break;
 						}
 /*TODO del
@@ -2657,7 +2744,13 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 					var allCount=all.length;	//find out how many nodes there are
 					for(var i=0; i<allCount; ++i)	//for each descendant node
 					{
-						this._initializeNode(all[i], false, initialInitialization);	//initialize this child node, but not its children
+						var childNode=all[i];	//get this child node
+						if(!this._initializeNode(childNode, false, initialInitialization))	//initialize this child node, but not its children; if the node should be removed
+						{
+							childNode.parentNode.removeChild(childNode);	//remove the child from the tree
+							--i;	//account for the child node being removed, because the child node list is live
+							--allCount;	//account for the child node being removed, because the child node list is live
+						}
 					}
 				}
 				else	//otherwise, walk the tree using the standard W3C DOM routines
@@ -2667,10 +2760,17 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 					var childNodeCount=childNodeList.length;	//find out how many children there are
 					for(var i=0; i<childNodeCount; ++i)	//for each child node
 					{
-						this._initializeNode(childNodeList[i], deep, initialInitialization);	//initialize this child subtree
+						var childNode=childNodeList[i];	//get this child node
+						if(!this._initializeNode(childNode, deep, initialInitialization))	//initialize this child subtree; if the node should be removed
+						{
+							node.removeChild(childNode);	//remove the child from the tree
+							--i;	//account for the child node being removed, because the child node list is live
+							--childNodeCount;	//account for the child node being removed, because the child node list is live
+						}
 					}
 				}
 			}
+			return true;	//indicate that initialization was successful
 		};
 		
 		/**Updates the representation of any dynamic components based upon the state of the underlying element.
@@ -2731,6 +2831,22 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 		proto._uninitializeNode=function(node, deep)	//TODO remove the node from the sorted list of drop targets
 		{
 			com.garretwilson.js.EventManager.clearEvents(node);	//clear events for this node
+			switch(node.nodeType)	//see which type of child node this is
+			{
+				case Node.ELEMENT_NODE:	//element
+					var elementName=node.nodeName.toLowerCase();	//get the element name
+					switch(elementName)	//see which element this is
+					{
+						case "textarea":
+							var contentType=node.getAttribute("guise:contentType");	//get the content type TODO use a constant
+							if(contentType=="application/xhtml+xml-external-parsed-entity")	//if this is an XHTML fragment
+							{
+								tinyMCE.execCommand('mceRemoveControl', false, node.id);	//remove TinyMCE
+							}
+							break;
+					}
+					break;
+			}
 			if(deep)	//if we should uninitialize child nodes
 			{
 				var all=node.all;	//see if the node has an all[] array, because that will be much faster
@@ -2839,6 +2955,20 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 						}
 					}
 				}
+			}
+		};
+
+		/**Called when the TinyMCE editor content changes.
+		@see http://wiki.moxiecode.com/index.php/TinyMCE:API/tinymce.Editor/onChange
+		*/
+		proto._onTinyMCEChange=function(editor, undoLevel, undoManager)
+		{
+			if(guise.isEnabled())	//if AJAX is enabled
+			{
+//TODO fix				textInput.removeAttribute("guise:attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+//TODO fix				guise.invalidateAncestorContent(editor);	//indicate that the ancestors now have different content TODO make sure this works with the editor
+				var ajaxRequest=new ChangeAJAXEvent(editor.componentID, new Map("value", editor.getContent()));	//create a new property change event with the Guise component ID and the new value
+				guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 			}
 		};
 

@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import javax.mail.internet.ContentType;
+
 import static com.globalmentor.text.Text.*;
 import com.globalmentor.util.Debug;
 import com.guiseframework.component.*;
@@ -14,6 +16,7 @@ import com.guiseframework.platform.*;
 
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
 
 /**Strategy for rendering a text control as an XHTML <code>&lt;input&gt;</code> element or an XHTML <code>&lt;textarea&gt;</code> element.
@@ -38,6 +41,7 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 	*/
 	public String getBodyLocalName()
 	{
+		final C component=getDepictedObject();	//get the component being depicted
 		return getDepictedObject().getRowCount()==1 ? ELEMENT_INPUT : ELEMENT_TEXTAREA;	//if something besides one row is requested (such as no rows), use a text area
 	}
 
@@ -187,7 +191,7 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 					&& modifiedProperties.contains(TextControl.PROVISIONAL_TEXT_PROPERTY)	//and if the text was provisionally modified
 					&& !modifiedProperties.contains(TextControl.TEXT_PROPERTY))	//but the actual text was not modified, this was just a provisional value update; notify the browser not to patch in the new value
 			{
-				depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, "patchType", "novalue");	//guise:patchType="novalue" TODO use constants
+				depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_PATCH_TYPE, ATTRIBUTE_PATCH_TYPE_NO_VALUE);	//guise:patchType="novalue"
 			}
 		}
 		else if(ELEMENT_TEXTAREA.equals(bodyLocalName))	//if we are rendering an <xhtml:textarea>
@@ -205,14 +209,18 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 			depictContext.writeAttribute(null, ELEMENT_TEXTAREA_ATTRIBUTE_WRAP, lineWrap ? TEXTAREA_WRAP_SOFT : TEXTAREA_WRAP_OFF);	//wrap="soft|off"
 			final boolean multiline=component.isMultiline();	//see if we should allow multiple lines of input
 			depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ELEMENT_TEXTAREA_ATTRIBUTE_MULTILINE, Boolean.toString(multiline));	//guise:multiline="true|false"
+			final ContentType valueContentType=component.getValueContentType();	//get the content type of the value
+			depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_CONTENT_TYPE, valueContentType.getBaseType());	//guise:contentType="valueContentType"
+			if(isHTML(valueContentType))	//if the content is HTML
+			{
+				depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_PATCH_TYPE, ATTRIBUTE_PATCH_TYPE_NONE);	//don't do any patching on the text area itself; rely on events instead
+			}
 		}
 		else	//if we don't recognize the type of element we are rendering
 		{
 			throw new AssertionError("Unrecognized element local name: "+bodyLocalName);
 		}
-		
 //TODO del Debug.trace("*****getting ready to update text input view; modified properties are:", getModifiedProperties());
-
 	}
 
 	/**Renders the body of the component.
@@ -221,7 +229,8 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 	protected void depictBody() throws IOException
 	{
 		super.depictBody();	//render the default main part of the component
-		if(ELEMENT_TEXTAREA.equals(getBodyLocalName()))	//if we are rendering an <xhtml:textarea>
+		final String bodyLocalName=getBodyLocalName();	//see which type of element we are rendering
+		if(ELEMENT_TEXTAREA.equals(getBodyLocalName())/*TODO del || ELEMENT_DIV.equals(getBodyLocalName())*/)	//if we are rendering an <xhtml:textarea> or an <xhtml:div>
 		{
 			final String text=getDepictedObject().getText();	//see what literal text representation we are using
 			if(text!=null)	//if there is a value
@@ -230,4 +239,23 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 			}
 		}
 	}
+
+	/**Writes the ending part of the outer decorator element.
+	This version writes a dummy element for rich text editing if needed
+	@exception IOException if there is an error rendering the component.
+	@see #writeErrorMessage()
+	*/
+	protected void writeDecoratorEnd() throws IOException
+	{
+		if(isHTML(getDepictedObject().getValueContentType()))	//if the content is HTML
+		{
+			final WebDepictContext depictContext=getDepictContext();	//get the depict context
+			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_SPAN);	//<xhtml:span>
+			depictContext.writeAttribute(null, ATTRIBUTE_ID, decorateID(getPlatform().getDepictIDString(getDepictedObject().getDepictID()), null, COMPONENT_BODY_CLASS_SUFFIX+"_container"));	//write the ID that will be used by the generated component for the editor
+			depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_PATCH_TYPE, ATTRIBUTE_PATCH_TYPE_TEMP);	//guise:patchType="temp"; this is just a fill-in for the real content that gets placed later
+			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_SPAN);	//</xhtml:span>
+		}
+		super.writeDecoratorEnd();	//write the ending components
+	}
+
 }
