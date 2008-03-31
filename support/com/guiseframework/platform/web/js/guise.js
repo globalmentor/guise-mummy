@@ -2852,8 +2852,7 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 				var all=node.all;	//see if the node has an all[] array, because that will be much faster
 				if(all)	//if there is an all[] array
 				{
-					var allCount=all.length;	//find out how many nodes there are
-					for(var i=0; i<allCount; ++i)	//for each descendant node
+					for(var i=all.length-1; i>=0; --i)	//for each descendant node
 					{
 						this._uninitializeNode(all[i], false);	//uninitialize this child node, but not its children
 					}
@@ -2862,8 +2861,7 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 				{
 						//uninitialize child nodes
 					var childNodeList=node.childNodes;	//get all the child nodes
-					var childNodeCount=childNodeList.length;	//find out how many children there are
-					for(var i=0; i<childNodeCount; ++i)	//for each child node
+					for(var i=childNodeList.length-1; i>=0; --i)	//uninitialize the child nodes in reverse order, because uninitialization can cause elements to be removed (e.g. TinyMCE)
 					{
 						this._uninitializeNode(childNodeList[i], deep);	//initialize this child subtree
 					}
