@@ -1919,6 +1919,7 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 				{
 			    mode: "none",
 			    theme: "simple",
+			    skin: "guise",
 			    entity_encoding: "raw"	//don't entity encoding except for necessary XML characters; XHTML by default doesn't understand HTML entities, and numeric encoding would encur an unnecessary slowdown
 //TODO del			    plugins: "-guise" //specify the Guise plugin, telling TinyMCE not to try to load it
 				});
