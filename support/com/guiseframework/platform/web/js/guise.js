@@ -1900,26 +1900,16 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 		//TODO del	com.garretwilson.js.EventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
 			com.garretwilson.js.EventManager.addEvent(window, "unload", this.onUnload.bind(this), false);	//do the appropriate uninitialization when the window unloads
 
-			
-			
-			
-/*TODO del
-			tinymce.create('tinymce.plugins.GuisePlugin',	//create a new TinyMCE plugin class; see http://wiki.moxiecode.com/index.php/TinyMCE:API/tinymce.Plugin
-					{
-						init:function(editor, url)
-						{
-//				var tinyMCEFrame=tinyMCE.get(node.id);	//TODO see http://wiki.moxiecode.com/index.php/TinyMCE:Migration_guide
-				console.log(editor);
-//							alert("tiny startup");
-						}
-			    });
-			tinymce.PluginManager.add('guise', tinymce.plugins.GuisePlugin);	//register the Guise plugin for TinyMCE
-*/
 			tinyMCE.init(
 				{
 			    mode: "none",
-			    theme: "simple",
+			    theme: "advanced",
 			    skin: "guise",
+			    auto_resize: true,	//experimental
+			    theme_advanced_toolbar_align: "left",
+			    theme_advanced_toolbar_location: "top",
+			    theme_advanced_statusbar_location: "bottom",
+			    theme_advanced_disable: "image,cleanup,help,code,fontselect,fontsizeselect,styleselect,forecolor,backcolor,forecolorpicker,backcolorpicker,newdocument",
 			    entity_encoding: "raw"	//don't entity encoding except for necessary XML characters; XHTML by default doesn't understand HTML entities, and numeric encoding would encur an unnecessary slowdown
 //TODO del			    plugins: "-guise" //specify the Guise plugin, telling TinyMCE not to try to load it
 				});

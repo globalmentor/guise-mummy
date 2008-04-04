@@ -251,7 +251,7 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 		{
 			final WebDepictContext depictContext=getDepictContext();	//get the depict context
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_SPAN);	//<xhtml:span>
-			depictContext.writeAttribute(null, ATTRIBUTE_ID, decorateID(getPlatform().getDepictIDString(getDepictedObject().getDepictID()), null, COMPONENT_BODY_CLASS_SUFFIX+"_container"));	//write the ID that will be used by the generated component for the editor
+			depictContext.writeAttribute(null, ATTRIBUTE_ID, decorateID(getPlatform().getDepictIDString(getDepictedObject().getDepictID()), null, COMPONENT_BODY_CLASS_SUFFIX+"_parent"));	//write the ID that will be used by the generated component for the editor
 			depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_PATCH_TYPE, ATTRIBUTE_PATCH_TYPE_TEMP);	//guise:patchType="temp"; this is just a fill-in for the real content that gets placed later
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_SPAN);	//</xhtml:span>
 		}
