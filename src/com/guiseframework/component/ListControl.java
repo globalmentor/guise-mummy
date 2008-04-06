@@ -1,9 +1,9 @@
 package com.guiseframework.component;
 
+import static com.globalmentor.java.Classes.*;
+
 import com.guiseframework.converter.AbstractStringLiteralConverter;
 import com.guiseframework.model.*;
-
-import static com.globalmentor.java.Classes.*;
 
 /**Control to allow selection of one or more values from a list.
 @param <V> The type of values to select.
@@ -65,7 +65,17 @@ public class ListControl<V> extends AbstractListSelectControl<V>
 	*/
 	public ListControl(final Class<V> valueClass)
 	{
-		this(new DefaultListSelectModel<V>(valueClass));	//construct the class with a default model
+		this(valueClass, true);	//construct the class with multiple selection enabled
+	}
+
+	/**Value class constructor with a default data model to represent a given type.
+	@param valueClass The class indicating the type of value held in the model.
+	@param multipleSelection <code>true</code> if the list control should allow multiple selections, else <code>false</code> if only a single selection is allowed.
+	@exception NullPointerException if the given value class is <code>null</code>.
+	*/
+	public ListControl(final Class<V> valueClass, final boolean multipleSelection)
+	{
+		this(valueClass, multipleSelection ? new MultipleListSelectionPolicy<V>() : new SingleListSelectionPolicy<V>());	//construct the class with an appropriate selection policy
 	}
 
 	/**Value class and row count constructor with a default data model to represent a given type with multiple selection.
@@ -75,7 +85,18 @@ public class ListControl<V> extends AbstractListSelectControl<V>
 	*/
 	public ListControl(final Class<V> valueClass, final int rowCount)
 	{
-		this(new DefaultListSelectModel<V>(valueClass), rowCount);	//construct the class with a default model and the row count
+		this(valueClass, true, rowCount);	//construct the class with multiple selection enabled
+	}
+
+	/**Value class and row count constructor with a default data model to represent a given type.
+	@param valueClass The class indicating the type of value held in the model.
+	@param multipleSelection <code>true</code> if the list control should allow multiple selections, else <code>false</code> if only a single selection is allowed.
+	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
+	@exception NullPointerException if the given value class is <code>null</code>.
+	*/
+	public ListControl(final Class<V> valueClass, final boolean multipleSelection, final int rowCount)
+	{
+		this(valueClass, multipleSelection ? new MultipleListSelectionPolicy<V>() : new SingleListSelectionPolicy<V>(), rowCount);	//construct the class with an appropriate selection policy and the row count
 	}
 
 	/**Value class and selection strategy constructor with a default data model to represent a given type.

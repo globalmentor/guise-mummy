@@ -3,6 +3,9 @@ package com.guiseframework;
 import java.net.URI;
 
 import static com.globalmentor.java.Classes.*;
+
+import com.globalmentor.java.Classes;
+import com.globalmentor.java.Enums;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.Text.*;
@@ -23,6 +26,14 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 
 	/**The prefix character used to introduce string value references.*/
 	public final static char STRING_VALUE_REFERENCE_PREFIX_CHAR='=';
+
+		//common property strings
+	/**The aspect used to identify labels as part of resource property keys.*/
+	public final static String LABEL_PROPERTY_KEY_ASPECT="label";
+	/**The aspect used to identify glyphs as part of resource property keys.*/
+	public final static String GLYPH_PROPERTY_KEY_ASPECT="glyph";
+	/**The aspect used to identify info as part of resource property keys.*/
+	public final static String INFO_PROPERTY_KEY_ASPECT="info";
 
 		//standard labels
 	public final static String APPLICATION_NAME=createStringResourceReference("application.name");
@@ -94,4 +105,87 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 		return e.name().toLowerCase().replace('_', '.');	//convert the name to lowercase and replace underscores with periods
 	}
 
+	/**Returns a resource reference for the label aspect of a resource key based upon the given enum class.
+	The resource reference will a resource key in the form <code><var>com.example.EnumClass</var>.label</code>.
+	@param enumClass The enum class for which to return a resource reference.
+	@return A string resource reference to the label aspect of a resource key based upon the given enum class.
+	@exception NullPointerException if the given enum is <code>null</code>.
+	@see Classes#getPropertyName(Class, String)
+	@see #LABEL_PROPERTY_KEY_ASPECT
+	@see #createStringResourceReference(String)
+	*/
+	public static <E extends Enum<E>> String getLabelResourceReference(final Class<E> enumClass)
+	{
+		return createStringResourceReference(Classes.getPropertyName(enumClass, LABEL_PROPERTY_KEY_ASPECT));
+	}
+
+	/**Returns a resource reference for the label aspect of a resource key based upon the given enum.
+	The resource reference will a resource key in the form <code><var>com.example.EnumClass</var>.<var>NAME</var>.label</code>.
+	@param e The enum instance for which to return a resource reference.
+	@return A string resource reference to the label aspect of a resource key based upon the given enum.
+	@exception NullPointerException if the given enum is <code>null</code>.
+	@see Enums#getPropertyName(Enum, String)
+	@see #LABEL_PROPERTY_KEY_ASPECT
+	@see #createStringResourceReference(String)
+	*/
+	public static <E extends Enum<E>> String getLabelResourceReference(final E e)
+	{
+		return createStringResourceReference(Enums.getPropertyName(e, LABEL_PROPERTY_KEY_ASPECT));
+	}
+
+	/**Returns a resource reference for the glyph aspect of a resource key based upon the given enum class.
+	The resource reference will a resource key in the form <code><var>com.example.EnumClass</var>.glyph</code>.
+	@param enumClass The enum class for which to return a resource reference.
+	@return A URI resource reference to the glyph aspect of a resource key based upon the given enum class.
+	@exception NullPointerException if the given enum is <code>null</code>.
+	@see Classes#getPropertyName(Class, String)
+	@see #GLYPH_PROPERTY_KEY_ASPECT
+	@see #createURIResourceReference(String)
+	*/
+	public static <E extends Enum<E>> URI getGlyphResourceReference(final Class<E> enumClass)
+	{
+		return createURIResourceReference(Classes.getPropertyName(enumClass, GLYPH_PROPERTY_KEY_ASPECT));
+	}
+
+	/**Returns a resource reference for the glyph aspect of a resource key based upon the given enum.
+	The resource reference will a resource key in the form <code><var>com.example.EnumClass</var>.<var>NAME</var>.glyph</code>.
+	@param e The enum instance for which to return a resource reference.
+	@return A URI resource reference to the glyph aspect of a resource key based upon the given enum.
+	@exception NullPointerException if the given enum is <code>null</code>.
+	@see Enums#getPropertyName(Enum, String)
+	@see #GLYPH_PROPERTY_KEY_ASPECT
+	@see #createURIResourceReference(String)
+	*/
+	public static <E extends Enum<E>> URI getGlyphResourceReference(final E e)
+	{
+		return createURIResourceReference(Enums.getPropertyName(e, GLYPH_PROPERTY_KEY_ASPECT));
+	}
+
+	/**Returns a resource reference for the info aspect of a resource key based upon the given enum class.
+	The resource reference will a resource key in the form <code><var>com.example.EnumClass</var>.info</code>.
+	@param enumClass The enum class for which to return a resource reference.
+	@return A string resource reference to the info aspect of a resource key based upon the given enum class.
+	@exception NullPointerException if the given enum is <code>null</code>.
+	@see Classes#getPropertyName(Class, String)
+	@see #INFO_PROPERTY_KEY_ASPECT
+	@see #createStringResourceReference(String)
+	*/
+	public static <E extends Enum<E>> String getInfoResourceReference(final Class<E> enumClass)
+	{
+		return createStringResourceReference(Classes.getPropertyName(enumClass, INFO_PROPERTY_KEY_ASPECT));
+	}
+
+	/**Returns a resource reference for the info aspect of a resource key based upon the given enum.
+	The resource reference will a resource key in the form <code><var>com.example.EnumClass</var>.<var>NAME</var>.info</code>.
+	@param e The enum instance for which to return a resource reference.
+	@return A string resource reference to the info aspect of a resource key based upon the given enum.
+	@exception NullPointerException if the given enum is <code>null</code>.
+	@see Enums#getPropertyName(Enum, String)
+	@see #INFO_PROPERTY_KEY_ASPECT
+	@see #createStringResourceReference(String)
+	*/
+	public static <E extends Enum<E>> String getInfoResourceReference(final E e)
+	{
+		return createStringResourceReference(Enums.getPropertyName(e, INFO_PROPERTY_KEY_ASPECT));
+	}
 }

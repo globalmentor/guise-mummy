@@ -606,7 +606,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 								final String itemContentType=fileItemStream.getContentType();	//get the item content type, if any
 								if(itemContentType!=null)	//if we know the item's content type
 								{
-									setContentType(resourceDescription, createContentType(itemContentType));	//set the resource's content type
+									setContentType(resourceDescription, getContentTypeInstance(itemContentType));	//set the resource's content type
 								}
 								final String name=getFilename(itemName);	//removing any extraneous path information a browser such as IE or Opera might have given
 								resourceDescription.setName(name);	//specify the name provided to us

@@ -5,10 +5,9 @@ import java.net.URI;
 
 import javax.mail.internet.ContentType;
 
-import com.globalmentor.io.ContentTypes;
-import com.globalmentor.net.http.HTTP;
-
+import static com.globalmentor.io.ContentTypes.*;
 import static com.globalmentor.io.ContentTypeConstants.*;
+import com.globalmentor.net.http.HTTP;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import com.globalmentor.util.NameValuePair;
@@ -24,7 +23,7 @@ public class WebFlashDepictor<C extends Flash> extends AbstractSimpleWebComponen
 {
 
 	/**The content type for Flash objects.*/
-	public final static ContentType FLASH_CONTENT_TYPE=new ContentType(ContentTypes.APPLICATION_PRIMARY_TYPE, X_SHOCKWAVE_FLASH_SUBTYPE, null);
+	public final static ContentType FLASH_CONTENT_TYPE=getContentTypeInstance(APPLICATION_PRIMARY_TYPE, X_SHOCKWAVE_FLASH_SUBTYPE);	//TODO move to Flash class
 
 	/**The "allowScriptAccess" parameter.
 	@see <a href="http://www.adobe.com/devnet/flash/articles/fplayer8_security_09.html">Security Changes in Flash Player 8</a>

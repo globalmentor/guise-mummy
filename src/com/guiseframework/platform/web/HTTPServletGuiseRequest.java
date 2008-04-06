@@ -126,7 +126,7 @@ public class HTTPServletGuiseRequest
 		requestPathReserved=requestPath.toString().startsWith(GuiseApplication.GUISE_RESERVED_BASE_PATH.toString());	//see if this is a request for a Guise reserved path (e.g. a public resource or a temporary resource)
 		navigationPath=guiseApplication.getNavigationPath(depictURI, requestPath);	//get the logical version of the the path
 		final String contentTypeString=request.getContentType();	//get the request content type
-		requestContentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
+		requestContentType=contentTypeString!=null ? getContentTypeInstance(contentTypeString) : null;	//create a content type object from the request content type, if there is one
 		ajax=requestContentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(requestContentType);	//see if this is a Guise AJAX request
 	}
 

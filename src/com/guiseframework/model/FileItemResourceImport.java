@@ -42,7 +42,7 @@ public class FileItemResourceImport implements ResourceImport
 	public FileItemResourceImport(final FileItem fileItem)
 	{
 		this.fileItem=checkInstance(fileItem, "File item cannot be null.");
-		contentType=createContentType(fileItem.getContentType());	//create a content type object from the file item
+		contentType=getContentTypeInstance(fileItem.getContentType());	//create a content type object from the file item
 		String name=fileItem.getName();	//get the name of the item
 		if(name!=null)	//if there is a filename
 		{

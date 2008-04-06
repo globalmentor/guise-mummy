@@ -16,7 +16,7 @@ public interface Widget extends Component
 {
 
 	/**The MIME type of a Guise widget.*/
-	public final static ContentType WIDGET_CONTENT_TYPE=new ContentType(APPLICATION_PRIMARY_TYPE, SUBTYPE_EXTENSION_PREFIX+"guise-widget", null);
+	public final static ContentType WIDGET_CONTENT_TYPE=getContentTypeInstance(APPLICATION_PRIMARY_TYPE, SUBTYPE_EXTENSION_PREFIX+"guise-widget");
 
 	/**Retrieves that names of parameters that are allowed to be accessed in a widget context.
 	@return The set of names of widget parameters.

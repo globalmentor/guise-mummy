@@ -5,7 +5,6 @@ import java.util.Queue;
 
 import javax.mail.internet.ContentType;
 
-
 import static com.globalmentor.io.ContentTypes.*;
 import static com.globalmentor.text.xml.XML.*;
 
@@ -33,10 +32,10 @@ public interface WebPlatform extends Platform
 	public final static String GUISE_VERSION_URI_QUERY_PARAMETER="guiseVersion";
 
 	/**The content type of a Guise AJAX request, <code>application/x-guise-ajax-request</code>.*/
-	public final static ContentType GUISE_AJAX_REQUEST_CONTENT_TYPE=new ContentType(APPLICATION_PRIMARY_TYPE, SUBTYPE_EXTENSION_PREFIX+"guise-ajax-request"+SUBTYPE_SUFFIX_DELIMITER_CHAR+XML_SUBTYPE_SUFFIX, null);
+	public final static ContentType GUISE_AJAX_REQUEST_CONTENT_TYPE=getContentTypeInstance(APPLICATION_PRIMARY_TYPE, SUBTYPE_EXTENSION_PREFIX+"guise-ajax-request"+SUBTYPE_SUFFIX_DELIMITER_CHAR+XML_SUBTYPE_SUFFIX);
 
 	/**The content type of a Guise AJAX response, <code>application/x-guise-ajax-response</code>.*/
-	public final static ContentType GUISE_AJAX_RESPONSE_CONTENT_TYPE=new ContentType(APPLICATION_PRIMARY_TYPE, SUBTYPE_EXTENSION_PREFIX+"guise-ajax-response"+SUBTYPE_SUFFIX_DELIMITER_CHAR+XML_SUBTYPE_SUFFIX, null);
+	public final static ContentType GUISE_AJAX_RESPONSE_CONTENT_TYPE=getContentTypeInstance(APPLICATION_PRIMARY_TYPE, SUBTYPE_EXTENSION_PREFIX+"guise-ajax-response"+SUBTYPE_SUFFIX_DELIMITER_CHAR+XML_SUBTYPE_SUFFIX);
 
 		//Guise-specific element attributes
 			//img

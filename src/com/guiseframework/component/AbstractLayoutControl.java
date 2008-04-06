@@ -132,12 +132,26 @@ public abstract class AbstractLayoutControl extends AbstractLayoutComponent impl
 		}
 		addPropertyChangeListener(ENABLED_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>()	//listen for the "enabled" property changing
 				{
-					public void propertyChange(GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent)	//if the "enabled" property changes
+					public void propertyChange(final GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent)	//if the "enabled" property changes
 					{
-						setNotification(null);	//clear any notification
-						updateValid();	//update the valid status, which depends on the enabled status					
+						assert genericPropertyChangeEvent.getOldValue()!=null && genericPropertyChangeEvent.getNewValue()!=null : "The enabled property does not support null.";
+						enabledPropertyChange(genericPropertyChangeEvent.getOldValue().booleanValue(), genericPropertyChangeEvent.getNewValue().booleanValue());	//delegate to our enabled property change method
 					}
 				});
+	}
+
+	/**Called when the enabled property changes.
+	Child versions should call this version.
+	This version clears any notifications and updates the valid status.
+	@param oldValue The old value of the property.
+	@param newValue The new value of the property.
+	@see #setNotification(Notification)
+	@see #updateValid()
+	*/
+	protected void enabledPropertyChange(final boolean oldValue, final boolean newValue)
+	{
+		setNotification(null);	//clear any notification
+		updateValid();	//update the valid status, which depends on the enabled status					
 	}
 
 		//Enableable delegations

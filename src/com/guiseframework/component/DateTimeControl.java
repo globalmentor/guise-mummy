@@ -15,6 +15,7 @@ import com.guiseframework.converter.*;
 import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
 import com.guiseframework.model.*;
+
 import static com.guiseframework.theme.Theme.*;
 
 /**Control that allows selection of a date and/or a time, providing separate inputs for date and time with the option of a calendar popup.
@@ -22,7 +23,7 @@ This implementation always represents the date and time in terms of the current 
 This implementation does not allow smaller than one-second precision.
 @author Garret Wilson
 */
-public class DateTimeControl extends AbstractLayoutValueControl<Date>	//TODO implement calendar popup
+public class DateTimeControl extends AbstractLayoutValueControl<Date>
 {
 
 	/**The control containing the date.*/
@@ -30,6 +31,12 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>	//TODO imp
 
 		/**@return The control containing the date.*/
 		public TextControl<Date> getYearControl() {return dateControl;}
+
+	/**The button allowing selection of the date.*/
+	private final Button calendarButton;
+
+		/**The button allowing selection of the date.*/
+		protected Button getCalendarButton() {return calendarButton;}
 
 	/**The control containing the date.*/
 	private final TextControl<Date> timeControl;
@@ -70,7 +77,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>	//TODO imp
 //TODO del		dateControl.setValidator(new ValueRequiredValidator<Date>());	//require a date
 		dateControl.setColumnCount(10);	//provide for sufficient characters for the most common date format
 		addComponent(dateControl);	//add the date control
-		final Button calendarButton=new Button(LABEL_CALENDAR+HORIZONTAL_ELLIPSIS_CHAR, GLYPH_CALENDAR);	//create a button for the calendar
+		calendarButton=new Button(LABEL_CALENDAR+HORIZONTAL_ELLIPSIS_CHAR, GLYPH_CALENDAR);	//create a button for the calendar
 		calendarButton.setLabelDisplayed(false);
 		calendarButton.addActionListener(new ActionListener() 
 				{
@@ -90,7 +97,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>	//TODO imp
 										{
 											try
 											{
-Debug.trace("ready to put new date in control:", newDate);
+//Debug.trace("ready to put new date in control:", newDate);
 												dateControl.setValue(newDate);	//show the date in the date control
 											}
 											catch(final PropertyVetoException propertyVetoException)	//we should never have a problem selecting a date
@@ -131,7 +138,7 @@ Debug.trace("ready to put new date in control:", newDate);
 						Date date=dateControl.getValue();	//get the date value, if there is one
 						if(date!=null)	//if there is a date value
 						{
-Debug.trace("got date", date, "milliseconds", date.getTime());
+//Debug.trace("got date", date, "milliseconds", date.getTime());
 							final GuiseSession session=getSession();	//get the current session
 							final Locale locale=session.getLocale();	//get the current locale
 							final TimeZone timeZone=session.getTimeZone();	//get the current time zone
@@ -140,7 +147,7 @@ Debug.trace("got date", date, "milliseconds", date.getTime());
 							final Date time=timeControl.getValue();	//get the time date
 							if(time!=null)	//if there is a time, we'll need to update our date
 							{
-Debug.trace("got time", time, "milliseconds", time.getTime());
+//Debug.trace("got time", time, "milliseconds", time.getTime());
 								final Calendar timeCalendar=Calendar.getInstance(timeZone, locale);	//get a calendar to manipulate the time
 								timeCalendar.setTime(time);	//set the time in the calendar
 								setTime(dateCalendar, timeCalendar);	//set the time of the date calendar
@@ -150,7 +157,7 @@ Debug.trace("got time", time, "milliseconds", time.getTime());
 								clearTime(dateCalendar);	//remove the time from the date calendar
 							}
 							date=dateCalendar.getTime();	//update the date to include or not include the time
-Debug.trace("using date", date, "milliseconds", date.getTime());
+//Debug.trace("using date", date, "milliseconds", date.getTime());
 						}
 						setValue(date);	//update our value with the date
 					}
@@ -169,6 +176,19 @@ Debug.trace("using date", date, "milliseconds", date.getTime());
 		updateDateControls();	//update the date controls
 		dateControl.addPropertyChangeListener(VALUE_PROPERTY, updateValuePropertyChangeListener);	//update the value if the date control changes
 		timeControl.addPropertyChangeListener(VALUE_PROPERTY, updateValuePropertyChangeListener);	//update the value if the time control changes
+	}
+
+	/**Called when the enabled property changes.
+	This version updates the enabled status of the child controls.
+	@param oldValue The old value of the property.
+	@param newValue The new value of the property.
+	*/
+	protected void enabledPropertyChange(final boolean oldValue, final boolean newValue)
+	{
+		dateControl.setEnabled(newValue);
+		calendarButton.setEnabled(newValue);
+		timeControl.setEnabled(newValue);
+		super.enabledPropertyChange(oldValue, newValue);	//always perform the default functionality
 	}
 
 	/**Whether we're currently updating the date controls, to avoid reentry from control events.*/
