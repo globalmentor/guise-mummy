@@ -4,12 +4,14 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.security.Principal;
+import java.text.Collator;
 import java.text.MessageFormat;
 import java.util.*;
 
 import com.globalmentor.beans.PropertyBindable;
 import static com.globalmentor.java.Classes.*;
 import com.globalmentor.net.*;
+import com.globalmentor.text.CollatorFactory;
 import com.globalmentor.urf.URFResource;
 import com.globalmentor.util.DataException;
 import com.guiseframework.component.*;
@@ -26,7 +28,7 @@ import com.guiseframework.theme.Theme;
 A Swing-based client application may have only one session, while a web server application will likely have multiple sessions.
 @author Garret Wilson
 */
-public interface GuiseSession extends PropertyBindable
+public interface GuiseSession extends PropertyBindable, CollatorFactory
 {
 
 	/**The input strategy bound property.*/
@@ -397,6 +399,13 @@ public interface GuiseSession extends PropertyBindable
 	@see #getURIResource(String)
 	*/
 	public URI getURIResource(final String resourceKey, final URI defaultValue) throws MissingResourceException;
+
+	/**Retrieves an instance of a collator appropriate for the current locale.
+	The returned collator instance performs collations based upon the current locale.
+	@return An instance of a collator appropriate for the current locale.
+	@see #getLocale()
+	*/
+	public Collator getCollatorInstance();
 
 	/**@return The current principal (e.g. logged-in user), or <code>null</code> if there is no principal authenticated for this session.*/
 	public Principal getPrincipal();

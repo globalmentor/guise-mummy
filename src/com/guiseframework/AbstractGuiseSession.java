@@ -4,6 +4,7 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.security.Principal;
+import java.text.Collator;
 import java.text.MessageFormat;
 
 import static java.text.MessageFormat.*;
@@ -369,10 +370,13 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			return resourceBundle;	//return the resource bundle
 		}
 
-		/**Unloads the current resource bundle so that the next call to {@link #getResourceBundle()} will load the resource bundle anew.*/
+		/**Unloads the current resource bundle so that the next call to {@link #getResourceBundle()} will load the resource bundle anew.
+		This method also releases the current collator.
+		*/
 		protected void releaseResourceBundle()
 		{
 			resourceBundle=null;	//release our reference to the resource bundle
+			collator=null;	//release the current collator
 		}
 
 		/**The property value change listener that, in response to a change in value, releases the resource bundle.
@@ -698,6 +702,27 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			{
 				return defaultValue;	//return the specified default value
 			}
+		}
+
+	/**The lazily-created collator for the current locale, or <code>null</code> if no collator has been created for the current locale.*/ 
+	private Collator collator=null;
+		
+		/**Retrieves an instance of a collator appropriate for the current locale.
+		The returned collator instance performs collations based upon the current locale.
+		@return An instance of a collator appropriate for the current locale.
+		@see #getLocale()
+		*/
+		public Collator getCollatorInstance()
+		{
+			Collator collator=this.collator;	//get the current collator
+			if(collator==null)	//if no collator has yet been created for the current locale
+			{
+				collator=Collator.getInstance(getLocale());	//get a collator for the current locale
+				collator.setStrength(Collator.PRIMARY);	//sort according to primary differences---ignore accents and case differences
+				collator.setDecomposition(Collator.FULL_DECOMPOSITION);	//fully decompose Unicode characters to get the best comparison
+				this.collator=collator;	//cache the collator for future requests
+			}
+			return collator;	//return the collator we found
 		}
 
 	/**The current principal (e.g. logged-in user), or <code>null</code> if there is no principal authenticated for this session.*/
