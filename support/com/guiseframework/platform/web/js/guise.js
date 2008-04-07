@@ -1902,15 +1902,15 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 
 			tinyMCE.init(
 				{
-			    mode: "none",
-			    theme: "advanced",
-			    skin: "guise",
-			    auto_resize: true,	//experimental
-			    theme_advanced_toolbar_align: "left",
-			    theme_advanced_toolbar_location: "top",
-			    theme_advanced_statusbar_location: "bottom",
-			    theme_advanced_disable: "image,cleanup,help,code,fontselect,fontsizeselect,styleselect,forecolor,backcolor,forecolorpicker,backcolorpicker,newdocument",
-			    entity_encoding: "raw"	//don't entity encoding except for necessary XML characters; XHTML by default doesn't understand HTML entities, and numeric encoding would encur an unnecessary slowdown
+			    "mode": "none",
+			    "theme": "advanced",
+			    "skin": "guise",
+			    "auto_resize": true,	//experimental
+			    "theme_advanced_toolbar_align": "left",
+			    "theme_advanced_toolbar_location": "top",
+			    "theme_advanced_statusbar_location": "bottom",
+			    "theme_advanced_disable": "image,cleanup,help,code,fontselect,fontsizeselect,styleselect,forecolor,backcolor,forecolorpicker,backcolorpicker,newdocument",
+			    "entity_encoding": "raw"	//don't entity encoding except for necessary XML characters; XHTML by default doesn't understand HTML entities, and numeric encoding would encur an unnecessary slowdown
 //TODO del			    plugins: "-guise" //specify the Guise plugin, telling TinyMCE not to try to load it
 				});
 			
