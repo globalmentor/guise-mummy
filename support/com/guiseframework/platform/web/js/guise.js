@@ -1,5 +1,5 @@
 /*Guise(TM) JavaScript support routines
-Copyright (c) 2005-2007 GlobalMentor, Inc.
+Copyright (c) 2005-2008 GlobalMentor, Inc.
 
 Dependencies:
 	javascript.js
@@ -437,8 +437,14 @@ com.guiseframework.js.Guise=function()
 	/**Whether we are currently processing AJAX responses.*/
 	this.processingAJAXResponses=false;
 
-	/**The Guise support Flash, or null if the support Flash has not yet been embedded.*/
+	/**The Guise support Flash, or null if the support Flash has not yet been embedded; the executeFlash() method should be used to lazily create the Flash object if needed.*/
 	this._flash=null;
+
+	/**Whether Guise support Flash has been initialized.*/
+	this._flashInitialized=false;
+
+	/**The Flash functions queued for execution before Flash is initialized.*/
+	this._flashFunctions=new Array();
 
 	/**The hidden IFrame target that receives the results of file uploads, or null if the upload IFrame hasn't yet been created.*/
 	this._uploadIFrame=null;
@@ -1070,26 +1076,26 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 			switch(command)	//see which command this is
 			{
 				case "audio-pause":
-					this._flash.pauseSound(objectID);	//pause the sound
+					this.executeFlash(function(flash){flash.pauseSound(objectID);});	//pause the sound
 					break;
 				case "audio-play":
-					this._flash.playSound(objectID, parameters["audioURI"]);	//play the sound
+					this.executeFlash(function(flash){flash.playSound(objectID, parameters["audioURI"]);});	//play the sound
 					break;
 				case "audio-position":
-					this._flash.setSoundPosition(objectID, parameters["position"]);	//set the sound position
+					this.executeFlash(function(flash){flash.setSoundPosition(objectID, parameters["position"]);});	//set the sound position
 					break;
 				case "audio-stop":
-					this._flash.stopSound(objectID);	//stop the sound
+					this.executeFlash(function(flash){flash.stopSound(objectID);});	//stop the sound
 					break;
 				case "file-browse":
-					this._flash.browseFiles(objectID, parameters["multiple"]);	//browse files, specifying whether multiple files should be selected
+					this.executeFlash(function(flash){flash.browseFiles(objectID, parameters["multiple"]);});	//browse files, specifying whether multiple files should be selected
 					break;
 				case "file-cancel":
-					this._flash.cancelFile(objectID, parameters["id"]);	//cancel the identified file
+					this.executeFlash(function(flash){flash.cancelFile(objectID, parameters["id"]);});	//cancel the identified file
 					this._onFileProgress(objectID, parameters["id"], this.TaskState.CANCELED, -1, -1);	//send a file progress canceled event, as Flash doesn't send a cancel event for us 
 					break;
 				case "file-upload":
-					this._flash.uploadFile(objectID, parameters["id"], parameters["destinationURI"]);	//upload the identified file to the specified destination URI
+					this.executeFlash(function(flash){flash.uploadFile(objectID, parameters["id"], parameters["destinationURI"]);});	//upload the identified file to the specified destination URI
 					break;
 				case "poll-interval":
 //console.log("received poll interval request:", parameters["interval"]);
@@ -1971,35 +1977,59 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 					//TODO fix; doesn't seem to work on IE6 or Firefox
 				this.setElementTempCursor(document.body, "wait");	//change the document body cursor to "wait" until the AJAX initialization is finished
 			}
-				//Guise Flash; we must embed Flash dynamically at runtime because of an EOLAS patent that forced Microsoft and Opera to disable automatic activation of Flash and other plugins
-			//see http://msdn2.microsoft.com/en-us/library/ms537508.aspx
-			//see http://blog.deconcept.com/2005/12/15/internet-explorer-eolas-changes-and-the-flash-plugin/
-			//see http://www.jeroenwijering.com/?item=embedding_flash
-			var guiseFlashDiv=document.createElementNS("http://www.w3.org/1999/xhtml", "div");	//create an outer div; we must use innerHTML, as the DOM methods don't result in a fully working Flash object
-			guiseFlashDiv.style.position="absolute";	//take the div out of normal flow
-			guiseFlashDiv.style.left="-9999px";	//completely remove the div from sight
-			guiseFlashDiv.style.top="-9999px";
-			document.body.appendChild(guiseFlashDiv);	//add the outer div to the body before adding the content, or the SWF won't register its exposed methods
-			var flashGuiseInnerHTMLStringBuilder=new StringBuilder();	//create a new string builder for creating the Flash object
-			var objectAttributes={"id":"guiseFlash", style:"width:1px;height:1px;"};	//create a map of attributes for serialization
-			if(isUserAgentIE)	//if this is IE
-			{
-				objectAttributes.classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000";
-				var httpMethod=window.location.protocol=="https:" ? "https" : "http";	//use HTTPS if this is a secure page
-				objectAttributes.codebase=httpMethod+"://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0";
-			}
-			else	//if this is any other browser
-			{
-				objectAttributes.type="application/x-shockwave-flash";
-				objectAttributes.data=GUISE_ASSETS_BASE_PATH+"flash/guise.swf?guiseVersion="+GUISE_VERSION;	//add the Guise version so an out-of-date cached version won't be used
-			}
-			DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "object", objectAttributes);	//<object ...>
-			DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param", {"name":"movie", "value":GUISE_ASSETS_BASE_PATH+"flash/guise.swf?guiseVersion="+GUISE_VERSION}, true);	//<param name="movie" value="...guise.swf"/>
-			DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param", {"name":"quality", "value":"high"}, true);	//<param name="movie" value="...guise.swf"/>
-			DOMUtilities.appendXMLEndTag(flashGuiseInnerHTMLStringBuilder, "object");	//</object>
-			guiseFlashDiv.innerHTML=flashGuiseInnerHTMLStringBuilder.toString();	//add the Flash content
-			this._flash=guiseFlashDiv.childNodes[0];	//the first child node is the flash component; save a reference to it for later
 			window.setTimeout(this._initialize.bind(this), 1);	//run the initialization function in a separate thread
+		};
+
+		/**Executes a function using the Guise support Flash object.
+		This method is necessary to lazily create the Guise support Flash object, after which the command must be executed some time later on some platforms.
+		We must embed Flash dynamically at runtime because of an EOLAS patent that forced Microsoft and Opera to disable automatic activation of Flash and other plugins.
+		In addition, it makes page loading faster only to load Flash when needed.
+		Example: this.executeFlash(function(flash){flash.pauseSound(objectID);});
+		@param flashFunction A function to execute, taking a single parameter of the Flash support object.
+		*/
+		proto.executeFlash=function(flashFunction)
+		{
+			if(this._flash==null)	//if the Flash support object has not yet been created, create it
+			{
+				//see http://msdn2.microsoft.com/en-us/library/ms537508.aspx
+				//see http://blog.deconcept.com/2005/12/15/internet-explorer-eolas-changes-and-the-flash-plugin/
+				//see http://www.jeroenwijering.com/?item=embedding_flash
+				var guiseFlashDiv=document.createElementNS("http://www.w3.org/1999/xhtml", "div");	//create an outer div; we must use innerHTML, as the DOM methods don't result in a fully working Flash object
+				guiseFlashDiv.style.position="absolute";	//take the div out of normal flow
+				guiseFlashDiv.style.left="-9999px";	//completely remove the div from sight
+				guiseFlashDiv.style.top="-9999px";
+				document.body.appendChild(guiseFlashDiv);	//add the outer div to the body before adding the content, or the SWF won't register its exposed methods
+				var flashGuiseInnerHTMLStringBuilder=new StringBuilder();	//create a new string builder for creating the Flash object
+				var objectAttributes={"id":"guiseFlash", style:"width:1px;height:1px;"};	//create a map of attributes for serialization
+				if(isUserAgentIE)	//if this is IE
+				{
+					objectAttributes.classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000";
+					var httpMethod=window.location.protocol=="https:" ? "https" : "http";	//use HTTPS if this is a secure page
+					objectAttributes.codebase=httpMethod+"://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0";
+				}
+				else	//if this is any other browser
+				{
+					objectAttributes.type="application/x-shockwave-flash";
+					objectAttributes.data=GUISE_ASSETS_BASE_PATH+"flash/guise.swf?guiseVersion="+GUISE_VERSION;	//add the Guise version so an out-of-date cached version won't be used
+				}
+				DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "object", objectAttributes);	//<object ...>
+				DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param", {"name":"movie", "value":GUISE_ASSETS_BASE_PATH+"flash/guise.swf?guiseVersion="+GUISE_VERSION}, true);	//<param name="movie" value="...guise.swf"/>
+				DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param", {"name":"quality", "value":"high"}, true);	//<param name="movie" value="...guise.swf"/>
+				DOMUtilities.appendXMLEndTag(flashGuiseInnerHTMLStringBuilder, "object");	//</object>
+				guiseFlashDiv.innerHTML=flashGuiseInnerHTMLStringBuilder.toString();	//add the Flash content
+				this._flash=guiseFlashDiv.childNodes[0];	//the first child node is the Flash component; save a reference to it for later
+//console.debug("enqueueing flash function");
+				this._flashFunctions.enqueue(flashFunction);	//enqueue the Flash function until after initialization
+				return;	//don't execute the Flash function now; it will be executed after initialization of Flash support
+			}
+			if(this._flashInitialized)	//if Flash is initialized
+			{
+				flashFunction(this._flash);	//process the Flash functionality immediately
+			}
+			else	//if Flash has not yet been initialized (even though it has been created)
+			{
+				this._flashFunctions.enqueue(flashFunction);	//enqueue the Flash function until after initialization
+			}
 		};
 
 		/**Uninstalls event handlers.
@@ -2959,6 +2989,26 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 				var ajaxRequest=new ChangeAJAXEvent(editor.componentID, new Map("value", editor.getContent()));	//create a new property change event with the Guise component ID and the new value
 				guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 			}
+		};
+
+		/**Called when the Flash component initializes.*/
+		proto._onFlashInitialize=function()
+		{
+//console.debug("flash initialized");
+			setTimeout(this._finishFlashInitialization.bind(this), 100);	//wait a little longer to make sure the Flash component has finished construction and then wrap up the initialization process 
+		};
+
+		/**Finishes Flash component initialization by setting the Flash initialization state and calling executing flash functions.*/
+		proto._finishFlashInitialization=function()
+		{
+//console.debug("finishing flash initialization");
+			while(this._flashFunctions.length>0)	//while there are more waiting Flash functions (execute waiting flash functions before setting the initialized flag, even though no more flash requests should come along while we're doing this)
+			{
+				var flashFunction=this._flashFunctions.dequeue();	//get the next Flash function to execute
+				flashFunction(this._flash);	//call the Flash function
+			}			
+			this._flashInitialized=true;	//indicate that Flash support is now initialized			
+//console.debug("flash support is now initialized");
 		};
 
 		/**Called when the state of a sound changes.

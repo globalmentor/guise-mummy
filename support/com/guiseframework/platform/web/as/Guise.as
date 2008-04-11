@@ -3,7 +3,7 @@ import flash.net.FileReference;
 import flash.net.FileReferenceList;
 
 /**Guise ActionScript for support functionality based in Flash.
-Copyright (c) 2007 GlobalMentor, Inc.
+Copyright (c) 2007-2008 GlobalMentor, Inc.
 @author Garret Wilson
 <p>Sounds are given the following additional variables:
 var id:String;	//the ID of the sound
@@ -63,6 +63,7 @@ class com.guiseframework.platform.web.as.Guise
 		ExternalInterface.addCallback("setSoundPosition", this, setSoundPosition); 
 		ExternalInterface.addCallback("stopSound", this, stopSound);
 		ExternalInterface.addCallback("uploadFile", this, uploadFile);
+		ExternalInterface.call(GUISE_JAVSCRIPT_VARIABLE_NAME+"._onFlashInitialize");	//indicate that Flash support is initialized
 	}
 
 	/**Sets the state of a sound.
