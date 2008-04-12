@@ -297,7 +297,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		}
 */
 		depictContext.write("\n");
-/*TODO del; we have to do this dynamically now because of the EOLAS patent loss by Mircosoft
+/*TODO del; we have to do this dynamically now because of the EOLAS patent loss by Microsoft
 		//Guise Flash
 		final String resolvedGuiseFlashPath=application.resolvePath(GUISE_FLASH_PATH);	//resolve the path to the Guise Flash file
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_OBJECT);	//<xhtml:object>

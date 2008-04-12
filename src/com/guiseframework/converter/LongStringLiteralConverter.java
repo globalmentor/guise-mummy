@@ -1,28 +1,57 @@
 package com.guiseframework.converter;
 
-import static java.text.MessageFormat.*;
+import java.util.Currency;
 
-/**A converter that converts a <code>Long</code> from and to a string literal.
+/**A converter that converts a {@link Long} from and to a string literal.
 @author Garret Wilson
 @see Long
 */
-public class LongStringLiteralConverter extends AbstractStringLiteralConverter<Long>
+public class LongStringLiteralConverter extends AbstractNumberStringLiteralConverter<Long>
 {
+
+	/**Default constructor with a default number style.*/
+	public LongStringLiteralConverter()
+	{
+		this(Style.NUMBER);	//construct the class with a default number style
+	}
+
+	/**Style constructor.
+	If the currency style is requested, the currency used will dynamically change whenever the locale changes.
+	@param style The representation style.
+	@exception NullPointerException if the given style is <code>null</code>.
+	*/
+	public LongStringLiteralConverter(final Style style)
+	{
+		this(style, null);	//construct the class using a dynamic default currency for the locale
+	}
+
+	/**Style, and currency constructor.
+	@param style The representation style.
+	@param currency The constant currency type to use, or <code>null</code> if currency representation is not requested or the currency should be dynamically determined by the locale.
+	@exception NullPointerException if the given style is <code>null</code>.
+	@exception IllegalArgumentException if a currency is provided for a style other than {@link Style#CURRENCY}.
+	*/
+	public LongStringLiteralConverter(final Style style, final Currency currency)
+	{
+		super(style, currency);	//construct the parent class
+	}
 
 	/**Converts a literal representation of a value from the lexical space into a value in the value space.
 	@param literal The literal value in the lexical space to convert.
 	@return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
 	@exception ConversionException if the literal value cannot be converted.
-	*/ 
+	*/
 	public Long convertLiteral(final String literal) throws ConversionException
 	{
-		try
+		final Number number=parseNumber(literal);	//parse a number from the literal value
+		if(number!=null)	//if there is a number
 		{
-			return literal!=null && literal.length()>0 ? new Long(Long.parseLong(literal)) : null;	//if there is a literal, convert it to a Long			
+			return number instanceof Long ? (Long)number : Long.valueOf(number.longValue());	//convert the number to a long object if necessary
 		}
-		catch(final NumberFormatException numberFormatException)	//if the string does not contain a valid Long
+		else	//if there is no number
 		{
-			throw new ConversionException(format(getSession().dereferenceString(getInvalidValueMessage()), literal), literal);
+			return null;	//there is no number to return
 		}
 	}
+	
 }

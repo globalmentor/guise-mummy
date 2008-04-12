@@ -2,7 +2,7 @@ package com.guiseframework.converter;
 
 import java.util.Currency;
 
-/**A converter that converts a <code>Double</code> from and to a string literal.
+/**A converter that converts a {@link Double} from and to a string literal.
 @author Garret Wilson
 @see Double
 */
@@ -46,7 +46,7 @@ public class DoubleStringLiteralConverter extends AbstractNumberStringLiteralCon
 		final Number number=parseNumber(literal);	//parse a number from the literal value
 		if(number!=null)	//if there is a number
 		{
-			return number instanceof Double ? (Double)number : new Double(number.doubleValue());	//convert the number to a double object if necessary
+			return number instanceof Double ? (Double)number : Double.valueOf(number.doubleValue());	//convert the number to a double object if necessary
 		}
 		else	//if there is no number
 		{

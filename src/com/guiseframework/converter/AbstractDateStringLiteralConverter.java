@@ -78,38 +78,6 @@ public abstract class AbstractDateStringLiteralConverter<V> extends AbstractConv
 		this.timeStyle=timeStyle;
 	}
 
-	/**Creates a new date format object for the indicated locale.
-	@param locale The locale for which a date format should be created.
-	@return A date format object appropriate for the given locale.
-	@see #getDateStyle()
-	@see #getTimeStyle()
-	*/
-/*TODO del when works
-	protected DateFormat createDateFormat(final Locale locale)
-	{
-		final Style dateStyle=getDateStyle();	//get the date style
-		final Style timeStyle=getTimeStyle();	//get the time style
-		final DateFormat dateFormat;	//we'll store here the date format
-		if(dateStyle!=null)	//if a date style is requested
-		{
-			if(timeStyle!=null)	//if both a date style and a time style is requested
-			{
-				dateFormat=DateFormat.getDateTimeInstance(DATE_FORMAT_STYLES[dateStyle.ordinal()], DATE_FORMAT_STYLES[timeStyle.ordinal()], locale);	//create a date/time instance
-			}
-			else	//if only a date style is requested
-			{
-				dateFormat=DateFormat.getDateInstance(DATE_FORMAT_STYLES[dateStyle.ordinal()], locale);	//create a date instance				
-			}
-		}
-		else	//if a date style is not requested, only a time style is requested
-		{
-			assert timeStyle!=null : "Neither date style or time style specified.";
-			dateFormat=DateFormat.getTimeInstance(DATE_FORMAT_STYLES[timeStyle.ordinal()], locale);	//create a time instance							
-		}
-		return dateFormat;	//return the date format we created
-	}
-*/
-
 	/**Creates a new date format object for the indicated styles and locale.
 	This implementation does not allow both date and time styles to be specified if one of the styles specifies other than short/medium/long/full format.
 	@param dateStyle The date representation style, or <code>null</code> if the date should not be represented.

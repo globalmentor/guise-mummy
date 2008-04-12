@@ -2,7 +2,7 @@ package com.guiseframework.converter;
 
 import java.util.Currency;
 
-/**A converter that converts a <code>Float</code> from and to a string literal.
+/**A converter that converts a {@link Float} from and to a string literal.
 @author Garret Wilson
 @see Float
 */
@@ -46,7 +46,7 @@ public class FloatStringLiteralConverter extends AbstractNumberStringLiteralConv
 		final Number number=parseNumber(literal);	//parse a number from the literal value
 		if(number!=null)	//if there is a number
 		{
-			return number instanceof Float ? (Float)number : new Float(number.floatValue());	//convert the number to a float object if necessary
+			return number instanceof Float ? (Float)number : Float.valueOf(number.floatValue());	//convert the number to a float object if necessary
 		}
 		else	//if there is no number
 		{

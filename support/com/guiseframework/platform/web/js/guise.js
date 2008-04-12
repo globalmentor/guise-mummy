@@ -1618,12 +1618,7 @@ if(elementName=="select")
 							{
 								if(oldChildNode.nodeName.toLowerCase()!=childNode.nodeName.toLowerCase())	//if these are elements with different node names
 								{
-//alert("child" +i+" found different node names; old: "+oldChildNode.nodeName+" and new: "+childNode.nodeName);
-//alert("old node structure of parent is: "+DOMUtilities.getNodeString(oldElement));
-//TODO del									if(Element.getAttributeNS(newChildNode, GUISE_ML_NAMESPACE_URI, "patchType")!="dummy")	//dummy-patched elements are considered compatible, even with different names TODO this is just to allow a TinyMCE <iframe>; maybe do more extensive checking to make sure this is the 
-									{
-										isChildrenCompatible=false;	//these child elements aren't compatible because they have different node name
-									}
+									isChildrenCompatible=false;	//these child elements aren't compatible because they have different node name
 								}
 								else	//if the names are the same but the IDs are different, assume that the entire child should be replaced rather than synchronized---the event listeners would probably be different anyway
 								{
@@ -1905,7 +1900,6 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 			com.garretwilson.js.EventManager.addEvent(window, "resize", this._onWindowResize.bind(this), false);	//add a resize listener
 		//TODO del	com.garretwilson.js.EventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
 			com.garretwilson.js.EventManager.addEvent(window, "unload", this.onUnload.bind(this), false);	//do the appropriate uninitialization when the window unloads
-
 			tinyMCE.init(
 				{
 			    "mode": "none",
@@ -1917,12 +1911,7 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 			    "theme_advanced_statusbar_location": "bottom",
 			    "theme_advanced_disable": "image,cleanup,help,code,fontselect,fontsizeselect,styleselect,forecolor,backcolor,forecolorpicker,backcolorpicker,newdocument",
 			    "entity_encoding": "raw"	//don't entity encoding except for necessary XML characters; XHTML by default doesn't understand HTML entities, and numeric encoding would encur an unnecessary slowdown
-//TODO del			    plugins: "-guise" //specify the Guise plugin, telling TinyMCE not to try to load it
 				});
-			
-			
-			
-			
 			this._initializeNode(document.documentElement, true, true);	//initialize the document tree, indicating that this is the first initialization
 			this._updateComponents(document.documentElement, true);	//update all components represented by elements within the document
 		//TODO del when works	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
@@ -2674,32 +2663,21 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 								var contentType=node.getAttribute("guise:contentType");	//get the content type TODO use a constant
 								if(contentType=="application/xhtml+xml-external-parsed-entity")	//if this is an XHTML fragment
 								{
-//TODO del; may not be needed now									tinyMCE.idCounter=0;	//several sites indicate that this is needed in order to have multiple editors on the same page
-//TODO testing									tinyMCE.execCommand('mceAddControl', false, node.id);
 									var component=Node.getAncestorElementByClassName(node, STYLES.COMPONENT);	//get the component element
 									if(component)	//if there is a component
 									{
 										var componentID=component.id;	//get the component ID
 										if(componentID)	//if there is a component ID
 										{
-											var editor=new tinymce.Editor(node.id, tinyMCE.settings);
+												//if ever dynamic loading is fixed, see using global scope for eval() at http://josephsmarr.com/2007/01/31/fixing-eval-to-use-global-scope-in-ie/
+												//see also http://ajaxian.com/archives/evaling-with-ies-windowexecscript#comments
+												//dynamic loading TinyMCE via eval() gets an error and sometimes crashes Firefox
+											var editor=new tinymce.Editor(node.id, tinyMCE.settings);	//create a new TinyMCE editor
 											editor.componentID=componentID;	//indicate the Guise component ID of the editor
 											editor.onChange.add(this._onTinyMCEChange.bind(this));
 											editor.render();
 										}
 									}
-									
-//									var tinyMCEFrame=tinyMCE.get(node.id);	//TODO see http://wiki.moxiecode.com/index.php/TinyMCE:Migration_guide
-//console.log(tinyMCEFrame);
-//TODO del									alert("IFrame ID: "+document.getElementById(node.id+"_ifr").id);
-/*TODO testing WYMEditor
-							    var wym=jQuery(node).wymeditor(
-							    		{
-								        skin: 'minimal'
-							    		});
-							    WYMeditor.INSTANCES[0].status("This is the status bar.");
-//TODO fix									window.setTimeout(function(){jQuery(node).wymeditor()}, 1);	//send the AJAX request later; in Firefox 2.0.0.3, sending the request from within the key event will cause the AJAX response to disappear
-*/
 								}
 								else	//if this is a normal text area TODO maybe require text/plain
 								{

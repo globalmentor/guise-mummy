@@ -34,6 +34,7 @@ public abstract class AbstractStringLiteralConverter<V> extends AbstractConverte
 		<li><code>java.lang.Boolean</code></li>
 		<li><code>java.util.Calendar</code></li>
 		<li><code>java.util.Date</code></li>
+		<li><code>java.util.Double</code></li>
 		<li>{@link EmailAddress}</li>
 		<li><code>java.lang.Float</code></li>
 		<li><code>java.lang.Integer</code></li>
@@ -53,47 +54,51 @@ public abstract class AbstractStringLiteralConverter<V> extends AbstractConverte
 	public static <VV> Converter<VV, String> getInstance(final Class<VV> valueClass)
 	{
 		checkInstance(valueClass, "Value class cannot be null.");
-		if(char[].class.equals(valueClass))	//char[]
+		if(char[].class.isAssignableFrom(valueClass))	//char[]
 		{
 			return (Converter<VV, String>)new CharArrayStringLiteralConverter();
 		}
-		else if(Boolean.class.equals(valueClass))	//Boolean
+		else if(Boolean.class.isAssignableFrom(valueClass))	//Boolean
 		{
 			return (Converter<VV, String>)new BooleanStringLiteralConverter();
 		}
-		else if(Calendar.class.equals(valueClass))	//Calendar
+		else if(Calendar.class.isAssignableFrom(valueClass))	//Calendar
 		{
-			return (Converter<VV, String>)new CalendarStringLiteralConverter(DateStringLiteralStyle.FULL, TimeStringLiteralStyle.FULL);
+			return (Converter<VV, String>)new CalendarStringLiteralConverter(DateStringLiteralStyle.SHORT, TimeStringLiteralStyle.FULL);
 		}
-		else if(Date.class.equals(valueClass))	//Date
+		else if(Date.class.isAssignableFrom(valueClass))	//Date
 		{
-			return (Converter<VV, String>)new DateStringLiteralConverter(DateStringLiteralStyle.FULL, TimeStringLiteralStyle.FULL);
+			return (Converter<VV, String>)new DateStringLiteralConverter(DateStringLiteralStyle.SHORT, TimeStringLiteralStyle.FULL);
 		}
-		else if(EmailAddress.class.equals(valueClass))	//EmailAddress
+		else if(Double.class.isAssignableFrom(valueClass))	//Double
+		{
+			return (Converter<VV, String>)new DoubleStringLiteralConverter();
+		}
+		else if(EmailAddress.class.isAssignableFrom(valueClass))	//EmailAddress
 		{
 			return (Converter<VV, String>)new EmailAddressStringLiteralConverter();
 		}
-		else if(Float.class.equals(valueClass))	//Float
+		else if(Float.class.isAssignableFrom(valueClass))	//Float
 		{
 			return (Converter<VV, String>)new FloatStringLiteralConverter();
 		}
-		else if(Integer.class.equals(valueClass))	//Integer
+		else if(Integer.class.isAssignableFrom(valueClass))	//Integer
 		{
 			return (Converter<VV, String>)new IntegerStringLiteralConverter();
 		}
-		else if(Locale.class.equals(valueClass))	//Locale
+		else if(Locale.class.isAssignableFrom(valueClass))	//Locale
 		{
 			return (Converter<VV, String>)new LocaleStringLiteralConverter(LocaleStringLiteralStyle.NAME);
 		}
-		else if(Long.class.equals(valueClass))	//Long
+		else if(Long.class.isAssignableFrom(valueClass))	//Long
 		{
 			return (Converter<VV, String>)new LongStringLiteralConverter();
 		}
-		else if(String.class.equals(valueClass))	//String
+		else if(String.class.isAssignableFrom(valueClass))	//String
 		{
 			return (Converter<VV, String>)new StringStringLiteralConverter();
 		}
-		else if(TelephoneNumber.class.equals(valueClass))	//TelephoneNumber
+		else if(TelephoneNumber.class.isAssignableFrom(valueClass))	//TelephoneNumber
 		{
 			return (Converter<VV, String>)new TelephoneNumberStringLiteralConverter();
 		}

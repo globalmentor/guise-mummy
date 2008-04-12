@@ -2,14 +2,23 @@ package com.guiseframework.component.urf;
 
 import java.net.URI;
 
+import static com.globalmentor.java.Objects.*;
+import com.globalmentor.net.Resource;
 import com.globalmentor.urf.*;
+
 import com.guiseframework.model.*;
 
 /**A table model based upon a list of URF resource.
 This table recognizes {@link URFResourceURITableColumnModel} columns.
 As for other columns, this table only recognizes {@link URFPropertyTableColumnModel} columns and will throw an exception if such a column is not found,
-so subclasses using non-URF property columns should override {@link #getCellValue(URFResource, int, TableColumnModel)}.
-and {@link #setCellValue(URFResource, int, TableColumnModel, Object)} to handle those custom columns before delegating to this class.
+so subclasses using non-URF property columns should override {@link #getCellValue(URFResource, int, TableColumnModel)}
+and use {@link #setCellValue(URFResource, int, TableColumnModel, Object)} to handle those custom columns before delegating to this class.
+For {@link URFPropertyTableColumnModel} columns, if the {@link TableColumnModel#getValueClass()} is {@link URFResource}, then the value
+will be used as-is. Otherwise, it will be attempted to be converted to the correct type using {@link URF#asObject(Resource)}.
+If the returned object is not of the correct type, the value will be ignored rather than a {@link ClassCastException} thrown,
+as a common use case is to display loosely-coupled URF resources that could have various value types.
+Values to be set, on the other hand, must be of the appropriate value or a {@link ClassCastException} will be thrown.
+Setting non-resource values is not yet supported.
 @author Garret Wilson
 */
 public class URFResourceTableModel extends AbstractListSelectTableModel<URFResource>
@@ -34,16 +43,27 @@ public class URFResourceTableModel extends AbstractListSelectTableModel<URFResou
 	*/
 	protected <C> C getCellValue(final URFResource resource, final int rowIndex, final TableColumnModel<C> column)
 	{
+		final Class<C> valueClass=column.getValueClass();	//get the type of value for the coloumn
+		final C value;	//we'll determine the value to use
 		if(column instanceof URFResourceURITableColumnModel)	//if this is the reference URI column
 		{
-			return column.getValueClass().cast(resource.getURI());	//return the reference URI
+			value=valueClass.cast(resource.getURI());	//use the reference URI
 		}
 		else	//if this is some other column type
 		{
 			final URFPropertyTableColumnModel<?> propertyColumn=(URFPropertyTableColumnModel<?>)column;	//cast the column
 			final URI propertyURI=propertyColumn.getPropertyURI();	//get the URI of the property
-			return column.getValueClass().cast(resource.getPropertyValue(propertyURI));	//get this property value and cast and return the value
+			final URFResource propertyValue=resource.getPropertyValue(propertyURI);	//get the property value
+			if(URFResource.class.isAssignableFrom(valueClass))	//if this is just an URF resource property column
+			{
+				value=column.getValueClass().cast(propertyValue);	//use the value as-is
+			}
+			else	//if the column expects another type
+			{
+				value=asInstance(URF.asObject(propertyValue), valueClass);	//try to convert the property value to the correct type
+			}
 		}
+		return value;	//return the value we determined
 	}
 
 	/**Sets the value's property for the given column.
@@ -58,6 +78,8 @@ public class URFResourceTableModel extends AbstractListSelectTableModel<URFResou
 	*/
 	protected <C> void setCellValue(final URFResource resource, final int rowIndex, final TableColumnModel<C> column, final C newCellValue)
 	{
+		final Class<C> valueClass=column.getValueClass();	//get the type of value for the coloumn
+		final URFResource propertyValue;	//we'll determine the property value to use
 		if(column instanceof URFResourceURITableColumnModel)	//if this is the reference URI column
 		{
 			throw new UnsupportedOperationException("Changing resource reference URI is not yet permitted.");
@@ -66,7 +88,15 @@ public class URFResourceTableModel extends AbstractListSelectTableModel<URFResou
 		{
 			final URFPropertyTableColumnModel<?> propertyColumn=(URFPropertyTableColumnModel<?>)column;	//cast the column
 			final URI propertyURI=propertyColumn.getPropertyURI();	//get the URI of the property
-			resource.setPropertyValue(propertyURI, (URFResource)newCellValue);
+			if(URFResource.class.isAssignableFrom(valueClass))	//if this is just an URF resource property column
+			{
+				propertyValue=(URFResource)newCellValue;	//cast the value
+			}
+			else	//if this is a non-resource property column
+			{
+				throw new UnsupportedOperationException("Changing resource reference URI is not yet permitted.");
+			}			
+			resource.setPropertyValue(propertyURI, propertyValue);
 		}
 	}
 
