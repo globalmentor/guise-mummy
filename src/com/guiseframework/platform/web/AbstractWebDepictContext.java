@@ -207,7 +207,7 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 	{
 		stringBuilder.append(CSS_PROP_OPACITY).append(PROPERTY_DIVIDER_CHAR).append(Double.toString(opacity)).append(DECLARATION_SEPARATOR_CHAR);	//add the opacity
 		final WebUserAgentProduct userAgent=getPlatform().getClientProduct();	//get the user agent
-		if(userAgent.getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER && userAgent.getVersionNumber()<7)	//if this is IE6 (which doesn't support opacity), we'll have to use a filter
+		if(userAgent.getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER && userAgent.getVersionNumber()<=7)	//if this is IE6 or IE7 (neither of which support opacity properly), we'll have to use a filter
 		{
 			stringBuilder.append(CSS_PROP_FILTER).append(PROPERTY_DIVIDER_CHAR).append("alpha(opacity=").append(Math.round(opacity*100)).append(')').append(DECLARATION_SEPARATOR_CHAR);	//add a filter for IE that gives the same opacity
 		}

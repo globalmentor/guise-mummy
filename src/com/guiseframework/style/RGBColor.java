@@ -447,7 +447,7 @@ public class RGBColor extends AbstractModeledColor<RGBColor.Component>
 	public final static RGBColor VIOLET_RED=new RGBColor(0xD02090);
 	public final static RGBColor WHEAT=new RGBColor(0xF5DEB3);
 	public final static RGBColor WHITE=new RGBColor(0xFFFFFF);
-	public final static RGBColor WHITES_MOKE=new RGBColor(0xF5F5F5);
+	public final static RGBColor WHITE_SMOKE=new RGBColor(0xF5F5F5);
 	public final static RGBColor YELLOW=new RGBColor(0xFFFF00);
 	public final static RGBColor YELLOW_GREEN=new RGBColor(0x9ACD32);
 
@@ -598,7 +598,7 @@ public class RGBColor extends AbstractModeledColor<RGBColor.Component>
 		namedColorMap.put(underscorePattern.matcher("VIOLET_RED").replaceAll("").toLowerCase(), VIOLET_RED);
 		namedColorMap.put(underscorePattern.matcher("WHEAT").replaceAll("").toLowerCase(), WHEAT);
 		namedColorMap.put(underscorePattern.matcher("WHITE").replaceAll("").toLowerCase(), WHITE);
-		namedColorMap.put(underscorePattern.matcher("WHITES_MOKE").replaceAll("").toLowerCase(), WHITES_MOKE);
+		namedColorMap.put(underscorePattern.matcher("WHITE_SMOKE").replaceAll("").toLowerCase(), WHITE_SMOKE);
 		namedColorMap.put(underscorePattern.matcher("YELLOW").replaceAll("").toLowerCase(), YELLOW);
 		namedColorMap.put(underscorePattern.matcher("YELLOW_GREEN").replaceAll("").toLowerCase(), YELLOW_GREEN);
 	}

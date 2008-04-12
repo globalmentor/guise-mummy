@@ -15,6 +15,7 @@ import com.guiseframework.component.effect.Effect;
 import com.guiseframework.event.*;
 import com.guiseframework.model.Notification;
 import com.guiseframework.prototype.*;
+import com.guiseframework.style.Color;
 
 /**Abstract implementation of a frame.
 This implementation notifies the user when the frame does not validate in {@link #validate()}.
@@ -162,6 +163,27 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 				final Component oldRelatedComponent=relatedComponent;	//get the old value
 				relatedComponent=newRelatedComponent;	//actually change the value
 				firePropertyChange(RELATED_COMPONENT_PROPERTY, oldRelatedComponent, newRelatedComponent);	//indicate that the value changed
+			}			
+		}
+
+	/**The background color of the title, or <code>null</code> if no background color is specified for the title.*/
+	private Color titleBackgroundColor=null;
+
+		/**@return The background color of the title, or <code>null</code> if no background color is specified for the title.*/
+		public Color getTitleBackgroundColor() {return titleBackgroundColor;}
+
+		/**Sets the background color of the title.
+		This is a bound property.
+		@param newTitleBackgroundColor The background color of the title, or <code>null</code> if the default background color should be used.
+		@see #TITLE_BACKGROUND_COLOR_PROPERTY 
+		*/
+		public void setTitleBackgroundColor(final Color newTitleBackgroundColor)
+		{
+			if(!Objects.equals(titleBackgroundColor, newTitleBackgroundColor))	//if the value is really changing
+			{
+				final Color oldTitleBackgroundColor=titleBackgroundColor;	//get the old value
+				titleBackgroundColor=newTitleBackgroundColor;	//actually change the value
+				firePropertyChange(TITLE_BACKGROUND_COLOR_PROPERTY, oldTitleBackgroundColor, newTitleBackgroundColor);	//indicate that the value changed
 			}			
 		}
 

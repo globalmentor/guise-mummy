@@ -9,6 +9,7 @@ import java.util.regex.*;
 
 import javax.mail.internet.ContentType;
 
+import com.globalmentor.java.Characters;
 import com.globalmentor.text.xml.XML;
 import com.globalmentor.util.Debug;
 import com.globalmentor.util.NameValuePair;
@@ -602,6 +603,21 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 		}
 	}
 
+	/**Writes an XHTML element to clear all floats.
+	@exception IOException if there is an error rendering the component.
+	*/
+	protected void writeFloatClear() throws IOException
+	{
+		final WebDepictContext depictContext=getDepictContext();	//get the depict context
+		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//<xhtml:div>
+		final Map<String, Object> styles=new HashMap<String, Object>();	//create a new map of styles
+		styles.put(CSS_PROP_CLEAR, CSS_CLEAR_BOTH);	//clear all floats
+		styles.put(CSS_PROP_MARGIN, Extent.ZERO_EXTENT1);
+		styles.put(CSS_PROP_PADDING, Extent.ZERO_EXTENT1);
+		writeStyleAttribute(styles);	//write the styles
+		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//</xhtml:div>
+	}
+
 	/**Writes an XHTML class attribute with the given style IDs.
 	@param styleIDs The style IDs to write.
 	@exception IOException if there is an error writing the attribute.
@@ -923,6 +939,11 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 		if(fontWeight!=FONT_WEIGHT_NORMAL)	//if this label has a non-normal font weight (the stylesheet defaults to normal)
 		{
 			labelStyles.put(CSS_PROP_FONT_WEIGHT, Double.valueOf(fontWeight));	//indicate the font weight
+		}
+		final Color labelTextColor=uiModel.getLabelTextColor();	//get the label text color to use
+		if(labelTextColor!=null)	//if there is a label text color
+		{
+			labelStyles.put(CSS_PROP_COLOR, labelTextColor);	//indicate the label text color
 		}
 		return labelStyles;	//return the styles
 	}

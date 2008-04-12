@@ -40,6 +40,9 @@
 			"theme.color.submenu"="\“theme.color.background\”",
 			"theme.color.toolbar"="\“theme.color.menu\”",
 			"theme.color.link"="royalblue",
+			"theme.color.frame.title.background"="\“theme.color.main\”",
+			"theme.color.frame.title.text"="\“theme.color.subordinate\”",
+			"theme.color.frame.border"="\“theme.color.frame.title.background\”",
 	
 			"theme.color.border"="\“theme.color.neutralA\”",
 	
@@ -54,7 +57,10 @@
 			;,
 			theme.apply=*theme.Template:
 				color=*style.ResourceColor("theme.color.text"),
-				backgroundColor=*style.ResourceColor("theme.color.background")
+				backgroundColor=*style.ResourceColor("theme.color.background"),
+				borderColor=*style.ResourceColor("theme.color.frame.border"),
+				labelTextColor=*style.ResourceColor("theme.color.frame.title.text"),
+				titleBackgroundColor=*style.ResourceColor("theme.color.frame.title.background")
 			;
 		;,
 		†Menu‡

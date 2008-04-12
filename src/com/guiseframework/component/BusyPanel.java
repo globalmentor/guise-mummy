@@ -8,11 +8,11 @@ import com.guiseframework.component.layout.*;
 /**The default panel used to indicate Guise busy status.
 @author Garret Wilson
 */
-public class DefaultBusyPanel extends LayoutPanel
+public class BusyPanel extends LayoutPanel
 {
 
 	/**Default constructor.*/
-	public DefaultBusyPanel()
+	public BusyPanel()
 	{
 		super(new RegionLayout());	//construct the parent class with a region layout
 		final Label label=new Label();	//create a new label

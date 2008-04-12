@@ -7,7 +7,9 @@ import static com.globalmentor.java.Classes.*;
 
 import com.globalmentor.beans.GenericPropertyChangeListener;
 import com.guiseframework.component.effect.Effect;
+import com.guiseframework.model.ui.PresentationModel;
 import com.guiseframework.prototype.*;
+import com.guiseframework.style.Color;
 
 /**A root-level component such as a window or an HTML page.
 The frame's contents are specified using {@link #setContent(Component)}.
@@ -34,6 +36,8 @@ public interface Frame extends ContentComponent, ModalComponent<Frame.Mode>, Inp
 	public final static String RESIZABLE_PROPERTY=getPropertyName(Frame.class, "resizable");
 	/**The bound state property.*/
 	public final static String STATE_PROPERTY=getPropertyName(Frame.class, "state");
+	/**The bound property of the title background color.*/
+	public final static String TITLE_BACKGROUND_COLOR_PROPERTY=getPropertyName(Frame.class, "titleBackgroundColor");
 	/**The bound property of whether the title bar is visible.*/
 	public final static String TITLE_VISIBLE_PROPERTY=getPropertyName(Frame.class, "titleVisible");
 	/**The bound property of the frame toolbar.*/
@@ -106,6 +110,16 @@ public interface Frame extends ContentComponent, ModalComponent<Frame.Mode>, Inp
 	@see Frame#RELATED_COMPONENT_PROPERTY 
 	*/
 	public void setRelatedComponent(final Component newRelatedComponent);
+
+	/**@return The background color of the title, or <code>null</code> if no background color is specified for the title.*/
+	public Color getTitleBackgroundColor();
+
+	/**Sets the background color of the title.
+	This is a bound property.
+	@param newTitleBackgroundColor The background color of the title, or <code>null</code> if the default background color should be used.
+	@see #TITLE_BACKGROUND_COLOR_PROPERTY 
+	*/
+	public void setTitleBackgroundColor(final Color newTitleBackgroundColor);
 
 	/**@return Whether the title bar is visible.*/
 	public boolean isTitleVisible();

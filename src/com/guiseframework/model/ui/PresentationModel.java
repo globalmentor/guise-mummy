@@ -75,6 +75,8 @@ public interface PresentationModel extends Model, Displayable
 	public final static String LABEL_FONT_STYLE_PROPERTY=getPropertyName(PresentationModel.class, "labelFontStyle");
 	/**The bound property of the label font weight.*/
 	public final static String LABEL_FONT_WEIGHT_PROPERTY=getPropertyName(PresentationModel.class, "labelFontWeight");
+	/**The bound property of the label text color.*/
+	public final static String LABEL_TEXT_COLOR_PROPERTY=getPropertyName(PresentationModel.class, "labelTextColor");
 	/**The bound property of the line near margin extent.*/
 	public final static String MARGIN_LINE_NEAR_EXTENT_PROPERTY=getPropertyName(PresentationModel.class, "marginLineNearExtent");
 	/**The bound property of the line far margin extent.*/
@@ -602,6 +604,16 @@ public interface PresentationModel extends Model, Displayable
 	@see #FONT_WEIGHT_BOLD
 	*/
 	public void setLabelFontWeight(final double newLabelFontWeight);
+
+	/**@return The text color of the label, or <code>null</code> if no text color is specified for the label.*/
+	public Color getLabelTextColor();
+
+	/**Sets the text color of the label.
+	This is a bound property.
+	@param newLabelTextColor The text color of the label, or <code>null</code> if the default text color should be used.
+	@see #LABEL_TEXT_COLOR_PROPERTY 
+	*/
+	public void setLabelTextColor(final Color newLabelTextColor);
 
 	/**Returns the margin extent of the indicated border.
 	@param border The border for which a margin extent should be returned.

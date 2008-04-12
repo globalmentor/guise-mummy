@@ -775,6 +775,27 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 			}
 		}
 
+	/**The text color of the label, or <code>null</code> if no text color is specified for the label.*/
+	private Color labelTextColor=null;
+
+		/**@return The text color of the label, or <code>null</code> if no text color is specified for the label.*/
+		public Color getLabelTextColor() {return labelTextColor;}
+
+		/**Sets the text color of the label.
+		This is a bound property.
+		@param newLabelTextColor The text color of the label, or <code>null</code> if the default text color should be used.
+		@see #LABEL_TEXT_COLOR_PROPERTY 
+		*/
+		public void setLabelTextColor(final Color newLabelTextColor)
+		{
+			if(!Objects.equals(labelTextColor, newLabelTextColor))	//if the value is really changing
+			{
+				final Color oldLabelTextColor=labelTextColor;	//get the old value
+				labelTextColor=newLabelTextColor;	//actually change the value
+				firePropertyChange(LABEL_TEXT_COLOR_PROPERTY, oldLabelTextColor, newLabelTextColor);	//indicate that the value changed
+			}			
+		}
+
 	/**The array of margin extents.*/
 	private Extent[] marginExtents=fill(new Extent[Border.values().length], Extent.ZERO_EXTENT1);
 

@@ -22,6 +22,8 @@
 			"theme.color.menu"="whitesmoke",
 			"theme.color.border"="gainsboro",
 			†<resource:theme.color.border>&#x0098;theme.color.subordinateA&#x009C;</resource:theme.color.border>‡
+			"theme.color.frame.title.background"="blue",
+			"theme.color.frame.title.text"="\“theme.color.subordinate\”",
 			"theme.color.link"="cornflowerblue"
 		〕
 	;
@@ -35,6 +37,33 @@
 				cursor=<resource:theme.cursor.action>
 			;
 		;,
+		†BusyPanel‡
+		*theme.Rule:
+			select.selector=*select.ObjectClassSelector:
+				select.selectClass=component.BusyPanel
+			;,
+			theme.apply=*theme.Template:
+				lineExtent=*geometry.Extent(#20#, «*geometry.Unit("EM")»),
+				pageExtent=*geometry.Extent(#15#, «*geometry.Unit("EM")»)
+			;
+		;,
+		*theme.Rule:	†busy panel label‡
+			select.selector=*select.IntersectionSelector:
+				select.selector=*select.ObjectClassSelector:
+					select.selectClass=component.Label
+				;,
+				select.selector=*select.ObjectPropertySelector:
+					select.selectPropertyName="parent",
+					select.selector=*select.ObjectClassSelector:
+						select.selectClass=component.BusyPanel
+					;
+				;
+			;,
+			theme.apply=*theme.Template:
+				labelFontSize=*geometry.Extent(#1.2#, «*geometry.Unit("RELATIVE")»),
+				labelFontWeight=#0.75#
+			;
+		;,
 		†CheckControl‡
 		*theme.Rule:
 			select.selector=*select.ObjectClassSelector:
@@ -44,6 +73,17 @@
 				cursor=<resource:theme.cursor.pointer>
 			;
 		;,
+		†DialogFrame‡
+		*theme.Rule:
+			select.selector=*select.ObjectClassSelector:
+				select.selectClass=component.DialogFrame
+			;,
+			theme.apply=*theme.Template:
+				backgroundColor=*style.ResourceColor("theme.color.subordinateA"),
+				borderStyle=«*style.LineStyle("SOLID")»,
+				borderExtent=*geometry.Extent(#1#, «*geometry.Unit("PIXEL")»)
+			;
+		;,
 		†Frame‡
 		*theme.Rule:
 			select.selector=*select.ObjectClassSelector:
@@ -51,7 +91,10 @@
 			;,
 			theme.apply=*theme.Template:
 				fontFamilies=["Arial", "sans-serif"],
-				fontSize=*geometry.Extent(#10#, «*geometry.Unit("POINT")»)
+				fontSize=*geometry.Extent(#10#, «*geometry.Unit("POINT")»),
+				labelFontFamilies=["Arial", "sans-serif"],
+				labelFontSize=*geometry.Extent(#8#, «*geometry.Unit("POINT")»),
+				labelFontWeight=#0.75#
 			;
 		;,
 		†Heading‡

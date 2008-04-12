@@ -4,16 +4,18 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-
 import com.globalmentor.util.Debug;
 import com.globalmentor.util.NameValuePair;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.geometry.CompassPoint;
+import com.guiseframework.geometry.Extent;
+import com.guiseframework.style.Color;
 
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Classes.*;
+import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
@@ -143,6 +145,14 @@ public class WebFrameDepictor<C extends Frame> extends AbstractWebFrameDepictor<
 			depictContext.writeAttribute(null, ATTRIBUTE_ID, decorateID(componentIDString, null, FRAME_TITLE_CLASS_SUFFIX));	//write the absolute unique ID with the correct suffix
 			writeClassAttribute(titleStyleIDs);	//write the title style IDs
 			writeDirectionAttribute();	//write the component direction, if this component specifies a direction
+			final Map<String, Object> titleStyles=new HashMap<String, Object>();	//create a new map of styles
+			titleStyles.put(CSS_PROP_POSITION, CSS_POSITION_RELATIVE);	//make the title position relative so that it can be a containing block for the title components
+			final Color titleBackgroundColor=component.getTitleBackgroundColor();	//get the title background color to use
+			if(titleBackgroundColor!=null)	//if there is a title background color
+			{
+				titleStyles.put(CSS_PROP_BACKGROUND_COLOR, titleBackgroundColor);	//indicate the title background color
+			}
+			writeStyleAttribute(titleStyles);	//write the title styles
 			if(hasLabelContent())	//if there is label content TODO how can we check for a blank string here, so that the title won't disappear in those cases?
 			{
 				writeLabel(decorateID(componentIDString, null, COMPONENT_BODY_CLASS_SUFFIX));	//write the label for the body, if there is a label
@@ -157,24 +167,18 @@ public class WebFrameDepictor<C extends Frame> extends AbstractWebFrameDepictor<
 			depictContext.writeAttribute(null, ATTRIBUTE_ID, decorateID(componentIDString, null, FRAME_TITLE_CONTROLS_CLASS_SUFFIX));	//write the absolute unique ID with the correct suffix TODO use a constant
 			writeClassAttribute(titleControlsStyleIDs);	//write the title style IDs
 			writeDirectionAttribute();	//write the component direction, if this component specifies a direction
-			
-			final ActionControl closeActionControl=component.getCloseActionControl();	//TODO testing
-			if(closeActionControl!=null)
+			final Map<String, Object> titleControlStyles=new HashMap<String, Object>();	//create a new map of styles
+			titleControlStyles.put(CSS_PROP_DISPLAY, CSS_DISPLAY_INLINE);	//make the title control wrapper inline so that a new block won't be created
+			titleControlStyles.put(CSS_PROP_POSITION, CSS_POSITION_ABSOLUTE);	//make the title position absolute relative to the title
+			titleControlStyles.put(CSS_PROP_RIGHT, Extent.ZERO_EXTENT1);	//align the right side of the controls with the right side of the title
+			writeStyleAttribute(titleControlStyles);	//write the title control styles
+			final ActionControl closeActionControl=component.getCloseActionControl();	//get the control for closing the frame
+			if(closeActionControl!=null)	//if there is a control for closing the frame
 			{
-				closeActionControl.depict();
+				closeActionControl.depict();	//depict the close control
 			}
-/*TODO fix
-				//close
-			final Set<String> closeStyleIDs=getBaseStyleIDs(component, null, FRAME_CLOSE_CLASS_SUFFIX);	//get the base style IDs with the correct suffix
-			closeStyleIDs.add(ACTION_CLASS);	//allow the close image to be an action
-			context.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IMG, true);	//<xhtml:img> (component-close)
-			context.writeAttribute(null, ATTRIBUTE_ID, decorateID(component.getID(), null, FRAME_CLOSE_CLASS_SUFFIX));	//write the absolute unique ID with the correct suffix
-			writeClassAttribute(context, closeStyleIDs);	//write the title style IDs
-			context.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, context.getSession().getApplication().resolvePath(FRAME_CLOSE_IMAGE_PATH));	//src="frame-close.gif"
-			context.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IMG);	//</xhtml:img> (component-close)
-*/
-	
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//</xhtml:div> (component-titleControls)
+			writeFloatClear();	//clear all floats in the title
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//</xhtml:div> (component-title)
 		}
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//<xhtml:div> (component-body)

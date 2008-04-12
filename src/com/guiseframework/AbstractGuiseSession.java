@@ -1520,7 +1520,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	*/
 	public Component createBusyComponent()
 	{
-		return new DefaultBusyPanel();	//create the default busy panel
+		return new BusyPanel();	//create the default busy panel
 	}
 
 	/**Processes input such as a keystroke, a mouse click, or a command.

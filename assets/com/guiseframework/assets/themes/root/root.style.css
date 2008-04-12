@@ -1,4 +1,4 @@
-/*Root Guise Stylesheet Copyright � 2005-2007 GlobalMentor, Inc.
+/*Root Guise Stylesheet Copyright © 2005-2008 GlobalMentor, Inc.
 @author Garret Wilson
 
 Styles:
@@ -114,9 +114,10 @@ label
 }
 
 
-/*IE6 fixes*/
+/*IE fixes*/
 
-label
+/*add layout to labels and links for both IE6 and IE7 to allow opacity to work, for example*/
+label.component, a.component
 {
 	zoom: 1;
 }
@@ -131,15 +132,6 @@ a:focus
 a img
 {
 	border-style: none;	
-}
-
-/*link*/
-
-a.linkControl.disabled
-{
-	opacity: .50;
-	filter: alpha(opacity=50);	/*allow opacity to work in IE6*/
-	zoom: 1;	/*required for this filter to work in IE6*/
 }
 
 /*modal layer*/
@@ -159,136 +151,6 @@ a.linkControl.disabled
 }
 
 /*components*/
-
-/*buttons*/
-.button
-{
-	display: block;
-	text-decoration: none;
-/*TODO fix
-	border-top: 1px solid #cecece;
-	border-bottom: 3px solid #4a4a4a;
-	border-left: 1px solid #cecece;
-	border-right: 3px solid #4a4a4a;
-*/
-}
-
-.button .button-decorator
-{
-	background-color: #CCCCCC;
-	padding: 0 0.4em;
-}
-
-.button:link
-{
-	color: black;
-}
-
-.button:visited
-{
-	color: black;
-}
-
-/*TODO fix
-a.button:link
-{
-	color: black;
-}
-
-a.button:visited
-{
-	color: black;
-}
-
-a.button:hover
-{
-	color: blue;
-}
-
-a.button:active
-{
-	color: blue;
-	border-bottom: 1px solid #cecece;
-	border-top: 3px solid #4a4a4a;
-	border-right: 1px solid #cecece;
-	border-left: 3px solid #4a4a4a;
-}
-*/
-
-.button-corner
-{
-	background-color: #CCCCCC;
-}
-
-/*TODO del when works
-
-.button span.cornerTop, .button span.cornerBottom{display:block;background: transparent}
-.button span.cornerTop span, .button span.cornerBottom span{display:block;height: 1px; overflow: hidden; background: #F5F5F5; font-size: 1px}
-.button span.corner1{margin: 0 5px}
-.button span.corner2{margin: 0 3px}
-.button span.corner3{margin: 0 2px}
-.button span.cornerTop span.corner4, .button span.cornerButton span.corner4{margin: 0 1px;height: 2px}
-*/
-
-/*frames*/
-
-.frame
-{
-	display: block;
-	background-color: #F5F5F5;
-	border-width: thin;
-	border-style: solid;
-	padding: 0em;
-	position: absolute;
-/*TODO fix; this prevents tethers; maybe transfer to body	overflow: hidden;*/
-}
-
-.frame-title
-{
-	color: white;
-	background-color: blue;
-	font-family: sans-serif;
-	font-size: smaller;
-	font-weight: bold;
-	position: relative;
-/*TODO del; this makes IE 6/7 corrupt the width: height: 1.5em;*/
-}
-
-.frame-title .frame-label
-{
-	cursor: inherit;	/*inherit the cursor on the title label for Mozilla, which does not do this automatically*/
-}
-
-.frame-titleControls
-{
-	display: inline;
-	position: absolute;
-	right: 0;
-}
-
-.frame-titleControls img
-{
-	display: inline;
-}
-
-/*TODO del; not currently used
-.frame-titleControls button
-{
-	display: inline;
-	padding: 0;
-	margin: 0;
-}
-*/
-
-.frame-body
-{
-	padding: 0.25em;
-	overflow: auto;
-/*TODO del; this makes IE 6/7 corrupt the size of the entire frame:
-	width: 100%;
-	height: 100%;
-*/
-}
 
 /**flyover frames*/
 
@@ -350,48 +212,18 @@ a.button:active
 
 /*busy component*/
 
-.defaultBusyPanel
-{
-	width: 20em;
-	height: 15em;
-	background-color: white;
-}
-
-.defaultBusyPanel .layout-region
+/*TODO replace with theme*/
+.busyPanel .layout-region
 {
 	width: 100%;
 	height: 100%;
 }
 
-.defaultBusyPanel label
-{
-	font-size: larger;
-	font-weight: bold;
-	width: 100%;
-}
-
-.defaultBusyPanel .layout-region-center
+/*TODO replace with theme*/
+.busyPanel .layout-region-center
 {
 	text-align: center;
 	vertical-align: middle;
-}
-
-/*panels*/
-
-.panel-body
-{
-	display: block;
-	margin: 0em;
-	border: 0em;
-	padding: 0em;
-}
-
-.groupPanel-body
-{
-	display: block;
-	border-width: thin;
-	border-style: solid;
-	padding: 0.25em;
 }
 
 /*tab controls, tabbed panels, and card controls*/
@@ -744,20 +576,6 @@ li.treeNode-leaf
 }
 
 /*general labels*/
-.label,
-.groupPanel-label,
-.listControl-label,
-.image-label,
-.message-label,
-.panel-label,
-.resourceImportControl-label,
-.sliderControl-label,
-.textAreaControl-label,
-.textControl-label
-{
-/*TODO del when new themes work	font-size: smaller;*/
-/*TODO del when new themes work	font-size:	font-weight: bold;*/
-}
 
 /*general errors*/
 .checkControl-error,

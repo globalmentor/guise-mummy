@@ -404,6 +404,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		if(busyComponent==null)	//if no busy component has yet been created
 		{
 			busyComponent=session.createBusyComponent();	//ask the session to create a new busy component
+			busyComponent.updateTheme();	//make sure a theme has been applied to the busy component
 		}
 		busyComponent.depict();	//update the busy component		
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//</xhtml:div> (busy)
