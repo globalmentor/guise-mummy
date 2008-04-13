@@ -37,6 +37,15 @@
 				cursor=<resource:theme.cursor.action>
 			;
 		;,
+		†Button‡
+		*theme.Rule:
+			select.selector=*select.ObjectClassSelector:
+				select.selectClass=component.ButtonControl
+			;,
+			theme.apply=*theme.Template:
+				paddingExtent=*geometry.Extent(#0.2#, «*geometry.Unit("EM")»)
+			;
+		;,
 		†BusyPanel‡
 		*theme.Rule:
 			select.selector=*select.ObjectClassSelector:

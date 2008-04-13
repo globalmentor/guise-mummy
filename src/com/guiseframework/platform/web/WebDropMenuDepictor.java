@@ -102,7 +102,7 @@ public class WebDropMenuDepictor<C extends Menu> extends AbstractWebMenuDepictor
 		super.depictBegin();	//do the default beginning rendering
 		final WebDepictContext depictContext=getDepictContext();	//get the depict context
 		final C component=getDepictedObject();	//get the component
-		writeIDClassAttributes(null, null, MOUSE_LISTENER_CLASS);	//write the ID and class attributes with no prefixes or suffixes, indicating that the menu should be a mouse listener
+		writeIDClassAttributes(null, null, MOUSE_LISTENER_CLASS);	//write the ID and class attributes with no prefixes or suffixes, indicating that the menu should be a mouse listener TODO maybe switch to overridding isMouseListener(); see tool button depictor
 		writeDirectionAttribute();	//write the component direction, if this component specifies a direction
 		writeLabel(decorateID(getPlatform().getDepictIDString(component.getDepictID()), null, COMPONENT_BODY_CLASS_SUFFIX));	//write the label for the menu body, if there is a label
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//<xhtml:div> (component-container)

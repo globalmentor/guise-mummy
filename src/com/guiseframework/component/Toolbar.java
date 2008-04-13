@@ -1,7 +1,7 @@
 package com.guiseframework.component;
 
 import com.guiseframework.component.layout.*;
-import com.guiseframework.prototype.Prototype;
+import com.guiseframework.prototype.*;
 
 /**A panel that holds components used as tools.
 @author Garret Wilson
@@ -25,14 +25,34 @@ public class Toolbar extends AbstractPanel
 	}
 
 	/**Creates a component appropriate for the context of this component from the given prototype.
-	This implementation creates a default component and then displays or hides the label as appropriate.
+	This version creates the following components, in order of priority:
+	<dl>
+		<dt>{@link ActionPrototype}</dt> <dd>{@link ToolButton}</dd>
+		<dt>{@link TogglePrototype}</dt> <dd>{@link BooleanSelectToolButton}</dd>	
+	</dl>
+	After creating a component, this version displays or hides the label as appropriate.
 	@param prototype The prototype of the component to create.
 	@return A new component based upon the given prototype.
 	@exception IllegalArgumentException if no component can be created from the given prototype
 	*/
 	public Component createComponent(final Prototype prototype)
 	{
-		final Component component=super.createComponent(prototype);	//create a default component
+		final Component component;
+		if(prototype instanceof ActionPrototype)	//action prototypes
+		{
+			component=new ToolButton((ActionPrototype)prototype);
+		}
+		else if(prototype instanceof TogglePrototype)	//toggle prototypes
+		{
+			final TogglePrototype togglePrototype=(TogglePrototype)prototype;	//get the toggle prototype
+			final BooleanSelectToolButton booleanSelectToolButton=new BooleanSelectToolButton(togglePrototype);	//create a boolean select tool button
+			booleanSelectToolButton.setToggle(true);	//turn on toggling
+			component=booleanSelectToolButton;	//use the button
+		}
+		else	//for all other components
+		{
+			component=super.createComponent(prototype);	//create a default component
+		}
 		if(component instanceof LabelDisplayableComponent)	//if this component can modify its label displayed status
 		{
 			((LabelDisplayableComponent)component).setLabelDisplayed(false);	//turn off the label TODO make this customizable

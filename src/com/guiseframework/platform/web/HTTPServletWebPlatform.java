@@ -103,6 +103,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 		registerDepictorClass(ApplicationFrame.class, WebApplicationFrameDepictor.class);
 //TODO fix custom button		registerView(Button.class, XHTMLButtonView.class);
 //TODO fix		registerView(ButtonControl.class, XHTMLCustomButtonView.class);
+		registerDepictorClass(BooleanSelectToolButton.class, WebToolButtonDepictor.class);
 		registerDepictorClass(ButtonControl.class, WebButtonDepictor.class);
 		registerDepictorClass(CardPanel.class, WebCardPanelDepictor.class);
 		registerDepictorClass(CheckControl.class, WebCheckControlDepictor.class);
@@ -134,6 +135,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 		registerDepictorClass(Table.class, WebTableDepictor.class);
 		registerDepictorClass(Text.class, WebTextDepictor.class);
 		registerDepictorClass(TextControl.class, WebTextControlDepictor.class);
+		registerDepictorClass(ToolButton.class, WebToolButtonDepictor.class);
 		registerDepictorClass(TreeControl.class, WebTreeControlDepictor.class);
 		registerDepictorClass(ValueSelectLink.class, WebValueSelectLinkDepictor.class);		
 	}

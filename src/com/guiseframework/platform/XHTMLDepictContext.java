@@ -2,8 +2,10 @@ package com.guiseframework.platform;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.*;
 
 import com.globalmentor.util.StringTemplate;
+import com.guiseframework.geometry.Side;
 
 /**Encapsulation of application/xhtml+xml information related to the current depiction.
 @author Garret Wilson
@@ -22,6 +24,9 @@ public interface XHTMLDepictContext extends XMLDepictContext
 	/**The template for "padding-?".*/
 	public final static StringTemplate CSS_PROPERTY_PADDING_X_TEMPLATE=new StringTemplate("padding-", StringTemplate.STRING_PARAMETER);
 
+	/**The sides supported by CSS.*/
+	public final Set<Side> CSS_SIDES=EnumSet.of(Side.LEFT, Side.RIGHT, Side.TOP, Side.BOTTOM);
+	
 	/**Generates a JavaScript element that references the given URI.
 	The given URI is resolved to the application path.
 	@param javascriptURI The application-relative IRO to the JavaScript file.

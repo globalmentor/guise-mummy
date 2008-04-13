@@ -49,7 +49,7 @@ public class WebAccordionMenuDepictor<C extends Menu> extends AbstractWebMenuDep
 		final WebDepictContext depictContext=getDepictContext();	//get the depict context
 		final C component=getDepictedObject();	//get the component
 //TODO del Debug.trace("updating accordian menu; is rollover?", component.isRollover());
-		final boolean mouseListener=!component.isOpen();	//if the component isn't open, listen for mouse events
+		final boolean mouseListener=!component.isOpen();	//if the component isn't open, listen for mouse events TODO fix; override isMouseListener() if needed
 				//TODO check---why are we writing mouse events either way? remove this logic
 		if(mouseListener)	//if we should listen for mouse events
 		{

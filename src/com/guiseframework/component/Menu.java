@@ -15,8 +15,6 @@ public interface Menu extends ContainerControl, ActionControl, LabelDisplayableC
 
 	/**The open bound property.*/
 	public final static String OPEN_PROPERTY=getPropertyName(Menu.class, "open");
-	/**The bound property of the rollover state.*/
-	public final static String ROLLOVER_PROPERTY=getPropertyName(Menu.class, "rollover");
 	/**The bound property of whether children will be displayed upon rollover.*/
 	public final static String ROLLOVER_OPEN_ENABLED_PROPERTY=getPropertyName(Menu.class, "rolloverOpenEnabled");
 
@@ -32,16 +30,6 @@ public interface Menu extends ContainerControl, ActionControl, LabelDisplayableC
 	@see #OPEN_PROPERTY
 	*/
 	public void setOpen(final boolean newOpen);
-
-	/**@return Whether the component is in a rollover state.*/
-	public boolean isRollover();
-
-	/**Sets whether the component is in a rollover state.
-	This is a bound property of type <code>Boolean</code>.
-	@param newRollover <code>true</code> if the component should be in a rollover state, else <code>false</code>.
-	@see #ROLLOVER_PROPERTY
-	*/
-	public void setRollover(final boolean newRollover);
 
 	/**@return Whether the menu children will be shown during rollover.*/
 	public boolean isRolloverOpenEnabled();

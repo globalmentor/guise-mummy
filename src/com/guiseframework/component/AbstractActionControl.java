@@ -59,6 +59,27 @@ public abstract class AbstractActionControl extends AbstractControl implements A
 			}
 		}
 
+	/**Whether the component is in a rollover state.*/
+	private boolean rollover=false;
+
+		/**@return Whether the component is in a rollover state.*/
+		public boolean isRollover() {return rollover;}
+
+		/**Sets whether the component is in a rollover state.
+		This is a bound property of type <code>Boolean</code>.
+		@param newRollover <code>true</code> if the component should be in a rollover state, else <code>false</code>.
+		@see Menu#ROLLOVER_PROPERTY
+		*/
+		public void setRollover(final boolean newRollover)
+		{
+			if(rollover!=newRollover)	//if the value is really changing
+			{
+				final boolean oldRollover=rollover;	//get the current value
+				rollover=newRollover;	//update the value
+				firePropertyChange(ROLLOVER_PROPERTY, Boolean.valueOf(oldRollover), Boolean.valueOf(newRollover));
+			}
+		}
+
 	/**Label model, action model, and enableable object constructor.
 	@param labelModel The component label model.
 	@param actionModel The component action model.

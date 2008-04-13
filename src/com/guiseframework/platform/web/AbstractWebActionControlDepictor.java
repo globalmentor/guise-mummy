@@ -1,15 +1,18 @@
 package com.guiseframework.platform.web;
 
 import java.net.URI;
-import java.util.Set;
+import java.util.*;
 
 import com.guiseframework.component.*;
-import com.guiseframework.platform.DepictEvent;
-import com.guiseframework.platform.PlatformEvent;
+import com.guiseframework.platform.*;
 
+import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**Abstract depictor for rendering simple action controls in XHTML.
+By default this implementation ignores changes in the {@link ActionControl#ROLLOVER_PROPERTY} property when determining whether to update the control.
+Depictors that wish to update the control upon rollover change must (besides implementing changing of the rollover property)
+remove the rollover property from the list of ignored properties, {@link #getIgnoredProperties()}. 
 @param <C> The type of component being depicted.
 @author Garret Wilson
 */
@@ -39,6 +42,7 @@ public abstract class AbstractWebActionControlDepictor<C extends ActionControl> 
 	public AbstractWebActionControlDepictor(final URI namespaceURI, final String localName, final boolean isEmptyElementAllowed)
 	{
 		super(namespaceURI, localName, isEmptyElementAllowed);	//construct the parent class
+		getIgnoredProperties().add(ActionControl.ROLLOVER_PROPERTY);	//ignore rollover property changes by default (even though rollover isn't even implemented by default) because rollovers are expensive and action controls won't by default update the control when rollover occurs
 	}
 
 	/**Processes an event from the platform.
@@ -100,7 +104,26 @@ public abstract class AbstractWebActionControlDepictor<C extends ActionControl> 
 		}
 		return baseStyleIDs;	//return the new style IDs
 	}
-	
+
+	/**Retrieves the styles for the body element of the component.
+	This version lowers the opacity if the control is disabled.
+	@return The styles for the body element of the component, mapped to CSS property names.
+	*/
+	protected Map<String, Object> getBodyStyles()
+	{
+		final Map<String, Object> styles=super.getBodyStyles();	//get the default body styles
+		final C component=getDepictedObject();	//get the component
+		if(!component.isEnabled())	//if this component is disabled
+		{
+			final double opacity=component.getOpacity();	//get the component's opacity
+			if(opacity==1.0)	//if there is no custom opacity (i.e. don't override any custom opacity)
+			{
+				styles.put(CSS_PROP_OPACITY, Double.valueOf(0.5));	//lower the opacity
+			}
+		}
+		return styles;	//return the styles
+	}
+
 	/**Writes any action parameters as comments.
 	This methods writes a comment containing the confirmation message, if any.
 	@param context Guise context information.

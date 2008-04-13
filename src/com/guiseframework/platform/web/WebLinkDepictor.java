@@ -3,21 +3,12 @@ package com.guiseframework.platform.web;
 import java.io.IOException;
 import java.util.Map;
 
-import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.CSS_POSITION_ABSOLUTE;
-import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.CSS_PROP_LEFT;
-import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.CSS_PROP_OPACITY;
-import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.CSS_PROP_POSITION;
-import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.CSS_PROP_TOP;
+import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 
 import com.guiseframework.component.*;
-import com.guiseframework.component.layout.Flow;
 import com.guiseframework.event.*;
-import com.guiseframework.geometry.Axis;
-import com.guiseframework.geometry.Extent;
-import com.guiseframework.geometry.Unit;
 import com.guiseframework.model.AbstractModel;
-import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**Strategy for rendering an action model control as an XHTML <code>&lt;a&gt;</code> element.
 If a link has a {@link NavigateActionListener} as one of its action listeners, the generated <code>href</code> URI will be that of the listener,
@@ -32,25 +23,6 @@ public class WebLinkDepictor<C extends ActionControl> extends AbstractWebActionC
 	public WebLinkDepictor()
 	{
 		super(XHTML_NAMESPACE_URI, ELEMENT_A);	//represent <xhtml:a>
-	}
-
-	/**Retrieves the styles for the body element of the component.
-	This version lowers the opacity if the control is disabled.
-	@return The styles for the body element of the component, mapped to CSS property names.
-	*/
-	protected Map<String, Object> getBodyStyles()
-	{
-		final Map<String, Object> styles=super.getBodyStyles();	//get the default body styles
-		final C component=getDepictedObject();	//get the component
-		if(!component.isEnabled())	//if this component is disabled
-		{
-			final double opacity=component.getOpacity();	//get the component's opacity
-			if(opacity==1.0)	//if there is no custom opacity (i.e. don't override any custom opacity)
-			{
-				styles.put(CSS_PROP_OPACITY, Double.valueOf(0.5));	//lower the opacity
-			}
-		}
-		return styles;	//return the styles
 	}
 
 	/**Begins the rendering process.

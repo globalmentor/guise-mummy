@@ -33,10 +33,10 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>
 		public TextControl<Date> getYearControl() {return dateControl;}
 
 	/**The button allowing selection of the date.*/
-	private final Button calendarButton;
+	private final ToolButton calendarButton;
 
 		/**The button allowing selection of the date.*/
-		protected Button getCalendarButton() {return calendarButton;}
+		protected ToolButton getCalendarButton() {return calendarButton;}
 
 	/**The control containing the date.*/
 	private final TextControl<Date> timeControl;
@@ -77,7 +77,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>
 //TODO del		dateControl.setValidator(new ValueRequiredValidator<Date>());	//require a date
 		dateControl.setColumnCount(10);	//provide for sufficient characters for the most common date format
 		addComponent(dateControl);	//add the date control
-		calendarButton=new Button(LABEL_CALENDAR+HORIZONTAL_ELLIPSIS_CHAR, GLYPH_CALENDAR);	//create a button for the calendar
+		calendarButton=new ToolButton(LABEL_CALENDAR+HORIZONTAL_ELLIPSIS_CHAR, GLYPH_CALENDAR);	//create a tool button for the calendar
 		calendarButton.setLabelDisplayed(false);
 		calendarButton.addActionListener(new ActionListener() 
 				{

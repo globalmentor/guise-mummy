@@ -170,11 +170,12 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	}
 
 	/**Creates a component appropriate for the context of this component from the given prototype.
-	This implementation creates the following components, in order of priority:
+	This version creates the following components, in order of priority:
 	<dl>
 		<dt>{@link ActionPrototype}</dt> <dd>{@link Button}</dd>
 		<dt>{@link LabelPrototype}</dt> <dd>{@link Label}</dd>	
 		<dt>{@link MenuPrototype}</dt> <dd>{@link DropMenu}</dd>	
+		<dt>{@link TogglePrototype}</dt> <dd>{@link BooleanSelectButton}</dd>	
 		<dt>{@link ValuePrototype}&lt;{@link Boolean}&gt;</dt> <dd>{@link CheckControl}</dd>	
 		<dt>{@link ValuePrototype}&lt;{@link Number}&gt; with installed {@link RangeValidator}</dt> <dd>{@link SliderControl}</dd>	
 		<dt>{@link ValuePrototype}&lt;?&gt;</dt> <dd>{@link TextControl}</dd>	

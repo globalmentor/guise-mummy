@@ -150,7 +150,7 @@ public abstract class AbstractMenu extends AbstractContainerControl implements M
 						fireActionPerformed(1, 0);	//fire an action with this component as the source TODO important---shouldn't we use a copy constructor, here?
 					}
 				});
-		addMouseListener(new MouseAdapter()	//listen for the mouse over the menu
+		addMouseListener(new MouseAdapter()	//listen for the mouse over the control
 				{
 					/**Called when the mouse enters the target.
 					@param mouseEvent The event providing mouse information
@@ -173,7 +173,6 @@ public abstract class AbstractMenu extends AbstractContainerControl implements M
 							setRollover(false);	//turn off the rollover state
 						}
 					}
-
 				});
 	}
 

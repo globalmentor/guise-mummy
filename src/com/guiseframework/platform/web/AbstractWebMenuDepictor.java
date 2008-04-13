@@ -39,6 +39,7 @@ public abstract class AbstractWebMenuDepictor<C extends Menu> extends AbstractWe
 	public AbstractWebMenuDepictor(final URI namespaceURI, final String localName, final boolean isEmptyElementAllowed)
 	{
 		super(namespaceURI, localName, isEmptyElementAllowed);	//construct the parent class
+		getIgnoredProperties().remove(ActionControl.ROLLOVER_PROPERTY);	//re-enable updates when rollover changes
 	}
 
 	/**Processes an event from the platform.

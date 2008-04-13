@@ -215,6 +215,7 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 	}
 
 	/**Appends a CSS string representation of the given color.
+	This method correctly handles transparent colors with the special CSS keyword {@value XMLCSS#CSS_COLOR_TRANSPARENT}.
 	@param stringBuilder The string builder to which the style will be added
 	@param color The color to represent in CSS.
 	@return The provided string builder.
@@ -222,10 +223,17 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 	protected static StringBuilder appendCSSValue(final StringBuilder stringBuilder, final Color color)
 	{
 		final RGBColor rgbColor=color.asRGB();	//get the color as RGB
-		stringBuilder.append(RGB_NUMBER_CHAR);	//#
-		stringBuilder.append(Integers.toHexString(rgbColor.getAbsoluteRed8(), 2));	//red
-		stringBuilder.append(Integers.toHexString(rgbColor.getAbsoluteGreen8(), 2));	//green
-		stringBuilder.append(Integers.toHexString(rgbColor.getAbsoluteBlue8(), 2));	//blue
+		if(rgbColor.getAlpha()>0)	//if there is an alpha value
+		{
+			stringBuilder.append(RGB_NUMBER_CHAR);	//#
+			stringBuilder.append(Integers.toHexString(rgbColor.getAbsoluteRed8(), 2));	//red
+			stringBuilder.append(Integers.toHexString(rgbColor.getAbsoluteGreen8(), 2));	//green
+			stringBuilder.append(Integers.toHexString(rgbColor.getAbsoluteBlue8(), 2));	//blue
+		}
+		else	//if there is no alpha, the color is transparent
+		{
+			stringBuilder.append(CSS_COLOR_TRANSPARENT);
+		}
 		return stringBuilder;	//return the string builder
 	}
 

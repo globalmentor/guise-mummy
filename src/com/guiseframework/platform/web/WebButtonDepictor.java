@@ -3,11 +3,10 @@ package com.guiseframework.platform.web;
 import java.io.*;
 import java.util.Map;
 
-
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.geometry.*;
-import com.guiseframework.platform.XHTMLDepictContext;
+import static com.guiseframework.platform.XHTMLDepictContext.*;
 
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
@@ -51,7 +50,7 @@ public class WebButtonDepictor<C extends ActionControl> extends AbstractWebActio
 */
 
 	/**Retrieves the styles for the body element of the component.
-	This version returns the style for background color.
+	This version adds special borders for a selected {@link SelectActionControl}.
 	@return The styles for the body element of the component, mapped to CSS property names.
 	*/
 	protected Map<String, Object> getBodyStyles()
@@ -61,12 +60,11 @@ public class WebButtonDepictor<C extends ActionControl> extends AbstractWebActio
 		final Map<String, Object> styles=super.getBodyStyles();	//get the default body styles
 		if(component instanceof SelectActionControl && ((SelectActionControl)component).isSelected())	//if this is a select action control that is selected
 		{
-			final ValueControl<?> valueControl=(ValueControl<?>)component;	//get the component as a value control
-			for(final Side side:Side.values())	//for each side
+			for(final Side side:CSS_SIDES)	//for each side
 			{
 //TODO del when works				styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), Extent.ZERO_EXTENT1);	//set the border to zero
-				styles.put(XHTMLDepictContext.CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), new Extent(1, Unit.PIXEL));	//set the border to 1 TODO change to a constant value 
-				styles.put(XHTMLDepictContext.CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), LineStyle.INSET);	//show the button as inset
+				styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), new Extent(1, Unit.PIXEL));	//set the border to 1 TODO change to a constant value 
+				styles.put(CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), LineStyle.INSET);	//show the button as inset
 			}
 		}
 /*TODO to fix to make a depressed border
