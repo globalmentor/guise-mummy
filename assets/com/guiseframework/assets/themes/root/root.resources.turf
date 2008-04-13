@@ -229,6 +229,7 @@
 		"theme.glyph.folder"=<images/icons/glyphs/folder.gif>,
 		"theme.glyph.folder.closed"=<resource:theme.glyph.folder>,
 		"theme.glyph.folder.open"=<images/icons/glyphs/folder_open.gif>,
+		"theme.glyph.folder.rich.content"=<images/icons/glyphs/folder_rich_content.gif>,
 		"theme.glyph.folder.tree"=<images/icons/glyphs/folder_tree.gif>,
 		"theme.glyph.help"=<resource:theme.glyph.question>,
 		"theme.glyph.hide"=<images/icons/glyphs/hide.gif>,
