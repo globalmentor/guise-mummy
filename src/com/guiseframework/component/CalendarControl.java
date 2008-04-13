@@ -264,6 +264,7 @@ public class CalendarControl extends AbstractLayoutValueControl<Date>
 			final TextControl<Integer> yearTextControl=new TextControl<Integer>(Integer.class);	//create a text control to select the year
 			yearTextControl.setMaximumLength(4);	//TODO testing
 			yearTextControl.setColumnCount(4);	//TODO testing
+			yearTextControl.setConverter(new PlainIntegerStringLiteralConverter());	//convert years using a plain representation with no delimiters
 			yearTextControl.setValidator(new IntegerRangeValidator(new Integer(1800), new Integer(2100), new Integer(1), true));	//restrict the range of the year TODO improve; don't arbitrarily restrict the range
 			yearTextControl.setAutoCommitPattern(Pattern.compile("\\d{4}"));	//automatically commit the year when four digits are entered
 			yearControl=yearTextControl;	//use the year text control for the year control
