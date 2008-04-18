@@ -321,7 +321,7 @@ Debug.trace("---removing Guise session", guiseSession, "associated with HTTP ses
 	The URI is first resolved to the container base URI.
 	This version loads local resources directly through the servlet context.
 	@param uri A URI to the entity; either absolute or relative to the container.
-	@return An input stream to the entity at the given resource URI, or <code>null</code> if no entity exists at the given resource path..
+	@return An input stream to the entity at the given resource URI, or <code>null</code> if no entity exists at the given resource path.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	@exception IOException if there was an error connecting to the entity at the given URI.
 	@see #getBaseURI()

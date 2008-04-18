@@ -14,50 +14,50 @@ public class PrototypeProvision<P extends Prototype> extends AbstractHashObject 
 {
 
 	/**No order.*/
-	public final static double NO_ORDER=-1;
+	public final static int NO_ORDER=-1;
 	/**The minimum allowed order.*/
-	public final static double MIN_ORDER=0;
+	public final static int MIN_ORDER=0;
 	/**The maximum allowed order.*/
-	public final static double MAX_ORDER=Double.MAX_VALUE;
+	public final static int MAX_ORDER=Integer.MAX_VALUE;
 
 		//top-level prototype orders
-	public final static double RESOURCE_MENU_ORDER=100;
-	public final static double EDIT_MENU_ORDER=200;
-	public final static double INSERT_MENU_ORDER=300;
-	public final static double VIEW_MENU_ORDER=400;
-	public final static double TOOL_MENU_ORDER=500;
-	public final static double CONFIGURE_MENU_ORDER=600;
-	public final static double WINDOW_MENU_ORDER=700;
-	public final static double HELP_MENU_ORDER=9900;
+	public final static int RESOURCE_MENU_ORDER=1000000;
+	public final static int EDIT_MENU_ORDER=2000000;
+	public final static int INSERT_MENU_ORDER=3000000;
+	public final static int VIEW_MENU_ORDER=4000000;
+	public final static int TOOL_MENU_ORDER=5000000;
+	public final static int CONFIGURE_MENU_ORDER=6000000;
+	public final static int WINDOW_MENU_ORDER=7000000;
+	public final static int HELP_MENU_ORDER=99000000;
 
 		//resource menu order
-	public final static double RESOURCE_MENU_NEW_ORDER=RESOURCE_MENU_ORDER+1;
-	public final static double RESOURCE_MENU_ADD_ORDER=RESOURCE_MENU_ORDER+2;
-	public final static double RESOURCE_MENU_OPEN_ORDER=RESOURCE_MENU_ORDER+3;
-	public final static double RESOURCE_MENU_CLOSE_ORDER=RESOURCE_MENU_ORDER+4;
-	public final static double RESOURCE_MENU_EDIT_ORDER=RESOURCE_MENU_ORDER+5;
-	public final static double RESOURCE_MENU_SAVE_ORDER=RESOURCE_MENU_ORDER+6;
-	public final static double RESOURCE_MENU_SAVE_AS_ORDER=RESOURCE_MENU_ORDER+7;
-	public final static double RESOURCE_MENU_SAVE_ALL_ORDER=RESOURCE_MENU_ORDER+8;
-	public final static double RESOURCE_MENU_REVERT_ORDER=RESOURCE_MENU_ORDER+9;
-	public final static double RESOURCE_MENU_MOVE_ORDER=RESOURCE_MENU_ORDER+10;
-	public final static double RESOURCE_MENU_RENAME_ORDER=RESOURCE_MENU_ORDER+11;
-	public final static double RESOURCE_MENU_REFRESH_ORDER=RESOURCE_MENU_ORDER+12;
-	public final static double RESOURCE_MENU_DELETE_ORDER=RESOURCE_MENU_ORDER+13;
-	public final static double RESOURCE_MENU_PREVIOUS_ORDER=RESOURCE_MENU_ORDER+14;
-	public final static double RESOURCE_MENU_RECEDE_ORDER=RESOURCE_MENU_ORDER+15;
-	public final static double RESOURCE_MENU_PLAY_ORDER=RESOURCE_MENU_ORDER+16;
-	public final static double RESOURCE_MENU_PAUSE_ORDER=RESOURCE_MENU_ORDER+17;
-	public final static double RESOURCE_MENU_RECORD_ORDER=RESOURCE_MENU_ORDER+18;
-	public final static double RESOURCE_MENU_STOP_ORDER=RESOURCE_MENU_ORDER+19;
-	public final static double RESOURCE_MENU_ADVANCE_ORDER=RESOURCE_MENU_ORDER+20;
-	public final static double RESOURCE_MENU_NEXT_ORDER=RESOURCE_MENU_ORDER+21;
-	public final static double RESOURCE_MENU_RETRIEVE_ORDER=RESOURCE_MENU_ORDER+22;
-	public final static double RESOURCE_MENU_PROPERTIES_ORDER=RESOURCE_MENU_ORDER+23;
-	public final static double RESOURCE_MENU_EXIT_ORDER=RESOURCE_MENU_ORDER+99;
+	public final static int RESOURCE_MENU_NEW_ORDER=RESOURCE_MENU_ORDER+100;
+	public final static int RESOURCE_MENU_ADD_ORDER=RESOURCE_MENU_ORDER+200;
+	public final static int RESOURCE_MENU_OPEN_ORDER=RESOURCE_MENU_ORDER+300;
+	public final static int RESOURCE_MENU_CLOSE_ORDER=RESOURCE_MENU_ORDER+400;
+	public final static int RESOURCE_MENU_EDIT_ORDER=RESOURCE_MENU_ORDER+500;
+	public final static int RESOURCE_MENU_SAVE_ORDER=RESOURCE_MENU_ORDER+600;
+	public final static int RESOURCE_MENU_SAVE_AS_ORDER=RESOURCE_MENU_ORDER+700;
+	public final static int RESOURCE_MENU_SAVE_ALL_ORDER=RESOURCE_MENU_ORDER+800;
+	public final static int RESOURCE_MENU_REVERT_ORDER=RESOURCE_MENU_ORDER+900;
+	public final static int RESOURCE_MENU_MOVE_ORDER=RESOURCE_MENU_ORDER+1000;
+	public final static int RESOURCE_MENU_RENAME_ORDER=RESOURCE_MENU_ORDER+1100;
+	public final static int RESOURCE_MENU_REFRESH_ORDER=RESOURCE_MENU_ORDER+1200;
+	public final static int RESOURCE_MENU_DELETE_ORDER=RESOURCE_MENU_ORDER+1300;
+	public final static int RESOURCE_MENU_PREVIOUS_ORDER=RESOURCE_MENU_ORDER+1400;
+	public final static int RESOURCE_MENU_RECEDE_ORDER=RESOURCE_MENU_ORDER+1500;
+	public final static int RESOURCE_MENU_PLAY_ORDER=RESOURCE_MENU_ORDER+1600;
+	public final static int RESOURCE_MENU_PAUSE_ORDER=RESOURCE_MENU_ORDER+1700;
+	public final static int RESOURCE_MENU_RECORD_ORDER=RESOURCE_MENU_ORDER+1800;
+	public final static int RESOURCE_MENU_STOP_ORDER=RESOURCE_MENU_ORDER+1900;
+	public final static int RESOURCE_MENU_ADVANCE_ORDER=RESOURCE_MENU_ORDER+2000;
+	public final static int RESOURCE_MENU_NEXT_ORDER=RESOURCE_MENU_ORDER+2100;
+	public final static int RESOURCE_MENU_RETRIEVE_ORDER=RESOURCE_MENU_ORDER+2200;
+	public final static int RESOURCE_MENU_PROPERTIES_ORDER=RESOURCE_MENU_ORDER+2300;
+	public final static int RESOURCE_MENU_EXIT_ORDER=RESOURCE_MENU_ORDER+9900;
 
 		//help prototype orders
-	public final static double HELP_MENU_ABOUT_ORDER=HELP_MENU_ORDER+1;
+	public final static int HELP_MENU_ABOUT_ORDER=HELP_MENU_ORDER+100;
 
 	/**The prototype description's parent, or <code>null</code> if the prototype description has no parent.*/
 	private final PrototypeProvision<?> parentPrototypeProvision;
@@ -72,10 +72,10 @@ public class PrototypeProvision<P extends Prototype> extends AbstractHashObject 
 		public P getPrototype() {return prototype;}
 
 	/**The order of the prototype.*/
-	private final double order;
+	private final int order;
 
 		/**@return The order of the prototype.*/
-		public double getOrder() {return order;}
+		public int getOrder() {return order;}
 
 	/**Whether this prototype should be used in a menu if available.*/ 
 	private final boolean isMenu;
@@ -97,7 +97,7 @@ public class PrototypeProvision<P extends Prototype> extends AbstractHashObject 
 	@exception NullPointerException if the given prototype is <code>null</code>.
 	@exception IllegalArgumentException if the given order is not {@value #NO_ORDER} and does not come between {@value #MIN_ORDER} and {@value #MAX_ORDER}, inclusive.
 	*/
-	public PrototypeProvision(final P prototype, final double order, final boolean isMenu, final boolean isTool)
+	public PrototypeProvision(final P prototype, final int order, final boolean isMenu, final boolean isTool)
 	{
 		this(null, prototype, order, isMenu, isTool);	//construct the class with no parent prototype description
 	}
@@ -111,9 +111,9 @@ public class PrototypeProvision<P extends Prototype> extends AbstractHashObject 
 	@exception NullPointerException if the given prototype is <code>null</code>.
 	@exception IllegalArgumentException if the given order is not {@value #NO_ORDER} and does not come between {@value #MIN_ORDER} and {@value #MAX_ORDER}, inclusive.
 	*/
-	public PrototypeProvision(final PrototypeProvision<?> parentPrototypeProvision, final P prototype, final double order, final boolean isMenu, final boolean isTool)
+	public PrototypeProvision(final PrototypeProvision<?> parentPrototypeProvision, final P prototype, final int order, final boolean isMenu, final boolean isTool)
 	{
-		super(parentPrototypeProvision, checkInstance(prototype, "Prototype cannot be null."), Double.valueOf(order));	//construct the parent class
+		super(parentPrototypeProvision, checkInstance(prototype, "Prototype cannot be null."), Integer.valueOf(order));	//construct the parent class
 		if(order!=NO_ORDER && (order<MIN_ORDER || order>MAX_ORDER))	//if the order is invalid
 		{
 			throw new IllegalArgumentException("Invalid order: "+order);
@@ -131,7 +131,7 @@ public class PrototypeProvision<P extends Prototype> extends AbstractHashObject 
 	*/
 	public int compareTo(final PrototypeProvision<P> prototypeDescription)
 	{
-		int value=Double.compare(getOrder(), prototypeDescription.getOrder());	//compare the orders
+		int value=getOrder()-prototypeDescription.getOrder();	//compare the orders
 		if(value==0 && !equals(prototypeDescription))	//if the orders were the same but the objects are not equal
 		{
 				//TODO compare the labels

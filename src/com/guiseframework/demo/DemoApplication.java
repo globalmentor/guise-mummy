@@ -1,5 +1,6 @@
 package com.guiseframework.demo;
 
+import java.net.URI;
 import java.security.Principal;
 import java.util.*;
 
@@ -34,12 +35,13 @@ public class DemoApplication extends AbstractGuiseApplication
 			return "user"+(++userCounter);	//return a user ID in the form userX
 		}
 
-	/**Default constructor.
-	This implementation sets the locale to the JVM default.
+	/**URI constructor.
+	@param uri The URI for the application, which may or may not be the URI at which the application can be accessed.
+	@throws NullPointerException if the given URI is <code>null</code>.
 	*/
-	public DemoApplication()
+	public DemoApplication(final URI uri)
 	{
-		super();	//construct the parent class
+		super(uri);	//construct the parent class
 		setResourceBundleBaseName(getClass().getPackage().getName()+"/resources");	//set the resource bundle
 		users.add(new DemoUser(generateUserID(), "Jane", null, "Smith", "password".toCharArray(), "janesmith@example.com"));	//add example users
 		users.add(new DemoUser(generateUserID(), "John", null, "Smith", "password".toCharArray(), "johnsmith@example.com"));

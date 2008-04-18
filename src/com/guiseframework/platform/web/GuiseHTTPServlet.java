@@ -90,21 +90,23 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	/**The URI query parameter indicating that the content disposition of the content of a {@link ResourceReadDestination}.
 	The value will be the serialize version of a {@link ContentDispositionType} value.
 	*/
-	public static String GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER="guiseContentDisposition";
+	public final static String GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER="guiseContentDisposition";
 
 	/**The ID of the viewport to use for sending resources.*/
-	public static String SEND_RESOURCE_VIEWPORT_ID="guiseDownload";
+	public final static String SEND_RESOURCE_VIEWPORT_ID="guiseDownload";
 
 	/**The I/O implementation that reads a Guise application description from TURF.*/
-	private final static IO<AbstractGuiseApplication> applicationIO;
+	private final static PLOOPTURFIO<AbstractGuiseApplication> applicationIO;
 
 		/**@return The I/O implementation that reads a Guise application description from TURF.*/
-		public static IO<AbstractGuiseApplication> getApplicationIO() {return applicationIO;}
+		public static PLOOPTURFIO<AbstractGuiseApplication> getApplicationIO() {return applicationIO;}
 
+	/**The name of the application configuration file in the data directory for supplemental application initialization.*/
+	public final static String DATA_APPLICATION_FILENAME=addExtension("application", TURF.TURF_NAME_EXTENSION);
+		
 	static
 	{
 		applicationIO=new PLOOPTURFIO<AbstractGuiseApplication>(AbstractGuiseApplication.class);	//create the Guise application I/O
-//TODO del if not needed		pageIO.registerResourceFactory(MARMOX_CONTENT_NAMESPACE_URI, new JavaURFResourceFactory(MarmoxContent.class.getPackage()));	//register a resource factory for Marmox content classes
 	}
 
 	/**The Guise container that owns the applications.*/
@@ -344,13 +346,30 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 				final URIPath guiseApplicationRelativePath=containerBasePath.relativize(guiseApplicationBasePath);	//get the application path relative to the container path
 
 //TODO del Debug.trace("context path", request.getContextPath(), "servlet path", request.getServletPath(), "container base path", containerBasePath, "application base path", guiseApplicationBasePath, "application relative path", guiseApplicationRelativePath);
-
-				final File guiseApplicationHomeDirectory=getDataDirectory(servletContext, DATA_DIRECTORY_INIT_PARAMETER, "guise/home/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
-				final File guiseApplicationLogDirectory=getDataDirectory(servletContext, LOG_DIRECTORY_INIT_PARAMETER, "guise/logs/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
-				final File guiseApplicationTempDirectory=getDataDirectory(servletContext, TEMP_DIRECTORY_INIT_PARAMETER, "guise/temp/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
-				//			TODO delDebug.trace("ready to install application into container with context path", guiseApplicationContextPath);
 				try
 				{
+					final File dataDirectory=getDataDirectory(servletContext);	//get the data directory
+					if(dataDirectory==null)	//if there is no data directory
+					{
+						throw new ServletException("No data directory available; either deploy servlet as in a file system or define the init parameter "+DATA_DIRECTORY_INIT_PARAMETER+".");
+					}
+					final File dataApplicationFile=new File(dataDirectory, "guise/"+DATA_APPLICATION_FILENAME);	//get the supplemental application description file, if any TODO use a constant
+					if(dataApplicationFile.exists())	//if there is a supplemental application description
+					{
+						final InputStream guiseApplicationDescriptionInputStream=new BufferedInputStream(new FileInputStream(dataApplicationFile));	////get an input stream to the supplemental application description
+						try
+						{
+							getApplicationIO().merge(guiseApplication, guiseApplicationDescriptionInputStream, dataApplicationFile.toURI());	//merge the application description from the PLOOP TURF, using the URI of the application description as the base URI
+						}
+						finally
+						{
+							guiseApplicationDescriptionInputStream.close();	//always close the input stream
+						}
+					}
+					final File guiseApplicationHomeDirectory=getDataDirectory(servletContext, DATA_DIRECTORY_INIT_PARAMETER, "guise/home/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
+					final File guiseApplicationLogDirectory=getDataDirectory(servletContext, LOG_DIRECTORY_INIT_PARAMETER, "guise/logs/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
+					final File guiseApplicationTempDirectory=getDataDirectory(servletContext, TEMP_DIRECTORY_INIT_PARAMETER, "guise/temp/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
+					//			TODO delDebug.trace("ready to install application into container with context path", guiseApplicationContextPath);
 					guiseContainer.installApplication(guiseApplication, guiseApplicationBasePath, guiseApplicationHomeDirectory, guiseApplicationLogDirectory, guiseApplicationTempDirectory);	//install the application
 				}
 				catch(final IOException ioException)	//if there is an I/O exception installing the application
@@ -1440,13 +1459,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 				final String cookieName=cookie.getName();	//get the name of this cookie
 				if(!SESSION_ID_COOKIE_NAME.equals(cookieName))	//ignore the session ID
 				{
-					/*TODO bring back final */ String environmentPropertyValue=asInstance(environment.getProperty(cookieName), String.class);	//see if there is a string environment property value for this cookie's name
-
-					if(cookieName.startsWith("marmox.repo"))	//TODO del after several versions; this is included to purge inadvertent password cookies from clients
-					{
-						environmentPropertyValue=null;
-					}
-
+					final String environmentPropertyValue=asInstance(environment.getProperty(cookieName), String.class);	//see if there is a string environment property value for this cookie's name
 					if(environmentPropertyValue!=null)	//if a value in the environment matches the cookie's name
 					{
 						if(!Objects.equals(cookie.getValue(), encode(environmentPropertyValue)))	//if the cookie's value doesn't match the encoded environment property value

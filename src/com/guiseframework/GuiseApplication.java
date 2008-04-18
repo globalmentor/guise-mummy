@@ -8,6 +8,7 @@ import javax.mail.*;
 
 import com.globalmentor.beans.PropertyBindable;
 import com.globalmentor.io.IOOperation;
+import com.globalmentor.net.Resource;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.net.URIs;
 import com.guiseframework.component.ApplicationFrame;
@@ -19,7 +20,7 @@ import static com.globalmentor.java.Classes.*;
 /**An application running Guise.
 @author Garret Wilson
 */
-public interface GuiseApplication extends PropertyBindable
+public interface GuiseApplication extends Resource, PropertyBindable
 {
 
 	/**The environment bound property.*/

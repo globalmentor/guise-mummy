@@ -13,8 +13,6 @@ import java.util.concurrent.*;
 import javax.mail.*;
 import javax.mail.Message;
 
-
-
 import static com.globalmentor.io.FileConstants.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Objects.*;
@@ -68,6 +66,15 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 		/**@return I/O for loading resources.*/
 		protected static IO<Resources> getResourcesIO() {return resourcesIO;}
+
+	/**The application identifier URI.*/
+	private URI uri;
+
+		/**Returns the application identifier URI.
+		This URI may be but is not guaranteed to be the URI at which the application can be accessed.
+		@return The application identifier URI, or <code>null</code> if the identifier is not known.
+		*/
+		public URI getURI() {return uri;}
 
 	/**The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed.*/
 	private AbstractGuiseContainer container=null;
@@ -429,6 +436,18 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		}
 	}
 
+	/**Checks to ensure that this application is not installed.
+	@exception IllegalStateException if the application is installed.
+	@see #isInstalled()
+	*/
+	public void checkNotInstalled()
+	{
+		if(isInstalled())	//if the application is installed
+		{
+			throw new IllegalStateException("Application already installed.");
+		}
+	}
+
 	/**Installs the application into the given container at the given base path.
 	This method is called by {@link GuiseContainer} and should not be called directly by applications.
 	This implementation configures mail using the file {@value GuiseApplication#MAIL_PROPERTIES_FILENAME} if present relative to the home directory.
@@ -645,22 +664,16 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			}
 		}
 
-	/**Default constructor.
+	/**URI constructor.
 	This implementation sets the locale to the JVM default.
+	@param uri The URI for the application, which may or may not be the URI at which the application can be accessed.
+	@throws NullPointerException if the given URI is <code>null</code>.
 	*/
-	public AbstractGuiseApplication()
+	public AbstractGuiseApplication(final URI uri)
 	{
-		this(Locale.getDefault());	//construct the class with the JVM default locale
+		this.uri=checkInstance(uri, "Application URI cannot be null."); //set the URI
+		locales=unmodifiableList(asList(Locale.getDefault()));	//create an unmodifiable list of locales including only the default locale of the JVM
 		this.environment=new DefaultEnvironment();	//create a default environment
-	}
-
-	/**Locale constructor.
-	@param locale The default application locale.
-	*/
-	public AbstractGuiseApplication(final Locale locale)
-	{
-//TODO del		this.defaultLocale=locale;	//set the default locale
-		locales=unmodifiableList(asList(locale));	//create an unmodifiable list of locales including only the default locale
 	}
 
 	/**The concurrent list of destinations which have path patterns specified.*/
