@@ -29,6 +29,7 @@ import com.globalmentor.beans.BoundPropertyObject;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Objects;
 import com.globalmentor.mail.MailManager;
+import com.globalmentor.marmot.repository.Repository;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.net.URIs;
 import com.globalmentor.text.W3CDateFormat;
@@ -105,13 +106,41 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			}
 		}
 
+	/**The properties of the mail manager, or <code>null</code> if the mail properties have not been configured.*/
+	private Map<?, ?> mailProperties=null;
+
+		/**Returns the properties of the mail manager.
+		This method is guaranteed to return a non-<code>null</code> value after the application is installed.
+		@return The properties of the mail manager.
+		@exception ConfigurationException if the application is installed into a container but the mail properties has not been configured. 
+		*/
+		public Map<?, ?> getMailProperties()
+		{
+			if(isInstalled() && mailProperties==null)	//if the application has been installed but the repositories repository has not yet been set
+			{
+				throw new ConfigurationException("Repositories repository has not been configured.");
+			}
+			return mailProperties;	//return the repository for user repositories
+		}
+
+		/**Sets properties of the mail manager.
+		@param mailProperties The new properties of the mail manager
+		@exception NullPointerException if the given properties is <code>null</code>.
+		@exception IllegalStateException if the application has already been installed into a container. 
+		*/
+		public void setMailProperties(final Map<?, ?> mailProperties)
+		{
+			checkNotInstalled();	//make sure the application has not been installed
+			this.mailProperties=unmodifiableMap(checkInstance(mailProperties, "Repository cannot be null."));
+		}
+
 	/**The mail manager, or <code>null</code> if the application is not installed or there is no mail defined for this application.*/
 	private MailManager mailManager=null;
 
 		/**Retrieves the current mail session.
 		@return This application's mail session.
 		@exception IllegalStateException if the application has not yet been installed into a container.
-		@exception IllegalStateException if mail has not been configured for this application.
+		@exception ConfigurationException if mail has not been configured for this application.
 		*/
 		public Session getMailSession()
 		{
@@ -119,7 +148,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			final MailManager mailManager=this.mailManager;	//get the mail manager
 			if(mailManager==null)	//if we don't have a mail manager, mail hasn't been configured
 			{
-				throw new IllegalStateException("Mail has not been configured for the application.");
+				throw new ConfigurationException("Mail has not been configured for the application.");
 			}
 			return mailManager.getSession();	//return the mail manager's session
 		}
@@ -128,7 +157,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		Mail added to this queue will be sent use the application's configured mail protocols.
 		@return The queue used for to send mail.
 		@exception IllegalStateException if the application has not yet been installed into a container.
-		@exception IllegalStateException if mail has not been configured for this application.
+		@exception ConfigurationException if mail has not been configured for this application.
 		*/
 		public Queue<Message> getMailSendQueue()
 		{
@@ -136,7 +165,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			final MailManager mailManager=this.mailManager;	//get the mail manager
 			if(mailManager==null)	//if we don't have a mail manager, mail hasn't been configured
 			{
-				throw new IllegalStateException("Mail has not been configured for the application.");
+				throw new ConfigurationException("Mail has not been configured for the application.");
 			}
 			return mailManager.getSendQueue();	//return the mail manager's send queue
 		}
@@ -450,7 +479,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	/**Installs the application into the given container at the given base path.
 	This method is called by {@link GuiseContainer} and should not be called directly by applications.
-	This implementation configures mail using the file {@value GuiseApplication#MAIL_PROPERTIES_FILENAME} if present relative to the home directory.
+	Mail is enabled if mail properties have been configured using {@link #setMailProperties(Map)}.
 	@param container The Guise container into which the application is being installed.
 	@param basePath The base path at which the application is being installed.
 	@param homeDirectory The home directory of the application.
@@ -477,20 +506,20 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		this.homeDirectory=checkInstance(homeDirectory, "Home directory cannot be null.");
 		this.logDirectory=checkInstance(logDirectory, "Log directory cannot be null.");
 		this.tempDirectory=checkInstance(tempDirectory, "Temporary directory cannot be null.");
-//TODO del if not needed		hashCode=ObjectUtilities.hashCode(container.getBaseURI(), basePath);	//create a hash code based upon the base URI of the container and the base path of the application
-
-		try
+		if(mailProperties!=null)	//if mail properties have been configured
 		{
-			final Properties mailProperties=loadProperties(MAIL_PROPERTIES_FILENAME);	//try to load the mail properties
-			mailManager=new MailManager(mailProperties);	//create a new mail manager from the properties
+			try
+			{
+				mailManager=new MailManager(mailProperties);	//create a new mail manager from the properties
+			}
+			catch(final NoSuchProviderException noSuchProviderException)	//if a provider couldn't be found
+			{
+				throw new ConfigurationException(noSuchProviderException);	//indicate that there was a problem configuring the application TODO use a better error; create a ConfigurationStateException
+			}
 		}
-		catch(final IOException ioException)	//if we couldn't load the mail properties
+		else	//if there are no mail properties
 		{
-			Debug.warn(ioException);	//warn that mail isn't configured
-		}
-		catch(final NoSuchProviderException noSuchProviderException)	//if a provider couldn't be found
-		{
-			throw new AssertionError(noSuchProviderException);	//indicate that there was a problem configuring the application TODO use a better error; create a ConfigurationStateException
+			Debug.warn("Mail properties not configured.");	//warn that mail isn't configured
 		}
 	}
 

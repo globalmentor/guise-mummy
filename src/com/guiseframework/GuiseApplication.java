@@ -18,6 +18,7 @@ import com.guiseframework.theme.Theme;
 import static com.globalmentor.java.Classes.*;
 
 /**An application running Guise.
+To enable mail-related functionality, mail must be configured using {@link #setMailProperties(Map)}.
 @author Garret Wilson
 */
 public interface GuiseApplication extends Resource, PropertyBindable
@@ -114,6 +115,20 @@ public interface GuiseApplication extends Resource, PropertyBindable
 	@see #ENVIRONMENT_PROPERTY
 	*/
 	public void setEnvironment(final Environment newEnvironment);
+
+	/**Returns the properties of the mail manager.
+	This method is guaranteed to return a non-<code>null</code> value after the application is installed.
+	@return The properties of the mail manager.
+	@exception IllegalStateException if the application is installed into a container but the mail properties has not been configured. 
+	*/
+	public Map<?, ?> getMailProperties();
+
+	/**Sets properties of the mail manager.
+	@param mailProperties The new properties of the mail manager
+	@exception NullPointerException if the given properties is <code>null</code>.
+	@exception IllegalStateException if the application has already been installed into a container. 
+	*/
+	public void setMailProperties(final Map<?, ?> mailProperties);
 
 	/**Retrieves the current mail session.
 	@return This application's mail session.
