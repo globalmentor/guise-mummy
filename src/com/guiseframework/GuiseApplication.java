@@ -66,9 +66,6 @@ public interface GuiseApplication extends Resource, PropertyBindable
 	/**The base path of the default Guise theme cursors, relative to the application.*/
 	public final static URIPath GUISE_ROOT_THEME_CURSORS_PATH=GUISE_ROOT_THEME_BASE_PATH.resolve("cursors/");
 
-	/**The name of the mail properties filename relative to the application home directory, used for configuring mail for the application.*/
-	public final static String MAIL_PROPERTIES_FILENAME="mail.properties.xml";
-
 	/**@return The application locale used by default if a new session cannot determine the users's preferred locale.*/
 //TODO del	public Locale getDefaultLocale();
 

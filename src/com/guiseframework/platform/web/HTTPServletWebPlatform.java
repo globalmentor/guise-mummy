@@ -261,11 +261,10 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	@param resourcePath The path of the resource to send, relative to the application.
 	@param bookmark The bookmark at the given path, or <code>null</code> if there is no bookmark.
 	@exception NullPointerException if the given path is <code>null</code>.
-	@exception IllegalArgumentException if the given string is not a path.
 	*/
 	public void sendResource(final URIPath resourcePath, final Bookmark bookmark)
 	{
-		sendResource(resourcePath.toURI(), bookmark);	//send the requested URI, converting the path to a URI and verifying that it is only a path
+		sendResource(resourcePath.toURI(), bookmark);	//send the requested URI, converting the path to a URI
 	}
 
 	/**Sends a resource to the platform.
@@ -273,7 +272,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	@param bookmark The bookmark at the given path, or <code>null</code> if there is no bookmark.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	*/
-	public void sendResource(final URI resourceURI, final Bookmark bookmark)
+	public void sendResource(final URI resourceURI, final Bookmark bookmark)	//TODO resolve whether resource URI can have bookmark information; currently some code relies on allowing bookmark information in the URI
 	{
 		sendResourceURI=checkInstance(resourceURI, "Resource URI cannot be null.");	//save the resource; it will be resolved when depicted
 		if(bookmark!=null)	//if a bookmark was provided

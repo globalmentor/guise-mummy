@@ -242,9 +242,11 @@ public class Bookmark implements Cloneable
 		@param value The parameter value.
 		@exception NullPointerException if the given name and/or value is <code>null</code>.
 		*/
+/*TODO del
 		public <E extends Enum<E>> Parameter(final String name, final E value)
 		{
 			this(name, getSerializationName(value));	//get the serialized form of the enum and create the bookmark
 		}
+*/
 	}
 }

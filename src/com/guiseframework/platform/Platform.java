@@ -92,7 +92,6 @@ public interface Platform
 	@param resourcePath The path of the resource to send, relative to the application.
 	@param bookmark The bookmark at the given path, or <code>null</code> if there is no bookmark.
 	@exception NullPointerException if the given path is <code>null</code>.
-	@exception IllegalArgumentException if the given string is not a path.
 	*/
 	public void sendResource(final URIPath resourcePath, final Bookmark bookmark);
 

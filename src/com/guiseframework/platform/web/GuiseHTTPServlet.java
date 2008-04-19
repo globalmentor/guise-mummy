@@ -623,7 +623,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 								}
 								final URFResource resourceDescription=new DefaultURFResource();	//create a new resource description
 								final String itemContentType=fileItemStream.getContentType();	//get the item content type, if any
-								if(itemContentType!=null)	//if we know the item's content type
+								if(itemContentType!=null && !APPLICATION_OCTET_STREAM_CONTENT_TYPE.match(itemContentType))	//if we know the item's content type (and it's not just a generic "bunch of bytes" content type)
 								{
 									setContentType(resourceDescription, getContentTypeInstance(itemContentType));	//set the resource's content type
 								}
