@@ -162,7 +162,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 			httpSessionGuiseSessionSetMap.addItem(httpSession, guiseSession);	//indicate that this Guise session is for this HTTP session
 		}
 		final URI requestDepictionURI=URI.create(httpRequest.getRequestURL().toString());	//get the depiction URI of the current request
-		final URI sessionDepictionBaseURI=requestDepictionURI.resolve(guiseApplication.getDepictURI(requestDepictionURI, guiseApplication.getBasePath().toURI()));	//resolve the depiction form of the application base path to the request depiction URI
+		final URI sessionDepictionBaseURI=requestDepictionURI.resolve(guiseApplication.getDepictionURI(requestDepictionURI, guiseApplication.getBasePath().toURI()));	//resolve the depiction form of the application base path to the request depiction URI
 			//TODO currently changing the depiction base URI doesn't fire any events; if it did, we might want first to create a session thread group; but can the depiction base URI actually even change within the current session?
 		guiseSession.setDepictionBaseURI(sessionDepictionBaseURI);	//update the depiction base URI to the one specified by the request, in case the session is created from a different URL
 		return guiseSession;	//return the Guise session

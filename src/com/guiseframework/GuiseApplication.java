@@ -199,7 +199,7 @@ public interface GuiseApplication extends Resource, PropertyBindable
 	@throws NullPointerException if the given depict URI and/or logical URI is <code>null</code>.
 	@see #GUISE_RESERVED_BASE_PATH
 	*/
-	public URI getDepictURI(final URI depictURI, final URI navigationURI);
+	public URI getDepictionURI(final URI depictURI, final URI navigationURI);
 
 	/**Registers a destination so that it can be matched against one or more paths.
 	Any existing destinations for the path or path pattern is replaced.

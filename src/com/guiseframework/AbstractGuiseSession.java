@@ -110,12 +110,12 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@return A URI suitable for depiction, deferenced and resolved to the application.
 	@see #dereferenceURI(URI, String...)
 	@see #getDepictionBaseURI()
-	@see GuiseApplication#getDepictURI(URI, URI)
+	@see GuiseApplication#getDepictionURI(URI, URI)
 	*/
 	public URI getDepictionURI(final URI navigationURI, final String... suffixes)
 	{
 		final GuiseApplication guiseApplication=getApplication();	//get the application
-		return guiseApplication.resolveURI(guiseApplication.getDepictURI(getDepictionBaseURI(), dereferenceURI(navigationURI, suffixes)));	//determine the depict URI and resolve it to the application
+		return guiseApplication.resolveURI(guiseApplication.getDepictionURI(getDepictionBaseURI(), dereferenceURI(navigationURI, suffixes)));	//determine the depict URI and resolve it to the application
 	}
 
 	/**The application frame, initialized during {@link #initialize()}.*/

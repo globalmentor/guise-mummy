@@ -95,7 +95,7 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory
 	@return A URI suitable for depiction, deferenced and resolved to the application.
 	@see #dereferenceURI(URI, String...)
 	@see #getDepictionBaseURI()
-	@see GuiseApplication#getDepictURI(URI, URI)
+	@see GuiseApplication#getDepictionURI(URI, URI)
 	*/
 	public URI getDepictionURI(final URI navigationURI, final String... suffixes);
 

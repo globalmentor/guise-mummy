@@ -1085,7 +1085,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						{
 							redirectNavigationURI=appendRawQuery(navigationPath.toURI(), newBookmark.toString());	//save the constructed bookmark URI	TODO fix the confusion about whether there is a query on the URIs
 						}
-						final URI redirectDepictURI=requestDepictURI.resolve(guiseApplication.resolveURI(guiseApplication.getDepictURI(requestDepictURI, redirectNavigationURI)));	//get the absolute redirect URI in depiction terms
+						final URI redirectDepictURI=requestDepictURI.resolve(guiseApplication.resolveURI(guiseApplication.getDepictionURI(requestDepictURI, redirectNavigationURI)));	//get the absolute redirect URI in depiction terms
 //Debug.trace("depict version of requested navigation:", redirectDepictURI);
 						if(!requestDepictURI.equals(redirectDepictURI))	//if the navigation is really changing (i.e. they didn't request to go to where they already were)
 						{
@@ -1422,7 +1422,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 	protected void redirect(final HTTPServletGuiseRequest guiseRequest, final GuiseApplication guiseApplication, final URI redirectNavigationURI, final Bookmark bookmark, final boolean permanent) throws HTTPRedirectException
 	{
 		final URI requestDepictURI=guiseRequest.getDepictURI();	//get the request depict URI
-		URI redirectDepictURI=requestDepictURI.resolve(guiseApplication.resolveURI(guiseApplication.getDepictURI(requestDepictURI, redirectNavigationURI)));	//convert the redirect URI to a depict URI, resolve it to the application, and resolve it to the original depict URI
+		URI redirectDepictURI=requestDepictURI.resolve(guiseApplication.resolveURI(guiseApplication.getDepictionURI(requestDepictURI, redirectNavigationURI)));	//convert the redirect URI to a depict URI, resolve it to the application, and resolve it to the original depict URI
 		if(bookmark!=null)	//if a bookmark was given
 		{
 			redirectDepictURI=appendRawQuery(redirectDepictURI, bookmark.toString().substring(1));	//append the bookmark to the redirect URI TODO use a better way of extracting the bookmark query information

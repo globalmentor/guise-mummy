@@ -214,7 +214,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@throws NullPointerException if the given depict URI and/or logical URI is <code>null</code>.
 	@see #GUISE_RESERVED_BASE_PATH
 	*/
-	public URI getDepictURI(final URI depictURI, final URI navigationURI)
+	public URI getDepictionURI(final URI depictURI, final URI navigationURI)
 	{
 		return navigationURI;	//by default the navigation URI and the depiction URI are the same	
 	}
