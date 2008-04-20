@@ -23,14 +23,14 @@ This implementation always represents the date and time in terms of the current 
 This implementation does not allow smaller than one-second precision.
 @author Garret Wilson
 */
-public class DateTimeControl extends AbstractLayoutValueControl<Date>
+public class DateTimeControl extends AbstractLayoutValueControl<Date>	//TODO refactor this and code from this and RepositoryResourceURIControl into abstract functionality for decorated controls
 {
 
 	/**The control containing the date.*/
 	private final TextControl<Date> dateControl;
 
 		/**@return The control containing the date.*/
-		public TextControl<Date> getYearControl() {return dateControl;}
+		protected TextControl<Date> getDateControl() {return dateControl;}
 
 	/**The button allowing selection of the date.*/
 	private final ToolButton calendarButton;
@@ -71,7 +71,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>
 		super(new FlowLayout(Flow.LINE), valueModel);	//construct the parent class flowing along the line
 			//date
 		dateControl=new TextControl<Date>(Date.class);	//create a control for the date
-		dateControl.setLabel("Date");	//set the date control label TODO get from resources
+		dateControl.setLabel(LABEL_DATE);	//set the date control label
 		final Converter<Date, String> dateConverter=new DateStringLiteralConverter(DateStringLiteralStyle.SHORT, null);	//get a converter to display the date in a numeric representation
 		dateControl.setConverter(dateConverter);	//set the date converter
 //TODO del		dateControl.setValidator(new ValueRequiredValidator<Date>());	//require a date
@@ -112,7 +112,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>
 		addComponent(calendarButton);	//add the calendar button
 			//time
 		timeControl=new TextControl<Date>(Date.class);	//create a control for the time
-		timeControl.setLabel("Time");	//set the date control label TODO get from resources
+		timeControl.setLabel(LABEL_TIME);	//set the date control label
 		final Converter<Date, String> timeConverter=new DateStringLiteralConverter(null, TimeStringLiteralStyle.SHORT);	//get a converter to display the time in a numeric representation
 		timeControl.setConverter(timeConverter);	//set the time converter
 //TODO del		dateControl.setValidator(new ValueRequiredValidator<Date>());	//require a date

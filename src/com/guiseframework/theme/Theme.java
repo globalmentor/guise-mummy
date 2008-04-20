@@ -245,6 +245,7 @@ public class Theme extends URFListResource<Rule>
 	public final static String LABEL_CALENDAR=createStringResourceReference("theme.label.calendar");
 	public final static String LABEL_CANCEL=createStringResourceReference("theme.label.cancel");
 	public final static String LABEL_CLOSE=createStringResourceReference("theme.label.close");
+	public final static String LABEL_DATE=createStringResourceReference("theme.label.date");
 	public final static String LABEL_DEFAULT=createStringResourceReference("theme.label.default");
 	public final static String LABEL_DELETE=createStringResourceReference("theme.label.delete");
 	public final static String LABEL_DELETE_X=createStringResourceReference("theme.label.delete.x");
@@ -284,6 +285,7 @@ public class Theme extends URFListResource<Rule>
 	public final static String LABEL_RETRY=createStringResourceReference("theme.label.retry");
 	public final static String LABEL_SUBMIT=createStringResourceReference("theme.label.submit");
 	public final static String LABEL_SUBTRACT=createStringResourceReference("theme.label.subtract");
+	public final static String LABEL_TIME=createStringResourceReference("theme.label.time");
 	public final static String LABEL_TOTAL=createStringResourceReference("theme.label.total");
 	public final static String LABEL_TYPE=createStringResourceReference("theme.label.type");
 	public final static String LABEL_UNKNOWN=createStringResourceReference("theme.label.unknown");
