@@ -1,16 +1,30 @@
+/*
+ * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.guiseframework;
 
 import static java.util.Collections.*;
 
 import java.util.*;
 
-import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 
 import com.globalmentor.net.URIs;
 import com.globalmentor.text.ArgumentSyntaxException;
-import com.globalmentor.util.Debug;
 import com.globalmentor.util.NameValuePair;
 
 /**An identification of a saved state at a navigation point. The bookmark is relative to the navigation path.
@@ -19,21 +33,9 @@ import com.globalmentor.util.NameValuePair;
 public class Bookmark implements Cloneable
 {
 
-	/**The bookmark ID.*/
-//TODO del	private final String id;
-
-		/**@return The bookmark ID.*/
-//TODO del		public String getID() {return id;}
-
 	/**The map of parameters keyd to parameter names. This map is not thread-safe, but it should never be modified by more than one thread because this is an immutable class.*/
 	private HashMap<String, Parameter> parameterMap=new HashMap<String, Parameter>();
 	
-	/**The array of parameters.*/
-//TODO del	private final Parameter[] parameters;
-
-		/**@return A read-only list of parameters.*/
-//TODO del		public List<Parameter> getParameters() {return unmodifiableList(asList(parameters));}	//return a read-only list of the parameters
-
 	/**@return A read-only set of parameters.*/
 	public Set<Parameter> getParameters() {return unmodifiableSet(new HashSet<Parameter>(parameterMap.values()));}	//return a read-only set of the parameters
 	
@@ -46,17 +48,6 @@ public class Bookmark implements Cloneable
 	{
 		final Parameter parameter=parameterMap.get(checkInstance(parameterName, "Parameter name cannot be null."));	//get the requested parameter
 		return parameter!=null ? parameter.getValue() : null;	//return the parameter value, if there was a parameter
-/*TODO del when works
-		for(int i=0; i<parameters.length; ++i)	//for each parameter
-		{
-			final Parameter parameter=parameters[i];	//get a reference to this parameter
-			if(parameterName.equals(parameter.getName()))	//if this parameter has the correct name
-			{
-				return parameter.getValue();	//return this parameter value
-			}
-		}
-		return null;	//indicate that no parameter with the given name was found
-*/
 	}
 
 	/**String constructor.
@@ -92,7 +83,6 @@ public class Bookmark implements Cloneable
 	*/
 	public Bookmark(/*TODO del final String id, */final Parameter... parameters)
 	{
-//TODO del		this.id=checkNull(id, "ID cannot be null.");
 		setParameters(parameters);	//set the parameters
 	}
 
@@ -168,8 +158,6 @@ public class Bookmark implements Cloneable
 	public int hashCode()
 	{
 		return parameterMap.hashCode();	//return the hash code of the parameter map
-//TODO del		return Arrays.hashCode(parameters);	//calculate a hash code from the parameters
-//TODO fix		return ObjectUtilities.hashCode(id, Arrays.hashCode(parameters));	//calculate a hash code from the ID and the parameters
 	}
 
 	/**Indicates whether some other object is "equal to" this one.
@@ -181,10 +169,7 @@ public class Bookmark implements Cloneable
 	{
 		if(object instanceof Bookmark)	//if the given object is a bookmark
 		{
-//TODO del			final Bookmark bookmark=(Bookmark)object;	//cast the object to a boomark
 			return parameterMap.equals(((Bookmark)object).parameterMap);	//compare parameter maps
-//TODO del			return Arrays.equals(parameters, bookmark.parameters);	//compare the ID and parameters
-//TODO del			return getID().equals(bookmark.getID()) && Arrays.equals(parameters, bookmark.parameters);	//compare the ID and parameters
 		}
 		else	//if the given object is not a bookmark
 		{
@@ -200,13 +185,6 @@ public class Bookmark implements Cloneable
 	public String toString()
 	{
 		final StringBuilder bookmarkQueryStringBuilder=new StringBuilder();	//create a new string builder
-/*TODO fix
-		final String bookmarkID=bookmark.getID();	//get the bookmark ID
-		if(bookmarkID!=null)	//if there is a bookmark ID
-		{
-			bookmarkQueryStringBuilder.append(FRAGMENT_SEPARATOR).append(encode(bookmarkID));	//append #bookmarkID (encoded)
-		}
-*/
 		if(!parameterMap.isEmpty())	//if there are parameters
 		{
 			final Set<Parameter> parameterSet=getParameters();	//get the parameters
@@ -236,17 +214,5 @@ public class Bookmark implements Cloneable
 			super(checkInstance(name, "Parameter name cannot be null."), checkInstance(value, "Parameter value cannot be null."));	//construct the parent class
 		}		
 
-		/**Constructor specifying the name and an enum value.
-		The value will be converted to a serialized form by changing the enum name to lowercase and replacing every '_' with '-'.
-		@param name The parameter name.
-		@param value The parameter value.
-		@exception NullPointerException if the given name and/or value is <code>null</code>.
-		*/
-/*TODO del
-		public <E extends Enum<E>> Parameter(final String name, final E value)
-		{
-			this(name, getSerializationName(value));	//get the serialized form of the enum and create the bookmark
-		}
-*/
 	}
 }

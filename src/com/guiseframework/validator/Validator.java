@@ -1,17 +1,33 @@
+/*
+ * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.guiseframework.validator;
 
 import static com.globalmentor.java.Classes.*;
 
 import com.globalmentor.beans.PropertyBindable;
-import com.guiseframework.GuiseResourceConstants;
 import com.guiseframework.GuiseSession;
+import com.guiseframework.Resources;
 
 /**Indicates an object that can determine whether a value is valid.
 The invalid value message should be in the form "Invalid value: '{0}'.", where "{0}" represents the invalid value.
 @param <V> The value type this validator supports.
 @author Garret Wilson
-@see GuiseResourceConstants#VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE_REFERENCE
-@see GuiseResourceConstants#VALIDATOR_VALUE_REQUIRED_MESSAGE_RESOURCE_REFERENCE
+@see Resources#VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE_REFERENCE
+@see Resources#VALIDATOR_VALUE_REQUIRED_MESSAGE_RESOURCE_REFERENCE
 */
 public interface Validator<V> extends PropertyBindable
 {

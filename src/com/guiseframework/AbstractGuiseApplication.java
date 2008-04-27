@@ -1,3 +1,19 @@
+/*
+ * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.guiseframework;
 
 import java.io.*;
@@ -23,13 +39,11 @@ import static com.globalmentor.urf.URF.*;
 import static com.globalmentor.util.Calendars.*;
 import static com.globalmentor.util.Locales.*;
 import static com.guiseframework.Guise.*;
-import static com.guiseframework.GuiseResourceConstants.*;
 
 import com.globalmentor.beans.BoundPropertyObject;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Objects;
 import com.globalmentor.mail.MailManager;
-import com.globalmentor.marmot.repository.Repository;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.net.URIs;
 import com.globalmentor.text.W3CDateFormat;
@@ -37,12 +51,9 @@ import com.globalmentor.urf.*;
 import com.globalmentor.util.*;
 import com.guiseframework.component.*;
 import static com.guiseframework.Resources.*;
+import com.guiseframework.platform.*;
 import com.guiseframework.theme.Theme;
 import static com.guiseframework.theme.Theme.*;
-
-import com.guiseframework.platform.DefaultEnvironment;
-import com.guiseframework.platform.Environment;
-import com.guiseframework.platform.Platform;
 
 /**An abstract base class for a Guise application.
 This implementation only works with Guise containers that descend from {@link AbstractGuiseContainer}.
@@ -599,30 +610,6 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			}
 		}
 	
-	/**The application locale used by default if a new session cannot determine the users's preferred locale.*/
-//TODO del	private Locale defaultLocale;
-
-		/**@return The application locale used by default if a new session cannot determine the users's preferred locale.*/
-//TODO del		public Locale getDefaultLocale() {return defaultLocale;}
-
-		/**Sets the application locale used by default if a new session cannot determine the users's preferred locale.
-		This is a bound property.
-		@param newDefaultLocale The new default application locale.
-		@exception NullPointerException if the given locale is <code>null</code>.
-		@see GuiseApplication#DEFAULT_LOCALE_PROPERTY
-		*/
-/*TODO del
-		public void setDefaultLocale(final Locale newDefaultLocale)
-		{
-			if(!ObjectUtilities.equals(defaultLocale, newDefaultLocale))	//if the value is really changing (compare their values, rather than identity)
-			{
-				final Locale oldLocale=defaultLocale;	//get the old value
-				defaultLocale=checkInstance(newDefaultLocale, "Guise application default locale cannot be null.");	//actually change the value
-				firePropertyChange(DEFAULT_LOCALE_PROPERTY, oldLocale, newDefaultLocale);	//indicate that the value changed
-			}
-		}
-*/
-
 	/**The thread-safe set of locales supported by this application.*/
 	private final Set<Locale> supportedLocales=new CopyOnWriteArraySet<Locale>();
 
@@ -1139,13 +1126,6 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	*/
 	private final Map<String, TempFileInfo> filenameTempFileInfoMap=new ConcurrentHashMap<String, TempFileInfo>();
 
-/*TODO del
-	protected TempFileInfo getTempFileInfo(final String filename)	//TODO comment
-	{
-		return filenameTempFileInfoMap.get(filename);
-	}
-*/
-
 	/**Creates a temporary asset available at an application navigation path.
 	The file will be created in the application's temporary file directory.
 	If the asset is restricted to the current Guise session, the asset will be deleted when the current Guise session ends.
@@ -1318,7 +1298,6 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			{
 				resourceBundle=loadResourceBundle(resourcesURI, resourceBundle);	//load the resources and insert it into the chain
 			}
-//TODO del when works			final Map<String, Object> resourceMap=ResourceBundleUtilities.toMap(resourceResource, STRING_NAMESPACE_URI);	//generate a map from the local resources TODO cache this if possible
 			if(resourcesResource instanceof Resources)	//if this is a Guise reosurces object
 			{
 				final Map<String, Object> resourceMap=ResourceBundles.getResourceValue(resourcesResource);	//generate a map from the local resources TODO cache this if possible
@@ -1351,7 +1330,6 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			try
 			{
 				final Resources resources=getResourcesIO().read(resourcesInputStream, resourceBundleURI);	//load the resources
-//TODO del when works				resourceMap=ResourceBundleUtilities.toMap(resources, STRING_NAMESPACE_URI);	//generate a map from the resources
 				resourceMap=ResourceBundles.getResourceValue(resources);	//generate a map from the resources
 				cachedResourceMapMap.put(resourceBundleURI, resourceMap);	//cache the map for later
 			}

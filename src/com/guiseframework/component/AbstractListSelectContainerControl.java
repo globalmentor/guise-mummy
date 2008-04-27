@@ -1,3 +1,19 @@
+/*
+ * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.guiseframework.component;
 
 import static com.globalmentor.java.Objects.*;
@@ -27,37 +43,8 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 
 		//TODO make sure we listen for enabled status changing on the layout and send an index enabled property change, maybe
 
-	/**The list select model used by this component.*/
-//TODO del	private final ListSelectModel<Component<?>> listSelectModel;
-
-		/**@return The list select model used by this component.*/
-//TODO del		protected ListSelectModel<Component<?>> getListSelectModel() {return listSelectModel;}
-	
 	/**@return The layout definition for the container.*/
 	public AbstractValueLayout<? extends ControlConstraints> getLayout() {return (AbstractValueLayout<? extends ControlConstraints>)super.getLayout();}
-
-	/**Whether the value is editable and the control will allow the the user to change the value.*/
-//TODO del	private boolean editable=true;
-
-		/**@return Whether the value is editable and the control will allow the the user to change the value.*/
-//TODO del		public boolean isEditable() {return editable;}
-
-		/**Sets whether the value is editable and the control will allow the the user to change the value.
-		This is a bound property of type <code>Boolean</code>.
-		@param newEditable <code>true</code> if the control should allow the user to change the value.
-		@see #EDITABLE_PROPERTY
-		*/
-/*TODO del
-		public void setEditable(final boolean newEditable)
-		{
-			if(editable!=newEditable)	//if the value is really changing
-			{
-				final boolean oldEditable=editable;	//get the old value
-				editable=newEditable;	//actually change the value
-				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
-			}			
-		}
-*/
 
 	/**The strategy used to generate a component to represent each value in the model.*/
 	private ValueRepresentationStrategy<Component> valueRepresentationStrategy;
@@ -108,38 +95,6 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 						fireSelectionChanged(null, null);	//indicate that the selection changed
 					}			
 				});
-/*TODO del; this isn't needed, and doesn't do what we want
-		layout.addPropertyChangeListener(CardLayout.Constraints.ENABLED_PROPERTY, new PropertyChangeListener()	//listen for the constraints enabled value 
-				{
-					public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//if the value changes
-					{
-						if(propertyChangeEvent instanceof LayoutConstraintsPropertyChangeEvent)
-						{
-							final LayoutConstraintsPropertyChangeEvent<CardLayout.Constraints, Boolean> layoutConstraintsPropertyChangeEvent=(LayoutConstraintsPropertyChangeEvent<CardLayout.Constraints, Boolean>)propertyChangeEvent;	//get the layout constraints change
-							setValueEnabled(layoutConstraintsPropertyChangeEvent.getComponent(), layoutConstraintsPropertyChangeEvent.getNewValue());	//update the enabled status of the index
-						}
-					}			
-				});
-*/
-//TODO del if not needed		this.selectModel=checkNull(layout.getModel(), "Select model cannot be null.");	//save the card layout's value model
-/*TODO del if not needed
-		this.listSelectModel=checkNull(layout.getListSelectModel(), "List select model cannot be null.");	//save the list select model
-		this.listSelectModel.addPropertyChangeListener(getRepeaterPropertyChangeListener());	//listen and repeat all property changes of the value model
-		this.listSelectModel.addListListener(new ListListener<Component>()	//install a repeater list listener to listen to the decorated model
-				{
-					public void listModified(final ListEvent<Component> listEvent)	//if the list is modified
-					{
-						fireListModified(listEvent.getIndex(), listEvent.getAddedElement(), listEvent.getRemovedElement());	//repeat the event, indicating the component as the source of the event
-					}
-				});
-		this.listSelectModel.addListSelectionListener(new ListSelectionListener<Component>()	//install a repeater list selection listener to listen to the decorated model
-				{
-					public void listSelectionChanged(final ListSelectionEvent<Component> selectionEvent)	//if the list selection changes
-					{
-						fireSelectionChanged(selectionEvent.getAddedElement(), selectionEvent.getRemovedElement());	//repeat the event, indicating the component as the source of the event
-					}		
-				});
-*/
 	}
 
 	/**Reports that a bound property has changed.

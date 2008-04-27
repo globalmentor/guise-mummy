@@ -1,10 +1,23 @@
+/*
+ * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.guiseframework.component;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-
-
-
 
 import com.globalmentor.itu.SIUnit;
 import com.globalmentor.java.Objects;
@@ -12,8 +25,7 @@ import com.globalmentor.net.URIPath;
 import com.guiseframework.Bookmark;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
-import com.guiseframework.geometry.Extent;
-import com.guiseframework.geometry.Unit;
+import com.guiseframework.geometry.*;
 import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.*;
 import com.guiseframework.prototype.ActionPrototype;

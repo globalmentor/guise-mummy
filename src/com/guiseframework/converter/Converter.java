@@ -1,3 +1,19 @@
+/*
+ * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.guiseframework.converter;
 
 import static com.globalmentor.java.Classes.*;
@@ -9,7 +25,7 @@ import com.guiseframework.GuiseSession;
 @param <V> The value type this converter supports.
 @param <L> The literal type of the lexical form of the value.
 @author Garret Wilson
-@see GuiseResourceConstants#CONVERTER_INVALID_VALUE_MESSAGE_RESOURCE_REFERENCE
+@see Resources#CONVERTER_INVALID_VALUE_MESSAGE_RESOURCE_REFERENCE
 */
 public interface Converter<V, L> extends PropertyBindable
 {

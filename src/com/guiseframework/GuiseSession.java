@@ -1,3 +1,19 @@
+/*
+ * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.guiseframework;
 
 import java.io.*;
@@ -440,13 +456,6 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory
 
 	/**@return The action prototype for presenting application information.*/
 	public ActionPrototype getAboutApplicationActionPrototype();
-
-	/**Queues a postponed event to be fired after the context has finished processing events.
-	If a Guise context is currently processing events, the event will be queued for later.
-	If no Guise context is currently processing events, the event will be fired immediately.
-	@param postponedEvent The event to fire at a later time.
-	*/
-//TODO del	public void queueEvent(final PostponedEvent<?> postponedEvent);	//TODO complete conversion
 
 	/**Retrieves the component bound to the given destination.
 	If a component has already been created and cached, it will be be returned; otherwise, one will be created and cached. 

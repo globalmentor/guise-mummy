@@ -1,6 +1,20 @@
-package com.guiseframework.model;
+/*
+ * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import java.util.Set;
+package com.guiseframework.model;
 
 /**An implementation of a selection strategy for a select model allowing only a single selection at a time.
 This class is marked final because it demarcates certain selection semantics that, if they can be assumed, may be offloaded to a component's view in certain circumstances. 
@@ -40,21 +54,4 @@ public final class SingleListSelectionPolicy<V> extends AbstractListSelectionPol
 		}
 	}
 
-	/**Determines whether the provided index can be added to the selected indices.
-	This method does default validations and then ensures that only one item is selected at any given time.
-	@param selectModel The model containing the values to select.
-	@param index The index to be selected.
-	@return <code>true</code> if the provided index is valid and no other indices are selected.
-	*/
-/*TODO del when works
-	protected boolean canSelectIndex(final ListSelectModel<V> selectModel, final int index)
-	{
-		final Set<Integer> selectedIndices=getSelectedIndices();	//get the set of selected indices
-		synchronized(selectedIndices)	//don't allow anyone to alter the selected indices while we check its size and contents
-		{
-			return super.canSelectIndex(selectModel, index)	//do default checks
-					&& (selectedIndices.isEmpty() || (selectedIndices.size()==1 && selectedIndices.iterator().next().intValue()==index));	//only allow this selection to be added if there are no selections besides this one
-		}
-	}
-*/
 }

@@ -1,3 +1,19 @@
+/*
+ * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.guiseframework;
 
 import java.io.*;
@@ -43,27 +59,6 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	/**The thread-safe map of Guise applications keyed to application base paths.*/
 	private final Map<URIPath, AbstractGuiseApplication> applicationMap=new ConcurrentHashMap<URIPath, AbstractGuiseApplication>();
 
-	/**The thread-safe reverse map of thread groups for Guise sessions.*/
-//TODO del	private final ReverseMap<GuiseSession, ThreadGroup> sessionThreadGroupReverseMap=new DecoratorReverseMap<GuiseSession, ThreadGroup>(new ConcurrentHashMap<GuiseSession, ThreadGroup>(), new ConcurrentHashMap<ThreadGroup, GuiseSession>());
-
-	/**Determines the thread group to use for the given session.
-	This method must not be called for a session that has not yet been added to the container.
-	@param guiseSession The session for which a thread group is requested.
-	@return The thread group to use for the given session.
-	@exception IllegalStateException if the given session has not yet been associated with a thread group because it has not yet been added to the container.
-	*/
-/*TODO del
-	protected ThreadGroup getThreadGroup(final GuiseSession guiseSession)
-	{
-		final ThreadGroup threadGroup=sessionThreadGroupReverseMap.get(guiseSession);	//retrieve the thread group associated with the given session
-		if(threadGroup==null)	//if there is no thread group for this session
-		{
-			throw new IllegalStateException("Guise session "+guiseSession+" not yet associated with a thread group.");
-		}
-		return threadGroup;	//return the thread group
-	}
-*/
-	
 	/**Adds and initializes a Guise session.
 	This version creates a thread group for the session.
 	The Guise session will be registered with the Guise application before it is initialized.

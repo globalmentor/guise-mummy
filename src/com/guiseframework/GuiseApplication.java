@@ -1,3 +1,19 @@
+/*
+ * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.guiseframework;
 
 import java.io.*;
@@ -65,19 +81,6 @@ public interface GuiseApplication extends Resource, PropertyBindable
 			public final static URIPath GUISE_BASIC_THEME_PATH=GUISE_BASIC_THEME_BASE_PATH.resolve("basic.theme.turf");
 	/**The base path of the default Guise theme cursors, relative to the application.*/
 	public final static URIPath GUISE_ROOT_THEME_CURSORS_PATH=GUISE_ROOT_THEME_BASE_PATH.resolve("cursors/");
-
-	/**@return The application locale used by default if a new session cannot determine the users's preferred locale.*/
-//TODO del	public Locale getDefaultLocale();
-
-	/**Sets the application locale used by default if a new session cannot determine the users's preferred locale.
-	This is a bound property.
-	@param newDefaultLocale The new default application locale.
-	@see #DEFAULT_LOCALE_PROPERTY
-	*/
-//TODO del	public void setDefaultLocale(final Locale newDefaultLocale);
-
-	/**@return The thread-safe set of locales supported by this application.*/
-//TODO del	public Set<Locale> getSupportedLocales();
 
 	/**@return The read-only non-empty list of locales supported by the application, with the first locale the default used if a new session cannot determine the users's preferred locale.*/
 	public List<Locale> getLocales();

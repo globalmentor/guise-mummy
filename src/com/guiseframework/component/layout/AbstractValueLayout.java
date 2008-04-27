@@ -1,3 +1,19 @@
+/*
+ * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.guiseframework.component.layout;
 
 import static java.text.MessageFormat.*;
@@ -6,13 +22,11 @@ import java.beans.*;
 
 import com.globalmentor.java.Objects;
 import com.globalmentor.util.Debug;
-import com.guiseframework.component.Component;
-import com.guiseframework.component.Container;
-import com.guiseframework.component.LayoutComponent;
+import com.guiseframework.component.*;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
-import static com.guiseframework.GuiseResourceConstants.*;
+import static com.guiseframework.Resources.*;
 import static com.guiseframework.model.AbstractValueModel.createPropertyVetoException;
 
 /**A layout that manages the selection of child components, only one of which can be selected at a time.
