@@ -75,13 +75,22 @@ public class Bookmark implements Cloneable
 		setParameters(bookmarkParameters);	//set the parameters
 	}
 	
-	/**ID and optional parameters constructor.
+	/**Parameter list constructor.
 	If there are parameters with duplicate names, only the first ones are used and the rest with the same name are ignored.
-	@param id The bookmark ID.
-	@param parameters The optional bookmark parameters.
-	@exception NullPointerException if the given ID and/or the parameters array is <code>null</code>.
+	@param parameters The bookmark parameters.
+	@exception NullPointerException if the given parameters list is <code>null</code>.
 	*/
-	public Bookmark(/*TODO del final String id, */final Parameter... parameters)
+	public Bookmark(final List<Parameter> parameters)
+	{
+		setParameters(parameters);	//set the parameters
+	}
+
+	/**Parameter array constructor.
+	If there are parameters with duplicate names, only the first ones are used and the rest with the same name are ignored.
+	@param parameters The optional bookmark parameters.
+	@exception NullPointerException if the given parameters array is <code>null</code>.
+	*/
+	public Bookmark(final Parameter... parameters)
 	{
 		setParameters(parameters);	//set the parameters
 	}
@@ -92,6 +101,23 @@ public class Bookmark implements Cloneable
 	@param parameters The optional bookmark parameters.
 	*/
 	protected void setParameters(final Parameter...parameters)
+	{
+		for(final Parameter parameter:parameters)	//for each parameter
+		{
+			final String parameterName=parameter.getName();	//get the parameter name
+			if(!parameterMap.containsKey(parameterName))	//if this parameter is not already stored in the map
+			{
+				parameterMap.put(parameterName, parameter);	//store this parameter in the map
+			}
+		}		
+	}
+
+	/**Sets bookmark parameters.
+	If there are parameters with duplicate names, only the first ones are used and the rest with the same name are ignored.
+	This method should only be called during constructor initialization.
+	@param parameters The optional bookmark parameters.
+	*/
+	protected void setParameters(final List<Parameter> parameters)
 	{
 		for(final Parameter parameter:parameters)	//for each parameter
 		{
