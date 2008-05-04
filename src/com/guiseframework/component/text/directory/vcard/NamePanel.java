@@ -20,17 +20,16 @@ import java.beans.PropertyVetoException;
 import java.util.Collection;
 import java.util.Locale;
 
-
 import com.globalmentor.text.directory.vcard.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 
 import static com.globalmentor.text.TextFormatter.*;
-import static com.globalmentor.text.directory.vcard.VCardConstants.*;
+import static com.globalmentor.text.directory.vcard.VCard.*;
 import static com.globalmentor.util.Arrays.*;
 import static com.guiseframework.Resources.*;
 
-/**A panel allowing entry of the {@value VCardConstants#N_TYPE} type of a vCard <code>text/directory</code>
+/**A panel allowing entry of the {@value VCard#N_TYPE} type of a vCard <code>text/directory</code>
 	profile as defined in <a href="http://www.ietf.org/rfc/rfc2426.txt">RFC 2426</a>, "vCard MIME Directory Profile".
 @author Garret Wilson
 */
