@@ -313,6 +313,9 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	/**The strategy for processing prototypes provisions from child prototype providers, along with this frame's prototype provisions.*/
 	private final FrameMenuToolPrototypeProvisionStrategy prototypeProvisionStrategy=new FrameMenuToolPrototypeProvisionStrategy(this, defaultPrototypeProvider);
 
+		/**@return The strategy for processing prototypes provisions from child prototype providers, along with this frame's prototype provisions.*/
+		protected FrameMenuToolPrototypeProvisionStrategy getPrototypeProvisionStrategy() {return prototypeProvisionStrategy;}
+
 	/**The action listener for closing the frame.*/
 	private final ActionListener closeActionListener;
 		

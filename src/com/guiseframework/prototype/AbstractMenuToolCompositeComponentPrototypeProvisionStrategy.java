@@ -45,6 +45,12 @@ public abstract class AbstractMenuToolCompositeComponentPrototypeProvisionStrate
 	/**The reverse map of tool components that have been used to represent processed prototypes, keyed to the prototype infos they represent; this map uses the same locks as the one for menu components.*/
 	private ReadWriteLockReverseMap<PrototypeProvision<?>, Component> prototypeProvisionToolComponentMap=new DecoratorReadWriteLockReverseMap<PrototypeProvision<?>, Component>(new HashMap<PrototypeProvision<?>, Component>(), new HashMap<Component, PrototypeProvision<?>>(), this);
 
+	/**The weak set of static components in the menu or the toolbar that should be displayed last; all components based upon prototypes will be inserted before the components.*/
+	private final Set<Component> lastComponents=new DecoratorReadWriteLockSet<Component>(new WeakHashSet<Component>(), this);
+	
+		/**The weak set of static components in the menu or the toolbar that should be displayed last; all components based upon prototypes will be inserted before the components.*/
+		public Set<Component> getLastComponents() {return lastComponents;}
+
 	/**Parent component and prototype providers constructor.
 	@param parentComponent The composite component the top-level prototype provider children of which will be monitored.
 	@param defaultPrototypeProviders The default prototype providers that will provide prototypes for processing, outside the children of the composite component parent.
@@ -215,13 +221,16 @@ public abstract class AbstractMenuToolCompositeComponentPrototypeProvisionStrate
 
 	/**Adds a prototype to a container in the correct order by examining the prototype information of the other components added to the container
 	The prototype is inserted before the first component that was created from prototype info with a larger order.
+	The prototype will be inserted before any component present in the set returned by {@link #getLastComponents()}.
 	@param container The container to which the prototype should be added.
 	@param prototypeProvision The prototype information to add.
 	@return The component that was created to represent the prototype.
 	@see PrototypeProvision#getOrder()
+	@see #getLastComponents()
 	*/
 	protected Component add(final Container container, final PrototypeProvision<?> prototypeProvision)
 	{
+		final Set<Component> lastComponents=getLastComponents();	//get the components to appear last
 		final double order=prototypeProvision.getOrder();	//get the prototype's order
 		int index=0;	//keep track of the child component index
 		for(final Component childComponent:container)	//for each child component in the container
@@ -233,7 +242,14 @@ public abstract class AbstractMenuToolCompositeComponentPrototypeProvisionStrate
 			}
 			else	//if this component wasn't created from a prototype, or the prototype info had a lower order than the new one
 			{
-				++index;	//go to the next index
+				if(getLastComponents().contains(childComponent))	//if this component should always be displayed last
+				{
+					break;	//use this index
+				}
+				else	//if we don't recognize this component
+				{
+					++index;	//go to the next index
+				}
 			}
 		}
 		return container.add(index, prototypeProvision.getPrototype());	//insert the prototype in front of the existing child component (or at the end, if there was no lower prototype info) and return the created child component
