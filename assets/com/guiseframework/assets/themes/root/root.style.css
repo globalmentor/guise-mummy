@@ -64,15 +64,54 @@ Drag and Drop classes
 
 /*global presets to meet Guise theme default expectations*/
 
-/*remove borders, padding, and margins; initialize default fonts and colors*/
-a.component, caption.component, div.component, img.component, label.component, table.component, th.component, td.component, span.component
+/*remove borders, padding, and margins, including link components*/
+a.component,
+caption.component,
+div.component,
+h1.component, h2.component, h3.component, h4.component, h5.component, h6.component,
+img.component,
+label.component,
+table.component,
+th.component,
+td.component,
+span.component,
+
+a.component caption,
+a.component div,
+a.component h1, a.component h2, a.component h3, a.component h4, a.component h5, a.component h6,
+a.component img,
+a.component label,
+a.component table,
+a.component span
+
 {
 	border: 0;
 	border-style: none;
-	font-style: normal;
-	font-weight: normal;
 	margin: 0;
 	padding: 0;
+}
+
+/*initialize default fonts and colors, including link components*/
+a.component,
+caption.component,
+div.component,
+img.component,
+label.component,
+table.component,
+th.component,
+td.component,
+span.component,
+
+a.component caption,
+a.component div,
+a.component img,
+a.component label,
+a.component table,
+a.component span
+
+{
+	font-style: normal;
+	font-weight: normal;
 }
 
 a.component
