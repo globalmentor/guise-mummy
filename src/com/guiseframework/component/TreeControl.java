@@ -222,7 +222,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		this.treeModel.addActionListener(repeatActionListener);	//listen and repeat all actions of the tree model
 			//TODO listen for and repeat tree model-specific events
 		setTreeNodeRepresentationStrategy(Object.class, new DefaultValueRepresentationStrategy<Object>(Object.class));	//create a default representation strategy and set it as the default by associating it with the Object class
-		setTreeNodeRepresentationStrategy(LabelModel.class, new LabelModelTreeNodeRepresentationStrategy());	//create and associate a label model representation strategy
+		setTreeNodeRepresentationStrategy(InfoModel.class, new InfoModelTreeNodeRepresentationStrategy());	//create and associate a label model representation strategy
 //TODO fix		setTreeNodeRepresentationStrategy(MessageModel.class, new MessageModelRepresentationStrategy(session));	//create and associate a message model representation strategy
 		setTreeNodeRepresentationStrategy(TextModel.class, new TextModelTreeNodeRepresentationStrategy());	//create and associate a text model representation strategy
 		addPropertyChangeListener(TreeNodeModel.SELECTED_PROPERTY, new TreeNodeSelectChangeListener());	//TODO comment
@@ -374,7 +374,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 			}
 			else	//if the component should not be editable, return a label component
 			{
-				return new SelectableLabel(new ValueConverterLabelModel<V>(treeNode.getValue(), getConverter()));	//create a label that will convert the value to a string
+				return new SelectableLabel(new ValueConverterInfoModel<V>(treeNode.getValue(), getConverter()));	//create a label that will convert the value to a string
 			}
 		}
 	}
@@ -383,7 +383,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	@see Label
 	@author Garret Wilson
 	*/
-	public static class LabelModelTreeNodeRepresentationStrategy extends AbstractTreeNodeRepresentationStrategy<LabelModel>
+	public static class InfoModelTreeNodeRepresentationStrategy extends AbstractTreeNodeRepresentationStrategy<InfoModel>
 	{
 
 		/**Creates a label to represent the given tree node.
@@ -396,7 +396,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		@param focused <code>true</code> if the value has the focus.
 		@return A new component to represent the given value.
 		*/
-		public <N extends LabelModel> Label createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
+		public <N extends InfoModel> Label createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 		{
 			return new Label(treeNode.getValue());	//return a label from the label model
 		}

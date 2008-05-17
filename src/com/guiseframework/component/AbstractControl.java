@@ -126,16 +126,16 @@ public abstract class AbstractControl extends AbstractComponent implements Contr
 		setNotification(null);	//clear any notification
 	}
 
-	/**Label model and enableable object constructor.
-	@param labelModel The component label model.
+	/**Info model and enableable object constructor.
+	@param infoModel The component info model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given label model and/or enableable object is <code>null</code>.
+	@exception NullPointerException if the given info model and/or enableable object is <code>null</code>.
 	*/
-	public AbstractControl(final LabelModel labelModel, final Enableable enableable)
+	public AbstractControl(final InfoModel infoModel, final Enableable enableable)
 	{
-		super(labelModel);	//construct the parent class
+		super(infoModel);	//construct the parent class
 		this.enableable=checkInstance(enableable, "Enableable object cannot be null.");	//save the enableable object
-		if(enableable!=labelModel)	//if the enableable and the label model are two different objects (we don't want to repeat property change events twice) TODO eventually just listen to specific events for each object
+		if(enableable!=infoModel)	//if the enableable and the info model are two different objects (we don't want to repeat property change events twice) TODO eventually just listen to specific events for each object
 		{
 			this.enableable.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the enableable object
 		}

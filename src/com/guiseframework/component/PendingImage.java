@@ -67,7 +67,7 @@ public class PendingImage extends Image implements PendingImageComponent
 	/**Default constructor.*/
 	public PendingImage()
 	{
-		this(new DefaultLabelModel(), new DefaultImageModel());	//construct the parent class with default models
+		this(new DefaultInfoModel(), new DefaultImageModel());	//construct the parent class with default models
 	}
 
 	/**Image model constructor.
@@ -76,17 +76,17 @@ public class PendingImage extends Image implements PendingImageComponent
 	*/
 	public PendingImage(final ImageModel imageModel)
 	{
-		this(new DefaultLabelModel(), imageModel);	//construct the parent class with a default label model
+		this(new DefaultInfoModel(), imageModel);	//construct the parent class with a default info model
 	}
 
-	/**Label model and image model constructor.
-	@param labelModel The component label model.
+	/**Info model and image model constructor.
+	@param infoModel The component info model.
 	@param imageModel The component image model.
-	@exception NullPointerException if the given label model and/or image model is <code>null</code>.
+	@exception NullPointerException if the given info model and/or image model is <code>null</code>.
 	*/
-	public PendingImage(final LabelModel labelModel, final ImageModel imageModel)
+	public PendingImage(final InfoModel infoModel, final ImageModel imageModel)
 	{
-		super(labelModel, imageModel);	//construct the parent class
+		super(infoModel, imageModel);	//construct the parent class
 		if(!(imageModel instanceof PendingImageModel))	//if the image model is not a pending image model, the presence/absence of the image model will change the image pending status
 		{
 			imageModel.addPropertyChangeListener(IMAGE_URI_PROPERTY, new AbstractGenericPropertyChangeListener<URI>()	//listen for the image URI changing

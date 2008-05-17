@@ -25,7 +25,7 @@ The table column model by default is not editable.
 @param <V> The type of values contained in the table column.
 @author Garret Wilson
 */
-public class DefaultTableColumnModel<V> extends DefaultLabelModel implements TableColumnModel<V>
+public class DefaultTableColumnModel<V> extends DefaultInfoModel implements TableColumnModel<V>
 {
 
 	/**The class representing the type of values this model can hold.*/

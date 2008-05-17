@@ -106,22 +106,22 @@ public abstract class AbstractArrayCompositeComponent extends AbstractMultipleCo
 		return false;	//all components in the array are null; we have no child components
 	}
 
-	/**Maximum component count constructor with a default label model.
+	/**Maximum component count constructor with a default info model.
 	@param maxComponentCount The maximum number of child components to support.
 	*/
 	public AbstractArrayCompositeComponent(final int maxComponentCount)
 	{
-		this(new DefaultLabelModel(), maxComponentCount);	//construct the class with a default label model
+		this(new DefaultInfoModel(), maxComponentCount);	//construct the class with a default info model
 	}
 
-	/**Label model and maximum component count constructor.
-	@param labelModel The component label model.
+	/**Info model and maximum component count constructor.
+	@param infoModel The component info model.
 	@param maxComponentCount The maximum number of child components to support.
-	@exception NullPointerException if the given label model is <code>null</code>.
+	@exception NullPointerException if the given info model is <code>null</code>.
 	*/
-	public AbstractArrayCompositeComponent(final LabelModel labelModel, final int maxComponentCount)	//TODO check the range of the maximum component count
+	public AbstractArrayCompositeComponent(final InfoModel infoModel, final int maxComponentCount)	//TODO check the range of the maximum component count
 	{
-		super(labelModel);	//construct the parent class
+		super(infoModel);	//construct the parent class
 		componentArray=new Component[maxComponentCount];	//create an array of components of the appropriate length
 		fill(componentArray, null);	//fill the array with nulls
 	}

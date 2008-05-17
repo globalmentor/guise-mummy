@@ -49,18 +49,18 @@ public class Heading extends AbstractLabel implements HeadingComponent
 			}			
 		}
 
-	/**Default constructor with a default label model.*/
+	/**Default constructor with a default info model.*/
 	public Heading()
 	{
 		this(NO_HEADING_LEVEL);	//construct the class with a default model with no heading level
 	}
 
-	/**Heading level constructor with a default label model.
+	/**Heading level constructor with a default info model.
 	@param level The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
 	*/
 	public Heading(final int level)
 	{
-		this(new DefaultLabelModel(), level);	//construct the class with a default model
+		this(new DefaultInfoModel(), level);	//construct the class with a default model
 	}
 
 	/**Label constructor.
@@ -68,16 +68,16 @@ public class Heading extends AbstractLabel implements HeadingComponent
 	*/
 	public Heading(final String label)
 	{
-		this(new DefaultLabelModel(label));	//construct the heading with a default label model and the given label text
+		this(new DefaultInfoModel(label));	//construct the heading with a default info model and the given label text
 	}
 
-	/**Label model constructor.
-	@param labelModel The component label model.
-	@exception NullPointerException if the given label model is <code>null</code>.
+	/**Info model constructor.
+	@param infoModel The component info model.
+	@exception NullPointerException if the given info model is <code>null</code>.
 	*/
-	public Heading(final LabelModel labelModel)
+	public Heading(final InfoModel infoModel)
 	{
-		this(labelModel, NO_HEADING_LEVEL);	//construct the class with no heading level
+		this(infoModel, NO_HEADING_LEVEL);	//construct the class with no heading level
 	}
 
 	/**Label and level constructor.
@@ -86,17 +86,17 @@ public class Heading extends AbstractLabel implements HeadingComponent
 	*/
 	public Heading(final String label, final int level)
 	{
-		this(new DefaultLabelModel(label), level);	//construct the heading with a default label model and the given label text
+		this(new DefaultInfoModel(label), level);	//construct the heading with a default info model and the given label text
 	}
 
-	/**Label model and level constructor.
-	@param labelModel The component label model.
+	/**Info model and level constructor.
+	@param infoModel The component info model.
 	@param level The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
-	@exception NullPointerException if the given session label model is <code>null</code>.
+	@exception NullPointerException if the given session info model is <code>null</code>.
 	*/
-	public Heading(final LabelModel labelModel, final int level)
+	public Heading(final InfoModel infoModel, final int level)
 	{
-		super(labelModel);	//construct the parent class
+		super(infoModel);	//construct the parent class
 		this.level=level;	//save the level
 	}
 }

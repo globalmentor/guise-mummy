@@ -60,7 +60,7 @@ public class InternationalizationPanel extends LayoutPanel
 			//create check controls for each locale supported by the application (defined in the web.xml file, for example)
 		for(final Locale supportedLocale:supportedLocales)	//for each supported locale
 		{
-			final LabelModel localeLabelModel=new LocaleLabelModel(supportedLocale);	//create a label model to represent the locale
+			final InfoModel localeLabelModel=new LocaleInfoModel(supportedLocale);	//create a label model to represent the locale
 				//create a check control, using the locale label model
 			final CheckControl checkControl=new CheckControl(localeLabelModel);
 			checkControl.setCheckType(CheckControl.CheckType.ELLIPSE);	//show the check as an ellipse
@@ -98,7 +98,7 @@ public class InternationalizationPanel extends LayoutPanel
 				//create a converter to convert the date to a string in long format using the current locale
 		final Converter<Date, String> dateConverter=new DateStringLiteralConverter(DateStringLiteralStyle.LONG);
 			//create a label with the current date using the converter we created to show the date in the label
-		final Label dateLabel=new Label(new ValueConverterLabelModel<Date>(new Date(), dateConverter));
+		final Label dateLabel=new Label(new ValueConverterInfoModel<Date>(new Date(), dateConverter));
 		dateMenu.add(dateLabel);	//add the date label to the date menu
 		
 		menu.add(dateMenu);	//add the date menu to the horizontal menu

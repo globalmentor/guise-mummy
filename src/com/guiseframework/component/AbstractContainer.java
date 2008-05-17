@@ -19,8 +19,7 @@ package com.guiseframework.component;
 import java.util.*;
 
 import com.guiseframework.component.layout.*;
-import com.guiseframework.model.DefaultLabelModel;
-import com.guiseframework.model.LabelModel;
+import com.guiseframework.model.*;
 import com.guiseframework.prototype.*;
 import com.guiseframework.validator.RangeValidator;
 
@@ -356,23 +355,23 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 		super.setLayout(newLayout);	//delegate to the parent class
 	}
 
-	/**Layout constructor with a default label model.
+	/**Layout constructor with a default info model.
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
 	public AbstractContainer(final Layout<? extends Constraints> layout)
 	{
-		this(new DefaultLabelModel(), layout);	//construct the class with a default label model
+		this(new DefaultInfoModel(), layout);	//construct the class with a default info model
 	}
 
-	/**Label model and layout constructor.
-	@param labelModel The component label model.
+	/**Info model and layout constructor.
+	@param infoModel The component info model.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given label model and/or layout is <code>null</code>.
+	@exception NullPointerException if the given info model and/or layout is <code>null</code>.
 	*/
-	public AbstractContainer(final LabelModel labelModel, final Layout<? extends Constraints> layout)
+	public AbstractContainer(final InfoModel infoModel, final Layout<? extends Constraints> layout)
 	{
-		super(labelModel, layout);	//construct the parent class
+		super(infoModel, layout);	//construct the parent class
 	}
 
 }

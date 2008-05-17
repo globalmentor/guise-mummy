@@ -27,7 +27,7 @@ public class Image extends AbstractImageComponent
 	/**Default constructor.*/
 	public Image()
 	{
-		this(new DefaultLabelModel(), new DefaultImageModel());	//construct the parent class with default models
+		this(new DefaultInfoModel(), new DefaultImageModel());	//construct the parent class with default models
 	}
 
 	/**Image model constructor.
@@ -36,17 +36,17 @@ public class Image extends AbstractImageComponent
 	*/
 	public Image(final ImageModel imageModel)
 	{
-		this(new DefaultLabelModel(), imageModel);	//construct the parent class with a default label model
+		this(new DefaultInfoModel(), imageModel);	//construct the parent class with a default info model
 	}
 
-	/**Label model and image model constructor.
-	@param labelModel The component label model.
+	/**Info model and image model constructor.
+	@param infoModel The component info model.
 	@param imageModel The component image model.
-	@exception NullPointerException if the given label model and/or image model is <code>null</code>.
+	@exception NullPointerException if the given info model and/or image model is <code>null</code>.
 	*/
-	public Image(final LabelModel labelModel, final ImageModel imageModel)
+	public Image(final InfoModel infoModel, final ImageModel imageModel)
 	{
-		super(labelModel, imageModel);	//construct the parent class
+		super(infoModel, imageModel);	//construct the parent class
 	}
 
 }

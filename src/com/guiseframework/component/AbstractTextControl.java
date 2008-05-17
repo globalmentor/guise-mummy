@@ -257,7 +257,7 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V>
 	*/
 	public AbstractTextControl(final ValueModel<V> valueModel, final Converter<V, String> converter)
 	{
-		super(new DefaultLabelModel(), valueModel, new DefaultEnableable());	//construct the parent class
+		super(new DefaultInfoModel(), valueModel, new DefaultEnableable());	//construct the parent class
 		this.valueContentType=PLAIN_TEXT_CONTENT_TYPE;
 		this.converter=checkInstance(converter, "Converter cannot be null");	//save the converter
 		updateText();	//initialize the text with the literal form of the initial model value

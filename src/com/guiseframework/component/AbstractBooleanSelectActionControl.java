@@ -146,16 +146,16 @@ public abstract class AbstractBooleanSelectActionControl extends AbstractActionV
 			}			
 		}
 
-	/**Label model, action model, value model, and enableable object constructor.
-	@param labelModel The component label model.
+	/**Info model, action model, value model, and enableable object constructor.
+	@param infoModel The component info model.
 	@param actionModel The component action model.
 	@param valueModel The component value model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given label model, action model, and/or enableable object is <code>null</code>.
+	@exception NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
 	*/
-	public AbstractBooleanSelectActionControl(final LabelModel labelModel, final ActionModel actionModel, final ValueModel<Boolean> valueModel, final Enableable enableable)
+	public AbstractBooleanSelectActionControl(final InfoModel infoModel, final ActionModel actionModel, final ValueModel<Boolean> valueModel, final Enableable enableable)
 	{
-		super(labelModel, actionModel, valueModel, enableable);	//construct the parent class
+		super(infoModel, actionModel, valueModel, enableable);	//construct the parent class
 		setValidator(new ValueRequiredValidator<Boolean>());	//install a value-required validator
 		addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>()	//listen for the value changing
 				{

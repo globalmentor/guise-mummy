@@ -21,7 +21,7 @@ import static com.globalmentor.java.Objects.*;
 import java.io.IOException;
 import java.util.*;
 
-import com.guiseframework.model.LabelModel;
+import com.guiseframework.model.InfoModel;
 
 import static java.util.Collections.*;
 
@@ -163,13 +163,13 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 		throw new IllegalArgumentException("Component "+component+" not representing any object.");
 	}
 
-	/**Label model constructor.
-	@param labelModel The component label model.
-	@exception NullPointerException if the given label model is <code>null</code>.
+	/**Info model constructor.
+	@param infoModel The component info model.
+	@exception NullPointerException if the given info model is <code>null</code>.
 	*/
-	public AbstractCompositeStateComponent(final LabelModel labelModel)
+	public AbstractCompositeStateComponent(final InfoModel infoModel)
 	{
-		super(labelModel);	//construct the parent class
+		super(infoModel);	//construct the parent class
 	}
 
 	/**Creates a component state to represent the given object.

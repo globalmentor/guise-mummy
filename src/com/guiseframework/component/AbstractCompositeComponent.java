@@ -19,16 +19,14 @@ package com.guiseframework.component;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
-
 import static com.globalmentor.java.Objects.*;
-
 
 import com.globalmentor.beans.*;
 import com.globalmentor.event.TargetedEvent;
 import com.globalmentor.util.Debug;
 import com.guiseframework.event.*;
 import com.guiseframework.input.*;
-import com.guiseframework.model.LabelModel;
+import com.guiseframework.model.InfoModel;
 
 /**An abstract implementation of a composite component.
 Every child component must be added or removed using {@link #addComponent(Component)} and {@link #removeComponent(Component)}, although other actions may take place.
@@ -217,13 +215,13 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	}
 */
 
-	/**Label model constructor.
-	@param labelModel The component label model.
-	@exception NullPointerException if the given label model is <code>null</code>.
+	/**Info model constructor.
+	@param infoModel The component info model.
+	@exception NullPointerException if the given info model is <code>null</code>.
 	*/
-	public AbstractCompositeComponent(final LabelModel labelModel)
+	public AbstractCompositeComponent(final InfoModel infoModel)
 	{
-		super(labelModel);	//construct the parent class
+		super(infoModel);	//construct the parent class
 	}
 
 	/**Called when the {@link Component#VALID_PROPERTY} of a child component changes.

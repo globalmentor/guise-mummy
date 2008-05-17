@@ -618,12 +618,12 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 		}
 	}
 
-	/**A list select value representation strategy that creates a component by converting the value to a label model.
-	The specified component class must have a constructor that takes a single {@link LabelModel} as an argument.
+	/**A list select value representation strategy that creates a component by converting the value to a info model.
+	The specified component class must have a constructor that takes a single {@link InfoModel} as an argument.
 	@param <VV> The type of value the strategy is to represent.
 	@author Garret Wilson
 	*/
-	public static class ConverterLabelModelValueRepresentationStrategy<VV> implements ValueRepresentationStrategy<VV>
+	public static class ConverterInfoModelValueRepresentationStrategy<VV> implements ValueRepresentationStrategy<VV>
 	{
 	
 		/**The converter to use for displaying the value as a string.*/
@@ -632,17 +632,17 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 			/**@return The converter to use for displaying the value as a string.*/
 			public Converter<VV, String> getConverter() {return converter;}
 
-		/**The component constructor that takes a single {@link LabelModel} argument.*/
-		private final Constructor<? extends Component> componentLabelModelConstructor;
+		/**The component constructor that takes a single {@link InfoModel} argument.*/
+		private final Constructor<? extends Component> componentInfoModelConstructor;
 
 		/**Value class constructor with a default converter.
 		This implementation uses a {@link DefaultStringLiteralConverter}.
 		@param valueClass The class indicating the type of value to convert.
 		@param componentClass The class of component to create.
 		@exception NullPointerException if the given value class and/or component class is <code>null</code>.
-		@exception IllegalArgumentException if the given component class does not have a constructor with a single {@link LabelModel} constructor.
+		@exception IllegalArgumentException if the given component class does not have a constructor with a single {@link InfoModel} constructor.
 		*/
-		public ConverterLabelModelValueRepresentationStrategy(final Class<VV> valueClass, final Class<? extends Component> componentClass)
+		public ConverterInfoModelValueRepresentationStrategy(final Class<VV> valueClass, final Class<? extends Component> componentClass)
 		{
 			this(componentClass, AbstractStringLiteralConverter.getInstance(valueClass));	//construct the class with the appropriate string literal converter
 		}
@@ -651,20 +651,20 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 		@param converter The converter to use for displaying the value as a string.
 		@param componentClass The class of component to create.
 		@exception NullPointerException if the given converter is <code>null</code>.
-		@exception IllegalArgumentException if the given component class does not have a constructor with a single {@link LabelModel} constructor.
+		@exception IllegalArgumentException if the given component class does not have a constructor with a single {@link InfoModel} constructor.
 		*/
-		public ConverterLabelModelValueRepresentationStrategy(final Class<? extends Component> componentClass, final Converter<VV, String> converter)
+		public ConverterInfoModelValueRepresentationStrategy(final Class<? extends Component> componentClass, final Converter<VV, String> converter)
 		{
 			this.converter=checkInstance(converter, "Converter cannot be null.");	//save the converter
-			componentLabelModelConstructor=getCompatibleConstructor(checkInstance(componentClass, "Component class cannot be null."), LabelModel.class);	//get the constructor for the component
-			if(componentLabelModelConstructor==null)	//if there is no appropriate constructor
+			componentInfoModelConstructor=getCompatibleConstructor(checkInstance(componentClass, "Component class cannot be null."), InfoModel.class);	//get the constructor for the component
+			if(componentInfoModelConstructor==null)	//if there is no appropriate constructor
 			{
-				throw new IllegalArgumentException("Component class "+componentClass+" has no constructor with a single label model parameter.");
+				throw new IllegalArgumentException("Component class "+componentClass+" has no constructor with a single info model parameter.");
 			}
 		}
 
 		/**Creates a component for the given list value.
-		This implementation constructs a component from a label model that converts the value using the saved converter.
+		This implementation constructs a component from a info model that converts the value using the saved converter.
 		@param model The model containing the value.
 		@param value The value for which a component should be created.
 		@param index The index of the value within the list, or -1 if the value is not in the list (e.g. for representing no selection).
@@ -677,7 +677,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 		{
 			try
 			{
-				return componentLabelModelConstructor.newInstance(new ValueConverterLabelModel<VV>(value, getConverter()));	//create a component that will convert the value to a string in a label model
+				return componentInfoModelConstructor.newInstance(new ValueConverterInfoModel<VV>(value, getConverter()));	//create a component that will convert the value to a string in a info model
 			}
 			catch(final InstantiationException instantiationException)
 			{
@@ -700,7 +700,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	@see Label
 	@author Garret Wilson
 	*/
-	public static class DefaultValueRepresentationStrategy<VV> extends ConverterLabelModelValueRepresentationStrategy<VV>
+	public static class DefaultValueRepresentationStrategy<VV> extends ConverterInfoModelValueRepresentationStrategy<VV>
 	{
 
 		/**Value class constructor with a default converter.

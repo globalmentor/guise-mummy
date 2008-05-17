@@ -69,13 +69,13 @@ public class CheckControl extends AbstractEditValueControl<Boolean>
 			}			
 		}
 
-	/**Default constructor with a default label model and a default value model.*/
+	/**Default constructor with a default info model and a default value model.*/
 	public CheckControl()
 	{
 		this(new DefaultValueModel<Boolean>(Boolean.class, Boolean.FALSE));	//construct the class with a value model
 	}
 
-	/**Check type constructor with a default label model and value model.
+	/**Check type constructor with a default info model and value model.
 	@param checkType The type of check area presented to the user, or <code>null</code> if the check type should be determined automatically.
 	*/
 	public CheckControl(final CheckType checkType)
@@ -88,7 +88,7 @@ public class CheckControl extends AbstractEditValueControl<Boolean>
 	*/
 	public CheckControl(final String label)
 	{
-		this(label, null);	//construct the label model with no icon		
+		this(label, null);	//construct the info model with no icon		
 	}
 
 	/**Label and icon constructor.
@@ -97,26 +97,26 @@ public class CheckControl extends AbstractEditValueControl<Boolean>
 	*/
 	public CheckControl(final String label, final URI icon)
 	{
-		this(new DefaultLabelModel(label, icon));	//construct the class, indicating that a default value model should be used
+		this(new DefaultInfoModel(label, icon));	//construct the class, indicating that a default value model should be used
 	}
 
-	/**Label model constructor.
-	@param labelModel The component label model.
-	@exception NullPointerException if the given label model is <code>null</code>.
+	/**Info model constructor.
+	@param infoModel The component info model.
+	@exception NullPointerException if the given info model is <code>null</code>.
 	*/
-	public CheckControl(final LabelModel labelModel)
+	public CheckControl(final InfoModel infoModel)
 	{
-		this(labelModel, new DefaultValueModel<Boolean>(Boolean.class, Boolean.FALSE));	//construct the class, indicating that a default value model should be used
+		this(infoModel, new DefaultValueModel<Boolean>(Boolean.class, Boolean.FALSE));	//construct the class, indicating that a default value model should be used
 	}
 
-	/**Label model and value model constructor.
-	@param labelModel The component label model.
+	/**Info model and value model constructor.
+	@param infoModel The component info model.
 	@param valueModel The component value model.
-	@exception NullPointerException if the given label model and/or value model is <code>null</code>.
+	@exception NullPointerException if the given info model and/or value model is <code>null</code>.
 	*/
-	public CheckControl(final LabelModel labelModel, final ValueModel<Boolean> valueModel)
+	public CheckControl(final InfoModel infoModel, final ValueModel<Boolean> valueModel)
 	{
-		this(labelModel, valueModel, null);	//construct the class, indicating that the default check type should be used
+		this(infoModel, valueModel, null);	//construct the class, indicating that the default check type should be used
 	}
 
 	/**Value model constructor.
@@ -135,30 +135,30 @@ public class CheckControl extends AbstractEditValueControl<Boolean>
 	*/
 	public CheckControl(final ValueModel<Boolean> valueModel, final CheckType checkType)
 	{
-		this(new DefaultLabelModel(), valueModel, checkType);	//construct the class with a default label model
+		this(new DefaultInfoModel(), valueModel, checkType);	//construct the class with a default info model
 	}
 
-	/**Label model, value model and check type constructor.
-	@param labelModel The component label model.
+	/**Info model, value model and check type constructor.
+	@param infoModel The component info model.
 	@param valueModel The component value model.
 	@param checkType The type of check area presented to the user, or <code>null</code> if the check type should be determined automatically.
-	@exception NullPointerException if the given value model, and/or label model is <code>null</code>.
+	@exception NullPointerException if the given value model, and/or info model is <code>null</code>.
 	*/
-	public CheckControl(final LabelModel labelModel, final ValueModel<Boolean> valueModel, final CheckType checkType)
+	public CheckControl(final InfoModel infoModel, final ValueModel<Boolean> valueModel, final CheckType checkType)
 	{
-		this(labelModel, valueModel, new DefaultEnableable(), checkType);	//construct the class with default enableable support
+		this(infoModel, valueModel, new DefaultEnableable(), checkType);	//construct the class with default enableable support
 	}
 
-	/**Label model, value model, enableable object, and check type constructor.
-	@param labelModel The component label model.
+	/**Info model, value model, enableable object, and check type constructor.
+	@param infoModel The component info model.
 	@param valueModel The component value model.
 	@param enableable The enableable object in which to store enabled status.
 	@param checkType The type of check area presented to the user, or <code>null</code> if the check type should be determined automatically.
-	@exception NullPointerException if the given value model and/or label model is <code>null</code>.
+	@exception NullPointerException if the given value model and/or info model is <code>null</code>.
 	*/
-	public CheckControl(final LabelModel labelModel, final ValueModel<Boolean> valueModel, final Enableable enableable, final CheckType checkType)
+	public CheckControl(final InfoModel infoModel, final ValueModel<Boolean> valueModel, final Enableable enableable, final CheckType checkType)
 	{
-		super(labelModel, valueModel, enableable);	//construct the parent class
+		super(infoModel, valueModel, enableable);	//construct the parent class
 		this.checkType=checkType;	//save the check type
 		setValidator(new ValueRequiredValidator<Boolean>());	//require a value, as a check control cannot indicate the absence of a value
 	}

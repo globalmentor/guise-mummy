@@ -87,22 +87,22 @@ public abstract class AbstractURFResourceTreeNodeRepresentationStrategy<V extend
 	{
 			//TODO improve this entire strategy
 		final N value=treeNode.getValue();	//get the current value
-		final Label label=new SelectableLabel(createLabelModel(treeControl, model, treeNode));	//create a new label using the created label model TODO always create a label model, not just if there is a value
+		final Label label=new SelectableLabel(createInfoModel(treeControl, model, treeNode));	//create a new label using the created label model TODO always create a label model, not just if there is a value
 		final String labelText=buildLabelText(new StringBuilder(), treeControl, model, treeNode, value).toString();	//construct the label text
 		label.setLabel(labelText);	//set the label's text
 		return label;	//return the label
 	}
 
-	/**Creates a label model for the representation label.
+	/**Creates an info model for the representation label.
 	@param <N> The type of value contained in the node.
 	@param treeControl The component containing the model.
 	@param model The model containing the value.
 	@param treeNode The node containing the value. 
 	@return The label model to use for the label.
 	*/
-	protected <N extends V> LabelModel createLabelModel(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode)
+	protected <N extends V> InfoModel createInfoModel(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode)
 	{
-		return new DefaultLabelModel();	//return a default label model
+		return new DefaultInfoModel();	//return a default label model
 	}
 	
 	/**Builds the label to be used for a tree node.

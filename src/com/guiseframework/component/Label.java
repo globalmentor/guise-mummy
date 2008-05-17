@@ -31,10 +31,10 @@ This component installs a default export strategy supporting export of the follo
 public class Label extends AbstractLabel
 {
 
-	/**Default constructor with a default label model.*/
+	/**Default constructor with a default info model.*/
 	public Label()
 	{
-		this(new DefaultLabelModel());	//construct the class with a default label model
+		this(new DefaultInfoModel());	//construct the class with a default info model
 	}
 
 	/**Label constructor.
@@ -51,16 +51,16 @@ public class Label extends AbstractLabel
 	*/
 	public Label(final String label, final URI icon)
 	{
-		this(new DefaultLabelModel(label, icon));	//construct the class  with a default label model and the given label text
+		this(new DefaultInfoModel(label, icon));	//construct the class  with a default info model and the given label text
 	}
 
-	/**Label model constructor.
-	@param labelModel The component label model.
-	@exception NullPointerException if the given label model is <code>null</code>.
+	/**Info model constructor.
+	@param infoModel The component info model.
+	@exception NullPointerException if the given info model is <code>null</code>.
 	*/
-	public Label(final LabelModel labelModel)
+	public Label(final InfoModel infoModel)
 	{
-		super(labelModel);	//construct the parent class
+		super(infoModel);	//construct the parent class
 	}
 
 	/**Prototype constructor.
@@ -69,7 +69,7 @@ public class Label extends AbstractLabel
 	*/
 	public Label(final LabelPrototype labelPrototype)
 	{
-		this((LabelModel)labelPrototype);	//use the label prototype as the needed model
+		this((InfoModel)labelPrototype);	//use the label prototype as the needed model
 	}
 
 }

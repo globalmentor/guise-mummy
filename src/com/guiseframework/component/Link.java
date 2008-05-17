@@ -40,27 +40,27 @@ public class Link extends AbstractLinkControl
 	*/
 	public Link(final String label)
 	{
-		this(new DefaultLabelModel(label));	//construct the class with a default label model
+		this(new DefaultInfoModel(label));	//construct the class with a default info model
 	}
 
-	/**Label model constructor.
-	@param labelModel The component label model.
-	@exception NullPointerException if the given label model is <code>null</code>.
+	/**Info model constructor.
+	@param infoModel The component info model.
+	@exception NullPointerException if the given info model is <code>null</code>.
 	*/
-	public Link(final LabelModel labelModel)
+	public Link(final InfoModel infoModel)
 	{
-		super(labelModel, new DefaultActionModel(), new DefaultEnableable());	//construct the parent class with the given label model and default other models
+		super(infoModel, new DefaultActionModel(), new DefaultEnableable());	//construct the parent class with the given info model and default other models
 	}
 
-	/**Label model, action model, and enableable object constructor.
-	@param labelModel The component label model.
+	/**Info model, action model, and enableable object constructor.
+	@param infoModel The component info model.
 	@param actionModel The component action model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given label model, action model, and/or enableable object is <code>null</code>.
+	@exception NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
 	*/
-	public Link(final LabelModel labelModel, final ActionModel actionModel, final Enableable enableable)
+	public Link(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable)
 	{
-		super(labelModel, actionModel, enableable);	//construct the parent class
+		super(infoModel, actionModel, enableable);	//construct the parent class
 	}
 
 	/**Label and navigation path convenience constructor.

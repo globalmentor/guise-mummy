@@ -70,16 +70,16 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 	*/
 	public void setImageURI(final URI newImageURI) {getImageModel().setImageURI(newImageURI);}
 
-	/**Label model and image model constructor.
-	@param labelModel The component label model.
+	/**Info model and image model constructor.
+	@param infoModel The component info model.
 	@param imageModel The component image model.
-	@exception NullPointerException if the given label model and/or iamge model is <code>null</code>.
+	@exception NullPointerException if the given info model and/or iamge model is <code>null</code>.
 	*/
-	public AbstractImageComponent(final LabelModel labelModel, final ImageModel imageModel)
+	public AbstractImageComponent(final InfoModel infoModel, final ImageModel imageModel)
 	{
-		super(labelModel);	//construct the parent class
+		super(infoModel);	//construct the parent class
 		this.imageModel=checkInstance(imageModel, "Image model cannot be null.");	//save the image model
-		if(imageModel!=labelModel)	//if the models are different (we'll already be listening to the label model)
+		if(imageModel!=infoModel)	//if the models are different (we'll already be listening to the info model)
 		{
 			this.imageModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the image model
 			this.imageModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the image model

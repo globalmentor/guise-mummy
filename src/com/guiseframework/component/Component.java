@@ -18,9 +18,6 @@ package com.guiseframework.component;
 
 import java.io.IOException;
 
-import javax.mail.internet.ContentType;
-
-
 import static com.globalmentor.java.Classes.*;
 
 import com.globalmentor.event.TargetedEvent;
@@ -35,8 +32,7 @@ import com.guiseframework.input.Input;
 import com.guiseframework.input.InputStrategy;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.PresentationModel;
-import com.guiseframework.platform.DepictedObject;
-import com.guiseframework.platform.Depictor;
+import com.guiseframework.platform.*;
 import com.guiseframework.theme.Theme;
 
 /**Base interface for all Guise components.
@@ -49,17 +45,13 @@ If a developer must hide sensitive data, the developer should remove the compone
 <p>For widest platform support the general {@link #ROUNDED_CORNER_RADIUS_EXTENT} constant should be used whenever possible when requesting rounded corners.</p>
 @author Garret Wilson
 */
-public interface Component extends DepictedObject, PresentationModel, LabelModel
+public interface Component extends DepictedObject, PresentationModel, InfoModel
 {
 
 	/**The bound property of whether the component has bookmarks enabled.*/
 	public final static String BOOKMARK_ENABLED_PROPERTY=getPropertyName(Component.class, "bookmarkEnabled");
 	/**The bound property of the layout constraints.*/
 	public final static String CONSTRAINTS_PROPERTY=getPropertyName(Component.class, "constraints");
-	/**The description bound property.*/
-	public final static String DESCRIPTION_PROPERTY=getPropertyName(Component.class, "description");
-	/**The description content type bound property.*/
-	public final static String DESCRIPTION_CONTENT_TYPE_PROPERTY=getPropertyName(Component.class, "descriptionContentType");
 	/**The bound property of whether the component has dragging enabled.*/
 	public final static String DRAG_ENABLED_PROPERTY=getPropertyName(Component.class, "dragEnabled");
 	/**The bound property of whether the component has dropping enabled.*/
@@ -68,10 +60,6 @@ public interface Component extends DepictedObject, PresentationModel, LabelModel
 	public final static String FLYOVER_ENABLED_PROPERTY=getPropertyName(Component.class, "flyoverEnabled");
 	/**The bound property of the strategy controlling flyovers.*/
 	public final static String FLYOVER_STRATEGY_PROPERTY=getPropertyName(Component.class, "flyoverStrategy");
-	/**The info bound property.*/
-	public final static String INFO_PROPERTY=getPropertyName(Component.class, "info");
-	/**The info content type bound property.*/
-	public final static String INFO_CONTENT_TYPE_PROPERTY=getPropertyName(Component.class, "infoContentType");
 	/**The input strategy bound property.*/
 	public final static String INPUT_STRATEGY_PROPERTY=getPropertyName(Component.class, "inputStrategy");
 	/**The bound property of the component name.*/
@@ -127,50 +115,6 @@ public interface Component extends DepictedObject, PresentationModel, LabelModel
 	@see #NAME_PROPERTY
 	*/
 	public void setName(final String newName);
-
-	/**@return The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information.*/
-	public String getInfo();
-
-	/**Sets the advisory information text, such as might appear in a tooltip.
-	This is a bound property.
-	@param newInfo The new text of the advisory information, such as might appear in a tooltip.
-	@see #INFO_PROPERTY
-	*/
-	public void setInfo(final String newInfo);
-
-	/**@return The content type of the advisory information text.*/
-	public ContentType getInfoContentType();
-
-	/**Sets the content type of the advisory information text.
-	This is a bound property.
-	@param newInfoContentType The new advisory information text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
-	@see #INFO_CONTENT_TYPE_PROPERTY
-	*/
-	public void setInfoContentType(final ContentType newInfoContentType);
-
-	/**@return The description text, such as might appear in a flyover, or <code>null</code> if there is no description.*/
-	public String getDescription();
-
-	/**Sets the description text, such as might appear in a flyover.
-	This is a bound property.
-	@param newDescription The new text of the description, such as might appear in a flyover.
-	@see #DESCRIPTION_PROPERTY
-	*/
-	public void setDescription(final String newDescription);
-
-	/**@return The content type of the description text.*/
-	public ContentType getDescriptionContentType();
-
-	/**Sets the content type of the description text.
-	This is a bound property.
-	@param newDescriptionContentType The new description text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
-	@see #DESCRIPTION_CONTENT_TYPE_PROPERTY
-	*/
-	public void setDescriptionContentType(final ContentType newDescriptionContentType);
 
 	/**@return The layout constraints describing individual component layout information, or <code>null</code> if no constraints have been specified for this component.*/
 	public Constraints getConstraints();

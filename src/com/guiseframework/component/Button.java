@@ -30,7 +30,7 @@ public class Button extends AbstractButtonControl
 	/**Default constructor.*/
 	public Button()
 	{
-		this(new DefaultLabelModel(), new DefaultActionModel(), new DefaultEnableable());	//construct the class with default models
+		this(new DefaultInfoModel(), new DefaultActionModel(), new DefaultEnableable());	//construct the class with default models
 	}
 
 	/**Label constructor.
@@ -47,18 +47,18 @@ public class Button extends AbstractButtonControl
 	*/
 	public Button(final String label, final URI icon)
 	{
-		this(new DefaultLabelModel(label, icon), new DefaultActionModel(), new DefaultEnableable());	//construct the class  with a default label model and the given label text
+		this(new DefaultInfoModel(label, icon), new DefaultActionModel(), new DefaultEnableable());	//construct the class  with a default info model and the given label text
 	}
 
-	/**Label model, action model, and enableable object constructor.
-	@param labelModel The component label model.
+	/**Info model, action model, and enableable object constructor.
+	@param infoModel The component info model.
 	@param actionModel The component action model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given label model, action model, and/or enableable object is <code>null</code>.
+	@exception NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
 	*/
-	public Button(final LabelModel labelModel, final ActionModel actionModel, final Enableable enableable)
+	public Button(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable)
 	{
-		super(labelModel, actionModel, enableable);	//construct the parent class
+		super(infoModel, actionModel, enableable);	//construct the parent class
 	}
 
 	/**Prototype constructor.

@@ -19,7 +19,7 @@ package com.guiseframework.component;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.guiseframework.model.LabelModel;
+import com.guiseframework.model.InfoModel;
 
 /**Abstract implementation of a composite component that keeps track of its child components in sequence.
 Iterating over child components is thread safe.
@@ -118,13 +118,13 @@ public abstract class AbstractListCompositeComponent extends AbstractMultipleCom
 	/**@return Whether this component has children. This implementation delegates to the component list.*/
 	public boolean hasChildComponents() {return !componentList.isEmpty();}
 
-	/**Label model constructor.
-	@param labelModel The component label model.
-	@exception NullPointerException if the given label model is <code>null</code>.
+	/**Info model constructor.
+	@param infoModel The component info model.
+	@exception NullPointerException if the given info model is <code>null</code>.
 	*/
-	public AbstractListCompositeComponent(final LabelModel labelModel)
+	public AbstractListCompositeComponent(final InfoModel infoModel)
 	{
-		super(labelModel);	//construct the parent class
+		super(infoModel);	//construct the parent class
 	}
 
 }

@@ -21,12 +21,12 @@ import java.net.URI;
 import static com.globalmentor.java.Objects.*;
 import com.globalmentor.net.URIPath;
 
-import com.guiseframework.model.DefaultLabelModel;
+import com.guiseframework.model.DefaultInfoModel;
 
 /**Encapsulates navigation information for particular location, such as the segment of a navigation URI.
 @author Garret Wilson
 */
-public class Breadcrumb extends DefaultLabelModel
+public class Breadcrumb extends DefaultInfoModel
 {
 
 	/**The navigation path this breadcrumb represents.*/

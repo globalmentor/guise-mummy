@@ -308,7 +308,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 	*/
 	public SliderControl(final ValueModel<V> valueModel, final Converter<V, String> converter, final Flow flow)
 	{
-		super(new DefaultLabelModel(), valueModel, new DefaultEnableable());	//construct the parent class
+		super(new DefaultInfoModel(), valueModel, new DefaultEnableable());	//construct the parent class
 		this.converter=checkInstance(converter, "Converter cannot be null");	//save the converter
 		this.flow=checkInstance(flow, "Flow cannot be null.");
 		axisThumbImages=new URI[Axis.values().length];	//create the array of thumb images and fill it with corresponding properties

@@ -50,17 +50,17 @@ public abstract class AbstractValueControl<V> extends AbstractControl implements
 				}
 			};
 
-	/**Label model, value model, and enableable constructor.
-	@param labelModel The component label model.
+	/**Info model, value model, and enableable constructor.
+	@param infoModel The component info model.
 	@param valueModel The component value model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given label model, value model, and/or enableable object is <code>null</code>.
+	@exception NullPointerException if the given info model, value model, and/or enableable object is <code>null</code>.
 	*/
-	public AbstractValueControl(final LabelModel labelModel, final ValueModel<V> valueModel, final Enableable enableable)
+	public AbstractValueControl(final InfoModel infoModel, final ValueModel<V> valueModel, final Enableable enableable)
 	{
-		super(labelModel, enableable);	//construct the parent class
+		super(infoModel, enableable);	//construct the parent class
 		this.valueModel=checkInstance(valueModel, "Value model cannot be null.");	//save the value model
-		if(valueModel!=labelModel && valueModel!=enableable)	//if the value model is not the same as the enableable object and the label model (we don't want to repeat property change events twice) TODO eventually just listen to specific events for each object
+		if(valueModel!=infoModel && valueModel!=enableable)	//if the value model is not the same as the enableable object and the info model (we don't want to repeat property change events twice) TODO eventually just listen to specific events for each object
 		{
 			this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the value model
 		}

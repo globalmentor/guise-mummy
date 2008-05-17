@@ -97,22 +97,22 @@ public class ImageBooleanSelectActionControl extends AbstractBooleanSelectAction
 	/**Default constructor.*/
 	public ImageBooleanSelectActionControl()
 	{
-		this(new DefaultLabelModel(), new DefaultImageModel(), new DefaultActionModel(), new DefaultValueModel<Boolean>(Boolean.class, Boolean.FALSE), new DefaultEnableable());	//construct the class with default models
+		this(new DefaultInfoModel(), new DefaultImageModel(), new DefaultActionModel(), new DefaultValueModel<Boolean>(Boolean.class, Boolean.FALSE), new DefaultEnableable());	//construct the class with default models
 	}
 
-	/**Label model, image model, action model, value model, and enableable object constructor.
-	@param labelModel The component label model.
+	/**Info model, image model, action model, value model, and enableable object constructor.
+	@param infoModel The component info model.
 	@param imageModel The component image model.
 	@param actionModel The component action model.
 	@param valueModel The component value model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given label model, image model, action model, and/or enableable object is <code>null</code>.
+	@exception NullPointerException if the given info model, image model, action model, and/or enableable object is <code>null</code>.
 	*/
-	public ImageBooleanSelectActionControl(final LabelModel labelModel, final ImageModel imageModel, final ActionModel actionModel, final ValueModel<Boolean> valueModel, final Enableable enableable)
+	public ImageBooleanSelectActionControl(final InfoModel infoModel, final ImageModel imageModel, final ActionModel actionModel, final ValueModel<Boolean> valueModel, final Enableable enableable)
 	{
-		super(labelModel, actionModel, valueModel, enableable);	//construct the parent class
+		super(infoModel, actionModel, valueModel, enableable);	//construct the parent class
 		this.imageModel=checkInstance(imageModel, "Image model cannot be null.");	//save the image model
-		if(imageModel!=labelModel && imageModel!=actionModel && imageModel!=valueModel && imageModel!=enableable)	//if the models are different (we'll already be listening to the other models)
+		if(imageModel!=infoModel && imageModel!=actionModel && imageModel!=valueModel && imageModel!=enableable)	//if the models are different (we'll already be listening to the other models)
 		{
 			this.imageModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the image model
 			this.imageModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the image model

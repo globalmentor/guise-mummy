@@ -19,7 +19,7 @@ package com.guiseframework.component;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import com.guiseframework.model.LabelModel;
+import com.guiseframework.model.InfoModel;
 
 /**An abstract implementation of a composite component that can contain multiple components.
 Every child component must be added or removed using {@link #addComponent(Component)} and {@link #removeComponent(Component)}, although other actions may take place.
@@ -88,12 +88,12 @@ public abstract class AbstractMultipleCompositeComponent extends AbstractComposi
 		}
 	}
 
-	/**Label model constructor.
-	@param labelModel The component label model.
-	@exception NullPointerException if the given label model is <code>null</code>.
+	/**Info model constructor.
+	@param infoModel The component info model.
+	@exception NullPointerException if the given info model is <code>null</code>.
 	*/
-	public AbstractMultipleCompositeComponent(final LabelModel labelModel)
+	public AbstractMultipleCompositeComponent(final InfoModel infoModel)
 	{
-		super(labelModel);	//construct the parent class
+		super(infoModel);	//construct the parent class
 	}
 }

@@ -48,15 +48,15 @@ public abstract class AbstractEditValueControl<V> extends AbstractValueControl<V
 			}			
 		}
 
-	/**Label model, value model, and enableable constructor.
-	@param labelModel The component label model.
+	/**Info model, value model, and enableable constructor.
+	@param infoModel The component info model.
 	@param valueModel The component value model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given label model, value model, and/or enableable object is <code>null</code>.
+	@exception NullPointerException if the given info model, value model, and/or enableable object is <code>null</code>.
 	*/
-	public AbstractEditValueControl(final LabelModel labelModel, final ValueModel<V> valueModel, final Enableable enableable)
+	public AbstractEditValueControl(final InfoModel infoModel, final ValueModel<V> valueModel, final Enableable enableable)
 	{
-		super(labelModel, valueModel, enableable);	//construct the parent class
+		super(infoModel, valueModel, enableable);	//construct the parent class
 		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<V>()	//listen for the value changing, and when the value changes fire an edit event
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<V> propertyChangeEvent)	//when the value changes

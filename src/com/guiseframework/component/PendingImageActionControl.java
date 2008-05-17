@@ -67,7 +67,7 @@ public class PendingImageActionControl extends ImageActionControl implements Pen
 	/**Default constructor.*/
 	public PendingImageActionControl()
 	{
-		this(new DefaultLabelModel(), new DefaultImageModel(), new DefaultActionModel(), new DefaultEnableable());	//construct the class with default models
+		this(new DefaultInfoModel(), new DefaultImageModel(), new DefaultActionModel(), new DefaultEnableable());	//construct the class with default models
 	}
 
 	/**Image model constructor.
@@ -75,19 +75,19 @@ public class PendingImageActionControl extends ImageActionControl implements Pen
 	*/
 	public PendingImageActionControl(final ImageModel imageModel)
 	{
-		this(new DefaultLabelModel(), imageModel, new DefaultActionModel(), new DefaultEnableable());	//construct the class with an image model and other default models
+		this(new DefaultInfoModel(), imageModel, new DefaultActionModel(), new DefaultEnableable());	//construct the class with an image model and other default models
 	}
 
-	/**Label model, image model, action model, and enableable object constructor.
-	@param labelModel The component label model.
+	/**Info model, image model, action model, and enableable object constructor.
+	@param infoModel The component info model.
 	@param imageModel The component image model.
 	@param actionModel The component action model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given label model, image model, action model, and/or enableable object is <code>null</code>.
+	@exception NullPointerException if the given info model, image model, action model, and/or enableable object is <code>null</code>.
 	*/
-	public PendingImageActionControl(final LabelModel labelModel, final ImageModel imageModel, final ActionModel actionModel, final Enableable enableable)
+	public PendingImageActionControl(final InfoModel infoModel, final ImageModel imageModel, final ActionModel actionModel, final Enableable enableable)
 	{
-		super(labelModel, imageModel, actionModel, enableable);	//construct the parent class
+		super(infoModel, imageModel, actionModel, enableable);	//construct the parent class
 		if(!(imageModel instanceof PendingImageModel))	//if the image model is not a pending image model, the presence/absence of the image model will change the image pending status
 		{
 			imageModel.addPropertyChangeListener(IMAGE_URI_PROPERTY, new AbstractGenericPropertyChangeListener<URI>()	//listen for the image URI changing

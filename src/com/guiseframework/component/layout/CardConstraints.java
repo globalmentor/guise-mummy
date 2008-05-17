@@ -27,14 +27,14 @@ import com.guiseframework.model.*;
 /**Constraints on an individual component in a card layout.
 @author Garret Wilson
 */
-public class CardConstraints extends ControlConstraints implements LabelModel, Displayable, Enableable
+public class CardConstraints extends ControlConstraints implements InfoModel, Displayable, Enableable
 {
 
-	/**The label model used by this component.*/
-	private final LabelModel labelModel;
+	/**The info model used by this component.*/
+	private final InfoModel infoModel;
 
-		/**@return The label model used by this component.*/
-		protected LabelModel getLabelModel() {return labelModel;}
+		/**@return The info model used by this component.*/
+		protected InfoModel getInfoModel() {return infoModel;}
 
 	/**Default constructor.*/
 	public CardConstraints()
@@ -64,55 +64,55 @@ public class CardConstraints extends ControlConstraints implements LabelModel, D
 	*/
 	public CardConstraints(final String label, final boolean enabled)
 	{
-		this(new DefaultLabelModel(label), enabled);	//construct the class with a default label model
+		this(new DefaultInfoModel(label), enabled);	//construct the class with a default info model
 	}
 
-	/**Label model constructor.
-	@param labelModel The label model representing the card label.
-	@exception NullPointerException if the given label model is <code>null</code>.
+	/**Info model constructor.
+	@param infoModel The info model representing the card label.
+	@exception NullPointerException if the given info model is <code>null</code>.
 	*/
-	public CardConstraints(final LabelModel labelModel)
+	public CardConstraints(final InfoModel infoModel)
 	{
-		this(labelModel, true);	//construct the class, defaulting to enabled
+		this(infoModel, true);	//construct the class, defaulting to enabled
 	}
 
-	/**Label model, and enabled constructor.
-	@param labelModel The label model representing the card label.
+	/**Info model and enabled constructor.
+	@param infoModel The info model representing the card label.
 	@param enabled Whether the card is enabled.
-	@exception NullPointerException if the given label model is <code>null</code>.
+	@exception NullPointerException if the given info model is <code>null</code>.
 	*/
-	public CardConstraints(final LabelModel labelModel, final boolean enabled)
+	public CardConstraints(final InfoModel infoModel, final boolean enabled)
 	{
 		super(enabled);	//construct the parent class 
-		this.labelModel=checkInstance(labelModel, "Label model cannot be null.");	//save the label model
-		this.labelModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the label model
-		this.labelModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the label model
+		this.infoModel=checkInstance(infoModel, "Info model cannot be null.");	//save the info model
+		this.infoModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the info model
+		this.infoModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the info model
 	}
 
-		//LabelModel delegations
+		//InfoModel delegations
 
 	/**@return The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.*/
-	public URI getGlyphURI() {return getLabelModel().getGlyphURI();}
+	public URI getGlyphURI() {return getInfoModel().getGlyphURI();}
 
 	/**Sets the URI of the icon.
 	This is a bound property of type <code>URI</code>.
 	@param newLabelIcon The new URI of the icon, which may be a resource URI.
 	@see #GLYPH_URI_PROPERTY
 	*/
-	public void setGlyphURI(final URI newLabelIcon) {getLabelModel().setGlyphURI(newLabelIcon);}
+	public void setGlyphURI(final URI newLabelIcon) {getInfoModel().setGlyphURI(newLabelIcon);}
 
 	/**@return The label text, which may include a resource reference, or <code>null</code> if there is no label text.*/
-	public String getLabel() {return getLabelModel().getLabel();}
+	public String getLabel() {return getInfoModel().getLabel();}
 
 	/**Sets the text of the label.
 	This is a bound property.
 	@param newLabelText The new text of the label, which may include a resource reference.
 	@see #LABEL_PROPERTY
 	*/
-	public void setLabel(final String newLabelText) {getLabelModel().setLabel(newLabelText);}
+	public void setLabel(final String newLabelText) {getInfoModel().setLabel(newLabelText);}
 
 	/**@return The content type of the label text.*/
-	public ContentType getLabelContentType() {return getLabelModel().getLabelContentType();}
+	public ContentType getLabelContentType() {return getInfoModel().getLabelContentType();}
 
 	/**Sets the content type of the label text.
 	This is a bound property.
@@ -121,6 +121,50 @@ public class CardConstraints extends ControlConstraints implements LabelModel, D
 	@exception IllegalArgumentException if the given content type is not a text content type.
 	@see #LABEL_CONTENT_TYPE_PROPERTY
 	*/
-	public void setLabelContentType(final ContentType newLabelTextContentType) {getLabelModel().setLabelContentType(newLabelTextContentType);}
+	public void setLabelContentType(final ContentType newLabelTextContentType) {getInfoModel().setLabelContentType(newLabelTextContentType);}
+
+	/**@return The description text, such as might appear in a flyover, or <code>null</code> if there is no description.*/
+	public String getDescription() {return getInfoModel().getDescription();}
+
+	/**Sets the description text, such as might appear in a flyover.
+	This is a bound property.
+	@param newDescription The new text of the description, such as might appear in a flyover.
+	@see #DESCRIPTION_PROPERTY
+	*/
+	public void setDescription(final String newDescription) {getInfoModel().setDescription(newDescription);}
+
+	/**@return The content type of the description text.*/
+	public ContentType getDescriptionContentType() {return getInfoModel().getDescriptionContentType();}
+
+	/**Sets the content type of the description text.
+	This is a bound property.
+	@param newDescriptionContentType The new description text content type.
+	@exception NullPointerException if the given content type is <code>null</code>.
+	@exception IllegalArgumentException if the given content type is not a text content type.
+	@see #DESCRIPTION_CONTENT_TYPE_PROPERTY
+	*/
+	public void setDescriptionContentType(final ContentType newDescriptionContentType) {getInfoModel().setDescriptionContentType(newDescriptionContentType);}
+
+	/**@return The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information.*/
+	public String getInfo() {return getInfoModel().getInfo();} 
+
+	/**Sets the advisory information text, such as might appear in a tooltip.
+	This is a bound property.
+	@param newInfo The new text of the advisory information, such as might appear in a tooltip.
+	@see #INFO_PROPERTY
+	*/
+	public void setInfo(final String newInfo) {getInfoModel().setInfo(newInfo);}
+
+	/**@return The content type of the advisory information text.*/
+	public ContentType getInfoContentType() {return getInfoModel().getInfoContentType();}
+
+	/**Sets the content type of the advisory information text.
+	This is a bound property.
+	@param newInfoContentType The new advisory information text content type.
+	@exception NullPointerException if the given content type is <code>null</code>.
+	@exception IllegalArgumentException if the given content type is not a text content type.
+	@see #INFO_CONTENT_TYPE_PROPERTY
+	*/
+	public void setInfoContentType(final ContentType newInfoContentType) {getInfoModel().setInfoContentType(newInfoContentType);}
 
 }

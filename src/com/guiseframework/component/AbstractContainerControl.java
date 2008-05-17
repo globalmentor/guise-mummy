@@ -122,26 +122,26 @@ public abstract class AbstractContainerControl extends AbstractContainer impleme
 		setNotification(null);	//clear any notification
 	}
 
-	/**Layout constructor with a default label model and enableable.
+	/**Layout constructor with a default info model and enableable.
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
 	public AbstractContainerControl(final Layout<?> layout)
 	{
-		this(new DefaultLabelModel(), new DefaultEnableable(), layout);	//construct the class with a default label model and enableable
+		this(new DefaultInfoModel(), new DefaultEnableable(), layout);	//construct the class with a default info model and enableable
 	}
 
-	/**Label model, enableable, and layout constructor.
-	@param labelModel The component label model.
+	/**Info model, enableable, and layout constructor.
+	@param infoModel The component info model.
 	@param enableable The enableable object in which to store enabled status.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given label model, enableable, and/or layout is <code>null</code>.
+	@exception NullPointerException if the given info model, enableable, and/or layout is <code>null</code>.
 	*/
-	public AbstractContainerControl(final LabelModel labelModel, final Enableable enableable, final Layout<?> layout)
+	public AbstractContainerControl(final InfoModel infoModel, final Enableable enableable, final Layout<?> layout)
 	{
-		super(labelModel, layout);	//construct the parent class
+		super(infoModel, layout);	//construct the parent class
 		this.enableable=checkInstance(enableable, "Enableable object cannot be null.");	//save the enableable object
-		if(enableable!=labelModel)	//if the enableable and the label model are two different objects (we don't want to repeat property change events twice) TODO eventually just listen to specific events for each object
+		if(enableable!=infoModel)	//if the enableable and the info model are two different objects (we don't want to repeat property change events twice) TODO eventually just listen to specific events for each object
 		{
 			this.enableable.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the enableable object
 		}

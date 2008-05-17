@@ -19,7 +19,7 @@ package com.guiseframework.component;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.guiseframework.model.LabelModel;
+import com.guiseframework.model.InfoModel;
 
 /**An abstract implementation of a composite component that can contain a single component.
 @author Garret Wilson
@@ -76,13 +76,13 @@ public abstract class AbstractSingleCompositeComponent extends AbstractComposite
 //TODO del		return component!=null ? new ObjectIterator<Component>(component) : new EmptyIterator<Component>();
 	}
 
-	/**Label model constructor.
-	@param labelModel The component label model.
-	@exception NullPointerException if the given label model is <code>null</code>.
+	/**Info model constructor.
+	@param infoModel The component info model.
+	@exception NullPointerException if the given info model is <code>null</code>.
 	*/
-	public AbstractSingleCompositeComponent(final LabelModel labelModel)
+	public AbstractSingleCompositeComponent(final InfoModel infoModel)
 	{
-		super(labelModel);	//construct the parent class
+		super(infoModel);	//construct the parent class
 	}
 
 }

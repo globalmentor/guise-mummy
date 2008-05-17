@@ -24,7 +24,7 @@ import com.guiseframework.validator.Validator;
 @param <V> The type of values contained in the table column.
 @author Garret Wilson
 */
-public interface TableColumnModel<V> extends LabelModel
+public interface TableColumnModel<V> extends InfoModel
 {
 
 	/**The bound property of the column style ID.*/

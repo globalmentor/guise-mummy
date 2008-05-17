@@ -138,17 +138,17 @@ public class ResourceCollectControl extends AbstractControl
 	/**Default constructor with a default models.*/
 	public ResourceCollectControl()
 	{
-		this(new DefaultLabelModel(), new DefaultEnableable());	//construct the class with default models
+		this(new DefaultInfoModel(), new DefaultEnableable());	//construct the class with default models
 	}
 
-	/**Label model and enableable object constructor.
-	@param labelModel The component label model.
+	/**Info model and enableable object constructor.
+	@param infoModel The component info model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given label model and/or enableable object is <code>null</code>.
+	@exception NullPointerException if the given info model and/or enableable object is <code>null</code>.
 	*/
-	public ResourceCollectControl(final LabelModel labelModel, final Enableable enableable)
+	public ResourceCollectControl(final InfoModel infoModel, final Enableable enableable)
 	{
-		super(labelModel, enableable);	//construct the parent class
+		super(infoModel, enableable);	//construct the parent class
 	}
 
 	/**Receives collected resources at the given destination path with no bookmark.

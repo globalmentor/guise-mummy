@@ -23,10 +23,10 @@ import com.guiseframework.GuiseSession;
 
 import static com.globalmentor.java.Objects.*;
 
-/**A label model that provides a localized version of a locale name.
+/**An info model that provides a localized version of a locale name.
 @author Garret Wilson
 */
-public class LocaleLabelModel extends DefaultLabelModel
+public class LocaleInfoModel extends DefaultInfoModel
 {
 
 	/**The Guise session that owns this object.*/
@@ -41,10 +41,10 @@ public class LocaleLabelModel extends DefaultLabelModel
 		/**@return The locale the label should represent.*/
 		public Locale getLocale() {return locale;}
 
-	/**Constructs a label model indicating the locale to represent.
+	/**Constructs an info model indicating the locale to represent.
 	@exception NullPointerException if the given locale is <code>null</code>.
 	*/
-	public LocaleLabelModel(final Locale locale)
+	public LocaleInfoModel(final Locale locale)
 	{
 		this.session=Guise.getInstance().getGuiseSession();	//store a reference to the current Guise session
 		this.locale=checkInstance(locale, "Locale cannot be null");	//save the locale

@@ -21,12 +21,12 @@ import com.guiseframework.converter.Converter;
 
 import static com.globalmentor.java.Objects.*;
 
-/**A label model that converts a value to a string for the label.
+/**An info model that converts a value to a string for the label.
 If no label is explicitly set, the label will represent the given value converted to a string using the given converter.
 @param <V> The type of value represented by the label.
 @author Garret Wilson
 */
-public class ValueConverterLabelModel<V> extends DefaultLabelModel
+public class ValueConverterInfoModel<V> extends DefaultInfoModel
 {
 
 	/**The represented value.*/
@@ -46,7 +46,7 @@ public class ValueConverterLabelModel<V> extends DefaultLabelModel
 	@param converter The converter to use for displaying the value as a string.
 	@exception NullPointerException if the given converter is <code>null</code>.
 	*/
-	public ValueConverterLabelModel(final V value, final Converter<V, String> converter)
+	public ValueConverterInfoModel(final V value, final Converter<V, String> converter)
 	{
 		this.value=value;	//save the value
 		this.converter=checkInstance(converter, "Converter cannot be null.");	//save the converter		

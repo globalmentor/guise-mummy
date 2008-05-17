@@ -36,7 +36,7 @@ public class ResourceImportControl extends AbstractEditValueControl<ResourceImpo
 	*/
 	public ResourceImportControl(final ValueModel<ResourceImport> valueModel)
 	{
-		super(new DefaultLabelModel(), valueModel, new DefaultEnableable());	//construct the parent class
+		super(new DefaultInfoModel(), valueModel, new DefaultEnableable());	//construct the parent class
 	}
 
 }

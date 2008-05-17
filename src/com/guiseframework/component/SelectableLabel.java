@@ -80,18 +80,18 @@ public class SelectableLabel extends Label implements Selectable
 			}			
 		}
 
-	/**Default constructor with a default label model.*/
+	/**Default constructor with a default info model.*/
 	public SelectableLabel()
 	{
-		this(new DefaultLabelModel());	//construct the class with a default label model
+		this(new DefaultInfoModel());	//construct the class with a default info model
 	}
 
-	/**Label model constructor.
-	@param labelModel The component label model.
-	@exception NullPointerException if the given label model is <code>null</code>.
+	/**Info model constructor.
+	@param infoModel The component info model.
+	@exception NullPointerException if the given info model is <code>null</code>.
 	*/
-	public SelectableLabel(LabelModel labelModel)
+	public SelectableLabel(final InfoModel infoModel)
 	{
-		super(labelModel);	//construct the parent class
+		super(infoModel);	//construct the parent class
 	}
 }

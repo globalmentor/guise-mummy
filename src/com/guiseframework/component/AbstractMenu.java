@@ -18,12 +18,9 @@ package com.guiseframework.component;
 
 import static com.globalmentor.java.Objects.*;
 
-import com.globalmentor.util.Debug;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
-import com.guiseframework.model.ActionModel;
-import com.guiseframework.model.Enableable;
-import com.guiseframework.model.LabelModel;
+import com.guiseframework.model.*;
 import com.guiseframework.prototype.*;
 
 /**An abstract menu component.
@@ -148,16 +145,16 @@ public abstract class AbstractMenu extends AbstractContainerControl implements M
 			}
 		}
 
-	/**Label model, action model, enableable, and menu layout constructor.
-	@param labelModel The component label model.
+	/**Info model, action model, enableable, and menu layout constructor.
+	@param infoModel The component info model.
 	@param actionModel The component action model.
 	@param enableable The enableable object in which to store enabled status.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given label model, action model, enableable, and/or layout is <code>null</code>.
+	@exception NullPointerException if the given info model, action model, enableable, and/or layout is <code>null</code>.
 	*/
-	public AbstractMenu(final LabelModel labelModel, final ActionModel actionModel, final Enableable enableable, final MenuLayout layout)
+	public AbstractMenu(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable, final MenuLayout layout)
 	{
-		super(labelModel, enableable, layout);	//construct the parent class
+		super(infoModel, enableable, layout);	//construct the parent class
 		this.actionModel=checkInstance(actionModel, "Action model cannot be null.");	//save the action model
 		this.actionModel.addActionListener(new ActionListener()	//create an action repeater to forward events to this component's listeners TODO create a common method to create a forwarding listener, if we can
 				{

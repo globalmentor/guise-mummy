@@ -86,17 +86,17 @@ public class Picture extends AbstractImageComponent
 	/**Default constructor.*/
 	public Picture()
 	{
-		this(new DefaultLabelModel(), new DefaultImageModel());	//construct the parent class with default models
+		this(new DefaultInfoModel(), new DefaultImageModel());	//construct the parent class with default models
 	}
 
-	/**Label model and image model constructor.
-	@param labelModel The component label model.
+	/**Info model and image model constructor.
+	@param infoModel The component info model.
 	@param imageModel The component image model.
-	@exception NullPointerException if the given label model and/or image model is <code>null</code>.
+	@exception NullPointerException if the given info model and/or image model is <code>null</code>.
 	*/
-	public Picture(final LabelModel labelModel, final ImageModel imageModel)
+	public Picture(final InfoModel infoModel, final ImageModel imageModel)
 	{
-		super(labelModel, imageModel);	//construct the parent class
+		super(infoModel, imageModel);	//construct the parent class
 		}
 
 	/**Whether the component has image dragging enabled.*/

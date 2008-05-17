@@ -96,15 +96,15 @@ public abstract class AbstractActionControl extends AbstractControl implements A
 			}
 		}
 
-	/**Label model, action model, and enableable object constructor.
-	@param labelModel The component label model.
+	/**Info model, action model, and enableable object constructor.
+	@param infoModel The component info model.
 	@param actionModel The component action model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given label model, action model, and/or enableable object is <code>null</code>.
+	@exception NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
 	*/
-	public AbstractActionControl(final LabelModel labelModel, final ActionModel actionModel, final Enableable enableable)
+	public AbstractActionControl(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable)
 	{
-		super(labelModel, enableable);	//construct the parent class
+		super(infoModel, enableable);	//construct the parent class
 		this.actionModel=checkInstance(actionModel, "Action model cannot be null.");	//save the action model
 		this.actionModel.addActionListener(new ActionListener()	//create an action repeater to forward events to this component's listeners
 				{

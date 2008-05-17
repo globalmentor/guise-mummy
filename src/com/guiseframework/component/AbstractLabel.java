@@ -46,19 +46,19 @@ public abstract class AbstractLabel extends AbstractComponent implements LabelCo
 				}
 			};
 
-	/**Default constructor with a default label model.*/
+	/**Default constructor with a default info model.*/
 	public AbstractLabel()
 	{
-		this(new DefaultLabelModel());	//construct the class with a default label model
+		this(new DefaultInfoModel());	//construct the class with a default info model
 	}
 
-	/**Label model constructor.
-	@param labelModel The component label model.
+	/**Info model constructor.
+	@param infoModel The component info model.
 	@exception NullPointerException if the given label or model is <code>null</code>.
 	*/
-	public AbstractLabel(final LabelModel labelModel)
+	public AbstractLabel(final InfoModel infoModel)
 	{
-		super(labelModel);	//construct the parent class
+		super(infoModel);	//construct the parent class
 		addExportStrategy(DEFAULT_EXPORT_STRATEGY);	//install a default export strategy 
 	}
 

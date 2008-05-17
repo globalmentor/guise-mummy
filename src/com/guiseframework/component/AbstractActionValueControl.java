@@ -60,16 +60,16 @@ public abstract class AbstractActionValueControl<V> extends AbstractActionContro
 			firePropertyChange(VALUE_GLYPH_URI_PROPERTY, oldValueIcon, newValueIcon);	//indicate that the value changed (which will only fire the event if the value actually changed)
 		}
 
-	/**Label model, action model, value model, and enableable object constructor.
-	@param labelModel The component label model.
+	/**Info model, action model, value model, and enableable object constructor.
+	@param infoModel The component info model.
 	@param actionModel The component action model.
 	@param valueModel The component value model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given label model, action model, and/or enableable object is <code>null</code>.
+	@exception NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
 	*/
-	public AbstractActionValueControl(final LabelModel labelModel, final ActionModel actionModel, final ValueModel<V> valueModel, final Enableable enableable)
+	public AbstractActionValueControl(final InfoModel infoModel, final ActionModel actionModel, final ValueModel<V> valueModel, final Enableable enableable)
 	{
-		super(labelModel, actionModel, enableable);	//construct the parent class
+		super(infoModel, actionModel, enableable);	//construct the parent class
 		this.valueModel=checkInstance(valueModel, "Value model cannot be null.");	//save the table model
 		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen an repeat all property changes of the value model
 		this.valueModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the value model

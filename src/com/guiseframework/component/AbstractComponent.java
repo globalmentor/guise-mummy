@@ -26,7 +26,6 @@ import java.util.concurrent.*;
 import javax.mail.internet.ContentType;
 
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.text.Text.*;
 import static com.globalmentor.util.Arrays.*;
 
 import com.globalmentor.event.TargetedEvent;
@@ -93,11 +92,11 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		*/
 		public void removePreferenceProperty(final String propertyName) {preferenceProperties.remove(propertyName);}
 
-	/**The label model decorated by this component.*/
-	private final LabelModel labelModel;
+	/**The info model decorated by this component.*/
+	private final InfoModel infoModel;
 
-		/**@return The label model decorated by this component.*/
-		protected LabelModel getLabelModel() {return labelModel;}
+		/**@return The info model decorated by this component.*/
+		protected InfoModel getInfoModel() {return infoModel;}
 
 	/**The name of the component, not guaranteed to be unique (but guaranteed not to be the empty string) and useful only for searching for components within a component sub-hierarchy, or <code>null</code> if the component has no name.*/
 	private String name=null;
@@ -126,27 +125,27 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		}
 
 	/**@return The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.*/
-	public URI getGlyphURI() {return getLabelModel().getGlyphURI();}
+	public URI getGlyphURI() {return getInfoModel().getGlyphURI();}
 
 	/**Sets the URI of the icon.
 	This is a bound property of type <code>URI</code>.
 	@param newLabelIcon The new URI of the icon, which may be a resource URI.
 	@see #GLYPH_URI_PROPERTY
 	*/
-	public void setGlyphURI(final URI newLabelIcon) {getLabelModel().setGlyphURI(newLabelIcon);}
+	public void setGlyphURI(final URI newLabelIcon) {getInfoModel().setGlyphURI(newLabelIcon);}
 
 	/**@return The label text, which may include a resource reference, or <code>null</code> if there is no label text.*/
-	public String getLabel() {return getLabelModel().getLabel();}
+	public String getLabel() {return getInfoModel().getLabel();}
 
 	/**Sets the text of the label.
 	This is a bound property.
 	@param newLabelText The new text of the label, which may include a resource reference.
 	@see #LABEL_PROPERTY
 	*/
-	public void setLabel(final String newLabelText) {getLabelModel().setLabel(newLabelText);}
+	public void setLabel(final String newLabelText) {getInfoModel().setLabel(newLabelText);}
 
 	/**@return The content type of the label text.*/
-	public ContentType getLabelContentType() {return getLabelModel().getLabelContentType();}
+	public ContentType getLabelContentType() {return getInfoModel().getLabelContentType();}
 
 	/**Sets the content type of the label text.
 	This is a bound property.
@@ -155,105 +154,51 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	@exception IllegalArgumentException if the given content type is not a text content type.
 	@see #LABEL_CONTENT_TYPE_PROPERTY
 	*/
-	public void setLabelContentType(final ContentType newLabelTextContentType) {getLabelModel().setLabelContentType(newLabelTextContentType);}
+	public void setLabelContentType(final ContentType newLabelTextContentType) {getInfoModel().setLabelContentType(newLabelTextContentType);}
 
-	/**The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information.*/
-	private String info=null;
+	/**@return The description text, such as might appear in a flyover, or <code>null</code> if there is no description.*/
+	public String getDescription() {return getInfoModel().getDescription();}
 
-		/**@return The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information.*/
-		public String getInfo() {return info;}
+	/**Sets the description text, such as might appear in a flyover.
+	This is a bound property.
+	@param newDescription The new text of the description, such as might appear in a flyover.
+	@see #DESCRIPTION_PROPERTY
+	*/
+	public void setDescription(final String newDescription) {getInfoModel().setDescription(newDescription);}
 
-		/**Sets the advisory information text, such as might appear in a tooltip.
-		This is a bound property.
-		@param newInfo The new text of the advisory information, such as might appear in a tooltip.
-		@see #INFO_PROPERTY
-		*/
-		public void setInfo(final String newInfo)
-		{
-			if(!Objects.equals(info, newInfo))	//if the value is really changing
-			{
-				final String oldInfo=info;	//get the old value
-				info=newInfo;	//actually change the value
-				firePropertyChange(INFO_PROPERTY, oldInfo, newInfo);	//indicate that the value changed
-			}			
-		}
+	/**@return The content type of the description text.*/
+	public ContentType getDescriptionContentType() {return getInfoModel().getDescriptionContentType();}
 
-	/**The content type of the advisory information text.*/
-	private ContentType infoContentType=PLAIN_TEXT_CONTENT_TYPE;
+	/**Sets the content type of the description text.
+	This is a bound property.
+	@param newDescriptionContentType The new description text content type.
+	@exception NullPointerException if the given content type is <code>null</code>.
+	@exception IllegalArgumentException if the given content type is not a text content type.
+	@see #DESCRIPTION_CONTENT_TYPE_PROPERTY
+	*/
+	public void setDescriptionContentType(final ContentType newDescriptionContentType) {getInfoModel().setDescriptionContentType(newDescriptionContentType);}
 
-		/**@return The content type of the advisory information text.*/
-		public ContentType getInfoContentType() {return infoContentType;}
+	/**@return The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information.*/
+	public String getInfo() {return getInfoModel().getInfo();} 
 
-		/**Sets the content type of the advisory information text.
-		This is a bound property.
-		@param newInfoContentType The new advisory information text content type.
-		@exception NullPointerException if the given content type is <code>null</code>.
-		@exception IllegalArgumentException if the given content type is not a text content type.
-		@see #INFO_CONTENT_TYPE_PROPERTY
-		*/
-		public void setInfoContentType(final ContentType newInfoContentType)
-		{
-			checkInstance(newInfoContentType, "Content type cannot be null.");
-			if(infoContentType!=newInfoContentType)	//if the value is really changing
-			{
-				final ContentType oldInfoContentType=infoContentType;	//get the old value
-				if(!isText(newInfoContentType))	//if the new content type is not a text content type
-				{
-					throw new IllegalArgumentException("Content type "+newInfoContentType+" is not a text content type.");
-				}
-				infoContentType=newInfoContentType;	//actually change the value
-				firePropertyChange(INFO_CONTENT_TYPE_PROPERTY, oldInfoContentType, newInfoContentType);	//indicate that the value changed
-			}			
-		}
+	/**Sets the advisory information text, such as might appear in a tooltip.
+	This is a bound property.
+	@param newInfo The new text of the advisory information, such as might appear in a tooltip.
+	@see #INFO_PROPERTY
+	*/
+	public void setInfo(final String newInfo) {getInfoModel().setInfo(newInfo);}
 
-	/**The description text, such as might appear in a flyover, or <code>null</code> if there is no description.*/
-	private String description=null;
+	/**@return The content type of the advisory information text.*/
+	public ContentType getInfoContentType() {return getInfoModel().getInfoContentType();}
 
-		/**@return The description text, such as might appear in a flyover, or <code>null</code> if there is no description.*/
-		public String getDescription() {return description;}
-
-		/**Sets the description text, such as might appear in a flyover.
-		This is a bound property.
-		@param newDescription The new text of the description, such as might appear in a flyover.
-		@see #DESCRIPTION_PROPERTY
-		*/
-		public void setDescription(final String newDescription)
-		{
-			if(!Objects.equals(description, newDescription))	//if the value is really changing
-			{
-				final String oldDescription=description;	//get the old value
-				description=newDescription;	//actually change the value
-				firePropertyChange(DESCRIPTION_PROPERTY, oldDescription, newDescription);	//indicate that the value changed
-			}			
-		}
-
-	/**The content type of the description text.*/
-	private ContentType descriptionContentType=PLAIN_TEXT_CONTENT_TYPE;
-
-		/**@return The content type of the description text.*/
-		public ContentType getDescriptionContentType() {return descriptionContentType;}
-
-		/**Sets the content type of the description text.
-		This is a bound property.
-		@param newDescriptionContentType The new description text content type.
-		@exception NullPointerException if the given content type is <code>null</code>.
-		@exception IllegalArgumentException if the given content type is not a text content type.
-		@see #DESCRIPTION_CONTENT_TYPE_PROPERTY
-		*/
-		public void setDescriptionContentType(final ContentType newDescriptionContentType)
-		{
-			checkInstance(newDescriptionContentType, "Content type cannot be null.");
-			if(descriptionContentType!=newDescriptionContentType)	//if the value is really changing
-			{
-				final ContentType oldDescriptionContentType=descriptionContentType;	//get the old value
-				if(!isText(newDescriptionContentType))	//if the new content type is not a text content type
-				{
-					throw new IllegalArgumentException("Content type "+newDescriptionContentType+" is not a text content type.");
-				}
-				descriptionContentType=newDescriptionContentType;	//actually change the value
-				firePropertyChange(DESCRIPTION_CONTENT_TYPE_PROPERTY, oldDescriptionContentType, newDescriptionContentType);	//indicate that the value changed
-			}			
-		}
+	/**Sets the content type of the advisory information text.
+	This is a bound property.
+	@param newInfoContentType The new advisory information text content type.
+	@exception NullPointerException if the given content type is <code>null</code>.
+	@exception IllegalArgumentException if the given content type is not a text content type.
+	@see #INFO_CONTENT_TYPE_PROPERTY
+	*/
+	public void setInfoContentType(final ContentType newInfoContentType) {getInfoModel().setInfoContentType(newInfoContentType);}
 
 	/**The layout constraints describing individual component layout information, or <code>null</code> if no constraints have been specified for this component.*/
 	private Constraints constraints=null;
@@ -801,16 +746,16 @@ Debug.trace("now valid of", this, "is", isValid());
 	*/
 	public AbstractComponent()
 	{
-		this(new DefaultLabelModel());	//construct the component with a default label model
+		this(new DefaultInfoModel());	//construct the component with a default info model
 	}
 
-	/**Label model constructor.
-	@param labelModel The component label model.
-	@exception NullPointerException if the given model is <code>null</code>.
+	/**Info model constructor.
+	@param infoModel The component info model.
+	@exception NullPointerException if the given info model is <code>null</code>.
 	@exception IllegalStateException if no depictor is registered for this component type.
 	*/
 	@SuppressWarnings("unchecked")
-	public AbstractComponent(final LabelModel labelModel)
+	public AbstractComponent(final InfoModel infoModel)
 	{
 		final GuiseSession session=getSession();	//get the Guise session
 		final Platform platform=session.getPlatform();	//get the Guise platform
@@ -822,9 +767,9 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 //TODO del; lazily installed		notifyDepictorInstalled(depictor);	//tell the the depictor it has been installed
 		platform.registerDepictedObject(this);	//register this depicted object with the platform
-		this.labelModel=checkInstance(labelModel, "Label model cannot be null.");	//save the label model
-		this.labelModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the label model
-		this.labelModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the label model
+		this.infoModel=checkInstance(infoModel, "Info model cannot be null.");	//save the info model
+		this.infoModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the info model
+		this.infoModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the info model
 	}
 
 	/**Notifies a depictor that it has been installed in this object.

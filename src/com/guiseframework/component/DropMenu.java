@@ -34,19 +34,19 @@ public class DropMenu extends AbstractMenu
 	*/
 	public DropMenu(final Flow axis)
 	{
-		this(new DefaultLabelModel(), new DefaultActionModel(), new DefaultEnableable(), axis);	//construct the class with default models
+		this(new DefaultInfoModel(), new DefaultActionModel(), new DefaultEnableable(), axis);	//construct the class with default models
 	}
 
-	/**Label model, action model, enableable, and menu layout constructor.
-	@param labelModel The component label model.
+	/**Info model, action model, enableable, and menu layout constructor.
+	@param infoModel The component info model.
 	@param actionModel The component action model.
 	@param enableable The enableable object in which to store enabled status.
 	@param axis The axis along which the menu is oriented.
-	@exception NullPointerException if the given label model, action model, enableable, and/or layout is <code>null</code>.
+	@exception NullPointerException if the given info model, action model, enableable, and/or layout is <code>null</code>.
 	*/
-	public DropMenu(final LabelModel labelModel, final ActionModel actionModel, final Enableable enableable, final Flow axis)
+	public DropMenu(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable, final Flow axis)
 	{
-		super(labelModel, actionModel, enableable, new MenuLayout(axis));	//construct the parent class
+		super(infoModel, actionModel, enableable, new MenuLayout(axis));	//construct the parent class
 		setRolloverOpenEnabled(true);	//default to showing the menu as open upon rollover
 	}
 

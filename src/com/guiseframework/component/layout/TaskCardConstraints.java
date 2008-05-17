@@ -18,9 +18,7 @@ package com.guiseframework.component.layout;
 
 import static com.globalmentor.java.Classes.*;
 
-import com.guiseframework.model.DefaultLabelModel;
-import com.guiseframework.model.LabelModel;
-import com.guiseframework.model.TaskState;
+import com.guiseframework.model.*;
 
 /**Constraints on an individual component representing a task in a card layout.
 @author Garret Wilson
@@ -80,26 +78,26 @@ public class TaskCardConstraints extends CardConstraints
 	*/
 	public TaskCardConstraints(final String label, final boolean enabled)
 	{
-		this(new DefaultLabelModel(label), enabled);	//construct the class with a default label model
+		this(new DefaultInfoModel(label), enabled);	//construct the class with a default info model
 	}
 
-	/**Label model constructor.
-	@param labelModel The label model representing the card label.
-	@exception NullPointerException if the given label model is <code>null</code>.
+	/**Info model constructor.
+	@param infoModel The info model representing the card label.
+	@exception NullPointerException if the given info model is <code>null</code>.
 	*/
-	public TaskCardConstraints(final LabelModel labelModel)
+	public TaskCardConstraints(final InfoModel infoModel)
 	{
-		this(labelModel, true);	//construct the class, defaulting to enabled
+		this(infoModel, true);	//construct the class, defaulting to enabled
 	}
 
-	/**Label model and enabled constructor.
-	@param labelModel The label model representing the card label.
+	/**Info model and enabled constructor.
+	@param infoModel The info model representing the card label.
 	@param enabled Whether the card is enabled.
-	@exception NullPointerException if the given label model is <code>null</code>.
+	@exception NullPointerException if the given info model is <code>null</code>.
 	*/
-	public TaskCardConstraints(final LabelModel labelModel, final boolean enabled)
+	public TaskCardConstraints(final InfoModel infoModel, final boolean enabled)
 	{
-		super(labelModel, enabled);	//construct the parent class
+		super(infoModel, enabled);	//construct the parent class
 	}
 
 }

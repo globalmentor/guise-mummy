@@ -64,24 +64,24 @@ public class HeadingLink extends AbstractLinkControl implements HeadingComponent
 		this(label, NO_HEADING_LEVEL);	//construct the class with no heading level
 	}
 
-	/**Label model constructor.
-	@param labelModel The component label model.
-	@exception NullPointerException if the given label model is <code>null</code>.
+	/**Info model constructor.
+	@param infoModel The component info model.
+	@exception NullPointerException if the given info model is <code>null</code>.
 	*/
-	public HeadingLink(final LabelModel labelModel)
+	public HeadingLink(final InfoModel infoModel)
 	{
-		this(labelModel, NO_HEADING_LEVEL);	//construct the class with no heading level
+		this(infoModel, NO_HEADING_LEVEL);	//construct the class with no heading level
 	}
 
-	/**Label model, action model, and enableable object constructor.
-	@param labelModel The component label model.
+	/**Info model, action model, and enableable object constructor.
+	@param infoModel The component info model.
 	@param actionModel The component action model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given label model, action model, and/or enableable object is <code>null</code>.
+	@exception NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
 	*/
-	public HeadingLink(final LabelModel labelModel, final ActionModel actionModel, final Enableable enableable)
+	public HeadingLink(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable)
 	{
-		this(labelModel, actionModel, enableable, NO_HEADING_LEVEL);	//construct the class with no heading level
+		this(infoModel, actionModel, enableable, NO_HEADING_LEVEL);	//construct the class with no heading level
 	}
 
 	/**Label and navigation path convenience constructor.
@@ -129,28 +129,28 @@ public class HeadingLink extends AbstractLinkControl implements HeadingComponent
 	*/
 	public HeadingLink(final String label, final int level)
 	{
-		this(new DefaultLabelModel(label), level);	//construct the class with a default label model
+		this(new DefaultInfoModel(label), level);	//construct the class with a default info model
 	}
 
-	/**Label model constructor.
-	@param labelModel The component label model.
+	/**Info model constructor.
+	@param labelModel The component info model.
 	@param level The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
-	@exception NullPointerException if the given label model is <code>null</code>.
+	@exception NullPointerException if the given info model is <code>null</code>.
 	*/
-	public HeadingLink(final LabelModel labelModel, final int level)
+	public HeadingLink(final InfoModel labelModel, final int level)
 	{
-		super(labelModel, new DefaultActionModel(), new DefaultEnableable());	//construct the parent class with the given label model and default other models
+		super(labelModel, new DefaultActionModel(), new DefaultEnableable());	//construct the parent class with the given info model and default other models
 		this.level=level;	//save the level
 	}
 
-	/**Label model, action model, and enableable object constructor.
-	@param labelModel The component label model.
+	/**Info model, action model, and enableable object constructor.
+	@param labelModel The component info model.
 	@param actionModel The component action model.
 	@param enableable The enableable object in which to store enabled status.
 	@param level The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
-	@exception NullPointerException if the given label model, action model, and/or enableable object is <code>null</code>.
+	@exception NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
 	*/
-	public HeadingLink(final LabelModel labelModel, final ActionModel actionModel, final Enableable enableable, final int level)
+	public HeadingLink(final InfoModel labelModel, final ActionModel actionModel, final Enableable enableable, final int level)
 	{
 		super(labelModel, actionModel, enableable);	//construct the parent class
 		this.level=level;	//save the level

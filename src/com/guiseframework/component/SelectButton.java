@@ -27,18 +27,18 @@ public class SelectButton extends AbstractSelectActionControl implements SelectB
 	/**Default constructor.*/
 	public SelectButton()
 	{
-		this(new DefaultLabelModel(), new DefaultActionModel(), new DefaultEnableable());	//construct the class with default models
+		this(new DefaultInfoModel(), new DefaultActionModel(), new DefaultEnableable());	//construct the class with default models
 	}
 
-	/**Label model, action model, and enableable object constructor.
-	@param labelModel The component label model.
+	/**Info model, action model, and enableable object constructor.
+	@param infoModel The component info model.
 	@param actionModel The component action model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given label model, action model, and/or enableable object is <code>null</code>.
+	@exception NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
 	*/
-	public SelectButton(final LabelModel labelModel, final ActionModel actionModel, final Enableable enableable)
+	public SelectButton(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable)
 	{
-		super(labelModel, actionModel, enableable);	//construct the parent class
+		super(infoModel, actionModel, enableable);	//construct the parent class
 	}
 
 	/**Prototype constructor.

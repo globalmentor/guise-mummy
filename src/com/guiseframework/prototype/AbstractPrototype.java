@@ -18,12 +18,12 @@ package com.guiseframework.prototype;
 
 import java.net.URI;
 
-import com.guiseframework.model.DefaultLabelModel;
+import com.guiseframework.model.DefaultInfoModel;
 
 /**Contains abstract prototype information for a component.
 @author Garret Wilson
 */
-public class AbstractPrototype extends DefaultLabelModel implements Prototype 
+public class AbstractPrototype extends DefaultInfoModel implements Prototype 
 {
 
 	/**Default constructor.*/
