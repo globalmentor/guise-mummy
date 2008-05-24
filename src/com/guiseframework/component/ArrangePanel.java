@@ -20,14 +20,17 @@ import com.guiseframework.component.layout.Flow;
 import com.guiseframework.component.layout.FlowLayout;
 import com.guiseframework.component.layout.Layout;
 
-/**A panel that demarcates a semantically significant area of the a parent component with arranged child components.
+/**A panel that semantically demarcates an area that arranges other components.
+This panel is usually styled to arrange the spacing between child components.
+This is stronger than a {@link LayoutPanel}, which provides no arranging styles to the children. 
 @author Garret Wilson
+@see ArrangeContainer
 */
-public class SectionPanel extends ArrangePanel
+public class ArrangePanel extends LayoutPanel implements ArrangeContainer
 {
 	
 	/**Default constructor with a default vertical flow layout.*/
-	public SectionPanel()
+	public ArrangePanel()
 	{
 		this(new FlowLayout(Flow.PAGE));	//default to flowing vertically
 	}
@@ -36,7 +39,7 @@ public class SectionPanel extends ArrangePanel
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
-	public SectionPanel(final Layout<?> layout)
+	public ArrangePanel(final Layout<?> layout)
 	{
 		super(layout);	//construct the parent class
 	}

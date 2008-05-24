@@ -16,15 +16,10 @@
 
 package com.guiseframework.component;
 
-/**Base interface for boxes within a frame.
-<p>There are several types of often-used panels, in increasing order of complexity and functionality:</p>
-<dl>
-	<dt>{@link LayoutPanel}</dt> <dd>A class only used for laying out child components without providing extra arrangement such as inter-child-component spacing.</dd>
-	<dt>{@link ArrangePanel}</dt> <dd>A panel that semantically demarcates an area that arranges other components. This panel is usually styled to arrange the spacing between child components.</dd>
-	<dt>{@link SectionPanel}</dt> <dd>A panel that demarcates a semantically significant area of the a parent component with arranged child components.</dd>
-</dl>
+/**A container that that semantically demarcates an area that arranges other components.
+This container is usually styled to arrange the spacing between child components.
 @author Garret Wilson
 */
-public interface Panel extends Box
+public interface ArrangeContainer extends Container
 {
 }

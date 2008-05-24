@@ -174,7 +174,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 			}
 			else	//if the flow layout isn't wrapped
 			{
-/*TODO fix DIV-based vertical flow
+///*TODO fix DIV-based vertical flow
 				if(flowAxis==Axis.Y)	//TODO testing new vertical flow
 				{
 					depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//<xhtml:div>
@@ -192,11 +192,12 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 						
 						
 						depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_FLOW_Y_CHILD_CLASS);	//class="layout-flow-y-child"
-*/
-/*TODO fix alignment and gap
+//*/
+/*TODO fix alignment
 						final double alignment=flowLayout.getConstraints(childComponent).getAlignment();	//get the alignment of this component
 						final String tdAlign=getAlign(alignment, alignFlowAxis, alignFlowDirection);	//determine the align string from the alignment value TODO does the direction attribute take care of this automatically?
 						depictContext.writeAttribute(null, ELEMENT_TD_ATTRIBUTE_ALIGN, tdAlign);	//align="tdAlign"
+*/
 						styles.clear();	//clear our map of styles
 						final Extent gapBefore=childIndex==0 ? flowLayout.getGapBefore() : flowLayout.getGapBetween();	//if this isn't the first component, use the between-components spacing amount
 						final Extent gapAfter=childComponentIterator.hasNext() ? Extent.ZERO_EXTENT1 : flowLayout.getGapAfter();	//if this is the last component, we'll add the requested amount of space after the component as well
@@ -209,8 +210,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 							styles.put(CSS_PROP_PADDING_BOTTOM, gapAfter);	//insert padding after the components
 						}
 						writeStyleAttribute(styles);	//write the styles
-*/
-				/*TODO fix DIV-based vertical flow
+//				/*TODO fix DIV-based vertical flow
 						updateFlowChildView(childComponent, flowAxis);	//update this child's view
 						depictContext.writeIndent();	//indent the ending tag
 						depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//</xhtml:div>
@@ -220,7 +220,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 				}
 				else
 				{
-*/				
+//*/				
 				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TABLE);	//<xhtml:table>
 				writeIDAttribute(null, COMPONENT_LAYOUT_CLASS_SUFFIX);	//id="id-layout"
 				depictContext.writeAttribute(null, ATTRIBUTE_CLASS, flowAxis==Axis.X ? LAYOUT_FLOW_X_CLASS : LAYOUT_FLOW_Y_CLASS);	//class="layout-flow-x/y"
@@ -307,9 +307,9 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 				depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TBODY);	//</xhtml:tbody>
 				depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TABLE);	//</xhtml:table>
 			}			
-			/*TODO fix DIV-based vertical flow
+//			/*TODO fix DIV-based vertical flow
 			}
-*/			
+//*/			
 			
 			
 			

@@ -134,6 +134,15 @@
 				color=*style.ResourceColor("theme.color.link")
 			;
 		;,
+		†ArrangeContainer‡
+		*theme.Rule:
+			select.selector=*select.ObjectClassSelector:
+				select.selectClass=component.ArrangeContainer
+			;,
+			theme.apply=*theme.Template:
+				paddingExtent=*geometry.Extent(#0.5#, «*geometry.Unit("EM")»)
+			;
+		;,
 		†SectionPanel‡
 		*theme.Rule:
 			select.selector=*select.ObjectClassSelector:
@@ -144,8 +153,7 @@
 				borderStyle=«*style.LineStyle("SOLID")»,
 				borderExtent=*geometry.Extent(#1#, «*geometry.Unit("PIXEL")»),
 				borderColor=*style.ResourceColor("theme.color.border"),
-				marginExtent=*geometry.Extent(#0.5#, «*geometry.Unit("EM")»),
-				paddingExtent=*geometry.Extent(#0.5#, «*geometry.Unit("EM")»)
+				marginExtent=*geometry.Extent(#0.5#, «*geometry.Unit("EM")»)
 			;
 		;,
 		†Menu‡
@@ -235,9 +243,17 @@
 			;
 		;,
 	
-		*theme.Rule: †flow layout‡
-			select.selector=*select.ObjectClassSelector:
-				select.selectClass=layout.FlowLayout
+		*theme.Rule: †arrange container flow layout‡
+			select.selector=*select.IntersectionSelector:
+				select.selector=*select.ObjectClassSelector:
+					select.selectClass=layout.FlowLayout
+				;,
+				select.selector=*select.ObjectPropertySelector:
+					select.selectPropertyName="owner",
+					select.selector=*select.ObjectClassSelector:
+						select.selectClass=component.ArrangeContainer
+					;
+				;
 			;,
 			theme.apply=*theme.Template:
 				gap=*geometry.Extent(#0.25#, «*geometry.Unit("EM")»)
@@ -267,7 +283,7 @@
 						select.selector=*select.ObjectPropertySelector:
 							select.selectPropertyName="parent",
 							select.selector=*select.ObjectClassSelector:
-								select.selectClass=component.Menu
+								select.selectClass=component.DialogFrame
 							;
 						;
 					;

@@ -72,8 +72,8 @@ h1.component, h2.component, h3.component, h4.component, h5.component, h6.compone
 img.component,
 label.component,
 table.component,
-th.component,
 td.component,
+th.component,
 span.component,
 
 a.component caption,
@@ -82,13 +82,32 @@ a.component h1, a.component h2, a.component h3, a.component h4, a.component h5, 
 a.component img,
 a.component label,
 a.component table,
+a.component td,
+a.component th,
 a.component span
-
 {
 	border: 0;
 	border-style: none;
 	margin: 0;
 	padding: 0;
+}
+
+/*remove borders, padding, and margins for all tables TODO later explicitly do this just for layout tables*/
+table,
+tbody,
+td,
+th,
+tr
+{
+	border: 0;
+	border-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+table
+{
+	border-spacing: 0;
 }
 
 /*initialize default fonts and colors, including link components*/
