@@ -19,7 +19,6 @@ package com.guiseframework.theme;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
-
 import com.globalmentor.urf.AbstractClassTypedURFResource;
 import com.globalmentor.urf.ploop.PLOOPURFProcessor;
 import com.globalmentor.urf.select.Select;
@@ -71,6 +70,14 @@ public class Rule extends AbstractClassTypedURFResource
 	public Template getApply()
 	{
 		return asInstance(getPropertyValue(APPLY_PROPERTY_URI), Template.class);	//return the theme.apply value if it is a Template
+	}
+
+	/**Sets this rule's apply declaration.
+	@param apply This rule's apply declaration, or <code>null</code> if this rule should have no apply declaration.
+	*/
+	public void setApply(final Template apply)
+	{
+		setPropertyValue(APPLY_PROPERTY_URI, apply);	//set the theme.apply property
 	}
 
 	/**Applies this rule to the given object.

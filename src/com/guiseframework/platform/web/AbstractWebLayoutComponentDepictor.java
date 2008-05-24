@@ -174,6 +174,53 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 			}
 			else	//if the flow layout isn't wrapped
 			{
+/*TODO fix DIV-based vertical flow
+				if(flowAxis==Axis.Y)	//TODO testing new vertical flow
+				{
+					depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//<xhtml:div>
+					writeIDAttribute(null, COMPONENT_LAYOUT_CLASS_SUFFIX);	//id="id-layout"
+					depictContext.writeAttribute(null, ATTRIBUTE_CLASS, flowAxis==Axis.X ? LAYOUT_FLOW_X_CLASS : LAYOUT_FLOW_Y_CLASS);	//class="layout-flow-x/y"
+					writeDirectionAttribute(orientation, flow);	//explicitly write the direction ("ltr" or "rtl") for this flow so that the orientation will be taken into account
+					childComponentIterator=flowDirection==Flow.Direction.INCREASING ? component.getChildComponents().iterator() : new ReverseIterator<Component>(component.getChildComponents());	//get an iterator to child components in the correct direction
+					while(childComponentIterator.hasNext())	//for each visible child component in the container, wrap the component in a span with the correct style
+					{
+						final Component childComponent=childComponentIterator.next();	//get the next child component
+						++childIndex;	//update the child index
+						depictContext.write("\n");	//format the output
+						depictContext.writeIndent();	//write an indentation
+						depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//<xhtml:div>
+						
+						
+						depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_FLOW_Y_CHILD_CLASS);	//class="layout-flow-y-child"
+*/
+/*TODO fix alignment and gap
+						final double alignment=flowLayout.getConstraints(childComponent).getAlignment();	//get the alignment of this component
+						final String tdAlign=getAlign(alignment, alignFlowAxis, alignFlowDirection);	//determine the align string from the alignment value TODO does the direction attribute take care of this automatically?
+						depictContext.writeAttribute(null, ELEMENT_TD_ATTRIBUTE_ALIGN, tdAlign);	//align="tdAlign"
+						styles.clear();	//clear our map of styles
+						final Extent gapBefore=childIndex==0 ? flowLayout.getGapBefore() : flowLayout.getGapBetween();	//if this isn't the first component, use the between-components spacing amount
+						final Extent gapAfter=childComponentIterator.hasNext() ? Extent.ZERO_EXTENT1 : flowLayout.getGapAfter();	//if this is the last component, we'll add the requested amount of space after the component as well
+						if(gapBefore.getValue()!=0)	//if there is a gap before (the stylesheet should set the default to zero)
+						{
+							styles.put(CSS_PROP_PADDING_TOP, gapBefore);	//insert padding before the components
+						}
+						if(gapAfter.getValue()!=0)	//if there is a gap after (the stylesheet should set the default to zero)
+						{
+							styles.put(CSS_PROP_PADDING_BOTTOM, gapAfter);	//insert padding after the components
+						}
+						writeStyleAttribute(styles);	//write the styles
+*/
+				/*TODO fix DIV-based vertical flow
+						updateFlowChildView(childComponent, flowAxis);	//update this child's view
+						depictContext.writeIndent();	//indent the ending tag
+						depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//</xhtml:div>
+						depictContext.write("\n");	//format the output
+					}
+					depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//</xhtml:div>
+				}
+				else
+				{
+*/				
 				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TABLE);	//<xhtml:table>
 				writeIDAttribute(null, COMPONENT_LAYOUT_CLASS_SUFFIX);	//id="id-layout"
 				depictContext.writeAttribute(null, ATTRIBUTE_CLASS, flowAxis==Axis.X ? LAYOUT_FLOW_X_CLASS : LAYOUT_FLOW_Y_CLASS);	//class="layout-flow-x/y"
@@ -260,8 +307,9 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 				depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TBODY);	//</xhtml:tbody>
 				depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TABLE);	//</xhtml:table>
 			}			
-			
-			
+			/*TODO fix DIV-based vertical flow
+			}
+*/			
 			
 			
 			
@@ -348,13 +396,15 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TABLE);	//<xhtml:table>
 				writeIDAttribute(null, COMPONENT_LAYOUT_CLASS_SUFFIX);	//id="id-layout"
 				depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_REGION_CLASS);	//class="layout-region"
+				final Map<String, Object> tableStyles=new HashMap<String, Object>();	//create a new map of styles
 				if(regionLayout.isFixed())	//if this is a fixed region layout
 				{
-					final Map<String, Object> tableStyles=new HashMap<String, Object>();	//create a new map of styles
 					tableStyles.put(CSS_PROP_TABLE_LAYOUT, CSS_TABLE_LAYOUT_FIXED);	//indicate a fixed table layout
 					tableStyles.put(CSS_PROP_WIDTH, "100%");	//indicate that the table should take up all available horizontal space
-					writeStyleAttribute(tableStyles);	//write the table's styles
 				}
+				tableStyles.put(CSS_PROP_BORDER_COLLAPSE, CSS_BORDER_COLLAPSE_COLLAPSE);	//collapse the table cells (needed to prevent extra space in IE)
+				writeStyleAttribute(tableStyles);	//write the table's styles
+				
 ///*TODO del; messes up frames
 /*TODO fix; we may be able to get around this by checking the parent
 				else if(!(component.getParent() instanceof Frame))	//TODO testing

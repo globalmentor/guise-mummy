@@ -135,6 +135,14 @@ public class Theme extends URFListResource<Rule>
 		addAll(collection);	//add all the collection elements to the list
 	}
 
+	/**Parent theme constructor.
+	@param parent The theme to serve as the parent of this theme, or <code>null</code> if this theme should have no parent.
+	*/
+	public Theme(final Theme parent)
+	{
+		this.parent=parent;	//save the parent theme
+	}
+
 	/**Retrieves the URI indicating the parent theme.
 	@return The URI indicating the parent theme, or <code>null</code> if no parent theme is indicated or the value is not a URI.
 	*/
@@ -161,6 +169,7 @@ public class Theme extends URFListResource<Rule>
 	}
 
 	/**Updates the internal maps of rules.
+	This method should be called after rules are modified so that rules will be applied correctly in the future.
 	@exception ClassNotFoundException if one of the rules selects a class that cannot be found.
 	@see PropertySelector#getSelectClass()
 	*/
