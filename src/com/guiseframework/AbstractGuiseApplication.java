@@ -62,6 +62,12 @@ This implementation only works with Guise containers that descend from {@link Ab
 public abstract class AbstractGuiseApplication extends BoundPropertyObject implements GuiseApplication
 {
 
+	/**I/O for loading resources.*/
+	private final static IO<Resources> resourcesIO=new TypedURFResourceTURFIO<Resources>(Resources.class, RESOURCES_NAMESPACE_URI);
+
+		/**@return I/O for loading resources.*/
+		public IO<Resources> getResourcesIO() {return resourcesIO;}
+
 	/**I/O for loading themes.*/
 	private final static IO<Theme> themeIO=new TypedURFResourceTURFIO<Theme>(Theme.class, THEME_NAMESPACE_URI);	//create I/O for loading the theme
 
@@ -71,13 +77,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	}
 
 		/**@return I/O for loading themes.*/
-		protected static IO<Theme> getThemeIO() {return themeIO;}
-
-	/**I/O for loading resources.*/
-	private final static IO<Resources> resourcesIO=new TypedURFResourceTURFIO<Resources>(Resources.class, RESOURCES_NAMESPACE_URI);
-
-		/**@return I/O for loading resources.*/
-		protected static IO<Resources> getResourcesIO() {return resourcesIO;}
+		public IO<Theme> getThemeIO() {return themeIO;}
 
 	/**The application identifier URI.*/
 	private URI uri;
@@ -1367,31 +1367,11 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		{
 			throw new FileNotFoundException("Missing theme resource: "+resolvedThemeURI);	//indicate that the theme cannot be found
 		}
+		final Theme theme;
 		final InputStream bufferedThemeInputStream=new BufferedInputStream(themeInputStream);	//get a buffered input stream to the theme
 		try
 		{
-			final Theme theme=getThemeIO().read(bufferedThemeInputStream, resolvedThemeURI);	//read this theme
-			final URI rootThemeURI=GUISE_ROOT_THEME_PATH.toURI();	//get the application-relative URI to the root theme
-			final URI resolvedRootThemeURI=resolveURI(rootThemeURI);	//get the resolved path URI to the root theme
-			if(!resolvedThemeURI.equals(resolvedRootThemeURI))	//if this is not the root theme, load the parent theme
-			{
-				URI parentURI=theme.getParentURI();	//get the parent designation, if any TODO detect circular references
-				if(parentURI==null)	//if no parent was designated
-				{
-					parentURI=rootThemeURI;	//use the root theme for the parent theme
-				}
-				final Theme parentTheme=loadTheme(parentURI);	//load the parent theme
-				theme.setParent(parentTheme);	//set the parent theme
-			}
-			try
-			{
-				theme.updateRules();	//update the theme rules
-			}
-			catch(final ClassNotFoundException classNotFoundException)	//if a class specified by a rule selector cannot be found
-			{
-				throw new IOException("Error loading theme ("+resolvedThemeURI+"): "+classNotFoundException.getMessage(), classNotFoundException);
-			}
-			return theme;	//return the theme
+			theme=getThemeIO().read(bufferedThemeInputStream, resolvedThemeURI);	//read this theme
 		}
 		catch(final IOException ioException)	//if there was an error loading the theme
 		{
@@ -1401,6 +1381,27 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		{
 			bufferedThemeInputStream.close();	//always close the theme input stream
 		}				
+		final URI rootThemeURI=GUISE_ROOT_THEME_PATH.toURI();	//get the application-relative URI to the root theme
+		final URI resolvedRootThemeURI=resolveURI(rootThemeURI);	//get the resolved path URI to the root theme
+		if(!resolvedThemeURI.equals(resolvedRootThemeURI))	//if this is not the root theme, load the parent theme
+		{
+			URI parentURI=theme.getParentURI();	//get the parent designation, if any TODO detect circular references
+			if(parentURI==null)	//if no parent was designated
+			{
+				parentURI=rootThemeURI;	//use the root theme for the parent theme
+			}
+			final Theme parentTheme=loadTheme(parentURI);	//load the parent theme
+			theme.setParent(parentTheme);	//set the parent theme
+		}
+		try
+		{
+			theme.updateRules();	//update the theme rules
+		}
+		catch(final ClassNotFoundException classNotFoundException)	//if a class specified by a rule selector cannot be found
+		{
+			throw new IOException("Error loading theme ("+resolvedThemeURI+"): "+classNotFoundException.getMessage(), classNotFoundException);
+		}
+		return theme;	//return the theme
 	}
 
 	/**Loads properties from a file in the home directory.

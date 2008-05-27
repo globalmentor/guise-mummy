@@ -445,12 +445,12 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	}
 
 	/**Determines the color for rendering the component.
-	This version delegates to {@link Component#getColor()}.
+	This version delegates to {@link Component#getTextColor()}.
 	@return The color to use for this component.
 	*/
 	protected Color getColor()
 	{
-		return getDepictedObject().getColor();	//return the component's color
+		return getDepictedObject().getTextColor();	//return the component's color
 	}
 
 	/**Determines the background color for rendering the component.

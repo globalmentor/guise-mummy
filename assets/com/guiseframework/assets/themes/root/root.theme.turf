@@ -56,7 +56,7 @@
 				select.selectClass=component.Frame
 			;,
 			theme.apply=*theme.Template:
-				color=*style.ResourceColor("theme.color.text"),
+				textColor=*style.ResourceColor("theme.color.text"),
 				backgroundColor=*style.ResourceColor("theme.color.background"),
 				borderColor=*style.ResourceColor("theme.color.frame.border"),
 				labelTextColor=*style.ResourceColor("theme.color.frame.title.text"),

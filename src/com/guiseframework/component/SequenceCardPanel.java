@@ -40,7 +40,7 @@ If any card has constraints of {@link TaskCardConstraints}, this class will upda
 @author Garret Wilson
 @see CardLayout
 */
-public class SequenceCardPanel extends AbstractCardPanel implements Commitable
+public class SequenceCardPanel extends AbstractCardPanel implements ArrangeContainer, Commitable
 {
 
 	/**The bound property of the sequence state.*/

@@ -23,6 +23,7 @@ import java.util.*;
 import javax.mail.*;
 
 import com.globalmentor.beans.PropertyBindable;
+import com.globalmentor.io.IO;
 import com.globalmentor.io.IOOperation;
 import com.globalmentor.net.Resource;
 import com.globalmentor.net.URIPath;
@@ -81,6 +82,12 @@ public interface GuiseApplication extends Resource, PropertyBindable
 			public final static URIPath GUISE_BASIC_THEME_PATH=GUISE_BASIC_THEME_BASE_PATH.resolve("basic.theme.turf");
 	/**The base path of the default Guise theme cursors, relative to the application.*/
 	public final static URIPath GUISE_ROOT_THEME_CURSORS_PATH=GUISE_ROOT_THEME_BASE_PATH.resolve("cursors/");
+
+	/**@return I/O for loading resources.*/
+	public IO<Resources> getResourcesIO();
+
+	/**@return I/O for loading themes.*/
+	public IO<Theme> getThemeIO();
 
 	/**@return The read-only non-empty list of locales supported by the application, with the first locale the default used if a new session cannot determine the users's preferred locale.*/
 	public List<Locale> getLocales();

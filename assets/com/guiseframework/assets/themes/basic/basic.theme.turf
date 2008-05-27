@@ -106,13 +106,22 @@
 				labelFontWeight=#0.75#
 			;
 		;,
-		†Heading‡
+		†HeadingComponent‡
 		*theme.Rule:
 			select.selector=*select.ObjectClassSelector:
-				select.selectClass=component.Heading
+				select.selectClass=component.HeadingComponent
 			;,
 			theme.apply=*theme.Template:
 				fontFamilies=["Tahoma", "Arial", "sans-serif"]
+			;
+		;,
+		†Label‡
+		*theme.Rule:
+			select.selector=*select.ObjectClassSelector:
+				select.selectClass=component.Label
+			;,
+			theme.apply=*theme.Template:
+				labelFontWeight=#0.75#
 			;
 		;,
 		†Link‡
@@ -131,7 +140,7 @@
 				;
 			;,
 			theme.apply=*theme.Template:
-				color=*style.ResourceColor("theme.color.link")
+				textColor=*style.ResourceColor("theme.color.link")
 			;
 		;,
 		†ArrangeContainer‡
@@ -259,7 +268,24 @@
 				gap=*geometry.Extent(#0.25#, «*geometry.Unit("EM")»)
 			;
 		;,
-	
+
+		*theme.Rule:	†arrange container region layout‡
+			select.selector=*select.IntersectionSelector:
+				select.selector=*select.ObjectClassSelector:
+					select.selectClass=layout.RegionLayout
+				;,
+				select.selector=*select.ObjectPropertySelector:
+					select.selectPropertyName="owner",
+					select.selector=*select.ObjectClassSelector:
+						select.selectClass=component.ArrangeContainer
+					;
+				;
+			;,
+			theme.apply=*theme.Template:
+				paddingExtent=*geometry.Extent(#0.25#, «*geometry.Unit("EM")»)
+			;
+		;,
+
 		*theme.Rule: †menu layout‡
 			select.selector=*select.ObjectClassSelector:
 				select.selectClass=layout.MenuLayout
@@ -269,7 +295,7 @@
 			;
 		;,
 	
-		*theme.Rule:	†region layout of a frame's content component‡
+		*theme.Rule:	†region layout of a dialog frame's content component‡
 			select.selector=*select.IntersectionSelector:
 				select.selector=*select.ObjectClassSelector:
 					select.selectClass=layout.RegionLayout

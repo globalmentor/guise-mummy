@@ -390,27 +390,6 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 			}
 		}
 		
-	/**The foreground color of the component, or <code>null</code> if no foreground color is specified for this component.*/
-	private Color color=null;
-
-		/**@return The foreground color of the component, or <code>null</code> if no foreground color is specified for this component.*/
-		public Color getColor() {return color;}
-
-		/**Sets the foreground color of the component.
-		This is a bound property.
-		@param newColor The foreground color of the component, or <code>null</code> if the default foreground color should be used.
-		@see #COLOR_PROPERTY
-		*/
-		public void setColor(final Color newColor)
-		{
-			if(!Objects.equals(color, newColor))	//if the value is really changing
-			{
-				final Color oldColor=color;	//get the old value
-				color=newColor;	//actually change the value
-				firePropertyChange(COLOR_PROPERTY, oldColor, newColor);	//indicate that the value changed
-			}			
-		}
-
 	/**The array of dimensions each defining a corner arc by two radiuses.*/
 	private Dimensions[] cornerArcSizes=fill(new Dimensions[Corner.values().length], Dimensions.ZERO_DIMENSIONS);
 
@@ -1129,6 +1108,27 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 				displayed=newDisplayed;	//update the value
 				firePropertyChange(DISPLAYED_PROPERTY, Boolean.valueOf(oldDisplayed), Boolean.valueOf(newDisplayed));
 			}
+		}
+
+	/**The text color of the component, or <code>null</code> if no text color is specified for this component.*/
+	private Color textColor=null;
+
+		/**@return The text color of the component, or <code>null</code> if no text color is specified for this component.*/
+		public Color getTextColor() {return textColor;}
+
+		/**Sets the text color of the component.
+		This is a bound property.
+		@param newTextColor The text color of the component, or <code>null</code> if the default text color should be used.
+		@see #TEXT_COLOR_PROPERTY
+		*/
+		public void setTextColor(final Color newTextColor)
+		{
+			if(!Objects.equals(textColor, newTextColor))	//if the value is really changing
+			{
+				final Color oldTextColor=textColor;	//get the old value
+				textColor=newTextColor;	//actually change the value
+				firePropertyChange(TEXT_COLOR_PROPERTY, oldTextColor, newTextColor);	//indicate that the value changed
+			}			
 		}
 
 	/**Whether tooltips are enabled for this component.*/

@@ -123,12 +123,13 @@ public abstract class AbstractOptionDialogFrame<O> extends AbstractDialogFrame<O
 	}
 
 	/**Creates a container for holding the options.
-	This implementation creates a horizontal layout panel.
+	This implementation creates a horizontal arrange panel.
 	@return a container for holding the options.
+	@see ArrangePanel
 	*/
 	protected Container createOptionContainer()
 	{
-		return new LayoutPanel(new FlowLayout(Flow.LINE));	//create a horizontal layout panel
+		return new ArrangePanel(new FlowLayout(Flow.LINE));	//create a horizontal arrange panel
 	}
 
 	/**Initializes the option container with the available options.

@@ -59,8 +59,6 @@ public interface PresentationModel extends Model, Displayable
 	public final static String BORDER_PAGE_NEAR_STYLE_PROPERTY=getPropertyName(PresentationModel.class, "borderPageNearStyle");
 	/**The bound property of the page far border style.*/
 	public final static String BORDER_PAGE_FAR_STYLE_PROPERTY=getPropertyName(PresentationModel.class, "borderPageFarStyle");
-	/**The bound property of the color.*/
-	public final static String COLOR_PROPERTY=getPropertyName(PresentationModel.class, "color");
 	/**The bound property of the line near page near corner arc size.*/
 	public final static String CORNER_LINE_NEAR_PAGE_NEAR_ARC_SIZE_PROPERTY=getPropertyName(PresentationModel.class, "cornerLineNearPageNearArcSize");
 	/**The bound property of the line far page near corner arc size.*/
@@ -113,6 +111,8 @@ public interface PresentationModel extends Model, Displayable
 	public final static String PADDING_PAGE_FAR_EXTENT_PROPERTY=getPropertyName(PresentationModel.class, "paddingPageFarExtent");
 	/**The bound property of the component style ID.*/
 	public final static String STYLE_ID_PROPERTY=getPropertyName(PresentationModel.class, "styleID");
+	/**The bound property of the text color.*/
+	public final static String TEXT_COLOR_PROPERTY=getPropertyName(PresentationModel.class, "textColor");
 	/**The bound property of whether the component has tooltips enabled.*/
 	public final static String TOOLTIP_ENABLED_PROPERTY=getPropertyName(PresentationModel.class, "tooltipEnabled");
 	/**The bound property of whether the component is visible.*/
@@ -381,16 +381,6 @@ public interface PresentationModel extends Model, Displayable
 	@see #BORDER_PAGE_FAR_STYLE_PROPERTY
 	*/
 	public void setBorderStyle(final LineStyle newBorderStyle);
-
-	/**@return The foreground color of the component, or <code>null</code> if no foreground color is specified for this component.*/
-	public Color getColor();
-
-	/**Sets the foreground color of the component.
-	This is a bound property.
-	@param newColor The foreground color of the component, or <code>null</code> if the default foreground color should be used.
-	@see #COLOR_PROPERTY 
-	*/
-	public void setColor(final Color newColor);
 
 	/**Returns the arc size for the indicated corner.
 	@param corner The corner for which an arc size should be returned.
@@ -844,6 +834,16 @@ public interface PresentationModel extends Model, Displayable
 	@see #setVisible(boolean)
 	*/
 	public void setDisplayed(final boolean newDisplayed);
+
+	/**@return The text color of the component, or <code>null</code> if no text color is specified.*/
+	public Color getTextColor();
+
+	/**Sets the text color of the component.
+	This is a bound property.
+	@param newTextColor The text color of the component, or <code>null</code> if the default text color should be used.
+	@see #TEXT_COLOR_PROPERTY 
+	*/
+	public void setTextColor(final Color newTextColor);
 
 	/**@return Whether tooltips are enabled for this component.*/
 	public boolean isTooltipEnabled();
