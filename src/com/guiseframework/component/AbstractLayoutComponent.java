@@ -152,10 +152,25 @@ public abstract class AbstractLayoutComponent extends AbstractListCompositeCompo
 		layout.setOwner(this);	//tell the layout which container owns it
 	}
 
-	/**Update's this object's theme.
+	/**Resets this object's theme.
+	This method sets to <code>false</code> the state of whether a theme has been applied to this object.
+	This method is called for any child components resetting its own theme.
+	No new theme is actually loaded.
+	There is normally no need to override this method or to call this method directly by applications.
+	This version resets the theme of the given layout.
+	@see #setThemeApplied(boolean)
+	@see #setLayoutThemeApplied(boolean)
+	*/
+	public void resetTheme()
+	{
+		super.resetTheme();	//reset the theme
+		setLayoutThemeApplied(false);	//indicate that no theme has been applied to the layout
+	}
+
+	/**Updates this object's theme.
 	This method checks whether a theme has been applied to this object.
 	If a theme has not been applied to this object this method calls {@link #applyTheme()}.
-	This method is called for any child components before initializing applying the theme to the component itself,
+	This method is called for any child components before applying the theme to the component itself,
 	to assure that child theme updates have already occured before theme updates occur for this component.
 	There is normally no need to override this method or to call this method directly by applications.
 	This version checks to see if the theme needs to be applied to the given layout.
@@ -173,7 +188,7 @@ public abstract class AbstractLayoutComponent extends AbstractListCompositeCompo
 		}		
 	}
 
-	/**Applies the theme to this objectd.
+	/**Applies the theme to this object.
 	Themes are only applied of the application is themed.
 	This method may be overridden to effectively override theme settings by ensuring the state of important properties after the theme has been set. 
 	If the theme is successfully applied, this method updates the theme applied status.

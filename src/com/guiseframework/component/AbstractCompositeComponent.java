@@ -310,10 +310,27 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 		return result;	//return whether all child components validated
 	}
 
-	/**Update's this object's theme.
+	/**Resets this object's theme.
+	This method sets to <code>false</code> the state of whether a theme has been applied to this object.
+	This method is called for any child components resetting its own theme.
+	No new theme is actually loaded.
+	There is normally no need to override this method or to call this method directly by applications.
+	This version recursively calls the {@link #resetTheme()} method of all child components before resetting the theme of this component.
+	@see #setThemeApplied(boolean)
+	*/
+	public void resetTheme()
+	{
+		for(final Component childComponent:getChildComponents())	//for each child component
+		{
+			childComponent.resetTheme();	//tell the child component to reset its theme
+		}
+		super.resetTheme();	//update the theme for this component normally
+	}
+
+	/**Updates this object's theme.
 	This method checks whether a theme has been applied to this object.
 	If a theme has not been applied to this object this method calls {@link #applyTheme()}.
-	This method is called for any child components before initializing applying the theme to the component itself,
+	This method is called for any child components before applying the theme to the component itself,
 	to assure that child theme updates have already occured before theme updates occur for this component.
 	There is normally no need to override this method or to call this method directly by applications.
 	This version recursively calls the {@link #updateTheme()} method of all child components before updating the theme of this component.
