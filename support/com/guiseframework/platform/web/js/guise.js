@@ -1906,6 +1906,7 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 			    "theme": "advanced",
 			    "skin": "guise",
 			    "auto_resize": true,	//experimental
+			    "theme_advanced_blockformats": "address,blockquote,div,h1,h2,h3,h4,h5,h6,dt,dd,code,p,pre",
 			    "theme_advanced_toolbar_align": "left",
 			    "theme_advanced_toolbar_location": "top",
 			    "theme_advanced_statusbar_location": "bottom",
@@ -3276,6 +3277,10 @@ function onLinkClick(event)
 */
 function onAction(event)
 {
+	if(isUserAgentIE && tinyMCE.editors.length>0)	//on IE if there are TinyMCE editors in use, make sure their changes are saved before performing any action, because TinyMCE doesn't trigger a change when focus is lost on IE 
+	{
+		tinyMCE.triggerSave();
+	}
 	var target=event.currentTarget;	//get the element on which the event was registered
 //TODO del alert("action on: "+element.nodeName);
 	var component=Node.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element TODO improve all this
