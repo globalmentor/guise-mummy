@@ -1905,12 +1905,14 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 			    "mode": "none",
 			    "theme": "advanced",
 			    "skin": "guise",
+			    "plugins": "xhtmlxtras",
 			    "auto_resize": true,	//experimental
 			    "theme_advanced_blockformats": "address,blockquote,div,h1,h2,h3,h4,h5,h6,dt,dd,code,p,pre",
 			    "theme_advanced_toolbar_align": "left",
 			    "theme_advanced_toolbar_location": "top",
 			    "theme_advanced_statusbar_location": "bottom",
 			    "theme_advanced_disable": "image,cleanup,help,code,fontselect,fontsizeselect,styleselect,forecolor,backcolor,forecolorpicker,backcolorpicker,newdocument",
+			    "theme_advanced_buttons3_add": "|,cite,abbr,acronym,del,ins,attribs,dfn",
 			    "entity_encoding": "raw"	//don't entity encoding except for necessary XML characters; XHTML by default doesn't understand HTML entities, and numeric encoding would encur an unnecessary slowdown
 				});
 			this._initializeNode(document.documentElement, true, true);	//initialize the document tree, indicating that this is the first initialization
