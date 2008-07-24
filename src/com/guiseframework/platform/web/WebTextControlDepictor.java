@@ -25,11 +25,14 @@ import javax.mail.internet.ContentType;
 
 import static com.globalmentor.text.Text.*;
 import com.globalmentor.util.Debug;
+
+import com.guiseframework.GuiseApplication;
 import com.guiseframework.component.*;
 import com.guiseframework.converter.*;
 import com.guiseframework.model.Notification;
 import com.guiseframework.platform.*;
 
+import static com.globalmentor.io.ContentTypes.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
@@ -45,6 +48,12 @@ This implementation automatically converts between the controls LF end-of-line r
 public class WebTextControlDepictor<V, C extends TextControl<V>> extends AbstractDecoratedWebComponentDepictor<C>
 {
 
+	/**The content type for XStandard objects.*/
+	public final static ContentType XSTANDARD_CONTENT_TYPE=getContentTypeInstance(APPLICATION_PRIMARY_TYPE, "x-xstandard");
+
+	/**The XStandard class ID.*/
+	public final static String XSTANDARD_CLASS_ID="clsid:0EED7206-1661-11D7-84A3-00606744831D";
+
 	/**Default constructor using the XHTML <code>&lt;input&gt;</code> element.*/
 	public WebTextControlDepictor()
 	{
@@ -58,7 +67,13 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 	public String getBodyLocalName()
 	{
 		final C component=getDepictedObject();	//get the component being depicted
-		return getDepictedObject().getRowCount()==1 ? ELEMENT_INPUT : ELEMENT_TEXTAREA;	//if something besides one row is requested (such as no rows), use a text area
+/*TODO XStandard
+		if(isHTML(component.getValueContentType()))	//if the content is HTML, use an <object> tag for XStandard
+		{
+			return ELEMENT_OBJECT;
+		}
+*/
+		return component.getRowCount()==1 ? ELEMENT_INPUT : ELEMENT_TEXTAREA;	//if something besides one row is requested (such as no rows), use a text area
 	}
 
 	/**Determines whether an empty body element can be created if there is no content.
@@ -232,6 +247,31 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 				depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_PATCH_TYPE, ATTRIBUTE_PATCH_TYPE_NONE);	//don't do any patching on the text area itself; rely on events instead
 			}
 		}
+/*TODO XStandard
+		else if(ELEMENT_OBJECT.equals(bodyLocalName))	//if we are rendering an <xhtml:object> (XStandard)
+		{
+				//if IE7 has not had Security Update MS07-057 (KB939653) applied, it will not auto-install from the type and will require a classid (see http://xstandard.com/en/support/ie-7-auto-install-workaround/ )
+			if(getPlatform().getClientProduct().isBrandVersionNumber(WebUserAgentProduct.Brand.INTERNET_EXPLORER, 7))	//if this is IE7
+			{
+				depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CLASSID, XSTANDARD_CLASS_ID);	//classid="clsid:0EED7206-1661-11D7-84A3-00606744831D"; only write the classid attributes for IE 7
+					//depict the codebase URI to the CAB file
+				depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CODEBASE, GuiseApplication.GUISE_ASSETS_CABS_PATH.resolve("xstandard/XStandard.cab").toString()+"#Version=2,0,0,0");	//codebase="...assets/cabs/xstandard/XStandard.cab#Version=2,0,0,0" TODO use constant; allow version to be specified
+			}
+			else	//if the user agent is not IE7, specify the object content type
+			{
+				depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_TYPE, XSTANDARD_CONTENT_TYPE.toString());	//type="application/x-xstandard"
+			}
+			final String text=component.getProvisionalText();	//see what string we should use for the XHTML value attribute (the provisional text represents the most recent text we know about)
+			if(text!=null)	//if there is a value
+			{
+				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_PARAM, true);	//<xhtml:param>
+				depictContext.writeAttribute(null, ELEMENT_PARAM_ATTRIBUTE_NAME, "Value");	//name="Value" TODO use a constant
+				depictContext.writeAttribute(null, ELEMENT_PARAM_ATTRIBUTE_VALUE, text);	//value="text"
+				depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_PARAM);	//</xhtml:param>
+				depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_OBJECT);	//</xhtml:object>
+			}
+		}
+*/
 		else	//if we don't recognize the type of element we are rendering
 		{
 			throw new AssertionError("Unrecognized element local name: "+bodyLocalName);
@@ -256,6 +296,29 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 		}
 	}
 
+	/**Writes the beginning part of the outer decorator element.
+	This version writes a dummy element for rich text editing if needed
+	@exception IOException if there is an error rendering the component.
+	*/
+	protected void writeDecoratorBegin() throws IOException
+	{
+		super.writeDecoratorBegin();	//write the beginning components
+/*TODO FCKeditor
+		if(isHTML(getDepictedObject().getValueContentType()))	//if the content is HTML, create the content needed by FCKeditor
+		{
+			final WebDepictContext depictContext=getDepictContext();	//get the depict context
+			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//<xhtml:div>
+			depictContext.writeAttribute(null, ATTRIBUTE_ID, decorateID(getPlatform().getDepictIDString(getDepictedObject().getDepictID()), null, "___Config"));	//write the ID that will be used by the generated component for the editor
+			depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_PATCH_TYPE, ATTRIBUTE_PATCH_TYPE_TEMP);	//guise:patchType="temp"; this is just a fill-in for the real content that gets placed later
+			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//</xhtml:div>
+			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//<xhtml:div>
+			depictContext.writeAttribute(null, ATTRIBUTE_ID, decorateID(getPlatform().getDepictIDString(getDepictedObject().getDepictID()), null, "___Frame"));	//write the ID that will be used by the generated component for the editor
+			depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_PATCH_TYPE, ATTRIBUTE_PATCH_TYPE_TEMP);	//guise:patchType="temp"; this is just a fill-in for the real content that gets placed later
+			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//</xhtml:div>
+		}
+*/
+	}
+
 	/**Writes the ending part of the outer decorator element.
 	This version writes a dummy element for rich text editing if needed
 	@exception IOException if there is an error rendering the component.
@@ -263,7 +326,7 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 	*/
 	protected void writeDecoratorEnd() throws IOException
 	{
-		if(isHTML(getDepictedObject().getValueContentType()))	//if the content is HTML
+		if(isHTML(getDepictedObject().getValueContentType()))	//if the content is HTML, create the content needed by TinyMCE
 		{
 			final WebDepictContext depictContext=getDepictContext();	//get the depict context
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_SPAN);	//<xhtml:span>

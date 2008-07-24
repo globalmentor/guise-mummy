@@ -30,4 +30,17 @@ public interface BrandedProduct<BRAND extends Enum<BRAND> & BrandedProduct.Brand
 	/**@return The brand of the product, or <code>null</code> if the brand is not known.*/
 	public BRAND getBrand();
 
+	/**Determines whether this product has the indicated brand and version number.
+	@param brand The brand to check for.
+	@param versionNumber The version number to check for.
+	@return <code>true</code> if this product has the indicated brand and version number.
+	*/
+	public boolean isBrandVersionNumber(final BRAND brand, final double versionNumber);
+
+	/**Determines whether this product has the indicated brand and a version number less than the one indicated.
+	@param brand The brand to check for.
+	@param versionNumber The version number to check for.
+	@return <code>true</code> if this product has the indicated brand and a version number less than the one indicated.
+	*/
+	public boolean isBrandLessThanVersionNumber(final BRAND brand, final double versionNumber);
 }

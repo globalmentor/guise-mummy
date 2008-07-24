@@ -62,6 +62,8 @@ public interface GuiseApplication extends Resource, PropertyBindable
 	public final static URIPath GUISE_ASSETS_TEMP_BASE_PATH=GUISE_ASSETS_BASE_PATH.resolve("temp/");
 	/**The base path of audio assets, relative to the application.*/
 	public final static URIPath GUISE_ASSETS_AUDIO_PATH=GUISE_ASSETS_BASE_PATH.resolve("audio/");
+	/**The base path of CAB assets, relative to the application.*/
+	public final static URIPath GUISE_ASSETS_CABS_PATH=GUISE_ASSETS_BASE_PATH.resolve("cabs/");
 	/**The base path of document assets, relative to the application.*/
 	public final static URIPath GUISE_ASSETS_DOCUMENTS_PATH=GUISE_ASSETS_BASE_PATH.resolve("documents/");
 	/**The base path of DTD assets, relative to the application.*/

@@ -268,10 +268,13 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.write("\t");
 		depictContext.writeJavaScriptElement(appendQueryParameters(GUISE_JAVASCRIPT_PATH.toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//JavaScript: guise.js
 
-
 		depictContext.write("\t");	//TinyMCE
 		depictContext.writeJavaScriptElement(appendQueryParameters(GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("tiny_mce/tiny_mce.js").toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//TODO use a constant
-		
+
+/*TODO FCKeditor
+		depictContext.write("\t");	//fckeditor
+		depictContext.writeJavaScriptElement(appendQueryParameters(GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("fckeditor/fckeditor.js").toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//TODO use a constant
+*/
 		depictContext.write("\n");
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_HEAD);	//</xhtml:head>		
 		depictContext.write("\n");

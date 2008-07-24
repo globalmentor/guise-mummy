@@ -1383,22 +1383,6 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 		proto._synchronizeElement=function(oldElement, element, isRoot)
 		{
 			var elementName=element.nodeName;	//save the element name
-			
-			
-/*TODO del			
-			if(elementName=="button")
-			{
-				alert("updating button with new info: "+DOMUtilities.getNodeString(element));
-			}
-*/
-			
-/*TODO del or salvage
-			if(elementName==this.ResponseElement.ATTRIBUTE)	//if this is really an attribute patch
-			{
-				this._processAttribute(element);	//patch the element with this attribute information TODO now that we're doing this in the patch tree, there may be no need for the ID attribute; double-check
-				return;	//don't do synchronization patching
-			}
-*/
 			var patchType=Element.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "patchType");	//get the patch type TODO use a constant
 			if(patchType=="none" || patchType=="temp")	//if we should not do any patching
 			{
@@ -1616,20 +1600,22 @@ if(elementName=="select")
 						{
 							if(childNode.nodeType==Node.ELEMENT_NODE)	//if this is an element, check the name and ID
 							{
-								if(oldChildNode.nodeName.toLowerCase()!=childNode.nodeName.toLowerCase())	//if these are elements with different node names
-								{
-									isChildrenCompatible=false;	//these child elements aren't compatible because they have different node name
-								}
-								else	//if the names are the same but the IDs are different, assume that the entire child should be replaced rather than synchronized---the event listeners would probably be different anyway
-								{
-									var oldChildID=oldChildNode.getAttribute("id");	//get the old child ID
-									var oldChildID=oldChildNode.id ? oldChildNode.id : null;	//normalize the ID because some browsers such as IE in HTML mode might return "" for a missing attribute rather than null
-									var childID=childNode.getAttribute("id");	//get the new child's ID
+									//if the IDs are different, assume that the entire child should be replaced rather than synchronized---the event listeners would probably be different anyway
+								var oldChildID=oldChildNode.getAttribute("id");	//get the old child ID
+								var oldChildID=oldChildNode.id ? oldChildNode.id : null;	//normalize the ID because some browsers such as IE in HTML mode might return "" for a missing attribute rather than null
+								var childID=childNode.getAttribute("id");	//get the new child's ID
 	//TODO del alert("comparing "+oldChildNode.nodeName+" IDs "+oldChildID+" "+typeof oldChildID+" and "+childID+" "+typeof childID);
-									if(oldChildID!=childID)	//if the IDs are different
-									{
+								if(oldChildID!=childID)	//if the IDs are different
+								{
 //alert("child IDs don't match: "+oldChildNode.nodeName+" IDs "+oldChildID+" "+typeof oldChildID+" and "+childID+" "+typeof childID);
-										isChildrenCompatible=false;	//these child elements aren't compatible because they have different IDs
+									isChildrenCompatible=false;	//these child elements aren't compatible because they have different IDs
+								}
+								else if(oldChildNode.nodeName.toLowerCase()!=childNode.nodeName.toLowerCase())	//if the IDs are the same, check the node names; if they are different
+								{
+									var patchType=Element.getAttributeNS(childNode, GUISE_ML_NAMESPACE_URI, "patchType");	//ignore different element types if this is a temp or a non-patch node TODO use a constant
+									if(patchType!="none" && patchType!="temp")	//all regular patching nodes are incompatible if the node names are different (those that are not non-patching or temporary nodes)
+									{
+										isChildrenCompatible=false;	//these child elements aren't compatible because they have different node name
 									}
 								}
 	/*TODO maybe add this later to prevent shifting elements from creating duplicate IDs; it would be better to simply remove the child ID attribute, though
@@ -1900,21 +1886,57 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 			com.garretwilson.js.EventManager.addEvent(window, "resize", this._onWindowResize.bind(this), false);	//add a resize listener
 		//TODO del	com.garretwilson.js.EventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
 			com.garretwilson.js.EventManager.addEvent(window, "unload", this.onUnload.bind(this), false);	//do the appropriate uninitialization when the window unloads
+
+			/**Support for insert for TinyMCE.
+			Modified from XHTMLxtras TinyMCE Plugin, Copyright © 2004-2008, Moxiecode Systems AB.
+			@param elementName The name of the element to add.
+			*/
+			tinymce.Editor.prototype.insertElement=function(elementName)
+			{
+				var element=this.dom.getParent(this.focusElement, elementName.toUpperCase());
+				tinyMCE.execCommand('mceBeginUndoLevel');
+				if(element==null)
+				{
+					var selectedText=this.selection.getContent();
+					if(selectedText.length>0)
+					{
+						var tagName=elementName;
+						if (tinymce.isIE && elementName.indexOf('html:') == 0)
+						{
+							elementName = elementName.substring(5).toLowerCase();
+						}
+						var htmlText = '<' + tagName + ' id="#sxe_temp_' + elementName + '#">' + selectedText + '</' + tagName + '>';
+						tinyMCE.execCommand('mceInsertContent', false, htmlText);
+						var elementArray = tinymce.grep(this.dom.select(elementName), function(n) {return n.id == '#sxe_temp_' + elementName + '#';});
+						for (var i=0; i<elementArray.length; i++)
+						{
+							var element = elementArray[i];
+							element.id = '';
+							element.setAttribute('id', '');
+							element.removeAttribute('id');
+						}
+					}
+				}
+				this.nodeChanged();
+				tinyMCE.execCommand('mceEndUndoLevel');
+			};
+
 			tinyMCE.init(
 				{
 			    "mode": "none",
 			    "theme": "advanced",
 			    "skin": "guise",
-			    "plugins": "xhtmlxtras",
+			    "plugins": "xhtmlxtras,xhtmlphrases",
 			    "auto_resize": true,	//experimental
 			    "theme_advanced_blockformats": "address,blockquote,div,h1,h2,h3,h4,h5,h6,dt,dd,code,p,pre",
 			    "theme_advanced_toolbar_align": "left",
 			    "theme_advanced_toolbar_location": "top",
 			    "theme_advanced_statusbar_location": "bottom",
 			    "theme_advanced_disable": "image,cleanup,help,code,fontselect,fontsizeselect,styleselect,forecolor,backcolor,forecolorpicker,backcolorpicker,newdocument",
-			    "theme_advanced_buttons3_add": "|,cite,abbr,acronym,del,ins,attribs,dfn",
+			    "theme_advanced_buttons3_add": "|,cite,abbr,acronym,del,ins,attribs,dfn,computercode,var,samp,kbd",
 			    "entity_encoding": "raw"	//don't entity encoding except for necessary XML characters; XHTML by default doesn't understand HTML entities, and numeric encoding would encur an unnecessary slowdown
 				});
+			
 			this._initializeNode(document.documentElement, true, true);	//initialize the document tree, indicating that this is the first initialization
 			this._updateComponents(document.documentElement, true);	//update all components represented by elements within the document
 		//TODO del when works	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
@@ -2574,6 +2596,12 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 									}
 								}
 								break;
+							case "div":
+								if(node.getAttribute("guise:patchType")=="temp")	//if this is just a temporary element that should be removed (in anticipation of a later replacement, such as the FCKeditor, for example) (IE doesn't let us check this attribute for all elements)
+								{
+									return false;	//stop initializing and indicate that the element should be deleted
+								}
+								break;
 /*TODO del
 							case "div":	//TODO maybe use a custom element
 								if(elementClassNames.contains("textControl-body"))	//if this is a Guise text control TODO use constant
@@ -2611,6 +2639,9 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 										}
 									}
 								}
+								break;	//TODO del if not needed
+							case "iframe":	//TODO improve to only ignore fckEditor iframes if needed
+								deep=false;	//don't look at the iframe children
 								break;
 							case "input":
 								switch(node.type)	//get the type of input
@@ -2672,6 +2703,13 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 										var componentID=component.id;	//get the component ID
 										if(componentID)	//if there is a component ID
 										{
+/*TODO FCKeditor
+											var oFCKeditor = new FCKeditor(componentID) ;
+											oFCKeditor.BasePath = GUISE_ASSETS_BASE_PATH+"javascript/fckeditor/";
+											oFCKeditor.OnAfterLinkedFieldUpdate=function(){alert("updated!");};
+											oFCKeditor.ReplaceTextarea() ;
+*/
+											
 												//if ever dynamic loading is fixed, see using global scope for eval() at http://josephsmarr.com/2007/01/31/fixing-eval-to-use-global-scope-in-ie/
 												//see also http://ajaxian.com/archives/evaling-with-ies-windowexecscript#comments
 												//dynamic loading TinyMCE via eval() gets an error and sometimes crashes Firefox
@@ -2968,9 +3006,29 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 //TODO fix				textInput.removeAttribute("guise:attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
 //TODO fix				guise.invalidateAncestorContent(editor);	//indicate that the ancestors now have different content TODO make sure this works with the editor
 				var ajaxRequest=new ChangeAJAXEvent(editor.componentID, new Map("value", editor.getContent()));	//create a new property change event with the Guise component ID and the new value
-				guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+				this.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 			}
 		};
+
+		/**Called when the FCKeditor is blurred.
+		@see http://docs.fckeditor.net/FCKeditor_2.x/Developers_Guide/JavaScript_API#Events
+		*/
+/*TODO FCKeditor
+		proto._onFCKeditorBlur=function(editor)
+		{
+			if(guise.isEnabled())	//if AJAX is enabled
+			{
+				if(editor.IsDirty())	//only report new content if the content changed
+				{
+//TODO fix				textInput.removeAttribute("guise:attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+//TODO fix				guise.invalidateAncestorContent(editor);	//indicate that the ancestors now have different content TODO make sure this works with the editor
+					editor.ResetIsDirty();	//TODO testing
+					var ajaxRequest=new ChangeAJAXEvent(editor.Name, new Map("value", editor.GetData(true)));	//create a new property change event with the Guise component ID and the new value
+					this.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+				}
+			}
+		};
+*/
 
 		/**Called when the Flash component initializes.*/
 		proto._onFlashInitialize=function()
@@ -3041,6 +3099,20 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 };
 
 var guise=new com.guiseframework.js.Guise();	//create a new global variable for the Guise client
+
+
+//editor supplements
+
+/**The global function that recognizes that an instance of the FCKeditor has been initialized.
+@param editor The editor instance that has just completed initializing.
+*/
+/*TODO FCKeditor
+function FCKeditor_OnComplete(editor)
+{
+//	alert("on complete");
+	editor.Events.AttachEvent("OnBlur", guise._onFCKeditorBlur.bind(guise, editor));	//when the editor os blurred, notify Guise
+} 
+*/
 
 /**The global drag state variable.*/
 var dragState;
@@ -3283,6 +3355,25 @@ function onAction(event)
 	{
 		tinyMCE.triggerSave();
 	}
+/*TODO FCKeditor
+	if(typeof FCKeditorAPI!="undefined")
+	{
+		var fckEditorInstances=FCKeditorAPI.Instances;	//TODO testing
+		for(var editorName in fckEditorInstances)
+		{
+			var editor=fckEditorInstances[editorName];
+			if(editor.IsDirty())	//only report new content if the content changed
+			{
+				//TODO fix				textInput.removeAttribute("guise:attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+				//TODO fix				guise.invalidateAncestorContent(editor);	//indicate that the ancestors now have different content TODO make sure this works with the editor
+				editor.ResetIsDirty();	//TODO testing
+				var ajaxRequest=new ChangeAJAXEvent(editor.Name, new Map("value", editor.GetData(true)));	//create a new property change event with the Guise component ID and the new value
+				guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+			}
+		}
+	}
+*/
+
 	var target=event.currentTarget;	//get the element on which the event was registered
 //TODO del alert("action on: "+element.nodeName);
 	var component=Node.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element TODO improve all this
