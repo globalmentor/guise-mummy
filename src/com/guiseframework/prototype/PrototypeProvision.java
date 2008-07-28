@@ -69,7 +69,8 @@ public class PrototypeProvision<P extends Prototype> extends AbstractHashObject 
 	public final static int RESOURCE_MENU_ADVANCE_ORDER=RESOURCE_MENU_ORDER+2000;
 	public final static int RESOURCE_MENU_NEXT_ORDER=RESOURCE_MENU_ORDER+2100;
 	public final static int RESOURCE_MENU_RETRIEVE_ORDER=RESOURCE_MENU_ORDER+2200;
-	public final static int RESOURCE_MENU_PROPERTIES_ORDER=RESOURCE_MENU_ORDER+2300;
+	public final static int RESOURCE_MENU_ANNOTATE_ORDER=RESOURCE_MENU_ORDER+2300;
+	public final static int RESOURCE_MENU_PROPERTIES_ORDER=RESOURCE_MENU_ORDER+2400;
 	public final static int RESOURCE_MENU_EXIT_ORDER=RESOURCE_MENU_ORDER+9900;
 
 		//help prototype orders
