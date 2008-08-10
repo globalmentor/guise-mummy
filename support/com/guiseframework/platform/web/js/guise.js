@@ -1030,7 +1030,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 											}
 											break;
 										case this.ResponseElement.RELOAD:	//reload
-											window.location.reload();	//reload the page
+											window.location.reload(true);	//reload the page, forcing a GET
 											return;	//stop processing events
 									}
 								}
@@ -1138,7 +1138,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 //TODO fix; this doesn't work						this._uploadIFrame.src="";	//TODO testing
 						this.removeUploadIFrame();	//remove the upload IFrame
 						this._resetUploadControl(element);	//reset the upload control, which seems to make Firefox stop the upload TODO test on production to see if it cancels
-						window.location.reload();	//reload the page, which seems to make IE stop the upload TODO test on production to see if it cancels
+						window.location.reload(true);	//reload the page, which seems to make IE stop the upload TODO test on production to see if it cancels
 					}
 					break;
 				case "resource-collect-complete":
