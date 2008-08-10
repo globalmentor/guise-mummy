@@ -105,10 +105,11 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory
 	public void setDepictionBaseURI(final URI depictionBaseURI);
 
 	/**Determines the URI to use for depiction based upon a navigation URI.
-	The URI will first be dereferenced for the current session and then resolved to the depiction base URI.
+	The URI will first be dereferenced for the current session and then resolved to the application base path
+	The resulting URI may not be absolute, but can be made absolute by resolving it against the depiction base URI.
 	@param navigationURI The navigation URI, which may be absolute or relative to the application.
 	@param suffixes The suffixes, if any, to append to a resource key in a URI reference.
-	@return A URI suitable for depiction, deferenced and resolved to the application.
+	@return A URI suitable for depiction, deferenced and resolved to the application base path.
 	@see #dereferenceURI(URI, String...)
 	@see #getDepictionBaseURI()
 	@see GuiseApplication#getDepictionURI(URI, URI)

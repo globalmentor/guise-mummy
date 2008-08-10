@@ -15,6 +15,7 @@
 		"application.description"="This application uses the Guise™ framework.",
 		"application.copyright"="",
 		"application.version"="0.0.0",
+		"application.support.email"="support@example.com",
 	
 		†Guise converters‡
 		"converter.invalid.value.message"="Invalid value: \"{0}\".",

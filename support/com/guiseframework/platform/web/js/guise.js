@@ -3351,7 +3351,7 @@ function onLinkClick(event)
 */
 function onAction(event)
 {
-	if(isUserAgentIE && tinyMCE.editors.length>0)	//on IE if there are TinyMCE editors in use, make sure their changes are saved before performing any action, because TinyMCE doesn't trigger a change when focus is lost on IE 
+	if(isUserAgentIE/*TODO find out why this is zero when TinyMCE is in a dialog: && tinyMCE.editors.length>0*/)	//on IE if there are TinyMCE editors in use, make sure their changes are saved before performing any action, because TinyMCE doesn't trigger a change when focus is lost on IE 
 	{
 		tinyMCE.triggerSave();
 	}
