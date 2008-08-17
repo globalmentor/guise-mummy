@@ -562,6 +562,9 @@ tinymce.create('tinymce.util.Dispatcher', {
 		},
 
 		toRelative : function(u) {
+			if(u=="./")	//workaround to allow relative URIs to the same collection; needed until URI parsing is fixed
+				return u;
+			
 			var t = this, o;
 
 			u = new tinymce.util.URI(u, {base_uri : t});
