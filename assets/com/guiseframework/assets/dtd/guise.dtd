@@ -12,6 +12,7 @@
 @see http://groups.yahoo.com/group/XHTML-L/message/1933
 @see http://www.w3.org/TR/xhtml-modularization/dtd_module_rules.html#s_dtd_module_rules
 @see http://www.alistapart.com/articles/customdtd/
+@see http://joeclark.org/access/captioning/bpoc/LiteraryMooseembedDTD.html
 -->
 
 <!--import XHTML 1.1 base module-->
@@ -31,6 +32,32 @@
 <!ATTLIST script
   language    							CDATA          #IMPLIED
 >
+
+<!--embed, needed for embedding Flash-->
+
+<!ENTITY % embed.element  "INCLUDE" >
+<![%embed.element;[
+<!ENTITY % embed.content
+     "( #PCDATA | %Flow.mix; | %param.qname; )*"
+>
+<!ENTITY % embed.qname  "embed" >
+<!ELEMENT %embed.qname;  %embed.content; >
+]]>
+
+<!ENTITY % embed.attlist  "INCLUDE" >
+<![%embed.attlist;[
+<!ATTLIST %embed.qname;
+      %Common.attrib;
+      pluginspage %URI.datatype;           #IMPLIED
+      src          %URI.datatype;           #IMPLIED
+      type         %ContentType.datatype;   #IMPLIED
+      quality      %Text.datatype;          #IMPLIED
+      height       %Length.datatype;        #IMPLIED
+      width        %Length.datatype;        #IMPLIED
+      name         CDATA                    #IMPLIED
+      tabindex     %Number.datatype;        #IMPLIED
+>
+]]>
 
 <!--add custom Guise attributes-->
 
