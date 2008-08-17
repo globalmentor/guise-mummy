@@ -2014,22 +2014,32 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 				guiseFlashDiv.style.top="-9999px";
 				document.body.appendChild(guiseFlashDiv);	//add the outer div to the body before adding the content, or the SWF won't register its exposed methods
 				var flashGuiseInnerHTMLStringBuilder=new StringBuilder();	//create a new string builder for creating the Flash object
-				var objectAttributes={"id":"guiseFlash", style:"width:1px;height:1px;"};	//create a map of attributes for serialization
-				if(isUserAgentIE)	//if this is IE
+				if(isUserAgentFirefox && navigator.userAgentVersionNumber>=3)	//Firefox 3 doesn't seem to like using <object> to dynamically embed Flash
 				{
-					objectAttributes.classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000";
-					var httpMethod=window.location.protocol=="https:" ? "https" : "http";	//use HTTPS if this is a secure page
-					objectAttributes.codebase=httpMethod+"://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0";
+					var embedAttributes={"id":"guiseFlash", style:"width:1px;height:1px;", quality:"high", type:"application/x-shockwave-flash"};	//create a map of attributes for serialization
+					embedAttributes.src=GUISE_ASSETS_BASE_PATH+"flash/guise.swf?guiseVersion="+GUISE_VERSION;	//add the Guise version so an out-of-date cached version won't be used
+					DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "embed", embedAttributes);	//<embed ...>
+					DOMUtilities.appendXMLEndTag(flashGuiseInnerHTMLStringBuilder, "embed");	//</embed>
 				}
-				else	//if this is any other browser
+				else	//for all other browsers, including Firefox <3 TODO replace with SWFObject when it supports XHTML
 				{
-					objectAttributes.type="application/x-shockwave-flash";
-					objectAttributes.data=GUISE_ASSETS_BASE_PATH+"flash/guise.swf?guiseVersion="+GUISE_VERSION;	//add the Guise version so an out-of-date cached version won't be used
+					var objectAttributes={"id":"guiseFlash", style:"width:1px;height:1px;"};	//create a map of attributes for serialization
+					if(isUserAgentIE)	//if this is IE
+					{
+						objectAttributes.classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000";
+						var httpMethod=window.location.protocol=="https:" ? "https" : "http";	//use HTTPS if this is a secure page
+						objectAttributes.codebase=httpMethod+"://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0";
+					}
+					else	//if this is any other browser
+					{
+						objectAttributes.type="application/x-shockwave-flash";
+						objectAttributes.data=GUISE_ASSETS_BASE_PATH+"flash/guise.swf?guiseVersion="+GUISE_VERSION;	//add the Guise version so an out-of-date cached version won't be used
+					}
+					DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "object", objectAttributes);	//<object ...>
+					DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param", {"name":"movie", "value":GUISE_ASSETS_BASE_PATH+"flash/guise.swf?guiseVersion="+GUISE_VERSION}, true);	//<param name="movie" value="...guise.swf"/>
+					DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param", {"name":"quality", "value":"high"}, true);	//<param name="movie" value="...guise.swf"/>
+					DOMUtilities.appendXMLEndTag(flashGuiseInnerHTMLStringBuilder, "object");	//</object>
 				}
-				DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "object", objectAttributes);	//<object ...>
-				DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param", {"name":"movie", "value":GUISE_ASSETS_BASE_PATH+"flash/guise.swf?guiseVersion="+GUISE_VERSION}, true);	//<param name="movie" value="...guise.swf"/>
-				DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param", {"name":"quality", "value":"high"}, true);	//<param name="movie" value="...guise.swf"/>
-				DOMUtilities.appendXMLEndTag(flashGuiseInnerHTMLStringBuilder, "object");	//</object>
 				guiseFlashDiv.innerHTML=flashGuiseInnerHTMLStringBuilder.toString();	//add the Flash content
 				this._flash=guiseFlashDiv.childNodes[0];	//the first child node is the Flash component; save a reference to it for later
 //console.debug("enqueueing flash function");
