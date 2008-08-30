@@ -16,13 +16,14 @@
 
 package com.guiseframework.model.rdf.maqro;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.globalmentor.rdf.RDFObject;
 import com.globalmentor.rdf.RDFResource;
-import com.globalmentor.rdf.maqro.FollowupEvaluation;
-import com.globalmentor.rdf.maqro.Group;
-import com.globalmentor.rdf.maqro.Question;
+import com.globalmentor.urf.maqro.FollowupEvaluation;
+import com.globalmentor.urf.maqro.Group;
+import com.globalmentor.urf.maqro.Question;
 import com.guiseframework.model.TreeNodeModel;
 import com.guiseframework.model.rdf.AbstractRDFResourceTreeNodeModel;
 
@@ -66,6 +67,7 @@ public abstract class AbstractGroupTreeNodeModel<V extends Group> extends Abstra
 	*/
 	protected boolean determineLeaf()
 	{
+/*TODO fix
 		if(!super.determineLeaf())	//if the base class doesn't think this is a leaf
 		{
 			return false;	//this isn't a leaf
@@ -79,6 +81,7 @@ public abstract class AbstractGroupTreeNodeModel<V extends Group> extends Abstra
 				return false;	//this is not a leaf because there is at least one child interaction
 			}
 		}
+*/
 		return true;	//we couldn't find child interactions, so this is a leaf 
 	}
 
@@ -88,6 +91,7 @@ public abstract class AbstractGroupTreeNodeModel<V extends Group> extends Abstra
 	*/
 	protected List<TreeNodeModel<?>> determineChildren()
 	{
+/*TODO fix
 		final List<TreeNodeModel<?>> children=super.determineChildren();	//determine the default children
 		final Group group=getValue();	//get the group
 		if(group!=null)	//if we have a group
@@ -103,6 +107,8 @@ public abstract class AbstractGroupTreeNodeModel<V extends Group> extends Abstra
 			}
 		}
 		return children;	//return the determined children
+*/
+		return Collections.emptyList();
 	}
 
 	/**Creates a child node to represent a property object resource and optional property.
@@ -115,6 +121,7 @@ public abstract class AbstractGroupTreeNodeModel<V extends Group> extends Abstra
 	*/ 
 	protected AbstractRDFResourceTreeNodeModel createRDFResourceTreeNode(final RDFResource rdfProperty, final RDFResource rdfResource)
 	{
+/*TODO fix
 		if(rdfResource instanceof Group)	//if the interaction is a group
 		{
 			return new GroupTreeNodeModel(null, (Group)rdfResource);	//create a group tree node model
@@ -127,6 +134,7 @@ public abstract class AbstractGroupTreeNodeModel<V extends Group> extends Abstra
 		{
 			return super.createRDFResourceTreeNode(rdfProperty, rdfResource);	//create a default RDF tree node
 		}
+*/throw new UnsupportedOperationException("TODO convert to URF");
 	}
 
 }

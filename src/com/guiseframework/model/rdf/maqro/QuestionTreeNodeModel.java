@@ -19,7 +19,7 @@ package com.guiseframework.model.rdf.maqro;
 import java.util.*;
 
 import com.globalmentor.rdf.*;
-import com.globalmentor.rdf.maqro.*;
+import com.globalmentor.urf.maqro.*;
 import com.guiseframework.model.TreeNodeModel;
 import com.guiseframework.model.rdf.AbstractRDFResourceTreeNodeModel;
 
@@ -58,6 +58,7 @@ public class QuestionTreeNodeModel extends AbstractInteractionTreeNodeModel<Ques
 	*/
 	protected boolean determineLeaf()
 	{
+/*TODO fix
 		if(!super.determineLeaf())	//if the base class doesn't think this is a leaf
 		{
 			return false;	//this isn't a leaf
@@ -81,14 +82,8 @@ public class QuestionTreeNodeModel extends AbstractInteractionTreeNodeModel<Ques
 					}
 				}
 			}
-/*TODO del when works
-			final RDFListResource followupList=question.getFollowups();	//get the followups
-			if(followupList!=null && !followupList.isEmpty())	//if there are followups
-			{
-				return false;	//there is at least one followup, so this is not a leaf
-			}
-*/
 		}
+*/
 		return true;	//we couldn't find any followup interactions, so this is a leaf 
 	}
 
@@ -98,6 +93,7 @@ public class QuestionTreeNodeModel extends AbstractInteractionTreeNodeModel<Ques
 	*/
 	protected List<TreeNodeModel<?>> determineChildren()
 	{
+/*TODO fix
 		final List<TreeNodeModel<?>> children=super.determineChildren();	//determine the default children
 		final Question question=getValue();	//get the question
 		if(question!=null)	//if we have a question
@@ -120,24 +116,9 @@ public class QuestionTreeNodeModel extends AbstractInteractionTreeNodeModel<Ques
 					}
 				}
 			}
-/*TODO del when works
-			final RDFListResource followupList=question.getFollowups();	//get the followups
-			if(followupList!=null)	//if there are followups
-			{
-				for(final RDFResource followupResource:followupList)	//for each followup
-				{
-					if(followupResource instanceof Interaction)	//if this is a followup interaction
-					{
-						if(!followups.contains(followupResource))	//if we haven't already added this followup as the object of a followup evaluation
-						{
-							children.add(createFollowupInteractionTreeNode(null, (Interaction)followupResource));	//add a new followup node to the list with no followup evaluation
-						}
-					}
-				}
-			}
-*/
 		}
 		return children;	//return the determined children
+*/return Collections.emptyList();
 	}
 	
 	/**Creates a child node to represent an interaction and optional subject followup evaluation.
@@ -150,6 +131,7 @@ public class QuestionTreeNodeModel extends AbstractInteractionTreeNodeModel<Ques
 	*/
 	protected AbstractRDFResourceTreeNodeModel createFollowupInteractionTreeNode(final FollowupEvaluation followupEvaluation, final Interaction interaction)
 	{
+/*TODO fix
 		if(interaction instanceof Group)	//if the interaction is a group
 		{
 			return new GroupTreeNodeModel(followupEvaluation, (Group)interaction);	//create a group tree node model
@@ -162,6 +144,7 @@ public class QuestionTreeNodeModel extends AbstractInteractionTreeNodeModel<Ques
 		{
 			return new DefaultInteractionTreeNodeModel(interaction.getClass(), followupEvaluation, interaction);	//create a general interaction tree node TODO improve
 		}
+*/throw new UnsupportedOperationException("TODO convert to URF");
 	}
 
 }

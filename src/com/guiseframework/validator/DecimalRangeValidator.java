@@ -91,8 +91,8 @@ public class DecimalRangeValidator<V extends Number & Comparable<V>> extends Abs
 	*/ 
 	protected boolean isValidStep(final V value, final V step, final V base)
 	{
-		final BigDecimal bigBase=base!=null ? asBigDecimal(base) : new BigDecimal(0);	//default to zero for the base
-		final double bigFactor=asBigDecimal(value).subtract(bigBase).divide(asBigDecimal(step)).doubleValue();	//get the number of times the step goes into the normalized value
+		final BigDecimal bigBase=base!=null ? toBigDecimal(base) : new BigDecimal(0);	//default to zero for the base
+		final double bigFactor=toBigDecimal(value).subtract(bigBase).divide(toBigDecimal(step)).doubleValue();	//get the number of times the step goes into the normalized value
 		return bigFactor==Math.floor(bigFactor);	//see if the step goes into the normalized value a whole number of times
 	}
 

@@ -16,7 +16,7 @@
 
 package com.guiseframework.model.rdf.maqro;
 
-import com.globalmentor.rdf.maqro.*;
+import com.globalmentor.urf.maqro.*;
 
 /**A tree node model that represents a MAQRO group.
 @author Garret Wilson

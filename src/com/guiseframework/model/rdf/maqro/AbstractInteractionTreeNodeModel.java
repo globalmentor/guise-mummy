@@ -16,8 +16,8 @@
 
 package com.guiseframework.model.rdf.maqro;
 
-import com.globalmentor.rdf.maqro.FollowupEvaluation;
-import com.globalmentor.rdf.maqro.Interaction;
+import com.globalmentor.urf.maqro.FollowupEvaluation;
+import com.globalmentor.urf.maqro.Interaction;
 import com.guiseframework.model.rdf.AbstractRDFResourceTreeNodeModel;
 
 /**Abstract functionality for a tree node model that represents an interaction.
@@ -25,7 +25,7 @@ This class by default does not include resource children or resource properties.
 @param <V> The type of value contained in the tree node.
 @author Garret Wilson
 */
-public abstract class AbstractInteractionTreeNodeModel<V extends Interaction> extends AbstractRDFResourceTreeNodeModel<V>
+public abstract class AbstractInteractionTreeNodeModel<V extends Interaction> //TODO fix extends AbstractRDFResourceTreeNodeModel<V>
 {
 
 	/**The followup evaluation which considers this interaction a followup in this context, or <code>null</code> if there is no followup evaluation subject in this context.*/
@@ -58,10 +58,14 @@ public abstract class AbstractInteractionTreeNodeModel<V extends Interaction> ex
 	*/
 	public AbstractInteractionTreeNodeModel(final Class<V> valueClass, final FollowupEvaluation followupEvaluation, final V initialValue)
 	{
+/*TODO fix
 		super(valueClass, initialValue);	//construct the parent class
+*/
 		this.followupEvaluation=followupEvaluation; //save the evaluation of which this interaction is the followup
+/*TODO fix
 		setResourceChildrenIncluded(false);	//don't show resource children
 		setResourcePropertiesIncluded(false);	//don't show resource properties
+*/
 	}
 
 }

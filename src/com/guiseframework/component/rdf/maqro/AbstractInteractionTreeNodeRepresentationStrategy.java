@@ -21,7 +21,7 @@ import java.util.List;
 import static com.globalmentor.rdf.dublincore.RDFDublinCore.*;
 
 import com.globalmentor.rdf.*;
-import com.globalmentor.rdf.maqro.*;
+import com.globalmentor.urf.maqro.*;
 import com.globalmentor.util.Debug;
 import com.guiseframework.component.TreeControl;
 import com.guiseframework.component.rdf.AbstractRDFResourceTreeNodeRepresentationStrategy;
@@ -32,7 +32,7 @@ import com.guiseframework.model.rdf.maqro.AbstractInteractionTreeNodeModel;
 @param <V> The type of value the strategy is to represent.
 @author Garret Wilson
 */
-public abstract class AbstractInteractionTreeNodeRepresentationStrategy<V extends Interaction> extends AbstractRDFResourceTreeNodeRepresentationStrategy<V>
+public abstract class AbstractInteractionTreeNodeRepresentationStrategy<V extends Interaction> //TODO fix extends AbstractRDFResourceTreeNodeRepresentationStrategy<V>
 {
 
 	/**Default constructor with a default RDF XMLifier.*/
@@ -47,7 +47,7 @@ public abstract class AbstractInteractionTreeNodeRepresentationStrategy<V extend
 	*/
 	public AbstractInteractionTreeNodeRepresentationStrategy(final RDFXMLGenerator rdfXMLifier)
 	{
-		super(rdfXMLifier);	//construct the parent
+//TODO fix		super(rdfXMLifier);	//construct the parent
 	}
 
 	/**Builds the label to be used for a tree node.
@@ -70,6 +70,7 @@ public abstract class AbstractInteractionTreeNodeRepresentationStrategy<V extend
 		{
 			final Question question=(Question)parentValue;	//get the question
 			final FollowupEvaluation followupEvaluation=((AbstractInteractionTreeNodeModel<?>)treeNode).getFollowupEvaluation();	//get the followup evaluation, if any, associated with the RDF object
+/*TODO fix
 			final String condition=followupEvaluation!=null ? followupEvaluation.getCondition() : null;	//get the evaluation condition, if any
 			if(condition!=null)	//if the evaluation has a condition
 			{
@@ -106,14 +107,17 @@ public abstract class AbstractInteractionTreeNodeRepresentationStrategy<V extend
 					}
 				}
 			}
+*/
 		}
-		if(value!=null)	//if there is a value
+		if(value!=null)	//if there is no value
 		{
+/*TODO fix
 			final RDFObject title=getTitle(value);	//get the title, if any
 			if(title!=null)	//if there is a title
 			{
 				stringBuilder.append(title);	//TODO testing; improve
 			}
+*/
 		}
 //TODO del		super.buildLabelText(stringBuilder, treeControl, model, treeNode, value);	//do the default label text building
 		return stringBuilder;	//return the string builder

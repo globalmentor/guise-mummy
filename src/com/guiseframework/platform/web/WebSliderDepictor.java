@@ -145,10 +145,10 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 		}
 		else if(Float.class.isAssignableFrom(valueClass) || Double.class.isAssignableFrom(valueClass) || BigInteger.class.isAssignableFrom(valueClass))	//decimal types
 		{
-			final BigDecimal bigMinimum=rangeMinimum!=null ? asBigDecimal(rangeMinimum) : BigDecimal.valueOf(0);	//get the minimum to use for calculations 
-			final BigDecimal bigMaximum=rangeMaximum!=null ? asBigDecimal(rangeMaximum) : BigDecimal.valueOf(100);	//get the maximum to use for calculations 
+			final BigDecimal bigMinimum=rangeMinimum!=null ? toBigDecimal(rangeMinimum) : BigDecimal.valueOf(0);	//get the minimum to use for calculations 
+			final BigDecimal bigMaximum=rangeMaximum!=null ? toBigDecimal(rangeMaximum) : BigDecimal.valueOf(100);	//get the maximum to use for calculations 
 			final BigDecimal bigRange=bigMaximum.subtract(bigMinimum);	//calculate the range
-			final BigDecimal bigStep=rangeStep!=null ? asBigDecimal(rangeStep) : BigDecimal.valueOf(1);	//get the step to use for calculations
+			final BigDecimal bigStep=rangeStep!=null ? toBigDecimal(rangeStep) : BigDecimal.valueOf(1);	//get the step to use for calculations
 				//TODO check this next line; it has thrown an Infinite or NaN NumberFormatException
 			final BigDecimal pureValue=bigRange.multiply(new BigDecimal(position)).add(bigStep.divide(BigDecimal.valueOf(2)));	//calculate the pure value without accounting for the base, and add half a step to allow rounding to the nearest step
 			final BigDecimal bigFactor=new BigDecimal(pureValue.divide(bigStep).intValue());	//find out how many times the step goes evenly into the pure value
@@ -337,10 +337,10 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 			if(rangeMinimum!=null && rangeMaximum!=null)	//if we have a range
 			{
 				
-				final BigDecimal bigRangeMinimum=asBigDecimal(rangeMinimum);	//get a big decimal version of the minimum
-				final BigDecimal bigRangeMaximum=asBigDecimal(rangeMaximum);	//get a big decimal version of the maximum
+				final BigDecimal bigRangeMinimum=toBigDecimal(rangeMinimum);	//get a big decimal version of the minimum
+				final BigDecimal bigRangeMaximum=toBigDecimal(rangeMaximum);	//get a big decimal version of the maximum
 				final BigDecimal bigRange=bigRangeMaximum.subtract(bigRangeMinimum);	//calculate the range
-				final BigDecimal bigInterval=interval!=null ? asBigDecimal(interval) : bigRange;	//use the existing interval or simply use the range if there is no interval
+				final BigDecimal bigInterval=interval!=null ? toBigDecimal(interval) : bigRange;	//use the existing interval or simply use the range if there is no interval
 //Debug.trace("using big interval", bigInterval);
 /*TODO fix
 				final List<BigDecimal> intervalValues=new ArrayList<BigDecimal>();	//create a list for the interval values
