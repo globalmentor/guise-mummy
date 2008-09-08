@@ -21,10 +21,10 @@ import static java.util.Collections.*;
 
 import static com.globalmentor.java.Classes.*;
 
+import com.globalmentor.model.TaskState;
 import com.globalmentor.net.URIPath;
 import com.guiseframework.Bookmark;
 import com.guiseframework.event.*;
-import com.guiseframework.model.TaskState;
 
 /**A task to upload a series of files from the platform.
 The files are uploaded sequentially.

@@ -23,9 +23,9 @@ import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 
 
+import com.globalmentor.model.TaskState;
 import com.globalmentor.util.*;
 import com.guiseframework.audio.Audio;
-import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.DepictEvent;
 import com.guiseframework.platform.PlatformEvent;
 

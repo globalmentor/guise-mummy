@@ -24,7 +24,6 @@ import com.globalmentor.beans.*;
 import com.guiseframework.event.*;
 import com.guiseframework.input.*;
 import com.guiseframework.model.*;
-import com.guiseframework.model.Notification.Option;
 
 /**Default implementation of a frame for communication of an option such as "OK" or "Cancel".
 An option frame defaults to a single composite child panel with a row of options along the bottom.
@@ -43,9 +42,9 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	@param options The available options.
 	@exception NullPointerException if the given options is <code>null</code>.
 	*/
-	public NotificationOptionDialogFrame(final Option... options)
+	public NotificationOptionDialogFrame(final Notification.Option... options)
 	{
-		this(new DefaultValueModel<Option>(Option.class), options);	//use a default value model
+		this(new DefaultValueModel<Notification.Option>(Notification.Option.class), options);	//use a default value model
 	}
 
 	/**Notification constructor.
@@ -56,7 +55,7 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	*/
 	public NotificationOptionDialogFrame(final Notification notification)
 	{
-		this(notification.getMessage(), notification.getMessageContentType(), notification.getOptions().toArray(new Option[notification.getOptions().size()]));	//create a dialog from the contents of the notification
+		this(notification.getMessage(), notification.getMessageContentType(), notification.getOptions().toArray(new Notification.Option[notification.getOptions().size()]));	//create a dialog from the contents of the notification
 	}
 	
 	/**Text constructor with a default {@link Model#PLAIN_TEXT_CONTENT_TYPE} content type.
@@ -66,7 +65,7 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	@exception NullPointerException if the given options is <code>null</code>.
 	#see {@link Text}
 	*/
-	public NotificationOptionDialogFrame(final String text, final Option... options)
+	public NotificationOptionDialogFrame(final String text, final Notification.Option... options)
 	{
 		this(text, PLAIN_TEXT_CONTENT_TYPE, options);	//construct the class with a plain text content type
 	}
@@ -80,7 +79,7 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	@exception IllegalArgumentException if the given content type is not a text content type.
 	#see {@link Text}
 	*/
-	public NotificationOptionDialogFrame(final String text, final ContentType textContentType, final Option... options)
+	public NotificationOptionDialogFrame(final String text, final ContentType textContentType, final Notification.Option... options)
 	{
 		this(new Text(text, textContentType), options);	//create a dialog using a Text component created from the given text and content type
 	}	
@@ -91,9 +90,9 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	@param options The available options.
 	@exception NullPointerException if the given options is <code>null</code>.
 	*/
-	public NotificationOptionDialogFrame(final Component component, final Option... options)
+	public NotificationOptionDialogFrame(final Component component, final Notification.Option... options)
 	{
-		this(new DefaultValueModel<Option>(Option.class), component, options);	//use a default value model
+		this(new DefaultValueModel<Notification.Option>(Notification.Option.class), component, options);	//use a default value model
 	}
 
 	/**Value model, and options constructor.
@@ -102,7 +101,7 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	@param options The available options.
 	@exception NullPointerException if the given value model and or options is <code>null</code>.
 	*/
-	public NotificationOptionDialogFrame(final ValueModel<Option> valueModel, final Option... options)
+	public NotificationOptionDialogFrame(final ValueModel<Notification.Option> valueModel, final Notification.Option... options)
 	{
 		this(valueModel, null, options);	//default to no component
 	}
@@ -114,7 +113,7 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	@param options The available options.
 	@exception NullPointerException if the given value model and/or options is <code>null</code>.
 	*/
-	public NotificationOptionDialogFrame(final ValueModel<Option> valueModel, final Component component, final Option... options)
+	public NotificationOptionDialogFrame(final ValueModel<Notification.Option> valueModel, final Component component, final Notification.Option... options)
 	{
 		super(valueModel, component, options);	//construct the parent class
 	}
@@ -165,7 +164,7 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	This implementation creates a button for the given option.
 	@param option The option for which a component should be created.
 	*/
-	protected Component createOptionComponent(final Option option)
+	protected Component createOptionComponent(final Notification.Option option)
 	{
 		if(bindingInputStrategy==null)	//if we haven't yet created our input strategy (we have to use lazy creation because this method is called from the parent constructor)
 		{

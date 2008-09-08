@@ -24,10 +24,10 @@ import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 
 
+import com.globalmentor.model.TaskState;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.util.*;
 import com.guiseframework.Bookmark;
-import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.PlatformEvent;
 
 /**A web depictor for a Flash <code>flash.net.FileReferenceList</code>.

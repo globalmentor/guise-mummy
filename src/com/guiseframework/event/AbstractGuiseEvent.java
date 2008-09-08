@@ -16,17 +16,15 @@
 
 package com.guiseframework.event;
 
-import java.util.EventObject;
+import com.globalmentor.event.AbstractEvent;
 
 import com.guiseframework.Guise;
 import com.guiseframework.GuiseSession;
 
-import static com.globalmentor.java.Objects.*;
-
 /**The base class for custom Guise events.
 @author Garret Wilson
 */
-public abstract class AbstractGuiseEvent extends EventObject implements GuiseEvent
+public abstract class AbstractGuiseEvent extends AbstractEvent implements GuiseEvent
 {
 
 	/**The Guise session in which this event was generated.*/
@@ -41,7 +39,7 @@ public abstract class AbstractGuiseEvent extends EventObject implements GuiseEve
 	*/
 	public AbstractGuiseEvent(final Object source)
 	{
-		super(checkInstance(source, "Event source object cannot be null."));	//construct the parent class
+		super(source);	//construct the parent class
 		this.session=Guise.getInstance().getGuiseSession();	//store a reference to the current Guise session
 	}
 

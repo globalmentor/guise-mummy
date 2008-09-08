@@ -18,7 +18,7 @@ package com.guiseframework.event;
 
 import static com.globalmentor.java.Objects.*;
 
-import com.guiseframework.model.TaskState;
+import com.globalmentor.model.TaskState;
 
 /**An event used to notify interested parties that progress has been made for a	particular task.
 @param <P> The type of progress being made.

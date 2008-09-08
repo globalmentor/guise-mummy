@@ -20,8 +20,10 @@ import java.net.URI;
 
 import static com.guiseframework.Resources.*;
 
+import com.globalmentor.model.TaskState;
 import com.guiseframework.Resources;
 import com.guiseframework.model.*;
+import com.guiseframework.theme.Theme;
 
 /**Selectable link that stores a task state.
 The link uses selected and unselected icons from the resources using resouce keys
@@ -61,10 +63,10 @@ public class TaskStateSelectLink extends ValueSelectLink<TaskState>
 		super(infoModel, actionModel, valueModel, enableable);	//construct the parent class		
 		setSelectedGlyphURI(SELECT_ACTION_SELECTED_GLYPH_RESOURCE_URI);
 		setUnselectedGlyphURI(SELECT_ACTION_UNSELECTED_GLYPH_RESOURCE_URI);
-		setValueGlyphURI(null, TaskState.getNoGlyph());	//set the icon resource for no task state
+		setValueGlyphURI(null, Theme.GLYPH_BLANK);	//set the icon resource for no task state
 		for(final TaskState taskState:TaskState.values())	//for each task status
 		{
-			setValueGlyphURI(taskState, taskState.getGlyph());	//set the icon resource for this task state
+			setValueGlyphURI(taskState, Resources.getGlyphResourceReference(taskState));	//set the icon resource for this task state
 		}
 	}
 

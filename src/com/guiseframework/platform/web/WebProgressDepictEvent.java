@@ -18,7 +18,7 @@ package com.guiseframework.platform.web;
 
 import static com.globalmentor.java.Objects.*;
 
-import com.guiseframework.model.TaskState;
+import com.globalmentor.model.TaskState;
 import com.guiseframework.platform.DepictedObject;
 
 /**Indicates that some sort of progress has been made on the web platform.

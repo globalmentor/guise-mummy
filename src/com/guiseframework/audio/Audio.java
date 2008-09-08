@@ -21,11 +21,11 @@ import java.net.URI;
 import static com.globalmentor.java.Classes.*;
 
 import com.globalmentor.java.Objects;
+import com.globalmentor.model.TaskState;
 import com.guiseframework.event.EventListenerManager;
 import com.guiseframework.event.ProgressEvent;
 import com.guiseframework.event.ProgressListenable;
 import com.guiseframework.event.ProgressListener;
-import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.AbstractDepictedObject;
 
 /**Audio that can be played.

@@ -18,6 +18,7 @@ package com.guiseframework.component.layout;
 
 import static com.globalmentor.java.Classes.*;
 
+import com.globalmentor.model.TaskState;
 import com.guiseframework.model.*;
 
 /**Constraints on an individual component representing a task in a card layout.

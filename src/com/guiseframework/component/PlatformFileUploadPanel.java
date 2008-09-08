@@ -21,12 +21,13 @@ import java.util.Collection;
 
 import com.globalmentor.itu.SIUnit;
 import com.globalmentor.java.Objects;
+import com.globalmentor.model.TaskState;
 import com.globalmentor.net.URIPath;
 import com.guiseframework.Bookmark;
+import com.guiseframework.Resources;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
-import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.*;
 import com.guiseframework.prototype.ActionPrototype;
 
@@ -338,7 +339,7 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 		}
 		else if(state!=null)	//if we're not transferring, just show the task state
 		{
-			statusStringBuilder.append(state.getLabel());	//show the task status label
+			statusStringBuilder.append(Resources.getLabelResourceReference(state));	//show the task status label
 		}
 		platformFileStatusLabel.setLabel(statusStringBuilder.toString());	//update the status
 	}
@@ -369,7 +370,7 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 		}
 		else if(state!=null)	//if we're not transferring, just show the task state
 		{
-			statusStringBuilder.append(state.getLabel());	//show the task status label
+			statusStringBuilder.append(Resources.getLabelResourceReference(state));	//show the task status label
 		}
 		overallStatusLabel.setLabel(statusStringBuilder.toString());	//update the status
 	}

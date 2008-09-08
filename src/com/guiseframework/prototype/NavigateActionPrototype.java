@@ -28,7 +28,7 @@ import com.guiseframework.event.NavigateActionListener;
 The navigation destination can be updated.
 @author Garret Wilson
 */
-public class NavigateActionPrototype extends ActionPrototype
+public class NavigateActionPrototype extends ActionPrototype	//TODO change to extend AbstractActionPrototype when ActionPrototype changes to an interface
 {
 
 	/**The navigate action listener, if any, installed for navigation.*/

@@ -26,6 +26,7 @@ import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 
+import com.globalmentor.model.TaskState;
 import com.globalmentor.util.Debug;
 import com.guiseframework.*;
 import com.guiseframework.event.*;

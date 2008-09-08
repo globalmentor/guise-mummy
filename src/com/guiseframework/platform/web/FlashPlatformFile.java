@@ -18,11 +18,11 @@ package com.guiseframework.platform.web;
 
 import static com.globalmentor.java.Objects.*;
 
+import com.globalmentor.model.TaskState;
 import com.globalmentor.net.URIPath;
 import com.guiseframework.Bookmark;
 import com.guiseframework.event.ProgressEvent;
 import com.guiseframework.event.ProgressListener;
-import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.AbstractPlatformFile;
 
 /**A local file represented by a Flash <code>flash.net.FileReference</code> on the web platform.

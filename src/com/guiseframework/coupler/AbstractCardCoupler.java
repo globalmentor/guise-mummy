@@ -29,6 +29,7 @@ import static java.util.Collections.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.java.Objects;
+import com.globalmentor.model.TaskState;
 import com.globalmentor.util.Debug;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;

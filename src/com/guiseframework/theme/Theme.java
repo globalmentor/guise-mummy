@@ -271,6 +271,7 @@ public class Theme extends URFListResource<Rule>
 	public final static String LABEL_CALENDAR=createStringResourceReference("theme.label.calendar");
 	public final static String LABEL_CANCEL=createStringResourceReference("theme.label.cancel");
 	public final static String LABEL_CLOSE=createStringResourceReference("theme.label.close");
+	public final static String LABEL_CONFIRM=createStringResourceReference("theme.label.confirm");
 	public final static String LABEL_DATE=createStringResourceReference("theme.label.date");
 	public final static String LABEL_DEFAULT=createStringResourceReference("theme.label.default");
 	public final static String LABEL_DELETE=createStringResourceReference("theme.label.delete");
@@ -309,6 +310,8 @@ public class Theme extends URFListResource<Rule>
 	public final static String LABEL_RENAME_X=createStringResourceReference("theme.label.rename.x");
 	public final static String LABEL_RESOURCE=createStringResourceReference("theme.label.resource");
 	public final static String LABEL_RETRY=createStringResourceReference("theme.label.retry");
+	public final static String LABEL_START=createStringResourceReference("theme.label.start");
+	public final static String LABEL_STOP=createStringResourceReference("theme.label.stop");
 	public final static String LABEL_SUBMIT=createStringResourceReference("theme.label.submit");
 	public final static String LABEL_SUBTRACT=createStringResourceReference("theme.label.subtract");
 	public final static String LABEL_TIME=createStringResourceReference("theme.label.time");
@@ -340,6 +343,7 @@ public class Theme extends URFListResource<Rule>
 	public final static URI GLYPH_CALENDAR=createURIResourceReference("theme.glyph.calendar");
 	public final static URI GLYPH_CANCEL=createURIResourceReference("theme.glyph.cancel");
 	public final static URI GLYPH_CLOSE=createURIResourceReference("theme.glyph.close");
+	public final static URI GLYPH_CONFIRM=createURIResourceReference("theme.glyph.confirm");
 	public final static URI GLYPH_DELETE=createURIResourceReference("theme.glyph.delete");
 	public final static URI GLYPH_DOCUMENT=createURIResourceReference("theme.glyph.document");
 	public final static URI GLYPH_DOCUMENT_CONTENT=createURIResourceReference("theme.glyph.document.content");
@@ -406,6 +410,7 @@ public class Theme extends URFListResource<Rule>
 	public final static URI GLYPH_SPEECH_BUBBLE=createURIResourceReference("theme.glyph.speech.bubble");
 	public final static URI GLYPH_SPEECH_BUBBLE_TEXT=createURIResourceReference("theme.glyph.speech.bubble.text");
 	public final static URI GLYPH_SPEECH_BUBBLE_TEXT_ADD=createURIResourceReference("theme.glyph.speech.bubble.text.add");
+	public final static URI GLYPH_START=createURIResourceReference("theme.glyph.start");
 	public final static URI GLYPH_STOP=createURIResourceReference("theme.glyph.stop");
 	public final static URI GLYPH_STRING_EDIT=createURIResourceReference("theme.glyph.string.edit");
 	public final static URI GLYPH_SUBMIT=createURIResourceReference("theme.glyph.submit");

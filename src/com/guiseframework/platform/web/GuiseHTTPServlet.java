@@ -36,6 +36,7 @@ import com.globalmentor.event.ProgressListener;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Objects;
 import com.globalmentor.javascript.JSON;
+import com.globalmentor.model.TaskState;
 import com.globalmentor.net.*;
 import com.globalmentor.net.http.*;
 import com.globalmentor.net.mime.ContentDispositionType;
@@ -53,7 +54,6 @@ import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
 import com.guiseframework.input.Key;
 import com.guiseframework.model.FileItemResourceImport;
-import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.*;
 
 import static com.globalmentor.flash.Flash.*;

@@ -23,6 +23,7 @@ import java.util.List;
 
 
 import com.globalmentor.beans.*;
+import com.globalmentor.model.TaskState;
 import com.globalmentor.util.Debug;
 import com.guiseframework.Bookmark;
 

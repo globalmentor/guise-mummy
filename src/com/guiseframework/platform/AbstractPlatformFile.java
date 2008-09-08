@@ -18,10 +18,10 @@ package com.guiseframework.platform;
 
 import static com.globalmentor.java.Objects.*;
 
+import com.globalmentor.model.TaskState;
 import com.guiseframework.event.EventListenerManager;
 import com.guiseframework.event.ProgressEvent;
 import com.guiseframework.event.ProgressListener;
-import com.guiseframework.model.TaskState;
 
 /**An abstract implementation of a local file on a platform.
 @author Garret Wilson
