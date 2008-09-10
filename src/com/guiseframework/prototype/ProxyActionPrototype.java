@@ -1,5 +1,5 @@
 /*
- * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,60 @@
 
 package com.guiseframework.prototype;
 
-import java.net.URI;
-
 import com.guiseframework.event.*;
 
-/**Abstract prototype information for an action control.
-If a subclass wants to perform some action, it should override {@link #action(int, int)}.
+/**An action prototype that is a proxy for another action prototype.
 @author Garret Wilson
 */
-public abstract class AbstractActionPrototype extends AbstractEnableablePrototype implements ActionPrototype
+public class ProxyActionPrototype extends AbstractEnableableProxyPrototype<ActionPrototype> implements ActionPrototype 
 {
+
+	/**A lazily-created action listener to repeat copies of events received, using this object as the source.*/ 
+	private ActionListener repeatActionListener=null;
+
+		/**@return An action listener to repeat copies of events received, using this object as the source.*/ 
+		protected synchronized ActionListener getRepeatActionListener()
+		{	//TODO synchronize on something else
+			if(repeatActionListener==null)	//if we have not yet created the repeater action listener
+			{
+				repeatActionListener=new ActionListener()	//create a listener to listen for a changing property value
+						{
+							public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed
+									{
+										final ActionEvent repeatActionEvent=new ActionEvent(ProxyActionPrototype.this, actionEvent);	//copy the action event with this class as its source, but keeping the same target if present
+										fireActionPerformed(actionEvent);	//fire the repeated action event
+									}
+						};
+			}
+			return repeatActionListener;	//return the repeater action listener
+		}
+
+	/**Uninstalls listeners from a proxied prototype.
+	@param oldProxiedPrototype The old proxied prototype.
+	*/
+	protected void uninstallListeners(final ActionPrototype oldProxiedPrototype)
+	{
+		super.uninstallListeners(oldProxiedPrototype);
+		oldProxiedPrototype.removeActionListener(getRepeatActionListener());	//stop repeating all actions of the proxied prototype
+	}
+
+	/**Installs listeners to a proxied prototype.
+	@param newProxiedPrototype The new proxied prototype.
+	*/
+	protected void installListeners(final ActionPrototype newProxiedPrototype)
+	{
+		super.installListeners(newProxiedPrototype);
+		newProxiedPrototype.addActionListener(getRepeatActionListener());	//listen and repeat all actions of the proxied prototype
+	}
+
+	/**Proxied prototype constructor.
+	@param proxiedPrototype The prototype proxied by this prototype.
+	@exception NullPointerException if the given proxied prototype is <code>null</code> is <code>null</code>.
+	*/
+	public ProxyActionPrototype(final ActionPrototype proxiedPrototype)
+	{
+		super(proxiedPrototype);
+	}
 
 	/**Adds an action listener.
 	@param actionListener The action listener to add.
@@ -66,16 +110,8 @@ public abstract class AbstractActionPrototype extends AbstractEnableablePrototyp
 	*/
 	public void performAction(final int force, final int option)
 	{
-		action(force, option);	//actually perform the action
 		fireActionPerformed(force, option);	//fire an event saying that the action has been performed with the given force and option
 	}
-
-	/**Performs whatever is necessary.
-	This method is guaranteed to be called before any action event is fired to any listeners.
-	@param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
-	@param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button click.
-	*/
-	protected abstract void action(final int force, final int option);
 
 	/**Fires an action event to all registered action listeners.
 	This method delegates to {@link #fireActionPerformed(ActionEvent)}.
@@ -104,26 +140,4 @@ public abstract class AbstractActionPrototype extends AbstractEnableablePrototyp
 		}
 	}
 
-	/**Default constructor.*/
-	public AbstractActionPrototype()
-	{
-		this(null);	//construct the class with no label
-	}
-
-	/**Label constructor.
-	@param label The text of the label, or <code>null</code> if there should be no label.
-	*/
-	public AbstractActionPrototype(final String label)
-	{
-		this(label, null);	//construct the label model with no icon
-	}
-
-	/**Label and icon constructor.
-	@param label The text of the label, or <code>null</code> if there should be no label.
-	@param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
-	*/
-	public AbstractActionPrototype(final String label, final URI icon)
-	{
-		super(label, icon);	//construct the parent class
-	}
 }

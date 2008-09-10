@@ -30,9 +30,8 @@ import com.guiseframework.Bookmark;
 import static com.globalmentor.java.Classes.*;
 import static com.guiseframework.Resources.*;
 import com.guiseframework.component.layout.*;
-import com.guiseframework.event.ActionEvent;
-import com.guiseframework.event.ActionListener;
 import com.guiseframework.model.*;
+import com.guiseframework.prototype.AbstractActionPrototype;
 import com.guiseframework.prototype.ActionPrototype;
 import static com.guiseframework.theme.Theme.*;
 
@@ -170,57 +169,57 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 	{
 		super(layout);	//construct the parent class
 			//previous action prototype
-		previousActionPrototype=new ActionPrototype(LABEL_PREVIOUS, GLYPH_PREVIOUS);
-		previousActionPrototype.addActionListener(new ActionListener()
+		previousActionPrototype=new AbstractActionPrototype(LABEL_PREVIOUS, GLYPH_PREVIOUS)
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the previous action is performed
-					{
-						goPrevious();	//go to the previous card
-					};
-				});
+					goPrevious();	//go to the previous card
+				};
+			};
 			//next action prototype
-		nextActionPrototype=new ActionPrototype(LABEL_NEXT, GLYPH_NEXT);
-		nextActionPrototype.addActionListener(new ActionListener()
+		nextActionPrototype=new AbstractActionPrototype(LABEL_NEXT, GLYPH_NEXT)
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the next action is performed
+					goNext();	//go to the next card
+				};
+			};
+			//finish action prototype
+		finishActionPrototype=new AbstractActionPrototype(LABEL_FINISH, GLYPH_FINISH)
+			{
+				@Override
+				protected void action(final int force, final int option)
+				{
+					goFinish();	//finish the sequence
+				};
+			};
+			//continue action prototype
+		continueActionPrototype=new AbstractActionPrototype(LABEL_NEXT, GLYPH_NEXT)
+			{
+				@Override
+				protected void action(final int force, final int option)
+				{
+					if(hasNext())	//if there is a next card
 					{
 						goNext();	//go to the next card
-					};
-				});
-			//finish action prototype
-		finishActionPrototype=new ActionPrototype(LABEL_FINISH, GLYPH_FINISH);
-		finishActionPrototype.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the finish action is performed
+					}
+					else	//if there is no next card
 					{
 						goFinish();	//finish the sequence
-					};
-				});
-			//continue action prototype
-		continueActionPrototype=new ActionPrototype(LABEL_NEXT, GLYPH_NEXT);
-		continueActionPrototype.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the next action is performed
-					{
-						if(hasNext())	//if there is a next card
-						{
-							goNext();	//go to the next card
-						}
-						else	//if there is no next card
-						{
-							goFinish();	//finish the sequence
-						}
-					};
-				});
+					}
+				};
+			};
 			//cancel action prototype
-		cancelActionPrototype=new ActionPrototype(LABEL_CANCEL, GLYPH_CANCEL);
-		cancelActionPrototype.addActionListener(new ActionListener()
+		cancelActionPrototype=new AbstractActionPrototype(LABEL_CANCEL, GLYPH_CANCEL)
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the cancel action is performed
-					{
-						goCancel();	//cancel the sequence
-					};
-				});
+					goCancel();	//cancel the sequence
+				};
+			};
 		addVetoableChangeListener(VALUE_PROPERTY, new SequenceCardVetoableChangeListener());	//do validation as needed on card changes
 		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Component>()
 				{

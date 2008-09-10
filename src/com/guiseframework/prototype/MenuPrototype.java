@@ -47,4 +47,8 @@ public class MenuPrototype extends AbstractActionPrototype
 		super(label, icon);	//construct the parent class
 	}
 
+	@Override
+	protected void action(final int force, final int option)
+	{
+	}
 }

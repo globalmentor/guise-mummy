@@ -18,12 +18,11 @@ package com.guiseframework.model;
 
 import java.beans.PropertyVetoException;
 
-
 import com.globalmentor.beans.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.FlowOrientation;
 import com.guiseframework.event.*;
-import com.guiseframework.prototype.ActionPrototype;
+import com.guiseframework.prototype.*;
 
 import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.theme.Theme.*;
@@ -95,50 +94,50 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 					}
 				});
 			//insert
-		insertActionPrototype=new ActionPrototype(LABEL_INSERT, GLYPH_INSERT);
-		insertActionPrototype.addActionListener(new ActionListener()	//listen for the insert action being performed
+		insertActionPrototype=new AbstractActionPrototype(LABEL_INSERT, GLYPH_INSERT)
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the action was performed
-					{
-						insertValue();	//insert a value
-					}
-				});
+					insertValue();	//insert a value
+				}
+			};
 			//edit
-		editActionPrototype=new ActionPrototype(LABEL_EDIT, GLYPH_EDIT);		
-		editActionPrototype.addActionListener(new ActionListener()	//listen for the edit action being performed
+		editActionPrototype=new AbstractActionPrototype(LABEL_EDIT, GLYPH_EDIT)		
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the action was performed
-					{
-						editValue();	//edit the selected value
-					}
-				});
+					editValue();	//edit the selected value
+				}
+			};
 			//remove
-		removeActionPrototype=new ActionPrototype(LABEL_REMOVE, GLYPH_REMOVE);
-		removeActionPrototype.addActionListener(new ActionListener()	//listen for the remove action being performed
+		removeActionPrototype=new AbstractActionPrototype(LABEL_REMOVE, GLYPH_REMOVE)
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the action was performed
-					{
-						removeValue();	//remove the selected value
-					}
-				});
+					removeValue();	//remove the selected value
+				}
+			};
 			//lower
-		lowerActionPrototype=new ActionPrototype(LABEL_LOWER, FlowOrientation.BOTTOM_TO_TOP.getGlyph());
-		lowerActionPrototype.addActionListener(new ActionListener()	//listen for the lower action being performed
+		lowerActionPrototype=new AbstractActionPrototype(LABEL_LOWER, FlowOrientation.BOTTOM_TO_TOP.getGlyph())
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the action was performed
-					{
-						lowerValue();	//lower the selected value
-					}
-				});
+					lowerValue();	//lower the selected value
+				}
+			};
 			//raise
-		raiseActionPrototype=new ActionPrototype(LABEL_RAISE, FlowOrientation.TOP_TO_BOTTOM.getGlyph());
-		raiseActionPrototype.addActionListener(new ActionListener()	//listen for the raise action being performed
+		raiseActionPrototype=new AbstractActionPrototype(LABEL_RAISE, FlowOrientation.TOP_TO_BOTTOM.getGlyph())
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the action was performed
-					{
-						raiseValue();	//raise the selected value
-					}
-				});
+					raiseValue();	//raise the selected value
+				}
+			};
 		updateProperties();	//initialize the properties
 	}
 

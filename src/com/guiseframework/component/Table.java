@@ -34,6 +34,7 @@ import com.guiseframework.event.*;
 import com.guiseframework.geometry.Extent;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.AbstractPresentationModel;
+import com.guiseframework.prototype.AbstractActionPrototype;
 import com.guiseframework.prototype.ActionPrototype;
 import com.guiseframework.style.FontStyle;
 import com.guiseframework.validator.*;
@@ -717,49 +718,41 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 					});
 		}
 			//first action prototype
-		firstActionPrototype=new ActionPrototype();
-		firstActionPrototype.setGlyphURI(GLYPH_FIRST);
-		firstActionPrototype.setLabel(LABEL_FIRST);
-		firstActionPrototype.addActionListener(new ActionListener()
+		firstActionPrototype=new AbstractActionPrototype(LABEL_FIRST, GLYPH_FIRST)
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the first action is performed
-					{
-						goFirst();	//go to the first set of rows
-					};
-				});
+					goFirst();	//go to the first set of rows
+				};
+			};
 			//previous action prototype
-		previousActionPrototype=new ActionPrototype();
-		previousActionPrototype.setGlyphURI(GLYPH_PREVIOUS);
-		previousActionPrototype.setLabel(LABEL_PREVIOUS);
-		previousActionPrototype.addActionListener(new ActionListener()
+		previousActionPrototype=new AbstractActionPrototype(LABEL_PREVIOUS, GLYPH_PREVIOUS)
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the previous action is performed
-					{
-						goPrevious();	//go to the previous set of rows
-					};
-				});
+					goPrevious();	//go to the previous set of rows
+				};
+			};
 			//next action prototype
-		nextActionPrototype=new ActionPrototype();
-		nextActionPrototype.setGlyphURI(GLYPH_NEXT);
-		nextActionPrototype.setLabel(LABEL_NEXT);
-		nextActionPrototype.addActionListener(new ActionListener()
+		nextActionPrototype=new AbstractActionPrototype(LABEL_NEXT, GLYPH_NEXT)
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the next action is performed
-					{
-						goNext();	//go to the next set of rows
-					};
-				});
+					goNext();	//go to the next set of rows
+				};
+			};
 			//last action prototype
-		lastActionPrototype=new ActionPrototype();
-		lastActionPrototype.setGlyphURI(GLYPH_LAST);
-		lastActionPrototype.setLabel(LABEL_LAST);
-		lastActionPrototype.addActionListener(new ActionListener()
+		lastActionPrototype=new AbstractActionPrototype(LABEL_LAST, GLYPH_LAST)
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the last action is performed
-					{
-						goLast();	//go to the last set of rows
-					};
-				});
+					goLast();	//go to the last set of rows
+				};
+			};
 		addPropertyChangeListener(DISPLAY_ROW_COUNT_PROPERTY, updatePrototypesPropertyChangeListener);	//update the prorotypes when the display row count changes
 		addPropertyChangeListener(DISPLAY_ROW_START_INDEX_PROPERTY, updatePrototypesPropertyChangeListener);	//update the prorotypes when the display row start index changes
 		//TODO listen for the row count changing and update the prototypes in response

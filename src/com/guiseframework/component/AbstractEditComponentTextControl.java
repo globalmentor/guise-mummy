@@ -201,47 +201,41 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 		this.editControl.setDisplayed(false);	//hide the edit control
 		add(editControl);	//add the edit control
 			//edit action prototype
-		editActionPrototype=new ActionPrototype();
-		editActionPrototype.addActionListener(new ActionListener()
+		editActionPrototype=new AbstractActionPrototype()
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(final ActionEvent actionEvent)
-					{
-						editLabel();	//initiate editing
-					}
-				});
+					editLabel();	//initiate editing
+				}
+			};
 			//accept action prototype
-		acceptActionPrototype=new ActionPrototype();
-		acceptActionPrototype.setGlyphURI(Theme.GLYPH_ACCEPT);
-		acceptActionPrototype.setLabel(Theme.LABEL_ACCEPT);
-		acceptActionPrototype.addActionListener(new ActionListener()
+		acceptActionPrototype=new AbstractActionPrototype(Theme.LABEL_ACCEPT, Theme.GLYPH_ACCEPT)
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(final ActionEvent actionEvent)
-					{
-						acceptEdit();	//accept edits
-					}
-				});
+					acceptEdit();	//accept edits
+				}
+			};
 			//reject action prototype
-		rejectActionPrototype=new ActionPrototype();
-		rejectActionPrototype.setGlyphURI(Theme.GLYPH_REJECT);
-		rejectActionPrototype.setLabel(Theme.LABEL_REJECT);
-		rejectActionPrototype.addActionListener(new ActionListener()
+		rejectActionPrototype=new AbstractActionPrototype(Theme.LABEL_REJECT, Theme.GLYPH_REJECT)
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(final ActionEvent actionEvent)
-					{
-						rejectEdit();	//cancel editing
-					}
-				});
+					rejectEdit();	//cancel editing
+				}
+			};
 			//delete action prototype
-		deleteActionPrototype=new ActionPrototype();
-		deleteActionPrototype.setGlyphURI(Theme.GLYPH_DELETE);
-		deleteActionPrototype.setLabel(Theme.LABEL_DELETE);
-		deleteActionPrototype.addActionListener(new ActionListener()
+		deleteActionPrototype=new AbstractActionPrototype(Theme.LABEL_DELETE, Theme.GLYPH_DELETE)
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(final ActionEvent actionEvent)
-					{
-						deleteLabel();	//delete the current label
-					}
-				});
+					deleteLabel();	//delete the current label
+				}
+			};
 		addPropertyChangeListener(EDITABLE_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>()	//listen for the editable property changing
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent)	//if the editable property changes

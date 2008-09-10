@@ -22,23 +22,23 @@ import com.globalmentor.java.Objects;
 import static com.globalmentor.java.Classes.*;
 import com.globalmentor.net.URIPath;
 
-import com.guiseframework.event.NavigateActionListener;
+import com.guiseframework.Guise;
 
 /**Action prototype that knows how to navigate.
 The navigation destination can be updated.
 @author Garret Wilson
 */
-public class NavigateActionPrototype extends ActionPrototype	//TODO change to extend AbstractActionPrototype when ActionPrototype changes to an interface
+public class NavigateActionPrototype extends AbstractActionPrototype
 {
-
-	/**The navigate action listener, if any, installed for navigation.*/
-	private NavigateActionListener navigateActionListener=null;
 
 	/**The navigation URI bound property.*/
 	public final static String NAVIGATION_URI_PROPERTY=getPropertyName(NavigateActionPrototype.class, "navigationURI");
-	
-		/**@return The navigation URI, or <code>null</code> if there is no navigation URI.*/
-		public URI getNavigationURI() {return navigateActionListener!=null ? navigateActionListener.getNavigationURI() : null;}
+
+	/**The requested navigation URI.*/
+	private URI navigationURI;
+
+		/**@return The requested navigation URI.*/
+		public URI getNavigationURI() {return navigationURI;}
 
 		/**Sets the URI for navigation.
 		This is a bound property.
@@ -50,20 +50,8 @@ public class NavigateActionPrototype extends ActionPrototype	//TODO change to ex
 			final URI oldNavigationURI=getNavigationURI();
 			if(!Objects.equals(oldNavigationURI, newNavigationURI))	//if the value is really changing
 			{
-				if(navigateActionListener!=null)	//if we already have a navigate action listener
-				{
-					removeActionListener(navigateActionListener);	//stop listening for the action
-				}
-				if(newNavigationURI!=null)	//if we have a new navigation URI
-				{
-					navigateActionListener=new NavigateActionListener(newNavigationURI);	//create a new navigate action listener for the new URI
-					addActionListener(navigateActionListener);	//install the new action listener
-				}
-				else	//if we have no new navigation URI
-				{
-					navigateActionListener=null;	//we don't need a navigate action listener
-				}
-				firePropertyChange(NAVIGATION_URI_PROPERTY, oldNavigationURI, getNavigationURI());	//indicate that the value changed
+				this.navigationURI=newNavigationURI;	//actually set the new navigation URI
+				firePropertyChange(NAVIGATION_URI_PROPERTY, oldNavigationURI, newNavigationURI);	//indicate that the value changed
 			}
 		}
 
@@ -116,7 +104,7 @@ public class NavigateActionPrototype extends ActionPrototype	//TODO change to ex
 	public NavigateActionPrototype(final String label, final URI icon, final URI navigationURI)
 	{
 		super(label, icon);	//construct the parent class
-		setNavigationURI(navigationURI);	//set the navigation URI
+		this.navigationURI=navigationURI;	//set the navigation URI
 	}
 	
 	/**Navigation URI path constructor.
@@ -145,6 +133,15 @@ public class NavigateActionPrototype extends ActionPrototype	//TODO change to ex
 	{
 		this(label, icon, navigationURIPath!=null ? navigationURIPath.toURI() : null);	//construct the class with the navigation URI
 	}
-	
-	
+
+	@Override
+	protected void action(final int force, final int option)
+	{
+		final URI navigationURI=getNavigationURI();	//get the configured navigation URI, if any
+		if(navigationURI!=null)	//if we have a navigation URI
+		{
+			Guise.getInstance().getGuiseSession().navigate(getNavigationURI(), null);	//request that the session navigate to the configured URI
+		}
+	}
+
 }

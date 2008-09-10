@@ -201,17 +201,17 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	*/
 	public Component createComponent(final Prototype prototype)
 	{
-		if(prototype instanceof ActionPrototype)	//action prototypes
+		if(prototype instanceof MenuPrototype)	//menu prototypes
+		{
+			return new DropMenu((MenuPrototype)prototype, Flow.PAGE);
+		}
+		else if(prototype instanceof ActionPrototype)	//all other action prototypes
 		{
 			return new Button((ActionPrototype)prototype);
 		}
 		else if(prototype instanceof LabelPrototype)	//label prototypes
 		{
 			return new Label((LabelPrototype)prototype);
-		}
-		else if(prototype instanceof MenuPrototype)	//menu prototypes
-		{
-			return new DropMenu((MenuPrototype)prototype, Flow.PAGE);
 		}
 		else if(prototype instanceof TogglePrototype)	//toggle prototypes
 		{

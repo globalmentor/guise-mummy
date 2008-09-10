@@ -416,7 +416,13 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 				};
 
 			//close action prototype
-		closeActionPrototype=new ActionPrototype(LABEL_CLOSE, GLYPH_CLOSE);	//create the prototype for the close action
+		closeActionPrototype=new AbstractActionPrototype(LABEL_CLOSE, GLYPH_CLOSE)	//create the prototype for the close action
+			{
+				@Override
+				protected void action(final int force, final int option)	//TODO improve to call close action listener directly if wanted
+				{
+				}
+			};
 		closeActionPrototype.addActionListener(closeActionListener);	//close the frame when the close action is performed
 			//default close action control
 		final Link closeActionControl=new Link(closeActionPrototype);	//create a close action control from the prototype

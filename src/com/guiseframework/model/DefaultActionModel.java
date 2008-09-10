@@ -18,7 +18,8 @@ package com.guiseframework.model;
 
 import com.guiseframework.event.*;
 
-/**A default implementation of a button model.
+/**A default implementation of an action model.
+If a subclass wants to perform some action, it should override {@link #action(int, int)}.
 @author Garret Wilson
 */
 public class DefaultActionModel extends AbstractModel implements ActionModel
@@ -56,15 +57,27 @@ public class DefaultActionModel extends AbstractModel implements ActionModel
 	}
 
 	/**Performs the action with the given force and option.
+	This implementation calls {@link #action(int, int)} to perform the actual action.
 	An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
 	@param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
 	@param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button click.
 	*/
 	public void performAction(final int force, final int option)
 	{
+		action(force, option);	//actually perform the action
 		fireActionPerformed(force, option);	//fire an event saying that the action has been performed with the given force and option
 	}
 
+	/**Performs whatever is necessary.
+	This method is guaranteed to be called before any action event is fired to any listeners.
+	This version does nothing.
+	@param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
+	@param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button click.
+	*/
+	protected void action(final int force, final int option)
+	{
+	}
+	
 	/**Fires an action event to all registered action listeners.
 	This method delegates to {@link #fireActionPerformed(ActionEvent)}.
 	@param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.

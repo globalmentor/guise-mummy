@@ -29,6 +29,7 @@ import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
 import com.guiseframework.platform.*;
+import com.guiseframework.prototype.AbstractActionPrototype;
 import com.guiseframework.prototype.ActionPrototype;
 
 import static com.globalmentor.java.Characters.*;
@@ -215,56 +216,56 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 //TODO del		resourceCollectControl=new ResourceCollectControl();	//resource collector
 //TODO del		controlPanel.add(resourceCollectControl);
 
-		browseActionPrototype=new ActionPrototype(LABEL_BROWSE+HORIZONTAL_ELLIPSIS_CHAR, GLYPH_BROWSE);	//browse
-		browseActionPrototype.addActionListener(new ActionListener()
+		browseActionPrototype=new AbstractActionPrototype(LABEL_BROWSE+HORIZONTAL_ELLIPSIS_CHAR, GLYPH_BROWSE)	//browse
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(ActionEvent actionEvent)
-					{
-						getSession().getPlatform().selectPlatformFiles(true, new ValueSelectListener<Collection<PlatformFile>>()	//select platform files, listening for the selection to occur
+					getSession().getPlatform().selectPlatformFiles(true, new ValueSelectListener<Collection<PlatformFile>>()	//select platform files, listening for the selection to occur
+						{
+							public void valueSelected(final ValueEvent<Collection<PlatformFile>> valueEvent)	//when files are selected
+							{
+								final Collection<PlatformFile> platformFiles=valueEvent.getValue();	//get the new platform files
+								platformFileListControl.clear();	//remove the currently displayed platform files
+								platformFileListControl.addAll(platformFiles);	//add all the new platform files to the list
+								for(final PlatformFile platformFile:platformFiles)	//for each platform file
 								{
-									public void valueSelected(final ValueEvent<Collection<PlatformFile>> valueEvent)	//when files are selected
-									{
-										final Collection<PlatformFile> platformFiles=valueEvent.getValue();	//get the new platform files
-										platformFileListControl.clear();	//remove the currently displayed platform files
-										platformFileListControl.addAll(platformFiles);	//add all the new platform files to the list
-										for(final PlatformFile platformFile:platformFiles)	//for each platform file
-										{
-											platformFile.removeProgressListener(platformFileProgressListener);	//make sure we're not already listening for progress on this platform file
-											platformFile.addProgressListener(platformFileProgressListener);	//start listening for progress on this platform file
-										}
-										updateComponents();	//update the components
-									}
-								});
-					}
-				});
+									platformFile.removeProgressListener(platformFileProgressListener);	//make sure we're not already listening for progress on this platform file
+									platformFile.addProgressListener(platformFileProgressListener);	//start listening for progress on this platform file
+								}
+								updateComponents();	//update the components
+							}
+						});
+				}
+			};
 		controlPanel.add(browseActionPrototype);
-		uploadActionPrototype=new ActionPrototype(LABEL_UPLOAD, GLYPH_UPLOAD);	//resource upload
-		uploadActionPrototype.setEnabled(false);	//initially disable upload
-		uploadActionPrototype.addActionListener(new ActionListener()
+		uploadActionPrototype=new AbstractActionPrototype(LABEL_UPLOAD, GLYPH_UPLOAD)	//resource upload
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(ActionEvent actionEvent)
+					platformFileUploadTask=new PlatformFileUploadTask(platformFileListControl, getDestinationPath(), getDestinationBookmark());	//create a new platform file upload task
+					platformFileUploadTask.addProgressListener(overallProgressListener);	//listen for progress of the platform file upload task
+					platformFileUploadTask.start();	//start the file uploads
+					updateComponents();	//update the components to show the new state
+				}
+			};
+		uploadActionPrototype.setEnabled(false);	//initially disable upload
+		controlPanel.add(uploadActionPrototype);
+		cancelActionPrototype=new AbstractActionPrototype(LABEL_CANCEL, GLYPH_CANCEL)	//upload cancel
+			{
+				@Override
+				protected void action(final int force, final int option)
+				{
+					final PlatformFileUploadTask platformFileUploadTask=PlatformFileUploadPanel.this.platformFileUploadTask;	//get the file platform upload task
+					if(platformFileUploadTask!=null)	//if there is an upload task
 					{
-						platformFileUploadTask=new PlatformFileUploadTask(platformFileListControl, getDestinationPath(), getDestinationBookmark());	//create a new platform file upload task
-						platformFileUploadTask.addProgressListener(overallProgressListener);	//listen for progress of the platform file upload task
-						platformFileUploadTask.start();	//start the file uploads
+						platformFileUploadTask.cancel();	//cancel the upload task
 						updateComponents();	//update the components to show the new state
 					}
-				});
-		controlPanel.add(uploadActionPrototype);
-		cancelActionPrototype=new ActionPrototype(LABEL_CANCEL, GLYPH_CANCEL);	//upload cancel
+				}
+			};
 		cancelActionPrototype.setEnabled(false);	//initially disable canceling
-		cancelActionPrototype.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent actionEvent)
-					{
-						final PlatformFileUploadTask platformFileUploadTask=PlatformFileUploadPanel.this.platformFileUploadTask;	//get the file platform upload task
-						if(platformFileUploadTask!=null)	//if there is an upload task
-						{
-							platformFileUploadTask.cancel();	//cancel the upload task
-							updateComponents();	//update the components to show the new state
-						}
-					}
-				});
 		controlPanel.add(cancelActionPrototype);
 	
 			//listen for the resource collection control changing its list of collected resource paths

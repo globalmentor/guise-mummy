@@ -828,22 +828,20 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		this.orientation=Orientation.getOrientation(locale);	//set the orientation default based upon the locale
 		logWriter=new OutputStreamWriter(System.err);	//default to logging to the error output; this will be replaced after the session is created
 			//about action prototype
-		aboutApplicationActionPrototype=new ActionPrototype();
-		aboutApplicationActionPrototype.setLabel(LABEL_ABOUT_X+createStringValueReference(APPLICATION_NAME));
-		aboutApplicationActionPrototype.setGlyphURI(GLYPH_ABOUT);
-		aboutApplicationActionPrototype.addActionListener(new ActionListener()
+		aboutApplicationActionPrototype=new AbstractActionPrototype(LABEL_ABOUT_X+createStringValueReference(APPLICATION_NAME), GLYPH_ABOUT)
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(final ActionEvent actionEvent)
-					{
-						final AboutPanel aboutPanel=new AboutPanel();	//create a new about panel
-						aboutPanel.setNameLabel(APPLICATION_NAME);
-						aboutPanel.setVersionLabel(LABEL_VERSION+' '+APPLICATION_VERSION);
-						aboutPanel.setCopyrightLabel(APPLICATION_COPYRIGHT);
-						final Frame aboutFrame=new NotificationOptionDialogFrame(aboutPanel, Notification.Option.OK);	//create an about frame
-						aboutFrame.setLabel(LABEL_ABOUT+' '+APPLICATION_NAME);	//set the title
-						aboutFrame.open(true);	//show the about dialog
-					}
-				});
+					final AboutPanel aboutPanel=new AboutPanel();	//create a new about panel
+					aboutPanel.setNameLabel(APPLICATION_NAME);
+					aboutPanel.setVersionLabel(LABEL_VERSION+' '+APPLICATION_VERSION);
+					aboutPanel.setCopyrightLabel(APPLICATION_COPYRIGHT);
+					final Frame aboutFrame=new NotificationOptionDialogFrame(aboutPanel, Notification.Option.OK);	//create an about frame
+					aboutFrame.setLabel(LABEL_ABOUT+' '+APPLICATION_NAME);	//set the title
+					aboutFrame.open(true);	//show the about dialog
+				}
+			};
 	}
 
 	/**Retrieves the component bound to the given destination.

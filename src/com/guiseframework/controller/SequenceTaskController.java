@@ -19,7 +19,7 @@ package com.guiseframework.controller;
 import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.model.SequenceTask;
-import com.guiseframework.event.*;
+import com.guiseframework.prototype.AbstractActionPrototype;
 import com.guiseframework.prototype.ActionPrototype;
 import static com.guiseframework.theme.Theme.*;
 
@@ -188,85 +188,85 @@ public class SequenceTaskController
 	public SequenceTaskController(final SequenceTask task)
 	{
 		this.task=checkInstance(task, "Task cannot be null.");
-		startActionPrototype=new ActionPrototype(LABEL_START, GLYPH_START);
-		startActionPrototype.addActionListener(new ActionListener()
+		startActionPrototype=new AbstractActionPrototype(LABEL_START, GLYPH_START)
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the start action is performed
+					if(!isConfirmNavigation() || getConfirmingActionPrototype()==startActionPrototype)	//if this action is waiting to be confirmed
 					{
-						if(!isConfirmNavigation() || getConfirmingActionPrototype()==startActionPrototype)	//if this action is waiting to be confirmed
-						{
-							getTask().goStart(); //start the sequence
-							setConfirmingActionPrototype(null);	//show that we're not waiting for confirmation on anything
-						}
-						else	//if we should confirm this action
-						{
-							setConfirmingActionPrototype(startActionPrototype);	//perform this action subject to confirmation
-						}
-					};
-				});
-		previousActionPrototype=new ActionPrototype(LABEL_PREVIOUS, GLYPH_PREVIOUS);
-		previousActionPrototype.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the previous action is performed
-					{
-						if(!isConfirmNavigation() || getConfirmingActionPrototype()==previousActionPrototype)	//if this action is waiting to be confirmed
-						{
-							getTask().goPrevious();  //go to the previous step
-							setConfirmingActionPrototype(null);	//show that we're not waiting for confirmation on anything
-						}
-						else	//if we should confirm this action
-						{
-							setConfirmingActionPrototype(previousActionPrototype);	//perform this action subject to confirmation
-						}
-					};
-				});
-		nextActionPrototype=new ActionPrototype(LABEL_NEXT, GLYPH_NEXT);
-		nextActionPrototype.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the next action is performed
-					{
-						if(!isConfirmNavigation() || getConfirmingActionPrototype()==nextActionPrototype)	//if this action is waiting to be confirmed
-						{
-							getTask().goNext();  //go to the next step
-							setConfirmingActionPrototype(null);	//show that we're not waiting for confirmation on anything
-						}
-						else	//if we should confirm this action
-						{
-							setConfirmingActionPrototype(nextActionPrototype);	//perform this action subject to confirmation
-						}
-					};
-				});
-		finishActionPrototype=new ActionPrototype(LABEL_FINISH, GLYPH_FINISH);
-		finishActionPrototype.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the finish action is performed
-					{
-						if(!isConfirmNavigation() || getConfirmingActionPrototype()==finishActionPrototype)	//if this action is waiting to be confirmed
-						{
-							getTask().goFinish(); //try to finish the sequence
-							setConfirmingActionPrototype(null);	//show that we're not waiting for confirmation on anything
-						}
-						else	//if we should confirm this action
-						{
-							setConfirmingActionPrototype(finishActionPrototype);	//perform this action subject to confirmation
-						}
+						getTask().goStart(); //start the sequence
+						setConfirmingActionPrototype(null);	//show that we're not waiting for confirmation on anything
 					}
-				});
+					else	//if we should confirm this action
+					{
+						setConfirmingActionPrototype(startActionPrototype);	//perform this action subject to confirmation
+					}
+				};
+			};
+		previousActionPrototype=new AbstractActionPrototype(LABEL_PREVIOUS, GLYPH_PREVIOUS)
+			{
+				@Override
+				protected void action(final int force, final int option)
+				{
+					if(!isConfirmNavigation() || getConfirmingActionPrototype()==previousActionPrototype)	//if this action is waiting to be confirmed
+					{
+						getTask().goPrevious();  //go to the previous step
+						setConfirmingActionPrototype(null);	//show that we're not waiting for confirmation on anything
+					}
+					else	//if we should confirm this action
+					{
+						setConfirmingActionPrototype(previousActionPrototype);	//perform this action subject to confirmation
+					}
+				};
+			};
+		nextActionPrototype=new AbstractActionPrototype(LABEL_NEXT, GLYPH_NEXT)
+			{
+				@Override
+				protected void action(final int force, final int option)
+				{
+					if(!isConfirmNavigation() || getConfirmingActionPrototype()==nextActionPrototype)	//if this action is waiting to be confirmed
+					{
+						getTask().goNext();  //go to the next step
+						setConfirmingActionPrototype(null);	//show that we're not waiting for confirmation on anything
+					}
+					else	//if we should confirm this action
+					{
+						setConfirmingActionPrototype(nextActionPrototype);	//perform this action subject to confirmation
+					}
+				};
+			};
+		finishActionPrototype=new AbstractActionPrototype(LABEL_FINISH, GLYPH_FINISH)
+			{
+				@Override
+				protected void action(final int force, final int option)
+				{
+					if(!isConfirmNavigation() || getConfirmingActionPrototype()==finishActionPrototype)	//if this action is waiting to be confirmed
+					{
+						getTask().goFinish(); //try to finish the sequence
+						setConfirmingActionPrototype(null);	//show that we're not waiting for confirmation on anything
+					}
+					else	//if we should confirm this action
+					{
+						setConfirmingActionPrototype(finishActionPrototype);	//perform this action subject to confirmation
+					}
+				}
+			};
 		
 //TODO fix		advanceAction=new ProxyAction(startActionPrototype);	//the advance action will initially proxy the start action
-		confirmActionPrototype=new ActionPrototype(LABEL_CONFIRM, GLYPH_CONFIRM);
-		confirmActionPrototype.addActionListener(new ActionListener()
+		confirmActionPrototype=new AbstractActionPrototype(LABEL_CONFIRM, GLYPH_CONFIRM)
+			{
+				@Override
+				protected void action(final int force, final int option)
 				{
-					@Override public void actionPerformed(final ActionEvent actionEvent)
+					final ActionPrototype confirmingActionProtype=getConfirmingActionPrototype();	//see if there is an action waiting to be confirmed
+					if(confirmingActionProtype!=null)	//if there is an action waiting to be confirmed
 					{
-						final ActionPrototype confirmingActionProtype=getConfirmingActionPrototype();	//see if there is an action waiting to be confirmed
-						if(confirmingActionProtype!=null)	//if there is an action waiting to be confirmed
-						{
 //TODO fix							confirmTimer.stop();	//the action is confirmed; suspend waiting for confirmation
-							confirmingActionProtype.performAction();	//perform the confirming action
-						}
+						confirmingActionProtype.performAction();	//perform the confirming action
 					}
-				});
+				}
+			};
 /*TODO fix
 		confirmTimer=new Timer(CONFIRM_DELAY, new ActionListener()	//create a new action listener that will remove any confirming action after a delay
 				{
