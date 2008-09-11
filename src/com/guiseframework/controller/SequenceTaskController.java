@@ -21,6 +21,8 @@ import static com.globalmentor.java.Objects.*;
 import com.globalmentor.model.SequenceTask;
 import com.guiseframework.prototype.AbstractActionPrototype;
 import com.guiseframework.prototype.ActionPrototype;
+import com.guiseframework.prototype.ProxyActionPrototype;
+
 import static com.guiseframework.theme.Theme.*;
 
 /**Abstract base class for managing progression of a sequence.
@@ -59,18 +61,15 @@ public class SequenceTaskController
 		/**@return The action prototype for confirming an action.*/
 		public ActionPrototype getConfirmActionPrototype() {return confirmActionPrototype;}
 
-	/**The action for advancing; serves as a proxy for the start, next,
-		and finish actions, depending on the state of the sequence.
-	*/
-//TODO fix	private final ProxyAction advanceAction;
+	/**The action prototype for advancing; serves as a proxy for the start, next, and finish actions, depending on the state of the sequence.*/
+	private final ProxyActionPrototype advanceActionPrototype;
 
-		/**The action for advancing; serves as a proxy for the start, next,
-			and finish actions, depending on the state of the sequence.
+		/**The action prototype for advancing; serves as a proxy for the start, next, and finish actions, depending on the state of the sequence.
 		@see #getStartActionPrototype()
 		@see #getNextActionPrototype()
 		@see #getFinishActionPrototype()
 		*/
-//TODO fix		public ProxyAction getAdvanceAction() {return advanceAction;}
+		public ProxyActionPrototype getAdvanceActionPrototype() {return advanceActionPrototype;}
 
 	/**The button for staring the sequence; created from the corresponding action.*/
 //TODO fix	private final JButton startButton;
@@ -253,7 +252,7 @@ public class SequenceTaskController
 				}
 			};
 		
-//TODO fix		advanceAction=new ProxyAction(startActionPrototype);	//the advance action will initially proxy the start action
+		advanceActionPrototype=new ProxyActionPrototype(startActionPrototype);	//the advance action prototype will initially proxy the start action prototype
 		confirmActionPrototype=new AbstractActionPrototype(LABEL_CONFIRM, GLYPH_CONFIRM)
 			{
 				@Override

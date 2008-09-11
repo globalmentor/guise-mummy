@@ -32,7 +32,7 @@ public class ProxyActionPrototype extends AbstractEnableableProxyPrototype<Actio
 		{	//TODO synchronize on something else
 			if(repeatActionListener==null)	//if we have not yet created the repeater action listener
 			{
-				repeatActionListener=new ActionListener()	//create a listener to listen for a changing property value
+				repeatActionListener=new ActionListener()	//create a listener to listen for an action
 						{
 							public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed
 									{
@@ -103,14 +103,15 @@ public class ProxyActionPrototype extends AbstractEnableableProxyPrototype<Actio
 	}
 
 	/**Performs the action with the given force and option.
-	This implementation calls {@link #action(int, int)} to perform the actual action.
-	An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
+	This implementation calls {@link ActionPrototype#performAction(int, int)} on the proxied prototype to perform the actual action.
+	An {@link ActionEvent} is not fired to registered {@link ActionListener}s;
+	the proxied action prototype should fire such an event, which we will them repeat.
 	@param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
 	@param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button click.
 	*/
 	public void performAction(final int force, final int option)
 	{
-		fireActionPerformed(force, option);	//fire an event saying that the action has been performed with the given force and option
+		getProxiedPrototype().performAction(force, option);	//send the action on to the proxied prototype
 	}
 
 	/**Fires an action event to all registered action listeners.

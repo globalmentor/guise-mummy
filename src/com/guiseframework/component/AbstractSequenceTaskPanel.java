@@ -105,7 +105,7 @@ public abstract class AbstractSequenceTaskPanel extends AbstractPanel
 		final Button previousButton=new Button(taskController.getPreviousActionPrototype());
 		final Button nextButton=new Button(taskController.getNextActionPrototype());
 		final Button finishButton=new Button(taskController.getFinishActionPrototype());
-//TODO fix		final Button advanceButton=new Button(advanceAction);
+		final Button advanceButton=new Button(taskController.getAdvanceActionPrototype());
 		distinctAdvance=false;	//default to shared actions for advancing
 		final Toolbar toolbar=new Toolbar();
 		if(isDistinctAdvance())	//if we should have distinct advance, use separate actions
@@ -118,8 +118,8 @@ public abstract class AbstractSequenceTaskPanel extends AbstractPanel
 		else	//if we should not have distinct advance, use a dual-use action
 		{
 			toolbar.add(taskController.getPreviousActionPrototype());
-//TODO fix			toolbar.add(taskController.getAdvanceAction());
-		} 
+			toolbar.add(taskController.getAdvanceActionPrototype());
+		}
 //TODO fix		actionManager.addToolAction(new ActionManager.SeparatorAction());
 		toolbar.add(taskController.getConfirmActionPrototype());
 		add(toolbar, new RegionConstraints(Region.PAGE_END));
