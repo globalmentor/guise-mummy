@@ -18,11 +18,11 @@ package com.guiseframework.platform;
 
 import java.io.IOException;
 
-
+import com.globalmentor.event.EventListenerManager;
 import com.globalmentor.java.Longs;
+
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.transfer.Transferable;
-import com.guiseframework.event.EventListenerManager;
 import com.guiseframework.event.GuiseBoundPropertyObject;
 
 /**Abstract implementation of an object that can be depicted on some platform.

@@ -86,8 +86,7 @@ public abstract class AbstractActionPrototype extends AbstractEnableablePrototyp
 	*/
 	protected void fireActionPerformed(final int force, final int option)
 	{
-		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
-		if(eventListenerManager.hasListeners(ActionListener.class))	//if there are action listeners registered
+		if(getEventListenerManager().hasListeners(ActionListener.class))	//if there are action listeners registered
 		{
 			fireActionPerformed(new ActionEvent(this, force, option));	//create and fire a new action event
 		}

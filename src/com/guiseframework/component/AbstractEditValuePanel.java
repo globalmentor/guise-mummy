@@ -145,8 +145,7 @@ public abstract class AbstractEditValuePanel<V> extends AbstractValuedPanel<V> i
 	*/
 	protected void fireEdited()
 	{
-		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
-		if(eventListenerManager.hasListeners(EditListener.class))	//if there are edit listeners registered
+		if(getEventListenerManager().hasListeners(EditListener.class))	//if there are edit listeners registered
 		{
 			fireEdited(new EditEvent(this));	//create and fire a new edit event
 		}

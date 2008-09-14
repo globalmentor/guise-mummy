@@ -22,10 +22,7 @@ import static com.globalmentor.java.Classes.*;
 
 import com.globalmentor.java.Objects;
 import com.globalmentor.model.TaskState;
-import com.guiseframework.event.EventListenerManager;
-import com.guiseframework.event.ProgressEvent;
-import com.guiseframework.event.ProgressListenable;
-import com.guiseframework.event.ProgressListener;
+import com.guiseframework.event.*;
 import com.guiseframework.platform.AbstractDepictedObject;
 
 /**Audio that can be played.
@@ -252,8 +249,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	*/
 	protected void fireProgressed(final long timePosition, final long timeDuration)
 	{
-		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
-		if(eventListenerManager.hasListeners(ProgressListener.class))	//if there are progress listeners registered
+		if(getEventListenerManager().hasListeners(ProgressListener.class))	//if there are progress listeners registered
 		{
 			final URI audioURI=getAudioURI();	//get the audio URI
 			fireProgressed(new ProgressEvent<Long>(this, audioURI!=null ? audioURI.toString() : null, getState(), timePosition>=0 ? Long.valueOf(timePosition) : null, timeDuration>=0 ? Long.valueOf(timeDuration) : null));	//create and fire a new progress event

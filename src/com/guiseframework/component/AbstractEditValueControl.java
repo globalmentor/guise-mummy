@@ -91,8 +91,7 @@ public abstract class AbstractEditValueControl<V> extends AbstractValueControl<V
 	*/
 	protected void fireEdited()
 	{
-		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
-		if(eventListenerManager.hasListeners(EditListener.class))	//if there are edit listeners registered
+		if(getEventListenerManager().hasListeners(EditListener.class))	//if there are edit listeners registered
 		{
 			fireEdited(new EditEvent(this));	//create and fire a new edit event
 		}

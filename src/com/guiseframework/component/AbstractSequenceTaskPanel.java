@@ -154,7 +154,7 @@ public abstract class AbstractSequenceTaskPanel extends AbstractPanel
 		if(isDistinctAdvance())	//if we should have distinct advance, use separate actions
 		{
 			toolbar.add(taskController.getStartActionPrototype());
-//TODo fix			actionManager.addToolAction(new ActionManager.SeparatorAction());
+//TODO fix			actionManager.addToolAction(new ActionManager.SeparatorAction());
 			toolbar.add(taskController.getPreviousActionPrototype());
 			toolbar.add(taskController.getNextActionPrototype());
 		}

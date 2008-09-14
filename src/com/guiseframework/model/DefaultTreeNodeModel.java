@@ -22,7 +22,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import com.globalmentor.event.TargetedEvent;
 import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
-import com.guiseframework.event.EventListenerManager;
 
 /**A default node in a tree model.
 Property change events and action events on one tree node will be bubbled up the hierarchy, with the tree node initiating the event accessible via {@link TargetedEvent#getTarget()}.
@@ -330,8 +329,7 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 	*/
 	protected void fireActionPerformed(final int force, final int option)
 	{
-		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
-		if(eventListenerManager.hasListeners(ActionListener.class))	//if there are action listeners registered
+		if(getEventListenerManager().hasListeners(ActionListener.class))	//if there are action listeners registered
 		{
 			fireActionPerformed(new ActionEvent(this, force, option));	//create and fire a new action event
 		}

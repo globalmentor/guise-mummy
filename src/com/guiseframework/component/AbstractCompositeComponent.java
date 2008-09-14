@@ -511,8 +511,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	*/
 	protected void fireChildComponentAdded(final Component childComponent)
 	{
-		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
-		if(eventListenerManager.hasListeners(CompositeComponentListener.class))	//if there are composite component listeners registered
+		if(getEventListenerManager().hasListeners(CompositeComponentListener.class))	//if there are composite component listeners registered
 		{
 			fireChildComponentAdded(new ComponentEvent(this, childComponent));	//create and fire a new component event
 		}
@@ -537,8 +536,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	*/
 	protected void fireChildComponentRemoved(final Component childComponent)
 	{
-		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
-		if(eventListenerManager.hasListeners(CompositeComponentListener.class))	//if there are composite component listeners registered
+		if(getEventListenerManager().hasListeners(CompositeComponentListener.class))	//if there are composite component listeners registered
 		{
 			fireChildComponentRemoved(new ComponentEvent(this, childComponent));	//create and fire a new component event
 		}

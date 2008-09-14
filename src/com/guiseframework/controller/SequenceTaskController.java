@@ -21,7 +21,6 @@ import java.beans.PropertyVetoException;
 import com.globalmentor.beans.*;
 
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Integers.checkRange;
 import static com.globalmentor.java.Objects.*;
 import com.globalmentor.model.*;
 

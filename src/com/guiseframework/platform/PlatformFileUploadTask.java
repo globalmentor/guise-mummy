@@ -21,6 +21,7 @@ import static java.util.Collections.*;
 
 import static com.globalmentor.java.Classes.*;
 
+import com.globalmentor.event.EventListenerManager;
 import com.globalmentor.model.TaskState;
 import com.globalmentor.net.URIPath;
 import com.guiseframework.Bookmark;

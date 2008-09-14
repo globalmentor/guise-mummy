@@ -21,7 +21,6 @@ import java.beans.*;
 import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.beans.*;
-import com.globalmentor.util.Debug;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.input.*;
@@ -379,8 +378,7 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 	*/
 	protected void fireEdited()
 	{
-		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
-		if(eventListenerManager.hasListeners(EditListener.class))	//if there are edit listeners registered
+		if(getEventListenerManager().hasListeners(EditListener.class))	//if there are edit listeners registered
 		{
 			fireEdited(new EditEvent(this));	//create and fire a new edit event
 		}

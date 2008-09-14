@@ -28,7 +28,7 @@ import javax.mail.internet.ContentType;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.util.Arrays.*;
 
-import com.globalmentor.event.TargetedEvent;
+import com.globalmentor.event.*;
 import com.globalmentor.java.*;
 import com.globalmentor.urf.URFResource;
 import com.globalmentor.urf.ploop.*;

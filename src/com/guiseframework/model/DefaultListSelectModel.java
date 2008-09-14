@@ -19,11 +19,11 @@ package com.guiseframework.model;
 import java.beans.PropertyVetoException;
 import java.util.*;
 
+import com.globalmentor.event.EventListenerManager;
 import com.globalmentor.java.Objects;
 import com.globalmentor.util.*;
 import com.guiseframework.event.*;
-import com.guiseframework.validator.ValidationException;
-import com.guiseframework.validator.Validator;
+import com.guiseframework.validator.*;
 
 import static com.globalmentor.java.Integers.*;
 import static com.globalmentor.java.Objects.*;
@@ -1023,7 +1023,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	protected void fireListModified(final int index, final V addedElement, final V removedElement)
 	{
 		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
-		if(eventListenerManager.hasListeners(ListListener.class))	//if there are appropriate listeners registered
+		if(getEventListenerManager().hasListeners(ListListener.class))	//if there are appropriate listeners registered
 		{
 			final ListEvent<V> listEvent=new ListEvent<V>(this, index, addedElement, removedElement);	//create a new event
 			for(final ListListener<V> listListener:eventListenerManager.getListeners(ListListener.class))	//for each list listener

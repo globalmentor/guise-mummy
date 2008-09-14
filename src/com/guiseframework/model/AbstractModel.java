@@ -21,8 +21,8 @@ import static com.globalmentor.text.Text.*;
 
 import javax.mail.internet.ContentType;
 
-import com.globalmentor.beans.BoundPropertyObject;
-import com.guiseframework.event.*;
+import com.globalmentor.beans.*;
+import com.globalmentor.event.EventListenerManager;
 
 /**A base abstract class implementing helpful functionality for models.
 @author Garret Wilson
