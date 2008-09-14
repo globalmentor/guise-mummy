@@ -16,20 +16,27 @@
 
 package com.guiseframework.controller;
 
-import static com.globalmentor.java.Objects.*;
+import java.beans.PropertyVetoException;
 
-import com.globalmentor.model.SequenceTask;
-import com.guiseframework.prototype.AbstractActionPrototype;
-import com.guiseframework.prototype.ActionPrototype;
-import com.guiseframework.prototype.ProxyActionPrototype;
+import com.globalmentor.beans.*;
+
+import static com.globalmentor.java.Classes.*;
+import static com.globalmentor.java.Integers.checkRange;
+import static com.globalmentor.java.Objects.*;
+import com.globalmentor.model.*;
+
+import com.guiseframework.prototype.*;
 
 import static com.guiseframework.theme.Theme.*;
 
 /**Abstract base class for managing progression of a sequence.
 @author Garret Wilson
 */
-public class SequenceTaskController
+public class SequenceTaskController extends BoundPropertyObject
 {
+
+	/**The bound property of whether navigation should be confirmed, of type {@link Boolean}.*/
+	public static final String CONFIRM_NAVIGATION_PROPERTY=getPropertyName(SequenceTaskController.class, "confirmNavigation");
 
 	/**The action prototype for starting the sequence.*/
 	private final ActionPrototype startActionPrototype;
@@ -70,61 +77,6 @@ public class SequenceTaskController
 		@see #getFinishActionPrototype()
 		*/
 		public ProxyActionPrototype getAdvanceActionPrototype() {return advanceActionPrototype;}
-
-	/**The button for staring the sequence; created from the corresponding action.*/
-//TODO fix	private final JButton startButton;
-
-		/**@return The action for starting the sequence; created from the corresponding action.
-		@see #getStartAction
-		*/
-//TODO fix		private JButton getStartButton() {return startButton;}		
-
-	/**The button for going to the previous component; created from the corresponding action.*/
-//TODO fix	private final JButton previousButton;
-
-		/**@return The action for going to the previous component; created from the corresponding action.
-		@see #getPreviousAction
-		*/
-//TODO fix		private JButton getPreviousButton() {return previousButton;}
-		
-	/**The button for going to the next component; created from the corresponding action.*/
-//TODO fix	private final JButton nextButton;
-
-		/**@return The action for going to the next component; created from the corresponding action.
-		@see #getNextAction
-		*/
-//TODO fix		private JButton getNextButton() {return nextButton;}
-		
-	/**The button for finishing the sequence; created from the corresponding action.*/
-//TODO fix	private final JButton finishButton;
-
-		/**@return The action for finishing the sequence; created from the corresponding action.
-		@see #getFinishAction
-		*/
-//TODO fix		private JButton getFinishButton() {return finishButton;}		
-
-	/**The button for advancing in the sequence; created from the corresponding action.*/
-//TODO fix	private final JButton advanceButton;
-
-		/**@return The action for advancing in sequence; created from the corresponding action.
-		@see #getAdvanceAction
-		*/
-//TODO fix		private JButton getAdvanceButton() {return advanceButton;}		
-
-	/**Whether the advance buttons are distinct or dual-duty.*/
-	private boolean distinctAdvance;
-
-		/**@return Whether the advance buttons are distinct or dual-duty;
-			this defaults to <code>false</code>.
-		*/
-		public boolean isDistinctAdvance() {return distinctAdvance;}
-
-		/**Sets whether the advance buttons are distinct or dual-duty.
-		@param distinct <code>true</code> if there should be distinct buttons for
-			start, next, and finish, or <code>false</code> if one button should share
-			these responsibilitiese.
-		*/
-		public void setDistinctAdvance(final boolean distinct) {distinctAdvance=distinct;}
 
 	/**The length of time, in milliseconds, to wait for confirmation when applicable.*/
 	protected final static int CONFIRM_DELAY=5000;
@@ -170,9 +122,19 @@ public class SequenceTaskController
 		public boolean isConfirmNavigation() {return confirmNavigation;}
 	
 		/**Sets whether each navigation must be confirmed.
-		@param confirmNavigation <code>true</code> if each navigation must be confirmed.
+		This is a bound property of type {@link Boolean}.
+		@param newConfirmNavigation <code>true</code> if each navigation must be confirmed.
+		@see #CONFIRM_NAVIGATION_PROPERTY
 		*/
-		public void setConfirmNavigation(final boolean confirmNavigation) {this.confirmNavigation=confirmNavigation;}
+		public void setConfirmNavigation(final boolean newConfirmNavigation)
+		{
+			final boolean oldConfirmNavigation=confirmNavigation; //get the current index
+			if(newConfirmNavigation!=oldConfirmNavigation)  //if the confirm navigation is really changing
+			{
+				confirmNavigation=newConfirmNavigation; //actually change the value
+				firePropertyChange(CONFIRM_NAVIGATION_PROPERTY, oldConfirmNavigation, newConfirmNavigation);
+			}
+		}
 
 	/**The sequence task being controlled.*/
 	private final SequenceTask task;
@@ -181,6 +143,7 @@ public class SequenceTaskController
 		public SequenceTask getTask() {return task;}
 
 	/**Sequence task constructor.
+	This controller listens to bound properties of the task.
 	@param task The sequence task being controlled.
 	@throws NullPointerException if the given task is <code>null</code>.
 	*/
@@ -210,7 +173,14 @@ public class SequenceTaskController
 				{
 					if(!isConfirmNavigation() || getConfirmingActionPrototype()==previousActionPrototype)	//if this action is waiting to be confirmed
 					{
-						getTask().goPrevious();  //go to the previous step
+						try
+						{
+							getTask().goPrevious();  //go to the previous step
+						}
+						catch(final PropertyVetoException propertyVetoException)
+						{
+							throw new IllegalStateException(propertyVetoException);
+						}
 						setConfirmingActionPrototype(null);	//show that we're not waiting for confirmation on anything
 					}
 					else	//if we should confirm this action
@@ -226,7 +196,14 @@ public class SequenceTaskController
 				{
 					if(!isConfirmNavigation() || getConfirmingActionPrototype()==nextActionPrototype)	//if this action is waiting to be confirmed
 					{
-						getTask().goNext();  //go to the next step
+						try
+						{
+							getTask().goNext();  //go to the next step
+						}
+						catch(final PropertyVetoException propertyVetoException)
+						{
+							throw new IllegalStateException(propertyVetoException);
+						}
 						setConfirmingActionPrototype(null);	//show that we're not waiting for confirmation on anything
 					}
 					else	//if we should confirm this action
@@ -274,90 +251,48 @@ public class SequenceTaskController
 		confirmTimer.setRepeats(false);	//we only have one waiting period for confirmation
 */
 		confirmingActionProtype=null;	//there is currently no action being confirmed
-		distinctAdvance=false;	//default to shared actions for advancing
+		task.addPropertyChangeListener(Task.STATE_PROPERTY, new AbstractGenericPropertyChangeListener<Task>()	//update the controller when the status changes
+				{
+					@Override
+					public void propertyChange(final GenericPropertyChangeEvent<Task> genericPropertyChangeEvent)
+					{
+						update();
+					}
+				});
+		task.addPropertyChangeListener(SequenceTask.SEQUENCE_INDEX_PROPERTY, new AbstractGenericPropertyChangeListener<Integer>()	//update the controller when the sequence index changing
+				{
+					@Override
+					public void propertyChange(final GenericPropertyChangeEvent<Integer> genericPropertyChangeEvent)
+					{
+						update();
+					}
+				});
+		update();	//update the controller with the initial state
 	}
 
-	/**Initializes actions in the action manager.
-	@param actionManager The implementation that manages actions.
+	/**Updates the condition of the controller based upon the state.
+	This method is a convenience method for complex components that would like to perform wholesale updates any prototypes, enabled/disabled status, proxied actions, etc.
+	This implementation updates the states of action prototypes.
 	*/
-/*TODO fix
-	protected void initializeActions(final ActionManager actionManager)
+	protected void update()
 	{
-		super.initializeActions(actionManager);	//do the default initialization
-		if(isDistinctAdvance())	//if we should have distinct advance, use separate actions
-		{
-			actionManager.addToolAction(getStartActionPrototype());
-			actionManager.addToolAction(new ActionManager.SeparatorAction());
-			actionManager.addToolAction(getPreviousActionPrototype());
-			actionManager.addToolAction(getNextActionPrototype());
-		}
-		else	//if we should not have distinct advance, use a dual-use action
-		{
-			actionManager.addToolAction(getPreviousActionPrototype());
-			actionManager.addToolAction(getAdvanceAction());
-		} 
-		actionManager.addToolAction(new ActionManager.SeparatorAction());
-		actionManager.addToolAction(getConfirmActionPrototype());
-	}
-*/
-
-	/**Initializes the user interface.*/
-/*TODO fix
-	protected void initializeUI()
-	{
-		if(getToolBar()!=null)	//if we have a toolbar
-			getToolBar().setButtonTextVisible(true);	//show text on the toolbar buttons
-		super.initializeUI();	//do the default initialization
-		previousButton.setHorizontalTextPosition(SwingConstants.LEADING);	//change the text position of the previous button
-		setContentComponent(getDefaultComponent());	//start with the default component		
-		setPreferredSize(new Dimension(300, 200));	//set an arbitrary preferred size
-	}
-*/
-
-	/**Updates the states of the prototypes, including enabled/disabled status, proxied actions, etc.
-	*/
-/*TODO fix; decide in which class to place
-	public void updateStates()
-	{
-		super.updateStatus(); //update the default actions
-		getStartActionPrototype().setEnabled(getAdvanceAction().getProxiedAction()!=getStartActionPrototype()); //only allow starting if we haven't started, yet
-		getPreviousActionPrototype().setEnabled(hasPrevious()); //only allow going backwards if we have a previous step
-		getNextActionPrototype().setEnabled(hasNext()); //only allow going backwards if we have a next step
-		getFinishActionPrototype().setEnabled(!hasNext()); //only allow finishing if there are no next components
+		final SequenceTask task=getTask();	//get the task
+		final TaskState taskState=task.getState();	//get the state of the task
+		getStartActionPrototype().setEnabled(taskState==TaskState.UNSTARTED); //only allow starting if we haven't started, yet
+		getPreviousActionPrototype().setEnabled(task.hasPrevious()); //only allow going backwards if we have a previous step
+		getNextActionPrototype().setEnabled(task.hasNext()); //only allow going backwards if we have a next step
+		getFinishActionPrototype().setEnabled(!task.hasNext()); //only allow finishing if there is no next step
 		getConfirmActionPrototype().setEnabled(isConfirmNavigation() && getConfirmingActionPrototype()!=null); //only allow confirmation if confirmation is enabled and there is an action waiting to be confirmed
-		if(getToolBar()!=null)	//if we have a toolbar
-		{
-			final Component confirmComponent=getToolBar().getComponent(getConfirmActionPrototype());	//see if the confirm action is on the toolbar
-			if(confirmComponent!=null)	//if the action has a corresponding component on the toolbar
-			{
-				confirmComponent.setVisible(isConfirmNavigation());	//only show the confirm action if navigation confirmation is enabled
-			}
-		}
-		if(getAdvanceAction().getProxiedAction()!=getStartActionPrototype())	//if we've already started
+		if(taskState!=TaskState.UNSTARTED)	//if we've already started
 		{
 				//determine if advancing should go to the next item in the sequence or finish
-			getAdvanceAction().setProxiedAction(hasNext() ? getNextActionPrototype() : getFinishActionPrototype());			
+			getAdvanceActionPrototype().setProxiedPrototype(task.hasNext() ? getNextActionPrototype() : getFinishActionPrototype());			
 		}
-		final JRootPane rootPane=getRootPane();	//get the ancestor root pane, if there is one
-		if(rootPane!=null)	//if there is a root pane
+		final ActionPrototype confirmingActionPrototype=getConfirmingActionPrototype();	//see if there is an action waiting to be confirmed
+		if(confirmingActionPrototype!=null)	//if there is an action waiting to be confirmed
 		{
-			final JButton defaultButton;	//determind the default button
-			if(isDistinctAdvance())	//if we're using distinct buttons for advance
-			{
-				defaultButton=hasNext() ? getNextButton() : getFinishButton();	//set the next button as the default unless we're finished; in that case, set the finish button as the default
-			}
-			else	//if we're using a dual-use button for advance
-			{					
-				defaultButton=getAdvanceButton();	//set the advance button as the default	
-			}
-			rootPane.setDefaultButton(defaultButton);	//update the default button	
-		}
-		final Action confirmingAction=getConfirmingActionPrototype();	//see if there is an action waiting to be confirmed
-		if(confirmingAction!=null)	//if there is an action waiting to be confirmed
-		{
-			confirmingAction.setEnabled(false);	//disable the confirming action, because it will be accessed indirectly through the confirmation action
+			confirmingActionPrototype.setEnabled(false);	//disable the confirming action, because it will be accessed indirectly through the confirmation action
 		}
 	}
-*/
 
 }

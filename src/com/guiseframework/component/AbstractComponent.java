@@ -800,6 +800,14 @@ Debug.trace("now valid of", this, "is", isValid());
 		initialized=true;	//show that this component has been initialized
 	}
 
+	/**Updates the condition of the component based upon the state.
+	This method is a convenience method for complex components that would like to perform wholesale updates any prototypes, enabled/disabled status, proxied actions, etc.
+	This version does nothing.
+	*/
+	protected void update()
+	{
+	}
+
 	/**Validates the user input of this component and all child components.
 	The component will be updated with error information.
 	This version clears all notifications.

@@ -17,10 +17,13 @@
 package com.guiseframework.component;
 
 import static com.globalmentor.java.Objects.*;
+
+import com.globalmentor.beans.*;
+import com.globalmentor.model.SequenceTask;
 import com.globalmentor.util.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.controller.*;
-import com.guiseframework.prototype.*;
+import com.guiseframework.input.*;
 
 /**Abstract base class for a panel that allows progression in a sequence.
 <p>When progressing through the sequence, this panel attempts to verify
@@ -32,46 +35,49 @@ import com.guiseframework.prototype.*;
 public abstract class AbstractSequenceTaskPanel extends AbstractPanel
 {
 
-	/**The button for staring the sequence; created from the corresponding action.*/
-//TODO fix	private final JButton startButton;
+	/**The button for starting the sequence; created from the corresponding action prototype.*/
+	private final ButtonControl startButton;
 
-		/**@return The action for starting the sequence; created from the corresponding action.
-		@see #getStartAction
+		/**@return The action for starting the sequence; created from the corresponding action prototype.
+		@see SequenceTaskController#getStartActionPrototype()
 		*/
-//TODO fix		private JButton getStartButton() {return startButton;}		
+		private ButtonControl getStartButton() {return startButton;}		
 
-	/**The button for going to the previous component; created from the corresponding action.*/
-//TODO fix	private final JButton previousButton;
+	/**The button for going to the previous step; created from the corresponding action prototype.*/
+	private final ButtonControl previousButton;
 
-		/**@return The action for going to the previous component; created from the corresponding action.
-		@see #getPreviousAction
+		/**@return The action for going to the previous step; created from the corresponding action prototype.
+		@see SequenceTaskController#getPreviousActionPrototype()
 		*/
-//TODO fix		private JButton getPreviousButton() {return previousButton;}
+		private ButtonControl getPreviousButton() {return previousButton;}
 		
-	/**The button for going to the next component; created from the corresponding action.*/
-//TODO fix	private final JButton nextButton;
+	/**The button for going to the next step; created from the corresponding action prototype.*/
+	private final ButtonControl nextButton;
 
-		/**@return The action for going to the next component; created from the corresponding action.
-		@see #getNextAction
+		/**@return The action for going to the next step; created from the corresponding action prototype.
+		@see SequenceTaskController#getNextActionPrototype()
 		*/
-//TODO fix		private JButton getNextButton() {return nextButton;}
+		private ButtonControl getNextButton() {return nextButton;}
 		
-	/**The button for finishing the sequence; created from the corresponding action.*/
-//TODO fix	private final JButton finishButton;
+	/**The button for finishing the sequence; created from the corresponding action prototype.*/
+	private final ButtonControl finishButton;
 
-		/**@return The action for finishing the sequence; created from the corresponding action.
-		@see #getFinishAction
+		/**@return The action for finishing the sequence; created from the corresponding action prototype.
+		@see SequenceTaskController#getFinishActionPrototype()
 		*/
-//TODO fix		private JButton getFinishButton() {return finishButton;}		
+		private ButtonControl getFinishButton() {return finishButton;}		
 
-	/**The button for advancing in the sequence; created from the corresponding action.*/
-//TODO fix	private final JButton advanceButton;
+	/**The button for advancing in the sequence; created from the corresponding action prototype.*/
+	private final ButtonControl advanceButton;
 
-		/**@return The action for advancing in sequence; created from the corresponding action.
-		@see #getAdvanceAction
+		/**@return The action for advancing in sequence; created from the corresponding action prototype.
+		@see SequenceTaskController#getAdvanceActionPrototype()
 		*/
-//TODO fix		private JButton getAdvanceButton() {return advanceButton;}		
+		private ButtonControl getAdvanceButton() {return advanceButton;}		
 
+	/**The toolbar on which the controls are located.*/
+	private final Toolbar toolbar;
+		
 	/**Whether the advance buttons are distinct or dual-duty.*/
 	private boolean distinctAdvance;
 
@@ -81,11 +87,20 @@ public abstract class AbstractSequenceTaskPanel extends AbstractPanel
 		public boolean isDistinctAdvance() {return distinctAdvance;}
 
 		/**Sets whether the advance buttons are distinct or dual-duty.
-		@param distinct <code>true</code> if there should be distinct buttons for
+		This method updates the toolbar if this property changes.
+		@param newDistinctAdvance <code>true</code> if there should be distinct buttons for
 			start, next, and finish, or <code>false</code> if one button should share
 			these responsibilitiese.
 		*/
-		public void setDistinctAdvance(final boolean distinct) {distinctAdvance=distinct;}
+		public void setDistinctAdvance(final boolean newDistinctAdvance)
+		{
+			final boolean oldDistinctAdvance=distinctAdvance;;
+			if(oldDistinctAdvance!=newDistinctAdvance)
+			{
+				distinctAdvance=newDistinctAdvance;
+				configureToolbar();	//reconfigure the toolbar so that the the buttons will reflect this setting
+			}
+		}
 
 	/**The object controlling the sequence task.*/
 	private final SequenceTaskController taskController;
@@ -101,13 +116,41 @@ public abstract class AbstractSequenceTaskPanel extends AbstractPanel
 	{
 		super(new RegionLayout());	//construct the parent class
 		this.taskController=checkInstance(taskController, "Task controller cannot be null.");
-		final Button startButton=new Button(taskController.getStartActionPrototype());	//create the buttons
-		final Button previousButton=new Button(taskController.getPreviousActionPrototype());
-		final Button nextButton=new Button(taskController.getNextActionPrototype());
-		final Button finishButton=new Button(taskController.getFinishActionPrototype());
-		final Button advanceButton=new Button(taskController.getAdvanceActionPrototype());
+		startButton=new Button(taskController.getStartActionPrototype());	//create the buttons
+		previousButton=new Button(taskController.getPreviousActionPrototype());
+		nextButton=new Button(taskController.getNextActionPrototype());
+		finishButton=new Button(taskController.getFinishActionPrototype());
+		advanceButton=new Button(taskController.getAdvanceActionPrototype());
 		distinctAdvance=false;	//default to shared actions for advancing
-		final Toolbar toolbar=new Toolbar();
+		toolbar=new Toolbar();
+		add(toolbar, new RegionConstraints(Region.PAGE_END));
+		configureToolbar();	//arrange the controls on the toolbar for the first time
+		taskController.addPropertyChangeListener(SequenceTaskController.CONFIRM_NAVIGATION_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>()	//listen for the confirm navigation property changing
+				{
+					@Override
+					public void propertyChange(final GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent)
+					{
+						configureToolbar();	//reconfigure the toolbar if the confirm navigation specification changes, because this will determine which buttons go on the toolbar
+					}
+				});
+		taskController.getTask().addPropertyChangeListener(SequenceTask.SEQUENCE_INDEX_PROPERTY, new AbstractGenericPropertyChangeListener<Integer>()	//listen for the sequence index changing
+				{
+					@Override
+					public void propertyChange(final GenericPropertyChangeEvent<Integer> genericPropertyChangeEvent)
+					{
+						onSequenceIndexChange(genericPropertyChangeEvent.getOldValue().intValue(), genericPropertyChangeEvent.getNewValue().intValue());
+					}
+				});
+		final BindingInputStrategy bindingInputStrategy=new BindingInputStrategy(getInputStrategy());	//create a new input strategy based upon the current input strategy (if any)
+		bindingInputStrategy.bind(new CommandInput(ProcessCommand.CONTINUE), getTaskController().getAdvanceActionPrototype());	//map the "continue" command to the card panel continue action prototype
+		setInputStrategy(bindingInputStrategy);	//switch to our new input strategy
+	}
+
+	/**Clears and the appropriate components to the toolbar based upon the current settings.
+	@see #isDistinctAdvance()
+	*/
+	protected void configureToolbar()
+	{
 		if(isDistinctAdvance())	//if we should have distinct advance, use separate actions
 		{
 			toolbar.add(taskController.getStartActionPrototype());
@@ -121,92 +164,23 @@ public abstract class AbstractSequenceTaskPanel extends AbstractPanel
 			toolbar.add(taskController.getAdvanceActionPrototype());
 		}
 //TODO fix		actionManager.addToolAction(new ActionManager.SeparatorAction());
-		toolbar.add(taskController.getConfirmActionPrototype());
-		add(toolbar, new RegionConstraints(Region.PAGE_END));
+		if(getTaskController().isConfirmNavigation())	//if we should confirm navigation
+		{
+			toolbar.add(taskController.getConfirmActionPrototype());
+		}
 	}
 
-	/**Initializes actions in the action manager.
-	@param actionManager The implementation that manages actions.
+	/**Called after the sequence index changes.
+	Any derived class that overrides this method should call this version.
+	@param oldIndex The old index, or <code>-1</code> if there was no old index.
+	@param newIndex The new index, or <code>-1</code> if there was no new index.
 	*/
-/*TODO fix
-	protected void initializeActions(final ActionManager actionManager)
+	protected void onSequenceIndexChange(final int oldIndex, final int newIndex)
 	{
-		super.initializeActions(actionManager);	//do the default initialization
-		if(isDistinctAdvance())	//if we should have distinct advance, use separate actions
-		{
-			actionManager.addToolAction(getStartActionPrototype());
-			actionManager.addToolAction(new ActionManager.SeparatorAction());
-			actionManager.addToolAction(getPreviousActionPrototype());
-			actionManager.addToolAction(getNextActionPrototype());
-		}
-		else	//if we should not have distinct advance, use a dual-use action
-		{
-			actionManager.addToolAction(getPreviousActionPrototype());
-			actionManager.addToolAction(getAdvanceAction());
-		} 
-		actionManager.addToolAction(new ActionManager.SeparatorAction());
-		actionManager.addToolAction(getConfirmActionPrototype());
+		getTaskController().setConfirmingActionPrototype(null);	//make sure no actions are waiting for confirmation
+		update();	//update the prototypes
+//TODO fix		scheduleTimeStatusUpdate();	//schedule a time status update if we need to for this new item
 	}
-*/
-
-	/**Initializes the user interface.*/
-/*TODO fix
-	protected void initializeUI()
-	{
-		if(getToolBar()!=null)	//if we have a toolbar
-			getToolBar().setButtonTextVisible(true);	//show text on the toolbar buttons
-		super.initializeUI();	//do the default initialization
-		previousButton.setHorizontalTextPosition(SwingConstants.LEADING);	//change the text position of the previous button
-		setContentComponent(getDefaultComponent());	//start with the default component		
-		setPreferredSize(new Dimension(300, 200));	//set an arbitrary preferred size
-	}
-*/
-
-	/**Updates the states of the prototypes, including enabled/disabled status, proxied actions, etc.
-	*/
-/*TODO fix; decide in which class to place
-	public void updateStates()
-	{
-		super.updateStatus(); //update the default actions
-		getStartActionPrototype().setEnabled(getAdvanceAction().getProxiedAction()!=getStartActionPrototype()); //only allow starting if we haven't started, yet
-		getPreviousActionPrototype().setEnabled(hasPrevious()); //only allow going backwards if we have a previous step
-		getNextActionPrototype().setEnabled(hasNext()); //only allow going backwards if we have a next step
-		getFinishActionPrototype().setEnabled(!hasNext()); //only allow finishing if there are no next components
-		getConfirmActionPrototype().setEnabled(isConfirmNavigation() && getConfirmingActionPrototype()!=null); //only allow confirmation if confirmation is enabled and there is an action waiting to be confirmed
-		if(getToolBar()!=null)	//if we have a toolbar
-		{
-			final Component confirmComponent=getToolBar().getComponent(getConfirmActionPrototype());	//see if the confirm action is on the toolbar
-			if(confirmComponent!=null)	//if the action has a corresponding component on the toolbar
-			{
-				confirmComponent.setVisible(isConfirmNavigation());	//only show the confirm action if navigation confirmation is enabled
-			}
-		}
-		if(getAdvanceAction().getProxiedAction()!=getStartActionPrototype())	//if we've already started
-		{
-				//determine if advancing should go to the next item in the sequence or finish
-			getAdvanceAction().setProxiedAction(hasNext() ? getNextActionPrototype() : getFinishActionPrototype());			
-		}
-		final JRootPane rootPane=getRootPane();	//get the ancestor root pane, if there is one
-		if(rootPane!=null)	//if there is a root pane
-		{
-			final JButton defaultButton;	//determind the default button
-			if(isDistinctAdvance())	//if we're using distinct buttons for advance
-			{
-				defaultButton=hasNext() ? getNextButton() : getFinishButton();	//set the next button as the default unless we're finished; in that case, set the finish button as the default
-			}
-			else	//if we're using a dual-use button for advance
-			{					
-				defaultButton=getAdvanceButton();	//set the advance button as the default	
-			}
-			rootPane.setDefaultButton(defaultButton);	//update the default button	
-		}
-		final Action confirmingAction=getConfirmingActionPrototype();	//see if there is an action waiting to be confirmed
-		if(confirmingAction!=null)	//if there is an action waiting to be confirmed
-		{
-			confirmingAction.setEnabled(false);	//disable the confirming action, because it will be accessed indirectly through the confirmation action
-		}
-	}
-*/
 
 	/**Verifies the contents of the current component, if the current component
 		can be verified.
