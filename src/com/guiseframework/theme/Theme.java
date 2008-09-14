@@ -296,6 +296,7 @@ public class Theme extends URFListResource<Rule>
 	public final static String LABEL_NEXT=createStringResourceReference("theme.label.next");
 	public final static String LABEL_NEW=createStringResourceReference("theme.label.new");
 	public final static String LABEL_NEW_X=createStringResourceReference("theme.label.new.x");
+	public final static String LABEL_ORDER=createStringResourceReference("theme.label.order");
 	public final static String LABEL_PASSWORD=createStringResourceReference("theme.label.password");
 	public final static String LABEL_PASSWORD_VERIFICATION=createStringResourceReference("theme.label.password_verification");
 	public final static String LABEL_PREVIOUS=createStringResourceReference("theme.label.previous");
@@ -310,6 +311,7 @@ public class Theme extends URFListResource<Rule>
 	public final static String LABEL_RENAME_X=createStringResourceReference("theme.label.rename.x");
 	public final static String LABEL_RESOURCE=createStringResourceReference("theme.label.resource");
 	public final static String LABEL_RETRY=createStringResourceReference("theme.label.retry");
+	public final static String LABEL_SORT=createStringResourceReference("theme.label.sort");
 	public final static String LABEL_START=createStringResourceReference("theme.label.start");
 	public final static String LABEL_STOP=createStringResourceReference("theme.label.stop");
 	public final static String LABEL_SUBMIT=createStringResourceReference("theme.label.submit");
@@ -391,6 +393,7 @@ public class Theme extends URFListResource<Rule>
 	public final static URI GLYPH_MEDIA_STOP=createURIResourceReference("theme.glyph.media.stop");
 	public final static URI GLYPH_MUSIC=createURIResourceReference("theme.glyph.music");
 	public final static URI GLYPH_NEXT=createURIResourceReference("theme.glyph.next");
+	public final static URI GLYPH_ORDER=createURIResourceReference("theme.glyph.order");
 	public final static URI GLYPH_PASSWORD=createURIResourceReference("theme.glyph.password");
 	public final static URI GLYPH_PICTURE=createURIResourceReference("theme.glyph.picture");
 	public final static URI GLYPH_POLYGON_CURVED=createURIResourceReference("theme.glyph.polygon.curved");
@@ -407,6 +410,7 @@ public class Theme extends URFListResource<Rule>
 	public final static URI GLYPH_RESOURCE=createURIResourceReference("theme.glyph.resource");
 	public final static URI GLYPH_RETRY=createURIResourceReference("theme.glyph.retry");
 	public final static URI GLYPH_SELECTED=createURIResourceReference("theme.glyph.selected");
+	public final static URI GLYPH_SORT=createURIResourceReference("theme.glyph.sort");
 	public final static URI GLYPH_SPEECH_BUBBLE=createURIResourceReference("theme.glyph.speech.bubble");
 	public final static URI GLYPH_SPEECH_BUBBLE_TEXT=createURIResourceReference("theme.glyph.speech.bubble.text");
 	public final static URI GLYPH_SPEECH_BUBBLE_TEXT_ADD=createURIResourceReference("theme.glyph.speech.bubble.text.add");
