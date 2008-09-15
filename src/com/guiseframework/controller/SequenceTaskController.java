@@ -280,7 +280,7 @@ public class SequenceTaskController extends BoundPropertyObject
 		getStartActionPrototype().setEnabled(taskState==TaskState.UNSTARTED); //only allow starting if we haven't started, yet
 		getPreviousActionPrototype().setEnabled(task.hasPrevious()); //only allow going backwards if we have a previous step
 		getNextActionPrototype().setEnabled(task.hasNext()); //only allow going backwards if we have a next step
-		getFinishActionPrototype().setEnabled(!task.hasNext()); //only allow finishing if there is no next step
+		getFinishActionPrototype().setEnabled(taskState==TaskState.INCOMPLETE && !task.hasNext()); //only allow finishing if the task is in progress and there is no next step
 		getConfirmActionPrototype().setEnabled(isConfirmNavigation() && getConfirmingActionPrototype()!=null); //only allow confirmation if confirmation is enabled and there is an action waiting to be confirmed
 		if(taskState!=TaskState.UNSTARTED)	//if we've already started
 		{
