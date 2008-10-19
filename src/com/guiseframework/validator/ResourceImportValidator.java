@@ -19,7 +19,7 @@ package com.guiseframework.validator;
 import java.util.*;
 import static java.util.Collections.*;
 
-import javax.mail.internet.ContentType;
+import com.globalmentor.net.ContentType;
 
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Classes.*;

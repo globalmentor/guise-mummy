@@ -21,9 +21,8 @@ import static com.globalmentor.text.Text.*;
 
 import java.net.URI;
 
-import javax.mail.internet.ContentType;
-
 import com.globalmentor.java.Objects;
+import com.globalmentor.net.ContentType;
 import com.guiseframework.model.*;
 
 /**Contains prototype information for a value control.

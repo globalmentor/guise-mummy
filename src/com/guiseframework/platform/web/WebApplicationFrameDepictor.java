@@ -21,14 +21,13 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.util.*;
 
-import javax.mail.internet.ContentType;
+import com.globalmentor.net.ContentType;
 
 import static com.globalmentor.javascript.JavaScript.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.xml.XML.*;
 import com.globalmentor.text.xml.xhtml.XHTML;
-import com.globalmentor.util.Debug;
-import com.globalmentor.util.NameValuePair;
+import com.globalmentor.util.*;
 import com.guiseframework.*;
 
 import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;

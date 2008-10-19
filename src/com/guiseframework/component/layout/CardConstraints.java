@@ -20,8 +20,7 @@ import static com.globalmentor.java.Objects.*;
 
 import java.net.URI;
 
-import javax.mail.internet.ContentType;
-
+import com.globalmentor.net.ContentType;
 import com.guiseframework.model.*;
 
 /**Constraints on an individual component in a card layout.

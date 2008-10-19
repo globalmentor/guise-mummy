@@ -22,7 +22,6 @@ import java.util.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
-import javax.mail.internet.ContentType;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -33,6 +32,7 @@ import static com.globalmentor.net.http.HTTPServlets.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.event.ProgressListener;
+import com.globalmentor.net.ContentType;
 import com.globalmentor.net.URIPath;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseApplication;

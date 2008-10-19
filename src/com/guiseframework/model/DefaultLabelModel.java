@@ -21,9 +21,8 @@ import static com.globalmentor.text.Text.*;
 
 import java.net.URI;
 
-import javax.mail.internet.ContentType;
-
 import com.globalmentor.java.Objects;
+import com.globalmentor.net.ContentType;
 
 /**A default implementation of a model for an identifier such as text and/or an icon.
 @author Garret Wilson

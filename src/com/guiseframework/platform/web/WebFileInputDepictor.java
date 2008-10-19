@@ -20,7 +20,7 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.*;
 
-import javax.mail.internet.ContentType;
+import com.globalmentor.net.ContentType;
 
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;

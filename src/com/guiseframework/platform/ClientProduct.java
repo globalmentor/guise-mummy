@@ -18,7 +18,7 @@ package com.guiseframework.platform;
 
 import java.util.Locale;
 
-import javax.mail.internet.ContentType;
+import com.globalmentor.net.ContentType;
 
 /**The identification of the client software accessing Guise on the platform.
 @author Garret Wilson

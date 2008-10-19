@@ -20,9 +20,8 @@ import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.text.Text.*;
 
-import javax.mail.internet.ContentType;
-
 import com.globalmentor.java.Objects;
+import com.globalmentor.net.ContentType;
 
 /**A message component showing the message and any label.
 The message only supports text content types, including:

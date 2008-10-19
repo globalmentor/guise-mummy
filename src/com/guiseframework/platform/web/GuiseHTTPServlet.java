@@ -25,11 +25,9 @@ import java.util.*;
 import static java.util.Collections.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.mail.internet.ContentType;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.xml.parsers.*;
-
 
 import com.globalmentor.event.ProgressEvent;
 import com.globalmentor.event.ProgressListener;
@@ -57,7 +55,6 @@ import com.guiseframework.model.FileItemResourceImport;
 import com.guiseframework.platform.*;
 
 import static com.globalmentor.flash.Flash.*;
-import static com.globalmentor.io.ContentTypes.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
@@ -638,10 +635,14 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 									}
 								}
 								final URFResource resourceDescription=new DefaultURFResource();	//create a new resource description
-								final String itemContentType=fileItemStream.getContentType();	//get the item content type, if any
-								if(itemContentType!=null && !APPLICATION_OCTET_STREAM_CONTENT_TYPE.match(itemContentType))	//if we know the item's content type (and it's not just a generic "bunch of bytes" content type)
+								final String itemContentTypeString=fileItemStream.getContentType();	//get the item content type, if any
+								if(itemContentTypeString!=null)	//if we know the item's content type
 								{
-									setContentType(resourceDescription, getContentTypeInstance(itemContentType));	//set the resource's content type
+									final ContentType itemContentType=ContentType.getInstance(itemContentTypeString);
+									if(!ContentType.APPLICATION_OCTET_STREAM_CONTENT_TYPE.match(itemContentType))	//if the content type is not just a generic "bunch of bytes" content type
+									{
+										setContentType(resourceDescription, itemContentType);	//set the resource's content type
+									}
 								}
 								final String name=getFilename(itemName);	//removing any extraneous path information a browser such as IE or Opera might have given
 								resourceDescription.setName(name);	//specify the name provided to us

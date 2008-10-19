@@ -18,10 +18,8 @@ package com.guiseframework.component;
 
 import static com.globalmentor.java.Objects.*;
 
-import javax.mail.internet.ContentType;
-
-import com.guiseframework.component.layout.ReferenceConstraints;
-import com.guiseframework.component.layout.ReferenceLayout;
+import com.globalmentor.net.ContentType;
+import com.guiseframework.component.layout.*;
 import com.guiseframework.model.*;
 
 /**A text component with an associated label.

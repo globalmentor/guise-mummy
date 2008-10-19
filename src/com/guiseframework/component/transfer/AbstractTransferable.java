@@ -16,7 +16,7 @@
 
 package com.guiseframework.component.transfer;
 
-import javax.mail.internet.ContentType;
+import com.globalmentor.net.ContentType;
 
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;

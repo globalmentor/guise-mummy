@@ -16,8 +16,7 @@
 
 package com.guiseframework.model;
 
-import javax.mail.internet.ContentType;
-
+import com.globalmentor.net.ContentType;
 import com.globalmentor.beans.*;
 import com.globalmentor.text.Text;
 import com.globalmentor.text.xml.xhtml.XHTML;

@@ -16,13 +16,13 @@
 
 package com.guiseframework.component;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyVetoException;
+import java.beans.*;
+
 import static java.util.Collections.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.mail.internet.ContentType;
+import com.globalmentor.net.ContentType;
 
 import static com.globalmentor.java.Objects.*;
 import com.globalmentor.beans.*;

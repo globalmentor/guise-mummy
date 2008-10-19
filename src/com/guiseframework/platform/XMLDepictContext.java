@@ -20,8 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import javax.mail.internet.ContentType;
-
+import com.globalmentor.net.ContentType;
 import com.globalmentor.text.xml.QualifiedName;
 
 /**Encapsulation of text/xml information related to the current depiction.

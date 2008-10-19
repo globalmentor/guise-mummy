@@ -20,7 +20,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import javax.mail.*;
+import javax.mail.Message;
+import javax.mail.Session;
 
 import com.globalmentor.beans.PropertyBindable;
 import com.globalmentor.io.IO;

@@ -19,9 +19,7 @@ package com.guiseframework.component.widget;
 import java.net.URI;
 import java.util.Set;
 
-import javax.mail.internet.ContentType;
-
-import static com.globalmentor.io.ContentTypes.*;
+import com.globalmentor.net.ContentType;
 
 import com.guiseframework.component.Component;
 
@@ -34,7 +32,7 @@ public interface Widget extends Component
 {
 
 	/**The MIME type of a Guise widget.*/
-	public final static ContentType WIDGET_CONTENT_TYPE=getContentTypeInstance(APPLICATION_PRIMARY_TYPE, SUBTYPE_EXTENSION_PREFIX+"guise-widget");
+	public final static ContentType WIDGET_CONTENT_TYPE=ContentType.getInstance(ContentType.APPLICATION_PRIMARY_TYPE, ContentType.SUBTYPE_EXTENSION_PREFIX+"guise-widget");
 
 	/**Returns the base URI where the widget is embedded.
 	@return The base URI where the widget is embedded, or <code>null</code> if the base URI is not known.

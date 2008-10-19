@@ -19,9 +19,8 @@ package com.guiseframework.component;
 import java.beans.*;
 import java.util.regex.Pattern;
 
-import javax.mail.internet.ContentType;
-
 import com.globalmentor.java.Objects;
+import com.globalmentor.net.ContentType;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.converter.*;
 import com.guiseframework.model.*;

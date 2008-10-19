@@ -18,9 +18,8 @@ package com.guiseframework.model;
 
 import java.io.*;
 
-import javax.mail.internet.ContentType;
+import com.globalmentor.net.ContentType;
 
-import static com.globalmentor.io.ContentTypes.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Objects.*;
 
@@ -58,7 +57,7 @@ public class FileItemResourceImport implements ResourceImport
 	public FileItemResourceImport(final FileItem fileItem)
 	{
 		this.fileItem=checkInstance(fileItem, "File item cannot be null.");
-		contentType=getContentTypeInstance(fileItem.getContentType());	//create a content type object from the file item
+		contentType=ContentType.getInstance(fileItem.getContentType());	//create a content type object from the file item
 		String name=fileItem.getName();	//get the name of the item
 		if(name!=null)	//if there is a filename
 		{

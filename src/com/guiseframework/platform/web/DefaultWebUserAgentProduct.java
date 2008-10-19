@@ -16,10 +16,9 @@
 
 package com.guiseframework.platform.web;
 
-import java.util.Iterator;
-import java.util.Locale;
+import java.util.*;
 
-import javax.mail.internet.ContentType;
+import com.globalmentor.net.ContentType;
 
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.http.HTTP.*;

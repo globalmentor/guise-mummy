@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import javax.mail.internet.ContentType;
+import com.globalmentor.net.ContentType;
 
 import static com.globalmentor.text.Text.*;
 import com.globalmentor.util.Debug;
@@ -32,7 +32,6 @@ import com.guiseframework.converter.*;
 import com.guiseframework.model.Notification;
 import com.guiseframework.platform.*;
 
-import static com.globalmentor.io.ContentTypes.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
@@ -49,7 +48,7 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 {
 
 	/**The content type for XStandard objects.*/
-	public final static ContentType XSTANDARD_CONTENT_TYPE=getContentTypeInstance(APPLICATION_PRIMARY_TYPE, "x-xstandard");
+	public final static ContentType XSTANDARD_CONTENT_TYPE=ContentType.getInstance(ContentType.APPLICATION_PRIMARY_TYPE, "x-xstandard");
 
 	/**The XStandard class ID.*/
 	public final static String XSTANDARD_CLASS_ID="clsid:0EED7206-1661-11D7-84A3-00606744831D";

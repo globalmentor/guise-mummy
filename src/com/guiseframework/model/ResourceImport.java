@@ -18,7 +18,7 @@ package com.guiseframework.model;
 
 import java.io.*;
 
-import javax.mail.internet.ContentType;
+import com.globalmentor.net.ContentType;
 
 /**An interface to a resource being imported, such as a web file upload.
 All resource access methods must be synchronized on the resource import instance.

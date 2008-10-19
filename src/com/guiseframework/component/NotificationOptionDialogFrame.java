@@ -18,8 +18,7 @@ package com.guiseframework.component;
 
 import java.beans.PropertyVetoException;
 
-import javax.mail.internet.ContentType;
-
+import com.globalmentor.net.ContentType;
 import com.globalmentor.beans.*;
 import com.guiseframework.event.*;
 import com.guiseframework.input.*;

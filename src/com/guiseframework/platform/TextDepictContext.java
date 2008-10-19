@@ -18,8 +18,7 @@ package com.guiseframework.platform;
 
 import java.io.*;
 
-import javax.mail.internet.ContentType;
-
+import com.globalmentor.net.ContentType;
 import com.globalmentor.text.CharacterEncoding;
 
 /**Encapsulation of text information related to the current depiction.

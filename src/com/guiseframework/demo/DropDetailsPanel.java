@@ -19,8 +19,7 @@ package com.guiseframework.demo;
 import java.beans.PropertyVetoException;
 import java.net.URI;
 
-import javax.mail.internet.ContentType;
-
+import com.globalmentor.net.ContentType;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.component.transfer.*;

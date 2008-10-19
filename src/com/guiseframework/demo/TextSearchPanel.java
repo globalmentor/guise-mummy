@@ -21,9 +21,9 @@ import java.io.*;
 import java.util.regex.*;
 
 import com.globalmentor.beans.*;
+import com.globalmentor.net.ContentType;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
-import static com.globalmentor.io.ContentTypes.*;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
@@ -79,7 +79,7 @@ public class TextSearchPanel extends LayoutPanel
 		final ResourceImportControl resourceImportControl=new ResourceImportControl();	//create the file upload control
 		resourceImportControl.setLabel("Input Text File");	//give the file upload control a label	
 				//create a validator only allowing text files (files of type text/*) not greater than 64K to be uploaded, and require a value
-		final ResourceImportValidator textImportValidator=new ResourceImportValidator(getContentTypeInstance("text", "*"), 1024*64, true);
+		final ResourceImportValidator textImportValidator=new ResourceImportValidator(ContentType.getInstance("text", "*"), 1024*64, true);
 		resourceImportControl.setValidator(textImportValidator);	//assign the validator to the the file upload control model		
 		inputPanel.add(resourceImportControl);	//add the file upload control to the input panel
 			//search button

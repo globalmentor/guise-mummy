@@ -23,10 +23,10 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import static java.util.Collections.*;
 
-import javax.mail.internet.ContentType;
 import javax.servlet.http.HttpServletResponse;
 
 import com.globalmentor.io.ParseReader;
+import com.globalmentor.net.ContentType;
 import com.globalmentor.net.http.HTTPServlets;
 import com.globalmentor.text.CharacterEncoding;
 import com.globalmentor.text.Text;
@@ -35,9 +35,8 @@ import com.globalmentor.util.*;
 import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 
-import static com.globalmentor.io.ContentTypeConstants.*;
-import static com.globalmentor.io.ContentTypes.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.net.ContentTypeConstants.*;
 import static com.globalmentor.text.CharacterEncoding.*;
 import static com.globalmentor.text.TextFormatter.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
@@ -79,7 +78,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 		public boolean isQuirksMode() {return isQuirksMode;}
 
 	/**The current content type of the output.*/
-	private ContentType outputContentType=getContentTypeInstance(TEXT_PRIMARY_TYPE, Text.PLAIN_SUBTYPE);	//default to text/plain
+	private ContentType outputContentType=ContentType.getInstance(ContentType.TEXT_PRIMARY_TYPE, Text.PLAIN_SUBTYPE);	//default to text/plain
 
 	/**The qualified name to use for the attribute hash attribute.*/
 	private final String attributeHashAttributeQualifiedName=getQualifiedName(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_ATTRIBUTE_HASH);
@@ -117,7 +116,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
 */
 		setHashAttributesGenerated(true);	//always generate hash attributes
-		final ContentType defaultContentType=getContentTypeInstance(outputContentType.getPrimaryType(), outputContentType.getSubType(), new NameValuePair<String, String>(CHARSET_PARAMETER, UTF_8));	//default to text/plain encoded in UTF-8
+		final ContentType defaultContentType=ContentType.getInstance(outputContentType.getPrimaryType(), outputContentType.getSubType(), new NameValuePair<String, String>(ContentType.CHARSET_PARAMETER, UTF_8));	//default to text/plain encoded in UTF-8
 		response.setContentType(defaultContentType.toString());	//initialize the default content type and encoding
 		HTTPServlets.setContentLanguage(response, session.getLocale());	//set the response content language
 		final WebUserAgentProduct webUserAgent=getPlatform().getClientProduct();	//get the web user agent
@@ -140,7 +139,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 	public void setOutputContentType(final ContentType contentType)
 	{
 			//default to text/plain encoded in UTF-8 replace the charset parameter with the currently set character set TODO change to really just replace one parameter, instead of removing all others
-		this.outputContentType=getContentTypeInstance(contentType.getPrimaryType(), contentType.getSubType(), new NameValuePair<String, String>(CHARSET_PARAMETER, getOutputCharacterEncoding().toString()));
+		this.outputContentType=ContentType.getInstance(contentType.getPrimaryType(), contentType.getSubType(), new NameValuePair<String, String>(ContentType.CHARSET_PARAMETER, getOutputCharacterEncoding().toString()));
 		getResponse().setContentType(this.outputContentType.toString());	//set the content type of the response, including the current character set
 	}
 

@@ -20,8 +20,9 @@ import java.io.*;
 import java.net.URI;
 import java.util.*;
 
-import javax.mail.internet.ContentType;
 import javax.xml.parsers.*;
+
+import com.globalmentor.net.ContentType;
 
 import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.java.Objects.*;

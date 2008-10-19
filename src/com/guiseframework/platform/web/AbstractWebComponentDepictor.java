@@ -23,9 +23,8 @@ import static java.util.Collections.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.*;
 
-import javax.mail.internet.ContentType;
-
 import com.globalmentor.java.Characters;
+import com.globalmentor.net.ContentType;
 import com.globalmentor.text.xml.XML;
 import com.globalmentor.util.Debug;
 import com.globalmentor.util.NameValuePair;

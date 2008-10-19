@@ -16,15 +16,12 @@
 
 package com.guiseframework.component.transfer;
 
-import javax.mail.internet.*;
+import com.globalmentor.io.*;
+import com.globalmentor.net.ContentType;
 
-import com.globalmentor.io.ContentTypeConstants;
-import com.globalmentor.io.ContentTypes;
-
-import static com.globalmentor.io.ContentTypeConstants.*;
-import static com.globalmentor.io.ContentTypes.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.net.ContentTypeConstants.*;
 
 /**A abstract transferable that carries one or more Java objects.
 A subclass must implement {@link #transfer(Class)}.
@@ -72,13 +69,13 @@ public abstract class AbstractObjectTransferable<S> implements Transferable<S>
 	}
 
 	/**Determines the class this content type matches.
-	This method matches a content type against the {@value ContentTypes#APPLICATION_PRIMARY_TYPE} primary type and {@value ContentTypeConstants#X_JAVA_OBJECT} subtype, with a "class" parameter indicating the given object class.
+	This method matches a content type against the {@value ContentType#APPLICATION_PRIMARY_TYPE} primary type and {@value ContentType#X_JAVA_OBJECT} subtype, with a "class" parameter indicating the given object class.
 	@param contentType The type of data requested, which may include wildcards.
 	@return The matching class, or <code>null</code> if no supported class matches the requested content type.
 	*/
 	protected Class<?> getClass(final ContentType contentType)
 	{
-		if(match(contentType, ContentTypes.APPLICATION_PRIMARY_TYPE, X_JAVA_OBJECT))	//if this is an application/x-java-object type
+		if(contentType.match(ContentType.APPLICATION_PRIMARY_TYPE, ContentType.X_JAVA_OBJECT))	//if this is an application/x-java-object type
 		{
 			final String className=contentType.getParameter("class");	//get the class parameter TODO use a constant
 			if(className!=null)	//if a class name was given
@@ -96,7 +93,7 @@ public abstract class AbstractObjectTransferable<S> implements Transferable<S>
 	}
 
 	/**Determines whether this transferable can transfer data with the given content type.
-	This implementation matches a content type against the {@value ContentTypes#APPLICATION_PRIMARY_TYPE} primary type and {@value ContentTypeConstants#X_JAVA_OBJECT} subtype, with a "class" parameter indicating the given object class.
+	This implementation matches a content type against the {@value ContentType#APPLICATION_PRIMARY_TYPE} primary type and {@value ContentType#X_JAVA_OBJECT} subtype, with a "class" parameter indicating the given object class.
 	@param contentType The type of data requested, which may include wildcards.
 	@return <code>true</code> if this object can transfer data with the requested content type.
 	*/

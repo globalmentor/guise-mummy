@@ -23,8 +23,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 
-import javax.mail.internet.ContentType;
-
 import com.garretwilson.model.ResourceModel;
 import com.globalmentor.marmot.AbstractMarmotSession;
 import com.globalmentor.marmot.MarmotSession;

@@ -21,10 +21,9 @@ import java.net.URI;
 import java.security.*;
 import java.util.*;
 
-import javax.mail.internet.ContentType;
-
 import com.globalmentor.java.Objects;
 import com.globalmentor.java.Strings;
+import com.globalmentor.net.ContentType;
 import com.globalmentor.text.xml.QualifiedName;
 import com.globalmentor.text.xml.XMLNamespacePrefixManager;
 import com.guiseframework.Destination;

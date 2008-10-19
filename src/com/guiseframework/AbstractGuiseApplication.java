@@ -26,8 +26,9 @@ import static java.util.Arrays.*;
 import static java.util.Collections.*;
 import java.util.concurrent.*;
 
-import javax.mail.*;
 import javax.mail.Message;
+import javax.mail.NoSuchProviderException;
+import javax.mail.Session;
 
 import static com.globalmentor.io.FileConstants.*;
 import static com.globalmentor.io.Files.*;
