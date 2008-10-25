@@ -372,7 +372,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 						final InputStream guiseApplicationDescriptionInputStream=new BufferedInputStream(new FileInputStream(dataApplicationFile));	////get an input stream to the supplemental application description
 						try
 						{
-							getApplicationIO().merge(guiseApplication, guiseApplicationDescriptionInputStream, dataApplicationFile.toURI());	//merge the application description from the PLOOP TURF, using the URI of the application description as the base URI
+							getApplicationIO().merge(guiseApplication, guiseApplicationDescriptionInputStream, Files.toURI(dataApplicationFile));	//merge the application description from the PLOOP TURF, using the URI of the application description as the base URI
 						}
 						finally
 						{
