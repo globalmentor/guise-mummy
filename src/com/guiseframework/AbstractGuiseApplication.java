@@ -30,7 +30,6 @@ import javax.mail.Message;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 
-import static com.globalmentor.io.FileConstants.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
@@ -48,6 +47,7 @@ import com.globalmentor.mail.MailManager;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.net.URIs;
 import com.globalmentor.text.W3CDateFormat;
+import com.globalmentor.text.xml.XML;
 import com.globalmentor.urf.*;
 import com.globalmentor.util.*;
 import com.guiseframework.component.*;
@@ -1419,11 +1419,11 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		final File propertiesFile=new File(getHomeDirectory(), checkInstance(propertiesPath, "Properties path cannot be null."));	//create the properties file object
 		final String extension=getExtension(propertiesFile);	//get the extension of the properties file
 		final boolean isXML;	//see if this is an XML file
-		if(XML_EXTENSION.equals(extension))	//if this is an XML file
+		if(XML.XML_NAME_EXTENSION.equals(extension))	//if this is an XML file
 		{
 			isXML=true;	//indicate that we should load XML
 		}
-		else if(PROPERTIES_EXTENSION.equals(extension))	//if this is a properties file
+		else if(PropertiesUtilities.PROPERTIES_NAME_EXTENSION.equals(extension))	//if this is a properties file
 		{
 			isXML=false;	//indicate that we should load normal properties
 		}

@@ -20,15 +20,13 @@ import java.net.URI;
 import java.util.*;
 import static java.util.Collections.*;
 
-
-
+import com.globalmentor.io.Images;
 import com.globalmentor.text.xml.stylesheets.css.XMLCSSCursor;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.CompassPoint;
 
 import com.guiseframework.GuiseApplication;
 
-import static com.globalmentor.io.FileConstants.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
@@ -79,7 +77,7 @@ public enum Cursor
 	/**@return The URI of the predefined cursor relative to the application.*/
 	public URI getURI()
 	{
-		return URI.create(addExtension(GUISE_ROOT_THEME_CURSORS_PATH+getSerializationName(this), PNG_EXTENSION));
+		return URI.create(addExtension(GUISE_ROOT_THEME_CURSORS_PATH+getSerializationName(this), Images.PNG_NAME_EXTENSION));
 	}
 
 	/**The XML CSS cursor to which this cursor corresponds.

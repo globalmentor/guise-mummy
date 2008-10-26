@@ -25,15 +25,16 @@ import com.globalmentor.net.Resource;
 import com.globalmentor.rdf.*;
 import com.globalmentor.urf.*;
 
-
-import static com.globalmentor.io.FileConstants.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Java.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
+import static com.globalmentor.rdf.RDF.*;
 import static com.globalmentor.rdf.RDFResources.*;
+import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.urf.TURF.*;
 import static com.globalmentor.util.Locales.*;
+import static com.globalmentor.util.PropertiesUtilities.*;
 
 /**Utilities for working with resource bundles.
 @author Garret Wilson
@@ -53,13 +54,13 @@ public class ResourceBundles
 		TURF(TURF_NAME_EXTENSION),
 		
 		/**The resource bundle is serialized in an RDF+XML file.*/
-		RDFXML(RDF_EXTENSION),
+		RDFXML(RDF_NAME_EXTENSION),
 		
 		/**The resource bundle is serialized in an XML file.*/
-		XML(XML_EXTENSION),
+		XML(XML_NAME_EXTENSION),
 		
 		/**The resource bundle is serialized in a properties file.*/
-		PROPERTIES(PROPERTIES_EXTENSION);
+		PROPERTIES(PROPERTIES_NAME_EXTENSION);
 
 		/**The extension for this resource bundle file type.*/
 		private final String extension;
