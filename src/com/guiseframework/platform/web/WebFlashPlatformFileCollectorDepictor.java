@@ -18,6 +18,7 @@ package com.guiseframework.platform.web;
 
 import java.net.URI;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
@@ -28,12 +29,14 @@ import com.globalmentor.model.TaskState;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.util.*;
 import com.guiseframework.Bookmark;
+import com.guiseframework.platform.PlatformFileCollector;
 import com.guiseframework.platform.PlatformEvent;
+import com.guiseframework.platform.PlatformFile;
 
 /**A web depictor for a Flash <code>flash.net.FileReferenceList</code>.
 @author Garret Wilson
 */
-public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<FlashFileReferenceList> implements FlashFileReferenceList.Depictor<FlashFileReferenceList>
+public class WebFlashPlatformFileCollectorDepictor extends AbstractWebDepictor<PlatformFileCollector> implements PlatformFileCollector.Depictor<PlatformFileCollector>
 {
 
 	/**The web commands for controlling audio.*/
@@ -62,7 +65,17 @@ public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<Flash
 		public final static String MULTIPLE_PROPERTY="multiple";
 
 	}
-	
+
+	/**The concurrent map of Flash platform files mapped to the IDs assigned to them by Flash.*/
+	private final Map<String, FlashPlatformFile> idPlatformFileMap=new ConcurrentHashMap<String, FlashPlatformFile>();
+
+		/**Retrieves a platform file by the ID assigned to it by Flash.
+		@param id The ID assigned to the platform file by Flash.
+		@return The specified platform file, or <code>null</code> if there is no platforom file with the given ID.
+		@exception NullPointerException if the given ID is <code>null</code>.
+		*/
+		public FlashPlatformFile getPlatformFile(final String id) {return idPlatformFileMap.get(checkInstance(id, "Flash platform file ID cannot be null."));}
+
 	/**Requests that the user be presented with a dialog to browse.*/
 	@SuppressWarnings("unchecked")
 	public void browse()
@@ -77,10 +90,10 @@ public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<Flash
 	@exception IllegalStateException the specified platform file can no longer be canceled because, for example, other platform files have since been selected.	
 	*/
 	@SuppressWarnings("unchecked")
-	public void cancel(final FlashPlatformFile platformFile)
+	public void cancel(final PlatformFile platformFile)
 	{
 		getPlatform().getSendMessageQueue().add(new WebCommandDepictEvent<FlashFileReferenceCommand>(getDepictedObject(), FlashFileReferenceCommand.FILE_CANCEL,	//send a file cancel command to the platform
-				new NameValuePair<String, Object>(FlashFileReferenceCommand.ID_PROPERTY, platformFile.getID())));	//send the ID of the file
+				new NameValuePair<String, Object>(FlashFileReferenceCommand.ID_PROPERTY, ((FlashPlatformFile)platformFile).getID())));	//send the ID of the file
 	}	
 
 	/**Initiates a platform file upload.
@@ -91,14 +104,14 @@ public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<Flash
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
 	@SuppressWarnings("unchecked")
-	public void upload(final FlashPlatformFile platformFile, final URIPath destinationPath, final Bookmark destinationBookmark)
+	public void upload(final PlatformFile platformFile, final URIPath destinationPath, final Bookmark destinationBookmark)
 	{
 		final URIPath resolvedDestinationPath=getSession().getApplication().resolvePath(destinationPath.checkRelative());	//resolve the destination path
 		final URI destinationURI=destinationBookmark!=null ? URI.create(resolvedDestinationPath.toString()+destinationBookmark.toString()) : resolvedDestinationPath.toURI();	//construct a destination URI
 			//add an identification of the Guise session to the URI if needed, as Flash 8 on FireFox sends the wrong HTTP session ID cookie value
 		final URI sessionedDestinationURI=appendQueryParameters(destinationURI, new NameValuePair<String, String>(WebPlatform.GUISE_SESSION_UUID_URI_QUERY_PARAMETER, getSession().getUUID().toString()));
 		getPlatform().getSendMessageQueue().add(new WebCommandDepictEvent<FlashFileReferenceCommand>(getDepictedObject(), FlashFileReferenceCommand.FILE_UPLOAD,	//send a file upload command to the platform
-				new NameValuePair<String, Object>(FlashFileReferenceCommand.ID_PROPERTY, platformFile.getID()),	//send the ID of the file
+				new NameValuePair<String, Object>(FlashFileReferenceCommand.ID_PROPERTY, ((FlashPlatformFile)platformFile).getID()),	//send the ID of the file
 				new NameValuePair<String, Object>(FlashFileReferenceCommand.DESTINATION_URI_PROPERTY, sessionedDestinationURI)));	//indicate the destination
 	}	
 
@@ -111,7 +124,7 @@ public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<Flash
 		if(event instanceof WebChangeDepictEvent)	//if a property changed
 		{
 			final WebChangeDepictEvent webChangeEvent=(WebChangeDepictEvent)event;	//get the web change event
-			final FlashFileReferenceList flashFileReferenceList=getDepictedObject();	//get the depicted object
+			final PlatformFileCollector flashFileReferenceList=getDepictedObject();	//get the depicted object
 			if(webChangeEvent.getDepictedObject()!=flashFileReferenceList)	//if the event was meant for another depicted object
 			{
 				throw new IllegalArgumentException("Depict event "+event+" meant for depicted object "+webChangeEvent.getDepictedObject());
@@ -120,10 +133,14 @@ public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<Flash
 			final List<Map<String, Object>> fileReferences=(List<Map<String, Object>>)asInstance(properties.get("fileReferences"), List.class);	//get the new file references, if any
 			if(fileReferences!=null)	//if file references were given
 			{
+				idPlatformFileMap.clear();	//clear the map of platform files TODO fix race condition, perhaps by adding read/write locks; it is very unlikely that this class would be used in such as way as to create race conditions, however, as most of the time the file references of a file reference list will be updated at long intervals  
 				final List<FlashPlatformFile> platformFileList=new ArrayList<FlashPlatformFile>(fileReferences.size());	//create a new list to store the platform files
 				for(final Map<String, Object> fileReference:fileReferences)	//for each file reference
 				{
-					platformFileList.add(new FlashPlatformFile(flashFileReferenceList, (String)fileReference.get("id"), (String)fileReference.get("name"), ((Number)fileReference.get("size")).longValue()));
+					final String id=(String)fileReference.get("id");
+					final FlashPlatformFile platformFile=new FlashPlatformFile(flashFileReferenceList, id, (String)fileReference.get("name"), ((Number)fileReference.get("size")).longValue());
+					platformFileList.add(platformFile);
+					idPlatformFileMap.put(platformFile.getID(), platformFile);	//map the platform file with the ID assigned to it by Flash
 				}
 				flashFileReferenceList.setPlatformFiles(platformFileList);	//tell the file reference list which platform files it now has
 			}			
@@ -135,7 +152,7 @@ public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<Flash
 				final Number total=asInstance(properties.get("total"), Number.class);	//get the total bytes to transfer, if any
 				final String flashPlatformFileID=asInstance(properties.get("id"), String.class);	//get the ID of the platform file
 
-				final FlashPlatformFile platformFile=flashPlatformFileID!=null ? flashFileReferenceList.getPlatformFile(flashPlatformFileID) : null;	//get the platform file identified
+				final FlashPlatformFile platformFile=flashPlatformFileID!=null ? getPlatformFile(flashPlatformFileID) : null;	//get the platform file identified
 				if(platformFile!=null)	//if we know the platform file
 				{
 					platformFile.fireProgressed(taskState, transferred.longValue(), total!=null ? total.longValue() : -1);	//update the file progress

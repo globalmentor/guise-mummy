@@ -113,7 +113,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 				//audio
 		registerDepictorClass(Audio.class, WebAudioDepictor.class);		
 				//Flash
-		registerDepictorClass(FlashFileReferenceList.class, WebFlashFileReferenceListDepictor.class);		
+		registerDepictorClass(PlatformFileCollector.class, WebFlashPlatformFileCollectorDepictor.class);		
 				//components
 		registerDepictorClass(AccordionMenu.class, WebAccordionMenuDepictor.class);
 		registerDepictorClass(ApplicationFrame.class, WebApplicationFrameDepictor.class);
@@ -188,7 +188,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	}
 
 
-	private FlashFileReferenceList fileReferenceList=null;	//TODO finish; comment
+	private PlatformFileCollector fileReferenceList=null;	//TODO finish; comment
 	
 
 	/**Selects one or more files on the platform, using the appropriate selection functionality for the platform.
@@ -198,13 +198,13 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	*/
 	public void selectPlatformFiles(final boolean multiple, final ValueSelectListener<Collection<PlatformFile>> platformFileSelectListener)
 	{
-		fileReferenceList=new FlashFileReferenceList();	//create a new flash file reference list
+		fileReferenceList=new PlatformFileCollector();	//create a new platform file collector
 		checkInstance(platformFileSelectListener, "Platform file select listener cannot be null.");
-		fileReferenceList.addPropertyChangeListener(FlashFileReferenceList.PLATFORM_FILES_PROPERTY, new AbstractGenericPropertyChangeListener<List<PlatformFile>>()	//listen for the files changing
+		fileReferenceList.addPropertyChangeListener(PlatformFileCollector.PLATFORM_FILES_PROPERTY, new AbstractGenericPropertyChangeListener<List<PlatformFile>>()	//listen for the files changing
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<List<PlatformFile>> genericPropertyChangeEvent)	//if the user selects platform files
 					{
-						fileReferenceList.removePropertyChangeListener(FlashFileReferenceList.PLATFORM_FILES_PROPERTY, this);	//we don't need to listen for the files anymore
+						fileReferenceList.removePropertyChangeListener(PlatformFileCollector.PLATFORM_FILES_PROPERTY, this);	//we don't need to listen for the files anymore
 						platformFileSelectListener.valueSelected(new ValueEvent<Collection<PlatformFile>>(HTTPServletWebPlatform.this, genericPropertyChangeEvent.getNewValue()));	//report the new value to the listener
 					}
 				});
@@ -221,7 +221,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	@exception IllegalArgumentException if the provided path is absolute.
 	@exception IllegalStateException if one or more of the specified platform files can no longer be uploaded because, for example, other platform files have since been selected.	
 	*/
-	public void uploadPlatformFiles(final String destinationPath, final Bookmark destinationBookmark, final ProgressListener progressListener, final PlatformFile... platformFiles)
+	public void uploadPlatformFiles(final String destinationPath, final Bookmark destinationBookmark, final ProgressListener progressListener, final PlatformFile... platformFiles)	//TODO del if not needed
 	{
 		if(fileReferenceList==null)	//if no Flash file reference list has been created
 		{

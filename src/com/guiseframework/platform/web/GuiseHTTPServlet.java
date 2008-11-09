@@ -39,7 +39,6 @@ import com.globalmentor.net.*;
 import com.globalmentor.net.http.*;
 import com.globalmentor.net.mime.ContentDispositionType;
 import com.globalmentor.security.Nonce;
-import com.globalmentor.text.CharacterEncoding;
 import com.globalmentor.text.elff.*;
 import com.globalmentor.text.xml.xpath.*;
 import com.globalmentor.urf.*;
@@ -55,6 +54,7 @@ import com.guiseframework.model.FileItemResourceImport;
 import com.guiseframework.platform.*;
 
 import static com.globalmentor.flash.Flash.*;
+import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
@@ -1305,7 +1305,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 			}
 //Debug.trace("response length:", text.length());
 //Debug.trace("response text:", text);
-			final byte[] bytes=text.getBytes(CharacterEncoding.UTF_8);	//write the content we collected in the context as series of bytes encoded in UTF-8
+			final byte[] bytes=text.getBytes(UTF_8_CHARSET);	//write the content we collected in the context as series of bytes encoded in UTF-8
 			final OutputStream outputStream=getCompressedOutputStream(guiseRequest.getHTTPServletRequest(), response);	//get a compressed output stream, if possible
 			outputStream.write(bytes);	//write the bytes
 			outputStream.close();	//close the output stream, finishing writing the compressed contents (don't put this in a finally block, as it will attempt to write more data and raise another exception)
@@ -2346,7 +2346,7 @@ Debug.trace("this is a destination");
 			final InputStream inputStream=getResource().getInputStream(request);	//get an input stream to the resource
 			try
 			{
-				final ParseReader cssReader=new ParseReader(new InputStreamReader(inputStream, CharacterEncoding.UTF_8));
+				final ParseReader cssReader=new ParseReader(new InputStreamReader(inputStream, UTF_8_CHARSET));
 				final CSSStylesheet cssStylesheet=cssProcessor.process(cssReader);	//parse the stylesheet
 				return cssStylesheet;	//return the stylesheet
 			}
@@ -2363,7 +2363,7 @@ Debug.trace("this is a destination");
 		*/
 		protected byte[] loadBytes(final HttpServletRequest request) throws IOException
 		{
-			return loadStylesheet(request, new GuiseCSSProcessor()).toString().getBytes(CharacterEncoding.UTF_8);	//load the stylesheet and return its bytes
+			return loadStylesheet(request, new GuiseCSSProcessor()).toString().getBytes(UTF_8_CHARSET);	//load the stylesheet and return its bytes
 		}
 
 		/**HTTP servlet resource constructor.

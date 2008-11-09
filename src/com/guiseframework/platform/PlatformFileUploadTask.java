@@ -19,9 +19,8 @@ package com.guiseframework.platform;
 import java.util.*;
 import static java.util.Collections.*;
 
-import static com.globalmentor.java.Classes.*;
-
 import com.globalmentor.event.EventListenerManager;
+import com.globalmentor.model.Task;
 import com.globalmentor.model.TaskState;
 import com.globalmentor.net.URIPath;
 import com.guiseframework.Bookmark;
@@ -33,11 +32,8 @@ This task fires progress events indicating the overall bytes transferred out of 
 The task state indicates the state of the overall transfer, not each individual transfer.
 @author Garret Wilson
 */
-public class PlatformFileUploadTask extends GuiseBoundPropertyObject
+public class PlatformFileUploadTask extends GuiseBoundPropertyObject implements Task
 {
-
-	/**The bound property of the state.*/
-	public final static String STATE_PROPERTY=getPropertyName(PlatformFileUploadTask.class, "state");	//TODO move to task interface
 
 	/**The object managing event listeners.*/
 	private final EventListenerManager eventListenerManager=new EventListenerManager();

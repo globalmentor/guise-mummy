@@ -24,6 +24,7 @@ import com.guiseframework.Bookmark;
 import com.guiseframework.event.ProgressEvent;
 import com.guiseframework.event.ProgressListener;
 import com.guiseframework.platform.AbstractPlatformFile;
+import com.guiseframework.platform.PlatformFileCollector;
 
 /**A local file represented by a Flash <code>flash.net.FileReference</code> on the web platform.
 Because Flash registers progress listeners on a per-file basis, this file keeps track of a single listener,
@@ -34,10 +35,10 @@ public class FlashPlatformFile extends AbstractPlatformFile
 {
 
 	/**The Flash file reference list that owns this platform file.*/
-	private final FlashFileReferenceList fileReferenceList;
+	private final PlatformFileCollector fileReferenceList;
 
 		/**@return The Flash file reference list that owns this platform file.*/
-		protected FlashFileReferenceList getFileReferenceList() {return fileReferenceList;}
+		protected PlatformFileCollector getFileReferenceList() {return fileReferenceList;}
 
 	/**The ID given to the file by Flash.*/
 	private final String id;
@@ -52,7 +53,7 @@ public class FlashPlatformFile extends AbstractPlatformFile
 	@param size The size of the file, or -1 if the size is unknown.
 	@exception NullPointerException if the given ID, file reference list, and/or name is <code>null</code>.
 	*/
-	public FlashPlatformFile(final FlashFileReferenceList fileReferenceList, final String id, final String name, final long size)
+	public FlashPlatformFile(final PlatformFileCollector fileReferenceList, final String id, final String name, final long size)
 	{
 		super(name, size);	//construct the parent class
 		this.id=checkInstance(id, "ID cannot be null.");
@@ -79,14 +80,14 @@ public class FlashPlatformFile extends AbstractPlatformFile
 	}
 
 	/**Fires a progress event to all registered progress listeners.
-	This method delegates to the super version and is present in this class so that it may be called from the depictor of {@link FlashFileReferenceList}.
+	This method delegates to the super version and is present in this class so that it may be called from the depictor of {@link PlatformFileCollector}.
 	@param state The state of the progress.
 	@param transferred The current number of bytes transferred, or <code>-1</code> if not known.
 	@param total The total or estimated total bytes to transfer, or <code>-1</code> if not known.
 	@exception NullPointerException if the given state is <code>null</code>.
 	@see ProgressListener
 	@see ProgressEvent
-	@see WebFlashFileReferenceListDepictor
+	@see WebFlashPlatformFileCollectorDepictor
 	*/
 	protected void fireProgressed(final TaskState state, final long transferred, final long total)
 	{
