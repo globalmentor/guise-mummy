@@ -18,27 +18,25 @@ package com.guiseframework.platform.web;
 
 import static com.globalmentor.java.Objects.*;
 
+import java.net.URI;
+
 import com.globalmentor.model.TaskState;
-import com.globalmentor.net.URIPath;
-import com.guiseframework.Bookmark;
-import com.guiseframework.event.ProgressEvent;
-import com.guiseframework.event.ProgressListener;
-import com.guiseframework.platform.AbstractPlatformFile;
-import com.guiseframework.platform.PlatformFileCollector;
+import com.guiseframework.event.*;
+import com.guiseframework.platform.*;
 
 /**A local file represented by a Flash <code>flash.net.FileReference</code> on the web platform.
 Because Flash registers progress listeners on a per-file basis, this file keeps track of a single listener,
 available only to web classes (as other upload implementations may not register listeners for individual files).
 @author Garret Wilson
 */
-public class FlashPlatformFile extends AbstractPlatformFile
+public class WebPlatformFile extends AbstractPlatformFile
 {
 
-	/**The Flash file reference list that owns this platform file.*/
-	private final PlatformFileCollector fileReferenceList;
+	/**The platform file collector that owns this platform file.*/
+	private final PlatformFileCollector platformFileCollector;
 
-		/**@return The Flash file reference list that owns this platform file.*/
-		protected PlatformFileCollector getFileReferenceList() {return fileReferenceList;}
+		/**@return The platform file collector that owns this platform file.*/
+		protected PlatformFileCollector getPlatformFileCollector() {return platformFileCollector;}
 
 	/**The ID given to the file by Flash.*/
 	private final String id;
@@ -53,30 +51,27 @@ public class FlashPlatformFile extends AbstractPlatformFile
 	@param size The size of the file, or -1 if the size is unknown.
 	@exception NullPointerException if the given ID, file reference list, and/or name is <code>null</code>.
 	*/
-	public FlashPlatformFile(final PlatformFileCollector fileReferenceList, final String id, final String name, final long size)
+	public WebPlatformFile(final PlatformFileCollector fileReferenceList, final String id, final String name, final long size)
 	{
 		super(name, size);	//construct the parent class
 		this.id=checkInstance(id, "ID cannot be null.");
-		this.fileReferenceList=checkInstance(fileReferenceList, "File reference list cannot be null.");
+		this.platformFileCollector=checkInstance(fileReferenceList, "File reference list cannot be null.");
 	}
 
 	/**Uploads the file from the platform.
-	@param destinationPath The path representing the destination of the platform file, relative to the application.
-	@param destinationBookmark The bookmark to be used in uploading the platform file to the destination path, or <code>null</code> if no bookmark should be used.
-	@exception NullPointerException if the given destination path and/or listener is <code>null</code>.
-	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
-	@exception IllegalArgumentException if the provided path is absolute.
+	@param destinationURI The URI representing the destination of the platform file, either absolute or relative to the application.
+	@exception NullPointerException if the given destination URI is <code>null</code>.
 	@exception IllegalStateException the platform file can no longer be uploaded because, for example, other platform files have since been selected.	
 	*/
-	public void upload(final URIPath destinationPath, final Bookmark destinationBookmark)
+	public void upload(final URI destinationURI)
 	{
-		getFileReferenceList().upload(this, destinationPath, destinationBookmark);	//tell the owner file reference list to upload this file
+		getPlatformFileCollector().upload(this, destinationURI);	//tell the owner file reference list to upload this file
 	}
 
 	/**Cancels the current upload or download.*/
 	public void cancel()
 	{
-		getFileReferenceList().cancel(this);	//tell the owner file reference list to cancel this file transfer
+		getPlatformFileCollector().cancel(this);	//tell the owner file reference list to cancel this file transfer
 	}
 
 	/**Fires a progress event to all registered progress listeners.
@@ -87,7 +82,7 @@ public class FlashPlatformFile extends AbstractPlatformFile
 	@exception NullPointerException if the given state is <code>null</code>.
 	@see ProgressListener
 	@see ProgressEvent
-	@see WebFlashPlatformFileCollectorDepictor
+	@see DefaultWebPlatformFileCollectorDepictor
 	*/
 	protected void fireProgressed(final TaskState state, final long transferred, final long total)
 	{

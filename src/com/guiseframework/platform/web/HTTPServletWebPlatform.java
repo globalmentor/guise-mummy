@@ -112,8 +112,8 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 			//register depictors
 				//audio
 		registerDepictorClass(Audio.class, WebAudioDepictor.class);		
-				//Flash
-		registerDepictorClass(PlatformFileCollector.class, WebFlashPlatformFileCollectorDepictor.class);		
+				//file upload
+		registerDepictorClass(PlatformFileCollector.class, DefaultWebPlatformFileCollectorDepictor.class);	//this depictor supports Flash/Google Gears		
 				//components
 		registerDepictorClass(AccordionMenu.class, WebAccordionMenuDepictor.class);
 		registerDepictorClass(ApplicationFrame.class, WebApplicationFrameDepictor.class);

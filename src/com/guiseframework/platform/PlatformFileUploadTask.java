@@ -16,6 +16,7 @@
 
 package com.guiseframework.platform;
 
+import java.net.URI;
 import java.util.*;
 import static java.util.Collections.*;
 
@@ -23,6 +24,7 @@ import com.globalmentor.event.EventListenerManager;
 import com.globalmentor.model.Task;
 import com.globalmentor.model.TaskState;
 import com.globalmentor.net.URIPath;
+import static com.globalmentor.net.URIs.*;
 import com.guiseframework.Bookmark;
 import com.guiseframework.event.*;
 
@@ -47,16 +49,16 @@ public class PlatformFileUploadTask extends GuiseBoundPropertyObject implements 
 		/**@return The platform files to upload.*/
 		public List<PlatformFile> getPlatformFiles() {return platformFiles;}
 
-	/**The destination path of the upload relative to the application context path, or <code>null</code> if the destination path has not yet been set.*/
-	private final URIPath destinationPath;
+	/**The collection URI representing the base destination of the platform files, either absolute or relative to the application, or <code>null</code> if the destination URI has not yet been set.*/
+	private final URI destinationBaseURI;
 
-		/**@return The destination path of the upload relative to the application context path, or <code>null</code> if the destination path has not yet been set.*/
-		public URIPath getDestinationPath() {return destinationPath;}
+		/**@return The collection URI representing the base destination of the platform files, either absolute or relative to the application, or <code>null</code> if the destination URI has not yet been set.*/
+		public URI getDestinationBaseURI() {return destinationBaseURI;}
 
-	/**The bookmark to be used in sending resources to the destination path, or <code>null</code> if there is no bookmark specified.*/
+	/**The bookmark to be used in sending resources to the destination URI, or <code>null</code> if there is no bookmark specified.*/
 	private final Bookmark destinationBookmark;
 
-		/**@return The bookmark to be used in sending resources to the destination path, or <code>null</code> if there is no bookmark specified.*/
+		/**@return The bookmark to be used in sending resources to the destination URI, or <code>null</code> if there is no bookmark specified.*/
 		public Bookmark getDestinationBookmark() {return destinationBookmark;}	
 
 	/**The state of the task, or <code>null</code> if the task has not been started.*/
@@ -171,15 +173,15 @@ public class PlatformFileUploadTask extends GuiseBoundPropertyObject implements 
 				}
 			};
 		
-	/**Platform files, Destination path and destination bookmark constructor.
+	/**Platform files, destination URI, and destination bookmark constructor.
 	@param platformFiles The platform files to upload.
-	@param destinationPath The path relative to the application representing the destination of the collected resources.
-	@param destinationBookmark The bookmark to be used in sending resources to the destination path, or <code>null</code> if there is no bookmark specified.
-	@exception NullPointerException if the given list of platform files and/or destination path is <code>null</code>.
-	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
-	@exception IllegalArgumentException if the provided path is absolute.
+	@param destinationBaseURI The collection URI representing the base destination of the platform files, either absolute or relative to the application.
+	@param destinationBookmark The bookmark to be used in sending resources to the destination URI, or <code>null</code> if there is no bookmark specified.
+	@exception NullPointerException if the given list of platform files and/or destination URI is <code>null</code>.
+	@exception IllegalArgumentException if the provided URI is not a collection URI.
+	@exception IllegalArgumentException if the provided URI specifies a query and/or fragment.
 	*/
-	public PlatformFileUploadTask(final Iterable<PlatformFile> platformFiles, final URIPath destinationPath, final Bookmark destinationBookmark)
+	public PlatformFileUploadTask(final Iterable<PlatformFile> platformFiles, final URI destinationBaseURI, final Bookmark destinationBookmark)
 	{
 		final List<PlatformFile> tempPlatformFiles=new ArrayList<PlatformFile>();	//create a list of platform files
 		long tempCompletion=0;	//we'll calculate the total number of bytes to transfer
@@ -194,7 +196,7 @@ public class PlatformFileUploadTask extends GuiseBoundPropertyObject implements 
 		}
 		this.completion=tempCompletion;	//save the completion amount
 		this.platformFiles=unmodifiableList(tempPlatformFiles);	//save an unmodifiable copy of the list
-		this.destinationPath=destinationPath.checkRelative();	//save the destination path
+		this.destinationBaseURI=checkCollectionURI(checkPlainURI(destinationBaseURI));	//save the destination URI
 		this.destinationBookmark=destinationBookmark;	//save the destination bookmark
 	}
 
@@ -235,7 +237,9 @@ public class PlatformFileUploadTask extends GuiseBoundPropertyObject implements 
 		currentProgress=0;	//indicate that we haven't transferred anything for this platform file
 		final PlatformFile platformFile=getPlatformFiles().get(platformFileIndex);	//get the current platform file
 		platformFile.addProgressListener(platformFileProgressListener);	//start listening to the platform file's progress
-		platformFile.upload(getDestinationPath(), getDestinationBookmark());	//tell the platform file to start uploading		
+		final Bookmark destinationBookmark=getDestinationBookmark();
+		final URI destinationURI=destinationBookmark!=null ? URI.create(getDestinationBaseURI()+URIPath.encodeSegment(platformFile.getName())+destinationBookmark) : getDestinationBaseURI().resolve(URIPath.encodeSegment(platformFile.getName()));	//determine the destination URI, adding a bookmark if one is given
+		platformFile.upload(destinationURI);	//tell the platform file to start uploading		
 	}
 
 	/**Cleans up after an upload for the current platform file.

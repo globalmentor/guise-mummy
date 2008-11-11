@@ -17,12 +17,12 @@
 package com.guiseframework.component;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.Collection;
 
 import com.globalmentor.itu.SIUnit;
 import com.globalmentor.java.Objects;
 import com.globalmentor.model.TaskState;
-import com.globalmentor.net.URIPath;
 import com.guiseframework.Bookmark;
 import com.guiseframework.Resources;
 import com.guiseframework.component.layout.*;
@@ -34,6 +34,7 @@ import com.guiseframework.prototype.ActionPrototype;
 
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Classes.*;
+import static com.globalmentor.net.URIs.*;
 import static com.guiseframework.theme.Theme.*;
 
 /**Panel to browse platform files and upload them to the specified destination.
@@ -45,8 +46,8 @@ for the latter, the source of the event will be a {@link PlatformFileUploadTask}
 public class PlatformFileUploadPanel extends AbstractPanel implements ProgressListenable<Long>
 {
 
-	/**The bound property of the destination path.*/
-	public final static String DESTINATION_PATH_PROPERTY=getPropertyName(PlatformFileUploadPanel.class, "destinationPath");
+	/**The bound property of the destination URI.*/
+	public final static String DESTINATION_URI_PROPERTY=getPropertyName(PlatformFileUploadPanel.class, "destinationURI");
 
 	/**The bound property of the destination bookmark.*/
 	public final static String DESTINATION_BOOKMARK_PROPERTY=getPropertyName(PlatformFileUploadPanel.class, "destinationBookmark");
@@ -60,39 +61,39 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 		/**@return The panel containing controls such as buttons.*/
 		public Panel getControlPanel() {return controlPanel;}
 
-	/**The destination path of the upload relative to the application context path, or <code>null</code> if the destination path has not yet been set.*/
-	private URIPath destinationPath=null;
+	/**The collection URI representing the base destination of the platform files, either absolute or relative to the application, or <code>null</code> if the destination URI has not yet been set.*/
+	private URI destinationURI=null;
 
-		/**@return The destination path of the upload relative to the application context path, or <code>null</code> if the destination path has not yet been set.*/
-		public URIPath getDestinationPath() {return destinationPath;}
+		/**@return The collection URI representing the base destination of the platform files, either absolute or relative to the application, or <code>null</code> if the destination URI has not yet been set.*/
+		public URI getDestinationURI() {return destinationURI;}
 
-		/**Sets the destination path of the upload.
+		/**Sets the destination base URI of the upload.
 		This is a bound property.
-		@param newDestinationPath The path relative to the application representing the destination of the collected resources.
-		@exception NullPointerException if the given path is <code>null</code>.
-		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
-		@exception IllegalArgumentException if the provided path is absolute.
-		@see #DESTINATION_PATH_PROPERTY
+		@param newDestinationURI The collection URI representing the base destination of the platform files, either absolute or relative to the application.
+		@exception NullPointerException if the given URI is <code>null</code>.
+		@exception IllegalArgumentException if the provided URI is not a collection URI.
+		@exception IllegalArgumentException if the provided URI specifies a query and/or fragment.
+		@see #DESTINATION_URI_PROPERTY
 		*/
-		public void setDestinationPath(final URIPath newDestinationPath)
+		public void setDestinationURI(final URI newDestinationURI)
 		{
-			if(!Objects.equals(destinationPath, newDestinationPath.checkRelative()))	//if the value is really changing
+			if(!Objects.equals(destinationURI, checkCollectionURI(checkPlainURI(newDestinationURI))))	//if the value is really changing
 			{
-				final URIPath oldDestinationPath=destinationPath;	//get the old value
-				destinationPath=newDestinationPath;	//actually change the value
-				firePropertyChange(DESTINATION_PATH_PROPERTY, oldDestinationPath, newDestinationPath);	//indicate that the value changed
+				final URI oldDestinationPath=destinationURI;	//get the old value
+				destinationURI=newDestinationURI;	//actually change the value
+				firePropertyChange(DESTINATION_URI_PROPERTY, oldDestinationPath, newDestinationURI);	//indicate that the value changed
 			}
 		}
 
-	/**The bookmark to be used in sending resources to the destination path, or <code>null</code> if there is no bookmark specified.*/
+	/**The bookmark to be used in sending resources to the destination URI, or <code>null</code> if there is no bookmark specified.*/
 	private Bookmark destinationBookmark=null;
 
-		/**@return The bookmark to be used in sending resources to the destination path, or <code>null</code> if there is no bookmark specified.*/
+		/**@return The bookmark to be used in sending resources to the destination URI, or <code>null</code> if there is no bookmark specified.*/
 		public Bookmark getDestinationBookmark() {return destinationBookmark;}	
 
 		/**Sets the destination bookmark of the upload.
 		This is a bound property.
-		@param newDestinationBookmark The bookmark to be used in sending resources to the destination path, or <code>null</code> if there is no bookmark specified.
+		@param newDestinationBookmark The bookmark to be used in sending resources to the destination URI, or <code>null</code> if there is no bookmark specified.
 		@see #DESTINATION_BOOKMARK_PROPERTY
 		*/
 		public void setDestinationBookmark(final Bookmark newDestinationBookmark)
@@ -172,28 +173,28 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 					}
 				};
 
-	/**Destination path constructor.
-	@param destinationPath The path relative to the application representing the destination of the collected resources.
-	@exception NullPointerException if the given path is <code>null</code>.
-	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
-	@exception IllegalArgumentException if the provided path is absolute.
+	/**Destination URI constructor.
+	@param destinationBaseURI The collection URI representing the base destination of the platform files, either absolute or relative to the application.
+	@exception NullPointerException if the given list of platform files and/or destination URI is <code>null</code>.
+	@exception IllegalArgumentException if the provided URI is not a collection URI.
+	@exception IllegalArgumentException if the provided URI specifies a query and/or fragment.
 	*/
-	public PlatformFileUploadPanel(final URIPath destinationPath)
+	public PlatformFileUploadPanel(final URI destinationURI)
 	{
-		this(destinationPath, null);	//construct the panel with no bookmark
+		this(destinationURI, null);	//construct the panel with no bookmark
 	}
 
-	/**Destination path and destination bookmark constructor.
-	@param destinationPath The path relative to the application representing the destination of the collected resources.
-	@param destinationBookmark The bookmark to be used in sending resources to the destination path, or <code>null</code> if there is no bookmark specified.
-	@exception NullPointerException if the given path is <code>null</code>.
-	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
-	@exception IllegalArgumentException if the provided path is absolute.
+	/**Destination URI and destination bookmark constructor.
+	@param destinationBaseURI The collection URI representing the base destination of the platform files, either absolute or relative to the application.
+	@param destinationBookmark The bookmark to be used in sending resources to the destination URI, or <code>null</code> if there is no bookmark specified.
+	@exception NullPointerException if the given list of platform files and/or destination URI is <code>null</code>.
+	@exception IllegalArgumentException if the provided URI is not a collection URI.
+	@exception IllegalArgumentException if the provided URI specifies a query and/or fragment.
 	*/
-	public PlatformFileUploadPanel(final URIPath destinationPath, final Bookmark destinationBookmark)
+	public PlatformFileUploadPanel(final URI destinationURI, final Bookmark destinationBookmark)
 	{
 		this();	//construct the default panel
-		setDestinationPath(destinationPath);	//set the destination path
+		setDestinationURI(destinationURI);	//set the destination URI
 		setDestinationBookmark(destinationBookmark);	//set the destionation bookmark
 	}
 
@@ -244,7 +245,7 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 				@Override
 				protected void action(final int force, final int option)
 				{
-					platformFileUploadTask=new PlatformFileUploadTask(platformFileListControl, getDestinationPath(), getDestinationBookmark());	//create a new platform file upload task
+					platformFileUploadTask=new PlatformFileUploadTask(platformFileListControl, getDestinationURI(), getDestinationBookmark());	//create a new platform file upload task
 					platformFileUploadTask.addProgressListener(overallProgressListener);	//listen for progress of the platform file upload task
 					platformFileUploadTask.start();	//start the file uploads
 					updateComponents();	//update the components to show the new state

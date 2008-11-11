@@ -1064,6 +1064,126 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 			}
 		};
 
+		/**Checks to see if Google Gears is installed.
+		If Google Gears is installed, this method returns <code>true</code>.
+		Otherwise, the user is asked if Google Gears should be installed.
+		If so, the user is redirected to the Google Gears installation page.
+		If the user elects not to install Google Gears, this method returns <code>false</code>.
+		@param askInstall If the user should be asked to install Google Gears if it isn't already installed.
+		@return <code>true</code> if Google Gears is installed, else <code>false</code> if Google Gears is not installed and the user has not been asked to install or the user declines.
+		*/ 
+		proto._verifyGoogleGears=function(askInstall)
+		{
+			if(window.google && google.gears)	//if Google Gears is installed
+			{
+				return true;
+			}
+			else	//if Google Gears is not installed
+			{
+				if(askInstall && confirm("To perform the requested functionality, you should have Google Gears installed.\nPlease install Google Gears and restart your browser.\n\nWould you like to install Google Gears now?\n\n(If you choose not to install Google Gears, the requested action may not perform correctly.)"))	//TODO i18n
+				{
+					location.href="http://gears.google.com/?action=install&message=Install%20Google%20Gears%20for%20the%20Marmox%E2%84%A2%20Network.&return="+location.href;
+				}
+				else	//if we shouldn't ask to install, or the user declined to install
+				{
+					return false;
+				}
+			}
+		};
+		
+		/**The map of arrays of files ready for uploading, or <code>null</code> if no files have been selected.
+		The arrays are mapped to the ID of the file list. 
+		Each file also has a <var>httpRequest</var> variable with the current request, if any.
+		*/
+		proto._gearsFilesMap={};	//TODO provide a way for lists to be removed from the map
+
+		/**Called when Google Gears selects files to open.
+		@param files The files being selected.
+		*/ 
+		proto._onGearsOpenFiles=function(id, files)
+		{
+			var fileCount=files.length;
+			if(fileCount>0)	//if the user selected files
+			{
+				var fileReferences=new Array(fileCount);	//create a new array of file infos to send back
+				for(var fileIndex=0; fileIndex<fileCount; ++fileIndex)	//give each file an ID
+				{
+					var file=files[fileIndex];
+					fileReferences[fileIndex]={id:fileIndex.toString(), name:file.name, size:file.blob.length};	//create our own information about this file reference; convert the index to a string for the ID, because server expects a string ID
+				}
+				this._gearsFilesMap[id]=files;	//store the files in the map, keyed to the ID
+				this._onFilesSelected(id, fileReferences);	//send information on the selected files to the server
+			}
+		};
+
+		/**Called when Google Gears has progress uploading files.
+		@param filesID The ID of the files list.
+		@param fileID The string ID of the file within the list.
+		@param progressEvent The event containing information on the upload progress.
+		*/ 
+		proto._onGearsUploadProgress=function(filesID, fileID, progressEvent)
+		{
+			this._onFileProgress(filesID, fileID, this.TaskState.INCOMPLETE, progressEvent.loaded, progressEvent.lengthComputable ? progressEvent.total : -1);	//update the progress
+		};
+
+		/**Uploads a file using Google Gears.
+		If no such files list exists, or no files match that indicated by the given file ID, no action occurs.
+		@param filesID The ID of the files list.
+		@param fileID The string ID of the file within the list.
+		@param fileURI The URI to which the file should be uploaded.
+		*/
+		proto._gearsUploadFile=function(filesID, fileID, fileURI)
+		{
+			var files=this._gearsFilesMap[filesID];	//get the existing file list, if any
+			if(files)	//if there is such a file list
+			{
+				var file=files[parseInt(fileID)];	//get the requested file; we should have been passed the string form of the index as teh ID
+				if(file)	//if we found a file
+				{
+					this._onFileProgress(filesID, fileID, this.TaskState.INCOMPLETE, 0, file.blob.length);	//send an initial progress of zero bytes
+					var httpUploadRequest=google.gears.factory.create("beta.httprequest");
+					httpUploadRequest.open("PUT", fileURI);
+					httpUploadRequest.upload.onprogress = this._onGearsUploadProgress.bind(this, filesID, fileID);
+					var closureThis=this;
+					httpUploadRequest.onreadystatechange = function()
+					{
+						switch(httpUploadRequest.readyState)
+						{
+							case 4:	//complete
+								delete file.httpRequest;	//remove the HTTP request from the file
+								closureThis._onFileProgress(filesID, fileID, closureThis.TaskState.COMPLETE, 0, file.blob.length);	//indicate that the transfer is complete TODO check for errors and cancellation, and verify that all the file was actually uploaded
+								break;
+						}
+					};
+					file.httpRequest=httpUploadRequest;	//save the request in case we need to cancel it
+					httpUploadRequest.send(file.blob);
+				} 
+			}
+		};
+
+		/**Cancels a file upload using Google Gears.
+		If no such files list exists, or no files match that indicated by the given file ID, no action occurs.
+		@param filesID The ID of the files list.
+		@param fileID The string ID of the file within the list.
+		*/
+		proto._gearsCancelUploadFile=function(filesID, fileID)
+		{
+			var files=this._gearsFilesMap[filesID];	//get the existing file list, if any
+			if(files)	//if there is such a file list
+			{
+				var file=files[parseInt(fileID)];	//get the requested file; we should have been passed the string form of the index as teh ID
+				if(file)	//if we found a file
+				{
+					var httpRequest=file.httpRequest;	//get the in-progress request, if any
+					if(httpRequest)	//if there is an in-progress request
+					{
+						httpRequest.abort();	//abort the request
+						delete file.httpRequest;	//remove the HTTP request from the file
+					}
+				} 
+			}
+		};
+		
 		/**Processes the AJAX command response.
 		@param element The element representing the command response.
 		*/ 
@@ -1088,14 +1208,36 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 					this.executeFlash(function(flash){flash.stopSound(objectID);});	//stop the sound
 					break;
 				case "file-browse":
-					this.executeFlash(function(flash){flash.browseFiles(objectID, parameters["multiple"]);});	//browse files, specifying whether multiple files should be selected
+					if(this._verifyGoogleGears(true))	//use Google Gears if we can, asking the user if they want to install
+					{
+						var desktop = google.gears.factory.create("beta.desktop");	//access the desktop using Gears
+						desktop.openFiles(this._onGearsOpenFiles.bind(this, objectID), {singleFile:!parameters["multiple"]});	//ask the user for files
+					}
+					else	//if Google Gears isn't installed, try to use Flash
+					{
+						this.executeFlash(function(flash){flash.browseFiles(objectID, parameters["multiple"]);});	//browse files, specifying whether multiple files should be selected
+					}
 					break;
 				case "file-cancel":
-					this.executeFlash(function(flash){flash.cancelFile(objectID, parameters["id"]);});	//cancel the identified file
-					this._onFileProgress(objectID, parameters["id"], this.TaskState.CANCELED, -1, -1);	//send a file progress canceled event, as Flash doesn't send a cancel event for us 
+					if(this._verifyGoogleGears(false))	//if we have Google Gears
+					{
+						this._gearsCancelUploadFile(objectID, parameters["id"]);	//cancel the identified file
+					}
+					else	//if Google Gears isn't installed, we must be using Flash
+					{
+						this.executeFlash(function(flash){flash.cancelFile(objectID, parameters["id"]);});	//cancel the identified file
+					}
+					this._onFileProgress(objectID, parameters["id"], this.TaskState.CANCELED, -1, -1);	//send a file progress canceled event, as neither Flash nor Google sends a cancel event for us
 					break;
 				case "file-upload":
-					this.executeFlash(function(flash){flash.uploadFile(objectID, parameters["id"], parameters["destinationURI"]);});	//upload the identified file to the specified destination URI
+					if(this._verifyGoogleGears(false))	//if we have Google Gears
+					{
+						this._gearsUploadFile(objectID, parameters["id"], parameters["destinationURI"]);	//upload the identified file to the specified destination URI
+					}
+					else	//if Google Gears isn't installed, we must be using Flash
+					{
+						this.executeFlash(function(flash){flash.uploadFile(objectID, parameters["id"], parameters["destinationURI"]);});	//upload the identified file to the specified destination URI
+					}
 					break;
 				case "poll-interval":
 //console.log("received poll interval request:", parameters["interval"]);

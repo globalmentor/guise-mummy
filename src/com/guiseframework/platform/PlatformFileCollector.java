@@ -16,14 +16,12 @@
 
 package com.guiseframework.platform;
 
+import java.net.URI;
 import java.util.*;
 import static java.util.Collections.*;
 
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
-
-import com.globalmentor.net.URIPath;
-import com.guiseframework.Bookmark;
 
 /**Encapsulation of a list of platform files and a way to collect them.
 The installed depictor must be of the specialized type {@link Depictor}.
@@ -89,20 +87,18 @@ public class PlatformFileCollector extends AbstractDepictedObject
 
 	/**Initiates a platform file upload.
 	@param platformFile Thet platform file to upload.
-	@param destinationPath The path representing the destination of the platform file, relative to the application.
-	@param destinationBookmark The bookmark to be used in uploading the platform file to the destination path, or <code>null</code> if no bookmark should be used.
-	@exception NullPointerException if the given platform file and/or destination path is <code>null</code>.
-	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
-	@exception IllegalArgumentException if the provided path is absolute.
+	@param platformFile Thet platform file to upload.
+	@param destinationURI The URI representing the destination of the platform file, either absolute or relative to the application.
+	@exception NullPointerException if the given platform file and/or destination URI is <code>null</code>.
 	@exception IllegalStateException the specified platform file can no longer be uploaded because, for example, other platform files have since been selected.	
 	*/
-	public void upload(final PlatformFile platformFile, final URIPath destinationPath, final Bookmark destinationBookmark)
+	public void upload(final PlatformFile platformFile, final URI destinationURI)
 	{
 		if(!getPlatformFiles().contains(platformFile))	//if this list no longer knows about this platform file
 		{
 			throw new IllegalStateException("Platform file "+platformFile+" no longer available for upload; perhaps other platform files have since been selected.");
 		}
-		getDepictor().upload(platformFile, destinationPath, destinationBookmark);	//tell the depictor to initiate the platform file upload
+		getDepictor().upload(platformFile, destinationURI);	//tell the depictor to initiate the platform file upload
 	}	
 
 	/**The custom depictor type for this depicted object class.
@@ -124,12 +120,10 @@ public class PlatformFileCollector extends AbstractDepictedObject
 
 		/**Initiates a platform file upload.
 		@param platformFile Thet platform file to upload.
-		@param destinationURI The URI representing the destination of the platform file, relative to the application.
-		@exception NullPointerException if the given platform file and/or destination path is <code>null</code>.
-		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
-		@exception IllegalArgumentException if the provided path is absolute.
+		@param destinationURI The URI representing the destination of the platform file, either absolute or relative to the application.
+		@exception NullPointerException if the given platform file and/or destination URI is <code>null</code>.
 		*/
-		public void upload(final PlatformFile platformFile, final URIPath destinationPath, final Bookmark destinationBookmark);
+		public void upload(final PlatformFile platformFile, final URI destinationURI);
 
 	}
 

@@ -16,8 +16,8 @@
 
 package com.guiseframework.platform;
 
-import com.globalmentor.net.URIPath;
-import com.guiseframework.Bookmark;
+import java.net.URI;
+
 import com.guiseframework.event.ProgressListenable;
 
 /**A local file on a platform.
@@ -36,13 +36,10 @@ public interface PlatformFile extends ProgressListenable<Long>
 	public void cancel();
 
 	/**Uploads the file from the platform.
-	@param destinationPath The path representing the destination of the platform file, relative to the application.
-	@param destinationBookmark The bookmark to be used in uploading the platform file to the destination path, or <code>null</code> if no bookmark should be used.
-	@exception NullPointerException if the given destination path and/or listener is <code>null</code>.
-	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
-	@exception IllegalArgumentException if the provided path is absolute.
+	@param destinationURI The URI representing the destination of the platform file, either absolute or relative to the application.
+	@exception NullPointerException if the given destination URI is <code>null</code>.
 	@exception IllegalStateException the platform file can no longer be uploaded because, for example, other platform files have since been selected.	
 	*/
-	public void upload(final URIPath destinationPath, final Bookmark destinationBookmark);
+	public void upload(final URI destinationURI);
 
 }

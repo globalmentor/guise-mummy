@@ -417,26 +417,6 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
 		final HTTPServletGuiseRequest guiseRequest=new HTTPServletGuiseRequest(request, /*TODO del response, */guiseContainer, guiseApplication);	//get Guise request information
-/*TODO del		
-		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
-		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
-*/
-//Debug.info("method:", request.getMethod(), "raw path info:", rawPathInfo);
-//TODO del Debug.info("user agent:", getUserAgent(request));
-//	TODO del final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
-//	TODO del Debug.info("before service request: memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
-/*TODO del
-		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
-		URIPath navigationPath=new URIPath(rawPathInfo.substring(1));	//remove the beginning slash to get the navigation path from the path info
-*/
-/*TODO del
-final Enumeration headerNames=request.getHeaderNames();	//TODO del
-while(headerNames.hasMoreElements())
-{
-	final String headerName=(String)headerNames.nextElement();
-	Debug.info("request header:", headerName, request.getHeader(headerName));
-}
-*/
 		if(guiseRequest.isRequestPathReserved())	//if this is a request for a Guise reserved path (e.g. a public resource or a temporary resource)
 		{
 			super.doGet(request, response);	//go ahead and retrieve the resource immediately
@@ -448,12 +428,6 @@ while(headerNames.hasMoreElements())
 		{
 Debug.trace("found destination:", destination);
 			final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
-/*TODO del
-	Debug.info("session ID", guiseSession.getHTTPSession().getId());	//TODO del
-	Debug.info("content length:", request.getContentLength());
-	Debug.info("content type:", request.getContentType());
-	*/
-
 				//make sure the environment has the WebTrends ID
 			final Environment environment=guiseSession.getPlatform().getEnvironment();	//get the session's environment
 			if(!environment.hasProperty(WEBTRENDS_ID_COOKIE_NAME))	//if the environment doesn't have a WebTrends ID
@@ -463,15 +437,8 @@ Debug.trace("found destination:", destination);
 				webtrendsIDStringBuilder.append('-');	//-
 				webtrendsIDStringBuilder.append(System.currentTimeMillis());	//current time in milliseconds
 				//TODO fix nanonseconds if needed, but Java doesn't even offer this information
-/*TODO del; this is some sort of checksum, not a UUID
-				webtrendsIDStringBuilder.append("::");	//::
-				final UUID uuid=UUID.randomUUID();	//create a new UUID
-				webtrendsIDStringBuilder.append(toHexString(uuid).toUpperCase());	//append the UUID in hex
-*/
 				environment.setProperty(WEBTRENDS_ID_COOKIE_NAME, webtrendsIDStringBuilder.toString());	//store the WebTrends ID in the environment, which will be stored in the cookies eventually
 			}
-	//TODO del Debug.info("supports Flash: ", guiseSession.getEnvironment().getProperty(GuiseEnvironment.CONTENT_APPLICATION_SHOCKWAVE_FLASH_ACCEPTED_PROPERTY));
-
 			final String httpMethod=request.getMethod();	//get the current HTTP method being used
 Debug.trace("method", httpMethod);
 Debug.trace("destination", destination, "is resource read destination?", (destination instanceof ResourceReadDestination));
@@ -532,6 +499,64 @@ Debug.trace("ready to delegate to super");
 		}
 	}
 
+	/**Services the PUT method.
+  @param request The HTTP request.
+  @param response The HTTP response.
+  @exception ServletException if there is a problem servicing the request.
+  @exception IOException if there is an error reading or writing data.
+  */
+	public void doPut(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
+	{
+		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
+		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+		final HTTPServletGuiseRequest guiseRequest=new HTTPServletGuiseRequest(request, /*TODO del response, */guiseContainer, guiseApplication);	//get Guise request information
+		if(guiseRequest.isRequestPathReserved())	//if this is a request for a Guise reserved path (e.g. a public resource or a temporary resource)
+		{
+			throw new HTTPForbiddenException("Uploading content to "+guiseRequest.getNavigationPath()+" is not allowed.");
+		}
+		final Destination destination=guiseApplication.getDestination(guiseRequest.getNavigationPath());	//try to get a destination associated with the requested path
+		if(!(destination instanceof ResourceWriteDestination))	//if we don't have a write destination associated with the requested path
+		{
+			throw new HTTPForbiddenException("Uploading content to "+guiseRequest.getNavigationPath()+" is not supported.");
+		}
+Debug.trace("found resource write destination:", destination);
+		final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
+		final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
+		try
+		{
+			call(guiseSessionThreadGroup, new Runnable()	//call the method in a new thread inside the thread group
+					{
+						public void run()
+						{
+							try
+							{
+								serviceGuiseResourceWriteDestinationRequest(guiseRequest, response, guiseContainer, guiseApplication, guiseSession, (ResourceWriteDestination)destination, request.getInputStream(), null);
+							}
+							catch(final IOException ioException)	//if an exception is thrown
+							{
+								throw new UndeclaredThrowableException(ioException);	//let it pass to the calling thread
+							}
+						}
+					});
+		}
+		catch(final UndeclaredThrowableException undeclaredThrowableException)	//if an exception was thrown
+		{
+			final Throwable cause=undeclaredThrowableException.getCause();	//see what exception was thrown
+			if(cause instanceof ResourceNotFoundException)	//if a ResourceNotFoundException was thrown
+			{
+				HTTPException.createHTTPException((ResourceIOException)cause);	//pass back an equivalent HTTP exception
+			}
+			else if(cause instanceof IOException)	//if an IOException was thrown
+			{
+				throw ((IOException)cause);	//pass it on
+			}
+			else	//we don't expect any other types of exceptions
+			{
+				throw new AssertionError(cause);
+			}
+		}
+	}
+
 	/**Services a Guise request.
   If this is a request for a Guise component destination, a Guise context will be assigned to the Guise session while the request is processed.
   @param request The HTTP request.
@@ -542,17 +567,10 @@ Debug.trace("ready to delegate to super");
   @param destination The Guise session destination being accessed.
   @exception IOException if there is an error reading or writing data.
   */
-	private void serviceGuiseRequest(/*TODO del when works final HttpServletRequest request,*/final HTTPServletGuiseRequest guiseRequest, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final Destination destination) throws IOException
+	private void serviceGuiseRequest(final HTTPServletGuiseRequest guiseRequest, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final Destination destination) throws IOException
 	{
 Debug.trace("servicing Guise request with request", guiseRequest);
 		final WebPlatform guisePlatform=(WebPlatform)guiseSession.getPlatform();	//get the web platform
-/*TODO del
-		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
-//TODO del Debug.trace("servicing Guise request with request URI:", requestURI);
-Debug.trace("servicing Guise request with request URI:", requestURI);
-		final String contentTypeString=request.getContentType();	//get the request content type
-		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
-*/
 		final URI requestURI=guiseRequest.getDepictURI();	//get the request URI
 		final ContentType contentType=guiseRequest.getRequestContentType();	//get the request content type
 		final URIPath path=guiseRequest.getNavigationPath();	//get the path
@@ -589,7 +607,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 		{
 			serviceGuiseComponentDestinationRequest(guiseRequest, response, guiseContainer, guiseApplication, guiseSession, (ComponentDestination)destination);	//service the request for the component destination TODO eventually maybe create an HTTPServletComponentDestination and pass everything there
 		}
-		else if(destination instanceof ResourceWriteDestination)	//if we should be writing to this destination
+		else if(destination instanceof ResourceWriteDestination)	//if we should be writing to this destination TODO refactor this to use serviceGuiseResourceWriteDestinationRequest()
 		{
 			if(ServletFileUpload.isMultipartContent(guiseRequest.getHTTPServletRequest()))	//if the request is multipart content, as we expect
 			{
@@ -736,6 +754,94 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 			return false;	//indicate that this was not a Guise component-related request
 		}
 */
+	}
+
+	/**Services a Guise upload request intended for a write destination.
+  @param request The HTTP request.
+  @param response The HTTP response.
+  @param guiseContainer The Guise container.
+  @param guiseApplication The Guise application.
+  @param guiseSession The Guise session.
+  @param resourceWriteDestination The Guise session destination being accessed.
+  @param inputStream The input stream containing the resource content to be written; this stream will not be closed in this method.
+  @param progressComponent The component the wants to know progress, or <code>null</code> if no component wants to know progress.
+  @exception IOException if there is an error reading or writing data.
+  */
+	private void serviceGuiseResourceWriteDestinationRequest(final HTTPServletGuiseRequest guiseRequest, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ResourceWriteDestination resourceWriteDestination, final InputStream inputStream, final Component progressComponent) throws IOException
+	{
+Debug.trace("servicing Guise request with request", guiseRequest);
+		final WebPlatform guisePlatform=(WebPlatform)guiseSession.getPlatform();	//get the web platform
+		final URI requestURI=guiseRequest.getDepictURI();	//get the request URI
+		final ContentType contentType=guiseRequest.getRequestContentType();	//get the request content type
+		final URIPath path=guiseRequest.getNavigationPath();	//get the path
+		final Bookmark bookmark=guiseRequest.getBookmark();	//get the bookmark, if any
+		final URI referrerURI=guiseRequest.getReferrerURI();	//get the referrer URI, if any
+//TODO del		final boolean isAJAX=contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType);	//see if this is a Guise AJAX request
+		final String requestMethod=guiseRequest.getHTTPServletRequest().getMethod();	//get the request method
+//TODO del if not needed				final HTTPServletWebDepictContext depictContext=new HTTPServletWebDepictContext(guiseRequest, response, guiseSession, resourceWriteDestination);	//create a new Guise context
+	final URFResource resourceDescription=new DefaultURFResource();	//create a new resource description
+/*TODO del if not needed
+			final String itemContentTypeString=fileItemStream.getContentType();	//get the item content type, if any
+			if(itemContentTypeString!=null)	//if we know the item's content type
+			{
+				final ContentType itemContentType=ContentType.getInstance(itemContentTypeString);
+				if(!ContentType.APPLICATION_OCTET_STREAM_CONTENT_TYPE.match(itemContentType))	//if the content type is not just a generic "bunch of bytes" content type
+				{
+					setContentType(resourceDescription, itemContentType);	//set the resource's content type
+				}
+			}
+*/
+		final String name=URIs.getName(requestURI);	//determine a name to use for informational purposes TODO create URIPath.getName() and use on the navigation path
+		final ProgressListener progressListener=new ProgressListener()	//create a progress listener for listening for progress
+		{
+			public void progressed(ProgressEvent progressEvent)	//when progress has been made
+			{
+//Debug.trace("delta: ", progressEvent.getDelta(), "progress:", progressEvent.getValue());
+				synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
+				{
+					if(progressComponent!=null)	//if there is a progress component
+					{
+						progressComponent.processEvent(new WebProgressDepictEvent(progressComponent, name, TaskState.INCOMPLETE, progressEvent.getValue()));	//indicate to the component that progress is starting for this file
+					}
+				}
+			}
+		};
+		OutputStream outputStream=resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, path, bookmark, referrerURI);	//get an output stream to the destination; don't buffer the output stream (our copy method essentially does this) so that progress events will be accurate
+		if(progressComponent!=null)	//if we know the component that wants to know progress
+		{
+			outputStream=new ProgressOutputStream(outputStream);	//create a wrapper that will give us progress so that we can send it back manually
+		}
+		try
+		{
+			if(progressComponent!=null)	//if we know the component that wants to know progress
+			{
+				synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
+				{
+					progressComponent.processEvent(new WebProgressDepictEvent(progressComponent, name, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for this file
+				}
+			}
+			if(outputStream instanceof ProgressOutputStream)
+			{
+				((ProgressOutputStream)outputStream).addProgressListener(progressListener);	//start listening for progress events from the output stream
+			}
+			InputStreams.copy(inputStream, outputStream);	//copy the uploaded file to the destination
+			if(outputStream instanceof ProgressOutputStream)
+			{
+				((ProgressOutputStream)outputStream).removeProgressListener(progressListener);	//stop listening for progress events from the output stream
+			}
+				//TODO catch and send errors here
+		}
+		finally
+		{
+			outputStream.close();	//always close the output stream
+		}
+		if(progressComponent!=null)	//if we know the component that wants to know progress (send the progress event after the output stream is closed, because the output stream may buffer contents)
+		{
+			synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
+			{
+				progressComponent.processEvent(new WebProgressDepictEvent(progressComponent, name, TaskState.COMPLETE, 0));	//indicate to the component that progress is finished for this file
+			}
+		}
 	}
 
 	/**Services a Guise request meant for a component destination.
