@@ -2077,7 +2077,7 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 			    "skin": "guise",
 			    "plugins": "xhtmlxtras,xhtmlphrases",
 			    "auto_resize": true,	//experimental
-			    "theme_advanced_blockformats": "address,blockquote,div,h1,h2,h3,h4,h5,h6,dt,dd,code,p,pre",
+			    "theme_advanced_blockformats": "p,h1,h2,h3,h4,h5,h6,address,blockquote,pre,div,dt,dd",
 			    "theme_advanced_toolbar_align": "left",
 			    "theme_advanced_toolbar_location": "top",
 			    "theme_advanced_statusbar_location": "bottom",
