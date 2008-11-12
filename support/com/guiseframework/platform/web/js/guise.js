@@ -2030,7 +2030,7 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 			com.garretwilson.js.EventManager.addEvent(window, "unload", this.onUnload.bind(this), false);	//do the appropriate uninitialization when the window unloads
 
 			/**Support for insert for TinyMCE.
-			Modified from XHTMLxtras TinyMCE Plugin, Copyright © 2004-2008, Moxiecode Systems AB.
+			Modified from XHTMLxtras TinyMCE Plugin 3.2.1, Copyright © 2004-2008, Moxiecode Systems AB.
 			@param elementName The name of the element to add.
 			*/
 			tinymce.Editor.prototype.insertElement=function(elementName)
@@ -2042,14 +2042,17 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 					var selectedText=this.selection.getContent();
 					if(selectedText.length>0)
 					{
-						var tagName=elementName;
 						if (tinymce.isIE && elementName.indexOf('html:') == 0)
 						{
 							elementName = elementName.substring(5).toLowerCase();
 						}
-						var htmlText = '<' + tagName + ' id="#sxe_temp_' + elementName + '#">' + selectedText + '</' + tagName + '>';
-						tinyMCE.execCommand('mceInsertContent', false, htmlText);
-						var elementArray = tinymce.grep(this.dom.select(elementName), function(n) {return n.id == '#sxe_temp_' + elementName + '#';});
+						var dom = this.dom;
+						this.getDoc().execCommand('FontName', false, 'mceinline');
+						tinymce.each(dom.select(tinymce.isWebKit ? 'span' : 'font'), function(n) {
+							if (n.style.fontFamily == 'mceinline' || n.face == 'mceinline')
+								dom.replace(dom.create(elementName), n, 1);
+						});
+						var elementArray = tinymce.grep(dom.select(elementName));						
 						for (var i=0; i<elementArray.length; i++)
 						{
 							var element = elementArray[i];
@@ -2058,6 +2061,10 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 							element.removeAttribute('id');
 						}
 					}
+				}
+				else
+				{
+					setElementAttribs(element);
 				}
 				this.nodeChanged();
 				tinyMCE.execCommand('mceEndUndoLevel');

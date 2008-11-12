@@ -62,20 +62,23 @@
 						cm.setDisabled('kbd', co);
 						cm.setDisabled('samp', co);
 						cm.setDisabled('var', co);
+						cm.setActive('computercode', 0);
+						cm.setActive('dfn', 0);
+						cm.setActive('kbd', 0);
+						cm.setActive('samp', 0);
+						cm.setActive('var', 0);
+
+						// Activate all
 						if (n) {
-							var name=n.nodeName.toLowerCase();
-							if(name=="code")
-							{
-								name="computercode";
-							}
-							cm.setDisabled(name, 0);
-							cm.setActive(name, 1);
-						} else {
-							cm.setActive('computercode', 0);
-							cm.setActive('dfn', 0);
-							cm.setActive('kbd', 0);
-							cm.setActive('samp', 0);
-							cm.setActive('var', 0);
+							do {
+								var name=n.nodeName.toLowerCase();
+								if(name=="code")
+								{
+									name="computercode";
+								}
+								cm.setDisabled(name, 0);
+								cm.setActive(name, 1);
+							} while (n = n.parentNode);
 						}
 					});
 		},
