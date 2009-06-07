@@ -1,5 +1,6 @@
 /*
- * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2005-2009 GlobalMentor, Inc. <http://www.globalmentor.com/>
+
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,8 +88,27 @@ public class HTTPServletGuiseSessionManager implements HttpSessionListener
 			final Map<String, Object> userAgentProperties=getUserAgentProperties(httpRequest);	//get user agent-related properties TODO have the method cache these in the request
 			final String userAgentName=asInstance(userAgentProperties.get(USER_AGENT_NAME_PROPERTY), String.class);	//get the user agent name
 			final boolean isSpider=UNSESSIONED_SPIDER_USER_AGENT_NAMES.contains(userAgentName);	//see if the user agent is a spider that does not support sessions
-				//if this isn't a spider, we have no existing spider session, or the existing spider session is almost expired, create a session
-			if(!isSpider || spiderSession==null || (spiderSession.getLastAccessedTime()-System.currentTimeMillis())/1000>spiderSession.getMaxInactiveInterval()-2)
+			boolean useSpiderSession=isSpider && spiderSession!=null;	//we'll use the spider session if the user agent is a spider and we have a spider session
+			if(useSpiderSession)	//even if the user agent is a spider, make sure the spider session is valid
+			{
+				try	
+				{
+					if((System.currentTimeMillis()-spiderSession.getLastAccessedTime())/1000>spiderSession.getMaxInactiveInterval()-2)	//if the existing spider session is almost expired 
+					{
+						useSpiderSession=false;	//don't use the spider session
+					}
+				}
+				catch(final IllegalStateException illegalStateException)	//if the spider session is already invalidated (the servlet API seems to allow no way to check this explicitly for arbitrary sessions) 
+				{
+					useSpiderSession=false;
+				}
+			}
+			if(useSpiderSession)//if this is a spider and we have a spider session
+			{
+//TODO del Debug.info("using spider session for user agent name", userAgentName);
+				httpSession=spiderSession;	//use the spider session
+			}
+			else	//if this isn't a spider, we have no existing spider session, or the existing spider session is almost expired, create a session
 			{
 //TODO del Debug.info("creating session for user agent name", userAgentName);
 				httpSession=httpRequest.getSession(true);	//create a new HTTP session for the HTTP request
@@ -99,11 +119,6 @@ public class HTTPServletGuiseSessionManager implements HttpSessionListener
 //TODO del Debug.info("storing this session as a spider session");
 					spiderSession=httpSession;	//store the spider session for future sharing
 				}
-			}
-			else	//if this is a spider and we have a spider session
-			{
-//TODO del Debug.info("using spider session for user agent name", userAgentName);
-				httpSession=spiderSession;	//use the spider session
 			}
 		}
 		return guiseContainer.getGuiseSession(guiseApplication, httpRequest, httpSession);	//ask the Guise application for a Guise session corresponding to the HTTP session
