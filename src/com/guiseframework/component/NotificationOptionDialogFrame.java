@@ -33,7 +33,7 @@ The contents of an option dialog frame should be accessed by {@link #getOptionCo
 public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Notification.Option>
 {
 
-	/**Our input strategy for mapping the "continue" command to the first non-fatal option. As the options are created in the parent contructor, we'll have to lazily create this instance.*/
+	/**Our input strategy for mapping the "continue" command to the first non-fatal option. As the options are created in the parent constructor, we'll have to lazily create this instance.*/
 	private BindingInputStrategy bindingInputStrategy=null;
 
 	/**Options constructor.
