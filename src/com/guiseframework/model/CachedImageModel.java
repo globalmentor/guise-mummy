@@ -26,25 +26,25 @@ import com.globalmentor.java.Objects;
 import com.globalmentor.util.*;
 
 /**An image model that can initiate retrieval of an image from a cache and update the image when fetching succeeds.
-@param <K> The type of key used to lookup data in the cache.
+@param <Q> The type of query used to request data from the cache.
 @param <V> The type of value stored in the cache.
-Cache checking and possible fetching is initiated when both the image URI is set using {@link #setImageURI(URI)} and the cached image key is set using {@link #setCachedImageKey(Object)}.
+Cache checking and possible fetching is initiated when both the image URI is set using {@link #setImageURI(URI)} and the cached image key is set using {@link #setCachedImageQuery(Object)}.
 The image URI is set automatically when the image is determined to have been fetched into the cache.
 @author Garret Wilson
 */
-public class CachedImageModel<K, V> extends DefaultImageModel implements PendingImageModel
+public class CachedImageModel<Q, V> extends DefaultImageModel implements PendingImageModel
 {
 
-	/**The cached image key bound property.*/
-	public final static String CACHED_IMAGE_KEY_PROPERTY=getPropertyName(CachedImageModel.class, "cachedImageKey");
+	/**The cached image query bound property.*/
+	public final static String CACHED_IMAGE_QUERY_PROPERTY=getPropertyName(CachedImageModel.class, "cachedImageQuery");
 	/**The cached image URI bound property.*/
 	public final static String CACHED_IMAGE_URI_PROPERTY=getPropertyName(CachedImageModel.class, "cachedImageURI");
 
 	/**The cache from which images will be retrieved.*/
-	private final Cache<K, V> cache;
+	private final Cache<Q, V> cache;
 
 		/**The cache from which images will be retrieved.*/
-		public Cache<K, V> getCache() {return cache;}
+		public Cache<Q, V> getCache() {return cache;}
 
 	/**The listener that changes the image URI when the an image is fetched into the cache.*/
 	private final CachedImageListener cachedImageListener=new CachedImageListener();
@@ -76,31 +76,31 @@ public class CachedImageModel<K, V> extends DefaultImageModel implements Pending
 			}
 		}
 
-	/**The key to the image in the cache, which or <code>null</code> if the image should not be looked up from the cache.*/
-	private K cachedImageKey;
+	/**The query to request an image from the cache, or <code>null</code> if the image should not be looked up from the cache.*/
+	private Q cachedImageQuery;
 
-		/**@return The key to the image in the cache, which or <code>null</code> if the image should not be looked up from the cache.*/
-		public K getCachedImageKey() {return cachedImageKey;}
+		/**@return The query to request an image from the cache, or <code>null</code> if the image should not be looked up from the cache.*/
+		public Q getCachedImageQuery() {return cachedImageQuery;}
 
-		/**The key to the image in the cache, which or <code>null</code> if the image should not be looked up from the cache.
-		Chaging the cached image key initiates a deferred retrieval of the image from the cache.
+		/**The query to request an image from the cache, or <code>null</code> if the image should not be looked up from the cache.
+		Chaging the cached image query initiates a deferred retrieval of the image from the cache.
 		This is a bound property.
-		@param newCachedImageKey The new key to the image in the cache, which or <code>null</code> if the image should not be looked up from the cache.
-		@exception IllegalStateException if the cached image key is changed while the current image is pending.
-		@see #CACHED_IMAGE_KEY_PROPERTY
+		@param newCachedImageQuery The new query to request an image from the cache, or <code>null</code> if the image should not be looked up from the cache.
+		@exception IllegalStateException if the cached image query is changed while the current image is pending.
+		@see #CACHED_IMAGE_QUERY_PROPERTY
 		*/
-		public void setCachedImageKey(final K newCachedImageKey)
+		public void setCachedImageQuery(final Q newCachedImageQuery)
 		{
-			if(!Objects.equals(cachedImageKey, newCachedImageKey))	//if the value is really changing
+			if(!Objects.equals(cachedImageQuery, newCachedImageQuery))	//if the value is really changing
 			{
 				if(isImagePending())	//if the image is pending
 				{
 					throw new IllegalStateException("Cached image key cannot be changed while the image is pending.");
 				}
-Debug.trace("for cached image", getCachedImageURI(), "changing from cached image key", cachedImageKey, "to", newCachedImageKey);
-				final K oldCachedImageKey=cachedImageKey;	//get the old value
-				cachedImageKey=newCachedImageKey;	//actually change the value
-				firePropertyChange(CACHED_IMAGE_URI_PROPERTY, oldCachedImageKey, newCachedImageKey);	//indicate that the value changed
+Debug.trace("for cached image", getCachedImageURI(), "changing from cached image key", cachedImageQuery, "to", newCachedImageQuery);
+				final Q oldCachedImageQuery=cachedImageQuery;	//get the old value
+				cachedImageQuery=newCachedImageQuery;	//actually change the value
+				firePropertyChange(CACHED_IMAGE_QUERY_PROPERTY, oldCachedImageQuery, newCachedImageQuery);	//indicate that the value changed
 Debug.trace("initiating pending");
 				updatePending();	//initiate image retrieval if we can
 			}
@@ -126,11 +126,11 @@ Debug.trace("initiating pending");
 Debug.trace("pending state changed to", newImagePending, "now adding or removing cache fetch listener");
 				if(newImagePending)	//if the image is now pending
 				{
-					getCache().addCacheFetchListener(cachedImageKey, cachedImageListener);	//listen for cache fetches before requesting the image in case the fetch occurs before we can check if the image exists
+					getCache().addCacheFetchListener(getCachedImageQuery(), cachedImageListener);	//listen for cache fetches before requesting the image in case the fetch occurs before we can check if the image exists
 				}
 				else	//if the image is no longer pending
 				{
-					getCache().removeCacheFetchListener(getCachedImageKey(), cachedImageListener);	//stop listening for fetches				
+					getCache().removeCacheFetchListener(getCachedImageQuery(), cachedImageListener);	//stop listening for fetches				
 				}
 				firePropertyChange(IMAGE_PENDING_PROPERTY, oldImagePending, newImagePending);
 			}
@@ -143,7 +143,7 @@ Debug.trace("pending state changed to", newImagePending, "now adding or removing
 	*/
 	protected void updatePending()
 	{
-		final K cachedImageKey=getCachedImageKey();	//get the key of the cached image
+		final Q cachedImageKey=getCachedImageQuery();	//get the query for the cached image
 		final URI cachedImageURI=getCachedImageURI();	//get the URI of the cached image
 		if(cachedImageKey!=null && cachedImageURI!=null)	//if we know enough information to begin pending
 		{
@@ -169,7 +169,7 @@ Debug.trace("pending state changed to", newImagePending, "now adding or removing
 	@param cache The cache from which the image will be retrieved.
 	@exception NullPointerException if the given cache is <code>null</code>.
 	*/
-	public CachedImageModel(final Cache<K, V> cache)
+	public CachedImageModel(final Cache<Q, V> cache)
 	{
 		this(cache, null);	//construct the class with no image
 	}
@@ -179,7 +179,7 @@ Debug.trace("pending state changed to", newImagePending, "now adding or removing
 	@param cachedImageURI The cached image URI, which may be a resource URI, or <code>null</code> if there is no cached image URI.
 	@exception NullPointerException if the given cache is <code>null</code>.
 	*/
-	public CachedImageModel(final Cache<K, V> cache, final URI cachedImageURI)
+	public CachedImageModel(final Cache<Q, V> cache, final URI cachedImageURI)
 	{
 		this.cache=checkInstance(cache, "Cache cannot be null.");
 		this.cachedImageURI=cachedImageURI;	//save the cached image URI
@@ -188,9 +188,9 @@ Debug.trace("pending state changed to", newImagePending, "now adding or removing
 	/**A listener that changes the image URI when the an image is fetched into the cache.
 	@see #getCachedImageURI()
 	*/
-	protected class CachedImageListener implements CacheFetchListener<K, V>
+	protected class CachedImageListener implements CacheFetchListener<Q, V>
 	{
-		public void fetched(final CacheFetchEvent<K, V> cacheFetchEvent)	//when the image is fetched
+		public void fetched(final CacheFetchEvent<Q, V> cacheFetchEvent)	//when the image is fetched
 		{
 			setImageURI(getCachedImageURI());	//switch to the cached image URI
 			setImagePending(false);	//indicate that the image is no longer pending
