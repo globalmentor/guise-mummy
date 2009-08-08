@@ -22,6 +22,9 @@ import java.net.URI;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 
+import com.globalmentor.cache.Cache;
+import com.globalmentor.cache.CacheFetchEvent;
+import com.globalmentor.cache.CacheFetchListener;
 import com.globalmentor.java.Objects;
 import com.globalmentor.util.*;
 
