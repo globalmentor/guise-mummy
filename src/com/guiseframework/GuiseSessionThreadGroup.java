@@ -16,13 +16,18 @@
 
 package com.guiseframework;
 
+import com.globalmentor.config.*;
 import static com.globalmentor.java.Objects.*;
 
 /**A thread group allocated to a Guise session.
 All threads accessing a Guise session should be part of the session's thread group.
+<p>This thread group also allows access to managed configurations using {@link Configurator}.
+Thread-group-local configurations are retrieved by searching for a configuration first in the
+Guise session using {@link GuiseSession#getConfiguration(Class)}, and second in the Guise
+application using {@link GuiseApplication#getConfiguration(Class)}.</p>
 @author Garret Wilson
 */
-public class GuiseSessionThreadGroup extends ThreadGroup
+public class GuiseSessionThreadGroup extends ThreadGroup implements ConfigurationManaged
 {
 	/**The Guise session to which this thread group belongs and in which its related threads run.*/
 	private final GuiseSession guiseSession;
@@ -39,4 +44,20 @@ public class GuiseSessionThreadGroup extends ThreadGroup
 		super("Guise Session Thread Group "+guiseSession.toString());	//construct the parent class TODO improve name
 		this.guiseSession=checkInstance(guiseSession, "Guise session cannot be null.");
 	}
+
+	/**Returns the configuration for the given configuration type.
+	@param <C> The type of configuration to retrieve.
+	@param configurationClass The class of configuration to retrieve.
+	@return The configuration associated with the given class, or <code>null</code> if there was no configuration for that class.
+	*/
+	public <C extends Configuration> C getConfiguration(final Class<C> configurationClass)
+	{
+		C configuration=guiseSession.getConfiguration(configurationClass);	//see if the session has the requested configuration
+		if(configuration==null)	//if no such configuration was found in the session
+		{
+			configuration=guiseSession.getApplication().getConfiguration(configurationClass);	//see if the application has the requested configuration
+		}
+		return configuration;	//return the configuration we found, if any
+	}
+
 }

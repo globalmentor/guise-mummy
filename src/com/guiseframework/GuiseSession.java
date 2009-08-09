@@ -25,6 +25,8 @@ import java.text.MessageFormat;
 import java.util.*;
 
 import com.globalmentor.beans.PropertyBindable;
+import com.globalmentor.config.ConfigurationManaged;
+
 import static com.globalmentor.java.Classes.*;
 import com.globalmentor.net.*;
 import com.globalmentor.text.CollatorFactory;
@@ -44,7 +46,7 @@ import com.guiseframework.theme.Theme;
 A Swing-based client application may have only one session, while a web server application will likely have multiple sessions.
 @author Garret Wilson
 */
-public interface GuiseSession extends PropertyBindable, CollatorFactory
+public interface GuiseSession extends PropertyBindable, CollatorFactory, ConfigurationManaged
 {
 
 	/**The input strategy bound property.*/

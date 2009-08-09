@@ -24,6 +24,7 @@ import javax.mail.Message;
 import javax.mail.Session;
 
 import com.globalmentor.beans.PropertyBindable;
+import com.globalmentor.config.ConfigurationManaged;
 import com.globalmentor.io.IO;
 import com.globalmentor.io.IOOperation;
 import com.globalmentor.net.Resource;
@@ -39,7 +40,7 @@ import static com.globalmentor.java.Classes.*;
 To enable mail-related functionality, mail must be configured using {@link #setMailProperties(Map)}.
 @author Garret Wilson
 */
-public interface GuiseApplication extends Resource, PropertyBindable
+public interface GuiseApplication extends Resource, PropertyBindable, ConfigurationManaged
 {
 
 	/**The environment bound property.*/
