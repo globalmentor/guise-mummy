@@ -21,9 +21,9 @@ import java.lang.ref.*;
 import java.net.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import static com.globalmentor.io.InputStreams.*;
 import static com.globalmentor.java.Characters.*;
+import com.globalmentor.java.Threads;
 import static com.globalmentor.net.URIs.*;
 
 /**The singleton Guise class.
@@ -251,16 +251,7 @@ guiseSessionThreadGroup.enumerate(activeThreads);
 	*/
 	final GuiseSessionThreadGroup getGuiseSessionThreadGroup(final Thread thread)
 	{
-		ThreadGroup threadGroup=thread.getThreadGroup();	//get the thread's thread group
-		while(threadGroup!=null)	//stop looking if we run out of thread groups
-		{
-			if(threadGroup instanceof GuiseSessionThreadGroup)	//if this is a Guise session thread group
-			{
-				return ((GuiseSessionThreadGroup)threadGroup);	//return the Guise session thread group
-			}
-			threadGroup=threadGroup.getParent();	//check this thread group's parent thread group
-		}
-		return null;	//we were unable to find a Guise session thread group
+		return Threads.getThreadGroup(thread, GuiseSessionThreadGroup.class);	//return the Guise session thread group for this class
 	}
 
 	/**Private default constructor.
