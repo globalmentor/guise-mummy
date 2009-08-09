@@ -41,6 +41,7 @@ import static com.globalmentor.util.Locales.*;
 import static com.guiseframework.Guise.*;
 
 import com.globalmentor.beans.BoundPropertyObject;
+import com.globalmentor.config.ConfigurationException;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Objects;
 import com.globalmentor.mail.MailManager;
