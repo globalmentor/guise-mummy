@@ -1437,7 +1437,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void navigate(final URI uri, final String viewportID)
 		{
-com.globalmentor.log.Log.log("Navigating: ", uri, viewportID);
+//com.globalmentor.log.Log.info("Navigating: ", uri, viewportID);
 			requestedNavigation=new Navigation(getNavigationPath().toURI(), checkInstance(uri, "URI cannot be null."), viewportID);	//create new requested navigation
 		}
 
