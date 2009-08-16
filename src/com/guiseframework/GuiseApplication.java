@@ -27,6 +27,7 @@ import com.globalmentor.beans.PropertyBindable;
 import com.globalmentor.config.ConfigurationManaged;
 import com.globalmentor.io.IO;
 import com.globalmentor.io.IOOperation;
+import com.globalmentor.log.Log;
 import com.globalmentor.net.Resource;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.net.URIs;
@@ -126,6 +127,13 @@ public interface GuiseApplication extends Resource, PropertyBindable, Configurat
 	@see #ENVIRONMENT_PROPERTY
 	*/
 	public void setEnvironment(final Environment newEnvironment);
+
+	/**Sets the log level that will be logged.
+	Any log information at or above the given level will be logged.
+	@param level The minimum level to be logged.
+	@throws NullPointerException if the given level is <code>null</code>.
+	*/
+	public void setLogLevel(final Log.Level level);
 
 	/**Returns the properties of the mail manager.
 	This method is guaranteed to return a non-<code>null</code> value after the application is installed.

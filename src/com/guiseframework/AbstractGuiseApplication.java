@@ -22,6 +22,7 @@ import java.net.URL;
 import java.security.Principal;
 import java.text.DateFormat;
 import java.util.*;
+
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 import java.util.concurrent.*;
@@ -35,7 +36,6 @@ import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.CharacterEncoding.*;
-import static com.globalmentor.urf.URF.*;
 import static com.globalmentor.util.Calendars.*;
 import static com.globalmentor.util.Locales.*;
 import static com.guiseframework.Guise.*;
@@ -47,6 +47,8 @@ import com.globalmentor.config.ConfigurationManager;
 import com.globalmentor.config.DefaultConfigurationManager;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Objects;
+import com.globalmentor.log.*;
+import com.globalmentor.log.Log;
 import com.globalmentor.mail.MailManager;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.net.URIs;
@@ -548,6 +550,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	/**Installs the application into the given container at the given base path.
 	This method is called by {@link GuiseContainer} and should not be called directly by applications.
+	This implementation configures logging.
 	Mail is enabled if mail properties have been configured using {@link #setMailProperties(Map)}.
 	@param container The Guise container into which the application is being installed.
 	@param basePath The base path at which the application is being installed.
@@ -575,6 +578,10 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		this.homeDirectory=checkInstance(homeDirectory, "Home directory cannot be null.");
 		this.logDirectory=checkInstance(logDirectory, "Log directory cannot be null.");
 		this.tempDirectory=checkInstance(tempDirectory, "Temporary directory cannot be null.");
+		final DateFormat logFilenameDateFormat=new W3CDateFormat(W3CDateFormat.Style.DATE);	//create a formatter for the log filename
+		final String logFilename=addExtension("debug-"+logFilenameDateFormat.format(new Date()), Log.NAME_EXTENSION);	//create a filename in the form "debug-YYYY-MM-DD.log"
+		final File logFile=new File(logDirectory, logFilename);	//determine the log file for this application TODO create a custom log configuration that will use rolling log files
+		setConfiguration(LogConfiguration.class, logConfiguration);	//configure logging for this application
 		if(mailProperties!=null)	//if mail properties have been configured
 		{
 			try
@@ -738,6 +745,19 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			}
 		}
 
+	/**The log configuration for this application.*/
+	private final DefaultLogConfiguration logConfiguration;
+
+		/**Sets the log level that will be logged.
+		Any log information at or above the given level will be logged.
+		@param level The minimum level to be logged.
+		@throws NullPointerException if the given level is <code>null</code>.
+		*/
+		public void setLogLevel(final Log.Level level)
+		{
+			logConfiguration.setLevel(level);
+		}
+		
 	/**URI constructor.
 	This implementation sets the locale to the JVM default.
 	@param uri The URI for the application, which may or may not be the URI at which the application can be accessed.
@@ -748,6 +768,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		this.uri=checkInstance(uri, "Application URI cannot be null."); //set the URI
 		locales=unmodifiableList(asList(Locale.getDefault()));	//create an unmodifiable list of locales including only the default locale of the JVM
 		this.environment=new DefaultEnvironment();	//create a default environment
+		this.logConfiguration=new DefaultLogConfiguration();
 	}
 
 	/**The concurrent list of destinations which have path patterns specified.*/
