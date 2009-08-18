@@ -160,7 +160,7 @@ public abstract class AbstractTextDepictContext extends AbstractDepictContext im
 	{
 		if(isFormatted())	//if we should format the output
 		{
-			append(getDepictStringBuilder(), HORIZONTAL_TABULATION_CHAR, getIndentLevel());	//write the correct number of tabs
+			append(getDepictStringBuilder(), CHARACTER_TABULATION_CHAR, getIndentLevel());	//write the correct number of tabs
 		}
 	}
 
