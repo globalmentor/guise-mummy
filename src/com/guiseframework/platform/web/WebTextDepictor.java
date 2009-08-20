@@ -22,6 +22,8 @@ import java.util.*;
 
 import javax.xml.parsers.*;
 
+import com.globalmentor.collections.DecoratorReadWriteLockMap;
+import com.globalmentor.collections.PurgeOnWriteSoftValueHashMap;
 import com.globalmentor.net.ContentType;
 
 import static com.globalmentor.io.Charsets.*;

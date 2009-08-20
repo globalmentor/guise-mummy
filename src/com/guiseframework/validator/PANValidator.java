@@ -22,8 +22,8 @@ import static com.globalmentor.java.Objects.*;
 
 import java.util.*;
 
+import com.globalmentor.collections.Arrays;
 import com.globalmentor.iso.idcard.*;
-import com.globalmentor.util.Arrays;
 
 /**A validator to validate a Primary Account Number (PAN) of an identification card
 	as defined in ISO/IEC 7812-1:2000(E),

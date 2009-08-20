@@ -23,9 +23,9 @@ import java.util.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 
+import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.URIs;
 import com.globalmentor.text.ArgumentSyntaxException;
-import com.globalmentor.util.NameValuePair;
 
 /**An identification of a saved state at a navigation point. The bookmark is relative to the navigation path.
 @author Garret Wilson

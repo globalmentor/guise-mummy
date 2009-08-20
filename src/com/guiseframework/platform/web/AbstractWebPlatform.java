@@ -23,8 +23,8 @@ import static com.globalmentor.java.Integers.*;
 import static com.globalmentor.java.Maths.*;
 import static com.globalmentor.java.Objects.*;
 
+import com.globalmentor.model.NameValuePair;
 import com.globalmentor.util.Debug;
-import com.globalmentor.util.NameValuePair;
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.platform.*;
 

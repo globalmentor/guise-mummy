@@ -19,10 +19,10 @@ package com.guiseframework.platform.web;
 import java.util.*;
 import static java.util.Collections.*;
 
+import static com.globalmentor.collections.Maps.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.util.Maps.*;
 
-import com.globalmentor.util.NameValuePair;
+import com.globalmentor.model.NameValuePair;
 import com.guiseframework.platform.DepictedObject;
 
 /**A command to or from a depicted object on the web platform.

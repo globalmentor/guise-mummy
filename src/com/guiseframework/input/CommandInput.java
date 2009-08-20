@@ -16,7 +16,7 @@
 
 package com.guiseframework.input;
 
-import com.globalmentor.util.AbstractHashObject;
+import com.globalmentor.model.AbstractHashObject;
 
 import static com.globalmentor.java.Objects.*;
 

@@ -21,6 +21,9 @@ import java.net.URI;
 import java.util.*;
 
 
+import com.globalmentor.collections.DecoratorReadWriteLockMap;
+import com.globalmentor.collections.PurgeOnWriteWeakValueHashMap;
+import com.globalmentor.collections.ReadWriteLockMap;
 import com.globalmentor.util.*;
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;

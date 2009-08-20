@@ -22,6 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
+
+import com.globalmentor.model.NameValuePair;
 import com.globalmentor.model.TaskState;
 import static com.globalmentor.net.URIs.*;
 import com.globalmentor.util.*;

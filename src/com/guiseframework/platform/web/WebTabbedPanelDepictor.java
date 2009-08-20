@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Set;
 
 
-import com.globalmentor.util.NameValuePair;
+import com.globalmentor.model.NameValuePair;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.model.Notification;

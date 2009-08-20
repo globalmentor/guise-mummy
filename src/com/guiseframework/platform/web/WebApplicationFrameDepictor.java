@@ -21,9 +21,11 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.util.*;
 
+import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.ContentType;
 
 import static com.globalmentor.javascript.JavaScript.*;
+import static com.globalmentor.model.Locales.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.xml.XML.*;
 import com.globalmentor.text.xml.xhtml.XHTML;
@@ -32,7 +34,6 @@ import com.guiseframework.*;
 
 import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
-import static com.globalmentor.util.Locales.*;
 
 import static com.guiseframework.GuiseApplication.*;
 import com.guiseframework.component.*;

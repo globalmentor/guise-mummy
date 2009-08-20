@@ -19,7 +19,7 @@ package com.guiseframework.platform.web.css;
 import java.util.*;
 import static java.util.Collections.*;
 
-import com.globalmentor.util.NameValuePair;
+import com.globalmentor.model.NameValuePair;
 
 import static com.globalmentor.java.Objects.*;
 

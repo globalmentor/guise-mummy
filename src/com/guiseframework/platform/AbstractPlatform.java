@@ -24,6 +24,9 @@ import java.util.concurrent.locks.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 
+import com.globalmentor.collections.DecoratorReadWriteLockMap;
+import com.globalmentor.collections.PurgeOnWriteWeakValueHashMap;
+import com.globalmentor.collections.ReadWriteLockMap;
 import com.globalmentor.util.*;
 import com.guiseframework.GuiseApplication;
 

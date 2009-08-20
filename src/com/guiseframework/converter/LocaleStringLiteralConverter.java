@@ -19,7 +19,7 @@ package com.guiseframework.converter;
 import java.util.*;
 
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.util.Locales.*;
+import static com.globalmentor.model.Locales.*;
 
 /**An object that can convert a locale to a string using the current locale.
 This implementation does not support conversion of a literal value to a locale.

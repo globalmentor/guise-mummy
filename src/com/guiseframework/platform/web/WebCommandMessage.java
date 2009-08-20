@@ -19,10 +19,10 @@ package com.guiseframework.platform.web;
 import java.util.*;
 import static java.util.Collections.*;
 
-import com.globalmentor.util.NameValuePair;
+import com.globalmentor.model.NameValuePair;
 
+import static com.globalmentor.collections.Maps.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.util.Maps.*;
 
 /**A command message to or from the web platform.
 @param <C> The type of command.

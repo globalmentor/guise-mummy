@@ -26,6 +26,7 @@ import static java.util.Collections.*;
 import javax.servlet.http.HttpServletResponse;
 
 import com.globalmentor.io.ParseReader;
+import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.net.http.HTTPServlets;
 import com.globalmentor.text.CharacterEncoding;
@@ -35,12 +36,12 @@ import com.globalmentor.util.*;
 import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 
+import static com.globalmentor.collections.Arrays.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.ContentTypeConstants.*;
 import static com.globalmentor.text.CharacterEncoding.*;
 import static com.globalmentor.text.TextFormatter.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
-import static com.globalmentor.util.Arrays.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
 import com.guiseframework.platform.web.css.*;
 import com.guiseframework.platform.web.css.GuiseCSSProcessor.IE6FixClass;

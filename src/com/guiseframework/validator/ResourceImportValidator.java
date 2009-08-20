@@ -21,9 +21,9 @@ import static java.util.Collections.*;
 
 import com.globalmentor.net.ContentType;
 
+import static com.globalmentor.collections.Collections.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.util.Collections.*;
 
 import com.globalmentor.util.Debug;
 import com.guiseframework.GuiseSession;

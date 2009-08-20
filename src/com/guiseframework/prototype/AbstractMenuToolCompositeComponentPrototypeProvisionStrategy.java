@@ -19,6 +19,11 @@ package com.guiseframework.prototype;
 import java.util.*;
 
 
+import com.globalmentor.collections.DecoratorReadWriteLockReverseMap;
+import com.globalmentor.collections.DecoratorReadWriteLockSet;
+import com.globalmentor.collections.ReadWriteLockReverseMap;
+import com.globalmentor.collections.ReverseMap;
+import com.globalmentor.collections.WeakHashSet;
 import com.globalmentor.util.*;
 import com.guiseframework.component.*;
 import static com.guiseframework.component.Components.*;

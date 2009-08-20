@@ -19,7 +19,7 @@ package com.guiseframework;
 import java.net.URI;
 import java.util.*;
 
-import com.globalmentor.util.UUIDs;
+import com.globalmentor.model.UUIDs;
 
 /**The default implementation of a Guise application.
 @author Garret Wilson

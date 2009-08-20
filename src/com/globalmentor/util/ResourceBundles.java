@@ -21,6 +21,7 @@ import java.net.*;
 import java.util.*;
 
 import com.globalmentor.io.IO;
+import com.globalmentor.model.Locales;
 import com.globalmentor.net.Resource;
 import com.globalmentor.rdf.*;
 import com.globalmentor.urf.*;
@@ -28,12 +29,12 @@ import com.globalmentor.urf.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Java.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.model.Locales.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.rdf.RDF.*;
 import static com.globalmentor.rdf.RDFResources.*;
 import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.urf.TURF.*;
-import static com.globalmentor.util.Locales.*;
 import static com.globalmentor.util.PropertiesUtilities.*;
 
 /**Utilities for working with resource bundles.

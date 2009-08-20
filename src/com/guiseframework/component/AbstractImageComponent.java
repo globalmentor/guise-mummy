@@ -18,10 +18,10 @@ package com.guiseframework.component;
 
 import java.net.URI;
 
+import static com.globalmentor.collections.Arrays.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.ContentTypeConstants.*;
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.util.Arrays.*;
 
 import com.globalmentor.io.*;
 import com.globalmentor.net.ContentType;

@@ -24,9 +24,9 @@ import com.globalmentor.text.directory.vcard.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 
+import static com.globalmentor.collections.Arrays.*;
 import static com.globalmentor.text.TextFormatter.*;
 import static com.globalmentor.text.directory.vcard.VCard.*;
-import static com.globalmentor.util.Arrays.*;
 import static com.guiseframework.Resources.*;
 
 /**A panel allowing entry of the {@value VCard#N_TYPE} type of a vCard <code>text/directory</code>

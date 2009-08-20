@@ -29,6 +29,8 @@ import java.util.*;
 import static java.util.Collections.*;
 
 import com.globalmentor.beans.*;
+import com.globalmentor.collections.DecoratorReadWriteLockMap;
+import com.globalmentor.collections.ReadWriteLockMap;
 import com.globalmentor.config.Configuration;
 import com.globalmentor.config.ConfigurationManager;
 import com.globalmentor.config.DefaultConfigurationManager;

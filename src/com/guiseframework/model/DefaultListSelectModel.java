@@ -19,16 +19,18 @@ package com.guiseframework.model;
 import java.beans.PropertyVetoException;
 import java.util.*;
 
+import com.globalmentor.collections.Arrays;
+import com.globalmentor.collections.SynchronizedListDecorator;
+import com.globalmentor.collections.iterators.DefaultListIterator;
 import com.globalmentor.event.EventListenerManager;
 import com.globalmentor.java.Objects;
 import com.globalmentor.util.*;
 import com.guiseframework.event.*;
 import com.guiseframework.validator.*;
 
+import static com.globalmentor.collections.Arrays.*;
 import static com.globalmentor.java.Integers.*;
 import static com.globalmentor.java.Objects.*;
-import com.globalmentor.util.Arrays;
-import static com.globalmentor.util.Arrays.*;
 
 /**The default implementation of a model for selecting one or more values from a list.
 The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class.

@@ -23,6 +23,7 @@ import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 
 
+import com.globalmentor.model.NameValuePair;
 import com.globalmentor.model.TaskState;
 import com.globalmentor.util.*;
 import com.guiseframework.audio.Audio;

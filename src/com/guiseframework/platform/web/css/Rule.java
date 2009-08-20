@@ -21,7 +21,7 @@ import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
 import java.util.*;
 import static java.util.Collections.*;
 
-import com.globalmentor.util.NameValuePair;
+import com.globalmentor.model.NameValuePair;
 
 /**A CSS rule, consisting of one or more selectors and a declaration.
 @author Garret Wilson

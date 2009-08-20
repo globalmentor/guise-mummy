@@ -19,7 +19,7 @@ package com.guiseframework;
 import java.util.*;
 import static java.util.Collections.*;
 
-import com.globalmentor.util.DefaultComparableIDNamed;
+import com.globalmentor.model.DefaultComparableIDNamed;
 
 /**A general category used in Guise.
 @author Garret Wilson

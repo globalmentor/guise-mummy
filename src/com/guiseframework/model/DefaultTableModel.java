@@ -19,9 +19,9 @@ package com.guiseframework.model;
 import java.util.*;
 import static java.util.Collections.*;
 
-import static com.globalmentor.util.Arrays.*;
+import static com.globalmentor.collections.Arrays.*;
 
-import com.globalmentor.util.SynchronizedListDecorator;
+import com.globalmentor.collections.SynchronizedListDecorator;
 
 /**The default implementation of a table model.
 The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class. 

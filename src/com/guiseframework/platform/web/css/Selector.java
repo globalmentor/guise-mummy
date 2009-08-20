@@ -18,7 +18,7 @@ package com.guiseframework.platform.web.css;
 
 import java.util.*;
 
-import com.globalmentor.util.NameValuePair;
+import com.globalmentor.model.NameValuePair;
 
 /**A selector of a CSS rule.
 A selector represents a list of simple selector sequences, each paired with a combinator.

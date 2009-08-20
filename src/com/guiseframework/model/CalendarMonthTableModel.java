@@ -22,7 +22,7 @@ import java.util.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Integers.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.util.Calendars.*;
+import static com.globalmentor.model.Calendars.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.util.Debug;

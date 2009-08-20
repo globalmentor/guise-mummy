@@ -26,6 +26,8 @@ import static com.guiseframework.theme.Theme.*;
 
 
 import com.globalmentor.beans.*;
+import com.globalmentor.collections.DecoratorReadWriteLockMap;
+import com.globalmentor.collections.ReadWriteLockMap;
 import com.globalmentor.util.*;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.Border;

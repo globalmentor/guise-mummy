@@ -24,6 +24,8 @@ import static java.util.Collections.*;
 
 
 
+import com.globalmentor.collections.CollectionMap;
+import com.globalmentor.collections.HashSetHashMap;
 import com.globalmentor.urf.*;
 import com.globalmentor.urf.ploop.PLOOPURFProcessor;
 import com.globalmentor.urf.select.*;

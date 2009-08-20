@@ -18,7 +18,8 @@ package com.guiseframework.component;
 
 import com.globalmentor.net.ContentType;
 
-import static com.globalmentor.util.Arrays.*;
+import static com.globalmentor.collections.Arrays.*;
+
 import com.guiseframework.component.transfer.*;
 import com.guiseframework.model.*;
 

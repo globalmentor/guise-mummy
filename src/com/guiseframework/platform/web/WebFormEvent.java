@@ -20,6 +20,8 @@ import java.util.*;
 
 import static com.globalmentor.text.TextFormatter.*;
 
+import com.globalmentor.collections.ArrayListHashMap;
+import com.globalmentor.collections.CollectionMap;
 import com.globalmentor.util.*;
 
 /**Indicates the submission of a full or partial form on the web platform

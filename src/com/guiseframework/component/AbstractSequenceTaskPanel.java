@@ -20,6 +20,7 @@ import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.model.SequenceTask;
+import com.globalmentor.model.Verifiable;
 import com.globalmentor.util.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.controller.*;

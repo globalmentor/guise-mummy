@@ -18,7 +18,7 @@ package com.guiseframework.prototype;
 
 import static com.globalmentor.java.Objects.*;
 
-import com.globalmentor.util.AbstractHashObject;
+import com.globalmentor.model.AbstractHashObject;
 import com.globalmentor.util.Debug;
 
 /**Prototype provision information indicating order, hierarchy, and location for generated components.

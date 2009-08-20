@@ -21,8 +21,8 @@ import java.util.*;
 
 import com.globalmentor.beans.*;
 import static com.globalmentor.java.Characters.*;
+import static com.globalmentor.model.Calendars.*;
 
-import static com.globalmentor.util.Calendars.*;
 import com.globalmentor.util.Debug;
 
 import com.guiseframework.GuiseSession;

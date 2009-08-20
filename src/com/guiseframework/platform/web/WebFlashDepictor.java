@@ -19,13 +19,13 @@ package com.guiseframework.platform.web;
 import java.io.IOException;
 import java.net.URI;
 
+import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.net.http.HTTP;
 
 import static com.globalmentor.net.ContentTypeConstants.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
-import com.globalmentor.util.NameValuePair;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.Flash;
