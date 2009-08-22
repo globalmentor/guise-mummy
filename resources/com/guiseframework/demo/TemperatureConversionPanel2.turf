@@ -3,8 +3,7 @@
 	"layout"~<java:/com/guiseframework/component/layout/>,
 	"validator"~<java:/com/guiseframework/validator/>,
 	"demo"~<java:/com/guiseframework/demo/>
-;
-¤
+;¤
 	*demo.TemperatureConversionPanel2:
 		label="Guise™ Demonstration: Temperature Conversion",
 		layout=*layout.FlowLayout:
