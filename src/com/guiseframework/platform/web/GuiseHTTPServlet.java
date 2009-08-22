@@ -36,6 +36,7 @@ import com.globalmentor.event.ProgressListener;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Objects;
 import com.globalmentor.javascript.JSON;
+import com.globalmentor.log.Log;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.model.ObjectHolder;
 import com.globalmentor.model.TaskState;
@@ -215,7 +216,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	public void init(final ServletConfig servletConfig) throws ServletException
 	{
 		super.init(servletConfig);	//do the default initialization
-		Debug.log("initializing servlet", servletConfig.getServletName(), Guise.GUISE_NAME, Guise.BUILD_ID);
+		Log.info("initializing servlet", servletConfig.getServletName(), Guise.GUISE_NAME, Guise.BUILD_ID);
 		setReadOnly(true);	//make this servlet read-only
 		//TODO turn off directory listings, and/or fix them
 		try
@@ -251,7 +252,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 				throw new ServletException("Guise application path "+normalizedGuiseApplicationDescriptionPath+" is not a relative path.");
 			}
 			final String absoluteGuiseApplicationDescriptionPath=WEB_INF_DIRECTORY_PATH+normalizedGuiseApplicationDescriptionPath;	//determine the context-relative absolute path of the description file
-//		TODO del Debug.trace("determined absolute path to application description:", absoluteGuiseApplicationDescriptionPath);
+//		TODO del Log.trace("determined absolute path to application description:", absoluteGuiseApplicationDescriptionPath);
 			final URL guiseApplicationDescriptionURL;
 			try
 			{
@@ -263,7 +264,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 			}
 			try
 			{
-//			TODO del Debug.trace("found URL to application description", guiseApplicationDescriptionURL);
+//			TODO del Log.trace("found URL to application description", guiseApplicationDescriptionURL);
 				if(guiseApplicationDescriptionURL==null)	//if we can't find the resource
 				{
 					throw new ServletException("Missing Guise application resource description at "+absoluteGuiseApplicationDescriptionPath);
@@ -315,7 +316,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 						}
 						catch(final URISyntaxException uriSyntaxException)	//if we couldn't parse the value as a URI
 						{
-							Debug.warn("Unable to process Guise environment property "+environmentPropertyName+" value "+environmentPropertyValue+" as a URI.");
+							Log.warn("Unable to process Guise environment property "+environmentPropertyName+" value "+environmentPropertyValue+" as a URI.");
 						}
 					}
 					environment.setProperty(environmentPropertyName, environmentPropertyValue);	//store the Guise environment property in the environment
@@ -337,31 +338,31 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	*/
 	public void init(final HttpServletRequest request) throws ServletException
 	{
-//TODO del Debug.trace("initializing servlet from request");
+//TODO del Log.trace("initializing servlet from request");
 		super.init(request);	//do the default initialization
 		synchronized(guiseContainerMutex)	//if more than one request are coming in simultaneously, only look up the container for the first one (although multiple lookups should still retrieve the same container)
 		{
-//TODO del	Debug.trace("checking container");
+//TODO del	Log.trace("checking container");
 			if(guiseContainer==null)	//if no container exists
 			{
-//TODO del				Debug.trace("context path", getContextPath());
+//TODO del				Log.trace("context path", getContextPath());
 				final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
-//			TODO del	Debug.trace("requestURI", requestURI);
+//			TODO del	Log.trace("requestURI", requestURI);
 				final URIPath containerBasePath=new URIPath(getContextPath()+PATH_SEPARATOR);	//determine the base path of the container TODO important: determine if getContextPath() returns the raw path, as we want; otherwise, this will not work correctly for context paths with encoded path characters
 				final URI containerBaseURI=changeRawPath(requestURI, containerBasePath.toString());	//determine the container base URI
-//			TODO del	Debug.trace("containerURI", containerBaseURI);
+//			TODO del	Log.trace("containerURI", containerBaseURI);
 
 				final ServletContext servletContext=getServletContext();	//get the servlet context
 				guiseContainer=HTTPServletGuiseContainer.getGuiseContainer(servletContext, containerBaseURI);	//get a reference to the Guise container, creating it if needed
-//			TODO del	Debug.trace("guise container: ", guiseContainer, "for servlet context", getServletContext());
-//TODO del Debug.trace("installing application into guise container: ", guiseContainer, "for servlet context", getServletContext());
+//			TODO del	Log.trace("guise container: ", guiseContainer, "for servlet context", getServletContext());
+//TODO del Log.trace("installing application into guise container: ", guiseContainer, "for servlet context", getServletContext());
 					//install the application into the container
 				final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
 						//"/contextPath" or "", "/servletPath" or ""
 				final URIPath guiseApplicationBasePath=new URIPath(request.getContextPath()+request.getServletPath()+PATH_SEPARATOR);	//construct the Guise application base path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
 				final URIPath guiseApplicationRelativePath=containerBasePath.relativize(guiseApplicationBasePath);	//get the application path relative to the container path
 
-//TODO del Debug.trace("context path", request.getContextPath(), "servlet path", request.getServletPath(), "container base path", containerBasePath, "application base path", guiseApplicationBasePath, "application relative path", guiseApplicationRelativePath);
+//TODO del Log.trace("context path", request.getContextPath(), "servlet path", request.getServletPath(), "container base path", containerBasePath, "application base path", guiseApplicationBasePath, "application relative path", guiseApplicationRelativePath);
 				try
 				{
 					final File dataDirectory=getDataDirectory(servletContext);	//get the data directory
@@ -385,7 +386,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 					final File guiseApplicationHomeDirectory=getDataDirectory(servletContext, DATA_DIRECTORY_INIT_PARAMETER, "guise/home/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
 					final File guiseApplicationLogDirectory=getDataDirectory(servletContext, LOG_DIRECTORY_INIT_PARAMETER, "guise/logs/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
 					final File guiseApplicationTempDirectory=getDataDirectory(servletContext, TEMP_DIRECTORY_INIT_PARAMETER, "guise/temp/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
-					//			TODO delDebug.trace("ready to install application into container with context path", guiseApplicationContextPath);
+					//			TODO delLog.trace("ready to install application into container with context path", guiseApplicationContextPath);
 					guiseContainer.installApplication(guiseApplication, guiseApplicationBasePath, guiseApplicationHomeDirectory, guiseApplicationLogDirectory, guiseApplicationTempDirectory);	//install the application
 				}
 				catch(final IOException ioException)	//if there is an I/O exception installing the application
@@ -394,14 +395,14 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 				}
 			}
 		}
-//	TODO del		Debug.trace("initializing; container base URI:", guiseContainer.getBaseURI(), "container base path:", guiseContainer.getBasePath());
+//	TODO del		Log.trace("initializing; container base URI:", guiseContainer.getBaseURI(), "container base path:", guiseContainer.getBasePath());
 /*TODO del when works; now application is installed when container is retrieved
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container (which we just created if needed)
 		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
 		if(guiseApplication.getContainer()==null)	//if this application has not yet been installed (note that there is a race condition here if multiple HTTP requests attempt to access the application simultaneously, but the losing thread will simply throw an exception and not otherwise disturb the application functionality)
 		{
 			final String guiseApplicationContextPath=request.getContextPath()+request.getServletPath()+PATH_SEPARATOR;	//construct the Guise application context path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
-//		TODO delDebug.trace("ready to install application into container with context path", guiseApplicationContextPath);
+//		TODO delLog.trace("ready to install application into container with context path", guiseApplicationContextPath);
 			guiseContainer.installApplication(guiseApplication, guiseApplicationContextPath);	//install the application
 		}
 */
@@ -429,7 +430,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		final Destination destination=guiseApplication.getDestination(guiseRequest.getNavigationPath());	//try to get a destination associated with the requested path
 		if(destination!=null)	//if we have a destination associated with the requested path
 		{
-Debug.trace("found destination:", destination);
+Log.trace("found destination:", destination);
 			final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
 				//make sure the environment has the WebTrends ID
 			final Environment environment=guiseSession.getPlatform().getEnvironment();	//get the session's environment
@@ -443,9 +444,9 @@ Debug.trace("found destination:", destination);
 				environment.setProperty(WEBTRENDS_ID_COOKIE_NAME, webtrendsIDStringBuilder.toString());	//store the WebTrends ID in the environment, which will be stored in the cookies eventually
 			}
 			final String httpMethod=request.getMethod();	//get the current HTTP method being used
-Debug.trace("method", httpMethod);
-Debug.trace("destination", destination, "is resource read destination?", (destination instanceof ResourceReadDestination));
-Debug.trace("is GET with resource destination?", (destination instanceof ResourceReadDestination && GET_METHOD.equals(httpMethod)));
+Log.trace("method", httpMethod);
+Log.trace("destination", destination, "is resource read destination?", (destination instanceof ResourceReadDestination));
+Log.trace("is GET with resource destination?", (destination instanceof ResourceReadDestination && GET_METHOD.equals(httpMethod)));
 			if(destination instanceof ResourceReadDestination && GET_METHOD.equals(httpMethod))	//if this is a resource read destination (but only if this is a GET request; the ResourceReadDestination may also be a ResourceWriteDestination)
 			{
 				final URIPath path=guiseRequest.getNavigationPath();	//get the path
@@ -456,7 +457,7 @@ Debug.trace("is GET with resource destination?", (destination instanceof Resourc
 				{
 					redirect(guiseRequest, guiseApplication, newPath.toURI(), bookmark, true);	//redirect the user agent to the preferred path
 				}
-Debug.trace("ready to delegate to super");
+Log.trace("ready to delegate to super");
 				super.doGet(request, response);	//let the default functionality take over, which will take care of accessing the resource destination by creating a specialized access resource
 				return;	//don't service the Guise request normally
 			}
@@ -522,7 +523,7 @@ Debug.trace("ready to delegate to super");
 		{
 			throw new HTTPForbiddenException("Uploading content to "+guiseRequest.getNavigationPath()+" is not supported.");
 		}
-Debug.trace("found resource write destination:", destination);
+Log.trace("found resource write destination:", destination);
 		final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
 		final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
 		try
@@ -572,7 +573,7 @@ Debug.trace("found resource write destination:", destination);
   */
 	private void serviceGuiseRequest(final HTTPServletGuiseRequest guiseRequest, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final Destination destination) throws IOException
 	{
-Debug.trace("servicing Guise request with request", guiseRequest);
+Log.trace("servicing Guise request with request", guiseRequest);
 		final WebPlatform guisePlatform=(WebPlatform)guiseSession.getPlatform();	//get the web platform
 		final URI requestURI=guiseRequest.getDepictURI();	//get the request URI
 		final ContentType contentType=guiseRequest.getRequestContentType();	//get the request content type
@@ -649,7 +650,7 @@ Debug.trace("servicing Guise request with request", guiseRequest);
 								if(progressComponent!=null && !progressComponents.contains(progressComponent))	//if there is a transfer component and this is the first transfer for this component
 								{
 									progressComponents.add(progressComponent);	//add this progress component to our set of progress components so we can send finish events to them later
-//Debug.trace("sending progress with no task for starting");
+//Log.trace("sending progress with no task for starting");
 									synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
 									{
 										progressComponent.processEvent(new WebProgressDepictEvent(progressComponent, null, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for all transfers
@@ -677,7 +678,7 @@ Debug.trace("servicing Guise request with request", guiseRequest);
 										{
 											public void progressed(ProgressEvent progressEvent)	//when progress has been made
 											{
-//Debug.trace("delta: ", progressEvent.getDelta(), "progress:", progressEvent.getValue());
+//Log.trace("delta: ", progressEvent.getDelta(), "progress:", progressEvent.getValue());
 												synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
 												{
 													if(progressComponent!=null)	//if there is a progress component
@@ -772,7 +773,7 @@ Debug.trace("servicing Guise request with request", guiseRequest);
   */
 	private void serviceGuiseResourceWriteDestinationRequest(final HTTPServletGuiseRequest guiseRequest, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ResourceWriteDestination resourceWriteDestination, final InputStream inputStream, final Component progressComponent) throws IOException
 	{
-Debug.trace("servicing Guise request with request", guiseRequest);
+Log.trace("servicing Guise request with request", guiseRequest);
 		final WebPlatform guisePlatform=(WebPlatform)guiseSession.getPlatform();	//get the web platform
 		final URI requestURI=guiseRequest.getDepictURI();	//get the request URI
 		final ContentType contentType=guiseRequest.getRequestContentType();	//get the request content type
@@ -799,7 +800,7 @@ Debug.trace("servicing Guise request with request", guiseRequest);
 		{
 			public void progressed(ProgressEvent progressEvent)	//when progress has been made
 			{
-//Debug.trace("delta: ", progressEvent.getDelta(), "progress:", progressEvent.getValue());
+//Log.trace("delta: ", progressEvent.getDelta(), "progress:", progressEvent.getValue());
 				synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
 				{
 					if(progressComponent!=null)	//if there is a progress component
@@ -870,7 +871,7 @@ Debug.trace("servicing Guise request with request", guiseRequest);
 		//this is a non-AJAX Guise POST if there is an XHTML action input ID field TODO add a better field; stop using a view
 		final boolean isGuisePOST=POST_METHOD.equals(guiseRequest.getHTTPServletRequest().getMethod()) && guiseRequest.getHTTPServletRequest().getParameter(WebApplicationFrameDepictor.getActionInputID(guiseSession.getApplicationFrame()))!=null;
 		final HTTPServletWebDepictContext depictContext=new HTTPServletWebDepictContext(guiseRequest, response, guiseSession, componentDestination);	//create a new Guise context
-//Debug.trace("setting context");
+//Log.trace("setting context");
 		guisePlatform.getDepictLock().lock();	//get the platform depict lock
 		guisePlatform.setDepictContext(depictContext);	//set the depict context for this platform
 		try
@@ -893,14 +894,14 @@ Debug.trace("servicing Guise request with request", guiseRequest);
 			final Bookmark navigationBookmark=guiseRequest.getBookmark();	//get the bookmark from this request
 //TODO fix to recognize navigation, bookmark, and principal changes when the navigation panel is created		final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
 			final Bookmark oldBookmark=isAJAX ? guiseSession.getBookmark() : navigationBookmark;	//get the original bookmark, which will be the one requested in navigation (which we'll soon set) if this is a normal HTTP GET/POST
-//TODO del Debug.trace("navigation bookmark:", navigationBookmark, "old bookmark:", oldBookmark, "session bookmark:", guiseSession.getBookmark(), "is AJAX:", isAJAX);
+//TODO del Log.trace("navigation bookmark:", navigationBookmark, "old bookmark:", oldBookmark, "session bookmark:", guiseSession.getBookmark(), "is AJAX:", isAJAX);
 			final Principal oldPrincipal=guiseSession.getPrincipal();	//get the old principal
 			final Component destinationComponent=guiseSession.getDestinationComponent(componentDestination);	//get the component bound to the requested destination
 			assert destinationComponent!=null : "No component found, even though we found a valid destination.";
 			final ApplicationFrame applicationFrame=guiseSession.getApplicationFrame();	//get the application frame
-//TODO del Debug.trace("ready to get request events");
+//TODO del Log.trace("ready to get request events");
 			final List<GuiseEvent> requestEvents=getRequestEvents(guiseRequest, guiseSession, depictContext);	//get all events from the request
-Debug.trace("got control events");
+Log.trace("got control events");
 			if(isAJAX)	//if this is an AJAX request
 			{
 /*TODO tidy when stringbuilder context works
@@ -910,7 +911,7 @@ Debug.trace("got control events");
 			}
 			else	//if this is not an AJAX request
 			{
-//TODO del Debug.trace("this is not AJAX, with method:", request.getMethod(), "content type", contentType, "guise POST?", isGuisePOST);
+//TODO del Log.trace("this is not AJAX, with method:", request.getMethod(), "content type", contentType, "guise POST?", isGuisePOST);
 				applicationFrame.setContent(destinationComponent);	//place the component in the application frame
 				setNoCache(guiseRequest.getHTTPServletRequest(), response);	//make sure the response is not cached TODO should we do this for AJAX responses as well?
 /*TODO del
@@ -923,7 +924,7 @@ Debug.trace("got control events");
 					//a non-Guise form HTTP POST, get the servlet parameters (which will include the URL query information)
 				if(POST_METHOD.equals(guiseRequest.getHTTPServletRequest().getMethod()) && contentType!=null && APPLICATION_X_WWW_FORM_URLENCODED_CONTENT_TYPE.match(contentType) && !isGuisePOST)
 				{
-//TODO del Debug.trace("using servlet parameter methods");
+//TODO del Log.trace("using servlet parameter methods");
 					final List<Bookmark.Parameter> bookmarkParameterList=new ArrayList<Bookmark.Parameter>();	//create a new list of bookmark parameters
 					final Iterator<Map.Entry<String, String[]>> parameterEntryIterator=(Iterator<Map.Entry<String, String[]>>)guiseRequest.getHTTPServletRequest().getParameterMap().entrySet().iterator();	//get an iterator to the parameter entries
 					while(parameterEntryIterator.hasNext())	//while there are more parameter entries
@@ -933,7 +934,7 @@ Debug.trace("got control events");
 						final String[] parameterValues=parameterEntry.getValue();	//get the parameter values
 						for(final String parameterValue:parameterValues)	//for each parameter value
 						{
-//TODO del Debug.trace("adding parameter bookmark:", parameterKey, parameterValue);
+//TODO del Log.trace("adding parameter bookmark:", parameterKey, parameterValue);
 							bookmarkParameterList.add(new Bookmark.Parameter(parameterKey, parameterValue));	//create a corresponding bookmark parameter
 						}
 					}
@@ -944,7 +945,7 @@ Debug.trace("got control events");
 						guiseSession.setNavigation(navigationPath, postBookmark, referrerURI);	//set the session navigation to the POST bookmark information
 					}
 				}
-//TODO del Debug.trace("ready to set navigation with new navigation path:", navigationPath, "navigation bookmark:", navigationBookmark, "referrerURI:", referrerURI);
+//TODO del Log.trace("ready to set navigation with new navigation path:", navigationPath, "navigation bookmark:", navigationBookmark, "referrerURI:", referrerURI);
 				guiseSession.setNavigation(navigationPath, navigationBookmark, referrerURI);	//set the session navigation with the navigation bookmark, firing any navigation events if appropriate
 			}
 			final Set<Frame> removedFrames=new HashSet<Frame>();	//create a set of frames so that we can know which ones were removed TODO testing
@@ -992,7 +993,7 @@ Debug.trace("got control events");
 									else	//if this parameter is not a special action parameter
 									{
 										//TODO don't re-update nested components (less important for controls, which don't have nested components)
-						//TODO del Debug.trace("looking for component with name", parameterName);
+						//TODO del Log.trace("looking for component with name", parameterName);
 										getComponentsByDepictName(applicationFrame, parameterName, requestedComponents);	//get all components with depictions using the given name
 			//TODO del; test new method; tidy; comment							getControlsByName(guiseContext, navigationPanel, parameterName, requestedComponents);	//get all components identified by this name
 									}
@@ -1096,7 +1097,7 @@ Debug.trace("got control events");
 							final List<String> destinationSubcategoryIDs=new ArrayList<String>();	//we'll look for all the subcategories available, in whatever category (because WebTrends doesn't distinguish among categories for subcategories)
 							for(final Category category:componentDestination.getCategories())	//look at each category
 							{
-//TODO del									Debug.trace("destination has category", category.getID());
+//TODO del									Log.trace("destination has category", category.getID());
 								final String categoryID=category.getID();	//get this category's ID
 								if(!destinationCategoryIDs.contains(categoryID))	//if this category hasn't yet been added TODO use an array set
 								{
@@ -1104,7 +1105,7 @@ Debug.trace("got control events");
 								}
 								for(final Category subcategory:category.getCategories())	//look at each subcategory
 								{
-//TODO del										Debug.trace("category has subcategory", subcategory.getID());
+//TODO del										Log.trace("category has subcategory", subcategory.getID());
 									final String subcategoryID=subcategory.getID();	//get this subcategory's ID
 									if(!destinationSubcategoryIDs.contains(subcategoryID))	//if this subcategory hasn't yet been added TODO use an array set
 									{
@@ -1126,7 +1127,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 								}
 							}
 							queryParametersStringBuilder.delete(queryParametersStringBuilder.length()-1, queryParametersStringBuilder.length());	//remove the last parameter delimiter
-//TODO del Debug.trace("ready to log query:", queryParametersStringBuilder);
+//TODO del Log.trace("ready to log query:", queryParametersStringBuilder);
 //TODO del when works								final NameValuePair<String, String>[] queryParameterArray=(NameValuePair<String, String>[])queryParameters.toArray(new NameValuePair[queryParameters.size()]);	//put the query parameters into an array
 //TODO del when works								entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, appendQueryParameters(request.getQueryString(), queryParameterArray));	//append the new parameters and set the log field
 							entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, queryParametersStringBuilder.toString());	//set the log field to be the parameters we determined
@@ -1157,7 +1158,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						{
 							for(final Component component:requestedComponents)	//for each requested component
 							{
-		Debug.trace("ready to process event", controlEvent, "for component", component);
+		Log.trace("ready to process event", controlEvent, "for component", component);
 								component.processEvent(controlEvent);		//tell the component to process the event
 							}
 						}
@@ -1167,10 +1168,10 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						applicationFrame.dispatchInputEvent((InputEvent)requestEvent);	//tell the application frame to dispatch the input event
 					}
 		/*TODO del
-		Debug.trace("we now have affected components:", affectedComponents.size());
+		Log.trace("we now have affected components:", affectedComponents.size());
 		for(final Component<?> affectedComponent:affectedComponents)
 		{
-			Debug.trace("affected component:", affectedComponent);
+			Log.trace("affected component:", affectedComponent);
 		}
 		*/
 							//send the resource if needed
@@ -1188,16 +1189,16 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 					}
 					final URI requestDepictURI=guiseRequest.getDepictURI();	//get the request URI
 					final Bookmark newBookmark=guiseSession.getBookmark();	//see if the bookmark has changed
-//TODO del Debug.trace("navigation bookmark:", navigationBookmark, "new bookmark", newBookmark);
+//TODO del Log.trace("navigation bookmark:", navigationBookmark, "new bookmark", newBookmark);
 					final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
-//Debug.trace("requested navigation:", requestedNavigation);
+//Log.trace("requested navigation:", requestedNavigation);
 					if(requestedNavigation!=null || !Objects.equals(navigationBookmark, newBookmark))	//if navigation is requested or the bookmark has changed, redirect the browser
 					{
 						final URI redirectNavigationURI;	//we'll determine where to direct to in navigation terms; this may not be an absolute URI
 						if(requestedNavigation!=null)	//if navigation is requested
 						{
 							final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
-//Debug.trace("navigation requested to", requestedNavigationURI);
+//Log.trace("navigation requested to", requestedNavigationURI);
 							guiseSession.clearRequestedNavigation();	//remove any navigation requests
 /*TODO remove modal navigation
 							if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
@@ -1212,7 +1213,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 							redirectNavigationURI=appendRawQuery(navigationPath.toURI(), newBookmark.toString());	//save the constructed bookmark URI	TODO fix the confusion about whether there is a query on the URIs
 						}
 						final URI redirectDepictURI=requestDepictURI.resolve(guiseApplication.resolveURI(guiseApplication.getDepictionURI(requestDepictURI, redirectNavigationURI)));	//get the absolute redirect URI in depiction terms
-//Debug.trace("depict version of requested navigation:", redirectDepictURI);
+//Log.trace("depict version of requested navigation:", redirectDepictURI);
 						if(!requestDepictURI.equals(redirectDepictURI))	//if the navigation is really changing (i.e. they didn't request to go to where they already were)
 						{
 							if(isAJAX)	//if this is an AJAX request
@@ -1230,13 +1231,13 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 										isNavigating=false;	//don't consider a viewport-specific navigation to be true navigation, as we still want the main page to be updated (e.g. closed frames still need to be removed)
 									}
 								}
-//Debug.trace("telling AJAX to redirect to:", redirectDepictURI);
+//Log.trace("telling AJAX to redirect to:", redirectDepictURI);
 								depictContext.write(redirectDepictURI.toString());	//write the redirect URI
 								depictContext.writeElementEnd(null, "navigate");	//</navigate>
 							}
 							else	//if this is not an AJAX request
 							{
-//Debug.trace("HTTP redirecting to:", redirectDepictURI);
+//Log.trace("HTTP redirecting to:", redirectDepictURI);
 								throw new HTTPMovedTemporarilyException(redirectDepictURI);	//redirect to the new location TODO fix to work with other viewports
 							}
 							//TODO if !AJAX						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
@@ -1252,7 +1253,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						if(isAJAX)	//if this is an AJAX request
 						{
 							depictContext.clearDepictText();	//clear all the response data (which at this point should only be navigation information, anyway)
-//Debug.traceStack("ready to reload");
+//Log.traceStack("ready to reload");
 							depictContext.writeElementBegin(null, "reload", true);	//<reload>	//TODO use a constant
 							depictContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 							depictContext.writeElementEnd(null, "reload");	//</reload>
@@ -1268,7 +1269,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 				{
 					if(isAJAX)	//if this is an AJAX request
 					{
-						Debug.error(runtimeException);	//log the error
+						Log.error(runtimeException);	//log the error
 						//TODO send back the error
 					}
 					else	//if this is ano an AJAX request
@@ -1326,15 +1327,15 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 					Collections.removeAll(removedFrames, guiseSession.getApplicationFrame().getChildFrames().iterator());	//remove all the ending frames, leaving us the frames that were removed TODO improve all this
 	//TODO fix					dirtyComponents.addAll(frames);	//add all the frames that were removed
 
-					Debug.trace("we now have dirty components:", dirtyComponents.size());
+					Log.trace("we now have dirty components:", dirtyComponents.size());
 					for(final Component affectedComponent:dirtyComponents)
 					{
-						Debug.trace("affected component:", affectedComponent);
+						Log.trace("affected component:", affectedComponent);
 					}
 					if(dirtyComponents.contains(applicationFrame))	//if the application frame itself was affected, we might as well reload the page
 					{
-//TODO del Debug.trace("dirty because:", CollectionUtilities.toString(((AbstractDepictor)applicationFrame.getDepictor()).getModifiedProperties(), ','));
-//Debug.traceStack("ready to reload");
+//TODO del Log.trace("dirty because:", CollectionUtilities.toString(((AbstractDepictor)applicationFrame.getDepictor()).getModifiedProperties(), ','));
+//Log.traceStack("ready to reload");
 						depictContext.writeElementBegin(null, "reload", true);	//<reload>	//TODO use a constant
 						depictContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 						depictContext.writeElementEnd(null, "reload");	//</reload>
@@ -1412,8 +1413,8 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 				depictContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type TODO verify UTF-8 in a consistent, elegant way
 				text="<response>"+text+"</response>";	//wrap the text in a response element
 			}
-//Debug.trace("response length:", text.length());
-//Debug.trace("response text:", text);
+//Log.trace("response length:", text.length());
+//Log.trace("response text:", text);
 			final byte[] bytes=text.getBytes(UTF_8_CHARSET);	//write the content we collected in the context as series of bytes encoded in UTF-8
 			final OutputStream outputStream=getCompressedOutputStream(guiseRequest.getHTTPServletRequest(), response);	//get a compressed output stream, if possible
 			outputStream.write(bytes);	//write the bytes
@@ -1639,7 +1640,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 	{
 		if(resource instanceof DestinationResource)	//if the resource is a destination we're reading from
 		{
-//Debug.trace("ready to serve destination resource", request.getRequestURI(), "with query", request.getQueryString());
+//Log.trace("ready to serve destination resource", request.getRequestURI(), "with query", request.getQueryString());
 			final DestinationResource destinationResource=(DestinationResource)resource;	//get the desetination resource
 				//check for a content-disposition indication
 			final String queryString=request.getQueryString();	//get the query string from the request
@@ -1662,7 +1663,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 							}
 						}
 						final URI referenceURI=destinationResource.getResourceDescription().getURI();	//get the reference URI of the description, if any
-//Debug.trace("setting content disposition, reference URI", referenceURI);
+//Log.trace("setting content disposition, reference URI", referenceURI);
 						setContentDisposition(response, contentDispositionType, referenceURI!=null ? getName(referenceURI) : null);	//set the response content disposition, suggesting the resource's decoded name if we can
 					}
 				}
@@ -1716,7 +1717,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
   */
 	protected List<GuiseEvent> getRequestEvents(/*TODO del final HttpServletRequest request,*/final HTTPServletGuiseRequest guiseRequest, final GuiseSession guiseSession, final DepictContext depictContext) throws IOException
 	{
-Debug.trace("getting request events");
+Log.trace("getting request events");
 		final WebPlatform platform=(WebPlatform)guiseSession.getPlatform();	//get the web platform
 		final List<GuiseEvent> requestEventList=new ArrayList<GuiseEvent>();	//create a new list for storing request events
 /*TODO del
@@ -1725,13 +1726,13 @@ Debug.trace("getting request events");
 */
 		if(guiseRequest.isAJAX())	//if this is a Guise AJAX request
 		{
-//		TODO del Debug.trace("Guise AJAX request");
+//		TODO del Log.trace("Guise AJAX request");
 			try
 			{
 				final DocumentBuilderFactory documentBuilderFactory=DocumentBuilderFactory.newInstance();	//create a document builder factory TODO create a shared document builder factory, maybe---but make sure it is used by only one thread
 				final DocumentBuilder documentBuilder=documentBuilderFactory.newDocumentBuilder();	//create a new document builder
 				final Document document=documentBuilder.parse(guiseRequest.getHTTPServletRequest().getInputStream());	//read the document from the request
-//Debug.trace("request XML:", XMLUtilities.toString(document));
+//Log.trace("request XML:", XMLUtilities.toString(document));
 				final List<Node> eventNodes=(List<Node>)XPath.evaluatePathExpression(document, AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION);	//get all the events
 				for(final Node eventNode:eventNodes)	//for each event node
 				{
@@ -1742,7 +1743,7 @@ Debug.trace("getting request events");
 						final WebPlatformEventType eventType=getSerializedEnum(WebPlatformEventType.class, eventName);	//get this event type, throwing an IllegalArgumentException if the event type is not recognized
 						if(eventType!=WebPlatformEventType.LOG)	//if this is not a log event (there's no use logging a log even)
 						{
-							Debug.info("AJAX event:", eventType);
+							Log.debug("AJAX event:", eventType);
 						}
 						switch(eventType)	//see which type of event this is
 						{
@@ -1837,7 +1838,7 @@ Debug.trace("getting request events");
 										}
 										catch(final URISyntaxException uriSyntaxException)	//if there is a problem with the URI syntax
 										{
-											Debug.warn("Invalid referrer URI syntax: "+referrer);
+											Log.warn("Invalid referrer URI syntax: "+referrer);
 										}
 									}
 									final WebInitializeEvent initEvent=new WebInitializeEvent(depictContext,
@@ -1885,9 +1886,9 @@ Debug.trace("getting request events");
 								break;
 							case LOG:
 								{
-									final Debug.ReportLevel reportLevel=getSerializedEnum(Debug.ReportLevel.class, eventElement.getAttribute("level"));	//get the report level
+									final Log.Level logLevel=getSerializedEnum(Log.Level.class, eventElement.getAttribute("level"));	//get the log level
 									final String text=eventElement.getTextContent();	//get the log text
-									Debug.output(reportLevel, "Guise AJAX:", text);	//send this information to the debug output
+									Log.log(logLevel, "Guise AJAX:", text);	//log this information
 								}
 								break;
 							case MOUSECLICK:
@@ -1963,9 +1964,9 @@ Debug.trace("getting request events");
 												default:
 													throw new AssertionError("Unrecognized mouse event type: "+eventType);
 											}
-//Debug.trace("mouse event bound for component", ((Component<?>)mouseEvent.getTarget()).getID());
+//Log.trace("mouse event bound for component", ((Component<?>)mouseEvent.getTarget()).getID());
 											requestEventList.add(mouseEvent);	//add the event to the list
-//Debug.trace("mouse event; targetXY:", targetX, targetY, "viewportXY:", viewportX, viewportY, "mouseXY:", mouseX, mouseY);
+//Log.trace("mouse event; targetXY:", targetX, targetY, "viewportXY:", viewportX, viewportY, "mouseXY:", mouseX, mouseY);
 										}
 									}
 								}
@@ -2044,19 +2045,19 @@ Debug.trace("getting request events");
 				}
 			}
 		}
-		if(requestEventList.size()>0 && Debug.isDebug() && Debug.getReportLevels().contains(Debug.ReportLevel.INFO))	//indicate the parameters if information tracing is turned on
+		if(requestEventList.size()>0)	//indicate the parameters
 		{
-			Debug.info("Received Request Events:");
+			Log.debug("Received Request Events:");
 			for(final GuiseEvent requestEvent:requestEventList)	//for each control event
 			{
-				Debug.info("  Event:", requestEvent.getClass(), requestEvent);
+				Log.debug("  Event:", requestEvent.getClass(), requestEvent);
 			}
 		}
 
 /*TODO del
-Debug.trace("parameter names:", request.getParameterNames());	//TODO del when finished with dual mulipart+encoded content
-Debug.trace("number of parameter names:", request.getParameterNames());
-Debug.trace("***********number of distinct parameter keys", parameterListMap.size());
+Log.trace("parameter names:", request.getParameterNames());	//TODO del when finished with dual mulipart+encoded content
+Log.trace("number of parameter names:", request.getParameterNames());
+Log.trace("***********number of distinct parameter keys", parameterListMap.size());
 */
 		return requestEventList;	//return the list of control events
 	}
@@ -2156,10 +2157,10 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	*/
 	protected boolean isValid(final HttpServletRequest request, final Nonce nonce)	//TODO check to see if we want to force a session
 	{
-//	TODO del Debug.trace("ready to check validity of nonce; default validity", nonce);
+//	TODO del Log.trace("ready to check validity of nonce; default validity", nonce);
 		if(!super.isValid(request, nonce))	//if the nonce doesn't pass the normal validity checks
 		{
-//		TODO del Debug.trace("doesn't pass the basic checks");
+//		TODO del Log.trace("doesn't pass the basic checks");
 			return false;	//the nonce isn't valid
 		}
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
@@ -2167,12 +2168,12 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
 		final Principal guiseSessionPrincipal=guiseSession.getPrincipal();	//get the current principal of the Guise session
 		final String guiseSessionPrincipalID=guiseSessionPrincipal!=null ? guiseSessionPrincipal.getName() : null;	//get the current guise session principal ID
-//	TODO del Debug.trace("checking to see if nonce principal ID", getNoncePrincipalID(nonce), "matches Guise session principal ID", guiseSessionPrincipalID);
+//	TODO del Log.trace("checking to see if nonce principal ID", getNoncePrincipalID(nonce), "matches Guise session principal ID", guiseSessionPrincipalID);
 		if(!Objects.equals(getNoncePrincipalID(nonce), guiseSessionPrincipalID))	//if this nonce was for a different principal
 		{
 			return false;	//the user must have logged out or have been changed
 		}
-//	TODO del Debug.trace("nonce is valid");
+//	TODO del Log.trace("nonce is valid");
 		return true;	//indicate that the nonce passed all the tests
 	}
 
@@ -2209,12 +2210,12 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		final String queryString=request.getQueryString();	//get the query string from the request
 		if(queryString!=null && queryString.length()>0)	//if there is a query string (Tomcat 5.5.16 returns an empty string for no query, even though the Java Servlet specification 2.4 says that it should return null; this is fixed in Tomcat 6)
 		{
-//TODO del Debug.trace("just got query string from request, length", queryString.length(), "content", queryString);
+//TODO del Log.trace("just got query string from request, length", queryString.length(), "content", queryString);
 			return new Bookmark(String.valueOf(QUERY_SEPARATOR)+queryString);	//construct a new bookmark, preceding the string with a query indicator
 		}
 		else	//if there is no query string, there is no bookmark
 		{
-//TODO del Debug.trace("just got null query string from request");
+//TODO del Log.trace("just got null query string from request");
 			return null;	//indicate that there is no bookmark information
 		}
 	}
@@ -2254,7 +2255,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   */
   protected boolean exists(final HttpServletRequest request, final URI resourceURI) throws IOException
   {
-Debug.trace("checking exists for", resourceURI);
+Log.trace("checking exists for", resourceURI);
 		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
   	final HTTPServletGuiseRequest guiseRequest=new HTTPServletGuiseRequest(request, /*TODO del response, */guiseContainer, guiseApplication);	//get Guise request information
   	final URIPath path=guiseRequest.getNavigationPath();	//get the application-relative logical path
@@ -2266,7 +2267,7 @@ Debug.trace("checking exists for", resourceURI);
 		final Destination destination=guiseApplication.getDestination(path);	//get the destination for the given path
   	if(destination!=null)	//if the URI represents a valid navigation path
   	{
-Debug.trace("this is a destination");
+Log.trace("this is a destination");
   		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
  			final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
  			final Bookmark bookmark=guiseRequest.getBookmark();	//get the bookmark, if any
@@ -2329,7 +2330,7 @@ Debug.trace("this is a destination");
   */
 	protected HTTPServletResource getResource(final HttpServletRequest request, final URI resourceURI) throws IllegalArgumentException, IOException
 	{
-//TODO del Debug.trace("getting resource for URI: ", resourceURI);
+//TODO del Log.trace("getting resource for URI: ", resourceURI);
 		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
   	final HTTPServletGuiseRequest guiseRequest=new HTTPServletGuiseRequest(request, /*TODO del response, */guiseContainer, guiseApplication);	//get Guise request information
   	final URIPath path=guiseRequest.getNavigationPath();	//get the application-relative logical path
@@ -2350,7 +2351,7 @@ Debug.trace("this is a destination");
 			{
 				throw new HTTPForbiddenException(illegalStateException.getMessage(), illegalStateException);	//forbid the user from accessing the resource
 			}
-//		TODO del Debug.trace("constructed a resource with length:", resource.getContentLength(), "and last modified", resource.getLastModified());
+//		TODO del Log.trace("constructed a resource with length:", resource.getContentLength(), "and last modified", resource.getLastModified());
   	}
   	else	//if this is not a Guise asset, see if it is a Guise resource destination
   	{
@@ -2407,7 +2408,7 @@ Debug.trace("this is a destination");
 	  	}
   	}
 		final ContentType contentType=getContentType(request, resource);	//get the content type of the resource
-//TODO del Debug.trace("got content type", contentType, "for resource", resource);
+//TODO del Log.trace("got content type", contentType, "for resource", resource);
 		if(contentType!=null && TEXT_CSS_CONTENT_TYPE.match(contentType))	//if this is a CSS stylesheet
 		{
 			final Map<String, Object> userAgentProperties=getUserAgentProperties(request);	//get the user agent properties for this request
@@ -2416,21 +2417,21 @@ Debug.trace("this is a destination");
 				final Object version=userAgentProperties.get(USER_AGENT_VERSION_NUMBER_PROPERTY);	//get the version number
 				if(version instanceof Number && ((Number)version).doubleValue()<7)	//if this is IE 6 (lower than IE 7)
 				{
-//TODO del Debug.trace("need a stylesheet for IE6");
+//TODO del Log.trace("need a stylesheet for IE6");
 					final Reference<HTTPServletResource> ie6CSSResourceReference=cachedIE6FixedStylesheetResources.get(resourceURI);	//get a reference to the IE6 fixed stylesheet, if there is one cached
 					HTTPServletResource ie6CSSResource=ie6CSSResourceReference!=null ? ie6CSSResourceReference.get() : null;	//dereference the reference if there is one
 					if(ie6CSSResource==null)	//we don't have the resource in the cache (the race condition here is benign, and could only result in an initual multiple-loading of a stylesheet)
 					{
-//TODO del Debug.trace("IE6 stylesheet wasn't cached");
+//TODO del Log.trace("IE6 stylesheet wasn't cached");
 						ie6CSSResource=new IE6CSSResource(resource);	//create a resource that does extra CSS processing for IE6
 						cachedIE6FixedStylesheetResources.put(resourceURI, new SoftReference<HTTPServletResource>(ie6CSSResource));	//cache the processed stylesheet for later
 					}
 					else
 					{
-//TODO del Debug.trace("IE6 stylesheet was cached");
+//TODO del Log.trace("IE6 stylesheet was cached");
 					}
 					return ie6CSSResource;	//use the cached IE6 CSS resource so we won't have to process it all over again
-//TODO del								Debug.trace("fixed stylesheet for IE6", cssStylesheet);
+//TODO del								Log.trace("fixed stylesheet for IE6", cssStylesheet);
 				}
 			}
 		}

@@ -24,7 +24,6 @@ import java.util.regex.Pattern;
 import com.globalmentor.net.ContentType;
 
 import static com.globalmentor.text.Text.*;
-import com.globalmentor.util.Debug;
 
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.component.*;
@@ -275,7 +274,7 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 		{
 			throw new AssertionError("Unrecognized element local name: "+bodyLocalName);
 		}
-//TODO del Debug.trace("*****getting ready to update text input view; modified properties are:", getModifiedProperties());
+//TODO del Log.trace("*****getting ready to update text input view; modified properties are:", getModifiedProperties());
 	}
 
 	/**Renders the body of the component.

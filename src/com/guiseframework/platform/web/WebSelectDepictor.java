@@ -21,9 +21,9 @@ import java.io.IOException;
 import java.util.*;
 
 import static com.globalmentor.java.Objects.*;
+import com.globalmentor.log.Log;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 
-import com.globalmentor.util.Debug;
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;
 import com.guiseframework.platform.*;
@@ -129,7 +129,7 @@ public class WebSelectDepictor<V, C extends ListSelectControl<V>> extends Abstra
 		}
 		try
 		{
-Debug.trace("ready to set selected indexes to", Arrays.toString(selectedIndices));
+Log.trace("ready to set selected indexes to", Arrays.toString(selectedIndices));
 			selectControl.setSelectedIndexes(selectedIndices);	//store the decoded value in the model
 		}
 		catch(final PropertyVetoException propertyVetoException)	//if there is a veto
@@ -144,7 +144,7 @@ Debug.trace("ready to set selected indexes to", Arrays.toString(selectedIndices)
 	*/
 	protected void depictBegin() throws IOException
 	{
-//TODO del Debug.trace("updating select view");
+//TODO del Log.trace("updating select view");
 		super.depictBegin();	//do the default beginning rendering
 		final WebDepictContext depictContext=getDepictContext();	//get the depict context
 		final C component=getDepictedObject();	//get the component
@@ -174,16 +174,16 @@ Debug.trace("ready to set selected indexes to", Arrays.toString(selectedIndices)
 			rowCount=-1;	//no row count was specified
 		}
 		final V[] selectedValues=component.getSelectedValues();	//get the selected values
-//TODO del Debug.trace("selected values count:", selectedValues.length);
+//TODO del Log.trace("selected values count:", selectedValues.length);
 		final Set<String> selectedIDs=new HashSet<String>(selectedValues.length);	//create a set to contain all selected IDs
 		for(final V selectedValue:selectedValues)	//for each selected value
 		{
 			selectedIDs.add(getPlatform().getDepictIDString(component.getComponent(selectedValue).getDepictID()));	//get the ID of this value's representation component
 		}
-//TODO del Debug.trace("selected IDs count:", selectedIDs.size());
+//TODO del Log.trace("selected IDs count:", selectedIDs.size());
 		final Validator<V> validator=component.getValidator();	//get the model's validator
 		final boolean valueRequired=validator!=null && validator instanceof AbstractValidator && ((AbstractValidator<V>)validator).isValueRequired();	//see if a value is required
-//TODO del Debug.trace("size:", component.size(), "isEmpty", component.isEmpty());
+//TODO del Log.trace("size:", component.size(), "isEmpty", component.isEmpty());
 		int optionsWritten=0;	//keep track of how many options we've written
 		if(!component.isEmpty())	//if there are options, determine whether to add a dummy null option (if there are no options, there's no point in having a "no options" option)
 		{
@@ -194,7 +194,7 @@ Debug.trace("ready to set selected indexes to", Arrays.toString(selectedIndices)
 					//TODO decide if we want to keep the new logic; apparently even single-row controls allow value removal using the Ctrl key
 			if(isSingleSelection && (selectedIDs.size()==0 || !valueRequired))	//for single selection controls, if there is no value required we need to have a way for the user to unselect everything (presumably a multiple selection would inherently allow this)
 			{
-//TODO del Debug.trace("writing dummy null!");
+//TODO del Log.trace("writing dummy null!");
 				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_OPTION);	//<xhtml:option>
 				depictContext.writeAttribute(null, ATTRIBUTE_VALUE, GUISE_DUMMY_NULL_VALUE);	//value="guiseDummyNull"
 				if(selectedIDs.size()==0)	//if no items are selected, select the dummy null option

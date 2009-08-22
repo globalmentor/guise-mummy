@@ -299,7 +299,7 @@ public class CalendarControl extends AbstractLayoutValueControl<Date>
 			updatingDateControls=true;	//show that we're updating the calendars
 			try
 			{
-//TODO del		Debug.trace("*** Updating calendars");
+//TODO del		Log.trace("*** Updating calendars");
 				final Locale locale=getSession().getLocale();	//get the current locale
 				final TimeZone timeZone=getSession().getTimeZone();	//get the current time zone
 				final boolean localeChanged=!locale.equals(oldLocale);	//see if the locale changed		

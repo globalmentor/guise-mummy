@@ -50,7 +50,7 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 		{
 			public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//if a property changes
 			{
-//TODO del Debug.trace("hey, a value property", propertyChangeEvent.getPropertyName(), "just changed!");
+//TODO del Log.trace("hey, a value property", propertyChangeEvent.getPropertyName(), "just changed!");
 				setDepicted(false);	//show that we need general updates TODO improve to only indicate that the relevant property, such as VALUE_PROPERTY, changed			
 			}
 		};
@@ -157,7 +157,7 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 			}
 			if(component instanceof InputFocusableComponent)	//if this is a focusable component, set all the focused components of the focus groups up the chain to form a path from application frame to focused component
 			{
-//Debug.trace("setting focus for component", component);
+//Log.trace("setting focus for component", component);
 				final ApplicationFrame applicationFrame=component.getSession().getApplicationFrame();	//we'll work our way up until we get to the application frame
 				InputFocusableComponent focusableComponent=(InputFocusableComponent)component;	//the component is focusable
 				Component currentComponent=component;	//we'll start looking at the component receiving the focus
@@ -271,7 +271,7 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 		final String propertyName=propertyChangeEvent.getPropertyName();	//get the name of the changing property
 		final Object oldValue=propertyChangeEvent.getOldValue();	//get the old value
 		final Object newValue=propertyChangeEvent.getOldValue();	//get the new value
-//Debug.trace("property", propertyChangeEvent.getPropertyName(), "of source", source, "ID", source instanceof Component ? ((Component)source).getID() : "(non-component)", "change from", propertyChangeEvent.getOldValue(), "to", propertyChangeEvent.getNewValue());
+//Log.trace("property", propertyChangeEvent.getPropertyName(), "of source", source, "ID", source instanceof Component ? ((Component)source).getID() : "(non-component)", "change from", propertyChangeEvent.getOldValue(), "to", propertyChangeEvent.getNewValue());
 		if(source==depictedObject)	//if this property change was on the depicted object
 		{
 			if(source instanceof Container && Container.LAYOUT_PROPERTY.equals(propertyName))	//if the source is a container and the container layout changed

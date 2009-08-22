@@ -22,7 +22,7 @@ import java.util.*;
 
 import com.globalmentor.java.Integers;
 import com.globalmentor.text.xml.stylesheets.css.*;
-import com.globalmentor.util.Debug;
+
 import com.guiseframework.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.geometry.*;

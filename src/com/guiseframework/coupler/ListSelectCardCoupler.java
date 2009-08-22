@@ -22,7 +22,7 @@ import java.beans.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.java.Objects;
-import com.globalmentor.util.Debug;
+
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;
 
@@ -54,7 +54,7 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler
 			final V newValue=propertyChangeEvent.getNewValue();	//get the new selected value
 			if(newValue!=null && Objects.equals(newValue, getValue()))	//if the connected value was selected
 			{
-//TODO del				Debug.trace("tab changed to", getListSelect().indexOf(newValue), " trying to select new card to match; is reverting list select?", isRevertingListSelect);
+//TODO del				Log.trace("tab changed to", getListSelect().indexOf(newValue), " trying to select new card to match; is reverting list select?", isRevertingListSelect);
 				try
 				{
 					selectCard();	//select a connected card
@@ -66,7 +66,7 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler
 						throw new AssertionError("Infinite loop detected in list select card coupler; it's likely that one of the cards isn't listed as part of the coupler and the change to a new card was vetoed, as was the reversion back to the non-included card.");
 					}
 					isRevertingListSelect=true;	//show that we're reverting the list select to its old value, so that we can detect infinite loops
-//TODO del Debug.trace("card change was vetoed; trying to revert to tab", getListSelect().indexOf(propertyChangeEvent.getOldValue()), "is reverting list select?", isRevertingListSelect);
+//TODO del Log.trace("card change was vetoed; trying to revert to tab", getListSelect().indexOf(propertyChangeEvent.getOldValue()), "is reverting list select?", isRevertingListSelect);
 					try
 					{
 						listSelect.setValue(propertyChangeEvent.getOldValue());	//go back to the old selected value, if we can

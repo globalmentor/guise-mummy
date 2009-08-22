@@ -359,7 +359,7 @@ public class DateTimeFieldsControl extends AbstractLayoutValueControl<Date>	//TO
 			{
 				
 				
-//TODO del		Debug.trace("*** Updating calendars");
+//TODO del		Log.trace("*** Updating calendars");
 				final GuiseSession session=getSession();	//get the Guise session
 				final Integer oldMonthYearInteger=calendar!=null ? Integer.valueOf(calendar.get(Calendar.YEAR)) : null;	//get the year last used for calculating months
 				final Locale locale=session.getLocale();	//get the current locale

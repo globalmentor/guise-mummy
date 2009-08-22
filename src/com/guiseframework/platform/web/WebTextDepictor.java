@@ -28,10 +28,10 @@ import com.globalmentor.net.ContentType;
 
 import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.java.Objects.*;
+import com.globalmentor.log.Log;
 import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 
-import com.globalmentor.util.*;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.Text;
 
@@ -73,10 +73,10 @@ public class WebTextDepictor<C extends Text> extends AbstractSimpleWebComponentD
 	*/
 	protected void depictChildren() throws IOException
 	{
-//TODO del Debug.trace("ready to load text");
+//TODO del Log.trace("ready to load text");
 		final C component=getDepictedObject();	//get the component
 		final String text=component.getText();	//get the component text, if any
-//TODO del Debug.trace("text loaded");
+//TODO del Log.trace("text loaded");
 		if(text!=null)	//if the component has text
 		{
 			final String resolvedText=component.getSession().dereferenceString(text);	//resolve the text
@@ -116,25 +116,25 @@ public class WebTextDepictor<C extends Text> extends AbstractSimpleWebComponentD
 					final Document document;	//we'll use the cached document if we can
 					if(cachedDocument!=null)	//if we have a cached document for this text
 					{
-Debug.info("cache hit for text", xmlTextHash);
+Log.debug("cache hit for text", xmlTextHash);
 						document=cachedDocument.getDocument();	//use the document
 					}
 					else	//if there is no cached document
 					{					
-Debug.info("cache miss for text", xmlTextHash);
-	//				TODO del Debug.trace("ready to parse text");
-	//				TODO del Debug.trace("creating document builder factory");
+Log.debug("cache miss for text", xmlTextHash);
+	//				TODO del Log.trace("ready to parse text");
+	//				TODO del Log.trace("creating document builder factory");
 					
 						final DocumentBuilder documentBuilder=createDocumentBuilder(true);	//create a new namespace-aware document builder
-	//				TODO del Debug.trace("getting bytes");
+	//				TODO del Log.trace("getting bytes");
 						final byte[] bytes=xmlText.getBytes(UTF_8_CHARSET);
-	//				TODO del Debug.trace("creating input stream");
+	//				TODO del Log.trace("creating input stream");
 						final InputStream inputStream=new ByteArrayInputStream(bytes);
-	//				TODO del Debug.trace("parsing input stream");
+	//				TODO del Log.trace("parsing input stream");
 						document=documentBuilder.parse(inputStream);	//parse the document; this goes *very* quickly after removing the "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>" from the wrapper
 						cachedDocumentMap.put(xmlTextHash, new CachedDocument(xmlText, document));	//cache this parsed XML document along with its text
 					}
-//				TODO del Debug.trace("text parsed");
+//				TODO del Log.trace("text parsed");
 					final Element rootElement;	//we'll find which element to start with
 					if(isHTML(contentType))	//if this is an HTML document
 					{
@@ -151,9 +151,9 @@ Debug.info("cache miss for text", xmlTextHash);
 					{
 						rootElement=document.getDocumentElement();	//use the document element
 					}
-//				TODO del Debug.trace("ready to render text");
+//				TODO del Log.trace("ready to render text");
 					updateElementContent(rootElement);	//update the contents of the root element
-//				TODO del Debug.trace("text rendered");
+//				TODO del Log.trace("text rendered");
 				}
 				catch(final SAXException saxException)	//we don't expect parsing errors
 				{

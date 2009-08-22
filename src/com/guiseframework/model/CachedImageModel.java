@@ -22,11 +22,9 @@ import java.net.URI;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 
-import com.globalmentor.cache.Cache;
-import com.globalmentor.cache.CacheFetchEvent;
-import com.globalmentor.cache.CacheFetchListener;
+import com.globalmentor.cache.*;
 import com.globalmentor.java.Objects;
-import com.globalmentor.util.*;
+import com.globalmentor.log.Log;
 
 /**An image model that can initiate retrieval of an image from a cache and update the image when fetching succeeds.
 @param <Q> The type of query used to request data from the cache.
@@ -100,11 +98,11 @@ public class CachedImageModel<Q, V> extends DefaultImageModel implements Pending
 				{
 					throw new IllegalStateException("Cached image key cannot be changed while the image is pending.");
 				}
-Debug.trace("for cached image", getCachedImageURI(), "changing from cached image key", cachedImageQuery, "to", newCachedImageQuery);
+Log.trace("for cached image", getCachedImageURI(), "changing from cached image key", cachedImageQuery, "to", newCachedImageQuery);
 				final Q oldCachedImageQuery=cachedImageQuery;	//get the old value
 				cachedImageQuery=newCachedImageQuery;	//actually change the value
 				firePropertyChange(CACHED_IMAGE_QUERY_PROPERTY, oldCachedImageQuery, newCachedImageQuery);	//indicate that the value changed
-Debug.trace("initiating pending");
+Log.trace("initiating pending");
 				updatePending();	//initiate image retrieval if we can
 			}
 		}
@@ -126,7 +124,7 @@ Debug.trace("initiating pending");
 			{
 				final boolean oldImagePending=imagePending;	//get the current value
 				imagePending=newImagePending;	//update the value
-Debug.trace("pending state changed to", newImagePending, "now adding or removing cache fetch listener");
+Log.trace("pending state changed to", newImagePending, "now adding or removing cache fetch listener");
 				if(newImagePending)	//if the image is now pending
 				{
 					getCache().addCacheFetchListener(getCachedImageQuery(), cachedImageListener);	//listen for cache fetches before requesting the image in case the fetch occurs before we can check if the image exists

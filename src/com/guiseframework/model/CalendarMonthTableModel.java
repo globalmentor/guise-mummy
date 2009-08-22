@@ -25,7 +25,6 @@ import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.model.Calendars.*;
 
 import com.globalmentor.beans.*;
-import com.globalmentor.util.Debug;
 
 import com.guiseframework.*;
 import com.guiseframework.converter.*;
@@ -135,20 +134,20 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 		monthCalendar.set(Calendar.MINUTE, 0);	//set the minute to zero
 		monthCalendar.set(Calendar.SECOND, 0);	//set the second to zero
 		monthCalendar.set(Calendar.MILLISECOND, 0);	//set the millisecond to zero
-//TODO fix Debug.trace("updating calendar model in locale", getSession().getLocale());
-//	TODO fix Debug.trace("ready to update model with calendar", monthCalendar);
+//TODO fix Log.trace("updating calendar model in locale", getSession().getLocale());
+//	TODO fix Log.trace("ready to update model with calendar", monthCalendar);
 		final int firstDayOfWeek=monthCalendar.getFirstDayOfWeek();	//get the first day of the week for this calendar
-//TODO del Debug.trace("first day of week", firstDayOfWeek);
+//TODO del Log.trace("first day of week", firstDayOfWeek);
 		final int dayOfWeek=monthCalendar.get(Calendar.DAY_OF_WEEK);	//get the day of the week of the first day of the month
-//TODO del Debug.trace("day of week", dayOfWeek);
+//TODO del Log.trace("day of week", dayOfWeek);
 		dayOffset=firstDayOfWeek-dayOfWeek;	//calculate the offset for the first day of the month, and all days
 		if(dayOfWeek<firstDayOfWeek)	//if the day of the week is before the first day of the week
 		{
 			dayOffset-=WEEK_DAY_COUNT;		//keep from going backwards too far TODO there should be a better way to do this using modulus
 		}
-//TODO del Debug.trace("day offset", dayOffset);
+//TODO del Log.trace("day offset", dayOffset);
 		rowCount=(int)Math.ceil((monthCalendar.getActualMaximum(Calendar.DAY_OF_MONTH)-dayOffset)/(double)WEEK_DAY_COUNT);	//find out how many partial rows are used, taking into account the day offset
-//TODO del Debug.trace("row count", rowCount);
+//TODO del Log.trace("row count", rowCount);
 		updateColumnLabelDateFormat();	//update the date format object for formatting column labels
 	}
 

@@ -31,8 +31,8 @@ import com.globalmentor.country.us.SSN;
 import com.globalmentor.iso.idcard.PAN;
 import com.globalmentor.iso.idcard.Product;
 import com.globalmentor.itu.TelephoneNumber;
+import com.globalmentor.log.Log;
 import com.globalmentor.net.URIPath;
-import com.globalmentor.util.Debug;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.Resources;
@@ -78,16 +78,16 @@ public class HomePanel extends LayoutPanel
 /*TODO del		
 
 		
-Debug.trace("testing date");
+Log.trace("testing date");
 
 final DateFormat dateFormat=DateFormat.getDateInstance(DateFormat.SHORT);	//create a predefined date format instance
-Debug.trace("date format class:", dateFormat.getClass());
-Debug.trace("instance of simple date format?", dateFormat instanceof SimpleDateFormat);
+Log.trace("date format class:", dateFormat.getClass());
+Log.trace("instance of simple date format?", dateFormat instanceof SimpleDateFormat);
 if(dateFormat instanceof SimpleDateFormat)
 {
 	final SimpleDateFormat simpleDateFormat=(SimpleDateFormat)dateFormat;
-	Debug.trace("pattern:", simpleDateFormat.toPattern());
-	Debug.trace("localized pattern:", simpleDateFormat.toLocalizedPattern());
+	Log.trace("pattern:", simpleDateFormat.toPattern());
+	Log.trace("localized pattern:", simpleDateFormat.toLocalizedPattern());
 }
 
 
@@ -101,59 +101,59 @@ if(dateFormat instanceof SimpleDateFormat)
 		
 try
 {
-Debug.trace("short date:", shortDateConverter.convertValue(now));
-Debug.trace("medium date:", mediumDateConverter.convertValue(now));
-Debug.trace("long date:", longDateConverter.convertValue(now));
-Debug.trace("full date:", fullDateConverter.convertValue(now));
+Log.trace("short date:", shortDateConverter.convertValue(now));
+Log.trace("medium date:", mediumDateConverter.convertValue(now));
+Log.trace("long date:", longDateConverter.convertValue(now));
+Log.trace("full date:", fullDateConverter.convertValue(now));
 }
 catch(final ConversionException conversionException)
 {
-	Debug.error(conversionException);
+	Log.error(conversionException);
 }
 try
 {
-Debug.trace("converting 3/24/06");
-Debug.trace(shortDateConverter.convertLiteral("3/24/06"));
+Log.trace("converting 3/24/06");
+Log.trace(shortDateConverter.convertLiteral("3/24/06"));
 }
 catch(final ConversionException conversionException)
 {
-	Debug.error(conversionException);
+	Log.error(conversionException);
 }
 try
 {
-Debug.trace("converting 03/24/06");
-Debug.trace(shortDateConverter.convertLiteral("03/24/06"));
+Log.trace("converting 03/24/06");
+Log.trace(shortDateConverter.convertLiteral("03/24/06"));
 }
 catch(final ConversionException conversionException)
 {
-	Debug.error(conversionException);
+	Log.error(conversionException);
 }
 try
 {
-Debug.trace("converting 3/24/2006");
-Debug.trace(shortDateConverter.convertLiteral("3/24/2006"));
+Log.trace("converting 3/24/2006");
+Log.trace(shortDateConverter.convertLiteral("3/24/2006"));
 }
 catch(final ConversionException conversionException)
 {
-	Debug.error(conversionException);
+	Log.error(conversionException);
 }
 try
 {
-Debug.trace("converting 3-24-06");
-Debug.trace(shortDateConverter.convertLiteral("3-24-06"));
+Log.trace("converting 3-24-06");
+Log.trace(shortDateConverter.convertLiteral("3-24-06"));
 }
 catch(final ConversionException conversionException)
 {
-	Debug.error(conversionException);
+	Log.error(conversionException);
 }
 try
 {
-Debug.trace("converting 3-24-2006");
-Debug.trace(shortDateConverter.convertLiteral("3-24-2006"));
+Log.trace("converting 3-24-2006");
+Log.trace(shortDateConverter.convertLiteral("3-24-2006"));
 }
 catch(final ConversionException conversionException)
 {
-	Debug.error(conversionException);
+	Log.error(conversionException);
 }
 */
 
@@ -305,7 +305,7 @@ catch(final ConversionException conversionException)
 						final Float newValue=propertyChangeEvent.getNewValue();	//get the new value
 						try
 						{
-Debug.trace("list control changed value to", newValue);
+Log.trace("list control changed value to", newValue);
 							outputTextControl.setValue(newValue!=null ? newValue*2 : null);	//update the value
 						}
 						catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
@@ -530,7 +530,7 @@ Debug.trace("list control changed value to", newValue);
 							frame=new TestFrame();
 							frame.setLabel("Test Frame");
 						}
-	Debug.trace("ready to set frame visible");
+	Log.trace("ready to set frame visible");
 						frame.open();
 					}
 				});
@@ -905,8 +905,8 @@ Debug.trace("list control changed value to", newValue);
 		final CardTabControl remoteTabControl=new CardTabControl(tabbedPanel, Flow.LINE);
 		contentPanel.add(remoteTabControl);
 /*TODO del
-Debug.trace("tabbed panel", tabbedPanel, "has view", tabbedPanel.getViewer());
-Debug.trace("card tab control", remoteTabControl, "has view", remoteTabControl.getViewer());
+Log.trace("tabbed panel", tabbedPanel, "has view", tabbedPanel.getViewer());
+Log.trace("card tab control", remoteTabControl, "has view", remoteTabControl.getViewer());
 */
 		checkbox.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>()
 				{
@@ -921,11 +921,11 @@ Debug.trace("card tab control", remoteTabControl, "has view", remoteTabControl.g
 						
 //TODO del						testButton.setVisible(newValue);	//update the button enabled state
 //TODO bring back						testButton.getModel().setEnabled(newValue);	//update the button enabled state
-Debug.trace("ready to set tabbed panel enabled to", newValue);
+Log.trace("ready to set tabbed panel enabled to", newValue);
 //TODO del						tabbedPanel.getLayout().getConstraints(helloPanel).setEnabled(newValue);	//TODO testing
 /*TODO del
 						remoteTabControl.setValueEnabled(helloPanel, newValue);	//TODO testing
-Debug.trace("now tab enabled is", remoteTabControl.isValueEnabled(helloPanel));
+Log.trace("now tab enabled is", remoteTabControl.isValueEnabled(helloPanel));
 */
 					}
 				});

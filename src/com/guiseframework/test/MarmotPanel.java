@@ -39,7 +39,7 @@ import com.globalmentor.rdf.RDFResources;
 import com.globalmentor.rdf.rdfs.RDFS;
 import com.globalmentor.urf.maqro.Activity;
 import com.globalmentor.urf.maqro.ActivityModelIOKit;
-import com.globalmentor.util.Debug;
+
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.rdf.RDFLiteralTreeNodeRepresentationStrategy;
@@ -118,12 +118,12 @@ try
 }
 catch(final IOException ioException)
 {
-	Debug.error(ioException);
+	Log.error(ioException);
 //TODO del	getSession().notify(new Notification(ioException));	//TODO add component-level notify, maybe
 }
 catch(final ValidationException validationException)
 {
-	Debug.error(validationException);
+	Log.error(validationException);
 //TODO del	getSession().notify(new Notification(validationException));	//TODO add component-level notify, maybe
 }
 							frame.setContent(textArea);
@@ -141,7 +141,7 @@ catch(final ValidationException validationException)
 										}
 										public boolean importTransfer(final TreeControl component, final Transferable<?> transferable)
 										{
-Debug.trace("!!got an import from component:", component);											
+Log.trace("!!got an import from component:", component);											
 											return true;
 										}
 									});
@@ -159,7 +159,7 @@ Debug.trace("!!got an import from component:", component);
 							}
 							catch(final IOException ioException)
 							{
-								Debug.error(ioException);
+								Log.error(ioException);
 //							TODO del	getSession().notify(new Notification(ioException));	//TODO add component-level notify, maybe
 							}
 							add(treeControl);
@@ -217,7 +217,7 @@ Debug.trace("!!got an import from component:", component);
 			final ActivityModelIOKit activityModelIOKit=new ActivityModelIOKit();
 			final ResourceModel<Activity> activityResourceModel=activityModelIOKit.load(new FileInputStream("D:\\projects\\marmot\\example\\Activities\\test.maqro"), URI.create("file:/D:/projects/marmot/example/Activities/"));
 			final Activity activity=activityResourceModel.getResource();
-//TODO del			Debug.trace(RDFUtilities.toString(activity));
+//TODO del			Log.trace(RDFUtilities.toString(activity));
 			final TreeControl treeControl=new TreeControl();
 			treeControl.setTreeNodeRepresentationStrategy(RDFResource.class, new RDFResourceTreeNodeRepresentationStrategy());
 			treeControl.setTreeNodeRepresentationStrategy(RDFLiteral.class, new RDFLiteralTreeNodeRepresentationStrategy());

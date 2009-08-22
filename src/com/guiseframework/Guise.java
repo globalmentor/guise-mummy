@@ -190,12 +190,12 @@ public final class Guise
 
 /*TODO fix
 		//TODO maybe try to interrupt and join active threads in the thread group, preferably with a timeout; this is risky because we don't know the interruption policy of whatever threads have been started in the thread group, but if we let them run destroying the thread group will cause an exception because there are still active threads in the thread group, if the application session has started any new threads		
-Debug.trace("ready to destroy thread group", guiseSessionThreadGroup.getName(), "with active threads", guiseSessionThreadGroup.activeCount());
+Log.trace("ready to destroy thread group", guiseSessionThreadGroup.getName(), "with active threads", guiseSessionThreadGroup.activeCount());
 final Thread[] activeThreads=new Thread[guiseSessionThreadGroup.activeCount()];
 guiseSessionThreadGroup.enumerate(activeThreads);
 		for(Thread activeThread:activeThreads)
 		{
-			Debug.trace("active thread:", activeThread.getName());
+			Log.trace("active thread:", activeThread.getName());
 		}
 */
 			//TODO maybe interrupt the thread group first as a safety precaution to make sure it can be destroyed, but when we reach here there shouldn't be any session-related threads running (see comment above) 

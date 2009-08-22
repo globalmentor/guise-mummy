@@ -26,7 +26,6 @@ import javax.servlet.http.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.http.HTTPServlets.*;
 
-import com.globalmentor.util.Debug;
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.GuiseSession;
 
@@ -81,7 +80,7 @@ public class HTTPServletGuiseSessionManager implements HttpSessionListener
 				return guiseSession;	//return the session we found
 			}
 		}
-//TODO del Debug.trace("requested session ID: ", httpRequest.getRequestedSessionId());
+//TODO del Log.trace("requested session ID: ", httpRequest.getRequestedSessionId());
 		HttpSession httpSession=httpRequest.getSession(false);	//get the current HTTP session from the HTTP request, if there is a session
 		if(httpSession==null)	//if there is no session yet for this request, we'll create one
 		{

@@ -111,28 +111,28 @@ public abstract class AbstractMenuToolCompositeComponentPrototypeProvisionStrate
 						{
 							if(menu!=null && !prototypeProvisionMenuComponentMap.containsKey(prototypeProvision))	//if we have a menu, but we haven't yet created a menu component for this prototype info
 							{
-//Debug.trace("no menu yet created for prototype", prototypePublication);
+//Log.trace("no menu yet created for prototype", prototypePublication);
 								final PrototypeProvision<?> parentPrototypeProvision=prototypeProvision.getParentPrototypeProvision();	//get the prototype's parent, if any
 								final Container parentContainer;	//we'll determine where to add this prototype; if we set this to null, the component shouldn't be added
 								if(parentPrototypeProvision!=null)	//if this prototype specifies a parent
 								{
-//Debug.trace("prototype", prototypePublication, "has parent", parentPrototypePublication);
+//Log.trace("prototype", prototypePublication, "has parent", parentPrototypePublication);
 									final Component parentPrototypeComponent=prototypeProvisionMenuComponentMap.get(parentPrototypeProvision);	//get the component used to represent the parent prototype
 									if(parentPrototypeComponent instanceof Container)	//if the parent component is a container
 									{
-//Debug.trace("found parent component", parentPrototypeComponent, "which is a container");
+//Log.trace("found parent component", parentPrototypeComponent, "which is a container");
 										parentContainer=(Container)parentPrototypeComponent;	//use the parent component as the container
 									}
 									else if(parentPrototypeComponent!=null)	//if the parent component is a non-container component
 									{
-//Debug.trace("found parent component", parentPrototypeComponent, "which is not a container so we'll use the menu as the parent");
+//Log.trace("found parent component", parentPrototypeComponent, "which is not a container so we'll use the menu as the parent");
 										parentContainer=menu;	//add the prototype to the menu
 
 									}
 									else	//if there is no component for the parent prototype yet
 									{
 										parentContainer=addAllRemaining ? menu : null;	//if we should add all remaining prototypes, put it in the menu; otherwise, wait until the next iteration
-//Debug.trace("no parent found; add all remaining?", addAllRemaining, "parent container to use", parentContainer);
+//Log.trace("no parent found; add all remaining?", addAllRemaining, "parent container to use", parentContainer);
 									}
 								}
 								else	//if this prototype doesn't specify a parent

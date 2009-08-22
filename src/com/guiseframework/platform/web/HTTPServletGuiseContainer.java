@@ -35,12 +35,11 @@ import com.globalmentor.collections.DecoratorReadWriteLockMap;
 import com.globalmentor.collections.HashSetHashMap;
 import com.globalmentor.collections.ReadWriteLockCollectionMap;
 import com.globalmentor.collections.ReadWriteLockMap;
+import com.globalmentor.log.Log;
 import com.globalmentor.model.AbstractProxyHashObject;
 import com.globalmentor.net.URIPath;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.net.http.HTTPServlets.*;
-
-import com.globalmentor.util.*;
 
 import com.guiseframework.*;
 
@@ -161,7 +160,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 /*TODO del
 					final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
 					Debug.info("memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
-				Debug.trace("+++creating Guise session", httpSession.getId());
+				Log.trace("+++creating Guise session", httpSession.getId());
 	//TODO del if not needed				final String relativeApplicationPath=relativizePath(getBasePath(), guiseApplication.getBasePath());	//get the application path relative to the container path
 */
 					guiseSession=guiseApplication.createSession(new HTTPServletWebPlatform(guiseApplication, httpSession, httpRequest));	//ask the application to create a new Guise session for the given platform
@@ -271,7 +270,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 		}
 		for(final GuiseSession guiseSession:guiseSessions)	//now that we've updated the relevant maps related to the HTTP session, we can uninitialize the Guise sessions at our leisure without blocking new HTTP requests
 		{
-Debug.trace("---removing Guise session", guiseSession, "associated with HTTP sesssion", httpSession.getId());
+Log.trace("---removing Guise session", guiseSession, "associated with HTTP sesssion", httpSession.getId());
 			removeGuiseSession(guiseSession);	//remove the Guise session
 		}
 		return guiseSessions;	//return the Guise sessions
@@ -305,7 +304,7 @@ Debug.trace("---removing Guise session", guiseSession, "associated with HTTP ses
 		}
 		catch(final IOException ioException)	//if there is an I/O error
 		{
-			Debug.error(ioException);	//log the error
+			Log.error(ioException);	//log the error
 		}
 }
 */
@@ -351,19 +350,19 @@ Debug.trace("---removing Guise session", guiseSession, "associated with HTTP ses
 	*/
 	public InputStream getInputStream(final URI uri) throws IOException
 	{
-//TODO del Debug.trace("getting container input stream to URI", uri);
+//TODO del Log.trace("getting container input stream to URI", uri);
 		final URI baseURI=getBaseURI();	//get the base URI
-//	TODO del Debug.trace("base URI:", baseURI);
+//	TODO del Log.trace("base URI:", baseURI);
 		final URI absoluteResolvedURI=baseURI.resolve(uri);	//resolve the URI against the container base URI
-//	TODO del Debug.trace("resolved URI:", absoluteResolvedURI);
+//	TODO del Log.trace("resolved URI:", absoluteResolvedURI);
 		final URI relativeURI=baseURI.relativize(absoluteResolvedURI);	//see if the absolute URI is in the application public path
-//	TODO del Debug.trace("relative URI:", relativeURI);		
+//	TODO del Log.trace("relative URI:", relativeURI);		
 		
 //TODO allow multiple base URIs; as a short-term fix, check HTTP and HTTPS variations 
 		
 		if(!relativeURI.isAbsolute())	//if the URI is relative to the container base URI, we can load it directly
 		{
-//TODO del Debug.trace("Loading directly from servlet: "+ROOT_PATH+relativeURI);
+//TODO del Log.trace("Loading directly from servlet: "+ROOT_PATH+relativeURI);
 			return getServletContext().getResourceAsStream(ROOT_PATH+relativeURI.toString());	//get an input stream through the servlet context (which may be null if there is no such resource)
 		}
 		return super.getInputStream(uri);	//if we can't get the resource locally, delegate to the super class

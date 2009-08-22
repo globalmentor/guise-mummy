@@ -195,22 +195,22 @@ public class CSSProcessor
 			switch(parseReader.peekExpectedStrings(EXPECTED_STYLESHEET_STRINGS))	//see what we have next in the stylesheet
 			{
 				case MEDIA_RULE:	//if this is a media rule
-//G***del Debug.trace("found media rule");
+//G***del Log.trace("found media rule");
 				  parseReader.readStringUntilChar('}');  //G***fix parsing media rules
 					parseReader.readExpectedChar('}'); //G***fix parsing media rules
 					break;	//G***fix
 				case PAGE_RULE:	//if this is a page rule
-//G***del Debug.trace("Found page rule"); //G***del
+//G***del Log.trace("Found page rule"); //G***del
 				  parseReader.readStringUntilChar('}');  //G***fix parsing page rules
 					parseReader.readExpectedChar('}'); //G***fix parsing page rules
 					break;	//G***fix
 				case FONT_FACE_RULE:	//if this is a font face rule
-//G***del Debug.trace("found font face");
+//G***del Log.trace("found font face");
 				  parseReader.readStringUntilChar('}');  //G***fix parsing font-face rules
 					parseReader.readExpectedChar('}'); //G***fix parsing font-face rules
 					break;	//G***fix
 				case UNKNOWN_AT_RULE:	//if this is an at-rule we don't know about
-//G***del Debug.trace("found unknown at rule");
+//G***del Log.trace("found unknown at rule");
 				  parseReader.readStringUntilChar('}');  //G***fix parsing at rules
 					parseReader.readExpectedChar('}'); //G***fix parsing at rules
 					break;	//G***fix

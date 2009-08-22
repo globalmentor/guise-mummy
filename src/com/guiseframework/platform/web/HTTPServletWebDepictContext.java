@@ -26,6 +26,7 @@ import static java.util.Collections.*;
 import javax.servlet.http.HttpServletResponse;
 
 import com.globalmentor.io.ParseReader;
+import com.globalmentor.log.Log;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.net.http.HTTPServlets;
@@ -164,7 +165,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 				final InputStream inputStream=getSession().getApplication().getInputStream(styleURI);	//get an input stream to the stylesheet
 				if(inputStream!=null)	//if this stylesheet exists, load it; otherwise, just stick with the empty list of IE6 fix classes so that we won't try to load the stylesheet again 
 				{
-	//TODO del Debug.trace("got input stream to:", styleURI);
+	//TODO del Log.trace("got input stream to:", styleURI);
 					final ParseReader cssReader=new ParseReader(new InputStreamReader(inputStream, UTF_8));
 					try
 					{
@@ -174,7 +175,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 	/*TODO del
 	for(final GuiseCSSProcessor.IE6FixClass ie6FixClass:cssProcessor.getIE6FixClasses())	//TODO del; testing
 	{
-		Debug.trace("for stylesheet", styleURI, "got IE6 fix class", ie6FixClass.getFixClass());
+		Log.trace("for stylesheet", styleURI, "got IE6 fix class", ie6FixClass.getFixClass());
 	}
 	*/
 						ie6FixClasses.addAll(cssProcessor.getIE6FixClasses());	//add all these IE6 fix classes to our list
@@ -187,7 +188,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 			}
 			catch(final IOException ioException)	//if there is an error loading the stylesheet, stick with an empty list of IE6 fix classes
 			{
-				Debug.warn(ioException);	//TODO use a Guise warn method eventually
+				Log.warn(ioException);	//TODO use a Guise warn method eventually
 			}
 			styleIE6FixClassesReferenceMap.put(styleURI, new SoftReference<List<IE6FixClass>>(ie6FixClasses));	//cache a soft reference to this list for next time
 		}
@@ -210,7 +211,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 		{
 			if(XHTML_NAMESPACE_URI.toString().equals(elementQualifiedName.getNamespaceURI()) && attributeQualifiedName.getNamespaceURI()==null && ATTRIBUTE_CLASS.equals(attributeQualifiedName.getLocalName()))	//if this is an XHTML class attribute
 			{
-				//TODO del Debug.trace("ready to fix classes:", attributeValue);
+				//TODO del Log.trace("ready to fix classes:", attributeValue);
 				final Set<String> newClasses=new HashSet<String>();	//we'll collect new classes to add; use a set to keep from getting duplicates of fixed class names (multiple selectors may match the same class that needs fixed)
 				final String[] classNames=attributeValue.split("\\s");	//split out the class names
 				for(final URI styleURI:getStyles())	//for each stylesheet
@@ -219,7 +220,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 					for(final IE6FixClass ie6FixClass:ie6FixClasses)	//look at each IE6 fix classes
 					{
 						final List<SimpleSelector> simpleSelectorSequence=ie6FixClass.getSimpleSelectorSequence();	//get this simple selector sequence
-//					TODO del Debug.trace("looking at IE6 fix class", ie6FixClass.getFixClass(), "with simple selector count", simpleSelectorSequence.size());
+//					TODO del Log.trace("looking at IE6 fix class", ie6FixClass.getFixClass(), "with simple selector count", simpleSelectorSequence.size());
 						final TypeSelector typeSelector=simpleSelectorSequence.size()>0 ? asInstance(simpleSelectorSequence.get(0), TypeSelector.class) : null;	//get the first simple selector if it is a type selector
 						if(typeSelector==null || typeSelector.getTypeName().equals(elementQualifiedName.getLocalName()))	//make sure the type selector matches the element name
 						{
@@ -230,7 +231,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 								{
 									if(simpleSelector instanceof ClassSelector)	//if this is a class selector
 									{
-//									TODO del Debug.trace("looking at class selector:", ((ClassSelector)simpleSelector).getClassName());
+//									TODO del Log.trace("looking at class selector:", ((ClassSelector)simpleSelector).getClassName());
 										if(!contains(classNames, ((ClassSelector)simpleSelector).getClassName()))	//if this class name is not contained in the list TODO switch to a hash set to make this more efficient
 										{
 											classesMatch=false;	//all the classes don't match; don't bother fixing things up
@@ -241,7 +242,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 							}
 							if(classesMatch)	//if all the classes selectors match
 							{
-//							TODO del Debug.trace("adding fix class:", ie6FixClass.getFixClass());
+//							TODO del Log.trace("adding fix class:", ie6FixClass.getFixClass());
 								newClasses.add(ie6FixClass.getFixClass());	//add the fix class to the class names
 							}
 						}
@@ -251,7 +252,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 				{
 					addAll(newClasses, classNames);	//add the normal class names to our new classes list
 					attributeValue=formatList(new StringBuilder(), ' ', newClasses).toString();	//combine the classes back into one class string
-//TODO del Debug.trace("new attribute value:", attributeValue);
+//TODO del Log.trace("new attribute value:", attributeValue);
 				}
 			}
 		}

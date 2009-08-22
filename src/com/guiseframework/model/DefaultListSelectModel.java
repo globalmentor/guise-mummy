@@ -1009,7 +1009,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 		}
 		catch(final ValidationException validationException)
 		{
-			Debug.warn(validationException);	//TODO improve error handling
+			Log.warn(validationException);	//TODO improve error handling
 		}
 */
 		fireListModified(index, addedElement, removedElement);	//fire an event indicating that the list changed

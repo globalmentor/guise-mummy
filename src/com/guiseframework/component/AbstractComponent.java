@@ -301,7 +301,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		{
 			if(valid==null)	//if valid is not yet initialized TODO eliminate race condition
 			{
-//TODO del Debug.traceStack("ready to call determineValid() for the first time from inside isValid()");
+//TODO del Log.traceStack("ready to call determineValid() for the first time from inside isValid()");
 				valid=Boolean.TRUE;	//initialize valid to an arbitrary value so that if determineValid() calls isValid() there won't be inifinite recursion
 				valid=Boolean.valueOf(determineValid());	//determine validity
 			}
@@ -313,7 +313,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		{
 			if(VALID_PROPERTY.equals(propertyName))
 			{
-				Debug.traceStack("we have a new validity listener:", listener);
+				Log.traceStack("we have a new validity listener:", listener);
 			}
 			super.addPropertyChangeListener(propertyName, listener);
 		}
@@ -347,14 +347,14 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 /*TODO del
 if(valid==null)
 {
-	Debug.traceStack("ready to call determineValid() for the first time from inside updateValid()");	
+	Log.traceStack("ready to call determineValid() for the first time from inside updateValid()");	
 }
 */
 /*TODO del
 				final boolean newValid=determineValid();
-Debug.trace("ready to set valid in", this, "to", newValid);
+Log.trace("ready to set valid in", this, "to", newValid);
 				setValid(newValid);	//update the vailidity after rechecking it
-Debug.trace("now valid of", this, "is", isValid());
+Log.trace("now valid of", this, "is", isValid());
 */
 				setValid(determineValid());	//update the vailidity after rechecking it
 			}
@@ -838,26 +838,26 @@ Debug.trace("now valid of", this, "is", isValid());
 	*/
 	public void dispatchInputEvent(final InputEvent inputEvent)
 	{
-//Debug.trace("in component", this, "ready to do default dispatching of input event", inputEvent);		
+//Log.trace("in component", this, "ready to do default dispatching of input event", inputEvent);		
 		if(!inputEvent.isConsumed())	//if the input has not been consumed
 		{
-//Debug.trace("event is not consumed; ready to fire it to listeners");
+//Log.trace("event is not consumed; ready to fire it to listeners");
 			fireInputEvent(inputEvent);	//fire the event to any listeners
-//Debug.trace("firing finised");
+//Log.trace("firing finised");
 			if(!inputEvent.isConsumed())	//if the input has still not been consumed
 			{
-//Debug.trace("event is not still not consumed; checking input strategy");
+//Log.trace("event is not still not consumed; checking input strategy");
 				final InputStrategy inputStrategy=getInputStrategy();	//get our input strategy, if any
 				if(inputStrategy!=null)	//if we have an input strategy
 				{
-//Debug.trace("got input strategy");
+//Log.trace("got input strategy");
 					final Input input=inputEvent.getInput();	//get the event's input, if any
 					if(input!=null)	//if the event has input
 					{
-//Debug.trace("got input for this event:", input);
+//Log.trace("got input for this event:", input);
 						if(inputStrategy.input(input))	//send the input to the input strategy; if the input was consumed
 						{
-//Debug.trace("our input strategy consumed the input");
+//Log.trace("our input strategy consumed the input");
 							inputEvent.consume();	//mark the event as consumed
 						}
 					}
@@ -1061,7 +1061,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		if(preferencePropertyIterator.hasNext())	//if there are preference properties
 		{
 			final URFResource preferences=getSession().getPreferences(getClass());	//get existing preferences for this class
-//TODO del Debug.traceStack("ready to load preferences; view:", ((ResourceChildrenPanel)this).getView(), "thumbnail size:", ((ResourceChildrenPanel)this).getThumbnailSize(), "preferences", RDFUtilities.toString(preferences));
+//TODO del Log.traceStack("ready to load preferences; view:", ((ResourceChildrenPanel)this).getView(), "thumbnail size:", ((ResourceChildrenPanel)this).getThumbnailSize(), "preferences", RDFUtilities.toString(preferences));
 			final PLOOPURFProcessor ploopProcessor=new PLOOPURFProcessor();	//create a new PLOOP processor for retrieving the properties
 			do	//for each property
 			{
@@ -1080,7 +1080,7 @@ Debug.trace("now valid of", this, "is", isValid());
 				}
 			}
 			while(preferencePropertyIterator.hasNext());	//keep saving properties while there are more preference properties
-//Debug.trace("loaded preferences; view:", ((ResourceChildrenPanel)this).getView(), "thumbnail size:", ((ResourceChildrenPanel)this).getThumbnailSize());
+//Log.trace("loaded preferences; view:", ((ResourceChildrenPanel)this).getView(), "thumbnail size:", ((ResourceChildrenPanel)this).getThumbnailSize());
 		}
 	}
 
@@ -1091,7 +1091,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	*/
 	public void savePreferences(final boolean includeDescendants) throws IOException
 	{
-//Debug.trace("ready to save preferences for component", this, "have preference properties", preferenceProperties);
+//Log.trace("ready to save preferences for component", this, "have preference properties", preferenceProperties);
 		final Iterator<String> preferencePropertyIterator=getPreferenceProperties().iterator();	//get an iterator to all preferences properties
 		if(preferencePropertyIterator.hasNext())	//if there are preference properties
 		{
@@ -1112,7 +1112,7 @@ Debug.trace("now valid of", this, "is", isValid());
 				}
 			}
 			while(preferencePropertyIterator.hasNext());	//keep saving properties while there are more preference properties
-//Debug.trace("ready to save preferences; view:", ((ResourceChildrenPanel)this).getView(), "thumbnail size:", ((ResourceChildrenPanel)this).getThumbnailSize(), "preferences", URF.toString(preferences));
+//Log.trace("ready to save preferences; view:", ((ResourceChildrenPanel)this).getView(), "thumbnail size:", ((ResourceChildrenPanel)this).getThumbnailSize(), "preferences", URF.toString(preferences));
 			session.setPreferences(componentClass, preferences);	//set the new preferences
 		}
 	}
@@ -1630,25 +1630,25 @@ Debug.trace("now valid of", this, "is", isValid());
 		public void mouseEntered(final MouseEnterEvent mouseEvent)
 		{
 /*TODO del when works
-Debug.trace("source bounds:", mouseEvent.getSourceBounds());
+Log.trace("source bounds:", mouseEvent.getSourceBounds());
 			final Dimensions sourceSize=mouseEvent.getSourceBounds().getSize();	//get the size of the source
 			final Point sourceCenter=mouseEvent.getSourceBounds().getPosition().translate(sourceSize.getWidth().getValue()/2, sourceSize.getHeight().getValue()/2);	//determine the center of the source
-Debug.trace("source center:", sourceCenter);
-Debug.trace("viewport bounds:", mouseEvent.getViewportBounds());
+Log.trace("source center:", sourceCenter);
+Log.trace("viewport bounds:", mouseEvent.getViewportBounds());
 			final Point viewportPosition=mouseEvent.getViewportBounds().getPosition();	//get the position of the viewport
 			final Dimensions viewportSize=mouseEvent.getViewportBounds().getSize();	//get the size of the viewport
 			final Point viewportSourceCenter=sourceCenter.translate(-viewportPosition.getX().getValue(), -viewportPosition.getY().getValue());	//translate the source center into the viewport
-Debug.trace("viewport source center:", viewportSourceCenter);
+Log.trace("viewport source center:", viewportSourceCenter);
 */
 			final Rectangle viewportBounds=mouseEvent.getViewportBounds();	//get the bounds of the viewport
-//TODO del Debug.trace("viewport bounds:", viewportBounds);
-//TODO del Debug.trace("source bounds:", mouseEvent.getSourceBounds());
+//TODO del Log.trace("viewport bounds:", viewportBounds);
+//TODO del Log.trace("source bounds:", mouseEvent.getSourceBounds());
 			final Dimensions viewportSize=viewportBounds.getSize();	//get the size of the viewport
 			final Point mousePosition=mouseEvent.getMousePosition();	//get the mouse position
-//TODO del Debug.trace("mouse position:", mousePosition);
+//TODO del Log.trace("mouse position:", mousePosition);
 				//get the mouse position inside the traditional coordinate space with the origin at the center of the viewport
 			final Point traditionalMousePosition=new Point(mousePosition.getX().getValue()-(viewportSize.getWidth().getValue()/2), -(mousePosition.getY().getValue()-(viewportSize.getHeight().getValue()/2)));
-//TODO del Debug.trace("traditional mouse position:", traditionalMousePosition);
+//TODO del Log.trace("traditional mouse position:", traditionalMousePosition);
 				//get the angle of the point from the y axis in the range of (-PI, PI)
 			final double atan2=Math.atan2(traditionalMousePosition.getX().getValue(), traditionalMousePosition.getY().getValue());
 			final double normalizedAtan2=atan2>=0 ? atan2 : (Math.PI*2)+atan2;	//normalize the angle to the range (0, 2PI) 
@@ -1696,7 +1696,7 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 		{
 			if(flyoverFrame==null)	//if no flyover frame has been created
 			{
-//TODO del Debug.trace("no frame; created");
+//TODO del Log.trace("no frame; created");
 				flyoverFrame=createFrame();	//create a new frame
 				final String styleID=getStyleID();	//get the styld ID
 				if(styleID!=null)	//if there is a style ID

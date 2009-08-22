@@ -507,7 +507,7 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	/**Implementation of frame closing.*/
 	protected void closeImpl()
 	{
-//TODO del Debug.trace("ready to remove frame");
+//TODO del Log.trace("ready to remove frame");
 		final ApplicationFrame applicationFrame=getSession().getApplicationFrame();	//get the application frame
 		if(this!=applicationFrame)	//if this is not the application frame
 		{

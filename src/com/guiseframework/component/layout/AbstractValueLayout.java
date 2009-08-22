@@ -21,7 +21,7 @@ import static java.text.MessageFormat.*;
 import java.beans.*;
 
 import com.globalmentor.java.Objects;
-import com.globalmentor.util.Debug;
+
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.*;

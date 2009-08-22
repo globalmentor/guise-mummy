@@ -18,12 +18,10 @@ package com.guiseframework.component.urf;
 
 import java.net.URI;
 
-
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.urf.URF.*;
-
 import com.globalmentor.urf.*;
-import com.globalmentor.util.Debug;
+
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;
 import com.guiseframework.model.urf.URFResourceDynamicTreeNodeModel;

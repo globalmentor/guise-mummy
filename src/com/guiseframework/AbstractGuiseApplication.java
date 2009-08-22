@@ -348,7 +348,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 				{
 					if(!tempFile.delete())	//delete the temporary file; if the file could not be deleted
 					{
-						Debug.warn("Could not delete temporary file "+tempFile+" associated with Guise session "+guiseSession);
+						Log.warn("Could not delete temporary file "+tempFile+" associated with Guise session "+guiseSession);
 					}
 				}
 			}
@@ -597,7 +597,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		}
 		else	//if there are no mail properties
 		{
-			Debug.warn("Mail properties not configured.");	//warn that mail isn't configured
+			Log.warn("Mail properties not configured.");	//warn that mail isn't configured
 		}
 	}
 
@@ -629,7 +629,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 				}
 				catch(final IOException ioException)	//if there is an error closing the writer
 				{
-					Debug.warn(ioException);	//log the warning and continue
+					Log.warn(ioException);	//log the warning and continue
 				}
 			}
 			baseNameLogWriterInfoMap.clear();	//remove all log writer information
@@ -1040,26 +1040,26 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			return getResourceInputStream(uri.get)
 		}
 */
-//TODO del Debug.trace("getting input stream to URI", uri);
+//TODO del Log.trace("getting input stream to URI", uri);
 		final GuiseContainer container=getContainer();	//get the container
 		final URI resolvedURI=resolveURI(uri);	//resolve the URI to the application
-//TODO del Debug.trace("resolved URI:", resolvedURI);
+//TODO del Log.trace("resolved URI:", resolvedURI);
 		final URI absoluteResolvedURI=container.getBaseURI().resolve(resolvedURI);	//resolve the URI against the container base URI
-//TODO del Debug.trace("absolute resolved URI:", absoluteResolvedURI);
+//TODO del Log.trace("absolute resolved URI:", absoluteResolvedURI);
 			//check for Guise public resources
 		final URI publicResourcesBaseURI=container.getBaseURI().resolve(getBasePath().resolve(GUISE_ASSETS_BASE_PATH).toURI());	//get the base URI of Guise public resources
-//	TODO del Debug.trace("publicResourcesBaseURI:", publicResourcesBaseURI);
+//	TODO del Log.trace("publicResourcesBaseURI:", publicResourcesBaseURI);
 		final URI publicResourceRelativeURI=publicResourcesBaseURI.relativize(absoluteResolvedURI);	//see if the absolute URI is in the application public path
-//	TODO del Debug.trace("resourceURI:", resourceURI);		
+//	TODO del Log.trace("resourceURI:", resourceURI);		
 		if(!publicResourceRelativeURI.isAbsolute())	//if the URI is relative to the application's public resources
 		{
 			return Guise.getInstance().getAssetInputStream(GUISE_ASSETS_BASE_KEY+publicResourceRelativeURI.getPath());	//return an input stream to the resource directly, rather than going through the server
 		}
 			//check for Guise public temp resources
 		final URI publicTempBaseURI=container.getBaseURI().resolve(getBasePath().resolve(GUISE_ASSETS_TEMP_BASE_PATH).toURI());	//get the base URI of Guise public temporary resources
-//	TODO del Debug.trace("publicResourcesBaseURI:", publicResourcesBaseURI);
+//	TODO del Log.trace("publicResourcesBaseURI:", publicResourcesBaseURI);
 		final URI publicTempRelativeURI=publicTempBaseURI.relativize(absoluteResolvedURI);	//see if the absolute URI is in the application public temporary path
-//	TODO del Debug.trace("resourceURI:", resourceURI);		
+//	TODO del Log.trace("resourceURI:", resourceURI);		
 		if(!publicTempRelativeURI.isAbsolute())	//if the URI is relative to the application's public temp resources
 		{
 			final String filename=publicTempRelativeURI.getRawPath();	//get the filename of the temp file
@@ -1147,16 +1147,16 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	*/
 	public OutputStream getOutputStream(final URI uri) throws IOException
 	{
-//TODO del Debug.trace("getting input stream to URI", uri);
+//TODO del Log.trace("getting input stream to URI", uri);
 		final GuiseContainer container=getContainer();	//get the container
 		final URI resolvedURI=resolveURI(uri);	//resolve the URI to the application
-//	TODO del Debug.trace("resolved URI:", resolvedURI);
+//	TODO del Log.trace("resolved URI:", resolvedURI);
 		final URI absoluteResolvedURI=container.getBaseURI().resolve(resolvedURI);	//resolve the URI against the container base URI
-//	TODO del Debug.trace("absolute resolved URI:", absoluteResolvedURI);
+//	TODO del Log.trace("absolute resolved URI:", absoluteResolvedURI);
 		final URI publicTempBaseURI=container.getBaseURI().resolve(getBasePath().resolve(GUISE_ASSETS_TEMP_BASE_PATH).toURI());	//get the base URI of the Guise temp resources
-//	TODO del Debug.trace("publicResourcesBaseURI:", publicResourcesBaseURI);
+//	TODO del Log.trace("publicResourcesBaseURI:", publicResourcesBaseURI);
 		final URI publicTempRelativeURI=publicTempBaseURI.relativize(absoluteResolvedURI);	//see if the absolute URI is in the application public path
-//	TODO del Debug.trace("resourceURI:", resourceURI);		
+//	TODO del Log.trace("resourceURI:", resourceURI);		
 		if(!publicTempRelativeURI.isAbsolute())	//if the URI is relative to the application's temp resources
 		{
 			final String filename=publicTempRelativeURI.getRawPath();	//get the filename of the temp file
@@ -1346,7 +1346,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		resourceBundle=loadResourceBundle(theme, locale, resourceBundle);	//load any resources for this theme and resolving parents
 			//application resources
 		final String resourceBundleBaseName=getResourceBundleBaseName();	//get the specified resource bundle base name
-//TODO del Debug.trace("ready to load application resources; resource bundle base name:", resourceBundleBaseName);
+//TODO del Log.trace("ready to load application resources; resource bundle base name:", resourceBundleBaseName);
 		if(resourceBundleBaseName!=null && !resourceBundleBaseName.equals(DEFAULT_RESOURCE_BUNDLE_BASE_NAME))	//if a distinct resource bundle base name was specified
 		{
 			resourceBundle=ResourceBundles.getResourceBundle(resourceBundleBaseName, locale, loader, resourceBundle, resourcesIO, null, null);	//load the new resource bundle, specifying the current resource bundle as the parent					

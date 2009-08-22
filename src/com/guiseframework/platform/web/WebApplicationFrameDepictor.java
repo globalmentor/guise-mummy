@@ -209,7 +209,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			//<xhtml:link> styles in this order: theme styles (from most distant parent to current theme), application style, destination style
 		for(final URI styleURI:depictContext.getStyles())	//for each style URI
 		{
-//TODO del Debug.trace("looking at style URI", styleURI);
+//TODO del Log.trace("looking at style URI", styleURI);
 			depictContext.write('\t');
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_LINK);	//<xhtml:link>
 			depictContext.writeAttribute(null, ELEMENT_LINK_ATTRIBUTE_REL, LINK_REL_STYLESHEET);	//rel="stylesheet"

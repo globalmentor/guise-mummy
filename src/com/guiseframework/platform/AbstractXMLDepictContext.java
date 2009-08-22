@@ -298,14 +298,14 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 			//set the content type
 		if(contentType!=null)	//if a content type is specified
 		{
-//TODO del Debug.trace("content type specified: ", contentType);
+//TODO del Log.trace("content type specified: ", contentType);
 			if(contentType.match(XHTML_CONTENT_TYPE))	//if the preferred content type is "application/xhtml+xml"
 			{
 					//if the client doesn't accept "application/xhtml+xml" exactly
 				if(!getPlatform().getClientProduct().isAcceptedContentType(XHTML_CONTENT_TYPE, false))
 				{
 					contentType=HTML_CONTENT_TYPE;	//step down to "text/html"
-//TODO del Debug.trace("stepping down to: ", contentType);
+//TODO del Log.trace("stepping down to: ", contentType);
 				}
 			}
 			setOutputContentType(contentType);	//set the content type of the response

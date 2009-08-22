@@ -20,7 +20,7 @@ import java.beans.PropertyVetoException;
 
 import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
 import com.globalmentor.beans.GenericPropertyChangeEvent;
-import com.globalmentor.util.Debug;
+
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.CardLayout;
@@ -78,7 +78,7 @@ public abstract class AbstractCardPanel extends AbstractListSelectContainerContr
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<Component> propertyChangeEvent)	//if the value changes
 					{
-//TODO del Debug.trace("value changed to ", propertyChangeEvent.getNewValue(), "and ready to update bookmark");
+//TODO del Log.trace("value changed to ", propertyChangeEvent.getNewValue(), "and ready to update bookmark");
 						updateBookmark();	//update the bookmark, now that the property has changed
 					}
 				});
@@ -89,7 +89,7 @@ public abstract class AbstractCardPanel extends AbstractListSelectContainerContr
 	*/
 	protected void updateBookmark()
 	{
-//TODO del Debug.trace("ready to update bookmarks, bookmarks enabled", isBookmarkEnabled(), "name", getName());
+//TODO del Log.trace("ready to update bookmarks, bookmarks enabled", isBookmarkEnabled(), "name", getName());
 		if(isBookmarkEnabled())	//if bookmarks are enabled
 		{
 			final String name=getName();	//get the component name
@@ -109,7 +109,7 @@ public abstract class AbstractCardPanel extends AbstractListSelectContainerContr
 				{
 					newBookmark=bookmark.removeParameter(name);	//remove the parameter altogether
 				}
-//TODO del Debug.trace("ready to set new bookmark:", newBookmark);
+//TODO del Log.trace("ready to set new bookmark:", newBookmark);
 				session.setBookmark(newBookmark);	//update the bookmark
 			}
 		}		
@@ -126,9 +126,9 @@ public abstract class AbstractCardPanel extends AbstractListSelectContainerContr
 		if(isBookmarkEnabled())	//if bookmarks are enabled
 		{
 			final Bookmark bookmark=navigationEvent.getBookmark();	//get the navigation bookmark, if any
-//TODO del Debug.trace("card panel ready to change to bookmark:", bookmark, "old component", getValue(), "old index", getSelectedIndex());
+//TODO del Log.trace("card panel ready to change to bookmark:", bookmark, "old component", getValue(), "old index", getSelectedIndex());
 			final Component component=getComponent(bookmark);	//get the component from the bookmark
-//TODO del Debug.trace("new component:", component, "new index", indexOf(component));
+//TODO del Log.trace("new component:", component, "new index", indexOf(component));
 			if(component!=null && isEnabled(component) && isDisplayed(component))	//if an enabled, displayed component is specified
 			{
 				try
@@ -202,7 +202,7 @@ public abstract class AbstractCardPanel extends AbstractListSelectContainerContr
 				}
 			}
 		}
-//TODO del Debug.trace("keeping component we already have");
+//TODO del Log.trace("keeping component we already have");
 		return getValue();	//if no bookmark was specified for this component, keep the same component we current have
 	}
 

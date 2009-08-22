@@ -19,14 +19,11 @@ package com.guiseframework.component;
 import java.util.*;
 import java.util.concurrent.*;
 
-
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
-
-
 import com.globalmentor.beans.*;
 import com.globalmentor.event.TargetedEvent;
-import com.globalmentor.util.Debug;
+
 import com.guiseframework.component.transfer.*;
 import com.guiseframework.converter.*;
 import com.guiseframework.event.*;
@@ -546,12 +543,12 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		*/
 		public void actionPerformed(final ActionEvent actionEvent)
 		{
-//TODO del Debug.trace("received action from source", actionEvent.getSource(), "for target", actionEvent.getTarget(), "with force", actionEvent.getForce(), "and option", actionEvent.getOption());
+//TODO del Log.trace("received action from source", actionEvent.getSource(), "for target", actionEvent.getTarget(), "with force", actionEvent.getForce(), "and option", actionEvent.getOption());
 			final Object target=actionEvent.getTarget();	//get the event target
 			if(target instanceof TreeNodeModel)	//if this action was on a tree node
 			{
 				final TreeNodeModel<?> treeNode=(TreeNodeModel<?>)target;	//get the tree node
-//Debug.trace("selecting tree node", treeNode);
+//Log.trace("selecting tree node", treeNode);
 				treeNode.setSelected(true);	//select the tree node
 /*TODO fix
 				final Component component=getComponent(treeNode);	//TODO testing
@@ -568,10 +565,10 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 				{
 					final Interaction interaction=(Interaction)value;	//get the specified interaction
 					final TreeNodeModel<?> parentTreeNode=treeNode.getParent();	//get the parent tree node
-//TODO del Debug.trace("ready to edit; is there a parent?", parentTreeNode);
+//TODO del Log.trace("ready to edit; is there a parent?", parentTreeNode);
 					final Interaction contextInteraction=asInstance(parentTreeNode!=null ? parentTreeNode.getValue() : null, Interaction.class);	//get the parent's value, if any, which will be the context interaction
 //TODO del					final Question contextQuestion=asInstance(parentTreeNode!=null ? parentTreeNode.getValue() : null, Question.class);	//get the parent's value, if any, which will be the context question
-//TODO del Debug.trace("is there a context question?", contextQuestion);
+//TODO del Log.trace("is there a context question?", contextQuestion);
 					final FollowupEvaluation followupEvaluation=treeNode instanceof AbstractInteractionTreeNodeModel ? ((AbstractInteractionTreeNodeModel<?>)treeNode).getFollowupEvaluation() : null;	//get the followup evaluation, if any
 					switch(actionEvent.getOption())	//see which option was requested
 					{

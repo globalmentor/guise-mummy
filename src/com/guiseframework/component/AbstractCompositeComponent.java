@@ -23,9 +23,10 @@ import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.event.TargetedEvent;
-import com.globalmentor.util.Debug;
+
 import com.guiseframework.event.*;
 import com.guiseframework.input.*;
+import com.globalmentor.log.Log;
 import com.guiseframework.model.InfoModel;
 
 /**An abstract implementation of a composite component.
@@ -143,7 +144,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 		}
 		catch(final IOException ioException)	//if there was an error loading preferences
 		{
-			Debug.warn(ioException);	//log a warning			
+			Log.warn(ioException);	//log a warning			
 		}
 		childComponent.addPropertyChangeListener(DISPLAYED_PROPERTY, getDisplayVisibleChangeListener());	//listen for changes in the component's displayed status and update this component's valid status in response
 		childComponent.addPropertyChangeListener(VALID_PROPERTY, getValidChangeListener());	//listen for changes in the component's valid status and update this component's valid status in response
@@ -172,7 +173,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 		}
 		catch(final IOException ioException)	//if there was an error saving preferences
 		{
-			Debug.warn(ioException);	//log a warning			
+			Log.warn(ioException);	//log a warning			
 		}
 		childComponent.removePropertyChangeListener(DISPLAYED_PROPERTY, getDisplayVisibleChangeListener());	//stop listening for changes in the component's displayed status
 		childComponent.removePropertyChangeListener(VALID_PROPERTY, getValidChangeListener());	//stop listening for changes in the component's valid status
@@ -266,17 +267,17 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	*/ 
 	protected boolean determineChildrenValid()
 	{
-//TODO fix Debug.trace("ready to determine children valid in", this);
+//TODO fix Log.trace("ready to determine children valid in", this);
 		for(final Component childComponent:getChildComponents())	//for each child component
 		{
-//TODO del Debug.trace("in", this, "child", childComponent, "is valid", childComponent.isValid());			
+//TODO del Log.trace("in", this, "child", childComponent, "is valid", childComponent.isValid());			
 			if(childComponent.isDisplayed() && childComponent.isVisible() && !childComponent.isValid())	//if this child component is displayed and visible, but not valid
 			{
-//TODO del Debug.trace("in", this, "found non-valid child", childComponent);
+//TODO del Log.trace("in", this, "found non-valid child", childComponent);
 				return false;	//the composite component should not be considered valid
 			}
 		}
-//	TODO fix Debug.trace("in", this, "child", "all children are valid");
+//	TODO fix Log.trace("in", this, "child", "all children are valid");
 		return true;	//all children are valid
 	}
 
@@ -289,7 +290,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	{
 		validateChildren();	//validate all children
 		super.validate();	//validate the component normally
-//TODO del Debug.trace("in panel", this, "ready to return", isValid(), "for isValid()");
+//TODO del Log.trace("in panel", this, "ready to return", isValid(), "for isValid()");
 		return isValid();	//return the current valid state
 	}
 
@@ -402,25 +403,25 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	*/
 	public void dispatchInputEvent(final InputEvent inputEvent)
 	{
-//Debug.trace("in composite component", this, "ready to do default dispatching of input event", inputEvent);
+//Log.trace("in composite component", this, "ready to do default dispatching of input event", inputEvent);
 		if(!inputEvent.isConsumed())	//if the input has not been consumed
 		{
 			if(inputEvent instanceof FocusedInputEvent)	//if this is a focused input event, the target will be the focused child of the focus group ancestor of this component (or this component, if this component is a focused group)
 			{
-//Debug.trace("this is a focused event");
+//Log.trace("this is a focused event");
 				Component component=this;	//start with this component
 				do
 				{
 					if(component instanceof InputFocusGroupComponent)	//if we found a focus group
 					{
-//Debug.trace("component", component, "is the focus group");
+//Log.trace("component", component, "is the focus group");
 						final InputFocusGroupComponent focusGroup=(InputFocusGroupComponent)component;	//get the focus group
 						final InputFocusableComponent focusedComponent=focusGroup.getInputFocusedComponent();	//get the focused component
 						if(focusedComponent!=null)	//if there is a focused component
 						{
-//Debug.trace("ready to dispatch to focused component", focusedComponent);
+//Log.trace("ready to dispatch to focused component", focusedComponent);
 							dispatchInputEvent(inputEvent, focusedComponent);	//dispatch the event to the focused component
-//Debug.trace("done dispatching to focused component", focusedComponent);
+//Log.trace("done dispatching to focused component", focusedComponent);
 						}
 						break;
 					}
@@ -433,7 +434,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 			}
 			else if(inputEvent instanceof TargetedEvent)	//if this is a targeted event
 			{
-//Debug.trace("this is a targeted event");
+//Log.trace("this is a targeted event");
 				final Object targetObject=((TargetedEvent)inputEvent).getTarget();	//get the event target
 				if(targetObject instanceof Component)	//if the target is a component other than any focus target we might have used earlier
 				{
@@ -442,7 +443,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 			}
 			else	//if this wasn't a focused or targeted event, dispatch the event to all child components
 			{
-//Debug.trace("this is an unconsumed non-targeted event; ready to send to children");
+//Log.trace("this is an unconsumed non-targeted event; ready to send to children");
 				for(final Component childComponent:getChildComponents())	//for each child component
 				{
 					if(inputEvent.isConsumed())	//if the event has been consumed
@@ -451,11 +452,11 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 					}
 					childComponent.dispatchInputEvent(inputEvent);	//dispatch the event to this child components
 				}				
-//Debug.trace("finishing sending event to children");
+//Log.trace("finishing sending event to children");
 			}
 			if(!inputEvent.isConsumed())	//if the event has not been consumed
 			{
-//Debug.trace("event still not consumed, ready to do default dispatching");
+//Log.trace("event still not consumed, ready to do default dispatching");
 				super.dispatchInputEvent(inputEvent);	//do the default dispatching
 			}	
 		}

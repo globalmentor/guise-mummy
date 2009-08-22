@@ -110,7 +110,7 @@ public abstract class DynamicTreeNodeModel<V> extends DefaultTreeNodeModel<V>	//
 /*TODO del if not needed
 	protected synchronized void ensureChildrenDetermined()
 	{
-//TODO del Debug.trace("ensuring child nodes loaded for resource", getValue(), "isChildNodesLoaded()", isChildNodesLoaded());
+//TODO del Log.trace("ensuring child nodes loaded for resource", getValue(), "isChildNodesLoaded()", isChildNodesLoaded());
 		if(!isChildNodesLoaded()) //if the children are not yet loaded
 		{
 			childNodesLoaded=true;  //show that we've loaded the child nodes (this is done before the actual loading so that future calls to getChildCount() won't cause reloading)

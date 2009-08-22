@@ -21,10 +21,8 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.List;
 
-
 import com.globalmentor.beans.*;
 import com.globalmentor.model.TaskState;
-import com.globalmentor.util.Debug;
 import com.guiseframework.Bookmark;
 
 import static com.globalmentor.java.Classes.*;
@@ -489,7 +487,7 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 	*/
 	public void goNext()
 	{
-//TODO del Debug.trace("ready to go next");
+//TODO del Log.trace("ready to go next");
 		final SequenceTransition oldTransition=transition;	//save the current transition
 		transition=SequenceTransition.NEXT;	//indicate the current transition
 		try
@@ -499,14 +497,14 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 			{
 				if(isTransitionEnabled())	//if transitions are enabled
 				{
-//				TODO del Debug.trace("got next card; ready to get selected card");
+//				TODO del Log.trace("got next card; ready to get selected card");
 					final Component selectedCard=getSelectedValue();	//get the selected card
-//TODO del Debug.trace("got next card", nextCard, "selected card", selectedCard);
+//TODO del Log.trace("got next card", nextCard, "selected card", selectedCard);
 					assert selectedCard!=null : "No card selected, even though getNext() should have returned null if no card is selected.";
-//				TODO del Debug.trace("ready to validate selected card");
+//				TODO del Log.trace("ready to validate selected card");
 					if(validate())	//validate this panel; if everything, including the selected card, is valid
 					{
-	//				TODO del Debug.trace("card validated");
+	//				TODO del Log.trace("card validated");
 							//show any notifications, anyway
 						final List<Notification> notifications=getNotifications(selectedCard);	//get the notifications from the card
 						final Runnable valueSetter=new Runnable()	//create code for notifying, committing the card and advancing to the next card
@@ -519,7 +517,7 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 										}
 										catch(final PropertyVetoException propertyVetoException)	//if the change is vetoed, don't do anything special
 										{
-//										TODO del Debug.warn(propertyVetoException);
+//										TODO del Log.warn(propertyVetoException);
 										}
 										finally
 										{
@@ -527,7 +525,7 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 										}
 									}
 								};
-	//						TODO del Debug.trace("ready to do notify/commit/advance");
+	//						TODO del Log.trace("ready to do notify/commit/advance");
 						final int notificationCount=notifications.size();	//see how many notifications there are
 						if(notificationCount>0)	//if there is at least one notification
 						{
@@ -783,16 +781,16 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 		{
 			if(isTransitionEnabled() && genericPropertyChangeEvent.getNewValue()!=getValue())	//if transitions are enabled and the index is really changing (the VetoableChangeListener contract says that if a change is vetoed this method will be called again with a reverse change, and we don't want to validate in those circumstances)
 			{
-	//		TODO del Debug.trace("validating vetoable change");
+	//		TODO del Log.trace("validating vetoable change");
 				final Component currentCard=genericPropertyChangeEvent.getOldValue();	//get the currently selected card
 				if(currentCard!=null)	//if there is a selected card, do validation if we need to
 				{
 					final int selectedIndex=indexOf(currentCard);	//get the index of the selected card
-	//			TODO del Debug.trace("selected index:", selectedIndex);
+	//			TODO del Log.trace("selected index:", selectedIndex);
 					assert selectedIndex>=0 : "Expected selected card to be present in the container.";
 					final Component newCard=genericPropertyChangeEvent.getNewValue();	//get the new card
 					final int newIndex=indexOf(newCard);	//see what index the proposed new value has
-//TODO del					Debug.trace("selected index", selectedIndex, "new index", newIndex, "current selected index", getSelectedIndex());
+//TODO del					Log.trace("selected index", selectedIndex, "new index", newIndex, "current selected index", getSelectedIndex());
 	/*TODO del
 					if(newIndex<0)	//if the new value isn't in the container TODO maybe put this in a default card panel validator
 					{
@@ -800,9 +798,9 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 					}
 	*/
 					final int indexDelta=newIndex-selectedIndex;	//get the relative index
-	//			TODO del Debug.trace("index delta:", indexDelta);
+	//			TODO del Log.trace("index delta:", indexDelta);
 					final SequenceTransition transition=getTransition();	//get thet current transition
-	//			TODO del Debug.trace("current transition:", transition);
+	//			TODO del Log.trace("current transition:", transition);
 					if(transition!=SequenceTransition.NEXT && transition!=SequenceTransition.PREVIOUS && !isEnabled(newCard))	//if the new card is not enabled (with exceptions for the previous and next buttons)
 					{
 						throw new PropertyVetoException("Card not enabled.", genericPropertyChangeEvent);	//indicate that the new card isn't enabled and the value shouldn't be changed TODO i18n
@@ -829,23 +827,23 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 					}
 					if(needsValidationCommit)	//if we need to validate and commit
 					{
-	//				TODO del Debug.trace("need to validate and commit; ready to validate");
+	//				TODO del Log.trace("need to validate and commit; ready to validate");
 						if(transition==SequenceTransition.NEXT || validate())	//validate this panel (unless this is a "next" transition, meaning validation already occurred); if everything, including the selected card, is valid
 						{
-	//					TODO del Debug.trace("validated; ready to check canTransition if needed");
+	//					TODO del Log.trace("validated; ready to check canTransition if needed");
 							if(!(currentCard instanceof SequenceTransitionable) || ((SequenceTransitionable)currentCard).canTransition(indexDelta))	//if the current card is sequence transitionable, see if it OKs the transition
 							{
 								try
 								{
-	//							TODO del Debug.trace("can transition; ready to commit");
+	//							TODO del Log.trace("can transition; ready to commit");
 									commit();	//commit this panel
-	//							TODO del Debug.trace("committed; ready to set enabled if supported");
+	//							TODO del Log.trace("committed; ready to set enabled if supported");
 									final Constraints newCardConstraints=newCard.getConstraints();	//get the new card's constraints
 									if(newCardConstraints instanceof Enableable)	//if the new card constraints is enableable
 									{
 										((Enableable)newCardConstraints).setEnabled(true);	//enable the new card constraints
 									}
-	//							TODO del Debug.trace("enabled");
+	//							TODO del Log.trace("enabled");
 								}
 								catch(final IOException ioException)	//if there is a problem commiting the result
 								{
@@ -870,7 +868,7 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 							throw new PropertyVetoException("Card denied transition.", genericPropertyChangeEvent);	//indicate that the card didn't allow transition TODO i18n						
 						}
 					}
-	//TODO del Debug.trace("vetoable change seemed to go OK");
+	//TODO del Log.trace("vetoable change seemed to go OK");
 				}
 			}
 		}

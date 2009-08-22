@@ -21,7 +21,7 @@ import java.net.URI;
 import java.util.*;
 
 import com.globalmentor.model.NameValuePair;
-import com.globalmentor.util.Debug;
+
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.effect.Effect;
@@ -123,7 +123,7 @@ public class WebFrameDepictor<C extends Frame> extends AbstractWebFrameDepictor<
 			final URI tetherImage=flyoverFrame.getTetherImage();
 			if(tetherImage!=null)
 			{
-//TODO del Debug.trace("rendering tether image", tetherImage);
+//TODO del Log.trace("rendering tether image", tetherImage);
 				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IMG, true);	//<xhtml:img> (component-tether)
 
 				final CompassPoint tetherCompassPoint=CompassPoint.getCompassPoint(flyoverFrame.getTetherBearing());	//get the compass point nearest the tether bearing

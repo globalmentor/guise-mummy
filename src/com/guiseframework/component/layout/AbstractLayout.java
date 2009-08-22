@@ -279,7 +279,7 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 		*/
 		protected <V> void refirePropertyChange(final Component component, final T constraints, final String propertyName, final V oldValue, final V newValue)
 		{
-//TODO del Debug.trace("Ready to fire an event indicating that component", componentConstraintsEntry.getKey(), "changed property", propertyChangeEvent.getPropertyName(), "to value", propertyChangeEvent.getNewValue());	//TODO del
+//TODO del Log.trace("Ready to fire an event indicating that component", componentConstraintsEntry.getKey(), "changed property", propertyChangeEvent.getPropertyName(), "to value", propertyChangeEvent.getNewValue());	//TODO del
 			//fire an event indicating that the constraints for this component changed one if its properties
 			fireConstraintsPropertyChange(component, constraints, propertyName, oldValue, newValue);								
 			

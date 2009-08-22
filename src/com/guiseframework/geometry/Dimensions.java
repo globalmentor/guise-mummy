@@ -151,10 +151,10 @@ public class Dimensions
 			return this;	//return this dimension unchanged
 		}
 		final double relation=(double)widthValue/heightValue;	//determine the relationship of the sides
-//TODO del Debug.trace("relation of sides is:", relation);
+//TODO del Log.trace("relation of sides is:", relation);
 		double newWidthValue, newHeightValue;
 		newHeightValue=constrainingWidthValue/relation;	//get the matching height for a constrained width
-//TODO del Debug.trace("trying to constrain width to", constrainingWidth, "height to ", newHeight);
+//TODO del Log.trace("trying to constrain width to", constrainingWidth, "height to ", newHeight);
 		if(newHeightValue<=constrainingHeightValue)	//if the height has been constrained
 		{
 			newWidthValue=constrainingWidthValue;	//constrain the width to the edges
@@ -163,7 +163,7 @@ public class Dimensions
 		{
 			newWidthValue=constrainingHeightValue*relation;	//get the matching width for a constrained height
 			newHeightValue=constrainingHeightValue;	//constrain the height to the edges
-//TODO del Debug.trace("that didn't work; trying to constrain width to", newWidth, "height to ", newHeight);
+//TODO del Log.trace("that didn't work; trying to constrain width to", newWidth, "height to ", newHeight);
 		}
 		return new Dimensions(newWidthValue, widthUnit, newHeightValue, heightUnit);	//return the new constrained dimensions
 	}

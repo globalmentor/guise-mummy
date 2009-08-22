@@ -22,9 +22,8 @@ import static java.util.Collections.*;
 import static com.globalmentor.java.Integers.*;
 import static com.globalmentor.java.Maths.*;
 import static com.globalmentor.java.Objects.*;
-
 import com.globalmentor.model.NameValuePair;
-import com.globalmentor.util.Debug;
+
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.platform.*;
 
@@ -113,17 +112,17 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 		*/ 
 		public boolean discontinuePollInterval(final DepictedObject depictedObject)
 		{
-//Debug.trace("ready to discontinue poll interval for", depictedObject);
+//Log.trace("ready to discontinue poll interval for", depictedObject);
 			synchronized(requestedPollIntervalMap)	//synchronize to ensure the that race conditions don't cause the actual poll interval to be out of synch with the requested poll intervals
 			{
 				final int oldPollInterval=getPollInterval();	//get the current polling interval
 				final Integer relinquishedPollInterval=requestedPollIntervalMap.remove(checkInstance(depictedObject, "Depicted object cannot be null."));
-//Debug.trace("got relinquished poll interval", relinquishedPollInterval, "old poll interval", oldPollInterval);
+//Log.trace("got relinquished poll interval", relinquishedPollInterval, "old poll interval", oldPollInterval);
 				if(relinquishedPollInterval!=null && relinquishedPollInterval.intValue()<=oldPollInterval)	//if a poll interval was relinquished that was less than or equal to our current poll interval
 				{
-//Debug.trace("now there are remaining poll intervals:", requestedPollIntervalMap.size());
+//Log.trace("now there are remaining poll intervals:", requestedPollIntervalMap.size());
 					final int newPollInterval=min(requestedPollIntervalMap.values(), DEFAULT_POLL_INTERVAL);	//determine the new poll interval
-//Debug.trace("we want to change to new poll interval", newPollInterval);
+//Log.trace("we want to change to new poll interval", newPollInterval);
 					if(oldPollInterval!=newPollInterval)	//if the poll interval is different
 					{
 						setPollInterval(newPollInterval);	//update the polling interval

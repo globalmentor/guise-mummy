@@ -36,6 +36,7 @@ import com.globalmentor.config.ConfigurationManager;
 import com.globalmentor.config.DefaultConfigurationManager;
 import com.globalmentor.io.BOMInputStreamReader;
 import com.globalmentor.java.*;
+import com.globalmentor.log.Log;
 import com.globalmentor.net.*;
 import com.globalmentor.text.CharacterEncoding;
 import com.globalmentor.urf.*;
@@ -1001,7 +1002,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	{
 		final Class<?> componentClass=component.getClass();	//get the class of the component
 		final String descriptionFilename=addExtension(getLocalName(componentClass), TURF_NAME_EXTENSION);	//create a name in the form ClassName.turf
-		//TODO del Debug.trace("Trying to load description file:", descriptionFilename);
+		//TODO del Log.trace("Trying to load description file:", descriptionFilename);
 		final InputStream descriptionInputStream=componentClass.getResourceAsStream(descriptionFilename);	//get an input stream to the description file
 		if(descriptionInputStream!=null)	//if we have a description file
 		{
@@ -1306,14 +1307,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void setNavigation(final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI)
 		{
-//TODO del Debug.trace("setting naviation; navigation path:", navigationPath, "bookmark:", bookmark, "referrerURI:", referrerURI);
+//TODO del Log.trace("setting naviation; navigation path:", navigationPath, "bookmark:", bookmark, "referrerURI:", referrerURI);
 				//if the navigation path or the bookmark is changing
 			if(!Objects.equals(this.navigationPath, navigationPath)	//see if the navigation path is changing (the old navigation path will be null if this session has not yet navigated anywhere; don't call getNavigationPath(), which might throw an exception)
 					|| !Objects.equals(this.bookmark, bookmark))	//see if the bookmark is changing
 			{
 				setNavigationPath(navigationPath);	//make sure the Guise session has the correct navigation path
 				setBookmark(bookmark);	//make sure the Guise session has the correct bookmark
-//TODO del Debug.trace("changed to new bookmark:", getBookmark());
+//TODO del Log.trace("changed to new bookmark:", getBookmark());
 				final Map<String, Object> logParameters=new HashMap<String, Object>();	//create a map for our log parameters
 				logParameters.put("bookmark", bookmark);	//bookmark TODO use a constant
 				logParameters.put("referrerURI", referrerURI);	//referrer URI TODO use a constant
@@ -1679,7 +1680,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		}
 		catch(final IOException ioException)	//if there is a log error
 		{
-			Debug.error(ioException);	//log the error in the debug log
+			Log.error(ioException);	//log the error in the debug log
 		}
 */
 	}	
@@ -1750,7 +1751,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			final Throwable throwable=notification.getError();	//get the error, if any
 			if(throwable!=null)	//if there is an error
 			{
-				Debug.error(throwable);	//produce a stack trace
+				Log.error(throwable);	//produce a stack trace
 			}
 		}
 		final NotificationOptionDialogFrame optionDialogFrame=new NotificationOptionDialogFrame(notification);	//create a dialog from the notification

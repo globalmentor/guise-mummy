@@ -30,7 +30,7 @@ import static java.util.Collections.*;
 import com.globalmentor.beans.*;
 import com.globalmentor.java.Objects;
 import com.globalmentor.model.TaskState;
-import com.globalmentor.util.Debug;
+
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
@@ -252,7 +252,7 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 	*/
 	protected void selectCard() throws PropertyVetoException
 	{
-//TODO del Debug.trace("ready to select new card for tab");
+//TODO del Log.trace("ready to select new card for tab");
 		synchronized(this)	//prevent race conditions accessing updatingSelected
 		{
 			if(!updatingSelected)	//if we're not already updating the selected state (if we are, then this change could be in response to one of our cards being selected, and if we select a new card we could select the wrong one)
@@ -262,12 +262,12 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 				{
 					final Component selectedCard=cardControl.getValue();	//get the current selected card value
 /*TODO del
-Debug.trace("seleted card is index", cardControl.indexOf(selectedCard), "is one of our cards?", cards.contains(selectedCard));
+Log.trace("seleted card is index", cardControl.indexOf(selectedCard), "is one of our cards?", cards.contains(selectedCard));
 if(!cards.contains(selectedCard))
 {
 	for(final Component card:cards)	//for each card
 	{
-		Debug.trace("we have card:", cardControl.indexOf(card));
+		Log.trace("we have card:", cardControl.indexOf(card));
 	}
 }
 */
@@ -295,7 +295,7 @@ if(!cards.contains(selectedCard))
 	*/
 	protected boolean isCardSelectable(final Component card)
 	{
-//TODO del Debug.trace("is card selectable?");
+//TODO del Log.trace("is card selectable?");
 		final Constraints constraints=card.getConstraints();	//get the card constraints, if any
 		if(!(constraints instanceof Enableable) || ((Enableable)constraints).isEnabled())	//if the constraints indicate enabled
 		{
@@ -305,12 +305,12 @@ if(!cards.contains(selectedCard))
 			}
 			else
 			{
-//			TODO del 				Debug.trace("card not displayed");
+//			TODO del 				Log.trace("card not displayed");
 			}
 		}
 		else
 		{
-//		TODO del 			Debug.trace("card not enabled");
+//		TODO del 			Log.trace("card not enabled");
 		}
 		return false;	//if the card doesn't pass the tests, it can't be selected
 	}

@@ -22,7 +22,6 @@ import java.math.*;
 import java.net.URI;
 import java.util.*;
 
-import com.globalmentor.util.Debug;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
@@ -101,7 +100,7 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 			else if("slideEnd".equals(actionID))	//if sliding is ending TODO use a constant
 			{
 				component.setSliding(false);	//turn sliding off
-//TODO del Debug.trace("Received slider action: "+actionEvent.getActionID());
+//TODO del Log.trace("Received slider action: "+actionEvent.getActionID());
 			}
 		}
 		super.processEvent(event);	//do the default event processing
@@ -341,7 +340,7 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 				final BigDecimal bigRangeMaximum=toBigDecimal(rangeMaximum);	//get a big decimal version of the maximum
 				final BigDecimal bigRange=bigRangeMaximum.subtract(bigRangeMinimum);	//calculate the range
 				final BigDecimal bigInterval=interval!=null ? toBigDecimal(interval) : bigRange;	//use the existing interval or simply use the range if there is no interval
-//Debug.trace("using big interval", bigInterval);
+//Log.trace("using big interval", bigInterval);
 /*TODO fix
 				final List<BigDecimal> intervalValues=new ArrayList<BigDecimal>();	//create a list for the interval values
 

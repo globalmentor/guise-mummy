@@ -154,7 +154,7 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 			}
 			final WebPlatform platform=getPlatform();	//get the platform
 			final String targetID=webActionEvent.getTargetID();	//get the action target
-//			Debug.trace("just got action event for tree node target:", targetID);
+//			Log.trace("just got action event for tree node target:", targetID);
 			if(targetID.endsWith("-child"))	//if the action was for the tree node itself TODO use a constant
 			{
 				final String treeNodeIDString=targetID.substring(0, targetID.length()-"-child".length());	//get the tree node ID string
@@ -162,7 +162,7 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 				final TreeNodeModel<?> treeNode=getTreeNode(treeNodeID);	//get the associated tree node
 				if(treeNode!=null)	//if we found a tree node
 				{
-//			Debug.trace("found tree node for action:", treeNode);
+//			Log.trace("found tree node for action:", treeNode);
 					treeNode.performAction(1, webActionEvent.getOption());	//perform the action on the tree node
 				}
 			}
@@ -174,7 +174,7 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 				if(treeNode!=null)	//if we found a tree node
 				{
 					//TODO check enabled/disabled status
-//Debug.trace("toggling expanded state", treeNode.isExpanded(), "to", !treeNode.isExpanded(), "for tree node", treeNodeID);
+//Log.trace("toggling expanded state", treeNode.isExpanded(), "to", !treeNode.isExpanded(), "for tree node", treeNodeID);
 					treeNode.setExpanded(!treeNode.isExpanded());	//toggle the tree node expanded state
 				}
 			}
@@ -286,7 +286,7 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 		
 			//write the component
 		final Component treeNodeComponent=component.getComponent(treeNode);	//get the component for this tree node
-//TODO del Debug.trace("rendering tree node for", treeNode.getValue(), "is leaf", treeNode.isLeaf());	//TODO del
+//TODO del Log.trace("rendering tree node for", treeNode.getValue(), "is leaf", treeNode.isLeaf());	//TODO del
 			//action
 			//determine the image resource key to use for the tree node; use a leaf image if the image is a leaf, otherwise show the expanded or collapsed state
 		final String treeNodeImageResourceKey=treeNode.isLeaf()

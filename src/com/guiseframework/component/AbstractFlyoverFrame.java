@@ -73,7 +73,7 @@ public abstract class AbstractFlyoverFrame extends AbstractFrame implements Flyo
 		*/
 		public void setTetherBearing(BigDecimal newTetherBearing)
 		{
-//TODO del Debug.trace("setting flyover tether bearing to", newTetherBearing);
+//TODO del Log.trace("setting flyover tether bearing to", newTetherBearing);
 			checkInstance(newTetherBearing, "Tether bearing cannot be null.");
 			final Set<CompassPoint> tetherBearingCompassPoints=getTetherBearingCompassPoints();	//get the tether bearing compass points available
 			if(!tetherBearingCompassPoints.isEmpty())	//if some tether bearings are supported TOOD fix; right now, if there are no compass points then all bearings are supported
@@ -102,7 +102,7 @@ public abstract class AbstractFlyoverFrame extends AbstractFrame implements Flyo
 					}
 					newTetherBearing=compassPoint.getBearing();	//at this point we will have found a supported compass point; use that compass point's bearing
 				}
-//TODO del Debug.trace("deciding to really use compass point", compassPoint);
+//TODO del Log.trace("deciding to really use compass point", compassPoint);
 			}
 			if(!tetherBearing.equals(newTetherBearing))	//if the value is really changing
 			{

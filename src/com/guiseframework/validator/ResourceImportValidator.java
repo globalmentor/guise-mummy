@@ -24,8 +24,8 @@ import com.globalmentor.net.ContentType;
 import static com.globalmentor.collections.Collections.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Classes.*;
+import com.globalmentor.log.Log;
 
-import com.globalmentor.util.Debug;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.model.ResourceImport;
 
@@ -207,7 +207,7 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport>
 	*/
 	public void validate(final ResourceImport resourceImport) throws ValidationException
 	{
-Debug.trace("ready to validate resource import", resourceImport);
+Log.trace("ready to validate resource import", resourceImport);
 		super.validate(resourceImport);	//do the default validation
 		final Set<ContentType> acceptedContentTypes=getAcceptedContentTypes();	//get the accepted content types
 		if(acceptedContentTypes!=null)	//if we need to check the content types

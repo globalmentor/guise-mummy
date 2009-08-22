@@ -21,9 +21,8 @@ import java.util.*;
 
 import com.globalmentor.beans.*;
 import static com.globalmentor.java.Characters.*;
+import com.globalmentor.log.Log;
 import static com.globalmentor.model.Calendars.*;
-
-import com.globalmentor.util.Debug;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.*;
@@ -113,7 +112,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>	//TODO ref
 										{
 											try
 											{
-//Debug.trace("ready to put new date in control:", newDate);
+//Log.trace("ready to put new date in control:", newDate);
 												dateControl.setValue(newDate);	//show the date in the date control
 											}
 											catch(final PropertyVetoException propertyVetoException)	//we should never have a problem selecting a date
@@ -154,7 +153,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>	//TODO ref
 						Date date=dateControl.getValue();	//get the date value, if there is one
 						if(date!=null)	//if there is a date value
 						{
-//Debug.trace("got date", date, "milliseconds", date.getTime());
+//Log.trace("got date", date, "milliseconds", date.getTime());
 							final GuiseSession session=getSession();	//get the current session
 							final Locale locale=session.getLocale();	//get the current locale
 							final TimeZone timeZone=session.getTimeZone();	//get the current time zone
@@ -163,7 +162,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>	//TODO ref
 							final Date time=timeControl.getValue();	//get the time date
 							if(time!=null)	//if there is a time, we'll need to update our date
 							{
-//Debug.trace("got time", time, "milliseconds", time.getTime());
+//Log.trace("got time", time, "milliseconds", time.getTime());
 								final Calendar timeCalendar=Calendar.getInstance(timeZone, locale);	//get a calendar to manipulate the time
 								timeCalendar.setTime(time);	//set the time in the calendar
 								setTime(dateCalendar, timeCalendar);	//set the time of the date calendar
@@ -173,13 +172,13 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>	//TODO ref
 								clearTime(dateCalendar);	//remove the time from the date calendar
 							}
 							date=dateCalendar.getTime();	//update the date to include or not include the time
-//Debug.trace("using date", date, "milliseconds", date.getTime());
+//Log.trace("using date", date, "milliseconds", date.getTime());
 						}
 						setValue(date);	//update our value with the date
 					}
 					catch(final PropertyVetoException propertyVetoException)	//the control might have a validator, but currently we can't do much about it at this point
 					{
-						Debug.warn(propertyVetoException);
+						Log.warn(propertyVetoException);
 					}
 					finally
 					{
@@ -223,7 +222,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date>	//TODO ref
 				final Date date=getValue();
 				if(date!=null)	//if there is a date
 				{
-//Debug.trace("updating controls with date", date, "milliseconds", date.getTime());
+//Log.trace("updating controls with date", date, "milliseconds", date.getTime());
 					final GuiseSession session=getSession();	//get the current session
 					final Locale locale=session.getLocale();	//get the current locale
 					final TimeZone timeZone=session.getTimeZone();	//get the current time zone
