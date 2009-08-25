@@ -119,7 +119,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		public static PLOOPTURFIO<AbstractGuiseApplication> getApplicationIO() {return applicationIO;}
 
 	/**The name of the application configuration file in the data directory for supplemental application initialization.*/
-	public final static String DATA_APPLICATION_FILENAME=addExtension("application", TURF.TURF_NAME_EXTENSION);
+	public final static String DATA_APPLICATION_FILENAME=addExtension("application", TURF.NAME_EXTENSION);
 		
 	static
 	{

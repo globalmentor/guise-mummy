@@ -34,7 +34,6 @@ import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.rdf.RDF.*;
 import static com.globalmentor.rdf.RDFResources.*;
 import static com.globalmentor.text.xml.XML.*;
-import static com.globalmentor.urf.TURF.*;
 import static com.globalmentor.util.PropertiesUtilities.*;
 
 /**Utilities for working with resource bundles.
@@ -52,7 +51,7 @@ public class ResourceBundles
 	private enum ResourceBundleFormat
 	{
 		/**The resource bundle is serialized in a TURF file.*/
-		TURF(TURF_NAME_EXTENSION),
+		TURF(com.globalmentor.urf.TURF.NAME_EXTENSION),
 		
 		/**The resource bundle is serialized in an RDF+XML file.*/
 		RDFXML(RDF_NAME_EXTENSION),
