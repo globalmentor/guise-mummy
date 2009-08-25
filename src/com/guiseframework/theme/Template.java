@@ -57,7 +57,7 @@ public class Template extends AbstractClassTypedURFResource
 	*/
 	public void apply(final Object object, final PLOOPURFProcessor ploopProcessor) throws DataException, InvocationTargetException
 	{
-		ploopProcessor.setObjectProperties(object, this, TEMPLATE_CLASS_URI);	//initialize the object from the template, using the URI of the template class as the namespace URI for finding properties
+		ploopProcessor.setObjectProperties(object, this);	//initialize the object from the template
 	}
 
 }

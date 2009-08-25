@@ -43,7 +43,7 @@ public class URFPropertyTableColumnModel<V extends URFResource> extends DefaultT
 	*/
 	public URFPropertyTableColumnModel(final Class<V> valueClass, final URI propertyURI)
 	{
-		this(valueClass, propertyURI, URFTURFGenerator.createReferenceString(propertyURI, new TURFNamespaceLabelManager(), null, null, true));	//construct the class with a label appropriate for this property URI, determining a new namespace prefix if needed TODO use a shared namespace label manager
+		this(valueClass, propertyURI, URFTURFGenerator.createReferenceString(propertyURI, new TURFNamespaceLabelManager(), null, true));	//construct the class with a label appropriate for this property URI, determining a new namespace prefix if needed TODO use a shared namespace label manager
 	}
 	
 	/**Value class and label constructor.

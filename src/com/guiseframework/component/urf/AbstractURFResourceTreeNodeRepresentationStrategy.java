@@ -117,17 +117,6 @@ public abstract class AbstractURFResourceTreeNodeRepresentationStrategy<V extend
 //TODO fix	protected StringBuilder buildLabelText(final StringBuilder stringBuilder, final TreeControl treeControl, final TreeModel model, final TreeNodeModel<? extends V> treeNode, final V value)	//TODO later put this method hierarchy in a custom label model
 	{
 			//TODO shouldn't we make sure the resource is not null?
-		final URI parentTypeURI;	//determine the type URI of the parent
-		final TreeNodeModel<?> parentTreeNode=treeNode.getParent();	//get the parent tree node, if any
-		if(parentTreeNode!=null && URFResource.class.isAssignableFrom(parentTreeNode.getValueClass()))	//if there is a parent holding an URF resource
-		{
-			final URFResource parentTreeNodeResource=(URFResource)parentTreeNode.getValue();	//get the resoure from the parent tree node
-			parentTypeURI=parentTreeNodeResource!=null ? parentTreeNodeResource.getTypeURI() : null;	//if the parent tree node has an URF resource, get its type URI
-		}
-		else	//if there is no parent URF resource context
-		{
-			parentTypeURI=null;	//there is no parent context URI
-		}
 		final URI propertyURI;
 		if(treeNode instanceof URFResourceDynamicTreeNodeModel)	//if the tree node is an URF tree node
 		{
@@ -140,7 +129,7 @@ public abstract class AbstractURFResourceTreeNodeRepresentationStrategy<V extend
 						//TODO update algorithm to probably check up the tree node hierarchy for an URF tree node, and check to see if the namespace URI actually exist in the data model
 					getNamespaceLabelManager().determineNamespaceLabel(propertyNamespaceURI);	//ask the namespace label manager for a label for this namespace, so that one will be there
 				}				
-				stringBuilder.append(URFTURFGenerator.createReferenceString(propertyURI, getNamespaceLabelManager(), null, parentTypeURI)); //append a reference to the property URI
+				stringBuilder.append(URFTURFGenerator.createReferenceString(propertyURI, getNamespaceLabelManager(), null)); //append a reference to the property URI
 			}
 		}
 		else	//if this is not an URF tree node
