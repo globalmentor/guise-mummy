@@ -2075,13 +2075,13 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 			    "mode": "none",
 			    "theme": "advanced",
 			    "skin": "guise",
-			    "plugins": "autoresize,directionality,paste,xhtmlxtras,xhtmlphrases",
+			    "plugins": "autoresize,directionality,paste,table,xhtmlxtras,xhtmlphrases",
 			    "theme_advanced_blockformats": "p,h1,h2,h3,h4,h5,h6,address,blockquote,pre,div,dt,dd",
 			    "theme_advanced_toolbar_align": "left",
 			    "theme_advanced_toolbar_location": "top",
 			    "theme_advanced_statusbar_location": "bottom",
 			    "theme_advanced_disable": "image,cleanup,help,code,fontselect,fontsizeselect,styleselect,forecolor,backcolor,forecolorpicker,backcolorpicker,newdocument",
-			    "theme_advanced_buttons3_add": "|,ltr,rtl,|,cite,abbr,acronym,del,ins,attribs,dfn,computercode,var,samp,kbd",
+			    "theme_advanced_buttons3_add": ",|,tablecontrols,|,ltr,rtl,|,cite,abbr,acronym,del,ins,attribs,dfn,computercode,var,samp,kbd",
 			    "entity_encoding": "raw"	//don't entity encoding except for necessary XML characters; XHTML by default doesn't understand HTML entities, and numeric encoding would encur an unnecessary slowdown
 				});
 			
