@@ -583,6 +583,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		final DateFormat logFilenameDateFormat=new W3CDateFormat(W3CDateFormat.Style.DATE);	//create a formatter for the log filename
 		final String logFilename=addExtension("debug-"+logFilenameDateFormat.format(new Date()), Log.NAME_EXTENSION);	//create a filename in the form "debug-YYYY-MM-DD.log"
 		final File logFile=new File(logDirectory, logFilename);	//determine the log file for this application TODO create a custom log configuration that will use rolling log files
+		logConfiguration.setFile(logFile);	//set the log file for our log configuration
 		setConfiguration(LogConfiguration.class, logConfiguration);	//configure logging for this application
 		if(mailProperties!=null)	//if mail properties have been configured
 		{
@@ -770,7 +771,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		this.uri=checkInstance(uri, "Application URI cannot be null."); //set the URI
 		locales=unmodifiableList(asList(Locale.getDefault()));	//create an unmodifiable list of locales including only the default locale of the JVM
 		this.environment=new DefaultEnvironment();	//create a default environment
-		this.logConfiguration=new DefaultLogConfiguration();
+		this.logConfiguration=new DefaultLogConfiguration();	//create a default log configuration, which we'll initialize with a log file later
+		this.logConfiguration.setStandardOutput(false);	//turn off logging to the standard output
 	}
 
 	/**The concurrent list of destinations which have path patterns specified.*/
