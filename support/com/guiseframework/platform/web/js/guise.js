@@ -2075,6 +2075,7 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 			    "mode": "none",
 			    "theme": "advanced",
 			    "skin": "guise",
+			    "extended_valid_elements": "-table[border|cellspacing|cellpadding|width|frame|rules|height|align|summary|bgcolor|background|bordercolor]",	//TODO removed when TinyMCE 3.2.7 removes default border attribute in distribution
 			    "plugins": "autoresize,directionality,paste,table,xhtmlxtras,xhtmlphrases",
 			    "theme_advanced_blockformats": "p,h1,h2,h3,h4,h5,h6,address,blockquote,pre,div,dt,dd",
 			    "theme_advanced_toolbar_align": "left",
