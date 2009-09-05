@@ -48,7 +48,6 @@ import com.globalmentor.text.elff.*;
 import com.globalmentor.text.xml.xpath.*;
 import com.globalmentor.urf.*;
 import com.globalmentor.urf.ploop.*;
-import com.globalmentor.util.*;
 
 import com.guiseframework.*;
 import com.guiseframework.component.*;
@@ -2235,7 +2234,7 @@ Log.trace("***********number of distinct parameter keys", parameterListMap.size(
 	protected boolean canSubstitute(final HttpServletRequest request, final URI requestedResourceURI, final URI substituteResourceURI) throws IOException
 	{
   	final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-  	final URIPath path=guiseApplication.relativizeURI(requestedResourceURI);	//get the application-relative path TODO probably change this to be the same logic as for getting the navigation path
+  	final URIPath path=guiseApplication.getNavigationPath(requestedResourceURI);	//get the application-relative navigation path
 		if(guiseApplication.hasDestination(path))	//if the application has a registered destination at the requested URI
 		{
 			return false;	//don't allow URI substitutions for any registered destination
@@ -2258,12 +2257,12 @@ Log.trace("***********number of distinct parameter keys", parameterListMap.size(
 Log.trace("checking exists for", resourceURI);
 		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
   	final HTTPServletGuiseRequest guiseRequest=new HTTPServletGuiseRequest(request, /*TODO del response, */guiseContainer, guiseApplication);	//get Guise request information
-  	final URIPath path=guiseRequest.getNavigationPath();	//get the application-relative logical path
+///TODO del when works  	final URIPath path=guiseRequest.getNavigationPath();	//get the application-relative logical path
+  	final URIPath path=guiseApplication.getNavigationPath(resourceURI);	//get the application-relative navigation path for the given resource URI
   	if(guiseApplication.hasAsset(path))	//if the path represents a valid application asset
   	{
   		return true;	//the resource exists
   	}
-//TODO del  	final URIPath path=guiseApplication.relativizeURI(resourceURI);	//get the application-relative path TODO probably change this to be the same logic as for getting the navigation path
 		final Destination destination=guiseApplication.getDestination(path);	//get the destination for the given path
   	if(destination!=null)	//if the URI represents a valid navigation path
   	{

@@ -203,15 +203,14 @@ public interface GuiseApplication extends Resource, PropertyBindable, Configurat
 	*/
 	public void setDCSID(final String dcsID);
 
-	/**Determines the logical navigation path based upon a requested depict path.
+	/**Determines the logical navigation path based upon a requested depiction URI.
 	This method must preserve paths beginning with {@value #GUISE_RESERVED_BASE_PATH}.
-	@param depictURI The plain absolute depict URI.
-	@param depictPath The application-relative depict path.
+	@param depictionURI The plain absolute depict URI.
 	@return The application-relative logical navigation path.
-	@throws NullPointerException if the given depict URI and/or depict path is <code>null</code>.
+	@throws NullPointerException if the given depiction URI is <code>null</code>.
 	@see #GUISE_RESERVED_BASE_PATH
 	*/
-	public URIPath getNavigationPath(final URI depictURI, final URIPath depictPath);
+	public URIPath getNavigationPath(final URI depictionURI);
 
 	/**Determines the depict URI based upon a navigation URI.
 	This method must preserve paths beginning with {@value #GUISE_RESERVED_BASE_PATH}.

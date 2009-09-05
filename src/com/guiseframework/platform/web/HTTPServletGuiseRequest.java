@@ -138,7 +138,7 @@ public class HTTPServletGuiseRequest
 		this.referrerURI=referrerURI;	//save the referring URI
 		URIPath requestPath=new URIPath(rawPathInfo.substring(1));	//remove the beginning slash to get the request path from the path info
 		requestPathReserved=requestPath.toString().startsWith(GuiseApplication.GUISE_RESERVED_BASE_PATH.toString());	//see if this is a request for a Guise reserved path (e.g. a public resource or a temporary resource)
-		navigationPath=guiseApplication.getNavigationPath(depictURI, requestPath);	//get the logical version of the the path
+		navigationPath=guiseApplication.getNavigationPath(depictURI);	//get the logical version of the the path
 		final String contentTypeString=request.getContentType();	//get the request content type
 		requestContentType=contentTypeString!=null ? ContentType.getInstance(contentTypeString) : null;	//create a content type object from the request content type, if there is one
 		ajax=requestContentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(requestContentType);	//see if this is a Guise AJAX request
