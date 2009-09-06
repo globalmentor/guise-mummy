@@ -47,7 +47,7 @@ public class Theme extends URFListResource<Rule>
 	/**The recommended prefix to the theme ontology namespace.*/
 	public final static String THEME_NAMESPACE_PREFIX="theme";
 	/**The URI to the theme ontology namespace.*/
-	public final static URI THEME_NAMESPACE_URI=URI.create("http://guiseframework.com/namespaces/theme");
+	public final static URI THEME_NAMESPACE_URI=URI.create("http://guiseframework.com/namespaces/theme/");
 
 		//classes
 	/**The URI of the template class.*/

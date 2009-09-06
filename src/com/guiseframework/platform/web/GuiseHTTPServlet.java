@@ -222,8 +222,14 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		{
 			guiseApplication=initGuiseApplication(servletConfig);	//initialize the application and frame bindings
 		}
+		catch(final ServletException servletException)
+		{
+			Log.error(servletException);
+			throw servletException;
+		}
 		catch(final Exception exception)	//if there is any problem initializing the Guise application
 		{
+			Log.error(exception);
 			throw new ServletException("Error initializing Guise application: "+exception.getMessage(), exception);
 		}
 	}

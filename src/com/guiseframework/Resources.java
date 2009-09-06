@@ -37,7 +37,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	/**The recommended prefix to the resources key ontology namespace.*/
 	public final static String RESOURCES_NAMESPACE_PREFIX="resources";
 	/**The URI to the resource key ontology namespace.*/
-	public final static URI RESOURCES_NAMESPACE_URI=URI.create("http://guiseframework.com/namespaces/resources");
+	public final static URI RESOURCES_NAMESPACE_URI=URI.create("http://guiseframework.com/namespaces/resources/");
 
 	/**The default base name of the Guise resource bundle.*/
 	public final static String DEFAULT_RESOURCE_BUNDLE_BASE_NAME=Resources.class.getPackage().getName()+"/resources";
