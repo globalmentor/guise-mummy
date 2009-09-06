@@ -141,15 +141,15 @@ public abstract class AbstractURFResourceTreeNodeRepresentationStrategy<V extend
 		if(resourceURI!=null)	//if there is a resource URI
 		{
 			final URI namespaceURI;	//we'll see if there is some related namespace so that we can ensure a namespace label TODO improve algorithm to ensure somewhere that namespace URIs appear before other resources in the tree
-			final URI lexicalTypeURI;	//we'll determine a lexical type, if there is one
-			if(isLexicalURI(resourceURI))	//if the resource URI is a lexical URI
+			final URI inlineTypeURI;	//we'll determine an inline type, if there is one
+			if(isInlineURI(resourceURI))	//if the resource URI is an inline URI
 			{
-				lexicalTypeURI=getLexicalTypeURI(resourceURI);	//get the lexical type URI of the resource URI
-				namespaceURI=getNamespaceURI(lexicalTypeURI);	//get the namespace of the lexical type URI
+				inlineTypeURI=getInlineTypeURI(resourceURI);	//get the inline type URI of the resource URI
+				namespaceURI=getNamespaceURI(inlineTypeURI);	//get the namespace of the inline type URI
 			}
-			else	//if the resource URI is not a lexical URI
+			else	//if the resource URI is not an inline URI
 			{
-				lexicalTypeURI=null;	//there is no lexical type
+				inlineTypeURI=null;	//there is no inline type
 				namespaceURI=getNamespaceURI(resourceURI);	//get the resource URI namespace URI, if any
 			}
 			if(namespaceURI!=null)	//if there is some related namespace
@@ -159,9 +159,9 @@ public abstract class AbstractURFResourceTreeNodeRepresentationStrategy<V extend
 			}
 			if(typeURI!=null)	//if we have a type URI
 			{
-				if(typeURI.equals(lexicalTypeURI))	//if this resource has a lexical URI of the same type as we just found
+				if(typeURI.equals(inlineTypeURI))	//if this resource has an inline URI of the same type as we just found
 				{
-					typeURI=null;	//don't use the type URI; the type inherent in the lexical URI is sufficient
+					typeURI=null;	//don't use the type URI; the type inherent in the inline URI is sufficient
 				}
 			}
 		}
