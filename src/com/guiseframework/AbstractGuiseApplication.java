@@ -565,6 +565,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	*/
 	public void install(final AbstractGuiseContainer container, final URIPath basePath, final File homeDirectory, final File logDirectory, final File tempDirectory)
 	{
+		Log.info("Installing application", this);
 		if(this.container!=null || this.basePath!=null)	//if we already have a container and/or a base path
 		{
 			throw new IllegalStateException("Application already installed.");
@@ -581,10 +582,11 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		this.logDirectory=checkInstance(logDirectory, "Log directory cannot be null.");
 		this.tempDirectory=checkInstance(tempDirectory, "Temporary directory cannot be null.");
 		final DateFormat logFilenameDateFormat=new W3CDateFormat(W3CDateFormat.Style.DATE);	//create a formatter for the log filename
-		final String logFilename=addExtension("debug-"+logFilenameDateFormat.format(new Date()), Log.NAME_EXTENSION);	//create a filename in the form "debug-YYYY-MM-DD.log"
+		final String logFilename=addExtension("application-"+logFilenameDateFormat.format(new Date()), Log.NAME_EXTENSION);	//create a filename in the form "application-YYYY-MM-DD.log"
 		final File logFile=new File(logDirectory, logFilename);	//determine the log file for this application TODO create a custom log configuration that will use rolling log files
 		logConfiguration.setFile(logFile);	//set the log file for our log configuration
 		setConfiguration(LogConfiguration.class, logConfiguration);	//configure logging for this application
+		logConfiguration.getLogger().info("Installing application", this);	//inform the application-specific log
 		if(mailProperties!=null)	//if mail properties have been configured
 		{
 			try
@@ -610,6 +612,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	*/
 	public void uninstall(final GuiseContainer container)
 	{
+		Log.info("Uninstalling application", this);
+		logConfiguration.getLogger().info("Uninstalling application", this);	//inform the application-specific log
 		if(this.container==null)	//if we don't have a container
 		{
 			throw new IllegalStateException("Application not installed.");

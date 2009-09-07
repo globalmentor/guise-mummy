@@ -215,7 +215,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	public void init(final ServletConfig servletConfig) throws ServletException
 	{
 		super.init(servletConfig);	//do the default initialization
-		Log.info("initializing servlet", servletConfig.getServletName(), Guise.GUISE_NAME, Guise.BUILD_ID);
+		Log.info("Initializing", Guise.GUISE_NAME, Guise.BUILD_ID);
 		setReadOnly(true);	//make this servlet read-only
 		//TODO turn off directory listings, and/or fix them
 		try

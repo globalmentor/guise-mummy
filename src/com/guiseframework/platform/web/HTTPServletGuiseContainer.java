@@ -157,13 +157,8 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 				isNewGuiseSession=guiseSession==null;	//if there is still no Guise session associated with the given HTTP session and Guise application, we'll create a Guise session
 				if(isNewGuiseSession)	//if we should create a new Guise session
 				{
-/*TODO del
-					final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
-					Debug.info("memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
-				Log.trace("+++creating Guise session", httpSession.getId());
-	//TODO del if not needed				final String relativeApplicationPath=relativizePath(getBasePath(), guiseApplication.getBasePath());	//get the application path relative to the container path
-*/
 					guiseSession=guiseApplication.createSession(new HTTPServletWebPlatform(guiseApplication, httpSession, httpRequest));	//ask the application to create a new Guise session for the given platform
+					Log.info("Adding Guise session", guiseSession, "associated with HTTP sesssion", httpSession.getId());
 					addGuiseSession(guiseSession);	//add and initialize the Guise session
 					final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client
 					guiseSession.requestLocale(asList(clientAcceptedLanguages));	//ask the Guise session to change to one of the accepted locales, if the application supports one
@@ -270,7 +265,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 		}
 		for(final GuiseSession guiseSession:guiseSessions)	//now that we've updated the relevant maps related to the HTTP session, we can uninitialize the Guise sessions at our leisure without blocking new HTTP requests
 		{
-Log.trace("---removing Guise session", guiseSession, "associated with HTTP sesssion", httpSession.getId());
+			Log.info("Removing Guise session", guiseSession, "associated with HTTP sesssion", httpSession.getId());
 			removeGuiseSession(guiseSession);	//remove the Guise session
 		}
 		return guiseSessions;	//return the Guise sessions
