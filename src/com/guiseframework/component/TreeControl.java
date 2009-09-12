@@ -399,7 +399,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		}
 	}
 
-	/**A tree node representation strategy for a {@link TextModel}, generating a {@link Text} component.
+	/**A tree node representation strategy for a {@link TextModel}, generating a {@link TextBox} component.
 	@see Message
 	@author Garret Wilson
 	*/
@@ -416,9 +416,9 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		@param focused <code>true</code> if the value has the focus.
 		@return A new component to represent the given value.
 		*/
-		public <N extends TextModel> Text createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
+		public <N extends TextModel> TextBox createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 		{
-			return new Text(treeNode.getValue());	//return a message from the message model
+			return new TextBox(treeNode.getValue());	//return a message from the message model
 		}
 	}
 

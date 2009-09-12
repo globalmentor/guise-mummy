@@ -33,7 +33,7 @@ import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 
 import com.guiseframework.component.Component;
-import com.guiseframework.component.Text;
+import com.guiseframework.component.TextBox;
 
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
@@ -42,7 +42,7 @@ import org.xml.sax.SAXException;
 @param <C> The type of component being depicted.
 @author Garret Wilson
 */
-public class WebTextDepictor<C extends Text> extends AbstractSimpleWebComponentDepictor<C>
+public class WebTextDepictor<C extends TextBox> extends AbstractSimpleWebComponentDepictor<C>
 {
 
 	/**The document prefix to wrap around an XHTML fragment.*/

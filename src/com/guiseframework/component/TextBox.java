@@ -22,10 +22,10 @@ import com.globalmentor.net.ContentType;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.model.*;
 
-/**A text component with an associated label.
-This component may have child components, each bound to a specific ID in the text using {@link ReferenceConstraints}.
+/**A box containing text.
+<p>This component may have child components, each bound to a specific ID in the text using {@link ReferenceConstraints}.
 When the text is rendered, XML elements with IDs referencing child components will be replaced with representations of those child components.
-Child element ID reference replacement can only occur if the text has an XML-based content type (such as XHTML).
+Child element ID reference replacement can only occur if the text has an XML-based content type (such as XHTML).</p>
 <p>This component only supports text content types, including:</p>
 <ul>
 	<li><code>text/*</code></li>
@@ -36,7 +36,7 @@ Child element ID reference replacement can only occur if the text has an XML-bas
 @author Garret Wilson
 @see ReferenceLayout
 */
-public class Text extends AbstractContainer implements TextModel
+public class TextBox extends AbstractContainer implements TextModel
 {
 
 	/**The text model used by this component.*/
@@ -49,7 +49,7 @@ public class Text extends AbstractContainer implements TextModel
 	public ReferenceLayout getLayout() {return (ReferenceLayout)super.getLayout();}	//a text component can only have a reference layout
 
 	/**Default constructor with a default text model.*/
-	public Text()
+	public TextBox()
 	{
 		this((String)null);	//construct the class with no text
 	}
@@ -57,7 +57,7 @@ public class Text extends AbstractContainer implements TextModel
 	/**Text constructor with a default {@link Model#PLAIN_TEXT_CONTENT_TYPE} content type.
 	@param text The text, which may include a resource reference, or <code>null</code> if there is no text.
 	*/
-	public Text(final String text)
+	public TextBox(final String text)
 	{
 		this(text, PLAIN_TEXT_CONTENT_TYPE);	//construct the class with a plain text content type
 	}
@@ -68,7 +68,7 @@ public class Text extends AbstractContainer implements TextModel
 	@exception NullPointerException if the given content type is <code>null</code>.
 	@exception IllegalArgumentException if the given content type is not a text content type.
 	*/
-	public Text(final String text, final ContentType textContentType)
+	public TextBox(final String text, final ContentType textContentType)
 	{
 		this(new DefaultTextModel(text, textContentType));	//construct the class with a default text model using the given values
 	}
@@ -77,7 +77,7 @@ public class Text extends AbstractContainer implements TextModel
 	@param textModel The component text model.
 	@exception NullPointerException if the given text model is <code>null</code>.
 	*/
-	public Text(final TextModel textModel)
+	public TextBox(final TextModel textModel)
 	{
 		super(new ReferenceLayout());	//construct the parent class
 		this.textModel=checkInstance(textModel, "Text model cannot be null.");	//save the text model

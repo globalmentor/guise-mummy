@@ -366,7 +366,7 @@ Log.trace("list control changed value to", newValue);
     contentPanel.add(imageAction);
 */
 		
-		final Text testText=new Text();
+		final TextBox testText=new TextBox();
 		testText.setTextContentType(XHTML_FRAGMENT_CONTENT_TYPE);
 //TODO bring back		testText.getModel().setTextResourceKey("test.html");
 		testText.setText("this is <strong>good</strong> stuff");

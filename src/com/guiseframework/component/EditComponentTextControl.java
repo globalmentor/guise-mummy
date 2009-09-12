@@ -21,7 +21,7 @@ import com.guiseframework.component.layout.Flow;
 /**Control that allows a text component's text to be edited in-place.
 @author Garret Wilson
 */
-public class EditComponentTextControl extends AbstractEditComponentTextControl<Text>  
+public class EditComponentTextControl extends AbstractEditComponentTextControl<TextBox>  
 {
 
 	/**Default constructor with a default text component, default text edit control, and {@link Flow#LINE} layout.*/
@@ -36,14 +36,14 @@ public class EditComponentTextControl extends AbstractEditComponentTextControl<T
 	*/
 	public EditComponentTextControl(final Flow flow)
 	{
-		this(new Text(), flow);	//construct the parent class with a default text component
+		this(new TextBox(), flow);	//construct the parent class with a default text component
 	}
 
 	/**Text component constructor with default text edit control and {@link Flow#LINE} flow.
 	@param textComponent The component the text of which is to be edited.
 	@exception NullPointerException if the text component is <code>null</code>.
 	*/
-	public EditComponentTextControl(final Text textComponent)
+	public EditComponentTextControl(final TextBox textComponent)
 	{
 		this(textComponent, new TextControl<String>(String.class));	//construct the class with a default text control
 	}
@@ -53,7 +53,7 @@ public class EditComponentTextControl extends AbstractEditComponentTextControl<T
 	@param flow The logical axis (line or page) along which information is flowed.
 	@exception NullPointerException if the text component and/or flow is <code>null</code>.
 	*/
-	public EditComponentTextControl(final Text textComponent, final Flow flow)
+	public EditComponentTextControl(final TextBox textComponent, final Flow flow)
 	{
 		this(textComponent, new TextControl<String>(String.class), flow);	//construct the class with a default text control
 	}
@@ -63,7 +63,7 @@ public class EditComponentTextControl extends AbstractEditComponentTextControl<T
 	@param editControl The control used to edit the text.
 	@exception NullPointerException if the text component and/or edit control is <code>null</code>.
 	*/
-	public EditComponentTextControl(final Text textComponent, final ValueControl<String> editControl)
+	public EditComponentTextControl(final TextBox textComponent, final ValueControl<String> editControl)
 	{
 		this(textComponent, editControl, Flow.LINE);	//construct the class with line flow
 	}
@@ -74,27 +74,27 @@ public class EditComponentTextControl extends AbstractEditComponentTextControl<T
 	@param flow The logical axis (line or page) along which information is flowed.
 	@exception NullPointerException if the text component, value control, and/or flow axis is <code>null</code>.
 	*/
-	public EditComponentTextControl(final Text textComponent, final ValueControl<String> editControl, final Flow flow)
+	public EditComponentTextControl(final TextBox textComponent, final ValueControl<String> editControl, final Flow flow)
 	{
-		super(textComponent, Text.TEXT_PROPERTY, editControl, flow);	//construct the parent class with a flow layout
+		super(textComponent, TextBox.TEXT_PROPERTY, editControl, flow);	//construct the parent class with a flow layout
 	}
 
 	/**Retrieves the text from the edited component.
-	This version returns the value of {@link Text#getText()}
+	This version returns the value of {@link TextBox#getText()}
 	@param editedComponent The component the text of which is to be edited.
 	@return The current text of the edited component
 	*/
-	protected String getText(final Text editedComponent)
+	protected String getText(final TextBox editedComponent)
 	{
 		return editedComponent.getText();	//return the component's text
 	}
 
 	/**Updates the text of the edited component.
-	This version updates the text of the component using {@link Text#setText(String)}
+	This version updates the text of the component using {@link TextBox#setText(String)}
 	@param editedComponent The component the text of which is to be edited.
 	@param newText The new text to set in the edited component.
 	*/
-	protected void setText(final Text editedComponent, final String newText)
+	protected void setText(final TextBox editedComponent, final String newText)
 	{
 		editedComponent.setText(newText);	//set the component's text		
 	}

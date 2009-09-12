@@ -86,7 +86,7 @@ public class URFProcessPanel extends LayoutPanel
 		heading.setLabel("Guise\u2122 URF Processing Demo");	//set the heading text
 		controlPanel.add(heading);	//add the heading to the control panel
 			//instructions
-		final Text text=new Text();	//create new text
+		final TextBox text=new TextBox();	//create new text
 		text.setLabel("Instructions");	//give a label to the text
 		text.setTextContentType(XHTML_CONTENT_TYPE);	//indicate that the message will be of the "application/xhtml+xml" content type
 		text.setText(INSTRUCTIONS);	//set the instructions

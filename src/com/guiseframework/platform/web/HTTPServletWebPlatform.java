@@ -149,7 +149,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 		registerDepictorClass(TabContainerControl.class, WebTabDepictor.class);
 		registerDepictorClass(TabControl.class, WebTabDepictor.class);
 		registerDepictorClass(Table.class, WebTableDepictor.class);
-		registerDepictorClass(Text.class, WebTextDepictor.class);
+		registerDepictorClass(TextBox.class, WebTextDepictor.class);
 		registerDepictorClass(TextControl.class, WebTextControlDepictor.class);
 		registerDepictorClass(ToolButton.class, WebToolButtonDepictor.class);
 		registerDepictorClass(TreeControl.class, WebTreeControlDepictor.class);

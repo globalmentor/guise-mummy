@@ -50,7 +50,7 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	Duplicate options are ignored.
 	@param notification The notification that specifies the message and options.
 	@exception NullPointerException if the given notification is <code>null</code>.
-	#see {@link Text}
+	#see {@link TextBox}
 	*/
 	public NotificationOptionDialogFrame(final Notification notification)
 	{
@@ -62,7 +62,7 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	@param text The text, which may include a resource reference, or <code>null</code> if there is no text.
 	@param options The available options.
 	@exception NullPointerException if the given options is <code>null</code>.
-	#see {@link Text}
+	#see {@link TextBox}
 	*/
 	public NotificationOptionDialogFrame(final String text, final Notification.Option... options)
 	{
@@ -76,11 +76,11 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	@param options The available options.
 	@exception NullPointerException if the given content type and/or options is <code>null</code>.
 	@exception IllegalArgumentException if the given content type is not a text content type.
-	#see {@link Text}
+	#see {@link TextBox}
 	*/
 	public NotificationOptionDialogFrame(final String text, final ContentType textContentType, final Notification.Option... options)
 	{
-		this(new Text(text, textContentType), options);	//create a dialog using a Text component created from the given text and content type
+		this(new TextBox(text, textContentType), options);	//create a dialog using a Text component created from the given text and content type
 	}	
 	
 	/**Component and options constructor.

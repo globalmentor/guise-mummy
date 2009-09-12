@@ -106,7 +106,7 @@ public class InternationalizationPanel extends LayoutPanel
 		add(menu, new RegionConstraints(Region.PAGE_START));	//add the menu at the top
 
 			//localized text
-		final Text text=new Text();	//create a text component
+		final TextBox text=new TextBox();	//create a text component
 		text.setTextContentType(XHTML_CONTENT_TYPE);	//use application/xhtml+xml content
 		text.setText(Resources.createStringResourceReference(UN_CHARTER_PREAMBLE_RESOURCE_KEY));	//use the UN Charter Preamble resource, appropriately localized
 
