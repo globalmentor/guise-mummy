@@ -36,7 +36,7 @@ Child element ID reference replacement can only occur if the text has an XML-bas
 @author Garret Wilson
 @see ReferenceLayout
 */
-public class Text extends AbstractContainer implements TextModel	//TODO probably change to a LayoutComponent
+public class Text extends AbstractContainer implements TextModel
 {
 
 	/**The text model used by this component.*/

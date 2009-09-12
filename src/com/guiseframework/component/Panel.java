@@ -25,6 +25,6 @@ package com.guiseframework.component;
 </dl>
 @author Garret Wilson
 */
-public interface Panel extends Box
+public interface Panel extends Box, Container
 {
 }

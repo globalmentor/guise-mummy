@@ -21,7 +21,7 @@ import com.guiseframework.component.layout.*;
 /**An abstract base class for panels.
 @author Garret Wilson
 */
-public abstract class AbstractPanel extends AbstractBox implements Panel
+public abstract class AbstractPanel extends AbstractContainer implements Panel
 {
 
 	/**Layout constructor.

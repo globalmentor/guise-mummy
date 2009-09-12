@@ -21,7 +21,7 @@ import com.guiseframework.component.layout.*;
 /**A panel for grouping multiple components with a default page flow layout.
 @author Garret Wilson
 */
-public class GroupPanel extends AbstractBox implements Panel	//TODO maybe add a label model constructor parameter; see old revisions
+public class GroupPanel extends AbstractContainer implements Panel	//TODO maybe add a label model constructor parameter; see old revisions
 {
 
 	/**Default constructor with a default vertical flow layout.*/

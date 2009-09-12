@@ -21,7 +21,7 @@ import com.guiseframework.component.layout.*;
 /**An abstract base class for boxes.
 @author Garret Wilson
 */
-public abstract class AbstractBox extends AbstractContainer implements Box
+public abstract class AbstractBox extends AbstractContainer implements Box	//TODO finalize box semantics; determine if this class is needed
 {
 
 	/**Layout constructor.

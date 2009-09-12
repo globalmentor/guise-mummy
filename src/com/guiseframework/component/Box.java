@@ -16,9 +16,9 @@
 
 package com.guiseframework.component;
 
-/**Base interface for basic layout components.
+/**Rectangular components that are laid out.
 @author Garret Wilson
 */
-public interface Box extends Container
+public interface Box extends Component
 {
 }
