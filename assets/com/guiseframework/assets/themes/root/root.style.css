@@ -647,7 +647,6 @@ li.treeNode-leaf
 .panel-error,
 .resourceImportControl-error,
 .sliderControl-error,
-.textAreaControl-error,
 .textControl-error
 {
 	color: red;
@@ -659,7 +658,6 @@ li.treeNode-leaf
 .listControl-label, .listControl-body, .listControl-error,
 .resourceImportControl-label, .resourceImportControl-body, .resourceImportControl-error,
 .sliderControl-error,
-.textAreaControl-label, .textAreaControl-body, .textAreaControl-error,
 .textControl-label, .textControl-body, .textControl-error
 {
 	display: block;
