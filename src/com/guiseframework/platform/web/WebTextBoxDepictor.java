@@ -28,6 +28,8 @@ import com.globalmentor.net.ContentType;
 
 import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.java.Objects.*;
+
+import com.globalmentor.java.Strings;
 import com.globalmentor.log.Log;
 import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
@@ -198,6 +200,7 @@ Log.debug("cache miss for text", xmlTextHash);
 			final URI elementNamespaceURI=elementNamespaceURIString!=null ? URI.create(elementNamespaceURIString) : null;	//get the namespace URI, if there is one
 			final String elementLocalName=element.getLocalName();	//get the element local name
 			depictContext.writeElementBegin(elementNamespaceURI, elementLocalName, isEmpty);	//begin this element
+			String classAttributeValue="";	//we'll add "content" to all the class attributes
 			final NamedNodeMap attributes=element.getAttributes();	//get the element attributes
 			final int attributeCount=attributes.getLength();	//get the number of attributes
 			for(int attributeIndex=0; attributeIndex<attributeCount; ++attributeIndex)	//for each attribute
@@ -206,17 +209,24 @@ Log.debug("cache miss for text", xmlTextHash);
 				final String attributeNamespaceURIString=attribute.getNamespaceURI();	//get the attribute namespace
 				final URI attributeNamespaceURI=attributeNamespaceURIString!=null ? URI.create(attributeNamespaceURIString) : null;	//get the namespace URI, if there is one
 				final String attributeLocalName=attribute.getLocalName();	//get the attribute local name
-				if(!XMLNS_NAMESPACE_URI.equals(attributeNamespaceURI) || !ATTRIBUTE_XMLNS.equals(attributeLocalName))	//don't write xmlns:xmlns attributes TODO fix; this is to keep xmlns:xmlns from being redefined, because apparently the Java parse things xmlns="" is in the XMLNS namespace
+				if(XMLNS_NAMESPACE_URI.equals(attributeNamespaceURI) && ATTRIBUTE_XMLNS.equals(attributeLocalName))	//don't write xmlns:xmlns attributes TODO fix; this is to keep xmlns:xmlns from being redefined, because apparently the Java parse things xmlns="" is in the XMLNS namespace
 				{
-					final String attributeValue=attribute.getNodeValue();	//get the value of the attribute
-					depictContext.writeAttribute(attributeNamespaceURI, attributeLocalName, attributeValue);	//write this attribute
+					continue;
 				}
+				final String attributeValue=attribute.getNodeValue();	//get the value of the attribute
+				if(XHTML_NAMESPACE_URI.equals(attributeNamespaceURI) && ATTRIBUTE_CLASS.equals(attributeLocalName))	//treat the class attribute independently and separately
+				{
+					classAttributeValue=attributeValue;	//save the class attribute for later
+					continue;
+				}
+				depictContext.writeAttribute(attributeNamespaceURI, attributeLocalName, attributeValue);	//write this attribute
 			}
+			depictContext.writeAttribute(XHTML_NAMESPACE_URI, ATTRIBUTE_CLASS, Strings.join(' ', classAttributeValue, WebPlatform.ATTRIBUTE_CLASS_CONTENT));	//write the class attribute, appending the "content" class
 			updateElementContent(element);	//update the element content
 			depictContext.writeElementEnd(elementNamespaceURI, elementLocalName);	//end this element
 		}
 	}
-	
+
 	/**Renders the content of an XML element.
 	@param element The element the content of which should be rendered.
 	@exception IOException if there is an error rendering the component.

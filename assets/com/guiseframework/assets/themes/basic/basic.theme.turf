@@ -1,5 +1,6 @@
 `URF:
 	"select"~<http://urf.name/select>
+	"xml"~<http://urf.name/xml>
 	"theme"~<http://guiseframework.com/namespaces/theme>
 	"component"~<java:/com/guiseframework/component/>
 	"layout"~<java:/com/guiseframework/component/layout/>
@@ -13,7 +14,9 @@
 		dc.description="The bland, basic, default Guise™ theme."
 		dc.rights="Copyright © 2007 GlobalMentor, Inc."
 		dc.creator="Garret Wilson"
-	
+
+		xml.style=«basic.style.css»
+
 		theme.resources=*resources.Resources〔
 			†<resource:theme.color.text>slategray</resource:theme.color.text>‡
 			"theme.color.subordinateA"="whitesmoke"

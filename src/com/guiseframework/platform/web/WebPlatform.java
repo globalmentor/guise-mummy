@@ -76,6 +76,9 @@ public interface WebPlatform extends Platform
 		/**The Guise attribute value indicating that the element is a temporary element that will be replaced later; functions just like "none" for patching except that this element will be removed from the original hierarchy.*/
 		public final static String ATTRIBUTE_PATCH_TYPE_TEMP="temp";
 
+	/**The HTML class attribute indicating content.*/
+	public final static String ATTRIBUTE_CLASS_CONTENT="content";
+		
 	/**The path of the blank MP3 file, relative to the application.*/
 	public final static URIPath BLANK_MP3_PATH=GuiseApplication.GUISE_ASSETS_AUDIO_PATH.resolve("blank.mp3");	
 

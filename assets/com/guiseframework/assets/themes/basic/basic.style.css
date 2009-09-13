@@ -1,0 +1,43 @@
+/*Basic Theme Guise Stylesheet Copyright © 2009 GlobalMentor, Inc.
+@author Garret Wilson
+
+This stylesheet handles XHTML that appears in text boxes.
+It should not be used to style XHTML representing components on the web platform;
+rather, Guise properties should be used to change the style of Guise components.
+*/
+
+table.content
+{
+	border-collapse: collapse;
+	border-style: solid;
+	border-width: medium;
+}
+
+th.content, td.content
+{
+	border-color: gainsboro;
+	border-style: solid dotted solid dotted;
+	border-width: thin;
+	padding: 0.5em 0.5em;
+}
+
+caption.content, th.content
+{
+	background-color: whitesmoke;
+}
+
+caption.content
+{
+	font-weight: bold;
+	border-top-style: solid;
+	border-top-width: medium;
+	border-bottom-style: solid;
+	border-bottom-width: thin;
+	margin-bottom: 0.1em;
+	padding: 0.5em 0.5em;
+}
+
+dt
+{
+	font-weight: bold;
+}
