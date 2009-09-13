@@ -42,7 +42,7 @@ import org.xml.sax.SAXException;
 @param <C> The type of component being depicted.
 @author Garret Wilson
 */
-public class WebTextDepictor<C extends TextBox> extends AbstractSimpleWebComponentDepictor<C>
+public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComponentDepictor<C>
 {
 
 	/**The document prefix to wrap around an XHTML fragment.*/
@@ -62,7 +62,7 @@ public class WebTextDepictor<C extends TextBox> extends AbstractSimpleWebCompone
 	private final static Map<Integer, CachedDocument> cachedDocumentMap=new DecoratorReadWriteLockMap<Integer, CachedDocument>(new PurgeOnWriteSoftValueHashMap<Integer, CachedDocument>());
 
 	/**Default constructor using the XHTML <code>&lt;div&gt;</code> element.*/
-	public WebTextDepictor()
+	public WebTextBoxDepictor()
 	{
 		super(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//represent <xhtml:div>
 	}
