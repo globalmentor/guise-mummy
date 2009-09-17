@@ -2075,15 +2075,17 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 			    "mode": "none",
 			    "theme": "advanced",
 			    "skin": "guise",
-			    "extended_valid_elements": "-table[border|cellspacing|cellpadding|width|frame|rules|height|align|summary|bgcolor|background|bordercolor]",	//TODO removed when TinyMCE 3.2.7 removes default border attribute in distribution
 			    "plugins": "autoresize,directionality,paste,table,xhtmlxtras,xhtmlphrases",
 			    "theme_advanced_blockformats": "p,h1,h2,h3,h4,h5,h6,address,blockquote,pre,div,dt,dd",
 			    "theme_advanced_toolbar_align": "left",
 			    "theme_advanced_toolbar_location": "top",
 			    "theme_advanced_statusbar_location": "bottom",
-			    "theme_advanced_disable": "image,cleanup,help,code,fontselect,fontsizeselect,styleselect,forecolor,backcolor,forecolorpicker,backcolorpicker,newdocument",
-			    "theme_advanced_buttons3_add": ",|,tablecontrols,|,ltr,rtl,|,cite,abbr,acronym,del,ins,attribs,dfn,computercode,var,samp,kbd",
-			    "entity_encoding": "raw"	//don't entity encoding except for necessary XML characters; XHTML by default doesn't understand HTML entities, and numeric encoding would encur an unnecessary slowdown
+			    "theme_advanced_buttons1": "undo,redo,|,formatselect,|,indent,outdent,|,justifyleft,justifycenter,justifyright,justifyfull,|,ltr,rtl,|,bullist,numlist",
+			    "theme_advanced_buttons2": "bold,italic,underline,strikethrough,|,cite,abbr,acronym,|,del,ins,|,dfn,computercode,var,samp,kbd,|,link,unlink,anchor,|,sub,sup,|,attribs",
+			    "theme_advanced_buttons3": "removeformat,|,visualaid,|,hr,|,charmap,|,tablecontrols,|,code",
+			    "extended_valid_elements": "-table[border|cellspacing|cellpadding|width|frame|rules|height|align|summary|bgcolor|background|bordercolor]",	//TODO remove when TinyMCE 3.2.7 removes default border attribute in distribution
+			    "invalid_elements": "applet,embed,meta,noscript,object,script",	//keep out dangerous or inappropriate HTML; see http://www.feedparser.org/docs/html-sanitization.html
+			    "entity_encoding": "raw"	//don't perform entity encoding except for necessary XML characters; XHTML by default doesn't understand HTML entities, and numeric encoding would encur an unnecessary slowdown
 				});
 			
 			this._initializeNode(document.documentElement, true, true);	//initialize the document tree, indicating that this is the first initialization
