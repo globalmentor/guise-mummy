@@ -14,9 +14,9 @@
 		dc.rights="Copyright © 2007 GlobalMentor, Inc."
 		dc.creator="Garret Wilson"
 	
-		theme.parentURI=<path:~guise/assets/themes/basic/basic.theme.turf>
+		theme.parentURI=<path:~guise/assets/themes/basic/basic.guisetheme>
 	
-		xml.style=«sunflower.style.css»
+		xml.style=«sunflower.css»
 	
 		theme.resources=«sunflower.resources.turf»
 	;

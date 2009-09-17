@@ -15,7 +15,7 @@
 		dc.rights="Copyright © 2007 GlobalMentor, Inc."
 		dc.creator="Garret Wilson"
 
-		xml.style=«basic.style.css»
+		xml.style=«basic.css»
 
 		theme.resources=*resources.Resources〔
 			†<resource:theme.color.text>slategray</resource:theme.color.text>‡
