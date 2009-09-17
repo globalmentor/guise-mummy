@@ -1001,7 +1001,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	public void initializeComponent(final Component component)
 	{
 		final Class<?> componentClass=component.getClass();	//get the class of the component
-		final String descriptionFilename=addExtension(getLocalName(componentClass), NAME_EXTENSION);	//create a name in the form ClassName.turf
+		final String descriptionFilename=addExtension(getLocalName(componentClass), TURF.NAME_EXTENSION);	//create a name in the form ClassName.turf
 		//TODO del Log.trace("Trying to load description file:", descriptionFilename);
 		final InputStream descriptionInputStream=componentClass.getResourceAsStream(descriptionFilename);	//get an input stream to the description file
 		if(descriptionInputStream!=null)	//if we have a description file

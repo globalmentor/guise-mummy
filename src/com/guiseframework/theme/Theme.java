@@ -26,6 +26,7 @@ import static java.util.Collections.*;
 
 import com.globalmentor.collections.CollectionMap;
 import com.globalmentor.collections.HashSetHashMap;
+import com.globalmentor.net.ContentType;
 import com.globalmentor.urf.*;
 import com.globalmentor.urf.ploop.PLOOPURFProcessor;
 import com.globalmentor.urf.select.*;
@@ -43,6 +44,11 @@ import static com.guiseframework.Resources.*;
 */
 public class Theme extends URFListResource<Rule>
 {
+	
+	/**The extension for Guise theme resource names.*/
+	public final static String NAME_EXTENSION="guisetheme";
+	/**The content type for theme resources: <code>application/theme+turf</code>.*/
+	public static final ContentType CONTENT_TYPE=ContentType.getInstance(ContentType.APPLICATION_PRIMARY_TYPE, "theme"+ContentType.SUBTYPE_SUFFIX_DELIMITER_CHAR+TURF.SUBTYPE_SUFFIX);
 
 	/**The recommended prefix to the theme ontology namespace.*/
 	public final static String THEME_NAMESPACE_PREFIX="theme";
