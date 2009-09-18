@@ -80,11 +80,11 @@ public interface GuiseApplication extends Resource, PropertyBindable, Configurat
 		/**The base path of the default Guise theme, relative to the application.*/
 		public final static URIPath GUISE_ROOT_THEME_BASE_PATH=GUISE_ASSETS_THEMES_PATH.resolve("root/");
 			/**The path of the root Guise theme, relative to the application.*/
-			public final static URIPath GUISE_ROOT_THEME_PATH=GUISE_ROOT_THEME_BASE_PATH.resolve("root.theme.turf");
+			public final static URIPath GUISE_ROOT_THEME_PATH=GUISE_ROOT_THEME_BASE_PATH.resolve("root.guisetheme");
 		/**The base path of the basic Guise theme, relative to the application.*/
 		public final static URIPath GUISE_BASIC_THEME_BASE_PATH=GUISE_ASSETS_THEMES_PATH.resolve("basic/");
 			/**The path of the basic Guise theme, relative to the application.*/
-			public final static URIPath GUISE_BASIC_THEME_PATH=GUISE_BASIC_THEME_BASE_PATH.resolve("basic.theme.turf");
+			public final static URIPath GUISE_BASIC_THEME_PATH=GUISE_BASIC_THEME_BASE_PATH.resolve("basic.guisetheme");
 	/**The base path of the default Guise theme cursors, relative to the application.*/
 	public final static URIPath GUISE_ROOT_THEME_CURSORS_PATH=GUISE_ROOT_THEME_BASE_PATH.resolve("cursors/");
 
