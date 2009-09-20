@@ -93,27 +93,43 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Configu
 	*/
 	public void setPreferences(final Class<?> objectClass, final URFResource preferences) throws IOException;
 
-	/**Reports the current depiction base URI of the session.
-	The depiction base URI is an absolute plain URI that ends with the session's depiction base path of the application, ending with a slash ('/').
-	The session depiction base URI may be different for different sessions, and may not be equal to the application navigation base path resolved to the container's base URI.
-	@return The depiction base URI currently representing the Guise session.
+	/**Reports the current depiction root URI of the session.
+	The depiction root URI is an absolute plain root URI.
+	The session depiction root URI may be different for different sessions, and may not be equal to the application navigation base path resolved to the container's base URI.
+	@return The depiction root URI currently representing the Guise session.
 	*/
-	public URI getDepictionBaseURI();
+	public URI getDepictionRootURI();
 
-	/**Sets the depiction base URI of the session.
-	@param depictionBaseURI The new depiction base URI of the session.
-	@exception NullPointerException if the given depiction base URI is <code>null</code>.
+	/**Sets the depiction root URI of the session.
+	The depiction root URI is an absolute plain root URI.
+	@param depictionRootURI The new depiction root URI of the session.
+	@exception NullPointerException if the given depiction root URI is <code>null</code>.
+	@exception IllegalArgumentException if the provided URI specifies a query and/or fragment.
+	@exception IllegalArgumentException if the provided URI is not absolute.
+	@exception IllegalArgumentException if the provided URI is not a root URI.
 	*/
-	public void setDepictionBaseURI(final URI depictionBaseURI);
+	public void setDepictionRootURI(final URI depictionRootURI);
 
-	/**Determines the URI to use for depiction based upon a navigation URI.
-	The URI will first be dereferenced for the current session and then resolved to the application base path
-	The resulting URI may not be absolute, but can be made absolute by resolving it against the depiction base URI.
-	@param navigationURI The navigation URI, which may be absolute or relative to the application.
+	/**Determines the URI to use for depiction based upon a navigation path.
+	The path will first be dereferenced for the current session and then resolved to the application base path.
+	The resulting URI may not be absolute, but can be made absolute by resolving it against the depiction root URI.
+	@param navigationPath The navigation path, which may be absolute or relative to the application.
 	@param suffixes The suffixes, if any, to append to a resource key in a URI reference.
 	@return A URI suitable for depiction, deferenced and resolved to the application base path.
 	@see #dereferenceURI(URI, String...)
-	@see #getDepictionBaseURI()
+	@see #getDepictionRootURI()
+	@see GuiseApplication#getDepictionURI(URI, URIPath)
+	*/
+	public URI getDepictionURI(final URIPath navigationPath, final String... suffixes);
+
+	/**Determines the URI to use for depiction based upon a navigation URI.
+	The URI will first be dereferenced for the current session and then resolved to the application base path.
+	The resulting URI may not be absolute, but can be made absolute by resolving it against the depiction root URI.
+	@param navigationURI The navigation URI, which may be absolute or have an absolute path or a path relative to the application.
+	@param suffixes The suffixes, if any, to append to a resource key in a URI reference.
+	@return A URI suitable for depiction, deferenced and resolved to the application base path.
+	@see #dereferenceURI(URI, String...)
+	@see #getDepictionRootURI()
 	@see GuiseApplication#getDepictionURI(URI, URI)
 	*/
 	public URI getDepictionURI(final URI navigationURI, final String... suffixes);

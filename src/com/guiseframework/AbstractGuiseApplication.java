@@ -31,13 +31,13 @@ import javax.mail.Message;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 
+import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
 import static com.globalmentor.model.Calendars.*;
 import static com.globalmentor.model.Locales.*;
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.text.CharacterEncoding.*;
 import static com.guiseframework.Guise.*;
 
 import com.globalmentor.beans.BoundPropertyObject;
@@ -50,7 +50,6 @@ import com.globalmentor.config.DefaultConfigurationManager;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Objects;
 import com.globalmentor.log.*;
-import com.globalmentor.log.Log;
 import com.globalmentor.mail.MailManager;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.net.URIs;
@@ -279,18 +278,22 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		return relativizeURI(depictionURI);	//by default the navigation path and the depiction path are the same	
 	}
 
-	/**Determines the depict URI based upon a navigation URI.
-	This method must preserve paths beginning with {@value #GUISE_RESERVED_BASE_PATH}.
-	This version returns the navigation URI unmodified.
-	@param depictURI The plain absolute depict URI.
-	@param navigationURI The logical navigation URI, either absolute or relative to the application.
-	@return The depict URI, either absolute or relative to the application.
-	@throws NullPointerException if the given depict URI and/or logical URI is <code>null</code>.
-	@see #GUISE_RESERVED_BASE_PATH
+	/**{@inheritDoc}
+	<p>This implementation delegates to {@link #getDepictionURI(URI, URI)}.</p>
 	*/
-	public URI getDepictionURI(final URI depictURI, final URI navigationURI)
+	@Override
+	public final URI getDepictionURI(final URI depictionRootURI, final URIPath navigationPath)
 	{
-		return navigationURI;	//by default the navigation URI and the depiction URI are the same	
+		return getDepictionURI(depictionRootURI, navigationPath.toURI());
+	}
+
+	/**{@inheritDoc}
+	<p>This version resolves the navigation URI to the base path, but otherwise returns the navigation URI unmodified.</p>
+	*/
+	@Override
+	public URI getDepictionURI(final URI depictionRootURI, final URI navigationURI)
+	{
+		return getBasePath().resolve(navigationURI);	//by default the navigation URI and the depiction URI are the same, except that the depiction URI is resolved to the application base path	
 	}
 
 	/**Creates a new session for the application on the given platform.
@@ -374,12 +377,37 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		return new DefaultApplicationFrame();	//return an instance of the default application frame 
 	}
 
-	/**The base path of the application, or <code>null</code> if the application is not yet installed.*/
+	/**The base URI where the application is installed, or <code>null</code> if no application base URI has been specified and the application is not yet installed.*/
+	private URI baseURI=null;
+
+		/**Reports the base URI where the application is installed.
+		The base URI is an absolute URI that ends with the base path, which ends with a slash ('/').
+		@return The base URI representing the Guise application, or <code>null</code> if no application base URI has been specified and the application is not yet installed.
+		@see #getBasePath() 
+		*/
+		public URI getBaseURI() {return baseURI;}
+
+		/**Sets the base URI of the application.
+		The base path is also set.
+		@param baseURI The base URI where the application is installed, which must be an absolute URI with an absolute collection path (e.g. <code>http://www.example.com/path/</code>).
+		@throws NullPointerException if the given base URI is <code>null</code>.
+		@throws IllegalArgumentException if the given URI is not absolute or the path of which is not absolute or not a collection.
+		@throws IllegalStateException if the application is already installed.
+		@see #getBasePath() 
+		*/
+		public void setBaseURI(final URI baseURI)
+		{
+			checkNotInstalled();
+			this.basePath=getPath(checkAbsolute(baseURI)).checkAbsolute().checkCollection();
+			this.baseURI=baseURI;
+		}
+
+	/**The base path of the application, or <code>null</code> if no application base URI has been specified and the application is not yet installed.*/
 	private URIPath basePath=null;
 
 		/**Reports the base path of the application.
 		The base path is an absolute path that ends with a slash ('/'), indicating the base path of the navigation panels.
-		@return The base path representing the Guise application, or <code>null</code> if the application is not yet installed.
+		@return The base path representing the Guise application, or <code>null</code> if no application base URI has been specified and the application is not yet installed.
 		*/
 		public URIPath getBasePath() {return basePath;}
 	
@@ -459,7 +487,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 //TODO add a way to let the initializer know if this is a new log file or just a new writer				final boolean isNewLogFile=!logFile.exists();	//see if this is a new log file
 				try
 				{
-					final Writer writer=new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(logFile, true)), UTF_8);	//create a buffered UTF-8 log writer, appending if the file already exists
+					final Writer writer=new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(logFile, true)), UTF_8_CHARSET);	//create a buffered UTF-8 log writer, appending if the file already exists
 					final ThreadGroup guiseSessionThreadGroup=Guise.getInstance().getGuiseSessionThreadGroup(Thread.currentThread());	//get the Guise session thread group
 					assert guiseSessionThreadGroup!=null : "Expected to be inside a Guise session thread group when application log writer was requested.";
 					final AsynchronousWriterRunnable asynchronousWriterRunnable=new AsynchronousWriterRunnable(writer);	//create a runnable for creating the new asynchronous writer
@@ -550,34 +578,28 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		}
 	}
 
-	/**Installs the application into the given container at the given base path.
+	/**Installs the application into the given container at the given base URI.
 	This method is called by {@link GuiseContainer} and should not be called directly by applications.
 	This implementation configures logging.
 	Mail is enabled if mail properties have been configured using {@link #setMailProperties(Map)}.
 	@param container The Guise container into which the application is being installed.
-	@param basePath The base path at which the application is being installed.
+	@param baseURI The base URI at which the application is being installed.
 	@param homeDirectory The home directory of the application.
 	@param logDirectory The log directory of the application.
 	@param tempDirectory The temporary directory of the application.
-	@exception NullPointerException if the container, base path, home directory, log directory, and/or temporary directory is <code>null</code>.
+	@exception NullPointerException if the container, base URI, home directory, log directory, and/or temporary directory is <code>null</code>.
+	@exception IllegalArgumentException if the given base URI is not absolute or the path of which is not absolute or not a collection.
 	@exception IllegalArgumentException if the context path is not absolute and does not end with a slash ('/') character.
 	@exception IllegalStateException if the application is already installed.
 	*/
-	public void install(final AbstractGuiseContainer container, final URIPath basePath, final File homeDirectory, final File logDirectory, final File tempDirectory)
+	@Override
+	public void install(final AbstractGuiseContainer container, final URI baseURI, final File homeDirectory, final File logDirectory, final File tempDirectory)
 	{
-		Log.info("Installing application", this);
-		if(this.container!=null || this.basePath!=null)	//if we already have a container and/or a base path
-		{
-			throw new IllegalStateException("Application already installed.");
-		}
 		checkInstance(container, "Container cannot be null");
-		checkInstance(basePath, "Application base path cannot be null");
-		if(!basePath.isAbsolute() || !basePath.isCollection())	//if the path doesn't begin and end with a slash
-		{
-			throw new IllegalArgumentException("Application base path "+basePath+" does not begin and end with a path separator.");
-		}
+		checkNotInstalled();
+		Log.info("Installing application", this, "at URI", baseURI);
+		setBaseURI(baseURI);	//set the base URI
 		this.container=container;	//store the container
-		this.basePath=basePath;	//store the base path
 		this.homeDirectory=checkInstance(homeDirectory, "Home directory cannot be null.");
 		this.logDirectory=checkInstance(logDirectory, "Log directory cannot be null.");
 		this.tempDirectory=checkInstance(tempDirectory, "Temporary directory cannot be null.");
@@ -612,7 +634,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	*/
 	public void uninstall(final GuiseContainer container)
 	{
-		Log.info("Uninstalling application", this);
+		Log.info("Uninstalling application", this, "from URI", baseURI);
 		logConfiguration.getLogger().info("Uninstalling application", this);	//inform the application-specific log
 		if(this.container==null)	//if we don't have a container
 		{

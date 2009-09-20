@@ -268,9 +268,9 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.write("\t");
 		depictContext.writeJavaScriptElement(appendQueryParameters(GUISE_JAVASCRIPT_PATH.toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//JavaScript: guise.js
 		depictContext.write("\t");	//Google Gears
-		depictContext.writeJavaScriptElement(appendQueryParameters(GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("google/gears_init.js").toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//TODO use a constant
+		depictContext.writeJavaScriptElement(appendQueryParameters(GUISE_ASSETS_JAVASCRIPT_PATH.resolve("google/gears_init.js").toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//TODO use a constant
 		depictContext.write("\t");	//TinyMCE
-		depictContext.writeJavaScriptElement(appendQueryParameters(GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("tiny_mce/tiny_mce.js").toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//TODO use a constant
+		depictContext.writeJavaScriptElement(appendQueryParameters(GUISE_ASSETS_JAVASCRIPT_PATH.resolve("tiny_mce/tiny_mce.js").toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//TODO use a constant
 /*TODO FCKeditor
 		depictContext.write("\t");	//fckeditor
 		depictContext.writeJavaScriptElement(appendQueryParameters(GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("fckeditor/fckeditor.js").toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//TODO use a constant
@@ -317,7 +317,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.write("\n");
 /*TODO del; we have to do this dynamically now because of the EOLAS patent loss by Microsoft
 		//Guise Flash
-		final String resolvedGuiseFlashPath=application.resolvePath(GUISE_FLASH_PATH);	//resolve the path to the Guise Flash file
+//TODO fix; new absolute path		final String resolvedGuiseFlashPath=application.resolvePath(GUISE_FLASH_PATH);	//resolve the path to the Guise Flash file
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_OBJECT);	//<xhtml:object>
 		depictContext.writeAttribute(null, ATTRIBUTE_ID, GUISE_FLASH_ID);	//id="guiseFlash"		
 		if(getPlatform().getClientProduct().getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER)	//if the user agent is IE, use the special attributes

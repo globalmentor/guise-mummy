@@ -19,6 +19,7 @@ package com.guiseframework.platform;
 import java.net.URI;
 
 import com.globalmentor.beans.PropertyBindable;
+import com.globalmentor.net.URIPath;
 import com.guiseframework.*;
 
 /**Encapsulation of information related to the current depiction.
@@ -39,10 +40,20 @@ public interface DepictContext extends PropertyBindable
 	/**@return The current full absolute URI for this depiction, including any query.*/
 	public URI getDepictionURI();
 
+	/**Determines the URI to use for depiction based upon a navigation path.
+	The path will first be dereferenced for the current session and then resolved to the application.
+	This method is equivalent to calling {@link GuiseSession#getDepictionURI(URIPath, String...)}.
+	@param navigationPath The navigation path, which may be absolute or relative to the application.
+	@param suffixes The suffixes, if any, to append to a resource key in a URI reference.
+	@return A URI suitable for depiction, deferenced and resolved to the application.
+	@see GuiseSession#getDepictionURI(URIPath, String...)
+	*/
+	public URI getDepictionURI(final URIPath navigationPath, final String... suffixes);
+
 	/**Determines the URI to use for depiction based upon a navigation URI.
 	The URI will first be dereferenced for the current session and then resolved to the application.
-	This method delegates to {@link GuiseSession#getDepictionURI(URI, String...)}.
-	@param navigationURI The navigation URI, which may be absolute or relative to the application.
+	This method is equivalent to calling {@link GuiseSession#getDepictionURI(URI, String...)}.
+	@param navigationURI The navigation URI, which may be absolute or have an absolute path or a path relative to the application.
 	@param suffixes The suffixes, if any, to append to a resource key in a URI reference.
 	@return A URI suitable for depiction, deferenced and resolved to the application.
 	@see GuiseSession#getDepictionURI(URI, String...)

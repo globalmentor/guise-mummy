@@ -56,8 +56,8 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 		*/
 		public URIPath getBasePath() {return basePath;}
 
-	/**The thread-safe map of Guise applications keyed to application base paths.*/
-	private final Map<URIPath, AbstractGuiseApplication> applicationMap=new ConcurrentHashMap<URIPath, AbstractGuiseApplication>();
+	/**The thread-safe map of Guise applications keyed to application base URIs.*/
+	private final Map<URI, AbstractGuiseApplication> applicationMap=new ConcurrentHashMap<URI, AbstractGuiseApplication>();
 
 	/**Adds and initializes a Guise session.
 	This version creates a thread group for the session.
@@ -105,34 +105,34 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	}
 
 	/**Installs the given application at the given base path.
-	This version ensures the home, log, and temp directories exist.
 	If no theme is specified, the default theme will be loaded.
+	This version ensures the home, log, and temp directories exist.
 	@param application The application to install.
-	@param basePath The base path at which the application is being installed.
+	@param baseURI The base URI at which the application is being installed.
 	@param homeDirectory The home directory of the application.
 	@param logDirectory The log directory of the application.
 	@param tempDirectory The temporary directory of the application.
-	@exception NullPointerException if the application, base path, home directory, log directory, and/or temporary directory is <code>null</code>.
-	@exception IllegalArgumentException if the base path is not absolute and does not end with a slash ('/') character.
+	@exception NullPointerException if the application, base URI, home directory, log directory, and/or temporary directory is <code>null</code>.
+	@exception IllegalArgumentException if the given base URI is not absolute or the path of which is not absolute or not a collection.
 	@exception IllegalStateException if the application is already installed in some container.
 	@exception IllegalStateException if there is already an application installed in this container at the given base path.
 	@exception IOException if there is an I/O error when installing the application.
 	*/
-	protected void installApplication(final AbstractGuiseApplication application, final URIPath basePath, final File homeDirectory, final File logDirectory, final File tempDirectory) throws IOException
+	protected void installApplication(final AbstractGuiseApplication application, final URI baseURI, final File homeDirectory, final File logDirectory, final File tempDirectory) throws IOException
 	{
 		checkInstance(application, "Application cannot be null");
-		checkInstance(basePath, "Application base path cannot be null");
-		synchronized(applicationMap)	//synchronize installations so that we can check the existence of the base path in the container
+		checkAbsolute(baseURI);
+		synchronized(applicationMap)	//synchronize installations so that we can check the existence of the base URI in the container
 		{
-			if(applicationMap.get(basePath)!=null)	//if there is already an application installed at the given base path
+			if(applicationMap.get(baseURI)!=null)	//if there is already an application installed at the given base URI
 			{
-				throw new IllegalStateException("Application already installed at base path "+basePath);
+				throw new IllegalStateException("Application already installed at base URI "+baseURI);
 			}
 			ensureDirectoryExists(homeDirectory);	//make sure the application home directory exists
 			ensureDirectoryExists(logDirectory);	//make sure the application log directory exists
 			ensureDirectoryExists(tempDirectory);	//make sure the application temporary directory exists
-			application.install(this, basePath, homeDirectory, logDirectory, tempDirectory);	//tell the application it's being installed
-			applicationMap.put(basePath, application);	//install the application in the map
+			application.install(this, baseURI, homeDirectory, logDirectory, tempDirectory);	//tell the application it's being installed
+			applicationMap.put(baseURI, application);	//install the application in the map
 		}
 	}
 
@@ -144,18 +144,18 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	protected void uninstallApplication(final AbstractGuiseApplication application)	//TODO add a facility to unregister and remove all sessions associated with the application
 	{
 		checkInstance(application, "Application cannot be null");
-		final URIPath basePath=application.getBasePath();	//get the application's base path
-		if(basePath==null || application.getContainer()!=this)	//if the application has no bsae path or has a different container than this class
+		final URI baseURI=application.getBaseURI();	//get the application's base URI
+		if(baseURI==null || application.getContainer()!=this)	//if the application has no bsae path or has a different container than this class
 		{
 			throw new IllegalStateException("Application installed in a different container.");
 		}
-		synchronized(applicationMap)	//synchronize uninstallations so that we can check the existence of the base path in the container
+		synchronized(applicationMap)	//synchronize uninstallations so that we can check the existence of the base URI in the container
 		{
-			if(applicationMap.get(basePath)!=application)	//if something (or nothing) other than the given application is installed at this base path
+			if(applicationMap.get(baseURI)!=application)	//if something (or nothing) other than the given application is installed at this base URI
 			{
-				throw new IllegalStateException("Application not installed at base path "+basePath);
+				throw new IllegalStateException("Application not installed at base URI "+baseURI);
 			}
-			applicationMap.remove(basePath);	//remove the application in the map
+			applicationMap.remove(baseURI);	//remove the application in the map
 			application.uninstall(this);	//tell the application it's being uninstalled
 		}
 	}

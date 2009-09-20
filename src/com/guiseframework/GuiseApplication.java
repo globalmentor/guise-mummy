@@ -57,11 +57,11 @@ public interface GuiseApplication extends Resource, PropertyBindable, Configurat
 	/**The bound property of whether this application applies themes.*/
 	public final static String THEMED_PROPERTY=getPropertyName(GuiseApplication.class, "themed");
 
-	/**The application-relative base path reserved for exclusive Guise use.*/
+	/**The base path reserved for exclusive Guise use.*/
 	public final static URIPath GUISE_RESERVED_BASE_PATH=new URIPath("~guise/");
-	/**The application-relative base path to access all Guise assets.*/
+	/**The base path to access all Guise assets.*/
 	public final static URIPath GUISE_ASSETS_BASE_PATH=GUISE_RESERVED_BASE_PATH.resolve("assets/");
-	/**The application-relative base path to access all Guise temporary assets.*/
+	/**The base path to access all Guise temporary assets.*/
 	public final static URIPath GUISE_ASSETS_TEMP_BASE_PATH=GUISE_ASSETS_BASE_PATH.resolve("temp/");
 	/**The base path of audio assets, relative to the application.*/
 	public final static URIPath GUISE_ASSETS_AUDIO_PATH=GUISE_ASSETS_BASE_PATH.resolve("audio/");
@@ -212,15 +212,34 @@ public interface GuiseApplication extends Resource, PropertyBindable, Configurat
 	*/
 	public URIPath getNavigationPath(final URI depictionURI);
 
-	/**Determines the depict URI based upon a navigation URI.
-	This method must preserve paths beginning with {@value #GUISE_RESERVED_BASE_PATH}.
-	@param depictURI The plain absolute depict URI.
-	@param navigationURI The logical navigation URI, either absolute or relative to the application.
-	@return The depict URI, either absolute or relative to the application.
-	@throws NullPointerException if the given depict URI and/or logical URI is <code>null</code>.
-	@see #GUISE_RESERVED_BASE_PATH
+	/**Determines the depiction URI based upon a navigation path.
+	<p>The requested navigation path is allowed to be in three forms:</p>
+	<ul>
+		<li>An absolute path, such as <code>/full/path/file.ext</code>, which is typically resolved to the root depiction URI.</li>
+		<li>A path relative to the application, such as <code>path/file.ext</code>, which is typically transformed if needed based upon hosts configured for sub-paths.</li>
+		<li>
+	</ul>
+	@param depictionRootURI The plain, absolute, root URI depiction currently in use.
+	@param navigationPath The logical navigation path, either relative to the application, or absolute to the host.
+	@return A URI suitable for depiction, resolved to the application base path.
+	@throws NullPointerException if the given navigation URI is <code>null</code>.
 	*/
-	public URI getDepictionURI(final URI depictURI, final URI navigationURI);
+	public URI getDepictionURI(final URI depictionRootURI, final URIPath navigationPath);
+
+	/**Determines the depiction URI based upon a navigation URI.
+	<p>The requested navigation URI is allowed to be in three forms:</p>
+	<ul>
+		<li>An absolute URI, such as <code>http://www.cnn.com/</code>, which is typically returned unmodified.</li>
+		<li>A relative URI with an absolute path, such as <code>/full/path/file.ext</code>, which is typically resolved to the root depiction URI.</li>
+		<li>A relative URI with a path relative to the application, such as <code>path/file.ext</code>, which is typically transformed if needed based upon hosts configured for sub-paths.</li>
+		<li>
+	</ul>
+	@param depictionRootURI The plain, absolute, root URI depiction currently in use.
+	@param navigationURI The logical navigation URI, either absolute, relative to the application, or absolute to the host.
+	@return A URI suitable for depiction, resolved to the application base path.
+	@throws NullPointerException if the given navigation URI is <code>null</code>.
+	*/
+	public URI getDepictionURI(final URI depictionRootURI, final URI navigationURI);
 
 	/**Registers a destination so that it can be matched against one or more paths.
 	Any existing destinations for the path or path pattern is replaced.
@@ -357,18 +376,18 @@ public interface GuiseApplication extends Resource, PropertyBindable, Configurat
 	*/
 	public void checkInstalled();
 
-	/**Installs the application into the given container at the given base path.
+	/**Installs the application into the given container at the given base URI.
 	This method is called by {@link GuiseContainer} and should not be called directly by applications.
 	@param container The Guise container into which the application is being installed.
-	@param basePath The base path at which the application is being installed.
+	@param baseURI The base URI at which the application is being installed.
 	@param homeDirectory The home directory of the application.
 	@param logDirectory The log directory of the application.
 	@param tempDirectory The temporary directory of the application.
-	@exception NullPointerException if the container, base path, home directory, log directory, and/or temporary directory is <code>null</code>.
-	@exception IllegalArgumentException if the context path is not absolute and does not end with a slash ('/') character.
+	@exception NullPointerException if the container, base URI, home directory, log directory, and/or temporary directory is <code>null</code>.
+	@exception IllegalArgumentException if the given base URI is not absolute or the path of which is not absolute or not a collection.
 	@exception IllegalStateException if the application is already installed.
 	*/
-	public void install(final AbstractGuiseContainer container, final URIPath basePath, final File homeDirectory, final File logDirectory, final File tempDirectory);
+	public void install(final AbstractGuiseContainer container, final URI baseURI, final File homeDirectory, final File logDirectory, final File tempDirectory);
 
 	/**Uninstalls the application from the given container.
 	All log writers are closed.

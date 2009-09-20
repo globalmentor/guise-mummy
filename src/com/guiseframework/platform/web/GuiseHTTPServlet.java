@@ -354,7 +354,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 				final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
 //			TODO del	Log.trace("requestURI", requestURI);
 				final URIPath containerBasePath=new URIPath(getContextPath()+PATH_SEPARATOR);	//determine the base path of the container TODO important: determine if getContextPath() returns the raw path, as we want; otherwise, this will not work correctly for context paths with encoded path characters
-				final URI containerBaseURI=changeRawPath(requestURI, containerBasePath.toString());	//determine the container base URI
+				final URI containerBaseURI=changePath(requestURI, containerBasePath);	//determine the container base URI
 //			TODO del	Log.trace("containerURI", containerBaseURI);
 
 				final ServletContext servletContext=getServletContext();	//get the servlet context
@@ -363,9 +363,11 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 //TODO del Log.trace("installing application into guise container: ", guiseContainer, "for servlet context", getServletContext());
 					//install the application into the container
 				final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+/*TODO del when works
 						//"/contextPath" or "", "/servletPath" or ""
 				final URIPath guiseApplicationBasePath=new URIPath(request.getContextPath()+request.getServletPath()+PATH_SEPARATOR);	//construct the Guise application base path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
 				final URIPath guiseApplicationRelativePath=containerBasePath.relativize(guiseApplicationBasePath);	//get the application path relative to the container path
+*/
 
 //TODO del Log.trace("context path", request.getContextPath(), "servlet path", request.getServletPath(), "container base path", containerBasePath, "application base path", guiseApplicationBasePath, "application relative path", guiseApplicationRelativePath);
 				try
@@ -388,11 +390,17 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 							guiseApplicationDescriptionInputStream.close();	//always close the input stream
 						}
 					}
+					URI applicationBaseURI=guiseApplication.getBaseURI();	//see if the application already has a preferred base URI
+					if(applicationBaseURI==null)	//if the application has no preferred base URI
+					{
+						applicationBaseURI=containerBaseURI.resolve(request.getContextPath()+request.getServletPath()+PATH_SEPARATOR);	//get the default Guise application base path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash, and resolve it to the container base path
+					}
+					final URIPath guiseApplicationRelativePath=new URIPath("");	//TODO fix, now that we are using URIs for each application; perhaps use a name for each application, as this ID must remain the same even when deployed in different locations
 					final File guiseApplicationHomeDirectory=getDataDirectory(servletContext, DATA_DIRECTORY_INIT_PARAMETER, "guise/home/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
 					final File guiseApplicationLogDirectory=getDataDirectory(servletContext, LOG_DIRECTORY_INIT_PARAMETER, "guise/logs/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
 					final File guiseApplicationTempDirectory=getDataDirectory(servletContext, TEMP_DIRECTORY_INIT_PARAMETER, "guise/temp/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
 					//			TODO delLog.trace("ready to install application into container with context path", guiseApplicationContextPath);
-					guiseContainer.installApplication(guiseApplication, guiseApplicationBasePath, guiseApplicationHomeDirectory, guiseApplicationLogDirectory, guiseApplicationTempDirectory);	//install the application
+					guiseContainer.installApplication(guiseApplication, applicationBaseURI, guiseApplicationHomeDirectory, guiseApplicationLogDirectory, guiseApplicationTempDirectory);	//install the application
 				}
 				catch(final IOException ioException)	//if there is an I/O exception installing the application
 				{
@@ -1192,7 +1200,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						depictContext.writeElementEnd(null, "navigate");	//</navigate>
 						guisePlatform.clearSendResourceURI();	//clear the address of the resource to send so that we won't send it again
 					}
-					final URI requestDepictURI=guiseRequest.getDepictURI();	//get the request URI
+					final URI requestDepictionURI=guiseRequest.getDepictURI();	//get the request URI
 					final Bookmark newBookmark=guiseSession.getBookmark();	//see if the bookmark has changed
 //TODO del Log.trace("navigation bookmark:", navigationBookmark, "new bookmark", newBookmark);
 					final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
@@ -1217,9 +1225,9 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						{
 							redirectNavigationURI=appendRawQuery(navigationPath.toURI(), newBookmark.toString());	//save the constructed bookmark URI	TODO fix the confusion about whether there is a query on the URIs
 						}
-						final URI redirectDepictURI=requestDepictURI.resolve(guiseApplication.resolveURI(guiseApplication.getDepictionURI(requestDepictURI, redirectNavigationURI)));	//get the absolute redirect URI in depiction terms
+						final URI redirectDepictionURI=requestDepictionURI.resolve(requestDepictionURI.resolve(guiseApplication.getDepictionURI(getPlainURI(requestDepictionURI.resolve(ROOT_PATH)), redirectNavigationURI)));	//get the absolute redirect URI in depiction terms
 //Log.trace("depict version of requested navigation:", redirectDepictURI);
-						if(!requestDepictURI.equals(redirectDepictURI))	//if the navigation is really changing (i.e. they didn't request to go to where they already were)
+						if(!requestDepictionURI.equals(redirectDepictionURI))	//if the navigation is really changing (i.e. they didn't request to go to where they already were)
 						{
 							if(isAJAX)	//if this is an AJAX request
 							{
@@ -1237,13 +1245,13 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 									}
 								}
 //Log.trace("telling AJAX to redirect to:", redirectDepictURI);
-								depictContext.write(redirectDepictURI.toString());	//write the redirect URI
+								depictContext.write(redirectDepictionURI.toString());	//write the redirect URI
 								depictContext.writeElementEnd(null, "navigate");	//</navigate>
 							}
 							else	//if this is not an AJAX request
 							{
 //Log.trace("HTTP redirecting to:", redirectDepictURI);
-								throw new HTTPMovedTemporarilyException(redirectDepictURI);	//redirect to the new location TODO fix to work with other viewports
+								throw new HTTPMovedTemporarilyException(redirectDepictionURI);	//redirect to the new location TODO fix to work with other viewports
 							}
 							//TODO if !AJAX						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
 							//TODO store a flag or something---if we're navigating, we probably should flush the other queued events
@@ -1553,19 +1561,19 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 	*/
 	protected void redirect(final HTTPServletGuiseRequest guiseRequest, final GuiseApplication guiseApplication, final URI redirectNavigationURI, final Bookmark bookmark, final boolean permanent) throws HTTPRedirectException
 	{
-		final URI requestDepictURI=guiseRequest.getDepictURI();	//get the request depict URI
-		URI redirectDepictURI=requestDepictURI.resolve(guiseApplication.resolveURI(guiseApplication.getDepictionURI(requestDepictURI, redirectNavigationURI)));	//convert the redirect URI to a depict URI, resolve it to the application, and resolve it to the original depict URI
+		final URI requestDepictionURI=guiseRequest.getDepictURI();	//get the request depict URI
+		URI redirectDepictionURI=requestDepictionURI.resolve(guiseApplication.getDepictionURI(getPlainURI(requestDepictionURI.resolve(ROOT_PATH)), redirectNavigationURI));	//convert the redirect URI to a depict URI, resolve it to the application, and resolve it to the original depict URI
 		if(bookmark!=null)	//if a bookmark was given
 		{
-			redirectDepictURI=appendRawQuery(redirectDepictURI, bookmark.toString().substring(1));	//append the bookmark to the redirect URI TODO use a better way of extracting the bookmark query information
+			redirectDepictionURI=appendRawQuery(redirectDepictionURI, bookmark.toString().substring(1));	//append the bookmark to the redirect URI TODO use a better way of extracting the bookmark query information
 		}
 		if(permanent)	//if this is a permanent redirect
 		{
-			throw new HTTPMovedPermanentlyException(redirectDepictURI);	//redirect permanently
+			throw new HTTPMovedPermanentlyException(redirectDepictionURI);	//redirect permanently
 		}
 		else	//if this is a temporary redirect
 		{
-			throw new HTTPMovedTemporarilyException(redirectDepictURI);	//redirect temporarily
+			throw new HTTPMovedTemporarilyException(redirectDepictionURI);	//redirect temporarily
 		}
 	}
 

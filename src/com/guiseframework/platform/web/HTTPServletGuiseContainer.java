@@ -99,19 +99,20 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 
 	/**Installs the given application at the given context path.
 	This version is provided to expose the method to the servlet.
-	@param basePath The base path at which the application is being installed.
+	@param baseURI The base URI at which the application is being installed.
 	@param homeDirectory The home directory of the application.
 	@param logDirectory The log directory of the application.
-	@param tempDirectory The temprary directory of the application.
-	@exception NullPointerException if either the application, base path, home directory, log directory, and/or temprary directory is <code>null</code>.
-	@exception IllegalArgumentException if the context path is not absolute and does not end with a slash ('/') character.
+	@param tempDirectory The temporary directory of the application.
+	@exception NullPointerException if the application, base URI, home directory, log directory, and/or temprary directory is <code>null</code>.
+	@exception IllegalArgumentException if the given base URI is not absolute or the path of which is not absolute or not a collection.
 	@exception IllegalStateException if the application is already installed in some container.
 	@exception IllegalStateException if there is already an application installed in this container at the given context path.
 	@exception IOException if there is an I/O error when installing the application.
 	*/
-	protected void installApplication(final AbstractGuiseApplication application, final URIPath basePath, final File homeDirectory, final File logDirectory, final File tempDirectory) throws IOException
+	@Override
+	protected void installApplication(final AbstractGuiseApplication application, final URI baseURI, final File homeDirectory, final File logDirectory, final File tempDirectory) throws IOException
 	{
-		super.installApplication(application, basePath, homeDirectory, logDirectory, tempDirectory);	//delegate to the parent class
+		super.installApplication(application, baseURI, homeDirectory, logDirectory, tempDirectory);	//delegate to the parent class
 	}
 
 	/**Uninstalls the given application.
@@ -179,9 +180,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 			httpSessionGuiseSessionSetMap.addItem(httpSession, guiseSession);	//indicate that this Guise session is for this HTTP session
 		}
 		final URI requestDepictionURI=URI.create(httpRequest.getRequestURL().toString());	//get the depiction URI of the current request
-		final URI sessionDepictionBaseURI=requestDepictionURI.resolve(guiseApplication.getDepictionURI(requestDepictionURI, guiseApplication.getBasePath().toURI()));	//resolve the depiction form of the application base path to the request depiction URI
-			//TODO currently changing the depiction base URI doesn't fire any events; if it did, we might want first to create a session thread group; but can the depiction base URI actually even change within the current session?
-		guiseSession.setDepictionBaseURI(sessionDepictionBaseURI);	//update the depiction base URI to the one specified by the request, in case the session is created from a different URL
+		guiseSession.setDepictionRootURI(getPlainURI(requestDepictionURI.resolve(ROOT_PATH)));	//update the depiction plain root URI to the root of the URL specified by the request, in case the session is created from a different URL
 		return guiseSession;	//return the Guise session
 	}
 

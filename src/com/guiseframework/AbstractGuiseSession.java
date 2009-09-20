@@ -157,24 +157,26 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	/**The depiction base URI of the session.*/
 	private URI depictionBaseURI;
 
-		/**Reports the current depiction base URI of the session.
-		The depiction base URI is an absolute plain URI that ends with the session's depiction base path of the application, ending with a slash ('/').
-		The session depiction base URI may be different for different sessions, and may not be equal to the application navigation base path resolved to the container's base URI.
-		@return The depiction base URI currently representing the Guise session.
-		*/
-		public URI getDepictionBaseURI() {return depictionBaseURI;}
+		/**{@inheritDoc}*/
+		public URI getDepictionRootURI() {return depictionBaseURI;}
 
-		/**Sets the depiction base URI of the session.
-		@param depictionBaseURI The new depiction base URI of the session.
-		@exception NullPointerException if the given depiction base URI is <code>null</code>.
-		*/
-		public void setDepictionBaseURI(final URI depictionBaseURI)
+		/**{@inheritDoc}*/
+		public void setDepictionRootURI(final URI depictionBaseURI)
 		{
-			if(!this.depictionBaseURI.equals(checkInstance(depictionBaseURI, "Session depiction base URI cannot be null.")))	//if a new base URI is given
+			if(!this.depictionBaseURI.equals(checkRoot(checkAbsolute(checkPlainURI(depictionBaseURI)))))	//if a new root URI is given
 			{
 				this.depictionBaseURI=depictionBaseURI;	//save the new base URI
 			}
 		}
+
+	/**{@inheritDoc}
+ 	<p>This implementation delegates to {@link #getDepictionURI(URI, String...)}.</p>
+	*/
+	@Override
+	public final URI getDepictionURI(final URIPath navigationPath, final String... suffixes)
+	{
+		return getDepictionURI(navigationPath.toURI(), suffixes);
+	}
 
 	/**Determines the URI to use for depiction based upon a navigation URI.
 	The URI will first be dereferenced for the current session and then resolved to the application base path
@@ -183,13 +185,13 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@param suffixes The suffixes, if any, to append to a resource key in a URI reference.
 	@return A URI suitable for depiction, deferenced and resolved to the application base path.
 	@see #dereferenceURI(URI, String...)
-	@see #getDepictionBaseURI()
 	@see GuiseApplication#getDepictionURI(URI, URI)
 	*/
+	@Override
 	public URI getDepictionURI(final URI navigationURI, final String... suffixes)
 	{
 		final GuiseApplication guiseApplication=getApplication();	//get the application
-		return guiseApplication.resolveURI(guiseApplication.getDepictionURI(getDepictionBaseURI(), dereferenceURI(navigationURI, suffixes)));	//determine the depict URI and resolve it to the application base path
+		return guiseApplication.getDepictionURI(getDepictionRootURI(), dereferenceURI(navigationURI, suffixes));	//dereference the navigation URI and determine the depiction URI
 	}
 
 	/**The application frame, initialized during {@link #initialize()}.*/
@@ -1491,11 +1493,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@param navigationPath The navigation path which a breadcrumb should be returned.
 	@return A breadcrumb for the given navigation URI.
 	@throws NullPointerException if the given navigation path is <code>null</code>.
-	@see #getDepictionURI(URI, String...)
+	@see #getDepictionURI(URIPath, String...)
 	*/
 	public Breadcrumb getBreadcrumb(final URIPath navigationPath)
 	{
-		final URI depictionURI=getDepictionURI(navigationPath.toURI());	//get the depiction URI to show
+		final URI depictionURI=getDepictionURI(navigationPath);	//get the depiction URI to show
 		return new Breadcrumb(navigationPath, URIs.getName(depictionURI));	//create a default breadcrumb with the decoded depiction name of this navigation path
 	}
 		
