@@ -788,13 +788,13 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		}
 		
 	/**URI constructor.
+	The URI identifier may or may not be the URI at which the application can be accessed
 	This implementation sets the locale to the JVM default.
-	@param uri The URI for the application, which may or may not be the URI at which the application can be accessed.
-	@throws NullPointerException if the given URI is <code>null</code>.
+	@param uri The URI for the application, or <code>null</code> if there is no identifier is not known.
 	*/
 	public AbstractGuiseApplication(final URI uri)
 	{
-		this.uri=checkInstance(uri, "Application URI cannot be null."); //set the URI
+		this.uri=uri; //set the URI
 		locales=unmodifiableList(asList(Locale.getDefault()));	//create an unmodifiable list of locales including only the default locale of the JVM
 		this.environment=new DefaultEnvironment();	//create a default environment
 		this.logConfiguration=new DefaultLogConfiguration();	//create a default log configuration, which we'll initialize with a log file later

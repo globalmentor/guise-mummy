@@ -51,9 +51,15 @@ public class DemoApplication extends AbstractGuiseApplication
 			return "user"+(++userCounter);	//return a user ID in the form userX
 		}
 
+	/**Default constructor with no identifier.*/
+	public DemoApplication()
+	{
+		this(null);
+	}
+
 	/**URI constructor.
-	@param uri The URI for the application, which may or may not be the URI at which the application can be accessed.
-	@throws NullPointerException if the given URI is <code>null</code>.
+	The URI identifier may or may not be the URI at which the application can be accessed.
+	@param uri The URI for the application, or <code>null</code> if there is no identifier.
 	*/
 	public DemoApplication(final URI uri)
 	{
