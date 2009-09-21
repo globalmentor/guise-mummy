@@ -214,7 +214,7 @@ Log.debug("cache miss for text", xmlTextHash);
 					continue;
 				}
 				final String attributeValue=attribute.getNodeValue();	//get the value of the attribute
-				if(XHTML_NAMESPACE_URI.equals(attributeNamespaceURI) && ATTRIBUTE_CLASS.equals(attributeLocalName))	//treat the class attribute independently and separately
+				if(attributeNamespaceURI==null && ATTRIBUTE_CLASS.equals(attributeLocalName))	//treat the class attribute independently and separately
 				{
 					classAttributeValue=attributeValue;	//save the class attribute for later
 					continue;
