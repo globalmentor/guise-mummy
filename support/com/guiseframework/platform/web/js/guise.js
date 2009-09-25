@@ -3702,7 +3702,7 @@ function onClick(event)
 	var target=event.target;	//get the element being clicked 
 	if(target.nodeType==Node.ELEMENT_NODE)	//if the event occurred on an element
 	{
-		var elementClassName=node.className;	//get the element class name
+		var elementClassName=target.className;	//get the element class name
 		var elementClassNames=elementClassName ? elementClassName.split(/\s/) : EMPTY_ARRAY;	//split out the class names
 		if(elementClassNames.contains("content"))	//if something in the content was clicked on
 		{
