@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 
-import com.garretwilson.model.ResourceModel;
 import com.globalmentor.marmot.AbstractMarmotSession;
 import com.globalmentor.marmot.MarmotSession;
 import com.globalmentor.marmot.guise.repository.RepositoryResourceTreeNodeModel;
@@ -33,6 +32,7 @@ import com.globalmentor.marmot.repository.webdav.WebDAVRepository;
 import com.globalmentor.marmot.resource.DefaultResourceKit;
 import com.globalmentor.marmot.resource.folder.FolderResourceKit;
 import com.globalmentor.marmot.resource.image.ImageResourceKit;
+import com.globalmentor.net.ResourceModel;
 import com.globalmentor.rdf.RDFLiteral;
 import com.globalmentor.rdf.RDFResource;
 import com.globalmentor.rdf.RDFResources;
