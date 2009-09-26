@@ -292,7 +292,7 @@ function DragState(dragSource, mouseX, mouseY)
 */
 //TODO del if not needed			drag(mouseX, mouseY);	//do a fake drag to make sure that the position of the element is within any ranges
 			this.dragging=true;	//show that we are dragging
-			com.garretwilson.js.EventManager.addEvent(document, "mousemove", onDrag, false);	//listen for mouse move anywhere in document (IE doesn't allow us to listen on the window), as dragging may end somewhere else besides a drop target
+			com.globalmentor.js.EventManager.addEvent(document, "mousemove", onDrag, false);	//listen for mouse move anywhere in document (IE doesn't allow us to listen on the window), as dragging may end somewhere else besides a drop target
 			if(this.onDragBegin)	//if there is a function for beginning dragging
 			{
 				this.onDragBegin(this.element);	//call the dragging begin method
@@ -381,7 +381,7 @@ function DragState(dragSource, mouseX, mouseY)
 		/**Ends the drag process.*/
 		DragState.prototype.endDrag=function()
 		{
-			com.garretwilson.js.EventManager.removeEvent(document, "mousemove", onDrag, false);	//stop listening for mouse moves
+			com.globalmentor.js.EventManager.removeEvent(document, "mousemove", onDrag, false);	//stop listening for mouse moves
 /*TODO del after new stop default method
 			document.body.ondrag=null;	//turn IE drag event processing back on
 			document.body.onselectstart=null;

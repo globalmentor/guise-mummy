@@ -21,7 +21,7 @@ Dependencies:
 	javascript.js
 */
 
-var com=com||{}; com.garretwilson=com.garretwilson||{}; com.garretwilson.js=com.garretwilson.js||{};	//create the com.garretwilson.js package
+var com=com||{}; com.globalmentor=com.globalmentor||{}; com.globalmentor.js=com.globalmentor.js||{};	//create the com.globalmentor.js package
 
 /**See if the browser is Safari.*/
 var isSafari=navigator.userAgent.indexOf("Safari")>=0;	//TODO use a better variable; do better checks
@@ -560,11 +560,11 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		{
 			var onLoad=function()	//create a function to call the function after the image is loaded TODO fix this creates a race condition, because the image could finish loading before we can install our listener
 					{
-						com.garretwilson.js.EventManager.removeEvent(img, "load", onLoad, false);	//stop waiting for the img to load
+						com.globalmentor.js.EventManager.removeEvent(img, "load", onLoad, false);	//stop waiting for the img to load
 						fn();	//call the function
 //TODO del alert("img loaded after waiting!");	//TODO del
 					};
-			com.garretwilson.js.EventManager.addEvent(img, "load", onLoad, false);	//register an event on the img to wait for it to load
+			com.globalmentor.js.EventManager.addEvent(img, "load", onLoad, false);	//register an event on the img to wait for it to load
 		}
 	},
 
@@ -1228,13 +1228,13 @@ A decorator will be created for the event function.
 @param createDecorator Whether a decorator should be created to wrap the event function and ensure W3DC compliancy.
 var decorator The decorator created to wrap the event function and ensure W3C compliancy.
 */
-com.garretwilson.js.EventListener=function(currentTarget, eventType, fn, useCapture, createDecorator)
+com.globalmentor.js.EventListener=function(currentTarget, eventType, fn, useCapture, createDecorator)
 {
 	this.currentTarget=currentTarget;
 	this.eventType=eventType;
 	this.fn=fn;
 	this.useCapture=useCapture;
-	var proto=com.garretwilson.js.EventListener.prototype;
+	var proto=com.globalmentor.js.EventListener.prototype;
 	if(!proto._initialized)
 	{
 		proto._initialized=true;
@@ -1361,7 +1361,7 @@ com.garretwilson.js.EventListener=function(currentTarget, eventType, fn, useCapt
 }
 
 /**A class that manages events.*/
-com.garretwilson.js.EventManager=
+com.globalmentor.js.EventManager=
 {
 	/**The array of event listeners.*/
 	_eventListeners:[],
@@ -1380,19 +1380,19 @@ com.garretwilson.js.EventManager=
 		if(object.addEventListener)	//if the W3C DOM method is supported
 		{
 			object.addEventListener(eventType, fn, useCapture);	//add the event normally
-			eventListener=new com.garretwilson.js.EventListener(object, eventType, fn, useCapture, false);	//create an event listener to keep track of the information
+			eventListener=new com.globalmentor.js.EventListener(object, eventType, fn, useCapture, false);	//create an event listener to keep track of the information
 		}
 		else	//if the W3C version isn't available
 		{
 			var eventName="on"+eventType;	//create the event name
 			if(object.attachEvent)	//if we can use the IE version
 			{
-				eventListener=new com.garretwilson.js.EventListener(object, eventType, fn, useCapture, true);	//create an event listener with a decorator
+				eventListener=new com.globalmentor.js.EventListener(object, eventType, fn, useCapture, true);	//create an event listener with a decorator
 				result=object.attachEvent(eventName, eventListener.decorator);	//attach the function decorator
 			}
 			else	//if we can't use the IE version
 			{
-				eventListener=new com.garretwilson.js.EventListener(object, eventType, fn, useCapture, true);	//create an event listener with a decorator
+				eventListener=new com.globalmentor.js.EventListener(object, eventType, fn, useCapture, true);	//create an event listener with a decorator
 				object[eventName]=eventListener.decorator;	//use the object.onEvent property and our decorator
 			}
 		}
@@ -1506,4 +1506,4 @@ function addLoadListener(func)
 }
 */
 
-//TODO find out why this doesn't work: com.garretwilson.js.EventManager.addEvent(window, "unload", com.garretwilson.js.EventManager.clearEvents.bind(com.garretwilson.js.EventManager), false);	//unload all events when the window unloads
+//TODO find out why this doesn't work: com.globalmentor.js.EventManager.addEvent(window, "unload", com.globalmentor.js.EventManager.clearEvents.bind(com.globalmentor.js.EventManager), false);	//unload all events when the window unloads

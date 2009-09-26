@@ -2025,9 +2025,9 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 				guiseIE6Fix.fixStylesheets();	//fix all IE6 stylesheets
 			}
 		*/
-			com.garretwilson.js.EventManager.addEvent(window, "resize", this._onWindowResize.bind(this), false);	//add a resize listener
-		//TODO del	com.garretwilson.js.EventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
-			com.garretwilson.js.EventManager.addEvent(window, "unload", this.onUnload.bind(this), false);	//do the appropriate uninitialization when the window unloads
+			com.globalmentor.js.EventManager.addEvent(window, "resize", this._onWindowResize.bind(this), false);	//add a resize listener
+		//TODO del	com.globalmentor.js.EventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
+			com.globalmentor.js.EventManager.addEvent(window, "unload", this.onUnload.bind(this), false);	//do the appropriate uninitialization when the window unloads
 
 			/**Support for insert for TinyMCE.
 			Modified from XHTMLxtras TinyMCE Plugin 3.2.1, Copyright © 2004-2008, Moxiecode Systems AB.
@@ -2091,10 +2091,10 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 			this._initializeNode(document.documentElement, true, true);	//initialize the document tree, indicating that this is the first initialization
 			this._updateComponents(document.documentElement, true);	//update all components represented by elements within the document
 		//TODO del when works	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
-			com.garretwilson.js.EventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
-			com.garretwilson.js.EventManager.addEvent(document.documentElement, "keydown", onKey, false);	//listen for key down anywhere in the document so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
-			com.garretwilson.js.EventManager.addEvent(document.documentElement, "keyup", onKey, false);	//listen for key up anywhere in the document so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
-			com.garretwilson.js.EventManager.addEvent(document.documentElement, "click", onClick, false);	//listen for mouse clicks bubbling up from anywhere (that we haven't dealt with specifically and canceled) in the document so that we can report clicks back to the server
+			com.globalmentor.js.EventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
+			com.globalmentor.js.EventManager.addEvent(document.documentElement, "keydown", onKey, false);	//listen for key down anywhere in the document so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
+			com.globalmentor.js.EventManager.addEvent(document.documentElement, "keyup", onKey, false);	//listen for key up anywhere in the document so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
+			com.globalmentor.js.EventManager.addEvent(document.documentElement, "click", onClick, false);	//listen for mouse clicks bubbling up from anywhere (that we haven't dealt with specifically and canceled) in the document so that we can report clicks back to the server
 			this.sendAJAXRequest(new InitAJAXEvent());	//send an initialization AJAX request	
 		//TODO del	alert("compatibility mode: "+document.compatMode);
 			this.setBusyVisible(false);	//turn off the busy indicator	
@@ -2214,7 +2214,7 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 		{
 			this.setEnabled(false);	//immediately turn off AJAX communication
 				//TODO fix or del	this.setBusyVisible(true);	//turn on the busy indicator
-			com.garretwilson.js.EventManager.clearEvents();	//unload all events
+			com.globalmentor.js.EventManager.clearEvents();	//unload all events
 				//TODO fix or del	this.setBusyVisible(false);	//turn off the busy indicator
 		};
 
@@ -2739,7 +2739,7 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 								{
 									if(!node.getAttribute("target"))	//if the link has no target (the target wouldn't work if we tried to take over the events; we can't just check for null because IE will always send back at least "")
 									{
-										com.garretwilson.js.EventManager.addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
+										com.globalmentor.js.EventManager.addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
 										if(isSafari)	//if this is Safari TODO fix better; this may have been fixed in Safari 2.0.4; see http://developer.yahoo.com/yui/docs/YAHOO.util.Event.html
 										{
 											node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
@@ -2750,7 +2750,7 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 							case "button":
 								if(elementClassNames.contains("buttonControl"))	//if this is a Guise button TODO use constant
 								{
-									com.garretwilson.js.EventManager.addEvent(node, "click", onButtonClick, false);	//listen for button clicks
+									com.globalmentor.js.EventManager.addEvent(node, "click", onButtonClick, false);	//listen for button clicks
 									if(isSafari)	//if this is Safari TODO fix better
 									{
 										node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
@@ -2780,8 +2780,8 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 									this.loadImage(rolloverSrc);	//preload the image
 									if(!Element.hasClassName(node, STYLES.MOUSE_LISTENER))	//if this is not a mouse listener (which would get a onMouse listener registered, anyway)
 									{
-										com.garretwilson.js.EventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
-										com.garretwilson.js.EventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener							
+										com.globalmentor.js.EventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
+										com.globalmentor.js.EventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener							
 									}
 		//TODO del							alert("rollover source: "+node.getAttribute("guise:rolloverSrc"));
 								}
@@ -2809,19 +2809,19 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 								{
 									case "text":
 									case "password":
-										com.garretwilson.js.EventManager.addEvent(node, "change", onTextInputChange, false);
-		//TODO del; doesn't work across browsers								com.garretwilson.js.EventManager.addEvent(node, "keypress", onTextInputKeyPress, false);
-										com.garretwilson.js.EventManager.addEvent(node, "keydown", onTextInputKeyDown, false);
-										com.garretwilson.js.EventManager.addEvent(node, "keyup", onTextInputKeyUp, false);
+										com.globalmentor.js.EventManager.addEvent(node, "change", onTextInputChange, false);
+		//TODO del; doesn't work across browsers								com.globalmentor.js.EventManager.addEvent(node, "keypress", onTextInputKeyPress, false);
+										com.globalmentor.js.EventManager.addEvent(node, "keydown", onTextInputKeyDown, false);
+										com.globalmentor.js.EventManager.addEvent(node, "keyup", onTextInputKeyUp, false);
 										break;
 									case "checkbox":
 									case "radio":
-										com.garretwilson.js.EventManager.addEvent(node, "click", onCheckInputChange, false);
+										com.globalmentor.js.EventManager.addEvent(node, "click", onCheckInputChange, false);
 										break;
 									case "file":
 										if(elementClassNames.contains("resourceCollectControl-body"))	//if this is a Guise resource collect control TODO maybe change to the reverse logic (i.e. not ResourceCollectControl)
 										{
-											com.garretwilson.js.EventManager.addEvent(node, "change", onFileInputChange, false);
+											com.globalmentor.js.EventManager.addEvent(node, "change", onFileInputChange, false);
 										}
 										else if(elementClassNames.contains("resourceImportControl-body"))	//if this is a Guise resource import control, we'll later need to submit the form differently
 										{
@@ -2831,7 +2831,7 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 								}
 								break;
 							case "select":
-								com.garretwilson.js.EventManager.addEvent(node, "change", onSelectChange, false);
+								com.globalmentor.js.EventManager.addEvent(node, "change", onSelectChange, false);
 		/*TODO del
 								var iframe=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//TODO testing
 								iframe.src="about:blank";
@@ -2883,8 +2883,8 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 								}
 								else	//if this is a normal text area TODO maybe require text/plain
 								{
-									com.garretwilson.js.EventManager.addEvent(node, "change", onTextInputChange, false);
-									com.garretwilson.js.EventManager.addEvent(node, "keydown", onTextInputKeyDown, false);	//commit the text area on Enter TODO decide whether we want real-time checking with onTextInpuKeyUp, which would be very expensive for text areas
+									com.globalmentor.js.EventManager.addEvent(node, "change", onTextInputChange, false);
+									com.globalmentor.js.EventManager.addEvent(node, "keydown", onTextInputKeyDown, false);	//commit the text area on Enter TODO decide whether we want real-time checking with onTextInpuKeyUp, which would be very expensive for text areas
 								}
 								break;
 						}
@@ -2901,38 +2901,38 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 							{
 		/*TODO del
 								case "button":	//TODO testing; del
-									com.garretwilson.js.EventManager.addEvent(node, "click", onButtonClick, false);	//listen for button clicks
+									com.globalmentor.js.EventManager.addEvent(node, "click", onButtonClick, false);	//listen for button clicks
 									break;
 		*/
 								case STYLES.ACTION:
-									com.garretwilson.js.EventManager.addEvent(node, "click", onActionClick, false);	//listen for a click on an action element
-									com.garretwilson.js.EventManager.addEvent(node, "contextmenu", onContextMenu, false);	//listen for a right click on an action element
+									com.globalmentor.js.EventManager.addEvent(node, "click", onActionClick, false);	//listen for a click on an action element
+									com.globalmentor.js.EventManager.addEvent(node, "contextmenu", onContextMenu, false);	//listen for a right click on an action element
 									if(isSafari)	//if this is Safari TODO fix better
 									{
 										node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
 									}
 									break;
 								case STYLES.DRAG_HANDLE:
-									com.garretwilson.js.EventManager.addEvent(node, "mousedown", onDragBegin, false);	//listen for mouse down on a drag handle
+									com.globalmentor.js.EventManager.addEvent(node, "mousedown", onDragBegin, false);	//listen for mouse down on a drag handle
 									break;
 								case STYLES.MOUSE_LISTENER:
 									if(!Node.getAncestorElementByClassName(node.parentNode, STYLES.MOUSE_LISTENER))	//make sure this is the root mouse listener, as we'll allow events to bubble
 									{
-										com.garretwilson.js.EventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
-										com.garretwilson.js.EventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener
+										com.globalmentor.js.EventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
+										com.globalmentor.js.EventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener
 									}
 									break;
 								case STYLES.DROP_TARGET:
 									this.addDropTarget(node);	//add this node to the list of drop targets
 									break;
 								case STYLES.SLIDER_CONTROL_THUMB:
-									com.garretwilson.js.EventManager.addEvent(node, "mousedown", onSliderThumbDragBegin, false);	//listen for mouse down on a slider thumb
+									com.globalmentor.js.EventManager.addEvent(node, "mousedown", onSliderThumbDragBegin, false);	//listen for mouse down on a slider thumb
 									break;
 							}
 						}
 						if(node.focus)	//if this element can receive the focus
 						{
-							com.garretwilson.js.EventManager.addEvent(node, "focus", this._onFocus.bind(this), false);	//listen for focus events; we must do this specifically for each node, because focus events don't focus correctly
+							com.globalmentor.js.EventManager.addEvent(node, "focus", this._onFocus.bind(this), false);	//listen for focus events; we must do this specifically for each node, because focus events don't focus correctly
 						}
 					}
 					break;
@@ -3031,7 +3031,7 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 		*/
 		proto._uninitializeNode=function(node, deep)	//TODO remove the node from the sorted list of drop targets
 		{
-			com.garretwilson.js.EventManager.clearEvents(node);	//clear events for this node
+			com.globalmentor.js.EventManager.clearEvents(node);	//clear events for this node
 			switch(node.nodeType)	//see which type of child node this is
 			{
 				case Node.ELEMENT_NODE:	//element
@@ -4417,4 +4417,4 @@ function debug(text)
 	window.open(dymamicContent, "debug", "status=no,menubar=no,scrollbars=yes,resizable=no,width=800,height=600");
 }
 
-com.garretwilson.js.EventManager.addEvent(window, "load", guise.onLoad.bind(guise), false);	//do the appropriate initialization when the window loads
+com.globalmentor.js.EventManager.addEvent(window, "load", guise.onLoad.bind(guise), false);	//do the appropriate initialization when the window loads
