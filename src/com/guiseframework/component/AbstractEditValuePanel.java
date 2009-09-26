@@ -20,7 +20,6 @@ import java.util.ArrayList;
 
 import static com.guiseframework.component.Components.*;
 
-import com.garretwilson.swing.Editable;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 

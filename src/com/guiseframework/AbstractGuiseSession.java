@@ -1568,7 +1568,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	/**Reports that a bound property has changed.
 	This implementation delegates to the Guise session to fire or postpone the property change event.
 	@param propertyChangeEvent The event to fire.
-	@see GuiseSession#queueEvent(com.garretwilson.event.PostponedEvent)
+	@see GuiseSession#queueEvent(com.globalmentor.event.PostponedEvent)
 	*/
 /*TODO del when postponed property change events are removed
 	protected void firePropertyChange(final PropertyChangeEvent propertyChangeEvent)
