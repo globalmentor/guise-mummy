@@ -308,6 +308,7 @@ public class Theme extends URFListResource<Rule>
 	public final static String LABEL_PASSWORD=createStringResourceReference("theme.label.password");
 	public final static String LABEL_PASSWORD_VERIFICATION=createStringResourceReference("theme.label.password_verification");
 	public final static String LABEL_PREVIOUS=createStringResourceReference("theme.label.previous");
+	public final static String LABEL_PRODUCT_JAVA=createStringResourceReference("theme.label.product.java");
 	public final static String LABEL_PROPERTIES=createStringResourceReference("theme.label.properties");
 	public final static String LABEL_X_PROPERTIES=createStringResourceReference("theme.label.x.properties");
 	public final static String LABEL_RAISE=createStringResourceReference("theme.label.raise");
@@ -408,6 +409,7 @@ public class Theme extends URFListResource<Rule>
 	public final static URI GLYPH_POLYGON_POINTS=createURIResourceReference("theme.glyph.polygon.points");
 	public final static URI GLYPH_PREVIEW=createURIResourceReference("theme.glyph.preview");
 	public final static URI GLYPH_PREVIOUS=createURIResourceReference("theme.glyph.previous");
+	public final static URI GLYPH_PRODUCT_JAVA=createURIResourceReference("theme.glyph.product.java");
 	public final static URI GLYPH_PROPERTIES=createURIResourceReference("theme.glyph.properties");
 	public final static URI GLYPH_QUESTION=createURIResourceReference("theme.glyph.question");
 	public final static URI GLYPH_REFRESH=createURIResourceReference("theme.glyph.refresh");

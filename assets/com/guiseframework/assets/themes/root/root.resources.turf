@@ -169,6 +169,7 @@
 		"theme.label.password"="Password"
 		"theme.label.password.verification"="Password Verification"
 		"theme.label.previous"="Previous"
+		"theme.label.product.java"="Java"
 		"theme.label.properties"="Properties"
 		"theme.label.x.properties"="{0} \“theme.label.properties\”"
 		"theme.label.raise"="Raise"
@@ -270,6 +271,7 @@
 		"theme.glyph.polygon.points"=<images/icons/glyphs/polygon_points.gif>
 		"theme.glyph.preview"=<resource:theme.glyph.document.preview>
 		"theme.glyph.previous"=<images/icons/glyphs/hand_point_left.gif>
+		"theme.glyph.product.java"=<images/icons/glyphs/product-java.png>
 		"theme.glyph.properties"=<images/icons/glyphs/properties.gif>
 		"theme.glyph.question"=<images/icons/glyphs/question.gif>
 		"theme.glyph.refresh"=<images/icons/glyphs/refresh.gif>
