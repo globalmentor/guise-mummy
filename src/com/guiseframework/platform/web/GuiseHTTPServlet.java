@@ -603,21 +603,23 @@ Log.trace("servicing Guise request with request", guiseRequest);
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 		URIPath navigationPath=new URIPath(rawPathInfo.substring(1));	//remove the beginning slash to get the navigation path from the path info
 */
-		if(!guiseRequest.isAJAX() && (GET_METHOD.equals(requestMethod) || !(destination instanceof ResourceWriteDestination)))	//if this is not an AJAX request, verify that the destination exists (doing this with AJAX requests would be too costly; we can assume that AJAX requests are for existing destinations) (but don't check if this is a POST to a ResourceWriteDestination, which probably won't exist; TODO clarify exist() semantics for ResourceWriteDestinations)
+		if(!guiseRequest.isAJAX())	//if this is not an AJAX request, verify existence and permissions
 		{
-/*TODO del
-			final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
-			final String referrer=getReferer(request);	//get the request referrer, if any
-			final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
-*/
-			final URIPath newPath=destination.getPath(guiseSession, path, bookmark, referrerURI);	//see if we should use another path
-			if(!newPath.equals(path))	//if we should use another path
+			if(GET_METHOD.equals(requestMethod) || !(destination instanceof ResourceWriteDestination))	//if this is not an AJAX request, verify that the destination exists (doing this with AJAX requests would be too costly; we can assume that AJAX requests are for existing destinations) (but don't check if this is a POST to a ResourceWriteDestination, which probably won't exist; TODO clarify exist() semantics for ResourceWriteDestinations)
 			{
-				redirect(guiseRequest, guiseApplication, newPath.toURI(), bookmark, true);	//redirect the user agent to the preferred path
+				final URIPath newPath=destination.getPath(guiseSession, path, bookmark, referrerURI);	//see if we should use another path
+				if(!newPath.equals(path))	//if we should use another path
+				{
+					redirect(guiseRequest, guiseApplication, newPath.toURI(), bookmark, true);	//redirect the user agent to the preferred path
+				}
+				if(!destination.exists(guiseSession, path, bookmark, referrerURI))	//if this destination doesn't exist
+				{
+					throw new HTTPNotFoundException("Path does not exist at Guise destination: "+path);
+				}
 			}
-			else if(!destination.exists(guiseSession, path, bookmark, referrerURI))	//if this destination doesn't exist
+			if(!destination.isAuthorized(guiseSession, path, bookmark, referrerURI))	//if this destination isn't authorized
 			{
-				throw new HTTPNotFoundException("Path does not exist at Guise destination: "+path);
+				throw new HTTPForbiddenException("Path is not authorized at Guise destination: "+path);
 			}
 		}
 		if(destination instanceof ComponentDestination)	//if we have a component destination associated with the requested path

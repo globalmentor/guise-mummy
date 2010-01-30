@@ -68,4 +68,20 @@ public interface Destination extends PropertyBindable
 	*/
 	public boolean exists(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException;
 
+	/**Determines if access to the given path is authorized for access by the current user, if any.
+	<p>The result of this method for resources that do not exist is undefined; it is assumed that this method will not be called unless
+	{@link #exists(GuiseSession, URIPath, Bookmark, URI)} returns <code>true</code> for that resource, although this method must not
+	produce an error if the resource does not exist.</p>
+	<p>This method allows the underlying platform to handle unauthorized resources. If this implementation wishes to handle unauthorized
+	resources, this method should return <code>true</code> and provide a resource that indicates the true resource is unauthorized or
+	at the appropriate time redirect to an unauthorized indication page.</p>
+	@param session The current Guise session. 
+	@param navigationPath The navigation path relative to the application context path.
+	@param bookmark The bookmark for which navigation should occur at this navigation path, or <code>null</code> if there is no bookmark involved in navigation.
+	@param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
+	@return Whether the requested path exists.
+	@exception NullPointerException if the given navigation path is <code>null</code>.
+	@exception ResourceIOException if there is an error accessing the resource.
+	*/
+	public boolean isAuthorized(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException;
 }
