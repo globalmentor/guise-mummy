@@ -1225,7 +1225,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						{
 							redirectNavigationURI=appendRawQuery(navigationPath.toURI(), newBookmark.toString());	//save the constructed bookmark URI	TODO fix the confusion about whether there is a query on the URIs
 						}
-						final URI redirectDepictionURI=requestDepictionURI.resolve(requestDepictionURI.resolve(guiseApplication.getDepictionURI(getPlainURI(requestDepictionURI.resolve(ROOT_PATH)), redirectNavigationURI)));	//get the absolute redirect URI in depiction terms
+						final URI redirectDepictionURI=requestDepictionURI.resolve(guiseApplication.getDepictionURI(getPlainURI(requestDepictionURI.resolve(ROOT_PATH)), redirectNavigationURI));	//get the absolute redirect URI in depiction terms
 //Log.trace("depict version of requested navigation:", redirectDepictURI);
 						if(!requestDepictionURI.equals(redirectDepictionURI))	//if the navigation is really changing (i.e. they didn't request to go to where they already were)
 						{
