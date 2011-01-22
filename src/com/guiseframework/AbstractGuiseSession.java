@@ -882,7 +882,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	{
 		this.uuid=UUID.randomUUID();	//create a UUID for the session
 		this.application=checkInstance(application, "Application cannot be null.");	//save the application
-		this.depictionBaseURI=application.getContainer().getBaseURI().resolve(application.getBasePath().toURI());	//default to a base URI calculated from the application base path resolved to the container's base URI TODO fix to convert from navigation to depiction path
+		this.depictionBaseURI=resolve(application.getContainer().getBaseURI(), application.getBasePath().toURI());	//default to a base URI calculated from the application base path resolved to the container's base URI TODO fix to convert from navigation to depiction path
 		this.platform=checkInstance(platform, "Platform cannot be null.");	//save the platform
 		this.themeURI=application.getThemeURI();	//default to the application theme
 		this.locale=application.getLocales().get(0);	//default to the first application locale

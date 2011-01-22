@@ -238,7 +238,7 @@ public class PlatformFileUploadTask extends GuiseBoundPropertyObject implements 
 		final PlatformFile platformFile=getPlatformFiles().get(platformFileIndex);	//get the current platform file
 		platformFile.addProgressListener(platformFileProgressListener);	//start listening to the platform file's progress
 		final Bookmark destinationBookmark=getDestinationBookmark();
-		final URI destinationURI=destinationBookmark!=null ? URI.create(getDestinationBaseURI()+URIPath.encodeSegment(platformFile.getName())+destinationBookmark) : getDestinationBaseURI().resolve(URIPath.encodeSegment(platformFile.getName()));	//determine the destination URI, adding a bookmark if one is given
+		final URI destinationURI=destinationBookmark!=null ? URI.create(getDestinationBaseURI()+URIPath.encodeSegment(platformFile.getName())+destinationBookmark) : resolve(getDestinationBaseURI(), URIPath.encodeSegment(platformFile.getName()));	//determine the destination URI, adding a bookmark if one is given
 		platformFile.upload(destinationURI);	//tell the platform file to start uploading		
 	}
 

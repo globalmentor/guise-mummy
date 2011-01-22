@@ -239,7 +239,7 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	public InputStream getInputStream(final URI uri) throws IOException	//TODO fix to work with resource URIs by delegating to getResourceInputStream()
 	{
 			//TODO make sure this is an HTTP URI; update to work with resource URIs
-		final URI resolvedURI=getBaseURI().resolve(uri);	//resolve the URI against the container base URI
+		final URI resolvedURI=resolve(getBaseURI(), uri);	//resolve the URI against the container base URI
 		try
 		{
 			return new HTTPResource(resolvedURI).getInputStream();	//get an input stream to the URI

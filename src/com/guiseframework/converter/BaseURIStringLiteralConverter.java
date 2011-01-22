@@ -18,6 +18,7 @@ package com.guiseframework.converter;
 
 import java.net.URI;
 
+import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.java.Objects.*;
 
 /**A URI converter that resolves relative URIs to some base URI.
@@ -51,6 +52,6 @@ public class BaseURIStringLiteralConverter extends AbstractURIStringLiteralConve
 	*/
 	protected URI resolveURI(URI uri)
 	{
-		return uri.isAbsolute() ? uri : getBaseURI().resolve(uri);	//if the URI is relative, resolve it against the base URI
+		return uri.isAbsolute() ? uri : resolve(getBaseURI(), uri);	//if the URI is relative, resolve it against the base URI
 	}
 }

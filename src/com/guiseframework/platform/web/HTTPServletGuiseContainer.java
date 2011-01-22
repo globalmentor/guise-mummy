@@ -180,7 +180,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 			httpSessionGuiseSessionSetMap.addItem(httpSession, guiseSession);	//indicate that this Guise session is for this HTTP session
 		}
 		final URI requestDepictionURI=URI.create(httpRequest.getRequestURL().toString());	//get the depiction URI of the current request
-		guiseSession.setDepictionRootURI(getPlainURI(requestDepictionURI.resolve(ROOT_PATH)));	//update the depiction plain root URI to the root of the URL specified by the request, in case the session is created from a different URL
+		guiseSession.setDepictionRootURI(getPlainURI(resolve(requestDepictionURI, ROOT_PATH)));	//update the depiction plain root URI to the root of the URL specified by the request, in case the session is created from a different URL
 		return guiseSession;	//return the Guise session
 	}
 
@@ -347,7 +347,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 //TODO del Log.trace("getting container input stream to URI", uri);
 		final URI baseURI=getBaseURI();	//get the base URI
 //	TODO del Log.trace("base URI:", baseURI);
-		final URI absoluteResolvedURI=baseURI.resolve(uri);	//resolve the URI against the container base URI
+		final URI absoluteResolvedURI=resolve(baseURI, uri);	//resolve the URI against the container base URI
 //	TODO del Log.trace("resolved URI:", absoluteResolvedURI);
 		final URI relativeURI=baseURI.relativize(absoluteResolvedURI);	//see if the absolute URI is in the application public path
 //	TODO del Log.trace("relative URI:", relativeURI);		

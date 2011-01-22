@@ -1072,10 +1072,10 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		final GuiseContainer container=getContainer();	//get the container
 		final URI resolvedURI=resolveURI(uri);	//resolve the URI to the application
 //TODO del Log.trace("resolved URI:", resolvedURI);
-		final URI absoluteResolvedURI=container.getBaseURI().resolve(resolvedURI);	//resolve the URI against the container base URI
+		final URI absoluteResolvedURI=resolve(container.getBaseURI(), resolvedURI);	//resolve the URI against the container base URI
 //TODO del Log.trace("absolute resolved URI:", absoluteResolvedURI);
 			//check for Guise public resources
-		final URI publicResourcesBaseURI=container.getBaseURI().resolve(getBasePath().resolve(GUISE_ASSETS_BASE_PATH).toURI());	//get the base URI of Guise public resources
+		final URI publicResourcesBaseURI=resolve(container.getBaseURI(), getBasePath().resolve(GUISE_ASSETS_BASE_PATH).toURI());	//get the base URI of Guise public resources
 //	TODO del Log.trace("publicResourcesBaseURI:", publicResourcesBaseURI);
 		final URI publicResourceRelativeURI=publicResourcesBaseURI.relativize(absoluteResolvedURI);	//see if the absolute URI is in the application public path
 //	TODO del Log.trace("resourceURI:", resourceURI);		
@@ -1084,7 +1084,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			return Guise.getInstance().getAssetInputStream(GUISE_ASSETS_BASE_KEY+publicResourceRelativeURI.getPath());	//return an input stream to the resource directly, rather than going through the server
 		}
 			//check for Guise public temp resources
-		final URI publicTempBaseURI=container.getBaseURI().resolve(getBasePath().resolve(GUISE_ASSETS_TEMP_BASE_PATH).toURI());	//get the base URI of Guise public temporary resources
+		final URI publicTempBaseURI=resolve(container.getBaseURI(), getBasePath().resolve(GUISE_ASSETS_TEMP_BASE_PATH).toURI());	//get the base URI of Guise public temporary resources
 //	TODO del Log.trace("publicResourcesBaseURI:", publicResourcesBaseURI);
 		final URI publicTempRelativeURI=publicTempBaseURI.relativize(absoluteResolvedURI);	//see if the absolute URI is in the application public temporary path
 //	TODO del Log.trace("resourceURI:", resourceURI);		
@@ -1179,9 +1179,9 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		final GuiseContainer container=getContainer();	//get the container
 		final URI resolvedURI=resolveURI(uri);	//resolve the URI to the application
 //	TODO del Log.trace("resolved URI:", resolvedURI);
-		final URI absoluteResolvedURI=container.getBaseURI().resolve(resolvedURI);	//resolve the URI against the container base URI
+		final URI absoluteResolvedURI=resolve(container.getBaseURI(), resolvedURI);	//resolve the URI against the container base URI
 //	TODO del Log.trace("absolute resolved URI:", absoluteResolvedURI);
-		final URI publicTempBaseURI=container.getBaseURI().resolve(getBasePath().resolve(GUISE_ASSETS_TEMP_BASE_PATH).toURI());	//get the base URI of the Guise temp resources
+		final URI publicTempBaseURI=resolve(container.getBaseURI(), getBasePath().resolve(GUISE_ASSETS_TEMP_BASE_PATH).toURI());	//get the base URI of the Guise temp resources
 //	TODO del Log.trace("publicResourcesBaseURI:", publicResourcesBaseURI);
 		final URI publicTempRelativeURI=publicTempBaseURI.relativize(absoluteResolvedURI);	//see if the absolute URI is in the application public path
 //	TODO del Log.trace("resourceURI:", resourceURI);		

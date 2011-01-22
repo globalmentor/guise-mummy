@@ -393,7 +393,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 					URI applicationBaseURI=guiseApplication.getBaseURI();	//see if the application already has a preferred base URI
 					if(applicationBaseURI==null)	//if the application has no preferred base URI
 					{
-						applicationBaseURI=containerBaseURI.resolve(request.getContextPath()+request.getServletPath()+PATH_SEPARATOR);	//get the default Guise application base path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash, and resolve it to the container base path
+						applicationBaseURI=resolve(containerBaseURI, request.getContextPath()+request.getServletPath()+PATH_SEPARATOR);	//get the default Guise application base path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash, and resolve it to the container base path
 					}
 					final URIPath guiseApplicationRelativePath=new URIPath("");	//TODO fix, now that we are using URIs for each application; perhaps use a name for each application, as this ID must remain the same even when deployed in different locations
 					final File guiseApplicationHomeDirectory=getDataDirectory(servletContext, DATA_DIRECTORY_INIT_PARAMETER, "guise/home/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
@@ -1227,7 +1227,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						{
 							redirectNavigationURI=appendRawQuery(navigationPath.toURI(), newBookmark.toString());	//save the constructed bookmark URI	TODO fix the confusion about whether there is a query on the URIs
 						}
-						final URI redirectDepictionURI=requestDepictionURI.resolve(guiseApplication.getDepictionURI(getPlainURI(requestDepictionURI.resolve(ROOT_PATH)), redirectNavigationURI));	//get the absolute redirect URI in depiction terms
+						final URI redirectDepictionURI=resolve(requestDepictionURI, guiseApplication.getDepictionURI(getPlainURI(resolve(requestDepictionURI, ROOT_PATH)), redirectNavigationURI));	//get the absolute redirect URI in depiction terms
 //Log.trace("depict version of requested navigation:", redirectDepictURI);
 						if(!requestDepictionURI.equals(redirectDepictionURI))	//if the navigation is really changing (i.e. they didn't request to go to where they already were)
 						{
@@ -1535,7 +1535,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 /*TODO del when works
 	protected void redirect(final URI requestURI, final Bookmark bookmark, final URIPath redirectPath, final GuiseApplication guiseApplication, final boolean permanent) throws HTTPRedirectException
 	{
-		URI redirectURI=requestURI.resolve(guiseApplication.resolvePath(redirectPath).toURI());	//resolve the path to the application and resolve that against the request URI
+		URI redirectURI=resolve(requestURI, guiseApplication.resolvePath(redirectPath).toURI());	//resolve the path to the application and resolve that against the request URI
 		if(bookmark!=null)	//if a bookmark was given
 		{
 			redirectURI=appendRawQuery(redirectURI, bookmark.toString().substring(1));	//append the bookmark to the redirect URI TODO use a better way of extracting the bookmark query information
@@ -1564,7 +1564,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 	protected void redirect(final HTTPServletGuiseRequest guiseRequest, final GuiseApplication guiseApplication, final URI redirectNavigationURI, final Bookmark bookmark, final boolean permanent) throws HTTPRedirectException
 	{
 		final URI requestDepictionURI=guiseRequest.getDepictURI();	//get the request depict URI
-		URI redirectDepictionURI=requestDepictionURI.resolve(guiseApplication.getDepictionURI(getPlainURI(requestDepictionURI.resolve(ROOT_PATH)), redirectNavigationURI));	//convert the redirect URI to a depict URI, resolve it to the application, and resolve it to the original depict URI
+		URI redirectDepictionURI=resolve(requestDepictionURI, guiseApplication.getDepictionURI(getPlainURI(resolve(requestDepictionURI, ROOT_PATH)), redirectNavigationURI));	//convert the redirect URI to a depict URI, resolve it to the application, and resolve it to the original depict URI
 		if(bookmark!=null)	//if a bookmark was given
 		{
 			redirectDepictionURI=appendRawQuery(redirectDepictionURI, bookmark.toString().substring(1));	//append the bookmark to the redirect URI TODO use a better way of extracting the bookmark query information
