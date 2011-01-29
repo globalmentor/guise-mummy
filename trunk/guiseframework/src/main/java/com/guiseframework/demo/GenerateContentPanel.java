@@ -81,7 +81,6 @@ public class GenerateContentPanel extends LayoutPanel
 						final Notification notification=new Notification("ready to generate?");
 						getSession().notify(new Runnable()
 						{
-@Override
 							public void run()
 							{
 	if(GenerateContentPanel.this.validate())	//validate the form; if validation succeeds

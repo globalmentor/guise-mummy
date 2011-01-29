@@ -172,7 +172,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	/**{@inheritDoc}
  	<p>This implementation delegates to {@link #getDepictionURI(URI, String...)}.</p>
 	*/
-	@Override
 	public final URI getDepictionURI(final URIPath navigationPath, final String... suffixes)
 	{
 		return getDepictionURI(navigationPath.toURI(), suffixes);
@@ -187,7 +186,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@see #dereferenceURI(URI, String...)
 	@see GuiseApplication#getDepictionURI(URI, URI)
 	*/
-	@Override
 	public URI getDepictionURI(final URI navigationURI, final String... suffixes)
 	{
 		final GuiseApplication guiseApplication=getApplication();	//get the application

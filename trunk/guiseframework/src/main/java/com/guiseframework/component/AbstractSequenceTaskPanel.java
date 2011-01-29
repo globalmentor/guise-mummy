@@ -128,7 +128,6 @@ public abstract class AbstractSequenceTaskPanel extends AbstractPanel
 		configureToolbar();	//arrange the controls on the toolbar for the first time
 		taskController.addPropertyChangeListener(SequenceTaskController.CONFIRM_NAVIGATION_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>()	//listen for the confirm navigation property changing
 				{
-					@Override
 					public void propertyChange(final GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent)
 					{
 						configureToolbar();	//reconfigure the toolbar if the confirm navigation specification changes, because this will determine which buttons go on the toolbar
@@ -136,7 +135,6 @@ public abstract class AbstractSequenceTaskPanel extends AbstractPanel
 				});
 		taskController.getTask().addPropertyChangeListener(SequenceTask.SEQUENCE_INDEX_PROPERTY, new AbstractGenericPropertyChangeListener<Integer>()	//listen for the sequence index changing
 				{
-					@Override
 					public void propertyChange(final GenericPropertyChangeEvent<Integer> genericPropertyChangeEvent)
 					{
 						onSequenceIndexChange(genericPropertyChangeEvent.getOldValue().intValue(), genericPropertyChangeEvent.getNewValue().intValue());

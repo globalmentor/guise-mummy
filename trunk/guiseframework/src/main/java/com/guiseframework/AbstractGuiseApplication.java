@@ -272,7 +272,6 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@throws NullPointerException if the given depiction URI is <code>null</code>.
 	@see #GUISE_RESERVED_BASE_PATH
 	*/
-	@Override
 	public URIPath getNavigationPath(final URI depictionURI)
 	{
 		return relativizeURI(depictionURI);	//by default the navigation path and the depiction path are the same	
@@ -281,7 +280,6 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	/**{@inheritDoc}
 	<p>This implementation delegates to {@link #getDepictionURI(URI, URI)}.</p>
 	*/
-	@Override
 	public final URI getDepictionURI(final URI depictionRootURI, final URIPath navigationPath)
 	{
 		return getDepictionURI(depictionRootURI, navigationPath.toURI());
@@ -290,7 +288,6 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	/**{@inheritDoc}
 	<p>This version resolves the navigation URI to the base path, but otherwise returns the navigation URI unmodified.</p>
 	*/
-	@Override
 	public URI getDepictionURI(final URI depictionRootURI, final URI navigationURI)
 	{
 		return getBasePath().resolve(navigationURI);	//by default the navigation URI and the depiction URI are the same, except that the depiction URI is resolved to the application base path	
@@ -592,7 +589,6 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@exception IllegalArgumentException if the context path is not absolute and does not end with a slash ('/') character.
 	@exception IllegalStateException if the application is already installed.
 	*/
-	@Override
 	public void install(final AbstractGuiseContainer container, final URI baseURI, final File homeDirectory, final File logDirectory, final File tempDirectory)
 	{
 		checkInstance(container, "Container cannot be null");

@@ -252,7 +252,6 @@ public class SequenceTaskController extends BoundPropertyObject
 		confirmingActionProtype=null;	//there is currently no action being confirmed
 		task.addPropertyChangeListener(Task.STATE_PROPERTY, new AbstractGenericPropertyChangeListener<Task>()	//update the controller when the status changes
 				{
-					@Override
 					public void propertyChange(final GenericPropertyChangeEvent<Task> genericPropertyChangeEvent)
 					{
 						update();
@@ -260,7 +259,6 @@ public class SequenceTaskController extends BoundPropertyObject
 				});
 		task.addPropertyChangeListener(SequenceTask.SEQUENCE_INDEX_PROPERTY, new AbstractGenericPropertyChangeListener<Integer>()	//update the controller when the sequence index changing
 				{
-					@Override
 					public void propertyChange(final GenericPropertyChangeEvent<Integer> genericPropertyChangeEvent)
 					{
 						update();
