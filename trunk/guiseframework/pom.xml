@@ -48,9 +48,33 @@
 				<directory>src/main/assets</directory>
 			</resource>
 			<resource>
+				<directory>src/main/javascript</directory>
+			</resource>
+			<resource>
 				<directory>src/main/resources</directory>
 			</resource>
 		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>yuicompressor-maven-plugin</artifactId>
+				<version>1.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compress</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<excludes>
+						<exclude>com/guiseframework/assets/**/*.*</exclude>
+					</excludes>
+					<jswarn>false</jswarn>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 
 	<profiles>
