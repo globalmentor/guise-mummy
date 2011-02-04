@@ -55,6 +55,7 @@
 			</resource>
 		</resources>
 
+		<!--compress Guise JavaScript files to assets directory-->
 		<plugins>
 			<plugin>
 				<groupId>net.alchim31.maven</groupId>
@@ -62,6 +63,7 @@
 				<version>1.1</version>
 				<executions>
 					<execution>
+						<phase>process-resources</phase>
 						<goals>
 							<goal>compress</goal>
 						</goals>
@@ -73,6 +75,55 @@
 					</excludes>
 					<jswarn>false</jswarn>
 				</configuration>
+			</plugin>
+
+			<!--copy dependency JavaScript files-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.1</version>
+				<executions>
+					<execution>
+						<id>unpack</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>com.globalmentor</groupId>
+									<artifactId>globalmentor-core</artifactId>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.outputDirectory}/com/guiseframework/assets/javascript</outputDirectory>
+									<includes>**/*.js</includes>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!--copy Guise JavaScript files to assets directory-->
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.4.3</version>
+				<executions>
+					<execution>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.outputDirectory}/com/guiseframework/assets/javascript</outputDirectory>
+							<resources>          
+								<resource>
+									<directory>${project.build.outputDirectory}/com/guiseframework/platform/web/js</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
