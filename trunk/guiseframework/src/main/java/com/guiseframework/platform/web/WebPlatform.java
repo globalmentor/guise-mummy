@@ -86,13 +86,13 @@ public interface WebPlatform extends Platform
 	public final static URIPath GUISE_EMPTY_HTML_DOCUMENT_PATH=GuiseApplication.GUISE_ASSETS_DOCUMENTS_PATH.resolve("empty.html");
 
 	/**The path of the AJAX JavaScript file, relative to the application.*/
-	public final static URIPath AJAX_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("com/globalmentor/js/ajax.js");
+	public final static URIPath AJAX_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/ajax.js");
 	/**The path of the DOM JavaScript file, relative to the application.*/
-	public final static URIPath DOM_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("com/globalmentor/js/dom.js");
+	public final static URIPath DOM_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/dom.js");
 	/**The path of the Guise JavaScript file, relative to the application.*/
-	public final static URIPath GUISE_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("guise.js");
+	public final static URIPath GUISE_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("guise/guise.js");
 	/**The path of the JavaScript JavaScript file, relative to the application.*/
-	public final static URIPath JAVASCRIPT_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("com/globalmentor/js/javascript.js");
+	public final static URIPath JAVASCRIPT_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/javascript.js");
 
 	/**The path of the Guise DTD, relative to the application.*/
 	public final static URIPath GUISE_DTD_PATH=GuiseApplication.GUISE_ASSETS_DTD_PATH.resolve("guise.dtd");
