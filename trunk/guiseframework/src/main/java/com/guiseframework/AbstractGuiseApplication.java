@@ -657,6 +657,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			}
 			baseNameLogWriterInfoMap.clear();	//remove all log writer information
 		}
+		logConfiguration.dispose();	//dispose of our main application log configuration, closing files as necessary
 		this.container=null;	//release the container
 		this.basePath=null;	//remove the base path
 	}
