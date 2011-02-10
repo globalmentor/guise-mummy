@@ -2329,9 +2329,6 @@ Log.trace("this is a destination");
  		return super.exists(request, resourceURI);	//see if a physical resource exists at the location, if we can't find a virtual resource (a Guise public resource or a navigation path component)
   }
 
-  /**The thread-safe map of references to cached stylesheets fixed for IE6.*/
-  private final Map<URI, Reference<HTTPServletResource>> cachedIE6FixedStylesheetResources=new ConcurrentHashMap<URI, Reference<HTTPServletResource>>();
-
 	/**Determines the requested resource.
   This version adds support for Guise public and temporary resources; and destination resources.
 	@param request The HTTP request in response to which the resource is being retrieved.
@@ -2422,113 +2419,7 @@ Log.trace("this is a destination");
 	  		resource=super.getResource(request, resourceURI);	//return a default resource
 	  	}
   	}
-		final ContentType contentType=getContentType(request, resource);	//get the content type of the resource
-//TODO del Log.trace("got content type", contentType, "for resource", resource);
-		if(contentType!=null && TEXT_CSS_CONTENT_TYPE.match(contentType))	//if this is a CSS stylesheet
-		{
-			final Map<String, Object> userAgentProperties=getUserAgentProperties(request);	//get the user agent properties for this request
-			if(USER_AGENT_NAME_MSIE.equals(userAgentProperties.get(USER_AGENT_NAME_PROPERTY)))	//if this is IE
-			{
-				final Object version=userAgentProperties.get(USER_AGENT_VERSION_NUMBER_PROPERTY);	//get the version number
-				if(version instanceof Number && ((Number)version).doubleValue()<7)	//if this is IE 6 (lower than IE 7)
-				{
-//TODO del Log.trace("need a stylesheet for IE6");
-					final Reference<HTTPServletResource> ie6CSSResourceReference=cachedIE6FixedStylesheetResources.get(resourceURI);	//get a reference to the IE6 fixed stylesheet, if there is one cached
-					HTTPServletResource ie6CSSResource=ie6CSSResourceReference!=null ? ie6CSSResourceReference.get() : null;	//dereference the reference if there is one
-					if(ie6CSSResource==null)	//we don't have the resource in the cache (the race condition here is benign, and could only result in an initual multiple-loading of a stylesheet)
-					{
-//TODO del Log.trace("IE6 stylesheet wasn't cached");
-						ie6CSSResource=new IE6CSSResource(resource);	//create a resource that does extra CSS processing for IE6
-						cachedIE6FixedStylesheetResources.put(resourceURI, new SoftReference<HTTPServletResource>(ie6CSSResource));	//cache the processed stylesheet for later
-					}
-					else
-					{
-//TODO del Log.trace("IE6 stylesheet was cached");
-					}
-					return ie6CSSResource;	//use the cached IE6 CSS resource so we won't have to process it all over again
-//TODO del								Log.trace("fixed stylesheet for IE6", cssStylesheet);
-				}
-			}
-		}
 		return resource;	//return the resource without extra processing
-	}
-
-	/**A resource that represents a CSS file, decorating an existing resource.
-	This version compresses resources of type <code>text/css</code>.
-	@author Garret Wilson
-	*/
-	protected static class CSSResource extends AbstractByteCacheDecoratorResource
-	{
-
-		/**Loads a CSS stylesheet from the requested resource.
-		@param request The HTTP request in response to which the bytes are being retrieved.
-		@param cssProcessor The processor to use in processing the stylesheet.
-		@return A stylesheet object representing the resource.
-		@exception IOException if there is an error retrieving the bytes.
-		*/
-		protected CSSStylesheet loadStylesheet(final HttpServletRequest request, final GuiseCSSProcessor cssProcessor) throws IOException
-		{
-			final InputStream inputStream=getResource().getInputStream(request);	//get an input stream to the resource
-			try
-			{
-				final ParseReader cssReader=new ParseReader(new InputStreamReader(inputStream, UTF_8_CHARSET));
-				final CSSStylesheet cssStylesheet=cssProcessor.process(cssReader);	//parse the stylesheet
-				return cssStylesheet;	//return the stylesheet
-			}
-			finally
-			{
-				inputStream.close();	//always close the original input stream
-			}
-		}
-
-		/**Loads bytes from the requested resource.
-		@param request The HTTP request in response to which the bytes are being retrieved.
-		@return The bytes that constitute the resource.
-		@exception IOException if there is an error retrieving the bytes.
-		*/
-		protected byte[] loadBytes(final HttpServletRequest request) throws IOException
-		{
-			return loadStylesheet(request, new GuiseCSSProcessor()).toString().getBytes(UTF_8_CHARSET);	//load the stylesheet and return its bytes
-		}
-
-		/**HTTP servlet resource constructor.
-		@param resource The decorated HTTP servlet resource.
-		@exception IllegalArgumentException if the given resource is <code>null</code>.
-		*/
-		public CSSResource(final HTTPServletResource resource)
-		{
-			super(resource);	//construct the parent class
-		}
-	}
-
-	/**A resource that represents an IE6 CSS file, decorating an existing resource.
-	This version processes resources of type <code>text/css</code> to work around IE6 bugs, if IE6 is the user agent.
-	@author Garret Wilson
-	*/
-	protected static class IE6CSSResource extends CSSResource
-	{
-
-		/**Loads a CSS stylesheet from the requested resource.
-		@param request The HTTP request in response to which the bytes are being retrieved.
-		@param cssProcessor The processor to use in processing the stylesheet.
-		@return A stylesheet object representing the resource.
-		@exception IOException if there is an error retrieving the bytes.
-		*/
-		protected CSSStylesheet loadStylesheet(final HttpServletRequest request, final GuiseCSSProcessor cssProcessor) throws IOException
-		{
-			final CSSStylesheet cssStylesheet=super.loadStylesheet(request, cssProcessor);	//load and process the stylesheet normally
-			cssProcessor.fixIE6Stylesheet(cssStylesheet);	//fix this stylesheet for IE6
-			return cssStylesheet;	//return the fixed stylesheet
-		}
-
-		/**HTTP servlet resource constructor.
-		@param resource The decorated HTTP servlet resource.
-		@exception IllegalArgumentException if the given resource is <code>null</code>.
-		*/
-		public IE6CSSResource(final HTTPServletResource resource)
-		{
-			super(resource);	//construct the parent class
-		}
 	}
 
 	/**A resource that is accessed through a Guise session's resource destination.

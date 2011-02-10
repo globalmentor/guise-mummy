@@ -40,11 +40,17 @@ import com.guiseframework.style.*;
 
 /**Abstract implementation of information related to the current depiction on the web platform.
 This implementation maps the XHTML namespace {@value WebPlatform#GUISE_ML_NAMESPACE_URI} to the prefix {@value WebPlatform#GUISE_ML_NAMESPACE_PREFIX}.
+This implementation defaults to not using quirks mode
 @author Garret Wilson
 */
 public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContext implements WebDepictContext
 {
 
+	/**{@inheritDoc}
+	 * This implementation always returns <code>false</code>.
+	 */
+	public boolean isQuirksMode() {return false;}
+	
 	/**@return The web platform on which Guise objects are depicted.*/
 	public WebPlatform getPlatform() {return (WebPlatform)super.getPlatform();}
 
@@ -150,28 +156,6 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 			{
 				appendCSSOpacityProperty(stringBuilder, ((Number)value).doubleValue());	//append the opacity
 				continue;	//we did custom appending; don't do the default appending
-			}
-			else if((CSS_PROP_MAX_WIDTH.equals(property) || CSS_PROP_MAX_HEIGHT.equals(property)) && value instanceof Extent)	//if this is the max-width or max-height property with an extent value
-			{
-				final Extent extent=(Extent)value;	//get the extent
-				final WebUserAgentProduct userAgent=platform.getClientProduct();	//get the user agent
-				if(userAgent.getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER && userAgent.getVersionNumber()<7 && extent.getUnit()==Unit.PIXEL)	//if a pixel max-width or max-height is being used on IE6 (which doesn't support max-width or max-height)
-				{
-						//see http://msdn2.microsoft.com/en-us/library/ms537634.aspx
-						//see http://www.svendtofte.com/code/max_width_in_ie/
-						//see http://www.gunlaug.no/contents/wd_additions_14.html
-						//http://www.sanctifiedstudios.com/internet-explorer-min-and-max-width-bug-fix/
-					if(CSS_PROP_MAX_WIDTH.equals(property))	//if this is a max-width request
-					{
-						property=CSS_PROP_WIDTH;	//use a width instead
-						value="expression(this.clientWidth>"+extent.getValue()+"-1 ? \""+appendCSSValue(new StringBuilder(), extent)+"\" : \"auto\")";	//expression(this:clientWidth>value-1 ? "valuepx" : "auto"); (don't use the same value twice or IE6 will freeze)
-					}
-					else	//if this is a max-height request
-					{
-						property=CSS_PROP_HEIGHT;	//use a height instead
-						value="expression(this.clientHeight>"+extent.getValue()+"-1 ? \""+appendCSSValue(new StringBuilder(), extent)+"\" : \"auto\")";	//expression(this:clientHeight>value-1 ? "valuepx" : "auto"); (don't use the same value twice or IE6 will freeze)
-					}
-				}
 			}
 			stringBuilder.append(property).append(PROPERTY_DIVIDER_CHAR);	//property:
 			if(value instanceof Color)	//if the value is a color

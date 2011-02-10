@@ -15,14 +15,17 @@
  */
 
 /*
-Author: Garret Wilson
-
-Dependencies:
-	javascript.js
-*/
+ * GlobalMentor general DOM library.
+ * Author: Garret Wilson
+ * 
+ * Dependencies:
+ * 	javascript.js
+ */
 
 var com=com||{}; com.globalmentor=com.globalmentor||{}; com.globalmentor.js=com.globalmentor.js||{};	//create the com.globalmentor.js package
 
+/**See if the browser is IE.*/
+var isIE=navigator.userAgentName=="MSIE";	//TODO use a better variable; do better checks
 /**See if the browser is Safari.*/
 var isSafari=navigator.userAgent.indexOf("Safari")>=0;	//TODO use a better variable; do better checks
 
@@ -101,7 +104,7 @@ if(typeof document.createAttributeNS=="undefined")	//if the document does not su
 	};
 }
 
-if(isSafari || (typeof document.importNode=="undefined"))	//if the document does not support document.importNode() (or this is Safari, which doesn't support importing XML into an XHTML DOM), create a substitute
+if(/*TODO revisit Safari needs isSafari ||*/ (typeof document.importNode=="undefined"))	//if the document does not support document.importNode() (or this is Safari, which doesn't support importing XML into an XHTML DOM), create a substitute
 {
 
 	/**Imports a new node in the the document.
@@ -114,7 +117,7 @@ if(isSafari || (typeof document.importNode=="undefined"))	//if the document does
 		var importedNode=null;	//we'll create a new node and store it here
 
 		var nodeType=node.nodeType;	//get the type of the node
-		if(deep	//if we should do a deep import, resort immediately to using innerHTML and a dummy node because of all the IE errors---and the Safari errors that make importing from walking the tree almost impossible
+		if(deep && (isIE || isSafari)	//if we should do a deep import on IE, resort immediately to using innerHTML and a dummy node because of all the IE errors---and the Safari errors that make importing from walking the tree almost impossible
 				&& nodeType!=Node.TEXT_NODE)	//Safari seems to break when using innerHTML to import a text node of length 1---it's probably better to use the DOM to import text, anyway
 		{
 			var elementName=nodeType==Node.ELEMENT_NODE ? node.nodeName.toLowerCase() : null;	//get the name of the node to be imported, if it is an element
@@ -194,6 +197,14 @@ if(isSafari || (typeof document.importNode=="undefined"))	//if the document does
 					{
 						var childNodes=node.childNodes;	//get a list of child nodes
 						var childNodeCount=childNodes.length;	//find out how many child nodes there are
+						
+						for(var i=0; i<childNodeCount; ++i)	//for each child node
+						{
+							var childNode=childNodes[i];	//get this child node
+							var importedChildNode=document.importNode(childNode, deep);
+							importedNode.appendChild(importedChildNode);
+						}
+/*TODO testing innerhtml; see if we can safely delete---after all, we already checked the browsers at the beginning
 						if(childNodeCount>0)	//if there are child nodes (IE6 will fail on importedNode.innerHTML="" for input type="text")
 						{
 							var innerHTMLStringBuilder=new StringBuilder();	//construct the inner HTML
@@ -203,6 +214,7 @@ if(isSafari || (typeof document.importNode=="undefined"))	//if the document does
 							}
 							importedNode.innerHTML=innerHTMLStringBuilder.toString();	//set the element's inner HTML to the string we constructed
 						}
+*/
 					}
 				}
 				break;

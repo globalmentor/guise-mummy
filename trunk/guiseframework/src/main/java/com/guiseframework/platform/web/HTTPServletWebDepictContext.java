@@ -17,39 +17,24 @@
 package com.guiseframework.platform.web;
 
 import java.io.*;
-import java.lang.ref.*;
 import java.net.URI;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import static java.util.Collections.*;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.globalmentor.io.ParseReader;
-import com.globalmentor.log.Log;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.net.http.HTTPServlets;
 import com.globalmentor.text.CharacterEncoding;
 import com.globalmentor.text.Text;
-import com.globalmentor.text.xml.QualifiedName;
-import com.globalmentor.util.*;
 import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 
-import static com.globalmentor.collections.Arrays.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.net.ContentTypeConstants.*;
 import static com.globalmentor.text.CharacterEncoding.*;
-import static com.globalmentor.text.TextFormatter.*;
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
-import com.guiseframework.platform.web.css.*;
-import com.guiseframework.platform.web.css.GuiseCSSProcessor.IE6FixClass;
 
 /**A web depict context of an HTTP servlet.
 The output stream defaults to <code>text/plain</code> encoded in <code>UTF-8</code>.
-Quirks mode is only used with IE6 in some configurations.
 @author Garret Wilson
 */
 public class HTTPServletWebDepictContext extends AbstractWebDepictContext
@@ -72,12 +57,6 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 
 		/**@return The current full absolute URI for this depiction, including any query.*/
 		public URI getDepictionURI() {return depictURI;}
-
-	/**Whether quirks mode is being used.*/
-	private final boolean isQuirksMode;
-
-		/**@return Whether quirks mode is being used.*/
-		public boolean isQuirksMode() {return isQuirksMode;}
 
 	/**The current content type of the output.*/
 	private ContentType outputContentType=ContentType.getInstance(ContentType.TEXT_PRIMARY_TYPE, Text.PLAIN_SUBTYPE);	//default to text/plain
@@ -121,8 +100,6 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 		final ContentType defaultContentType=ContentType.getInstance(outputContentType.getPrimaryType(), outputContentType.getSubType(), new NameValuePair<String, String>(ContentType.CHARSET_PARAMETER, UTF_8));	//default to text/plain encoded in UTF-8
 		response.setContentType(defaultContentType.toString());	//initialize the default content type and encoding
 		HTTPServlets.setContentLanguage(response, session.getLocale());	//set the response content language
-		final WebUserAgentProduct webUserAgent=getPlatform().getClientProduct();	//get the web user agent
-		this.isQuirksMode=webUserAgent.getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER && webUserAgent.getVersionNumber()<7 && !session.getApplication().isThemed();	//only use quirks mode for certain legacy (non-themed) applications using IE6
 	}
 
 	/**@return The character encoding currently used for the text output.*/
@@ -143,120 +120,6 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 			//default to text/plain encoded in UTF-8 replace the charset parameter with the currently set character set TODO change to really just replace one parameter, instead of removing all others
 		this.outputContentType=ContentType.getInstance(contentType.getPrimaryType(), contentType.getSubType(), new NameValuePair<String, String>(ContentType.CHARSET_PARAMETER, getOutputCharacterEncoding().toString()));
 		getResponse().setContentType(this.outputContentType.toString());	//set the content type of the response, including the current character set
-	}
-
-	/**The map of soft references to IE6 fix class lists, keyed to style URIs.*/
-	private final static Map<URI, Reference<List<IE6FixClass>>> styleIE6FixClassesReferenceMap=new ConcurrentHashMap<URI, Reference<List<IE6FixClass>>>();
-
-	/**Returns a list of IE6 fix classes for the given stylesheet URI.
-	If the IE6 classes have not yet been determined for this stylesheet URI, the stylesheet will be loaded and parsed, and the IE6 fix classes cached.
-	@param styleURI The URI of the stylesheet for which IE6 fix classes should be returned.
-	@return The list of IE6 fix classes for the given stylesheet, which may be empty if the stylesheet could not be loaded.
-	*/
-	protected List<IE6FixClass> getIE6FixClasses(final URI styleURI)
-	{
-		final Reference<List<IE6FixClass>> ie6FixClassesReference=styleIE6FixClassesReferenceMap.get(styleURI);	//get a reference to a list of IE6 fix classes
-		List<IE6FixClass> ie6FixClasses=ie6FixClassesReference!=null ? ie6FixClassesReference.get() : null;	//dereference the list if we got a reference
-		if(ie6FixClasses==null)	//if no IE6 fix classes are available for this stylesheet, load the stylesheet and cache the results (the race condition here is unlikely and benign, as in the worse case we'll load the stylesheet an extra time initially)
-		{
-			ie6FixClasses=new ArrayList<IE6FixClass>();	//create a new array of IE6 fix classes
-			try
-			{
-				final InputStream inputStream=getSession().getApplication().getInputStream(styleURI);	//get an input stream to the stylesheet
-				if(inputStream!=null)	//if this stylesheet exists, load it; otherwise, just stick with the empty list of IE6 fix classes so that we won't try to load the stylesheet again 
-				{
-	//TODO del Log.trace("got input stream to:", styleURI);
-					final ParseReader cssReader=new ParseReader(new InputStreamReader(inputStream, UTF_8));
-					try
-					{
-						final GuiseCSSProcessor cssProcessor=new GuiseCSSProcessor();	//TODO comment
-						final CSSStylesheet cssStylesheet=cssProcessor.process(cssReader);	//parse the stylesheet
-						cssProcessor.fixIE6Stylesheet(cssStylesheet);	//fix this stylesheet for IE6 so that we can have the fixed classes
-	/*TODO del
-	for(final GuiseCSSProcessor.IE6FixClass ie6FixClass:cssProcessor.getIE6FixClasses())	//TODO del; testing
-	{
-		Log.trace("for stylesheet", styleURI, "got IE6 fix class", ie6FixClass.getFixClass());
-	}
-	*/
-						ie6FixClasses.addAll(cssProcessor.getIE6FixClasses());	//add all these IE6 fix classes to our list
-					}
-					finally
-					{
-						cssReader.close();	//always close the input stream
-					}
-				}
-			}
-			catch(final IOException ioException)	//if there is an error loading the stylesheet, stick with an empty list of IE6 fix classes
-			{
-				Log.warn(ioException);	//TODO use a Guise warn method eventually
-			}
-			styleIE6FixClassesReferenceMap.put(styleURI, new SoftReference<List<IE6FixClass>>(ie6FixClasses));	//cache a soft reference to this list for next time
-		}
-		return ie6FixClasses;	//return the IE6 fix classes
-	}
-
-	/**Retrieves the value of a given attribute.
-	This version modifed any class attributes if there are IE6 fix classes and this is not an AJAX call.
-	@param elementQualifedName The qualified name of the element.
-	@param attributeQualifiedName The qualified name of the attribute.
-	@param attributeValue The default value of the attribute.
-	@return The value of the attribute.
-	@see #getIE6FixClasses()
-	@see #isAJAX()
-	*/
-	protected String getAttributeValue(final QualifiedName elementQualifiedName, final QualifiedName attributeQualifiedName, String attributeValue)
-	{
-		final WebUserAgentProduct webUserAgent=getPlatform().getClientProduct();	//get the web user agent
-		if(webUserAgent.getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER && webUserAgent.getVersionNumber()<7)	//if the user agent is IE6, touch up the class name
-		{
-			if(XHTML_NAMESPACE_URI.toString().equals(elementQualifiedName.getNamespaceURI()) && attributeQualifiedName.getNamespaceURI()==null && ATTRIBUTE_CLASS.equals(attributeQualifiedName.getLocalName()))	//if this is an XHTML class attribute
-			{
-				//TODO del Log.trace("ready to fix classes:", attributeValue);
-				final Set<String> newClasses=new HashSet<String>();	//we'll collect new classes to add; use a set to keep from getting duplicates of fixed class names (multiple selectors may match the same class that needs fixed)
-				final String[] classNames=attributeValue.split("\\s");	//split out the class names
-				for(final URI styleURI:getStyles())	//for each stylesheet
-				{
-					final List<IE6FixClass> ie6FixClasses=getIE6FixClasses(styleURI);	//get the fix classes for this stylesheet
-					for(final IE6FixClass ie6FixClass:ie6FixClasses)	//look at each IE6 fix classes
-					{
-						final List<SimpleSelector> simpleSelectorSequence=ie6FixClass.getSimpleSelectorSequence();	//get this simple selector sequence
-//					TODO del Log.trace("looking at IE6 fix class", ie6FixClass.getFixClass(), "with simple selector count", simpleSelectorSequence.size());
-						final TypeSelector typeSelector=simpleSelectorSequence.size()>0 ? asInstance(simpleSelectorSequence.get(0), TypeSelector.class) : null;	//get the first simple selector if it is a type selector
-						if(typeSelector==null || typeSelector.getTypeName().equals(elementQualifiedName.getLocalName()))	//make sure the type selector matches the element name
-						{
-							boolean classesMatch=true;	//see if this element matches all the classes (we don't have to make sure there are multiple classes; if not, the IE6 fix object wouldn't be included in the list
-							for(final SimpleSelector simpleSelector:simpleSelectorSequence)	//for each simple selector
-							{
-								if(simpleSelector!=typeSelector)	//if this isn't the type selector
-								{
-									if(simpleSelector instanceof ClassSelector)	//if this is a class selector
-									{
-//									TODO del Log.trace("looking at class selector:", ((ClassSelector)simpleSelector).getClassName());
-										if(!contains(classNames, ((ClassSelector)simpleSelector).getClassName()))	//if this class name is not contained in the list TODO switch to a hash set to make this more efficient
-										{
-											classesMatch=false;	//all the classes don't match; don't bother fixing things up
-											break;	//stop looking at the classes
-										}
-									}
-								}
-							}
-							if(classesMatch)	//if all the classes selectors match
-							{
-//							TODO del Log.trace("adding fix class:", ie6FixClass.getFixClass());
-								newClasses.add(ie6FixClass.getFixClass());	//add the fix class to the class names
-							}
-						}
-					}
-				}
-				if(!newClasses.isEmpty())	//if there are new classes
-				{
-					addAll(newClasses, classNames);	//add the normal class names to our new classes list
-					attributeValue=formatList(new StringBuilder(), ' ', newClasses).toString();	//combine the classes back into one class string
-//TODO del Log.trace("new attribute value:", attributeValue);
-				}
-			}
-		}
-		return attributeValue;	//return the attribute value with no modifications
 	}
 
 }

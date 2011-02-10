@@ -15,12 +15,13 @@
  */
 
 /*
-Author: Garret Wilson
-
-Dependencies:
-	javascript.js
-	dom.js
-*/
+ * GlobalMentor general Ajax library.
+ * Author: Garret Wilson
+ * 
+ * Dependencies:
+ * 	javascript.js
+ * 	dom.js
+ */
 
 //HTTP Communicator
 

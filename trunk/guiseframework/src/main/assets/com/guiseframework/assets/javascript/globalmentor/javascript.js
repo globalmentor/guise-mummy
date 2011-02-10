@@ -1,5 +1,5 @@
 /* GlobalMentor JavaScript Library
- * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2005-2011 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,21 @@
  */
 
 /*
-Author: Garret Wilson
+ * GlobalMentor general JavaScript library.
+ * Author: Garret Wilson
 */
 
 //Array
 
-/**Returns an array representing the contents of the given object.
-This implementation recognizes other arrays and the arguments of a function;
-along with anything else that is iterable by virtue of having a length property and a [] access method.
-@param object The non-null object the contents of which to return as an array.
-@return An array containing the contents of the given object.
-@see http://www.prototypejs.org/api/array/from
-*/
+/**
+ * Returns an array representing the contents of the given object. This implementation recognizes other arrays and the
+ * arguments of a function; along with anything else that is iterable by virtue of having a length property and a []
+ * access method.
+ * 
+ * @param object The non-null object the contents of which to return as an array.
+ * @return An array containing the contents of the given object.
+ * @see http://www.prototypejs.org/api/array/from
+ */
 Array.from=function(object)
 {
 	if(object instanceof Array)	//if the object is an array
@@ -44,21 +47,23 @@ Array.from=function(object)
 	}
 };
 
-/**An add() method for arrays, equivalent to Array.push().*/
+/** An add() method for arrays, equivalent to Array.push(). */
 Array.prototype.add=Array.prototype.push;
 
-/**An enqueue() method for arrays, equivalent to Array.push().*/
+/** An enqueue() method for arrays, equivalent to Array.push(). */
 Array.prototype.enqueue=Array.prototype.push;
 
-/**A dequeue() method for arrays, equivalent to Array.shift().*/
+/** A dequeue() method for arrays, equivalent to Array.shift(). */
 Array.prototype.dequeue=Array.prototype.shift;
 
 if(typeof Array.prototype.indexOf=="undefined")	//defined in JavaScript 1.6
 {
-	/**Determines the index of the first occurrence of a given object in the array.
-	@param object The object to find in the array.
-	@return The index of the object in the array, or -1 if the object is not in the array.
-	*/
+	/**
+	 * Determines the index of the first occurrence of a given object in the array.
+	 * 
+	 * @param object The object to find in the array.
+	 * @return The index of the object in the array, or -1 if the object is not in the array.
+	 */
 	Array.prototype.indexOf=function(object)
 	{
 		var length=this.length;	//get the length of the array
@@ -73,10 +78,13 @@ if(typeof Array.prototype.indexOf=="undefined")	//defined in JavaScript 1.6
 	};
 }
 
-/**Determines the index of the first match of a given object in the array using object.toString() if the object isn't null.
-@param regexp The regular expression of the string version of the object to find in the array.
-@return The index of the matching object in the array, or -1 if a matching object is not in the array.
-*/
+/**
+ * Determines the index of the first match of a given object in the array using object.toString() if the object isn't
+ * null.
+ * 
+ * @param regexp The regular expression of the string version of the object to find in the array.
+ * @return The index of the matching object in the array, or -1 if a matching object is not in the array.
+ */
 Array.prototype.indexOfMatch=function(regexp)
 {
 	var length=this.length;	//get the length of the array
@@ -91,44 +99,52 @@ Array.prototype.indexOfMatch=function(regexp)
 	return -1;	//indicate that the object could not be found
 };
 
-/**Clears an array by removing every item at every index in the array.*/
+/** Clears an array by removing every item at every index in the array. */
 Array.prototype.clear=function()
 {
 	this.splice(0, this.length);	//splice out all the elements
 };
 
-/**Determines whether the given object is present in the array.
-@param object The object for which to check.
-@return true if the object is present in the array.
-*/
+/**
+ * Determines whether the given object is present in the array.
+ * 
+ * @param object The object for which to check.
+ * @return true if the object is present in the array.
+ */
 Array.prototype.contains=function(object)
 {
 	return this.indexOf(object)>=0;	//see if the object is in the array
 };
 
-/**Determines whether a match of the given regular expression is present in the array, using object.toString() if the object isn't null.
-@param regexp The regular expression of the string version of the object to find in the array.
-@return true if a matching object is present in the array.
-*/
+/**
+ * Determines whether a match of the given regular expression is present in the array, using object.toString() if the
+ * object isn't null.
+ * 
+ * @param regexp The regular expression of the string version of the object to find in the array.
+ * @return true if a matching object is present in the array.
+ */
 Array.prototype.containsMatch=function(regexp)
 {
 	return this.indexOfMatch(regexp)>=0;	//see if a matching object is in the array
 };
 
-/**Removes an item at the given index in the array.
-@param index The index at which the element should be removed.
-@return The element previously at the given index in the array.
-*/
+/**
+ * Removes an item at the given index in the array.
+ * 
+ * @param index The index at which the element should be removed.
+ * @return The element previously at the given index in the array.
+ */
 Array.prototype.remove=function(index)
 {
 	return this.splice(index, 1)[0];	//splice out the element and return it (note that this will not work on Netscape <4.06 or IE <=5.5; see http://www.samspublishing.com/articles/article.asp?p=30111&seqNum=3&rl=1)
 };
 
-/**Removes an item from the array.
-If the item is not contained in the array, no action is taken.
-@param item The item to be removed.
-@return The removed item.
-*/
+/**
+ * Removes an item from the array. If the item is not contained in the array, no action is taken.
+ * 
+ * @param item The item to be removed.
+ * @return The removed item.
+ */
 Array.prototype.removeItem=function(item)
 {
 	var index=this.indexOf(item);	//get the index of the item
@@ -142,14 +158,17 @@ var EMPTY_ARRAY=new Array();	//a shared empty array TODO create methods to make 
 
 //Function
 
-/**Creates a new function that functions exactly as does the original function,
-except that it provides the given variable to appear as "this" to the new function.
-Any other given arguments will be inserted before the actual arguments when the function is invoked.
-@param newThis The variable to appear as "this" when the function is called.
-@param extraArguments The new arguments, if any, to appear at the first of the arguments when the new function is called.
-@return A new function bound to the given this.
-@see http://www.prototypejs.org/api/function/bind
-*/
+/**
+ * Creates a new function that functions exactly as does the original function, except that it provides the given
+ * variable to appear as "this" to the new function. Any other given arguments will be inserted before the actual
+ * arguments when the function is invoked.
+ * 
+ * @param newThis The variable to appear as "this" when the function is called.
+ * @param extraArguments The new arguments, if any, to appear at the first of the arguments when the new function is
+ *          called.
+ * @return A new function bound to the given this.
+ * @see http://www.prototypejs.org/api/function/bind
+ */
 Function.prototype.bind=function()
 {
 	var originalFunction=this;	//save a reference to this function instance to allow calling this via closure
@@ -161,15 +180,18 @@ Function.prototype.bind=function()
 	};
 };
 
-/**Creates a new function that functions exactly as does the original function,
-except that it provides the given variable to appear as "this" to the new function.
-The original this present when the function is invoked will be inserted as the first argument.
-Any other given arguments will be inserted before the actual arguments when the function is invoked.
-@param newThis The variable to appear as "this" when the function is called.
-@param extraArguments The new arguments, if any, to appear at the first of the arguments when the new function is called.
-@return A new function bound to the given this.
-@see http://www.prototypejs.org/api/function/bind
-*/
+/**
+ * Creates a new function that functions exactly as does the original function, except that it provides the given
+ * variable to appear as "this" to the new function. The original this present when the function is invoked will be
+ * inserted as the first argument. Any other given arguments will be inserted before the actual arguments when the
+ * function is invoked.
+ * 
+ * @param newThis The variable to appear as "this" when the function is called.
+ * @param extraArguments The new arguments, if any, to appear at the first of the arguments when the new function is
+ *          called.
+ * @return A new function bound to the given this.
+ * @see http://www.prototypejs.org/api/function/bind
+ */
 Function.prototype.bindOldThis=function()
 {
 	var originalFunction=this;	//save a reference to this function instance to allow calling this via closure
@@ -186,54 +208,66 @@ Function.prototype.bindOldThis=function()
 
 //String
 
-/**Determines whether the given substring is present in the string.
-@param substring The substring for which to check.
-@return true if the substring is present in the string.
-*/
+/**
+ * Determines whether the given substring is present in the string.
+ * 
+ * @param substring The substring for which to check.
+ * @return true if the substring is present in the string.
+ */
 String.prototype.contains=function(substring)
 {
 	return this.indexOf(substring)>=0;	//see if the substring is in the string
 };
 
-/**Determines whether this string is in all lowercase.
-@return true if the string is in all lowercase.
-*/
+/**
+ * Determines whether this string is in all lowercase.
+ * 
+ * @return true if the string is in all lowercase.
+ */
 String.prototype.isLowerCase=function()
 {
 	return this==this.toLowerCase();	//see if this substring matches the same string in all lowercase
 };
 
-/**Determines whether this string is in all uppercase.
-@return true if the string is in all uppercase.
-*/
+/**
+ * Determines whether this string is in all uppercase.
+ * 
+ * @return true if the string is in all uppercase.
+ */
 String.prototype.isUpperCase=function()
 {
 	return this==this.toUpperCase();	//see if this substring matches the same string in all uppercase
 };
 
-/**Determines whether this string starts with the indicated substring.
-@param substring The string to check to see if it is at the beginning of this string.
-@return true if the given string is at the start of this string.
-*/
+/**
+ * Determines whether this string starts with the indicated substring.
+ * 
+ * @param substring The string to check to see if it is at the beginning of this string.
+ * @return true if the given string is at the start of this string.
+ */
 String.prototype.startsWith=function(substring)
 {
 	return this.hasSubstring(substring, 0);	//see if this substring is at the beginning of the string
 };
 
-/**Determines whether this string ends with the indicated substring.
-@param substring The string to check to see if it is at the end of this string.
-@return true if the given string is at the end of this string.
-*/
+/**
+ * Determines whether this string ends with the indicated substring.
+ * 
+ * @param substring The string to check to see if it is at the end of this string.
+ * @return true if the given string is at the end of this string.
+ */
 String.prototype.endsWith=function(substring)
 {
 	return this.hasSubstring(substring, this.length-substring.length);	//see if this substring is at the end of the string
 };
 
-/**Determines if this string has the given substring at the given index in the string.
-@param substring The substring to compare.
-@param index The index to compare.
-@return true if the given substring matches the characters as the given index of this string.
-*/
+/**
+ * Determines if this string has the given substring at the given index in the string.
+ * 
+ * @param substring The substring to compare.
+ * @param index The index to compare.
+ * @return true if the given substring matches the characters as the given index of this string.
+ */
 String.prototype.hasSubstring=function(substring, index)
 {
 	var length=substring.length;	//get the length of the substring
@@ -251,13 +285,15 @@ String.prototype.hasSubstring=function(substring, index)
 	return true;	//show that the string matches
 }
 
-/**Splits a string and returns an associative array with the contents.
-Each the value of each key of the associative array will be set to true.
-Empty and null splits will be ignored.
-@param separator The optional separator string or regular expression; if no separator is provided, the entire string is placed in the set.
-@param limit The optional limit to the number of splits to be found.
-@return An associative array with they keys set to the elements of the split string.
-*/
+/**
+ * Splits a string and returns an associative array with the contents. Each the value of each key of the associative
+ * array will be set to true. Empty and null splits will be ignored.
+ * 
+ * @param separator The optional separator string or regular expression; if no separator is provided, the entire string
+ *          is placed in the set.
+ * @param limit The optional limit to the number of splits to be found.
+ * @return An associative array with they keys set to the elements of the split string.
+ */
 String.prototype.splitSet=function(separator, limit)
 {
 	var splitSet=new Object();	//create an associative array
@@ -273,9 +309,11 @@ String.prototype.splitSet=function(separator, limit)
 	return splitSet;	//return the set of splits
 };
 
-/**Trims the given string of whitespace.
-@see https://lists.latech.edu/pipermail/javascript/2004-May/007570.html
-*/
+/**
+ * Trims the given string of whitespace.
+ * 
+ * @see https://lists.latech.edu/pipermail/javascript/2004-May/007570.html
+ */
 String.prototype.trim=function()
 {
 	return this.replace(/^\s+|\s+$/g, "");	//replace beginning and ending whitespace with nothing
@@ -283,10 +321,12 @@ String.prototype.trim=function()
 
 //StringBuilder
 
-/**A class for concatenating string with more efficiency than using the additive operator.
-Inspired by Nicholas C. Zakas, _Professional JavaScript for Web Developers_, Wiley, 2005, p. 97.
-@param strings (...) Zero or more strings with which to initialize the string builder.
-*/
+/**
+ * A class for concatenating string with more efficiency than using the additive operator. Inspired by Nicholas C.
+ * Zakas, _Professional JavaScript for Web Developers_, Wiley, 2005, p. 97.
+ * 
+ * @param strings (...) Zero or more strings with which to initialize the string builder.
+ */
 function StringBuilder(strings)
 {
 	this._strings=new Array();	//create an array of strings
@@ -294,25 +334,29 @@ function StringBuilder(strings)
 	{
 		StringBuilder.prototype._initialized=true;
 
-		/**Appends a string to the string builder.
-		@param string The string to append.
-		@return A reference to the string builder.
-		*/
+		/**
+		 * Appends a string to the string builder.
+		 * 
+		 * @param string The string to append.
+		 * @return A reference to the string builder.
+		 */
 		StringBuilder.prototype.append=function(string)
 		{
 			this._strings.add(string);	//add this string to the array
 			return this;
 		};
 
-		/**Removes the last string appended to the string builder.
-		@return The string removed from the string builder.
-		*/
+		/**
+		 * Removes the last string appended to the string builder.
+		 * 
+		 * @return The string removed from the string builder.
+		 */
 		StringBuilder.prototype.unpend=function(string)
 		{
 			return this._strings.pop();	//pop the last element from the array
 		};
 
-		/**@return A single string containing the contents of the string builder.*/
+		/** @return A single string containing the contents of the string builder. */
 		StringBuilder.prototype.toString=function()
 		{
 			return this._strings.join("");	//join with no separator and return the strings
@@ -327,23 +371,27 @@ function StringBuilder(strings)
 
 //JSON
 
-/**A set of utilities for working with JSON.
-@see http://www.ietf.org/rfc/rfc4627.txt
-*/
+/**
+ * A set of utilities for working with JSON.
+ * 
+ * @see http://www.ietf.org/rfc/rfc4627.txt
+ */
 var JSON=
 {
 
-	/**The regular expression for testing JSON expressions.*/
+	/** The regular expression for testing JSON expressions. */
 	_TEST_REGEXP:/[^,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t]/,
 
-	/**The regular expression for testing JSON expressions.*/
+	/** The regular expression for testing JSON expressions. */
 	_REPLACE_REGEXP:/\"(\\.|[^\"\\])*\"/g,
 
-	/**Evaluates a JSON expression, returning the result of the expression.
-	@param json The JSON expression to evaluate.
-	@return The result of the JSON evaluation
-	@exception If the JSON expression contains more than the valid JSON subset or is otherwise invalid.
-	*/
+	/**
+	 * Evaluates a JSON expression, returning the result of the expression.
+	 * 
+	 * @param json The JSON expression to evaluate.
+	 * @return The result of the JSON evaluation
+	 * @exception If the JSON expression contains more than the valid JSON subset or is otherwise invalid.
+	 */
 	evaluate:function(json)
 	{
 		if(this._TEST_REGEXP.test(json.replace(this._REPLACE_REGEXP, "")))	//if the JSON expression is invalid
@@ -353,10 +401,11 @@ var JSON=
 		return eval("("+json+")");	//evaluate and return the JSON expresion
 	},
 
-	/**Serializes an object using JSON.
-	This implementation does not yet correctly escape characters.
-	@param object The object to serialize.
-	*/
+	/**
+	 * Serializes an object using JSON. This implementation does not yet correctly escape characters.
+	 * 
+	 * @param object The object to serialize.
+	 */
 	serialize:function(object)
 	{
 		if(object!=null)	//if the object is not null
@@ -407,10 +456,12 @@ var JSON=
 		}
 	},
 
-	/**Escapes a character of a JSON string.
-	@param restricted The restricted character as a string.
-	@return The escaped form of the given character string.
-	*/
+	/**
+	 * Escapes a character of a JSON string.
+	 * 
+	 * @param restricted The restricted character as a string.
+	 * @return The escaped form of the given character string.
+	 */
 	escapeStringChar:function(restricted)
 	{
 		switch(restricted)
@@ -433,12 +484,14 @@ var JSON=
 
 //Map
 
-/**A class encapsulating keys and values.
-This is a convenience class for constructing an Object with a given set of keys and values, as the JavaScript shorthand notation does not allow non-literal key names.
-Values may be accessed in normal object[key]==value syntax. The constructor allows any number of key/value pairs as arguments.
-@param key: A key with which to associate a value.
-@param value: The value associated with the preceding key.
-*/
+/**
+ * A class encapsulating keys and values. This is a convenience class for constructing an Object with a given set of
+ * keys and values, as the JavaScript shorthand notation does not allow non-literal key names. Values may be accessed in
+ * normal object[key]==value syntax. The constructor allows any number of key/value pairs as arguments.
+ * 
+ * @param key A key with which to associate a value.
+ * @param value The value associated with the preceding key.
+ */
 function Map(key, value)
 {
 	var argumentCount=arguments.length;	//find out how many arguments there are
@@ -450,11 +503,13 @@ function Map(key, value)
 
 //Set
 
-/**A class encapsulating keys mapped to the value true.
-This is a convenience class for constructing an Object with a given set of keys, as the JavaScript shorthand notation does not allow non-literal key names.
-Values may be tested in normal if(object[item]) syntax. The constructor allows any number of items as arguments.
-@param items: The items to store in the set.
-*/
+/**
+ * A class encapsulating keys mapped to the value true. This is a convenience class for constructing an Object with a
+ * given set of keys, as the JavaScript shorthand notation does not allow non-literal key names. Values may be tested in
+ * normal if(object[item]) syntax. The constructor allows any number of items as arguments.
+ * 
+ * @param items The items to store in the set.
+ */
 function Set(items)
 {
 	for(var i=arguments.length-1; i>=0; --i)	//for each item (order doesn't matter in a set)
@@ -465,20 +520,24 @@ function Set(items)
 
 //Point
 
-/**A class encapsulating a point.
-@param x: The X coordinate, stored under this.x;
-@param y: The Y coordinate, stored under this.y;
-*/
+/**
+ * A class encapsulating a point.
+ * 
+ * @param x The X coordinate, stored under this.x;
+ * @param y The Y coordinate, stored under this.y;
+ */
 function Point(x, y) {this.x=x; this.y=y;}
 
 //Rectangle
 
-/**A class encapsulating a rectangle.
-@param coordinates: The position of the top left corner of the rectangle, stored under this.coordinates.
-@param size: The size of the rectangle, stored under this.size.
-var x, y: The coordinates of the upper-left corner of the rectangle.
-var width, height: The dimensions of the rectangle.
-*/
+/**
+ * A class encapsulating a rectangle.
+ * 
+ * @param coordinates The position of the top left corner of the rectangle, stored under this.coordinates.
+ * @param size The size of the rectangle, stored under this.size.
+ * @var x, y The coordinates of the upper-left corner of the rectangle.
+ * @var width, height The dimensions of the rectangle.
+ */
 function Rectangle(coordinates, size)
 {
 	this.coordinates=coordinates;
@@ -491,24 +550,29 @@ function Rectangle(coordinates, size)
 
 //Size
 
-/**A class encapsulating a size.
-@param width: The width, stored under this.width;
-@param height: The height coordinate, stored under this.height;
-*/
+/**
+ * A class encapsulating a size.
+ * 
+ * @param width The width, stored under this.width;
+ * @param height The height coordinate, stored under this.height;
+ */
 function Size(width, height) {this.width=width; this.height=height;}
 
 //URI
 
-/**A class for parsing and encapsulting a URI according to RFC 2396, "Uniform Resource Identifiers (URI): Generic Syntax".
-@param uriString The string form of the URI.
-@see http://www.ietf.org/rfc/rfc2396.txt
-var scheme The scheme of the URI.
-var authority The authority of the URI.
-var path The path of the URI.
-var query The query of the URI.
-var fragment The fragment of the URI.
-var parameters An associative array of parameter name/value combinations.
-*/
+/**
+ * A class for parsing and encapsulting a URI according to RFC 2396, "Uniform Resource Identifiers (URI): Generic
+ * Syntax".
+ * 
+ * @param uriString The string form of the URI.
+ * @see http://www.ietf.org/rfc/rfc2396.txt
+ * @var scheme The scheme of the URI.
+ * @var authority The authority of the URI.
+ * @var path The path of the URI.
+ * @var query The query of the URI.
+ * @var fragment The fragment of the URI.
+ * @var parameters An associative array of parameter name/value combinations.
+ */
 function URI(uriString)
 {
 	if(!URI.prototype._initialized)
@@ -537,3 +601,19 @@ function URI(uriString)
 	}
 	this.fragment=RegExp.$9;
 }
+
+//Console
+
+/*
+ * Prevents logging errors if the browser has no log support.
+ * @see <a href="http://stackoverflow.com/questions/217957/how-to-print-debug-messages-in-the-google-chrome-javascript-console/2757552#2757552">How to print debug messages in the Google Chrome Javascript Console</a>
+ */
+if(!window.console)
+{
+	window.console = {};
+}
+window.console.log = console.log || function(){};
+window.console.warn = console.warn || function(){};
+window.console.error = console.error || function(){};
+window.console.info = console.info || function(){};
+

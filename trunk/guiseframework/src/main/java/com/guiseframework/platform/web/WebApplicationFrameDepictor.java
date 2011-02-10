@@ -58,17 +58,11 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 	/**The ID segment for the busy information.*/ 
 	protected final static String BUSY_ID_SEGMENT="busy";
 
-	/**The ID segment for the flyover IFrame used with IE6.*/ 
-	protected final static String FLYOVER_IFRAME_ID_SEGMENT="flyoverIFrame";
-
 	/**The ID segment for the form.*/ 
 	protected final static String FORM_ID_SEGMENT="form";
 
 	/**The ID segment for the layer to shield user input during initialization.*/ 
 	protected final static String INIT_IFRAME_ID_SEGMENT="initIFrame";
-
-	/**The ID segment for the model IFrame used with IE6.*/ 
-	protected final static String MODAL_IFRAME_ID_SEGMENT="modalIFrame";
 
 	/**The ID for the Guise SWF.*/ 
 	protected final static String GUISE_FLASH_ID="guiseFlash";
@@ -95,16 +89,6 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		return BUSY_ID_SEGMENT;	//create an ID for the busy ID segment on the frame TODO use common routine
 	}
 
-	/**Determines the ID to be used for an IFrame used for a flyover shield in IE6.
-	@param applicationFrame The frame for which a flyover IFrame ID should be returned.
-	@return An ID appropriate for creating a flyover IFrame for IE6.
-	*/
-	public static String getFlyoverIFrameID(final ApplicationFrame applicationFrame)
-	{
-//TODO fix for no form		return applicationFrame.getID()+'.'+FLYOVER_IFRAME_ID_SEGMENT;	//create an ID for the flyover IFrame ID segment on the frame TODO use common routine
-		return FLYOVER_IFRAME_ID_SEGMENT;	//create an ID for the flyover IFrame ID segment on the frame TODO use common routine
-	}
-
 	/**Determines the ID to be used for a form associated with the given application frame.
 	@param applicationFrame The frame for which a form ID should be returned.
 	@return An ID appropriate for creating a form in the given frame.
@@ -122,16 +106,6 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 	{
 //TODO fix for no form		return applicationFrame.getID()+'.'+INIT_IFRAME_ID_SEGMENT;	//create an ID for the init IFrame ID segment on the frame TODO use common routine
 		return INIT_IFRAME_ID_SEGMENT;	//create an ID for the init IFrame ID segment on the frame TODO use common routine
-	}
-
-	/**Determines the ID to be used for an IFrame used for a modal shield in IE6.
-	@param applicationFrame The frame for which a modal IFrame ID should be returned.
-	@return An ID appropriate for creating a modal IFrame for IE6.
-	*/
-	public static String getModalIFrameID(final ApplicationFrame applicationFrame)
-	{
-//TODO fix for no form		return applicationFrame.getID()+'.'+MODAL_IFRAME_ID_SEGMENT;	//create an ID for the modal IFrame ID segment on the frame TODO use common routine
-		return MODAL_IFRAME_ID_SEGMENT;	//create an ID for the modal IFrame ID segment on the frame TODO use common routine
 	}
 
 	/**The lazily-created busy component.*/
@@ -157,18 +131,8 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		final GuiseSession session=getSession();	//get the session
 		final GuiseApplication application=session.getApplication();	//get a reference to the application
 		final Locale locale=session.getLocale();	//get the component's locale
-			//don't send the XML declaration for MSIE 6, because the XML declaration will switch that user agent into quirks mode
-//TODO testing		final boolean writeXMLDeclaration=true;	//always write the XML declaration, even though this will switch IE6 to quirks mode--IE6 in standards mode is incredibly slow
-		final boolean isUserAgentIE=userAgent.getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER;	//see if this is IE
-		final boolean isUserAgentIE6=isUserAgentIE && userAgent.getVersionNumber()<7;	//see if this is IE6
-		final boolean writeXMLDeclaration=!(isUserAgentIE6 && !depictContext.isQuirksMode());	//always write the XML declaration except for IE6 when not in quirks mode (writing the XML declaration puts IE6 into quirks mode)
-			//see http://www.quirksmode.org/css/quirksmode.html
-			//see http://blogs.msdn.com/ie/archive/2005/09/15/467901.aspx
-			//see http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnie60/html/cssenhancements.asp
-			//see http://msdn.microsoft.com/workshop/author/dhtml/reference/properties/compatmode.asp
-			//see http://hsivonen.iki.fi/doctype/
 			//XML declaration and doctype
-		depictContext.writeDocType(writeXMLDeclaration, XHTML_NAMESPACE_URI, ELEMENT_HTML, GUISE_XHTML_DTD_PUBLIC_ID);	//write the doctype and optionally the XML declaration
+		depictContext.writeDocType(true, XHTML_NAMESPACE_URI, ELEMENT_HTML, GUISE_XHTML_DTD_PUBLIC_ID);	//write the doctype and with an XML declaration
 			//<xhtml:html>
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_HTML);	//<xhtml:html>
 		depictContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
@@ -426,27 +390,6 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		}
 		busyComponent.depict();	//update the busy component		
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//</xhtml:div> (busy)
-		final WebUserAgentProduct userAgent=getPlatform().getClientProduct();	//get the user agent
-		if(userAgent.getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER && userAgent.getVersionNumber()<7)	//if this is IE6, create IFrames that will be used to prevent certain controls from showing through
-		{
-				//modal IFrame
-			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IFRAME);	//<xhtml:iframe>
-			final String modalIFrameID=getModalIFrameID(session.getApplicationFrame());	//get the modal IFrame ID
-			depictContext.writeAttribute(null, ATTRIBUTE_ID, modalIFrameID);	//id="xxx:modalIFrame"		
-			depictContext.writeAttribute(null, ELEMENT_IFRAME_ATTRIBUTE_SRC, application.resolvePath(GUISE_EMPTY_HTML_DOCUMENT_PATH).toString());	//src="guise/documents/empty.html"	(resolved to context) TODO wouldn't it be better to resolve the path to the session, now, as a convenience?
-			depictContext.writeAttribute(null, ELEMENT_IFRAME_ATTRIBUTE_FRAMEBORDER, "0");	//frameborder="0"
-			depictContext.writeAttribute(null, ATTRIBUTE_STYLE, "display:none;position:absolute;top:0px;left:0px;filter:progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0);");	//TODO maybe allow this this to be set using CSS
-			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IFRAME);	//</xhtml:iframe>
-				//flyover IFrame
-			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IFRAME);	//<xhtml:iframe>
-			final String flyoverIFrameID=getFlyoverIFrameID(session.getApplicationFrame());	//get the flyover IFrame ID
-			depictContext.writeAttribute(null, ATTRIBUTE_ID, flyoverIFrameID);	//id="xxx:flyoverIFrame"		
-			depictContext.writeAttribute(null, ELEMENT_IFRAME_ATTRIBUTE_SRC, application.resolvePath(GUISE_EMPTY_HTML_DOCUMENT_PATH).toString());	//src="guise/documents/empty.html"	(resolved to context) TODO wouldn't it be better to resolve the path to the session, now, as a convenience?
-			depictContext.writeAttribute(null, ELEMENT_IFRAME_ATTRIBUTE_FRAMEBORDER, "0");	//frameborder="0"
-			depictContext.writeAttribute(null, ATTRIBUTE_STYLE, "display:none;position:absolute;top:0px;left:0px;filter:progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0);");	//TODO maybe allow this this to be set using CSS
-//TODO del when works				depictContext.writeAttribute(null, ATTRIBUTE_STYLE, "display:none;position:absolute;top:0px;left:0px;");	//TODO maybe allow this this to be set using CSS
-			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IFRAME);	//</xhtml:iframe>
-		}
 			//init IFrame
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IFRAME);	//<xhtml:iframe>
 		final String initIFrameID=getInitIFrameID(session.getApplicationFrame());	//get the init IFrame ID

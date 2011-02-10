@@ -150,19 +150,10 @@ public class WebImageActionControlDepictor<C extends ImageComponent & ActionCont
 				final Layout<?> layout=((LayoutComponent)parent).getLayout();	//get the layout
 				if(layout instanceof RegionLayout && ((RegionLayout)layout).isFixed())	//if the container layout is a fixed region layout
 				{
-					final WebUserAgentProduct userAgent=getPlatform().getClientProduct();	//get the user agent
-					final boolean isUserAgentIE6=userAgent.getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER && userAgent.getVersionNumber()<7;	//see if this is IE6
-					if(isUserAgentIE6)	//if we're in IE6, simply make the image fill the entire area (it would be better to add max-width, but that's not supported by IE6; on IE7, neither width or max-width takes into consideration the padding of the container)
-					{
-						styles.put(CSS_PROP_WIDTH, "100%");	//indicate a width of 100%
-					}
-					else	//if we're not on IE6, assume that the browser can handle max-width
-					{
-						styles.put(CSS_PROP_MAX_WIDTH, "100%");	//indicate a maximum width of 100%				
-					}
+					styles.put(CSS_PROP_MAX_WIDTH, "100%");	//indicate a maximum width of 100%				
 					final RegionConstraints constraints=((RegionLayout)layout).getConstraints(component);	//get the region constraints
 					final Extent pageExtent=constraints.getPageExtent();	//get the page extent of the region
-					if(pageExtent!=null && !isUserAgentIE6)	//if a page extent is given, restrict the image to the same height to prevent overflow (don't do this on IE6 because, even using expressions to simulate max-height, the images aren't scaled correctly and the browser is slowed down immensely)
+					if(pageExtent!=null)	//if a page extent is given, restrict the image to the same height to prevent overflow
 					{
 						styles.put(CSS_PROP_MAX_HEIGHT, "100%");	//indicate a maximum height of 100% (using a maximum height of the specified height of the region will not resize correctly on Firefox 2 or IE7)
 					}

@@ -1,17 +1,34 @@
-/*Guise(TM) JavaScript support routines
-Copyright (c) 2005-2008 GlobalMentor, Inc.
+/* Guise™ JavaScript Library
+ * Copyright © 2005-2011 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-Dependencies:
-	javascript.js
-	dom.js
-	ajax.js
-	guise.swf
 
-This script expects the following variables to be defined:
-navigator.userAgentName The name of the user agent, such as "Firefox", "Mozilla", "MSIE", or "Opera".
-navigator.userAgentVersionNumber The version of the user agent stored as a number.
-GUISE_ASSETS_BASE_PATH The absolute base path of Guise assets.
-GUISE_VERSION The build ID of the current Guise version.
+/*Guise™ JavaScript support routines
+ * Author: Garret Wilson
+ * 
+ * Dependencies:
+ * 	javascript.js
+ * 	dom.js
+ * 	ajax.js
+ * 	guise.swf
+ * 
+ * This script expects the following variables to be defined:
+ * navigator.userAgentName The name of the user agent, such as "Firefox", "Mozilla", "MSIE", or "Opera".
+ * navigator.userAgentVersionNumber The version of the user agent stored as a number.
+ * GUISE_ASSETS_BASE_PATH The absolute base path of Guise assets.
+ * GUISE_VERSION The build ID of the current Guise version.
 */
 
 /*Guise AJAX Request Format, content type application/x-guise-ajax-request+xml
@@ -90,14 +107,6 @@ GUISE_VERSION The build ID of the current Guise version.
 </response>
 */
 
-/*Guise modal windows
-Guise creates a div element and places it as a layer in the z-order behind the top frame when modal frames are needed.
-To work around the IE6 bug where select elements are windowed controls, Guise places a separate transparant IFrame behind the modal div element if IE6 is being used.
-This blocks out IE6 select elements, and does not help non-modal frames.
-See http://dotnetjunkies.com/WebLog/jking/archive/2003/07/21/488.aspx .
-See http://homepage.mac.com/igstudio/design/ulsmenus/vertical-uls-iframe.html .
-*/
-
 /**Rollovers
 For every component marked with the "mouseListener" class, Guise will send mouseover and mouseout events.
 Guise will also automatically add and remove a "jsRollover" class to the component and every subelement that is part of the component
@@ -117,7 +126,7 @@ var isUserAgentFirefoxLessThan3=isUserAgentFirefox && navigator.userAgentVersion
 /**See if the browser is IE.*/
 var isUserAgentIE=navigator.userAgentName=="MSIE";
 /**See if the browser is IE6.*/
-var isUserAgentIE6=isUserAgentIE && navigator.userAgentVersionNumber<7;
+var isUserAgentIE6=isUserAgentIE && navigator.userAgentVersionNumber<7;	//TODO transfer; have Guise send message of non-support
 
 /**Whether Guise AJAX communication is initially enabled.*/
 var GUISE_AJAX_ENABLED=true;
@@ -476,12 +485,6 @@ com.guiseframework.js.Guise=function()
 	/**The layer that allows modality by blocking user interaction to elements below.*/
 	this._modalLayer=null;
 	
-	/**The IFrame that hides select elements from modal frames in IE6; positioned right below the modal layer.*/
-	this._modalIFrame=null;
-
-	/**The IFrame that hides select elements from flyover frames in IE6; positioned right below the flyover.*/
-	this._flyoverIFrame=null;
-
 	/**The current busy element, or null if there is no busy element.*/
 	this._busyElement=null;
 
@@ -953,6 +956,8 @@ com.guiseframework.js.Guise=function()
 			}
 			catch(exception)	//if a problem occurred
 			{
+				console.error(exception);
+				console.info("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 				//TODO log a warning
 alert(exception);
 alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
@@ -964,7 +969,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 		/**Processes responses from AJAX requests.
 		This routine should be called asynchronously from an event so that the DOM tree can be successfully updated.
 		Whether the busy indicator is shown depends on the the browser type and the size of the response.
-		This implementation shows the busy indicator for medium communication size on IE6, and on large communication sizes on all other browsers.
+		This implementation shows the busy indicator for large communication sizes on all other browsers.
 		Typical response sizes include:
 		500-2000: Normal communication size; acceptable delay on IE6.
 		5000-10000: Medium communication size; perceptible delay on IE6.
@@ -983,7 +988,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 					{
 						var ajaxResponse=this.ajaxResponses.dequeue();	//get this response
 						var responseDocument=ajaxResponse.document;	//get this response document
-						var showBusy=isUserAgentIE6 ? ajaxResponse.size>5000 : ajaxResponse.size>20000;	//see if we should show a busy indicator
+						var showBusy=ajaxResponse.size>20000;	//see if we should show a busy indicator
 //TODO del; testing						var showBusy=ajaxResponse.size>100;	//TODO del; testing
 /*TODO salvage if needed
 						if(showBusy)	//if we should show a busy indicator
@@ -1463,7 +1468,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 		{
 			"style":true,	//don't remove local styles, because they may be used by Guise (with frames, for instance)
 			"onclick":true,	//don't remove the onclick attribute, because we may be using it for Safari to prevent a default action
-			"hideFocus":true,	//don't remove the IE hideFocus attribute, because we're using it to fix the IE6 lack of CSS outline: none support
+			"hideFocus":true,	//don't remove the IE hideFocus attribute, because we're using it to fix the IE6 lack of CSS outline: none support TODO revisit
 			"guiseStateWidth":true,	//don't remove Guise state attributes TODO change to jsXXX
 			"guiseStateHeight":true
 		};
@@ -1496,7 +1501,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 		proto.invalidateAncestorContent=function(element)
 		{
 			var parentNode=element.parentNode;	//get the element's parent
-			if(parentNode!=null && parentNode.nodeType==Node.ELEMENT_NODE && parentNode.nodeName.toLowerCase()!="table")	//if there is a parent element (IE6 crashes if we even check an attribute of TABLE)
+			if(parentNode!=null && parentNode.nodeType==Node.ELEMENT_NODE)	//if there is a parent element
 			{
 				parentNode.removeAttribute("guise:contentHash");	//indicate that the children have changed TODO use a constant
 				this.invalidateAncestorContent(parentNode);	//invalidate the rest of the ancestors
@@ -1564,7 +1569,6 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 					if(element.getAttribute(attributeName)==null && !this.NON_REMOVABLE_ATTRIBUTE_SET[attributeName])	//if the new element doesn't have this attribute, and this isn't an attribute we shouldn't remove
 					{
 //TODO del; not needed						if(attributeName!="value" || elementName!="textarea")	//if this is the value attribute of a text area, don't remove the value, because the value is really specified as the text content
-							//TODO see if there is a way to keep from removing all the non-null but empty default IE6 attributes
 		//TODO del alert("ready to remove "+oldElement.nodeName+" attribute "+oldAttributeName+" with current value "+oldAttributeValue);
 						oldElement.removeAttribute(oldAttributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
 		//TODO fix					i=0;	//TODO fix; temporary to get out of looking at all IE's attributes
@@ -1627,29 +1631,6 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 								valueChanged=oldAttributeValue!=attributeValue;	//check again to see if the value is really changing
 							}
 						}							
-/*TODO del unless we want to fix external-toGuise stylesheets
-						if(valueChanged)	//if the value is changing, see if we have to do fixes for IE6 (if the value hasn't changed, that means there were no fixes before and no fixes afterwards; we may want to categorically do fixes in the future if we add attribute-based selectors)
-						{
-							if(attributeName=="className")	//if we're changing the class name
-							{
-								if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
-								{
-									var fixedAttributeValue=guiseIE6Fix.getFixedElementClassName(oldElement, attributeValue);	//get the IE6 fixed form of the class name TODO make sure this is done last if we start doing CSS2 attribute-based selectors
-									if(fixedAttributeValue!=null)	//if the proposed attribute changed, make sure it's now that we already have (if the proposed attribute didn't change, it's the same as it was, meaning it's different than the old attribute)
-									{
-										if(fixedAttributeValue!=oldAttributeValue)	//if the fixed value isn't what we already had
-										{
-											attributeValue=fixedAttributeValue;	//used the fixed class name
-										}
-										else	//if the fixed value is the same as what we already had
-										{
-											valueChanged=false;	//there's nothing to change; the fix put us right back where we were
-										}
-									}
-								}
-							}
-						}
-*/
 						if(valueChanged && attributeName=="src")	//if a "src" attribute changed (e.g. img.src), make sure that the new src is not a relative URL form of the current src, which would cause IE6 to needlessly reload the image
 						{
 							if(attributeValue.startsWith("/") && location.protocol+"//"+location.host+attributeValue==oldAttributeValue)	//if the new value is just the relative form of the old value
@@ -1807,12 +1788,6 @@ if(elementName=="select")
 					{
 	//TODO del alert("children are not compatible, old "+oldElement.nodeName+" with ID "+oldElement.id+" child node count: "+oldChildNodeCount+" new "+element.nodeName+" "+"with ID "+element.getAttribute("id")+" child node count "+childNodeCount+" (verify) "+element.childNodes.length);
 						this._removeChildren(oldElement);	//remove all the children from the old element and start from scratch
-	/*TODO fix, if can improve IE6, but it probably won't help much, as most incompatible children may be single-child changes
-						if(isUserAgentIE6)	//if this is IE6, it will be much faster to use innerHTML to load the children
-						{
-							var innerHTML=DOMUtilities.DOMUtilities.appendNodeContentString(newStringBuilder, element);	//get the inner HTML to use
-						}
-	*/
 	//TODO del alert("incompatible old element now has children: "+oldElement.childNodes.length);
 					}
 
@@ -1879,7 +1854,7 @@ if(elementName=="select")
 						}
 					}
 					
-					if(elementName=="select")	//if we just patched a select element, we must go back and make sure the correct options are selected, as IE6 will automatically select any newly added option, even if we didn't specify with the DOM that it should be selected
+					if(elementName=="select")	//if we just patched a select element, we must go back and make sure the correct options are selected, as IE6 will automatically select any newly added option, even if we didn't specify with the DOM that it should be selected TODO revisit
 					{
 
 //TODO del alert("selected index before: "+oldElement.selectedIndex);
@@ -2019,12 +1994,6 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 		{
 		//TODO display a wait cursor until we initialize everything
 		
-		/*TODO del unless we want to fix external-toGuise stylesheets
-			if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
-			{
-				guiseIE6Fix.fixStylesheets();	//fix all IE6 stylesheets
-			}
-		*/
 			com.globalmentor.js.EventManager.addEvent(window, "resize", this._onWindowResize.bind(this), false);	//add a resize listener
 		//TODO del	com.globalmentor.js.EventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
 			com.globalmentor.js.EventManager.addEvent(window, "unload", this.onUnload.bind(this), false);	//do the appropriate uninitialization when the window unloads
@@ -2130,11 +2099,6 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 			this._modalLayer.style.top="0px";
 			this._modalLayer.style.left="0px";
 			document.body.appendChild(this._modalLayer);	//add the modal layer to the document
-			if(isUserAgentIE6)	//if we're in IE6
-			{
-				this._modalIFrame=document.getElementById("modalIFrame");	//get the modal IFrame
-				this._flyoverIFrame=document.getElementById("flyoverIFrame");	//get the flyover IFrame
-			}
 			this._busyElement=document.getElementById("busy");	//get the busy element
 			if(document.bodyLength && document.bodyLength>60000)	//if the body length is over 60,000 (as indicated by the custom Guise variable), show a busy indicator
 			{
@@ -2518,41 +2482,10 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 				}
 				this._modalLayer.style.zIndex=this._modalFrame.style.zIndex-1;	//place the modal layer directly behind the modal frame
 				this._modalLayer.style.display="block";	//make the modal layer visible
-				if(this._modalIFrame)	//if we have a modal IFrame
-				{
-					this._modalIFrame.style.zIndex=this._modalLayer.style.zIndex-1;	//place the modal iframe directly behind the modal layer
-					this._modalIFrame.style.display="block";	//make the modal IFrame visible
-				}
 			}
 			else	//if there is no modal frame
 			{
 				this._modalLayer.style.display="none";	//hide the modal layer
-				if(this._modalIFrame)	//if we have a modal IFrame
-				{
-					this._modalIFrame.style.display="none";	//hide the modal iframe
-				}
-			}
-			if(isUserAgentIE6)	//if we're in IE6
-			{
-				var flyoverIFrame=this._flyoverIFrame;	//get the flyover IFrame
-				if(flyoverIFrame)	//if we know the flyover IFrame
-				{
-					if(this.flyoverFrame!=null)	//if there is a flyover frame
-					{
-					
-						var flyoverFrameBounds=GUIUtilities.getElementExternalBounds(this.flyoverFrame);	//get the flyover frame bounds
-						flyoverIFrame.style.left=flyoverFrameBounds.x;	//update the bounds of the IFrame to match that of the flyover frame
-						flyoverIFrame.style.top=flyoverFrameBounds.y;
-						flyoverIFrame.style.width=flyoverFrameBounds.width;
-						flyoverIFrame.style.height=flyoverFrameBounds.height;
-						flyoverIFrame.style.zIndex=this.flyoverFrame.style.zIndex-1;	//place the flyover iframe directly behind the flyover frame (a frame shouldn't be modal and a flyover both at the same time)
-						flyoverIFrame.style.display="block";	//make the flyover IFrame visible
-					}
-					else	//if there is no flyover frame
-					{
-						flyoverIFrame.style.display="none";	//hide the flyover iframe
-					}
-				}
 			}
 		};
 
@@ -2561,21 +2494,6 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 		{
 			var oldModalLayerDisplay=this._modalLayer.style.display;	//get the current display status of the modal layer
 			this._modalLayer.style.display="none";	//make sure the modal layer is hidden, because having it visible will interfere with the page/viewport size calculations (setting the size to 0px will not give us immediate feedback in IE during resize)
-			var oldModalIFrameDisplay=null;	//get the old modal IFrame display if we need to
-			if(this._modalIFrame)	//if we have a modal IFrame
-			{
-				oldModalIFrameDisplay=this._modalIFrame.style.display;	//get the current display status of the modal IFrame
-				this._modalIFrame.style.display="none";	//make sure the modal IFrame is hidden, because having it visible will interfere with the page/viewport size calculations
-			}
-/*TODO del
-			var oldFlyoverIFrameDisplay=null;	//get the old flyover IFrame display if we need to
-			if(this._flyoverIFrame)	//if we have a flyover IFrame
-			{
-				oldFlyoverIFrameDisplay=this._flyoverIFrame.style.display;	//get the current display status of the flyover IFrame
-				this._flyoverIFrame.style.display="none";	//make sure the flyover IFrame is hidden, because having it visible will interfere with the page/viewport size calculations
-			}
-*/
-		
 		/*TODO del; doesn't work instantanously with IE
 			modalLayer.style.width="0px";	//don't let the size of the modal layer get in the way of the size calculations
 			modalLayer.style.height="0px";
@@ -2607,20 +2525,6 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 		*/
 		
 			this._modalLayer.style.display=oldModalLayerDisplay;	//show the modal layer, if it was visible before
-			if(this._modalIFrame)	//if we have a modal IFrame
-			{
-				this._modalIFrame.style.width=this._modalLayer.style.width;	//update the size of the IFrame to match that of the modal layer
-				this._modalIFrame.style.height=this._modalLayer.style.height;
-				this._modalIFrame.style.display=oldModalIFrameDisplay;	//show the modal IFrame, if it was visible before
-			}
-/*TODO del
-			if(this._flyoverIFrame)	//if we have a flyover IFrame
-			{
-				this._flyoverIFrame.style.width=this._modalLayer.style.width;	//update the size of the IFrame to match that of the modal layer
-				this._flyoverIFrame.style.height=this._modalLayer.style.height;
-				this._flyoverIFrame.style.display=oldFlyoverIFrameDisplay;	//show the flyover IFrame, if it was visible before
-			}
-*/
 		};
 
 		/*Sets the busy indicator visible or hidden.
@@ -2645,23 +2549,6 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 					if(busyVisible)	//TODO testing
 					{
 						GUIUtilities.centerNode(busyElement);
-					}
-					if(isUserAgentIE6)	//if we're in IE6, prepare the flyover frame TODO consolidate duplicate code
-					{
-						var flyoverIFrame=this._flyoverIFrame;	//get the flyover IFrame
-						if(flyoverIFrame)	//if we know the flyover IFrame
-						{
-							if(busyVisible)	//if we are now showing the busy information
-							{							
-								var flyoverFrameBounds=GUIUtilities.getElementExternalBounds(busyElement);	//get the flyover frame bounds
-								flyoverIFrame.style.left=flyoverFrameBounds.x;	//update the bounds of the IFrame to match that of the flyover frame
-								flyoverIFrame.style.top=flyoverFrameBounds.y;
-								flyoverIFrame.style.width=flyoverFrameBounds.width;
-								flyoverIFrame.style.height=flyoverFrameBounds.height;
-								flyoverIFrame.style.zIndex=busyElement.style.zIndex-1;	//place the flyover iframe directly behind the flyover frame (a frame shouldn't be modal and a flyover both at the same time)
-							}
-							flyoverIFrame.style.display=newBusyDisplay;	//show or hide the flyover IFrame
-						}
 					}
 				}
 			}
@@ -2718,23 +2605,12 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 		//TODO bring back after giving all relevant nodes IDs			if(node.id)	//only look at element swith IDs
 		//TODO this may allow "layout" for IE, but only do it when we need it (otherwise it will screw up buttons and such)			node.style.zoom=1;	//TODO testing
 					{
-		/*TODO del unless we want to fix external-toGuise stylesheets			
-						if(!initialInitialization && (typeof guiseIE6Fix!="undefined"))	//if we have IE6 fix routines loaded, fix this element's class name (but don't do this for the first initialization, because we've already done this on the server)
-						{
-							guiseIE6Fix.fixElementClassName(node);	//fix the class name of this element
-						}
-		*/
-
 						var elementName=node.nodeName.toLowerCase();	//get the element name
 						var elementClassName=node.className;	//get the element class name
 						var elementClassNames=elementClassName ? elementClassName.split(/\s/) : EMPTY_ARRAY;	//split out the class names
 						switch(elementName)	//see which element this is
 						{
 							case "a":
-								if(isUserAgentIE6 && Element.hasClassName(node, "imageSelectActionControl"))	//if this is IE6, which doesn't support the CSS outline: none property, create a workaround TODO use a constant; create something more general than just the image select action control
-								{
-									node.hideFocus="true";	//hide the focus on this element
-								}
 								if(elementClassNames.contains("actionControl") || elementClassNames.contains("actionControl-link"))	//if this is a Guise action, or a link in an action control TODO later look at *all* link clicks and do popups for certain ones
 								{
 									if(!node.getAttribute("target"))	//if the link has no target (the target wouldn't work if we tried to take over the events; we can't just check for null because IE will always send back at least "")
@@ -2832,21 +2708,6 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 								break;
 							case "select":
 								com.globalmentor.js.EventManager.addEvent(node, "change", onSelectChange, false);
-		/*TODO del
-								var iframe=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//TODO testing
-								iframe.src="about:blank";
-								iframe.scrolling="no";
-								iframe.frameborder="0";
-								document.body.appendChild(iframe);
-								iframe.position="absolute";
-								var coordinates=getElementCoordinates(node);
-								iframe.style.left=coordinates.x;
-								iframe.style.top=coordinates.y;
-								iframe.style.width=node.offsetWidth+"px";
-								iframe.style.height=node.offsetHeight+"px";
-								iframe.style.zIndex=1;
-		*/	
-								
 								break;
 							case "span":
 								if(node.getAttribute("guise:patchType")=="temp")	//if this is just a temporary element that should be removed (in anticipation of a later replacement, such as the TinyMCE editor, for example) (IE doesn't let us check this attribute for all elements)
@@ -3880,11 +3741,6 @@ function onSliderThumbDragBegin(event)
 //TODO del alert("thumb offsetWidth: "+thumb.offsetWidth+" offsetHeight: "+thumb.offsetHeight);
 		var slider=Node.getAncestorElementByClassName(thumb, STYLES.SLIDER_CONTROL);	//find the slider
 		var track=Node.getAncestorElementByClassName(thumb, STYLES.SLIDER_CONTROL_TRACK);	//find the slider track
-		
-		
-//TODO find out why the slider track gets constantly reloaded in IE6
-//TODO we need to make sure the slider is fully loaded (which may not be as relevant once IE6 no longer constantly reloads images)		
-		
 		var positionID=slider.id+"-position";	//TODO use constant
 		var positionInput=document.getElementById(positionID);	//get the position element		
 		if(slider && track && positionInput)	//if we found the slider and the slider track
@@ -4023,15 +3879,6 @@ function updateSlider(slider)	//TODO maybe rename to updateSliderView
 		if(isHorizontal)	//if this is a horizontal slider
 		{	//TODO fix; the compiled version on IE once gave an "invalid argument" error here
 		
-/*TODO del; this was probably being caused from the IE6 image reloading problem combined with removing the thumb spans when synchronizing earlier
-		
-if(isNaN(newCoordinate))
-{
-	alert("track width: "+track.offsetWidth+"thumb width: "+thumb[GUISE_STATE_WIDTH_ATTRIBUTE]);
-	alert("position: "+position+" span: "+span+" min: "+min);
-
-}
-*/		
 			thumb.style.left=newCoordinate+"px";	//update the horizontal position of the slider
 //alert("thumb.style.left: "+thumb.style.left);
 		}
