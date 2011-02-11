@@ -221,6 +221,10 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		}
 			//<xhtml:script> (external)
 		depictContext.write("\t");
+		final URI jqueryJavascriptURI=application.isDebug() ? JQUERY_JAVASCRIPT_PATH.toURI() : JQUERY_MIN_JAVASCRIPT_PATH.toURI();
+		depictContext.writeJavaScriptElement(jqueryJavascriptURI);	//JavaScript: jquery-?.?.js
+		depictContext.write("\n");
+		depictContext.write("\t");
 		final URI javascriptURI=application.isDebug() ? JAVASCRIPT_JAVASCRIPT_PATH.toURI() : JAVASCRIPT_MIN_JAVASCRIPT_PATH.toURI();
 		depictContext.writeJavaScriptElement(appendQueryParameter(javascriptURI, GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID));	//JavaScript: javascript.js
 		depictContext.write("\n");
@@ -235,15 +239,18 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.write("\t");
 		final URI guiseJavascriptURI=application.isDebug() ? GUISE_JAVASCRIPT_PATH.toURI() : GUISE_MIN_JAVASCRIPT_PATH.toURI();
 		depictContext.writeJavaScriptElement(appendQueryParameter(guiseJavascriptURI, GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID));	//JavaScript: guise.js
+		depictContext.write("\n");
 		depictContext.write("\t");	//Google Gears
 		depictContext.writeJavaScriptElement(appendQueryParameter(GUISE_ASSETS_JAVASCRIPT_PATH.resolve("google/gears_init.js").toURI(), GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID));	//TODO use a constant
+		depictContext.write("\n");
 		depictContext.write("\t");	//TinyMCE
 		depictContext.writeJavaScriptElement(appendQueryParameter(GUISE_ASSETS_JAVASCRIPT_PATH.resolve("tiny_mce/tiny_mce.js").toURI(), GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID));	//TODO use a constant
+		depictContext.write("\n");
 /*TODO FCKeditor
 		depictContext.write("\t");	//fckeditor
 		depictContext.writeJavaScriptElement(appendQueryParameters(GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("fckeditor/fckeditor.js").toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//TODO use a constant
-*/
 		depictContext.write("\n");
+*/
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_HEAD);	//</xhtml:head>		
 		depictContext.write("\n");
 
