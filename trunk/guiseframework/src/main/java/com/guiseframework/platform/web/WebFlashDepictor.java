@@ -74,10 +74,9 @@ public class WebFlashDepictor<C extends Flash> extends AbstractSimpleWebComponen
 	@param secure Whether a secure URI should be retrieved.
 	@return A URI to the swflash.cab file.
 	*/
-	@SuppressWarnings("unchecked")
 	public static URI getSWFlashCabURI(final String version, final boolean secure)
 	{
-		return appendQueryParameters(secure ? SWFLASH_CAB_SECURE_URI : SWFLASH_CAB_URI, new NameValuePair<String, String>(SWFLASH_CAB_URI_VERSION_PARAMETER, version));
+		return appendQueryParameter(secure ? SWFLASH_CAB_SECURE_URI : SWFLASH_CAB_URI, SWFLASH_CAB_URI_VERSION_PARAMETER, version);
 	}
 
 	/**Default constructor using the XHTML <code>&lt;object&gt;</code> element.*/

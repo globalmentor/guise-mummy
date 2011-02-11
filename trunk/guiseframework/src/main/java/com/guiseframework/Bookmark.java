@@ -24,6 +24,7 @@ import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 
 import com.globalmentor.model.NameValuePair;
+import com.globalmentor.net.URIQueryParameter;
 import com.globalmentor.net.URIs;
 import com.globalmentor.text.ArgumentSyntaxException;
 
@@ -215,7 +216,7 @@ public class Bookmark implements Cloneable
 		{
 			final Set<Parameter> parameterSet=getParameters();	//get the parameters
 			final Parameter[] parameters=parameterSet.toArray(new Parameter[parameterSet.size()]);	//create an array of parameters
-			bookmarkQueryStringBuilder.append(constructQuery((NameValuePair<String, String>[])parameters));	//append the parameters to the query string
+			bookmarkQueryStringBuilder.append(constructQuery(parameters));	//append the parameters to the query string
 		}
 		else	//if there are no parameters
 		{
@@ -228,7 +229,7 @@ public class Bookmark implements Cloneable
 	Neither the name nor the value of a bookmark parameter can be <code>null</code>.
 	@author Garret Wilson
 	*/
-	public static class Parameter extends NameValuePair<String, String>
+	public static class Parameter extends URIQueryParameter
 	{
 		/**Constructor specifying the name and value.
 		@param name The parameter name.
@@ -239,6 +240,5 @@ public class Bookmark implements Cloneable
 		{
 			super(checkInstance(name, "Parameter name cannot be null."), checkInstance(value, "Parameter value cannot be null."));	//construct the parent class
 		}		
-
 	}
 }

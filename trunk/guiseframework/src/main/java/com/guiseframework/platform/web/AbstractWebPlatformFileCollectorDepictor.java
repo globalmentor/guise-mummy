@@ -102,7 +102,7 @@ public class AbstractWebPlatformFileCollectorDepictor extends AbstractWebDepicto
 	{
 		final URI resolvedDestinationURI=getSession().getApplication().resolveURI(destinationURI);	//resolve the destination URI
 			//add an identification of the Guise session to the URI if needed, as Flash 8 on FireFox sends the wrong HTTP session ID cookie value TODO transfer to a Flash-only version if we can
-		final URI sessionedDestinationURI=appendQueryParameters(resolvedDestinationURI, new NameValuePair<String, String>(WebPlatform.GUISE_SESSION_UUID_URI_QUERY_PARAMETER, getSession().getUUID().toString()));
+		final URI sessionedDestinationURI=appendQueryParameter(resolvedDestinationURI, WebPlatform.GUISE_SESSION_UUID_URI_QUERY_PARAMETER, getSession().getUUID().toString());
 		getPlatform().getSendMessageQueue().add(new WebCommandDepictEvent<WebPlatformFileCollectorCommand>(getDepictedObject(), WebPlatformFileCollectorCommand.FILE_UPLOAD,	//send a file upload command to the platform
 				new NameValuePair<String, Object>(WebPlatformFileCollectorCommand.ID_PROPERTY, ((WebPlatformFile)platformFile).getID()),	//send the ID of the file
 				new NameValuePair<String, Object>(WebPlatformFileCollectorCommand.DESTINATION_URI_PROPERTY, sessionedDestinationURI)));	//indicate the destination

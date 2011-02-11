@@ -20,8 +20,7 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Set;
 
-
-import com.globalmentor.model.NameValuePair;
+import com.globalmentor.net.URIQueryParameter;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.model.Notification;
@@ -176,7 +175,7 @@ public class WebTabbedPanelDepictor<C extends AbstractCardPanel> extends Abstrac
 				tabStyleIDs.add(ACTION_CLASS);	//allow the tab link to be an action
 				writeClassAttribute(tabStyleIDs);	//write the base style IDs with a "-tab" (or "-tab-selected") suffix
 				writeDirectionAttribute();	//write the component direction, if this component specifies a direction
-				final String query=constructQuery(new NameValuePair<String, String>(componentID, childComponentID));	//construct a query in the form "tabbedPanelID=tabID"
+				final String query=constructQuery(new URIQueryParameter(componentID, childComponentID));	//construct a query in the form "tabbedPanelID=tabID"
 //TODO del				final URI panelComponentURI=resolveFragment(null, childComponentID);	//create a fragment URI link to the component, even if it isn't showing
 				depictContext.writeAttribute(null, ELEMENT_A_ATTRIBUTE_HREF, query);	//write the href attribute to the tab component
 				writeLabelContent(constraints);	//write the content of the label

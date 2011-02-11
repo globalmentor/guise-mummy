@@ -19,9 +19,7 @@ package com.guiseframework.platform.web;
 import java.io.IOException;
 import java.util.*;
 
-
-
-import com.globalmentor.model.NameValuePair;
+import com.globalmentor.net.URIQueryParameter;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Flow;
 import com.guiseframework.platform.*;
@@ -166,7 +164,7 @@ public class WebTabDepictor<V, C extends ListSelectControl<V>> extends AbstractD
 					context.writeAttribute(null, ELEMENT_OPTION_ATTRIBUTE_SELECTED, OPTION_SELECTED_SELECTED);	//selected="selected"			
 				}
 */
-				final String query=constructQuery(new NameValuePair<String, String>(componentID, valueID));	//construct a query in the form "tabControlID=tabID"
+				final String query=constructQuery(new URIQueryParameter(componentID, valueID));	//construct a query in the form "tabControlID=tabID"
 //	TODO del				final URI panelComponentURI=resolveFragment(null, childComponentID);	//create a fragment URI link to the component, even if it isn't showing
 				depictContext.writeAttribute(null, ELEMENT_A_ATTRIBUTE_HREF, query);	//write the href attribute to the tab component
 				representationComponent.depict();	//tell the representation component to update its view

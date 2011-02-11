@@ -221,20 +221,24 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		}
 			//<xhtml:script> (external)
 		depictContext.write("\t");
-		depictContext.writeJavaScriptElement(appendQueryParameters(JAVASCRIPT_JAVASCRIPT_PATH.toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//JavaScript: javascript.js
+		final URI javascriptURI=application.isDebug() ? JAVASCRIPT_JAVASCRIPT_PATH.toURI() : JAVASCRIPT_MIN_JAVASCRIPT_PATH.toURI();
+		depictContext.writeJavaScriptElement(appendQueryParameter(javascriptURI, GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID));	//JavaScript: javascript.js
 		depictContext.write("\n");
 		depictContext.write("\t");
-		depictContext.writeJavaScriptElement(appendQueryParameters(DOM_JAVASCRIPT_PATH.toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//JavaScript: dom.js
+		final URI domJavascriptURI=application.isDebug() ? DOM_JAVASCRIPT_PATH.toURI() : DOM_MIN_JAVASCRIPT_PATH.toURI();
+		depictContext.writeJavaScriptElement(appendQueryParameter(domJavascriptURI, GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID));	//JavaScript: dom.js
 		depictContext.write("\n");
 		depictContext.write("\t");
-		depictContext.writeJavaScriptElement(appendQueryParameters(AJAX_JAVASCRIPT_PATH.toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//JavaScript: ajax.js
+		final URI ajaxJavascriptURI=application.isDebug() ? AJAX_JAVASCRIPT_PATH.toURI() : AJAX_MIN_JAVASCRIPT_PATH.toURI();
+		depictContext.writeJavaScriptElement(appendQueryParameter(ajaxJavascriptURI, GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID));	//JavaScript: ajax.js
 		depictContext.write("\n");
 		depictContext.write("\t");
-		depictContext.writeJavaScriptElement(appendQueryParameters(GUISE_JAVASCRIPT_PATH.toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//JavaScript: guise.js
+		final URI guiseJavascriptURI=application.isDebug() ? GUISE_JAVASCRIPT_PATH.toURI() : GUISE_MIN_JAVASCRIPT_PATH.toURI();
+		depictContext.writeJavaScriptElement(appendQueryParameter(guiseJavascriptURI, GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID));	//JavaScript: guise.js
 		depictContext.write("\t");	//Google Gears
-		depictContext.writeJavaScriptElement(appendQueryParameters(GUISE_ASSETS_JAVASCRIPT_PATH.resolve("google/gears_init.js").toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//TODO use a constant
+		depictContext.writeJavaScriptElement(appendQueryParameter(GUISE_ASSETS_JAVASCRIPT_PATH.resolve("google/gears_init.js").toURI(), GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID));	//TODO use a constant
 		depictContext.write("\t");	//TinyMCE
-		depictContext.writeJavaScriptElement(appendQueryParameters(GUISE_ASSETS_JAVASCRIPT_PATH.resolve("tiny_mce/tiny_mce.js").toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//TODO use a constant
+		depictContext.writeJavaScriptElement(appendQueryParameter(GUISE_ASSETS_JAVASCRIPT_PATH.resolve("tiny_mce/tiny_mce.js").toURI(), GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID));	//TODO use a constant
 /*TODO FCKeditor
 		depictContext.write("\t");	//fckeditor
 		depictContext.writeJavaScriptElement(appendQueryParameters(GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("fckeditor/fckeditor.js").toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//TODO use a constant

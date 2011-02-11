@@ -1197,7 +1197,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						depictContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 						depictContext.writeAttribute(null, "viewportID", SEND_RESOURCE_VIEWPORT_ID);	//specify the viewport ID for sending resources
 							//append the "guiseContentDisposition=attachment" query parameter to the URI
-						final URI sendResourceAttachmentURI=appendQueryParameters(sendResourceURI, new NameValuePair<String, String>(GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER, getSerializationName(ContentDispositionType.ATTACHMENT)));
+						final URI sendResourceAttachmentURI=appendQueryParameter(sendResourceURI, GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER, getSerializationName(ContentDispositionType.ATTACHMENT));
 						depictContext.write(depictContext.getDepictionURI(sendResourceAttachmentURI).toString());	//write the depict URI of the resource to send
 						depictContext.writeElementEnd(null, "navigate");	//</navigate>
 						guisePlatform.clearSendResourceURI();	//clear the address of the resource to send so that we won't send it again
