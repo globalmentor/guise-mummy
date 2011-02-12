@@ -101,10 +101,10 @@ public interface WebPlatform extends Platform
 	public final static URIPath JAVASCRIPT_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/javascript.js");
 	/**The path of the compressed JavaScript JavaScript file, relative to the application.*/
 	public final static URIPath JAVASCRIPT_MIN_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/javascript.min.js");
-	/**The path of the JQuery JavaScript file, relative to the application.*/
-	public final static URIPath JQUERY_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("jquery/jquery-1.5.js");
-	/**The path of the compressed JQuery JavaScript file, relative to the application.*/
-	public final static URIPath JQUERY_MIN_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("jquery/jquery-1.5.min.js");
+	/**The path of the MooTools JavaScript file, relative to the application.*/
+	public final static URIPath MOOTOOLS_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("mootools/mootools-core-1.3-full-nocompat.js");
+	/**The path of the compressed MooTools JavaScript file, relative to the application.*/
+	public final static URIPath MOOTOOLS_MIN_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("mootools/mootools-core-1.3-full-cocompat-yc.js");
 
 	/**The path of the Guise DTD, relative to the application.*/
 	public final static URIPath GUISE_DTD_PATH=GuiseApplication.GUISE_ASSETS_DTD_PATH.resolve("guise.dtd");

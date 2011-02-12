@@ -74,7 +74,7 @@
 					<excludes>
 						<exclude>com/guiseframework/assets/javascript/fckeditor/**/*.*</exclude>
 						<exclude>com/guiseframework/assets/javascript/google/**/*.*</exclude>
-						<exclude>com/guiseframework/assets/javascript/jquery/**/*.*</exclude>
+						<exclude>com/guiseframework/assets/javascript/mootools/**/*.*</exclude>
 						<exclude>com/guiseframework/assets/javascript/tiny_mce/**/*.*</exclude>
 					</excludes>
 					<jswarn>false</jswarn>

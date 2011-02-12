@@ -21,32 +21,6 @@
 
 //Array
 
-/**
- * Returns an array representing the contents of the given object. This implementation recognizes other arrays and the
- * arguments of a function; along with anything else that is iterable by virtue of having a length property and a []
- * access method.
- * 
- * @param object The non-null object the contents of which to return as an array.
- * @return An array containing the contents of the given object.
- * @see http://www.prototypejs.org/api/array/from
- */
-Array.from=function(object)
-{
-	if(object instanceof Array)	//if the object is an array
-	{
-		return object;
-	}
-	else	//otherwise, try to iterate using length and []
-	{
-		var array=new Array();	//create a new array
-		for(var i=0, length=object.length; i<length; ++i)	//for each element
-		{
-			array.add(object[i]);	//add this element to our array
-		}
-		return array;	//return the new array we created
-	}
-};
-
 /** An add() method for arrays, equivalent to Array.push(). */
 Array.prototype.add=Array.prototype.push;
 
@@ -55,28 +29,6 @@ Array.prototype.enqueue=Array.prototype.push;
 
 /** A dequeue() method for arrays, equivalent to Array.shift(). */
 Array.prototype.dequeue=Array.prototype.shift;
-
-if(typeof Array.prototype.indexOf=="undefined")	//defined in JavaScript 1.6
-{
-	/**
-	 * Determines the index of the first occurrence of a given object in the array.
-	 * 
-	 * @param object The object to find in the array.
-	 * @return The index of the object in the array, or -1 if the object is not in the array.
-	 */
-	Array.prototype.indexOf=function(object)
-	{
-		var length=this.length;	//get the length of the array
-		for(var i=0; i<length; ++i)	//for each index
-		{
-			if(this[i]==object)	//if this object is the requested object
-			{
-				return i;	//return this index
-			}
-		}
-		return -1;	//indicate that the object could not be found
-	};
-}
 
 /**
  * Determines the index of the first match of a given object in the array using object.toString() if the object isn't
@@ -100,20 +52,9 @@ Array.prototype.indexOfMatch=function(regexp)
 };
 
 /** Clears an array by removing every item at every index in the array. */
-Array.prototype.clear=function()
+Array.prototype.clear=function()	//TODO del when no longer used
 {
 	this.splice(0, this.length);	//splice out all the elements
-};
-
-/**
- * Determines whether the given object is present in the array.
- * 
- * @param object The object for which to check.
- * @return true if the object is present in the array.
- */
-Array.prototype.contains=function(object)
-{
-	return this.indexOf(object)>=0;	//see if the object is in the array
 };
 
 /**
@@ -139,85 +80,9 @@ Array.prototype.remove=function(index)
 	return this.splice(index, 1)[0];	//splice out the element and return it (note that this will not work on Netscape <4.06 or IE <=5.5; see http://www.samspublishing.com/articles/article.asp?p=30111&seqNum=3&rl=1)
 };
 
-/**
- * Removes an item from the array. If the item is not contained in the array, no action is taken.
- * 
- * @param item The item to be removed.
- * @return The removed item.
- */
-Array.prototype.removeItem=function(item)
-{
-	var index=this.indexOf(item);	//get the index of the item
-	if(index>=0)	//if the item is contained in the array
-	{
-		return this.remove(index);	//remove the item at the index
-	}
-};
-
 var EMPTY_ARRAY=new Array();	//a shared empty array TODO create methods to make this read-only
 
-//Function
-
-/**
- * Creates a new function that functions exactly as does the original function, except that it provides the given
- * variable to appear as "this" to the new function. Any other given arguments will be inserted before the actual
- * arguments when the function is invoked.
- * 
- * @param newThis The variable to appear as "this" when the function is called.
- * @param extraArguments The new arguments, if any, to appear at the first of the arguments when the new function is
- *          called.
- * @return A new function bound to the given this.
- * @see http://www.prototypejs.org/api/function/bind
- */
-Function.prototype.bind=function()
-{
-	var originalFunction=this;	//save a reference to this function instance to allow calling this via closure
-	var extraArguments=Array.from(arguments);	//get the provided arguments
-	var newThis=extraArguments.shift();	//get the first argument, which provides the new this when calling the function, and leaving the remaining arguments to be passed to the function
-	return function()	//create and send back a new function
-	{
-		originalFunction.apply(newThis, extraArguments.length!=0 ? extraArguments.concat(Array.from(arguments)) : arguments);	//the new function will call the original function with the new arguments followed by whatever arguments are given, but using the given this instead of whatever this is passed when the function is called
-	};
-};
-
-/**
- * Creates a new function that functions exactly as does the original function, except that it provides the given
- * variable to appear as "this" to the new function. The original this present when the function is invoked will be
- * inserted as the first argument. Any other given arguments will be inserted before the actual arguments when the
- * function is invoked.
- * 
- * @param newThis The variable to appear as "this" when the function is called.
- * @param extraArguments The new arguments, if any, to appear at the first of the arguments when the new function is
- *          called.
- * @return A new function bound to the given this.
- * @see http://www.prototypejs.org/api/function/bind
- */
-Function.prototype.bindOldThis=function()
-{
-	var originalFunction=this;	//save a reference to this function instance to allow calling this via closure
-	var extraArguments=Array.from(arguments);	//get the provided arguments
-	var newThis=extraArguments.shift();	//get the first argument, which provides the new this when calling the function, and leaving the remaining arguments to be passed to the function
-	return function()	//create and send back a new function
-	{
-		var actualArguments=Array.from(arguments);	//get the actual arguments as an array
-		var newArguments=extraArguments.length!=0 ? extraArguments.concat(actualArguments) : actualArguments;	//if extra arguments were supplied, use them at the front of the array
-		newArguments.unshift(this);	//insert the old this at the beginning of the arguments
-		originalFunction.apply(newThis, newArguments);	//the new function will call the original function with the new arguments followed by the new arguments, but using the given this instead of whatever this is passed when the function is called
-	};
-};
-
 //String
-
-/**
- * Determines whether the given substring is present in the string.
- * 
- * @param substring The substring for which to check.
- * @return true if the substring is present in the string.
- */
-String.prototype.contains=function(substring)
-{
-	return this.indexOf(substring)>=0;	//see if the substring is in the string
-};
 
 /**
  * Determines whether this string is in all lowercase.
@@ -309,16 +174,6 @@ String.prototype.splitSet=function(separator, limit)
 	return splitSet;	//return the set of splits
 };
 
-/**
- * Trims the given string of whitespace.
- * 
- * @see https://lists.latech.edu/pipermail/javascript/2004-May/007570.html
- */
-String.prototype.trim=function()
-{
-	return this.replace(/^\s+|\s+$/g, "");	//replace beginning and ending whitespace with nothing
-};
-
 //StringBuilder
 
 /**
@@ -366,119 +221,6 @@ function StringBuilder(strings)
 	for(var i=0; i<argumentCount; ++i)	//for each argument
 	{
 		this.append(arguments[i]);	//append this string
-	}
-}
-
-//JSON
-
-/**
- * A set of utilities for working with JSON.
- * 
- * @see http://www.ietf.org/rfc/rfc4627.txt
- */
-var JSON=
-{
-
-	/** The regular expression for testing JSON expressions. */
-	_TEST_REGEXP:/[^,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t]/,
-
-	/** The regular expression for testing JSON expressions. */
-	_REPLACE_REGEXP:/\"(\\.|[^\"\\])*\"/g,
-
-	/**
-	 * Evaluates a JSON expression, returning the result of the expression.
-	 * 
-	 * @param json The JSON expression to evaluate.
-	 * @return The result of the JSON evaluation
-	 * @exception If the JSON expression contains more than the valid JSON subset or is otherwise invalid.
-	 */
-	evaluate:function(json)
-	{
-		if(this._TEST_REGEXP.test(json.replace(this._REPLACE_REGEXP, "")))	//if the JSON expression is invalid
-		{
-			throw "Invalid JSON expression: "+json;
-		}
-		return eval("("+json+")");	//evaluate and return the JSON expresion
-	},
-
-	/**
-	 * Serializes an object using JSON. This implementation does not yet correctly escape characters.
-	 * 
-	 * @param object The object to serialize.
-	 */
-	serialize:function(object)
-	{
-		if(object!=null)	//if the object is not null
-		{
-			switch(typeof object)	//see what type this object is
-			{
-				case "string":
-					return "\""+object.replace(/["\\\b\f\n\r\t]/g, this.escapeStringChar)+"\"";	//return the string surrounded by quotes
-				case "boolean":
-				case "number":
-					return object.toString();	//return the string version of the
-				default:
-					if(object instanceof Array)
-					{
-						var length=object.length;	//get the length of the array
-						if(length==0)	//if the array is empty
-						{
-							return "[]";	//return an empty array serialization
-						}
-						var serializedObjectArray=new Array();	//create a new array for serializating the objects
-						for(var i=0; i<length; ++i)	//for each array element
-						{
-							serializedObjectArray[i]=this.serialize(object[i]);	//place the serialization of the array element into the new array
-						}
-						return "["+serializedObjectArray.join(",")+"]";	//join the object serializations, separated by commas, and surround the list with the array delimiters
-					}
-					else	//if this is a general object
-					{
-						var stringBuilder=new StringBuilder("{");	//create a new string builder with the beginning object delimiter
-						var propertyCount=0;	//keep track of the properties
-						for(var property in object)	//for each object property
-						{
-							stringBuilder.append(this.serialize(property)).append(":").append(this.serialize(object[property])).append(",");	//"property":value,
-							++propertyCount;	//show that we serialized another property
-						}
-						if(propertyCount>0)	//if there were properties
-						{
-							stringBuilder.unpend();	//remove the last value separator
-						}
-						stringBuilder.append("}");	//append the ending object delimiter
-						return stringBuilder.toString();	//return the serialized object 
-					}
-			}
-		}
-		else	//if the object is null
-		{
-			return "null";		
-		}
-	},
-
-	/**
-	 * Escapes a character of a JSON string.
-	 * 
-	 * @param restricted The restricted character as a string.
-	 * @return The escaped form of the given character string.
-	 */
-	escapeStringChar:function(restricted)
-	{
-		switch(restricted)
-		{
-			case "\b":
-				return "\\b";
-			case "\f":
-				return "\\f";
-			case "\n":
-				return "\\n";
-			case "\r":
-				return "\\r";
-			case "\t":
-				return "\\t";
-			default:	//for all other characters
-				return "\\"+restricted;	//escape the character with a backslash
-		}
 	}
 }
 
@@ -616,4 +358,3 @@ window.console.log = console.log || function(){};
 window.console.warn = console.warn || function(){};
 window.console.error = console.error || function(){};
 window.console.info = console.info || function(){};
-

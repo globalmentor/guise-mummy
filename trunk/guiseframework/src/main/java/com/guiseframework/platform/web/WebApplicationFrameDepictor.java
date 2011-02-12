@@ -221,8 +221,8 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		}
 			//<xhtml:script> (external)
 		depictContext.write("\t");
-		final URI jqueryJavascriptURI=application.isDebug() ? JQUERY_JAVASCRIPT_PATH.toURI() : JQUERY_MIN_JAVASCRIPT_PATH.toURI();
-		depictContext.writeJavaScriptElement(jqueryJavascriptURI);	//JavaScript: jquery-?.?.js
+		final URI mootoolsJavascriptURI=application.isDebug() ? MOOTOOLS_JAVASCRIPT_PATH.toURI() : MOOTOOLS_MIN_JAVASCRIPT_PATH.toURI();
+		depictContext.writeJavaScriptElement(mootoolsJavascriptURI);	//JavaScript: mootools-???.js
 		depictContext.write("\n");
 		depictContext.write("\t");
 		final URI javascriptURI=application.isDebug() ? JAVASCRIPT_JAVASCRIPT_PATH.toURI() : JAVASCRIPT_MIN_JAVASCRIPT_PATH.toURI();
