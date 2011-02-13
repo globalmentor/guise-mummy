@@ -259,7 +259,31 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 		return createQualifiedName(prefix, localName);	//return the qualified name
 	}
 
-	/**Writes a doctype along with an optional an XML declaration to the string builder and sets the output content type.
+	/**Writes a doctype along with an optional XML declaration to the string builder and sets the output content type.
+	No system ID or public ID will be written.
+	@param writeXMLDeclaration Whether an XML declaration should be included before the doctype.
+	@param namespaceURI The URI of the XML namespace of document element, or <code>null</code> if there is no namespace.
+	@param localName The local name of the document element with no prefix.
+	*/
+	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName) throws IOException
+	{
+		writeDocType(writeXMLDeclaration, namespaceURI, localName, null, null, null);
+	}
+
+	/**Writes a doctype along with an optional XML declaration to the string builder and sets the output content type.
+	No system ID or public ID will be written.
+	@param writeXMLDeclaration Whether an XML declaration should be included before the doctype.
+	@param namespaceURI The URI of the XML namespace of document element, or <code>null</code> if there is no namespace.
+	@param localName The local name of the document element with no prefix.
+	@param contentType The specific XML content type.
+	@throws NullPointerException if the given content type is <code>null</code>.
+	*/
+	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, final ContentType contentType) throws IOException
+	{
+		writeDocType(writeXMLDeclaration, namespaceURI, localName, null, null, checkInstance(contentType, "Content type must be provided in this context."));
+	}
+
+	/**Writes a doctype along with an optional XML declaration to the string builder and sets the output content type.
 	The system ID and content type will be determined from the given public ID.
 	@param writeXMLDeclaration Whether an XML declaration should be included before the doctype.
 	@param namespaceURI The URI of the XML namespace of document element, or <code>null</code> if there is no namespace.
@@ -270,16 +294,17 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	*/
 	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, final String publicID) throws IOException
 	{
-		writeDocType(writeXMLDeclaration, namespaceURI, localName, checkInstance(publicID, "Null public ID not allowed in this method."), null, null);	//check the public ID for null and determine defaults for the other values
+		writeDocType(writeXMLDeclaration, namespaceURI, localName, checkInstance(publicID, "Null public ID not allowed in this context."), null, null);	//check the public ID for null and determine defaults for the other values
 	}
 
 	/**Writes a doctype along with an optional XML declaration to the string builder and sets the output content type.
+	If no public ID or system ID is provided, no public ID or system ID will be written.
 	@param writeXMLDeclaration Whether an XML declaration should be included before the doctype.
 	@param namespaceURI The URI of the XML namespace of document element, or <code>null</code> if there is no namespace.
 	@param localName The local name of the document element with no prefix.
 	@param publicID The XML declaration public ID, or <code>null</code> if none is used.
 	@param systemID The XML declaration system ID, or <code>null</code> if one can be determined from the given public ID.
-	@param contentType The specific XML content type, or <code>null</code> if a content type should be determiend from the public ID; otherwise will default to "text/xml".
+	@param contentType The specific XML content type, or <code>null</code> if a content type should be determined from the public ID; otherwise will default to "text/xml".
 	@exception IllegalArgumentException if a system ID was not provided or one could not be determined from the given public ID.
 	*/
 	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, String publicID, String systemID, ContentType contentType) throws IOException
@@ -336,37 +361,32 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 			if(publicID!=null)	//if we have a public ID
 			{
 				systemID=getDefaultSystemID(publicID);	//try to determine the system ID from the public ID
-				if(systemID==null)	//if no system ID was given TODO testing; check a match against the Guise XHTML DTD
-				{
-					systemID=getSession().getApplication().resolvePath(WebPlatform.GUISE_DTD_PATH).toString();	//TODO testing
-				}
 			}
-		}
-		if(systemID==null)	//if we still don't have a system ID
-		{
-			throw new IllegalArgumentException("A system ID must be provided or must be able to determine one from provided public ID");
 		}
 		stringBuilder.append(DOCTYPE_DECL_START);	//<!DOCTYPE
 		stringBuilder.append(SPACE_CHAR);
 		stringBuilder.append(localName);	//root element TODO check the namespace and add a prefix if necessary, or make a note that this is the default namespace so that later writes can know when generating XML qualified names
-		stringBuilder.append(SPACE_CHAR);
-		if(publicID!=null)	//if there is a public ID
+		if(systemID!=null)	//if a system ID is given
 		{
-			stringBuilder.append(PUBLIC_ID_NAME);	//PUBLIC
 			stringBuilder.append(SPACE_CHAR);
+			if(publicID!=null)	//if there is a public ID
+			{
+				stringBuilder.append(PUBLIC_ID_NAME);	//PUBLIC
+				stringBuilder.append(SPACE_CHAR);
+				stringBuilder.append(DOUBLE_QUOTE_CHAR);	//"
+				stringBuilder.append(publicID);						//public ID
+				stringBuilder.append(DOUBLE_QUOTE_CHAR);	//"
+				stringBuilder.append(SPACE_CHAR);
+			}
+			else	//if there is no public ID
+			{
+				stringBuilder.append(SYSTEM_ID_NAME);	//SYSTEM
+				stringBuilder.append(SPACE_CHAR);
+			}
 			stringBuilder.append(DOUBLE_QUOTE_CHAR);	//"
-			stringBuilder.append(publicID);						//public ID
+			stringBuilder.append(systemID);	//always  write the system literal
 			stringBuilder.append(DOUBLE_QUOTE_CHAR);	//"
-			stringBuilder.append(SPACE_CHAR);
 		}
-		else	//if there is no public ID
-		{
-			stringBuilder.append(SYSTEM_ID_NAME);	//SYSTEM
-			stringBuilder.append(SPACE_CHAR);
-		}
-		stringBuilder.append(DOUBLE_QUOTE_CHAR);	//"
-		stringBuilder.append(systemID);	//always  write the system literal
-		stringBuilder.append(DOUBLE_QUOTE_CHAR);	//"
 		stringBuilder.append(DOCTYPE_DECL_END);	//>
 		stringBuilder.append('\n');
 	}

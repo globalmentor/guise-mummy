@@ -110,9 +110,6 @@ public interface WebPlatform extends Platform
 	/**The path of the compressed TinyMCE JavaScript file, relative to the application.*/
 	public final static URIPath TINYMCE_MIN_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("tiny_mce/tiny_mce.js");
 
-	/**The path of the Guise DTD, relative to the application.*/
-	public final static URIPath GUISE_DTD_PATH=GuiseApplication.GUISE_ASSETS_DTD_PATH.resolve("guise.dtd");
-	
 	/**The path of the Guise Flash file, relative to the application.*/
 	public final static URIPath GUISE_FLASH_PATH=GuiseApplication.GUISE_ASSETS_FLASH_PATH.resolve("guise.swf");
 

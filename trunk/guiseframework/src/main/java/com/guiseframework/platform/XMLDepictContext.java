@@ -39,7 +39,25 @@ public interface XMLDepictContext extends TextDepictContext
 	*/
 	public String getQualifiedName(final URI namespaceURI, final String localName);
 
-	/**Writes a doctype along with an optional an XML declaration to the string builder and sets the output content type.
+	/**Writes a doctype along with an optional XML declaration to the string builder and sets the output content type.
+	No system ID or public ID will be written.
+	@param writeXMLDeclaration Whether an XML declaration should be included before the doctype.
+	@param namespaceURI The URI of the XML namespace of document element, or <code>null</code> if there is no namespace.
+	@param localName The local name of the document element with no prefix.
+	*/
+	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName) throws IOException;
+
+	/**Writes a doctype along with an optional XML declaration to the string builder and sets the output content type.
+	No system ID or public ID will be written.
+	@param writeXMLDeclaration Whether an XML declaration should be included before the doctype.
+	@param namespaceURI The URI of the XML namespace of document element, or <code>null</code> if there is no namespace.
+	@param localName The local name of the document element with no prefix.
+	@param contentType The specific XML content type.
+	@throws NullPointerException if the given content type is <code>null</code>.
+	*/
+	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, final ContentType contentType) throws IOException;
+
+	/**Writes a doctype along with an optional XML declaration to the string builder and sets the output content type.
 	The system ID and content type will be determined from the given public ID.
 	@param writeXMLDeclaration Whether an XML declaration should be included before the doctype.
 	@param namespaceURI The URI of the XML namespace of document element, or <code>null</code> if there is no namespace.
@@ -56,7 +74,7 @@ public interface XMLDepictContext extends TextDepictContext
 	@param localName The local name of the document element with no prefix.
 	@param publicID The XML declaration public ID, or <code>null</code> if none is used.
 	@param systemID The XML declaration system ID, or <code>null</code> if one can be determined from the given public ID.
-	@param contentType The specific XML content type, or <code>null</code> if a content type should be determiend from the public ID; otherwise will default to "text/xml".
+	@param contentType The specific XML content type, or <code>null</code> if a content type should be determined from the public ID; otherwise will default to "text/xml".
 	@exception IllegalArgumentException if a system ID was not provided or one could not be determined from the given public ID.
 	*/
 	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, String publicID, String systemID, ContentType contentType) throws IOException;

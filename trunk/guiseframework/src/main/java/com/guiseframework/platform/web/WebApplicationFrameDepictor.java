@@ -132,7 +132,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		final GuiseApplication application=session.getApplication();	//get a reference to the application
 		final Locale locale=session.getLocale();	//get the component's locale
 			//XML declaration and doctype
-		depictContext.writeDocType(true, XHTML_NAMESPACE_URI, ELEMENT_HTML, GUISE_XHTML_DTD_PUBLIC_ID);	//write the doctype and with an XML declaration
+		depictContext.writeDocType(true, XHTML_NAMESPACE_URI, ELEMENT_HTML, XHTML_CONTENT_TYPE);	//write the doctype and with an XML declaration, with no system ID to a DTD as per HTML 5: http://www.w3.org/TR/html5/syntax.html#the-doctype
 			//<xhtml:html>
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_HTML);	//<xhtml:html>
 		depictContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
