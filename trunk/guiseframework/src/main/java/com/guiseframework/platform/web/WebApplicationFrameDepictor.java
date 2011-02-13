@@ -244,7 +244,8 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeJavaScriptElement(appendQueryParameter(GUISE_ASSETS_JAVASCRIPT_PATH.resolve("google/gears_init.js").toURI(), GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID));	//TODO use a constant
 		depictContext.write("\n");
 		depictContext.write("\t");	//TinyMCE
-		depictContext.writeJavaScriptElement(appendQueryParameter(GUISE_ASSETS_JAVASCRIPT_PATH.resolve("tiny_mce/tiny_mce.js").toURI(), GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID));	//TODO use a constant
+		final URI tinyMCEJavascriptURI=application.isDebug() ? TINYMCE_JAVASCRIPT_PATH.toURI() : TINYMCE_MIN_JAVASCRIPT_PATH.toURI();
+		depictContext.writeJavaScriptElement(appendQueryParameter(tinyMCEJavascriptURI, GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID));
 		depictContext.write("\n");
 /*TODO FCKeditor
 		depictContext.write("\t");	//fckeditor

@@ -105,6 +105,10 @@ public interface WebPlatform extends Platform
 	public final static URIPath MOOTOOLS_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("mootools/mootools-core-1.3-full-nocompat.js");
 	/**The path of the compressed MooTools JavaScript file, relative to the application.*/
 	public final static URIPath MOOTOOLS_MIN_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("mootools/mootools-core-1.3-full-cocompat-yc.js");
+	/**The path of the TinyMCE JavaScript file, relative to the application.*/
+	public final static URIPath TINYMCE_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("tiny_mce/tiny_mce_src.js");
+	/**The path of the compressed TinyMCE JavaScript file, relative to the application.*/
+	public final static URIPath TINYMCE_MIN_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("tiny_mce/tiny_mce.js");
 
 	/**The path of the Guise DTD, relative to the application.*/
 	public final static URIPath GUISE_DTD_PATH=GuiseApplication.GUISE_ASSETS_DTD_PATH.resolve("guise.dtd");

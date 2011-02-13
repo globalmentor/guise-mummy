@@ -2003,29 +2003,26 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 			com.globalmentor.js.EventManager.addEvent(window, "resize", this._onWindowResize.bind(this), false);	//add a resize listener
 		//TODO del	com.globalmentor.js.EventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
 			com.globalmentor.js.EventManager.addEvent(window, "unload", this.onUnload.bind(this), false);	//do the appropriate uninitialization when the window unloads
-
+			
 			/**Support for insert for TinyMCE.
-			Modified from XHTMLxtras TinyMCE Plugin 3.2.1, Copyright © 2004-2008, Moxiecode Systems AB.
+			Modified from XHTMLxtras TinyMCE Plugin 3.2.1, 3.4b3, Copyright © 2004-2008, 2009, Moxiecode Systems AB.
 			@param elementName The name of the element to add.
 			*/
 			tinymce.Editor.prototype.insertElement=function(elementName)
 			{
 				var element=this.dom.getParent(this.focusElement, elementName.toUpperCase());
-				tinyMCE.execCommand('mceBeginUndoLevel');
+				this.undoManager.add()
+//TODO testing				tinyMCE.execCommand('mceBeginUndoLevel');
 				if(element==null)
 				{
 					var selectedText=this.selection.getContent();
 					if(selectedText.length>0)
 					{
-						if (tinymce.isIE && elementName.indexOf('html:') == 0)
-						{
-							elementName = elementName.substring(5).toLowerCase();
-						}
 						var dom = this.dom;
 						this.getDoc().execCommand('FontName', false, 'mceinline');
-						tinymce.each(dom.select(tinymce.isWebKit ? 'span' : 'font'), function(n) {
+						tinymce.each(dom.select('span,font'), function(n) {
 							if (n.style.fontFamily == 'mceinline' || n.face == 'mceinline')
-								dom.replace(dom.create(elementName), n, 1);
+								dom.replace(dom.create(elementName, {'data-mce-new' : 1}), n, 1);
 						});
 						var elementArray = tinymce.grep(dom.select(elementName));						
 						for (var i=0; i<elementArray.length; i++)
@@ -2034,15 +2031,12 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 							element.id = '';
 							element.setAttribute('id', '');
 							element.removeAttribute('id');
+							element.removeAttribute('data-mce-new');
 						}
 					}
 				}
-				else
-				{
-					setElementAttribs(element);
-				}
 				this.nodeChanged();
-				tinyMCE.execCommand('mceEndUndoLevel');
+//TODO testing				tinyMCE.execCommand('mceEndUndoLevel');
 			};
 
 			tinyMCE.init(
