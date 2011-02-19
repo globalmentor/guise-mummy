@@ -12513,7 +12513,7 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 
 						// Scroll range into view scrollIntoView on element can't be used since it will scroll the main view port as well
 						if (!tinymce.isIE) {
-							node = dom.create('span', null, '&nbsp;');
+							node = dom.create('span', null, '\u00a0');
 							rng.insertNode(node);
 							nodeRect = dom.getRect(node);
 							viewPortRect = dom.getViewPort(editor.getWin());
@@ -13430,10 +13430,10 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 						nn = nn.appendChild(nl[i]);
 
 					// Padd most inner style element
-					nl[0].innerHTML = isOpera ? '&nbsp;' : '<br />'; // Extra space for Opera so that the caret can move there
+					nl[0].innerHTML = isOpera ? '\u00a0' : '<br />'; // Extra space for Opera so that the caret can move there
 					return nl[0]; // Move caret to most inner element
 				} else
-					e.innerHTML = isOpera ? '&nbsp;' : '<br />'; // Extra space for Opera so that the caret can move there
+					e.innerHTML = isOpera ? '\u00a0' : '<br />'; // Extra space for Opera so that the caret can move there
 			};
 
 			// Fill empty afterblook with current style
