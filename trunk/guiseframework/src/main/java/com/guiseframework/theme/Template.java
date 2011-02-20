@@ -19,8 +19,9 @@ package com.guiseframework.theme;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
+import org.ploop.PLOOPURFProcessor;
+
 import com.globalmentor.urf.AbstractClassTypedURFResource;
-import com.globalmentor.urf.ploop.PLOOPURFProcessor;
 import com.globalmentor.util.DataException;
 
 import static com.guiseframework.theme.Theme.*;

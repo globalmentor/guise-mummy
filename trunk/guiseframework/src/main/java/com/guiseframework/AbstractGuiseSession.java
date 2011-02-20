@@ -26,6 +26,8 @@ import java.text.MessageFormat;
 import static java.text.MessageFormat.*;
 import java.util.*;
 
+import org.ploop.PLOOPURFProcessor;
+
 import static java.util.Collections.*;
 
 import com.globalmentor.beans.*;
@@ -40,7 +42,6 @@ import com.globalmentor.log.Log;
 import com.globalmentor.net.*;
 import com.globalmentor.text.CharacterEncoding;
 import com.globalmentor.urf.*;
-import com.globalmentor.urf.ploop.PLOOPURFProcessor;
 import com.globalmentor.util.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;

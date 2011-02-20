@@ -20,6 +20,8 @@ import java.net.URI;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+import org.ploop.PLOOPURFProcessor;
+
 import static java.util.Collections.*;
 
 
@@ -28,7 +30,6 @@ import com.globalmentor.collections.CollectionMap;
 import com.globalmentor.collections.HashSetHashMap;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.urf.*;
-import com.globalmentor.urf.ploop.PLOOPURFProcessor;
 import com.globalmentor.urf.select.*;
 import com.globalmentor.urf.xml.XML;
 import com.globalmentor.util.*;

@@ -23,6 +23,8 @@ import java.net.URI;
 import java.util.*;
 import java.util.concurrent.*;
 
+import org.ploop.*;
+
 import static com.globalmentor.collections.Arrays.*;
 import static com.globalmentor.java.Objects.*;
 
@@ -30,7 +32,6 @@ import com.globalmentor.event.*;
 import com.globalmentor.java.*;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.urf.URFResource;
-import com.globalmentor.urf.ploop.*;
 import com.globalmentor.util.*;
 import com.guiseframework.*;
 import com.guiseframework.component.effect.*;
