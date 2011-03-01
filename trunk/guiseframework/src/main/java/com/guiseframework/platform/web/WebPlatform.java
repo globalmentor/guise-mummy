@@ -93,6 +93,14 @@ public interface WebPlatform extends Platform
 	public final static URIPath DOM_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/dom.js");
 	/**The path of the compressed DOM JavaScript file, relative to the application.*/
 	public final static URIPath DOM_MIN_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/dom.min.js");
+	/**The path of the domready JavaScript file, relative to the application.*/
+	public final static URIPath DOMREADY_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("domready/domready.js");
+	/**The path of the compressed domready JavaScript file, relative to the application.*/
+	public final static URIPath DOMREADY_MIN_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("domready/domready.min.js");
+	/**The path of the Google Gears JavaScript file, relative to the application.*/
+	public final static URIPath GOOGLE_GEARS_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("google/gears_init.js");
+	/**The path of the compressed Google Gears JavaScript file, relative to the application.*/
+	public final static URIPath GOOGLE_GEARS_MIN_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("google/gears_init.min.js");
 	/**The path of the Guise JavaScript file, relative to the application.*/
 	public final static URIPath GUISE_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("guise/guise.js");
 	/**The path of the compressed Guise JavaScript file, relative to the application.*/
@@ -101,10 +109,6 @@ public interface WebPlatform extends Platform
 	public final static URIPath JAVASCRIPT_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/javascript.js");
 	/**The path of the compressed JavaScript JavaScript file, relative to the application.*/
 	public final static URIPath JAVASCRIPT_MIN_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/javascript.min.js");
-	/**The path of the MooTools JavaScript file, relative to the application.*/
-	public final static URIPath MOOTOOLS_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("mootools/mootools-core-1.3-full-nocompat.js");
-	/**The path of the compressed MooTools JavaScript file, relative to the application.*/
-	public final static URIPath MOOTOOLS_MIN_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("mootools/mootools-core-1.3-full-cocompat-yc.js");
 	/**The path of the TinyMCE JavaScript file, relative to the application.*/
 	public final static URIPath TINYMCE_JAVASCRIPT_PATH=GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("tiny_mce/tiny_mce_src.js");
 	/**The path of the compressed TinyMCE JavaScript file, relative to the application.*/

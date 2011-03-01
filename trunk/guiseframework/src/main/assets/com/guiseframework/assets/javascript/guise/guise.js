@@ -765,7 +765,7 @@ com.guiseframework.js.Guise=function()
 			{
 				DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.PROPERTY,	//<property>
 						new Map(this.RequestElement.NAME, propertyName));	//name="name"
-				DOMUtilities.appendXMLText(stringBuilder, JSON.encode(properties[propertyName]));	//value
+				DOMUtilities.appendXMLText(stringBuilder, JSON.serialize(properties[propertyName]));	//value
 				DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.PROPERTY);	//</property>
 			}
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.CHANGE);	//</change>
@@ -1196,13 +1196,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 		{
 			var objectID=element.getAttribute(this.ResponseElement.OBJECT_ID);	//get the object ID, if there is one
 			var command=element.getAttribute(this.ResponseElement.COMMAND);	//get the command
-			var parameterString=DOMUtilities.getNodeText(element);
-			var parameters=JSON.decode(parameterString);	//parse the parameters
-			if(parameters==null)	//TODO upgrade to exception handling when MooTools updates this
-			{
-				console.debug("Invalid JSON expression: "+parameterString);
-				throw "Invalid JSON expression: "+parameterString;
-			}
+			var parameters=JSON.evaluate(DOMUtilities.getNodeText(element));	//parse the parameters
 //			alert("received command "+command+" for object "+objectID+" with audioURI "+parameters["audioURI"]);
 			switch(command)	//see which command this is
 			{
@@ -3949,7 +3943,7 @@ function onMouse(event)
 		switch(event.type)	//see which type of mouse event this is
 		{
 			case "mouseover":	//if we are entering a component
-//console.log("got mouse over component ID ", componentID, " mouseOverComponentIDs: ", JSON.encode(mouseOverComponentIDs));
+//console.log("got mouse over component ID ", componentID, " mouseOverComponentIDs: ", JSON.serialize(mouseOverComponentIDs));
 				var ancestorComponents=Node.getAncestorElementsByClassName(component, STYLES.COMPONENT);	//get an array of all ancestor components, including this component, in current-to-root order
 //guise.trace("got mouse over component ID: ", componentID, "with ancestor component count", ancestorComponents.length, "will look up to to target", currentTarget.id);
 				for(var i=ancestorComponents.length-1; i>=0; --i)	//for each ancestor, from root to this one
@@ -3972,10 +3966,10 @@ function onMouse(event)
 				}
 				event.stopPropagation();	//tell the event to stop bubbling
 				event.preventDefault();	//prevent the default functionality from occurring
-//console.log("finished mouse over, mouseOverComponentIDs: ", JSON.encode(mouseOverComponentIDs));
+//console.log("finished mouse over, mouseOverComponentIDs: ", JSON.serialize(mouseOverComponentIDs));
 				break;
 			case "mouseout":	//if we are leaving a component
-//console.log("got mouse out of component ID ", componentID, " other component ID ", (otherComponent!=null ? otherComponent.id : "none"), " mouseOverComponentIDs: ", JSON.encode(mouseOverComponentIDs));
+//console.log("got mouse out of component ID ", componentID, " other component ID ", (otherComponent!=null ? otherComponent.id : "none"), " mouseOverComponentIDs: ", JSON.serialize(mouseOverComponentIDs));
 				var ancestorComponents=Node.getAncestorElementsByClassName(component, STYLES.COMPONENT);	//get an array of all ancestor components, including this component, in current-to-root order
 //console.log("mouse really leaving hierarchy, ancestor components number ", ancestorComponents.length);
 				for(var i=0, length=ancestorComponents.length; i<length; ++i)	//for each ancestor, from this one to root
@@ -3998,7 +3992,7 @@ function onMouse(event)
 						}
 					}
 				}
-//console.log("finished mouse out, mouseOverComponentIDs: ", JSON.encode(mouseOverComponentIDs));
+//console.log("finished mouse out, mouseOverComponentIDs: ", JSON.serialize(mouseOverComponentIDs));
 				event.stopPropagation();	//tell the event to stop bubbling
 				event.preventDefault();	//prevent the default functionality from occurring
 				break;
@@ -4264,4 +4258,4 @@ function debug(text)
 	window.open(dymamicContent, "debug", "status=no,menubar=no,scrollbars=yes,resizable=no,width=800,height=600");
 }
 
-window.addEvent('domready', guise.onLoad.bind(guise));	//do the appropriate initialization when the DOM is ready
+DomReady.ready(guise.onLoad.bind(guise));	//do the appropriate initialization when the DOM is ready

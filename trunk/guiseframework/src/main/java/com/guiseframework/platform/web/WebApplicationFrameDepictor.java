@@ -221,8 +221,8 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		}
 			//<xhtml:script> (external)
 		depictContext.write("\t");
-		final URI mootoolsJavascriptURI=application.isDebug() ? MOOTOOLS_JAVASCRIPT_PATH.toURI() : MOOTOOLS_MIN_JAVASCRIPT_PATH.toURI();
-		depictContext.writeJavaScriptElement(mootoolsJavascriptURI);	//JavaScript: mootools-???.js
+		final URI domreadyJavascriptURI=application.isDebug() ? DOMREADY_JAVASCRIPT_PATH.toURI() : DOMREADY_MIN_JAVASCRIPT_PATH.toURI();
+		depictContext.writeJavaScriptElement(domreadyJavascriptURI);	//JavaScript: domready.js
 		depictContext.write("\n");
 		depictContext.write("\t");
 		final URI javascriptURI=application.isDebug() ? JAVASCRIPT_JAVASCRIPT_PATH.toURI() : JAVASCRIPT_MIN_JAVASCRIPT_PATH.toURI();
@@ -241,7 +241,8 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeJavaScriptElement(appendQueryParameter(guiseJavascriptURI, GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID));	//JavaScript: guise.js
 		depictContext.write("\n");
 		depictContext.write("\t");	//Google Gears
-		depictContext.writeJavaScriptElement(appendQueryParameter(GUISE_ASSETS_JAVASCRIPT_PATH.resolve("google/gears_init.js").toURI(), GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID));	//TODO use a constant
+		final URI googleGearsURI=application.isDebug() ? GOOGLE_GEARS_JAVASCRIPT_PATH.toURI() : GOOGLE_GEARS_MIN_JAVASCRIPT_PATH.toURI();
+		depictContext.writeJavaScriptElement(appendQueryParameter(googleGearsURI, GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID));
 		depictContext.write("\n");
 		depictContext.write("\t");	//TinyMCE
 		final URI tinyMCEJavascriptURI=application.isDebug() ? TINYMCE_JAVASCRIPT_PATH.toURI() : TINYMCE_MIN_JAVASCRIPT_PATH.toURI();
