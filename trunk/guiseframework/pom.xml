@@ -78,7 +78,6 @@
 				<configuration>
 					<suffix>.min</suffix>
 					<excludes>
-						<exclude>com/guiseframework/assets/javascript/fckeditor/**/*.*</exclude>
 						<exclude>com/guiseframework/assets/javascript/tiny_mce/**/*.*</exclude>
 					</excludes>
 					<jswarn>false</jswarn>

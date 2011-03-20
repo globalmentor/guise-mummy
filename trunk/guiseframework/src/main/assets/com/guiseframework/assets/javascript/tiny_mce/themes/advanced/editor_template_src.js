@@ -610,7 +610,7 @@
 		},
 
 		resizeBy : function(dw, dh) {
-			var e = DOM.get(this.editor.id + '_tbl');
+			var e = DOM.get(this.editor.id + '_ifr');
 
 			this.resizeTo(e.clientWidth + dw, e.clientHeight + dh);
 		},
@@ -970,12 +970,12 @@
 			}
 
 			if (c = cm.get('anchor')) {
-				c.setActive(!!p && p.name);
+				c.setActive(!co && !!p && p.name);
 			}
 
 			p = getParent('IMG');
 			if (c = cm.get('image'))
-				c.setActive(!!p && n.className.indexOf('mceItem') == -1);
+				c.setActive(!co && !!p && n.className.indexOf('mceItem') == -1);
 
 			if (c = cm.get('styleselect')) {
 				t._importClasses();
@@ -1069,10 +1069,6 @@
 					// Ignore non element and hidden elements
 					if (n.nodeType != 1 || n.nodeName === 'BR' || (DOM.hasClass(n, 'mceItemHidden') || DOM.hasClass(n, 'mceItemRemoved')))
 						return;
-
-					// Fake name
-					if (v = DOM.getAttrib(n, 'mce_name'))
-						na = v;
 
 					// Handle prefix
 					if (tinymce.isIE && n.scopeName !== 'HTML')
