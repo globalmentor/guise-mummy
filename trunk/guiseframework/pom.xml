@@ -54,6 +54,9 @@
 				<directory>src/main/assets</directory>
 			</resource>
 			<resource>
+				<directory>src/main/licenses</directory>
+			</resource>
+			<resource>
 				<directory>src/main/javascript</directory>
 			</resource>
 			<resource>
