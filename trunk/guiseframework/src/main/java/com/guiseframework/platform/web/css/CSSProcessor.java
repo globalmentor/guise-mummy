@@ -60,7 +60,7 @@ public class CSSProcessor
 		while(true)	//keep reading declarations until there aren't any more
 		{
 			skipWhitespaceCommentsEOF(parseReader);	//skip over whitespace and comments
-			if(parseReader.isEOF())	//if we've hit the end of the stream of characters
+			if(parseReader.isEnd())	//if we've hit the end of the stream of characters
 				return false;	//show that we hit the end of the stream without finding the end-of-rule-group character
 			if(parseReader.peek()==RULE_GROUP_END_CHAR)  //if we're at the end of the rule group (which will happen if the rule group is empty, for instance)
 				return true;  //show that we hit the end of the rule group G***this check is done at the end of this loop, too -- is there a place we can combine both checks?
@@ -188,7 +188,7 @@ public class CSSProcessor
 		while(true)	//we'll keep processing rulesets and such until we run out of characters looking for whitespace
 		{
 			parseReader.skipCharsEOF(WHITESPACE_CHARS);	//skip over whitespace
-			if(parseReader.isEOF())	//if we've hit the end of the stream of characters
+			if(parseReader.isEnd())	//if we've hit the end of the stream of characters
 				return;	//we're finished processing the stylesheet
 			parseReader.resetPeek();	//reset peeking so that the next character peeked will reflect the next character to be read
 
