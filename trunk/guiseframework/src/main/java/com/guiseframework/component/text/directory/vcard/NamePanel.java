@@ -25,6 +25,7 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 
 import static com.globalmentor.collections.Arrays.*;
+import static com.globalmentor.java.Strings.NO_STRINGS;
 import static com.globalmentor.text.TextFormatter.*;
 import static com.globalmentor.text.directory.vcard.VCard.*;
 import static com.guiseframework.Resources.*;
@@ -121,9 +122,9 @@ public class NamePanel extends AbstractPanel
 		final String familyNameValue=familyNameControl.getValue();
 		final String givenNameValue=givenNameControl.getValue();
 		final String additionalNameValue=additionalNameControl.getValue();
-		final String[] familyNames=familyNameValue!=null ? familyNameValue.trim().split(String.valueOf(VALUE_SEPARATOR_CHAR)) : EMPTY_STRING_ARRAY;
-		final String[] givenNames=givenNameValue!=null ? givenNameValue.trim().split(String.valueOf(VALUE_SEPARATOR_CHAR)) : EMPTY_STRING_ARRAY;
-		final String[] additionalNames=additionalNameValue!=null ? additionalNameValue.trim().split(String.valueOf(VALUE_SEPARATOR_CHAR)) : EMPTY_STRING_ARRAY;
+		final String[] familyNames=familyNameValue!=null ? familyNameValue.trim().split(String.valueOf(VALUE_SEPARATOR_CHAR)) : NO_STRINGS;
+		final String[] givenNames=givenNameValue!=null ? givenNameValue.trim().split(String.valueOf(VALUE_SEPARATOR_CHAR)) : NO_STRINGS;
+		final String[] additionalNames=additionalNameValue!=null ? additionalNameValue.trim().split(String.valueOf(VALUE_SEPARATOR_CHAR)) : NO_STRINGS;
 		final String[] honorificPrefixes=honorificPrefixControl.getSelectedValues();
 		final String[] honorificSuffixes=honorificSuffixControl.getSelectedValues();
 //TODO fix		final Locale locale=selectLanguageAction.getLocale();

@@ -1810,7 +1810,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	}
 
 	/**The set of string reference delimiters, <code>SOS</code> and <code>ST</code>.*/
-	private final static String STRING_REFERENCE_DELIMITERS=new StringBuilder().append(START_OF_STRING_CHAR).append(STRING_TERMINATOR_CHAR).toString();
+	private final static Characters STRING_REFERENCE_DELIMITERS=new Characters(START_OF_STRING_CHAR, STRING_TERMINATOR_CHAR);
 	
 	/**Dereferences a string by replacing any string references with a string from the resources.
 	A string reference begins with the Start of String (<code>SOS</code>) control character (U+0098) and ends with a String Terminator (<code>ST</code>) control character (U+009C).

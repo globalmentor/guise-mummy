@@ -24,6 +24,7 @@ import java.io.*;
 import java.util.*;
 
 import com.globalmentor.io.*;
+import com.globalmentor.java.Characters;
 import com.globalmentor.model.NameValuePair;
 
 /**Class to parse CSS stylesheets in order to manipulate them within Guise.
@@ -114,7 +115,7 @@ public class CSSProcessor
 				//read to the end of a simple selector chain
 			final String simpleSelectorSequenceString=parseReader.readStringUntilChar(COMBINATOR_CHARS+SELECTOR_SEPARATOR_CHAR+RULE_GROUP_START_CHAR+"/");	//the end of each simple selector sequence will either be a combinator, comma, the start of the block of rules, or a comment TODO use a constnat for the start of a comment
 			final List<SimpleSelector> simpleSelectorSequence=new ArrayList<SimpleSelector>();	//create a new list of simple selectors			
-			final ReaderTokenizer simpleSelectorSequenceTokenizer=new ReaderTokenizer(new StringReader(simpleSelectorSequenceString), ""+CLASS_SELECTOR_DELIMITER+ID_SELECTOR_DELIMITER+PSEUDO_CLASS_DELIMITER);	//tokenize the simple selector sequence
+			final ReaderTokenizer simpleSelectorSequenceTokenizer=new ReaderTokenizer(new StringReader(simpleSelectorSequenceString), new Characters(CLASS_SELECTOR_DELIMITER, ID_SELECTOR_DELIMITER, PSEUDO_CLASS_DELIMITER));	//tokenize the simple selector sequence
 			for(final String simpleSelectorString:simpleSelectorSequenceTokenizer)//for each simple selector string
 			{
 				final SimpleSelector simpleSelector;	//we'll create the appropriate simple selector
