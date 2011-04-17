@@ -29,7 +29,7 @@ import com.globalmentor.net.ContentType;
 import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.java.Objects.*;
 
-import com.globalmentor.java.Strings;
+import static com.globalmentor.java.CharSequences.*;
 import com.globalmentor.log.Log;
 import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
@@ -221,7 +221,7 @@ Log.debug("cache miss for text", xmlTextHash);
 				}
 				depictContext.writeAttribute(attributeNamespaceURI, attributeLocalName, attributeValue);	//write this attribute
 			}
-			depictContext.writeAttribute(XHTML_NAMESPACE_URI, ATTRIBUTE_CLASS, Strings.join(' ', classAttributeValue, WebPlatform.ATTRIBUTE_CLASS_CONTENT));	//write the class attribute, appending the "content" class
+			depictContext.writeAttribute(XHTML_NAMESPACE_URI, ATTRIBUTE_CLASS, join(' ', classAttributeValue, WebPlatform.ATTRIBUTE_CLASS_CONTENT).toString());	//write the class attribute, appending the "content" class
 			updateElementContent(element);	//update the element content
 			depictContext.writeElementEnd(elementNamespaceURI, elementLocalName);	//end this element
 		}
