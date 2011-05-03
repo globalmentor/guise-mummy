@@ -127,7 +127,7 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Configu
 	The resulting URI may not be absolute, but can be made absolute by resolving it against the depiction root URI.
 	@param navigationURI The navigation URI, which may be absolute or have an absolute path or a path relative to the application.
 	@param suffixes The suffixes, if any, to append to a resource key in a URI reference.
-	@return A URI suitable for depiction, deferenced and resolved to the application base path.
+	@return A URI suitable for depiction, dereferenced and resolved to the application base path.
 	@see #dereferenceURI(URI, String...)
 	@see #getDepictionRootURI()
 	@see GuiseApplication#getDepictionURI(URI, URI)

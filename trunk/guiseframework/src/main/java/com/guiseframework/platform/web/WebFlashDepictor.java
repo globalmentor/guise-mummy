@@ -19,7 +19,6 @@ package com.guiseframework.platform.web;
 import java.io.IOException;
 import java.net.URI;
 
-import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.net.http.HTTP;
 
@@ -66,7 +65,7 @@ public class WebFlashDepictor<C extends Flash> extends AbstractSimpleWebComponen
 	public final static URI SWFLASH_CAB_URI=URI.create("http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab");
 	/**The HTTPS URI to the swflash.cab file.*/
 	public final static URI SWFLASH_CAB_SECURE_URI=URI.create("https://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab");
-	/**The URI parameter specifying the version of the swflash.cab file to retreive.*/
+	/**The URI parameter specifying the version of the swflash.cab file to retrieve.*/
 	public final static String SWFLASH_CAB_URI_VERSION_PARAMETER="version";
 
 	/**Returns A URI appropriate for accessing the swflash.cab file at an optionally secure location with the given version.
@@ -100,7 +99,7 @@ public class WebFlashDepictor<C extends Flash> extends AbstractSimpleWebComponen
 		{
 			depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CLASSID, FLASH_CLASS_ID);	//classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"; only write the classid attributes for IE, because it will prevent the Flash from being loaded in Firefox
 				//create a codebase URI in the form "http[s]://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0", making sure we use the same scheme so that IE6 won't complain if a secure page references a non-secure codebase
-			depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CODEBASE, getSWFlashCabURI("6,0,40,0", HTTP.HTTPS_SCHEME.equals(depictContext.getDepictionURI().getScheme())).toString());	//codebase="http[s]://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0" TODO allow version to be specified
+			depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CODEBASE, getSWFlashCabURI("6,0,40,0", HTTP.HTTPS_URI_SCHEME.equals(depictContext.getDepictionURI().getScheme())).toString());	//codebase="http[s]://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0" TODO allow version to be specified
 		}
 		else	//if the user agent is not IE, specify the object content type
 		{

@@ -33,7 +33,7 @@ public class NavigationEvent extends AbstractGuiseEvent
 	/**The navigation path relative to the application context path.*/
 	private final URIPath navigationPath;
 
-		/**@public The navigation path relative to the application context path.*/
+		/**@return The navigation path relative to the application context path.*/
 		public URIPath getNavigationPath() {return navigationPath;}
 
 	/**The bookmark for which navigation should occur at the navigation path, or <code>null</code> if there is no bookmark involved in navigation.*/

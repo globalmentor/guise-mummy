@@ -42,6 +42,7 @@ public interface DepictContext extends PropertyBindable
 
 	/**Determines the URI to use for depiction based upon a navigation path.
 	The path will first be dereferenced for the current session and then resolved to the application.
+	The resulting URI may not be absolute, but can be made absolute by resolving it against the depiction root URI.
 	This method is equivalent to calling {@link GuiseSession#getDepictionURI(URIPath, String...)}.
 	@param navigationPath The navigation path, which may be absolute or relative to the application.
 	@param suffixes The suffixes, if any, to append to a resource key in a URI reference.
@@ -52,6 +53,7 @@ public interface DepictContext extends PropertyBindable
 
 	/**Determines the URI to use for depiction based upon a navigation URI.
 	The URI will first be dereferenced for the current session and then resolved to the application.
+	The resulting URI may not be absolute, but can be made absolute by resolving it against the depiction root URI.
 	This method is equivalent to calling {@link GuiseSession#getDepictionURI(URI, String...)}.
 	@param navigationURI The navigation URI, which may be absolute or have an absolute path or a path relative to the application.
 	@param suffixes The suffixes, if any, to append to a resource key in a URI reference.

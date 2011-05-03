@@ -38,9 +38,11 @@ import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.audio.Audio;
 import com.guiseframework.component.*;
+import com.guiseframework.component.facebook.LikeButton;
 import com.guiseframework.event.ValueEvent;
 import com.guiseframework.event.ValueSelectListener;
 import com.guiseframework.platform.*;
+import com.guiseframework.platform.web.facebook.WebIFrameLikeButtonDepictor;
 
 /**A web platform based upon an HTTP servlet.
 @author Garret Wilson
@@ -105,7 +107,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 //			TODO del Log.trace("Looking at cookie", cookieName, "with value", cookie.getValue());
 				if(!SESSION_ID_COOKIE_NAME.equals(cookieName))	//ignore the session ID
 				{
-					environment.setProperty(cookieName, uriDecode(cookie.getValue()));	//put this cookie's decoded value into the session's environment
+					environment.setProperty(cookieName, decode(cookie.getValue()));	//put this cookie's decoded value into the session's environment
 				}
 			}
 		}
@@ -153,7 +155,9 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 		registerDepictorClass(TextControl.class, WebTextControlDepictor.class);
 		registerDepictorClass(ToolButton.class, WebToolButtonDepictor.class);
 		registerDepictorClass(TreeControl.class, WebTreeControlDepictor.class);
-		registerDepictorClass(ValueSelectLink.class, WebValueSelectLinkDepictor.class);		
+		registerDepictorClass(ValueSelectLink.class, WebValueSelectLinkDepictor.class);
+		//Facebook
+		registerDepictorClass(LikeButton.class, WebIFrameLikeButtonDepictor.class);
 	}
 
 	/**The current depict context.*/
