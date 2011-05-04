@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
+import com.globalmentor.facebook.OpenGraph;
 import com.globalmentor.java.Integers;
 import com.globalmentor.text.xml.stylesheets.css.*;
 
@@ -40,7 +41,8 @@ import com.guiseframework.style.*;
 
 /**Abstract implementation of information related to the current depiction on the web platform.
 This implementation maps the XHTML namespace {@value WebPlatform#GUISE_ML_NAMESPACE_URI} to the prefix {@value WebPlatform#GUISE_ML_NAMESPACE_PREFIX}.
-This implementation defaults to not using quirks mode
+This implementation maps the XHTML namespace {@value OpenGraph#NAMESPACE_URI} to the prefix {@value OpenGraph#NAMESPACE_PREFIX}.
+This implementation defaults to not using quirks mode.
 @author Garret Wilson
 */
 public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContext implements WebDepictContext
@@ -64,6 +66,7 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 	{
 		super(session, destination);	//construct the parent class
 		getXMLNamespacePrefixManager().registerNamespacePrefix(GUISE_ML_NAMESPACE_URI.toString(), GUISE_ML_NAMESPACE_PREFIX);	//map the Guise namespace to the Guise prefix
+		getXMLNamespacePrefixManager().registerNamespacePrefix(OpenGraph.NAMESPACE_URI.toString(), OpenGraph.NAMESPACE_PREFIX);	//map the Open Graph namespace to the Open Graph prefix
 	}
 
 	/**Returns a string representation of the provided style declarations.

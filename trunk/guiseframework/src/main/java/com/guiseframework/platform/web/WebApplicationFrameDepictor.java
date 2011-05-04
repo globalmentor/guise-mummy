@@ -21,6 +21,7 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.util.*;
 
+import com.globalmentor.facebook.OpenGraph;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.ContentType;
 
@@ -28,7 +29,10 @@ import static com.globalmentor.javascript.JavaScript.*;
 import static com.globalmentor.model.Locales.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.xml.XML.*;
+
+import com.globalmentor.text.xml.XML;
 import com.globalmentor.text.xml.xhtml.XHTML;
+import com.globalmentor.urf.URFResource;
 import com.globalmentor.util.*;
 import com.guiseframework.*;
 
@@ -137,7 +141,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_HTML);	//<xhtml:html>
 		depictContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
 		depictContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
-//	TODO del; not present in XHTML		context.writeAttribute(null, XHTMLConstants.ATTRIBUTE_LANG, getLanguageTag(locale));	//lang="locale"
+		depictContext.writeAttribute(XMLNS_NAMESPACE_URI, OpenGraph.NAMESPACE_PREFIX, OpenGraph.NAMESPACE_URI.toString());	//xmlns:og="http://ogp.me/ns#"
 		depictContext.writeAttribute(null, XHTML.ATTRIBUTE_LANG, getLanguageTag(locale));	//lang="locale"
 		final Orientation componentOrientation=component.getComponentOrientation();	//get the orientation used by the frame
 		writeDirectionAttribute(componentOrientation, componentOrientation.getFlow(Axis.X));	//always write the direction for the <xhtml:html> element
@@ -169,6 +173,20 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			depictContext.write(AbstractModel.getPlainText(session.dereferenceString(title), component.getLabelContentType()));	//write the title
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TITLE);	//</xhtml:title>
 			depictContext.write('\n');
+		}
+		final Component contentComponent=component.getContent();	//get the contents of the frame
+		if(contentComponent instanceof ResourceNavigationComponent)	//if this component navigates to a resource
+		{
+			final URFResource resource=((ResourceNavigationComponent)contentComponent).getResource();	//get a description of the resource
+			if(resource!=null)
+			{
+				depictContext.write('\t');	//og:title
+				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_META);	//<xhtml:meta>
+				depictContext.writeAttribute(null, ELEMENT_META_ATTRIBUTE_PROPERTY, XML.createQualifiedName(OpenGraph.NAMESPACE_PREFIX, OpenGraph.TITLE_LOCAL_NAME));	//property="og:title"
+				depictContext.writeAttribute(null, ELEMENT_META_ATTRIBUTE_CONTENT, resource.determineLabel());	//content="..."
+				depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_META);	//</xhtml:meta>		
+				depictContext.write('\n');
+			}
 		}
 			//<xhtml:link> styles in this order: theme styles (from most distant parent to current theme), application style, destination style
 		for(final URI styleURI:depictContext.getStyles())	//for each style URI

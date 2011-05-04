@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package com.guiseframework.platform.web.facebook;
+package com.guiseframework.component;
 
-import java.net.URI;
+import com.globalmentor.urf.URFResource;
 
 /**
- * Values and definitions for working with Facebook.
+ * A navigation component that keeps track of a resource at the destination.
  * @author Garret Wilson
- * @see <a href="https://www.facebook.com/>Facebook</a>
  */
-public class Facebook
+public interface ResourceNavigationComponent extends NavigationComponent
 {
 
-	/** The URI for the Facebook Like plugin. */
-	public final static URI FACEBOOK_PLUGIN_LIKE_URI = URI.create("http://www.facebook.com/plugins/like.php");
+	/**@return A description of the current resource being navigated, or <code>null</code> if there is no resource at this navigation location.*/
+	public URFResource getResource();
 
 }
