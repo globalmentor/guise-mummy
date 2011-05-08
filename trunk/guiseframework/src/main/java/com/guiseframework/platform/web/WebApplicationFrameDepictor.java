@@ -22,6 +22,7 @@ import java.text.DateFormat;
 import java.util.*;
 
 import com.globalmentor.facebook.OpenGraph;
+import com.globalmentor.facebook.PredefinedType;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.ContentType;
 
@@ -33,6 +34,7 @@ import static com.globalmentor.text.xml.XML.*;
 import com.globalmentor.text.xml.XML;
 import com.globalmentor.text.xml.xhtml.XHTML;
 import com.globalmentor.urf.URFResource;
+import com.globalmentor.urf.dcmi.DCMI;
 import com.globalmentor.util.*;
 import com.guiseframework.*;
 
@@ -180,11 +182,24 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			final URFResource resource=((ResourceNavigationComponent)contentComponent).getResource();	//get a description of the resource
 			if(resource!=null)
 			{
-				depictContext.write('\t');	//og:title
-				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_META);	//<xhtml:meta>
-				depictContext.writeAttribute(null, ELEMENT_META_ATTRIBUTE_PROPERTY, XML.createQualifiedName(OpenGraph.NAMESPACE_PREFIX, OpenGraph.TITLE_LOCAL_NAME));	//property="og:title"
-				depictContext.writeAttribute(null, ELEMENT_META_ATTRIBUTE_CONTENT, resource.determineLabel());	//content="..."
-				depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_META);	//</xhtml:meta>		
+					//Open Graph meta properties
+				depictContext.write('\t');	//og:title (required)
+				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.TITLE_LOCAL_NAME, resource.determineLabel());
+				depictContext.write('\n');
+				final String description=DCMI.getDescription(resource);	//see if the resource has a description
+				if(description!=null)
+				{
+					depictContext.write('\t');	//og:description (optional)
+					depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.DESCRIPTION_LOCAL_NAME, description);
+					depictContext.write('\n');
+				}
+				//TODO implement og:site_name (optional)
+				depictContext.write('\t');	//og:type (required)
+				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.TYPE_LOCAL_NAME, PredefinedType.WEBSITE.getID());
+				depictContext.write('\n');
+				//TODO implement og:image (required)
+				depictContext.write('\t');	//og:url (required)
+				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.URL_LOCAL_NAME, depictContext.getDepictionURI().toString());
 				depictContext.write('\n');
 			}
 		}
