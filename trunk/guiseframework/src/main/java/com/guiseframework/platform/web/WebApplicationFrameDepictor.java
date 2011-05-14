@@ -186,6 +186,13 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 				depictContext.write('\t');	//og:title (required)
 				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.TITLE_LOCAL_NAME, resource.determineLabel());
 				depictContext.write('\n');
+				final String siteName=getSession().getSiteName();	//see if we know the name of this site based upon the current navigation path
+				if(siteName!=null)
+				{
+					depictContext.write('\t');	//og:description (optional)
+					depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.SITE_NAME_LOCAL_NAME, siteName);
+					depictContext.write('\n');
+				}
 				final String description=DCMI.getDescription(resource);	//see if the resource has a description
 				if(description!=null)
 				{
@@ -193,7 +200,6 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 					depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.DESCRIPTION_LOCAL_NAME, description);
 					depictContext.write('\n');
 				}
-				//TODO implement og:site_name (optional)
 				depictContext.write('\t');	//og:type (required)
 				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.TYPE_LOCAL_NAME, PredefinedType.WEBSITE.getID());
 				depictContext.write('\n');
