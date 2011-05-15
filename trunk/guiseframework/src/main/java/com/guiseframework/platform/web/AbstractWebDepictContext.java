@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import com.globalmentor.facebook.OpenGraph;
+import com.globalmentor.facebook.*;
 import com.globalmentor.java.Integers;
 import com.globalmentor.text.xml.stylesheets.css.*;
 
@@ -67,6 +67,7 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 		super(session, destination);	//construct the parent class
 		getXMLNamespacePrefixManager().registerNamespacePrefix(GUISE_ML_NAMESPACE_URI.toString(), GUISE_ML_NAMESPACE_PREFIX);	//map the Guise namespace to the Guise prefix
 		getXMLNamespacePrefixManager().registerNamespacePrefix(OpenGraph.NAMESPACE_URI.toString(), OpenGraph.NAMESPACE_PREFIX);	//map the Open Graph namespace to the Open Graph prefix
+		getXMLNamespacePrefixManager().registerNamespacePrefix(Facebook.NAMESPACE_URI.toString(), Facebook.NAMESPACE_PREFIX);	//map the Facebook namespace to the Facebook prefix
 	}
 
 	/**Returns a string representation of the provided style declarations.

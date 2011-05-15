@@ -1,5 +1,5 @@
 /*
- * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2005-2011 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import java.util.*;
 
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
+
 import java.util.concurrent.*;
 
 import javax.mail.Message;
@@ -73,13 +74,13 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	/** Whether this application is in debug mode. */
 	private boolean debug = false;
 
-	/**{@inheritDoc}*/
+	/** {@inheritDoc} */
 	public boolean isDebug()
 	{
 		return debug;
 	}
 
-	/**{@inheritDoc}*/
+	/** {@inheritDoc} */
 	public void setDebug(final boolean debug)
 	{
 		this.debug = debug;
@@ -99,7 +100,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	static
 	{
-		((TypedURFResourceTURFIO<Theme>) themeIO).registerResourceFactory(RESOURCES_NAMESPACE_URI, new JavaURFResourceFactory(Resources.class.getPackage())); //add support for resource declarations within a theme
+		((TypedURFResourceTURFIO<Theme>)themeIO).registerResourceFactory(RESOURCES_NAMESPACE_URI, new JavaURFResourceFactory(Resources.class.getPackage())); //add support for resource declarations within a theme
 	}
 
 	/** @return I/O for loading themes. */
@@ -1715,11 +1716,11 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 */
 	protected String getRealm(final URIPath applicationPath)
 	{
-		return getBasePath().toString(); //return the application base path as the realm for all resouces
+		return getBasePath().toString(); //return the application base path as the realm for all resources
 	}
 
 	/**
-	 * Checks whether the given principal is authorized to access the resouce at the given application path. This version authorized any principal accessing any
+	 * Checks whether the given principal is authorized to access the resource at the given application path. This version authorized any principal accessing any
 	 * application path.
 	 * @param applicationPath The relative path of the resource requested.
 	 * @param principal The principal requesting authentication, or <code>null</code> if the principal is not known.
@@ -1729,6 +1730,32 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	protected boolean isAuthorized(final URIPath applicationPath, final Principal principal, final String realm)
 	{
 		return true; //default to authorizing access
+	}
+
+	/** {@inheritDoc} This version returns an empty set. */
+	public Set<String> getFacebookAdminIDs()
+	{
+		return emptySet(); //TODO fix to allow storage in the application
+	}
+
+	/** {@inheritDoc} This version delegates to {@link #getFacebookAdminIDs()}. */
+	public Set<String> getFacebookAdminIDs(final URIPath navigationPath)
+	{
+		checkInstance(navigationPath);
+		return getFacebookAdminIDs();
+	}
+
+	/** {@inheritDoc} This version returns <code>null</code>. */
+	public String getFacebookAppID()
+	{
+		return null; //TODO fix to allow storage in the application
+	}
+
+	/** {@inheritDoc} This version delegates to {@link #getFacebookAppID()}. */
+	public String getFacebookAppID(final URIPath navigationPath)
+	{
+		checkInstance(navigationPath);
+		return getFacebookAppID();
 	}
 
 	/**
@@ -1818,7 +1845,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		 */
 		public boolean equals(final Object object)
 		{
-			return object instanceof TempFileInfo && getTempFile().equals(((TempFileInfo) object).getTempFile()); //see if the other object is a temp file info object for the same file
+			return object instanceof TempFileInfo && getTempFile().equals(((TempFileInfo)object).getTempFile()); //see if the other object is a temp file info object for the same file
 		}
 
 		/** @return A string version of this object. */
@@ -1875,7 +1902,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		 */
 		public boolean equals(final Object object)
 		{
-			return object instanceof GuiseSessionInfo && getGuiseSession().equals(((GuiseSessionInfo) object).getGuiseSession()); //see if the other object is a Guise session info object for the same Guise session
+			return object instanceof GuiseSessionInfo && getGuiseSession().equals(((GuiseSessionInfo)object).getGuiseSession()); //see if the other object is a Guise session info object for the same Guise session
 		}
 
 		/** @return A string version of this object. */

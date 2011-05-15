@@ -1584,7 +1584,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 */
 	public String getSiteName()
 	{
-		return null;
+		return null; //TODO fix to retrieve from application
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2005-2011 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,16 +21,18 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.util.*;
 
-import com.globalmentor.facebook.OpenGraph;
-import com.globalmentor.facebook.PredefinedType;
+import com.globalmentor.facebook.*;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.ContentType;
+import com.globalmentor.net.URIPath;
 
+import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.javascript.JavaScript.*;
 import static com.globalmentor.model.Locales.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.xml.XML.*;
 
+import com.globalmentor.text.TextFormatter;
 import com.globalmentor.text.xml.XML;
 import com.globalmentor.text.xml.xhtml.XHTML;
 import com.globalmentor.urf.URFResource;
@@ -137,6 +139,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		final GuiseSession session=getSession();	//get the session
 		final GuiseApplication application=session.getApplication();	//get a reference to the application
 		final Locale locale=session.getLocale();	//get the component's locale
+		final URIPath navigationPath=session.getNavigationPath();	//get the navigation path being depicted
 			//XML declaration and doctype
 		depictContext.writeDocType(true, XHTML_NAMESPACE_URI, ELEMENT_HTML, XHTML_CONTENT_TYPE);	//write the doctype and with an XML declaration, with no system ID to a DTD as per HTML 5: http://www.w3.org/TR/html5/syntax.html#the-doctype
 			//<xhtml:html>
@@ -144,6 +147,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
 		depictContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 		depictContext.writeAttribute(XMLNS_NAMESPACE_URI, OpenGraph.NAMESPACE_PREFIX, OpenGraph.NAMESPACE_URI.toString());	//xmlns:og="http://ogp.me/ns#"
+		depictContext.writeAttribute(XMLNS_NAMESPACE_URI, Facebook.NAMESPACE_PREFIX, Facebook.NAMESPACE_URI.toString());	//xmlns:fb="https://www.facebook.com/2008/fbml"
 		depictContext.writeAttribute(null, XHTML.ATTRIBUTE_LANG, getLanguageTag(locale));	//lang="locale"
 		final Orientation componentOrientation=component.getComponentOrientation();	//get the orientation used by the frame
 		writeDirectionAttribute(componentOrientation, componentOrientation.getFlow(Axis.X));	//always write the direction for the <xhtml:html> element
@@ -207,6 +211,21 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 				depictContext.write('\t');	//og:url (required)
 				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.URL_LOCAL_NAME, depictContext.getDepictionURI().toString());
 				depictContext.write('\n');
+					//Facebook meta properties
+				final Set<String> facebookAdminIDs=application.getFacebookAdminIDs(navigationPath);
+				if(!facebookAdminIDs.isEmpty())
+				{
+					depictContext.write('\t');	//fb:admins
+					depictContext.writeMetaElement(Facebook.NAMESPACE_URI, Facebook.ADMINS_LOCAL_NAME, TextFormatter.formatList(COMMA_CHAR, facebookAdminIDs));
+					depictContext.write('\n');
+				}
+				final String facebookAppID=application.getFacebookAppID(navigationPath);
+				if(facebookAppID!=null)
+				{
+					depictContext.write('\t');	//fb:app_id
+					depictContext.writeMetaElement(Facebook.NAMESPACE_URI, Facebook.APP_ID_LOCAL_NAME, facebookAppID);
+					depictContext.write('\n');
+				}
 			}
 		}
 			//<xhtml:link> styles in this order: theme styles (from most distant parent to current theme), application style, destination style

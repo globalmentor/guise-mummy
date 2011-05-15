@@ -1,5 +1,5 @@
 /*
- * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2005-2011 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ public interface GuiseApplication extends Resource, PropertyBindable, Configurat
 	 * @param debug Whether debug mode should be enabled.
 	 */
 	public void setDebug(final boolean debug);
-	
+
 	/** @return I/O for loading resources. */
 	public IO<Resources> getResourcesIO();
 
@@ -673,5 +673,33 @@ public interface GuiseApplication extends Resource, PropertyBindable, Configurat
 	 * @see #getHomeDirectory()
 	 */
 	public Properties loadProperties(final String propertiesPath) throws IOException;
+
+	/**
+	 * Indicates the Facebook administrators, if any, for this application.
+	 * @return The IDs of the Facebook administrators, if any, for this application.
+	 */
+	public Set<String> getFacebookAdminIDs();
+
+	/**
+	 * Indicates the Facebook administrators, if any, for the given navigation path.
+	 * @return The IDs of the Facebook administrators, if any, for the navigation path.
+	 */
+	public Set<String> getFacebookAdminIDs(final URIPath navigationPath);
+
+	/**
+	 * Indicates the Facebook application, if any.
+	 * @param navigationPath The navigation path for which a Facebook application ID should be returned.
+	 * @return The ID of the Facebook application, or <code>null</code> if there is no Facebook application.
+	 * @throws NullPointerException if the given navigation path is <code>null</code>.
+	 */
+	public String getFacebookAppID();
+
+	/**
+	 * Indicates the Facebook application, if any, for the given navigation path.
+	 * @param navigationPath The navigation path for which a Facebook application ID should be returned.
+	 * @return The ID of the Facebook application for the given navigation path, or <code>null</code> if there is no Facebook application.
+	 * @throws NullPointerException if the given navigation path is <code>null</code>.
+	 */
+	public String getFacebookAppID(final URIPath navigationPath);
 
 }
