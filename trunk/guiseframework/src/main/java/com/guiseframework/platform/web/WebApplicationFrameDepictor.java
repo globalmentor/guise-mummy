@@ -180,52 +180,58 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TITLE);	//</xhtml:title>
 			depictContext.write('\n');
 		}
-		final Component contentComponent=component.getContent();	//get the contents of the frame
-		if(contentComponent instanceof ResourceNavigationComponent)	//if this component navigates to a resource
+		final URFResource navigationDescription=session.getNavigationDescription();	//get a description of our current navigation
+		if(navigationDescription!=null)
 		{
-			final URFResource resource=((ResourceNavigationComponent)contentComponent).getResource();	//get a description of the resource
-			if(resource!=null)
+				//Open Graph meta properties
+			depictContext.write('\t');	//og:title (required)
+			depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.TITLE_LOCAL_NAME, navigationDescription.determineLabel());
+			depictContext.write('\n');
+			final String siteName=getSession().getSiteName();	//see if we know the name of this site based upon the current navigation path
+			if(siteName!=null)
 			{
-					//Open Graph meta properties
-				depictContext.write('\t');	//og:title (required)
-				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.TITLE_LOCAL_NAME, resource.determineLabel());
+				depictContext.write('\t');	//og:site_name (optional)
+				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.SITE_NAME_LOCAL_NAME, siteName);
 				depictContext.write('\n');
-				final String siteName=getSession().getSiteName();	//see if we know the name of this site based upon the current navigation path
-				if(siteName!=null)
-				{
-					depictContext.write('\t');	//og:description (optional)
-					depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.SITE_NAME_LOCAL_NAME, siteName);
-					depictContext.write('\n');
-				}
-				final String description=DCMI.getDescription(resource);	//see if the resource has a description
-				if(description!=null)
-				{
-					depictContext.write('\t');	//og:description (optional)
-					depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.DESCRIPTION_LOCAL_NAME, description);
-					depictContext.write('\n');
-				}
-				depictContext.write('\t');	//og:type (required)
-				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.TYPE_LOCAL_NAME, PredefinedType.WEBSITE.getID());
+			}
+			final String description=DCMI.getDescription(navigationDescription);	//see if the resource has a description
+			if(description!=null)
+			{
+				depictContext.write('\t');	//og:description (optional)
+				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.DESCRIPTION_LOCAL_NAME, description);
 				depictContext.write('\n');
-				//TODO implement og:image (required)
-				depictContext.write('\t');	//og:url (required)
-				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.URL_LOCAL_NAME, depictContext.getDepictionURI().toString());
+			}
+			depictContext.write('\t');	//og:type (required)
+			depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.TYPE_LOCAL_NAME, PredefinedType.WEBSITE.getID());
+			depictContext.write('\n');
+			final URI iconURI=navigationDescription.getIcon();	//get the navigation icon, if any
+			if(iconURI==null)	//TODO fix
+			{
+				//TODO fix
+			}
+			if(iconURI!=null)	//if we know an icon
+			{
+				depictContext.write('\t');	//og:image (required)
+				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.IMAGE_LOCAL_NAME, session.resolveURI(iconURI).toASCIIString());
 				depictContext.write('\n');
-					//Facebook meta properties
-				final Set<String> facebookAdminIDs=application.getFacebookAdminIDs(navigationPath);
-				if(!facebookAdminIDs.isEmpty())
-				{
-					depictContext.write('\t');	//fb:admins
-					depictContext.writeMetaElement(Facebook.NAMESPACE_URI, Facebook.ADMINS_LOCAL_NAME, TextFormatter.formatList(COMMA_CHAR, facebookAdminIDs));
-					depictContext.write('\n');
-				}
-				final String facebookAppID=application.getFacebookAppID(navigationPath);
-				if(facebookAppID!=null)
-				{
-					depictContext.write('\t');	//fb:app_id
-					depictContext.writeMetaElement(Facebook.NAMESPACE_URI, Facebook.APP_ID_LOCAL_NAME, facebookAppID);
-					depictContext.write('\n');
-				}
+			}
+			depictContext.write('\t');	//og:url (required)
+			depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.URL_LOCAL_NAME, depictContext.getDepictionURI().toASCIIString());
+			depictContext.write('\n');
+				//Facebook meta properties
+			final Set<String> facebookAdminIDs=application.getFacebookAdminIDs(navigationPath);
+			if(!facebookAdminIDs.isEmpty())
+			{
+				depictContext.write('\t');	//fb:admins
+				depictContext.writeMetaElement(Facebook.NAMESPACE_URI, Facebook.ADMINS_LOCAL_NAME, TextFormatter.formatList(COMMA_CHAR, facebookAdminIDs));
+				depictContext.write('\n');
+			}
+			final String facebookAppID=application.getFacebookAppID(navigationPath);
+			if(facebookAppID!=null)
+			{
+				depictContext.write('\t');	//fb:app_id
+				depictContext.writeMetaElement(Facebook.NAMESPACE_URI, Facebook.APP_ID_LOCAL_NAME, facebookAppID);
+				depictContext.write('\n');
 			}
 		}
 			//<xhtml:link> styles in this order: theme styles (from most distant parent to current theme), application style, destination style

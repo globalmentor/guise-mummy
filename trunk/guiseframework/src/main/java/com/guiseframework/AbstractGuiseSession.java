@@ -1028,6 +1028,19 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		return getDestinationComponent((ComponentDestination)destination); //return the component
 	}
 
+	/** {@inheritDoc} */
+	public URFResource getNavigationDescription(final URIPath navigationPath, final Bookmark bookmark) throws IOException
+	{
+		final Destination destination = getApplication().getDestination(navigationPath); //get the destination associated with the given path
+		return destination != null ? destination.getDescription(this, navigationPath, bookmark, null) : null; //delegate to the destination, if any
+	}
+
+	/** {@inheritDoc} */
+	public URFResource getNavigationDescription() throws IOException
+	{
+		return getNavigationDescription(getNavigationPath(), getBookmark());
+	}
+
 	/**
 	 * Creates the component for the given class.
 	 * @param componentClass The class representing the component to create.

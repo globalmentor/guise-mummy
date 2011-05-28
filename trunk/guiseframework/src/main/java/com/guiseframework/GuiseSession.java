@@ -517,6 +517,18 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Configu
 	 */
 	public Component getNavigationComponent(final URIPath path);
 
+	/**
+	 * Returns a description of the resource for the given navigation path and bookmark. This is a convenience method that delegates to the appropriate
+	 * destination.
+	 * @param navigationPath The navigation path relative to the application context path.
+	 * @param bookmark The bookmark for which navigation should occur at this navigation path, or <code>null</code> if there is no bookmark involved in
+	 *          navigation.
+	 * @return A description of the indicated navigation path, or <code>null</code> if nothing exists at the given navigation path.
+	 * @throws IOException if there is an error accessing the navigation path.
+	 * @see Destination#getDescription(GuiseSession, URIPath, Bookmark, URI)
+	 */
+	public URFResource getNavigationDescription(final URIPath navigationPath, final Bookmark bookmark) throws IOException;
+
 	/** @return Whether the session is in a modal navigation state. */
 	public boolean isModalNavigation();
 
@@ -550,6 +562,17 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Configu
 	 * @exception IllegalStateException if this message has been called before the navigation path has been initialized.
 	 */
 	public URIPath getNavigationPath();
+
+	/**
+	 * Returns a description of the resource for the current navigation path and bookmark. This is a convenience method that delegates to the appropriate
+	 * destination for the current navigation path.
+	 * @return A description of the indicated navigation path, or <code>null</code> if nothing exists at the current navigation path.
+	 * @throws IOException if there is an error accessing the navigation path.
+	 * @see #getNavigationPath()
+	 * @see #getBookmark()
+	 * @see #getNavigationDescription(URIPath, Bookmark)
+	 */
+	public URFResource getNavigationDescription() throws IOException;
 
 	/**
 	 * Changes the navigation path of the session. This method does not actually cause navigation to occur. If the given navigation path is the same as the
