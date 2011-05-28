@@ -212,7 +212,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			if(iconURI!=null)	//if we know an icon
 			{
 				depictContext.write('\t');	//og:image (required)
-				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.IMAGE_LOCAL_NAME, session.resolveURI(iconURI).toASCIIString());
+				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.IMAGE_LOCAL_NAME, session.getDepictionRootURI().resolve(session.resolveURI(iconURI)).toASCIIString());
 				depictContext.write('\n');
 			}
 			depictContext.write('\t');	//og:url (required)
