@@ -714,7 +714,7 @@ Log.trace("servicing Guise request with request", guiseRequest);
 												}
 											}
 											progressOutputStream.addProgressListener(progressListener);	//start listening for progress events from the output stream
-											InputStreams.copy(inputStream, progressOutputStream);	//copy the uploaded file to the destination
+											Streams.copy(inputStream, progressOutputStream);	//copy the uploaded file to the destination
 											progressOutputStream.removeProgressListener(progressListener);	//stop listening for progress events from the output stream
 												//TODO catch and send errors here
 										}
@@ -843,7 +843,7 @@ Log.trace("servicing Guise request with request", guiseRequest);
 			{
 				((ProgressOutputStream)outputStream).addProgressListener(progressListener);	//start listening for progress events from the output stream
 			}
-			InputStreams.copy(inputStream, outputStream);	//copy the uploaded file to the destination
+			Streams.copy(inputStream, outputStream);	//copy the uploaded file to the destination
 			if(outputStream instanceof ProgressOutputStream)
 			{
 				((ProgressOutputStream)outputStream).removeProgressListener(progressListener);	//stop listening for progress events from the output stream
