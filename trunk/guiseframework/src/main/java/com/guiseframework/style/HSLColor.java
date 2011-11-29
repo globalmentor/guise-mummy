@@ -19,8 +19,8 @@ package com.guiseframework.style;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.globalmentor.java.Integers.*;
 import static com.globalmentor.java.Numbers.*;
+import static com.globalmentor.java.Preconditions.*;
 
 import com.globalmentor.text.ArgumentSyntaxException;
 
@@ -49,7 +49,7 @@ public class HSLColor extends AbstractModeledColor<HSLColor.Component>
 	*/
 	public HSLColor(final int hue, final double saturation, final double lightness)
 	{
-		this((double)checkRange(hue, 0, 359)/360.0, saturation, lightness);	//construct the hue to a relative amount and construct the class
+		this((double)checkArgumentRange(hue, 0, 359)/360.0, saturation, lightness);	//construct the hue to a relative amount and construct the class
 	}
 
 	/**Creates an HSL color with the specified hue, saturation, and lightness component values in the range (0.0-1.0).

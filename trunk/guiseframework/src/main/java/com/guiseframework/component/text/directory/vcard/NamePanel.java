@@ -24,7 +24,7 @@ import com.globalmentor.text.directory.vcard.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 
-import static com.globalmentor.collections.Arrays.*;
+import static com.globalmentor.java.Arrays.*;
 import static com.globalmentor.java.Strings.NO_STRINGS;
 import static com.globalmentor.text.TextFormatter.*;
 import static com.globalmentor.text.directory.vcard.VCard.*;

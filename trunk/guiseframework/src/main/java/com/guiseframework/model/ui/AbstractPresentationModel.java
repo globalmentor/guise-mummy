@@ -27,7 +27,7 @@ import com.guiseframework.style.Color;
 import com.guiseframework.style.FontStyle;
 import com.guiseframework.style.LineStyle;
 
-import static com.globalmentor.collections.Arrays.*;
+import static com.globalmentor.java.Arrays.*;
 import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.theme.Theme.*;
 

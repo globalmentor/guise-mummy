@@ -26,7 +26,7 @@ import static com.globalmentor.java.Integers.*;
 import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.beans.*;
-import com.globalmentor.collections.Arrays;
+import com.globalmentor.java.Arrays;
 
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.component.layout.*;

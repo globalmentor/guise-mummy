@@ -16,7 +16,7 @@
 
 package com.guiseframework.component.layout;
 
-import static com.globalmentor.collections.Arrays.fill;
+import static com.globalmentor.java.Arrays.fill;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 

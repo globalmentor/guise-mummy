@@ -21,7 +21,7 @@ import java.net.URI;
 import java.util.*;
 
 
-import static com.globalmentor.collections.Arrays.*;
+import static com.globalmentor.java.Arrays.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Numbers.*;
 import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;

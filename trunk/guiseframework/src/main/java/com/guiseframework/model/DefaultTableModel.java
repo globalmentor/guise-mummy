@@ -19,7 +19,7 @@ package com.guiseframework.model;
 import java.util.*;
 import static java.util.Collections.*;
 
-import static com.globalmentor.collections.Arrays.*;
+import static com.globalmentor.java.Arrays.*;
 
 import com.globalmentor.collections.SynchronizedListDecorator;
 

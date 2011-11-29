@@ -20,8 +20,8 @@ import java.text.DateFormat;
 import java.util.*;
 
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Integers.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.java.Preconditions.*;
 import static com.globalmentor.model.Calendars.*;
 
 import com.globalmentor.beans.*;
@@ -259,7 +259,7 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 		public WeekDayTableColumnModel(final int index)
 		{
 			super(Date.class);	//construct the parent class
-			this.index=checkIndexBounds(index, 0, WEEK_DAY_COUNT);	//make sure the index is within bounds
+			this.index=checkIndexBounds(index, WEEK_DAY_COUNT);	//make sure the index is within bounds
 		}		
 	}
 	

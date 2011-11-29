@@ -25,7 +25,7 @@ import java.util.concurrent.*;
 
 import org.ploop.*;
 
-import static com.globalmentor.collections.Arrays.*;
+import static com.globalmentor.java.Arrays.*;
 import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.event.*;

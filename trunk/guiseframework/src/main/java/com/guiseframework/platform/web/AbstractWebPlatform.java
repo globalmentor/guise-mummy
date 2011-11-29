@@ -19,9 +19,10 @@ package com.guiseframework.platform.web;
 import java.util.*;
 import static java.util.Collections.*;
 
-import static com.globalmentor.java.Integers.*;
 import static com.globalmentor.java.Maths.*;
 import static com.globalmentor.java.Objects.*;
+import static com.globalmentor.java.Preconditions.*;
+
 import com.globalmentor.model.NameValuePair;
 
 import com.guiseframework.GuiseApplication;
@@ -66,7 +67,7 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 		@SuppressWarnings("unchecked")
 		public void setPollInterval(final int newPollInterval)
 		{
-			if(pollInterval!=checkMinimum(newPollInterval, 0))	//if the value is really changing
+			if(pollInterval!=checkArgumentMinimum(newPollInterval, 0))	//if the value is really changing
 			{
 				pollInterval=newPollInterval;	//actually change the value
 				getSendMessageQueue().add(new WebCommandMessage<PollCommand>(PollCommand.POLL_INTERVAL,
@@ -87,7 +88,7 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 		*/ 
 		public boolean requestPollInterval(final DepictedObject depictedObject, final int pollInterval)
 		{
-			checkMinimum(pollInterval, 0);
+			checkArgumentMinimum(pollInterval, 0);
 			synchronized(requestedPollIntervalMap)	//synchronize to ensure the that race conditions don't cause the actual poll interval to be out of synch with the requested poll intervals
 			{
 				final int oldPollInterval=getPollInterval();	//get the current polling interval
