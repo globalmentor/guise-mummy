@@ -28,7 +28,7 @@ import javax.servlet.http.HttpSession;
 
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.net.http.HTTPServlets.*;
+import static com.globalmentor.servlet.http.HTTPServlets.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.event.ProgressListener;

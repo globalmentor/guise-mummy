@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.ContentType;
-import com.globalmentor.net.http.HTTPServlets;
+import com.globalmentor.servlet.http.HTTPServlets;
 import com.globalmentor.text.CharacterEncoding;
 import com.globalmentor.text.Text;
 import com.guiseframework.Destination;

@@ -28,7 +28,7 @@ import com.guiseframework.*;
 
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.net.http.HTTPServlets.*;
+import static com.globalmentor.servlet.http.HTTPServlets.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
 
 /**Information about the Guise request of an HTTP servlet.

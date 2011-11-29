@@ -28,7 +28,6 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.net.Servlets.*;
 
 import com.globalmentor.collections.DecoratorReadWriteLockCollectionMap;
 import com.globalmentor.collections.DecoratorReadWriteLockMap;
@@ -39,7 +38,8 @@ import com.globalmentor.log.Log;
 import com.globalmentor.model.AbstractProxyHashObject;
 import com.globalmentor.net.URIPath;
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.net.http.HTTPServlets.*;
+import static com.globalmentor.servlet.Servlets.*;
+import static com.globalmentor.servlet.http.HTTPServlets.*;
 
 import com.guiseframework.*;
 
