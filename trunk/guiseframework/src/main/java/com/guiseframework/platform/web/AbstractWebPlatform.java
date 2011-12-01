@@ -21,7 +21,7 @@ import static java.util.Collections.*;
 
 import static com.globalmentor.java.Maths.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.java.Preconditions.*;
+import static com.globalmentor.java.Conditions.*;
 
 import com.globalmentor.model.NameValuePair;
 

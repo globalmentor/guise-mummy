@@ -20,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.globalmentor.java.Numbers.*;
-import static com.globalmentor.java.Preconditions.*;
+import static com.globalmentor.java.Conditions.*;
 
 import com.globalmentor.text.ArgumentSyntaxException;
 
