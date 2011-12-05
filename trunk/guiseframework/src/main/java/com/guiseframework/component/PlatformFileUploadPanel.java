@@ -16,13 +16,12 @@
 
 package com.guiseframework.component;
 
-import java.math.BigDecimal;
 import java.net.URI;
 import java.util.Collection;
 
-import com.globalmentor.itu.SIUnit;
 import com.globalmentor.java.Objects;
 import com.globalmentor.model.TaskState;
+import com.globalmentor.si.*;
 import com.guiseframework.Bookmark;
 import com.guiseframework.Resources;
 import com.guiseframework.component.layout.*;
@@ -328,7 +327,7 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 		{
 			if(progress!=null)	//if a valid value is given
 			{
-				statusStringBuilder.append(SIUnit.BYTE.format(BigDecimal.valueOf(progress.longValue()), SIUnit.Prefix.KILO));	//show the value
+				statusStringBuilder.append(SIUnit.BYTE.format(progress.longValue(), SIPrefix.KILO));	//show the value
 			}
 			else	//if there is no value
 			{
@@ -336,7 +335,7 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 			}
 			if(completion!=null)	//if the total is known
 			{
-				statusStringBuilder.append(" / ").append(SIUnit.BYTE.format(BigDecimal.valueOf(completion.longValue()), SIUnit.Prefix.KILO));	//show the total
+				statusStringBuilder.append(" / ").append(SIUnit.BYTE.format(completion.longValue(), SIPrefix.KILO));	//show the total
 			}
 		}
 		else if(state!=null)	//if we're not transferring, just show the task state
@@ -359,7 +358,7 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 		{
 			if(progress!=null)	//if a valid value is given
 			{
-				statusStringBuilder.append(SIUnit.BYTE.format(BigDecimal.valueOf(progress.longValue()), SIUnit.Prefix.KILO));	//show the value
+				statusStringBuilder.append(SIUnit.BYTE.format(progress.longValue(), SIPrefix.KILO));	//show the value
 			}
 			else	//if there is no value
 			{
@@ -367,7 +366,7 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 			}
 			if(completion!=null)	//if the total is known
 			{
-				statusStringBuilder.append(" / ").append(SIUnit.BYTE.format(BigDecimal.valueOf(completion.longValue()), SIUnit.Prefix.KILO));	//show the total
+				statusStringBuilder.append(" / ").append(SIUnit.BYTE.format(completion.longValue(), SIPrefix.KILO));	//show the total
 			}
 		}
 		else if(state!=null)	//if we're not transferring, just show the task state
