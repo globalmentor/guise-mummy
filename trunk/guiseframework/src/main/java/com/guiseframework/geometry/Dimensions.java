@@ -120,7 +120,7 @@ public class Dimensions
 		this.width=checkInstance(width, "Width cannot be null.");
 		this.height=checkInstance(height, "Height cannot be null.");
 		this.depth=checkInstance(depth, "Depth cannot be null.");
-		this.hashCode=Objects.hashCode(width, height, depth);	//precalculate the hash code
+		this.hashCode=Objects.getHashCode(width, height, depth);	//precalculate the hash code
 	}
 
 	/**Constrains these inner dimensions within the given outer dimensions by scaling these dimensions so that no part lies outside the given outer dimensiona.

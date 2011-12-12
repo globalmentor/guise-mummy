@@ -49,7 +49,7 @@ public class KeystrokeInput extends AbstractGestureInput implements KeyboardInpu
 	*/
 	public int hashCode()
 	{
-		return Objects.hashCode(super.hashCode(), key);	//extend the hash code with the key
+		return Objects.getHashCode(super.hashCode(), key);	//extend the hash code with the key
 	}
 	
 	/**Determines if this object equals another object.

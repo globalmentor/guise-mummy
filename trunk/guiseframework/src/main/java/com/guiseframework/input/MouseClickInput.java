@@ -62,7 +62,7 @@ public class MouseClickInput extends AbstractMouseInput
 	*/
 	public int hashCode()
 	{
-		return Objects.hashCode(super.hashCode(), button, count);	//extend the hash code with the button and count
+		return Objects.getHashCode(super.hashCode(), button, count);	//extend the hash code with the button and count
 	}
 	
 	/**Determines if this object equals another object.

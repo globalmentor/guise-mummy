@@ -90,7 +90,7 @@ public class Extent implements Comparable<Extent>
 	/**@return A hash code value for the object.*/
 	public int hashCode()
 	{
-		return Objects.hashCode(getValue(), getUnit(), getDegree());	//determine the hash code
+		return Objects.getHashCode(getValue(), getUnit(), getDegree());	//determine the hash code
 	}
 
 	/**Indicates whether some other object is "equal to" this one.

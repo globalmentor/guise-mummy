@@ -272,6 +272,6 @@ public class Orientation
 	/**@return A hash code for the cell.*/
   public int hashCode()
   {
-  	return Objects.hashCode((Object[])orientations);	//generate a hash code
+  	return Objects.getHashCode((Object[])orientations);	//generate a hash code
   }
 }

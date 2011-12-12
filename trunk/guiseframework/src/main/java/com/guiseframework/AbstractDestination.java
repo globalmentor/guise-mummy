@@ -191,7 +191,7 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	/** @return A hash code for this object. */
 	public int hashCode()
 	{
-		return Objects.hashCode(getPath(), getPathPattern()); //construct a hash code from the path and path pattern
+		return Objects.getHashCode(getPath(), getPathPattern()); //construct a hash code from the path and path pattern
 	}
 
 	/**

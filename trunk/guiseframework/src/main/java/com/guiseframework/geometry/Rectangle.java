@@ -131,7 +131,7 @@ public class Rectangle
 	/**@return A hash code value for the object.*/
 	public int hashCode()
 	{
-		return Objects.hashCode(getPosition(), getSize());	//determine the hash code
+		return Objects.getHashCode(getPosition(), getSize());	//determine the hash code
 	}
 
 	/**Indicates whether some other object is "equal to" this one.

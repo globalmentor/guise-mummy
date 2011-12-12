@@ -135,7 +135,7 @@ public interface TableModel extends Model	//TODO maybe specify row count to be a
 		/**@return A hash code for the cell.*/
     public int hashCode()
     {
-    	return Objects.hashCode(rowIndex, column);	//generate a hash code
+    	return Objects.getHashCode(rowIndex, column);	//generate a hash code
     }
 
 	}
