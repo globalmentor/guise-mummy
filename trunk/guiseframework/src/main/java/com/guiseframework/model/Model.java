@@ -28,7 +28,7 @@ public interface Model extends PropertyBindable, PropertyConstrainable
 {
 
 	/**A content type of <code>text/plain</code>.*/
-	public final static ContentType PLAIN_TEXT_CONTENT_TYPE=Text.TEXT_PLAIN_CONTENT_TYPE;
+	public final static ContentType PLAIN_TEXT_CONTENT_TYPE=Text.PLAIN_CONTENT_TYPE;
 
 	/**A content type of <code>application/xhtml+xml</code>.*/
 	public final static ContentType XHTML_CONTENT_TYPE=XHTML.XHTML_CONTENT_TYPE;

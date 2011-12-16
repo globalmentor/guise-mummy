@@ -317,7 +317,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 			}
 			if(contentType==null)	//if we still couldn't find a content type
 			{
-				contentType=XML_CONTENT_TYPE;	//use the generic "text/xml" content type
+				contentType=CONTENT_TYPE;	//use the generic "text/xml" content type
 			}
 		}		
 			//set the content type

@@ -209,9 +209,9 @@ public class TextControl<V> extends AbstractTextControl<V>
 				{
 					boolean imported=false;	//we'll assume we didn't import anything
 					Object data=null;	//we'll store here any data we retrieve
-					if(transferable.canTransfer(TEXT_PLAIN_CONTENT_TYPE))	//text/plain is our favorite type; if we can import it
+					if(transferable.canTransfer(PLAIN_CONTENT_TYPE))	//text/plain is our favorite type; if we can import it
 					{
-						data=transferable.transfer(TEXT_PLAIN_CONTENT_TYPE);	//transfer the data
+						data=transferable.transfer(PLAIN_CONTENT_TYPE);	//transfer the data
 						imported=true;	//indicate that we transported data
 					}
 					else	//otherwise, check for text/* types
@@ -469,7 +469,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 		This implementation returns the <code>text/plain</code> content type.
 		@return The content types available for this transfer.
 		*/
-		public ContentType[] getContentTypes() {return new ContentType[]{TEXT_PLAIN_CONTENT_TYPE};}
+		public ContentType[] getContentTypes() {return new ContentType[]{PLAIN_CONTENT_TYPE};}
 
 		/**Transfers data using the given content type.
 		@param contentType The type of data expected.
@@ -478,7 +478,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 		*/
 		public Object transfer(final ContentType contentType)
 		{
-			if(contentType.match(TEXT_PLAIN_CONTENT_TYPE))	//if they request the supported content type
+			if(contentType.match(PLAIN_CONTENT_TYPE))	//if they request the supported content type
 			{
 				return getSource().getText();	//return the current text
 			}

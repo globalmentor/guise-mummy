@@ -209,13 +209,13 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		elff.setDirective(ELFF.SOFTWARE_DIRECTIVE, Guise.GUISE_NAME+' '+Guise.BUILD_ID);	//set the software directive of the ELFF log
 	}
 
-	/**Initializes the servlet.
-	@param servletConfig The servlet configuration.
+	/**{@inheritDoc}
+	This version initializes the Guise application.
 	@exception ServletException if there is a problem initializing.
 	*/
-	public void init(final ServletConfig servletConfig) throws ServletException
+	public void initialize(ServletConfig servletConfig) throws ServletException, IllegalArgumentException, IllegalStateException
 	{
-		super.init(servletConfig);	//do the default initialization
+		super.initialize(servletConfig);	//do the default initialization
 		Log.info("Initializing", Guise.GUISE_NAME, Guise.BUILD_ID);
 		setReadOnly(true);	//make this servlet read-only
 		//TODO turn off directory listings, and/or fix them
@@ -342,10 +342,10 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	@exception IllegalStateException if this servlet has already been initialized from a request.
 	@exception ServletException if there is a problem initializing.
 	*/
-	public void init(final HttpServletRequest request) throws ServletException
+	public void initialize(final HttpServletRequest request) throws ServletException
 	{
 //TODO del Log.trace("initializing servlet from request");
-		super.init(request);	//do the default initialization
+		super.initialize(request);	//do the default initialization
 		synchronized(guiseContainerMutex)	//if more than one request are coming in simultaneously, only look up the container for the first one (although multiple lookups should still retrieve the same container)
 		{
 //TODO del	Log.trace("checking container");
@@ -1426,7 +1426,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 			String text=depictContext.getDepictText();	//get the text to output
 			if(isAJAX)	//if this is an AJAX request
 			{
-				depictContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type TODO verify UTF-8 in a consistent, elegant way
+				depictContext.setOutputContentType(CONTENT_TYPE);	//switch to the "text/xml" content type TODO verify UTF-8 in a consistent, elegant way
 				text="<response>"+text+"</response>";	//wrap the text in a response element
 			}
 //Log.trace("response length:", text.length());
