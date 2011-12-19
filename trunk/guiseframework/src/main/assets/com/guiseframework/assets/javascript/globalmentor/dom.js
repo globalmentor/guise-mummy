@@ -22,9 +22,9 @@
  * 	javascript.js
  */
 
-var com = com || {};
+var com = com || {}; //create the com.globalmentor.js package
 com.globalmentor = com.globalmentor || {};
-com.globalmentor.js = com.globalmentor.js || {}; //create the com.globalmentor.js package
+com.globalmentor.js = com.globalmentor.js || {};
 
 /** See if the browser is IE. */
 var isIE = navigator.userAgentName == "MSIE"; //TODO use a better variable; do better checks
@@ -887,7 +887,7 @@ if(typeof Element == "undefined") //if no Element type is defined
 }
 
 /**
- * Adds the given class name to the element's style class.
+ * Adds the given class name to the element's class attribute.
  * 
  * @param element The element that should be given a class.
  * @param className The name of the class to add.
@@ -896,6 +896,40 @@ Element.addClassName = function(element, className)
 {
 	var classNamesString = element.className; //get the element's class names
 	element.className = classNamesString ? classNamesString + " " + className : className; //append the class name if there is a class name already
+};
+
+/**
+ * Adds or removed a given class name to the element's class attribute. When adding a class name to the element's class
+ * attribute, it is only added if the given class name does not already exist.
+ * 
+ * @param element The element that should be given a class.
+ * @param className The name of the class to add.
+ * @param state <code>true</code> if the class name should be set, or <code>false</code> if it should be removed.
+ */
+Element.setClassName = function(element, className, state)
+{
+	if(state)	//if the class name should be set
+	{
+		var classNameString = element.className; //get the element's class names
+		if(classNameString) //if there is a class name already
+		{
+			if(this.hasClassName(element, className)) //if the element already has this class name
+			{
+				return;
+			}
+			classNamesString = classNamesString + " " + className; //append the class name
+		}
+		else
+		//if there is as of yet no class name string
+		{
+			classNameString = className; //just assign the class name by itself
+		}
+		element.className = classNameString; //update the element class name
+	}
+	else	//if we should unset the class name
+	{
+		this.removeClassName(element, className);
+	}
 };
 
 //add correct support for namespace-aware DOM methods
@@ -1008,7 +1042,7 @@ Element.hasClassName = function(element, className)
 };
 
 /**
- * Removes the given class name from the element's style class.
+ * Removes the given class name from the element's class attribute.
  * 
  * @param element The element that should have a class removed.
  * @param className The name of the class to remove.

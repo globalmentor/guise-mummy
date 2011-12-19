@@ -1,5 +1,5 @@
 /* GlobalMentor AJAX JavaScript Library
- * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2005-2011 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,23 +120,47 @@ function HTTPCommunicator()
 		 * Performs an HTTP GET request.
 		 * 
 		 * @param uri The request URI.
-		 * @param query Query information for the URI of the GET request, or null if there is no query.
+		 * @param query Query information for the URI of the GET request, or <code>null</code> if there is no query.
+		 * @param requestHeaders The request headers, if any.
 		 */
-		HTTPCommunicator.prototype.get = function(uri, query)
+		HTTPCommunicator.prototype.get = function(uri, query, requestHeaders)
 		{
-			return this._performRequest("GET", uri, query); //perform a GET request
+			return this._performRequest("GET", uri, query, null, requestHeaders); //perform a GET request
 		};
 
 		/**
 		 * Performs an HTTP POST request.
 		 * 
 		 * @param uri The request URI.
-		 * @param query Query information for the body of the POST request, or null if there is no query.
-		 * @param contentType The content type of the request, or null if no content type should be specified.
+		 * @param query Query information for the body of the POST request, or <code>null</code> if there is no query; for the
+		 *          "application/x-www-form-urlencoded" content type, if a non-string object is passed the name/value pairs
+		 *          of the object will be form-encoded into a single string.
+		 * @param contentType The content type of the request; defaults to "application/x-www-form-urlencoded".
+		 * @param requestHeaders Additional request headers, if any.
 		 */
-		HTTPCommunicator.prototype.post = function(uri, query, contentType)
+		HTTPCommunicator.prototype.post = function(uri, query, contentType, requestHeaders)
 		{
-			return this._performRequest("POST", uri, query, contentType); //perform a POST request
+			contentType = contentType || "application/x-www-form-urlencoded"; //default to a form post TODO use a constant
+			if(contentType == "application/x-www-form-urlencoded" && query!=null && !(query instanceof String)) //if a non-string object was passed for form data
+			{
+				query = this.encodeForm(query); //encode the query object
+			}
+			return this._performRequest("POST", uri, query, contentType, requestHeaders); //perform a POST request
+		};
+
+		/**
+		 * Encodes the name/value pairs of the given map into a single form-encoded string.
+		 * @param map The object the name/value pairs of which to encode.
+		 * @returns A string containing the encoded form data.
+		 */
+		HTTPCommunicator.prototype.encodeForm = function(map)
+		{
+			var parameters = new Array();
+			for( var name in map) //for each property
+			{
+				parameters.add(name + '=' + encodeURIComponent(map[name])); //name=value
+			}
+			return parameters.join('&'); //join the values with the correct separator
 		};
 
 		/**
@@ -145,12 +169,13 @@ function HTTPCommunicator()
 		 * @param The HTTP request method.
 		 * @param uri The request URI.
 		 * @param query Query information for the request, or null if there is no query.
+		 * @param requestHeaders Additional request headers, if any.
 		 * @returns The text of the response or, if the response provides an XML DOM tree, the XML document object; or null
 		 *          if the request is asynchronous.
 		 * @throws Exception if an error occurs performing the request.
 		 * @throws Number if the HTTP response code was not 200 (OK).
 		 */
-		HTTPCommunicator.prototype._performRequest = function(method, uri, query, contentType)
+		HTTPCommunicator.prototype._performRequest = function(method, uri, query, contentType, requestHeaders)
 		{
 			//TODO assert this.xmlHTTP does not exist
 			this.xmlHTTP = this._createXMLHTTP(); //create an XML HTTP object
@@ -177,6 +202,13 @@ function HTTPCommunicator()
 					content = query; //use the query as the content
 				}
 			}
+			if(requestHeaders)	//if there are additional request headers
+			{
+				for(var headerName in requestHeaders)
+				{
+					xmlHTTP.setRequestHeader(headerName, requestHeaders[headerName]); //set this request header
+				}
+			}
 			try
 			{
 				xmlHTTP.send(content); //send the request
@@ -188,7 +220,7 @@ function HTTPCommunicator()
 			}
 			if(!asynchronous) //if we're communicating synchronously
 			{
-				this._reportResponse(); //report the response immediately TODO maybe put this into an asynchrous call using setTimeout()
+				this._reportResponse(); //report the response immediately TODO maybe put this into an asynchronous call using setTimeout()
 				return xmlHTTP; //TODO testing synchronous
 			}
 		};
