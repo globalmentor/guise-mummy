@@ -117,7 +117,7 @@ public class URFProcessPanel extends LayoutPanel
 								final InputStream inputStream=new ByteArrayInputStream(input.getBytes(UTF_8));	//get an input stream to the input string
 								final AbstractURFProcessor urfProcessor;	//we don't yet know which URF processor we'll use
 								final URF urf;	//we'll store the resulting URF data model here
-								if(input.startsWith(TURF_SIGNATURE))	//if this is TURF
+								if(input.startsWith(SIGNATURE))	//if this is TURF
 								{
 									final URFTURFProcessor urfTURFProcessor=new URFTURFProcessor();	//create a new TURF processor
 									urf=DefaultURFTURFIO.readTURF(urfTURFProcessor, inputStream, baseURI);	//read URF
@@ -131,7 +131,7 @@ public class URFProcessPanel extends LayoutPanel
 								}
 								else	//if this is unrecognized content
 								{
-									getSession().notify(new Notification("Input must start with "+TURF_SIGNATURE+" or "+XML_DECL_START+".", Severity.ERROR));	//notify the user
+									getSession().notify(new Notification("Input must start with "+SIGNATURE+" or "+XML_DECL_START+".", Severity.ERROR));	//notify the user
 									return;	//don't process the input further
 								}
 								final StringBuilder assertionStringBuilder=new StringBuilder();	//create a string builder for showiong the assertions
@@ -143,9 +143,9 @@ public class URFProcessPanel extends LayoutPanel
 								assertionOutputTextControl.setValue(assertionStringBuilder.toString());	//show the output assertions
 									//TURF
 								final URFTURFGenerator turfGenerator=new URFTURFGenerator();	//create a new TURF generator
-								final StringWriter turfStringWriter=new StringWriter();	//create a new string writer
-								turfGenerator.generateResources(turfStringWriter, urf);	//generate the URF to TURF
-								turfOutputTextControl.setValue(turfStringWriter.toString());	//show the output TURF
+								final StringBuilder turfStringBuilder=new StringBuilder();	//create a new string builder
+								turfGenerator.generateResources(turfStringBuilder, urf);	//generate the URF to TURF
+								turfOutputTextControl.setValue(turfStringBuilder.toString());	//show the output TURF
 									//resource tree
 								urfTreeControl.setRootNode(new URFDynamicTreeNodeModel(urf));	//show the URF in the tree
 								urfTreeControl.getRootNode().setExpanded(true);	//expand the root node of the tree
