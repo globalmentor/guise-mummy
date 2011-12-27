@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 import com.globalmentor.beans.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.model.TimeZones.*;
+import static com.globalmentor.time.TimeZones.*;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.Table.CellRepresentationStrategy;

@@ -36,9 +36,9 @@ import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
-import static com.globalmentor.model.Calendars.*;
 import static com.globalmentor.model.Locales.*;
 import static com.globalmentor.net.URIs.*;
+import static com.globalmentor.time.Calendars.*;
 import static com.guiseframework.Guise.*;
 
 import com.globalmentor.beans.BoundPropertyObject;

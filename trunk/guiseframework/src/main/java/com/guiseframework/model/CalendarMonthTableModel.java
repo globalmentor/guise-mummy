@@ -22,7 +22,7 @@ import java.util.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Conditions.*;
-import static com.globalmentor.model.Calendars.*;
+import static com.globalmentor.time.Calendars.*;
 
 import com.globalmentor.beans.*;
 

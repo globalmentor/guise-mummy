@@ -63,7 +63,6 @@ import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
-import static com.globalmentor.model.TimeZones.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.net.http.HTTP.*;
 import static com.globalmentor.servlet.Servlets.*;
@@ -72,6 +71,7 @@ import static com.globalmentor.text.elff.WebTrendsConstants.*;
 import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.time.TimeZones.*;
 import static com.globalmentor.urf.content.Content.*;
 import static com.globalmentor.urf.dcmi.DCMI.*;
 
