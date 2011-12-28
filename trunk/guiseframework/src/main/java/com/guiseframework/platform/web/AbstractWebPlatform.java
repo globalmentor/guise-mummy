@@ -51,23 +51,23 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 	/**The map of poll intervals requested for depicted objects.*/
 	private final Map<DepictedObject, Integer> requestedPollIntervalMap=synchronizedMap(new HashMap<DepictedObject, Integer>());
 
-	/**The default polling interval in milleseconds.*/
+	/**The default polling interval in milliseconds.*/
 	public final static int DEFAULT_POLL_INTERVAL=5*60*1000;
 
-	/**The current polling interval in milleseconds.*/
+	/**The current polling interval in milliseconds.*/
 	private int pollInterval=DEFAULT_POLL_INTERVAL;
 
-		/**@return The current polling interval in milleseconds.*/
+		/**@return The current polling interval in milliseconds.*/
 		public int getPollInterval() {return pollInterval;}
 
-		/**Sets the polling interval in millseconds.
-		@param newPollInterval The polling interval in millseconds.
+		/**Sets the polling interval in milliseconds.
+		@param newPollInterval The polling interval in milliseconds.
 		@exception IllegalArgumentException if the given polling interval is less than zero.
 		*/
 		@SuppressWarnings("unchecked")
 		public void setPollInterval(final int newPollInterval)
 		{
-			if(pollInterval!=checkArgumentMinimum(newPollInterval, 0))	//if the value is really changing
+			if(pollInterval!=checkArgumentNotNegative(newPollInterval))	//if the value is really changing
 			{
 				pollInterval=newPollInterval;	//actually change the value
 				getSendMessageQueue().add(new WebCommandMessage<PollCommand>(PollCommand.POLL_INTERVAL,
@@ -78,7 +78,7 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 		/**Requests a polling interval for a given depicted object.
 		The actual polling interval will be updated if the given polling interval is smaller than the current actual polling interval.
 		@param depictedObject The depicted object requesting a polling interval.
-		@param pollInterval The polling interval in milleseconds.
+		@param pollInterval The polling interval in milliseconds.
 		@return <code>true</code> if the polling interval changed as a result of this request.
 		@exception NullPointerException if the given depicted object is <code>null</code>.
 		@exception IllegalArgumentException if the value is less than zero.
@@ -88,7 +88,7 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 		*/ 
 		public boolean requestPollInterval(final DepictedObject depictedObject, final int pollInterval)
 		{
-			checkArgumentMinimum(pollInterval, 0);
+			checkArgumentNotNegative(pollInterval);
 			synchronized(requestedPollIntervalMap)	//synchronize to ensure the that race conditions don't cause the actual poll interval to be out of synch with the requested poll intervals
 			{
 				final int oldPollInterval=getPollInterval();	//get the current polling interval
