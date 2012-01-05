@@ -200,7 +200,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	/**
 	 * Sets the application local environment. This method will not normally be called directly from applications. This is a bound property.
 	 * @param newEnvironment The new application local environment.
-	 * @exception NullPointerException if the given environment is <code>null</code>.
+	 * @throws NullPointerException if the given environment is <code>null</code>.
 	 * @see #ENVIRONMENT_PROPERTY
 	 */
 	public void setEnvironment(final Environment newEnvironment)
@@ -219,7 +219,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	/**
 	 * Returns the properties of the mail manager. This method is guaranteed to return a non-<code>null</code> value after the application is installed.
 	 * @return The properties of the mail manager.
-	 * @exception ConfigurationException if the application is installed into a container but the mail properties has not been configured.
+	 * @throws ConfigurationException if the application is installed into a container but the mail properties has not been configured.
 	 */
 	public Map<?, ?> getMailProperties()
 	{
@@ -233,8 +233,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	/**
 	 * Sets properties of the mail manager.
 	 * @param mailProperties The new properties of the mail manager
-	 * @exception NullPointerException if the given properties is <code>null</code>.
-	 * @exception IllegalStateException if the application has already been installed into a container.
+	 * @throws NullPointerException if the given properties is <code>null</code>.
+	 * @throws IllegalStateException if the application has already been installed into a container.
 	 */
 	public void setMailProperties(final Map<?, ?> mailProperties)
 	{
@@ -248,8 +248,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	/**
 	 * Retrieves the current mail session.
 	 * @return This application's mail session.
-	 * @exception IllegalStateException if the application has not yet been installed into a container.
-	 * @exception ConfigurationException if mail has not been configured for this application.
+	 * @throws IllegalStateException if the application has not yet been installed into a container.
+	 * @throws ConfigurationException if mail has not been configured for this application.
 	 */
 	public Session getMailSession()
 	{
@@ -265,8 +265,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	/**
 	 * Retrieves the queue used to send mail. Mail added to this queue will be sent use the application's configured mail protocols.
 	 * @return The queue used for to send mail.
-	 * @exception IllegalStateException if the application has not yet been installed into a container.
-	 * @exception ConfigurationException if mail has not been configured for this application.
+	 * @throws IllegalStateException if the application has not yet been installed into a container.
+	 * @throws ConfigurationException if mail has not been configured for this application.
 	 */
 	public Queue<Message> getMailSendQueue()
 	{
@@ -342,7 +342,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * Creates a new session for the application on the given platform. This version creates and returns a default session.
 	 * @param platform The platform on which this session's objects are depicted.
 	 * @return A new session for the application
-	 * @exception NullPointerException if the given platform is <code>null</code>.
+	 * @throws NullPointerException if the given platform is <code>null</code>.
 	 */
 	public GuiseSession createSession(final Platform platform)
 	{
@@ -358,7 +358,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	/**
 	 * Registers a session with this application. The Guise session has not yet been initialized when this method is called.
 	 * @param guiseSession The Guise session to register with this Guise application.
-	 * @exception IllegalStateException if the given session has alreaady been registered with this application.
+	 * @throws IllegalStateException if the given session has alreaady been registered with this application.
 	 */
 	public void registerSession(final GuiseSession guiseSession)
 	{
@@ -373,7 +373,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	/**
 	 * Unregisters a session from this application. The Guise session has already been uninitialized when this method is called.
 	 * @param guiseSession The Guise session to unregister from this Guise application.
-	 * @exception IllegalStateException if the given session is not registered with this application.
+	 * @throws IllegalStateException if the given session is not registered with this application.
 	 */
 	public void unregisterSession(final GuiseSession guiseSession)
 	{
@@ -404,7 +404,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * Retrieves a Guise session for the given UUID.
 	 * @param uuid The UUID of the Guise session to retrieve.
 	 * @return The Guise session associated with the given UUID, or <code>null</code> if no Guise session is associated with the given UUID.
-	 * @exception NullPointerException if the given UUID is <code>null</code>.
+	 * @throws NullPointerException if the given UUID is <code>null</code>.
 	 */
 	public GuiseSession getSession(final UUID uuid)
 	{
@@ -473,7 +473,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	/**
 	 * Returns the home directory shared by all sessions of this application. This value is not available before the application is installed.
 	 * @return The home directory of the application.
-	 * @exception IllegalStateException if the application has not yet been installed into a container.
+	 * @throws IllegalStateException if the application has not yet been installed into a container.
 	 */
 	public File getHomeDirectory()
 	{
@@ -488,7 +488,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	/**
 	 * Returns the log directory shared by all sessions of this application. This value is not available before the application is installed.
 	 * @return The log directory of the application.
-	 * @exception IllegalStateException if the application has not yet been installed into a container.
+	 * @throws IllegalStateException if the application has not yet been installed into a container.
 	 */
 	public File getLogDirectory()
 	{
@@ -497,13 +497,13 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		return logDirectory; //return the log directory;
 	}
 
-	/** The temprary directory shared by all sessions of this application. */
+	/** The temporary directory shared by all sessions of this application. */
 	private File tempDirectory = null;
 
 	/**
-	 * Returns the temprary directory shared by all sessions of this application. This value is not available before the application is installed.
+	 * Returns the temporary directory shared by all sessions of this application. This value is not available before the application is installed.
 	 * @return The temporary directory of the application.
-	 * @exception IllegalStateException if the application has not yet been installed into a container.
+	 * @throws IllegalStateException if the application has not yet been installed into a container.
 	 */
 	public File getTempDirectory()
 	{
@@ -595,7 +595,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		/**
 		 * Constructs the class with a writer to decorate.
 		 * @param decoratedWriter The writer to decorate with an asynchronous writer.
-		 * @exception NullPointerException if the given writer is <code>null</code>.
+		 * @throws NullPointerException if the given writer is <code>null</code>.
 		 */
 		public AsynchronousWriterRunnable(final Writer decoratedWriter)
 		{
@@ -624,7 +624,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	/**
 	 * Checks to ensure that this application is installed.
-	 * @exception IllegalStateException if the application is not installed.
+	 * @throws IllegalStateException if the application is not installed.
 	 * @see #isInstalled()
 	 */
 	public void checkInstalled()
@@ -637,7 +637,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	/**
 	 * Checks to ensure that this application is not installed.
-	 * @exception IllegalStateException if the application is installed.
+	 * @throws IllegalStateException if the application is installed.
 	 * @see #isInstalled()
 	 */
 	public void checkNotInstalled()
@@ -656,10 +656,10 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @param homeDirectory The home directory of the application.
 	 * @param logDirectory The log directory of the application.
 	 * @param tempDirectory The temporary directory of the application.
-	 * @exception NullPointerException if the container, base URI, home directory, log directory, and/or temporary directory is <code>null</code>.
-	 * @exception IllegalArgumentException if the given base URI is not absolute or the path of which is not absolute or not a collection.
-	 * @exception IllegalArgumentException if the context path is not absolute and does not end with a slash ('/') character.
-	 * @exception IllegalStateException if the application is already installed.
+	 * @throws NullPointerException if the container, base URI, home directory, log directory, and/or temporary directory is <code>null</code>.
+	 * @throws IllegalArgumentException if the given base URI is not absolute or the path of which is not absolute or not a collection.
+	 * @throws IllegalArgumentException if the context path is not absolute and does not end with a slash ('/') character.
+	 * @throws IllegalStateException if the application is already installed.
 	 */
 	public void install(final AbstractGuiseContainer container, final URI baseURI, final File homeDirectory, final File logDirectory, final File tempDirectory)
 	{
@@ -675,6 +675,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		final String logFilename = addExtension("application-" + logFilenameDateFormat.format(new Date()), Log.NAME_EXTENSION); //create a filename in the form "application-YYYY-MM-DD.log"
 		final File logFile = new File(logDirectory, logFilename); //determine the log file for this application TODO create a custom log configuration that will use rolling log files
 		logConfiguration.setFile(logFile); //set the log file for our log configuration
+		logConfiguration.setStandardOutput(isDebug()); //if we are debugging, turn on logging to the standard output
 		setConfiguration(LogConfiguration.class, logConfiguration); //configure logging for this application
 		logConfiguration.getLogger().info("Installing application", this); //inform the application-specific log
 		if(mailProperties != null) //if mail properties have been configured
@@ -699,7 +700,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * Uninstalls the application from the given container. All log writers are closed. This method is called by {@link GuiseContainer} and should not be called
 	 * directly by applications.
 	 * @param container The Guise container into which the application is being installed.
-	 * @exception IllegalStateException if the application is not installed or is installed into another container.
+	 * @throws IllegalStateException if the application is not installed or is installed into another container.
 	 */
 	public void uninstall(final GuiseContainer container)
 	{
@@ -771,8 +772,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	/**
 	 * Sets the list of supported locales. This is a bound property.
 	 * @param newLocales The new supported application locales.
-	 * @exception NullPointerException if the given list of locales is <code>null</code>.
-	 * @exception IllegalArgumentException if the given list of locales is empty.
+	 * @throws NullPointerException if the given list of locales is <code>null</code>.
+	 * @throws IllegalArgumentException if the given list of locales is empty.
 	 * @see #LOCALES_PROPERTY
 	 */
 	public void setLocales(final List<Locale> newLocales)
@@ -863,7 +864,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	/**
 	 * Sets the URI of the application theme. This is a bound property.
 	 * @param newThemeURI The URI of the new application theme.
-	 * @exception NullPointerException if the given theme URI is <code>null</code>.
+	 * @throws NullPointerException if the given theme URI is <code>null</code>.
 	 * @see #THEME_URI_PROPERTY
 	 */
 	public void setThemeURI(final URI newThemeURI)
@@ -900,7 +901,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		locales = unmodifiableList(asList(Locale.getDefault())); //create an unmodifiable list of locales including only the default locale of the JVM
 		this.environment = new DefaultEnvironment(); //create a default environment
 		this.logConfiguration = new DefaultLogConfiguration(); //create a default log configuration, which we'll initialize with a log file later
-		this.logConfiguration.setStandardOutput(false); //turn off logging to the standard output
+		this.logConfiguration.setStandardOutput(false); //turn off logging to the standard output; we may turn it on later
 	}
 
 	/** The concurrent list of destinations which have path patterns specified. */
@@ -913,7 +914,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * Registers a destination so that it can be matched against one or more paths. Any existing destinations for the path or path pattern is replaced. Existing
 	 * destinations will take priority if a path matches multiple destination path patterns.
 	 * @param destination The description of the destination at the application context-relative path or path pattern.
-	 * @exception NullPointerException if the destination is <code>null</code>.
+	 * @throws NullPointerException if the destination is <code>null</code>.
 	 */
 	public void addDestination(final Destination destination)
 	{
@@ -925,7 +926,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @param destination The description of the destination at the application context-relative path or path pattern.
 	 * @param priority Whether this destination takes priority over other destinations when there are multiple matches; if this destination has no path pattern,
 	 *          this parameter is ignored.
-	 * @exception NullPointerException if the destination is <code>null</code>.
+	 * @throws NullPointerException if the destination is <code>null</code>.
 	 */
 	public void addDestination(final Destination destination, final boolean priority)
 	{
@@ -970,7 +971,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * path as given; if no matching path is found, all destinations with path patterns are searched for a match.
 	 * @param path The address for which a destination should be retrieved.
 	 * @return The destination associated with the given path, or <code>null</code> if no destination is associated with the path.
-	 * @exception IllegalArgumentException if the provided path is absolute.
+	 * @throws IllegalArgumentException if the provided path is absolute.
 	 */
 	public Destination getDestination(final URIPath path)
 	{
@@ -1008,8 +1009,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @param path The application context-relative path.
 	 * @return <code>true</code> if there is destination associated with the given path, or <code>false</code> if no destination is associated with the given
 	 *         path.
-	 * @exception NullPointerException if the path is <code>null</code>.
-	 * @exception IllegalArgumentException if the provided path is absolute.
+	 * @throws NullPointerException if the path is <code>null</code>.
+	 * @throws IllegalArgumentException if the provided path is absolute.
 	 */
 	public boolean hasDestination(final URIPath path)
 	{
@@ -1034,9 +1035,9 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * "/path/to/application/relative/path", while resolving "/absolute/path" will yield "/absolute/path".
 	 * @param path The path to be resolved.
 	 * @return The path resolved against the application base path.
-	 * @exception NullPointerException if the given path is <code>null</code>.
-	 * @exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
-	 *              {@link #resolveURI(URI)} should be used instead).
+	 * @throws NullPointerException if the given path is <code>null</code>.
+	 * @throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
+	 *           {@link #resolveURI(URI)} should be used instead).
 	 * @see #getBasePath()
 	 * @see #resolveURI(URI)
 	 */
@@ -1052,7 +1053,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".
 	 * @param uri The URI to be resolved.
 	 * @return The URI resolved against the application base path.
-	 * @exception NullPointerException if the given URI is <code>null</code>.
+	 * @throws NullPointerException if the given URI is <code>null</code>.
 	 * @see #getBasePath()
 	 * @see #resolvePath(URIPath)
 	 */
@@ -1070,9 +1071,9 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * "/path/to/application/relative/path" will yield "relative/path"
 	 * @param path The path to be relativized.
 	 * @return The path relativized to the application base path.
-	 * @exception NullPointerException if the given path is <code>null</code>.
-	 * @exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
-	 *              {@link #resolveURI(URI)} should be used instead).
+	 * @throws NullPointerException if the given path is <code>null</code>.
+	 * @throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
+	 *           {@link #resolveURI(URI)} should be used instead).
 	 * @see #getBasePath()
 	 * @see #relativizeURI(URI)
 	 */
@@ -1086,7 +1087,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * "http://www.example.com/path/to/application/relative/path" will yield "relative/path"
 	 * @param uri The URI to be relativized.
 	 * @return The URI path relativized to the application base path.
-	 * @exception NullPointerException if the given URI is <code>null</code>.
+	 * @throws NullPointerException if the given URI is <code>null</code>.
 	 * @see #getBasePath()
 	 * @see #relativizePath(String)
 	 */
@@ -1107,9 +1108,9 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @param locale The locale to use in generating candidate resource names.
 	 * @return The locale-sensitive path to an existing resource based upon the given locale, or <code>null</code> if no resource exists at the given resource
 	 *         base path or any of its locale candidates.
-	 * @exception NullPointerException if the given resource base path and/or locale is <code>null</code>.
-	 * @exception IllegalArgumentException if the given resource path is absolute.
-	 * @exception IllegalArgumentException if the given path is not a valid path.
+	 * @throws NullPointerException if the given resource base path and/or locale is <code>null</code>.
+	 * @throws IllegalArgumentException if the given resource path is absolute.
+	 * @throws IllegalArgumentException if the given path is not a valid path.
 	 * @see #hasResource(String)
 	 */
 	public String getLocaleResourcePath(final String resourceBasePath, final Locale locale)
@@ -1134,8 +1135,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * package access to delegate to {@link AbstractGuiseContainer#hasResource(String)}.
 	 * @param resourcePath An application-relative path to a resource in the application resource storage area.
 	 * @return <code>true</code> if a resource exists at the given resource path.
-	 * @exception IllegalArgumentException if the given resource path is absolute.
-	 * @exception IllegalArgumentException if the given path is not a valid path.
+	 * @throws IllegalArgumentException if the given resource path is absolute.
+	 * @throws IllegalArgumentException if the given path is not a valid path.
 	 */
 	public boolean hasResource(final String resourcePath)
 	{
@@ -1149,8 +1150,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * {@link AbstractGuiseContainer#getResourceInputStream(String)}.
 	 * @param resourcePath An application-relative path to a resource in the application resource storage area.
 	 * @return An input stream to the resource at the given resource path, or <code>null</code> if no resource exists at the given resource path.
-	 * @exception IllegalArgumentException if the given resource path is absolute.
-	 * @exception IllegalArgumentException if the given path is not a valid path.
+	 * @throws IllegalArgumentException if the given resource path is absolute.
+	 * @throws IllegalArgumentException if the given path is not a valid path.
 	 */
 	public InputStream getResourceInputStream(final String resourcePath)
 	{
@@ -1165,10 +1166,10 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * server request. This method supports read access to temporary public resources.
 	 * @param uri A URI to the entity; either absolute or relative to the application.
 	 * @return An input stream to the entity at the given resource URI, or <code>null</code> if no entity exists at the given resource path.
-	 * @exception NullPointerException if the given URI is <code>null</code>.
-	 * @exception IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made
-	 *              from the required session.
-	 * @exception IOException if there was an error connecting to the entity at the given URI.
+	 * @throws NullPointerException if the given URI is <code>null</code>.
+	 * @throws IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made
+	 *           from the required session.
+	 * @throws IOException if there was an error connecting to the entity at the given URI.
 	 * @see #resolveURI(URI)
 	 */
 	public InputStream getInputStream(final URI uri) throws IOException //TODO check for the resource: URI scheme
@@ -1231,12 +1232,12 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * public resources.
 	 * @param path A path that is either relative to the application context path or is absolute.
 	 * @return An input stream to the entity at the given resource path, or <code>null</code> if no entity exists at the given resource path.
-	 * @exception NullPointerException if the given path is <code>null</code>.
-	 * @exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
-	 *              {@link #getInputStream(URI)} should be used instead).
-	 * @exception IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made
-	 *              from the required session.
-	 * @exception IOException if there was an error connecting to the entity at the given path.
+	 * @throws NullPointerException if the given path is <code>null</code>.
+	 * @throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
+	 *           {@link #getInputStream(URI)} should be used instead).
+	 * @throws IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made
+	 *           from the required session.
+	 * @throws IOException if there was an error connecting to the entity at the given path.
 	 * @see #getInputStream(URI)
 	 */
 	public InputStream getInputStream(final URIPath path) throws IOException
@@ -1280,12 +1281,11 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * temporary public resources. Write access to resources other than Guise public temporary files is currently unsupported.
 	 * @param uri A URI to the entity; either absolute or relative to the application.
 	 * @return An output stream to the entity at the given resource URI.
-	 * @exception NullPointerException if the given URI is <code>null</code>.
-	 * @exception IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made
-	 *              from the required session.
-	 * @exception FileNotFoundException if a URI to a temporary file was passed before the file was created using
-	 *              {@link #createTempAsset(String, String, boolean)}.
-	 * @exception IOException if there was an error connecting to the entity at the given URI.
+	 * @throws NullPointerException if the given URI is <code>null</code>.
+	 * @throws IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made
+	 *           from the required session.
+	 * @throws FileNotFoundException if a URI to a temporary file was passed before the file was created using {@link #createTempAsset(String, String, boolean)}.
+	 * @throws IOException if there was an error connecting to the entity at the given URI.
 	 * @see #resolveURI(URI)
 	 * @see #createTempAsset(String, String, boolean)
 	 */
@@ -1335,14 +1335,13 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * other than Guise public temporary files is currently unsupported.
 	 * @param path A path that is either relative to the application context path or is absolute.
 	 * @return An output stream to the entity at the given resource path.
-	 * @exception NullPointerException if the given path is <code>null</code>.
-	 * @exception IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made
-	 *              from the required session.
-	 * @exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
-	 *              {@link #getOutputStream(URI)} should be used instead).
-	 * @exception FileNotFoundException if a path to a temporary file was passed before the file was created using
-	 *              {@link #createTempAsset(String, String, boolean)}.
-	 * @exception IOException if there was an error connecting to the entity at the given URI.
+	 * @throws NullPointerException if the given path is <code>null</code>.
+	 * @throws IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made
+	 *           from the required session.
+	 * @throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
+	 *           {@link #getOutputStream(URI)} should be used instead).
+	 * @throws FileNotFoundException if a path to a temporary file was passed before the file was created using {@link #createTempAsset(String, String, boolean)}.
+	 * @throws IOException if there was an error connecting to the entity at the given URI.
 	 * @see #getOutputStream(URI)
 	 * @see #createTempAsset(String, String, boolean)
 	 */
@@ -1365,10 +1364,10 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @param restrictionSession The Guise session to which access access to the temporary file should be restricted, or <code>null</code> if there should be no
 	 *          access restriction.
 	 * @return An application navigation path that can be used to access the asset.
-	 * @exception NullPointerException if the given base name and/or extension is <code>null</code>.
-	 * @exception IllegalArgumentException if the base name is the empty string.
-	 * @exception IllegalStateException if the given restriction session is not registered with this application.
-	 * @exception IOException if there is a problem creating the asset.
+	 * @throws NullPointerException if the given base name and/or extension is <code>null</code>.
+	 * @throws IllegalArgumentException if the base name is the empty string.
+	 * @throws IllegalStateException if the given restriction session is not registered with this application.
+	 * @throws IOException if there is a problem creating the asset.
 	 * @see #getTempDirectory()
 	 * @see #hasAsset(URIPath)
 	 */
@@ -1404,7 +1403,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * application assets.
 	 * @param path The application-relative path of the asset.
 	 * @return <code>true</code> if an asset exists at the given path.
-	 * @exception IOException if there was an error accessing the asset.
+	 * @throws IOException if there was an error accessing the asset.
 	 * @see #createTempAsset(String, String, boolean)
 	 * @see Guise#hasAsset(String)
 	 */
@@ -1436,8 +1435,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @param path The application-relative path of the asset.
 	 * @param session The Guise session requesting the asset, or <code>null</code> if there is no session associated with the request.
 	 * @return A URL to the asset, or <code>null</code> if there is no such asset.
-	 * @exception IllegalStateException if an asset was requested that requires a particular Guise session different from the given Guise session.
-	 * @exception IOException if there was an error accessing the asset.
+	 * @throws IllegalStateException if an asset was requested that requires a particular Guise session different from the given Guise session.
+	 * @throws IOException if there was an error accessing the asset.
 	 * @see #createTempAsset(String, String, boolean)
 	 * @see Guise#getAssetURL(String)
 	 */
@@ -1487,7 +1486,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @param theme The current theme in effect.
 	 * @param locale The locale for which resources should be retrieved.
 	 * @return A resolving resource bundle based upon the locale.
-	 * @exception IOException if there was an error loading a resource bundle.
+	 * @throws IOException if there was an error loading a resource bundle.
 	 * @see #getResourceBundleBaseName()
 	 */
 	public ResourceBundle loadResourceBundle(final Theme theme, final Locale locale) throws IOException
@@ -1515,7 +1514,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @param locale The locale for which resources should be retrieved.
 	 * @param parentResourceBundle The resource bundle to serve as the parent, or <code>null</code> if there is no parent resource bundle.
 	 * @return The resource bundle for the theme, with parent resource bundles loaded, or the parent resource bundle if the theme specifies no resources.
-	 * @exception IOException if there was an error loading a resource bundle.
+	 * @throws IOException if there was an error loading a resource bundle.
 	 */
 	protected ResourceBundle loadResourceBundle(final Theme theme, final Locale locale, final ResourceBundle parentResourceBundle) throws IOException
 	{
@@ -1553,7 +1552,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @param resourceBundleURI The URI of the resource bundle to load.
 	 * @param parentResourceBundle The resource bundle to serve as the parent, or <code>null</code> if there is no parent resource bundle.
 	 * @return The loaded resource bundle.
-	 * @exception IOException if there was an error loading the resource bundle.
+	 * @throws IOException if there was an error loading the resource bundle.
 	 */
 	protected ResourceBundle loadResourceBundle(final URI resourceBundleURI, ResourceBundle parentResourceBundle) throws IOException
 	{
@@ -1592,7 +1591,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * theme will be assigned unless the theme is the default theme.
 	 * @param themeURI The URI of the theme to load.
 	 * @return A loaded theme with resolving parents loaded as well.
-	 * @exception NullPointerException if the given theme URI is <code>null</code>.
+	 * @throws NullPointerException if the given theme URI is <code>null</code>.
 	 * @throws IOException if there is an error loading the theme or one of its parents.
 	 */
 	public Theme loadTheme(final URI themeURI) throws IOException
@@ -1644,9 +1643,9 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * Loads properties from a file in the home directory. The properties can be stored in XML or in the traditional properties format.
 	 * @param propertiesPath The path to the properties file, relative to the application home directory.
 	 * @return The properties loaded from the file at the given path.
-	 * @exception NullPointerException if the given properties path is <code>null</code>.
-	 * @exception IllegalArgumentException if the type of properties file is not recognized.
-	 * @exception IOException if there is an error loading the properties.
+	 * @throws NullPointerException if the given properties path is <code>null</code>.
+	 * @throws IllegalArgumentException if the type of properties file is not recognized.
+	 * @throws IOException if there is an error loading the properties.
 	 * @see #getHomeDirectory()
 	 */
 	public Properties loadProperties(final String propertiesPath) throws IOException
@@ -1786,7 +1785,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		 * Writer and expire time constructor.
 		 * @param writer The writer.
 		 * @param expireTime The time at which the writer expires.
-		 * @exception NullPointerException if the given writer is <code>null</code>.
+		 * @throws NullPointerException if the given writer is <code>null</code>.
 		 */
 		public LogWriterInfo(final Writer writer, final long expireTime)
 		{
@@ -1802,7 +1801,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	private static class TempFileInfo
 	{
 
-		/** The file object representing the actual temprary file in the file system. */
+		/** The file object representing the actual temporary file in the file system. */
 		private final File tempFile;
 
 		/** @return The file object representing the actual temporary file in the file system. */
@@ -1822,10 +1821,10 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 		/**
 		 * Temporary file and restriction session constructor.
-		 * @param tempFile The file object representing the actual temprary file in the file system.
+		 * @param tempFile The file object representing the actual temporary file in the file system.
 		 * @param restrictionSession The session to which this temporary file is restricted, or <code>null</code> if this temporary file is not restricted to a
 		 *          session.
-		 * @exception NullPointerException if the given temporary file is <code>null</code>.
+		 * @throws NullPointerException if the given temporary file is <code>null</code>.
 		 */
 		public TempFileInfo(final File tempFile, final GuiseSession restrictionSession)
 		{
@@ -1883,7 +1882,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		/**
 		 * Guise session constructor.
 		 * @param guiseSession The Guise session to which the information relates.
-		 * @exception NullPointerException if the given Guise session is <code>null</code>.
+		 * @throws NullPointerException if the given Guise session is <code>null</code>.
 		 */
 		public GuiseSessionInfo(final GuiseSession guiseSession)
 		{

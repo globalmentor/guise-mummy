@@ -1,5 +1,5 @@
 /*
- * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2005-2012 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,14 @@ package com.guiseframework.component;
 
 import java.beans.PropertyVetoException;
 
-import com.guiseframework.model.Valued;
+import com.globalmentor.model.MutableValued;
 
 /**A component that can be initialized with a value and allows a value to be retrieved.
 This component is useful for editing complex values (such as contact information).
 @param <V> The type of value displayed within the component.
 @author Garret Wilson
 */
-public interface ValuedComponent<V> extends Component, Valued<V>
+public interface ValuedComponent<V> extends Component, MutableValued<V>
 {
 
 	/**@return The class representing the type of value displayed in the component.*/

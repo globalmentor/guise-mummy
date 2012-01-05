@@ -20,13 +20,14 @@ import static com.globalmentor.java.Classes.*;
 
 import java.beans.PropertyVetoException;
 
+import com.globalmentor.model.MutableValued;
 import com.guiseframework.validator.*;
 
 /**A model for user input of a value.
 @param <V> The type of value contained in the model.
 @author Garret Wilson
 */
-public interface ValueModel<V> extends Model, Valued<V>
+public interface ValueModel<V> extends Model, MutableValued<V>
 {
 
 	/**The validator bound property.*/
