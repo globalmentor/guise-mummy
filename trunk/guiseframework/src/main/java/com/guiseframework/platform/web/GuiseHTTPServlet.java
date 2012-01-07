@@ -37,7 +37,7 @@ import com.globalmentor.io.*;
 import com.globalmentor.java.Objects;
 import com.globalmentor.javascript.JSON;
 import com.globalmentor.log.Log;
-import com.globalmentor.management.profile.Probe;
+import com.globalmentor.management.profile.Profiler;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.model.ObjectHolder;
 import com.globalmentor.model.TaskState;
