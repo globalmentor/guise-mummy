@@ -16,7 +16,7 @@
 
 package com.guiseframework.platform.web.css;
 
-import static com.globalmentor.java.Characters.NULL_CHAR;
+import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Strings.*;
 import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
 
@@ -122,7 +122,7 @@ public class CSSProcessor
 				final char simpleSelectorDelimiter=simpleSelectorSequenceTokenizer.getLastDelimiter();	//see which delimiter introduced this simple selector
 				switch(simpleSelectorDelimiter)	//see which delimiter was previously encountered
 				{
-					case NULL_CHAR:	//if we haven't yet encountered a delimiter
+					case UNDEFINED_CHAR:	//if we haven't yet encountered a delimiter
 						simpleSelector=new TypeSelector(simpleSelectorString);	//this is a type selector (accept the universal selector, '*', as a type selector)
 						break;
 					case CLASS_SELECTOR_DELIMITER:

@@ -81,9 +81,9 @@ public class NamePanel extends AbstractPanel
 	{
 		if(name!=null)	//if there is a name
 		{
-			familyNameControl.setValue(formatList(new StringBuilder(), VALUE_SEPARATOR_CHAR, name.getFamilyNames()).toString());
-			givenNameControl.setValue(formatList(new StringBuilder(), VALUE_SEPARATOR_CHAR, name.getGivenNames()).toString());
-			additionalNameControl.setValue(formatList(new StringBuilder(), VALUE_SEPARATOR_CHAR, name.getAdditionalNames()).toString());
+			familyNameControl.setValue(formatList(VALUE_SEPARATOR_CHAR, name.getFamilyNames()));
+			givenNameControl.setValue(formatList(VALUE_SEPARATOR_CHAR, name.getGivenNames()));
+			additionalNameControl.setValue(formatList(VALUE_SEPARATOR_CHAR, name.getAdditionalNames()));
 			final String[] honorificPrefixes=name.getHonorificPrefixes();	//get the existing values
 			for(final String honorifixPrefix:honorificPrefixes)	//for each existing value
 			{

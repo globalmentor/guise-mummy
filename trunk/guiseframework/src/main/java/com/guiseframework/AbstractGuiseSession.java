@@ -58,6 +58,7 @@ import static com.globalmentor.io.Writers.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Classes.*;
+import static com.globalmentor.java.Conditions.unexpected;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.CharacterEncoding.*;
@@ -2052,10 +2053,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			URI resourceURI = null; //we'll try to determine the resource URI
 			if(suffixes.length > 0) //if there are suffixes
 			{
-				final String decoratedResourceKey = formatList(new StringBuilder(resourceKey).append('.'), '.', suffixes).toString(); //append the suffixes
 				try
 				{
+					final String decoratedResourceKey = formatList(new StringBuilder(resourceKey).append('.'), '.', suffixes).toString(); //append the suffixes
 					resourceURI = getURIResource(decoratedResourceKey); //look up the resource using the decorated resource key
+				}
+				catch(final IOException ioException) //if there is no resource associated with the decorated resource key, ignore the error and try again with the base resource key
+				{
+					throw unexpected(ioException);
 				}
 				catch(final MissingResourceException missingResourceException) //if there is no resource associated with the decorated resource key, ignore the error and try again with the base resource key
 				{

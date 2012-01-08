@@ -16,13 +16,14 @@
 
 package com.guiseframework.platform.web;
 
+import java.io.IOException;
 import java.util.*;
 
+import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.text.TextFormatter.*;
 
 import com.globalmentor.collections.ArrayListHashMap;
 import com.globalmentor.collections.CollectionMap;
-import com.globalmentor.util.*;
 
 /**Indicates the submission of a full or partial form on the web platform
 @author Garret Wilson
@@ -68,18 +69,25 @@ public class WebFormEvent extends AbstractWebPlatformEvent
 	/**@return A string representation of this event.*/
 	public String toString()
 	{
-		final StringBuilder stringBuilder=new StringBuilder();	//create a string builder for constructing a string
-		if(isExhaustive())	//if the event is exhaustive
+		try
 		{
-			stringBuilder.append("(exhaustive) ");
+			final StringBuilder stringBuilder=new StringBuilder();	//create a string builder for constructing a string
+			if(isExhaustive())	//if the event is exhaustive
+			{
+				stringBuilder.append("(exhaustive) ");
+			}
+			final CollectionMap<String, Object, List<Object>> parameterListMap=getParameterListMap();	//get the request parameter map
+			for(final Map.Entry<String, List<Object>> parameterListMapEntry:parameterListMap.entrySet())	//for each entry in the map of parameter lists
+			{
+				stringBuilder.append("Key: ").append(parameterListMapEntry.getKey()).append(" Value: {");	//Key: key Value: {
+				formatList(stringBuilder, ',', parameterListMapEntry.getValue());	//values
+				stringBuilder.append('}');	//}
+			}
+			return stringBuilder.toString();	//return the string we constructed
 		}
-		final CollectionMap<String, Object, List<Object>> parameterListMap=getParameterListMap();	//get the request parameter map
-		for(final Map.Entry<String, List<Object>> parameterListMapEntry:parameterListMap.entrySet())	//for each entry in the map of parameter lists
+		catch(final IOException ioException)
 		{
-			stringBuilder.append("Key: ").append(parameterListMapEntry.getKey()).append(" Value: {");	//Key: key Value: {
-			formatList(stringBuilder, ',', parameterListMapEntry.getValue());	//values
-			stringBuilder.append('}');	//}
+			throw unexpected(ioException);
 		}
-		return stringBuilder.toString();	//return the string we constructed
 	}
 }
