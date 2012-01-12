@@ -132,16 +132,16 @@ function HTTPCommunicator()
 		 * Performs an HTTP POST request.
 		 * 
 		 * @param uri The request URI.
-		 * @param query Query information for the body of the POST request, or <code>null</code> if there is no query; for the
-		 *          "application/x-www-form-urlencoded" content type, if a non-string object is passed the name/value pairs
-		 *          of the object will be form-encoded into a single string.
+		 * @param query Query information for the body of the POST request, or <code>null</code> if there is no query; for
+		 *          the "application/x-www-form-urlencoded" content type, if a non-string object is passed the name/value
+		 *          pairs of the object will be form-encoded into a single string.
 		 * @param contentType The content type of the request; defaults to "application/x-www-form-urlencoded".
 		 * @param requestHeaders Additional request headers, if any.
 		 */
 		HTTPCommunicator.prototype.post = function(uri, query, contentType, requestHeaders)
 		{
 			contentType = contentType || "application/x-www-form-urlencoded"; //default to a form post TODO use a constant
-			if(contentType == "application/x-www-form-urlencoded" && query!=null && !(query instanceof String)) //if a non-string object was passed for form data
+			if(contentType == "application/x-www-form-urlencoded" && query != null && !(query instanceof String)) //if a non-string object was passed for form data
 			{
 				query = this.encodeForm(query); //encode the query object
 			}
@@ -202,9 +202,9 @@ function HTTPCommunicator()
 					content = query; //use the query as the content
 				}
 			}
-			if(requestHeaders)	//if there are additional request headers
+			if(requestHeaders) //if there are additional request headers
 			{
-				for(var headerName in requestHeaders)
+				for( var headerName in requestHeaders)
 				{
 					xmlHTTP.setRequestHeader(headerName, requestHeaders[headerName]); //set this request header
 				}
@@ -216,7 +216,6 @@ function HTTPCommunicator()
 			catch(e)
 			{
 				//TODO fix---why does this occur?				alert("error loading content: "+e);
-
 			}
 			if(!asynchronous) //if we're communicating synchronously
 			{
@@ -257,6 +256,16 @@ function HTTPCommunicator()
 			{
 				var xmlHTTP = this.xmlHTTP; //make a local copy of the XML HTTP request object
 				this.xmlHTTP = null; //remove the XML HTTP request object (Firefox only allows one asynchronous communication per object)
+				//if there is returned XML, but the returned XML's DOM doesn't support element.getAttributeNS()
+				//(IE9, for example, has DOM namespace support in the "text/html" web page document, but not the "text/xml" response XML)
+				if(xmlHTTP.responseXML && !xmlHTTP.responseXML.documentElement.getAttributeNS)
+				{
+					Element.getAttributeNS = Element.getAttributeNSCustom; //switch to using our own custom routines for all DOM access, both web page and response XML
+					if(document.documentElement.getAttributeNS) //if the document supports namespaces but our response XML doesn't (e.g. IE9), importNode() won't work---so use our own
+					{
+						document.importNode = document.importNodeCustom; //if the response XML doesn't support namespaces,
+					}
+				}
 				if(this.processHTTPResponse) //if we have a method for processing responses
 				{
 					this.processHTTPResponse(xmlHTTP); //process the response

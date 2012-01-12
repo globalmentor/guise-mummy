@@ -47,6 +47,8 @@ import com.globalmentor.net.mime.ContentDispositionType;
 import com.globalmentor.security.Nonce;
 import com.globalmentor.servlet.http.DefaultHTTPServlet;
 import com.globalmentor.text.elff.*;
+import com.globalmentor.text.xml.XML;
+import com.globalmentor.text.xml.xhtml.XHTML;
 import com.globalmentor.text.xml.xpath.*;
 import com.globalmentor.urf.*;
 
@@ -77,6 +79,7 @@ import static com.globalmentor.urf.content.Content.*;
 import static com.globalmentor.urf.dcmi.DCMI.*;
 
 import static com.guiseframework.platform.web.WebPlatform.*;
+import static com.guiseframework.platform.web.WebUserAgentProduct.Brand.*;
 import com.guiseframework.platform.web.WebPlatform.PollCommand;
 import com.guiseframework.platform.web.css.*;
 
@@ -1508,7 +1511,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 			String text = depictContext.getDepictText(); //get the text to output
 			if(isAJAX) //if this is an AJAX request
 			{
-				depictContext.setOutputContentType(CONTENT_TYPE); //switch to the "text/xml" content type TODO verify UTF-8 in a consistent, elegant way
+				depictContext.setOutputContentType(XML.CONTENT_TYPE); //switch to the "text/xml" content type TODO verify UTF-8 in a consistent, elegant way
 				text = "<response>" + text + "</response>"; //wrap the text in a response element
 			}
 			//Log.trace("response length:", text.length());
@@ -1731,7 +1734,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	}
 
 	/**
-	 * Serves a resource that has been verified to exist This version sets the content description and content disposition of {@link ResourceReadDestination}. If
+	 * Serves a resource that has been verified to exist.
+	 * <p>This version sets the content description and content disposition of {@link ResourceReadDestination}. If
 	 * there is a query parameter named {@value #GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER}, the value will indicate the content disposition through the use
 	 * of the serialize version of a {@link ContentDispositionType} value.</p> @param request The HTTP request.
 	 * @param response The HTTP response.

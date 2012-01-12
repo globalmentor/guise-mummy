@@ -114,137 +114,89 @@ if(typeof document.createAttributeNS == "undefined") //if the document does not 
 	};
 }
 
-if(/*TODO revisit Safari needs isSafari ||*/(typeof document.importNode == "undefined")) //if the document does not support document.importNode() (or this is Safari, which doesn't support importing XML into an XHTML DOM), create a substitute
+/**
+ * Manually imports a new node in the the document.
+ * 
+ * @param node The node to import.
+ * @param deep Whether the entire hierarchy should be imported.
+ * @returns A new clone of the node with the document as its owner.
+ */
+document.importNodeCustom = function(node, deep)
 {
-
-	/**
-	 * Imports a new node in the the document.
-	 * 
-	 * @param node The node to import.
-	 * @param deep Whether the entire hierarchy should be imported.
-	 * @returns A new clone of the node with the document as its owner.
-	 */
-	document.importNode = function(node, deep) //create a function to manually import a node
+	var importedNode = null; //we'll create a new node and store it here
+	switch(node.nodeType)
+	//see which type of child node this is
 	{
-		var importedNode = null; //we'll create a new node and store it here
-
-		var nodeType = node.nodeType; //get the type of the node
-		if(deep && (isIE || isSafari) //if we should do a deep import on IE, resort immediately to using innerHTML and a dummy node because of all the IE errors---and the Safari errors that make importing from walking the tree almost impossible
-				&& nodeType != Node.TEXT_NODE) //Safari seems to break when using innerHTML to import a text node of length 1---it's probably better to use the DOM to import text, anyway
-		{
-			var elementName = nodeType == Node.ELEMENT_NODE ? node.nodeName.toLowerCase() : null; //get the name of the node to be imported, if it is an element
-			var dummyNode = document.createElement("div"); //create a dummy node
-			var nodeString = DOMUtilities.getNodeString(node); //convert the child node to a string
-			if(elementName == "tr") //if this is a table row
+		case Node.COMMENT_NODE: //comment
+			importedNode = document.createCommentNode(node.nodeValue); //create a new comment node with appropriate text
+			break;
+		case Node.ELEMENT_NODE: //element
+			if(typeof node.namespaceURI != "undefined") //if the node supports namespaces
 			{
-				dummyNode.innerHTML = "<table><tbody>" + nodeString + "</tbody></table>"; //create the tbody and put the row inside it
-				importedNode = dummyNode.childNodes[0].childNodes[0].childNodes[0]; //return the tbody's first and only node, which is our new imported node; do not actually remove the node, which will cause an error on IE TODO see the failure to remove the node causes any long-term problems
-			}
-			else if(elementName == "th" || elementName == "td") //if this is a table header or cell
-			{
-				dummyNode.innerHTML = "<table><tbody><tr>" + nodeString + "</tr></tbody></table>"; //create the tbody and put the row inside it
-				importedNode = dummyNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]; //return the tr's first and only node, which is our new imported node; do not actually remove the node, which will cause an error on IE TODO see the failure to remove the node causes any long-term problems
-			}
-			else if(elementName == "option") //if this is a select option
-			{
-				dummyNode.innerHTML = "<select>" + nodeString + "</select>"; //create the select and put the option inside it
-				importedNode = dummyNode.childNodes[0].childNodes[0]; //return the select's first and only node, which is our new imported node; do not actually remove the node, which will cause an error on IE TODO see the failure to remove the node causes any long-term problems
+				importedNode = document.createElementNS(node.namespaceURI, node.nodeName); //create a namespace-aware element
 			}
 			else
-			//if this is not a table row
+			//if the node does not support namespaces
 			{
-				dummyNode.innerHTML = nodeString; //assign the string version of the node to the dummy node
-				if(dummyNode.childNodes.length != 1) //we expect a single child node at the end of the operation
-				{
-					throw "Error importing node: \"" + nodeString + "\". Imported: \"" + dummyNode.innerHTML + "\""; //TODO assert
-				}
-				importedNode = dummyNode.removeChild(dummyNode.childNodes[0]); //remove the dummy node's first and only node, which is our new imported node
+				importedNode = document.createElement(node.nodeName); //create a non-namespace-aware element
 			}
-			return importedNode;
-		}
-
-		switch(node.nodeType)
-		//see which type of child node this is
-		{
-			case Node.COMMENT_NODE: //comment
-				importedNode = document.createCommentNode(node.nodeValue); //create a new comment node with appropriate text
-				break;
-			case Node.ELEMENT_NODE: //element
-				if(typeof node.namespaceURI != "undefined") //if the node supports namespaces
+			{
+				var attributes = node.attributes; //get the element's attributes
+				var attributeCount = attributes.length; //find out how many attributes there are
+				for( var i = 0; i < attributeCount; ++i) //for each attribute
 				{
-					importedNode = document.createElementNS(node.namespaceURI, node.nodeName); //create a namespace-aware element
-				}
-				else
-				//if the node does not support namespaces
-				{
-					importedNode = document.createElement(node.nodeName); //create a non-namespace-aware element
-				}
-				{
-					var attributes = node.attributes; //get the element's attributes
-					var attributeCount = attributes.length; //find out how many attributes there are
-					for( var i = 0; i < attributeCount; ++i) //for each attribute
+					var attribute = attributes[i]; //get this attribute
+					var attributeName = attribute.nodeName; //get the attribute name
+					var attributeValue = attribute.nodeValue; //get the attribute value
+					if(attributeName == "style") //if this is the style attribute, it must be copied differently
 					{
-						var attribute = attributes[i]; //get this attribute
-						var attributeName = attribute.nodeName; //get the attribute name
-						if(attributeName == "style") //if this is the style attribute, it must be copied differently or it will throw an error on IE
+						importedNode.style.cssText = attributeValue; //see http://www.quirksmode.org/dom/w3c_css.html#t30
+					}
+					else
+					//for all other attributes
+					{
+						if(importedNode.setAttributeNodeNS instanceof Function && typeof attribute.namespaceURI != "undefined") //if the attribute supports namespaces
 						{
-							//TODO fix for Safari alert("ready to copy style attributes");
-							//TODO fix for Safari 							DOMUtilities.copyStyleAttribute(importedNode, node);	//copy the style attribute
+							var importedAttribute = document.createAttributeNS(attribute.namespaceURI, attributeName); //create a namespace-aware attribute
+							importedAttribute.nodeValue = attributeValue; //set the attribute value
+							importedNode.setAttributeNodeNS(importedAttribute); //set the attribute for the element						
 						}
 						else
-						//for all other attributes
+						//if the attribute does not support namespaces
 						{
-							var attributeValue = attribute.nodeValue; //get the attribute value
-							if(importedNode.setAttributeNodeNS instanceof Function && typeof attribute.namespaceURI != "undefined") //if the attribute supports namespaces
-							{
-								var importedAttribute = document.createAttributeNS(attribute.namespaceURI, attributeName); //create a namespace-aware attribute
-								importedAttribute.nodeValue = attributeValue; //set the attribute value
-								importedNode.setAttributeNodeNS(importedAttribute); //set the attribute for the element						
-							}
-							else
-							//if the attribute does not support namespaces
-							{
-								var importedAttribute = document.createAttribute(attributeName); //create a non-namespace-aware element
-								importedAttribute.nodeValue = attributeValue; //set the attribute value TODO verify this works on Safari
-								importedNode.setAttributeNode(importedAttribute); //set the attribute for the element
-							}
+							var importedAttribute = document.createAttribute(attributeName); //create a non-namespace-aware element
+							importedAttribute.nodeValue = attributeValue; //set the attribute value TODO verify this works on Safari
+							importedNode.setAttributeNode(importedAttribute); //set the attribute for the element
 						}
-					}
-					if(deep) //if we should import deep
-					{
-						var childNodes = node.childNodes; //get a list of child nodes
-						var childNodeCount = childNodes.length; //find out how many child nodes there are
-
-						for( var i = 0; i < childNodeCount; ++i) //for each child node
-						{
-							var childNode = childNodes[i]; //get this child node
-							var importedChildNode = document.importNode(childNode, deep);
-							importedNode.appendChild(importedChildNode);
-						}
-						/*TODO testing innerhtml; see if we can safely delete---after all, we already checked the browsers at the beginning
-												if(childNodeCount>0)	//if there are child nodes (IE6 will fail on importedNode.innerHTML="" for input type="text")
-												{
-													var innerHTMLStringBuilder=new StringBuilder();	//construct the inner HTML
-													for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
-													{
-														DOMUtilities.appendNodeString(innerHTMLStringBuilder, childNodes[i]);	//serialize the node and append it to the string builder
-													}
-													importedNode.innerHTML=innerHTMLStringBuilder.toString();	//set the element's inner HTML to the string we constructed
-												}
-						*/
 					}
 				}
-				break;
-			case Node.TEXT_NODE: //text
-				importedNode = document.createTextNode(node.nodeValue); //create a new text node with appropriate text
-				break;
-			default:
-				throw "Unknown node type: " + node.nodeType;
-				break;
-			//TODO add checks for other elements, such as CDATA
-		}
-		return importedNode; //return the imported node
-	};
+				if(deep) //if we should import deep
+				{
+					var childNodes = node.childNodes; //get a list of child nodes
+					var childNodeCount = childNodes.length; //find out how many child nodes there are
+					for( var i = 0; i < childNodeCount; ++i) //for each child node
+					{
+						var childNode = childNodes[i]; //get this child node
+						var importedChildNode = document.importNode(childNode, deep);
+						importedNode.appendChild(importedChildNode);
+					}
+				}
+			}
+			break;
+		case Node.TEXT_NODE: //text
+			importedNode = document.createTextNode(node.nodeValue); //create a new text node with appropriate text
+			break;
+		default:
+			throw "Unknown node type: " + node.nodeType;
+			break;
+		//TODO add checks for other elements, such as CDATA
+	}
+	return importedNode; //return the imported node
+};
+
+if(typeof document.importNode == "undefined") //if the document does not support document.importNode(), create use a substitute
+{
+	document.importNode = document.importNodeCustom;
 }
 
 /** Global utilities for working with the screen. */
@@ -908,7 +860,7 @@ Element.addClassName = function(element, className)
  */
 Element.setClassName = function(element, className, state)
 {
-	if(state)	//if the class name should be set
+	if(state) //if the class name should be set
 	{
 		var classNameString = element.className; //get the element's class names
 		if(classNameString) //if there is a class name already
@@ -926,91 +878,94 @@ Element.setClassName = function(element, className, state)
 		}
 		element.className = classNameString; //update the element class name
 	}
-	else	//if we should unset the class name
+	else
+	//if we should unset the class name
 	{
 		this.removeClassName(element, className);
 	}
+};
+
+/**
+ * Retrieves a namespaced attribute value from an element using the DOM element.getAttributeNS() method. This method
+ * correctly returns the empty string ("") as specified by the DOM, regardless of whether the underlying implementation
+ * returns "" or null.
+ * 
+ * @param element The element the attribute value of which to retrieve.
+ * @param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
+ * @param localName The local name of the attribute.
+ * @returns The value of the namespaced attribute, or "" if the attribute is not defined.
+ */
+Element.getAttributeNSNative = function(element, namespaceURI, localName)
+{
+	var value = element.getAttributeNS(namespaceURI, localName); //get the attribute value
+	return value != null ? value : ""; //return "" instead of null
+};
+
+/**
+ * Retrieves a namespaced attribute value from an element using the DOM element.getAttribute() method. This method
+ * correctly returns the empty string ("") as specified by the DOM, regardless of whether the underlying implementation
+ * returns "" or null. This implementation looks up the prefix from the given namespace; therefore only namespaces
+ * recognized by Guise are valid. This version assumes that any non-null namespace is that designated by
+ * GUISE_ML_NAMESPACE_URI, for which the prefix "guise" will be used.
+ * 
+ * @param element The element the attribute value of which to retrieve.
+ * @param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
+ * @param localName The local name of the attribute.
+ * @returns The value of the namespaced attribute, or "" if the attribute is not defined.
+ */
+Element.getAttributeNSCustom = function(element, namespaceURI, localName) //TODO transfer to Guise
+{
+	var value = element.getAttribute(namespaceURI != null ? "guise:" + localName : localName); //get the attribute value using the correct prefix TODO use a constant
+	return value != null ? value : ""; //return "" instead of null
+};
+
+/**
+ * Removes a namespaced attribute from an element using the DOM element.removeAttributeNS() method.
+ * 
+ * @param element The element the attribute of which to remove.
+ * @param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
+ * @param localName The local name of the attribute.
+ */
+Element.removeAttributeNSNative = function(element, namespaceURI, localName)
+{
+	element.removeAttributeNS(namespaceURI, localName); //remove the attribute
+};
+
+/**
+ * Removes a namespaced attribute from an element using the DOM element.removeAttribute() method. This implementation
+ * looks up the prefix from the given namespace; therefore only namespaces recognized by Guise are valid. This version
+ * assumes that any non-null namespace is that designated by GUISE_ML_NAMESPACE_URI, for which the prefix "guise" will
+ * be used.
+ * 
+ * @param element The element the attribute of which to remove.
+ * @param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
+ * @param localName The local name of the attribute.
+ */
+Element.removeAttributeNSCustom = function(element, namespaceURI, localName) //TODO transfer to Guise
+{
+	element.removeAttribute(namespaceURI != null ? "guise:" + localName : localName); //remove the attribute using the correct prefix TODO use a constant
 };
 
 //add correct support for namespace-aware DOM methods
 //Safari 1.3.2 requires namespaced attribute access in XMLHTTPRequest XML responses but requires non-namespaced attribute access in the HTML DOM.
 if(document.documentElement.getAttributeNS) //if this DOM supports element.getAttributeNS()
 {
-
-	/**
-	 * Retrieves a namespaced attribute value from an element using the DOM element.getAttributeNS() method. This method
-	 * correctly returns the empty string ("") as specified by the DOM, regardless of whether the underlying
-	 * implementation returns "" or null.
-	 * 
-	 * @param element The element the attribute value of which to retrieve.
-	 * @param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
-	 * @param localName The local name of the attribute.
-	 * @returns The value of the namespaced attribute, or "" if the attribute is not defined.
-	 */
-	Element.getAttributeNS = function(element, namespaceURI, localName)
-	{
-		var value = element.getAttributeNS(namespaceURI, localName); //get the attribute value
-		return value != null ? value : ""; //return "" instead of null
-	};
+	Element.getAttributeNS = Element.getAttributeNSNative;
 }
 else
 //if this DOM doesn't support element.getAttributeNS()
 {
-
-	/**
-	 * Retrieves a namespaced attribute value from an element using the DOM element.getAttribute() method. This method
-	 * correctly returns the empty string ("") as specified by the DOM, regardless of whether the underlying
-	 * implementation returns "" or null. This implementation looks up the prefix from the given namespace; therefore only
-	 * namespaces recognized by Guise are valid. This version assumes that any non-null namespace is that designated by
-	 * GUISE_ML_NAMESPACE_URI, for which the prefix "guise" will be used.
-	 * 
-	 * @param element The element the attribute value of which to retrieve.
-	 * @param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
-	 * @param localName The local name of the attribute.
-	 * @returns The value of the namespaced attribute, or "" if the attribute is not defined.
-	 */
-	Element.getAttributeNS = function(element, namespaceURI, localName) //TODO transfer to Guise
-	{
-		var value = element.getAttribute(namespaceURI != null ? "guise:" + localName : localName); //get the attribute value using the correct prefix TODO use a constant
-		return value != null ? value : ""; //return "" instead of null
-	};
-
+	Element.getAttributeNS = Element.getAttributeNSCustom;
 }
 
 if(document.documentElement.removeAttributeNS) //if this DOM supports element.removeAttributeNS (such as Safari)
 {
-
-	/**
-	 * Removes a namespaced attribute from an element using the DOM element.removeAttributeNS() method.
-	 * 
-	 * @param element The element the attribute of which to remove.
-	 * @param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
-	 * @param localName The local name of the attribute.
-	 */
-	Element.removeAttributeNS = function(element, namespaceURI, localName)
-	{
-		element.removeAttributeNS(namespaceURI, localName); //remove the attribute
-	};
+	Element.removeAttributeNS = Element.removeAttributeNSNative;
 }
 else
 //if this DOM doesn't support element.removeAttributeNS()
 {
-
-	/**
-	 * Removes a namespaced attribute from an element using the DOM element.removeAttribute() method. This implementation
-	 * looks up the prefix from the given namespace; therefore only namespaces recognized by Guise are valid. This version
-	 * assumes that any non-null namespace is that designated by GUISE_ML_NAMESPACE_URI, for which the prefix "guise" will
-	 * be used.
-	 * 
-	 * @param element The element the attribute of which to remove.
-	 * @param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
-	 * @param localName The local name of the attribute.
-	 */
-	Element.removeAttributeNS = function(element, namespaceURI, localName) //TODO transfer to Guise
-	{
-		element.removeAttribute(namespaceURI != null ? "guise:" + localName : localName); //remove the attribute using the correct prefix TODO use a constant
-	};
-
+	Element.removeAttributeNS = Element.removeAttributeNSCustom;
 }
 
 /**
