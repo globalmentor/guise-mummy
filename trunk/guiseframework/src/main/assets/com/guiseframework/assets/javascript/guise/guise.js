@@ -1,5 +1,5 @@
 /* Guise™ JavaScript Library
- * Copyright © 2005-2011 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2005-2012 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,12 +121,8 @@ is notified of the change in state.)
 
 /**See if the browser is Firefox.*/
 var isUserAgentFirefox=navigator.userAgentName=="Firefox";
-/**See if the browser is Firefox less than 3.*/
-var isUserAgentFirefoxLessThan3=isUserAgentFirefox && navigator.userAgentVersionNumber<3;
 /**See if the browser is IE.*/
 var isUserAgentIE=navigator.userAgentName=="MSIE";
-/**See if the browser is IE6.*/
-var isUserAgentIE6=isUserAgentIE && navigator.userAgentVersionNumber<7;	//TODO transfer; have Guise send message of non-support
 
 /**Whether Guise AJAX communication is initially enabled.*/
 var GUISE_AJAX_ENABLED=true;
@@ -1339,24 +1335,6 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 						{
 							this._synchronizeElement(oldElement, childNode, true);	//synchronize this element tree, indicating that this is the root of a synchronization subtree
 							this._updateComponents(oldElement, true);	//now that we've patched the old element, update any components that rely on the old element
-							if(isUserAgentFirefoxLessThan3)	//if we're running Firefox <3 and we just patched an element inside a Mozilla inline box, Firefox won't correctly update the flow so we'll have to do that manually
-							{
-//console.debug("patched element", oldElement, "on Moz<3");
-									//TODO at some point we may need to check the patched descendants, too---this only works if the root of the patched tree or one of its ancestors was a Mozilla inline box
-								var mozInlineBoxAncestor=Node.getAncestorElementByStyle(oldElement, "display", "-moz-inline-box");	//see if there is a Mozilla inline box element ancestor (including this element)
-								if(mozInlineBoxAncestor)	//if there is a Mozilla inline box element, we'll have to do special reflowing after all patching is done
-								{
-									var mozInlineBoxAncestorParent=mozInlineBoxAncestor.parentNode;	//get the inline box parent so we can just replace all the children
-									if(mozInlineBoxAncestorParent && mozInlineBoxAncestorParent.id)	//if we find its parent as we expect, and it has an ID
-									{
-										if(!mozInlineBoxParentIDSet)	//if we haven't yet created the set of inline box parents
-										{
-											mozInlineBoxParentIDSet=new Object();	//create a new set
-										}
-										mozInlineBoxParentIDSet[mozInlineBoxAncestorParent.id]=true;	//indicate that we have another parent node of an inline box
-									}
-								}
-							}
 						}
 						else if(DOMUtilities.hasClass(childNode, "frame"))	//if the element doesn't currently exist, but the patch is for a frame, create a new frame
 						{
@@ -2642,21 +2620,6 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 										com.globalmentor.js.EventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener							
 									}
 		//TODO del							alert("rollover source: "+node.getAttribute("guise:rolloverSrc"));
-								}
-								if(isUserAgentFirefoxLessThan3)	//if we're running Firefox <3, check for the inline box layout bug that doesn't show images that have not yet been cached
-								{
-									if(node.offsetWidth==0 && node.offsetHeight==0)	//if this image has no dimensions
-									{
-										var mozInlineBoxAncestor=Node.getAncestorElementByStyle(node, "display", "-moz-inline-box");	//see if there is a Mozilla inline box element ancestor
-										if(mozInlineBoxAncestor)	//if there is a Mozilla inline box element causing our problems
-										{
-											var mozInlineBoxAncestorParent=mozInlineBoxAncestor.parentNode;	//get *its* parent so we can just replace all the children
-											if(mozInlineBoxAncestorParent)	//if we find its parent like we expect
-											{
-												Node.refresh(mozInlineBoxAncestorParent);	//refresh the container element by removing it from the tree and putting it back
-											}
-										}
-									}
 								}
 								break;	//TODO del if not needed
 							case "iframe":	//TODO improve to only ignore fckEditor iframes if needed

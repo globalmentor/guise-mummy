@@ -1,5 +1,5 @@
 /* GlobalMentor Object Model JavaScript Library
- * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2005-2012 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,6 @@
 var com = com || {}; //create the com.globalmentor.js package
 com.globalmentor = com.globalmentor || {};
 com.globalmentor.js = com.globalmentor.js || {};
-
-/** See if the browser is IE. */
-var isIE = navigator.userAgentName == "MSIE"; //TODO use a better variable; do better checks
 
 /**
  * Key codes.
