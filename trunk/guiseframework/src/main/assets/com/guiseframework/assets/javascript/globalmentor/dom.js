@@ -1585,4 +1585,4 @@ function addLoadListener(func)
 }
 */
 
-//TODO find out why this doesn't work: com.globalmentor.dom.EventManager.addEvent(window, "unload", com.globalmentor.dom.EventManager.clearEvents.bind(com.globalmentor.dom.EventManager), false);	//unload all events when the window unloads
+com.globalmentor.dom.EventManager.addEvent(window, "unload", com.globalmentor.dom.EventManager.clearEvents.bind(com.globalmentor.dom.EventManager), false); //automatically do the appropriate uninitialization when the window unloads

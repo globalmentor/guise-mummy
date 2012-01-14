@@ -2295,9 +2295,6 @@ com.guiseframework.Guise = function()
 		proto.onUnload = function()
 		{
 			this.setEnabled(false); //immediately turn off AJAX communication
-			//TODO fix or del	this.setBusyVisible(true);	//turn on the busy indicator
-			com.globalmentor.dom.EventManager.clearEvents(); //unload all events
-			//TODO fix or del	this.setBusyVisible(false);	//turn off the busy indicator
 		};
 
 		/**
