@@ -682,12 +682,16 @@ li.treeNode-leaf
 
 /*elements*/
 
-head, body, body.applicationFrame, form
+head, body, body.applicationFrame, form, textarea
 {
 	margin: 0;
 	padding: 0;
 	border-width: 0;
 	border-style: none;
+}
+
+head, body, body.applicationFrame, form
+{
 	left: 0;
 	top: 0;
 	width: 100%;
@@ -702,4 +706,9 @@ head, body, body.applicationFrame
 form
 {
 	background-color: transparent;
+}
+
+textarea
+{
+	width: 100%;
 }
