@@ -28,8 +28,6 @@ com.globalmentor.js = com.globalmentor.js || {};
 
 /** See if the browser is IE. */
 var isIE = navigator.userAgentName == "MSIE"; //TODO use a better variable; do better checks
-/** See if the browser is Safari. */
-var isSafari = navigator.userAgent.indexOf("Safari") >= 0; //TODO use a better variable; do better checks
 
 /**
  * Key codes.
@@ -547,7 +545,7 @@ var DOMUtilities =
 		{
 			currentStyle[property]; //return the current style
 		}
-		var defaultView = document.defaultView; //see if there is a document defaultView (Mozilla, Safari 1.3+
+		var defaultView = document.defaultView; //see if there is a document defaultView (Mozilla, Safari 1.3+)
 		if(defaultView) //if there is a defaultView
 		{
 			var computedStyleFunction = defaultView.getComputedStyle; //get the computed style, if any
@@ -1364,7 +1362,7 @@ com.globalmentor.js.EventListener = function(currentTarget, eventType, fn, useCa
 				event.charCode = event.which ? event.which : event.keyCode; //use the NN4  key indication if available; otherwise, use the key code TODO make sure this is a key event, because NN4 uses event.which for mouse events, too			
 			}
 			//fix event.stopPropagation
-			if(!event.stopPropagation) //if there is no method for stopping propagation TODO add workaround for Safari, which has this method but doesn't actually stop propagation
+			if(!event.stopPropagation) //if there is no method for stopping propagation
 			{
 				//TODO assert window.event && window.event.cancelBubble
 				if(window.event && typeof window.event.cancelBubble == "boolean") //if there is a global event with a cancel bubble property (e.g. IE)
@@ -1376,7 +1374,7 @@ com.globalmentor.js.EventListener = function(currentTarget, eventType, fn, useCa
 				}
 			}
 			//fix event.preventDefault
-			if(!event.preventDefault) //if there is no method for preventing the default functionality TODO add workaround for Safari, which has this method but doesn't actually prevent default functionality
+			if(!event.preventDefault) //if there is no method for preventing the default functionality
 			{
 				//TODO assert window.event && window.event.returnValue
 				//TODO find out why IE returns "undefined" for window.event.returnValue, yet enumerates it in for:in		if(window.event && typeof window.event.returnValue=="boolean")	//if there is a global event with a return value property (e.g. IE)

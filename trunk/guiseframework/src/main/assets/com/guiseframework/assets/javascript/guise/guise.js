@@ -135,9 +135,6 @@ var GUISE_AJAX_POLL_INTERVAL=-1;	//TODO del when new server-directed poll interv
 /**The interval, in milliseconds, for polling the server during file uploads, or -1 if no polling should occur.*/
 var GUISE_AJAX_UPLOAD_POLL_INTERVAL=3000;
 
-/**See if the browser is Safari.*/
-var isSafari=navigator.userAgent.indexOf("Safari")>=0;	//TODO use a better variable; do better checks; update Guise server routines to check for Safari
-
 /**This will later be updated to indicate if there is a resource import control on the form.*/
 var hasResourceImportControl=false;
 
@@ -1467,7 +1464,6 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 		proto.NON_REMOVABLE_ATTRIBUTE_SET=
 		{
 			"style":true,	//don't remove local styles, because they may be used by Guise (with frames, for instance)
-			"onclick":true,	//don't remove the onclick attribute, because we may be using it for Safari to prevent a default action
 			"hideFocus":true,	//don't remove the IE hideFocus attribute, because we're using it to fix the IE6 lack of CSS outline: none support TODO revisit
 			"guiseStateWidth":true,	//don't remove Guise state attributes TODO change to jsXXX
 			"guiseStateHeight":true
@@ -2609,11 +2605,7 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 								{
 									if(!node.getAttribute("target"))	//if the link has no target (the target wouldn't work if we tried to take over the events; we can't just check for null because IE will always send back at least "")
 									{
-										com.globalmentor.js.EventManager.addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
-										if(isSafari)	//if this is Safari TODO fix better; this may have been fixed in Safari 2.0.4; see http://developer.yahoo.com/yui/docs/YAHOO.util.Event.html
-										{
-											node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
-										}
+										com.globalmentor.js.EventManager.addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks 
 									}
 								}
 								break;
@@ -2621,10 +2613,6 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 								if(elementClassNames.contains("buttonControl"))	//if this is a Guise button TODO use constant
 								{
 									com.globalmentor.js.EventManager.addEvent(node, "click", onButtonClick, false);	//listen for button clicks
-									if(isSafari)	//if this is Safari TODO fix better
-									{
-										node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
-									}
 								}
 								break;
 							case "div":
@@ -2762,10 +2750,6 @@ alert("trying to remove style "+removableStyleName+" with old value "+oldElement
 								case STYLES.ACTION:
 									com.globalmentor.js.EventManager.addEvent(node, "click", onActionClick, false);	//listen for a click on an action element
 									com.globalmentor.js.EventManager.addEvent(node, "contextmenu", onContextMenu, false);	//listen for a right click on an action element
-									if(isSafari)	//if this is Safari TODO fix better
-									{
-										node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
-									}
 									break;
 								case STYLES.DRAG_HANDLE:
 									com.globalmentor.js.EventManager.addEvent(node, "mousedown", onDragBegin, false);	//listen for mouse down on a drag handle
