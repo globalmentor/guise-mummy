@@ -23,6 +23,10 @@
  * 	dom.js
  */
 
+var com = com || {}; //create the com.globalmentor.ajax package
+com.globalmentor = com.globalmentor || {};
+com.globalmentor.ajax = com.globalmentor.ajax || {};
+
 //HTTP Communicator
 /**
  * A class encapsulating HTTP communication functionality. This class creates a shared
@@ -30,7 +34,7 @@
  * references a function to call for asynchronous HTTP requests, or <code>null</code> if HTTP communication should be
  * synchronous.
  */
-function HTTPCommunicator()
+com.globalmentor.ajax.HTTPCommunicator=function()
 {
 	/** The reference to the current XMLHTTP request object, or null if no communication is occurring. */
 	this.xmlHTTP = null;
@@ -38,18 +42,19 @@ function HTTPCommunicator()
 	/** The configured method for processing an HTTP response. */
 	this.processHTTPResponse = null;
 
-	if(!HTTPCommunicator.prototype._initialized)
+	var proto = com.globalmentor.ajax.HTTPCommunicator.prototype;
+	if(!proto._initialized)
 	{
-		HTTPCommunicator.prototype._initialized = true;
+		proto._initialized = true;
 
 		/** @returns true if the communicator is in the process of communicating. */
-		HTTPCommunicator.prototype.isCommunicating = function()
+		proto.isCommunicating = function()
 		{
 			return this.xmlHTTP != null;
 		};
 
 		/** The enumeration of ready states for asynchronous XMLHTTP requests. */
-		HTTPCommunicator.prototype.READY_STATE =
+		proto.READY_STATE =
 		{
 			UNINITIALIZED : 0,
 			LOADING : 1,
@@ -64,7 +69,7 @@ function HTTPCommunicator()
 		 * 
 		 * @param fn The function to call when processing HTTP responses, or null if requests should be synchronous.
 		 */
-		HTTPCommunicator.prototype.setProcessHTTPResponse = function(fn)
+		proto.setProcessHTTPResponse = function(fn)
 		{
 			this.processHTTPResponse = fn; //save the function for processing HTTP responses
 		};
@@ -72,7 +77,7 @@ function HTTPCommunicator()
 		if(window.XMLHttpRequest) //if we can create an XML HTTP request (e.g. Mozilla)
 		{
 			/** @returns A newly created XML HTTP request object. */
-			HTTPCommunicator.prototype._createXMLHTTP = function()
+			proto._createXMLHTTP = function()
 			{
 				return new XMLHttpRequest(); //create a new XML HTTP request object
 			};
@@ -104,7 +109,7 @@ function HTTPCommunicator()
 				throw "Unable to find Microsoft XMLHTTP ActiveX object.";
 			}
 			/** @returns A newly created XML HTTP request object. */
-			HTTPCommunicator.prototype._createXMLHTTP = function()
+			proto._createXMLHTTP = function()
 			{
 				return new ActiveXObject(msXMLHTTPVersion); //create a new ActiveX object, using closure to return the version determined to work
 			};
@@ -123,7 +128,7 @@ function HTTPCommunicator()
 		 * @param query Query information for the URI of the GET request, or <code>null</code> if there is no query.
 		 * @param requestHeaders The request headers, if any.
 		 */
-		HTTPCommunicator.prototype.get = function(uri, query, requestHeaders)
+		proto.get = function(uri, query, requestHeaders)
 		{
 			return this._performRequest("GET", uri, query, null, requestHeaders); //perform a GET request
 		};
@@ -138,7 +143,7 @@ function HTTPCommunicator()
 		 * @param contentType The content type of the request; defaults to "application/x-www-form-urlencoded".
 		 * @param requestHeaders Additional request headers, if any.
 		 */
-		HTTPCommunicator.prototype.post = function(uri, query, contentType, requestHeaders)
+		proto.post = function(uri, query, contentType, requestHeaders)
 		{
 			contentType = contentType || "application/x-www-form-urlencoded"; //default to a form post TODO use a constant
 			if(contentType == "application/x-www-form-urlencoded" && query != null && !(query instanceof String)) //if a non-string object was passed for form data
@@ -153,7 +158,7 @@ function HTTPCommunicator()
 		 * @param map The object the name/value pairs of which to encode.
 		 * @returns A string containing the encoded form data.
 		 */
-		HTTPCommunicator.prototype.encodeForm = function(map)
+		proto.encodeForm = function(map)
 		{
 			var parameters = new Array();
 			for( var name in map) //for each property
@@ -175,7 +180,7 @@ function HTTPCommunicator()
 		 * @throws Exception if an error occurs performing the request.
 		 * @throws Number if the HTTP response code was not 200 (OK).
 		 */
-		HTTPCommunicator.prototype._performRequest = function(method, uri, query, contentType, requestHeaders)
+		proto._performRequest = function(method, uri, query, contentType, requestHeaders)
 		{
 			//TODO assert this.xmlHTTP does not exist
 			this.xmlHTTP = this._createXMLHTTP(); //create an XML HTTP object
@@ -228,7 +233,7 @@ function HTTPCommunicator()
 		 * Creates a method for processing XML HTTP on ready state changes. This method uses JavaScript closure to capture a
 		 * reference to this class so that it will be present during later callback.
 		 */
-		HTTPCommunicator.prototype._createOnReadyStateChangeCallback = function()
+		proto._createOnReadyStateChangeCallback = function()
 		{
 			var thisHTTPCommunicator = this; //save this
 			/**
@@ -250,7 +255,7 @@ function HTTPCommunicator()
 		 * 
 		 * @see #processHTTPResponse()
 		 */
-		HTTPCommunicator.prototype._reportResponse = function()
+		proto._reportResponse = function()
 		{
 			if(this.xmlHTTP) //if we have an XML HTTP request object
 			{
@@ -366,7 +371,7 @@ function DragState(dragSource, mouseX, mouseY)
 			*/
 			//TODO del if not needed			drag(mouseX, mouseY);	//do a fake drag to make sure that the position of the element is within any ranges
 			this.dragging = true; //show that we are dragging
-			com.globalmentor.js.EventManager.addEvent(document, "mousemove", onDrag, false); //listen for mouse move anywhere in document (IE doesn't allow us to listen on the window), as dragging may end somewhere else besides a drop target
+			com.globalmentor.dom.EventManager.addEvent(document, "mousemove", onDrag, false); //listen for mouse move anywhere in document (IE doesn't allow us to listen on the window), as dragging may end somewhere else besides a drop target
 			if(this.onDragBegin) //if there is a function for beginning dragging
 			{
 				this.onDragBegin(this.element); //call the dragging begin method
@@ -452,7 +457,7 @@ function DragState(dragSource, mouseX, mouseY)
 		/** Ends the drag process. */
 		DragState.prototype.endDrag = function()
 		{
-			com.globalmentor.js.EventManager.removeEvent(document, "mousemove", onDrag, false); //stop listening for mouse moves
+			com.globalmentor.dom.EventManager.removeEvent(document, "mousemove", onDrag, false); //stop listening for mouse moves
 			/*TODO del after new stop default method
 						document.body.ondrag=null;	//turn IE drag event processing back on
 						document.body.onselectstart=null;

@@ -22,9 +22,9 @@
  * 	javascript.js
  */
 
-var com = com || {}; //create the com.globalmentor.js package
+var com = com || {}; //create the com.globalmentor.dom package
 com.globalmentor = com.globalmentor || {};
-com.globalmentor.js = com.globalmentor.js || {};
+com.globalmentor.dom = com.globalmentor.dom || {};
 
 /**
  * Key codes.
@@ -301,10 +301,6 @@ var GUIUtilities =
 			while(element != documentElement) //TODO fix for scroll left
 			{
 				var parentNode = element.parentNode;
-				if(isUserAgentIE6 && parentNode == documentElement) //ignore the outermost element in IE6
-				{
-					break;
-				}
 				if(element.scrollLeft)
 				{
 					//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
@@ -491,10 +487,10 @@ var DOMUtilities =
 		{
 			var onLoad = function() //create a function to call the function after the image is loaded TODO fix this creates a race condition, because the image could finish loading before we can install our listener
 			{
-				com.globalmentor.js.EventManager.removeEvent(img, "load", onLoad, false); //stop waiting for the img to load
+				com.globalmentor.dom.EventManager.removeEvent(img, "load", onLoad, false); //stop waiting for the img to load
 				fn(); //call the function
 			};
-			com.globalmentor.js.EventManager.addEvent(img, "load", onLoad, false); //register an event on the img to wait for it to load
+			com.globalmentor.dom.EventManager.addEvent(img, "load", onLoad, false); //register an event on the img to wait for it to load
 		}
 	},
 
@@ -1292,13 +1288,13 @@ Node.refresh = function(node)
  * @param createDecorator Whether a decorator should be created to wrap the event function and ensure W3DC compliancy.
  *          var decorator The decorator created to wrap the event function and ensure W3C compliancy.
  */
-com.globalmentor.js.EventListener = function(currentTarget, eventType, fn, useCapture, createDecorator)
+com.globalmentor.dom.EventListener = function(currentTarget, eventType, fn, useCapture, createDecorator)
 {
 	this.currentTarget = currentTarget;
 	this.eventType = eventType;
 	this.fn = fn;
 	this.useCapture = useCapture;
-	var proto = com.globalmentor.js.EventListener.prototype;
+	var proto = com.globalmentor.dom.EventListener.prototype;
 	if(!proto._initialized)
 	{
 		proto._initialized = true;
@@ -1428,7 +1424,7 @@ com.globalmentor.js.EventListener = function(currentTarget, eventType, fn, useCa
 };
 
 /** A class that manages events. */
-com.globalmentor.js.EventManager =
+com.globalmentor.dom.EventManager =
 {
 	/** The array of event listeners. */
 	_eventListeners : [],
@@ -1449,7 +1445,7 @@ com.globalmentor.js.EventManager =
 		if(object.addEventListener) //if the W3C DOM method is supported
 		{
 			object.addEventListener(eventType, fn, useCapture); //add the event normally
-			eventListener = new com.globalmentor.js.EventListener(object, eventType, fn, useCapture, false); //create an event listener to keep track of the information
+			eventListener = new com.globalmentor.dom.EventListener(object, eventType, fn, useCapture, false); //create an event listener to keep track of the information
 		}
 		else
 		//if the W3C version isn't available
@@ -1457,13 +1453,13 @@ com.globalmentor.js.EventManager =
 			var eventName = "on" + eventType; //create the event name
 			if(object.attachEvent) //if we can use the IE version
 			{
-				eventListener = new com.globalmentor.js.EventListener(object, eventType, fn, useCapture, true); //create an event listener with a decorator
+				eventListener = new com.globalmentor.dom.EventListener(object, eventType, fn, useCapture, true); //create an event listener with a decorator
 				result = object.attachEvent(eventName, eventListener.decorator); //attach the function decorator
 			}
 			else
 			//if we can't use the IE version
 			{
-				eventListener = new com.globalmentor.js.EventListener(object, eventType, fn, useCapture, true); //create an event listener with a decorator
+				eventListener = new com.globalmentor.dom.EventListener(object, eventType, fn, useCapture, true); //create an event listener with a decorator
 				object[eventName] = eventListener.decorator; //use the object.onEvent property and our decorator
 			}
 		}
@@ -1589,4 +1585,4 @@ function addLoadListener(func)
 }
 */
 
-//TODO find out why this doesn't work: com.globalmentor.js.EventManager.addEvent(window, "unload", com.globalmentor.js.EventManager.clearEvents.bind(com.globalmentor.js.EventManager), false);	//unload all events when the window unloads
+//TODO find out why this doesn't work: com.globalmentor.dom.EventManager.addEvent(window, "unload", com.globalmentor.dom.EventManager.clearEvents.bind(com.globalmentor.dom.EventManager), false);	//unload all events when the window unloads
