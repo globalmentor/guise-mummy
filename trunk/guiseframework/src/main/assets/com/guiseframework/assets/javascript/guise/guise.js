@@ -173,12 +173,20 @@ var STYLES =
 //Initialization AJAX Event
 
 /**
- * A class indicating an initialization AJAX request. var jsVersion The version of JavaScript. var utcOffset The current
- * UTC offset in milliseconds. var utcOffset01 The UTC offset of January in milliseconds. var utcOffset06 The UTC offset
- * of June in milliseconds. //TODO del var timezone The time zone offset. var hour The current hours. var language The
- * user language. var colorDepth The color depth. var screenWidth The screen width. var screenHeight The screen height.
- * var javaEnabled Whether java is enabled. var browserWidth The browser width. var browserHeight The browser height var
- * referrer=document.referrer; //get the document referrer
+ * A class indicating an initialization AJAX request.
+ * @property jsVersion The version of JavaScript.
+ * @property utcOffset The current UTC offset in milliseconds.
+ * @property utcOffset01 The UTC offset of January in milliseconds.
+ * @property utcOffset06 The UTC offset of June in milliseconds.
+ * @property hour The current hours.
+ * @property language The user language.
+ * @property colorDepth The color depth.
+ * @property screenWidth The screen width.
+ * @property screenHeight The screen height.
+ * @property javaEnabled Whether java is enabled.
+ * @property browserWidth The browser width.
+ * @property browserHeight The browser height.
+ * @property referrer The document referrer.
  */
 function InitAJAXEvent()
 {
@@ -250,12 +258,13 @@ function PollAJAXEvent()
 /**
  * A class encapsulating action information for an AJAX request.
  * @param objectID The ID of the depicted object.
- * @param targetID: The ID of the target element.
- * @param actionID: The action identifier, or null if no particular action is indicated.
- * @param option: The zero-based option indicating mouse buttons left, right, or middle in that order. var objectID The
- *          ID of the depicted object. var targetID: The ID of the target element. var actionID: The action identifier,
- *          or null if no particular action is indicated. var option: The zero-based option indicating mouse buttons
- *          left, right, or middle in that order.
+ * @param targetID The ID of the target element.
+ * @param actionID The action identifier, or null if no particular action is indicated.
+ * @param option The zero-based option indicating mouse buttons left, right, or middle in that order.
+ * @property objectID The ID of the depicted object.
+ * @property targetID The ID of the target element.
+ * @property actionID The action identifier, or null if no particular action is indicated.
+ * @property option The zero-based option indicating mouse buttons left, right, or middle in that order.
  */
 function ActionAJAXEvent(objectID, targetID, actionID, option)
 {
@@ -270,9 +279,11 @@ function ActionAJAXEvent(objectID, targetID, actionID, option)
 /**
  * A class encapsulating property change information for an AJAX request.
  * @param objectID The ID of the depicted object.
- * @param propertyMap An associative array of names of properties changing, keyed to a value or an array of values; null
- *          values are allowed. var objectID The ID of the depicted object. var properties An associative array of names
- *          of properties changing, keyed to a value or an array of values; null values are allowed.
+ * @param propertyMap An associative array of names of properties changing, keyed to a value or an array of values;
+ *          <code>null</code> values are allowed.
+ * @property objectID The ID of the depicted object.
+ * @property properties An associative array of names of properties changing, keyed to a value or an array of values;
+ *           <code>null</code> values are allowed.
  */
 function ChangeAJAXEvent(objectID, properties)
 {
@@ -284,12 +295,13 @@ function ChangeAJAXEvent(objectID, properties)
 
 /**
  * A class encapsulating drop information for an AJAX request.
- * @param dragState: The object containing the state of the drag and drop operation.
- * @param dragSource: The element that was the source of the drag and drop operation.
- * @param dropTarget: The element that is the target of the drag and drop operation.
- * @param event: The W3C event object associated with the drop. var dragSource: The element that was the source of the
- *          drag and drop operation. var dropTarget: The element that is the target of the drag and drop operation. var
- *          mousePosition: The position of the mouse at the drop.
+ * @param dragState The object containing the state of the drag and drop operation.
+ * @param dragSource The element that was the source of the drag and drop operation.
+ * @param dropTarget The element that is the target of the drag and drop operation.
+ * @param event The W3C event object associated with the drop.
+ * @property dragSource The element that was the source of the drag and drop operation.
+ * @property dropTarget The element that is the target of the drag and drop operation.
+ * @property mousePosition The position of the mouse at the drop.
  */
 function DropAJAXEvent(dragState, dragSource, dropTarget, event)
 {
@@ -302,7 +314,8 @@ function DropAJAXEvent(dragState, dragSource, dropTarget, event)
 
 /**
  * A class encapsulating focus information for an AJAX request.
- * @param objectID The ID of the depicted object. var objectID The ID of the depicted object.
+ * @param objectID The ID of the depicted object.
+ * @property objectID The ID of the depicted object.
  */
 function FocusAJAXEvent(objectID)
 {
@@ -313,13 +326,16 @@ function FocusAJAXEvent(objectID)
 
 /**
  * A class encapsulating key press or release information for an AJAX request.
- * @param eventType: The type of key event; one of KeyAJAXEvent.EventType.
- * @param code: The key code.
- * @param altKey: Whether the Alt key was pressed.
- * @param controlKey: Whether the Control key was pressed.
- * @param shiftKey: Whether the Shift key was pressed. var code: The key code var eventType: The type of key event; one
- *          of KeyAJAXEvent.EventType. var altKey: Whether the Alt key was pressed. var controlKey: Whether the Control
- *          key was pressed. var shiftKey: Whether the Shift key was pressed.
+ * @param eventType The type of key event; one of KeyAJAXEvent.EventType.
+ * @param code The key code.
+ * @param altKey Whether the Alt key was pressed.
+ * @param controlKey Whether the Control key was pressed.
+ * @param shiftKey Whether the Shift key was pressed.
+ * @property code The key code.
+ * @property eventType. The type of key event; one of KeyAJAXEvent.EventType.
+ * @property altKey Whether the Alt key was pressed.
+ * @property controlKey Whether the Control key was pressed.
+ * @property shiftKey Whether the Shift key was pressed.
  */
 function KeyAJAXEvent(eventType, code, altKey, controlKey, shiftKey)
 {
@@ -342,7 +358,9 @@ KeyAJAXEvent.EventType =
 /**
  * A class encapsulating debug information to send to the server.
  * @param level The level of debug reporting.
- * @param text The text to log. var level: The level of debug reporting. var text: The text to log.
+ * @param text The text to log.
+ * @property level The level of debug reporting.
+ * @property text The text to log.
  */
 function LogAJAXEvent(level, text)
 {
@@ -352,22 +370,26 @@ function LogAJAXEvent(level, text)
 
 /**
  * A class encapsulating mouse information for an AJAX request.
- * @param eventType: The type of mouse event; one of MouseAJAXEvent.EventType.
- * @param component: The target component.
- * @param target: The element indicating the target of the event.
- * @param x: The horizontal position of the mouse, in absolute terms.
- * @param y: The vertical position of the mouse, in absolute terms.
- * @param altKey: Whether the Alt key was pressed.
- * @param controlKey: Whether the Control key was pressed.
- * @param shiftKey: Whether the Shift key was pressed.
- * @param button: The optional W3C code for the button that was clicked (defaults to -1).
- * @param clickCount: The optional number of clicks, such as 1 for single click or 2 for double-click (defaults to 0).
- *          var eventType: The type of mouse event; one of MouseAJAXEvent.EventType. var componentID: The ID of the
- *          target component. var componentBounds: The rectangle of the component. var targetID: The ID of the target
- *          element. var targetBounds: The rectangle of the target element. var viewportBounds: the absolute bounds of
- *          the viewport. var mousePosition: The position of the mouse relative to the viewport. var altKey: Whether the
- *          Alt key was pressed. var controlKey: Whether the Control key was pressed. var shiftKey: Whether the Shift
- *          key was pressed.
+ * @param eventType The type of mouse event; one of MouseAJAXEvent.EventType.
+ * @param component The target component.
+ * @param target The element indicating the target of the event.
+ * @param x The horizontal position of the mouse, in absolute terms.
+ * @param y The vertical position of the mouse, in absolute terms.
+ * @param altKey Whether the Alt key was pressed.
+ * @param controlKey Whether the Control key was pressed.
+ * @param shiftKey Whether the Shift key was pressed.
+ * @param button The optional W3C code for the button that was clicked (defaults to -1).
+ * @param clickCount The optional number of clicks, such as 1 for single click or 2 for double-click (defaults to 0).
+ * @property eventType The type of mouse event; one of MouseAJAXEvent.EventType.
+ * @property componentID The ID of the target component.
+ * @property componentBounds The rectangle of the component.
+ * @property targetID The ID of the target element.
+ * @property targetBounds The rectangle of the target element.
+ * @property viewportBounds the absolute bounds of the viewport.
+ * @property mousePosition The position of the mouse relative to the viewport.
+ * @property altKey Whether the Alt key was pressed.
+ * @property controlKey Whether the Control key was pressed.
+ * @property shiftKey: Whether the Shift key was pressed.
  * @param button: The W3C code for the button that was clicked, or -1 if no button was clicked.
  * @param clickCount: The number of clicks, such as 1 for single click or 2 for double-click, or 0 if no button was
  *          clicked.
@@ -400,9 +422,10 @@ MouseAJAXEvent.EventType =
 
 /**
  * A class encapsulating an AJAX response.
- * @param document: The response XML document tree.
- * @param size: The number of characters in the document. var document: The response XML document tree. var size: The
- *          number of characters in the document.
+ * @param document The response XML document tree.
+ * @param size The number of characters in the document.
+ * @property document The response XML document tree.
+ * @property size The number of characters in the document.
  */
 function AJAXResponse(document, size)
 {
@@ -410,7 +433,7 @@ function AJAXResponse(document, size)
 	this.size = size
 }
 
-var com = com || {};	//create the com.guiseframework package
+var com = com || {}; //create the com.guiseframework package
 com.guiseframework = com.guiseframework || {};
 
 //Guise
@@ -450,6 +473,12 @@ com.guiseframework.Guise = function()
 	this._flashFunctions = new Array();
 
 	/**
+	 * The number of TinyMCE instances created. Sometimes <code>tinyMCE.editors.length</code> has been seen to be zero
+	 * on some platforms when TinyMCE is in a dialog.
+	 */
+	this._tinyMCECount = 0;
+
+	/**
 	 * The hidden IFrame target that receives the results of file uploads, or null if the upload IFrame hasn't yet been
 	 * created.
 	 */
@@ -458,10 +487,10 @@ com.guiseframework.Guise = function()
 	/** Whether Guise AJAX communication is enabled. */
 	this._enabled = GUISE_AJAX_ENABLED;
 
-	/** The poll interval timer ID, or null if polling is not occuring. */
+	/** The poll interval timer ID, or null if polling is not occurring. */
 	this._pollIntervalID = null;
 
-	/** The current poll interval, in milleseconds, or -1 if polling is not enabled. */
+	/** The current poll interval, in milliseconds, or -1 if polling is not enabled. */
 	this._pollInterval = -1;
 
 	/**
@@ -655,8 +684,9 @@ com.guiseframework.Guise = function()
 		};
 
 		/**
-		 * Sets the interval for polling the server. If polling is already occuring at the given interval, no action occurs.
-		 * @param pollInterval The new poll interval, in milleseconds, or -1 if polling should not be enabled.
+		 * Sets the interval for polling the server. If polling is already occurring at the given interval, no action
+		 * occurs.
+		 * @param pollInterval The new poll interval, in milliseconds, or -1 if polling should not be enabled.
 		 */
 		proto.setPollInterval = function(pollInterval)
 		{
@@ -1071,11 +1101,11 @@ com.guiseframework.Guise = function()
 																				break;
 										*/
 										case this.ResponseElement.COMMAND: //command
-										//TODO del alert("this is a remove");
+											//TODO del alert("this is a remove");
 											this._processCommand(childNode);
 											break;
 										case this.ResponseElement.REMOVE: //remove
-										//TODO del alert("this is a remove");
+											//TODO del alert("this is a remove");
 											this._processRemove(childNode); //remove the elements from the document with this removal element
 											break;
 										case this.ResponseElement.NAVIGATE: //navigate
@@ -1893,14 +1923,14 @@ com.guiseframework.Guise = function()
 							//see which type of child node this is
 							{
 								case Node.ELEMENT_NODE: //element
-								/*TODO del
-																	if(oldChildNode.id=="id1a-child")	//TODO del
-																	{
-								//TODO del										alert("ready to update old element: "+DOMUtilities.getNodeString(oldChildNode));
-																		alert("ready to update old element: "+oldChildNode.getAttribute("guise:contentHash"));
-																		alert("ready to update new element: "+childNode.getAttribute("guise:contentHash"));
-																	}
-								*/
+									/*TODO del
+																		if(oldChildNode.id=="id1a-child")	//TODO del
+																		{
+									//TODO del										alert("ready to update old element: "+DOMUtilities.getNodeString(oldChildNode));
+																			alert("ready to update old element: "+oldChildNode.getAttribute("guise:contentHash"));
+																			alert("ready to update new element: "+childNode.getAttribute("guise:contentHash"));
+																		}
+									*/
 
 									this._synchronizeElement(oldChildNode, childNode); //synchronize these elements
 									break;
@@ -1990,7 +2020,8 @@ com.guiseframework.Guise = function()
 		/**
 		 * Synchronizes the literal style of an element.
 		 * @param oldElement The old version of the element.
-		 * @param attributeValue The new literal value of the style attribute, which may be null or the empty string.
+		 * @param attributeValue The new literal value of the style attribute, which may be <code>null</code> or the empty
+		 *          string.
 		 */
 		proto._synchronizeElementStyle = function(oldElement, attributeValue) //TODO del comment: do extra checks for attributeValue; sometimes when the server sends all border widths of 0px, the browser will change this to a single shortcut border width of 0px
 		{
@@ -2150,7 +2181,9 @@ com.guiseframework.Guise = function()
 						"theme_advanced_buttons3" : "removeformat,|,visualaid,|,hr,|,charmap,|,tablecontrols,|,code",
 						"extended_valid_elements" : "-table[border|cellspacing|cellpadding|width|frame|rules|height|align|summary|bgcolor|background|bordercolor]", //TODO remove when TinyMCE 3.2.7 removes default border attribute in distribution
 						"invalid_elements" : "applet,embed,meta,noscript,object,script", //keep out dangerous or inappropriate HTML; see http://www.feedparser.org/docs/html-sanitization.html
-						"entity_encoding" : "raw" //don't perform entity encoding except for necessary XML characters; XHTML by default doesn't understand HTML entities, and numeric encoding would encur an unnecessary slowdown
+						"entity_encoding" : "raw", //don't perform entity encoding except for necessary XML characters; XHTML by default doesn't understand HTML entities, and numeric encoding would encur an unnecessary slowdown
+						onchange_callback : this._onTinyMCEChange.bind(this)
+					//configure the change callback on the global TinyMCE configuration scale
 					});
 
 			this._initializeNode(document.documentElement, true, true); //initialize the document tree, indicating that this is the first initialization
@@ -2661,9 +2694,10 @@ com.guiseframework.Guise = function()
 			this._modalLayer.style.display = oldModalLayerDisplay; //show the modal layer, if it was visible before
 		};
 
-		/*Sets the busy indicator visible or hidden.
-		@param busyVisible A boolean indication of whether the busy indicator should be visible.
-		*/
+		/**
+		 * Sets the busy indicator visible or hidden.
+		 * @param busyVisible A boolean indication of whether the busy indicator should be visible.
+		 */
 		proto.setBusyVisible = function(busyVisible)
 		{
 			if(busyVisible != this._isBusyVisible) //if the busy visibility is changing
@@ -2736,7 +2770,8 @@ com.guiseframework.Guise = function()
 		 * @param node The node to initialize.
 		 * @param deep true if the entire hierarchy should be initialized.
 		 * @param initialInitialization true if this is the first initialization of the entire page.
-		 * @return true if initialization was successful, else false if the node should be deleted.
+		 * @return <code>true</code> if initialization was successful, else <code>false</code> if the node should be
+		 *         deleted.
 		 */
 		proto._initializeNode = function(node, deep, initialInitialization)
 		{
@@ -2859,8 +2894,8 @@ com.guiseframework.Guise = function()
 										//dynamic loading TinyMCE via eval() gets an error and sometimes crashes Firefox
 										var editor = new tinymce.Editor(node.id, tinyMCE.settings); //create a new TinyMCE editor
 										editor.componentID = componentID; //indicate the Guise component ID of the editor
-										editor.onChange.add(this._onTinyMCEChange.bind(this));
 										editor.render();
+										this._tinyMCECount++;	//show that we have another tinyMCE instance
 									}
 								}
 							}
@@ -3032,6 +3067,7 @@ com.guiseframework.Guise = function()
 							if(contentType == "application/xhtml+xml-external-parsed-entity") //if this is an XHTML fragment
 							{
 								tinyMCE.execCommand('mceRemoveControl', false, node.id); //remove TinyMCE
+								this._tinyMCECount--;	//show that we removed a tinyMCE instance
 							}
 							break;
 					}
@@ -3154,10 +3190,11 @@ com.guiseframework.Guise = function()
 
 		/**
 		 * Called when the TinyMCE editor content changes.
-		 * @see http://wiki.moxiecode.com/index.php/TinyMCE:API/tinymce.Editor/onChange
+		 * @see http://www.tinymce.com/wiki.php/Configuration:onchange_callback
 		 */
-		proto._onTinyMCEChange = function(editor, undoLevel, undoManager)
+		proto._onTinyMCEChange = function(editor)
 		{
+			console.log("TinyMCE change");
 			if(guise.isEnabled()) //if AJAX is enabled
 			{
 				//TODO fix				textInput.removeAttribute("guise:attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
@@ -3538,9 +3575,10 @@ function onLinkClick(event)
  */
 function onAction(event)
 {
-	if(isUserAgentIE/*TODO find out why this is zero when TinyMCE is in a dialog: && tinyMCE.editors.length>0*/) //on IE if there are TinyMCE editors in use, make sure their changes are saved before performing any action, because TinyMCE doesn't trigger a change when focus is lost on IE 
+	//make sure tinyMCE changes are saved before performing any action, because TinyMCE doesn't trigger a change anymore when focus is lost (this used to happen only on IE)
+	if(guise._tinyMCECount>0) //if there are TinyMCE editors in use 
 	{
-		tinyMCE.triggerSave();
+		tinyMCE.triggerSave();	//trigger a save of all tinyMCE data being edited
 	}
 	/*TODO FCKeditor
 		if(typeof FCKeditorAPI!="undefined")
@@ -4134,7 +4172,7 @@ function onMouse(event)
 		//see which type of mouse event this is
 		{
 			case "mouseover": //if we are entering a component
-			//console.log("got mouse over component ID ", componentID, " mouseOverComponentIDs: ", JSON.serialize(mouseOverComponentIDs));
+				//console.log("got mouse over component ID ", componentID, " mouseOverComponentIDs: ", JSON.serialize(mouseOverComponentIDs));
 				var ancestorComponents = Node.getAncestorElementsByClassName(component, STYLES.COMPONENT); //get an array of all ancestor components, including this component, in current-to-root order
 				//guise.trace("got mouse over component ID: ", componentID, "with ancestor component count", ancestorComponents.length, "will look up to to target", currentTarget.id);
 				for( var i = ancestorComponents.length - 1; i >= 0; --i) //for each ancestor, from root to this one
@@ -4161,7 +4199,7 @@ function onMouse(event)
 				//console.log("finished mouse over, mouseOverComponentIDs: ", JSON.serialize(mouseOverComponentIDs));
 				break;
 			case "mouseout": //if we are leaving a component
-			//console.log("got mouse out of component ID ", componentID, " other component ID ", (otherComponent!=null ? otherComponent.id : "none"), " mouseOverComponentIDs: ", JSON.serialize(mouseOverComponentIDs));
+				//console.log("got mouse out of component ID ", componentID, " other component ID ", (otherComponent!=null ? otherComponent.id : "none"), " mouseOverComponentIDs: ", JSON.serialize(mouseOverComponentIDs));
 				var ancestorComponents = Node.getAncestorElementsByClassName(component, STYLES.COMPONENT); //get an array of all ancestor components, including this component, in current-to-root order
 				//console.log("mouse really leaving hierarchy, ancestor components number ", ancestorComponents.length);
 				for( var i = 0, length = ancestorComponents.length; i < length; ++i) //for each ancestor, from this one to root
@@ -4301,10 +4339,11 @@ function getFocusableDescendant(node)
 /**
  * An abstract effect base class. Child classes should implement _doEffect() to perform the effect.
  * @param element The element on which the effect will be performed.
- * @param delay The delay before the effect should begin. var effectBegin The function indicating what should occur at
- *          the beginning of the effect, after the delay, or null if there is no effect begin function. var effectEnd
- *          The function indicating what should occur at the end of the effect, or null if there is no effect end
- *          function.
+ * @param delay The delay before the effect should begin.
+ * @property effectBegin The function indicating what should occur at the beginning of the effect, after the delay, or
+ *           <code>null</code> if there is no effect begin function.
+ * @property effectEnd The function indicating what should occur at the end of the effect, or <code>null</code> if
+ *           there is no effect end function.
  */
 function AbstractEffect(element, delay)
 {
@@ -4362,10 +4401,11 @@ function AbstractEffect(element, delay)
 /**
  * A delay effect.
  * @param element The element on which the delay will be performed.
- * @param delay The delay before the effect should begin. var effectBegin The function indicating what should occur at
- *          the beginning of the effect, after the delay, or null if there is no effect begin function. var effectEnd
- *          The function indicating what should occur at the end of the effect, or null if there is no effect end
- *          function.
+ * @param delay The delay before the effect should begin.
+ * @property effectBegin The function indicating what should occur at the beginning of the effect, after the delay, or
+ *           <code>null</code> if there is no effect begin function.
+ * @property effectEnd The function indicating what should occur at the end of the effect, or <code>null</code> if
+ *           there is no effect end function.
  */
 function DelayEffect(element, delay) //extends AbstractEffect
 {
@@ -4385,10 +4425,11 @@ function DelayEffect(element, delay) //extends AbstractEffect
 /**
  * An effect for fading an element using opacity.
  * @param element The element on which the delay will be performed.
- * @param delay The delay before the effect should begin. var effectBegin The function indicating what should occur at
- *          the beginning of the effect, after the delay, or null if there is no effect begin function. var effectEnd
- *          The function indicating what should occur at the end of the effect, or null if there is no effect end
- *          function.
+ * @param delay The delay before the effect should begin.
+ * @property effectBegin The function indicating what should occur at the beginning of the effect, after the delay, or
+ *           <code>null</code> if there is no effect begin function.
+ * @property effectEnd The function indicating what should occur at the end of the effect, or <code>null</code> if
+ *           there is no effect end function.
  */
 function OpacityFadeEffect(element, delay) //extends AbstractEffect
 {
