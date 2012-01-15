@@ -321,6 +321,7 @@ public class Theme extends URFListResource<Rule>
 	public final static String LABEL_RENAME_X=createStringResourceReference("theme.label.rename.x");
 	public final static String LABEL_RESOURCE=createStringResourceReference("theme.label.resource");
 	public final static String LABEL_RETRY=createStringResourceReference("theme.label.retry");
+	public final static String LABEL_SAVE=createStringResourceReference("theme.label.save");
 	public final static String LABEL_SORT=createStringResourceReference("theme.label.sort");
 	public final static String LABEL_START=createStringResourceReference("theme.label.start");
 	public final static String LABEL_STOP=createStringResourceReference("theme.label.stop");
@@ -420,6 +421,7 @@ public class Theme extends URFListResource<Rule>
 	public final static URI GLYPH_RENAME=createURIResourceReference("theme.glyph.rename");
 	public final static URI GLYPH_RESOURCE=createURIResourceReference("theme.glyph.resource");
 	public final static URI GLYPH_RETRY=createURIResourceReference("theme.glyph.retry");
+	public final static URI GLYPH_SAVE=createURIResourceReference("theme.glyph.save");
 	public final static URI GLYPH_SELECTED=createURIResourceReference("theme.glyph.selected");
 	public final static URI GLYPH_SORT=createURIResourceReference("theme.glyph.sort");
 	public final static URI GLYPH_SPEECH_BUBBLE=createURIResourceReference("theme.glyph.speech.bubble");

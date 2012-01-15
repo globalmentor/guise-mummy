@@ -181,6 +181,7 @@
 		"theme.label.rename.x"="\“theme.label.rename\” {0}"
 		"theme.label.resource"="Resource"
 		"theme.label.retry"="Retry"
+		"theme.label.save"="Save"
 		"theme.label.sort"="Sort"
 		"theme.label.start"="Start"
 		"theme.label.stop"="Stop"
@@ -281,6 +282,7 @@
 		"theme.glyph.reject.multiple"=<images/icons/glyphs/reject_multiple.gif>
 		"theme.glyph.resource"=<images/icons/glyphs/resource.gif>
 		"theme.glyph.retry"=<images/icons/glyphs/retry.gif>
+		"theme.glyph.save"=<images/icons/glyphs/save.gif>
 		"theme.glyph.selected"=<images/icons/glyphs/hand_point_right.gif>
 		"theme.glyph.sort"=<images/icons/glyphs/sort.gif>
 		"theme.glyph.speech.bubble"=<images/icons/glyphs/speech_bubble.gif>
