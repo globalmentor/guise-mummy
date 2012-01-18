@@ -399,7 +399,7 @@ var JSON =
 		{
 			throw "Invalid JSON expression: " + json;
 		}
-		return eval("(" + json + ")"); //evaluate and return the JSON expresion
+		return eval("(" + json + ")"); //evaluate and return the JSON expression
 	},
 
 	/**
@@ -572,30 +572,138 @@ function Size(width, height)
 	this.height = height;
 }
 
-//URI
+//MIME Content Type
 
+/**
+ * A class for parsing and encapsulating a MIME content type according to RFC 2045, "Multipurpose Internet Mail
+ * Extensions - (MIME) Part One: Format of Internet Message Bodies".
+ * 
+ * @param string The string form of the MIME content type.
+ * @property type The top-level type of the content type.
+ * @property subType The sub-type of the content type.
+ * @property parameters An associative array of parameter name/value combinations.
+ * @see <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045 - Multipurpose Internet Mail Extensions - (MIME) Part
+ *      One: Format of Internet Message Bodies</a>
+ */
+function ContentType(string, _skipTest)
+{
+	this._string=string;
+	if(!ContentType.prototype._initialized)
+	{
+		ContentType.prototype._initialized = true;
+
+		/**
+		 * Determines if this content matches the given type and subtype.
+		 * @property type The top-level type of the content type.
+		 * @property subType The sub-type of the content type, or <code>null</code> if only the type should be compared.
+		 * @return <code>true</code> if this content type has the same type and optionally subtype.
+		 */
+		ContentType.prototype.match = function(type, subType)
+		{
+			return this.type == type && (!subType || this.subType == subType);
+		};
+
+		/** @return <code>true</code> if this content type represents some sort of audio content. */
+		ContentType.prototype.isAudio = function()
+		{
+			if(this.type == "audio") //audio/* is always audio
+			{
+				return true;
+			}
+			if(this.match("application", "ogg")) //application/ogg is also audio
+			{
+				return true;
+			}
+			return false;
+		};
+
+		/** @returns The string version of the content type. */
+		ContentType.prototype.toString = function()
+		{
+			return this._string; //return the string
+		};
+	}
+	if(!_skipTest) //if we shouldn't skip testing
+	{
+		if(ContentType.REGEXP.test(string)) //split out the components of the content type using a regular expression; if the string is not a content type
+		{
+			throw "Invalid MIME content type: " + string;
+		}
+	}
+	this.type = RegExp.$1; //save the content type components
+	this.subType = RegExp.$2;
+	var param = RegExp.$4;
+	this.parameters = new Object(); //create a new associative array to hold parameters
+	if(param) //if there are parameters
+	{
+		var parameterComponents = param.split("\s*&\s*"); //split up the parameter components
+		var parameterCount = parameterComponents.length; //find out how many parameters there are
+		for( var i = 0; i < parameterCount; ++i) //for each parameter
+		{
+			var parameterComponents = parameterComponents[i].split("="); //split out the parameter components
+			var parameterName = parameterComponents[0]; //get the parameter name
+			var parameterValue = parameterComponents.length > 1 ? parameterComponents[1] : null; //get the parameter value
+			this.parameters[parameterName] = parameterValue; //store this parameter name/value combination
+		}
+	}
+}
+
+/** The regular expression for parsing URIs, adapted from http://www.ietf.org/rfc/rfc2045.txt . */
+ContentType.REGEXP = /^(\w+)\/(\w+)(;\s*(\S*)\s*)?/;
+
+/**
+ * Tests the given string to see if it meets the requirements for a MIME content type, returning a content type
+ * instance.
+ * @param string The string form of the content type.
+ * @return A new content type instance from the parsed string, or <code>null</code> if the given string is not a valid
+ *         content type.
+ */
+ContentType.test = function(string)
+{
+	if(!ContentType.REGEXP.test(string)) //split out the components of the content type using a regular expression; if the string is not a content type
+	{
+		return false;
+	}
+	return new ContentType(string, true); //create a new content type; don't test twice 
+};
+
+//URI
 /**
  * A class for parsing and encapsulating a URI according to RFC 2396, "Uniform Resource Identifiers (URI): Generic
  * Syntax".
  * 
- * @param uriString The string form of the URI.
- * @see <a href="http://www.ietf.org/rfc/rfc2396.txt">RFC 2396</a>
+ * @param string The string form of the URI.
+ * @param _skipTest Whether the URI regular expression has already been tested and parsing should continue with the
+ *          latest regular expression results; for internal use only.
+ * @throws if the given string is not a valid URI (if _skipText is <code>false</code>).
  * @property scheme The scheme of the URI.
  * @property authority The authority of the URI.
  * @property path The path of the URI.
  * @property query The query of the URI.
  * @property fragment The fragment of the URI.
  * @property parameters An associative array of parameter name/value combinations.
+ * @see <a href="http://www.ietf.org/rfc/rfc2396.txt">RFC 2396 - Uniform Resource Identifiers (URI): Generic Syntax</a>
  */
-function URI(uriString)
+function URI(string, _skipTest)
 {
+	this._string=string
 	if(!URI.prototype._initialized)
 	{
 		URI.prototype._initialized = true;
 
-		URI.prototype.URI_REGEXP = /^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/; //the regular expression for parsing URIs, from http://www.ietf.org/rfc/rfc2396.txt
+		/** @returns The string version of the URI. */
+		URI.prototype.toString = function()
+		{
+			return this._string; //return the string
+		};
 	}
-	this.URI_REGEXP.test(uriString); //split out the components of the URI using a regular expression
+	if(!_skipTest) //if we shouldn't skip testing
+	{
+		if(URI.REGEXP.test(string)) //split out the components of the URI using a regular expression; if the string is not a URI
+		{
+			throw "Invalid URI: " + string;
+		}
+	}
 	this.scheme = RegExp.$2; //save the URI components
 	this.authority = RegExp.$4;
 	this.path = RegExp.$5;
@@ -615,6 +723,23 @@ function URI(uriString)
 	}
 	this.fragment = RegExp.$9;
 }
+
+/** The regular expression for parsing URIs, from http://www.ietf.org/rfc/rfc2396.txt . */
+URI.REGEXP = /^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/;
+
+/**
+ * Tests the given string to see if it meets the requirements for a URI, returning a URI instance.
+ * @param string The string form of the URI.
+ * @return A new URI instance from the parsed string, or <code>null</code> if the given string is not a valid URI.
+ */
+URI.test = function(string)
+{
+	if(!URI.REGEXP.test(string)) //split out the components of the URI using a regular expression; if the string is not a URI
+	{
+		return false;
+	}
+	return new URI(string, true); //create a new URI; don't test twice 
+};
 
 //Console
 

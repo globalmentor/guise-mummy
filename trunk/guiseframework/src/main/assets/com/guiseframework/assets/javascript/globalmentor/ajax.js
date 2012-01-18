@@ -34,7 +34,7 @@ com.globalmentor.ajax = com.globalmentor.ajax || {};
  * references a function to call for asynchronous HTTP requests, or <code>null</code> if HTTP communication should be
  * synchronous.
  */
-com.globalmentor.ajax.HTTPCommunicator=function()
+com.globalmentor.ajax.HTTPCommunicator = function()
 {
 	/** The reference to the current XMLHTTP request object, or null if no communication is occurring. */
 	this.xmlHTTP = null;
@@ -263,7 +263,7 @@ com.globalmentor.ajax.HTTPCommunicator=function()
 				this.xmlHTTP = null; //remove the XML HTTP request object (Firefox only allows one asynchronous communication per object)
 				//if there is returned XML, but the returned XML's DOM doesn't support element.getAttributeNS()
 				//(IE9, for example, has DOM namespace support in the "text/html" web page document, but not the "text/xml" response XML)
-				if(xmlHTTP.responseXML && !xmlHTTP.responseXML.documentElement.getAttributeNS)
+				if(xmlHTTP.responseXML && xmlHTTP.responseXML.documentElement && !xmlHTTP.responseXML.documentElement.getAttributeNS)
 				{
 					Element.getAttributeNS = Element.getAttributeNSCustom; //switch to using our own custom routines for all DOM access, both web page and response XML
 					if(document.documentElement.getAttributeNS) //if the document supports namespaces but our response XML doesn't (e.g. IE9), importNode() won't work---so use our own

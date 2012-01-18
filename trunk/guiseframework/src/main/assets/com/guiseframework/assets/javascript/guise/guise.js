@@ -461,8 +461,8 @@ com.guiseframework.Guise = function()
 	this.processingAJAXResponses = false;
 
 	/**
-	 * The Guise support Flash, or null if the support Flash has not yet been embedded; the executeFlash() method should
-	 * be used to lazily create the Flash object if needed.
+	 * The Guise support Flash, or <code>null</code> if the support Flash has not yet been embedded; the executeFlash()
+	 * method should be used to lazily create the Flash object if needed.
 	 */
 	this._flash = null;
 
@@ -740,7 +740,7 @@ com.guiseframework.Guise = function()
 		 */
 		proto.processAJAXRequests = function()
 		{
-			//see if the communicator is not busy (if it is busy, we're in asychronous mode and the end of the processing this method will be called again to check for new requests)
+			//see if the communicator is not busy (if it is busy, we're in asynchronous mode and the end of the processing this method will be called again to check for new requests)
 			if(!this.httpCommunicator.isCommunicating() && !this.processingAJAXRequests && this.ajaxRequests.length > 0) //if we aren't processing AJAX requests or communicating with the server, and there are requests queued TODO fix small race condition in determining whether processing is occurring
 			{
 				this.processingAJAXRequests = true; //we are processing AJAX requests now
@@ -1031,7 +1031,7 @@ com.guiseframework.Guise = function()
 				else
 				//if there was an HTTP error TODO check for redirects
 				{
-					//TODO fix		throw xmlHTTP.status;	//throw the status code
+					console.error("Guise HTTP communication error ", xmlHTTP.status, ": ", xmlHTTP.statusText);
 				}
 			}
 			catch(exception) //if a problem occurred
@@ -1281,6 +1281,45 @@ com.guiseframework.Guise = function()
 						delete file.httpRequest; //remove the HTTP request from the file
 					}
 				}
+			}
+		};
+
+		/**
+		 * Plays an audio file.
+		 * <p>
+		 * This method attempts to play audio via an HTML5 audio element. If the browser doesn't natively support audio or
+		 * doesn't support the content type (if given), Flash is used if the content type is supported by Flash.
+		 * </p>
+		 * @param uri The URI of the audio file to play.
+		 * @param contentType The object of type ContentType indicating the MIME type of the audio.
+		 * @param The ID to use for the audio, or <code>null</code> if no ID is known.
+		 */
+		proto.playAudio = function(uri, contentType, id)
+		{
+			//TODO fix content type
+			id = id || uri; //if we weren't given an ID, use the URI for the ID
+			//TODO fix			var audioElement = document.createElementNS("http://www.w3.org/1999/xhtml", "audio");
+			var audioElement = document.createElement("audio");
+			//if HTML5 audio of this type is supported
+			if(audioElement != null && audioElement.canPlayType && audioElement.canPlayType(contentType.toString()))
+			{
+				console.info("Audio " + uri + " of type " + contentType + " is supported."); //TODO del
+				audioElement.src = uri; //set the source of the audio
+				audioElement.play(); //play the audio
+			}
+			//if HTML5 audio is not supported, or this content type is not supported,
+			//but Flash supports it (MP3 or AAC); see http://kb2.adobe.com/cps/402/kb402866.html
+			else if(contentType.match("audio", "mpeg") /*TODO fix || contentType.match("audio", "wav")*/ || contentType.match("audio", "aac"))
+			{
+				console.info("Audio " + uri + " of type " + contentType + " is supported on Flash."); //TODO del
+				this.executeFlash(function(flash) //play the sound using Flash
+				{
+					flash.playSound(id, uri);
+				});
+			}
+			else
+			{
+				console.error("Audio " + uri + " of type " + contentType + " is not supported on your system.");
 			}
 		};
 
@@ -2341,6 +2380,21 @@ com.guiseframework.Guise = function()
 		}
 
 		/**
+		 * Called when a link is clicked that should play audio. The anchor element itself need not actually describe any
+		 * audio.
+		 * @param uri The URI of the audio to play.
+		 * @param id The ID of the audio to play, or <code>null</code> if no ID is known.
+		 * @param contentType The object of type ContentType indicating the MIME type of the audio.
+		 * @param event The object describing the event.
+		 */
+		proto._onAudioLinkClick = function(uri, contentType, id, event)
+		{
+			event.stopPropagation(); //tell the event to stop bubbling
+			event.preventDefault(); //prevent the default functionality from occurring
+			this.playAudio(uri, contentType, id); //play the audio
+		}
+
+		/**
 		 * Called when the window scrolls. Note that Firefox 1.0.7 calls this method even when a scrollable element scrolls;
 		 * this problem is fixed in Firefox 1.5.
 		 * @param event The object containing event information.
@@ -2779,9 +2833,7 @@ com.guiseframework.Guise = function()
 			//see which type of child node this is
 			{
 				case Node.ELEMENT_NODE: //element
-					//TODO fix with something else to give IE layout			node["contentEditable"]=false;	//for IE 6, give the component "layout" so that things like opacity will work
 					//TODO bring back after giving all relevant nodes IDs			if(node.id)	//only look at element swith IDs
-					//TODO this may allow "layout" for IE, but only do it when we need it (otherwise it will screw up buttons and such)			node.style.zoom=1;	//TODO testing
 				{
 					var elementName = node.nodeName.toLowerCase(); //get the element name
 					var elementClassName = node.className; //get the element class name
@@ -2795,6 +2847,19 @@ com.guiseframework.Guise = function()
 								if(!node.getAttribute("target")) //if the link has no target (the target wouldn't work if we tried to take over the events; we can't just check for null because IE will always send back at least "")
 								{
 									com.globalmentor.dom.EventManager.addEvent(node, "click", onLinkClick, false); //listen for anchor clicks 
+								}
+							}
+							else
+							//if this is not a Guise control
+							{
+								if(node.getAttribute("rel") == "alternate") //if this is an alternate link, see if we can patch in some special functionality for certain types of alternate
+								{
+									var href = node.getAttribute("href");
+									var contentType = ContentType.test(node.getAttribute("type")); //see if there is a content type provided
+									if(href && contentType && contentType.isAudio())
+									{
+										com.globalmentor.dom.EventManager.addEvent(node, "click", this._onAudioLinkClick.bind(this, href, contentType, href), false); //play audio when the link is clicked; use the href as the ID 
+									}
 								}
 							}
 							break;
@@ -2895,7 +2960,7 @@ com.guiseframework.Guise = function()
 										var editor = new tinymce.Editor(node.id, tinyMCE.settings); //create a new TinyMCE editor
 										editor.componentID = componentID; //indicate the Guise component ID of the editor
 										editor.render();
-										this._tinyMCECount++;	//show that we have another tinyMCE instance
+										this._tinyMCECount++; //show that we have another tinyMCE instance
 									}
 								}
 							}
@@ -3067,7 +3132,7 @@ com.guiseframework.Guise = function()
 							if(contentType == "application/xhtml+xml-external-parsed-entity") //if this is an XHTML fragment
 							{
 								tinyMCE.execCommand('mceRemoveControl', false, node.id); //remove TinyMCE
-								this._tinyMCECount--;	//show that we removed a tinyMCE instance
+								this._tinyMCECount--; //show that we removed a tinyMCE instance
 							}
 							break;
 					}
@@ -3194,11 +3259,10 @@ com.guiseframework.Guise = function()
 		 */
 		proto._onTinyMCEChange = function(editor)
 		{
-			console.log("TinyMCE change");
-			if(guise.isEnabled()) //if AJAX is enabled
+			if(this.isEnabled()) //if AJAX is enabled
 			{
 				//TODO fix				textInput.removeAttribute("guise:attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
-				//TODO fix				guise.invalidateAncestorContent(editor);	//indicate that the ancestors now have different content TODO make sure this works with the editor
+				//TODO fix				this.invalidateAncestorContent(editor);	//indicate that the ancestors now have different content TODO make sure this works with the editor
 				var ajaxRequest = new ChangeAJAXEvent(editor.componentID, new Map("value", editor.getContent())); //create a new property change event with the Guise component ID and the new value
 				this.sendAJAXRequest(ajaxRequest); //send the AJAX request
 			}
@@ -3211,12 +3275,12 @@ com.guiseframework.Guise = function()
 		/*TODO FCKeditor
 				proto._onFCKeditorBlur=function(editor)
 				{
-					if(guise.isEnabled())	//if AJAX is enabled
+					if(this.isEnabled())	//if AJAX is enabled
 					{
 						if(editor.IsDirty())	//only report new content if the content changed
 						{
 		//TODO fix				textInput.removeAttribute("guise:attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
-		//TODO fix				guise.invalidateAncestorContent(editor);	//indicate that the ancestors now have different content TODO make sure this works with the editor
+		//TODO fix				this.invalidateAncestorContent(editor);	//indicate that the ancestors now have different content TODO make sure this works with the editor
 							editor.ResetIsDirty();	//TODO testing
 							var ajaxRequest=new ChangeAJAXEvent(editor.Name, new Map("value", editor.GetData(true)));	//create a new property change event with the Guise component ID and the new value
 							this.sendAJAXRequest(ajaxRequest);	//send the AJAX request
@@ -3257,7 +3321,10 @@ com.guiseframework.Guise = function()
 		proto._onSoundStateChange = function(soundID, oldState, newState)
 		{
 			//alert("sound state changed for sound "+soundID+" new state "+newState);
-			this.sendAJAXRequest(new ChangeAJAXEvent(soundID, new Map("state", newState))); //send an AJAX request with the new sound state
+			if(soundID.startsWith("id")) //if the sound ID is a Guise ID (we might be playing a local non-Guise sound) TODO fix with dummy prefix for local IDs
+			{
+				this.sendAJAXRequest(new ChangeAJAXEvent(soundID, new Map("state", newState))); //send an AJAX request with the new sound state
+			}
 		};
 
 		/**
@@ -3268,7 +3335,10 @@ com.guiseframework.Guise = function()
 		 */
 		proto._onSoundPositionChange = function(soundID, position, duration)
 		{
-			this.sendAJAXRequest(new ChangeAJAXEvent(soundID, new Map("position", position, "duration", duration))); //send an AJAX request with the new sound position and duration
+			if(soundID.startsWith("id")) //if the sound ID is a Guise ID (we might be playing a local non-Guise sound) TODO fix with dummy prefix for local IDs
+			{
+				this.sendAJAXRequest(new ChangeAJAXEvent(soundID, new Map("position", position, "duration", duration))); //send an AJAX request with the new sound position and duration
+			}
 		};
 
 		/**
@@ -3576,9 +3646,9 @@ function onLinkClick(event)
 function onAction(event)
 {
 	//make sure tinyMCE changes are saved before performing any action, because TinyMCE doesn't trigger a change anymore when focus is lost (this used to happen only on IE)
-	if(guise._tinyMCECount>0) //if there are TinyMCE editors in use 
+	if(guise._tinyMCECount > 0) //if there are TinyMCE editors in use 
 	{
-		tinyMCE.triggerSave();	//trigger a save of all tinyMCE data being edited
+		tinyMCE.triggerSave(); //trigger a save of all tinyMCE data being edited
 	}
 	/*TODO FCKeditor
 		if(typeof FCKeditorAPI!="undefined")
