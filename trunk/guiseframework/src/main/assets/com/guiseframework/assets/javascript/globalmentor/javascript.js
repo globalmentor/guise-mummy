@@ -587,7 +587,7 @@ function Size(width, height)
  */
 function ContentType(string, _skipTest)
 {
-	this._string=string;
+	this._string = string;
 	if(!ContentType.prototype._initialized)
 	{
 		ContentType.prototype._initialized = true;
@@ -625,7 +625,7 @@ function ContentType(string, _skipTest)
 	}
 	if(!_skipTest) //if we shouldn't skip testing
 	{
-		if(ContentType.REGEXP.test(string)) //split out the components of the content type using a regular expression; if the string is not a content type
+		if(!ContentType.REGEXP.test(string)) //split out the components of the content type using a regular expression; if the string is not a content type
 		{
 			throw "Invalid MIME content type: " + string;
 		}
@@ -686,7 +686,7 @@ ContentType.test = function(string)
  */
 function URI(string, _skipTest)
 {
-	this._string=string
+	this._string = string
 	if(!URI.prototype._initialized)
 	{
 		URI.prototype._initialized = true;

@@ -121,6 +121,8 @@
 var isUserAgentFirefox = navigator.userAgentName == "Firefox";
 /** See if the browser is IE. */
 var isUserAgentIE = navigator.userAgentName == "MSIE";
+/** See if the browser is Chrome. */
+var isUserAgentChrome = !!window.chrome;
 
 /** Whether Guise AJAX communication is initially enabled. */
 var GUISE_AJAX_ENABLED = true;
@@ -1291,31 +1293,34 @@ com.guiseframework.Guise = function()
 		 * doesn't support the content type (if given), Flash is used if the content type is supported by Flash.
 		 * </p>
 		 * @param uri The URI of the audio file to play.
+		 * @param id The ID of the sound to play, or <code>null</code> if the sound should be played with no playback
+		 *          control and discarded.
 		 * @param contentType The object of type ContentType indicating the MIME type of the audio.
 		 * @param The ID to use for the audio, or <code>null</code> if no ID is known.
 		 */
-		proto.playAudio = function(uri, contentType, id)
+		proto.playAudio = function(uri, id, contentType)
 		{
-			//TODO fix content type
-			id = id || uri; //if we weren't given an ID, use the URI for the ID
-			//TODO fix			var audioElement = document.createElementNS("http://www.w3.org/1999/xhtml", "audio");
-			var audioElement = document.createElement("audio");
-			//if HTML5 audio of this type is supported
-			if(audioElement != null && audioElement.canPlayType && audioElement.canPlayType(contentType.toString()))
+			var audioElement = document.createElementNS("http://www.w3.org/1999/xhtml", "audio");
+			var browserSupportsAudio = audioElement != null && audioElement.canPlayType && audioElement.canPlayType(contentType.toString()).replace(/no/, "");
+			var flashSupportsAudio = contentType.match("audio", "mpeg") || contentType.match("audio", "wav") || contentType.match("audio", "aac");
+			if(browserSupportsAudio && !id) //if the browser supports this type of audio; currently we don't support playing controlled audio natively in the browser 
 			{
-				console.info("Audio " + uri + " of type " + contentType + " is supported."); //TODO del
 				audioElement.src = uri; //set the source of the audio
 				audioElement.play(); //play the audio
 			}
-			//if HTML5 audio is not supported, or this content type is not supported,
-			//but Flash supports it (MP3 or AAC); see http://kb2.adobe.com/cps/402/kb402866.html
-			else if(contentType.match("audio", "mpeg") /*TODO fix || contentType.match("audio", "wav")*/ || contentType.match("audio", "aac"))
+			//if HTML5 audio is not supported, or this content type is not supported, or this is controlled audio (which we don't yet support using HTML5)
+			//if Flash supports it (MP3 or AAC, with WAV added); see http://kb2.adobe.com/cps/402/kb402866.html
+			else if(flashSupportsAudio)
 			{
-				console.info("Audio " + uri + " of type " + contentType + " is supported on Flash."); //TODO del
 				this.executeFlash(function(flash) //play the sound using Flash
 				{
-					flash.playSound(id, uri);
+					flash.playSound(uri, id);
 				});
+			}
+			else if(browserSupportsAudio) //if Flash doesn't support this audio, play it in the browser even if we can't control it; that's better than nothing 
+			{
+				audioElement.src = uri; //set the source of the audio
+				audioElement.play(); //play the audio
 			}
 			else
 			{
@@ -1343,10 +1348,7 @@ com.guiseframework.Guise = function()
 					}); //pause the sound
 					break;
 				case "audio-play":
-					this.executeFlash(function(flash)
-					{
-						flash.playSound(objectID, parameters["audioURI"]);
-					}); //play the sound
+					this.playAudio(parameters["uri"], objectID, parameters["type"] ? new ContentType(parameters["type"]) : null); //start playing the sound with our general play audio method, which may use the browser's capabilities if appropriate
 					break;
 				case "audio-position":
 					this.executeFlash(function(flash)
@@ -2279,9 +2281,12 @@ com.guiseframework.Guise = function()
 
 		/**
 		 * Executes a function using the Guise support Flash object. This method is necessary to lazily create the Guise
-		 * support Flash object, after which the command must be executed some time later on some platforms. We must embed
-		 * Flash dynamically at runtime because of an EOLAS patent that forced Microsoft and Opera to disable automatic
-		 * activation of Flash and other plugins. In addition, it makes page loading faster only to load Flash when needed.
+		 * support Flash object, after which the command must be executed some time later on some platforms.
+		 * <p>
+		 * At one time, we had to embed Flash dynamically at runtime because of an EOLAS patent that forced Microsoft and
+		 * Opera to disable automatic activation of Flash and other plugins. We continue to do so, even though this patent
+		 * issue is no longer relevant, because it makes page loading faster only to load Flash when needed.
+		 * </p>
 		 * Example: this.executeFlash(function(flash){flash.pauseSound(objectID);});
 		 * @param flashFunction A function to execute, taking a single parameter of the Flash support object.
 		 */
@@ -2298,7 +2303,8 @@ com.guiseframework.Guise = function()
 				guiseFlashDiv.style.top = "-9999px";
 				document.body.appendChild(guiseFlashDiv); //add the outer div to the body before adding the content, or the SWF won't register its exposed methods
 				var flashGuiseInnerHTMLStringBuilder = new StringBuilder(); //create a new string builder for creating the Flash object
-				if(isUserAgentFirefox && navigator.userAgentVersionNumber >= 3) //Firefox 3 doesn't seem to like using <object> to dynamically embed Flash
+				/*at one point Firefox 3 and perhaps other browsers only worked with <embed>
+				if(isUserAgentFirefox || isUserAgentChrome) //Firefox 3 doesn't seem to like using <object> to dynamically embed Flash
 				{
 					var embedAttributes =
 					{
@@ -2310,40 +2316,38 @@ com.guiseframework.Guise = function()
 					embedAttributes.src = GUISE_ASSETS_BASE_PATH + "flash/guise.swf?guiseVersion=" + GUISE_VERSION; //add the Guise version so an out-of-date cached version won't be used
 					DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "embed", embedAttributes); //<embed ...>
 					DOMUtilities.appendXMLEndTag(flashGuiseInnerHTMLStringBuilder, "embed"); //</embed>
+				} else { //for all other browsers (we used to do this for Firefox <3 as well) TODO replace with SWFObject when it supports XHTML
+				*/
+				var objectAttributes =
+				{
+					"id" : "guiseFlash",
+					style : "width:1px;height:1px;"
+				}; //create a map of attributes for serialization
+				if(isUserAgentIE) //if this is IE
+				{
+					objectAttributes.classid = "clsid:D27CDB6E-AE6D-11cf-96B8-444553540000";
+					var httpMethod = window.location.protocol == "https:" ? "https" : "http"; //use HTTPS if this is a secure page
+					objectAttributes.codebase = httpMethod + "://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0"; //we currently require Flash 10 or above
 				}
 				else
-				//for all other browsers, including Firefox <3 TODO replace with SWFObject when it supports XHTML
+				//if this is any other browser
 				{
-					var objectAttributes =
-					{
-						"id" : "guiseFlash",
-						style : "width:1px;height:1px;"
-					}; //create a map of attributes for serialization
-					if(isUserAgentIE) //if this is IE
-					{
-						objectAttributes.classid = "clsid:D27CDB6E-AE6D-11cf-96B8-444553540000";
-						var httpMethod = window.location.protocol == "https:" ? "https" : "http"; //use HTTPS if this is a secure page
-						objectAttributes.codebase = httpMethod + "://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0";
-					}
-					else
-					//if this is any other browser
-					{
-						objectAttributes.type = "application/x-shockwave-flash";
-						objectAttributes.data = GUISE_ASSETS_BASE_PATH + "flash/guise.swf?guiseVersion=" + GUISE_VERSION; //add the Guise version so an out-of-date cached version won't be used
-					}
-					DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "object", objectAttributes); //<object ...>
-					DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param",
-					{
-						"name" : "movie",
-						"value" : GUISE_ASSETS_BASE_PATH + "flash/guise.swf?guiseVersion=" + GUISE_VERSION
-					}, true); //<param name="movie" value="...guise.swf"/>
-					DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param",
-					{
-						"name" : "quality",
-						"value" : "high"
-					}, true); //<param name="movie" value="...guise.swf"/>
-					DOMUtilities.appendXMLEndTag(flashGuiseInnerHTMLStringBuilder, "object"); //</object>
+					objectAttributes.type = "application/x-shockwave-flash";
+					objectAttributes.data = GUISE_ASSETS_BASE_PATH + "flash/guise.swf?guiseVersion=" + GUISE_VERSION; //add the Guise version so an out-of-date cached version won't be used
 				}
+				DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "object", objectAttributes); //<object ...>
+				DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param",
+				{
+					"name" : "movie",
+					"value" : GUISE_ASSETS_BASE_PATH + "flash/guise.swf?guiseVersion=" + GUISE_VERSION
+				}, true); //<param name="movie" value="...guise.swf"/>
+				DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param",
+				{
+					"name" : "quality",
+					"value" : "high"
+				}, true); //<param name="movie" value="...guise.swf"/>
+				DOMUtilities.appendXMLEndTag(flashGuiseInnerHTMLStringBuilder, "object"); //</object>
+				//}
 				guiseFlashDiv.innerHTML = flashGuiseInnerHTMLStringBuilder.toString(); //add the Flash content
 				this._flash = guiseFlashDiv.childNodes[0]; //the first child node is the Flash component; save a reference to it for later
 				//console.debug("enqueueing flash function");
@@ -2387,11 +2391,11 @@ com.guiseframework.Guise = function()
 		 * @param contentType The object of type ContentType indicating the MIME type of the audio.
 		 * @param event The object describing the event.
 		 */
-		proto._onAudioLinkClick = function(uri, contentType, id, event)
+		proto._onAudioLinkClick = function(uri, id, contentType, event)
 		{
 			event.stopPropagation(); //tell the event to stop bubbling
 			event.preventDefault(); //prevent the default functionality from occurring
-			this.playAudio(uri, contentType, id); //play the audio
+			this.playAudio(uri, id, contentType); //play the audio
 		}
 
 		/**
@@ -2858,7 +2862,7 @@ com.guiseframework.Guise = function()
 									var contentType = ContentType.test(node.getAttribute("type")); //see if there is a content type provided
 									if(href && contentType && contentType.isAudio())
 									{
-										com.globalmentor.dom.EventManager.addEvent(node, "click", this._onAudioLinkClick.bind(this, href, contentType, href), false); //play audio when the link is clicked; use the href as the ID 
+										com.globalmentor.dom.EventManager.addEvent(node, "click", this._onAudioLinkClick.bind(this, href, null, contentType), false); //play audio with no ID when the link is clicked 
 									}
 								}
 							}
@@ -3292,7 +3296,6 @@ com.guiseframework.Guise = function()
 		/** Called when the Flash component initializes. */
 		proto._onFlashInitialize = function()
 		{
-			//console.debug("flash initialized");
 			setTimeout(this._finishFlashInitialization.bind(this), 100); //wait a little longer to make sure the Flash component has finished construction and then wrap up the initialization process 
 		};
 
@@ -3302,14 +3305,12 @@ com.guiseframework.Guise = function()
 		 */
 		proto._finishFlashInitialization = function()
 		{
-			//console.debug("finishing flash initialization");
 			while(this._flashFunctions.length > 0) //while there are more waiting Flash functions (execute waiting flash functions before setting the initialized flag, even though no more flash requests should come along while we're doing this)
 			{
 				var flashFunction = this._flashFunctions.dequeue(); //get the next Flash function to execute
 				flashFunction(this._flash); //call the Flash function
 			}
 			this._flashInitialized = true; //indicate that Flash support is now initialized			
-			//console.debug("flash support is now initialized");
 		};
 
 		/**
@@ -3320,7 +3321,6 @@ com.guiseframework.Guise = function()
 		 */
 		proto._onSoundStateChange = function(soundID, oldState, newState)
 		{
-			//alert("sound state changed for sound "+soundID+" new state "+newState);
 			if(soundID.startsWith("id")) //if the sound ID is a Guise ID (we might be playing a local non-Guise sound) TODO fix with dummy prefix for local IDs
 			{
 				this.sendAJAXRequest(new ChangeAJAXEvent(soundID, new Map("state", newState))); //send an AJAX request with the new sound state
