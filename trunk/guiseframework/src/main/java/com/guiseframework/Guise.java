@@ -44,7 +44,7 @@ public final class Guise
 	public final static String GUISE_ASSETS_BASE_KEY="assets/";
 
 	/**The identifier of this build.*/
-	public final static String BUILD_ID="2012-01-12";
+	public final static String BUILD_ID="2012-01-29";
 
 		//Guise ontology
 	
