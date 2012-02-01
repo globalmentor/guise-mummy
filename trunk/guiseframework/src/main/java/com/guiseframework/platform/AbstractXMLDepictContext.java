@@ -30,6 +30,7 @@ import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.platform.web.WebPlatform;
 
+import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Strings.*;
 import static com.globalmentor.security.MessageDigests.*;
@@ -37,7 +38,7 @@ import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.util.Base64.*;
 
-/**Abstract encapsulation of text/xml information related to the current depiction.
+/**Abstract encapsulation of <code>text/xml</code> information related to the current depiction.
 @author Garret Wilson
 */
 public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext implements XMLDepictContext
