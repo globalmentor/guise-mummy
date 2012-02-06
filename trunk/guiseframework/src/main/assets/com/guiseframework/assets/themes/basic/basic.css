@@ -1,4 +1,4 @@
-/*Basic Theme Guise Stylesheet Copyright © 2009 GlobalMentor, Inc.
+/*Basic Theme Guise Stylesheet Copyright © 2009-2012 GlobalMentor, Inc.
 @author Garret Wilson
 
 This stylesheet handles XHTML that appears in text boxes.
@@ -40,4 +40,32 @@ caption.content
 dt
 {
 	font-weight: bold;
+}
+
+figure.content.near
+{
+	float: left;
+}
+
+figure.content.far
+{
+	float: right;
+}
+
+hgroup.content h2.content
+{
+	font-style: italic;
+}
+
+.content.footnote-ref
+{
+	font-size: smaller;
+	vertical-align: super;
+	text-decoration: none; 
+}
+
+/*denotes an instance of a general class*/
+.content.class-instance
+{
+	text-decoration: underline
 }
