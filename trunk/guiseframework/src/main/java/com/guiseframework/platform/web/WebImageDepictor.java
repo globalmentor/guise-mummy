@@ -24,7 +24,6 @@ import java.util.Map;
 import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 
-import com.globalmentor.java.Objects;
 import com.globalmentor.text.xml.xhtml.XHTML;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
@@ -33,9 +32,8 @@ import com.guiseframework.geometry.Axis;
 import com.guiseframework.model.AbstractModel;
 
 /**
- * Strategy for rendering an image component an XHTML <code>&lt;img&gt;</code> element. The {@link ImageComponent#getLabel()}, if any, will be used as the image
- * {@value XHTML#ATTRIBUTE_TITLE} attribute. The {@link ImageComponent#getDescription()} or {@link ImageComponent#getLabel()} will be used as the
- * {@value XHTML#ELEMENT_IMG_ATTRIBUTE_ALT} attribute.
+ * Strategy for rendering an image component an XHTML <code>&lt;img&gt;</code> element. The {@link ImageComponent#getLabel()} or
+ * {@link ImageComponent#getDescription()} will be used as the {@value XHTML#ELEMENT_IMG_ATTRIBUTE_ALT} attribute if available.
  * <p>
  * This depictor supports {@link PendingImageComponent}.
  * </p>
@@ -159,18 +157,25 @@ public class WebImageDepictor<C extends ImageComponent> extends AbstractSimpleWe
 		{
 			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictionURI(imageURI).toString()); //src="imageURI"
 		}
-		String label = component.getLabel(); //get the component label, if there is one
-		if(label != null) //if there is a label
+		String alt = component.getLabel(); //get the component label, if there is one
+		if(alt != null) //if there is a label
 		{
-			label = AbstractModel.getPlainText(session.dereferenceString(label), component.getLabelContentType()); //resolve the label and get plain text
-			depictContext.writeAttribute(null, ATTRIBUTE_TITLE, label); //title="label"
+			alt = AbstractModel.getPlainText(session.dereferenceString(alt), component.getLabelContentType()); //resolve the label and get plain text
 		}
-		String description = component.getDescription(); //get the component description, if there is one
-		if(description != null)
+		else
+		//if there is no label
 		{
-			label = AbstractModel.getPlainText(session.dereferenceString(description), component.getDescriptionContentType()); //resolve the description and get plain text
+			alt = component.getDescription(); //get the component description, if there is one
+			if(alt != null)
+			{
+				alt = AbstractModel.getPlainText(session.dereferenceString(alt), component.getDescriptionContentType()); //resolve the description and get plain text
+			}
+			else
+			//if there is no description
+			{
+				alt = ""; //resort to an empty string
+			}
 		}
-		final String alt = Objects.getInstance(description, label, ""); //determine the alternate text; use "" as a last resort
 		depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_ALT, alt); //alt="alt"
 	}
 
