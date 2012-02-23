@@ -352,7 +352,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 			stringBuilder.append(DOUBLE_QUOTE_CHAR);	//"
 			stringBuilder.append(getOutputCharacterEncoding().toString());	//encoding
 			stringBuilder.append(DOUBLE_QUOTE_CHAR);	//"
-				//G***fix standalone writing here
+				//TODO standalone writing here
 			stringBuilder.append(XML_DECL_END);	//?>
 			stringBuilder.append('\n');
 		}
