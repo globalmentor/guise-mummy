@@ -17,6 +17,9 @@
 /*Guise™ JavaScript support routines
  * Author: Garret Wilson
  * 
+ * Required browsers:
+ * 	IE: 8+ (e.g. use of removeAttribute(); see e.g. http://msdn.microsoft.com/en-us/library/dd347148.aspx)
+ * 
  * Dependencies:
  * 	javascript.js
  * 	dom.js
@@ -106,14 +109,16 @@
 </response>
 */
 
-/**Rollovers
- For every component marked with the "mouseListener" class, Guise will send mouseover and mouseout events.
- Guise will also automatically add and remove a "jsRollover" class to the component and every subelement that is part of the component
- (that is, every element that has a component ID-derived ID (i.e. "componentID-XXX") before sending the mouse event.
- This "jsRollover" class indicates that the rollover state is completely controlled by JavaScript, and will be set and unset
- independent of any server-side Guise rollover state.
- (When a mouse leaves an element, for example, the "jsRollover" class will usually be removed well before the associated Guise component
- is notified of the change in state.)
+var DOM = com.globalmentor.dom.DOM; //import DOM utilities
+
+/**
+ * Rollovers For every component marked with the "mouseListener" class, Guise will send mouseover and mouseout events.
+ * Guise will also automatically add and remove a "jsRollover" class to the component and every subelement that is part
+ * of the component (that is, every element that has a component ID-derived ID (i.e. "componentID-XXX") before sending
+ * the mouse event. This "jsRollover" class indicates that the rollover state is completely controlled by JavaScript,
+ * and will be set and unset independent of any server-side Guise rollover state. (When a mouse leaves an element, for
+ * example, the "jsRollover" class will usually be removed well before the associated Guise component is notified of the
+ * change in state.)
  */
 
 //TODO before sending a drop event, send a component update for the drop target so that its value will be updated; or otherwise make sure the value is synchronized
@@ -141,10 +146,10 @@ var XHTML_NAMESPACE_URI = "http://www.w3.org/1999/xhtml";
 var GUISE_ML_NAMESPACE_URI = "http://guiseframework.com/id/ml#";
 
 /**
- * The prefix for Guise state-related attributes, which shouldn't be removed when elements are synchronized. When more
+ * The prefix for Guise state-related properties, which shouldn't be removed when elements are synchronized. When more
  * states are added, the proto.NON_REMOVABLE_ATTRIBUTE_SET should be updated.
  */
-var GUISE_STATE_ATTRIBUTE_PREFIX = "guiseState";
+var GUISE_STATE_ATTRIBUTE_PREFIX = "guiseState"; //TODO rename to "PROPERTY" to indicate this is not an element attribute per se
 
 /** The state attribute for width. */
 var GUISE_STATE_WIDTH_ATTRIBUTE = GUISE_STATE_ATTRIBUTE_PREFIX + "Width";
@@ -475,10 +480,254 @@ com.guiseframework.Guise = function()
 	this._flashFunctions = new Array();
 
 	/**
-	 * The number of TinyMCE instances created. Sometimes <code>tinyMCE.editors.length</code> has been seen to be zero
-	 * on some platforms when TinyMCE is in a dialog.
+	 * The number of HTML editor (e.g. TinyMCE) instances created. (Sometimes <code>tinyMCE.editors.length</code> has
+	 * been seen to be zero on some platforms when TinyMCE is in a dialog.)
 	 */
-	this._tinyMCECount = 0;
+	this._htmlEditorCount = 0;
+
+	/** Configuration options for the CKEditor. */
+	this._ckEditorConfig =
+	{
+		autoGrow_onStartup : true,
+		//TODO bring back when CKEditor code is fixed: basicEntities : false, //don't use basic HTML entities, which includes some non-XML entities
+		entities : false, //don't use HTML entities
+		//TODO bring back when CKEditor code is fixed: entities_additional : 'lt,gt,amp,apos,quot', //use XML entities only; see http://www.w3.org/TR/REC-xml/#sec-predefined-ent
+		extraPlugins : 'autogrow,onchange', //see http://alfonsoml.blogspot.com/2011/03/onchange-event-for-ckeditor.html
+		removePlugins : 'resize', //we don't need the resize plugin with autogrow
+		fillEmptyBlocks : false, //try to prevent &nbsp; being inserted; see http://cksource.com/forums/viewtopic.php?t=16915
+		minimumChangeMilliseconds : 3000, //don't update changes more often than every three seconds
+		toolbar : 'Guise',
+		toolbar_Guise : [
+		{
+			name : 'document',
+			items : [ 'Source' ]
+		},
+		{
+			name : 'clipboard',
+			items : [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ]
+		},
+		{
+			name : 'editing',
+			items : [ 'Find', 'Replace', '-', 'SelectAll', '-', 'SpellChecker', 'Scayt' ]
+		},
+		{
+			name : 'tools',
+			items : [ 'Maximize', 'ShowBlocks', '-', 'About' ]
+		}, '/',
+		{
+			name : 'basicstyles',
+			items : [ 'Bold', 'Italic', 'Underline', /*'Strike', */'Subscript', 'Superscript', '-', 'RemoveFormat' ]
+		},
+		{
+			name : 'paragraph',
+			items : [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', /*'-', 'JustifyLeft', 'JustifyCenter',
+																																																																			'JustifyRight', 'JustifyBlock', */'-', 'BidiLtr', 'BidiRtl' ]
+		},
+		{
+			name : 'links',
+			items : [ 'Link', 'Unlink', 'Anchor' ]
+		},
+		{
+			name : 'insert',
+			items : [ /*'Image', */'Table', 'HorizontalRule', 'Smiley', 'SpecialChar' ]
+		},
+		{
+			name : 'styles',
+			items : [ 'Format', 'Styles' ]
+		} ],
+		stylesSet : [
+		//block styles
+
+		/* styles in the Format combo; bring back if needed
+		{ name : 'Paragraph'		, element : 'p' },
+		{ name : 'Heading 1'		, element : 'h1' },
+		{ name : 'Heading 2'		, element : 'h2' },
+		{ name : 'Heading 3'		, element : 'h3' },
+		{ name : 'Heading 4'		, element : 'h4' },
+		{ name : 'Heading 5'		, element : 'h5' },
+		{ name : 'Heading 6'		, element : 'h6' },
+		{ name : 'Preformatted Text', element : 'pre' },
+		{ name : 'Address'			, element : 'address' },
+		*/
+		{
+			name : 'Section',
+			element : 'section'
+		},
+		{
+			name : 'Header',
+			element : 'header'
+		},
+		{
+			name : 'Header Group',
+			element : 'hgroup'
+		},
+		{
+			name : 'Navigation',
+			element : 'nav'
+		},
+		{
+			name : 'Article',
+			element : 'article'
+		},
+		{
+			name : 'Aside',
+			element : 'aside'
+		},
+		{
+			name : 'Figure',
+			element : 'figure'
+		},
+		{
+			name : 'Figure (Near)',
+			element : 'figure',
+			attributes :
+			{
+				'class' : 'near'
+			}
+		},
+		{
+			name : 'Figure (Far)',
+			element : 'figure',
+			attributes :
+			{
+				'class' : 'far'
+			}
+		},
+		{
+			name : 'Figure Caption',
+			element : 'figcaption'
+		},
+		{
+			name : 'Details',
+			element : 'details'
+		},
+		{
+			name : 'Summary',
+			element : 'summary'
+		},
+		{
+			name : 'Definition List',
+			element : 'dl'
+		},
+		{
+			name : 'DL Term',
+			element : 'dt'
+		},
+		{
+			name : 'DL Definition',
+			element : 'dd'
+		},
+
+		//inline styles
+
+		/* styles in the toolbar
+		{ name : 'Strong'			, element : 'strong', overrides : 'b' },
+		{ name : 'Emphasis'			, element : 'em'	, overrides : 'i' },
+		{ name : 'Underline'		, element : 'u' },
+		{ name : 'Strikethrough'	, element : 'strike' },
+		{ name : 'Subscript'		, element : 'sub' },
+		{ name : 'Superscript'		, element : 'sup' },
+		*/
+
+		{
+			name : 'Small',
+			element : 'small'
+		},
+		{
+			name : 'Obsolete',
+			element : 's'
+		},
+		{
+			name : 'Cite',
+			element : 'cite'
+		},
+		{
+			name : 'Quote',
+			element : 'q'
+		},
+		{
+			name : 'Definition',
+			element : 'dfn'
+		},
+		{
+			name : 'Abbreviation',
+			element : 'abbr'
+		},
+		{
+			name : 'Code',
+			element : 'code'
+		},
+		{
+			name : 'Variable',
+			element : 'var'
+		},
+		{
+			name : 'Sample Output',
+			element : 'samp'
+		},
+		{
+			name : 'Keyboard Input',
+			element : 'kbd'
+		},
+		{
+			name : 'Mark',
+			element : 'mark'
+		},
+		{
+			name : 'Insertion',
+			element : 'ins'
+		},
+		{
+			name : 'Deletion',
+			element : 'del'
+		},
+		{
+			name : 'Span',
+			element : 'span'
+		},
+		{
+			name : 'RTL',
+			element : 'span',
+			attributes :
+			{
+				'dir' : 'rtl'
+			}
+		},
+		{
+			name : 'LTR',
+			element : 'span',
+			attributes :
+			{
+				'dir' : 'ltr'
+			}
+		} ],
+		on :
+		{
+			instanceReady : function(ev)
+			{
+				var dtd = CKEDITOR.dtd; //see http://docs.cksource.com/ckeditor_api/symbols/src/plugins_htmlwriter_plugin.js.html
+				for( var e in dtd.$block) //turn off internal breaking and indenting for block elements
+				{
+					this.dataProcessor.writer.setRules(e,
+					{
+						indent : false,
+						breakAfterOpen : false,
+					});
+				}
+				for( var e in CKEDITOR.tools.extend({}, dtd.$listItem, dtd.$tableContent)) //turn off internal breaking for list items and table content
+				{
+					this.dataProcessor.writer.setRules(e,
+					{
+						breakAfterOpen : false,
+					});
+				}
+			},
+			change : function(event)
+			{
+				this._onHTMLEditorChange(event.editor); //delegate to our change method, passing the editor that changed
+			}.bind(this)
+		}
+	};
 
 	/**
 	 * The hidden IFrame target that receives the results of file uploads, or null if the upload IFrame hasn't yet been
@@ -500,10 +749,6 @@ com.guiseframework.Guise = function()
 	 * of hierarchical depth.
 	 */
 	this._dropTargets = new Array();
-
-	/**
-	 * TODO del The array of original source images, keyed to this.originalImageSrcs=new Array();
-	 */
 
 	/** The array of frame elements. */
 	this._frames = new Array();
@@ -749,8 +994,8 @@ com.guiseframework.Guise = function()
 				try
 				{
 					var requestStringBuilder = new StringBuilder(); //create a string builder to hold the request string					
-					DOMUtilities.appendXMLStartTag(requestStringBuilder, this.RequestElement.REQUEST); //<request>
-					DOMUtilities.appendXMLStartTag(requestStringBuilder, this.RequestElement.EVENTS); //<event>
+					DOM.appendXMLStartTag(requestStringBuilder, this.RequestElement.REQUEST); //<request>
+					DOM.appendXMLStartTag(requestStringBuilder, this.RequestElement.EVENTS); //<event>
 					while(this.ajaxRequests.length > 0) //there are more AJAX requests
 					{
 						var ajaxRequest = this.ajaxRequests.dequeue(); //get the next AJAX request to process
@@ -791,8 +1036,8 @@ com.guiseframework.Guise = function()
 							this._appendPollAJAXEvent(requestStringBuilder, ajaxRequest); //append the poll event
 						}
 					}
-					DOMUtilities.appendXMLEndTag(requestStringBuilder, this.RequestElement.EVENTS); //</events>
-					DOMUtilities.appendXMLEndTag(requestStringBuilder, this.RequestElement.REQUEST); //</request>
+					DOM.appendXMLEndTag(requestStringBuilder, this.RequestElement.EVENTS); //</events>
+					DOM.appendXMLEndTag(requestStringBuilder, this.RequestElement.REQUEST); //</request>
 					try
 					{
 						//TODO del alert("ready to post: "+requestStringBuilder.toString());
@@ -820,12 +1065,12 @@ com.guiseframework.Guise = function()
 		 */
 		proto._appendActionAJAXEvent = function(stringBuilder, ajaxActionEvent)
 		{
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.ACTION, //<action>
+			DOM.appendXMLStartTag(stringBuilder, this.RequestElement.ACTION, //<action>
 			new Map(this.RequestElement.OBJECT_ID, ajaxActionEvent.objectID, //objectID="objectID"
 			this.RequestElement.TARGET_ID, ajaxActionEvent.targetID, //targetID="targetID"
 			this.RequestElement.ACTION_ID, ajaxActionEvent.actionID, //actionID="actionID"
 			this.RequestElement.OPTION, ajaxActionEvent.option)); //option="option"
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.ACTION); //</action>
+			DOM.appendXMLEndTag(stringBuilder, this.RequestElement.ACTION); //</action>
 			return stringBuilder; //return the string builder
 		};
 
@@ -837,17 +1082,17 @@ com.guiseframework.Guise = function()
 		 */
 		proto._appendChangeAJAXEvent = function(stringBuilder, ajaxChangeEvent)
 		{
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.CHANGE, //<change>
+			DOM.appendXMLStartTag(stringBuilder, this.RequestElement.CHANGE, //<change>
 			new Map(this.RequestElement.OBJECT_ID, ajaxChangeEvent.objectID)); //objectID="objectID"
 			var properties = ajaxChangeEvent.properties; //get the properties
 			for( var propertyName in properties) //for each property
 			{
-				DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.PROPERTY, //<property>
+				DOM.appendXMLStartTag(stringBuilder, this.RequestElement.PROPERTY, //<property>
 				new Map(this.RequestElement.NAME, propertyName)); //name="name"
-				DOMUtilities.appendXMLText(stringBuilder, JSON.serialize(properties[propertyName])); //value
-				DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.PROPERTY); //</property>
+				DOM.appendXMLText(stringBuilder, JSON.serialize(properties[propertyName])); //value
+				DOM.appendXMLEndTag(stringBuilder, this.RequestElement.PROPERTY); //</property>
 			}
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.CHANGE); //</change>
+			DOM.appendXMLEndTag(stringBuilder, this.RequestElement.CHANGE); //</change>
 			return stringBuilder; //return the string builder
 		};
 
@@ -859,13 +1104,13 @@ com.guiseframework.Guise = function()
 		 */
 		proto._appendDropAJAXEvent = function(stringBuilder, ajaxDropEvent)
 		{
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.DROP, //<drop>
+			DOM.appendXMLStartTag(stringBuilder, this.RequestElement.DROP, //<drop>
 			new Map(this.RequestElement.OBJECT_ID, ajaxDropEvent.dropTarget.id, //objectID="dropTargetID"
 			this.RequestElement.DRAG_SOURCE_ID, ajaxDropEvent.dragSource.id)); //objectID="dragSourceID"
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Map(this.RequestElement.X, ajaxDropEvent.mousePosition.x,
-					this.RequestElement.Y, ajaxDropEvent.mousePosition.y)); //<mouse x="x" y="y">
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE); //</mouse>
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.DROP); //</drop>
+			DOM.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Map(this.RequestElement.X, ajaxDropEvent.mousePosition.x, this.RequestElement.Y,
+					ajaxDropEvent.mousePosition.y)); //<mouse x="x" y="y">
+			DOM.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE); //</mouse>
+			DOM.appendXMLEndTag(stringBuilder, this.RequestElement.DROP); //</drop>
 			return stringBuilder; //return the string builder
 		};
 
@@ -877,9 +1122,9 @@ com.guiseframework.Guise = function()
 		 */
 		proto._appendFocusAJAXEvent = function(stringBuilder, ajaxFocusEvent)
 		{
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.FOCUS, //<focus>
+			DOM.appendXMLStartTag(stringBuilder, this.RequestElement.FOCUS, //<focus>
 			new Map(this.RequestElement.OBJECT_ID, ajaxFocusEvent.objectID)); //objectID="objectID"
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.FOCUS); //</focus>
+			DOM.appendXMLEndTag(stringBuilder, this.RequestElement.FOCUS); //</focus>
 			return stringBuilder; //return the string builder
 		};
 
@@ -891,12 +1136,12 @@ com.guiseframework.Guise = function()
 		 */
 		proto._appendKeyAJAXEvent = function(stringBuilder, ajaxKeyEvent)
 		{
-			DOMUtilities.appendXMLStartTag(stringBuilder, ajaxKeyEvent.eventType, //<keyXXX
+			DOM.appendXMLStartTag(stringBuilder, ajaxKeyEvent.eventType, //<keyXXX
 			new Map(this.RequestElement.CODE, ajaxKeyEvent.code, //code="code"
 			this.RequestElement.ALT_KEY, ajaxKeyEvent.altKey, //altKey="altKey"
 			this.RequestElement.CONTROL_KEY, ajaxKeyEvent.controlKey, //controlKey="controlKey"
 			this.RequestElement.SHIFT_KEY, ajaxKeyEvent.shiftKey)); //shiftKey="shiftKey"
-			DOMUtilities.appendXMLEndTag(stringBuilder, ajaxKeyEvent.eventType); //</keyXXX>
+			DOM.appendXMLEndTag(stringBuilder, ajaxKeyEvent.eventType); //</keyXXX>
 			return stringBuilder; //return the string builder
 		};
 
@@ -908,10 +1153,10 @@ com.guiseframework.Guise = function()
 		 */
 		proto._appendLogAJAXEvent = function(stringBuilder, ajaxLogEvent)
 		{
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.LOG, //<log>
+			DOM.appendXMLStartTag(stringBuilder, this.RequestElement.LOG, //<log>
 			new Map(this.RequestElement.LEVEL, ajaxLogEvent.level)); //level="level"
-			DOMUtilities.appendXMLText(stringBuilder, ajaxLogEvent.text); //text
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.LOG); //</log>
+			DOM.appendXMLText(stringBuilder, ajaxLogEvent.text); //text
+			DOM.appendXMLEndTag(stringBuilder, this.RequestElement.LOG); //</log>
 			return stringBuilder; //return the string builder
 		};
 
@@ -923,7 +1168,7 @@ com.guiseframework.Guise = function()
 		 */
 		proto._appendMouseAJAXEvent = function(stringBuilder, ajaxMouseEvent)
 		{
-			DOMUtilities.appendXMLStartTag(stringBuilder, ajaxMouseEvent.eventType, //<mouseXXX>
+			DOM.appendXMLStartTag(stringBuilder, ajaxMouseEvent.eventType, //<mouseXXX>
 			//TODO del alert("ready to append viewport info: "+this.RequestElement.VIEWPORT+" x: "+ajaxMouseEvent.viewportBounds.x+" y: "+ajaxMouseEvent.viewportBounds.y+" width: "+ajaxMouseEvent.viewportBounds.width+" height: "+ajaxMouseEvent.viewportBounds.height);
 			new Map(this.RequestElement.CODE, ajaxMouseEvent.code, //code="code"
 			this.RequestElement.ALT_KEY, ajaxMouseEvent.altKey, //altKey="altKey"
@@ -931,30 +1176,30 @@ com.guiseframework.Guise = function()
 			this.RequestElement.SHIFT_KEY, ajaxMouseEvent.shiftKey, //shiftKey="shiftKey"
 			this.RequestElement.BUTTON, ajaxMouseEvent.button, //button="button"
 			this.RequestElement.CLICK_COUNT, ajaxMouseEvent.clickCount)); //clickCount="clickCount"
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.VIEWPORT, //<viewport
+			DOM.appendXMLStartTag(stringBuilder, this.RequestElement.VIEWPORT, //<viewport
 			new Map(this.RequestElement.X, ajaxMouseEvent.viewportBounds.x, //x="viewportBounds.x"
 			this.RequestElement.Y, ajaxMouseEvent.viewportBounds.y, //y="viewportBounds.y"
 			this.RequestElement.WIDTH, ajaxMouseEvent.viewportBounds.width, //width="viewportBounds.width"
 			this.RequestElement.HEIGHT, ajaxMouseEvent.viewportBounds.height)); //height="viewportBounds.height">
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.VIEWPORT); //</viewport>
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.COMPONENT, //<component
+			DOM.appendXMLEndTag(stringBuilder, this.RequestElement.VIEWPORT); //</viewport>
+			DOM.appendXMLStartTag(stringBuilder, this.RequestElement.COMPONENT, //<component
 			new Map(this.RequestElement.ID, ajaxMouseEvent.componentID, //id="componentID"
 			this.RequestElement.X, ajaxMouseEvent.componentBounds.x, //x="componentBounds.x"
 			this.RequestElement.Y, ajaxMouseEvent.componentBounds.y, //y="componentBounds.y"
 			this.RequestElement.WIDTH, ajaxMouseEvent.componentBounds.width, //width="componentBounds.width"
 			this.RequestElement.HEIGHT, ajaxMouseEvent.componentBounds.height)); //height="componentBounds.height">
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.COMPONENT); //</component>
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.TARGET, //<target
+			DOM.appendXMLEndTag(stringBuilder, this.RequestElement.COMPONENT); //</component>
+			DOM.appendXMLStartTag(stringBuilder, this.RequestElement.TARGET, //<target
 			new Map(this.RequestElement.ID, ajaxMouseEvent.targetID, //id="targetID"
 			this.RequestElement.X, ajaxMouseEvent.targetBounds.x, //x="targetBounds.x"
 			this.RequestElement.Y, ajaxMouseEvent.targetBounds.y, //y="targetBounds.y"
 			this.RequestElement.WIDTH, ajaxMouseEvent.targetBounds.width, //width="targetBounds.width"
 			this.RequestElement.HEIGHT, ajaxMouseEvent.targetBounds.height)); //height="targetBounds.height">
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.TARGET); //</target>
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Map(this.RequestElement.X, ajaxMouseEvent.mousePosition.x,
-					this.RequestElement.Y, ajaxMouseEvent.mousePosition.y)); //<mouse x="x" y="y">
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE); //</mouse>
-			DOMUtilities.appendXMLEndTag(stringBuilder, ajaxMouseEvent.eventType); //</mouseXXX>
+			DOM.appendXMLEndTag(stringBuilder, this.RequestElement.TARGET); //</target>
+			DOM.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Map(this.RequestElement.X, ajaxMouseEvent.mousePosition.x, this.RequestElement.Y,
+					ajaxMouseEvent.mousePosition.y)); //<mouse x="x" y="y">
+			DOM.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE); //</mouse>
+			DOM.appendXMLEndTag(stringBuilder, ajaxMouseEvent.eventType); //</mouseXXX>
 			return stringBuilder; //return the string builder
 		};
 
@@ -966,14 +1211,14 @@ com.guiseframework.Guise = function()
 		 */
 		proto._appendInitAJAXEvent = function(stringBuilder, ajaxInitEvent)
 		{
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.INIT, //<init
+			DOM.appendXMLStartTag(stringBuilder, this.RequestElement.INIT, //<init
 			new Map("javascriptVersion", ajaxInitEvent.javascriptVersion, "utcOffset", ajaxInitEvent.utcOffset, "utcOffset01", ajaxInitEvent.utcOffset01,
 					"utcOffset06", ajaxInitEvent.utcOffset06,
 					//TODO del						"timezone", ajaxInitEvent.timezone,
 					"hour", ajaxInitEvent.hour, "language", ajaxInitEvent.language, "colorDepth", ajaxInitEvent.colorDepth, "screenWidth", ajaxInitEvent.screenWidth,
 					"screenHeight", ajaxInitEvent.screenHeight, "javaEnabled", Boolean(ajaxInitEvent.javaEnabled).toString(), "browserWidth", ajaxInitEvent.browserWidth,
 					"browserHeight", ajaxInitEvent.browserHeight, "referrer", ajaxInitEvent.referrer));
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.INIT); //</init>
+			DOM.appendXMLEndTag(stringBuilder, this.RequestElement.INIT); //</init>
 			return stringBuilder; //return the string builder
 		};
 
@@ -985,8 +1230,8 @@ com.guiseframework.Guise = function()
 		 */
 		proto._appendPollAJAXEvent = function(stringBuilder, ajaxPollEvent)
 		{
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.POLL); //<poll>
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.POLL); //</poll>
+			DOM.appendXMLStartTag(stringBuilder, this.RequestElement.POLL); //<poll>
+			DOM.appendXMLEndTag(stringBuilder, this.RequestElement.POLL); //</poll>
 			return stringBuilder; //return the string builder
 		};
 
@@ -1020,18 +1265,8 @@ com.guiseframework.Guise = function()
 						//TODO del						this.processAJAXRequests();	//make sure there are no waiting AJAX requests
 					}
 				}
-				/*TODO del; XMLHTTPRequest automatically follows redirects
-								else if(status>=300 && status<400)	//if this is a redirect
-								{
-									var location=xmlHTTP.getResponseHeader("Location");	//get the Location header
-									if(location)
-									{
-										alert("redirect to: "+location);
-									}
-								}
-				*/
 				else
-				//if there was an HTTP error TODO check for redirects
+				//if there was an HTTP error
 				{
 					console.error("Guise HTTP communication error ", xmlHTTP.status, ": ", xmlHTTP.statusText);
 				}
@@ -1040,9 +1275,6 @@ com.guiseframework.Guise = function()
 			{
 				console.error(exception);
 				console.info("text: " + xmlHTTP.responseText + " AJAX enabled? " + (this.isEnabled()));
-				//TODO log a warning
-				alert(exception);
-				alert("text: " + xmlHTTP.responseText + " AJAX enabled? " + (this.isEnabled()));
 				this.setEnabled(false); //stop further AJAX communication
 				throw exception; //TODO testing
 			}
@@ -1336,7 +1568,7 @@ com.guiseframework.Guise = function()
 		{
 			var objectID = element.getAttribute(this.ResponseElement.OBJECT_ID); //get the object ID, if there is one
 			var command = element.getAttribute(this.ResponseElement.COMMAND); //get the command
-			var parameters = JSON.evaluate(DOMUtilities.getNodeText(element)); //parse the parameters
+			var parameters = JSON.evaluate(DOM.getNodeText(element)); //parse the parameters
 			//			alert("received command "+command+" for object "+objectID+" with audioURI "+parameters["audioURI"]);
 			switch(command)
 			//see which command this is
@@ -1474,7 +1706,7 @@ com.guiseframework.Guise = function()
 		 */
 		proto._processNavigate = function(element)
 		{
-			var navigateURI = DOMUtilities.getNodeText(element); //report the requested location
+			var navigateURI = DOM.getNodeText(element); //report the requested location
 			var viewportID = element.getAttribute(this.ResponseElement.VIEWPORT_ID); //get the viewport ID, if there is one
 			if(viewportID != null) //if there is a viewport ID
 			{
@@ -1511,7 +1743,7 @@ com.guiseframework.Guise = function()
 							this._synchronizeElement(oldElement, childNode, true); //synchronize this element tree, indicating that this is the root of a synchronization subtree
 							this._updateComponents(oldElement, true); //now that we've patched the old element, update any components that rely on the old element
 						}
-						else if(DOMUtilities.hasClass(childNode, "frame")) //if the element doesn't currently exist, but the patch is for a frame, create a new frame
+						else if(DOM.hasClass(childNode, "frame")) //if the element doesn't currently exist, but the patch is for a frame, create a new frame
 						{
 							//TODO fix alert("ready to import frame node");
 							oldElement = document.importNode(childNode, true); //create an import clone of the node
@@ -1524,12 +1756,12 @@ com.guiseframework.Guise = function()
 			}
 			if(mozInlineBoxParentIDSet) //if we have a set of inline box parent IDs to fix for Mozilla
 			{
-				//console.debug("need to do some parent moz inline box updates");
+				//console.info("need to do some parent moz inline box updates");
 				for( var mozInlineBoxParentID in mozInlineBoxParentIDSet) //for each parent of a Mozilla inline box
 				{
-					//console.debug("ready to find ID", mozInlineBoxParentID);
+					//console.info("ready to find ID", mozInlineBoxParentID);
 					var mozInlineBoxParent = document.getElementById(mozInlineBoxParentID); //get the Mozilla inline box parent element
-					//console.debug("got inline box parent", mozInlineBoxParent, "ready to refresh");
+					//console.info("got inline box parent", mozInlineBoxParent, "ready to refresh");
 					if(mozInlineBoxParent) //if we have a parent to a Mozilla inline box that was updated
 					{
 						Node.refresh(mozInlineBoxParent); //refresh the Mozilla inline box container by removing it from the tree and putting it back
@@ -1538,34 +1770,6 @@ com.guiseframework.Guise = function()
 				}
 			}
 		};
-
-		/**
-		 * Processes the AJAX attribute response.
-		 * @param element The element representing attribute response.
-		 */
-		/*TODO del or salvage
-				proto._processAttribute=function(element)
-				{
-					var id=element.getAttribute("id");	//get the element ID
-					var name=element.getAttribute(this.ResponseElement.NAME);	//get the attribute name
-					if(id && name)	//if an ID and name are given
-					{
-						var oldElement=document.getElementById(id);	//get the element in the document
-						if(oldElement)	//if we found the old element
-						{
-							if(name=="style")	//if this is the style attribute
-							{
-								var value=element.getAttribute(this.ResponseElement.VALUE);	//get the attribute value
-								this._synchronizeElementStyle(oldElement, value);	//update the element style attribute
-							}
-							else	//TODO fix for general attributes
-							{
-								alert("Support for attribute "+name+" not yet supported.");
-							}			
-						}
-					}
-				};
-		*/
 
 		/**
 		 * Processes the AJAX remove response.
@@ -1594,26 +1798,6 @@ com.guiseframework.Guise = function()
 					}
 				}
 			}
-			/*TODO del when works
-						var childNodes=element.childNodes;	//get all the child nodes of the element
-						var childNodeCount=childNodes.length;	//find out how many children there are
-						for(var i=0; i<childNodeCount; ++i)	//for each child node
-						{
-							var childNode=childNodes[i];	//get this child node
-							if(childNode.nodeType==Node.ELEMENT_NODE)	//if this is an element
-							{
-								var id=childNode.getAttribute("id");	//get the child node's ID, if there is one
-								if(id)	//if the element has an ID
-								{
-									var oldElement=document.getElementById(id);	//get the old element
-									if(oldElement!=null)	//if we found the old element
-									{
-										oldElement.parentNode.removeChild(oldElement);	//remove the old element from the document
-									}
-								}
-							}
-						}
-			*/
 		};
 
 		/** The set of attribute names that should not be removed when synchronizing. */
@@ -1621,7 +1805,7 @@ com.guiseframework.Guise = function()
 		{
 			"style" : true, //don't remove local styles, because they may be used by Guise (with frames, for instance)
 			"hideFocus" : true, //don't remove the IE hideFocus attribute, because we're using it to fix the IE6 lack of CSS outline: none support TODO revisit
-			"guiseStateWidth" : true, //don't remove Guise state attributes TODO change to jsXXX
+			"guiseStateWidth" : true, //don't remove Guise state attributes
 			"guiseStateHeight" : true
 		};
 
@@ -1629,8 +1813,8 @@ com.guiseframework.Guise = function()
 		proto.UNCOPIED_ATTRIBUTE_SET =
 		{
 			"style" : true, //if this is a style attribute, we have to treat it differently, because neither Mozilla nor IE provide normal DOM access to the literal style attribute value
-			"guise:patchType" : true
-		//the guise:patchType attribute is used for patching information
+			"data-guise-patch" : true
+		//the data-guise-patch attribute is used for patching information
 		};
 
 		/** The set of class names that should not be removed when synchronizing. */
@@ -1650,7 +1834,7 @@ com.guiseframework.Guise = function()
 		proto.NON_REMOVABLE_CLASSES_REGEX = new RegExp(nonRemovableClassArray.join("|")); //create a regular expression of all non-removable classes, separated by a regular expression union symbol
 
 		/**
-		 * Invalidates the content of all ancestor elements by removing the "guise:contentHash" attribute up the hierarchy.
+		 * Invalidates the content of all ancestor elements by removing the "data-guise-c" attribute up the hierarchy.
 		 * @param element The element the ancestors of which will have their ancestors invalidated.
 		 */
 		proto.invalidateAncestorContent = function(element)
@@ -1658,7 +1842,7 @@ com.guiseframework.Guise = function()
 			var parentNode = element.parentNode; //get the element's parent
 			if(parentNode != null && parentNode.nodeType == Node.ELEMENT_NODE) //if there is a parent element
 			{
-				parentNode.removeAttribute("guise:contentHash"); //indicate that the children have changed TODO use a constant
+				parentNode.removeAttribute("data-guise-c"); //indicate that the children have changed
 				this.invalidateAncestorContent(parentNode); //invalidate the rest of the ancestors
 			}
 		};
@@ -1687,25 +1871,17 @@ com.guiseframework.Guise = function()
 		proto._synchronizeElement = function(oldElement, element, isRoot)
 		{
 			var elementName = element.nodeName; //save the element name
-			var patchType = Element.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "patchType"); //get the patch type TODO use a constant
+			var patchType = element.getAttribute("data-guise-patch"); //get the patch type
 			if(patchType == "none" || patchType == "temp") //if we should not do any patching
 			{
 				return; //stop synchronization
 			}
 
 			//get the content hash attributes before we update the attributes
-			var oldElementContentHash = oldElement.getAttribute("guise:contentHash"); //get the old element's content hash, if any TODO use a constant
-			var newElementContentHash = Element.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "contentHash"); //get the new element's content hash, if any TODO use a constant
-			/*TODO del
-						if(oldElementContentHash==newElementContentHash)	//TODO del; testing
-						{
-							alert("we think: "+DOMUtilities.getNodeString(oldElement));
-							alert("is the same as: "+DOMUtilities.getNodeString(element));
-						}
-			*/
-
-			var oldElementAttributeHash = oldElement.getAttribute("guise:attributeHash"); //get the old element's attribute hash, if any TODO use a constant
-			var newElementAttributeHash = Element.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "attributeHash"); //get the new element's attribute hash, if any TODO use a constant
+			var oldElementContentHash = oldElement.getAttribute("data-guise-c"); //get the old element's content hash
+			var newElementContentHash = element.getAttribute("data-guise-c"); //get the new element's content hash, if any
+			var oldElementAttributeHash = oldElement.getAttribute("data-guise-a"); //get the old element's attribute hash, if any
+			var newElementAttributeHash = element.getAttribute("data-guise-a"); //get the new element's attribute hash, if any
 			var isAttributesChanged = oldElementAttributeHash != newElementAttributeHash; //see if the attributes have changed (this doesn't count for the content hash attribute, which we'll check separately)
 			if(isAttributesChanged) //if the attribute hash values are different
 			{
@@ -1721,18 +1897,13 @@ com.guiseframework.Guise = function()
 					var oldAttribute = oldAttributes[i]; //get this attribute
 					var oldAttributeName = oldAttribute.nodeName; //get the attribute name
 					var oldAttributeValue = oldAttribute.nodeValue; //get the attribute value
-					var attributeName = DOMUtilities.DOM_ATTRIBUTE_NAME_MAP[oldAttributeName] || oldAttributeName; //convert the attribute name to its standard DOM form, changing "readOnly" to "readonly", for example
-					//TODO fix or del				if(attributeValue!=null && attributeValue.length>0 && !element.getAttribute(attributeName))	//if there is really an attribute value (IE provides all possible attributes, even with those with no value) and the new element doesn't have this attribute
-					if(element.getAttribute(attributeName) == null && !this.NON_REMOVABLE_ATTRIBUTE_SET[attributeName]) //if the new element doesn't have this attribute, and this isn't an attribute we shouldn't remove
+					if(!element.getAttribute(oldAttributeName) && !this.NON_REMOVABLE_ATTRIBUTE_SET[attributeName]) //if the new element doesn't have this attribute, and this isn't an attribute we shouldn't remove (IE9 doesn't support hasAttribute on the XMLHttpResponse DOM; see https://developer.mozilla.org/en/DOM/element.getAttribute#Notes for null/"")
 					{
-						//TODO del; not needed						if(attributeName!="value" || elementName!="textarea")	//if this is the value attribute of a text area, don't remove the value, because the value is really specified as the text content
 						//TODO del alert("ready to remove "+oldElement.nodeName+" attribute "+oldAttributeName+" with current value "+oldAttributeValue);
 						oldElement.removeAttribute(oldAttributeName); //remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
-						//TODO fix					i=0;	//TODO fix; temporary to get out of looking at all IE's attributes
 					}
-
 				}
-				if((elementName != "button" && elementName != "textarea") && oldElement.value && element.getAttribute("value") == null) //if there is an old value but no value attribute present in the new element (IE 6 and Mozilla do not show "value" in the list of enumerated values) (IE6 thinks that the value of a button is content, so ignore button values) (don't clear the value for text areas, which are stored as content) TODO fix button values for non-IE6 browsers, maybe, but current button values are unused anyway because of the IE6 bug
+				if(elementName != "textarea" && oldElement.value && !element.getAttribute("value")) //if there is an old value but no value attribute present in the new element (IE 6 and Mozilla do not show "value" in the list of enumerated values) (don't clear the value for text areas, which are stored as content)
 				{
 					//TODO del alert("clearing value; old value was: "+oldElement.value);
 					if(patchType != "novalue") //if we shouldn't ignore the value attribute
@@ -1745,8 +1916,7 @@ com.guiseframework.Guise = function()
 				for( var i = attributes.length - 1; i >= 0; --i) //for each attribute
 				{
 					var attribute = attributes[i]; //get this attribute
-					var attributeNodeName = attribute.nodeName; //get the node name
-					var attributeName = DOMUtilities.HTML_ATTRIBUTE_NAME_MAP[attributeNodeName] || attributeNodeName; //get the attribute name, compensating for special HTML attributes such as "className"
+					var attributeName = attribute.nodeName; //get the attribute name
 					var attributeValue = attribute.nodeValue; //get the attribute value
 					if(!this.UNCOPIED_ATTRIBUTE_SET[attributeName]) //if this is not an attribute that shouldn't be copied
 					{
@@ -1759,89 +1929,132 @@ com.guiseframework.Guise = function()
 								continue; //go to the next attribute
 							}
 						}
-						var oldAttributeValue = oldElement[attributeName]; //get the old attribute value
+						var propertyName = DOM.ATTRIBUTE_PROPERTY_MAP[attributeName]; //see if we should access the value using properties or getAttribute() TODO do we still need this? see http://msdn.microsoft.com/en-us/library/dd347148.aspx and http://msdn.microsoft.com/en-us/library/ms536429.aspx
+						//according to http://msdn.microsoft.com/en-us/library/ms536429.aspx, IE8+ correctly returns literal URLs with getAttribute(); see http://reference.sitepoint.com/javascript/Element/getAttribute and http://www.quirksmode.org/bugreports/archives/2005/02/getAttributeHREF_is_always_absolute.html
+						var oldAttributeValue = propertyName ? oldElement[propertyName] : oldElement.getAttribute(attributeName); //retrieve the attribute value, using a property if necessary 
 						var valueChanged = oldAttributeValue != attributeValue; //see if the value is really changing
-						if(valueChanged && attributeName == "className") //if the class name value is changing, add back any non-removable classes as needed
+						if(valueChanged) //if the value changed
 						{
-							if(oldAttributeValue.match(this.NON_REMOVABLE_CLASSES_REGEX)) //if the original class name had one of the non-removable classes (this is only to eliminate most cases in which there are no non-removable classes; because the regular expression has word boundary checking, this test may give some false positives because of substring matching)
+							switch(attributeName)
+							//perform special patching operations on certain attributes
 							{
-								var newAttributeValues = attributeValue.split(/\s/); //we'll add back any of the missing non-removable attributes to this array; start with the attributes we already have
-								var existingNonRemovableClasses = new Object(); //create a set of the already-existing non-removable classes
-								for( var newAttributeValueIndex = newAttributeValues.length - 1; newAttributeValueIndex >= 0; --newAttributeValueIndex) //for each new class
-								{
-									var newClass = newAttributeValues[newAttributeValueIndex]; //get the new class
-									if(this.NON_REMOVABLE_CLASS_SET[newClass]) //if this is a non-removable class
+								case "class": //if the class name value is changing, add back any non-removable classes as needed
+									if(oldAttributeValue.match(this.NON_REMOVABLE_CLASSES_REGEX)) //if the original class name had one of the non-removable classes (this is only to eliminate most cases in which there are no non-removable classes; because the regular expression has word boundary checking, this test may give some false positives because of substring matching)
 									{
-										existingNonRemovableClasses[newClass] = true; //show that we already have this non-removable class
+										var newAttributeValues = attributeValue.split(/\s/); //we'll add back any of the missing non-removable attributes to this array; start with the attributes we already have
+										var existingNonRemovableClasses = new Object(); //create a set of the already-existing non-removable classes
+										for( var newAttributeValueIndex = newAttributeValues.length - 1; newAttributeValueIndex >= 0; --newAttributeValueIndex) //for each new class
+										{
+											var newClass = newAttributeValues[newAttributeValueIndex]; //get the new class
+											if(this.NON_REMOVABLE_CLASS_SET[newClass]) //if this is a non-removable class
+											{
+												existingNonRemovableClasses[newClass] = true; //show that we already have this non-removable class
+											}
+										}
+										var oldAttributeValues = oldAttributeValue.split(/\s/); //split out all the old classes
+										for( var oldAttributeValueIndex = oldAttributeValues.length - 1; oldAttributeValueIndex >= 0; --oldAttributeValueIndex) //for each old class
+										{
+											var oldClass = oldAttributeValues[oldAttributeValueIndex]; //get the old class
+											if(this.NON_REMOVABLE_CLASS_SET[oldClass] && !existingNonRemovableClasses[oldClass]) //if this is a non-removable class that was removed in the new value
+											{
+												newAttributeValues.add(oldClass); //add the old class back to the array that will form the new class name
+											}
+										}
+										attributeValue = newAttributeValues.join(" "); //join the attributes back together to create the new class name
+										valueChanged = oldAttributeValue != attributeValue; //check again to see if the value is really changing
 									}
-								}
-								var oldAttributeValues = oldAttributeValue.split(/\s/); //split out all the old classes
-								for( var oldAttributeValueIndex = oldAttributeValues.length - 1; oldAttributeValueIndex >= 0; --oldAttributeValueIndex) //for each old class
-								{
-									var oldClass = oldAttributeValues[oldAttributeValueIndex]; //get the old class
-									if(this.NON_REMOVABLE_CLASS_SET[oldClass] && !existingNonRemovableClasses[oldClass]) //if this is a non-removable class that was removed in the new value
-									{
-										newAttributeValues.add(oldClass); //add the old class back to the array that will form the new class name
-									}
-								}
-								attributeValue = newAttributeValues.join(" "); //join the attributes back together to create the new class name
-								valueChanged = oldAttributeValue != attributeValue; //check again to see if the value is really changing
+									break;
+								case "style": //ignore the style attribute for now (if it even shows up here during enumeration); we'll update it separately later
+									valueChanged = false;
+									break;
 							}
 						}
-						if(valueChanged && attributeName == "src") //if a "src" attribute changed (e.g. img.src), make sure that the new src is not a relative URL form of the current src, which would cause IE6 to needlessly reload the image
+						if(valueChanged) //if the old element has a different value for this attribute
 						{
-							if(attributeValue.startsWith("/") && location.protocol + "//" + location.host + attributeValue == oldAttributeValue) //if the new value is just the relative form of the old value
+							if(propertyName) //if we should access the property
 							{
-								valueChanged = false; //keep the old value to prevent IE6 from reloading the image
-							}
-						}
-						if(valueChanged) //if the old element has a different (or no) value for this attribute (Firefox maintains different values for element.getAttribute(attributeName) and element[attributeName]) (note also that using setAttribute() IE will sometimes throw an error if button.style is changed, for instance)
-						{
-							//TODO del alert("updating "+element.nodeName+" attribute "+attributeName+" from value "+oldElement.getAttribute(attributeName)+" to new value "+attributeValue);
-							if(attributeName.indexOf(":") > 0) //if this is a namespaced attribute, we must use the DOM, because Firefox 1.5 won't allow the indexed notation for such attributes
-							{
-								oldElement.setAttribute(attributeName, attributeValue); //update the old element's attribute; only use this method when we need to, because it may be slower on Firefox and does not work with certain DOM attributes
+								oldElement[propertyName] = attributeValue; //update the old element's property
 							}
 							else
-							//if this is a normal attribute
+							//if we should access the attribute normally
 							{
-								oldElement[attributeName] = attributeValue; //update the old element's attribute (this format works for Firefox where oldElement.setAttribute("value", attributeValue) does not)
+								oldElement.setAttribute(attributeName, attributeValue); //update the old element's attribute
 							}
 							//TODO: fix the Firefox problem of sending an onchange event for any elements that get updated from an Ajax request, but only later when the focus blurs
 							//TODO fix the focus problem if the user has focus on an element that gets changed in response to the event
 						}
 					}
 				}
-				this._synchronizeElementStyle(oldElement, element.getAttribute("style")); //patch in the new style
-				//perform special-case attribute manipulations for certain elements
-				if(elementName == "input") //input checkboxes and radio buttons do not updated the checked state correctly based upon the "checked" attribute
+				//update the style attribute separately
+				if(!dragState || !dragState.dragging || dragState.dragSource != oldElement) //don't update the style of an element being dragged
 				{
+					oldElement.style.cssText = element.getAttribute("style") || ""; //set the CSS text property (which IE requires but works on all browsers), making sure we use an empty string rather than null 
+				}
+			}
+			//perform special-case attribute manipulations for certain elements
+			//deprecated (e.g. td.noWrap) and non-supported (e.g. object.declare) properties not included
+			//see http://stackoverflow.com/a/707702/421049
+			//see http://stackoverflow.com/questions/7006253/javascript-dom-how-to-handle-special-properties-as-versus-attributes
+			switch(elementName)
+			//TODO update for HMTML5
+			{
+				case "button":
+					oldElement.disabled = !!element.getAttribute("disabled");
+					break;
+				case "frame":
+					oldElement.noResize = !!element.getAttribute("noresize");
+					break;
+				case "img":
+					oldElement.isMap = !!element.getAttribute("ismap");
+					break;
+				case "input":
 					var inputType = element.getAttribute("type"); //get the input type
 					if(inputType == "radio" || inputType == "checkbox") //if this is a radio button or a checkbox
 					{
-						oldElement.checked = element.getAttribute("checked") == "checked"; //update the checked state based upon the new specified checked attribute
+						oldElement.checked = !!element.getAttribute("checked"); //update the checked state based upon the new specified checked attribute
 					}
-				}
+					else if(inputType == "text" || inputType == "password") //if this is a radio button or a checkbox
+					{
+						oldElement.readOnly = !!element.getAttribute("readonly");
+					}
+					else if(inputType == "image")
+					{
+						oldElement.isMap = !!element.getAttribute("ismap");
+					}
+					oldElement.disabled = !!element.getAttribute("disabled");
+					break;
+				case "optgroup":
+					oldElement.disabled = !!element.getAttribute("disabled");
+					break;
+				case "option":
+					oldElement.selected = !!element.getAttribute("selected");
+					oldElement.disabled = !!element.getAttribute("disabled");
+					break;
+				case "script":
+					oldElement.defer = !!element.getAttribute("defer");
+					break;
+				case "select":
+					oldElement.disabled = !!element.getAttribute("disabled");
+					oldElement.multiple = !!element.getAttribute("multiple");
+					break;
+				case "textarea":
+					oldElement.disabled = !!element.getAttribute("disabled");
+					oldElement.readOnly = !!element.getAttribute("readonly");
+					break;
 			}
-			/*TODO del
-						if(oldElementContentHash==newElementContentHash)	//TODO del; testing
-						{
-							alert("we think: "+DOMUtilities.getNodeString(oldElement));
-							alert("is the same as: "+DOMUtilities.getNodeString(element));
-						}
-			*/
+
 			if(oldElementContentHash != newElementContentHash) //if the content hash values are different
 			{
 				if(!isAttributesChanged) //if the main attributes didn't change, we'll still need to update the content hash attribute, which isn't accounted for by the attribute hash attribute
 				{
 					if(newElementContentHash) //if there is a content hash
 					{
-						oldElement.setAttribute("guise:contentHash", newElementContentHash); //update the content hash attribute manually TODO use a constant
+						oldElement.setAttribute("data-guise-c", newElementContentHash); //update the content hash attribute manually
 					}
 					else
 					//if there is no longer a content hash
 					{
-						oldElement.removeAttribute("guise:contentHash"); //remove the content hash attribute TODO use a constant
+						oldElement.removeAttribute("data-guise-c"); //remove the content hash attribute
 					}
 					if(isRoot) //if this is the root of the synchronization
 					{
@@ -1853,7 +2066,7 @@ com.guiseframework.Guise = function()
 				{
 					if(patchType != "novalue") //if we shouldn't ignore the value attribute
 					{
-						oldElement.value = DOMUtilities.getNodeText(element); //set the new value to be the text of the new element
+						oldElement.value = DOM.getNodeText(element); //set the new value to be the text of the new element
 					}
 				}
 				else
@@ -1863,17 +2076,6 @@ com.guiseframework.Guise = function()
 					var oldChildNodeCount = oldChildNodeList.length; //find out how many old children there are
 					var childNodeList = element.childNodes; //get all the child nodes of the element
 					var childNodeCount = childNodeList.length; //find out how many children there are
-
-					/*TODO del when works
-					if(elementName=="select")
-					{
-
-						alert("just assigned select child node count "+childNodeCount+" with old element ID "+oldElement.id);
-						alert("old node structure of select is: "+DOMUtilities.getNodeString(oldElement));
-						alert("new node structure of select is: "+DOMUtilities.getNodeString(element));
-					}
-					*/
-
 					var isChildrenCompatible = true; //start by assuming children are compatible; children will be compatible as long as the exiting children are of the same types and, if they are elements, of the same name
 					for( var i = 0; i < oldChildNodeCount && i < childNodeCount && isChildrenCompatible; ++i) //for each child node (as long as children are compatible)
 					{
@@ -1895,7 +2097,7 @@ com.guiseframework.Guise = function()
 								}
 								else if(oldChildNode.nodeName.toLowerCase() != childNode.nodeName.toLowerCase()) //if the IDs are the same, check the node names; if they are different
 								{
-									var patchType = Element.getAttributeNS(childNode, GUISE_ML_NAMESPACE_URI, "patchType"); //ignore different element types if this is a temp or a non-patch node TODO use a constant
+									var patchType = childNode.getAttribute("data-guise-patch"); //ignore different element types if this is a temp or a non-patch node
 									if(patchType != "none" && patchType != "temp") //all regular patching nodes are incompatible if the node names are different (those that are not non-patching or temporary nodes)
 									{
 										isChildrenCompatible = false; //these child elements aren't compatible because they have different node name
@@ -1921,7 +2123,7 @@ com.guiseframework.Guise = function()
 						//if the node types are different
 						{
 							//TODO del alert("node types are different; old "+oldElement.nodeName+" with ID "+oldElement.id+" child node count: "+oldChildNodeCount+" new "+element.nodeName+" "+"with ID "+element.getAttribute("id")+" child: "+i+" of "+childNodeCount+" old node type: "+oldChildNode.nodeType+" new node type: "+childNode.nodeType);
-							//TODO del alert("old node structure of parent is: "+DOMUtilities.getNodeString(oldElement));
+							//TODO del alert("old node structure of parent is: "+DOM.getNodeString(oldElement));
 							isChildrenCompatible = false; //these child nodes aren't compatible because they are of different types
 						}
 					}
@@ -1964,15 +2166,6 @@ com.guiseframework.Guise = function()
 							//see which type of child node this is
 							{
 								case Node.ELEMENT_NODE: //element
-									/*TODO del
-																		if(oldChildNode.id=="id1a-child")	//TODO del
-																		{
-									//TODO del										alert("ready to update old element: "+DOMUtilities.getNodeString(oldChildNode));
-																			alert("ready to update old element: "+oldChildNode.getAttribute("guise:contentHash"));
-																			alert("ready to update new element: "+childNode.getAttribute("guise:contentHash"));
-																		}
-									*/
-
 									this._synchronizeElement(oldChildNode, childNode); //synchronize these elements
 									break;
 								case Node.COMMENT_NODE: //comment
@@ -1986,10 +2179,10 @@ com.guiseframework.Guise = function()
 						//if we're out of old child nodes, create a new one
 						{
 							//alert("we're out of new children at index: "+i+" out of node count "+childNodeCount);
-							//alert("old node structure of parent is: "+DOMUtilities.getNodeString(oldElement));
+							//alert("old node structure of parent is: "+DOM.getNodeString(oldElement));
 							try
 							{
-								//TODO del alert("ready to clone node: "+DOMUtilities.getNodeString(childNode));
+								//TODO del alert("ready to clone node: "+DOM.getNodeString(childNode));
 								//TODO del alert("ready to clone node");
 								var importedNode = document.importNode(childNode, true); //create an import clone of the node
 								//alert("imported node: "+i+" out of node count "+childNodeCount);
@@ -1997,10 +2190,10 @@ com.guiseframework.Guise = function()
 								/*TODO del
 														if(!importedNode)	//TODO check and improve big IE hack
 														{
-								//TODO del							alert("big problem importing node: "+DOMUtilities.getNodeString(childNode));	//TODO fix importnode
+								//TODO del							alert("big problem importing node: "+DOM.getNodeString(childNode));	//TODO fix importnode
 															var dummyNode=document.createElement("div");	//create a dummy node
 								//TODO fix							document.documentElement.appendChild(dummyNode);	//append the dummy node to the document
-															dummyNode.innerHTML=DOMUtilities.getNodeString(childNode);	//convert the child node to a string and assign it to the dummy node
+															dummyNode.innerHTML=DOM.getNodeString(childNode);	//convert the child node to a string and assign it to the dummy node
 															importedNode=dummyNode.removeChild(dummyNode.childNodes[0]);	//remove the dummy node's first and only node, which is our new imported node
 								//TODO fix							document.documentElement.removeChild(dummyNode);	//throw away the dummy node
 														}
@@ -2014,7 +2207,7 @@ com.guiseframework.Guise = function()
 							}
 							catch(e)
 							{
-								alert("error creating new child node: " + DOMUtilities.getNodeString(childNode));
+								alert("error creating new child node: " + DOM.getNodeString(childNode));
 							}
 						}
 					}
@@ -2058,105 +2251,6 @@ com.guiseframework.Guise = function()
 			}
 		};
 
-		/**
-		 * Synchronizes the literal style of an element.
-		 * @param oldElement The old version of the element.
-		 * @param attributeValue The new literal value of the style attribute, which may be <code>null</code> or the empty
-		 *          string.
-		 */
-		proto._synchronizeElementStyle = function(oldElement, attributeValue) //TODO del comment: do extra checks for attributeValue; sometimes when the server sends all border widths of 0px, the browser will change this to a single shortcut border width of 0px
-		{
-			if(dragState && dragState.dragging && dragState.dragSource == oldElement) //if this element is being dragged
-			{
-				return; //don't update the style of the element while it is being dragged TODO improve to update all the styles bug position-related styles
-			}
-			if(attributeValue == null) //if there is no attribute value
-			{
-				attributeValue = ""; //use the empty string
-			}
-			if(isUserAgentIE) //if this is IE
-			{
-				oldElement.style.cssText = attributeValue; //use a special form of accessing the style text; see http://ajax.stealthsettings.com/developing-cross-browser-javascript/setting-an-elements-style-via-javascript/
-			}
-			else
-			//for all other browsers
-			{
-				oldElement.setAttribute("style", attributeValue); //set the style attribute
-			}
-
-			//TODO fix			var removableStyles={"backgroundColor":true, "borderWidth":true, "color":true, "display":true, "visibility":true};	//create a new map of styles to remove if not assigned, with the style name as the key
-
-			//TODO del if works			var removableStyles=new Set("backgroundColor", "borderBottomWidth", "borderLeftWidth", "borderRightWidth", "borderTopWidth", "borderWidth", "color", "display", "visibility");	//create a new map of styles to remove if not assigned, with the style name as the key
-
-			/*TODO del if not needed
-						var newStyles=null;	//we'll create a new map of styles if there are new styles
-						if(attributeValue)	//if there is a new style
-						{
-							newStyles={};	//create a new map of styles
-			//TODO fix with something else to give IE layout					oldElement["contentEditable"]=false;	//for IE 6, give the component "layout" so that things like opacity will work
-							var styles=attributeValue.split(";");	//split out the individual styles
-							for(var styleIndex=styles.length-1; styleIndex>=0; --styleIndex)	//for each style
-							{
-								var styleComponents=styles[styleIndex].split(":");	//get a reference to this style and split out the property and value
-								if(styleComponents.length==2)	//we expect there to be a property and a value
-								{
-									var styleToken=styleComponents[0].trim();	//trim the token
-									var styleProperty=DOMUtilities.CSS_ATTRIBUTE_NAME_MAP[styleToken] || styleToken;	//get the CSS DOM attribute version
-									var styleValue=styleComponents[1].trim();	//get the trimmed style value
-									delete removableStyles[styleProperty];	//remove this style from the map of removable styles, indicating that we shouldn't remove this style
-									newStyles[styleProperty]=
-									
-									
-									if(oldElement.style[styleProperty]!=styleValue)	//if the style is different	TODO check about removing a style
-									{
-			alert("ready to set element style "+styleProperty+" to value "+styleValue);
-										oldElement.style[styleProperty]=styleValue;	//update this style
-									}
-								}
-							}
-						}
-			*/
-			/*TODO del if not needed
-						if(attributeValue)	//if there is a new style
-						{
-			//TODO fix with something else to give IE layout					oldElement["contentEditable"]=false;	//for IE 6, give the component "layout" so that things like opacity will work
-							var compositeStyleMap={"borderBottomWidth":"borderWidth", "borderLeftWidth":"borderWidth", "borderRightWidth":"borderWidth", "borderTopWidth":"borderWidth", "borderWidth":"borderWidth"};	//the composite styles keyed to the componentized versions of them so that if we set a component we'll know not to remove the composite style TODO create a preconfigured version of this 
-							var styles=attributeValue.split(";");	//split out the individual styles
-							for(var styleIndex=styles.length-1; styleIndex>=0; --styleIndex)	//for each style
-							{
-								var styleComponents=styles[styleIndex].split(":");	//get a reference to this style and split out the property and value
-								if(styleComponents.length==2)	//we expect there to be a property and a value
-								{
-									var styleToken=styleComponents[0].trim();	//trim the token
-									var styleProperty=DOMUtilities.CSS_ATTRIBUTE_NAME_MAP[styleToken] || styleToken;	//get the CSS DOM attribute version
-									var styleValue=styleComponents[1].trim();	//get the trimmed style value
-									delete removableStyles[styleProperty];	//remove this style from the map of removable styles, indicating that we shouldn't remove this style
-									var compositeStyle=compositeStyleMap[styleProperty];	//see if this is part of a composite style
-									if(compositeStyle)	//if this style was part of a composite style
-									{
-										delete removableStyles[compositeStyle];	//remove the composite style style from the map of removable styles, indicating that we shouldn't remove the composite style							
-									}
-									if(oldElement.style[styleProperty]!=styleValue)	//if the style is different	TODO check about removing a style
-									{
-			alert("ready to set element style "+styleProperty+" to value "+styleValue);
-										oldElement.style[styleProperty]=styleValue;	//update this style
-									}
-								}
-							}
-						}
-							//remove the removable styles that weren't assigned
-						for(var removableStyleName in removableStyles)	//for each removable style that needs removed
-						{
-			//TODO del when works alert("looking at removable style "+removableStyleName+" with old value "+oldElement.style[removableStyleName]);
-							if(oldElement.style[removableStyleName])	//if this style was not in the new element but it was in the old element
-							{
-			alert("trying to remove style "+removableStyleName+" with old value "+oldElement.style[removableStyleName]);
-								oldElement.style[removableStyleName]="";	//remove the style from the old element
-							}
-						}
-			*/
-		};
-
 		/** The private method for asynchronously initializing. */
 		proto._initialize = function()
 		{
@@ -2166,66 +2260,100 @@ com.guiseframework.Guise = function()
 			//TODO del	com.globalmentor.dom.EventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
 			com.globalmentor.dom.EventManager.addEvent(window, "unload", this.onUnload.bind(this), false); //do the appropriate uninitialization when the window unloads
 
-			/**
-			 * Support for insert for TinyMCE. Modified from XHTMLxtras TinyMCE Plugin 3.2.1, 3.4b3, Copyright © 2004-2008,
-			 * 2009, Moxiecode Systems AB.
-			 * @param elementName The name of the element to add.
-			 */
-			tinymce.Editor.prototype.insertElement = function(elementName)
+			//initialize the HTML editor
+			if(typeof CKEDITOR != "undefined")
 			{
-				var element = this.dom.getParent(this.focusElement, elementName.toUpperCase());
-				this.undoManager.add()
-				//TODO testing				tinyMCE.execCommand('mceBeginUndoLevel');
-				if(element == null)
+			}
+			else if(typeof tinyMCE != "undefined")
+			{
+				/**
+				 * Support for insert for TinyMCE. Modified from XHTMLxtras TinyMCE Plugin 3.2.1, 3.4b3, Copyright © 2004-2008,
+				 * 2009, Moxiecode Systems AB.
+				 * @param elementName The name of the element to add.
+				 */
+				tinymce.Editor.prototype.insertElement = function(elementName)
 				{
-					var selectedText = this.selection.getContent();
-					if(selectedText.length > 0)
+					var element = this.dom.getParent(this.focusElement, elementName.toUpperCase());
+					this.undoManager.add()
+					if(element == null)
 					{
-						var dom = this.dom;
-						this.getDoc().execCommand('FontName', false, 'mceinline');
-						tinymce.each(dom.select('span,font'), function(n)
+						var selectedText = this.selection.getContent();
+						if(selectedText.length > 0)
 						{
-							if(n.style.fontFamily == 'mceinline' || n.face == 'mceinline')
-								dom.replace(dom.create(elementName,
-								{
-									'data-mce-new' : 1
-								}), n, 1);
-						});
-						var elementArray = tinymce.grep(dom.select(elementName));
-						for( var i = 0; i < elementArray.length; i++)
-						{
-							var element = elementArray[i];
-							element.id = '';
-							element.setAttribute('id', '');
-							element.removeAttribute('id');
-							element.removeAttribute('data-mce-new');
+							var dom = this.dom;
+							this.getDoc().execCommand('FontName', false, 'mceinline');
+							tinymce.each(dom.select('span,font'), function(n)
+							{
+								if(n.style.fontFamily == 'mceinline' || n.face == 'mceinline')
+									dom.replace(dom.create(elementName,
+									{
+										'data-mce-new' : 1
+									}), n, 1);
+							});
+							var elementArray = tinymce.grep(dom.select(elementName));
+							for( var i = 0; i < elementArray.length; i++)
+							{
+								var element = elementArray[i];
+								element.id = '';
+								element.setAttribute('id', '');
+								element.removeAttribute('id');
+								element.removeAttribute('data-mce-new');
+							}
 						}
 					}
-				}
-				this.nodeChanged();
-				//TODO testing				tinyMCE.execCommand('mceEndUndoLevel');
-			};
+					this.nodeChanged();
+				};
 
-			tinyMCE
-					.init(
-					{
-						"mode" : "none",
-						"theme" : "advanced",
-						"skin" : "guise",
-						"plugins" : "autoresize,directionality,paste,table,xhtmlxtras,xhtmlphrases",
-						"theme_advanced_blockformats" : "p,h1,h2,h3,h4,h5,h6,address,blockquote,pre,div,dt,dd",
-						"theme_advanced_toolbar_align" : "left",
-						"theme_advanced_toolbar_location" : "top",
-						"theme_advanced_statusbar_location" : "bottom",
-						"theme_advanced_buttons1" : "undo,redo,|,formatselect,|,indent,outdent,|,justifyleft,justifycenter,justifyright,justifyfull,|,ltr,rtl,|,bullist,numlist",
-						"theme_advanced_buttons2" : "bold,italic,underline,strikethrough,|,cite,abbr,acronym,|,del,ins,|,dfn,computercode,var,samp,kbd,|,link,unlink,anchor,|,sub,sup,|,attribs",
-						"theme_advanced_buttons3" : "removeformat,|,visualaid,|,hr,|,charmap,|,tablecontrols,|,code",
-						"extended_valid_elements" : "-table[border|cellspacing|cellpadding|width|frame|rules|height|align|summary|bgcolor|background|bordercolor]", //TODO remove when TinyMCE 3.2.7 removes default border attribute in distribution
-						"invalid_elements" : "applet,embed,meta,noscript,object,script", //keep out dangerous or inappropriate HTML; see http://www.feedparser.org/docs/html-sanitization.html
-						"entity_encoding" : "raw", //don't perform entity encoding except for necessary XML characters; XHTML by default doesn't understand HTML entities, and numeric encoding would encur an unnecessary slowdown
-						onchange_callback : this._onTinyMCEChange.bind(this)
-					//configure the change callback on the global TinyMCE configuration scale
-					});
+				tinyMCE
+						.init(
+						{
+							mode : "none",
+							theme : "advanced",
+							skin : "guise",
+							plugins : "autoresize,directionality,paste,table,xhtmlxtras,xhtmlphrases",
+							formats :
+							{
+								article :
+								{
+									wrapper : 'article'
+								},
+								section :
+								{
+									wrapper : 'section'
+								},
+								aside :
+								{
+									wrapper : 'aside'
+								},
+								figure :
+								{
+									wrapper : 'figure'
+								}
+							},
+							theme_advanced_blockformats : "p,h1,h2,h3,h4,h5,h6,address,blockquote,article,section,aside,figure,pre,div,dt,dd",
+							theme_advanced_toolbar_align : "left",
+							theme_advanced_toolbar_location : "top",
+							theme_advanced_statusbar_location : "bottom",
+							theme_advanced_buttons1 : "undo,redo,|,formatselect,|,indent,outdent,|,justifyleft,justifycenter,justifyright,justifyfull,|,ltr,rtl,|,bullist,numlist",
+							theme_advanced_buttons2 : "bold,italic,underline,strikethrough,|,cite,abbr,acronym,|,del,ins,|,dfn,computercode,var,samp,kbd,|,link,unlink,anchor,|,sub,sup,|,attribs",
+							theme_advanced_buttons3 : "removeformat,|,visualaid,|,hr,|,charmap,|,tablecontrols,|,code",
+							//see https://gist.github.com/551339
+							extended_valid_elements : 'article[class|dir<ltr?rtl|id|lang|style|title],' + 'aside[class|dir<ltr?rtl|id|lang|style|title],'
+									+ 'audio[autoplay|class|controls|dir<ltr?rtl|id|lang|loop|preload|src|style|title],' + 'details[class|dir<ltr?rtl|id|lang|open|style|title],'
+									+ 'figcaption[class|dir<ltr?rtl|id|lang|style|title],' + 'figure[class|dir<ltr?rtl|id|lang|style|title],'
+									+ 'header[class|dir<ltr?rtl|id|lang|style|title],' + 'hgroup[class|dir<ltr?rtl|id|lang|style|title],'
+									+ 'mark[class|dir<ltr?rtl|id|lang|style|title],' + 'section[class|dir<ltr?rtl|id|lang|style|title],'
+									+ 'source[class|dir<ltr?rtl|id|lang|src|style|title|type],' + 'summary[class|dir<ltr?rtl|id|lang|open|style|title],'
+									+ 'time[class|datetime|dir<ltr?rtl|id|lang|pubdate|style|title],'
+									+ 'video[autoplay|class|controls|dir<ltr?rtl|id|lang|loop|preload|poster|src|style|title|width],'
+									+ 'wbr[class|dir<ltr?rtl|id|lang|style|title]',
+							invalid_elements : "applet,embed,meta,noscript,object,script", //keep out dangerous or inappropriate HTML; see http://www.feedparser.org/docs/html-sanitization.html
+							fix_list_elements : true, //make sure neste lists are valid XHTML
+							entity_encoding : "raw", //don't perform entity encoding except for necessary XML characters; XHTML by default doesn't understand HTML entities, and numeric encoding would encur an unnecessary slowdown
+							onchange_callback : this._onHTMLEditorChange.bind(this)
+						//configure the change callback on the global TinyMCE configuration scale
+						});
+			}
 
 			this._initializeNode(document.documentElement, true, true); //initialize the document tree, indicating that this is the first initialization
 			this._updateComponents(document.documentElement, true); //update all components represented by elements within the document
@@ -2314,8 +2442,8 @@ com.guiseframework.Guise = function()
 						type : "application/x-shockwave-flash"
 					}; //create a map of attributes for serialization
 					embedAttributes.src = GUISE_ASSETS_BASE_PATH + "flash/guise.swf?guiseVersion=" + GUISE_VERSION; //add the Guise version so an out-of-date cached version won't be used
-					DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "embed", embedAttributes); //<embed ...>
-					DOMUtilities.appendXMLEndTag(flashGuiseInnerHTMLStringBuilder, "embed"); //</embed>
+					DOM.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "embed", embedAttributes); //<embed ...>
+					DOM.appendXMLEndTag(flashGuiseInnerHTMLStringBuilder, "embed"); //</embed>
 				} else { //for all other browsers (we used to do this for Firefox <3 as well) TODO replace with SWFObject when it supports XHTML
 				*/
 				var objectAttributes =
@@ -2335,22 +2463,22 @@ com.guiseframework.Guise = function()
 					objectAttributes.type = "application/x-shockwave-flash";
 					objectAttributes.data = GUISE_ASSETS_BASE_PATH + "flash/guise.swf?guiseVersion=" + GUISE_VERSION; //add the Guise version so an out-of-date cached version won't be used
 				}
-				DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "object", objectAttributes); //<object ...>
-				DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param",
+				DOM.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "object", objectAttributes); //<object ...>
+				DOM.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param",
 				{
 					"name" : "movie",
 					"value" : GUISE_ASSETS_BASE_PATH + "flash/guise.swf?guiseVersion=" + GUISE_VERSION
 				}, true); //<param name="movie" value="...guise.swf"/>
-				DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param",
+				DOM.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param",
 				{
 					"name" : "quality",
 					"value" : "high"
 				}, true); //<param name="movie" value="...guise.swf"/>
-				DOMUtilities.appendXMLEndTag(flashGuiseInnerHTMLStringBuilder, "object"); //</object>
+				DOM.appendXMLEndTag(flashGuiseInnerHTMLStringBuilder, "object"); //</object>
 				//}
 				guiseFlashDiv.innerHTML = flashGuiseInnerHTMLStringBuilder.toString(); //add the Flash content
 				this._flash = guiseFlashDiv.childNodes[0]; //the first child node is the Flash component; save a reference to it for later
-				//console.debug("enqueueing flash function");
+				//console.info("enqueueing flash function");
 				this._flashFunctions.enqueue(flashFunction); //enqueue the Flash function until after initialization
 				return; //don't execute the Flash function now; it will be executed after initialization of Flash support
 			}
@@ -2529,11 +2657,11 @@ com.guiseframework.Guise = function()
 								alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" visibility: "+focusable.style.visibility+" display: "+focusable.style.display+" disabled: "+focusable.style.disabled);
 								alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" current visibility: "+focusable.currentStyle.visibility+" current display: "+focusable.currentStyle.display+" current disabled: "+focusable.currentStyle.disabled);
 								alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" runtime visibility: "+focusable.runtimeStyle.visibility+" runtime display: "+focusable.runtimeStyle.display+" runtime disabled: "+focusable.runtimeStyle.disabled);
-								alert("error trying to focus element great-grandparent: "+DOMUtilities.getNodeString(focusable.parentNode.parentNode.parentNode));
+								alert("error trying to focus element great-grandparent: "+DOM.getNodeString(focusable.parentNode.parentNode.parentNode));
 					*/
 				}
 			}
-			//TODO del	debug(DOMUtilities.getNodeString(frame));
+			//TODO del	debug(DOM.getNodeString(frame));
 		};
 
 		/**
@@ -2562,7 +2690,7 @@ com.guiseframework.Guise = function()
 			//TODO del var debugString="";
 			//TODO del	var framePosition=new Point();	//we'll calculate the frame position; create an object rather than using primitives so that the internal function can access its variables via closure
 
-			//TODO del alert("initializing frame position, with width: "+DOMUtilities.getComputedStyle(frame, "width"));
+			//TODO del alert("initializing frame position, with width: "+DOM.getComputedStyle(frame, "width"));
 			//TODO del			alert("initializing frame position, with explicit width: "+frame.width);
 			//TODO del; fix alert("initializing frame position, with width: "+frame.currentStyle.width);
 
@@ -2632,7 +2760,7 @@ com.guiseframework.Guise = function()
 					if(tetherIMG && (tetherIMG.offsetWidth <= 0 || tetherIMG.offsetHeight <= 0)) //if there is a tether image with an invalid width and/or height
 					{
 						//TODO del alert("tether image: "+tetherIMG.src+" not yet loaded; size "+tetherIMG.offsetWidth+","+tetherIMG.offsetHeight);
-						DOMUtilities.waitIMGLoaded(tetherIMG, positionTether); //make sure the image is loaded before positioning on the tether
+						DOM.waitIMGLoaded(tetherIMG, positionTether); //make sure the image is loaded before positioning on the tether
 					}
 					else
 					//if there is no tether image, or we already know its image size
@@ -2833,6 +2961,7 @@ com.guiseframework.Guise = function()
 		 */
 		proto._initializeNode = function(node, deep, initialInitialization)
 		{
+			//TODO del console.info("Initializing node ", node);
 			switch(node.nodeType)
 			//see which type of child node this is
 			{
@@ -2874,7 +3003,7 @@ com.guiseframework.Guise = function()
 							}
 							break;
 						case "div":
-							if(node.getAttribute("guise:patchType") == "temp") //if this is just a temporary element that should be removed (in anticipation of a later replacement, such as the FCKeditor, for example) (IE doesn't let us check this attribute for all elements)
+							if(node.getAttribute("data-guise-patch") == "temp") //if this is just a temporary element that should be removed (in anticipation of a later replacement, such as the FCKeditor, for example) (IE doesn't let us check this attribute for all elements)
 							{
 								return false; //stop initializing and indicate that the element should be deleted
 							}
@@ -2890,8 +3019,8 @@ com.guiseframework.Guise = function()
 														break;
 						*/
 						case "img":
-							var rolloverSrc = node.getAttribute("guise:rolloverSrc"); //get the image rollover, if there is one TODO use a constant
-							if(rolloverSrc) //if the image has a rollover TODO use a constant; maybe use hasAttributeNS()
+							var rolloverSrc = node.getAttribute("data-guise-rolloversrc"); //get the image rollover, if there is one
+							if(rolloverSrc) //if the image has a rollover TODO maybe use hasAttribute()
 							{
 								this.loadImage(rolloverSrc); //preload the image
 								if(!Element.hasClassName(node, STYLES.MOUSE_LISTENER)) //if this is not a mouse listener (which would get a onMouse listener registered, anyway)
@@ -2899,7 +3028,7 @@ com.guiseframework.Guise = function()
 									com.globalmentor.dom.EventManager.addEvent(node, "mouseover", onMouse, false); //listen for mouse over on a mouse listener
 									com.globalmentor.dom.EventManager.addEvent(node, "mouseout", onMouse, false); //listen for mouse out on a mouse listener							
 								}
-								//TODO del							alert("rollover source: "+node.getAttribute("guise:rolloverSrc"));
+								//TODO del							alert("rollover source: "+node.getAttribute("data-guise-rolloversrc"));
 							}
 							break; //TODO del if not needed
 						case "iframe": //TODO improve to only ignore fckEditor iframes if needed
@@ -2936,13 +3065,13 @@ com.guiseframework.Guise = function()
 							com.globalmentor.dom.EventManager.addEvent(node, "change", onSelectChange, false);
 							break;
 						case "span":
-							if(node.getAttribute("guise:patchType") == "temp") //if this is just a temporary element that should be removed (in anticipation of a later replacement, such as the TinyMCE editor, for example) (IE doesn't let us check this attribute for all elements)
+							if(node.getAttribute("data-guise-patch") == "temp") //if this is just a temporary element that should be removed (in anticipation of a later replacement, such as the TinyMCE editor, for example) (IE doesn't let us check this attribute for all elements)
 							{
 								return false; //stop initializing and indicate that the element should be deleted
 							}
 							break;
 						case "textarea":
-							var contentType = node.getAttribute("guise:contentType"); //get the content type TODO use a constant
+							var contentType = node.getAttribute("data-guise-contenttype"); //get the content type
 							if(contentType == "application/xhtml+xml-external-parsed-entity") //if this is an XHTML fragment
 							{
 								var component = Node.getAncestorElementByClassName(node, STYLES.COMPONENT); //get the component element
@@ -2951,20 +3080,26 @@ com.guiseframework.Guise = function()
 									var componentID = component.id; //get the component ID
 									if(componentID) //if there is a component ID
 									{
-										/*TODO FCKeditor
-																					var oFCKeditor = new FCKeditor(componentID) ;
-																					oFCKeditor.BasePath = GUISE_ASSETS_BASE_PATH+"javascript/fckeditor/";
-																					oFCKeditor.OnAfterLinkedFieldUpdate=function(){alert("updated!");};
-																					oFCKeditor.ReplaceTextarea() ;
-										*/
-
-										//if ever dynamic loading is fixed, see using global scope for eval() at http://josephsmarr.com/2007/01/31/fixing-eval-to-use-global-scope-in-ie/
-										//see also http://ajaxian.com/archives/evaling-with-ies-windowexecscript#comments
-										//dynamic loading TinyMCE via eval() gets an error and sometimes crashes Firefox
-										var editor = new tinymce.Editor(node.id, tinyMCE.settings); //create a new TinyMCE editor
-										editor.componentID = componentID; //indicate the Guise component ID of the editor
-										editor.render();
-										this._tinyMCECount++; //show that we have another tinyMCE instance
+										if(typeof CKEDITOR != "undefined")
+										{
+											var editor = CKEDITOR.instances ? CKEDITOR.instances[node.id] : null; //see if there is an existing editor for this node already; this will happen in IE9 if the page is refreshed; see http://stackoverflow.com/questions/1794219/ckeditor-instance-already-exists 
+											if(!editor) //if this editor hasn't already been created (which should only happen when the user reloads the page on IE)
+											{
+												editor = CKEDITOR.replace(node.id, this._ckEditorConfig); //replace the textarea with a CKEditor instance
+												editor.componentID = componentID; //indicate the Guise component ID of the editor
+											}
+											this._htmlEditorCount++; //show that we have another HTML editor instance
+										}
+										else if(typeof tinyMCE != "undefined")
+										{
+											//if ever dynamic loading is fixed, see using global scope for eval() at http://josephsmarr.com/2007/01/31/fixing-eval-to-use-global-scope-in-ie/
+											//see also http://ajaxian.com/archives/evaling-with-ies-windowexecscript#comments
+											//dynamic loading TinyMCE via eval() gets an error and sometimes crashes Firefox
+											var editor = new tinymce.Editor(node.id, tinyMCE.settings); //create a new TinyMCE editor
+											editor.componentID = componentID; //indicate the Guise component ID of the editor
+											editor.render();
+											this._htmlEditorCount++; //show that we have another HTML editor instance
+										}
 									}
 								}
 							}
@@ -3132,11 +3267,23 @@ com.guiseframework.Guise = function()
 					//see which element this is
 					{
 						case "textarea":
-							var contentType = node.getAttribute("guise:contentType"); //get the content type TODO use a constant
+							var contentType = node.getAttribute("data-guise-contenttype"); //get the content type
 							if(contentType == "application/xhtml+xml-external-parsed-entity") //if this is an XHTML fragment
 							{
-								tinyMCE.execCommand('mceRemoveControl', false, node.id); //remove TinyMCE
-								this._tinyMCECount--; //show that we removed a tinyMCE instance
+								if(typeof CKEDITOR != "undefined")
+								{
+									var editor = CKEDITOR.instances[node.id]; //get the associated CK editor
+									if(editor) //if there is an associated editor
+									{
+										editor.destroy(); //destroy the editor
+										this._htmlEditorCount--; //show that we removed an HTML editor instance
+									}
+								}
+								else if(typeof tinyMCE != "undefined")
+								{
+									tinyMCE.execCommand('mceRemoveControl', false, node.id); //remove TinyMCE
+									this._htmlEditorCount--; //show that we removed an HTML editor instance							
+								}
 							}
 							break;
 					}
@@ -3227,7 +3374,7 @@ com.guiseframework.Guise = function()
 															alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" style: "+focusable.style+" class: "+focusable.className+" visibility: "+focusable.style.visibility+" display: "+focusable.style.display+" disabled: "+focusable.style.disabled);
 												alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" current visibility: "+focusable.currentStyle.visibility+" current display: "+focusable.currentStyle.display+" current disabled: "+focusable.currentStyle.disabled);
 												alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" runtime visibility: "+focusable.runtimeStyle.visibility+" runtime display: "+focusable.runtimeStyle.display+" runtime disabled: "+focusable.runtimeStyle.disabled);
-												alert("error trying to focus element great-grandparent: "+DOMUtilities.getNodeString(focusable.parentNode.parentNode.parentNode));
+												alert("error trying to focus element great-grandparent: "+DOM.getNodeString(focusable.parentNode.parentNode.parentNode));
 									*/
 								}
 							}
@@ -3258,17 +3405,51 @@ com.guiseframework.Guise = function()
 		};
 
 		/**
-		 * Called when the TinyMCE editor content changes.
+		 * Called when the HTML editor (e.g. TinyMCE) content changes. The editor must have a componentID property set with
+		 * the ID of the associated Guise component
 		 * @see http://www.tinymce.com/wiki.php/Configuration:onchange_callback
+		 * @see http://alfonsoml.blogspot.com/2011/03/onchange-event-for-ckeditor.html
 		 */
-		proto._onTinyMCEChange = function(editor)
+		proto._onHTMLEditorChange = function(editor)
+		{
+			if(typeof CKEDITOR != "undefined")
+			{
+				if(!editor.checkDirty()) //if this editor isn't really dirty
+				{
+					return; //don't save anything
+				}
+			}
+			this.saveHTMLEditorContents(editor); //save the contents of the editor
+		};
+
+		/**
+		 * Unconditionally saves the contents of an HTML editor (e.g. TinyMCE). The editor must have a componentID property
+		 * set with the ID of the associated Guise component
+		 */
+		proto.saveHTMLEditorContents = function(editor)
 		{
 			if(this.isEnabled()) //if AJAX is enabled
 			{
-				//TODO fix				textInput.removeAttribute("guise:attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
-				//TODO fix				this.invalidateAncestorContent(editor);	//indicate that the ancestors now have different content TODO make sure this works with the editor
-				var ajaxRequest = new ChangeAJAXEvent(editor.componentID, new Map("value", editor.getContent())); //create a new property change event with the Guise component ID and the new value
-				this.sendAJAXRequest(ajaxRequest); //send the AJAX request
+				var content = null;
+				if(typeof CKEDITOR != "undefined")
+				{
+					content = editor.getData();
+				}
+				else if(typeof tinyMCE != "undefined")
+				{
+					content = editor.getContent();
+				}
+				if(content != null)
+				{
+					//TODO fix				textInput.removeAttribute("data-guise-a");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+					//TODO fix				this.invalidateAncestorContent(editor);	//indicate that the ancestors now have different content TODO make sure this works with the editor
+					var ajaxRequest = new ChangeAJAXEvent(editor.componentID, new Map("value", content)); //create a new property change event with the Guise component ID and the new value
+					this.sendAJAXRequest(ajaxRequest); //send the AJAX request
+				}
+				if(typeof CKEDITOR != "undefined")
+				{
+					editor.resetDirty(); //show that the editor is no longer dirty
+				}
 			}
 		};
 
@@ -3283,7 +3464,7 @@ com.guiseframework.Guise = function()
 					{
 						if(editor.IsDirty())	//only report new content if the content changed
 						{
-		//TODO fix				textInput.removeAttribute("guise:attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+		//TODO fix				textInput.removeAttribute("data-guise-a");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
 		//TODO fix				this.invalidateAncestorContent(editor);	//indicate that the ancestors now have different content TODO make sure this works with the editor
 							editor.ResetIsDirty();	//TODO testing
 							var ajaxRequest=new ChangeAJAXEvent(editor.Name, new Map("value", editor.GetData(true)));	//create a new property change event with the Guise component ID and the new value
@@ -3460,8 +3641,8 @@ function onKey(event)
  * Called when a key is pressed in a text input. This implementation checks to see if the Enter key was pressed, and if
  * so commits the input by sending it to the server and canceling the default action. The Enter keypress is allowed to
  * bubble so that it may be reported to the server. If the Enter key was pressed for a textinput with
- * guise:multiline="true", the Enter key is stopped from propagating so that it won't be sent back to the server, but
- * the browser is allowed to process the key normally multiple lines can be entered.
+ * data-guise-multiline="true", the Enter key is stopped from propagating so that it won't be sent back to the server,
+ * but the browser is allowed to process the key normally multiple lines can be entered.
  * @param event The object describing the event.
  * @see http://www.quirksmode.org/js/keys.html
  * @see http://support.microsoft.com/kb/298498
@@ -3473,14 +3654,14 @@ function onTextInputKeyDown(event)
 	if(keyCode == KEY_CODE.ENTER) //if Enter/Return was pressed
 	{
 		var textInput = event.currentTarget; //get the control in which text changed
-		if(textInput.nodeName.toLowerCase() == "textarea" && textInput.getAttribute("guise:multiline") == "true") //if this is a multiline text area
+		if(textInput.nodeName.toLowerCase() == "textarea" && textInput.getAttribute("data-guise-multiline") == "true") //if this is a multiline text area
 		{
 			event.stopPropagation(); //tell the event to stop bubbling, so that it won't be sent back to the server, but allow the browser to process the key normally, so that multiple lines can be created in a text area
 			return; //don't do anything; allow the Enter key to function normally
 		}
 		if(guise.isEnabled()) //if AJAX is enabled
 		{
-			textInput.removeAttribute("guise:attributeHash"); //the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+			textInput.removeAttribute("data-guise-a"); //the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed
 			guise.invalidateAncestorContent(textInput); //indicate that the ancestors now have different content
 			var ajaxRequest = new ChangeAJAXEvent(textInput.name, new Map("value", textInput.value)); //create a new property change event with the control ID and the new value
 			guise.sendAJAXRequest(ajaxRequest); //send the AJAX request
@@ -3523,7 +3704,7 @@ function onTextInputChange(event)
 	if(guise.isEnabled()) //if AJAX is enabled
 	{
 		var textInput = event.currentTarget; //get the control in which text changed
-		textInput.removeAttribute("guise:attributeHash"); //the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+		textInput.removeAttribute("data-guise-a"); //the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed
 		guise.invalidateAncestorContent(textInput); //indicate that the ancestors now have different content
 		//TODO del alert("an input changed! "+textInput.id+" value "+textInput.value);
 		var ajaxRequest = new ChangeAJAXEvent(textInput.name, new Map("value", textInput.value)); //create a new property change event with the control ID and the new value
@@ -3541,7 +3722,7 @@ function onFileInputChange(event)
 	if(guise.isEnabled()) //if AJAX is enabled
 	{
 		var fileInput = event.currentTarget; //get the control in which the file changed
-		fileInput.removeAttribute("guise:attributeHash"); //the file is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+		fileInput.removeAttribute("data-guise-a"); //the file is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed
 		guise.invalidateAncestorContent(fileInput); //indicate that the ancestors now have different content
 		//TODO fix alert("file input changed to value: "+fileInput.value);
 		var fileInputValue = fileInput.value; //get the new value
@@ -3646,9 +3827,23 @@ function onLinkClick(event)
 function onAction(event)
 {
 	//make sure tinyMCE changes are saved before performing any action, because TinyMCE doesn't trigger a change anymore when focus is lost (this used to happen only on IE)
-	if(guise._tinyMCECount > 0) //if there are TinyMCE editors in use 
+	if(guise._htmlEditorCount > 0) //if there are any editors in use 
 	{
-		tinyMCE.triggerSave(); //trigger a save of all tinyMCE data being edited
+		if(typeof CKEDITOR != "undefined")
+		{
+			for( var editorID in CKEDITOR.instances) //look at all the editor instances
+			{
+				var editor = CKEDITOR.instances[editorID];
+				if(editor.checkDirty()) //if this editor is dirty
+				{
+					guise.saveHTMLEditorContents(editor); //force saving the contents of the editor
+				}
+			}
+		}
+		else if(typeof tinyMCE != "undefined")
+		{
+			tinyMCE.triggerSave(); //trigger a save of all tinyMCE data being edited			
+		}
 	}
 	/*TODO FCKeditor
 		if(typeof FCKeditorAPI!="undefined")
@@ -3659,7 +3854,7 @@ function onAction(event)
 				var editor=fckEditorInstances[editorName];
 				if(editor.IsDirty())	//only report new content if the content changed
 				{
-					//TODO fix				textInput.removeAttribute("guise:attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+					//TODO fix				textInput.removeAttribute("data-guise-a");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
 					//TODO fix				guise.invalidateAncestorContent(editor);	//indicate that the ancestors now have different content TODO make sure this works with the editor
 					editor.ResetIsDirty();	//TODO testing
 					var ajaxRequest=new ChangeAJAXEvent(editor.Name, new Map("value", editor.GetData(true)));	//create a new property change event with the Guise component ID and the new value
@@ -3798,14 +3993,14 @@ function onCheckInputChange(event)
 			for( var i = groupCheckInputs.length - 1; i >= 0; --i) //for each check
 			{
 				var groupCheckInput = groupCheckInputs[i]; //get this group check
-				groupCheckInput.removeAttribute("guise:attributeHash"); //the checked status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+				groupCheckInput.removeAttribute("data-guise-a"); //the checked status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed
 				guise.invalidateAncestorContent(groupCheckInput); //indicate that the ancestors now have different content
 			}
 		}
 	}
 	if(!invalidated) //if we didn't invalidate this checkbox
 	{
-		checkInput.removeAttribute("guise:attributeHash"); //the checked status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+		checkInput.removeAttribute("data-guise-a"); //the checked status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed
 		guise.invalidateAncestorContent(checkInput); //indicate that the ancestors now have different content
 	}
 	if(guise.isEnabled()) //if AJAX is enabled
@@ -3910,7 +4105,7 @@ function onSelectChange(event)
 			var componentID = component.id; //get the component ID
 			if(componentID) //if there is a component ID
 			{
-				//TODO del		select.removeAttribute("guise:contentHash");	//indicate that the select's children have changed TODO use a constant
+				//TODO del		select.removeAttribute("data-guise-c");	//indicate that the select's children have changed TODO use a constant
 				//TODO del when works		var selectName=select.name;	//get the name of the control
 				//TODO del alert("a select changed! "+select.id);
 				var selectedIDs = new Array(); //create an array to hold the selected values
@@ -3920,7 +4115,7 @@ function onSelectChange(event)
 					var option = options[i]; //get this option
 					if(option.selected) //if this option is selected
 					{
-						option.removeAttribute("guise:attributeHash"); //the option selected status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+						option.removeAttribute("data-guise-a"); //the option selected status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed
 						guise.invalidateAncestorContent(option); //indicate that the ancestors now have different content
 						//TODO dirty the unselected option
 						selectedIDs.add(option.value); //add the selected value (which is an ID of the selected value)
@@ -4214,8 +4409,8 @@ function onMouse(event)
 	}
 	if(target.nodeName.toLowerCase() == "img") //if this is an image, perform rollovers if needed
 	{
-		var rolloverSrc = target.getAttribute("guise:rolloverSrc"); //get the image rollover, if there is one
-		if(rolloverSrc) //if the image has a rollover TODO use a constant; maybe use hasAttributeNS()
+		var rolloverSrc = target.getAttribute("data-guise-rolloversrc"); //get the image rollover, if there is one
+		if(rolloverSrc) //if the image has a rollover TODO maybe use hasAttribute()
 		{
 			switch(event.type)
 			//see which type of mouse event this is
@@ -4224,7 +4419,7 @@ function onMouse(event)
 					target.src = rolloverSrc; //switch to the rollover image
 					break;
 				case "mouseout": //if we are rolling off the image TODO use a constant
-					target.src = target.getAttribute("guise:originalSrc"); //switch back to the original source TODO use a constant
+					target.src = target.getAttribute("data-guise-originalsrc"); //switch back to the original source
 					break;
 			}
 			event.stopPropagation(); //tell the event to stop bubbling
@@ -4313,7 +4508,7 @@ function addComponentClassName(element, className, componentID)
 	var id = element.id; //get the element ID
 	if(id == componentID || (id && id.startsWith(componentID + "-"))) //if the element ID is the component ID or starts with the component ID TODO use a constant
 	{
-		DOMUtilities.addClassName(element, className); //add the class to the element
+		DOM.addClassName(element, className); //add the class to the element
 	}
 	var childNodeList = element.childNodes; //get all the child nodes
 	var childNodeCount = childNodeList.length; //find out how many children there are
@@ -4339,7 +4534,7 @@ function removeComponentClassName(element, className, componentID)
 	var id = element.id; //get the element ID
 	if(id == componentID || (id && id.startsWith(componentID + "-"))) //if the element ID is the component ID or starts with the component ID TODO use a constant
 	{
-		DOMUtilities.removeClassName(element, className); //add the class to the element
+		DOM.removeClassName(element, className); //add the class to the element
 	}
 	var childNodeList = element.childNodes; //get all the child nodes
 	var childNodeCount = childNodeList.length; //find out how many children there are
@@ -4567,7 +4762,7 @@ function OpacityFadeEffect(element, delay) //extends AbstractEffect
 
 function debug(text)
 {
-	var dymamicContent = "javascript:document.write('<html><body>" + DOMUtilities.encodeXML(text) + "</body></html>');" //create JavaScript for writing the dynamic content
+	var dymamicContent = "javascript:document.write('<html><body>" + DOM.encodeXML(text) + "</body></html>');" //create JavaScript for writing the dynamic content
 	window.open(dymamicContent, "debug", "status=no,menubar=no,scrollbars=yes,resizable=no,width=800,height=600");
 }
 

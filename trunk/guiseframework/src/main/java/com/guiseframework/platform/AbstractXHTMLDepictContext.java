@@ -1,5 +1,5 @@
 /*
- * Copyright © 2005-2011 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2005-2012 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,18 @@ package com.guiseframework.platform;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
+import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.javascript.JavaScript.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static java.util.Collections.*;
 
+import com.globalmentor.text.ASCII;
+import com.globalmentor.text.xml.*;
 import com.globalmentor.text.xml.xhtml.XHTML;
-import com.guiseframework.Destination;
-import com.guiseframework.GuiseSession;
+import com.guiseframework.*;
 
 /**
  * Abstract encapsulation of <code>application/xhtml+xml</code> information related to the current depiction.
@@ -36,12 +41,42 @@ import com.guiseframework.GuiseSession;
 public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContext implements XHTMLDepictContext
 {
 
+	/** The map of namespace URIs to be represented as HTML5 data attributes. */
+	private final Set<URI> dataAttributeNamespaceURIs = newSetFromMap(new ConcurrentHashMap<URI, Boolean>());
+
+	@Override
+	public void registerDataAttributeNamespaceURI(final URI namespaceURI)
+	{
+		dataAttributeNamespaceURIs.add(checkInstance(namespaceURI));
+	}
+
+	@Override
+	public boolean isDataAttributeNamespaceURI(final URI namespaceURI)
+	{
+		return dataAttributeNamespaceURIs.contains(namespaceURI);
+	}
+
+	/** Whether all non-default-namespace attributes are encoded at HTML5 data attributes. */
+	private boolean allDataAttributes = false;
+
+	@Override
+	public boolean isAllDataAttributes()
+	{
+		return allDataAttributes;
+	}
+
+	@Override
+	public void setAllDataAttributes(final boolean dataAttributesEnabled)
+	{
+		this.allDataAttributes = dataAttributesEnabled;
+	}
+
 	/**
 	 * Guise session constructor.
 	 * @param session The Guise user session of which this context is a part.
 	 * @param destination The destination with which this context is associated.
-	 * @exception NullPointerException if the given session and/or destination is null.
-	 * @exception IOException If there was an I/O error loading a needed resource.
+	 * @throws NullPointerException if the given session and/or destination is null.
+	 * @throws IOException If there was an I/O error loading a needed resource.
 	 */
 	public AbstractXHTMLDepictContext(final GuiseSession session, final Destination destination) throws IOException
 	{
@@ -49,7 +84,37 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 		getXMLNamespacePrefixManager().registerNamespacePrefix(XHTML_NAMESPACE_URI.toString(), null); //don't use any prefix with the XHTML namespace
 	}
 
+	/**
+	 * {@inheritDoc} If HTML5 data attributes are enabled for all attributes or for the given namespace, this implementation converts non-XHTML-namespace
+	 * attributes into HTML data attribute form. For example, an attribute in the form <code>example:fooBar</code> will be depicted as
+	 * <code>data-example-foobar</code>. {@value XML#XMLNS_NAMESPACE_PREFIX} namespace attribute will never be converted.
+	 * @see <a href="http://www.w3.org/TR/html5/elements.html#embedding-custom-non-visible-data-with-the-data-attributes">HTML 5 Data Attributes</a>
+	 * @see #isAllDataAttributes()
+	 * @see #isDataAttributeNamespaceURI(URI)
+	 */
+	@Override
+	protected <A extends Appendable> A appendAttributeName(final A appendable, final QualifiedName attributeQualifiedName) throws IOException
+	{
+		final URI namespaceURI = attributeQualifiedName.getNamespaceURI();
+		if(isAllDataAttributes() || (namespaceURI != null && isDataAttributeNamespaceURI(namespaceURI))) //if we should use data attributes
+		{
+			if(!XML.XMLNS_NAMESPACE_URI.equals(namespaceURI)) //if this isn't the XMLNS namespace
+			{
+				final String prefix = attributeQualifiedName.getPrefix();
+				if(prefix != null) //we're technically only generating attributes for prefixed attributes (although all attributes in a namespace should have a prefix)
+				{
+					appendable.append(DATA_ATTRIBUTE_ID).append(ATTRIBUTE_DELIMITER_CHAR); //data-
+					appendable.append(ASCII.toLowerCase(prefix)).append(ATTRIBUTE_DELIMITER_CHAR); //prefix-
+					appendable.append(ASCII.toLowerCase(attributeQualifiedName.getLocalName())); //localName
+					return appendable;
+				}
+			}
+		}
+		return super.appendAttributeName(appendable, attributeQualifiedName); //append the attribute name normally
+	}
+
 	/** {@inheritDoc} */
+	@Override
 	public ElementState writeJavaScriptElement(final URI javascriptURI) throws IOException
 	{
 		writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT, false); //<xhtml:script> (explicitly don't create an empty <xhtml:script> element, otherwise IE wouldn't recognize it)
@@ -59,6 +124,7 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public ElementState writeMetaElement(final String property, final String content) throws IOException
 	{
 		writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_META, true); //<xhtml:meta>; allow the <meta> element to be empty
@@ -68,6 +134,7 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 	}
 
 	/** {@inheritDoc} */
+	@Override
 	public ElementState writeMetaElement(final URI propertyNamespaceURI, final String propertyLocalName, final String content) throws IOException
 	{
 		return writeMetaElement(getQualifiedName(propertyNamespaceURI, propertyLocalName), content); //get the qualified name for the property namespace and local name

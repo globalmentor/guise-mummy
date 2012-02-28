@@ -466,8 +466,8 @@ var GUIUtilities =
 
 };
 
-/** Global utilities for working with the DOM. */
-var DOMUtilities =
+/** Utilities for working with the DOM. */
+com.globalmentor.dom.DOM =
 {
 
 	/**
@@ -776,39 +776,16 @@ var DOMUtilities =
 	},
 
 	/**
-	 * Map of DOM attribute names keyed to HTML attribute names. For example, the key "readOnly" yields "readonly".
-	 * Attribute names that do not change are not included in the map.
+	 * Map of property names keyed to DOM attribute names for properties that must be accessed via object properties. This
+	 * distinction is important primarily because attributes maintain live values for some properties that are not
+	 * synchronized with their original attribute values.
+	 * @see <a href="http://reference.sitepoint.com/javascript/Element/getAttribute">sitepoint getAttribute</a>
+	 * @see <a href="see http://msdn.microsoft.com/en-us/library/ms536429.aspx">IE getAttribute</a>
+	 * @see <a href="http://msdn.microsoft.com/en-us/library/dd347148.aspx">Attribute Differences in Internet Explorer 8</a>
 	 */
-	DOM_ATTRIBUTE_NAME_MAP :
+	ATTRIBUTE_PROPERTY_MAP :
 	{
-		"className" : "class",
-		"maxLength" : "maxlength", //see http://www.quirksmode.org/bugreports/archives/2005/02/IE_setAttributemaxlength_5_on_input.html
-		"readOnly" : "readonly"
-	},
-
-	/**
-	 * Map of HTML attribute names keyed to DOM attribute names. For example, the key "class" yields "className".
-	 * Attribute names that do not change are not included in the map.
-	 */
-	HTML_ATTRIBUTE_NAME_MAP :
-	{
-		"class" : "className",
-		"maxlength" : "maxLength", //see http://www.quirksmode.org/bugreports/archives/2005/02/IE_setAttributemaxlength_5_on_input.html
-		"readonly" : "readOnly"
-	},
-
-	/**
-	 * Map of CSS attribute names keyed to CSS style names. For example, the key "background-color" yields
-	 * "backgroundColor". Style names that do not change are not included in the map.
-	 */
-	CSS_ATTRIBUTE_NAME_MAP :
-	{
-		"background-color" : "backgroundColor",
-		"border-bottom-width" : "borderBottomWidth",
-		"border-left-width" : "borderLeftWidth",
-		"border-right-width" : "borderRightWidth",
-		"border-top-width" : "borderTopWidth",
-		"border-width" : "borderWidth"
+		"value" : "value"
 	},
 
 	/** The set of names of elements that cannot be serialized as empty elements. */
@@ -1028,7 +1005,7 @@ else
 {
 
 	/**
-	 * Removes a namespaced attribute from an element using the DOM element.removetAttribute() method.
+	 * Sets a namespaced attribute of an element using the DOM element.setAttribute() method.
 	 * 
 	 * @param element The element the attribute of which to set.
 	 * @param namespaceURI The string designating the namespace of the attribute, or null for no namespace.

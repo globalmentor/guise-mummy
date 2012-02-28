@@ -485,7 +485,7 @@ function DragState(dragSource, mouseX, mouseY)
 				//console.log("getting drag element; initial position:", this.initialPosition);
 
 				element = this.dragSource.cloneNode(true); //create a clone of the original element TODO be careful about this---probably use our own copy method, because IE will clone event handlers as well
-				DOMUtilities.cleanNode(element); //clean the clone
+				com.globalmentor.dom.DOM.cleanNode(element); //clean the clone
 				//TODO clean the element better, removing drag handles and such
 				/*TODO add workaround to cover IE select controls, which are windowed and will appear over the dragged element
 							if(document.all)	//if this is IE	TODO add better check

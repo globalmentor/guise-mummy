@@ -505,6 +505,22 @@ function Map(key, value)
 	}
 }
 
+/**
+ * Reverses an associative array by associating the keys with the given values. If multiple keys have the same value, it
+ * is undefined which of the keys will be retained as a value.
+ * @param object The associative array to reverse; if a Map is provided, a Map will be returned.
+ * @return A new associative array (a Map, if a Map was provided) with they keys associated with the values.
+ */
+Map.reverse = function(object)
+{
+	var map = object instanceof Map ? new Map() : {}; //create a new object
+	for( var key in object) //for each key property
+	{
+		map[object[key]] = key; //associate the key with the value
+	}
+	return map; //return the new map
+};
+
 //Set
 
 /**

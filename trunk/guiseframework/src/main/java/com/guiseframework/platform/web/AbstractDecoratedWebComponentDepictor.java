@@ -131,8 +131,7 @@ public abstract class AbstractDecoratedWebComponentDepictor<C extends Component>
 	{
 		if(bodyElementState!=null && bodyElementState.isOpen())	//if the body element is open
 		{
-			final String bodyNamespaceURIString=bodyElementState.getNamespaceURI();	//get the namespace of the open element
-			getDepictContext().writeElementEnd(bodyNamespaceURIString!=null ? URI.create(bodyNamespaceURIString) : null, bodyElementState.getLocalName());	//end the element
+			getDepictContext().writeElementEnd(bodyElementState.getNamespaceURI(), bodyElementState.getLocalName());	//end the element
 		}
 		bodyElementState=null;	//release the element state
 		writeDecoratorEnd();	//write the decorator ending elements

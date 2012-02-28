@@ -23,7 +23,6 @@ import static java.util.Collections.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.*;
 
-import com.globalmentor.java.Characters;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.text.xml.XML;
@@ -219,8 +218,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	{
 		if(elementState!=null && elementState.isOpen())	//if the element is open
 		{
-			final String namespaceURIString=elementState.getNamespaceURI();	//get the namespace of the open element
-			getDepictContext().writeElementEnd(namespaceURIString!=null ? URI.create(namespaceURIString) : null, elementState.getLocalName());	//end the element
+			getDepictContext().writeElementEnd(elementState.getNamespaceURI(), elementState.getLocalName());	//end the element
 		}
 		elementState=null;	//release the element state
 	}

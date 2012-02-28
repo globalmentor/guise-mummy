@@ -17,13 +17,11 @@
 package com.guiseframework.platform.web;
 
 import java.io.*;
-import java.lang.ref.*;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.*;
 import java.security.Principal;
 import java.util.*;
 import static java.util.Collections.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -37,7 +35,6 @@ import com.globalmentor.io.*;
 import com.globalmentor.java.Objects;
 import com.globalmentor.javascript.JSON;
 import com.globalmentor.log.Log;
-import com.globalmentor.management.profile.Profiler;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.model.ObjectHolder;
 import com.globalmentor.model.TaskState;
@@ -48,7 +45,6 @@ import com.globalmentor.security.Nonce;
 import com.globalmentor.servlet.http.DefaultHTTPServlet;
 import com.globalmentor.text.elff.*;
 import com.globalmentor.text.xml.XML;
-import com.globalmentor.text.xml.xhtml.XHTML;
 import com.globalmentor.text.xml.xpath.*;
 import com.globalmentor.urf.*;
 
@@ -513,7 +509,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 								{
 									if(guiseApplication.isDebug())
 									{
-//TODO fix										Probe.startStackProbe(); //TODO testing
+										//TODO fix										Probe.startStackProbe(); //TODO testing
 									}
 									try
 									{
@@ -523,7 +519,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 									{
 										if(guiseApplication.isDebug())
 										{
-//TODO fix											Probe.stopStackProbe(); //TODO testing
+											//TODO fix											Probe.stopStackProbe(); //TODO testing
 										}
 									}
 								}
@@ -687,7 +683,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 								final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
 				*/
 				//TODO del and tidy
-				final HTTPServletWebDepictContext depictContext = new HTTPServletWebDepictContext(guiseRequest, response, guiseSession, resourceWriteDestination); //create a new Guise context
+				//TODO del if not needed final HTTPServletWebDepictContext depictContext = new HTTPServletWebDepictContext(guiseRequest, response, guiseSession, resourceWriteDestination); //create a new Guise context
 				try
 				{
 					final ServletFileUpload servletFileUpload = new ServletFileUpload(); //create a new servlet file upload object
@@ -946,8 +942,9 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		final boolean isGuisePOST = POST_METHOD.equals(guiseRequest.getHTTPServletRequest().getMethod())
 				&& guiseRequest.getHTTPServletRequest().getParameter(WebApplicationFrameDepictor.getActionInputID(guiseSession.getApplicationFrame())) != null;
 		final HTTPServletWebDepictContext depictContext = new HTTPServletWebDepictContext(guiseRequest, response, guiseSession, componentDestination); //create a new Guise context
+		depictContext.registerDataAttributeNamespaceURI(GUISE_ML_NAMESPACE_URI); //use HTML5 data attributes for the Guise namespace
 		//Log.trace("setting context");
-		guisePlatform.getDepictLock().lock(); //get the platform depict lock
+		guisePlatform.getDepictLock().lock(); //get the platform depict lock TODO surely reconsider this
 		guisePlatform.setDepictContext(depictContext); //set the depict context for this platform
 		try
 		{
@@ -1514,8 +1511,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 				depictContext.setOutputContentType(XML.CONTENT_TYPE); //switch to the "text/xml" content type TODO verify UTF-8 in a consistent, elegant way
 				text = "<response>" + text + "</response>"; //wrap the text in a response element
 			}
-			//Log.trace("response length:", text.length());
-			//Log.trace("response text:", text);
+			//			Log.debug("response length:", text.length());
+			//			Log.debug("response text:", text);
 			final byte[] bytes = text.getBytes(UTF_8_CHARSET); //write the content we collected in the context as series of bytes encoded in UTF-8
 			final OutputStream outputStream = getCompressedOutputStream(guiseRequest.getHTTPServletRequest(), response); //get a compressed output stream, if possible
 			outputStream.write(bytes); //write the bytes
@@ -1735,9 +1732,12 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 
 	/**
 	 * Serves a resource that has been verified to exist.
-	 * <p>This version sets the content description and content disposition of {@link ResourceReadDestination}. If
-	 * there is a query parameter named {@value #GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER}, the value will indicate the content disposition through the use
-	 * of the serialize version of a {@link ContentDispositionType} value.</p> @param request The HTTP request.
+	 * <p>
+	 * This version sets the content description and content disposition of {@link ResourceReadDestination}. If there is a query parameter named
+	 * {@value #GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER}, the value will indicate the content disposition through the use of the serialize version of a
+	 * {@link ContentDispositionType} value.
+	 * </p>
+	 * @param request The HTTP request.
 	 * @param response The HTTP response.
 	 * @param resource The resource being served.
 	 * @param serveContent <code>true</code> if the contents of the resource should be returned.
@@ -2600,7 +2600,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		 * @param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is
 		 *          known.
 		 * @throws NullPointerException if the reference URI, resource description, Guise container, Guise application, Guise session, resource destination,
-		 *              navigation path, and/or bookmark is <code>null</code>.
+		 *           navigation path, and/or bookmark is <code>null</code>.
 		 */
 		public DestinationResource(final URI referenceURI, final URFResource resourceDescription, final HTTPServletGuiseContainer guiseContainer,
 				final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ResourceReadDestination resourceDestination,

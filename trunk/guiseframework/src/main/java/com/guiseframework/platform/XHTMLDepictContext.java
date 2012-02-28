@@ -1,5 +1,5 @@
 /*
- * Copyright © 2005-2011 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2005-2012 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,9 @@ import com.globalmentor.util.StringTemplate;
 import com.guiseframework.geometry.Side;
 
 /**
- * Encapsulation of application/xhtml+xml information related to the current depiction.
+ * Encapsulation of <code>application/xhtml+xml</code> information related to the current depiction.
  * @author Garret Wilson
+ * @see <a href="http://www.w3.org/TR/html5/elements.html#embedding-custom-non-visible-data-with-the-data-attributes">HTML 5 Data Attributes</a>
  */
 public interface XHTMLDepictContext extends XMLDepictContext
 {
@@ -45,10 +46,43 @@ public interface XHTMLDepictContext extends XMLDepictContext
 	public final Set<Side> CSS_SIDES = EnumSet.of(Side.LEFT, Side.RIGHT, Side.TOP, Side.BOTTOM);
 
 	/**
+	 * Registers a namespace URI to be represented as an HTML5 data attribute. Any attribute in this namespace will be converted to lowercase and presented as an
+	 * HTML5 attribute. For example, an attribute in the form <code>example:fooBar</code> will be depicted as <code>data-example-foobar</code>.
+	 * @param namespaceURI The namespace URI to register.
+	 * @throws NullPointerException if the given namespace URI is <code>null</code>.
+	 */
+	public void registerDataAttributeNamespaceURI(final URI namespaceURI);
+
+	/**
+	 * Determines whether the given namespace URI should be represented as an HTML5 data attribute.
+	 * @param namespaceURI The namespace URI to check.
+	 * @return <code>true</code> if the given namespace URI should be represented as an HTML5 data attribute.
+	 */
+	public boolean isDataAttributeNamespaceURI(final URI namespaceURI);
+
+	/**
+	 * Returns whether all non-default-namespace attributes are encoded at HTML5 data attributes. This setting overrides {@link #isDataAttributeNamespaceURI(URI)}
+	 * .
+	 * @return Whether all non-default-namespace attributes are encoded at HTML5 data attributes.
+	 */
+	public boolean isAllDataAttributes();
+
+	/**
+	 * Sets whether all non-default-namespace attributes are encoded at HTML5 data attributes. If this setting is enabled, any non-default-namespace attribute
+	 * will be converted to lowercase and presented as an HTML5 attribute. For example, an attribute in the form <code>example:fooBar</code> will be depicted as
+	 * <code>data-example-foobar</code>.
+	 * <p>
+	 * If set to <code>true</code>, the setting of {@link #isDataAttributeNamespaceURI(URI)} is ignored.
+	 * </p>
+	 * @param dataAttributesEnabled Whether non-XHTML-namespace attributes are encoded at HTML5 data attributes.
+	 */
+	public void setAllDataAttributes(final boolean dataAttributesEnabled);
+
+	/**
 	 * Generates a JavaScript element that references the given URI. The given URI is resolved to the application path.
 	 * @param javascriptURI The application-relative IRO to the JavaScript file.
 	 * @return The state of the element written.
-	 * @exception IOException if there is an error writing the information.
+	 * @throws IOException if there is an error writing the information.
 	 */
 	public ElementState writeJavaScriptElement(final URI javascriptURI) throws IOException;
 
@@ -57,7 +91,7 @@ public interface XHTMLDepictContext extends XMLDepictContext
 	 * @param property The meta property name.
 	 * @param content The meta property content.
 	 * @return The state of the element written.
-	 * @exception IOException if there is an error writing the information.
+	 * @throws IOException if there is an error writing the information.
 	 */
 	public ElementState writeMetaElement(final String property, final String content) throws IOException;
 
@@ -68,7 +102,7 @@ public interface XHTMLDepictContext extends XMLDepictContext
 	 * @param propertyLocalName The local name of the meta property name with no prefix.
 	 * @param content The meta property content.
 	 * @return The state of the element being written.
-	 * @exception IOException if there is an error writing the information.
+	 * @throws IOException if there is an error writing the information.
 	 */
 	public ElementState writeMetaElement(final URI propertyNamespaceURI, final String propertyLocalName, final String content) throws IOException;
 }
