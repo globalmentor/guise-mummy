@@ -518,7 +518,7 @@ com.guiseframework.Guise = function()
 		{
 			name : 'paragraph',
 			items : [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', /*'-', 'JustifyLeft', 'JustifyCenter',
-																																																																			'JustifyRight', 'JustifyBlock', */'-', 'BidiLtr', 'BidiRtl' ]
+																																																																					'JustifyRight', 'JustifyBlock', */'-', 'BidiLtr', 'BidiRtl' ]
 		},
 		{
 			name : 'links',
@@ -3431,7 +3431,7 @@ com.guiseframework.Guise = function()
 				var content = null;
 				if(typeof CKEDITOR != "undefined")
 				{
-					content = editor.getData();
+					content = editor.getData().replace(/&nbsp;/g, " ");	//compensate for CKEditor adding &nbsp; on e.g. Chrome 17; see http://dev.ckeditor.com/ticket/8774
 				}
 				else if(typeof tinyMCE != "undefined")
 				{
