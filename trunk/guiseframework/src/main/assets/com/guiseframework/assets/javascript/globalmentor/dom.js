@@ -135,21 +135,23 @@ document.importNodeCustom = function(node, deep)
 			{
 				importedNode = document.createElement(node.nodeName); //create a non-namespace-aware element
 			}
+			var attributes = node.attributes; //get the element's attributes
+			var attributeCount = attributes.length; //find out how many attributes there are
+			for( var i = 0; i < attributeCount; ++i) //for each attribute
 			{
-				var attributes = node.attributes; //get the element's attributes
-				var attributeCount = attributes.length; //find out how many attributes there are
-				for( var i = 0; i < attributeCount; ++i) //for each attribute
+				var attribute = attributes[i]; //get this attribute
+				var attributeName = attribute.nodeName; //get the attribute name
+				var attributeValue = attribute.nodeValue; //get the attribute value
+				//some attributes must be copied differently to the HTML DOM
+				switch(attributeName)
 				{
-					var attribute = attributes[i]; //get this attribute
-					var attributeName = attribute.nodeName; //get the attribute name
-					var attributeValue = attribute.nodeValue; //get the attribute value
-					if(attributeName == "style") //if this is the style attribute, it must be copied differently
-					{
-						importedNode.style.cssText = attributeValue; //see http://www.quirksmode.org/dom/w3c_css.html#t30
-					}
-					else
-					//for all other attributes
-					{
+					case "style": //see http://www.quirksmode.org/dom/w3c_css.html#t30
+						importedNode.style.cssText = attributeValue;
+						break;
+					case "type": //IE9 doesn't copy <input type="..."/> correctly unless the property is used; see http://msdn.microsoft.com/en-us/library/ms534700.aspx
+						importedNode.type = attributeValue;
+						break;
+					default:
 						if(importedNode.setAttributeNodeNS instanceof Function && typeof attribute.namespaceURI != "undefined") //if the attribute supports namespaces
 						{
 							var importedAttribute = document.createAttributeNS(attribute.namespaceURI, attributeName); //create a namespace-aware attribute
@@ -163,18 +165,18 @@ document.importNodeCustom = function(node, deep)
 							importedAttribute.nodeValue = attributeValue; //set the attribute value TODO verify this works on Safari
 							importedNode.setAttributeNode(importedAttribute); //set the attribute for the element
 						}
-					}
+						break;
 				}
-				if(deep) //if we should import deep
+			}
+			if(deep) //if we should import deep
+			{
+				var childNodes = node.childNodes; //get a list of child nodes
+				var childNodeCount = childNodes.length; //find out how many child nodes there are
+				for( var i = 0; i < childNodeCount; ++i) //for each child node
 				{
-					var childNodes = node.childNodes; //get a list of child nodes
-					var childNodeCount = childNodes.length; //find out how many child nodes there are
-					for( var i = 0; i < childNodeCount; ++i) //for each child node
-					{
-						var childNode = childNodes[i]; //get this child node
-						var importedChildNode = document.importNode(childNode, deep);
-						importedNode.appendChild(importedChildNode);
-					}
+					var childNode = childNodes[i]; //get this child node
+					var importedChildNode = document.importNode(childNode, deep);
+					importedNode.appendChild(importedChildNode);
 				}
 			}
 			break;
@@ -469,6 +471,9 @@ var GUIUtilities =
 /** Utilities for working with the DOM. */
 com.globalmentor.dom.DOM =
 {
+
+	/** The URI of the XHTML namespace. */
+	XHTML_NAMESPACE_URI : "http://www.w3.org/1999/xhtml",
 
 	/**
 	 * Ensures that an IMG is loaded before calling a given function.

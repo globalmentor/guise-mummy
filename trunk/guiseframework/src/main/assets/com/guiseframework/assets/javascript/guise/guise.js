@@ -139,9 +139,6 @@ var GUISE_AJAX_UPLOAD_POLL_INTERVAL = 3000;
 /** This will later be updated to indicate if there is a resource import control on the form. */
 var hasResourceImportControl = false;
 
-/** The URI of the XHTML namespace. */
-var XHTML_NAMESPACE_URI = "http://www.w3.org/1999/xhtml";
-
 /** The URI of the GuiseML namespace. */
 var GUISE_ML_NAMESPACE_URI = "http://guiseframework.com/id/ml#";
 
@@ -875,7 +872,7 @@ com.guiseframework.Guise = function()
 		proto.createUploadIFrame = function()
 		{
 			this.removeUploadIFrame(); //first remove the current upload IFrame, if any
-			this._uploadIFrame = document.createElementNS("http://www.w3.org/1999/xhtml", "iframe"); //create an IFrame
+			this._uploadIFrame = document.createElementNS(DOM.XHTML_NAMESPACE_URI, "iframe"); //create an IFrame
 			this._uploadIFrame.id = "uploadIFrame"; //set the ID of the frame so that we can do the IE fix later
 			this._uploadIFrame.name = "uploadIFrame";
 			this._uploadIFrame.src = GUISE_ASSETS_BASE_PATH + "documents/empty.html"; //set the source to be an empty HTML document that won't create SSL messages of insecurity
@@ -1532,7 +1529,7 @@ com.guiseframework.Guise = function()
 		 */
 		proto.playAudio = function(uri, id, contentType)
 		{
-			var audioElement = document.createElementNS("http://www.w3.org/1999/xhtml", "audio");
+			var audioElement = document.createElementNS(DOM.XHTML_NAMESPACE_URI, "audio");
 			var browserSupportsAudio = audioElement != null && audioElement.canPlayType && audioElement.canPlayType(contentType.toString()).replace(/no/, "");
 			var flashSupportsAudio = contentType.match("audio", "mpeg") || contentType.match("audio", "wav") || contentType.match("audio", "aac");
 			if(browserSupportsAudio && !id) //if the browser supports this type of audio; currently we don't support playing controlled audio natively in the browser 
@@ -1912,6 +1909,7 @@ com.guiseframework.Guise = function()
 					}
 				}
 				//patch in the new and changed attributes
+				//TODO fix <intput type="..."/> change on IE9; see http://social.msdn.microsoft.com/Forums/en-US/iewebdevelopment/thread/c5531668-13ce-43c5-a1e9-fc504dc183d1 and http://msdn.microsoft.com/en-us/library/ms534700.aspx
 				var attributes = element.attributes; //get the new element's attributes
 				for( var i = attributes.length - 1; i >= 0; --i) //for each attribute
 				{
@@ -2389,7 +2387,7 @@ com.guiseframework.Guise = function()
 		proto.onLoad = function()
 		{
 			//create the modal layer
-			this._modalLayer = document.createElementNS("http://www.w3.org/1999/xhtml", "div"); //create a div TODO use a constant for the namespace
+			this._modalLayer = document.createElementNS(DOM.XHTML_NAMESPACE_URI, "div"); //create a div TODO use a constant for the namespace
 			this._modalLayer.className = "modalLayer"; //load the modal layer style
 			//TODO fix				oldModalLayerDisplayDisplay="none";
 			this._modalLayer.style.display = "none";
@@ -2425,7 +2423,7 @@ com.guiseframework.Guise = function()
 				//see http://msdn2.microsoft.com/en-us/library/ms537508.aspx
 				//see http://blog.deconcept.com/2005/12/15/internet-explorer-eolas-changes-and-the-flash-plugin/
 				//see http://www.jeroenwijering.com/?item=embedding_flash
-				var guiseFlashDiv = document.createElementNS("http://www.w3.org/1999/xhtml", "div"); //create an outer div; we must use innerHTML, as the DOM methods don't result in a fully working Flash object
+				var guiseFlashDiv = document.createElementNS(DOM.XHTML_NAMESPACE_URI, "div"); //create an outer div; we must use innerHTML, as the DOM methods don't result in a fully working Flash object
 				guiseFlashDiv.style.position = "absolute"; //take the div out of normal flow
 				guiseFlashDiv.style.left = "-9999px"; //completely remove the div from sight
 				guiseFlashDiv.style.top = "-9999px";
@@ -3756,7 +3754,7 @@ function onFileInputChange(event)
 					{
 						var ajaxRequest = new ChangeAJAXEvent(componentID, new Map("resourcePath", fileInput.value)); //create a new property change event with the control ID and the added resource path
 						guise.sendAJAXRequest(ajaxRequest); //send the AJAX request
-						var fileInputCopy = document.createElementNS("http://www.w3.org/1999/xhtml", "input"); //create a new input element; do *not* clone the element, because IE will clone the event handlers along with it
+						var fileInputCopy = document.createElementNS(DOM.XHTML_NAMESPACE_URI, "input"); //create a new input element; do *not* clone the element, because IE will clone the event handlers along with it
 						fileInputCopy.className = fileInput.className;
 						fileInputCopy.name = fileInput.name;
 						fileInputCopy.type = fileInput.type;
