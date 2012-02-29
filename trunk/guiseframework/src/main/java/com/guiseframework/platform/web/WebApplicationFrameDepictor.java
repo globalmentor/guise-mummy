@@ -21,10 +21,12 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.util.*;
 
+import com.globalmentor.collections.Lists;
 import com.globalmentor.facebook.*;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.net.URIPath;
 
+import static com.globalmentor.collections.Lists.listOf;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.impossible;
 import static com.globalmentor.javascript.JavaScript.*;
@@ -46,6 +48,7 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.Axis;
 import com.guiseframework.model.*;
+import com.guiseframework.theme.Theme;
 
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
@@ -240,8 +243,23 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 				depictContext.write('\n');
 			}
 		}
+		final List<URI> styleURIs = listOf(depictContext.getStyles()); //get the list of styles for depiction
+		//add in the content component theme's style, if appropriate TODO this will all get changed when we maintain a separate application frame for each navigation path
+		final Component contentComponent = component.getContent(); //get the content component
+		if(contentComponent != null) //if there is a content component
+		{
+			final Theme theme = contentComponent.getTheme(); //get the content component's theme
+			for(final URFResource style : theme.getStyles()) //get the styles
+			{
+				final URI styleURI = style.getURI(); //get this style's URI
+				if(styleURI != null && !styleURIs.contains(styleURI)) //if this style has a URI we don't yet have
+				{
+					styleURIs.add(styleURI); //add this style URI to the list, overriding all other styles
+				}
+			}
+		}
 		//<xhtml:link> styles in this order: theme styles (from most distant parent to current theme), application style, destination style
-		for(final URI styleURI : depictContext.getStyles()) //for each style URI
+		for(final URI styleURI : styleURIs) //for each style URI
 		{
 			//TODO del Log.trace("looking at style URI", styleURI);
 			depictContext.write('\t');
