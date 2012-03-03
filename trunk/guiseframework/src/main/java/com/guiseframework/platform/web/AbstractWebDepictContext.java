@@ -83,7 +83,6 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 	 * <li>{@value XMLCSS#CSS_PROP_COLOR} with a value of {@link Color} and an alpha less than 1.0.</li>
 	 * <li>{@value XMLCSS#CSS_PROP_CURSOR} with a value of {@link URI}, interpreted as a predefined cursor (one of {@link Cursor#getURI()}) or as a URI to a
 	 * custom cursor; URI references are allowed in either.</li>
-	 * <li>{@value XMLCSS#CSS_PROP_DISPLAY} with a value of {@value XMLCSS#CSS_DISPLAY_INLINE_BLOCK}.</li>
 	 * <li>{@value XMLCSS#CSS_PROP_FONT_WEIGHT} with a value of {@link Number}, interpreted in terms of {@link PresentationModel#FONT_WEIGHT_NORMAL} and
 	 * {@link PresentationModel#FONT_WEIGHT_BOLD}.</li>
 	 * <li>{@value XMLCSS#CSS_PROP_MAX_WIDTH} or {@value XMLCSS#CSS_PROP_MAX_HEIGHT} with a pixel value of {@link Extent}.</li>
@@ -107,8 +106,7 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 	 */
 	public String getCSSStyleString(final Map<String, Object> styles, final Orientation orientation)
 	{
-		final WebPlatform platform = getPlatform(); //get the platform
-		final StringBuilder stringBuilder = new StringBuilder(); //creat a new string builder for style
+		final StringBuilder stringBuilder = new StringBuilder(); //create a new string builder for style
 		for(final Map.Entry<String, Object> entry : styles.entrySet()) //for each style entry
 		{
 			String property = entry.getKey(); //get the property
@@ -129,26 +127,6 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 				if(cursor != null) //if this is a predefined cursor
 				{
 					value = cursor; //use the cursor as the value, which will get serialized later; otherwise, we'll use the custom URI as any other URI
-				}
-			}
-			//display property; see http://www.w3.org/TR/CSS21/visuren.html#display-prop
-			//see also: http://www.webmasterworld.com/css/3271607.htm
-			//see also for table-based method: http://godlikenerd.com/weblog/2005/03/24/firefox-inline-block-frustration/
-			//see also for support by other browsers: http://www.quirksmode.org/css/display.html#inlineblock
-			else if(CSS_DISPLAY_INLINE_BLOCK.equals(value) && CSS_PROP_DISPLAY.equals(property)) //if this is display:inline-block (check the value first, because there will be few inline-block values but a substantial number of display properties that do not have the inline-block property)
-			{
-				final WebUserAgentProduct userAgent = platform.getClientProduct(); //get the user agent
-				//Firefox 3 brings inline-block support; see http://developer.mozilla.org/en/docs/CSS:display and http://developer.mozilla.org/en/docs/Firefox_3_for_developers and https://bugzilla.mozilla.org/show_bug.cgi?id=9458
-				if(userAgent.getBrand() == FIREFOX && userAgent.getVersionNumber() < 3) //if this is Firefox <3, a value of "-moz-inline-box" is required (see http://www.quirksmode.org/css/display.html#inlineblock)
-				{
-					value = "-moz-inline-box"; //switch to a display value of "-moz-inline-box" TODO use a constant					
-				}
-				//IE added inline-block support in version 8; see http://www.quirksmode.org/css/display.html
-				else if(userAgent.getBrand() == INTERNET_EXPLORER && userAgent.getVersionNumber() < 8) //if this is IE <8, an hasLayout must be given to an inline element, in any order (see http://www.brunildo.org/test/InlineBlockLayout.html)
-				{
-					stringBuilder.append(CSS_PROP_DISPLAY).append(PROPERTY_DIVIDER_CHAR).append(CSS_DISPLAY_INLINE).append(DECLARATION_SEPARATOR_CHAR); //make the element inline: display: inline;					
-					stringBuilder.append("zoom").append(PROPERTY_DIVIDER_CHAR).append("1").append(DECLARATION_SEPARATOR_CHAR); //give the element hasLayout: zoom: 1;
-					continue; //we did custom appending; don't do the default appending
 				}
 			}
 			else if(CSS_PROP_FONT_WEIGHT.equals(property) && value instanceof Number) //if this is a font weight as a number
