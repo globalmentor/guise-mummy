@@ -37,25 +37,32 @@ import static com.guiseframework.model.ui.PresentationModel.*;
 import com.guiseframework.platform.AbstractXHTMLDepictContext;
 import com.guiseframework.platform.web.WebPlatform;
 import static com.guiseframework.platform.web.WebPlatform.*;
-import static com.guiseframework.platform.web.WebUserAgentProduct.Brand.*;
 import com.guiseframework.style.*;
 
 /**
- * Abstract implementation of information related to the current depiction on the web platform. This implementation maps the XHTML namespace
- * {@value WebPlatform#GUISE_ML_NAMESPACE_URI} to the prefix {@value WebPlatform#GUISE_ML_NAMESPACE_PREFIX}. This implementation maps the XHTML namespace
- * {@value OpenGraph#NAMESPACE_URI} to the prefix {@value OpenGraph#NAMESPACE_PREFIX}. This implementation defaults to not using quirks mode.
+ * Abstract implementation of information related to the current depiction on the web platform.
+ * <p>
+ * This implementation maps the XHTML namespace {@value WebPlatform#GUISE_ML_NAMESPACE_URI} to the prefix {@value WebPlatform#GUISE_ML_NAMESPACE_PREFIX}.
+ * </p>
+ * <p>
+ * This implementation maps the XHTML namespace {@value OpenGraph#NAMESPACE_URI} to the prefix {@value OpenGraph#NAMESPACE_PREFIX}.
+ * </p>
+ * <p>
+ * This implementation defaults to not using quirks mode.
+ * </p>
  * @author Garret Wilson
  */
 public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContext implements WebDepictContext
 {
 
 	/** {@inheritDoc} This implementation always returns <code>false</code>. */
+	@Override
 	public boolean isQuirksMode()
 	{
 		return false;
 	}
 
-	/** @return The web platform on which Guise objects are depicted. */
+	@Override
 	public WebPlatform getPlatform()
 	{
 		return (WebPlatform)super.getPlatform();
@@ -86,7 +93,6 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 	 * <li>{@value XMLCSS#CSS_PROP_FONT_WEIGHT} with a value of {@link Number}, interpreted in terms of {@link PresentationModel#FONT_WEIGHT_NORMAL} and
 	 * {@link PresentationModel#FONT_WEIGHT_BOLD}.</li>
 	 * <li>{@value XMLCSS#CSS_PROP_MAX_WIDTH} or {@value XMLCSS#CSS_PROP_MAX_HEIGHT} with a pixel value of {@link Extent}.</li>
-	 * <li>{@value XMLCSS#CSS_PROP_OPACITY} with a value of {@link Number}.</li>
 	 * </ul>
 	 * These styles include the CSS property {@value XMLCSS#CSS_PROP_DISPLAY} with a value of {@value XMLCSS#CSS_DISPLAY_INLINE_BLOCK}. This implementation
 	 * supports values of the following types:
@@ -117,7 +123,7 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 				final double alpha = rgbColor.getComponent(RGBColor.Component.ALPHA); //get the alpha value
 				if(alpha < 1.0 && !styles.containsKey(CSS_PROP_OPACITY)) //if the alpha value isn't 100% and some opacity has not explicitly been set
 				{
-					appendCSSOpacityProperty(stringBuilder, alpha); //append an opacity that matches the color opacity
+					stringBuilder.append(CSS_PROP_OPACITY).append(PROPERTY_DIVIDER_CHAR).append(Double.toString(alpha)).append(DECLARATION_SEPARATOR_CHAR); //append an opacity that matches the color opacity
 				}
 			}
 			else if(CSS_PROP_CURSOR.equals(property) && value instanceof URI) //if this is a cursor property with a URI value
@@ -145,11 +151,6 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 				{
 					value = CSS_FONT_WEIGHT_NORMAL; //everything else is normal in this implementation
 				}
-			}
-			else if(CSS_PROP_OPACITY.equals(property) && value instanceof Number) //if this is the opacity property with a number
-			{
-				appendCSSOpacityProperty(stringBuilder, ((Number)value).doubleValue()); //append the opacity
-				continue; //we did custom appending; don't do the default appending
 			}
 			stringBuilder.append(property).append(PROPERTY_DIVIDER_CHAR); //property:
 			if(value instanceof Color) //if the value is a color
@@ -188,25 +189,6 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 			stringBuilder.append(DECLARATION_SEPARATOR_CHAR); //;
 		}
 		return stringBuilder.toString(); //return the string we constructed
-	}
-
-	/**
-	 * Appends a CSS {@value XMLCSS#CSS_PROP_OPACITY} property designation. If the user agent is IE 6, the appropriate {@value XMLCSS#CSS_PROP_FILTER} property
-	 * will also be added.
-	 * @param stringBuilder The string builder to which the style will be added
-	 * @param opacity The opacity value to add.
-	 * @return The provided string builder.
-	 */
-	protected StringBuilder appendCSSOpacityProperty(final StringBuilder stringBuilder, final double opacity)
-	{
-		stringBuilder.append(CSS_PROP_OPACITY).append(PROPERTY_DIVIDER_CHAR).append(Double.toString(opacity)).append(DECLARATION_SEPARATOR_CHAR); //add the opacity
-		final WebUserAgentProduct userAgent = getPlatform().getClientProduct(); //get the user agent
-		if(userAgent.getBrand() == INTERNET_EXPLORER && userAgent.getVersionNumber() <= 7) //if this is IE6 or IE7 (neither of which support opacity properly), we'll have to use a filter
-		{
-			stringBuilder.append(CSS_PROP_FILTER).append(PROPERTY_DIVIDER_CHAR).append("alpha(opacity=").append(Math.round(opacity * 100)).append(')')
-					.append(DECLARATION_SEPARATOR_CHAR); //add a filter for IE that gives the same opacity
-		}
-		return stringBuilder; //return the string builder
 	}
 
 	/**
