@@ -25,14 +25,13 @@ import com.guiseframework.component.layout.Layout;
 import com.guiseframework.component.transfer.Transferable;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
-import com.guiseframework.platform.AbstractDepictor.DepictedPropertyChangeListener;
 
 /**An abstract implementation of a component depictor.
-If the component has a model, this implementation will automatically register to listen to its properties being changed.
-This implementation does not recognize that it needs to be updated if the associated component changes its registered listeners.
-A view keeps track of component modified properties between updates.
-This implementation ignores a change in {@link Component#VALID_PROPERTY} and {@link Component#INPUT_STRATEGY_PROPERTY}.
-This implementation only dirties the depictors of containers, not composite components in general, when child components are added or removed.
+<p>If the component has a model, this implementation will automatically register to listen to its properties being changed.</p>
+<p>This implementation does not recognize that it needs to be updated if the associated component changes its registered listeners.</p>
+<p>A view keeps track of component modified properties between updates.</p>
+<p>This implementation ignores a change in {@link Component#VALID_PROPERTY} and {@link Component#INPUT_STRATEGY_PROPERTY}.</p>
+<p>This implementation only dirties the depictors of containers, not composite components in general, when child components are added or removed.</p>
 @param <C> The type of component being depicted.
 @author Garret Wilson
 */
@@ -62,13 +61,8 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 		getIgnoredProperties().add(Component.VALID_PROPERTY);	//ignore Component.valid, because we don't want to mark composite components as dirty just because a child does not have valid input
 	}
 		
-	/**Called when the depictor is installed in a component.
-	If the component is a container, this version listens for container events and marks the view as needing updated.
-	@param component The component into which this depictor is being installed.
-	@exception NullPointerException if the given component is <code>null</code>.
-	@exception IllegalStateException if this depictor is already installed in a component.
-	@see #depictedPropertyChangeListener
-	*/
+	/**{@inheritDoc} If the component is a container, this version listens for container events and marks the view as needing updated.*/
+	@Override
 	public void installed(final C component)
 	{
 		super.installed(component);	//perform the default installation
@@ -94,13 +88,8 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 		}
 	}
 
-	/**Called when the depictor is uninstalled from a component.
-	If the component is a container, this version stops listening for container events.
-	@param component The component from which this depictor is being uninstalled.
-	@exception NullPointerException if the given component is <code>null</code>.
-	@exception IllegalStateException if this depictor is not installed in a component.
-	@see #depictedPropertyChangeListener
-	*/
+	/**{@inheritDoc} If the component is a container, this version stops listening for container events.*/
+	@Override
 	public void uninstalled(final C component)
 	{
 		super.uninstalled(component);	//perform the default uninstallation
@@ -126,11 +115,8 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 		}
 	}
 
-	/**Processes an event from the platform.
-	This implementation handles {@link PlatformFocusEvent}.
-	@param event The event to be processed.
-	@exception IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
-	*/
+	/**{@inheritDoc} This implementation handles {@link PlatformFocusEvent}.*/
+	@Override
 	public void processEvent(final PlatformEvent event)
 	{
 		if(event instanceof PlatformDropEvent)	//if this is a drop event
@@ -185,10 +171,10 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 		super.processEvent(event);	//do the default processing of the event
 	}
 
-	/**Updates the depiction of the object.
-	This implementation updates child components, if any.
-	@exception IOException if there is an error updating the depiction.
+	/**{@inheritDoc} This implementation updates child components, if any.
+	 * @see #depictChildren()
 	*/
+	@Override
 	public void depict() throws IOException
 	{
 		depictChildren();	//depict the children
@@ -197,7 +183,7 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 
 	/**Depicts any child components.
 	@param component The depicted component.
-	@exception IOException if there is an error updating the child depictions.
+	@throws IOException if there is an error updating the child depictions.
 	*/
 	protected void depictChildren() throws IOException
 	{
@@ -211,13 +197,13 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 		}
 	}
 
-	/**Depicts a single child.
-	The child's depiction will be marked as updated if successful.
-	@param childComponent The child component to depict.
-	@exception IOException if there is an error updating the child depiction.
-	@see Depictor#setDepicted(boolean)
-	@see DepictedObject#depict()
-	*/
+	/**
+	 * Depicts a single child. The child's depiction will be marked as updated if successful.
+	 * @param childComponent The child component to depict.
+	 * @throws IOException if there is an error updating the child depiction.
+	 * @see Depictor#setDepicted(boolean)
+	 * @see DepictedObject#depict()
+	 */
 	protected void depictChild(final Component childComponent) throws IOException
 	{
 		childComponent.getDepictor().setDepicted(false);	//mark the child component's view as generally not updated to prevent partial updates TODO improve this---in the future we may want child views to partially update, too, but not when the whole page is being rendered from scratch
@@ -256,13 +242,8 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 		}
 	}
 
-	/**Called when a depicted object bound property is changed.
-	This method may also be called for objects related to the depicted object, so if specific properties are checked the event source should be verified to be the depicted object.
-	This implementation marks the property as being modified if the property is not an ignored property.
-	@param propertyChangeEvent An event object describing the event source and the property that has changed.
-	@see #getIgnoredProperties()
-	@see #setPropertyModified(String, boolean)
-	*/ 
+	/**{@inheritDoc} This implementation marks the property as being modified if the property is not an ignored property.*/ 
+	@Override
 	protected void depictedObjectPropertyChange(final PropertyChangeEvent propertyChangeEvent)
 	{
 		super.depictedObjectPropertyChange(propertyChangeEvent);	//do the default property change functionality
@@ -305,10 +286,7 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 	protected class DepictedCompositeComponentListener implements CompositeComponentListener
 	{
 
-
-		/**Called when a child component is added to a composite component.
-		@param childComponentEvent The event indicating the added child component and the target parent composite component.
-		*/
+		@Override
 		public void childComponentAdded(final ComponentEvent childComponentEvent)
 		{
 			if(childComponentEvent.getTarget()==getDepictedObject())	//if the component as added as a direct child of this component
@@ -317,9 +295,7 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 			}
 		}
 
-		/**Called when a child component is removed from a composite component.
-		@param childComponentEvent The event indicating the removed child component and the target parent composite component.
-		*/
+		@Override
 		public void childComponentRemoved(final ComponentEvent childComponentEvent)
 		{
 			if(childComponentEvent.getTarget()==getDepictedObject())	//if the component as removed as a direct child of this component

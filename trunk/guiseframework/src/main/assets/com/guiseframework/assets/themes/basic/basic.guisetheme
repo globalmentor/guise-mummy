@@ -28,6 +28,22 @@
 			"theme.color.link"="cornflowerblue"
 		〕
 	;[
+		†non-link text controls‡
+		*theme.Rule:
+			select.selector=*select.IntersectionSelector:
+				select.selector=*select.ObjectClassSelector:
+					select.selectClass=component.AbstractTextControl
+				;
+				select.selector=*select.NegationSelector:
+					select.selector=*select.ObjectClassSelector:
+						select.selectClass=component.LinkControl
+					;
+				;
+			;
+			theme.apply=*theme.Template:
+				cursor=<resource:theme.cursor.text>
+			;
+		;
 		†ActionControl‡
 		*theme.Rule:
 			select.selector=*select.ObjectClassSelector:
@@ -122,6 +138,22 @@
 			;
 			theme.apply=*theme.Template:
 				labelFontWeight=#0.75#
+			;
+		;
+		†non-link LabelComponent‡
+		*theme.Rule:
+			select.selector=*select.IntersectionSelector:
+				select.selector=*select.ObjectClassSelector:
+					select.selectClass=component.LabelComponent
+				;
+				select.selector=*select.NegationSelector:
+					select.selector=*select.ObjectClassSelector:
+						select.selectClass=component.LinkControl
+					;
+				;
+			;
+			theme.apply=*theme.Template:
+				cursor=<resource:theme.cursor.text>
 			;
 		;
 		†Link‡
@@ -234,6 +266,15 @@
 				columnLabelFontWeight=#0.75#
 				columnPaddingLineNearExtent=*geometry.Extent(#0.5#, «*geometry.Unit("EM")»)
 				columnPaddingLineFarExtent=*geometry.Extent(#0.5#, «*geometry.Unit("EM")»)
+			;
+		;
+		†TextBox‡
+		*theme.Rule:
+			select.selector=*select.ObjectClassSelector:
+				select.selectClass=component.TextBox
+			;
+			theme.apply=*theme.Template:
+				cursor=<resource:theme.cursor.text>
 			;
 		;
 		†Toolbar‡
