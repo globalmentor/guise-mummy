@@ -1,5 +1,5 @@
 /*
- * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2005-2012 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ import com.guiseframework.geometry.*;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.PresentationModel;
 import com.guiseframework.platform.AbstractComponentDepictor;
-import com.guiseframework.platform.XHTMLDepictContext;
 
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Enums.*;
@@ -46,6 +45,7 @@ import static com.guiseframework.model.ui.PresentationModel.*;
 import com.guiseframework.style.Color;
 import com.guiseframework.style.FontStyle;
 
+import static com.guiseframework.platform.XHTMLDepictContext.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**
@@ -547,29 +547,38 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 		{
 			final Side side = orientation.getSide(border); //get the absolute side on which this border lies
 			final Extent borderExtent = component.getBorderExtent(border); //get the border extent for this border
-			if(borderExtent.getValue() != 0) //if there is a border on this side (to save bandwidth, only include border properties if there is a border; the stylesheet defaults to no border)
+			if(!borderExtent.isEmpty()) //if there is a border on this side (to save bandwidth, only include border properties if there is a border; the stylesheet defaults to no border)
 			{
-				styles.put(XHTMLDepictContext.CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), borderExtent); //set the border extent
-				styles.put(XHTMLDepictContext.CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), component.getBorderStyle(border)); //indicate the border style for this side
+				styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), borderExtent); //set the border extent
+				styles.put(CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), component.getBorderStyle(border)); //indicate the border style for this side
 				final Color borderColor = component.getBorderColor(border); //get the border color for this border
 				if(borderColor != null) //if a border color is specified
 				{
-					styles.put(XHTMLDepictContext.CSS_PROPERTY_BORDER_X_COLOR_TEMPLATE.apply(getSerializationName(side)), borderColor); //set the border color
+					styles.put(CSS_PROPERTY_BORDER_X_COLOR_TEMPLATE.apply(getSerializationName(side)), borderColor); //set the border color
 				}
 			}
 			final Extent marginExtent = component.getMarginExtent(border); //get the margin extent for this border
-			if(marginExtent.getValue() != 0) //if a non-zero margin extent is specified (the stylesheet specifies a zero default margin)
+			if(!marginExtent.isEmpty()) //if a non-zero margin extent is specified (the stylesheet specifies a zero default margin)
 			{
-				styles.put(XHTMLDepictContext.CSS_PROPERTY_MARGIN_X_TEMPLATE.apply(getSerializationName(side)), marginExtent); //set the margin extent
+				styles.put(CSS_PROPERTY_MARGIN_X_TEMPLATE.apply(getSerializationName(side)), marginExtent); //set the margin extent
 			}
 			final Extent paddingExtent = component.getPaddingExtent(border); //get the padding extent for this border
-			if(paddingExtent.getValue() != 0) //if a non-zero padding extent is specified (the stylesheet specifies a zero default padding)
+			if(!paddingExtent.isEmpty()) //if a non-zero padding extent is specified (the stylesheet specifies a zero default padding)
 			{
-				styles.put(XHTMLDepictContext.CSS_PROPERTY_PADDING_X_TEMPLATE.apply(getSerializationName(side)), paddingExtent); //set the padding extent
+				styles.put(CSS_PROPERTY_PADDING_X_TEMPLATE.apply(getSerializationName(side)), paddingExtent); //set the padding extent
 			}
 		}
-		final URI cursorURI = component.getCursor(); //get the URI for the cursor
-
+		for(final Corner corner : Corner.values()) //for each logical corner
+		{
+			final Dimensions cornerArcSize = component.getCornerArcSize(corner); //get the arc size for this corner
+			if(!cornerArcSize.isEmpty()) //if a non-zero corner arc size is indicated
+			{
+				final Side xSide = orientation.getSide(corner.getBorder(orientation.getFlow(Axis.X)));
+				final Side ySide = orientation.getSide(corner.getBorder(orientation.getFlow(Axis.Y)));
+				styles.put(CSS_PROPERTY_BORDER_X_Y_RADIUS_TEMPLATE.apply(getSerializationName(ySide), getSerializationName(xSide)),
+						new Extent[] { cornerArcSize.getWidth(), cornerArcSize.getHeight() }); //set the width and height of the arc for this corner
+			}
+		}
 		final URI resolvedCursorURI = session.resolveURI(component.getCursor()); //get the URI for the cursor and resolve it against the application, resolving resources in the process
 		final URI relativeCursorURI = session.getApplication().getBasePath().toURI().relativize(resolvedCursorURI); //get the relative cursor URI with all resource references resolved
 		if(!Cursor.DEFAULT.getURI().equals(relativeCursorURI)) //if this isn't the default cursor (the stylesheet sets all cursors to the default)

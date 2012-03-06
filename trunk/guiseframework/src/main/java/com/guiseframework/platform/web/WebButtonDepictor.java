@@ -1,5 +1,5 @@
 /*
- * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2005-2012 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ public class WebButtonDepictor<C extends ActionControl> extends AbstractWebActio
 			{
 				final Side side=orientation.getSide(border);	//get the absolute side on which this border lies
 				final Extent borderExtent=component.getBorderExtent(border);	//get the border extent for this border
-				if(borderExtent.getValue()!=0)	//if there is a border on this side (to save bandwidth, only include border properties if there is a border; the stylesheet defaults to no border)
+				if(!borderExtent.isEmpty())	//if there is a border on this side (to save bandwidth, only include border properties if there is a border; the stylesheet defaults to no border)
 				{
 					styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), borderExtent);	//set the border extent
 					styles.put(CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), component.getBorderStyle(border));	//indicate the border style for this side

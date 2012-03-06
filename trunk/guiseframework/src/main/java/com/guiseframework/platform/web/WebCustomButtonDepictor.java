@@ -1,5 +1,5 @@
 /*
- * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2005-2012 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ import com.guiseframework.event.ActionListener;
 import com.guiseframework.event.ModalNavigationListener;
 import com.guiseframework.event.NavigateActionListener;
 import com.guiseframework.geometry.Axis;
-import com.guiseframework.geometry.Dimensions;
 import com.guiseframework.geometry.Extent;
 import com.guiseframework.geometry.Unit;
 
@@ -204,11 +203,11 @@ public class WebCustomButtonDepictor<C extends ActionControl> extends AbstractWe
 			cornerStyles.put(CSS_PROP_BACKGROUND, new RGBColor(0xF5F5F5));	//background: backgroundColor
 */
 			cornerStyles.put(CSS_PROP_FONT_SIZE, new Extent(1, Unit.PIXEL));	//font-size: 1px
-			if(!Dimensions.ZERO_DIMENSIONS.equals(component.getCornerArcSize(leftCorner)))	//if there is a left corner arc size
+			if(!component.getCornerArcSize(leftCorner).isEmpty())	//if there is a left corner arc size
 			{
 				cornerStyles.put(CSS_PROP_MARGIN_LEFT, cornerMargin);	//add the appropriate margin for the left side
 			}
-			if(!Dimensions.ZERO_DIMENSIONS.equals(component.getCornerArcSize(rightCorner)))	//if there is a right corner arc size
+			if(!component.getCornerArcSize(rightCorner).isEmpty())	//if there is a right corner arc size
 			{
 				cornerStyles.put(CSS_PROP_MARGIN_RIGHT, cornerMargin);	//add the appropriate margin for the right side
 			}

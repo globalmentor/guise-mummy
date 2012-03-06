@@ -33,6 +33,9 @@ public interface XHTMLDepictContext extends XMLDepictContext
 
 	/** The template for "border-?-color". */
 	public final static StringTemplate CSS_PROPERTY_BORDER_X_COLOR_TEMPLATE = new StringTemplate("border-", StringTemplate.STRING_PARAMETER, "-color");
+	/** The template for "border-?-?-radius". */
+	public final static StringTemplate CSS_PROPERTY_BORDER_X_Y_RADIUS_TEMPLATE = new StringTemplate("border-", StringTemplate.STRING_PARAMETER, "-",
+			StringTemplate.STRING_PARAMETER, "-radius");
 	/** The template for "border-?-style". */
 	public final static StringTemplate CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE = new StringTemplate("border-", StringTemplate.STRING_PARAMETER, "-style");
 	/** The template for "border-?-width". */

@@ -87,7 +87,7 @@ public class WebToolButtonDepictor<C extends ActionControl> extends WebButtonDep
 			{
 				final Side side=orientation.getSide(border);	//get the absolute side on which this border lies
 				final Extent borderExtent=component.getBorderExtent(border);	//get the border extent for this border
-				if(borderExtent.getValue()!=0)	//if there is a border on this side (to save bandwidth, only include border properties if there is a border; the stylesheet defaults to no border)
+				if(!borderExtent.isEmpty())	//if there is a border on this side (to save bandwidth, only include border properties if there is a border; the stylesheet defaults to no border)
 				{
 					styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), borderExtent);	//set the border extent
 					styles.put(CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), component.getBorderStyle(border));	//indicate the border style for this side

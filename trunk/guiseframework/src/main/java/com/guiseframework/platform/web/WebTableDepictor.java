@@ -174,7 +174,7 @@ public class WebTableDepictor<C extends Table> extends AbstractWebComponentDepic
 				final Side side=orientation.getSide(border);	//get the absolute side on which this border lies
 	/*TODO fix
 				final Extent borderExtent=component.getBorderExtent(border);	//get the border extent for this border
-				if(borderExtent.getValue()!=0)	//if there is a border on this side (to save bandwidth, only include border properties if there is a border; the stylesheet defaults to no border)
+				if(!borderExtent.isEmpty())	//if there is a border on this side (to save bandwidth, only include border properties if there is a border; the stylesheet defaults to no border)
 				{
 					styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), borderExtent);	//set the border extent
 					styles.put(CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), component.getBorderStyle(border));	//indicate the border style for this side
@@ -185,13 +185,13 @@ public class WebTableDepictor<C extends Table> extends AbstractWebComponentDepic
 					}
 				}
 				final Extent marginExtent=component.getMarginExtent(border);	//get the margin extent for this border
-				if(marginExtent.getValue()!=0)	//if a non-zero margin extent is specified (the stylesheet specifies a zero default margin)
+				if(!marginExtent.isEmpty())	//if a non-zero margin extent is specified (the stylesheet specifies a zero default margin)
 				{
 					styles.put(CSS_PROPERTY_MARGIN_X_TEMPLATE.apply(getSerializationName(side)), marginExtent);	//set the margin extent
 				}
 	*/
 				final Extent paddingExtent=uiModel.getPaddingExtent(border);	//get the padding extent for this border of the current column
-				if(paddingExtent.getValue()!=0)	//if a non-zero padding extent is specified (the stylesheet specifies a zero default padding)
+				if(!paddingExtent.isEmpty())	//if a non-zero padding extent is specified (the stylesheet specifies a zero default padding)
 				{
 					labelStyles.put(XHTMLDepictContext.CSS_PROPERTY_PADDING_X_TEMPLATE.apply(getSerializationName(side)), paddingExtent);	//set the padding extent
 				}
@@ -246,7 +246,7 @@ public class WebTableDepictor<C extends Table> extends AbstractWebComponentDepic
 			final Side side=orientation.getSide(border);	//get the absolute side on which this border lies
 /*TODO fix
 			final Extent borderExtent=component.getBorderExtent(border);	//get the border extent for this border
-			if(borderExtent.getValue()!=0)	//if there is a border on this side (to save bandwidth, only include border properties if there is a border; the stylesheet defaults to no border)
+			if(!borderExtent.isEmpty())	//if there is a border on this side (to save bandwidth, only include border properties if there is a border; the stylesheet defaults to no border)
 			{
 				styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), borderExtent);	//set the border extent
 				styles.put(CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), component.getBorderStyle(border));	//indicate the border style for this side
@@ -257,13 +257,13 @@ public class WebTableDepictor<C extends Table> extends AbstractWebComponentDepic
 				}
 			}
 			final Extent marginExtent=component.getMarginExtent(border);	//get the margin extent for this border
-			if(marginExtent.getValue()!=0)	//if a non-zero margin extent is specified (the stylesheet specifies a zero default margin)
+			if(!marginExtent.isEmpty())	//if a non-zero margin extent is specified (the stylesheet specifies a zero default margin)
 			{
 				styles.put(CSS_PROPERTY_MARGIN_X_TEMPLATE.apply(getSerializationName(side)), marginExtent);	//set the margin extent
 			}
 */
 			final Extent paddingExtent=component.getColumnPaddingExtent(column, border);	//get the padding extent for this border of the current column
-			if(paddingExtent.getValue()!=0)	//if a non-zero padding extent is specified (the stylesheet specifies a zero default padding)
+			if(!paddingExtent.isEmpty())	//if a non-zero padding extent is specified (the stylesheet specifies a zero default padding)
 			{
 				styles.put(XHTMLDepictContext.CSS_PROPERTY_PADDING_X_TEMPLATE.apply(getSerializationName(side)), paddingExtent);	//set the padding extent
 			}

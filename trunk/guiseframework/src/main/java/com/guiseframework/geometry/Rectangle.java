@@ -1,5 +1,5 @@
 /*
- * Copyright © 2005-2008 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2005-2012 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,7 +122,7 @@ public class Rectangle
 	{
 		this.position=checkInstance(position, "Position cannot be null.");
 		this.size=checkInstance(size, "Size cannot be null.");
-		if(size.getDepth().getValue()!=0)	//if the depth is not zero
+		if(!size.getDepth().isEmpty())	//if the depth is not zero
 		{
 			throw new IllegalArgumentException("A rectangle cannot have a depth.");
 		}

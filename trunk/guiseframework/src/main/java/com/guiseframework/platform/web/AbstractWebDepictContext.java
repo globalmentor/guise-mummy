@@ -27,7 +27,6 @@ import com.globalmentor.text.xml.stylesheets.css.*;
 import com.guiseframework.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.geometry.*;
-import com.guiseframework.model.ui.PresentationModel;
 
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Enums.*;
@@ -72,8 +71,8 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 	 * Guise session constructor.
 	 * @param session The Guise user session of which this context is a part.
 	 * @param destination The destination with which this context is associated.
-	 * @exception NullPointerException if the given session and/or destination is null.
-	 * @exception IOException If there was an I/O error loading a needed resource.
+	 * @throws NullPointerException if the given session and/or destination is null.
+	 * @throws IOException If there was an I/O error loading a needed resource.
 	 */
 	public AbstractWebDepictContext(final GuiseSession session, final Destination destination) throws IOException
 	{
@@ -83,33 +82,7 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 		getXMLNamespacePrefixManager().registerNamespacePrefix(Facebook.NAMESPACE_URI.toString(), Facebook.NAMESPACE_PREFIX); //map the Facebook namespace to the Facebook prefix
 	}
 
-	/**
-	 * Returns a string representation of the provided style declarations. This method performs special processing on the following properties, including
-	 * generating user-agent-specific styles to allow proper display on certain browsers:
-	 * <ul>
-	 * <li>{@value XMLCSS#CSS_PROP_COLOR} with a value of {@link Color} and an alpha less than 1.0.</li>
-	 * <li>{@value XMLCSS#CSS_PROP_CURSOR} with a value of {@link URI}, interpreted as a predefined cursor (one of {@link Cursor#getURI()}) or as a URI to a
-	 * custom cursor; URI references are allowed in either.</li>
-	 * <li>{@value XMLCSS#CSS_PROP_FONT_WEIGHT} with a value of {@link Number}, interpreted in terms of {@link PresentationModel#FONT_WEIGHT_NORMAL} and
-	 * {@link PresentationModel#FONT_WEIGHT_BOLD}.</li>
-	 * <li>{@value XMLCSS#CSS_PROP_MAX_WIDTH} or {@value XMLCSS#CSS_PROP_MAX_HEIGHT} with a pixel value of {@link Extent}.</li>
-	 * </ul>
-	 * These styles include the CSS property {@value XMLCSS#CSS_PROP_DISPLAY} with a value of {@value XMLCSS#CSS_DISPLAY_INLINE_BLOCK}. This implementation
-	 * supports values of the following types:
-	 * <ul>
-	 * <li>{@link Color}</li>
-	 * <li>{@link Cursor}</li>
-	 * <li>{@link Extent}</li>
-	 * <li>{@link FontStyle}</li>
-	 * <li>{@link LineStyle}</li>
-	 * <li>{@link List}</li>
-	 * <li>{@link URI} with URI references allowed</li>
-	 * </ul>
-	 * All other values will be added using {@link Object#toString()}.
-	 * @param styles The map of styles to write, each keyed to a CSS style property.
-	 * @param orientation The orientation of the component for which the style is being produced.
-	 * @return A string containing the given CSS properties and styles.
-	 */
+	@Override
 	public String getCSSStyleString(final Map<String, Object> styles, final Orientation orientation)
 	{
 		final StringBuilder stringBuilder = new StringBuilder(); //create a new string builder for style
@@ -153,48 +126,75 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 				}
 			}
 			stringBuilder.append(property).append(PROPERTY_DIVIDER_CHAR); //property:
-			if(value instanceof Color) //if the value is a color
-			{
-				appendCSSValue(stringBuilder, (Color)value); //append the color value
-			}
-			else if(value instanceof Cursor) //if the value is a cursor
-			{
-				appendCSSValue(stringBuilder, (Cursor)value, orientation); //append the cursor value
-			}
-			else if(value instanceof Extent) //if the value is an extent
-			{
-				appendCSSValue(stringBuilder, (Extent)value); //append the extent value
-			}
-			else if(value instanceof FontStyle) //if the value is a font style
-			{
-				appendCSSValue(stringBuilder, (FontStyle)value); //append the font style
-			}
-			else if(value instanceof LineStyle) //if the value is a line style
-			{
-				appendCSSValue(stringBuilder, (LineStyle)value); //append the font style
-			}
-			else if(value instanceof List) //if the value is a list
-			{
-				appendCSSValue(stringBuilder, (List<?>)value); //append the list
-			}
-			else if(value instanceof URI) //if the value is a URI
-			{
-				appendCSSValue(stringBuilder, (URI)value); //append the URI
-			}
-			else
-			//if the value is any other type of object
-			{
-				stringBuilder.append(value); //append the normal string value of the object
-			}
+			appendCSSValue(stringBuilder, value, orientation); //value
 			stringBuilder.append(DECLARATION_SEPARATOR_CHAR); //;
 		}
 		return stringBuilder.toString(); //return the string we constructed
 	}
 
 	/**
+	 * Appends a CSS value to the given string builder. If the value is an array of a non-primitive type, each element in the array will be appended separated by
+	 * spaces.
+	 * @param stringBuilder The string builder to which the style value will be added.
+	 * @param value The value to append.
+	 * @param orientation The orientation of the component for which the style is being produced.
+	 * @return The provided string builder.
+	 */
+	protected StringBuilder appendCSSValue(final StringBuilder stringBuilder, final Object value, final Orientation orientation)
+	{
+		if(value instanceof Object[]) //if the value is an array
+		{
+			final Object[] array = (Object[])value;
+			final int arrayLength = array.length;
+			for(int i = 0; i < arrayLength; ++i) //look at each element in the array
+			{
+				if(i > 0) //append a separator if needed
+				{
+					stringBuilder.append(' ');
+				}
+				appendCSSValue(stringBuilder, array[i], orientation); //append this individual value element
+			}
+		}
+		else if(value instanceof Color) //if the value is a color
+		{
+			appendCSSValue(stringBuilder, (Color)value); //append the color value
+		}
+		else if(value instanceof Cursor) //if the value is a cursor
+		{
+			appendCSSValue(stringBuilder, (Cursor)value, orientation); //append the cursor value
+		}
+		else if(value instanceof Extent) //if the value is an extent
+		{
+			appendCSSValue(stringBuilder, (Extent)value); //append the extent value
+		}
+		else if(value instanceof FontStyle) //if the value is a font style
+		{
+			appendCSSValue(stringBuilder, (FontStyle)value); //append the font style
+		}
+		else if(value instanceof LineStyle) //if the value is a line style
+		{
+			appendCSSValue(stringBuilder, (LineStyle)value); //append the font style
+		}
+		else if(value instanceof List) //if the value is a list
+		{
+			appendCSSValue(stringBuilder, (List<?>)value); //append the list
+		}
+		else if(value instanceof URI) //if the value is a URI
+		{
+			appendCSSValue(stringBuilder, (URI)value); //append the URI
+		}
+		else
+		//if the value is any other type of object
+		{
+			stringBuilder.append(value); //append the normal string value of the object
+		}
+		return stringBuilder;
+	}
+
+	/**
 	 * Appends a CSS string representation of the given color. This method correctly handles transparent colors with the special CSS keyword
 	 * {@value XMLCSS#CSS_COLOR_TRANSPARENT}.
-	 * @param stringBuilder The string builder to which the style will be added
+	 * @param stringBuilder The string builder to which the style will be added.
 	 * @param color The color to represent in CSS.
 	 * @return The provided string builder.
 	 */
@@ -222,7 +222,7 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 	 * @param cursor The cursor to represent in CSS.
 	 * @param orientation The orientation of the component for which the cursor is being set.
 	 * @return The provided string builder.
-	 * @exception NullPointerException if the given cursor is <code>null</code>.
+	 * @throws NullPointerException if the given cursor is <code>null</code>.
 	 */
 	protected static StringBuilder appendCSSValue(final StringBuilder stringBuilder, final Cursor cursor, final Orientation orientation)
 	{
@@ -252,7 +252,7 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 	 * @param stringBuilder The string builder to which the style will be added
 	 * @param fontStyle The font style to represent in CSS.
 	 * @return The provided string builder.
-	 * @exception NullPointerException if the given font style is <code>null</code>.
+	 * @throws NullPointerException if the given font style is <code>null</code>.
 	 */
 	protected static StringBuilder appendCSSValue(final StringBuilder stringBuilder, final FontStyle fontStyle)
 	{
@@ -264,7 +264,7 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 	 * @param stringBuilder The string builder to which the style will be added
 	 * @param lineStyle The line style to be represented in CSS.
 	 * @return The provided string builder.
-	 * @exception NullPointerException if the given line style is <code>null</code>.
+	 * @throws NullPointerException if the given line style is <code>null</code>.
 	 */
 	protected static StringBuilder appendCSSValue(final StringBuilder stringBuilder, final LineStyle lineStyle)
 	{
