@@ -18,7 +18,8 @@ package com.guiseframework.model.urf;
 
 import java.net.URI;
 
-import com.globalmentor.urf.*;
+import org.urframework.*;
+
 import com.guiseframework.model.*;
 
 /**Abstract dynamic functionality for all tree node models representing URF.

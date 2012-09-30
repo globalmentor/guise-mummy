@@ -21,11 +21,12 @@ import java.util.*;
 import static java.util.Collections.*;
 import java.util.regex.Pattern;
 
+import org.urframework.URFResource;
+
 import com.globalmentor.beans.BoundPropertyObject;
 import com.globalmentor.java.Objects;
 import static com.globalmentor.java.Objects.*;
 import com.globalmentor.net.*;
-import com.globalmentor.urf.URFResource;
 
 import static com.globalmentor.net.URIs.*;
 

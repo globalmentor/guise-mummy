@@ -19,11 +19,12 @@ package com.guiseframework.model.rdf.maqro;
 import java.util.Collections;
 import java.util.List;
 
+import org.urframework.maqro.FollowupEvaluation;
+import org.urframework.maqro.Group;
+import org.urframework.maqro.Question;
+
 import com.globalmentor.rdf.RDFObject;
 import com.globalmentor.rdf.RDFResource;
-import com.globalmentor.urf.maqro.FollowupEvaluation;
-import com.globalmentor.urf.maqro.Group;
-import com.globalmentor.urf.maqro.Question;
 import com.guiseframework.model.TreeNodeModel;
 import com.guiseframework.model.rdf.AbstractRDFResourceTreeNodeModel;
 

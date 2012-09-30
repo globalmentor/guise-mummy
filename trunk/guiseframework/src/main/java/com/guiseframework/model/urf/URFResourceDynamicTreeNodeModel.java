@@ -19,10 +19,11 @@ package com.guiseframework.model.urf;
 import java.net.URI;
 import java.util.*;
 
-import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.urf.URF.*;
+import org.urframework.*;
 
-import com.globalmentor.urf.*;
+import static com.globalmentor.java.Classes.*;
+import static org.urframework.URF.*;
+
 import com.guiseframework.model.*;
 
 /**A dynamic tree node model that represents an URF resource.

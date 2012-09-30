@@ -20,9 +20,10 @@ import java.net.URI;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.urframework.URFResource;
+
 import com.globalmentor.beans.PropertyBindable;
 import com.globalmentor.net.*;
-import com.globalmentor.urf.URFResource;
 
 /**
  * Description of a navigation point, its properties, and its restrictions.

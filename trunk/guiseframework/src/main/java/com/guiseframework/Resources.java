@@ -18,6 +18,8 @@ package com.guiseframework;
 
 import java.net.URI;
 
+import org.urframework.*;
+
 import static com.globalmentor.java.Classes.*;
 
 import com.globalmentor.java.Classes;
@@ -25,8 +27,7 @@ import com.globalmentor.java.Enums;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.Text.*;
-import com.globalmentor.urf.*;
-import static com.globalmentor.urf.URF.*;
+import static org.urframework.URF.*;
 
 /**Guise resources description in URF.
 @author Garret Wilson

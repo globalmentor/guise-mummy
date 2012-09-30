@@ -19,10 +19,11 @@ package com.guiseframework;
 import java.io.InputStream;
 import java.net.URI;
 
+import org.urframework.URFResource;
+import org.urframework.content.*;
+
 import com.globalmentor.net.ResourceIOException;
 import com.globalmentor.net.URIPath;
-import com.globalmentor.urf.URFResource;
-import com.globalmentor.urf.content.*;
 
 /**A navigation point that retrieves a resource description and/or contents.
 @author Garret Wilson

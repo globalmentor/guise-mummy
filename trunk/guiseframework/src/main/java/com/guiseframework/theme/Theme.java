@@ -21,21 +21,21 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 import org.ploop.PLOOPURFProcessor;
+import org.urframework.*;
+import org.urframework.select.*;
+import org.urframework.xml.XML;
 
 import static java.util.Collections.*;
+import static org.urframework.URF.*;
 
 import com.globalmentor.collections.CollectionMap;
 import com.globalmentor.collections.HashSetHashMap;
 import com.globalmentor.net.ContentType;
-import com.globalmentor.urf.*;
-import com.globalmentor.urf.select.*;
-import com.globalmentor.urf.xml.XML;
 import com.globalmentor.util.*;
 import com.guiseframework.style.*;
 
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.urf.URF.*;
 import static com.guiseframework.Resources.*;
 
 /**

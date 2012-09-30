@@ -22,6 +22,8 @@ import java.net.*;
 import java.security.Principal;
 import java.util.*;
 import static java.util.Collections.*;
+import static org.urframework.content.Content.*;
+import static org.urframework.dcmi.DCMI.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -46,7 +48,6 @@ import com.globalmentor.servlet.http.DefaultHTTPServlet;
 import com.globalmentor.text.elff.*;
 import com.globalmentor.text.xml.XML;
 import com.globalmentor.text.xml.xpath.*;
-import com.globalmentor.urf.*;
 
 import com.guiseframework.*;
 import com.guiseframework.component.*;
@@ -71,8 +72,6 @@ import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.time.TimeZones.*;
-import static com.globalmentor.urf.content.Content.*;
-import static com.globalmentor.urf.dcmi.DCMI.*;
 
 import static com.guiseframework.platform.web.WebPlatform.*;
 import static com.guiseframework.platform.web.WebUserAgentProduct.Brand.*;
@@ -83,6 +82,7 @@ import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.ploop.*;
+import org.urframework.*;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 

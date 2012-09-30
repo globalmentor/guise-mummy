@@ -16,8 +16,9 @@
 
 package com.guiseframework.component.rdf.maqro;
 
+import org.urframework.maqro.Interaction;
+
 import com.globalmentor.rdf.*;
-import com.globalmentor.urf.maqro.Interaction;
 
 /**A tree node representation strategy representing a MAQRO interaction.
 @author Garret Wilson

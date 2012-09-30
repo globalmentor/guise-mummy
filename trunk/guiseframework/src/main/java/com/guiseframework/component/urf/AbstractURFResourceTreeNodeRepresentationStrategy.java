@@ -18,9 +18,10 @@ package com.guiseframework.component.urf;
 
 import java.net.URI;
 
+import org.urframework.*;
+
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.urf.URF.*;
-import com.globalmentor.urf.*;
+import static org.urframework.URF.*;
 
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;

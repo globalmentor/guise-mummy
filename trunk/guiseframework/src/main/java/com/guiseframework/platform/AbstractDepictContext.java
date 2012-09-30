@@ -20,11 +20,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
+import org.urframework.URFResource;
+
 import static java.util.Collections.*;
 
 import com.globalmentor.beans.BoundPropertyObject;
 import com.globalmentor.net.URIPath;
-import com.globalmentor.urf.URFResource;
 import com.guiseframework.*;
 import com.guiseframework.theme.Theme;
 

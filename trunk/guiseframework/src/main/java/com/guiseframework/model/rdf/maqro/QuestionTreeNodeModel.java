@@ -18,8 +18,9 @@ package com.guiseframework.model.rdf.maqro;
 
 import java.util.*;
 
+import org.urframework.maqro.*;
+
 import com.globalmentor.rdf.*;
-import com.globalmentor.urf.maqro.*;
 import com.guiseframework.model.TreeNodeModel;
 import com.guiseframework.model.rdf.AbstractRDFResourceTreeNodeModel;
 

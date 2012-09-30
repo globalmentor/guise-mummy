@@ -24,13 +24,14 @@ import java.text.Collator;
 import java.text.MessageFormat;
 import java.util.*;
 
+import org.urframework.URFResource;
+
 import com.globalmentor.beans.PropertyBindable;
 import com.globalmentor.config.ConfigurationManaged;
 
 import static com.globalmentor.java.Classes.*;
 import com.globalmentor.net.*;
 import com.globalmentor.text.CollatorFactory;
-import com.globalmentor.urf.URFResource;
 import com.globalmentor.util.DataException;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;

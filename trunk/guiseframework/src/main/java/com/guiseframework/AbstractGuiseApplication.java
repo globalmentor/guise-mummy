@@ -32,6 +32,8 @@ import javax.mail.Message;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 
+import org.urframework.*;
+
 import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Objects.*;
@@ -56,7 +58,6 @@ import com.globalmentor.net.URIPath;
 import com.globalmentor.net.URIs;
 import com.globalmentor.text.W3CDateFormat;
 import com.globalmentor.text.xml.XML;
-import com.globalmentor.urf.*;
 import com.globalmentor.util.*;
 import com.guiseframework.component.*;
 import static com.guiseframework.Resources.*;

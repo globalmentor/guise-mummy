@@ -18,7 +18,8 @@ package com.guiseframework.model.urf;
 
 import java.util.*;
 
-import com.globalmentor.urf.*;
+import org.urframework.*;
+
 import com.guiseframework.model.*;
 
 /**A dynamic tree node model that represents an URF data model.

@@ -21,6 +21,9 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.util.*;
 
+import org.urframework.URFResource;
+import org.urframework.dcmi.DCMI;
+
 import com.globalmentor.collections.Lists;
 import com.globalmentor.facebook.*;
 import com.globalmentor.net.ContentType;
@@ -36,8 +39,6 @@ import static com.globalmentor.text.xml.XML.*;
 
 import com.globalmentor.text.TextFormatter;
 import com.globalmentor.text.xml.xhtml.XHTML;
-import com.globalmentor.urf.URFResource;
-import com.globalmentor.urf.dcmi.DCMI;
 import com.guiseframework.*;
 
 import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;

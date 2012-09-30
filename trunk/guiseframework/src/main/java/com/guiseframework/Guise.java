@@ -25,7 +25,7 @@ import static com.globalmentor.io.InputStreams.*;
 import static com.globalmentor.java.Characters.*;
 import com.globalmentor.java.Threads;
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.urf.URF.createResourceURI;
+import static org.urframework.URF.createResourceURI;
 
 /**The singleton Guise class.
 There will only be one instance of Guise per JVM.

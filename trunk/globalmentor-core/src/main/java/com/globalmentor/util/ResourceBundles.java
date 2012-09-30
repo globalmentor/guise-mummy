@@ -20,11 +20,12 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import org.urframework.*;
+
 import com.globalmentor.io.IO;
 import com.globalmentor.model.Locales;
 import com.globalmentor.net.Resource;
 import com.globalmentor.rdf.*;
-import com.globalmentor.urf.*;
 
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Java.*;
@@ -51,7 +52,7 @@ public class ResourceBundles
 	private enum ResourceBundleFormat
 	{
 		/**The resource bundle is serialized in a TURF file.*/
-		TURF(com.globalmentor.urf.TURF.NAME_EXTENSION),
+		TURF(org.urframework.TURF.NAME_EXTENSION),
 		
 		/**The resource bundle is serialized in an RDF+XML file.*/
 		RDFXML(RDF_NAME_EXTENSION),

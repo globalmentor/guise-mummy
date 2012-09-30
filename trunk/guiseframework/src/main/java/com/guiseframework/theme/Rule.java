@@ -20,15 +20,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
 import org.ploop.PLOOPURFProcessor;
+import org.urframework.AbstractClassTypedURFResource;
+import org.urframework.select.Select;
+import org.urframework.select.Selector;
 
-import com.globalmentor.urf.AbstractClassTypedURFResource;
-import com.globalmentor.urf.select.Select;
-import com.globalmentor.urf.select.Selector;
 import com.globalmentor.util.DataException;
 
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.urf.select.Select.*;
 import static com.guiseframework.theme.Theme.*;
+import static org.urframework.select.Select.*;
 
 /**A rule for specifying part of a theme.
 @author Garret Wilson

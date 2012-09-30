@@ -20,11 +20,13 @@ import java.beans.PropertyVetoException;
 import java.io.*;
 import java.net.URI;
 
+import org.urframework.*;
+
 import static com.globalmentor.text.CharacterEncoding.*;
-import static com.globalmentor.urf.TURF.*;
 
 import static com.globalmentor.text.xml.XML.*;
-import com.globalmentor.urf.*;
+import static org.urframework.TURF.*;
+
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.component.urf.DefaultURFResourceTreeNodeRepresentationStrategy;

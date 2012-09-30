@@ -18,10 +18,11 @@ package com.guiseframework.component.rdf.maqro;
 
 import java.util.List;
 
+import org.urframework.maqro.*;
+
 import static com.globalmentor.rdf.dublincore.RDFDublinCore.*;
 
 import com.globalmentor.rdf.*;
-import com.globalmentor.urf.maqro.*;
 
 import com.guiseframework.component.TreeControl;
 import com.guiseframework.component.rdf.AbstractRDFResourceTreeNodeRepresentationStrategy;

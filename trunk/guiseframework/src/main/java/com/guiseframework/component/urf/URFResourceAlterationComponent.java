@@ -18,7 +18,8 @@ package com.guiseframework.component.urf;
 
 import java.beans.*;
 
-import com.globalmentor.urf.*;
+import org.urframework.*;
+
 
 import com.guiseframework.component.*;
 
