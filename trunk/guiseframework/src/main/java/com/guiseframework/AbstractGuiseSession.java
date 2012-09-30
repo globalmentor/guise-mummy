@@ -38,6 +38,7 @@ import com.globalmentor.config.ConfigurationManager;
 import com.globalmentor.config.DefaultConfigurationManager;
 import com.globalmentor.io.BOMInputStreamReader;
 import com.globalmentor.java.*;
+import com.globalmentor.java.Objects;
 import com.globalmentor.log.Log;
 import com.globalmentor.net.*;
 import com.globalmentor.urf.*;

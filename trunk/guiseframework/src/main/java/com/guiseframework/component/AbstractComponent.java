@@ -30,6 +30,7 @@ import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.event.*;
 import com.globalmentor.java.*;
+import com.globalmentor.java.Objects;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.urf.URFResource;
 import com.globalmentor.util.*;

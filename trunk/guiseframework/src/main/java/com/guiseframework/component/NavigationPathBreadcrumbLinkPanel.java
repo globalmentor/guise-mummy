@@ -19,6 +19,7 @@ package com.guiseframework.component;
 import java.util.*;
 
 import com.globalmentor.java.*;
+import com.globalmentor.java.Objects;
 import static com.globalmentor.java.Classes.*;
 import com.globalmentor.net.*;
 import static com.globalmentor.net.URIs.*;
