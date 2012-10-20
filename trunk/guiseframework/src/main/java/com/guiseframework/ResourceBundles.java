@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.globalmentor.util;
+package com.guiseframework;
 
 import java.io.*;
 import java.net.*;
@@ -26,6 +26,7 @@ import com.globalmentor.io.IO;
 import com.globalmentor.model.Locales;
 import com.globalmentor.net.Resource;
 import com.globalmentor.rdf.*;
+import com.globalmentor.util.HashMapResourceBundle;
 
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Java.*;
@@ -40,7 +41,7 @@ import static com.globalmentor.util.PropertiesUtilities.*;
 /**Utilities for working with resource bundles.
 @author Garret Wilson
 */
-public class ResourceBundles
+public class ResourceBundles	//TODO moved out of globalmentor-core to allow org.urframework project extraction; refactor to allow flexibility and storage format pluggability
 {
 
 	/**The map of resource bundles softly keyed to resource bundle base paths. This serves as a soft cache to resource bundles.*/

@@ -33,6 +33,7 @@ import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 
 import org.urframework.*;
+import org.urframework.io.TypedURFResourceTURFIO;
 
 import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.io.Files.*;

@@ -21,6 +21,8 @@ import java.io.*;
 import java.net.URI;
 
 import org.urframework.*;
+import org.urframework.io.DefaultURFRDFXMLIO;
+import org.urframework.io.DefaultURFTURFIO;
 
 import static com.globalmentor.text.CharacterEncoding.*;
 
