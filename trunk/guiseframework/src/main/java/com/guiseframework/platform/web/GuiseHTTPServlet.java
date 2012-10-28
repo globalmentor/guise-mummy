@@ -44,7 +44,7 @@ import com.globalmentor.net.*;
 import com.globalmentor.net.http.*;
 import com.globalmentor.net.mime.ContentDispositionType;
 import com.globalmentor.security.Nonce;
-import com.globalmentor.servlet.http.DefaultHTTPServlet;
+import com.globalmentor.servlet.http.*;
 import com.globalmentor.text.elff.*;
 import com.globalmentor.text.xml.XML;
 import com.globalmentor.text.xml.xpath.*;
@@ -93,6 +93,23 @@ import org.xml.sax.SAXException;
  * For all {@link ResourceReadDestination}s, this servlet recognizes a query parameter named {@value #GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER} specifying
  * the content disposition of the content to return; the value is the serialize version of a {@link ContentDispositionType} value.
  * </p>
+ * This servlet supports the following initialization parameters in addition to those in {@link BaseHTTPServlet}:
+ * <dl>
+ * <dt>{@value Servlets#DATA_DIRECTORY_INIT_PARAMETER}</dt>
+ * <dd>The directory for storing data.</dd>
+ * <dt>{@value Servlets#LOG_DIRECTORY_INIT_PARAMETER}</dt>
+ * <dd>The directory for storing logs.</dd>
+ * <dt>{@value #DEBUG_INIT_PARAMETER}</dt>
+ * <dd>Whether the servlet is in debug mode; should be "true" or "false"; sets the log level to debug if not explicitly set.</dd>
+ * <dt>{@value #LOG_LEVEL_INIT_PARAMETER}</dt>
+ * <dd>The level of logging for the JVM of type {@link Log.Level}. If multiple servlets specify this value, the last one initialized will have precedence.</dd>
+ * <dt>{@value #LOG_HTTP_INIT_PARAMETER}</dt>
+ * <dd>Whether HTTP communication is logged.</dd>
+ * <dt>{@value #PROFILE_INIT_PARAMETER}</dt>
+ * <dd>Whether profiling should occur; should be "true" or "false".</dd>
+ * </dl>
+ * <p>For example, the following Guise servlet context might define a data directory:</p>
+ * <blockquote>{@code <Context ...><Parameter name="dataDirectory" value="D:\data"/></Context>}</blockquote>
  * @author Garret Wilson
  */
 public class GuiseHTTPServlet extends DefaultHTTPServlet
