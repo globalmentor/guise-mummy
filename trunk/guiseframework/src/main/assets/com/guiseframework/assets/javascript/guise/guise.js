@@ -2983,7 +2983,7 @@ com.guiseframework.Guise = function()
 							else
 							//if this is not a Guise control
 							{
-								if(node.getAttribute("rel") == "alternate") //if this is an alternate link, see if we can patch in some special functionality for certain types of alternate
+								if(node.getAttribute("rel") == "rendition") //if this is a rendition link, see if we can patch in some special functionality for certain types of renditions; see http://www.globalmentor.com/specs/html-rel-rendition/
 								{
 									var href = node.getAttribute("href");
 									var contentType = ContentType.test(node.getAttribute("type")); //see if there is a content type provided

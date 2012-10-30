@@ -6,6 +6,11 @@ It should not be used to style XHTML representing components on the web platform
 rather, Guise properties should be used to change the style of Guise components.
 */
 
+a[rel="rendition"].content
+{
+	text-decoration: none; 
+}
+
 table.content
 {
 	border-collapse: collapse;
