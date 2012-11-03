@@ -24,6 +24,8 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import org.ploop.*;
+import org.ploop.graph.PLOOPURFGenerator;
+import org.ploop.graph.PLOOPURFProcessor;
 import org.urframework.URFResource;
 
 import static com.globalmentor.java.Arrays.*;

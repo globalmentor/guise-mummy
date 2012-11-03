@@ -20,7 +20,7 @@ import java.net.URI;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
-import org.ploop.PLOOPURFProcessor;
+import org.ploop.graph.PLOOPURFProcessor;
 import org.urframework.*;
 import org.urframework.select.*;
 import org.urframework.xml.XML;

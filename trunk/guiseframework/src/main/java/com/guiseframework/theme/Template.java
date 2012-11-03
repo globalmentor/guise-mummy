@@ -19,7 +19,7 @@ package com.guiseframework.theme;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
-import org.ploop.PLOOPURFProcessor;
+import org.ploop.graph.PLOOPURFProcessor;
 import org.urframework.AbstractClassTypedURFResource;
 
 import com.globalmentor.util.DataException;
