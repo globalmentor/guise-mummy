@@ -482,13 +482,29 @@ com.guiseframework.Guise = function()
 	 */
 	this._htmlEditorCount = 0;
 
-	/** Configuration options for the CKEditor. */
+	/**
+	 * Configuration options for the CKEditor.
+	 * <p>
+	 * This CKEditor was installed using the "full" download with the following added plugins:
+	 * </p>
+	 * <ul>
+	 * <li>Autogrow</li>
+	 * <li>onChange</li>
+	 * <li>CodeMirror Syntax Highlighting</li>
+	 * <li>Div Editing Error</li>
+	 * <li>SpellCheckAsYouType (SCAYT)</li>
+	 * <li>Table Resize</li>
+	 * </ul>
+	 */
 	this._ckEditorConfig =
 	{
 		autoGrow_onStartup : true,
-		//TODO bring back when CKEditor code is fixed: basicEntities : false, //don't use basic HTML entities, which includes some non-XML entities
-		entities : false, //don't use HTML entities
-		//TODO bring back when CKEditor code is fixed: entities_additional : 'lt,gt,amp,apos,quot', //use XML entities only; see http://www.w3.org/TR/REC-xml/#sec-predefined-ent
+		basicEntities : false, //don't use basic HTML entities, which includes some non-XML entities
+		entities : true, //use entities for some things
+		entities_latin : false, //don't use Latin entities
+		entities_greek : false, //don't use Greek entities
+		//entities_additional : 'lt,gt,amp,apos,quot', //use XML entities only; see http://www.w3.org/TR/REC-xml/#sec-predefined-ent
+		entities_additional : 'lt,gt,amp,', //use some XML entities only (this doesn't seem to work; CKEditor 4.0 still uses &apos; and &quot;); see http://www.w3.org/TR/REC-xml/#sec-predefined-ent
 		extraPlugins : 'autogrow,onchange', //see http://alfonsoml.blogspot.com/2011/03/onchange-event-for-ckeditor.html
 		removePlugins : 'resize', //we don't need the resize plugin with autogrow
 		fillEmptyBlocks : false, //try to prevent &nbsp; being inserted; see http://cksource.com/forums/viewtopic.php?t=16915
@@ -518,7 +534,7 @@ com.guiseframework.Guise = function()
 		{
 			name : 'paragraph',
 			items : [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', /*'-', 'JustifyLeft', 'JustifyCenter',
-																																																																					'JustifyRight', 'JustifyBlock', */'-', 'BidiLtr', 'BidiRtl' ]
+																																																																											'JustifyRight', 'JustifyBlock', */'-', 'BidiLtr', 'BidiRtl' ]
 		},
 		{
 			name : 'links',
@@ -3431,7 +3447,7 @@ com.guiseframework.Guise = function()
 				var content = null;
 				if(typeof CKEDITOR != "undefined")
 				{
-					content = editor.getData().replace(/&nbsp;/g, " ");	//compensate for CKEditor adding &nbsp; on e.g. Chrome 17; see http://dev.ckeditor.com/ticket/8774
+					content = editor.getData().replace(/&nbsp;/g, " "); //compensate for CKEditor adding &nbsp; on e.g. Chrome 17; see http://dev.ckeditor.com/ticket/8774
 				}
 				else if(typeof tinyMCE != "undefined")
 				{

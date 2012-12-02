@@ -32,6 +32,8 @@ import com.guiseframework.platform.*;
  */
 public interface WebPlatform extends Platform
 {
+	/**The version of CKEditor in use.*/
+	public final static String CKEDITOR_VERSION="4.0";
 
 	/** The namespace of the Guise markup language to be used with XHTML. */
 	public final static URI GUISE_ML_NAMESPACE_URI = URI.create("http://guiseframework.com/id/ml#");
@@ -129,9 +131,9 @@ public interface WebPlatform extends Platform
 	public final static URIPath JAVASCRIPT_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/javascript.min.js");
 	//CKEditor
 	/** The path of the CKEditor JavaScript file, relative to the application. */
-	public final static URIPath CKEDITOR_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("ckeditor/ckeditor_basic_source.js");
+	public final static URIPath CKEDITOR_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("ckeditor-"+CKEDITOR_VERSION+"/ckeditor.js");
 	/** The path of the compressed CKEditor JavaScript file, relative to the application. */
-	public final static URIPath CKEDITOR_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("ckeditor/ckeditor_basic.js");
+	public final static URIPath CKEDITOR_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("ckeditor-"+CKEDITOR_VERSION+"/ckeditor.js");
 	//TinyMCE
 	/** The path of the TinyMCE JavaScript file, relative to the application. */
 	public final static URIPath TINYMCE_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("tiny_mce/tiny_mce_src.js");

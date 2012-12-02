@@ -116,7 +116,7 @@
 					<suffix>.min</suffix>
 					<excludes>
 						<exclude>com/guiseframework/assets/javascript/tiny_mce/**/*.*</exclude>
-						<exclude>com/guiseframework/assets/javascript/ckeditor/**/*.*</exclude>
+						<exclude>com/guiseframework/assets/javascript/ckeditor-4.0/**/*.*</exclude>
 					</excludes>
 					<jswarn>false</jswarn>
 				</configuration>
