@@ -491,7 +491,7 @@ com.guiseframework.Guise = function()
 	 * <li>Autogrow</li>
 	 * <li>onChange</li>
 	 * <li>CodeMirror Syntax Highlighting</li>
-	 * <li>Div Editing Error</li>
+	 * <li>Div Editing Area</li>
 	 * <li>SpellCheckAsYouType (SCAYT)</li>
 	 * <li>Table Resize</li>
 	 * </ul>
@@ -506,7 +506,6 @@ com.guiseframework.Guise = function()
 		//entities_additional : 'lt,gt,amp,apos,quot', //use XML entities only; see http://www.w3.org/TR/REC-xml/#sec-predefined-ent
 		entities_additional : 'lt,gt,amp,', //use some XML entities only (this doesn't seem to work; CKEditor 4.0 still uses &apos; and &quot;); see http://www.w3.org/TR/REC-xml/#sec-predefined-ent
 		extraPlugins : 'autogrow,onchange', //see http://alfonsoml.blogspot.com/2011/03/onchange-event-for-ckeditor.html
-		removePlugins : 'resize', //we don't need the resize plugin with autogrow
 		fillEmptyBlocks : false, //try to prevent &nbsp; being inserted; see http://cksource.com/forums/viewtopic.php?t=16915
 		minimumChangeMilliseconds : 3000, //don't update changes more often than every three seconds
 		toolbar : 'Guise',
