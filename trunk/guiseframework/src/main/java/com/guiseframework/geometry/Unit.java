@@ -16,10 +16,12 @@
 
 package com.guiseframework.geometry;
 
+import com.globalmentor.lex.Identifier;
+
 /**A unit of measurement.
 @author Garret Wilson
 */
-public enum Unit
+public enum Unit implements Identifier
 {
 		//relative units
 	/**The size of a font.*/

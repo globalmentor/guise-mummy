@@ -16,14 +16,13 @@
 
 package com.guiseframework.platform.web;
 
-import com.globalmentor.java.Enums;
+import com.globalmentor.lex.Identifier;
 
 /**The type of event received from the web platform.
 The name of the XML element in which the event is serialized will be the serialized from of the event type name.
-@see Enums#getSerializedEnum(Class, String)
 @author Garret Wilson
 */
-public enum WebPlatformEventType
+public enum WebPlatformEventType implements Identifier
 {
 	/**An action on a component.*/
 	ACTION,

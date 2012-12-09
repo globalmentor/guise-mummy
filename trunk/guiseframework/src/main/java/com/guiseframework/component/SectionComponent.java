@@ -18,6 +18,8 @@ package com.guiseframework.component;
 
 import static com.globalmentor.java.Classes.*;
 
+import com.globalmentor.lex.Identifier;
+
 /**
  * A component that potentially demarcates a semantically significant area of the a parent component. The section component indicates the type of section it
  * demarcates with {@link #getSectionType()}. If this method returns <code>null</code>, it indicates that the component does not wish to demarcate a
@@ -31,7 +33,7 @@ public interface SectionComponent extends Component
 	public final static String SECTION_TYPE_PROPERTY = getPropertyName(SectionComponent.class, "sectionType");
 
 	/** The type of section. */
-	public enum SectionType
+	public enum SectionType implements Identifier
 	{
 		/** The main section of a self-contained article appropriate for syndication. */
 		ARTICLE,

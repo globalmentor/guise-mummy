@@ -16,9 +16,11 @@
 
 package com.guiseframework.platform;
 
+import com.globalmentor.lex.Identifier;
+
 /**A command to or from the platform on which objects are depicted.
 @author Garret Wilson
 */
-public interface PlatformCommand
+public interface PlatformCommand extends Identifier
 {
 }

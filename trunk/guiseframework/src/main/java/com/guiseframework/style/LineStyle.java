@@ -16,11 +16,13 @@
 
 package com.guiseframework.style;
 
+import com.globalmentor.lex.Identifier;
+
 /**The style of a line, such as used for a border or divider.
 @author Garret Wilson
 @see <a href="http://www.w3.org/TR/css3-background/#border-style">CSS3 Backgrounds and Borders Module: border-style</a>
 */
-public enum LineStyle
+public enum LineStyle implements Identifier
 {
 	/**A series of dots.*/
 	DOTTED,

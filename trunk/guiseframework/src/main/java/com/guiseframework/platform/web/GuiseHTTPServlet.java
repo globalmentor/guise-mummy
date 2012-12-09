@@ -1495,7 +1495,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 								final WebDepictEvent webDepictEvent = (WebDepictEvent)webCommandMessage; //get the depict event
 								depictContext.writeAttribute(null, "objectID", platform.getDepictIDString(webDepictEvent.getDepictedObject().getDepictID())); //objectID="depictedObjectID" TODO use a constant
 							}
-							depictContext.writeAttribute(null, "command", getSerializationName((Enum)webCommandMessage.getCommand())); //command="webCommand" (cast needed so that Sun JDK 1.6.0_03-b05 will realize that the type is always an enum; not required for Eclipse 3.4M3) TODO use a constant
+							depictContext.writeAttribute(null, "command", getSerializationName(webCommandMessage.getCommand())); //command="webCommand" TODO use a constant
 							/*TODO del if not needed
 														final Map<String, Object> depictParameters=new HashMap<String, Object>(webCommandMessage.getParameters().size());	//create a new map of depiction parameters
 														for(final Map.Entry<String, Object> parameterEntry:webCommandMessage.getParameters().entrySet())	//look at all the parameters

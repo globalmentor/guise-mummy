@@ -24,13 +24,15 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import com.globalmentor.lex.Identifier;
+
 /**
  * Indicates an absolute side.
  * @author Garret Wilson
  * @see Axis
  * @see com.guiseframework.component.layout.Border
  */
-public enum Side
+public enum Side implements Identifier
 {
 
 	/** The left side. */

@@ -21,6 +21,7 @@ import java.util.*;
 import static java.util.Collections.*;
 
 import com.globalmentor.io.Images;
+import com.globalmentor.lex.Identifier;
 import com.globalmentor.text.xml.stylesheets.css.XMLCSSCursor;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.CompassPoint;
@@ -38,7 +39,7 @@ These URIs are constructed by using the path {@value GuiseApplication#GUISE_ROOT
 @author Garret Wilson
 @see <a href="http://www.w3.org/TR/CSS21/ui.html">CSS 2.1 User Interface: Cursors</a>
 */
-public enum Cursor
+public enum Cursor implements Identifier
 {
 
 	/**A simple crosshair (e.g., short line segments resembling a "+" sign).*/

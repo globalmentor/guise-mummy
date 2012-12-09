@@ -16,11 +16,13 @@
 
 package com.guiseframework.style;
 
+import com.globalmentor.lex.Identifier;
+
 /**The style of a font.
 @author Garret Wilson
 @see <a href="http://www.w3.org/TR/REC-CSS2/fonts.html#font-styling">CSS 2 Fonts: Font Styling</a>
 */
-public enum FontStyle
+public enum FontStyle implements Identifier
 {
 	/**A font that is classified as "normal" in the font database.*/
   NORMAL,
