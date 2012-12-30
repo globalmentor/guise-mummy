@@ -106,7 +106,7 @@ public class Notification extends DefaultLabelModel
 			/**@return Whether this option is considered fatal.*/
 			public boolean isFatal() {return fatal;}
 
-		/**Fatality consructor.
+		/**Fatality constructor.
 		@param fatal Whether this option is considered fatal.
 		*/
 		private Option(final boolean fatal)
@@ -244,7 +244,7 @@ public class Notification extends DefaultLabelModel
 	@param severity The severity of the notification.
 	@param error The associated error or exception, or <code>null</code> if there is no related error.
 	@param options The available response options; if no options are given, {@link Option#OK} will be assumed.
-	@excepion NullPointerException if the given message and/or options is <code>null</code>.
+	@exception NullPointerException if the given message and/or options is <code>null</code>.
 	@exception IllegalArgumentException if the given content type is not a text content type.
 	*/
 	public Notification(final String message, final ContentType messageContentType, final Severity severity, final Throwable error, final Option... options)
