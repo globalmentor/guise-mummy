@@ -55,6 +55,7 @@ import com.guiseframework.prototype.*;
 import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
 
+import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.io.Writers.*;
 import static com.globalmentor.java.CharSequences.*;
@@ -63,7 +64,6 @@ import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Conditions.unexpected;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.text.CharacterEncoding.*;
 import static com.globalmentor.text.TextFormatter.*;
 
 import static com.guiseframework.Resources.*;
@@ -591,7 +591,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 							{
 								final StringWriter stringWriter = new StringWriter(); //create a new string writer to receive the resource contents
 								//TODO do better checking of XML encoding type by prereading
-								final Reader resourceReader = new BOMInputStreamReader(new BufferedInputStream(inputStream), UTF_8); //get an input reader to the file, defaulting to UTF-8 if we don't know its encoding
+								final Reader resourceReader = new BOMInputStreamReader(new BufferedInputStream(inputStream), UTF_8_CHARSET); //get an input reader to the file, defaulting to UTF-8 if we don't know its encoding
 								write(resourceReader, stringWriter); //copy the resource to the string
 								return stringWriter.toString(); //return the string read from the resource
 							}
@@ -1139,7 +1139,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		final String descriptionResource = getStringResource(resourceKey); //get the description resource
 		try
 		{
-			final InputStream descriptionInputStream = new ByteArrayInputStream(descriptionResource.getBytes(UTF_8)); //convert the string to bytes and create an input string to the array of bytes TODO verify the encoding somehow
+			final InputStream descriptionInputStream = new ByteArrayInputStream(descriptionResource.getBytes(UTF_8_CHARSET)); //convert the string to bytes and create an input string to the array of bytes TODO verify the encoding somehow
 			initializeComponent(component, descriptionInputStream); //initialize the component from the description resource
 		}
 		catch(final UnsupportedEncodingException unsupportedEncodingException) //UTF-8 should always be supported
