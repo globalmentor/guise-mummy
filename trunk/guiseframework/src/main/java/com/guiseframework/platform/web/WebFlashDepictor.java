@@ -37,7 +37,7 @@ public class WebFlashDepictor<C extends Flash> extends AbstractSimpleWebComponen
 {
 
 	/**The content type for Flash objects.*/
-	public final static ContentType FLASH_CONTENT_TYPE=ContentType.getInstance(ContentType.APPLICATION_PRIMARY_TYPE, X_SHOCKWAVE_FLASH_SUBTYPE);	//TODO move to Flash class
+	public final static ContentType FLASH_CONTENT_TYPE=ContentType.create(ContentType.APPLICATION_PRIMARY_TYPE, X_SHOCKWAVE_FLASH_SUBTYPE);	//TODO move to Flash class
 
 	/**The "allowScriptAccess" parameter.
 	@see <a href="http://www.adobe.com/devnet/flash/articles/fplayer8_security_09.html">Security Changes in Flash Player 8</a>

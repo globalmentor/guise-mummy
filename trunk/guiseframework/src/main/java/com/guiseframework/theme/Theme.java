@@ -48,7 +48,7 @@ public class Theme extends URFListResource<Rule>
 	/** The extension for Guise theme resource names. */
 	public final static String NAME_EXTENSION = "guisetheme";
 	/** The content type for theme resources: <code>application/theme+turf</code>. */
-	public static final ContentType CONTENT_TYPE = ContentType.getInstance(ContentType.APPLICATION_PRIMARY_TYPE, "theme"
+	public static final ContentType CONTENT_TYPE = ContentType.create(ContentType.APPLICATION_PRIMARY_TYPE, "theme"
 			+ ContentType.SUBTYPE_SUFFIX_DELIMITER_CHAR + TURF.SUBTYPE_SUFFIX);
 
 	/** The recommended prefix to the theme ontology namespace. */

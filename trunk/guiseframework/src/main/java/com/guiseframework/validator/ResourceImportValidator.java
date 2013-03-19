@@ -217,7 +217,7 @@ Log.trace("ready to validate resource import", resourceImport);
 			for(final ContentType contentType:acceptedContentTypes)	//look at all the accepted content types
 			{
 				if((contentType==null && resourceContentType==null)	//if this is a null content type and the resource import content type is also null
-						|| (contentType!=null && resourceContentType!=null && contentType.match(resourceContentType)))	//if this content type is not null and the resource content type matches it
+						|| (contentType!=null && resourceContentType!=null && contentType.hasBaseType(resourceContentType)))	//if this content type is not null and the resource content type matches it
 				{
 					isContentTypeMatch=true;	//show that the resource content type matches one of the accepted content types
 					break;	//stop looking for a match

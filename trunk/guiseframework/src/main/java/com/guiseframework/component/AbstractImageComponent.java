@@ -102,7 +102,7 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 		This implementation returns a URI-list content type and the content type of the label.
 		@return The content types available for this transfer.
 		*/
-		public ContentType[] getContentTypes() {return createArray(ContentType.getInstance(ContentType.TEXT_PRIMARY_TYPE, URI_LIST_SUBTYPE), getSource().getLabelContentType());}	//TODO use a static instance
+		public ContentType[] getContentTypes() {return createArray(ContentType.create(ContentType.TEXT_PRIMARY_TYPE, URI_LIST_SUBTYPE), getSource().getLabelContentType());}	//TODO use a static instance
 
 		/**Transfers data using the given content type.
 		@param contentType The type of data expected.
@@ -117,7 +117,7 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 				final URI imageURI=image.getImageURI();	//get the image URI
 				return imageURI!=null ? createURIList(image.getSession().resolveURI(imageURI)) : null;	//return the image URI, if there is one
 			}
-			else if(contentType.match(image.getLabelContentType()))	//if the label has the content type requested
+			else if(contentType.hasBaseType(image.getLabelContentType()))	//if the label has the content type requested
 			{
 				final String label=image.getLabel();	//get the image label, if any
 				return label!=null ? image.getSession().dereferenceString(image.getLabel()) : null;	//return the resolved label text, if any

@@ -90,7 +90,7 @@ public abstract class AbstractLabel extends AbstractComponent implements LabelCo
 		public Object transfer(final ContentType contentType)
 		{
 			final LabelComponent source=getSource();	//get the source of the transfer
-			if(contentType.match(source.getLabelContentType()))	//if we have the content type requested
+			if(contentType.hasBaseType(source.getLabelContentType()))	//if we have the content type requested
 			{
 				final String label=source.getLabel();	//get the label
 				return label!=null ? source.getSession().dereferenceString(source.getLabel()) : null;	//return the label text, if any

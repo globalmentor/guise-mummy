@@ -43,7 +43,7 @@ public abstract class AbstractTransferable<S> implements Transferable<S>
 	{
 		for(final ContentType transferContentType:getContentTypes())	//for each content type
 		{
-			if(contentType.match(transferContentType))	//if this content type matches
+			if(contentType.hasBaseType(transferContentType))	//if this content type matches
 			{
 				return true;	//indicate that we found a match
 			}

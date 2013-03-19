@@ -408,7 +408,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 		if(contentType != null) //if a content type is specified
 		{
 			//TODO del Log.trace("content type specified: ", contentType);
-			if(contentType.match(XHTML_CONTENT_TYPE)) //if the preferred content type is "application/xhtml+xml"
+			if(contentType.hasBaseType(XHTML_CONTENT_TYPE)) //if the preferred content type is "application/xhtml+xml"
 			{
 				//if the client doesn't accept "application/xhtml+xml" exactly
 				if(!getPlatform().getClientProduct().isAcceptedContentType(XHTML_CONTENT_TYPE, false))

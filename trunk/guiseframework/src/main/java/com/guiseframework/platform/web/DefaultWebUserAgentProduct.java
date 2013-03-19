@@ -64,7 +64,7 @@ public class DefaultWebUserAgentProduct extends AbstractBrandedProduct<WebUserAg
 				final ContentType acceptedContentType=contentTypeIterator.next();	//get the next accepted content type
 				if(matchWildcards || acceptedContentType.getBaseType().indexOf(WILDCARD_CHAR)<0)	//only match wildcards if we were asked to
 				{
-					if(contentType.match(acceptedContentType))	//if our content type matches an accepted content type (make sure we match to the accepted content type, which can have wildcards)
+					if(contentType.hasBaseType(acceptedContentType))	//if our content type matches an accepted content type (make sure we match to the accepted content type, which can have wildcards)
 					{
 						return true;	//show that we found a match
 					}

@@ -72,7 +72,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 	}
 
 	/** The current content type of the output. */
-	private ContentType outputContentType = ContentType.getInstance(ContentType.TEXT_PRIMARY_TYPE, Text.PLAIN_SUBTYPE); //default to text/plain
+	private ContentType outputContentType = ContentType.create(ContentType.TEXT_PRIMARY_TYPE, Text.PLAIN_SUBTYPE); //default to text/plain
 
 	/** The qualified name to use for the attribute hash attribute. */
 	private final QualifiedName attributeHashAttributeQualifiedName;
@@ -120,8 +120,8 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 		attributeHashAttributeQualifiedName = new QualifiedName(GUISE_ML_NAMESPACE_URI, getQualifiedName(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_ATTRIBUTE_HASH));
 		contentHashAttributeQualifiedName = new QualifiedName(GUISE_ML_NAMESPACE_URI, getQualifiedName(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_CONTENT_HASH));
 		setHashAttributesGenerated(true); //always generate hash attributes
-		final ContentType defaultContentType = ContentType.getInstance(outputContentType.getPrimaryType(), outputContentType.getSubType(),
-				new NameValuePair<String, String>(ContentType.CHARSET_PARAMETER, UTF_8)); //default to text/plain encoded in UTF-8
+		final ContentType defaultContentType = ContentType.create(outputContentType.getPrimaryType(), outputContentType.getSubType(),
+				new ContentType.Parameter(ContentType.CHARSET_PARAMETER, UTF_8)); //default to text/plain encoded in UTF-8
 		response.setContentType(defaultContentType.toString()); //initialize the default content type and encoding
 		HTTPServlets.setContentLanguage(response, session.getLocale()); //set the response content language
 	}
@@ -145,7 +145,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 	public void setOutputContentType(final ContentType contentType)
 	{
 		//default to text/plain encoded in UTF-8 replace the charset parameter with the currently set character set TODO change to really just replace one parameter, instead of removing all others
-		this.outputContentType = ContentType.getInstance(contentType.getPrimaryType(), contentType.getSubType(), new NameValuePair<String, String>(
+		this.outputContentType = ContentType.create(contentType.getPrimaryType(), contentType.getSubType(), new ContentType.Parameter(
 				ContentType.CHARSET_PARAMETER, getOutputCharacterEncoding().toString()));
 		getResponse().setContentType(this.outputContentType.toString()); //set the content type of the response, including the current character set
 	}

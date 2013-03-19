@@ -169,7 +169,7 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 		{
 			final String contentLabel=content.getLabel();	//get the content label, if any
 			final ContentType contentLabelContentType=content.getLabelContentType();	//get the content label content type
-			if(contentLabel==null || PLAIN_TEXT_CONTENT_TYPE.match(contentLabelContentType) || contentLabel==null)	//if there is no content label or the content label is plain text, we can use plain text for the entire label
+			if(contentLabel==null || PLAIN_TEXT_CONTENT_TYPE.hasBaseType(contentLabelContentType) || contentLabel==null)	//if there is no content label or the content label is plain text, we can use plain text for the entire label
 			{
 				final String basePlainLabel=getBasePlainLabel();	//see if there is a base label
 				if(basePlainLabel!=null || contentLabel!=null)	//if we have a base label or content label

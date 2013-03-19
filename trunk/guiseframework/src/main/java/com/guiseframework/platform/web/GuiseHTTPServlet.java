@@ -740,8 +740,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 								final String itemContentTypeString = fileItemStream.getContentType(); //get the item content type, if any
 								if(itemContentTypeString != null) //if we know the item's content type
 								{
-									final ContentType itemContentType = ContentType.getInstance(itemContentTypeString);
-									if(!ContentType.APPLICATION_OCTET_STREAM_CONTENT_TYPE.match(itemContentType)) //if the content type is not just a generic "bunch of bytes" content type
+									final ContentType itemContentType = ContentType.create(itemContentTypeString);
+									if(!ContentType.APPLICATION_OCTET_STREAM_CONTENT_TYPE.hasBaseType(itemContentType)) //if the content type is not just a generic "bunch of bytes" content type
 									{
 										setContentType(resourceDescription, itemContentType); //set the resource's content type
 									}
@@ -1014,7 +1014,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 				//see if there is non-Guise HTTP POST data, and if so, set that bookmark navigation temporarily
 				//a non-Guise form HTTP POST, get the servlet parameters (which will include the URL query information)
 				if(POST_METHOD.equals(guiseRequest.getHTTPServletRequest().getMethod()) && contentType != null
-						&& APPLICATION_X_WWW_FORM_URLENCODED_CONTENT_TYPE.match(contentType) && !isGuisePOST)
+						&& APPLICATION_X_WWW_FORM_URLENCODED_CONTENT_TYPE.hasBaseType(contentType) && !isGuisePOST)
 				{
 					//TODO del Log.trace("using servlet parameter methods");
 					final List<Bookmark.Parameter> bookmarkParameterList = new ArrayList<Bookmark.Parameter>(); //create a new list of bookmark parameters
