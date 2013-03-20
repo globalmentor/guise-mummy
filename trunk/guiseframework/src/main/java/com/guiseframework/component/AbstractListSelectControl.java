@@ -656,7 +656,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 		public ConverterInfoModelValueRepresentationStrategy(final Class<? extends Component> componentClass, final Converter<VV, String> converter)
 		{
 			this.converter=checkInstance(converter, "Converter cannot be null.");	//save the converter
-			componentInfoModelConstructor=getCompatibleConstructor(checkInstance(componentClass, "Component class cannot be null."), InfoModel.class);	//get the constructor for the component
+			componentInfoModelConstructor=getCompatiblePublicConstructor(checkInstance(componentClass, "Component class cannot be null."), InfoModel.class);	//get the constructor for the component
 			if(componentInfoModelConstructor==null)	//if there is no appropriate constructor
 			{
 				throw new IllegalArgumentException("Component class "+componentClass+" has no constructor with a single info model parameter.");

@@ -63,7 +63,7 @@ public class DefaultStringLiteralConverter<V> extends AbstractStringLiteralConve
 		else	//if the literal is not null
 		{
 			final Class<V> valueClass=getValueClass();	//get the value class
-			final Constructor<V> stringCompatibleConstructor=getCompatibleConstructor(valueClass, String.class);	//get the string-compatible constructor
+			final Constructor<V> stringCompatibleConstructor=getCompatiblePublicConstructor(valueClass, String.class);	//get the string-compatible constructor
 			if(stringCompatibleConstructor!=null)	//if there is a string-compatible constructor
 			{
 				try
