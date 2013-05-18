@@ -91,7 +91,7 @@ public abstract class AbstractSequenceTaskPanel extends AbstractPanel
 		This method updates the toolbar if this property changes.
 		@param newDistinctAdvance <code>true</code> if there should be distinct buttons for
 			start, next, and finish, or <code>false</code> if one button should share
-			these responsibilitiese.
+			these responsibilities.
 		*/
 		public void setDistinctAdvance(final boolean newDistinctAdvance)
 		{
