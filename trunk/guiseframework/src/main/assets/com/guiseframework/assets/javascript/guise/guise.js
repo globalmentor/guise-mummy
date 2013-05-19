@@ -485,15 +485,16 @@ com.guiseframework.Guise = function()
 	/**
 	 * Configuration options for the CKEditor.
 	 * <p>
-	 * This CKEditor was installed using the "full" download with the following added plugins:
+	 * This CKEditor was installed using the "full" download with the "moonocolor" skin and the following added plugins:
 	 * </p>
 	 * <ul>
 	 * <li>Autogrow</li>
 	 * <li>onChange</li>
 	 * <li>CodeMirror Syntax Highlighting</li>
 	 * <li>Div Editing Area</li>
-	 * <li>SpellCheckAsYouType (SCAYT)</li>
+	 * <li>SpellCheckAsYouType (SCAYT) (now included in "full")</li>
 	 * <li>Table Resize</li>
+	 * <li>Insert Symbol</li>
 	 * </ul>
 	 */
 	this._ckEditorConfig =
@@ -505,7 +506,7 @@ com.guiseframework.Guise = function()
 		entities_greek : false, //don't use Greek entities
 		//entities_additional : 'lt,gt,amp,apos,quot', //use XML entities only; see http://www.w3.org/TR/REC-xml/#sec-predefined-ent
 		entities_additional : 'lt,gt,amp,', //use some XML entities only (this doesn't seem to work; CKEditor 4.0 still uses &apos; and &quot;); see http://www.w3.org/TR/REC-xml/#sec-predefined-ent
-		extraPlugins : 'autogrow,onchange', //see http://alfonsoml.blogspot.com/2011/03/onchange-event-for-ckeditor.html
+		extraPlugins : 'autogrow,onchange,symbol', //see http://alfonsoml.blogspot.com/2011/03/onchange-event-for-ckeditor.html
 		fillEmptyBlocks : false, //try to prevent &nbsp; being inserted; see http://cksource.com/forums/viewtopic.php?t=16915
 		minimumChangeMilliseconds : 3000, //don't update changes more often than every three seconds
 		toolbar : 'Guise',
@@ -541,7 +542,7 @@ com.guiseframework.Guise = function()
 		},
 		{
 			name : 'insert',
-			items : [ /*'Image', */'Table', 'HorizontalRule', 'Smiley', 'SpecialChar' ]
+			items : [ /*'Image', */'Table', 'HorizontalRule', 'Smiley', 'Symbol' ]
 		},
 		{
 			name : 'styles',
