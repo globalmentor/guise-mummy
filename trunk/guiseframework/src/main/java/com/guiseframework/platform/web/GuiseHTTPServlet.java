@@ -109,7 +109,9 @@ import org.xml.sax.SAXException;
  * <dt>{@value #PROFILE_INIT_PARAMETER}</dt>
  * <dd>Whether profiling should occur; should be "true" or "false".</dd>
  * </dl>
- * <p>For example, the following Guise servlet context might define a data directory:</p>
+ * <p>
+ * For example, the following Guise servlet context might define a data directory:
+ * </p>
  * <blockquote>{@code <Context ...><Parameter name="dataDirectory" value="D:\data"/></Context>}</blockquote>
  * @author Garret Wilson
  */
@@ -238,7 +240,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 				Field.CLIENT_SERVER_METHOD_FIELD, Field.CLIENT_SERVER_URI_STEM_FIELD, Field.CLIENT_SERVER_URI_QUERY_FIELD, Field.SERVER_CLIENT_STATUS_FIELD,
 				Field.CLIENT_SERVER_BYTES_FIELD, Field.CLIENT_SERVER_VERSION_FIELD, Field.CLIENT_SERVER_USER_AGENT_HEADER_FIELD,
 				Field.CLIENT_SERVER_COOKIE_HEADER_FIELD, Field.CLIENT_SERVER_REFERER_HEADER_FIELD, Field.DCS_ID_FIELD);
-		elff.setDirective(ELFF.SOFTWARE_DIRECTIVE, Guise.GUISE_NAME + ' ' + Guise.BUILD_ID); //set the software directive of the ELFF log
+		elff.setDirective(ELFF.SOFTWARE_DIRECTIVE, Guise.GUISE_NAME + ' ' + Guise.getVersion()); //set the software directive of the ELFF log
 	}
 
 	/**
@@ -248,7 +250,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	public void initialize(ServletConfig servletConfig) throws ServletException, IllegalArgumentException, IllegalStateException
 	{
 		super.initialize(servletConfig); //do the default initialization
-		Log.info("Initializing", Guise.GUISE_NAME, Guise.BUILD_ID);
+		Log.info("Initializing", Guise.GUISE_NAME, Guise.getVersion(), Guise.getBuildDate());
 		setReadOnly(true); //make this servlet read-only
 		//TODO turn off directory listings, and/or fix them
 		try

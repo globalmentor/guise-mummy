@@ -1,5 +1,5 @@
 /* Guise™ JavaScript Library
- * Copyright © 2005-2012 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2005-2013 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,8 @@
  * navigator.userAgentName The name of the user agent, such as "Firefox", "Mozilla", "MSIE", or "Opera".
  * navigator.userAgentVersionNumber The version of the user agent stored as a number.
  * GUISE_ASSETS_BASE_PATH The absolute base path of Guise assets.
- * GUISE_VERSION The build ID of the current Guise version.
+ * GUISE_VERSION The current Guise version.
+ * GUISE_BUILD_DATE The build date of the current Guise version.
 */
 
 /*Guise AJAX Request Format, content type application/x-guise-ajax-request+xml
@@ -2475,13 +2476,13 @@ com.guiseframework.Guise = function()
 				//if this is any other browser
 				{
 					objectAttributes.type = "application/x-shockwave-flash";
-					objectAttributes.data = GUISE_ASSETS_BASE_PATH + "flash/guise.swf?guiseVersion=" + GUISE_VERSION; //add the Guise version so an out-of-date cached version won't be used
+					objectAttributes.data = GUISE_ASSETS_BASE_PATH + "flash/guise.swf?guiseVersion=" + GUISE_VERSION+'-'+GUISE_BUILD_DATE; //add the Guise version so an out-of-date cached version won't be used
 				}
 				DOM.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "object", objectAttributes); //<object ...>
 				DOM.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param",
 				{
 					"name" : "movie",
-					"value" : GUISE_ASSETS_BASE_PATH + "flash/guise.swf?guiseVersion=" + GUISE_VERSION
+					"value" : GUISE_ASSETS_BASE_PATH + "flash/guise.swf?guiseVersion=" + GUISE_VERSION+'-'+GUISE_BUILD_DATE
 				}, true); //<param name="movie" value="...guise.swf"/>
 				DOM.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param",
 				{

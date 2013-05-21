@@ -24,14 +24,13 @@ import java.util.*;
 import org.urframework.URFResource;
 import org.urframework.dcmi.DCMI;
 
-import com.globalmentor.collections.Lists;
 import com.globalmentor.facebook.*;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.net.URIPath;
 
-import static com.globalmentor.collections.Lists.listOf;
+import static com.globalmentor.collections.Lists.*;
 import static com.globalmentor.java.Characters.*;
-import static com.globalmentor.java.Conditions.impossible;
+import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.javascript.JavaScript.*;
 import static com.globalmentor.model.Locales.*;
 import static com.globalmentor.net.URIs.*;
@@ -43,8 +42,8 @@ import com.guiseframework.*;
 
 import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
-
 import static com.guiseframework.GuiseApplication.*;
+
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.Axis;
@@ -140,13 +139,14 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 	protected void depictBegin() throws IOException
 	{
 		final WebPlatform platform = getPlatform(); //get the platform
-		final WebUserAgentProduct userAgent = getPlatform().getClientProduct(); //get the user agent
+		final WebUserAgentProduct userAgent = platform.getClientProduct(); //get the user agent
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
 		final C component = getDepictedObject(); //get the component
 		final GuiseSession session = getSession(); //get the session
 		final GuiseApplication application = session.getApplication(); //get a reference to the application
 		final Locale locale = session.getLocale(); //get the component's locale
 		final URIPath navigationPath = session.getNavigationPath(); //get the navigation path being depicted
+		final String resourceTag = Guise.getVersion() + '-' + Guise.getBuildDate(); //create a suffix for preventing caching of previous resource versions
 		//XML declaration and doctype
 		//TODO bring back when CKEditor supports application/xhtml+xml: depictContext.writeDocType(true, XHTML_NAMESPACE_URI, ELEMENT_HTML, XHTML_CONTENT_TYPE); //write the doctype and with an XML declaration, with no system ID to a DTD as per HTML 5: http://www.w3.org/TR/html5/syntax.html#the-doctype
 		depictContext.writeDocType(true, XHTML_NAMESPACE_URI, ELEMENT_HTML, HTML_CONTENT_TYPE); //write the doctype and with an XML declaration, with no system ID to a DTD as per HTML 5: http://www.w3.org/TR/html5/syntax.html#the-doctype (CKEditor only supports text/html)
@@ -174,7 +174,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		{
 			headerCommentStringBuilder.append("an unlicensed copy of ");
 		}
-		headerCommentStringBuilder.append(Guise.GUISE_NAME).append(" build ").append(Guise.BUILD_ID).append(".\n"); //Guise
+		headerCommentStringBuilder.append(Guise.GUISE_NAME).append(' ').append(Guise.getVersion()).append(" (").append(Guise.getBuildDate()).append(")\n"); //Guise version (build date)
 		headerCommentStringBuilder.append("\tFor more information on ").append(Guise.GUISE_NAME).append(", please go to ").append(Guise.GUISE_WEB_URI);
 		headerCommentStringBuilder.append(" or contact <info@globalmentor.com>.\n\t");
 		depictContext.writeComment(headerCommentStringBuilder.toString()); //write the header comment
@@ -292,7 +292,9 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		//TODO del		context.writeLiteral("var GUISE_EMPTY_HTML_DOCUMENT_PATH=\""+application.resolvePath(GUISE_EMPTY_HTML_DOCUMENT_PATH)+"\";");	//write the path to the Guise empty HTML document
 		depictContext.writeLiteral("var GUISE_ASSETS_BASE_PATH=\"" + application.resolvePath(GUISE_ASSETS_BASE_PATH) + "\";"); //write the path to the Guise base path for assets TODO use a constant
 		depictContext.write("\n\t\t");
-		depictContext.writeLiteral("var GUISE_VERSION=\"" + Guise.BUILD_ID + "\";"); //write the path to the Guise base path for public resources TODO use a constant
+		depictContext.writeLiteral("var GUISE_VERSION=\"" + Guise.getVersion() + "\";"); //write the Guise version TODO use a constant
+		depictContext.write("\n\t\t");
+		depictContext.writeLiteral("var GUISE_BUILD_DATE=\"" + Guise.getBuildDate() + "\";"); //write the Guise build date TODO use a constant
 		depictContext.write('\n');
 		depictContext.write('\t');
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT); //</xhtml:script>
@@ -315,23 +317,23 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.write("\n");
 		depictContext.write("\t");
 		final URI javascriptURI = application.isDebug() ? JAVASCRIPT_JAVASCRIPT_PATH.toURI() : JAVASCRIPT_MIN_JAVASCRIPT_PATH.toURI();
-		depictContext.writeJavaScriptElement(appendQueryParameter(javascriptURI, GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)); //JavaScript: javascript.js
+		depictContext.writeJavaScriptElement(appendQueryParameter(javascriptURI, GUISE_VERSION_URI_QUERY_PARAMETER, resourceTag)); //JavaScript: javascript.js
 		depictContext.write("\n");
 		depictContext.write("\t");
 		final URI domJavascriptURI = application.isDebug() ? DOM_JAVASCRIPT_PATH.toURI() : DOM_MIN_JAVASCRIPT_PATH.toURI();
-		depictContext.writeJavaScriptElement(appendQueryParameter(domJavascriptURI, GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)); //JavaScript: dom.js
+		depictContext.writeJavaScriptElement(appendQueryParameter(domJavascriptURI, GUISE_VERSION_URI_QUERY_PARAMETER, resourceTag)); //JavaScript: dom.js
 		depictContext.write("\n");
 		depictContext.write("\t");
 		final URI ajaxJavascriptURI = application.isDebug() ? AJAX_JAVASCRIPT_PATH.toURI() : AJAX_MIN_JAVASCRIPT_PATH.toURI();
-		depictContext.writeJavaScriptElement(appendQueryParameter(ajaxJavascriptURI, GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)); //JavaScript: ajax.js
+		depictContext.writeJavaScriptElement(appendQueryParameter(ajaxJavascriptURI, GUISE_VERSION_URI_QUERY_PARAMETER, resourceTag)); //JavaScript: ajax.js
 		depictContext.write("\n");
 		depictContext.write("\t");
 		final URI guiseJavascriptURI = application.isDebug() ? GUISE_JAVASCRIPT_PATH.toURI() : GUISE_MIN_JAVASCRIPT_PATH.toURI();
-		depictContext.writeJavaScriptElement(appendQueryParameter(guiseJavascriptURI, GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)); //JavaScript: guise.js
+		depictContext.writeJavaScriptElement(appendQueryParameter(guiseJavascriptURI, GUISE_VERSION_URI_QUERY_PARAMETER, resourceTag)); //JavaScript: guise.js
 		depictContext.write("\n");
 		depictContext.write("\t"); //Google Gears
 		final URI googleGearsURI = application.isDebug() ? GOOGLE_GEARS_JAVASCRIPT_PATH.toURI() : GOOGLE_GEARS_MIN_JAVASCRIPT_PATH.toURI();
-		depictContext.writeJavaScriptElement(appendQueryParameter(googleGearsURI, GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID));
+		depictContext.writeJavaScriptElement(appendQueryParameter(googleGearsURI, GUISE_VERSION_URI_QUERY_PARAMETER, resourceTag));
 		depictContext.write("\n");
 		final URI htmlEditorJavaScriptURI; //HTML editor
 		switch(HTML_EDITOR)
@@ -346,14 +348,14 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 				throw impossible("Unrecognized HTML editor.");
 		}
 		depictContext.write("\t");
-		depictContext.writeJavaScriptElement(appendQueryParameter(htmlEditorJavaScriptURI, GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID));
+		depictContext.writeJavaScriptElement(appendQueryParameter(htmlEditorJavaScriptURI, GUISE_VERSION_URI_QUERY_PARAMETER, resourceTag));
 		depictContext.write("\n");
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_HEAD); //</xhtml:head>		
 		depictContext.write("\n");
 
 		//<xhtml:body>
 		super.depictBegin(); //do the default beginning rendering
-		depictContext.writeAttribute(null, ATTRIBUTE_ID, getPlatform().getDepictIDString(component.getDepictID())); //write the standard ID; don't write any class information, because this information (especially the frame-related style IDs) can confuse other frame styles
+		depictContext.writeAttribute(null, ATTRIBUTE_ID, platform.getDepictIDString(component.getDepictID())); //write the standard ID; don't write any class information, because this information (especially the frame-related style IDs) can confuse other frame styles
 		//TODO del when works		writeIDClassAttributes(context, component, null, null);	//write the ID and class attributes with no prefixes or suffixes
 		writeDirectionAttribute(); //write the component direction, if this component specifies a direction
 		/*TODO fix for new notification framework
@@ -392,7 +394,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		//TODO fix; new absolute path		final String resolvedGuiseFlashPath=application.resolvePath(GUISE_FLASH_PATH);	//resolve the path to the Guise Flash file
 				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_OBJECT);	//<xhtml:object>
 				depictContext.writeAttribute(null, ATTRIBUTE_ID, GUISE_FLASH_ID);	//id="guiseFlash"		
-				if(getPlatform().getClientProduct().getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER)	//if the user agent is IE, use the special attributes
+				if(platform.getClientProduct().getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER)	//if the user agent is IE, use the special attributes
 				{
 					depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CLASSID, FLASH_CLASS_ID);	//classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"; only write the classid attributes for IE, because it will prevent the Flash from being loaded in Firefox
 					depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CODEBASE, getSWFlashCabURI("8,0,0,0", HTTPS_SCHEME.equals(depictContext.getDepictURI().getScheme())).toString());	//codebase="http[s]://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0"

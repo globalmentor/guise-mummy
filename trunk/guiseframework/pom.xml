@@ -1,5 +1,5 @@
 ﻿<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.guiseframework</groupId>
@@ -8,10 +8,17 @@
 	<packaging>jar</packaging>
 
 	<name>Guise Application Framework</name>
+	<organization>
+		<name>GlobalMentor, Inc.</name>
+		<url>http://www.globalmentor.com/</url>
+	</organization>
 	<url>http://www.guiseframework.com/</url>
+	<inceptionYear>2005</inceptionYear>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.copyright>Copyright © ${project.inceptionYear}-2013 ${project.organization.name} All
+			Rights Reserved.</project.copyright>
 	</properties>
 
 	<dependencies>
@@ -85,6 +92,7 @@
 			</resource>
 			<resource>
 				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
 			</resource>
 		</resources>
 
@@ -99,7 +107,26 @@
 				</configuration>
 			</plugin>
 
-			<!--compress Guise JavaScript files to assets directory-->
+			<!--generate build date -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.2</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create-timestamp</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<timestampFormat>yyyy-MM-dd</timestampFormat>
+					<timestampPropertyName>build.date</timestampPropertyName>
+				</configuration>
+			</plugin>
+
+			<!--compress Guise JavaScript files to assets directory -->
 			<plugin>
 				<groupId>net.alchim31.maven</groupId>
 				<artifactId>yuicompressor-maven-plugin</artifactId>
@@ -122,39 +149,20 @@
 				</configuration>
 			</plugin>
 
-			<!--copy dependency JavaScript files-->
-			<!-- TODO bring back when works on m2e and JavaScript files are moved back to globalmentor-core
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.4</version>
-				<executions>
-					<execution>
-						<id>unpack</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>unpack</goal>
-						</goals>
-						<configuration>
-							<artifactItems>
-								<artifactItem>
-									<groupId>com.globalmentor</groupId>
-									<artifactId>globalmentor-core</artifactId>
-									<overWrite>true</overWrite>
-									<outputDirectory>${project.build.outputDirectory}/com/guiseframework/assets/javascript</outputDirectory>
-									<includes>**/*.js</includes>
-								</artifactItem>
-							</artifactItems>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			-->
+			<!--copy dependency JavaScript files -->
+			<!-- TODO bring back when works on m2e and JavaScript files are moved back to globalmentor-core <plugin> 
+				<groupId>org.apache.maven.plugins</groupId> <artifactId>maven-dependency-plugin</artifactId> <version>2.4</version> 
+				<executions> <execution> <id>unpack</id> <phase>process-resources</phase> <goals> <goal>unpack</goal> 
+				</goals> <configuration> <artifactItems> <artifactItem> <groupId>com.globalmentor</groupId> <artifactId>globalmentor-core</artifactId> 
+				<overWrite>true</overWrite> <outputDirectory>${project.build.outputDirectory}/com/guiseframework/assets/javascript</outputDirectory> 
+				<includes>**/*.js</includes> </artifactItem> </artifactItems> </configuration> </execution> </executions> 
+				</plugin> -->
 		</plugins>
 
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on 
+					the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -181,27 +189,26 @@
 										<ignore></ignore>
 									</action>
 								</pluginExecution>
-								<!-- TODO bring back and change to execute (or add links) when works on m2e and JavaScript files are moved back to globalmentor-core
+								<!-- TODO bring back and change to execute (or add links) when works on m2e and JavaScript files 
+									are moved back to globalmentor-core <pluginExecution> <pluginExecutionFilter> <groupId> org.apache.maven.plugins 
+									</groupId> <artifactId> maven-dependency-plugin </artifactId> <versionRange> [2.4,) </versionRange> <goals> 
+									<goal>unpack</goal> </goals> </pluginExecutionFilter> <action> <ignore></ignore> </action> </pluginExecution> -->
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>
-											org.apache.maven.plugins
-										</groupId>
-										<artifactId>
-											maven-dependency-plugin
-										</artifactId>
-										<versionRange>
-											[2.4,)
-										</versionRange>
+										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>buildnumber-maven-plugin</artifactId>
+										<versionRange>[1.2,)</versionRange>
 										<goals>
-											<goal>unpack</goal>
+											<goal>create-timestamp</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<execute>
+											<runOnConfiguration>true</runOnConfiguration>
+											<runOnIncremental>true</runOnIncremental>
+										</execute>
 									</action>
 								</pluginExecution>
-								-->
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
@@ -228,13 +235,13 @@
 							</execution>
 						</executions>
 					</plugin>
-					
+
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<version>2.8</version>
 						<configuration>
-							<bottom><![CDATA[<em>Copyright © 2005-2012 GlobalMentor, Inc. All Rights Reserved.</em>]]></bottom>
+							<bottom><![CDATA[<em>${project.copyright}</em>]]></bottom>
 							<includeDependencySources>true</includeDependencySources>
 							<dependencySourceIncludes>
 								<dependencySourceInclude>com.globalmentor:*</dependencySourceInclude>
