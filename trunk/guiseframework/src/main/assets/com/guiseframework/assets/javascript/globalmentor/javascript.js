@@ -619,7 +619,10 @@ function ContentType(string, _skipTest)
 			return this.type == type && (!subType || this.subType == subType);
 		};
 
-		/** @return <code>true</code> if this content type represents some sort of audio content. */
+		/**
+		 * @return <code>true</code> if this content type represents some sort of audio content; currently supports
+		 *         <code>audio/*</code> and <code>application/ogg</code>.
+		 */
 		ContentType.prototype.isAudio = function()
 		{
 			if(this.type == "audio") //audio/* is always audio
@@ -627,6 +630,19 @@ function ContentType(string, _skipTest)
 				return true;
 			}
 			if(this.match("application", "ogg")) //application/ogg is also audio
+			{
+				return true;
+			}
+			return false;
+		};
+
+		/**
+		 * @return <code>true</code> if this content type represents some sort of text content; currently only support
+		 *         <code>text/*</code>.
+		 */
+		ContentType.prototype.isText = function()
+		{
+			if(this.type == "text") //text/* is always text
 			{
 				return true;
 			}
@@ -715,7 +731,7 @@ function URI(string, _skipTest)
 	}
 	if(!_skipTest) //if we shouldn't skip testing
 	{
-		if(URI.REGEXP.test(string)) //split out the components of the URI using a regular expression; if the string is not a URI
+		if(!URI.REGEXP.test(string)) //split out the components of the URI using a regular expression; if the string is not a URI
 		{
 			throw "Invalid URI: " + string;
 		}
