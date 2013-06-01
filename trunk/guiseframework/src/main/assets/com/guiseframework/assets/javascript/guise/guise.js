@@ -535,7 +535,7 @@ com.guiseframework.Guise = function()
 		{
 			name : 'paragraph',
 			items : [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', /*'-', 'JustifyLeft', 'JustifyCenter',
-																																																																											'JustifyRight', 'JustifyBlock', */'-', 'BidiLtr', 'BidiRtl' ]
+																																																																																					'JustifyRight', 'JustifyBlock', */'-', 'BidiLtr', 'BidiRtl' ]
 		},
 		{
 			name : 'links',
@@ -2476,13 +2476,13 @@ com.guiseframework.Guise = function()
 				//if this is any other browser
 				{
 					objectAttributes.type = "application/x-shockwave-flash";
-					objectAttributes.data = GUISE_ASSETS_BASE_PATH + "flash/guise.swf?guiseVersion=" + GUISE_VERSION+'-'+GUISE_BUILD_DATE; //add the Guise version so an out-of-date cached version won't be used
+					objectAttributes.data = GUISE_ASSETS_BASE_PATH + "flash/guise.swf?guiseVersion=" + GUISE_VERSION + '-' + GUISE_BUILD_DATE; //add the Guise version so an out-of-date cached version won't be used
 				}
 				DOM.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "object", objectAttributes); //<object ...>
 				DOM.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param",
 				{
 					"name" : "movie",
-					"value" : GUISE_ASSETS_BASE_PATH + "flash/guise.swf?guiseVersion=" + GUISE_VERSION+'-'+GUISE_BUILD_DATE
+					"value" : GUISE_ASSETS_BASE_PATH + "flash/guise.swf?guiseVersion=" + GUISE_VERSION + '-' + GUISE_BUILD_DATE
 				}, true); //<param name="movie" value="...guise.swf"/>
 				DOM.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param",
 				{
@@ -2538,7 +2538,46 @@ com.guiseframework.Guise = function()
 		{
 			event.stopPropagation(); //tell the event to stop bubbling
 			event.preventDefault(); //prevent the default functionality from occurring
-			this.playAudio(uri, id, contentType); //play the audio
+			try
+			{
+				this.playAudio(uri, id, contentType); //play the audio
+			}
+			catch(exception)
+			{
+				console.error(exception)
+			}
+		}
+
+		/**
+		 * Called when a link is clicked that should display text. This method displays the text in an alert box.
+		 * @param uri The URI of the text to show.
+		 * @param contentType The object of type ContentType indicating the MIME type of the text.
+		 * @param event The object describing the event.
+		 */
+		proto._onTextLinkClick = function(uri, contentType, event)
+		{
+			event.stopPropagation(); //tell the event to stop bubbling
+			event.preventDefault(); //prevent the default functionality from occurring
+			if(!contentType.match("text", "plain")) //we only support plain text
+			{
+				console.error("Supposedly text URI ", uri, " content type ", contentType, " not supported.")
+				return;
+			}
+			try
+			{
+				var parsedURI = new URI(uri); //TODO fix
+				var data = parsedURI.getData();
+				if(typeof data != "string")
+				{
+					console.error("Supposedly text URI ", uri, " content type ", contentType, " not supported.")
+					return;
+				}
+				alert(data);
+			}
+			catch(exception)
+			{
+				console.error(exception)
+			}
 		}
 
 		/**
@@ -3004,9 +3043,16 @@ com.guiseframework.Guise = function()
 								{
 									var href = node.getAttribute("href");
 									var contentType = ContentType.test(node.getAttribute("type")); //see if there is a content type provided
-									if(href && contentType && contentType.isAudio())
+									if(href && contentType)
 									{
-										com.globalmentor.dom.EventManager.addEvent(node, "click", this._onAudioLinkClick.bind(this, href, null, contentType), false); //play audio with no ID when the link is clicked 
+										if(contentType.isAudio()) //audio
+										{
+											com.globalmentor.dom.EventManager.addEvent(node, "click", this._onAudioLinkClick.bind(this, href, null, contentType), false); //play audio with no ID when the link is clicked 
+										}
+										else if(contentType.isText()) //text
+										{
+											com.globalmentor.dom.EventManager.addEvent(node, "click", this._onTextLinkClick.bind(this, href, contentType), false); //show the text when the link is clicked 
+										}
 									}
 								}
 							}

@@ -704,7 +704,7 @@ ContentType.test = function(string)
  * A class for parsing and encapsulating a URI according to RFC 2396, "Uniform Resource Identifiers (URI): Generic
  * Syntax".
  * 
- * @param string The string form of the URI.
+ * @param _string The string form of the URI.
  * @param _skipTest Whether the URI regular expression has already been tested and parsing should continue with the
  *          latest regular expression results; for internal use only.
  * @throws if the given string is not a valid URI (if _skipText is <code>false</code>).
@@ -728,6 +728,81 @@ function URI(string, _skipTest)
 		{
 			return this._string; //return the string
 		};
+
+		/**
+		 * Decodes and returns everything after <code>,</code> in a <code>data:</code> URI. The type of data should be
+		 * verified by examining the type of object returned.
+		 * <p>
+		 * If the data is text, a string is returned. Otherwise, a byte array is returned
+		 * </p>
+		 * <p>
+		 * This implementation supports data: URIs of type <code>text/*</code> of either <code>US-ASCII</code> or
+		 * <code>UTF-8</code> encodings.
+		 * </p>
+		 * @return The data from a <code>data:</code> URI.
+		 * @throws if the URI is not a <code>data:</code> URI, is not formatted correctly, or contains an unsupported data
+		 *           type.
+		 */
+		URI.prototype.getData = function()
+		{
+			if(!this.scheme == "data")
+			{
+				throw "Not a data URI: " + this;
+			}
+			var commaIndex = this.path.indexOf(","); //find the (required) comma
+			if(commaIndex < 0)
+			{
+				throw "Invalid URI data: " + this;
+			}
+			var data = this.path.substr(commaIndex + 1); //extract everything after the comma
+			var info = this.path.substr(0, commaIndex); //get the information on the data
+			var isBase64 = info.endsWith(";base64");
+			if(isBase64) //remove the ";base64" if present
+			{
+				info = info.substr(0, info.length - 7);
+				throw "Base 64 data: URIs not supported."; //TODO add Base64 support
+			}
+			//data:,abc
+			if(!info) //if no info is provided, 
+			{
+				return decodeURIComponent(data); //the data is already text/plain encoded in US-ASCII TODO check for non-ASCII encoding sequences
+			}
+			if(info.startsWith("text/") || info.startsWith(";charset=")) //if the data is text
+			{
+				//data:text/plain,abc
+				if(info.startsWith("text/plain") && !info.contains(";charset=")) //if this is a plain text data URI with no charset indicated
+				{
+					return decodeURIComponent(data); //the US-ASCII charset is assumed TODO check for non-ASCII encoding sequences
+				}
+				//data:;US-ASCII,abc
+				//data:text/plain;US-ASCII,abc
+				//data:text/html;US-ASCII,abc
+				if(info.toLowerCase().contains(";charset=us-ascii")) //US-ASCII
+				{
+					return decodeURIComponent(data); //TODO check for non-ASCII encoding sequences
+				}
+				//data:;UTF-8,abc
+				//data:text/plain;UTF-8,abc
+				//data:text/html;UTF-8,abc
+				if(info.toLowerCase().contains(";charset=utf-8")) //UTF-8
+				{
+					return decodeURIComponent(data);
+				}
+				throw "The text data: URI " + this + " has an unsupported encoding.";
+			}
+			else
+			//if the data is not text
+			{
+				throw "Non-text data: URIs not supported: " + this;
+			}
+		};
+
+		/** @return The string form of the URI. */
+		URI.prototype.toString = function()
+		{
+			return this._string;
+		}
+
 	}
 	if(!_skipTest) //if we shouldn't skip testing
 	{
