@@ -33,7 +33,7 @@ import com.guiseframework.platform.*;
 public interface WebPlatform extends Platform
 {
 	/** The version of CKEditor in use. */
-	public final static String CKEDITOR_VERSION = "4.1.1";
+	public final static String CKEDITOR_VERSION = "4.2.1";
 
 	/** The namespace of the Guise markup language to be used with XHTML. */
 	public final static URI GUISE_ML_NAMESPACE_URI = URI.create("http://guiseframework.com/id/ml#");
