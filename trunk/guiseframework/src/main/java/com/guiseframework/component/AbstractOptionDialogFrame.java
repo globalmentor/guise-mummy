@@ -36,7 +36,7 @@ public abstract class AbstractOptionDialogFrame<O> extends AbstractDialogFrame<O
 	/**Sets the single child component.
 	This implementation throws an exception because the frame content is not allowed to be changed.
 	@param newContent The single child component, or <code>null</code> if this frame does not have a child component.
-	@exception IllegalArgumentException if any different content is provided.
+	@throws IllegalArgumentException if any different content is provided.
 	*/
 	public void setContent(final Component newContent)
 	{
@@ -102,7 +102,7 @@ public abstract class AbstractOptionDialogFrame<O> extends AbstractDialogFrame<O
 	@param valueModel The frame value model.
 	@param component The component representing the content of the option dialog frame, or <code>null</code> if there is no content component.
 	@param options The available options.
-	@exception NullPointerException if the given value model and/or options is <code>null</code>.
+	@throws NullPointerException if the given value model and/or options is <code>null</code>.
 	*/
 	public AbstractOptionDialogFrame(final ValueModel<O> valueModel, final Component component, final O... options)
 	{

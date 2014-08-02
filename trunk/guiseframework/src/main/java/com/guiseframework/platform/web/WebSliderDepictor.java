@@ -52,7 +52,7 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 
 	/**Processes an event from the platform.
 	@param event The event to be processed.
-	@exception IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
+	@throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
 	*/
 	public void processEvent(final PlatformEvent event)
 	{
@@ -110,7 +110,7 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 	@param <V> The type of value contained in the control.
 	@param sliderControl The slider control.
 	@param position The relative position of the slider.
-	@exception NullPointerException if the given control and/or value class is <code>null</code>.
+	@throws NullPointerException if the given control and/or value class is <code>null</code>.
 	*/
 	public static <V extends Number> void processPosition(final SliderControl<V> sliderControl, final double position)
 	{
@@ -224,8 +224,8 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 */
 
 	/**Begins the rendering process.
-	@exception IOException if there is an error rendering the component.
-	@exception IllegalArgumentException if the given value control represents a value type this controller doesn't support.
+	@throws IOException if there is an error rendering the component.
+	@throws IllegalArgumentException if the given value control represents a value type this controller doesn't support.
 	*/
 	protected void depictBegin() throws IOException
 	{
@@ -236,7 +236,7 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 	}
 
 	/**Renders the body of the component.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictBody() throws IOException
 	{
@@ -410,7 +410,7 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 	}
 
 	/**Ends the rendering process.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	public void depictEnd() throws IOException
 	{

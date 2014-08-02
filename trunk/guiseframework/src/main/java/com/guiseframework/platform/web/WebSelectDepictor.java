@@ -48,7 +48,7 @@ public class WebSelectDepictor<V, C extends ListSelectControl<V>> extends Abstra
 
 	/**Processes an event from the platform.
 	@param event The event to be processed.
-	@exception IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
+	@throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
 	*/
 	public void processEvent(final PlatformEvent event)
 	{
@@ -87,7 +87,7 @@ public class WebSelectDepictor<V, C extends ListSelectControl<V>> extends Abstra
 	@param <V> The type of value contained in the control.
 	@param selectControl The select control.
 	@param selectedIDs The array of new selected IDs, each identifying a representation component of the value.
-	@exception NullPointerException if the given control and/or selected IDs is <code>null</code>.
+	@throws NullPointerException if the given control and/or selected IDs is <code>null</code>.
 	*/
 	public static <V> void processSelectedIDs(final ListSelectControl<V> selectControl, final String[] selectedIDs)
 	{
@@ -140,7 +140,7 @@ Log.trace("ready to set selected indexes to", Arrays.toString(selectedIndices));
 	}
 
 	/**Begins the rendering process.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictBegin() throws IOException
 	{
@@ -248,7 +248,7 @@ Log.trace("ready to set selected indexes to", Arrays.toString(selectedIndices));
 
 	/**Updates the views of any children.
 	This version does nothing, because if a list select control is a composite component the child controls have already been rendered as values in {@link #depictBody(XMLGuiseContext, ListSelectControl)}.
-	@exception IOException if there is an error updating the child views.
+	@throws IOException if there is an error updating the child views.
 	*/
 	protected void depictChildren() throws IOException
 	{

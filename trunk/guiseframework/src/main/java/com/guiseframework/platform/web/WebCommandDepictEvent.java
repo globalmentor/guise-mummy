@@ -50,7 +50,7 @@ public class WebCommandDepictEvent<C extends Enum<C> & WebPlatformCommand> exten
 	@param depictedObject The depicted object on which the event initially occurred.
 	@param command The command.
 	@param parameters The parameters of the command; parameters with duplicate names replace earlier parameters of the same name.
-	@exception NullPointerException if the given depicted object, command, and/or parameters is <code>null</code>.
+	@throws NullPointerException if the given depicted object, command, and/or parameters is <code>null</code>.
 	*/
 	public WebCommandDepictEvent(final DepictedObject depictedObject, final C command, final NameValuePair<String, Object>... parameters)
 	{
@@ -63,7 +63,7 @@ public class WebCommandDepictEvent<C extends Enum<C> & WebPlatformCommand> exten
 	@param depictedObject The depicted object on which the event initially occurred.
 	@param command The command.
 	@param parameters The map representing the parameters of the command.
-	@exception NullPointerException if the given depicted object, command, and/or parameters is <code>null</code>.
+	@throws NullPointerException if the given depicted object, command, and/or parameters is <code>null</code>.
 	*/
 	public WebCommandDepictEvent(final DepictedObject depictedObject, final C command, final Map<String, Object> parameters)
 	{

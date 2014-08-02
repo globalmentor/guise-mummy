@@ -28,7 +28,7 @@ public class DefaultDialogFrame<V> extends AbstractDialogFrame<V>
 
 	/**Value class constructor.
 	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public DefaultDialogFrame(final Class<V> valueClass)
 	{
@@ -38,7 +38,7 @@ public class DefaultDialogFrame<V> extends AbstractDialogFrame<V>
 	/**Value class and component constructor.
 	@param valueClass The class indicating the type of value held in the model.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public DefaultDialogFrame(final Class<V> valueClass, final Component component)
 	{
@@ -47,7 +47,7 @@ public class DefaultDialogFrame<V> extends AbstractDialogFrame<V>
 
 	/**Value model constructor.
 	@param valueModel The component value model.
-	@exception NullPointerException if the given value model is <code>null</code>.
+	@throws NullPointerException if the given value model is <code>null</code>.
 	*/
 	public DefaultDialogFrame(final ValueModel<V> valueModel)
 	{
@@ -57,7 +57,7 @@ public class DefaultDialogFrame<V> extends AbstractDialogFrame<V>
 	/**Value model and component constructor.
 	@param valueModel The component value model.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
-	@exception NullPointerException if the given value model is <code>null</code>.
+	@throws NullPointerException if the given value model is <code>null</code>.
 	*/
 	public DefaultDialogFrame(final ValueModel<V> valueModel, final Component component)
 	{

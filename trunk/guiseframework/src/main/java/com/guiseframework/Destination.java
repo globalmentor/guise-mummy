@@ -62,8 +62,8 @@ public interface Destination extends PropertyBindable
 	 * @param bookmark The bookmark for this path, or <code>null</code> if there is no bookmark.
 	 * @param referrerURI The URI of the referring destination or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 	 * @return The preferred path.
-	 * @exception NullPointerException if the given session and/or path is <code>null</code>.
-	 * @exception ResourceIOException if there is an error accessing the resource.
+	 * @throws NullPointerException if the given session and/or path is <code>null</code>.
+	 * @throws ResourceIOException if there is an error accessing the resource.
 	 */
 	public URIPath getPath(final GuiseSession session, URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException;
 
@@ -75,8 +75,8 @@ public interface Destination extends PropertyBindable
 	 *          navigation.
 	 * @param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 	 * @return Whether the requested path exists.
-	 * @exception NullPointerException if the given navigation path is <code>null</code>.
-	 * @exception ResourceIOException if there is an error accessing the resource.
+	 * @throws NullPointerException if the given navigation path is <code>null</code>.
+	 * @throws ResourceIOException if there is an error accessing the resource.
 	 */
 	public boolean exists(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException;
 
@@ -98,8 +98,8 @@ public interface Destination extends PropertyBindable
 	 *          navigation.
 	 * @param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 	 * @return Whether the requested path exists.
-	 * @exception NullPointerException if the given navigation path is <code>null</code>.
-	 * @exception ResourceIOException if there is an error accessing the resource.
+	 * @throws NullPointerException if the given navigation path is <code>null</code>.
+	 * @throws ResourceIOException if there is an error accessing the resource.
 	 */
 	public boolean isAuthorized(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI)
 			throws ResourceIOException;

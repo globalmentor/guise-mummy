@@ -32,7 +32,7 @@ public class ReferenceConstraints extends AbstractConstraints
 
 	/**Creates constraints with a reference ID to which a component should be bound.
 	@param id The ID to which the component should be bound.
-	@exception NullPointerException if the given ID is <code>null</code>.
+	@throws NullPointerException if the given ID is <code>null</code>.
 	*/
 	public ReferenceConstraints(final String id)
 	{

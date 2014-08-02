@@ -162,7 +162,7 @@ public class Notification extends DefaultLabelModel
 	If the error provides a message, it is used as the notification message; otherwise, the error's string value is used as the message.
 	@param error The associated error or exception.
 	@param options The available response options; if no options are given, {@link Option#OK} will be assumed.
-	@exception NullPointerException if the given error and/or options is <code>null</code>.
+	@throws NullPointerException if the given error and/or options is <code>null</code>.
 	*/
 	public Notification(final Throwable error, final Option... options)
 	{
@@ -173,7 +173,7 @@ public class Notification extends DefaultLabelModel
 	@param error The associated error or exception.
 	@param message The message text, which may include a resource reference.
 	@param options The available response options; if no options are given, {@link Option#OK} will be assumed.
-	@exception NullPointerException if the given error, message, and/or options is <code>null</code>.
+	@throws NullPointerException if the given error, message, and/or options is <code>null</code>.
 	*/
 	public Notification(final Throwable error, final String message, final Option... options)
 	{
@@ -183,7 +183,7 @@ public class Notification extends DefaultLabelModel
 	/**Message constructor with a {@link Severity#INFO} severity, no error, and a <code>text/plain</code> content type.
 	@param message The message text, which may include a resource reference.
 	@param options The available response options; if no options are given, {@link Option#OK} will be assumed.
-	@exception NullPointerException if the given message and/or options is <code>null</code>.
+	@throws NullPointerException if the given message and/or options is <code>null</code>.
 	*/
 	public Notification(final String message, final Option... options)
 	{
@@ -194,7 +194,7 @@ public class Notification extends DefaultLabelModel
 	@param message The message text, which may include a resource reference.
 	@param severity The severity of the notification.
 	@param options The available response options; if no options are given, {@link Option#OK} will be assumed.
-	@exception NullPointerException if the given message, severity, and/or options is <code>null</code>.
+	@throws NullPointerException if the given message, severity, and/or options is <code>null</code>.
 	*/
 	public Notification(final String message, final Severity severity, final Option... options)
 	{
@@ -206,7 +206,7 @@ public class Notification extends DefaultLabelModel
 	@param severity The severity of the notification.
 	@param error The associated error or exception, or <code>null</code> if there is no related error.
 	@param options The available response options; if no options are given, {@link Option#OK} will be assumed.
-	@exception NullPointerException if the given message, severity, and/or options is <code>null</code>.
+	@throws NullPointerException if the given message, severity, and/or options is <code>null</code>.
 	*/
 	public Notification(final String message, final Severity severity, final Throwable error, final Option... options)
 	{
@@ -217,8 +217,8 @@ public class Notification extends DefaultLabelModel
 	@param message The message text, which may include a resource reference
 	@param messageContentType The message text content type.
 	@param options The available response options; if no options are given, {@link Option#OK} will be assumed.
-	@exception NullPointerException if the given message, severity, and/or options is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
+	@throws NullPointerException if the given message, severity, and/or options is <code>null</code>.
+	@throws IllegalArgumentException if the given content type is not a text content type.
 	*/
 	public Notification(final String message, final ContentType messageContentType, final Option... options)
 	{
@@ -230,8 +230,8 @@ public class Notification extends DefaultLabelModel
 	@param messageContentType The message text content type.
 	@param severity The severity of the notification.
 	@param options The available response options; if no options are given, {@link Option#OK} will be assumed.
-	@exception NullPointerException if the given message, severity, and/or options is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
+	@throws NullPointerException if the given message, severity, and/or options is <code>null</code>.
+	@throws IllegalArgumentException if the given content type is not a text content type.
 	*/
 	public Notification(final String message, final ContentType messageContentType, final Severity severity, final Option... options)
 	{
@@ -244,8 +244,8 @@ public class Notification extends DefaultLabelModel
 	@param severity The severity of the notification.
 	@param error The associated error or exception, or <code>null</code> if there is no related error.
 	@param options The available response options; if no options are given, {@link Option#OK} will be assumed.
-	@exception NullPointerException if the given message and/or options is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
+	@throws NullPointerException if the given message and/or options is <code>null</code>.
+	@throws IllegalArgumentException if the given content type is not a text content type.
 	*/
 	public Notification(final String message, final ContentType messageContentType, final Severity severity, final Throwable error, final Option... options)
 	{

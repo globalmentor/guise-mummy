@@ -28,7 +28,7 @@ public abstract class AbstractButtonControl extends AbstractActionControl implem
 	@param infoModel The component info model.
 	@param actionModel The component action model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
+	@throws NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
 	*/
 	public AbstractButtonControl(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable)
 	{

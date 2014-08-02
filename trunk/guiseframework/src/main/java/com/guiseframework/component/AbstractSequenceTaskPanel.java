@@ -111,7 +111,7 @@ public abstract class AbstractSequenceTaskPanel extends AbstractPanel
 
 	/**Task controller constructor.
 	@param taskController The object controlling the sequence task.
-	@exception NullPointerException if the given task controller is <code>null</code>.
+	@throws NullPointerException if the given task controller is <code>null</code>.
 	*/
 	public AbstractSequenceTaskPanel(final SequenceTaskController taskController)
 	{

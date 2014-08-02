@@ -37,7 +37,7 @@ public class GuiseSessionThreadGroup extends ThreadGroup implements Configuratio
 
 	/**Guise session constructor.
 	@param guiseSession The Guise session to which this thread group belongs and in which its related threads run.
-	@exception NullPointerException if the given Guise session is <code>null</code>. 
+	@throws NullPointerException if the given Guise session is <code>null</code>. 
 	*/
 	public GuiseSessionThreadGroup(final GuiseSession guiseSession)
 	{

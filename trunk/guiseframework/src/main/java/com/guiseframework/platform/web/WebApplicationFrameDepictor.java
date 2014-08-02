@@ -134,7 +134,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 
 	/**
 	 * Begins the rendering process. This version renders an outer html element.
-	 * @exception IOException if there is an error rendering the component.
+	 * @throws IOException if there is an error rendering the component.
 	 */
 	protected void depictBegin() throws IOException
 	{
@@ -458,7 +458,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 
 	/**
 	 * Ends the rendering process. This version ends the outer html element and the inner form element.
-	 * @exception IOException if there is an error rendering the component.
+	 * @throws IOException if there is an error rendering the component.
 	 */
 	protected void depictEnd() throws IOException
 	{

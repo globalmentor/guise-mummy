@@ -76,8 +76,8 @@ public abstract class AbstractTableModel extends AbstractModel implements TableM
 	@param <C> The type of cell value.
 	@param cell The cell containing the row index and column information.
 	@return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
-	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	@throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@throws IllegalArgumentException if the given column is not one of this table's columns.
 	*/
 	public <C> C getCellValue(final Cell<C> cell)
 	{
@@ -89,8 +89,8 @@ public abstract class AbstractTableModel extends AbstractModel implements TableM
 	@param <C> The type of cell value.
 	@param cell The cell containing the row index and column information.
 	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	@throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@throws IllegalArgumentException if the given column is not one of this table's columns.
 	*/
 	public <C> void setCellValue(final Cell<C> cell, final C newCellValue)
 	{

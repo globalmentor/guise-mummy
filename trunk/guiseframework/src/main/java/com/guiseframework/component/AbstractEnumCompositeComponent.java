@@ -53,7 +53,7 @@ public abstract class AbstractEnumCompositeComponent<E extends Enum<E>> extends 
 		
 	/**Enum values constructor.
 	@param enumValues The values of enums that allow access to the underlying array.
-	@exception NullPointerException if the given enum values array is <code>null</code>.
+	@throws NullPointerException if the given enum values array is <code>null</code>.
 	*/
 	public AbstractEnumCompositeComponent(final E[] enumValues)
 	{

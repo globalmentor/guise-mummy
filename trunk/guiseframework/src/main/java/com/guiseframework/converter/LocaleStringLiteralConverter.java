@@ -35,7 +35,7 @@ public class LocaleStringLiteralConverter extends AbstractConverter<Locale, Stri
 
 	/**Locale style constructor.
 	@param style The locale representation style.
-	@exception NullPointerException if the given locale style is <code>null</code>.
+	@throws NullPointerException if the given locale style is <code>null</code>.
 	*/
 	public LocaleStringLiteralConverter(final LocaleStringLiteralStyle style)
 	{
@@ -45,7 +45,7 @@ public class LocaleStringLiteralConverter extends AbstractConverter<Locale, Stri
 	/**Converts a value from the value space to a literal value in the lexical space.
 	@param value The value in the value space to convert.
 	@return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>.
-	@exception ConversionException if the value cannot be converted.
+	@throws ConversionException if the value cannot be converted.
 	*/ 
 	public String convertValue(final Locale value) throws ConversionException
 	{
@@ -108,7 +108,7 @@ public class LocaleStringLiteralConverter extends AbstractConverter<Locale, Stri
 	This version throws a conversion exception if the literal is not <code>null</code>.
 	@param literal The literal value in the lexical space to convert.
 	@return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
-	@exception ConversionException if the literal value cannot be converted.
+	@throws ConversionException if the literal value cannot be converted.
 	*/ 
 	public Locale convertLiteral(final String literal) throws ConversionException
 	{

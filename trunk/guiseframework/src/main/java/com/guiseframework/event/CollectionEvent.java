@@ -39,7 +39,7 @@ public class CollectionEvent<E> extends AbstractGuiseEvent
 
 	/**Source constructor for general collection modification.
 	@param source The object on which the event initially occurred.
-	@exception NullPointerException if the given source is <code>null</code>.
+	@throws NullPointerException if the given source is <code>null</code>.
 	*/
 	public CollectionEvent(final Object source)
 	{
@@ -50,7 +50,7 @@ public class CollectionEvent<E> extends AbstractGuiseEvent
 	@param source The object on which the event initially occurred.
 	@param addedElement The element that was added to the collection, or <code>null</code> if no element was added or it is unknown whether or which elements were added.
 	@param removedElement The element that was removed from the collection, or <code>null</code> if no element was removed or it is unknown whether or which elements were removed.
-	@exception NullPointerException if the given source is <code>null</code>.
+	@throws NullPointerException if the given source is <code>null</code>.
 	*/
 	public CollectionEvent(final Object source, final E addedElement, final E removedElement)
 	{

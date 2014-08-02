@@ -112,8 +112,8 @@ public class PrototypeProvision<P extends Prototype> extends AbstractHashObject 
 	@param order The order of the prototype.
 	@param isMenu Whether this prototype should be used in a menu if available.
 	@param isTool Whether this prototype should be used in a toolbar if available.
-	@exception NullPointerException if the given prototype is <code>null</code>.
-	@exception IllegalArgumentException if the given order is not {@value #NO_ORDER} and does not come between {@value #MIN_ORDER} and {@value #MAX_ORDER}, inclusive.
+	@throws NullPointerException if the given prototype is <code>null</code>.
+	@throws IllegalArgumentException if the given order is not {@value #NO_ORDER} and does not come between {@value #MIN_ORDER} and {@value #MAX_ORDER}, inclusive.
 	*/
 	public PrototypeProvision(final P prototype, final int order, final boolean isMenu, final boolean isTool)
 	{
@@ -126,8 +126,8 @@ public class PrototypeProvision<P extends Prototype> extends AbstractHashObject 
 	@param order The order of the prototype.
 	@param isMenu Whether this prototype should be used in a menu if available.
 	@param isTool Whether this prototype should be used in a toolbar if available.
-	@exception NullPointerException if the given prototype is <code>null</code>.
-	@exception IllegalArgumentException if the given order is not {@value #NO_ORDER} and does not come between {@value #MIN_ORDER} and {@value #MAX_ORDER}, inclusive.
+	@throws NullPointerException if the given prototype is <code>null</code>.
+	@throws IllegalArgumentException if the given order is not {@value #NO_ORDER} and does not come between {@value #MIN_ORDER} and {@value #MAX_ORDER}, inclusive.
 	*/
 	public PrototypeProvision(final PrototypeProvision<?> parentPrototypeProvision, final P prototype, final int order, final boolean isMenu, final boolean isTool)
 	{

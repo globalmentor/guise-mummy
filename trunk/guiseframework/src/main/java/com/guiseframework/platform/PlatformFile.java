@@ -37,8 +37,8 @@ public interface PlatformFile extends ProgressListenable<Long>
 
 	/**Uploads the file from the platform.
 	@param destinationURI The URI representing the destination of the platform file, either absolute or relative to the application.
-	@exception NullPointerException if the given destination URI is <code>null</code>.
-	@exception IllegalStateException the platform file can no longer be uploaded because, for example, other platform files have since been selected.	
+	@throws NullPointerException if the given destination URI is <code>null</code>.
+	@throws IllegalStateException the platform file can no longer be uploaded because, for example, other platform files have since been selected.	
 	*/
 	public void upload(final URI destinationURI);
 

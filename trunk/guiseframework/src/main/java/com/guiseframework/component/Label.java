@@ -56,7 +56,7 @@ public class Label extends AbstractLabel
 
 	/**Info model constructor.
 	@param infoModel The component info model.
-	@exception NullPointerException if the given info model is <code>null</code>.
+	@throws NullPointerException if the given info model is <code>null</code>.
 	*/
 	public Label(final InfoModel infoModel)
 	{
@@ -65,7 +65,7 @@ public class Label extends AbstractLabel
 
 	/**Prototype constructor.
 	@param labelPrototype The prototype on which this component should be based.
-	@exception NullPointerException if the given prototype is <code>null</code>.
+	@throws NullPointerException if the given prototype is <code>null</code>.
 	*/
 	public Label(final LabelPrototype labelPrototype)
 	{

@@ -50,7 +50,7 @@ public abstract class AbstractPlatformFile implements PlatformFile
 	/**Name and size constructor.
 	@param name The name of the file.
 	@param size The size of the file, or -1 if the size is unknown.
-	@exception NullPointerException if the given name is <code>null</code>.
+	@throws NullPointerException if the given name is <code>null</code>.
 	*/
 	public AbstractPlatformFile(final String name, final long size)
 	{
@@ -79,7 +79,7 @@ public abstract class AbstractPlatformFile implements PlatformFile
 	@param state The state of the progress.
 	@param transferred The current number of bytes transferred, or <code>-1</code> if not known.
 	@param total The total or estimated total bytes to transfer, or <code>-1</code> if not known.
-	@exception NullPointerException if the given state is <code>null</code>.
+	@throws NullPointerException if the given state is <code>null</code>.
 	@see ProgressListener
 	@see ProgressEvent
 	*/

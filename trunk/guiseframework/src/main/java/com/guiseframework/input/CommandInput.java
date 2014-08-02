@@ -34,7 +34,7 @@ public class CommandInput extends AbstractHashObject implements Input
 
 	/**Command constructor.
 	@param command The command.
-	@exception NullPointerException if the given command is <code>null</code>.
+	@throws NullPointerException if the given command is <code>null</code>.
 	*/
 	public CommandInput(final Command command)
 	{

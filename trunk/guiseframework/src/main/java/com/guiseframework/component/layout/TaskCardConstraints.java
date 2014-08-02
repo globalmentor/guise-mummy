@@ -84,7 +84,7 @@ public class TaskCardConstraints extends CardConstraints
 
 	/**Info model constructor.
 	@param infoModel The info model representing the card label.
-	@exception NullPointerException if the given info model is <code>null</code>.
+	@throws NullPointerException if the given info model is <code>null</code>.
 	*/
 	public TaskCardConstraints(final InfoModel infoModel)
 	{
@@ -94,7 +94,7 @@ public class TaskCardConstraints extends CardConstraints
 	/**Info model and enabled constructor.
 	@param infoModel The info model representing the card label.
 	@param enabled Whether the card is enabled.
-	@exception NullPointerException if the given info model is <code>null</code>.
+	@throws NullPointerException if the given info model is <code>null</code>.
 	*/
 	public TaskCardConstraints(final InfoModel infoModel, final boolean enabled)
 	{

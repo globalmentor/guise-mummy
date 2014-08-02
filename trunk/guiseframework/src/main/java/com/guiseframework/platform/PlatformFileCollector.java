@@ -48,7 +48,7 @@ public class PlatformFileCollector extends AbstractDepictedObject
 		This method is called by the platform; it should never be called directly from an application.
 		@param newPlatformFiles The new selected platform files.
 		@see #PLATFORM_FILES_PROPERTY
-		@exception NullPointerException if the given platform files is <code>null</code>. 
+		@throws NullPointerException if the given platform files is <code>null</code>. 
 		*/
 		public void setPlatformFiles(final List<? extends PlatformFile> newPlatformFiles)
 		{
@@ -73,8 +73,8 @@ public class PlatformFileCollector extends AbstractDepictedObject
 
 	/**Cancels a platform file upload or download.
 	@param platformFile Thet platform file to cancel.
-	@exception NullPointerException if the given platform file is <code>null</code>.
-	@exception IllegalStateException the specified platform file can no longer be canceled because, for example, other platform files have since been selected.	
+	@throws NullPointerException if the given platform file is <code>null</code>.
+	@throws IllegalStateException the specified platform file can no longer be canceled because, for example, other platform files have since been selected.	
 	*/
 	public void cancel(final PlatformFile platformFile)
 	{
@@ -89,8 +89,8 @@ public class PlatformFileCollector extends AbstractDepictedObject
 	@param platformFile Thet platform file to upload.
 	@param platformFile Thet platform file to upload.
 	@param destinationURI The URI representing the destination of the platform file, either absolute or relative to the application.
-	@exception NullPointerException if the given platform file and/or destination URI is <code>null</code>.
-	@exception IllegalStateException the specified platform file can no longer be uploaded because, for example, other platform files have since been selected.	
+	@throws NullPointerException if the given platform file and/or destination URI is <code>null</code>.
+	@throws IllegalStateException the specified platform file can no longer be uploaded because, for example, other platform files have since been selected.	
 	*/
 	public void upload(final PlatformFile platformFile, final URI destinationURI)
 	{
@@ -113,15 +113,15 @@ public class PlatformFileCollector extends AbstractDepictedObject
 
 		/**Cancels a platform file upload or download.
 		@param platformFile Thet platform file to cancel.
-		@exception NullPointerException if the given platform file is <code>null</code>.
-		@exception IllegalStateException the specified platform file can no longer be canceled because, for example, other platform files have since been selected.	
+		@throws NullPointerException if the given platform file is <code>null</code>.
+		@throws IllegalStateException the specified platform file can no longer be canceled because, for example, other platform files have since been selected.	
 		*/
 		public void cancel(final PlatformFile platformFile);
 
 		/**Initiates a platform file upload.
 		@param platformFile Thet platform file to upload.
 		@param destinationURI The URI representing the destination of the platform file, either absolute or relative to the application.
-		@exception NullPointerException if the given platform file and/or destination URI is <code>null</code>.
+		@throws NullPointerException if the given platform file and/or destination URI is <code>null</code>.
 		*/
 		public void upload(final PlatformFile platformFile, final URI destinationURI);
 

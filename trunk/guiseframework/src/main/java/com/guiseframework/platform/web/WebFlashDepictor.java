@@ -85,7 +85,7 @@ public class WebFlashDepictor<C extends Flash> extends AbstractSimpleWebComponen
 	}
 
 	/**Renders the body of the component.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictBody() throws IOException
 	{

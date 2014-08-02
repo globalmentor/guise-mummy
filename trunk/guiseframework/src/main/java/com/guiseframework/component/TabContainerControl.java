@@ -44,7 +44,7 @@ public class TabContainerControl extends AbstractListSelectContainerControl
 		/**Sets the flow axis.
 		This is a bound property
 		@param newAxis The flow axis.
-		@exception NullPointerException if the given axis is <code>null</code>.
+		@throws NullPointerException if the given axis is <code>null</code>.
 		@see #AXIS_PROPERTY
 		*/
 		public void setAxis(final Flow newAxis)
@@ -86,7 +86,7 @@ public class TabContainerControl extends AbstractListSelectContainerControl
 
 	/**Axis constructor.
 	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given axis is <code>null</code>.
+	@throws NullPointerException if the given axis is <code>null</code>.
 	*/
 	public TabContainerControl(final Flow axis)
 	{
@@ -96,7 +96,7 @@ public class TabContainerControl extends AbstractListSelectContainerControl
 	/**Layout and axis constructor.
 	@param layout The layout definition for the container.
 	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given layout, and/or axis is <code>null</code>.
+	@throws NullPointerException if the given layout, and/or axis is <code>null</code>.
 	*/
 	public TabContainerControl(final TabLayout layout, final Flow axis)
 	{
@@ -107,7 +107,7 @@ public class TabContainerControl extends AbstractListSelectContainerControl
 	@param layout The layout definition for the container.
 	@param axis The axis along which the tabs are oriented.
 	@param maxTabCount The requested number of visible tabs, or -1 if no maximum tab count is specified.
-	@exception NullPointerException if the given layout and/or axis is <code>null</code>.
+	@throws NullPointerException if the given layout and/or axis is <code>null</code>.
 	*/
 	public TabContainerControl(final TabLayout layout, final Flow axis, final int maxTabCount)
 	{

@@ -110,7 +110,7 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V>
 		/**Sets the converter.
 		This is a bound property
 		@param newConverter The converter for this component.
-		@exception NullPointerException if the given converter is <code>null</code>.
+		@throws NullPointerException if the given converter is <code>null</code>.
 		@see ValueControl#CONVERTER_PROPERTY
 		*/
 		public void setConverter(final Converter<V, String> newConverter)
@@ -183,8 +183,8 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V>
 		@see #getConverter()
 		@see Converter#convertLiteral(Object)
 		@see #setValue(Object)
-		@exception ConversionException if the literal value cannot be converted.
-		@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+		@throws ConversionException if the literal value cannot be converted.
+		@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 		*/
 		public void setTextValue(final String newText) throws ConversionException, PropertyVetoException
 		{
@@ -203,8 +203,8 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V>
 		/**Sets the content type of the value.
 		This is a bound property.
 		@param newValueContentType The new value content type.
-		@exception NullPointerException if the given content type is <code>null</code>.
-		@exception IllegalArgumentException if the given content type is not a text content type.
+		@throws NullPointerException if the given content type is <code>null</code>.
+		@throws IllegalArgumentException if the given content type is not a text content type.
 		@see #VALUE_CONTENT_TYPE_PROPERTY
 		*/
 		public void setValueContentType(final ContentType newValueContentType)
@@ -233,7 +233,7 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V>
 
 	/**Value class constructor with a default data model to represent a given type and a default converter.
 	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public AbstractTextControl(final Class<V> valueClass)
 	{
@@ -242,7 +242,7 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V>
 
 	/**Value model constructor with a default converter.
 	@param valueModel The component data model.
-	@exception NullPointerException if the given value model is <code>null</code>.
+	@throws NullPointerException if the given value model is <code>null</code>.
 	*/
 	public AbstractTextControl(final ValueModel<V> valueModel)
 	{
@@ -252,7 +252,7 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V>
 	/**Value model and converter constructor.
 	@param valueModel The component value model.
 	@param converter The converter for this component.
-	@exception NullPointerException if the given value model and/or converter is <code>null</code>.
+	@throws NullPointerException if the given value model and/or converter is <code>null</code>.
 	*/
 	public AbstractTextControl(final ValueModel<V> valueModel, final Converter<V, String> converter)
 	{

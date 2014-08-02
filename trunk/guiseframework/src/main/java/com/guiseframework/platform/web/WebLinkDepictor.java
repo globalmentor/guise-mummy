@@ -41,7 +41,7 @@ public class WebLinkDepictor<C extends ActionControl> extends AbstractWebActionC
 
 	/**Begins the rendering process.
 	This version renders any component info as a link title.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictBegin() throws IOException
 	{
@@ -85,7 +85,7 @@ public class WebLinkDepictor<C extends ActionControl> extends AbstractWebActionC
 
 	/**Renders the body of the component.
 	This version renders any label information.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictBody() throws IOException
 	{
@@ -120,7 +120,7 @@ public class WebLinkDepictor<C extends ActionControl> extends AbstractWebActionC
 	/**Writes the supplementary icons.
 	If no supplementary icons are present, no action occurs.
 	This version does nothing.
-	@exception IOException if there is an error writing the icons.
+	@throws IOException if there is an error writing the icons.
 	*/
 	protected void writeSupplementaryIcons() throws IOException
 	{

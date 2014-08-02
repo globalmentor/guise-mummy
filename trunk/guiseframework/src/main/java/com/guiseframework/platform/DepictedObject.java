@@ -45,7 +45,7 @@ public interface DepictedObject
 	/**Processes an event from the platform.
 	This method delegates to the currently installed depictor.
 	@param event The event to be processed.
-	@exception IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
+	@throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
 	@see #getDepictor()
 	@see Depictor#processEvent(PlatformEvent)
 	*/
@@ -54,7 +54,7 @@ public interface DepictedObject
 	/**Updates the depiction of the object.
 	The depiction will be marked as updated.
 	This method delegates to the currently installed depictor.
-	@exception IOException if there is an error updating the depiction.
+	@throws IOException if there is an error updating the depiction.
 	@see #getDepictor()
 	@see Depictor#depict()
 	*/

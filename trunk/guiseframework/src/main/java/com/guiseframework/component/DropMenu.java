@@ -30,7 +30,7 @@ public class DropMenu extends AbstractMenu
 
 	/**Axis constructor.
 	@param axis The axis along which the menu is oriented.
-	@exception NullPointerException if the given axis is <code>null</code>.
+	@throws NullPointerException if the given axis is <code>null</code>.
 	*/
 	public DropMenu(final Flow axis)
 	{
@@ -42,7 +42,7 @@ public class DropMenu extends AbstractMenu
 	@param actionModel The component action model.
 	@param enableable The enableable object in which to store enabled status.
 	@param axis The axis along which the menu is oriented.
-	@exception NullPointerException if the given info model, action model, enableable, and/or layout is <code>null</code>.
+	@throws NullPointerException if the given info model, action model, enableable, and/or layout is <code>null</code>.
 	*/
 	public DropMenu(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable, final Flow axis)
 	{
@@ -53,7 +53,7 @@ public class DropMenu extends AbstractMenu
 	/**Prototype and axis constructor.
 	@param actionPrototype The prototype on which this component should be based.
 	@param axis The axis along which the menu is oriented.
-	@exception NullPointerException if the given prototype and/or axis is <code>null</code>.
+	@throws NullPointerException if the given prototype and/or axis is <code>null</code>.
 	*/
 	public DropMenu(final MenuPrototype menuPrototype, final Flow axis)
 	{

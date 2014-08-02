@@ -151,7 +151,7 @@ public abstract class AbstractBooleanSelectActionControl extends AbstractActionV
 	@param actionModel The component action model.
 	@param valueModel The component value model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
+	@throws NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
 	*/
 	public AbstractBooleanSelectActionControl(final InfoModel infoModel, final ActionModel actionModel, final ValueModel<Boolean> valueModel, final Enableable enableable)
 	{

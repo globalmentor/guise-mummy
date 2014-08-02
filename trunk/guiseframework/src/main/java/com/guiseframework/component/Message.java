@@ -71,8 +71,8 @@ public class Message extends AbstractComponent	//TODO del component if not neede
 		/**Sets the content type of the message text.
 		This is a bound property.
 		@param newMessageContentType The new message text content type.
-		@exception NullPointerException if the given content type is <code>null</code>.
-		@exception IllegalArgumentException if the given content type is not a text content type.
+		@throws NullPointerException if the given content type is <code>null</code>.
+		@throws IllegalArgumentException if the given content type is not a text content type.
 		@see #MESSAGE_CONTENT_TYPE_PROPERTY
 		*/
 		public void setMessageContentType(final ContentType newMessageContentType)
@@ -97,7 +97,7 @@ public class Message extends AbstractComponent	//TODO del component if not neede
 
 	/**Message model constructor.
 	@param messageModel The component message model.
-	@exception NullPointerException if the given message model is <code>null</code>.
+	@throws NullPointerException if the given message model is <code>null</code>.
 	*/
 /*TODO fix
 	public Message(final MessageModel messageModel)

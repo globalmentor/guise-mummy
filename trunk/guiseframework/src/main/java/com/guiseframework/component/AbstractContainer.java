@@ -57,16 +57,16 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
   /**Returns the component at the specified index in the container.
   @param index The index of the component to return.
 	@return The component at the specified position in this container.
-	@exception IndexOutOfBoundsException if the index is out of range.
+	@throws IndexOutOfBoundsException if the index is out of range.
 	*/
 	public Component get(final int index) {return super.get(index);}
 
 	/**Adds a child component with default constraints to the container at the specified index.
 	@param index The index at which the component should be added.
 	@param component The component to add to this container.
-	@exception IllegalArgumentException if the component already has a parent.
-	@exception IllegalStateException if the installed layout does not support default constraints.
-	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
+	@throws IllegalArgumentException if the component already has a parent.
+	@throws IllegalStateException if the installed layout does not support default constraints.
+	@throws IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
 	*/
 	public void add(final int index, final Component component)
 	{
@@ -76,8 +76,8 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	/**Adds a component with default constraints to the container.
 	@param component The component to add to this container.
 	@return <code>true</code> if this container changed as a result of the operation.
-	@exception IllegalArgumentException if the component already has a parent.
-	@exception IllegalStateException if the installed layout does not support default constraints.
+	@throws IllegalArgumentException if the component already has a parent.
+	@throws IllegalStateException if the installed layout does not support default constraints.
 	*/
 	public boolean add(final Component component)
 	{
@@ -90,10 +90,10 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	@param index The index at which the component should be added.
 	@param component The component to add to this container.
 	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
-	@exception IllegalArgumentException if the component already has a parent.
-	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
-	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
-	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
+	@throws IllegalArgumentException if the component already has a parent.
+	@throws ClassCastException if the provided constraints are not appropriate for the installed layout.
+	@throws IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
+	@throws IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
 	*/
 	public void add(final int index, final Component component, final Constraints constraints)
 	{
@@ -106,9 +106,9 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	@param component The component to add to this container.
 	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
 	@return <code>true</code> if this container changed as a result of the operation.
-	@exception IllegalArgumentException if the component already has a parent.
-	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
-	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
+	@throws IllegalArgumentException if the component already has a parent.
+	@throws ClassCastException if the provided constraints are not appropriate for the installed layout.
+	@throws IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	*/
 	public boolean add(final Component component, final Constraints constraints)
 	{
@@ -121,9 +121,9 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	@param index The index at which the component should be added.
 	@param prototype The prototype of the component to add.
 	@return The component created to represent the given prototype.
-	@exception IllegalArgumentException if no component can be created from the given prototype
-	@exception IllegalStateException if the installed layout does not support default constraints.
-	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
+	@throws IllegalArgumentException if no component can be created from the given prototype
+	@throws IllegalStateException if the installed layout does not support default constraints.
+	@throws IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
 	@see #createComponent(Prototype)
 	*/
 	public Component add(final int index, final Prototype prototype)
@@ -137,8 +137,8 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	This implementation delegates to {@link #add(Component)}.
 	@param prototype The prototype of the component to add.
 	@return The component created to represent the given prototype.
-	@exception IllegalArgumentException if no component can be created from the given prototype
-	@exception IllegalStateException if the installed layout does not support default constraints.
+	@throws IllegalArgumentException if no component can be created from the given prototype
+	@throws IllegalStateException if the installed layout does not support default constraints.
 	@see #createComponent(Prototype)
 	*/
 	public Component add(final Prototype prototype)
@@ -154,10 +154,10 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	@param prototype The prototype of the component to add.
 	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
 	@return The component created to represent the given prototype.
-	@exception IllegalArgumentException if no component can be created from the given prototype
-	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
-	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
-	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
+	@throws IllegalArgumentException if no component can be created from the given prototype
+	@throws ClassCastException if the provided constraints are not appropriate for the installed layout.
+	@throws IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
+	@throws IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
 	@see #createComponent(Prototype)
 	*/
 	public Component add(final int index, final Prototype prototype, final Constraints constraints)
@@ -172,9 +172,9 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	@param prototype The prototype of the component to add.
 	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
 	@return The component created to represent the given prototype.
-	@exception IllegalArgumentException if no component can be created from the given prototype
-	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
-	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
+	@throws IllegalArgumentException if no component can be created from the given prototype
+	@throws ClassCastException if the provided constraints are not appropriate for the installed layout.
+	@throws IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	@see #createComponent(Prototype)
 	*/
 	public Component add(final Prototype prototype, final Constraints constraints)
@@ -197,7 +197,7 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	</dl>
 	@param prototype The prototype of the component to create.
 	@return A new component based upon the given prototype.
-	@exception IllegalArgumentException if no component can be created from the given prototype
+	@throws IllegalArgumentException if no component can be created from the given prototype
 	*/
 	public Component createComponent(final Prototype prototype)
 	{
@@ -260,7 +260,7 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	</dl>
 	@param prototype The prototype of the component to create.
 	@return A new component based upon the given prototype.
-	@exception IllegalArgumentException if no component can be created from the given prototype
+	@throws IllegalArgumentException if no component can be created from the given prototype
 	*/
 /*TODO del if not needed
 	public <V> ValueControl<V, ?> createValueControl(final ValuePrototype<V> valuePrototype)
@@ -282,7 +282,7 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	@param componentObject The component to remove.
 	@return <code>true</code> if this collection changed as a result of the operation.
 	@throws ClassCastException if given element is not a component.
-	@exception IllegalArgumentException if the component is not a member of the container.
+	@throws IllegalArgumentException if the component is not a member of the container.
 	*/
 	public boolean remove(final Object componentObject)
 	{
@@ -296,7 +296,7 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	/**Removes the child component at the specified position in this container.
 	@param index The index of the component to removed.
 	@return The value previously at the specified position.
-	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
+	@throws IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
 	*/
 	public Component remove(final int index)
 	{
@@ -346,7 +346,7 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	This is a bound property.
 	The layout is specified as not yet having a theme applied, as the specific theme rules applied to the layout may depend on the layout's owner.
 	@param newLayout The new layout definition for the container.
-	@exception NullPointerException if the given layout is <code>null</code>.
+	@throws NullPointerException if the given layout is <code>null</code>.
 	@see #LAYOUT_PROPERTY
 	@see #setPropertiesInitialized(boolean) 
 	*/
@@ -357,7 +357,7 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 
 	/**Layout constructor with a default info model.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given layout is <code>null</code>.
+	@throws NullPointerException if the given layout is <code>null</code>.
 	*/
 	public AbstractContainer(final Layout<? extends Constraints> layout)
 	{
@@ -367,7 +367,7 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	/**Info model and layout constructor.
 	@param infoModel The component info model.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given info model and/or layout is <code>null</code>.
+	@throws NullPointerException if the given info model and/or layout is <code>null</code>.
 	*/
 	public AbstractContainer(final InfoModel infoModel, final Layout<? extends Constraints> layout)
 	{

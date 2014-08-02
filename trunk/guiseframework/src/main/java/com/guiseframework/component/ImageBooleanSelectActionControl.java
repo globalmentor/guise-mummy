@@ -106,7 +106,7 @@ public class ImageBooleanSelectActionControl extends AbstractBooleanSelectAction
 	@param actionModel The component action model.
 	@param valueModel The component value model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given info model, image model, action model, and/or enableable object is <code>null</code>.
+	@throws NullPointerException if the given info model, image model, action model, and/or enableable object is <code>null</code>.
 	*/
 	public ImageBooleanSelectActionControl(final InfoModel infoModel, final ImageModel imageModel, final ActionModel actionModel, final ValueModel<Boolean> valueModel, final Enableable enableable)
 	{

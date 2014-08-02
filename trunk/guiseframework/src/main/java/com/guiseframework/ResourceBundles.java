@@ -72,7 +72,7 @@ public class ResourceBundles	//TODO moved out of globalmentor-core to allow org.
 
 		/**Extension constructor.
 		@param extension The extension for this resource bundle file type.
-		@exception NullPointerException if the given extension is <code>null</code>.
+		@throws NullPointerException if the given extension is <code>null</code>.
 		*/
 		private ResourceBundleFormat(final String extension)
 		{
@@ -92,7 +92,7 @@ public class ResourceBundles	//TODO moved out of globalmentor-core to allow org.
 	@param rdfResourceIO The I/O support for loading resources from an RDF+XML serialization, or <code>null</code> if RDF resource bundles are not supported.
 	@param rdfPropertyNamespaceURI The namespace of the properties to gather, using the property local name as the map entry key, or <code>null</code> if RDF resource bundles are not supported.
 	@return A resource bundle for the given base name and locale.
-	@exception MissingResourceException if no resource bundle for the specified base name can be found, or if there is an error loading the resource bundle.
+	@throws MissingResourceException if no resource bundle for the specified base name can be found, or if there is an error loading the resource bundle.
 	*/
 	public static ResourceBundle getResourceBundle(final String baseName, final Locale locale, final ClassLoader loader, final ResourceBundle parent, final IO<? extends URFResource> urfResourceIO, final IO<? extends RDFResource> rdfResourceIO, final URI rdfPropertyNamespaceURI) throws MissingResourceException
 	{

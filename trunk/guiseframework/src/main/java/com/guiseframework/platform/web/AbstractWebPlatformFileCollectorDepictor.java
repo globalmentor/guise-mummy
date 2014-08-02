@@ -68,7 +68,7 @@ public class AbstractWebPlatformFileCollectorDepictor extends AbstractWebDepicto
 		/**Retrieves a platform file by the ID assigned to it.
 		@param id The ID assigned to the platform file.
 		@return The specified platform file, or <code>null</code> if there is no platforom file with the given ID.
-		@exception NullPointerException if the given ID is <code>null</code>.
+		@throws NullPointerException if the given ID is <code>null</code>.
 		*/
 		public WebPlatformFile getPlatformFile(final String id) {return idPlatformFileMap.get(checkInstance(id, "Platform file ID cannot be null."));}
 
@@ -82,8 +82,8 @@ public class AbstractWebPlatformFileCollectorDepictor extends AbstractWebDepicto
 
 	/**Cancels a platform file upload or download.
 	@param platformFile Thet platform file to cancel.
-	@exception NullPointerException if the given platform file is <code>null</code>.
-	@exception IllegalStateException the specified platform file can no longer be canceled because, for example, other platform files have since been selected.	
+	@throws NullPointerException if the given platform file is <code>null</code>.
+	@throws IllegalStateException the specified platform file can no longer be canceled because, for example, other platform files have since been selected.	
 	*/
 	@SuppressWarnings("unchecked")
 	public void cancel(final PlatformFile platformFile)
@@ -95,7 +95,7 @@ public class AbstractWebPlatformFileCollectorDepictor extends AbstractWebDepicto
 	/**Initiates a platform file upload.
 	@param platformFile Thet platform file to upload.
 	@param destinationURI The URI representing the destination of the platform file, either absolute or relative to the application.
-	@exception NullPointerException if the given platform file and/or destination URI is <code>null</code>.
+	@throws NullPointerException if the given platform file and/or destination URI is <code>null</code>.
 	*/
 	@SuppressWarnings("unchecked")
 	public void upload(final PlatformFile platformFile, final URI destinationURI)
@@ -110,7 +110,7 @@ public class AbstractWebPlatformFileCollectorDepictor extends AbstractWebDepicto
 
 	/**Processes an event from the platform.
 	@param event The event to be processed.
-	@exception IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
+	@throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
 	*/
 	public void processEvent(final PlatformEvent event)
 	{

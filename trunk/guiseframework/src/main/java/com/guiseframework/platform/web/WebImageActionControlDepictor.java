@@ -52,8 +52,8 @@ public class WebImageActionControlDepictor<C extends ImageComponent & ActionCont
 	/**Called when the depictor is installed in a depicted object.
 	This version requests a poll interval if the image is pending.
 	@param component The component into which this depictor is being installed.
-	@exception NullPointerException if the given depicted object is <code>null</code>.
-	@exception IllegalStateException if this depictor is already installed in a depicted object.
+	@throws NullPointerException if the given depicted object is <code>null</code>.
+	@throws IllegalStateException if this depictor is already installed in a depicted object.
 	*/
 	public void installed(final C component)
 	{
@@ -67,8 +67,8 @@ public class WebImageActionControlDepictor<C extends ImageComponent & ActionCont
 	/**Called when the depictor is uninstalled from a depicted object.
 	This version requests any poll interval.
 	@param component The component from which this depictor is being uninstalled.
-	@exception NullPointerException if the given depicted object is <code>null</code>.
-	@exception IllegalStateException if this depictor is not installed in a depicted object.
+	@throws NullPointerException if the given depicted object is <code>null</code>.
+	@throws IllegalStateException if this depictor is not installed in a depicted object.
 	*/
 	public void uninstalled(final C component)
 	{
@@ -165,7 +165,7 @@ public class WebImageActionControlDepictor<C extends ImageComponent & ActionCont
 
 	/**Renders the body of the component.
 	This version renders the contained image element.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictBody() throws IOException
 	{

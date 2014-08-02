@@ -34,7 +34,7 @@ public class IDSelector implements SimpleSelector, Comparable<IDSelector>
 
 	/**ID constructor.
 	@param id The ID to be selected.
-	@exception NullPointerException if the given ID is <code>null</code>.
+	@throws NullPointerException if the given ID is <code>null</code>.
 	*/
 	public IDSelector(final String id)
 	{

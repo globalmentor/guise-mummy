@@ -290,7 +290,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 
 	/**Value class constructor with a default data model to represent a given type and a default converter.
 	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public TextControl(final Class<V> valueClass)
 	{
@@ -300,7 +300,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	/**Value class and default value constructor with a default data model to represent a given type and a default converter.
 	@param valueClass The class indicating the type of value held in the model.
 	@param defaultValue The default value, which will not be validated.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public TextControl(final Class<V> valueClass, final V defaultValue)
 	{
@@ -310,7 +310,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	/**Value class and column count constructor with one row and a default converter.
 	@param valueClass The class indicating the type of value held in the model.
 	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public TextControl(final Class<V> valueClass, final int columnCount)
 	{
@@ -321,7 +321,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	@param valueClass The class indicating the type of value held in the model.
 	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
 	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public TextControl(final Class<V> valueClass, final int rowCount, final int columnCount)
 	{
@@ -332,7 +332,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	@param valueClass The class indicating the type of value held in the model.
 	@param defaultValue The default value, which will not be validated.
 	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public TextControl(final Class<V> valueClass, final V defaultValue, final int columnCount)
 	{
@@ -344,7 +344,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	@param defaultValue The default value, which will not be validated.
 	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
 	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public TextControl(final Class<V> valueClass, final V defaultValue, final int rowCount, final int columnCount)
 	{
@@ -356,7 +356,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
 	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
 	@param lineWrap Whether lines should be wrapped in the view if needed.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public TextControl(final Class<V> valueClass, final int rowCount, final int columnCount, final boolean lineWrap)
 	{
@@ -369,7 +369,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
 	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
 	@param lineWrap Whether lines should be wrapped in the view if needed.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public TextControl(final Class<V> valueClass, final V defaultValue, final int rowCount, final int columnCount, final boolean lineWrap)
 	{
@@ -380,7 +380,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	@param valueModel The component value model.
 	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
 	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
-	@exception NullPointerException if the given value model is <code>null</code>.
+	@throws NullPointerException if the given value model is <code>null</code>.
 	*/
 	public TextControl(final ValueModel<V> valueModel, final int rowCount, final int columnCount)
 	{
@@ -392,7 +392,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
 	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
 	@param lineWrap Whether lines should be wrapped in the view if needed.
-	@exception NullPointerException if the given value model is <code>null</code>.
+	@throws NullPointerException if the given value model is <code>null</code>.
 	*/
 	public TextControl(final ValueModel<V> valueModel, final int rowCount, final int columnCount, final boolean lineWrap)
 	{
@@ -401,7 +401,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 
 	/**Value model constructor with a default converter.
 	@param valueModel The component value model.
-	@exception NullPointerException if the given value model is <code>null</code>.
+	@throws NullPointerException if the given value model is <code>null</code>.
 	*/
 	public TextControl(final ValueModel<V> valueModel)
 	{
@@ -411,7 +411,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	/**Value model and converter constructor.
 	@param valueModel The component value model.
 	@param converter The converter for this component.
-	@exception NullPointerException if the given value model and/or converter is <code>null</code>.
+	@throws NullPointerException if the given value model and/or converter is <code>null</code>.
 	*/
 	public TextControl(final ValueModel<V> valueModel, final Converter<V, String> converter)
 	{
@@ -424,7 +424,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
 	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
 	@param lineWrap Whether lines should be wrapped in the view if needed.
-	@exception NullPointerException if the given value model and/or converter is <code>null</code>.
+	@throws NullPointerException if the given value model and/or converter is <code>null</code>.
 	*/
 	public TextControl(final ValueModel<V> valueModel, final Converter<V, String> converter, final int rowCount, final int columnCount, final boolean lineWrap)
 	{
@@ -438,7 +438,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
 	@param lineWrap Whether lines should be wrapped in the view if needed.
 	@param multiline Whether the user should be allowed to enter multiple physical lines if the control has multiple rows.
-	@exception NullPointerException if the given value model and/or converter is <code>null</code>.
+	@throws NullPointerException if the given value model and/or converter is <code>null</code>.
 	*/
 	public TextControl(final ValueModel<V> valueModel, final Converter<V, String> converter, final int rowCount, final int columnCount, final boolean lineWrap, final boolean multiline)
 	{
@@ -458,7 +458,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 	{
 		/**Source constructor.
 		@param source The source of the transferable data.
-		@exception NullPointerException if the provided source is <code>null</code>.
+		@throws NullPointerException if the provided source is <code>null</code>.
 		*/
 		public DefaultTransferable(final TextControl<?> source)
 		{
@@ -474,7 +474,7 @@ public class TextControl<V> extends AbstractTextControl<V>
 		/**Transfers data using the given content type.
 		@param contentType The type of data expected.
 		@return The transferred data, which may be <code>null</code>.
-		@exception IllegalArgumentException if the given content type is not supported.
+		@throws IllegalArgumentException if the given content type is not supported.
 		*/
 		public Object transfer(final ContentType contentType)
 		{

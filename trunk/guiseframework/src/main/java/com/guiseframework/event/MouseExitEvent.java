@@ -32,7 +32,7 @@ public class MouseExitEvent extends AbstractMouseEvent
 	@param viewportBounds The absolute bounds of the viewport.
 	@param mousePosition The position of the mouse relative to the viewport.
 	@param keys The keys that were pressed when this event was generated.
-	@exception NullPointerException if the given source, target bounds, viewport bounds, mouse position, and/or keys is <code>null</code>.
+	@throws NullPointerException if the given source, target bounds, viewport bounds, mouse position, and/or keys is <code>null</code>.
 	*/
 	public MouseExitEvent(final Object source, final Rectangle targetBounds, final Rectangle viewportBounds, final Point mousePosition, final Key... keys)
 	{
@@ -46,7 +46,7 @@ public class MouseExitEvent extends AbstractMouseEvent
 	@param viewportBounds The absolute bounds of the viewport.
 	@param mousePosition The position of the mouse relative to the viewport.
 	@param keys The keys that were pressed when this event was generated.
-	@exception NullPointerException if the given source, target, target bounds, viewport bounds, mouse position, and/or keys is <code>null</code>.
+	@throws NullPointerException if the given source, target, target bounds, viewport bounds, mouse position, and/or keys is <code>null</code>.
 	*/
 	public MouseExitEvent(final Object source, final Object target, final Rectangle sourceBounds, final Rectangle viewportBounds, final Point mousePosition, final Key... keys)
 	{
@@ -56,7 +56,7 @@ public class MouseExitEvent extends AbstractMouseEvent
 	/**Copy constructor that specifies a different source.
 	@param source The object on which the event initially occurred.
 	@param mouseExitEvent The event the properties of which will be copied.
-	@exception NullPointerException if the given source and/or event is <code>null</code>.
+	@throws NullPointerException if the given source and/or event is <code>null</code>.
 	*/
 	public MouseExitEvent(final Object source, final MouseExitEvent mouseExitEvent)
 	{

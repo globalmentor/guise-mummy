@@ -64,7 +64,7 @@ public class ReferenceLayout extends AbstractLayout<ReferenceConstraints>
 
 	/**Creates default constraints for the container.
 	@return New default constraints for the container.
-	@exception IllegalStateException if this layout does not support default constraints.
+	@throws IllegalStateException if this layout does not support default constraints.
 	*/
 	public ReferenceConstraints createDefaultConstraints()
 	{

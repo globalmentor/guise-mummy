@@ -68,7 +68,7 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 	/**Requests that resource collection start.
 	@param destinationURI The URI representing the destination of the collected resources, relative to the application.
 	@param destinationBookmark The bookmark to be used in receiving the resources at the destination path, or <code>null</code> if no bookmark should be used.
-	@exception NullPointerException if the given destination URI is <code>null</code>.
+	@throws NullPointerException if the given destination URI is <code>null</code>.
 	*/
 	public void receive(URI destinationURI, final Bookmark destinationBookmark)
 	{
@@ -92,7 +92,7 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 
 	/**Processes an event from the platform.
 	@param event The event to be processed.
-	@exception IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
+	@throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
 	*/
 	public void processEvent(final PlatformEvent event)
 	{
@@ -153,7 +153,7 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 
 	/**Writes the beginning part of the outer decorator element.
 	This version write additional patching attributes.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void writeDecoratorBegin() throws IOException
 	{
@@ -164,7 +164,7 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 	}
 
 	/**Begins the rendering process.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictBegin() throws IOException
 	{

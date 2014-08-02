@@ -73,7 +73,7 @@ public class DemoUser implements Principal, Comparable<DemoUser>
 
 		/**Sets the email address of the user.
 		@param email The new email address of the user.
-		@exception NullPointerException if the email is <code>null</code>.
+		@throws NullPointerException if the email is <code>null</code>.
 		*/
 		public void setEmail(final String email)
 		{
@@ -102,7 +102,7 @@ public class DemoUser implements Principal, Comparable<DemoUser>
 	@param lastName The last name of the user.
 	@param password The password of the user.
 	@param email The email address of the user.
-	@exception NullPointerException if the ID, first name, last name, and/or email address is <code>null</code>.
+	@throws NullPointerException if the ID, first name, last name, and/or email address is <code>null</code>.
 	*/
 	public DemoUser(final String id, final String firstName, final String middleName, final String lastName, final char[] password, final String email)
 	{

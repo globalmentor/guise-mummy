@@ -24,7 +24,7 @@ public abstract class AbstractMouseInput extends AbstractGestureInput implements
 
 	/**Keys constructor.
 	@param keys The keys that were pressed when this input occurred.
-	@exception NullPointerException if the given keys is <code>null</code>.
+	@throws NullPointerException if the given keys is <code>null</code>.
 	*/
 	public AbstractMouseInput(final Key... keys)
 	{

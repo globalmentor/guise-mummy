@@ -27,7 +27,7 @@ public class ValueSelectButton<V> extends AbstractSelectActionValueControl<V> im
 
 	/**Value class constructor.
 	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public ValueSelectButton(final Class<V> valueClass)
 	{
@@ -39,7 +39,7 @@ public class ValueSelectButton<V> extends AbstractSelectActionValueControl<V> im
 	@param actionModel The component action model.
 	@param valueModel The component value model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
+	@throws NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
 	*/
 	public ValueSelectButton(final InfoModel infoModel, final ActionModel actionModel, final ValueModel<V> valueModel, final Enableable enableable)
 	{

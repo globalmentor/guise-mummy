@@ -173,7 +173,7 @@ public class TextSearchPanel extends LayoutPanel
 
 		/**Checks whether a given regular expression value is syntactically correct.
 		@param value The value to validate.
-		@exception ValidationException if the provided value is not valid.
+		@throws ValidationException if the provided value is not valid.
 		*/
 		public void validate(final String value) throws ValidationException
 		{

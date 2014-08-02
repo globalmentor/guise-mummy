@@ -28,7 +28,7 @@ public abstract class AbstractDepictEvent extends AbstractPlatformEvent implemen
 	
 	/**Depicted object constructor.
 	@param depictedObject The depicted object on which the event initially occurred.
-	@exception NullPointerException if the given depicted object is <code>null</code>.
+	@throws NullPointerException if the given depicted object is <code>null</code>.
 	*/
 	public AbstractDepictEvent(final DepictedObject depictedObject)
 	{

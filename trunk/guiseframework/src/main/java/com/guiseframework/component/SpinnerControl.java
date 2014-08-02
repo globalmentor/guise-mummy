@@ -36,7 +36,7 @@ public abstract class SpinnerControl<V> extends AbstractContainer implements Val
 	/**Layout and value model constructor.
 	@param layout The layout definition for the container.
 	@param valueModel The component value model.
-	@exception NullPointerException if the given layout and/or value model is <code>null</code>.
+	@throws NullPointerException if the given layout and/or value model is <code>null</code>.
 	*/
 	public SpinnerControl(final FlowLayout layout, final ValueModel<V> valueModel)
 	{

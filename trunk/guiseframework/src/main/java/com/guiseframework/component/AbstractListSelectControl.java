@@ -53,7 +53,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 		/**Sets the strategy used to generate a component to represent each value in the model.
 		This is a bound property
 		@param newValueRepresentationStrategy The new strategy to create components to represent this model's values.
-		@exception NullPointerException if the provided value representation strategy is <code>null</code>.
+		@throws NullPointerException if the provided value representation strategy is <code>null</code>.
 		@see SelectControl#VALUE_REPRESENTATION_STRATEGY_PROPERTY
 		*/
 		public void setValueRepresentationStrategy(final ValueRepresentationStrategy<V> newValueRepresentationStrategy)
@@ -71,7 +71,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	This version is provided to allow public access.
 	@param value The object for which a representation component should be returned.
 	@return The child component representing the given object.
-	@exception IllegalArgumentException if the given object is not an appropriate object for a component to be created.
+	@throws IllegalArgumentException if the given object is not an appropriate object for a component to be created.
 	*/
 	public Component getComponent(final V value)
 	{
@@ -81,7 +81,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	/**Creates a component state to represent the given object.
 	@param value The object with which the component state is to be associated.
 	@return The component state to represent the given object.
-	@exception IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
+	@throws IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
 	*/
 	protected ValueComponentState createComponentState(final V value)
 	{
@@ -94,7 +94,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	/**List select model and value representation strategy constructor.
 	@param listSelectModel The component list select model.
 	@param valueRepresentationStrategy The strategy to create controls to represent this model's values.
-	@exception NullPointerException if the given list select model and/or value representation strategy is <code>null</code>.
+	@throws NullPointerException if the given list select model and/or value representation strategy is <code>null</code>.
 	*/
 	public AbstractListSelectControl(final ListSelectModel<V> listSelectModel, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
 	{
@@ -202,7 +202,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	Validation always occurs if a validator is installed, even if the value is not changing.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param newValue The input value of the model.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see #getValidator()
 	@see #VALUE_PROPERTY
 	*/
@@ -236,7 +236,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	public boolean isValidValue() {return getListSelectModel().isValidValue();}
 
 	/**Validates the value of this model, throwing an exception if the model is not valid.
-	@exception ValidationException if the value of this model is not valid.	
+	@throws ValidationException if the value of this model is not valid.	
 	*/
 	public void validateValue() throws ValidationException {getListSelectModel().validateValue();}
 
@@ -272,7 +272,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	This method delegates to the selection strategy.
 	@param values The values to select.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	*/
 	public void setSelectedValues(final V... values) throws PropertyVetoException {getListSelectModel().setSelectedValues(values);}
 	
@@ -298,7 +298,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	Invalid and duplicate indices will be ignored.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to select.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getSetSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedValues(V[])
 	@see #addSelectedIndexes(int...)
@@ -309,7 +309,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	Any invalid indices will be ignored.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to add to the selection.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getAddSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedIndexes(int[])
 	*/
@@ -319,7 +319,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	Any invalid indices will be ignored.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to remove from the selection.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getRemoveSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedIndexes(int[])
 	*/
@@ -328,7 +328,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	/**Determines the displayed status of the first occurrence of a given value.
 	@param value The value for which the displayed status is to be determined.
 	@return <code>true</code> if the value is displayed, else <code>false</code>.
-	@exception IndexOutOfBoundsException if the given value does not occur in the model.
+	@throws IndexOutOfBoundsException if the given value does not occur in the model.
 	*/
 	public boolean isValueDisplayed(final V value) {return getListSelectModel().isValueDisplayed(value);}
 
@@ -351,14 +351,14 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	@param index The index of the value to enable or disable.
 	@param newDisplayed Whether the value at the given index should be displayed.
 	@see #DISPLAYED_PROPERTY
-	@exception IndexOutOfBoundsException if the given index is not within the range of the list.
+	@throws IndexOutOfBoundsException if the given index is not within the range of the list.
 	*/
 	public void setIndexDisplayed(final int index, final boolean newDisplayed) {getListSelectModel().setIndexDisplayed(index, newDisplayed);}	//TODO fix property change event
 
 	/**Determines the enabled status of the first occurrence of a given value.
 	@param value The value for which the enabled status is to be determined.
 	@return <code>true</code> if the value is enabled, else <code>false</code>.
-	@exception IndexOutOfBoundsException if the given value does not occur in the model.
+	@throws IndexOutOfBoundsException if the given value does not occur in the model.
 	*/
 	public boolean isValueEnabled(final V value) {return getListSelectModel().isValueEnabled(value);}
 
@@ -381,7 +381,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	@param index The index of the value to enable or disable.
 	@param newEnabled Whether the value at the given index should be enabled.
 	@see #ENABLED_PROPERTY
-	@exception IndexOutOfBoundsException if the given index is not within the range of the list.
+	@throws IndexOutOfBoundsException if the given index is not within the range of the list.
 	*/
 	public void setIndexEnabled(final int index, final boolean newEnabled) {getListSelectModel().setIndexEnabled(index, newEnabled);}	//TODO fix property change event
 
@@ -479,8 +479,8 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	/**Returns an array containing all of the values in this model.
 	@param array The array into which the value of this collection are to be stored, if it is big enough; otherwise, a new array of the same runtime type is allocated for this purpose.
 	@return An array containing the values of this model.
-	@exception ArrayStoreException if the runtime type of the specified array is not a supertype of the runtime type of every value in this model.
-	@exception NullPointerException if the specified array is <code>null</code>.
+	@throws ArrayStoreException if the runtime type of the specified array is not a supertype of the runtime type of every value in this model.
+	@throws NullPointerException if the specified array is <code>null</code>.
 	*/
 	public <T> T[] toArray(final T[] array) {return getListSelectModel().toArray(array);}
 
@@ -500,7 +500,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	/**Determines if this model contains all of the values of the specified collection.
 	@param collection The collection to be checked for containment in this model.
 	@return <code>true</code> if this model contains all of the values of the specified collection.
-	@exception NullPointerException if the specified collection is <code>null</code>.
+	@throws NullPointerException if the specified collection is <code>null</code>.
 	@see #contains(Object)
 	*/
 	public boolean containsAll(final Collection<?> collection) {return getListSelectModel().containsAll(collection);}
@@ -508,7 +508,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	/**Appends all of the values in the specified collection to the end of this model, in the order that they are returned by the specified collection's iterator.
 	@param collection The collection the values of which are to be added to this model.
 	@return <code>true</code> if this model changed as a result of the call.
-	@exception NullPointerException if the specified collection is <code>null</code>.
+	@throws NullPointerException if the specified collection is <code>null</code>.
 	@see #add(Object)
 	*/
 	public boolean addAll(final Collection<? extends V> collection) {return getListSelectModel().addAll(collection);}
@@ -517,15 +517,15 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	@param index The index at which to insert first value from the specified collection.
 	@param collection The values to be inserted into this model.
 	@return <code>true</code> if this model changed as a result of the call.
-	@exception NullPointerException if the specified collection is <code>null</code>.
-	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
+	@throws NullPointerException if the specified collection is <code>null</code>.
+	@throws IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
 	*/
 	public synchronized boolean addAll(final int index, final Collection<? extends V> collection) {return getListSelectModel().addAll(index, collection);}
 
 	/**Removes from this model all the values that are contained in the specified collection.
 	@param collection The collection that defines which values will be removed from this model.
 	@return <code>true</code> if this model changed as a result of the call.
-	@exception NullPointerException if the specified collection is <code>null</code>.
+	@throws NullPointerException if the specified collection is <code>null</code>.
 	@see #remove(Object)
 	@see #contains(Object)
 	*/
@@ -534,7 +534,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	/**Retains only the values in this model that are contained in the specified collection.
 	@param collection The collection that defines which values this model will retain.
 	@return <code>true</code> if this model changed as a result of the call.
-	@exception NullPointerException if the specified collection is <code>null</code>.
+	@throws NullPointerException if the specified collection is <code>null</code>.
 	@see #remove(Object)
 	@see #contains(Object)
 	*/
@@ -554,7 +554,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	@param index The index of the value to replace.
 	@param value The value to be stored at the specified position.
 	@return The value at the specified position.
-	@exception IndexOutOfBoundsException if the index is out of range (<var>index<var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
+	@throws IndexOutOfBoundsException if the index is out of range (<var>index<var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
 	*/
 	public V set(final int index, final V value) {return getListSelectModel().set(index, value);}
 
@@ -568,7 +568,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	/**Removes the value at the specified position in this model.
 	@param index The index of the value to removed.
 	@return The value previously at the specified position.
-	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
+	@throws IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
 	*/
 	public V remove(final int index) {return getListSelectModel().remove(index);}
 
@@ -590,7 +590,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	/**Returns a list iterator of the values in this model (in proper sequence), starting at the specified position in this model.
 	@param index The index of first value to be returned from the list iterator (by a call to the <code>next()</code> method).
 	@return A list iterator of the values in this model (in proper sequence), starting at the specified position in this model.
-	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
+	@throws IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
 	*/
 	public ListIterator<V> listIterator(final int index) {return getListSelectModel().listIterator(index);}
 
@@ -610,7 +610,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 			
 		/**Constructor
 		@param component The component for a tree node.
-		@exception NullPointerException if the given component is <code>null</code>.
+		@throws NullPointerException if the given component is <code>null</code>.
 		*/
 		public ValueComponentState(final Component component)
 		{
@@ -639,8 +639,8 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 		This implementation uses a {@link DefaultStringLiteralConverter}.
 		@param valueClass The class indicating the type of value to convert.
 		@param componentClass The class of component to create.
-		@exception NullPointerException if the given value class and/or component class is <code>null</code>.
-		@exception IllegalArgumentException if the given component class does not have a constructor with a single {@link InfoModel} constructor.
+		@throws NullPointerException if the given value class and/or component class is <code>null</code>.
+		@throws IllegalArgumentException if the given component class does not have a constructor with a single {@link InfoModel} constructor.
 		*/
 		public ConverterInfoModelValueRepresentationStrategy(final Class<VV> valueClass, final Class<? extends Component> componentClass)
 		{
@@ -650,8 +650,8 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 		/**Converter constructor.
 		@param converter The converter to use for displaying the value as a string.
 		@param componentClass The class of component to create.
-		@exception NullPointerException if the given converter is <code>null</code>.
-		@exception IllegalArgumentException if the given component class does not have a constructor with a single {@link InfoModel} constructor.
+		@throws NullPointerException if the given converter is <code>null</code>.
+		@throws IllegalArgumentException if the given component class does not have a constructor with a single {@link InfoModel} constructor.
 		*/
 		public ConverterInfoModelValueRepresentationStrategy(final Class<? extends Component> componentClass, final Converter<VV, String> converter)
 		{
@@ -706,7 +706,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 		/**Value class constructor with a default converter.
 		This implementation uses a {@link DefaultStringLiteralConverter}.
 		@param valueClass The class indicating the type of value to convert.
-		@exception NullPointerException if the given value class is <code>null</code>.
+		@throws NullPointerException if the given value class is <code>null</code>.
 		*/
 		public DefaultValueRepresentationStrategy(final Class<VV> valueClass)
 		{
@@ -715,7 +715,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 
 		/**Converter constructor.
 		@param converter The converter to use for displaying the value as a string.
-		@exception NullPointerException if the given converter is <code>null</code>.
+		@throws NullPointerException if the given converter is <code>null</code>.
 		*/
 		public DefaultValueRepresentationStrategy(final Converter<VV, String> converter)
 		{

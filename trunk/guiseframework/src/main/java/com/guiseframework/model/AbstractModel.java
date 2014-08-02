@@ -43,8 +43,8 @@ public abstract class AbstractModel extends BoundPropertyObject implements Model
 	@param text The given text.
 	@param contentType The content type of the text.
 	@return The plain text form of the given text, based upon the given content type.
-	@exception NullPointerException if the given text and/or content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
+	@throws NullPointerException if the given text and/or content type is <code>null</code>.
+	@throws IllegalArgumentException if the given content type is not a text content type.
 	*/
 	public static String getPlainText(final String text, final ContentType contentType)	//TODO del or move
 	{

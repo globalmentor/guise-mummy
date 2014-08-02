@@ -84,7 +84,7 @@ public class AuthorizeUsersPanel extends LayoutPanel
 	/**Updates the view of this component.
 	This versions makes sure the user list is updated from the application.
 	@param context Guise context information.
-	@exception IOException if there is an error updating the view.
+	@throws IOException if there is an error updating the view.
 	@see DepictContext.State#UPDATE_VIEW
 	*/
 	public <GC extends DepictContext> void updateView(final GC context) throws IOException	//TODO change to depict()
@@ -121,8 +121,8 @@ public class AuthorizeUsersPanel extends LayoutPanel
 		@param rowIndex The zero-based row index of the value.
 		@param column The column for which a value should be returned.
 		@return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
-		@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-		@exception IllegalArgumentException if the given column is not one of this table's columns.
+		@throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+		@throws IllegalArgumentException if the given column is not one of this table's columns.
 		*/
 		protected <C> C getCellValue(final DemoUser user, final int rowIndex, final TableColumnModel<C> column)
 		{
@@ -158,8 +158,8 @@ public class AuthorizeUsersPanel extends LayoutPanel
 		@param rowIndex The zero-based row index of the value.
 		@param column The column for which a value should be returned.
 		@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-		@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-		@exception IllegalArgumentException if the given column is not one of this table's columns.
+		@throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+		@throws IllegalArgumentException if the given column is not one of this table's columns.
 		*/
 		protected <C> void setCellValue(final DemoUser user, final int rowIndex, final TableColumnModel<C> column, final C newCellValue)
 		{

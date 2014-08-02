@@ -49,7 +49,7 @@ public class WebPlatformFile extends AbstractPlatformFile
 	@param id The ID given to the file by Flash.
 	@param name The name of the file.
 	@param size The size of the file, or -1 if the size is unknown.
-	@exception NullPointerException if the given ID, file reference list, and/or name is <code>null</code>.
+	@throws NullPointerException if the given ID, file reference list, and/or name is <code>null</code>.
 	*/
 	public WebPlatformFile(final PlatformFileCollector fileReferenceList, final String id, final String name, final long size)
 	{
@@ -60,8 +60,8 @@ public class WebPlatformFile extends AbstractPlatformFile
 
 	/**Uploads the file from the platform.
 	@param destinationURI The URI representing the destination of the platform file, either absolute or relative to the application.
-	@exception NullPointerException if the given destination URI is <code>null</code>.
-	@exception IllegalStateException the platform file can no longer be uploaded because, for example, other platform files have since been selected.	
+	@throws NullPointerException if the given destination URI is <code>null</code>.
+	@throws IllegalStateException the platform file can no longer be uploaded because, for example, other platform files have since been selected.	
 	*/
 	public void upload(final URI destinationURI)
 	{
@@ -79,7 +79,7 @@ public class WebPlatformFile extends AbstractPlatformFile
 	@param state The state of the progress.
 	@param transferred The current number of bytes transferred, or <code>-1</code> if not known.
 	@param total The total or estimated total bytes to transfer, or <code>-1</code> if not known.
-	@exception NullPointerException if the given state is <code>null</code>.
+	@throws NullPointerException if the given state is <code>null</code>.
 	@see ProgressListener
 	@see ProgressEvent
 	@see DefaultWebPlatformFileCollectorDepictor

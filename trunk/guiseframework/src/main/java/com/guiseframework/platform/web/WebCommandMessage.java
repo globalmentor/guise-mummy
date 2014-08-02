@@ -47,7 +47,7 @@ public class WebCommandMessage<C extends Enum<C> & WebPlatformCommand> extends A
 	/**Command and parameters constructor.
 	@param command The command.
 	@param parameters The parameters of the command; parameters with duplicate names replace earlier parameters of the same name.
-	@exception NullPointerException if the given command and/or parameters is <code>null</code>.
+	@throws NullPointerException if the given command and/or parameters is <code>null</code>.
 	*/
 	public WebCommandMessage(final C command, final NameValuePair<String, Object>... parameters)
 	{
@@ -58,7 +58,7 @@ public class WebCommandMessage<C extends Enum<C> & WebPlatformCommand> extends A
 	/**Command and parameters map constructor.
 	@param command The command.
 	@param parameters The map representing the parameters of the command.
-	@exception NullPointerException if the given command and/or parameters is <code>null</code>.
+	@throws NullPointerException if the given command and/or parameters is <code>null</code>.
 	*/
 	public WebCommandMessage(final C command, final Map<String, Object> parameters)
 	{

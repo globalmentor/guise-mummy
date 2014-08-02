@@ -26,7 +26,7 @@ public abstract class AbstractWebPlatformEvent extends AbstractPlatformEvent imp
 
 	/**Source constructor.
 	@param source The object on which the event initially occurred.
-	@exception NullPointerException if the given source is <code>null</code>.
+	@throws NullPointerException if the given source is <code>null</code>.
 	*/
 	public AbstractWebPlatformEvent(final Object source)
 	{

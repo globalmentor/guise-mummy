@@ -85,7 +85,7 @@ public class ResourceCollectControl extends AbstractControl
 		This method is called by the framework and normally this should not be called directly from applications. 
 		Manually adding a new resource path, depending on the platform, may not actually result in another resource being collected absent user intervention.
 		@param resourcePath The resource path to add.
-		@exception NullPointerException if the given resource path is <code>null</code>.
+		@throws NullPointerException if the given resource path is <code>null</code>.
 		@see #RESOURCE_PATHS_PROPERTY
 		*/
 		public void addResourcePath(final String resourcePath)
@@ -100,7 +100,7 @@ public class ResourceCollectControl extends AbstractControl
 		This method is called by the framework and normally this should not be called directly from applications. 
 //TODO fix to actually tell the browser control that the path has changed		Manually adding a new resource path, depending on the platform, may not actually result in another resource being collected absent user intervention.
 		@param resourcePath The resource path to remove.
-		@exception NullPointerException if the given resource path is <code>null</code>.
+		@throws NullPointerException if the given resource path is <code>null</code>.
 		@see #RESOURCE_PATHS_PROPERTY
 		*/
 		public void removeResourcePath(final String resourcePath)
@@ -146,7 +146,7 @@ public class ResourceCollectControl extends AbstractControl
 	/**Info model and enableable object constructor.
 	@param infoModel The component info model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given info model and/or enableable object is <code>null</code>.
+	@throws NullPointerException if the given info model and/or enableable object is <code>null</code>.
 	*/
 	public ResourceCollectControl(final InfoModel infoModel, final Enableable enableable)
 	{
@@ -155,8 +155,8 @@ public class ResourceCollectControl extends AbstractControl
 
 	/**Receives collected resources at the given destination path with no bookmark.
 	@param destinationPath The path representing the destination of the collected resources, relative to the application.
-	@exception NullPointerException if the given path is <code>null</code>.
-	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
+	@throws NullPointerException if the given path is <code>null</code>.
+	@throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
 	*/
 	public void receiveResources(final String destinationPath)
 	{
@@ -167,9 +167,9 @@ public class ResourceCollectControl extends AbstractControl
 	If the resources are currently started to be received or already being received, no action occurs.
 	@param destinationPath The path representing the destination of the collected resources, relative to the application.
 	@param destinationBookmark The bookmark to be used in receiving the resources at the destination path, or <code>null</code> if no bookmark should be used.
-	@exception NullPointerException if the given path is <code>null</code>.
-	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
-	@exception IllegalArgumentException if the provided path is absolute.
+	@throws NullPointerException if the given path is <code>null</code>.
+	@throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
+	@throws IllegalArgumentException if the provided path is absolute.
 	*/
 	public void receiveResources(final String destinationPath, final Bookmark destinationBookmark)
 	{
@@ -217,7 +217,7 @@ public class ResourceCollectControl extends AbstractControl
 	@param taskState The state of the task.
 	@param value The current progress, or <code>-1</code> if not known.
 	@param maximumValue The goal, or <code>-1</code> if not known.
-	@exception NullPointerException if the given task state is <code>null</code>.
+	@throws NullPointerException if the given task state is <code>null</code>.
 	@see ProgressListener
 	@see ProgressEvent
 	*/
@@ -263,7 +263,7 @@ public class ResourceCollectControl extends AbstractControl
 		/**Requests that resource collection start.
 		@param destinationURI The URI representing the destination of the collected resources, relative to the application.
 		@param destinationBookmark The bookmark to be used in receiving the resources at the destination path, or <code>null</code> if no bookmark should be used.
-		@exception NullPointerException if the given destination URI is <code>null</code>.
+		@throws NullPointerException if the given destination URI is <code>null</code>.
 		*/
 		public void receive(URI destinationURI, final Bookmark destinationBookmark);
 		

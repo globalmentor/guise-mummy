@@ -82,7 +82,7 @@ public abstract class AbstractDateStringLiteralConverter<V> extends AbstractConv
 	/**Date style and time style constructor.
 	@param dateStyle The date representation style, or <code>null</code> if the date should not be represented.
 	@param timeStyle The time representation style, or <code>null</code> if the time should not be represented.
-	@exception NullPointerException if both the given date style and time style are <code>null</code>.
+	@throws NullPointerException if both the given date style and time style are <code>null</code>.
 	*/
 	public AbstractDateStringLiteralConverter(final DateStringLiteralStyle dateStyle, final TimeStringLiteralStyle timeStyle)
 	{
@@ -101,8 +101,8 @@ public abstract class AbstractDateStringLiteralConverter<V> extends AbstractConv
 	@param locale The locale for which a date format should be created.
 	@param timeZone The time zone for which a date format should be created.
 	@return A date format object appropriate for the given locale.
-	@exception NullPointerException if the both the date style and time style is <code>null</code>, or if the locale and/or time zone is <code>null</code>.
-	@exception IllegalArgumentException if both date style and time style is given and one of the styles specifies other than short/medium/long/full format.
+	@throws NullPointerException if the both the date style and time style is <code>null</code>, or if the locale and/or time zone is <code>null</code>.
+	@throws IllegalArgumentException if both date style and time style is given and one of the styles specifies other than short/medium/long/full format.
 	*/
 	public static DateFormat createDateFormat(final DateStringLiteralStyle dateStyle, final TimeStringLiteralStyle timeStyle, final Locale locale, final TimeZone timeZone)
 	{
@@ -180,7 +180,7 @@ public abstract class AbstractDateStringLiteralConverter<V> extends AbstractConv
 	This implementation synchronizes on the {@link DateFormat} instance. 
 	@param value The value in the value space to convert.
 	@return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>..
-	@exception ConversionException if the value cannot be converted.
+	@throws ConversionException if the value cannot be converted.
 	@see #getDateFormat()
 	*/ 
 	protected String convertDateValue(final Date value) throws ConversionException
@@ -203,7 +203,7 @@ public abstract class AbstractDateStringLiteralConverter<V> extends AbstractConv
 	This implementation converts the empty string to a <code>null</code> value.
 	@param literal The literal value in the lexical space to convert.
 	@return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
-	@exception ConversionException if the literal value cannot be converted.
+	@throws ConversionException if the literal value cannot be converted.
 	*/
 	protected Date convertDateLiteral(final String literal) throws ConversionException
 	{

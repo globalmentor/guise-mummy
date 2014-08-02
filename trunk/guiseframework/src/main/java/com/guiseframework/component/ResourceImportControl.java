@@ -32,7 +32,7 @@ public class ResourceImportControl extends AbstractEditValueControl<ResourceImpo
 
 	/**Value model constructor.
 	@param valueModel The component value model.
-	@exception NullPointerException if the given value model is <code>null</code>.
+	@throws NullPointerException if the given value model is <code>null</code>.
 	*/
 	public ResourceImportControl(final ValueModel<ResourceImport> valueModel)
 	{

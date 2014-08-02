@@ -33,7 +33,7 @@ public class TypeSelector implements SimpleSelector, Comparable<TypeSelector>
 
 	/**Type name constructor.
 	@param typeName The name of the type to be selected.
-	@exception NullPointerException if the given type name is <code>null</code>.
+	@throws NullPointerException if the given type name is <code>null</code>.
 	*/
 	public TypeSelector(final String typeName)
 	{

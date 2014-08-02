@@ -40,7 +40,7 @@ public class DefaultTableModel extends AbstractTableModel
 	@param <C> The type of values in all the cells in the table.
 	@param valueClass The class indicating the type of values held in the model.
 	@param columnNames The names to serve as label headers for the columns.
-	@exception NullPointerException if the given class object is <code>null</code>.
+	@throws NullPointerException if the given class object is <code>null</code>.
 	*/
 	public <C> DefaultTableModel(final Class<C> valueClass, final String... columnNames)
 	{
@@ -49,7 +49,7 @@ public class DefaultTableModel extends AbstractTableModel
 
 	/**Constructs a default table model indicating the type of values it can hold along with column definitions.
 	@param columns The models representing the table columns.
-	@exception NullPointerException if the given class object is <code>null</code>.
+	@throws NullPointerException if the given class object is <code>null</code>.
 	*/
 	public DefaultTableModel(final TableColumnModel<?>... columns)
 	{
@@ -61,8 +61,8 @@ public class DefaultTableModel extends AbstractTableModel
 	@param valueClass The class indicating the type of values held in the model.
 	@param rowValues The two-dimensional list of values, where the first index represents the row and the second represents the column, or <code>null</code> if no default values should be given.
 	@param columnNames The names to serve as label headers for the columns.
-	@exception NullPointerException if the given class object is <code>null</code>.
-	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
+	@throws NullPointerException if the given class object is <code>null</code>.
+	@throws IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
 	*/
 	public <C> DefaultTableModel(final Class<C> valueClass, final C[][] rowValues, final String... columnNames)
 	{
@@ -72,8 +72,8 @@ public class DefaultTableModel extends AbstractTableModel
 	/**Constructs a default table model indicating the type of values it can hold.
 	@param rowValues The two-dimensional list of values, where the first index represents the row and the second represents the column, or <code>null</code> if no default values should be given.
 	@param columns The models representing the table columns.
-	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
-	@exception ClassCastException if one of the values in a row is not compatible with the type of its column.
+	@throws IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
+	@throws ClassCastException if one of the values in a row is not compatible with the type of its column.
 	*/
 	public DefaultTableModel(final Object[][] rowValues, final TableColumnModel<?>... columns)
 	{
@@ -125,8 +125,8 @@ public class DefaultTableModel extends AbstractTableModel
 	@param rowIndex The zero-based row index.
 	@param column The column for which a value should be returned.
 	@return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
-	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	@throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@throws IllegalArgumentException if the given column is not one of this table's columns.
 	*/
 	public <C> C getCellValue(final int rowIndex, final TableColumnModel<C> column)
 	{
@@ -146,8 +146,8 @@ public class DefaultTableModel extends AbstractTableModel
 	@param rowIndex The zero-based row index.
 	@param column The column for which a value should be returned.
 	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	@throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@throws IllegalArgumentException if the given column is not one of this table's columns.
 	*/
 	public <C> void setCellValue(final int rowIndex, final TableColumnModel<C> column, final C newCellValue)
 	{

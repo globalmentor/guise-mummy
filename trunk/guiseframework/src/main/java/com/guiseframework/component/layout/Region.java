@@ -51,7 +51,7 @@ public enum Region
 	@param orientation The component orientation.
 	@param flow The flow (line or page).
 	@param regionIndex The absolute region index (0, 1, or 2) from the upper left-hand corner.
-	@exception IllegalArgumentException if the given region index is less than <code>0</code> or greater than <code>2</code>. 
+	@throws IllegalArgumentException if the given region index is less than <code>0</code> or greater than <code>2</code>. 
 	*/
 	public static Region getRegion(final Orientation orientation, final Flow flow, final int regionIndex)
 	{

@@ -129,8 +129,8 @@ public final class Guise
 	 * than once in this implementation before its final value is placed in the cache.
 	 * @param guiseAssetKey The location of the asset.
 	 * @return The asset, or <code>null</code> if there is no such asset.
-	 * @exception IllegalArgumentException if the asset key does not begin with {@value #GUISE_ASSETS_BASE_KEY}.
-	 * @exception IOException if there is an error loading the asset.
+	 * @throws IllegalArgumentException if the asset key does not begin with {@value #GUISE_ASSETS_BASE_KEY}.
+	 * @throws IOException if there is an error loading the asset.
 	 * @see #GUISE_ASSETS_BASE_KEY
 	 */
 	public byte[] getGuiseAsset(final String guiseAssetKey) throws IOException
@@ -158,8 +158,8 @@ public final class Guise
 	 * Determines if a specified Guise asset exists. This version delegates to {@link #getAssetURL(String)}.
 	 * @param guiseAssetKey The location of the asset.
 	 * @return <code>true</code> if the URL references an existing Guise asset, else <code>false</code>.
-	 * @exception IllegalArgumentException if the asset key does not begin with {@value #GUISE_ASSETS_BASE_KEY}.
-	 * @exception IOException if there is an error accessing the asset.
+	 * @throws IllegalArgumentException if the asset key does not begin with {@value #GUISE_ASSETS_BASE_KEY}.
+	 * @throws IOException if there is an error accessing the asset.
 	 * @see #GUISE_ASSETS_BASE_KEY
 	 */
 	public boolean hasAsset(final String guiseAssetKey) throws IOException
@@ -172,8 +172,8 @@ public final class Guise
 	 * and should normally not be presented to users.
 	 * @param guiseAssetKey The location of the asset.
 	 * @return A URL to the asset, or <code>null</code> if there is no such asset.
-	 * @exception IllegalArgumentException if the asset key does not begin with {@value #GUISE_ASSETS_BASE_KEY}.
-	 * @exception IOException if there is an error loading the asset.
+	 * @throws IllegalArgumentException if the asset key does not begin with {@value #GUISE_ASSETS_BASE_KEY}.
+	 * @throws IOException if there is an error loading the asset.
 	 * @see #GUISE_ASSETS_BASE_KEY
 	 */
 	public URL getAssetURL(final String guiseAssetKey) throws IOException
@@ -190,8 +190,8 @@ public final class Guise
 	 * Retrieves an input stream to a Guise asset keyed to its location. This method will use cached assets if possible, but will not cache new assets.
 	 * @param guiseAssetKey The location of the asset.
 	 * @return An input stream to an asset, or <code>null</code> if there is no such asset.
-	 * @exception IllegalArgumentException if the asset key does not begin with {@value #GUISE_ASSETS_BASE_KEY}.
-	 * @exception IOException if there is an error loading the asset.
+	 * @throws IllegalArgumentException if the asset key does not begin with {@value #GUISE_ASSETS_BASE_KEY}.
+	 * @throws IOException if there is an error loading the asset.
 	 * @see #GUISE_ASSETS_BASE_KEY
 	 */
 	public InputStream getAssetInputStream(final String guiseAssetKey) throws IOException
@@ -230,7 +230,7 @@ public final class Guise
 	/**
 	 * Removes a Guise session and associated thread group.
 	 * @param guiseSession The Guise session to remove.
-	 * @exception IllegalStateException if the given Guise session is not recognized.
+	 * @throws IllegalStateException if the given Guise session is not recognized.
 	 */
 	void removeGuiseSession(final GuiseSession guiseSession)
 	{
@@ -258,7 +258,7 @@ public final class Guise
 	 * Determines the thread group to use for the given session. This method must not be called for a session that has not yet been added.
 	 * @param guiseSession The session for which a thread group is requested.
 	 * @return The thread group to use for the given session.
-	 * @exception IllegalStateException if the given session has not yet been associated with a thread group because it has not yet been added.
+	 * @throws IllegalStateException if the given session has not yet been associated with a thread group because it has not yet been added.
 	 */
 	public final GuiseSessionThreadGroup getThreadGroup(final GuiseSession guiseSession)
 	{
@@ -273,7 +273,7 @@ public final class Guise
 	/**
 	 * Retrieves the Guise session information for the current thread. This method calls {@link #getGuiseSession(Thread)} with the current thread.
 	 * @return The Guise session for the current thread.
-	 * @exception IllegalStateException if the current thread is not associated with any Guise session.
+	 * @throws IllegalStateException if the current thread is not associated with any Guise session.
 	 */
 	public final GuiseSession getGuiseSession()
 	{

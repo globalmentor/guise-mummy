@@ -38,7 +38,7 @@ public class NotificationEvent extends AbstractTargetedGuiseEvent
 	The target will be set to be the same as the given source.
 	@param source The object on which the event initially occurred.
 	@param notification The notification information.
-	@exception NullPointerException if the given source and/or notification is <code>null</code>.
+	@throws NullPointerException if the given source and/or notification is <code>null</code>.
 	*/
 	public NotificationEvent(final Object source, final Notification notification)
 	{
@@ -49,7 +49,7 @@ public class NotificationEvent extends AbstractTargetedGuiseEvent
 	@param source The object on which the event initially occurred.
 	@param target The target of the event.
 	@param notification The notification information.
-	@exception NullPointerException if the given source, target, and/or notification is <code>null</code>.
+	@throws NullPointerException if the given source, target, and/or notification is <code>null</code>.
 	*/
 	public NotificationEvent(final Object source, final Object target, final Notification notification)
 	{
@@ -60,7 +60,7 @@ public class NotificationEvent extends AbstractTargetedGuiseEvent
 	/**Copy constructor that specifies a different source.
 	@param source The object on which the event initially occurred.
 	@param notificationEvent The event the properties of which will be copied.
-	@exception NullPointerException if the given source and/or event is <code>null</code>.
+	@throws NullPointerException if the given source and/or event is <code>null</code>.
 	*/
 	public NotificationEvent(final Object source, final NotificationEvent notificationEvent)
 	{

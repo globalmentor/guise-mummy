@@ -79,7 +79,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	@param application The Guise application running on this platform.
 	@param httpSession The HTTP servlet session with which this platform is associated. 
 	@param httpRequest The HTTP servlet request.
-	@exception NullPointerException if the given application, HTTP session, and/or HTTP request is <code>null</code>.
+	@throws NullPointerException if the given application, HTTP session, and/or HTTP request is <code>null</code>.
 	*/
 	public HTTPServletWebPlatform(final GuiseApplication application, final HttpSession httpSession, final HttpServletRequest httpRequest)
 	{
@@ -166,7 +166,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	/**Sets the depict context.
 	This method has package access so that the depict context can be set when necessary by the appropriate platform classes.
 	@param depictContext The new depict context, or <code>null</code> if there should be no depict context.
-	@exception IllegalStateException if a depict context was given and there already exists a depict context.
+	@throws IllegalStateException if a depict context was given and there already exists a depict context.
 	*/
 	void setDepictContext(final WebDepictContext depictContext)
 	{
@@ -179,7 +179,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 
 	/**Retrieves information and functionality related to the current depiction.
 	@return A context for the current depiction.
-	@exception IllegalStateException if no depict context can be returned in the current depiction state.
+	@throws IllegalStateException if no depict context can be returned in the current depiction state.
 	*/
 	public WebDepictContext getDepictContext()
 	{
@@ -198,7 +198,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	/**Selects one or more files on the platform, using the appropriate selection functionality for the platform.
 	@param multiple Whether multiple files should be allowed to be selected.
 	@param platformFileSelectListener The listener that will be notified when platform files are selected.
-	@exception NullPointerException if the given listener is <code>null</code>.
+	@throws NullPointerException if the given listener is <code>null</code>.
 	*/
 	public void selectPlatformFiles(final boolean multiple, final ValueSelectListener<Collection<PlatformFile>> platformFileSelectListener)
 	{
@@ -220,10 +220,10 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	@param destinationBookmark The bookmark to be used in uploading the platform files to the destination path, or <code>null</code> if no bookmark should be used.
 	@param progressListener The listener that will be notified when progress is made for a particular platform file upload.
 	@param platformFiles Thet platform files to upload.
-	@exception NullPointerException if the given destination path and/or listener is <code>null</code>.
-	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
-	@exception IllegalArgumentException if the provided path is absolute.
-	@exception IllegalStateException if one or more of the specified platform files can no longer be uploaded because, for example, other platform files have since been selected.	
+	@throws NullPointerException if the given destination path and/or listener is <code>null</code>.
+	@throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
+	@throws IllegalArgumentException if the provided path is absolute.
+	@throws IllegalStateException if one or more of the specified platform files can no longer be uploaded because, for example, other platform files have since been selected.	
 	*/
 	public void uploadPlatformFiles(final String destinationPath, final Bookmark destinationBookmark, final ProgressListener progressListener, final PlatformFile... platformFiles)	//TODO del if not needed
 	{
@@ -260,8 +260,8 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 
 	/**Sends a resource to the platform.
 	@param resourcePath The path of the resource to send, relative to the application.
-	@exception NullPointerException if the given path is <code>null</code>.
-	@exception IllegalArgumentException if the given string is not a path.
+	@throws NullPointerException if the given path is <code>null</code>.
+	@throws IllegalArgumentException if the given string is not a path.
 	*/
 	public void sendResource(final URIPath resourcePath)
 	{
@@ -270,7 +270,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 
 	/**Sends a resource to the platform.
 	@param resourceURI The URI of the resource to send, relative to the application.
-	@exception NullPointerException if the given URI is <code>null</code>.
+	@throws NullPointerException if the given URI is <code>null</code>.
 	*/
 	public void sendResource(final URI resourceURI)
 	{
@@ -280,7 +280,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	/**Sends a resource to the platform with the specified bookmark.
 	@param resourcePath The path of the resource to send, relative to the application.
 	@param bookmark The bookmark at the given path, or <code>null</code> if there is no bookmark.
-	@exception NullPointerException if the given path is <code>null</code>.
+	@throws NullPointerException if the given path is <code>null</code>.
 	*/
 	public void sendResource(final URIPath resourcePath, final Bookmark bookmark)
 	{
@@ -290,7 +290,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	/**Sends a resource to the platform.
 	@param resourceURI The URI of the resource to send, relative to the application.
 	@param bookmark The bookmark at the given path, or <code>null</code> if there is no bookmark.
-	@exception NullPointerException if the given URI is <code>null</code>.
+	@throws NullPointerException if the given URI is <code>null</code>.
 	*/
 	public void sendResource(final URI resourceURI, final Bookmark bookmark)	//TODO resolve whether resource URI can have bookmark information; currently some code relies on allowing bookmark information in the URI
 	{

@@ -90,7 +90,7 @@ public class Point
 	/**Two-dimensional coordinate constructor.
 	@param x The X coordinate.
 	@param y The Y coordinate.
-	@exception NullPointerException if one of the given coordinates is <code>null</code>.
+	@throws NullPointerException if one of the given coordinates is <code>null</code>.
 	*/
 	public Point(final Extent x, final Extent y)
 	{
@@ -101,7 +101,7 @@ public class Point
 	@param x The X coordinate.
 	@param y The Y coordinate.
 	@param z The Z coordinate.
-	@exception NullPointerException if one of the given coordinates is <code>null</code>.
+	@throws NullPointerException if one of the given coordinates is <code>null</code>.
 	*/
 	public Point(final Extent x, final Extent y, final Extent z)	//TODO maybe check the degree
 	{

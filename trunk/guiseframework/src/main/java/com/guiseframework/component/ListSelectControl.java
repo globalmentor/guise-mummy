@@ -31,7 +31,7 @@ public interface ListSelectControl<V> extends SelectControl<V>, ListSelectModel<
 	/**Sets the strategy used to generate a component to represent each value in the model.
 	This is a bound property
 	@param newValueRepresentationStrategy The new strategy to create components to represent this model's values.
-	@exception NullPointerException if the provided value representation strategy is <code>null</code>.
+	@throws NullPointerException if the provided value representation strategy is <code>null</code>.
 	@see SelectControl#VALUE_REPRESENTATION_STRATEGY_PROPERTY
 	*/
 	public void setValueRepresentationStrategy(final ValueRepresentationStrategy<V> newValueRepresentationStrategy);
@@ -48,7 +48,7 @@ public interface ListSelectControl<V> extends SelectControl<V>, ListSelectModel<
 	/**Sets the strategy used to generate a component to represent each value in the model.
 	This is a bound property
 	@param newValueRepresentationStrategy The new strategy to create components to represent this model's values.
-	@exception NullPointerException if the provided value representation strategy is <code>null</code>.
+	@throws NullPointerException if the provided value representation strategy is <code>null</code>.
 	@see SelectControl#VALUE_REPRESENTATION_STRATEGY_PROPERTY
 	*/
 //TODO del when works	public void setValueRepresentationStrategy(final ValueRepresentationStrategy<V, R> newValueRepresentationStrategy);

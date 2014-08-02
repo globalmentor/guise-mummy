@@ -59,7 +59,7 @@ public class CachedImageModel<Q, V> extends DefaultImageModel implements Pending
 		/**Sets the URI of the image.
 		This is a bound property.
 		@param newCachedImageURI The new URI of the image, which may be a resource URI.
-		@exception IllegalStateException if the cached image URI is changed while the current image is pending.
+		@throws IllegalStateException if the cached image URI is changed while the current image is pending.
 		@see #CACHED_IMAGE_URI_PROPERTY
 		*/
 		public void setCachedImageURI(final URI newCachedImageURI)
@@ -87,7 +87,7 @@ public class CachedImageModel<Q, V> extends DefaultImageModel implements Pending
 		Chaging the cached image query initiates a deferred retrieval of the image from the cache.
 		This is a bound property.
 		@param newCachedImageQuery The new query to request an image from the cache, or <code>null</code> if the image should not be looked up from the cache.
-		@exception IllegalStateException if the cached image query is changed while the current image is pending.
+		@throws IllegalStateException if the cached image query is changed while the current image is pending.
 		@see #CACHED_IMAGE_QUERY_PROPERTY
 		*/
 		public void setCachedImageQuery(final Q newCachedImageQuery)
@@ -168,7 +168,7 @@ Log.trace("pending state changed to", newImagePending, "now adding or removing c
 
 	/**Cache constructor.
 	@param cache The cache from which the image will be retrieved.
-	@exception NullPointerException if the given cache is <code>null</code>.
+	@throws NullPointerException if the given cache is <code>null</code>.
 	*/
 	public CachedImageModel(final Cache<Q, V> cache)
 	{
@@ -178,7 +178,7 @@ Log.trace("pending state changed to", newImagePending, "now adding or removing c
 	/**Cached image URI constructor.
 	@param cache The cache from which the image will be retrieved.
 	@param cachedImageURI The cached image URI, which may be a resource URI, or <code>null</code> if there is no cached image URI.
-	@exception NullPointerException if the given cache is <code>null</code>.
+	@throws NullPointerException if the given cache is <code>null</code>.
 	*/
 	public CachedImageModel(final Cache<Q, V> cache, final URI cachedImageURI)
 	{

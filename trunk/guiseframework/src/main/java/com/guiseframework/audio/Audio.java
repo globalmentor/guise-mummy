@@ -146,7 +146,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	/**
 	 * Updates the time-based play position. This is a bound property.
 	 * @param newTimePosition The new play position in microseconds.
-	 * @exception IllegalArgumentException if the given position is negative.
+	 * @throws IllegalArgumentException if the given position is negative.
 	 * @see #TIME_POSITION_PROPERTY
 	 */
 	protected void updateTimePosition(final long newTimePosition)
@@ -166,7 +166,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	/**
 	 * Requests a new time-based play position. This is an asynchronous bound property.
 	 * @param newTimePosition The new play position in microseconds.
-	 * @exception IllegalArgumentException if the given position is negative.
+	 * @throws IllegalArgumentException if the given position is negative.
 	 * @see #TIME_POSITION_PROPERTY
 	 */
 	public void setTimePosition(final long newTimePosition)
@@ -356,7 +356,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 		/**
 		 * Requests a new time-based play position.
 		 * @param newTimePosition The new play position in microseconds.
-		 * @exception IllegalArgumentException if the given position is negative.
+		 * @throws IllegalArgumentException if the given position is negative.
 		 */
 		public void setTimePosition(final long newTimePosition);
 

@@ -93,7 +93,7 @@ public class DefaultWebUserAgentProduct extends AbstractBrandedProduct<WebUserAg
 	@param versionNumbers The version number components provided by the product, or <code>null</code> if there are no version number components of the product.
 	@param acceptedContentTypes The content types accepted by the client.
 	@param acceptedLanguages The languages accepted by the client.
-	@exception NullPointerException if the given ID, name, accepted content types, and/or accepted languages is <code>null</code>.
+	@throws NullPointerException if the given ID, name, accepted content types, and/or accepted languages is <code>null</code>.
 	*/
 	public DefaultWebUserAgentProduct(final String id, final WebUserAgentProduct.Brand brand, final String name, final String version, final double versionNumber, final int[] versionNumbers, final Iterable<ContentType> acceptedContentTypes, final Iterable<Locale> acceptedLanguages)
 	{

@@ -98,7 +98,7 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 	/**
 	 * Requests a new time-based play position.
 	 * @param newTimePosition The new play position in microseconds.
-	 * @exception IllegalArgumentException if the given position is negative.
+	 * @throws IllegalArgumentException if the given position is negative.
 	 */
 	@SuppressWarnings("unchecked")
 	public void setTimePosition(final long newTimePosition)
@@ -115,7 +115,7 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 	/**
 	 * Processes an event from the platform.
 	 * @param event The event to be processed.
-	 * @exception IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
+	 * @throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
 	 */
 	public void processEvent(final PlatformEvent event)
 	{

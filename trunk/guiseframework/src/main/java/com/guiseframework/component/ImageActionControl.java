@@ -174,7 +174,7 @@ public class ImageActionControl extends AbstractImageComponent implements Action
 	@param imageModel The component image model.
 	@param actionModel The component action model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given info model, image model, action model, and/or enableable object is <code>null</code>.
+	@throws NullPointerException if the given info model, image model, action model, and/or enableable object is <code>null</code>.
 	*/
 	public ImageActionControl(final InfoModel infoModel, final ImageModel imageModel, final ActionModel actionModel, final Enableable enableable)
 	{
@@ -208,7 +208,7 @@ public class ImageActionControl extends AbstractImageComponent implements Action
 
 	/**Prototype constructor.
 	@param actionPrototype The prototype on which this component should be based.
-	@exception NullPointerException if the given prototype is <code>null</code>.
+	@throws NullPointerException if the given prototype is <code>null</code>.
 	*/
 	public ImageActionControl(final ActionPrototype actionPrototype)
 	{

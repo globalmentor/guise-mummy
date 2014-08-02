@@ -33,7 +33,7 @@ public abstract class AbstractEffect extends GuiseBoundPropertyObject implements
 		/**Sets the delay before the effect takes place.
 		This is a bound property of type <code>Integer</code>.
 		@param newDelay The delay, in milliseconds, before the effect takes place.
-		@exception IllegalArgumentException if the given delay is negative.
+		@throws IllegalArgumentException if the given delay is negative.
 		@see Effect#DELAY_PROPERTY
 		*/
 		public void setDelay(final int newDelay)
@@ -58,7 +58,7 @@ public abstract class AbstractEffect extends GuiseBoundPropertyObject implements
 
 	/**Delay constructor.
 	@param delay The delay in milliseconds.
-	@exception IllegalArgumentException if the given delay is negative.
+	@throws IllegalArgumentException if the given delay is negative.
 	*/
 	public AbstractEffect(final int delay)
 	{

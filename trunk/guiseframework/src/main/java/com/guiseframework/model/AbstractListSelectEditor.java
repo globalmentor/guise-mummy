@@ -74,7 +74,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 
 	/**List select model constructor.
 	@param listSelectModel The list select model this prototype manipulates.
-	@exception NullPointerException if the given list select model is <code>null</code>.
+	@throws NullPointerException if the given list select model is <code>null</code>.
 	*/
 	public AbstractListSelectEditor(final ListSelectModel<V> listSelectModel)
 	{

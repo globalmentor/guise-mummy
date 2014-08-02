@@ -70,7 +70,7 @@ public class TelephoneNumberStringLiteralConverter extends AbstractStringLiteral
 	Otherwise, the country code of the current local's country, if available, will be used as the default telephone country code.
 	@param literal The literal value in the lexical space to convert.
 	@return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
-	@exception ConversionException if the literal value cannot be converted.
+	@throws ConversionException if the literal value cannot be converted.
 	*/ 
 	public TelephoneNumber convertLiteral(final String literal) throws ConversionException
 	{

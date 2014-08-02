@@ -113,8 +113,8 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 	/**Called when the view is installed in a component.
 	This implementation listens for {@link TreeNodePropertyChangeEvent}s fired from the control and marks the view as needing updated.
 	@param component The component into which this view is being installed.
-	@exception NullPointerException if the given component is <code>null</code>.
-	@exception IllegalStateException if this view is already installed in a component.
+	@throws NullPointerException if the given component is <code>null</code>.
+	@throws IllegalStateException if this view is already installed in a component.
 	*/
 /*TODO del if not needed
 	public void installed(final C component)
@@ -127,8 +127,8 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 	/**Called when the view is uninstalled from a component.
 	This implementation stops listening for {@link TreeNodePropertyChangeEvent}s fired from the control.
 	@param component The component from which this view is being uninstalled.
-	@exception NullPointerException if the given component is <code>null</code>.
-	@exception IllegalStateException if this view is not installed in a component.
+	@throws NullPointerException if the given component is <code>null</code>.
+	@throws IllegalStateException if this view is not installed in a component.
 	*/
 /*TODO del if not needed
 	public void uninstalled(final C component)
@@ -140,7 +140,7 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 
 	/**Processes an event from the platform.
 	@param event The event to be processed.
-	@exception IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
+	@throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
 	*/
 	public void processEvent(final PlatformEvent event)
 	{
@@ -212,7 +212,7 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 	}
 
 	/**Updates the views of any children.
-	@exception IOException if there is an error updating the child views.
+	@throws IOException if there is an error updating the child views.
 	@see DepictContext.State#UPDATE_VIEW
 	*/
 	protected void depictChildren() throws IOException
@@ -241,7 +241,7 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 	@param <T> The type of value contained in the tree node.
 	@param treeModel The component model.
 	@param treeNode The tree node.
-	@exception IOException if there is an error updating the tree node view.
+	@throws IOException if there is an error updating the tree node view.
 	*/
 	protected <T> void updateTreeNodeView(final TreeModel treeModel, final TreeNodeModel<T> treeNode) throws IOException
 	{
@@ -313,7 +313,7 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 	@param <T> The type of value contained in the tree node.
 	@param treeModel The component model.
 	@param treeNode The tree node the views of the children of which should be updated.
-	@exception IOException if there is an error updating the child tree node views.
+	@throws IOException if there is an error updating the child tree node views.
 	*/
 	protected <T> void updateTreeNodeChildViews(final TreeModel treeModel, final TreeNodeModel<T> treeNode) throws IOException
 	{

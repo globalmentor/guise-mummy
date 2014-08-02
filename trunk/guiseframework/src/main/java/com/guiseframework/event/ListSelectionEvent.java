@@ -36,7 +36,7 @@ public class ListSelectionEvent<V> extends SetEvent<Integer>
 
 	/**Source constructor for general selection modification.
 	@param source The object on which the event initially occurred.
-	@exception NullPointerException if the given source is <code>null</code>.
+	@throws NullPointerException if the given source is <code>null</code>.
 	*/
 	public ListSelectionEvent(final ListSelectModel<V> source)
 	{
@@ -47,7 +47,7 @@ public class ListSelectionEvent<V> extends SetEvent<Integer>
 	@param source The object on which the event initially occurred.
 	@param addedElement The index that was added to the selection, or <code>null</code> if no index was added or it is unknown whether or which indices were added.
 	@param removedElement The index that was removed from the selection, or <code>null</code> if no index was removed or it is unknown whether or which indices were removed.
-	@exception NullPointerException if the given source is <code>null</code>.
+	@throws NullPointerException if the given source is <code>null</code>.
 	*/
 	public ListSelectionEvent(final ListSelectModel<V> source, final Integer addedElement, final Integer removedElement)
 	{

@@ -38,8 +38,8 @@ public class ModalNavigation extends Navigation	//TODO del class; if kept, updat
 	@param oldNavigationURI The old point of navigation, with an absolute path.
 	@param newNavigationURI The new point of navigation, with an absolute path.
 	@param modalListener The listener to respond to the end of modal interaction.
-	@exception NullPointerException if one of the navigation URIs is <code>null</code>, or does not contain a path.
-	@exception IllegalArgumentException if one of the given navigation URIs contains a relative path.
+	@throws NullPointerException if one of the navigation URIs is <code>null</code>, or does not contain a path.
+	@throws IllegalArgumentException if one of the given navigation URIs contains a relative path.
 	*/
 	public ModalNavigation(final URI oldNavigationURI, final URI newNavigationURI, final ModalNavigationListener modalListener)
 	{

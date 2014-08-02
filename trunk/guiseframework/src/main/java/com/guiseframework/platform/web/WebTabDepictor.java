@@ -45,7 +45,7 @@ public class WebTabDepictor<V, C extends ListSelectControl<V>> extends AbstractD
 
 	/**Processes an event from the platform.
 	@param event The event to be processed.
-	@exception IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
+	@throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
 	*/
 	public void processEvent(final PlatformEvent event)
 	{
@@ -116,7 +116,7 @@ public class WebTabDepictor<V, C extends ListSelectControl<V>> extends AbstractD
 	}
 
 	/**Renders the body of the component.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictBody() throws IOException
 	{
@@ -176,7 +176,7 @@ public class WebTabDepictor<V, C extends ListSelectControl<V>> extends AbstractD
 
 	/**Updates the views of any children.
 	This version does nothing, because if a tab control is a composite component the child controls have already been rendered as values in {@link #depictBody(XMLGuiseContext, ListSelectControl)}.
-	@exception IOException if there is an error updating the child views.
+	@throws IOException if there is an error updating the child views.
 	*/
 	protected void depictChildren() throws IOException
 	{

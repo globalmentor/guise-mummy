@@ -66,7 +66,7 @@ public class Picture extends AbstractImageComponent
 		/**Sets the opacity of the image.
 		This is a bound property of type <code>Float</code>.
 		@param newImageOpacity The new opacity of the image in the range (0.0-1.0).
-		@exception IllegalArgumentException if the given opacity is not within the range (0.0-1.0).
+		@throws IllegalArgumentException if the given opacity is not within the range (0.0-1.0).
 		@see #IMAGE_OPACITY_PROPERTY 
 		*/
 		public void setImageOpacity(final float newImageOpacity)
@@ -92,7 +92,7 @@ public class Picture extends AbstractImageComponent
 	/**Info model and image model constructor.
 	@param infoModel The component info model.
 	@param imageModel The component image model.
-	@exception NullPointerException if the given info model and/or image model is <code>null</code>.
+	@throws NullPointerException if the given info model and/or image model is <code>null</code>.
 	*/
 	public Picture(final InfoModel infoModel, final ImageModel imageModel)
 	{

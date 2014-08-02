@@ -56,7 +56,7 @@ public abstract class AbstractTransferable<S> implements Transferable<S>
 	@param <T> The type of object to be transferred.
 	@param objectClass The class of object to return.
 	@return The transferred data object, which may be <code>null</code>.
-	@exception IllegalArgumentException if the given class is not supported.
+	@throws IllegalArgumentException if the given class is not supported.
 	*/
 	public <T> T transfer(final Class<T> objectClass)
 	{
@@ -65,7 +65,7 @@ public abstract class AbstractTransferable<S> implements Transferable<S>
 
 	/**Source constructor.
 	@param source The source of the transferable data.
-	@exception NullPointerException if the provided source is <code>null</code>.
+	@throws NullPointerException if the provided source is <code>null</code>.
 	*/
 	public AbstractTransferable(final S source)
 	{

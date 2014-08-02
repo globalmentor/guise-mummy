@@ -55,7 +55,7 @@ public class WebProgressDepictEvent extends AbstractWebDepictEvent
 	@param task The task being performed, or <code>null</code> if not indicated.
 	@param taskState The state of the task.
 	@param progress The amount of progress that has been made, or -1 if the progress is unknown.
-	@exception NullPointerException if the given depicted object and/or task state is <code>null</code>.
+	@throws NullPointerException if the given depicted object and/or task state is <code>null</code>.
 	*/
 	public WebProgressDepictEvent(final DepictedObject depictedObject, final String task, final TaskState taskState, final long progress)
 	{
@@ -68,7 +68,7 @@ public class WebProgressDepictEvent extends AbstractWebDepictEvent
 	@param taskState The state of the task.
 	@param progress The amount of progress that has been made, or -1 if the progress is unknown.
 	@param goal The total amount of progress that will have been made upon completion, or -1 if the goal is unknown.
-	@exception NullPointerException if the given depicted object and/or task state is <code>null</code>.
+	@throws NullPointerException if the given depicted object and/or task state is <code>null</code>.
 	*/
 	public WebProgressDepictEvent(final DepictedObject depictedObject, final String task, final TaskState taskState, final long progress, final long goal)
 	{

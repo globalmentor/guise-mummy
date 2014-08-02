@@ -64,7 +64,7 @@ public abstract class AbstractURFResourceTreeNodeRepresentationStrategy<V extend
 
 	/**Namespace label manager constructor.
 	@param namespaceLabelManager The manager responsible for generating namespace labels..
-	@exception NullPointerException if the given label manager is <code>null</code>.
+	@throws NullPointerException if the given label manager is <code>null</code>.
 	*/
 	public AbstractURFResourceTreeNodeRepresentationStrategy(final TURFNamespaceLabelManager namespaceLabelManager)
 	{

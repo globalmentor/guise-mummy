@@ -52,7 +52,7 @@ public class FileItemResourceImport implements ResourceImport
 
 	/**File item constructor.
 	@param fileItem The Apache commons file item representing a file upload.
-	@exception NullPointerException if the given file item is <code>null</code>.
+	@throws NullPointerException if the given file item is <code>null</code>.
 	*/
 	public FileItemResourceImport(final FileItem fileItem)
 	{
@@ -99,8 +99,8 @@ public class FileItemResourceImport implements ResourceImport
 	/**Retrieves an input stream to the resource.
 	There can only be at most a single call to this method or {@link #store(File)}.
 	@return An input stream to the resource to be imported.
-	@exception IllegalStateException if this resource has already been stored in a file, or an input stream to the resource has already been retrieved.
-	@exception IOException if there is an error getting an input stream to the resource.
+	@throws IllegalStateException if this resource has already been stored in a file, or an input stream to the resource has already been retrieved.
+	@throws IOException if there is an error getting an input stream to the resource.
 	*/
 	public synchronized InputStream getInputStream() throws IOException
 	{
@@ -116,8 +116,8 @@ public class FileItemResourceImport implements ResourceImport
 	Depending on the implementation, this may allow greater efficiency than reading from the stream.
 	There can only be at most a single call to this method or {@link #getInputStream()}.
 	@param file The file to which the resource should be written.
-	@exception IllegalStateException if this resource has already been stored in a file, or an input stream to the resource has already been retrieved.
-	@exception IOException If there is an error writing the resource to the file.
+	@throws IllegalStateException if this resource has already been stored in a file, or an input stream to the resource has already been retrieved.
+	@throws IOException If there is an error writing the resource to the file.
 	*/
 	public synchronized void store(final File file) throws IOException
 	{

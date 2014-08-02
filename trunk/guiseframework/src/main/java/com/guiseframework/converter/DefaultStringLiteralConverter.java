@@ -40,7 +40,7 @@ public class DefaultStringLiteralConverter<V> extends AbstractStringLiteralConve
 
 	/**Constructs a default string literal converter indicating the type of value to convert.
 	@param valueClass The class indicating the type of value to convert.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public DefaultStringLiteralConverter(final Class<V> valueClass)
 	{
@@ -52,7 +52,7 @@ public class DefaultStringLiteralConverter<V> extends AbstractStringLiteralConve
 	If there is no string-compatible constructor, a {@link ConversionException} is thrown.
 	@param literal The literal value in the lexical space to convert.
 	@return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
-	@exception ConversionException if the literal value cannot be converted.
+	@throws ConversionException if the literal value cannot be converted.
 	*/ 
 	public V convertLiteral(final String literal) throws ConversionException
 	{

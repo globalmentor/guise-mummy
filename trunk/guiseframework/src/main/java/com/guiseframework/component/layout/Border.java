@@ -49,7 +49,7 @@ public enum Border
 	/**Flow and end constructor.
 	@param flow The flow
 	@param end The end.
-	@exception NullPointerException if the given flow and/or end is <code>null</code>.
+	@throws NullPointerException if the given flow and/or end is <code>null</code>.
 	*/
 	private Border(final Flow flow, final Flow.End end)
 	{
@@ -64,7 +64,7 @@ public enum Border
 	@param flow The flow
 	@param end The end.
 	@return The border for the specified flow and page end.
-	@exception NullPointerException if the given flow and/or end is <code>null</code>.
+	@throws NullPointerException if the given flow and/or end is <code>null</code>.
 	*/
 	public static Border getBorder(final Flow flow, final Flow.End end)
 	{

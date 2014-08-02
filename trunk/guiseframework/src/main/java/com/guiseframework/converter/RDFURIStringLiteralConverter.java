@@ -72,7 +72,7 @@ public class RDFURIStringLiteralConverter extends DefaultStringLiteralConverter<
 	
 	/**XML RDF generator constructor.
 	@param rdfXMLGenerator The RDF XML generator to use in converting URIs to strings.
-	@exception NullPointerException if the given RDF XML generator is <code>null</code>.
+	@throws NullPointerException if the given RDF XML generator is <code>null</code>.
 	*/
 	public RDFURIStringLiteralConverter(final RDFXMLGenerator rdfXMLGenerator)
 	{
@@ -85,7 +85,7 @@ public class RDFURIStringLiteralConverter extends DefaultStringLiteralConverter<
 	otherwise, the reference URI itself will be returned.
 	@param value The value in the value space to convert.
 	@return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>.
-	@exception ConversionException if the value cannot be converted.
+	@throws ConversionException if the value cannot be converted.
 	*/
 	public String convertValue(final URI value) throws ConversionException
 	{

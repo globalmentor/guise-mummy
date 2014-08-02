@@ -37,7 +37,7 @@ public class QuestionTreeNodeRepresentationStrategy extends AbstractInteractionT
 
 	/**RDF XMLifier constructor.
 	@param rdfXMLifier The RDF XMLifier to use for creating labels.
-	@exception NullPointerException if the given RDF XMLifier is <code>null</code>.
+	@throws NullPointerException if the given RDF XMLifier is <code>null</code>.
 	*/
 	public QuestionTreeNodeRepresentationStrategy(final RDFXMLGenerator rdfXMLifier)
 	{

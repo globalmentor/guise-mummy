@@ -127,7 +127,7 @@ public class WebCheckControlDepictor<C extends CheckControl> extends AbstractWeb
 
 	/**Processes an event from the platform.
 	@param event The event to be processed.
-	@exception IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
+	@throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
 	*/
 	public void processEvent(final PlatformEvent event)
 	{
@@ -209,8 +209,8 @@ public class WebCheckControlDepictor<C extends CheckControl> extends AbstractWeb
 	}
 
 	/**Begins the rendering process.
-	@exception IOException if there is an error rendering the component.
-	@exception IllegalArgumentException if the given value control represents a value type this controller doesn't support.
+	@throws IOException if there is an error rendering the component.
+	@throws IllegalArgumentException if the given value control represents a value type this controller doesn't support.
 	*/
 	protected void depictBegin() throws IOException
 	{
@@ -240,7 +240,7 @@ public class WebCheckControlDepictor<C extends CheckControl> extends AbstractWeb
 	}
 
 	/**Ends the rendering process.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictEnd() throws IOException
 	{

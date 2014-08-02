@@ -106,7 +106,7 @@ public class DateTimeFieldsControl extends AbstractLayoutValueControl<Date>	//TO
 		A copy will be made of the date before it is stored.
 		This is a bound property.
 		@param newDate The date to be viewed, not necessarily chosen.
-		@exception NullPointerException if the given date is <code>null</code>.
+		@throws NullPointerException if the given date is <code>null</code>.
 		@see #DATE_PROPERTY
 		*/
 /*TODO del
@@ -139,7 +139,7 @@ public class DateTimeFieldsControl extends AbstractLayoutValueControl<Date>	//TO
 
 	/**Value model constructor.
 	@param valueModel The component value model.
-	@exception NullPointerException if the given value model is <code>null</code>.
+	@throws NullPointerException if the given value model is <code>null</code>.
 	*/
 	public DateTimeFieldsControl(final ValueModel<Date> valueModel)
 	{

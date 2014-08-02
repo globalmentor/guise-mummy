@@ -50,8 +50,8 @@ public interface InfoModel extends LabelModel
 	/**Sets the content type of the description text.
 	This is a bound property.
 	@param newDescriptionContentType The new description text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
+	@throws NullPointerException if the given content type is <code>null</code>.
+	@throws IllegalArgumentException if the given content type is not a text content type.
 	@see #DESCRIPTION_CONTENT_TYPE_PROPERTY
 	*/
 	public void setDescriptionContentType(final ContentType newDescriptionContentType);
@@ -72,8 +72,8 @@ public interface InfoModel extends LabelModel
 	/**Sets the content type of the advisory information text.
 	This is a bound property.
 	@param newInfoContentType The new advisory information text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
+	@throws NullPointerException if the given content type is <code>null</code>.
+	@throws IllegalArgumentException if the given content type is not a text content type.
 	@see #INFO_CONTENT_TYPE_PROPERTY
 	*/
 	public void setInfoContentType(final ContentType newInfoContentType);

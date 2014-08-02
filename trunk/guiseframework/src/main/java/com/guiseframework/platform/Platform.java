@@ -48,19 +48,19 @@ public interface Platform
 	@param <O> The type of depicted object.
 	@param depictedObject The depicted object for which a depictor should be returned.
 	@return A depictor to depict the given component, or <code>null</code> if no depictor is registered.
-	@exception IllegalStateException if the registered depictor could not be instantiated for some reason.
+	@throws IllegalStateException if the registered depictor could not be instantiated for some reason.
 	*/
 	public <O extends DepictedObject> Depictor<? super O> getDepictor(final O depictedObject);
 
 	/**Registers a depicted object so that it can interact with the platform.
 	@param depictedObject The depicted object to register.
-	@exception NullPointerException if the given depicted object is <code>null</code>.
+	@throws NullPointerException if the given depicted object is <code>null</code>.
 	*/
 	public void registerDepictedObject(final DepictedObject depictedObject);
 
 	/**Unregisters a depicted object so that no longer interacts with the platform.
 	@param depictedObject The depicted object to unregister.
-	@exception NullPointerException if the given depicted object is <code>null</code>.
+	@throws NullPointerException if the given depicted object is <code>null</code>.
 	*/
 	public void unregisterDepictedObject(final DepictedObject depictedObject);
 
@@ -81,7 +81,7 @@ public interface Platform
 
 	/**Retrieves information and functionality related to the current depiction.
 	@return A context for the current depiction.
-	@exception IllegalStateException if no depict context can be returned in the current depiction state.
+	@throws IllegalStateException if no depict context can be returned in the current depiction state.
 	*/
 	public DepictContext getDepictContext();
 
@@ -93,28 +93,28 @@ public interface Platform
 
 	/**Sends a resource to the platform.
 	@param resourcePath The path of the resource to send, relative to the application.
-	@exception NullPointerException if the given path is <code>null</code>.
-	@exception IllegalArgumentException if the given string is not a path.
+	@throws NullPointerException if the given path is <code>null</code>.
+	@throws IllegalArgumentException if the given string is not a path.
 	*/
 	public void sendResource(final URIPath resourcePath);
 
 	/**Sends a resource to the platform.
 	@param resourceURI The URI of the resource to send, relative to the application.
-	@exception NullPointerException if the given URI is <code>null</code>.
+	@throws NullPointerException if the given URI is <code>null</code>.
 	*/
 	public void sendResource(final URI resourceURI);
 
 	/**Sends a resource to the platform with the specified bookmark.
 	@param resourcePath The path of the resource to send, relative to the application.
 	@param bookmark The bookmark at the given path, or <code>null</code> if there is no bookmark.
-	@exception NullPointerException if the given path is <code>null</code>.
+	@throws NullPointerException if the given path is <code>null</code>.
 	*/
 	public void sendResource(final URIPath resourcePath, final Bookmark bookmark);
 
 	/**Sends a resource to the platform.
 	@param resourceURI The URI of the resource to send, relative to the application.
 	@param bookmark The bookmark at the given path, or <code>null</code> if there is no bookmark.
-	@exception NullPointerException if the given URI is <code>null</code>.
+	@throws NullPointerException if the given URI is <code>null</code>.
 	*/
 	public void sendResource(final URI resourceURI, final Bookmark bookmark);
 }

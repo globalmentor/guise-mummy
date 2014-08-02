@@ -47,7 +47,7 @@ public final class MutualExclusionPolicyModelGroup extends ValuePolicyModelGroup
 	/**
 	 * Model constructor.
 	 * @param models Zero or more models with which to initially place in the group.
-	 * @exception NullPointerException if one of the models is <code>null</code>.
+	 * @throws NullPointerException if one of the models is <code>null</code>.
 	 */
 	public MutualExclusionPolicyModelGroup(final ValueModel<Boolean>... models)
 	{

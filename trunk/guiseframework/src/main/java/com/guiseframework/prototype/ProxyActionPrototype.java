@@ -64,7 +64,7 @@ public class ProxyActionPrototype extends AbstractEnableableProxyPrototype<Actio
 
 	/**Proxied prototype constructor.
 	@param proxiedPrototype The prototype proxied by this prototype.
-	@exception NullPointerException if the given proxied prototype is <code>null</code> is <code>null</code>.
+	@throws NullPointerException if the given proxied prototype is <code>null</code> is <code>null</code>.
 	*/
 	public ProxyActionPrototype(final ActionPrototype proxiedPrototype)
 	{

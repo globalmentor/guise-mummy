@@ -45,7 +45,7 @@ public class DefaultMenuToolPrototypeProvisionStrategy extends AbstractMenuToolC
 	@param menu The menu being managed, or <code>null</code> if no menu is being managed.
 	@param toolbar The toolbar being managed, or <code>null</code> if no toolbar is being managed.
 	@param defaultPrototypeProviders The default prototype providers that will provide prototypes for processing, outside the children of the composite component parent.
-	@exception NullPointerException if the given parent component, prototype providers, and/or one or more prototype provider is <code>null</code>.
+	@throws NullPointerException if the given parent component, prototype providers, and/or one or more prototype provider is <code>null</code>.
 	*/
 	public DefaultMenuToolPrototypeProvisionStrategy(final CompositeComponent parentComponent, final Menu menu, final Toolbar toolbar, final PrototypeProvider... defaultPrototypeProviders)
 	{

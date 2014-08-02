@@ -41,8 +41,8 @@ public class WebLabelPanelDepictor<C extends LayoutComponent> extends AbstractWe
 
 	/**Begins the rendering process.
 	This version wraps the component in a decorator element.
-	@exception IOException if there is an error rendering the component.
-	@exception IllegalArgumentException if the given value control represents a value type this controller doesn't support.
+	@throws IOException if there is an error rendering the component.
+	@throws IllegalArgumentException if the given value control represents a value type this controller doesn't support.
 	*/
 	protected void depictBegin() throws IOException
 	{
@@ -57,7 +57,7 @@ public class WebLabelPanelDepictor<C extends LayoutComponent> extends AbstractWe
 
 	/**Ends the rendering process.
 	This version closes the decorator elements.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictEnd() throws IOException
 	{

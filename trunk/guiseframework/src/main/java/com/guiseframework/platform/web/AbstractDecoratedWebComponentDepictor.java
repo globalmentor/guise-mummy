@@ -92,7 +92,7 @@ public abstract class AbstractDecoratedWebComponentDepictor<C extends Component>
 
 	/**Begins the rendering process.
 	This version calls {@link #writeDecoratorBegin()}.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictBegin() throws IOException
 	{
@@ -113,7 +113,7 @@ public abstract class AbstractDecoratedWebComponentDepictor<C extends Component>
 
 	/**Writes the beginning part of the outer decorator element.
 	This version writes the beginning decorator items, such as the label, if any.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void writeDecoratorBegin() throws IOException
 	{
@@ -125,7 +125,7 @@ public abstract class AbstractDecoratedWebComponentDepictor<C extends Component>
 	/**Ends the rendering process.
 	This version writes the end of the body element, if there is one, and the ending decorator items, such as the error, if any.
 	This version calls {@link #writeDecoratorEnd()}.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictEnd() throws IOException
 	{
@@ -140,7 +140,7 @@ public abstract class AbstractDecoratedWebComponentDepictor<C extends Component>
 
 	/**Writes the ending part of the outer decorator element.
 	This version writes the ending decorator items, such as the error message, if any.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	@see #writeErrorMessage()
 	*/
 	protected void writeDecoratorEnd() throws IOException

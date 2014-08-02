@@ -46,7 +46,7 @@ public class DefaultValueModel<V> extends AbstractValueModel<V>
 		Validation always occurs if a validator is installed, even if the value is not changing.
 		If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 		@param newValue The new value.
-		@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+		@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 		@see #getValidator()
 		@see #VALUE_PROPERTY
 		*/
@@ -105,7 +105,7 @@ public class DefaultValueModel<V> extends AbstractValueModel<V>
 	/**Constructs a value model indicating the type of value it can hold.
 	The default value is set to <code>null</code>.
 	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public DefaultValueModel(final Class<V> valueClass)
 	{
@@ -115,7 +115,7 @@ public class DefaultValueModel<V> extends AbstractValueModel<V>
 	/**Constructs a value model indicating the type of value it can hold, along with an initial value.
 	@param valueClass The class indicating the type of value held in the model.
 	@param defaultValue The default value, which will not be validated.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public DefaultValueModel(final Class<V> valueClass, final V defaultValue)
 	{

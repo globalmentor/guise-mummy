@@ -88,7 +88,7 @@ public class SelectableLabel extends Label implements Selectable
 
 	/**Info model constructor.
 	@param infoModel The component info model.
-	@exception NullPointerException if the given info model is <code>null</code>.
+	@throws NullPointerException if the given info model is <code>null</code>.
 	*/
 	public SelectableLabel(final InfoModel infoModel)
 	{

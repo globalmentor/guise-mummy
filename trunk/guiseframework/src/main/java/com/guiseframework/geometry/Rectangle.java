@@ -115,8 +115,8 @@ public class Rectangle
 	/**Position and size constructor.
 	@param position The position of the upper-left corner of the rectangle.
 	@param size The size of the rectangle, which is guaranteed to have zero depth.
-	@exception NullPointerException if the position and/or size is <code>null</code>.
-	@exception IllegalArgumentException if the size has a non-zero depth.
+	@throws NullPointerException if the position and/or size is <code>null</code>.
+	@throws IllegalArgumentException if the size has a non-zero depth.
 	*/
 	public Rectangle(final Point position, final Dimensions size)
 	{

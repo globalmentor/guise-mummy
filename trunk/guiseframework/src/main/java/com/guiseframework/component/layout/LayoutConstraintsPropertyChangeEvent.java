@@ -50,7 +50,7 @@ public class LayoutConstraintsPropertyChangeEvent<T extends Constraints, V> exte
 	@param propertyName The programmatic name of the property that was changed.
 	@param oldValue The old value of the property, or <code>null</code> if no old value is not available.
 	@param newValue The new value of the property, or <code>null</code> if the new value is not available.
-	@exception NullPointerException if the given component and/or constraints is <code>null</code>.
+	@throws NullPointerException if the given component and/or constraints is <code>null</code>.
 	*/
 	public LayoutConstraintsPropertyChangeEvent(final Layout<T> source, final Component component, final T constraints, final String propertyName, final V oldValue, V newValue)
 	{

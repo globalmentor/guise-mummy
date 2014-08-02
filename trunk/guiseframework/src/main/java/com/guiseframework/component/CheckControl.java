@@ -102,7 +102,7 @@ public class CheckControl extends AbstractEditValueControl<Boolean>
 
 	/**Info model constructor.
 	@param infoModel The component info model.
-	@exception NullPointerException if the given info model is <code>null</code>.
+	@throws NullPointerException if the given info model is <code>null</code>.
 	*/
 	public CheckControl(final InfoModel infoModel)
 	{
@@ -112,7 +112,7 @@ public class CheckControl extends AbstractEditValueControl<Boolean>
 	/**Info model and value model constructor.
 	@param infoModel The component info model.
 	@param valueModel The component value model.
-	@exception NullPointerException if the given info model and/or value model is <code>null</code>.
+	@throws NullPointerException if the given info model and/or value model is <code>null</code>.
 	*/
 	public CheckControl(final InfoModel infoModel, final ValueModel<Boolean> valueModel)
 	{
@@ -121,7 +121,7 @@ public class CheckControl extends AbstractEditValueControl<Boolean>
 
 	/**Value model constructor.
 	@param valueModel The component value model.
-	@exception NullPointerException if the given value model is <code>null</code>.
+	@throws NullPointerException if the given value model is <code>null</code>.
 	*/
 	public CheckControl(final ValueModel<Boolean> valueModel)
 	{
@@ -131,7 +131,7 @@ public class CheckControl extends AbstractEditValueControl<Boolean>
 	/**Value model and check type constructor.
 	@param valueModel The component value model.
 	@param checkType The type of check area presented to the user, or <code>null</code> if the check type should be determined automatically.
-	@exception NullPointerException if the given value model is <code>null</code>.
+	@throws NullPointerException if the given value model is <code>null</code>.
 	*/
 	public CheckControl(final ValueModel<Boolean> valueModel, final CheckType checkType)
 	{
@@ -142,7 +142,7 @@ public class CheckControl extends AbstractEditValueControl<Boolean>
 	@param infoModel The component info model.
 	@param valueModel The component value model.
 	@param checkType The type of check area presented to the user, or <code>null</code> if the check type should be determined automatically.
-	@exception NullPointerException if the given value model, and/or info model is <code>null</code>.
+	@throws NullPointerException if the given value model, and/or info model is <code>null</code>.
 	*/
 	public CheckControl(final InfoModel infoModel, final ValueModel<Boolean> valueModel, final CheckType checkType)
 	{
@@ -154,7 +154,7 @@ public class CheckControl extends AbstractEditValueControl<Boolean>
 	@param valueModel The component value model.
 	@param enableable The enableable object in which to store enabled status.
 	@param checkType The type of check area presented to the user, or <code>null</code> if the check type should be determined automatically.
-	@exception NullPointerException if the given value model and/or info model is <code>null</code>.
+	@throws NullPointerException if the given value model and/or info model is <code>null</code>.
 	*/
 	public CheckControl(final InfoModel infoModel, final ValueModel<Boolean> valueModel, final Enableable enableable, final CheckType checkType)
 	{
@@ -165,7 +165,7 @@ public class CheckControl extends AbstractEditValueControl<Boolean>
 
 	/**Prototype constructor.
 	@param valuePrototype The prototype on which this component should be based.
-	@exception NullPointerException if the given prototype is <code>null</code>.
+	@throws NullPointerException if the given prototype is <code>null</code>.
 	*/
 	public CheckControl(final ValuePrototype<Boolean> valuePrototype)
 	{

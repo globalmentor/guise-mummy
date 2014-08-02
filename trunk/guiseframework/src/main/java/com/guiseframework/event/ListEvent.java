@@ -33,7 +33,7 @@ public class ListEvent<E> extends CollectionEvent<E>
 
 	/**Source constructor for general list modification.
 	@param source The object on which the event initially occurred.
-	@exception NullPointerException if the given source is <code>null</code>.
+	@throws NullPointerException if the given source is <code>null</code>.
 	*/
 	public ListEvent(final Object source)
 	{
@@ -45,7 +45,7 @@ public class ListEvent<E> extends CollectionEvent<E>
 	@param index The index at which an element was added and/or removed, or -1 if the index is unknown.
 	@param addedElement The element that was added to the list, or <code>null</code> if no element was added or it is unknown whether or which elements were added.
 	@param removedElement The element that was removed from the list, or <code>null</code> if no element was removed or it is unknown whether or which elements were removed.
-	@exception NullPointerException if the given source is <code>null</code>.
+	@throws NullPointerException if the given source is <code>null</code>.
 	*/
 	public ListEvent(final Object source, final int index, final E addedElement, final E removedElement)
 	{

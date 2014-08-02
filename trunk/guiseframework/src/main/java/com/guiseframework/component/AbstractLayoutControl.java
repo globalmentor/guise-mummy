@@ -125,7 +125,7 @@ public abstract class AbstractLayoutControl extends AbstractLayoutComponent impl
 
 	/**Layout constructor with a default info model and enableable.
 	@param layout The layout definition for the layout component.
-	@exception NullPointerException if the given layout is <code>null</code>.
+	@throws NullPointerException if the given layout is <code>null</code>.
 	*/
 	public AbstractLayoutControl(final Layout<?> layout)
 	{
@@ -136,7 +136,7 @@ public abstract class AbstractLayoutControl extends AbstractLayoutComponent impl
 	@param infoModel The component info model.
 	@param enableable The enableable object in which to store enabled status.
 	@param layout The layout definition for the layout component.
-	@exception NullPointerException if the given info model, enableable, and/or layout is <code>null</code>.
+	@throws NullPointerException if the given info model, enableable, and/or layout is <code>null</code>.
 	*/
 	public AbstractLayoutControl(final InfoModel infoModel, final Enableable enableable, final Layout<?> layout)
 	{

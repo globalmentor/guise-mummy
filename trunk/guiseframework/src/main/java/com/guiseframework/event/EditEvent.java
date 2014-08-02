@@ -27,7 +27,7 @@ public class EditEvent extends AbstractTargetedGuiseEvent
 	/**Source constructor.
 	The target will be set to be the same as the given source.
 	@param source The object on which the event initially occurred.
-	@exception NullPointerException if the given source is <code>null</code>.
+	@throws NullPointerException if the given source is <code>null</code>.
 	*/
 	public EditEvent(final Object source)
 	{
@@ -37,7 +37,7 @@ public class EditEvent extends AbstractTargetedGuiseEvent
 	/**Source and target constructor.
 	@param source The object on which the event initially occurred.
 	@param target The target of the event.
-	@exception NullPointerException if the given source and/or target is <code>null</code>.
+	@throws NullPointerException if the given source and/or target is <code>null</code>.
 	*/
 	public EditEvent(final Object source, final Object target)
 	{
@@ -47,7 +47,7 @@ public class EditEvent extends AbstractTargetedGuiseEvent
 	/**Copy constructor that specifies a different source.
 	@param source The object on which the event initially occurred.
 	@param editEvent The event the properties of which will be copied.
-	@exception NullPointerException if the given source and/or event is <code>null</code>.
+	@throws NullPointerException if the given source and/or event is <code>null</code>.
 	*/
 	public EditEvent(final Object source, final EditEvent editEvent)
 	{

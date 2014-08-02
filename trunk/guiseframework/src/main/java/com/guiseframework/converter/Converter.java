@@ -39,7 +39,7 @@ public interface Converter<V, L> extends PropertyBindable
 	/**Sets the text of the invalid value message.
 	This is a bound property.
 	@param newInvalidValueMessage The new text of the invalid value message, which may include a resource reference.
-	@exception NullPointerException if the given message is <code>null</code>.
+	@throws NullPointerException if the given message is <code>null</code>.
 	@see #INVALID_VALUE_MESSAGE_PROPERTY
 	*/
 	public void setInvalidValueMessage(final String newInvalidValueMessage);
@@ -50,14 +50,14 @@ public interface Converter<V, L> extends PropertyBindable
 	/**Converts a literal representation of a value from the lexical space into a value in the value space.
 	@param literal The literal value in the lexical space to convert.
 	@return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
-	@exception ConversionException if the literal value cannot be converted.
+	@throws ConversionException if the literal value cannot be converted.
 	*/ 
 	public V convertLiteral(final L literal) throws ConversionException;
 
 	/**Converts a value from the value space to a literal value in the lexical space.
 	@param value The value in the value space to convert.
 	@return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>.
-	@exception ConversionException if the value cannot be converted.
+	@throws ConversionException if the value cannot be converted.
 	*/ 
 	public L convertValue(final V value) throws ConversionException;
 

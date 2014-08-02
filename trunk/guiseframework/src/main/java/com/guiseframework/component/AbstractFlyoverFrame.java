@@ -68,8 +68,8 @@ public abstract class AbstractFlyoverFrame extends AbstractFrame implements Flyo
 		This is a bound property.
 		@param newTetherBearing The new bearing of the tether in relation to the frame.
 		@see FlyoverFrame#TETHER_BEARING_PROPERTY
-		@exception NullPointerException if the given bearing is <code>null</code>.
-		@exception IllegalArgumentException if the given bearing is greater than 360.
+		@throws NullPointerException if the given bearing is <code>null</code>.
+		@throws IllegalArgumentException if the given bearing is greater than 360.
 		*/
 		public void setTetherBearing(BigDecimal newTetherBearing)
 		{
@@ -122,7 +122,7 @@ public abstract class AbstractFlyoverFrame extends AbstractFrame implements Flyo
 		This is a bound property.
 		@param newTetherBearingCompassPoints The new set of compass points supported for tether bearing.
 		@see FlyoverFrame#TETHER_BEARING_COMPASS_POINTS_PROPERTY
-		@exception NullPointerException if the given set is <code>null</code>.
+		@throws NullPointerException if the given set is <code>null</code>.
 		*/
 		public void setTetherBearingCompassPoints(final Set<CompassPoint> newTetherBearingCompassPoints)
 		{

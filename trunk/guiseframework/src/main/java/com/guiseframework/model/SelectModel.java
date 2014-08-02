@@ -54,7 +54,7 @@ public interface SelectModel<V> extends ValueModel<V>, Collection<V>
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	This method delegates to the selection strategy.
 	@param values The values to select.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	*/
 	public void setSelectedValues(final V... values) throws PropertyVetoException;
 

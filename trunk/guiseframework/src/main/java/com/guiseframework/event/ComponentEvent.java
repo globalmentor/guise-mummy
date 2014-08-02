@@ -38,7 +38,7 @@ public class ComponentEvent extends AbstractTargetedGuiseEvent
 	The target will be set to be the same as the given source.
 	@param source The object on which the event initially occurred.
 	@param component The component affected by the event.
-	@exception NullPointerException if the given source and/or component is <code>null</code>.
+	@throws NullPointerException if the given source and/or component is <code>null</code>.
 	*/
 	public ComponentEvent(final Object source, final Component component)
 	{
@@ -49,7 +49,7 @@ public class ComponentEvent extends AbstractTargetedGuiseEvent
 	@param source The object on which the event initially occurred.
 	@param target The target of the event.
 	@param component The component affected by the event.
-	@exception NullPointerException if the given source, target, and/or component is <code>null</code>.
+	@throws NullPointerException if the given source, target, and/or component is <code>null</code>.
 	*/
 	public ComponentEvent(final Object source, final Object target, final Component component)
 	{
@@ -60,7 +60,7 @@ public class ComponentEvent extends AbstractTargetedGuiseEvent
 	/**Copy constructor that specifies a different source.
 	@param source The object on which the event initially occurred.
 	@param componentEvent The event the properties of which will be copied.
-	@exception NullPointerException if the given source and/or event is <code>null</code>.
+	@throws NullPointerException if the given source and/or event is <code>null</code>.
 	*/
 	public ComponentEvent(final Object source, final ComponentEvent componentEvent)
 	{

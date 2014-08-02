@@ -37,7 +37,7 @@ public abstract class AbstractArrayCompositeComponent extends AbstractMultipleCo
   /**Returns the component at the specified index in the array.
   @param index The index of the component to return.
 	@return The component at the specified position in this array.
-	@exception IndexOutOfBoundsException if the index is out of range.
+	@throws IndexOutOfBoundsException if the index is out of range.
 	*/
 	protected Component getComponent(final int index) {return componentArray[index];}
 		
@@ -47,7 +47,7 @@ public abstract class AbstractArrayCompositeComponent extends AbstractMultipleCo
   @param index The index of the component to set.
   @param newComponent The component to set at the given index.
   @return The component previously at the given index.
-	@exception IndexOutOfBoundsException if the index is out of range.
+	@throws IndexOutOfBoundsException if the index is out of range.
 	@see #addComponent(Component)
 	@see #removeComponent(Component)
 	*/
@@ -117,7 +117,7 @@ public abstract class AbstractArrayCompositeComponent extends AbstractMultipleCo
 	/**Info model and maximum component count constructor.
 	@param infoModel The component info model.
 	@param maxComponentCount The maximum number of child components to support.
-	@exception NullPointerException if the given info model is <code>null</code>.
+	@throws NullPointerException if the given info model is <code>null</code>.
 	*/
 	public AbstractArrayCompositeComponent(final InfoModel infoModel, final int maxComponentCount)	//TODO check the range of the maximum component count
 	{

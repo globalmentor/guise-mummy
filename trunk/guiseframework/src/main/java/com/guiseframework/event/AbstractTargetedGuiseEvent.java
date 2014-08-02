@@ -39,7 +39,7 @@ public class AbstractTargetedGuiseEvent extends AbstractGuiseEvent implements Ta
 	/**Source constructor.
 	The target will be set to be the same as the given source.
 	@param source The object on which the event initially occurred.
-	@exception NullPointerException if the given source is <code>null</code>.
+	@throws NullPointerException if the given source is <code>null</code>.
 	*/
 	public AbstractTargetedGuiseEvent(final Object source)
 	{
@@ -49,7 +49,7 @@ public class AbstractTargetedGuiseEvent extends AbstractGuiseEvent implements Ta
 	/**Source and target constructor.
 	@param source The object on which the event initially occurred.
 	@param target The target of the event.
-	@exception NullPointerException if the given source and/or target is <code>null</code>.
+	@throws NullPointerException if the given source and/or target is <code>null</code>.
 	*/
 	public AbstractTargetedGuiseEvent(final Object source, final Object target)
 	{

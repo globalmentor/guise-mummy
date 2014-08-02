@@ -72,8 +72,8 @@ public abstract class AbstractDepictContext extends BoundPropertyObject implemen
 	/**Guise session constructor.
 	@param session The Guise user session of which this context is a part.
 	@param destination The destination with which this context is associated.
-	@exception NullPointerException if the given session and/or destination is null.
-	@exception IOException If there was an I/O error loading a needed resource.
+	@throws NullPointerException if the given session and/or destination is null.
+	@throws IOException If there was an I/O error loading a needed resource.
 	*/
 	public AbstractDepictContext(final GuiseSession session, final Destination destination) throws IOException
 	{

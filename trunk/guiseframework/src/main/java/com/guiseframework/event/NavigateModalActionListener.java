@@ -28,8 +28,8 @@ public final class NavigateModalActionListener extends AbstractNavigateModalActi
 	/**Constructs a listener to navigate modally to the provided path.
 	@param navigationPath A path that is either relative to the application context path or is absolute.
 	@param modalListener The listener to respond to the end of modal interaction.
-	@exception NullPointerException if the given path and/or modal listener is <code>null</code>.
-	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #NavigateModalActionListener(URI, ModalNavigationListener)}</code> should be used instead).
+	@throws NullPointerException if the given path and/or modal listener is <code>null</code>.
+	@throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #NavigateModalActionListener(URI, ModalNavigationListener)}</code> should be used instead).
 	*/
 	public NavigateModalActionListener(final String navigationPath, final ModalNavigationListener modalListener)
 	{
@@ -39,7 +39,7 @@ public final class NavigateModalActionListener extends AbstractNavigateModalActi
 	/**Constructs a listener to navigate modally to the provided URI.
 	@param navigationURI The URI for navigation when the action occurs.
 	@param modalListener The listener to respond to the end of modal interaction.
-	@exception NullPointerException if the given navigation URI and/or modal listener is null.
+	@throws NullPointerException if the given navigation URI and/or modal listener is null.
 	*/
 	public NavigateModalActionListener(final URI navigationURI, final ModalNavigationListener modalListener)
 	{

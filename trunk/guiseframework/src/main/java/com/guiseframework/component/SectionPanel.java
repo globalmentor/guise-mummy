@@ -56,7 +56,7 @@ public class SectionPanel extends ArrangePanel implements SectionComponent
 	/**
 	 * Layout constructor with a default {@link SectionType#SECTION} section type.
 	 * @param layout The layout definition for the container.
-	 * @exception NullPointerException if the given layout is <code>null</code>.
+	 * @throws NullPointerException if the given layout is <code>null</code>.
 	 */
 	public SectionPanel(final Layout<?> layout)
 	{
@@ -76,7 +76,7 @@ public class SectionPanel extends ArrangePanel implements SectionComponent
 	 * Layout and section type constructor.
 	 * @param layout The layout definition for the container.
 	 * @param sectionType The type of section, or <code>null</code> if there is no specific type specified.
-	 * @exception NullPointerException if the given layout is <code>null</code>.
+	 * @throws NullPointerException if the given layout is <code>null</code>.
 	 */
 	public SectionPanel(final Layout<?> layout, final SectionType newSectionType)
 	{

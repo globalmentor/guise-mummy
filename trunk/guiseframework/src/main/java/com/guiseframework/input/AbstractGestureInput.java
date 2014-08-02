@@ -65,7 +65,7 @@ public abstract class AbstractGestureInput extends AbstractHashObject implements
 
 	/**Keys constructor.
 	@param keys The keys that were pressed when this input occurred.
-	@exception NullPointerException if the given keys is <code>null</code>.
+	@throws NullPointerException if the given keys is <code>null</code>.
 	*/
 	public AbstractGestureInput(final Key... keys)
 	{

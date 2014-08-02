@@ -35,7 +35,7 @@ public class KeystrokeInput extends AbstractGestureInput implements KeyboardInpu
 	/**Key and keys constructor.
 	@parma key The key that was pressed.
 	@param keys The keys that were pressed when this input occurred.
-	@exception NullPointerException if the given key and/or keys is <code>null</code>.
+	@throws NullPointerException if the given key and/or keys is <code>null</code>.
 	*/
 	public KeystrokeInput(final Key key, final Key... keys)
 	{

@@ -95,7 +95,7 @@ public class Toolbar extends AbstractPanel implements LabelDisplayableComponent
 	/**
 	 * Layout constructor.
 	 * @param layout The layout definition for the container.
-	 * @exception NullPointerException if the given layout is <code>null</code>.
+	 * @throws NullPointerException if the given layout is <code>null</code>.
 	 */
 	public Toolbar(final Layout<?> layout)
 	{
@@ -133,7 +133,7 @@ public class Toolbar extends AbstractPanel implements LabelDisplayableComponent
 	 * After creating a component, this version displays or hides the label as appropriate.
 	 * @param prototype The prototype of the component to create.
 	 * @return A new component based upon the given prototype.
-	 * @exception IllegalArgumentException if no component can be created from the given prototype
+	 * @throws IllegalArgumentException if no component can be created from the given prototype
 	 */
 	public Component createComponent(final Prototype prototype)
 	{

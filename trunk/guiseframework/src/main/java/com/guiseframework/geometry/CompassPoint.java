@@ -103,7 +103,7 @@ public enum CompassPoint
 	/**Determines the closes compass point to the given bearing.
 	@param bearing The bearing for which a compass point should be returned.
 	@return The compass point closest to the given bearing.
-	@exception IllegalArgumentException if the given bearing is greater than 360.
+	@throws IllegalArgumentException if the given bearing is greater than 360.
 	*/
 	public static CompassPoint getCompassPoint(final BigDecimal bearing)
 	{
@@ -117,8 +117,8 @@ public enum CompassPoint
 	@param latitudeCompassPoint The cardinal compass point of the latitude; either {@link CompassPoint#WEST} or {@link CompassPoint#EAST}.
 	@param longitudeCompassPoint The cardinal compass point of the longitude; either {@link CompassPoint#NORTH} or {@link CompassPoint#SOUTH}.
 	@return The ordinal compass position corresponding to 45 degrees between the given cardinal longitude and latitude compass points.
-	@exception NullPointerException if the given latitude and/or longitude compass point is <code>null</code>.
-	@exception IllegalArgumentException if the given latitude compass point is not {@link CompassPoint#WEST} or {@link CompassPoint#EAST};
+	@throws NullPointerException if the given latitude and/or longitude compass point is <code>null</code>.
+	@throws IllegalArgumentException if the given latitude compass point is not {@link CompassPoint#WEST} or {@link CompassPoint#EAST};
 		and/or if the given longitude compass point is not {@link CompassPoint#NORTH} or {@link CompassPoint#SOUTH}.
 	*/
 	public static CompassPoint getOrdinalCompassPoint(final CompassPoint latitudeCompassPoint, final CompassPoint longitudeCompassPoint)
@@ -153,7 +153,7 @@ public enum CompassPoint
 	/**Checks to ensure that the given bearing is valid.
 	@param bearing The bearing to check.
 	@return The valid bearing.
-	@exception IllegalArgumentException if the given bearing is greater than 360.
+	@throws IllegalArgumentException if the given bearing is greater than 360.
 	*/
 	public static BigDecimal checkBearing(final BigDecimal bearing)
 	{

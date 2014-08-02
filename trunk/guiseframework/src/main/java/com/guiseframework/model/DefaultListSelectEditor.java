@@ -39,7 +39,7 @@ public class DefaultListSelectEditor<V> extends AbstractListSelectEditor<V>
 	/**List select model and valued component constructor.
 	@param listSelectModel The list select model this prototype manipulates.
 	@param valuedComponentClass The class for the component allowing a list value to be edited.
-	@exception NullPointerException if the given list select model and/or value component class is <code>null</code>.
+	@throws NullPointerException if the given list select model and/or value component class is <code>null</code>.
 	*/
 	public DefaultListSelectEditor(final ListSelectModel<V> listSelectModel, final Class<? extends ValuedComponent<V>> valuedComponentClass)
 	{

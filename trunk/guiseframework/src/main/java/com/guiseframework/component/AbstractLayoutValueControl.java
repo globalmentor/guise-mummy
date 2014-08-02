@@ -41,7 +41,7 @@ public abstract class AbstractLayoutValueControl<V> extends AbstractLayoutContro
 	/**Layout and value model constructor.
 	@param layout The layout definition for the layout component.
 	@param valueModel The component value model.
-	@exception NullPointerException if the given layout and/or value model is <code>null</code>.
+	@throws NullPointerException if the given layout and/or value model is <code>null</code>.
 	*/
 	public AbstractLayoutValueControl(final Layout<?> layout, final ValueModel<V> valueModel)
 	{
@@ -110,7 +110,7 @@ public abstract class AbstractLayoutValueControl<V> extends AbstractLayoutContro
 	Validation always occurs if a validator is installed, even if the value is not changing.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param newValue The input value of the model.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see #getValidator()
 	@see #VALUE_PROPERTY
 	*/
@@ -144,7 +144,7 @@ public abstract class AbstractLayoutValueControl<V> extends AbstractLayoutContro
 	public boolean isValidValue() {return getValueModel().isValidValue();}
 
 	/**Validates the value of this model, throwing an exception if the model is not valid.
-	@exception ValidationException if the value of this model is not valid.	
+	@throws ValidationException if the value of this model is not valid.	
 	*/
 	public void validateValue() throws ValidationException {getValueModel().validateValue();}
 

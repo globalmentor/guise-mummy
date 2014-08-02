@@ -30,7 +30,7 @@ public class OpacityFadeEffect extends AbstractEffect
 
 	/**Delay constructor.
 	@param delay The delay in milliseconds.
-	@exception IllegalArgumentException if the given delay is negative.
+	@throws IllegalArgumentException if the given delay is negative.
 	*/
 	public OpacityFadeEffect(final int delay)
 	{

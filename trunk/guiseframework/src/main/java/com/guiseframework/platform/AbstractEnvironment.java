@@ -70,7 +70,7 @@ public class AbstractEnvironment implements Environment
 	@param <T> The type of property value expected.
 	@param name The name of the property to retrieve.
 	@return The property value.
-	@exception IllegalStateException if no such property exists.
+	@throws IllegalStateException if no such property exists.
 	*/
 	@SuppressWarnings("unchecked")	//cast needed so that Sun JDK 1.6.0_03-b05 will know which type we want; not required for Eclipse 3.4M3
 	public <T> T getRequiredProperty(final String name)
@@ -86,7 +86,7 @@ public class AbstractEnvironment implements Environment
 	/**Sets an environment property.
 	@param name The name of the property.
 	@param value The value to associate with the name.
-	@exception IllegalArgumentException if the given property cannot be set to the given value or cannot be changed.
+	@throws IllegalArgumentException if the given property cannot be set to the given value or cannot be changed.
 	*/
 	public void setProperty(final String name, final Object value)
 	{
@@ -95,7 +95,7 @@ public class AbstractEnvironment implements Environment
 
 	/**Sets multiple environment properties.
 	@param map The map of property names and values to set.
-	@exception IllegalArgumentException if the given property cannot be set to the given value or cannot be changed.
+	@throws IllegalArgumentException if the given property cannot be set to the given value or cannot be changed.
 	*/
 	public void setProperties(final Map<String, Object> map)
 	{
@@ -104,7 +104,7 @@ public class AbstractEnvironment implements Environment
 
 	/**Removes the property specified by the given name.
 	@param name The name of the property to remove.
-	@exception IllegalArgumentException if the given property cannot be removed.
+	@throws IllegalArgumentException if the given property cannot be removed.
 	*/
 	public void removeProperty(final String name)
 	{

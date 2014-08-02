@@ -45,7 +45,7 @@ public class HSLColor extends AbstractModeledColor<HSLColor.Component>
 	@param hue The hue component as an integer value in the range (0-359).
 	@param saturation The saturation component in the range (0.0-1.0).
 	@param lightness The lightness component in the range (0.0-1.0).
-	@exception IllegalArgumentException if the hue is outside the range (0-359), and/or if one of the other values is outside the range (0.0-1.0).
+	@throws IllegalArgumentException if the hue is outside the range (0-359), and/or if one of the other values is outside the range (0.0-1.0).
 	*/
 	public HSLColor(final int hue, final double saturation, final double lightness)
 	{
@@ -56,7 +56,7 @@ public class HSLColor extends AbstractModeledColor<HSLColor.Component>
 	@param hue The hue component.
 	@param saturation The saturation component.
 	@param lightness The lightness component.
-	@exception IllegalArgumentException if one of the values is outside the range (0.0-1.0).
+	@throws IllegalArgumentException if one of the values is outside the range (0.0-1.0).
 	*/
 	public HSLColor(final double hue, final double saturation, final double lightness)
 	{
@@ -169,8 +169,8 @@ public class HSLColor extends AbstractModeledColor<HSLColor.Component>
 	</ul>
 	@param charSequence The character sequence representation of an HSL color. 
 	@return An RGB color object representing the color represented by the given string.
-	@exception NullPointerException if the given string is <code>null</code>.
-	@exception IllegalArgumentException if a color cannot be determined from the given string. 
+	@throws NullPointerException if the given string is <code>null</code>.
+	@throws IllegalArgumentException if a color cannot be determined from the given string. 
 	*/
 	public static HSLColor valueOf(final CharSequence charSequence)
 	{

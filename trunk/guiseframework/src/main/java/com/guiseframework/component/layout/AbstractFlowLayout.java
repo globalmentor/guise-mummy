@@ -87,7 +87,7 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 		/**Sets the logical axis (line or page) along which information is flowed.
 		This is a bound property.
 		@param newFlow The logical axis along which information is flowed.
-		@exception NullPointerException if the given flow is <code>null</code>.
+		@throws NullPointerException if the given flow is <code>null</code>.
 		@see #FLOW_PROPERTY 
 		*/
 		public void setFlow(final Flow newFlow)
@@ -109,7 +109,7 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 		/**Sets the gap after flowed components.
 		This is a bound property.
 		@param newGapAfter The gap after flowed components.
-		@exception NullPointerException if the given gap is <code>null</code>.
+		@throws NullPointerException if the given gap is <code>null</code>.
 		@see #GAP_AFTER_PROPERTY 
 		*/
 		public void setGapAfter(final Extent newGapAfter)
@@ -131,7 +131,7 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 		/**Sets the gap before flowed components.
 		This is a bound property.
 		@param newGapBefore The gap before flowed components.
-		@exception NullPointerException if the given gap is <code>null</code>.
+		@throws NullPointerException if the given gap is <code>null</code>.
 		@see #GAP_BEFORE_PROPERTY 
 		*/
 		public void setGapBefore(final Extent newGapBefore)
@@ -153,7 +153,7 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 		/**Sets the gap between flowed components.
 		This is a bound property.
 		@param newGapBetween The gap between flowed components.
-		@exception NullPointerException if the given gap is <code>null</code>.
+		@throws NullPointerException if the given gap is <code>null</code>.
 		@see #GAP_BETWEEN_PROPERTY 
 		*/
 		public void setGapBetween(final Extent newGapBetween)
@@ -193,7 +193,7 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 	This is a convenience method that sets each of the gaps to the same value.
 	Each gap represents a bound property.
 	@param newGap The gap before, between, and after flowed components.
-	@exception NullPointerException if the given gap is <code>null</code>.
+	@throws NullPointerException if the given gap is <code>null</code>.
 	@see #GAP_BEFORE_PROPERTY 
 	@see #GAP_BETWEEN_PROPERTY 
 	@see #GAP_AFTER_PROPERTY 
@@ -208,7 +208,7 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 	/**Flow and wrap constructor.
 	@param flow The logical axis (line or page) along which information is flowed.
 	@param wrapped Whether flowed children should be wrapped when the flow extent is reached.
-	@exception NullPointerException if the flow axis is <code>null</code>.
+	@throws NullPointerException if the flow axis is <code>null</code>.
 	*/
 	public AbstractFlowLayout(final Flow flow, final boolean wrapped)
 	{

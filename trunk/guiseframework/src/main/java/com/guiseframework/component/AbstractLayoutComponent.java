@@ -36,9 +36,9 @@ public abstract class AbstractLayoutComponent extends AbstractListCompositeCompo
 	Any class that overrides this method must call this version.
 	@param index The index at which the component should be added.
 	@param childComponent The component to add to this component.
-	@exception IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
-	@exception IllegalStateException if the installed layout does not support default constraints.
-	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
+	@throws IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
+	@throws IllegalStateException if the installed layout does not support default constraints.
+	@throws IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
 	*/
 	protected void addComponent(final int index, final Component childComponent)
 	{
@@ -51,9 +51,9 @@ public abstract class AbstractLayoutComponent extends AbstractListCompositeCompo
 	@param component The component to add.
 	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
 	@return <code>true</code> if this container changed as a result of the operation.
-	@exception IllegalArgumentException if the component already has a parent.
-	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
-	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
+	@throws IllegalArgumentException if the component already has a parent.
+	@throws ClassCastException if the provided constraints are not appropriate for the installed layout.
+	@throws IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	*/
 /*TODO del if not needed
 	protected boolean add(final Component component, final Constraints constraints)
@@ -65,7 +65,7 @@ public abstract class AbstractLayoutComponent extends AbstractListCompositeCompo
 
 	/**Removes a component from the layout component.
 	@param childComponent The component to remove.
-	@exception IllegalArgumentException if the component does not recognize this composite component as its parent or the component is not a member of this composite component.
+	@throws IllegalArgumentException if the component does not recognize this composite component as its parent or the component is not a member of this composite component.
 	*/
 	protected void removeComponent(final Component childComponent)
 	{
@@ -88,7 +88,7 @@ public abstract class AbstractLayoutComponent extends AbstractListCompositeCompo
 		This is a bound property.
 		The layout is marked as not yet having a theme applied, as the specific theme rules applied to the layout may depend on the layout's owner.
 		@param newLayout The new layout definition for the container.
-		@exception NullPointerException if the given layout is <code>null</code>.
+		@throws NullPointerException if the given layout is <code>null</code>.
 		@see #LAYOUT_PROPERTY
 		@see #setPropertiesInitialized(boolean) 
 		*/
@@ -133,7 +133,7 @@ public abstract class AbstractLayoutComponent extends AbstractListCompositeCompo
 
 	/**Layout constructor with a default info model.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given layout is <code>null</code>.
+	@throws NullPointerException if the given layout is <code>null</code>.
 	*/
 	public AbstractLayoutComponent(final Layout<? extends Constraints> layout)
 	{
@@ -143,7 +143,7 @@ public abstract class AbstractLayoutComponent extends AbstractListCompositeCompo
 	/**Info model and layout constructor.
 	@param infoModel The component info model.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given info model and/or layout is <code>null</code>.
+	@throws NullPointerException if the given info model and/or layout is <code>null</code>.
 	*/
 	public AbstractLayoutComponent(final InfoModel infoModel, final Layout<? extends Constraints> layout)
 	{
@@ -174,7 +174,7 @@ public abstract class AbstractLayoutComponent extends AbstractListCompositeCompo
 	to assure that child theme updates have already occured before theme updates occur for this component.
 	There is normally no need to override this method or to call this method directly by applications.
 	This version checks to see if the theme needs to be applied to the given layout.
-	@exception IOException if there was an error loading or applying a theme.
+	@throws IOException if there was an error loading or applying a theme.
 	@see #isThemeApplied()
 	@see #isLayoutThemeApplied()
 	@see #applyTheme()
@@ -193,7 +193,7 @@ public abstract class AbstractLayoutComponent extends AbstractListCompositeCompo
 	This method may be overridden to effectively override theme settings by ensuring the state of important properties after the theme has been set. 
 	If the theme is successfully applied, this method updates the theme applied status.
 	This version applies the theme to the current layout and updates the layout theme applied status.
-	@exception IOException if there was an error loading or applying a theme.
+	@throws IOException if there was an error loading or applying a theme.
 	@see GuiseApplication#isThemed()
 	@see #getTheme()
 	@see #applyTheme(Theme)

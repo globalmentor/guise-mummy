@@ -68,8 +68,8 @@ public abstract class AbstractNumberStringLiteralConverter<V extends Number> ext
 	/**Style and currency constructor.
 	@param style The representation style.
 	@param currency The constant currency type to use, or <code>null</code> if currency representation is not requested or the currency should be dynamically determined by the locale.
-	@exception NullPointerException if the given style is <code>null</code>.
-	@exception IllegalArgumentException if a currency is provided for a style other than {@link Style#CURRENCY}.
+	@throws NullPointerException if the given style is <code>null</code>.
+	@throws IllegalArgumentException if a currency is provided for a style other than {@link Style#CURRENCY}.
 	*/
 	public AbstractNumberStringLiteralConverter(final Style style, final Currency currency)
 	{
@@ -133,7 +133,7 @@ public abstract class AbstractNumberStringLiteralConverter<V extends Number> ext
 	This implementation synchronizes on the {@link NumberFormat} instance. 
 	@param value The value in the value space to convert.
 	@return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>.
-	@exception ConversionException if the value cannot be converted.
+	@throws ConversionException if the value cannot be converted.
 	@see #getNumberFormat()
 	*/ 
 	public String convertValue(final V value) throws ConversionException
@@ -157,7 +157,7 @@ public abstract class AbstractNumberStringLiteralConverter<V extends Number> ext
 	This implementation adds any appropriate symbols, such as a percent sign or currency symbol, if needed.
 	@param literal The literal value in the lexical space to convert.
 	@return A number representing the converted value in the value space in either <code>Long</code> or <code>Double</code> form, or <code>null</code> if the given literal is <code>null</code> or the empty string.
-	@exception ConversionException if the literal value cannot be converted.
+	@throws ConversionException if the literal value cannot be converted.
 	*/ 
 	protected Number parseNumber(String literal) throws ConversionException
 	{

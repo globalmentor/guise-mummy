@@ -32,7 +32,7 @@ public class EditComponentLabelControl extends AbstractEditComponentTextControl<
 
 	/**Flow constructor with a default label component and text edit control.
 	@param flow The logical axis (line or page) along which information is flowed.
-	@exception NullPointerException if the flow axis is <code>null</code>.
+	@throws NullPointerException if the flow axis is <code>null</code>.
 	*/
 	public EditComponentLabelControl(final Flow flow)
 	{
@@ -41,7 +41,7 @@ public class EditComponentLabelControl extends AbstractEditComponentTextControl<
 
 	/**Label component constructor with default text edit control and {@link Flow#LINE} flow.
 	@param labelComponent The component the label of which is to be edited.
-	@exception NullPointerException if the label component is <code>null</code>.
+	@throws NullPointerException if the label component is <code>null</code>.
 	*/
 	public EditComponentLabelControl(final Component labelComponent)
 	{
@@ -51,7 +51,7 @@ public class EditComponentLabelControl extends AbstractEditComponentTextControl<
 	/**Label component and flow constructor with default text edit control.
 	@param labelComponent The component the label of which is to be edited.
 	@param flow The logical axis (line or page) along which information is flowed.
-	@exception NullPointerException if the label component and/or flow is <code>null</code>.
+	@throws NullPointerException if the label component and/or flow is <code>null</code>.
 	*/
 	public EditComponentLabelControl(final Component labelComponent, final Flow flow)
 	{
@@ -61,7 +61,7 @@ public class EditComponentLabelControl extends AbstractEditComponentTextControl<
 	/**Label component and value control constructor with default {@link Flow#LINE} flow.
 	@param labelComponent The component the label of which is to be edited.
 	@param editControl The control used to edit the label.
-	@exception NullPointerException if the label component and/or edit control is <code>null</code>.
+	@throws NullPointerException if the label component and/or edit control is <code>null</code>.
 	*/
 	public EditComponentLabelControl(final Component labelComponent, final ValueControl<String> editControl)
 	{
@@ -72,7 +72,7 @@ public class EditComponentLabelControl extends AbstractEditComponentTextControl<
 	@param labelComponent The component the label of which is to be edited.
 	@param editControl The control used to edit the label.
 	@param flow The logical axis (line or page) along which information is flowed.
-	@exception NullPointerException if the label component, value control, and/or flow axis is <code>null</code>.
+	@throws NullPointerException if the label component, value control, and/or flow axis is <code>null</code>.
 	*/
 	public EditComponentLabelControl(final Component labelComponent, final ValueControl<String> editControl, final Flow flow)
 	{

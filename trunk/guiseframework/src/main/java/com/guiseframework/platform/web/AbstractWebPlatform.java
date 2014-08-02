@@ -62,7 +62,7 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 
 		/**Sets the polling interval in milliseconds.
 		@param newPollInterval The polling interval in milliseconds.
-		@exception IllegalArgumentException if the given polling interval is less than zero.
+		@throws IllegalArgumentException if the given polling interval is less than zero.
 		*/
 		@SuppressWarnings("unchecked")
 		public void setPollInterval(final int newPollInterval)
@@ -80,8 +80,8 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 		@param depictedObject The depicted object requesting a polling interval.
 		@param pollInterval The polling interval in milliseconds.
 		@return <code>true</code> if the polling interval changed as a result of this request.
-		@exception NullPointerException if the given depicted object is <code>null</code>.
-		@exception IllegalArgumentException if the value is less than zero.
+		@throws NullPointerException if the given depicted object is <code>null</code>.
+		@throws IllegalArgumentException if the value is less than zero.
 		@see #discontinuePollInterval(DepictedObject)
 		@see #getPollInterval()
 		@see #setPollInterval()
@@ -106,7 +106,7 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 		The actual polling interval will be updated if the relinquished poll interval is less than or equal to the current poll interval.
 		@param depictedObject The depicted object that is relinquishing a polling interval.
 		@return <code>true</code> if the polling interval changed as a result of this relinquishment.
-		@exception NullPointerException if the given depicted object is <code>null</code>.
+		@throws NullPointerException if the given depicted object is <code>null</code>.
 		@see #requestPollInterval(DepictedObject, int)
 		@see #getPollInterval()
 		@see #setPollInterval()
@@ -137,7 +137,7 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 	/**Application.
 	This version copies the current application environment to a new environment for this platform.
 	@param application The Guise application running on this platform.
-	@exception NullPointerException if the given application is <code>null</code>.
+	@throws NullPointerException if the given application is <code>null</code>.
 	*/
 	public AbstractWebPlatform(final GuiseApplication application)
 	{
@@ -160,8 +160,8 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 	@param depictIDString The platform-specific form of the depict ID.
 	@param depictID The depict ID to be converted to a platform ID.
 	@return The depict ID the platform-specific form represents.
-	@exception NullPointerException if the given string is <code>null</code>.
-	@exception IllegalArgumentException if the given string does not represent the correct string form of a depict ID on this platform.
+	@throws NullPointerException if the given string is <code>null</code>.
+	@throws IllegalArgumentException if the given string does not represent the correct string form of a depict ID on this platform.
 	*/
 	public long getDepictID(final String depictIDString)
 	{

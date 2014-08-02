@@ -54,7 +54,7 @@ public abstract class AbstractValueControl<V> extends AbstractControl implements
 	@param infoModel The component info model.
 	@param valueModel The component value model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given info model, value model, and/or enableable object is <code>null</code>.
+	@throws NullPointerException if the given info model, value model, and/or enableable object is <code>null</code>.
 	*/
 	public AbstractValueControl(final InfoModel infoModel, final ValueModel<V> valueModel, final Enableable enableable)
 	{
@@ -131,7 +131,7 @@ public abstract class AbstractValueControl<V> extends AbstractControl implements
 	Validation always occurs if a validator is installed, even if the value is not changing.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param newValue The new value.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see #getValidator()
 	@see #VALUE_PROPERTY
 	*/
@@ -165,7 +165,7 @@ public abstract class AbstractValueControl<V> extends AbstractControl implements
 	public boolean isValidValue() {return getValueModel().isValidValue();}
 
 	/**Validates the value of this model, throwing an exception if the model is not valid.
-	@exception ValidationException if the value of this model is not valid.	
+	@throws ValidationException if the value of this model is not valid.	
 	*/
 	public void validateValue() throws ValidationException {getValueModel().validateValue();}
 

@@ -36,7 +36,7 @@ public abstract class AbstractKeyboardEvent extends AbstractFocusedGestureInputE
 	@param source The object on which the event initially occurred.
 	@parma key The key that was pressed.
 	@param keys The keys that were pressed when this event was generated.
-	@exception NullPointerException if the given source, key, and/or keys is <code>null</code>.
+	@throws NullPointerException if the given source, key, and/or keys is <code>null</code>.
 	*/
 	public AbstractKeyboardEvent(final Object source, final Key key, final Key... keys)
 	{

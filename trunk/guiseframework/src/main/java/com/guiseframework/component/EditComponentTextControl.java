@@ -32,7 +32,7 @@ public class EditComponentTextControl extends AbstractEditComponentTextControl<T
 
 	/**Flow constructor with a default text component and text edit control.
 	@param flow The logical axis (line or page) along which information is flowed.
-	@exception NullPointerException if the flow axis is <code>null</code>.
+	@throws NullPointerException if the flow axis is <code>null</code>.
 	*/
 	public EditComponentTextControl(final Flow flow)
 	{
@@ -41,7 +41,7 @@ public class EditComponentTextControl extends AbstractEditComponentTextControl<T
 
 	/**Text component constructor with default text edit control and {@link Flow#LINE} flow.
 	@param textComponent The component the text of which is to be edited.
-	@exception NullPointerException if the text component is <code>null</code>.
+	@throws NullPointerException if the text component is <code>null</code>.
 	*/
 	public EditComponentTextControl(final TextBox textComponent)
 	{
@@ -51,7 +51,7 @@ public class EditComponentTextControl extends AbstractEditComponentTextControl<T
 	/**Text component and flow constructor with default text edit control.
 	@param textComponent The component the text of which is to be edited.
 	@param flow The logical axis (line or page) along which information is flowed.
-	@exception NullPointerException if the text component and/or flow is <code>null</code>.
+	@throws NullPointerException if the text component and/or flow is <code>null</code>.
 	*/
 	public EditComponentTextControl(final TextBox textComponent, final Flow flow)
 	{
@@ -61,7 +61,7 @@ public class EditComponentTextControl extends AbstractEditComponentTextControl<T
 	/**Text component and value control constructor with default {@link Flow#LINE} flow.
 	@param textComponent The component the text of which is to be edited.
 	@param editControl The control used to edit the text.
-	@exception NullPointerException if the text component and/or edit control is <code>null</code>.
+	@throws NullPointerException if the text component and/or edit control is <code>null</code>.
 	*/
 	public EditComponentTextControl(final TextBox textComponent, final ValueControl<String> editControl)
 	{
@@ -72,7 +72,7 @@ public class EditComponentTextControl extends AbstractEditComponentTextControl<T
 	@param textComponent The component the text of which is to be edited.
 	@param editControl The control used to edit the text.
 	@param flow The logical axis (line or page) along which information is flowed.
-	@exception NullPointerException if the text component, value control, and/or flow axis is <code>null</code>.
+	@throws NullPointerException if the text component, value control, and/or flow axis is <code>null</code>.
 	*/
 	public EditComponentTextControl(final TextBox textComponent, final ValueControl<String> editControl, final Flow flow)
 	{

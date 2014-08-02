@@ -77,7 +77,7 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 		A copy will be made of the date before it is stored.
 		This is a bound property.
 		@param newDate The date this calendar is to represent.
-		@exception NullPointerException if the given date is <code>null</code>.
+		@throws NullPointerException if the given date is <code>null</code>.
 		@see #DATE_PROPERTY
 		*/
 		public void setDate(final Date newDate)
@@ -101,7 +101,7 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 		Note that this property is experimental, and may eventually be replaced with a style specification in the table component rather than the table model.
 		This is a bound property.
 		@param newColumnLabelStyle The style of the column label.
-		@exception NullPointerException if the given label style is <code>null</code>.
+		@throws NullPointerException if the given label style is <code>null</code>.
 		@see #COLUMN_LABEL_DATE_STYLE_PROPERTY
 		*/
 		public void setColumnLabelDateStyle(final DateStringLiteralStyle newColumnLabelStyle)
@@ -167,7 +167,7 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 
 	/**Date constructor.
 	@param date The date this calendar is to represent.
-	@exception NullPointerException if the given date is <code>null</code>.
+	@throws NullPointerException if the given date is <code>null</code>.
 	*/
 	public CalendarMonthTableModel(final Date date)	//TODO decide if we want to allow a calendar with another locale to be set, because right now we change calendars automatically
 	{
@@ -193,8 +193,8 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 	@param rowIndex The zero-based row index.
 	@param column The column for which a value should be returned.
 	@return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
-	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	@throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@throws IllegalArgumentException if the given column is not one of this table's columns.
 	*/
 	public <C> C getCellValue(final int rowIndex, final TableColumnModel<C> column)
 	{
@@ -214,8 +214,8 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 	@param rowIndex The zero-based row index.
 	@param column The column for which a value should be returned.
 	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	@throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@throws IllegalArgumentException if the given column is not one of this table's columns.
 	*/
 	public <C> void setCellValue(final int rowIndex, final TableColumnModel<C> column, final C newCellValue)
 	{
@@ -254,7 +254,7 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 
 		/**Day-of-week constructor.
 		@param index The physical index of the day of the week relative to the first day of the week.
-		@exception IllegalArgumentException if the given index is less than zero, or greater than or equal to the number of days in a week.
+		@throws IllegalArgumentException if the given index is less than zero, or greater than or equal to the number of days in a week.
 		*/
 		public WeekDayTableColumnModel(final int index)
 		{

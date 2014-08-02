@@ -43,8 +43,8 @@ public interface ResourceReadDestination extends Destination
 	@param bookmark The bookmark for which navigation should occur at this navigation path, or <code>null</code> if there is no bookmark involved in navigation.
 	@param referrerURI The URI of the referring component or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 	@return A description of the resource.
-	@exception NullPointerException if the given navigation path is <code>null</code>.
-	@exception ResourceIOException if there is an error retrieving the resource description.
+	@throws NullPointerException if the given navigation path is <code>null</code>.
+	@throws ResourceIOException if there is an error retrieving the resource description.
 	*/
 	public URFResource getResourceDescription(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException;
 
@@ -54,8 +54,8 @@ public interface ResourceReadDestination extends Destination
 	@param bookmark The bookmark for which navigation should occur at this navigation path, or <code>null</code> if there is no bookmark involved in navigation.
 	@param referrerURI The URI of the referring component or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 	@return An input stream to the given resource.
-	@exception NullPointerException if the given navigation path is <code>null</code>.
-	@exception ResourceIOException Thrown if there is an error accessing the resource, such as a missing file.
+	@throws NullPointerException if the given navigation path is <code>null</code>.
+	@throws ResourceIOException Thrown if there is an error accessing the resource, such as a missing file.
 	*/
 	public InputStream getInputStream(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException;
 

@@ -37,7 +37,7 @@ public class MessageOptionDialogFrame extends NotificationOptionDialogFrame	//TO
 	/**Options constructor with no message.
 	Duplicate options are ignored.
 	@param options The available options.
-	@exception NullPointerException if the given options is <code>null</code>.
+	@throws NullPointerException if the given options is <code>null</code>.
 	*/
 	public MessageOptionDialogFrame(final Notification.Option... options)
 	{
@@ -48,7 +48,7 @@ public class MessageOptionDialogFrame extends NotificationOptionDialogFrame	//TO
 	Duplicate options are ignored.
 	@param message The message to display in the frame, or <code>null</code> if no message should be displayed.
 	@param options The available options.
-	@exception NullPointerException if the given options is <code>null</code>.
+	@throws NullPointerException if the given options is <code>null</code>.
 	*/
 	public MessageOptionDialogFrame(final String message, final Notification.Option... options)
 	{
@@ -61,8 +61,8 @@ public class MessageOptionDialogFrame extends NotificationOptionDialogFrame	//TO
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param messageModel The model of the message to display in the frame.
 	@param options The available options.
-	@exception NullPointerException if the given session, message model, and/or options is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@throws NullPointerException if the given session, message model, and/or options is <code>null</code>.
+	@throws IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
 /*TODO fix or del
 	public MessageOptionDialogFrame(final GuiseSession session, final String id, final MessageModel messageModel, final Option... options)
@@ -75,7 +75,7 @@ public class MessageOptionDialogFrame extends NotificationOptionDialogFrame	//TO
 	Duplicate options are ignored.
 	@param messageComponent The message component to display in the frame.
 	@param options The available options.
-	@exception NullPointerException if the given message component, and/or options is <code>null</code>.
+	@throws NullPointerException if the given message component, and/or options is <code>null</code>.
 	*/
 	public MessageOptionDialogFrame(final Message messageComponent, final Notification.Option... options)
 	{

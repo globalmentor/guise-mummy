@@ -47,7 +47,7 @@ public class WebFileInputDepictor<C extends ResourceImportControl> extends Abstr
 
 	/**Processes an event from the platform.
 	@param event The event to be processed.
-	@exception IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
+	@throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
 	*/
 	public void processEvent(final PlatformEvent event)
 	{
@@ -78,7 +78,7 @@ public class WebFileInputDepictor<C extends ResourceImportControl> extends Abstr
 	}
 
 	/**Begins the rendering process.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictBegin() throws IOException
 	{

@@ -218,7 +218,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 
 	/**Info model constructor.
 	@param infoModel The component info model.
-	@exception NullPointerException if the given info model is <code>null</code>.
+	@throws NullPointerException if the given info model is <code>null</code>.
 	*/
 	public AbstractCompositeComponent(final InfoModel infoModel)
 	{
@@ -335,7 +335,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	to assure that child theme updates have already occured before theme updates occur for this component.
 	There is normally no need to override this method or to call this method directly by applications.
 	This version recursively calls the {@link #updateTheme()} method of all child components before updating the theme of this component.
-	@exception IOException if there was an error loading or applying a theme.
+	@throws IOException if there was an error loading or applying a theme.
 	@see #isThemeApplied()
 	@see #applyTheme()
 	*/
@@ -352,7 +352,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	Any preferences returned from {@link #getPreferenceProperties()} will be loaded automatically.
 	This version loads the preferences of child components if descendants should be included.
 	@param includeDescendants <code>true</code> if preferences of any descendant components should also be loaded, else <code>false</code>.
-	@exception IOException if there is an error loading preferences.
+	@throws IOException if there is an error loading preferences.
 	*/
 	public void loadPreferences(final boolean includeDescendants) throws IOException
 	{
@@ -370,7 +370,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	Any preferences returned from {@link #getPreferenceProperties()} will be saved automatically.
 	This version loads the preferences of child components if descendants should be included.
 	@param includeDescendants <code>true</code> if preferences of any descendant components should also be saved, else <code>false</code>.
-	@exception IOException if there is an error saving preferences.
+	@throws IOException if there is an error saving preferences.
 	*/
 	public void savePreferences(final boolean includeDescendants) throws IOException
 	{
@@ -392,7 +392,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	Once the event is consumed, no further processing takes place.
 	This version dispatches the event to child component(s) depending on whether the event is focused, targeted, or neither, and then performs default processing.
 	@param inputEvent The input event to dispatch.
-	@exception NullPointerException if the given event is <code>null</code>.
+	@throws NullPointerException if the given event is <code>null</code>.
 	@see TargetedEvent
 	@see FocusedInputEvent
 	@see #dispatchInputEvent(InputEvent, Component)
@@ -466,7 +466,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	If the given target is not a descendant of this component, or if the target is this component, no action occurs.
 	@param inputEvent The input event to dispatch.
 	@param target The target indicating the child hierarchy to which this event should be directed.
-	@exception NullPointerException if the given event and/or target is <code>null</code>.
+	@throws NullPointerException if the given event and/or target is <code>null</code>.
 	@see #fireInputEvent(InputEvent)
 	@see InputEvent#isConsumed()
 	@see TargetedEvent

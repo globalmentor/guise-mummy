@@ -128,8 +128,8 @@ public class AbstractProxyPrototype<P extends Prototype & InfoModel> extends Abs
 	/**Sets the content type of the label text.
 	This is a bound property.
 	@param newLabelTextContentType The new label text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
+	@throws NullPointerException if the given content type is <code>null</code>.
+	@throws IllegalArgumentException if the given content type is not a text content type.
 	@see #LABEL_CONTENT_TYPE_PROPERTY
 	*/
 	public void setLabelContentType(final ContentType newLabelTextContentType) {getProxiedPrototype().setLabelContentType(newLabelTextContentType);}
@@ -150,8 +150,8 @@ public class AbstractProxyPrototype<P extends Prototype & InfoModel> extends Abs
 	/**Sets the content type of the description text.
 	This is a bound property.
 	@param newDescriptionContentType The new description text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
+	@throws NullPointerException if the given content type is <code>null</code>.
+	@throws IllegalArgumentException if the given content type is not a text content type.
 	@see #DESCRIPTION_CONTENT_TYPE_PROPERTY
 	*/
 	public void setDescriptionContentType(final ContentType newDescriptionContentType) {getProxiedPrototype().setDescriptionContentType(newDescriptionContentType);}
@@ -172,15 +172,15 @@ public class AbstractProxyPrototype<P extends Prototype & InfoModel> extends Abs
 	/**Sets the content type of the advisory information text.
 	This is a bound property.
 	@param newInfoContentType The new advisory information text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
+	@throws NullPointerException if the given content type is <code>null</code>.
+	@throws IllegalArgumentException if the given content type is not a text content type.
 	@see #INFO_CONTENT_TYPE_PROPERTY
 	*/
 	public void setInfoContentType(final ContentType newInfoContentType) {getProxiedPrototype().setInfoContentType(newInfoContentType);}
 
 	/**Proxied prototype constructor.
 	@param proxiedPrototype The prototype proxied by this prototype.
-	@exception NullPointerException if the given proxied prototype is <code>null</code> is <code>null</code>.
+	@throws NullPointerException if the given proxied prototype is <code>null</code> is <code>null</code>.
 	*/
 	public AbstractProxyPrototype(final P proxiedPrototype)
 	{

@@ -40,7 +40,7 @@ public abstract class AbstractComparableRangeValidator<V extends Comparable<V>> 
 	This version checks for minimum and maximum compliance, and delegates to {@link #isValidStep(Number, Number, Number)} for checking step compliance.
 	Child classes will normally not override this class and instead merely implement {@link #isValidStep(Number, Number, Number)}.
 	@param value The value to validate, which may be <code>null</code>.
-	@exception ValidationException if the provided value is not valid.
+	@throws ValidationException if the provided value is not valid.
 	*/
 	public void validate(final V value) throws ValidationException
 	{

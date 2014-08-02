@@ -65,8 +65,8 @@ public class ComponentDestination extends AbstractDestination
 	/**Path and component constructor with no style specified.
 	@param path The application context-relative path within the Guise container context, which does not begin with '/'.
 	@param componentClass The class of the component to represent this destination.
-	@exception NullPointerException if the path and/or the component class is <code>null</code>.
-	@exception IllegalArgumentException if the provided path is absolute.
+	@throws NullPointerException if the path and/or the component class is <code>null</code>.
+	@throws IllegalArgumentException if the provided path is absolute.
 	*/
 	public ComponentDestination(final URIPath path, final Class<? extends Component> componentClass)
 	{
@@ -77,8 +77,8 @@ public class ComponentDestination extends AbstractDestination
 	@param path The application context-relative path within the Guise container context, which does not begin with '/'.
 	@param componentClass The class of the component to represent this destination.
 	@param style The style of this destination, or <code>null</code> if no destination-specific style is specified.
-	@exception NullPointerException if the path and/or the component class is <code>null</code>.
-	@exception IllegalArgumentException if the provided path is absolute.
+	@throws NullPointerException if the path and/or the component class is <code>null</code>.
+	@throws IllegalArgumentException if the provided path is absolute.
 	*/
 	public ComponentDestination(final URIPath path, final Class<? extends Component> componentClass, final URI style)
 	{
@@ -90,7 +90,7 @@ public class ComponentDestination extends AbstractDestination
 	/**Path pattern and component constructor with no style specified.
 	@param pathPattern The pattern to match an application context-relative path within the Guise container context, which does not begin with '/'.
 	@param componentClass The class of the component to represent this destination.
-	@exception NullPointerException if the path pattern and/or the component class is <code>null</code>.
+	@throws NullPointerException if the path pattern and/or the component class is <code>null</code>.
 	*/
 	public ComponentDestination(final Pattern pathPattern, final Class<? extends Component> componentClass)
 	{
@@ -101,8 +101,8 @@ public class ComponentDestination extends AbstractDestination
 	@param pathPattern The pattern to match an application context-relative path within the Guise container context, which does not begin with '/'.
 	@param componentClass The class of the component to represent this destination.
 	@param style The style of this destination, or <code>null</code> if no destination-specific style is specified.
-	@exception NullPointerException if the path pattern and/or the component class is <code>null</code>.
-	@exception IllegalArgumentException if the provided path is absolute.
+	@throws NullPointerException if the path pattern and/or the component class is <code>null</code>.
+	@throws IllegalArgumentException if the provided path is absolute.
 	*/
 	public ComponentDestination(final Pattern pathPattern, final Class<? extends Component> componentClass, final URI style)
 	{

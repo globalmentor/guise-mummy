@@ -39,7 +39,7 @@ public interface InputFocusGroupComponent extends InputFocusableComponent
 	/**Sets the input focus strategy.
 	This is a bound property
 	@param newInputFocusStrategy The input focus strategy for this group.
-	@exception NullPointerException if the given input focus strategy is <code>null</code>.
+	@throws NullPointerException if the given input focus strategy is <code>null</code>.
 	@see #INPUT_FOCUS_STRATEGY_PROPERTY
 	*/
 	public void setInputFocusStrategy(final InputFocusStrategy newInputFocusStrategy);
@@ -53,7 +53,7 @@ public interface InputFocusGroupComponent extends InputFocusableComponent
 	/**Sets the focused component within this input focus group.
 	This is a bound property.
 	@param newInputFocusedComponent The component to receive the input focus.
-	@exception PropertyVetoException if the given component is not a focusable component within this input focus group, the component cannot receive the input focus, or the input focus change has otherwise been vetoed.
+	@throws PropertyVetoException if the given component is not a focusable component within this input focus group, the component cannot receive the input focus, or the input focus change has otherwise been vetoed.
 	@see #getInputFocusStrategy()
 	@see #INPUT_FOCUSED_COMPONENT_PROPERTY
 	*/

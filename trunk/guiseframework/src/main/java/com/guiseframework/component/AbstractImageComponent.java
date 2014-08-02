@@ -71,7 +71,7 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 	/**Info model and image model constructor.
 	@param infoModel The component info model.
 	@param imageModel The component image model.
-	@exception NullPointerException if the given info model and/or iamge model is <code>null</code>.
+	@throws NullPointerException if the given info model and/or iamge model is <code>null</code>.
 	*/
 	public AbstractImageComponent(final InfoModel infoModel, final ImageModel imageModel)
 	{
@@ -91,7 +91,7 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 	{
 		/**Source constructor.
 		@param source The source of the transferable data.
-		@exception NullPointerException if the provided source is <code>null</code>.
+		@throws NullPointerException if the provided source is <code>null</code>.
 		*/
 		public DefaultTransferable(final ImageComponent source)
 		{
@@ -107,7 +107,7 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 		/**Transfers data using the given content type.
 		@param contentType The type of data expected.
 		@return The transferred data, which may be <code>null</code>.
-		@exception IllegalArgumentException if the given content type is not supported.
+		@throws IllegalArgumentException if the given content type is not supported.
 		*/
 		public Object transfer(final ContentType contentType)
 		{

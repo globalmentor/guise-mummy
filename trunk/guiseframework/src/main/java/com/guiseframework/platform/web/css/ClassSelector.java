@@ -33,7 +33,7 @@ public class ClassSelector implements SimpleSelector, Comparable<ClassSelector>
 
 	/**Class name constructor.
 	@param className The name of the class to be selected.
-	@exception NullPointerException if the given class name is <code>null</code>.
+	@throws NullPointerException if the given class name is <code>null</code>.
 	*/
 	public ClassSelector(final String className)
 	{

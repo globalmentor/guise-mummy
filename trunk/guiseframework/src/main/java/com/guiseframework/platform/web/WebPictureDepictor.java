@@ -59,7 +59,7 @@ public class WebPictureDepictor<C extends Picture> extends AbstractWebComponentD
 
 	/**Begins the rendering process.
 	This version wraps the component in a decorator element.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictBegin() throws IOException
 	{
@@ -91,7 +91,7 @@ public class WebPictureDepictor<C extends Picture> extends AbstractWebComponentD
 
 	/**Ends the rendering process.
 	This version renders the caption, if any, and closes the decorator elements.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictEnd() throws IOException
 	{

@@ -41,7 +41,7 @@ public class WebHeadingLinkDepictor<C extends ActionControl> extends WebLinkDepi
 
 	/**Begins the rendering process.
 	This version starts the inner heading element.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	@see WebHeadingDepictor#getHeadingLocalName(int)
 	*/
 	protected void depictBegin() throws IOException
@@ -54,7 +54,7 @@ public class WebHeadingLinkDepictor<C extends ActionControl> extends WebLinkDepi
 
 	/**Ends the depiction process.
 	This version ends the inner heading element.
-	@exception IOException if there is an error updating the depiction.
+	@throws IOException if there is an error updating the depiction.
 	@see WebHeadingDepictor#getHeadingLocalName(int)
 	*/
 	protected void depictEnd() throws IOException

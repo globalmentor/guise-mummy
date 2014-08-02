@@ -34,7 +34,7 @@ public class LayoutPanel extends AbstractPanel
 
 	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given layout is <code>null</code>.
+	@throws NullPointerException if the given layout is <code>null</code>.
 	*/
 	public LayoutPanel(final Layout<?> layout)
 	{

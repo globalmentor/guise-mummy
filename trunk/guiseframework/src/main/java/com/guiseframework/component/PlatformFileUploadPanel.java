@@ -69,9 +69,9 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 		/**Sets the destination base URI of the upload.
 		This is a bound property.
 		@param newDestinationURI The collection URI representing the base destination of the platform files, either absolute or relative to the application.
-		@exception NullPointerException if the given URI is <code>null</code>.
-		@exception IllegalArgumentException if the provided URI is not a collection URI.
-		@exception IllegalArgumentException if the provided URI specifies a query and/or fragment.
+		@throws NullPointerException if the given URI is <code>null</code>.
+		@throws IllegalArgumentException if the provided URI is not a collection URI.
+		@throws IllegalArgumentException if the provided URI specifies a query and/or fragment.
 		@see #DESTINATION_URI_PROPERTY
 		*/
 		public void setDestinationURI(final URI newDestinationURI)
@@ -174,9 +174,9 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 
 	/**Destination URI constructor.
 	@param destinationBaseURI The collection URI representing the base destination of the platform files, either absolute or relative to the application.
-	@exception NullPointerException if the given list of platform files and/or destination URI is <code>null</code>.
-	@exception IllegalArgumentException if the provided URI is not a collection URI.
-	@exception IllegalArgumentException if the provided URI specifies a query and/or fragment.
+	@throws NullPointerException if the given list of platform files and/or destination URI is <code>null</code>.
+	@throws IllegalArgumentException if the provided URI is not a collection URI.
+	@throws IllegalArgumentException if the provided URI specifies a query and/or fragment.
 	*/
 	public PlatformFileUploadPanel(final URI destinationURI)
 	{
@@ -186,9 +186,9 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 	/**Destination URI and destination bookmark constructor.
 	@param destinationBaseURI The collection URI representing the base destination of the platform files, either absolute or relative to the application.
 	@param destinationBookmark The bookmark to be used in sending resources to the destination URI, or <code>null</code> if there is no bookmark specified.
-	@exception NullPointerException if the given list of platform files and/or destination URI is <code>null</code>.
-	@exception IllegalArgumentException if the provided URI is not a collection URI.
-	@exception IllegalArgumentException if the provided URI specifies a query and/or fragment.
+	@throws NullPointerException if the given list of platform files and/or destination URI is <code>null</code>.
+	@throws IllegalArgumentException if the provided URI is not a collection URI.
+	@throws IllegalArgumentException if the provided URI specifies a query and/or fragment.
 	*/
 	public PlatformFileUploadPanel(final URI destinationURI, final Bookmark destinationBookmark)
 	{
@@ -317,7 +317,7 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 	@param state The new transfer state, or <code>null</code> if there is no state.
 	@param progress The current number of bytes transferred, or <code>null</code> if the bytes transferred is not known.
 	@param completion The total number of bytes to transfer, or <code>null</code> if the total is not known.
-	@exception NullPointerException if the given platform file is <code>null</code>.
+	@throws NullPointerException if the given platform file is <code>null</code>.
 	*/
 	protected void updatePlatformFileStatusLabel(final PlatformFile platformFile, final TaskState state, final Long progress, final Long completion)
 	{

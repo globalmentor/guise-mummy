@@ -49,8 +49,8 @@ public interface TableModel extends Model	//TODO maybe specify row count to be a
 	@param <C> The type of cell value.
 	@param cell The cell containing the row index and column information.
 	@return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
-	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	@throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@throws IllegalArgumentException if the given column is not one of this table's columns.
 	*/
 	public <C> C getCellValue(final Cell<C> cell);
 
@@ -59,8 +59,8 @@ public interface TableModel extends Model	//TODO maybe specify row count to be a
 	@param rowIndex The zero-based row index.
 	@param column The column for which a value should be returned.
 	@return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
-	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	@throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@throws IllegalArgumentException if the given column is not one of this table's columns.
 	*/
 	public <C> C getCellValue(final int rowIndex, final TableColumnModel<C> column);
 
@@ -69,8 +69,8 @@ public interface TableModel extends Model	//TODO maybe specify row count to be a
 	@param <C> The type of cell value.
 	@param cell The cell containing the row index and column information.
 	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	@throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@throws IllegalArgumentException if the given column is not one of this table's columns.
 	*/
 	public <C> void setCellValue(final Cell<C> cell, final C newCellValue);
 
@@ -79,8 +79,8 @@ public interface TableModel extends Model	//TODO maybe specify row count to be a
 	@param rowIndex The zero-based row index.
 	@param column The column for which a value should be returned.
 	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	@throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@throws IllegalArgumentException if the given column is not one of this table's columns.
 	*/
 	public <C> void setCellValue(final int rowIndex, final TableColumnModel<C> column, final C newCellValue);
 
@@ -107,7 +107,7 @@ public interface TableModel extends Model	//TODO maybe specify row count to be a
 		/**Row and column constructor
 		@param rowIndex The zero-based cell row index.
 		@param column The cell column.
-		@exception NullPointerException if the given column is null.
+		@throws NullPointerException if the given column is null.
 		*/
 		public Cell(final int rowIndex, final TableColumnModel<C> column)
 		{

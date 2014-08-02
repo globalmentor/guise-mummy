@@ -39,7 +39,7 @@ public class RDFPropertyTableColumnModel<V extends RDFObject> extends DefaultTab
 	/**Value class constructor.
 	@param valueClass The class indicating the type of values held in the model.
 	@param propertyURI The URI of the RDF property this column represents.
-	@exception NullPointerException if the given value class and/or property URI is <code>null</code>.
+	@throws NullPointerException if the given value class and/or property URI is <code>null</code>.
 	*/
 	public RDFPropertyTableColumnModel(final Class<V> valueClass, final URI propertyURI)
 	{
@@ -50,7 +50,7 @@ public class RDFPropertyTableColumnModel<V extends RDFObject> extends DefaultTab
 	@param valueClass The class indicating the type of values held in the model.
 	@param propertyURI The URI of the RDF property this column represents.
 	@param labelText The text of the label.
-	@exception NullPointerException if the given value class and/or property URI is <code>null</code>.
+	@throws NullPointerException if the given value class and/or property URI is <code>null</code>.
 	*/
 	public RDFPropertyTableColumnModel(final Class<V> valueClass, final URI propertyURI, final String labelText)
 	{

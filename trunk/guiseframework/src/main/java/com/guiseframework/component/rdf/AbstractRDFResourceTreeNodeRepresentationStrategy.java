@@ -59,7 +59,7 @@ public abstract class AbstractRDFResourceTreeNodeRepresentationStrategy<V extend
 
 	/**RDF XMLifier constructor.
 	@param rdfXMLifier The RDF XMLifier to use for creating labels.
-	@exception NullPointerException if the given RDF XMLifier is <code>null</code>.
+	@throws NullPointerException if the given RDF XMLifier is <code>null</code>.
 	*/
 	public AbstractRDFResourceTreeNodeRepresentationStrategy(final RDFXMLGenerator rdfXMLifier)
 	{

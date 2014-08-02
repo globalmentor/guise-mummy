@@ -62,8 +62,8 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 	@param servletContext The servlet context with which this container is associated.
 	@param baseURI The base URI of the container, an absolute URI that ends with the base path, which ends with a slash ('/'), indicating the base path of the application base paths.
 	@return The Guise container associated with the given servlet context.
-	@exception NullPointerException if the servlet context and/or base URI is <code>null</code>.
-	@exception IllegalArgumentException if the base URI is not absolute or does not end with a slash ('/') character.
+	@throws NullPointerException if the servlet context and/or base URI is <code>null</code>.
+	@throws IllegalArgumentException if the base URI is not absolute or does not end with a slash ('/') character.
 	*/
 	public static HTTPServletGuiseContainer getGuiseContainer(final ServletContext servletContext, final URI baseURI)
 	{
@@ -88,8 +88,8 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 	/**Servlet contains and container base URI constructor.
 	@param baseURI The base URI of the container, an absolute URI that ends with the base path, which ends with a slash ('/'), indicating the base path of the application base paths.
 	@param servletContext The servlet context with which this container is associated.
-	@exception NullPointerException if the base URI and/or servlet context is <code>null</code>.
-	@exception IllegalArgumentException if the base URI is not absolute or does not end with a slash ('/') character.
+	@throws NullPointerException if the base URI and/or servlet context is <code>null</code>.
+	@throws IllegalArgumentException if the base URI is not absolute or does not end with a slash ('/') character.
 	*/
 	public HTTPServletGuiseContainer(final URI baseURI, final ServletContext servletContext)
 	{
@@ -103,11 +103,11 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 	@param homeDirectory The home directory of the application.
 	@param logDirectory The log directory of the application.
 	@param tempDirectory The temporary directory of the application.
-	@exception NullPointerException if the application, base URI, home directory, log directory, and/or temprary directory is <code>null</code>.
-	@exception IllegalArgumentException if the given base URI is not absolute or the path of which is not absolute or not a collection.
-	@exception IllegalStateException if the application is already installed in some container.
-	@exception IllegalStateException if there is already an application installed in this container at the given context path.
-	@exception IOException if there is an I/O error when installing the application.
+	@throws NullPointerException if the application, base URI, home directory, log directory, and/or temprary directory is <code>null</code>.
+	@throws IllegalArgumentException if the given base URI is not absolute or the path of which is not absolute or not a collection.
+	@throws IllegalStateException if the application is already installed in some container.
+	@throws IllegalStateException if there is already an application installed in this container at the given context path.
+	@throws IOException if there is an I/O error when installing the application.
 	*/
 	@Override
 	protected void installApplication(final AbstractGuiseApplication application, final URI baseURI, final File homeDirectory, final File logDirectory, final File tempDirectory) throws IOException
@@ -117,8 +117,8 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 
 	/**Uninstalls the given application.
 	This version is provided to expose the method to the servlet.
-	@exception NullPointerException if the application is <code>null</code>.
-	@exception IllegalStateException if the application is not installed in this container.
+	@throws NullPointerException if the application is <code>null</code>.
+	@throws IllegalStateException if the application is not installed in this container.
 	*/
 	protected void uninstallApplication(final AbstractGuiseApplication application)
 	{
@@ -307,8 +307,8 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 	The provided path is first normalized.
 	@param resourcePath A container-relative path to a resource in the resource storage area.
 	@return <code>true</code> if a resource exists at the given resource path.
-	@exception IllegalArgumentException if the given resource path is absolute.
-	@exception IllegalArgumentException if the given path is not a valid path.
+	@throws IllegalArgumentException if the given resource path is absolute.
+	@throws IllegalArgumentException if the given path is not a valid path.
 	*/
 	protected boolean hasResource(final String resourcePath)
 	{
@@ -326,7 +326,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 	The provided path is first normalized.
 	@param resourcePath A container-relative path to a resource in the resource storage area.
 	@return An input stream to the resource at the given resource path, or <code>null</code> if no resource exists at the given resource path.
-	@exception IllegalArgumentException if the given resource path is absolute.
+	@throws IllegalArgumentException if the given resource path is absolute.
 	*/
 	protected InputStream getResourceInputStream(final String resourcePath)
 	{
@@ -338,8 +338,8 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 	This version loads local resources directly through the servlet context.
 	@param uri A URI to the entity; either absolute or relative to the container.
 	@return An input stream to the entity at the given resource URI, or <code>null</code> if no entity exists at the given resource path.
-	@exception NullPointerException if the given URI is <code>null</code>.
-	@exception IOException if there was an error connecting to the entity at the given URI.
+	@throws NullPointerException if the given URI is <code>null</code>.
+	@throws IOException if there was an error connecting to the entity at the given URI.
 	@see #getBaseURI()
 	*/
 	public InputStream getInputStream(final URI uri) throws IOException
@@ -366,7 +366,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 	The provided path is first normalized.
 	@param containerRelativeResourcePath A container-relative path to a resource in the resource storage area.
 	@return The absolute path to the resource relative to the servlet context.
-	@exception IllegalArgumentException if the given resource path is absolute.
+	@throws IllegalArgumentException if the given resource path is absolute.
 	*/
 	protected String getContextAbsoluteResourcePath(final String containerRelativeResourcePath)
 	{

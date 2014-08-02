@@ -87,7 +87,7 @@ public abstract class DynamicTreeNodeModel<V> extends DefaultTreeNodeModel<V>	//
 
 	/**Constructs a tree node model indicating the type of value it can hold.
 	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public DynamicTreeNodeModel(final Class<V> valueClass)
 	{
@@ -97,7 +97,7 @@ public abstract class DynamicTreeNodeModel<V> extends DefaultTreeNodeModel<V>	//
 	/**Constructs a tree node model indicating the type of value it can hold, along with an initial value.
 	@param valueClass The class indicating the type of value held in the model.
 	@param initialValue The initial value, which will not be validated.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public DynamicTreeNodeModel(final Class<V> valueClass, final V initialValue)
 	{

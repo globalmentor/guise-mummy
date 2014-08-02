@@ -104,8 +104,8 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 		/**Sets the content type of the label text.
 		This is a bound property.
 		@param newLabelTextContentType The new label text content type.
-		@exception NullPointerException if the given content type is <code>null</code>.
-		@exception IllegalArgumentException if the given content type is not a text content type.
+		@throws NullPointerException if the given content type is <code>null</code>.
+		@throws IllegalArgumentException if the given content type is not a text content type.
 		@see #LABEL_CONTENT_TYPE_PROPERTY
 		*/
 		public void setLabelContentType(final ContentType newLabelTextContentType)
@@ -153,8 +153,8 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 		/**Sets the content type of the description text.
 		This is a bound property.
 		@param newDescriptionContentType The new description text content type.
-		@exception NullPointerException if the given content type is <code>null</code>.
-		@exception IllegalArgumentException if the given content type is not a text content type.
+		@throws NullPointerException if the given content type is <code>null</code>.
+		@throws IllegalArgumentException if the given content type is not a text content type.
 		@see #DESCRIPTION_CONTENT_TYPE_PROPERTY
 		*/
 		public void setDescriptionContentType(final ContentType newDescriptionContentType)
@@ -202,8 +202,8 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 		/**Sets the content type of the advisory information text.
 		This is a bound property.
 		@param newInfoContentType The new advisory information text content type.
-		@exception NullPointerException if the given content type is <code>null</code>.
-		@exception IllegalArgumentException if the given content type is not a text content type.
+		@throws NullPointerException if the given content type is <code>null</code>.
+		@throws IllegalArgumentException if the given content type is not a text content type.
 		@see #INFO_CONTENT_TYPE_PROPERTY
 		*/
 		public void setInfoContentType(final ContentType newInfoContentType)
@@ -223,7 +223,7 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 
 	/**Value class constructor with a <code>null</code> default value.
 	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public ValuePrototype(final Class<V> valueClass)
 	{
@@ -233,7 +233,7 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	/**Value class and default value constructor.
 	@param valueClass The class indicating the type of value held in the model.
 	@param defaultValue The default value, which will not be validated.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public ValuePrototype(final Class<V> valueClass, final V defaultValue)
 	{
@@ -243,7 +243,7 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	/**Value class and label constructor with a <code>null</code> default value.
 	@param valueClass The class indicating the type of value held in the model.
 	@param label The text of the label, or <code>null</code> if there should be no label.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public ValuePrototype(final Class<V> valueClass, final String label)
 	{
@@ -254,7 +254,7 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	@param valueClass The class indicating the type of value held in the model.
 	@param defaultValue The default value, which will not be validated.
 	@param label The text of the label, or <code>null</code> if there should be no label.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public ValuePrototype(final Class<V> valueClass, final V defaultValue, final String label)
 	{
@@ -265,7 +265,7 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	@param valueClass The class indicating the type of value held in the model.
 	@param label The text of the label, or <code>null</code> if there should be no label.
 	@param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public ValuePrototype(final Class<V> valueClass, final String label, final URI icon)
 	{
@@ -277,7 +277,7 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	@param defaultValue The default value, which will not be validated.
 	@param label The text of the label, or <code>null</code> if there should be no label.
 	@param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public ValuePrototype(final Class<V> valueClass, final V defaultValue, final String label, final URI icon)
 	{

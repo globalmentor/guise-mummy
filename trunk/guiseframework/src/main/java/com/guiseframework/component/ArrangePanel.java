@@ -37,7 +37,7 @@ public class ArrangePanel extends LayoutPanel implements ArrangeContainer
 
 	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given layout is <code>null</code>.
+	@throws NullPointerException if the given layout is <code>null</code>.
 	*/
 	public ArrangePanel(final Layout<?> layout)
 	{

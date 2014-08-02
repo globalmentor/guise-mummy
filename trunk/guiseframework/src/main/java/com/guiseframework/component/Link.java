@@ -45,7 +45,7 @@ public class Link extends AbstractLinkControl
 
 	/**Info model constructor.
 	@param infoModel The component info model.
-	@exception NullPointerException if the given info model is <code>null</code>.
+	@throws NullPointerException if the given info model is <code>null</code>.
 	*/
 	public Link(final InfoModel infoModel)
 	{
@@ -56,7 +56,7 @@ public class Link extends AbstractLinkControl
 	@param infoModel The component info model.
 	@param actionModel The component action model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
+	@throws NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
 	*/
 	public Link(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable)
 	{
@@ -67,7 +67,7 @@ public class Link extends AbstractLinkControl
 	A {@link NavigateActionListener} will be installed to navigate to the provided navigation path.
 	@param label The label to use in the link, or <code>null</code> if there should be no label.
 	@param navigationPath The destination path that will be used for navigation when the link is selected.
-	@exception NullPointerException if the given navigation path is <code>null</code>.
+	@throws NullPointerException if the given navigation path is <code>null</code>.
 	*/
 	public Link(final String label, final URIPath navigationPath)
 	{
@@ -79,7 +79,7 @@ public class Link extends AbstractLinkControl
 	A {@link NavigateActionListener} will be installed to navigate to the provided navigation URI.
 	@param label The label to use in the link, or <code>null</code> if there should be no label.
 	@param navigationURI The destination URI that will be used for navigation when the link is selected.
-	@exception NullPointerException if the given navigation URI is <code>null</code>.
+	@throws NullPointerException if the given navigation URI is <code>null</code>.
 	*/
 	public Link(final String label, final URI navigationURI)
 	{
@@ -89,7 +89,7 @@ public class Link extends AbstractLinkControl
 
 	/**Prototype constructor.
 	@param actionPrototype The prototype on which this component should be based.
-	@exception NullPointerException if the given prototype is <code>null</code>.
+	@throws NullPointerException if the given prototype is <code>null</code>.
 	*/
 	public Link(final ActionPrototype actionPrototype)
 	{

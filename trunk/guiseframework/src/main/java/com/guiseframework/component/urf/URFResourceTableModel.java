@@ -54,9 +54,9 @@ public class URFResourceTableModel extends AbstractListSelectTableModel<URFResou
 	@param rowIndex The zero-based row index of the value.
 	@param column The column for which a value should be returned.
 	@return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
-	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	@exception IllegalArgumentException if the given column is not one of this table's columns.
-	@exception ClassCastException if the given column is not a {@link URFPropertyTableColumnModel} or one of the other column types supported by this class.
+	@throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@throws IllegalArgumentException if the given column is not one of this table's columns.
+	@throws ClassCastException if the given column is not a {@link URFPropertyTableColumnModel} or one of the other column types supported by this class.
 	*/
 	protected <C> C getCellValue(final URFResource resource, final int rowIndex, final TableColumnModel<C> column)
 	{
@@ -89,9 +89,9 @@ public class URFResourceTableModel extends AbstractListSelectTableModel<URFResou
 	@param rowIndex The zero-based row index of the value.
 	@param column The column for which a value should be returned.
 	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	@exception IllegalArgumentException if the given column is not one of this table's columns.
-	@exception ClassCastException if the given column is not a {@link URFPropertyTableColumnModel} or one of the other column types supported by this class or the new cell value is not an {@link URFResource}.
+	@throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@throws IllegalArgumentException if the given column is not one of this table's columns.
+	@throws ClassCastException if the given column is not a {@link URFPropertyTableColumnModel} or one of the other column types supported by this class or the new cell value is not an {@link URFResource}.
 	*/
 	protected <C> void setCellValue(final URFResource resource, final int rowIndex, final TableColumnModel<C> column, final C newCellValue)
 	{

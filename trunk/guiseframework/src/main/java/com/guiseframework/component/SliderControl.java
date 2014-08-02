@@ -63,7 +63,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 		/**Sets the flow of the slider.
 		This is a bound property
 		@param newFlow The flow along which the slider is oriented.
-		@exception NullPointerException if the given flow is <code>null</code>.
+		@throws NullPointerException if the given flow is <code>null</code>.
 		@see #FLOW_PROPERTY
 		*/
 		public void setFlow(final Flow newFlow)
@@ -85,7 +85,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 		/**Sets the converter.
 		This is a bound property
 		@param newConverter The converter for this component.
-		@exception NullPointerException if the given converter is <code>null</code>.
+		@throws NullPointerException if the given converter is <code>null</code>.
 		@see #CONVERTER_PROPERTY
 		*/
 		public void setConverter(final Converter<V, String> newConverter)
@@ -152,7 +152,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 		The thumb image of each axis represents a bound property.
 		@param axis The axis for which the thumb image should be set.
 		@param newThumbImage The thumb image.
-		@exception NullPointerException if the given axis and/or thumb image is <code>null</code>. 
+		@throws NullPointerException if the given axis and/or thumb image is <code>null</code>. 
 		@see #THUMB_X_IMAGE_PROPERTY
 		@see #THUMB_Y_IMAGE_PROPERTY
 		*/
@@ -170,7 +170,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 		/**Sets the thumb image for the X axis.
 		This is a bound property.
 		@param newThumbImage The thumb image.
-		@exception NullPointerException if the given thumb image is <code>null</code>.
+		@throws NullPointerException if the given thumb image is <code>null</code>.
 		@see #THUMB_X_IMAGE_PROPERTY
 		*/
 		public void setThumbXImage(final URI newThumbImage) {setThumbImage(Axis.X, newThumbImage);}
@@ -178,7 +178,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 		/**Sets the thumb image for the Y axis.
 		This is a bound property.
 		@param newThumbImage The thumb image.
-		@exception NullPointerException if the given thumb image is <code>null</code>.
+		@throws NullPointerException if the given thumb image is <code>null</code>.
 		@see #THUMB_Y_IMAGE_PROPERTY
 		*/
 		public void setThumbYImage(final URI newThumbImage) {setThumbImage(Axis.Y, newThumbImage);}
@@ -216,7 +216,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 		The track image of each axis represents a bound property.
 		@param axis The axis for which the track image should be set.
 		@param newTrackImage The track image.
-		@exception NullPointerException if the given axis and/or track image is <code>null</code>. 
+		@throws NullPointerException if the given axis and/or track image is <code>null</code>. 
 		@see #TRACK_X_IMAGE_PROPERTY
 		@see #TRACK_Y_IMAGE_PROPERTY
 		*/
@@ -234,7 +234,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 		/**Sets the track image for the X axis.
 		This is a bound property.
 		@param newTrackImage The track image.
-		@exception NullPointerException if the given track image is <code>null</code>.
+		@throws NullPointerException if the given track image is <code>null</code>.
 		@see #TRACK_X_IMAGE_PROPERTY
 		*/
 		public void setTrackXImage(final URI newTrackImage) {setTrackImage(Axis.X, newTrackImage);}
@@ -242,7 +242,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 		/**Sets the track image for the Y axis.
 		This is a bound property.
 		@param newTrackImage The track image.
-		@exception NullPointerException if the given track image is <code>null</code>.
+		@throws NullPointerException if the given track image is <code>null</code>.
 		@see #TRACK_Y_IMAGE_PROPERTY
 		*/
 		public void setTrackYImage(final URI newTrackImage) {setTrackImage(Axis.Y, newTrackImage);}
@@ -271,7 +271,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 	/**Value class and flow constructor with a default data model to represent a given type and a default converter.
 	@param valueClass The class indicating the type of value held in the model.
 	@param flow The flow along which the slider is oriented.
-	@exception NullPointerException if the value class and/or flow is <code>null</code>.
+	@throws NullPointerException if the value class and/or flow is <code>null</code>.
 	*/
 	public SliderControl(final Class<V> valueClass, final Flow flow)
 	{
@@ -282,7 +282,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 	@param valueClass The class indicating the type of value held in the model.
 	@param converter The string literal value converter for this component.
 	@param flow The flow along which the slider is oriented.
-	@exception NullPointerException if the given value class, converter, and/or flow is <code>null</code>.
+	@throws NullPointerException if the given value class, converter, and/or flow is <code>null</code>.
 	*/
 	public SliderControl(final Class<V> valueClass, final Converter<V, String> converter, final Flow flow)
 	{
@@ -292,8 +292,8 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 	/**Value model and flow constructor with a default converter.
 	@param valueModel The component value model.
 	@param flow The flow along which the slider is oriented.
-	@exception NullPointerException if the given value model and/or flow is <code>null</code>.
-	@exception IllegalArgumentException if no default converter is available for the given model's value class.
+	@throws NullPointerException if the given value model and/or flow is <code>null</code>.
+	@throws IllegalArgumentException if no default converter is available for the given model's value class.
 	*/
 	public SliderControl(final ValueModel<V> valueModel, final Flow flow)
 	{
@@ -304,7 +304,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 	@param valueModel The component value model.
 	@param converter The string literal value converter for this component.
 	@param flow The flow along which the slider is oriented.
-	@exception NullPointerException if the given value model, converter, and/or flow is <code>null</code>.
+	@throws NullPointerException if the given value model, converter, and/or flow is <code>null</code>.
 	*/
 	public SliderControl(final ValueModel<V> valueModel, final Converter<V, String> converter, final Flow flow)
 	{
@@ -322,7 +322,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 	/**Prototype and flow constructor.
 	@param valuePrototype The prototype on which this component should be based.
 	@param flow The flow along which the slider is oriented.
-	@exception NullPointerException if the given prototype and/or flow is <code>null</code>.
+	@throws NullPointerException if the given prototype and/or flow is <code>null</code>.
 	*/
 	public SliderControl(final ValuePrototype<V> valuePrototype, final Flow flow)
 	{

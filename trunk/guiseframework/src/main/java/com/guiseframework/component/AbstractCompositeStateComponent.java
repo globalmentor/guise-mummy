@@ -58,7 +58,7 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 	If no component yet exists for the given object, one will be created.
 	@param object The object for which a representation component should be returned.
 	@return The state of the child component to represent the given object.
-	@exception IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
+	@throws IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
 	@see #getComponentState(Object)
 	@see #createComponentState(Object)
 	@see #putComponentState(Object, com.guiseframework.component.AbstractCompositeStateComponent.ComponentState)
@@ -133,7 +133,7 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 	If no component yet exists for the given object, one will be created.
 	@param object The object for which a representation component should be returned.
 	@return The child component representing the given object.
-	@exception IllegalArgumentException if the given object is not an appropriate object for a component to be created.
+	@throws IllegalArgumentException if the given object is not an appropriate object for a component to be created.
 	*/
 	protected Component getComponent(final T object)
 	{
@@ -144,8 +144,8 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 	@param component The child component representing an object.
 	@param object The object for which a representation component should be returned.
 	@return The object the child component represents.
-	@exception NullPointerException if the given component is <code>null</code>.
-	@exception IllegalArgumentException if the given component does not represent any object.
+	@throws NullPointerException if the given component is <code>null</code>.
+	@throws IllegalArgumentException if the given component does not represent any object.
 	*/
 	protected T getObject(final Component component)
 	{
@@ -165,7 +165,7 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 
 	/**Info model constructor.
 	@param infoModel The component info model.
-	@exception NullPointerException if the given info model is <code>null</code>.
+	@throws NullPointerException if the given info model is <code>null</code>.
 	*/
 	public AbstractCompositeStateComponent(final InfoModel infoModel)
 	{
@@ -175,7 +175,7 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 	/**Creates a component state to represent the given object.
 	@param object The object with which the component state is to be associated.
 	@return The component state to represent the given object.
-	@exception IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
+	@throws IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
 	*/
 	protected abstract S createComponentState(final T object);
 
@@ -192,7 +192,7 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 
 		/**Constructor
 		@param component The representation component.
-		@exception NullPointerException if the given component is <code>null</code>.
+		@throws NullPointerException if the given component is <code>null</code>.
 		*/
 		public ComponentState(final Component component)
 		{

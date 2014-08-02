@@ -131,7 +131,7 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 		/**Sets the connected cards.
 		This is a bound property.
 		@param newCards The new cards to be connected.
-		@exception NullPointerException if the given cards is <code>null</code>.
+		@throws NullPointerException if the given cards is <code>null</code>.
 		@see #CARDS_PROPERTY
 		*/
 		public void setCards(final List<Component> newCards)
@@ -248,7 +248,7 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 	If no card is connected or the card has no parent card control, no action occurs.
 	If a selectable card is already selected, no action occurs.
 	This method calls {@link #isCardSelectable(Component)} and {@link #selectCard(CardControl, Component)}.
-	@exception PropertyVetoException if the appropriate card could not be selected.
+	@throws PropertyVetoException if the appropriate card could not be selected.
 	*/
 	protected void selectCard() throws PropertyVetoException
 	{
@@ -318,7 +318,7 @@ if(!cards.contains(selectedCard))
 	/**Selects the specified card.
 	@param The card control to use in selected the card.
 	@param card The card to select.
-	@exception PropertyVetoException if the provided card could not be selected.
+	@throws PropertyVetoException if the provided card could not be selected.
 	*/
 	protected void selectCard(final CardControl cardControl, final Component card) throws PropertyVetoException
 	{

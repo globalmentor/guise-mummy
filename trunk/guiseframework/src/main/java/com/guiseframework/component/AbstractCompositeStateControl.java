@@ -134,7 +134,7 @@ public abstract class AbstractCompositeStateControl<T, S extends AbstractComposi
 	/**Info model and enableable object constructor.
 	@param infoModel The component info model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given info model and/or enableable object is <code>null</code>.
+	@throws NullPointerException if the given info model and/or enableable object is <code>null</code>.
 	*/
 	public AbstractCompositeStateControl(final InfoModel infoModel, final Enableable enableable)
 	{

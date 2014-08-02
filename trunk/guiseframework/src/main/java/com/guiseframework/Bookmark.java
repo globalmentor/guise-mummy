@@ -43,7 +43,7 @@ public class Bookmark implements Cloneable
 	/**Returns the value associated with the first parameter of the given name.
 	@param parameterName The name of the parameter.
 	@return The value of the first parameter with the given name, or <code>null</code> if there is no parameter with the given name.
-	@exception NullPointerException if the given name is <code>null</code>.
+	@throws NullPointerException if the given name is <code>null</code>.
 	*/
 	public String getParameterValue(final String parameterName)
 	{
@@ -56,8 +56,8 @@ public class Bookmark implements Cloneable
 	The parameter names and values should be percent-encoded as required for URIs.
 	If there are parameters with duplicate names, only the first ones are used and the rest with the same name are ignored.
 	@param bookmark A string representation of the bookmark, beginning with '?'.
-	@exception NullPointerException if the given bookmark string is <code>null</code>.
-	@exception ArgumentSyntaxException if the bookmark does not begin with '?' or otherwise is not in the correct format.
+	@throws NullPointerException if the given bookmark string is <code>null</code>.
+	@throws ArgumentSyntaxException if the bookmark does not begin with '?' or otherwise is not in the correct format.
 	*/
 	public Bookmark(final CharSequence bookmark) throws ArgumentSyntaxException
 	{
@@ -79,7 +79,7 @@ public class Bookmark implements Cloneable
 	/**Parameter list constructor.
 	If there are parameters with duplicate names, only the first ones are used and the rest with the same name are ignored.
 	@param parameters The bookmark parameters.
-	@exception NullPointerException if the given parameters list is <code>null</code>.
+	@throws NullPointerException if the given parameters list is <code>null</code>.
 	*/
 	public Bookmark(final List<Parameter> parameters)
 	{
@@ -89,7 +89,7 @@ public class Bookmark implements Cloneable
 	/**Parameter array constructor.
 	If there are parameters with duplicate names, only the first ones are used and the rest with the same name are ignored.
 	@param parameters The optional bookmark parameters.
-	@exception NullPointerException if the given parameters array is <code>null</code>.
+	@throws NullPointerException if the given parameters array is <code>null</code>.
 	*/
 	public Bookmark(final Parameter... parameters)
 	{
@@ -135,7 +135,7 @@ public class Bookmark implements Cloneable
 	If this bookmark already contains a parameter with the given value, this bookmark will be returned.
 	@param name The parameter name.
 	@param value The parameter value.
-	@exception NullPointerException if the given name and/or value is <code>null</code>.
+	@throws NullPointerException if the given name and/or value is <code>null</code>.
 	*/
 	public Bookmark setParameter(final String name, final String value)
 	{
@@ -152,7 +152,7 @@ public class Bookmark implements Cloneable
 	/**Creates a new bookmark with the given parameter removed.
 	If this bookmark does not contains the given parameter, this bookmark will be returned.
 	@param name The parameter name.
-	@exception NullPointerException if the given name is <code>null</code>.
+	@throws NullPointerException if the given name is <code>null</code>.
 	*/
 	public Bookmark removeParameter(final String name)
 	{
@@ -234,7 +234,7 @@ public class Bookmark implements Cloneable
 		/**Constructor specifying the name and value.
 		@param name The parameter name.
 		@param value The parameter value.
-		@exception NullPointerException if the given name and/or value is <code>null</code>.
+		@throws NullPointerException if the given name and/or value is <code>null</code>.
 		*/
 		public Parameter(final String name, final String value)
 		{

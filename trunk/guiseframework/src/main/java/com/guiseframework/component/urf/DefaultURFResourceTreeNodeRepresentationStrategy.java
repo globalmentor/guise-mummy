@@ -32,7 +32,7 @@ public class DefaultURFResourceTreeNodeRepresentationStrategy extends AbstractUR
 
 	/**RDF XMLifier constructor.
 	@param namespaceLabelManager The manager responsible for generating namespace labels..
-	@exception NullPointerException if the given label manager is <code>null</code>.
+	@throws NullPointerException if the given label manager is <code>null</code>.
 	*/
 	public DefaultURFResourceTreeNodeRepresentationStrategy(final TURFNamespaceLabelManager namespaceLabelManager)
 	{

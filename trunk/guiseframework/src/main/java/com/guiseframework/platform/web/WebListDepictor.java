@@ -47,7 +47,7 @@ public class WebListDepictor<C extends CompositeComponent> extends AbstractSimpl
 	}
 
 	/**Updates the views of any children.
-	@exception IOException if there is an error updating the child views.
+	@throws IOException if there is an error updating the child views.
 	*/
 	protected void depictChildren() throws IOException
 	{

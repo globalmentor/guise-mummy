@@ -59,7 +59,7 @@ public abstract class AbstractMenuToolCompositeComponentPrototypeProvisionStrate
 	/**Parent component and prototype providers constructor.
 	@param parentComponent The composite component the top-level prototype provider children of which will be monitored.
 	@param defaultPrototypeProviders The default prototype providers that will provide prototypes for processing, outside the children of the composite component parent.
-	@exception NullPointerException if the given parent component, prototype providers, and/or one or more prototype provider is <code>null</code>.
+	@throws NullPointerException if the given parent component, prototype providers, and/or one or more prototype provider is <code>null</code>.
 	*/
 	public AbstractMenuToolCompositeComponentPrototypeProvisionStrategy(final CompositeComponent parentComponent, final PrototypeProvider... defaultPrototypeProviders)
 	{
@@ -194,7 +194,7 @@ public abstract class AbstractMenuToolCompositeComponentPrototypeProvisionStrate
 	@param prototypeProvisionComponentMap The map from which to remove values.
 	@param parentComponent The parent of the component tree in which published prototypes are represented.
 	@param prototypeProvisionSet The set to indicate which key entries to retain.
-	@exception NullPointerException if the given map, parent component, or prototype provision set is <code>null</code>.
+	@throws NullPointerException if the given map, parent component, or prototype provision set is <code>null</code>.
 	*/
 	protected static void synchronizePrototypeProvisionMap(final ReverseMap<PrototypeProvision<?>, Component> prototypeProvisionComponentMap, final CompositeComponent parentComponent, final Set<PrototypeProvision<?>> prototypeProvisionSet)
 	{

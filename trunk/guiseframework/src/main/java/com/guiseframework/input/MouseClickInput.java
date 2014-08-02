@@ -42,8 +42,8 @@ public class MouseClickInput extends AbstractMouseInput
 	@parma button The button that was clicked.
 	@param count The number of clicks that were input (e.g. 1 for a single click, 2 for a double click, etc.).
 	@param keys The keys that were pressed when this input occurred.
-	@exception NullPointerException if the given button and/or keys is <code>null</code>.
-	@exception IllegalArgumentException if the given count is zero or less.
+	@throws NullPointerException if the given button and/or keys is <code>null</code>.
+	@throws IllegalArgumentException if the given count is zero or less.
 	*/
 	public MouseClickInput(final MouseButton button, final int count, final Key... keys)
 	{

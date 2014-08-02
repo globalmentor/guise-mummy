@@ -33,7 +33,7 @@ public interface TreeModel extends ActionModel
 	/**Sets the root node of the tree model.
 	This is a bound property.
 	@param newRootNode The new root node of the tree model.
-	@exception NullPointerException if the given root node is <code>null</code>.
+	@throws NullPointerException if the given root node is <code>null</code>.
 	@see #ROOT_NODE_PROPERTY
 	*/
 	public void setRootNode(final TreeNodeModel<?> newRootNode);

@@ -26,7 +26,7 @@ public class StringStringLiteralConverter extends AbstractStringLiteralConverter
 	This version returns the literal itself.
 	@param literal The literal value in the lexical space to convert.
 	@return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
-	@exception ConversionException if the literal value cannot be converted.
+	@throws ConversionException if the literal value cannot be converted.
 	*/ 
 	public String convertLiteral(final String literal) throws ConversionException
 	{
@@ -37,7 +37,7 @@ public class StringStringLiteralConverter extends AbstractStringLiteralConverter
 	This version returns the value itself.
 	@param value The value in the value space to convert.
 	@return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>.
-	@exception ConversionException if the value cannot be converted.
+	@throws ConversionException if the value cannot be converted.
 	*/ 
 	public String convertValue(final String value) throws ConversionException
 	{

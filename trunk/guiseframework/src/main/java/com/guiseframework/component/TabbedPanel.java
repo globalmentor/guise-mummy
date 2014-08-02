@@ -34,7 +34,7 @@ public class TabbedPanel extends AbstractCardPanel
 
 	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given layout is <code>null</code>.
+	@throws NullPointerException if the given layout is <code>null</code>.
 	*/
 	protected TabbedPanel(final CardLayout layout)
 	{

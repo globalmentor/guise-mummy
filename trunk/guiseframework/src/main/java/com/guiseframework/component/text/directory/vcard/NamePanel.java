@@ -75,7 +75,7 @@ public class NamePanel extends AbstractPanel
 
 	/**Places the name information into the various fields.
 	@param name The name to place in the fields, or <code>null</code> if no information should be displayed.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	*/
 	public void setVCardName(final Name name) throws PropertyVetoException
 	{
@@ -148,7 +148,7 @@ public class NamePanel extends AbstractPanel
 
 	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given layout is <code>null</code>.
+	@throws NullPointerException if the given layout is <code>null</code>.
 	*/
 	public NamePanel(final Layout<?> layout)
 	{

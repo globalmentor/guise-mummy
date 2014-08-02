@@ -123,7 +123,7 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 
 	/**Adds a child tree node to this tree node.
 	@param treeNode The tree node to add.
-	@exception IllegalArgumentException if the tree node already has a parent.
+	@throws IllegalArgumentException if the tree node already has a parent.
 	*/
 	public void add(final TreeNodeModel<?> treeNode)
 	{
@@ -140,7 +140,7 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 
 	/**Removes a child tree node from this tree node.
 	@param treeNode The child tree node to remove.
-	@exception IllegalArgumentException if the tree node is not a child of this tree node.
+	@throws IllegalArgumentException if the tree node is not a child of this tree node.
 	*/
 	public void remove(final TreeNodeModel<?> treeNode)
 	{
@@ -177,9 +177,9 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 		A tree node's parent cannot be set unless that parent already recognizes this tree node as one of its children.
 		If a tree node is given the same parent it already has, no action occurs.
 		@param newParent The new parent for this tree node, or <code>null</code> if this tree node is being removed from a parent.
-		@exception IllegalStateException if a parent is provided and this tree node already has a parent.
-		@exception IllegalStateException if no parent is provided and this tree node's old parent still recognizes this tree node as its child.
-		@exception IllegalArgumentException if a parent is provided and the given parent does not already recognize this tree node as its child.
+		@throws IllegalStateException if a parent is provided and this tree node already has a parent.
+		@throws IllegalStateException if no parent is provided and this tree node's old parent still recognizes this tree node as its child.
+		@throws IllegalArgumentException if a parent is provided and the given parent does not already recognize this tree node as its child.
 		@see #add(TreeNodeModel)
 		@see #remove(TreeNodeModel)
 		*/
@@ -224,7 +224,7 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 
 	/**Constructs a tree node model indicating the type of value it can hold.
 	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public DefaultTreeNodeModel(final Class<V> valueClass)
 	{
@@ -234,7 +234,7 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 	/**Constructs a tree node model indicating the type of value it can hold, along with an initial value.
 	@param valueClass The class indicating the type of value held in the model.
 	@param initialValue The initial value, which will not be validated.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public DefaultTreeNodeModel(final Class<V> valueClass, final V initialValue)
 	{

@@ -35,7 +35,7 @@ public class CalendarDialogFrame extends AbstractDialogFrame<Date>
 	/**Sets the single child component.
 	This method throws an exception, as the content of a calendar dialog frame cannot be modified. 
 	@param newContent The single child component, or <code>null</code> if this frame does not have a child component.
-	@exception UnsupportedOperationException because the content cannot be changed.
+	@throws UnsupportedOperationException because the content cannot be changed.
 	*/
 	public void setContent(final Component newContent)
 	{
@@ -58,7 +58,7 @@ public class CalendarDialogFrame extends AbstractDialogFrame<Date>
 
 	/**Value model constructor.
 	@param valueModel The component value model.
-	@exception NullPointerException if the given model is <code>null</code>.
+	@throws NullPointerException if the given model is <code>null</code>.
 	*/
 	public CalendarDialogFrame(final ValueModel<Date> valueModel)
 	{

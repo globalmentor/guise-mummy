@@ -80,7 +80,7 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 
 	/**
 	 * Updates the views of any children. This version does not call the super version, because all child rendering is controlled by this version.
-	 * @exception IOException if there is an error updating the child views.
+	 * @throws IOException if there is an error updating the child views.
 	 */
 	protected void depictChildren() throws IOException
 	{
@@ -195,7 +195,7 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 	/**
 	 * Renders an XML element. If there is a child component with constraints indicating the same ID as this element, that child component will be rendered in
 	 * place of this element.
-	 * @exception IOException if there is an error rendering the component.
+	 * @throws IOException if there is an error rendering the component.
 	 */
 	protected void updateElement(final Element element) throws IOException
 	{
@@ -245,7 +245,7 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 	/**
 	 * Renders the content of an XML element.
 	 * @param element The element the content of which should be rendered.
-	 * @exception IOException if there is an error rendering the component.
+	 * @throws IOException if there is an error rendering the component.
 	 */
 	protected void updateElementContent(final Element element) throws IOException
 	{

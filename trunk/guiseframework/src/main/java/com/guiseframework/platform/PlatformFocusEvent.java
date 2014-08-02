@@ -24,7 +24,7 @@ public class PlatformFocusEvent extends AbstractDepictEvent
 
 	/**Constructs a focus control event.
 	@param depictedObject The depicted object on which the event initially occurred.
-	@exception NullPointerException if the given depicted object is <code>null</code>.
+	@throws NullPointerException if the given depicted object is <code>null</code>.
 	*/
 	public PlatformFocusEvent(final DepictedObject depictedObject)
 	{

@@ -66,7 +66,7 @@ public abstract class AbstractGestureInputEvent extends AbstractInputEvent imple
 	/**Source constructor.
 	@param source The object on which the event initially occurred.
 	@param keys The keys that were pressed when this event was generated.
-	@exception NullPointerException if the given source and/or keys is <code>null</code>.
+	@throws NullPointerException if the given source and/or keys is <code>null</code>.
 	*/
 	public AbstractGestureInputEvent(final Object source, final Key... keys)
 	{

@@ -81,7 +81,7 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 		Changing the mode to {@link Mode#EDIT} initiates the editing process; changing the mode from {@link Mode#EDIT} clears the value from the edit control.
 		If the mode changes, this method will call {@link #update()}.
 		@param newMode The new mode of component interaction.
-		@exception IllegalStateException If editing is initiated and the current text of the component cannot be edited in the edit control.
+		@throws IllegalStateException If editing is initiated and the current text of the component cannot be edited in the edit control.
 		@see #MODE_PROPERTY 
 		*/
 		public void setMode(final Mode newMode)
@@ -120,7 +120,7 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 		/**Sets the component the label of which is to be edited.
 		This is a bound property.
 		@param newLabelComponent The component the label of which is to be edited.
-		@exception NullPointerException if the given component is <code>null</code>.
+		@throws NullPointerException if the given component is <code>null</code>.
 		@see #LABEL_COMPONENT_PROPERTY
 		*/
 /*TODO del if not used; this will require updating the layout
@@ -144,7 +144,7 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 		/**Sets the control used to edit the text.
 		This is a bound property.
 		@param newEditControl The control used to edit the text.
-		@exception NullPointerException if the given component is <code>null</code>.
+		@throws NullPointerException if the given component is <code>null</code>.
 		@see #EDIT_CONTROL_PROPERTY
 		*/
 /*TODO del if not used; this will require updating the layout
@@ -188,7 +188,7 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 	@param editedProperty The component property that will be affected when the text changes.
 	@param editControl The control used to edit the text.
 	@param flow The logical axis (line or page) along which information is flowed.
-	@exception NullPointerException if the edited component, value control, text property, and/or flow axis is <code>null</code>.
+	@throws NullPointerException if the edited component, value control, text property, and/or flow axis is <code>null</code>.
 	*/
 	public AbstractEditComponentTextControl(final EC editedComponent, final String editedProperty, final ValueControl<String> editControl, final Flow flow)
 	{

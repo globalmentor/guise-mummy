@@ -48,8 +48,8 @@ public interface GuiseContainer
 	 * "/path/to/container/relative/path", while resolving "/absolute/path" will yield "/absolute/path".
 	 * @param path The path to be resolved.
 	 * @return The path resolved against the container base path.
-	 * @exception NullPointerException if the given path is <code>null</code>.
-	 * @exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
+	 * @throws NullPointerException if the given path is <code>null</code>.
+	 * @throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
 	 *              {@link #resolveURI(URI)} should be used instead).
 	 * @see #getBasePath()
 	 */
@@ -62,7 +62,7 @@ public interface GuiseContainer
 	 * "http://example.com/path".
 	 * @param uri The URI to be resolved.
 	 * @return The URI resolved against the container base path.
-	 * @exception NullPointerException if the given URI is <code>null</code>.
+	 * @throws NullPointerException if the given URI is <code>null</code>.
 	 * @see #getBasePath()
 	 */
 	public URI resolveURI(final URI uri);
@@ -71,8 +71,8 @@ public interface GuiseContainer
 	 * Retrieves an input stream to the entity at the given URI. The URI is first resolved to the container base URI.
 	 * @param uri A URI to the entity; either absolute or relative to the container.
 	 * @return An input stream to the entity at the given resource URI, or <code>null</code> if no entity exists at the given resource path.
-	 * @exception NullPointerException if the given URI is <code>null</code>.
-	 * @exception IOException if there was an error connecting to the entity at the given URI.
+	 * @throws NullPointerException if the given URI is <code>null</code>.
+	 * @throws IOException if there was an error connecting to the entity at the given URI.
 	 * @see #getBaseURI()
 	 */
 	public InputStream getInputStream(final URI uri) throws IOException;

@@ -53,7 +53,7 @@ public class NavigationEvent extends AbstractGuiseEvent
 	@param navigationPath The navigation path relative to the application context path.
 	@param bookmark The bookmark for which navigation should occur at this navigation path, or <code>null</code> if there is no bookmark involved in navigation.
 	@param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
-	@exception NullPointerException if the given source, and/or navigation path is <code>null</code>.
+	@throws NullPointerException if the given source, and/or navigation path is <code>null</code>.
 	*/
 	public NavigationEvent(final Object source, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI)
 	{

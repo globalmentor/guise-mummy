@@ -46,7 +46,7 @@ public enum Button
 	/**Code and mouse button constructor.
 	@param code The code reported by the browser.
 	@param mouseButton The mouse button this button represents.
-	@exception NullPointerException if the given mouse button is <code>null</code>.
+	@throws NullPointerException if the given mouse button is <code>null</code>.
 	*/
 	private Button(final int code, final MouseButton mouseButton)
 	{
@@ -57,7 +57,7 @@ public enum Button
 	/**Retrieves a button corresponding to the given code.
 	@param code The code for which a button should be returned.
 	@return The button representing the given code.
-	@exception IllegalArgumentException if the given code does not match one of the known buttons.
+	@throws IllegalArgumentException if the given code does not match one of the known buttons.
 	*/
 	public static Button valueOf(final int code)
 	{

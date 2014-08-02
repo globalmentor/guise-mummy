@@ -128,7 +128,7 @@ public class WebInitializeEvent extends AbstractWebPlatformEvent
 	@param javascriptVersion The version of JavaScript supported by the client, or <code>null</code> if JavaScript is not supported.
 	@param javaEnabled Whether Java is enabled for the user.
 	@param referrerURI The referring URI of the document, or <code>null</code> if there is no referrer.
-	@exception NullPointerException if the given context and/or language is <code>null</code>.
+	@throws NullPointerException if the given context and/or language is <code>null</code>.
 	*/
 	public WebInitializeEvent(final DepictContext context, final int hour, /*TODO del final int timezone, */final int utcOffset, final int utcOffset01, final int utcOffset06,
 			final String language, final int colorDepth, final int screenWidth, final int screenHeight, final int browserWidth, final int browserHeight,

@@ -72,7 +72,7 @@ public class PendingImage extends Image implements PendingImageComponent
 
 	/**Image model constructor.
 	@param imageModel The component image model.
-	@exception NullPointerException if the given image model is <code>null</code>.
+	@throws NullPointerException if the given image model is <code>null</code>.
 	*/
 	public PendingImage(final ImageModel imageModel)
 	{
@@ -82,7 +82,7 @@ public class PendingImage extends Image implements PendingImageComponent
 	/**Info model and image model constructor.
 	@param infoModel The component info model.
 	@param imageModel The component image model.
-	@exception NullPointerException if the given info model and/or image model is <code>null</code>.
+	@throws NullPointerException if the given info model and/or image model is <code>null</code>.
 	*/
 	public PendingImage(final InfoModel infoModel, final ImageModel imageModel)
 	{

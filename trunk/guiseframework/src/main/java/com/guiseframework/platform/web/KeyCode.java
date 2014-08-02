@@ -72,7 +72,7 @@ public enum KeyCode
 	/**Code and key constructor.
 	@param code The code reported by the browser.
 	@param key The key this key code represents.
-	@exception NullPointerException if the given key is <code>null</code>.
+	@throws NullPointerException if the given key is <code>null</code>.
 	*/
 	private KeyCode(final int code, final Key key)
 	{
@@ -96,7 +96,7 @@ public enum KeyCode
 	/**Retrieves a key code corresponding to the given code.
 	@param code The code for which a key code should be returned.
 	@return The key code representing the given code.
-	@exception IllegalArgumentException if the given code does not match one of the known key codes.
+	@throws IllegalArgumentException if the given code does not match one of the known key codes.
 	*/
 	public static KeyCode valueOf(final int code)
 	{

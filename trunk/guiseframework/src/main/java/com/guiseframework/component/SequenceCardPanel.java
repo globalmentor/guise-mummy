@@ -161,7 +161,7 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 
 	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given layout is <code>null</code>.
+	@throws NullPointerException if the given layout is <code>null</code>.
 	*/
 	protected SequenceCardPanel(final CardLayout layout)
 	{
@@ -284,7 +284,7 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 	Any class that overrides this method must call this version.
 	@param index The index at which the component should be added.
 	@param childComponent The component to add to this component.
-	@exception IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
+	@throws IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
 	*/
 	protected void addComponent(final int index, final Component childComponent)
 	{
@@ -296,8 +296,8 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 	This version uninstalls a listener for the component's displayed status.
 	Any class that overrides this method must call this version.
 	@param childComponent The component to remove from this component.
-	@exception IllegalArgumentException if the component does not recognize this composite component as its parent or the component is not a member of this composite component.
-	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
+	@throws IllegalArgumentException if the component does not recognize this composite component as its parent or the component is not a member of this composite component.
+	@throws IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
 	*/
 	protected void removeComponent(final Component childComponent)
 	{
@@ -328,7 +328,7 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 	/**Sets the new selected card.
 	This version validates the input on the currently selected card as needed.
 	@param newValue The new selected card.
-	@exception ValidationException if the provided value is not valid.
+	@throws ValidationException if the provided value is not valid.
 	@see #getValidator()
 	@see #VALUE_PROPERTY
 	*/
@@ -384,7 +384,7 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 	Components that are not displayed or not enabled based upon their associated constraints are skipped.
 	@param component The component the previous component to which should be found.
 	@return The previous component in the sequence, or <code>null</code> if there is no previous component in the sequence.
-	@exception NullPointerException if the given component is <code>null</code>.
+	@throws NullPointerException if the given component is <code>null</code>.
 	*/
 	protected Component getPrevious(final Component component)
 	{
@@ -775,7 +775,7 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 
 		/**Called when a constrained property is changed.
 		@param genericPropertyChangeEvent An event object describing the event source, the property that is changing, and its old and new values.
-		@exception PropertyVetoException if the recipient wishes the property change to be rolled back.
+		@throws PropertyVetoException if the recipient wishes the property change to be rolled back.
 		*/
 		public void vetoableChange(final GenericPropertyChangeEvent<Component> genericPropertyChangeEvent) throws PropertyVetoException
 		{

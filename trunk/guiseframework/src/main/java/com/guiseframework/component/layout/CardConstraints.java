@@ -68,7 +68,7 @@ public class CardConstraints extends ControlConstraints implements InfoModel, Di
 
 	/**Info model constructor.
 	@param infoModel The info model representing the card label.
-	@exception NullPointerException if the given info model is <code>null</code>.
+	@throws NullPointerException if the given info model is <code>null</code>.
 	*/
 	public CardConstraints(final InfoModel infoModel)
 	{
@@ -78,7 +78,7 @@ public class CardConstraints extends ControlConstraints implements InfoModel, Di
 	/**Info model and enabled constructor.
 	@param infoModel The info model representing the card label.
 	@param enabled Whether the card is enabled.
-	@exception NullPointerException if the given info model is <code>null</code>.
+	@throws NullPointerException if the given info model is <code>null</code>.
 	*/
 	public CardConstraints(final InfoModel infoModel, final boolean enabled)
 	{
@@ -116,8 +116,8 @@ public class CardConstraints extends ControlConstraints implements InfoModel, Di
 	/**Sets the content type of the label text.
 	This is a bound property.
 	@param newLabelTextContentType The new label text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
+	@throws NullPointerException if the given content type is <code>null</code>.
+	@throws IllegalArgumentException if the given content type is not a text content type.
 	@see #LABEL_CONTENT_TYPE_PROPERTY
 	*/
 	public void setLabelContentType(final ContentType newLabelTextContentType) {getInfoModel().setLabelContentType(newLabelTextContentType);}
@@ -138,8 +138,8 @@ public class CardConstraints extends ControlConstraints implements InfoModel, Di
 	/**Sets the content type of the description text.
 	This is a bound property.
 	@param newDescriptionContentType The new description text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
+	@throws NullPointerException if the given content type is <code>null</code>.
+	@throws IllegalArgumentException if the given content type is not a text content type.
 	@see #DESCRIPTION_CONTENT_TYPE_PROPERTY
 	*/
 	public void setDescriptionContentType(final ContentType newDescriptionContentType) {getInfoModel().setDescriptionContentType(newDescriptionContentType);}
@@ -160,8 +160,8 @@ public class CardConstraints extends ControlConstraints implements InfoModel, Di
 	/**Sets the content type of the advisory information text.
 	This is a bound property.
 	@param newInfoContentType The new advisory information text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
+	@throws NullPointerException if the given content type is <code>null</code>.
+	@throws IllegalArgumentException if the given content type is not a text content type.
 	@see #INFO_CONTENT_TYPE_PROPERTY
 	*/
 	public void setInfoContentType(final ContentType newInfoContentType) {getInfoModel().setInfoContentType(newInfoContentType);}

@@ -64,8 +64,8 @@ public class AbstractWebFrameDepictor<C extends Frame> extends AbstractWebCompon
 	/**Called when the depictor is installed in a component.
 	This implementation listens for changes in the session and in response marks the view as needing updated.
 	@param component The component into which this view is being installed.
-	@exception NullPointerException if the given component is <code>null</code>.
-	@exception IllegalStateException if this view is already installed in a component.
+	@throws NullPointerException if the given component is <code>null</code>.
+	@throws IllegalStateException if this view is already installed in a component.
 	@see #getDepictedPropertyChangeListener()
 	*/
 	public void installed(final C component)
@@ -77,8 +77,8 @@ public class AbstractWebFrameDepictor<C extends Frame> extends AbstractWebCompon
 	/**Called when the depictor is uninstalled from a component.
 	This implementation stops listening for session changes.
 	@param component The component from which this view is being uninstalled.
-	@exception NullPointerException if the given component is <code>null</code>.
-	@exception IllegalStateException if this view is not installed in a component.
+	@throws NullPointerException if the given component is <code>null</code>.
+	@throws IllegalStateException if this view is not installed in a component.
 	@see #getDepictedPropertyChangeListener()
 	*/
 	public void uninstalled(final C component)
@@ -89,7 +89,7 @@ public class AbstractWebFrameDepictor<C extends Frame> extends AbstractWebCompon
 
 	/**Renders the body of the component.
 	This version renders the content of the frame.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	@see Frame#getContent()
 	*/
 	protected void depictBody() throws IOException

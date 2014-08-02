@@ -55,7 +55,7 @@ public class ProgressEvent<P> extends AbstractGuiseEvent
 	/**Task state constructor with no known value or maximum value.
 	@param source The object on which the event initially occurred.
 	@param taskState The state of the task.
-	@exception NullPointerException if the given task state is <code>null</code>.
+	@throws NullPointerException if the given task state is <code>null</code>.
 	*/
 	public ProgressEvent(final Object source, final TaskState taskState)
 	{
@@ -66,7 +66,7 @@ public class ProgressEvent<P> extends AbstractGuiseEvent
 	@param source The object on which the event initially occurred.
 	@param taskState The state of the task.
 	@param value The current progress, or <code>null</code> if not known.
-	@exception NullPointerException if the given task state is <code>null</code>.
+	@throws NullPointerException if the given task state is <code>null</code>.
 	*/
 	public ProgressEvent(final Object source, final TaskState taskState, final P value)
 	{
@@ -78,7 +78,7 @@ public class ProgressEvent<P> extends AbstractGuiseEvent
 	@param taskState The state of the task.
 	@param progress The current progress, or <code>null</code> if not known.
 	@param completion The goal, or <code>null</code> if not known.
-	@exception NullPointerException if the given task state is <code>null</code>.
+	@throws NullPointerException if the given task state is <code>null</code>.
 	*/
 	public ProgressEvent(final Object source, final TaskState taskState, final P progress, final P completion)
 	{
@@ -89,7 +89,7 @@ public class ProgressEvent<P> extends AbstractGuiseEvent
 	@param source The object on which the event initially occurred.
 	@param task The task being performed, or <code>null</code> if not indicated.
 	@param taskState The state of the task.
-	@exception NullPointerException if the given task state is <code>null</code>.
+	@throws NullPointerException if the given task state is <code>null</code>.
 	*/
 	public ProgressEvent(final Object source, final String task, final TaskState taskState)
 	{
@@ -101,7 +101,7 @@ public class ProgressEvent<P> extends AbstractGuiseEvent
 	@param task The task being performed, or <code>null</code> if not indicated.
 	@param taskState The state of the task.
 	@param progress The current progress, or <code>null</code> if not known.
-	@exception NullPointerException if the given task state is <code>null</code>.
+	@throws NullPointerException if the given task state is <code>null</code>.
 	*/
 	public ProgressEvent(final Object source, final String task, final TaskState taskState, final P progress)
 	{
@@ -114,7 +114,7 @@ public class ProgressEvent<P> extends AbstractGuiseEvent
 	@param taskState The state of the task.
 	@param value The current progress, or <code>null</code> if not known.
 	@param completion The goal, or <code>null</code> if not known.
-	@exception NullPointerException if the given task state is <code>null</code>.
+	@throws NullPointerException if the given task state is <code>null</code>.
 	*/
 	public ProgressEvent(final Object source, final String task, final TaskState taskState, final P value, final P completion)
 	{
@@ -128,7 +128,7 @@ public class ProgressEvent<P> extends AbstractGuiseEvent
 	/**Source copy constructor.
 	@param source The object on which the event initially occurred.
 	@param progressEvent The existing progress event the values of which will be copied to this object.
-	@exception NullPointerException if the given progress event is <code>null</code>.
+	@throws NullPointerException if the given progress event is <code>null</code>.
 	*/
 	public ProgressEvent(final Object source, final ProgressEvent<P> progressEvent)
 	{

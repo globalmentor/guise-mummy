@@ -60,7 +60,7 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 		/**Sets the text of the invalid value message.
 		This is a bound property.
 		@param newInvalidValueMessage The new text of the invalid value message, which may include a resource reference.
-		@exception NullPointerException if the given message is <code>null</code>.
+		@throws NullPointerException if the given message is <code>null</code>.
 		@see #INVALID_VALUE_MESSAGE_PROPERTY
 		*/
 		public void setInvalidValueMessage(final String newInvalidValueMessage)
@@ -82,7 +82,7 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 		/**Sets the text of the value required message.
 		This is a bound property.
 		@param newValueRequiredMessage The new text of the value required message, which may include a resource reference.
-		@exception NullPointerException if the given message is <code>null</code>.
+		@throws NullPointerException if the given message is <code>null</code>.
 		@see #VALUE_REQUIRED_VALUE_MESSAGE_PROPERTY
 		*/
 		public void setValueRequiredMessage(final String newValueRequiredMessage)
@@ -97,7 +97,7 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 
 		/**Throws a validation exception with a message indicating that the given value is invalid.
 		@param value The value being validated.
-		@exception ValidationException to indicate that the given value is invalid.
+		@throws ValidationException to indicate that the given value is invalid.
 		@see #getInvalidValueMessage()
 		*/
 		public void throwInvalidValueValidationException(final V value) throws ValidationException
@@ -108,7 +108,7 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 
 		/**Throws a validation exception with a message indicating that a valid is required.
 		@param value The value being validated.
-		@exception ValidationException to indicate that a value is required.
+		@throws ValidationException to indicate that a value is required.
 		@see #getValueRequiredMessage()
 		*/
 		public void throwValueRequiredValidationException(final V value) throws ValidationException
@@ -142,7 +142,7 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 	Although {@link #isValid(Object)} may be overridden to provide optimized fast-fail determinations,
 	adding new logic to {@link #isValid(Object)} cannot be used in place of overriding this method.</p>
 	@param value The value to validate, which may be <code>null</code>.
-	@exception ValidationException if the provided value is not valid.
+	@throws ValidationException if the provided value is not valid.
 	@see #throwInvalidValueValidationException(Object)
 	@see #throwValueRequiredValidationException(Object)
 	*/

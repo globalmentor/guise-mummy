@@ -118,7 +118,7 @@ public abstract class AbstractCompositeComponentPrototypeProvisionStrategy exten
 	/**Parent component and prototype providers constructor.
 	@param parentComponent The composite component the top-level prototype provider children of which will be monitored.
 	@param basePrototypeProviders The base prototype providers that will provide prototypes for processing, outside the children of the composite component parent.
-	@exception NullPointerException if the given parent component, prototype providers, and/or one or more prototype provider is <code>null</code>.
+	@throws NullPointerException if the given parent component, prototype providers, and/or one or more prototype provider is <code>null</code>.
 	*/
 	public AbstractCompositeComponentPrototypeProvisionStrategy(final CompositeComponent parentComponent, final PrototypeProvider... basePrototypeProviders)
 	{

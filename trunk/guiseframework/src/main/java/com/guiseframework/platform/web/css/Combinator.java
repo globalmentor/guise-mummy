@@ -61,7 +61,7 @@ public enum Combinator
 	Any whitespace character will produce {@link #DESCENDANT}. 
 	@param combinatorChar The character representing a combinator.
 	@return The combinator the character represents.
-	@exception IllegalArgumentException if the given character does not represent a combinator. 
+	@throws IllegalArgumentException if the given character does not represent a combinator. 
 	*/
 	public static Combinator valueOf(final char combinatorChar)
 	{

@@ -51,7 +51,7 @@ public abstract class AbstractURFDynamicTreeNodeModel<V> extends DynamicTreeNode
 	@param propertyURI The URI of the URF property of which this URF resource is an object, or <code>null</code> if this resource should not be considered the object of any property.
 	@param resource The resource to represent in the new node.
 	@return A child node to represent the given property object resource.
-	@exception NullPointerException if the given resource is <code>null</code>.
+	@throws NullPointerException if the given resource is <code>null</code>.
 	*/
 	@SuppressWarnings("unchecked")	//the class of the resource should always be its type, so the cast is logically correct
 	protected <T extends URFResource> URFResourceDynamicTreeNodeModel<?> createURFResourceTreeNode(final URI propertyURI, final T resource)

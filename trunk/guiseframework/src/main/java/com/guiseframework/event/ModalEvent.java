@@ -32,7 +32,7 @@ public class ModalEvent extends AbstractGuiseEvent
 
 	/**Source constructor.
 	@param source The object on which the event initially occurred.
-	@exception NullPointerException if the given source is <code>null</code>.
+	@throws NullPointerException if the given source is <code>null</code>.
 	*/
 	public ModalEvent(final ModalNavigationPanel<?> source)
 	{

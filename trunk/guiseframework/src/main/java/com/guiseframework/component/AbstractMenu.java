@@ -150,7 +150,7 @@ public abstract class AbstractMenu extends AbstractContainerControl implements M
 	@param actionModel The component action model.
 	@param enableable The enableable object in which to store enabled status.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given info model, action model, enableable, and/or layout is <code>null</code>.
+	@throws NullPointerException if the given info model, action model, enableable, and/or layout is <code>null</code>.
 	*/
 	public AbstractMenu(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable, final MenuLayout layout)
 	{
@@ -261,8 +261,8 @@ public abstract class AbstractMenu extends AbstractContainerControl implements M
 	Any class that overrides this method must call this version.
 	@param index The index at which the component should be added.
 	@param childComponent The component to add to this component.
-	@exception IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
-	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
+	@throws IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
+	@throws IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
 	*/
 	protected void addComponent(final int index, final Component childComponent)
 	{
@@ -280,7 +280,7 @@ public abstract class AbstractMenu extends AbstractContainerControl implements M
 	</dl>
 	@param prototype The prototype of the component to create.
 	@return A new component based upon the given prototype.
-	@exception IllegalArgumentException if no component can be created from the given prototype
+	@throws IllegalArgumentException if no component can be created from the given prototype
 	*/
 	public Component createComponent(final Prototype prototype)
 	{

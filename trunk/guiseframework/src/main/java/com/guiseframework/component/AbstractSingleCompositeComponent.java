@@ -37,7 +37,7 @@ public abstract class AbstractSingleCompositeComponent extends AbstractComposite
 		This is a bound property.
 		@param newComponent The child component, or <code>null</code> if this component does not contain a child component.
 //TODO fix if needed		@see #CHECK_TYPE_PROPERTY 
-		@exception IllegalArgumentException if the component already has a parent.
+		@throws IllegalArgumentException if the component already has a parent.
 		*/
 		public void setComponent(final Component newComponent)
 		{
@@ -78,7 +78,7 @@ public abstract class AbstractSingleCompositeComponent extends AbstractComposite
 
 	/**Info model constructor.
 	@param infoModel The component info model.
-	@exception NullPointerException if the given info model is <code>null</code>.
+	@throws NullPointerException if the given info model is <code>null</code>.
 	*/
 	public AbstractSingleCompositeComponent(final InfoModel infoModel)
 	{

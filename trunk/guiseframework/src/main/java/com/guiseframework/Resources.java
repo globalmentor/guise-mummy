@@ -96,7 +96,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * @param resourceKey The resource key to a string in the resources which could be retrieved using {@link GuiseSession#getStringResource(String)}.
 	 * @return A string containing a reference to the given resource key, an ECMA-48 control string with the given resource key as its content, which can be
 	 *         resolved using {@link GuiseSession#dereferenceString(String)}.
-	 * @exception NullPointerException if the given resource key is <code>null</code>.
+	 * @throws NullPointerException if the given resource key is <code>null</code>.
 	 * @see <a href="http://www.ecma-international.org/publications/standards/Ecma-048.htm">ECMA-48: Control Functions for Coded Character Sets</a>
 	 */
 	public final static String createStringResourceReference(final String resourceKey)
@@ -109,7 +109,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * @param value The value to be used as an argument.
 	 * @return A string containing a reference to the given value, an ECMA-48 control string beginning with {@value #STRING_VALUE_REFERENCE_PREFIX_CHAR} with the
 	 *         given Value as its content.
-	 * @exception NullPointerException if the given value is <code>null</code>.
+	 * @throws NullPointerException if the given value is <code>null</code>.
 	 * @see <a href="http://www.ecma-international.org/publications/standards/Ecma-048.htm">ECMA-48: Control Functions for Coded Character Sets</a>
 	 */
 	public final static String createStringValueReference(final String value)
@@ -122,7 +122,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * scheme-specific part indicating the resource key.
 	 * @param resourceKey The resource key to a string in the resources which could be retrieved using {@link GuiseSession#getURIResource(String)}.
 	 * @return A URI containing a reference to the given resource key, which can be resolved using {@link GuiseSession#resolveURI(String)}.
-	 * @exception NullPointerException if the given resource key is <code>null</code>.
+	 * @throws NullPointerException if the given resource key is <code>null</code>.
 	 */
 	public final static URI createURIResourceReference(final String resourceKey)
 	{
@@ -146,7 +146,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * <code><var>com.example.EnumClass</var>.label</code>.
 	 * @param enumClass The enum class for which to return a resource reference.
 	 * @return A string resource reference to the label aspect of a resource key based upon the given enum class.
-	 * @exception NullPointerException if the given enum is <code>null</code>.
+	 * @throws NullPointerException if the given enum is <code>null</code>.
 	 * @see Classes#getPropertyName(Class, String)
 	 * @see #LABEL_PROPERTY_KEY_ASPECT
 	 * @see #createStringResourceReference(String)
@@ -161,7 +161,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * <code><var>com.example.EnumClass</var>.<var>NAME</var>.label</code>.
 	 * @param e The enum instance for which to return a resource reference.
 	 * @return A string resource reference to the label aspect of a resource key based upon the given enum.
-	 * @exception NullPointerException if the given enum is <code>null</code>.
+	 * @throws NullPointerException if the given enum is <code>null</code>.
 	 * @see Enums#getPropertyName(Enum, String)
 	 * @see #LABEL_PROPERTY_KEY_ASPECT
 	 * @see #createStringResourceReference(String)
@@ -176,7 +176,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * <code><var>com.example.EnumClass</var>.glyph</code>.
 	 * @param enumClass The enum class for which to return a resource reference.
 	 * @return A URI resource reference to the glyph aspect of a resource key based upon the given enum class.
-	 * @exception NullPointerException if the given enum is <code>null</code>.
+	 * @throws NullPointerException if the given enum is <code>null</code>.
 	 * @see Classes#getPropertyName(Class, String)
 	 * @see #GLYPH_PROPERTY_KEY_ASPECT
 	 * @see #createURIResourceReference(String)
@@ -191,7 +191,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * <code><var>com.example.EnumClass</var>.<var>NAME</var>.glyph</code>.
 	 * @param e The enum instance for which to return a resource reference.
 	 * @return A URI resource reference to the glyph aspect of a resource key based upon the given enum.
-	 * @exception NullPointerException if the given enum is <code>null</code>.
+	 * @throws NullPointerException if the given enum is <code>null</code>.
 	 * @see Enums#getPropertyName(Enum, String)
 	 * @see #GLYPH_PROPERTY_KEY_ASPECT
 	 * @see #createURIResourceReference(String)
@@ -206,7 +206,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * <code><var>com.example.EnumClass</var>.info</code>.
 	 * @param enumClass The enum class for which to return a resource reference.
 	 * @return A string resource reference to the info aspect of a resource key based upon the given enum class.
-	 * @exception NullPointerException if the given enum is <code>null</code>.
+	 * @throws NullPointerException if the given enum is <code>null</code>.
 	 * @see Classes#getPropertyName(Class, String)
 	 * @see #INFO_PROPERTY_KEY_ASPECT
 	 * @see #createStringResourceReference(String)
@@ -221,7 +221,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * <code><var>com.example.EnumClass</var>.<var>NAME</var>.info</code>.
 	 * @param e The enum instance for which to return a resource reference.
 	 * @return A string resource reference to the info aspect of a resource key based upon the given enum.
-	 * @exception NullPointerException if the given enum is <code>null</code>.
+	 * @throws NullPointerException if the given enum is <code>null</code>.
 	 * @see Enums#getPropertyName(Enum, String)
 	 * @see #INFO_PROPERTY_KEY_ASPECT
 	 * @see #createStringResourceReference(String)

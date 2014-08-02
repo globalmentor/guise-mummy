@@ -177,9 +177,9 @@ public class PlatformFileUploadTask extends GuiseBoundPropertyObject implements 
 	@param platformFiles The platform files to upload.
 	@param destinationBaseURI The collection URI representing the base destination of the platform files, either absolute or relative to the application.
 	@param destinationBookmark The bookmark to be used in sending resources to the destination URI, or <code>null</code> if there is no bookmark specified.
-	@exception NullPointerException if the given list of platform files and/or destination URI is <code>null</code>.
-	@exception IllegalArgumentException if the provided URI is not a collection URI.
-	@exception IllegalArgumentException if the provided URI specifies a query and/or fragment.
+	@throws NullPointerException if the given list of platform files and/or destination URI is <code>null</code>.
+	@throws IllegalArgumentException if the provided URI is not a collection URI.
+	@throws IllegalArgumentException if the provided URI specifies a query and/or fragment.
 	*/
 	public PlatformFileUploadTask(final Iterable<PlatformFile> platformFiles, final URI destinationBaseURI, final Bookmark destinationBookmark)
 	{

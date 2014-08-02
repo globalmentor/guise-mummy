@@ -81,7 +81,7 @@ public class RegionConstraints extends AbstractConstraints
 		The alignment of each flow represents a bound property of type {@link Double}.
 		@param flow The flow for which the alignment should be set.
 		@param newAlignment The alignment of the region relative to the beginning of the given flow.
-		@exception NullPointerException if the given flow is <code>null</code>. 
+		@throws NullPointerException if the given flow is <code>null</code>. 
 		@see #LINE_ALIGNMENT_PROPERTY
 		@see #PAGE_ALIGNMENT_PROPERTY
 		*/
@@ -149,7 +149,7 @@ public class RegionConstraints extends AbstractConstraints
 		The extent of each flow represents a bound property.
 		@param flow The flow for which the extent should be set.
 		@param newExtent The new requested extent of the region, or <code>null</code> there is no extent preference.
-		@exception NullPointerException if the given flow is <code>null</code>. 
+		@throws NullPointerException if the given flow is <code>null</code>. 
 		@see #LINE_EXTENT_PROPERTY
 		@see #PAGE_EXTENT_PROPERTY
 		*/
@@ -225,7 +225,7 @@ public class RegionConstraints extends AbstractConstraints
 		The padding extent of each border represents a bound property.
 		@param border The border for which the padding extent should be set.
 		@param newPaddingExtent The padding extent.
-		@exception NullPointerException if the given border and/or padding extent is <code>null</code>. 
+		@throws NullPointerException if the given border and/or padding extent is <code>null</code>. 
 		@see #PADDING_LINE_NEAR_EXTENT_PROPERTY
 		@see #PADDING_LINE_FAR_EXTENT_PROPERTY
 		@see #PADDING_PAGE_NEAR_EXTENT_PROPERTY
@@ -245,7 +245,7 @@ public class RegionConstraints extends AbstractConstraints
 		/**Sets the padding extent of the line near border.
 		This is a bound property.
 		@param newPaddingExtent The padding extent.
-		@exception NullPointerException if the given padding extent is <code>null</code>. 
+		@throws NullPointerException if the given padding extent is <code>null</code>. 
 		@see #PADDING_LINE_NEAR_EXTENT_PROPERTY
 		*/
 		public void setPaddingLineNearExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.LINE_NEAR, newPaddingExtent);}
@@ -253,7 +253,7 @@ public class RegionConstraints extends AbstractConstraints
 		/**Sets the padding extent of the line far border.
 		This is a bound property.
 		@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
-		@exception NullPointerException if the given padding extent is <code>null</code>. 
+		@throws NullPointerException if the given padding extent is <code>null</code>. 
 		@see #PADDING_LINE_FAR_EXTENT_PROPERTY
 		*/
 		public void setPaddingLineFarExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.LINE_FAR, newPaddingExtent);}
@@ -261,7 +261,7 @@ public class RegionConstraints extends AbstractConstraints
 		/**Sets the padding extent of the page near border.
 		This is a bound property.
 		@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
-		@exception NullPointerException if the given padding extent is <code>null</code>. 
+		@throws NullPointerException if the given padding extent is <code>null</code>. 
 		@see #PADDING_PAGE_NEAR_EXTENT_PROPERTY
 		*/
 		public void setPaddingPageNearExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.PAGE_NEAR, newPaddingExtent);}
@@ -269,7 +269,7 @@ public class RegionConstraints extends AbstractConstraints
 		/**Sets the padding extent of the page far border.
 		This is a bound property.
 		@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
-		@exception NullPointerException if the given padding extent is <code>null</code>. 
+		@throws NullPointerException if the given padding extent is <code>null</code>. 
 		@see #PADDING_PAGE_FAR_EXTENT_PROPERTY
 		*/
 		public void setPaddingPageFarExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.PAGE_FAR, newPaddingExtent);}
@@ -278,7 +278,7 @@ public class RegionConstraints extends AbstractConstraints
 		The padding extent of each border represents a bound property.
 		This is a convenience method that calls {@link #setPaddingExtent(Border, Extent)} for each border.
 		@param newPaddingExtent The padding extent.
-		@exception NullPointerException if the given padding extent is <code>null</code>. 
+		@throws NullPointerException if the given padding extent is <code>null</code>. 
 		@see #PADDING_LINE_NEAR_EXTENT_PROPERTY
 		@see #PADDING_LINE_FAR_EXTENT_PROPERTY
 		@see #PADDING_PAGE_NEAR_EXTENT_PROPERTY
@@ -294,7 +294,7 @@ public class RegionConstraints extends AbstractConstraints
 
 	/**Region constructor.
 	@param region The layout region for the associated component.
-	@exception NullPointerException if the given region is <code>null</code>.
+	@throws NullPointerException if the given region is <code>null</code>.
 	*/
 	public RegionConstraints(final Region region)
 	{

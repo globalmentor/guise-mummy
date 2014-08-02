@@ -51,7 +51,7 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListena
 	Invalid and duplicate indices will be ignored.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to select.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getSetSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedValues(V[])
 	@see #addSelectedIndexes(int...)
@@ -62,7 +62,7 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListena
 	Any invalid indices will be ignored.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to add to the selection.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getAddSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedIndexes(int[])
 	*/
@@ -72,7 +72,7 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListena
 	Any invalid indices will be ignored.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to remove from the selection.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getRemoveSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedIndexes(int[])
 	*/
@@ -81,7 +81,7 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListena
 	/**Determines the displayed status of the first occurrence of a given value.
 	@param value The value for which the displayed status is to be determined.
 	@return <code>true</code> if the value is displayed, else <code>false</code>.
-	@exception IndexOutOfBoundsException if the given value does not occur in the model.
+	@throws IndexOutOfBoundsException if the given value does not occur in the model.
 	*/
 	public boolean isValueDisplayed(final V value);
 
@@ -104,14 +104,14 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListena
 	@param index The index of the value to display.
 	@param newDisplayed Whether the value at the given index should be displayed.
 	@see #DISPLAYED_PROPERTY
-	@exception IndexOutOfBoundsException if the given index is not within the range of the list.
+	@throws IndexOutOfBoundsException if the given index is not within the range of the list.
 	*/
 	public void setIndexDisplayed(final int index, final boolean newDisplayed);	//TODO fix property change event 
 	
 	/**Determines the enabled status of the first occurrence of a given value.
 	@param value The value for which the enabled status is to be determined.
 	@return <code>true</code> if the value is enabled, else <code>false</code>.
-	@exception IndexOutOfBoundsException if the given value does not occur in the model.
+	@throws IndexOutOfBoundsException if the given value does not occur in the model.
 	*/
 	public boolean isValueEnabled(final V value);
 
@@ -134,7 +134,7 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListena
 	@param index The index of the value to enable or disable.
 	@param newEnabled Whether the value at the given index should be enabled.
 	@see #ENABLED_PROPERTY
-	@exception IndexOutOfBoundsException if the given index is not within the range of the list.
+	@throws IndexOutOfBoundsException if the given index is not within the range of the list.
 	*/
 	public void setIndexEnabled(final int index, final boolean newEnabled);	//TODO fix property change event 
 

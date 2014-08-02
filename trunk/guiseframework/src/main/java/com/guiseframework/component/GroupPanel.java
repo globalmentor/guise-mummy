@@ -32,7 +32,7 @@ public class GroupPanel extends AbstractContainer implements Panel	//TODO maybe 
 
 	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given layout is <code>null</code>.
+	@throws NullPointerException if the given layout is <code>null</code>.
 	*/
 	public GroupPanel(final Layout<?> layout)
 	{

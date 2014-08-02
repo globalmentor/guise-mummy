@@ -89,8 +89,8 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	/**
 	 * Path constructor.
 	 * @param path The application context-relative path within the Guise container context, which does not begin with '/'.
-	 * @exception NullPointerException if the path is <code>null</code>.
-	 * @exception IllegalArgumentException if the provided path is absolute.
+	 * @throws NullPointerException if the path is <code>null</code>.
+	 * @throws IllegalArgumentException if the provided path is absolute.
 	 */
 	public AbstractDestination(final URIPath path)
 	{
@@ -101,7 +101,7 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	/**
 	 * Path pattern constructor.
 	 * @param pathPattern The pattern to match an application context-relative path within the Guise container context, which does not begin with '/'.
-	 * @exception NullPointerException if the path pattern is <code>null</code>.
+	 * @throws NullPointerException if the path pattern is <code>null</code>.
 	 */
 	public AbstractDestination(final Pattern pathPattern)
 	{
@@ -117,8 +117,8 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	 * @param bookmark The bookmark for this path, or <code>null</code> if there is no bookmark.
 	 * @param referrerURI The URI of the referring destination or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 	 * @return The preferred path.
-	 * @exception NullPointerException if the given session and/or path is <code>null</code>.
-	 * @exception ResourceIOException if there is an error accessing the resource.
+	 * @throws NullPointerException if the given session and/or path is <code>null</code>.
+	 * @throws ResourceIOException if there is an error accessing the resource.
 	 */
 	public URIPath getPath(final GuiseSession session, final URIPath path, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException
 	{
@@ -145,8 +145,8 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	 *          navigation.
 	 * @param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 	 * @return Whether the requested path exists.
-	 * @exception NullPointerException if the given navigation path is <code>null</code>.
-	 * @exception ResourceIOException if there is an error accessing the resource.
+	 * @throws NullPointerException if the given navigation path is <code>null</code>.
+	 * @throws ResourceIOException if there is an error accessing the resource.
 	 */
 	public boolean exists(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException
 	{
@@ -174,8 +174,8 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	 *          navigation.
 	 * @param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 	 * @return Whether the requested path exists.
-	 * @exception NullPointerException if the given navigation path is <code>null</code>.
-	 * @exception ResourceIOException if there is an error accessing the resource.
+	 * @throws NullPointerException if the given navigation path is <code>null</code>.
+	 * @throws ResourceIOException if there is an error accessing the resource.
 	 */
 	public boolean isAuthorized(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI)
 			throws ResourceIOException

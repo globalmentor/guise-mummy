@@ -34,7 +34,7 @@ public class WebValueSelectLinkDepictor<V, C extends SelectActionControl & Actio
 	/**Writes the supplementary icons.
 	If no supplementary icons are present, no action occurs.
 	This version writes the value icon, if available.
-	@exception IOException if there is an error writing the icon.
+	@throws IOException if there is an error writing the icon.
 	*/
 	protected void writeSupplementaryIcons() throws IOException
 	{

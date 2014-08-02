@@ -54,7 +54,7 @@ public class Button extends AbstractButtonControl
 	@param infoModel The component info model.
 	@param actionModel The component action model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
+	@throws NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
 	*/
 	public Button(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable)
 	{
@@ -63,7 +63,7 @@ public class Button extends AbstractButtonControl
 
 	/**Prototype constructor.
 	@param actionPrototype The prototype on which this component should be based.
-	@exception NullPointerException if the given prototype is <code>null</code>.
+	@throws NullPointerException if the given prototype is <code>null</code>.
 	*/
 	public Button(final ActionPrototype actionPrototype)
 	{

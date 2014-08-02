@@ -54,7 +54,7 @@ public abstract class AbstractObjectTransferable<S> implements Transferable<S>
 	/**Source and object esclass constructor.
 	@param source The source of the transferable data.
 	@param objectClasses The classes indicating the typees of object to be transferred.
-	@exception NullPointerException if the provided source and/or object classes is <code>null</code>.
+	@throws NullPointerException if the provided source and/or object classes is <code>null</code>.
 	*/
 	public AbstractObjectTransferable(final S source, final Class<?>... objectClasses)
 	{
@@ -106,7 +106,7 @@ public abstract class AbstractObjectTransferable<S> implements Transferable<S>
 	This implementation delegates to {@link #transfer(Class)}.
 	@param contentType The type of data expected.
 	@return The transferred data, which may be <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not supported.
+	@throws IllegalArgumentException if the given content type is not supported.
 	*/
 	public Object transfer(final ContentType contentType)
 	{

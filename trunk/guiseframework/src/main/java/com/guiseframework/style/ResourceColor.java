@@ -37,7 +37,7 @@ public class ResourceColor implements Color
 
 	/**Resource key constructor.
 	@param resourceKey The key to accessing the color defined in the resources.
-	@exception NullPointerException if the given resource key is <code>null</code>.
+	@throws NullPointerException if the given resource key is <code>null</code>.
 	*/
 	public ResourceColor(final String resourceKey)
 	{

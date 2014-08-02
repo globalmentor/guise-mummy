@@ -124,7 +124,7 @@ public abstract class AbstractContainerControl extends AbstractContainer impleme
 
 	/**Layout constructor with a default info model and enableable.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given layout is <code>null</code>.
+	@throws NullPointerException if the given layout is <code>null</code>.
 	*/
 	public AbstractContainerControl(final Layout<?> layout)
 	{
@@ -135,7 +135,7 @@ public abstract class AbstractContainerControl extends AbstractContainer impleme
 	@param infoModel The component info model.
 	@param enableable The enableable object in which to store enabled status.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given info model, enableable, and/or layout is <code>null</code>.
+	@throws NullPointerException if the given info model, enableable, and/or layout is <code>null</code>.
 	*/
 	public AbstractContainerControl(final InfoModel infoModel, final Enableable enableable, final Layout<?> layout)
 	{

@@ -29,7 +29,7 @@ public interface InputStrategy
 	If the input is not consumed by this input strategy, it is sent to the parent input strategy, if any, for processing.
 	@param input The input to process.
 	@return <code>true</code> if the input was consumed and should not be processed further.
-	@exception NullPointerException if the given input is <code>null</code>.
+	@throws NullPointerException if the given input is <code>null</code>.
 	*/
 	public boolean input(final Input input);
 

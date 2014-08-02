@@ -200,7 +200,7 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport>
 	/**Determines whether a given resource import meets the provided criteria.
 	This version delgates to the super class version to determine whether <code>null</code> values are allowed.
 	@param resourceImport The resource import to validate, which may be <code>null</code>.
-	@exception ValidationException if the provided value is not valid.
+	@throws ValidationException if the provided value is not valid.
 	@see #getAcceptedContentTypes()
 	@see #getAcceptedExtensions()
 	@see #getMaxContentLength()

@@ -60,8 +60,8 @@ public interface LabelModel extends Model
 	/**Sets the content type of the label text.
 	This is a bound property.
 	@param newLabelTextContentType The new label text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
+	@throws NullPointerException if the given content type is <code>null</code>.
+	@throws IllegalArgumentException if the given content type is not a text content type.
 	@see #LABEL_CONTENT_TYPE_PROPERTY
 	*/
 	public void setLabelContentType(final ContentType newLabelTextContentType);

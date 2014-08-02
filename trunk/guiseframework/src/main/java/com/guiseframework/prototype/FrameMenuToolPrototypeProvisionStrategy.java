@@ -40,7 +40,7 @@ public class FrameMenuToolPrototypeProvisionStrategy extends AbstractMenuToolCom
 	/**Frame prototype providers constructor.
 	@param frame The composite component the top-level prototype provider children of which will be monitored.
 	@param defaultPrototypeProviders The default prototype providers that will provide prototypes for processing, outside the children of the composite component parent.
-	@exception NullPointerException if the given parent component, prototype providers, and/or one or more prototype provider is <code>null</code>.
+	@throws NullPointerException if the given parent component, prototype providers, and/or one or more prototype provider is <code>null</code>.
 	*/
 	public FrameMenuToolPrototypeProvisionStrategy(final Frame frame, final PrototypeProvider... defaultPrototypeProviders)
 	{

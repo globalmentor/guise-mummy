@@ -86,11 +86,11 @@ public class Rule extends AbstractClassTypedURFResource
 	@param object The object on which this rule should be applied.
 	@param ploopProcessor The PLOOP processor for setting object properties.
 	@return <code>true</code> if the rule selected the given object.
-	@exception NullPointerException if the given object and/or PLOOP processor is <code>null</code>.
- 	@exception DataException if a resource is a Java-typed resource the class of which cannot be found.
-	@exception DataException if a particular value is not an appropriate argument for the corresponding property.
-	@exception DataException If a particular property could not be accessed.
-	@exception InvocationTargetException if a resource indicates a Java class the constructor of which throws an exception.
+	@throws NullPointerException if the given object and/or PLOOP processor is <code>null</code>.
+ 	@throws DataException if a resource is a Java-typed resource the class of which cannot be found.
+	@throws DataException if a particular value is not an appropriate argument for the corresponding property.
+	@throws DataException If a particular property could not be accessed.
+	@throws InvocationTargetException if a resource indicates a Java class the constructor of which throws an exception.
 	*/
 	public boolean apply(final Object object, final PLOOPURFProcessor ploopProcessor) throws DataException, InvocationTargetException
 	{

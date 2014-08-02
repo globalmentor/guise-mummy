@@ -75,7 +75,7 @@ public class WebImageBooleanSelectActionControlViewer<C extends ImageBooleanSele
 	}
 	
 	/**Begins the rendering process.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictBegin() throws IOException
 	{

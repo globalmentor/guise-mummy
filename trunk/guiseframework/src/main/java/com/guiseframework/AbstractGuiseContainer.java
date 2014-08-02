@@ -124,11 +124,11 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	 * @param homeDirectory The home directory of the application.
 	 * @param logDirectory The log directory of the application.
 	 * @param tempDirectory The temporary directory of the application.
-	 * @exception NullPointerException if the application, base URI, home directory, log directory, and/or temporary directory is <code>null</code>.
-	 * @exception IllegalArgumentException if the given base URI is not absolute or the path of which is not absolute or not a collection.
-	 * @exception IllegalStateException if the application is already installed in some container.
-	 * @exception IllegalStateException if there is already an application installed in this container at the given base path.
-	 * @exception IOException if there is an I/O error when installing the application.
+	 * @throws NullPointerException if the application, base URI, home directory, log directory, and/or temporary directory is <code>null</code>.
+	 * @throws IllegalArgumentException if the given base URI is not absolute or the path of which is not absolute or not a collection.
+	 * @throws IllegalStateException if the application is already installed in some container.
+	 * @throws IllegalStateException if there is already an application installed in this container at the given base path.
+	 * @throws IOException if there is an I/O error when installing the application.
 	 */
 	protected void installApplication(final AbstractGuiseApplication application, final URI baseURI, final File homeDirectory, final File logDirectory,
 			final File tempDirectory) throws IOException
@@ -152,8 +152,8 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	/**
 	 * Uninstalls the given application.
 	 * @param application The application to uninstall.
-	 * @exception NullPointerException if the application is <code>null</code>.
-	 * @exception IllegalStateException if the application is not installed in this container.
+	 * @throws NullPointerException if the application is <code>null</code>.
+	 * @throws IllegalStateException if the application is not installed in this container.
 	 */
 	protected void uninstallApplication(final AbstractGuiseApplication application) //TODO add a facility to unregister and remove all sessions associated with the application
 	{
@@ -178,8 +178,8 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	 * Container base URI constructor.
 	 * @param baseURI The base URI of the container, an absolute URI that ends with the base path, which ends with a slash ('/'), indicating the base path of the
 	 *          application base paths.
-	 * @exception NullPointerException if the base URI is <code>null</code>.
-	 * @exception IllegalArgumentException if the base URI is not absolute or does not end with a slash ('/') character.
+	 * @throws NullPointerException if the base URI is <code>null</code>.
+	 * @throws IllegalArgumentException if the base URI is not absolute or does not end with a slash ('/') character.
 	 */
 	public AbstractGuiseContainer(final URI baseURI)
 	{
@@ -203,8 +203,8 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	 * "/path/to/container/relative/path", while resolving "/absolute/path" will yield "/absolute/path".
 	 * @param path The path to be resolved.
 	 * @return The path resolved against the container base path.
-	 * @exception NullPointerException if the given path is <code>null</code>.
-	 * @exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
+	 * @throws NullPointerException if the given path is <code>null</code>.
+	 * @throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
 	 *              {@link #resolveURI(URI)} should be used instead).
 	 * @see #getBasePath()
 	 */
@@ -220,7 +220,7 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	 * "http://example.com/path".
 	 * @param uri The URI to be resolved.
 	 * @return The uri resolved against the container base path.
-	 * @exception NullPointerException if the given URI is <code>null</code>.
+	 * @throws NullPointerException if the given URI is <code>null</code>.
 	 * @see #getBasePath()
 	 */
 	public URI resolveURI(final URI uri)
@@ -232,8 +232,8 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	 * Determines if the application has a resource available stored at the given resource path. The provided path is first normalized.
 	 * @param resourcePath A container-relative path to a resource in the resource storage area.
 	 * @return <code>true</code> if a resource exists at the given resource path.
-	 * @exception IllegalArgumentException if the given resource path is absolute.
-	 * @exception IllegalArgumentException if the given path is not a valid path.
+	 * @throws IllegalArgumentException if the given resource path is absolute.
+	 * @throws IllegalArgumentException if the given path is not a valid path.
 	 */
 	protected abstract boolean hasResource(final String resourcePath);
 
@@ -241,8 +241,8 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	 * Retrieves an input stream to the resource at the given path. The provided path is first normalized.
 	 * @param resourcePath A container-relative path to a resource in the resource storage area.
 	 * @return An input stream to the resource at the given resource path, or <code>null</code> if no resource exists at the given resource path.
-	 * @exception IllegalArgumentException if the given resource path is absolute.
-	 * @exception IllegalArgumentException if the given path is not a valid path.
+	 * @throws IllegalArgumentException if the given resource path is absolute.
+	 * @throws IllegalArgumentException if the given path is not a valid path.
 	 */
 	protected abstract InputStream getResourceInputStream(final String resourcePath);
 
@@ -250,8 +250,8 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	 * Retrieves an input stream to the entity at the given URI. The URI is first resolved to the container base URI.
 	 * @param uri A URI to the entity; either absolute or relative to the container.
 	 * @return An input stream to the entity at the given resource URI, or <code>null</code> if no entity exists at the given resource path.
-	 * @exception NullPointerException if the given URI is <code>null</code>.
-	 * @exception IOException if there was an error connecting to the entity at the given URI.
+	 * @throws NullPointerException if the given URI is <code>null</code>.
+	 * @throws IOException if there was an error connecting to the entity at the given URI.
 	 * @see #getBaseURI()
 	 */
 	public InputStream getInputStream(final URI uri) throws IOException //TODO fix to work with resource URIs by delegating to getResourceInputStream()

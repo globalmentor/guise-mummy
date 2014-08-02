@@ -111,7 +111,7 @@ public interface Component extends DepictedObject, PresentationModel, InfoModel
 	/**Sets the name of the component.
 	This is a bound property.
 	@param newName The new name of the component, or <code>null</code> if the component should have no name.
-	@exception IllegalArgumentException if the given name is the empty string.
+	@throws IllegalArgumentException if the given name is the empty string.
 	@see #NAME_PROPERTY
 	*/
 	public void setName(final String newName);
@@ -189,9 +189,9 @@ public interface Component extends DepictedObject, PresentationModel, InfoModel
 	A container's parent cannot be set to a container unless that container already recognizes this component as one of its children.
 	If a component is given the same parent it already has, no action occurs.
 	@param newParent The new parent for this component, or <code>null</code> if this component is being removed from a parent.
-	@exception IllegalStateException if a parent is provided and this component already has a parent.
-	@exception IllegalStateException if no parent is provided and this component's old parent is a container that still recognizes this component as its child.
-	@exception IllegalArgumentException if a parent container is provided and the given parent container does not already recognize this component as its child.
+	@throws IllegalStateException if a parent is provided and this component already has a parent.
+	@throws IllegalStateException if no parent is provided and this component's old parent is a container that still recognizes this component as its child.
+	@throws IllegalArgumentException if a parent container is provided and the given parent container does not already recognize this component as its child.
 	@see Container#add(Component)
 	@see Container#remove(Component)
 	*/
@@ -288,7 +288,7 @@ public interface Component extends DepictedObject, PresentationModel, InfoModel
 	/**Initializes the component after construction.
 	This method can only be called once during the life of a component.
 	Subclasses should call this version.
-	@exception IllegalStateException if this method has already been called.
+	@throws IllegalStateException if this method has already been called.
 	*/
 	public void initialize();
 
@@ -304,7 +304,7 @@ public interface Component extends DepictedObject, PresentationModel, InfoModel
 	/**Returns the theme to apply to this component.
 	If there is no theme to this component, the parent theme will be returned. 
 	@return The theme to apply to this component.
-	@exception IOException if there is an error loading the theme.
+	@throws IOException if there is an error loading the theme.
 	*/
 	public Theme getTheme() throws IOException;
 
@@ -323,7 +323,7 @@ public interface Component extends DepictedObject, PresentationModel, InfoModel
 	This method is called for any child components before applying the theme to the component itself,
 	to assure that child theme updates have already occured before theme updates occur for this component.
 	There is normally no need to override this method or to call this method directly by applications.
-	@exception IOException if there was an error loading or applying a theme.
+	@throws IOException if there was an error loading or applying a theme.
 	@see #isThemeApplied()
 	@see #applyTheme()
 	*/
@@ -333,7 +333,7 @@ public interface Component extends DepictedObject, PresentationModel, InfoModel
 	Themes are only applied of the application is themed.
 	This method may be overridden to effectively override theme settings by ensuring the state of important properties after the theme has been set. 
 	If the theme is successfully applied, this method updates the theme applied status.
-	@exception IOException if there was an error loading or applying a theme.
+	@throws IOException if there was an error loading or applying a theme.
 	@see GuiseApplication#isThemed()
 	@see #getTheme()
 	@see #applyTheme(Theme)
@@ -352,14 +352,14 @@ public interface Component extends DepictedObject, PresentationModel, InfoModel
 	/**Loads the preferences for this component and optionally any descendant components.
 	Any preferences returned from {@link #getPreferenceProperties()} will be loaded automatically.
 	@param includeDescendants <code>true</code> if preferences of any descendant components should also be loaded, else <code>false</code>.
-	@exception IOException if there is an error loading preferences.
+	@throws IOException if there is an error loading preferences.
 	*/
 	public void loadPreferences(final boolean includeDescendants) throws IOException;
 
 	/**Saves the preferences for this component and optionally any descendant components.
 	Any preferences returned from {@link #getPreferenceProperties()} will be saved automatically.
 	@param includeDescendants <code>true</code> if preferences of any descendant components should also be saved, else <code>false</code>.
-	@exception IOException if there is an error saving preferences.
+	@throws IOException if there is an error saving preferences.
 	*/
 	public void savePreferences(final boolean includeDescendants) throws IOException;
 
@@ -370,7 +370,7 @@ public interface Component extends DepictedObject, PresentationModel, InfoModel
 	Only after the event has been dispatched to any children will the event be fired to any event listeners and then passed to the installed input strategy, if any.
 	Once the event is consumed, no further processing takes place.
 	@param inputEvent The input event to dispatch.
-	@exception NullPointerException if the given event is <code>null</code>.
+	@throws NullPointerException if the given event is <code>null</code>.
 	@see TargetedEvent
 	@see FocusedInputEvent
 	@see InputEvent#isConsumed()
@@ -383,7 +383,7 @@ public interface Component extends DepictedObject, PresentationModel, InfoModel
 	/**Fire the given even to all registered listeners, if any.
 	If the event is consumed further processing should cease.
 	@param inputEvent The input event to fire.
-	@exception NullPointerException if the given event is <code>null</code>.
+	@throws NullPointerException if the given event is <code>null</code>.
 	@see InputEvent#isConsumed()
 	*/
 	public void fireInputEvent(final InputEvent inputEvent);
@@ -435,7 +435,7 @@ public interface Component extends DepictedObject, PresentationModel, InfoModel
 	@param componentBounds The absolute bounds of the component.
 	@param viewportBounds The absolute bounds of the viewport.
 	@param mousePosition The position of the mouse relative to the viewport.
-	@exception NullPointerException if one or more of the arguments are <code>null</code>.
+	@throws NullPointerException if one or more of the arguments are <code>null</code>.
 	@see MouseListener
 	@see MouseEvent
 	*/
@@ -446,7 +446,7 @@ public interface Component extends DepictedObject, PresentationModel, InfoModel
 	@param componentBounds The absolute bounds of the component.
 	@param viewportBounds The absolute bounds of the viewport.
 	@param mousePosition The position of the mouse relative to the viewport.
-	@exception NullPointerException if one or more of the arguments are <code>null</code>.
+	@throws NullPointerException if one or more of the arguments are <code>null</code>.
 	@see MouseListener
 	@see MouseEvent
 	*/

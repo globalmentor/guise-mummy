@@ -48,7 +48,7 @@ public class Orientation
 		/**Determines the orientation for the particular flow.
 		@param flow The flow (line or page).
 		@return The orientation for the specified flow.
-		@exception NullPointerException if the given flow is <code>null</code>.
+		@throws NullPointerException if the given flow is <code>null</code>.
 		*/
 		public FlowOrientation getOrientation(final Flow flow)
 		{
@@ -58,7 +58,7 @@ public class Orientation
 		/**Determines the axis for the particular flow.
 		@param flow The flow (line or page).
 		@return The axis for the specified flow.
-		@exception NullPointerException if the given flow is <code>null</code>.
+		@throws NullPointerException if the given flow is <code>null</code>.
 		*/
 		public Axis getAxis(final Flow flow)
 		{
@@ -68,7 +68,7 @@ public class Orientation
 		/**Determines the flow (line or page) that is aligned to the given axis.
 		@param axis The axis for which flow should be determined.
 		@return The flow that is aligned to the given axis.
-		@exception NullPointerException if the given axis is <code>null</code>.
+		@throws NullPointerException if the given axis is <code>null</code>.
 		*/
 		public Flow getFlow(final Axis axis)
 		{
@@ -85,7 +85,7 @@ public class Orientation
 		/**Determines the direction of the particular flow.
 		@param flow The flow (line or page).
 		@return The direction of the specified flow.
-		@exception NullPointerException if the given flow is <code>null</code>.
+		@throws NullPointerException if the given flow is <code>null</code>.
 		*/
 		public Flow.Direction getDirection(final Flow flow)
 		{
@@ -98,7 +98,7 @@ public class Orientation
 		/**Determines the side for the particular border.
 		@param border The logical border.
 		@return The side for the specified border.
-		@exception NullPointerException if the given border is <code>null</code>.
+		@throws NullPointerException if the given border is <code>null</code>.
 		*/
 		public Side getSide(final Border border)
 		{
@@ -108,7 +108,7 @@ public class Orientation
 		/**Determines the border that appears on the given side.
 		@param side The side for which the border should be determined.
 		@return The border that appears on the given side.
-		@exception NullPointerException if the given side is <code>null</code>.
+		@throws NullPointerException if the given side is <code>null</code>.
 		*/
 		public Border getBorder(final Side side)
 		{
@@ -126,7 +126,7 @@ public class Orientation
 	@param flow The flow for which the compass point should be returned
 	@param end The end of the flow requested.
 	@return The cardinal compass point indicating the absolute direction of the given flow end.
-	@exception NullPointerException if the given flow and/or end is <code>null</code>.
+	@throws NullPointerException if the given flow and/or end is <code>null</code>.
 	@see CompassPoint#NORTH
 	@see CompassPoint#EAST
 	@see CompassPoint#SOUTH
@@ -142,7 +142,7 @@ public class Orientation
 	@param lineEnd The end of the line flow, or <code>null</code> if a cardinal direction is requested and a page end is provided.
 	@param pageEnd The end of the page flow, or <code>null</code> if a cardinal direction is requested and a line end is provided.
 	@return The cardinal or ordinal compass point indicating the absolute direction of the given line and page end.
-	@exception NullPointerException if both the given line end and the given page end are <code>null</code>.
+	@throws NullPointerException if both the given line end and the given page end are <code>null</code>.
 	@see CompassPoint#NORTH
 	@see CompassPoint#NORTHEAST
 	@see CompassPoint#EAST
@@ -185,9 +185,9 @@ public class Orientation
 	/**Flow orientation constructor.
 	@param lineOrientation The orientation of the line.
 	@param pageOrientation The orientation of the page.
-	@exception NullPointerException if the line orientation and/or page orientation is <code>null</code>.
-	@exception IllegalArgumentException if the line orientation and/or page orientation uses the {@link Axis#Z} axis.
-	@exception IllegalArgumentException if both flow orientations specify the same axis.
+	@throws NullPointerException if the line orientation and/or page orientation is <code>null</code>.
+	@throws IllegalArgumentException if the line orientation and/or page orientation uses the {@link Axis#Z} axis.
+	@throws IllegalArgumentException if both flow orientations specify the same axis.
 	*/
 	public Orientation(final FlowOrientation lineOrientation, final FlowOrientation pageOrientation)
 	{

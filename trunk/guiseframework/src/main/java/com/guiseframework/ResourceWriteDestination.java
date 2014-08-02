@@ -44,8 +44,8 @@ public interface ResourceWriteDestination extends Destination
 	@param bookmark The bookmark for this navigation path, or <code>null</code> if there is no bookmark involved in navigation.
 	@param referrerURI The URI of the referring component or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 	@return An output stream to the given resource.
-	@exception NullPointerException if the given navigation path is <code>null</code>.
-	@exception ResourceIOException Thrown if there is an error writing to the resource.
+	@throws NullPointerException if the given navigation path is <code>null</code>.
+	@throws ResourceIOException Thrown if there is an error writing to the resource.
 	*/
 	public OutputStream getOutputStream(final URFResource resourceDescription, final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException;
 

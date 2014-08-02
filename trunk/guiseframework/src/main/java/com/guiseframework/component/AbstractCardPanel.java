@@ -69,7 +69,7 @@ public abstract class AbstractCardPanel extends AbstractListSelectContainerContr
 	
 	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given layout is <code>null</code>.
+	@throws NullPointerException if the given layout is <code>null</code>.
 	*/
 	protected AbstractCardPanel(final CardLayout layout)
 	{
@@ -211,7 +211,7 @@ public abstract class AbstractCardPanel extends AbstractListSelectContainerContr
 	Child components may override this method to select a different bookmark based upon whether components are enabled, for example.
 	@param bookmarkName The bookmark parameter value for which a component should be returned.
 	@return The child component indicated by the given bookmark parameter value, or <code>null</code> if the given bookmark name represents the <code>null</code> component value.
-	@exception NullPointerException if the given bookmark name is <code>null</code>.
+	@throws NullPointerException if the given bookmark name is <code>null</code>.
 	*/
 /*TODO del when works
 	protected Component getComponentByBookmarkName(final String bookmarkName)

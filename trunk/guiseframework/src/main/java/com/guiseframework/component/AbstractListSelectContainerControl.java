@@ -55,7 +55,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 		/**Sets the strategy used to generate a component to represent each value in the model.
 		This is a bound property
 		@param newValueRepresentationStrategy The new strategy to create components to represent this model's values.
-		@exception NullPointerException if the provided value representation strategy is <code>null</code>.
+		@throws NullPointerException if the provided value representation strategy is <code>null</code>.
 		@see SelectControl#VALUE_REPRESENTATION_STRATEGY_PROPERTY
 		*/
 		public void setValueRepresentationStrategy(final ValueRepresentationStrategy<Component> newValueRepresentationStrategy)
@@ -80,7 +80,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 
 	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given layout is <code>null</code>.
+	@throws NullPointerException if the given layout is <code>null</code>.
 	*/
 	protected AbstractListSelectContainerControl(final AbstractValueLayout<?> layout)
 	{
@@ -146,7 +146,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	Validation always occurs if a validator is installed, even if the value is not changing.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param newValue The new value.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see #getValidator()
 	@see #VALUE_PROPERTY
 	*/
@@ -180,7 +180,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	public boolean isValidValue() {return getLayout().isValidValue();}
 
 	/**Validates the value of this model, throwing an exception if the model is not valid.
-	@exception ValidationException if the value of this model is not valid.	
+	@throws ValidationException if the value of this model is not valid.	
 	*/
 	public void validateValue() throws ValidationException {getLayout().validateValue();}
 
@@ -218,7 +218,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	This method delegates to the selection strategy.
 	@param values The values to select.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	*/
 	public void setSelectedValues(final Component... values) throws PropertyVetoException
 	{
@@ -254,7 +254,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	Invalid and duplicate indices will be ignored.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to select.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getSetSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedValues(V[])
 	@see #addSelectedIndexes(int...)
@@ -268,7 +268,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	Any invalid indices will be ignored.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to add to the selection.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getAddSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedIndexes(int[])
 	*/
@@ -284,7 +284,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	Any invalid indices will be ignored.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to remove from the selection.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getRemoveSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedIndexes(int[])
 	*/
@@ -305,7 +305,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	/**Determines the displayed status of the first occurrence of a given value.
 	@param value The value for which the displayed status is to be determined.
 	@return <code>true</code> if the value is displayed, else <code>false</code>.
-	@exception IndexOutOfBoundsException if the given value does not occur in the model.
+	@throws IndexOutOfBoundsException if the given value does not occur in the model.
 	*/
 	public boolean isValueDisplayed(final Component value) {return getLayout().getConstraints(value).isDisplayed();}
 
@@ -328,14 +328,14 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	@param index The index of the value to enable or disable.
 	@param newDisplayed Whether the value at the given index should be displayed.
 	@see #DISPLAYED_PROPERTY
-	@exception IndexOutOfBoundsException if the given index is not within the range of the list.
+	@throws IndexOutOfBoundsException if the given index is not within the range of the list.
 	*/
 	public void setIndexDisplayed(final int index, final boolean newDisplayed) {setValueDisplayed(get(index), newDisplayed);}	//TODO fix property change event
 
 	/**Determines the enabled status of the first occurrence of a given value.
 	@param value The value for which the enabled status is to be determined.
 	@return <code>true</code> if the value is enabled, else <code>false</code>.
-	@exception IndexOutOfBoundsException if the given value does not occur in the model.
+	@throws IndexOutOfBoundsException if the given value does not occur in the model.
 	*/
 	public boolean isValueEnabled(final Component value) {return getLayout().getConstraints(value).isEnabled();}
 
@@ -358,7 +358,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	@param index The index of the value to enable or disable.
 	@param newEnabled Whether the value at the given index should be enabled.
 	@see #ENABLED_PROPERTY
-	@exception IndexOutOfBoundsException if the given index is not within the range of the list.
+	@throws IndexOutOfBoundsException if the given index is not within the range of the list.
 	*/
 	public void setIndexEnabled(final int index, final boolean newEnabled) {setValueEnabled(get(index), newEnabled);}	//TODO fix property change event
 
@@ -458,15 +458,15 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	/**Returns an array containing all of the values in this model.
 	@param array The array into which the value of this collection are to be stored, if it is big enough; otherwise, a new array of the same runtime type is allocated for this purpose.
 	@return An array containing the values of this model.
-	@exception ArrayStoreException if the runtime type of the specified array is not a supertype of the runtime type of every value in this model.
-	@exception NullPointerException if the specified array is <code>null</code>.
+	@throws ArrayStoreException if the runtime type of the specified array is not a supertype of the runtime type of every value in this model.
+	@throws NullPointerException if the specified array is <code>null</code>.
 	*/
 	public <T> T[] toArray(final T[] array) {return getComponentList().toArray(array);}
 
 	/**Determines if this model contains all of the values of the specified collection.
 	@param collection The collection to be checked for containment in this model.
 	@return <code>true</code> if this model contains all of the values of the specified collection.
-	@exception NullPointerException if the specified collection is <code>null</code>.
+	@throws NullPointerException if the specified collection is <code>null</code>.
 	@see #contains(Object)
 	*/
 	public boolean containsAll(final Collection<?> collection) {return getComponentList().containsAll(collection);}
@@ -474,7 +474,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	/**Appends all of the values in the specified collection to the end of this model, in the order that they are returned by the specified collection's iterator.
 	@param collection The collection the values of which are to be added to this model.
 	@return <code>true</code> if this model changed as a result of the call.
-	@exception NullPointerException if the specified collection is <code>null</code>.
+	@throws NullPointerException if the specified collection is <code>null</code>.
 	@see #add(Object)
 	*/
 	public boolean addAll(final Collection<? extends Component> collection) {throw new UnsupportedOperationException("addAll(Collection) not yet supported");}	//TODO add all these to container
@@ -483,15 +483,15 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	@param index The index at which to insert first value from the specified collection.
 	@param collection The values to be inserted into this model.
 	@return <code>true</code> if this model changed as a result of the call.
-	@exception NullPointerException if the specified collection is <code>null</code>.
-	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
+	@throws NullPointerException if the specified collection is <code>null</code>.
+	@throws IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
 	*/
 	public synchronized boolean addAll(final int index, final Collection<? extends Component> collection) {throw new UnsupportedOperationException("addAll(index, Collection) not yet supported");}
 
 	/**Removes from this model all the values that are contained in the specified collection.
 	@param collection The collection that defines which values will be removed from this model.
 	@return <code>true</code> if this model changed as a result of the call.
-	@exception NullPointerException if the specified collection is <code>null</code>.
+	@throws NullPointerException if the specified collection is <code>null</code>.
 	@see #remove(Object)
 	@see #contains(Object)
 	*/
@@ -500,7 +500,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	/**Retains only the values in this model that are contained in the specified collection.
 	@param collection The collection that defines which values this model will retain.
 	@return <code>true</code> if this model changed as a result of the call.
-	@exception NullPointerException if the specified collection is <code>null</code>.
+	@throws NullPointerException if the specified collection is <code>null</code>.
 	@see #remove(Object)
 	@see #contains(Object)
 	*/
@@ -510,7 +510,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	@param index The index of the value to replace.
 	@param value The value to be stored at the specified position.
 	@return The value at the specified position.
-	@exception IndexOutOfBoundsException if the index is out of range (<var>index<var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
+	@throws IndexOutOfBoundsException if the index is out of range (<var>index<var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
 	*/
 	public Component set(final int index, final Component value) {throw new UnsupportedOperationException("set(index, value) not yet supported");}
 
@@ -520,7 +520,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	/**Returns a list iterator of the values in this model (in proper sequence), starting at the specified position in this model.
 	@param index The index of first value to be returned from the list iterator (by a call to the <code>next()</code> method).
 	@return A list iterator of the values in this model (in proper sequence), starting at the specified position in this model.
-	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
+	@throws IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
 	*/
 	public ListIterator<Component> listIterator(final int index) {return getComponentList().listIterator(index);}
 
@@ -536,8 +536,8 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	This convenience method creates new card layout constraints from the given label model and adds the component.
 	@param component The component to add.
 	@param labelModel The label associated with an individual component.
-	@exception NullPointerException if the given label is <code>null</code>.
-	@exception IllegalArgumentException if the component already has a parent.
+	@throws NullPointerException if the given label is <code>null</code>.
+	@throws IllegalArgumentException if the component already has a parent.
 	*/
 /*TODO del if not wanted
 	public void add(final Component component, final LabelModel labelModel)
@@ -548,7 +548,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 
 	/**Convenience method to determine whether a card is displayed based upon its associated constraints.
 	@return Whether the card is displayed or has no representation, taking up no space.
-	@exception IllegalStateException if the given component has no associated constraints.
+	@throws IllegalStateException if the given component has no associated constraints.
 	@see ControlConstraints#isDisplayed()
 	*/
 	public boolean isDisplayed(final Component component)
@@ -565,7 +565,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	This convenience method changes the displayed status of the component's associated constraints.
 	@param component The component for which the card should be displayed or not displayed.
 	@param newDisplayed <code>true</code> if the card should be displayed.
-	@exception IllegalStateException if the given component has no associated constraints.
+	@throws IllegalStateException if the given component has no associated constraints.
 	@see ControlConstraints#setDisplayed(boolean)
 	*/
 	public void setDisplayed(final Component component, final boolean newDisplayed)
@@ -580,7 +580,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 
 	/**Convenience method to determine whether a card is enabled based upon its associated constraints.
 	@return Whether the card is enabled and can receive user input.
-	@exception IllegalStateException if the given component has no associated constraints.
+	@throws IllegalStateException if the given component has no associated constraints.
 	@see CardConstraints#isEnabled()
 	*/
 	public boolean isEnabled(final Component component)
@@ -597,7 +597,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	This convenience method changes the enabled status of the component's associated constraints.
 	@param component The component for which the card should be enabled or disabled.
 	@param newEnabled <code>true</code> if the card can be selected.
-	@exception IllegalStateException if the given component has no associated constraints.
+	@throws IllegalStateException if the given component has no associated constraints.
 	@see CardConstraints#setEnabled(boolean)
 	*/
 	public void setEnabled(final Component component, final boolean newEnabled)

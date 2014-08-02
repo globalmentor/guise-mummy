@@ -53,8 +53,8 @@ public interface TextModel extends Model
 	/**Sets the content type of the text.
 	This is a bound property.
 	@param newTextContentType The new text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
+	@throws NullPointerException if the given content type is <code>null</code>.
+	@throws IllegalArgumentException if the given content type is not a text content type.
 	@see #TEXT_CONTENT_TYPE_PROPERTY
 	*/
 	public void setTextContentType(final ContentType newTextContentType);

@@ -28,7 +28,7 @@ public class SetEvent<E> extends CollectionEvent<E>
 	/**Source constructor for general set modification.
 	@param session The Guise session in which this event was generated.
 	@param source The object on which the event initially occurred.
-	@exception NullPointerException if the given source is <code>null</code>.
+	@throws NullPointerException if the given source is <code>null</code>.
 	*/
 	public SetEvent(final Object source)
 	{
@@ -39,7 +39,7 @@ public class SetEvent<E> extends CollectionEvent<E>
 	@param source The object on which the event initially occurred.
 	@param addedElement The element that was added to the set, or <code>null</code> if no element was added or it is unknown whether or which elements were added.
 	@param removedElement The element that was removed from the set, or <code>null</code> if no element was removed or it is unknown whether or which elements were removed.
-	@exception NullPointerException if the given source is <code>null</code>.
+	@throws NullPointerException if the given source is <code>null</code>.
 	*/
 	public SetEvent(final Object source, final E addedElement, final E removedElement)
 	{

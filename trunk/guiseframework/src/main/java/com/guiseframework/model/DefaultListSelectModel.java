@@ -62,7 +62,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	Validation always occurs if a validator is installed, even if the value is not changing.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param newValue The input value of the model.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see #getValidator()
 	@see ValueModel#VALUE_PROPERTY
 	*/
@@ -169,8 +169,8 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	/**Returns an array containing all of the values in this model.
 	@param array The array into which the value of this collection are to be stored, if it is big enough; otherwise, a new array of the same runtime type is allocated for this purpose.
 	@return An array containing the values of this model.
-	@exception ArrayStoreException if the runtime type of the specified array is not a supertype of the runtime type of every value in this model.
-	@exception NullPointerException if the specified array is <code>null</code>.
+	@throws ArrayStoreException if the runtime type of the specified array is not a supertype of the runtime type of every value in this model.
+	@throws NullPointerException if the specified array is <code>null</code>.
 	*/
 	@SuppressWarnings("unchecked")	//we use the component type of the array if we create a new array, so the cast is logically correct
 	public <T> T[] toArray(T[] array)
@@ -245,7 +245,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	/**Determines if this model contains all of the values of the specified collection.
 	@param collection The collection to be checked for containment in this model.
 	@return <code>true</code> if this model contains all of the values of the specified collection.
-	@exception NullPointerException if the specified collection is <code>null</code>.
+	@throws NullPointerException if the specified collection is <code>null</code>.
 	@see #contains(Object)
 	*/
 	public boolean containsAll(final Collection<?> collection)
@@ -266,7 +266,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	/**Appends all of the values in the specified collection to the end of this model, in the order that they are returned by the specified collection's iterator.
 	@param collection The collection the values of which are to be added to this model.
 	@return <code>true</code> if this model changed as a result of the call.
-	@exception NullPointerException if the specified collection is <code>null</code>.
+	@throws NullPointerException if the specified collection is <code>null</code>.
 	@see #add(Object)
 	*/
 	public boolean addAll(final Collection<? extends V> collection)
@@ -281,8 +281,8 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	@param index The index at which to insert first value from the specified collection.
 	@param collection The values to be inserted into this model.
 	@return <code>true</code> if this model changed as a result of the call.
-	@exception NullPointerException if the specified collection is <code>null</code>.
-	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
+	@throws NullPointerException if the specified collection is <code>null</code>.
+	@throws IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
 	*/
 	public synchronized boolean addAll(int index, final Collection<? extends V> collection)
 	{
@@ -306,7 +306,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	/**Removes from this model all the values that are contained in the specified collection.
 	@param collection The collection that defines which values will be removed from this model.
 	@return <code>true</code> if this model changed as a result of the call.
-	@exception NullPointerException if the specified collection is <code>null</code>.
+	@throws NullPointerException if the specified collection is <code>null</code>.
 	@see #remove(Object)
 	@see #contains(Object)
 	*/
@@ -342,7 +342,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	/**Retains only the values in this model that are contained in the specified collection.
 	@param collection The collection that defines which values this model will retain.
 	@return <code>true</code> if this model changed as a result of the call.
-	@exception NullPointerException if the specified collection is <code>null</code>.
+	@throws NullPointerException if the specified collection is <code>null</code>.
 	@see #remove(Object)
 	@see #contains(Object)
 	*/
@@ -413,7 +413,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	@param index The index of the value to replace.
 	@param value The value to be stored at the specified position.
 	@return The value at the specified position.
-	@exception IndexOutOfBoundsException if the index is out of range (<var>index<var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
+	@throws IndexOutOfBoundsException if the index is out of range (<var>index<var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
 	*/
 	public V set(final int index, final V value)
 	{
@@ -453,7 +453,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	/**Removes the value at the specified position in this model.
 	@param index The index of the value to removed.
 	@return The value previously at the specified position.
-	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
+	@throws IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
 	*/
 	public V remove(final int index)
 	{
@@ -520,7 +520,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	/**Returns a list iterator of the values in this model (in proper sequence), starting at the specified position in this model.
 	@param index The index of first value to be returned from the list iterator (by a call to the <code>next()</code> method).
 	@return A list iterator of the values in this model (in proper sequence), starting at the specified position in this model.
-	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
+	@throws IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
 	*/
 	public ListIterator<V> listIterator(final int index)
 	{
@@ -604,7 +604,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	Invalid and duplicate indices will be ignored.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to select.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getSetSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedValues(V[])
 	@see #addSelectedIndexes(int...)
@@ -670,7 +670,7 @@ if(validIndexCount==0)	//TODO add more thorough validation throughout; right now
 	Any invalid indices will be ignored.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to add to the selection.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getAddSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedIndexes(int[])
 	*/
@@ -704,7 +704,7 @@ if(validIndexCount==0)	//TODO add more thorough validation throughout; right now
 	Any invalid indices will be ignored.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to remove from the selection.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getRemoveSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedIndexes(int[])
 	*/
@@ -780,7 +780,7 @@ if(validIndexCount==0)	//TODO add more thorough validation throughout; right now
 	Values that do not occur in the select model will be ignored.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param values The values to select.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see #setSelectedIndexes(int[])
 	*/
 	public void setSelectedValues(final V... values) throws PropertyVetoException
@@ -834,7 +834,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	/**Determines the displayed status of the first occurrence of a given value.
 	@param value The value for which the displayed status is to be determined.
 	@return <code>true</code> if the value is displayed, else <code>false</code>.
-	@exception IndexOutOfBoundsException if the given value does not occur in the model.
+	@throws IndexOutOfBoundsException if the given value does not occur in the model.
 	*/
 	public boolean isValueDisplayed(final V value)
 	{
@@ -875,7 +875,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	@param index The index of the value to display.
 	@param newDisplayed Whether the value at the given index should be displayed.
 	@see #DISPLAYED_PROPERTY
-	@exception IndexOutOfBoundsException if the given index is not within the range of the list.
+	@throws IndexOutOfBoundsException if the given index is not within the range of the list.
 	*/
 	public void setIndexDisplayed(final int index, final boolean newDisplayed)	//TODO fix property change event 
 	{
@@ -894,7 +894,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	/**Determines the enabled status of the first occurrence of a given value.
 	@param value The value for which the enabled status is to be determined.
 	@return <code>true</code> if the value is enabled, else <code>false</code>.
-	@exception IndexOutOfBoundsException if the given value does not occur in the model.
+	@throws IndexOutOfBoundsException if the given value does not occur in the model.
 	*/
 	public boolean isValueEnabled(final V value)
 	{
@@ -935,7 +935,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	@param index The index of the value to enable or disable.
 	@param newEnabled Whether the value at the given index should be enabled.
 	@see #ENABLED_PROPERTY
-	@exception IndexOutOfBoundsException if the given index is not within the range of the list.
+	@throws IndexOutOfBoundsException if the given index is not within the range of the list.
 	*/
 	public void setIndexEnabled(final int index, final boolean newEnabled)	//TODO fix property change event 
 	{
@@ -1078,7 +1078,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 
 	/**Constructs a list select model indicating the type of values it can hold, using a default multiple selection strategy.
 	@param valueClass The class indicating the type of values held in the model.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public DefaultListSelectModel(final Class<V> valueClass)
 	{
@@ -1089,7 +1089,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	The selection strategy is not added as a listener to this model but is rather notified manually so that the event won't be delayed and/or sent out of order
 	@param valueClass The class indicating the type of values held in the model.
 	@param listSelectionStrategy The strategy for selecting values in the model.
-	@exception NullPointerException if the given value class and/or selection strategy is <code>null</code>.
+	@throws NullPointerException if the given value class and/or selection strategy is <code>null</code>.
 	*/
 	public DefaultListSelectModel(final Class<V> valueClass, final ListSelectionPolicy<V> listSelectionStrategy)
 	{

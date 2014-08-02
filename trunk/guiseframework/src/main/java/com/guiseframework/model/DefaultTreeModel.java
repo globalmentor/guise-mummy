@@ -63,7 +63,7 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel	//TODO 
 		/**Sets the root node of the tree model.
 		This is a bound property.
 		@param newRootNode The new root node of the tree model.
-		@exception NullPointerException if the given root node is <code>null</code>.
+		@throws NullPointerException if the given root node is <code>null</code>.
 		@see #ROOT_NODE_PROPERTY
 		*/
 		public void setRootNode(final TreeNodeModel<?> newRootNode)
@@ -114,7 +114,7 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel	//TODO 
 	/**Root node constructor.
 	@param session The Guise session that owns this model.
 	@param rootNode The root node of the tree model.
-	@exception NullPointerException if the given root node is <code>null</code>.
+	@throws NullPointerException if the given root node is <code>null</code>.
 	*/
 	public DefaultTreeModel(final TreeNodeModel<?> rootNode)
 	{

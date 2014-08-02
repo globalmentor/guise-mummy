@@ -51,7 +51,7 @@ public class HTTPServletGuiseSessionManager implements HttpSessionListener
 	@param guiseApplication The application to install to own the created session..
 	@param httpRequest The HTTP request with which the Guise session is to be associated. 
 	@return The Guise session associated with the provided HTTP session.
-	@exception IllegalArgumentException if the provided HTTP session is not a session from this web application or the HTTP session has been invalidated, and there is therefore no corresponding Guise session.
+	@throws IllegalArgumentException if the provided HTTP session is not a session from this web application or the HTTP session has been invalidated, and there is therefore no corresponding Guise session.
 	*/
 	protected static GuiseSession getGuiseSession(final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final HttpServletRequest httpRequest)
 	{
@@ -66,7 +66,7 @@ public class HTTPServletGuiseSessionManager implements HttpSessionListener
 	@param httpRequest The HTTP request with which the Guise session is to be associated.
 	@param createSession Whether a Guise session should be created if one does not already exist. 
 	@return The Guise session associated with the provided HTTP request, or <code>null</code> if there is no Guise session and session creation was not requested.
-	@exception IllegalArgumentException if the provided HTTP session is not a session from this web application or the HTTP session has been invalidated, and there is therefore no corresponding Guise session.
+	@throws IllegalArgumentException if the provided HTTP session is not a session from this web application or the HTTP session has been invalidated, and there is therefore no corresponding Guise session.
 	*/
 	protected static GuiseSession getGuiseSession(final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final HttpServletRequest httpRequest, final boolean createSession)
 	{

@@ -103,7 +103,7 @@ public abstract class AbstractPrototypeProvisionStrategy extends ReentrantReadWr
 		
 	/**Prototype providers constructor.
 	@param prototypeProviders The prototype providers that will provide prototypes for processing.
-	@exception NullPointerException if the given prototype providers and/or one or more prototype provider is <code>null</code>.
+	@throws NullPointerException if the given prototype providers and/or one or more prototype provider is <code>null</code>.
 	*/
 	public AbstractPrototypeProvisionStrategy(final PrototypeProvider... prototypeProviders)
 	{

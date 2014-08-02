@@ -61,7 +61,7 @@ public abstract class AbstractValueModel<V> extends AbstractModel implements Val
 
 	/**Constructs a value model indicating the type of value it can hold.
 	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public AbstractValueModel(final Class<V> valueClass)
 	{
@@ -82,7 +82,7 @@ public abstract class AbstractValueModel<V> extends AbstractModel implements Val
 
 	/**Validates the value of this model, throwing an exception if the model is not valid.
 	This version validates the current value if there is a validator installed.
-	@exception ValidationException if the value of this model is not valid.	
+	@throws ValidationException if the value of this model is not valid.	
 	*/
 	public void validateValue() throws ValidationException
 	{

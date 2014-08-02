@@ -53,26 +53,26 @@ public interface Environment
 	@param <T> The type of property value expected.
 	@param name The name of the property to retrieve.
 	@return The property value.
-	@exception IllegalStateException if no such property exists.
+	@throws IllegalStateException if no such property exists.
 	*/
 	public <T> T getRequiredProperty(final String name);
 
 	/**Sets an environment property.
 	@param name The name of the property.
 	@param value The value to associate with the name.
-	@exception IllegalArgumentException if the given property cannot be set to the given value or cannot be changed.
+	@throws IllegalArgumentException if the given property cannot be set to the given value or cannot be changed.
 	*/
 	public void setProperty(final String name, final Object value);
 
 	/**Sets multiple environment properties.
 	@param map The map of property names and values to set.
-	@exception IllegalArgumentException if the given property cannot be set to the given value or cannot be changed.
+	@throws IllegalArgumentException if the given property cannot be set to the given value or cannot be changed.
 	*/
 	public void setProperties(final Map<String, Object> map);
 
 	/**Removes the property specified by the given name.
 	@param name The name of the property to remove.
-	@exception IllegalArgumentException if the given property cannot be removed.
+	@throws IllegalArgumentException if the given property cannot be removed.
 	*/
 	public void removeProperty(final String name);
 

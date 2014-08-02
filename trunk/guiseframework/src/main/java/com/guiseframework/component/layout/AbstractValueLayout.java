@@ -89,9 +89,9 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 		/**Sets the index of the selected component.
 		If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 		@param newIndex The index of the selected component, or -1 if no component is selected.
-		@exception IllegalStateException if this layout has not yet been installed into a container.
-		@exception IndexOutOfBoundsException if the index is out of range.
-		@exception PropertyVetoException if the component at the given index is not a valid compoment to select or the change has otherwise been vetoed.
+		@throws IllegalStateException if this layout has not yet been installed into a container.
+		@throws IndexOutOfBoundsException if the index is out of range.
+		@throws PropertyVetoException if the component at the given index is not a valid compoment to select or the change has otherwise been vetoed.
 		*/
 		public void setSelectedIndex(final int newIndex) throws PropertyVetoException
 		{
@@ -114,7 +114,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	This version selects a component if none is selected.
 	This version updates the new component's active status if the component implements {@link Activeable}.
 	@param component The component to add to the layout.
-	@exception IllegalStateException if this layout has not yet been installed into a container.
+	@throws IllegalStateException if this layout has not yet been installed into a container.
 	*/
 	public void addComponent(final Component component)
 	{
@@ -180,10 +180,10 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	A layout cannot be given a container unless that container already recognizes this layout as its layout.
 	If a layout is given the same container it already has, no action occurs.
 	@param newOwner The new container for this layout.
-//TODO del		@exception NullPointerException if the given container is <code>null</code>.
-	@exception IllegalStateException if a different container is provided and this layout already has a container.
-	@exception ClassCastException if the given layout component is not a {@link Container}.
-	@exception IllegalArgumentException if a different container is provided and the given container does not already recognize this layout as its layout.
+//TODO del		@throws NullPointerException if the given container is <code>null</code>.
+	@throws IllegalStateException if a different container is provided and this layout already has a container.
+	@throws ClassCastException if the given layout component is not a {@link Container}.
+	@throws IllegalArgumentException if a different container is provided and the given container does not already recognize this layout as its layout.
 	*/
 	public void setOwner(final LayoutComponent newOwner)
 	{
@@ -215,7 +215,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	This version makes sure that the given component is contained in the container, and resets the cached selected index so that it can be recalculated.
 	This version updates the active status of the old and new components if the implement {@link Activeable}.
 	@param newValue The input value of the model.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see #getValidator()
 	@see #VALUE_PROPERTY
 	*/
@@ -294,7 +294,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	public boolean isValidValue() {return getValueModel().isValidValue();}
 
 	/**Validates the value of this model, throwing an exception if the model is not valid.
-	@exception ValidationException if the value of this model is not valid.	
+	@throws ValidationException if the value of this model is not valid.	
 	*/
 	public void validateValue() throws ValidationException {getValueModel().validateValue();}
 

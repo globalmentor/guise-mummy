@@ -32,7 +32,7 @@ public class ValueEvent<V> extends AbstractGuiseEvent
 	/**Source and value constructor.
 	@param source The object on which the event initially occurred.
 	@param value The value being reported.
-	@exception NullPointerException if the given source is <code>null</code>.
+	@throws NullPointerException if the given source is <code>null</code>.
 	*/
 	public ValueEvent(final Object source, final V value)
 	{

@@ -46,7 +46,7 @@ public class AutoNavigationPathBreadcrumbLinkPanel extends NavigationPathBreadcr
 
 	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given layout is <code>null</code>.
+	@throws NullPointerException if the given layout is <code>null</code>.
 	*/
 	public AutoNavigationPathBreadcrumbLinkPanel(final Layout<?> layout)
 	{
@@ -56,7 +56,7 @@ public class AutoNavigationPathBreadcrumbLinkPanel extends NavigationPathBreadcr
 	/**Layout and URI constructor.
 	@param layout The layout definition for the container.
 	@param navigationPath The navigation path, or <code>null</code> if there should be no navigation path.
-	@exception NullPointerException if the given layout is <code>null</code>.
+	@throws NullPointerException if the given layout is <code>null</code>.
 	*/
 	public AutoNavigationPathBreadcrumbLinkPanel(final Layout<?> layout, final URIPath navigationPath)
 	{

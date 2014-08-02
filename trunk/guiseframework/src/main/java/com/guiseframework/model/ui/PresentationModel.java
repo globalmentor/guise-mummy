@@ -171,7 +171,7 @@ public interface PresentationModel extends Model, Displayable
 	The border color of each border represents a bound property.
 	@param border The border for which the border color should be set.
 	@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
-	@exception NullPointerException if the given border is <code>null</code>. 
+	@throws NullPointerException if the given border is <code>null</code>. 
 	@see #BORDER_LINE_NEAR_COLOR_PROPERTY
 	@see #BORDER_LINE_FAR_COLOR_PROPERTY
 	@see #BORDER_PAGE_NEAR_COLOR_PROPERTY
@@ -248,7 +248,7 @@ public interface PresentationModel extends Model, Displayable
 	The border extent of each border represents a bound property.
 	@param border The border for which the border extent should be set.
 	@param newBorderExtent The border extent.
-	@exception NullPointerException if the given border and/or border extent is <code>null</code>. 
+	@throws NullPointerException if the given border and/or border extent is <code>null</code>. 
 	@see #BORDER_LINE_NEAR_EXTENT_PROPERTY
 	@see #BORDER_LINE_FAR_EXTENT_PROPERTY
 	@see #BORDER_PAGE_NEAR_EXTENT_PROPERTY
@@ -259,7 +259,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the border extent of the line near border.
 	This is a bound property.
 	@param newBorderExtent The border extent.
-	@exception NullPointerException if the given border extent is <code>null</code>.
+	@throws NullPointerException if the given border extent is <code>null</code>.
 	@see #BORDER_LINE_NEAR_EXTENT_PROPERTY
 	*/
 	public void setBorderLineNearExtent(final Extent newBorderExtent);
@@ -267,7 +267,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the border extent of the line far border.
 	This is a bound property.
 	@param newBorderExtent The border extent.
-	@exception NullPointerException if the given border extent is <code>null</code>.
+	@throws NullPointerException if the given border extent is <code>null</code>.
 	@see #BORDER_LINE_FAR_EXTENT_PROPERTY
 	*/
 	public void setBorderLineFarExtent(final Extent newBorderExtent);
@@ -275,7 +275,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the border extent of the page near border.
 	This is a bound property.
 	@param newBorderExtent The border extent.
-	@exception NullPointerException if the given border extent is <code>null</code>.
+	@throws NullPointerException if the given border extent is <code>null</code>.
 	@see #BORDER_PAGE_NEAR_EXTENT_PROPERTY
 	*/
 	public void setBorderPageNearExtent(final Extent newBorderExtent);
@@ -283,7 +283,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the border extent of the page far border.
 	This is a bound property.
 	@param newBorderExtent The border extent.
-	@exception NullPointerException if the given border extent is <code>null</code>.
+	@throws NullPointerException if the given border extent is <code>null</code>.
 	@see #BORDER_PAGE_FAR_EXTENT_PROPERTY
 	*/
 	public void setBorderPageFarExtent(final Extent newBorderExtent);
@@ -292,7 +292,7 @@ public interface PresentationModel extends Model, Displayable
 	The border extent of each border represents a bound property.
 	This is a convenience method that calls {@link #setBorderExtent(Border, Extent)} for each border.
 	@param newBorderExtent The border extent.
-	@exception NullPointerException if the given border extent is <code>null</code>.
+	@throws NullPointerException if the given border extent is <code>null</code>.
 	@see #BORDER_LINE_NEAR_EXTENT_PROPERTY
 	@see #BORDER_LINE_FAR_EXTENT_PROPERTY
 	@see #BORDER_PAGE_NEAR_EXTENT_PROPERTY
@@ -330,7 +330,7 @@ public interface PresentationModel extends Model, Displayable
 	The border style of each border represents a bound property.
 	@param border The border for which the border style should be set.
 	@param newBorderStyle The border style.
-	@exception NullPointerException if the given border and/or border style is <code>null</code>. 
+	@throws NullPointerException if the given border and/or border style is <code>null</code>. 
 	@see #BORDER_LINE_NEAR_STYLE_PROPERTY
 	@see #BORDER_LINE_FAR_STYLE_PROPERTY
 	@see #BORDER_PAGE_NEAR_STYLE_PROPERTY
@@ -341,7 +341,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the border style of the line near border.
 	This is a bound property.
 	@param newBorderStyle The border style.
-	@exception NullPointerException if the given border style is <code>null</code>.
+	@throws NullPointerException if the given border style is <code>null</code>.
 	@see #BORDER_LINE_NEAR_STYLE_PROPERTY
 	*/
 	public void setBorderLineNearStyle(final LineStyle newBorderStyle);
@@ -349,7 +349,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the border style of the line far border.
 	This is a bound property.
 	@param newBorderStyle The border style.
-	@exception NullPointerException if the given border style is <code>null</code>.
+	@throws NullPointerException if the given border style is <code>null</code>.
 	@see #BORDER_LINE_FAR_STYLE_PROPERTY
 	*/
 	public void setBorderLineFarStyle(final LineStyle newBorderStyle);
@@ -357,7 +357,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the border style of the page near border.
 	This is a bound property.
 	@param newBorderStyle The border style.
-	@exception NullPointerException if the given border style is <code>null</code>.
+	@throws NullPointerException if the given border style is <code>null</code>.
 	@see #BORDER_PAGE_NEAR_STYLE_PROPERTY
 	*/
 	public void setBorderPageNearStyle(final LineStyle newBorderStyle);
@@ -365,7 +365,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the border style of the page far border.
 	This is a bound property.
 	@param newBorderStyle The border style.
-	@exception NullPointerException if the given border style is <code>null</code>.
+	@throws NullPointerException if the given border style is <code>null</code>.
 	@see #BORDER_PAGE_FAR_STYLE_PROPERTY
 	*/
 	public void setBorderPageFarStyle(final LineStyle newBorderStyle);
@@ -374,7 +374,7 @@ public interface PresentationModel extends Model, Displayable
 	The border style of each border represents a bound property.
 	This is a convenience method that calls {@link #setBorderStyle(Border, LineStyle)} for each border.
 	@param newBorderStyle The border style.
-	@exception NullPointerException if the given border style is <code>null</code>.
+	@throws NullPointerException if the given border style is <code>null</code>.
 	@see #BORDER_LINE_NEAR_STYLE_PROPERTY
 	@see #BORDER_LINE_FAR_STYLE_PROPERTY
 	@see #BORDER_PAGE_NEAR_STYLE_PROPERTY
@@ -412,7 +412,7 @@ public interface PresentationModel extends Model, Displayable
 	The radius of each corner represents a bound property.
 	@param corner The corner for which the arc size should be set.
 	@param newCornerArcSize The dimensions indicating the two radiuses of the corner, or dimensions of zero if the corner should not be rounded.
-	@exception NullPointerException if the given corner and/or arc size is <code>null</code>. 
+	@throws NullPointerException if the given corner and/or arc size is <code>null</code>. 
 	@see #CORNER_LINE_NEAR_PAGE_NEAR_ARC_SIZE_PROPERTY
 	@see #CORNER_LINE_FAR_PAGE_NEAR_ARC_SIZE_PROPERTY
 	@see #CORNER_LINE_NEAR_PAGE_FAR_ARC_SIZE_PROPERTY
@@ -423,7 +423,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the arc size of the line near page near corner.
 	This is a bound property.
 	@param newCornerArcSize The dimensions indicating the two radiuses of the corner, or dimensions of zero if the corner should not be rounded.
-	@exception NullPointerException if the given size is <code>null</code>. 
+	@throws NullPointerException if the given size is <code>null</code>. 
 	@see #CORNER_LINE_NEAR_PAGE_NEAR_ARC_SIZE_PROPERTY
 	*/
 	public void setCornerLineNearPageNearArcSize(final Dimensions newCornerArcSize);
@@ -431,7 +431,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the arc size of the line far page near corner.
 	This is a bound property.
 	@param newCornerArcSize The dimensions indicating the two radiuses of the corner, or dimensions of zero if the corner should not be rounded.
-	@exception NullPointerException if the given size is <code>null</code>. 
+	@throws NullPointerException if the given size is <code>null</code>. 
 	@see #CORNER_LINE_FAR_PAGE_NEAR_ARC_SIZE_PROPERTY
 	*/
 	public void setCornerLineFarPageNearArcSize(final Dimensions newCornerArcSize);
@@ -439,7 +439,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the arc size of the line near page far corner.
 	This is a bound property.
 	@param newCornerArcSize The dimensions indicating the two radiuses of the corner, or dimensions of zero if the corner should not be rounded.
-	@exception NullPointerException if the given size is <code>null</code>. 
+	@throws NullPointerException if the given size is <code>null</code>. 
 	@see #CORNER_LINE_NEAR_PAGE_FAR_ARC_SIZE_PROPERTY
 	*/
 	public void setCornerLineNearPageFarArcSize(final Dimensions newCornerArcSize);
@@ -447,7 +447,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the arc size of the line far page far corner.
 	This is a bound property.
 	@param newCornerArcSize The dimensions indicating the two radiuses of the corner, or dimensions of zero if the corner should not be rounded.
-	@exception NullPointerException if the given size is <code>null</code>. 
+	@throws NullPointerException if the given size is <code>null</code>. 
 	@see #CORNER_LINE_FAR_PAGE_FAR_ARC_SIZE_PROPERTY
 	*/
 	public void setCornerLineFarPageFarArcSize(final Dimensions newCornerArcSize);
@@ -456,7 +456,7 @@ public interface PresentationModel extends Model, Displayable
 	The radius of each corner represents a bound property.
 	This is a convenience method that calls {@link #setCornerArcSize(Corner, Dimensions)} for each corner.
 	@param newCornerArcSize The dimensions indicating the two radiuses of the corners, or dimensions of zero if the corners should not be rounded.
-	@exception NullPointerException if the given arc size is <code>null</code>. 
+	@throws NullPointerException if the given arc size is <code>null</code>. 
 	@see #CORNER_LINE_NEAR_PAGE_NEAR_ARC_SIZE_PROPERTY
 	@see #CORNER_LINE_FAR_PAGE_NEAR_ARC_SIZE_PROPERTY
 	@see #CORNER_LINE_NEAR_PAGE_FAR_ARC_SIZE_PROPERTY
@@ -470,7 +470,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the URI of the cursor.
 	This is a bound property.
 	@param newCursor The new URI of the cursor, which may be a resource URI.
-	@exception NullPointerException if the given cursor URI is <code>null</code>.
+	@throws NullPointerException if the given cursor URI is <code>null</code>.
 	@see #CURSOR_PROPERTY
 	*/
 	public void setCursor(final URI newCursor);
@@ -497,7 +497,7 @@ public interface PresentationModel extends Model, Displayable
 	The extent of each flow represents a bound property.
 	@param flow The flow for which the extent should be set.
 	@param newExtent The new requested extent of the component, or <code>null</code> there is no extent preference.
-	@exception NullPointerException if the given flow is <code>null</code>. 
+	@throws NullPointerException if the given flow is <code>null</code>. 
 	@see #LINE_EXTENT_PROPERTY
 	@see #PAGE_EXTENT_PROPERTY
 	*/
@@ -545,7 +545,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the style of the font.
 	This is a bound property.
 	@param newFontStyle The style of the font.
-	@exception NullPointerException if the given font style is <code>null</code>.
+	@throws NullPointerException if the given font style is <code>null</code>.
 	@see #FONT_STYLE_PROPERTY
 	*/
 	public void setFontStyle(final FontStyle newFontStyle);
@@ -591,7 +591,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the style of the label font.
 	This is a bound property.
 	@param newLabelFontStyle The style of the label font.
-	@exception NullPointerException if the given label font style is <code>null</code>.
+	@throws NullPointerException if the given label font style is <code>null</code>.
 	@see #LABEL_FONT_STYLE_PROPERTY
 	*/
 	public void setLabelFontStyle(final FontStyle newLabelFontStyle);
@@ -651,7 +651,7 @@ public interface PresentationModel extends Model, Displayable
 	The margin extent of each border represents a bound property.
 	@param border The border for which the margin extent should be set.
 	@param newMarginExtent The margin extent.
-	@exception NullPointerException if the given border and/or margin extent is <code>null</code>. 
+	@throws NullPointerException if the given border and/or margin extent is <code>null</code>. 
 	@see #MARGIN_LINE_NEAR_EXTENT_PROPERTY
 	@see #MARGIN_LINE_FAR_EXTENT_PROPERTY
 	@see #MARGIN_PAGE_NEAR_EXTENT_PROPERTY
@@ -662,7 +662,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the margin extent of the line near border.
 	This is a bound property.
 	@param newMarginExtent The margin extent.
-	@exception NullPointerException if the given margin extent is <code>null</code>. 
+	@throws NullPointerException if the given margin extent is <code>null</code>. 
 	@see #MARGIN_LINE_NEAR_EXTENT_PROPERTY
 	*/
 	public void setMarginLineNearExtent(final Extent newMarginExtent);
@@ -670,7 +670,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the margin extent of the line far border.
 	This is a bound property.
 	@param newMarginExtent The margin extent, or <code>null</code> if the default margin extent should be used.
-	@exception NullPointerException if the given margin extent is <code>null</code>. 
+	@throws NullPointerException if the given margin extent is <code>null</code>. 
 	@see #MARGIN_LINE_FAR_EXTENT_PROPERTY
 	*/
 	public void setMarginLineFarExtent(final Extent newMarginExtent);
@@ -678,7 +678,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the margin extent of the page near border.
 	This is a bound property.
 	@param newMarginExtent The margin extent, or <code>null</code> if the default margin extent should be used.
-	@exception NullPointerException if the given margin extent is <code>null</code>. 
+	@throws NullPointerException if the given margin extent is <code>null</code>. 
 	@see #MARGIN_PAGE_NEAR_EXTENT_PROPERTY
 	*/
 	public void setMarginPageNearExtent(final Extent newMarginExtent);
@@ -686,7 +686,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the margin extent of the page far border.
 	This is a bound property.
 	@param newMarginExtent The margin extent, or <code>null</code> if the default margin extent should be used.
-	@exception NullPointerException if the given margin extent is <code>null</code>. 
+	@throws NullPointerException if the given margin extent is <code>null</code>. 
 	@see #MARGIN_PAGE_FAR_EXTENT_PROPERTY
 	*/
 	public void setMarginPageFarExtent(final Extent newMarginExtent);
@@ -695,7 +695,7 @@ public interface PresentationModel extends Model, Displayable
 	The margin extent of each border represents a bound property.
 	This is a convenience method that calls {@link #setMarginExtent(Border, Extent)} for each border.
 	@param newMarginExtent The margin extent.
-	@exception NullPointerException if the given margin extent is <code>null</code>. 
+	@throws NullPointerException if the given margin extent is <code>null</code>. 
 	@see #MARGIN_LINE_NEAR_EXTENT_PROPERTY
 	@see #MARGIN_LINE_FAR_EXTENT_PROPERTY
 	@see #MARGIN_PAGE_NEAR_EXTENT_PROPERTY
@@ -709,7 +709,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the opacity of the entire component.
 	This is a bound property of type {@link Double}.
 	@param newOpacity The new opacity of the entire component in the range (0.0-1.0).
-	@exception IllegalArgumentException if the given opacity is not within the range (0.0-1.0).
+	@throws IllegalArgumentException if the given opacity is not within the range (0.0-1.0).
 	@see #OPACITY_PROPERTY 
 	*/
 	public void setOpacity(final double newOpacity);
@@ -744,7 +744,7 @@ public interface PresentationModel extends Model, Displayable
 	The padding extent of each border represents a bound property.
 	@param border The border for which the padding extent should be set.
 	@param newPaddingExtent The padding extent.
-	@exception NullPointerException if the given border and/or padding extent is <code>null</code>. 
+	@throws NullPointerException if the given border and/or padding extent is <code>null</code>. 
 	@see #PADDING_LINE_NEAR_EXTENT_PROPERTY
 	@see #PADDING_LINE_FAR_EXTENT_PROPERTY
 	@see #PADDING_PAGE_NEAR_EXTENT_PROPERTY
@@ -755,7 +755,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the padding extent of the line near border.
 	This is a bound property.
 	@param newPaddingExtent The padding extent.
-	@exception NullPointerException if the given padding extent is <code>null</code>. 
+	@throws NullPointerException if the given padding extent is <code>null</code>. 
 	@see #PADDING_LINE_NEAR_EXTENT_PROPERTY
 	*/
 	public void setPaddingLineNearExtent(final Extent newPaddingExtent);
@@ -763,7 +763,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the padding extent of the line far border.
 	This is a bound property.
 	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
-	@exception NullPointerException if the given padding extent is <code>null</code>. 
+	@throws NullPointerException if the given padding extent is <code>null</code>. 
 	@see #PADDING_LINE_FAR_EXTENT_PROPERTY
 	*/
 	public void setPaddingLineFarExtent(final Extent newPaddingExtent);
@@ -771,7 +771,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the padding extent of the page near border.
 	This is a bound property.
 	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
-	@exception NullPointerException if the given padding extent is <code>null</code>. 
+	@throws NullPointerException if the given padding extent is <code>null</code>. 
 	@see #PADDING_PAGE_NEAR_EXTENT_PROPERTY
 	*/
 	public void setPaddingPageNearExtent(final Extent newPaddingExtent);
@@ -779,7 +779,7 @@ public interface PresentationModel extends Model, Displayable
 	/**Sets the padding extent of the page far border.
 	This is a bound property.
 	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
-	@exception NullPointerException if the given padding extent is <code>null</code>. 
+	@throws NullPointerException if the given padding extent is <code>null</code>. 
 	@see #PADDING_PAGE_FAR_EXTENT_PROPERTY
 	*/
 	public void setPaddingPageFarExtent(final Extent newPaddingExtent);
@@ -788,7 +788,7 @@ public interface PresentationModel extends Model, Displayable
 	The padding extent of each border represents a bound property.
 	This is a convenience method that calls {@link #setPaddingExtent(Border, Extent)} for each border.
 	@param newPaddingExtent The padding extent.
-	@exception NullPointerException if the given padding extent is <code>null</code>. 
+	@throws NullPointerException if the given padding extent is <code>null</code>. 
 	@see #PADDING_LINE_NEAR_EXTENT_PROPERTY
 	@see #PADDING_LINE_FAR_EXTENT_PROPERTY
 	@see #PADDING_PAGE_NEAR_EXTENT_PROPERTY

@@ -113,7 +113,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		/**Sets the index of the first row to display.
 		This is a bound property of type <code>Integer</code>.
 		@param newDisplayRowStartIndex The index of the first row to display.
-		@exception IndexOutOfBoundsException if the given index is less than zero.
+		@throws IndexOutOfBoundsException if the given index is less than zero.
 		@see #DISPLAY_ROW_START_INDEX_PROPERTY
 		*/
 		public void setDisplayRowStartIndex(final int newDisplayRowStartIndex)
@@ -225,7 +225,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	This version is provided to allow public access.
 	@param cell The object for which a representation component should be returned.
 	@return The child component representing the given object.
-	@exception IllegalArgumentException if the given object is not an appropriate object for a component to be created.
+	@throws IllegalArgumentException if the given object is not an appropriate object for a component to be created.
 	*/
 	public Component getComponent(final TableModel.Cell<?> cell)
 	{
@@ -236,7 +236,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	This implementation delegates to {@link #createTypedComponentState(com.guiseframework.model.TableModel.Cell)}.
 	@param cell The object with which the component state is to be associated.
 	@return The component state to represent the given object.
-	@exception IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
+	@throws IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
 	*/
 	protected CellComponentState createComponentState(final TableModel.Cell<?> cell)
 	{
@@ -247,8 +247,8 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@param <T> The type of value contained in the cell.
 	@param cell The object with which the component state is to be associated.
 	@return The component state to represent the given object.
-	@exception IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
-	@exception IllegalStateException if there is no registered cell representation strategy appropriate for the cell. 
+	@throws IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
+	@throws IllegalStateException if there is no registered cell representation strategy appropriate for the cell. 
 	*/
 	protected <T> CellComponentState createTypedComponentState(final TableModel.Cell<T> cell)
 	{
@@ -309,7 +309,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	There is normally no need for applications to call this method directly.
 	@param column The column for which a UI model should be returned.
 	@return The UI model for the given column.
-	@exception NullPointerException if the given column is <code>null</code>.
+	@throws NullPointerException if the given column is <code>null</code>.
 	*/
 	public ColumnUIModel getColumnUIModel(final TableColumnModel<?> column)	//if we ever allow columns to be removed, automatically remove the corresponding UI model and remove its repeat property change listener
 	{
@@ -348,7 +348,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	/**Returns the label font families for a given column.
 	@param column The column for which the label font families should be returned.
 	@return The prioritized list of label font family names, or <code>null</code> if no label font family names have been specified.
-	@exception NullPointerException if the given column is <code>null</code>.
+	@throws NullPointerException if the given column is <code>null</code>.
 	*/
 	public List<String> getColumnLabelFontFamilies(final TableColumnModel<?> column) {return getColumnUIModel(column).getLabelFontFamilies();}
 
@@ -356,7 +356,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	This is a bound property.
 	@param column The column for which the label font families should be set.
 	@param newLabelFontFamilies The new prioritized list of label font family names, or <code>null</code> if no label font family names are specified.
-	@exception NullPointerException if the given column is <code>null</code>.
+	@throws NullPointerException if the given column is <code>null</code>.
 	@see ColumnUIModel#LABEL_FONT_FAMILIES_PROPERTY 
 	*/
 	public void setColumnLabelFontFamilies(final TableColumnModel<?> column, final List<String> newLabelFontFamilies) {getColumnUIModel(column).setLabelFontFamilies(newLabelFontFamilies);}
@@ -377,7 +377,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	/**Returns the label font size for a given column.
 	@param column The column for which the label font size should be returned.
 	@return The size of the label font from baseline to baseline, or <code>null</code> if no label font size has been specified.
-	@exception NullPointerException if the given column is <code>null</code>.
+	@throws NullPointerException if the given column is <code>null</code>.
 	*/
 	public Extent getColumnLabelFontSize(final TableColumnModel<?> column) {return getColumnUIModel(column).getLabelFontSize();}
 
@@ -385,7 +385,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	This is a bound property.
 	@param column The column for which the label font size should be set.
 	@param newLabelFontSize The new size of the label font from baseline to baseline, or <code>null</code> there is no label font size specified.
-	@exception NullPointerException if the given column is <code>null</code>.
+	@throws NullPointerException if the given column is <code>null</code>.
 	@see ColumnUIModel#LABEL_FONT_SIZE_PROPERTY 
 	*/
 	public void setColumnLabelFontSize(final TableColumnModel<?> column, final Extent newLabelFontSize) {getColumnUIModel(column).setLabelFontSize(newLabelFontSize);}
@@ -406,7 +406,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	/**Returns the label font style for a given column.
 	@param column The column for which the label font style should be returned.
 	@return The style of the label font.
-	@exception NullPointerException if the given column is <code>null</code>.
+	@throws NullPointerException if the given column is <code>null</code>.
 	*/
 	public FontStyle getColumnLabelFontStyle(final TableColumnModel<?> column) {return getColumnUIModel(column).getLabelFontStyle();}
 
@@ -414,7 +414,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	This is a bound property.
 	@param column The column for which the label font size should be set.
 	@param newLabelFontStyle The style of the label font.
-	@exception NullPointerException if the given column and/or label font style is <code>null</code>.
+	@throws NullPointerException if the given column and/or label font style is <code>null</code>.
 	@see ColumnUIModel#LABEL_FONT_STYLE_PROPERTY
 	*/
 	public void setColumnLabelFontStyle(final TableColumnModel<?> column, final FontStyle newLabelFontStyle) {getColumnUIModel(column).setLabelFontStyle(newLabelFontStyle);}
@@ -422,7 +422,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	/**Sets the style of the label font for all columns.
 	This is a bound property of each column.
 	@param newLabelFontStyle The style of the label font.
-	@exception NullPointerException if the given label font style is <code>null</code>.
+	@throws NullPointerException if the given label font style is <code>null</code>.
 	@see ColumnUIModel#LABEL_FONT_STYLE_PROPERTY
 	*/
 	public void setColumnLabelFontStyle(final FontStyle newLabelFontStyle)
@@ -436,7 +436,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	/**Returns the label font weight for a given column.
 	@param column The column for which the label font weight should be returned.
 	@return The weight of the label font relative to a normal value of 0.5.
-	@exception NullPointerException if the given column is <code>null</code>.
+	@throws NullPointerException if the given column is <code>null</code>.
 	*/
 	public double getColumnLabelFontWeight(final TableColumnModel<?> column) {return getColumnUIModel(column).getLabelFontWeight();}
 
@@ -447,7 +447,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	This is a bound property of type {@link Double}.
 	@param column The column for which the label font weight should be set.
 	@param newLabelFontWeight The weight of the label font relative to a normal value of 0.5.
-	@exception NullPointerException if the given column is <code>null</code>.
+	@throws NullPointerException if the given column is <code>null</code>.
 	@see ComponentUIModel#FONT_WEIGHT_PROPERTY
 	@see ComponentUIModel#FONT_WEIGHT_NORMAL
 	@see ComponentUIModel#FONT_WEIGHT_BOLD
@@ -476,35 +476,35 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@param column The column for which a padding extent should be returned.
 	@param border The border for which a padding extent should be returned.
 	@return The padding extent of the given column border.
-	@exception NullPointerException if the given column is <code>null</code>.
+	@throws NullPointerException if the given column is <code>null</code>.
 	*/
 	public Extent getColumnPaddingExtent(final TableColumnModel<?> column, final Border border) {return getColumnUIModel(column).getPaddingExtent(border);}
 
 	/**Returns the padding extent of the column line near page near border.
 	@param column The column for which a padding extent should be returned.
 	@return The padding extent of the given column border.
-	@exception NullPointerException if the given column is <code>null</code>.
+	@throws NullPointerException if the given column is <code>null</code>.
 	*/
 	public Extent getColumnPaddingLineNearExtent(final TableColumnModel<?> column) {return getColumnUIModel(column).getPaddingLineNearExtent();}
 
 	/**Returns the padding extent of the column line far page near border.
 	@param column The column for which a padding extent should be returned.
 	@return The padding extent of the given column border.
-	@exception NullPointerException if the given column is <code>null</code>.
+	@throws NullPointerException if the given column is <code>null</code>.
 	*/
 	public Extent getColumnPaddingLineFarExtent(final TableColumnModel<?> column) {return getColumnUIModel(column).getPaddingLineFarExtent();}
 
 	/**Returns the padding extent of the column line near page far border.
 	@param column The column for which a padding extent should be returned.
 	@return The padding extent of the given column border.
-	@exception NullPointerException if the given column is <code>null</code>.
+	@throws NullPointerException if the given column is <code>null</code>.
 	*/
 	public Extent getColumnPaddingPageNearExtent(final TableColumnModel<?> column) {return getColumnUIModel(column).getPaddingPageNearExtent();}
 
 	/**Returns the padding extent of the column line far page far border.
 	@param column The column for which a padding extent should be returned.
 	@return The padding extent of the given column border.
-	@exception NullPointerException if the given column is <code>null</code>.
+	@throws NullPointerException if the given column is <code>null</code>.
 	*/
 	public Extent getColumnPaddingPageFarExtent(final TableColumnModel<?> column) {return getColumnUIModel(column).getPaddingPageFarExtent();}
 
@@ -513,7 +513,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@param column The column for which the padding extent should be set.
 	@param border The border for which the padding extent should be set.
 	@param newPaddingExtent The padding extent.
-	@exception NullPointerException if the given column, border and/or padding extent is <code>null</code>. 
+	@throws NullPointerException if the given column, border and/or padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_LINE_NEAR_EXTENT_PROPERTY
 	@see ColumnUIModel#PADDING_LINE_FAR_EXTENT_PROPERTY
 	@see ColumnUIModel#PADDING_PAGE_NEAR_EXTENT_PROPERTY
@@ -525,7 +525,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	This is a bound property.
 	@param column The column for which the padding extent should be set.
 	@param newPaddingExtent The padding extent.
-	@exception NullPointerException if the given column and/or padding extent is <code>null</code>. 
+	@throws NullPointerException if the given column and/or padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_LINE_NEAR_EXTENT_PROPERTY
 	*/
 	public void setColumnPaddingLineNearExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {getColumnUIModel(column).setPaddingLineNearExtent(newPaddingExtent);}
@@ -534,7 +534,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	This is a bound property.
 	@param column The column for which the padding extent should be set.
 	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
-	@exception NullPointerException if the given column and/or padding extent is <code>null</code>. 
+	@throws NullPointerException if the given column and/or padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_LINE_FAR_EXTENT_PROPERTY
 	*/
 	public void setColumnPaddingLineFarExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {getColumnUIModel(column).setPaddingLineFarExtent(newPaddingExtent);}
@@ -543,7 +543,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	This is a bound property.
 	@param column The column for which the padding extent should be set.
 	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
-	@exception NullPointerException if the given columna and/or padding extent is <code>null</code>. 
+	@throws NullPointerException if the given columna and/or padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_PAGE_NEAR_EXTENT_PROPERTY
 	*/
 	public void setColumnPaddingPageNearExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {getColumnUIModel(column).setPaddingPageNearExtent(newPaddingExtent);}
@@ -552,7 +552,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	This is a bound property.
 	@param column The column for which the padding extent should be set.
 	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
-	@exception NullPointerException if the given column and/or padding extent is <code>null</code>. 
+	@throws NullPointerException if the given column and/or padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_PAGE_FAR_EXTENT_PROPERTY
 	*/
 	public void setColumnPaddingPageFarExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {getColumnUIModel(column).setPaddingPageFarExtent(newPaddingExtent);}
@@ -561,7 +561,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	The padding extent of each column border represents a bound property.
 	@param column The column for which the padding extent should be set.
 	@param newPaddingExtent The padding extent.
-	@exception NullPointerException if the given column and/or padding extent is <code>null</code>. 
+	@throws NullPointerException if the given column and/or padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_LINE_NEAR_EXTENT_PROPERTY
 	@see ColumnUIModel#PADDING_LINE_FAR_EXTENT_PROPERTY
 	@see ColumnUIModel#PADDING_PAGE_NEAR_EXTENT_PROPERTY
@@ -573,7 +573,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	The padding extent of each column border represents a bound property.
 	@param border The border for which the padding extent should be set.
 	@param newPaddingExtent The padding extent.
-	@exception NullPointerException if the border and/or padding extent is <code>null</code>. 
+	@throws NullPointerException if the border and/or padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_LINE_NEAR_EXTENT_PROPERTY
 	@see ColumnUIModel#PADDING_LINE_FAR_EXTENT_PROPERTY
 	@see ColumnUIModel#PADDING_PAGE_NEAR_EXTENT_PROPERTY
@@ -590,7 +590,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	/**Sets the padding extent of the line near border of all columns.
 	This is a bound property.
 	@param newPaddingExtent The padding extent.
-	@exception NullPointerException if the given padding extent is <code>null</code>. 
+	@throws NullPointerException if the given padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_LINE_NEAR_EXTENT_PROPERTY
 	*/
 	public void setColumnPaddingLineNearExtent(final Extent newPaddingExtent) {setColumnPaddingExtent(Border.LINE_NEAR, newPaddingExtent);}
@@ -598,7 +598,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	/**Sets the padding extent of the line far border of all columns.
 	This is a bound property.
 	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
-	@exception NullPointerException if the given padding extent is <code>null</code>. 
+	@throws NullPointerException if the given padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_LINE_FAR_EXTENT_PROPERTY
 	*/
 	public void setColumnPaddingLineFarExtent(final Extent newPaddingExtent) {setColumnPaddingExtent(Border.LINE_FAR, newPaddingExtent);}
@@ -606,7 +606,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	/**Sets the padding extent of the page near border of all columns.
 	This is a bound property.
 	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
-	@exception NullPointerException if the given padding extent is <code>null</code>. 
+	@throws NullPointerException if the given padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_PAGE_NEAR_EXTENT_PROPERTY
 	*/
 	public void setColumnPaddingPageNearExtent(final Extent newPaddingExtent) {setColumnPaddingExtent(Border.PAGE_NEAR, newPaddingExtent);}
@@ -614,7 +614,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	/**Sets the padding extent of the page far border of all columns.
 	This is a bound property.
 	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
-	@exception NullPointerException if the given padding extent is <code>null</code>. 
+	@throws NullPointerException if the given padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_PAGE_FAR_EXTENT_PROPERTY
 	*/
 	public void setColumnPaddingPageFarExtent(final Extent newPaddingExtent) {setColumnPaddingExtent(Border.PAGE_FAR, newPaddingExtent);}
@@ -623,7 +623,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	The padding extent of each border represents a bound property.
 	This is a convenience method that calls {@link #setColumnPaddingExtent(Border, Extent)} for each border.
 	@param newPaddingExtent The padding extent.
-	@exception NullPointerException if the given padding extent is <code>null</code>. 
+	@throws NullPointerException if the given padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_LINE_NEAR_EXTENT_PROPERTY
 	@see ColumnUIModel#PADDING_LINE_FAR_EXTENT_PROPERTY
 	@see ColumnUIModel#PADDING_PAGE_NEAR_EXTENT_PROPERTY
@@ -642,7 +642,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@param <C> The type of values in all the cells in the table.
 	@param valueClass The class indicating the type of values held in the model.
 	@param columnNames The names to serve as label headers for the columns.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public <C> Table(final Class<C> valueClass, final String... columnNames)
 	{
@@ -664,9 +664,9 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@param valueClass The class indicating the type of values held in the model.
 	@param rowValues The two-dimensional list of values, where the first index represents the row and the second represents the column, or <code>null</code> if no default values should be given.
 	@param columnNames The names to serve as label headers for the columns.
-	@exception NullPointerException if the given value class is <code>null</code>.
-	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
-	@exception ClassCastException if one of the values in a row is not compatible with the type of its column.
+	@throws NullPointerException if the given value class is <code>null</code>.
+	@throws IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
+	@throws ClassCastException if one of the values in a row is not compatible with the type of its column.
 	*/
 	public <C> Table(final Class<C> valueClass, final C[][] rowValues, final String... columnNames)
 	{
@@ -677,8 +677,8 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	Default cell representation strategies will be installed for the value classes of the given columns.
 	@param rowValues The two-dimensional list of values, where the first index represents the row and the second represents the column, or <code>null</code> if no default values should be given.
 	@param columns The models representing the table columns.
-	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
-	@exception ClassCastException if one of the values in a row is not compatible with the type of its column.
+	@throws IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
+	@throws ClassCastException if one of the values in a row is not compatible with the type of its column.
 	*/
 	public Table(final Object[][] rowValues, final TableColumnModel<?>... columns)
 	{
@@ -688,7 +688,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	/**Table model constructor.
 	Default cell representation strategies will be installed for the value classes of all the model's columns.
 	@param tableModel The component data model.
-	@exception NullPointerException if the given table model is <code>null</code>.
+	@throws NullPointerException if the given table model is <code>null</code>.
 	*/
 	public Table(final TableModel tableModel)
 	{
@@ -866,8 +866,8 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@param <C> The type of cell value.
 	@param cell The cell containing the row index and column information.
 	@return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
-	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	@throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@throws IllegalArgumentException if the given column is not one of this table's columns.
 	*/
 	public <C> C getCellValue(final Cell<C> cell) {return getTableModel().getCellValue(cell);}
 
@@ -876,8 +876,8 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@param rowIndex The zero-based row index.
 	@param column The column for which a value should be returned.
 	@return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
-	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	@throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@throws IllegalArgumentException if the given column is not one of this table's columns.
 	*/
 	public <C> C getCellValue(final int rowIndex, final TableColumnModel<C> column) {return getTableModel().getCellValue(rowIndex, column);}
 
@@ -885,8 +885,8 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@param <C> The type of cell value.
 	@param cell The cell containing the row index and column information.
 	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	@throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@throws IllegalArgumentException if the given column is not one of this table's columns.
 	*/
 	public <C> void setCellValue(final Cell<C> cell, final C newCellValue) {getTableModel().setCellValue(cell, newCellValue);}
 
@@ -895,8 +895,8 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@param rowIndex The zero-based row index.
 	@param column The column for which a value should be returned.
 	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	@throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@throws IllegalArgumentException if the given column is not one of this table's columns.
 	*/
 	public <C> void setCellValue(final int rowIndex, final TableColumnModel<C> column, final C newCellValue) {getTableModel().setCellValue(rowIndex, column, newCellValue);}
 
@@ -914,7 +914,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		/**Constructor
 		@param component The component for a cell.
 		@param editable Whether the component is for a cell that was editable when the component was created.
-		@exception NullPointerException if the given component is <code>null</code>.
+		@throws NullPointerException if the given component is <code>null</code>.
 		*/
 		public CellComponentState(final Component component, final boolean editable)
 		{
@@ -1025,7 +1025,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 
 		/**Converter constructor.
 		@param converter The converter to use for displaying the value as a string.
-		@exception NullPointerException if the given converter is <code>null</code>.
+		@throws NullPointerException if the given converter is <code>null</code>.
 		*/
 		public DefaultCellRepresentationStrategy(final Converter<V, String> converter)
 		{
@@ -1101,7 +1101,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		@param tableModel The table model of the cell.
 		@param cell The cell being represented.
 		@param converter The converter to use for displaying the value as a string.
-		@exception NullPointerException if the given session, table model and/or cell is <code>null</code>.
+		@throws NullPointerException if the given session, table model and/or cell is <code>null</code>.
 		*/
 		public DefaultCellMessage(final TableModel tableModel, final TableModel.Cell<C> cell, final Converter<? super C, String> converter)
 		{
@@ -1157,7 +1157,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		/**Constructs a default value model for a cell.
 		@param model The table model of the cell.
 		@param cell The cell being represented.
-		@exception NullPointerException if the given table model and/or cell is <code>null</code>.
+		@throws NullPointerException if the given table model and/or cell is <code>null</code>.
 		*/
 		public DefaultCellValueModel(final TableModel model, final TableModel.Cell<C> cell)
 		{
@@ -1198,7 +1198,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		/**Sets the value in the cell.
 		If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 		@param newValue The new value of the cell.
-		@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+		@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 		@see #getValidator()
 		@see #VALUE_PROPERTY
 		*/

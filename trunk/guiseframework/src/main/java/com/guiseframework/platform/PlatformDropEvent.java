@@ -39,7 +39,7 @@ public class PlatformDropEvent extends AbstractDepictEvent
 	/**Drag source and drop target constructor.
 	@param dragSource The source of the drag-drop gesture.
 	@param dropTarget The target of the drag-drop gesture.
-	@exception NullPointerException if the given drag source and/or drop target is <code>null</code>.
+	@throws NullPointerException if the given drag source and/or drop target is <code>null</code>.
 	*/
 	public PlatformDropEvent(final DepictedObject dragSource, final DepictedObject dropTarget)
 	{

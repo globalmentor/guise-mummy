@@ -61,7 +61,7 @@ public abstract class AbstractListCompositeComponent extends AbstractMultipleCom
   /**Returns the component at the specified index in the component.
   @param index The index of the component to return.
 	@return The component at the specified position in this component.
-	@exception IndexOutOfBoundsException if the index is out of range.
+	@throws IndexOutOfBoundsException if the index is out of range.
 	*/
 	protected Component get(final int index) {return getComponentList().get(index);}
 
@@ -70,8 +70,8 @@ public abstract class AbstractListCompositeComponent extends AbstractMultipleCom
 	Any class that overrides this method must call this version.
 	@param index The index at which the component should be added.
 	@param childComponent The component to add to this component.
-	@exception IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
-	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
+	@throws IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
+	@throws IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
 	*/
 	protected void addComponent(final int index, final Component childComponent)
 	{
@@ -87,7 +87,7 @@ public abstract class AbstractListCompositeComponent extends AbstractMultipleCom
 	This version adds the component to the component list.
 	Any class that overrides this method must call this version.
 	@param childComponent The component to add to this component.
-	@exception IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
+	@throws IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
 	*/
 	protected final void addComponent(final Component childComponent)
 	{
@@ -98,7 +98,7 @@ public abstract class AbstractListCompositeComponent extends AbstractMultipleCom
 	This version removes the component from the component list.
 	Any class that overrides this method must call this version.
 	@param childComponent The component to remove from this component.
-	@exception IllegalArgumentException if the component does not recognize this composite component as its parent or the component is not a member of this composite component.
+	@throws IllegalArgumentException if the component does not recognize this composite component as its parent or the component is not a member of this composite component.
 	*/
 	protected void removeComponent(final Component childComponent)
 	{
@@ -120,7 +120,7 @@ public abstract class AbstractListCompositeComponent extends AbstractMultipleCom
 
 	/**Info model constructor.
 	@param infoModel The component info model.
-	@exception NullPointerException if the given info model is <code>null</code>.
+	@throws NullPointerException if the given info model is <code>null</code>.
 	*/
 	public AbstractListCompositeComponent(final InfoModel infoModel)
 	{

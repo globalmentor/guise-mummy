@@ -85,27 +85,27 @@ public interface TextDepictContext extends DepictContext
 	/**Writes literal text with no encoding.
 	All writing by the controller should use this method.
 	@param text The literal text to write.
-	@exception IOException if there is an error writing the information.
+	@throws IOException if there is an error writing the information.
 	*/
 	public void writeLiteral(final String text) throws IOException;
 
 	/**Writes a character, encoding it as necessary.
 	This method calls {@link #writeLiteral(String)}.
 	@param character The character to write.
-	@exception IOException if there is an error writing the information.
+	@throws IOException if there is an error writing the information.
 	*/
 	public void write(final char character) throws IOException;
 
 	/**Writes text, encoding it as necessary.
 	This method calls {@link #writeLiteral(String)}.
 	@param text The text to write.
-	@exception IOException if there is an error writing the information.
+	@throws IOException if there is an error writing the information.
 	*/
 	public void write(final String text) throws IOException;
 
 	/**Writes an indention at the current indention level.
 	If the context is not formatted, no action occurs.
-	@exception IOException if there is an error writing the information.
+	@throws IOException if there is an error writing the information.
 	@see #isFormatted()
 	@see #getIndentLevel()
 	*/

@@ -63,7 +63,7 @@ public abstract class AbstractWebActionControlDepictor<C extends ActionControl> 
 
 	/**Processes an event from the platform.
 	@param event The event to be processed.
-	@exception IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
+	@throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
 	*/
 	public void processEvent(final PlatformEvent event)
 	{
@@ -144,7 +144,7 @@ public abstract class AbstractWebActionControlDepictor<C extends ActionControl> 
 	This methods writes a comment containing the confirmation message, if any.
 	@param context Guise context information.
 	@param component The component being rendered.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 /*TODO del; transfer to another technique if needed
 	protected void writeParameters(final GC context, final C component) throws IOException	//TODO replace with better parameters; probably remove confirmation altogether

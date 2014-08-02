@@ -110,7 +110,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		/**Sets the name of the component.
 		This is a bound property.
 		@param newName The new name of the component, or <code>null</code> if the component should have no name.
-		@exception IllegalArgumentException if the given name is the empty string.
+		@throws IllegalArgumentException if the given name is the empty string.
 		@see #NAME_PROPERTY
 		*/
 		public void setName(final String newName)
@@ -153,8 +153,8 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/**Sets the content type of the label text.
 	This is a bound property.
 	@param newLabelTextContentType The new label text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
+	@throws NullPointerException if the given content type is <code>null</code>.
+	@throws IllegalArgumentException if the given content type is not a text content type.
 	@see #LABEL_CONTENT_TYPE_PROPERTY
 	*/
 	public void setLabelContentType(final ContentType newLabelTextContentType) {getInfoModel().setLabelContentType(newLabelTextContentType);}
@@ -175,8 +175,8 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/**Sets the content type of the description text.
 	This is a bound property.
 	@param newDescriptionContentType The new description text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
+	@throws NullPointerException if the given content type is <code>null</code>.
+	@throws IllegalArgumentException if the given content type is not a text content type.
 	@see #DESCRIPTION_CONTENT_TYPE_PROPERTY
 	*/
 	public void setDescriptionContentType(final ContentType newDescriptionContentType) {getInfoModel().setDescriptionContentType(newDescriptionContentType);}
@@ -197,8 +197,8 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/**Sets the content type of the advisory information text.
 	This is a bound property.
 	@param newInfoContentType The new advisory information text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
+	@throws NullPointerException if the given content type is <code>null</code>.
+	@throws IllegalArgumentException if the given content type is not a text content type.
 	@see #INFO_CONTENT_TYPE_PROPERTY
 	*/
 	public void setInfoContentType(final ContentType newInfoContentType) {getInfoModel().setInfoContentType(newInfoContentType);}
@@ -389,7 +389,7 @@ Log.trace("now valid of", this, "is", isValid());
 		/**Processes an event from the platform.
 		This method delegates to the currently installed depictor.
 		@param event The event to be processed.
-		@exception IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
+		@throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
 		@see #getDepictor()
 		@see Depictor#processEvent(PlatformEvent)
 		*/
@@ -401,7 +401,7 @@ Log.trace("now valid of", this, "is", isValid());
 		/**Updates the depiction of the object.
 		The depiction will be marked as updated.
 		This method delegates to the currently installed depictor.
-		@exception IOException if there is an error updating the depiction.
+		@throws IOException if there is an error updating the depiction.
 		@see #getDepictor()
 		@see Depictor#depict()
 		*/
@@ -502,9 +502,9 @@ Log.trace("now valid of", this, "is", isValid());
 		A container's parent cannot be set to a container unless that container already recognizes this component as one of its children.
 		If a component is given the same parent it already has, no action occurs.
 		@param newParent The new parent for this component, or <code>null</code> if this component is being removed from a parent.
-		@exception IllegalStateException if a parent is provided and this component already has a parent.
-		@exception IllegalStateException if no parent is provided and this component's old parent is a container that still recognizes this component as its child.
-		@exception IllegalArgumentException if a parent container is provided and the given parent container does not already recognize this component as its child.
+		@throws IllegalStateException if a parent is provided and this component already has a parent.
+		@throws IllegalStateException if no parent is provided and this component's old parent is a container that still recognizes this component as its child.
+		@throws IllegalArgumentException if a parent container is provided and the given parent container does not already recognize this component as its child.
 		@see Container#add(Component)
 		@see Container#remove(Component)
 		*/
@@ -744,8 +744,8 @@ Log.trace("now valid of", this, "is", isValid());
 		}
 
 	/**Default constructor.
-	@exception IllegalStateException if no controller is registered for this component type.
-	@exception IllegalStateException if no view is registered for this component type.
+	@throws IllegalStateException if no controller is registered for this component type.
+	@throws IllegalStateException if no view is registered for this component type.
 	*/
 	public AbstractComponent()
 	{
@@ -754,8 +754,8 @@ Log.trace("now valid of", this, "is", isValid());
 
 	/**Info model constructor.
 	@param infoModel The component info model.
-	@exception NullPointerException if the given info model is <code>null</code>.
-	@exception IllegalStateException if no depictor is registered for this component type.
+	@throws NullPointerException if the given info model is <code>null</code>.
+	@throws IllegalStateException if no depictor is registered for this component type.
 	*/
 	@SuppressWarnings("unchecked")
 	public AbstractComponent(final InfoModel infoModel)
@@ -792,7 +792,7 @@ Log.trace("now valid of", this, "is", isValid());
 	This method can only be called once during the life of a component.
 	Subclasses should call this version.
 	This implementation performs no actions.
-	@exception IllegalStateException if this method has already been called.
+	@throws IllegalStateException if this method has already been called.
 	*/
 	public void initialize()
 	{
@@ -832,7 +832,7 @@ Log.trace("now valid of", this, "is", isValid());
 	Once the event is consumed, no further processing takes place.
 	This version fires all events that are not consumed.
 	@param inputEvent The input event to dispatch.
-	@exception NullPointerException if the given event is <code>null</code>.
+	@throws NullPointerException if the given event is <code>null</code>.
 	@see TargetedEvent
 	@see FocusedInputEvent
 	@see InputEvent#isConsumed()
@@ -873,7 +873,7 @@ Log.trace("now valid of", this, "is", isValid());
 	/**Fire the given even to all registered listeners, if any.
 	If the event is consumed further processing should cease.
 	@param inputEvent The input event to fire.
-	@exception NullPointerException if the given event is <code>null</code>.
+	@throws NullPointerException if the given event is <code>null</code>.
 	@see InputEvent#isConsumed()
 	@see CommandEvent
 	@see KeyboardEvent
@@ -984,7 +984,7 @@ Log.trace("now valid of", this, "is", isValid());
 	If there is no theme to this component, the parent theme will be returned. 
 	This version delegates to the parent version, if there is a parent component; otherwise, the session theme is returned.
 	@return The theme to apply to this component.
-	@exception IOException if there is an error loading the theme.
+	@throws IOException if there is an error loading the theme.
 	@see #getParent()
 	@see GuiseSession#getTheme()
 	*/
@@ -1012,7 +1012,7 @@ Log.trace("now valid of", this, "is", isValid());
 	This method is called for any child components before applying the theme to the component itself,
 	to assure that child theme updates have already occured before theme updates occur for this component.
 	There is normally no need to override this method or to call this method directly by applications.
-	@exception IOException if there was an error loading or applying a theme.
+	@throws IOException if there was an error loading or applying a theme.
 	@see #isThemeApplied()
 	@see #applyTheme()
 	*/
@@ -1028,7 +1028,7 @@ Log.trace("now valid of", this, "is", isValid());
 	Themes are only applied of the application is themed.
 	This method may be overridden to effectively override theme settings by ensuring the state of important properties after the theme has been set. 
 	If the theme is successfully applied, this method updates the theme applied status.
-	@exception IOException if there was an error loading or applying a theme.
+	@throws IOException if there was an error loading or applying a theme.
 	@see GuiseApplication#isThemed()
 	@see #getTheme()
 	@see #applyTheme(Theme)
@@ -1057,7 +1057,7 @@ Log.trace("now valid of", this, "is", isValid());
 	/**Loads the preferences for this component and optionally any descendant components.
 	Any preferences returned from {@link #getPreferenceProperties()} will be loaded automatically.
 	@param includeDescendants <code>true</code> if preferences of any descendant components should also be loaded, else <code>false</code>.
-	@exception IOException if there is an error loading preferences.
+	@throws IOException if there is an error loading preferences.
 	*/
 	public void loadPreferences(final boolean includeDescendants) throws IOException
 	{
@@ -1091,7 +1091,7 @@ Log.trace("now valid of", this, "is", isValid());
 	/**Saves the preferences for this component and optionally any descendant components.
 	Any preferences returned from {@link #getPreferenceProperties()} will be saved automatically.
 	@param includeDescendants <code>true</code> if preferences of any descendant components should also be saved, else <code>false</code>.
-	@exception IOException if there is an error saving preferences.
+	@throws IOException if there is an error saving preferences.
 	*/
 	public void savePreferences(final boolean includeDescendants) throws IOException
 	{
@@ -1209,7 +1209,7 @@ Log.trace("now valid of", this, "is", isValid());
 	@param componentBounds The absolute bounds of the component.
 	@param viewportBounds The absolute bounds of the viewport.
 	@param mousePosition The position of the mouse relative to the viewport.
-	@exception NullPointerException if one or more of the arguments are <code>null</code>.
+	@throws NullPointerException if one or more of the arguments are <code>null</code>.
 	@see MouseListener
 	@see MouseEvent
 	*/
@@ -1231,7 +1231,7 @@ Log.trace("now valid of", this, "is", isValid());
 	@param componentBounds The absolute bounds of the component.
 	@param viewportBounds The absolute bounds of the viewport.
 	@param mousePosition The position of the mouse relative to the viewport.
-	@exception NullPointerException if one or more of the arguments are <code>null</code>.
+	@throws NullPointerException if one or more of the arguments are <code>null</code>.
 	@see MouseListener
 	@see MouseEvent
 	*/
@@ -1267,7 +1267,7 @@ Log.trace("now valid of", this, "is", isValid());
 	@param component The component for which the potential ancestor should be checked.
 	@param ancestor The component to check as an ancestor.
 	@return <code>true</code> if the given ancestor component is its parent or one of its parent's parents.
-	@exception NullPointerException if the given component and/or ancestor is <code>null</code>.
+	@throws NullPointerException if the given component and/or ancestor is <code>null</code>.
 	*/
 	public static boolean hasAncestor(Component component, final CompositeComponent ancestor)
 	{
@@ -1438,7 +1438,7 @@ Log.trace("now valid of", this, "is", isValid());
 	/**Fires an event to all registered notification listeners with the new notification information.
 	Parents are expected to refire the notification event up the hierarchy.
 	@param notification The notification to send to the notification listeners.
-	@exception NullPointerException if the given notification is <code>null</code>.
+	@throws NullPointerException if the given notification is <code>null</code>.
 	@see NotificationListener
 	@see NotificationEvent
 	*/
@@ -1450,7 +1450,7 @@ Log.trace("now valid of", this, "is", isValid());
 	/**Fires an event to all registered notification listeners with the new notification information.
 	Parents are expected to refire copies of the notification event up the hierarchy, keeping the original target.
 	@param notificationEvent The notification event to send to the notification listeners.
-	@exception NullPointerException if the given notification event is <code>null</code>.
+	@throws NullPointerException if the given notification event is <code>null</code>.
 	@see NotificationListener
 	*/
 	protected void fireNotified(final NotificationEvent notificationEvent)
@@ -1533,7 +1533,7 @@ Log.trace("now valid of", this, "is", isValid());
 			The extent of each flow represents a bound property.
 			@param flow The flow for which the extent should be set.
 			@param newExtent The new requested extent of the flyover, or <code>null</code> there is no extent preference.
-			@exception NullPointerException if the given flow is <code>null</code>. 
+			@throws NullPointerException if the given flow is <code>null</code>. 
 			*/
 			public void setExtent(final Flow flow, final Extent newExtent)
 			{
@@ -1585,8 +1585,8 @@ Log.trace("now valid of", this, "is", isValid());
 
 			/**Sets the bearing of the tether in relation to the frame.
 			@param newTetherBearing The new bearing of the tether in relation to the frame.
-			@exception NullPointerException if the given bearing is <code>null</code>.
-			@exception IllegalArgumentException if the given bearing is greater than 360.
+			@throws NullPointerException if the given bearing is <code>null</code>.
+			@throws IllegalArgumentException if the given bearing is greater than 360.
 			*/
 			public void setTetherBearing(final BigDecimal newTetherBearing)
 			{
@@ -1619,7 +1619,7 @@ Log.trace("now valid of", this, "is", isValid());
 
 		/**Component constructor.
 		@param component The component for which this object will control flyovers.
-		@exception NullPointerException if the given component is <code>null</code>.
+		@throws NullPointerException if the given component is <code>null</code>.
 		*/
 		public AbstractFlyoverStrategy(final S component)
 		{
@@ -1684,7 +1684,7 @@ Log.trace("viewport source center:", viewportSourceCenter);
 
 		/**Component constructor.
 		@param component The component for which this object will control flyovers.
-		@exception NullPointerException if the given component is <code>null</code>.
+		@throws NullPointerException if the given component is <code>null</code>.
 		*/
 		public AbstractFlyoverFrameStrategy(final S component)
 		{
@@ -1750,7 +1750,7 @@ Log.trace("viewport source center:", viewportSourceCenter);
 	{
 		/**Component constructor.
 		@param component The component for which this object will control flyovers.
-		@exception NullPointerException if the given component is <code>null</code>.
+		@throws NullPointerException if the given component is <code>null</code>.
 		*/
 		public DefaultFlyoverStrategy(final S component)
 		{

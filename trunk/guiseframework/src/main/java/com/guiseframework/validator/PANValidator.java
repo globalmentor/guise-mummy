@@ -47,7 +47,7 @@ public class PANValidator extends AbstractValidator<PAN>	//TODO add http://www.d
 		/**Sets the PAN products that the validator considers valid.
 		This is a bound property.
 		@param newValidProducts The set of valid products.
-		@exception NullPointerException if the given set of valid products is <code>null</code>.
+		@throws NullPointerException if the given set of valid products is <code>null</code>.
 		@see #VALID_PRODUCTS_PROPERTY
 		*/
 		public void setValidProducts(final Set<Product> newValidProducts)
@@ -64,7 +64,7 @@ public class PANValidator extends AbstractValidator<PAN>	//TODO add http://www.d
 		This is a bound property.
 		This implementation delegates to {@link #setValidProducts(Set)}
 		@param validProducts The products that are allowed, if any.
-		@exception NullPointerException if the given array of valid products is <code>null</code>.
+		@throws NullPointerException if the given array of valid products is <code>null</code>.
 		@see #VALID_PRODUCTS_PROPERTY
 		*/
 		public void setValidProducts(final Product... validProducts)
@@ -76,7 +76,7 @@ public class PANValidator extends AbstractValidator<PAN>	//TODO add http://www.d
 	
 	/**Valid products constructor with no value required.
 	@param validProducts The products that are allowed, if any.
-	@exception NullPointerException if the given array of valid products is <code>null</code>.
+	@throws NullPointerException if the given array of valid products is <code>null</code>.
 	*/
 	public PANValidator(final Product... validProducts)
 	{
@@ -94,7 +94,7 @@ public class PANValidator extends AbstractValidator<PAN>	//TODO add http://www.d
 	/**Value required and valid products constructor.
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
 	@param validProducts The products that are allowed, if any.
-	@exception NullPointerException if the given array of valid products is <code>null</code>.
+	@throws NullPointerException if the given array of valid products is <code>null</code>.
 	*/
 	public PANValidator(final boolean valueRequired, final Product... validProducts)
 	{
@@ -107,7 +107,7 @@ public class PANValidator extends AbstractValidator<PAN>	//TODO add http://www.d
 	/**Checks whether a given value is valid, and throws an exception if not.
 	This version determines whether a given PAN represents one of the supported products and is the correct length.
 	@param value The value to validate.
-	@exception ValidationException if the provided value is not valid.
+	@throws ValidationException if the provided value is not valid.
 	*/
 	public void validate(final PAN value) throws ValidationException
 	{

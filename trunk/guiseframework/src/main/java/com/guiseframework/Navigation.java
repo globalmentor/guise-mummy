@@ -47,7 +47,7 @@ public class Navigation
 	/**Creates an object encapsulating a point of navigation.
 	@param oldNavigationURI The old point of navigation, either absolute or application-relative.
 	@param newNavigationURI The new point of navigation, either absolute or application-relative.
-	@exception NullPointerException if one of the navigation URIs is <code>null</code>, or does not contain a path.
+	@throws NullPointerException if one of the navigation URIs is <code>null</code>, or does not contain a path.
 	*/
 	public Navigation(final URI oldNavigationURI, final URI newNavigationURI)
 	{
@@ -58,7 +58,7 @@ public class Navigation
 	@param oldNavigationURI The old point of navigation, either absolute or application-relative.
 	@param newNavigationURI The new point of navigation, either absolute or application-relative.
 	@param viewportID The ID of the viewport in which navigation should occur, or <code>null</code> if navigation should occur in the current viewport.
-	@exception NullPointerException if one of the navigation URIs is <code>null</code>, or does not contain a path.
+	@throws NullPointerException if one of the navigation URIs is <code>null</code>, or does not contain a path.
 	*/
 	public Navigation(final URI oldNavigationURI, final URI newNavigationURI, final String viewportID)
 	{

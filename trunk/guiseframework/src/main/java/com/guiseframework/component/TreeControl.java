@@ -155,7 +155,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	This version is provided to allow public access.
 	@param treeNode The object for which a representation component should be returned.
 	@return The child component representing the given object.
-	@exception IllegalArgumentException if the given object is not an appropriate object for a component to be created.
+	@throws IllegalArgumentException if the given object is not an appropriate object for a component to be created.
 	*/
 	public Component getComponent(final TreeNodeModel<?> treeNode)
 	{
@@ -166,7 +166,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	This implementation delegates to {@link #createTypedComponentState(TreeNodeModel)}.
 	@param object The object with which the component state is to be associated.
 	@return The component state to represent the given object.
-	@exception IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
+	@throws IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
 	*/
 	protected TreeNodeComponentState createComponentState(final TreeNodeModel<?> treeNode)
 	{
@@ -177,7 +177,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	@param <T> The type of value contained in the tree node.
 	@param object The object with which the component state is to be associated.
 	@return The component state to represent the given object.
-	@exception IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
+	@throws IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
 	*/
 	private <T> TreeNodeComponentState createTypedComponentState(final TreeNodeModel<T> treeNode)
 	{
@@ -209,7 +209,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 
 	/**Tree model constructor.
 	@param treeModel The component tree model.
-	@exception NullPointerException if the given tree model is <code>null</code>.
+	@throws NullPointerException if the given tree model is <code>null</code>.
 	*/
 	public TreeControl(final TreeModel treeModel)
 	{
@@ -235,7 +235,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	If the this control requests that the root not be displayed, this implementation automatically expanded the root node after it is added.
 	This is a bound property.
 	@param newRootNode The new root node of the tree model.
-	@exception NullPointerException if the given root node is <code>null</code>.
+	@throws NullPointerException if the given root node is <code>null</code>.
 	@see #ROOT_NODE_PROPERTY
 	*/
 	public void setRootNode(final TreeNodeModel<?> newRootNode)
@@ -273,7 +273,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		@param component The component for a tree node.
 		@param editable Whether the component is for a tree node that was editable when the component was created.
 		@param expanded Whether the component is for a tree node that was expanded when the component was created.
-		@exception NullPointerException if the given component is <code>null</code>.
+		@throws NullPointerException if the given component is <code>null</code>.
 		*/
 		public TreeNodeComponentState(final Component component, final boolean editable/*TODO del, final boolean expanded*/)
 		{
@@ -327,7 +327,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		/**Value class constructor with a default converter.
 		This implementation uses a {@link DefaultStringLiteralConverter}.
 		@param valueClass The class indicating the type of value to convert.
-		@exception NullPointerException if the given value class is <code>null</code>.
+		@throws NullPointerException if the given value class is <code>null</code>.
 		*/
 		public DefaultValueRepresentationStrategy(final Class<V> valueClass)
 		{
@@ -336,7 +336,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 
 		/**Converter constructor.
 		@param converter The converter to use for displaying the value as a string.
-		@exception NullPointerException if the given converter is <code>null</code>.
+		@throws NullPointerException if the given converter is <code>null</code>.
 		*/
 		public DefaultValueRepresentationStrategy(final Converter<V, String> converter)
 		{
@@ -433,7 +433,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 
 		/**Session constructor.
 		@param session The Guise session that owns this representation strategy.
-		@exception NullPointerException if the given session is <code>null</code>.
+		@throws NullPointerException if the given session is <code>null</code>.
 		*/
 /*TODO fix
 		public MessageModelRepresentationStrategy(final GuiseSession session)
@@ -653,7 +653,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		/**Source and tree node constructor.
 		@param source The source of the transferable data.
 		@param treeNode The tree node representing the transferred data.
-		@exception NullPointerException if the provided source and/or tree node is <code>null</code>.
+		@throws NullPointerException if the provided source and/or tree node is <code>null</code>.
 		*/
 		public TreeNodeTransferable(final TreeControl source, final TreeNodeModel<V> treeNode)
 		{
@@ -666,7 +666,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		@param <T> The type of object to be transferred.
 		@param objectClass The class of object to return.
 		@return The transferred data object, which may be <code>null</code>.
-		@exception IllegalArgumentException if the given class is not supported.
+		@throws IllegalArgumentException if the given class is not supported.
 		*/
 		public <T> T transfer(final Class<T> objectClass)
 		{

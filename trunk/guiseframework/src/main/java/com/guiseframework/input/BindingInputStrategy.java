@@ -94,7 +94,7 @@ public class BindingInputStrategy extends AbstractInputStrategy
 	If a bound action implements {@link Enableable} and is not enabled, the action is not performed and the input is not considered to be consumed.
 	@param input The input to process.
 	@return <code>true</code> if the input was consumed and should not be processed further.
-	@exception NullPointerException if the given input is <code>null</code>.
+	@throws NullPointerException if the given input is <code>null</code>.
 	@see GuiseSession#input(Input)
 	@see ActionModel#performAction()
 	*/

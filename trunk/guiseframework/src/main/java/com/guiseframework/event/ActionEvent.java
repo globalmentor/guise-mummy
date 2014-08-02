@@ -89,7 +89,7 @@ public class ActionEvent extends AbstractTargetedGuiseEvent
 	/**Source constructor with a default force and option.
 	The target will be set to be the same as the given source.
 	@param source The object on which the event initially occurred.
-	@exception NullPointerException if the given source is <code>null</code>.
+	@throws NullPointerException if the given source is <code>null</code>.
 	*/
 	public ActionEvent(final Object source)
 	{
@@ -101,8 +101,8 @@ public class ActionEvent extends AbstractTargetedGuiseEvent
 	@param source The object on which the event initially occurred.
 	@param force The zero-based force, such as 0 for no force or 1 for a mouse single click.
 	@param option The zero-based option, such as 0 for a mouse left button click or 1 for a mouse right button click.
-	@exception NullPointerException if the given source and/or target is <code>null</code>.
-	@exception IllegalArgumentException if the given force and/or option is negative.
+	@throws NullPointerException if the given source and/or target is <code>null</code>.
+	@throws IllegalArgumentException if the given force and/or option is negative.
 	*/
 	public ActionEvent(final Object source, final int force, final int option)
 	{
@@ -114,8 +114,8 @@ public class ActionEvent extends AbstractTargetedGuiseEvent
 	@param target The target of the event.
 	@param force The zero-based force, such as 0 for no force or 1 for a mouse single click.
 	@param option The zero-based option, such as 0 for a mouse left button click or 1 for a mouse right button click.
-	@exception NullPointerException if the given source and/or target is <code>null</code>.
-	@exception IllegalArgumentException if the given force and/or option is negative.
+	@throws NullPointerException if the given source and/or target is <code>null</code>.
+	@throws IllegalArgumentException if the given force and/or option is negative.
 	*/
 	public ActionEvent(final Object source, final Object target, final int force, final int option)
 	{
@@ -135,7 +135,7 @@ public class ActionEvent extends AbstractTargetedGuiseEvent
 	/**Copy constructor that specifies a different source.
 	@param source The object on which the event initially occurred.
 	@param actionEvent The event the properties of which will be copied.
-	@exception NullPointerException if the given source and/or event is <code>null</code>.
+	@throws NullPointerException if the given source and/or event is <code>null</code>.
 	*/
 	public ActionEvent(final Object source, final ActionEvent actionEvent)
 	{

@@ -49,7 +49,7 @@ public abstract class AbstractModalNavigationPanel<R> extends AbstractPanel impl
 
 	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given layout, is <code>null</code>.
+	@throws NullPointerException if the given layout, is <code>null</code>.
 	*/
 	public AbstractModalNavigationPanel(final Layout<?> layout)
 	{

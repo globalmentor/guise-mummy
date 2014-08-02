@@ -44,7 +44,7 @@ public class TabControl<V> extends AbstractListSelectControl<V>
 		/**Sets the flow axis.
 		This is a bound property
 		@param newAxis The flow axis.
-		@exception NullPointerException if the given axis is <code>null</code>.
+		@throws NullPointerException if the given axis is <code>null</code>.
 		@see #AXIS_PROPERTY
 		*/
 		public void setAxis(final Flow newAxis)
@@ -81,7 +81,7 @@ public class TabControl<V> extends AbstractListSelectControl<V>
 	/**Value class and axis constructor with a default data model to represent a given type.
 	@param valueClass The class indicating the type of value held in the model.
 	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given value class and/or axis is <code>null</code>.
+	@throws NullPointerException if the given value class and/or axis is <code>null</code>.
 	*/
 	public TabControl(final Class<V> valueClass, final Flow axis)
 	{
@@ -92,7 +92,7 @@ public class TabControl<V> extends AbstractListSelectControl<V>
 	@param valueClass The class indicating the type of value held in the model.
 	@param axis The axis along which the tabs are oriented.
 	@param maxTabCount The requested number of visible rows, or -1 if no row count is specified.
-	@exception NullPointerException if the given value class and/or axis is <code>null</code>.
+	@throws NullPointerException if the given value class and/or axis is <code>null</code>.
 	*/
 	public TabControl(final Class<V> valueClass, final Flow axis, final int maxTabCount)
 	{
@@ -103,7 +103,7 @@ public class TabControl<V> extends AbstractListSelectControl<V>
 	@param valueClass The class indicating the type of value held in the model.
 	@param selectionStrategy The strategy for selecting values in the model.
 	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given value class, selection strategy, and/or axis is <code>null</code>.
+	@throws NullPointerException if the given value class, selection strategy, and/or axis is <code>null</code>.
 	*/
 	public TabControl(final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final Flow axis)
 	{
@@ -115,7 +115,7 @@ public class TabControl<V> extends AbstractListSelectControl<V>
 	@param selectionStrategy The strategy for selecting values in the model.
 	@param axis The axis along which the tabs are oriented.
 	@param maxTabCount The requested number of visible tabs, or -1 if no maximum tab count is specified.
-	@exception NullPointerException if the given value class, selection strategy, and/or axis is <code>null</code>.
+	@throws NullPointerException if the given value class, selection strategy, and/or axis is <code>null</code>.
 	*/
 	public TabControl(final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final Flow axis, final int maxTabCount)
 	{
@@ -125,7 +125,7 @@ public class TabControl<V> extends AbstractListSelectControl<V>
 	/**List select model and axis constructor.
 	@param listSelectModel The component list select model.
 	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given list select model and/or axis is <code>null</code>.
+	@throws NullPointerException if the given list select model and/or axis is <code>null</code>.
 	*/
 	public TabControl(final ListSelectModel<V> listSelectModel, final Flow axis)
 	{
@@ -136,7 +136,7 @@ public class TabControl<V> extends AbstractListSelectControl<V>
 	@param listSelectModel The component list select model.
 	@param axis The axis along which the tabs are oriented.
 	@param maxTabCount The requested number of visible tabs, or -1 if no maximum tab count is specified.
-	@exception NullPointerException if the given list select model and/or axis is <code>null</code>.
+	@throws NullPointerException if the given list select model and/or axis is <code>null</code>.
 	*/
 	public TabControl(final ListSelectModel<V> listSelectModel, final Flow axis, final int maxTabCount)
 	{
@@ -147,7 +147,7 @@ public class TabControl<V> extends AbstractListSelectControl<V>
 	@param listSelectModel The component list select model.
 	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
 	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given list select model, value representation strategy, and/or axis is <code>null</code>.
+	@throws NullPointerException if the given list select model, value representation strategy, and/or axis is <code>null</code>.
 	*/
 	public TabControl(final ListSelectModel<V> listSelectModel, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final Flow axis)
 	{
@@ -159,7 +159,7 @@ public class TabControl<V> extends AbstractListSelectControl<V>
 	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
 	@param axis The axis along which the tabs are oriented.
 	@param maxTabCount The requested number of visible tabs, or -1 if no maximum tab count is specified.
-	@exception NullPointerException if the given list select model, value representation strategy, and/or axis is <code>null</code>.
+	@throws NullPointerException if the given list select model, value representation strategy, and/or axis is <code>null</code>.
 	*/
 	public TabControl(final ListSelectModel<V> listSelectModel, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final Flow axis, final int maxTabCount)
 	{

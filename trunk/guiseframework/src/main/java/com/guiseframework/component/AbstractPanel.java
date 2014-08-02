@@ -26,7 +26,7 @@ public abstract class AbstractPanel extends AbstractContainer implements Panel
 
 	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given layout is <code>null</code>.
+	@throws NullPointerException if the given layout is <code>null</code>.
 	*/
 	public AbstractPanel(final Layout<? extends Constraints> layout)
 	{

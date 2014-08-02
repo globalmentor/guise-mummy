@@ -48,7 +48,7 @@ public class WebButtonDepictor<C extends ActionControl> extends AbstractWebActio
 	This methods writes a comment containing the confirmation message, if any.
 	@param context Guise context information.
 	@param component The component being rendered.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 /*TODO del; transfer to another technique if needed
 	protected void writeParameters(final GC context, final C component) throws IOException	//TODO replace with better parameters; probably remove confirmation altogether
@@ -105,7 +105,7 @@ public class WebButtonDepictor<C extends ActionControl> extends AbstractWebActio
 	}
 
 	/**Begins the rendering process.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictBegin() throws IOException
 	{

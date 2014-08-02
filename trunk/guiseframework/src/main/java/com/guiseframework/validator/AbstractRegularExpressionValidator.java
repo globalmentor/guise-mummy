@@ -35,7 +35,7 @@ public abstract class AbstractRegularExpressionValidator<V> extends AbstractVali
 
 	/**Constructs a string regular expression validator from a regular expression string, without requiring a non-<code>null</code> value..
 	@param regularExpression The regular expression against which to validate string values.
-	@exception NullPointerException if the given regular expression is <code>null</code>.
+	@throws NullPointerException if the given regular expression is <code>null</code>.
 	*/
 	public AbstractRegularExpressionValidator(final String regularExpression)
 	{
@@ -45,7 +45,7 @@ public abstract class AbstractRegularExpressionValidator<V> extends AbstractVali
 	/**Constructs a string regular expression validator from a regular expression string.
 	@param regularExpression The regular expression against which to validate string values.
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
-	@exception NullPointerException if the given regular expression is <code>null</code>.
+	@throws NullPointerException if the given regular expression is <code>null</code>.
 	*/
 	public AbstractRegularExpressionValidator(final String regularExpression, final boolean valueRequired)
 	{
@@ -54,7 +54,7 @@ public abstract class AbstractRegularExpressionValidator<V> extends AbstractVali
 
 	/**Constructs a string regular expression validator from a regular expression pattern, without requiring a non-<code>null</code> value.
 	@param pattern The regular expression pattern against which to validate string values.
-	@exception NullPointerException if the given regular expression pattern is <code>null</code>.
+	@throws NullPointerException if the given regular expression pattern is <code>null</code>.
 	*/
 	public AbstractRegularExpressionValidator(final Pattern pattern)
 	{
@@ -64,7 +64,7 @@ public abstract class AbstractRegularExpressionValidator<V> extends AbstractVali
 	/**Constructs a string regular expression validator from a regular expression pattern.
 	@param pattern The regular expression pattern against which to validate string values.
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
-	@exception NullPointerException if the given regular expression pattern is <code>null</code>.
+	@throws NullPointerException if the given regular expression pattern is <code>null</code>.
 	*/
 	public AbstractRegularExpressionValidator(final Pattern pattern, final boolean valueRequired)
 	{
@@ -80,7 +80,7 @@ public abstract class AbstractRegularExpressionValidator<V> extends AbstractVali
 
 	/**Checks whether a given string matches the regular expression.
 	@param value The value to validate.
-	@exception ValidationException if the provided value is not valid.
+	@throws ValidationException if the provided value is not valid.
 	@see #getPattern()
 	*/
 	public void validate(final V value) throws ValidationException

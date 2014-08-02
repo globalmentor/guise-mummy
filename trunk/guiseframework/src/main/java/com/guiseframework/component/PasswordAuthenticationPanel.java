@@ -78,7 +78,7 @@ public class PasswordAuthenticationPanel extends ArrangePanel
 
 	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given layout is <code>null</code>.
+	@throws NullPointerException if the given layout is <code>null</code>.
 	*/
 	public PasswordAuthenticationPanel(final Layout<?> layout)
 	{
@@ -115,7 +115,7 @@ public class PasswordAuthenticationPanel extends ArrangePanel
 
 	/**Sets the username shown in the panel.
 	@param username The username to show.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	*/
 	public void setUsername(final String username) throws PropertyVetoException
 	{
@@ -144,7 +144,7 @@ public class PasswordAuthenticationPanel extends ArrangePanel
 
 	/**Sets the password shown in the panel.
 	@param password The password to show.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	*/
 	public void setPassword(final char[] password) throws PropertyVetoException
 	{

@@ -64,13 +64,13 @@ public interface TreeNodeModel<V> extends ActionModel, ValueModel<V>, Selectable
 
 	/**Adds a child tree node to this tree node.
 	@param treeNode The tree node to add.
-	@exception IllegalArgumentException if the tree node already has a parent.
+	@throws IllegalArgumentException if the tree node already has a parent.
 	*/
 	public void add(final TreeNodeModel<?> treeNode);
 
 	/**Removes a child tree node from this tree node.
 	@param treeNode The child tree node to remove.
-	@exception IllegalArgumentException if the tree node is not a child of this tree node.
+	@throws IllegalArgumentException if the tree node is not a child of this tree node.
 	*/
 	public void remove(final TreeNodeModel<?> treeNode);
 
@@ -87,9 +87,9 @@ public interface TreeNodeModel<V> extends ActionModel, ValueModel<V>, Selectable
 	A tree node's parent cannot be set unless that parent already recognizes this tree node as one of its children.
 	If a tree node is given the same parent it already has, no action occurs.
 	@param newParent The new parent for this tree node, or <code>null</code> if this tree node is being removed from a parent.
-	@exception IllegalStateException if a parent is provided and this tree node already has a parent.
-	@exception IllegalStateException if no parent is provided and this tree node's old parent still recognizes this tree node as its child.
-	@exception IllegalArgumentException if a parent is provided and the given parent does not already recognize this tree node as its child.
+	@throws IllegalStateException if a parent is provided and this tree node already has a parent.
+	@throws IllegalStateException if no parent is provided and this tree node's old parent still recognizes this tree node as its child.
+	@throws IllegalArgumentException if a parent is provided and the given parent does not already recognize this tree node as its child.
 	@see #add(TreeNodeModel)
 	@see #remove(TreeNodeModel)
 	*/

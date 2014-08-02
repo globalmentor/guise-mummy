@@ -27,7 +27,7 @@ public abstract class AbstractWebDepictEvent extends AbstractDepictEvent impleme
 
 	/**Depicted object constructor.
 	@param depictedObject The depicted object on which the event initially occurred.
-	@exception NullPointerException if the given depicted object is <code>null</code>.
+	@throws NullPointerException if the given depicted object is <code>null</code>.
 	*/
 	public AbstractWebDepictEvent(final DepictedObject depictedObject)
 	{

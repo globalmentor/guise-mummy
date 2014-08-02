@@ -27,7 +27,7 @@ public class MenuLayout extends AbstractFlowLayout<MenuConstraints>	//TODO proba
 
 	/**Flow constructor.
 	@param flow The logical axis (line or page) along which information is flowed.
-	@exception NullPointerException if the flow axis is <code>null</code>.
+	@throws NullPointerException if the flow axis is <code>null</code>.
 	*/
 	public MenuLayout(final Flow flow)
 	{
@@ -36,7 +36,7 @@ public class MenuLayout extends AbstractFlowLayout<MenuConstraints>	//TODO proba
 
 	/**Creates default constraints for the container.
 	@return New default constraints for the container.
-	@exception IllegalStateException if this layout does not support default constraints.
+	@throws IllegalStateException if this layout does not support default constraints.
 	*/
 	public MenuConstraints createDefaultConstraints()
 	{

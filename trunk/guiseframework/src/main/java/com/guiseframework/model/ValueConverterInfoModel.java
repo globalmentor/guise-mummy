@@ -44,7 +44,7 @@ public class ValueConverterInfoModel<V> extends DefaultInfoModel
 	/**Value and converter constructor.
 	@param value The value to represent as a label.
 	@param converter The converter to use for displaying the value as a string.
-	@exception NullPointerException if the given converter is <code>null</code>.
+	@throws NullPointerException if the given converter is <code>null</code>.
 	*/
 	public ValueConverterInfoModel(final V value, final Converter<V, String> converter)
 	{

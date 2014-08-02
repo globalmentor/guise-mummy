@@ -83,7 +83,7 @@ public class PendingImageActionControl extends ImageActionControl implements Pen
 	@param imageModel The component image model.
 	@param actionModel The component action model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given info model, image model, action model, and/or enableable object is <code>null</code>.
+	@throws NullPointerException if the given info model, image model, action model, and/or enableable object is <code>null</code>.
 	*/
 	public PendingImageActionControl(final InfoModel infoModel, final ImageModel imageModel, final ActionModel actionModel, final Enableable enableable)
 	{

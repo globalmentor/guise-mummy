@@ -121,7 +121,7 @@ public class DefaultTableColumnModel<V> extends DefaultInfoModel implements Tabl
 	/**Session and value class constructor.
 	@param session The Guise session that owns this column.
 	@param valueClass The class indicating the type of values held in the model.
-	@exception NullPointerException if the given session, and/or value class is <code>null</code>.
+	@throws NullPointerException if the given session, and/or value class is <code>null</code>.
 	*/
 /*TODO del; the ID apparently is not used
 	public DefaultTableColumnModel(final GuiseSession session, final Class<V> valueClass)
@@ -132,7 +132,7 @@ public class DefaultTableColumnModel<V> extends DefaultInfoModel implements Tabl
 	
 	/**Value class constructor.
 	@param valueClass The class indicating the type of values held in the model.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public DefaultTableColumnModel(final Class<V> valueClass)
 	{

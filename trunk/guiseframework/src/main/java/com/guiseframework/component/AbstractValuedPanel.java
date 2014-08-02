@@ -36,7 +36,7 @@ public abstract class AbstractValuedPanel<V> extends AbstractPanel implements Va
 	/**Value class and layout constructor.
 	@param valueClass The class indicating the type of value displayed within the component.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given value class and/or layout is <code>null</code>.
+	@throws NullPointerException if the given value class and/or layout is <code>null</code>.
 	*/
 	public AbstractValuedPanel(final Class<V> valueClass, final Layout<? extends Constraints> layout)
 	{

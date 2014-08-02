@@ -32,7 +32,7 @@ public interface Effect
 	/**Sets the delay before the effect takes place.
 	This is a bound property of type <code>Integer</code>.
 	@param newDelay The delay, in milliseconds, before the effect takes place.
-	@exception IllegalArgumentException if the given delay is negative.
+	@throws IllegalArgumentException if the given delay is negative.
 	@see #DELAY_PROPERTY
 	*/
 	public void setDelay(final int newDelay);

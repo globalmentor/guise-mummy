@@ -53,7 +53,7 @@ public class Components
 	/**
 	 * Retrieves all components, including the given component and all descendant components.
 	 * @param component The component to search.
-	 * @exception NullPointerException if the given component is <code>null</code>.
+	 * @throws NullPointerException if the given component is <code>null</code>.
 	 * @return The collection of components.
 	 */
 	public static Collection<Component> getComponents(final Component component)
@@ -65,7 +65,7 @@ public class Components
 	 * Retrieves all components, including the given component and all descendant components.
 	 * @param component The component to search.
 	 * @param componentCollection The collection into which the components will be collected.
-	 * @exception NullPointerException if the given component and/or collection is <code>null</code>.
+	 * @throws NullPointerException if the given component and/or collection is <code>null</code>.
 	 * @return The component collection.
 	 */
 	public static <T extends Collection<Component>> T getComponents(final Component component, final T componentCollection)
@@ -83,7 +83,7 @@ public class Components
 	 * @param deep <code>true</code> if the children of composite components should recursively be searched.
 	 * @param below <code>true</code> if the children of composite components that are instances of the given class should recursively be searched, if
 	 *          <var>deep</var> is set to <code>true</code>.
-	 * @exception NullPointerException if the given component, component class, and/or collection is <code>null</code>.
+	 * @throws NullPointerException if the given component, component class, and/or collection is <code>null</code>.
 	 * @return The component collection.
 	 */
 	public static <C, T extends Collection<C>> T getComponents(final Component component, final Class<C> componentClass, final T componentCollection,
@@ -104,7 +104,7 @@ public class Components
 	/**
 	 * Retrieves all descendant components.
 	 * @param component The component to search.
-	 * @exception NullPointerException if the given component is <code>null</code>.
+	 * @throws NullPointerException if the given component is <code>null</code>.
 	 * @return The collection of components.
 	 */
 	public static Collection<Component> getDescendantComponents(final CompositeComponent compositeComponent)
@@ -116,7 +116,7 @@ public class Components
 	 * Retrieves all descendant components.
 	 * @param compositeComponent The component to search.
 	 * @param componentCollection The collection into which the components will be collected.
-	 * @exception NullPointerException if the given component and/or collection is <code>null</code>.
+	 * @throws NullPointerException if the given component and/or collection is <code>null</code>.
 	 * @return The component collection.
 	 */
 	public static <T extends Collection<Component>> T getDescendantComponents(final CompositeComponent compositeComponent, final T componentCollection)
@@ -134,7 +134,7 @@ public class Components
 	 * @param deep <code>true</code> if the children of composite components should recursively be searched.
 	 * @param below <code>true</code> if the children of composite components that are instances of the given class should recursively be searched, if
 	 *          <var>deep</var> is set to <code>true</code>.
-	 * @exception NullPointerException if the given component, component class, and/or collection is <code>null</code>.
+	 * @throws NullPointerException if the given component, component class, and/or collection is <code>null</code>.
 	 * @return The component collection.
 	 */
 	public static <C, T extends Collection<C>> T getChildComponents(final CompositeComponent compositeComponent, final Class<C> componentClass,
@@ -151,7 +151,7 @@ public class Components
 	 * Determines if the given component is or has as a descendant the given other component.
 	 * @param component The component to search.
 	 * @param hasComponent The component to find.
-	 * @exception NullPointerException if one of the given components is <code>null</code>.
+	 * @throws NullPointerException if one of the given components is <code>null</code>.
 	 * @return <code>true</code> if the given component is the composite component or is a descendant of the given composite component.
 	 */
 	public static boolean hasComponent(final Component component, final Component hasComponent)
@@ -164,7 +164,7 @@ public class Components
 	 * @param component The component to search.
 	 * @param hasComponent The component to find.
 	 * @param deep <code>true</code> if the children of composite components should recursively be searched.
-	 * @exception NullPointerException if one of the given components is <code>null</code>.
+	 * @throws NullPointerException if one of the given components is <code>null</code>.
 	 * @return <code>true</code> if the given component is the composite component or is a descendant of the given composite component.
 	 */
 	public static boolean hasComponent(final Component component, final Component hasComponent, final boolean deep)
@@ -184,7 +184,7 @@ public class Components
 	 * Determines if the given composite component has the given component as one of its descendants.
 	 * @param compositeComponent The component to search.
 	 * @param component The component to find.
-	 * @exception NullPointerException if the given composite component or component is <code>null</code>.
+	 * @throws NullPointerException if the given composite component or component is <code>null</code>.
 	 * @return Whether the given component is a descendant of the given composite component.
 	 */
 	public static boolean hasChildComponent(final CompositeComponent compositeComponent, final Component component)
@@ -197,7 +197,7 @@ public class Components
 	 * @param compositeComponent The component to search.
 	 * @param component The component to find.
 	 * @param deep <code>true</code> if the children of composite components should recursively be searched.
-	 * @exception NullPointerException if the given composite component or component is <code>null</code>.
+	 * @throws NullPointerException if the given composite component or component is <code>null</code>.
 	 * @return Whether the given component is a descendant of the given composite component.
 	 */
 	public static boolean hasChildComponent(final CompositeComponent compositeComponent, final Component component, final boolean deep)

@@ -52,7 +52,7 @@ public abstract class AbstractEditValueControl<V> extends AbstractValueControl<V
 	@param infoModel The component info model.
 	@param valueModel The component value model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given info model, value model, and/or enableable object is <code>null</code>.
+	@throws NullPointerException if the given info model, value model, and/or enableable object is <code>null</code>.
 	*/
 	public AbstractEditValueControl(final InfoModel infoModel, final ValueModel<V> valueModel, final Enableable enableable)
 	{

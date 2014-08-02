@@ -33,7 +33,7 @@ public class WebSelectLinkDepictor<C extends SelectActionControl> extends WebLin
 	/**Writes the supplementary icons.
 	If no supplementary icons are present, no action occurs.
 	This version writes the selected icon, if available.
-	@exception IOException if there is an error writing the icon.
+	@throws IOException if there is an error writing the icon.
 	*/
 	protected void writeSupplementaryIcons() throws IOException
 	{

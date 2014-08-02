@@ -164,7 +164,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	/**
 	 * Sets the log writer.
 	 * @param logWriter The writer for writing to the log file, which may not be thread-safe.
-	 * @exception NullPointerException if the given log writer is <code>null</code>.
+	 * @throws NullPointerException if the given log writer is <code>null</code>.
 	 */
 	public void setLogWriter(final Writer logWriter)
 	{
@@ -222,7 +222,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * Returns the application frame, which is available after {@link #initialize()} has been called. This method must not be called before initialization has
 	 * occurred.
 	 * @return The application frame.
-	 * @exception IllegalStateException if this session has not yet been initialized.
+	 * @throws IllegalStateException if this session has not yet been initialized.
 	 */
 	public ApplicationFrame getApplicationFrame()
 	{
@@ -247,8 +247,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * Retrieves the saved preference properties for a given class.
 	 * @param objectClass The class for which preference properties should be returned.
 	 * @return The saved preference properties for the given class.
-	 * @exception NullPointerException if the given class is <code>null</code>.
-	 * @exception IOException if there was an error retrieving preferences.
+	 * @throws NullPointerException if the given class is <code>null</code>.
+	 * @throws IOException if there was an error retrieving preferences.
 	 */
 	public URFResource getPreferences(final Class<?> objectClass) throws IOException
 	{
@@ -280,8 +280,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * Saves preference properties for a given class.
 	 * @param objectClass The class for which preference properties should be saved.
 	 * @param preferences The preferences to save for the given class.
-	 * @exception NullPointerException if the given class and/or preferences is <code>null</code>.
-	 * @exception IOException if there was an error storing preferences.
+	 * @throws NullPointerException if the given class and/or preferences is <code>null</code>.
+	 * @throws IOException if there was an error storing preferences.
 	 */
 	public void setPreferences(final Class<?> objectClass, final URFResource preferences) throws IOException
 	{
@@ -334,7 +334,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	/**
 	 * Sets the current session time zone. This is a bound property.
 	 * @param newTimeZone The new session time zone.
-	 * @exception NullPointerException if the given time zone is <code>null</code>.
+	 * @throws NullPointerException if the given time zone is <code>null</code>.
 	 * @see GuiseSession#TIME_ZONE_PROPERTY
 	 */
 	public void setTimeZone(final TimeZone newTimeZone)
@@ -359,7 +359,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	/**
 	 * Sets the current session locale. The default orientation will be updated if needed to reflect the new locale. This is a bound property.
 	 * @param newLocale The new session locale.
-	 * @exception NullPointerException if the given locale is <code>null</code>.
+	 * @throws NullPointerException if the given locale is <code>null</code>.
 	 * @see GuiseSession#LOCALE_PROPERTY
 	 * @see #setOrientation(Orientation)
 	 */
@@ -432,7 +432,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	/**
 	 * Sets the default orientation. This is a bound property
 	 * @param newOrientation The new default internationalization orientation of components for this session.
-	 * @exception NullPointerException if the given orientation is <code>null</code>.
+	 * @throws NullPointerException if the given orientation is <code>null</code>.
 	 * @see GuiseSession#ORIENTATION_PROPERTY
 	 */
 	public void setOrientation(final Orientation newOrientation)
@@ -459,7 +459,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * <li>Any resource defined by default by Guise.</li>
 	 * </ol>
 	 * @return The resource bundle containing the resources for this session, based upon the locale.
-	 * @exception MissingResourceException if no resource bundle for the application's specified base name can be found or there was an error loading a resource
+	 * @throws MissingResourceException if no resource bundle for the application's specified base name can be found or there was an error loading a resource
 	 *              bundle.
 	 * @see GuiseApplication#loadResourceBundle(Theme, Locale)
 	 * @see #getTheme()
@@ -522,8 +522,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * method ends if the resource is not of the expected type.
 	 * @param resourceKey The key of the resource to retrieve.
 	 * @return The resource associated with the specified resource key.
-	 * @exception NullPointerException if the provided resource key is <code>null</code>.
-	 * @exception MissingResourceException if no resource could be found associated with the given key.
+	 * @throws NullPointerException if the provided resource key is <code>null</code>.
+	 * @throws MissingResourceException if no resource could be found associated with the given key.
 	 * @see #getResourceBundle()
 	 * @see #getResource(String, Object)
 	 */
@@ -540,7 +540,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param resourceKey The key of the resource to retrieve.
 	 * @param defaultValue The default value to use if there is no resource associated with the given key.
 	 * @return The resource associated with the specified resource key or the default if none is available.
-	 * @exception NullPointerException if the provided resource key is <code>null</code>.
+	 * @throws NullPointerException if the provided resource key is <code>null</code>.
 	 * @see #getResourceBundle()
 	 * @see #getResource(String)
 	 */
@@ -563,9 +563,9 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * method for accessing the resources in the session's resource bundle.
 	 * @param resourceKey The key of the resource to retrieve, or a relative path to the resource in the application's resource area.
 	 * @return The resource associated with the specified resource key.
-	 * @exception NullPointerException if the provided resource key is <code>null</code>.
-	 * @exception MissingResourceException if no resource could be found associated with the given key.
-	 * @exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code>.
+	 * @throws NullPointerException if the provided resource key is <code>null</code>.
+	 * @throws MissingResourceException if no resource could be found associated with the given key.
+	 * @throws ClassCastException if the resource associated with the given key is not an instance of <code>String</code>.
 	 * @see #getResourceBundle()
 	 * @see #getStringResource(String, String)
 	 */
@@ -619,8 +619,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param resourceKey The key of the resource to retrieve, or a relative path to the resource in the application's resource area.
 	 * @param defaultValue The default value to use if there is no resource associated with the given key.
 	 * @return The resource associated with the specified resource key or the default if none is available.
-	 * @exception NullPointerException if the provided resource key is <code>null</code>.
-	 * @exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code>.
+	 * @throws NullPointerException if the provided resource key is <code>null</code>.
+	 * @throws ClassCastException if the resource associated with the given key is not an instance of <code>String</code>.
 	 * @see #getResourceBundle()
 	 * @see #getStringResource(String)
 	 */
@@ -641,9 +641,9 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * {@link Boolean#valueOf(java.lang.String)} rules. This is a preferred convenience method for accessing the resources in the session's resource bundle.
 	 * @param resourceKey The key of the resource to retrieve.
 	 * @return The resource associated with the specified resource key.
-	 * @exception NullPointerException if the provided resource key is <code>null</code>.
-	 * @exception MissingResourceException if no resource could be found associated with the given key.
-	 * @exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>Boolean</code>.
+	 * @throws NullPointerException if the provided resource key is <code>null</code>.
+	 * @throws MissingResourceException if no resource could be found associated with the given key.
+	 * @throws ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>Boolean</code>.
 	 * @see #getResourceBundle()
 	 * @see #getBooleanResource(String, Boolean)
 	 */
@@ -668,8 +668,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param resourceKey The key of the resource to retrieve.
 	 * @param defaultValue The default value to use if there is no resource associated with the given key.
 	 * @return The resource associated with the specified resource key or the default if none is available.
-	 * @exception NullPointerException if the provided resource key is <code>null</code>.
-	 * @exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>Boolean</code>.
+	 * @throws NullPointerException if the provided resource key is <code>null</code>.
+	 * @throws ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>Boolean</code>.
 	 * @see #getResourceBundle()
 	 * @see #getBooleanResource(String)
 	 */
@@ -690,10 +690,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * {@link AbstractModeledColor#valueOf(CharSequence)}. This is a preferred convenience method for accessing the resources in the session's resource bundle.
 	 * @param resourceKey The key of the resource to retrieve.
 	 * @return The resource associated with the specified resource key.
-	 * @exception NullPointerException if the provided resource key is <code>null</code>.
-	 * @exception MissingResourceException if no resource could be found associated with the given key.
-	 * @exception ClassCastException if the resource associated with the given key is not an instance of {@link String} or {@link Color}.
-	 * @exception IllegalArgumentException if a string is provided that is not a valid color.
+	 * @throws NullPointerException if the provided resource key is <code>null</code>.
+	 * @throws MissingResourceException if no resource could be found associated with the given key.
+	 * @throws ClassCastException if the resource associated with the given key is not an instance of {@link String} or {@link Color}.
+	 * @throws IllegalArgumentException if a string is provided that is not a valid color.
 	 * @see #getResourceBundle()
 	 * @see #getColorResource(String, Color)
 	 * @see AbstractModeledColor#valueOf(CharSequence)
@@ -719,8 +719,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param resourceKey The key of the resource to retrieve.
 	 * @param defaultValue The default value to use if there is no resource associated with the given key.
 	 * @return The resource associated with the specified resource key or the default if none is available.
-	 * @exception NullPointerException if the provided resource key is <code>null</code>.
-	 * @exception ClassCastException if the resource associated with the given key is not an instance of {@link String} or {@link Color}.
+	 * @throws NullPointerException if the provided resource key is <code>null</code>.
+	 * @throws ClassCastException if the resource associated with the given key is not an instance of {@link String} or {@link Color}.
 	 * @see #getResourceBundle()
 	 * @see #getColorResource(String)
 	 * @see AbstractModeledColor#valueOf(CharSequence)
@@ -742,10 +742,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * {@link Integer#valueOf(java.lang.String)} rules. This is a preferred convenience method for accessing the resources in the session's resource bundle.
 	 * @param resourceKey The key of the resource to retrieve.
 	 * @return The resource associated with the specified resource key.
-	 * @exception NullPointerException if the provided resource key is <code>null</code>.
-	 * @exception MissingResourceException if no resource could be found associated with the given key.
-	 * @exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>Integer</code>.
-	 * @exception NumberFormatException if the resource key identifies a string that is not a valid integer.
+	 * @throws NullPointerException if the provided resource key is <code>null</code>.
+	 * @throws MissingResourceException if no resource could be found associated with the given key.
+	 * @throws ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>Integer</code>.
+	 * @throws NumberFormatException if the resource key identifies a string that is not a valid integer.
 	 * @see #getResourceBundle()
 	 * @see #getIntegerResource(String, Integer)
 	 */
@@ -770,8 +770,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param resourceKey The key of the resource to retrieve.
 	 * @param defaultValue The default value to use if there is no resource associated with the given key.
 	 * @return The resource associated with the specified resource key or the default if none is available.
-	 * @exception NullPointerException if the provided resource key is <code>null</code>.
-	 * @exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>Integer</code>.
+	 * @throws NullPointerException if the provided resource key is <code>null</code>.
+	 * @throws ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>Integer</code>.
 	 * @see #getResourceBundle()
 	 * @see #getIntegerResource(String)
 	 */
@@ -792,10 +792,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * convenience method for accessing the resources in the session's resource bundle.
 	 * @param resourceKey The key of the resource to retrieve.
 	 * @return The resource associated with the specified resource key.
-	 * @exception NullPointerException if the provided resource key is <code>null</code>.
-	 * @exception MissingResourceException if no resource could be found associated with the given key.
-	 * @exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>URI</code>.
-	 * @exception IllegalArgumentException if a string is provided that is not a valid URI.
+	 * @throws NullPointerException if the provided resource key is <code>null</code>.
+	 * @throws MissingResourceException if no resource could be found associated with the given key.
+	 * @throws ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>URI</code>.
+	 * @throws IllegalArgumentException if a string is provided that is not a valid URI.
 	 * @see #getResourceBundle()
 	 * @see #getURIResource(String, URI)
 	 */
@@ -819,8 +819,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param resourceKey The key of the resource to retrieve.
 	 * @param defaultValue The default value to use if there is no resource associated with the given key.
 	 * @return The resource associated with the specified resource key or the default if none is available.
-	 * @exception NullPointerException if the provided resource key is <code>null</code>.
-	 * @exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>URI</code>.
+	 * @throws NullPointerException if the provided resource key is <code>null</code>.
+	 * @throws ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>URI</code>.
 	 * @see #getResourceBundle()
 	 * @see #getURIResource(String)
 	 */
@@ -887,7 +887,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	/**
 	 * Returns the current session theme. If this session's theme has not yet been loaded, this method loads the theme.
 	 * @return The current session theme.
-	 * @exception IOException if there is an error loading the theme.
+	 * @throws IOException if there is an error loading the theme.
 	 * @see #getThemeURI()
 	 */
 	public Theme getTheme() throws IOException
@@ -912,7 +912,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * Sets the URI of the session theme. The current theme, if any, will be released and loaded the next time {@link #getTheme()} is called. This is a bound
 	 * property.
 	 * @param newThemeURI The URI of the new session theme.
-	 * @exception NullPointerException if the given theme URI is <code>null</code>.
+	 * @throws NullPointerException if the given theme URI is <code>null</code>.
 	 * @see #THEME_URI_PROPERTY
 	 * @see #getTheme()
 	 */
@@ -941,7 +941,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * performed inside the constructor that would require the presence of the Guise session within this thread group.
 	 * @param application The Guise application to which this session belongs.
 	 * @param platform The platform on which this session's objects are depicted.
-	 * @exception NullPointerException if the given application and/or platform is <code>null</code>.
+	 * @throws NullPointerException if the given application and/or platform is <code>null</code>.
 	 */
 	public AbstractGuiseSession(final GuiseApplication application, final Platform platform)
 	{
@@ -976,8 +976,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * created and cached. This method synchronizes on {@link #destinationComponentMap}.
 	 * @param destination The destination for which a component should be returned.
 	 * @return The component bound to the given destination.
-	 * @exception NullPointerException if the destination is <code>null</code>.
-	 * @exception IllegalStateException if the component class bound to the destination does not provide appropriate constructors, is an interface, is abstract,
+	 * @throws NullPointerException if the destination is <code>null</code>.
+	 * @throws IllegalStateException if the component class bound to the destination does not provide appropriate constructors, is an interface, is abstract,
 	 *              or throws an exception during instantiation.
 	 */
 	public Component getDestinationComponent(final ComponentDestination destination)
@@ -1000,7 +1000,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * Releases the component bound to the given destination.
 	 * @param destination The destination for which any bound component should be released.
 	 * @return The component previously bound to the given destination, or <code>null</code> if no component was bound to the given destination.
-	 * @exception NullPointerException if the destination is <code>null</code>.
+	 * @throws NullPointerException if the destination is <code>null</code>.
 	 */
 	public Component releaseDestinationComponent(final ComponentDestination destination)
 	{
@@ -1013,11 +1013,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * {@link #getDestinationComponent(ComponentDestination)}.
 	 * @param path The application context-relative path within the Guise container context.
 	 * @return The component bound to the given path.
-	 * @exception NullPointerException if the path is <code>null</code>.
-	 * @exception IllegalArgumentException if the provided path is absolute.
-	 * @exception IllegalArgumentException if no component is appropriate to associated the given navigation path (i.e. the given navigation path is not
+	 * @throws NullPointerException if the path is <code>null</code>.
+	 * @throws IllegalArgumentException if the provided path is absolute.
+	 * @throws IllegalArgumentException if no component is appropriate to associated the given navigation path (i.e. the given navigation path is not
 	 *              associated with a component destination).
-	 * @exception IllegalStateException if the component class bound to the path does not provide appropriate constructors, is an interface, is abstract, or
+	 * @throws IllegalStateException if the component class bound to the path does not provide appropriate constructors, is an interface, is abstract, or
 	 *              throws an exception during instantiation.
 	 * @see ComponentDestination
 	 */
@@ -1048,7 +1048,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * Creates the component for the given class.
 	 * @param componentClass The class representing the component to create.
 	 * @return The created component.
-	 * @exception IllegalStateException if the component class does not provide a default constructor, is an interface, is abstract, or throws an exception during
+	 * @throws IllegalStateException if the component class does not provide a default constructor, is an interface, is abstract, or throws an exception during
 	 *              instantiation.
 	 */
 	protected Component createComponent(final Class<? extends Component> componentClass)
@@ -1077,9 +1077,9 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * successful, the component is initialized from this URF description. This implementation calls {@link #initializeComponent(Component, InputStream)}. The
 	 * component's {@link Component#initialize()} is called whether there is an URF description. This method synchronizes on {@link #getDocumentBuilder()}.
 	 * @param component The component to initialize.
-	 * @exception MissingResourceException if no resource could be found associated with the given key.
-	 * @exception IllegalArgumentException if the URF description does not provide a resource description of the same type as the specified component.
-	 * @exception IllegalStateException if the given component has already been initialized, or there was some other problem initializing the component.
+	 * @throws MissingResourceException if no resource could be found associated with the given key.
+	 * @throws IllegalArgumentException if the URF description does not provide a resource description of the same type as the specified component.
+	 * @throws IllegalStateException if the given component has already been initialized, or there was some other problem initializing the component.
 	 * @see Component#initialize()
 	 * @see <a href="http://www.ploop.org/">PLOOP</a>
 	 */
@@ -1127,11 +1127,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * the description. This implementation calls {@link #initializeComponent(Component, InputStream)}. This method synchronizes on {@link #getDocumentBuilder()}.
 	 * @param component The component to initialize.
 	 * @param resourceKey The key to a TURF description resource file.
-	 * @exception MissingResourceException if no resource could be found associated with the given key.
-	 * @exception IllegalArgumentException if the URF description does not provide a resource description of the same type as the specified component.
-	 * @exception IllegalStateException if the given component has already been initialized.
-	 * @exception DataException if the data was incorrect for component initialization.
-	 * @exception InvocationTargetException if a given resource indicates a Java class the constructor of which throws an exception.
+	 * @throws MissingResourceException if no resource could be found associated with the given key.
+	 * @throws IllegalArgumentException if the URF description does not provide a resource description of the same type as the specified component.
+	 * @throws IllegalStateException if the given component has already been initialized.
+	 * @throws DataException if the data was incorrect for component initialization.
+	 * @throws InvocationTargetException if a given resource indicates a Java class the constructor of which throws an exception.
 	 * @see Component#initialize()
 	 */
 	public void initializeComponentFromResource(final Component component, final String resourceKey) throws DataException, InvocationTargetException
@@ -1157,11 +1157,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * component from the description. This method synchronizes on {@link #getDocumentBuilder()}.
 	 * @param component The component to initialize.
 	 * @param descriptionInputStream The input stream containing an URF description.
-	 * @exception IllegalArgumentException if the URF description does not provide a resource description of the same type as the specified component.
-	 * @exception IllegalStateException if the given component has already been initialized.
-	 * @exception IOException if there is an error reading from the input stream.
-	 * @exception DataException if the data was incorrect for component initialization.
-	 * @exception InvocationTargetException if a given resource indicates a Java class the constructor of which throws an exception.
+	 * @throws IllegalArgumentException if the URF description does not provide a resource description of the same type as the specified component.
+	 * @throws IllegalStateException if the given component has already been initialized.
+	 * @throws IOException if there is an error reading from the input stream.
+	 * @throws DataException if the data was incorrect for component initialization.
+	 * @throws InvocationTargetException if a given resource indicates a Java class the constructor of which throws an exception.
 	 * @see Component#initialize()
 	 */
 	public void initializeComponent(final Component component, final InputStream descriptionInputStream) throws IOException, DataException,
@@ -1202,7 +1202,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	/**
 	 * Pushes the given model navigation onto the top of the stack.
 	 * @param modalNavigation The modal navigation to add.
-	 * @exception NullPointerException if the given modal navigation is <code>null</code>.
+	 * @throws NullPointerException if the given modal navigation is <code>null</code>.
 	 */
 	protected void pushModalNavigation(final ModalNavigation modalNavigation)
 	{
@@ -1229,7 +1229,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	/**
 	 * @return The modal navigation from the top of the stack.
-	 * @exception NoSuchElementException if there are no modal navigations on the stack.
+	 * @throws NoSuchElementException if there are no modal navigations on the stack.
 	 */
 	protected ModalNavigation popModalNavigation()
 	{
@@ -1329,7 +1329,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	/**
 	 * Reports the navigation path relative to the application context path.
 	 * @return The path representing the current navigation location of the Guise application.
-	 * @exception IllegalStateException if this message has been called before the navigation path has been initialized.
+	 * @throws IllegalStateException if this message has been called before the navigation path has been initialized.
 	 */
 	public URIPath getNavigationPath()
 	{
@@ -1344,9 +1344,9 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * Changes the navigation path of the session. This method does not actually cause navigation to occur. If the given navigation path is the same as the
 	 * current navigation path, no action occurs.
 	 * @param navigationPath The navigation path relative to the application context path.
-	 * @exception NullPointerException if the given navigation path is <code>null</code>.
-	 * @exception IllegalArgumentException if the provided path is absolute.
-	 * @exception IllegalArgumentException if the navigation path is not recognized (e.g. there is no destination associated with the navigation path).
+	 * @throws NullPointerException if the given navigation path is <code>null</code>.
+	 * @throws IllegalArgumentException if the provided path is absolute.
+	 * @throws IllegalArgumentException if the navigation path is not recognized (e.g. there is no destination associated with the navigation path).
 	 * @see #navigate(URIPath)
 	 * @see #navigate(URI)
 	 * @see #navigateModal(URIPath, ModalNavigationListener)
@@ -1398,7 +1398,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param bookmark The bookmark for which navigation should occur at this navigation path, or <code>null</code> if there is no bookmark involved in
 	 *          navigation.
 	 * @param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
-	 * @exception NullPointerException if the given navigation path is <code>null</code>.
+	 * @throws NullPointerException if the given navigation path is <code>null</code>.
 	 * @see #setNavigationPath(URIPath)
 	 * @see #setBookmark(Bookmark)
 	 * @see #getApplicationFrame()
@@ -1478,7 +1478,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * Requests navigation to the specified path. The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later
 	 * point. Later requested navigation before navigation occurs will override this request.
 	 * @param path A path that is either relative to the application context path or is absolute.
-	 * @exception NullPointerException if the given path is <code>null</code>.
+	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @see #navigate(URI)
 	 */
 	public void navigate(final URIPath path)
@@ -1491,7 +1491,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * navigation at some later point. Later requested navigation before navigation occurs will override this request.
 	 * @param path A path that is either relative to the application context path or is absolute.
 	 * @param viewportID The ID of the viewport in which navigation should occur, or <code>null</code> if navigation should occur in the current viewport.
-	 * @exception NullPointerException if the given path is <code>null</code>.
+	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @see #navigate(URI, String)
 	 */
 	public void navigate(final URIPath path, final String viewportID)
@@ -1504,7 +1504,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * some later point. Later requested navigation before navigation occurs will override this request.
 	 * @param path A path that is either relative to the application context path or is absolute.
 	 * @param bookmark The bookmark at the given path, or <code>null</code> if no bookmark should be included in the navigation.
-	 * @exception NullPointerException if the given path is <code>null</code>.
+	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @see #navigate(URI)
 	 */
 	public void navigate(final URIPath path, final Bookmark bookmark)
@@ -1518,7 +1518,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param path A path that is either relative to the application context path or is absolute.
 	 * @param bookmark The bookmark at the given path, or <code>null</code> if no bookmark should be included in the navigation.
 	 * @param viewportID The ID of the viewport in which navigation should occur, or <code>null</code> if navigation should occur in the current viewport.
-	 * @exception NullPointerException if the given path is <code>null</code>.
+	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @see #navigate(URI, String)
 	 */
 	public void navigate(final URIPath path, final Bookmark bookmark, final String viewportID)
@@ -1531,7 +1531,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * Requests navigation to the specified URI. The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later
 	 * point. Later requested navigation before navigation occurs will override this request.
 	 * @param uri Either a relative or absolute path, or an absolute URI.
-	 * @exception NullPointerException if the given URI is <code>null</code>.
+	 * @throws NullPointerException if the given URI is <code>null</code>.
 	 */
 	public void navigate(final URI uri)
 	{
@@ -1543,7 +1543,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * navigation at some later point. Later requested navigation before navigation occurs will override this request.
 	 * @param uri Either a relative or absolute path, or an absolute URI.
 	 * @param viewportID The ID of the viewport in which navigation should occur, or <code>null</code> if navigation should occur in the current viewport.
-	 * @exception NullPointerException if the given URI is <code>null</code>.
+	 * @throws NullPointerException if the given URI is <code>null</code>.
 	 */
 	public void navigate(final URI uri, final String viewportID)
 	{
@@ -1556,7 +1556,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * later point. Later requested navigation before navigation occurs will override this request.
 	 * @param path A path that is either relative to the application context path or is absolute.
 	 * @param modalListener The listener to respond to the end of modal interaction.
-	 * @exception NullPointerException if the given path is <code>null</code>.
+	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @see #navigateModal(URI, ModalNavigationListener)
 	 */
 	public void navigateModal(final URIPath path, final ModalNavigationListener modalListener)
@@ -1570,7 +1570,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param path A path that is either relative to the application context path or is absolute.
 	 * @param bookmark The bookmark at the given path, or <code>null</code> if no bookmark should be included in the navigation.
 	 * @param modalListener The listener to respond to the end of modal interaction.
-	 * @exception NullPointerException if the given path is <code>null</code>.
+	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @see #navigateModal(URI, ModalNavigationListener)
 	 */
 	public void navigateModal(final URIPath path, final Bookmark bookmark, final ModalNavigationListener modalListener)
@@ -1584,7 +1584,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * later point. Later requested navigation before navigation occurs will override this request.
 	 * @param uri Either a relative or absolute path, or an absolute URI.
 	 * @param modalListener The listener to respond to the end of modal interaction.
-	 * @exception NullPointerException if the given URI is <code>null</code>.
+	 * @throws NullPointerException if the given URI is <code>null</code>.
 	 */
 	public void navigateModal(final URI uri, final ModalNavigationListener modalListener)
 	{
@@ -1638,7 +1638,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	/**
 	 * Called when the session is initialized.
-	 * @exception IllegalStateException if the session is already initialized.
+	 * @throws IllegalStateException if the session is already initialized.
 	 * @see #destroy()
 	 */
 	public void initialize()
@@ -1651,7 +1651,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	/**
 	 * Called when the session is destroyed.
-	 * @exception IllegalStateException if the session has not yet been initialized or has already been destroyed.
+	 * @throws IllegalStateException if the session has not yet been initialized or has already been destroyed.
 	 * @see #initialize()
 	 */
 	public void destroy()
@@ -1667,9 +1667,9 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param baseName The base filename to be used in generating the filename.
 	 * @param extension The extension to use for the temporary file.
 	 * @return A public application navigation path that can be used to access the resource only from this session.
-	 * @exception NullPointerException if the given base name and/or extension is <code>null</code>.
-	 * @exception IllegalArgumentException if the base name is the empty string.
-	 * @exception IOException if there is a problem creating the public resource.
+	 * @throws NullPointerException if the given base name and/or extension is <code>null</code>.
+	 * @throws IllegalArgumentException if the base name is the empty string.
+	 * @throws IOException if there is a problem creating the public resource.
 	 * @see GuiseApplication#createTempAsset(String, String, GuiseSession)
 	 * @see GuiseApplication#getTempDirectory()
 	 */
@@ -1705,8 +1705,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * input event is still not consumed after dispatching, its input is processed by the installed input strategy, if any.
 	 * @param input The input to process.
 	 * @return <code>true</code> if the input was consumed and should not be processed further.
-	 * @exception NullPointerException if the given input is <code>null</code>.
-	 * @exception IllegalArgumentException if input was given that this session does not know how to process.
+	 * @throws NullPointerException if the given input is <code>null</code>.
+	 * @throws IllegalArgumentException if input was given that this session does not know how to process.
 	 * @see #createInputEvent(Input)
 	 * @see GuiseSession#getApplicationFrame()
 	 * @see Component#dispatchInputEvent(InputEvent)
@@ -1736,8 +1736,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * Creates an input event for the given input.
 	 * @param input The input to process.
 	 * @return An event to represent the given input.
-	 * @exception NullPointerException if the given input is <code>null</code>.
-	 * @exception IllegalArgumentException if an unknown input type was given.
+	 * @throws NullPointerException if the given input is <code>null</code>.
+	 * @throws IllegalArgumentException if an unknown input type was given.
 	 * @see CommandInput
 	 * @see KeystrokeInput
 	 * @see MouseClickInput
@@ -1772,7 +1772,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param object The log object identification, or <code>null</code> if there is no related object.
 	 * @param parameters The map of log parameters, or <code>null</code> if there are no parameters.
 	 * @param comment The log comment, or <code>null</code> if there is no log comment.
-	 * @exception NullPointerException if the given log level is <code>null</code>.
+	 * @throws NullPointerException if the given log level is <code>null</code>.
 	 */
 	public void log(final String subject, final String predicate, final String object, final Map<?, ?> parameters, final CharSequence comment)
 	{
@@ -1787,7 +1787,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param object The log object identification, or <code>null</code> if there is no related object.
 	 * @param parameters The map of log parameters, or <code>null</code> if there are no parameters.
 	 * @param comment The log comment, or <code>null</code> if there is no log comment.
-	 * @exception NullPointerException if the given log level is <code>null</code>.
+	 * @throws NullPointerException if the given log level is <code>null</code>.
 	 */
 	public void log(final InformationLevel level, final String subject, final String predicate, final String object, final Map<?, ?> parameters,
 			final CharSequence comment)
@@ -1812,8 +1812,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * to any notification is fatal, the remaining notifications will not be performed. The absence of an option selection is considered fatal only if a fatal
 	 * option was presented for a given notification. This is a convenience method that delegates to {@link #notify(Runnable, Notification...)}.
 	 * @param notifications One or more notification informations to relay.
-	 * @exception NullPointerException if the given notifications is <code>null</code>.
-	 * @exception IllegalArgumentException if no notifications are given.
+	 * @throws NullPointerException if the given notifications is <code>null</code>.
+	 * @throws IllegalArgumentException if no notifications are given.
 	 */
 	public void notify(final Notification... notifications)
 	{
@@ -1828,8 +1828,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * notification. This implementation delegates to {@link #notify(Notification, Runnable)}.
 	 * @param notifications One or more notification informations to relay.
 	 * @param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
-	 * @exception NullPointerException if the given notifications is <code>null</code>.
-	 * @exception IllegalArgumentException if no notifications are given.
+	 * @throws NullPointerException if the given notifications is <code>null</code>.
+	 * @throws IllegalArgumentException if no notifications are given.
 	 */
 	public void notify(final Runnable afterNotify, final Notification... notifications)
 	{
@@ -1902,8 +1902,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * The absence of an option selection is considered fatal only if a fatal option was presented for a given notification. This is a convenience method that
 	 * delegates to {@link #notify(Runnable, Throwable...)}.
 	 * @param errors The errors with which to notify the user.
-	 * @exception NullPointerException if the given errors is <code>null</code>.
-	 * @exception IllegalArgumentException if no errors are given.
+	 * @throws NullPointerException if the given errors is <code>null</code>.
+	 * @throws IllegalArgumentException if no errors are given.
 	 */
 	public void notify(final Throwable... errors)
 	{
@@ -1917,8 +1917,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * {@link #notify(Runnable, Notification...)}.
 	 * @param error The error with which to notify the user.
 	 * @param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
-	 * @exception NullPointerException if the given errors is <code>null</code>.
-	 * @exception IllegalArgumentException if no errors are given.
+	 * @throws NullPointerException if the given errors is <code>null</code>.
+	 * @throws IllegalArgumentException if no errors are given.
 	 */
 	public void notify(final Runnable afterNotify, final Throwable... errors)
 	{
@@ -1946,10 +1946,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * </p>
 	 * @param string The string to be dereferenced.
 	 * @return The dereferenced string with any string references replaced with the appropriate string from the resources.
-	 * @exception NullPointerException if the given string is <code>null</code>.
-	 * @exception IllegalArgumentException if a string reference has no ending String Terminator control character (U+009C).
-	 * @exception MissingResourceException if no resource could be found associated with a string reference.
-	 * @exception ClassCastException if the resource associated with a string reference is not an instance of <code>String</code>.
+	 * @throws NullPointerException if the given string is <code>null</code>.
+	 * @throws IllegalArgumentException if a string reference has no ending String Terminator control character (U+009C).
+	 * @throws MissingResourceException if no resource could be found associated with a string reference.
+	 * @throws ClassCastException if the resource associated with a string reference is not an instance of <code>String</code>.
 	 * @see Resources#createStringResourceReference(String)
 	 * @see Resources#createStringValueReference(String)
 	 * @see #getStringResource(String)
@@ -2042,8 +2042,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param uri The URI to be dereferenced.
 	 * @param suffixes The suffixes, if any, to append to a resource key in a URI reference.
 	 * @return The URI dereferenced from the resources.
-	 * @exception NullPointerException if the given URI is <code>null</code>.
-	 * @exception MissingResourceException if no resource could be found associated with a string reference.
+	 * @throws NullPointerException if the given URI is <code>null</code>.
+	 * @throws MissingResourceException if no resource could be found associated with a string reference.
 	 * @see Resources#createURIResourceReference(String)
 	 * @see #getURIResource(String)
 	 */
@@ -2085,8 +2085,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param uri The URI to be resolved.
 	 * @param suffixes The suffixes, if any, to append to a resource key in a URI reference.
 	 * @return The uri resolved against resources the application base path.
-	 * @exception NullPointerException if the given URI is <code>null</code>.
-	 * @exception MissingResourceException if no resource could be found associated with a string reference.
+	 * @throws NullPointerException if the given URI is <code>null</code>.
+	 * @throws MissingResourceException if no resource could be found associated with a string reference.
 	 * @see #dereferenceURI(URI, String...)
 	 * @see GuiseApplication#resolveURI(URI)
 	 */

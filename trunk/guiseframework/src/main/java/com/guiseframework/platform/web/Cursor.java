@@ -88,7 +88,7 @@ public enum Cursor implements Identifier
 
 	/**CSS cursor constructor.
 	@param cssCursor The XML CSS cursor to which this cursor corresponds.
-	@exception NullPointerException if the given CSS cursor is <code>null</code>.
+	@throws NullPointerException if the given CSS cursor is <code>null</code>.
 	*/
 	private Cursor(final XMLCSSCursor cssCursor)
 	{
@@ -98,7 +98,7 @@ public enum Cursor implements Identifier
 	/**Retrieves the CSS cursor that corresponds to the predefined cursor based in the given component orientation.
 	@param orientation The component orientation for which the cursor should be returned.
 	@return The CSS cursor corresponding to this cursor in the given orientation.
-	@exception NullPointerException if the given orientation is <code>null</code>.
+	@throws NullPointerException if the given orientation is <code>null</code>.
 	*/
 	public XMLCSSCursor getCSSCursor(final Orientation orientation)
 	{

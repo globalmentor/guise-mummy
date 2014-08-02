@@ -48,7 +48,7 @@ public class WebFormEvent extends AbstractWebPlatformEvent
 		
 	/**Source exhaustive constructor.
 	@param source The object on which the event initially occurred.
-	@exception NullPointerException if the given source is <code>null</code>.
+	@throws NullPointerException if the given source is <code>null</code>.
 	*/
 	public WebFormEvent(final WebPlatform source)
 	{
@@ -58,7 +58,7 @@ public class WebFormEvent extends AbstractWebPlatformEvent
 	/**Source and exhaustive constructor.
 	@param source The object on which the event initially occurred.
 	@param exhaustive Whether this event represents all components on the form.
-	@exception NullPointerException if the given source is <code>null</code>.
+	@throws NullPointerException if the given source is <code>null</code>.
 	*/
 	public WebFormEvent(final WebPlatform source, final boolean exhaustive)
 	{

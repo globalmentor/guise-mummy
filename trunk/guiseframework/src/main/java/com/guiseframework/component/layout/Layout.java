@@ -45,9 +45,9 @@ public interface Layout<T extends Constraints> extends PropertyBindable
 	A layout cannot be given a layout component unless that layout component already recognizes this layout as its layout.
 	If a layout is given the same layout component it already has, no action occurs.
 	@param newLayoutComponent The new layout component for this layout.
-	@exception NullPointerException if the given layout component is <code>null</code>.
-	@exception IllegalStateException if a different layout component is provided and this layout already has a layout component.
-	@exception IllegalArgumentException if a different layout component is provided and the given layout component does not already recognize this layout as its layout.
+	@throws NullPointerException if the given layout component is <code>null</code>.
+	@throws IllegalStateException if a different layout component is provided and this layout already has a layout component.
+	@throws IllegalArgumentException if a different layout component is provided and the given layout component does not already recognize this layout as its layout.
 	*/
 	public void setOwner(final LayoutComponent newLayoutComponent);
 
@@ -55,7 +55,7 @@ public interface Layout<T extends Constraints> extends PropertyBindable
 	Called immediately after a component is added to the associated layout component.
 	This method is called by the associated layout component, and should not be called directly by application code.
 	@param component The component to add to the layout.
-	@exception IllegalStateException if this layout has not yet been installed into a layout component.
+	@throws IllegalStateException if this layout has not yet been installed into a layout component.
 	*/
 	public void addComponent(final Component component);
 
@@ -72,8 +72,8 @@ public interface Layout<T extends Constraints> extends PropertyBindable
 		default constraints are created and associated with the component.
 	@param component The component for which layout metadata is being requested.
 	@return The constraints associated with the component.
-	@exception IllegalStateException if this layout has not yet been installed into a layout component.
-	@exception IllegalStateException if no constraints are associated with the given component and this layout does not support default constraints.
+	@throws IllegalStateException if this layout has not yet been installed into a layout component.
+	@throws IllegalStateException if no constraints are associated with the given component and this layout does not support default constraints.
 	@see #getConstraintsClass()
 	@see Component#getConstraints()
 	@see Component#setConstraints(Constraints)
@@ -82,7 +82,7 @@ public interface Layout<T extends Constraints> extends PropertyBindable
 
 	/**Creates default constraints for the layout component.
 	@return New default constraints for the layout component.
-	@exception IllegalStateException if this layout does not support default constraints.
+	@throws IllegalStateException if this layout does not support default constraints.
 	*/
 	public T createDefaultConstraints();
 

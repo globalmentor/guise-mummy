@@ -33,7 +33,7 @@ public class FlowLayout extends AbstractFlowLayout<FlowConstraints>
 
 	/**Flow constructor with no wrapping.
 	@param flow The logical axis (line or page) along which information is flowed.
-	@exception NullPointerException if the flow axis is <code>null</code>.
+	@throws NullPointerException if the flow axis is <code>null</code>.
 	*/
 	public FlowLayout(final Flow flow)
 	{
@@ -43,7 +43,7 @@ public class FlowLayout extends AbstractFlowLayout<FlowConstraints>
 	/**Flow and wrap constructor.
 	@param flow The logical axis (line or page) along which information is flowed.
 	@param wrapped Whether flowed children should be wrapped when the flow extent is reached.
-	@exception NullPointerException if the flow axis is <code>null</code>.
+	@throws NullPointerException if the flow axis is <code>null</code>.
 	*/
 	public FlowLayout(final Flow flow, final boolean wrapped)
 	{
@@ -53,7 +53,7 @@ public class FlowLayout extends AbstractFlowLayout<FlowConstraints>
 	/**Creates default constraints for the container.
 	The new flow constraints will use the default alignment specified by the layout.
 	@return New default constraints for the container.
-	@exception IllegalStateException if this layout does not support default constraints.
+	@throws IllegalStateException if this layout does not support default constraints.
 	@see #getAlignment()
 	@see FlowConstraints#setAlignment(double)
 	*/

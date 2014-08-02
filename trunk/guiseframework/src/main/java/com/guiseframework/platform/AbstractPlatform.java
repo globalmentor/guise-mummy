@@ -100,7 +100,7 @@ public abstract class AbstractPlatform implements Platform
 		@param <O> The type of depicted object.
 		@param depictedObject The depicted object for which a depictor should be returned.
 		@return A depictor to depict the given component, or <code>null</code> if no depictor is registered.
-		@exception IllegalStateException if the registered depictor could not be instantiated for some reason.
+		@throws IllegalStateException if the registered depictor could not be instantiated for some reason.
 		*/
 		@SuppressWarnings("unchecked")	//casting is needed because Object.getClass() doesn't return a class for THIS type
 		public <O extends DepictedObject> Depictor<? super O> getDepictor(final O depictedObject)
@@ -130,7 +130,7 @@ public abstract class AbstractPlatform implements Platform
 
 		/**Registers a depicted object so that it can interact with the platform.
 		@param depictedObject The depicted object to register.
-		@exception NullPointerException if the given depicted object is <code>null</code>.
+		@throws NullPointerException if the given depicted object is <code>null</code>.
 		*/
 		public void registerDepictedObject(final DepictedObject depictedObject)
 		{
@@ -139,7 +139,7 @@ public abstract class AbstractPlatform implements Platform
 	
 		/**Unregisters a depicted object so that no longer interacts with the platform.
 		@param depictedObject The depicted object to unregister.
-		@exception NullPointerException if the given depicted object is <code>null</code>.
+		@throws NullPointerException if the given depicted object is <code>null</code>.
 		*/
 		public void unregisterDepictedObject(final DepictedObject depictedObject)
 		{
@@ -175,7 +175,7 @@ public abstract class AbstractPlatform implements Platform
 	/**Application constructor.
 	@param application The Guise application running on this platform.
 	@param environment The initial environment of the session.
-	@exception NullPointerException if the given application and/or environment is <code>null</code>.
+	@throws NullPointerException if the given application and/or environment is <code>null</code>.
 	*/
 	public AbstractPlatform(final GuiseApplication application)
 	{

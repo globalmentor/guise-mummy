@@ -118,7 +118,7 @@ public class HTTPServletGuiseRequest
   @param guiseContainer The Guise container.
   @param guiseApplication The Guise application.
   @param guiseSession The Guise session.
-  @exception IOException if there is an error reading or writing data.
+  @throws IOException if there is an error reading or writing data.
   */
 	public HTTPServletGuiseRequest(final HttpServletRequest request, /*TODO del final HttpServletResponse response, */final GuiseContainer guiseContainer, final GuiseApplication guiseApplication) throws IOException
 	{

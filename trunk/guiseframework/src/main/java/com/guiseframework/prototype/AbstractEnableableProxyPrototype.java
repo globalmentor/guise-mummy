@@ -52,7 +52,7 @@ public abstract class AbstractEnableableProxyPrototype<P extends Prototype & Inf
 
 	/**Proxied prototype constructor.
 	@param proxiedPrototype The prototype proxied by this prototype.
-	@exception NullPointerException if the given proxied prototype is <code>null</code> is <code>null</code>.
+	@throws NullPointerException if the given proxied prototype is <code>null</code> is <code>null</code>.
 	*/
 	public AbstractEnableableProxyPrototype(final P proxiedPrototype)
 	{

@@ -46,8 +46,8 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 		/**Adds a frame to the list of child frames.
 		This method should usually only be called by the frames themselves.
 		@param frame The frame to add.
-		@exception NullPointerException if the given frame is <code>null</code>.
-		@exception IllegalArgumentException if the given frame is this frame.
+		@throws NullPointerException if the given frame is <code>null</code>.
+		@throws IllegalArgumentException if the given frame is this frame.
 		*/
 		public void addChildFrame(final Frame frame)
 		{
@@ -69,8 +69,8 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 		/**Removes a frame from the list of child frames.
 		This method should usually only be called by the frames themselves.
 		@param frame The frame to remove.
-		@exception NullPointerException if the given frame is <code>null</code>.
-		@exception IllegalArgumentException if the given frame is the application frame.
+		@throws NullPointerException if the given frame is <code>null</code>.
+		@throws IllegalArgumentException if the given frame is the application frame.
 		*/
 		public void removeChildFrame(final Frame frame)
 		{

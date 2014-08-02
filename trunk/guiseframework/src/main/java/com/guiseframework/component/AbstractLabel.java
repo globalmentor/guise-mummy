@@ -54,7 +54,7 @@ public abstract class AbstractLabel extends AbstractComponent implements LabelCo
 
 	/**Info model constructor.
 	@param infoModel The component info model.
-	@exception NullPointerException if the given label or model is <code>null</code>.
+	@throws NullPointerException if the given label or model is <code>null</code>.
 	*/
 	public AbstractLabel(final InfoModel infoModel)
 	{
@@ -69,7 +69,7 @@ public abstract class AbstractLabel extends AbstractComponent implements LabelCo
 	{
 		/**Source constructor.
 		@param source The source of the transferable data.
-		@exception NullPointerException if the provided source is <code>null</code>.
+		@throws NullPointerException if the provided source is <code>null</code>.
 		*/
 		public DefaultTransferable(final LabelComponent source)
 		{
@@ -85,7 +85,7 @@ public abstract class AbstractLabel extends AbstractComponent implements LabelCo
 		/**Transfers data using the given content type.
 		@param contentType The type of data expected.
 		@return The transferred data, which may be <code>null</code>.
-		@exception IllegalArgumentException if the given content type is not supported.
+		@throws IllegalArgumentException if the given content type is not supported.
 		*/
 		public Object transfer(final ContentType contentType)
 		{

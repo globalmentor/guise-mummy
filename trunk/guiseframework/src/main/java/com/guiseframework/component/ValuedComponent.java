@@ -36,7 +36,7 @@ public interface ValuedComponent<V> extends Component, MutableValued<V>
 
 	/**Sets the new value to be displayed in the component.
 	@param newValue The new value.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	*/
 	public void setValue(final V newValue) throws PropertyVetoException;
 

@@ -38,7 +38,7 @@ public abstract class AbstractModelGroup<M extends Model> implements ModelGroup<
 	/**Determines whether this group contains the given model.
 	@param model The model being checked for group inclusion.
 	@return <code>true</code> if the model is contained in this group, else <code>false</code>.
-	@exception NullPointerException if the given model is <code>null</code>.	
+	@throws NullPointerException if the given model is <code>null</code>.	
 	*/
 	public boolean contains(final Model model)
 	{
@@ -49,7 +49,7 @@ public abstract class AbstractModelGroup<M extends Model> implements ModelGroup<
 	If the model is already included in the group, no action occurs.
 	This version delegates to {@link #addImpl(M)}.
 	@param model The model to add to the group.
-	@exception NullPointerException if the given model is <code>null</code>.	
+	@throws NullPointerException if the given model is <code>null</code>.	
 	*/
 	public void add(final M model)
 	{
@@ -61,7 +61,7 @@ public abstract class AbstractModelGroup<M extends Model> implements ModelGroup<
 
 	/**Actual implementation of adding a model to the group.
 	@param model The model to add to the group.	
-	@exception NullPointerException if the given model is <code>null</code>.	
+	@throws NullPointerException if the given model is <code>null</code>.	
 	*/
 	protected void addImpl(final M model)
 	{
@@ -72,7 +72,7 @@ public abstract class AbstractModelGroup<M extends Model> implements ModelGroup<
 	If the model is not included in this group, no action occurs.
 	This version delegates to {@link #removeImpl(M)}.
 	@param model The model to remove from the group.
-	@exception NullPointerException if the given model is <code>null</code>.	
+	@throws NullPointerException if the given model is <code>null</code>.	
 	*/
 	public void remove(final M model)
 	{
@@ -84,7 +84,7 @@ public abstract class AbstractModelGroup<M extends Model> implements ModelGroup<
 
 	/**Actual implementation of removing a model from the group.
 	@param model The model to remove from the group.
-	@exception NullPointerException if the given model is <code>null</code>.	
+	@throws NullPointerException if the given model is <code>null</code>.	
 	*/
 	protected void removeImpl(final M model)
 	{
@@ -93,7 +93,7 @@ public abstract class AbstractModelGroup<M extends Model> implements ModelGroup<
 
 	/**Model constructor.
 	@param models Zero or more models with which to initially place in the group.
-	@exception NullPointerException if one of the models is <code>null</code>.
+	@throws NullPointerException if one of the models is <code>null</code>.
 	*/
 	public AbstractModelGroup(final M... models)
 	{

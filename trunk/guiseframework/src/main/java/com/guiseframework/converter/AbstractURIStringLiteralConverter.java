@@ -42,7 +42,7 @@ public abstract class AbstractURIStringLiteralConverter extends AbstractStringLi
 	This version resolves any URI using {@link #resolveURI(URI)}.
 	@param literal The literal value in the lexical space to convert.
 	@return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
-	@exception ConversionException if the literal value cannot be converted.
+	@throws ConversionException if the literal value cannot be converted.
 	@see #resolveURI(URI)
 	*/ 
 	public URI convertLiteral(final String literal) throws ConversionException

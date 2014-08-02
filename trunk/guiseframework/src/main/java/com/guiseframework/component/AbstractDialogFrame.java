@@ -156,7 +156,7 @@ public abstract class AbstractDialogFrame<V> extends AbstractFrame implements Di
 	/**Value model, and component constructor.
 	@param valueModel The frame value model.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
-	@exception NullPointerException if the given value model is <code>null</code>.
+	@throws NullPointerException if the given value model is <code>null</code>.
 	*/
 	public AbstractDialogFrame(final ValueModel<V> valueModel, final Component component)
 	{
@@ -231,7 +231,7 @@ public abstract class AbstractDialogFrame<V> extends AbstractFrame implements Di
 	Validation always occurs if a validator is installed, even if the value is not changing.
 	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param newValue The input value of the model.
-	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see #getValidator()
 	@see #VALUE_PROPERTY
 	*/
@@ -265,7 +265,7 @@ public abstract class AbstractDialogFrame<V> extends AbstractFrame implements Di
 	public boolean isValidValue() {return getValueModel().isValidValue();}
 
 	/**Validates the value of this model, throwing an exception if the model is not valid.
-	@exception ValidationException if the value of this model is not valid.	
+	@throws ValidationException if the value of this model is not valid.	
 	*/
 	public void validateValue() throws ValidationException {getValueModel().validateValue();}
 

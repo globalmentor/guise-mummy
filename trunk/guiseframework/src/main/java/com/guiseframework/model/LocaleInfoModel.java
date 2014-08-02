@@ -42,7 +42,7 @@ public class LocaleInfoModel extends DefaultInfoModel
 		public Locale getLocale() {return locale;}
 
 	/**Constructs an info model indicating the locale to represent.
-	@exception NullPointerException if the given locale is <code>null</code>.
+	@throws NullPointerException if the given locale is <code>null</code>.
 	*/
 	public LocaleInfoModel(final Locale locale)
 	{

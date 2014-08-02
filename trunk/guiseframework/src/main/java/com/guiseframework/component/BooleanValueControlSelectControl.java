@@ -56,7 +56,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 		This is a bound property.
 		The layout is marked as not yet having a theme applied, as the specific theme rules applied to the layout may depend on the layout's owner.
 		@param newLayout The new layout definition for the container.
-		@exception NullPointerException if the given layout is <code>null</code>.
+		@throws NullPointerException if the given layout is <code>null</code>.
 		@see #LAYOUT_PROPERTY 
 		@see #setPropertiesInitialized(boolean) 
 		*/
@@ -130,7 +130,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 
 	/**Value class constructor with a default data model to represent a given type with multiple selection and a {@link FlowLayout} with {@link Flow#PAGE} flow.
 	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public BooleanValueControlSelectControl(final Class<V> valueClass)
 	{
@@ -140,7 +140,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	/**Value class and value representation strategy constructor with a default data model to represent a given type with multiple selection and a {@link FlowLayout} with {@link Flow#PAGE} flow.
 	@param valueClass The class indicating the type of value held in the model.
 	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
-	@exception NullPointerException if the given value class and/or value representation strategy is <code>null</code>.
+	@throws NullPointerException if the given value class and/or value representation strategy is <code>null</code>.
 	*/
 	public BooleanValueControlSelectControl(final Class<V> valueClass, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
 	{
@@ -150,7 +150,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	/**Value class and selection strategy constructor with a default data model to represent a given type and a {@link FlowLayout} with {@link Flow#PAGE} flow.
 	@param valueClass The class indicating the type of value held in the model.
 	@param selectionStrategy The strategy for selecting values in the model.
-	@exception NullPointerException if the given value class and/or selection strategy is <code>null</code>.
+	@throws NullPointerException if the given value class and/or selection strategy is <code>null</code>.
 	*/
 	public BooleanValueControlSelectControl(final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy)
 	{
@@ -161,7 +161,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	@param valueClass The class indicating the type of value held in the model.
 	@param selectionStrategy The strategy for selecting values in the model.
 	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
-	@exception NullPointerException if the given value class, selection strategy, and/or value representation strategy is <code>null</code>.
+	@throws NullPointerException if the given value class, selection strategy, and/or value representation strategy is <code>null</code>.
 	*/
 	public BooleanValueControlSelectControl(final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
 	{
@@ -170,7 +170,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 
 	/**List select model constructor with a {@link FlowLayout} with {@link Flow#PAGE} flow.
 	@param listSelectModel The component list select model.
-	@exception NullPointerException if the given list select model is <code>null</code>.
+	@throws NullPointerException if the given list select model is <code>null</code>.
 	*/
 	public BooleanValueControlSelectControl(final ListSelectModel<V> listSelectModel)
 	{
@@ -180,7 +180,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	/**List select model and value representation strategy constructor with a {@link FlowLayout} with {@link Flow#PAGE} flow.
 	@param listSelectModel The component list select model.
 	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
-	@exception NullPointerException if the given list select model and/or value representation strategy is <code>null</code>.
+	@throws NullPointerException if the given list select model and/or value representation strategy is <code>null</code>.
 	*/
 	public BooleanValueControlSelectControl(final ListSelectModel<V> listSelectModel, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
 	{
@@ -190,7 +190,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	/**Value class and layout constructor with a default data model to represent a given type with multiple selection.
 	@param valueClass The class indicating the type of value held in the model.
 	@param layout The layout definition for the component.
-	@exception NullPointerException if the given value class and/or layout is <code>null</code>.
+	@throws NullPointerException if the given value class and/or layout is <code>null</code>.
 	*/
 	public BooleanValueControlSelectControl(final Class<V> valueClass, final Layout<?> layout)
 	{
@@ -201,7 +201,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	@param valueClass The class indicating the type of value held in the model.
 	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
 	@param layout The layout definition for the component.
-	@exception NullPointerException if the given value class, layout, and/or value representation strategy is <code>null</code>.
+	@throws NullPointerException if the given value class, layout, and/or value representation strategy is <code>null</code>.
 	*/
 	public BooleanValueControlSelectControl(final Class<V> valueClass, final Layout<?> layout, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
 	{
@@ -212,7 +212,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	@param valueClass The class indicating the type of value held in the model.
 	@param selectionStrategy The strategy for selecting values in the model.
 	@param layout The layout definition for the component.
-	@exception NullPointerException if the given value class, selection strategy, and/or layout is <code>null</code>.
+	@throws NullPointerException if the given value class, selection strategy, and/or layout is <code>null</code>.
 	*/
 	public BooleanValueControlSelectControl(final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final Layout<?> layout)
 	{
@@ -224,7 +224,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	@param selectionStrategy The strategy for selecting values in the model.
 	@param layout The layout definition for the component.
 	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
-	@exception NullPointerException if the given value class, selection strategy, layout, and/or value representation strategy is <code>null</code>.
+	@throws NullPointerException if the given value class, selection strategy, layout, and/or value representation strategy is <code>null</code>.
 	*/
 	public BooleanValueControlSelectControl(final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final Layout<?> layout, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
 	{
@@ -234,7 +234,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	/**List select model and layout constructor.
 	@param listSelectModel The component list select model.
 	@param layout The layout definition for the component.
-	@exception NullPointerException if the given list select model and/or layout is <code>null</code>.
+	@throws NullPointerException if the given list select model and/or layout is <code>null</code>.
 	*/
 	public BooleanValueControlSelectControl(final ListSelectModel<V> listSelectModel, final Layout<?> layout)
 	{
@@ -245,7 +245,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	@param listSelectModel The component list select model.
 	@param layout The layout definition for the component.
 	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
-	@exception NullPointerException if the given list select model, layout, and/or value representation strategy is <code>null</code>.
+	@throws NullPointerException if the given list select model, layout, and/or value representation strategy is <code>null</code>.
 	*/
 	@SuppressWarnings("unchecked")	//an empty varargs doesn't need a generics cast, but Java requires one anyway
 	public BooleanValueControlSelectControl(final ListSelectModel<V> listSelectModel, final Layout<?> layout, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
@@ -265,8 +265,8 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 
 	/**Adds a component to the layout component with default constraints.
 	@param childComponent The component to add.
-	@exception IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
-	@exception IllegalStateException if the installed layout does not support default constraints.
+	@throws IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
+	@throws IllegalStateException if the installed layout does not support default constraints.
 	*/
 	protected void addComponent(final Component childComponent)
 	{
@@ -286,7 +286,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 
 	/**Removes a component from the layout component.
 	@param childComponent The component to remove.
-	@exception IllegalArgumentException if the component does not recognize this composite component as its parent or the component is not a member of this composite component.
+	@throws IllegalArgumentException if the component does not recognize this composite component as its parent or the component is not a member of this composite component.
 	*/
 	protected void removeComponent(final Component childComponent)
 	{
@@ -393,7 +393,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	to assure that child theme updates have already occured before theme updates occur for this component.
 	There is normally no need to override this method or to call this method directly by applications.
 	This version checks to see if the theme needs to be applied to the given layout.
-	@exception IOException if there was an error loading or applying a theme.
+	@throws IOException if there was an error loading or applying a theme.
 	@see #isThemeApplied()
 	@see #isLayoutThemeApplied()
 	@see #applyTheme()
@@ -412,7 +412,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	This method may be overridden to effectively override theme settings by ensuring the state of important properties after the theme has been set. 
 	If the theme is successfully applied, this method updates the theme applied status.
 	This version applies the theme to the current layout and updates the layout theme applied status.
-	@exception IOException if there was an error loading or applying a theme.
+	@throws IOException if there was an error loading or applying a theme.
 	@see GuiseApplication#isThemed()
 	@see #getTheme()
 	@see #applyTheme(Theme)

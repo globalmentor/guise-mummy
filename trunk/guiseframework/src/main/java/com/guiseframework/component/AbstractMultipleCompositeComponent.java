@@ -42,7 +42,7 @@ public abstract class AbstractMultipleCompositeComponent extends AbstractComposi
 	This version adds the component to the component set.
 	Any class that overrides this method must call this version.
 	@param childComponent The component to add to this component.
-	@exception IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
+	@throws IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
 	*/
 	protected void addComponent(final Component childComponent)
 	{
@@ -67,7 +67,7 @@ public abstract class AbstractMultipleCompositeComponent extends AbstractComposi
 	This version removes the component from the component set.
 	Any class that overrides this method must call this version.
 	@param childComponent The component to remove from this component.
-	@exception IllegalArgumentException if the component does not recognize this composite component as its parent or the component is not a member of this composite component.
+	@throws IllegalArgumentException if the component does not recognize this composite component as its parent or the component is not a member of this composite component.
 	*/
 	protected void removeComponent(final Component childComponent)
 	{
@@ -90,7 +90,7 @@ public abstract class AbstractMultipleCompositeComponent extends AbstractComposi
 
 	/**Info model constructor.
 	@param infoModel The component info model.
-	@exception NullPointerException if the given info model is <code>null</code>.
+	@throws NullPointerException if the given info model is <code>null</code>.
 	*/
 	public AbstractMultipleCompositeComponent(final InfoModel infoModel)
 	{

@@ -51,7 +51,7 @@ public class WebCustomButtonDepictor<C extends ActionControl> extends AbstractWe
 	}
 
 	/**Begins the rendering process.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictBegin() throws IOException
 	{
@@ -158,7 +158,7 @@ public class WebCustomButtonDepictor<C extends ActionControl> extends AbstractWe
 	
 	/**Renders corners for the given component.
 	@param direction Which physical end of the vertical flow the corner is on (decreasing for top or increasing for bottom). 
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void updateCorners(final Flow.Direction direction) throws IOException
 	{

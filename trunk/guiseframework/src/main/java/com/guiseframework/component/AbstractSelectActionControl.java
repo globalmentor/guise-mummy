@@ -139,7 +139,7 @@ public abstract class AbstractSelectActionControl extends AbstractActionControl 
 	@param infoModel The component info model.
 	@param actionModel The component action model.
 	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
+	@throws NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
 	*/
 	public AbstractSelectActionControl(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable)
 	{
@@ -158,7 +158,7 @@ public abstract class AbstractSelectActionControl extends AbstractActionControl 
 		
 		/**Select action control constructor.
 		@param selectActionControl The control to select when the action occurs.
-		@exception NullPointerException if the given select action control is <code>null</code>.
+		@throws NullPointerException if the given select action control is <code>null</code>.
 		*/
 		public SelectActionListener(final SelectActionControl selectActionControl)
 		{

@@ -36,7 +36,7 @@ public abstract class AbstractStringLiteralConverter<V> extends AbstractConverte
 	This implementation returns the {@link Object#toString()} version of the value, if a value is given.
 	@param value The value in the value space to convert.
 	@return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>.
-	@exception ConversionException if the value cannot be converted.
+	@throws ConversionException if the value cannot be converted.
 	*/ 
 	public String convertValue(final V value) throws ConversionException
 	{
@@ -64,7 +64,7 @@ public abstract class AbstractStringLiteralConverter<V> extends AbstractConverte
 	@param <VV> The type of value represented.
 	@param valueClass The class of the represented value.
 	@return The default converter for the value type represented by the given value class.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	@SuppressWarnings("unchecked")	//we check the value class before generic casting
 	public static <VV> Converter<VV, String> getInstance(final Class<VV> valueClass)

@@ -61,7 +61,7 @@ public abstract class AbstractMouseEvent extends AbstractGestureInputEvent imple
 	@param viewportBounds The absolute bounds of the viewport.
 	@param mousePosition The position of the mouse relative to the viewport.
 	@param keys The keys that were pressed when this event was generated.
-	@exception NullPointerException if the given source, target, target bounds, viewport bounds, mouse position, and/or keys is <code>null</code>.
+	@throws NullPointerException if the given source, target, target bounds, viewport bounds, mouse position, and/or keys is <code>null</code>.
 	*/
 	public AbstractMouseEvent(final Object source, final Object target, final Rectangle targetBounds, final Rectangle viewportBounds, final Point mousePosition, final Key... keys)
 	{

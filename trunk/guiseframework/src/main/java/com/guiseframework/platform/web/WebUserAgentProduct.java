@@ -93,7 +93,7 @@ public interface WebUserAgentProduct extends ClientProduct, BrandedProduct<WebUs
 		/**Retrieves a brand from a given user agent name.
 		@param userAgentName The user agent name as reported by the HTTP {@value HTTP#USER_AGENT_HEADER} header.
 		@return The brand corresponding to the given user agent name, or <code>null</code> if the given user agent name was not recognized.
-		@exception NullPointerException if the given user agent name is <code>null</code>.
+		@throws NullPointerException if the given user agent name is <code>null</code>.
 		*/
 		public static Brand getBrand(final String userAgentName)
 		{

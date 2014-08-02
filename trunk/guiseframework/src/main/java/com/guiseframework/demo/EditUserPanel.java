@@ -157,8 +157,8 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
 
 	/**Initializes the panel with information for a new user.
 	@param id The ID of the new user to be edited.
-	@exception NullPointerException if the provided user is <code>null</code>.
-	@exception IllegalArgumentException if any user information is invalid.
+	@throws NullPointerException if the provided user is <code>null</code>.
+	@throws IllegalArgumentException if any user information is invalid.
 	*/
 	public void setNewUser(final String id)
 	{
@@ -174,8 +174,8 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
 
 	/**Initializes the panel with user information.
 	@param user The user with which to initialize the panel.
-	@exception NullPointerException if the provided user is <code>null</code>.
-	@exception IllegalArgumentException if any user information is invalid.
+	@throws NullPointerException if the provided user is <code>null</code>.
+	@throws IllegalArgumentException if any user information is invalid.
 	*/
 	public void setUser(final DemoUser user)
 	{

@@ -68,7 +68,7 @@ public abstract class AbstractSimpleWebComponentDepictor<C extends Component> ex
 
 	/**Begins the rendering process.
 	This version writes the body ID and class attributes, along with the direction attribute.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictBegin() throws IOException
 	{

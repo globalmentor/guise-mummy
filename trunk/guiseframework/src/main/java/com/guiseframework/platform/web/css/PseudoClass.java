@@ -34,7 +34,7 @@ public class PseudoClass implements SimpleSelector, Comparable<PseudoClass>
 
 	/**Pseudo class name constructor.
 	@param pseudoClassName The name of the pseudo class to be selected.
-	@exception NullPointerException if the given pseudo class name is <code>null</code>.
+	@throws NullPointerException if the given pseudo class name is <code>null</code>.
 	*/
 	public PseudoClass(final String pseudoClassName)
 	{

@@ -59,7 +59,7 @@ public class WebTableDepictor<C extends Table> extends AbstractWebComponentDepic
 	}
 
 	/**Begins the rendering process.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictBegin() throws IOException
 	{
@@ -89,7 +89,7 @@ public class WebTableDepictor<C extends Table> extends AbstractWebComponentDepic
 	}
 
 	/**Renders the body of the component.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictBody() throws IOException
 	{
@@ -102,7 +102,7 @@ public class WebTableDepictor<C extends Table> extends AbstractWebComponentDepic
 	}
 
 	/**Updates the views of any children.
-	@exception IOException if there is an error updating the child views.
+	@throws IOException if there is an error updating the child views.
 	@see DepictContext.State#UPDATE_VIEW
 	*/
 	protected void depictChildren() throws IOException
@@ -132,7 +132,7 @@ public class WebTableDepictor<C extends Table> extends AbstractWebComponentDepic
 	@param <T> The type of value contained in the cells of the column.
 	@param tableModel The component model.
 	@param column The cell column.
-	@exception IOException if there is an error updating the cell view.
+	@throws IOException if there is an error updating the cell view.
 	*/
 	protected <T> void updateHeaderView(final TableModel tableModel, final TableColumnModel<T> column) throws IOException
 	{
@@ -227,7 +227,7 @@ public class WebTableDepictor<C extends Table> extends AbstractWebComponentDepic
 	@param tableModel The component model.
 	@param rowIndex The zero-based cell row index.
 	@param column The cell column.
-	@exception IOException if there is an error updating the cell view.
+	@throws IOException if there is an error updating the cell view.
 	*/
 	protected <T> void updateCellView(final TableModel tableModel, final int rowIndex, final TableColumnModel<T> column) throws IOException
 	{
@@ -297,7 +297,7 @@ public class WebTableDepictor<C extends Table> extends AbstractWebComponentDepic
 	}
 
 	/**Ends the rendering process.
-	@exception IOException if there is an error rendering the component.
+	@throws IOException if there is an error rendering the component.
 	*/
 	protected void depictEnd() throws IOException
 	{

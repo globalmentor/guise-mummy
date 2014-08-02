@@ -73,7 +73,7 @@ public class Heading extends AbstractLabel implements HeadingComponent
 
 	/**Info model constructor.
 	@param infoModel The component info model.
-	@exception NullPointerException if the given info model is <code>null</code>.
+	@throws NullPointerException if the given info model is <code>null</code>.
 	*/
 	public Heading(final InfoModel infoModel)
 	{
@@ -92,7 +92,7 @@ public class Heading extends AbstractLabel implements HeadingComponent
 	/**Info model and level constructor.
 	@param infoModel The component info model.
 	@param level The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
-	@exception NullPointerException if the given session info model is <code>null</code>.
+	@throws NullPointerException if the given session info model is <code>null</code>.
 	*/
 	public Heading(final InfoModel infoModel, final int level)
 	{

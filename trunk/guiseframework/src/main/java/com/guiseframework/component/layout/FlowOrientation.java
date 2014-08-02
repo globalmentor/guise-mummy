@@ -71,7 +71,7 @@ public enum FlowOrientation
 	/**Axis and direction constructor.
 	@param axis The axis of the flow.
 	@param direction The direction of the flow on the axis.
-	@exception NullPointerException if the given axis and/or direction is <code>null</code>.
+	@throws NullPointerException if the given axis and/or direction is <code>null</code>.
 	*/
 	private FlowOrientation(final Axis axis, final Flow.Direction direction)
 	{
@@ -117,7 +117,7 @@ public enum FlowOrientation
 	/**Retrieves a cardinal compass point indicating the absolute direction based upon the given flow end.
 	@param end The end of the flow.
 	@return The cardinal compass point indicating the absolute direction of the given end.
-	@exception NullPointerException if the given end is <code>null</code>.
+	@throws NullPointerException if the given end is <code>null</code>.
 	@see CompassPoint#NORTH
 	@see CompassPoint#EAST
 	@see CompassPoint#SOUTH

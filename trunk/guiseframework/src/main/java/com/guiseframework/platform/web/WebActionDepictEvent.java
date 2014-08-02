@@ -46,7 +46,7 @@ public class WebActionDepictEvent extends AbstractWebDepictEvent
 	@param targetID The ID of the component target site, or <code>null</code> if there was no component target.
 	@param actionID The action identifier, or <code>null</code> if this event represents a general action.
 	@param option The zero-based option, such as 0 for a left click or 1 for a right click.
-	@exception NullPointerException if the given context and/or component ID is <code>null</code>.
+	@throws NullPointerException if the given context and/or component ID is <code>null</code>.
 	*/
 	public WebActionDepictEvent(final DepictedObject depictedObject, final String targetID, final String actionID, final int option)
 	{

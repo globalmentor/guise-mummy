@@ -51,8 +51,8 @@ public class MouseClickEvent extends AbstractMouseEvent
 	@parma button The button that was clicked.
 	@param count The number of clicks that were input (e.g. 1 for a single click, 2 for a double click, etc.).
 	@param keys The keys that were pressed when this event was generated.
-	@exception NullPointerException if the given source, target bounds, viewport bounds, mouse position, button, and/or keys is <code>null</code>.
-	@exception IllegalArgumentException if the given count is zero or less.
+	@throws NullPointerException if the given source, target bounds, viewport bounds, mouse position, button, and/or keys is <code>null</code>.
+	@throws IllegalArgumentException if the given count is zero or less.
 	*/
 	public MouseClickEvent(final Object source, final Rectangle targetBounds, final Rectangle viewportBounds, final Point mousePosition, final MouseButton button, final int count, final Key... keys)
 	{
@@ -68,8 +68,8 @@ public class MouseClickEvent extends AbstractMouseEvent
 	@parma button The button that was clicked.
 	@param count The number of clicks that were input (e.g. 1 for a single click, 2 for a double click, etc.).
 	@param keys The keys that were pressed when this event was generated.
-	@exception NullPointerException if the given source, target, target bounds, viewport bounds, mouse position, button, and/or keys is <code>null</code>.
-	@exception IllegalArgumentException if the given count is zero or less.
+	@throws NullPointerException if the given source, target, target bounds, viewport bounds, mouse position, button, and/or keys is <code>null</code>.
+	@throws IllegalArgumentException if the given count is zero or less.
 	*/
 	public MouseClickEvent(final Object source, final Object target, final Rectangle targetBounds, final Rectangle viewportBounds, final Point mousePosition, final MouseButton button, final int count, final Key... keys)
 	{
@@ -85,7 +85,7 @@ public class MouseClickEvent extends AbstractMouseEvent
 	/**Mouse click input constructor with empty target bounds and viewport bounds and a mouse position at the origin.
 	@param source The object on which the event initially occurred.
 	@param mouseClickInput The mouse click input the properties of which will be copied.
-	@exception NullPointerException if the given source and/or input is <code>null</code>.
+	@throws NullPointerException if the given source and/or input is <code>null</code>.
 	*/
 	public MouseClickEvent(final Object source, final MouseClickInput mouseClickInput)
 	{
@@ -95,8 +95,8 @@ public class MouseClickEvent extends AbstractMouseEvent
 	/**Copy constructor that specifies a different source.
 	@param source The object on which the event initially occurred.
 	@param mouseClickEvent The event the properties of which will be copied.
-	@exception NullPointerException if the given source and/or event is <code>null</code>.
-	@exception IllegalArgumentException if the given count is zero or less.
+	@throws NullPointerException if the given source and/or event is <code>null</code>.
+	@throws IllegalArgumentException if the given count is zero or less.
 	*/
 	public MouseClickEvent(final Object source, final MouseClickEvent mouseClickEvent)
 	{

@@ -39,7 +39,7 @@ public abstract class AbstractConverter<V, L> extends GuiseBoundPropertyObject i
 		/**Sets the text of the invalid value message.
 		This is a bound property.
 		@param newInvalidValueMessage The new text of the invalid value message, which may include a resource reference.
-		@exception NullPointerException if the given message is <code>null</code>.
+		@throws NullPointerException if the given message is <code>null</code>.
 		@see #INVALID_VALUE_MESSAGE_PROPERTY
 		*/
 		public void setInvalidValueMessage(final String newInvalidValueMessage)

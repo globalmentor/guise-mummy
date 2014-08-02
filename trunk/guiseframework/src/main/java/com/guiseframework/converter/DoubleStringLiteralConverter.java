@@ -34,7 +34,7 @@ public class DoubleStringLiteralConverter extends AbstractNumberStringLiteralCon
 	/**Style constructor.
 	If the currency style is requested, the currency used will dynamically change whenever the locale changes.
 	@param style The representation style.
-	@exception NullPointerException if the given style is <code>null</code>.
+	@throws NullPointerException if the given style is <code>null</code>.
 	*/
 	public DoubleStringLiteralConverter(final Style style)
 	{
@@ -44,8 +44,8 @@ public class DoubleStringLiteralConverter extends AbstractNumberStringLiteralCon
 	/**Style, and currency constructor.
 	@param style The representation style.
 	@param currency The constant currency type to use, or <code>null</code> if currency representation is not requested or the currency should be dynamically determined by the locale.
-	@exception NullPointerException if the given style is <code>null</code>.
-	@exception IllegalArgumentException if a currency is provided for a style other than {@link Style#CURRENCY}.
+	@throws NullPointerException if the given style is <code>null</code>.
+	@throws IllegalArgumentException if a currency is provided for a style other than {@link Style#CURRENCY}.
 	*/
 	public DoubleStringLiteralConverter(final Style style, final Currency currency)
 	{
@@ -55,7 +55,7 @@ public class DoubleStringLiteralConverter extends AbstractNumberStringLiteralCon
 	/**Converts a literal representation of a value from the lexical space into a value in the value space.
 	@param literal The literal value in the lexical space to convert.
 	@return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
-	@exception ConversionException if the literal value cannot be converted.
+	@throws ConversionException if the literal value cannot be converted.
 	*/
 	public Double convertLiteral(final String literal) throws ConversionException
 	{

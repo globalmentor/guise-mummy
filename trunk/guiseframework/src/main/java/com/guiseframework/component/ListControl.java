@@ -54,7 +54,7 @@ public class ListControl<V> extends AbstractListSelectControl<V>
 
 	/**Value class constructor with a default data model to represent a given type with multiple selection.
 	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public ListControl(final Class<V> valueClass)
 	{
@@ -64,7 +64,7 @@ public class ListControl<V> extends AbstractListSelectControl<V>
 	/**Value class constructor with a default data model to represent a given type.
 	@param valueClass The class indicating the type of value held in the model.
 	@param multipleSelection <code>true</code> if the list control should allow multiple selections, else <code>false</code> if only a single selection is allowed.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public ListControl(final Class<V> valueClass, final boolean multipleSelection)
 	{
@@ -74,7 +74,7 @@ public class ListControl<V> extends AbstractListSelectControl<V>
 	/**Value class and row count constructor with a default data model to represent a given type with multiple selection.
 	@param valueClass The class indicating the type of value held in the model.
 	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public ListControl(final Class<V> valueClass, final int rowCount)
 	{
@@ -85,7 +85,7 @@ public class ListControl<V> extends AbstractListSelectControl<V>
 	@param valueClass The class indicating the type of value held in the model.
 	@param multipleSelection <code>true</code> if the list control should allow multiple selections, else <code>false</code> if only a single selection is allowed.
 	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
-	@exception NullPointerException if the given value class is <code>null</code>.
+	@throws NullPointerException if the given value class is <code>null</code>.
 	*/
 	public ListControl(final Class<V> valueClass, final boolean multipleSelection, final int rowCount)
 	{
@@ -95,7 +95,7 @@ public class ListControl<V> extends AbstractListSelectControl<V>
 	/**Value class and selection strategy constructor with a default data model to represent a given type.
 	@param valueClass The class indicating the type of value held in the model.
 	@param selectionStrategy The strategy for selecting values in the model.
-	@exception NullPointerException if the given value class and/or selection strategy is <code>null</code>.
+	@throws NullPointerException if the given value class and/or selection strategy is <code>null</code>.
 	*/
 	public ListControl(final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy)
 	{
@@ -106,7 +106,7 @@ public class ListControl<V> extends AbstractListSelectControl<V>
 	@param valueClass The class indicating the type of value held in the model.
 	@param selectionStrategy The strategy for selecting values in the model.
 	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
-	@exception NullPointerException if the given value class and/or selection strategy is <code>null</code>.
+	@throws NullPointerException if the given value class and/or selection strategy is <code>null</code>.
 	*/
 	public ListControl(final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final int rowCount)
 	{
@@ -115,7 +115,7 @@ public class ListControl<V> extends AbstractListSelectControl<V>
 
 	/**List select model constructor.
 	@param listSelectModel The component list select model.
-	@exception NullPointerException if the given list select model is <code>null</code>.
+	@throws NullPointerException if the given list select model is <code>null</code>.
 	*/
 	public ListControl(final ListSelectModel<V> listSelectModel)
 	{
@@ -125,7 +125,7 @@ public class ListControl<V> extends AbstractListSelectControl<V>
 	/**List select model and row count constructor.
 	@param listSelectModel The component list select model.
 	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
-	@exception NullPointerException if the given list select model is <code>null</code>.
+	@throws NullPointerException if the given list select model is <code>null</code>.
 	*/
 	public ListControl(final ListSelectModel<V> listSelectModel, final int rowCount)
 	{
@@ -135,7 +135,7 @@ public class ListControl<V> extends AbstractListSelectControl<V>
 	/**List select model and value representation strategy constructor.
 	@param listSelectModel The component list select model.
 	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
-	@exception NullPointerException if the given list select model and/or value representation strategy is <code>null</code>.
+	@throws NullPointerException if the given list select model and/or value representation strategy is <code>null</code>.
 	*/
 	public ListControl(final ListSelectModel<V> listSelectModel, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
 	{
@@ -146,7 +146,7 @@ public class ListControl<V> extends AbstractListSelectControl<V>
 	@param listSelectModel The component list select model.
 	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
 	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
-	@exception NullPointerException if the given list select model and/or value representation strategy is <code>null</code>.
+	@throws NullPointerException if the given list select model and/or value representation strategy is <code>null</code>.
 	*/
 	public ListControl(final ListSelectModel<V> listSelectModel, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final int rowCount)
 	{

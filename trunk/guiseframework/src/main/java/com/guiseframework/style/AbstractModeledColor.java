@@ -39,8 +39,8 @@ public abstract class AbstractModeledColor<C extends Enum<C> & ModeledColor.Comp
 
 	/**Constructs a color with the given components.
 	@param values The values of components of the color in the correct color space, each within the range (0.0-1.0), in the order of the component ordinals.
-	@exception NullPointerException if the components is <code>null</code>.
-TODO fix	@exception IllegalArgumentException if the number of component values do not equal the number of components.
+	@throws NullPointerException if the components is <code>null</code>.
+TODO fix	@throws IllegalArgumentException if the number of component values do not equal the number of components.
 	*/
 	public AbstractModeledColor(final double... values)
 	{
@@ -55,7 +55,7 @@ TODO fix	@exception IllegalArgumentException if the number of component values d
   /**Checks the range of a given color component.
 	@param value The value to check.
 	@return The checked value.
-	@exception IllegalArgumentException if the given component is outside the range (0.0-1.0).
+	@throws IllegalArgumentException if the given component is outside the range (0.0-1.0).
 	*/
   protected static double checkComponentValue(final double value)
   {
@@ -119,8 +119,8 @@ TODO fix	@exception IllegalArgumentException if the number of component values d
 	This method also recognizes the <code>transparent</code> color name as equivalent to <code>rgba(0, 0, 0, 0)</code>, or black with zero alpha.
 	@param charSequence The character sequence representation of a color. 
 	@return A color object representing the color represented by the given string.
-	@exception NullPointerException if the given string is <code>null</code>.
-	@exception IllegalArgumentException if a color cannot be determined from the given string.
+	@throws NullPointerException if the given string is <code>null</code>.
+	@throws IllegalArgumentException if a color cannot be determined from the given string.
 	@see HSLColor#valueOf(CharSequence) 
 	@see RGBColor#valueOf(CharSequence)
 	*/

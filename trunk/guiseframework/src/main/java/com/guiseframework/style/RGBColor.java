@@ -61,8 +61,8 @@ public class RGBColor extends AbstractModeledColor<RGBColor.Component>
 	This method also recognizes the <code>transparent</code> color name as equivalent to rgba(0, 0, 0, 0), or black with zero alpha.
 	In most instances, the {@link #valueOf(CharSequence)} static method is preferred for string-based construction, as it allows singleton instances of named RGB colors to be used.
 	@param charSequence The character sequence representation of a color, either a lowercase name of a standard HTML color, or a three or six-digit hex code beginning with '#'. 
-	@exception NullPointerException if the given string is <code>null</code>.
-	@exception IllegalArgumentException if a color cannot be determined from the given string. 
+	@throws NullPointerException if the given string is <code>null</code>.
+	@throws IllegalArgumentException if a color cannot be determined from the given string. 
 	*/
 	public RGBColor(final CharSequence charSequence)	//TODO probably change back to a String constructor
 	{
@@ -92,7 +92,7 @@ public class RGBColor extends AbstractModeledColor<RGBColor.Component>
 	@param red The red component on an absolute scale in the range (0x00-0xFF).
 	@param green The green component on an absolute scale in the range (0x00-0xFF).
 	@param blue The blue component on an absolute scale in the range (0x00-0xFF).
-	@exception IllegalArgumentException if one of the values is outside the range (0x00-0xFF).
+	@throws IllegalArgumentException if one of the values is outside the range (0x00-0xFF).
 	*/
 	public RGBColor(final int red, final int green, final int blue)
 	{
@@ -104,7 +104,7 @@ public class RGBColor extends AbstractModeledColor<RGBColor.Component>
 	@param green The green component on an absolute scale in the range (0x00-0xFF).
 	@param blue The blue component on an absolute scale in the range (0x00-0xFF).
 	@param alpha The alpha component on an absolute scale in the range (0x00-0xFF).
-	@exception IllegalArgumentException if one of the values is outside the range (0x00-0xFF).
+	@throws IllegalArgumentException if one of the values is outside the range (0x00-0xFF).
 	*/
 	public RGBColor(final int red, final int green, final int blue, final int alpha)
 	{
@@ -116,7 +116,7 @@ public class RGBColor extends AbstractModeledColor<RGBColor.Component>
 	@param red The red component.
 	@param green The green component.
 	@param blue The blue component.
-	@exception IllegalArgumentException if one of the values is outside the range (0.0-1.0).
+	@throws IllegalArgumentException if one of the values is outside the range (0.0-1.0).
 	*/
 	public RGBColor(final double red, final double green, final double blue)
 	{
@@ -128,7 +128,7 @@ public class RGBColor extends AbstractModeledColor<RGBColor.Component>
 	@param green The green component.
 	@param blue The blue component.
 	@param alpha The alpha component.
-	@exception IllegalArgumentException if one of the values is outside the range (0.0-1.0).
+	@throws IllegalArgumentException if one of the values is outside the range (0.0-1.0).
 	*/
 	public RGBColor(final double red, final double green, final double blue, final double alpha)
 	{
@@ -275,8 +275,8 @@ public class RGBColor extends AbstractModeledColor<RGBColor.Component>
 	This method also recognizes the <code>transparent</code> color name as equivalent to <code>rgba(0, 0, 0, 0)</code>, or black with zero alpha.
 	@param charSequence The character sequence representation of an RGB color. 
 	@return An RGB color object representing the color represented by the given string.
-	@exception NullPointerException if the given string is <code>null</code>.
-	@exception IllegalArgumentException if a color cannot be determined from the given string. 
+	@throws NullPointerException if the given string is <code>null</code>.
+	@throws IllegalArgumentException if a color cannot be determined from the given string. 
 	*/
 	public static RGBColor valueOf(final CharSequence charSequence)
 	{

@@ -29,7 +29,7 @@ public class KeyReleaseEvent extends AbstractKeyboardEvent
 	@param source The object on which the event initially occurred.
 	@parma key The key that was pressed.
 	@param keys The keys that were pressed when this event was generated.
-	@exception NullPointerException if the given source, key, and/or keys is <code>null</code>.
+	@throws NullPointerException if the given source, key, and/or keys is <code>null</code>.
 	*/
 	public KeyReleaseEvent(final Object source, final Key key, final Key... keys)
 	{
@@ -39,7 +39,7 @@ public class KeyReleaseEvent extends AbstractKeyboardEvent
 	/**Copy constructor that specifies a different source.
 	@param source The object on which the event initially occurred.
 	@param keyPressEvent The event the properties of which will be copied.
-	@exception NullPointerException if the given source, key, and/or event is <code>null</code>.
+	@throws NullPointerException if the given source, key, and/or event is <code>null</code>.
 	*/
 	public KeyReleaseEvent(final Object source, final KeyReleaseEvent keyReleaseEvent)
 	{
