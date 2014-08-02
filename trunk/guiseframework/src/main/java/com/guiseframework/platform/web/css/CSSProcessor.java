@@ -37,7 +37,7 @@ public class CSSProcessor
 	/**Skips whitespace and comments without throwing an error if the end of the input was reached.
 	Peeking is reset.
 	@param parseReader The reader from which to retrieve characters.
-	@except IOException Thrown if there is an error reading the input or the input is invalid.
+	@throws IOException Thrown if there is an error reading the input or the input is invalid.
 	*/
 	protected static void skipWhitespaceCommentsEOF(final ParseReader parseReader) throws IOException
 	{
@@ -53,7 +53,7 @@ public class CSSProcessor
 	/**Parses an input stream is expected to contain a set of declaration names and values.
 	@param parseReader The reader from which to retrieve characters.
 	@param rule The rule which will hold the declarations.
-	@except IOException Thrown if there is an error reading the input, the input is invalid, or the end of the input was reached unexpectedly.
+	@throws IOException Thrown if there is an error reading the input, the input is invalid, or the end of the input was reached unexpectedly.
 	@return <code>true</code> if the end-of-rule-group character was found, <code>false</code> if the end of the stream was reached.
 	*/
 	public static boolean parseDeclarations(final ParseReader parseReader, final Rule rule) throws IOException
@@ -88,7 +88,7 @@ public class CSSProcessor
 	/**Parses an input stream is expected to contain a block of declaration names and values, with appropriate beginning and ending delimiters.
 	@param parseReader The reader from which to retrieve characters.
 	@param rule The rule which will hold the declarations.
-	@except IOException Thrown if there is an error reading the input, the input is invalid, or the end of the input was reached unexpectedly.
+	@throws IOException Thrown if there is an error reading the input, the input is invalid, or the end of the input was reached unexpectedly.
 	*/
 	public static void parseDeclarationBlock(final ParseReader parseReader, final Rule rule) throws IOException
 	{
@@ -100,7 +100,7 @@ public class CSSProcessor
 	
 	/**Parses an input stream that is expected to begin with a CSS rule.
 	@param parseReader The reader from which to retrieve characters.
-	@except IOException Thrown if there is an error reading the input, the input is invalid, or the end of the input was reached unexpectedly.
+	@throws IOException Thrown if there is an error reading the input, the input is invalid, or the end of the input was reached unexpectedly.
 	@return A new CSS rule constructed from the reader.
 	*/
 	protected static Rule parseRule(final ParseReader parseReader) throws IOException
@@ -178,7 +178,7 @@ public class CSSProcessor
 	/**Parses an input stream that contains stylesheet information.
 	@param parseReader The reader from which to retrieve characters.
 	@param stylesheet The stylesheet being constructed.
-	@except IOException Thrown if there is an error reading the input, the input is invalid, or the end of the input was reached unexpectedly.
+	@throws IOException Thrown if there is an error reading the input, the input is invalid, or the end of the input was reached unexpectedly.
 	*/
 	protected static void parseStylesheetContent(final ParseReader parseReader, final CSSStylesheet stylesheet) throws IOException
 	{
@@ -232,7 +232,7 @@ public class CSSProcessor
 	/**Processes a CSS stylesheet.
 	@param parseReader The reader from which to retrieve characters.
 	@return stylesheet The constructed stylesheet.
-	@except IOException Thrown if there is an error reading the input, the input is invalid, or the end of the input was reached unexpectedly.
+	@throws IOException Thrown if there is an error reading the input, the input is invalid, or the end of the input was reached unexpectedly.
 	*/
 	public CSSStylesheet process(final ParseReader parseReader) throws IOException
 	{
