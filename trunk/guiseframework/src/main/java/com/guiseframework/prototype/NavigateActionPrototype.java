@@ -24,123 +24,118 @@ import com.globalmentor.net.URIPath;
 
 import com.guiseframework.Guise;
 
-/**Action prototype that knows how to navigate.
-The navigation destination can be updated.
-@author Garret Wilson
-*/
-public class NavigateActionPrototype extends AbstractActionPrototype
-{
+/**
+ * Action prototype that knows how to navigate. The navigation destination can be updated.
+ * @author Garret Wilson
+ */
+public class NavigateActionPrototype extends AbstractActionPrototype {
 
-	/**The navigation URI bound property.*/
-	public final static String NAVIGATION_URI_PROPERTY=getPropertyName(NavigateActionPrototype.class, "navigationURI");
+	/** The navigation URI bound property. */
+	public final static String NAVIGATION_URI_PROPERTY = getPropertyName(NavigateActionPrototype.class, "navigationURI");
 
-	/**The requested navigation URI.*/
+	/** The requested navigation URI. */
 	private URI navigationURI;
 
-		/**@return The requested navigation URI.*/
-		public URI getNavigationURI() {return navigationURI;}
+	/** @return The requested navigation URI. */
+	public URI getNavigationURI() {
+		return navigationURI;
+	}
 
-		/**Sets the URI for navigation.
-		This is a bound property.
-		@param newNavigationURI The new URI for navigation.
-		@see #NAVIGATION_URI_PROPERTY
-		*/
-		public void setNavigationURI(final URI newNavigationURI)
-		{
-			final URI oldNavigationURI=getNavigationURI();
-			if(!Objects.equals(oldNavigationURI, newNavigationURI))	//if the value is really changing
-			{
-				this.navigationURI=newNavigationURI;	//actually set the new navigation URI
-				firePropertyChange(NAVIGATION_URI_PROPERTY, oldNavigationURI, newNavigationURI);	//indicate that the value changed
-			}
+	/**
+	 * Sets the URI for navigation. This is a bound property.
+	 * @param newNavigationURI The new URI for navigation.
+	 * @see #NAVIGATION_URI_PROPERTY
+	 */
+	public void setNavigationURI(final URI newNavigationURI) {
+		final URI oldNavigationURI = getNavigationURI();
+		if(!Objects.equals(oldNavigationURI, newNavigationURI)) { //if the value is really changing
+			this.navigationURI = newNavigationURI; //actually set the new navigation URI
+			firePropertyChange(NAVIGATION_URI_PROPERTY, oldNavigationURI, newNavigationURI); //indicate that the value changed
 		}
-
-		/**Sets the URI path for navigation.
-		This is a bound property.
-		@param newNavigationURIPath The new URI path for navigation.
-		@see #NAVIGATION_URI_PROPERTY
-		*/
-		public void setNavigationURIPath(final URIPath newNavigationURIPath)
-		{
-			setNavigationURI(newNavigationURIPath!=null ? newNavigationURIPath.toURI() : null);
-		}
-
-	/**Default constructor.*/
-	public NavigateActionPrototype()
-	{
-		this((String)null);	//construct the class with no label
 	}
 
-	/**Label constructor.
-	@param label The text of the label, or <code>null</code> if there should be no label.
-	*/
-	public NavigateActionPrototype(final String label)
-	{
-		this(label, (URI)null);	//construct the class with no icon
+	/**
+	 * Sets the URI path for navigation. This is a bound property.
+	 * @param newNavigationURIPath The new URI path for navigation.
+	 * @see #NAVIGATION_URI_PROPERTY
+	 */
+	public void setNavigationURIPath(final URIPath newNavigationURIPath) {
+		setNavigationURI(newNavigationURIPath != null ? newNavigationURIPath.toURI() : null);
 	}
 
-	/**Label and icon constructor.
-	@param label The text of the label, or <code>null</code> if there should be no label.
-	@param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
-	*/
-	public NavigateActionPrototype(final String label, final URI icon)
-	{
-		this(label, icon, (URI)null);	//construct the class with no navigation URI
-	}
-	
-	/**Navigation URI constructor.
-	@param navigationURI The URI for navigation when the action occurs, or <code>null</code> if no navigation should occur.
-	*/
-	public NavigateActionPrototype(final URI navigationURI)
-	{
-		this(null, null, navigationURI);	//construct the class with no label or icon, but with a navigation URI
+	/** Default constructor. */
+	public NavigateActionPrototype() {
+		this((String)null); //construct the class with no label
 	}
 
-	/**Label, icon, and navigation URI constructor.
-	@param label The text of the label, or <code>null</code> if there should be no label.
-	@param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
-	@param navigationURI The URI for navigation when the action occurs, or <code>null</code> if no navigation should occur.
-	*/
-	public NavigateActionPrototype(final String label, final URI icon, final URI navigationURI)
-	{
-		super(label, icon);	//construct the parent class
-		this.navigationURI=navigationURI;	//set the navigation URI
-	}
-	
-	/**Navigation URI path constructor.
-	@param navigationURIPath The URI path for navigation when the action occurs, or <code>null</code> if no navigation should occur.
-	*/
-	public NavigateActionPrototype(final URIPath navigationURIPath)
-	{
-		this(null, navigationURIPath);	//construct the class with no label
+	/**
+	 * Label constructor.
+	 * @param label The text of the label, or <code>null</code> if there should be no label.
+	 */
+	public NavigateActionPrototype(final String label) {
+		this(label, (URI)null); //construct the class with no icon
 	}
 
-	/**Label and navigation URI path constructor.
-	@param label The text of the label, or <code>null</code> if there should be no label.
-	@param navigationURIPath The URI path for navigation when the action occurs, or <code>null</code> if no navigation should occur.
-	*/
-	public NavigateActionPrototype(final String label, final URIPath navigationURIPath)
-	{
-		this(label, null, navigationURIPath);	//construct the class with no icon
+	/**
+	 * Label and icon constructor.
+	 * @param label The text of the label, or <code>null</code> if there should be no label.
+	 * @param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
+	 */
+	public NavigateActionPrototype(final String label, final URI icon) {
+		this(label, icon, (URI)null); //construct the class with no navigation URI
 	}
 
-	/**Label, icon, and navigation URI path constructor.
-	@param label The text of the label, or <code>null</code> if there should be no label.
-	@param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
-	@param navigationURIPath The URI path for navigation when the action occurs, or <code>null</code> if no navigation should occur.
-	*/
-	public NavigateActionPrototype(final String label, final URI icon, final URIPath navigationURIPath)
-	{
-		this(label, icon, navigationURIPath!=null ? navigationURIPath.toURI() : null);	//construct the class with the navigation URI
+	/**
+	 * Navigation URI constructor.
+	 * @param navigationURI The URI for navigation when the action occurs, or <code>null</code> if no navigation should occur.
+	 */
+	public NavigateActionPrototype(final URI navigationURI) {
+		this(null, null, navigationURI); //construct the class with no label or icon, but with a navigation URI
+	}
+
+	/**
+	 * Label, icon, and navigation URI constructor.
+	 * @param label The text of the label, or <code>null</code> if there should be no label.
+	 * @param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
+	 * @param navigationURI The URI for navigation when the action occurs, or <code>null</code> if no navigation should occur.
+	 */
+	public NavigateActionPrototype(final String label, final URI icon, final URI navigationURI) {
+		super(label, icon); //construct the parent class
+		this.navigationURI = navigationURI; //set the navigation URI
+	}
+
+	/**
+	 * Navigation URI path constructor.
+	 * @param navigationURIPath The URI path for navigation when the action occurs, or <code>null</code> if no navigation should occur.
+	 */
+	public NavigateActionPrototype(final URIPath navigationURIPath) {
+		this(null, navigationURIPath); //construct the class with no label
+	}
+
+	/**
+	 * Label and navigation URI path constructor.
+	 * @param label The text of the label, or <code>null</code> if there should be no label.
+	 * @param navigationURIPath The URI path for navigation when the action occurs, or <code>null</code> if no navigation should occur.
+	 */
+	public NavigateActionPrototype(final String label, final URIPath navigationURIPath) {
+		this(label, null, navigationURIPath); //construct the class with no icon
+	}
+
+	/**
+	 * Label, icon, and navigation URI path constructor.
+	 * @param label The text of the label, or <code>null</code> if there should be no label.
+	 * @param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
+	 * @param navigationURIPath The URI path for navigation when the action occurs, or <code>null</code> if no navigation should occur.
+	 */
+	public NavigateActionPrototype(final String label, final URI icon, final URIPath navigationURIPath) {
+		this(label, icon, navigationURIPath != null ? navigationURIPath.toURI() : null); //construct the class with the navigation URI
 	}
 
 	@Override
-	protected void action(final int force, final int option)
-	{
-		final URI navigationURI=getNavigationURI();	//get the configured navigation URI, if any
-		if(navigationURI!=null)	//if we have a navigation URI
-		{
-			Guise.getInstance().getGuiseSession().navigate(getNavigationURI(), null);	//request that the session navigate to the configured URI
+	protected void action(final int force, final int option) {
+		final URI navigationURI = getNavigationURI(); //get the configured navigation URI, if any
+		if(navigationURI != null) { //if we have a navigation URI
+			Guise.getInstance().getGuiseSession().navigate(getNavigationURI(), null); //request that the session navigate to the configured URI
 		}
 	}
 

@@ -33,30 +33,26 @@ import com.guiseframework.event.*;
  * @param <O> The type of object being depicted.
  * @author Garret Wilson
  */
-public abstract class AbstractDepictor<O extends DepictedObject> implements Depictor<O>
-{
+public abstract class AbstractDepictor<O extends DepictedObject> implements Depictor<O> {
 
 	/** The Guise session that owns this object. */
 	private final GuiseSession session;
 
 	/** @return The Guise session that owns this object. */
-	public GuiseSession getSession()
-	{
+	public GuiseSession getSession() {
 		return session;
 	}
 
 	private final Platform platform;
 
 	@Override
-	public Platform getPlatform()
-	{
+	public Platform getPlatform() {
 		return platform;
 	}
 
 	/** {@inheritDoc} This method delegates to {@link Platform#getDepictContext()}. */
 	@Override
-	public DepictContext getDepictContext()
-	{
+	public DepictContext getDepictContext() {
 		return getPlatform().getDepictContext();
 	}
 
@@ -64,8 +60,7 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	private final Set<String> ignoredProperties = new CopyOnWriteArraySet<String>();
 
 	/** @return The depicted object properties that are to be ignored. */
-	protected Set<String> getIgnoredProperties()
-	{
+	protected Set<String> getIgnoredProperties() {
 		return ignoredProperties;
 	}
 
@@ -73,8 +68,7 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	private final Set<String> modifiedProperties = new CopyOnWriteArraySet<String>();
 
 	/** @return The depicted object properties that have been modified. */
-	protected Set<String> getModifiedProperties()
-	{
+	protected Set<String> getModifiedProperties() {
 		return modifiedProperties;
 	}
 
@@ -85,20 +79,13 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	 * @param property The property that has been modified.
 	 * @see #setDepicted(boolean)
 	 */
-	protected void setPropertyModified(final String property, final boolean modified)
-	{
-		if(modified) //if the property is modified
-		{
+	protected void setPropertyModified(final String property, final boolean modified) {
+		if(modified) { //if the property is modified
 			modifiedProperties.add(property); //add this property to the list of modified properties
 			depicted = false; //note that the depiction is not updated
-		}
-		else
-		//if the property is not modified
-		{
-			if(modifiedProperties.remove(property)) //remove the property from the set of modified properties; if the property was in the set
-			{
-				if(modifiedProperties.isEmpty()) //if there are no modified properties
-				{
+		} else { //if the property is not modified
+			if(modifiedProperties.remove(property)) { //remove the property from the set of modified properties; if the property was in the set
+				if(modifiedProperties.isEmpty()) { //if there are no modified properties
 					depicted = true; //count the depiction as updated
 				}
 			}
@@ -109,8 +96,7 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	private final DepictedPropertyChangeListener depictedPropertyChangeListener = new DepictedPropertyChangeListener();
 
 	/** @return The listener that marks this depiction as dirty if a change occurs. */
-	protected DepictedPropertyChangeListener getDepictedPropertyChangeListener()
-	{
+	protected DepictedPropertyChangeListener getDepictedPropertyChangeListener() {
 		return depictedPropertyChangeListener;
 	}
 
@@ -118,8 +104,7 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	private O depictedObject = null;
 
 	@Override
-	public O getDepictedObject()
-	{
+	public O getDepictedObject() {
 		return depictedObject;
 	}
 
@@ -127,29 +112,22 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	private boolean depicted = false;
 
 	@Override
-	public boolean isDepicted()
-	{
+	public boolean isDepicted() {
 		return depicted;
 	}
 
 	@Override
-	public void setDepicted(final boolean newDepicted)
-	{
-		if(newDepicted) //if the depiction is being marked as updated 
-		{
+	public void setDepicted(final boolean newDepicted) {
+		if(newDepicted) { //if the depiction is being marked as updated 
 			modifiedProperties.clear(); //remove all modified properties
-		}
-		else
-		//if the depiction is being marked as not updated
-		{
+		} else { //if the depiction is being marked as not updated
 			modifiedProperties.add(GENERAL_PROPERTY); //add the general property to the list of modified properties				
 		}
 		depicted = newDepicted; //update the depicted status
 	}
 
 	/** Default constructor. */
-	public AbstractDepictor()
-	{
+	public AbstractDepictor() {
 		this.session = Guise.getInstance().getGuiseSession(); //store a reference to the current Guise session
 		this.platform = this.session.getPlatform(); //store a reference to the platform
 	}
@@ -165,19 +143,15 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	 * @see #depictedPropertyChangeListener
 	 */
 	@Override
-	public void installed(final O depictedObject)
-	{
-		if(this.depictedObject != null) //if this depictor is already installed
-		{
+	public void installed(final O depictedObject) {
+		if(this.depictedObject != null) { //if this depictor is already installed
 			throw new IllegalStateException("Depictor is already installed in a depicted object.");
 		}
 		this.depictedObject = depictedObject; //change depicted objects
-		if(depictedObject instanceof PropertyBindable) //if the depicted object allows bound properties
-		{
+		if(depictedObject instanceof PropertyBindable) { //if the depicted object allows bound properties
 			((PropertyBindable)depictedObject).addPropertyChangeListener(getDepictedPropertyChangeListener()); //listen for property changes
 		}
-		if(depictedObject instanceof ListListenable) //if the depicted object notifies of list changes
-		{
+		if(depictedObject instanceof ListListenable) { //if the depicted object notifies of list changes
 			((ListListenable<Object>)depictedObject).addListListener(getDepictedPropertyChangeListener()); //listen for list changes
 		}
 	}
@@ -193,32 +167,26 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	 * @see #depictedPropertyChangeListener
 	 */
 	@Override
-	public void uninstalled(final O depictedObject)
-	{
-		if(this.depictedObject == null) //if this depictor is not installed
-		{
+	public void uninstalled(final O depictedObject) {
+		if(this.depictedObject == null) { //if this depictor is not installed
 			throw new IllegalStateException("Depictor is not installed in a depicted object.");
 		}
 		this.depictedObject = null; //remove the depicted object
-		if(depictedObject instanceof PropertyBindable) //if the depicted object allows bound properties
-		{
+		if(depictedObject instanceof PropertyBindable) { //if the depicted object allows bound properties
 			((PropertyBindable)depictedObject).removePropertyChangeListener(depictedPropertyChangeListener); //stop listening for property changes
 		}
-		if(depictedObject instanceof ListListenable) //if the depicted object notifies of list changes
-		{
+		if(depictedObject instanceof ListListenable) { //if the depicted object notifies of list changes
 			((ListListenable<Object>)depictedObject).removeListListener(depictedPropertyChangeListener); //stop listening for list changes
 		}
 	}
 
 	@Override
-	public void processEvent(final PlatformEvent event)
-	{
+	public void processEvent(final PlatformEvent event) {
 	}
 
 	/** {@inheritDoc} This implementation marks the depiction as depicted. */
 	@Override
-	public void depict() throws IOException
-	{
+	public void depict() throws IOException {
 		setDepicted(true); //show that the depiction has been updated
 	}
 
@@ -235,11 +203,9 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	 * @see #getIgnoredProperties()
 	 * @see #setPropertyModified(String, boolean)
 	 */
-	protected void depictedObjectPropertyChange(final PropertyChangeEvent propertyChangeEvent)
-	{
+	protected void depictedObjectPropertyChange(final PropertyChangeEvent propertyChangeEvent) {
 		final String propertyName = propertyChangeEvent.getPropertyName(); //get the name of the changing property
-		if(getIgnoredProperties().contains(propertyName)) //if this is an ignored property
-		{
+		if(getIgnoredProperties().contains(propertyName)) { //if this is an ignored property
 			return; //ignore this property change
 		}
 		setPropertyModified(propertyName, true); //show that a property has been modified
@@ -252,18 +218,15 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	 * </p>
 	 * @author Garret Wilson
 	 */
-	protected class DepictedPropertyChangeListener implements PropertyChangeListener, ListListener<Object>
-	{
+	protected class DepictedPropertyChangeListener implements PropertyChangeListener, ListListener<Object> {
 
 		@Override
-		public void propertyChange(final PropertyChangeEvent propertyChangeEvent)
-		{
+		public void propertyChange(final PropertyChangeEvent propertyChangeEvent) {
 			depictedObjectPropertyChange(propertyChangeEvent); //delegate to the outer class method
 		}
 
 		@Override
-		public void listModified(final ListEvent<Object> listEvent)
-		{
+		public void listModified(final ListEvent<Object> listEvent) {
 			setDepicted(false); //show that we need general updates			
 		}
 	};

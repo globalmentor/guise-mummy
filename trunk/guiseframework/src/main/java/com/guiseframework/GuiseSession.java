@@ -48,8 +48,7 @@ import com.guiseframework.theme.Theme;
  * sessions.
  * @author Garret Wilson
  */
-public interface GuiseSession extends PropertyBindable, CollatorFactory, ConfigurationManaged
-{
+public interface GuiseSession extends PropertyBindable, CollatorFactory, ConfigurationManaged {
 
 	/** The input strategy bound property. */
 	public final static String INPUT_STRATEGY_PROPERTY = getPropertyName(GuiseSession.class, "inputStrategy");
@@ -261,7 +260,7 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Configu
 	 * </ol>
 	 * @return The resource bundle containing the resources for this session, based upon the locale.
 	 * @throws MissingResourceException if no resource bundle for the application's specified base name can be found or there was an error loading a resource
-	 *              bundle.
+	 *           bundle.
 	 * @see GuiseApplication#loadResourceBundle(Theme, Locale)
 	 * @see #getTheme()
 	 * @see #getLocale()
@@ -489,8 +488,8 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Configu
 	 * @param destination The destination for which a component should be returned.
 	 * @return The component bound to the given destination.
 	 * @throws NullPointerException if the destination is <code>null</code>.
-	 * @throws IllegalStateException if the component class bound to the destination does not provide appropriate constructors, is an interface, is abstract,
-	 *              or throws an exception during instantiation.
+	 * @throws IllegalStateException if the component class bound to the destination does not provide appropriate constructors, is an interface, is abstract, or
+	 *           throws an exception during instantiation.
 	 */
 	public Component getDestinationComponent(final ComponentDestination destination);
 
@@ -510,10 +509,10 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Configu
 	 * @return The component bound to the given path.
 	 * @throws NullPointerException if the path is <code>null</code>.
 	 * @throws IllegalArgumentException if the provided path is absolute.
-	 * @throws IllegalArgumentException if no component is appropriate to associated the given navigation path (i.e. the given navigation path is not
-	 *              associated with a component destination).
-	 * @throws IllegalStateException if the component class bound to the path does not provide appropriate constructors, is an interface, is abstract, or
-	 *              throws an exception during instantiation.
+	 * @throws IllegalArgumentException if no component is appropriate to associated the given navigation path (i.e. the given navigation path is not associated
+	 *           with a component destination).
+	 * @throws IllegalStateException if the component class bound to the path does not provide appropriate constructors, is an interface, is abstract, or throws
+	 *           an exception during instantiation.
 	 * @see ComponentDestination
 	 */
 	public Component getNavigationComponent(final URIPath path);

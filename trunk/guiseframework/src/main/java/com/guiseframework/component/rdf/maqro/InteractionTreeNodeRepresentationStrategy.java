@@ -20,24 +20,23 @@ import org.urframework.maqro.Interaction;
 
 import com.globalmentor.rdf.*;
 
-/**A tree node representation strategy representing a MAQRO interaction.
-@author Garret Wilson
-*/
-public class InteractionTreeNodeRepresentationStrategy extends AbstractInteractionTreeNodeRepresentationStrategy<Interaction>
-{
+/**
+ * A tree node representation strategy representing a MAQRO interaction.
+ * @author Garret Wilson
+ */
+public class InteractionTreeNodeRepresentationStrategy extends AbstractInteractionTreeNodeRepresentationStrategy<Interaction> {
 
-	/**Default constructor with a default RDF XMLifier.*/
-	public InteractionTreeNodeRepresentationStrategy()
-	{
-		this(new RDFXMLGenerator());	//create the class with a default RDF XMLifier
+	/** Default constructor with a default RDF XMLifier. */
+	public InteractionTreeNodeRepresentationStrategy() {
+		this(new RDFXMLGenerator()); //create the class with a default RDF XMLifier
 	}
 
-	/**RDF XMLifier constructor.
-	@param rdfXMLifier The RDF XMLifier to use for creating labels.
-	@throws NullPointerException if the given RDF XMLifier is <code>null</code>.
-	*/
-	public InteractionTreeNodeRepresentationStrategy(final RDFXMLGenerator rdfXMLifier)
-	{
-		super(rdfXMLifier);	//construct the parent
+	/**
+	 * RDF XMLifier constructor.
+	 * @param rdfXMLifier The RDF XMLifier to use for creating labels.
+	 * @throws NullPointerException if the given RDF XMLifier is <code>null</code>.
+	 */
+	public InteractionTreeNodeRepresentationStrategy(final RDFXMLGenerator rdfXMLifier) {
+		super(rdfXMLifier); //construct the parent
 	}
 }

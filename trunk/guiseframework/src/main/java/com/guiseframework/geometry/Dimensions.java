@@ -27,8 +27,7 @@ import com.globalmentor.java.Objects;
  * </p>
  * @author Garret Wilson
  */
-public class Dimensions
-{
+public class Dimensions {
 
 	/** A convenience dimensions of zero pixel size. */
 	public final static Dimensions ZERO_DIMENSIONS = new Dimensions(0, 0, 0, Unit.PIXEL);
@@ -37,8 +36,7 @@ public class Dimensions
 	private final Extent width;
 
 	/** @return The width extent. */
-	public Extent getWidth()
-	{
+	public Extent getWidth() {
 		return width;
 	}
 
@@ -46,8 +44,7 @@ public class Dimensions
 	private final Extent height;
 
 	/** @return The height extent. */
-	public Extent getHeight()
-	{
+	public Extent getHeight() {
 		return height;
 	}
 
@@ -55,8 +52,7 @@ public class Dimensions
 	private final Extent depth;
 
 	/** @return The depth extent. */
-	public Extent getDepth()
-	{
+	public Extent getDepth() {
 		return depth;
 	}
 
@@ -64,8 +60,7 @@ public class Dimensions
 	 * @return <code>true</code> if all extents of the dimensions are zero.
 	 * @see Extent#isEmpty()
 	 */
-	public boolean isEmpty()
-	{
+	public boolean isEmpty() {
 		return getWidth().isEmpty() && getHeight().isEmpty() && getDepth().isEmpty();
 	}
 
@@ -79,8 +74,7 @@ public class Dimensions
 	 * @param unit The unit with which the extent is measured.
 	 * @throws NullPointerException if the given unit is <code>null</code>.
 	 */
-	public Dimensions(final double width, final double height, final Unit unit)
-	{
+	public Dimensions(final double width, final double height, final Unit unit) {
 		this(width, unit, height, unit); //create the dimensions with the same unit
 	}
 
@@ -92,8 +86,7 @@ public class Dimensions
 	 * @param heightUnit The unit with which the height is measured.
 	 * @throws NullPointerException if the given width unit and/or height unit is <code>null</code>.
 	 */
-	public Dimensions(final double width, final Unit widthUnit, final double height, final Unit heightUnit)
-	{
+	public Dimensions(final double width, final Unit widthUnit, final double height, final Unit heightUnit) {
 		this(new Extent(width, widthUnit, 1), new Extent(height, heightUnit, 1), Extent.ZERO_EXTENT1); //create extents and construct the class with a zero depth
 	}
 
@@ -105,8 +98,7 @@ public class Dimensions
 	 * @param unit The unit with which the extent is measured.
 	 * @throws NullPointerException if the given unit is <code>null</code>.
 	 */
-	public Dimensions(final double width, final double height, final double depth, final Unit unit)
-	{
+	public Dimensions(final double width, final double height, final double depth, final Unit unit) {
 		this(new Extent(width, unit, 1), new Extent(height, unit, 1), new Extent(depth, unit, 1)); //create extents and construct the class
 	}
 
@@ -117,8 +109,7 @@ public class Dimensions
 	 * @throws NullPointerException if the given width, and/or height is <code>null</code>.
 	 * @throws IllegalArgumentException if the degree of any extent is not <code>1</code>.
 	 */
-	public Dimensions(final Extent width, final Extent height)
-	{
+	public Dimensions(final Extent width, final Extent height) {
 		this(width, height, Extent.ZERO_EXTENT1); //construct the class with a zero depth
 	}
 
@@ -130,18 +121,14 @@ public class Dimensions
 	 * @throws NullPointerException if the given width, height, and/or depth is <code>null</code>.
 	 * @throws IllegalArgumentException if the degree of any extent is not <code>1</code>.
 	 */
-	public Dimensions(final Extent width, final Extent height, final Extent depth)
-	{
-		if(width.getDegree() != 1) //if the width degree is not one
-		{
+	public Dimensions(final Extent width, final Extent height, final Extent depth) {
+		if(width.getDegree() != 1) { //if the width degree is not one
 			throw new IllegalArgumentException("Width dimension degree must be 1.");
 		}
-		if(height.getDegree() != 1) //if the height degree is not one
-		{
+		if(height.getDegree() != 1) { //if the height degree is not one
 			throw new IllegalArgumentException("Height dimension degree must be 1.");
 		}
-		if(depth.getDegree() != 1) //if the depth degree is not one
-		{
+		if(depth.getDegree() != 1) { //if the depth degree is not one
 			throw new IllegalArgumentException("Depth dimension degree must be 1.");
 		}
 		this.width = checkInstance(width, "Width cannot be null.");
@@ -158,8 +145,7 @@ public class Dimensions
 	 * @throws NullPointerException if the given constraining dimensions is <code>null</code>.
 	 * @throws IllegalArgumentException if the given constraining dimensions use different units than these dimensions.
 	 */
-	public Dimensions constrain(final Dimensions constrainingDimensions)
-	{
+	public Dimensions constrain(final Dimensions constrainingDimensions) {
 		final Extent width = getWidth();
 		final double widthValue = width.getValue();
 		final Unit widthUnit = width.getUnit();
@@ -170,12 +156,10 @@ public class Dimensions
 		final double constrainingWidthValue = constrainingWidth.getValue();
 		final Extent constrainingHeight = constrainingDimensions.getHeight();
 		final double constrainingHeightValue = constrainingHeight.getValue();
-		if(widthUnit != constrainingWidth.getUnit() || heightUnit != constrainingHeight.getUnit()) //if the units don't match
-		{
+		if(widthUnit != constrainingWidth.getUnit() || heightUnit != constrainingHeight.getUnit()) { //if the units don't match
 			throw new IllegalArgumentException("Units of dimensions " + this + " and " + constrainingDimensions + " do not match.");
 		}
-		if(widthValue <= constrainingWidthValue && heightValue <= constrainingHeightValue) //if nothing needs to be constrained
-		{
+		if(widthValue <= constrainingWidthValue && heightValue <= constrainingHeightValue) { //if nothing needs to be constrained
 			return this; //return this dimension unchanged
 		}
 		final double relation = (double)widthValue / heightValue; //determine the relationship of the sides
@@ -183,13 +167,9 @@ public class Dimensions
 		double newWidthValue, newHeightValue;
 		newHeightValue = constrainingWidthValue / relation; //get the matching height for a constrained width
 		//TODO del Log.trace("trying to constrain width to", constrainingWidth, "height to ", newHeight);
-		if(newHeightValue <= constrainingHeightValue) //if the height has been constrained
-		{
+		if(newHeightValue <= constrainingHeightValue) { //if the height has been constrained
 			newWidthValue = constrainingWidthValue; //constrain the width to the edges
-		}
-		else
-		//if the height needs to be constrained
-		{
+		} else { //if the height needs to be constrained
 			newWidthValue = constrainingHeightValue * relation; //get the matching width for a constrained height
 			newHeightValue = constrainingHeightValue; //constrain the height to the edges
 			//TODO del Log.trace("that didn't work; trying to constrain width to", newWidth, "height to ", newHeight);
@@ -198,17 +178,14 @@ public class Dimensions
 	}
 
 	@Override
-	public int hashCode()
-	{
+	public int hashCode() {
 		return hashCode; //return the precalculated hash code
 	}
 
 	/** {@inheritDoc} This implementation returns whether the object is another dimensions with identical width, height, and depth. */
 	@Override
-	public boolean equals(final Object object)
-	{
-		if(object instanceof Dimensions) //if the object is an extent
-		{
+	public boolean equals(final Object object) {
+		if(object instanceof Dimensions) { //if the object is an extent
 			final Dimensions dimensions = (Dimensions)object; //get the object as dimensions
 			return getWidth().equals(dimensions.getWidth()) && getHeight().equals(dimensions.getHeight()) && getDepth().equals(dimensions.getDepth()); //compare dimensions
 		}
@@ -216,8 +193,7 @@ public class Dimensions
 	}
 
 	@Override
-	public final String toString()
-	{
+	public final String toString() {
 		return "[" + getWidth().getValue() + ", " + getHeight().getValue() + ", " + getDepth().getValue() + "]"; //"[width, height, depth]"
 	}
 

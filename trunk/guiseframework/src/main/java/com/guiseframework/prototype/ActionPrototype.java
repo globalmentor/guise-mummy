@@ -18,9 +18,9 @@ package com.guiseframework.prototype;
 
 import com.guiseframework.model.*;
 
-/**Contains prototype information for an action control.
-@author Garret Wilson
-*/
-public interface ActionPrototype extends Prototype, Enableable, InfoModel, ActionModel
-{
+/**
+ * Contains prototype information for an action control.
+ * @author Garret Wilson
+ */
+public interface ActionPrototype extends Prototype, Enableable, InfoModel, ActionModel {
 }

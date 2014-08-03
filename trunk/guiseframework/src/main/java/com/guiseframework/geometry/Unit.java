@@ -18,30 +18,30 @@ package com.guiseframework.geometry;
 
 import com.globalmentor.lex.Identifier;
 
-/**A unit of measurement.
-@author Garret Wilson
-*/
-public enum Unit implements Identifier
-{
-		//relative units
-	/**The size of a font.*/
+/**
+ * A unit of measurement.
+ * @author Garret Wilson
+ */
+public enum Unit implements Identifier {
+	//relative units
+	/** The size of a font. */
 	EM,
-	/**The x-height of a font.*/
+	/** The x-height of a font. */
 	EX,
-	/**Pixels relative to the viewing device.*/
+	/** Pixels relative to the viewing device. */
 	PIXEL,
-		//absolute units
-	/**Inches.*/
+	//absolute units
+	/** Inches. */
 	INCH,
-	/**Centimeters.*/
+	/** Centimeters. */
 	CENTIMETER,
-	/**Millimeters.*/
+	/** Millimeters. */
 	MILLIMETER,
-	/**Points, or 1/72 of an inch.*/
+	/** Points, or 1/72 of an inch. */
 	POINT,
-	/**Picas, or 12 points.*/
+	/** Picas, or 12 points. */
 	PICA,
-		//pure relative units
-	/**Pure relative units (i.e. the fractional form of a percentage).*/
+	//pure relative units
+	/** Pure relative units (i.e. the fractional form of a percentage). */
 	RELATIVE;
 }

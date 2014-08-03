@@ -33,8 +33,7 @@ import static org.urframework.URF.*;
  * Guise resources description in URF.
  * @author Garret Wilson
  */
-public class Resources extends URFMapResource<URFResource, URFResource>
-{
+public class Resources extends URFMapResource<URFResource, URFResource> {
 
 	/** The recommended prefix to the resources key ontology namespace. */
 	public final static String RESOURCES_NAMESPACE_PREFIX = "resources";
@@ -75,8 +74,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	public final static String VALIDATION_FALSE_MESSAGE_RESOURCE_REFERENCE = createStringResourceReference("validation.false.message");
 
 	/** Default constructor. */
-	public Resources()
-	{
+	public Resources() {
 		this(null); //construct the class with no reference URI
 	}
 
@@ -84,8 +82,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * Reference URI constructor.
 	 * @param referenceURI The reference URI for the new resource.
 	 */
-	public Resources(final URI referenceURI)
-	{
+	public Resources(final URI referenceURI) {
 		super(referenceURI, createResourceURI(RESOURCES_NAMESPACE_URI, getLocalName(Resources.class))); //construct the parent class
 	}
 
@@ -99,8 +96,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * @throws NullPointerException if the given resource key is <code>null</code>.
 	 * @see <a href="http://www.ecma-international.org/publications/standards/Ecma-048.htm">ECMA-48: Control Functions for Coded Character Sets</a>
 	 */
-	public final static String createStringResourceReference(final String resourceKey)
-	{
+	public final static String createStringResourceReference(final String resourceKey) {
 		return createControlString(resourceKey); //return a control string for the given resource key
 	}
 
@@ -112,8 +108,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * @throws NullPointerException if the given value is <code>null</code>.
 	 * @see <a href="http://www.ecma-international.org/publications/standards/Ecma-048.htm">ECMA-48: Control Functions for Coded Character Sets</a>
 	 */
-	public final static String createStringValueReference(final String value)
-	{
+	public final static String createStringValueReference(final String value) {
 		return createControlString(new StringBuilder().append(STRING_VALUE_REFERENCE_PREFIX_CHAR).append(value).toString()); //return a control string for the given value prefixed by the value reference character
 	}
 
@@ -124,8 +119,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * @return A URI containing a reference to the given resource key, which can be resolved using {@link GuiseSession#resolveURI(String)}.
 	 * @throws NullPointerException if the given resource key is <code>null</code>.
 	 */
-	public final static URI createURIResourceReference(final String resourceKey)
-	{
+	public final static URI createURIResourceReference(final String resourceKey) {
 		return createURI(RESOURCE_SCHEME, checkInstance(resourceKey, "Resource key cannot be null."));
 	}
 
@@ -136,8 +130,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * @return A string representing the enum instance in a style appropriate for use as a resource key.
 	 * @see Enum#name()
 	 */
-	public static String getResourceKeyName(final Enum<?> e)
-	{
+	public static String getResourceKeyName(final Enum<?> e) {
 		return e.name().toLowerCase().replace('_', '.'); //convert the name to lowercase and replace underscores with periods
 	}
 
@@ -151,8 +144,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * @see #LABEL_PROPERTY_KEY_ASPECT
 	 * @see #createStringResourceReference(String)
 	 */
-	public static <E extends Enum<E>> String getLabelResourceReference(final Class<E> enumClass)
-	{
+	public static <E extends Enum<E>> String getLabelResourceReference(final Class<E> enumClass) {
 		return createStringResourceReference(Classes.getPropertyName(enumClass, LABEL_PROPERTY_KEY_ASPECT));
 	}
 
@@ -166,8 +158,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * @see #LABEL_PROPERTY_KEY_ASPECT
 	 * @see #createStringResourceReference(String)
 	 */
-	public static <E extends Enum<E>> String getLabelResourceReference(final E e)
-	{
+	public static <E extends Enum<E>> String getLabelResourceReference(final E e) {
 		return createStringResourceReference(Enums.getPropertyName(e, LABEL_PROPERTY_KEY_ASPECT));
 	}
 
@@ -181,8 +172,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * @see #GLYPH_PROPERTY_KEY_ASPECT
 	 * @see #createURIResourceReference(String)
 	 */
-	public static <E extends Enum<E>> URI getGlyphResourceReference(final Class<E> enumClass)
-	{
+	public static <E extends Enum<E>> URI getGlyphResourceReference(final Class<E> enumClass) {
 		return createURIResourceReference(Classes.getPropertyName(enumClass, GLYPH_PROPERTY_KEY_ASPECT));
 	}
 
@@ -196,8 +186,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * @see #GLYPH_PROPERTY_KEY_ASPECT
 	 * @see #createURIResourceReference(String)
 	 */
-	public static <E extends Enum<E>> URI getGlyphResourceReference(final E e)
-	{
+	public static <E extends Enum<E>> URI getGlyphResourceReference(final E e) {
 		return createURIResourceReference(Enums.getPropertyName(e, GLYPH_PROPERTY_KEY_ASPECT));
 	}
 
@@ -211,8 +200,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * @see #INFO_PROPERTY_KEY_ASPECT
 	 * @see #createStringResourceReference(String)
 	 */
-	public static <E extends Enum<E>> String getInfoResourceReference(final Class<E> enumClass)
-	{
+	public static <E extends Enum<E>> String getInfoResourceReference(final Class<E> enumClass) {
 		return createStringResourceReference(Classes.getPropertyName(enumClass, INFO_PROPERTY_KEY_ASPECT));
 	}
 
@@ -226,8 +214,7 @@ public class Resources extends URFMapResource<URFResource, URFResource>
 	 * @see #INFO_PROPERTY_KEY_ASPECT
 	 * @see #createStringResourceReference(String)
 	 */
-	public static <E extends Enum<E>> String getInfoResourceReference(final E e)
-	{
+	public static <E extends Enum<E>> String getInfoResourceReference(final E e) {
 		return createStringResourceReference(Enums.getPropertyName(e, INFO_PROPERTY_KEY_ASPECT));
 	}
 }

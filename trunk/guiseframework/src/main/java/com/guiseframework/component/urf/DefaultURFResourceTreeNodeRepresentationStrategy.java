@@ -18,25 +18,24 @@ package com.guiseframework.component.urf;
 
 import org.urframework.*;
 
-/**A default tree node representation strategy representing an URF resource.
-@author Garret Wilson
-*/
-public class DefaultURFResourceTreeNodeRepresentationStrategy extends AbstractURFResourceTreeNodeRepresentationStrategy<URFResource>
-{
+/**
+ * A default tree node representation strategy representing an URF resource.
+ * @author Garret Wilson
+ */
+public class DefaultURFResourceTreeNodeRepresentationStrategy extends AbstractURFResourceTreeNodeRepresentationStrategy<URFResource> {
 
-	/**Default constructor with a default namespace label manager.*/
-	public DefaultURFResourceTreeNodeRepresentationStrategy()
-	{
-		this(new TURFNamespaceLabelManager());	//create the class with a default namespace label manager
+	/** Default constructor with a default namespace label manager. */
+	public DefaultURFResourceTreeNodeRepresentationStrategy() {
+		this(new TURFNamespaceLabelManager()); //create the class with a default namespace label manager
 	}
 
-	/**RDF XMLifier constructor.
-	@param namespaceLabelManager The manager responsible for generating namespace labels..
-	@throws NullPointerException if the given label manager is <code>null</code>.
-	*/
-	public DefaultURFResourceTreeNodeRepresentationStrategy(final TURFNamespaceLabelManager namespaceLabelManager)
-	{
-		super(namespaceLabelManager);	//construct the parent class
+	/**
+	 * RDF XMLifier constructor.
+	 * @param namespaceLabelManager The manager responsible for generating namespace labels..
+	 * @throws NullPointerException if the given label manager is <code>null</code>.
+	 */
+	public DefaultURFResourceTreeNodeRepresentationStrategy(final TURFNamespaceLabelManager namespaceLabelManager) {
+		super(namespaceLabelManager); //construct the parent class
 	}
 
 }

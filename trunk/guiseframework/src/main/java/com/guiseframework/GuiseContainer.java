@@ -26,8 +26,7 @@ import com.globalmentor.net.URIPath;
  * The interface for a Guise container.
  * @author Garret Wilson
  */
-public interface GuiseContainer
-{
+public interface GuiseContainer {
 
 	/**
 	 * Reports the base URI of the container. The base URI is an absolute URI that ends with the base path, which ends with a slash ('/').
@@ -50,7 +49,7 @@ public interface GuiseContainer
 	 * @return The path resolved against the container base path.
 	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
-	 *              {@link #resolveURI(URI)} should be used instead).
+	 *           {@link #resolveURI(URI)} should be used instead).
 	 * @see #getBasePath()
 	 */
 	public URIPath resolvePath(final URIPath path);

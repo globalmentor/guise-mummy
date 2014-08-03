@@ -42,23 +42,18 @@ import static org.urframework.URF.*;
  * </p>
  * @author Garret Wilson
  */
-public final class Guise
-{
+public final class Guise {
 
 	//properties keys for the properties resources
 	private final static String VERSION_PROPERTIES_KEY = "version"; //String
 	private final static String BUILD_DATE_PROPERTIES_KEY = "build.date"; //ISODate
 
-	static
-	{
-		try
-		{
+	static {
+		try {
 			final Properties properties = loadPropertiesResource(Guise.class);
 			version = checkConfigurationNotNull(properties.getProperty(VERSION_PROPERTIES_KEY));
 			buildDate = ISODate.valueOf(checkConfigurationNotNull(properties.getProperty(BUILD_DATE_PROPERTIES_KEY)));
-		}
-		catch(final IOException ioException)
-		{
+		} catch(final IOException ioException) {
 			throw new ConfigurationException(ioException);
 		}
 	}
@@ -66,16 +61,14 @@ public final class Guise
 	private final static String version;
 
 	/** @return The version of Guise. */
-	public static String getVersion()
-	{
+	public static String getVersion() {
 		return version;
 	}
 
 	private final static ISODate buildDate;
 
 	/** @return The build date of Guise. */
-	public static ISODate getBuildDate()
-	{
+	public static ISODate getBuildDate() {
 		return buildDate;
 	}
 
@@ -103,10 +96,8 @@ public final class Guise
 	private static Guise instance = null;
 
 	/** @return The singleton instance of Guise. */
-	public static Guise getInstance()
-	{
-		if(instance == null) //if Guise has not yet been created TODO make this concurrent-aware
-		{
+	public static Guise getInstance() {
+		if(instance == null) { //if Guise has not yet been created TODO make this concurrent-aware
 			instance = new Guise(); //create a new Guise
 		}
 		return instance;
@@ -116,8 +107,7 @@ public final class Guise
 	private final boolean licensed;
 
 	/** @return Whether this deployment of Guise is licensed. */
-	public boolean isLicensed()
-	{
+	public boolean isLicensed() {
 		return licensed;
 	}
 
@@ -133,20 +123,16 @@ public final class Guise
 	 * @throws IOException if there is an error loading the asset.
 	 * @see #GUISE_ASSETS_BASE_KEY
 	 */
-	public byte[] getGuiseAsset(final String guiseAssetKey) throws IOException
-	{
+	public byte[] getGuiseAsset(final String guiseAssetKey) throws IOException {
 		final String key = normalizePath(guiseAssetKey); //normalize the asset key
-		if(!key.startsWith(GUISE_ASSETS_BASE_KEY)) //if this isn't an asset key
-		{
+		if(!key.startsWith(GUISE_ASSETS_BASE_KEY)) { //if this isn't an asset key
 			throw new IllegalArgumentException("String " + guiseAssetKey + " is not a Guise asset key.");
 		}
 		final Reference<byte[]> reference = assetMap.get(key); //get a reference to the asset
 		byte[] asset = reference != null ? reference.get() : null; //dereference the reference, if there is a reference
-		if(asset == null) //if we haven't yet loaded the asset, or it has been dereferenced
-		{
+		if(asset == null) { //if we haven't yet loaded the asset, or it has been dereferenced
 			final InputStream assetInputStream = getClass().getResourceAsStream(key); //get an input stream to the asset
-			if(assetInputStream != null) //if we got an input stream to the asset
-			{
+			if(assetInputStream != null) { //if we got an input stream to the asset
 				asset = getBytes(assetInputStream); //load the asset
 				assetMap.put(key, new SoftReference<byte[]>(asset)); //cache the asset
 			}
@@ -162,8 +148,7 @@ public final class Guise
 	 * @throws IOException if there is an error accessing the asset.
 	 * @see #GUISE_ASSETS_BASE_KEY
 	 */
-	public boolean hasAsset(final String guiseAssetKey) throws IOException
-	{
+	public boolean hasAsset(final String guiseAssetKey) throws IOException {
 		return getAssetURL(guiseAssetKey) != null; //see if there is actually an asset at the given location
 	}
 
@@ -176,11 +161,9 @@ public final class Guise
 	 * @throws IOException if there is an error loading the asset.
 	 * @see #GUISE_ASSETS_BASE_KEY
 	 */
-	public URL getAssetURL(final String guiseAssetKey) throws IOException
-	{
+	public URL getAssetURL(final String guiseAssetKey) throws IOException {
 		final String key = normalizePath(guiseAssetKey); //normalize the asset key
-		if(!key.startsWith(GUISE_ASSETS_BASE_KEY)) //if this isn't an asset key
-		{
+		if(!key.startsWith(GUISE_ASSETS_BASE_KEY)) { //if this isn't an asset key
 			throw new IllegalArgumentException("String " + guiseAssetKey + " is not a Guise asset key.");
 		}
 		return getClass().getResource(key); //get a URL to the asset
@@ -194,22 +177,16 @@ public final class Guise
 	 * @throws IOException if there is an error loading the asset.
 	 * @see #GUISE_ASSETS_BASE_KEY
 	 */
-	public InputStream getAssetInputStream(final String guiseAssetKey) throws IOException
-	{
+	public InputStream getAssetInputStream(final String guiseAssetKey) throws IOException {
 		final String key = normalizePath(guiseAssetKey); //normalize the asset key
-		if(!key.startsWith(GUISE_ASSETS_BASE_KEY)) //if this isn't an asset key
-		{
+		if(!key.startsWith(GUISE_ASSETS_BASE_KEY)) { //if this isn't an asset key
 			throw new IllegalArgumentException("String " + guiseAssetKey + " is not a Guise asset key.");
 		}
 		final Reference<byte[]> reference = assetMap.get(key); //get a reference to the asset
 		byte[] asset = reference != null ? reference.get() : null; //dereference the reference, if there is a reference
-		if(asset != null) //if the asset is already loaded
-		{
+		if(asset != null) { //if the asset is already loaded
 			return new ByteArrayInputStream(asset); //return an input stream to the cached asset
-		}
-		else
-		//if we haven't yet loaded the asset, or it has been dereferenced
-		{
+		} else { //if we haven't yet loaded the asset, or it has been dereferenced
 			return getClass().getResourceAsStream(key); //get an input stream to the asset
 		}
 	}
@@ -221,8 +198,7 @@ public final class Guise
 	 * Adds a Guise session and creates an associated thread group. This method creates a thread group for the session.
 	 * @param guiseSession The Guise session to add.
 	 */
-	void addGuiseSession(final GuiseSession guiseSession)
-	{
+	void addGuiseSession(final GuiseSession guiseSession) {
 		final GuiseSessionThreadGroup threadGroup = new GuiseSessionThreadGroup(guiseSession); //create a new thread group for the session
 		sessionThreadGroupMap.put(guiseSession, threadGroup); //associate the thread group with the Guise session and vice versa
 	}
@@ -232,11 +208,9 @@ public final class Guise
 	 * @param guiseSession The Guise session to remove.
 	 * @throws IllegalStateException if the given Guise session is not recognized.
 	 */
-	void removeGuiseSession(final GuiseSession guiseSession)
-	{
+	void removeGuiseSession(final GuiseSession guiseSession) {
 		final GuiseSessionThreadGroup guiseSessionThreadGroup = sessionThreadGroupMap.remove(guiseSession); //remove the association between the session and the thread group, retrieving a reference to the thread group
-		if(guiseSessionThreadGroup == null) //if there was no thread group associated with this session
-		{
+		if(guiseSessionThreadGroup == null) { //if there was no thread group associated with this session
 			throw new IllegalStateException("Unrecognized Guise session; no thread group registered for session: " + guiseSession);
 		}
 
@@ -260,11 +234,9 @@ public final class Guise
 	 * @return The thread group to use for the given session.
 	 * @throws IllegalStateException if the given session has not yet been associated with a thread group because it has not yet been added.
 	 */
-	public final GuiseSessionThreadGroup getThreadGroup(final GuiseSession guiseSession)
-	{
+	public final GuiseSessionThreadGroup getThreadGroup(final GuiseSession guiseSession) {
 		final GuiseSessionThreadGroup threadGroup = sessionThreadGroupMap.get(guiseSession); //retrieve the thread group associated with the given session
-		if(threadGroup == null) //if there is no thread group for this session
-		{
+		if(threadGroup == null) { //if there is no thread group for this session
 			throw new IllegalStateException("Guise session " + guiseSession + " not yet associated with a Guise thread group.");
 		}
 		return threadGroup; //return the thread group
@@ -275,12 +247,10 @@ public final class Guise
 	 * @return The Guise session for the current thread.
 	 * @throws IllegalStateException if the current thread is not associated with any Guise session.
 	 */
-	public final GuiseSession getGuiseSession()
-	{
+	public final GuiseSession getGuiseSession() {
 		final Thread currentThread = Thread.currentThread(); //get the current thread
 		final GuiseSession guiseSession = getGuiseSession(currentThread); //get the session for the current thread
-		if(guiseSession == null) //if there is no Guise session for the current thread
-		{
+		if(guiseSession == null) { //if there is no Guise session for the current thread
 			throw new IllegalStateException("Current thread " + currentThread + " is not associated associated with any Guise session.");
 		}
 		return guiseSession; //return the session for the current thread
@@ -292,8 +262,7 @@ public final class Guise
 	 * @return The Guise session for the given thread, or <code>null</code> if the given thread is not in a Guise session thread group.
 	 * @see #getGuiseSessionThreadGroup(Thread)
 	 */
-	final GuiseSession getGuiseSession(final Thread thread)
-	{
+	final GuiseSession getGuiseSession(final Thread thread) {
 		final GuiseSessionThreadGroup guiseSessionThreadGroup = getGuiseSessionThreadGroup(thread); //get the Guise session thread group the given thread is in
 		return guiseSessionThreadGroup != null ? guiseSessionThreadGroup.getGuiseSession() : null; //return the session from the thread group, if there is a Guise session thread group
 	}
@@ -302,8 +271,7 @@ public final class Guise
 	 * Retrieves the Guise session thread group. All thread groups up the hierarchy are searched for an instance of {@link GuiseSessionThreadGroup}.
 	 * @return The Guise session thread group for the given thread, or <code>null</code> if the given thread is not in a Guise session thread group.
 	 */
-	final GuiseSessionThreadGroup getGuiseSessionThreadGroup(final Thread thread)
-	{
+	final GuiseSessionThreadGroup getGuiseSessionThreadGroup(final Thread thread) {
 		return Threads.getThreadGroup(thread, GuiseSessionThreadGroup.class); //return the Guise session thread group for this class
 	}
 
@@ -311,8 +279,7 @@ public final class Guise
 	 * Private default constructor.
 	 * @see #getInstance()
 	 */
-	private Guise()
-	{
+	private Guise() {
 		licensed = getClass().getResource("license.properties") != null; //determine if Guise is licensed; for now we simply see if the license.properties file exists
 	}
 }

@@ -30,8 +30,8 @@ import com.guiseframework.platform.*;
  * The web platform for Guise.
  * @author Garret Wilson
  */
-public interface WebPlatform extends Platform
-{
+public interface WebPlatform extends Platform {
+
 	/** The version of CKEditor in use. */
 	public final static String CKEDITOR_VERSION = "4.2.1";
 
@@ -57,8 +57,7 @@ public interface WebPlatform extends Platform
 			ContentType.SUBTYPE_EXTENSION_PREFIX + "guise-ajax-response" + ContentType.SUBTYPE_SUFFIX_DELIMITER_CHAR + XML_SUBTYPE_SUFFIX);
 
 	/** The types of JavaScript-based HTML editors available. */
-	public enum HTMLEditor
-	{
+	public enum HTMLEditor {
 		/** @see <a href="http://www.tinymce.com/">TinyMCE</a> */
 		TINY_MCE,
 		/** @see <a href="http://ckeditor.com/">CKEditor</a> */
@@ -145,8 +144,7 @@ public interface WebPlatform extends Platform
 	public final static URIPath GUISE_FLASH_PATH = GuiseApplication.GUISE_ASSETS_FLASH_PATH.resolve("guise.swf");
 
 	/** The web commands for controlling polling. */
-	public enum PollCommand implements WebPlatformCommand
-	{
+	public enum PollCommand implements WebPlatformCommand {
 		/**
 		 * The command to set the polling interval. parameters: <code>{{@value #INTERVAL}:"<var>interval</var>"}</code>
 		 */

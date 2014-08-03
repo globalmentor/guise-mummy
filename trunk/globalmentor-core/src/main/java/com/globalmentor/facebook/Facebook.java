@@ -24,8 +24,7 @@ import java.net.URI;
  * @see <a href="https://www.facebook.com/>Facebook</a>
  * @see <a href="https://developers.facebook.com/docs/opengraph/">Facebook Developers: Open Graph protocol</a>
  */
-public class Facebook
-{
+public class Facebook {
 
 	/** The Facebook namespace. */
 	public final static URI NAMESPACE_URI = URI.create("https://www.facebook.com/2008/fbml");

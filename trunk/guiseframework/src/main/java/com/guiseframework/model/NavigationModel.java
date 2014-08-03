@@ -24,8 +24,8 @@ import static com.globalmentor.java.Classes.*;
  * A model for identifying a navigation path.
  * @author Garret Wilson
  */
-public interface NavigationModel extends Model
-{
+public interface NavigationModel extends Model {
+
 	/** The navigation path bound property, of type {@link URIPath}. */
 	public final static String NAVIGATION_PATH_PROPERTY = getPropertyName(NavigationModel.class, "navigationPath");
 

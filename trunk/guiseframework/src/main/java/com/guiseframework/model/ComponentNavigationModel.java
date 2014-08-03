@@ -29,8 +29,7 @@ import com.guiseframework.component.*;
  * @author Garret Wilson
  * @see Components#getNavigationPath(Component)
  */
-public class ComponentNavigationModel extends AbstractModel implements NavigationModel
-{
+public class ComponentNavigationModel extends AbstractModel implements NavigationModel {
 
 	/** The component used for retrieving the navigation path. */
 	private final Component component;
@@ -40,14 +39,12 @@ public class ComponentNavigationModel extends AbstractModel implements Navigatio
 	 * @param component The component used for retrieving the navigation path.
 	 * @throws NullPointerException if the given component is <code>null</code>.
 	 */
-	public ComponentNavigationModel(final Component component)
-	{
+	public ComponentNavigationModel(final Component component) {
 		this.component = checkInstance(component);
 	}
 
 	/** {@inheritDoc} */
-	public URIPath getNavigationPath()
-	{
+	public URIPath getNavigationPath() {
 		return Components.getNavigationPath(component); //retrieve the navigation path from the component
 	}
 
@@ -58,8 +55,7 @@ public class ComponentNavigationModel extends AbstractModel implements Navigatio
 	 * </p>
 	 * @throws UnsupportedOperationException
 	 */
-	public void setNavigationPath(final URIPath newNavigationPath)
-	{
+	public void setNavigationPath(final URIPath newNavigationPath) {
 		throw new UnsupportedOperationException("Component navigation models do not allow the navigation path to be set.");
 	}
 

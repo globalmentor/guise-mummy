@@ -28,8 +28,7 @@ import com.guiseframework.geometry.Side;
  * @author Garret Wilson
  * @see <a href="http://www.w3.org/TR/html5/elements.html#embedding-custom-non-visible-data-with-the-data-attributes">HTML 5 Data Attributes</a>
  */
-public interface XHTMLDepictContext extends XMLDepictContext
-{
+public interface XHTMLDepictContext extends XMLDepictContext {
 
 	/** The template for "border-?-color". */
 	public final static StringTemplate CSS_PROPERTY_BORDER_X_COLOR_TEMPLATE = new StringTemplate("border-", StringTemplate.STRING_PARAMETER, "-color");

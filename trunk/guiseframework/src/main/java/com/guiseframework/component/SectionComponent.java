@@ -26,15 +26,13 @@ import com.globalmentor.lex.Identifier;
  * semantically significant area.
  * @author Garret Wilson
  */
-public interface SectionComponent extends Component
-{
+public interface SectionComponent extends Component {
 
 	/** The section type bound property. */
 	public final static String SECTION_TYPE_PROPERTY = getPropertyName(SectionComponent.class, "sectionType");
 
 	/** The type of section. */
-	public enum SectionType implements Identifier
-	{
+	public enum SectionType implements Identifier {
 		/** The main section of a self-contained article appropriate for syndication. */
 		ARTICLE,
 		/** Content tangentially related to the surrounding content. */

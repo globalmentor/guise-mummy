@@ -41,8 +41,7 @@ import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
  * @param <C> The type of component being depicted.
  * @author Garret Wilson
  */
-public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutComponent> extends AbstractWebComponentDepictor<C>
-{
+public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutComponent> extends AbstractWebComponentDepictor<C> {
 
 	/** The style classes for each region in a row. */
 	protected final static String ROW_REGION_CLASSES[] = new String[] { LAYOUT_REGION_LEFT_CLASS, LAYOUT_REGION_CENTER_CLASS, LAYOUT_REGION_RIGHT_CLASS };
@@ -51,8 +50,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 	protected final static String COLUMN_REGION_CLASSES[] = new String[] { LAYOUT_REGION_TOP_CLASS, LAYOUT_REGION_CENTER_CLASS, LAYOUT_REGION_BOTTOM_CLASS };
 
 	/** Default constructor with no element representation. */
-	public AbstractWebLayoutComponentDepictor()
-	{
+	public AbstractWebLayoutComponentDepictor() {
 		this(null, null); //construct the strategy with no element representation
 	}
 
@@ -61,8 +59,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 	 * @param namespaceURI The URI of the XML namespace of the element, or <code>null</code> if there is no namespace.
 	 * @param localName The local name of the element with no prefix, or <code>null</code> if this component should not be rendered as an element.
 	 */
-	public AbstractWebLayoutComponentDepictor(final URI namespaceURI, final String localName)
-	{
+	public AbstractWebLayoutComponentDepictor(final URI namespaceURI, final String localName) {
 		this(namespaceURI, localName, false); //don't allow an empty element
 	}
 
@@ -72,8 +69,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 	 * @param localName The local name of the element with no prefix, or <code>null</code> if this component should not be rendered as an element.
 	 * @param isEmptyElementAllowed Whether an empty element can be created if there is no content.
 	 */
-	public AbstractWebLayoutComponentDepictor(final URI namespaceURI, final String localName, final boolean isEmptyElementAllowed)
-	{
+	public AbstractWebLayoutComponentDepictor(final URI namespaceURI, final String localName, final boolean isEmptyElementAllowed) {
 		super(namespaceURI, localName, isEmptyElementAllowed); //construct the parent class
 	}
 
@@ -82,14 +78,12 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 	 * @see Container#getLayout()
 	 */
 	@Override
-	protected void depictChildren() throws IOException
-	{
+	protected void depictChildren() throws IOException {
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
 		final C component = getDepictedObject(); //get the component
 		final Orientation orientation = component.getComponentOrientation(); //get the component's orientation
 		final Layout<?> layout = component.getLayout(); //get the layout of this component
-		if(layout instanceof AbstractFlowLayout) //if this is a flow layout
-		{
+		if(layout instanceof AbstractFlowLayout) { //if this is a flow layout
 			final AbstractFlowLayout<?> flowLayout = (AbstractFlowLayout<?>)layout; //cast the layout to a flow layout
 			final Flow flow = flowLayout.getFlow(); //get the flow
 			final Axis flowAxis = orientation.getAxis(flow); //get the axis of the flow
@@ -103,18 +97,15 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 			int childIndex = -1; //keep track of which child we're writing; we're not writing any child, yet
 			depictContext.write("\n"); //format the output
 			depictContext.writeIndent(); //write an indentation
-			if(wrapped)
-			{
-				if(flowAxis == Axis.Y) //if wrapping is specified on the Y axis
-				{
+			if(wrapped) {
+				if(flowAxis == Axis.Y) { //if wrapping is specified on the Y axis
 					throw new IllegalStateException("Flow layout wrapping not supported on the Y axis.");
 				}
 				childComponentIterator = component.getChildComponents().iterator(); //get an iterator to child components in logical order TODO i18n fix flow direction
 				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_DIV); //<xhtml:div>
 				writeIDAttribute(null, COMPONENT_LAYOUT_CLASS_SUFFIX); //id="id-layout"
 				depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_FLOW_X_CLASS); //class="layout-flow-x"
-				while(childComponentIterator.hasNext()) //for each visible child component in the container, wrap the component in a span with the correct style
-				{
+				while(childComponentIterator.hasNext()) { //for each visible child component in the container, wrap the component in a span with the correct style
 					final Component childComponent = childComponentIterator.next(); //get the next child component
 					++childIndex; //update the child index
 					depictContext.write("\n"); //format the output
@@ -127,12 +118,10 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 					styles.put(CSS_PROP_VERTICAL_ALIGN, verticalAlign); //align the child correctly vertically (Firefox 2.x inline boxes need *some* value here to correctly align even identically-sized children)
 					final Extent gapBefore = childIndex == 0 ? flowLayout.getGapBefore() : flowLayout.getGapBetween(); //if this isn't the first component, use the between-components spacing amount
 					final Extent gapAfter = childComponentIterator.hasNext() ? Extent.ZERO_EXTENT1 : flowLayout.getGapAfter(); //if this is the last component, we'll add the requested amount of space after the component as well
-					if(gapBefore.getValue() != 0) //if there is a gap before (the stylesheet should set the default to zero)
-					{
+					if(gapBefore.getValue() != 0) { //if there is a gap before (the stylesheet should set the default to zero)
 						styles.put(CSS_PROP_PADDING_LEFT, gapBefore); //insert padding before the components
 					}
-					if(gapAfter.getValue() != 0) //if there is a gap after (the stylesheet should set the default to zero)
-					{
+					if(gapAfter.getValue() != 0) { //if there is a gap after (the stylesheet should set the default to zero)
 						styles.put(CSS_PROP_PADDING_RIGHT, gapAfter); //insert padding after the components
 					}
 					writeStyleAttribute(styles); //write the styles
@@ -144,21 +133,16 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 				depictContext.write("\n"); //format the output
 				depictContext.writeIndent(); //indent the ending tag
 				depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV); //</xhtml:div>
-			}
-			else
-			//if the flow layout isn't wrapped
-			{
+			} else { //if the flow layout isn't wrapped
 				///*TODO fix DIV-based vertical flow
-				if(flowAxis == Axis.Y) //TODO testing new vertical flow
-				{
+				if(flowAxis == Axis.Y) { //TODO testing new vertical flow
 					depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_DIV); //<xhtml:div>
 					writeIDAttribute(null, COMPONENT_LAYOUT_CLASS_SUFFIX); //id="id-layout"
 					depictContext.writeAttribute(null, ATTRIBUTE_CLASS, flowAxis == Axis.X ? LAYOUT_FLOW_X_CLASS : LAYOUT_FLOW_Y_CLASS); //class="layout-flow-x/y"
 					writeDirectionAttribute(orientation, flow); //explicitly write the direction ("ltr" or "rtl") for this flow so that the orientation will be taken into account
 					childComponentIterator = flowDirection == Flow.Direction.INCREASING ? component.getChildComponents().iterator() : new ReverseIterator<Component>(
 							component.getChildComponents()); //get an iterator to child components in the correct direction
-					while(childComponentIterator.hasNext()) //for each visible child component in the container, wrap the component in a span with the correct style
-					{
+					while(childComponentIterator.hasNext()) { //for each visible child component in the container, wrap the component in a span with the correct style
 						final Component childComponent = childComponentIterator.next(); //get the next child component
 						++childIndex; //update the child index
 						depictContext.write("\n"); //format the output
@@ -175,12 +159,10 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 						styles.clear(); //clear our map of styles
 						final Extent gapBefore = childIndex == 0 ? flowLayout.getGapBefore() : flowLayout.getGapBetween(); //if this isn't the first component, use the between-components spacing amount
 						final Extent gapAfter = childComponentIterator.hasNext() ? Extent.ZERO_EXTENT1 : flowLayout.getGapAfter(); //if this is the last component, we'll add the requested amount of space after the component as well
-						if(gapBefore.getValue() != 0) //if there is a gap before (the stylesheet should set the default to zero)
-						{
+						if(gapBefore.getValue() != 0) { //if there is a gap before (the stylesheet should set the default to zero)
 							styles.put(CSS_PROP_PADDING_TOP, gapBefore); //insert padding before the components
 						}
-						if(gapAfter.getValue() != 0) //if there is a gap after (the stylesheet should set the default to zero)
-						{
+						if(gapAfter.getValue() != 0) { //if there is a gap after (the stylesheet should set the default to zero)
 							styles.put(CSS_PROP_PADDING_BOTTOM, gapAfter); //insert padding after the components
 						}
 						writeStyleAttribute(styles); //write the styles
@@ -191,9 +173,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 						depictContext.write("\n"); //format the output
 					}
 					depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV); //</xhtml:div>
-				}
-				else
-				{
+				} else {
 					//*/				
 					depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TABLE); //<xhtml:table>
 					writeIDAttribute(null, COMPONENT_LAYOUT_CLASS_SUFFIX); //id="id-layout"
@@ -203,15 +183,12 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 					writeStyleAttribute(styles); //write the table's styles
 					writeDirectionAttribute(orientation, flow); //explicitly write the direction ("ltr" or "rtl") for this flow so that the orientation will be taken into account
 					depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TBODY); //<xhtml:tbody> (IE will not show dynamically-allocated tables without a tbody)
-					switch(flowAxis)
-					//see on which axis we should flow
-					{
+					switch(flowAxis) { //see on which axis we should flow
 						case X: //horizontal flow
 							childComponentIterator = component.getChildComponents().iterator(); //get an iterator to child components in logical order---we compensated for orientation by setting the table direction attribute
 							depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TR); //<xhtml:tr>
 							depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_FLOW_X_CLASS); //class="layout-flow-x"
-							while(childComponentIterator.hasNext()) //for each visible child component in the container, wrap the component in a span with the correct style
-							{
+							while(childComponentIterator.hasNext()) { //for each visible child component in the container, wrap the component in a span with the correct style
 								final Component childComponent = childComponentIterator.next(); //get the next child component
 								++childIndex; //update the child index
 								depictContext.write("\n"); //format the output
@@ -224,12 +201,10 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 								styles.clear(); //clear our map of styles
 								final Extent gapBefore = childIndex == 0 ? flowLayout.getGapBefore() : flowLayout.getGapBetween(); //if this isn't the first component, use the between-components spacing amount
 								final Extent gapAfter = childComponentIterator.hasNext() ? Extent.ZERO_EXTENT1 : flowLayout.getGapAfter(); //if this is the last component, we'll add the requested amount of space after the component as well
-								if(gapBefore.getValue() != 0) //if there is a gap before (the stylesheet should set the default to zero)
-								{
+								if(gapBefore.getValue() != 0) { //if there is a gap before (the stylesheet should set the default to zero)
 									styles.put(CSS_PROP_PADDING_LEFT, gapBefore); //insert padding before the components
 								}
-								if(gapAfter.getValue() != 0) //if there is a gap after (the stylesheet should set the default to zero)
-								{
+								if(gapAfter.getValue() != 0) { //if there is a gap after (the stylesheet should set the default to zero)
 									styles.put(CSS_PROP_PADDING_RIGHT, gapAfter); //insert padding after the components
 								}
 								writeStyleAttribute(styles); //write the styles							
@@ -245,8 +220,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 						case Y: //vertical flow
 							childComponentIterator = flowDirection == Flow.Direction.INCREASING ? component.getChildComponents().iterator() : new ReverseIterator<Component>(
 									component.getChildComponents()); //get an iterator to child components in the correct direction
-							while(childComponentIterator.hasNext()) //for each visible child component in the container, wrap the component in a span with the correct style
-							{
+							while(childComponentIterator.hasNext()) { //for each visible child component in the container, wrap the component in a span with the correct style
 								final Component childComponent = childComponentIterator.next(); //get the next child component
 								++childIndex; //update the child index
 								depictContext.write("\n"); //format the output
@@ -261,12 +235,10 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 								styles.clear(); //clear our map of styles
 								final Extent gapBefore = childIndex == 0 ? flowLayout.getGapBefore() : flowLayout.getGapBetween(); //if this isn't the first component, use the between-components spacing amount
 								final Extent gapAfter = childComponentIterator.hasNext() ? Extent.ZERO_EXTENT1 : flowLayout.getGapAfter(); //if this is the last component, we'll add the requested amount of space after the component as well
-								if(gapBefore.getValue() != 0) //if there is a gap before (the stylesheet should set the default to zero)
-								{
+								if(gapBefore.getValue() != 0) { //if there is a gap before (the stylesheet should set the default to zero)
 									styles.put(CSS_PROP_PADDING_TOP, gapBefore); //insert padding before the components
 								}
-								if(gapAfter.getValue() != 0) //if there is a gap after (the stylesheet should set the default to zero)
-								{
+								if(gapAfter.getValue() != 0) { //if there is a gap after (the stylesheet should set the default to zero)
 									styles.put(CSS_PROP_PADDING_BOTTOM, gapAfter); //insert padding after the components
 								}
 								writeStyleAttribute(styles); //write the styles							
@@ -293,8 +265,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 						
 						final String styleID;	//we'll determine the style ID for the child container elements
 						final Axis flowAxis=flowLayout.getAxis();	//get the flow axis
-						switch(flowAxis)	//see on which axis we should flow
-						{
+						switch(flowAxis) {	//see on which axis we should flow
 							case X:	//horizontal flow
 								styleID=LAYOUT_FLOW_X_CHILD_CLASS;	//use the horizontal flow style class
 								break;
@@ -305,12 +276,9 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 							default:
 								throw new IllegalArgumentException("Z axis flowing currently unsupported.");
 						}			
-						for(final Component childComponent:component)	//for each visible child component in the container, wrap the component in a span with the correct style
-						{
-							if(childComponent.isVisible())	//if this component is visible TODO do we really want to do this? it may be better just to leave the wrapper material, and delegate to the child component so that it will at least be notified
-							{
-								if(flowAxis==Axis.Y)	//if we're flowing vertically
-								{
+						for(final Component childComponent:component) {	//for each visible child component in the container, wrap the component in a span with the correct style
+							if(childComponent.isVisible()) {	//if this component is visible TODO do we really want to do this? it may be better just to leave the wrapper material, and delegate to the child component so that it will at least be notified
+								if(flowAxis==Axis.Y) {	//if we're flowing vertically
 									write(context, "\n");	//format the output
 								}
 								writeElementBegin(context, XHTML_NAMESPACE_URI, ELEMENT_SPAN);	//<xhtml:span>
@@ -318,8 +286,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 								writeElementBeginClose(context);	//>
 								childComponent.depict();	//update the child view
 								writeElementEnd(context, XHTML_NAMESPACE_URI, ELEMENT_SPAN);	//</xhtml:span>
-								if(flowAxis==Axis.Y)	//if we're flowing vertically
-								{
+								if(flowAxis==Axis.Y) {	//if we're flowing vertically
 									write(context, "\n");	//format the output
 								}
 							}
@@ -327,13 +294,11 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 			*/
 		}
 		/*TODO fix
-				else if(layout instanceof MenuLayout)	//if this is a menu layout
-				{
+				else if(layout instanceof MenuLayout) {	//if this is a menu layout
 					super.updateChildViews(context, component);	//lay out the children normally
 				}
 		*/
-		else if(layout instanceof RegionLayout) //if this is a region layout
-		{
+		else if(layout instanceof RegionLayout) { //if this is a region layout
 			final RegionLayout regionLayout = (RegionLayout)layout; //cast the layout to a region layout
 			final Flow spanFlow = regionLayout.getSpanFlow(); //see which flow is being spanned
 			final Axis spanAxis = orientation.getAxis(spanFlow); //get the axis the span should flow on
@@ -343,9 +308,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 			//for the table columns, use absolute regions rather than compensating for flow direction, and use the XHTML direction attribute to allow this to be changed by the client
 			final Flow flowX; //we'll see which flow goes along the X axis
 			final Axis lineAxis = orientation.getAxis(Flow.LINE); //get the axis of line flow
-			switch(lineAxis)
-			//see on which axis lines flow
-			{
+			switch(lineAxis) { //see on which axis lines flow
 				case X: //if lines flow along the X axis
 					flowX = Flow.LINE; //show that lines are horizontal
 					rowComponents[0] = regionLayout.getComponent(Region.LINE_START); //line start
@@ -364,16 +327,14 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 			final Component rightComponent = rowComponents[rowComponents.length - 1]; //create an alias for the right component in case we need to use it
 			final int rowComponentCount = getInstanceCount(rowComponents); //we'll see how many components are in the row
 			final Component bottomComponent = regionLayout.getComponent(Region.getRegion(orientation, Flow.PAGE, Region.FLOW_REGION_COUNT - 1)); //get the component for the bottom
-			if(topComponent != null || rowComponentCount > 0 || bottomComponent != null) //if there is a component in the layout
-			{
+			if(topComponent != null || rowComponentCount > 0 || bottomComponent != null) { //if there is a component in the layout
 				depictContext.write("\n"); //format the output
 				depictContext.writeIndent(); //write an indentation
 				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TABLE); //<xhtml:table>
 				writeIDAttribute(null, COMPONENT_LAYOUT_CLASS_SUFFIX); //id="id-layout"
 				depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_REGION_CLASS); //class="layout-region"
 				final Map<String, Object> tableStyles = new HashMap<String, Object>(); //create a new map of styles
-				if(regionLayout.isFixed()) //if this is a fixed region layout
-				{
+				if(regionLayout.isFixed()) { //if this is a fixed region layout
 					tableStyles.put(CSS_PROP_TABLE_LAYOUT, CSS_TABLE_LAYOUT_FIXED); //indicate a fixed table layout
 					tableStyles.put(CSS_PROP_WIDTH, "100%"); //indicate that the table should take up all available horizontal space
 				}
@@ -382,8 +343,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 
 				///*TODO del; messes up frames
 				/*TODO fix; we may be able to get around this by checking the parent
-								else if(!(component.getParent() instanceof Frame))	//TODO testing
-								{
+								else if(!(component.getParent() instanceof Frame)) {	//TODO testing
 									final Map<String, Object> tableStyles=new HashMap<String, Object>();	//create a new map of styles
 									tableStyles.put(CSS_PROP_WIDTH, "100%");	//indicate that the table should take up all available horizontal space TODO check orientation
 									writeStyleAttribute(tableStyles);	//write the table's styles
@@ -393,24 +353,17 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 				writeDirectionAttribute(orientation, flowX); //explicitly write the direction ("ltr" or "rtl") for this flow so that the orientation will be taken into account
 				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TBODY); //<xhtml:tbody> (IE will not show dynamically-allocated tables without a tbody)
 				depictContext.indent(); //increase the indentation
-				try
-				{
-					switch(spanAxis)
-					//see which components should span rows or columns
-					{
+				try {
+					switch(spanAxis) { //see which components should span rows or columns
 						case X: //if we should span the top and bottom components horizontally
-							if(topComponent != null) //if there is a top component TODO fix to determine if the top and bottom component should span columns or vice-versa, based upon the orientation
-							{
-								if(regionLayout.isFixed() && rowComponentCount > 0) //if this is a fixed layout with row component, write dummy components for the rows so that fixed layout will know their sizes
-								{
+							if(topComponent != null) { //if there is a top component TODO fix to determine if the top and bottom component should span columns or vice-versa, based upon the orientation
+								if(regionLayout.isFixed() && rowComponentCount > 0) { //if this is a fixed layout with row component, write dummy components for the rows so that fixed layout will know their sizes
 									depictContext.write("\n"); //format the output
 									depictContext.writeIndent(); //write an indentation
 									depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TR); //<xhtml:tr>					
-									for(int columnIndex = 0; columnIndex < Region.FLOW_REGION_COUNT; ++columnIndex) //for each column
-									{
+									for(int columnIndex = 0; columnIndex < Region.FLOW_REGION_COUNT; ++columnIndex) { //for each column
 										final Component rowComponent = rowComponents[columnIndex]; //get the component for this column
-										if(rowComponent != null) //if we have a component for this column
-										{
+										if(rowComponent != null) { //if we have a component for this column
 											depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TD); //<xhtml:td>
 											beginRegion(regionLayout, regionLayout.getConstraints(rowComponent), orientation, true, false); //write the size for this region
 											depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TD); //</xhtml:td>					
@@ -424,8 +377,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 								depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_REGION_CLASS); //class="layout-region"
 								depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TD); //<xhtml:td>
 								depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_REGION_TOP_CLASS); //class="layout-region-top"
-								if(rowComponentCount > 1) //if there are more than one row component
-								{
+								if(rowComponentCount > 1) { //if there are more than one row component
 									depictContext.writeAttribute(null, ELEMENT_TD_ATTRIBUTE_COLSPAN, Integer.toString(rowComponentCount)); //colspan="rowComponentCount"						
 								}
 								beginRegion(regionLayout, regionLayout.getConstraints(topComponent), orientation); //write the styles for this region
@@ -433,17 +385,14 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 								depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TD); //</xhtml:td>					
 								depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TR); //</xhtml:tr>
 							}
-							if(rowComponentCount > 0) //if there are any row components
-							{
+							if(rowComponentCount > 0) { //if there are any row components
 								depictContext.write("\n"); //format the output
 								depictContext.writeIndent(); //write an indentation
 								depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TR); //<xhtml:tr>					
 								depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_REGION_CLASS); //class="layout-region"
-								for(int columnIndex = 0; columnIndex < Region.FLOW_REGION_COUNT; ++columnIndex) //for each column
-								{
+								for(int columnIndex = 0; columnIndex < Region.FLOW_REGION_COUNT; ++columnIndex) { //for each column
 									final Component rowComponent = rowComponents[columnIndex]; //get the component for this column
-									if(rowComponent != null) //if we have a component for this column
-									{
+									if(rowComponent != null) { //if we have a component for this column
 										depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TD); //<xhtml:td>
 										depictContext.writeAttribute(null, ATTRIBUTE_CLASS, ROW_REGION_CLASSES[columnIndex]); //class="layout-region-left/center/right"
 										beginRegion(regionLayout, regionLayout.getConstraints(rowComponent), orientation); //write the styles for this region
@@ -453,16 +402,14 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 								}
 								depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TR); //</xhtml:tr>
 							}
-							if(bottomComponent != null) //if there is a top component TODO fix to determine if the top and bottom component should span columns or vice-versa, based upon the orientation
-							{
+							if(bottomComponent != null) { //if there is a top component TODO fix to determine if the top and bottom component should span columns or vice-versa, based upon the orientation
 								depictContext.write("\n"); //format the output
 								depictContext.writeIndent(); //write an indentation
 								depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TR); //<xhtml:tr>					
 								depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_REGION_CLASS); //class="layout-region"
 								depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TD); //<xhtml:td>
 								depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_REGION_BOTTOM_CLASS); //class="layout-region-bottom"
-								if(rowComponentCount > 0) //if there are more than one row component
-								{
+								if(rowComponentCount > 0) { //if there are more than one row component
 									depictContext.writeAttribute(null, ELEMENT_TD_ATTRIBUTE_COLSPAN, Integer.toString(rowComponentCount)); //colspan="rowComponentCount"						
 								}
 								beginRegion(regionLayout, regionLayout.getConstraints(bottomComponent), orientation); //write the styles for this region
@@ -479,12 +426,10 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 							depictContext.writeIndent(); //write an indentation
 							depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TR); //<xhtml:tr>					
 							depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_REGION_CLASS); //class="layout-region"
-							if(leftComponent != null) //if there is a left component
-							{
+							if(leftComponent != null) { //if there is a left component
 								depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TD); //<xhtml:td>
 								depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_REGION_LEFT_CLASS); //class="layout-region-left"
-								if(columnComponentCount > 1) //if there are more than one row component
-								{
+								if(columnComponentCount > 1) { //if there are more than one row component
 									depictContext.writeAttribute(null, ELEMENT_TD_ATTRIBUTE_ROWSPAN, Integer.toString(columnComponentCount)); //rowspan="columnComponentCount"						
 								}
 								beginRegion(regionLayout, regionLayout.getConstraints(leftComponent), orientation); //write the styles for this region
@@ -494,14 +439,12 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 							int centerColumnRowIndex = 0; //keep track of which center row comopnent we're on
 							for(; centerColumnRowIndex < columnComponents.length && columnComponents[centerColumnRowIndex] == null; ++centerColumnRowIndex)
 								; //skip the null center column components
-							if(centerColumnRowIndex < columnComponents.length) //if there is a center column component
-							{
+							if(centerColumnRowIndex < columnComponents.length) { //if there is a center column component
 								final Component columnComponent = columnComponents[centerColumnRowIndex]; //get this column component
 								depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TD); //<xhtml:td>
 								depictContext.writeAttribute(null, ATTRIBUTE_CLASS, COLUMN_REGION_CLASSES[centerColumnRowIndex]); //class="layout-region-top/center/bottom"
 								/*TODO del
-																	if(columnComponentCount>1)	//if there are more than one row component
-																	{
+																	if(columnComponentCount>1) {	//if there are more than one row component
 																		depictContext.writeAttribute(null, ELEMENT_TD_ATTRIBUTE_ROWSPAN, Integer.toString(columnComponentCount));	//rowspan="columnComponentCount"						
 																	}
 								*/
@@ -509,12 +452,10 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 								columnComponent.depict(); //update the child view for the component in this column
 								depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TD); //</xhtml:td>					
 							}
-							if(rightComponent != null) //if there is a right component
-							{
+							if(rightComponent != null) { //if there is a right component
 								depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TD); //<xhtml:td>
 								depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_REGION_RIGHT_CLASS); //class="layout-region-right"
-								if(columnComponentCount > 1) //if there are more than one row component
-								{
+								if(columnComponentCount > 1) { //if there are more than one row component
 									depictContext.writeAttribute(null, ELEMENT_TD_ATTRIBUTE_ROWSPAN, Integer.toString(columnComponentCount)); //rowspan="columnComponentCount"						
 								}
 								beginRegion(regionLayout, regionLayout.getConstraints(rightComponent), orientation); //write the styles for this region
@@ -522,11 +463,9 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 								depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TD); //</xhtml:td>
 							}
 							depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TR); //</xhtml:tr>
-							for(++centerColumnRowIndex; centerColumnRowIndex < columnComponents.length; ++centerColumnRowIndex) //for each of the remaining center column components (the left and right components will have already been written, and span down the correct number of rows)
-							{
+							for(++centerColumnRowIndex; centerColumnRowIndex < columnComponents.length; ++centerColumnRowIndex) { //for each of the remaining center column components (the left and right components will have already been written, and span down the correct number of rows)
 								final Component columnComponent = columnComponents[centerColumnRowIndex]; //get this column component
-								if(columnComponent != null) //if there is a column component for this row
-								{
+								if(columnComponent != null) { //if there is a column component for this row
 									depictContext.write("\n"); //format the output
 									depictContext.writeIndent(); //write an indentation
 									depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TR); //<xhtml:tr>					
@@ -544,9 +483,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 						default: //if we don't recognize the span axis
 							throw new AssertionError("Unrecognized span axis: " + spanAxis);
 					}
-				}
-				finally
-				{
+				} finally {
 					depictContext.unindent(); //always unindent
 				}
 				depictContext.write("\n"); //format the output
@@ -555,26 +492,18 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 				depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TABLE); //</xhtml:table>
 				depictContext.write("\n"); //format the output
 			}
-		}
-		else if(layout instanceof CardLayout) //if this is a card layout
-		{
+		} else if(layout instanceof CardLayout) { //if this is a card layout
 			final CardLayout cardLayout = (CardLayout)layout; //cast the layout to a card layout
 			final Component selectedCard = cardLayout.getValue(); //get the selected component
-			if(selectedCard != null) //if a component is selected
-			{
+			if(selectedCard != null) { //if a component is selected
 				selectedCard.depict(); //update the component view
 			}
-			for(final Component card : component.getChildComponents()) //set the views of the non-visible cards as updated (this will keep them from being sent to the client before they are needed)
-			{
-				if(card != selectedCard) //if this is not the selected card
-				{
+			for(final Component card : component.getChildComponents()) { //set the views of the non-visible cards as updated (this will keep them from being sent to the client before they are needed)
+				if(card != selectedCard) { //if this is not the selected card
 					AbstractComponent.setDepicted(card, true); //the other cards might as well have had their views updates, as they aren't shown					
 				}
 			}
-		}
-		else
-		//if we don't recognize the layout
-		{
+		} else { //if we don't recognize the layout
 			throw new IllegalArgumentException("Unrecognized layout " + layout);
 		}
 	}
@@ -586,10 +515,8 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 	/*TODO del if not needed
 		protected boolean isChildComponentVisible(final C component)
 		{
-			for(final Component childComponent:component)	//for each child component
-			{
-				if(childComponent.isVisible())	//if this child component is visible
-				{
+			for(final Component childComponent:component) {	//for each child component
+				if(childComponent.isVisible()) {	//if this child component is visible
 					return true;	//show that we found a visible child component
 				}
 			}
@@ -607,8 +534,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 	 * @param orientation The orientation of the component for which the region is being rendered.
 	 * @throws IOException if there is an error writing the attribute.
 	 */
-	protected void beginRegion(final RegionLayout regionLayout, final RegionConstraints regionConstraints, final Orientation orientation) throws IOException
-	{
+	protected void beginRegion(final RegionLayout regionLayout, final RegionConstraints regionConstraints, final Orientation orientation) throws IOException {
 		beginRegion(regionLayout, regionConstraints, orientation, true, true); //begin the region including size and other styles
 	}
 
@@ -625,14 +551,11 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 	 * @throws IOException if there is an error writing the attribute.
 	 */
 	protected void beginRegion(final RegionLayout regionLayout, final RegionConstraints regionConstraints, final Orientation orientation,
-			final boolean includeSize, final boolean includeStyles) throws IOException
-	{
+			final boolean includeSize, final boolean includeStyles) throws IOException {
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
 		final Map<String, Object> styles = new HashMap<String, Object>(); //create a new map of styles
-		if(includeSize) //if we should include the size
-		{
-			for(final Flow flow : Flow.values()) //for each flow, write an alignment attribute and the width or height
-			{
+		if(includeSize) { //if we should include the size
+			for(final Flow flow : Flow.values()) { //for each flow, write an alignment attribute and the width or height
 				final double alignment = regionConstraints.getAlignment(flow); //get the alignment
 				final Axis axis = orientation.getAxis(flow); //get the axis of the flow
 				final Flow.Direction direction = orientation.getDirection(flow); //get the direction of the flow
@@ -640,20 +563,16 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 				final String alignAttributeName = axis == Axis.X ? ELEMENT_TD_ATTRIBUTE_ALIGN : ELEMENT_TD_ATTRIBUTE_VALIGN; //use the correct <td> attribute for the fline
 				depictContext.writeAttribute(null, alignAttributeName, align); //align="align"
 				final Extent extent = regionConstraints.getExtent(flow); //get the extent for this flow
-				if(extent != null) //if this region has a requested extent for this flow
-				{
+				if(extent != null) { //if this region has a requested extent for this flow
 					styles.put(axis == Axis.X ? CSS_PROP_WIDTH : CSS_PROP_HEIGHT, extent); //indicate the width or height				
 				}
 			}
 		}
-		if(includeStyles) //if we should include other styles
-		{
-			for(final Border border : Border.values()) //for each logical border
-			{
+		if(includeStyles) { //if we should include other styles
+			for(final Border border : Border.values()) { //for each logical border
 				final Side side = orientation.getSide(border); //get the absolute side on which this border lies
 				final Extent paddingExtent = regionConstraints.getPaddingExtent(border); //get the padding extent for this border
-				if(paddingExtent.getValue() != 0) //if a non-zero padding extent is specified (the stylesheet specifies a zero default padding)
-				{
+				if(paddingExtent.getValue() != 0) { //if a non-zero padding extent is specified (the stylesheet specifies a zero default padding)
 					styles.put(XHTMLDepictContext.CSS_PROPERTY_PADDING_X_TEMPLATE.apply(getSerializationName(side)), paddingExtent); //set the padding extent
 				}
 			}
@@ -680,37 +599,22 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 	 * @see #TD_VALIGN_MIDDLE
 	 * @see #TD_VALIGN_BOTTOM
 	 */
-	protected String getAlign(final double alignment, final Axis axis, final Flow.Direction direction)
-	{
-		switch(axis)
-		//see which axis this is
-		{
+	protected String getAlign(final double alignment, final Axis axis, final Flow.Direction direction) {
+		switch(axis) { //see which axis this is
 			case X:
-				if(alignment < ONE_THIRD_DOUBLE) //if the alignment is in the bottom third
-				{
+				if(alignment < ONE_THIRD_DOUBLE) { //if the alignment is in the bottom third
 					return direction == Flow.Direction.INCREASING ? TD_ALIGN_LEFT : TD_ALIGN_RIGHT; //get the near alignment, depending on flow direction
-				}
-				else if(alignment < TWO_THIRDS_DOUBLE) //if the alignment is in the middle third
-				{
+				} else if(alignment < TWO_THIRDS_DOUBLE) { //if the alignment is in the middle third
 					return TD_ALIGN_CENTER; //the middle alignment is always "center"
-				}
-				else
-				//if the alignment is in the top third
-				{
+				} else { //if the alignment is in the top third
 					return direction == Flow.Direction.INCREASING ? TD_ALIGN_RIGHT : TD_ALIGN_LEFT; //get the far alignment, depending on flow direction
 				}
 			case Y:
-				if(alignment < ONE_THIRD_DOUBLE) //if the alignment is in the bottom third
-				{
+				if(alignment < ONE_THIRD_DOUBLE) { //if the alignment is in the bottom third
 					return direction == Flow.Direction.INCREASING ? TD_VALIGN_TOP : TD_VALIGN_BOTTOM; //get the near alignment, depending on flow direction
-				}
-				else if(alignment < TWO_THIRDS_DOUBLE) //if the alignment is in the middle third
-				{
+				} else if(alignment < TWO_THIRDS_DOUBLE) { //if the alignment is in the middle third
 					return TD_VALIGN_MIDDLE; //the middle alignment is always "middle"
-				}
-				else
-				//if the alignment is in the top third
-				{
+				} else { //if the alignment is in the top third
 					return direction == Flow.Direction.INCREASING ? TD_VALIGN_BOTTOM : TD_VALIGN_TOP; //get the far alignment, depending on flow direction
 				}
 			default:
@@ -728,19 +632,15 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 	 * @param axis The axis along which flow is occurring.
 	 * @throws IOException if there is an error updating child views.
 	 */
-	protected void updateFlowChildView(final Component childComponent, final Axis axis) throws IOException
-	{
+	protected void updateFlowChildView(final Component childComponent, final Axis axis) throws IOException {
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
 		depictContext.write("\n"); //format the output
 		depictContext.indent(); //increase the indentation
-		try
-		{
+		try {
 			depictContext.writeIndent(); //write an indentation
 			childComponent.depict(); //update the child view
 			depictContext.write("\n"); //format the output
-		}
-		finally
-		{
+		} finally {
 			depictContext.unindent(); //always unindent
 		}
 	}

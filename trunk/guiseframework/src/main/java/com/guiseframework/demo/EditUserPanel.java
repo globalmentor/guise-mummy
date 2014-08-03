@@ -25,185 +25,165 @@ import com.guiseframework.event.*;
 import com.guiseframework.model.Notification;
 import com.guiseframework.validator.*;
 
-/**Edit User Guise demonstration panel.
-Copyright © 2005 GlobalMentor, Inc.
-Demonstrates modal panels, component validity checks, masked text controls, ending modality, and modal cancel functionality.
-@author Garret Wilson
-*/
-public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
-{
+/**
+ * Edit User Guise demonstration panel. Copyright © 2005 GlobalMentor, Inc. Demonstrates modal panels, component validity checks, masked text controls, ending
+ * modality, and modal cancel functionality.
+ * @author Garret Wilson
+ */
+public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser> {
 
-	private final TextControl<String> idControl; 
-	private final TextControl<String> firstNameControl; 
-	private final TextControl<String> middleNameControl; 
-	private final TextControl<String> lastNameControl; 
-	private final TextControl<char[]> passwordControl; 
-	private final TextControl<char[]> passwordVerificationControl; 
-	private final TextControl<String> emailControl; 
+	private final TextControl<String> idControl;
+	private final TextControl<String> firstNameControl;
+	private final TextControl<String> middleNameControl;
+	private final TextControl<String> lastNameControl;
+	private final TextControl<char[]> passwordControl;
+	private final TextControl<char[]> passwordVerificationControl;
+	private final TextControl<String> emailControl;
 
-	/**Default constructor.*/
-	public EditUserPanel()
-	{
-		super(new FlowLayout(Flow.PAGE));	//construct the parent class flowing vertically
-		setLabel("Guise\u2122 Demonstration: Edit User");	//set the panel title	
+	/** Default constructor. */
+	public EditUserPanel() {
+		super(new FlowLayout(Flow.PAGE)); //construct the parent class flowing vertically
+		setLabel("Guise\u2122 Demonstration: Edit User"); //set the panel title	
 
-		final LayoutPanel idPanel=new LayoutPanel(new FlowLayout(Flow.LINE));	//create the ID panel flowing horizontally
-			//ID
-		idControl=new TextControl<String>(String.class);	//create the ID input control
-		idControl.setLabel("ID");	//set the ID control label
-		idControl.setEditable(false);	//don't allow the ID to be edited
-		idPanel.add(idControl);	//add the ID control to the ID panel
-		
-		final LayoutPanel namePanel=new LayoutPanel(new FlowLayout(Flow.LINE));	//create the name panel flowing horizontally
-			//first name
-		firstNameControl=new TextControl<String>(String.class);	//create the first name input control
-		firstNameControl.setLabel("First Name *");	//set the name control label
-		firstNameControl.setValidator(new RegularExpressionStringValidator("\\S+.*", true));	//require at least a single non-whitespace character followed by any other characters
-		namePanel.add(firstNameControl);	//add the name control to the name panel
-			//middle name
-		middleNameControl=new TextControl<String>(String.class);	//create the first name input control, but don't require any validation
-		middleNameControl.setLabel("Middle Name");	//set the name control label
-		namePanel.add(middleNameControl);	//add the name control to the name panel
-			//last name
-		lastNameControl=new TextControl<String>(String.class);	//create the last name input control
-		lastNameControl.setLabel("Last Name *");	//set the name control label
-		lastNameControl.setValidator(new RegularExpressionStringValidator("\\S+.*", true));	//require at least a single non-whitespace character followed by any other characters
-		namePanel.add(lastNameControl);	//add the name control to the name panel
+		final LayoutPanel idPanel = new LayoutPanel(new FlowLayout(Flow.LINE)); //create the ID panel flowing horizontally
+		//ID
+		idControl = new TextControl<String>(String.class); //create the ID input control
+		idControl.setLabel("ID"); //set the ID control label
+		idControl.setEditable(false); //don't allow the ID to be edited
+		idPanel.add(idControl); //add the ID control to the ID panel
 
-		final LayoutPanel passwordPanel=new LayoutPanel(new FlowLayout(Flow.LINE));	//create the password panel flowing horizontally
-			//password
-		passwordControl=new TextControl<char[]>(char[].class);	//create the password input control
-		passwordControl.setLabel("Password *");	//set the password control label
-		passwordControl.setMasked(true);	//mask the password input
-		passwordControl.setValidator(new RegularExpressionCharArrayValidator("\\S+", true));	//require at least a single non-whitespace character
-		passwordPanel.add(passwordControl);	//add the password control to the password panel
-			//password verification
-		passwordVerificationControl=new TextControl<char[]>(char[].class);	//create the password verification input control
-		passwordVerificationControl.setLabel("Password Verification *");	//set the password control label
-		passwordVerificationControl.setMasked(true);	//mask the password input
-		passwordVerificationControl.setValidator(new RegularExpressionCharArrayValidator("\\S+", true));	//require at least a single non-whitespace character
-		passwordPanel.add(passwordVerificationControl);	//add the password verification control to the password panel
+		final LayoutPanel namePanel = new LayoutPanel(new FlowLayout(Flow.LINE)); //create the name panel flowing horizontally
+		//first name
+		firstNameControl = new TextControl<String>(String.class); //create the first name input control
+		firstNameControl.setLabel("First Name *"); //set the name control label
+		firstNameControl.setValidator(new RegularExpressionStringValidator("\\S+.*", true)); //require at least a single non-whitespace character followed by any other characters
+		namePanel.add(firstNameControl); //add the name control to the name panel
+		//middle name
+		middleNameControl = new TextControl<String>(String.class); //create the first name input control, but don't require any validation
+		middleNameControl.setLabel("Middle Name"); //set the name control label
+		namePanel.add(middleNameControl); //add the name control to the name panel
+		//last name
+		lastNameControl = new TextControl<String>(String.class); //create the last name input control
+		lastNameControl.setLabel("Last Name *"); //set the name control label
+		lastNameControl.setValidator(new RegularExpressionStringValidator("\\S+.*", true)); //require at least a single non-whitespace character followed by any other characters
+		namePanel.add(lastNameControl); //add the name control to the name panel
 
-		final LayoutPanel emailPanel=new LayoutPanel(new FlowLayout(Flow.LINE));	//create the email panel flowing horizontally
-			//email
-		emailControl=new TextControl<String>(String.class);	//create the email input control
-		emailControl.setLabel("Email *");	//set the email control label
-		emailControl.setValidator(new RegularExpressionStringValidator(".+@.+\\.[a-z]+", true));	//require an email in the correct format
-		emailPanel.add(emailControl);	//add the email control to the email panel
+		final LayoutPanel passwordPanel = new LayoutPanel(new FlowLayout(Flow.LINE)); //create the password panel flowing horizontally
+		//password
+		passwordControl = new TextControl<char[]>(char[].class); //create the password input control
+		passwordControl.setLabel("Password *"); //set the password control label
+		passwordControl.setMasked(true); //mask the password input
+		passwordControl.setValidator(new RegularExpressionCharArrayValidator("\\S+", true)); //require at least a single non-whitespace character
+		passwordPanel.add(passwordControl); //add the password control to the password panel
+		//password verification
+		passwordVerificationControl = new TextControl<char[]>(char[].class); //create the password verification input control
+		passwordVerificationControl.setLabel("Password Verification *"); //set the password control label
+		passwordVerificationControl.setMasked(true); //mask the password input
+		passwordVerificationControl.setValidator(new RegularExpressionCharArrayValidator("\\S+", true)); //require at least a single non-whitespace character
+		passwordPanel.add(passwordVerificationControl); //add the password verification control to the password panel
 
-		final LayoutPanel buttonPanel=new LayoutPanel(new FlowLayout(Flow.LINE));	//create the button panel flowing horizontally
-		final Button okButton=new Button();	//create the OK button
-		okButton.setLabel("OK");	//set the text of the OK button
-		okButton.addActionListener(new ActionListener()	//if the OK button was pressed
-				{
-					public void actionPerformed(ActionEvent actionEvent)
-					{
-						if(validate())	//validate the form, showing errors; if the form validates
-						{
-							endModal(getUser());	//end the panel modality with the edited user only if the form validates
+		final LayoutPanel emailPanel = new LayoutPanel(new FlowLayout(Flow.LINE)); //create the email panel flowing horizontally
+		//email
+		emailControl = new TextControl<String>(String.class); //create the email input control
+		emailControl.setLabel("Email *"); //set the email control label
+		emailControl.setValidator(new RegularExpressionStringValidator(".+@.+\\.[a-z]+", true)); //require an email in the correct format
+		emailPanel.add(emailControl); //add the email control to the email panel
+
+		final LayoutPanel buttonPanel = new LayoutPanel(new FlowLayout(Flow.LINE)); //create the button panel flowing horizontally
+		final Button okButton = new Button(); //create the OK button
+		okButton.setLabel("OK"); //set the text of the OK button
+		okButton.addActionListener(new ActionListener() { //if the OK button was pressed
+
+					public void actionPerformed(ActionEvent actionEvent) {
+						if(validate()) { //validate the form, showing errors; if the form validates
+							endModal(getUser()); //end the panel modality with the edited user only if the form validates
 						}
 					}
 				});
-		buttonPanel.add(okButton);	//add the button to the button panel
-		final Button cancelButton=new Button();	//create the cancel button
-		cancelButton.setLabel("Cancel");	//set the text of the cancel button
-		cancelButton.addActionListener(new ActionListener()	//if the cancel button was pressed
-				{
-					public void actionPerformed(ActionEvent actionEvent)
-					{
-						endModal(null);	//end the panel modality with no user
+		buttonPanel.add(okButton); //add the button to the button panel
+		final Button cancelButton = new Button(); //create the cancel button
+		cancelButton.setLabel("Cancel"); //set the text of the cancel button
+		cancelButton.addActionListener(new ActionListener() { //if the cancel button was pressed
+
+					public void actionPerformed(ActionEvent actionEvent) {
+						endModal(null); //end the panel modality with no user
 					}
 				});
-		buttonPanel.add(cancelButton);	//add the button to the button panel
+		buttonPanel.add(cancelButton); //add the button to the button panel
 
-		add(idPanel);	//add the ID panel to the panel
-		add(namePanel);	//add the name panel to the panel
-		add(passwordPanel);	//add the password panel to the panel
-		add(emailPanel);	//add the email panel to the panel
-		add(buttonPanel);	//add the buttonpanel to the panel
+		add(idPanel); //add the ID panel to the panel
+		add(namePanel); //add the name panel to the panel
+		add(passwordPanel); //add the password panel to the panel
+		add(emailPanel); //add the email panel to the panel
+		add(buttonPanel); //add the buttonpanel to the panel
 	}
 
-	/**@return <code>true</code> if both entered passwords are identical.*/ 
-	protected boolean isPasswordMatch()
-	{
-		return Arrays.equals(passwordControl.getValue(), passwordVerificationControl.getValue());	//see if the passwords match
+	/** @return <code>true</code> if both entered passwords are identical. */
+	protected boolean isPasswordMatch() {
+		return Arrays.equals(passwordControl.getValue(), passwordVerificationControl.getValue()); //see if the passwords match
 	}
 
-	/**Checks the state of the component for validity.
-	This version ensures the entered passwords match.
-	@return <code>true</code> if the component and all children passes all validity tests, else <code>false</code>.
-	*/ 
-	protected boolean determineValid()
-	{
-		return super.determineValid() && isPasswordMatch();	//add a check for password validity
+	/**
+	 * Checks the state of the component for validity. This version ensures the entered passwords match.
+	 * @return <code>true</code> if the component and all children passes all validity tests, else <code>false</code>.
+	 */
+	protected boolean determineValid() {
+		return super.determineValid() && isPasswordMatch(); //add a check for password validity
 	}
 
-	/**Validates the user input of this component and all child components.
-	The component will be updated with error information.
-	This version adds errors for non-matching passwords.
-	@return The current state of {@link #isValid()} as a convenience.
-	*/
-	public boolean validate()
-	{
-		super.validate();	//validate the component normally
-		if(!isPasswordMatch())	//if the password isn't valid
-		{
-			final Notification notification=new Notification("Passwords do not match.", Notification.Severity.ERROR);	//create an error notification
-			passwordControl.setNotification(notification);	//add the error notification to each password control
+	/**
+	 * Validates the user input of this component and all child components. The component will be updated with error information. This version adds errors for
+	 * non-matching passwords.
+	 * @return The current state of {@link #isValid()} as a convenience.
+	 */
+	public boolean validate() {
+		super.validate(); //validate the component normally
+		if(!isPasswordMatch()) { //if the password isn't valid
+			final Notification notification = new Notification("Passwords do not match.", Notification.Severity.ERROR); //create an error notification
+			passwordControl.setNotification(notification); //add the error notification to each password control
 			passwordVerificationControl.setNotification(notification);
 		}
-		return isValid();	//return the current valid state
+		return isValid(); //return the current valid state
 	}
 
-	/**Initializes the panel with information for a new user.
-	@param id The ID of the new user to be edited.
-	@throws NullPointerException if the provided user is <code>null</code>.
-	@throws IllegalArgumentException if any user information is invalid.
-	*/
-	public void setNewUser(final String id)
-	{
-		try
-		{
-			idControl.setValue(id);	//set the user ID
-		}
-		catch(final PropertyVetoException propertyVetoException)	//if the user information is invalid
-		{
+	/**
+	 * Initializes the panel with information for a new user.
+	 * @param id The ID of the new user to be edited.
+	 * @throws NullPointerException if the provided user is <code>null</code>.
+	 * @throws IllegalArgumentException if any user information is invalid.
+	 */
+	public void setNewUser(final String id) {
+		try {
+			idControl.setValue(id); //set the user ID
+		} catch(final PropertyVetoException propertyVetoException) { //if the user information is invalid
 			throw new IllegalArgumentException(propertyVetoException);
-		}		
+		}
 	}
 
-	/**Initializes the panel with user information.
-	@param user The user with which to initialize the panel.
-	@throws NullPointerException if the provided user is <code>null</code>.
-	@throws IllegalArgumentException if any user information is invalid.
-	*/
-	public void setUser(final DemoUser user)
-	{
-		try
-		{
-			idControl.setValue(user.getID());	//update the values
+	/**
+	 * Initializes the panel with user information.
+	 * @param user The user with which to initialize the panel.
+	 * @throws NullPointerException if the provided user is <code>null</code>.
+	 * @throws IllegalArgumentException if any user information is invalid.
+	 */
+	public void setUser(final DemoUser user) {
+		try {
+			idControl.setValue(user.getID()); //update the values
 			firstNameControl.setValue(user.getFirstName());
 			middleNameControl.setValue(user.getMiddleName());
 			lastNameControl.setValue(user.getLastName());
 			passwordControl.setValue(user.getPassword());
 			passwordVerificationControl.setValue(user.getPassword());
 			emailControl.setValue(user.getEmail());
-		}
-		catch(final PropertyVetoException propertyVetoException)	//if the user information is invalid
-		{
+		} catch(final PropertyVetoException propertyVetoException) { //if the user information is invalid
 			throw new IllegalArgumentException(propertyVetoException);
 		}
 	}
 
-	/**@return A user representing the information entered in the panel.*/
-	public DemoUser getUser()
-	{
-		return new DemoUser(	//create and return a new user
-				idControl.getValue(),
-				firstNameControl.getValue(),
-				middleNameControl.getValue(),
-				lastNameControl.getValue(),
-				passwordControl.getValue(),
+	/** @return A user representing the information entered in the panel. */
+	public DemoUser getUser() {
+		return new DemoUser( //create and return a new user
+				idControl.getValue(), firstNameControl.getValue(), middleNameControl.getValue(), lastNameControl.getValue(), passwordControl.getValue(),
 				emailControl.getValue());
 	}
 }

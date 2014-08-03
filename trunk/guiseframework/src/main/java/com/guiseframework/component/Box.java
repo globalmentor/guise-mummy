@@ -16,9 +16,9 @@
 
 package com.guiseframework.component;
 
-/**Rectangular components that are laid out.
-@author Garret Wilson
-*/
-public interface Box extends Component
-{
+/**
+ * Rectangular components that are laid out.
+ * @author Garret Wilson
+ */
+public interface Box extends Component {
 }

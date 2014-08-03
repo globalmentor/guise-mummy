@@ -31,12 +31,10 @@ import static com.globalmentor.text.xml.xhtml.XHTML.*;
  * @param <C> The type of component being depicted.
  * @author Garret Wilson
  */
-public class WebLayoutComponentDepictor<C extends LayoutComponent> extends AbstractWebLayoutComponentDepictor<C>
-{
+public class WebLayoutComponentDepictor<C extends LayoutComponent> extends AbstractWebLayoutComponentDepictor<C> {
 
 	/** Default constructor using the XHTML <code>&lt;div&gt;</code> element. */
-	public WebLayoutComponentDepictor()
-	{
+	public WebLayoutComponentDepictor() {
 		super(XHTML_NAMESPACE_URI, ELEMENT_DIV); //represent <xhtml:div>
 		getIgnoredProperties().add(LayoutComponent.NOTIFICATION_PROPERTY); //ignore Panel.notification, because we don't want to mark the component invalid when it registers a notification as this is used to pass a notification up to an enclosing class
 	}
@@ -46,8 +44,7 @@ public class WebLayoutComponentDepictor<C extends LayoutComponent> extends Abstr
 	 * @see AbstractWebComponentDepictor#getBodyStyles(XMLGuiseContext, Component)
 	 */
 	@Override
-	protected Map<String, Object> getOuterStyles() //TODO decide if this technique is the best for the container views
-	{
+	protected Map<String, Object> getOuterStyles() { //TODO decide if this technique is the best for the container views
 		final Map<String, Object> outerStyles = super.getOuterStyles(); //get the default outer styles
 		outerStyles.putAll(getBodyStyles()); //add the styles for the body
 		return outerStyles; //return the combined styles		
@@ -55,8 +52,7 @@ public class WebLayoutComponentDepictor<C extends LayoutComponent> extends Abstr
 
 	/** {@inheritDoc} This version writes ID, class, and direction attributes. */
 	@Override
-	protected void depictBegin() throws IOException
-	{
+	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		writeBodyIDClassAttributes(null, null); //write the ID and class attributes
 		writeDirectionAttribute(); //write the component direction, if this component specifies a direction

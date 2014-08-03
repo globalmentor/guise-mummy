@@ -25,22 +25,18 @@ import com.guiseframework.component.layout.*;
  * </p>
  * @author Garret Wilson
  */
-public class SectionPanel extends ArrangePanel implements SectionComponent
-{
+public class SectionPanel extends ArrangePanel implements SectionComponent {
 
 	private SectionType sectionType = SectionType.SECTION;
 
 	@Override
-	public SectionType getSectionType()
-	{
+	public SectionType getSectionType() {
 		return sectionType;
 	}
 
 	@Override
-	public void setSectionType(final SectionType newSectionType)
-	{
-		if(sectionType != newSectionType) //if the value is really changing
-		{
+	public void setSectionType(final SectionType newSectionType) {
+		if(sectionType != newSectionType) { //if the value is really changing
 			final SectionType oldType = sectionType; //get the old value
 			sectionType = newSectionType; //actually change the value
 			firePropertyChange(SECTION_TYPE_PROPERTY, oldType, newSectionType); //indicate that the value changed
@@ -48,8 +44,7 @@ public class SectionPanel extends ArrangePanel implements SectionComponent
 	}
 
 	/** Default constructor with a default vertical flow layout and a default {@link SectionType#SECTION} section type. */
-	public SectionPanel()
-	{
+	public SectionPanel() {
 		this(SectionType.SECTION);
 	}
 
@@ -58,8 +53,7 @@ public class SectionPanel extends ArrangePanel implements SectionComponent
 	 * @param layout The layout definition for the container.
 	 * @throws NullPointerException if the given layout is <code>null</code>.
 	 */
-	public SectionPanel(final Layout<?> layout)
-	{
+	public SectionPanel(final Layout<?> layout) {
 		this(layout, SectionType.SECTION);
 	}
 
@@ -67,8 +61,7 @@ public class SectionPanel extends ArrangePanel implements SectionComponent
 	 * Section type constructor with a default vertical flow layout.
 	 * @param sectionType The type of section, or <code>null</code> if there is no specific type specified.
 	 */
-	public SectionPanel(final SectionType newSectionType)
-	{
+	public SectionPanel(final SectionType newSectionType) {
 		this(new FlowLayout(Flow.PAGE), newSectionType); //default to flowing vertically
 	}
 
@@ -78,8 +71,7 @@ public class SectionPanel extends ArrangePanel implements SectionComponent
 	 * @param sectionType The type of section, or <code>null</code> if there is no specific type specified.
 	 * @throws NullPointerException if the given layout is <code>null</code>.
 	 */
-	public SectionPanel(final Layout<?> layout, final SectionType newSectionType)
-	{
+	public SectionPanel(final Layout<?> layout, final SectionType newSectionType) {
 		super(layout); //construct the parent class
 		this.sectionType = newSectionType;
 	}

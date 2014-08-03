@@ -23,69 +23,71 @@ import java.beans.PropertyVetoException;
 import com.globalmentor.model.MutableValued;
 import com.guiseframework.validator.*;
 
-/**A model for user input of a value.
-@param <V> The type of value contained in the model.
-@author Garret Wilson
-*/
-public interface ValueModel<V> extends Model, MutableValued<V>
-{
+/**
+ * A model for user input of a value.
+ * @param <V> The type of value contained in the model.
+ * @author Garret Wilson
+ */
+public interface ValueModel<V> extends Model, MutableValued<V> {
 
-	/**The validator bound property.*/
-	public final static String VALIDATOR_PROPERTY=getPropertyName(ValueModel.class, "validator");
-	/**The value bound property.*/
-	public final static String VALUE_PROPERTY=getPropertyName(ValueModel.class, "value");
+	/** The validator bound property. */
+	public final static String VALIDATOR_PROPERTY = getPropertyName(ValueModel.class, "validator");
+	/** The value bound property. */
+	public final static String VALUE_PROPERTY = getPropertyName(ValueModel.class, "value");
 
-	/**@return The default value.*/
+	/** @return The default value. */
 	public V getDefaultValue();
 
-	/**@return The input value, or <code>null</code> if there is no input value.*/
+	/** @return The input value, or <code>null</code> if there is no input value. */
 	public V getValue();
 
-	/**Sets the new value.
-	This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.
-	If a validator is installed, the value will first be validated before the current value is changed.
-	Validation always occurs if a validator is installed, even if the value is not changing.
-	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
-	@param newValue The new value.
-	@throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
-	@see #getValidator()
-	@see #VALUE_PROPERTY
-	*/
+	/**
+	 * Sets the new value. This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method. If a
+	 * validator is installed, the value will first be validated before the current value is changed. Validation always occurs if a validator is installed, even
+	 * if the value is not changing. If the value change is vetoed by the installed validator, the validation exception will be accessible via
+	 * {@link PropertyVetoException#getCause()}.
+	 * @param newValue The new value.
+	 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+	 * @see #getValidator()
+	 * @see #VALUE_PROPERTY
+	 */
 	public void setValue(final V newValue) throws PropertyVetoException;
 
-	/**Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators.
-	No validation occurs.
-	@see #VALUE_PROPERTY
-	*/
+	/**
+	 * Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators. No validation occurs.
+	 * @see #VALUE_PROPERTY
+	 */
 	public void clearValue();
 
-	/**Resets the value to a default value, which may be invalid according to any installed validators.
-	No validation occurs.
-	@see #VALUE_PROPERTY
-	*/
+	/**
+	 * Resets the value to a default value, which may be invalid according to any installed validators. No validation occurs.
+	 * @see #VALUE_PROPERTY
+	 */
 	public void resetValue();
 
-	/**@return The validator for this model, or <code>null</code> if no validator is installed.*/
+	/** @return The validator for this model, or <code>null</code> if no validator is installed. */
 	public Validator<V> getValidator();
 
-	/**Sets the validator.
-	This is a bound property
-	@param newValidator The validator for this model, or <code>null</code> if no validator should be used.
-	@see #VALIDATOR_PROPERTY
-	*/
+	/**
+	 * Sets the validator. This is a bound property
+	 * @param newValidator The validator for this model, or <code>null</code> if no validator should be used.
+	 * @see #VALIDATOR_PROPERTY
+	 */
 	public void setValidator(final Validator<V> newValidator);
 
-	/**Determines whether the value of this model is valid.
-	@return Whether the value of this model is valid.
-	*/
+	/**
+	 * Determines whether the value of this model is valid.
+	 * @return Whether the value of this model is valid.
+	 */
 	public boolean isValidValue();
 
-	/**Validates the value of this model, throwing an exception if the model is not valid.
-	@throws ValidationException if the value of this model is not valid.	
-	*/
+	/**
+	 * Validates the value of this model, throwing an exception if the model is not valid.
+	 * @throws ValidationException if the value of this model is not valid.
+	 */
 	public void validateValue() throws ValidationException;
 
-	/**@return The class representing the type of value this model can hold.*/
+	/** @return The class representing the type of value this model can hold. */
 	public Class<V> getValueClass();
 
 }

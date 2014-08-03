@@ -23,38 +23,39 @@ import com.globalmentor.net.ContentType;
 import com.globalmentor.beans.*;
 import com.globalmentor.event.EventListenerManager;
 
-/**A base abstract class implementing helpful functionality for models.
-@author Garret Wilson
-*/
-public abstract class AbstractModel extends BoundPropertyObject implements Model
-{
-	/**The object managing event listeners.*/
-	private final EventListenerManager eventListenerManager=new EventListenerManager();
+/**
+ * A base abstract class implementing helpful functionality for models.
+ * @author Garret Wilson
+ */
+public abstract class AbstractModel extends BoundPropertyObject implements Model {
 
-		/**@return The object managing event listeners.*/
-		protected EventListenerManager getEventListenerManager() {return eventListenerManager;}
+	/** The object managing event listeners. */
+	private final EventListenerManager eventListenerManager = new EventListenerManager();
 
-	/**Default constructor.*/
-	public AbstractModel()
-	{
+	/** @return The object managing event listeners. */
+	protected EventListenerManager getEventListenerManager() {
+		return eventListenerManager;
 	}
 
-	/**Determines the plain text form of the given text, based upon its content type.
-	@param text The given text.
-	@param contentType The content type of the text.
-	@return The plain text form of the given text, based upon the given content type.
-	@throws NullPointerException if the given text and/or content type is <code>null</code>.
-	@throws IllegalArgumentException if the given content type is not a text content type.
-	*/
-	public static String getPlainText(final String text, final ContentType contentType)	//TODO del or move
-	{
+	/** Default constructor. */
+	public AbstractModel() {
+	}
+
+	/**
+	 * Determines the plain text form of the given text, based upon its content type.
+	 * @param text The given text.
+	 * @param contentType The content type of the text.
+	 * @return The plain text form of the given text, based upon the given content type.
+	 * @throws NullPointerException if the given text and/or content type is <code>null</code>.
+	 * @throws IllegalArgumentException if the given content type is not a text content type.
+	 */
+	public static String getPlainText(final String text, final ContentType contentType) { //TODO del or move
 		checkInstance(text, "Text cannot be null");
 		checkInstance(contentType, "Content Type cannot be null.");
-		if(!isText(contentType))	//if the new content type is not a text content type
-		{
-			throw new IllegalArgumentException("Content type "+contentType+" is not a text content type.");
+		if(!isText(contentType)) { //if the new content type is not a text content type
+			throw new IllegalArgumentException("Content type " + contentType + " is not a text content type.");
 		}
-		return text;	//TODO fix to actually convert to plain text
+		return text; //TODO fix to actually convert to plain text
 	}
 
 }

@@ -16,10 +16,10 @@
 
 package com.guiseframework.component;
 
-/**A container that that semantically demarcates an area that arranges other components.
-This container is usually styled to arrange the spacing between child components.
-@author Garret Wilson
-*/
-public interface ArrangeContainer extends Container
-{
+/**
+ * A container that that semantically demarcates an area that arranges other components. This container is usually styled to arrange the spacing between child
+ * components.
+ * @author Garret Wilson
+ */
+public interface ArrangeContainer extends Container {
 }

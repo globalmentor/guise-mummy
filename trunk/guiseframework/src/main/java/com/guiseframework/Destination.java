@@ -29,8 +29,7 @@ import com.globalmentor.net.*;
  * Description of a navigation point, its properties, and its restrictions.
  * @author Garret Wilson
  */
-public interface Destination extends PropertyBindable
-{
+public interface Destination extends PropertyBindable {
 
 	/**
 	 * @return The application context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if there is no path

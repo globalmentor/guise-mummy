@@ -18,85 +18,83 @@ package com.guiseframework.component;
 
 import com.guiseframework.model.*;
 
-/**A heading component.
-This component installs a default export strategy supporting export of the following content types:
-<ul>
-	<li>The label content type.</li>
-</ul>
-@author Garret Wilson
-*/
-public class Heading extends AbstractLabel implements HeadingComponent
-{
-	
-	/**The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.*/
+/**
+ * A heading component. This component installs a default export strategy supporting export of the following content types:
+ * <ul>
+ * <li>The label content type.</li>
+ * </ul>
+ * @author Garret Wilson
+ */
+public class Heading extends AbstractLabel implements HeadingComponent {
+
+	/** The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified. */
 	private int level;
 
-		/**@return The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.*/
-		public int getLevel() {return level;}
+	/** @return The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified. */
+	public int getLevel() {
+		return level;
+	}
 
-		/**Sets the level of the heading.
-		This is a bound property of type <code>Integer</code>.
-		@param newLevel The new zero-based heading level, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
-		@see HeadingComponent#LEVEL_PROPERTY
-		*/
-		public void setLevel(final int newLevel)
-		{
-			if(level!=newLevel)	//if the value is really changing
-			{
-				final int oldLevel=level;	//get the old value
-				level=newLevel;	//actually change the value
-				firePropertyChange(LEVEL_PROPERTY, oldLevel, newLevel);	//indicate that the value changed
-			}			
+	/**
+	 * Sets the level of the heading. This is a bound property of type <code>Integer</code>.
+	 * @param newLevel The new zero-based heading level, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
+	 * @see HeadingComponent#LEVEL_PROPERTY
+	 */
+	public void setLevel(final int newLevel) {
+		if(level != newLevel) { //if the value is really changing
+			final int oldLevel = level; //get the old value
+			level = newLevel; //actually change the value
+			firePropertyChange(LEVEL_PROPERTY, oldLevel, newLevel); //indicate that the value changed
 		}
-
-	/**Default constructor with a default info model.*/
-	public Heading()
-	{
-		this(NO_HEADING_LEVEL);	//construct the class with a default model with no heading level
 	}
 
-	/**Heading level constructor with a default info model.
-	@param level The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
-	*/
-	public Heading(final int level)
-	{
-		this(new DefaultInfoModel(), level);	//construct the class with a default model
+	/** Default constructor with a default info model. */
+	public Heading() {
+		this(NO_HEADING_LEVEL); //construct the class with a default model with no heading level
 	}
 
-	/**Label constructor.
-	@param label The text of the label, or <code>null</code> if there should be no label.
-	*/
-	public Heading(final String label)
-	{
-		this(new DefaultInfoModel(label));	//construct the heading with a default info model and the given label text
+	/**
+	 * Heading level constructor with a default info model.
+	 * @param level The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
+	 */
+	public Heading(final int level) {
+		this(new DefaultInfoModel(), level); //construct the class with a default model
 	}
 
-	/**Info model constructor.
-	@param infoModel The component info model.
-	@throws NullPointerException if the given info model is <code>null</code>.
-	*/
-	public Heading(final InfoModel infoModel)
-	{
-		this(infoModel, NO_HEADING_LEVEL);	//construct the class with no heading level
+	/**
+	 * Label constructor.
+	 * @param label The text of the label, or <code>null</code> if there should be no label.
+	 */
+	public Heading(final String label) {
+		this(new DefaultInfoModel(label)); //construct the heading with a default info model and the given label text
 	}
 
-	/**Label and level constructor.
-	@param label The text of the label, or <code>null</code> if there should be no label.
-	@param level The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
-	*/
-	public Heading(final String label, final int level)
-	{
-		this(new DefaultInfoModel(label), level);	//construct the heading with a default info model and the given label text
+	/**
+	 * Info model constructor.
+	 * @param infoModel The component info model.
+	 * @throws NullPointerException if the given info model is <code>null</code>.
+	 */
+	public Heading(final InfoModel infoModel) {
+		this(infoModel, NO_HEADING_LEVEL); //construct the class with no heading level
 	}
 
-	/**Info model and level constructor.
-	@param infoModel The component info model.
-	@param level The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
-	@throws NullPointerException if the given session info model is <code>null</code>.
-	*/
-	public Heading(final InfoModel infoModel, final int level)
-	{
-		super(infoModel);	//construct the parent class
-		this.level=level;	//save the level
+	/**
+	 * Label and level constructor.
+	 * @param label The text of the label, or <code>null</code> if there should be no label.
+	 * @param level The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
+	 */
+	public Heading(final String label, final int level) {
+		this(new DefaultInfoModel(label), level); //construct the heading with a default info model and the given label text
+	}
+
+	/**
+	 * Info model and level constructor.
+	 * @param infoModel The component info model.
+	 * @param level The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
+	 * @throws NullPointerException if the given session info model is <code>null</code>.
+	 */
+	public Heading(final InfoModel infoModel, final int level) {
+		super(infoModel); //construct the parent class
+		this.level = level; //save the level
 	}
 }

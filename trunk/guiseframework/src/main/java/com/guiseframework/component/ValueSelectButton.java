@@ -18,32 +18,32 @@ package com.guiseframework.component;
 
 import com.guiseframework.model.*;
 
-/**Selectable button that stores a separate value in a value model.
-@param <V> The type of value the control represents.
-@author Garret Wilson
-*/
-public class ValueSelectButton<V> extends AbstractSelectActionValueControl<V> implements SelectButtonControl
-{
+/**
+ * Selectable button that stores a separate value in a value model.
+ * @param <V> The type of value the control represents.
+ * @author Garret Wilson
+ */
+public class ValueSelectButton<V> extends AbstractSelectActionValueControl<V> implements SelectButtonControl {
 
-	/**Value class constructor.
-	@param valueClass The class indicating the type of value held in the model.
-	@throws NullPointerException if the given value class is <code>null</code>.
-	*/
-	public ValueSelectButton(final Class<V> valueClass)
-	{
-		this(new DefaultInfoModel(), new DefaultActionModel(), new DefaultValueModel<V>(valueClass), new DefaultEnableable());	//construct the class with default models
+	/**
+	 * Value class constructor.
+	 * @param valueClass The class indicating the type of value held in the model.
+	 * @throws NullPointerException if the given value class is <code>null</code>.
+	 */
+	public ValueSelectButton(final Class<V> valueClass) {
+		this(new DefaultInfoModel(), new DefaultActionModel(), new DefaultValueModel<V>(valueClass), new DefaultEnableable()); //construct the class with default models
 	}
 
-	/**Info model, action model, value model, and enableable object constructor.
-	@param infoModel The component info model.
-	@param actionModel The component action model.
-	@param valueModel The component value model.
-	@param enableable The enableable object in which to store enabled status.
-	@throws NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
-	*/
-	public ValueSelectButton(final InfoModel infoModel, final ActionModel actionModel, final ValueModel<V> valueModel, final Enableable enableable)
-	{
-		super(infoModel, actionModel, valueModel, enableable);	//construct the parent class		
+	/**
+	 * Info model, action model, value model, and enableable object constructor.
+	 * @param infoModel The component info model.
+	 * @param actionModel The component action model.
+	 * @param valueModel The component value model.
+	 * @param enableable The enableable object in which to store enabled status.
+	 * @throws NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
+	 */
+	public ValueSelectButton(final InfoModel infoModel, final ActionModel actionModel, final ValueModel<V> valueModel, final Enableable enableable) {
+		super(infoModel, actionModel, valueModel, enableable); //construct the parent class		
 	}
-	
+
 }

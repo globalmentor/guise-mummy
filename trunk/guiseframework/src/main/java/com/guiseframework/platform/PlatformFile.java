@@ -20,26 +20,27 @@ import java.net.URI;
 
 import com.guiseframework.event.ProgressListenable;
 
-/**A local file on a platform.
-@author Garret Wilson
-*/
-public interface PlatformFile extends ProgressListenable<Long>
-{
+/**
+ * A local file on a platform.
+ * @author Garret Wilson
+ */
+public interface PlatformFile extends ProgressListenable<Long> {
 
-	/**@return The name of the file.*/
+	/** @return The name of the file. */
 	public String getName();
 
-	/**@return The size of the file, or -1 if the size is unknown.*/
+	/** @return The size of the file, or -1 if the size is unknown. */
 	public long getSize();
 
-	/**Cancels the current upload or download.*/
+	/** Cancels the current upload or download. */
 	public void cancel();
 
-	/**Uploads the file from the platform.
-	@param destinationURI The URI representing the destination of the platform file, either absolute or relative to the application.
-	@throws NullPointerException if the given destination URI is <code>null</code>.
-	@throws IllegalStateException the platform file can no longer be uploaded because, for example, other platform files have since been selected.	
-	*/
+	/**
+	 * Uploads the file from the platform.
+	 * @param destinationURI The URI representing the destination of the platform file, either absolute or relative to the application.
+	 * @throws NullPointerException if the given destination URI is <code>null</code>.
+	 * @throws IllegalStateException the platform file can no longer be uploaded because, for example, other platform files have since been selected.
+	 */
 	public void upload(final URI destinationURI);
 
 }

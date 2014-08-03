@@ -24,12 +24,10 @@ import com.guiseframework.model.*;
  * A simple image component with no descriptive text.
  * @author Garret Wilson
  */
-public class Image extends AbstractImageComponent
-{
+public class Image extends AbstractImageComponent {
 
 	/** Default constructor. */
-	public Image()
-	{
+	public Image() {
 		this(new DefaultInfoModel(), new DefaultImageModel()); //construct the parent class with default models
 	}
 
@@ -38,8 +36,7 @@ public class Image extends AbstractImageComponent
 	 * @param imageModel The component image model.
 	 * @throws NullPointerException if the given image model is <code>null</code>.
 	 */
-	public Image(final ImageModel imageModel)
-	{
+	public Image(final ImageModel imageModel) {
 		this(new DefaultInfoModel(), imageModel); //construct the parent class with a default info model
 	}
 
@@ -49,8 +46,7 @@ public class Image extends AbstractImageComponent
 	 * @param imageModel The component image model.
 	 * @throws NullPointerException if the given info model and/or image model is <code>null</code>.
 	 */
-	public Image(final InfoModel infoModel, final ImageModel imageModel)
-	{
+	public Image(final InfoModel infoModel, final ImageModel imageModel) {
 		super(infoModel, imageModel); //construct the parent class
 	}
 
@@ -58,8 +54,7 @@ public class Image extends AbstractImageComponent
 	 * Image URI constructor.
 	 * @param imageURI The image URI, which may be a resource URI, or <code>null</code> if there is no image URI.
 	 */
-	public Image(final URI imageURI)
-	{
+	public Image(final URI imageURI) {
 		this(imageURI, null);
 	}
 
@@ -68,8 +63,7 @@ public class Image extends AbstractImageComponent
 	 * @param imageURI The image URI, which may be a resource URI, or <code>null</code> if there is no image URI.
 	 * @param label The text of the label, or <code>null</code> if there should be no label.
 	 */
-	public Image(final URI imageURI, final String label)
-	{
+	public Image(final URI imageURI, final String label) {
 		this(new DefaultInfoModel(label), new DefaultImageModel(imageURI));
 	}
 

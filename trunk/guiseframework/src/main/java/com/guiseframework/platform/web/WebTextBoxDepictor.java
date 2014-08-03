@@ -44,8 +44,7 @@ import org.xml.sax.SAXException;
  * @param <C> The type of component being depicted.
  * @author Garret Wilson
  */
-public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComponentDepictor<C>
-{
+public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComponentDepictor<C> {
 
 	/** The document prefix to wrap around an XHTML fragment. */
 	private final static String XHTML11_FRAGMENT_DOCUMENT_PREFIX = //TODO fix; this doesn't create valid XHTML; it needs an internal DIV, but we need to then get the contents of the DIV rather than the BODY, which we could do using an ID
@@ -61,18 +60,15 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 			new PurgeOnWriteSoftValueHashMap<Integer, CachedDocument>());
 
 	/** Default constructor using the XHTML <code>&lt;div&gt;</code> element. */
-	public WebTextBoxDepictor()
-	{
+	public WebTextBoxDepictor() {
 		super(XHTML_NAMESPACE_URI, ELEMENT_DIV); //represent <xhtml:div>
 	}
 
 	/** {@inheritDoc} This version returns special section elements if the component is a {@link SectionComponent} with a non-<code>null</code> section type. */
 	@Override
-	public String getLocalName()
-	{
+	public String getLocalName() {
 		final SectionType sectionType = getDepictedObject().getSectionType();
-		if(sectionType != null) //if a specific type is indicated
-		{
+		if(sectionType != null) { //if a specific type is indicated
 			return WebPanelDepictor.getLocalName(sectionType); //return the local name for the section type
 		}
 		return super.getLocalName(); //return the default local name
@@ -82,58 +78,43 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 	 * Updates the views of any children. This version does not call the super version, because all child rendering is controlled by this version.
 	 * @throws IOException if there is an error updating the child views.
 	 */
-	protected void depictChildren() throws IOException
-	{
+	protected void depictChildren() throws IOException {
 		//TODO del Log.trace("ready to load text");
 		final C component = getDepictedObject(); //get the component
 		final String text = component.getText(); //get the component text, if any
 		//TODO del Log.trace("text loaded");
-		if(text != null) //if the component has text
-		{
+		if(text != null) { //if the component has text
 			final String resolvedText = component.getSession().dereferenceString(text); //resolve the text
 			final ContentType contentType = component.getTextContentType(); //get the content type of the text
 			final boolean isXML = isXML(contentType); //see if the content type is for XML
 			final boolean isXMLExternalParsedEntity = isXMLExternalParsedEntity(contentType); //see if the content type is for an XML external parsed entity
-			if(isXML || isXMLExternalParsedEntity) //if the text is XML or an XML external parsed entity
-			{
+			if(isXML || isXMLExternalParsedEntity) { //if the text is XML or an XML external parsed entity
 				final String xmlText; //we'll determine the XML text to process
-				if(isXMLExternalParsedEntity) //if this is an XML external parsed entity
-				{
-					if(!XHTML_XML_EXTERNAL_PARSED_ENTITY_SUBTYPE.equals(contentType.getSubType())) //if this is not an XHTML external parsed entity (an XHTML fragment), it's a fragment we don't know what to do with
-					{
+				if(isXMLExternalParsedEntity) { //if this is an XML external parsed entity
+					if(!XHTML_XML_EXTERNAL_PARSED_ENTITY_SUBTYPE.equals(contentType.getSubType())) { //if this is not an XHTML external parsed entity (an XHTML fragment), it's a fragment we don't know what to do with
 						throw new AssertionError("Unsupported fragment media type: " + contentType);
 					}
 					//TODO probably make sure that the external parsed entity is just a fragment---is it legal to have a whole document as an external parsed entity?
 					xmlText = XHTML11_FRAGMENT_DOCUMENT_PREFIX + resolvedText + XHTML11_FRAGMENT_DOCUMENT_SUFFIX; //wrap the fragment in an XHTML 1.1 document
-				}
-				else
-				//if this is just standard XML (i.e. the whole XHTML document, if necessary)
-				{
+				} else { //if this is just standard XML (i.e. the whole XHTML document, if necessary)
 					xmlText = resolvedText; //just use the text as-is
 				}
-				try
-				{
+				try {
 					final Integer xmlTextHash = new Integer(xmlText.hashCode()); //get the hash code of the string
 					//TODO del					CachedDocument cachedDocument=null;	//we'll see if we can find a cached document for the XML text
 					//don't synchronize on the cache, which would cause delays when blocking to load new documents
 					//the race condition is benign; at the worse, a document might be loaded several times during initial caching
 					CachedDocument cachedDocument = cachedDocumentMap.get(xmlTextHash); //see if there is an XML document for this string already cached
-					if(cachedDocument != null) //if we supposedly have a cached document
-					{
-						if(!xmlText.equals(cachedDocument.getText())) //if the cached text isn't identical to the text we're using (which is possible because we're keying on hash codes, which aren't guaranteed to be unique)
-						{
+					if(cachedDocument != null) { //if we supposedly have a cached document
+						if(!xmlText.equals(cachedDocument.getText())) { //if the cached text isn't identical to the text we're using (which is possible because we're keying on hash codes, which aren't guaranteed to be unique)
 							cachedDocument = null; //don't used the cached document
 						}
 					}
 					final Document document; //we'll use the cached document if we can
-					if(cachedDocument != null) //if we have a cached document for this text
-					{
+					if(cachedDocument != null) { //if we have a cached document for this text
 						Log.debug("cache hit for text", xmlTextHash);
 						document = cachedDocument.getDocument(); //use the document
-					}
-					else
-					//if there is no cached document
-					{
+					} else { //if there is no cached document
 						Log.debug("cache miss for text", xmlTextHash);
 						//				TODO del Log.trace("ready to parse text");
 						//				TODO del Log.trace("creating document builder factory");
@@ -149,28 +130,21 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 					}
 					//				TODO del Log.trace("text parsed");
 					final Element rootElement; //we'll find which element to start with
-					if(isHTML(contentType)) //if this is an HTML document
-					{
+					if(isHTML(contentType)) { //if this is an HTML document
 						//TODO fix; this throws a NullPointerException final Element bodyElement=getBodyElement(document);	//see if there is a body element
 						Element bodyElement = null; //TODO 
 						final NodeList bodyElements = document.getElementsByTagNameNS(XHTML_NAMESPACE_URI.toString(), "body");
-						if(bodyElements.getLength() > 0)
-						{
+						if(bodyElements.getLength() > 0) {
 							bodyElement = (Element)bodyElements.item(0);
 						}
 						rootElement = bodyElement != null ? bodyElement : document.getDocumentElement(); //use the body element if there is one
-					}
-					else
-					//if this is any other XML document
-					{
+					} else { //if this is any other XML document
 						rootElement = document.getDocumentElement(); //use the document element
 					}
 					//				TODO del Log.trace("ready to render text");
 					updateElementContent(rootElement); //update the contents of the root element
 					//				TODO del Log.trace("text rendered");
-				}
-				catch(final SAXException saxException) //we don't expect parsing errors
-				{
+				} catch(final SAXException saxException) { //we don't expect parsing errors
 					throw new AssertionError(saxException); //TODO maybe change to throwing an IOException
 				}
 				/*TODO del
@@ -179,14 +153,10 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 									throw new AssertionError(uriSyntaxException);	//TODO fix better
 								}
 				*/
-				catch(final IOException ioException) //if there is an I/O exception
-				{
+				catch(final IOException ioException) { //if there is an I/O exception
 					throw new AssertionError(ioException); //TODO fix better
 				}
-			}
-			else
-			//if the text is not XML
-			{
+			} else { //if the text is not XML
 				writeText(resolvedText, component.getTextContentType()); //write the text appropriately for its content type				
 			}
 		}
@@ -197,19 +167,14 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 	 * place of this element.
 	 * @throws IOException if there is an error rendering the component.
 	 */
-	protected void updateElement(final Element element) throws IOException
-	{
+	protected void updateElement(final Element element) throws IOException {
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
 		final C component = getDepictedObject(); //get the component
 		final String id = element.getAttributeNS(null, "id"); //see if this element has an ID attribute TODO check for the HTML namespace on the element, maybe; use a constant
 		final Component childComponent = id != null ? component.getLayout().getComponentByID(id) : null; //if this element has an ID, see if we have a component bound to that ID
-		if(childComponent != null) //if we have a component bound to the given ID
-		{
+		if(childComponent != null) { //if we have a component bound to the given ID
 			childComponent.depict(); //tell the child component to update its view
-		}
-		else
-		//if there is no child component to replace this element
-		{
+		} else { //if there is no child component to replace this element
 			final boolean isEmpty = !element.hasChildNodes(); //find out if this is an empty element TODO see if we need to special-case some HTML elements so as not to confuse IE
 			final String elementNamespaceURIString = element.getNamespaceURI(); //get the element namespace
 			final URI elementNamespaceURI = elementNamespaceURIString != null ? URI.create(elementNamespaceURIString) : null; //get the namespace URI, if there is one
@@ -218,19 +183,16 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 			String classAttributeValue = ""; //we'll add "content" to all the class attributes
 			final NamedNodeMap attributes = element.getAttributes(); //get the element attributes
 			final int attributeCount = attributes.getLength(); //get the number of attributes
-			for(int attributeIndex = 0; attributeIndex < attributeCount; ++attributeIndex) //for each attribute
-			{
+			for(int attributeIndex = 0; attributeIndex < attributeCount; ++attributeIndex) { //for each attribute
 				final Attr attribute = (Attr)attributes.item(attributeIndex); //get a reference to this attribute
 				final String attributeNamespaceURIString = attribute.getNamespaceURI(); //get the attribute namespace
 				final URI attributeNamespaceURI = attributeNamespaceURIString != null ? URI.create(attributeNamespaceURIString) : null; //get the namespace URI, if there is one
 				final String attributeLocalName = attribute.getLocalName(); //get the attribute local name
-				if(XMLNS_NAMESPACE_URI.equals(attributeNamespaceURI) && ATTRIBUTE_XMLNS.equals(attributeLocalName)) //don't write xmlns:xmlns attributes TODO fix; this is to keep xmlns:xmlns from being redefined, because apparently the Java parse things xmlns="" is in the XMLNS namespace
-				{
+				if(XMLNS_NAMESPACE_URI.equals(attributeNamespaceURI) && ATTRIBUTE_XMLNS.equals(attributeLocalName)) { //don't write xmlns:xmlns attributes TODO fix; this is to keep xmlns:xmlns from being redefined, because apparently the Java parse things xmlns="" is in the XMLNS namespace
 					continue;
 				}
 				final String attributeValue = attribute.getNodeValue(); //get the value of the attribute
-				if(attributeNamespaceURI == null && ATTRIBUTE_CLASS.equals(attributeLocalName)) //treat the class attribute independently and separately
-				{
+				if(attributeNamespaceURI == null && ATTRIBUTE_CLASS.equals(attributeLocalName)) { //treat the class attribute independently and separately
 					classAttributeValue = attributeValue; //save the class attribute for later
 					continue;
 				}
@@ -247,17 +209,13 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 	 * @param element The element the content of which should be rendered.
 	 * @throws IOException if there is an error rendering the component.
 	 */
-	protected void updateElementContent(final Element element) throws IOException
-	{
+	protected void updateElementContent(final Element element) throws IOException {
 		final NodeList childNodes = element.getChildNodes(); //get the list of child nodes
 		final int childNodeCount = childNodes.getLength(); //find the number of child nodes
-		for(int childNodeIndex = 0; childNodeIndex < childNodeCount; ++childNodeIndex) //for each child node
-		{
+		for(int childNodeIndex = 0; childNodeIndex < childNodeCount; ++childNodeIndex) { //for each child node
 			final Node childNode = childNodes.item(childNodeIndex); //get a reference to this child node
 			final int nodeType = childNode.getNodeType(); //get a reference to this node type
-			switch(nodeType)
-			//see which type of node this is
-			{
+			switch(nodeType) { //see which type of node this is
 				case Node.ELEMENT_NODE:
 					updateElement((Element)childNode); //update this child element
 					break;
@@ -272,15 +230,13 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 	 * Cached information associating a pre-parsed XML document with a string.
 	 * @author Garret Wilson
 	 */
-	protected static class CachedDocument
-	{
+	protected static class CachedDocument {
 
 		/** The text for which there is a cached XML document. */
 		private final String text;
 
 		/** @return The text for which there is a cached XML document. */
-		public String getText()
-		{
+		public String getText() {
 			return text;
 		}
 
@@ -288,8 +244,7 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 		private final Document document;
 
 		/** @return The cached XML document. */
-		public Document getDocument()
-		{
+		public Document getDocument() {
 			return document;
 		}
 
@@ -298,8 +253,7 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 		 * @param text The text for which there is a cached XML document.
 		 * @param document The cached XML document.
 		 */
-		public CachedDocument(final String text, final Document document)
-		{
+		public CachedDocument(final String text, final Document document) {
 			this.text = checkInstance(text, "Text cannot be null.");
 			this.document = checkInstance(document, "Document cannot be null.");
 		}

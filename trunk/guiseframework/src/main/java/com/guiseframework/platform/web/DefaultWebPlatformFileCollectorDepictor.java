@@ -16,11 +16,10 @@
 
 package com.guiseframework.platform.web;
 
-/**The default web depictor for a platform file collector.
-This implementation supports both Flash <code>flash.net.FileReferenceList</code> and Google Gears.
-@author Garret Wilson
-*/
-public class DefaultWebPlatformFileCollectorDepictor extends AbstractWebPlatformFileCollectorDepictor
-{
+/**
+ * The default web depictor for a platform file collector. This implementation supports both Flash <code>flash.net.FileReferenceList</code> and Google Gears.
+ * @author Garret Wilson
+ */
+public class DefaultWebPlatformFileCollectorDepictor extends AbstractWebPlatformFileCollectorDepictor {
 
 }

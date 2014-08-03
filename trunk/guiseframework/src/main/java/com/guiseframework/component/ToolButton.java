@@ -24,73 +24,71 @@ import com.guiseframework.event.MouseExitEvent;
 import com.guiseframework.model.*;
 import com.guiseframework.prototype.ActionPrototype;
 
-/**Control with an action model rendered as a tool button.
-Tool buttons are typically presented on toolbars and rendered differently than a normal button;
-they usually are more subtle and may only present button decorations upon certain gestures such as mouse overs.
-@author Garret Wilson
-*/
-public class ToolButton extends AbstractButtonControl implements ToolButtonControl
-{
+/**
+ * Control with an action model rendered as a tool button. Tool buttons are typically presented on toolbars and rendered differently than a normal button; they
+ * usually are more subtle and may only present button decorations upon certain gestures such as mouse overs.
+ * @author Garret Wilson
+ */
+public class ToolButton extends AbstractButtonControl implements ToolButtonControl {
 
-	/**Default constructor.*/
-	public ToolButton()
-	{
-		this(new DefaultInfoModel(), new DefaultActionModel(), new DefaultEnableable());	//construct the class with default models
+	/** Default constructor. */
+	public ToolButton() {
+		this(new DefaultInfoModel(), new DefaultActionModel(), new DefaultEnableable()); //construct the class with default models
 	}
 
-	/**Label constructor.
-	@param label The text of the label, or <code>null</code> if there should be no label.
-	*/
-	public ToolButton(final String label)
-	{
-		this(label, null);	//construct the class with no icon
+	/**
+	 * Label constructor.
+	 * @param label The text of the label, or <code>null</code> if there should be no label.
+	 */
+	public ToolButton(final String label) {
+		this(label, null); //construct the class with no icon
 	}
 
-	/**Label and icon constructor.
-	@param label The text of the label, or <code>null</code> if there should be no label.
-	@param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
-	*/
-	public ToolButton(final String label, final URI icon)
-	{
-		this(new DefaultInfoModel(label, icon), new DefaultActionModel(), new DefaultEnableable());	//construct the class  with a default info model and the given label text
+	/**
+	 * Label and icon constructor.
+	 * @param label The text of the label, or <code>null</code> if there should be no label.
+	 * @param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
+	 */
+	public ToolButton(final String label, final URI icon) {
+		this(new DefaultInfoModel(label, icon), new DefaultActionModel(), new DefaultEnableable()); //construct the class  with a default info model and the given label text
 	}
 
-	/**Info model, action model, and enableable object constructor.
-	@param infoModel The component info model.
-	@param actionModel The component action model.
-	@param enableable The enableable object in which to store enabled status.
-	@throws NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
-	*/
-	public ToolButton(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable)
-	{
-		super(infoModel, actionModel, enableable);	//construct the parent class
+	/**
+	 * Info model, action model, and enableable object constructor.
+	 * @param infoModel The component info model.
+	 * @param actionModel The component action model.
+	 * @param enableable The enableable object in which to store enabled status.
+	 * @throws NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
+	 */
+	public ToolButton(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable) {
+		super(infoModel, actionModel, enableable); //construct the parent class
 	}
 
-	/**Prototype constructor.
-	@param actionPrototype The prototype on which this component should be based.
-	@throws NullPointerException if the given prototype is <code>null</code>.
-	*/
-	public ToolButton(final ActionPrototype actionPrototype)
-	{
-		this(actionPrototype, actionPrototype, actionPrototype);	//use the action prototype as every needed model
-		addMouseListener(new MouseAdapter()	//listen for the mouse over the control TODO eventually promote this (with modified logic for menus) to the tops of all action control hierarchy, as we already ignore rollover change unless needed
-		{
-			/**Called when the mouse enters the target.
-			@param mouseEvent The event providing mouse information
-			*/
-			public void mouseEntered(final MouseEnterEvent mouseEvent)
-			{
-				setRollover(true);	//turn on the rollover state
+	/**
+	 * Prototype constructor.
+	 * @param actionPrototype The prototype on which this component should be based.
+	 * @throws NullPointerException if the given prototype is <code>null</code>.
+	 */
+	public ToolButton(final ActionPrototype actionPrototype) {
+		this(actionPrototype, actionPrototype, actionPrototype); //use the action prototype as every needed model
+		addMouseListener(new MouseAdapter() { //listen for the mouse over the control TODO eventually promote this (with modified logic for menus) to the tops of all action control hierarchy, as we already ignore rollover change unless needed
+
+			/**
+			 * Called when the mouse enters the target.
+			 * @param mouseEvent The event providing mouse information
+			 */
+			public void mouseEntered(final MouseEnterEvent mouseEvent) {
+				setRollover(true); //turn on the rollover state
 			}
 
-			/**Called when the mouse exits the target.
-			@param mouseEvent The event providing mouse information
-			*/
-			public void mouseExited(final MouseExitEvent mouseEvent)
-			{
-				setRollover(false);	//turn off the rollover state
+			/**
+			 * Called when the mouse exits the target.
+			 * @param mouseEvent The event providing mouse information
+			 */
+			public void mouseExited(final MouseExitEvent mouseEvent) {
+				setRollover(false); //turn off the rollover state
 			}
 		});
 	}
-	
+
 }

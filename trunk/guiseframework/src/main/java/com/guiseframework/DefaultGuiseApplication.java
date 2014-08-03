@@ -18,25 +18,23 @@ package com.guiseframework;
 
 import java.net.URI;
 
-/**The default implementation of a Guise application.
-@author Garret Wilson
-*/
-public class DefaultGuiseApplication extends AbstractGuiseApplication
-{
+/**
+ * The default implementation of a Guise application.
+ * @author Garret Wilson
+ */
+public class DefaultGuiseApplication extends AbstractGuiseApplication {
 
-	/**Default constructor with no identifier.*/
-	public DefaultGuiseApplication()
-	{
+	/** Default constructor with no identifier. */
+	public DefaultGuiseApplication() {
 		this(null);
 	}
 
-	/**URI constructor.
-	The URI identifier may or may not be the URI at which the application can be accessed.
-	@param uri The URI for the application, or <code>null</code> if there is no identifier.
-	*/
-	public DefaultGuiseApplication(final URI uri)
-	{
-		super(uri);	//construct the parent class
+	/**
+	 * URI constructor. The URI identifier may or may not be the URI at which the application can be accessed.
+	 * @param uri The URI for the application, or <code>null</code> if there is no identifier.
+	 */
+	public DefaultGuiseApplication(final URI uri) {
+		super(uri); //construct the parent class
 	}
 
 }

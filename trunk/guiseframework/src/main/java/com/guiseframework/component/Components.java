@@ -24,8 +24,7 @@ import com.globalmentor.net.URIPath;
  * Utility methods for working with components.
  * @author Garret Wilson
  */
-public class Components
-{
+public class Components {
 
 	/**
 	 * Determines the navigation path of the given component, based upon the {@link NavigationComponent}(s) in the component hierarchy.
@@ -35,18 +34,14 @@ public class Components
 	 * @param component The component for which the navigation path should be found.
 	 * @return The navigation path for the given component.
 	 */
-	public static URIPath getNavigationPath(Component component)
-	{
+	public static URIPath getNavigationPath(Component component) {
 		URIPath navigationPath = null;
-		do
-		{
-			if(component instanceof NavigationComponent) //if this component may have navigation information
-			{
+		do {
+			if(component instanceof NavigationComponent) { //if this component may have navigation information
 				navigationPath = ((NavigationComponent)component).getNavigationPath(); //ask the component for navigation information
 			}
 			component = component.getParent(); //get the component parent in case we need to keep looking
-		}
-		while(component != null && navigationPath == null); //keep looking until we find the first navigation path---or we run out of components in the hierarchy
+		} while(component != null && navigationPath == null); //keep looking until we find the first navigation path---or we run out of components in the hierarchy
 		return navigationPath; //return the navigation path, if any
 	}
 
@@ -56,8 +51,7 @@ public class Components
 	 * @throws NullPointerException if the given component is <code>null</code>.
 	 * @return The collection of components.
 	 */
-	public static Collection<Component> getComponents(final Component component)
-	{
+	public static Collection<Component> getComponents(final Component component) {
 		return getComponents(component, new HashSet<Component>()); //return all components in a hash set
 	}
 
@@ -68,8 +62,7 @@ public class Components
 	 * @throws NullPointerException if the given component and/or collection is <code>null</code>.
 	 * @return The component collection.
 	 */
-	public static <T extends Collection<Component>> T getComponents(final Component component, final T componentCollection)
-	{
+	public static <T extends Collection<Component>> T getComponents(final Component component, final T componentCollection) {
 		return getComponents(component, Component.class, componentCollection, true, true); //get all components deeply
 	}
 
@@ -87,15 +80,12 @@ public class Components
 	 * @return The component collection.
 	 */
 	public static <C, T extends Collection<C>> T getComponents(final Component component, final Class<C> componentClass, final T componentCollection,
-			final boolean deep, final boolean below)
-	{
+			final boolean deep, final boolean below) {
 		final boolean match = componentClass.isInstance(component); //determine if this component is an instance of the given class
-		if(match) //if the component is an instance of the given class
-		{
+		if(match) { //if the component is an instance of the given class
 			componentCollection.add(componentClass.cast(component)); //add the component to the collection
 		}
-		if(deep && (!match || below) && component instanceof CompositeComponent) //if we should go deep, see if this is not a match (or they want to search matches, too) and if this is is a composite component
-		{
+		if(deep && (!match || below) && component instanceof CompositeComponent) { //if we should go deep, see if this is not a match (or they want to search matches, too) and if this is is a composite component
 			getChildComponents((CompositeComponent)component, componentClass, componentCollection, deep, below); //get the components of the child components
 		}
 		return componentCollection; //return the collection
@@ -107,8 +97,7 @@ public class Components
 	 * @throws NullPointerException if the given component is <code>null</code>.
 	 * @return The collection of components.
 	 */
-	public static Collection<Component> getDescendantComponents(final CompositeComponent compositeComponent)
-	{
+	public static Collection<Component> getDescendantComponents(final CompositeComponent compositeComponent) {
 		return getDescendantComponents(compositeComponent, new HashSet<Component>()); //return all descendant components in a hash set
 	}
 
@@ -119,8 +108,7 @@ public class Components
 	 * @throws NullPointerException if the given component and/or collection is <code>null</code>.
 	 * @return The component collection.
 	 */
-	public static <T extends Collection<Component>> T getDescendantComponents(final CompositeComponent compositeComponent, final T componentCollection)
-	{
+	public static <T extends Collection<Component>> T getDescendantComponents(final CompositeComponent compositeComponent, final T componentCollection) {
 		return getChildComponents(compositeComponent, Component.class, componentCollection, true, true); //get all child components deeply
 	}
 
@@ -138,10 +126,8 @@ public class Components
 	 * @return The component collection.
 	 */
 	public static <C, T extends Collection<C>> T getChildComponents(final CompositeComponent compositeComponent, final Class<C> componentClass,
-			final T componentCollection, final boolean deep, final boolean below)
-	{
-		for(final Component childComponent : compositeComponent.getChildComponents()) //for each child component
-		{
+			final T componentCollection, final boolean deep, final boolean below) {
+		for(final Component childComponent : compositeComponent.getChildComponents()) { //for each child component
 			getComponents(childComponent, componentClass, componentCollection, deep, below); //get the components under the child component
 		}
 		return componentCollection; //return the collection
@@ -154,8 +140,7 @@ public class Components
 	 * @throws NullPointerException if one of the given components is <code>null</code>.
 	 * @return <code>true</code> if the given component is the composite component or is a descendant of the given composite component.
 	 */
-	public static boolean hasComponent(final Component component, final Component hasComponent)
-	{
+	public static boolean hasComponent(final Component component, final Component hasComponent) {
 		return hasComponent(component, hasComponent, true); //do a deep search for the component
 	}
 
@@ -167,14 +152,10 @@ public class Components
 	 * @throws NullPointerException if one of the given components is <code>null</code>.
 	 * @return <code>true</code> if the given component is the composite component or is a descendant of the given composite component.
 	 */
-	public static boolean hasComponent(final Component component, final Component hasComponent, final boolean deep)
-	{
-		if(component.equals(hasComponent)) //if the components are equal
-		{
+	public static boolean hasComponent(final Component component, final Component hasComponent, final boolean deep) {
+		if(component.equals(hasComponent)) { //if the components are equal
 			return true; //we found the component
-		}
-		else if(deep && component instanceof CompositeComponent) //if we should search deeply and this is a composite component
-		{
+		} else if(deep && component instanceof CompositeComponent) { //if we should search deeply and this is a composite component
 			return hasChildComponent((CompositeComponent)component, hasComponent, deep); //check the children
 		}
 		return false; //this is not the component, and we were asked not to check deeply
@@ -187,8 +168,7 @@ public class Components
 	 * @throws NullPointerException if the given composite component or component is <code>null</code>.
 	 * @return Whether the given component is a descendant of the given composite component.
 	 */
-	public static boolean hasChildComponent(final CompositeComponent compositeComponent, final Component component)
-	{
+	public static boolean hasChildComponent(final CompositeComponent compositeComponent, final Component component) {
 		return hasChildComponent(compositeComponent, component, true); //do a deep search on the children
 	}
 
@@ -200,25 +180,16 @@ public class Components
 	 * @throws NullPointerException if the given composite component or component is <code>null</code>.
 	 * @return Whether the given component is a descendant of the given composite component.
 	 */
-	public static boolean hasChildComponent(final CompositeComponent compositeComponent, final Component component, final boolean deep)
-	{
-		if(deep) //if we should search deeply, do this a tree at a time so as not to redundantly iterate
-		{
-			for(final Component childComponent : compositeComponent.getChildComponents()) //for each child component
-			{
-				if(hasComponent(childComponent, component, deep)) //if this child is or has the component
-				{
+	public static boolean hasChildComponent(final CompositeComponent compositeComponent, final Component component, final boolean deep) {
+		if(deep) { //if we should search deeply, do this a tree at a time so as not to redundantly iterate
+			for(final Component childComponent : compositeComponent.getChildComponents()) { //for each child component
+				if(hasComponent(childComponent, component, deep)) { //if this child is or has the component
 					return true; //we found the component
 				}
 			}
-		}
-		else
-		//if we should not search deeply
-		{
-			for(final Component childComponent : compositeComponent.getChildComponents()) //for each child component
-			{
-				if(compositeComponent.equals(component)) //if the components are equal
-				{
+		} else { //if we should not search deeply
+			for(final Component childComponent : compositeComponent.getChildComponents()) { //for each child component
+				if(compositeComponent.equals(component)) { //if the components are equal
 					return true; //we found the component
 				}
 			}

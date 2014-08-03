@@ -33,15 +33,13 @@ import com.guiseframework.prototype.*;
  * </p>
  * @author Garret Wilson
  */
-public class Toolbar extends AbstractPanel implements LabelDisplayableComponent
-{
+public class Toolbar extends AbstractPanel implements LabelDisplayableComponent {
 
 	/** Whether the icon is displayed. */
 	private boolean iconDisplayed = true;
 
 	/** @return Whether the icon is displayed. */
-	public boolean isIconDisplayed()
-	{
+	public boolean isIconDisplayed() {
 		return iconDisplayed;
 	}
 
@@ -51,10 +49,8 @@ public class Toolbar extends AbstractPanel implements LabelDisplayableComponent
 	 *          space.
 	 * @see #ICON_DISPLAYED_PROPERTY
 	 */
-	public void setIconDisplayed(final boolean newIconDisplayed)
-	{
-		if(iconDisplayed != newIconDisplayed) //if the value is really changing
-		{
+	public void setIconDisplayed(final boolean newIconDisplayed) {
+		if(iconDisplayed != newIconDisplayed) { //if the value is really changing
 			final boolean oldIconDisplayed = iconDisplayed; //get the current value
 			iconDisplayed = newIconDisplayed; //update the value
 			firePropertyChange(ICON_DISPLAYED_PROPERTY, Boolean.valueOf(oldIconDisplayed), Boolean.valueOf(newIconDisplayed));
@@ -65,8 +61,7 @@ public class Toolbar extends AbstractPanel implements LabelDisplayableComponent
 	private boolean labelDisplayed = false;
 
 	/** @return Whether the label is displayed. */
-	public boolean isLabelDisplayed()
-	{
+	public boolean isLabelDisplayed() {
 		return labelDisplayed;
 	}
 
@@ -76,10 +71,8 @@ public class Toolbar extends AbstractPanel implements LabelDisplayableComponent
 	 *          space.
 	 * @see #LABEL_DISPLAYED_PROPERTY
 	 */
-	public void setLabelDisplayed(final boolean newLabelDisplayed)
-	{
-		if(labelDisplayed != newLabelDisplayed) //if the value is really changing
-		{
+	public void setLabelDisplayed(final boolean newLabelDisplayed) {
+		if(labelDisplayed != newLabelDisplayed) { //if the value is really changing
 			final boolean oldLabelDisplayed = labelDisplayed; //get the current value
 			labelDisplayed = newLabelDisplayed; //update the value
 			firePropertyChange(LABEL_DISPLAYED_PROPERTY, Boolean.valueOf(oldLabelDisplayed), Boolean.valueOf(newLabelDisplayed));
@@ -87,8 +80,7 @@ public class Toolbar extends AbstractPanel implements LabelDisplayableComponent
 	}
 
 	/** Default constructor with a default horizontal flow layout. */
-	public Toolbar()
-	{
+	public Toolbar() {
 		this(new FlowLayout(Flow.LINE)); //default to flowing horizontal
 	}
 
@@ -97,19 +89,15 @@ public class Toolbar extends AbstractPanel implements LabelDisplayableComponent
 	 * @param layout The layout definition for the container.
 	 * @throws NullPointerException if the given layout is <code>null</code>.
 	 */
-	public Toolbar(final Layout<?> layout)
-	{
+	public Toolbar(final Layout<?> layout) {
 		super(layout); //construct the parent class
 		//create a listener that will update all child components' icon/label displayed status
-		final GenericPropertyChangeListener<Boolean> labelDisplayedPropertyChangeListener = new AbstractGenericPropertyChangeListener<Boolean>()
-		{
+		final GenericPropertyChangeListener<Boolean> labelDisplayedPropertyChangeListener = new AbstractGenericPropertyChangeListener<Boolean>() {
+
 			@Override
-			public void propertyChange(GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent)
-			{
-				for(final Component childComponent : getChildComponents()) //update the displayed status of all child components
-				{
-					if(childComponent instanceof LabelDisplayableComponent) //if this component can modify its label displayed status
-					{
+			public void propertyChange(GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent) {
+				for(final Component childComponent : getChildComponents()) { //update the displayed status of all child components
+					if(childComponent instanceof LabelDisplayableComponent) { //if this component can modify its label displayed status
 						((LabelDisplayableComponent)childComponent).setIconDisplayed(isIconDisplayed()); //turn the icon on or off
 						((LabelDisplayableComponent)childComponent).setLabelDisplayed(isLabelDisplayed()); //turn the label on or off
 					}
@@ -135,27 +123,19 @@ public class Toolbar extends AbstractPanel implements LabelDisplayableComponent
 	 * @return A new component based upon the given prototype.
 	 * @throws IllegalArgumentException if no component can be created from the given prototype
 	 */
-	public Component createComponent(final Prototype prototype)
-	{
+	public Component createComponent(final Prototype prototype) {
 		final Component component;
-		if(prototype instanceof ActionPrototype) //action prototypes
-		{
+		if(prototype instanceof ActionPrototype) { //action prototypes
 			component = new ToolButton((ActionPrototype)prototype);
-		}
-		else if(prototype instanceof TogglePrototype) //toggle prototypes
-		{
+		} else if(prototype instanceof TogglePrototype) { //toggle prototypes
 			final TogglePrototype togglePrototype = (TogglePrototype)prototype; //get the toggle prototype
 			final BooleanSelectToolButton booleanSelectToolButton = new BooleanSelectToolButton(togglePrototype); //create a boolean select tool button
 			booleanSelectToolButton.setToggle(true); //turn on toggling
 			component = booleanSelectToolButton; //use the button
-		}
-		else
-		//for all other components
-		{
+		} else { //for all other components
 			component = super.createComponent(prototype); //create a default component
 		}
-		if(component instanceof LabelDisplayableComponent) //if this component can modify its label displayed status
-		{
+		if(component instanceof LabelDisplayableComponent) { //if this component can modify its label displayed status
 			((LabelDisplayableComponent)component).setIconDisplayed(isIconDisplayed()); //turn the icon on or off
 			((LabelDisplayableComponent)component).setLabelDisplayed(isLabelDisplayed()); //turn the label on or off
 		}

@@ -46,21 +46,18 @@ import com.guiseframework.model.*;
  * @author Garret Wilson
  * @see ReferenceLayout
  */
-public class TextBox extends AbstractContainer implements TextModel, SectionComponent
-{
+public class TextBox extends AbstractContainer implements TextModel, SectionComponent {
 
 	/** The text model used by this component. */
 	private final TextModel textModel;
 
 	/** @return The text model used by this component. */
-	protected TextModel getTextModel()
-	{
+	protected TextModel getTextModel() {
 		return textModel;
 	}
 
 	/** @return The layout definition for the text. */
-	public ReferenceLayout getLayout()
-	{
+	public ReferenceLayout getLayout() {
 		return (ReferenceLayout)super.getLayout(); //a text component can only have a reference layout
 	}
 
@@ -68,16 +65,13 @@ public class TextBox extends AbstractContainer implements TextModel, SectionComp
 	private SectionType sectionType = null;
 
 	@Override
-	public SectionType getSectionType()
-	{
+	public SectionType getSectionType() {
 		return sectionType;
 	}
 
 	@Override
-	public void setSectionType(final SectionType newSectionType)
-	{
-		if(sectionType != newSectionType) //if the value is really changing
-		{
+	public void setSectionType(final SectionType newSectionType) {
+		if(sectionType != newSectionType) { //if the value is really changing
 			final SectionType oldType = sectionType; //get the old value
 			sectionType = newSectionType; //actually change the value
 			firePropertyChange(SECTION_TYPE_PROPERTY, oldType, newSectionType); //indicate that the value changed
@@ -85,8 +79,7 @@ public class TextBox extends AbstractContainer implements TextModel, SectionComp
 	}
 
 	/** Default constructor with a default text model. */
-	public TextBox()
-	{
+	public TextBox() {
 		this((String)null); //construct the class with no text
 	}
 
@@ -94,8 +87,7 @@ public class TextBox extends AbstractContainer implements TextModel, SectionComp
 	 * Text constructor with a default {@link Model#PLAIN_TEXT_CONTENT_TYPE} content type.
 	 * @param text The text, which may include a resource reference, or <code>null</code> if there is no text.
 	 */
-	public TextBox(final String text)
-	{
+	public TextBox(final String text) {
 		this(text, PLAIN_TEXT_CONTENT_TYPE); //construct the class with a plain text content type
 	}
 
@@ -106,8 +98,7 @@ public class TextBox extends AbstractContainer implements TextModel, SectionComp
 	 * @throws NullPointerException if the given content type is <code>null</code>.
 	 * @throws IllegalArgumentException if the given content type is not a text content type.
 	 */
-	public TextBox(final String text, final ContentType textContentType)
-	{
+	public TextBox(final String text, final ContentType textContentType) {
 		this(new DefaultTextModel(text, textContentType)); //construct the class with a default text model using the given values
 	}
 
@@ -116,8 +107,7 @@ public class TextBox extends AbstractContainer implements TextModel, SectionComp
 	 * @param textModel The component text model.
 	 * @throws NullPointerException if the given text model is <code>null</code>.
 	 */
-	public TextBox(final TextModel textModel)
-	{
+	public TextBox(final TextModel textModel) {
 		super(new ReferenceLayout()); //construct the parent class
 		this.textModel = checkInstance(textModel, "Text model cannot be null."); //save the text model
 		this.textModel.addPropertyChangeListener(getRepeatPropertyChangeListener()); //listen and repeat all property changes of the text model
@@ -127,8 +117,7 @@ public class TextBox extends AbstractContainer implements TextModel, SectionComp
 	//TextModel delegates 
 
 	/** @return The text, which may include a resource reference, or <code>null</code> if there is no text. */
-	public String getText()
-	{
+	public String getText() {
 		return getTextModel().getText();
 	}
 
@@ -137,14 +126,12 @@ public class TextBox extends AbstractContainer implements TextModel, SectionComp
 	 * @param newText The new text, which may include a resource reference.
 	 * @see #TEXT_PROPERTY
 	 */
-	public void setText(final String newText)
-	{
+	public void setText(final String newText) {
 		getTextModel().setText(newText);
 	}
 
 	/** @return The content type of the text. */
-	public ContentType getTextContentType()
-	{
+	public ContentType getTextContentType() {
 		return getTextModel().getTextContentType();
 	}
 
@@ -155,8 +142,7 @@ public class TextBox extends AbstractContainer implements TextModel, SectionComp
 	 * @throws IllegalArgumentException if the given content type is not a text content type.
 	 * @see #TEXT_CONTENT_TYPE_PROPERTY
 	 */
-	public void setTextContentType(final ContentType newTextContentType)
-	{
+	public void setTextContentType(final ContentType newTextContentType) {
 		getTextModel().setTextContentType(newTextContentType);
 	}
 

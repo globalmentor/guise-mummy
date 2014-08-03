@@ -23,280 +23,273 @@ import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 import com.guiseframework.prototype.*;
 
-/**An abstract menu component.
-This implementation initially closes any child menu added to this menu.
-@author Garret Wilson
-*/
-public abstract class AbstractMenu extends AbstractContainerControl implements Menu  
-{
+/**
+ * An abstract menu component. This implementation initially closes any child menu added to this menu.
+ * @author Garret Wilson
+ */
+public abstract class AbstractMenu extends AbstractContainerControl implements Menu {
 
-	/**@return The layout definition for the menu.*/
-	public MenuLayout getLayout() {return (MenuLayout)super.getLayout();}	//a menu can only have a menu layout
+	/** @return The layout definition for the menu. */
+	public MenuLayout getLayout() {
+		return (MenuLayout)super.getLayout();
+	} //a menu can only have a menu layout
 
-	/**The action model used by this component.*/
+	/** The action model used by this component. */
 	private final ActionModel actionModel;
 
-		/**@return The action model used by this component.*/
-		protected ActionModel getActionModel() {return actionModel;}
+	/** @return The action model used by this component. */
+	protected ActionModel getActionModel() {
+		return actionModel;
+	}
 
-	/**Whether the icon is displayed.*/
-	private boolean iconDisplayed=true;
+	/** Whether the icon is displayed. */
+	private boolean iconDisplayed = true;
 
-		/**@return Whether the icon is displayed.*/
-		public boolean isIconDisplayed() {return iconDisplayed;}
+	/** @return Whether the icon is displayed. */
+	public boolean isIconDisplayed() {
+		return iconDisplayed;
+	}
 
-		/**Sets whether the icon is displayed.
-		This is a bound property of type <code>Boolean</code>.
-		@param newIconDisplayed <code>true</code> if the icon should be displayed, else <code>false</code> if the icon should not be displayed and take up no space.
-		@see #ICON_DISPLAYED_PROPERTY
-		*/
-		public void setIconDisplayed(final boolean newIconDisplayed)
-		{
-			if(iconDisplayed!=newIconDisplayed)	//if the value is really changing
-			{
-				final boolean oldIconDisplayed=iconDisplayed;	//get the current value
-				iconDisplayed=newIconDisplayed;	//update the value
-				firePropertyChange(ICON_DISPLAYED_PROPERTY, Boolean.valueOf(oldIconDisplayed), Boolean.valueOf(newIconDisplayed));
-			}
+	/**
+	 * Sets whether the icon is displayed. This is a bound property of type <code>Boolean</code>.
+	 * @param newIconDisplayed <code>true</code> if the icon should be displayed, else <code>false</code> if the icon should not be displayed and take up no
+	 *          space.
+	 * @see #ICON_DISPLAYED_PROPERTY
+	 */
+	public void setIconDisplayed(final boolean newIconDisplayed) {
+		if(iconDisplayed != newIconDisplayed) { //if the value is really changing
+			final boolean oldIconDisplayed = iconDisplayed; //get the current value
+			iconDisplayed = newIconDisplayed; //update the value
+			firePropertyChange(ICON_DISPLAYED_PROPERTY, Boolean.valueOf(oldIconDisplayed), Boolean.valueOf(newIconDisplayed));
 		}
+	}
 
-	/**Whether the label is displayed.*/
-	private boolean labelDisplayed=true;
+	/** Whether the label is displayed. */
+	private boolean labelDisplayed = true;
 
-		/**@return Whether the label is displayed.*/
-		public boolean isLabelDisplayed() {return labelDisplayed;}
+	/** @return Whether the label is displayed. */
+	public boolean isLabelDisplayed() {
+		return labelDisplayed;
+	}
 
-		/**Sets whether the label is displayed.
-		This is a bound property of type <code>Boolean</code>.
-		@param newLabelDisplayed <code>true</code> if the label should be displayed, else <code>false</code> if the label should not be displayed and take up no space.
-		@see #LABEL_DISPLAYED_PROPERTY
-		*/
-		public void setLabelDisplayed(final boolean newLabelDisplayed)
-		{
-			if(labelDisplayed!=newLabelDisplayed)	//if the value is really changing
-			{
-				final boolean oldLabelDisplayed=labelDisplayed;	//get the current value
-				labelDisplayed=newLabelDisplayed;	//update the value
-				firePropertyChange(LABEL_DISPLAYED_PROPERTY, Boolean.valueOf(oldLabelDisplayed), Boolean.valueOf(newLabelDisplayed));
-			}
+	/**
+	 * Sets whether the label is displayed. This is a bound property of type <code>Boolean</code>.
+	 * @param newLabelDisplayed <code>true</code> if the label should be displayed, else <code>false</code> if the label should not be displayed and take up no
+	 *          space.
+	 * @see #LABEL_DISPLAYED_PROPERTY
+	 */
+	public void setLabelDisplayed(final boolean newLabelDisplayed) {
+		if(labelDisplayed != newLabelDisplayed) { //if the value is really changing
+			final boolean oldLabelDisplayed = labelDisplayed; //get the current value
+			labelDisplayed = newLabelDisplayed; //update the value
+			firePropertyChange(LABEL_DISPLAYED_PROPERTY, Boolean.valueOf(oldLabelDisplayed), Boolean.valueOf(newLabelDisplayed));
 		}
+	}
 
-	/**Whether the menu is open.*/
-	private boolean open=true;
+	/** Whether the menu is open. */
+	private boolean open = true;
 
-		/**@return Whether the menu is open.*/
-		public boolean isOpen() {return open;}
+	/** @return Whether the menu is open. */
+	public boolean isOpen() {
+		return open;
+	}
 
-		/**Sets whether the menu is open.
-		This is a bound property of type <code>Boolean</code>.
-		@param newOpen <code>true</code> if the menu should be open.
-		@see #OPEN_PROPERTY
-		*/
-		public void setOpen(final boolean newOpen)
-		{
-			if(open!=newOpen)	//if the value is really changing
-			{
-				final boolean oldOpen=open;	//get the old value
-				open=newOpen;	//actually change the value
-				firePropertyChange(OPEN_PROPERTY, Boolean.valueOf(oldOpen), Boolean.valueOf(newOpen));	//indicate that the value changed
-			}			
+	/**
+	 * Sets whether the menu is open. This is a bound property of type <code>Boolean</code>.
+	 * @param newOpen <code>true</code> if the menu should be open.
+	 * @see #OPEN_PROPERTY
+	 */
+	public void setOpen(final boolean newOpen) {
+		if(open != newOpen) { //if the value is really changing
+			final boolean oldOpen = open; //get the old value
+			open = newOpen; //actually change the value
+			firePropertyChange(OPEN_PROPERTY, Boolean.valueOf(oldOpen), Boolean.valueOf(newOpen)); //indicate that the value changed
 		}
+	}
 
-	/**Whether the component is in a rollover state.*/
-	private boolean rollover=false;
+	/** Whether the component is in a rollover state. */
+	private boolean rollover = false;
 
-		/**@return Whether the component is in a rollover state.*/
-		public boolean isRollover() {return rollover;}
+	/** @return Whether the component is in a rollover state. */
+	public boolean isRollover() {
+		return rollover;
+	}
 
-		/**Sets whether the component is in a rollover state.
-		This is a bound property of type <code>Boolean</code>.
-		@param newRollover <code>true</code> if the component should be in a rollover state, else <code>false</code>.
-		@see Menu#ROLLOVER_PROPERTY
-		*/
-		public void setRollover(final boolean newRollover)
-		{
-			if(rollover!=newRollover)	//if the value is really changing
-			{
-				final boolean oldRollover=rollover;	//get the current value
-				rollover=newRollover;	//update the value
-				firePropertyChange(ROLLOVER_PROPERTY, Boolean.valueOf(oldRollover), Boolean.valueOf(newRollover));
-			}
+	/**
+	 * Sets whether the component is in a rollover state. This is a bound property of type <code>Boolean</code>.
+	 * @param newRollover <code>true</code> if the component should be in a rollover state, else <code>false</code>.
+	 * @see Menu#ROLLOVER_PROPERTY
+	 */
+	public void setRollover(final boolean newRollover) {
+		if(rollover != newRollover) { //if the value is really changing
+			final boolean oldRollover = rollover; //get the current value
+			rollover = newRollover; //update the value
+			firePropertyChange(ROLLOVER_PROPERTY, Boolean.valueOf(oldRollover), Boolean.valueOf(newRollover));
 		}
+	}
 
-	/**Whether the menu children will be shown during rollover.*/
-	private boolean rolloverOpenEnabled=false;
+	/** Whether the menu children will be shown during rollover. */
+	private boolean rolloverOpenEnabled = false;
 
-		/**@return Whether the menu children will be shown during rollover.*/
-		public boolean isRolloverOpenEnabled() {return rolloverOpenEnabled;}
+	/** @return Whether the menu children will be shown during rollover. */
+	public boolean isRolloverOpenEnabled() {
+		return rolloverOpenEnabled;
+	}
 
-		/**Sets whether the menu children will be shown during rollover.
-		If rollover open is enabled, the open state will not actually be changed during rollover.
-		This is a bound property of type <code>Boolean</code>.
-		@param newRolloverOpenEnabled <code>true</code> if the component should allow display during rollover, else <code>false</code>.
-		@see Menu#ROLLOVER_OPEN_ENABLED_PROPERTY
-		*/
-		public void setRolloverOpenEnabled(final boolean newRolloverOpenEnabled)
-		{
-			if(rolloverOpenEnabled!=newRolloverOpenEnabled)	//if the value is really changing
-			{
-				final boolean oldRolloverOpenEnabled=rolloverOpenEnabled;	//get the current value
-				rolloverOpenEnabled=newRolloverOpenEnabled;	//update the value
-				firePropertyChange(ROLLOVER_OPEN_ENABLED_PROPERTY, Boolean.valueOf(oldRolloverOpenEnabled), Boolean.valueOf(newRolloverOpenEnabled));
-			}
+	/**
+	 * Sets whether the menu children will be shown during rollover. If rollover open is enabled, the open state will not actually be changed during rollover.
+	 * This is a bound property of type <code>Boolean</code>.
+	 * @param newRolloverOpenEnabled <code>true</code> if the component should allow display during rollover, else <code>false</code>.
+	 * @see Menu#ROLLOVER_OPEN_ENABLED_PROPERTY
+	 */
+	public void setRolloverOpenEnabled(final boolean newRolloverOpenEnabled) {
+		if(rolloverOpenEnabled != newRolloverOpenEnabled) { //if the value is really changing
+			final boolean oldRolloverOpenEnabled = rolloverOpenEnabled; //get the current value
+			rolloverOpenEnabled = newRolloverOpenEnabled; //update the value
+			firePropertyChange(ROLLOVER_OPEN_ENABLED_PROPERTY, Boolean.valueOf(oldRolloverOpenEnabled), Boolean.valueOf(newRolloverOpenEnabled));
 		}
+	}
 
-	/**Info model, action model, enableable, and menu layout constructor.
-	@param infoModel The component info model.
-	@param actionModel The component action model.
-	@param enableable The enableable object in which to store enabled status.
-	@param layout The layout definition for the container.
-	@throws NullPointerException if the given info model, action model, enableable, and/or layout is <code>null</code>.
-	*/
-	public AbstractMenu(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable, final MenuLayout layout)
-	{
-		super(infoModel, enableable, layout);	//construct the parent class
-		this.actionModel=checkInstance(actionModel, "Action model cannot be null.");	//save the action model
-		this.actionModel.addActionListener(new ActionListener()	//create an action repeater to forward events to this component's listeners TODO create a common method to create a forwarding listener, if we can
-				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed
-					{
-						fireActionPerformed(1, 0);	//fire an action with this component as the source TODO important---shouldn't we use a copy constructor, here?
+	/**
+	 * Info model, action model, enableable, and menu layout constructor.
+	 * @param infoModel The component info model.
+	 * @param actionModel The component action model.
+	 * @param enableable The enableable object in which to store enabled status.
+	 * @param layout The layout definition for the container.
+	 * @throws NullPointerException if the given info model, action model, enableable, and/or layout is <code>null</code>.
+	 */
+	public AbstractMenu(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable, final MenuLayout layout) {
+		super(infoModel, enableable, layout); //construct the parent class
+		this.actionModel = checkInstance(actionModel, "Action model cannot be null."); //save the action model
+		this.actionModel.addActionListener(new ActionListener() { //create an action repeater to forward events to this component's listeners TODO create a common method to create a forwarding listener, if we can
+
+					public void actionPerformed(final ActionEvent actionEvent) { //if the action is performed
+						fireActionPerformed(1, 0); //fire an action with this component as the source TODO important---shouldn't we use a copy constructor, here?
 					}
 				});
-		addMouseListener(new MouseAdapter()	//listen for the mouse over the control
-				{
-					/**Called when the mouse enters the target.
-					@param mouseEvent The event providing mouse information
-					*/
-					public void mouseEntered(final MouseEnterEvent mouseEvent)
-					{
-						if(getParent() instanceof Menu)
-						{
-							setRollover(true);	//turn on the rollover state
-						}
-					}
-		
-					/**Called when the mouse exits the target.
-					@param mouseEvent The event providing mouse information
-					*/
-					public void mouseExited(final MouseExitEvent mouseEvent)
-					{
-						if(getParent() instanceof Menu)
-						{
-							setRollover(false);	//turn off the rollover state
-						}
-					}
-				});
+		addMouseListener(new MouseAdapter() { //listen for the mouse over the control
+
+			/**
+			 * Called when the mouse enters the target.
+			 * @param mouseEvent The event providing mouse information
+			 */
+			public void mouseEntered(final MouseEnterEvent mouseEvent) {
+				if(getParent() instanceof Menu) {
+					setRollover(true); //turn on the rollover state
+				}
+			}
+
+			/**
+			 * Called when the mouse exits the target.
+			 * @param mouseEvent The event providing mouse information
+			 */
+			public void mouseExited(final MouseExitEvent mouseEvent) {
+				if(getParent() instanceof Menu) {
+					setRollover(false); //turn off the rollover state
+				}
+			}
+		});
 	}
 
-	/**Adds an action listener.
-	@param actionListener The action listener to add.
-	*/
-	public void addActionListener(final ActionListener actionListener)
-	{
-		getEventListenerManager().add(ActionListener.class, actionListener);	//add the listener
+	/**
+	 * Adds an action listener.
+	 * @param actionListener The action listener to add.
+	 */
+	public void addActionListener(final ActionListener actionListener) {
+		getEventListenerManager().add(ActionListener.class, actionListener); //add the listener
 	}
 
-	/**Removes an action listener.
-	@param actionListener The action listener to remove.
-	*/
-	public void removeActionListener(final ActionListener actionListener)
-	{
-		getEventListenerManager().remove(ActionListener.class, actionListener);	//remove the listener
+	/**
+	 * Removes an action listener.
+	 * @param actionListener The action listener to remove.
+	 */
+	public void removeActionListener(final ActionListener actionListener) {
+		getEventListenerManager().remove(ActionListener.class, actionListener); //remove the listener
 	}
 
-	/**@return all registered action listeners.*/
-	public Iterable<ActionListener> getActionListeners()
-	{
-		return getEventListenerManager().getListeners(ActionListener.class);	//remove the listener
+	/** @return all registered action listeners. */
+	public Iterable<ActionListener> getActionListeners() {
+		return getEventListenerManager().getListeners(ActionListener.class); //remove the listener
 	}
 
-	/**Performs the action with default force and default option.
-	An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
-	This method delegates to {@link #performAction(int, int)}.
-	*/
-	public void performAction()
-	{
-		getActionModel().performAction();	//delegate to the installed action model, which will fire an event which we will catch and queue for refiring
+	/**
+	 * Performs the action with default force and default option. An {@link ActionEvent} is fired to all registered {@link ActionListener}s. This method delegates
+	 * to {@link #performAction(int, int)}.
+	 */
+	public void performAction() {
+		getActionModel().performAction(); //delegate to the installed action model, which will fire an event which we will catch and queue for refiring
 	}
 
-	/**Performs the action with the given force and option.
-	An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
-	@param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
-	@param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button click.
-	*/
-	public void performAction(final int force, final int option)
-	{
-		getActionModel().performAction(force, option);	//delegate to the installed action model, which will fire an event which we will catch and queue for refiring
+	/**
+	 * Performs the action with the given force and option. An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
+	 * @param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
+	 * @param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button
+	 *          click.
+	 */
+	public void performAction(final int force, final int option) {
+		getActionModel().performAction(force, option); //delegate to the installed action model, which will fire an event which we will catch and queue for refiring
 	}
 
-	/**Fires an action event to all registered action listeners.
-	This method delegates to {@link #fireActionPerformed(ActionEvent)}.
-	@param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
-	@param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button click.
-	@see ActionListener
-	@see ActionEvent
-	*/
-	protected void fireActionPerformed(final int force, final int option)
-	{
-		if(getEventListenerManager().hasListeners(ActionListener.class))	//if there are action listeners registered
-		{
-			fireActionPerformed(new ActionEvent(this, force, option));	//create and fire a new action event
+	/**
+	 * Fires an action event to all registered action listeners. This method delegates to {@link #fireActionPerformed(ActionEvent)}.
+	 * @param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
+	 * @param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button
+	 *          click.
+	 * @see ActionListener
+	 * @see ActionEvent
+	 */
+	protected void fireActionPerformed(final int force, final int option) {
+		if(getEventListenerManager().hasListeners(ActionListener.class)) { //if there are action listeners registered
+			fireActionPerformed(new ActionEvent(this, force, option)); //create and fire a new action event
 		}
 	}
 
-	/**Fires a given action event to all registered action listeners.
-	@param actionEvent The action event to fire.
-	*/
-	protected void fireActionPerformed(final ActionEvent actionEvent)
-	{
-		for(final ActionListener actionListener:getEventListenerManager().getListeners(ActionListener.class))	//for each action listener
-		{
-			actionListener.actionPerformed(actionEvent);	//dispatch the action to the listener
+	/**
+	 * Fires a given action event to all registered action listeners.
+	 * @param actionEvent The action event to fire.
+	 */
+	protected void fireActionPerformed(final ActionEvent actionEvent) {
+		for(final ActionListener actionListener : getEventListenerManager().getListeners(ActionListener.class)) { //for each action listener
+			actionListener.actionPerformed(actionEvent); //dispatch the action to the listener
 		}
 	}
 
-	/**Adds a child component at the specified index.
-	If this component is itself a menu, this version closes that menu. 
-	Any class that overrides this method must call this version.
-	@param index The index at which the component should be added.
-	@param childComponent The component to add to this component.
-	@throws IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
-	@throws IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
-	*/
-	protected void addComponent(final int index, final Component childComponent)
-	{
-		super.addComponent(index, childComponent);	//do the default adding
-		if(childComponent instanceof Menu)	//if the component is a menu
-		{
-			((Menu)childComponent).setOpen(false);	//close the child menu
+	/**
+	 * Adds a child component at the specified index. If this component is itself a menu, this version closes that menu. Any class that overrides this method must
+	 * call this version.
+	 * @param index The index at which the component should be added.
+	 * @param childComponent The component to add to this component.
+	 * @throws IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
+	 * @throws IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
+	 */
+	protected void addComponent(final int index, final Component childComponent) {
+		super.addComponent(index, childComponent); //do the default adding
+		if(childComponent instanceof Menu) { //if the component is a menu
+			((Menu)childComponent).setOpen(false); //close the child menu
 		}
 	}
 
-	/**Creates a component appropriate for the context of this component from the given prototype.
-	This implementation creates the following components, in order of priority:
-	<dl>
-		<dt>{@link ActionPrototype}</dt> <dd>{@link Link}</dd>
-	</dl>
-	@param prototype The prototype of the component to create.
-	@return A new component based upon the given prototype.
-	@throws IllegalArgumentException if no component can be created from the given prototype
-	*/
-	public Component createComponent(final Prototype prototype)
-	{
-		if(prototype instanceof ActionPrototype && !(prototype instanceof MenuPrototype))	//action prototypes (don't create a link for menus, even though they are also action prototypes)
-		{
+	/**
+	 * Creates a component appropriate for the context of this component from the given prototype. This implementation creates the following components, in order
+	 * of priority:
+	 * <dl>
+	 * <dt>{@link ActionPrototype}</dt>
+	 * <dd>{@link Link}</dd>
+	 * </dl>
+	 * @param prototype The prototype of the component to create.
+	 * @return A new component based upon the given prototype.
+	 * @throws IllegalArgumentException if no component can be created from the given prototype
+	 */
+	public Component createComponent(final Prototype prototype) {
+		if(prototype instanceof ActionPrototype && !(prototype instanceof MenuPrototype)) { //action prototypes (don't create a link for menus, even though they are also action prototypes)
 			return new Link((ActionPrototype)prototype);
-		}
-		else if(prototype instanceof ValuePrototype)	//value prototypes
-		{
-			final Class<?> valueClass=((ValuePrototype<?>)prototype).getValueClass();	//get the type of value represented
-			if(Boolean.class.isAssignableFrom(valueClass))	//if a boolean value is represented
-			{
-				return new BooleanSelectLink((ValuePrototype<Boolean>)prototype);	//TODO testing; add comment to method signature
+		} else if(prototype instanceof ValuePrototype) { //value prototypes
+			final Class<?> valueClass = ((ValuePrototype<?>)prototype).getValueClass(); //get the type of value represented
+			if(Boolean.class.isAssignableFrom(valueClass)) { //if a boolean value is represented
+				return new BooleanSelectLink((ValuePrototype<Boolean>)prototype); //TODO testing; add comment to method signature
 			}
 		}
-		return super.createComponent(prototype);	//delegate to the parent class
+		return super.createComponent(prototype); //delegate to the parent class
 	}
 
 }

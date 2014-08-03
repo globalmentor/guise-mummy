@@ -22,8 +22,7 @@ import com.globalmentor.net.URIPath;
  * A component that keeps track of and can report its current navigation path.
  * @author Garret Wilson
  */
-public interface NavigationComponent extends Component
-{
+public interface NavigationComponent extends Component {
 
 	/** @return The navigation path relative to the application context path, or <code>null</code> if this component is not yet part of navigation. */
 	public URIPath getNavigationPath();

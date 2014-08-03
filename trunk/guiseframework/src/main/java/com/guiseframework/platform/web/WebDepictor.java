@@ -23,8 +23,7 @@ import com.guiseframework.platform.*;
  * @param <O> The type of object being depicted.
  * @author Garret Wilson
  */
-public interface WebDepictor<O extends DepictedObject> extends Depictor<O>
-{
+public interface WebDepictor<O extends DepictedObject> extends Depictor<O> {
 
 	@Override
 	public WebPlatform getPlatform();

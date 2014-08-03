@@ -59,8 +59,7 @@ import static com.guiseframework.platform.web.WebPlatform.*;
  * @param <C> The type of component being depicted.
  * @author Garret Wilson
  */
-public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends AbstractWebFrameDepictor<C>
-{
+public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends AbstractWebFrameDepictor<C> {
 
 	/** The ID segment for the hidden action input field. */
 	protected final static String ACTION_INPUT_ID_SEGMENT = "input";
@@ -85,8 +84,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 	 * @param applicationFrame The frame for which an input ID should be returned.
 	 * @return The ID of the hidden field that holds any action value.
 	 */
-	public static String getActionInputID(final ApplicationFrame applicationFrame)
-	{
+	public static String getActionInputID(final ApplicationFrame applicationFrame) {
 		return applicationFrame.getDepictID() + '.' + ACTION_INPUT_ID_SEGMENT; //create an ID for the form ID segment on the frame TODO use common routine
 	}
 
@@ -95,8 +93,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 	 * @param applicationFrame The frame for which a busy ID should be returned.
 	 * @return An ID appropriate for creating an element to contain busy component information.
 	 */
-	public static String getBusyID(final ApplicationFrame applicationFrame)
-	{
+	public static String getBusyID(final ApplicationFrame applicationFrame) {
 		//TODO fix for no form		return applicationFrame.getID()+'.'+BUSY_ID_SEGMENT;	//create an ID for the busy ID segment on the frame TODO use common routine
 		return BUSY_ID_SEGMENT; //create an ID for the busy ID segment on the frame TODO use common routine
 	}
@@ -106,8 +103,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 	 * @param applicationFrame The frame for which a form ID should be returned.
 	 * @return An ID appropriate for creating a form in the given frame.
 	 */
-	public static String getFormID(final ApplicationFrame applicationFrame)
-	{
+	public static String getFormID(final ApplicationFrame applicationFrame) {
 		return applicationFrame.getDepictID() + '.' + FORM_ID_SEGMENT; //create an ID for the form ID segment on the frame TODO use common routine
 	}
 
@@ -116,8 +112,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 	 * @param applicationFrame The frame for which an init IFrame ID should be returned.
 	 * @return An ID appropriate for creating an init IFrame.
 	 */
-	public static String getInitIFrameID(final ApplicationFrame applicationFrame)
-	{
+	public static String getInitIFrameID(final ApplicationFrame applicationFrame) {
 		//TODO fix for no form		return applicationFrame.getID()+'.'+INIT_IFRAME_ID_SEGMENT;	//create an ID for the init IFrame ID segment on the frame TODO use common routine
 		return INIT_IFRAME_ID_SEGMENT; //create an ID for the init IFrame ID segment on the frame TODO use common routine
 	}
@@ -126,8 +121,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 	private Component busyComponent = null;
 
 	/** Default constructor using the XHTML <code>body</code> element. */
-	public WebApplicationFrameDepictor()
-	{
+	public WebApplicationFrameDepictor() {
 		super(XHTML_NAMESPACE_URI, ELEMENT_BODY); //represent <xhtml:body>
 		getIgnoredProperties().add(ApplicationFrame.LABEL_PROPERTY); //ignore ApplicationFrame.label by default, because we don't want to reload the page just because its title changed; we'll send a special platform event instead
 	}
@@ -136,8 +130,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 	 * Begins the rendering process. This version renders an outer html element.
 	 * @throws IOException if there is an error rendering the component.
 	 */
-	protected void depictBegin() throws IOException
-	{
+	protected void depictBegin() throws IOException {
 		final WebPlatform platform = getPlatform(); //get the platform
 		final WebUserAgentProduct userAgent = platform.getClientProduct(); //get the user agent
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
@@ -170,8 +163,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 				.append('\n');
 		headerCommentStringBuilder.append("\n");
 		headerCommentStringBuilder.append("\tXHTML produced by ");
-		if(!Guise.getInstance().isLicensed()) //if this copy of Guise is not licensed
-		{
+		if(!Guise.getInstance().isLicensed()) { //if this copy of Guise is not licensed
 			headerCommentStringBuilder.append("an unlicensed copy of ");
 		}
 		headerCommentStringBuilder.append(Guise.GUISE_NAME).append(' ').append(Guise.getVersion()).append(" (").append(Guise.getBuildDate()).append(")\n"); //Guise version (build date)
@@ -180,8 +172,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeComment(headerCommentStringBuilder.toString()); //write the header comment
 		depictContext.write("\n");
 		final String title = component.getLabel(); //get the frame title
-		if(title != null) //if a title is given
-		{
+		if(title != null) { //if a title is given
 			//<xhtml:title>
 			depictContext.write('\t');
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TITLE); //<xhtml:title>
@@ -190,22 +181,19 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			depictContext.write('\n');
 		}
 		final URFResource navigationDescription = session.getNavigationDescription(); //get a description of our current navigation
-		if(navigationDescription != null)
-		{
+		if(navigationDescription != null) {
 			//Open Graph meta properties
 			depictContext.write('\t'); //og:title (required)
 			depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.TITLE_LOCAL_NAME, navigationDescription.determineLabel());
 			depictContext.write('\n');
 			final String siteName = getSession().getSiteName(); //see if we know the name of this site based upon the current navigation path
-			if(siteName != null)
-			{
+			if(siteName != null) {
 				depictContext.write('\t'); //og:site_name (optional)
 				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.SITE_NAME_LOCAL_NAME, siteName);
 				depictContext.write('\n');
 			}
 			final String description = DCMI.getDescription(navigationDescription); //see if the resource has a description
-			if(description != null)
-			{
+			if(description != null) {
 				depictContext.write('\t'); //og:description (optional)
 				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.DESCRIPTION_LOCAL_NAME, description);
 				depictContext.write('\n');
@@ -214,12 +202,10 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.TYPE_LOCAL_NAME, PredefinedType.WEBSITE.getID());
 			depictContext.write('\n');
 			final URI iconURI = navigationDescription.getIcon(); //get the navigation icon, if any
-			if(iconURI == null) //TODO fix
-			{
+			if(iconURI == null) { //TODO fix
 				//TODO fix
 			}
-			if(iconURI != null) //if we know an icon
-			{
+			if(iconURI != null) { //if we know an icon
 				depictContext.write('\t'); //og:image (required)
 				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.IMAGE_LOCAL_NAME, session.getDepictionRootURI().resolve(session.resolveURI(iconURI))
 						.toASCIIString());
@@ -230,15 +216,13 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			depictContext.write('\n');
 			//Facebook meta properties
 			final Set<String> facebookAdminIDs = application.getFacebookAdminIDs(navigationPath);
-			if(!facebookAdminIDs.isEmpty())
-			{
+			if(!facebookAdminIDs.isEmpty()) {
 				depictContext.write('\t'); //fb:admins
 				depictContext.writeMetaElement(Facebook.NAMESPACE_URI, Facebook.ADMINS_LOCAL_NAME, TextFormatter.formatList(COMMA_CHAR, facebookAdminIDs));
 				depictContext.write('\n');
 			}
 			final String facebookAppID = application.getFacebookAppID(navigationPath);
-			if(facebookAppID != null)
-			{
+			if(facebookAppID != null) {
 				depictContext.write('\t'); //fb:app_id
 				depictContext.writeMetaElement(Facebook.NAMESPACE_URI, Facebook.APP_ID_LOCAL_NAME, facebookAppID);
 				depictContext.write('\n');
@@ -247,21 +231,17 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		final List<URI> styleURIs = listOf(depictContext.getStyles()); //get the list of styles for depiction
 		//add in the content component theme's style, if appropriate TODO this will all get changed when we maintain a separate application frame for each navigation path
 		final Component contentComponent = component.getContent(); //get the content component
-		if(contentComponent != null) //if there is a content component
-		{
+		if(contentComponent != null) { //if there is a content component
 			final Theme theme = contentComponent.getTheme(); //get the content component's theme
-			for(final URFResource style : theme.getStyles()) //get the styles
-			{
+			for(final URFResource style : theme.getStyles()) { //get the styles
 				final URI styleURI = style.getURI(); //get this style's URI
-				if(styleURI != null && !styleURIs.contains(styleURI)) //if this style has a URI we don't yet have
-				{
+				if(styleURI != null && !styleURIs.contains(styleURI)) { //if this style has a URI we don't yet have
 					styleURIs.add(styleURI); //add this style URI to the list, overriding all other styles
 				}
 			}
 		}
 		//<xhtml:link> styles in this order: theme styles (from most distant parent to current theme), application style, destination style
-		for(final URI styleURI : styleURIs) //for each style URI
-		{
+		for(final URI styleURI : styleURIs) { //for each style URI
 			//TODO del Log.trace("looking at style URI", styleURI);
 			depictContext.write('\t');
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_LINK); //<xhtml:link>
@@ -300,8 +280,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT); //</xhtml:script>
 		depictContext.write("\n");
 		//write scripts to test for the JavaScript version
-		for(final String javascriptVersion : JAVSCRIPT_VERSIONS) //for each version
-		{
+		for(final String javascriptVersion : JAVSCRIPT_VERSIONS) { //for each version
 			depictContext.write("\t"); //<xhtml:script> (internal) for testing for a JavaScript version
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT, false); //<xhtml:script> (explicitly don't create an empty <xhtml:script> element, otherwise IE wouldn't recognize it)
 			depictContext.writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_LANGUAGE, "JavaScript" + javascriptVersion); //language="JavaScriptX.X"
@@ -336,8 +315,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeJavaScriptElement(appendQueryParameter(googleGearsURI, GUISE_VERSION_URI_QUERY_PARAMETER, resourceTag));
 		depictContext.write("\n");
 		final URI htmlEditorJavaScriptURI; //HTML editor
-		switch(HTML_EDITOR)
-		{
+		switch(HTML_EDITOR) {
 			case CKEDITOR:
 				htmlEditorJavaScriptURI = application.isDebug() ? CKEDITOR_JAVASCRIPT_PATH.toURI() : CKEDITOR_MIN_JAVASCRIPT_PATH.toURI();
 				break;
@@ -359,25 +337,20 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		//TODO del when works		writeIDClassAttributes(context, component, null, null);	//write the ID and class attributes with no prefixes or suffixes
 		writeDirectionAttribute(); //write the component direction, if this component specifies a direction
 		/*TODO fix for new notification framework
-				if(component.hasErrors())	//if this component has one or more errors
-				{
+				if(component.hasErrors()) {	//if this component has one or more errors
 					final StringBuilder errorStringBuilder=new StringBuilder();	//we'll construct the error message
-					for(final Throwable error:component.getErrors())	//for each error
-					{
+					for(final Throwable error:component.getErrors()) {	//for each error
 						final String message=error.getMessage();	//get the error message
-						if(errorStringBuilder.length()>0)	//if we've already included error messages
-						{
+						if(errorStringBuilder.length()>0) {	//if we've already included error messages
 							errorStringBuilder.append("\n");	//separate the messages
 						}
 						errorStringBuilder.append(context.getSession().getStringResource(ERROR_LABEL_RESOURCE));	//"Error"
 							//add the associated component's label, if any
-						if(error instanceof ComponentException)	//if the error is a component exception
-						{
+						if(error instanceof ComponentException) {	//if the error is a component exception
 							final ComponentException componentException=(ComponentException)error;	//get the component exception version of the error
 							final Component errorComponent=componentException.getComponent();	//get the associated component
 							final String label=errorComponent.getSession().determineString(errorComponent.getLabel(), errorComponent.getLabelResourceKey());	//get the associated label
-							if(label!=null)	//if there is a label for this component
-							{
+							if(label!=null) {	//if there is a label for this component
 								errorStringBuilder.append(' ').append('(').append(label).append(')');	//identify the component by its label
 							}
 						}
@@ -394,13 +367,11 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		//TODO fix; new absolute path		final String resolvedGuiseFlashPath=application.resolvePath(GUISE_FLASH_PATH);	//resolve the path to the Guise Flash file
 				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_OBJECT);	//<xhtml:object>
 				depictContext.writeAttribute(null, ATTRIBUTE_ID, GUISE_FLASH_ID);	//id="guiseFlash"		
-				if(platform.getClientProduct().getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER)	//if the user agent is IE, use the special attributes
-				{
+				if(platform.getClientProduct().getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER) {	//if the user agent is IE, use the special attributes
 					depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CLASSID, FLASH_CLASS_ID);	//classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"; only write the classid attributes for IE, because it will prevent the Flash from being loaded in Firefox
 					depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CODEBASE, getSWFlashCabURI("8,0,0,0", HTTPS_SCHEME.equals(depictContext.getDepictURI().getScheme())).toString());	//codebase="http[s]://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0"
 				}
-				else	//if the user agent is not IE, specify the object content type
-				{
+				else {	//if the user agent is not IE, specify the object content type
 					depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_TYPE, FLASH_CONTENT_TYPE.toString());	//type="application/x-shockwave-flash"; don't write the type Type attribute in IE, because this will prevent IE from loading the Flash movie 			
 					depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_DATA, resolvedGuiseFlashPath);	//data="flashURI"; don't write the data attribute in IE, because it will prevent the Flash movie from showing its preloader
 				}
@@ -442,16 +413,14 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV); //</xhtml:div>
 		depictContext.write("\n");
 		final Menu menu = component.getMenu(); //get the frame's menu, if any
-		if(menu != null) //if there is a menu
-		{
+		if(menu != null) { //if there is a menu
 			//TODO check the type of menu; this may be a sidebar menu
 			//TODO del			context.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//<xhtml:div>
 			menu.depict(); //update the menu
 			//TODO del			context.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//</xhtml:div>
 		}
 		final Toolbar toolbar = component.getToolbar(); //get the frame's toolbar, if any
-		if(toolbar != null) //if there is a toolbar
-		{
+		if(toolbar != null) { //if there is a toolbar
 			toolbar.depict(); //update the toolbar
 		}
 	}
@@ -460,8 +429,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 	 * Ends the rendering process. This version ends the outer html element and the inner form element.
 	 * @throws IOException if there is an error rendering the component.
 	 */
-	protected void depictEnd() throws IOException
-	{
+	protected void depictEnd() throws IOException {
 		final GuiseSession session = getSession(); //get the session
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
 		final GuiseApplication application = session.getApplication(); //get the application
@@ -469,8 +437,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_FORM); //</xhtml:form>
 		depictContext.write("\n");
 		//license
-		if(!Guise.getInstance().isLicensed()) //if this copy of Guise is not licensed
-		{
+		if(!Guise.getInstance().isLicensed()) { //if this copy of Guise is not licensed
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_P); //<xhtml:p>
 			depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LICENSE_CLASS); //class="license"
 			depictContext.write("XHTML produced by an unlicensed copy of ");
@@ -493,8 +460,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeAttribute(null, ATTRIBUTE_ID, busyID); //id="xxx:busy"		
 		//TODO del when works		depictContext.writeAttribute(null, ATTRIBUTE_STYLE, "position:absolute;width:300px;height:200px;display:none;");	//style="position:absolute;display:none;"	//TODO use constants; improve
 		depictContext.writeAttribute(null, ATTRIBUTE_STYLE, "position:absolute;display:none;"); //style="position:absolute;display:none;"	//TODO use constants; improve
-		if(busyComponent == null) //if no busy component has yet been created
-		{
+		if(busyComponent == null) { //if no busy component has yet been created
 			busyComponent = session.createBusyComponent(); //ask the session to create a new busy component
 			busyComponent.updateTheme(); //make sure a theme has been applied to the busy component
 		}
@@ -536,22 +502,16 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 	 * @see ValueModel
 	 * @see ResourceImport
 	 */
-	protected static boolean hasResourceImportControl(final Component component)
-	{
-		if(component instanceof ValueControl) //if this component is a value control
-		{
+	protected static boolean hasResourceImportControl(final Component component) {
+		if(component instanceof ValueControl) { //if this component is a value control
 			final Class<?> valueClass = ((ValueControl<?>)component).getValueClass(); //get the value class of the value model
-			if(ResourceImport.class.isAssignableFrom(valueClass)) //if the value model represents some type of resource import
-			{
+			if(ResourceImport.class.isAssignableFrom(valueClass)) { //if the value model represents some type of resource import
 				return true; //we found a resource import control
 			}
 		}
-		if(component instanceof CompositeComponent) //if this component is composed of other components
-		{
-			for(final Component childComponent : ((CompositeComponent)component).getChildComponents()) //look at each child class component
-			{
-				if(hasResourceImportControl(childComponent)) //if this child has a resource import control
-				{
+		if(component instanceof CompositeComponent) { //if this component is composed of other components
+			for(final Component childComponent : ((CompositeComponent)component).getChildComponents()) { //look at each child class component
+				if(hasResourceImportControl(childComponent)) { //if this child has a resource import control
 					return true; //we found a child with a resource import control
 				}
 			}

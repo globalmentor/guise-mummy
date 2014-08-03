@@ -28,34 +28,29 @@ import com.guiseframework.model.NavigationModel;
  * A component representing a Facebook Like button.
  * @author Garret Wilson
  */
-public class LikeButton extends AbstractComponent implements NavigationModel
-{
+public class LikeButton extends AbstractComponent implements NavigationModel {
 
 	private final NavigationModel navigationModel;
 
 	/** @return The internal navigation model. */
-	protected NavigationModel getNavigationModel()
-	{
+	protected NavigationModel getNavigationModel() {
 		return navigationModel;
 	}
 
 	/** {@inheritDoc} */
-	public URIPath getNavigationPath()
-	{
+	public URIPath getNavigationPath() {
 		return getNavigationModel().getNavigationPath();
 	}
 
 	/** {@inheritDoc} */
-	public void setNavigationPath(final URIPath newNavigationPath)
-	{
+	public void setNavigationPath(final URIPath newNavigationPath) {
 		getNavigationModel().setNavigationPath(newNavigationPath);
 	}
 
 	/**
 	 * Default constructor. The navigation path will dynamically be determined based upon the hierarchy in which this component is installed.
 	 */
-	public LikeButton()
-	{
+	public LikeButton() {
 		this.navigationModel = new ComponentNavigationModel(this);
 	}
 
@@ -63,8 +58,7 @@ public class LikeButton extends AbstractComponent implements NavigationModel
 	 * Navigation path constructor.
 	 * @param navigationPath The navigation path, or <code>null</code> if the navigation path is not available.
 	 */
-	public LikeButton(final URIPath navigationPath)
-	{
+	public LikeButton(final URIPath navigationPath) {
 		this(new DefaultNavigationModel(navigationPath));
 	}
 
@@ -73,8 +67,7 @@ public class LikeButton extends AbstractComponent implements NavigationModel
 	 * @param navigationModel The model for retrieving the navigation path.
 	 * @throws NullPointerException if the given navigation model is <code>null</code>.
 	 */
-	public LikeButton(final NavigationModel navigationModel)
-	{
+	public LikeButton(final NavigationModel navigationModel) {
 		this.navigationModel = checkInstance(navigationModel);
 	}
 }

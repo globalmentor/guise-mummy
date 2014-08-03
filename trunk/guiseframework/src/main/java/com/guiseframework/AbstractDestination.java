@@ -35,15 +35,13 @@ import static com.globalmentor.net.URIs.*;
  * are considered equal.
  * @author Garret Wilson
  */
-public abstract class AbstractDestination extends BoundPropertyObject implements Destination
-{
+public abstract class AbstractDestination extends BoundPropertyObject implements Destination {
 
 	/** The map of sub-categories; it is not thread-safe, but any changes will simply create a new list. */
 	private List<Category> categories = unmodifiableList(new ArrayList<Category>()); //TODO add a property and fire a change
 
 	/** The read-only iterable of categories. */
-	public Iterable<Category> getCategories()
-	{
+	public Iterable<Category> getCategories() {
 		return categories;
 	}
 
@@ -51,8 +49,7 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	 * Sets the categories.
 	 * @param categories The list of new categories.
 	 */
-	public void setCategories(final List<Category> categories)
-	{
+	public void setCategories(final List<Category> categories) {
 		this.categories = unmodifiableList(new ArrayList<Category>(categories)); //create a copy of the list and save the list
 	}
 
@@ -66,8 +63,7 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	 * @return The application context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if there is no path
 	 *         specified for this destination.
 	 */
-	public URIPath getPath()
-	{
+	public URIPath getPath() {
 		return path;
 	}
 
@@ -78,11 +74,10 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	private final Pattern pathPattern;
 
 	/**
-	 * @return The pattern to match an application context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if
-	 *         there is no path pattern specified for this destination.
+	 * @return The pattern to match an application context-relative path within the Guise container context, which does not begin with '/', or <code>null</code>
+	 *         if there is no path pattern specified for this destination.
 	 */
-	public Pattern getPathPattern()
-	{
+	public Pattern getPathPattern() {
 		return pathPattern;
 	}
 
@@ -92,8 +87,7 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	 * @throws NullPointerException if the path is <code>null</code>.
 	 * @throws IllegalArgumentException if the provided path is absolute.
 	 */
-	public AbstractDestination(final URIPath path)
-	{
+	public AbstractDestination(final URIPath path) {
 		this.path = checkInstance(path, "Navigation path cannot be null.").checkRelative(); //store the path, making sure it is relative
 		this.pathPattern = null; //indicate that there is no path pattern
 	}
@@ -103,8 +97,7 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	 * @param pathPattern The pattern to match an application context-relative path within the Guise container context, which does not begin with '/'.
 	 * @throws NullPointerException if the path pattern is <code>null</code>.
 	 */
-	public AbstractDestination(final Pattern pathPattern)
-	{
+	public AbstractDestination(final Pattern pathPattern) {
 		this.pathPattern = checkInstance(pathPattern, "Navigation path pattern cannot be null.");
 		this.path = null; //indicate that there is no path
 	}
@@ -120,15 +113,11 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	 * @throws NullPointerException if the given session and/or path is <code>null</code>.
 	 * @throws ResourceIOException if there is an error accessing the resource.
 	 */
-	public URIPath getPath(final GuiseSession session, final URIPath path, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException
-	{
-		if(!exists(session, path, bookmark, referrerURI)) //if this destination doesn't exist	
-		{
-			if(!path.isCollection()) //if a non-collection path was requested
-			{
+	public URIPath getPath(final GuiseSession session, final URIPath path, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException {
+		if(!exists(session, path, bookmark, referrerURI)) { //if this destination doesn't exist	
+			if(!path.isCollection()) { //if a non-collection path was requested
 				final URIPath collectionPath = new URIPath(path.toString() + PATH_SEPARATOR); //create a collection version of the path
-				if(exists(session, collectionPath, bookmark, referrerURI)) //if the collection form of the path exists
-				{
+				if(exists(session, collectionPath, bookmark, referrerURI)) { //if the collection form of the path exists
 					return collectionPath; //return the collection path
 				}
 			}
@@ -148,8 +137,7 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	 * @throws NullPointerException if the given navigation path is <code>null</code>.
 	 * @throws ResourceIOException if there is an error accessing the resource.
 	 */
-	public boolean exists(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException
-	{
+	public boolean exists(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException {
 		return true; //make it easy for simple resource destinations by assuming the resource exists
 	}
 
@@ -178,20 +166,18 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	 * @throws ResourceIOException if there is an error accessing the resource.
 	 */
 	public boolean isAuthorized(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI)
-			throws ResourceIOException
-	{
+			throws ResourceIOException {
 		return true; //by default authorize all resources
 	}
 
-	/** {@inheritDoc} This implementation returns <code>null</code>.*/
-	public URFResource getDescription(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException
-	{
+	/** {@inheritDoc} This implementation returns <code>null</code>. */
+	public URFResource getDescription(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI)
+			throws ResourceIOException {
 		return null;
 	}
 
 	/** @return A hash code for this object. */
-	public int hashCode()
-	{
+	public int hashCode() {
 		return Objects.getHashCode(getPath(), getPathPattern()); //construct a hash code from the path and path pattern
 	}
 
@@ -201,10 +187,8 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	 * @param object The object to compare to this object.
 	 * @return <code>true</code> if the given object is an equivalent destination.
 	 */
-	public boolean equals(final Object object)
-	{
-		if(getClass().isInstance(object)) //if the given object is an instance of this object's class
-		{
+	public boolean equals(final Object object) {
+		if(getClass().isInstance(object)) { //if the given object is an instance of this object's class
 			final Destination destination = (Destination)object; //cast the object to a destination (which it must be, if it's the same type as this instance
 			return Objects.equals(getPath(), destination.getPath()) && Objects.equals(getPathPattern(), destination.getPathPattern()); //see if the paths and path patterns match 
 		}

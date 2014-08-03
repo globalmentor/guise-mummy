@@ -30,8 +30,7 @@ import com.guiseframework.platform.AbstractDepictedObject;
  * Audio that can be played. The installed depictor must be of the specialized type {@link Depictor}.
  * @author Garret Wilson
  */
-public class Audio extends AbstractDepictedObject implements ProgressListenable<Long>
-{
+public class Audio extends AbstractDepictedObject implements ProgressListenable<Long> {
 
 	/** The bound property of the audio URI. */
 	public final static String AUDIO_URI_PROPERTY = getPropertyName(Audio.class, "audioURI");
@@ -46,8 +45,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 
 	/** @return The depictor for this object. */
 	@SuppressWarnings("unchecked")
-	public Depictor<? extends Audio> getDepictor()
-	{
+	public Depictor<? extends Audio> getDepictor() {
 		return (Depictor<? extends Audio>)super.getDepictor();
 	}
 
@@ -55,8 +53,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	private URI audioURI = null;
 
 	/** @return The audio URI, which may be a resource URI, or <code>null</code> if there is no audio URI. */
-	public URI getAudioURI()
-	{
+	public URI getAudioURI() {
 		return audioURI;
 	}
 
@@ -65,10 +62,8 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	 * @param newAudioURI The new URI of the audio, which may be a resource URI, or <code>null</code> if there is no audio URI.
 	 * @see #AUDIO_URI_PROPERTY
 	 */
-	public void setAudioURI(final URI newAudioURI)
-	{
-		if(!Objects.equals(audioURI, newAudioURI)) //if the value is really changing
-		{
+	public void setAudioURI(final URI newAudioURI) {
+		if(!Objects.equals(audioURI, newAudioURI)) { //if the value is really changing
 			stop(); //make sure the current audio is stopped
 			final URI oldAudio = audioURI; //get the old value
 			audioURI = newAudioURI; //actually change the value
@@ -82,8 +77,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	private ContentType audioContentType = null;
 
 	/** @return The audio content type, or <code>null</code> if there is no audio URI or the content type is not known. */
-	public ContentType getAudioContentType()
-	{
+	public ContentType getAudioContentType() {
 		return audioContentType;
 	}
 
@@ -92,10 +86,8 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	 * @param newAudioContentType The new content type of the audio, or <code>null</code> if there is no audio URI or the content type is not known.
 	 * @see #AUDIO_CONTENT_TYPE_PROPERTY
 	 */
-	public void setAudioContentType(final ContentType newAudioContentType)
-	{
-		if(!Objects.equals(audioContentType, newAudioContentType)) //if the value is really changing
-		{
+	public void setAudioContentType(final ContentType newAudioContentType) {
+		if(!Objects.equals(audioContentType, newAudioContentType)) { //if the value is really changing
 			stop(); //make sure the current audio is stopped
 			final ContentType oldAudioContentType = audioContentType; //get the old value
 			audioContentType = newAudioContentType; //actually change the value
@@ -109,8 +101,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	private TaskState state = null;
 
 	/** @return The state of the audio, or <code>null</code> if the audio has not been started. */
-	public TaskState getState()
-	{
+	public TaskState getState() {
 		return state;
 	}
 
@@ -120,15 +111,12 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	 * @param newState The new state of the audio, or <code>null</code> if the audio has not been started.
 	 * @see #STATE_PROPERTY
 	 */
-	public void setState(final TaskState newState)
-	{
-		if(state != newState) //if the value is really changing
-		{
+	public void setState(final TaskState newState) {
+		if(state != newState) { //if the value is really changing
 			final TaskState oldState = state; //get the old value
 			state = newState; //actually change the value
 			firePropertyChange(STATE_PROPERTY, oldState, newState); //indicate that the value changed
-			if(newState == TaskState.STOPPED) //if the audio was just stopped
-			{
+			if(newState == TaskState.STOPPED) { //if the audio was just stopped
 				updateTimeProgress(0, -1); //show that we'll be at the beginning of this audio if/when we start again
 			}
 		}
@@ -138,8 +126,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	private long timePosition = 0;
 
 	/** @return The current play position in microseconds. */
-	public long getTimePosition()
-	{
+	public long getTimePosition() {
 		return timePosition;
 	}
 
@@ -149,12 +136,9 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	 * @throws IllegalArgumentException if the given position is negative.
 	 * @see #TIME_POSITION_PROPERTY
 	 */
-	protected void updateTimePosition(final long newTimePosition)
-	{
-		if(timePosition != newTimePosition) //if the value is really changing
-		{
-			if(newTimePosition < 0) //if the new time position is negative
-			{
+	protected void updateTimePosition(final long newTimePosition) {
+		if(timePosition != newTimePosition) { //if the value is really changing
+			if(newTimePosition < 0) { //if the new time position is negative
 				throw new IllegalArgumentException("Time position cannot be negative: " + newTimePosition);
 			}
 			final long oldTimePosition = timePosition; //get the old value
@@ -169,8 +153,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	 * @throws IllegalArgumentException if the given position is negative.
 	 * @see #TIME_POSITION_PROPERTY
 	 */
-	public void setTimePosition(final long newTimePosition)
-	{
+	public void setTimePosition(final long newTimePosition) {
 		getDepictor().setTimePosition(newTimePosition); //tell the depictor to request the time position			
 	}
 
@@ -178,8 +161,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	private long timeLength = -1;
 
 	/** @return The current duration or estimated duration in microseconds, or -1 if not known. */
-	public long getTimeLength()
-	{
+	public long getTimeLength() {
 		return timeLength;
 	}
 
@@ -188,10 +170,8 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	 * @param newTimeLength The new duration in microseconds.
 	 * @see #TIME_LENGTH_PROPERTY
 	 */
-	protected void updateTimeLength(final long newTimeLength)
-	{
-		if(timeLength != newTimeLength) //if the value is really changing
-		{
+	protected void updateTimeLength(final long newTimeLength) {
+		if(timeLength != newTimeLength) { //if the value is really changing
 			final long oldTimeLength = timeLength; //get the old value
 			timeLength = newTimeLength; //actually change the value
 			firePropertyChange(TIME_LENGTH_PROPERTY, oldTimeLength, newTimeLength); //indicate that the value changed
@@ -199,8 +179,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	}
 
 	/** Default constructor. */
-	public Audio()
-	{
+	public Audio() {
 		this(null, null); //construct the audio with no audio URI
 	}
 
@@ -209,8 +188,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	 * @param audioURI The new URI of the audio, which may be a resource URI, or <code>null</code> if there is no audio URI.
 	 * @param audioContenType The new content type of the audio, or <code>null</code> if there is no audio URI or the content type is not known.
 	 */
-	public Audio(final URI audioURI, final ContentType contentType)
-	{
+	public Audio(final URI audioURI, final ContentType contentType) {
 		this.audioURI = audioURI;
 		this.audioContentType = contentType;
 	}
@@ -218,11 +196,9 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	/**
 	 * Requests that the audio start playing. If the audio is currently starting to play or already playing, no action occurs.
 	 */
-	public void play()
-	{
+	public void play() {
 		final TaskState state = getState(); //get the current audio state
-		if(state != TaskState.INITIALIZE && state != TaskState.INCOMPLETE) //if the audio is not yet started
-		{
+		if(state != TaskState.INITIALIZE && state != TaskState.INCOMPLETE) { //if the audio is not yet started
 			setState(TaskState.INITIALIZE); //show that we're initializing the audio
 			getDepictor().play(); //tell the depictor to start
 		}
@@ -231,10 +207,8 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	/**
 	 * Requests that the audio pause. If the audio is not playing, no action occurs.
 	 */
-	public void pause()
-	{
-		if(getState() == TaskState.INCOMPLETE) //if the audio is playing
-		{
+	public void pause() {
+		if(getState() == TaskState.INCOMPLETE) { //if the audio is playing
 			getDepictor().pause(); //tell the depictor to pause
 		}
 	}
@@ -242,11 +216,9 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	/**
 	 * Requests that the audio stop. If the audio is not initializing, playing, or paused, no action occurs.
 	 */
-	public void stop()
-	{
+	public void stop() {
 		final TaskState state = getState(); //get the current audio state
-		if(state == TaskState.INITIALIZE || state == TaskState.INCOMPLETE || state == TaskState.PAUSED) //if the audio is not initializing, playing, or paused
-		{
+		if(state == TaskState.INITIALIZE || state == TaskState.INCOMPLETE || state == TaskState.PAUSED) { //if the audio is not initializing, playing, or paused
 			getDepictor().stop(); //tell the depictor to stop
 		}
 	}
@@ -257,16 +229,12 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	 * @param timePosition The current play position in microseconds, or <code>-1</code> if not known.
 	 * @param timeLength The duration or estimated duration of the audio in microseconds, or <code>-1</code> if not known.
 	 */
-	public void updateTimeProgress(final long timePosition, final long timeLength)
-	{
-		if(timePosition >= 0 || timeLength >= 0) //if one of the values is being updated
-		{
-			if(timePosition >= 0) //if the position is known
-			{
+	public void updateTimeProgress(final long timePosition, final long timeLength) {
+		if(timePosition >= 0 || timeLength >= 0) { //if one of the values is being updated
+			if(timePosition >= 0) { //if the position is known
 				updateTimePosition(timePosition); //update the position
 			}
-			if(timeLength >= 0) //if the duration is known
-			{
+			if(timeLength >= 0) { //if the duration is known
 				updateTimeLength(timeLength); //update the duration
 			}
 			fireProgressed(getTimePosition(), getTimeLength()); //fire a new progress event, using the latest times that we know about (or an old value if it wasn't updated just now)
@@ -277,8 +245,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	 * Adds a progress listener.
 	 * @param progressListener The progress listener to add.
 	 */
-	public void addProgressListener(final ProgressListener<Long> progressListener)
-	{
+	public void addProgressListener(final ProgressListener<Long> progressListener) {
 		getEventListenerManager().add(ProgressListener.class, progressListener); //add the listener
 	}
 
@@ -286,8 +253,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	 * Removes an progress listener.
 	 * @param progressListener The progress listener to remove.
 	 */
-	public void removeProgressListener(final ProgressListener<Long> progressListener)
-	{
+	public void removeProgressListener(final ProgressListener<Long> progressListener) {
 		getEventListenerManager().remove(ProgressListener.class, progressListener); //remove the listener
 	}
 
@@ -298,10 +264,8 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	 * @see ProgressListener
 	 * @see ProgressEvent
 	 */
-	protected void fireProgressed(final long timePosition, final long timeDuration)
-	{
-		if(getEventListenerManager().hasListeners(ProgressListener.class)) //if there are progress listeners registered
-		{
+	protected void fireProgressed(final long timePosition, final long timeDuration) {
+		if(getEventListenerManager().hasListeners(ProgressListener.class)) { //if there are progress listeners registered
 			final URI audioURI = getAudioURI(); //get the audio URI
 			fireProgressed(new ProgressEvent<Long>(this, audioURI != null ? audioURI.toString() : null, getState(), timePosition >= 0 ? Long.valueOf(timePosition)
 					: null, timeDuration >= 0 ? Long.valueOf(timeDuration) : null)); //create and fire a new progress event
@@ -312,10 +276,8 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	 * Fires a given progress event to all registered progress listeners.
 	 * @param progressEvent The progress event to fire.
 	 */
-	protected void fireProgressed(final ProgressEvent<Long> progressEvent)
-	{
-		for(final ProgressListener<Long> progressListener : getEventListenerManager().getListeners(ProgressListener.class)) //for each progress listener
-		{
+	protected void fireProgressed(final ProgressEvent<Long> progressEvent) {
+		for(final ProgressListener<Long> progressListener : getEventListenerManager().getListeners(ProgressListener.class)) { //for each progress listener
 			progressListener.progressed(progressEvent); //dispatch the progress event to the listener
 		}
 	}
@@ -323,13 +285,10 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	/**
 	 * Prepares the object for garbage collection. This implementation makes sure the audio is stopped.
 	 */
-	protected void finalize() throws Throwable
-	{
-		try
-		{
+	protected void finalize() throws Throwable {
+		try {
 			stop(); //stop the audio
-		}
-		finally
+		} finally
 		//always do the default finalization
 		{
 			super.finalize();
@@ -341,8 +300,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	 * @author Garret Wilson
 	 * @param <A> The type of audio to be depicted.
 	 */
-	public interface Depictor<A extends Audio> extends com.guiseframework.platform.Depictor<A>
-	{
+	public interface Depictor<A extends Audio> extends com.guiseframework.platform.Depictor<A> {
 
 		/** Requests that the audio start playing. */
 		public void play();

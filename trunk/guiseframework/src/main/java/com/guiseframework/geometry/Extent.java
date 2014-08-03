@@ -27,8 +27,7 @@ import com.globalmentor.java.Objects;
  * extents of the same unit and degree should be compared, although consistent, if inaccurate, values will still be obtained otherwise.
  * @author Garret Wilson
  */
-public class Extent implements Comparable<Extent>
-{
+public class Extent implements Comparable<Extent> {
 
 	/** A convenience one-dimensional extent of zero pixels. */
 	public final static Extent ZERO_EXTENT1 = new Extent(0, Unit.PIXEL, 1);
@@ -37,14 +36,12 @@ public class Extent implements Comparable<Extent>
 	private final double value;
 
 	/** @return The value of the extent. */
-	public double getValue()
-	{
+	public double getValue() {
 		return value;
 	}
 
 	/** @return <code>true</code> if the extent has a zero value. */
-	public boolean isEmpty()
-	{
+	public boolean isEmpty() {
 		return value == 0.0;
 	}
 
@@ -52,8 +49,7 @@ public class Extent implements Comparable<Extent>
 	private final Unit unit;
 
 	/** @return The unit with which the extent is measured. */
-	public Unit getUnit()
-	{
+	public Unit getUnit() {
 		return unit;
 	}
 
@@ -61,8 +57,7 @@ public class Extent implements Comparable<Extent>
 	private final int degree;
 
 	/** @return The degree of dimensions of the measurement. */
-	public int getDegree()
-	{
+	public int getDegree() {
 		return degree;
 	}
 
@@ -70,8 +65,7 @@ public class Extent implements Comparable<Extent>
 	 * Value constructor for a one-dimensional pixel extent.
 	 * @param value The value of the extent.
 	 */
-	public Extent(final double value)
-	{
+	public Extent(final double value) {
 		this(value, Unit.PIXEL); //construct the extent using pixel units
 	}
 
@@ -81,8 +75,7 @@ public class Extent implements Comparable<Extent>
 	 * @param unit The unit with which the extent is measured.
 	 * @throws NullPointerException if the given unit is <code>null</code>.
 	 */
-	public Extent(final double value, final Unit unit)
-	{
+	public Extent(final double value, final Unit unit) {
 		this(value, unit, 1); //construct the extent with a degree of one
 	}
 
@@ -94,10 +87,8 @@ public class Extent implements Comparable<Extent>
 	 * @throws NullPointerException if the given unit is <code>null</code>.
 	 * @throws IllegalArgumentException if the degree is non-positive.
 	 */
-	public Extent(final double value, final Unit unit, final int degree)
-	{
-		if(degree <= 0) //if a non-positive degree was given
-		{
+	public Extent(final double value, final Unit unit, final int degree) {
+		if(degree <= 0) { //if a non-positive degree was given
 			throw new IllegalArgumentException("Degree must be positive.");
 		}
 		this.value = value; //save the value
@@ -106,8 +97,7 @@ public class Extent implements Comparable<Extent>
 	}
 
 	@Override
-	public int hashCode()
-	{
+	public int hashCode() {
 		return Objects.getHashCode(getValue(), getUnit(), getDegree()); //determine the hash code
 	}
 
@@ -116,20 +106,15 @@ public class Extent implements Comparable<Extent>
 	 * zero.
 	 */
 	@Override
-	public boolean equals(final Object object)
-	{
-		if(this == object) //if the objects are the same
-		{
+	public boolean equals(final Object object) {
+		if(this == object) { //if the objects are the same
 			return true; //identical objects are always equal
 		}
-		if(object instanceof Extent) //if the object is an extent
-		{
+		if(object instanceof Extent) { //if the object is an extent
 			final Extent extent = (Extent)object; //get the object as an extent
 			final double value = getValue(); //get this extent's value
-			if(value == extent.getValue()) //if values match
-			{
-				if(getUnit() == extent.getUnit() || value == 0) //if the units match (or the value is zero, because all zero extents are equal)
-				{
+			if(value == extent.getValue()) { //if values match
+				if(getUnit() == extent.getUnit() || value == 0) { //if the units match (or the value is zero, because all zero extents are equal)
 					return getDegree() == extent.getDegree(); //if degrees match, everything at this point matches
 				}
 			}
@@ -147,26 +132,22 @@ public class Extent implements Comparable<Extent>
 	 * </p>
 	 */
 	@Override
-	public int compareTo(final Extent extent)
-	{
+	public int compareTo(final Extent extent) {
 		final Unit unit = getUnit(); //get this extent's unit
 		final Unit extentUnit = extent.getUnit(); //get the other extent's unit
-		if(unit != extentUnit) //if units are different
-		{
+		if(unit != extentUnit) { //if units are different
 			return unit.ordinal() - extentUnit.ordinal(); //extents shouldn't be compared with different units; do something reasonable by sorting based upon the unit
 		}
 		final int degree = getDegree(); //get this extent's degree
 		final int extentDegree = getDegree(); //get the other extent's degree
-		if(degree != extentDegree) //if the degrees are different
-		{
+		if(degree != extentDegree) { //if the degrees are different
 			return degree - extentDegree; //extents shouldn't be compared with different degrees; do something reasonable by sorting based upon the degree
 		}
 		return Double.compare(getValue(), extent.getValue()); //compare values
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return Arrays.toString(new Object[] { getValue(), getUnit(), getDegree() });
 	}
 }

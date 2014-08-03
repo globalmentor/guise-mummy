@@ -27,8 +27,7 @@ import com.globalmentor.text.xml.QualifiedName;
  * Encapsulation of text/xml information related to the current depiction.
  * @author Garret Wilson
  */
-public interface XMLDepictContext extends TextDepictContext
-{
+public interface XMLDepictContext extends TextDepictContext {
 
 	/**
 	 * Retrieves the qualified name of the given namespace and local name. If the namespace URI is not recognized, a new prefix will be generated for that
@@ -153,14 +152,13 @@ public interface XMLDepictContext extends TextDepictContext
 	 * The state of rendering for a particular element.
 	 * @author Garret Wilson
 	 */
-	public static class ElementState extends QualifiedName
-	{
+	public static class ElementState extends QualifiedName {
+
 		/** The map of attribute values keyed to attribute qualified names. */
 		private final Map<QualifiedName, String> attributeMap = new HashMap<QualifiedName, String>();
 
 		/** @return The map of attribute values keyed to attribute qualified names. */
-		public Map<QualifiedName, String> getAttributeMap()
-		{
+		public Map<QualifiedName, String> getAttributeMap() {
 			return attributeMap;
 		}
 
@@ -168,8 +166,7 @@ public interface XMLDepictContext extends TextDepictContext
 		private final StringBuilder depictStringBuilder = new StringBuilder();
 
 		/** @return The string builder that holds the element content being collected for depiction. */
-		public StringBuilder getDepictStringBuilder()
-		{
+		public StringBuilder getDepictStringBuilder() {
 			return depictStringBuilder;
 		}
 
@@ -177,8 +174,7 @@ public interface XMLDepictContext extends TextDepictContext
 		private final boolean emptyElementAllowed;
 
 		/** @return Whether an empty element can be created if there is no content. */
-		public boolean isEmptyElementAllowed()
-		{
+		public boolean isEmptyElementAllowed() {
 			return emptyElementAllowed;
 		}
 
@@ -186,8 +182,7 @@ public interface XMLDepictContext extends TextDepictContext
 		protected boolean open = true;
 
 		/** Whether the element has been opened but not closed. */
-		public boolean isOpen()
-		{
+		public boolean isOpen() {
 			return open;
 		}
 
@@ -197,8 +192,7 @@ public interface XMLDepictContext extends TextDepictContext
 		 * @param qname The combined <var>prefix</var>:<var>localName</var> qualified name.
 		 * @param isEmptyElementAllowed Whether an empty element can be created if there is no content.
 		 */
-		public ElementState(final URI namespaceURI, final String qname, final boolean isEmptyElementAllowed)
-		{
+		public ElementState(final URI namespaceURI, final String qname, final boolean isEmptyElementAllowed) {
 			super(namespaceURI, qname); //construct the parent class
 			this.emptyElementAllowed = isEmptyElementAllowed;
 		}

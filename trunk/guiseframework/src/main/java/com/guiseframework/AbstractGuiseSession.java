@@ -73,8 +73,7 @@ import static com.guiseframework.theme.Theme.*;
  * An abstract implementation that keeps track of the components of a user session.
  * @author Garret Wilson
  */
-public abstract class AbstractGuiseSession extends BoundPropertyObject implements GuiseSession
-{
+public abstract class AbstractGuiseSession extends BoundPropertyObject implements GuiseSession {
 
 	/** The manager of configurations for this session. */
 	private final ConfigurationManager configurationManager = new DefaultConfigurationManager();
@@ -83,8 +82,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * Sets the given configurations, associating them with their respective classes.
 	 * @param configurations The configurations to set.
 	 */
-	protected void setConfigurations(final Configuration... configurations)
-	{
+	protected void setConfigurations(final Configuration... configurations) {
 		configurationManager.setConfigurations(configurations);
 	}
 
@@ -95,8 +93,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @return The configuration previously associated with the same class, or <code>null</code> if there was no previous configuration for that class.
 	 * @throws NullPointerException if the given configuration is <code>null</code>.
 	 */
-	protected <C extends Configuration> C setConfiguration(final C configuration)
-	{
+	protected <C extends Configuration> C setConfiguration(final C configuration) {
 		return configurationManager.setConfiguration(configuration);
 	}
 
@@ -107,8 +104,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param configuration The configuration to set.
 	 * @return The configuration previously associated with the given class, or <code>null</code> if there was no previous configuration for that class.
 	 */
-	protected <C extends Configuration> C setConfiguration(final Class<C> configurationClass, final C configuration)
-	{
+	protected <C extends Configuration> C setConfiguration(final Class<C> configurationClass, final C configuration) {
 		return configurationManager.setConfiguration(configurationClass, configuration);
 	}
 
@@ -118,8 +114,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param configurationClass The class of configuration to retrieve.
 	 * @return The configuration associated with the given class, or <code>null</code> if there was no configuration for that class.
 	 */
-	public <C extends Configuration> C getConfiguration(final Class<C> configurationClass)
-	{
+	public <C extends Configuration> C getConfiguration(final Class<C> configurationClass) {
 		return configurationManager.getConfiguration(configurationClass);
 	}
 
@@ -129,8 +124,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param configurationClass The class with which the configuration is associated.
 	 * @return The configuration previously associated with the given class, or <code>null</code> if there was no previous configuration for that class.
 	 */
-	protected <C extends Configuration> C removeConfiguration(final Class<C> configurationClass)
-	{
+	protected <C extends Configuration> C removeConfiguration(final Class<C> configurationClass) {
 		return configurationManager.removeConfiguration(configurationClass);
 	}
 
@@ -138,8 +132,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	private final UUID uuid;
 
 	/** @return The unique identifier of this session. */
-	public UUID getUUID()
-	{
+	public UUID getUUID() {
 		return uuid;
 	}
 
@@ -147,8 +140,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	private final GuiseApplication application;
 
 	/** @return The Guise application to which this session belongs. */
-	public GuiseApplication getApplication()
-	{
+	public GuiseApplication getApplication() {
 		return application;
 	}
 
@@ -156,8 +148,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	private Writer logWriter;
 
 	/** @return The writer for writing to the log file, which may not be thread-safe. */
-	public Writer getLogWriter()
-	{
+	public Writer getLogWriter() {
 		return logWriter;
 	}
 
@@ -166,8 +157,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param logWriter The writer for writing to the log file, which may not be thread-safe.
 	 * @throws NullPointerException if the given log writer is <code>null</code>.
 	 */
-	public void setLogWriter(final Writer logWriter)
-	{
+	public void setLogWriter(final Writer logWriter) {
 		this.logWriter = checkInstance(logWriter, "Log writer cannot be null.");
 	}
 
@@ -175,16 +165,13 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	private URI depictionBaseURI;
 
 	/** {@inheritDoc} */
-	public URI getDepictionRootURI()
-	{
+	public URI getDepictionRootURI() {
 		return depictionBaseURI;
 	}
 
 	/** {@inheritDoc} */
-	public void setDepictionRootURI(final URI depictionBaseURI)
-	{
-		if(!this.depictionBaseURI.equals(checkRoot(checkAbsolute(checkPlainURI(depictionBaseURI))))) //if a new root URI is given
-		{
+	public void setDepictionRootURI(final URI depictionBaseURI) {
+		if(!this.depictionBaseURI.equals(checkRoot(checkAbsolute(checkPlainURI(depictionBaseURI))))) { //if a new root URI is given
 			this.depictionBaseURI = depictionBaseURI; //save the new base URI
 		}
 	}
@@ -195,8 +182,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * This implementation delegates to {@link #getDepictionURI(URI, String...)}.
 	 * </p>
 	 */
-	public final URI getDepictionURI(final URIPath navigationPath, final String... suffixes)
-	{
+	public final URI getDepictionURI(final URIPath navigationPath, final String... suffixes) {
 		return getDepictionURI(navigationPath.toURI(), suffixes);
 	}
 
@@ -209,8 +195,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see #dereferenceURI(URI, String...)
 	 * @see GuiseApplication#getDepictionURI(URI, URI)
 	 */
-	public URI getDepictionURI(final URI navigationURI, final String... suffixes)
-	{
+	public URI getDepictionURI(final URI navigationURI, final String... suffixes) {
 		final GuiseApplication guiseApplication = getApplication(); //get the application
 		return guiseApplication.getDepictionURI(getDepictionRootURI(), dereferenceURI(navigationURI, suffixes)); //dereference the navigation URI and determine the depiction URI
 	}
@@ -224,10 +209,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @return The application frame.
 	 * @throws IllegalStateException if this session has not yet been initialized.
 	 */
-	public ApplicationFrame getApplicationFrame()
-	{
-		if(applicationFrame == null) //if this session has not yet been initialized
-		{
+	public ApplicationFrame getApplicationFrame() {
+		if(applicationFrame == null) { //if this session has not yet been initialized
 			throw new IllegalStateException("Guise session " + this + " has not yet been initialized and therefore has no application frame.");
 		}
 		return applicationFrame; //return the application frame
@@ -250,19 +233,16 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws NullPointerException if the given class is <code>null</code>.
 	 * @throws IOException if there was an error retrieving preferences.
 	 */
-	public URFResource getPreferences(final Class<?> objectClass) throws IOException
-	{
+	public URFResource getPreferences(final Class<?> objectClass) throws IOException {
 		URFResource preferences = classPreferencesMap.get(checkInstance(objectClass, "Class cannot be null.")); //get the preferences stored in the map
-		if(preferences == null) //if no preferences are stored in the map
-		{
+		if(preferences == null) { //if no preferences are stored in the map
 			preferences = new DefaultURFResource(); //create a default set of preference properties				
 			/*TODO del if we decide to store resource copies; change map to concurrent map
 							classPreferencesMap.writeLock().lock();	//get a write lock on the preferences map
 							try
 							{
 								preferences=classPreferencesMap.get(objectClass);	//try again to get the preferences stored in the map
-								if(preferences==null)	//if preferences are still not stored in the map
-								{
+								if(preferences==null) {	//if preferences are still not stored in the map
 									preferences=new DefaultRDFResource();	//create a default set of preference properties
 									classPreferencesMap.put(objectClass, preferences);	//store the preferences in the map
 								}
@@ -283,8 +263,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws NullPointerException if the given class and/or preferences is <code>null</code>.
 	 * @throws IOException if there was an error storing preferences.
 	 */
-	public void setPreferences(final Class<?> objectClass, final URFResource preferences) throws IOException
-	{
+	public void setPreferences(final Class<?> objectClass, final URFResource preferences) throws IOException {
 		classPreferencesMap.put(checkInstance(objectClass, "Class cannot be null."),
 				new DefaultURFResource(checkInstance(preferences, "Preferences cannot be null."))); //store a copy of the preferences in the map
 	}
@@ -293,8 +272,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	private final Platform platform;
 
 	/** @return The platform on which Guise objects are depicted. */
-	public Platform getPlatform()
-	{
+	public Platform getPlatform() {
 		return platform;
 	}
 
@@ -302,8 +280,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	private InputStrategy inputStrategy = null;
 
 	/** @return The strategy for processing input, or <code>null</code> if this session has no input strategy. */
-	public InputStrategy getInputStrategy()
-	{
+	public InputStrategy getInputStrategy() {
 		return inputStrategy;
 	}
 
@@ -312,10 +289,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param newInputStrategy The new strategy for processing input, or <code>null</code> if this session is to have no input strategy.
 	 * @see #INPUT_STRATEGY_PROPERTY
 	 */
-	public void setInputStrategy(final InputStrategy newInputStrategy)
-	{
-		if(!Objects.equals(inputStrategy, newInputStrategy)) //if the value is really changing
-		{
+	public void setInputStrategy(final InputStrategy newInputStrategy) {
+		if(!Objects.equals(inputStrategy, newInputStrategy)) { //if the value is really changing
 			final InputStrategy oldInputStrategy = inputStrategy; //get the current value
 			inputStrategy = newInputStrategy; //update the value
 			firePropertyChange(INPUT_STRATEGY_PROPERTY, oldInputStrategy, newInputStrategy);
@@ -326,8 +301,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	private TimeZone timeZone;
 
 	/** @return The current session time zone. */
-	public TimeZone getTimeZone()
-	{
+	public TimeZone getTimeZone() {
 		return timeZone;
 	}
 
@@ -337,10 +311,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws NullPointerException if the given time zone is <code>null</code>.
 	 * @see GuiseSession#TIME_ZONE_PROPERTY
 	 */
-	public void setTimeZone(final TimeZone newTimeZone)
-	{
-		if(!timeZone.equals(newTimeZone)) //if the value is really changing (compare their values, rather than identity)
-		{
+	public void setTimeZone(final TimeZone newTimeZone) {
+		if(!timeZone.equals(newTimeZone)) { //if the value is really changing (compare their values, rather than identity)
 			final TimeZone oldTimeZone = timeZone; //get the old value
 			timeZone = checkInstance(newTimeZone, "Guise session time zone cannot be null."); //actually change the value
 			firePropertyChange(TIME_ZONE_PROPERTY, oldTimeZone, newTimeZone); //indicate that the value changed
@@ -351,8 +323,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	private Locale locale;
 
 	/** @return The current session locale. */
-	public Locale getLocale()
-	{
+	public Locale getLocale() {
 		return locale;
 	}
 
@@ -363,10 +334,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see GuiseSession#LOCALE_PROPERTY
 	 * @see #setOrientation(Orientation)
 	 */
-	public void setLocale(final Locale newLocale)
-	{
-		if(!Objects.equals(locale, newLocale)) //if the value is really changing (compare their values, rather than identity) TODO locale should never be null, so no need to use Objects.equals()
-		{
+	public void setLocale(final Locale newLocale) {
+		if(!Objects.equals(locale, newLocale)) { //if the value is really changing (compare their values, rather than identity) TODO locale should never be null, so no need to use Objects.equals()
 			final Locale oldLocale = locale; //get the old value
 			locale = checkInstance(newLocale, "Guise session locale cannot be null."); //actually change the value
 			releaseResourceBundle(); //release the resource bundle, as the new locale may indicate that new resources should be used
@@ -384,35 +353,27 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see GuiseApplication#getSupportedLocales()
 	 * @see #setLocale(Locale)
 	 */
-	public Locale requestLocale(final List<Locale> requestedLocales)
-	{
+	public Locale requestLocale(final List<Locale> requestedLocales) {
 		final List<Locale> supportedLocales = getApplication().getLocales(); //get the application's supported locales
 		//TODO del when works			final Set<Locale> supportedLocales=getApplication().getSupportedLocales();	//get the application's supported locales	TODO maybe don't expose the whole set
-		for(final Locale requestedLocale : requestedLocales) //for each requested locale
-		{
+		for(final Locale requestedLocale : requestedLocales) { //for each requested locale
 			Locale acceptedLocale = null; //we'll determine if any variations of the requested locale is supported
-			if(supportedLocales.contains(requestedLocale)) //if the application supports this local 
-			{
+			if(supportedLocales.contains(requestedLocale)) { //if the application supports this local 
 				acceptedLocale = requestedLocale; //accept this locale as-is
 			}
-			if(acceptedLocale == null && requestedLocale.getVariant().length() > 0) //if the requested locale specifies a variant, see if there is a more general supported locale
-			{
+			if(acceptedLocale == null && requestedLocale.getVariant().length() > 0) { //if the requested locale specifies a variant, see if there is a more general supported locale
 				final Locale languageCountryLocale = new Locale(requestedLocale.getLanguage(), requestedLocale.getCountry()); //create a more general locale with just the language and country
-				if(supportedLocales.contains(languageCountryLocale)) //if the application supports this locale 
-				{
+				if(supportedLocales.contains(languageCountryLocale)) { //if the application supports this locale 
 					acceptedLocale = languageCountryLocale; //accept this more general locale
 				}
 			}
-			if(acceptedLocale == null && requestedLocale.getCountry().length() > 0) //if the requested locale specifies a country, see if there is an even more general supported locale
-			{
+			if(acceptedLocale == null && requestedLocale.getCountry().length() > 0) { //if the requested locale specifies a country, see if there is an even more general supported locale
 				final Locale languageLocale = new Locale(requestedLocale.getLanguage()); //create a more general locale with just the language
-				if(supportedLocales.contains(languageLocale)) //if the application supports this locale 
-				{
+				if(supportedLocales.contains(languageLocale)) { //if the application supports this locale 
 					acceptedLocale = languageLocale; //accept this more general locale
 				}
 			}
-			if(acceptedLocale != null) //if we were able to find a supported locale
-			{
+			if(acceptedLocale != null) { //if we were able to find a supported locale
 				setLocale(acceptedLocale); //change to this locale
 				return acceptedLocale; //indicate which locale was accepted
 			}
@@ -424,8 +385,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	private Orientation orientation = Orientation.LEFT_TO_RIGHT_TOP_TO_BOTTOM;
 
 	/** @return The default internationalization orientation of components for this session. */
-	public Orientation getOrientation()
-	{
+	public Orientation getOrientation() {
 		return orientation;
 	}
 
@@ -435,10 +395,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws NullPointerException if the given orientation is <code>null</code>.
 	 * @see GuiseSession#ORIENTATION_PROPERTY
 	 */
-	public void setOrientation(final Orientation newOrientation)
-	{
-		if(!Objects.equals(orientation, newOrientation)) //if the value is really changing
-		{
+	public void setOrientation(final Orientation newOrientation) {
+		if(!Objects.equals(orientation, newOrientation)) { //if the value is really changing
 			final Orientation oldOrientation = checkInstance(orientation, "Orientation cannot be null"); //get the old value
 			orientation = newOrientation; //actually change the value
 			firePropertyChange(ORIENTATION_PROPERTY, oldOrientation, newOrientation); //indicate that the value changed
@@ -460,7 +418,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * </ol>
 	 * @return The resource bundle containing the resources for this session, based upon the locale.
 	 * @throws MissingResourceException if no resource bundle for the application's specified base name can be found or there was an error loading a resource
-	 *              bundle.
+	 *           bundle.
 	 * @see GuiseApplication#loadResourceBundle(Theme, Locale)
 	 * @see #getTheme()
 	 * @see #getLocale()
@@ -473,17 +431,12 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see #getURIResource(String)
 	 * @see #getURIResource(String, URI)
 	 */
-	public ResourceBundle getResourceBundle() throws MissingResourceException
-	{
-		if(resourceBundle == null) //if the resource bundle has not yet been loaded
-		{
+	public ResourceBundle getResourceBundle() throws MissingResourceException {
+		if(resourceBundle == null) { //if the resource bundle has not yet been loaded
 			final Locale locale = getLocale(); //get the current locale
-			try
-			{
+			try {
 				resourceBundle = getApplication().loadResourceBundle(getTheme(), locale); //ask the application for the resource bundle based upon the locale
-			}
-			catch(final IOException ioException) //if there is an I/O error, convert it to a missing resource exception
-			{
+			} catch(final IOException ioException) { //if there is an I/O error, convert it to a missing resource exception
 				throw (MissingResourceException)new MissingResourceException(ioException.getMessage(), null, null).initCause(ioException); //TODO check to see if null is OK for arguments here
 			}
 		}
@@ -494,8 +447,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * Unloads the current resource bundle so that the next call to {@link #getResourceBundle()} will load the resource bundle anew. This method also releases the
 	 * current collator.
 	 */
-	protected void releaseResourceBundle()
-	{
+	protected void releaseResourceBundle() {
 		resourceBundle = null; //release our reference to the resource bundle
 		collator = null; //release the current collator
 	}
@@ -504,14 +456,13 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * The property value change listener that, in response to a change in value, releases the resource bundle.
 	 * @see #releaseResourceBundle()
 	 */
-	private final GenericPropertyChangeListener<String> resourceBundleReleasePropertyValueChangeListener = new AbstractGenericPropertyChangeListener<String>()
-	{
+	private final GenericPropertyChangeListener<String> resourceBundleReleasePropertyValueChangeListener = new AbstractGenericPropertyChangeListener<String>() {
+
 		/**
 		 * Called when a bound property is changed.
 		 * @param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
 		 */
-		public void propertyChange(final GenericPropertyChangeEvent<String> propertyChangeEvent)
-		{
+		public void propertyChange(final GenericPropertyChangeEvent<String> propertyChangeEvent) {
 			releaseResourceBundle(); //release the resource bundle, as the new locale may indicate that new resources should be used					
 		}
 	};
@@ -528,8 +479,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see #getResource(String, Object)
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> T getResource(final String resourceKey) throws MissingResourceException
-	{
+	public <T> T getResource(final String resourceKey) throws MissingResourceException {
 		return (T)getResourceBundle().getObject(resourceKey); //retrieve an object from the resource bundle
 	}
 
@@ -545,14 +495,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see #getResource(String)
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> T getResource(final String resourceKey, final T defaultValue) throws MissingResourceException
-	{
-		try
-		{
+	public <T> T getResource(final String resourceKey, final T defaultValue) throws MissingResourceException {
+		try {
 			return (T)getResource(resourceKey); //try to load the string from the resources
-		}
-		catch(final MissingResourceException missingResourceException) //if no such resource is available
-		{
+		} catch(final MissingResourceException missingResourceException) { //if no such resource is available
 			return defaultValue; //return the specified default value
 		}
 	}
@@ -569,39 +515,26 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see #getResourceBundle()
 	 * @see #getStringResource(String, String)
 	 */
-	public String getStringResource(final String resourceKey) throws MissingResourceException //TODO convert the resource to a string using toString()
-	{
-		try
-		{
+	public String getStringResource(final String resourceKey) throws MissingResourceException { //TODO convert the resource to a string using toString()
+		try {
 			return getResource(resourceKey); //retrieve a string from the resource bundle
-		}
-		catch(final MissingResourceException missingResourceException) //if the resource does not exist
-		{
-			if(isPath(resourceKey) && !isAbsolutePath(resourceKey)) //if the resource key is a relative path
-			{
+		} catch(final MissingResourceException missingResourceException) { //if the resource does not exist
+			if(isPath(resourceKey) && !isAbsolutePath(resourceKey)) { //if the resource key is a relative path
 				final String applicationResourcePath = getApplication().getLocaleResourcePath(resourceKey, getLocale()); //try to get a locale-sensitive path to the resource
-				if(applicationResourcePath != null) //if there is a path to the resource
-				{
+				if(applicationResourcePath != null) { //if there is a path to the resource
 					final InputStream inputStream = getApplication().getResourceInputStream(applicationResourcePath); //get a stream to the resource
-					if(inputStream != null) //if we got a stream to the resource (we always should, as we already checked to see which path represents an existing resource)
-					{
-						try
-						{
-							try
-							{
+					if(inputStream != null) { //if we got a stream to the resource (we always should, as we already checked to see which path represents an existing resource)
+						try {
+							try {
 								final StringWriter stringWriter = new StringWriter(); //create a new string writer to receive the resource contents
 								//TODO do better checking of XML encoding type by prereading
 								final Reader resourceReader = new BOMInputStreamReader(new BufferedInputStream(inputStream), UTF_8_CHARSET); //get an input reader to the file, defaulting to UTF-8 if we don't know its encoding
 								write(resourceReader, stringWriter); //copy the resource to the string
 								return stringWriter.toString(); //return the string read from the resource
-							}
-							finally
-							{
+							} finally {
 								inputStream.close(); //always close the input stream
 							}
-						}
-						catch(final IOException ioException) //if there is an I/O error, convert it to a missing resource exception
-						{
+						} catch(final IOException ioException) { //if there is an I/O error, convert it to a missing resource exception
 							throw (MissingResourceException)new MissingResourceException(ioException.getMessage(), missingResourceException.getClassName(),
 									missingResourceException.getKey()).initCause(ioException);
 						}
@@ -624,14 +557,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see #getResourceBundle()
 	 * @see #getStringResource(String)
 	 */
-	public String getStringResource(final String resourceKey, final String defaultValue) throws MissingResourceException
-	{
-		try
-		{
+	public String getStringResource(final String resourceKey, final String defaultValue) throws MissingResourceException {
+		try {
 			return getStringResource(resourceKey); //try to load the string from the resources
-		}
-		catch(final MissingResourceException missingResourceException) //if no such resource is available
-		{
+		} catch(final MissingResourceException missingResourceException) { //if no such resource is available
 			return defaultValue; //return the specified default value
 		}
 	}
@@ -647,16 +576,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see #getResourceBundle()
 	 * @see #getBooleanResource(String, Boolean)
 	 */
-	public Boolean getBooleanResource(final String resourceKey) throws MissingResourceException
-	{
+	public Boolean getBooleanResource(final String resourceKey) throws MissingResourceException {
 		final Object resource = getResource(resourceKey); //retrieve a resource from the resource bundle
-		if(resource instanceof String) //if the resource is a string
-		{
+		if(resource instanceof String) { //if the resource is a string
 			return Boolean.valueOf(dereferenceString((String)resource)); //get the Boolean value of the resource string
-		}
-		else
-		//if the resource is not a string, assume it is a Boolean
-		{
+		} else { //if the resource is not a string, assume it is a Boolean
 			return (Boolean)resource; //return the resource as a Boolean object, throwing a ClassCastException if it isn't an instance of Boolean
 		}
 	}
@@ -673,14 +597,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see #getResourceBundle()
 	 * @see #getBooleanResource(String)
 	 */
-	public Boolean getBooleanResource(final String resourceKey, final Boolean defaultValue) throws MissingResourceException
-	{
-		try
-		{
+	public Boolean getBooleanResource(final String resourceKey, final Boolean defaultValue) throws MissingResourceException {
+		try {
 			return getBooleanResource(resourceKey); //try to load the Boolean from the resources
-		}
-		catch(final MissingResourceException missingResourceException) //if no such resource is available
-		{
+		} catch(final MissingResourceException missingResourceException) { //if no such resource is available
 			return defaultValue; //return the specified default value
 		}
 	}
@@ -698,16 +618,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see #getColorResource(String, Color)
 	 * @see AbstractModeledColor#valueOf(CharSequence)
 	 */
-	public Color getColorResource(final String resourceKey) throws MissingResourceException
-	{
+	public Color getColorResource(final String resourceKey) throws MissingResourceException {
 		final Object resource = getResource(resourceKey); //retrieve a resource from the resource bundle
-		if(resource instanceof String) //if the resource is a string
-		{
+		if(resource instanceof String) { //if the resource is a string
 			return AbstractModeledColor.valueOf(dereferenceString((String)resource)); //create a color from the resolved string
-		}
-		else
-		//if the resource is not a string, assume it is a color
-		{
+		} else { //if the resource is not a string, assume it is a color
 			return (Color)resource; //return the resource as a color object, throwing a ClassCastException if it isn't an instance of Color
 		}
 	}
@@ -725,14 +640,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see #getColorResource(String)
 	 * @see AbstractModeledColor#valueOf(CharSequence)
 	 */
-	public Color getColorResource(final String resourceKey, final Color defaultValue) throws MissingResourceException
-	{
-		try
-		{
+	public Color getColorResource(final String resourceKey, final Color defaultValue) throws MissingResourceException {
+		try {
 			return getColorResource(resourceKey); //try to load the color from the resources
-		}
-		catch(final MissingResourceException missingResourceException) //if no such resource is available
-		{
+		} catch(final MissingResourceException missingResourceException) { //if no such resource is available
 			return defaultValue; //return the specified default value
 		}
 	}
@@ -749,16 +660,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see #getResourceBundle()
 	 * @see #getIntegerResource(String, Integer)
 	 */
-	public Integer getIntegerResource(final String resourceKey) throws MissingResourceException
-	{
+	public Integer getIntegerResource(final String resourceKey) throws MissingResourceException {
 		final Object resource = getResource(resourceKey); //retrieve a resource from the resource bundle
-		if(resource instanceof String) //if the resource is a string
-		{
+		if(resource instanceof String) { //if the resource is a string
 			return Integer.valueOf(dereferenceString((String)resource)); //get the Integer value of the resource string
-		}
-		else
-		//if the resource is not a string, assume it is an Integer
-		{
+		} else { //if the resource is not a string, assume it is an Integer
 			return (Integer)resource; //return the resource as an Integer object, throwing a ClassCastException if it isn't an instance of Integer
 		}
 	}
@@ -775,14 +681,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see #getResourceBundle()
 	 * @see #getIntegerResource(String)
 	 */
-	public Integer getIntegerResource(final String resourceKey, final Integer defaultValue) throws MissingResourceException
-	{
-		try
-		{
+	public Integer getIntegerResource(final String resourceKey, final Integer defaultValue) throws MissingResourceException {
+		try {
 			return getIntegerResource(resourceKey); //try to load the Integer from the resources
-		}
-		catch(final MissingResourceException missingResourceException) //if no such resource is available
-		{
+		} catch(final MissingResourceException missingResourceException) { //if no such resource is available
 			return defaultValue; //return the specified default value
 		}
 	}
@@ -799,16 +701,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see #getResourceBundle()
 	 * @see #getURIResource(String, URI)
 	 */
-	public URI getURIResource(final String resourceKey) throws MissingResourceException
-	{
+	public URI getURIResource(final String resourceKey) throws MissingResourceException {
 		final Object resource = getResource(resourceKey); //retrieve a resource from the resource bundle
-		if(resource instanceof String) //if the resource is a string
-		{
+		if(resource instanceof String) { //if the resource is a string
 			return URI.create(dereferenceString((String)resource)); //create a URI from the resource string
-		}
-		else
-		//if the resource is not a string, assume it is a URI
-		{
+		} else { //if the resource is not a string, assume it is a URI
 			return (URI)resource; //return the resource as a URI object, throwing a ClassCastException if it isn't an instance of URI
 		}
 	}
@@ -824,14 +721,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see #getResourceBundle()
 	 * @see #getURIResource(String)
 	 */
-	public URI getURIResource(final String resourceKey, final URI defaultValue) throws MissingResourceException
-	{
-		try
-		{
+	public URI getURIResource(final String resourceKey, final URI defaultValue) throws MissingResourceException {
+		try {
 			return getURIResource(resourceKey); //try to load the URI from the resources
-		}
-		catch(final MissingResourceException missingResourceException) //if no such resource is available
-		{
+		} catch(final MissingResourceException missingResourceException) { //if no such resource is available
 			return defaultValue; //return the specified default value
 		}
 	}
@@ -844,11 +737,9 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @return An instance of a collator appropriate for the current locale.
 	 * @see #getLocale()
 	 */
-	public Collator getCollatorInstance()
-	{
+	public Collator getCollatorInstance() {
 		Collator collator = this.collator; //get the current collator
-		if(collator == null) //if no collator has yet been created for the current locale
-		{
+		if(collator == null) { //if no collator has yet been created for the current locale
 			collator = Collator.getInstance(getLocale()); //get a collator for the current locale
 			collator.setStrength(Collator.PRIMARY); //sort according to primary differences---ignore accents and case differences
 			collator.setDecomposition(Collator.FULL_DECOMPOSITION); //fully decompose Unicode characters to get the best comparison
@@ -861,8 +752,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	private Principal principal;
 
 	/** @return The current principal (e.g. logged-in user), or <code>null</code> if there is no principal authenticated for this session. */
-	public Principal getPrincipal()
-	{
+	public Principal getPrincipal() {
 		return principal;
 	}
 
@@ -871,10 +761,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param newPrincipal The new principal, or <code>null</code> if there should be no associated principal (e.g. the user should be logged off).
 	 * @see GuiseSession#PRINCIPAL_PROPERTY
 	 */
-	public void setPrincipal(final Principal newPrincipal)
-	{
-		if(!Objects.equals(principal, newPrincipal)) //if the value is really changing (compare their values, rather than identity)
-		{
+	public void setPrincipal(final Principal newPrincipal) {
+		if(!Objects.equals(principal, newPrincipal)) { //if the value is really changing (compare their values, rather than identity)
 			final Principal oldPrincipal = principal; //get the old value
 			principal = newPrincipal; //actually change the value
 			firePropertyChange(PRINCIPAL_PROPERTY, oldPrincipal, newPrincipal); //indicate that the value changed
@@ -890,10 +778,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws IOException if there is an error loading the theme.
 	 * @see #getThemeURI()
 	 */
-	public Theme getTheme() throws IOException
-	{
-		if(theme == null) //if there is no theme (this race condition is more or less benign, and will only result in the theme being loaded more than once initially)
-		{
+	public Theme getTheme() throws IOException {
+		if(theme == null) { //if there is no theme (this race condition is more or less benign, and will only result in the theme being loaded more than once initially)
 			theme = getApplication().loadTheme(getThemeURI()); //ask the application to load the theme
 		}
 		return theme;
@@ -903,8 +789,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	private URI themeURI;
 
 	/** @return The URI of the session theme, to be resolved against the application base path. */
-	public URI getThemeURI()
-	{
+	public URI getThemeURI() {
 		return themeURI;
 	}
 
@@ -916,10 +801,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see #THEME_URI_PROPERTY
 	 * @see #getTheme()
 	 */
-	public void setThemeURI(final URI newThemeURI)
-	{
-		if(!Objects.equals(themeURI, newThemeURI)) //if the value is really changing
-		{
+	public void setThemeURI(final URI newThemeURI) {
+		if(!Objects.equals(themeURI, newThemeURI)) { //if the value is really changing
 			final URI oldThemeURI = themeURI; //get the old value
 			themeURI = checkInstance(newThemeURI, "Theme URI cannot be null."); //actually change the value
 			theme = null; //release our reference to the current theme
@@ -931,8 +814,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	private final ActionPrototype aboutApplicationActionPrototype;
 
 	/** @return The action prototype for presenting application information. */
-	public ActionPrototype getAboutApplicationActionPrototype()
-	{
+	public ActionPrototype getAboutApplicationActionPrototype() {
 		return aboutApplicationActionPrototype;
 	}
 
@@ -943,8 +825,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param platform The platform on which this session's objects are depicted.
 	 * @throws NullPointerException if the given application and/or platform is <code>null</code>.
 	 */
-	public AbstractGuiseSession(final GuiseApplication application, final Platform platform)
-	{
+	public AbstractGuiseSession(final GuiseApplication application, final Platform platform) {
 		this.uuid = UUID.randomUUID(); //create a UUID for the session
 		this.application = checkInstance(application, "Application cannot be null."); //save the application
 		this.depictionBaseURI = resolve(application.getContainer().getBaseURI(), application.getBasePath().toURI()); //default to a base URI calculated from the application base path resolved to the container's base URI TODO fix to convert from navigation to depiction path
@@ -955,11 +836,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		this.orientation = Orientation.getOrientation(locale); //set the orientation default based upon the locale
 		logWriter = new OutputStreamWriter(System.err); //default to logging to the error output; this will be replaced after the session is created
 		//about action prototype
-		aboutApplicationActionPrototype = new AbstractActionPrototype(LABEL_ABOUT_X + createStringValueReference(APPLICATION_NAME), GLYPH_ABOUT)
-		{
+		aboutApplicationActionPrototype = new AbstractActionPrototype(LABEL_ABOUT_X + createStringValueReference(APPLICATION_NAME), GLYPH_ABOUT) {
+
 			@Override
-			protected void action(final int force, final int option)
-			{
+			protected void action(final int force, final int option) {
 				final AboutPanel aboutPanel = new AboutPanel(); //create a new about panel
 				aboutPanel.setNameLabel(APPLICATION_NAME);
 				aboutPanel.setVersionLabel(LABEL_VERSION + ' ' + APPLICATION_VERSION);
@@ -977,17 +857,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param destination The destination for which a component should be returned.
 	 * @return The component bound to the given destination.
 	 * @throws NullPointerException if the destination is <code>null</code>.
-	 * @throws IllegalStateException if the component class bound to the destination does not provide appropriate constructors, is an interface, is abstract,
-	 *              or throws an exception during instantiation.
+	 * @throws IllegalStateException if the component class bound to the destination does not provide appropriate constructors, is an interface, is abstract, or
+	 *           throws an exception during instantiation.
 	 */
-	public Component getDestinationComponent(final ComponentDestination destination)
-	{
+	public Component getDestinationComponent(final ComponentDestination destination) {
 		Component component; //we'll store the component here, either a cached component or a created component
-		synchronized(destinationComponentMap) //don't allow the map to be modified while we access it
-		{
+		synchronized(destinationComponentMap) { //don't allow the map to be modified while we access it
 			component = destinationComponentMap.get(destination); //get cached component, if any
-			if(component == null) //if no component is cached
-			{
+			if(component == null) { //if no component is cached
 				//TODO maybe verify that this destination is actually associated with the navigation path for this application				final Destination destination=getApplication().getDestination(path);	//get the destination for this path
 				component = createComponent(destination.getComponentClass()); //create the component
 				destinationComponentMap.put(destination, component); //bind the component to the path, caching it for next time
@@ -1002,8 +879,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @return The component previously bound to the given destination, or <code>null</code> if no component was bound to the given destination.
 	 * @throws NullPointerException if the destination is <code>null</code>.
 	 */
-	public Component releaseDestinationComponent(final ComponentDestination destination)
-	{
+	public Component releaseDestinationComponent(final ComponentDestination destination) {
 		return destinationComponentMap.remove(destination); //uncache the component
 	}
 
@@ -1015,32 +891,28 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @return The component bound to the given path.
 	 * @throws NullPointerException if the path is <code>null</code>.
 	 * @throws IllegalArgumentException if the provided path is absolute.
-	 * @throws IllegalArgumentException if no component is appropriate to associated the given navigation path (i.e. the given navigation path is not
-	 *              associated with a component destination).
-	 * @throws IllegalStateException if the component class bound to the path does not provide appropriate constructors, is an interface, is abstract, or
-	 *              throws an exception during instantiation.
+	 * @throws IllegalArgumentException if no component is appropriate to associated the given navigation path (i.e. the given navigation path is not associated
+	 *           with a component destination).
+	 * @throws IllegalStateException if the component class bound to the path does not provide appropriate constructors, is an interface, is abstract, or throws
+	 *           an exception during instantiation.
 	 * @see ComponentDestination
 	 */
-	public Component getNavigationComponent(final URIPath path)
-	{
+	public Component getNavigationComponent(final URIPath path) {
 		final Destination destination = getApplication().getDestination(path); //get the destination associated with the given path
-		if(!(destination instanceof ComponentDestination)) //if the destination is not a component destination
-		{
+		if(!(destination instanceof ComponentDestination)) { //if the destination is not a component destination
 			throw new IllegalArgumentException("Navigation path " + path + " does not designate a component destination.");
 		}
 		return getDestinationComponent((ComponentDestination)destination); //return the component
 	}
 
 	/** {@inheritDoc} */
-	public URFResource getNavigationDescription(final URIPath navigationPath, final Bookmark bookmark) throws IOException
-	{
+	public URFResource getNavigationDescription(final URIPath navigationPath, final Bookmark bookmark) throws IOException {
 		final Destination destination = getApplication().getDestination(navigationPath); //get the destination associated with the given path
 		return destination != null ? destination.getDescription(this, navigationPath, bookmark, null) : null; //delegate to the destination, if any
 	}
 
 	/** {@inheritDoc} */
-	public URFResource getNavigationDescription() throws IOException
-	{
+	public URFResource getNavigationDescription() throws IOException {
 		return getNavigationDescription(getNavigationPath(), getBookmark());
 	}
 
@@ -1049,21 +921,15 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param componentClass The class representing the component to create.
 	 * @return The created component.
 	 * @throws IllegalStateException if the component class does not provide a default constructor, is an interface, is abstract, or throws an exception during
-	 *              instantiation.
+	 *           instantiation.
 	 */
-	protected Component createComponent(final Class<? extends Component> componentClass)
-	{
+	protected Component createComponent(final Class<? extends Component> componentClass) {
 		Component component; //we'll store the component here
-		try
-		{
+		try {
 			component = componentClass.newInstance(); //create a new instance of the component
-		}
-		catch(final IllegalAccessException illegalAccessException) //if the constructor is not visible
-		{
+		} catch(final IllegalAccessException illegalAccessException) { //if the constructor is not visible
 			throw new IllegalStateException(illegalAccessException);
-		}
-		catch(final InstantiationException instantiationException) //if the class is an interface or is abstract
-		{
+		} catch(final InstantiationException instantiationException) { //if the class is an interface or is abstract
 			throw new IllegalStateException(instantiationException);
 		}
 		initializeComponent(component); //initialize the component from a TURF description, if possible
@@ -1083,41 +949,26 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see Component#initialize()
 	 * @see <a href="http://www.ploop.org/">PLOOP</a>
 	 */
-	public void initializeComponent(final Component component)
-	{
+	public void initializeComponent(final Component component) {
 		final Class<?> componentClass = component.getClass(); //get the class of the component
 		final String descriptionFilename = addExtension(getLocalName(componentClass), TURF.NAME_EXTENSION); //create a name in the form ClassName.turf
 		//TODO del Log.trace("Trying to load description file:", descriptionFilename);
 		final InputStream descriptionInputStream = componentClass.getResourceAsStream(descriptionFilename); //get an input stream to the description file
-		if(descriptionInputStream != null) //if we have a description file
-		{
-			try
-			{
-				try
-				{
+		if(descriptionInputStream != null) { //if we have a description file
+			try {
+				try {
 					initializeComponent(component, descriptionInputStream); //initialize the component from the description, calling the initialize() method in the process
-				}
-				finally
-				{
+				} finally {
 					descriptionInputStream.close(); //always close the description input stream for good measure
 				}
-			}
-			catch(final IOException ioException) //if there is an I/O exception
-			{
+			} catch(final IOException ioException) { //if there is an I/O exception
 				throw new IllegalStateException(ioException); //TODO fix better
-			}
-			catch(final DataException dataException)
-			{
+			} catch(final DataException dataException) {
 				throw new IllegalStateException(dataException); //TODO fix better
-			}
-			catch(final InvocationTargetException invocationTargetException)
-			{
+			} catch(final InvocationTargetException invocationTargetException) {
 				throw new IllegalStateException(invocationTargetException); //TODO fix better
 			}
-		}
-		else
-		//if there is no description file
-		{
+		} else { //if there is no description file
 			component.initialize(); //call the initialize() method manually
 		}
 	}
@@ -1134,20 +985,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws InvocationTargetException if a given resource indicates a Java class the constructor of which throws an exception.
 	 * @see Component#initialize()
 	 */
-	public void initializeComponentFromResource(final Component component, final String resourceKey) throws DataException, InvocationTargetException
-	{
+	public void initializeComponentFromResource(final Component component, final String resourceKey) throws DataException, InvocationTargetException {
 		final String descriptionResource = getStringResource(resourceKey); //get the description resource
-		try
-		{
+		try {
 			final InputStream descriptionInputStream = new ByteArrayInputStream(descriptionResource.getBytes(UTF_8_CHARSET)); //convert the string to bytes and create an input string to the array of bytes TODO verify the encoding somehow
 			initializeComponent(component, descriptionInputStream); //initialize the component from the description resource
-		}
-		catch(final UnsupportedEncodingException unsupportedEncodingException) //UTF-8 should always be supported
-		{
+		} catch(final UnsupportedEncodingException unsupportedEncodingException) { //UTF-8 should always be supported
 			throw new AssertionError(unsupportedEncodingException);
-		}
-		catch(final IOException ioException) //we should never have an I/O exception reading from a byte array input stream
-		{
+		} catch(final IOException ioException) { //we should never have an I/O exception reading from a byte array input stream
 			throw new AssertionError(ioException);
 		}
 	}
@@ -1165,22 +1010,17 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see Component#initialize()
 	 */
 	public void initializeComponent(final Component component, final InputStream descriptionInputStream) throws IOException, DataException,
-			InvocationTargetException
-	{
+			InvocationTargetException {
 		final URI BASE_URI = URI.create("guise:/"); //TODO fix
 		final URF urf = AbstractTURFIO.readTURF(new URF(), descriptionInputStream, BASE_URI); //read TURF from the input stream
 		final URI componentResourceTypeURI = createJavaURI(component.getClass()); //create a new URI that indicates the type of the resource description we expect
 		final URFResource componentResource = urf.getResourceByTypeURI(componentResourceTypeURI); //try to locate the description of the given component
-		if(componentResource != null) //if there is a resource description of a matching type
-		{
+		if(componentResource != null) { //if there is a resource description of a matching type
 			final PLOOPURFProcessor ploopProcessor = new PLOOPURFProcessor(); //create a new PLOOP processor
 			ploopProcessor.setObjectProperties(component, componentResource); //initialize the component from this resource
 			component.initialize(); //initialize the component
 			final List<Object> objects = ploopProcessor.getObjects(urf); //make sure all described Java objects in the URF instance have been created
-		}
-		else
-		//if there is no resource of the appropriate type
-		{
+		} else { //if there is no resource of the appropriate type
 			throw new IllegalArgumentException("No resource description found of type " + componentResourceTypeURI); //TODO do we want to change to DataException?
 		}
 	}
@@ -1204,25 +1044,20 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param modalNavigation The modal navigation to add.
 	 * @throws NullPointerException if the given modal navigation is <code>null</code>.
 	 */
-	protected void pushModalNavigation(final ModalNavigation modalNavigation)
-	{
+	protected void pushModalNavigation(final ModalNavigation modalNavigation) {
 		modalNavigationStack.add(checkInstance(modalNavigation, "Modal navigation cannot be null.")); //push the modal navigation onto the top of the stack (the end of the list)
 	}
 
 	/** @return The modal navigation on the top of the stack, or <code>null</code> if there are no modal navigations. */
-	protected ModalNavigation peekModalNavigation()
-	{
-		synchronized(modalNavigationStack) //don't allow anyone to to access the modal navigation stack while we access it
-		{
+	protected ModalNavigation peekModalNavigation() {
+		synchronized(modalNavigationStack) { //don't allow anyone to to access the modal navigation stack while we access it
 			return !modalNavigationStack.isEmpty() ? modalNavigationStack.get(modalNavigationStack.size() - 1) : null; //return the last (top) modal navigation in the stack
 		}
 	}
 
 	/** @return The modal navigation from the top of the stack, or <code>null</code> if there are no modal navigations on the stack. */
-	protected ModalNavigation pollModalNavigation()
-	{
-		synchronized(modalNavigationStack) //don't allow anyone to to access the modal navigation stack while we access it
-		{
+	protected ModalNavigation pollModalNavigation() {
+		synchronized(modalNavigationStack) { //don't allow anyone to to access the modal navigation stack while we access it
 			return !modalNavigationStack.isEmpty() ? modalNavigationStack.remove(modalNavigationStack.size() - 1) : null; //return the last (top) modal navigation in the stack
 		}
 	}
@@ -1231,25 +1066,21 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @return The modal navigation from the top of the stack.
 	 * @throws NoSuchElementException if there are no modal navigations on the stack.
 	 */
-	protected ModalNavigation popModalNavigation()
-	{
+	protected ModalNavigation popModalNavigation() {
 		final ModalNavigation modalNavigation = pollModalNavigation(); //get the modal navigation from the top of the stack, if there is one
-		if(modalNavigation == null) //if the stack was empty
-		{
+		if(modalNavigation == null) { //if the stack was empty
 			throw new NoSuchElementException("No modal navigations are on the stack.");
 		}
 		return modalNavigation; //return the modal navigation we popped from the top of the stack
 	}
 
 	/** @return Whether the session is in a modal navigation state. */
-	public boolean isModalNavigation()
-	{
+	public boolean isModalNavigation() {
 		return !modalNavigationStack.isEmpty(); //we are modally navigating if there is one or more modal navigation states on the stack
 	}
 
 	/** @return The current modal navigation state, or <code>null</code> if there are no modal navigations. */
-	public ModalNavigation getModalNavigation()
-	{
+	public ModalNavigation getModalNavigation() {
 		return peekModalNavigation();
 	}
 
@@ -1260,8 +1091,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param modalNavigation The state of modal navigation.
 	 * @see #pushModalNavigation(ModalNavigation)
 	 */
-	public void beginModalNavigation(final ModalNavigationPanel<?> modalNavigationPanel, final ModalNavigation modalNavigation)
-	{
+	public void beginModalNavigation(final ModalNavigationPanel<?> modalNavigationPanel, final ModalNavigation modalNavigation) {
 		//TODO release the navigation panel, maybe, just in case
 		pushModalNavigation(modalNavigation); //push the modal navigation onto the top of the modal navigation stack
 		modalNavigation.getModalListener().modalBegan(new ModalEvent(modalNavigationPanel));
@@ -1279,44 +1109,35 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see Frame#getReferrerURI()
 	 * @see #releaseDestinationComponent(String)
 	 */
-	public boolean endModalNavigation(final ModalNavigationPanel<?> modalNavigationPanel)
-	{
+	public boolean endModalNavigation(final ModalNavigationPanel<?> modalNavigationPanel) {
 		final URIPath navigationPath = getNavigationPath(); //get our current navigation path
 		final GuiseApplication application = getApplication(); //get the application
 		ModalNavigation modalNavigation = null; //if we actually end modal navigation, we'll store the information here
 		final Destination destination = application.getDestination(navigationPath); //get the destination for this path TODO maybe add a GuiseSession.getDestination()
-		if(destination instanceof ComponentDestination) //if we're at a component destination
-		{
+		if(destination instanceof ComponentDestination) { //if we're at a component destination
 			final ComponentDestination componentDestination = (ComponentDestination)destination; //get the destination as a component destination
 			URI navigationURI = null; //TODO fix
 			//TODO fix			URI navigationURI=modalPanel.getReferrerURI();	//in the worse case scenario, we'll want to go back to where the modal panel came from, if that's available
-			if(destinationComponentMap.get(componentDestination) == modalNavigationPanel) //before we try to actually ending modality, make sure this panel is actually the one at our current destination
-			{
-				synchronized(modalNavigationStack) //don't allow anyone to to access the modal navigation stack while we access it
-				{
+			if(destinationComponentMap.get(componentDestination) == modalNavigationPanel) { //before we try to actually ending modality, make sure this panel is actually the one at our current destination
+				synchronized(modalNavigationStack) { //don't allow anyone to to access the modal navigation stack while we access it
 					final ModalNavigation currentModalNavigation = peekModalNavigation(); //see which model navigation is on the top of the stack
-					if(currentModalNavigation != null) //if there is a modal navigation currently in use
-					{
-						if(application.resolvePath(navigationPath).equals(new URIPath(currentModalNavigation.getNewNavigationURI().getRawPath()))) //if we're navigating where we expect to be (if we somehow got to here at something other than the modal navigation path, we wouldn't want to remove the current navigation path)
-						{
+					if(currentModalNavigation != null) { //if there is a modal navigation currently in use
+						if(application.resolvePath(navigationPath).equals(new URIPath(currentModalNavigation.getNewNavigationURI().getRawPath()))) { //if we're navigating where we expect to be (if we somehow got to here at something other than the modal navigation path, we wouldn't want to remove the current navigation path)
 							modalNavigation = popModalNavigation(); //end the current modal navigation
 							navigationURI = modalNavigation.getOldNavigationURI(); //we'll return to where the current modal navigation came from---that's a better choice
 							final ModalNavigation oldModalNavigation = peekModalNavigation(); //see which model navigation is next on the stack
-							if(oldModalNavigation != null) //if there is another modal navigation to go to
-							{
+							if(oldModalNavigation != null) { //if there is another modal navigation to go to
 								navigationURI = oldModalNavigation.getOldNavigationURI(); //we're forced to go to the navigation URI of the old modal navigation							
 							}
 						}
 					}
 				}
 			}
-			if(navigationURI != null) //if we know where to go now that modality has ended
-			{
+			if(navigationURI != null) { //if we know where to go now that modality has ended
 				navigate(navigationURI); //navigate to the new URI
 			}
 			releaseDestinationComponent(componentDestination); //release the component associated with this destination
-			if(modalNavigation != null) //if we if we ended modality for the panel
-			{
+			if(modalNavigation != null) { //if we if we ended modality for the panel
 				modalNavigation.getModalListener().modalEnded(new ModalEvent(modalNavigationPanel)); //send an event to the modal listener
 			}
 		}
@@ -1331,10 +1152,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @return The path representing the current navigation location of the Guise application.
 	 * @throws IllegalStateException if this message has been called before the navigation path has been initialized.
 	 */
-	public URIPath getNavigationPath()
-	{
-		if(navigationPath == null) //if no navigation path has been set, yet
-		{
+	public URIPath getNavigationPath() {
+		if(navigationPath == null) { //if no navigation path has been set, yet
 			throw new IllegalStateException("Navigation path has not yet been initialized.");
 		}
 		return navigationPath; //return the navigation path
@@ -1352,12 +1171,9 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see #navigateModal(URIPath, ModalNavigationListener)
 	 * @see #navigateModal(URI, ModalNavigationListener)
 	 */
-	public void setNavigationPath(final URIPath navigationPath)
-	{
-		if(!Objects.equals(this.navigationPath, checkInstance(navigationPath, "Navigation path cannot be null."))) //if the navigation path is really changing
-		{
-			if(!getApplication().hasDestination(navigationPath)) //if no destination is associated with the given navigation path
-			{
+	public void setNavigationPath(final URIPath navigationPath) {
+		if(!Objects.equals(this.navigationPath, checkInstance(navigationPath, "Navigation path cannot be null."))) { //if the navigation path is really changing
+			if(!getApplication().hasDestination(navigationPath)) { //if no destination is associated with the given navigation path
 				throw new IllegalArgumentException("Unknown navigation path: " + navigationPath);
 			}
 			this.navigationPath = navigationPath; //change the navigation path TODO fire an event, but make sure that doesn't make the page reload
@@ -1371,8 +1187,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * Reports the current bookmark relative to the current navigation path.
 	 * @return The bookmark relative to the current navigation path, or <code>null</code> if there is no bookmark specified.
 	 */
-	public Bookmark getBookmark()
-	{
+	public Bookmark getBookmark() {
 		return bookmark; //return the bookmark, if there is one
 	}
 
@@ -1381,10 +1196,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * indicate that it is representative of the current state of the current navigation.
 	 * @param bookmark The bookmark relative to the current navigation path, or <code>null</code> if there should be no bookmark.
 	 */
-	public void setBookmark(final Bookmark bookmark)
-	{
-		if(!Objects.equals(this.bookmark, bookmark)) //if the bookmark is really changing
-		{
+	public void setBookmark(final Bookmark bookmark) {
+		if(!Objects.equals(this.bookmark, bookmark)) { //if the bookmark is really changing
 			this.bookmark = bookmark; //change the bookmark TODO fire an event, but make sure that doesn't make the page reload
 			log(null, "guise-bookmark", bookmark != null ? bookmark.toString() : null, null, null); //TODO improve; use a constant
 		}
@@ -1403,13 +1216,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see #setBookmark(Bookmark)
 	 * @see #getApplicationFrame()
 	 */
-	public void setNavigation(final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI)
-	{
+	public void setNavigation(final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) {
 		//TODO del Log.trace("setting naviation; navigation path:", navigationPath, "bookmark:", bookmark, "referrerURI:", referrerURI);
 		//if the navigation path or the bookmark is changing
 		if(!Objects.equals(this.navigationPath, navigationPath) //see if the navigation path is changing (the old navigation path will be null if this session has not yet navigated anywhere; don't call getNavigationPath(), which might throw an exception)
-				|| !Objects.equals(this.bookmark, bookmark)) //see if the bookmark is changing
-		{
+				|| !Objects.equals(this.bookmark, bookmark)) { //see if the bookmark is changing
 			setNavigationPath(navigationPath); //make sure the Guise session has the correct navigation path
 			setBookmark(bookmark); //make sure the Guise session has the correct bookmark
 			//TODO del Log.trace("changed to new bookmark:", getBookmark());
@@ -1430,8 +1241,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see NavigationListener
 	 * @see NavigationEvent
 	 */
-	public void fireNavigated(final URI referrerURI)
-	{
+	public void fireNavigated(final URI referrerURI) {
 		final NavigationEvent navigationEvent = new NavigationEvent(this, getNavigationPath(), getBookmark(), referrerURI); //create a navigation event with the session as the source of the event
 		fireNavigated(getApplicationFrame(), navigationEvent); //fire a navigation event to all components in the application frame hierarchy			
 	}
@@ -1444,16 +1254,12 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see NavigationListener
 	 * @see NavigationEvent
 	 */
-	protected void fireNavigated(final Component component, final NavigationEvent navigationEvent)
-	{
-		if(component instanceof NavigationListener) //if the component is a navigation listener
-		{
+	protected void fireNavigated(final Component component, final NavigationEvent navigationEvent) {
+		if(component instanceof NavigationListener) { //if the component is a navigation listener
 			((NavigationListener)component).navigated(navigationEvent); //fire the event to the component
 		}
-		if(component instanceof CompositeComponent) //if the component is a composite component
-		{
-			for(final Component childComponent : ((CompositeComponent)component).getChildComponents()) //for every child component
-			{
+		if(component instanceof CompositeComponent) { //if the component is a composite component
+			for(final Component childComponent : ((CompositeComponent)component).getChildComponents()) { //for every child component
 				fireNavigated(childComponent, navigationEvent); //fire the event to the child component if possible
 			}
 		}
@@ -1463,14 +1269,12 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	private Navigation requestedNavigation = null;
 
 	/** @return The requested navigation, or <code>null</code> if no navigation has been requested. */
-	public Navigation getRequestedNavigation()
-	{
+	public Navigation getRequestedNavigation() {
 		return requestedNavigation;
 	}
 
 	/** Removes any requests for navigation. */
-	public void clearRequestedNavigation()
-	{
+	public void clearRequestedNavigation() {
 		requestedNavigation = null;
 	}
 
@@ -1481,8 +1285,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @see #navigate(URI)
 	 */
-	public void navigate(final URIPath path)
-	{
+	public void navigate(final URIPath path) {
 		navigate(path, (Bookmark)null); //navigate to the requested path with no bookmark
 	}
 
@@ -1494,8 +1297,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @see #navigate(URI, String)
 	 */
-	public void navigate(final URIPath path, final String viewportID)
-	{
+	public void navigate(final URIPath path, final String viewportID) {
 		navigate(path, null, viewportID); //navigate to the requested path in the viewport with no bookmark
 	}
 
@@ -1507,8 +1309,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @see #navigate(URI)
 	 */
-	public void navigate(final URIPath path, final Bookmark bookmark)
-	{
+	public void navigate(final URIPath path, final Bookmark bookmark) {
 		navigate(path, bookmark, null); //navigate to the requested path with no viewport ID
 	}
 
@@ -1521,8 +1322,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @see #navigate(URI, String)
 	 */
-	public void navigate(final URIPath path, final Bookmark bookmark, final String viewportID)
-	{
+	public void navigate(final URIPath path, final Bookmark bookmark, final String viewportID) {
 		final URI uri = bookmark != null ? URI.create(path.toString() + bookmark.toString()) : path.toURI(); //append the bookmark if needed
 		navigate(uri, viewportID); //navigate to the requested URI, converting the path to a URI and verifying that it is only a path
 	}
@@ -1533,8 +1333,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param uri Either a relative or absolute path, or an absolute URI.
 	 * @throws NullPointerException if the given URI is <code>null</code>.
 	 */
-	public void navigate(final URI uri)
-	{
+	public void navigate(final URI uri) {
 		navigate(uri, null); //navigate to the given URI in the current viewport
 	}
 
@@ -1545,8 +1344,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param viewportID The ID of the viewport in which navigation should occur, or <code>null</code> if navigation should occur in the current viewport.
 	 * @throws NullPointerException if the given URI is <code>null</code>.
 	 */
-	public void navigate(final URI uri, final String viewportID)
-	{
+	public void navigate(final URI uri, final String viewportID) {
 		//com.globalmentor.log.Log.info("Navigating: ", uri, viewportID);
 		requestedNavigation = new Navigation(getNavigationPath().toURI(), checkInstance(uri, "URI cannot be null."), viewportID); //create new requested navigation
 	}
@@ -1559,8 +1357,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @see #navigateModal(URI, ModalNavigationListener)
 	 */
-	public void navigateModal(final URIPath path, final ModalNavigationListener modalListener)
-	{
+	public void navigateModal(final URIPath path, final ModalNavigationListener modalListener) {
 		navigateModal(path.toURI(), modalListener); //navigate to the requested URI, converting the path to a URI and verifying that it is only a path
 	}
 
@@ -1573,8 +1370,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @see #navigateModal(URI, ModalNavigationListener)
 	 */
-	public void navigateModal(final URIPath path, final Bookmark bookmark, final ModalNavigationListener modalListener)
-	{
+	public void navigateModal(final URIPath path, final Bookmark bookmark, final ModalNavigationListener modalListener) {
 		final URI uri = bookmark != null ? URI.create(path.toString() + bookmark.toString()) : path.toURI(); //append the bookmark if needed
 		navigateModal(uri, modalListener); //navigate to the requested URI, converting the path to a URI and verifying that it is only a path
 	}
@@ -1586,8 +1382,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param modalListener The listener to respond to the end of modal interaction.
 	 * @throws NullPointerException if the given URI is <code>null</code>.
 	 */
-	public void navigateModal(final URI uri, final ModalNavigationListener modalListener)
-	{
+	public void navigateModal(final URI uri, final ModalNavigationListener modalListener) {
 		requestedNavigation = new ModalNavigation(getApplication().resolveURI(getNavigationPath().toURI()), getApplication().resolveURI(
 				checkInstance(uri, "URI cannot be null.")), modalListener); //resolve the URI against the application context path
 	}
@@ -1598,8 +1393,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * This version returns <code>null</code>.
 	 * </p>
 	 */
-	public String getSiteName()
-	{
+	public String getSiteName() {
 		return null; //TODO fix to retrieve from application
 	}
 
@@ -1613,8 +1407,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * </p>
 	 * @see #getDepictionURI(URIPath, String...)
 	 */
-	public Breadcrumb getBreadcrumb(final URIPath navigationPath)
-	{
+	public Breadcrumb getBreadcrumb(final URIPath navigationPath) {
 		final URI depictionURI = getDepictionURI(navigationPath); //get the depiction URI to show
 		return new Breadcrumb(navigationPath, URIs.getName(depictionURI)); //create a default breadcrumb with the decoded depiction name of this navigation path
 	}
@@ -1625,12 +1418,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * This method delegates to {@link #getBreadcrumb(URIPath)} to create each segment breadcrumb.
 	 * </p>
 	 */
-	public List<Breadcrumb> getBreadcrumbs(final URIPath navigationPath)
-	{
+	public List<Breadcrumb> getBreadcrumbs(final URIPath navigationPath) {
 		final List<URIPath> baseNavigationPaths = navigationPath.getBasePaths(); //get the base paths of the navigation path
 		final List<Breadcrumb> breadcrumbs = new ArrayList<Breadcrumb>(baseNavigationPaths.size()); //create a list in which to store the breadcrumbs
-		for(final URIPath baseNavigationPath : baseNavigationPaths) //look at all the base paths in the navigation path
-		{
+		for(final URIPath baseNavigationPath : baseNavigationPaths) { //look at all the base paths in the navigation path
 			breadcrumbs.add(getBreadcrumb(baseNavigationPath)); //add a breadcrumb for this base path of the navigation path
 		}
 		return breadcrumbs; //return the breadcrumbs we collected
@@ -1641,8 +1432,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws IllegalStateException if the session is already initialized.
 	 * @see #destroy()
 	 */
-	public void initialize()
-	{
+	public void initialize() {
 		this.applicationFrame = application.createApplicationFrame(); //create the application frame
 		this.applicationFrame.open(); //open the application frame
 		//TODO check active state
@@ -1654,8 +1444,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws IllegalStateException if the session has not yet been initialized or has already been destroyed.
 	 * @see #initialize()
 	 */
-	public void destroy()
-	{
+	public void destroy() {
 		//TODO check active state
 		getApplication().removePropertyChangeListener(GuiseApplication.RESOURCE_BUNDLE_BASE_NAME_PROPERTY, resourceBundleReleasePropertyValueChangeListener); //stop listening for the application to change its resource bundle base name				
 	}
@@ -1673,8 +1462,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see GuiseApplication#createTempAsset(String, String, GuiseSession)
 	 * @see GuiseApplication#getTempDirectory()
 	 */
-	public URIPath createTempPublicResource(final String baseName, final String extension) throws IOException
-	{
+	public URIPath createTempPublicResource(final String baseName, final String extension) throws IOException {
 		return getApplication().createTempAsset(baseName, extension, this); //delegate to the application with a reference to this session
 	}
 
@@ -1695,8 +1483,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @return A component to indicate Guise busy status.
 	 * @see Theme#GLYPH_BUSY
 	 */
-	public Component createBusyComponent()
-	{
+	public Component createBusyComponent() {
 		return new BusyPanel(); //create the default busy panel
 	}
 
@@ -1714,17 +1501,13 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see InputStrategy#input(Input)
 	 * @see InputEvent#isConsumed()
 	 */
-	public boolean input(final Input input)
-	{
+	public boolean input(final Input input) {
 		final InputEvent inputEvent = createInputEvent(input); //create an input event from the input
-		if(!inputEvent.isConsumed()) //if the input has not been consumed (the event could be created as consumed, preventing further processing)
-		{
+		if(!inputEvent.isConsumed()) { //if the input has not been consumed (the event could be created as consumed, preventing further processing)
 			getApplicationFrame().dispatchInputEvent(inputEvent); //dispatch the input event to the application frame
-			if(!inputEvent.isConsumed()) //if the input has still not been consumed
-			{
+			if(!inputEvent.isConsumed()) { //if the input has still not been consumed
 				final InputStrategy inputStrategy = getInputStrategy(); //get our input strategy, if any
-				if(inputStrategy != null) //if we have an input strategy
-				{
+				if(inputStrategy != null) { //if we have an input strategy
 					return inputStrategy.input(input); //send the input to the input strategy and return whether it was consumed
 				}
 			}
@@ -1742,24 +1525,15 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see KeystrokeInput
 	 * @see MouseClickInput
 	 */
-	protected InputEvent createInputEvent(final Input input)
-	{
+	protected InputEvent createInputEvent(final Input input) {
 		final InputEvent inputEvent; //create an input event from the input
-		if(input instanceof CommandInput) //if this is command input
-		{
+		if(input instanceof CommandInput) { //if this is command input
 			return new CommandEvent(this, (CommandInput)input); //return a command event
-		}
-		else if(input instanceof KeystrokeInput) //if this is keystroke input
-		{
+		} else if(input instanceof KeystrokeInput) { //if this is keystroke input
 			return new KeyPressEvent(this, (KeystrokeInput)input); //return a key press event
-		}
-		else if(input instanceof MouseClickInput) //if this is mouse click input
-		{
+		} else if(input instanceof MouseClickInput) { //if this is mouse click input
 			return new MouseClickEvent(this, (MouseClickInput)input); //return a mouse click event
-		}
-		else
-		//if we don't recognize the event
-		{
+		} else { //if we don't recognize the event
 			throw new IllegalArgumentException("Unrecognized input: " + input);
 		}
 	}
@@ -1774,8 +1548,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param comment The log comment, or <code>null</code> if there is no log comment.
 	 * @throws NullPointerException if the given log level is <code>null</code>.
 	 */
-	public void log(final String subject, final String predicate, final String object, final Map<?, ?> parameters, final CharSequence comment)
-	{
+	public void log(final String subject, final String predicate, final String object, final Map<?, ?> parameters, final CharSequence comment) {
 		log(InformationLevel.LOG, subject, predicate, object, parameters, comment); //log the information with LOG level
 	}
 
@@ -1790,8 +1563,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws NullPointerException if the given log level is <code>null</code>.
 	 */
 	public void log(final InformationLevel level, final String subject, final String predicate, final String object, final Map<?, ?> parameters,
-			final CharSequence comment)
-	{
+			final CharSequence comment) {
 		/*TODO fix; bring back after testing out-of-memory error
 				final Writer logWriter=getLogWriter();	//get the log writer
 				try
@@ -1799,8 +1571,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 					Log.log(logWriter, level, navigationPath, subject, predicate, object, parameters, comment);	//write the log information to the file; get the navigation path directly in case it hasn't yet been initialized and it still null so that an exception won't be thrown
 					logWriter.flush();	//flush the log information
 				}
-				catch(final IOException ioException)	//if there is a log error
-				{
+				catch(final IOException ioException) {	//if there is a log error
 					Log.error(ioException);	//log the error in the debug log
 				}
 		*/
@@ -1815,8 +1586,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws NullPointerException if the given notifications is <code>null</code>.
 	 * @throws IllegalArgumentException if no notifications are given.
 	 */
-	public void notify(final Notification... notifications)
-	{
+	public void notify(final Notification... notifications) {
 		notify(null, notifications); //perform the notifications with no ending logic
 	}
 
@@ -1831,24 +1601,18 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws NullPointerException if the given notifications is <code>null</code>.
 	 * @throws IllegalArgumentException if no notifications are given.
 	 */
-	public void notify(final Runnable afterNotify, final Notification... notifications)
-	{
-		if(checkInstance(notifications, "Notifications cannot be null.").length == 0) //if no notifications were given
-		{
+	public void notify(final Runnable afterNotify, final Notification... notifications) {
+		if(checkInstance(notifications, "Notifications cannot be null.").length == 0) { //if no notifications were given
 			throw new IllegalArgumentException("No notifications were given.");
 		}
-		final Runnable enumerateNotifications = new Runnable() //create code for notifying all notifications, including the extra one we were given
-		{
+		final Runnable enumerateNotifications = new Runnable() { //create code for notifying all notifications, including the extra one we were given
+
 			private int notificationIndex = 0; //start at the first notification
 
-			public void run() //each time this logic is executed
-			{
-				if(notificationIndex < notifications.length) //if there are more notifications
-				{
+			public void run() { //each time this logic is executed
+				if(notificationIndex < notifications.length) { //if there are more notifications
 					AbstractGuiseSession.this.notify(notifications[notificationIndex++], this); //notify of the current notification (advancing to the next one), specifying that this runnable should be called again
-				}
-				else if(afterNotify != null) //if we're out of notifications and there's something we're supposed to run after all notifications are done
-				{
+				} else if(afterNotify != null) { //if we're out of notifications and there's something we're supposed to run after all notifications are done
 					afterNotify.run(); //run whatever logic we're supposed to execute after notifications
 				}
 			}
@@ -1864,32 +1628,24 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param notification The notification information to relay.
 	 * @param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
 	 */
-	protected void notify(final Notification notification, final Runnable afterNotify)
-	{
+	protected void notify(final Notification notification, final Runnable afterNotify) {
 		final Notification.Severity severity = notification.getSeverity(); //get the notification severity
-		if(severity == Notification.Severity.ERROR) //if this is an error notification TODO improve to work with all notifications; this will entail adding a general public debug write method and translating between log report levels and notification severities
-		{
+		if(severity == Notification.Severity.ERROR) { //if this is an error notification TODO improve to work with all notifications; this will entail adding a general public debug write method and translating between log report levels and notification severities
 			final Throwable throwable = notification.getError(); //get the error, if any
-			if(throwable != null) //if there is an error
-			{
+			if(throwable != null) { //if there is an error
 				Log.error(throwable); //produce a stack trace
 			}
 		}
 		final NotificationOptionDialogFrame optionDialogFrame = new NotificationOptionDialogFrame(notification); //create a dialog from the notification
 		final String notificationLabel = notification.getLabel(); //get the notification's specified label, if any
-		if(notificationLabel != null) //if the notification specified a label
-		{
+		if(notificationLabel != null) { //if the notification specified a label
 			optionDialogFrame.setLabel(notificationLabel); //set the label from the notification
 			optionDialogFrame.setLabelContentType(notification.getLabelContentType()); //set the label content type from the notification
-		}
-		else
-		//if the notification specified no label
-		{
+		} else { //if the notification specified no label
 			optionDialogFrame.setLabel(severity.getLabel()); //set the label based upon the severity			
 		}
 		URI icon = notification.getGlyphURI(); //get the notification's specified icon, if any
-		if(icon == null) //if no icon was specified
-		{
+		if(icon == null) { //if no icon was specified
 			icon = severity.getGlyph(); //set the icon based upon the severity
 		}
 		optionDialogFrame.setGlyphURI(icon); //set the icon
@@ -1905,8 +1661,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws NullPointerException if the given errors is <code>null</code>.
 	 * @throws IllegalArgumentException if no errors are given.
 	 */
-	public void notify(final Throwable... errors)
-	{
+	public void notify(final Throwable... errors) {
 		notify(null, errors); //notify the user with no post-notification action
 	}
 
@@ -1920,12 +1675,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws NullPointerException if the given errors is <code>null</code>.
 	 * @throws IllegalArgumentException if no errors are given.
 	 */
-	public void notify(final Runnable afterNotify, final Throwable... errors)
-	{
+	public void notify(final Runnable afterNotify, final Throwable... errors) {
 		final int errorCount = checkInstance(errors, "Errors cannot be null").length; //see how many errors there are (we'll let the other methods check for a non-empty array)
 		final Notification[] notifications = new Notification[errorCount]; //create an array of as many notifications as are errors
-		for(int i = 0; i < errorCount; ++i) //for each error
-		{
+		for(int i = 0; i < errorCount; ++i) { //for each error
 			notifications[i] = new Notification(errors[i]); //create a new notification for this error
 		}
 		notify(afterNotify, notifications); //notify the user with the notifications of the errors
@@ -1954,35 +1707,27 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see Resources#createStringValueReference(String)
 	 * @see #getStringResource(String)
 	 */
-	public String dereferenceString(final String string) throws MissingResourceException
-	{
+	public String dereferenceString(final String string) throws MissingResourceException {
 		//TODO add later if we create a Guise-specific parameter feature; for now we use {}		int parameterCount=0;	//keep track of how many parameters have appeared
 		List<String> argumentList = null; //the lazily-created list of arguments
 		int fromIndex = 0; //keep track of where we are in the string
 		int stringStartIndex = string.indexOf(START_OF_STRING_CHAR, fromIndex); //see if there is a string reference in the string
-		if(stringStartIndex >= 0) //if there is a string reference
-		{
+		if(stringStartIndex >= 0) { //if there is a string reference
 			final StringBuilder stringBuilder = new StringBuilder(); //create a new string builder
-			do
-			{
-				if(stringStartIndex > fromIndex) //if there is literal text to add
-				{
+			do {
+				if(stringStartIndex > fromIndex) { //if there is literal text to add
 					stringBuilder.append(string.substring(fromIndex, stringStartIndex)); //append the literal text
 				}
 				int terminatorsRemaining = 1; //we currently expect to find one more string terminator
 				int searchStartIndex = stringStartIndex + 1; //start searching after the SOS character
 				int stringEndIndex; //we'll store here the end of the string reference
-				do
-				{
+				do {
 					stringEndIndex = charIndexOf(string, STRING_REFERENCE_DELIMITERS, searchStartIndex); //search for the end of the string (or the beginning of another reference)
-					if(stringEndIndex < 0) //if there is no string delimiter (and therefore no string terminator)
-					{
+					if(stringEndIndex < 0) { //if there is no string delimiter (and therefore no string terminator)
 						throw new IllegalArgumentException("String reference missing String Terminator (U+009C).");
 					}
 					final char delimiter = string.charAt(stringEndIndex); //get the delimiter we encountered
-					switch(string.charAt(stringEndIndex))
-					//see if we encountered a string terminator or another start of string
-					{
+					switch(string.charAt(stringEndIndex)) { //see if we encountered a string terminator or another start of string
 						case STRING_TERMINATOR_CHAR: //if we ended the string
 							--terminatorsRemaining; //we have one less terminator left
 							break;
@@ -1993,43 +1738,31 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 							throw new AssertionError("Unrecognized delimiter: " + delimiter);
 					}
 					searchStartIndex = stringEndIndex + 1; //if we need to search some more, we'll start searching immediately after the last delimiter
-				}
-				while(terminatorsRemaining > 0); //keep searching until 
+				} while(terminatorsRemaining > 0); //keep searching until 
 				final String stringReference = string.substring(stringStartIndex + 1, stringEndIndex); //get the string reference
-				if(startsWith(stringReference, STRING_VALUE_REFERENCE_PREFIX_CHAR)) //if this is a value reference
-				{
+				if(startsWith(stringReference, STRING_VALUE_REFERENCE_PREFIX_CHAR)) { //if this is a value reference
 					final String stringValue = dereferenceString(stringReference.substring(1)); //dereference the actual reference (i.e. ignore the string value reference prefix character)
-					if(argumentList == null) //if we don't yet have an argument list
-					{
+					if(argumentList == null) { //if we don't yet have an argument list
 						argumentList = new ArrayList<String>(); //create a new argument list
 					}
 					argumentList.add(stringValue); //add this string value to our argument list
-				}
-				else
-				//if this is not a value reference, it must be a resource reference
-				{
+				} else { //if this is not a value reference, it must be a resource reference
 					final String stringResource = getStringResource(stringReference); //look up the string resource, using the reference as a resource key
 					stringBuilder.append(dereferenceString(stringResource)); //dereference and append the value of the string reference
 				}
 				fromIndex = stringEndIndex + 1; //show the new search location
 				stringStartIndex = string.indexOf(START_OF_STRING_CHAR, fromIndex); //see if there is another string reference in the string
-			}
-			while(stringStartIndex >= 0); //keep building the string as long as there are more string references
+			} while(stringStartIndex >= 0); //keep building the string as long as there are more string references
 			final int length = string.length(); //get the string length
-			if(fromIndex < length) //if there is remaining literal text
-			{
+			if(fromIndex < length) { //if there is remaining literal text
 				stringBuilder.append(string.substring(fromIndex, length)); //append the remaining text
 			}
 			String dereferencedString = stringBuilder.toString(); //get the string we constructed
-			if(argumentList != null) //if we have string value arguments
-			{
+			if(argumentList != null) { //if we have string value arguments
 				dereferencedString = format(dereferencedString, (Object[])argumentList.toArray()); //use the string as a format pattern, formatted using the collected arguments
 			}
 			return dereferencedString; //return the string we dereferenced
-		}
-		else
-		//if there is no string reference
-		{
+		} else { //if there is no string reference
 			return string; //return the string as-is
 		}
 	}
@@ -2047,29 +1780,20 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see Resources#createURIResourceReference(String)
 	 * @see #getURIResource(String)
 	 */
-	public URI dereferenceURI(URI uri, final String... suffixes) throws MissingResourceException
-	{
-		while(RESOURCE_SCHEME.equals(uri.getScheme())) //if this is a resource reference
-		{
+	public URI dereferenceURI(URI uri, final String... suffixes) throws MissingResourceException {
+		while(RESOURCE_SCHEME.equals(uri.getScheme())) { //if this is a resource reference
 			final String resourceKey = uri.getSchemeSpecificPart(); //get the resource key from the URI
 			URI resourceURI = null; //we'll try to determine the resource URI
-			if(suffixes.length > 0) //if there are suffixes
-			{
-				try
-				{
+			if(suffixes.length > 0) { //if there are suffixes
+				try {
 					final String decoratedResourceKey = formatList(new StringBuilder(resourceKey).append('.'), '.', suffixes).toString(); //append the suffixes
 					resourceURI = getURIResource(decoratedResourceKey); //look up the resource using the decorated resource key
-				}
-				catch(final IOException ioException) //if there is no resource associated with the decorated resource key, ignore the error and try again with the base resource key
-				{
+				} catch(final IOException ioException) { //if there is no resource associated with the decorated resource key, ignore the error and try again with the base resource key
 					throw unexpected(ioException);
-				}
-				catch(final MissingResourceException missingResourceException) //if there is no resource associated with the decorated resource key, ignore the error and try again with the base resource key
-				{
+				} catch(final MissingResourceException missingResourceException) { //if there is no resource associated with the decorated resource key, ignore the error and try again with the base resource key
 				}
 			}
-			if(resourceURI == null) //if we haven't found a resource URI, yet
-			{
+			if(resourceURI == null) { //if we haven't found a resource URI, yet
 				resourceURI = getURIResource(resourceKey); //look up the resource using the plain resource key				
 			}
 			uri = resourceURI; //switch to the dereferenced URI in case we need to dereference it again
@@ -2090,8 +1814,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @see #dereferenceURI(URI, String...)
 	 * @see GuiseApplication#resolveURI(URI)
 	 */
-	public URI resolveURI(final URI uri, final String... suffixes) throws MissingResourceException
-	{
+	public URI resolveURI(final URI uri, final String... suffixes) throws MissingResourceException {
 		return getApplication().resolveURI(dereferenceURI(uri, suffixes)); //dereference and then resolve the URI
 	}
 

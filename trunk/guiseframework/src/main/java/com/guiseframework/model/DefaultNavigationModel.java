@@ -23,14 +23,12 @@ import com.globalmentor.net.URIPath;
  * A default implementation of a model for identifying a navigation path.
  * @author Garret Wilson
  */
-public class DefaultNavigationModel extends AbstractModel implements NavigationModel
-{
+public class DefaultNavigationModel extends AbstractModel implements NavigationModel {
 
 	private URIPath navigationPath;
 
 	/** Default constructor. */
-	public DefaultNavigationModel()
-	{
+	public DefaultNavigationModel() {
 		this(null);
 	}
 
@@ -38,22 +36,18 @@ public class DefaultNavigationModel extends AbstractModel implements NavigationM
 	 * Navigation path constructor.
 	 * @param navigationPath The navigation path, or <code>null</code> if the navigation path is not available.
 	 */
-	public DefaultNavigationModel(final URIPath navigationPath)
-	{
+	public DefaultNavigationModel(final URIPath navigationPath) {
 		this.navigationPath = navigationPath;
 	}
 
 	/** {@inheritDoc} */
-	public URIPath getNavigationPath()
-	{
+	public URIPath getNavigationPath() {
 		return navigationPath;
 	}
 
 	/** {@inheritDoc} */
-	public void setNavigationPath(final URIPath newNavigationPath)
-	{
-		if(!Objects.equals(navigationPath, newNavigationPath)) //if the value is really changing
-		{
+	public void setNavigationPath(final URIPath newNavigationPath) {
+		if(!Objects.equals(navigationPath, newNavigationPath)) { //if the value is really changing
 			final URIPath oldNavigationPath = navigationPath; //get the old value
 			navigationPath = newNavigationPath; //actually change the value
 			firePropertyChange(NAVIGATION_PATH_PROPERTY, oldNavigationPath, newNavigationPath); //indicate that the value changed
@@ -61,8 +55,7 @@ public class DefaultNavigationModel extends AbstractModel implements NavigationM
 	}
 
 	/** @return A string representation of this navigation model. */
-	public String toString()
-	{
+	public String toString() {
 		final URIPath navigationPath = getNavigationPath(); //get the navigation path, if any
 		return navigationPath != null ? getClass().getName() + ": " + navigationPath : super.toString(); //return the class and navigation path, or the default string if there is no navigation path
 	}

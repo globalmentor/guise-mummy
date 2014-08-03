@@ -21,15 +21,17 @@ import java.util.Queue;
 
 import com.guiseframework.platform.*;
 
-/**An abstract depictor for the web.
-@param <O> The type of object being depicted.
-@author Garret Wilson
-*/
-public abstract class AbstractWebDepictor<O extends DepictedObject> extends AbstractDepictor<O>
-{
+/**
+ * An abstract depictor for the web.
+ * @param <O> The type of object being depicted.
+ * @author Garret Wilson
+ */
+public abstract class AbstractWebDepictor<O extends DepictedObject> extends AbstractDepictor<O> {
 
-	/**@return The web platform on which this depictor is depicting ojects.*/
-	public WebPlatform getPlatform() {return (WebPlatform)super.getPlatform();}
+	/** @return The web platform on which this depictor is depicting ojects. */
+	public WebPlatform getPlatform() {
+		return (WebPlatform)super.getPlatform();
+	}
 
-//TODO fix	private final Queue<E>
+	//TODO fix	private final Queue<E>
 }

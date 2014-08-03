@@ -27,8 +27,7 @@ import com.guiseframework.component.*;
  * @param <C> The type of component being depicted.
  * @author Garret Wilson
  */
-public class WebHeadingDepictor<C extends LabelComponent> extends WebLabelDepictor<C>
-{
+public class WebHeadingDepictor<C extends LabelComponent> extends WebLabelDepictor<C> {
 
 	/** The array of XHTML heading element local names. */
 	protected final static String[] HEADING_LOCAL_NAMES = new String[] { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3, ELEMENT_H4, ELEMENT_H5, ELEMENT_H6 };
@@ -40,14 +39,11 @@ public class WebHeadingDepictor<C extends LabelComponent> extends WebLabelDepict
 	 * @see #getHeadingLocalName(int)
 	 */
 	@Override
-	public String getLocalName()
-	{
+	public String getLocalName() {
 		final C component = getDepictedObject(); //get the component		
-		if(component instanceof HeadingComponent) //if this is a heading
-		{
+		if(component instanceof HeadingComponent) { //if this is a heading
 			final String localName = getHeadingLocalName(((HeadingComponent)component).getLevel()); //get the heading local name for this heading level
-			if(localName != null) //if there is a local name
-			{
+			if(localName != null) { //if there is a local name
 				return localName; //return the local name
 			}
 		}
@@ -61,8 +57,7 @@ public class WebHeadingDepictor<C extends LabelComponent> extends WebLabelDepict
 	 * @return The appropriate XHTML heading element name if a level is specified, or <code>null</code> if there is no heading local name for the given heading
 	 *         level.
 	 */
-	public static String getHeadingLocalName(final int headingLevel)
-	{
+	public static String getHeadingLocalName(final int headingLevel) {
 		return headingLevel >= 0 && headingLevel < HEADING_LOCAL_NAMES.length ? HEADING_LOCAL_NAMES[headingLevel] : null; //if this is a valid level, retrieve the local name from the array
 	}
 

@@ -20,30 +20,30 @@ import java.util.regex.Pattern;
 
 import com.globalmentor.net.URIPath;
 
-/**A destination that permanently redirects to another referenced destination.
-@author Garret Wilson
-*/
-public class PermanentRedirectReferenceDestination extends AbstractReferenceDestination implements PermanentRedirectDestination
-{
+/**
+ * A destination that permanently redirects to another referenced destination.
+ * @author Garret Wilson
+ */
+public class PermanentRedirectReferenceDestination extends AbstractReferenceDestination implements PermanentRedirectDestination {
 
-	/**Path and referenced destination constructor.
-	@param path The application context-relative path within the Guise container context, which does not begin with '/'.
-	@param destination The referenced destination.
-	@throws NullPointerException if the path and/or destination is <code>null</code>.
-	@throws IllegalArgumentException if the provided path is absolute.
-	*/
-	public PermanentRedirectReferenceDestination(final URIPath path, final Destination destination)
-	{
-		super(path, destination);	//construct the parent class
+	/**
+	 * Path and referenced destination constructor.
+	 * @param path The application context-relative path within the Guise container context, which does not begin with '/'.
+	 * @param destination The referenced destination.
+	 * @throws NullPointerException if the path and/or destination is <code>null</code>.
+	 * @throws IllegalArgumentException if the provided path is absolute.
+	 */
+	public PermanentRedirectReferenceDestination(final URIPath path, final Destination destination) {
+		super(path, destination); //construct the parent class
 	}
 
-	/**Path pattern and referenced destination constructor.
-	@param pathPattern The pattern to match an application context-relative path within the Guise container context, which does not begin with '/'.
-	@param destination The referenced destination.
-	@throws NullPointerException if the path pattern and/or destination is <code>null</code>.
-	*/
-	public PermanentRedirectReferenceDestination(final Pattern pathPattern, final Destination destination)
-	{
-		super(pathPattern, destination);	//construct the parent class
+	/**
+	 * Path pattern and referenced destination constructor.
+	 * @param pathPattern The pattern to match an application context-relative path within the Guise container context, which does not begin with '/'.
+	 * @param destination The referenced destination.
+	 * @throws NullPointerException if the path pattern and/or destination is <code>null</code>.
+	 */
+	public PermanentRedirectReferenceDestination(final Pattern pathPattern, final Destination destination) {
+		super(pathPattern, destination); //construct the parent class
 	}
 }

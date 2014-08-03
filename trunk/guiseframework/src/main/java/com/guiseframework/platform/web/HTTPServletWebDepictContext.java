@@ -41,15 +41,13 @@ import static com.guiseframework.platform.web.WebPlatform.*;
  * </p>
  * @author Garret Wilson
  */
-public class HTTPServletWebDepictContext extends AbstractWebDepictContext
-{
+public class HTTPServletWebDepictContext extends AbstractWebDepictContext {
 
 	/** The Guise HTTP request. */
 	private final HTTPServletGuiseRequest guiseRequest;
 
 	/** @return The Guise HTTP request. */
-	protected HTTPServletGuiseRequest getGuiseRequest()
-	{
+	protected HTTPServletGuiseRequest getGuiseRequest() {
 		return guiseRequest;
 	}
 
@@ -57,8 +55,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 	private final HttpServletResponse response;
 
 	/** @return The HTTP servlet response. */
-	protected HttpServletResponse getResponse()
-	{
+	protected HttpServletResponse getResponse() {
 		return response;
 	}
 
@@ -66,8 +63,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 	private final URI depictURI;
 
 	/** @return The current full absolute URI for this depiction, including any query. */
-	public URI getDepictionURI()
-	{
+	public URI getDepictionURI() {
 		return depictURI;
 	}
 
@@ -78,8 +74,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 	private final QualifiedName attributeHashAttributeQualifiedName;
 
 	@Override
-	protected QualifiedName getAttributeHashAttributeQualifiedName()
-	{
+	protected QualifiedName getAttributeHashAttributeQualifiedName() {
 		return attributeHashAttributeQualifiedName;
 	}
 
@@ -87,8 +82,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 	private final QualifiedName contentHashAttributeQualifiedName;
 
 	@Override
-	protected QualifiedName getContentHashAttributeQualifiedName()
-	{
+	protected QualifiedName getContentHashAttributeQualifiedName() {
 		return contentHashAttributeQualifiedName;
 	}
 
@@ -102,8 +96,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 	 * @throws IOException If there was an I/O error loading a needed resource.
 	 */
 	public HTTPServletWebDepictContext(final HTTPServletGuiseRequest guiseRequest, final HttpServletResponse response, final GuiseSession session,
-			final Destination destination) throws IOException
-	{
+			final Destination destination) throws IOException {
 		super(session, destination); //construct the parent class
 		this.guiseRequest = checkInstance(guiseRequest, "Guise request cannot be null.");
 		this.response = checkInstance(response, "Response cannot be null.");
@@ -120,21 +113,19 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 		attributeHashAttributeQualifiedName = new QualifiedName(GUISE_ML_NAMESPACE_URI, getQualifiedName(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_ATTRIBUTE_HASH));
 		contentHashAttributeQualifiedName = new QualifiedName(GUISE_ML_NAMESPACE_URI, getQualifiedName(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_CONTENT_HASH));
 		setHashAttributesGenerated(true); //always generate hash attributes
-		final ContentType defaultContentType = ContentType.create(outputContentType.getPrimaryType(), outputContentType.getSubType(),
-				new ContentType.Parameter(ContentType.CHARSET_PARAMETER, UTF_8)); //default to text/plain encoded in UTF-8
+		final ContentType defaultContentType = ContentType.create(outputContentType.getPrimaryType(), outputContentType.getSubType(), new ContentType.Parameter(
+				ContentType.CHARSET_PARAMETER, UTF_8)); //default to text/plain encoded in UTF-8
 		response.setContentType(defaultContentType.toString()); //initialize the default content type and encoding
 		HTTPServlets.setContentLanguage(response, session.getLocale()); //set the response content language
 	}
 
 	/** @return The character encoding currently used for the text output. */
-	public CharacterEncoding getOutputCharacterEncoding()
-	{
+	public CharacterEncoding getOutputCharacterEncoding() {
 		return new CharacterEncoding(getResponse().getCharacterEncoding(), NO_BOM); //return the current output character encoding
 	}
 
 	/** @return The current content type of the text output. */
-	public ContentType getOutputContentType()
-	{
+	public ContentType getOutputContentType() {
 		return outputContentType;
 	}
 
@@ -142,8 +133,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext
 	 * Sets the content type of the text output. This implementation removes all parameters and adds a character set parameter of the current encoding.
 	 * @param contentType The content type of the text output.
 	 */
-	public void setOutputContentType(final ContentType contentType)
-	{
+	public void setOutputContentType(final ContentType contentType) {
 		//default to text/plain encoded in UTF-8 replace the charset parameter with the currently set character set TODO change to really just replace one parameter, instead of removing all others
 		this.outputContentType = ContentType.create(contentType.getPrimaryType(), contentType.getSubType(), new ContentType.Parameter(
 				ContentType.CHARSET_PARAMETER, getOutputCharacterEncoding().toString()));

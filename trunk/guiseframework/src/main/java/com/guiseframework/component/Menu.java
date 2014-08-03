@@ -20,41 +20,40 @@ import static com.globalmentor.java.Classes.*;
 
 import com.guiseframework.component.layout.MenuLayout;
 
-/**A group of components arranged as a menu.
-This component uses a {@link MenuModel} and a {@link MenuLayout}.
-@author Garret Wilson
-@see MenuLayout
-@see MenuModel
-*/
-public interface Menu extends ContainerControl, ActionControl, LabelDisplayableComponent
-{
+/**
+ * A group of components arranged as a menu. This component uses a {@link MenuModel} and a {@link MenuLayout}.
+ * @author Garret Wilson
+ * @see MenuLayout
+ * @see MenuModel
+ */
+public interface Menu extends ContainerControl, ActionControl, LabelDisplayableComponent {
 
-	/**The open bound property.*/
-	public final static String OPEN_PROPERTY=getPropertyName(Menu.class, "open");
-	/**The bound property of whether children will be displayed upon rollover.*/
-	public final static String ROLLOVER_OPEN_ENABLED_PROPERTY=getPropertyName(Menu.class, "rolloverOpenEnabled");
+	/** The open bound property. */
+	public final static String OPEN_PROPERTY = getPropertyName(Menu.class, "open");
+	/** The bound property of whether children will be displayed upon rollover. */
+	public final static String ROLLOVER_OPEN_ENABLED_PROPERTY = getPropertyName(Menu.class, "rolloverOpenEnabled");
 
-	/**@return The layout definition for the menu.*/
+	/** @return The layout definition for the menu. */
 	public MenuLayout getLayout();
 
-	/**@return Whether the menu is open.*/
+	/** @return Whether the menu is open. */
 	public boolean isOpen();
 
-	/**Sets whether the menu is open.
-	This is a bound property of type <code>Boolean</code>.
-	@param newOpen <code>true</code> if the menu should be open.
-	@see #OPEN_PROPERTY
-	*/
+	/**
+	 * Sets whether the menu is open. This is a bound property of type <code>Boolean</code>.
+	 * @param newOpen <code>true</code> if the menu should be open.
+	 * @see #OPEN_PROPERTY
+	 */
 	public void setOpen(final boolean newOpen);
 
-	/**@return Whether the menu children will be shown during rollover.*/
+	/** @return Whether the menu children will be shown during rollover. */
 	public boolean isRolloverOpenEnabled();
 
-	/**Sets whether the menu children will be shown during rollover.
-	If rollover open is enabled, the open state will not actually be changed during rollover.
-	This is a bound property of type <code>Boolean</code>.
-	@param newRolloverOpenEnabled <code>true</code> if the component should allow display during rollover, else <code>false</code>.
-	@see #ROLLOVER_OPEN_ENABLED_PROPERTY
-	*/
+	/**
+	 * Sets whether the menu children will be shown during rollover. If rollover open is enabled, the open state will not actually be changed during rollover.
+	 * This is a bound property of type <code>Boolean</code>.
+	 * @param newRolloverOpenEnabled <code>true</code> if the component should allow display during rollover, else <code>false</code>.
+	 * @see #ROLLOVER_OPEN_ENABLED_PROPERTY
+	 */
 	public void setRolloverOpenEnabled(final boolean newRolloverOpenEnabled);
 }

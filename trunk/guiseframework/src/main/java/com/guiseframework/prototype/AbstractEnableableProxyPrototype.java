@@ -18,44 +18,48 @@ package com.guiseframework.prototype;
 
 import com.guiseframework.model.*;
 
-/**An enableable prototype that is a proxy for another enableable prototype.
-@param <P> The type of prototype being proxied.
-@author Garret Wilson
-*/
-public abstract class AbstractEnableableProxyPrototype<P extends Prototype & InfoModel & Enableable> extends AbstractProxyPrototype<P> implements Enableable 
-{
+/**
+ * An enableable prototype that is a proxy for another enableable prototype.
+ * @param <P> The type of prototype being proxied.
+ * @author Garret Wilson
+ */
+public abstract class AbstractEnableableProxyPrototype<P extends Prototype & InfoModel & Enableable> extends AbstractProxyPrototype<P> implements Enableable {
 
-	/**@return Whether the object is enabled and can receive user input.*/
-	public boolean isEnabled() {return getProxiedPrototype().isEnabled();}
+	/** @return Whether the object is enabled and can receive user input. */
+	public boolean isEnabled() {
+		return getProxiedPrototype().isEnabled();
+	}
 
-	/**Sets whether the object is enabled and can receive user input.
-	This is a bound property of type <code>Boolean</code>.
-	@param newEnabled <code>true</code> if the object should indicate and accept user input.
-	@see #ENABLED_PROPERTY
-	*/
-	public void setEnabled(final boolean newEnabled) {getProxiedPrototype().setEnabled(newEnabled);}
+	/**
+	 * Sets whether the object is enabled and can receive user input. This is a bound property of type <code>Boolean</code>.
+	 * @param newEnabled <code>true</code> if the object should indicate and accept user input.
+	 * @see #ENABLED_PROPERTY
+	 */
+	public void setEnabled(final boolean newEnabled) {
+		getProxiedPrototype().setEnabled(newEnabled);
+	}
 
-	/**Fires appropriate property change events for the bound properties of the proxied prototype
-	This implementation fires property change events for the following properties:
-	<ul>
-		<li>{@link #ENABLED_PROPERTY}</li>
-	</ul>
-	@param oldProxiedPrototype The old proxied prototype.
-	@param newProxiedPrototype The new proxied prototype.
-	@throws NullPointerException if the given old proxied prototype and/or new proxied prototype is <code>null</code>.
-	*/
-	protected void fireProxiedPrototypeBoundPropertyChanges(final P oldProxiedPrototype, final P newProxiedPrototype)
-	{
-		super.fireProxiedPrototypeBoundPropertyChanges(oldProxiedPrototype, newProxiedPrototype);	//fire the default proxied prototype bound property change events
+	/**
+	 * Fires appropriate property change events for the bound properties of the proxied prototype This implementation fires property change events for the
+	 * following properties:
+	 * <ul>
+	 * <li>{@link #ENABLED_PROPERTY}</li>
+	 * </ul>
+	 * @param oldProxiedPrototype The old proxied prototype.
+	 * @param newProxiedPrototype The new proxied prototype.
+	 * @throws NullPointerException if the given old proxied prototype and/or new proxied prototype is <code>null</code>.
+	 */
+	protected void fireProxiedPrototypeBoundPropertyChanges(final P oldProxiedPrototype, final P newProxiedPrototype) {
+		super.fireProxiedPrototypeBoundPropertyChanges(oldProxiedPrototype, newProxiedPrototype); //fire the default proxied prototype bound property change events
 		firePropertyChange(ENABLED_PROPERTY, oldProxiedPrototype.isEnabled(), newProxiedPrototype.isEnabled());
 	}
 
-	/**Proxied prototype constructor.
-	@param proxiedPrototype The prototype proxied by this prototype.
-	@throws NullPointerException if the given proxied prototype is <code>null</code> is <code>null</code>.
-	*/
-	public AbstractEnableableProxyPrototype(final P proxiedPrototype)
-	{
+	/**
+	 * Proxied prototype constructor.
+	 * @param proxiedPrototype The prototype proxied by this prototype.
+	 * @throws NullPointerException if the given proxied prototype is <code>null</code> is <code>null</code>.
+	 */
+	public AbstractEnableableProxyPrototype(final P proxiedPrototype) {
 		super(proxiedPrototype);
 	}
 

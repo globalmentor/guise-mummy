@@ -38,21 +38,18 @@ import com.guiseframework.*;
  * </p>
  * @author Garret Wilson
  */
-public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContext implements XHTMLDepictContext
-{
+public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContext implements XHTMLDepictContext {
 
 	/** The map of namespace URIs to be represented as HTML5 data attributes. */
 	private final Set<URI> dataAttributeNamespaceURIs = newSetFromMap(new ConcurrentHashMap<URI, Boolean>());
 
 	@Override
-	public void registerDataAttributeNamespaceURI(final URI namespaceURI)
-	{
+	public void registerDataAttributeNamespaceURI(final URI namespaceURI) {
 		dataAttributeNamespaceURIs.add(checkInstance(namespaceURI));
 	}
 
 	@Override
-	public boolean isDataAttributeNamespaceURI(final URI namespaceURI)
-	{
+	public boolean isDataAttributeNamespaceURI(final URI namespaceURI) {
 		return dataAttributeNamespaceURIs.contains(namespaceURI);
 	}
 
@@ -60,14 +57,12 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 	private boolean allDataAttributes = false;
 
 	@Override
-	public boolean isAllDataAttributes()
-	{
+	public boolean isAllDataAttributes() {
 		return allDataAttributes;
 	}
 
 	@Override
-	public void setAllDataAttributes(final boolean dataAttributesEnabled)
-	{
+	public void setAllDataAttributes(final boolean dataAttributesEnabled) {
 		this.allDataAttributes = dataAttributesEnabled;
 	}
 
@@ -78,8 +73,7 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 	 * @throws NullPointerException if the given session and/or destination is null.
 	 * @throws IOException If there was an I/O error loading a needed resource.
 	 */
-	public AbstractXHTMLDepictContext(final GuiseSession session, final Destination destination) throws IOException
-	{
+	public AbstractXHTMLDepictContext(final GuiseSession session, final Destination destination) throws IOException {
 		super(session, destination); //construct the parent class
 		getXMLNamespacePrefixManager().registerNamespacePrefix(XHTML_NAMESPACE_URI.toString(), null); //don't use any prefix with the XHTML namespace
 	}
@@ -93,16 +87,12 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 	 * @see #isDataAttributeNamespaceURI(URI)
 	 */
 	@Override
-	protected <A extends Appendable> A appendAttributeName(final A appendable, final QualifiedName attributeQualifiedName) throws IOException
-	{
+	protected <A extends Appendable> A appendAttributeName(final A appendable, final QualifiedName attributeQualifiedName) throws IOException {
 		final URI namespaceURI = attributeQualifiedName.getNamespaceURI();
-		if(isAllDataAttributes() || (namespaceURI != null && isDataAttributeNamespaceURI(namespaceURI))) //if we should use data attributes
-		{
-			if(!XML.XMLNS_NAMESPACE_URI.equals(namespaceURI)) //if this isn't the XMLNS namespace
-			{
+		if(isAllDataAttributes() || (namespaceURI != null && isDataAttributeNamespaceURI(namespaceURI))) { //if we should use data attributes
+			if(!XML.XMLNS_NAMESPACE_URI.equals(namespaceURI)) { //if this isn't the XMLNS namespace
 				final String prefix = attributeQualifiedName.getPrefix();
-				if(prefix != null) //we're technically only generating attributes for prefixed attributes (although all attributes in a namespace should have a prefix)
-				{
+				if(prefix != null) { //we're technically only generating attributes for prefixed attributes (although all attributes in a namespace should have a prefix)
 					appendable.append(DATA_ATTRIBUTE_ID).append(ATTRIBUTE_DELIMITER_CHAR); //data-
 					appendable.append(ASCII.toLowerCase(prefix)).append(ATTRIBUTE_DELIMITER_CHAR); //prefix-
 					appendable.append(ASCII.toLowerCase(attributeQualifiedName.getLocalName())); //localName
@@ -115,8 +105,7 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 
 	/** {@inheritDoc} */
 	@Override
-	public ElementState writeJavaScriptElement(final URI javascriptURI) throws IOException
-	{
+	public ElementState writeJavaScriptElement(final URI javascriptURI) throws IOException {
 		writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT, false); //<xhtml:script> (explicitly don't create an empty <xhtml:script> element, otherwise IE wouldn't recognize it)
 		writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_TYPE, JAVASCRIPT_OBSOLETE_CONTENT_TYPE.toString()); //type="text/javascript"
 		writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_SRC, getDepictionURI(javascriptURI).toString()); //src="javascript.js"
@@ -125,8 +114,7 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 
 	/** {@inheritDoc} */
 	@Override
-	public ElementState writeMetaElement(final String property, final String content) throws IOException
-	{
+	public ElementState writeMetaElement(final String property, final String content) throws IOException {
 		writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_META, true); //<xhtml:meta>; allow the <meta> element to be empty
 		writeAttribute(null, ELEMENT_META_ATTRIBUTE_PROPERTY, property); //property="(property)"
 		writeAttribute(null, ELEMENT_META_ATTRIBUTE_CONTENT, content); //content="(content)"
@@ -135,8 +123,7 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 
 	/** {@inheritDoc} */
 	@Override
-	public ElementState writeMetaElement(final URI propertyNamespaceURI, final String propertyLocalName, final String content) throws IOException
-	{
+	public ElementState writeMetaElement(final URI propertyNamespaceURI, final String propertyLocalName, final String content) throws IOException {
 		return writeMetaElement(getQualifiedName(propertyNamespaceURI, propertyLocalName), content); //get the qualified name for the property namespace and local name
 	}
 

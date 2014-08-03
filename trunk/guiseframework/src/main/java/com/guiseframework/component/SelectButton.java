@@ -18,37 +18,37 @@ package com.guiseframework.component;
 
 import com.guiseframework.model.*;
 
-/**Selectable button.
-@author Garret Wilson
-*/
-public class SelectButton extends AbstractSelectActionControl implements SelectButtonControl
-{
+/**
+ * Selectable button.
+ * @author Garret Wilson
+ */
+public class SelectButton extends AbstractSelectActionControl implements SelectButtonControl {
 
-	/**Default constructor.*/
-	public SelectButton()
-	{
-		this(new DefaultInfoModel(), new DefaultActionModel(), new DefaultEnableable());	//construct the class with default models
+	/** Default constructor. */
+	public SelectButton() {
+		this(new DefaultInfoModel(), new DefaultActionModel(), new DefaultEnableable()); //construct the class with default models
 	}
 
-	/**Info model, action model, and enableable object constructor.
-	@param infoModel The component info model.
-	@param actionModel The component action model.
-	@param enableable The enableable object in which to store enabled status.
-	@throws NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
+	/**
+	 * Info model, action model, and enableable object constructor.
+	 * @param infoModel The component info model.
+	 * @param actionModel The component action model.
+	 * @param enableable The enableable object in which to store enabled status.
+	 * @throws NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
+	 */
+	public SelectButton(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable) {
+		super(infoModel, actionModel, enableable); //construct the parent class
+	}
+
+	/**
+	 * Prototype constructor.
+	 * @param actionPrototype The prototype on which this component should be based.
+	 */
+	/*TODO fix
+		public Button(final ActionPrototype actionPrototype)
+		{
+			this(actionPrototype, actionPrototype, actionPrototype);	//use the action prototype as every needed model
+		}
 	*/
-	public SelectButton(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable)
-	{
-		super(infoModel, actionModel, enableable);	//construct the parent class
-	}
-
-	/**Prototype constructor.
-	@param actionPrototype The prototype on which this component should be based.
-	*/
-/*TODO fix
-	public Button(final ActionPrototype actionPrototype)
-	{
-		this(actionPrototype, actionPrototype, actionPrototype);	//use the action prototype as every needed model
-	}
-*/
 
 }

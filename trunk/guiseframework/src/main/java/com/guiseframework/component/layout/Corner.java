@@ -23,8 +23,7 @@ import static com.globalmentor.java.Objects.*;
  * @author Garret Wilson
  * @see Flow
  */
-public enum Corner
-{
+public enum Corner {
 
 	/** The upper-left corner in left-to-right top-to-bottom orientation. */
 	LINE_NEAR_PAGE_NEAR(Border.LINE_NEAR, Border.PAGE_NEAR),
@@ -47,8 +46,7 @@ public enum Corner
 	 * @return The corner border for the given flow.
 	 * @throws NullPointerException if the given flow is <code>null</code>.
 	 */
-	public Border getBorder(final Flow flow)
-	{
+	public Border getBorder(final Flow flow) {
 		return borders[flow.ordinal()];
 	}
 
@@ -58,8 +56,7 @@ public enum Corner
 	 * @param pageBorder The page border.
 	 * @throws NullPointerException if the given line border and/or page border is <code>null</code>.
 	 */
-	private Corner(final Border lineBorder, final Border pageBorder)
-	{
+	private Corner(final Border lineBorder, final Border pageBorder) {
 		assert Flow.values().length == 2 : "Corners only support two flows.";
 		borders = new Border[Flow.values().length];
 		borders[Flow.LINE.ordinal()] = checkInstance(lineBorder, "Line border cannot be null.");
@@ -76,8 +73,7 @@ public enum Corner
 	 * @return The corner value for the specified line and page ends.
 	 * @throws NullPointerException if the given line end and/or page end is <code>null</code>.
 	 */
-	public static Corner getCorner(final Flow.End lineEnd, final Flow.End pageEnd)
-	{
+	public static Corner getCorner(final Flow.End lineEnd, final Flow.End pageEnd) {
 		return LINE_PAGE_CORNERS[lineEnd.ordinal()][pageEnd.ordinal()]; //look up the corner in our array
 	}
 }

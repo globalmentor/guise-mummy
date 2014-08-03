@@ -42,14 +42,13 @@ import static com.guiseframework.Resources.*;
  * Guise theme specification.
  * @author Garret Wilson
  */
-public class Theme extends URFListResource<Rule>
-{
+public class Theme extends URFListResource<Rule> {
 
 	/** The extension for Guise theme resource names. */
 	public final static String NAME_EXTENSION = "guisetheme";
 	/** The content type for theme resources: <code>application/theme+turf</code>. */
-	public static final ContentType CONTENT_TYPE = ContentType.create(ContentType.APPLICATION_PRIMARY_TYPE, "theme"
-			+ ContentType.SUBTYPE_SUFFIX_DELIMITER_CHAR + TURF.SUBTYPE_SUFFIX);
+	public static final ContentType CONTENT_TYPE = ContentType.create(ContentType.APPLICATION_PRIMARY_TYPE, "theme" + ContentType.SUBTYPE_SUFFIX_DELIMITER_CHAR
+			+ TURF.SUBTYPE_SUFFIX);
 
 	/** The recommended prefix to the theme ontology namespace. */
 	public final static String THEME_NAMESPACE_PREFIX = "theme";
@@ -72,8 +71,7 @@ public class Theme extends URFListResource<Rule>
 	private Theme parent = null;
 
 	/** @return The theme parent, or <code>null</code> if there is no resolving parent. */
-	public Theme getParent()
-	{
+	public Theme getParent() {
 		return parent;
 	}
 
@@ -81,8 +79,7 @@ public class Theme extends URFListResource<Rule>
 	 * Sets the theme parent.
 	 * @param newParent The new theme parent, or <code>null</code> if there should be no resolving parent.
 	 */
-	public void setParent(final Theme newParent)
-	{
+	public void setParent(final Theme newParent) {
 		parent = newParent;
 	} //TODO maybe remove and create custom ThemeIO
 
@@ -96,29 +93,24 @@ public class Theme extends URFListResource<Rule>
 	 * @return A set of all rules that reference a class that selects the given object's class.
 	 * @throws NullPointerException if the given object is <code>null</code>.
 	 */
-	public Set<Rule> getClassRules(final Object object)
-	{
+	public Set<Rule> getClassRules(final Object object) {
 		final Class<?> objectClass = checkInstance(object, "Object cannot be null").getClass(); //get the object's class
 		Set<Rule> combinedRuleSet = null; //we'll create the rule set only if needed
 		final List<Class<?>> ancestorClasses = getAncestorClasses(objectClass); //get the class ancestor hierarchy of this class TODO cache these
-		for(final Class<?> ancestorClass : ancestorClasses) //for each ancestor class TODO iterate the list in the correct order; send back the rules in the correct order
-		{
+		for(final Class<?> ancestorClass : ancestorClasses) { //for each ancestor class TODO iterate the list in the correct order; send back the rules in the correct order
 			final Set<Rule> ruleSet = classRuleMap.get(ancestorClass); //try to get a rule for the object's ancestor class
-			if(ruleSet != null) //if we found a rule set
-			{
-				if(combinedRuleSet == null) //if we haven't yet created the combined rule set
-				{
+			if(ruleSet != null) { //if we found a rule set
+				if(combinedRuleSet == null) { //if we haven't yet created the combined rule set
 					combinedRuleSet = new HashSet<Rule>(); //create a new hash set
 				}
 				combinedRuleSet.addAll(ruleSet); //add all the rules for the ancestor class to the combined rule set
 			}
 		}
-		return combinedRuleSet != null ? combinedRuleSet : Collections.<Rule>emptySet(); //return the combined set of rules we've found (Java won't allow emptySet() to be used in this context, but a warning here is better than alternate, less-efficient methods)
+		return combinedRuleSet != null ? combinedRuleSet : Collections.<Rule> emptySet(); //return the combined set of rules we've found (Java won't allow emptySet() to be used in this context, but a warning here is better than alternate, less-efficient methods)
 	}
 
 	/** Default constructor. */
-	public Theme()
-	{
+	public Theme() {
 		this((URI)null); //construct the class with no reference URI
 	}
 
@@ -126,8 +118,7 @@ public class Theme extends URFListResource<Rule>
 	 * Reference URI constructor.
 	 * @param referenceURI The reference URI for the new resource.
 	 */
-	public Theme(final URI referenceURI)
-	{
+	public Theme(final URI referenceURI) {
 		super(referenceURI, createResourceURI(THEME_NAMESPACE_URI, getLocalName(Theme.class))); //construct the parent class, using a type based upon the name of this class
 	}
 
@@ -137,8 +128,7 @@ public class Theme extends URFListResource<Rule>
 	 * @param collection The collection whose elements are to be placed into this list.
 	 * @throws NullPointerException if the specified collection is <code>null</code>.
 	 */
-	public Theme(final Collection<? extends Rule> collection)
-	{
+	public Theme(final Collection<? extends Rule> collection) {
 		this(null, collection); //construct the class with no URI
 	}
 
@@ -149,8 +139,7 @@ public class Theme extends URFListResource<Rule>
 	 * @param collection The collection whose elements are to be placed into this list.
 	 * @throws NullPointerException if the specified collection is <code>null</code>.
 	 */
-	public Theme(final URI uri, final Collection<? extends Rule> collection)
-	{
+	public Theme(final URI uri, final Collection<? extends Rule> collection) {
 		this(uri); //construct the class with the URI
 		addAll(collection); //add all the collection elements to the list
 	}
@@ -159,8 +148,7 @@ public class Theme extends URFListResource<Rule>
 	 * Parent theme constructor.
 	 * @param parent The theme to serve as the parent of this theme, or <code>null</code> if this theme should have no parent.
 	 */
-	public Theme(final Theme parent)
-	{
+	public Theme(final Theme parent) {
 		this.parent = parent; //save the parent theme
 	}
 
@@ -168,8 +156,7 @@ public class Theme extends URFListResource<Rule>
 	 * Retrieves the URI indicating the parent theme.
 	 * @return The URI indicating the parent theme, or <code>null</code> if no parent theme is indicated or the value is not a URI.
 	 */
-	public URI getParentURI()
-	{
+	public URI getParentURI() {
 		return asURI(getPropertyValue(PARENT_URI_PROPERTY_URI)); //return the theme.parent property as a URI
 	}
 
@@ -178,8 +165,7 @@ public class Theme extends URFListResource<Rule>
 	 * resource definitions.
 	 * @return The list of resources that indicate resources locations and/or contain resource definitions.
 	 */
-	public Iterable<URFResource> getResourceResources(final Locale locale) //TODO use the locale to narrow down the resources
-	{
+	public Iterable<URFResource> getResourceResources(final Locale locale) { //TODO use the locale to narrow down the resources
 		return getPropertyValues(RESOURCES_PROPERTY_URI); //return all the theme.resource properties
 	}
 
@@ -187,8 +173,7 @@ public class Theme extends URFListResource<Rule>
 	 * Retrieves an iterable to the XML styles.
 	 * @return The styles.
 	 */
-	public Iterable<URFResource> getStyles()
-	{
+	public Iterable<URFResource> getStyles() {
 		return XML.getStyles(this); //return the styles
 	}
 
@@ -197,14 +182,11 @@ public class Theme extends URFListResource<Rule>
 	 * @throws ClassNotFoundException if one of the rules selects a class that cannot be found.
 	 * @see PropertySelector#getSelectClass()
 	 */
-	public void updateRules() throws ClassNotFoundException
-	{
+	public void updateRules() throws ClassNotFoundException {
 		classRuleMap.clear(); //clear the map of rules
-		for(final Rule rule : this) //for each rule in this theme
-		{
+		for(final Rule rule : this) { //for each rule in this theme
 			final Selector selector = rule.getSelector(); //get what this rule selects
-			if(selector != null) //if there is a selector for this rule
-			{
+			if(selector != null) { //if there is a selector for this rule
 				updateRules(rule, selector); //update the rules with this selector
 			}
 		}
@@ -218,26 +200,18 @@ public class Theme extends URFListResource<Rule>
 	 * @throws ClassNotFoundException if one of the selectors selects a class that cannot be found.
 	 * @see PropertySelector#getSelectClass()
 	 */
-	protected void updateRules(final Rule rule, final Selector selector) throws ClassNotFoundException
-	{
+	protected void updateRules(final Rule rule, final Selector selector) throws ClassNotFoundException {
 		checkInstance(rule, "Rule cannot be null.");
 		checkInstance(selector, "Selector cannot be null.");
-		if(selector instanceof ObjectClassSelector) //if this is a class selector
-		{
+		if(selector instanceof ObjectClassSelector) { //if this is a class selector
 			final Class<?> selectClass = ((ObjectClassSelector)selector).getSelectClass(); //get the class selected by the selector
-			if(selectClass != null) //if we have a selected class
-			{
+			if(selectClass != null) { //if we have a selected class
 				classRuleMap.addItem(selectClass, rule); //add this rule to our map
-			}
-			else
-			{
+			} else {
 				throw new IllegalStateException("Objcect class selector missing class selection property.");
 			}
-		}
-		else if(selector instanceof OperatorSelector) //if this is an operator selector
-		{
-			for(final Selector subselector : ((OperatorSelector)selector).getSelectors()) //for each subselector
-			{
+		} else if(selector instanceof OperatorSelector) { //if this is an operator selector
+			for(final Selector subselector : ((OperatorSelector)selector).getSelectors()) { //for each subselector
 				updateRules(rule, subselector); //update the rules for each subselector
 			}
 		}
@@ -252,28 +226,20 @@ public class Theme extends URFListResource<Rule>
 	 * @throws IllegalStateException If a particular property could not be accessed.
 	 * @throws IllegalStateException if a resource indicates a Java class the constructor of which throws an exception.
 	 */
-	public void apply(final Object object)
-	{
-		try
-		{
+	public void apply(final Object object) {
+		try {
 			final Theme parent = getParent(); //get the parent theme
-			if(parent != null) //if there is a parent theme
-			{
+			if(parent != null) { //if there is a parent theme
 				parent.apply(object); //first apply the ancestor hierarchy to this object
 			}
 			final PLOOPURFProcessor ploopProcessor = new PLOOPURFProcessor(); //use the same PLOOP processor for all the rules of this theme
 			final Set<Rule> classRules = getClassRules(object); //get all the rules applying to the object class
-			for(final Rule rule : classRules) //for each rule
-			{
+			for(final Rule rule : classRules) { //for each rule
 				rule.apply(object, ploopProcessor); //apply the rule to the component, if the rule is applicable
 			}
-		}
-		catch(final DataException dataException)
-		{
+		} catch(final DataException dataException) {
 			throw new IllegalStateException(dataException);
-		}
-		catch(final InvocationTargetException invocationTargetException)
-		{
+		} catch(final InvocationTargetException invocationTargetException) {
 			throw new IllegalStateException(invocationTargetException);
 		}
 	}

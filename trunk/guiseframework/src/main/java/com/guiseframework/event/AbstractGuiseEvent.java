@@ -21,26 +21,28 @@ import com.globalmentor.event.AbstractEvent;
 import com.guiseframework.Guise;
 import com.guiseframework.GuiseSession;
 
-/**The base class for custom Guise events.
-@author Garret Wilson
-*/
-public abstract class AbstractGuiseEvent extends AbstractEvent implements GuiseEvent
-{
+/**
+ * The base class for custom Guise events.
+ * @author Garret Wilson
+ */
+public abstract class AbstractGuiseEvent extends AbstractEvent implements GuiseEvent {
 
-	/**The Guise session in which this event was generated.*/
+	/** The Guise session in which this event was generated. */
 	private final GuiseSession session;
 
-		/**@return The Guise session in which this event was generated.*/
-		public GuiseSession getSession() {return session;}
+	/** @return The Guise session in which this event was generated. */
+	public GuiseSession getSession() {
+		return session;
+	}
 
-	/**Source constructor.
-	@param source The object on which the event initially occurred.
-	@throws NullPointerException if the given source is <code>null</code>.
-	*/
-	public AbstractGuiseEvent(final Object source)
-	{
-		super(source);	//construct the parent class
-		this.session=Guise.getInstance().getGuiseSession();	//store a reference to the current Guise session
+	/**
+	 * Source constructor.
+	 * @param source The object on which the event initially occurred.
+	 * @throws NullPointerException if the given source is <code>null</code>.
+	 */
+	public AbstractGuiseEvent(final Object source) {
+		super(source); //construct the parent class
+		this.session = Guise.getInstance().getGuiseSession(); //store a reference to the current Guise session
 	}
 
 }

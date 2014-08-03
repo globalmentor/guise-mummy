@@ -41,8 +41,7 @@ import static com.globalmentor.java.Classes.*;
  * An application running Guise. To enable mail-related functionality, mail must be configured using {@link #setMailProperties(Map)}.
  * @author Garret Wilson
  */
-public interface GuiseApplication extends Resource, PropertyBindable, ConfigurationManaged
-{
+public interface GuiseApplication extends Resource, PropertyBindable, ConfigurationManaged {
 
 	/** The environment bound property. */
 	public final static String ENVIRONMENT_PROPERTY = getPropertyName(GuiseApplication.class, "environment");
@@ -450,7 +449,7 @@ public interface GuiseApplication extends Resource, PropertyBindable, Configurat
 	 * @return The path resolved against the application base path.
 	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
-	 *              {@link #resolveURI(URI)} should be used instead).
+	 *           {@link #resolveURI(URI)} should be used instead).
 	 * @see #getBasePath()
 	 * @see #resolveURI(URI)
 	 */
@@ -476,7 +475,7 @@ public interface GuiseApplication extends Resource, PropertyBindable, Configurat
 	 * @return The path relativized to the application base path.
 	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
-	 *              {@link #resolveURI(URI)} should be used instead).
+	 *           {@link #resolveURI(URI)} should be used instead).
 	 * @see #getBasePath()
 	 * @see #relativizeURI(URI)
 	 */
@@ -539,7 +538,7 @@ public interface GuiseApplication extends Resource, PropertyBindable, Configurat
 	 * @return An input stream to the entity at the given resource URI, or <code>null</code> if no entity exists at the given resource path.
 	 * @throws NullPointerException if the given URI is <code>null</code>.
 	 * @throws IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made
-	 *              from the required session.
+	 *           from the required session.
 	 * @throws IOException if there was an error connecting to the entity at the given URI.
 	 * @see #resolveURI(URI)
 	 */
@@ -553,9 +552,9 @@ public interface GuiseApplication extends Resource, PropertyBindable, Configurat
 	 * @return An input stream to the entity at the given resource path, or <code>null</code> if no entity exists at the given resource path.
 	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
-	 *              {@link #getInputStream(URI)} should be used instead).
+	 *           {@link #getInputStream(URI)} should be used instead).
 	 * @throws IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made
-	 *              from the required session.
+	 *           from the required session.
 	 * @throws IOException if there was an error connecting to the entity at the given path.
 	 * @see #getInputStream(URI)
 	 */
@@ -568,9 +567,8 @@ public interface GuiseApplication extends Resource, PropertyBindable, Configurat
 	 * @return An output stream to the entity at the given resource URI.
 	 * @throws NullPointerException if the given URI is <code>null</code>.
 	 * @throws IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made
-	 *              from the required session.
-	 * @throws FileNotFoundException if a URI to a temporary file was passed before the file was created using
-	 *              {@link #createTempAsset(String, String, boolean)}.
+	 *           from the required session.
+	 * @throws FileNotFoundException if a URI to a temporary file was passed before the file was created using {@link #createTempAsset(String, String, boolean)}.
 	 * @throws IOException if there was an error connecting to the entity at the given URI.
 	 * @see #resolveURI(URI)
 	 * @see #createTempAsset(String, String, boolean)
@@ -584,11 +582,10 @@ public interface GuiseApplication extends Resource, PropertyBindable, Configurat
 	 * @return An output stream to the entity at the given resource path.
 	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
-	 *              {@link #getOutputStream(URI)} should be used instead).
+	 *           {@link #getOutputStream(URI)} should be used instead).
 	 * @throws IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made
-	 *              from the required session.
-	 * @throws FileNotFoundException if a path to a temporary file was passed before the file was created using
-	 *              {@link #createTempAsset(String, String, boolean)}.
+	 *           from the required session.
+	 * @throws FileNotFoundException if a path to a temporary file was passed before the file was created using {@link #createTempAsset(String, String, boolean)}.
 	 * @throws IOException if there was an error connecting to the entity at the given URI.
 	 * @see #getOutputStream(URI)
 	 * @see #createTempAsset(String, String, boolean)

@@ -32,15 +32,13 @@ import com.globalmentor.beans.GenericPropertyChangeEvent;
  * </p>
  * @author Garret Wilson.
  */
-public final class MutualExclusionPolicyModelGroup extends ValuePolicyModelGroup<Boolean> //TODO improve class to update the selected model when models are added or removed
-{
+public final class MutualExclusionPolicyModelGroup extends ValuePolicyModelGroup<Boolean> { //TODO improve class to update the selected model when models are added or removed
 
 	/**
 	 * Default constructor. Provided to prevent array of generic types warning.
 	 */
 	@SuppressWarnings("unchecked")
-	public MutualExclusionPolicyModelGroup()
-	{
+	public MutualExclusionPolicyModelGroup() {
 		this(new ValueModel[0]);
 	}
 
@@ -49,8 +47,7 @@ public final class MutualExclusionPolicyModelGroup extends ValuePolicyModelGroup
 	 * @param models Zero or more models with which to initially place in the group.
 	 * @throws NullPointerException if one of the models is <code>null</code>.
 	 */
-	public MutualExclusionPolicyModelGroup(final ValueModel<Boolean>... models)
-	{
+	public MutualExclusionPolicyModelGroup(final ValueModel<Boolean>... models) {
 		super(models); //construct the parent class
 	}
 
@@ -58,8 +55,7 @@ public final class MutualExclusionPolicyModelGroup extends ValuePolicyModelGroup
 	private ValueModel<Boolean> selectedModel = null;
 
 	/** @return The currently selected model. */
-	public ValueModel<Boolean> getSelectedModel()
-	{
+	public ValueModel<Boolean> getSelectedModel() {
 		return selectedModel;
 	}
 
@@ -67,23 +63,16 @@ public final class MutualExclusionPolicyModelGroup extends ValuePolicyModelGroup
 	 * Called when the boolean model value is changed.
 	 * @param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
 	 */
-	public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent)
-	{
-		if(Boolean.TRUE.equals(propertyChangeEvent.getNewValue())) //if this model is changing to true, change the other models to false
-		{
+	public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent) {
+		if(Boolean.TRUE.equals(propertyChangeEvent.getNewValue())) { //if this model is changing to true, change the other models to false
 			final ValueModel<Boolean> source = (ValueModel<Boolean>)propertyChangeEvent.getSource(); //see which model changed TODO verify, improve cast
 			selectedModel = source; //update the selected model
 			final Set<ValueModel<Boolean>> modelSet = getModelSet(); //get the set of models in the group
-			for(final ValueModel<Boolean> valueModel : modelSet) //for each model in the group
-			{
-				if(valueModel != source) //if this is not the source (the source model should keep the value of true)
-				{
-					try
-					{
+			for(final ValueModel<Boolean> valueModel : modelSet) { //for each model in the group
+				if(valueModel != source) { //if this is not the source (the source model should keep the value of true)
+					try {
 						valueModel.setValue(Boolean.FALSE); //set the values of the other value models to false (which will fire other events, but will be ignored by this class because the value is false)
-					}
-					catch(final PropertyVetoException propertyVetoException) //if the change was vetoed, ignore the exception
-					{
+					} catch(final PropertyVetoException propertyVetoException) { //if the change was vetoed, ignore the exception
 					}
 				}
 			}

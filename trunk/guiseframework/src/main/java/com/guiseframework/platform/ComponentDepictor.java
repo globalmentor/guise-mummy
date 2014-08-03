@@ -23,6 +23,5 @@ import com.guiseframework.component.Component;
  * @param <C> The type of component being depicted.
  * @author Garret Wilson
  */
-public interface ComponentDepictor<C extends Component> extends Depictor<C>
-{
+public interface ComponentDepictor<C extends Component> extends Depictor<C> {
 }

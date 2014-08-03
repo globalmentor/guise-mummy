@@ -18,23 +18,24 @@ package com.guiseframework.component.effect;
 
 import static com.globalmentor.java.Classes.*;
 
-/**Encapsulates information for a component effect.
-@author Garret Wilson
-*/
-public interface Effect
-{
-	/**The delay bound property.*/
-	public final static String DELAY_PROPERTY=getPropertyName(Effect.class, "delay");
+/**
+ * Encapsulates information for a component effect.
+ * @author Garret Wilson
+ */
+public interface Effect {
 
-	/**@return The delay, in milliseconds, before the effect takes place.*/
+	/** The delay bound property. */
+	public final static String DELAY_PROPERTY = getPropertyName(Effect.class, "delay");
+
+	/** @return The delay, in milliseconds, before the effect takes place. */
 	public int getDelay();
 
-	/**Sets the delay before the effect takes place.
-	This is a bound property of type <code>Integer</code>.
-	@param newDelay The delay, in milliseconds, before the effect takes place.
-	@throws IllegalArgumentException if the given delay is negative.
-	@see #DELAY_PROPERTY
-	*/
+	/**
+	 * Sets the delay before the effect takes place. This is a bound property of type <code>Integer</code>.
+	 * @param newDelay The delay, in milliseconds, before the effect takes place.
+	 * @throws IllegalArgumentException if the given delay is negative.
+	 * @see #DELAY_PROPERTY
+	 */
 	public void setDelay(final int newDelay);
 
 }

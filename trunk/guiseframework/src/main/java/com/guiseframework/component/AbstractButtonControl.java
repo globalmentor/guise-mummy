@@ -18,20 +18,20 @@ package com.guiseframework.component;
 
 import com.guiseframework.model.*;
 
-/**Abstract implementation of a button.
-@author Garret Wilson
-*/
-public abstract class AbstractButtonControl extends AbstractActionControl implements ButtonControl
-{
+/**
+ * Abstract implementation of a button.
+ * @author Garret Wilson
+ */
+public abstract class AbstractButtonControl extends AbstractActionControl implements ButtonControl {
 
-	/**Info model, action model, and enableable object constructor.
-	@param infoModel The component info model.
-	@param actionModel The component action model.
-	@param enableable The enableable object in which to store enabled status.
-	@throws NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
-	*/
-	public AbstractButtonControl(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable)
-	{
-		super(infoModel, actionModel, enableable);	//construct the parent class
+	/**
+	 * Info model, action model, and enableable object constructor.
+	 * @param infoModel The component info model.
+	 * @param actionModel The component action model.
+	 * @param enableable The enableable object in which to store enabled status.
+	 * @throws NullPointerException if the given info model, action model, and/or enableable object is <code>null</code>.
+	 */
+	public AbstractButtonControl(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable) {
+		super(infoModel, actionModel, enableable); //construct the parent class
 	}
 }

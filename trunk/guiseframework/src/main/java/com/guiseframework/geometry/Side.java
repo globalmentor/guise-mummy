@@ -32,8 +32,7 @@ import com.globalmentor.lex.Identifier;
  * @see Axis
  * @see com.guiseframework.component.layout.Border
  */
-public enum Side implements Identifier
-{
+public enum Side implements Identifier {
 
 	/** The left side. */
 	LEFT,
@@ -58,10 +57,8 @@ public enum Side implements Identifier
 	BACK;
 
 	/** @return The absolute axis of the side. */
-	public Axis getAxis()
-	{
-		switch(this)
-		{
+	public Axis getAxis() {
+		switch(this) {
 			case LEFT:
 			case RIGHT:
 				return Axis.X;
@@ -84,13 +81,11 @@ public enum Side implements Identifier
 	 * @param axis The axis the sides of which to return.
 	 * @return The sides for the given axis.
 	 */
-	public static Set<Side> getSides(@Nonnull final Axis axis)
-	{
+	public static Set<Side> getSides(@Nonnull final Axis axis) {
 		return AXIS_SIDES.get(axis); //return the sides for this axis
 	}
 
-	static
-	{
+	static {
 		final Axis[] axes = Axis.values();
 		assert axes.length == 3;
 		final Map<Axis, Set<Side>> axisSides = new EnumMap<Axis, Set<Side>>(Axis.class);

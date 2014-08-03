@@ -25,8 +25,8 @@ import com.guiseframework.GuiseSession;
  * @param <O> The type of object being depicted.
  * @author Garret Wilson
  */
-public interface Depictor<O extends DepictedObject>
-{
+public interface Depictor<O extends DepictedObject> {
+
 	/** The property indicating general depicted object changes. */
 	public final static String GENERAL_PROPERTY = "generalProperty";
 

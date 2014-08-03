@@ -24,8 +24,8 @@ import com.guiseframework.platform.ComponentDepictor;
  * @param <C> The type of component being depicted.
  * @author Garret Wilson
  */
-public interface WebComponentDepictor<C extends Component> extends ComponentDepictor<C>, WebDepictor<C>
-{
+public interface WebComponentDepictor<C extends Component> extends ComponentDepictor<C>, WebDepictor<C> {
+
 	/**
 	 * Determines the identifier to place in the name attribute of the component's XHTML element, if appropriate. This is usually the string version of the ID of
 	 * the component, but some grouped components may use a common name.

@@ -20,44 +20,43 @@ import com.guiseframework.component.layout.*;
 import com.guiseframework.model.*;
 import com.guiseframework.prototype.MenuPrototype;
 
-/**A menu that drops its children down from the top or over to the side.
-By default rollover open is enabled.
-@author Garret Wilson
-@see Menu#setRolloverOpenEnabled
-*/
-public class DropMenu extends AbstractMenu
-{
+/**
+ * A menu that drops its children down from the top or over to the side. By default rollover open is enabled.
+ * @author Garret Wilson
+ * @see Menu#setRolloverOpenEnabled
+ */
+public class DropMenu extends AbstractMenu {
 
-	/**Axis constructor.
-	@param axis The axis along which the menu is oriented.
-	@throws NullPointerException if the given axis is <code>null</code>.
-	*/
-	public DropMenu(final Flow axis)
-	{
-		this(new DefaultInfoModel(), new DefaultActionModel(), new DefaultEnableable(), axis);	//construct the class with default models
+	/**
+	 * Axis constructor.
+	 * @param axis The axis along which the menu is oriented.
+	 * @throws NullPointerException if the given axis is <code>null</code>.
+	 */
+	public DropMenu(final Flow axis) {
+		this(new DefaultInfoModel(), new DefaultActionModel(), new DefaultEnableable(), axis); //construct the class with default models
 	}
 
-	/**Info model, action model, enableable, and menu layout constructor.
-	@param infoModel The component info model.
-	@param actionModel The component action model.
-	@param enableable The enableable object in which to store enabled status.
-	@param axis The axis along which the menu is oriented.
-	@throws NullPointerException if the given info model, action model, enableable, and/or layout is <code>null</code>.
-	*/
-	public DropMenu(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable, final Flow axis)
-	{
-		super(infoModel, actionModel, enableable, new MenuLayout(axis));	//construct the parent class
-		setRolloverOpenEnabled(true);	//default to showing the menu as open upon rollover
+	/**
+	 * Info model, action model, enableable, and menu layout constructor.
+	 * @param infoModel The component info model.
+	 * @param actionModel The component action model.
+	 * @param enableable The enableable object in which to store enabled status.
+	 * @param axis The axis along which the menu is oriented.
+	 * @throws NullPointerException if the given info model, action model, enableable, and/or layout is <code>null</code>.
+	 */
+	public DropMenu(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable, final Flow axis) {
+		super(infoModel, actionModel, enableable, new MenuLayout(axis)); //construct the parent class
+		setRolloverOpenEnabled(true); //default to showing the menu as open upon rollover
 	}
 
-	/**Prototype and axis constructor.
-	@param actionPrototype The prototype on which this component should be based.
-	@param axis The axis along which the menu is oriented.
-	@throws NullPointerException if the given prototype and/or axis is <code>null</code>.
-	*/
-	public DropMenu(final MenuPrototype menuPrototype, final Flow axis)
-	{
-		this(menuPrototype, menuPrototype, menuPrototype, axis);	//use the menu prototype as every needed model
+	/**
+	 * Prototype and axis constructor.
+	 * @param actionPrototype The prototype on which this component should be based.
+	 * @param axis The axis along which the menu is oriented.
+	 * @throws NullPointerException if the given prototype and/or axis is <code>null</code>.
+	 */
+	public DropMenu(final MenuPrototype menuPrototype, final Flow axis) {
+		this(menuPrototype, menuPrototype, menuPrototype, axis); //use the menu prototype as every needed model
 	}
 
 }

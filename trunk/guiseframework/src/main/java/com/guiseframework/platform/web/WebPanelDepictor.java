@@ -37,25 +37,20 @@ import com.guiseframework.component.SectionComponent.SectionType;
  * @param <C> The type of component being depicted.
  * @author Garret Wilson
  */
-public class WebPanelDepictor<C extends Panel> extends WebLayoutComponentDepictor<C>
-{
+public class WebPanelDepictor<C extends Panel> extends WebLayoutComponentDepictor<C> {
 
 	/** Default constructor. */
-	public WebPanelDepictor()
-	{
+	public WebPanelDepictor() {
 		getIgnoredProperties().add(Panel.LABEL_PROPERTY); //ignore Panel.label by default, because panels are large objects with many children but most do not show labels
 	}
 
 	/** {@inheritDoc} This version returns special section elements if the component is a {@link SectionComponent} with a non-<code>null</code> section type. */
 	@Override
-	public String getLocalName()
-	{
+	public String getLocalName() {
 		final C component = getDepictedObject(); //get the component
-		if(component instanceof SectionComponent)//if this is a section component
-		{
+		if(component instanceof SectionComponent) { //if this is a section component
 			final SectionType sectionType = ((SectionComponent)component).getSectionType();
-			if(sectionType != null) //if a specific type is indicated
-			{
+			if(sectionType != null) { //if a specific type is indicated
 				return getLocalName(sectionType); //return the local name for the section type
 			}
 		}
@@ -70,10 +65,8 @@ public class WebPanelDepictor<C extends Panel> extends WebLayoutComponentDepicto
 	 * @throws NullPointerException if the given section type is <code>null</code>.
 	 */
 	@Nonnull
-	public static String getLocalName(@Nonnull final SectionType sectionType)
-	{
-		switch(sectionType)
-		{
+	public static String getLocalName(@Nonnull final SectionType sectionType) {
+		switch(sectionType) {
 			case ARTICLE:
 				return ELEMENT_ARTICLE;
 			case ASIDE:
