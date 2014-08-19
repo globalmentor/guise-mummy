@@ -18,20 +18,19 @@ package com.guiseframework.platform.web;
 
 import java.io.*;
 import java.net.URI;
+import java.nio.charset.Charset;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.globalmentor.model.NameValuePair;
+import com.globalmentor.io.Charsets;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.servlet.http.HTTPServlets;
-import com.globalmentor.text.CharacterEncoding;
 import com.globalmentor.text.Text;
 import com.globalmentor.text.xml.QualifiedName;
 import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.text.CharacterEncoding.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
 
 /**
@@ -114,14 +113,14 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext {
 		contentHashAttributeQualifiedName = new QualifiedName(GUISE_ML_NAMESPACE_URI, getQualifiedName(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_CONTENT_HASH));
 		setHashAttributesGenerated(true); //always generate hash attributes
 		final ContentType defaultContentType = ContentType.create(outputContentType.getPrimaryType(), outputContentType.getSubType(), new ContentType.Parameter(
-				ContentType.CHARSET_PARAMETER, UTF_8)); //default to text/plain encoded in UTF-8
+				ContentType.CHARSET_PARAMETER, Charsets.UTF_8_NAME)); //default to text/plain encoded in UTF-8
 		response.setContentType(defaultContentType.toString()); //initialize the default content type and encoding
 		HTTPServlets.setContentLanguage(response, session.getLocale()); //set the response content language
 	}
 
-	/** @return The character encoding currently used for the text output. */
-	public CharacterEncoding getOutputCharacterEncoding() {
-		return new CharacterEncoding(getResponse().getCharacterEncoding(), NO_BOM); //return the current output character encoding
+	@Override
+	public Charset getOutputCharset() {
+		return Charset.forName(getResponse().getCharacterEncoding()); //return the character encoding indicated by the HTTP servlet response
 	}
 
 	/** @return The current content type of the text output. */
@@ -129,14 +128,12 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext {
 		return outputContentType;
 	}
 
-	/**
-	 * Sets the content type of the text output. This implementation removes all parameters and adds a character set parameter of the current encoding.
-	 * @param contentType The content type of the text output.
-	 */
+	/**{@inheritDoc} This implementation removes all parameters and adds a character set parameter of the current encoding.*/
+	@Override
 	public void setOutputContentType(final ContentType contentType) {
-		//default to text/plain encoded in UTF-8 replace the charset parameter with the currently set character set TODO change to really just replace one parameter, instead of removing all others
+		//TODO change to really just replace one parameter, instead of removing all others
 		this.outputContentType = ContentType.create(contentType.getPrimaryType(), contentType.getSubType(), new ContentType.Parameter(
-				ContentType.CHARSET_PARAMETER, getOutputCharacterEncoding().toString()));
+				ContentType.CHARSET_PARAMETER, getOutputCharset().name()));
 		getResponse().setContentType(this.outputContentType.toString()); //set the content type of the response, including the current character set
 	}
 

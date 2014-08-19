@@ -17,9 +17,9 @@
 package com.guiseframework.platform;
 
 import java.io.*;
+import java.nio.charset.Charset;
 
 import com.globalmentor.net.ContentType;
-import com.globalmentor.text.CharacterEncoding;
 
 /**
  * Encapsulation of text information related to the current depiction. Text is collected in a {@link StringBuilder} until it is ready to be depicted. The text
@@ -75,8 +75,8 @@ public interface TextDepictContext extends DepictContext {
 	 */
 	public void unindent();
 
-	/** @return The character encoding currently used for the text output. */
-	public CharacterEncoding getOutputCharacterEncoding();
+	/** @return The charset currently used for the text output. */
+	public Charset getOutputCharset();
 
 	/** @return The current content type of the text output. */
 	public ContentType getOutputContentType();
