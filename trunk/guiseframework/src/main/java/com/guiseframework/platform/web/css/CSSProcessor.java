@@ -61,7 +61,7 @@ public class CSSProcessor {
 			if(parseReader.isEnd()) //if we've hit the end of the stream of characters
 				return false; //show that we hit the end of the stream without finding the end-of-rule-group character
 			if(parseReader.peek() == RULE_GROUP_END_CHAR) //if we're at the end of the rule group (which will happen if the rule group is empty, for instance)
-				return true; //show that we hit the end of the rule group G***this check is done at the end of this loop, too -- is there a place we can combine both checks?
+				return true; //show that we hit the end of the rule group TODO this check is done at the end of this loop, too -- is there a place we can combine both checks?
 
 			final String propertyName = parseReader.readStringUntilChar(WHITESPACE_CHARS + PROPERTY_DIVIDER_CHAR + '/'); //get the name of the property, which is followed by whitespace (or a comment) or a divider character TODO use a constant
 			skipWhitespaceCommentsEOF(parseReader); //skip over whitespace and comments, which might come before the property divider
@@ -180,25 +180,25 @@ public class CSSProcessor {
 
 			switch(parseReader.peekExpectedStrings(EXPECTED_STYLESHEET_STRINGS)) { //see what we have next in the stylesheet
 				case MEDIA_RULE: //if this is a media rule
-					//G***del Log.trace("found media rule");
-					parseReader.readStringUntilChar('}'); //G***fix parsing media rules
-					parseReader.readExpectedChar('}'); //G***fix parsing media rules
-					break; //G***fix
+					//TODO del Log.trace("found media rule");
+					parseReader.readStringUntilChar('}'); //TODO fix parsing media rules
+					parseReader.readExpectedChar('}'); //TODO fix parsing media rules
+					break; //TODO fix
 				case PAGE_RULE: //if this is a page rule
-					//G***del Log.trace("Found page rule"); //G***del
-					parseReader.readStringUntilChar('}'); //G***fix parsing page rules
-					parseReader.readExpectedChar('}'); //G***fix parsing page rules
-					break; //G***fix
+					//TODO del Log.trace("Found page rule"); //TODO del
+					parseReader.readStringUntilChar('}'); //TODO fix parsing page rules
+					parseReader.readExpectedChar('}'); //TODO fix parsing page rules
+					break; //TODO fix
 				case FONT_FACE_RULE: //if this is a font face rule
-					//G***del Log.trace("found font face");
-					parseReader.readStringUntilChar('}'); //G***fix parsing font-face rules
-					parseReader.readExpectedChar('}'); //G***fix parsing font-face rules
-					break; //G***fix
+					//TODO del Log.trace("found font face");
+					parseReader.readStringUntilChar('}'); //TODO fix parsing font-face rules
+					parseReader.readExpectedChar('}'); //TODO fix parsing font-face rules
+					break; //TODO fix
 				case UNKNOWN_AT_RULE: //if this is an at-rule we don't know about
-					//G***del Log.trace("found unknown at rule");
-					parseReader.readStringUntilChar('}'); //G***fix parsing at rules
-					parseReader.readExpectedChar('}'); //G***fix parsing at rules
-					break; //G***fix
+					//TODO del Log.trace("found unknown at rule");
+					parseReader.readStringUntilChar('}'); //TODO fix parsing at rules
+					parseReader.readExpectedChar('}'); //TODO fix parsing at rules
+					break; //TODO fix
 				case COMMENT: //if this is a CSS comment
 					parseReader.readStringUntilSkipString(COMMENT_END); //read until the end of the comment
 					break;
@@ -209,7 +209,7 @@ public class CSSProcessor {
 					stylesheet.getRules().add(parseRule(parseReader)); //parse a rule and add it to the stylesheet's list of rules
 					break;
 			}
-			//G***del System.out.println("Outside of switch statment.");	//G***del
+			//TODO del System.out.println("Outside of switch statment.");	//TODO del
 		}
 	}
 

@@ -97,7 +97,7 @@ public class SequenceTaskController extends BoundPropertyObject {
 	//TODO fix	private final Timer confirmTimer;
 
 	/** @return The timer that allows confirmation only within a specified time. */
-	//G***del if not needed		protected Timer getConfirmTimer() {return confirmTimer;}
+	//TODO del if not needed		protected Timer getConfirmTimer() {return confirmTimer;}
 
 	/** The action prototype currently being confirmed and which, if confirmed, will be performed. */
 	private ActionPrototype confirmingActionProtype;
