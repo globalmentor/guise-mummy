@@ -28,11 +28,11 @@ import com.guiseframework.validator.Validator;
 public interface TableColumnModel<V> extends InfoModel {
 
 	/** The bound property of the column style ID. */
-	public final static String STYLE_ID_PROPERTY = getPropertyName(TableColumnModel.class, "styleID");
+	public static final String STYLE_ID_PROPERTY = getPropertyName(TableColumnModel.class, "styleID");
 	/** The validator bound property. */
-	public final static String VALIDATOR_PROPERTY = getPropertyName(TableColumnModel.class, "validator");
+	public static final String VALIDATOR_PROPERTY = getPropertyName(TableColumnModel.class, "validator");
 	/** The bound property of whether the column is visible. */
-	public final static String VISIBLE_PROPERTY = getPropertyName(TableColumnModel.class, "visible");
+	public static final String VISIBLE_PROPERTY = getPropertyName(TableColumnModel.class, "visible");
 
 	/** @return The class representing the type of values this model can hold. */
 	public Class<V> getValueClass();

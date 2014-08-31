@@ -37,37 +37,37 @@ import com.guiseframework.component.Flash;
 public class WebFlashDepictor<C extends Flash> extends AbstractSimpleWebComponentDepictor<C> { //TODO fix to work with new Microsoft activation process; see http://www.jeroenwijering.com/?item=embedding_flash and http://blog.deconcept.com/swfobject/
 
 	/** The content type for Flash objects. */
-	public final static ContentType FLASH_CONTENT_TYPE = ContentType.create(ContentType.APPLICATION_PRIMARY_TYPE, X_SHOCKWAVE_FLASH_SUBTYPE); //TODO move to Flash class
+	public static final ContentType FLASH_CONTENT_TYPE = ContentType.create(ContentType.APPLICATION_PRIMARY_TYPE, X_SHOCKWAVE_FLASH_SUBTYPE); //TODO move to Flash class
 
 	/**
 	 * The "allowScriptAccess" parameter.
 	 * @see <a href="http://www.adobe.com/devnet/flash/articles/fplayer8_security_09.html">Security Changes in Flash Player 8</a>
 	 */
-	public final static String ALLOW_SCRIPT_ACCESS_PARAMETER = "allowScriptAccess";
+	public static final String ALLOW_SCRIPT_ACCESS_PARAMETER = "allowScriptAccess";
 	/** The "allowScriptAccess" parameter "always" value. */
-	public final static String ALLOW_SCRIPT_ACCESS_PARAMETER_ALWAYS = "always";
+	public static final String ALLOW_SCRIPT_ACCESS_PARAMETER_ALWAYS = "always";
 	/** The "allowScriptAccess" parameter "never" value. */
-	public final static String ALLOW_SCRIPT_ACCESS_PARAMETER_NEVER = "never";
+	public static final String ALLOW_SCRIPT_ACCESS_PARAMETER_NEVER = "never";
 	/** The "allowScriptAccess" parameter "sameDomain" value. */
-	public final static String ALLOW_SCRIPT_ACCESS_PARAMETER_SAME_DOMAIN = "sameDomain";
+	public static final String ALLOW_SCRIPT_ACCESS_PARAMETER_SAME_DOMAIN = "sameDomain";
 	/** The "movie" parameter. */
-	public final static String MOVIE_PARAMETER = "movie";
+	public static final String MOVIE_PARAMETER = "movie";
 	/** The "quality" parameter. */
-	public final static String QUALITY_PARAMETER = "quality";
+	public static final String QUALITY_PARAMETER = "quality";
 	/** The "quality" parameter "high" value. */
-	public final static String QUALITY_PARAMETER_HIGH = "high";
+	public static final String QUALITY_PARAMETER_HIGH = "high";
 	/** The "wmode" parameter. */
-	public final static String WMODE_PARAMETER = "wmode";
+	public static final String WMODE_PARAMETER = "wmode";
 
 	/** The Shockwave Flash player class ID. */
-	public final static String FLASH_CLASS_ID = "clsid:D27CDB6E-AE6D-11cf-96B8-444553540000";
+	public static final String FLASH_CLASS_ID = "clsid:D27CDB6E-AE6D-11cf-96B8-444553540000";
 
 	/** The URI to the swflash.cab file. */
-	public final static URI SWFLASH_CAB_URI = URI.create("http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab");
+	public static final URI SWFLASH_CAB_URI = URI.create("http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab");
 	/** The HTTPS URI to the swflash.cab file. */
-	public final static URI SWFLASH_CAB_SECURE_URI = URI.create("https://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab");
+	public static final URI SWFLASH_CAB_SECURE_URI = URI.create("https://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab");
 	/** The URI parameter specifying the version of the swflash.cab file to retrieve. */
-	public final static String SWFLASH_CAB_URI_VERSION_PARAMETER = "version";
+	public static final String SWFLASH_CAB_URI_VERSION_PARAMETER = "version";
 
 	/**
 	 * Returns A URI appropriate for accessing the swflash.cab file at an optionally secure location with the given version.

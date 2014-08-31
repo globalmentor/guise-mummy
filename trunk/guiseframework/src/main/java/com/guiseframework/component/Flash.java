@@ -29,7 +29,7 @@ import com.globalmentor.java.Objects;
 public class Flash extends AbstractComponent {
 
 	/** The flash URI bound property. */
-	public final static String FLASH_URI_PROPERTY = getPropertyName(Flash.class, "flashURI");
+	public static final String FLASH_URI_PROPERTY = getPropertyName(Flash.class, "flashURI");
 
 	/** The Flash URI, which may be a resource URI, or <code>null</code> if there is no Flash URI. */
 	private URI flashURI = null;

@@ -31,9 +31,9 @@ import com.guiseframework.validator.*;
 public interface ValueModel<V> extends Model, MutableValued<V> {
 
 	/** The validator bound property. */
-	public final static String VALIDATOR_PROPERTY = getPropertyName(ValueModel.class, "validator");
+	public static final String VALIDATOR_PROPERTY = getPropertyName(ValueModel.class, "validator");
 	/** The value bound property. */
-	public final static String VALUE_PROPERTY = getPropertyName(ValueModel.class, "value");
+	public static final String VALUE_PROPERTY = getPropertyName(ValueModel.class, "value");
 
 	/** @return The default value. */
 	public V getDefaultValue();

@@ -55,7 +55,7 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 		RESOURCE_COLLECT_CANCEL;
 
 		/** The property for specifying the destination URI of the resources to receive. */
-		public final static String DESTINATION_URI_PROPERTY = "destinationURI";
+		public static final String DESTINATION_URI_PROPERTY = "destinationURI";
 	}
 
 	/** Default constructor using the XHTML <code>&lt;input&gt;</code> element. */

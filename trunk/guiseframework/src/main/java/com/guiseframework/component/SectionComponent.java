@@ -29,7 +29,7 @@ import com.globalmentor.lex.Identifier;
 public interface SectionComponent extends Component {
 
 	/** The section type bound property. */
-	public final static String SECTION_TYPE_PROPERTY = getPropertyName(SectionComponent.class, "sectionType");
+	public static final String SECTION_TYPE_PROPERTY = getPropertyName(SectionComponent.class, "sectionType");
 
 	/** The type of section. */
 	public enum SectionType implements Identifier {

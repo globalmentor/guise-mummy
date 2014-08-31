@@ -62,22 +62,22 @@ import static com.guiseframework.platform.web.WebPlatform.*;
 public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends AbstractWebFrameDepictor<C> {
 
 	/** The ID segment for the hidden action input field. */
-	protected final static String ACTION_INPUT_ID_SEGMENT = "input";
+	protected static final String ACTION_INPUT_ID_SEGMENT = "input";
 
 	/** The ID segment for the busy information. */
-	protected final static String BUSY_ID_SEGMENT = "busy";
+	protected static final String BUSY_ID_SEGMENT = "busy";
 
 	/** The ID segment for the form. */
-	protected final static String FORM_ID_SEGMENT = "form";
+	protected static final String FORM_ID_SEGMENT = "form";
 
 	/** The ID segment for the layer to shield user input during initialization. */
-	protected final static String INIT_IFRAME_ID_SEGMENT = "initIFrame";
+	protected static final String INIT_IFRAME_ID_SEGMENT = "initIFrame";
 
 	/** The ID for the Guise SWF. */
-	protected final static String GUISE_FLASH_ID = "guiseFlash";
+	protected static final String GUISE_FLASH_ID = "guiseFlash";
 
 	/** The available JavaScript versions above 1.0 that could be supported by a browser. */
-	private final static String[] JAVSCRIPT_VERSIONS = new String[] { "1.1", "1.2", "1.3", "1.4", "1.5", "2.0" };
+	private static final String[] JAVSCRIPT_VERSIONS = new String[] { "1.1", "1.2", "1.3", "1.4", "1.5", "2.0" };
 
 	/**
 	 * Determines the ID to be used for the hidden field associated with the given application frame.

@@ -25,7 +25,7 @@ import static com.globalmentor.java.Classes.*;
 public class AbstractFlowConstraints extends AbstractConstraints {
 
 	/** The bound property of the alignment. */
-	public final static String ALIGNMENT_PROPERTY = getPropertyName(AbstractFlowConstraints.class, "alignment");
+	public static final String ALIGNMENT_PROPERTY = getPropertyName(AbstractFlowConstraints.class, "alignment");
 
 	/** The alignment of a component perpendicular to the flow axis in terms relative to the beginning of the alignment axis. */
 	private double alignment = 0;

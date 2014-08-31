@@ -28,7 +28,7 @@ import com.guiseframework.GuiseSession;
 public interface Depictor<O extends DepictedObject> {
 
 	/** The property indicating general depicted object changes. */
-	public final static String GENERAL_PROPERTY = "generalProperty";
+	public static final String GENERAL_PROPERTY = "generalProperty";
 
 	/** @return The Guise session that owns this object. */
 	public GuiseSession getSession();

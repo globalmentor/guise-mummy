@@ -34,104 +34,104 @@ import static com.globalmentor.java.Classes.*;
 public interface PresentationModel extends Model, Displayable {
 
 	/** The bound property of the background color. */
-	public final static String BACKGROUND_COLOR_PROPERTY = getPropertyName(PresentationModel.class, "backgroundColor");
+	public static final String BACKGROUND_COLOR_PROPERTY = getPropertyName(PresentationModel.class, "backgroundColor");
 	/** The bound property of the line near border color. */
-	public final static String BORDER_LINE_NEAR_COLOR_PROPERTY = getPropertyName(PresentationModel.class, "borderLineNearColor");
+	public static final String BORDER_LINE_NEAR_COLOR_PROPERTY = getPropertyName(PresentationModel.class, "borderLineNearColor");
 	/** The bound property of the line far border color. */
-	public final static String BORDER_LINE_FAR_COLOR_PROPERTY = getPropertyName(PresentationModel.class, "borderLineFarColor");
+	public static final String BORDER_LINE_FAR_COLOR_PROPERTY = getPropertyName(PresentationModel.class, "borderLineFarColor");
 	/** The bound property of the page near border color. */
-	public final static String BORDER_PAGE_NEAR_COLOR_PROPERTY = getPropertyName(PresentationModel.class, "borderPageNearColor");
+	public static final String BORDER_PAGE_NEAR_COLOR_PROPERTY = getPropertyName(PresentationModel.class, "borderPageNearColor");
 	/** The bound property of the page far border color. */
-	public final static String BORDER_PAGE_FAR_COLOR_PROPERTY = getPropertyName(PresentationModel.class, "borderPageFarColor");
+	public static final String BORDER_PAGE_FAR_COLOR_PROPERTY = getPropertyName(PresentationModel.class, "borderPageFarColor");
 	/** The bound property of the line near border extent. */
-	public final static String BORDER_LINE_NEAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "borderLineNearExtent");
+	public static final String BORDER_LINE_NEAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "borderLineNearExtent");
 	/** The bound property of the line far border extent. */
-	public final static String BORDER_LINE_FAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "borderLineFarExtent");
+	public static final String BORDER_LINE_FAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "borderLineFarExtent");
 	/** The bound property of the page near border extent. */
-	public final static String BORDER_PAGE_NEAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "borderPageNearExtent");
+	public static final String BORDER_PAGE_NEAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "borderPageNearExtent");
 	/** The bound property of the page far border extent. */
-	public final static String BORDER_PAGE_FAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "borderPageFarExtent");
+	public static final String BORDER_PAGE_FAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "borderPageFarExtent");
 	/** The bound property of the line near border style. */
-	public final static String BORDER_LINE_NEAR_STYLE_PROPERTY = getPropertyName(PresentationModel.class, "borderLineNearStyle");
+	public static final String BORDER_LINE_NEAR_STYLE_PROPERTY = getPropertyName(PresentationModel.class, "borderLineNearStyle");
 	/** The bound property of the line far border style. */
-	public final static String BORDER_LINE_FAR_STYLE_PROPERTY = getPropertyName(PresentationModel.class, "borderLineFarStyle");
+	public static final String BORDER_LINE_FAR_STYLE_PROPERTY = getPropertyName(PresentationModel.class, "borderLineFarStyle");
 	/** The bound property of the page near border style. */
-	public final static String BORDER_PAGE_NEAR_STYLE_PROPERTY = getPropertyName(PresentationModel.class, "borderPageNearStyle");
+	public static final String BORDER_PAGE_NEAR_STYLE_PROPERTY = getPropertyName(PresentationModel.class, "borderPageNearStyle");
 	/** The bound property of the page far border style. */
-	public final static String BORDER_PAGE_FAR_STYLE_PROPERTY = getPropertyName(PresentationModel.class, "borderPageFarStyle");
+	public static final String BORDER_PAGE_FAR_STYLE_PROPERTY = getPropertyName(PresentationModel.class, "borderPageFarStyle");
 	/** The bound property of the line near page near corner arc size. */
-	public final static String CORNER_LINE_NEAR_PAGE_NEAR_ARC_SIZE_PROPERTY = getPropertyName(PresentationModel.class, "cornerLineNearPageNearArcSize");
+	public static final String CORNER_LINE_NEAR_PAGE_NEAR_ARC_SIZE_PROPERTY = getPropertyName(PresentationModel.class, "cornerLineNearPageNearArcSize");
 	/** The bound property of the line far page near corner arc size. */
-	public final static String CORNER_LINE_FAR_PAGE_NEAR_ARC_SIZE_PROPERTY = getPropertyName(PresentationModel.class, "cornerLineFarPageNearArcSize");
+	public static final String CORNER_LINE_FAR_PAGE_NEAR_ARC_SIZE_PROPERTY = getPropertyName(PresentationModel.class, "cornerLineFarPageNearArcSize");
 	/** The bound property of the line near page far corner arc size. */
-	public final static String CORNER_LINE_NEAR_PAGE_FAR_ARC_SIZE_PROPERTY = getPropertyName(PresentationModel.class, "cornerLineNearPageFarArcSize");
+	public static final String CORNER_LINE_NEAR_PAGE_FAR_ARC_SIZE_PROPERTY = getPropertyName(PresentationModel.class, "cornerLineNearPageFarArcSize");
 	/** The bound property of the line far page far corner arc size. */
-	public final static String CORNER_LINE_FAR_PAGE_FAR_ARC_SIZE_PROPERTY = getPropertyName(PresentationModel.class, "cornerLineFarPageFarArcSize");
+	public static final String CORNER_LINE_FAR_PAGE_FAR_ARC_SIZE_PROPERTY = getPropertyName(PresentationModel.class, "cornerLineFarPageFarArcSize");
 	/** The bound property of the cursor. */
-	public final static String CURSOR_PROPERTY = getPropertyName(PresentationModel.class, "cursor");
+	public static final String CURSOR_PROPERTY = getPropertyName(PresentationModel.class, "cursor");
 	/** The line extent (width in left-to-right top-to-bottom orientation) bound property. */
-	public final static String LINE_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "lineExtent");
+	public static final String LINE_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "lineExtent");
 	/** The page extent (height in left-to-right top-to-bottom orientation) bound property. */
-	public final static String PAGE_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "pageExtent");
+	public static final String PAGE_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "pageExtent");
 	/** The bound property of the font families. */
-	public final static String FONT_FAMILIES_PROPERTY = getPropertyName(PresentationModel.class, "fontFamilies");
+	public static final String FONT_FAMILIES_PROPERTY = getPropertyName(PresentationModel.class, "fontFamilies");
 	/** The bound property of the font size. */
-	public final static String FONT_SIZE_PROPERTY = getPropertyName(PresentationModel.class, "fontSize");
+	public static final String FONT_SIZE_PROPERTY = getPropertyName(PresentationModel.class, "fontSize");
 	/** The bound property of the font style. */
-	public final static String FONT_STYLE_PROPERTY = getPropertyName(PresentationModel.class, "fontStyle");
+	public static final String FONT_STYLE_PROPERTY = getPropertyName(PresentationModel.class, "fontStyle");
 	/** The bound property of the font weight. */
-	public final static String FONT_WEIGHT_PROPERTY = getPropertyName(PresentationModel.class, "fontWeight");
+	public static final String FONT_WEIGHT_PROPERTY = getPropertyName(PresentationModel.class, "fontWeight");
 	/** The bound property of the label font families. */
-	public final static String LABEL_FONT_FAMILIES_PROPERTY = getPropertyName(PresentationModel.class, "labelFontFamilies");
+	public static final String LABEL_FONT_FAMILIES_PROPERTY = getPropertyName(PresentationModel.class, "labelFontFamilies");
 	/** The bound property of the label font size. */
-	public final static String LABEL_FONT_SIZE_PROPERTY = getPropertyName(PresentationModel.class, "labelFontSize");
+	public static final String LABEL_FONT_SIZE_PROPERTY = getPropertyName(PresentationModel.class, "labelFontSize");
 	/** The bound property of the label font style. */
-	public final static String LABEL_FONT_STYLE_PROPERTY = getPropertyName(PresentationModel.class, "labelFontStyle");
+	public static final String LABEL_FONT_STYLE_PROPERTY = getPropertyName(PresentationModel.class, "labelFontStyle");
 	/** The bound property of the label font weight. */
-	public final static String LABEL_FONT_WEIGHT_PROPERTY = getPropertyName(PresentationModel.class, "labelFontWeight");
+	public static final String LABEL_FONT_WEIGHT_PROPERTY = getPropertyName(PresentationModel.class, "labelFontWeight");
 	/** The bound property of the label text color. */
-	public final static String LABEL_TEXT_COLOR_PROPERTY = getPropertyName(PresentationModel.class, "labelTextColor");
+	public static final String LABEL_TEXT_COLOR_PROPERTY = getPropertyName(PresentationModel.class, "labelTextColor");
 	/** The bound property of the line near margin extent. */
-	public final static String MARGIN_LINE_NEAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "marginLineNearExtent");
+	public static final String MARGIN_LINE_NEAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "marginLineNearExtent");
 	/** The bound property of the line far margin extent. */
-	public final static String MARGIN_LINE_FAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "marginLineFarExtent");
+	public static final String MARGIN_LINE_FAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "marginLineFarExtent");
 	/** The bound property of the page near margin extent. */
-	public final static String MARGIN_PAGE_NEAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "marginPageNearExtent");
+	public static final String MARGIN_PAGE_NEAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "marginPageNearExtent");
 	/** The bound property of the page far margin extent. */
-	public final static String MARGIN_PAGE_FAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "marginPageFarExtent");
+	public static final String MARGIN_PAGE_FAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "marginPageFarExtent");
 	/** The opacity bound property. */
-	public final static String OPACITY_PROPERTY = getPropertyName(PresentationModel.class, "opacity");
+	public static final String OPACITY_PROPERTY = getPropertyName(PresentationModel.class, "opacity");
 	/** The bound property of the line near padding extent. */
-	public final static String PADDING_LINE_NEAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "paddingLineNearExtent");
+	public static final String PADDING_LINE_NEAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "paddingLineNearExtent");
 	/** The bound property of the line far padding extent. */
-	public final static String PADDING_LINE_FAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "paddingLineFarExtent");
+	public static final String PADDING_LINE_FAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "paddingLineFarExtent");
 	/** The bound property of the page near padding extent. */
-	public final static String PADDING_PAGE_NEAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "paddingPageNearExtent");
+	public static final String PADDING_PAGE_NEAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "paddingPageNearExtent");
 	/** The bound property of the page far padding extent. */
-	public final static String PADDING_PAGE_FAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "paddingPageFarExtent");
+	public static final String PADDING_PAGE_FAR_EXTENT_PROPERTY = getPropertyName(PresentationModel.class, "paddingPageFarExtent");
 	/** The bound property of the component style ID. */
-	public final static String STYLE_ID_PROPERTY = getPropertyName(PresentationModel.class, "styleID");
+	public static final String STYLE_ID_PROPERTY = getPropertyName(PresentationModel.class, "styleID");
 	/** The bound property of the text color. */
-	public final static String TEXT_COLOR_PROPERTY = getPropertyName(PresentationModel.class, "textColor");
+	public static final String TEXT_COLOR_PROPERTY = getPropertyName(PresentationModel.class, "textColor");
 	/** The bound property of whether the component has tooltips enabled. */
-	public final static String TOOLTIP_ENABLED_PROPERTY = getPropertyName(PresentationModel.class, "tooltipEnabled");
+	public static final String TOOLTIP_ENABLED_PROPERTY = getPropertyName(PresentationModel.class, "tooltipEnabled");
 	/** The bound property of whether the component is visible. */
-	public final static String VISIBLE_PROPERTY = getPropertyName(PresentationModel.class, "visible");
+	public static final String VISIBLE_PROPERTY = getPropertyName(PresentationModel.class, "visible");
 
 	/*The constant value representing a general rounded corner.*/
-	public final static Dimensions ROUNDED_CORNER_ARC_SIZE = new Dimensions(0.25, 0.25, Unit.EM);
+	public static final Dimensions ROUNDED_CORNER_ARC_SIZE = new Dimensions(0.25, 0.25, Unit.EM);
 
 	/**
 	 * The normal font weight.
 	 * @see #setFontWeight(double)
 	 */
-	public final static double FONT_WEIGHT_NORMAL = 0.5;
+	public static final double FONT_WEIGHT_NORMAL = 0.5;
 
 	/**
 	 * The bold font weight.
 	 * @see #setFontWeight(double)
 	 */
-	public final static double FONT_WEIGHT_BOLD = 0.75;
+	public static final double FONT_WEIGHT_BOLD = 0.75;
 
 	/** @return The background color of the component, or <code>null</code> if no background color is specified for this component. */
 	public Color getBackgroundColor();

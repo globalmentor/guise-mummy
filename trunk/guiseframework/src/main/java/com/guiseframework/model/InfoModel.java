@@ -27,13 +27,13 @@ import static com.globalmentor.java.Classes.*;
 public interface InfoModel extends LabelModel {
 
 	/** The description bound property. */
-	public final static String DESCRIPTION_PROPERTY = getPropertyName(InfoModel.class, "description");
+	public static final String DESCRIPTION_PROPERTY = getPropertyName(InfoModel.class, "description");
 	/** The description content type bound property. */
-	public final static String DESCRIPTION_CONTENT_TYPE_PROPERTY = getPropertyName(InfoModel.class, "descriptionContentType");
+	public static final String DESCRIPTION_CONTENT_TYPE_PROPERTY = getPropertyName(InfoModel.class, "descriptionContentType");
 	/** The info bound property. */
-	public final static String INFO_PROPERTY = getPropertyName(InfoModel.class, "info");
+	public static final String INFO_PROPERTY = getPropertyName(InfoModel.class, "info");
 	/** The info content type bound property. */
-	public final static String INFO_CONTENT_TYPE_PROPERTY = getPropertyName(InfoModel.class, "infoContentType");
+	public static final String INFO_CONTENT_TYPE_PROPERTY = getPropertyName(InfoModel.class, "infoContentType");
 
 	/** @return The description text, such as might appear in a flyover, or <code>null</code> if there is no description. */
 	public String getDescription();

@@ -48,15 +48,15 @@ import static com.globalmentor.text.Text.*;
 public class AbstractTextControl<V> extends AbstractEditValueControl<V> {
 
 	/** The auto commit pattern bound property. */
-	public final static String AUTO_COMMIT_PATTERN_PROPERTY = getPropertyName(AbstractTextControl.class, "autoCommitPattern");
+	public static final String AUTO_COMMIT_PATTERN_PROPERTY = getPropertyName(AbstractTextControl.class, "autoCommitPattern");
 	/** The column count bound property. */
-	public final static String COLUMN_COUNT_PROPERTY = getPropertyName(AbstractTextControl.class, "columnCount");
+	public static final String COLUMN_COUNT_PROPERTY = getPropertyName(AbstractTextControl.class, "columnCount");
 	/** The provisional text literal bound property. */
-	public final static String PROVISIONAL_TEXT_PROPERTY = getPropertyName(AbstractTextControl.class, "provisionalText");
+	public static final String PROVISIONAL_TEXT_PROPERTY = getPropertyName(AbstractTextControl.class, "provisionalText");
 	/** The text literal bound property. */
-	public final static String TEXT_PROPERTY = getPropertyName(AbstractTextControl.class, "text");
+	public static final String TEXT_PROPERTY = getPropertyName(AbstractTextControl.class, "text");
 	/** The value content type bound property. */
-	public final static String VALUE_CONTENT_TYPE_PROPERTY = getPropertyName(AbstractTextControl.class, "valueContentType");
+	public static final String VALUE_CONTENT_TYPE_PROPERTY = getPropertyName(AbstractTextControl.class, "valueContentType");
 
 	/**
 	 * The regular expression pattern that will cause the text automatically to be committed immediately, or <code>null</code> if text should not be committed

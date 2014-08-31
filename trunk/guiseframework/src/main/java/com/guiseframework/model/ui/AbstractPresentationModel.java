@@ -62,7 +62,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 	private Color[] borderColors = fill(new Color[Border.values().length], null);
 
 	/** The properties corresponding to the border colors. */
-	private final static String[] BORDER_COLOR_PROPERTIES;
+	private static final String[] BORDER_COLOR_PROPERTIES;
 
 	static {
 		BORDER_COLOR_PROPERTIES = new String[Border.values().length]; //create the array of properties and fill it with corresponding properties
@@ -187,7 +187,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 	private Extent[] borderExtents = fill(new Extent[Border.values().length], Extent.ZERO_EXTENT1);
 
 	/** The properties corresponding to the border extents. */
-	private final static String[] BORDER_EXTENT_PROPERTIES;
+	private static final String[] BORDER_EXTENT_PROPERTIES;
 
 	static {
 		BORDER_EXTENT_PROPERTIES = new String[Border.values().length]; //create the array of properties and fill it with corresponding properties
@@ -317,7 +317,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 	private LineStyle[] borderStyles = fill(new LineStyle[Border.values().length], LineStyle.SOLID);
 
 	/** The properties corresponding to the border styles. */
-	private final static String[] BORDER_STYLE_PROPERTIES;
+	private static final String[] BORDER_STYLE_PROPERTIES;
 
 	static {
 		BORDER_STYLE_PROPERTIES = new String[Border.values().length]; //create the array of properties and fill it with corresponding properties
@@ -447,7 +447,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 	private Dimensions[] cornerArcSizes = fill(new Dimensions[Corner.values().length], Dimensions.ZERO_DIMENSIONS);
 
 	/** The properties corresponding to the corner arc sizes. */
-	private final static String[] CORNER_ARC_SIZE_PROPERTIES;
+	private static final String[] CORNER_ARC_SIZE_PROPERTIES;
 
 	static {
 		CORNER_ARC_SIZE_PROPERTIES = new String[Corner.values().length]; //create the array of properties and fill it with corresponding properties
@@ -599,7 +599,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 	private Extent[] extents = fill(new Extent[Flow.values().length], null);
 
 	/** The properties corresponding to the component extents. */
-	private final static String[] EXTENT_PROPERTIES;
+	private static final String[] EXTENT_PROPERTIES;
 
 	static {
 		EXTENT_PROPERTIES = new String[Flow.values().length]; //create the array of properties and fill it with corresponding properties
@@ -870,7 +870,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 	private Extent[] marginExtents = fill(new Extent[Border.values().length], Extent.ZERO_EXTENT1);
 
 	/** The properties corresponding to the margin extents. */
-	private final static String[] MARGIN_EXTENT_PROPERTIES;
+	private static final String[] MARGIN_EXTENT_PROPERTIES;
 
 	static {
 		MARGIN_EXTENT_PROPERTIES = new String[Border.values().length]; //create the array of properties and fill it with corresponding properties
@@ -1025,7 +1025,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 	private Extent[] paddingExtents = fill(new Extent[Border.values().length], Extent.ZERO_EXTENT1);
 
 	/** The properties corresponding to the padding extents. */
-	private final static String[] PADDING_EXTENT_PROPERTIES;
+	private static final String[] PADDING_EXTENT_PROPERTIES;
 
 	static {
 		PADDING_EXTENT_PROPERTIES = new String[Border.values().length]; //create the array of properties and fill it with corresponding properties

@@ -25,7 +25,7 @@ import static com.globalmentor.java.Classes.*;
 public interface Effect {
 
 	/** The delay bound property. */
-	public final static String DELAY_PROPERTY = getPropertyName(Effect.class, "delay");
+	public static final String DELAY_PROPERTY = getPropertyName(Effect.class, "delay");
 
 	/** @return The delay, in milliseconds, before the effect takes place. */
 	public int getDelay();

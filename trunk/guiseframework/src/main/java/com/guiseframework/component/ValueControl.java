@@ -28,6 +28,6 @@ import com.guiseframework.model.ValueModel;
 public interface ValueControl<V> extends Control, /*TODO del if not wanted EditComponent, */ValueModel<V>, ValuedComponent<V> {
 
 	/** The converter bound property. */
-	public final static String CONVERTER_PROPERTY = getPropertyName(ValueControl.class, "converter");
+	public static final String CONVERTER_PROPERTY = getPropertyName(ValueControl.class, "converter");
 
 }

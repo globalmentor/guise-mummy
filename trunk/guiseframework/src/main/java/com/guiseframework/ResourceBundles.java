@@ -46,7 +46,7 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 {
 
 	/** The map of resource bundles softly keyed to resource bundle base paths. This serves as a soft cache to resource bundles. */
-	//TODO fix caching; the problem is currently how to verify the same loader and resource path while keeping a weak reference to the loader private final static Map<String, ResourceBundle> resourceBundleMap=synchronizedMap(new SoftValueHashMap<String, ResourceBundle>());
+	//TODO fix caching; the problem is currently how to verify the same loader and resource path while keeping a weak reference to the loader private static final Map<String, ResourceBundle> resourceBundleMap=synchronizedMap(new SoftValueHashMap<String, ResourceBundle>());
 
 	/**
 	 * The format in which a resource bundle is serialized, in order of preference.

@@ -27,7 +27,7 @@ import static com.globalmentor.java.Classes.*;
 public interface NavigationModel extends Model {
 
 	/** The navigation path bound property, of type {@link URIPath}. */
-	public final static String NAVIGATION_PATH_PROPERTY = getPropertyName(NavigationModel.class, "navigationPath");
+	public static final String NAVIGATION_PATH_PROPERTY = getPropertyName(NavigationModel.class, "navigationPath");
 
 	/** @return The navigation path, or <code>null</code> if the navigation path is not available. */
 	public URIPath getNavigationPath();

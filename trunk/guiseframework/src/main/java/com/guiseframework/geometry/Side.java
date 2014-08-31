@@ -74,7 +74,7 @@ public enum Side implements Identifier {
 	}
 
 	//the map of sides for each axis
-	private final static Map<Axis, Set<Side>> AXIS_SIDES;
+	private static final Map<Axis, Set<Side>> AXIS_SIDES;
 
 	/**
 	 * Determines the sides on the given axis.

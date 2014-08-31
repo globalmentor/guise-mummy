@@ -36,7 +36,7 @@ public interface Control extends Component, InputFocusableComponent, Enableable 
 	}
 
 	/** The status bound property. */
-	public final static String STATUS_PROPERTY = getPropertyName(Control.class, "status");
+	public static final String STATUS_PROPERTY = getPropertyName(Control.class, "status");
 
 	/** @return The status of the current user input, or <code>null</code> if there is no status to report. */
 	public Status getStatus();

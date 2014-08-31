@@ -28,7 +28,7 @@ import java.net.URI;
 public interface ActionValueControl<V> extends ActionControl, ValueControl<V> {
 
 	/** The bound property for an icon associated with a value. */
-	public final static String VALUE_GLYPH_URI_PROPERTY = getPropertyName(SelectActionControl.class, "valueGlyphURI");
+	public static final String VALUE_GLYPH_URI_PROPERTY = getPropertyName(SelectActionControl.class, "valueGlyphURI");
 
 	/**
 	 * Retrieves the icon associated with a given value.

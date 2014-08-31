@@ -39,9 +39,9 @@ public class Message extends AbstractComponent //TODO del component if not neede
 {
 
 	/** The message bound property. */
-	public final static String MESSAGE_PROPERTY = getPropertyName(Message.class, "message");
+	public static final String MESSAGE_PROPERTY = getPropertyName(Message.class, "message");
 	/** The message content type bound property. */
-	public final static String MESSAGE_CONTENT_TYPE_PROPERTY = getPropertyName(Message.class, "messageContentType");
+	public static final String MESSAGE_CONTENT_TYPE_PROPERTY = getPropertyName(Message.class, "messageContentType");
 
 	/** The message text, which may include a resource reference, or <code>null</code> if there is no message text. */
 	private String message = null;

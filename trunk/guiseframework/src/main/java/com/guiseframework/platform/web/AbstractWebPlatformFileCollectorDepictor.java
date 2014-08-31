@@ -55,11 +55,11 @@ public class AbstractWebPlatformFileCollectorDepictor extends AbstractWebDepicto
 		FILE_UPLOAD;
 
 		/** The property for specifying the destination URI of a file upload. */
-		public final static String DESTINATION_URI_PROPERTY = "destinationURI";
+		public static final String DESTINATION_URI_PROPERTY = "destinationURI";
 		/** The property for specifying the ID of a file. */
-		public final static String ID_PROPERTY = "id";
+		public static final String ID_PROPERTY = "id";
 		/** The property for specifying whether multiple files should be selected. */
-		public final static String MULTIPLE_PROPERTY = "multiple";
+		public static final String MULTIPLE_PROPERTY = "multiple";
 
 	}
 

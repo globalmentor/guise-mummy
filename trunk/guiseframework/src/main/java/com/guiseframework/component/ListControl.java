@@ -29,7 +29,7 @@ import com.guiseframework.model.*;
 public class ListControl<V> extends AbstractListSelectControl<V> {
 
 	/** The row count bound property. */
-	public final static String ROW_COUNT_PROPERTY = getPropertyName(ListControl.class, "rowCount");
+	public static final String ROW_COUNT_PROPERTY = getPropertyName(ListControl.class, "rowCount");
 
 	/** The estimated number of rows requested to be visible, or -1 if no row count is specified. */
 	private int rowCount;

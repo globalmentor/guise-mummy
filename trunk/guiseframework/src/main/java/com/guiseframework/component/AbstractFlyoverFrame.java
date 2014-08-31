@@ -58,7 +58,7 @@ public abstract class AbstractFlyoverFrame extends AbstractFrame implements Flyo
 	 */
 
 	/** The base resource URI for the flyover tether image URI. */
-	public final static URI TETHER_IMAGE_RESOURCE_URI = createURIResourceReference("theme.flyover.frame.tether.image");
+	public static final URI TETHER_IMAGE_RESOURCE_URI = createURIResourceReference("theme.flyover.frame.tether.image");
 
 	/** The bearing of the tether in relation to the frame. */
 	private BigDecimal tetherBearing = CompassPoint.NORTHWEST_BY_WEST.getBearing();

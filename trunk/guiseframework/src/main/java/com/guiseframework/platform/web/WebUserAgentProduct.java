@@ -66,7 +66,7 @@ public interface WebUserAgentProduct extends ClientProduct, BrandedProduct<WebUs
 		YAHOO_MMCRAWLER;
 
 		/** The map of web user agent brands keyed to user agent names. */
-		private final static Map<String, Brand> nameBrandMap;
+		private static final Map<String, Brand> nameBrandMap;
 
 		static { //initialize the name brand lookup map
 			final Map<String, Brand> tempMap = new HashMap<String, Brand>(); //create a new map to hold the brand lookup values

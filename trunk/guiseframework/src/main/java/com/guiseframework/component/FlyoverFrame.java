@@ -46,11 +46,11 @@ import com.guiseframework.geometry.CompassPoint;
 public interface FlyoverFrame extends Frame {
 
 	/** The tether bearing bound property. */
-	public final static String TETHER_BEARING_PROPERTY = getPropertyName(FlyoverFrame.class, "tetherBearing");
+	public static final String TETHER_BEARING_PROPERTY = getPropertyName(FlyoverFrame.class, "tetherBearing");
 	/** The tether bearing compass points bound property. */
-	public final static String TETHER_BEARING_COMPASS_POINTS_PROPERTY = getPropertyName(FlyoverFrame.class, "tetherBearingCompassPoints");
+	public static final String TETHER_BEARING_COMPASS_POINTS_PROPERTY = getPropertyName(FlyoverFrame.class, "tetherBearingCompassPoints");
 	/** The tether image bound property. */
-	public final static String TETHER_IMAGE_PROPERTY = getPropertyName(FlyoverFrame.class, "tetherImage");
+	public static final String TETHER_IMAGE_PROPERTY = getPropertyName(FlyoverFrame.class, "tetherImage");
 
 	/** @return The bearing of the tether in relation to the frame. */
 	public BigDecimal getTetherBearing();

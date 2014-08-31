@@ -51,17 +51,17 @@ import com.guiseframework.theme.Theme;
 public interface GuiseSession extends PropertyBindable, CollatorFactory, ConfigurationManaged {
 
 	/** The input strategy bound property. */
-	public final static String INPUT_STRATEGY_PROPERTY = getPropertyName(GuiseSession.class, "inputStrategy");
+	public static final String INPUT_STRATEGY_PROPERTY = getPropertyName(GuiseSession.class, "inputStrategy");
 	/** The locale bound property. */
-	public final static String LOCALE_PROPERTY = getPropertyName(GuiseSession.class, "locale");
+	public static final String LOCALE_PROPERTY = getPropertyName(GuiseSession.class, "locale");
 	/** The orientation bound property. */
-	public final static String ORIENTATION_PROPERTY = getPropertyName(GuiseSession.class, "orientation");
+	public static final String ORIENTATION_PROPERTY = getPropertyName(GuiseSession.class, "orientation");
 	/** The principal (e.g. user) bound property. */
-	public final static String PRINCIPAL_PROPERTY = getPropertyName(GuiseSession.class, "principal");
+	public static final String PRINCIPAL_PROPERTY = getPropertyName(GuiseSession.class, "principal");
 	/** The theme URI bound property. */
-	public final static String THEME_URI_PROPERTY = getPropertyName(GuiseSession.class, "themeURI");
+	public static final String THEME_URI_PROPERTY = getPropertyName(GuiseSession.class, "themeURI");
 	/** The time zone bound property. */
-	public final static String TIME_ZONE_PROPERTY = getPropertyName(GuiseSession.class, "timeZone");
+	public static final String TIME_ZONE_PROPERTY = getPropertyName(GuiseSession.class, "timeZone");
 
 	/** @return The unique identifier of this session. */
 	public UUID getUUID();

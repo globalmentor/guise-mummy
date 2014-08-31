@@ -145,7 +145,7 @@ public class WebCustomButtonDepictor<C extends ActionControl> extends AbstractWe
 		*/
 	}
 
-	private final static Extent[] CORNER_MARGINS = new Extent[] { new Extent(5, Unit.PIXEL), new Extent(3, Unit.PIXEL), new Extent(2, Unit.PIXEL),
+	private static final Extent[] CORNER_MARGINS = new Extent[] { new Extent(5, Unit.PIXEL), new Extent(3, Unit.PIXEL), new Extent(2, Unit.PIXEL),
 			new Extent(1, Unit.PIXEL), new Extent(1, Unit.PIXEL) };
 
 	/**

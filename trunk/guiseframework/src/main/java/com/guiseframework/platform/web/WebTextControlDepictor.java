@@ -47,10 +47,10 @@ import static com.guiseframework.platform.web.WebPlatform.*;
 public class WebTextControlDepictor<V, C extends TextControl<V>> extends AbstractDecoratedWebComponentDepictor<C> {
 
 	/** The content type for XStandard objects. */
-	public final static ContentType XSTANDARD_CONTENT_TYPE = ContentType.create(ContentType.APPLICATION_PRIMARY_TYPE, "x-xstandard");
+	public static final ContentType XSTANDARD_CONTENT_TYPE = ContentType.create(ContentType.APPLICATION_PRIMARY_TYPE, "x-xstandard");
 
 	/** The XStandard class ID. */
-	public final static String XSTANDARD_CLASS_ID = "clsid:0EED7206-1661-11D7-84A3-00606744831D";
+	public static final String XSTANDARD_CLASS_ID = "clsid:0EED7206-1661-11D7-84A3-00606744831D";
 
 	/** Default constructor using the XHTML <code>&lt;input&gt;</code> element. */
 	public WebTextControlDepictor() {

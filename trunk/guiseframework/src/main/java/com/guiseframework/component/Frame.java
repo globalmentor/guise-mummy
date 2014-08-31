@@ -42,27 +42,27 @@ import com.guiseframework.style.Color;
 public interface Frame extends ContentComponent, ModalComponent<Frame.Mode>, InputFocusGroupComponent {
 
 	/** The close action control bound property. */
-	public final static String CLOSE_ACTION_CONTROL_PROPERTY = getPropertyName(Frame.class, "closeActionControl");
+	public static final String CLOSE_ACTION_CONTROL_PROPERTY = getPropertyName(Frame.class, "closeActionControl");
 	/** The bound property of the frame menu. */
-	public final static String MENU_PROPERTY = getPropertyName(Frame.class, "menu");
+	public static final String MENU_PROPERTY = getPropertyName(Frame.class, "menu");
 	/** The bound property of whether the frame is modal if and when it is open. */
-	public final static String MODAL_PROPERTY = getPropertyName(Frame.class, "modal");
+	public static final String MODAL_PROPERTY = getPropertyName(Frame.class, "modal");
 	/** The bound property of whether the component is movable. */
-	public final static String MOVABLE_PROPERTY = getPropertyName(Frame.class, "movable");
+	public static final String MOVABLE_PROPERTY = getPropertyName(Frame.class, "movable");
 	/** The open effect bound property. */
-	public final static String OPEN_EFFECT_PROPERTY = getPropertyName(Frame.class, "openEffect");
+	public static final String OPEN_EFFECT_PROPERTY = getPropertyName(Frame.class, "openEffect");
 	/** The bound property of the related component. */
-	public final static String RELATED_COMPONENT_PROPERTY = getPropertyName(Frame.class, "relatedComponent");
+	public static final String RELATED_COMPONENT_PROPERTY = getPropertyName(Frame.class, "relatedComponent");
 	/** The bound property of whether the frame can be resized. */
-	public final static String RESIZABLE_PROPERTY = getPropertyName(Frame.class, "resizable");
+	public static final String RESIZABLE_PROPERTY = getPropertyName(Frame.class, "resizable");
 	/** The bound state property. */
-	public final static String STATE_PROPERTY = getPropertyName(Frame.class, "state");
+	public static final String STATE_PROPERTY = getPropertyName(Frame.class, "state");
 	/** The bound property of the title background color. */
-	public final static String TITLE_BACKGROUND_COLOR_PROPERTY = getPropertyName(Frame.class, "titleBackgroundColor");
+	public static final String TITLE_BACKGROUND_COLOR_PROPERTY = getPropertyName(Frame.class, "titleBackgroundColor");
 	/** The bound property of whether the title bar is visible. */
-	public final static String TITLE_VISIBLE_PROPERTY = getPropertyName(Frame.class, "titleVisible");
+	public static final String TITLE_VISIBLE_PROPERTY = getPropertyName(Frame.class, "titleVisible");
 	/** The bound property of the frame toolbar. */
-	public final static String TOOLBAR_PROPERTY = getPropertyName(Frame.class, "toolbar");
+	public static final String TOOLBAR_PROPERTY = getPropertyName(Frame.class, "toolbar");
 
 	/** The mode of this component; whether the frame is in exclusive interaction with the user. */
 	public enum Mode implements com.guiseframework.component.Mode {

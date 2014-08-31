@@ -36,42 +36,42 @@ import static org.urframework.URF.*;
 public class Resources extends URFMapResource<URFResource, URFResource> {
 
 	/** The recommended prefix to the resources key ontology namespace. */
-	public final static String RESOURCES_NAMESPACE_PREFIX = "resources";
+	public static final String RESOURCES_NAMESPACE_PREFIX = "resources";
 	/** The URI to the resource key ontology namespace. */
-	public final static URI RESOURCES_NAMESPACE_URI = URI.create("http://guiseframework.com/namespaces/resources/");
+	public static final URI RESOURCES_NAMESPACE_URI = URI.create("http://guiseframework.com/namespaces/resources/");
 
 	/** The default base name of the Guise resource bundle. */
-	public final static String DEFAULT_RESOURCE_BUNDLE_BASE_NAME = Resources.class.getPackage().getName() + "/resources";
+	public static final String DEFAULT_RESOURCE_BUNDLE_BASE_NAME = Resources.class.getPackage().getName() + "/resources";
 
 	/** The prefix character used to introduce string value references. */
-	public final static char STRING_VALUE_REFERENCE_PREFIX_CHAR = '=';
+	public static final char STRING_VALUE_REFERENCE_PREFIX_CHAR = '=';
 
 	//common property strings
 	/** The aspect used to identify labels as part of resource property keys. */
-	public final static String LABEL_PROPERTY_KEY_ASPECT = "label";
+	public static final String LABEL_PROPERTY_KEY_ASPECT = "label";
 	/** The aspect used to identify glyphs as part of resource property keys. */
-	public final static String GLYPH_PROPERTY_KEY_ASPECT = "glyph";
+	public static final String GLYPH_PROPERTY_KEY_ASPECT = "glyph";
 	/** The aspect used to identify info as part of resource property keys. */
-	public final static String INFO_PROPERTY_KEY_ASPECT = "info";
+	public static final String INFO_PROPERTY_KEY_ASPECT = "info";
 
 	//standard labels
-	public final static String APPLICATION_NAME = createStringResourceReference("application.name");
-	public final static String APPLICATION_NAME_SHORT = createStringResourceReference("application.name.short");
-	public final static String APPLICATION_LABEL = createStringResourceReference("application.label");
-	public final static String APPLICATION_DESCRIPTION = createStringResourceReference("application.description");
-	public final static String APPLICATION_COPYRIGHT = createStringResourceReference("application.copyright");
-	public final static String APPLICATION_VERSION = createStringResourceReference("application.version");
+	public static final String APPLICATION_NAME = createStringResourceReference("application.name");
+	public static final String APPLICATION_NAME_SHORT = createStringResourceReference("application.name.short");
+	public static final String APPLICATION_LABEL = createStringResourceReference("application.label");
+	public static final String APPLICATION_DESCRIPTION = createStringResourceReference("application.description");
+	public static final String APPLICATION_COPYRIGHT = createStringResourceReference("application.copyright");
+	public static final String APPLICATION_VERSION = createStringResourceReference("application.version");
 
 	//converter resources
 	/** The resource reference for a converter message indicating that a value is invalid. */
-	public final static String CONVERTER_INVALID_VALUE_MESSAGE_RESOURCE_REFERENCE = createStringResourceReference("converter.invalid.value.message");
+	public static final String CONVERTER_INVALID_VALUE_MESSAGE_RESOURCE_REFERENCE = createStringResourceReference("converter.invalid.value.message");
 	//validator resources
 	/** The resource reference for a validator message indicating that a value is required. */
-	public final static String VALIDATOR_VALUE_REQUIRED_MESSAGE_RESOURCE_REFERENCE = createStringResourceReference("validator.value.required.message");
+	public static final String VALIDATOR_VALUE_REQUIRED_MESSAGE_RESOURCE_REFERENCE = createStringResourceReference("validator.value.required.message");
 	/** The resource reference for a validator message indicating that a value is invalid. */
-	public final static String VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE_REFERENCE = createStringResourceReference("validator.invalid.value.message");
+	public static final String VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE_REFERENCE = createStringResourceReference("validator.invalid.value.message");
 	/** The resource bundle key for a general failed validation message. */
-	public final static String VALIDATION_FALSE_MESSAGE_RESOURCE_REFERENCE = createStringResourceReference("validation.false.message");
+	public static final String VALIDATION_FALSE_MESSAGE_RESOURCE_REFERENCE = createStringResourceReference("validation.false.message");
 
 	/** Default constructor. */
 	public Resources() {
@@ -96,7 +96,7 @@ public class Resources extends URFMapResource<URFResource, URFResource> {
 	 * @throws NullPointerException if the given resource key is <code>null</code>.
 	 * @see <a href="http://www.ecma-international.org/publications/standards/Ecma-048.htm">ECMA-48: Control Functions for Coded Character Sets</a>
 	 */
-	public final static String createStringResourceReference(final String resourceKey) {
+	public static final String createStringResourceReference(final String resourceKey) {
 		return createControlString(resourceKey); //return a control string for the given resource key
 	}
 
@@ -108,7 +108,7 @@ public class Resources extends URFMapResource<URFResource, URFResource> {
 	 * @throws NullPointerException if the given value is <code>null</code>.
 	 * @see <a href="http://www.ecma-international.org/publications/standards/Ecma-048.htm">ECMA-48: Control Functions for Coded Character Sets</a>
 	 */
-	public final static String createStringValueReference(final String value) {
+	public static final String createStringValueReference(final String value) {
 		return createControlString(new StringBuilder().append(STRING_VALUE_REFERENCE_PREFIX_CHAR).append(value).toString()); //return a control string for the given value prefixed by the value reference character
 	}
 
@@ -119,7 +119,7 @@ public class Resources extends URFMapResource<URFResource, URFResource> {
 	 * @return A URI containing a reference to the given resource key, which can be resolved using {@link GuiseSession#resolveURI(String)}.
 	 * @throws NullPointerException if the given resource key is <code>null</code>.
 	 */
-	public final static URI createURIResourceReference(final String resourceKey) {
+	public static final URI createURIResourceReference(final String resourceKey) {
 		return createURI(RESOURCE_SCHEME, checkInstance(resourceKey, "Resource key cannot be null."));
 	}
 

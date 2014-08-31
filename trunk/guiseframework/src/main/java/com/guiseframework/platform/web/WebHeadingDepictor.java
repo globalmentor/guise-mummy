@@ -30,7 +30,7 @@ import com.guiseframework.component.*;
 public class WebHeadingDepictor<C extends LabelComponent> extends WebLabelDepictor<C> {
 
 	/** The array of XHTML heading element local names. */
-	protected final static String[] HEADING_LOCAL_NAMES = new String[] { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3, ELEMENT_H4, ELEMENT_H5, ELEMENT_H6 };
+	protected static final String[] HEADING_LOCAL_NAMES = new String[] { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3, ELEMENT_H4, ELEMENT_H5, ELEMENT_H6 };
 
 	/**
 	 * {@inheritDoc} This version returns one of the XHTML heading element local names if the component is a {@link HeadingComponent} and a valid level is

@@ -29,7 +29,7 @@ import com.globalmentor.event.TargetedEvent;
 public interface TreeNodeModel<V> extends ActionModel, ValueModel<V>, Selectable, Iterable<TreeNodeModel<?>> {
 
 	/** The expanded bound property. */
-	public final static String EXPANDED_PROPERTY = getPropertyName(TreeNodeModel.class, "expanded");
+	public static final String EXPANDED_PROPERTY = getPropertyName(TreeNodeModel.class, "expanded");
 
 	/** @return Whether the node is expanded, showing its children, if any. */
 	public boolean isExpanded();

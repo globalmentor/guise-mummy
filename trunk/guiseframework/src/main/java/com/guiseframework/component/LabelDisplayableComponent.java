@@ -25,9 +25,9 @@ import static com.globalmentor.java.Classes.*;
 public interface LabelDisplayableComponent extends Component {
 
 	/** The bound property of whether the icon is displayed or has no representation, taking up no space. */
-	public final static String ICON_DISPLAYED_PROPERTY = getPropertyName(LabelDisplayableComponent.class, "iconDisplayed");
+	public static final String ICON_DISPLAYED_PROPERTY = getPropertyName(LabelDisplayableComponent.class, "iconDisplayed");
 	/** The bound property of whether the label is displayed or has no representation, taking up no space. */
-	public final static String LABEL_DISPLAYED_PROPERTY = getPropertyName(LabelDisplayableComponent.class, "labelDisplayed");
+	public static final String LABEL_DISPLAYED_PROPERTY = getPropertyName(LabelDisplayableComponent.class, "labelDisplayed");
 
 	/** @return Whether the icon is displayed. */
 	public boolean isIconDisplayed();

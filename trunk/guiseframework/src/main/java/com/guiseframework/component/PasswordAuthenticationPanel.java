@@ -33,7 +33,7 @@ import com.guiseframework.validator.*;
 public class PasswordAuthenticationPanel extends ArrangePanel {
 
 	/** The bound property of the password verification status. */
-	public final static String PASSWORD_VERIFIED_PROPERTY = getPropertyName(PasswordAuthenticationPanel.class, "passwordVerified");
+	public static final String PASSWORD_VERIFIED_PROPERTY = getPropertyName(PasswordAuthenticationPanel.class, "passwordVerified");
 
 	/** The username text control. */
 	private final TextControl<String> usernameControl;

@@ -30,7 +30,7 @@ import static com.globalmentor.java.Objects.*;
 public class PlatformFileCollector extends AbstractDepictedObject {
 
 	/** The bound property of the selected platform files. */
-	public final static String PLATFORM_FILES_PROPERTY = getPropertyName(PlatformFileCollector.class, "platformFiles");
+	public static final String PLATFORM_FILES_PROPERTY = getPropertyName(PlatformFileCollector.class, "platformFiles");
 
 	/** @return The depictor for this object. */
 	@SuppressWarnings("unchecked")

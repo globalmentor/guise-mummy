@@ -32,7 +32,7 @@ import com.guiseframework.component.Component;
 public interface Widget extends Component {
 
 	/** The MIME type of a Guise widget. */
-	public final static ContentType WIDGET_CONTENT_TYPE = ContentType.create(ContentType.APPLICATION_PRIMARY_TYPE, ContentType.SUBTYPE_EXTENSION_PREFIX
+	public static final ContentType WIDGET_CONTENT_TYPE = ContentType.create(ContentType.APPLICATION_PRIMARY_TYPE, ContentType.SUBTYPE_EXTENSION_PREFIX
 			+ "guise-widget");
 
 	/**

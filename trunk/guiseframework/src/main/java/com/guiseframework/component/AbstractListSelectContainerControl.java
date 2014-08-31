@@ -40,7 +40,7 @@ import com.guiseframework.validator.*;
 public abstract class AbstractListSelectContainerControl extends AbstractContainerControl implements ListSelectControl<Component> {
 
 	/** The static representation strategy to represent component values as themselves. */
-	public final static ComponentRepresentationStrategy COMPONENT_REPRESENTATION_STRATEGY = new ComponentRepresentationStrategy();
+	public static final ComponentRepresentationStrategy COMPONENT_REPRESENTATION_STRATEGY = new ComponentRepresentationStrategy();
 
 	//TODO make sure we listen for enabled status changing on the layout and send an index enabled property change, maybe
 
@@ -248,7 +248,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	}
 
 	/** The shared single component selection policy. */
-	private final static ListSelectionPolicy<Component> SINGLE_COMPONENT_SELECTION_POLICY = new SingleListSelectionPolicy<Component>();
+	private static final ListSelectionPolicy<Component> SINGLE_COMPONENT_SELECTION_POLICY = new SingleListSelectionPolicy<Component>();
 
 	//ListSelectModel delegations
 

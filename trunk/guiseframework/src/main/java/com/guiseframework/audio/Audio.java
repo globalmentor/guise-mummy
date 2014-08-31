@@ -33,15 +33,15 @@ import com.guiseframework.platform.AbstractDepictedObject;
 public class Audio extends AbstractDepictedObject implements ProgressListenable<Long> {
 
 	/** The bound property of the audio URI. */
-	public final static String AUDIO_URI_PROPERTY = getPropertyName(Audio.class, "audioURI");
+	public static final String AUDIO_URI_PROPERTY = getPropertyName(Audio.class, "audioURI");
 	/** The bound property of the audio content type. */
-	public final static String AUDIO_CONTENT_TYPE_PROPERTY = getPropertyName(Audio.class, "audioContentType");
+	public static final String AUDIO_CONTENT_TYPE_PROPERTY = getPropertyName(Audio.class, "audioContentType");
 	/** The bound property of the state. */
-	public final static String STATE_PROPERTY = getPropertyName(Audio.class, "state");
+	public static final String STATE_PROPERTY = getPropertyName(Audio.class, "state");
 	/** The bound property of the play duration using microseconds. */
-	public final static String TIME_LENGTH_PROPERTY = getPropertyName(Audio.class, "timeLength");
+	public static final String TIME_LENGTH_PROPERTY = getPropertyName(Audio.class, "timeLength");
 	/** The bound property of the play position in time using microseconds. */
-	public final static String TIME_POSITION_PROPERTY = getPropertyName(Audio.class, "timePosition");
+	public static final String TIME_POSITION_PROPERTY = getPropertyName(Audio.class, "timePosition");
 
 	/** @return The depictor for this object. */
 	@SuppressWarnings("unchecked")

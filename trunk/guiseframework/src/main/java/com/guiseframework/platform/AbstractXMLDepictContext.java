@@ -125,13 +125,13 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	 * The characters that should be encoded in XML.
 	 * @see #XML_REPLACEMENT_STRINGS
 	 */
-	private final static char[] XML_REPLACE_CHARACTERS = new char[] { '&', '<', '>', '"' };
+	private static final char[] XML_REPLACE_CHARACTERS = new char[] { '&', '<', '>', '"' };
 
 	/**
 	 * The strings that replace the XML replace characters, in order.
 	 * @see #XML_REPLACE_CHARACTERS
 	 */
-	private final static String[] XML_REPLACEMENT_STRINGS = new String[] { "&amp;", "&lt;", "&gt;", "&quot;" };
+	private static final String[] XML_REPLACEMENT_STRINGS = new String[] { "&amp;", "&lt;", "&gt;", "&quot;" };
 
 	/**
 	 * Encodes text information for writing. This version encodes XML characters.
@@ -513,7 +513,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	}
 
 	/** Encoded hyphens to replaces illegal "--" sequences within a comment. */
-	private final static String XML_COMMENT_ENCODED_HYPHENS = createCharacterReference('-') + createCharacterReference('-');
+	private static final String XML_COMMENT_ENCODED_HYPHENS = createCharacterReference('-') + createCharacterReference('-');
 
 	/**
 	 * Writes an XML comment. This method ensures that any open beginning tag has been closed.

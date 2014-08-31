@@ -26,9 +26,9 @@ import static com.globalmentor.java.Classes.*;
 public interface ModalFrame<R> extends Frame {
 
 	/** The modal state bound property. */
-	public final static String MODAL_PROPERTY = getPropertyName(ModalFrame.class, "modal");
+	public static final String MODAL_PROPERTY = getPropertyName(ModalFrame.class, "modal");
 	/** The result bound property. */
-	public final static String RESULT_PROPERTY = getPropertyName(ModalFrame.class, "result");
+	public static final String RESULT_PROPERTY = getPropertyName(ModalFrame.class, "result");
 
 	/** @return The result of this frame's modal interaction, or <code>null</code> if no result is given. */
 	public R getResult();

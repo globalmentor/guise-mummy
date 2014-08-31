@@ -44,10 +44,10 @@ import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutComponent> extends AbstractWebComponentDepictor<C> {
 
 	/** The style classes for each region in a row. */
-	protected final static String ROW_REGION_CLASSES[] = new String[] { LAYOUT_REGION_LEFT_CLASS, LAYOUT_REGION_CENTER_CLASS, LAYOUT_REGION_RIGHT_CLASS };
+	protected static final String ROW_REGION_CLASSES[] = new String[] { LAYOUT_REGION_LEFT_CLASS, LAYOUT_REGION_CENTER_CLASS, LAYOUT_REGION_RIGHT_CLASS };
 
 	/** The style classes for each region in a column. */
-	protected final static String COLUMN_REGION_CLASSES[] = new String[] { LAYOUT_REGION_TOP_CLASS, LAYOUT_REGION_CENTER_CLASS, LAYOUT_REGION_BOTTOM_CLASS };
+	protected static final String COLUMN_REGION_CLASSES[] = new String[] { LAYOUT_REGION_TOP_CLASS, LAYOUT_REGION_CENTER_CLASS, LAYOUT_REGION_BOTTOM_CLASS };
 
 	/** Default constructor with no element representation. */
 	public AbstractWebLayoutComponentDepictor() {

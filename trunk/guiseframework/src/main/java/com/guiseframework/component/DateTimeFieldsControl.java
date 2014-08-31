@@ -40,7 +40,7 @@ import com.guiseframework.validator.*;
 public class DateTimeFieldsControl extends AbstractLayoutValueControl<Date> { //TODO finish or delete class
 
 	/** The visible date bound property. */
-	//TODO del	public final static String DATE_PROPERTY=getPropertyName(DateTimeControl.class, "date");
+	//TODO del	public static final String DATE_PROPERTY=getPropertyName(DateTimeControl.class, "date");
 
 	/** The list control containing the months. */
 	private final ListControl<Date> monthListControl;

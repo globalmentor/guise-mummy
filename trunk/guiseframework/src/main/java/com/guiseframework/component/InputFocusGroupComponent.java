@@ -29,9 +29,9 @@ import com.guiseframework.event.InputFocusStrategy;
 public interface InputFocusGroupComponent extends InputFocusableComponent {
 
 	/** The input focus strategy bound property. */
-	public final static String INPUT_FOCUS_STRATEGY_PROPERTY = getPropertyName(InputFocusGroupComponent.class, "inputFocusStrategy");
+	public static final String INPUT_FOCUS_STRATEGY_PROPERTY = getPropertyName(InputFocusGroupComponent.class, "inputFocusStrategy");
 	/** The input focused component bound property. */
-	public final static String INPUT_FOCUSED_COMPONENT_PROPERTY = getPropertyName(InputFocusGroupComponent.class, "inputFocusedComponent");
+	public static final String INPUT_FOCUSED_COMPONENT_PROPERTY = getPropertyName(InputFocusGroupComponent.class, "inputFocusedComponent");
 
 	/** @return The input focus strategy for this input focus group. */
 	public InputFocusStrategy getInputFocusStrategy();

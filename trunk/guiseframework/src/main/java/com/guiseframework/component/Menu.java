@@ -29,9 +29,9 @@ import com.guiseframework.component.layout.MenuLayout;
 public interface Menu extends ContainerControl, ActionControl, LabelDisplayableComponent {
 
 	/** The open bound property. */
-	public final static String OPEN_PROPERTY = getPropertyName(Menu.class, "open");
+	public static final String OPEN_PROPERTY = getPropertyName(Menu.class, "open");
 	/** The bound property of whether children will be displayed upon rollover. */
-	public final static String ROLLOVER_OPEN_ENABLED_PROPERTY = getPropertyName(Menu.class, "rolloverOpenEnabled");
+	public static final String ROLLOVER_OPEN_ENABLED_PROPERTY = getPropertyName(Menu.class, "rolloverOpenEnabled");
 
 	/** @return The layout definition for the menu. */
 	public MenuLayout getLayout();

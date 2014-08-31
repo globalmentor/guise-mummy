@@ -47,16 +47,16 @@ import org.xml.sax.SAXException;
 public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComponentDepictor<C> {
 
 	/** The document prefix to wrap around an XHTML fragment. */
-	private final static String XHTML11_FRAGMENT_DOCUMENT_PREFIX = //TODO fix; this doesn't create valid XHTML; it needs an internal DIV, but we need to then get the contents of the DIV rather than the BODY, which we could do using an ID
+	private static final String XHTML11_FRAGMENT_DOCUMENT_PREFIX = //TODO fix; this doesn't create valid XHTML; it needs an internal DIV, but we need to then get the contents of the DIV rather than the BODY, which we could do using an ID
 	"<?xml version='1.0'?>" +
 	/*TODO del; we don't validate, so why do we need a doctype?		"<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>"+*/
 	"<html xmlns='http://www.w3.org/1999/xhtml'>" + "<head><title>XHTML Fragment Document</title></head>" + "<body>";
 
 	/** The document suffix to wrap around an XHTML fragment. */
-	private final static String XHTML11_FRAGMENT_DOCUMENT_SUFFIX = "</body>" + "</html>";
+	private static final String XHTML11_FRAGMENT_DOCUMENT_SUFFIX = "</body>" + "</html>";
 
 	/** A thread-safe cache of softly-referenced XML documents keyed to hashes of the strings with which the documents are associated. */
-	private final static Map<Integer, CachedDocument> cachedDocumentMap = new DecoratorReadWriteLockMap<Integer, CachedDocument>(
+	private static final Map<Integer, CachedDocument> cachedDocumentMap = new DecoratorReadWriteLockMap<Integer, CachedDocument>(
 			new PurgeOnWriteSoftValueHashMap<Integer, CachedDocument>());
 
 	/** Default constructor using the XHTML <code>&lt;div&gt;</code> element. */

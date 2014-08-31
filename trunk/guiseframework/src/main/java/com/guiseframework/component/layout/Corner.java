@@ -64,7 +64,7 @@ public enum Corner {
 	}
 
 	/** The corners in [line][page] order. */
-	private final static Corner[][] LINE_PAGE_CORNERS = new Corner[][] { { LINE_NEAR_PAGE_NEAR, LINE_NEAR_PAGE_FAR }, { LINE_FAR_PAGE_NEAR, LINE_FAR_PAGE_FAR } };
+	private static final Corner[][] LINE_PAGE_CORNERS = new Corner[][] { { LINE_NEAR_PAGE_NEAR, LINE_NEAR_PAGE_FAR }, { LINE_FAR_PAGE_NEAR, LINE_FAR_PAGE_FAR } };
 
 	/**
 	 * Determines the corner from the given line and page ends.

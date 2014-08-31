@@ -62,7 +62,7 @@ public enum Border {
 	}
 
 	/** The borders in [flow][end] order. */
-	private final static Border[][] FLOW_END_BORDERS = new Border[][] { { LINE_NEAR, LINE_FAR }, { PAGE_NEAR, PAGE_FAR } };
+	private static final Border[][] FLOW_END_BORDERS = new Border[][] { { LINE_NEAR, LINE_FAR }, { PAGE_NEAR, PAGE_FAR } };
 
 	/**
 	 * Determines the border from the flow and end.

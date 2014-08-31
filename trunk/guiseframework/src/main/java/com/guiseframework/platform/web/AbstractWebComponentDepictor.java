@@ -59,10 +59,10 @@ import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 public abstract class AbstractWebComponentDepictor<C extends Component> extends AbstractComponentDepictor<C> implements WebComponentDepictor<C> {
 
 	/** The pattern matching the HTML body start tag. */
-	protected final static Pattern BODY_START_PATTERN = Pattern.compile("<body[^>]*>", Pattern.CASE_INSENSITIVE); //TODO fix to ensure that there is either a space or > after the string "body"
+	protected static final Pattern BODY_START_PATTERN = Pattern.compile("<body[^>]*>", Pattern.CASE_INSENSITIVE); //TODO fix to ensure that there is either a space or > after the string "body"
 
 	/** The pattern matching the HTML body end tag. */
-	protected final static Pattern BODY_END_PATTERN = Pattern.compile("</body[^>]*>", Pattern.CASE_INSENSITIVE); //TODO fix to ensure that there is either a space or > after the string "body"
+	protected static final Pattern BODY_END_PATTERN = Pattern.compile("</body[^>]*>", Pattern.CASE_INSENSITIVE); //TODO fix to ensure that there is either a space or > after the string "body"
 
 	@Override
 	public WebPlatform getPlatform() {
@@ -236,10 +236,10 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	}
 
 	/** The array of style IDs for axes for quick lookup. */
-	private final static String[] AXIS_STYLE_IDS;
+	private static final String[] AXIS_STYLE_IDS;
 
 	/** The array of style IDs for line directions for quick lookup. */
-	private final static String[] LINE_DIRECTION_STYLE_IDS;
+	private static final String[] LINE_DIRECTION_STYLE_IDS;
 
 	/**
 	 * Returns whether the component is interested in mouse events.
@@ -254,7 +254,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	}
 
 	/** The thread-safe shared map of class-derived base style IDs keyed to class names. */
-	private final static Map<String, String[]> cachedClassBaseStyleIDs = new ConcurrentHashMap<String, String[]>();
+	private static final Map<String, String[]> cachedClassBaseStyleIDs = new ConcurrentHashMap<String, String[]>();
 
 	/**
 	 * Retrieves the base style IDs for the given component.

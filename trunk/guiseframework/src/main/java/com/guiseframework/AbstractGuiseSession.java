@@ -1685,7 +1685,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	}
 
 	/** The set of string reference delimiters, <code>SOS</code> and <code>ST</code>. */
-	private final static Characters STRING_REFERENCE_DELIMITERS = new Characters(START_OF_STRING_CHAR, STRING_TERMINATOR_CHAR);
+	private static final Characters STRING_REFERENCE_DELIMITERS = new Characters(START_OF_STRING_CHAR, STRING_TERMINATOR_CHAR);
 
 	/**
 	 * Dereferences a string by replacing any string references with a string from the resources. A string reference begins with the Start of String (

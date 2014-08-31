@@ -41,7 +41,7 @@ public enum CompassPoint {
 			"326.25"), false, false), NORTH_NORTHWEST("NNW", new BigDecimal("337.50"), false, false), NORTHBY_WEST("NbW", new BigDecimal("348.75"), false, false);
 
 	/** The maximum bearing available; synonymous with {@link #NORTH}. */
-	public final static BigDecimal MAX_BEARING = new BigDecimal(360);
+	public static final BigDecimal MAX_BEARING = new BigDecimal(360);
 
 	/** The abbreviation of this compass point. */
 	private final String abbreviation;

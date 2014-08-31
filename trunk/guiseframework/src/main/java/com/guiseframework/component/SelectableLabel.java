@@ -31,7 +31,7 @@ import static com.guiseframework.theme.Theme.*;
 public class SelectableLabel extends Label implements Selectable {
 
 	/** The bound property of the selected background color. */
-	public final static String SELECTED_BACKGROUND_COLOR_PROPERTY = getPropertyName(SelectableLabel.class, "selectedBackgroundColor");
+	public static final String SELECTED_BACKGROUND_COLOR_PROPERTY = getPropertyName(SelectableLabel.class, "selectedBackgroundColor");
 
 	/** Whether the component is selected. */
 	private boolean selected = false;

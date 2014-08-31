@@ -29,11 +29,11 @@ import static com.globalmentor.java.Classes.*;
 public interface LabelModel extends Model {
 
 	/** The icon bound property. */
-	public final static String GLYPH_URI_PROPERTY = getPropertyName(LabelModel.class, "glyphURI");
+	public static final String GLYPH_URI_PROPERTY = getPropertyName(LabelModel.class, "glyphURI");
 	/** The label bound property. */
-	public final static String LABEL_PROPERTY = getPropertyName(LabelModel.class, "label");
+	public static final String LABEL_PROPERTY = getPropertyName(LabelModel.class, "label");
 	/** The label content type bound property. */
-	public final static String LABEL_CONTENT_TYPE_PROPERTY = getPropertyName(LabelModel.class, "labelContentType");
+	public static final String LABEL_CONTENT_TYPE_PROPERTY = getPropertyName(LabelModel.class, "labelContentType");
 
 	/** @return The glyph URI, which may be a resource URI, or <code>null</code> if there is no glyph URI. */
 	public URI getGlyphURI();

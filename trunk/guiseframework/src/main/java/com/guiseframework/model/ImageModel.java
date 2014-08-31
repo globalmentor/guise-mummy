@@ -27,7 +27,7 @@ import static com.globalmentor.java.Classes.*;
 public interface ImageModel extends Model {
 
 	/** The image URI bound property. */
-	public final static String IMAGE_URI_PROPERTY = getPropertyName(ImageModel.class, "imageURI");
+	public static final String IMAGE_URI_PROPERTY = getPropertyName(ImageModel.class, "imageURI");
 
 	/** @return The image URI, which may be a resource URI, or <code>null</code> if there is no image URI. */
 	public URI getImageURI();

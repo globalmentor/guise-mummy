@@ -42,7 +42,7 @@ import com.guiseframework.validator.*;
 public class CalendarControl extends AbstractLayoutValueControl<Date> {
 
 	/** The visible date bound property. */
-	public final static String DATE_PROPERTY = getPropertyName(CalendarControl.class, "date");
+	public static final String DATE_PROPERTY = getPropertyName(CalendarControl.class, "date");
 
 	private int getMonthCount() {
 		return 1;

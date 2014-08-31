@@ -264,7 +264,7 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 	 * The pre-filled CSS unit strings mapped to extent unit ordinal indices.
 	 * @see Unit
 	 */
-	private final static String[] CSS_UNITS;
+	private static final String[] CSS_UNITS;
 
 	/** Initializes the CSS unit lookup array. */
 	static {

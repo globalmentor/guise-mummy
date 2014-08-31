@@ -56,15 +56,15 @@ import com.guiseframework.model.*;
 public class TextControl<V> extends AbstractTextControl<V> {
 
 	/** The line wrap bound property. */
-	public final static String LINE_WRAP_PROPERTY = getPropertyName(TextControl.class, "lineWrap");
+	public static final String LINE_WRAP_PROPERTY = getPropertyName(TextControl.class, "lineWrap");
 	/** The masked bound property. */
-	public final static String MASKED_PROPERTY = getPropertyName(TextControl.class, "masked");
+	public static final String MASKED_PROPERTY = getPropertyName(TextControl.class, "masked");
 	/** The maximum length bound property. */
-	public final static String MAXIMUM_LENGTH_PROPERTY = getPropertyName(TextControl.class, "maximumLength");
+	public static final String MAXIMUM_LENGTH_PROPERTY = getPropertyName(TextControl.class, "maximumLength");
 	/** The multiline bound property. */
-	public final static String MULTILINE_PROPERTY = getPropertyName(TextControl.class, "multiline");
+	public static final String MULTILINE_PROPERTY = getPropertyName(TextControl.class, "multiline");
 	/** The row count bound property. */
-	public final static String ROW_COUNT_PROPERTY = getPropertyName(TextControl.class, "rowCount");
+	public static final String ROW_COUNT_PROPERTY = getPropertyName(TextControl.class, "rowCount");
 
 	/** Whether the user input text is masked to prevent viewing of the literal entered value. */
 	private boolean masked = false;
@@ -172,7 +172,7 @@ public class TextControl<V> extends AbstractTextControl<V> {
 	}
 
 	/** The default export strategy for this component type. */
-	protected final static ExportStrategy<TextControl<?>> DEFAULT_EXPORT_STRATEGY = new ExportStrategy<TextControl<?>>() {
+	protected static final ExportStrategy<TextControl<?>> DEFAULT_EXPORT_STRATEGY = new ExportStrategy<TextControl<?>>() {
 
 		/**
 		 * Exports data from the given component.
@@ -185,7 +185,7 @@ public class TextControl<V> extends AbstractTextControl<V> {
 	};
 
 	/** The default import strategy for this component type. */
-	protected final static ImportStrategy<TextControl<?>> DEFAULT_IMPORT_STRATEGY = new ImportStrategy<TextControl<?>>() { //add a new import strategy for this component
+	protected static final ImportStrategy<TextControl<?>> DEFAULT_IMPORT_STRATEGY = new ImportStrategy<TextControl<?>>() { //add a new import strategy for this component
 
 		/**
 		 * Determines whether this strategy can import the given transferable object. This implementation accepts all transferables providing <code>text/*</code>

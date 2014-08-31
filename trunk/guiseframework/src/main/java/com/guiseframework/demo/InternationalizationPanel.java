@@ -37,7 +37,7 @@ import com.guiseframework.model.*;
 public class InternationalizationPanel extends LayoutPanel {
 
 	/** The key to the UN Charter Preamble resource. */
-	protected final static String UN_CHARTER_PREAMBLE_RESOURCE_KEY = "uncharterpreamble.html";
+	protected static final String UN_CHARTER_PREAMBLE_RESOURCE_KEY = "uncharterpreamble.html";
 
 	/** Default constructor. */
 	public InternationalizationPanel() {

@@ -40,9 +40,9 @@ import com.guiseframework.model.*;
 public class URFResourceDynamicTreeNodeModel<V extends URFResource> extends AbstractURFDynamicTreeNodeModel<V> {
 
 	/** The bound property of whether resource children are included in the node. */
-	public final static String RESOURCE_CHILDREN_INCLUDED_PROPERTY = getPropertyName(URFResourceDynamicTreeNodeModel.class, "resourceChildrenIncluded");
+	public static final String RESOURCE_CHILDREN_INCLUDED_PROPERTY = getPropertyName(URFResourceDynamicTreeNodeModel.class, "resourceChildrenIncluded");
 	/** The bound property of whether resource properties are included in the node. */
-	public final static String RESOURCE_PROPERTIES_INCLUDED_PROPERTY = getPropertyName(URFResourceDynamicTreeNodeModel.class, "resourcePropertiesIncluded");
+	public static final String RESOURCE_PROPERTIES_INCLUDED_PROPERTY = getPropertyName(URFResourceDynamicTreeNodeModel.class, "resourcePropertiesIncluded");
 
 	/**
 	 * The URI of the URF property of which this URF resource is an object, or <code>null</code> if this resource should not be considered the object of any

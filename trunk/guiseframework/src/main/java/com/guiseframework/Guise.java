@@ -45,8 +45,8 @@ import static org.urframework.URF.*;
 public final class Guise {
 
 	//properties keys for the properties resources
-	private final static String VERSION_PROPERTIES_KEY = "version"; //String
-	private final static String BUILD_DATE_PROPERTIES_KEY = "build.date"; //ISODate
+	private static final String VERSION_PROPERTIES_KEY = "version"; //String
+	private static final String BUILD_DATE_PROPERTIES_KEY = "build.date"; //ISODate
 
 	static {
 		try {
@@ -58,14 +58,14 @@ public final class Guise {
 		}
 	}
 
-	private final static String version;
+	private static final String version;
 
 	/** @return The version of Guise. */
 	public static String getVersion() {
 		return version;
 	}
 
-	private final static ISODate buildDate;
+	private static final ISODate buildDate;
 
 	/** @return The build date of Guise. */
 	public static ISODate getBuildDate() {
@@ -73,24 +73,24 @@ public final class Guise {
 	}
 
 	/** The name of Guise. */
-	public final static String GUISE_NAME = "Guise" + TRADE_MARK_SIGN_CHAR;
+	public static final String GUISE_NAME = "Guise" + TRADE_MARK_SIGN_CHAR;
 
 	/** The web address of Guise. */
-	public final static URI GUISE_WEB_URI = URI.create("http://www.guiseframework.com/");
+	public static final URI GUISE_WEB_URI = URI.create("http://www.guiseframework.com/");
 
 	/** The base key to Guise assets bundled in the Guise distributable. */
-	public final static String GUISE_ASSETS_BASE_KEY = "assets/";
+	public static final String GUISE_ASSETS_BASE_KEY = "assets/";
 
 	//Guise ontology
 
 	/** The recommended prefix to the Guise ontology namespace. */
-	public final static String NAMESPACE_PREFIX = "guise";
+	public static final String NAMESPACE_PREFIX = "guise";
 	/** The URI to the Guise ontology namespace. */
-	public final static URI NAMESPACE_URI = URI.create("http://guiseframework.com/namespaces/guise/");
+	public static final URI NAMESPACE_URI = URI.create("http://guiseframework.com/namespaces/guise/");
 
 	//properties
 	/** The property indicating the URI of the theme of a resource. */
-	public final static URI THEME_URI_PROPERTY_URI = createResourceURI(NAMESPACE_URI, "themeURI");
+	public static final URI THEME_URI_PROPERTY_URI = createResourceURI(NAMESPACE_URI, "themeURI");
 
 	/** The singleton instance of Guise. */
 	private static Guise instance = null;

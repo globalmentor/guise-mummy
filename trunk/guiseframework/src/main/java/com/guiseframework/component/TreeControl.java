@@ -37,9 +37,9 @@ import com.guiseframework.model.*;
 public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>, TreeControl.TreeNodeComponentState> implements TreeModel {
 
 	/** The bound property of whether the root node is displayed. */
-	public final static String ROOT_NODE_DISPLAYED_PROPERTY = getPropertyName(TreeControl.class, "rootNodeDisplayed");
+	public static final String ROOT_NODE_DISPLAYED_PROPERTY = getPropertyName(TreeControl.class, "rootNodeDisplayed");
 	/** The bound property of whether the tree node components have dragging enabled. */
-	public final static String TREE_NODE_DRAG_ENABLED_PROPERTY = getPropertyName(TreeControl.class, "treeNodeDragEnabled");
+	public static final String TREE_NODE_DRAG_ENABLED_PROPERTY = getPropertyName(TreeControl.class, "treeNodeDragEnabled");
 
 	/** The tree model used by this component. */
 	private final TreeModel treeModel;

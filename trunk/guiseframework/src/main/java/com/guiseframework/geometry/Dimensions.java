@@ -30,7 +30,7 @@ import com.globalmentor.java.Objects;
 public class Dimensions {
 
 	/** A convenience dimensions of zero pixel size. */
-	public final static Dimensions ZERO_DIMENSIONS = new Dimensions(0, 0, 0, Unit.PIXEL);
+	public static final Dimensions ZERO_DIMENSIONS = new Dimensions(0, 0, 0, Unit.PIXEL);
 
 	/** The width extent. */
 	private final Extent width;

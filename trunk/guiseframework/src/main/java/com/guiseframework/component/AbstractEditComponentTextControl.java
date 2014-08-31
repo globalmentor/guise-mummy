@@ -46,9 +46,9 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 	}
 
 	/** The label component bound property. */
-	//TODO del if not used	public final static String LABEL_COMPONENT_PROPERTY=getPropertyName(EditableComponentLabelControl.class, "labelComponent");
+	//TODO del if not used	public static final String LABEL_COMPONENT_PROPERTY=getPropertyName(EditableComponentLabelControl.class, "labelComponent");
 	/** The edit control bound property. */
-	//TODO del if not used	public final static String EDIT_CONTROL_PROPERTY=getPropertyName(EditableComponentLabelControl.class, "editControl");
+	//TODO del if not used	public static final String EDIT_CONTROL_PROPERTY=getPropertyName(EditableComponentLabelControl.class, "editControl");
 
 	/** Whether the value is editable and the component will allow the the user to change the value. */
 	private boolean editable = true;

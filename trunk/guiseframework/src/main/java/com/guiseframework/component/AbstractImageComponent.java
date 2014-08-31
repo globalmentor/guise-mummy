@@ -39,7 +39,7 @@ import com.guiseframework.model.*;
 public abstract class AbstractImageComponent extends AbstractComponent implements ImageComponent {
 
 	/** The default export strategy for this component type. */
-	protected final static ExportStrategy<ImageComponent> DEFAULT_EXPORT_STRATEGY = new ExportStrategy<ImageComponent>() {
+	protected static final ExportStrategy<ImageComponent> DEFAULT_EXPORT_STRATEGY = new ExportStrategy<ImageComponent>() {
 
 		/**
 		 * Exports data from the given component.

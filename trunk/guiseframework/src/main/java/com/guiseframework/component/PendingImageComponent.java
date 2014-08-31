@@ -29,7 +29,7 @@ import com.guiseframework.model.PendingImageModel;
 public interface PendingImageComponent extends ImageComponent, PendingImageModel {
 
 	/** The pending image URI bound property. */
-	public final static String PENDING_IMAGE_URI_PROPERTY = getPropertyName(PendingImageComponent.class, "pendingImageURI");
+	public static final String PENDING_IMAGE_URI_PROPERTY = getPropertyName(PendingImageComponent.class, "pendingImageURI");
 
 	/** @return The pending image URI, which may be a resource URI, or <code>null</code> if there is no image URI. */
 	public URI getPendingImageURI();

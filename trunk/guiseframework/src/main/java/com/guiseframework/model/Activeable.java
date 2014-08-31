@@ -25,7 +25,7 @@ import static com.globalmentor.java.Classes.*;
 public interface Activeable {
 
 	/** The active bound property. */
-	public final static String ACTIVE_PROPERTY = getPropertyName(Activeable.class, "active");
+	public static final String ACTIVE_PROPERTY = getPropertyName(Activeable.class, "active");
 
 	/** @return Whether the object is active. */
 	public boolean isActive();

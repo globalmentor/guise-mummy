@@ -30,7 +30,7 @@ import com.guiseframework.event.ActionListener;
 public class RestrictedPanel extends LayoutPanel {
 
 	/** The notice to display on the restricted panel. */
-	protected final static String NOTICE = "Note: This page may be accessed either by logging in via the login panel or by accessing this page directly using the browser's HTTP digest authentication capabilities. "
+	protected static final String NOTICE = "Note: This page may be accessed either by logging in via the login panel or by accessing this page directly using the browser's HTTP digest authentication capabilities. "
 			+ "Once a user logs out from this page, by default the browser attempts to authenticate the user because the same page is attempting to be loaded with no Guise session principal set. "
 			+ "This illustrates how login panels and browser-based HTTP digest authentication can be used interchangeably. "
 			+ "If a login panel is always desired, the logout functionality could navigate to the login panel, or a default login panel could be set.";

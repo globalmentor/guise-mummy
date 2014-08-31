@@ -43,7 +43,7 @@ import static com.globalmentor.java.Classes.*;
 public class CheckControl extends AbstractEditValueControl<Boolean> {
 
 	/** The check type bound property. */
-	public final static String CHECK_TYPE_PROPERTY = getPropertyName(CheckControl.class, "checkType");
+	public static final String CHECK_TYPE_PROPERTY = getPropertyName(CheckControl.class, "checkType");
 
 	/** The type of check area to present to the user. */
 	public enum CheckType {

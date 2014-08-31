@@ -26,10 +26,10 @@ import static com.globalmentor.java.Classes.*;
 public interface HeadingComponent extends Component {
 
 	/** The heading level value indicating no heading level. */
-	public final static int NO_HEADING_LEVEL = -1;
+	public static final int NO_HEADING_LEVEL = -1;
 
 	/** The level bound property. */
-	public final static String LEVEL_PROPERTY = getPropertyName(HeadingComponent.class, "level");
+	public static final String LEVEL_PROPERTY = getPropertyName(HeadingComponent.class, "level");
 
 	/** @return The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified. */
 	public int getLevel();

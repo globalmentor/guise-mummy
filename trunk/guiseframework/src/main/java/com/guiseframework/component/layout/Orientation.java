@@ -33,13 +33,13 @@ import static com.globalmentor.java.Objects.*;
 public class Orientation {
 
 	/** Left-to-right line, top-to-bottom page orientation (e.g. English). */
-	public final static Orientation LEFT_TO_RIGHT_TOP_TO_BOTTOM = new Orientation(FlowOrientation.LEFT_TO_RIGHT, FlowOrientation.TOP_TO_BOTTOM);
+	public static final Orientation LEFT_TO_RIGHT_TOP_TO_BOTTOM = new Orientation(FlowOrientation.LEFT_TO_RIGHT, FlowOrientation.TOP_TO_BOTTOM);
 
 	/** Right-to-left line, top-to-bottom page orientation (e.g. Arabic). */
-	public final static Orientation RIGHT_TO_LEFT_TOP_TO_BOTTOM = new Orientation(FlowOrientation.RIGHT_TO_LEFT, FlowOrientation.TOP_TO_BOTTOM);
+	public static final Orientation RIGHT_TO_LEFT_TOP_TO_BOTTOM = new Orientation(FlowOrientation.RIGHT_TO_LEFT, FlowOrientation.TOP_TO_BOTTOM);
 
 	/** Top-to-bottom line, right-to-left page orientation (e.g. Chinese). */
-	public final static Orientation TOP_TO_BOTTOM_RIGHT_TO_LEFT = new Orientation(FlowOrientation.TOP_TO_BOTTOM, FlowOrientation.RIGHT_TO_LEFT);
+	public static final Orientation TOP_TO_BOTTOM_RIGHT_TO_LEFT = new Orientation(FlowOrientation.TOP_TO_BOTTOM, FlowOrientation.RIGHT_TO_LEFT);
 
 	/** The orientation of each flow. */
 	private final FlowOrientation[] orientations = new FlowOrientation[Flow.values().length];

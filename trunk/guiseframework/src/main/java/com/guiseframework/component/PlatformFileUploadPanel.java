@@ -45,13 +45,13 @@ import static com.guiseframework.theme.Theme.*;
 public class PlatformFileUploadPanel extends AbstractPanel implements ProgressListenable<Long> {
 
 	/** The bound property of the destination URI. */
-	public final static String DESTINATION_URI_PROPERTY = getPropertyName(PlatformFileUploadPanel.class, "destinationURI");
+	public static final String DESTINATION_URI_PROPERTY = getPropertyName(PlatformFileUploadPanel.class, "destinationURI");
 
 	/** The bound property of the destination bookmark. */
-	public final static String DESTINATION_BOOKMARK_PROPERTY = getPropertyName(PlatformFileUploadPanel.class, "destinationBookmark");
+	public static final String DESTINATION_BOOKMARK_PROPERTY = getPropertyName(PlatformFileUploadPanel.class, "destinationBookmark");
 
 	/** The number of platform files to display at the same time. */
-	private final static int PLATFORM_FILE_DISPLAY_COUNT = 16;
+	private static final int PLATFORM_FILE_DISPLAY_COUNT = 16;
 
 	/** The panel containing controls such as buttons. */
 	private final Panel controlPanel;

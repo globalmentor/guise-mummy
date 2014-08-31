@@ -31,9 +31,9 @@ import com.guiseframework.AbstractGuiseApplication;
 public class DemoApplication extends AbstractGuiseApplication {
 
 	/** The application-relative navigation path to the edit user modal panel. */
-	public final static URIPath EDIT_USER_PANEL_NAVIGATION_PATH = new URIPath("edituser");
+	public static final URIPath EDIT_USER_PANEL_NAVIGATION_PATH = new URIPath("edituser");
 	/** The application-relative navigation path to the restricted panel. */
-	public final static URIPath RESTRICTED_PANEL_NAVIGATION_PATH = new URIPath("restricted");
+	public static final URIPath RESTRICTED_PANEL_NAVIGATION_PATH = new URIPath("restricted");
 
 	/** The synchronized list of application users. */
 	final private List<DemoUser> users = Collections.synchronizedList(new ArrayList<DemoUser>());

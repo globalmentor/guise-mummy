@@ -27,7 +27,7 @@ import com.guiseframework.model.ActionModel;
 public interface ActionControl extends Control, ActionModel {
 
 	/** The bound property of the rollover state. */
-	public final static String ROLLOVER_PROPERTY = getPropertyName(ActionControl.class, "rollover");
+	public static final String ROLLOVER_PROPERTY = getPropertyName(ActionControl.class, "rollover");
 
 	/** @return Whether the component is in a rollover state. */
 	public boolean isRollover();

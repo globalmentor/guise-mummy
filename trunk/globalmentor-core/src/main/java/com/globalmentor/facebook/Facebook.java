@@ -27,16 +27,16 @@ import java.net.URI;
 public class Facebook {
 
 	/** The Facebook namespace. */
-	public final static URI NAMESPACE_URI = URI.create("https://www.facebook.com/2008/fbml");
+	public static final URI NAMESPACE_URI = URI.create("https://www.facebook.com/2008/fbml");
 	/** The default prefix for the Facebook namespace, e.g. in XML documents. */
-	public final static String NAMESPACE_PREFIX = "fb";
+	public static final String NAMESPACE_PREFIX = "fb";
 
 	/** A comma-separated list of IDs of Facebook user that administers a page. */
-	public final static String ADMINS_LOCAL_NAME = "admins";
+	public static final String ADMINS_LOCAL_NAME = "admins";
 	/** The ID of the Facebook Platform application that administers this page. */
-	public final static String APP_ID_LOCAL_NAME = "app_id";
+	public static final String APP_ID_LOCAL_NAME = "app_id";
 
 	/** The URI for the Facebook Like plugin. */
-	public final static URI FACEBOOK_PLUGIN_LIKE_URI = URI.create("http://www.facebook.com/plugins/like.php");
+	public static final URI FACEBOOK_PLUGIN_LIKE_URI = URI.create("http://www.facebook.com/plugins/like.php");
 
 }

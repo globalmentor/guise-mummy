@@ -27,9 +27,9 @@ import static com.globalmentor.java.Classes.*;
 public interface LayoutComponent extends CompositeComponent {
 
 	/** The bound property of the layout. */
-	public final static String LAYOUT_PROPERTY = getPropertyName(LayoutComponent.class, "layout");
+	public static final String LAYOUT_PROPERTY = getPropertyName(LayoutComponent.class, "layout");
 	/** The bound property of whether a theme has been applied to this component's layout. */
-	public final static String LAYOUT_THEME_APPLIED_PROPERTY = getPropertyName(LayoutComponent.class, "layoutThemeApplied");
+	public static final String LAYOUT_THEME_APPLIED_PROPERTY = getPropertyName(LayoutComponent.class, "layoutThemeApplied");
 
 	/** @return The layout definition for the container. */
 	public Layout<? extends Constraints> getLayout();

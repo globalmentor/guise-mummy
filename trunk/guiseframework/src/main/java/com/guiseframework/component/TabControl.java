@@ -31,9 +31,9 @@ import static com.globalmentor.java.Objects.*;
 public class TabControl<V> extends AbstractListSelectControl<V> {
 
 	/** The axis bound property. */
-	public final static String AXIS_PROPERTY = getPropertyName(TabControl.class, "axis");
+	public static final String AXIS_PROPERTY = getPropertyName(TabControl.class, "axis");
 	/** The maximum tab count bound property. */
-	public final static String MAX_TAB_COUNT_PROPERTY = getPropertyName(TabControl.class, "maxTabCount");
+	public static final String MAX_TAB_COUNT_PROPERTY = getPropertyName(TabControl.class, "maxTabCount");
 
 	/** The flow axis. */
 	private Flow axis;

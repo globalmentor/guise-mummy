@@ -38,25 +38,25 @@ import com.guiseframework.geometry.Extent;
 public class RegionLayout extends AbstractLayout<RegionConstraints> {
 
 	/** The bound property of the fixed setting. */
-	public final static String FIXED_PROPERTY = getPropertyName(RegionLayout.class, "fixed");
+	public static final String FIXED_PROPERTY = getPropertyName(RegionLayout.class, "fixed");
 	/** The bound property of the line alignment. */
-	public final static String LINE_ALIGNMENT_PROPERTY = getPropertyName(RegionLayout.class, "lineAlignment");
+	public static final String LINE_ALIGNMENT_PROPERTY = getPropertyName(RegionLayout.class, "lineAlignment");
 	/** The bound property of the page alignment. */
-	public final static String PAGE_ALIGNMENT_PROPERTY = getPropertyName(RegionLayout.class, "pageAlignment");
+	public static final String PAGE_ALIGNMENT_PROPERTY = getPropertyName(RegionLayout.class, "pageAlignment");
 	/** The line extent (width in left-to-right top-to-bottom orientation) bound property. */
-	public final static String LINE_EXTENT_PROPERTY = getPropertyName(RegionLayout.class, "lineExtent");
+	public static final String LINE_EXTENT_PROPERTY = getPropertyName(RegionLayout.class, "lineExtent");
 	/** The page extent (height in left-to-right top-to-bottom orientation) bound property. */
-	public final static String PAGE_EXTENT_PROPERTY = getPropertyName(RegionLayout.class, "pageExtent");
+	public static final String PAGE_EXTENT_PROPERTY = getPropertyName(RegionLayout.class, "pageExtent");
 	/** The bound property of the line near padding extent. */
-	public final static String PADDING_LINE_NEAR_EXTENT_PROPERTY = getPropertyName(RegionLayout.class, "paddingLineNearExtent");
+	public static final String PADDING_LINE_NEAR_EXTENT_PROPERTY = getPropertyName(RegionLayout.class, "paddingLineNearExtent");
 	/** The bound property of the line far padding extent. */
-	public final static String PADDING_LINE_FAR_EXTENT_PROPERTY = getPropertyName(RegionLayout.class, "paddingLineFarExtent");
+	public static final String PADDING_LINE_FAR_EXTENT_PROPERTY = getPropertyName(RegionLayout.class, "paddingLineFarExtent");
 	/** The bound property of the page near padding extent. */
-	public final static String PADDING_PAGE_NEAR_EXTENT_PROPERTY = getPropertyName(RegionLayout.class, "paddingPageNearExtent");
+	public static final String PADDING_PAGE_NEAR_EXTENT_PROPERTY = getPropertyName(RegionLayout.class, "paddingPageNearExtent");
 	/** The bound property of the page far padding extent. */
-	public final static String PADDING_PAGE_FAR_EXTENT_PROPERTY = getPropertyName(RegionLayout.class, "paddingPageFarExtent");
+	public static final String PADDING_PAGE_FAR_EXTENT_PROPERTY = getPropertyName(RegionLayout.class, "paddingPageFarExtent");
 	/** The bound property of the span flow. */
-	public final static String SPAN_FLOW_PROPERTY = getPropertyName(RegionLayout.class, "spanFlow");
+	public static final String SPAN_FLOW_PROPERTY = getPropertyName(RegionLayout.class, "spanFlow");
 
 	/** Whether the sizes of the regions are fixed or will dynamically change to support content. */
 	private boolean fixed = false;
@@ -85,7 +85,7 @@ public class RegionLayout extends AbstractLayout<RegionConstraints> {
 	private double[] alignments = fill(new double[Flow.values().length], 0);
 
 	/** The properties corresponding to the region alignments. */
-	private final static String[] ALIGNMENT_PROPERTIES;
+	private static final String[] ALIGNMENT_PROPERTIES;
 
 	static {
 		ALIGNMENT_PROPERTIES = new String[Flow.values().length]; //create the array of properties and fill it with corresponding properties
@@ -165,7 +165,7 @@ public class RegionLayout extends AbstractLayout<RegionConstraints> {
 	private Extent[] extents = fill(new Extent[Flow.values().length], null);
 
 	/** The properties corresponding to the default region extents. */
-	private final static String[] EXTENT_PROPERTIES;
+	private static final String[] EXTENT_PROPERTIES;
 
 	static {
 		EXTENT_PROPERTIES = new String[Flow.values().length]; //create the array of properties and fill it with corresponding properties
@@ -247,7 +247,7 @@ public class RegionLayout extends AbstractLayout<RegionConstraints> {
 	private Extent[] paddingExtents = fill(new Extent[Border.values().length], Extent.ZERO_EXTENT1);
 
 	/** The properties corresponding to the padding extents. */
-	private final static String[] PADDING_EXTENT_PROPERTIES;
+	private static final String[] PADDING_EXTENT_PROPERTIES;
 
 	static {
 		PADDING_EXTENT_PROPERTIES = new String[Border.values().length]; //create the array of properties and fill it with corresponding properties

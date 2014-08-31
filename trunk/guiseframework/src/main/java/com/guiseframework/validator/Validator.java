@@ -33,11 +33,11 @@ import com.guiseframework.Resources;
 public interface Validator<V> extends PropertyBindable {
 
 	/** The invalid value message bound property. */
-	public final static String INVALID_VALUE_MESSAGE_PROPERTY = getPropertyName(Validator.class, "invalidValueMessage");
+	public static final String INVALID_VALUE_MESSAGE_PROPERTY = getPropertyName(Validator.class, "invalidValueMessage");
 	/** The value required message bound property. */
-	public final static String VALUE_REQUIRED_MESSAGE_PROPERTY = getPropertyName(Validator.class, "valueRequiredMessage");
+	public static final String VALUE_REQUIRED_MESSAGE_PROPERTY = getPropertyName(Validator.class, "valueRequiredMessage");
 	/** The value required bound property. */
-	public final static String VALUE_REQUIRED_PROPERTY = getPropertyName(Validator.class, "valueRequired");
+	public static final String VALUE_REQUIRED_PROPERTY = getPropertyName(Validator.class, "valueRequired");
 
 	/** @return The invalid value message text, which may include a resource reference. */
 	public String getInvalidValueMessage();

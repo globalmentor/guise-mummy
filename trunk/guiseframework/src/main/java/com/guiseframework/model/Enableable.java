@@ -27,7 +27,7 @@ import com.globalmentor.beans.PropertyBindable;
 public interface Enableable extends PropertyBindable {
 
 	/** The enabled bound property. */
-	public final static String ENABLED_PROPERTY = getPropertyName(Enableable.class, "enabled");
+	public static final String ENABLED_PROPERTY = getPropertyName(Enableable.class, "enabled");
 
 	/** @return Whether the object is enabled and can receive user input. */
 	public boolean isEnabled();

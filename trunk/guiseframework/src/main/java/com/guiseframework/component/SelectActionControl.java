@@ -31,13 +31,13 @@ import com.guiseframework.model.Selectable;
 public interface SelectActionControl extends ActionControl, Selectable {
 
 	/** The auto-select bound property. */
-	public final static String AUTO_SELECT_PROPERTY = getPropertyName(SelectActionControl.class, "autoSelect");
+	public static final String AUTO_SELECT_PROPERTY = getPropertyName(SelectActionControl.class, "autoSelect");
 	/** The selected icon bound property. */
-	public final static String SELECTED_GLYPH_URI_PROPERTY = getPropertyName(SelectActionControl.class, "selectedGlyphURI");
+	public static final String SELECTED_GLYPH_URI_PROPERTY = getPropertyName(SelectActionControl.class, "selectedGlyphURI");
 	/** The toggle bound property. */
-	public final static String TOGGLE_PROPERTY = getPropertyName(SelectActionControl.class, "toggle");
+	public static final String TOGGLE_PROPERTY = getPropertyName(SelectActionControl.class, "toggle");
 	/** The unselected icon bound property. */
-	public final static String UNSELECTED_GLYPH_URI_PROPERTY = getPropertyName(SelectActionControl.class, "unselectedGlyphURI");
+	public static final String UNSELECTED_GLYPH_URI_PROPERTY = getPropertyName(SelectActionControl.class, "unselectedGlyphURI");
 
 	/** @return Whether this control automatically sets or toggles the selection state when the action occurs. */
 	public boolean isAutoSelect();

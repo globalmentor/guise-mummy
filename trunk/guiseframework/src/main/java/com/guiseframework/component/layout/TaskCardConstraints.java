@@ -28,7 +28,7 @@ import com.guiseframework.model.*;
 public class TaskCardConstraints extends CardConstraints {
 
 	/** The task state bound property. */
-	public final static String TASK_STATE_PROPERTY = getPropertyName(TaskCardConstraints.class, "taskState");
+	public static final String TASK_STATE_PROPERTY = getPropertyName(TaskCardConstraints.class, "taskState");
 
 	/** The current task state of this card, or <code>null</code> if no task has been started in relation to this card. */
 	private TaskState taskState = null;

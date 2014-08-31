@@ -33,27 +33,27 @@ import com.guiseframework.platform.*;
 public interface WebPlatform extends Platform {
 
 	/** The version of CKEditor in use. */
-	public final static String CKEDITOR_VERSION = "4.2.1";
+	public static final String CKEDITOR_VERSION = "4.2.1";
 
 	/** The namespace of the Guise markup language to be used with XHTML. */
-	public final static URI GUISE_ML_NAMESPACE_URI = URI.create("http://guiseframework.com/id/ml#");
+	public static final URI GUISE_ML_NAMESPACE_URI = URI.create("http://guiseframework.com/id/ml#");
 	/** The standard prefix to use with the Guise markup language namespace. */
-	public final static String GUISE_ML_NAMESPACE_PREFIX = "guise";
+	public static final String GUISE_ML_NAMESPACE_PREFIX = "guise";
 
 	/** The public ID of the Guise XHTML DTD. */
-	public final static String GUISE_XHTML_DTD_PUBLIC_ID = "-//Guise//DTD XHTML Guise 1.0//EN";
+	public static final String GUISE_XHTML_DTD_PUBLIC_ID = "-//Guise//DTD XHTML Guise 1.0//EN";
 
 	/** The URI query parameter used to specify a Guise session by UUID, overriding the Guise session based upon the HTTP session identified by the request. */
-	public final static String GUISE_SESSION_UUID_URI_QUERY_PARAMETER = "guiseSessionUUID";
+	public static final String GUISE_SESSION_UUID_URI_QUERY_PARAMETER = "guiseSessionUUID";
 	/** The URI query parameter used to indicate the Guise version to prevent caching between versions. */
-	public final static String GUISE_VERSION_URI_QUERY_PARAMETER = "guiseVersion";
+	public static final String GUISE_VERSION_URI_QUERY_PARAMETER = "guiseVersion";
 
 	/** The content type of a Guise AJAX request, <code>application/x-guise-ajax-request</code>. */
-	public final static ContentType GUISE_AJAX_REQUEST_CONTENT_TYPE = ContentType.create(ContentType.APPLICATION_PRIMARY_TYPE,
+	public static final ContentType GUISE_AJAX_REQUEST_CONTENT_TYPE = ContentType.create(ContentType.APPLICATION_PRIMARY_TYPE,
 			ContentType.SUBTYPE_EXTENSION_PREFIX + "guise-ajax-request" + ContentType.SUBTYPE_SUFFIX_DELIMITER_CHAR + XML_SUBTYPE_SUFFIX);
 
 	/** The content type of a Guise AJAX response, <code>application/x-guise-ajax-response</code>. */
-	public final static ContentType GUISE_AJAX_RESPONSE_CONTENT_TYPE = ContentType.create(ContentType.APPLICATION_PRIMARY_TYPE,
+	public static final ContentType GUISE_AJAX_RESPONSE_CONTENT_TYPE = ContentType.create(ContentType.APPLICATION_PRIMARY_TYPE,
 			ContentType.SUBTYPE_EXTENSION_PREFIX + "guise-ajax-response" + ContentType.SUBTYPE_SUFFIX_DELIMITER_CHAR + XML_SUBTYPE_SUFFIX);
 
 	/** The types of JavaScript-based HTML editors available. */
@@ -65,83 +65,83 @@ public interface WebPlatform extends Platform {
 	};
 
 	/** The editor used by the platform. */
-	public final static HTMLEditor HTML_EDITOR = HTMLEditor.CKEDITOR;
+	public static final HTMLEditor HTML_EDITOR = HTMLEditor.CKEDITOR;
 
 	//Guise-specific element attributes; presented in all lowercase so as to work when saved as XML or as HTML
 	//img
 	/** The Guise image attribute indicating the original source location of the image. */
-	public final static String ELEMENT_IMG_ATTRIBUTE_ORIGINAL_SRC = "originalsrc";
+	public static final String ELEMENT_IMG_ATTRIBUTE_ORIGINAL_SRC = "originalsrc";
 	/** The Guise image attribute indicating the source location of the image to be used for rollovers. */
-	public final static String ELEMENT_IMG_ATTRIBUTE_ROLLOVER_SRC = "rolloversrc";
+	public static final String ELEMENT_IMG_ATTRIBUTE_ROLLOVER_SRC = "rolloversrc";
 	//textarea
 	/** The Guise textarea attribute indicating whether the user should be allowed to enter multiple physical lines; value is "true" or "false". */
-	public final static String ELEMENT_TEXTAREA_ATTRIBUTE_MULTILINE = "multiline";
+	public static final String ELEMENT_TEXTAREA_ATTRIBUTE_MULTILINE = "multiline";
 	//all elements 
 	/** The Guise attribute containing the hash of the element attributes. */
-	public final static String ATTRIBUTE_ATTRIBUTE_HASH = "a";
+	public static final String ATTRIBUTE_ATTRIBUTE_HASH = "a";
 	/** The Guise attribute containing the hash of the element content. */
-	public final static String ATTRIBUTE_CONTENT_HASH = "c";
+	public static final String ATTRIBUTE_CONTENT_HASH = "c";
 	/** The Guise attribute indicating the content type of an element's contents. */
-	public final static String ATTRIBUTE_CONTENT_TYPE = "contenttype";
+	public static final String ATTRIBUTE_CONTENT_TYPE = "contenttype";
 	/** The Guise attribute indicating the type of patching that should occur. */
-	public final static String ATTRIBUTE_PATCH_TYPE = "patch";
+	public static final String ATTRIBUTE_PATCH_TYPE = "patch";
 	/** The Guise attribute value indicating that no patching should occur on the value. */
-	public final static String ATTRIBUTE_PATCH_TYPE_NO_VALUE = "novalue";
+	public static final String ATTRIBUTE_PATCH_TYPE_NO_VALUE = "novalue";
 	/** The Guise attribute value indicating that no patching should occur. */
-	public final static String ATTRIBUTE_PATCH_TYPE_NONE = "none";
+	public static final String ATTRIBUTE_PATCH_TYPE_NONE = "none";
 	/**
 	 * The Guise attribute value indicating that the element is a temporary element that will be replaced later; functions just like "none" for patching except
 	 * that this element will be removed from the original hierarchy.
 	 */
-	public final static String ATTRIBUTE_PATCH_TYPE_TEMP = "temp";
+	public static final String ATTRIBUTE_PATCH_TYPE_TEMP = "temp";
 
 	/** The HTML class attribute indicating content. */
-	public final static String ATTRIBUTE_CLASS_CONTENT = "content";
+	public static final String ATTRIBUTE_CLASS_CONTENT = "content";
 
 	/** The path of the blank MP3 file, relative to the application. */
-	public final static URIPath BLANK_MP3_PATH = GuiseApplication.GUISE_ASSETS_AUDIO_PATH.resolve("blank.mp3");
+	public static final URIPath BLANK_MP3_PATH = GuiseApplication.GUISE_ASSETS_AUDIO_PATH.resolve("blank.mp3");
 
 	/** The path of the empty HTML document, relative to the application. */
-	public final static URIPath GUISE_EMPTY_HTML_DOCUMENT_PATH = GuiseApplication.GUISE_ASSETS_DOCUMENTS_PATH.resolve("empty.html");
+	public static final URIPath GUISE_EMPTY_HTML_DOCUMENT_PATH = GuiseApplication.GUISE_ASSETS_DOCUMENTS_PATH.resolve("empty.html");
 
 	/** The path of the AJAX JavaScript file, relative to the application. */
-	public final static URIPath AJAX_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/ajax.js");
+	public static final URIPath AJAX_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/ajax.js");
 	/** The path of the compressed AJAX JavaScript file, relative to the application. */
-	public final static URIPath AJAX_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/ajax.min.js");
+	public static final URIPath AJAX_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/ajax.min.js");
 	/** The path of the DOM JavaScript file, relative to the application. */
-	public final static URIPath DOM_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/dom.js");
+	public static final URIPath DOM_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/dom.js");
 	/** The path of the compressed DOM JavaScript file, relative to the application. */
-	public final static URIPath DOM_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/dom.min.js");
+	public static final URIPath DOM_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/dom.min.js");
 	/** The path of the domready JavaScript file, relative to the application. */
-	public final static URIPath DOMREADY_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("domready/domready.js");
+	public static final URIPath DOMREADY_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("domready/domready.js");
 	/** The path of the compressed domready JavaScript file, relative to the application. */
-	public final static URIPath DOMREADY_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("domready/domready.min.js");
+	public static final URIPath DOMREADY_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("domready/domready.min.js");
 	/** The path of the Google Gears JavaScript file, relative to the application. */
-	public final static URIPath GOOGLE_GEARS_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("google/gears_init.js");
+	public static final URIPath GOOGLE_GEARS_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("google/gears_init.js");
 	/** The path of the compressed Google Gears JavaScript file, relative to the application. */
-	public final static URIPath GOOGLE_GEARS_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("google/gears_init.min.js");
+	public static final URIPath GOOGLE_GEARS_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("google/gears_init.min.js");
 	/** The path of the Guise JavaScript file, relative to the application. */
-	public final static URIPath GUISE_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("guise/guise.js");
+	public static final URIPath GUISE_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("guise/guise.js");
 	/** The path of the compressed Guise JavaScript file, relative to the application. */
-	public final static URIPath GUISE_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("guise/guise.min.js");
+	public static final URIPath GUISE_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("guise/guise.min.js");
 	/** The path of the JavaScript JavaScript file, relative to the application. */
-	public final static URIPath JAVASCRIPT_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/javascript.js");
+	public static final URIPath JAVASCRIPT_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/javascript.js");
 	/** The path of the compressed JavaScript JavaScript file, relative to the application. */
-	public final static URIPath JAVASCRIPT_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/javascript.min.js");
+	public static final URIPath JAVASCRIPT_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("globalmentor/javascript.min.js");
 	//CKEditor
 	/** The path of the CKEditor JavaScript file, relative to the application. */
-	public final static URIPath CKEDITOR_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("ckeditor-" + CKEDITOR_VERSION + "/ckeditor.js");
+	public static final URIPath CKEDITOR_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("ckeditor-" + CKEDITOR_VERSION + "/ckeditor.js");
 	/** The path of the compressed CKEditor JavaScript file, relative to the application. */
-	public final static URIPath CKEDITOR_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("ckeditor-" + CKEDITOR_VERSION
+	public static final URIPath CKEDITOR_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("ckeditor-" + CKEDITOR_VERSION
 			+ "/ckeditor.js");
 	//TinyMCE
 	/** The path of the TinyMCE JavaScript file, relative to the application. */
-	public final static URIPath TINYMCE_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("tiny_mce/tiny_mce_src.js");
+	public static final URIPath TINYMCE_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("tiny_mce/tiny_mce_src.js");
 	/** The path of the compressed TinyMCE JavaScript file, relative to the application. */
-	public final static URIPath TINYMCE_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("tiny_mce/tiny_mce.js");
+	public static final URIPath TINYMCE_MIN_JAVASCRIPT_PATH = GuiseApplication.GUISE_ASSETS_JAVASCRIPT_PATH.resolve("tiny_mce/tiny_mce.js");
 
 	/** The path of the Guise Flash file, relative to the application. */
-	public final static URIPath GUISE_FLASH_PATH = GuiseApplication.GUISE_ASSETS_FLASH_PATH.resolve("guise.swf");
+	public static final URIPath GUISE_FLASH_PATH = GuiseApplication.GUISE_ASSETS_FLASH_PATH.resolve("guise.swf");
 
 	/** The web commands for controlling polling. */
 	public enum PollCommand implements WebPlatformCommand {
@@ -151,7 +151,7 @@ public interface WebPlatform extends Platform {
 		POLL_INTERVAL;
 
 		/** The property for specifying the poll interval in milliseconds. */
-		public final static String INTERVAL_PROPERTY = "interval";
+		public static final String INTERVAL_PROPERTY = "interval";
 	}
 
 	/**

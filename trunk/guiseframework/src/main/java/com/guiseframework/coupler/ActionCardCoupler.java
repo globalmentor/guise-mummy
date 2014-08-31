@@ -39,7 +39,7 @@ public class ActionCardCoupler extends AbstractCardCoupler //TODO now that const
 {
 
 	/** The bound property of the action. */
-	public final static String ACTION_PROPERTY = getPropertyName(ActionCardCoupler.class, "action");
+	public static final String ACTION_PROPERTY = getPropertyName(ActionCardCoupler.class, "action");
 
 	/** The action listener to listen for the action event. */
 	private final ActionListener actionListener = new ActionListener() {

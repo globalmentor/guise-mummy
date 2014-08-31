@@ -26,7 +26,7 @@ import java.text.Collator;
 public class DemoUser implements Principal, Comparable<DemoUser> {
 
 	/** The collator for comparing user names. */
-	protected final static Collator COLLATOR = Collator.getInstance();
+	protected static final Collator COLLATOR = Collator.getInstance();
 
 	/** The user ID. */
 	private final String id;

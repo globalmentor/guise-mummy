@@ -31,17 +31,17 @@ import com.guiseframework.geometry.Extent;
 public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> extends AbstractLayout<T> {
 
 	/** The bound property of the alignment. */
-	public final static String ALIGNMENT_PROPERTY = getPropertyName(AbstractFlowLayout.class, "alignment");
+	public static final String ALIGNMENT_PROPERTY = getPropertyName(AbstractFlowLayout.class, "alignment");
 	/** The bound property of the flow. */
-	public final static String FLOW_PROPERTY = getPropertyName(AbstractFlowLayout.class, "flow");
+	public static final String FLOW_PROPERTY = getPropertyName(AbstractFlowLayout.class, "flow");
 	/** The bound property of the gap after flowed components. */
-	public final static String GAP_AFTER_PROPERTY = getPropertyName(AbstractFlowLayout.class, "gapAfter");
+	public static final String GAP_AFTER_PROPERTY = getPropertyName(AbstractFlowLayout.class, "gapAfter");
 	/** The bound property of the gap before flowed components. */
-	public final static String GAP_BEFORE_PROPERTY = getPropertyName(AbstractFlowLayout.class, "gapBefore");
+	public static final String GAP_BEFORE_PROPERTY = getPropertyName(AbstractFlowLayout.class, "gapBefore");
 	/** The bound property of the gap between flowed components. */
-	public final static String GAP_BETWEEN_PROPERTY = getPropertyName(AbstractFlowLayout.class, "gapBetween");
+	public static final String GAP_BETWEEN_PROPERTY = getPropertyName(AbstractFlowLayout.class, "gapBetween");
 	/** The bound property of whether wrapping occurs. */
-	public final static String WRAPPED_PROPERTY = getPropertyName(AbstractFlowLayout.class, "wrapped");
+	public static final String WRAPPED_PROPERTY = getPropertyName(AbstractFlowLayout.class, "wrapped");
 
 	/** The default alignment of components perpendicular to the flow axis in terms relative to the beginning of the alignment axis. */
 	private double alignment = 0;

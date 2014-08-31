@@ -47,9 +47,9 @@ public class CalendarMonthTableModel extends AbstractTableModel //TODO set the m
 	}
 
 	/** The column style bound property. */
-	public final static String COLUMN_LABEL_DATE_STYLE_PROPERTY = getPropertyName(CalendarMonthTableModel.class, "columnLabelStyle");
+	public static final String COLUMN_LABEL_DATE_STYLE_PROPERTY = getPropertyName(CalendarMonthTableModel.class, "columnLabelStyle");
 	/** The date bound property. */
-	public final static String DATE_PROPERTY = getPropertyName(CalendarMonthTableModel.class, "date");
+	public static final String DATE_PROPERTY = getPropertyName(CalendarMonthTableModel.class, "date");
 
 	/** The number of days this calendar should be offset left (negative) or right (positive) so that the days align with the correct day-of-the-week column. */
 	private int dayOffset = 0;

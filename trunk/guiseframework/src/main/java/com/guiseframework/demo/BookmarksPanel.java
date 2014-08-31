@@ -33,7 +33,7 @@ import com.guiseframework.model.ValueModel;
 public class BookmarksPanel extends LayoutPanel implements NavigationListener {
 
 	/** The number of tabs. */
-	private final static int TAB_COUNT = 5;
+	private static final int TAB_COUNT = 5;
 
 	private final TabbedPanel tabbedPanel;
 

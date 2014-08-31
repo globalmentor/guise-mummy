@@ -30,52 +30,52 @@ import com.globalmentor.model.AbstractHashObject;
 public class PrototypeProvision<P extends Prototype> extends AbstractHashObject implements Comparable<PrototypeProvision<P>> {
 
 	/** No order. */
-	public final static int NO_ORDER = -1;
+	public static final int NO_ORDER = -1;
 	/** The minimum allowed order. */
-	public final static int MIN_ORDER = 0;
+	public static final int MIN_ORDER = 0;
 	/** The maximum allowed order. */
-	public final static int MAX_ORDER = Integer.MAX_VALUE;
+	public static final int MAX_ORDER = Integer.MAX_VALUE;
 
 	//top-level prototype orders
-	public final static int RESOURCE_MENU_ORDER = 1000000;
-	public final static int EDIT_MENU_ORDER = 2000000;
-	public final static int INSERT_MENU_ORDER = 3000000;
-	public final static int VIEW_MENU_ORDER = 4000000;
-	public final static int TOOL_MENU_ORDER = 5000000;
-	public final static int CONFIGURE_MENU_ORDER = 6000000;
-	public final static int WINDOW_MENU_ORDER = 7000000;
-	public final static int HELP_MENU_ORDER = 99000000;
+	public static final int RESOURCE_MENU_ORDER = 1000000;
+	public static final int EDIT_MENU_ORDER = 2000000;
+	public static final int INSERT_MENU_ORDER = 3000000;
+	public static final int VIEW_MENU_ORDER = 4000000;
+	public static final int TOOL_MENU_ORDER = 5000000;
+	public static final int CONFIGURE_MENU_ORDER = 6000000;
+	public static final int WINDOW_MENU_ORDER = 7000000;
+	public static final int HELP_MENU_ORDER = 99000000;
 
 	//resource menu order
-	public final static int RESOURCE_MENU_NEW_ORDER = RESOURCE_MENU_ORDER + 100;
-	public final static int RESOURCE_MENU_ADD_ORDER = RESOURCE_MENU_ORDER + 200;
-	public final static int RESOURCE_MENU_OPEN_ORDER = RESOURCE_MENU_ORDER + 300;
-	public final static int RESOURCE_MENU_CLOSE_ORDER = RESOURCE_MENU_ORDER + 400;
-	public final static int RESOURCE_MENU_EDIT_ORDER = RESOURCE_MENU_ORDER + 500;
-	public final static int RESOURCE_MENU_EDIT_CANCEL = RESOURCE_MENU_ORDER + 550;
-	public final static int RESOURCE_MENU_SAVE_ORDER = RESOURCE_MENU_ORDER + 600;
-	public final static int RESOURCE_MENU_SAVE_AS_ORDER = RESOURCE_MENU_ORDER + 700;
-	public final static int RESOURCE_MENU_SAVE_ALL_ORDER = RESOURCE_MENU_ORDER + 800;
-	public final static int RESOURCE_MENU_REVERT_ORDER = RESOURCE_MENU_ORDER + 900;
-	public final static int RESOURCE_MENU_MOVE_ORDER = RESOURCE_MENU_ORDER + 1000;
-	public final static int RESOURCE_MENU_RENAME_ORDER = RESOURCE_MENU_ORDER + 1100;
-	public final static int RESOURCE_MENU_REFRESH_ORDER = RESOURCE_MENU_ORDER + 1200;
-	public final static int RESOURCE_MENU_DELETE_ORDER = RESOURCE_MENU_ORDER + 1300;
-	public final static int RESOURCE_MENU_PREVIOUS_ORDER = RESOURCE_MENU_ORDER + 1400;
-	public final static int RESOURCE_MENU_RECEDE_ORDER = RESOURCE_MENU_ORDER + 1500;
-	public final static int RESOURCE_MENU_PLAY_ORDER = RESOURCE_MENU_ORDER + 1600;
-	public final static int RESOURCE_MENU_PAUSE_ORDER = RESOURCE_MENU_ORDER + 1700;
-	public final static int RESOURCE_MENU_RECORD_ORDER = RESOURCE_MENU_ORDER + 1800;
-	public final static int RESOURCE_MENU_STOP_ORDER = RESOURCE_MENU_ORDER + 1900;
-	public final static int RESOURCE_MENU_ADVANCE_ORDER = RESOURCE_MENU_ORDER + 2000;
-	public final static int RESOURCE_MENU_NEXT_ORDER = RESOURCE_MENU_ORDER + 2100;
-	public final static int RESOURCE_MENU_RETRIEVE_ORDER = RESOURCE_MENU_ORDER + 2200;
-	public final static int RESOURCE_MENU_ANNOTATE_ORDER = RESOURCE_MENU_ORDER + 2300;
-	public final static int RESOURCE_MENU_PROPERTIES_ORDER = RESOURCE_MENU_ORDER + 2400;
-	public final static int RESOURCE_MENU_EXIT_ORDER = RESOURCE_MENU_ORDER + 9900;
+	public static final int RESOURCE_MENU_NEW_ORDER = RESOURCE_MENU_ORDER + 100;
+	public static final int RESOURCE_MENU_ADD_ORDER = RESOURCE_MENU_ORDER + 200;
+	public static final int RESOURCE_MENU_OPEN_ORDER = RESOURCE_MENU_ORDER + 300;
+	public static final int RESOURCE_MENU_CLOSE_ORDER = RESOURCE_MENU_ORDER + 400;
+	public static final int RESOURCE_MENU_EDIT_ORDER = RESOURCE_MENU_ORDER + 500;
+	public static final int RESOURCE_MENU_EDIT_CANCEL = RESOURCE_MENU_ORDER + 550;
+	public static final int RESOURCE_MENU_SAVE_ORDER = RESOURCE_MENU_ORDER + 600;
+	public static final int RESOURCE_MENU_SAVE_AS_ORDER = RESOURCE_MENU_ORDER + 700;
+	public static final int RESOURCE_MENU_SAVE_ALL_ORDER = RESOURCE_MENU_ORDER + 800;
+	public static final int RESOURCE_MENU_REVERT_ORDER = RESOURCE_MENU_ORDER + 900;
+	public static final int RESOURCE_MENU_MOVE_ORDER = RESOURCE_MENU_ORDER + 1000;
+	public static final int RESOURCE_MENU_RENAME_ORDER = RESOURCE_MENU_ORDER + 1100;
+	public static final int RESOURCE_MENU_REFRESH_ORDER = RESOURCE_MENU_ORDER + 1200;
+	public static final int RESOURCE_MENU_DELETE_ORDER = RESOURCE_MENU_ORDER + 1300;
+	public static final int RESOURCE_MENU_PREVIOUS_ORDER = RESOURCE_MENU_ORDER + 1400;
+	public static final int RESOURCE_MENU_RECEDE_ORDER = RESOURCE_MENU_ORDER + 1500;
+	public static final int RESOURCE_MENU_PLAY_ORDER = RESOURCE_MENU_ORDER + 1600;
+	public static final int RESOURCE_MENU_PAUSE_ORDER = RESOURCE_MENU_ORDER + 1700;
+	public static final int RESOURCE_MENU_RECORD_ORDER = RESOURCE_MENU_ORDER + 1800;
+	public static final int RESOURCE_MENU_STOP_ORDER = RESOURCE_MENU_ORDER + 1900;
+	public static final int RESOURCE_MENU_ADVANCE_ORDER = RESOURCE_MENU_ORDER + 2000;
+	public static final int RESOURCE_MENU_NEXT_ORDER = RESOURCE_MENU_ORDER + 2100;
+	public static final int RESOURCE_MENU_RETRIEVE_ORDER = RESOURCE_MENU_ORDER + 2200;
+	public static final int RESOURCE_MENU_ANNOTATE_ORDER = RESOURCE_MENU_ORDER + 2300;
+	public static final int RESOURCE_MENU_PROPERTIES_ORDER = RESOURCE_MENU_ORDER + 2400;
+	public static final int RESOURCE_MENU_EXIT_ORDER = RESOURCE_MENU_ORDER + 9900;
 
 	//help prototype orders
-	public final static int HELP_MENU_ABOUT_ORDER = HELP_MENU_ORDER + 100;
+	public static final int HELP_MENU_ABOUT_ORDER = HELP_MENU_ORDER + 100;
 
 	/** The prototype description's parent, or <code>null</code> if the prototype description has no parent. */
 	private final PrototypeProvision<?> parentPrototypeProvision;

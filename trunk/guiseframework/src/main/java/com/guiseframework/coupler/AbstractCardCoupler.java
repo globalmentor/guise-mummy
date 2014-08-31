@@ -46,9 +46,9 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject //TODO listen 
 {
 
 	/** The bound property of the connected card. */
-	public final static String CARD_PROPERTY = getPropertyName(AbstractCardCoupler.class, "card");
+	public static final String CARD_PROPERTY = getPropertyName(AbstractCardCoupler.class, "card");
 	/** The bound property of the connected cards. */
-	public final static String CARDS_PROPERTY = getPropertyName(AbstractCardCoupler.class, "cards");
+	public static final String CARDS_PROPERTY = getPropertyName(AbstractCardCoupler.class, "cards");
 
 	/**
 	 * The flag indicating if we are currently updaing the selected state, so that we can prevent selecting an incorrect card if another card is being selected;

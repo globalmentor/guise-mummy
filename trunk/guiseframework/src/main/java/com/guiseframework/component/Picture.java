@@ -27,12 +27,12 @@ import com.guiseframework.model.*;
 public class Picture extends AbstractImageComponent {
 
 	/** The bound property of whether the description is displayed. */
-	public final static String DESCRIPTION_DISPLAYED_PROPERTY = getPropertyName(Picture.class, "descriptionDisplayed");
+	public static final String DESCRIPTION_DISPLAYED_PROPERTY = getPropertyName(Picture.class, "descriptionDisplayed");
 	/** The image opacity bound property. */
-	public final static String IMAGE_OPACITY_PROPERTY = getPropertyName(Picture.class, "imageOpacity");
+	public static final String IMAGE_OPACITY_PROPERTY = getPropertyName(Picture.class, "imageOpacity");
 
 	/** The bound property of whether the component has image dragging enabled. */
-	//TODO del if not needed	public final static String IMAGE_DRAG_ENABLED_PROPERTY=getPropertyName(Picture.class, "imageDragEnabled");
+	//TODO del if not needed	public static final String IMAGE_DRAG_ENABLED_PROPERTY=getPropertyName(Picture.class, "imageDragEnabled");
 
 	/** Whether the description is displayed. */
 	private boolean descriptionDisplayed = true;

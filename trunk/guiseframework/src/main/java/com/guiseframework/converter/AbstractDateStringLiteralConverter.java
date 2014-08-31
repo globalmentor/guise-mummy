@@ -35,10 +35,10 @@ import com.guiseframework.GuiseSession;
 public abstract class AbstractDateStringLiteralConverter<V> extends AbstractConverter<V, String> {
 
 	/** The array of date format styles (or -1 indicating no corresponding format style) indexed by enumerated styles for quick conversion. */
-	private final static int[] DATE_FORMAT_STYLES = new int[DateStringLiteralStyle.values().length];
+	private static final int[] DATE_FORMAT_STYLES = new int[DateStringLiteralStyle.values().length];
 
 	/** The array of time format styles (or -1 indicating no corresponding format style) indexed by enumerated styles for quick conversion. */
-	private final static int[] TIME_FORMAT_STYLES = new int[TimeStringLiteralStyle.values().length];
+	private static final int[] TIME_FORMAT_STYLES = new int[TimeStringLiteralStyle.values().length];
 
 	/** The date representation style, or <code>null</code> if the date should not be represented. */
 	private final DateStringLiteralStyle dateStyle;

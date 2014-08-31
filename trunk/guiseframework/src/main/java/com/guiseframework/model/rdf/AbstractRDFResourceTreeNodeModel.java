@@ -38,9 +38,9 @@ import com.guiseframework.model.*;
 public abstract class AbstractRDFResourceTreeNodeModel<V extends RDFResource> extends DynamicTreeNodeModel<V> implements RDFObjectTreeNodeModel<V> {
 
 	/** The bound property of whether resource children are included in the node. */
-	public final static String RESOURCE_CHILDREN_INCLUDED_PROPERTY = getPropertyName(AbstractRDFResourceTreeNodeModel.class, "resourceChildrenIncluded");
+	public static final String RESOURCE_CHILDREN_INCLUDED_PROPERTY = getPropertyName(AbstractRDFResourceTreeNodeModel.class, "resourceChildrenIncluded");
 	/** The bound property of whether resource properties are included in the node. */
-	public final static String RESOURCE_PROPERTIES_INCLUDED_PROPERTY = getPropertyName(AbstractRDFResourceTreeNodeModel.class, "resourcePropertiesIncluded");
+	public static final String RESOURCE_PROPERTIES_INCLUDED_PROPERTY = getPropertyName(AbstractRDFResourceTreeNodeModel.class, "resourcePropertiesIncluded");
 
 	/** The RDF property of which this RDF object is an object, or <code>null</code> if this object should not be considered the object of any property. */
 	private final RDFResource property;

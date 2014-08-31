@@ -26,7 +26,7 @@ import static com.globalmentor.java.Classes.*;
 public interface ModalComponent<M extends Mode> extends Component {
 
 	/** The bound property of the mode. */
-	public final static String MODE_PROPERTY = getPropertyName(ModalComponent.class, "mode");
+	public static final String MODE_PROPERTY = getPropertyName(ModalComponent.class, "mode");
 
 	/** @return The current mode of interaction, or <code>null</code> if the component is in a modeless state. */
 	public M getMode();

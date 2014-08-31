@@ -58,11 +58,11 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 		AUDIO_POSITION;
 
 		/** The property for specifying the URI of the audio. */
-		public final static String URI_PROPERTY = "uri";
+		public static final String URI_PROPERTY = "uri";
 		/** The property for specifying the content type of the audio. */
-		public final static String TYPE_PROPERTY = "type";
+		public static final String TYPE_PROPERTY = "type";
 		/** The property for specifying the position of the audio. */
-		public final static String POSITION_PROPERTY = "position";
+		public static final String POSITION_PROPERTY = "position";
 
 	}
 

@@ -132,7 +132,7 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 	}
 
 	/** The delimiter to use when constructing the label from its various segments. */
-	public final static String LABEL_SEPARATOR = " > ";
+	public static final String LABEL_SEPARATOR = " > ";
 
 	/**
 	 * Retrieves the plain-text base title to use when constructing a label.

@@ -30,7 +30,7 @@ import com.globalmentor.java.Objects;
 public class Extent implements Comparable<Extent> {
 
 	/** A convenience one-dimensional extent of zero pixels. */
-	public final static Extent ZERO_EXTENT1 = new Extent(0, Unit.PIXEL, 1);
+	public static final Extent ZERO_EXTENT1 = new Extent(0, Unit.PIXEL, 1);
 
 	/** The value of the extent. */
 	private final double value;

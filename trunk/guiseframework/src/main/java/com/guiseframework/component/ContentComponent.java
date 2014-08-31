@@ -25,7 +25,7 @@ import static com.globalmentor.java.Classes.*;
 public interface ContentComponent extends CompositeComponent {
 
 	/** The content bound property. */
-	public final static String CONTENT_PROPERTY = getPropertyName(ContentComponent.class, "content");
+	public static final String CONTENT_PROPERTY = getPropertyName(ContentComponent.class, "content");
 
 	/** @return The content child component, or <code>null</code> if this component does not have a content child component. */
 	public Component getContent();

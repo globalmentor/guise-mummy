@@ -35,9 +35,9 @@ import static com.globalmentor.java.Classes.*;
 public interface TextModel extends Model {
 
 	/** The text content type bound property. */
-	public final static String TEXT_CONTENT_TYPE_PROPERTY = getPropertyName(TextModel.class, "contentType");
+	public static final String TEXT_CONTENT_TYPE_PROPERTY = getPropertyName(TextModel.class, "contentType");
 	/** The text bound property. */
-	public final static String TEXT_PROPERTY = getPropertyName(TextModel.class, "text");
+	public static final String TEXT_PROPERTY = getPropertyName(TextModel.class, "text");
 
 	/** @return The text, which may include a resource reference, or <code>null</code> if there is no text. */
 	public String getText();

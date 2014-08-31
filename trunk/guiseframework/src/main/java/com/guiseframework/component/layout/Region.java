@@ -40,10 +40,10 @@ public enum Region {
 	CENTER;
 
 	/** The number of regions for each of the the line and page flows. */
-	public final static int FLOW_REGION_COUNT = 3;
+	public static final int FLOW_REGION_COUNT = 3;
 
 	/** The three regions for each axis/direction combination. */
-	protected final static Region[][][] REGIONS = new Region[Axis.values().length][Flow.Direction.values().length][FLOW_REGION_COUNT];
+	protected static final Region[][][] REGIONS = new Region[Axis.values().length][Flow.Direction.values().length][FLOW_REGION_COUNT];
 
 	/**
 	 * Determines the corresponding region for an orientation flow and absolute region number. For example, a left-to-right, top-to-bottom page flow of index

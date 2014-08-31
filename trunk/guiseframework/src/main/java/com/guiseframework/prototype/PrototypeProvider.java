@@ -30,7 +30,7 @@ import static com.globalmentor.java.Classes.*;
 public interface PrototypeProvider extends PropertyBindable {
 
 	/** The prototype provisions property. */
-	public final static String PROTOTYPE_PROVISIONS_PROPERTY = getPropertyName(PrototypeProvider.class, "prototypeProvisions");
+	public static final String PROTOTYPE_PROVISIONS_PROPERTY = getPropertyName(PrototypeProvider.class, "prototypeProvisions");
 
 	/**
 	 * Returns the prototypes provisions currently provided by this provider. This is a read-only bound property.

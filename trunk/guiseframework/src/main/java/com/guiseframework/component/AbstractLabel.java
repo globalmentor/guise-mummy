@@ -34,7 +34,7 @@ import com.guiseframework.model.*;
 public abstract class AbstractLabel extends AbstractComponent implements LabelComponent {
 
 	/** The default export strategy for this component type. */
-	protected final static ExportStrategy<LabelComponent> DEFAULT_EXPORT_STRATEGY = new ExportStrategy<LabelComponent>() {
+	protected static final ExportStrategy<LabelComponent> DEFAULT_EXPORT_STRATEGY = new ExportStrategy<LabelComponent>() {
 
 		/**
 		 * Exports data from the given component.

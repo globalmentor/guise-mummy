@@ -27,7 +27,7 @@ import com.guiseframework.event.EditListenable;
 public interface EditComponent extends Component, EditListenable {
 
 	/** The editable bound property. */
-	public final static String EDITABLE_PROPERTY = getPropertyName(EditComponent.class, "editable");
+	public static final String EDITABLE_PROPERTY = getPropertyName(EditComponent.class, "editable");
 
 	/** @return Whether the value is editable and the component will allow the the user to change the value. */
 	public boolean isEditable();

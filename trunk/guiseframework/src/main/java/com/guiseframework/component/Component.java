@@ -52,29 +52,29 @@ import com.guiseframework.theme.Theme;
 public interface Component extends DepictedObject, PresentationModel, InfoModel {
 
 	/** The bound property of whether the component has bookmarks enabled. */
-	public final static String BOOKMARK_ENABLED_PROPERTY = getPropertyName(Component.class, "bookmarkEnabled");
+	public static final String BOOKMARK_ENABLED_PROPERTY = getPropertyName(Component.class, "bookmarkEnabled");
 	/** The bound property of the layout constraints. */
-	public final static String CONSTRAINTS_PROPERTY = getPropertyName(Component.class, "constraints");
+	public static final String CONSTRAINTS_PROPERTY = getPropertyName(Component.class, "constraints");
 	/** The bound property of whether the component has dragging enabled. */
-	public final static String DRAG_ENABLED_PROPERTY = getPropertyName(Component.class, "dragEnabled");
+	public static final String DRAG_ENABLED_PROPERTY = getPropertyName(Component.class, "dragEnabled");
 	/** The bound property of whether the component has dropping enabled. */
-	public final static String DROP_ENABLED_PROPERTY = getPropertyName(Component.class, "dropEnabled");
+	public static final String DROP_ENABLED_PROPERTY = getPropertyName(Component.class, "dropEnabled");
 	/** The bound property of whether the component has flyovers enabled. */
-	public final static String FLYOVER_ENABLED_PROPERTY = getPropertyName(Component.class, "flyoverEnabled");
+	public static final String FLYOVER_ENABLED_PROPERTY = getPropertyName(Component.class, "flyoverEnabled");
 	/** The bound property of the strategy controlling flyovers. */
-	public final static String FLYOVER_STRATEGY_PROPERTY = getPropertyName(Component.class, "flyoverStrategy");
+	public static final String FLYOVER_STRATEGY_PROPERTY = getPropertyName(Component.class, "flyoverStrategy");
 	/** The input strategy bound property. */
-	public final static String INPUT_STRATEGY_PROPERTY = getPropertyName(Component.class, "inputStrategy");
+	public static final String INPUT_STRATEGY_PROPERTY = getPropertyName(Component.class, "inputStrategy");
 	/** The bound property of the component name. */
-	public final static String NAME_PROPERTY = getPropertyName(Component.class, "name");
+	public static final String NAME_PROPERTY = getPropertyName(Component.class, "name");
 	/** The bound property of the notification. */
-	public final static String NOTIFICATION_PROPERTY = getPropertyName(Component.class, "notification");
+	public static final String NOTIFICATION_PROPERTY = getPropertyName(Component.class, "notification");
 	/** The orientation bound property. */
-	public final static String ORIENTATION_PROPERTY = getPropertyName(Component.class, "orientation");
+	public static final String ORIENTATION_PROPERTY = getPropertyName(Component.class, "orientation");
 	/** The bound property of whether a theme has been applied to this object. */
-	public final static String THEME_APPLIED_PROPERTY = getPropertyName(Component.class, "themeApplied");
+	public static final String THEME_APPLIED_PROPERTY = getPropertyName(Component.class, "themeApplied");
 	/** The valid bound property. */
-	public final static String VALID_PROPERTY = getPropertyName(Component.class, "valid");
+	public static final String VALID_PROPERTY = getPropertyName(Component.class, "valid");
 
 	/** @return The depictor for this component. */
 	public Depictor<? extends Component> getDepictor();

@@ -41,11 +41,11 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 
 	//TODO move these resource keys to the control
 	/** The resource bundle key for the tree node expanded image URI. */
-	public final static String TREE_NODE_COLLAPSED_IMAGE_RESOURCE_KEY = "theme.tree.node.collapsed.image";
+	public static final String TREE_NODE_COLLAPSED_IMAGE_RESOURCE_KEY = "theme.tree.node.collapsed.image";
 	/** The resource bundle key for the tree node collapsed image URI. */
-	public final static String TREE_NODE_EXPANDED_IMAGE_RESOURCE_KEY = "theme.tree.node.expanded.image";
+	public static final String TREE_NODE_EXPANDED_IMAGE_RESOURCE_KEY = "theme.tree.node.expanded.image";
 	/** The resource bundle key for the tree node leaf image URI. */
-	public final static String TREE_NODE_LEAF_IMAGE_RESOURCE_KEY = "theme.tree.node.leaf.image";
+	public static final String TREE_NODE_LEAF_IMAGE_RESOURCE_KEY = "theme.tree.node.leaf.image";
 
 	/** A listener to listen for changes in properties of tree nodes in the model and marks the view as modified accordingly. */
 	/*TODO del; now that we use normal property change events, override the default AbstractView routines with node-specific dirtying

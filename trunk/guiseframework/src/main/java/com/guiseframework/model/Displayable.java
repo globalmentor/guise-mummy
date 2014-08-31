@@ -25,7 +25,7 @@ import static com.globalmentor.java.Classes.*;
 public interface Displayable {
 
 	/** The bound property of whether the object is displayed or has no representation, taking up no space. */
-	public final static String DISPLAYED_PROPERTY = getPropertyName(Displayable.class, "displayed");
+	public static final String DISPLAYED_PROPERTY = getPropertyName(Displayable.class, "displayed");
 
 	/** @return Whether the object is displayed or has no representation, taking up no space. */
 	public boolean isDisplayed();

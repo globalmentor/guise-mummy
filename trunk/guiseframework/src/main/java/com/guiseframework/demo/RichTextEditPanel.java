@@ -27,7 +27,7 @@ import com.guiseframework.component.*;
 public class RichTextEditPanel extends LayoutPanel {
 
 	/** Sample text for the this demo. */
-	protected final static String SAMPLE_TEXT = "<h1>Sample Text</h2>" + "<p>This is <em>really</em> rich text.</p>";
+	protected static final String SAMPLE_TEXT = "<h1>Sample Text</h2>" + "<p>This is <em>really</em> rich text.</p>";
 
 	/** Default constructor. */
 	public RichTextEditPanel() {

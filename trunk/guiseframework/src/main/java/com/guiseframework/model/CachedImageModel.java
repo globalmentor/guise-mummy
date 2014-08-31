@@ -37,9 +37,9 @@ import com.globalmentor.log.Log;
 public class CachedImageModel<Q, V> extends DefaultImageModel implements PendingImageModel {
 
 	/** The cached image query bound property. */
-	public final static String CACHED_IMAGE_QUERY_PROPERTY = getPropertyName(CachedImageModel.class, "cachedImageQuery");
+	public static final String CACHED_IMAGE_QUERY_PROPERTY = getPropertyName(CachedImageModel.class, "cachedImageQuery");
 	/** The cached image URI bound property. */
-	public final static String CACHED_IMAGE_URI_PROPERTY = getPropertyName(CachedImageModel.class, "cachedImageURI");
+	public static final String CACHED_IMAGE_URI_PROPERTY = getPropertyName(CachedImageModel.class, "cachedImageURI");
 
 	/** The cache from which images will be retrieved. */
 	private final Cache<Q, V> cache;

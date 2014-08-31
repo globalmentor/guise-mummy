@@ -27,7 +27,7 @@ import com.globalmentor.java.Objects;
 public class Point {
 
 	/** A predefined point with zero coordinates. */
-	public final static Point ORIGIN_POINT = new Point(0, 0);
+	public static final Point ORIGIN_POINT = new Point(0, 0);
 
 	/** The X coordinate. */
 	private final Extent x;

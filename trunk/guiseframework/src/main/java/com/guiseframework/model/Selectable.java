@@ -25,7 +25,7 @@ import static com.globalmentor.java.Classes.*;
 public interface Selectable {
 
 	/** The bound property of whether the object is selected. */
-	public final static String SELECTED_PROPERTY = getPropertyName(Selectable.class, "selected");
+	public static final String SELECTED_PROPERTY = getPropertyName(Selectable.class, "selected");
 
 	/** @return Whether the object is selected. */
 	public boolean isSelected();

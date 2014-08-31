@@ -42,9 +42,9 @@ import static com.guiseframework.theme.Theme.*;
 public class SequenceCardPanel extends AbstractCardPanel implements ArrangeContainer, Commitable {
 
 	/** The bound property of the sequence state. */
-	public final static String STATE_PROPERTY = getPropertyName(SequenceCardPanel.class, "state");
+	public static final String STATE_PROPERTY = getPropertyName(SequenceCardPanel.class, "state");
 	/** The bound property of whether the transitions are enabled. */
-	public final static String TRANSITION_ENABLED_PROPERTY = getPropertyName(SequenceCardPanel.class, "transitionEnabled");
+	public static final String TRANSITION_ENABLED_PROPERTY = getPropertyName(SequenceCardPanel.class, "transitionEnabled");
 
 	/** The current state of the sequence, or <code>null</code> if the sequence is not occurring. */
 	private TaskState state = null;

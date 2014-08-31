@@ -118,25 +118,25 @@ import org.xml.sax.SAXException;
 public class GuiseHTTPServlet extends DefaultHTTPServlet {
 
 	/** The init parameter, "application", used to specify the relative path to the application description file. */
-	public final static String APPLICATION_INIT_PARAMETER = "application";
+	public static final String APPLICATION_INIT_PARAMETER = "application";
 
 	/** The init parameter prefix, "guise-environment:", used to indicate a Guise environment property. */
-	public final static String GUISE_ENVIRONMENT_INIT_PARAMETER_PREFIX = "guise-environment:";
+	public static final String GUISE_ENVIRONMENT_INIT_PARAMETER_PREFIX = "guise-environment:";
 
 	/** The init parameter suffix, ".uri", used to indicate that a Guise environment property should be processed as a URI. */
-	public final static String GUISE_ENVIRONMENT_URI_INIT_PARAMETER_SUFFIX = ".uri";
+	public static final String GUISE_ENVIRONMENT_URI_INIT_PARAMETER_SUFFIX = ".uri";
 
 	/**
 	 * The URI query parameter indicating that the content disposition of the content of a {@link ResourceReadDestination}. The value will be the serialize
 	 * version of a {@link ContentDispositionType} value.
 	 */
-	public final static String GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER = "guiseContentDisposition";
+	public static final String GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER = "guiseContentDisposition";
 
 	/** The ID of the viewport to use for sending resources. */
-	public final static String SEND_RESOURCE_VIEWPORT_ID = "guiseDownload";
+	public static final String SEND_RESOURCE_VIEWPORT_ID = "guiseDownload";
 
 	/** The I/O implementation that reads a Guise application description from TURF. */
-	private final static PLOOPTURFIO<AbstractGuiseApplication> applicationIO;
+	private static final PLOOPTURFIO<AbstractGuiseApplication> applicationIO;
 
 	/** @return The I/O implementation that reads a Guise application description from TURF. */
 	public static PLOOPTURFIO<AbstractGuiseApplication> getApplicationIO() {
@@ -144,7 +144,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	}
 
 	/** The name of the application configuration file in the data directory for supplemental application initialization. */
-	public final static String DATA_APPLICATION_FILENAME = addExtension("application", TURF.NAME_EXTENSION);
+	public static final String DATA_APPLICATION_FILENAME = addExtension("application", TURF.NAME_EXTENSION);
 
 	static {
 		applicationIO = new PLOOPTURFIO<AbstractGuiseApplication>(AbstractGuiseApplication.class); //create the Guise application I/O

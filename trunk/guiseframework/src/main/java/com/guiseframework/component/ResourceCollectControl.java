@@ -41,9 +41,9 @@ import com.guiseframework.model.*;
 public class ResourceCollectControl extends AbstractControl {
 
 	/** The bound property of the paths of the collected resources. */
-	public final static String RESOURCE_PATHS_PROPERTY = getPropertyName(ResourceCollectControl.class, "resourcePaths");
+	public static final String RESOURCE_PATHS_PROPERTY = getPropertyName(ResourceCollectControl.class, "resourcePaths");
 	/** The bound property of the state of receiving collected resources. */
-	public final static String STATE_PROPERTY = getPropertyName(ResourceCollectControl.class, "state");
+	public static final String STATE_PROPERTY = getPropertyName(ResourceCollectControl.class, "state");
 
 	/** @return The depictor for this object. */
 	@SuppressWarnings("unchecked")

@@ -46,9 +46,9 @@ public enum MediaCommand implements Command {
 	STOP;
 
 	/** The resource key template for each label. */
-	private final static StringTemplate LABEL_RESOURCE_KEY_TEMPLATE = new StringTemplate("command.media.", StringTemplate.STRING_PARAMETER, ".label");
+	private static final StringTemplate LABEL_RESOURCE_KEY_TEMPLATE = new StringTemplate("command.media.", StringTemplate.STRING_PARAMETER, ".label");
 	/** The resource key template for each glyph. */
-	private final static StringTemplate GLYPH_RESOURCE_KEY_TEMPLATE = new StringTemplate("command.media.", StringTemplate.STRING_PARAMETER, ".glyph");
+	private static final StringTemplate GLYPH_RESOURCE_KEY_TEMPLATE = new StringTemplate("command.media.", StringTemplate.STRING_PARAMETER, ".glyph");
 
 	/** @return The resource reference for the label. */
 	public String getLabel() {

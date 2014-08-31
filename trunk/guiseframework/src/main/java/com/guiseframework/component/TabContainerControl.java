@@ -30,9 +30,9 @@ import com.guiseframework.component.layout.TabLayout;
 public class TabContainerControl extends AbstractListSelectContainerControl {
 
 	/** The axis bound property. */
-	public final static String AXIS_PROPERTY = getPropertyName(TabContainerControl.class, "axis");
+	public static final String AXIS_PROPERTY = getPropertyName(TabContainerControl.class, "axis");
 	/** The maximum tab count bound property. */
-	public final static String MAX_TAB_COUNT_PROPERTY = getPropertyName(TabContainerControl.class, "maxTabCount");
+	public static final String MAX_TAB_COUNT_PROPERTY = getPropertyName(TabContainerControl.class, "maxTabCount");
 
 	/** The flow axis. */
 	private Flow axis;

@@ -25,7 +25,7 @@ import static com.globalmentor.java.Classes.*;
 public interface TreeModel extends ActionModel {
 
 	/** The bound property of the root node. */
-	public final static String ROOT_NODE_PROPERTY = getPropertyName(TreeModel.class, "rootNode");
+	public static final String ROOT_NODE_PROPERTY = getPropertyName(TreeModel.class, "rootNode");
 
 	/** @return The root node of the tree model. */
 	public TreeNodeModel<?> getRootNode();

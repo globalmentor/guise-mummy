@@ -33,9 +33,9 @@ public class ImageBooleanSelectActionControl extends AbstractBooleanSelectAction
 {
 
 	/** The rollover image URI bound property. */
-	public final static String ROLLOVER_IMAGE_URI_PROPERTY = getPropertyName(ImageBooleanSelectActionControl.class, "rolloverImageURI");
+	public static final String ROLLOVER_IMAGE_URI_PROPERTY = getPropertyName(ImageBooleanSelectActionControl.class, "rolloverImageURI");
 	/** The selected image URI bound property. */
-	public final static String SELECTED_IMAGE_URI_PROPERTY = getPropertyName(ImageBooleanSelectActionControl.class, "selectedImageURI");
+	public static final String SELECTED_IMAGE_URI_PROPERTY = getPropertyName(ImageBooleanSelectActionControl.class, "selectedImageURI");
 
 	/** The image model used by this component. */
 	private final ImageModel imageModel;

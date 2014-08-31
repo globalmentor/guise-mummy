@@ -29,7 +29,7 @@ import com.guiseframework.validator.*;
 public class MultiplicationTablePanel extends LayoutPanel {
 
 	/** The maximum number of tabs. */
-	protected final static int MAX_TAB_COUNT = 5;
+	protected static final int MAX_TAB_COUNT = 5;
 
 	/** Default constructor. */
 	public MultiplicationTablePanel() {

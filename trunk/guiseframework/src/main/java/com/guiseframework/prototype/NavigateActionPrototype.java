@@ -31,7 +31,7 @@ import com.guiseframework.Guise;
 public class NavigateActionPrototype extends AbstractActionPrototype {
 
 	/** The navigation URI bound property. */
-	public final static String NAVIGATION_URI_PROPERTY = getPropertyName(NavigateActionPrototype.class, "navigationURI");
+	public static final String NAVIGATION_URI_PROPERTY = getPropertyName(NavigateActionPrototype.class, "navigationURI");
 
 	/** The requested navigation URI. */
 	private URI navigationURI;

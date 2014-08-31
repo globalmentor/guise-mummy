@@ -139,12 +139,12 @@ public class HSLColor extends AbstractModeledColor<HSLColor.Component> {
 	 * A regular expression pattern matching <code>hsl(<var>hue</var>,<var>saturation</var>,<var>lightness</var>)</code>, with the first three groups representing
 	 * the three HSL character sequences.
 	 */
-	private final static Pattern HSL_ABSOLUTE_FUNCTION_PATTERN = Pattern.compile("hsl\\((\\d{0,3}),\\s*(\\d{0,3}),\\s*(\\d{0,3})\\)");
+	private static final Pattern HSL_ABSOLUTE_FUNCTION_PATTERN = Pattern.compile("hsl\\((\\d{0,3}),\\s*(\\d{0,3}),\\s*(\\d{0,3})\\)");
 	/**
 	 * A regular expression pattern matching <code>hsl(<var>hue</var>%,<var>saturation</var>%,<var>lightness</var>%)</code>, with the first three groups
 	 * representing the three HSL character sequences.
 	 */
-	private final static Pattern HSL_PERCENT_FUNCTION_PATTERN = Pattern.compile("hsl\\(([\\d\\.]+)%,\\s*([\\d\\.]+)%,\\s*([\\d\\.]+)%\\)");
+	private static final Pattern HSL_PERCENT_FUNCTION_PATTERN = Pattern.compile("hsl\\(([\\d\\.]+)%,\\s*([\\d\\.]+)%,\\s*([\\d\\.]+)%\\)");
 
 	/**
 	 * Creates an HSL color from a string representation. This representation can be in one of the following forms:

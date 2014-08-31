@@ -38,9 +38,9 @@ import com.guiseframework.model.*;
 public class ListSelectCardCoupler<V> extends AbstractCardCoupler {
 
 	/** The bound property of the list select control. */
-	public final static String LIST_SELECT_PROPERTY = getPropertyName(ListSelectCardCoupler.class, "listSelect");
+	public static final String LIST_SELECT_PROPERTY = getPropertyName(ListSelectCardCoupler.class, "listSelect");
 	/** The value bound property. */
-	public final static String VALUE_PROPERTY = getPropertyName(ListSelectCardCoupler.class, "value");
+	public static final String VALUE_PROPERTY = getPropertyName(ListSelectCardCoupler.class, "value");
 
 	/** The private flag to keep track of whether we are reverting the list select control to keep from re-reverting ad infinitum. */
 	private boolean isRevertingListSelect = false;

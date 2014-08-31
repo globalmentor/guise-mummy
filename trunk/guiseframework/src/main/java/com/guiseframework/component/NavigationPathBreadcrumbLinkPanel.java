@@ -37,7 +37,7 @@ import com.guiseframework.event.NavigateActionListener;
 public class NavigationPathBreadcrumbLinkPanel extends AbstractPanel {
 
 	/** The navigation path bound property. */
-	public final static String NAVIGATION_PATH_PROPERTY = getPropertyName(NavigationPathBreadcrumbLinkPanel.class, "navigationPath");
+	public static final String NAVIGATION_PATH_PROPERTY = getPropertyName(NavigationPathBreadcrumbLinkPanel.class, "navigationPath");
 
 	/** The navigation path, or <code>null</code> if there is no navigation path. */
 	private URIPath navigationPath = null;

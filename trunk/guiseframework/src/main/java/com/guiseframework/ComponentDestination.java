@@ -33,7 +33,7 @@ import com.guiseframework.component.Component;
 public class ComponentDestination extends AbstractDestination {
 
 	/** The style bound property. */
-	public final static String STYLE_PROPERTY = getPropertyName(ComponentDestination.class, "style");
+	public static final String STYLE_PROPERTY = getPropertyName(ComponentDestination.class, "style");
 
 	/** The class of the component to represent this destination. */
 	private final Class<? extends Component> componentClass;

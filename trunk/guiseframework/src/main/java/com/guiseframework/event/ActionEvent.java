@@ -24,10 +24,10 @@ package com.guiseframework.event;
 public class ActionEvent extends AbstractTargetedGuiseEvent {
 
 	/** The default action option. */
-	public final static int DEFAULT_OPTION = 0;
+	public static final int DEFAULT_OPTION = 0;
 
 	/** The default action force. */
-	public final static int DEFAULT_FORCE = 1;
+	public static final int DEFAULT_FORCE = 1;
 
 	/** The commands that can be represented by an action. */
 	public enum Command {

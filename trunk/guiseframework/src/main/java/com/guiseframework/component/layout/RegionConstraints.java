@@ -30,21 +30,21 @@ import com.guiseframework.geometry.Extent;
 public class RegionConstraints extends AbstractConstraints {
 
 	/** The bound property of the line alignment. */
-	public final static String LINE_ALIGNMENT_PROPERTY = getPropertyName(RegionConstraints.class, "lineAlignment");
+	public static final String LINE_ALIGNMENT_PROPERTY = getPropertyName(RegionConstraints.class, "lineAlignment");
 	/** The bound property of the page alignment. */
-	public final static String PAGE_ALIGNMENT_PROPERTY = getPropertyName(RegionConstraints.class, "pageAlignment");
+	public static final String PAGE_ALIGNMENT_PROPERTY = getPropertyName(RegionConstraints.class, "pageAlignment");
 	/** The line extent (width in left-to-right top-to-bottom orientation) bound property. */
-	public final static String LINE_EXTENT_PROPERTY = getPropertyName(RegionConstraints.class, "lineExtent");
+	public static final String LINE_EXTENT_PROPERTY = getPropertyName(RegionConstraints.class, "lineExtent");
 	/** The page extent (height in left-to-right top-to-bottom orientation) bound property. */
-	public final static String PAGE_EXTENT_PROPERTY = getPropertyName(RegionConstraints.class, "pageExtent");
+	public static final String PAGE_EXTENT_PROPERTY = getPropertyName(RegionConstraints.class, "pageExtent");
 	/** The bound property of the line near padding extent. */
-	public final static String PADDING_LINE_NEAR_EXTENT_PROPERTY = getPropertyName(RegionConstraints.class, "paddingLineNearExtent");
+	public static final String PADDING_LINE_NEAR_EXTENT_PROPERTY = getPropertyName(RegionConstraints.class, "paddingLineNearExtent");
 	/** The bound property of the line far padding extent. */
-	public final static String PADDING_LINE_FAR_EXTENT_PROPERTY = getPropertyName(RegionConstraints.class, "paddingLineFarExtent");
+	public static final String PADDING_LINE_FAR_EXTENT_PROPERTY = getPropertyName(RegionConstraints.class, "paddingLineFarExtent");
 	/** The bound property of the page near padding extent. */
-	public final static String PADDING_PAGE_NEAR_EXTENT_PROPERTY = getPropertyName(RegionConstraints.class, "paddingPageNearExtent");
+	public static final String PADDING_PAGE_NEAR_EXTENT_PROPERTY = getPropertyName(RegionConstraints.class, "paddingPageNearExtent");
 	/** The bound property of the page far padding extent. */
-	public final static String PADDING_PAGE_FAR_EXTENT_PROPERTY = getPropertyName(RegionConstraints.class, "paddingPageFarExtent");
+	public static final String PADDING_PAGE_FAR_EXTENT_PROPERTY = getPropertyName(RegionConstraints.class, "paddingPageFarExtent");
 
 	/** The layout region for the associated component. */
 	private final Region region;
@@ -58,7 +58,7 @@ public class RegionConstraints extends AbstractConstraints {
 	private double[] alignments = fill(new double[Flow.values().length], 0);
 
 	/** The properties corresponding to the region alignments. */
-	private final static String[] ALIGNMENT_PROPERTIES;
+	private static final String[] ALIGNMENT_PROPERTIES;
 
 	static {
 		ALIGNMENT_PROPERTIES = new String[Flow.values().length]; //create the array of properties and fill it with corresponding properties
@@ -128,7 +128,7 @@ public class RegionConstraints extends AbstractConstraints {
 	private Extent[] extents = fill(new Extent[Flow.values().length], null);
 
 	/** The properties corresponding to the region extents. */
-	private final static String[] EXTENT_PROPERTIES;
+	private static final String[] EXTENT_PROPERTIES;
 
 	static {
 		EXTENT_PROPERTIES = new String[Flow.values().length]; //create the array of properties and fill it with corresponding properties
@@ -200,7 +200,7 @@ public class RegionConstraints extends AbstractConstraints {
 	private Extent[] paddingExtents = fill(new Extent[Border.values().length], Extent.ZERO_EXTENT1);
 
 	/** The properties corresponding to the padding extents. */
-	private final static String[] PADDING_EXTENT_PROPERTIES;
+	private static final String[] PADDING_EXTENT_PROPERTIES;
 
 	static {
 		PADDING_EXTENT_PROPERTIES = new String[Border.values().length]; //create the array of properties and fill it with corresponding properties

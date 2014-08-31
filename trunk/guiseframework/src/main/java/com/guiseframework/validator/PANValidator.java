@@ -34,7 +34,7 @@ import com.globalmentor.java.Arrays;
 public class PANValidator extends AbstractValidator<PAN> { //TODO add http://www.darkcoding.net/index.php/credit-card-numbers/ reference
 
 	/** The valid products bound property. */
-	public final static String VALID_PRODUCTS_PROPERTY = getPropertyName(PANValidator.class, "validProducts");
+	public static final String VALID_PRODUCTS_PROPERTY = getPropertyName(PANValidator.class, "validProducts");
 
 	/** The read-only set of valid products. */
 	private Set<Product> validProducts;

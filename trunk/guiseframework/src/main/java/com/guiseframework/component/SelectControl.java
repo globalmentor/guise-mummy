@@ -26,6 +26,6 @@ import static com.globalmentor.java.Classes.*;
 public interface SelectControl<V> extends ValueControl<V> {
 
 	/** The value representation strategy bound property. */
-	public final static String VALUE_REPRESENTATION_STRATEGY_PROPERTY = getPropertyName(SelectControl.class, "valueRepresentationStrategy");
+	public static final String VALUE_REPRESENTATION_STRATEGY_PROPERTY = getPropertyName(SelectControl.class, "valueRepresentationStrategy");
 
 }

@@ -35,7 +35,7 @@ import com.guiseframework.platform.*;
 public abstract class AbstractWebPlatform extends AbstractPlatform implements WebPlatform {
 
 	/** The prefix used for creating depict ID strings on this platform. */
-	protected final static String DEPICT_ID_STRING_PREFIX = "id";
+	protected static final String DEPICT_ID_STRING_PREFIX = "id";
 
 	/** The user local environment. */
 	private final Environment environment;
@@ -55,7 +55,7 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 	private final Map<DepictedObject, Integer> requestedPollIntervalMap = synchronizedMap(new HashMap<DepictedObject, Integer>());
 
 	/** The default polling interval in milliseconds. */
-	public final static int DEFAULT_POLL_INTERVAL = 5 * 60 * 1000;
+	public static final int DEFAULT_POLL_INTERVAL = 5 * 60 * 1000;
 
 	/** The current polling interval in milliseconds. */
 	private int pollInterval = DEFAULT_POLL_INTERVAL;

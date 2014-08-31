@@ -31,7 +31,7 @@ import com.guiseframework.GuiseSession;
 public interface Converter<V, L> extends PropertyBindable {
 
 	/** The invalid value message bound property. */
-	public final static String INVALID_VALUE_MESSAGE_PROPERTY = getPropertyName(Converter.class, "invalidValueMessage");
+	public static final String INVALID_VALUE_MESSAGE_PROPERTY = getPropertyName(Converter.class, "invalidValueMessage");
 
 	/** @return The invalid value message text, which may include a resource reference. */
 	public String getInvalidValueMessage();

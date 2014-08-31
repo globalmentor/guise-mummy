@@ -50,9 +50,9 @@ import com.guiseframework.validator.*;
 public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Table.CellComponentState> implements EditComponent, TableModel {
 
 	/** The display row count bound property. */
-	public final static String DISPLAY_ROW_COUNT_PROPERTY = getPropertyName(Table.class, "displayRowCount");
+	public static final String DISPLAY_ROW_COUNT_PROPERTY = getPropertyName(Table.class, "displayRowCount");
 	/** The display row start index bound property. */
-	public final static String DISPLAY_ROW_START_INDEX_PROPERTY = getPropertyName(Table.class, "displayRowStartIndex");
+	public static final String DISPLAY_ROW_START_INDEX_PROPERTY = getPropertyName(Table.class, "displayRowStartIndex");
 
 	/** The table model used by this component. */
 	private final TableModel tableModel;

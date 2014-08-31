@@ -38,7 +38,7 @@ import com.guiseframework.validator.*;
 public class WebSelectDepictor<V, C extends ListSelectControl<V>> extends AbstractDecoratedWebComponentDepictor<C> {
 
 	/** The value for indicating a dummy <code>null</code> value when no value is selected. */
-	protected final static String GUISE_DUMMY_NULL_VALUE = "$guiseDummyNull"; //TODO del if not needed
+	protected static final String GUISE_DUMMY_NULL_VALUE = "$guiseDummyNull"; //TODO del if not needed
 
 	/** Default constructor using the XHTML <code>&lt;select&gt;</code> element. */
 	public WebSelectDepictor() {

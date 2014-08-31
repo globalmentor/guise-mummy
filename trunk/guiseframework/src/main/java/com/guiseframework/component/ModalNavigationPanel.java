@@ -26,9 +26,9 @@ import static com.globalmentor.java.Classes.*;
 public interface ModalNavigationPanel<R> extends Panel {
 
 	/** The modal state bound property. */
-	public final static String MODAL_PROPERTY = getPropertyName(ModalNavigationPanel.class, "modal");
+	public static final String MODAL_PROPERTY = getPropertyName(ModalNavigationPanel.class, "modal");
 	/** The result bound property. */
-	public final static String RESULT_PROPERTY = getPropertyName(ModalNavigationPanel.class, "result");
+	public static final String RESULT_PROPERTY = getPropertyName(ModalNavigationPanel.class, "result");
 
 	/** @return The result of this navigation panel's modal interaction, or <code>null</code> if no result is given. */
 	public R getResult();

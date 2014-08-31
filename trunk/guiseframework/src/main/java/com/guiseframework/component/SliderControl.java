@@ -39,19 +39,19 @@ import com.guiseframework.validator.ValidationException;
 public class SliderControl<V extends Number> extends AbstractEditValueControl<V> {
 
 	/** The flow bound property. */
-	public final static String FLOW_PROPERTY = getPropertyName(SliderControl.class, "flow");
+	public static final String FLOW_PROPERTY = getPropertyName(SliderControl.class, "flow");
 	/** The interval step bound property. */
-	public final static String INTERVAL_PROPERTY = getPropertyName(SliderControl.class, "intervalStep");
+	public static final String INTERVAL_PROPERTY = getPropertyName(SliderControl.class, "intervalStep");
 	/** The bound property of the sliding state. */
-	public final static String SLIDING_PROPERTY = getPropertyName(SliderControl.class, "sliding");
+	public static final String SLIDING_PROPERTY = getPropertyName(SliderControl.class, "sliding");
 	/** The bound property of the horizontal thumb image. */
-	public final static String THUMB_X_IMAGE_PROPERTY = getPropertyName(SliderControl.class, "thumbXImage");
+	public static final String THUMB_X_IMAGE_PROPERTY = getPropertyName(SliderControl.class, "thumbXImage");
 	/** The bound property of the vertical thumb image. */
-	public final static String THUMB_Y_IMAGE_PROPERTY = getPropertyName(SliderControl.class, "thumbYImage");
+	public static final String THUMB_Y_IMAGE_PROPERTY = getPropertyName(SliderControl.class, "thumbYImage");
 	/** The bound property of the horizontal track image. */
-	public final static String TRACK_X_IMAGE_PROPERTY = getPropertyName(SliderControl.class, "trackXImage");
+	public static final String TRACK_X_IMAGE_PROPERTY = getPropertyName(SliderControl.class, "trackXImage");
 	/** The bound property of the vertical track image. */
-	public final static String TRACK_Y_IMAGE_PROPERTY = getPropertyName(SliderControl.class, "trackYImage");
+	public static final String TRACK_Y_IMAGE_PROPERTY = getPropertyName(SliderControl.class, "trackYImage");
 
 	/** The flow along which the slider is oriented. */
 	private Flow flow;
@@ -122,7 +122,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 	private URI[] axisThumbImages;
 
 	/** The properties corresponding to the axis thumb images. */
-	private final static String[] AXIS_THUMB_IMAGE_PROPERTIES;
+	private static final String[] AXIS_THUMB_IMAGE_PROPERTIES;
 
 	static {
 		AXIS_THUMB_IMAGE_PROPERTIES = new String[Axis.values().length]; //create the array of properties and fill it with corresponding properties
@@ -196,7 +196,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 	private URI[] axisTrackImages;
 
 	/** The properties corresponding to the axis track images. */
-	private final static String[] AXIS_TRACK_IMAGE_PROPERTIES;
+	private static final String[] AXIS_TRACK_IMAGE_PROPERTIES;
 
 	static {
 		AXIS_TRACK_IMAGE_PROPERTIES = new String[Axis.values().length]; //create the array of properties and fill it with corresponding properties

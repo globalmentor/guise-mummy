@@ -86,7 +86,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	}
 
 	/** I/O for loading resources. */
-	private final static IO<Resources> resourcesIO = new TypedURFResourceTURFIO<Resources>(Resources.class, RESOURCES_NAMESPACE_URI);
+	private static final IO<Resources> resourcesIO = new TypedURFResourceTURFIO<Resources>(Resources.class, RESOURCES_NAMESPACE_URI);
 
 	/** @return I/O for loading resources. */
 	public IO<Resources> getResourcesIO() {
@@ -94,7 +94,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	}
 
 	/** I/O for loading themes. */
-	private final static IO<Theme> themeIO = new TypedURFResourceTURFIO<Theme>(Theme.class, THEME_NAMESPACE_URI); //create I/O for loading the theme
+	private static final IO<Theme> themeIO = new TypedURFResourceTURFIO<Theme>(Theme.class, THEME_NAMESPACE_URI); //create I/O for loading the theme
 
 	static {
 		((TypedURFResourceTURFIO<Theme>)themeIO).registerResourceFactory(RESOURCES_NAMESPACE_URI, new JavaURFResourceFactory(Resources.class.getPackage())); //add support for resource declarations within a theme
@@ -1239,10 +1239,10 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	//TODO rename all these to XXXAsset() and check both for normal and temp assets, delegating to the Guise class for non-temp assets
 
 	/** The string form of the assets base path. */
-	private final static String GUISE_ASSETS_BASE_PATH_STRING = GUISE_ASSETS_BASE_PATH.toString();
+	private static final String GUISE_ASSETS_BASE_PATH_STRING = GUISE_ASSETS_BASE_PATH.toString();
 
 	/** The string form of the temp assets base path. */
-	private final static String GUISE_ASSETS_TEMP_BASE_PATH_STRING = GUISE_ASSETS_TEMP_BASE_PATH.toString();
+	private static final String GUISE_ASSETS_TEMP_BASE_PATH_STRING = GUISE_ASSETS_TEMP_BASE_PATH.toString();
 
 	/**
 	 * Determines whether this application has an asset at the given path. The path is first normalized. This method supports Guise assets and temporary
@@ -1367,7 +1367,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	}
 
 	/** A thread-safe cache of softly-referenced resource maps keyed to resource bundle URIs. */
-	private final static Map<URI, Map<String, Object>> cachedResourceMapMap = new DecoratorReadWriteLockMap<URI, Map<String, Object>>(
+	private static final Map<URI, Map<String, Object>> cachedResourceMapMap = new DecoratorReadWriteLockMap<URI, Map<String, Object>>(
 			new PurgeOnWriteSoftValueHashMap<URI, Map<String, Object>>());
 
 	/**
