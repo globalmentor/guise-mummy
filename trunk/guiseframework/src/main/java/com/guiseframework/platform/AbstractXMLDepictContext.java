@@ -357,7 +357,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 			ContentType contentType) throws IOException {
 		if(contentType == null) { //if no content type was provided
 			if(publicID != null) { //if there is a document type public ID
-				contentType = getContentType(publicID); //get the content type for this doctype public ID
+				contentType = getContentTypeForPublicID(publicID); //get the content type for this doctype public ID
 			}
 			if(contentType == null) { //if we still couldn't find a content type
 				contentType = CONTENT_TYPE; //use the generic "text/xml" content type
