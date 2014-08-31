@@ -22,7 +22,6 @@ import java.nio.charset.Charset;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.globalmentor.io.Charsets;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.servlet.http.HTTPServlets;
 import com.globalmentor.text.Text;
@@ -32,6 +31,7 @@ import com.guiseframework.GuiseSession;
 
 import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
+import static java.nio.charset.StandardCharsets.*;
 
 /**
  * A web depict context of an HTTP servlet.
@@ -113,7 +113,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext {
 		contentHashAttributeQualifiedName = new QualifiedName(GUISE_ML_NAMESPACE_URI, getQualifiedName(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_CONTENT_HASH));
 		setHashAttributesGenerated(true); //always generate hash attributes
 		final ContentType defaultContentType = ContentType.create(outputContentType.getPrimaryType(), outputContentType.getSubType(), new ContentType.Parameter(
-				ContentType.CHARSET_PARAMETER, Charsets.UTF_8_NAME)); //default to text/plain encoded in UTF-8
+				ContentType.CHARSET_PARAMETER, UTF_8.name())); //default to text/plain encoded in UTF-8
 		response.setContentType(defaultContentType.toString()); //initialize the default content type and encoding
 		HTTPServlets.setContentLanguage(response, session.getLocale()); //set the response content language
 	}
@@ -128,7 +128,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext {
 		return outputContentType;
 	}
 
-	/**{@inheritDoc} This implementation removes all parameters and adds a character set parameter of the current encoding.*/
+	/** {@inheritDoc} This implementation removes all parameters and adds a character set parameter of the current encoding. */
 	@Override
 	public void setOutputContentType(final ContentType contentType) {
 		//TODO change to really just replace one parameter, instead of removing all others

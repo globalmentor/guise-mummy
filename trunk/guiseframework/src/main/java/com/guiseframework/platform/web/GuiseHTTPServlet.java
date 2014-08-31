@@ -21,6 +21,8 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.net.*;
 import java.security.Principal;
 import java.util.*;
+
+import static java.nio.charset.StandardCharsets.*;
 import static java.util.Collections.*;
 import static org.urframework.content.Content.*;
 import static org.urframework.dcmi.DCMI.*;
@@ -48,7 +50,6 @@ import com.globalmentor.servlet.http.*;
 import com.globalmentor.text.elff.*;
 import com.globalmentor.text.xml.XML;
 import com.globalmentor.text.xml.xpath.*;
-
 import com.guiseframework.*;
 import com.guiseframework.component.*;
 import com.guiseframework.event.*;
@@ -58,7 +59,6 @@ import com.guiseframework.model.FileItemResourceImport;
 import com.guiseframework.platform.*;
 
 import static com.globalmentor.flash.Flash.*;
-import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
@@ -72,9 +72,9 @@ import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.time.TimeZones.*;
-
 import static com.guiseframework.platform.web.WebPlatform.*;
 import static com.guiseframework.platform.web.WebUserAgentProduct.Brand.*;
+
 import com.guiseframework.platform.web.WebPlatform.PollCommand;
 import com.guiseframework.platform.web.css.*;
 
@@ -1268,7 +1268,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 			}
 			//			Log.debug("response length:", text.length());
 			//			Log.debug("response text:", text);
-			final byte[] bytes = text.getBytes(UTF_8_CHARSET); //write the content we collected in the context as series of bytes encoded in UTF-8
+			final byte[] bytes = text.getBytes(UTF_8); //write the content we collected in the context as series of bytes encoded in UTF-8
 			final OutputStream outputStream = getCompressedOutputStream(guiseRequest.getHTTPServletRequest(), response); //get a compressed output stream, if possible
 			outputStream.write(bytes); //write the bytes
 			outputStream.close(); //close the output stream, finishing writing the compressed contents (don't put this in a finally block, as it will attempt to write more data and raise another exception)

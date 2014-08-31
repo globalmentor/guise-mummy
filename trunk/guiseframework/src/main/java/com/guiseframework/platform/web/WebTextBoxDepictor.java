@@ -25,13 +25,14 @@ import javax.xml.parsers.*;
 import com.globalmentor.collections.*;
 import com.globalmentor.net.ContentType;
 
-import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.java.Objects.*;
-
 import static com.globalmentor.java.CharSequences.*;
+
 import com.globalmentor.log.Log;
+
 import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static java.nio.charset.StandardCharsets.*;
 
 import com.guiseframework.component.*;
 import com.guiseframework.component.SectionComponent.SectionType;
@@ -121,7 +122,7 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 
 						final DocumentBuilder documentBuilder = createDocumentBuilder(true); //create a new namespace-aware document builder
 						//				TODO del Log.trace("getting bytes");
-						final byte[] bytes = xmlText.getBytes(UTF_8_CHARSET);
+						final byte[] bytes = xmlText.getBytes(UTF_8);
 						//				TODO del Log.trace("creating input stream");
 						final InputStream inputStream = new ByteArrayInputStream(bytes);
 						//				TODO del Log.trace("parsing input stream");

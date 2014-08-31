@@ -23,6 +23,7 @@ import java.security.Principal;
 import java.text.DateFormat;
 import java.util.*;
 
+import static java.nio.charset.StandardCharsets.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
@@ -35,7 +36,6 @@ import javax.mail.Session;
 import org.urframework.*;
 import org.urframework.io.TypedURFResourceTURFIO;
 
-import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
@@ -61,9 +61,12 @@ import com.globalmentor.text.W3CDateFormat;
 import com.globalmentor.text.xml.XML;
 import com.globalmentor.util.*;
 import com.guiseframework.component.*;
+
 import static com.guiseframework.Resources.*;
+
 import com.guiseframework.platform.*;
 import com.guiseframework.theme.Theme;
+
 import static com.guiseframework.theme.Theme.*;
 
 /**
@@ -497,7 +500,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 				final File logFile = new File(logDirectory, logFilename); //create a log file object
 				//TODO add a way to let the initializer know if this is a new log file or just a new writer				final boolean isNewLogFile=!logFile.exists();	//see if this is a new log file
 				try {
-					final Writer writer = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(logFile, true)), UTF_8_CHARSET); //create a buffered UTF-8 log writer, appending if the file already exists
+					final Writer writer = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(logFile, true)), UTF_8); //create a buffered UTF-8 log writer, appending if the file already exists
 					final ThreadGroup guiseSessionThreadGroup = Guise.getInstance().getGuiseSessionThreadGroup(Thread.currentThread()); //get the Guise session thread group
 					assert guiseSessionThreadGroup != null : "Expected to be inside a Guise session thread group when application log writer was requested.";
 					final AsynchronousWriterRunnable asynchronousWriterRunnable = new AsynchronousWriterRunnable(writer); //create a runnable for creating the new asynchronous writer

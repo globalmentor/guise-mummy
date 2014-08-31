@@ -24,8 +24,8 @@ import org.urframework.*;
 import org.urframework.io.DefaultURFRDFXMLIO;
 import org.urframework.io.DefaultURFTURFIO;
 
-import static com.globalmentor.io.Charsets.*;
 import static com.globalmentor.text.xml.XML.*;
+import static java.nio.charset.StandardCharsets.*;
 import static org.urframework.TURF.*;
 
 import com.guiseframework.component.*;
@@ -109,7 +109,7 @@ public class URFProcessPanel extends LayoutPanel {
 				if(input != null) { //if there is input
 					try {
 						final URI baseURI = URI.create("info:example/"); //use a default base URI
-						final InputStream inputStream = new ByteArrayInputStream(input.getBytes(UTF_8_CHARSET)); //get an input stream to the input string
+						final InputStream inputStream = new ByteArrayInputStream(input.getBytes(UTF_8)); //get an input stream to the input string
 						final AbstractURFProcessor urfProcessor; //we don't yet know which URF processor we'll use
 						final URF urf; //we'll store the resulting URF data model here
 						if(input.startsWith(SIGNATURE)) { //if this is TURF
