@@ -16,9 +16,9 @@
 
 package com.guiseframework.platform.web.css;
 
-import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
-
 import java.util.*;
+
+import static com.globalmentor.text.css.CSS.*;
 import static java.util.Collections.*;
 
 import com.globalmentor.model.NameValuePair;

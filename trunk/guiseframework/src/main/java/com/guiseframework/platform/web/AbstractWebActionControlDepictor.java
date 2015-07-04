@@ -22,7 +22,7 @@ import java.util.*;
 import com.guiseframework.component.*;
 import com.guiseframework.platform.*;
 
-import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
+import static com.globalmentor.text.css.CSS.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**

@@ -23,11 +23,11 @@ import java.util.*;
 import static com.globalmentor.java.Arrays.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Numbers.*;
-import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
+import static com.globalmentor.text.css.CSS.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 
 import com.globalmentor.collections.iterators.ReverseIterator;
-import com.globalmentor.text.xml.stylesheets.css.XMLCSS;
+import com.globalmentor.text.css.CSS;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.Axis;
@@ -586,7 +586,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 	 * This implementation converts the alignment to a value by determining into which third the alignment value falls.
 	 * </p>
 	 * <p>
-	 * Note that these values also work on the {@link Axis#Y} axis for the CSS {@link XMLCSS#CSS_PROP_VERTICAL_ALIGN} property.
+	 * Note that these values also work on the {@link Axis#Y} axis for the CSS {@link CSS#CSS_PROP_VERTICAL_ALIGN} property.
 	 * </p>
 	 * @param alignment The alignment value to convert.
 	 * @param axis The axis of alignment.

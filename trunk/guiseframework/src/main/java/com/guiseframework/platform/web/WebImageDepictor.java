@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
-import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
+import static com.globalmentor.text.css.CSS.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 
 import com.globalmentor.text.xml.xhtml.XHTML;

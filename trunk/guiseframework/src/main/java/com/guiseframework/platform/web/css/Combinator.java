@@ -19,7 +19,7 @@ package com.guiseframework.platform.web.css;
 import static com.globalmentor.java.Characters.GREATER_THAN_CHAR;
 import static com.globalmentor.java.Characters.PLUS_SIGN_CHAR;
 import static com.globalmentor.java.Characters.TILDE_CHAR;
-import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
+import static com.globalmentor.text.css.CSS.*;
 
 /**
  * A combinator separating sequences of simple selectors.

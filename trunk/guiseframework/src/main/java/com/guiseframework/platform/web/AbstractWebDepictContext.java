@@ -22,7 +22,7 @@ import java.util.*;
 
 import com.globalmentor.facebook.*;
 import com.globalmentor.java.Integers;
-import com.globalmentor.text.xml.stylesheets.css.*;
+import com.globalmentor.text.css.CSS;
 
 import com.guiseframework.*;
 import com.guiseframework.component.layout.Orientation;
@@ -31,7 +31,7 @@ import com.guiseframework.geometry.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.StringBuilders.*;
-import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
+import static com.globalmentor.text.css.CSS.*;
 import static com.guiseframework.model.ui.PresentationModel.*;
 import com.guiseframework.platform.AbstractXHTMLDepictContext;
 import com.guiseframework.platform.web.WebPlatform;
@@ -153,7 +153,7 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 
 	/**
 	 * Appends a CSS string representation of the given color. This method correctly handles transparent colors with the special CSS keyword
-	 * {@value XMLCSS#CSS_COLOR_TRANSPARENT}.
+	 * {@value CSS#CSS_COLOR_TRANSPARENT}.
 	 * @param stringBuilder The string builder to which the style will be added.
 	 * @param color The color to represent in CSS.
 	 * @return The provided string builder.

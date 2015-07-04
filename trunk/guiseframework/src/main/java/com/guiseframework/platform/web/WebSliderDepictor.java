@@ -32,7 +32,7 @@ import com.guiseframework.validator.*;
 
 import static com.globalmentor.java.Numbers.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
+import static com.globalmentor.text.css.CSS.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 

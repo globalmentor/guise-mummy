@@ -31,7 +31,7 @@ import com.guiseframework.style.Color;
 
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
+import static com.globalmentor.text.css.CSS.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 

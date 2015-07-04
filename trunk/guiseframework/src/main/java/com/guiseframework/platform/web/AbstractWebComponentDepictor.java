@@ -39,7 +39,7 @@ import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.text.TextFormatter.*;
-import static com.globalmentor.text.xml.stylesheets.css.XMLCSS.*;
+import static com.globalmentor.text.css.CSS.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.guiseframework.model.ui.PresentationModel.*;
 import com.guiseframework.style.Color;
