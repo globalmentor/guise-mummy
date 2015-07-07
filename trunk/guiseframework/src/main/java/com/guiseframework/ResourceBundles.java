@@ -33,7 +33,6 @@ import static com.globalmentor.java.Java.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.model.Locales.*;
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.rdf.RDF.*;
 import static com.globalmentor.rdf.RDFResources.*;
 import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.util.PropertiesUtilities.*;
@@ -57,7 +56,7 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 		TURF(org.urframework.TURF.NAME_EXTENSION),
 
 		/** The resource bundle is serialized in an RDF+XML file. */
-		RDFXML(RDF_NAME_EXTENSION),
+		RDFXML(com.globalmentor.rdf.RDFXML.NAME_EXTENSION),
 
 		/** The resource bundle is serialized in an XML file. */
 		XML(XML_NAME_EXTENSION),
