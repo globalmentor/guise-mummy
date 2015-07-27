@@ -22,7 +22,7 @@ import static java.util.Collections.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.servlet.http.HTTPServlets.*;
 
-import com.globalmentor.net.http.HTTP;
+import com.globalmentor.net.HTTP;
 import com.guiseframework.platform.BrandedProduct;
 import com.guiseframework.platform.ClientProduct;
 

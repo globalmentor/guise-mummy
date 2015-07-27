@@ -21,7 +21,7 @@ import java.util.*;
 import com.globalmentor.net.ContentType;
 
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.net.http.HTTP.*;
+import static com.globalmentor.net.HTTP.*;
 
 import com.guiseframework.platform.AbstractBrandedProduct;
 

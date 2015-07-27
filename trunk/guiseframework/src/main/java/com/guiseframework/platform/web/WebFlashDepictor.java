@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 
 import com.globalmentor.net.ContentType;
-import com.globalmentor.net.http.HTTP;
+import com.globalmentor.net.HTTP;
 
 import static com.globalmentor.net.ContentTypeConstants.*;
 import static com.globalmentor.net.URIs.*;

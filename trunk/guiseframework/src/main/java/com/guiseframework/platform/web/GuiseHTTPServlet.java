@@ -64,7 +64,7 @@ import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.net.http.HTTP.*;
+import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.servlet.Servlets.*;
 import static com.globalmentor.servlet.http.HTTPServlets.*;
 import static com.globalmentor.text.css.CSS.*;
