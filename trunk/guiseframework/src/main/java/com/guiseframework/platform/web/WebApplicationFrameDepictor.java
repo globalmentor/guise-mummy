@@ -199,7 +199,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 				depictContext.write('\n');
 			}
 			depictContext.write('\t'); //og:type (required)
-			depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.TYPE_LOCAL_NAME, PredefinedType.WEBSITE.getID());
+			depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.TYPE_LOCAL_NAME, OpenGraph.PredefinedType.WEBSITE.getID());
 			depictContext.write('\n');
 			final URI iconURI = navigationDescription.getIcon(); //get the navigation icon, if any
 			if(iconURI == null) { //TODO fix
