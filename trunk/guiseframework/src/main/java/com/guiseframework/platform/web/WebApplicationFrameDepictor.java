@@ -25,6 +25,7 @@ import org.urframework.URFResource;
 import org.urframework.dcmi.DCMI;
 
 import com.globalmentor.facebook.*;
+import com.globalmentor.metadata.OpenGraph;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.net.URIPath;
 

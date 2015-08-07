@@ -22,6 +22,7 @@ import java.util.*;
 
 import com.globalmentor.facebook.*;
 import com.globalmentor.java.Integers;
+import com.globalmentor.metadata.OpenGraph;
 import com.globalmentor.text.css.CSS;
 
 import com.guiseframework.*;
