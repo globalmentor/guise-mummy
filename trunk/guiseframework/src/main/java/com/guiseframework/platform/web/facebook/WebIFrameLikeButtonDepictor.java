@@ -26,7 +26,7 @@ import com.globalmentor.net.URIQueryParameter;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
-import static com.globalmentor.www.facebook.Facebook.*;
+import static com.guiseframework.platform.web.facebook.Facebook.*;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.facebook.LikeButton;

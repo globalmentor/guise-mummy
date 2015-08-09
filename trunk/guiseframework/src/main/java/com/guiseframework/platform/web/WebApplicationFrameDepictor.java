@@ -39,7 +39,6 @@ import static com.globalmentor.text.xml.XML.*;
 
 import com.globalmentor.text.TextFormatter;
 import com.globalmentor.text.xml.xhtml.XHTML;
-import com.globalmentor.www.facebook.*;
 import com.guiseframework.*;
 
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
@@ -49,6 +48,7 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.Axis;
 import com.guiseframework.model.*;
+import com.guiseframework.platform.web.facebook.Facebook;
 import com.guiseframework.theme.Theme;
 
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;

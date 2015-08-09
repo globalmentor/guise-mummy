@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.globalmentor.www.adobe;
+package com.guiseframework.platform.web.adobe;
 
 /**
  * Information related to Adobe Flash.

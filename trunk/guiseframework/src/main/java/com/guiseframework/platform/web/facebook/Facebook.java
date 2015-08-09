@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.globalmentor.www.facebook;
+package com.guiseframework.platform.web.facebook;
 
 import java.net.URI;
 
