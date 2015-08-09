@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.globalmentor.facebook;
+package com.globalmentor.www.facebook;
 
 import java.net.URI;
 

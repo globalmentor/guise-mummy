@@ -20,11 +20,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import com.globalmentor.facebook.*;
 import com.globalmentor.java.Integers;
 import com.globalmentor.metadata.OpenGraph;
 import com.globalmentor.text.css.CSS;
-
+import com.globalmentor.www.facebook.*;
 import com.guiseframework.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.geometry.*;

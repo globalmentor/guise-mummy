@@ -24,7 +24,6 @@ import java.util.*;
 import org.urframework.URFResource;
 import org.urframework.dcmi.DCMI;
 
-import com.globalmentor.facebook.*;
 import com.globalmentor.metadata.OpenGraph;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.net.URIPath;
@@ -40,6 +39,7 @@ import static com.globalmentor.text.xml.XML.*;
 
 import com.globalmentor.text.TextFormatter;
 import com.globalmentor.text.xml.xhtml.XHTML;
+import com.globalmentor.www.facebook.*;
 import com.guiseframework.*;
 
 import static com.globalmentor.text.xml.xhtml.XHTML.*;

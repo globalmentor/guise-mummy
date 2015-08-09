@@ -58,7 +58,6 @@ import com.guiseframework.input.Key;
 import com.guiseframework.model.FileItemResourceImport;
 import com.guiseframework.platform.*;
 
-import static com.globalmentor.flash.Flash.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
@@ -72,6 +71,7 @@ import static com.globalmentor.text.elff.WebTrendsConstants.*;
 import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.time.TimeZones.*;
+import static com.globalmentor.www.adobe.Flash.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
 import static com.guiseframework.platform.web.WebUserAgentProduct.Brand.*;
 

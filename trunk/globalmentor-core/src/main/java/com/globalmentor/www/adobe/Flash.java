@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.globalmentor.flash;
+package com.globalmentor.www.adobe;
 
 /**
  * Information related to Adobe Flash.
