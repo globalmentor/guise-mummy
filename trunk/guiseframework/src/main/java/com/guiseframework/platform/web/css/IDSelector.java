@@ -17,7 +17,7 @@
 package com.guiseframework.platform.web.css;
 
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.text.css.CSS.*;
+import static com.globalmentor.w3c.spec.CSS.*;
 
 /**
  * An ID simple selector.

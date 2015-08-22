@@ -19,7 +19,7 @@ package com.guiseframework.platform.web;
 import java.util.Map;
 
 import static com.globalmentor.java.Enums.*;
-import static com.globalmentor.text.css.CSS.*;
+import static com.globalmentor.w3c.spec.CSS.*;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;

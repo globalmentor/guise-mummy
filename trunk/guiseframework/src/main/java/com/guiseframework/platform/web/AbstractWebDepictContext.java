@@ -22,7 +22,7 @@ import java.util.*;
 
 import com.globalmentor.java.Integers;
 import com.globalmentor.metadata.OpenGraph;
-import com.globalmentor.text.css.CSS;
+import com.globalmentor.w3c.spec.CSS;
 import com.guiseframework.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.geometry.*;
@@ -30,7 +30,7 @@ import com.guiseframework.geometry.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.StringBuilders.*;
-import static com.globalmentor.text.css.CSS.*;
+import static com.globalmentor.w3c.spec.CSS.*;
 import static com.guiseframework.model.ui.PresentationModel.*;
 import com.guiseframework.platform.AbstractXHTMLDepictContext;
 import com.guiseframework.platform.web.WebPlatform;

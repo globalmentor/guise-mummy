@@ -18,7 +18,7 @@ package com.guiseframework.platform.web.css;
 
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Strings.*;
-import static com.globalmentor.text.css.CSS.*;
+import static com.globalmentor.w3c.spec.CSS.*;
 
 import java.io.*;
 import java.util.*;

@@ -34,7 +34,6 @@ import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.javascript.JavaScript.*;
 import static com.globalmentor.model.Locales.*;
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.text.css.CSS.*;
 import static com.globalmentor.text.xml.XML.*;
 
 import com.globalmentor.text.TextFormatter;
@@ -42,6 +41,7 @@ import com.globalmentor.text.xml.xhtml.XHTML;
 import com.guiseframework.*;
 
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.w3c.spec.CSS.*;
 import static com.guiseframework.GuiseApplication.*;
 
 import com.guiseframework.component.*;

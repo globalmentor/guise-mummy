@@ -18,8 +18,8 @@ package com.guiseframework.platform.web;
 
 import java.util.Map;
 
-import static com.globalmentor.text.css.CSS.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.w3c.spec.CSS.*;
 
 import com.guiseframework.component.*;
 
