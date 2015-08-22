@@ -20,6 +20,7 @@ import java.net.URI;
 
 import com.globalmentor.java.Objects;
 import com.globalmentor.net.ContentType;
+import com.globalmentor.text.Text;
 
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.text.Text.*;
@@ -52,7 +53,7 @@ public class DefaultInfoModel extends DefaultLabelModel implements InfoModel {
 	}
 
 	/** The content type of the description text. */
-	private ContentType descriptionContentType = PLAIN_TEXT_CONTENT_TYPE;
+	private ContentType descriptionContentType = Text.PLAIN_CONTENT_TYPE;
 
 	/** @return The content type of the description text. */
 	public ContentType getDescriptionContentType() {
@@ -100,7 +101,7 @@ public class DefaultInfoModel extends DefaultLabelModel implements InfoModel {
 	}
 
 	/** The content type of the advisory information text. */
-	private ContentType infoContentType = PLAIN_TEXT_CONTENT_TYPE;
+	private ContentType infoContentType = Text.PLAIN_CONTENT_TYPE;
 
 	/** @return The content type of the advisory information text. */
 	public ContentType getInfoContentType() {

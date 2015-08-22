@@ -21,6 +21,7 @@ import java.util.*;
 
 import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
 import com.globalmentor.beans.GenericPropertyChangeEvent;
+import com.globalmentor.text.xml.xhtml.XHTML;
 import com.guiseframework.Resources;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
@@ -96,7 +97,7 @@ public class InternationalizationPanel extends LayoutPanel {
 
 		//localized text
 		final TextBox text = new TextBox(); //create a text component
-		text.setTextContentType(XHTML_CONTENT_TYPE); //use application/xhtml+xml content
+		text.setTextContentType(XHTML.XHTML_CONTENT_TYPE); //use application/xhtml+xml content
 		text.setText(Resources.createStringResourceReference(UN_CHARTER_PREAMBLE_RESOURCE_KEY)); //use the UN Charter Preamble resource, appropriately localized
 
 		add(text, new RegionConstraints(Region.CENTER)); //add the text in the center of the panel

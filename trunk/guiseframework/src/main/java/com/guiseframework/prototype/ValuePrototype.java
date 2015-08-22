@@ -23,6 +23,7 @@ import java.net.URI;
 
 import com.globalmentor.java.Objects;
 import com.globalmentor.net.ContentType;
+import com.globalmentor.text.Text;
 import com.guiseframework.model.*;
 
 /**
@@ -96,7 +97,7 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	}
 
 	/** The content type of the label text. */
-	private ContentType labelContentType = PLAIN_TEXT_CONTENT_TYPE;
+	private ContentType labelContentType = Text.PLAIN_CONTENT_TYPE;
 
 	/** @return The content type of the label text. */
 	public ContentType getLabelContentType() {
@@ -144,7 +145,7 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	}
 
 	/** The content type of the description text. */
-	private ContentType descriptionContentType = PLAIN_TEXT_CONTENT_TYPE;
+	private ContentType descriptionContentType = Text.PLAIN_CONTENT_TYPE;
 
 	/** @return The content type of the description text. */
 	public ContentType getDescriptionContentType() {
@@ -192,7 +193,7 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	}
 
 	/** The content type of the advisory information text. */
-	private ContentType infoContentType = PLAIN_TEXT_CONTENT_TYPE;
+	private ContentType infoContentType = Text.PLAIN_CONTENT_TYPE;
 
 	/** @return The content type of the advisory information text. */
 	public ContentType getInfoContentType() {

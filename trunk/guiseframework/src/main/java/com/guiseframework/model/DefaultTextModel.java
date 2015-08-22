@@ -18,6 +18,7 @@ package com.guiseframework.model;
 
 import com.globalmentor.java.Objects;
 import com.globalmentor.net.ContentType;
+import com.globalmentor.text.Text;
 
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.text.Text.*;
@@ -82,11 +83,11 @@ public class DefaultTextModel extends AbstractModel implements TextModel {
 	}
 
 	/**
-	 * Text constructor with a default {@link Model#PLAIN_TEXT_CONTENT_TYPE} content type.
+	 * Text constructor with a default {@link Text#PLAIN_CONTENT_TYPE} content type.
 	 * @param text The text, which may include a resource reference, or <code>null</code> if there is no text.
 	 */
 	public DefaultTextModel(final String text) {
-		this(text, PLAIN_TEXT_CONTENT_TYPE); //construct the class with a plain text content type
+		this(text, Text.PLAIN_CONTENT_TYPE); //construct the class with a plain text content type
 	}
 
 	/**

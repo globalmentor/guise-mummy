@@ -23,6 +23,7 @@ import java.net.URI;
 
 import com.globalmentor.java.Objects;
 import com.globalmentor.net.ContentType;
+import com.globalmentor.text.Text;
 
 /**
  * A default implementation of a model for an identifier such as text and/or an icon.
@@ -73,7 +74,7 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel {
 	}
 
 	/** The content type of the label text. */
-	private ContentType labelContentType = PLAIN_TEXT_CONTENT_TYPE;
+	private ContentType labelContentType = Text.PLAIN_CONTENT_TYPE;
 
 	/** @return The content type of the label text. */
 	public ContentType getLabelContentType() {

@@ -22,6 +22,7 @@ import java.util.*;
 import static java.util.Collections.*;
 
 import com.globalmentor.net.ContentType;
+import com.globalmentor.text.Text;
 
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.text.Text.*;
@@ -208,7 +209,7 @@ public class Notification extends DefaultLabelModel {
 	 * @throws NullPointerException if the given message, severity, and/or options is <code>null</code>.
 	 */
 	public Notification(final String message, final Severity severity, final Throwable error, final Option... options) {
-		this(message, Model.PLAIN_TEXT_CONTENT_TYPE, severity, error, options); //construct the notification with a plain text message
+		this(message, Text.PLAIN_CONTENT_TYPE, severity, error, options); //construct the notification with a plain text message
 	}
 
 	/**

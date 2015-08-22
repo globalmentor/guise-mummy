@@ -22,6 +22,7 @@ import static com.globalmentor.text.Text.*;
 
 import com.globalmentor.java.Objects;
 import com.globalmentor.net.ContentType;
+import com.globalmentor.text.Text;
 
 /**
  * A message component showing the message and any label. The message only supports text content types, including:
@@ -65,7 +66,7 @@ public class Message extends AbstractComponent //TODO del component if not neede
 	}
 
 	/** The content type of the message text. */
-	private ContentType messageContentType = Component.PLAIN_TEXT_CONTENT_TYPE;
+	private ContentType messageContentType = Text.PLAIN_CONTENT_TYPE;
 
 	/** @return The content type of the message text. */
 	public ContentType getMessageContentType() {

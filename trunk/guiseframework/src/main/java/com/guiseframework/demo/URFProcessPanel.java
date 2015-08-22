@@ -28,6 +28,7 @@ import static com.globalmentor.text.xml.XML.*;
 import static java.nio.charset.StandardCharsets.*;
 import static org.urframework.TURF.*;
 
+import com.globalmentor.text.xml.xhtml.XHTML;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.component.urf.DefaultURFResourceTreeNodeRepresentationStrategy;
@@ -86,7 +87,7 @@ public class URFProcessPanel extends LayoutPanel {
 		//instructions
 		final TextBox text = new TextBox(); //create new text
 		text.setLabel("Instructions"); //give a label to the text
-		text.setTextContentType(XHTML_CONTENT_TYPE); //indicate that the message will be of the "application/xhtml+xml" content type
+		text.setTextContentType(XHTML.XHTML_CONTENT_TYPE); //indicate that the message will be of the "application/xhtml+xml" content type
 		text.setText(INSTRUCTIONS); //set the instructions
 		controlPanel.add(text); //add the text message to the control panel
 		//process button

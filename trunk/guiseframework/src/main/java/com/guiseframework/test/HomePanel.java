@@ -33,6 +33,7 @@ import com.globalmentor.iso.idcard.Product;
 import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.log.Log;
 import com.globalmentor.net.URIPath;
+import com.globalmentor.text.xml.xhtml.XHTML;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.Resources;
@@ -346,7 +347,7 @@ public class HomePanel extends LayoutPanel {
 		*/
 
 		final TextBox testText = new TextBox();
-		testText.setTextContentType(XHTML_FRAGMENT_CONTENT_TYPE);
+		testText.setTextContentType(XHTML.XHTML_FRAGMENT_CONTENT_TYPE);
 		//TODO bring back		testText.getModel().setTextResourceKey("test.html");
 		testText.setText("this is <strong>good</strong> stuff");
 

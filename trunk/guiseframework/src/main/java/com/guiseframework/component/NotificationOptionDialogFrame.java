@@ -19,6 +19,7 @@ package com.guiseframework.component;
 import java.beans.PropertyVetoException;
 
 import com.globalmentor.net.ContentType;
+import com.globalmentor.text.Text;
 import com.globalmentor.beans.*;
 import com.guiseframework.event.*;
 import com.guiseframework.input.*;
@@ -61,13 +62,13 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	}
 
 	/**
-	 * Text constructor with a default {@link Model#PLAIN_TEXT_CONTENT_TYPE} content type. Duplicate options are ignored.
+	 * Text constructor with a default {@link Text#PLAIN_CONTENT_TYPE} content type. Duplicate options are ignored.
 	 * @param text The text, which may include a resource reference, or <code>null</code> if there is no text.
 	 * @param options The available options.
 	 * @throws NullPointerException if the given options is <code>null</code>. #see {@link TextBox}
 	 */
 	public NotificationOptionDialogFrame(final String text, final Notification.Option... options) {
-		this(text, PLAIN_TEXT_CONTENT_TYPE, options); //construct the class with a plain text content type
+		this(text, Text.PLAIN_CONTENT_TYPE, options); //construct the class with a plain text content type
 	}
 
 	/**
