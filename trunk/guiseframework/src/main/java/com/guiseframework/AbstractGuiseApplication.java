@@ -58,8 +58,8 @@ import com.globalmentor.mail.MailManager;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.net.URIs;
 import com.globalmentor.text.W3CDateFormat;
-import com.globalmentor.text.xml.XML;
 import com.globalmentor.util.*;
+import com.globalmentor.w3c.spec.XML;
 import com.guiseframework.component.*;
 
 import static com.guiseframework.Resources.*;

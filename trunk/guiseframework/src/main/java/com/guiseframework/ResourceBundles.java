@@ -34,8 +34,8 @@ import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.model.Locales.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.rdf.RDFResources.*;
-import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.util.PropertiesUtilities.*;
+import static com.globalmentor.w3c.spec.XML.*;
 
 /**
  * Utilities for working with resource bundles.

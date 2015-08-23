@@ -38,6 +38,7 @@ import static com.globalmentor.security.MessageDigests.*;
 import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.util.Base64.*;
+import static com.globalmentor.w3c.spec.XML.*;
 
 /**
  * Abstract encapsulation of <code>text/xml</code> information related to the current depiction.

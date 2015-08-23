@@ -19,7 +19,7 @@ package com.guiseframework.platform.web;
 import java.net.URI;
 import java.util.Queue;
 
-import static com.globalmentor.text.xml.XML.*;
+import static com.globalmentor.w3c.spec.XML.*;
 
 import com.globalmentor.net.ContentType;
 import com.globalmentor.net.URIPath;
