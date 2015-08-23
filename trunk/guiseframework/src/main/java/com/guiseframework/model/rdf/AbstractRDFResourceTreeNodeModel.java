@@ -20,7 +20,8 @@ import java.util.*;
 
 import static com.globalmentor.java.Classes.*;
 import com.globalmentor.rdf.*;
-import static com.globalmentor.rdf.RDF.*;
+
+import static com.globalmentor.w3c.spec.RDF.*;
 
 import com.guiseframework.model.*;
 

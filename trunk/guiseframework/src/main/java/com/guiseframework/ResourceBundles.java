@@ -56,7 +56,7 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 		TURF(org.urframework.TURF.NAME_EXTENSION),
 
 		/** The resource bundle is serialized in an RDF+XML file. */
-		RDFXML(com.globalmentor.rdf.RDFXML.NAME_EXTENSION),
+		RDFXML(com.globalmentor.w3c.spec.RDF.XML.NAME_EXTENSION),
 
 		/** The resource bundle is serialized in an XML file. */
 		XML(XML_NAME_EXTENSION),
@@ -99,7 +99,7 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 	 */
 	public static ResourceBundle getResourceBundle(final String baseName, final Locale locale, final ClassLoader loader, final ResourceBundle parent,
 			final IO<? extends URFResource> urfResourceIO, final IO<? extends RDFResource> rdfResourceIO, final URI rdfPropertyNamespaceURI)
-			throws MissingResourceException {
+					throws MissingResourceException {
 		final String basePath = baseName.replace(PACKAGE_SEPARATOR, PATH_SEPARATOR); //create a base path from base name
 		final ResourceBundleFormat[] resourceBundleFormats = ResourceBundleFormat.values(); //get the available resource bundle formats
 		final int resourceBundleFormatCount = resourceBundleFormats.length; //see how many resource bundle formats there are
@@ -161,16 +161,16 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 								throw (MissingResourceException)new MissingResourceException(uriSyntaxException.getMessage(), baseName + Locales.LOCALE_SEPARATOR + locale, "")
 										.initCause(uriSyntaxException);
 							} catch(final IOException ioException) { //if there is an error loading the resource
-								throw (MissingResourceException)new MissingResourceException("I/O error in " + resourceURL + ": " + ioException.getMessage(), baseName
-										+ Locales.LOCALE_SEPARATOR + locale, "").initCause(ioException);
+								throw (MissingResourceException)new MissingResourceException("I/O error in " + resourceURL + ": " + ioException.getMessage(),
+										baseName + Locales.LOCALE_SEPARATOR + locale, "").initCause(ioException);
 							}
 						}
 					}
 				}
 			}
 		}
-		throw new MissingResourceException("Can't find resource bundle for base name " + baseName + ", locale " + locale, baseName + Locales.LOCALE_SEPARATOR
-				+ locale, "");
+		throw new MissingResourceException("Can't find resource bundle for base name " + baseName + ", locale " + locale,
+				baseName + Locales.LOCALE_SEPARATOR + locale, "");
 	}
 
 	/**
