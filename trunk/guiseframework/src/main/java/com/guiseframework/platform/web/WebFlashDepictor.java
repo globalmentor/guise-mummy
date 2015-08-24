@@ -24,7 +24,7 @@ import com.globalmentor.net.HTTP;
 
 import static com.globalmentor.net.ContentTypeConstants.*;
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.Flash;

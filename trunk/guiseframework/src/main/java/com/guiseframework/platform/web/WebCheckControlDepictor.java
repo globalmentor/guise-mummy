@@ -28,7 +28,7 @@ import com.guiseframework.platform.PlatformEvent;
 
 import static com.globalmentor.java.Booleans.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**

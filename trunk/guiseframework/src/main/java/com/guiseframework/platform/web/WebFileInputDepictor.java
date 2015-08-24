@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.*;
 
 import com.globalmentor.net.ContentType;
-
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;
 import com.guiseframework.platform.DepictEvent;
@@ -30,7 +29,7 @@ import com.guiseframework.validator.*;
 
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 
 /**
  * Strategy for rendering a resource import control as an XHTML <code>&lt;input&gt;</code> element with type="file".

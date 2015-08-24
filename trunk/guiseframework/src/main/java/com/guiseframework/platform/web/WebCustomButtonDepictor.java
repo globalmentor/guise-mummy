@@ -21,8 +21,8 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.w3c.spec.CSS.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Corner;

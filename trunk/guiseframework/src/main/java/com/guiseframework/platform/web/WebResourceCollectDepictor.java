@@ -23,14 +23,12 @@ import java.util.Map;
 
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.model.TaskState;
-
 import com.guiseframework.Bookmark;
 import com.guiseframework.component.*;
-import com.guiseframework.model.*;
 import com.guiseframework.platform.*;
 
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
 
 /**

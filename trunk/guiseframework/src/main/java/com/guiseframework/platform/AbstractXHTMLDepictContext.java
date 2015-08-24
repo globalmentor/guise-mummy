@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.javascript.JavaScript.*;
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 import static java.util.Collections.*;
 
 import com.globalmentor.text.ASCII;

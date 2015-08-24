@@ -21,7 +21,7 @@ import java.net.URI;
 
 import com.guiseframework.component.*;
 
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**

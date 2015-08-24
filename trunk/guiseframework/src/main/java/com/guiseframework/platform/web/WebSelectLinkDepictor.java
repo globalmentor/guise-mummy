@@ -19,7 +19,7 @@ package com.guiseframework.platform.web;
 import java.io.IOException;
 import java.net.URI;
 
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 
 import com.guiseframework.component.*;
 

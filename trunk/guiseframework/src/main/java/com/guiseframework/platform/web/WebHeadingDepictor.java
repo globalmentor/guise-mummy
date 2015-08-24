@@ -16,7 +16,7 @@
 
 package com.guiseframework.platform.web;
 
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 
 import com.guiseframework.component.*;
 

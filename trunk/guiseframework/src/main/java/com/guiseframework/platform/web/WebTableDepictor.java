@@ -29,7 +29,7 @@ import com.guiseframework.platform.DepictContext;
 import com.guiseframework.platform.XHTMLDepictContext;
 
 import static com.globalmentor.java.Enums.*;
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**

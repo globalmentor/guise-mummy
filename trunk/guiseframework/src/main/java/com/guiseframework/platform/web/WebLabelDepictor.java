@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import com.guiseframework.component.LabelComponent;
 
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 
 /**
  * Strategy for rendering a label as an XHTML <code>&lt;label&gt;</code> element.

@@ -22,7 +22,8 @@ import java.util.*;
 
 import static com.globalmentor.java.Objects.*;
 import com.globalmentor.log.Log;
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
+
+import static com.globalmentor.w3c.spec.HTML.*;
 
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;

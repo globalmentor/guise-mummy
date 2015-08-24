@@ -25,7 +25,7 @@ import com.globalmentor.net.URIQueryParameter;
 
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.net.HTTP.*;
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 import static com.guiseframework.platform.web.facebook.Facebook.*;
 
 import com.guiseframework.GuiseSession;

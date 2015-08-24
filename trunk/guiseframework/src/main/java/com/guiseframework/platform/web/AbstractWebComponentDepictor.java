@@ -26,7 +26,6 @@ import java.util.regex.*;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.text.xml.XML;
-
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
@@ -41,6 +40,7 @@ import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.text.TextFormatter.*;
 import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.w3c.spec.CSS.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 import static com.guiseframework.model.ui.PresentationModel.*;
 import com.guiseframework.style.Color;
 import com.guiseframework.style.FontStyle;

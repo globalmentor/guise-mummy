@@ -36,11 +36,11 @@ import static com.globalmentor.model.Locales.*;
 import static com.globalmentor.net.URIs.*;
 
 import com.globalmentor.text.TextFormatter;
-import com.globalmentor.text.xml.xhtml.XHTML;
+import com.globalmentor.w3c.spec.HTML;
 import com.guiseframework.*;
 
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.w3c.spec.CSS.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 import static com.globalmentor.w3c.spec.XML.*;
 import static com.guiseframework.GuiseApplication.*;
 
@@ -150,7 +150,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString()); //xmlns:guise="http://guiseframework.com/id/ml#"
 		depictContext.writeAttribute(XMLNS_NAMESPACE_URI, OpenGraph.NAMESPACE_PREFIX, OpenGraph.NAMESPACE_URI.toString()); //xmlns:og="http://ogp.me/ns#"
 		depictContext.writeAttribute(XMLNS_NAMESPACE_URI, Facebook.NAMESPACE_PREFIX, Facebook.NAMESPACE_URI.toString()); //xmlns:fb="https://www.facebook.com/2008/fbml"
-		depictContext.writeAttribute(null, XHTML.ATTRIBUTE_LANG, getLanguageTag(locale)); //lang="locale"
+		depictContext.writeAttribute(null, HTML.ATTRIBUTE_LANG, getLanguageTag(locale)); //lang="locale"
 		final Orientation componentOrientation = component.getComponentOrientation(); //get the orientation used by the frame
 		writeDirectionAttribute(componentOrientation, componentOrientation.getFlow(Axis.X)); //always write the direction for the <xhtml:html> element
 		depictContext.write('\n');

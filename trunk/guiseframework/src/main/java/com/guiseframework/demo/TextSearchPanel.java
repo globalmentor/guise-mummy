@@ -22,7 +22,7 @@ import java.util.regex.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.net.ContentType;
-import com.globalmentor.text.xml.xhtml.XHTML;
+import com.globalmentor.w3c.spec.HTML;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.model.*;
@@ -59,7 +59,7 @@ public class TextSearchPanel extends LayoutPanel {
 		//instructions
 		final Message message = new Message(); //create a new message
 		message.setLabel("Instructions"); //give a label to the message
-		message.setMessageContentType(XHTML.XHTML_CONTENT_TYPE); //indicate that the message will be of the "application/xhtml+xml" content type
+		message.setMessageContentType(HTML.XHTML_CONTENT_TYPE); //indicate that the message will be of the "application/xhtml+xml" content type
 		message.setMessage(INSTRUCTIONS); //set the instructions
 		inputPanel.add(message); //add the message to the input panel
 		//search regular expression input

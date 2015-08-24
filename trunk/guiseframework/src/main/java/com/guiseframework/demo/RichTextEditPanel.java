@@ -19,7 +19,7 @@ package com.guiseframework.demo;
 import java.beans.PropertyVetoException;
 
 import com.globalmentor.text.Text;
-import com.globalmentor.text.xml.xhtml.XHTML;
+import com.globalmentor.w3c.spec.HTML;
 import com.guiseframework.component.*;
 
 /**
@@ -39,7 +39,7 @@ public class RichTextEditPanel extends LayoutPanel {
 		xhtmlTextControl.setLabel("XHTML"); //set the label for the text control
 		try {
 			xhtmlTextControl.setValue(SAMPLE_TEXT); //set the sample text in the rich text control
-			xhtmlTextControl.setValueContentType(XHTML.XHTML_FRAGMENT_CONTENT_TYPE); //indicate that the text is an XHTML fragment
+			xhtmlTextControl.setValueContentType(HTML.XHTML_FRAGMENT_CONTENT_TYPE); //indicate that the text is an XHTML fragment
 		} catch(final PropertyVetoException propertyVetoException) { //we don't have a validator installed, so there should be no problems setting the value 
 			throw new AssertionError(propertyVetoException);
 		}

@@ -18,7 +18,7 @@ package com.guiseframework.demo;
 
 import java.net.URI;
 
-import com.globalmentor.text.xml.xhtml.XHTML;
+import com.globalmentor.w3c.spec.HTML;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.Extent;
@@ -57,7 +57,7 @@ public class BookDescriptionPanel extends LayoutPanel {
 
 		final Picture book1 = new Picture(); //_The Great Philosophers_
 		book1.setImageURI(URI.create("http://www.garretwilson.com/books/reviews/greatphilosophers_small.jpg")); //set the URI
-		book1.setDescriptionContentType(XHTML.XHTML_CONTENT_TYPE); //use an XHTML description
+		book1.setDescriptionContentType(HTML.XHTML_CONTENT_TYPE); //use an XHTML description
 		book1.setDescription( //set the description
 				"<?xml version='1.0'?>"
 						+ "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>"
@@ -83,7 +83,7 @@ public class BookDescriptionPanel extends LayoutPanel {
 
 		final Picture book2 = new Picture(); //_The Supreme Court_
 		book2.setImageURI(URI.create("http://www.garretwilson.com/books/reviews/supremecourt_small.jpg")); //set the URI
-		book2.setDescriptionContentType(XHTML.XHTML_CONTENT_TYPE); //use an XHTML description
+		book2.setDescriptionContentType(HTML.XHTML_CONTENT_TYPE); //use an XHTML description
 		book2.setDescription( //set the description
 				"<?xml version='1.0'?>"
 						+ "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>"
@@ -102,7 +102,7 @@ public class BookDescriptionPanel extends LayoutPanel {
 
 		final Picture book3 = new Picture(); //_Uncertain Identities_
 		book3.setImageURI(URI.create("http://www.garretwilson.com/books/reviews/uncertainidentities_small.jpg")); //set the URI
-		book3.setDescriptionContentType(XHTML.XHTML_CONTENT_TYPE); //use an XHTML description
+		book3.setDescriptionContentType(HTML.XHTML_CONTENT_TYPE); //use an XHTML description
 		book3.setDescription( //set the description
 				"<?xml version='1.0'?>"
 						+ "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>"

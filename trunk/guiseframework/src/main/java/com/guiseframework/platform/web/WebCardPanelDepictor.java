@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import com.guiseframework.component.AbstractCardPanel;
 
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**

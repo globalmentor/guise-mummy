@@ -23,8 +23,8 @@ import java.util.*;
 import static com.globalmentor.java.Arrays.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Numbers.*;
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.w3c.spec.CSS.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 
 import com.globalmentor.collections.iterators.ReverseIterator;
 import com.globalmentor.w3c.spec.CSS;

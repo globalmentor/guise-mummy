@@ -23,8 +23,8 @@ import java.util.Map;
 import com.guiseframework.component.*;
 import com.guiseframework.event.AbstractNavigateActionListener;
 
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.w3c.spec.CSS.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**

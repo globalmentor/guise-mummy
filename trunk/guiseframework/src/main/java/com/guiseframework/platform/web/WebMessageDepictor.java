@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import com.guiseframework.component.Message;
 
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 
 /**
  * Strategy for rendering a message component as an XHTML <code>&lt;div&gt;</code> element.

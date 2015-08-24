@@ -21,7 +21,7 @@ import java.util.Map;
 
 import com.guiseframework.component.*;
 
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
+import static com.globalmentor.w3c.spec.HTML.*;
 
 /**
  * Strategy for rendering a {@link LayoutComponent} as an XHTML <code>&lt;div&gt;</code> element.
