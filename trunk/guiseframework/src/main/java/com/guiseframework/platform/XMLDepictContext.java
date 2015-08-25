@@ -21,7 +21,7 @@ import java.net.URI;
 import java.util.*;
 
 import com.globalmentor.net.ContentType;
-import com.globalmentor.text.xml.QualifiedName;
+import com.globalmentor.xml.QualifiedName;
 
 /**
  * Encapsulation of text/xml information related to the current depiction.

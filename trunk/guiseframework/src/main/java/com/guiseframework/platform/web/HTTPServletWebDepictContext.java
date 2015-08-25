@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.servlet.http.HTTPServlets;
 import com.globalmentor.text.Text;
-import com.globalmentor.text.xml.QualifiedName;
+import com.globalmentor.xml.QualifiedName;
 import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 

@@ -27,9 +27,9 @@ import static com.globalmentor.w3c.spec.HTML.*;
 import static java.util.Collections.*;
 
 import com.globalmentor.text.ASCII;
-import com.globalmentor.text.xml.QualifiedName;
-import com.globalmentor.text.xml.xhtml.XHTML;
 import com.globalmentor.w3c.spec.XML;
+import com.globalmentor.xml.QualifiedName;
+import com.globalmentor.xml.xhtml.XHTML;
 import com.guiseframework.*;
 
 /**

@@ -24,8 +24,8 @@ import java.util.*;
 import com.globalmentor.java.Objects;
 import com.globalmentor.java.Strings;
 import com.globalmentor.net.ContentType;
-import com.globalmentor.text.xml.QualifiedName;
-import com.globalmentor.text.xml.XMLNamespacePrefixManager;
+import com.globalmentor.xml.QualifiedName;
+import com.globalmentor.xml.XMLNamespacePrefixManager;
 import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 
@@ -35,10 +35,10 @@ import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Strings.*;
 import static com.globalmentor.security.MessageDigests.*;
-import static com.globalmentor.text.xml.XML.*;
 import static com.globalmentor.util.Base64.*;
 import static com.globalmentor.w3c.spec.HTML.*;
 import static com.globalmentor.w3c.spec.XML.*;
+import static com.globalmentor.xml.XML.*;
 
 /**
  * Abstract encapsulation of <code>text/xml</code> information related to the current depiction.

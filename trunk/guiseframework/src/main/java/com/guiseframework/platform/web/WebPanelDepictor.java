@@ -20,7 +20,7 @@ import static com.globalmentor.w3c.spec.HTML.*;
 
 import javax.annotation.Nonnull;
 
-import com.globalmentor.text.xml.xhtml.XHTML;
+import com.globalmentor.xml.xhtml.XHTML;
 import com.guiseframework.component.*;
 import com.guiseframework.component.SectionComponent.SectionType;
 

@@ -24,7 +24,7 @@ import java.util.Map;
 import static com.globalmentor.w3c.spec.CSS.*;
 import static com.globalmentor.w3c.spec.HTML.*;
 
-import com.globalmentor.text.xml.xhtml.XHTML;
+import com.globalmentor.xml.xhtml.XHTML;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;

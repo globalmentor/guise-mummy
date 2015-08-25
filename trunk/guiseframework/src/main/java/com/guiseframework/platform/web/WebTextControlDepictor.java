@@ -32,8 +32,8 @@ import com.guiseframework.platform.*;
 
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.w3c.spec.HTML.*;
+import static com.globalmentor.xml.xhtml.XHTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
 

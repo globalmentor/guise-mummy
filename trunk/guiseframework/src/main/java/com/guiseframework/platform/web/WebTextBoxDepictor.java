@@ -30,10 +30,10 @@ import static com.globalmentor.java.CharSequences.*;
 
 import com.globalmentor.log.Log;
 
-import static com.globalmentor.text.xml.XML.*;
-import static com.globalmentor.text.xml.xhtml.XHTML.*;
 import static com.globalmentor.w3c.spec.HTML.*;
 import static com.globalmentor.w3c.spec.XML.*;
+import static com.globalmentor.xml.XML.*;
+import static com.globalmentor.xml.xhtml.XHTML.*;
 import static java.nio.charset.StandardCharsets.*;
 
 import com.guiseframework.component.*;
