@@ -22,7 +22,7 @@ import static java.util.Collections.*;
 
 import com.globalmentor.io.Images;
 import com.globalmentor.lex.Identifier;
-import com.globalmentor.text.css.CSSCursor;
+import com.globalmentor.w3c.spec.CSS;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.CompassPoint;
 
@@ -42,40 +42,40 @@ import static com.guiseframework.GuiseApplication.*;
 public enum Cursor implements Identifier {
 
 	/** A simple crosshair (e.g., short line segments resembling a "+" sign). */
-	CROSSHAIR(CSSCursor.CROSSHAIR),
+	CROSSHAIR(CSS.Cursor.CROSSHAIR),
 	/** The platform-dependent default cursor. Often rendered as an arrow. */
-	DEFAULT(CSSCursor.DEFAULT),
+	DEFAULT(CSS.Cursor.DEFAULT),
 	/** Help is available for the object under the cursor. Often rendered as a question mark or a balloon. */
-	HELP(CSSCursor.HELP),
+	HELP(CSS.Cursor.HELP),
 	/** Indicates something is to be moved. */
-	MOVE(CSSCursor.MOVE),
+	MOVE(CSS.Cursor.MOVE),
 	/** The cursor is a pointer that indicates a link. */
-	POINTER(CSSCursor.POINTER),
+	POINTER(CSS.Cursor.POINTER),
 	/**
 	 * A progress indicator. The program is performing some processing, but is different from {@link #WAIT} in that the user may still interact with the program.
 	 * Often rendered as a spinning beach ball, or an arrow with a watch or hourglass.
 	 */
-	PROGRESS(CSSCursor.PROGRESS),
+	PROGRESS(CSS.Cursor.PROGRESS),
 	/** Indicate that some edge is to be moved from the east of the box in left-to-right top-to-bottom orientation. */
-	RESIZE_LINE_FAR(CSSCursor.E_RESIZE),
+	RESIZE_LINE_FAR(CSS.Cursor.E_RESIZE),
 	/** Indicate that some edge is to be moved from the south-east corner of the box in left-to-right top-to-bottom orientation. */
-	RESIZE_LINE_FAR_PAGE_FAR(CSSCursor.SE_RESIZE),
+	RESIZE_LINE_FAR_PAGE_FAR(CSS.Cursor.SE_RESIZE),
 	/** Indicate that some edge is to be moved from the north-east corner of the box in left-to-right top-to-bottom orientation. */
-	RESIZE_LINE_FAR_PAGE_NEAR(CSSCursor.NE_RESIZE),
+	RESIZE_LINE_FAR_PAGE_NEAR(CSS.Cursor.NE_RESIZE),
 	/** Indicate that some edge is to be moved from the west of the box in left-to-right top-to-bottom orientation. */
-	RESIZE_LINE_NEAR(CSSCursor.W_RESIZE),
+	RESIZE_LINE_NEAR(CSS.Cursor.W_RESIZE),
 	/** Indicate that some edge is to be moved from the south-west corner of the box in left-to-right top-to-bottom orientation. */
-	RESIZE_LINE_NEAR_PAGE_FAR(CSSCursor.SW_RESIZE),
+	RESIZE_LINE_NEAR_PAGE_FAR(CSS.Cursor.SW_RESIZE),
 	/** Indicate that some edge is to be moved from the north-west corner of the box in left-to-right top-to-bottom orientation. */
-	RESIZE_LINE_NEAR_PAGE_NEAR(CSSCursor.NW_RESIZE),
+	RESIZE_LINE_NEAR_PAGE_NEAR(CSS.Cursor.NW_RESIZE),
 	/** Indicate that some edge is to be moved from the north of the box in left-to-right top-to-bottom orientation. */
-	RESIZE_PAGE_NEAR(CSSCursor.N_RESIZE),
+	RESIZE_PAGE_NEAR(CSS.Cursor.N_RESIZE),
 	/** Indicate that some edge is to be moved from the south corner of the box in left-to-right top-to-bottom orientation. */
-	RESIZE_PAGE_FAR(CSSCursor.S_RESIZE),
+	RESIZE_PAGE_FAR(CSS.Cursor.S_RESIZE),
 	/** Indicates text that may be selected. Often rendered as an I-beam. */
-	TEXT(CSSCursor.TEXT),
+	TEXT(CSS.Cursor.TEXT),
 	/** Indicates that the program is busy and the user should wait. Often rendered as a watch or hourglass. */
-	WAIT(CSSCursor.WAIT);
+	WAIT(CSS.Cursor.WAIT);
 
 	/** @return The URI of the predefined cursor relative to the application. */
 	public URI getURI() {
@@ -83,17 +83,17 @@ public enum Cursor implements Identifier {
 	}
 
 	/**
-	 * The XML CSS cursor to which this cursor corresponds. Some cursors may need further checks to determine the correct CSS cursor based upon component
+	 * The CSS cursor to which this cursor corresponds. Some cursors may need further checks to determine the correct CSS cursor based upon component
 	 * orientation.
 	 */
-	private final CSSCursor cssCursor;
+	private final CSS.Cursor cssCursor;
 
 	/**
 	 * CSS cursor constructor.
-	 * @param cssCursor The XML CSS cursor to which this cursor corresponds.
+	 * @param cssCursor The CSS cursor to which this cursor corresponds.
 	 * @throws NullPointerException if the given CSS cursor is <code>null</code>.
 	 */
-	private Cursor(final CSSCursor cssCursor) {
+	private Cursor(final CSS.Cursor cssCursor) {
 		this.cssCursor = checkInstance(cssCursor, "CSS cursor cannot be null.");
 	}
 
@@ -103,7 +103,7 @@ public enum Cursor implements Identifier {
 	 * @return The CSS cursor corresponding to this cursor in the given orientation.
 	 * @throws NullPointerException if the given orientation is <code>null</code>.
 	 */
-	public CSSCursor getCSSCursor(final Orientation orientation) {
+	public CSS.Cursor getCSSCursor(final Orientation orientation) {
 		checkInstance(orientation, "Orientation cannot be null.");
 		final CompassPoint resizeCompassPoint; //we'll determine a esize compass point if needed
 		switch(this) {
@@ -136,21 +136,21 @@ public enum Cursor implements Identifier {
 		}
 		switch(resizeCompassPoint) { //choose a CSS resize cursor based upon the compass point
 			case NORTH:
-				return CSSCursor.N_RESIZE;
+				return CSS.Cursor.N_RESIZE;
 			case NORTHEAST:
-				return CSSCursor.NE_RESIZE;
+				return CSS.Cursor.NE_RESIZE;
 			case EAST:
-				return CSSCursor.NE_RESIZE;
+				return CSS.Cursor.NE_RESIZE;
 			case SOUTHEAST:
-				return CSSCursor.SE_RESIZE;
+				return CSS.Cursor.SE_RESIZE;
 			case SOUTH:
-				return CSSCursor.S_RESIZE;
+				return CSS.Cursor.S_RESIZE;
 			case SOUTHWEST:
-				return CSSCursor.SW_RESIZE;
+				return CSS.Cursor.SW_RESIZE;
 			case WEST:
-				return CSSCursor.W_RESIZE;
+				return CSS.Cursor.W_RESIZE;
 			case NORTHWEST:
-				return CSSCursor.NW_RESIZE;
+				return CSS.Cursor.NW_RESIZE;
 			default:
 				throw new AssertionError("Unsupported resize compass point: " + resizeCompassPoint);
 		}
