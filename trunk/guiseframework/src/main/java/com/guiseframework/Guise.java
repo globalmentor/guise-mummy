@@ -27,9 +27,9 @@ import static com.globalmentor.io.InputStreams.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
 
-import com.globalmentor.config.ConfigurationException;
 import com.globalmentor.iso.datetime.ISODate;
 import com.globalmentor.java.Threads;
+import com.globalmentor.model.ConfigurationException;
 
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.util.PropertiesUtilities.*;

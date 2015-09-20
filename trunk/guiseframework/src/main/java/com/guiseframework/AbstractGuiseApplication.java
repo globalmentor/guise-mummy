@@ -47,14 +47,14 @@ import static com.guiseframework.Guise.*;
 import com.globalmentor.beans.BoundPropertyObject;
 import com.globalmentor.collections.DecoratorReadWriteLockMap;
 import com.globalmentor.collections.PurgeOnWriteSoftValueHashMap;
-import com.globalmentor.config.Configuration;
-import com.globalmentor.config.ConfigurationException;
-import com.globalmentor.config.ConfigurationManager;
-import com.globalmentor.config.DefaultConfigurationManager;
+import com.globalmentor.config.Concern;
+import com.globalmentor.config.ConcernRegistry;
+import com.globalmentor.config.DefaultConcernRegistry;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Objects;
 import com.globalmentor.log.*;
 import com.globalmentor.mail.MailManager;
+import com.globalmentor.model.ConfigurationException;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.net.URIs;
 import com.globalmentor.text.W3CDateFormat;
@@ -109,14 +109,14 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	}
 
 	/** The manager of configurations for this session. */
-	private final ConfigurationManager configurationManager = new DefaultConfigurationManager();
+	private final ConcernRegistry configurationManager = new DefaultConcernRegistry();
 
 	/**
 	 * Sets the given configurations, associating them with their respective classes.
 	 * @param configurations The configurations to set.
 	 */
-	protected void setConfigurations(final Configuration... configurations) {
-		configurationManager.setConfigurations(configurations);
+	protected void setConfigurations(final Concern... configurations) {
+		configurationManager.registerConcerns(configurations);
 	}
 
 	/**
@@ -126,8 +126,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @return The configuration previously associated with the same class, or <code>null</code> if there was no previous configuration for that class.
 	 * @throws NullPointerException if the given configuration is <code>null</code>.
 	 */
-	protected <C extends Configuration> C setConfiguration(final C configuration) {
-		return configurationManager.setConfiguration(configuration);
+	protected <C extends Concern> C setConfiguration(final C configuration) {
+		return configurationManager.registerConcern(configuration);
 	}
 
 	/**
@@ -137,8 +137,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @param configuration The configuration to set.
 	 * @return The configuration previously associated with the given class, or <code>null</code> if there was no previous configuration for that class.
 	 */
-	protected <C extends Configuration> C setConfiguration(final Class<C> configurationClass, final C configuration) {
-		return configurationManager.setConfiguration(configurationClass, configuration);
+	protected <C extends Concern> C setConfiguration(final Class<C> configurationClass, final C configuration) {
+		return configurationManager.registerConcern(configurationClass, configuration);
 	}
 
 	/**
@@ -147,8 +147,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @param configurationClass The class of configuration to retrieve.
 	 * @return The configuration associated with the given class, or <code>null</code> if there was no configuration for that class.
 	 */
-	public <C extends Configuration> C getConfiguration(final Class<C> configurationClass) {
-		return configurationManager.getConfiguration(configurationClass);
+	public <C extends Concern> C getConcern(final Class<C> configurationClass) {
+		return configurationManager.getConcern(configurationClass);
 	}
 
 	/**
@@ -157,8 +157,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @param configurationClass The class with which the configuration is associated.
 	 * @return The configuration previously associated with the given class, or <code>null</code> if there was no previous configuration for that class.
 	 */
-	protected <C extends Configuration> C removeConfiguration(final Class<C> configurationClass) {
-		return configurationManager.removeConfiguration(configurationClass);
+	protected <C extends Concern> C removeConfiguration(final Class<C> configurationClass) {
+		return configurationManager.unregisterConcern(configurationClass);
 	}
 
 	/** The application identifier URI. */

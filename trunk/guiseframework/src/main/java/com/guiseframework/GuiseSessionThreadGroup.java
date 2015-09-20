@@ -22,13 +22,13 @@ import static com.globalmentor.java.Objects.*;
 /**
  * A thread group allocated to a Guise session. All threads accessing a Guise session should be part of the session's thread group.
  * <p>
- * This thread group also allows access to managed configurations using {@link Configurator}. Thread-group-local configurations are retrieved by searching for a
- * configuration first in the Guise session using {@link GuiseSession#getConfiguration(Class)}, and second in the Guise application using
- * {@link GuiseApplication#getConfiguration(Class)}.
+ * This thread group also allows access to managed configurations using {@link Concerns}. Thread-group-local configurations are retrieved by searching for a
+ * configuration first in the Guise session using {@link GuiseSession#getConcern(Class)}, and second in the Guise application using
+ * {@link GuiseApplication#getConcern(Class)}.
  * </p>
  * @author Garret Wilson
  */
-public class GuiseSessionThreadGroup extends ThreadGroup implements ConfigurationManaged {
+public class GuiseSessionThreadGroup extends ThreadGroup implements Concerned {
 
 	/** The Guise session to which this thread group belongs and in which its related threads run. */
 	private final GuiseSession guiseSession;
@@ -54,10 +54,10 @@ public class GuiseSessionThreadGroup extends ThreadGroup implements Configuratio
 	 * @param configurationClass The class of configuration to retrieve.
 	 * @return The configuration associated with the given class, or <code>null</code> if there was no configuration for that class.
 	 */
-	public <C extends Configuration> C getConfiguration(final Class<C> configurationClass) {
-		C configuration = guiseSession.getConfiguration(configurationClass); //see if the session has the requested configuration
+	public <C extends Concern> C getConcern(final Class<C> configurationClass) {
+		C configuration = guiseSession.getConcern(configurationClass); //see if the session has the requested configuration
 		if(configuration == null) { //if no such configuration was found in the session
-			configuration = guiseSession.getApplication().getConfiguration(configurationClass); //see if the application has the requested configuration
+			configuration = guiseSession.getApplication().getConcern(configurationClass); //see if the application has the requested configuration
 		}
 		return configuration; //return the configuration we found, if any
 	}

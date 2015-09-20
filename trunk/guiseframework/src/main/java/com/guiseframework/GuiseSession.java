@@ -27,7 +27,7 @@ import java.util.*;
 import org.urframework.URFResource;
 
 import com.globalmentor.beans.PropertyBindable;
-import com.globalmentor.config.ConfigurationManaged;
+import com.globalmentor.config.Concerned;
 
 import static com.globalmentor.java.Classes.*;
 import com.globalmentor.net.*;
@@ -48,7 +48,7 @@ import com.guiseframework.theme.Theme;
  * sessions.
  * @author Garret Wilson
  */
-public interface GuiseSession extends PropertyBindable, CollatorFactory, ConfigurationManaged {
+public interface GuiseSession extends PropertyBindable, CollatorFactory, Concerned {
 
 	/** The input strategy bound property. */
 	public static final String INPUT_STRATEGY_PROPERTY = getPropertyName(GuiseSession.class, "inputStrategy");

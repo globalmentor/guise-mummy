@@ -24,7 +24,7 @@ import javax.mail.Message;
 import javax.mail.Session;
 
 import com.globalmentor.beans.PropertyBindable;
-import com.globalmentor.config.ConfigurationManaged;
+import com.globalmentor.config.Concerned;
 import com.globalmentor.io.IO;
 import com.globalmentor.io.IOOperation;
 import com.globalmentor.log.Log;
@@ -41,7 +41,7 @@ import static com.globalmentor.java.Classes.*;
  * An application running Guise. To enable mail-related functionality, mail must be configured using {@link #setMailProperties(Map)}.
  * @author Garret Wilson
  */
-public interface GuiseApplication extends Resource, PropertyBindable, ConfigurationManaged {
+public interface GuiseApplication extends Resource, PropertyBindable, Concerned {
 
 	/** The environment bound property. */
 	public static final String ENVIRONMENT_PROPERTY = getPropertyName(GuiseApplication.class, "environment");
