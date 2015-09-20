@@ -27,7 +27,7 @@ import java.util.*;
 import org.urframework.URFResource;
 
 import com.globalmentor.beans.PropertyBindable;
-import com.globalmentor.config.Concerned;
+import com.globalmentor.concern.Concerned;
 
 import static com.globalmentor.java.Classes.*;
 import com.globalmentor.net.*;

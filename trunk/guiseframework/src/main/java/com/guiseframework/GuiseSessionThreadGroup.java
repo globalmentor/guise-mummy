@@ -16,8 +16,9 @@
 
 package com.guiseframework;
 
-import com.globalmentor.config.*;
 import static com.globalmentor.java.Objects.*;
+
+import com.globalmentor.concern.*;
 
 /**
  * A thread group allocated to a Guise session. All threads accessing a Guise session should be part of the session's thread group.

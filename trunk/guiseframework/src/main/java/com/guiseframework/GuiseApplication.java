@@ -24,7 +24,7 @@ import javax.mail.Message;
 import javax.mail.Session;
 
 import com.globalmentor.beans.PropertyBindable;
-import com.globalmentor.config.Concerned;
+import com.globalmentor.concern.Concerned;
 import com.globalmentor.io.IO;
 import com.globalmentor.io.IOOperation;
 import com.globalmentor.log.Log;
