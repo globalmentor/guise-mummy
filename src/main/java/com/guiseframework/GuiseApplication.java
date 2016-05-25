@@ -24,7 +24,6 @@ import javax.mail.Message;
 import javax.mail.Session;
 
 import com.globalmentor.beans.PropertyBindable;
-import com.globalmentor.concern.Concerned;
 import com.globalmentor.io.IO;
 import com.globalmentor.io.IOOperation;
 import com.globalmentor.log.Log;
@@ -34,6 +33,8 @@ import com.globalmentor.net.URIs;
 import com.guiseframework.component.ApplicationFrame;
 import com.guiseframework.platform.*;
 import com.guiseframework.theme.Theme;
+
+import io.csar.Concerned;
 
 import static com.globalmentor.java.Classes.*;
 

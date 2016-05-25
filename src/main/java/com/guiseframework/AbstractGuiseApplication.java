@@ -47,9 +47,6 @@ import static com.guiseframework.Guise.*;
 import com.globalmentor.beans.BoundPropertyObject;
 import com.globalmentor.collections.DecoratorReadWriteLockMap;
 import com.globalmentor.collections.PurgeOnWriteSoftValueHashMap;
-import com.globalmentor.concern.Concern;
-import com.globalmentor.concern.ConcernRegistry;
-import com.globalmentor.concern.DefaultConcernRegistry;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Objects;
 import com.globalmentor.log.*;
@@ -66,6 +63,8 @@ import static com.guiseframework.Resources.*;
 
 import com.guiseframework.platform.*;
 import com.guiseframework.theme.Theme;
+
+import io.csar.*;
 
 import static com.guiseframework.theme.Theme.*;
 

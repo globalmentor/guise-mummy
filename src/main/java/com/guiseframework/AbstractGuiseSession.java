@@ -37,9 +37,6 @@ import static java.util.Collections.*;
 import com.globalmentor.beans.*;
 import com.globalmentor.collections.DecoratorReadWriteLockMap;
 import com.globalmentor.collections.ReadWriteLockMap;
-import com.globalmentor.concern.Concern;
-import com.globalmentor.concern.ConcernRegistry;
-import com.globalmentor.concern.DefaultConcernRegistry;
 import com.globalmentor.io.BOMInputStreamReader;
 import com.globalmentor.java.*;
 import com.globalmentor.java.Objects;
@@ -56,6 +53,8 @@ import com.guiseframework.platform.Platform;
 import com.guiseframework.prototype.*;
 import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
+
+import io.csar.*;
 
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.io.Writers.*;

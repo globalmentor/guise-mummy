@@ -27,7 +27,6 @@ import java.util.*;
 import org.urframework.URFResource;
 
 import com.globalmentor.beans.PropertyBindable;
-import com.globalmentor.concern.Concerned;
 
 import static com.globalmentor.java.Classes.*;
 import com.globalmentor.net.*;
@@ -42,6 +41,8 @@ import com.guiseframework.platform.Platform;
 import com.guiseframework.prototype.ActionPrototype;
 import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
+
+import io.csar.Concerned;
 
 /**
  * Represents a session with a user. A Swing-based client application may have only one session, while a web server application will likely have multiple
