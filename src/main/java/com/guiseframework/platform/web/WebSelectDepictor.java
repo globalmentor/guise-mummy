@@ -215,7 +215,7 @@ public class WebSelectDepictor<V, C extends ListSelectControl<V>> extends Abstra
 
 	/**
 	 * Updates the views of any children. This version does nothing, because if a list select control is a composite component the child controls have already
-	 * been rendered as values in {@link #depictBody(XMLGuiseContext, ListSelectControl)}.
+	 * been rendered as values in {@link #depictBody()}.
 	 * @throws IOException if there is an error updating the child views.
 	 */
 	protected void depictChildren() throws IOException {

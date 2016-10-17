@@ -20,6 +20,7 @@ import static com.globalmentor.java.Classes.*;
 
 import com.globalmentor.beans.PropertyBindable;
 import com.guiseframework.GuiseSession;
+import com.guiseframework.Resources;
 
 /**
  * Indicates an object that can convert a value from and to its lexical form.

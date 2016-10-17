@@ -18,6 +18,7 @@ package com.guiseframework.model;
 
 import static com.globalmentor.java.Classes.*;
 
+import com.guiseframework.component.EditComponent;
 import com.guiseframework.validator.Validator;
 
 /**
@@ -44,7 +45,7 @@ public interface TableColumnModel<V> extends InfoModel {
 	 * Sets whether the cells in this table column model are editable and will allow the the user to change their values. This is a bound property of type
 	 * <code>Boolean</code>.
 	 * @param newEditable <code>true</code> if the table column cells should allow the user to change their values.
-	 * @see #EDITABLE_PROPERTY
+	 * @see EditComponent#EDITABLE_PROPERTY
 	 */
 	public void setEditable(final boolean newEditable);
 

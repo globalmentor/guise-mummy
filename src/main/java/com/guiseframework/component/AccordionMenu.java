@@ -59,7 +59,7 @@ public class AccordionMenu extends AbstractMenu {
 
 	/**
 	 * Prototype and axis constructor.
-	 * @param actionPrototype The prototype on which this component should be based.
+	 * @param menuPrototype The prototype on which this component should be based.
 	 * @param axis The axis along which the menu is oriented.
 	 * @throws NullPointerException if the given prototype is <code>null</code>.
 	 */

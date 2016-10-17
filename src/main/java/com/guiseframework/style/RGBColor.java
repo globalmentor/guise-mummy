@@ -50,8 +50,8 @@ public class RGBColor extends AbstractModeledColor<RGBColor.Component> {
 	/**
 	 * Creates an RGB color from the specified string representation. This representation can be in one of the following forms:
 	 * <ul>
-	 * <li><code><var>colorname</var></code>, one of the {@link <a href="http://www.w3schools.com/html/html_colornames.asp">HTML color names</a>}, which must be
-	 * in all lowercase without delimiters, such as "aliceblue".</li>
+	 * <li><code><var>colorname</var></code>, one of the <a href="http://www.w3schools.com/html/html_colornames.asp">HTML color names</a>, which must be in all
+	 * lowercase without delimiters, such as "aliceblue".</li>
 	 * <li><code>#<var>rgb</var></code>, with hexadecimal representation of color components without regard to case.</li>
 	 * <li><code>#<var>rrggbb</var></code>, with hexadecimal representation of color components without regard to case.</li>
 	 * </ul>
@@ -173,7 +173,7 @@ public class RGBColor extends AbstractModeledColor<RGBColor.Component> {
 	 * Converts this RGB color to an HSL color.
 	 * @return The color in the HSL color space.
 	 * @see <a href="http://en.wikipedia.org/wiki/HSL_color_space">HSL color space: Converting to RGB</a>
-	 * @see <a href="http://www.easyrgb.com/math.php?MATH=M18#text18">EasyRGB RGB->HSL</a>
+	 * @see <a href="http://www.easyrgb.com/math.php?MATH=M18#text18">EasyRGB RGB-&gt;HSL</a>
 	 */
 	public HSLColor asHSL() {
 		final double red = getRed(); //get the RGB values
@@ -246,13 +246,14 @@ public class RGBColor extends AbstractModeledColor<RGBColor.Component> {
 	/**
 	 * Creates an RGB color from a string representation. This representation can be in one of the following forms:
 	 * <ul>
-	 * <li><code><var>colorname</var></code>, one of the {@link <a href="http://www.w3schools.com/html/html_colornames.asp">HTML color names</a>}, which must be
-	 * in all lowercase without delimiters, such as "aliceblue".</li>
+	 * <li><code><var>colorname</var></code>, one of the <a href="http://www.w3schools.com/html/html_colornames.asp">HTML color names</a>, which must be in all
+	 * lowercase without delimiters, such as "aliceblue".</li>
 	 * <li><code>#<var>rgb</var></code>, with hexadecimal representation of color components without regard to case.</li>
 	 * <li><code>#<var>rrggbb</var></code>, with hexadecimal representation of color components without regard to case.</li>
 	 * <li><code>rgb(<var>red</var>,<var>green</var>,<var>blue</var>)</code>, with decimal representation with a depth of eight bits (0-255).</li>
 	 * <li><code>rgb(<var>red</var>%,<var>green</var>%,<var>blue</var>%)</code>, with decimal component values multiplied by 100 (0.0-100.0%).</li>
-	 * <li><code>rgba(<var>red</var>,<var>green</var>,<var>blue</var>,<var>alpha</var>)</code>, with decimal representation with a depth of eight bits (0-255).</li>
+	 * <li><code>rgba(<var>red</var>,<var>green</var>,<var>blue</var>,<var>alpha</var>)</code>, with decimal representation with a depth of eight bits
+	 * (0-255).</li>
 	 * <li><code>rgba(<var>red</var>%,<var>green</var>%,<var>blue</var>%,<var>alpha</var>%)</code>, with decimal component values multiplied by 100 (0.0%-100.0%).
 	 * </li>
 	 * </ul>

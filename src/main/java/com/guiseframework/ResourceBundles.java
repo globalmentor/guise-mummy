@@ -90,7 +90,7 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 	 * @param locale The locale for which a resource bundle is desired.
 	 * @param loader The class loader from which to load the resource bundle.
 	 * @param parent The parent resource bundle, or <code>null</code> if there should be no parent for resolving resources.
-	 * @param turfResourceIO The I/O support for loading resources from a TURF representation, or <code>null</code> if TURF resource bundles are not supported.
+	 * @param urfResourceIO The I/O support for loading resources from a TURF representation, or <code>null</code> if TURF resource bundles are not supported.
 	 * @param rdfResourceIO The I/O support for loading resources from an RDF+XML serialization, or <code>null</code> if RDF resource bundles are not supported.
 	 * @param rdfPropertyNamespaceURI The namespace of the properties to gather, using the property local name as the map entry key, or <code>null</code> if RDF
 	 *          resource bundles are not supported.
@@ -290,6 +290,7 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 	 * <li>If the property value is an {@link URFMapResource}, a {@link Map} is returned filled with values obtained by using this same algorithm.</li>
 	 * <li>For all other resources, the result of {@link URF#asObject(Resource)}, if any, is returned.</li>
 	 * </ol>
+	 * @param <T> The type of the resource.
 	 * @param urfPropertyValue The URF property value to be converted to a resource value.
 	 * @return An object representing the resource value for the URF property value.
 	 */

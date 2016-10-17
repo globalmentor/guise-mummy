@@ -43,7 +43,8 @@ import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 /**
- * Strategy for rendering a text component as an XHTML <code>&lt;div&gt;</code> element or, based upon {@link TextBox#getType()}, a specialized XHTML element.
+ * Strategy for rendering a text component as an XHTML <code>&lt;div&gt;</code> element or, based upon {@link TextBox#getTextContentType()}, a specialized XHTML
+ * element.
  * @param <C> The type of component being depicted.
  * @author Garret Wilson
  */
@@ -51,9 +52,9 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 
 	/** The document prefix to wrap around an XHTML fragment. */
 	private static final String XHTML11_FRAGMENT_DOCUMENT_PREFIX = //TODO fix; this doesn't create valid XHTML; it needs an internal DIV, but we need to then get the contents of the DIV rather than the BODY, which we could do using an ID
-	"<?xml version='1.0'?>" +
-	/*TODO del; we don't validate, so why do we need a doctype?		"<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>"+*/
-	"<html xmlns='http://www.w3.org/1999/xhtml'>" + "<head><title>XHTML Fragment Document</title></head>" + "<body>";
+			"<?xml version='1.0'?>" +
+			/*TODO del; we don't validate, so why do we need a doctype?		"<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>"+*/
+					"<html xmlns='http://www.w3.org/1999/xhtml'>" + "<head><title>XHTML Fragment Document</title></head>" + "<body>";
 
 	/** The document suffix to wrap around an XHTML fragment. */
 	private static final String XHTML11_FRAGMENT_DOCUMENT_SUFFIX = "</body>" + "</html>";
@@ -168,6 +169,7 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 	/**
 	 * Renders an XML element. If there is a child component with constraints indicating the same ID as this element, that child component will be rendered in
 	 * place of this element.
+	 * @param element The element the content of which should be rendered.
 	 * @throws IOException if there is an error rendering the component.
 	 */
 	protected void updateElement(final Element element) throws IOException {

@@ -33,7 +33,7 @@ import com.guiseframework.model.AbstractModel;
 
 /**
  * Strategy for rendering an image component an XHTML <code>&lt;img&gt;</code> element. The {@link ImageComponent#getLabel()} or
- * {@link ImageComponent#getDescription()} will be used as the {@value XHTML#ELEMENT_IMG_ATTRIBUTE_ALT} attribute if available.
+ * {@link ImageComponent#getDescription()} will be used as the {@value com.globalmentor.w3c.spec.HTML#ELEMENT_IMG_ATTRIBUTE_ALT} attribute if available.
  * <p>
  * This depictor supports {@link PendingImageComponent}.
  * </p>

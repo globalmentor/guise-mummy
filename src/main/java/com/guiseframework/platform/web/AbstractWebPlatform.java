@@ -90,7 +90,7 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 	 * @throws IllegalArgumentException if the value is less than zero.
 	 * @see #discontinuePollInterval(DepictedObject)
 	 * @see #getPollInterval()
-	 * @see #setPollInterval()
+	 * @see #setPollInterval(int)
 	 */
 	public boolean requestPollInterval(final DepictedObject depictedObject, final int pollInterval) {
 		checkArgumentNotNegative(pollInterval);
@@ -113,7 +113,7 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 	 * @throws NullPointerException if the given depicted object is <code>null</code>.
 	 * @see #requestPollInterval(DepictedObject, int)
 	 * @see #getPollInterval()
-	 * @see #setPollInterval()
+	 * @see #setPollInterval(int)
 	 */
 	public boolean discontinuePollInterval(final DepictedObject depictedObject) {
 		//Log.trace("ready to discontinue poll interval for", depictedObject);
@@ -158,7 +158,6 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 	/**
 	 * Returns the depicted object ID represented by the given platform-specific ID string.
 	 * @param depictIDString The platform-specific form of the depict ID.
-	 * @param depictID The depict ID to be converted to a platform ID.
 	 * @return The depict ID the platform-specific form represents.
 	 * @throws NullPointerException if the given string is <code>null</code>.
 	 * @throws IllegalArgumentException if the given string does not represent the correct string form of a depict ID on this platform.

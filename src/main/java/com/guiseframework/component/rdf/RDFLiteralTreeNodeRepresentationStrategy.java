@@ -42,7 +42,6 @@ public class RDFLiteralTreeNodeRepresentationStrategy extends AbstractRDFObjectT
 
 	/**
 	 * Builds the label to be used for a tree node. This version appends information about the literal.
-	 * @param <N> The type of value contained in the node.
 	 * @param stringBuilder The string builder to hold the label text.
 	 * @param treeControl The component containing the model.
 	 * @param model The model containing the value.

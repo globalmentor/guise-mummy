@@ -32,7 +32,7 @@ public final class NavigateActionListener extends AbstractNavigateActionListener
 	 * @param navigationPath A path that is either relative to the application context path or is absolute.
 	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
-	 *           {@link #NavigateActionListener(URI)}</code> should be used instead).
+	 *           {@link #NavigateActionListener(URI)} should be used instead).
 	 */
 	public NavigateActionListener(final URIPath navigationPath) {
 		super(navigationPath); //construct the parent class

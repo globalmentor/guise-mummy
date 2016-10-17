@@ -57,7 +57,7 @@ public interface Validator<V> extends PropertyBindable {
 	 * Sets the text of the value required message. This is a bound property.
 	 * @param newValueRequiredMessage The new text of the value required message, which may include a resource reference..
 	 * @throws NullPointerException if the given message is <code>null</code>.
-	 * @see #VALUE_REQUIRED_VALUE_MESSAGE_PROPERTY
+	 * @see #VALUE_REQUIRED_MESSAGE_PROPERTY
 	 */
 	public void setValueRequiredMessage(final String newValueRequiredMessage);
 
@@ -68,9 +68,9 @@ public interface Validator<V> extends PropertyBindable {
 	 * Checks whether a given value is valid, and throws an exception if not.
 	 * <p>
 	 * The message of the thrown exception should be appropriate for display to the user, although it may include string resource references. If a child class has
-	 * no specific message to return, that class may call {@link #throwInvalidValueValidationException(Object)} as a convenience. A child class may also call
-	 * {@link #throwValueRequiredValidationException(Object)} as a convenience, but this is usually not required if this version of the method, which provides a
-	 * missing value check, is called first.
+	 * no specific message to return, that class may call {@link AbstractValidator#throwInvalidValueValidationException(Object)} as a convenience. A child class
+	 * may also call {@link AbstractValidator#throwValueRequiredValidationException(Object)} as a convenience, but this is usually not required if this version of
+	 * the method, which provides a missing value check, is called first.
 	 * </p>
 	 * <p>
 	 * This version checks whether a value is provided if values are required. Child classes should call this version as a convenience for checking non-
@@ -82,8 +82,8 @@ public interface Validator<V> extends PropertyBindable {
 	 * </p>
 	 * @param value The value to validate, which may be <code>null</code>.
 	 * @throws ValidationException if the provided value is not valid.
-	 * @see #throwInvalidValueValidationException(Object)
-	 * @see #throwValueRequiredValidationException(Object)
+	 * @see AbstractValidator#throwInvalidValueValidationException(Object)
+	 * @see AbstractValidator#throwValueRequiredValidationException(Object)
 	 */
 	public void validate(final V value) throws ValidationException;
 

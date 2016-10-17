@@ -51,7 +51,7 @@ public class CalendarControl extends AbstractLayoutValueControl<Date> {
 	/** The container containing the controls. */
 	private Container controlContainer;
 
-	/** The container containing the controls. */
+	/** @return The container containing the controls. */
 	public Container getControlContainer() {
 		return controlContainer;
 	}
@@ -59,7 +59,7 @@ public class CalendarControl extends AbstractLayoutValueControl<Date> {
 	/** The container containing the calendars. */
 	private Container calendarContainer;
 
-	/** The container containing the calendars. */
+	/** @return The container containing the calendars. */
 	public Container getCalendarContainer() {
 		return calendarContainer;
 	}

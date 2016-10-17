@@ -35,7 +35,7 @@ public class DefaultEnableable extends BoundPropertyObject implements Enableable
 	/**
 	 * Sets whether the control is enabled and and can receive user input. This is a bound property of type <code>Boolean</code>.
 	 * @param newEnabled <code>true</code> if the control should indicate and accept user input.
-	 * @see #ENABLED_PROPERTY
+	 * @see Enableable#ENABLED_PROPERTY
 	 */
 	public void setEnabled(final boolean newEnabled) {
 		if(enabled != newEnabled) { //if the value is really changing

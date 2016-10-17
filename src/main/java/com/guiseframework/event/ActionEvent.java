@@ -49,9 +49,9 @@ public class ActionEvent extends AbstractTargetedGuiseEvent {
 	private final int option;
 
 	/**
-	 * Returns the option indicated by this action. The option is zero-based and represents any alternate option indicated by the user. If the action was
-	 * initiated by a mouse click, for instance, the left button traditionally will indicate the default option (0), while the right button will indicate a
-	 * secondary option (1).
+	 * @return The option indicated by this action. The option is zero-based and represents any alternate option indicated by the user. If the action was
+	 *         initiated by a mouse click, for instance, the left button traditionally will indicate the default option (0), while the right button will indicate
+	 *         a secondary option (1).
 	 */
 	public int getOption() {
 		return option;
@@ -61,8 +61,8 @@ public class ActionEvent extends AbstractTargetedGuiseEvent {
 	private final int force;
 
 	/**
-	 * Returns the force with which the action was initiated. A force of zero indicates no force. A mouse single click should generate a force of 1, while a
-	 * double single click should generate a force of 2.
+	 * @return The force with which the action was initiated. A force of zero indicates no force. A mouse single click should generate a force of 1, while a
+	 *         double single click should generate a force of 2.
 	 */
 	public int getForce() {
 		return force;

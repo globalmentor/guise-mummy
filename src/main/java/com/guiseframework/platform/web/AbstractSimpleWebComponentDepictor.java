@@ -56,7 +56,7 @@ public abstract class AbstractSimpleWebComponentDepictor<C extends Component> ex
 	/**
 	 * Retrieves the styles for the outer element of the component. This version combines the body styles with the outer styles.
 	 * @return The styles for the outer element of the component, mapped to CSS property names.
-	 * @see AbstractWebComponentDepictor#getBodyStyles(XMLGuiseContext, Component)
+	 * @see AbstractWebComponentDepictor#getBodyStyles()
 	 */
 	protected Map<String, Object> getOuterStyles() {
 		final Map<String, Object> outerStyles = super.getOuterStyles(); //get the default outer styles

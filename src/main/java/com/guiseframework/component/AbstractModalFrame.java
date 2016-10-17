@@ -17,6 +17,7 @@
 package com.guiseframework.component;
 
 import com.globalmentor.java.Objects;
+import com.guiseframework.GuiseSession;
 
 /**
  * Abstract implementation of a modal frame.
@@ -57,8 +58,8 @@ public abstract class AbstractModalFrame<R> extends AbstractFrame implements Mod
 	/**
 	 * Ends this frame's modal interaction and navigates either to the previous modal navigation or to this frame's referring URI, if any.
 	 * @param result The result of this frame's modal interaction, or <code>null</code> if no result is given.
-	 * @see #setResult(R)
-	 * @see GuiseSession#endModalNavigation(ModalPanel)
+	 * @see #setResult(Object)
+	 * @see GuiseSession#endModalNavigation(ModalNavigationPanel)
 	 */
 	public void endModal(final R result) {
 		/*TODO fix

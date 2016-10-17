@@ -35,7 +35,7 @@ public class ControlConstraints extends AbstractConstraints implements Displayab
 	/**
 	 * Sets whether the component is displayed or has no representation, taking up no space. This is a bound property of type <code>Boolean</code>.
 	 * @param newDisplayed <code>true</code> if the component should be displayed, else <code>false</code> if the component should take up no space.
-	 * @see #DISPLAYED_PROPERTY
+	 * @see Displayable#DISPLAYED_PROPERTY
 	 */
 	public void setDisplayed(final boolean newDisplayed) {
 		if(displayed != newDisplayed) { //if the value is really changing
@@ -56,7 +56,7 @@ public class ControlConstraints extends AbstractConstraints implements Displayab
 	/**
 	 * Sets whether the the component is enabled. This is a bound property of type <code>Boolean</code>.
 	 * @param newEnabled <code>true</code> if the corresponding component is enabled.
-	 * @see #ENABLED_PROPERTY
+	 * @see Enableable#ENABLED_PROPERTY
 	 */
 	public void setEnabled(final boolean newEnabled) {
 		if(enabled != newEnabled) { //if the value is really changing

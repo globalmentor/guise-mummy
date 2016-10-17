@@ -68,7 +68,7 @@ public class RDFURIStringLiteralConverter extends DefaultStringLiteralConverter<
 	/**
 	 * XML namespace prefix manager constructor.
 	 * @param xmlNamespacePrefixManager The object managing XML namespaces and prefixes.
-	 * @excepion NullPointerException if the given XML namespace prefix manager is <code>null</code>.
+	 * @throws NullPointerException if the given XML namespace prefix manager is <code>null</code>.
 	 */
 	public RDFURIStringLiteralConverter(final XMLNamespacePrefixManager xmlNamespacePrefixManager) {
 		this(new RDFXMLGenerator(xmlNamespacePrefixManager));//construct the class with a new RDF XML generator

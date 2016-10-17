@@ -57,6 +57,7 @@ public class Components {
 
 	/**
 	 * Retrieves all components, including the given component and all descendant components.
+	 * @param <T> The type of the component collection.
 	 * @param component The component to search.
 	 * @param componentCollection The collection into which the components will be collected.
 	 * @throws NullPointerException if the given component and/or collection is <code>null</code>.
@@ -70,6 +71,8 @@ public class Components {
 	 * Retrieves all components, including the given component, that are instances of the of the given class. If <var>deep</var> is set to <code>true</code>, the
 	 * component's child components are recursively searched if the component is a composite component. If <var>below</var> is set to <code>true</code>, the child
 	 * components of any composite component that is an instance of the given class are also recursively searched.
+	 * @param <C> The type of the component.
+	 * @param <T> The type of the component collection.
 	 * @param component The component to search.
 	 * @param componentClass The type of component to retrieve.
 	 * @param componentCollection The collection into which the components will be collected.
@@ -93,7 +96,7 @@ public class Components {
 
 	/**
 	 * Retrieves all descendant components.
-	 * @param component The component to search.
+	 * @param compositeComponent The component to search.
 	 * @throws NullPointerException if the given component is <code>null</code>.
 	 * @return The collection of components.
 	 */
@@ -103,6 +106,7 @@ public class Components {
 
 	/**
 	 * Retrieves all descendant components.
+	 * @param <T> The type of the components.
 	 * @param compositeComponent The component to search.
 	 * @param componentCollection The collection into which the components will be collected.
 	 * @throws NullPointerException if the given component and/or collection is <code>null</code>.
@@ -116,6 +120,8 @@ public class Components {
 	 * Retrieves all child components that are instances of the of the given class. If <var>deep</var> is set to <code>true</code>, a component's child components
 	 * are recursively searched if that component is a composite component. If <var>below</var> is set to <code>true</code>, the child components of any composite
 	 * component that is an instance of the given class are also recursively searched.
+	 * @param <T> The type of the component collection.
+	 * @param <C> The type of the objects from the collection.
 	 * @param compositeComponent The component to search.
 	 * @param componentClass The type of component to retrieve.
 	 * @param componentCollection The collection into which the components will be collected.

@@ -38,7 +38,7 @@ public class DemoApplication extends AbstractGuiseApplication {
 	/** The synchronized list of application users. */
 	final private List<DemoUser> users = Collections.synchronizedList(new ArrayList<DemoUser>());
 
-	/** The synchronized list of application users. */
+	/** @return The synchronized list of application users. */
 	public List<DemoUser> getUsers() {
 		return users;
 	}

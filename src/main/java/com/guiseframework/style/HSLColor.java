@@ -92,7 +92,7 @@ public class HSLColor extends AbstractModeledColor<HSLColor.Component> {
 	 * Converts this HSL color to an RGB color.
 	 * @return The color in the RGB color space.
 	 * @see <a href="http://en.wikipedia.org/wiki/HSL_color_space">HSL color space: Converting to RGB</a>
-	 * @see <a href="http://www.easyrgb.com/math.php?MATH=M19#text19">EasyRGB HSL->RGB</a>
+	 * @see <a href="http://www.easyrgb.com/math.php?MATH=M19#text19">EasyRGB HSL-&gt;RGB</a>
 	 */
 	public RGBColor asRGB() {
 		final double hue = getHue(); //get the HSL values
@@ -115,7 +115,7 @@ public class HSLColor extends AbstractModeledColor<HSLColor.Component> {
 	 * Determines the RGB component value for a particular hue.
 	 * @param hue The hue, which appears in the (0.0-1.0) range +/- 1.0.
 	 * @see <a href="http://en.wikipedia.org/wiki/HSL_color_space">HSL color space: Converting to RGB</a>
-	 * @see <a href="http://www.easyrgb.com/math.php?MATH=M19#text19">EasyRGB HSL->RGB</a>
+	 * @see <a href="http://www.easyrgb.com/math.php?MATH=M19#text19">EasyRGB HSL-&gt;RGB</a>
 	 * @return The new RGB component value based upon the given hue and parameters
 	 */
 	private static double getHueRGBComponent(double hue, final double p, final double q) {

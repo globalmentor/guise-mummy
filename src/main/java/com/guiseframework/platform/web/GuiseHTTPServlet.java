@@ -46,6 +46,7 @@ import com.globalmentor.net.*;
 import com.globalmentor.net.http.*;
 import com.globalmentor.net.mime.ContentDispositionType;
 import com.globalmentor.security.Nonce;
+import com.globalmentor.servlet.Servlets;
 import com.globalmentor.servlet.http.*;
 import com.globalmentor.text.elff.*;
 import com.globalmentor.w3c.spec.HTML;
@@ -97,17 +98,17 @@ import org.xml.sax.SAXException;
  * </p>
  * This servlet supports the following initialization parameters in addition to those in {@link BaseHTTPServlet}:
  * <dl>
- * <dt>{@value Servlets#DATA_DIRECTORY_INIT_PARAMETER}</dt>
+ * <dt>{@link Servlets#DATA_DIRECTORY_INIT_PARAMETER}</dt>
  * <dd>The directory for storing data.</dd>
- * <dt>{@value Servlets#LOG_DIRECTORY_INIT_PARAMETER}</dt>
+ * <dt>{@link Servlets#LOG_DIRECTORY_INIT_PARAMETER}</dt>
  * <dd>The directory for storing logs.</dd>
- * <dt>{@value #DEBUG_INIT_PARAMETER}</dt>
+ * <dt>{@link #DEBUG_INIT_PARAMETER}</dt>
  * <dd>Whether the servlet is in debug mode; should be "true" or "false"; sets the log level to debug if not explicitly set.</dd>
- * <dt>{@value #LOG_LEVEL_INIT_PARAMETER}</dt>
+ * <dt>{@link #LOG_LEVEL_INIT_PARAMETER}</dt>
  * <dd>The level of logging for the JVM of type {@link Log.Level}. If multiple servlets specify this value, the last one initialized will have precedence.</dd>
- * <dt>{@value #LOG_HTTP_INIT_PARAMETER}</dt>
+ * <dt>{@link #LOG_HTTP_INIT_PARAMETER}</dt>
  * <dd>Whether HTTP communication is logged.</dd>
- * <dt>{@value #PROFILE_INIT_PARAMETER}</dt>
+ * <dt>{@link #PROFILE_INIT_PARAMETER}</dt>
  * <dd>Whether profiling should occur; should be "true" or "false".</dd>
  * </dl>
  * <p>
@@ -367,8 +368,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 				try {
 					final File dataDirectory = getDataDirectory(servletContext); //get the data directory
 					if(dataDirectory == null) { //if there is no data directory
-						throw new ServletException("No data directory available; either deploy servlet as in a file system or define the init parameter "
-								+ DATA_DIRECTORY_INIT_PARAMETER + ".");
+						throw new ServletException(
+								"No data directory available; either deploy servlet as in a file system or define the init parameter " + DATA_DIRECTORY_INIT_PARAMETER + ".");
 					}
 					final File dataApplicationFile = new File(dataDirectory, "guise/" + DATA_APPLICATION_FILENAME); //get the supplemental application description file, if any TODO use a constant
 					if(dataApplicationFile.exists()) { //if there is a supplemental application description
@@ -384,11 +385,12 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 						applicationBaseURI = resolve(containerBaseURI, request.getContextPath() + request.getServletPath() + PATH_SEPARATOR); //get the default Guise application base path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash, and resolve it to the container base path
 					}
 					final URIPath guiseApplicationRelativePath = new URIPath(""); //TODO fix, now that we are using URIs for each application; perhaps use a name for each application, as this ID must remain the same even when deployed in different locations
-					final File guiseApplicationHomeDirectory = getDataDirectory(servletContext, DATA_DIRECTORY_INIT_PARAMETER, "guise/home/"
-							+ guiseApplicationRelativePath); //get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
-					final File guiseApplicationLogDirectory = getDataDirectory(servletContext, LOG_DIRECTORY_INIT_PARAMETER, "guise/logs/" + guiseApplicationRelativePath); //get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
-					final File guiseApplicationTempDirectory = getDataDirectory(servletContext, TEMP_DIRECTORY_INIT_PARAMETER, "guise/temp/"
-							+ guiseApplicationRelativePath); //get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
+					final File guiseApplicationHomeDirectory = getDataDirectory(servletContext, DATA_DIRECTORY_INIT_PARAMETER,
+							"guise/home/" + guiseApplicationRelativePath); //get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
+					final File guiseApplicationLogDirectory = getDataDirectory(servletContext, LOG_DIRECTORY_INIT_PARAMETER,
+							"guise/logs/" + guiseApplicationRelativePath); //get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
+					final File guiseApplicationTempDirectory = getDataDirectory(servletContext, TEMP_DIRECTORY_INIT_PARAMETER,
+							"guise/temp/" + guiseApplicationRelativePath); //get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
 					//			TODO delLog.trace("ready to install application into container with context path", guiseApplicationContextPath);
 					guiseContainer.installApplication(guiseApplication, applicationBaseURI, guiseApplicationHomeDirectory, guiseApplicationLogDirectory,
 							guiseApplicationTempDirectory); //install the application
@@ -462,23 +464,23 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 			try {
 				call(guiseSessionThreadGroup, new Runnable() { //call the method in a new thread inside the thread group
 
-							public void run() {
-								try {
-									if(guiseApplication.isDebug()) {
-										//TODO fix										Probe.startStackProbe(); //TODO testing
-									}
-									try {
-										serviceGuiseRequest(guiseRequest, response, guiseContainer, guiseApplication, guiseSession, destination); //service the Guise request to the given destination
-									} finally {
-										if(guiseApplication.isDebug()) {
-											//TODO fix											Probe.stopStackProbe(); //TODO testing
-										}
-									}
-								} catch(final IOException ioException) { //if an exception is thrown
-									throw new UndeclaredThrowableException(ioException); //let it pass to the calling thread
+					public void run() {
+						try {
+							if(guiseApplication.isDebug()) {
+								//TODO fix										Probe.startStackProbe(); //TODO testing
+							}
+							try {
+								serviceGuiseRequest(guiseRequest, response, guiseContainer, guiseApplication, guiseSession, destination); //service the Guise request to the given destination
+							} finally {
+								if(guiseApplication.isDebug()) {
+									//TODO fix											Probe.stopStackProbe(); //TODO testing
 								}
 							}
-						});
+						} catch(final IOException ioException) { //if an exception is thrown
+							throw new UndeclaredThrowableException(ioException); //let it pass to the calling thread
+						}
+					}
+				});
 			} catch(final UndeclaredThrowableException undeclaredThrowableException) { //if an exception was thrown
 				final Throwable cause = undeclaredThrowableException.getCause(); //see what exception was thrown
 				if(cause instanceof ResourceNotFoundException) { //if a ResourceNotFoundException was thrown
@@ -518,15 +520,15 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		try {
 			call(guiseSessionThreadGroup, new Runnable() { //call the method in a new thread inside the thread group
 
-						public void run() {
-							try {
-								serviceGuiseResourceWriteDestinationRequest(guiseRequest, response, guiseContainer, guiseApplication, guiseSession,
-										(ResourceWriteDestination)destination, request.getInputStream(), null);
-							} catch(final IOException ioException) { //if an exception is thrown
-								throw new UndeclaredThrowableException(ioException); //let it pass to the calling thread
-							}
-						}
-					});
+				public void run() {
+					try {
+						serviceGuiseResourceWriteDestinationRequest(guiseRequest, response, guiseContainer, guiseApplication, guiseSession,
+								(ResourceWriteDestination)destination, request.getInputStream(), null);
+					} catch(final IOException ioException) { //if an exception is thrown
+						throw new UndeclaredThrowableException(ioException); //let it pass to the calling thread
+					}
+				}
+			});
 		} catch(final UndeclaredThrowableException undeclaredThrowableException) { //if an exception was thrown
 			final Throwable cause = undeclaredThrowableException.getCause(); //see what exception was thrown
 			if(cause instanceof ResourceNotFoundException) { //if a ResourceNotFoundException was thrown
@@ -646,8 +648,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 												}
 											}
 										};
-										final ProgressOutputStream progressOutputStream = new ProgressOutputStream(resourceWriteDestination.getOutputStream(resourceDescription,
-												guiseSession, path, bookmark, referrerURI)); //get an output stream to the destination; don't buffer the output stream (our copy method essentially does this) so that progress events will be accurate
+										final ProgressOutputStream progressOutputStream = new ProgressOutputStream(
+												resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, path, bookmark, referrerURI)); //get an output stream to the destination; don't buffer the output stream (our copy method essentially does this) so that progress events will be accurate
 										try {
 											if(progressComponent != null) { //if we know the component that wants to know progress
 												synchronized(guiseSession) { //don't allow other session contexts to be active while we dispatch the event
@@ -961,8 +963,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 							//TODO add WT.co_d to provide cookie data (only on the first time---is this a WebTrends hack that isn't needed here, or is it used for something?)
 							//WT.sr
 							ELFF.appendURIQueryParameter(queryParametersStringBuilder, BROWSER_SIZE_QUERY_ATTRIBUTE_NAME,
-									Integer.toString(initControlEvent.getBrowserWidth()) + "x" + Integer.toString(initControlEvent.getBrowserHeight())).append(
-									QUERY_NAME_VALUE_PAIR_DELIMITER); //add WT.bs as a query parameter
+									Integer.toString(initControlEvent.getBrowserWidth()) + "x" + Integer.toString(initControlEvent.getBrowserHeight()))
+									.append(QUERY_NAME_VALUE_PAIR_DELIMITER); //add WT.bs as a query parameter
 							//WT.cd
 							ELFF.appendURIQueryParameter(queryParametersStringBuilder, COLOR_DEPTH_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getColorDepth()))
 									.append(QUERY_NAME_VALUE_PAIR_DELIMITER); //add WT.cd as a query parameter
@@ -979,27 +981,27 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 							if(jsProduct != null) { //if JavaScript is supported
 								final String jsVersion = jsProduct.getVersion(); //get the JavaScript version, if any
 								if(jsVersion != null) { //if we know the JavaScript version
-									ELFF.appendURIQueryParameter(queryParametersStringBuilder, JAVASCRIPT_VERSION_QUERY_ATTRIBUTE_NAME, jsVersion).append(
-											QUERY_NAME_VALUE_PAIR_DELIMITER); //add WT.jv as a query parameter
+									ELFF.appendURIQueryParameter(queryParametersStringBuilder, JAVASCRIPT_VERSION_QUERY_ATTRIBUTE_NAME, jsVersion)
+											.append(QUERY_NAME_VALUE_PAIR_DELIMITER); //add WT.jv as a query parameter
 								}
 							}
 							//TODO add WT.sp, if needed
 							//WT.sr
 							ELFF.appendURIQueryParameter(queryParametersStringBuilder, SCREEN_RESOLUTION_QUERY_ATTRIBUTE_NAME,
-									Integer.toString(initControlEvent.getScreenWidth()) + "x" + Integer.toString(initControlEvent.getScreenHeight())).append(
-									QUERY_NAME_VALUE_PAIR_DELIMITER); //add WT.sr as a query parameter
+									Integer.toString(initControlEvent.getScreenWidth()) + "x" + Integer.toString(initControlEvent.getScreenHeight()))
+									.append(QUERY_NAME_VALUE_PAIR_DELIMITER); //add WT.sr as a query parameter
 							//WT.ti
 							final String title = destinationComponent.getLabel(); //get the title of the page, if there is a title
 							if(title != null) { //if there is a title
-								ELFF.appendURIQueryParameter(queryParametersStringBuilder, TITLE_QUERY_ATTRIBUTE_NAME, guiseSession.dereferenceString(title)).append(
-										QUERY_NAME_VALUE_PAIR_DELIMITER); //add WT.ti as a query parameter
+								ELFF.appendURIQueryParameter(queryParametersStringBuilder, TITLE_QUERY_ATTRIBUTE_NAME, guiseSession.dereferenceString(title))
+										.append(QUERY_NAME_VALUE_PAIR_DELIMITER); //add WT.ti as a query parameter
 							}
 							//WT.tz
 							ELFF.appendURIQueryParameter(queryParametersStringBuilder, TIMEZONE_QUERY_ATTRIBUTE_NAME,
 									Integer.toString(initControlEvent.getUTCOffset() / (60 * 60 * 1000))).append(QUERY_NAME_VALUE_PAIR_DELIMITER); //add WT.tz as a query parameter
 							//WT.ul
-							ELFF.appendURIQueryParameter(queryParametersStringBuilder, USER_LANGUAGE_QUERY_ATTRIBUTE_NAME, initControlEvent.getLanguage()).append(
-									QUERY_NAME_VALUE_PAIR_DELIMITER); //add WT.ul as a query parameter
+							ELFF.appendURIQueryParameter(queryParametersStringBuilder, USER_LANGUAGE_QUERY_ATTRIBUTE_NAME, initControlEvent.getLanguage())
+									.append(QUERY_NAME_VALUE_PAIR_DELIMITER); //add WT.ul as a query parameter
 							//content groups and subgroups
 							final List<String> destinationCategoryIDs = new ArrayList<String>(); //we'll look for all the categories available
 							final List<String> destinationSubcategoryIDs = new ArrayList<String>(); //we'll look for all the subcategories available, in whatever category (because WebTrends doesn't distinguish among categories for subcategories)
@@ -1055,8 +1057,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 							final WebPlatform platform = (WebPlatform)guiseSession.getPlatform(); //get the current platform
 							final int pollInterval = platform.getPollInterval(); //get the current polling interval
 							final Queue<WebPlatformMessage> sendMessageQueue = platform.getSendMessageQueue(); //get the queue for sending messages
-							sendMessageQueue.add(new WebCommandMessage<PollCommand>(PollCommand.POLL_INTERVAL, new NameValuePair<String, Object>(
-									PollCommand.INTERVAL_PROPERTY, Integer.valueOf(pollInterval)))); //send a poll command to the platform with the new interval
+							sendMessageQueue.add(new WebCommandMessage<PollCommand>(PollCommand.POLL_INTERVAL,
+									new NameValuePair<String, Object>(PollCommand.INTERVAL_PROPERTY, Integer.valueOf(pollInterval)))); //send a poll command to the platform with the new interval
 						}
 						if(!requestedComponents.isEmpty()) { //if components were requested
 							for(final Component component : requestedComponents) { //for each requested component
@@ -1526,10 +1528,11 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 
 	/**
 	 * Retrieves events from the HTTP request.
-	 * @param request The HTTP request.
+	 * @param guiseRequest The HTTP request.
 	 * @param guiseSession The Guise session object.
 	 * @param depictContext The platform depict object.
 	 * @throws IOException if there is an error reading or writing data.
+	 * @return The events from the HTTP request.
 	 */
 	protected List<GuiseEvent> getRequestEvents(/*TODO del final HttpServletRequest request,*/final HTTPServletGuiseRequest guiseRequest,
 			final GuiseSession guiseSession, final DepictContext depictContext) throws IOException {
@@ -1633,8 +1636,9 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 										Log.warn("Invalid referrer URI syntax: " + referrer);
 									}
 								}
-								final WebInitializeEvent initEvent = new WebInitializeEvent(depictContext, hour.length() > 0 ? Integer.parseInt(hour) : 0, /*TODO del timezone.length()>0 ? Integer.parseInt(timezone) : 0,*/
-								utcOffset.length() > 0 ? Integer.parseInt(utcOffset) : 0, utcOffset.length() > 0 ? Integer.parseInt(utcOffset01) : 0,
+								final WebInitializeEvent initEvent = new WebInitializeEvent(depictContext,
+										hour.length() > 0 ? Integer.parseInt(hour) : 0, /*TODO del timezone.length()>0 ? Integer.parseInt(timezone) : 0,*/
+										utcOffset.length() > 0 ? Integer.parseInt(utcOffset) : 0, utcOffset.length() > 0 ? Integer.parseInt(utcOffset01) : 0,
 										utcOffset06.length() > 0 ? Integer.parseInt(utcOffset06) : 0, language.length() > 0 ? language : "en-US",
 										colorDepth.length() > 0 ? Integer.parseInt(colorDepth) : 24, screenWidth.length() > 0 ? Integer.parseInt(screenWidth) : 1024,
 										screenHeight.length() > 0 ? Integer.parseInt(screenHeight) : 768, browserWidth.length() > 0 ? Integer.parseInt(browserWidth) : 1024,
@@ -1722,8 +1726,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 												final int buttonCode = Integer.parseInt(eventElement.getAttribute("button")); //get the button code TODO use a constant
 												final int clickCount = Integer.parseInt(eventElement.getAttribute("clickCount")); //get the click count TODO use a constant
 												mouseEvent = new MouseClickEvent(platform, component, new Rectangle(componentX, componentY, componentWidth, componentHeight),
-														new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight), new Point(mouseX, mouseY), Button.valueOf(buttonCode)
-																.getMouseButton(), clickCount, keys.toArray(new Key[keys.size()])); //create a new mouse enter event
+														new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight), new Point(mouseX, mouseY),
+														Button.valueOf(buttonCode).getMouseButton(), clickCount, keys.toArray(new Key[keys.size()])); //create a new mouse enter event
 											}
 												break;
 											case MOUSEENTER:
@@ -1936,8 +1940,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	 * @param authenticated <code>true</code> if the principal succeeded in authentication, else <code>false</code>.
 	 * @see GuiseSession#setPrincipal(Principal)
 	 */
-	protected void authenticated(final HttpServletRequest request, final URI resourceURI, final String method, final String requestURI,
-			final Principal principal, final String realm, final AuthenticateCredentials credentials, final boolean authenticated) {
+	protected void authenticated(final HttpServletRequest request, final URI resourceURI, final String method, final String requestURI, final Principal principal,
+			final String realm, final AuthenticateCredentials credentials, final boolean authenticated) {
 		if(authenticated && credentials != null) { //if authentication was successful with credentials (don't change the session principal for no credentials, because this might remove a principal set by the session itself with no knowledge of the browser)
 			final HTTPServletGuiseContainer guiseContainer = getGuiseContainer(); //get the Guise container
 			final AbstractGuiseApplication guiseApplication = getGuiseApplication(); //get the Guise application
@@ -2022,14 +2026,14 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 			try {
 				call(guiseSessionThreadGroup, new Runnable() { //call the method in a new thread inside the thread group
 
-							public void run() {
-								try {
-									resourceExistsHolder.setObject(Boolean.valueOf(destination.exists(guiseSession, path, bookmark, referrerURI))); //ask the resource destination if the resource exists
-								} catch(final IOException ioException) { //if an exception is thrown
-									throw new UndeclaredThrowableException(ioException); //let it pass to the calling thread
-								}
-							}
-						});
+					public void run() {
+						try {
+							resourceExistsHolder.setObject(Boolean.valueOf(destination.exists(guiseSession, path, bookmark, referrerURI))); //ask the resource destination if the resource exists
+						} catch(final IOException ioException) { //if an exception is thrown
+							throw new UndeclaredThrowableException(ioException); //let it pass to the calling thread
+						}
+					}
+				});
 			} catch(final UndeclaredThrowableException undeclaredThrowableException) { //if an exception was thrown
 				final Throwable cause = undeclaredThrowableException.getCause(); //see what exception was thrown
 				if(cause instanceof IOException) { //if an IOException was thrown
@@ -2091,14 +2095,14 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 				try {
 					call(guiseSessionThreadGroup, new Runnable() { //call the method in a new thread inside the thread group
 
-								public void run() {
-									try {
-										destinationResourceDescriptionHolder.setObject(resourceDestination.getResourceDescription(guiseSession, path, bookmark, referrerURI)); //ask the resource destination for the resource description
-									} catch(final ResourceIOException resourceIOException) { //if an exception is thrown
-										throw new UndeclaredThrowableException(resourceIOException); //let it pass to the calling thread
-									}
-								}
-							});
+						public void run() {
+							try {
+								destinationResourceDescriptionHolder.setObject(resourceDestination.getResourceDescription(guiseSession, path, bookmark, referrerURI)); //ask the resource destination for the resource description
+							} catch(final ResourceIOException resourceIOException) { //if an exception is thrown
+								throw new UndeclaredThrowableException(resourceIOException); //let it pass to the calling thread
+							}
+						}
+					});
 				} catch(final UndeclaredThrowableException undeclaredThrowableException) { //if an exception was thrown
 					final Throwable cause = undeclaredThrowableException.getCause(); //see what exception was thrown
 					if(cause instanceof ResourceIOException) { //if a ResourceIOException was thrown
@@ -2133,8 +2137,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		final URI referrerURI;
 
 		/**
-		 * Returns an input stream to the resource. This method delegates to {@link ResourceReadDestination#getInputStream(String, Bookmark, URI)}, providing the
-		 * Guise session by running in a separate thread group.
+		 * Returns an input stream to the resource. This method delegates to {@link ResourceReadDestination#getInputStream(GuiseSession, URIPath, Bookmark, URI)},
+		 * providing the Guise session by running in a separate thread group.
 		 * @param request The HTTP request in response to which the input stream is being retrieved.
 		 * @return The input stream to the resource.
 		 * @throws IOException if there is an error getting an input stream to the resource.
@@ -2145,14 +2149,14 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 			try {
 				call(guiseSessionThreadGroup, new Runnable() { //call the method in a new thread inside the thread group
 
-							public void run() {
-								try {
-									inputStreamHolder.setObject(resourceDestination.getInputStream(guiseSession, navigationPath, bookmark, referrerURI)); //ask the resource destination for an input stream to the resource
-								} catch(final ResourceIOException resourceIOException) { //if an exception is thrown
-									throw new UndeclaredThrowableException(resourceIOException); //let it pass to the calling thread
-								}
-							}
-						});
+					public void run() {
+						try {
+							inputStreamHolder.setObject(resourceDestination.getInputStream(guiseSession, navigationPath, bookmark, referrerURI)); //ask the resource destination for an input stream to the resource
+						} catch(final ResourceIOException resourceIOException) { //if an exception is thrown
+							throw new UndeclaredThrowableException(resourceIOException); //let it pass to the calling thread
+						}
+					}
+				});
 			} catch(final UndeclaredThrowableException undeclaredThrowableException) { //if an exception was thrown
 				final Throwable cause = undeclaredThrowableException.getCause(); //see what exception was thrown
 				if(cause instanceof ResourceIOException) { //if a ResourceIOException was thrown

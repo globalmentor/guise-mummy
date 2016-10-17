@@ -44,6 +44,7 @@ public interface XMLDepictContext extends TextDepictContext {
 	 * @param writeXMLDeclaration Whether an XML declaration should be included before the doctype.
 	 * @param namespaceURI The URI of the XML namespace of document element, or <code>null</code> if there is no namespace.
 	 * @param localName The local name of the document element with no prefix.
+	 * @throws IOException if there is an error writing the information.
 	 */
 	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName) throws IOException;
 
@@ -54,6 +55,7 @@ public interface XMLDepictContext extends TextDepictContext {
 	 * @param localName The local name of the document element with no prefix.
 	 * @param contentType The specific XML content type.
 	 * @throws NullPointerException if the given content type is <code>null</code>.
+	 * @throws IOException if there is an error writing the information.
 	 */
 	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, final ContentType contentType) throws IOException;
 
@@ -66,6 +68,7 @@ public interface XMLDepictContext extends TextDepictContext {
 	 * @param publicID The XML declaration public ID.
 	 * @throws NullPointerException if the given public ID is <code>null</code>.
 	 * @throws IllegalArgumentException if a system ID could not be determined from the given public ID.
+	 * @throws IOException if there is an error writing the information.
 	 */
 	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, final String publicID) throws IOException;
 
@@ -79,6 +82,7 @@ public interface XMLDepictContext extends TextDepictContext {
 	 * @param contentType The specific XML content type, or <code>null</code> if a content type should be determined from the public ID; otherwise will default to
 	 *          "text/xml".
 	 * @throws IllegalArgumentException if a system ID was not provided or one could not be determined from the given public ID.
+	 * @throws IOException if there is an error writing the information.
 	 */
 	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, String publicID, String systemID,
 			ContentType contentType) throws IOException;
@@ -181,7 +185,7 @@ public interface XMLDepictContext extends TextDepictContext {
 		/** Whether the element has been opened but not closed. */
 		protected boolean open = true;
 
-		/** Whether the element has been opened but not closed. */
+		/** @return Whether the element has been opened but not closed. */
 		public boolean isOpen() {
 			return open;
 		}

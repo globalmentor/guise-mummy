@@ -283,7 +283,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	/**
 	 * Determines the logical navigation path based upon a requested depiction URI. This method must preserve paths beginning with
-	 * {@value #GUISE_RESERVED_BASE_PATH}. This version returns the relative path to the application unmodified.
+	 * {@link #GUISE_RESERVED_BASE_PATH}. This version returns the relative path to the application unmodified.
 	 * @param depictionURI The plain absolute depiction URI.
 	 * @return The application-relative logical navigation path.
 	 * @throws NullPointerException if the given depiction URI is <code>null</code>.
@@ -973,7 +973,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @return The URI path relativized to the application base path.
 	 * @throws NullPointerException if the given URI is <code>null</code>.
 	 * @see #getBasePath()
-	 * @see #relativizePath(String)
+	 * @see #relativizePath(URIPath)
 	 */
 	public URIPath relativizeURI(final URI uri) {
 		return relativizePath(new URIPath(uri.getRawPath())); //relativize the path of the URI TODO make sure the URI is from the correct domain
@@ -1147,10 +1147,11 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @throws NullPointerException if the given URI is <code>null</code>.
 	 * @throws IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made
 	 *           from the required session.
-	 * @throws FileNotFoundException if a URI to a temporary file was passed before the file was created using {@link #createTempAsset(String, String, boolean)}.
+	 * @throws FileNotFoundException if a URI to a temporary file was passed before the file was created using
+	 *           {@link #createTempAsset(String, String, GuiseSession)}.
 	 * @throws IOException if there was an error connecting to the entity at the given URI.
 	 * @see #resolveURI(URI)
-	 * @see #createTempAsset(String, String, boolean)
+	 * @see #createTempAsset(String, String, GuiseSession)
 	 */
 	public OutputStream getOutputStream(final URI uri) throws IOException {
 		//TODO del Log.trace("getting input stream to URI", uri);
@@ -1192,10 +1193,11 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 *           from the required session.
 	 * @throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
 	 *           {@link #getOutputStream(URI)} should be used instead).
-	 * @throws FileNotFoundException if a path to a temporary file was passed before the file was created using {@link #createTempAsset(String, String, boolean)}.
+	 * @throws FileNotFoundException if a path to a temporary file was passed before the file was created using
+	 *           {@link #createTempAsset(String, String, GuiseSession)}.
 	 * @throws IOException if there was an error connecting to the entity at the given URI.
 	 * @see #getOutputStream(URI)
-	 * @see #createTempAsset(String, String, boolean)
+	 * @see #createTempAsset(String, String, GuiseSession)
 	 */
 	public OutputStream getOutputStream(final URIPath path) throws IOException {
 		return getOutputStream(path.toURI()); //create a URI, verifying that it is a path, and return an output stream to the URI
@@ -1252,7 +1254,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @param path The application-relative path of the asset.
 	 * @return <code>true</code> if an asset exists at the given path.
 	 * @throws IOException if there was an error accessing the asset.
-	 * @see #createTempAsset(String, String, boolean)
+	 * @see #createTempAsset(String, String, GuiseSession)
 	 * @see Guise#hasAsset(String)
 	 */
 	public boolean hasAsset(final URIPath path) throws IOException {
@@ -1275,11 +1277,11 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * Returns a URL to the asset at the given path. The path is first normalized. This method supports Guise assets and temporary application assets. The
 	 * returned URL represents internal access to the asset and should normally not be presented to users.
 	 * @param path The application-relative path of the asset.
-	 * @param session The Guise session requesting the asset, or <code>null</code> if there is no session associated with the request.
+	 * @param guiseSession The Guise session requesting the asset, or <code>null</code> if there is no session associated with the request.
 	 * @return A URL to the asset, or <code>null</code> if there is no such asset.
 	 * @throws IllegalStateException if an asset was requested that requires a particular Guise session different from the given Guise session.
 	 * @throws IOException if there was an error accessing the asset.
-	 * @see #createTempAsset(String, String, boolean)
+	 * @see #createTempAsset(String, String, GuiseSession)
 	 * @see Guise#getAssetURL(String)
 	 */
 	public URL getAssetURL(final URIPath path, final GuiseSession guiseSession) throws IOException {

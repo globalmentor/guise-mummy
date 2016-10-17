@@ -22,6 +22,7 @@ import static com.globalmentor.java.Objects.*;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.LayoutComponent;
 import com.guiseframework.geometry.Extent;
+import com.guiseframework.model.ui.PresentationModel;
 
 /**
  * A layout that flows information along an axis.
@@ -169,7 +170,7 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 
 	/**
 	 * @return Whether the description is displayed.
-	 * @see #isDisplayed()
+	 * @see PresentationModel#isDisplayed()
 	 */
 	public boolean isWrapped() {
 		return wrapped;

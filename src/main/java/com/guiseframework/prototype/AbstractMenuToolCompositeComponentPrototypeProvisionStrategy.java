@@ -61,8 +61,8 @@ public abstract class AbstractMenuToolCompositeComponentPrototypeProvisionStrate
 	private final Set<Component> lastComponents = new DecoratorReadWriteLockSet<Component>(new WeakHashSet<Component>(), this);
 
 	/**
-	 * The weak set of static components in the menu or the toolbar that should be displayed last; all components based upon prototypes will be inserted before
-	 * the components.
+	 * @return The weak set of static components in the menu or the toolbar that should be displayed last; all components based upon prototypes will be inserted
+	 *         before the components.
 	 */
 	public Set<Component> getLastComponents() {
 		return lastComponents;

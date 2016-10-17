@@ -176,8 +176,8 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 
 	/**
 	 * Retrieves the style IDs for a tree node.
-	 * @param <T> The type of value contained in the tree node. This version returns the base tree node style ID {@link #TREE_NODE_CLASS} with the given
-	 *          prefix/suffix, if any, along with styles representing the expandeded or collapseed state and whether the node is a leaf.
+	 * @param <T> The type of value contained in the tree node. This version returns the base tree node style ID {@link GuiseCSSStyleConstants#TREE_NODE_CLASS}
+	 *          with the given prefix/suffix, if any, along with styles representing the expanded or collapsed state and whether the node is a leaf.
 	 * @param treeModel The component model.
 	 * @param treeNode The tree node.
 	 * @param prefix The prefix that needs to be added to the base style, or <code>null</code> if there is no prefix to add.
@@ -198,7 +198,6 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 	/**
 	 * Updates the views of any children.
 	 * @throws IOException if there is an error updating the child views.
-	 * @see DepictContext.State#UPDATE_VIEW
 	 */
 	protected void depictChildren() throws IOException {
 		//TODO add "root" class

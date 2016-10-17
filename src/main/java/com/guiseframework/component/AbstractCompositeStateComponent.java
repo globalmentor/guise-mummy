@@ -133,7 +133,6 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 	/**
 	 * Retrieves the object for the given component.
 	 * @param component The child component representing an object.
-	 * @param object The object for which a representation component should be returned.
 	 * @return The object the child component represents.
 	 * @throws NullPointerException if the given component is <code>null</code>.
 	 * @throws IllegalArgumentException if the given component does not represent any object.

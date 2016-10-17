@@ -17,6 +17,7 @@
 package com.guiseframework.component;
 
 import com.globalmentor.java.Objects;
+import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.Layout;
 
 /**
@@ -59,8 +60,8 @@ public abstract class AbstractModalNavigationPanel<R> extends AbstractPanel impl
 	/**
 	 * Ends this navigation panel's modal interaction and navigates either to the previous modal navigation or to this navigation panel's referring URI, if any.
 	 * @param result The result of this navigation panel's modal interaction, or <code>null</code> if no result is given.
-	 * @see #setResult(R)
-	 * @see GuiseSession#endModalNavigation(ModalPanel)
+	 * @see #setResult(Object)
+	 * @see GuiseSession#endModalNavigation(ModalNavigationPanel)
 	 */
 	public void endModal(final R result) {
 		/*TODO fix

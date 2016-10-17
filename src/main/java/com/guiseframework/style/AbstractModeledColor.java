@@ -106,13 +106,14 @@ public abstract class AbstractModeledColor<C extends Enum<C> & ModeledColor.Comp
 	/**
 	 * Creates a color from a string representation. This representation can be in one of the following forms:
 	 * <ul>
-	 * <li><code><var>colorname</var></code>, one of the {@link <a href="http://www.w3schools.com/html/html_colornames.asp">HTML color names</a>}, which must be
-	 * in all lowercase without delimiters, such as "aliceblue".</li>
+	 * <li><code><var>colorname</var></code>, one of the <a href="http://www.w3schools.com/html/html_colornames.asp">HTML color names</a>, which must be in all
+	 * lowercase without delimiters, such as "aliceblue".</li>
 	 * <li><code>#<var>rgb</var></code>, with hexadecimal representation of RGB color components without regard to case.</li>
 	 * <li><code>#<var>rrggbb</var></code>, with hexadecimal representation of RGB color components without regard to case.</li>
 	 * <li><code>rgb(<var>red</var>,<var>green</var>,<var>blue</var>)</code>, with decimal representation with a depth of eight bits (0-255).</li>
 	 * <li><code>rgb(<var>red</var>%,<var>green</var>%,<var>blue</var>%)</code>, with decimal component values multiplied by 100 (0.0-100.0%).</li>
-	 * <li><code>rgba(<var>red</var>,<var>green</var>,<var>blue</var>,<var>alpha</var>)</code>, with decimal representation with a depth of eight bits (0-255).</li>
+	 * <li><code>rgba(<var>red</var>,<var>green</var>,<var>blue</var>,<var>alpha</var>)</code>, with decimal representation with a depth of eight bits
+	 * (0-255).</li>
 	 * <li><code>rgba(<var>red</var>%,<var>green</var>%,<var>blue</var>%,<var>alpha</var>%)</code>, with decimal component values multiplied by 100 (0.0%-100.0%).
 	 * </li>
 	 * <li><code>hsl(<var>hue</var>,<var>saturation</var>,<var>lightness</var>)</code>, with decimal representation with a depth of eight bits (0-255).</li>

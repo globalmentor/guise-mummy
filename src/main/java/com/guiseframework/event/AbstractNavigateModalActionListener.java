@@ -41,7 +41,7 @@ public class AbstractNavigateModalActionListener extends AbstractNavigateActionL
 	 * @param modalListener The listener to respond to the end of modal interaction.
 	 * @throws NullPointerException if the given path and/or modal listener is <code>null</code>.
 	 * @throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
-	 *           {@link #AbstractNavigateModalActionListener(URI, ModalNavigationListener)}</code> should be used instead).
+	 *           {@link #AbstractNavigateModalActionListener(URI, ModalNavigationListener)} should be used instead).
 	 */
 	public AbstractNavigateModalActionListener(final String navigationPath, final ModalNavigationListener modalListener) {
 		this(createPathURI(navigationPath), modalListener); //create a URI from the path and construct the class

@@ -23,6 +23,7 @@ import com.globalmentor.java.Objects;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
+import com.guiseframework.model.Displayable;
 import com.guiseframework.style.Color;
 import com.guiseframework.style.FontStyle;
 import com.guiseframework.style.LineStyle;
@@ -1211,7 +1212,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 	/**
 	 * Sets whether the component is displayed or has no representation, taking up no space. This is a bound property of type {@link Boolean}.
 	 * @param newDisplayed <code>true</code> if the component should be displayed, else <code>false</code> if the component should take up no space.
-	 * @see #DISPLAYED_PROPERTY
+	 * @see Displayable#DISPLAYED_PROPERTY
 	 * @see #setVisible(boolean)
 	 */
 	public void setDisplayed(final boolean newDisplayed) {
@@ -1255,7 +1256,6 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 	 * Sets whether tooltips are enabled for this component. Tooltips contain information from the component model's "info" property. This is a bound property of
 	 * type {@link Boolean}.
 	 * @param newTooltipEnabled <code>true</code> if the component should display tooltips, else <code>false</code>.
-	 * @see #getInfo()
 	 * @see #TOOLTIP_ENABLED_PROPERTY
 	 */
 	public void setTooltipEnabled(final boolean newTooltipEnabled) {

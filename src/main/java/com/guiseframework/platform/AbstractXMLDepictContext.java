@@ -75,7 +75,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 
 	/**
 	 * Sets whether attributes should be generated representing the hash of XML attributes and content.
-	 * @param generateHashAttribute Whether hash attributes should be generated.
+	 * @param generateHashAttributes Whether hash attributes should be generated.
 	 */
 	protected void setHashAttributesGenerated(final boolean generateHashAttributes) {
 		this.hashAttributesGenerated = generateHashAttributes;
@@ -213,6 +213,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 
 	/**
 	 * Appends an attribute and its value to the given appendable.
+	 * @param <A> The type of the appendable.
 	 * @param appendable The appendable to which the attribute should be appended.
 	 * @param attributeQualifiedName The qualified name of the attribute.
 	 * @param attributeValue The value of the attribute.
@@ -235,6 +236,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	 * This implementation appends the attribute qname.
 	 * </p>
 	 * @param appendable The appendable to which the attribute should be appended.
+	 * @param <A> The type of the appendable.
 	 * @param attributeQualifiedName The qualified name of the attribute.
 	 * @return The given appendable.
 	 * @throws IOException if there is a problem appending the attribute information.
@@ -251,6 +253,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	 * This implementation first encodes and then appends appends the given value.
 	 * </p>
 	 * @param appendable The appendable to which the attribute should be appended.
+	 * @param <A> The type of the appendable.
 	 * @param attributeValue The value of the attribute.
 	 * @return The given appendable.
 	 * @throws IOException if there is a problem appending the attribute information.

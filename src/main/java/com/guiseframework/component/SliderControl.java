@@ -109,6 +109,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 	 * Sets the value of the intervals. This is a bound property.
 	 * @param newInterval The new value of the intervals, or <code>null</code> if a default interval should be used.
 	 * @see #INTERVAL_PROPERTY
+	 * @throws ValidationException If the new interval is not valid.
 	 */
 	public void setInterval(final V newInterval) throws ValidationException {
 		if(!Objects.equals(interval, newInterval)) { //if the value is really changing (compare their values, rather than identity)

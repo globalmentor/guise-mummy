@@ -131,6 +131,7 @@ public class Bookmark implements Cloneable {
 	 * @param name The parameter name.
 	 * @param value The parameter value.
 	 * @throws NullPointerException if the given name and/or value is <code>null</code>.
+	 * @return The new bookmark with the given parameter set to the given value.
 	 */
 	public Bookmark setParameter(final String name, final String value) {
 		if(value.equals(getParameterValue(name))) { //if this bookmark already has the given parameter name and value
@@ -146,6 +147,7 @@ public class Bookmark implements Cloneable {
 	 * Creates a new bookmark with the given parameter removed. If this bookmark does not contains the given parameter, this bookmark will be returned.
 	 * @param name The parameter name.
 	 * @throws NullPointerException if the given name is <code>null</code>.
+	 * @return The new bookmark with the given parameter removed.
 	 */
 	public Bookmark removeParameter(final String name) {
 		if(getParameterValue(name) == null) { //if this bookmark does not have given parameter name and value
@@ -156,7 +158,7 @@ public class Bookmark implements Cloneable {
 		return newBookmark; //return our modified clone
 	}
 
-	/** Creates a shallow clone of this object. */
+	/** @return A shallow clone of this object. */
 	@SuppressWarnings("unchecked")
 	//we clone our internal hash map, so we know the generic return type
 	public Object clone() {

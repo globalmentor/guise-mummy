@@ -91,7 +91,6 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 
 	/**
 	 * Determines the local name of the XML element.
-	 * @param component The component for which an element local name should be retrieved.
 	 * @return The local name of the element with no prefix, or <code>null</code> if this component should not be rendered as an element.
 	 */
 	public String getLocalName() {
@@ -246,7 +245,6 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	 * <p>
 	 * This version returns <code>true</code> if the component has at least one mouse listener registered.
 	 * </p>
-	 * @param component The component which may be interested in mouse events.
 	 * @return <code>true</code> if the component is interested in mouse events.
 	 */
 	protected boolean isMouseListener() {
@@ -262,12 +260,11 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	 * This version returns the default style ID and the specified component style ID, if any.
 	 * </p>
 	 * <p>
-	 * If the component is {@link Selectable} and is selected, the {@link SELECTED_CLASS} is returned.
+	 * If the component is {@link Selectable} and is selected, the {@link GuiseCSSStyleConstants#SELECTED_CLASS} is returned.
 	 * </p>
 	 * @param prefix The prefix that needs to be added to each, or <code>null</code> if there is no prefix to add.
 	 * @param suffix The suffix that needs to be added to each, or <code>null</code> if there is no suffix to add.
 	 * @return The base style IDs for the component.
-	 * @see #getDefaultStyleID(C)
 	 */
 	protected Set<String> getBaseStyleIDs(final String prefix, final String suffix) {
 		final C component = getDepictedObject(); //get the depicted component
@@ -653,7 +650,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	 * Writes an XHTML direction attribute for the X axis direction only if the given component has an orientation explicitly set.
 	 * @throws IOException if there is an error writing the attribute.
 	 * @see Component#getOrientation()
-	 * @see #writeDirectionAttribute(GC, C, Orientation)
+	 * @see #writeDirectionAttribute(Orientation, Flow)
 	 */
 	protected void writeDirectionAttribute() throws IOException {
 		final Orientation orientation = getDepictedObject().getOrientation(); //get the component's defined orientation
@@ -689,6 +686,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	 * <p>
 	 * This implementation delegates to {@link #hasLabelContent(LabelModel)}.
 	 * </p>
+	 * @throws IOException if there is an error reading the label.
 	 * @return <code>true</code> if the component contains some label content, such as an icon or label text.
 	 */
 	protected boolean hasLabelContent() throws IOException {
@@ -702,6 +700,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	 * </p>
 	 * @param includeIcon <code>true</code> if the icon should be considered for label content.
 	 * @param includeLabel <code>true</code> if the label text should be considered for label content.
+	 * @throws IOException if there is an error reading the label.
 	 * @return <code>true</code> if the component contains some label content, such as an icon or label text.
 	 */
 	protected boolean hasLabelContent(final boolean includeIcon, final boolean includeLabel) throws IOException {
@@ -714,6 +713,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	 * This implementation delegates to {@link #hasLabelContent(LabelModel, boolean, boolean)}.
 	 * </p>
 	 * @param labelModel The label model containing the label information.
+	 * @throws IOException if there is an error reading the label.
 	 * @return <code>true</code> if the label model contains some label content, such as an icon or label text.
 	 */
 	protected boolean hasLabelContent(final LabelModel labelModel) throws IOException {
@@ -725,6 +725,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	 * @param labelModel The label model containing the label information.
 	 * @param includeIcon <code>true</code> if the icon should be considered for label content.
 	 * @param includeLabel <code>true</code> if the label text should be considered for label content.
+	 * @throws IOException if there is an error reading the label.
 	 * @return <code>true</code> if the label model contains some label content, such as an icon or label text.
 	 */
 	protected boolean hasLabelContent(final LabelModel labelModel, final boolean includeIcon, final boolean includeLabel) throws IOException {
@@ -908,7 +909,6 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	 * <p>
 	 * This version delegates to {@link #getLabelStyles(LabelModel)} using the component as the label model.
 	 * </p>
-	 * @param component The component for which styles should be retrieved.
 	 * @return The styles for the label of the component, mapped to CSS property names.
 	 */
 	protected final Map<String, Object> getLabelStyles() {

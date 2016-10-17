@@ -592,12 +592,12 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 	 * @param axis The axis of alignment.
 	 * @param direction The direction of flow along the axis.
 	 * @return The string alignment value, appropriate for a table cell <code>align</code> or <code>valign</code>.
-	 * @see #TD_ALIGN_LEFT
-	 * @see #TD_ALIGN_CENTER
-	 * @see #TD_ALIGN_RIGHT
-	 * @see #TD_VALIGN_TOP
-	 * @see #TD_VALIGN_MIDDLE
-	 * @see #TD_VALIGN_BOTTOM
+	 * @see com.globalmentor.w3c.spec.HTML#TD_ALIGN_LEFT
+	 * @see com.globalmentor.w3c.spec.HTML#TD_ALIGN_CENTER
+	 * @see com.globalmentor.w3c.spec.HTML#TD_ALIGN_RIGHT
+	 * @see com.globalmentor.w3c.spec.HTML#TD_VALIGN_TOP
+	 * @see com.globalmentor.w3c.spec.HTML#TD_VALIGN_MIDDLE
+	 * @see com.globalmentor.w3c.spec.HTML#TD_VALIGN_BOTTOM
 	 */
 	protected String getAlign(final double alignment, final Axis axis, final Flow.Direction direction) {
 		switch(axis) { //see which axis this is

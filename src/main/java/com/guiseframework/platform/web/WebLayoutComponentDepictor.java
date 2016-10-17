@@ -41,7 +41,7 @@ public class WebLayoutComponentDepictor<C extends LayoutComponent> extends Abstr
 
 	/**
 	 * {@inheritDoc} This version combines the body styles with the outer styles.
-	 * @see AbstractWebComponentDepictor#getBodyStyles(XMLGuiseContext, Component)
+	 * @see AbstractWebComponentDepictor#getBodyStyles()
 	 */
 	@Override
 	protected Map<String, Object> getOuterStyles() { //TODO decide if this technique is the best for the container views

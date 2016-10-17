@@ -49,7 +49,7 @@ public class RegionConstraints extends AbstractConstraints {
 	/** The layout region for the associated component. */
 	private final Region region;
 
-	/** The layout region for the associated component. */
+	/** @return The layout region for the associated component. */
 	public Region getRegion() {
 		return region;
 	}

@@ -186,7 +186,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	/**
 	 * Audio URI constructor.
 	 * @param audioURI The new URI of the audio, which may be a resource URI, or <code>null</code> if there is no audio URI.
-	 * @param audioContenType The new content type of the audio, or <code>null</code> if there is no audio URI or the content type is not known.
+	 * @param contentType The new content type of the audio, or <code>null</code> if there is no audio URI or the content type is not known.
 	 */
 	public Audio(final URI audioURI, final ContentType contentType) {
 		this.audioURI = audioURI;
@@ -258,7 +258,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	}
 
 	/**
-	 * Fires a progress event to all registered progress listeners. This method delegates to {@link #fireProgessed(ProgressEvent)}.
+	 * Fires a progress event to all registered progress listeners. This method delegates to {@link #fireProgressed(ProgressEvent)}.
 	 * @param timePosition The current position in microseconds, or <code>-1</code> if not known.
 	 * @param timeDuration The length or estimated length of the audio in microseconds, or <code>-1</code> if not known.
 	 * @see ProgressListener

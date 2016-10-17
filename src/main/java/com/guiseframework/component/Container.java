@@ -102,7 +102,7 @@ public interface Container extends LayoutComponent, Iterable<Component> {
 	 * @throws IllegalArgumentException if no component can be created from the given prototype
 	 * @throws IllegalStateException if the installed layout does not support default constraints.
 	 * @throws IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
-	 * @see #createComponent(Prototype)
+	 * @see AbstractContainer#createComponent(Prototype)
 	 */
 	public Component add(final int index, final Prototype prototype);
 
@@ -112,7 +112,7 @@ public interface Container extends LayoutComponent, Iterable<Component> {
 	 * @return The component created to represent the given prototype.
 	 * @throws IllegalArgumentException if no component can be created from the given prototype
 	 * @throws IllegalStateException if the installed layout does not support default constraints.
-	 * @see #createComponent(Prototype)
+	 * @see AbstractContainer#createComponent(Prototype)
 	 */
 	public Component add(final Prototype prototype);
 
@@ -126,7 +126,7 @@ public interface Container extends LayoutComponent, Iterable<Component> {
 	 * @throws ClassCastException if the provided constraints are not appropriate for the installed layout.
 	 * @throws IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	 * @throws IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
-	 * @see #createComponent(Prototype)
+	 * @see AbstractContainer#createComponent(Prototype)
 	 */
 	public Component add(final int index, final Prototype prototype, final Constraints constraints);
 
@@ -138,13 +138,12 @@ public interface Container extends LayoutComponent, Iterable<Component> {
 	 * @throws IllegalArgumentException if no component can be created from the given prototype
 	 * @throws ClassCastException if the provided constraints are not appropriate for the installed layout.
 	 * @throws IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
-	 * @see #createComponent(Prototype)
 	 */
 	public Component add(final Prototype prototype, final Constraints constraints);
 
 	/**
 	 * Removes a component from the container.
-	 * @param object The component to remove.
+	 * @param component The component to remove.
 	 * @return <code>true</code> if this collection changed as a result of the operation.
 	 * @throws ClassCastException if given element is not a component.
 	 * @throws IllegalArgumentException if the component is not a member of the container.
@@ -165,6 +164,7 @@ public interface Container extends LayoutComponent, Iterable<Component> {
 	/**
 	 * Sets the layout definition for the container. The layout definition can only be changed if the container currently has no child components. This is a bound
 	 * property.
+	 * @param <T> The type of the constraints.
 	 * @param newLayout The new layout definition for the container.
 	 * @throws NullPointerException if the given layout is <code>null</code>.
 	 * @throws IllegalStateException if a new layout is requested while this container has one or more children.

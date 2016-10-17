@@ -288,7 +288,7 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject //TODO listen 
 
 	/**
 	 * Selects the specified card.
-	 * @param The card control to use in selected the card.
+	 * @param cardControl The card control to use in selected the card.
 	 * @param card The card to select.
 	 * @throws PropertyVetoException if the provided card could not be selected.
 	 */

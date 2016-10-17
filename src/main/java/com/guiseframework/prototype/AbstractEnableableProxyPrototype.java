@@ -33,7 +33,7 @@ public abstract class AbstractEnableableProxyPrototype<P extends Prototype & Inf
 	/**
 	 * Sets whether the object is enabled and can receive user input. This is a bound property of type <code>Boolean</code>.
 	 * @param newEnabled <code>true</code> if the object should indicate and accept user input.
-	 * @see #ENABLED_PROPERTY
+	 * @see Enableable#ENABLED_PROPERTY
 	 */
 	public void setEnabled(final boolean newEnabled) {
 		getProxiedPrototype().setEnabled(newEnabled);

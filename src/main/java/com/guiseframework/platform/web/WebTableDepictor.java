@@ -98,7 +98,6 @@ public class WebTableDepictor<C extends Table> extends AbstractWebComponentDepic
 	/**
 	 * Updates the views of any children.
 	 * @throws IOException if there is an error updating the child views.
-	 * @see DepictContext.State#UPDATE_VIEW
 	 */
 	protected void depictChildren() throws IOException {
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context

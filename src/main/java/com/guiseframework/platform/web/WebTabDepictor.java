@@ -155,7 +155,7 @@ public class WebTabDepictor<V, C extends ListSelectControl<V>> extends AbstractD
 
 	/**
 	 * Updates the views of any children. This version does nothing, because if a tab control is a composite component the child controls have already been
-	 * rendered as values in {@link #depictBody(XMLGuiseContext, ListSelectControl)}.
+	 * rendered as values in {@link #depictBody()}.
 	 * @throws IOException if there is an error updating the child views.
 	 */
 	protected void depictChildren() throws IOException {

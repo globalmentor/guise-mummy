@@ -28,7 +28,7 @@ import static com.globalmentor.w3c.spec.HTML.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**
- * Strategy for rendering a menu as a drop menu. The following illustrates a simplified drop menu structure. <blockquote><code><pre>
+ * Strategy for rendering a menu as a drop menu. The following illustrates a simplified drop menu structure. <blockquote><code>
 &lt;div class="dropMenu" style="position:relative;"&gt;
 	&lt;label&gt;Menu&lt;/label&gt;
 	&lt;div class="dropMenu-container" style="position:absolute;left:0%;top:100%;width:1000%"&gt;
@@ -45,7 +45,7 @@ import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 		&lt;/div&gt;
 	&lt;/div&gt;
 &lt;/div&gt;
-</pre></code><blockquote>
+</code></blockquote>
  * @param <C> The type of component being depicted.
  * @author Garret Wilson
  */

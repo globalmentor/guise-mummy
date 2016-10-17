@@ -861,7 +861,7 @@ public interface PresentationModel extends Model, Displayable {
 	/**
 	 * Sets whether the component is displayed or has no representation, taking up no space. This is a bound property of type {@link Boolean}.
 	 * @param newDisplayed <code>true</code> if the component should be displayed, else <code>false</code> if the component should take up no space.
-	 * @see #DISPLAYED_PROPERTY
+	 * @see Displayable#DISPLAYED_PROPERTY
 	 * @see #setVisible(boolean)
 	 */
 	public void setDisplayed(final boolean newDisplayed);
@@ -883,7 +883,7 @@ public interface PresentationModel extends Model, Displayable {
 	 * Sets whether tooltips are enabled for this component. Tooltips contain information from the component model's "info" property. This is a bound property of
 	 * type {@link Boolean}.
 	 * @param newTooltipEnabled <code>true</code> if the component should display tooltips, else <code>false</code>.
-	 * @see Model#getInfo()
+	 * @see InfoModel#getInfo()
 	 * @see #TOOLTIP_ENABLED_PROPERTY
 	 */
 	public void setTooltipEnabled(final boolean newTooltipEnabled);

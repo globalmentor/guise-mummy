@@ -38,7 +38,7 @@ public abstract class AbstractEditValueControl<V> extends AbstractValueControl<V
 	/**
 	 * Sets whether the value is editable and the control will allow the the user to change the value. This is a bound property of type <code>Boolean</code>.
 	 * @param newEditable <code>true</code> if the control should allow the user to change the value.
-	 * @see #EDITABLE_PROPERTY
+	 * @see EditComponent#EDITABLE_PROPERTY
 	 */
 	public void setEditable(final boolean newEditable) {
 		if(editable != newEditable) { //if the value is really changing

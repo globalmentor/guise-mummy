@@ -24,6 +24,7 @@ import com.globalmentor.beans.*;
 import com.guiseframework.event.*;
 import com.guiseframework.input.*;
 import com.guiseframework.model.*;
+import com.guiseframework.model.Notification.Option;
 
 /**
  * Default implementation of a frame for communication of an option such as "OK" or "Cancel". An option frame defaults to a single composite child panel with a

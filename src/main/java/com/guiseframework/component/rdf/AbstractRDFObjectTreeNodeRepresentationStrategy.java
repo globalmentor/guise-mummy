@@ -86,7 +86,6 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 
 	/**
 	 * Builds the label to be used for a tree node. If the tree node is an {@link RDFObjectTreeNodeModel}, this version prepends a representation of its property.
-	 * @param <N> The type of value contained in the node.
 	 * @param stringBuilder The string builder to hold the label text.
 	 * @param treeControl The component containing the model.
 	 * @param model The model containing the value.

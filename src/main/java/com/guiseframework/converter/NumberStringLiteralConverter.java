@@ -22,7 +22,7 @@ import java.util.Currency;
  * Indicates an object that can convert a number from and to a string. This converter supports different representations, including number, currency, percent,
  * and integer. If the currency style is chosen, care should be taken to indicate a specific constant currency unless it is desired that the currency type
  * change whenever the locale changes.
- * @see http://support.worldpay.com/kb/integration_guides/pro/help/spig12300.html
+ * @see <a href="http://support.worldpay.com/kb/integration_guides/pro/help/spig12300.html">WorldPay - Integration Guides (spig12300)</a>
  * @param <V> The value type this converter supports.
  * @author Garret Wilson
  */

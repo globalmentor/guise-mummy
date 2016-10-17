@@ -162,7 +162,7 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 	 * @param suffix The suffix that needs to be added to each, or <code>null</code> if there is no suffix to add.
 	 * @return The base style IDs for the component.
 	 * @see AbstractWebComponentDepictor#addFlowStyleIDs(Set, Flow)
-	 * @see GuiseCSSStyleConstants#SLIDING_CLASS
+	 * @see GuiseCSSStyleConstants#SLIDER_SLIDING_CLASS
 	 */
 	protected Set<String> getBaseStyleIDs(final String prefix, final String suffix) {
 		final Set<String> baseStyleIDs = super.getBaseStyleIDs(prefix, suffix); //get the default base style IDs

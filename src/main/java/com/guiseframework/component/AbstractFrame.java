@@ -231,7 +231,7 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 
 	/**
 	 * Sets the effect used for opening the frame. This is a bound property.
-	 * @param newEffect The new effect used for opening the frame, or <code>null</code> if there should be no open effect.
+	 * @param newOpenEffect The new effect used for opening the frame, or <code>null</code> if there should be no open effect.
 	 * @see Frame#OPEN_EFFECT_PROPERTY
 	 */
 	public void setOpenEffect(final Effect newOpenEffect) {

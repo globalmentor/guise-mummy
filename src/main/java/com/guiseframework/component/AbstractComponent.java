@@ -546,7 +546,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	 * @throws IllegalStateException if no parent is provided and this component's old parent is a container that still recognizes this component as its child.
 	 * @throws IllegalArgumentException if a parent container is provided and the given parent container does not already recognize this component as its child.
 	 * @see Container#add(Component)
-	 * @see Container#remove(Component)
+	 * @see Container#remove(Object)
 	 */
 	public void setParent(final CompositeComponent newParent) {
 		final CompositeComponent oldParent = parent; //get the old parent
@@ -1235,6 +1235,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/**
 	 * Retrieves a component with the given ID. This method checks the given component and all descendant components.
 	 * @param component The component that should be checked, along with its descendants, for the given ID.
+	 * @param id The ID of the component.
 	 * @return The component with the given ID, or <code>null</code> if this component and all descendant components do not have the given ID.
 	 */
 	public static Component getComponentByID(final Component component, final long id) {
@@ -1254,6 +1255,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/**
 	 * Retrieves a component with the given name. This method checks the given component and all descendant components.
 	 * @param component The component that should be checked, along with its descendants, for the given name.
+	 * @param name The name of the component.
 	 * @return The first component with the given name, or <code>null</code> if this component and all descendant components do not have the given name.
 	 */
 	public static Component getComponentByName(final Component component, final String name) {
@@ -1300,6 +1302,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 
 	/**
 	 * Changes the updated status of the views of an entire component descendant hierarchy.
+	 * @param component The component from which, along with its descendants, notifications should be retrieved.
 	 * @param newUpdated Whether the views of this component and all child components are up to date.
 	 */
 	public static void setDepicted(final Component component, final boolean newUpdated) {
@@ -1407,7 +1410,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 
 	/**
 	 * Notifies the user of the given notification information. The notification is stored in this component using {@link #setNotification(Notification)}, which
-	 * fires appropriate notification events. This method calls {@link GuiseSession#notify(Notification)}.
+	 * fires appropriate notification events. This method calls {@link GuiseSession#notify(Notification...)}.
 	 * @param notification The notification information to relay.
 	 */
 	public void notify(final Notification notification) {
@@ -1538,7 +1541,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 
 		/**
 		 * Sets the effect used for opening the flyover.
-		 * @param newEffect The new effect used for opening the flyover, or <code>null</code> if there should be no open effect.
+		 * @param newOpenEffect The new effect used for opening the flyover, or <code>null</code> if there should be no open effect.
 		 * @see Frame#OPEN_EFFECT_PROPERTY
 		 */
 		public void setOpenEffect(final Effect newOpenEffect) {

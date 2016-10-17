@@ -165,7 +165,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 
 	/**
 	 * Creates a component state to represent the given object. This implementation delegates to {@link #createTypedComponentState(TreeNodeModel)}.
-	 * @param object The object with which the component state is to be associated.
+	 * @param treeNode The object with which the component state is to be associated.
 	 * @return The component state to represent the given object.
 	 * @throws IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
 	 */
@@ -176,7 +176,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	/**
 	 * Creates a component state to represent the given object.
 	 * @param <T> The type of value contained in the tree node.
-	 * @param object The object with which the component state is to be associated.
+	 * @param treeNode The object with which the component state is to be associated.
 	 * @return The component state to represent the given object.
 	 * @throws IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
 	 */
@@ -278,7 +278,6 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		 * Constructor
 		 * @param component The component for a tree node.
 		 * @param editable Whether the component is for a tree node that was editable when the component was created.
-		 * @param expanded Whether the component is for a tree node that was expanded when the component was created.
 		 * @throws NullPointerException if the given component is <code>null</code>.
 		 */
 		public TreeNodeComponentState(final Component component, final boolean editable/*TODO del, final boolean expanded*/) {
@@ -452,7 +451,6 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 
 	/**
 	 * Creates a message to represent the given tree node.
-	 * @param <N> The type of value contained in the node.
 	 * @param treeControl The component containing the model.
 	 * @param model The model containing the value.
 	 * @param treeNode The node containing the value.

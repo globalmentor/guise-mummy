@@ -77,6 +77,7 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	 * depictor's {@link #isDepicted()} status is changed to <code>false</code>. If the property's modified status is set to <code>false</code> and there are no
 	 * other modified properties, the depictor's {@link #isDepicted()} status is set to <code>true</code>.
 	 * @param property The property that has been modified.
+	 * @param modified Whether the property has been modified.
 	 * @see #setDepicted(boolean)
 	 */
 	protected void setPropertyModified(final String property, final boolean modified) {

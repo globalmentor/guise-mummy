@@ -26,10 +26,10 @@ import com.guiseframework.model.*;
 import com.guiseframework.theme.Theme;
 
 /**
- * Selectable link that stores a task state. The link uses selected and unselected icons from the resources using resouce keys
- * <code>select.action.selected.glyph</code> and <code>select.action.unselected.glyph</code>, respectively. The link uses task state icons from the resouces
- * using resouce keys <code>task.state.<var>taskState</var>.glyph</code>, where <var>taskState</var> represents the task state enum value such as
- * {@value TaskState#INCOMPLETE} in its resource key form such as <code>task.state.incomplete.glyph</code>, and <code>task.state..glyph</code> for the
+ * Selectable link that stores a task state. The link uses selected and unselected icons from the resources using resource keys
+ * <code>select.action.selected.glyph</code> and <code>select.action.unselected.glyph</code>, respectively. The link uses task state icons from the resources
+ * using resource keys <code>task.state.<var>taskState</var>.glyph</code>, where <var>taskState</var> represents the task state enum value such as
+ * {@link TaskState#INCOMPLETE} in its resource key form such as <code>task.state.incomplete.glyph</code>, and <code>task.state..glyph</code> for the
  * <code>null</code> task state value.
  * @author Garret Wilson
  * @see Resources#getResourceKeyName(Enum)

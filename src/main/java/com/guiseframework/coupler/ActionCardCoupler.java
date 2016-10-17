@@ -22,6 +22,7 @@ import java.beans.PropertyVetoException;
 
 import com.globalmentor.model.TaskState;
 import com.guiseframework.component.*;
+import com.guiseframework.component.layout.TaskCardConstraints;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 

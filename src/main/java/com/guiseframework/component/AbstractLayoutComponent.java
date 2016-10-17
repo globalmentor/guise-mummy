@@ -87,10 +87,10 @@ public abstract class AbstractLayoutComponent extends AbstractListCompositeCompo
 	/**
 	 * Sets the layout definition for the component. This is a bound property. The layout is marked as not yet having a theme applied, as the specific theme rules
 	 * applied to the layout may depend on the layout's owner.
+	 * @param <T> The type of the constraints.
 	 * @param newLayout The new layout definition for the container.
 	 * @throws NullPointerException if the given layout is <code>null</code>.
 	 * @see #LAYOUT_PROPERTY
-	 * @see #setPropertiesInitialized(boolean)
 	 */
 	protected <T extends Constraints> void setLayout(final Layout<T> newLayout) {
 		if(layout != checkInstance(newLayout, "Layout cannot be null.")) { //if the value is really changing

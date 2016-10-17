@@ -28,11 +28,11 @@ import com.guiseframework.event.NavigateActionListener;
  * attribute will be set of the listener specifies a viewport ID.
  * <p>
  * This view uses the following attributes which are not in XHTML:
+ * </p>
  * <ul>
  * <li><code>guise:originalSrc</code></li>
  * <li><code>guise:rolloverSrc</code></li>
  * </ul>
- * </p>
  * @param <C> The type of component being depicted.
  * @author Garret Wilson
  */

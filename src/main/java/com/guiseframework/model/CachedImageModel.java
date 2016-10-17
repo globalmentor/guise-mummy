@@ -44,7 +44,7 @@ public class CachedImageModel<Q, V> extends DefaultImageModel implements Pending
 	/** The cache from which images will be retrieved. */
 	private final Cache<Q, V> cache;
 
-	/** The cache from which images will be retrieved. */
+	/** @return The cache from which images will be retrieved. */
 	public Cache<Q, V> getCache() {
 		return cache;
 	}

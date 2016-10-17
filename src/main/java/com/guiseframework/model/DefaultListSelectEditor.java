@@ -65,7 +65,6 @@ public class DefaultListSelectEditor<V> extends AbstractListSelectEditor<V> {
 
 	/**
 	 * Creates a component for editing a value. This version creates a new valued component from the valued component class.
-	 * @param value The current value.
 	 * @return A component for editing the value.
 	 * @see #getValuedComponentClass()
 	 */

@@ -29,7 +29,6 @@ public class DelayEffect extends AbstractEffect {
 
 	/**
 	 * Delay constructor.
-	 * @param session The Guise session that owns this effect.
 	 * @param delay The delay in milliseconds.
 	 * @throws IllegalArgumentException if the given delay is negative.
 	 */

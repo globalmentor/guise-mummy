@@ -44,7 +44,6 @@ public class WebChangeDepictEvent extends AbstractWebDepictEvent {
 	/**
 	 * Depicted object and properties constructor.
 	 * @param depictedObject The depicted object on which the event initially occurred.
-	 * @param command The command.
 	 * @param properties The relevant properties; properties with duplicate names replace earlier properties of the same name.
 	 * @throws NullPointerException if the given depicted object and/or properties is <code>null</code>.
 	 */
@@ -56,7 +55,6 @@ public class WebChangeDepictEvent extends AbstractWebDepictEvent {
 	/**
 	 * Depicted object and properties map constructor.
 	 * @param depictedObject The depicted object on which the event initially occurred.
-	 * @param command The command.
 	 * @param properties The map representing the relevant properties.
 	 * @throws NullPointerException if the given depicted object and/or properties is <code>null</code>.
 	 */

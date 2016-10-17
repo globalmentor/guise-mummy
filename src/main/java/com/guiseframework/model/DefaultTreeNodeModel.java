@@ -242,7 +242,7 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 	}
 
 	/**
-	 * Returns a list of children. This method along with {@link #setChildren()} provides a <code>children</code> property for alternate children access.
+	 * Returns a list of children. This method along with {@link #setChildren(List)} provides a <code>children</code> property for alternate children access.
 	 * @return A list of tree node children in order.
 	 * @see #iterator()
 	 */

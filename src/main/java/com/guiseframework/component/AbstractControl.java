@@ -67,7 +67,7 @@ public abstract class AbstractControl extends AbstractComponent implements Contr
 	}
 
 	/**
-	 * Checks the user input status of the control. If the component has a notification of {@link Notification.Severity#WARNING}, the status is determined to be
+	 * Checks the user input status of the control. If the component has a notification of {@link Notification.Severity#WARN}, the status is determined to be
 	 * {@link Status#WARNING}. If the component has a notification of {@link Notification.Severity#ERROR}, the status is determined to be {@link Status#ERROR}.
 	 * Otherwise, this version returns <code>null</code>. If the control is disabled <code>null</code> is returned.
 	 * @return The current user input status of the control.
@@ -149,7 +149,7 @@ public abstract class AbstractControl extends AbstractComponent implements Contr
 	/**
 	 * Sets whether the control is enabled and and can receive user input. This is a bound property of type <code>Boolean</code>.
 	 * @param newEnabled <code>true</code> if the control should indicate and accept user input.
-	 * @see #ENABLED_PROPERTY
+	 * @see Enableable#ENABLED_PROPERTY
 	 */
 	public void setEnabled(final boolean newEnabled) {
 		enableable.setEnabled(newEnabled);

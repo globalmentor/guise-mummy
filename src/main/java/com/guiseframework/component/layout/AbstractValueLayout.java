@@ -194,7 +194,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	 * @param newValue The input value of the model.
 	 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	 * @see #getValidator()
-	 * @see #VALUE_PROPERTY
+	 * @see ValueModel#VALUE_PROPERTY
 	 */
 	public void setValue(final Component newValue) throws PropertyVetoException {
 		final Component oldValue = getValue(); //get the old value
@@ -228,7 +228,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	/**
 	 * Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators. No validation occurs. This version
 	 * resets the cached selected index so that it can be recalculated.
-	 * @see #VALUE_PROPERTY
+	 * @see ValueModel#VALUE_PROPERTY
 	 */
 	public void clearValue() {
 		selectedIndex = -1; //uncache the selected index
@@ -238,7 +238,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	/**
 	 * Resets the value to a default value, which may be invalid according to any installed validators. No validation occurs. This version resets the cached
 	 * selected index so that it can be recalculated.
-	 * @see #VALUE_PROPERTY
+	 * @see ValueModel#VALUE_PROPERTY
 	 */
 	public void resetValue() {
 		selectedIndex = -1; //uncache the selected index

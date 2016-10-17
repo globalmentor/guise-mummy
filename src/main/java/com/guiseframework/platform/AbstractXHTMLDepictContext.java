@@ -27,6 +27,7 @@ import static com.globalmentor.w3c.spec.HTML.*;
 import static java.util.Collections.*;
 
 import com.globalmentor.text.ASCII;
+import com.globalmentor.w3c.spec.HTML;
 import com.globalmentor.w3c.spec.XML;
 import com.globalmentor.xml.QualifiedName;
 import com.globalmentor.xml.xhtml.XHTML;
@@ -35,7 +36,7 @@ import com.guiseframework.*;
 /**
  * Abstract encapsulation of <code>application/xhtml+xml</code> information related to the current depiction.
  * <p>
- * This implementation maps the XHTML namespace {@value XHTML#XHTML_NAMESPACE_URI} to the <code>null</code> prefix.
+ * This implementation maps the XHTML namespace {@link HTML#XHTML_NAMESPACE_URI} to the <code>null</code> prefix.
  * </p>
  * @author Garret Wilson
  */

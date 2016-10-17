@@ -145,6 +145,7 @@ public abstract class AbstractOptionDialogFrame<O> extends AbstractDialogFrame<O
 	/**
 	 * Creates a component to represent the given option.
 	 * @param option The option for which a component should be created.
+	 * @return A component to represents the given option.
 	 */
 	protected abstract Component createOptionComponent(final O option);
 }

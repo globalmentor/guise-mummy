@@ -48,6 +48,7 @@ public abstract class AbstractURFDynamicTreeNodeModel<V> extends DynamicTreeNode
 
 	/**
 	 * Creates a child node to represent a property object resource and optional property. This version returns a {@link URFResourceDynamicTreeNodeModel}.
+	 * @param <T> The type of the URF resource.
 	 * @param propertyURI The URI of the URF property of which this URF resource is an object, or <code>null</code> if this resource should not be considered the
 	 *          object of any property.
 	 * @param resource The resource to represent in the new node.
