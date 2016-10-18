@@ -42,15 +42,15 @@ public class MouseExitEvent extends AbstractMouseEvent {
 	 * Source and target constructor.
 	 * @param source The object on which the event initially occurred.
 	 * @param target The target of the event.
-	 * @param sourceBounds The absolute bounds of the event source.
+	 * @param targetBounds The absolute bounds of the event target.
 	 * @param viewportBounds The absolute bounds of the viewport.
 	 * @param mousePosition The position of the mouse relative to the viewport.
 	 * @param keys The keys that were pressed when this event was generated.
 	 * @throws NullPointerException if the given source, target, target bounds, viewport bounds, mouse position, and/or keys is <code>null</code>.
 	 */
-	public MouseExitEvent(final Object source, final Object target, final Rectangle sourceBounds, final Rectangle viewportBounds, final Point mousePosition,
+	public MouseExitEvent(final Object source, final Object target, final Rectangle targetBounds, final Rectangle viewportBounds, final Point mousePosition,
 			final Key... keys) {
-		super(source, target, sourceBounds, viewportBounds, mousePosition, keys); //construct the parent class
+		super(source, target, targetBounds, viewportBounds, mousePosition, keys); //construct the parent class
 	}
 
 	/**
