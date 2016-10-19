@@ -42,10 +42,10 @@ import com.guiseframework.style.*;
 /**
  * Abstract implementation of information related to the current depiction on the web platform.
  * <p>
- * This implementation maps the XHTML namespace {@value WebPlatform#GUISE_ML_NAMESPACE_URI} to the prefix {@value WebPlatform#GUISE_ML_NAMESPACE_PREFIX}.
+ * This implementation maps the XHTML namespace {@link WebPlatform#GUISE_ML_NAMESPACE_URI} to the prefix {@value WebPlatform#GUISE_ML_NAMESPACE_PREFIX}.
  * </p>
  * <p>
- * This implementation maps the XHTML namespace {@value OpenGraph#NAMESPACE_URI} to the prefix {@value OpenGraph#NAMESPACE_PREFIX}.
+ * This implementation maps the XHTML namespace {@link OpenGraph#NAMESPACE_URI} to the prefix {@value OpenGraph#NAMESPACE_PREFIX}.
  * </p>
  * <p>
  * This implementation defaults to not using quirks mode.
@@ -226,7 +226,7 @@ public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContex
 	 * Appends a CSS string containing the given list of items. Strings containing spaces will be quoted. Items that are <code>null</code> will be represented by
 	 * a missing item in the list.
 	 * @param stringBuilder The string builder to which the style will be added
-	 * @param list The list of items to be converted to a string.
+	 * @param items The list of items to be converted to a string.
 	 * @return The provided string builder.
 	 */
 	protected static StringBuilder appendCSSValue(final StringBuilder stringBuilder, final List<?> items) {

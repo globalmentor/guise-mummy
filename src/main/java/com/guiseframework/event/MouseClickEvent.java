@@ -32,7 +32,7 @@ public class MouseClickEvent extends AbstractMouseEvent {
 	/** The button that was clicked. */
 	private final MouseButton button;
 
-	/** The button that was clicked. */
+	/** @return The button that was clicked. */
 	public MouseButton getButton() {
 		return button;
 	}
@@ -51,7 +51,7 @@ public class MouseClickEvent extends AbstractMouseEvent {
 	 * @param targetBounds The absolute bounds of the event target.
 	 * @param viewportBounds The absolute bounds of the viewport.
 	 * @param mousePosition The position of the mouse relative to the viewport.
-	 * @parma button The button that was clicked.
+	 * @param button The button that was clicked.
 	 * @param count The number of clicks that were input (e.g. 1 for a single click, 2 for a double click, etc.).
 	 * @param keys The keys that were pressed when this event was generated.
 	 * @throws NullPointerException if the given source, target bounds, viewport bounds, mouse position, button, and/or keys is <code>null</code>.
@@ -69,7 +69,7 @@ public class MouseClickEvent extends AbstractMouseEvent {
 	 * @param targetBounds The absolute bounds of the event target.
 	 * @param viewportBounds The absolute bounds of the viewport.
 	 * @param mousePosition The position of the mouse relative to the viewport.
-	 * @parma button The button that was clicked.
+	 * @param button The button that was clicked.
 	 * @param count The number of clicks that were input (e.g. 1 for a single click, 2 for a double click, etc.).
 	 * @param keys The keys that were pressed when this event was generated.
 	 * @throws NullPointerException if the given source, target, target bounds, viewport bounds, mouse position, button, and/or keys is <code>null</code>.

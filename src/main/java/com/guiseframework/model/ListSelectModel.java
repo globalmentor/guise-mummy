@@ -19,6 +19,7 @@ package com.guiseframework.model;
 import java.beans.PropertyVetoException;
 import java.util.List;
 
+import com.guiseframework.component.layout.Constraints;
 import com.guiseframework.event.*;
 
 /**
@@ -54,7 +55,7 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListena
 	 * @param indexes The indices to select.
 	 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	 * @see ListSelectionPolicy#getSetSelectedIndices(ListSelectModel, int[])
-	 * @see #setSelectedValues(V[])
+	 * @see #setSelectedValues(Object...)
 	 * @see #addSelectedIndexes(int...)
 	 */
 	public void setSelectedIndexes(int... indexes) throws PropertyVetoException;
@@ -65,7 +66,7 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListena
 	 * @param indexes The indices to add to the selection.
 	 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	 * @see ListSelectionPolicy#getAddSelectedIndices(ListSelectModel, int[])
-	 * @see #setSelectedIndexes(int[])
+	 * @see #setSelectedIndexes(int...)
 	 */
 	public void addSelectedIndexes(int... indexes) throws PropertyVetoException;
 
@@ -91,7 +92,7 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListena
 	 * Sets the displayed status of the first occurrence of a given value. This is a bound value state property.
 	 * @param value The value to display.
 	 * @param newDisplayed Whether the value should be displayed.
-	 * @see #DISPLAYED_PROPERTY
+	 * @see Displayable#DISPLAYED_PROPERTY
 	 */
 	public void setValueDisplayed(final V value, final boolean newDisplayed); //TODO update comments after property firing is fixed	//TODO fix property change event 
 
@@ -106,7 +107,7 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListena
 	 * Sets the displayed status of a given index. This is a bound value state property.
 	 * @param index The index of the value to display.
 	 * @param newDisplayed Whether the value at the given index should be displayed.
-	 * @see #DISPLAYED_PROPERTY
+	 * @see Displayable#DISPLAYED_PROPERTY
 	 * @throws IndexOutOfBoundsException if the given index is not within the range of the list.
 	 */
 	public void setIndexDisplayed(final int index, final boolean newDisplayed); //TODO fix property change event 
@@ -123,7 +124,7 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListena
 	 * Sets the enabled status of the first occurrence of a given value. This is a bound value state property.
 	 * @param value The value to enable or disable.
 	 * @param newEnabled Whether the value should be enabled.
-	 * @see #ENABLED_PROPERTY
+	 * @see Enableable#ENABLED_PROPERTY
 	 */
 	public void setValueEnabled(final V value, final boolean newEnabled); //TODO fix property change event 
 
@@ -138,7 +139,7 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListena
 	 * Sets the enabled status of a given index. This is a bound value state property.
 	 * @param index The index of the value to enable or disable.
 	 * @param newEnabled Whether the value at the given index should be enabled.
-	 * @see #ENABLED_PROPERTY
+	 * @see Enableable#ENABLED_PROPERTY
 	 * @throws IndexOutOfBoundsException if the given index is not within the range of the list.
 	 */
 	public void setIndexEnabled(final int index, final boolean newEnabled); //TODO fix property change event 

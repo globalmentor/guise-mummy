@@ -35,6 +35,7 @@ import com.guiseframework.event.*;
 import com.guiseframework.geometry.Extent;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.AbstractPresentationModel;
+import com.guiseframework.model.ui.PresentationModel;
 import com.guiseframework.prototype.AbstractActionPrototype;
 import com.guiseframework.prototype.ActionPrototype;
 import com.guiseframework.style.FontStyle;
@@ -157,7 +158,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	 * Sets whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable as
 	 * well. This is a bound property of type <code>Boolean</code>.
 	 * @param newEditable <code>true</code> if the cells should allow the user to change their values if their respective columns are also designated as editable.
-	 * @see TableModel#EDITABLE_PROPERTY
+	 * @see EditComponent#EDITABLE_PROPERTY
 	 */
 	public void setEditable(final boolean newEditable) {
 		if(editable != newEditable) { //if the value is really changing
@@ -465,14 +466,14 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 
 	/**
 	 * Sets the weight of the label font of a given column. The weight of the label font relative to a normal value of 0.5. A font weight of 0.75 is equivalent to
-	 * a bold font. It is recommended that the constant variables {@link ComponentUIModel#FONT_WEIGHT_NORMAL} and {@link ComponentUIModel#FONT_WEIGHT_BOLD} be
+	 * a bold font. It is recommended that the constant variables {@link PresentationModel#FONT_WEIGHT_NORMAL} and {@link PresentationModel#FONT_WEIGHT_BOLD} be
 	 * used for the most compatibility across platforms. This is a bound property of type {@link Double}.
 	 * @param column The column for which the label font weight should be set.
 	 * @param newLabelFontWeight The weight of the label font relative to a normal value of 0.5.
 	 * @throws NullPointerException if the given column is <code>null</code>.
-	 * @see ComponentUIModel#FONT_WEIGHT_PROPERTY
-	 * @see ComponentUIModel#FONT_WEIGHT_NORMAL
-	 * @see ComponentUIModel#FONT_WEIGHT_BOLD
+	 * @see PresentationModel#FONT_WEIGHT_PROPERTY
+	 * @see PresentationModel#FONT_WEIGHT_NORMAL
+	 * @see PresentationModel#FONT_WEIGHT_BOLD
 	 */
 	public void setColumnLabelFontWeight(final TableColumnModel<?> column, final double newLabelFontWeight) {
 		getColumnUIModel(column).setLabelFontWeight(newLabelFontWeight);
@@ -480,12 +481,12 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 
 	/**
 	 * Sets the weight of the label font of all columns. The weight of the label font relative to a normal value of 0.5. A font weight of 0.75 is equivalent to a
-	 * bold font. It is recommended that the constant variables {@link ComponentUIModel#FONT_WEIGHT_NORMAL} and {@link ComponentUIModel#FONT_WEIGHT_BOLD} be used
-	 * for the most compatibility across platforms. This is a bound property of type {@link Double}.
+	 * bold font. It is recommended that the constant variables {@link PresentationModel#FONT_WEIGHT_NORMAL} and {@link PresentationModel#FONT_WEIGHT_BOLD} be
+	 * used for the most compatibility across platforms. This is a bound property of type {@link Double}.
 	 * @param newLabelFontWeight The weight of the label font relative to a normal value of 0.5.
-	 * @see ComponentUIModel#FONT_WEIGHT_PROPERTY
-	 * @see ComponentUIModel#FONT_WEIGHT_NORMAL
-	 * @see ComponentUIModel#FONT_WEIGHT_BOLD
+	 * @see PresentationModel#FONT_WEIGHT_PROPERTY
+	 * @see PresentationModel#FONT_WEIGHT_NORMAL
+	 * @see PresentationModel#FONT_WEIGHT_BOLD
 	 */
 	public void setColumnLabelFontWeight(final double newLabelFontWeight) {
 		for(final TableColumnModel<?> column : getColumns()) { //for each column
@@ -1018,7 +1019,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	}
 
 	/**
-	 * Fires an edit event to all registered edit listeners. This method delegates to {@link #fireEdited(EditEvent))}.
+	 * Fires an edit event to all registered edit listeners. This method delegates to {@link #fireEdited(EditEvent)}.
 	 * @see EditListener
 	 * @see EditEvent
 	 */

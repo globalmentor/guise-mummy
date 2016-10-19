@@ -176,7 +176,6 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 
 	/**
 	 * Depicts any child components.
-	 * @param component The depicted component.
 	 * @throws IOException if there is an error updating the child depictions.
 	 */
 	protected void depictChildren() throws IOException {

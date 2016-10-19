@@ -29,7 +29,7 @@ public abstract class AbstractKeyboardEvent extends AbstractFocusedGestureInputE
 	/** The key that was pressed. */
 	private final Key key;
 
-	/** The key that was pressed. */
+	/** @return The key that was pressed. */
 	public Key getKey() {
 		return key;
 	}
@@ -37,7 +37,7 @@ public abstract class AbstractKeyboardEvent extends AbstractFocusedGestureInputE
 	/**
 	 * Source constructor.
 	 * @param source The object on which the event initially occurred.
-	 * @parma key The key that was pressed.
+	 * @param key The key that was pressed.
 	 * @param keys The keys that were pressed when this event was generated.
 	 * @throws NullPointerException if the given source, key, and/or keys is <code>null</code>.
 	 */

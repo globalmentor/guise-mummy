@@ -18,6 +18,7 @@ package com.guiseframework.model;
 
 import java.net.URI;
 
+import com.guiseframework.component.EditComponent;
 import com.guiseframework.validator.Validator;
 
 /**
@@ -47,7 +48,7 @@ public class DefaultTableColumnModel<V> extends DefaultInfoModel implements Tabl
 	 * Sets whether the cells in this table column model are editable and will allow the the user to change their values. This is a bound property of type
 	 * <code>Boolean</code>.
 	 * @param newEditable <code>true</code> if the table column cells should allow the user to change their values.
-	 * @see TableColumnModel#EDITABLE_PROPERTY
+	 * @see EditComponent#EDITABLE_PROPERTY
 	 */
 	public void setEditable(final boolean newEditable) {
 		if(editable != newEditable) { //if the value is really changing

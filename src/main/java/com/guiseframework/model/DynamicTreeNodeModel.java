@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * A node in a tree model that can dynamically load its children when needed.
  * <p>
- * Child classes must override {@link #determineLeaf()} and {@link #determineChildNodes()}.
+ * Child classes must override {@link #determineLeaf()} and {@link #determineChildren()}.
  * </p>
  * <p>
  * Property change events on one tree node will be bubbled up the hierarchy, with the source indicating the tree node on which the property change occurred.
@@ -102,7 +102,7 @@ public abstract class DynamicTreeNodeModel<V> extends DefaultTreeNodeModel<V> { 
 
 	/**
 	 * Loads children if they haven't already been loaded.
-	 * @see #determineChildNodes()
+	 * @see #determineChildren()
 	 */
 	/*TODO del if not needed
 		protected synchronized void ensureChildrenDetermined()

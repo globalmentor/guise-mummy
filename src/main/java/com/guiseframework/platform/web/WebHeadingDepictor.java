@@ -53,7 +53,7 @@ public class WebHeadingDepictor<C extends LabelComponent> extends WebLabelDepict
 	/**
 	 * Determines the local name to use for a heading based upon a heading level. This method returns one of the XHTML heading element local names if a valid
 	 * level is specified.
-	 * @param headingLevel The zero-based level of the heading, or {@link #NO_HEADING_LEVEL} if no level is specified.
+	 * @param headingLevel The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
 	 * @return The appropriate XHTML heading element name if a level is specified, or <code>null</code> if there is no heading local name for the given heading
 	 *         level.
 	 */

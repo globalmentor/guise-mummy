@@ -53,7 +53,7 @@ public class ComponentNavigationModel extends AbstractModel implements Navigatio
 	 * <p>
 	 * This implementation does not allow the navigation path to be set.
 	 * </p>
-	 * @throws UnsupportedOperationException
+	 * @throws UnsupportedOperationException because the content cannot be changed.
 	 */
 	public void setNavigationPath(final URIPath newNavigationPath) {
 		throw new UnsupportedOperationException("Component navigation models do not allow the navigation path to be set.");

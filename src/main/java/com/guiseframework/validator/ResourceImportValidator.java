@@ -70,7 +70,10 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 		return maxContentLength;
 	}
 
-	/** Default constructor. */
+	/**
+	 * Default constructor.
+	 * @param session The Guise session that owns the validator.
+	 */
 	public ResourceImportValidator(final GuiseSession session) {
 		this(-1); //accept any content type, extension, and content length, and don't require a value
 	}

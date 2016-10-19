@@ -29,6 +29,7 @@ public class ValidationsException extends Exception implements Collection<Valida
 
 	/**
 	 * Validation exceptions constructor. The provided validation exceptions will be added to the list of exceptions.
+	 * @param validationExceptions The validation exceptions to be added to the list.
 	 */
 	public ValidationsException(final ValidationException... validationExceptions) {
 		Collections.addAll(validationExceptionList, validationExceptions); //add all the provided exceptions to the list

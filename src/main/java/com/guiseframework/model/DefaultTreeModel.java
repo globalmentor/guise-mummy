@@ -89,7 +89,7 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel //TODO 
 	 * Sets whether the tree model is editable and the nodes will allow the the user to change their values, if they are designated as editable as well. This is a
 	 * bound property of type <code>Boolean</code>.
 	 * @param newEditable <code>true</code> if the nodes should allow the user to change their values if they are also designated as editable.
-	 * @see TableModel#EDITABLE_PROPERTY
+	 * @see EditComponent#EDITABLE_PROPERTY
 	 */
 	/*TODO del if not needed
 			public void setEditable(final boolean newEditable)
@@ -109,7 +109,6 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel //TODO 
 
 	/**
 	 * Root node constructor.
-	 * @param session The Guise session that owns this model.
 	 * @param rootNode The root node of the tree model.
 	 * @throws NullPointerException if the given root node is <code>null</code>.
 	 */

@@ -54,7 +54,7 @@ public abstract class AbstractCardPanel extends AbstractListSelectContainerContr
 	/**
 	 * Sets whether the component is has bookmarks enabled. This is a bound property of type <code>Boolean</code>.
 	 * @param newBookmarkEnabled <code>true</code> if the component should support bookmarking, else <code>false</code>.
-	 * @see #BOOKMARK_ENABLED
+	 * @see Component#BOOKMARK_ENABLED_PROPERTY
 	 */
 	public void setBookmarkEnabled(final boolean newBookmarkEnabled) {
 		if(bookmarkEnabled != newBookmarkEnabled) { //if the value is really changing

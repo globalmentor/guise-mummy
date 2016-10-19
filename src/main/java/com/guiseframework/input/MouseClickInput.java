@@ -29,7 +29,7 @@ public class MouseClickInput extends AbstractMouseInput {
 	/** The button that was clicked. */
 	private final MouseButton button;
 
-	/** The button that was clicked. */
+	/** @return The button that was clicked. */
 	public MouseButton getButton() {
 		return button;
 	}
@@ -44,7 +44,7 @@ public class MouseClickInput extends AbstractMouseInput {
 
 	/**
 	 * Button and keys constructor.
-	 * @parma button The button that was clicked.
+	 * @param button The button that was clicked.
 	 * @param count The number of clicks that were input (e.g. 1 for a single click, 2 for a double click, etc.).
 	 * @param keys The keys that were pressed when this input occurred.
 	 * @throws NullPointerException if the given button and/or keys is <code>null</code>.

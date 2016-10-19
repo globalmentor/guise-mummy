@@ -61,7 +61,7 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 	/**
 	 * Sets whether the value is editable and the component will allow the the user to change the value. This is a bound property of type <code>Boolean</code>.
 	 * @param newEditable <code>true</code> if the component should allow the user to change the value.
-	 * @see #EDITABLE_PROPERTY
+	 * @see EditComponent#EDITABLE_PROPERTY
 	 */
 	public void setEditable(final boolean newEditable) {
 		if(editable != newEditable) { //if the value is really changing
@@ -108,7 +108,7 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 	/** The component the text of which is to be edited. */
 	private EC editedComponent;
 
-	/** The component the text of which is to be edited. */
+	/** @return The component the text of which is to be edited. */
 	public EC getEditedComponent() {
 		return editedComponent;
 	}
@@ -133,7 +133,7 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 	/** The control used to edit the text. */
 	private ValueControl<String> editControl;
 
-	/** The control used to edit the text. */
+	/** @return The control used to edit the text. */
 	public ValueControl<String> getEditControl() {
 		return editControl;
 	}

@@ -189,7 +189,7 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Concern
 	 * supported.)
 	 * @param requestedLocales The locales requested, in order of preference.
 	 * @return The accepted locale (which may be a variation of this locale), or <code>null</code> if none of the given locales are supported by the application.
-	 * @see GuiseApplication#getSupportedLocales()
+	 * @see GuiseApplication#getLocales()
 	 * @see #setLocale(Locale)
 	 */
 	public Locale requestLocale(final List<Locale> requestedLocales);
@@ -210,7 +210,7 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Concern
 	 * a TURF file with the same name as the class file in the same directory, with an <code>.turf</code> extension. That is, for the class
 	 * <code>MyComponent.class</code> this method first tries to load <code>MyComponent.turf</code> from the same directory. If this is successful, the component
 	 * is initialized from this URF description. This implementation calls {@link #initializeComponent(Component, InputStream)}. The component's
-	 * {@link Component#initialize()} is called whether there is an URF description. This method synchronizes on {@link #getDocumentBuilder()}.
+	 * {@link Component#initialize()} is called whether there is an URF description.
 	 * @param component The component to initialize.
 	 * @throws MissingResourceException if no resource could be found associated with the given key.
 	 * @throws IllegalArgumentException if the URF description does not provide a resource description of the same type as the specified component.
@@ -222,7 +222,7 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Concern
 
 	/**
 	 * Initializes a component with a description in a TURF resource file. This method calls {@link Component#initialize()} after initializing the component from
-	 * the description. This implementation calls {@link #initializeComponent(Component, InputStream)}. This method synchronizes on {@link #getDocumentBuilder()}.
+	 * the description. This implementation calls {@link #initializeComponent(Component, InputStream)}.
 	 * @param component The component to initialize.
 	 * @param resourceKey The key to a TURF description resource file.
 	 * @throws MissingResourceException if no resource could be found associated with the given key.
@@ -236,7 +236,7 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Concern
 
 	/**
 	 * Initializes a component from the contents of an URF description input stream. This method calls {@link Component#initialize()} after initializing the
-	 * component from the description. This method synchronizes on {@link #getDocumentBuilder()}.
+	 * component from the description.
 	 * @param component The component to initialize.
 	 * @param descriptionInputStream The input stream containing an URF description.
 	 * @throws IllegalArgumentException if the URF description does not provide a resource description of the same type as the specified component.
@@ -280,6 +280,7 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Concern
 	 * Retrieves an object resource from the resource bundle. Every resource access method should eventually call this method. This is a preferred convenience
 	 * method for accessing the resources in the session's resource bundle. This method involves an implicit cast that will throw a class cast exception after the
 	 * method ends if the resource is not of the expected type.
+	 * @param <T> The type of the resource.
 	 * @param resourceKey The key of the resource to retrieve.
 	 * @return The resource associated with the specified resource key.
 	 * @throws NullPointerException if the provided resource key is <code>null</code>.
@@ -293,6 +294,7 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Concern
 	 * Retrieves an object resource from the resource bundle, using a specified default if no such resource is available. This is a preferred convenience method
 	 * for accessing the resources in the session's resource bundle. This method involves an implicit cast that will throw a class cast exception after the method
 	 * ends if the resource is not of the expected type.
+	 * @param <T> The type of the resource.
 	 * @param resourceKey The key of the resource to retrieve.
 	 * @param defaultValue The default value to use if there is no resource associated with the given key.
 	 * @return The resource associated with the specified resource key or the default if none is available.
@@ -504,7 +506,7 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Concern
 
 	/**
 	 * Retrieves the component bound to the given application context-relative path. This is a convenience method that retrieves the component associated with the
-	 * component destination for the given navigation path. This method calls {@link GuiseApplication#getDestination(String)}. This method calls
+	 * component destination for the given navigation path. This method calls {@link GuiseApplication#getDestination(URIPath)}. This method calls
 	 * {@link #getDestinationComponent(ComponentDestination)}.
 	 * @param path The application context-relative path within the Guise container context.
 	 * @return The component bound to the given path.
@@ -552,8 +554,8 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Concern
 	 * changed, although navigation and releasal will still occur.
 	 * @param modalNavigationPanel The panel for which modal navigation state should be ended.
 	 * @return true if modality actually ended for the given panel.
-	 * @see Frame#getReferrerURI()
-	 * @see #releaseDestinationComponent(String)
+	 * @see NavigationEvent#getReferrerURI()
+	 * @see #releaseDestinationComponent(ComponentDestination)
 	 */
 	public boolean endModalNavigation(final ModalNavigationPanel<?> modalNavigationPanel);
 
@@ -859,8 +861,8 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Concern
 	 * notification is fatal, the remaining notifications and the specified logic, if any, will not be performed. The absence of an option selection is considered
 	 * fatal only if a fatal option was presented for a given notification. This is a convenience method that delegates to
 	 * {@link #notify(Runnable, Notification...)}.
-	 * @param error The error with which to notify the user.
 	 * @param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
+	 * @param errors The errors with which to notify the user.
 	 * @throws NullPointerException if the given errors is <code>null</code>.
 	 * @throws IllegalArgumentException if no errors are given.
 	 */

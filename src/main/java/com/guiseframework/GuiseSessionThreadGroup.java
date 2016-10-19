@@ -23,7 +23,7 @@ import io.csar.*;
 /**
  * A thread group allocated to a Guise session. All threads accessing a Guise session should be part of the session's thread group.
  * <p>
- * This thread group also allows access to managed configurations using {@link Concerns}. Thread-group-local configurations are retrieved by searching for a
+ * This thread group also allows access to managed configurations using {@link Concern}. Thread-group-local configurations are retrieved by searching for a
  * configuration first in the Guise session using {@link GuiseSession#getConcern(Class)}, and second in the Guise application using
  * {@link GuiseApplication#getConcern(Class)}.
  * </p>
@@ -34,7 +34,7 @@ public class GuiseSessionThreadGroup extends ThreadGroup implements Concerned {
 	/** The Guise session to which this thread group belongs and in which its related threads run. */
 	private final GuiseSession guiseSession;
 
-	/** The Guise session to which this thread group belongs and in which its related threads run. */
+	/** @return The Guise session to which this thread group belongs and in which its related threads run. */
 	public GuiseSession getGuiseSession() {
 		return guiseSession;
 	}

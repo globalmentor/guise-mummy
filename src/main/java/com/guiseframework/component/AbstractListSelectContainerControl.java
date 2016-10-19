@@ -282,7 +282,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	 * @param indexes The indices to select.
 	 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	 * @see ListSelectionPolicy#getSetSelectedIndices(ListSelectModel, int[])
-	 * @see #setSelectedValues(V[])
+	 * @see #setSelectedValues(Component...)
 	 * @see #addSelectedIndexes(int...)
 	 */
 	public void setSelectedIndexes(final int... indexes) throws PropertyVetoException {
@@ -336,7 +336,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	 * Sets the displayed status of the first occurrence of a given value. This is a bound value state property.
 	 * @param value The value to enable or disable.
 	 * @param newDisplayed Whether the value should be displayed.
-	 * @see #DISPLAYED_PROPERTY
+	 * @see Displayable#DISPLAYED_PROPERTY
 	 */
 	public void setValueDisplayed(final Component value, final boolean newDisplayed) {
 		getLayout().getConstraints(value).setDisplayed(newDisplayed);
@@ -355,7 +355,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	 * Sets the displayed status of a given index. This is a bound value state property.
 	 * @param index The index of the value to enable or disable.
 	 * @param newDisplayed Whether the value at the given index should be displayed.
-	 * @see #DISPLAYED_PROPERTY
+	 * @see Displayable#DISPLAYED_PROPERTY
 	 * @throws IndexOutOfBoundsException if the given index is not within the range of the list.
 	 */
 	public void setIndexDisplayed(final int index, final boolean newDisplayed) {
@@ -376,7 +376,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	 * Sets the enabled status of the first occurrence of a given value. This is a bound value state property.
 	 * @param value The value to enable or disable.
 	 * @param newEnabled Whether the value should be enabled.
-	 * @see #ENABLED_PROPERTY
+	 * @see Enableable#ENABLED_PROPERTY
 	 */
 	public void setValueEnabled(final Component value, final boolean newEnabled) {
 		getLayout().getConstraints(value).setEnabled(newEnabled);
@@ -395,7 +395,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	 * Sets the enabled status of a given index. This is a bound value state property.
 	 * @param index The index of the value to enable or disable.
 	 * @param newEnabled Whether the value at the given index should be enabled.
-	 * @see #ENABLED_PROPERTY
+	 * @see Enableable#ENABLED_PROPERTY
 	 * @throws IndexOutOfBoundsException if the given index is not within the range of the list.
 	 */
 	public void setIndexEnabled(final int index, final boolean newEnabled) {
@@ -567,7 +567,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	 * @param index The index of the value to replace.
 	 * @param value The value to be stored at the specified position.
 	 * @return The value at the specified position.
-	 * @throws IndexOutOfBoundsException if the index is out of range (<var>index<var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
+	 * @throws IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
 	 */
 	public Component set(final int index, final Component value) {
 		throw new UnsupportedOperationException("set(index, value) not yet supported");
@@ -617,6 +617,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 
 	/**
 	 * Convenience method to determine whether a card is displayed based upon its associated constraints.
+	 * @param component The component for which the card should be displayed or not displayed.
 	 * @return Whether the card is displayed or has no representation, taking up no space.
 	 * @throws IllegalStateException if the given component has no associated constraints.
 	 * @see ControlConstraints#isDisplayed()
@@ -646,6 +647,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 
 	/**
 	 * Convenience method to determine whether a card is enabled based upon its associated constraints.
+	 * @param component The component for which the card should be enabled or disabled.
 	 * @return Whether the card is enabled and can receive user input.
 	 * @throws IllegalStateException if the given component has no associated constraints.
 	 * @see CardConstraints#isEnabled()

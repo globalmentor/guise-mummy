@@ -429,7 +429,7 @@ public class RegionLayout extends AbstractLayout<RegionConstraints> {
 	}
 
 	/**
-	 * Creates default constraints for the container. This implementation returns {@link #CENTER_CONSTRAINTS}. The new extents will have the default alignment,
+	 * Creates default constraints for the container. This implementation returns {@link Region#CENTER}. The new extents will have the default alignment,
 	 * extent, and padding.
 	 * @return New default constraints for the given component.
 	 */

@@ -27,7 +27,7 @@ import static com.globalmentor.w3c.spec.CSS.*;
 import static com.globalmentor.w3c.spec.HTML.*;
 
 import com.globalmentor.collections.iterators.ReverseIterator;
-import com.globalmentor.w3c.spec.CSS;
+import com.globalmentor.w3c.spec.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.Axis;
@@ -592,12 +592,12 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 	 * @param axis The axis of alignment.
 	 * @param direction The direction of flow along the axis.
 	 * @return The string alignment value, appropriate for a table cell <code>align</code> or <code>valign</code>.
-	 * @see #TD_ALIGN_LEFT
-	 * @see #TD_ALIGN_CENTER
-	 * @see #TD_ALIGN_RIGHT
-	 * @see #TD_VALIGN_TOP
-	 * @see #TD_VALIGN_MIDDLE
-	 * @see #TD_VALIGN_BOTTOM
+	 * @see HTML#TD_ALIGN_LEFT
+	 * @see HTML#TD_ALIGN_CENTER
+	 * @see HTML#TD_ALIGN_RIGHT
+	 * @see HTML#TD_VALIGN_TOP
+	 * @see HTML#TD_VALIGN_MIDDLE
+	 * @see HTML#TD_VALIGN_BOTTOM
 	 */
 	protected String getAlign(final double alignment, final Axis axis, final Flow.Direction direction) {
 		switch(axis) { //see which axis this is

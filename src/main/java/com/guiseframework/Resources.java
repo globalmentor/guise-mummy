@@ -116,7 +116,7 @@ public class Resources extends URFMapResource<URFResource, URFResource> {
 	 * Creates a URI containing a reference to the given string resource key. The URI resource reference is URI with the scheme <code>resource</code> and the
 	 * scheme-specific part indicating the resource key.
 	 * @param resourceKey The resource key to a string in the resources which could be retrieved using {@link GuiseSession#getURIResource(String)}.
-	 * @return A URI containing a reference to the given resource key, which can be resolved using {@link GuiseSession#resolveURI(String)}.
+	 * @return A URI containing a reference to the given resource key, which can be resolved using {@link GuiseSession#resolveURI(URI, String...)}.
 	 * @throws NullPointerException if the given resource key is <code>null</code>.
 	 */
 	public static final URI createURIResourceReference(final String resourceKey) {
@@ -137,6 +137,7 @@ public class Resources extends URFMapResource<URFResource, URFResource> {
 	/**
 	 * Returns a resource reference for the label aspect of a resource key based upon the given enum class. The resource reference will a resource key in the form
 	 * <code><var>com.example.EnumClass</var>.label</code>.
+	 * @param <E> The type of the enum.
 	 * @param enumClass The enum class for which to return a resource reference.
 	 * @return A string resource reference to the label aspect of a resource key based upon the given enum class.
 	 * @throws NullPointerException if the given enum is <code>null</code>.
@@ -151,6 +152,7 @@ public class Resources extends URFMapResource<URFResource, URFResource> {
 	/**
 	 * Returns a resource reference for the label aspect of a resource key based upon the given enum. The resource reference will a resource key in the form
 	 * <code><var>com.example.EnumClass</var>.<var>NAME</var>.label</code>.
+	 * @param <E> The type of the enum.
 	 * @param e The enum instance for which to return a resource reference.
 	 * @return A string resource reference to the label aspect of a resource key based upon the given enum.
 	 * @throws NullPointerException if the given enum is <code>null</code>.
@@ -165,6 +167,7 @@ public class Resources extends URFMapResource<URFResource, URFResource> {
 	/**
 	 * Returns a resource reference for the glyph aspect of a resource key based upon the given enum class. The resource reference will a resource key in the form
 	 * <code><var>com.example.EnumClass</var>.glyph</code>.
+	 * @param <E> The type of the enum.
 	 * @param enumClass The enum class for which to return a resource reference.
 	 * @return A URI resource reference to the glyph aspect of a resource key based upon the given enum class.
 	 * @throws NullPointerException if the given enum is <code>null</code>.
@@ -179,6 +182,7 @@ public class Resources extends URFMapResource<URFResource, URFResource> {
 	/**
 	 * Returns a resource reference for the glyph aspect of a resource key based upon the given enum. The resource reference will a resource key in the form
 	 * <code><var>com.example.EnumClass</var>.<var>NAME</var>.glyph</code>.
+	 * @param <E> The type of the enum.
 	 * @param e The enum instance for which to return a resource reference.
 	 * @return A URI resource reference to the glyph aspect of a resource key based upon the given enum.
 	 * @throws NullPointerException if the given enum is <code>null</code>.
@@ -193,6 +197,7 @@ public class Resources extends URFMapResource<URFResource, URFResource> {
 	/**
 	 * Returns a resource reference for the info aspect of a resource key based upon the given enum class. The resource reference will a resource key in the form
 	 * <code><var>com.example.EnumClass</var>.info</code>.
+	 * @param <E> The type of the enum.
 	 * @param enumClass The enum class for which to return a resource reference.
 	 * @return A string resource reference to the info aspect of a resource key based upon the given enum class.
 	 * @throws NullPointerException if the given enum is <code>null</code>.
@@ -207,6 +212,7 @@ public class Resources extends URFMapResource<URFResource, URFResource> {
 	/**
 	 * Returns a resource reference for the info aspect of a resource key based upon the given enum. The resource reference will a resource key in the form
 	 * <code><var>com.example.EnumClass</var>.<var>NAME</var>.info</code>.
+	 * @param <E> The type of the enum.
 	 * @param e The enum instance for which to return a resource reference.
 	 * @return A string resource reference to the info aspect of a resource key based upon the given enum.
 	 * @throws NullPointerException if the given enum is <code>null</code>.

@@ -81,7 +81,7 @@ public class SequenceTaskController extends BoundPropertyObject {
 	private final ProxyActionPrototype advanceActionPrototype;
 
 	/**
-	 * The action prototype for advancing; serves as a proxy for the start, next, and finish actions, depending on the state of the sequence.
+	 * @return The action prototype for advancing; serves as a proxy for the start, next, and finish actions, depending on the state of the sequence.
 	 * @see #getStartActionPrototype()
 	 * @see #getNextActionPrototype()
 	 * @see #getFinishActionPrototype()
@@ -102,7 +102,7 @@ public class SequenceTaskController extends BoundPropertyObject {
 	/** The action prototype currently being confirmed and which, if confirmed, will be performed. */
 	private ActionPrototype confirmingActionProtype;
 
-	/** The action prototype currently being confirmed and which, if confirmed, will be performed. */
+	/** @return The action prototype currently being confirmed and which, if confirmed, will be performed. */
 	public ActionPrototype getConfirmingActionPrototype() {
 		return confirmingActionProtype;
 	}

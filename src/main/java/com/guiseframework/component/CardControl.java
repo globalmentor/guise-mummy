@@ -26,6 +26,7 @@ public interface CardControl extends CardContainer, ContainerControl, ListSelect
 
 	/**
 	 * Convenience method to determine whether a card is displayed based upon its associated constraints.
+	 * @param component The component for which the card should be displayed or not displayed.
 	 * @return Whether the card is displayed or has no representation, taking up no space.
 	 * @throws IllegalStateException if the given component has no associated constraints.
 	 * @see CardConstraints#isDisplayed()
@@ -42,7 +43,8 @@ public interface CardControl extends CardContainer, ContainerControl, ListSelect
 	public void setDisplayed(final Component component, final boolean newDisplayed);
 
 	/**
-	 * Convenience method to determine whether a card is enabled based upon its associated constraints.
+	 * Convenience method to determine whether a card is enabled based upon its associated constraints.]
+	 * @param component The component for which the card is enabled or disabled.
 	 * @return Whether the card is enabled and can receive user input.
 	 * @throws IllegalStateException if the given component has no associated constraints.
 	 * @see CardConstraints#isEnabled()

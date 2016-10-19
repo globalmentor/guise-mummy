@@ -146,7 +146,7 @@ public abstract class AbstractActionValueControl<V> extends AbstractActionContro
 	 * @param newValue The input value of the model.
 	 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	 * @see #getValidator()
-	 * @see #VALUE_PROPERTY
+	 * @see ValueModel#VALUE_PROPERTY
 	 */
 	public void setValue(final V newValue) throws PropertyVetoException {
 		getValueModel().setValue(newValue);

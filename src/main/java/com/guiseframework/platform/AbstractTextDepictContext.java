@@ -125,7 +125,7 @@ public abstract class AbstractTextDepictContext extends AbstractDepictContext im
 	 * Writes a character, encoding it as necessary. This method calls {@link #writeLiteral(String)}.
 	 * @param character The character to write.
 	 * @throws IOException if there is an error writing the information.
-	 * @see #encode(StringBuilder)
+	 * @see #encode(String)
 	 */
 	public void write(final char character) throws IOException {
 		write(String.valueOf(character)); //convert the character to a string and write it
@@ -135,7 +135,7 @@ public abstract class AbstractTextDepictContext extends AbstractDepictContext im
 	 * Writes text, encoding it as necessary. This method calls {@link #writeLiteral(String)}.
 	 * @param text The text to write.
 	 * @throws IOException if there is an error writing the information.
-	 * @see #encode(StringBuilder)
+	 * @see #encode(String)
 	 */
 	public void write(final String text) throws IOException {
 		writeLiteral(encode(text)); //encode and write the text

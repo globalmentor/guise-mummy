@@ -30,11 +30,11 @@ import com.globalmentor.log.Log;
 import com.guiseframework.model.InfoModel;
 
 /**
- * An abstract implementation of a composite component. Every child component must be added or removed using {@link #addComponent(Component)} and
- * {@link #removeComponent(Component)}, although other actions may take place. This version listens for the {@link Component#VALID_PROPERTY} of each child
- * component and updates the valid status of this component in response. This version listens for child notifications and fires a copy of the
- * {@link NotificationEvent}, retaining the original event target. This version listens for child components being added or removed and fires a copy of the
- * {@link ComponentEvent}, retaining the original event target.
+ * An abstract implementation of a composite component. Every child component must be added or removed using
+ * {@link AbstractLayoutComponent#addComponent(Component)} and {@link AbstractLayoutComponent#removeComponent(Component)}, although other actions may take
+ * place. This version listens for the {@link Component#VALID_PROPERTY} of each child component and updates the valid status of this component in response. This
+ * version listens for child notifications and fires a copy of the {@link NotificationEvent}, retaining the original event target. This version listens for
+ * child components being added or removed and fires a copy of the {@link ComponentEvent}, retaining the original event target.
  * @author Garret Wilson
  */
 public abstract class AbstractCompositeComponent extends AbstractComponent implements CompositeComponent {
@@ -138,7 +138,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	 * events. This version installs a listener to refire copies of composite component events. This version loads the preferences of the child component, but not
 	 * its descendants.
 	 * @param childComponent The component to add to this component.
-	 * @see Component#loadPreferences()
+	 * @see Component#loadPreferences(boolean)
 	 */
 	protected void initializeChildComponent(final Component childComponent) {
 		try {
@@ -161,7 +161,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	 * notification events. This version uninstalls a listener to refire copies of composite component events. This version saves any preferences of the child
 	 * component and any descendants.
 	 * @param childComponent The component to remove from this component.
-	 * @see Component#savePreferences()
+	 * @see Component#savePreferences(boolean)
 	 */
 	protected void uninitializeChildComponent(final Component childComponent) {
 		try {

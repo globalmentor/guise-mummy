@@ -43,7 +43,7 @@ public interface Destination extends PropertyBindable {
 	 */
 	public Pattern getPathPattern();
 
-	/** The read-only iterable of categories. */
+	/** @return The read-only iterable of categories. */
 	public Iterable<Category> getCategories();
 
 	/**

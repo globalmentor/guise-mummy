@@ -349,7 +349,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * supported.)
 	 * @param requestedLocales The locales requested, in order of preference.
 	 * @return The accepted locale (which may be a variation of this locale), or <code>null</code> if none of the given locales are supported by the application.
-	 * @see GuiseApplication#getSupportedLocales()
+	 * @see GuiseApplication#getLocales()
 	 * @see #setLocale(Locale)
 	 */
 	public Locale requestLocale(final List<Locale> requestedLocales) {
@@ -884,7 +884,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	/**
 	 * Retrieves the component bound to the given application context-relative path. This is a convenience method that retrieves the component associated with the
-	 * component destination for the given navigation path. This method calls {@link GuiseApplication#getDestination(String)}. This method calls
+	 * component destination for the given navigation path. This method calls {@link GuiseApplication#getDestination(URIPath)}. This method calls
 	 * {@link #getDestinationComponent(ComponentDestination)}.
 	 * @param path The application context-relative path within the Guise container context.
 	 * @return The component bound to the given path.
@@ -940,7 +940,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * a TURF file in the classpath in the same directory with the same name as the class file, with an <code>.turf</code> extension. That is, for the class
 	 * <code>MyComponent.class</code> this method first tries to load <code>MyComponent.turf</code> from the same directory in the classpath. If this is
 	 * successful, the component is initialized from this URF description. This implementation calls {@link #initializeComponent(Component, InputStream)}. The
-	 * component's {@link Component#initialize()} is called whether there is an URF description. This method synchronizes on {@link #getDocumentBuilder()}.
+	 * component's {@link Component#initialize()} is called whether there is an URF description.
 	 * @param component The component to initialize.
 	 * @throws MissingResourceException if no resource could be found associated with the given key.
 	 * @throws IllegalArgumentException if the URF description does not provide a resource description of the same type as the specified component.
@@ -974,7 +974,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	/**
 	 * Initializes a component with a description in an TURF resource file. This method calls {@link Component#initialize()} after initializing the component from
-	 * the description. This implementation calls {@link #initializeComponent(Component, InputStream)}. This method synchronizes on {@link #getDocumentBuilder()}.
+	 * the description. This implementation calls {@link #initializeComponent(Component, InputStream)}.
 	 * @param component The component to initialize.
 	 * @param resourceKey The key to a TURF description resource file.
 	 * @throws MissingResourceException if no resource could be found associated with the given key.
@@ -998,7 +998,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	/**
 	 * Initializes a component from the contents of an URF description input stream. This method calls {@link Component#initialize()} after initializing the
-	 * component from the description. This method synchronizes on {@link #getDocumentBuilder()}.
+	 * component from the description.
 	 * @param component The component to initialize.
 	 * @param descriptionInputStream The input stream containing an URF description.
 	 * @throws IllegalArgumentException if the URF description does not provide a resource description of the same type as the specified component.
@@ -1105,8 +1105,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param modalNavigationPanel The panel for which modal navigation state should be ended.
 	 * @return true if modality actually ended for the given panel.
 	 * @see #popModalNavigation()
-	 * @see Frame#getReferrerURI()
-	 * @see #releaseDestinationComponent(String)
+	 * @see NavigationEvent#getReferrerURI()
+	 * @see #releaseDestinationComponent(ComponentDestination)
 	 */
 	public boolean endModalNavigation(final ModalNavigationPanel<?> modalNavigationPanel) {
 		final URIPath navigationPath = getNavigationPath(); //get our current navigation path
@@ -1669,8 +1669,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * notification is fatal, the remaining notifications and the specified logic, if any, will not be performed. The absence of an option selection is considered
 	 * fatal only if a fatal option was presented for a given notification. This is a convenience method that delegates to
 	 * {@link #notify(Runnable, Notification...)}.
-	 * @param error The error with which to notify the user.
 	 * @param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
+	 * @param errors The errors with which to notify the user.
 	 * @throws NullPointerException if the given errors is <code>null</code>.
 	 * @throws IllegalArgumentException if no errors are given.
 	 */

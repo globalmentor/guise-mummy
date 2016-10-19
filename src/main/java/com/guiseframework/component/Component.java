@@ -45,7 +45,8 @@ import com.guiseframework.theme.Theme;
  * container altogether.
  * </p>
  * <p>
- * For widest platform support the general {@link #ROUNDED_CORNER_RADIUS_EXTENT} constant should be used whenever possible when requesting rounded corners.
+ * For widest platform support the general {@link PresentationModel#ROUNDED_CORNER_ARC_SIZE} constant should be used whenever possible when requesting rounded
+ * corners.
  * </p>
  * @author Garret Wilson
  */
@@ -207,7 +208,7 @@ public interface Component extends DepictedObject, PresentationModel, InfoModel 
 	 * @throws IllegalStateException if no parent is provided and this component's old parent is a container that still recognizes this component as its child.
 	 * @throws IllegalArgumentException if a parent container is provided and the given parent container does not already recognize this component as its child.
 	 * @see Container#add(Component)
-	 * @see Container#remove(Component)
+	 * @see Container#remove(Object)
 	 */
 	public void setParent(final CompositeComponent newParent);
 
@@ -238,7 +239,7 @@ public interface Component extends DepictedObject, PresentationModel, InfoModel 
 	 * Sets whether flyovers are enabled for this component. Flyovers contain information from the component model's "description" property. This is a bound
 	 * property of type {@link Boolean}.
 	 * @param newFlyoverEnabled <code>true</code> if the component should display flyovers, else <code>false</code>.
-	 * @see Model#getDescription()
+	 * @see InfoModel#getDescription()
 	 * @see #FLYOVER_ENABLED_PROPERTY
 	 */
 	public void setFlyoverEnabled(final boolean newFlyoverEnabled);
@@ -486,7 +487,7 @@ public interface Component extends DepictedObject, PresentationModel, InfoModel 
 
 	/**
 	 * Notifies the user of the given notification information. The notification is stored in this component using {@link #setNotification(Notification)}, which
-	 * fires appropriate notification events. This method calls {@link GuiseSession#notify(Notification)}.
+	 * fires appropriate notification events. This method calls {@link GuiseSession#notify(Notification...)}.
 	 * @param notification The notification information to relay.
 	 */
 	public void notify(final Notification notification);
@@ -536,7 +537,7 @@ public interface Component extends DepictedObject, PresentationModel, InfoModel 
 
 		/**
 		 * Sets the effect used for opening the flyover.
-		 * @param newEffect The new effect used for opening the flyover, or <code>null</code> if there should be no open effect.
+		 * @param newOpenEffect The new effect used for opening the flyover, or <code>null</code> if there should be no open effect.
 		 * @see Frame#OPEN_EFFECT_PROPERTY
 		 */
 		public void setOpenEffect(final Effect newOpenEffect);

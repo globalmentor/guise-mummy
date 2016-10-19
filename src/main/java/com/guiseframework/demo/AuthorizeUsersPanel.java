@@ -79,9 +79,9 @@ public class AuthorizeUsersPanel extends LayoutPanel {
 
 	/**
 	 * Updates the view of this component. This versions makes sure the user list is updated from the application.
+	 * @param <GC> The type of the context.
 	 * @param context Guise context information.
 	 * @throws IOException if there is an error updating the view.
-	 * @see DepictContext.State#UPDATE_VIEW
 	 */
 	public <GC extends DepictContext> void updateView(final GC context) throws IOException { //TODO change to depict()
 		userAuthorizationModel.clear(); //clear all the users we currently have

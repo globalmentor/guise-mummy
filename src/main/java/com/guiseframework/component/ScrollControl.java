@@ -91,10 +91,7 @@ public class ScrollControl extends AbstractEnumCompositeComponent<ScrollControl.
 		//TODO check; are we missing notification methods?		setNotification(null);	//clear any notification
 	}
 
-	/**
-	 * Default constructor with no content component.
-	 * @param component The single content child component, or <code>null</code> if this control should have no content child component.
-	 */
+	/** Default constructor with no content component. */
 	public ScrollControl() {
 		this(null); //construct the class with no content child component
 	}
@@ -110,11 +107,11 @@ public class ScrollControl extends AbstractEnumCompositeComponent<ScrollControl.
 		this.enableable.addPropertyChangeListener(getRepeatPropertyChangeListener()); //listen and repeat all property changes of the enableable object
 		addPropertyChangeListener(ENABLED_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>() { //listen for the "enabled" property changing
 
-					public void propertyChange(GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent) { //if the "enabled" property changes
-						setNotification(null); //clear any notification
-						updateValid(); //update the valid status, which depends on the enabled status					
-					}
-				});
+			public void propertyChange(GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent) { //if the "enabled" property changes
+				setNotification(null); //clear any notification
+				updateValid(); //update the valid status, which depends on the enabled status					
+			}
+		});
 	}
 
 	//Enableable delegations
@@ -127,7 +124,7 @@ public class ScrollControl extends AbstractEnumCompositeComponent<ScrollControl.
 	/**
 	 * Sets whether the control is enabled and and can receive user input. This is a bound property of type <code>Boolean</code>.
 	 * @param newEnabled <code>true</code> if the control should indicate and accept user input.
-	 * @see #ENABLED_PROPERTY
+	 * @see Enableable#ENABLED_PROPERTY
 	 */
 	public void setEnabled(final boolean newEnabled) {
 		enableable.setEnabled(newEnabled);

@@ -24,8 +24,8 @@ import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
 /**
- * Abstract implementation of a control to accept input from the user. The component valid status is updated before a change in the {@link #VALUE_PROPERTY} or
- * the {@link #VALIDATOR_PROPERTY} is fired.
+ * Abstract implementation of a control to accept input from the user. The component valid status is updated before a change in the
+ * {@link ValueModel#VALUE_PROPERTY} or the {@link #VALIDATOR_PROPERTY} is fired.
  * @param <V> The type of value to represent.
  * @author Garret Wilson
  */
@@ -129,7 +129,7 @@ public abstract class AbstractValueControl<V> extends AbstractControl implements
 	 * @param newValue The new value.
 	 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	 * @see #getValidator()
-	 * @see #VALUE_PROPERTY
+	 * @see ValueModel#VALUE_PROPERTY
 	 */
 	public void setValue(final V newValue) throws PropertyVetoException {
 		getValueModel().setValue(newValue);
@@ -137,7 +137,7 @@ public abstract class AbstractValueControl<V> extends AbstractControl implements
 
 	/**
 	 * Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators. No validation occurs.
-	 * @see Value#VALUE_PROPERTY
+	 * @see ValueModel#VALUE_PROPERTY
 	 */
 	public void clearValue() {
 		getValueModel().clearValue();
@@ -145,7 +145,7 @@ public abstract class AbstractValueControl<V> extends AbstractControl implements
 
 	/**
 	 * Resets the value to a default value, which may be invalid according to any installed validators. No validation occurs.
-	 * @see #VALUE_PROPERTY
+	 * @see ValueModel#VALUE_PROPERTY
 	 */
 	public void resetValue() {
 		getValueModel().resetValue();

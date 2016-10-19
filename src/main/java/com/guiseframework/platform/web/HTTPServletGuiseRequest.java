@@ -130,10 +130,8 @@ public class HTTPServletGuiseRequest {
 	/**
 	 * Creates an HTTP request.
 	 * @param request The HTTP request.
-	 * @param response The HTTP response.
 	 * @param guiseContainer The Guise container.
 	 * @param guiseApplication The Guise application.
-	 * @param guiseSession The Guise session.
 	 * @throws IOException if there is an error reading or writing data.
 	 */
 	public HTTPServletGuiseRequest(final HttpServletRequest request, /*TODO del final HttpServletResponse response, */final GuiseContainer guiseContainer,

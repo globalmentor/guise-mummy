@@ -26,7 +26,6 @@ public class TogglePrototype extends ValuePrototype<Boolean> {
 
 	/**
 	 * Default constructor with a {@link Boolean#FALSE} default value.
-	 * @param valueClass The class indicating the type of value held in the model.
 	 */
 	public TogglePrototype() {
 		this(Boolean.FALSE); //construct the class with a false default value
@@ -34,7 +33,6 @@ public class TogglePrototype extends ValuePrototype<Boolean> {
 
 	/**
 	 * Default value constructor.
-	 * @param valueClass The class indicating the type of value held in the model.
 	 * @param defaultValue The default value, which will not be validated.
 	 */
 	public TogglePrototype(final Boolean defaultValue) {
@@ -43,7 +41,6 @@ public class TogglePrototype extends ValuePrototype<Boolean> {
 
 	/**
 	 * Label constructor with a {@link Boolean#FALSE} default value.
-	 * @param valueClass The class indicating the type of value held in the model.
 	 * @param label The text of the label, or <code>null</code> if there should be no label.
 	 */
 	public TogglePrototype(final String label) {
@@ -61,7 +58,6 @@ public class TogglePrototype extends ValuePrototype<Boolean> {
 
 	/**
 	 * Label and icon constructor with a {@link Boolean#FALSE} default value.
-	 * @param valueClass The class indicating the type of value held in the model.
 	 * @param label The text of the label, or <code>null</code> if there should be no label.
 	 * @param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
 	 */

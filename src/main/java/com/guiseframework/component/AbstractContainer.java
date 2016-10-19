@@ -325,7 +325,7 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	}
 
 	/**
-	 * Returns a list of children. This method along with {@link #setChildren()} provides a <code>children</code> property for alternate children access.
+	 * Returns a list of children. This method along with {@link #setChildren(List)} provides a <code>children</code> property for alternate children access.
 	 * @return A list of container children in order.
 	 * @see #iterator()
 	 */
@@ -353,7 +353,6 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	 * @param newLayout The new layout definition for the container.
 	 * @throws NullPointerException if the given layout is <code>null</code>.
 	 * @see #LAYOUT_PROPERTY
-	 * @see #setPropertiesInitialized(boolean)
 	 */
 	public <T extends Constraints> void setLayout(final Layout<T> newLayout) {
 		super.setLayout(newLayout); //delegate to the parent class

@@ -37,7 +37,7 @@ public enum Border {
 	/** The flow. */
 	private final Flow flow;
 
-	/** The flow. */
+	/** @return The flow. */
 	public Flow getFlow() {
 		return flow;
 	}
@@ -45,7 +45,7 @@ public enum Border {
 	/** The end. */
 	private final Flow.End end;
 
-	/** The end. */
+	/** @return The end. */
 	public Flow.End getEnd() {
 		return end;
 	}

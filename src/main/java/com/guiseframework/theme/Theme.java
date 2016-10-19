@@ -163,6 +163,7 @@ public class Theme extends URFListResource<Rule> {
 	/**
 	 * Retrieves the resources URF resources. Each resource may indicate an external set of resources to load by providing a reference URI, as well as contain
 	 * resource definitions.
+	 * @param locale The locale of the resource to be retrieved.
 	 * @return The list of resources that indicate resources locations and/or contain resource definitions.
 	 */
 	public Iterable<URFResource> getResourceResources(final Locale locale) { //TODO use the locale to narrow down the resources
@@ -180,7 +181,7 @@ public class Theme extends URFListResource<Rule> {
 	/**
 	 * Updates the internal maps of rules. This method should be called after rules are modified so that rules will be applied correctly in the future.
 	 * @throws ClassNotFoundException if one of the rules selects a class that cannot be found.
-	 * @see PropertySelector#getSelectClass()
+	 * @see PropertySelector#getSelector()
 	 */
 	public void updateRules() throws ClassNotFoundException {
 		classRuleMap.clear(); //clear the map of rules
@@ -198,7 +199,7 @@ public class Theme extends URFListResource<Rule> {
 	 * @param selector The selector which may result in the theme being updated with this rule.
 	 * @throws NullPointerException if the given rule and/or selector is <code>null</code>.
 	 * @throws ClassNotFoundException if one of the selectors selects a class that cannot be found.
-	 * @see PropertySelector#getSelectClass()
+	 * @see OperatorSelector#getSelectors()
 	 */
 	protected void updateRules(final Rule rule, final Selector selector) throws ClassNotFoundException {
 		checkInstance(rule, "Rule cannot be null.");

@@ -67,6 +67,7 @@ public class WebLinkDepictor<C extends ActionControl> extends AbstractWebActionC
 	 * Retrieves the first {@link NavigateActionListener} or {@link ModalNavigationListener} registered with the given action control, if any. This action
 	 * listener is useful for determining whether predetermined navigation action is called for. If more than one navigate action listener is registered with the
 	 * given action control, it is undefined which will be returned.
+	 * @param actionControl The action control used to look for the registered listener.
 	 * @return An action listener registered with the action control with predefined semantics for navigation, or <code>null</code> if no such action listener is
 	 *         registered with the control.
 	 */

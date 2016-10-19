@@ -30,7 +30,7 @@ public class CommandEvent extends AbstractFocusedInputEvent {
 	/** The command. */
 	private final Command command;
 
-	/** The command. */
+	/** @return The command. */
 	public Command getCommand() {
 		return command;
 	}

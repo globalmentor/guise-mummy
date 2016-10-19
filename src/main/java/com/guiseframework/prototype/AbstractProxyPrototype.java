@@ -81,7 +81,7 @@ public class AbstractProxyPrototype<P extends Prototype & InfoModel> extends Abs
 	 * <ul>
 	 * <li>{@link #LABEL_PROPERTY}</li>
 	 * <li>{@link #LABEL_CONTENT_TYPE_PROPERTY}</li>
-	 * <li>{@link #GLYPH_URI}</li>
+	 * <li>{@link #GLYPH_URI_PROPERTY}</li>
 	 * <li>{@link #DESCRIPTION_PROPERTY}</li>
 	 * <li>{@link #DESCRIPTION_CONTENT_TYPE_PROPERTY}</li>
 	 * <li>{@link #INFO_PROPERTY}</li>

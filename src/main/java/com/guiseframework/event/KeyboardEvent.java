@@ -24,7 +24,7 @@ import com.guiseframework.input.*;
  */
 public interface KeyboardEvent extends GestureInputEvent, FocusedInputEvent {
 
-	/** The key that was pressed. */
+	/** @return The key that was pressed. */
 	public Key getKey();
 
 	/** @return The input associated with this event, or <code>null</code> if there is no input associated with this event. */

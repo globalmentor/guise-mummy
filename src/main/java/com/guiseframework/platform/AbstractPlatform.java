@@ -83,10 +83,9 @@ public abstract class AbstractPlatform implements Platform {
 
 	/**
 	 * Determines the depictor class appropriate for the given depicted object class. A depicted class is located by individually looking up the depicted object
-	 * class hiearchy for registered depictors.
+	 * class hierarchy for registered depictors.
 	 * @param <O> The type of registered depicted object class.
 	 * @param depictedObjectClass The class of depicted object for which a depictor should be returned.
-	 * @param allowDefault Whether a default depictor for the depicted object class should be accepted.
 	 * @return A class of depictor for the given depicted object class, or <code>null</code> if no depictor is registered.
 	 */
 	protected <O extends DepictedObject> Class<? extends Depictor<? super O>> getDepictorClass(final Class<O> depictedObjectClass) {
@@ -179,7 +178,6 @@ public abstract class AbstractPlatform implements Platform {
 	/**
 	 * Application constructor.
 	 * @param application The Guise application running on this platform.
-	 * @param environment The initial environment of the session.
 	 * @throws NullPointerException if the given application and/or environment is <code>null</code>.
 	 */
 	public AbstractPlatform(final GuiseApplication application) {

@@ -40,7 +40,7 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 		/**
 		 * The command to start the audio. Parameters:
 		 * <ul>
-		 * <il><code>{{@value #URI_PROPERTY}:"<var>uri</var>"}</code></li>
+		 * <li><code>{{@value #URI_PROPERTY}:"<var>uri</var>"}</code></li>
 		 * <li><code>{{@value #TYPE_PROPERTY}:"<var>type</var>"}</code></li>
 		 * </ul>
 		 */

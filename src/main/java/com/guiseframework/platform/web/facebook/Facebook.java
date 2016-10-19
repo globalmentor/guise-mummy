@@ -21,7 +21,7 @@ import java.net.URI;
 /**
  * Values and definitions for working with Facebook.
  * @author Garret Wilson
- * @see <a href="https://www.facebook.com/>Facebook</a>
+ * @see <a href="https://www.facebook.com/">Facebook</a>
  * @see <a href="https://developers.facebook.com/docs/opengraph/">Facebook Developers: Open Graph protocol</a>
  */
 public class Facebook {

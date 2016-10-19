@@ -27,7 +27,7 @@ import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 /**
  * An abstract XHTML component depictor that writes component decorations such as label and error. The component is wrapped in an ourter XHTML
  * <code>&lt;div&gt;</code> element. The body of the component will be preceded by a label and succeeded by an error. The provided element, if any, will be used
- * as the body of the component with the {@link #COMPONENT_BODY_CLASS_SUFFIX} ID and style suffix.
+ * as the body of the component with the {@link GuiseCSSStyleConstants#COMPONENT_BODY_CLASS_SUFFIX} ID and style suffix.
  * @param <C> The type of component being depicted.
  * @author Garret Wilson
  */

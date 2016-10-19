@@ -370,7 +370,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	 * @param index The index of the value to replace.
 	 * @param value The value to be stored at the specified position.
 	 * @return The value at the specified position.
-	 * @throws IndexOutOfBoundsException if the index is out of range (<var>index<var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
+	 * @throws IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
 	 */
 	public V set(final int index, final V value) {
 		final V oldValue; //remember the old value at the given position
@@ -551,7 +551,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	 * @param indexes The indices to select.
 	 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	 * @see ListSelectionPolicy#getSetSelectedIndices(ListSelectModel, int[])
-	 * @see #setSelectedValues(V[])
+	 * @see #setSelectedValues(Object...)
 	 * @see #addSelectedIndexes(int...)
 	 */
 	public void setSelectedIndexes(int... indexes) throws PropertyVetoException {
@@ -747,7 +747,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	 * Sets the displayed status of the first occurrence of a given value. This is a bound value state property.
 	 * @param value The value to display.
 	 * @param newDisplayed Whether the value should be displayed.
-	 * @see #DISPLAYED_PROPERTY
+	 * @see Displayable#DISPLAYED_PROPERTY
 	 */
 	public void setValueDisplayed(final V value, final boolean newDisplayed) { //TODO fix property change event 
 		synchronized(this) { //don't allow the model to be changed while we look up the value in the array
@@ -770,7 +770,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	 * Sets the displayed status of a given index. This is a bound value state property.
 	 * @param index The index of the value to display.
 	 * @param newDisplayed Whether the value at the given index should be displayed.
-	 * @see #DISPLAYED_PROPERTY
+	 * @see Displayable#DISPLAYED_PROPERTY
 	 * @throws IndexOutOfBoundsException if the given index is not within the range of the list.
 	 */
 	public void setIndexDisplayed(final int index, final boolean newDisplayed) { //TODO fix property change event 
@@ -800,7 +800,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	 * Sets the enabled status of the first occurrence of a given value. This is a bound value state property.
 	 * @param value The value to enable or disable.
 	 * @param newEnabled Whether the value should be enabled.
-	 * @see #ENABLED_PROPERTY
+	 * @see Enableable#ENABLED_PROPERTY
 	 */
 	public void setValueEnabled(final V value, final boolean newEnabled) { //TODO fix property change event 
 		synchronized(this) { //don't allow the model to be changed while we look up the value in the array
@@ -823,7 +823,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	 * Sets the enabled status of a given index. This is a bound value state property.
 	 * @param index The index of the value to enable or disable.
 	 * @param newEnabled Whether the value at the given index should be enabled.
-	 * @see #ENABLED_PROPERTY
+	 * @see Enableable#ENABLED_PROPERTY
 	 * @throws IndexOutOfBoundsException if the given index is not within the range of the list.
 	 */
 	public void setIndexEnabled(final int index, final boolean newEnabled) { //TODO fix property change event 

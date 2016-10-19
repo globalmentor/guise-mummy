@@ -228,7 +228,7 @@ public interface GuiseApplication extends Resource, PropertyBindable, Concerned 
 
 	/**
 	 * Determines the logical navigation path based upon a requested depiction URI. This method must preserve paths beginning with
-	 * {@value #GUISE_RESERVED_BASE_PATH}.
+	 * {@link #GUISE_RESERVED_BASE_PATH}.
 	 * @param depictionURI The plain absolute depict URI.
 	 * @return The application-relative logical navigation path.
 	 * @throws NullPointerException if the given depiction URI is <code>null</code>.
@@ -401,6 +401,8 @@ public interface GuiseApplication extends Resource, PropertyBindable, Concerned 
 	 *          requested.
 	 * @param uninitializer The encapsulation of any uninitialization that should be performed on any new writer, or <code>null</code> if no uninitialization is
 	 *          requested.
+	 * @throws IOException if there was an error connecting to the entity at the given URI.
+	 * @return The writer suitable for recording log information for the application.
 	 * @see GuiseApplication#getLogDirectory()
 	 */
 	public Writer getLogWriter(final String baseFilename, /*TODO fix final CalendarResolution calendarResolution, */final IOOperation<Writer> initializer,
@@ -569,10 +571,11 @@ public interface GuiseApplication extends Resource, PropertyBindable, Concerned 
 	 * @throws NullPointerException if the given URI is <code>null</code>.
 	 * @throws IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made
 	 *           from the required session.
-	 * @throws FileNotFoundException if a URI to a temporary file was passed before the file was created using {@link #createTempAsset(String, String, boolean)}.
+	 * @throws FileNotFoundException if a URI to a temporary file was passed before the file was created using
+	 *           {@link #createTempAsset(String, String, GuiseSession)}.
 	 * @throws IOException if there was an error connecting to the entity at the given URI.
 	 * @see #resolveURI(URI)
-	 * @see #createTempAsset(String, String, boolean)
+	 * @see #createTempAsset(String, String, GuiseSession)
 	 */
 	public OutputStream getOutputStream(final URI uri) throws IOException;
 
@@ -586,10 +589,11 @@ public interface GuiseApplication extends Resource, PropertyBindable, Concerned 
 	 *           {@link #getOutputStream(URI)} should be used instead).
 	 * @throws IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made
 	 *           from the required session.
-	 * @throws FileNotFoundException if a path to a temporary file was passed before the file was created using {@link #createTempAsset(String, String, boolean)}.
+	 * @throws FileNotFoundException if a path to a temporary file was passed before the file was created using
+	 *           {@link #createTempAsset(String, String, GuiseSession)}.
 	 * @throws IOException if there was an error connecting to the entity at the given URI.
 	 * @see #getOutputStream(URI)
-	 * @see #createTempAsset(String, String, boolean)
+	 * @see #createTempAsset(String, String, GuiseSession)
 	 */
 	public OutputStream getOutputStream(final URIPath path) throws IOException;
 
@@ -616,7 +620,7 @@ public interface GuiseApplication extends Resource, PropertyBindable, Concerned 
 	 * @param path The application-relative path of the asset.
 	 * @return <code>true</code> if an asset exists at the given path.
 	 * @throws IOException if there was an error accessing the asset.
-	 * @see #createTempAsset(String, String, boolean)
+	 * @see #createTempAsset(String, String, GuiseSession)
 	 * @see Guise#hasAsset(String)
 	 */
 	public boolean hasAsset(final URIPath path) throws IOException;
@@ -625,11 +629,11 @@ public interface GuiseApplication extends Resource, PropertyBindable, Concerned 
 	 * Returns a URL to the asset at the given path. The path is first normalized. This method supports Guise assets and temporary application assets. The
 	 * returned URL represents internal access to the asset and should normally not be presented to users.
 	 * @param path The application-relative path of the asset.
-	 * @param session The Guise session requesting the asset, or <code>null</code> if there is no session associated with the request.
+	 * @param guiseSession The Guise session requesting the asset, or <code>null</code> if there is no session associated with the request.
 	 * @return A URL to the asset, or <code>null</code> if there is no such asset.
 	 * @throws IllegalStateException if an asset was requested that requires a particular Guise session different from the given Guise session.
 	 * @throws IOException if there was an error accessing the asset.
-	 * @see #createTempAsset(String, String, boolean)
+	 * @see #createTempAsset(String, String, GuiseSession)
 	 * @see Guise#getAssetURL(String)
 	 */
 	public URL getAssetURL(final URIPath path, final GuiseSession guiseSession) throws IOException;
@@ -680,13 +684,13 @@ public interface GuiseApplication extends Resource, PropertyBindable, Concerned 
 
 	/**
 	 * Indicates the Facebook administrators, if any, for the given navigation path.
+	 * @param navigationPath The navigation path for which a Facebook application ID should be returned.
 	 * @return The IDs of the Facebook administrators, if any, for the navigation path.
 	 */
 	public Set<String> getFacebookAdminIDs(final URIPath navigationPath);
 
 	/**
 	 * Indicates the Facebook application, if any.
-	 * @param navigationPath The navigation path for which a Facebook application ID should be returned.
 	 * @return The ID of the Facebook application, or <code>null</code> if there is no Facebook application.
 	 * @throws NullPointerException if the given navigation path is <code>null</code>.
 	 */

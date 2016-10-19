@@ -52,7 +52,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date> { //TODO r
 	/** The button allowing selection of the date. */
 	private final ToolButton calendarButton;
 
-	/** The button allowing selection of the date. */
+	/** @return The button allowing selection of the date. */
 	protected ToolButton getCalendarButton() {
 		return calendarButton;
 	}

@@ -24,7 +24,7 @@ public class WebPollEvent extends AbstractWebPlatformEvent {
 
 	/**
 	 * Context constructor.
-	 * @param context The context in which this control event was produced.
+	 * @param source The context in which this control event was produced.
 	 * @throws NullPointerException if the given context is <code>null</code>.
 	 */
 	public WebPollEvent(final WebPlatform source) {

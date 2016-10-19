@@ -47,7 +47,7 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 	 * Sets whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable as
 	 * well. This is a bound property of type <code>Boolean</code>.
 	 * @param newEditable <code>true</code> if the cells should allow the user to change their values if their respective columns are also designated as editable.
-	 * @see TableModel#EDITABLE_PROPERTY
+	 * @see EditComponent#EDITABLE_PROPERTY
 	 */
 	/*TODO fix
 			public void setEditable(final boolean newEditable)
@@ -156,7 +156,7 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 	}
 
 	/**
-	 * Sets the cell value for the given cell. This method delegates to {@link #setCellValue(int, TableColumnModel, C)}.
+	 * Sets the cell value for the given cell. This method delegates to {@link #setCellValue(int, TableColumnModel, Object)}.
 	 * @param <C> The type of cell value.
 	 * @param cell The cell containing the row index and column information.
 	 * @param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.

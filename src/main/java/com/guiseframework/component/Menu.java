@@ -19,12 +19,13 @@ package com.guiseframework.component;
 import static com.globalmentor.java.Classes.*;
 
 import com.guiseframework.component.layout.MenuLayout;
+import com.guiseframework.prototype.MenuPrototype;
 
 /**
- * A group of components arranged as a menu. This component uses a {@link MenuModel} and a {@link MenuLayout}.
+ * A group of components arranged as a menu. This component uses a {@link MenuPrototype} and a {@link MenuLayout}.
  * @author Garret Wilson
  * @see MenuLayout
- * @see MenuModel
+ * @see MenuPrototype
  */
 public interface Menu extends ContainerControl, ActionControl, LabelDisplayableComponent {
 

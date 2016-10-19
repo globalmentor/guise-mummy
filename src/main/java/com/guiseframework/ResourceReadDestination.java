@@ -34,9 +34,9 @@ public interface ResourceReadDestination extends Destination {
 	/**
 	 * Returns a description of the resource. The resource should include valid values for the following properties:
 	 * <ul>
-	 * <li>{@value Content#TYPE_PROPERTY_URI}</li>
-	 * <li>{@value Content#LENGTH_PROPERTY_URI}</li>
-	 * <li>{@value Content#MODIFIED_PROPERTY_URI}</li>
+	 * <li>{@link Content#TYPE_PROPERTY_URI}</li>
+	 * <li>{@link Content#LENGTH_PROPERTY_URI}</li>
+	 * <li>{@link Content#MODIFIED_PROPERTY_URI}</li>
 	 * </ul>
 	 * @param session The current Guise Session.
 	 * @param navigationPath The navigation path relative to the application context path.

@@ -113,7 +113,7 @@ public class QuestionTreeNodeModel extends AbstractInteractionTreeNodeModel<Ques
 	/**
 	 * Creates a child node to represent an interaction and optional subject followup evaluation. This version returns a {@link GroupTreeNodeModel} if the given
 	 * resource is a {@link Group}. This version returns a {@link QuestionTreeNodeModel} if the given resource is a {@link Question}. Otherwise, this method
-	 * delegates to {@link #createRDFResourceTreeNode(RDFResource, RDFResource)}.
+	 * delegates to {@link AbstractGroupTreeNodeModel#createRDFResourceTreeNode(RDFResource, RDFResource)}.
 	 * @param followupEvaluation The followup evaluation which considers this interaction a followup in this context, or <code>null</code> if there is no followup
 	 *          evaluation subject in this context.
 	 * @param interaction The interaction to represent in the new node.

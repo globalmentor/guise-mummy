@@ -267,7 +267,7 @@ public class PlatformFileUploadTask extends GuiseBoundPropertyObject implements 
 	}
 
 	/**
-	 * Fires a progress event to all registered progress listeners with the current . This method delegates to {@link #fireProgessed(ProgressEvent)}.
+	 * Fires a progress event to all registered progress listeners with the current . This method delegates to {@link #fireProgressed(ProgressEvent)}.
 	 * @see ProgressListener
 	 * @see ProgressEvent
 	 */

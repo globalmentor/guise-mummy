@@ -221,7 +221,7 @@ public class ResourceCollectControl extends AbstractControl {
 	}
 
 	/**
-	 * Fires a progress event to all registered progress listeners. This method delegates to {@link #fireProgessed(ProgressEvent)}.
+	 * Fires a progress event to all registered progress listeners. This method delegates to {@link #fireProgressed(ProgressEvent)}.
 	 * @param task The task being performed, or <code>null</code> if not indicated.
 	 * @param taskState The state of the task.
 	 * @param value The current progress, or <code>-1</code> if not known.

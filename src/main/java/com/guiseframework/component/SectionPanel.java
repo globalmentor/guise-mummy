@@ -59,7 +59,7 @@ public class SectionPanel extends ArrangePanel implements SectionComponent {
 
 	/**
 	 * Section type constructor with a default vertical flow layout.
-	 * @param sectionType The type of section, or <code>null</code> if there is no specific type specified.
+	 * @param newSectionType The type of section, or <code>null</code> if there is no specific type specified.
 	 */
 	public SectionPanel(final SectionType newSectionType) {
 		this(new FlowLayout(Flow.PAGE), newSectionType); //default to flowing vertically
@@ -68,7 +68,7 @@ public class SectionPanel extends ArrangePanel implements SectionComponent {
 	/**
 	 * Layout and section type constructor.
 	 * @param layout The layout definition for the container.
-	 * @param sectionType The type of section, or <code>null</code> if there is no specific type specified.
+	 * @param newSectionType The type of section, or <code>null</code> if there is no specific type specified.
 	 * @throws NullPointerException if the given layout is <code>null</code>.
 	 */
 	public SectionPanel(final Layout<?> layout, final SectionType newSectionType) {

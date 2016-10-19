@@ -29,14 +29,14 @@ public class KeystrokeInput extends AbstractGestureInput implements KeyboardInpu
 	/** The key that was pressed. */
 	private final Key key;
 
-	/** The key that was pressed. */
+	/** @return The key that was pressed. */
 	public Key getKey() {
 		return key;
 	}
 
 	/**
 	 * Key and keys constructor.
-	 * @parma key The key that was pressed.
+	 * @param key The key that was pressed.
 	 * @param keys The keys that were pressed when this input occurred.
 	 * @throws NullPointerException if the given key and/or keys is <code>null</code>.
 	 */
@@ -45,10 +45,7 @@ public class KeystrokeInput extends AbstractGestureInput implements KeyboardInpu
 		this.key = checkInstance(key, "Key cannot be null."); //save the key
 	}
 
-	/**
-	 * Returns the hash code of this object. This version extends the hash code of the underlying objects with the the key.
-	 * @return The hash code of this object.
-	 */
+	/** @return The hash code of this object. This version extends the hash code of the underlying objects with the the key. */
 	public int hashCode() {
 		return Objects.getHashCode(super.hashCode(), key); //extend the hash code with the key
 	}

@@ -47,7 +47,6 @@ public class LayoutConstraintsPropertyChangeEvent<T extends Constraints, V> exte
 
 	/**
 	 * Source, component, constraint, property name, with old and new value constructor.
-	 * @param session The Guise session in which this event was generated.
 	 * @param source The layout that fired the event.
 	 * @param component The component for which a constraint value changed.
 	 * @param constraints The constraints for which a value changed.

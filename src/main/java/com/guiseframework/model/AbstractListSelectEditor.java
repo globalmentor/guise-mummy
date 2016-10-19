@@ -92,16 +92,16 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 		this.listSelectModel = checkInstance(listSelectModel, "List select model cannot be null.");
 		listSelectModel.addListListener(new ListListener<V>() { //listen to the list being modified
 
-					public void listModified(final ListEvent<V> listEvent) { //if the list is modified
-						updateProperties(); //keep the properties up-to-date
-					}
-				});
+			public void listModified(final ListEvent<V> listEvent) { //if the list is modified
+				updateProperties(); //keep the properties up-to-date
+			}
+		});
 		listSelectModel.addListSelectionListener(new ListSelectionListener<V>() { //listen for the list selection changing
 
-					public void listSelectionChanged(final ListSelectionEvent<V> selectionEvent) { //if the list selection changes
-						updateProperties(); //keep the properties up-to-date
-					}
-				});
+			public void listSelectionChanged(final ListSelectionEvent<V> selectionEvent) { //if the list selection changes
+				updateProperties(); //keep the properties up-to-date
+			}
+		});
 		//insert
 		insertActionPrototype = new AbstractActionPrototype(LABEL_INSERT, GLYPH_INSERT) {
 
@@ -176,22 +176,22 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 		editDialog.setLabel(title); //set the title of the dialog
 		editDialog.open(new AbstractGenericPropertyChangeListener<Frame.Mode>() { //open the dialog modally
 
-					public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> genericPropertyChangeEvent) {
-						if(genericPropertyChangeEvent.getNewValue() == null && editDialog.getValue() == Notification.Option.OK) { //if modality is ending and the user selected OK
-							final V newValue = valuedComponent.getValue(); //get the new value
-							if(replace) { //if we should replace the current value
-								listSelectModel.set(index, value); //change the value in the list
-							} else { //if we shouldn't replace the current value
-								listSelectModel.add(index, value); //insert the value into the list
-							}
-							try {
-								listSelectModel.setSelectedIndexes(index); //make sure the modifed index is selected
-							} catch(final PropertyVetoException propertyVetoException) { //if we can't select the modified item, there's a problem somewhere; in itself this does not hurt the edit functionality, but it's a problem that shouldn't be occurring 
-								throw new AssertionError(propertyVetoException);
-							}
-						}
+			public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> genericPropertyChangeEvent) {
+				if(genericPropertyChangeEvent.getNewValue() == null && editDialog.getValue() == Notification.Option.OK) { //if modality is ending and the user selected OK
+					final V newValue = valuedComponent.getValue(); //get the new value
+					if(replace) { //if we should replace the current value
+						listSelectModel.set(index, value); //change the value in the list
+					} else { //if we shouldn't replace the current value
+						listSelectModel.add(index, value); //insert the value into the list
 					}
-				});
+					try {
+						listSelectModel.setSelectedIndexes(index); //make sure the modifed index is selected
+					} catch(final PropertyVetoException propertyVetoException) { //if we can't select the modified item, there's a problem somewhere; in itself this does not hurt the edit functionality, but it's a problem that shouldn't be occurring 
+						throw new AssertionError(propertyVetoException);
+					}
+				}
+					}
+		});
 	}
 
 	/**
@@ -278,7 +278,6 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 
 	/**
 	 * Creates a component for editing a value.
-	 * @param value The current value.
 	 * @return A component for editing the value.
 	 */
 	protected abstract ValuedComponent<V> createValuedComponent();

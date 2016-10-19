@@ -26,7 +26,6 @@ public class SetEvent<E> extends CollectionEvent<E> {
 
 	/**
 	 * Source constructor for general set modification.
-	 * @param session The Guise session in which this event was generated.
 	 * @param source The object on which the event initially occurred.
 	 * @throws NullPointerException if the given source is <code>null</code>.
 	 */

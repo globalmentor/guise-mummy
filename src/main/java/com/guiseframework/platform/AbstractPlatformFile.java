@@ -81,7 +81,7 @@ public abstract class AbstractPlatformFile implements PlatformFile {
 	}
 
 	/**
-	 * Fires a progress event to all registered progress listeners. This method delegates to {@link #fireProgessed(ProgressEvent)}.
+	 * Fires a progress event to all registered progress listeners. This method delegates to {@link #fireProgressed(ProgressEvent)}.
 	 * @param state The state of the progress.
 	 * @param transferred The current number of bytes transferred, or <code>-1</code> if not known.
 	 * @param total The total or estimated total bytes to transfer, or <code>-1</code> if not known.

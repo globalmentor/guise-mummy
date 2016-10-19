@@ -47,7 +47,7 @@ public abstract class AbstractModelGroup<M extends Model> implements ModelGroup<
 	}
 
 	/**
-	 * Adds a model to the group. If the model is already included in the group, no action occurs. This version delegates to {@link #addImpl(M)}.
+	 * Adds a model to the group. If the model is already included in the group, no action occurs. This version delegates to {@link #addImpl(Model)}.
 	 * @param model The model to add to the group.
 	 * @throws NullPointerException if the given model is <code>null</code>.
 	 */
@@ -67,7 +67,7 @@ public abstract class AbstractModelGroup<M extends Model> implements ModelGroup<
 	}
 
 	/**
-	 * Removes a model from the group. If the model is not included in this group, no action occurs. This version delegates to {@link #removeImpl(M)}.
+	 * Removes a model from the group. If the model is not included in this group, no action occurs. This version delegates to {@link #removeImpl(Model)}.
 	 * @param model The model to remove from the group.
 	 * @throws NullPointerException if the given model is <code>null</code>.
 	 */

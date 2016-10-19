@@ -16,6 +16,7 @@
 
 package com.guiseframework.component;
 
+import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.Layout;
 import com.guiseframework.component.layout.RegionLayout;
 
@@ -44,8 +45,8 @@ public class DefaultModalNavigationPanel<R> extends AbstractModalNavigationPanel
 	/**
 	 * Ends this frame's modal interaction and navigates either to the previous modal navigation or to this frame's referring URI, if any.
 	 * @param result The result of this frame's modal interaction, or <code>null</code> if no result is given.
-	 * @see #setResult(R)
-	 * @see GuiseSession#endModalNavigation(ModalPanel)
+	 * @see #setResult(Object)
+	 * @see GuiseSession#endModalNavigation(ModalNavigationPanel)
 	 */
 	public void endModal(final R result) {
 		setResult(result); //update the result

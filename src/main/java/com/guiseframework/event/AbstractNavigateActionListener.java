@@ -49,7 +49,7 @@ public abstract class AbstractNavigateActionListener implements ActionListener {
 	 * @param navigationPath A path that is either relative to the application context path or is absolute.
 	 * @throws NullPointerException if the given path is <code>null</code>.
 	 * @throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
-	 *           {@link #AbstractNavigateActionListener(URI)}</code> should be used instead).
+	 *           {@link #AbstractNavigateActionListener(URI)} should be used instead).
 	 */
 	public AbstractNavigateActionListener(final URIPath navigationPath) {
 		this(navigationPath.toURI()); //construct the class with the URI form of the path

@@ -30,7 +30,7 @@ public class Category extends DefaultComparableIDNamed<String, String> {
 	/** The map of sub-categories; it is not thread-safe, but any changes will simply create a new list. */
 	private List<Category> categories = unmodifiableList(new ArrayList<Category>());
 
-	/** The read-only iterable of categories. */
+	/** @return The read-only iterable of categories. */
 	public Iterable<Category> getCategories() {
 		return categories;
 	}

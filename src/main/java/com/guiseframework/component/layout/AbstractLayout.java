@@ -87,9 +87,9 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 	/**
 	 * Sets the layout component that owns this layout This method is managed by layout components, and normally should not be called by applications. //TODO del
 	 * A layout cannot be given a layout component if it is already installed in another layout component. Once a layout is installed in a layout component, it
-	 * cannot be uninstalled. A layout cannot be given a layout component if it is already installed in another layout component. A layout cannot be given a layout
-	 * component unless that layout component already recognizes this layout as its layout. If a layout is given the same layout component it already has, no
-	 * action occurs.
+	 * cannot be uninstalled. A layout cannot be given a layout component if it is already installed in another layout component. A layout cannot be given a
+	 * layout component unless that layout component already recognizes this layout as its layout. If a layout is given the same layout component it already has,
+	 * no action occurs.
 	 * @param newOwner The new layout component for this layout. //TODO del @throws NullPointerException if the given layout component is <code>null</code>.
 	 * @throws IllegalStateException if a different layout component is provided and this layout already has a layout component.
 	 * @throws IllegalArgumentException if a different layout component is provided and the given layout component does not already recognize this layout as its
@@ -98,12 +98,12 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 	public void setOwner(final LayoutComponent newOwner) {
 		final LayoutComponent oldOwner = owner; //get the old component
 		if(oldOwner != newOwner) { //if the component is really changing
-		/*TODO fix
-						checkNull(newContainer, "Layout component cannot be null.");
-						if(oldContainer!=null) {	//if we already have a parent
-							throw new IllegalStateException("Layout "+this+" already has layout component: "+oldContainer);
-						}
-		*/
+			/*TODO fix
+							checkNull(newContainer, "Layout component cannot be null.");
+							if(oldContainer!=null) {	//if we already have a parent
+								throw new IllegalStateException("Layout "+this+" already has layout component: "+oldContainer);
+							}
+			*/
 			if(newOwner != null && newOwner.getLayout() != this) { //if the layout component that is not really our owner
 				throw new IllegalArgumentException("Provided layout component " + newOwner + " is not really owner of layout " + this);
 			}
@@ -196,6 +196,7 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 	 * Reports that the bound property of a component's constraints has changed. No event is fired if old and new are both <code>null</code> or are both non-
 	 * <code>null</code> and equal according to the {@link Object#equals(java.lang.Object)} method. No event is fired if no listeners are registered for the given
 	 * property. This method delegates actual firing of the event to {@link #firePropertyChange(PropertyChangeEvent)}.
+	 * @param <V> The type of the values.
 	 * @param component The component for which a constraint value changed.
 	 * @param constraints The constraints for which a value changed.
 	 * @param propertyName The name of the property being changed.
@@ -203,7 +204,8 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 	 * @param newValue The new property value.
 	 * @see LayoutConstraintsPropertyChangeEvent
 	 */
-	protected <V> void fireConstraintsPropertyChange(final Component component, final T constraints, final String propertyName, final V oldValue, final V newValue) {
+	protected <V> void fireConstraintsPropertyChange(final Component component, final T constraints, final String propertyName, final V oldValue,
+			final V newValue) {
 		if(hasPropertyChangeListeners(propertyName)) { //if we have listeners registered for this property
 			if(!Objects.equals(oldValue, newValue)) { //if the values are different					
 				firePropertyChange(new LayoutConstraintsPropertyChangeEvent<T, V>(this, component, constraints, propertyName, oldValue, newValue)); //create and fire a layout constraints property change event
@@ -242,6 +244,7 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 
 		/**
 		 * Refires a constraint property change event for the layout in the form of a {@link LayoutConstraintsPropertyChangeEvent}.
+		 * @param <V> The type of the values.
 		 * @param component The component for which a constraint value changed.
 		 * @param constraints The constraints for which a value changed.
 		 * @param propertyName The name of the property being changed.

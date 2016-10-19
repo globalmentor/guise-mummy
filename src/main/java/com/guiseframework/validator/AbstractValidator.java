@@ -85,7 +85,7 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 	 * Sets the text of the value required message. This is a bound property.
 	 * @param newValueRequiredMessage The new text of the value required message, which may include a resource reference.
 	 * @throws NullPointerException if the given message is <code>null</code>.
-	 * @see #VALUE_REQUIRED_VALUE_MESSAGE_PROPERTY
+	 * @see Validator#VALUE_REQUIRED_MESSAGE_PROPERTY
 	 */
 	public void setValueRequiredMessage(final String newValueRequiredMessage) {
 		if(!valueRequiredMessage.equals(checkInstance(newValueRequiredMessage, "Value required message cannot be null."))) { //if the value is really changing
