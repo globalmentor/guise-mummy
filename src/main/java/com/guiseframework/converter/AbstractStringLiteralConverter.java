@@ -33,12 +33,12 @@ import com.globalmentor.net.EmailAddress;
 public abstract class AbstractStringLiteralConverter<V> extends AbstractConverter<V, String> {
 
 	/**
-	 * Converts a value from the value space to a literal value in the lexical space. This implementation returns the {@link Object#toString()} version of the
-	 * value, if a value is given.
-	 * @param value The value in the value space to convert.
-	 * @return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>.
-	 * @throws ConversionException if the value cannot be converted.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation returns the {@link Object#toString()} version of the value, if a value is given.
+	 * </p>
 	 */
+	@Override
 	public String convertValue(final V value) throws ConversionException {
 		return value != null ? value.toString() : null; //convert the value to a string if there is a value
 	}

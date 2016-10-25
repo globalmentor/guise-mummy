@@ -31,7 +31,7 @@ public class DefaultMenuToolPrototypeProvisionStrategy extends AbstractMenuToolC
 	/** The menu being managed, or <code>null</code> if no menu is being managed. */
 	private final Menu menu;
 
-	/** @return The menu being managed, or <code>null</code> if no menu is being managed. */
+	@Override
 	protected Menu getMenu() {
 		return menu;
 	}
@@ -39,7 +39,7 @@ public class DefaultMenuToolPrototypeProvisionStrategy extends AbstractMenuToolC
 	/** The toolbar being managed, or <code>null</code> if no toolbar is being managed. */
 	private final Toolbar toolbar;
 
-	/** @return The toolbar being managed, or <code>null</code> if no toolbar is being managed. */
+	@Override
 	protected Toolbar getToolbar() {
 		return toolbar;
 	}

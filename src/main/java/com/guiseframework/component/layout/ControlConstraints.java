@@ -27,16 +27,12 @@ public class ControlConstraints extends AbstractConstraints implements Displayab
 	/** Whether the component is displayed or has no representation, taking up no space. */
 	private boolean displayed = true;
 
-	/** @return Whether the component is displayed or has no representation, taking up no space. */
+	@Override
 	public boolean isDisplayed() {
 		return displayed;
 	}
 
-	/**
-	 * Sets whether the component is displayed or has no representation, taking up no space. This is a bound property of type <code>Boolean</code>.
-	 * @param newDisplayed <code>true</code> if the component should be displayed, else <code>false</code> if the component should take up no space.
-	 * @see Displayable#DISPLAYED_PROPERTY
-	 */
+	@Override
 	public void setDisplayed(final boolean newDisplayed) {
 		if(displayed != newDisplayed) { //if the value is really changing
 			final boolean oldDisplayed = displayed; //get the current value
@@ -48,16 +44,12 @@ public class ControlConstraints extends AbstractConstraints implements Displayab
 	/** Whether the component is enabled. */
 	private boolean enabled = true;
 
-	/** @return Whether the component is enabled. */
+	@Override
 	public boolean isEnabled() {
 		return enabled;
 	}
 
-	/**
-	 * Sets whether the the component is enabled. This is a bound property of type <code>Boolean</code>.
-	 * @param newEnabled <code>true</code> if the corresponding component is enabled.
-	 * @see Enableable#ENABLED_PROPERTY
-	 */
+	@Override
 	public void setEnabled(final boolean newEnabled) {
 		if(enabled != newEnabled) { //if the value is really changing
 			final boolean oldEnabled = enabled; //get the old value

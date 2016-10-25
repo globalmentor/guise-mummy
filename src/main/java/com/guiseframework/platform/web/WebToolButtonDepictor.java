@@ -43,9 +43,12 @@ public class WebToolButtonDepictor<C extends ActionControl> extends WebButtonDep
 	}
 
 	/**
-	 * Retrieves the styles for the body element of the component. This version adds special borders for a selected {@link SelectActionControl}.
-	 * @return The styles for the body element of the component, mapped to CSS property names.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version adds special borders for a selected {@link SelectActionControl}.
+	 * </p>
 	 */
+	@Override
 	protected Map<String, Object> getBodyStyles() {
 		final C component = getDepictedObject(); //get the depicted component
 		final GuiseSession session = getSession(); //get the Guise session

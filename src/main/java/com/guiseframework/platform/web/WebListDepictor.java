@@ -45,10 +45,7 @@ public class WebListDepictor<C extends CompositeComponent> extends AbstractSimpl
 		super(namespaceURI, localName); //construct the parent class
 	}
 
-	/**
-	 * Updates the views of any children.
-	 * @throws IOException if there is an error updating the child views.
-	 */
+	@Override
 	protected void depictChildren() throws IOException {
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
 		final C component = getDepictedObject(); //get the component

@@ -182,7 +182,12 @@ public class Dimensions {
 		return hashCode; //return the precalculated hash code
 	}
 
-	/** {@inheritDoc} This implementation returns whether the object is another dimensions with identical width, height, and depth. */
+	/**
+	 * {@inheritDoc}
+	 * </p>
+	 * This implementation returns whether the object is another dimensions with identical width, height, and depth.
+	 * </p>
+	 */
 	@Override
 	public boolean equals(final Object object) {
 		if(object instanceof Dimensions) { //if the object is an extent

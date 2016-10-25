@@ -22,7 +22,7 @@ package com.guiseframework.platform;
  */
 public abstract class AbstractDepictEvent extends AbstractPlatformEvent implements DepictEvent {
 
-	/** @return The depicted object on which the event initially occurred. */
+	@Override
 	public DepictedObject getDepictedObject() {
 		return (DepictedObject)getSource();
 	}

@@ -34,10 +34,7 @@ public class WebLabelDepictor<C extends LabelComponent> extends AbstractSimpleWe
 		super(XHTML_NAMESPACE_URI, ELEMENT_LABEL, false); //represent <xhtml:label>; don't allow an empty element to be created, which would confuse IE6 and corrupt the DOM tree
 	}
 
-	/**
-	 * Renders the body of the component.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictBody() throws IOException {
 		super.depictBody(); //render the default main part of the component
 		writeLabelContent(); //write the content of the label

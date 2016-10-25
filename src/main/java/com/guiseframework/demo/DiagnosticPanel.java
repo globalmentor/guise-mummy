@@ -82,9 +82,11 @@ public class DiagnosticPanel extends LayoutPanel {
 		diagnoseButton.setLabel("Update");
 		diagnoseButton.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(final ActionEvent actionEvent) {
 				diagnose(); //update the diagnostics						
 			}
+
 		});
 		add(diagnoseButton);
 

@@ -46,17 +46,7 @@ public class URFResourceTableModel extends AbstractListSelectTableModel<URFResou
 		super(URFResource.class, columns); //construct the parent class
 	}
 
-	/**
-	 * Returns the value's property for the given column.
-	 * @param <C> The type of cell values in the given column.
-	 * @param resource The resource in this list select model.
-	 * @param rowIndex The zero-based row index of the value.
-	 * @param column The column for which a value should be returned.
-	 * @return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
-	 * @throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	 * @throws IllegalArgumentException if the given column is not one of this table's columns.
-	 * @throws ClassCastException if the given column is not a {@link URFPropertyTableColumnModel} or one of the other column types supported by this class.
-	 */
+	@Override
 	protected <C> C getCellValue(final URFResource resource, final int rowIndex, final TableColumnModel<C> column) {
 		final Class<C> valueClass = column.getValueClass(); //get the type of value for the coloumn
 		final C value; //we'll determine the value to use
@@ -75,18 +65,7 @@ public class URFResourceTableModel extends AbstractListSelectTableModel<URFResou
 		return value; //return the value we determined
 	}
 
-	/**
-	 * Sets the value's property for the given column.
-	 * @param <C> The type of cell values in the given column.
-	 * @param resource The resource in this list select model.
-	 * @param rowIndex The zero-based row index of the value.
-	 * @param column The column for which a value should be returned.
-	 * @param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	 * @throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	 * @throws IllegalArgumentException if the given column is not one of this table's columns.
-	 * @throws ClassCastException if the given column is not a {@link URFPropertyTableColumnModel} or one of the other column types supported by this class or the
-	 *           new cell value is not an {@link URFResource}.
-	 */
+	@Override
 	protected <C> void setCellValue(final URFResource resource, final int rowIndex, final TableColumnModel<C> column, final C newCellValue) {
 		final Class<C> valueClass = column.getValueClass(); //get the type of value for the coloumn
 		final URFResource propertyValue; //we'll determine the property value to use

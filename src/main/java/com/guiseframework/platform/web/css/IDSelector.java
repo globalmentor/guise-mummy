@@ -42,31 +42,29 @@ public class IDSelector implements SimpleSelector, Comparable<IDSelector> {
 		this.id = checkInstance(id, "ID cannot be null.");
 	}
 
-	/** @return A hash code for this object. */
+	@Override
 	public int hashCode() {
 		return getID().hashCode();
 	}
 
-	/**
-	 * Determines whether this object is equivalent to another object.
-	 * @param object The object to compare with this object.
-	 * @return <code>true</code> if this object is equivalent to the given object.
-	 */
+	@Override
 	public boolean equals(final Object object) {
 		return object instanceof IDSelector && getID().equals(((IDSelector)object).getID());
 	}
 
-	/** @return A string representation of this object. */
+	@Override
 	public String toString() {
 		return new StringBuilder().append(ID_SELECTOR_DELIMITER).append(getID()).toString();
 	}
 
 	/**
-	 * Compares this object with the specified object for order. This implementation compares IDs. Returns a negative integer, zero, or a positive integer as this
-	 * object is less than, equal to, or greater than the specified object.
-	 * @param object The object to be compared.
-	 * @return A negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation compares IDs. Returns a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the
+	 * specified object.
+	 * </p>
 	 */
+	@Override
 	public int compareTo(final IDSelector object) {
 		return getID().compareTo(object.getID()); //compare IDs
 	}

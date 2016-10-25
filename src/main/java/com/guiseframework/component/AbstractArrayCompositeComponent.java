@@ -67,7 +67,7 @@ public abstract class AbstractArrayCompositeComponent extends AbstractMultipleCo
 		return oldComponent; //return the component previously at the given index
 	}
 
-	/** @return An iterable to contained components. */
+	@Override
 	public Iterable<Component> getChildComponents() {
 		return getChildList(); //create and return a list of children
 	}
@@ -87,7 +87,7 @@ public abstract class AbstractArrayCompositeComponent extends AbstractMultipleCo
 		return componentList; //return our list of components
 	}
 
-	/** @return Whether this component has children. */
+	@Override
 	public boolean hasChildComponents() {
 		for(int i = componentArray.length - 1; i >= 0; --i) { //for each component
 			if(componentArray[i] != null) { //if there is a component at this index

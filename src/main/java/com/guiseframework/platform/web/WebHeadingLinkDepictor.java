@@ -38,10 +38,13 @@ public class WebHeadingLinkDepictor<C extends ActionControl> extends WebLinkDepi
 	}
 
 	/**
-	 * Begins the rendering process. This version starts the inner heading element.
-	 * @throws IOException if there is an error rendering the component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version starts the inner heading element.
+	 * </p>
 	 * @see WebHeadingDepictor#getHeadingLocalName(int)
 	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		final C component = getDepictedObject(); //get the component
@@ -50,10 +53,13 @@ public class WebHeadingLinkDepictor<C extends ActionControl> extends WebLinkDepi
 	}
 
 	/**
-	 * Ends the depiction process. This version ends the inner heading element.
-	 * @throws IOException if there is an error updating the depiction.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version ends the inner heading element.
+	 * </p>
 	 * @see WebHeadingDepictor#getHeadingLocalName(int)
 	 */
+	@Override
 	protected void depictEnd() throws IOException {
 		final C component = getDepictedObject(); //get the component
 		final String localName = component instanceof HeadingComponent ? WebHeadingDepictor.getHeadingLocalName(((HeadingComponent)component).getLevel()) : null; //if this is a heading, try to get a local name for its specified heading level

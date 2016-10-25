@@ -49,12 +49,7 @@ public class GuiseSessionThreadGroup extends ThreadGroup implements Concerned {
 		this.guiseSession = checkInstance(guiseSession, "Guise session cannot be null.");
 	}
 
-	/**
-	 * Returns the configuration for the given configuration type.
-	 * @param <C> The type of configuration to retrieve.
-	 * @param configurationClass The class of configuration to retrieve.
-	 * @return The configuration associated with the given class, or <code>null</code> if there was no configuration for that class.
-	 */
+	@Override
 	public <C extends Concern> C getConcern(final Class<C> configurationClass) {
 		C configuration = guiseSession.getConcern(configurationClass); //see if the session has the requested configuration
 		if(configuration == null) { //if no such configuration was found in the session

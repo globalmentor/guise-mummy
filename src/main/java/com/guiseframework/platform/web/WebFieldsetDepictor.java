@@ -37,10 +37,12 @@ public class WebFieldsetDepictor<C extends LayoutComponent> extends AbstractWebL
 	}
 
 	/**
-	 * Begins the rendering process. This implementation writes the fieldset <code>&lt;fieldset&gt;</code> element if the component has a label
-	 * @throws IOException if there is an error rendering the component.
-	 * @throws IllegalArgumentException if the given value control represents a value type this controller doesn't support.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation writes the fieldset <code>&lt;fieldset&gt;</code> element if the component has a label.
+	 * </p>
 	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		writeBodyIDClassAttributes(null, null); //write the ID and class attributes

@@ -28,16 +28,12 @@ import com.guiseframework.model.*;
  */
 public class CalendarDialogFrame extends AbstractDialogFrame<Date> {
 
-	/** @return The single calendar control child component. */
+	@Override
 	public CalendarControl getContent() {
 		return (CalendarControl)super.getContent();
 	}
 
-	/**
-	 * Sets the single child component. This method throws an exception, as the content of a calendar dialog frame cannot be modified.
-	 * @param newContent The single child component, or <code>null</code> if this frame does not have a child component.
-	 * @throws UnsupportedOperationException because the content cannot be changed.
-	 */
+	@Override
 	public void setContent(final Component newContent) {
 		throw new UnsupportedOperationException("Cannot change content component of " + getClass());
 	}
@@ -73,18 +69,20 @@ public class CalendarDialogFrame extends AbstractDialogFrame<Date> {
 		}
 		calendarControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Date>() { //listen for the calendar control value changing
 
-					public void propertyChange(final GenericPropertyChangeEvent<Date> propertyChangeEvent) { //if the calendar control value changed
-						try {
-							final Date newDate = propertyChangeEvent.getNewValue(); //get the new date
-							setValue(newDate); //update our own value
-							if(newDate != null) { //if a date was selected
-								close(); //close the frame
-							}
-						} catch(final PropertyVetoException propertyVetoException) {
-							//TODO fix							throw new AssertionError(validationException);	//TODO fix
-						}
+			@Override
+			public void propertyChange(final GenericPropertyChangeEvent<Date> propertyChangeEvent) { //if the calendar control value changed
+				try {
+					final Date newDate = propertyChangeEvent.getNewValue(); //get the new date
+					setValue(newDate); //update our own value
+					if(newDate != null) { //if a date was selected
+						close(); //close the frame
 					}
-				});
+				} catch(final PropertyVetoException propertyVetoException) {
+					//TODO fix							throw new AssertionError(validationException);	//TODO fix
+				}
+			}
+
+		});
 	}
 
 }

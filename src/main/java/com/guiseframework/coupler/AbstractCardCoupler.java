@@ -59,38 +59,47 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject //TODO listen 
 	/** The property change listener to listen for the selected card changing. */
 	private final GenericPropertyChangeListener<Component> selectedCardChangeListener = new AbstractGenericPropertyChangeListener<Component>() {
 
+		@Override
 		public void propertyChange(final GenericPropertyChangeEvent<Component> propertyChangeEvent) { //if the selected card changes
 			updateSelected(); //update the selected status
 		}
+
 	};
 
 	/** The property change listener to listen for the card displayed status changing and change the action accordingly. */
 	private final GenericPropertyChangeListener<Boolean> displayedChangeListener = new AbstractGenericPropertyChangeListener<Boolean>() {
 
+		@Override
 		public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent) { //if the displayed status changes
 			updateDisplayed(); //update the displayed status based upon all the cards
 		}
+
 	};
 
 	/** The property change listener to listen for the card enabled status changing and reflect that value in the action. */
 	private final GenericPropertyChangeListener<Boolean> enabledChangeListener = new AbstractGenericPropertyChangeListener<Boolean>() {
 
+		@Override
 		public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent) { //if the enabled status changes
 			updateEnabled(); //update the enabled status based upon all the cards
 		}
+
 	};
 
 	/** The property change listener to listen for the card task status changing and reflect that value in the action. */
 	private final GenericPropertyChangeListener<TaskState> taskStateChangeListener = new AbstractGenericPropertyChangeListener<TaskState>() {
 
+		@Override
 		public void propertyChange(final GenericPropertyChangeEvent<TaskState> propertyChangeEvent) { //if the task state changes
 			updateTaskState(); //update the task state based upon all the cards
 		}
+
 	};
 
 	/** The property change listener to listen for card constraints changing. */
 	private final GenericPropertyChangeListener<Constraints> constraintsChangeListener = new AbstractGenericPropertyChangeListener<Constraints>() {
 
+		@Override
 		public void propertyChange(final GenericPropertyChangeEvent<Constraints> propertyChangeEvent) { //if the constrants change
 			final Constraints oldCardConstraints = propertyChangeEvent.getOldValue(); //get the old card constraints
 			if(oldCardConstraints != null) { //if there were old card constraints
@@ -101,6 +110,7 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject //TODO listen 
 				installCardConstraints(newCardConstraints); //install the old card constraints
 			}
 		}
+
 	};
 
 	/** The thread-safe list of connected cards. */

@@ -50,7 +50,12 @@ public class WebLayoutComponentDepictor<C extends LayoutComponent> extends Abstr
 		return outerStyles; //return the combined styles		
 	}
 
-	/** {@inheritDoc} This version writes ID, class, and direction attributes. */
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This version writes ID, class, and direction attributes.
+	 * </p>
+	 */
 	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering

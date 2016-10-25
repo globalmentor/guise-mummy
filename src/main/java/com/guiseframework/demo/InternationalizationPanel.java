@@ -69,11 +69,13 @@ public class InternationalizationPanel extends LayoutPanel {
 			//install a value change listener to listen for language selection
 			checkControl.addPropertyChangeListener(CheckControl.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>() {
 
+				@Override
 				public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent) { //when the language check changes
 					if(Boolean.TRUE.equals(propertyChangeEvent.getNewValue())) { //if this language is being set
 						getSession().setLocale(supportedLocale); //change the session locale
 					}
 				}
+
 			});
 			localeMutualExclusionPolicyModelGroup.add(checkControl); //add this check control to the mutual exclusion policy group
 			languageMenu.add(checkControl); //add the check control to the language menu			

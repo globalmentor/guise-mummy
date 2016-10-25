@@ -57,10 +57,12 @@ public class RestrictedPanel extends LayoutPanel {
 		logoutButton.setLabel("Log out"); //set the button label
 		logoutButton.addActionListener(new ActionListener() { //when the logout button is pressed
 
-					public void actionPerformed(final ActionEvent actionEvent) { //set the session's user to null
-						getSession().setPrincipal(null); //log out the user
-					}
-				});
+			@Override
+			public void actionPerformed(final ActionEvent actionEvent) { //set the session's user to null
+				getSession().setPrincipal(null); //log out the user
+			}
+
+		});
 		restrictionPanel.add(logoutButton); //add the button to the panel
 
 		add(restrictionPanel); //add the panel to the panel in the default center

@@ -61,7 +61,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	/** The user agent client, such as a browser, used to access Guise on this platform. */
 	private final WebUserAgentProduct clientProduct;
 
-	/** @return The user agent client, such as a browser, used to access Guise on this platform. */
+	@Override
 	public WebUserAgentProduct getClientProduct() {
 		return clientProduct;
 	}
@@ -182,11 +182,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 		this.depictContext = depictContext; //change the depict context
 	}
 
-	/**
-	 * Retrieves information and functionality related to the current depiction.
-	 * @return A context for the current depiction.
-	 * @throws IllegalStateException if no depict context can be returned in the current depiction state.
-	 */
+	@Override
 	public WebDepictContext getDepictContext() {
 		final WebDepictContext depictContext = this.depictContext; //get the depict context
 		if(depictContext == null) { //if there is no depict context
@@ -197,23 +193,20 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 
 	private PlatformFileCollector fileReferenceList = null; //TODO finish; comment
 
-	/**
-	 * Selects one or more files on the platform, using the appropriate selection functionality for the platform.
-	 * @param multiple Whether multiple files should be allowed to be selected.
-	 * @param platformFileSelectListener The listener that will be notified when platform files are selected.
-	 * @throws NullPointerException if the given listener is <code>null</code>.
-	 */
+	@Override
 	public void selectPlatformFiles(final boolean multiple, final ValueSelectListener<Collection<PlatformFile>> platformFileSelectListener) {
 		fileReferenceList = new PlatformFileCollector(); //create a new platform file collector
 		checkInstance(platformFileSelectListener, "Platform file select listener cannot be null.");
 		fileReferenceList.addPropertyChangeListener(PlatformFileCollector.PLATFORM_FILES_PROPERTY, new AbstractGenericPropertyChangeListener<List<PlatformFile>>() { //listen for the files changing
 
-					public void propertyChange(final GenericPropertyChangeEvent<List<PlatformFile>> genericPropertyChangeEvent) { //if the user selects platform files
-						fileReferenceList.removePropertyChangeListener(PlatformFileCollector.PLATFORM_FILES_PROPERTY, this); //we don't need to listen for the files anymore
-						platformFileSelectListener.valueSelected(new ValueEvent<Collection<PlatformFile>>(HTTPServletWebPlatform.this, genericPropertyChangeEvent
-								.getNewValue())); //report the new value to the listener
-					}
-				});
+			@Override
+			public void propertyChange(final GenericPropertyChangeEvent<List<PlatformFile>> genericPropertyChangeEvent) { //if the user selects platform files
+				fileReferenceList.removePropertyChangeListener(PlatformFileCollector.PLATFORM_FILES_PROPERTY, this); //we don't need to listen for the files anymore
+				platformFileSelectListener
+						.valueSelected(new ValueEvent<Collection<PlatformFile>>(HTTPServletWebPlatform.this, genericPropertyChangeEvent.getNewValue())); //report the new value to the listener
+			}
+
+		});
 		fileReferenceList.browse(); //tell the file reference list to start browsing
 	}
 
@@ -223,7 +216,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	 * @param destinationBookmark The bookmark to be used in uploading the platform files to the destination path, or <code>null</code> if no bookmark should be
 	 *          used.
 	 * @param progressListener The listener that will be notified when progress is made for a particular platform file upload.
-	 * @param platformFiles Thet platform files to upload.
+	 * @param platformFiles That platform files to upload.
 	 * @throws NullPointerException if the given destination path and/or listener is <code>null</code>.
 	 * @throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
 	 * @throws IllegalArgumentException if the provided path is absolute.
@@ -264,31 +257,17 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 		sendResourceURI = null;
 	}
 
-	/**
-	 * Sends a resource to the platform.
-	 * @param resourcePath The path of the resource to send, relative to the application.
-	 * @throws NullPointerException if the given path is <code>null</code>.
-	 * @throws IllegalArgumentException if the given string is not a path.
-	 */
+	@Override
 	public void sendResource(final URIPath resourcePath) {
 		sendResource(resourcePath, null); //send the resource with no bookmark
 	}
 
-	/**
-	 * Sends a resource to the platform.
-	 * @param resourceURI The URI of the resource to send, relative to the application.
-	 * @throws NullPointerException if the given URI is <code>null</code>.
-	 */
+	@Override
 	public void sendResource(final URI resourceURI) {
 		sendResource(resourceURI, null); //send the resource with no bookmark
 	}
 
-	/**
-	 * Sends a resource to the platform with the specified bookmark.
-	 * @param resourcePath The path of the resource to send, relative to the application.
-	 * @param bookmark The bookmark at the given path, or <code>null</code> if there is no bookmark.
-	 * @throws NullPointerException if the given path is <code>null</code>.
-	 */
+	@Override
 	public void sendResource(final URIPath resourcePath, final Bookmark bookmark) {
 		sendResource(resourcePath.toURI(), bookmark); //send the requested URI, converting the path to a URI
 	}

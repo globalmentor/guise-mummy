@@ -102,8 +102,10 @@ public class Extent implements Comparable<Extent> {
 	}
 
 	/**
-	 * {@inheritDoc} This implementation returns whether the object is another extent with identical value, unit, and degree, ignoring the unit if the value is
-	 * zero.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation returns whether the object is another extent with identical value, unit, and degree, ignoring the unit if the value is zero.
+	 * </p>
 	 */
 	@Override
 	public boolean equals(final Object object) {

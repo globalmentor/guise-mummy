@@ -51,9 +51,11 @@ public class AccordionMenu extends AbstractMenu {
 		setRolloverOpenEnabled(false); //default to not showing the menu as open upon rollover
 		addActionListener(new ActionListener() { //create an action listener to toggle the menu's open status
 
+			@Override
 			public void actionPerformed(final ActionEvent actionEvent) { //if the action is performed
 				setOpen(!isOpen()); //toggle the menu's open status
 			}
+
 		});
 	}
 

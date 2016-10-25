@@ -32,8 +32,8 @@ public class PlatformFileCollector extends AbstractDepictedObject {
 	/** The bound property of the selected platform files. */
 	public static final String PLATFORM_FILES_PROPERTY = getPropertyName(PlatformFileCollector.class, "platformFiles");
 
-	/** @return The depictor for this object. */
 	@SuppressWarnings("unchecked")
+	@Override
 	public Depictor<? extends PlatformFileCollector> getDepictor() {
 		return (Depictor<? extends PlatformFileCollector>)super.getDepictor();
 	}

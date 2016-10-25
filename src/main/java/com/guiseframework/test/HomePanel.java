@@ -75,10 +75,10 @@ public class HomePanel extends LayoutPanel {
 		final LayoutPanel contentPanel = new LayoutPanel(new FlowLayout(Flow.PAGE));
 
 		/*TODO del		
-
+		
 				
 		Log.trace("testing date");
-
+		
 		final DateFormat dateFormat=DateFormat.getDateInstance(DateFormat.SHORT);	//create a predefined date format instance
 		Log.trace("date format class:", dateFormat.getClass());
 		Log.trace("instance of simple date format?", dateFormat instanceof SimpleDateFormat);
@@ -88,10 +88,10 @@ public class HomePanel extends LayoutPanel {
 			Log.trace("pattern:", simpleDateFormat.toPattern());
 			Log.trace("localized pattern:", simpleDateFormat.toLocalizedPattern());
 		}
-
-
-
-
+		
+		
+		
+		
 				final Date now=new Date();
 				final DateStringLiteralConverter shortDateConverter=new DateStringLiteralConverter(DateStringLiteralStyle.SHORT);
 				final DateStringLiteralConverter mediumDateConverter=new DateStringLiteralConverter(DateStringLiteralStyle.MEDIUM);
@@ -266,6 +266,7 @@ public class HomePanel extends LayoutPanel {
 		inputPanel.add(outputTextControl); //add the output control to the input panel
 		inputTextControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Float>() {
 
+			@Override
 			public void propertyChange(final GenericPropertyChangeEvent<Float> propertyChangeEvent) {
 				final Float newValue = propertyChangeEvent.getNewValue(); //get the new value
 				try {
@@ -273,6 +274,7 @@ public class HomePanel extends LayoutPanel {
 				} catch(final PropertyVetoException propertyVetoException) { //if the change was vetoed, ignore the exception
 				}
 			}
+
 		});
 		final CheckControl checkbox = new CheckControl();
 		checkbox.setLabel("Enable the button \u278A");
@@ -290,6 +292,7 @@ public class HomePanel extends LayoutPanel {
 		listControl.add(new Float(30));
 		listControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Float>() {
 
+			@Override
 			public void propertyChange(final GenericPropertyChangeEvent<Float> propertyChangeEvent) {
 				final Float newValue = propertyChangeEvent.getNewValue(); //get the new value
 				try {
@@ -298,6 +301,7 @@ public class HomePanel extends LayoutPanel {
 				} catch(final PropertyVetoException propertyVetoException) { //if the change was vetoed, ignore the exception
 				}
 			}
+
 		});
 		inputPanel.add(listControl);
 
@@ -380,6 +384,7 @@ public class HomePanel extends LayoutPanel {
 		testButton2.setLabel("Click this button to change the text.");
 		testButton2.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				testLabel.setLabel("You pressed the button!");
 				/*TODO del test						
@@ -428,12 +433,14 @@ public class HomePanel extends LayoutPanel {
 										confirmDialog.open();
 				*/
 			}
+
 		});
 		buttonPanel.add(testButton2); //add a new button
 		final Link testLink = new Link();
 		testLink.setLabel("This is a link.");
 		testLink.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 
 				getSession().getPlatform().getEnvironment().removeProperty("testCookie");
@@ -441,12 +448,14 @@ public class HomePanel extends LayoutPanel {
 				testLabel.setLabel("The link works.");
 
 			}
+
 		});
 		buttonPanel.add(testLink); //add a new button
 		final Link modalLink = new Link();
 		modalLink.setLabel("Test modal.");
 		modalLink.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				getSession().navigateModal(new URIPath("edituser"), new ModalNavigationAdapter() {
 
@@ -461,12 +470,14 @@ public class HomePanel extends LayoutPanel {
 
 				);
 			}
+
 		});
 
 		final Button audioButton = new Button();
 		audioButton.setLabel("Audio");
 		audioButton.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				final Audio audio = new Audio();
 				audio.setAudioURI(URI.create("https://dav.globalmentor.com/public/desperado.mp3"));
@@ -491,6 +502,7 @@ public class HomePanel extends LayoutPanel {
 		//TODO del		frameLink.getFlyoverStrategy().setOpenEffect(new OpacityFadeEffect(1500));	//TODO testing openEffect
 		frameLink.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				if(frame == null) {
 					frame = new TestFrame();
@@ -499,6 +511,7 @@ public class HomePanel extends LayoutPanel {
 				Log.trace("ready to set frame visible");
 				frame.open();
 			}
+
 		});
 		buttonPanel.add(frameLink);
 
@@ -506,6 +519,7 @@ public class HomePanel extends LayoutPanel {
 		modalFrameLink.setLabel("Modal Frame");
 		modalFrameLink.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				final DefaultDialogFrame<Boolean> dialog = new DefaultDialogFrame<Boolean>(Boolean.class);
 				dialog.setLabel("Test Dialog");
@@ -520,6 +534,7 @@ public class HomePanel extends LayoutPanel {
 
 				dialog.open(true);
 			}
+
 		});
 		buttonPanel.add(modalFrameLink);
 
@@ -557,9 +572,11 @@ public class HomePanel extends LayoutPanel {
 		nearbyLink.setLabel("Inside");
 		nearbyLink.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				getSession().navigate(URI.create("http://www.cnn.com"));
 			}
+
 		});
 		linkPanel.add(nearbyLink);
 
@@ -567,9 +584,11 @@ public class HomePanel extends LayoutPanel {
 		popupLink.setLabel("Popup");
 		popupLink.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				getSession().navigate(URI.create("http://www.cnn.com"), "another");
 			}
+
 		});
 		linkPanel.add(popupLink);
 
@@ -591,9 +610,11 @@ public class HomePanel extends LayoutPanel {
 		bookmark1Link.setLabel("Bookmark1");
 		bookmark1Link.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				getSession().setBookmark(new Bookmark(new Bookmark.Parameter("bookmark", "1")));
 			}
+
 		});
 		bookmarkPanel.add(bookmark1Link);
 
@@ -601,9 +622,11 @@ public class HomePanel extends LayoutPanel {
 		bookmark2Link.setLabel("Bookmark2");
 		bookmark2Link.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				getSession().setBookmark(new Bookmark(new Bookmark.Parameter("bookmark", "2")));
 			}
+
 		});
 		bookmarkPanel.add(bookmark2Link);
 
@@ -611,9 +634,11 @@ public class HomePanel extends LayoutPanel {
 		bookmark3Link.setLabel("Go Bookmark3");
 		bookmark3Link.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
 				getSession().navigate(getSession().getNavigationPath(), new Bookmark(new Bookmark.Parameter("bookmark", "3")));
 			}
+
 		});
 		bookmarkPanel.add(bookmark3Link);
 
@@ -644,6 +669,7 @@ public class HomePanel extends LayoutPanel {
 		textInput.setLabel("This is the text input label.");
 		textInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<String>() {
 
+			@Override
 			public void propertyChange(GenericPropertyChangeEvent<String> propertyChangeEvent) {
 				testLabel.setLabel(propertyChangeEvent.getNewValue());
 				if(frame != null) {
@@ -651,6 +677,7 @@ public class HomePanel extends LayoutPanel {
 					frame.setLabel("Updated frame.");
 				}
 			}
+
 		});
 		//TODO del		textInput.getModel().setValidator(new RegularExpressionStringValidator("[a-z]*"));
 		contentPanel.add(textInput);
@@ -694,7 +721,7 @@ public class HomePanel extends LayoutPanel {
 				final ModelGroup<ValueModel<Boolean>> booleanGroupa=new MutualExclusionModelGroup();
 				booleanGroupa.add(check1a.getModel());
 				booleanGroupa.add(check2a.getModel());
-
+		
 				horizontalPanel.add(booleanPanela);
 		*/
 
@@ -711,6 +738,7 @@ public class HomePanel extends LayoutPanel {
 
 		sliderModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Integer>() {
 
+			@Override
 			public void propertyChange(GenericPropertyChangeEvent<Integer> propertyChangeEvent) {
 				final Integer newValue = propertyChangeEvent.getNewValue(); //get the new value
 				if(newValue != null) { //if there is a new value
@@ -718,6 +746,7 @@ public class HomePanel extends LayoutPanel {
 					image.setOpacity(newValue.doubleValue() / 100); //update the image opacity
 				}
 			}
+
 		});
 
 		contentPanel.add(horizontalPanel);
@@ -729,8 +758,8 @@ public class HomePanel extends LayoutPanel {
 		*/
 
 		final Label afterImageLabel = new Label();
-		afterImageLabel
-				.setLabel("This is a lot of text. ;alsjfd ;lkjas ;ljag ;lkjas g;lkajg; laksgj akjlshf lkjashd flkjsdhlksahlsadkhj asldkhjf ;sgdh a;lgkh a;glkha s;dglh asgd;");
+		afterImageLabel.setLabel(
+				"This is a lot of text. ;alsjfd ;lkjas ;ljag ;lkjas g;lkajg; laksgj akjlshf lkjashd flkjsdhlksahlsadkhj asldkhjf ;sgdh a;lgkh a;glkha s;dglh asgd;");
 		contentPanel.add(afterImageLabel);
 
 		final ListControl<String> listSelectControl = new ListControl<String>(String.class, new SingleListSelectionPolicy<String>());
@@ -843,6 +872,7 @@ public class HomePanel extends LayoutPanel {
 		*/
 		checkbox.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>() {
 
+			@Override
 			public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent) {
 				final Boolean newValue = propertyChangeEvent.getNewValue(); //get the new value
 				//TODO del						testButton.setDisplayed(newValue);	//update the button enabled state
@@ -859,6 +889,7 @@ public class HomePanel extends LayoutPanel {
 				Log.trace("now tab enabled is", remoteTabControl.isValueEnabled(helloPanel));
 				*/
 			}
+
 		});
 
 		add(contentPanel, new RegionConstraints(Region.CENTER)); //add the content panel in the center
@@ -942,10 +973,12 @@ public class HomePanel extends LayoutPanel {
 
 		editMenu.addActionListener(new ActionListener() { //testing accordion menu action
 
-					public void actionPerformed(ActionEvent actionEvent) {
-						testLabel.setLabel("You pressed the accordion edit menu!");
-					}
-				});
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				testLabel.setLabel("You pressed the accordion edit menu!");
+			}
+
+		});
 
 		final AccordionMenu stuffMenu = new AccordionMenu(Flow.PAGE);
 		stuffMenu.setLabel("Stuff");
@@ -982,7 +1015,7 @@ public class HomePanel extends LayoutPanel {
 								+" This is some text. It is added so that it will make the frame wrap and keep going."
 						);
 						contentPanel.add(text);
-
+			
 						final Link frameLink=new Link();
 						frameLink.setLabelText("Frame");
 						frameLink.getModel().setDescription("This is a flyover for the frame link.");
@@ -990,13 +1023,13 @@ public class HomePanel extends LayoutPanel {
 						frameLink.getFlyoverStrategy().setPreferredWidth(new Extent(15, Extent.Unit.EM));
 						frameLink.getFlyoverStrategy().setPreferredHeight(new Extent(10, Extent.Unit.EM));
 						contentPanel.add(frameLink);
-
+			
 						final Text otherText=new Text();
 						otherText.getModel().setText("This is some text. It is added so that it will make the frame wrap and keep going."
 								+" This is some text. It is added so that it will make the frame wrap and keep going."
 						);
 						contentPanel.add(otherText);
-
+			
 						setContent(contentPanel);
 					
 						setPreferredWidth(new Extent(15, Extent.Unit.EM));

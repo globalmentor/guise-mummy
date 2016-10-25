@@ -61,7 +61,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext {
 	/** The current full absolute URI for this depiction, including any query. */
 	private final URI depictURI;
 
-	/** @return The current full absolute URI for this depiction, including any query. */
+	@Override
 	public URI getDepictionURI() {
 		return depictURI;
 	}
@@ -123,12 +123,17 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext {
 		return Charset.forName(getResponse().getCharacterEncoding()); //return the character encoding indicated by the HTTP servlet response
 	}
 
-	/** @return The current content type of the text output. */
+	@Override
 	public ContentType getOutputContentType() {
 		return outputContentType;
 	}
 
-	/** {@inheritDoc} This implementation removes all parameters and adds a character set parameter of the current encoding. */
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation removes all parameters and adds a character set parameter of the current encoding.
+	 * </p>
+	 */
 	@Override
 	public void setOutputContentType(final ContentType contentType) {
 		//TODO change to really just replace one parameter, instead of removing all others

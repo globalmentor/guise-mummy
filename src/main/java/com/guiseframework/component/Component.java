@@ -283,8 +283,8 @@ public interface Component extends DepictedObject, PresentationModel, InfoModel 
 	public Transferable<?> exportTransfer(); //TODO del when move to DepictedObject is complete
 
 	/**
-	 * Adds an import strategy to the component. The import strategy will take prececence over any compatible import strategy previously added.
-	 * @param importStrategy The importstrategy to add.
+	 * Adds an import strategy to the component. The import strategy will take precedence over any compatible import strategy previously added.
+	 * @param importStrategy The import strategy to add.
 	 */
 	public void addImportStrategy(final ImportStrategy<?> importStrategy);
 
@@ -334,7 +334,7 @@ public interface Component extends DepictedObject, PresentationModel, InfoModel 
 	/**
 	 * Updates this object's theme. This method checks whether a theme has been applied to this object. If a theme has not been applied to this object this method
 	 * calls {@link #applyTheme()}. This method is called for any child components before applying the theme to the component itself, to assure that child theme
-	 * updates have already occured before theme updates occur for this component. There is normally no need to override this method or to call this method
+	 * updates have already occurred before theme updates occur for this component. There is normally no need to override this method or to call this method
 	 * directly by applications.
 	 * @throws IOException if there was an error loading or applying a theme.
 	 * @see #isThemeApplied()

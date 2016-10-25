@@ -444,11 +444,7 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Concern
 	 */
 	public URI getURIResource(final String resourceKey, final URI defaultValue) throws MissingResourceException;
 
-	/**
-	 * Retrieves an instance of a collator appropriate for the current locale. The returned collator instance performs collations based upon the current locale.
-	 * @return An instance of a collator appropriate for the current locale.
-	 * @see #getLocale()
-	 */
+	@Override
 	public Collator getCollatorInstance();
 
 	/** @return The current principal (e.g. logged-in user), or <code>null</code> if there is no principal authenticated for this session. */

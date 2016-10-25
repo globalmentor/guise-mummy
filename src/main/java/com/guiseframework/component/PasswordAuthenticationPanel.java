@@ -159,7 +159,7 @@ public class PasswordAuthenticationPanel extends ArrangePanel {
 		passwordVerificationControl.setValidator(newValidator); //install the validator into both password controls
 	}
 
-	/** Updates the state of the controls based upon current property settings. */
+	@Override
 	protected void update() {
 		passwordVerificationControl.setDisplayed(isPasswordVerified()); //only show the password verification if we should verify the password
 	}
@@ -170,18 +170,23 @@ public class PasswordAuthenticationPanel extends ArrangePanel {
 	}
 
 	/**
-	 * Checks the state of the component for validity. This version ensures the entered passwords match if password verification is enabled.
-	 * @return <code>true</code> if the component and all children passes all validity tests, else <code>false</code>.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version ensures the entered passwords match if password verification is enabled.
+	 * </p>
 	 */
+	@Override
 	protected boolean determineValid() {
 		return super.determineValid() && (!isPasswordVerified() || isPasswordMatch()); //add a check for password consistency if passwords are being verified 
 	}
 
 	/**
-	 * Validates the user input of this component and all child components. The component will be updated with error information. This version adds errors for
-	 * non-matching passwords if password verification is enabled.
-	 * @return The current state of {@link #isValid()} as a convenience.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version adds errors for non-matching passwords if password verification is enabled.
+	 * </p>
 	 */
+	@Override
 	public boolean validate() {
 		super.validate(); //validate the component normally
 		if(isPasswordVerified() && !isPasswordMatch()) { //if we're verifying the password and it isn't valid

@@ -45,18 +45,24 @@ public class URFDynamicTreeNodeModel extends AbstractURFDynamicTreeNodeModel<URF
 	}
 
 	/**
-	 * Dynamically determines whether this node is a leaf. This version determines if the URF data model has resources.
-	 * @return Whether this node should be considered a leaf with no children.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version determines if the URF data model has resources.
+	 * </p>
 	 */
+	@Override
 	protected boolean determineLeaf() {
 		final URF urf = getValue(); //get the URF data model
 		return urf == null || !urf.hasResources(); //if we have URF and the URF has resources, this is not a leaf
 	}
 
 	/**
-	 * Dynamically determines children. This version returns models representing the root children of the URF data model, if any.
-	 * @return The dynamically loaded list of children.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version returns models representing the root children of the URF data model, if any.
+	 * </p>
 	 */
+	@Override
 	protected List<TreeNodeModel<?>> determineChildren() {
 		final List<TreeNodeModel<?>> children = new ArrayList<TreeNodeModel<?>>(); //create a list to hold the children, even if we don't have any here, for child classes may add to this list
 		final URF urf = getValue(); //get the URF data model

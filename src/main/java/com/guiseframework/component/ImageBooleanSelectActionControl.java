@@ -45,16 +45,12 @@ public class ImageBooleanSelectActionControl extends AbstractBooleanSelectAction
 		return imageModel;
 	}
 
-	/** @return The image URI, which may be a resource URI, or <code>null</code> if there is no image URI. */
+	@Override
 	public URI getImageURI() {
 		return getImageModel().getImageURI();
 	}
 
-	/**
-	 * Sets the URI of the image. This is a bound property of type <code>URI</code>.
-	 * @param newImageURI The new URI of the image, which may be a resource URI.
-	 * @see #IMAGE_URI_PROPERTY
-	 */
+	@Override
 	public void setImageURI(final URI newImageURI) {
 		getImageModel().setImageURI(newImageURI);
 	}

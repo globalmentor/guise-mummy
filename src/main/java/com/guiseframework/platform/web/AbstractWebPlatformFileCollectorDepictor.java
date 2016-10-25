@@ -76,34 +76,24 @@ public class AbstractWebPlatformFileCollectorDepictor extends AbstractWebDepicto
 		return idPlatformFileMap.get(checkInstance(id, "Platform file ID cannot be null."));
 	}
 
-	/** Requests that the user be presented with a dialog to browse. */
 	@SuppressWarnings("unchecked")
+	@Override
 	public void browse() {
 		getPlatform().getSendMessageQueue().add(
 				new WebCommandDepictEvent<WebPlatformFileCollectorCommand>(getDepictedObject(), WebPlatformFileCollectorCommand.FILE_BROWSE,
 						new NameValuePair<String, Object>(WebPlatformFileCollectorCommand.MULTIPLE_PROPERTY, Boolean.TRUE))); //send a file browse command to the platform TODO fix single/multiple
 	}
 
-	/**
-	 * Cancels a platform file upload or download.
-	 * @param platformFile Thet platform file to cancel.
-	 * @throws NullPointerException if the given platform file is <code>null</code>.
-	 * @throws IllegalStateException the specified platform file can no longer be canceled because, for example, other platform files have since been selected.
-	 */
 	@SuppressWarnings("unchecked")
+	@Override
 	public void cancel(final PlatformFile platformFile) {
 		getPlatform().getSendMessageQueue().add(
 				new WebCommandDepictEvent<WebPlatformFileCollectorCommand>(getDepictedObject(), WebPlatformFileCollectorCommand.FILE_CANCEL, //send a file cancel command to the platform
 						new NameValuePair<String, Object>(WebPlatformFileCollectorCommand.ID_PROPERTY, ((WebPlatformFile)platformFile).getID()))); //send the ID of the file
 	}
 
-	/**
-	 * Initiates a platform file upload.
-	 * @param platformFile Thet platform file to upload.
-	 * @param destinationURI The URI representing the destination of the platform file, either absolute or relative to the application.
-	 * @throws NullPointerException if the given platform file and/or destination URI is <code>null</code>.
-	 */
 	@SuppressWarnings("unchecked")
+	@Override
 	public void upload(final PlatformFile platformFile, final URI destinationURI) {
 		final URI resolvedDestinationURI = getSession().getApplication().resolveURI(destinationURI); //resolve the destination URI
 		//add an identification of the Guise session to the URI if needed, as Flash 8 on FireFox sends the wrong HTTP session ID cookie value TODO transfer to a Flash-only version if we can
@@ -115,11 +105,7 @@ public class AbstractWebPlatformFileCollectorDepictor extends AbstractWebDepicto
 						new NameValuePair<String, Object>(WebPlatformFileCollectorCommand.DESTINATION_URI_PROPERTY, sessionedDestinationURI))); //indicate the destination
 	}
 
-	/**
-	 * Processes an event from the platform.
-	 * @param event The event to be processed.
-	 * @throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
-	 */
+	@Override
 	public void processEvent(final PlatformEvent event) {
 		if(event instanceof WebChangeDepictEvent) { //if a property changed
 			final WebChangeDepictEvent webChangeEvent = (WebChangeDepictEvent)event; //get the web change event

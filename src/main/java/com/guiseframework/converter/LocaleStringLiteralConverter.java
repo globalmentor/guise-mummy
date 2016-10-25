@@ -44,12 +44,7 @@ public class LocaleStringLiteralConverter extends AbstractConverter<Locale, Stri
 		this.style = checkInstance(style, "Locale style cannot be null.");
 	}
 
-	/**
-	 * Converts a value from the value space to a literal value in the lexical space.
-	 * @param value The value in the value space to convert.
-	 * @return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>.
-	 * @throws ConversionException if the value cannot be converted.
-	 */
+	@Override
 	public String convertValue(final Locale value) throws ConversionException {
 		if(value != null) { //if a value is given
 			try {
@@ -100,12 +95,12 @@ public class LocaleStringLiteralConverter extends AbstractConverter<Locale, Stri
 	}
 
 	/**
-	 * Converts a literal representation of a value from the lexical space into a value in the value space. This version throws a conversion exception if the
-	 * literal is not <code>null</code>.
-	 * @param literal The literal value in the lexical space to convert.
-	 * @return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
-	 * @throws ConversionException if the literal value cannot be converted.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version throws a conversion exception if the literal is not <code>null</code>.
+	 * </p>
 	 */
+	@Override
 	public Locale convertLiteral(final String literal) throws ConversionException {
 		if(literal == null) { //if the literal is null
 			return null; //the value is null

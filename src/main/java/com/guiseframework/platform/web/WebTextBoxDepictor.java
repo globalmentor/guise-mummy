@@ -68,7 +68,12 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 		super(XHTML_NAMESPACE_URI, ELEMENT_DIV); //represent <xhtml:div>
 	}
 
-	/** {@inheritDoc} This version returns special section elements if the component is a {@link SectionComponent} with a non-<code>null</code> section type. */
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This version returns special section elements if the component is a {@link SectionComponent} with a non-<code>null</code> section type.
+	 * </p>
+	 */
 	@Override
 	public String getLocalName() {
 		final SectionType sectionType = getDepictedObject().getSectionType();
@@ -79,9 +84,12 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 	}
 
 	/**
-	 * Updates the views of any children. This version does not call the super version, because all child rendering is controlled by this version.
-	 * @throws IOException if there is an error updating the child views.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version does not call the super version, because all child rendering is controlled by this version.
+	 * </p>
 	 */
+	@Override
 	protected void depictChildren() throws IOException {
 		//TODO del Log.trace("ready to load text");
 		final C component = getDepictedObject(); //get the component

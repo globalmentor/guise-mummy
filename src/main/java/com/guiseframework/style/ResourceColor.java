@@ -47,33 +47,40 @@ public class ResourceColor implements Color {
 	}
 
 	/**
-	 * Returns the color in the HSL color space. This implementation retrieves a color from the Guise session resources and delegates to that object.
-	 * @return The color in the HSL color space.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation retrieves a color from the Guise session resources and delegates to that object.
+	 * </p>
 	 */
+	@Override
 	public HSLColor asHSL() {
 		return Guise.getInstance().getGuiseSession().getColorResource(getResourceKey()).asHSL(); //delegate to a color from the resources
 	}
 
 	/**
-	 * Returns the color in the RGB color space. This implementation retrieves a color from the Guise session resources and delegates to that object.
-	 * @return The color in the RGB color space.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation retrieves a color from the Guise session resources and delegates to that object.
+	 * </p>
 	 */
+	@Override
 	public RGBColor asRGB() {
 		return Guise.getInstance().getGuiseSession().getColorResource(getResourceKey()).asRGB(); //delegate to a color from the resources
 	}
 
-	/** @return A hash code value for the object. */
+	@Override
 	public int hashCode() {
 		return getResourceKey().hashCode(); //calculate a hash code from the resource key
 	}
 
 	/**
-	 * Indicates whether some other object is "equal to" this one. This implementation returns whether the object is another resource color with the same resource
-	 * key.
-	 * @param object The reference object with which to compare.
-	 * @return <code>true</code> if this object is equivalent to the given object.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation returns whether the object is another resource color with the same resource key.
+	 * </p>
 	 * @see #getResourceKey()
 	 */
+	@Override
 	public boolean equals(final Object object) {
 		return object instanceof ResourceColor && ((ResourceColor)object).getResourceKey().equals(getResourceKey()); //see if the object is a resource color with the same resource key
 	}

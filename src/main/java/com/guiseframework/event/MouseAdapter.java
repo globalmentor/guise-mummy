@@ -22,24 +22,15 @@ package com.guiseframework.event;
  */
 public abstract class MouseAdapter implements MouseListener {
 
-	/**
-	 * Called when the mouse clicks the target.
-	 * @param mouseClickEvent The event providing mouse information
-	 */
+	@Override
 	public void mouseClicked(final MouseClickEvent mouseClickEvent) {
 	}
 
-	/**
-	 * Called when the mouse enters the target.
-	 * @param mouseEnterEvent The event providing mouse information
-	 */
+	@Override
 	public void mouseEntered(final MouseEnterEvent mouseEnterEvent) {
 	}
 
-	/**
-	 * Called when the mouse exits the target.
-	 * @param mouseEnterEvent The event providing mouse information
-	 */
+	@Override
 	public void mouseExited(final MouseExitEvent mouseEnterEvent) {
 	}
 

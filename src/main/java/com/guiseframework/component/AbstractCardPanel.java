@@ -37,7 +37,7 @@ public abstract class AbstractCardPanel extends AbstractListSelectContainerContr
 
 	//TODO make sure we listen for enabled status changing on the layout and send an index enabled property change, maybe
 
-	/** @return The layout definition for the container. */
+	@Override
 	@SuppressWarnings("unchecked")
 	public CardLayout getLayout() {
 		return (CardLayout)super.getLayout();
@@ -76,11 +76,13 @@ public abstract class AbstractCardPanel extends AbstractListSelectContainerContr
 		super(layout); //construct the parent class
 		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Component>() { //listen for the value changing and set bookmarks in response
 
-					public void propertyChange(final GenericPropertyChangeEvent<Component> propertyChangeEvent) { //if the value changes
-					//TODO del Log.trace("value changed to ", propertyChangeEvent.getNewValue(), "and ready to update bookmark");
-						updateBookmark(); //update the bookmark, now that the property has changed
-					}
-				});
+			@Override
+			public void propertyChange(final GenericPropertyChangeEvent<Component> propertyChangeEvent) { //if the value changes
+				//TODO del Log.trace("value changed to ", propertyChangeEvent.getNewValue(), "and ready to update bookmark");
+				updateBookmark(); //update the bookmark, now that the property has changed
+			}
+
+		});
 	}
 
 	/**
@@ -110,11 +112,13 @@ public abstract class AbstractCardPanel extends AbstractListSelectContainerContr
 	}
 
 	/**
-	 * Called when navigation occurs. This implementation changes the card based upon the bookmark if bookmarks are enabled for this component. A bookmarked
-	 * component is not selected if its constraints indicate disabled and/or not displayed.
-	 * @param navigationEvent The event indicating navigation details.
-	 * @see #getComponent(Bookmark)
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation changes the card based upon the bookmark if bookmarks are enabled for this component. A bookmarked component is not selected if its
+	 * constraints indicate disabled and/or not displayed.
+	 * </p>
 	 */
+	@Override
 	public void navigated(final NavigationEvent navigationEvent) {
 		if(isBookmarkEnabled()) { //if bookmarks are enabled
 			final Bookmark bookmark = navigationEvent.getBookmark(); //get the navigation bookmark, if any

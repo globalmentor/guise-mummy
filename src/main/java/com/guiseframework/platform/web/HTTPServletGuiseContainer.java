@@ -100,16 +100,10 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer {
 	}
 
 	/**
-	 * Installs the given application at the given context path. This version is provided to expose the method to the servlet.
-	 * @param baseURI The base URI at which the application is being installed.
-	 * @param homeDirectory The home directory of the application.
-	 * @param logDirectory The log directory of the application.
-	 * @param tempDirectory The temporary directory of the application.
-	 * @throws NullPointerException if the application, base URI, home directory, log directory, and/or temprary directory is <code>null</code>.
-	 * @throws IllegalArgumentException if the given base URI is not absolute or the path of which is not absolute or not a collection.
-	 * @throws IllegalStateException if the application is already installed in some container.
-	 * @throws IllegalStateException if there is already an application installed in this container at the given context path.
-	 * @throws IOException if there is an I/O error when installing the application.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version is provided to expose the method to the servlet.
+	 * </p>
 	 */
 	@Override
 	protected void installApplication(final AbstractGuiseApplication application, final URI baseURI, final File homeDirectory, final File logDirectory,
@@ -118,10 +112,12 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer {
 	}
 
 	/**
-	 * Uninstalls the given application. This version is provided to expose the method to the servlet.
-	 * @throws NullPointerException if the application is <code>null</code>.
-	 * @throws IllegalStateException if the application is not installed in this container.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version is provided to expose the method to the servlet.
+	 * </p>
 	 */
+	@Override
 	protected void uninstallApplication(final AbstractGuiseApplication application) {
 		super.uninstallApplication(application); //delegate to the parent class
 	}
@@ -290,13 +286,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer {
 	}
 	*/
 
-	/**
-	 * Determines if the container has a resource available stored at the given resource path. The provided path is first normalized.
-	 * @param resourcePath A container-relative path to a resource in the resource storage area.
-	 * @return <code>true</code> if a resource exists at the given resource path.
-	 * @throws IllegalArgumentException if the given resource path is absolute.
-	 * @throws IllegalArgumentException if the given path is not a valid path.
-	 */
+	@Override
 	protected boolean hasResource(final String resourcePath) {
 		try {
 			return getServletContext().getResource(getContextAbsoluteResourcePath(resourcePath)) != null; //determine whether we can get a URL to that resource
@@ -305,25 +295,18 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer {
 		}
 	}
 
-	/**
-	 * Retrieves an input stream to the resource at the given path. The provided path is first normalized.
-	 * @param resourcePath A container-relative path to a resource in the resource storage area.
-	 * @return An input stream to the resource at the given resource path, or <code>null</code> if no resource exists at the given resource path.
-	 * @throws IllegalArgumentException if the given resource path is absolute.
-	 */
+	@Override
 	protected InputStream getResourceInputStream(final String resourcePath) {
 		return getServletContext().getResourceAsStream(getContextAbsoluteResourcePath(resourcePath)); //try to get an input stream to the resource
 	}
 
 	/**
-	 * Retrieves an input stream to the entity at the given URI. The URI is first resolved to the container base URI. This version loads local resources directly
-	 * through the servlet context.
-	 * @param uri A URI to the entity; either absolute or relative to the container.
-	 * @return An input stream to the entity at the given resource URI, or <code>null</code> if no entity exists at the given resource path.
-	 * @throws NullPointerException if the given URI is <code>null</code>.
-	 * @throws IOException if there was an error connecting to the entity at the given URI.
-	 * @see #getBaseURI()
+	 * {@inheritDoc}
+	 * <p>
+	 * This version loads local resources directly through the servlet context.
+	 * </p>
 	 */
+	@Override
 	public InputStream getInputStream(final URI uri) throws IOException {
 		//TODO del Log.trace("getting container input stream to URI", uri);
 		final URI baseURI = getBaseURI(); //get the base URI
@@ -357,44 +340,45 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer {
 	}
 
 	/**
-	 * Looks up an application principal from the given ID. This version is provided to allow package access.
-	 * @param application The application for which a principal should be returned for the given ID.
-	 * @param id The ID of the principal.
-	 * @return The principal corresponding to the given ID, or <code>null</code> if no principal could be determined.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version is provided to allow package access.
+	 * </p>
 	 */
+	@Override
 	protected Principal getPrincipal(final AbstractGuiseApplication application, final String id) {
 		return super.getPrincipal(application, id); //delegate to the parent class
 	}
 
 	/**
-	 * Looks up the corresponding password for the given principal. This version is provided to allow package access.
-	 * @param application The application for which a password should e retrieved for the given principal.
-	 * @param principal The principal for which a password should be returned.
-	 * @return The password associated with the given principal, or <code>null</code> if no password is associated with the given principal.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version is provided to allow package access.
+	 * </p>
 	 */
+	@Override
 	protected char[] getPassword(final AbstractGuiseApplication application, final Principal principal) {
 		return super.getPassword(application, principal); //delegate to the parent class			
 	}
 
 	/**
-	 * Determines the realm applicable for the resource indicated by the given URI. This version is provided to allow package access.
-	 * @param application The application for a realm should be returned for the given resouce URI.
-	 * @param resourceURI The URI of the resource requested.
-	 * @return The realm appropriate for the resource, or <code>null</code> if the given resource is not in a known realm.
-	 * @see GuiseApplication#relativizeURI(URI)
+	 * {@inheritDoc}
+	 * <p>
+	 * This version is provided to allow package access.
+	 * </p>
 	 */
+	@Override
 	protected String getRealm(final AbstractGuiseApplication application, final URI resourceURI) {
 		return super.getRealm(application, resourceURI); //delegate to the parent class
 	}
 
 	/**
-	 * Checks whether the given principal is authorized to access the resouce at the given application path. This version is provided to allow package access.
-	 * @param application The application for which a principal should be authorized for a given resouce URI.
-	 * @param resourceURI The URI of the resource requested.
-	 * @param principal The principal requesting authentication, or <code>null</code> if the principal is not known.
-	 * @param realm The realm with which the resource is associated, or <code>null</code> if the realm is not known.
-	 * @return <code>true</code> if the given principal is authorized to access the resource represented by the given resource URI.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version is provided to allow package access.
+	 * </p>
 	 */
+	@Override
 	protected boolean isAuthorized(final AbstractGuiseApplication application, final URI resourceURI, final Principal principal, final String realm) {
 		return super.isAuthorized(application, resourceURI, principal, realm); //delegate to the parent class
 	}

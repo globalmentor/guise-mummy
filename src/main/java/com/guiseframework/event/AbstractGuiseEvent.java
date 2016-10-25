@@ -30,7 +30,7 @@ public abstract class AbstractGuiseEvent extends AbstractEvent implements GuiseE
 	/** The Guise session in which this event was generated. */
 	private final GuiseSession session;
 
-	/** @return The Guise session in which this event was generated. */
+	@Override
 	public GuiseSession getSession() {
 		return session;
 	}

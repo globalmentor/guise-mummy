@@ -32,12 +32,12 @@ public abstract class AbstractMultipleCompositeComponent extends AbstractComposi
 	/** The set of child components. */
 	private final Set<Component> childComponents = new CopyOnWriteArraySet<Component>(); //TODO change to a read write lock set and add thread-safety to the entire hierarchy
 
-	/** @return Whether this component has child components. */
+	@Override
 	public boolean hasChildComponents() {
 		return !childComponents.isEmpty();
 	}
 
-	/** @return An iterable to child components. */
+	@Override
 	public Iterable<Component> getChildComponents() {
 		return childComponents;
 	} //TODO make sure this is unmodifiable after we switch to thread-safety

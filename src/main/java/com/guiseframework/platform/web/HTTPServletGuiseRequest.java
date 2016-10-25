@@ -157,7 +157,7 @@ public class HTTPServletGuiseRequest {
 		ajax = requestContentType != null && GUISE_AJAX_REQUEST_CONTENT_TYPE.hasBaseType(requestContentType); //see if this is a Guise AJAX request
 	}
 
-	/** @return A string representation of the request. */
+	@Override
 	public String toString() {
 		return getDepictURI().toString() + " (" + getNavigationPath() + ") " + getBookmark();
 	}

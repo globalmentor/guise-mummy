@@ -74,19 +74,10 @@ public abstract class AbstractRegularExpressionValidator<V> extends AbstractVali
 		this.pattern = checkInstance(pattern, "Regular expression pattern cannot be null."); //save the pattern
 	}
 
-	/**
-	 * Returns a string representation of the given value so that it may be validated against the regular expression.
-	 * @param value The value being validated.
-	 * @return A string representation of the given value, or <code>null</code> if the value is <code>null</code>.
-	 */
+	@Override
 	protected abstract String toString(final V value);
 
-	/**
-	 * Checks whether a given string matches the regular expression.
-	 * @param value The value to validate.
-	 * @throws ValidationException if the provided value is not valid.
-	 * @see #getPattern()
-	 */
+	@Override
 	public void validate(final V value) throws ValidationException {
 		super.validate(value); //do the default validation
 		if(value != null && !pattern.matcher(toString(value)).matches()) { //if there is a non-null value being checked, and it doesn't match the pattern

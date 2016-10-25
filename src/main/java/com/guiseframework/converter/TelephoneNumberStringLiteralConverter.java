@@ -72,14 +72,7 @@ public class TelephoneNumberStringLiteralConverter extends AbstractStringLiteral
 		this.defaultCC = defaultCC; //save the default country code
 	}
 
-	/**
-	 * Converts a literal representation of a value from the lexical space into a value in the value space. If a default country code is specified, that country
-	 * code will be used as the default telephone country code. Otherwise, the country code of the current local's country, if available, will be used as the
-	 * default telephone country code.
-	 * @param literal The literal value in the lexical space to convert.
-	 * @return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
-	 * @throws ConversionException if the literal value cannot be converted.
-	 */
+	@Override
 	public TelephoneNumber convertLiteral(final String literal) throws ConversionException {
 		if(literal == null) { //if the literal is null
 			return null; //the value is null

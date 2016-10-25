@@ -146,20 +146,12 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	 */
 	private boolean editable = true;
 
-	/**
-	 * @return Whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable
-	 *         as well.
-	 */
+	@Override
 	public boolean isEditable() {
 		return editable;
 	}
 
-	/**
-	 * Sets whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable as
-	 * well. This is a bound property of type <code>Boolean</code>.
-	 * @param newEditable <code>true</code> if the cells should allow the user to change their values if their respective columns are also designated as editable.
-	 * @see EditComponent#EDITABLE_PROPERTY
-	 */
+	@Override
 	public void setEditable(final boolean newEditable) {
 		if(editable != newEditable) { //if the value is really changing
 			final boolean oldEditable = editable; //get the old value
@@ -171,9 +163,11 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	/** The property change listener that updates prototype properties. */
 	final protected PropertyChangeListener updatePrototypesPropertyChangeListener = new PropertyChangeListener() {
 
+		@Override
 		public void propertyChange(final PropertyChangeEvent propertyChangeEvent) { //when the property changes
 			updatePrototypes(); //update the prototypes
 		}
+
 	};
 
 	/** The map of cell representation strategies for value classes. */
@@ -245,23 +239,23 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	}
 
 	/**
-	 * Retrieves the component for the given object. If no component yet exists for the given object, one will be created. This version is provided to allow
-	 * public access.
-	 * @param cell The object for which a representation component should be returned.
-	 * @return The child component representing the given object.
-	 * @throws IllegalArgumentException if the given object is not an appropriate object for a component to be created.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version is provided to allow public access.
+	 * </p>
 	 */
+	@Override
 	public Component getComponent(final TableModel.Cell<?> cell) {
 		return super.getComponent(cell); //delegate to the parent version
 	}
 
 	/**
-	 * Creates a component state to represent the given object. This implementation delegates to
-	 * {@link #createTypedComponentState(com.guiseframework.model.TableModel.Cell)}.
-	 * @param cell The object with which the component state is to be associated.
-	 * @return The component state to represent the given object.
-	 * @throws IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation delegates to {@link #createTypedComponentState(com.guiseframework.model.TableModel.Cell)}.
+	 * </p>
 	 */
+	@Override
 	protected CellComponentState createComponentState(final TableModel.Cell<?> cell) {
 		return createTypedComponentState(cell); //delegate to the typed version
 	}
@@ -754,19 +748,22 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		}
 		getSession().addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGenericPropertyChangeListener<Locale>() { //listen for the session locale changing
 
-					public void propertyChange(GenericPropertyChangeEvent<Locale> propertyChangeEvent) { //if the locale changes
-						clearComponentStates(); //clear all the components and component states in case they are locale-related TODO probably transfer this up to the abstract composite state class
-					}
-				});
+			@Override
+			public void propertyChange(GenericPropertyChangeEvent<Locale> propertyChangeEvent) { //if the locale changes
+				clearComponentStates(); //clear all the components and component states in case they are locale-related TODO probably transfer this up to the abstract composite state class
+			}
+
+		});
 		if(tableModel instanceof ListListenable) { //if this table model allows list listeners TODO improve this; create a table model listener---maybe that will implement ListListener
 			final ListListenable<Object> listListenable = (ListListenable<Object>)tableModel; //get the list listenable
 			listListenable.addListListener(new ListListener<Object>() { //listen for table modifications
 
-						public void listModified(final ListEvent<Object> listEvent) { //if the table list is modified
-							clearComponentStates(); //clear all the components and component states TODO probably do this on a component-by-component basis
-							getDepictor().setDepicted(false); //TODO fix hack; add a table listener and have the view listen to that
-						};
-					});
+				@Override
+				public void listModified(final ListEvent<Object> listEvent) { //if the table list is modified
+					clearComponentStates(); //clear all the components and component states TODO probably do this on a component-by-component basis
+					getDepictor().setDepicted(false); //TODO fix hack; add a table listener and have the view listen to that
+				};
+			});
 		}
 		//first action prototype
 		firstActionPrototype = new AbstractActionPrototype(LABEL_FIRST, GLYPH_FIRST) {
@@ -880,76 +877,42 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 
 	//TableModel delegations
 
-	/**
-	 * Determines the logical index of the given table column.
-	 * @param column One of the table columns.
-	 * @return The zero-based logical index of the column within the table, or -1 if the column is not one of the model's columns.
-	 */
+	@Override
 	public int getColumnIndex(final TableColumnModel<?> column) {
 		return getTableModel().getColumnIndex(column);
 	}
 
-	/** @return A read-only list of table columns in physical order. */
+	@Override
 	public List<TableColumnModel<?>> getColumns() {
 		return getTableModel().getColumns();
 	}
 
-	/** @return The number of rows in this table. */
+	@Override
 	public int getRowCount() {
 		return getTableModel().getRowCount();
 	}
 
-	/** @return The number of columns in this table. */
+	@Override
 	public int getColumnCount() {
 		return getTableModel().getColumnCount();
 	}
 
-	/**
-	 * Returns the cell value for the given cell.
-	 * @param <C> The type of cell value.
-	 * @param cell The cell containing the row index and column information.
-	 * @return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
-	 * @throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	 * @throws IllegalArgumentException if the given column is not one of this table's columns.
-	 */
+	@Override
 	public <C> C getCellValue(final Cell<C> cell) {
 		return getTableModel().getCellValue(cell);
 	}
 
-	/**
-	 * Returns the cell value at the given row and column.
-	 * @param <C> The type of cell values in the given column.
-	 * @param rowIndex The zero-based row index.
-	 * @param column The column for which a value should be returned.
-	 * @return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
-	 * @throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	 * @throws IllegalArgumentException if the given column is not one of this table's columns.
-	 */
+	@Override
 	public <C> C getCellValue(final int rowIndex, final TableColumnModel<C> column) {
 		return getTableModel().getCellValue(rowIndex, column);
 	}
 
-	/**
-	 * Sets the cell value for the given cell.
-	 * @param <C> The type of cell value.
-	 * @param cell The cell containing the row index and column information.
-	 * @param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	 * @throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	 * @throws IllegalArgumentException if the given column is not one of this table's columns.
-	 */
+	@Override
 	public <C> void setCellValue(final Cell<C> cell, final C newCellValue) {
 		getTableModel().setCellValue(cell, newCellValue);
 	}
 
-	/**
-	 * Sets the cell value at the given row and column.
-	 * @param <C> The type of cell values in the given column.
-	 * @param rowIndex The zero-based row index.
-	 * @param column The column for which a value should be returned.
-	 * @param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	 * @throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	 * @throws IllegalArgumentException if the given column is not one of this table's columns.
-	 */
+	@Override
 	public <C> void setCellValue(final int rowIndex, final TableColumnModel<C> column, final C newCellValue) {
 		getTableModel().setCellValue(rowIndex, column, newCellValue);
 	}
@@ -1002,18 +965,12 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 
 	//TODO fix the edit event to actually be fired
 
-	/**
-	 * Adds an edit listener.
-	 * @param editListener The edit listener to add.
-	 */
+	@Override
 	public void addEditListener(final EditListener editListener) {
 		getEventListenerManager().add(EditListener.class, editListener); //add the listener
 	}
 
-	/**
-	 * Removes an edit listener.
-	 * @param editListener The edit listener to remove.
-	 */
+	@Override
 	public void removeEditListener(final EditListener editListener) {
 		getEventListenerManager().remove(EditListener.class, editListener); //remove the listener
 	}
@@ -1091,19 +1048,13 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		}
 
 		/**
-		 * Creates a component for the given cell. This implementation returns a message with string value of the given value using the object's
-		 * <code>toString()</code> method.
-		 * @param <C> The type of value contained in the column.
-		 * @param table The component containing the model.
-		 * @param model The model containing the value.
-		 * @param rowIndex The zero-based row index of the value.
-		 * @param column The column of the value.
-		 * @param editable Whether values in this column are editable.
-		 * @param selected <code>true</code> if the value is selected.
-		 * @param focused <code>true</code> if the value has the focus.
-		 * @return A new component to represent the given value.
+		 * {@inheritDoc}
+		 * <p>
+		 * This implementation returns a message with string value of the given value using the object's <code>toString()</code> method.
+		 * </p>
 		 */
 		@SuppressWarnings("unchecked")
+		@Override
 		//we check the type of the column value class, so the casts are safe
 		public <C extends V> Component createComponent(final Table table, final TableModel model, final int rowIndex, final TableColumnModel<C> column,
 				final boolean editable, final boolean selected, final boolean focused) {
@@ -1172,11 +1123,13 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		}
 
 		/**
-		 * Determines the message text of the cell. This implementation returns a message with a string value of the given value using the installed converter, if
-		 * no message has been explicitly set.
-		 * @return The message text of the cell.
+		 * {@inheritDoc}
+		 * <p>
+		 * This implementation returns a message with a string value of the given value using the installed converter, if no message has been explicitly set.
+		 * </p>
 		 * @see #getConverter()
 		 */
+		@Override
 		public String getMessage() {
 			String message = super.getMessage(); //get the message explicitly set
 			if(message == null) { //if no message has been explicitly set
@@ -1254,32 +1207,22 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		 */
 		//TODO update		public void setEnabled(final boolean newEnabled) {throw new UnsupportedOperationException("Enabled is read-only.");}
 
-		/** @return The validator for this model, or <code>null</code> if no validator is installed. */
+		@Override
 		public Validator<C> getValidator() {
 			return getCell().getColumn().getValidator();
 		} //return the validator from the column
 
-		/**
-		 * Sets the validator.
-		 * @param newValidator The validator for this model, or <code>null</code> if no validator should be used.
-		 */
+		@Override
 		public void setValidator(final Validator<C> newValidator) {
 			getCell().getColumn().setValidator(newValidator);
 		}
 
-		/** @return The value from the table model cell, or <code>null</code> if there is no value in the cell. */
+		@Override
 		public C getValue() {
 			return getModel().getCellValue(getCell());
 		} //return the value from the table model
 
-		/**
-		 * Sets the value in the cell. If the value change is vetoed by the installed validator, the validation exception will be accessible via
-		 * {@link PropertyVetoException#getCause()}.
-		 * @param newValue The new value of the cell.
-		 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
-		 * @see #getValidator()
-		 * @see #VALUE_PROPERTY
-		 */
+		@Override
 		public void setValue(final C newValue) throws PropertyVetoException {
 			final C oldValue = getValue(); //get the old value
 			final Validator<C> validator = getValidator(); //get the currently installed validator, if there is one
@@ -1293,10 +1236,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 			getModel().setCellValue(getCell(), newValue); //set the value in the table model
 		}
 
-		/**
-		 * Resets the value to a default value, which may be invalid according to any installed validators. No validation occurs.
-		 * @see ValueModel#VALUE_PROPERTY
-		 */
+		@Override
 		public void resetValue() {
 			getModel().setCellValue(getCell(), null); //set a null value in the table model
 		}

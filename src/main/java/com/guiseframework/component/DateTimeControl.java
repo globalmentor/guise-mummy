@@ -100,6 +100,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date> { //TODO r
 		calendarButton.setLabelDisplayed(false);
 		calendarButton.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(final ActionEvent actionEvent) { //if the calendar button is clicked
 				final Date date = dateControl.getValue(); //get the current date value, if any
 				final CalendarDialogFrame calendarDialogFrame = new CalendarDialogFrame(date); //create a new calendar popup for the current date
@@ -108,18 +109,20 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date> { //TODO r
 				calendarDialogFrame.open(); //show the calendar popup
 				calendarDialogFrame.open(new AbstractGenericPropertyChangeListener<Frame.Mode>() { //ask for the date to be selected		
 
-							public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> propertyChangeEvent) { //when the modal dialog mode changes
-								final Date newDate = calendarDialogFrame.getValue(); //get the value of the frame's model
-								if(newDate != null) { //if a new date was selected (i.e. the calendar dialog frame was not closed without a selection)
-									try {
-										//Log.trace("ready to put new date in control:", newDate);
-										dateControl.setValue(newDate); //show the date in the date control
-									} catch(final PropertyVetoException propertyVetoException) { //we should never have a problem selecting a date
-										throw new AssertionError(propertyVetoException);
-									}
-								}
+					@Override
+					public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> propertyChangeEvent) { //when the modal dialog mode changes
+						final Date newDate = calendarDialogFrame.getValue(); //get the value of the frame's model
+						if(newDate != null) { //if a new date was selected (i.e. the calendar dialog frame was not closed without a selection)
+							try {
+								//Log.trace("ready to put new date in control:", newDate);
+								dateControl.setValue(newDate); //show the date in the date control
+							} catch(final PropertyVetoException propertyVetoException) { //we should never have a problem selecting a date
+								throw new AssertionError(propertyVetoException);
 							}
-						});
+						}
+					}
+
+				});
 			}
 		});
 		addComponent(calendarButton); //add the calendar button
@@ -134,19 +137,22 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date> { //TODO r
 		//TODO del		updateYearControl();	//create and install an appropriate year control
 		updateDateControlsPropertyChangeListener = new AbstractGenericPropertyChangeListener<Object>() { //create a property change listener to update the calendars
 
+			@Override
 			public void propertyChange(final GenericPropertyChangeEvent<Object> propertyChangeEvent) { //if the model value value changed
 				updateDateControls(); //update the date controls based upon the new selected date
 			}
+
 		};
 		updateValuePropertyChangeListener = new AbstractGenericPropertyChangeListener<Object>() { //create a property change listener to update the value
 
+			@Override
 			public void propertyChange(final GenericPropertyChangeEvent<Object> propertyChangeEvent) { //if the model value changed
 				if(!updatingDateControls) { //if we're not manually updating the controls
 					updatingDateControls = true; //show that we're updating the calendars
 					try {
 						Date date = dateControl.getValue(); //get the date value, if there is one
 						if(date != null) { //if there is a date value
-						//Log.trace("got date", date, "milliseconds", date.getTime());
+							//Log.trace("got date", date, "milliseconds", date.getTime());
 							final GuiseSession session = getSession(); //get the current session
 							final Locale locale = session.getLocale(); //get the current locale
 							final TimeZone timeZone = session.getTimeZone(); //get the current time zone
@@ -154,7 +160,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date> { //TODO r
 							dateCalendar.setTime(date); //set the date in the calendar
 							final Date time = timeControl.getValue(); //get the time date
 							if(time != null) { //if there is a time, we'll need to update our date
-							//Log.trace("got time", time, "milliseconds", time.getTime());
+								//Log.trace("got time", time, "milliseconds", time.getTime());
 								final Calendar timeCalendar = Calendar.getInstance(timeZone, locale); //get a calendar to manipulate the time
 								timeCalendar.setTime(time); //set the time in the calendar
 								setTime(dateCalendar, timeCalendar); //set the time of the date calendar
@@ -172,6 +178,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date> { //TODO r
 					}
 				}
 			}
+
 		};
 		addPropertyChangeListener(VALUE_PROPERTY, updateDateControlsPropertyChangeListener); //update the controls if the selected date changes
 		updateDateControls(); //update the date controls
@@ -180,10 +187,12 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date> { //TODO r
 	}
 
 	/**
-	 * Called when the enabled property changes. This version updates the enabled status of the child controls.
-	 * @param oldValue The old value of the property.
-	 * @param newValue The new value of the property.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version updates the enabled status of the child controls.
+	 * </p>
 	 */
+	@Override
 	protected void enabledPropertyChange(final boolean oldValue, final boolean newValue) {
 		dateControl.setEnabled(newValue);
 		calendarButton.setEnabled(newValue);
@@ -203,7 +212,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date> { //TODO r
 			try {
 				final Date date = getValue();
 				if(date != null) { //if there is a date
-				//Log.trace("updating controls with date", date, "milliseconds", date.getTime());
+					//Log.trace("updating controls with date", date, "milliseconds", date.getTime());
 					final GuiseSession session = getSession(); //get the current session
 					final Locale locale = session.getLocale(); //get the current locale
 					final TimeZone timeZone = session.getTimeZone(); //get the current time zone

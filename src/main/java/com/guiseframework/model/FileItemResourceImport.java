@@ -49,7 +49,7 @@ public class FileItemResourceImport implements ResourceImport {
 	/** Whether the resource has been accessed, either by retrieving its input stream or by storing the resource in a file. */
 	private boolean imported = false;
 
-	/** @return Whether the resource has been accessed, either by retrieving its input stream or by storing the resource in a file. */
+	@Override
 	public synchronized boolean isImported() {
 		return imported;
 	}
@@ -69,39 +69,27 @@ public class FileItemResourceImport implements ResourceImport {
 		simpleName = name; //save the filename
 	}
 
-	/**
-	 * @return The name of the resource, which may be, for example, a simple name, a path and filename, or <code>null</code> if the name is not known.
-	 * @see #getSimpleName()
-	 */
+	@Override
 	public String getName() {
 		return getFileItem().getName(); //return the name returned by the the file item
 	}
 
-	/**
-	 * Returns the simple name, such as the filename, of the resource. The returned string does not include any path information.
-	 * @return The simple name of the resource, or <code>null</code> if the name is not known.
-	 * @see #getName()
-	 */
+	@Override
 	public String getSimpleName() {
 		return simpleName; //return the name we saved earlier
 	}
 
-	/** @return The content type of the resource to be imported, or <code>null</code> if the content type of the resource is not known. */
+	@Override
 	public ContentType getContentType() {
 		return contentType; //return the pre-made content type
 	}
 
-	/** @return The length of the resource to be imported, or -1 if the length of the resource is not known. */
+	@Override
 	public long getContentLength() {
 		return getFileItem().getSize(); //return the size of the file item
 	}
 
-	/**
-	 * Retrieves an input stream to the resource. There can only be at most a single call to this method or {@link #store(File)}.
-	 * @return An input stream to the resource to be imported.
-	 * @throws IllegalStateException if this resource has already been stored in a file, or an input stream to the resource has already been retrieved.
-	 * @throws IOException if there is an error getting an input stream to the resource.
-	 */
+	@Override
 	public synchronized InputStream getInputStream() throws IOException {
 		if(isImported()) { //if the resource is already stored
 			throw new IllegalStateException("Resource already stored.");
@@ -110,13 +98,7 @@ public class FileItemResourceImport implements ResourceImport {
 		return getFileItem().getInputStream(); //get an input stream from the file item
 	}
 
-	/**
-	 * Convenience method for storing the imported resource in a file. Depending on the implementation, this may allow greater efficiency than reading from the
-	 * stream. There can only be at most a single call to this method or {@link #getInputStream()}.
-	 * @param file The file to which the resource should be written.
-	 * @throws IllegalStateException if this resource has already been stored in a file, or an input stream to the resource has already been retrieved.
-	 * @throws IOException If there is an error writing the resource to the file.
-	 */
+	@Override
 	public synchronized void store(final File file) throws IOException {
 		if(isImported()) { //if the resource is already stored
 			throw new IllegalStateException("Resource already stored.");
@@ -129,7 +111,7 @@ public class FileItemResourceImport implements ResourceImport {
 		}
 	}
 
-	/** @return A string representation of this resource import. */
+	@Override
 	public String toString() {
 		final StringBuilder stringBuilder = new StringBuilder(super.toString()); //create a string builder for constructing the string
 		final String name = getName(); //get the name

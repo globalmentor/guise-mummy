@@ -44,7 +44,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 
 	//TODO make sure we listen for enabled status changing on the layout and send an index enabled property change, maybe
 
-	/** @return The layout definition for the container. */
+	@Override
 	public AbstractValueLayout<? extends ControlConstraints> getLayout() {
 		return (AbstractValueLayout<? extends ControlConstraints>)super.getLayout();
 	}
@@ -52,17 +52,12 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	/** The strategy used to generate a component to represent each value in the model. */
 	private ValueRepresentationStrategy<Component> valueRepresentationStrategy;
 
-	/** @return The strategy used to generate a component to represent each value in the model. */
+	@Override
 	public ValueRepresentationStrategy<Component> getValueRepresentationStrategy() {
 		return valueRepresentationStrategy;
 	}
 
-	/**
-	 * Sets the strategy used to generate a component to represent each value in the model. This is a bound property
-	 * @param newValueRepresentationStrategy The new strategy to create components to represent this model's values.
-	 * @throws NullPointerException if the provided value representation strategy is <code>null</code>.
-	 * @see SelectControl#VALUE_REPRESENTATION_STRATEGY_PROPERTY
-	 */
+	@Override
 	public void setValueRepresentationStrategy(final ValueRepresentationStrategy<Component> newValueRepresentationStrategy) {
 		if(valueRepresentationStrategy != newValueRepresentationStrategy) { //if the value is really changing
 			final ValueRepresentationStrategy<Component> oldValueRepresentationStrategy = valueRepresentationStrategy; //get the old value
@@ -72,10 +67,12 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	}
 
 	/**
-	 * Retrieves the component for the given object. This version returns the given component to fulfill the interface contract of {@link ListSelectControl}.
-	 * @param object The object for which a representation component should be returned.
-	 * @return The child component representing the given object, or <code>null</code> if there is no component representing the given object.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version returns the given component to fulfill the interface contract of {@link ListSelectControl}.
+	 * </p>
 	 */
+	@Override
 	public Component getComponent(final Component object) {
 		return object; //return the given component
 	}
@@ -92,18 +89,21 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 		layout.addVetoableChangeListener(getRepeatVetoableChangeListener()); //listen and repeat all vetoable changes of the card layout value model
 		addPropertyChangeListener(VALUE_PROPERTY, new PropertyChangeListener() { //listen for the value changing
 
-					public void propertyChange(final PropertyChangeEvent propertyChangeEvent) { //if the value changes
-						fireSelectionChanged(null, null); //indicate that the selection changed
-					}
-				});
+			@Override
+			public void propertyChange(final PropertyChangeEvent propertyChangeEvent) { //if the value changes
+				fireSelectionChanged(null, null); //indicate that the selection changed
+			}
+
+		});
 	}
 
 	/**
-	 * Reports that a bound property has changed. This version first updates the valid status if the value is reported as being changed.
-	 * @param propertyName The name of the property being changed.
-	 * @param oldValue The old property value.
-	 * @param newValue The new property value.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version first updates the valid status if the value is reported as being changed.
+	 * </p>
 	 */
+	@Override
 	protected <VV> void firePropertyChange(final String propertyName, final VV oldValue, final VV newValue) {
 		if(VALUE_PROPERTY.equals(propertyName) || VALIDATOR_PROPERTY.equals(propertyName)) { //if the value property or the validator property is being reported as changed
 			updateValid(); //update the valid status based upon the new property, so that any listeners will know whether the new property is valid
@@ -112,18 +112,24 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	}
 
 	/**
-	 * Checks the state of child components for validity. This version only checks the validity of the selected card.
-	 * @return <code>true</code> if the relevant children pass all validity tests.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version only checks the validity of the selected card.
+	 * </p>
 	 */
+	@Override
 	protected boolean determineChildrenValid() {
 		final Component selectedComponent = getValue(); //get the selected card
 		return selectedComponent == null || selectedComponent.isValid(); //the children will only be invalid if the selected card is invalid
 	}
 
 	/**
-	 * Validates the user input of child components. This version only validates the selected card.
-	 * @return <code>true</code> if all child validations return <code>true</code>.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version only validates the selected card.
+	 * </p>
 	 */
+	@Override
 	public boolean validateChildren() {
 		final Component selectedComponent = getValue(); //get the selected card
 		return selectedComponent != null ? selectedComponent.validate() : false; //only validate the selected card if there is one
@@ -131,118 +137,75 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 
 	//ValueModel delegations
 
-	/** @return The default value. */
+	@Override
 	public Component getDefaultValue() {
 		return getLayout().getDefaultValue();
 	}
 
-	/** @return The input value, or <code>null</code> if there is no input value. */
+	@Override
 	public Component getValue() {
 		return getLayout().getValue();
 	}
 
-	/**
-	 * Sets the value. This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method. If a
-	 * validator is installed, the value will first be validated before the current value is changed. Validation always occurs if a validator is installed, even
-	 * if the value is not changing. If the value change is vetoed by the installed validator, the validation exception will be accessible via
-	 * {@link PropertyVetoException#getCause()}.
-	 * @param newValue The new value.
-	 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
-	 * @see #getValidator()
-	 * @see #VALUE_PROPERTY
-	 */
+	@Override
 	public void setValue(final Component newValue) throws PropertyVetoException {
 		getLayout().setValue(newValue);
 	}
 
-	/**
-	 * Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators. No validation occurs.
-	 * @see ValueModel#VALUE_PROPERTY
-	 */
+	@Override
 	public void clearValue() {
 		getLayout().clearValue();
 	}
 
-	/**
-	 * Resets the value to a default value, which may be invalid according to any installed validators. No validation occurs.
-	 * @see #VALUE_PROPERTY
-	 */
+	@Override
 	public void resetValue() {
 		getLayout().resetValue();
 	}
 
-	/** @return The validator for this model, or <code>null</code> if no validator is installed. */
+	@Override
 	public Validator<Component> getValidator() {
 		return getLayout().getValidator();
 	}
 
-	/**
-	 * Sets the validator. This is a bound property
-	 * @param newValidator The validator for this model, or <code>null</code> if no validator should be used.
-	 * @see #VALIDATOR_PROPERTY
-	 */
+	@Override
 	public void setValidator(final Validator<Component> newValidator) {
 		getLayout().setValidator(newValidator);
 	}
 
-	/**
-	 * Determines whether the value of this model is valid.
-	 * @return Whether the value of this model is valid.
-	 */
+	@Override
 	public boolean isValidValue() {
 		return getLayout().isValidValue();
 	}
 
-	/**
-	 * Validates the value of this model, throwing an exception if the model is not valid.
-	 * @throws ValidationException if the value of this model is not valid.
-	 */
+	@Override
 	public void validateValue() throws ValidationException {
 		getLayout().validateValue();
 	}
 
-	/** @return The class representing the type of value this model can hold. */
+	@Override
 	public Class<Component> getValueClass() {
 		return getLayout().getValueClass();
 	}
 
 	//SelectModel delegations
 
-	/**
-	 * Replaces the first occurrence in the of the given value with its replacement. This method ensures that another thread does not change the model while the
-	 * search and replace operation occurs.
-	 * @param oldValue The value for which to search.
-	 * @param newValue The replacement value.
-	 * @return Whether the operation resulted in a modification of the model.
-	 */
+	@Override
 	public boolean replace(final Component oldValue, final Component newValue) {
 		throw new UnsupportedOperationException("replace() not yet supported");
 	}
 
-	/**
-	 * Determines the selected value. If more than one value is selected, the lead selected value will be returned.
-	 * @return The value currently selected, or <code>null</code> if no value is currently selected.
-	 */
+	@Override
 	public Component getSelectedValue() {
 		return getValue();
 	}
 
-	/**
-	 * Determines the selected values.
-	 * @return The values currently selected.
-	 */
+	@Override
 	public Component[] getSelectedValues() {
 		final Component selectedValue = getValue(); //get the selected value, if any
-		return selectedValue != null ? new Component[] { selectedValue } : new Component[] {}; //return an array with the component, if there is one selected
+		return selectedValue != null ? new Component[] {selectedValue} : new Component[] {}; //return an array with the component, if there is one selected
 	}
 
-	/**
-	 * Sets the selected values. If a value occurs more than one time in the model, the first occurrence of the value will be selected. Values that do not occur
-	 * in the select model will be ignored. If the value change is vetoed by the installed validator, the validation exception will be accessible via
-	 * {@link PropertyVetoException#getCause()}. This method delegates to the selection strategy.
-	 * @param values The values to select.
-	 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
-	 */
+	@Override
 	public void setSelectedValues(final Component... values) throws PropertyVetoException {
 		setValue(values.length > 0 ? values[0] : null); //select the first or no value
 	}
@@ -252,65 +215,35 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 
 	//ListSelectModel delegations
 
-	/** @return The selection policy for this model. */
+	@Override
 	public ListSelectionPolicy<Component> getSelectionPolicy() {
 		return SINGLE_COMPONENT_SELECTION_POLICY;
 	}
 
-	/**
-	 * Determines the selected index. If more than one index is selected, the lead selected index will be returned.
-	 * @return The index currently selected, or -1 if no index is selected.
-	 * @see #getSelectedValue()
-	 */
+	@Override
 	public int getSelectedIndex() {
 		return getLayout().getSelectedIndex();
 	}
 
-	/**
-	 * Determines the selected indices.
-	 * @return The indices currently selected.
-	 * @see #getSelectedValues()
-	 */
+	@Override
 	public int[] getSelectedIndexes() {
 		final int selectedIndex = getLayout().getSelectedIndex(); //get the selected index
-		return selectedIndex >= 0 ? new int[] { selectedIndex } : new int[] {}; //return the selected index in an array, if there is a selected index
+		return selectedIndex >= 0 ? new int[] {selectedIndex} : new int[] {}; //return the selected index in an array, if there is a selected index
 	}
 
-	/**
-	 * Sets the selected indices. Invalid and duplicate indices will be ignored. If the value change is vetoed by the installed validator, the validation
-	 * exception will be accessible via {@link PropertyVetoException#getCause()}.
-	 * @param indexes The indices to select.
-	 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
-	 * @see ListSelectionPolicy#getSetSelectedIndices(ListSelectModel, int[])
-	 * @see #setSelectedValues(Component...)
-	 * @see #addSelectedIndexes(int...)
-	 */
+	@Override
 	public void setSelectedIndexes(final int... indexes) throws PropertyVetoException {
 		getLayout().setSelectedIndex(indexes.length > 0 ? indexes[0] : -1); //select the first index if there are indexes to select
 	}
 
-	/**
-	 * Adds a selection at the given indices. Any invalid indices will be ignored. If the value change is vetoed by the installed validator, the validation
-	 * exception will be accessible via {@link PropertyVetoException#getCause()}.
-	 * @param indexes The indices to add to the selection.
-	 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
-	 * @see ListSelectionPolicy#getAddSelectedIndices(ListSelectModel, int[])
-	 * @see #setSelectedIndexes(int[])
-	 */
+	@Override
 	public void addSelectedIndexes(int... indexes) throws PropertyVetoException {
 		if(getSelectedIndex() < 0) { //only if there are no selected indexes
 			setSelectedIndexes(indexes); //set the new index
 		}
 	}
 
-	/**
-	 * Removes a selection at the given indices. Any invalid indices will be ignored. If the value change is vetoed by the installed validator, the validation
-	 * exception will be accessible via {@link PropertyVetoException#getCause()}.
-	 * @param indexes The indices to remove from the selection.
-	 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
-	 * @see ListSelectionPolicy#getRemoveSelectedIndices(ListSelectModel, int[])
-	 * @see #setSelectedIndexes(int[])
-	 */
+	@Override
 	public void removeSelectedIndexes(int... indexes) throws PropertyVetoException {
 		final int selectedIndex = getLayout().getSelectedIndex(); //get the selected index
 		for(int i = indexes.length - 1; i >= 0; --i) { //for each index index
@@ -322,123 +255,73 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 		}
 	}
 
-	/**
-	 * Determines the displayed status of the first occurrence of a given value.
-	 * @param value The value for which the displayed status is to be determined.
-	 * @return <code>true</code> if the value is displayed, else <code>false</code>.
-	 * @throws IndexOutOfBoundsException if the given value does not occur in the model.
-	 */
+	@Override
 	public boolean isValueDisplayed(final Component value) {
 		return getLayout().getConstraints(value).isDisplayed();
 	}
 
-	/**
-	 * Sets the displayed status of the first occurrence of a given value. This is a bound value state property.
-	 * @param value The value to enable or disable.
-	 * @param newDisplayed Whether the value should be displayed.
-	 * @see Displayable#DISPLAYED_PROPERTY
-	 */
+	@Override
 	public void setValueDisplayed(final Component value, final boolean newDisplayed) {
 		getLayout().getConstraints(value).setDisplayed(newDisplayed);
 	} //TODO fix property change event
 
-	/**
-	 * Determines the displayed status of a given index.
-	 * @param index The index of the value for which the displayed status is to be determined.
-	 * @return <code>true</code> if the value at the given index is displayed, else <code>false</code>.
-	 */
+	@Override
 	public boolean isIndexDisplayed(final int index) {
 		return isValueDisplayed(get(index));
 	}
 
-	/**
-	 * Sets the displayed status of a given index. This is a bound value state property.
-	 * @param index The index of the value to enable or disable.
-	 * @param newDisplayed Whether the value at the given index should be displayed.
-	 * @see Displayable#DISPLAYED_PROPERTY
-	 * @throws IndexOutOfBoundsException if the given index is not within the range of the list.
-	 */
+	@Override
 	public void setIndexDisplayed(final int index, final boolean newDisplayed) {
 		setValueDisplayed(get(index), newDisplayed);
 	} //TODO fix property change event
 
-	/**
-	 * Determines the enabled status of the first occurrence of a given value.
-	 * @param value The value for which the enabled status is to be determined.
-	 * @return <code>true</code> if the value is enabled, else <code>false</code>.
-	 * @throws IndexOutOfBoundsException if the given value does not occur in the model.
-	 */
+	@Override
 	public boolean isValueEnabled(final Component value) {
 		return getLayout().getConstraints(value).isEnabled();
 	}
 
-	/**
-	 * Sets the enabled status of the first occurrence of a given value. This is a bound value state property.
-	 * @param value The value to enable or disable.
-	 * @param newEnabled Whether the value should be enabled.
-	 * @see Enableable#ENABLED_PROPERTY
-	 */
+	@Override
 	public void setValueEnabled(final Component value, final boolean newEnabled) {
 		getLayout().getConstraints(value).setEnabled(newEnabled);
 	} //TODO fix property change event
 
-	/**
-	 * Determines the enabled status of a given index.
-	 * @param index The index of the value for which the enabled status is to be determined.
-	 * @return <code>true</code> if the value at the given index is enabled, else <code>false</code>.
-	 */
+	@Override
 	public boolean isIndexEnabled(final int index) {
 		return isValueEnabled(get(index));
 	}
 
-	/**
-	 * Sets the enabled status of a given index. This is a bound value state property.
-	 * @param index The index of the value to enable or disable.
-	 * @param newEnabled Whether the value at the given index should be enabled.
-	 * @see Enableable#ENABLED_PROPERTY
-	 * @throws IndexOutOfBoundsException if the given index is not within the range of the list.
-	 */
+	@Override
 	public void setIndexEnabled(final int index, final boolean newEnabled) {
 		setValueEnabled(get(index), newEnabled);
 	} //TODO fix property change event
 
-	/**
-	 * Adds a list listener.
-	 * @param listListener The list listener to add.
-	 */
+	@Override
 	public void addListListener(final ListListener<Component> listListener) {
 		getEventListenerManager().add(ListListener.class, listListener); //add the listener
 	}
 
-	/**
-	 * Removes a list listener.
-	 * @param listListener The list listener to remove.
-	 */
+	@Override
 	public void removeListListener(final ListListener<Component> listListener) {
 		getEventListenerManager().remove(ListListener.class, listListener); //remove the listener
 	}
 
-	/**
-	 * Adds a list selection listener.
-	 * @param selectionListener The selection listener to add.
-	 */
+	@Override
 	public void addListSelectionListener(final ListSelectionListener<Component> selectionListener) {
 		getEventListenerManager().add(ListSelectionListener.class, selectionListener); //add the listener
 	}
 
-	/**
-	 * Removes a list selection listener.
-	 * @param selectionListener The selection listener to remove.
-	 */
+	@Override
 	public void removeListSelectionListener(final ListSelectionListener<Component> selectionListener) {
 		getEventListenerManager().remove(ListSelectionListener.class, selectionListener); //remove the listener
 	}
 
 	/**
-	 * Fires a given component added event to all registered composite component listeners. This implementation also fires a list modified event to all registered
-	 * list listeners, if any.
-	 * @param childComponentEvent The child component event to fire.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation also fires a list modified event to all registered list listeners, if any.
+	 * </p>
 	 */
+	@Override
 	protected void fireChildComponentAdded(final ComponentEvent childComponentEvent) { //TODO it might be better to listen for the composite component events and act accordingly
 		super.fireChildComponentAdded(childComponentEvent); //fire the component added event normally
 		if(getEventListenerManager().hasListeners(ListListener.class)) { //if there are appropriate listeners registered
@@ -487,115 +370,57 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 
 	//List delegations
 
-	/** @return An array containing all of the values in this model. */
+	@Override
 	public Object[] toArray() {
 		return getComponentList().toArray();
 	}
 
-	/**
-	 * Returns an array containing all of the values in this model.
-	 * @param array The array into which the value of this collection are to be stored, if it is big enough; otherwise, a new array of the same runtime type is
-	 *          allocated for this purpose.
-	 * @return An array containing the values of this model.
-	 * @throws ArrayStoreException if the runtime type of the specified array is not a supertype of the runtime type of every value in this model.
-	 * @throws NullPointerException if the specified array is <code>null</code>.
-	 */
+	@Override
 	public <T> T[] toArray(final T[] array) {
 		return getComponentList().toArray(array);
 	}
 
-	/**
-	 * Determines if this model contains all of the values of the specified collection.
-	 * @param collection The collection to be checked for containment in this model.
-	 * @return <code>true</code> if this model contains all of the values of the specified collection.
-	 * @throws NullPointerException if the specified collection is <code>null</code>.
-	 * @see #contains(Object)
-	 */
+	@Override
 	public boolean containsAll(final Collection<?> collection) {
 		return getComponentList().containsAll(collection);
 	}
 
-	/**
-	 * Appends all of the values in the specified collection to the end of this model, in the order that they are returned by the specified collection's iterator.
-	 * @param collection The collection the values of which are to be added to this model.
-	 * @return <code>true</code> if this model changed as a result of the call.
-	 * @throws NullPointerException if the specified collection is <code>null</code>.
-	 * @see #add(Object)
-	 */
+	@Override
 	public boolean addAll(final Collection<? extends Component> collection) {
 		throw new UnsupportedOperationException("addAll(Collection) not yet supported");
 	} //TODO add all these to container
 
-	/**
-	 * Inserts all of the values in the specified collection into this model at the specified position.
-	 * @param index The index at which to insert first value from the specified collection.
-	 * @param collection The values to be inserted into this model.
-	 * @return <code>true</code> if this model changed as a result of the call.
-	 * @throws NullPointerException if the specified collection is <code>null</code>.
-	 * @throws IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
-	 */
+	@Override
 	public synchronized boolean addAll(final int index, final Collection<? extends Component> collection) {
 		throw new UnsupportedOperationException("addAll(index, Collection) not yet supported");
 	}
 
-	/**
-	 * Removes from this model all the values that are contained in the specified collection.
-	 * @param collection The collection that defines which values will be removed from this model.
-	 * @return <code>true</code> if this model changed as a result of the call.
-	 * @throws NullPointerException if the specified collection is <code>null</code>.
-	 * @see #remove(Object)
-	 * @see #contains(Object)
-	 */
+	@Override
 	public boolean removeAll(final Collection<?> collection) {
 		throw new UnsupportedOperationException("removeAll(Collection) not yet supported");
 	}
 
-	/**
-	 * Retains only the values in this model that are contained in the specified collection.
-	 * @param collection The collection that defines which values this model will retain.
-	 * @return <code>true</code> if this model changed as a result of the call.
-	 * @throws NullPointerException if the specified collection is <code>null</code>.
-	 * @see #remove(Object)
-	 * @see #contains(Object)
-	 */
+	@Override
 	public boolean retainAll(final Collection<?> collection) {
 		throw new UnsupportedOperationException("retainAll(Collection) not yet supported");
 	}
 
-	/**
-	 * Replaces the value at the specified position in this model with the specified value.
-	 * @param index The index of the value to replace.
-	 * @param value The value to be stored at the specified position.
-	 * @return The value at the specified position.
-	 * @throws IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
-	 */
+	@Override
 	public Component set(final int index, final Component value) {
 		throw new UnsupportedOperationException("set(index, value) not yet supported");
 	}
 
-	/** @return A read-only list iterator of the values in this model (in proper sequence). */
+	@Override
 	public ListIterator<Component> listIterator() {
 		return getComponentList().listIterator();
 	}
 
-	/**
-	 * Returns a list iterator of the values in this model (in proper sequence), starting at the specified position in this model.
-	 * @param index The index of first value to be returned from the list iterator (by a call to the <code>next()</code> method).
-	 * @return A list iterator of the values in this model (in proper sequence), starting at the specified position in this model.
-	 * @throws IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
-	 */
+	@Override
 	public ListIterator<Component> listIterator(final int index) {
 		return getComponentList().listIterator(index);
 	}
 
-	/**
-	 * Returns a read-only view of the portion of this model between the specified <var>fromIndex</var>, inclusive, and <var>toIndex</var>, exclusive.
-	 * @param fromIndex The low endpoint (inclusive) of the sub-list.
-	 * @param toIndex The high endpoint (exclusive) of the sub-list.
-	 * @return A view of the specified range within this model.
-	 * @throws IndexOutOfBoundsException for an illegal endpoint index value (<var>fromIndex</var> &lt; 0 || <var>toIndex</var> &gt; <code>size()</code> ||
-	 *           <var>fromIndex</var> &gt; <var>toIndex</var>).
-	 */
+	@Override
 	public List<Component> subList(final int fromIndex, final int toIndex) {
 		return getComponentList().subList(fromIndex, toIndex);
 	}
@@ -682,14 +507,12 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	public static class ComponentRepresentationStrategy implements ValueRepresentationStrategy<Component> {
 
 		/**
-		 * Creates a component for the given list value. This implementation returns the component value itself.
-		 * @param model The model containing the value.
-		 * @param value The value for which a component should be created.
-		 * @param index The index of the value within the list, or -1 if the value is not in the list (e.g. for representing no selection).
-		 * @param selected <code>true</code> if the value is selected.
-		 * @param focused <code>true</code> if the value has the focus.
-		 * @return A new component to represent the given value.
+		 * {@inheritDoc}
+		 * <p>
+		 * This implementation returns the component value itself.
+		 * </p>
 		 */
+		@Override
 		public Component createComponent(final ListSelectModel<Component> model, final Component value, final int index, final boolean selected,
 				final boolean focused) {
 			return value; //return the component to represent itself

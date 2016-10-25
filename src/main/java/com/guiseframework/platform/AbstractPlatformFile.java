@@ -40,7 +40,7 @@ public abstract class AbstractPlatformFile implements PlatformFile {
 	/** The name of the file. */
 	private final String name;
 
-	/** @return The name of the file. */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -48,7 +48,7 @@ public abstract class AbstractPlatformFile implements PlatformFile {
 	/** The size of the file, or -1 if the size is unknown. */
 	private final long size;
 
-	/** @return The size of the file, or -1 if the size is unknown. */
+	@Override
 	public long getSize() {
 		return size;
 	}
@@ -64,18 +64,12 @@ public abstract class AbstractPlatformFile implements PlatformFile {
 		this.size = size;
 	}
 
-	/**
-	 * Adds a progress listener.
-	 * @param progressListener The progress listener to add.
-	 */
+	@Override
 	public void addProgressListener(final ProgressListener<Long> progressListener) {
 		getEventListenerManager().add(ProgressListener.class, progressListener); //add the listener
 	}
 
-	/**
-	 * Removes an progress listener.
-	 * @param progressListener The progress listener to remove.
-	 */
+	@Override
 	public void removeProgressListener(final ProgressListener<Long> progressListener) {
 		getEventListenerManager().remove(ProgressListener.class, progressListener); //remove the listener
 	}
@@ -106,7 +100,7 @@ public abstract class AbstractPlatformFile implements PlatformFile {
 		}
 	}
 
-	/** @return A string representation of this platform file. */
+	@Override
 	public String toString() {
 		return getName(); //return the name of the file as a representation
 	}

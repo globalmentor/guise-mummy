@@ -34,16 +34,12 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel {
 	/** The glyph URI, which may be a resource URI, or <code>null</code> if there is no glyph URI. */
 	private URI glyphURI;
 
-	/** @return The glyph URI, which may be a resource URI, or <code>null</code> if there is no glyph URI. */
+	@Override
 	public URI getGlyphURI() {
 		return glyphURI;
 	}
 
-	/**
-	 * Sets the URI of the glyph. This is a bound property.
-	 * @param newGlyphURI The new URI of the glyph, which may be a resource URI.
-	 * @see #GLYPH_URI_PROPERTY
-	 */
+	@Override
 	public void setGlyphURI(final URI newGlyphURI) {
 		if(!Objects.equals(glyphURI, newGlyphURI)) { //if the value is really changing
 			final URI oldGlyphURI = glyphURI; //get the old value
@@ -55,16 +51,12 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel {
 	/** The label text, which may include a resource reference, or <code>null</code> if there is no label text. */
 	private String label;
 
-	/** @return The label text, which may include a resource reference, or <code>null</code> if there is no label text. */
+	@Override
 	public String getLabel() {
 		return label;
 	}
 
-	/**
-	 * Sets the text of the label. This is a bound property.
-	 * @param newLabelText The new text of the label, which may include a resource reference.
-	 * @see #LABEL_PROPERTY
-	 */
+	@Override
 	public void setLabel(final String newLabelText) {
 		if(!Objects.equals(label, newLabelText)) { //if the value is really changing
 			final String oldLabel = label; //get the old value
@@ -76,18 +68,12 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel {
 	/** The content type of the label text. */
 	private ContentType labelContentType = Text.PLAIN_CONTENT_TYPE;
 
-	/** @return The content type of the label text. */
+	@Override
 	public ContentType getLabelContentType() {
 		return labelContentType;
 	}
 
-	/**
-	 * Sets the content type of the label text. This is a bound property.
-	 * @param newLabelTextContentType The new label text content type.
-	 * @throws NullPointerException if the given content type is <code>null</code>.
-	 * @throws IllegalArgumentException if the given content type is not a text content type.
-	 * @see #LABEL_CONTENT_TYPE_PROPERTY
-	 */
+	@Override
 	public void setLabelContentType(final ContentType newLabelTextContentType) {
 		checkInstance(newLabelTextContentType, "Content type cannot be null.");
 		if(labelContentType != newLabelTextContentType) { //if the value is really changing
@@ -123,7 +109,7 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel {
 		this.glyphURI = glyphURI; //save the glyph URI
 	}
 
-	/** @return A string representation of this label model. */
+	@Override
 	public String toString() {
 		final String label = getLabel(); //get the label, if any
 		return label != null ? getClass().getName() + ": " + label : super.toString(); //return the class and label, or the default string if there is no label

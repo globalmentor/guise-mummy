@@ -67,38 +67,28 @@ public abstract class AbstractModeledColor<C extends Enum<C> & ModeledColor.Comp
 		return value; //return the value, as it passed the test
 	}
 
-	/**
-	 * Determines the value of the given color component.
-	 * @param component The color component for which a value should be retrieved.
-	 * @return The value of the requested color component.
-	 */
+	@Override
 	public double getComponent(final C component) {
 		return values[component.ordinal()]; //look up the color component in the array
 	}
 
-	/**
-	 * Determines the absolute value of the given color component with the given bit depth. For example, retrieving a component with value 0.5 and a bit depth of
-	 * 16 would produce 128 or 0x80.
-	 * @param component The color component for which a value should be retrieved.
-	 * @param bitDepth The number of bits to use for the given color component.
-	 * @return The absolute value of the requested color component at the given bit depth.
-	 * @see #getComponent(Enum)
-	 */
+	@Override
 	public long getAbsoluteComponent(final C component, final int bitDepth) {
 		return Math.round(getComponent(component) * ((1 << bitDepth) - 1)); //multiply the component value by the range of values at the given bit depth
 	}
 
-	/** @return A hash code value for the object. */
+	@Override
 	public int hashCode() {
 		return hashCode; //return the precalculated hash code
 	}
 
 	/**
-	 * Indicates whether some other object is "equal to" this one. This implementation returns whether the objects are of the same class with identical color
-	 * component values.
-	 * @param object The reference object with which to compare.
-	 * @return <code>true</code> if this object is equivalent to the given object.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation returns whether the objects are of the same class with identical color component values.
+	 * </p>
 	 */
+	@Override
 	public boolean equals(final Object object) {
 		return object != null && getClass().equals(object.getClass()) && Arrays.equals(values, ((AbstractModeledColor<?>)object).values); //see if the classes and the component values are the same
 	}

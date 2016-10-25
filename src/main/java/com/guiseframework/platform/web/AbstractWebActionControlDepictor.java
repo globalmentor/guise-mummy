@@ -60,11 +60,7 @@ public abstract class AbstractWebActionControlDepictor<C extends ActionControl> 
 		getIgnoredProperties().add(ActionControl.ROLLOVER_PROPERTY); //ignore rollover property changes by default (even though rollover isn't even implemented by default) because rollovers are expensive and action controls won't by default update the control when rollover occurs
 	}
 
-	/**
-	 * Processes an event from the platform.
-	 * @param event The event to be processed.
-	 * @throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
-	 */
+	@Override
 	public void processEvent(final PlatformEvent event) {
 		if(event instanceof WebActionDepictEvent) { //if this is an action event
 			final WebActionDepictEvent webActionEvent = (WebActionDepictEvent)event; //get the web action event
@@ -95,15 +91,13 @@ public abstract class AbstractWebActionControlDepictor<C extends ActionControl> 
 	}
 
 	/**
-	 * Retrieves the base style IDs for the given component. This version adds an attribute for selected status if the control is a select action control with a
-	 * selected model. This version also adds an attribute if the component is disabled.
-	 * @param prefix The prefix that needs to be added to each, or <code>null</code> if there is no prefix to add.
-	 * @param suffix The suffix that needs to be added to each, or <code>null</code> if there is no suffix to add.
-	 * @return The base style IDs for the component.
-	 * @see SelectActionControl
-	 * @see GuiseCSSStyleConstants#SELECTED_CLASS
-	 * @see GuiseCSSStyleConstants#DISABLED_CLASS
+	 * {@inheritDoc}
+	 * <p>
+	 * This version adds an attribute for selected status if the control is a select action control with a selected model. This version also adds an attribute if
+	 * the component is disabled.
+	 * </p>
 	 */
+	@Override
 	protected Set<String> getBaseStyleIDs(final String prefix, final String suffix) {
 		final Set<String> baseStyleIDs = super.getBaseStyleIDs(prefix, suffix); //get the default base style IDs
 		if(!getDepictedObject().isEnabled()) { //if this component is disabled	//TODO maybe add an Enableable interface
@@ -113,9 +107,12 @@ public abstract class AbstractWebActionControlDepictor<C extends ActionControl> 
 	}
 
 	/**
-	 * Retrieves the styles for the body element of the component. This version lowers the opacity if the control is disabled.
-	 * @return The styles for the body element of the component, mapped to CSS property names.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version lowers the opacity if the control is disabled.
+	 * </p>
 	 */
+	@Override
 	protected Map<String, Object> getBodyStyles() {
 		final Map<String, Object> styles = super.getBodyStyles(); //get the default body styles
 		final C component = getDepictedObject(); //get the component

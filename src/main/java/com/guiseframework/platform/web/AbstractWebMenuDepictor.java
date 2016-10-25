@@ -92,15 +92,12 @@ public abstract class AbstractWebMenuDepictor<C extends Menu> extends AbstractWe
 	}
 
 	/**
-	 * Retrieves the base style IDs for the given component. This version adds attributes based upon the menu axis and orientation, as well as whether the menu is
-	 * open and/or in a rollover state.
-	 * @param prefix The prefix that needs to be added to each, or <code>null</code> if there is no prefix to add.
-	 * @param suffix The suffix that needs to be added to each, or <code>null</code> if there is no suffix to add.
-	 * @return The base style IDs for the component.
-	 * @see AbstractWebComponentDepictor#addFlowStyleIDs(Set, com.guiseframework.component.layout.Flow)
-	 * @see GuiseCSSStyleConstants#OPEN_CLASS
-	 * @see GuiseCSSStyleConstants#ROLLOVER_CLASS
+	 * {@inheritDoc}
+	 * <p>
+	 * This version adds attributes based upon the menu axis and orientation, as well as whether the menu is open and/or in a rollover state.
+	 * </p>
 	 */
+	@Override
 	protected Set<String> getBaseStyleIDs(final String prefix, final String suffix) {
 		final Set<String> baseStyleIDs = super.getBaseStyleIDs(prefix, suffix); //get the default base style IDs
 		final C component = getDepictedObject(); //get the component

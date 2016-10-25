@@ -27,12 +27,7 @@ import com.globalmentor.text.ArgumentSyntaxException;
  */
 public class EmailAddressStringLiteralConverter extends AbstractStringLiteralConverter<EmailAddress> {
 
-	/**
-	 * Converts a literal representation of a value from the lexical space into a value in the value space.
-	 * @param literal The literal value in the lexical space to convert.
-	 * @return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
-	 * @throws ConversionException if the literal value cannot be converted.
-	 */
+	@Override
 	public EmailAddress convertLiteral(final String literal) throws ConversionException {
 		if(literal == null) { //if the literal is null
 			return null; //the value is null

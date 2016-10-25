@@ -61,35 +61,36 @@ public class AbstractWebFrameDepictor<C extends Frame> extends AbstractWebCompon
 	}
 
 	/**
-	 * Called when the depictor is installed in a component. This implementation listens for changes in the session and in response marks the view as needing
-	 * updated.
-	 * @param component The component into which this view is being installed.
-	 * @throws NullPointerException if the given component is <code>null</code>.
-	 * @throws IllegalStateException if this view is already installed in a component.
-	 * @see #getDepictedPropertyChangeListener()
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation listens for changes in the session and in response marks the view as needing updated.
+	 * </p>
 	 */
+	@Override
 	public void installed(final C component) {
 		super.installed(component); //install ourselves normally
 		component.getSession().addPropertyChangeListener(getDepictedPropertyChangeListener()); //listen for session changes
 	}
 
 	/**
-	 * Called when the depictor is uninstalled from a component. This implementation stops listening for session changes.
-	 * @param component The component from which this view is being uninstalled.
-	 * @throws NullPointerException if the given component is <code>null</code>.
-	 * @throws IllegalStateException if this view is not installed in a component.
-	 * @see #getDepictedPropertyChangeListener()
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation stops listening for session changes.
+	 * </p>
 	 */
+	@Override
 	public void uninstalled(final C component) {
 		super.uninstalled(component); //uninstall ourselves normally
 		component.getSession().removePropertyChangeListener(getDepictedPropertyChangeListener()); //stop listening for session changes
 	}
 
 	/**
-	 * Renders the body of the component. This version renders the content of the frame.
-	 * @throws IOException if there is an error rendering the component.
-	 * @see Frame#getContent()
+	 * {@inheritDoc}
+	 * <p>
+	 * This version renders the content of the frame.
+	 * </p>
 	 */
+	@Override
 	protected void depictBody() throws IOException {
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
 		depictContext.indent(); //indent the context

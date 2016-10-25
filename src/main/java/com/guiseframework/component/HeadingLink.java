@@ -32,16 +32,12 @@ public class HeadingLink extends AbstractLinkControl implements HeadingComponent
 	/** The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified. */
 	private int level;
 
-	/** @return The zero-based level of the heading, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified. */
+	@Override
 	public int getLevel() {
 		return level;
 	}
 
-	/**
-	 * Sets the level of the heading. This is a bound property of type <code>Integer</code>.
-	 * @param newLevel The new zero-based heading level, or {@link HeadingComponent#NO_HEADING_LEVEL} if no level is specified.
-	 * @see HeadingComponent#LEVEL_PROPERTY
-	 */
+	@Override
 	public void setLevel(final int newLevel) {
 		if(level != newLevel) { //if the value is really changing
 			final int oldLevel = level; //get the old value

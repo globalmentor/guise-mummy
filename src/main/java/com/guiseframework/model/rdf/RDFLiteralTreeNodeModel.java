@@ -28,7 +28,7 @@ public class RDFLiteralTreeNodeModel extends DefaultTreeNodeModel<RDFLiteral> im
 	/** The RDF property of which this RDF object is an object, or <code>null</code> if this object should not be considered the object of any property. */
 	private final RDFResource property;
 
-	/** @return The RDF property of which this RDF object is an object, or <code>null</code> if this object should not be considered the object of any property. */
+	@Override
 	public RDFResource getProperty() {
 		return property;
 	}

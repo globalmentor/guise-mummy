@@ -105,10 +105,12 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	/** An action listener to repeat copies of events received, using this component as the source. */
 	private ActionListener repeatActionListener = new ActionListener() {
 
+		@Override
 		public void actionPerformed(final ActionEvent actionEvent) { //if an action was performed
 			final ActionEvent repeatActionEvent = new ActionEvent(TreeControl.this, actionEvent); //copy the action event with this class as its source, keeping the same target
 			fireActionPerformed(repeatActionEvent); //fire the repeated action
 		}
+
 	};
 
 	/** The map of tree node representation strategies for classes. */
@@ -153,22 +155,23 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	}
 
 	/**
-	 * Retrieves the component for the given object. If no component yet exists for the given object, one will be created. This version is provided to allow
-	 * public access.
-	 * @param treeNode The object for which a representation component should be returned.
-	 * @return The child component representing the given object.
-	 * @throws IllegalArgumentException if the given object is not an appropriate object for a component to be created.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version is provided to allow public access.
+	 * </p>
 	 */
+	@Override
 	public Component getComponent(final TreeNodeModel<?> treeNode) {
 		return super.getComponent(treeNode); //delegate to the parent version
 	}
 
 	/**
-	 * Creates a component state to represent the given object. This implementation delegates to {@link #createTypedComponentState(TreeNodeModel)}.
-	 * @param treeNode The object with which the component state is to be associated.
-	 * @return The component state to represent the given object.
-	 * @throws IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation delegates to {@link #createTypedComponentState(TreeNodeModel)}.
+	 * </p>
 	 */
+	@Override
 	protected TreeNodeComponentState createComponentState(final TreeNodeModel<?> treeNode) {
 		return createTypedComponentState(treeNode); //delegate to the typed version
 	}
@@ -188,14 +191,11 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 
 		treeNodeComponent.addExportStrategy(new ExportStrategy() { //TODO fix for generics with a separate method 
 
-					/**
-					 * Exports data from the given tree node.
-					 * @param component The component from which data will be transferred.
-					 */
-					public Transferable<Component> exportTransfer(final Component component) {
-						return new TreeNodeTransferable<T>(TreeControl.this, treeNode); //return a default transferable for the tree and the tree node
-					}
-				});
+			@Override
+			public Transferable<Component> exportTransfer(final Component component) {
+				return new TreeNodeTransferable<T>(TreeControl.this, treeNode); //return a default transferable for the tree and the tree node
+			}
+		});
 
 		treeNodeComponent.setDragEnabled(isTreeNodeDragEnabled()); //set the drag mode appropriately
 		return new TreeNodeComponentState(treeNodeComponent, editable); //create a new component state for the tree node's component and metadata
@@ -227,18 +227,19 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 
 	//TreeModel delegations
 
-	/** @return The root node of the tree model. */
+	@Override
 	public TreeNodeModel<?> getRootNode() {
 		return getTreeModel().getRootNode();
 	}
 
 	/**
-	 * Sets the root node of the tree model. If the this control requests that the root not be displayed, this implementation automatically expanded the root node
-	 * after it is added. This is a bound property.
-	 * @param newRootNode The new root node of the tree model.
-	 * @throws NullPointerException if the given root node is <code>null</code>.
-	 * @see #ROOT_NODE_PROPERTY
+	 * {@inheritDoc}
+	 * <p>
+	 * If the this control requests that the root not be displayed, this implementation automatically expanded the root node after it is added. This is a bound
+	 * property.
+	 * </p>
 	 */
+	@Override
 	public void setRootNode(final TreeNodeModel<?> newRootNode) {
 		getTreeModel().setRootNode(newRootNode); //delegate to the tree model
 		if(!isRootNodeDisplayed()) { //if the root is not displayed
@@ -246,10 +247,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		}
 	}
 
-	/**
-	 * Sets whether all tree nodes are expanded.
-	 * @param newAllExpanded <code>true</code> if all the nodes should be expanded, or <code>false</code> if they should be collapsed.
-	 */
+	@Override
 	public void setAllExpanded(final boolean newAllExpanded) {
 		getTreeModel().setAllExpanded(newAllExpanded);
 	}
@@ -352,17 +350,12 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		}
 
 		/**
-		 * Creates a component to represent the given tree node. This implementation returns a label with string value of the given value using the object's
-		 * <code>toString()</code> method.
-		 * @param <N> The type of value contained in the node.
-		 * @param treeControl The component containing the model.
-		 * @param model The model containing the value.
-		 * @param treeNode The node containing the value.
-		 * @param editable Whether values in this column are editable.
-		 * @param selected <code>true</code> if the value is selected.
-		 * @param focused <code>true</code> if the value has the focus.
-		 * @return A new component to represent the given value.
+		 * {@inheritDoc}
+		 * <p>
+		 * This implementation returns a label with string value of the given value using the object's <code>toString()</code> method.
+		 * </p>
 		 */
+		@Override
 		@SuppressWarnings("unchecked")
 		public <N extends V> Component createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode,
 				final boolean editable, final boolean selected, final boolean focused) {
@@ -386,17 +379,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	 */
 	public static class InfoModelTreeNodeRepresentationStrategy extends AbstractTreeNodeRepresentationStrategy<InfoModel> {
 
-		/**
-		 * Creates a label to represent the given tree node.
-		 * @param <N> The type of value contained in the node.
-		 * @param treeControl The component containing the model.
-		 * @param model The model containing the value.
-		 * @param treeNode The node containing the value.
-		 * @param editable Whether values in this column are editable.
-		 * @param selected <code>true</code> if the value is selected.
-		 * @param focused <code>true</code> if the value has the focus.
-		 * @return A new component to represent the given value.
-		 */
+		@Override
 		public <N extends InfoModel> Label createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode,
 				final boolean editable, final boolean selected, final boolean focused) {
 			return new Label(treeNode.getValue()); //return a label from the label model
@@ -410,17 +393,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	 */
 	public static class TextModelTreeNodeRepresentationStrategy extends AbstractTreeNodeRepresentationStrategy<TextModel> {
 
-		/**
-		 * Creates a text component to represent the given tree node.
-		 * @param <N> The type of value contained in the node.
-		 * @param treeControl The component containing the model.
-		 * @param model The model containing the value.
-		 * @param treeNode The node containing the value.
-		 * @param editable Whether values in this column are editable.
-		 * @param selected <code>true</code> if the value is selected.
-		 * @param focused <code>true</code> if the value has the focus.
-		 * @return A new component to represent the given value.
-		 */
+		@Override
 		public <N extends TextModel> TextBox createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode,
 				final boolean editable, final boolean selected, final boolean focused) {
 			return new TextBox(treeNode.getValue()); //return a message from the message model
@@ -473,41 +446,27 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 
 	//ActionModel support
 
-	/**
-	 * Adds an action listener.
-	 * @param actionListener The action listener to add.
-	 */
+	@Override
 	public void addActionListener(final ActionListener actionListener) {
 		getEventListenerManager().add(ActionListener.class, actionListener); //add the listener
 	}
 
-	/**
-	 * Removes an action listener.
-	 * @param actionListener The action listener to remove.
-	 */
+	@Override
 	public void removeActionListener(final ActionListener actionListener) {
 		getEventListenerManager().remove(ActionListener.class, actionListener); //remove the listener
 	}
 
-	/** @return all registered action listeners. */
+	@Override
 	public Iterable<ActionListener> getActionListeners() {
 		return getEventListenerManager().getListeners(ActionListener.class); //remove the listener
 	}
 
-	/**
-	 * Performs the action with default force and default option. An {@link ActionEvent} is fired to all registered {@link ActionListener}s. This method delegates
-	 * to {@link #performAction(int, int)}.
-	 */
+	@Override
 	public void performAction() {
 		getTreeModel().performAction(); //delegate to the installed tree model, which will fire an event which we will catch and queue for refiring
 	}
 
-	/**
-	 * Performs the action with the given force and option. An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
-	 * @param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
-	 * @param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button
-	 *          click.
-	 */
+	@Override
 	public void performAction(final int force, final int option) {
 		getTreeModel().performAction(force, option); //delegate to the installed tree model, which will fire an event which we will catch and queue for refiring
 	}
@@ -542,10 +501,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	 */
 	private class TreeNodeActionListener implements ActionListener {
 
-		/**
-		 * Called when an action is initiated.
-		 * @param actionEvent The event indicating the source of the action.
-		 */
+		@Override
 		public void actionPerformed(final ActionEvent actionEvent) {
 			//TODO del Log.trace("received action from source", actionEvent.getSource(), "for target", actionEvent.getTarget(), "with force", actionEvent.getForce(), "and option", actionEvent.getOption());
 			final Object target = actionEvent.getTarget(); //get the event target
@@ -595,10 +551,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	 */
 	private class TreeNodeSelectChangeListener extends AbstractGenericPropertyChangeListener<Boolean> {
 
-		/**
-		 * Called when a bound property is changed.
-		 * @param genericPropertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
-		 */
+		@Override
 		public void propertyChange(GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent) {
 			final Boolean newValue = genericPropertyChangeEvent.getNewValue(); //get the new value
 			if(newValue != null) { //if we know the new selected value
@@ -657,12 +610,12 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		}
 
 		/**
-		 * Transfers data of the given class. This implementation returns subclasses.
-		 * @param <T> The type of object to be transferred.
-		 * @param objectClass The class of object to return.
-		 * @return The transferred data object, which may be <code>null</code>.
-		 * @throws IllegalArgumentException if the given class is not supported.
+		 * {@inheritDoc}
+		 * <p>
+		 * This implementation returns subclasses.
+		 * </p>
 		 */
+		@Override
 		public <T> T transfer(final Class<T> objectClass) {
 			if(objectClass.isAssignableFrom(treeNode.getValueClass())) { //if the value class can be cast to the object class
 				return objectClass.cast(treeNode.getValue()); //return the value of the tree node

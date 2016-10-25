@@ -54,10 +54,12 @@ public abstract class AbstractSimpleWebComponentDepictor<C extends Component> ex
 	}
 
 	/**
-	 * Retrieves the styles for the outer element of the component. This version combines the body styles with the outer styles.
-	 * @return The styles for the outer element of the component, mapped to CSS property names.
-	 * @see AbstractWebComponentDepictor#getBodyStyles()
+	 * {@inheritDoc}
+	 * <p>
+	 * This version combines the body styles with the outer styles.
+	 * </p>
 	 */
+	@Override
 	protected Map<String, Object> getOuterStyles() {
 		final Map<String, Object> outerStyles = super.getOuterStyles(); //get the default outer styles
 		outerStyles.putAll(getBodyStyles()); //add the styles for the body
@@ -65,9 +67,12 @@ public abstract class AbstractSimpleWebComponentDepictor<C extends Component> ex
 	}
 
 	/**
-	 * Begins the rendering process. This version writes the body ID and class attributes, along with the direction attribute.
-	 * @throws IOException if there is an error rendering the component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version writes the body ID and class attributes, along with the direction attribute.
+	 * </p>
 	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		final String localName = getLocalName(); //get the element local name, if there is one

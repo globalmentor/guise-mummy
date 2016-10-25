@@ -46,24 +46,24 @@ public class DateStringLiteralConverter extends AbstractDateStringLiteralConvert
 	}
 
 	/**
-	 * Converts a value from the value space to a literal value in the lexical space. This implementation converts the value using the date format object. This
-	 * implementation synchronizes on the {@link DateFormat} instance.
-	 * @param value The value in the value space to convert.
-	 * @return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>.
-	 * @throws ConversionException if the value cannot be converted.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation converts the value using the date format object. This implementation synchronizes on the {@link DateFormat} instance.
+	 * </p>
 	 * @see #getDateFormat()
 	 */
+	@Override
 	public String convertValue(final Date value) throws ConversionException {
 		return convertDateValue(value); //convert the date to a string
 	}
 
 	/**
-	 * Converts a literal representation of a value from the lexical space into a value in the value space. This implementation converts the empty string to a
-	 * <code>null</code> value.
-	 * @param literal The literal value in the lexical space to convert.
-	 * @return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
-	 * @throws ConversionException if the literal value cannot be converted.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation converts the empty string to a <code>null</code> value.
+	 * </p>
 	 */
+	@Override
 	public Date convertLiteral(final String literal) throws ConversionException {
 		return convertDateLiteral(literal); //convert the string to a date
 	}

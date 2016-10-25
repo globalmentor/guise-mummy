@@ -54,20 +54,22 @@ public class MultiplicationTablePanel extends LayoutPanel {
 		addButton.setInfo("Add a tab containing a multiplication table of the specified factor."); //set the button information
 		addButton.addActionListener(new ActionListener() { //listen for the button being pressed
 
-					public void actionPerformed(ActionEvent actionEvent) { //if the button is pressed
-						if(tabbedPanel.size() < MAX_TAB_COUNT) { //if we don't have too many tabs
-							if(maxFactorControl.validate()) { //validate the count control to make sure the value is correct, showing an error if not
-								final int maxFactor = maxFactorControl.getValue().intValue(); //find out how many factors to display
-								final Component tab = createMultiplicationTableTab(maxFactor); //create a multiplication table with the desired maximum factor
-								tabbedPanel.add(tab, new CardConstraints(String.valueOf(maxFactor))); //add the tab to the tabbed panel
-								if(tabbedPanel.size() == MAX_TAB_COUNT) { //if we've reached the maximum tab count
-									maxFactorControl.setEnabled(false); //disable the count control
-									addButton.setEnabled(false); //disable the add button
-								}
-							}
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) { //if the button is pressed
+				if(tabbedPanel.size() < MAX_TAB_COUNT) { //if we don't have too many tabs
+					if(maxFactorControl.validate()) { //validate the count control to make sure the value is correct, showing an error if not
+						final int maxFactor = maxFactorControl.getValue().intValue(); //find out how many factors to display
+						final Component tab = createMultiplicationTableTab(maxFactor); //create a multiplication table with the desired maximum factor
+						tabbedPanel.add(tab, new CardConstraints(String.valueOf(maxFactor))); //add the tab to the tabbed panel
+						if(tabbedPanel.size() == MAX_TAB_COUNT) { //if we've reached the maximum tab count
+							maxFactorControl.setEnabled(false); //disable the count control
+							addButton.setEnabled(false); //disable the add button
 						}
 					}
-				});
+				}
+			}
+
+		});
 		controlPanel.add(addButton); //add the add button to this panel
 		//create the clear button
 		final Button clearButton = new Button(); //create the button for clearing the tabs
@@ -75,16 +77,18 @@ public class MultiplicationTablePanel extends LayoutPanel {
 		clearButton.setInfo("Remove all tabs except the default tab."); //set the button information
 		clearButton.addActionListener(new ActionListener() { //listen for the button being pressed
 
-					public void actionPerformed(ActionEvent actionEvent) { //if the button is pressed
-						for(final Component tab : tabbedPanel) { //for each tab in the tabbed panel
-							if(tab != defaultTab) { //if this is not the default tab
-								tabbedPanel.remove(tab); //remove the tab
-							}
-						}
-						maxFactorControl.setEnabled(true); //make sure the count control is enabled
-						addButton.setEnabled(true); //make sure the add button is enabled 
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) { //if the button is pressed
+				for(final Component tab : tabbedPanel) { //for each tab in the tabbed panel
+					if(tab != defaultTab) { //if this is not the default tab
+						tabbedPanel.remove(tab); //remove the tab
 					}
-				});
+				}
+				maxFactorControl.setEnabled(true); //make sure the count control is enabled
+				addButton.setEnabled(true); //make sure the add button is enabled 
+			}
+
+		});
 		controlPanel.add(clearButton); //add the clear button to this panel
 
 		add(controlPanel); //add the control panel to this panel

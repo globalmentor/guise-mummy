@@ -99,21 +99,23 @@ public abstract class AbstractListCompositeComponent extends AbstractMultipleCom
 	}
 
 	/**
-	 * Adds a child component to the last position. This version adds the component to the component list. Any class that overrides this method must call this
-	 * version.
-	 * @param childComponent The component to add to this component.
-	 * @throws IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version adds the component to the component list.
+	 * </p>
 	 */
+	@Override
 	protected final void addComponent(final Component childComponent) {
 		addComponent(componentList.size(), childComponent); //add the component to the end of the list
 	}
 
 	/**
-	 * Removes a child component. This version removes the component from the component list. Any class that overrides this method must call this version.
-	 * @param childComponent The component to remove from this component.
-	 * @throws IllegalArgumentException if the component does not recognize this composite component as its parent or the component is not a member of this
-	 *           composite component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version removes the component from the component list.
+	 * </p>
 	 */
+	@Override
 	protected void removeComponent(final Component childComponent) {
 		if(componentList.remove(childComponent)) { //remove the component from the list
 			super.removeComponent(childComponent); //do the default removal
@@ -122,12 +124,18 @@ public abstract class AbstractListCompositeComponent extends AbstractMultipleCom
 		}
 	}
 
-	/** @return An iterable to contained components. */
+	@Override
 	public Iterable<Component> getChildComponents() {
 		return componentList;
 	}
 
-	/** @return Whether this component has children. This implementation delegates to the component list. */
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation delegates to the component list.
+	 * </p>
+	 */
+	@Override
 	public boolean hasChildComponents() {
 		return !componentList.isEmpty();
 	}

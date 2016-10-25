@@ -98,9 +98,12 @@ public abstract class AbstractDecoratedWebComponentDepictor<C extends Component>
 	}
 
 	/**
-	 * Begins the rendering process. This version calls {@link #writeDecoratorBegin()}.
-	 * @throws IOException if there is an error rendering the component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version calls {@link #writeDecoratorBegin()}.
+	 * </p>
 	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		writeDecoratorBegin(); //write the decorator attributes
@@ -125,10 +128,12 @@ public abstract class AbstractDecoratedWebComponentDepictor<C extends Component>
 	}
 
 	/**
-	 * Ends the rendering process. This version writes the end of the body element, if there is one, and the ending decorator items, such as the error, if any.
+	 * {@inheritDoc}
+	 * <p>
 	 * This version calls {@link #writeDecoratorEnd()}.
-	 * @throws IOException if there is an error rendering the component.
+	 * </p>
 	 */
+	@Override
 	protected void depictEnd() throws IOException {
 		if(bodyElementState != null && bodyElementState.isOpen()) { //if the body element is open
 			getDepictContext().writeElementEnd(bodyElementState.getNamespaceURI(), bodyElementState.getLocalName()); //end the element

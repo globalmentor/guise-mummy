@@ -38,10 +38,8 @@ public class TextSearchPanel extends LayoutPanel {
 
 	/** Instructions for the this demo. */
 	protected static final String INSTRUCTIONS = "<?xml version='1.0'?>"
-			+ "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>"
-			+ "<html xmlns='http://www.w3.org/1999/xhtml'>"
-			+ "<head><title>Instructions</title></head>"
-			+ "<body>"
+			+ "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>" + "<html xmlns='http://www.w3.org/1999/xhtml'>"
+			+ "<head><title>Instructions</title></head>" + "<body>"
 			+ "	<p>This demonstration allows you to search a text file for regular expression matches. The text file is assumed to use the system default character encoding.</p>"
 			+ "	<p>Select an input text file, and then enter a regular expression. All regular expression matches from the text file will be presented in the output text area.</p>"
 			+ "	<p>No regular expression (either <code>null</code> or the empty string) will cause the original text file to be displayed.</p>"
@@ -87,6 +85,7 @@ public class TextSearchPanel extends LayoutPanel {
 		//listen for the value of the resource import changing
 		resourceImportControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<ResourceImport>() {
 
+			@Override
 			public void propertyChange(GenericPropertyChangeEvent<ResourceImport> propertyChangeEvent) {
 				try {
 					final ResourceImport resourceImport = propertyChangeEvent.getNewValue(); //get the new resource import
@@ -128,6 +127,7 @@ public class TextSearchPanel extends LayoutPanel {
 					resourceImportControl.setNotification(new Notification(ioException)); //add it to the resource import control for display to the user
 				}
 			}
+
 		});
 
 		add(inputPanel); //add the input panel to the panel
@@ -145,11 +145,7 @@ public class TextSearchPanel extends LayoutPanel {
 			super(false); //don't require non-null values
 		}
 
-		/**
-		 * Checks whether a given regular expression value is syntactically correct.
-		 * @param value The value to validate.
-		 * @throws ValidationException if the provided value is not valid.
-		 */
+		@Override
 		public void validate(final String value) throws ValidationException {
 			super.validate(value); //perform the default validation, checking for null and throwing an exception if a value was required
 			if(value != null) { //if a non-null value is given

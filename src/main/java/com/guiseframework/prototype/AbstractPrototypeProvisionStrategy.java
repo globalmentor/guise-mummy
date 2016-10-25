@@ -87,9 +87,11 @@ public abstract class AbstractPrototypeProvisionStrategy extends ReentrantReadWr
 	 */
 	private final PropertyChangeListener prototypeProvisionsChangeListener = new AbstractGenericPropertyChangeListener<Set<PrototypeProvision<?>>>() {
 
+		@Override
 		public void propertyChange(final GenericPropertyChangeEvent<Set<PrototypeProvision<?>>> genericPropertyChangeEvent) { //if different prototypes are provided
 			processPrototypeProvisions(); //process the prototype provisions
 		}
+
 	};
 
 	/**

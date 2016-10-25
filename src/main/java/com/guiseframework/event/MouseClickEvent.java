@@ -108,7 +108,7 @@ public class MouseClickEvent extends AbstractMouseEvent {
 				mouseClickEvent.getButton(), mouseClickEvent.getCount(), mouseClickEvent.getKeys().toArray(new Key[mouseClickEvent.getKeys().size()])); //construct the class with the same target		
 	}
 
-	/** @return The mouse click input associated with this event. */
+	@Override
 	public MouseClickInput getInput() {
 		return new MouseClickInput(getButton(), getCount(), getKeys().toArray(new Key[getKeys().size()])); //return new mouse click input based upon this event
 	}

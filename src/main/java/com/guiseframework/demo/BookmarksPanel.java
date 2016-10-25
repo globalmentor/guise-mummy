@@ -54,19 +54,24 @@ public class BookmarksPanel extends LayoutPanel implements NavigationListener {
 		//save a new bookmark ever time the tab changes
 		tabbedPanel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Component>() { //listen for the tab changing
 
-					public void propertyChange(GenericPropertyChangeEvent<Component> propertyChangeEvent) { //if the tab changes
-						final String bookmarkID = "step" + (tabbedPanel.getSelectedIndex()); //create the bookmark ID
-						final Bookmark bookmark = new Bookmark(new Bookmark.Parameter("step", Integer.toString(tabbedPanel.getSelectedIndex()))); //create a new bookmark
-						getSession().setBookmark(bookmark); //save this state by setting a bookmark
-					}
-				});
+			@Override
+			public void propertyChange(GenericPropertyChangeEvent<Component> propertyChangeEvent) { //if the tab changes
+				final String bookmarkID = "step" + (tabbedPanel.getSelectedIndex()); //create the bookmark ID
+				final Bookmark bookmark = new Bookmark(new Bookmark.Parameter("step", Integer.toString(tabbedPanel.getSelectedIndex()))); //create a new bookmark
+				getSession().setBookmark(bookmark); //save this state by setting a bookmark
+			}
+
+		});
 		add(tabbedPanel);
 	}
 
 	/**
-	 * Called when navigation occurs. This implementation updates the tab in response to a new bookmark navigation.
-	 * @param navigationEvent The event indicating navigation details.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation updates the tab in response to a new bookmark navigation.
+	 * </p>
 	 */
+	@Override
 	public void navigated(final NavigationEvent navigationEvent) {
 		final Bookmark bookmark = navigationEvent.getBookmark(); //get the bookmark, if any, from the navigation event
 		final String bookmarkedStepString = bookmark != null ? bookmark.getParameterValue("step") : null; //see if there is a bookmark "step" parameter

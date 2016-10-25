@@ -69,10 +69,12 @@ public class DemoApplication extends AbstractGuiseApplication {
 	}
 
 	/**
-	 * Looks up a principal from the given ID. This version returns the user with the given ID.
-	 * @param id The ID of the principal.
-	 * @return The principal corresponding to the given ID, or <code>null</code> if no principal could be determined.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version returns the user with the given ID.
+	 * </p>
 	 */
+	@Override
 	protected DemoUser getPrincipal(final String id) {
 		synchronized(users) { //don't allow others to modify the users while we access them
 			for(final DemoUser user : users) { //look at each user (this is an inefficient user lookup routine, but sufficient for demonstration purposes)
@@ -85,10 +87,12 @@ public class DemoApplication extends AbstractGuiseApplication {
 	}
 
 	/**
-	 * Looks up the corresponding password for the given principal. This version returns the password of the given user.
-	 * @param principal The principal for which a password should be returned.
-	 * @return The password associated with the given principal, or <code>null</code> if no password is associated with the given principal.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version returns the password of the given user.
+	 * </p>
 	 */
+	@Override
 	protected char[] getPassword(final Principal principal) {
 		if(principal instanceof DemoUser) { //if this principal is one of the users we know about
 			return ((DemoUser)principal).getPassword(); //return this user's password
@@ -98,13 +102,12 @@ public class DemoApplication extends AbstractGuiseApplication {
 	}
 
 	/**
-	 * Checks whether the given principal is authorized to access the resouce at the given application path. For the application path "restricted", this version
-	 * authorized only users marked as authorized.
-	 * @param applicationPath The relative path of the resource requested.
-	 * @param principal The principal requesting authentication, or <code>null</code> if the principal is not known.
-	 * @param realm The realm with which the resource is associated, or <code>null</code> if the realm is not known.
-	 * @return <code>true</code> if the given principal is authorized to access the resource represented by the given application path.
+	 * {@inheritDoc}
+	 * <p>
+	 * For the application path "restricted", this version authorized only users marked as authorized.
+	 * </p>
 	 */
+	@Override
 	protected boolean isAuthorized(final URIPath applicationPath, final Principal principal, final String realm) {
 		if("restricted".equals(applicationPath)) { //if this is the "restricted" application path
 			return principal instanceof DemoUser && ((DemoUser)principal).isAuthorized(); //only authorize authorized principals

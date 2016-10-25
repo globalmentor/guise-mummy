@@ -101,106 +101,72 @@ public class AbstractProxyPrototype<P extends Prototype & InfoModel> extends Abs
 		firePropertyChange(INFO_CONTENT_TYPE_PROPERTY, oldProxiedPrototype.getInfoContentType(), newProxiedPrototype.getInfoContentType());
 	}
 
-	/** @return The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI. */
+	@Override
 	public URI getGlyphURI() {
 		return getProxiedPrototype().getGlyphURI();
 	}
 
-	/**
-	 * Sets the URI of the icon. This is a bound property of type <code>URI</code>.
-	 * @param newLabelIcon The new URI of the icon, which may be a resource URI.
-	 * @see #GLYPH_URI_PROPERTY
-	 */
+	@Override
 	public void setGlyphURI(final URI newLabelIcon) {
 		getProxiedPrototype().setGlyphURI(newLabelIcon);
 	}
 
-	/** @return The label text, which may include a resource reference, or <code>null</code> if there is no label text. */
+	@Override
 	public String getLabel() {
 		return getProxiedPrototype().getLabel();
 	}
 
-	/**
-	 * Sets the text of the label. This is a bound property.
-	 * @param newLabelText The new text of the label, which may include a resource reference.
-	 * @see #LABEL_PROPERTY
-	 */
+	@Override
 	public void setLabel(final String newLabelText) {
 		getProxiedPrototype().setLabel(newLabelText);
 	}
 
-	/** @return The content type of the label text. */
+	@Override
 	public ContentType getLabelContentType() {
 		return getProxiedPrototype().getLabelContentType();
 	}
 
-	/**
-	 * Sets the content type of the label text. This is a bound property.
-	 * @param newLabelTextContentType The new label text content type.
-	 * @throws NullPointerException if the given content type is <code>null</code>.
-	 * @throws IllegalArgumentException if the given content type is not a text content type.
-	 * @see #LABEL_CONTENT_TYPE_PROPERTY
-	 */
+	@Override
 	public void setLabelContentType(final ContentType newLabelTextContentType) {
 		getProxiedPrototype().setLabelContentType(newLabelTextContentType);
 	}
 
-	/** @return The description text, such as might appear in a flyover, or <code>null</code> if there is no description. */
+	@Override
 	public String getDescription() {
 		return getProxiedPrototype().getDescription();
 	}
 
-	/**
-	 * Sets the description text, such as might appear in a flyover. This is a bound property.
-	 * @param newDescription The new text of the description, such as might appear in a flyover.
-	 * @see #DESCRIPTION_PROPERTY
-	 */
+	@Override
 	public void setDescription(final String newDescription) {
 		getProxiedPrototype().setDescription(newDescription);
 	}
 
-	/** @return The content type of the description text. */
+	@Override
 	public ContentType getDescriptionContentType() {
 		return getProxiedPrototype().getDescriptionContentType();
 	}
 
-	/**
-	 * Sets the content type of the description text. This is a bound property.
-	 * @param newDescriptionContentType The new description text content type.
-	 * @throws NullPointerException if the given content type is <code>null</code>.
-	 * @throws IllegalArgumentException if the given content type is not a text content type.
-	 * @see #DESCRIPTION_CONTENT_TYPE_PROPERTY
-	 */
+	@Override
 	public void setDescriptionContentType(final ContentType newDescriptionContentType) {
 		getProxiedPrototype().setDescriptionContentType(newDescriptionContentType);
 	}
 
-	/** @return The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information. */
+	@Override
 	public String getInfo() {
 		return getProxiedPrototype().getInfo();
 	}
 
-	/**
-	 * Sets the advisory information text, such as might appear in a tooltip. This is a bound property.
-	 * @param newInfo The new text of the advisory information, such as might appear in a tooltip.
-	 * @see #INFO_PROPERTY
-	 */
+	@Override
 	public void setInfo(final String newInfo) {
 		getProxiedPrototype().setInfo(newInfo);
 	}
 
-	/** @return The content type of the advisory information text. */
+	@Override
 	public ContentType getInfoContentType() {
 		return getProxiedPrototype().getInfoContentType();
 	}
 
-	/**
-	 * Sets the content type of the advisory information text. This is a bound property.
-	 * @param newInfoContentType The new advisory information text content type.
-	 * @throws NullPointerException if the given content type is <code>null</code>.
-	 * @throws IllegalArgumentException if the given content type is not a text content type.
-	 * @see #INFO_CONTENT_TYPE_PROPERTY
-	 */
+	@Override
 	public void setInfoContentType(final ContentType newInfoContentType) {
 		getProxiedPrototype().setInfoContentType(newInfoContentType);
 	}

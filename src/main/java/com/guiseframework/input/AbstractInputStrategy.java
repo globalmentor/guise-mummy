@@ -25,7 +25,7 @@ public class AbstractInputStrategy implements InputStrategy {
 	/** The parent input strategy, or <code>null</code> if there is no parent input strategy. */
 	private final InputStrategy parent;
 
-	/** @return The parent input strategy, or <code>null</code> if there is no parent input strategy. */
+	@Override
 	public InputStrategy getParent() {
 		return parent;
 	}
@@ -39,12 +39,12 @@ public class AbstractInputStrategy implements InputStrategy {
 	}
 
 	/**
-	 * Processes input, returning whether the input was consumed. If the input is not consumed by this input strategy, it is sent to the parent input strategy, if
-	 * any, for processing. This version does nothing besides delegate to the parent input strategy.
-	 * @param input The input to process.
-	 * @return <code>true</code> if the input was consumed and should not be processed further.
-	 * @throws NullPointerException if the given input is <code>null</code>.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version does nothing besides delegate to the parent input strategy.
+	 * </p>
 	 */
+	@Override
 	public boolean input(final Input input) {
 		final InputStrategy parent = getParent(); //get the parent
 		if(parent != null) { //if there is a parent input strategy

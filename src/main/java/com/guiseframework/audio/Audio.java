@@ -43,7 +43,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	/** The bound property of the play position in time using microseconds. */
 	public static final String TIME_POSITION_PROPERTY = getPropertyName(Audio.class, "timePosition");
 
-	/** @return The depictor for this object. */
+	@Override
 	@SuppressWarnings("unchecked")
 	public Depictor<? extends Audio> getDepictor() {
 		return (Depictor<? extends Audio>)super.getDepictor();
@@ -241,18 +241,12 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 		}
 	}
 
-	/**
-	 * Adds a progress listener.
-	 * @param progressListener The progress listener to add.
-	 */
+	@Override
 	public void addProgressListener(final ProgressListener<Long> progressListener) {
 		getEventListenerManager().add(ProgressListener.class, progressListener); //add the listener
 	}
 
-	/**
-	 * Removes an progress listener.
-	 * @param progressListener The progress listener to remove.
-	 */
+	@Override
 	public void removeProgressListener(final ProgressListener<Long> progressListener) {
 		getEventListenerManager().remove(ProgressListener.class, progressListener); //remove the listener
 	}
@@ -283,8 +277,12 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	}
 
 	/**
-	 * Prepares the object for garbage collection. This implementation makes sure the audio is stopped.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation makes sure the audio is stopped.
+	 * </p>
 	 */
+	@Override
 	protected void finalize() throws Throwable {
 		try {
 			stop(); //stop the audio

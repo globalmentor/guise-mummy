@@ -50,10 +50,12 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 		if(componentConstraintsChangeListener == null) { //if we haven't yet created a property change listener for the component constraints property
 			componentConstraintsChangeListener = new AbstractGenericPropertyChangeListener<Constraints>() { //create a property change listener to listen for the component constraints property changing
 
+				@Override
 				public void propertyChange(final GenericPropertyChangeEvent<Constraints> propertyChangeEvent) { //if a component's constraints property changes
 					//indicate that the component's constraints changed, and update the constraints property listener
 					componentConstraintsChanged((Component)propertyChangeEvent.getSource(), propertyChangeEvent.getOldValue(), propertyChangeEvent.getNewValue());
 				}
+
 			};
 		}
 		return componentConstraintsChangeListener; //return the listener of component constraints
@@ -79,22 +81,12 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 	/** The layout component that owns this layout, or <code>null</code> if this layout has not been installed into a layout component. */
 	private LayoutComponent owner = null;
 
-	/** @return The layout component that owns this layout, or <code>null</code> if this layout has not been installed into a layout component. */
+	@Override
 	public LayoutComponent getOwner() {
 		return owner;
 	}
 
-	/**
-	 * Sets the layout component that owns this layout This method is managed by layout components, and normally should not be called by applications. //TODO del
-	 * A layout cannot be given a layout component if it is already installed in another layout component. Once a layout is installed in a layout component, it
-	 * cannot be uninstalled. A layout cannot be given a layout component if it is already installed in another layout component. A layout cannot be given a
-	 * layout component unless that layout component already recognizes this layout as its layout. If a layout is given the same layout component it already has,
-	 * no action occurs.
-	 * @param newOwner The new layout component for this layout. //TODO del @throws NullPointerException if the given layout component is <code>null</code>.
-	 * @throws IllegalStateException if a different layout component is provided and this layout already has a layout component.
-	 * @throws IllegalArgumentException if a different layout component is provided and the given layout component does not already recognize this layout as its
-	 *           layout.
-	 */
+	@Override
 	public void setOwner(final LayoutComponent newOwner) {
 		final LayoutComponent oldOwner = owner; //get the old component
 		if(oldOwner != newOwner) { //if the component is really changing
@@ -131,12 +123,7 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 		}
 	*/
 
-	/**
-	 * Adds a component to the layout. Called immediately after a component is added to the associated layout component. This method is called by the associated
-	 * layout component, and should not be called directly by application code.
-	 * @param component The component to add to the layout.
-	 * @throws IllegalStateException if this layout has not yet been installed into a layout component.
-	 */
+	@Override
 	public void addComponent(final Component component) {
 		final LayoutComponent owner = getOwner(); //get the layout's owner
 		if(owner == null) { //if we haven't been installed into an owner
@@ -150,11 +137,7 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 		component.addPropertyChangeListener(Component.CONSTRAINTS_PROPERTY, getComponentConstraintsChangeListener()); //listen for the component's constraints property changing so that we can listen for properties of the new constraints changing
 	}
 
-	/**
-	 * Removes a component from the layout. Called immediately before a component is removed from the associated layout component. This method is called by the
-	 * associated layout component, and should not be called directly by application code.
-	 * @param component The component to remove from the layout.
-	 */
+	@Override
 	public void removeComponent(final Component component) {
 		final LayoutComponent owner = getOwner(); //get the layout's owner
 		if(owner == null) { //if we haven't been installed into a owner
@@ -167,17 +150,7 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 		}
 	}
 
-	/**
-	 * Retreives layout constraints associated with a component. If the constraints currently associated with the component are not compatible with this layout,
-	 * or if no constraints are associated with the given component, default constraints are created and associated with the component.
-	 * @param component The component for which layout metadata is being requested.
-	 * @return The constraints associated with the component.
-	 * @throws IllegalStateException if this layout has not yet been installed into a layout component.
-	 * @throws IllegalStateException if no constraints are associated with the given component and this layout does not support default constraints.
-	 * @see #getConstraintsClass()
-	 * @see Component#getConstraints()
-	 * @see Component#setConstraints(Constraints)
-	 */
+	@Override
 	public T getConstraints(final Component component) {
 		final LayoutComponent layoutComponent = getOwner(); //get the layout's layout component
 		if(layoutComponent == null) { //if we haven't been installed into a layout component
@@ -223,10 +196,12 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 	protected class ConstraintsPropertyChangeListener extends AbstractGenericPropertyChangeListener<Object> { //TODO important fix; when a LayoutConstraintsPropertyChangeEvent is refired by the component, it won't be the correct type 
 
 		/**
-		 * Called when a bound property is changed. This implementation fires a {@link LayoutConstraintsPropertyChangeEvent} indicating the constraints and
-		 * associated component.
-		 * @param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
+		 * {@inheritDoc}
+		 * <p>
+		 * This implementation fires a {@link LayoutConstraintsPropertyChangeEvent} indicating the constraints and associated component.
+		 * </p>
 		 */
+		@Override
 		public void propertyChange(final GenericPropertyChangeEvent<Object> propertyChangeEvent) {
 			final Class<? extends T> constraintsClass = getConstraintsClass(); //get the type of constraints we expect			
 			final Constraints constraints = (Constraints)propertyChangeEvent.getSource(); //get the constraints for which a property changed

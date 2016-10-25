@@ -29,7 +29,7 @@ public abstract class AbstractKeyboardEvent extends AbstractFocusedGestureInputE
 	/** The key that was pressed. */
 	private final Key key;
 
-	/** @return The key that was pressed. */
+	@Override
 	public Key getKey() {
 		return key;
 	}

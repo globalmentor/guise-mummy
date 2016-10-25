@@ -36,16 +36,12 @@ public class SelectableLabel extends Label implements Selectable {
 	/** Whether the component is selected. */
 	private boolean selected = false;
 
-	/** @return Whether the component is selected. */
+	@Override
 	public boolean isSelected() {
 		return selected;
 	}
 
-	/**
-	 * Sets whether the component is selected. This is a bound property of type <code>Boolean</code>.
-	 * @param newSelected <code>true</code> if the component should be selected, else <code>false</code>.
-	 * @see #SELECTED_PROPERTY
-	 */
+	@Override
 	public void setSelected(final boolean newSelected) {
 		if(selected != newSelected) { //if the value is really changing
 			final boolean oldSelected = selected; //get the current value

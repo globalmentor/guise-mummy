@@ -33,7 +33,7 @@ public class DefaultTableModel extends AbstractTableModel {
 	/** The list of value lists for rows. */
 	private final List<List<Object>> valueRowLists;
 
-	/** @return The number of rows in this table. */
+	@Override
 	public int getRowCount() {
 		return valueRowLists.size();
 	}
@@ -119,15 +119,7 @@ public class DefaultTableModel extends AbstractTableModel {
 		return columns; //return the columns we created
 	}
 
-	/**
-	 * Returns the cell value at the given row and column.
-	 * @param <C> The type of cell values in the given column.
-	 * @param rowIndex The zero-based row index.
-	 * @param column The column for which a value should be returned.
-	 * @return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
-	 * @throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	 * @throws IllegalArgumentException if the given column is not one of this table's columns.
-	 */
+	@Override
 	public <C> C getCellValue(final int rowIndex, final TableColumnModel<C> column) {
 		final int columnIndex = getColumnIndex(column); //get the index of this column
 		if(columnIndex < 0) { //if this column isn't in this table
@@ -138,15 +130,7 @@ public class DefaultTableModel extends AbstractTableModel {
 		}
 	}
 
-	/**
-	 * Sets the cell value at the given row and column.
-	 * @param <C> The type of cell values in the given column.
-	 * @param rowIndex The zero-based row index.
-	 * @param column The column for which a value should be returned.
-	 * @param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	 * @throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	 * @throws IllegalArgumentException if the given column is not one of this table's columns.
-	 */
+	@Override
 	public <C> void setCellValue(final int rowIndex, final TableColumnModel<C> column, final C newCellValue) {
 		final int columnIndex = getColumnIndex(column); //get the index of this column
 		if(columnIndex < 0) { //if this column isn't in this table

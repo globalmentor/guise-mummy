@@ -25,14 +25,12 @@ public abstract class AbstractInputEvent extends AbstractGuiseEvent implements I
 	/** Whether the input associated with this event has been consumed. */
 	private boolean consumed = false;
 
-	/** @return Whether the input associated with this event has been consumed. */
+	@Override
 	public boolean isConsumed() {
 		return consumed;
 	}
 
-	/**
-	 * Consumes the input associated with this event. The event is marked as consumed so that other listeners will be on notice not to consume the input.
-	 */
+	@Override
 	public void consume() {
 		consumed = true;
 	}

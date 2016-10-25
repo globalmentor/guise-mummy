@@ -56,7 +56,7 @@ public class KeyPressEvent extends AbstractKeyboardEvent {
 		this(source, keyPressEvent.getKey(), keyPressEvent.getKeys().toArray(new Key[keyPressEvent.getKeys().size()])); //construct the class with the specified source		
 	}
 
-	/** @return The key input associated with this event. */
+	@Override
 	public KeystrokeInput getInput() {
 		return new KeystrokeInput(getKey(), getKeys().toArray(new Key[getKeys().size()])); //return new key input based upon this event
 	}

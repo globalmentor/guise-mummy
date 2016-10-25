@@ -81,11 +81,14 @@ public abstract class AbstractMenuToolCompositeComponentPrototypeProvisionStrate
 	}
 
 	/**
-	 * Processes prototype provisions. This implementation merges prototype provisions into the given menu and/or toolbar, if any.
-	 * @param prototypeProvisions The mutable set of prototype provisions to be used.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation merges prototype provisions into the given menu and/or toolbar, if any.
+	 * </p>
 	 * @see #getMenu()
 	 * @see #getToolbar()
 	 */
+	@Override
 	protected void processPrototypeProvisions(final Set<PrototypeProvision<?>> prototypeProvisions) {
 		prototypeProvisionMenuComponentMap.writeLock().lock(); //get a write lock to our prototype component maps
 		try {

@@ -43,11 +43,12 @@ import com.guiseframework.model.AbstractModel;
 public class WebImageDepictor<C extends ImageComponent> extends AbstractSimpleWebComponentDepictor<C> {
 
 	/**
-	 * Called when the depictor is installed in a depicted object. This version requests a poll interval if the image is pending.
-	 * @param component The component into which this depictor is being installed.
-	 * @throws NullPointerException if the given depicted object is <code>null</code>.
-	 * @throws IllegalStateException if this depictor is already installed in a depicted object.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version requests a poll interval if the image is pending.
+	 * </p>
 	 */
+	@Override
 	public void installed(final C component) {
 		super.installed(component); //perform the default installation
 		if(component instanceof PendingImageComponent && ((PendingImageComponent)component).isImagePending()) { //if the image is pending
@@ -56,11 +57,12 @@ public class WebImageDepictor<C extends ImageComponent> extends AbstractSimpleWe
 	}
 
 	/**
-	 * Called when the depictor is uninstalled from a depicted object. This version requests any poll interval.
-	 * @param component The component from which this depictor is being uninstalled.
-	 * @throws NullPointerException if the given depicted object is <code>null</code>.
-	 * @throws IllegalStateException if this depictor is not installed in a depicted object.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version requests any poll interval.
+	 * </p>
 	 */
+	@Override
 	public void uninstalled(final C component) {
 		if(component instanceof PendingImageComponent && ((PendingImageComponent)component).isImagePending()) { //if the image is pending
 			getPlatform().discontinuePollInterval(component); //indicate that polling should no longer occur for this image; another depictor can request polling if necessary
@@ -69,12 +71,13 @@ public class WebImageDepictor<C extends ImageComponent> extends AbstractSimpleWe
 	}
 
 	/**
-	 * Called when a depicted object bound property is changed. This method may also be called for objects related to the depicted object, so if specific
-	 * properties are checked the event source should be verified to be the depicted object. This implementation requests or discontinues a poll interval when the
-	 * pending state changes.
-	 * @param propertyChangeEvent An event object describing the event source and the property that has changed.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation requests or discontinues a poll interval when the pending state changes.
+	 * </p>
 	 * @see PendingImageComponent#isImagePending()
 	 */
+	@Override
 	protected void depictedObjectPropertyChange(final PropertyChangeEvent propertyChangeEvent) {
 		super.depictedObjectPropertyChange(propertyChangeEvent); //do the default property change functionality
 		final C component = getDepictedObject(); //get the depicted object
@@ -95,9 +98,12 @@ public class WebImageDepictor<C extends ImageComponent> extends AbstractSimpleWe
 	}
 
 	/**
-	 * Retrieves the styles for the body element of the component. This adds layout fixes for images within tables.
-	 * @return The styles for the body element of the component, mapped to CSS property names.
+	 * {@inheritDoc}
+	 * <p>
+	 * This adds layout fixes for images within tables.
+	 * </p>
 	 */
+	@Override
 	protected Map<String, Object> getBodyStyles() {
 		final Map<String, Object> styles = super.getBodyStyles(); //get the default body styles
 		final C component = getDepictedObject(); //get the component
@@ -125,10 +131,7 @@ public class WebImageDepictor<C extends ImageComponent> extends AbstractSimpleWe
 				.getPendingImageURI() : component.getImageURI(); //get the image URI to use, using the pending image URI if appropriate
 	}
 
-	/**
-	 * Renders the body of the component.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictBody() throws IOException {
 		super.depictBody(); //render the default main part of the component
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context

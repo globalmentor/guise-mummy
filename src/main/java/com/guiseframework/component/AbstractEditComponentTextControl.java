@@ -37,8 +37,8 @@ import com.guiseframework.theme.Theme;
  * @param <EC> The type of component being edited.
  * @author Garret Wilson
  */
-public abstract class AbstractEditComponentTextControl<EC extends Component> extends AbstractContainerControl implements
-		ModalComponent<AbstractEditComponentTextControl.Mode>, EditComponent {
+public abstract class AbstractEditComponentTextControl<EC extends Component> extends AbstractContainerControl
+		implements ModalComponent<AbstractEditComponentTextControl.Mode>, EditComponent {
 
 	/** The mode of this component; whether the component is being edited. */
 	public enum Mode implements com.guiseframework.component.Mode {
@@ -53,16 +53,12 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 	/** Whether the value is editable and the component will allow the the user to change the value. */
 	private boolean editable = true;
 
-	/** @return Whether the value is editable and the component will allow the the user to change the value. */
+	@Override
 	public boolean isEditable() {
 		return editable;
 	}
 
-	/**
-	 * Sets whether the value is editable and the component will allow the the user to change the value. This is a bound property of type <code>Boolean</code>.
-	 * @param newEditable <code>true</code> if the component should allow the user to change the value.
-	 * @see EditComponent#EDITABLE_PROPERTY
-	 */
+	@Override
 	public void setEditable(final boolean newEditable) {
 		if(editable != newEditable) { //if the value is really changing
 			final boolean oldEditable = editable; //get the old value
@@ -74,18 +70,12 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 	/** The current mode of interaction, or <code>null</code> if the component is in a modeless state. */
 	private Mode mode = null;
 
-	/** @return The current mode of interaction, or <code>null</code> if the component is in a modeless state. */
+	@Override
 	public Mode getMode() {
 		return mode;
 	}
 
-	/**
-	 * Sets the mode of interaction. This is a bound property. Changing the mode to {@link Mode#EDIT} initiates the editing process; changing the mode from
-	 * {@link Mode#EDIT} clears the value from the edit control. If the mode changes, this method will call {@link #update()}.
-	 * @param newMode The new mode of component interaction.
-	 * @throws IllegalStateException If editing is initiated and the current text of the component cannot be edited in the edit control.
-	 * @see #MODE_PROPERTY
-	 */
+	@Override
 	public void setMode(final Mode newMode) {
 		if(mode != newMode) { //if the value is really changing
 			final Mode oldMode = mode; //get the old value
@@ -210,6 +200,7 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 			protected void action(final int force, final int option) {
 				editLabel(); //initiate editing
 			}
+
 		};
 		//accept action prototype
 		acceptActionPrototype = new AbstractActionPrototype(Theme.LABEL_ACCEPT, Theme.GLYPH_ACCEPT) {
@@ -218,6 +209,7 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 			protected void action(final int force, final int option) {
 				acceptEdit(); //accept edits
 			}
+
 		};
 		//reject action prototype
 		rejectActionPrototype = new AbstractActionPrototype(Theme.LABEL_REJECT, Theme.GLYPH_REJECT) {
@@ -226,6 +218,7 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 			protected void action(final int force, final int option) {
 				rejectEdit(); //cancel editing
 			}
+
 		};
 		//delete action prototype
 		deleteActionPrototype = new AbstractActionPrototype(Theme.LABEL_DELETE, Theme.GLYPH_DELETE) {
@@ -234,19 +227,24 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 			protected void action(final int force, final int option) {
 				deleteLabel(); //delete the current label
 			}
+
 		};
 		addPropertyChangeListener(EDITABLE_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>() { //listen for the editable property changing
 
-					public void propertyChange(final GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent) { //if the editable property changes
-						update(); //update this component TODO maybe make an automatic generator for a property change listener that calls update()
-					}
-				});
+			@Override
+			public void propertyChange(final GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent) { //if the editable property changes
+				update(); //update this component TODO maybe make an automatic generator for a property change listener that calls update()
+			}
+
+		});
 		editedComponent.addPropertyChangeListener(checkInstance(editedProperty, "Edited property cannot be null."), new PropertyChangeListener() { //listen for the edited property changing
 
-					public void propertyChange(final PropertyChangeEvent propertyChangeEvent) { //if the edited property changes
-						update(); //update this component TODO maybe make an automatic generator for a property change listener that calls update()
-					}
-				});
+			@Override
+			public void propertyChange(final PropertyChangeEvent propertyChangeEvent) { //if the edited property changes
+				update(); //update this component TODO maybe make an automatic generator for a property change listener that calls update()
+			}
+
+		});
 		update(); //update the component to initialize the child components and prototypes
 
 		final BindingInputStrategy bindingInputStrategy = new BindingInputStrategy(getInputStrategy()); //create a new input strategy based upon the current input strategy (if any)
@@ -296,7 +294,7 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 		update(); //update the component and prototypes
 	}
 
-	/** Update the states of the components and prototypes based upon the current state of the component. */
+	@Override
 	protected void update() {
 		final boolean isEditable = isEditable(); //see if this component is editable
 		final Mode mode = getMode(); //get the current mode
@@ -344,18 +342,12 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 
 	//EditComponent implementation
 
-	/**
-	 * Adds an edit listener.
-	 * @param editListener The edit listener to add.
-	 */
+	@Override
 	public void addEditListener(final EditListener editListener) {
 		getEventListenerManager().add(EditListener.class, editListener); //add the listener
 	}
 
-	/**
-	 * Removes an edit listener.
-	 * @param editListener The edit listener to remove.
-	 */
+	@Override
 	public void removeEditListener(final EditListener editListener) {
 		getEventListenerManager().remove(EditListener.class, editListener); //remove the listener
 	}

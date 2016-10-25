@@ -38,7 +38,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 	/** The list select model being edited. */
 	private final ListSelectModel<V> listSelectModel;
 
-	/** @return The list select model being edited. */
+	@Override
 	public ListSelectModel<V> getListSelectModel() {
 		return listSelectModel;
 	}
@@ -46,7 +46,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 	/** The prototype for inserting a value into the list. */
 	private final ActionPrototype insertActionPrototype;
 
-	/** @return The prototype for inserting a value into the list. */
+	@Override
 	public ActionPrototype getInsertActionPrototype() {
 		return insertActionPrototype;
 	}
@@ -54,7 +54,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 	/** The prototype for editing a value in the list. */
 	private final ActionPrototype editActionPrototype;
 
-	/** @return The prototype for editing a value in the list. */
+	@Override
 	public ActionPrototype getEditActionPrototype() {
 		return editActionPrototype;
 	}
@@ -62,7 +62,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 	/** The prototype for removing a value from the list. */
 	private final ActionPrototype removeActionPrototype;
 
-	/** @return The prototype for removing a value from the list. */
+	@Override
 	public ActionPrototype getRemoveActionPrototype() {
 		return removeActionPrototype;
 	}
@@ -70,7 +70,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 	/** The prototype for lowering a value in the list to a lesser index. */
 	private final ActionPrototype lowerActionPrototype;
 
-	/** @return The prototype for lowering a value from the list to a lesser index. */
+	@Override
 	public ActionPrototype getLowerActionPrototype() {
 		return lowerActionPrototype;
 	}
@@ -78,7 +78,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 	/** The prototype for raising a value in the list to a higher index. */
 	private final ActionPrototype raiseActionPrototype;
 
-	/** @return The prototype for raising a value from the list to a higher index. */
+	@Override
 	public ActionPrototype getRaiseActionPrototype() {
 		return raiseActionPrototype;
 	}
@@ -92,15 +92,19 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 		this.listSelectModel = checkInstance(listSelectModel, "List select model cannot be null.");
 		listSelectModel.addListListener(new ListListener<V>() { //listen to the list being modified
 
+			@Override
 			public void listModified(final ListEvent<V> listEvent) { //if the list is modified
 				updateProperties(); //keep the properties up-to-date
 			}
+
 		});
 		listSelectModel.addListSelectionListener(new ListSelectionListener<V>() { //listen for the list selection changing
 
+			@Override
 			public void listSelectionChanged(final ListSelectionEvent<V> selectionEvent) { //if the list selection changes
 				updateProperties(); //keep the properties up-to-date
 			}
+
 		});
 		//insert
 		insertActionPrototype = new AbstractActionPrototype(LABEL_INSERT, GLYPH_INSERT) {
@@ -109,6 +113,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 			protected void action(final int force, final int option) {
 				insertValue(); //insert a value
 			}
+
 		};
 		//edit
 		editActionPrototype = new AbstractActionPrototype(LABEL_EDIT, GLYPH_EDIT) {
@@ -117,6 +122,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 			protected void action(final int force, final int option) {
 				editValue(); //edit the selected value
 			}
+
 		};
 		//remove
 		removeActionPrototype = new AbstractActionPrototype(LABEL_REMOVE, GLYPH_REMOVE) {
@@ -125,6 +131,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 			protected void action(final int force, final int option) {
 				removeValue(); //remove the selected value
 			}
+
 		};
 		//lower
 		lowerActionPrototype = new AbstractActionPrototype(LABEL_LOWER, FlowOrientation.BOTTOM_TO_TOP.getGlyph()) {
@@ -133,6 +140,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 			protected void action(final int force, final int option) {
 				lowerValue(); //lower the selected value
 			}
+
 		};
 		//raise
 		raiseActionPrototype = new AbstractActionPrototype(LABEL_RAISE, FlowOrientation.TOP_TO_BOTTOM.getGlyph()) {
@@ -141,6 +149,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 			protected void action(final int force, final int option) {
 				raiseValue(); //raise the selected value
 			}
+
 		};
 		updateProperties(); //initialize the properties
 	}
@@ -176,6 +185,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 		editDialog.setLabel(title); //set the title of the dialog
 		editDialog.open(new AbstractGenericPropertyChangeListener<Frame.Mode>() { //open the dialog modally
 
+			@Override
 			public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> genericPropertyChangeEvent) {
 				if(genericPropertyChangeEvent.getNewValue() == null && editDialog.getValue() == Notification.Option.OK) { //if modality is ending and the user selected OK
 					final V newValue = valuedComponent.getValue(); //get the new value
@@ -190,14 +200,12 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 						throw new AssertionError(propertyVetoException);
 					}
 				}
-					}
+			}
+
 		});
 	}
 
-	/**
-	 * Creates and allows the user to edit a new value. If the user accepts the changes, the value is inserted before the currently selected value in the list, or
-	 * at the end of the list if no value is selected.
-	 */
+	@Override
 	public void insertValue() {
 		final ListSelectModel<V> listSelectModel = getListSelectModel(); //get the list select model
 		//TODO lock the list
@@ -207,9 +215,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 		editValue(value, insertIndex, false); //edit and insert the new value		
 	}
 
-	/**
-	 * Edits the currently selected value in the list. If no value is selected in the list, no action occurs.
-	 */
+	@Override
 	public void editValue() {
 		final ListSelectModel<V> listSelectModel = getListSelectModel(); //get the list select model
 		//TODO lock the list
@@ -220,9 +226,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 		}
 	}
 
-	/**
-	 * Removes the currently selected value in the list. If no value is selected in the list, no action occurs.
-	 */
+	@Override
 	public void removeValue() {
 		final ListSelectModel<V> listSelectModel = getListSelectModel(); //get the list select model
 		//TODO lock the list
@@ -263,7 +267,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 			final V value = listSelectModel.remove(selectedIndex); //remove the selected index
 			listSelectModel.add(newIndex, value); //add the value back at a lower index
 			try {
-				listSelectModel.setSelectedIndexes(newIndex); //make sure the modifed index is selected
+				listSelectModel.setSelectedIndexes(newIndex); //make sure the modified index is selected
 			} catch(final PropertyVetoException propertyVetoException) { //if we can't select the modified item, there's a problem somewhere; in itself this does not hurt the edit functionality, but it's a problem that shouldn't be occurring 
 				throw new AssertionError(propertyVetoException);
 			}

@@ -34,16 +34,12 @@ public abstract class AbstractValueModel<V> extends AbstractModel implements Val
 	/** The validator for this model, or <code>null</code> if no validator is installed. */
 	private Validator<V> validator;
 
-	/** @return The validator for this model, or <code>null</code> if no validator is installed. */
+	@Override
 	public Validator<V> getValidator() {
 		return validator;
 	}
 
-	/**
-	 * Sets the validator. This is a bound property.
-	 * @param newValidator The validator for this model, or <code>null</code> if no validator should be used.
-	 * @see ValueModel#VALIDATOR_PROPERTY
-	 */
+	@Override
 	public void setValidator(final Validator<V> newValidator) {
 		if(validator != newValidator) { //if the value is really changing
 			final Validator<V> oldValidator = validator; //get the old value
@@ -55,7 +51,7 @@ public abstract class AbstractValueModel<V> extends AbstractModel implements Val
 	/** The class representing the type of value this model can hold. */
 	private final Class<V> valueClass;
 
-	/** @return The class representing the type of value this model can hold. */
+	@Override
 	public Class<V> getValueClass() {
 		return valueClass;
 	}
@@ -70,21 +66,26 @@ public abstract class AbstractValueModel<V> extends AbstractModel implements Val
 	}
 
 	/**
-	 * Determines whether the value of this model is valid. This version delegates to the validator, if one is installed.
-	 * @return Whether the value of this model is valid.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version delegates to the validator, if one is installed.
+	 * </p>
 	 * @see #getValidator()
 	 * @see #getValue()
 	 */
+	@Override
 	public boolean isValidValue() {
 		final Validator<V> validator = getValidator(); //get the current validator
 		return validator != null ? validator.isValid(getValue()) : true; //if we have a validator, make sure it thinks the value is valid
 	}
 
 	/**
-	 * Validates the value of this model, throwing an exception if the model is not valid. This version validates the current value if there is a validator
-	 * installed.
-	 * @throws ValidationException if the value of this model is not valid.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version validates the current value if there is a validator installed.
+	 * </p>
 	 */
+	@Override
 	public void validateValue() throws ValidationException {
 		final Validator<V> validator = getValidator(); //get the currently installed validator, if there is one
 		if(validator != null) { //if a validator is installed

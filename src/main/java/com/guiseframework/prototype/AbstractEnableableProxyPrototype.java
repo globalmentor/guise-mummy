@@ -25,30 +25,26 @@ import com.guiseframework.model.*;
  */
 public abstract class AbstractEnableableProxyPrototype<P extends Prototype & InfoModel & Enableable> extends AbstractProxyPrototype<P> implements Enableable {
 
-	/** @return Whether the object is enabled and can receive user input. */
+	@Override
 	public boolean isEnabled() {
 		return getProxiedPrototype().isEnabled();
 	}
 
-	/**
-	 * Sets whether the object is enabled and can receive user input. This is a bound property of type <code>Boolean</code>.
-	 * @param newEnabled <code>true</code> if the object should indicate and accept user input.
-	 * @see Enableable#ENABLED_PROPERTY
-	 */
+	@Override
 	public void setEnabled(final boolean newEnabled) {
 		getProxiedPrototype().setEnabled(newEnabled);
 	}
 
 	/**
-	 * Fires appropriate property change events for the bound properties of the proxied prototype This implementation fires property change events for the
-	 * following properties:
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation fires property change events for the following properties:
+	 * </p>
 	 * <ul>
 	 * <li>{@link #ENABLED_PROPERTY}</li>
 	 * </ul>
-	 * @param oldProxiedPrototype The old proxied prototype.
-	 * @param newProxiedPrototype The new proxied prototype.
-	 * @throws NullPointerException if the given old proxied prototype and/or new proxied prototype is <code>null</code>.
 	 */
+	@Override
 	protected void fireProxiedPrototypeBoundPropertyChanges(final P oldProxiedPrototype, final P newProxiedPrototype) {
 		super.fireProxiedPrototypeBoundPropertyChanges(oldProxiedPrototype, newProxiedPrototype); //fire the default proxied prototype bound property change events
 		firePropertyChange(ENABLED_PROPERTY, oldProxiedPrototype.isEnabled(), newProxiedPrototype.isEnabled());

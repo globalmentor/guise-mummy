@@ -51,12 +51,7 @@ public class IntegerStringLiteralConverter extends AbstractNumberStringLiteralCo
 		super(style, currency); //construct the parent class
 	}
 
-	/**
-	 * Converts a literal representation of a value from the lexical space into a value in the value space.
-	 * @param literal The literal value in the lexical space to convert.
-	 * @return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
-	 * @throws ConversionException if the literal value cannot be converted.
-	 */
+	@Override
 	public Integer convertLiteral(final String literal) throws ConversionException {
 		final Number number = parseNumber(literal); //parse a number from the literal value
 		if(number != null) { //if there is a number

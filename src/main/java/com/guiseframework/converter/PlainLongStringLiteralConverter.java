@@ -25,12 +25,7 @@ import static java.text.MessageFormat.*;
  */
 public class PlainLongStringLiteralConverter extends AbstractStringLiteralConverter<Long> {
 
-	/**
-	 * Converts a literal representation of a value from the lexical space into a value in the value space.
-	 * @param literal The literal value in the lexical space to convert.
-	 * @return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
-	 * @throws ConversionException if the literal value cannot be converted.
-	 */
+	@Override
 	public Long convertLiteral(final String literal) throws ConversionException {
 		try {
 			return literal != null && literal.length() > 0 ? Long.valueOf(Long.parseLong(literal)) : null; //if there is a literal, convert it to a Long			

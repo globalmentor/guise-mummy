@@ -45,21 +45,29 @@ public class KeystrokeInput extends AbstractGestureInput implements KeyboardInpu
 		this.key = checkInstance(key, "Key cannot be null."); //save the key
 	}
 
-	/** @return The hash code of this object. This version extends the hash code of the underlying objects with the the key. */
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This version extends the hash code of the underlying objects with the the key.
+	 * </p>
+	 */
+	@Override
 	public int hashCode() {
 		return Objects.getHashCode(super.hashCode(), key); //extend the hash code with the key
 	}
 
 	/**
-	 * Determines if this object equals another object. Besides the default checks, this version ensures that the keys are equal.
-	 * @param object The object to compare with this object.
-	 * @return <code>true</code> if the given object is considered equal to this object.
+	 * {@inheritDoc}
+	 * <p>
+	 * Besides the default checks, this version ensures that the keys are equal.
+	 * </p>
 	 */
+	@Override
 	public boolean equals(final Object object) {
 		return super.equals(object) && getKey() == ((KeystrokeInput)object).getKey(); //if the default checks pass, the object is of the correct type; compare keys
 	}
 
-	/** @return A string representation of this object. */
+	@Override
 	public String toString() {
 		return getKey().toString() + ' ' + super.toString(); //add the key representation to the string
 	}

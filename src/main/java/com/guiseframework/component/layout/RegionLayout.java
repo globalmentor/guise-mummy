@@ -408,7 +408,7 @@ public class RegionLayout extends AbstractLayout<RegionConstraints> {
 		}
 	}
 
-	/** @return The class representing the type of constraints appropriate for this layout. */
+	@Override
 	public Class<? extends RegionConstraints> getConstraintsClass() {
 		return RegionConstraints.class;
 	}
@@ -429,10 +429,12 @@ public class RegionLayout extends AbstractLayout<RegionConstraints> {
 	}
 
 	/**
-	 * Creates default constraints for the container. This implementation returns {@link Region#CENTER}. The new extents will have the default alignment,
-	 * extent, and padding.
-	 * @return New default constraints for the given component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation returns {@link Region#CENTER}. The new extents will have the default alignment, extent, and padding.
+	 * </p>
 	 */
+	@Override
 	public RegionConstraints createDefaultConstraints() {
 		final RegionConstraints regionConstraints = new RegionConstraints(Region.CENTER); //create new constraints defaulting to the center region
 		for(final Flow flow : Flow.values()) { //for each flow

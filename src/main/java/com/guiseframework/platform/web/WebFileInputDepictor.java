@@ -43,11 +43,7 @@ public class WebFileInputDepictor<C extends ResourceImportControl> extends Abstr
 		super(XHTML_NAMESPACE_URI, ELEMENT_INPUT, true); //represent <xhtml:input>, allowing an empty element if possible
 	}
 
-	/**
-	 * Processes an event from the platform.
-	 * @param event The event to be processed.
-	 * @throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
-	 */
+	@Override
 	public void processEvent(final PlatformEvent event) {
 		if(event instanceof WebFormEvent) { //if this is a form submission
 			final WebFormEvent formEvent = (WebFormEvent)event; //get the form submit event
@@ -69,10 +65,7 @@ public class WebFileInputDepictor<C extends ResourceImportControl> extends Abstr
 		super.processEvent(event); //do the default event processing
 	}
 
-	/**
-	 * Begins the rendering process.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context

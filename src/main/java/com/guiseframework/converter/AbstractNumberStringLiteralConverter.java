@@ -134,13 +134,12 @@ public abstract class AbstractNumberStringLiteralConverter<V extends Number> ext
 	}
 
 	/**
-	 * Converts a value from the value space to a literal value in the lexical space. This implementation converts the value using the number format object. This
-	 * implementation synchronizes on the {@link NumberFormat} instance.
-	 * @param value The value in the value space to convert.
-	 * @return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>.
-	 * @throws ConversionException if the value cannot be converted.
-	 * @see #getNumberFormat()
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation converts the value using the number format object. This implementation synchronizes on the {@link NumberFormat} instance.
+	 * </p>
 	 */
+	@Override
 	public String convertValue(final V value) throws ConversionException {
 		if(value != null) { //if there is a value
 			final NumberFormat numberFormat = getNumberFormat(); //get the number format to use

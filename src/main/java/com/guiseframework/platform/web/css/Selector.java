@@ -47,7 +47,7 @@ public class Selector extends ArrayList<NameValuePair<Combinator, List<SimpleSel
 		}
 	}
 
-	/** @return A string representation of the selector. */
+	@Override
 	public String toString() {
 		final StringBuilder stringBuilder = new StringBuilder();
 		for(final NameValuePair<Combinator, List<SimpleSelector>> combinatorSimpleSelectorSequence : this) { //for each combinator/simple selector sequence pair

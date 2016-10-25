@@ -130,10 +130,13 @@ public class URFResourceDynamicTreeNodeModel<V extends URFResource> extends Abst
 	}
 
 	/**
-	 * Dynamically determines whether this node is a leaf. This version determines if resource properties are included and there are properties, or if resource
-	 * children are included and there are children. This version ignores URF type properties and properties of a {@link URFCollectionResource}.
-	 * @return Whether this node should be considered a leaf with no children.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version determines if resource properties are included and there are properties, or if resource children are included and there are children. This
+	 * version ignores URF type properties and properties of a {@link URFCollectionResource}.
+	 * </p>
 	 */
+	@Override
 	protected boolean determineLeaf() {
 		final URFResource resource = getValue(); //get the resource
 		if(resource != null) { //if we have a resource
@@ -161,9 +164,12 @@ public class URFResourceDynamicTreeNodeModel<V extends URFResource> extends Abst
 	}
 
 	/**
-	 * Dynamically determines children. This version ignores URF type properties and properties of an {@link URFCollectionResource}.
-	 * @return The dynamically loaded list of children.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version ignores URF type properties and properties of an {@link URFCollectionResource}.
+	 * </p>
 	 */
+	@Override
 	protected List<TreeNodeModel<?>> determineChildren() {
 		final List<TreeNodeModel<?>> children = new ArrayList<TreeNodeModel<?>>(); //create a list to hold the children, even if we don't have any here, for child classes may add to this list
 		final URFResource resource = getValue(); //get the resource

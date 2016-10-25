@@ -29,10 +29,7 @@ public class AbstractTargetedGuiseEvent extends AbstractGuiseEvent implements Ta
 	/** The target of the event, or <code>null</code> if the event target is not known. */
 	private final Object target;
 
-	/**
-	 * Returns the object to which the event applies. This may be a different than <dfn>source</dfn>, which is the object that generated this event instance.
-	 * @return The target of the event.
-	 */
+	@Override
 	public Object getTarget() {
 		return target;
 	}

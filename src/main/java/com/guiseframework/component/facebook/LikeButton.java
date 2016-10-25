@@ -37,12 +37,12 @@ public class LikeButton extends AbstractComponent implements NavigationModel {
 		return navigationModel;
 	}
 
-	/** {@inheritDoc} */
+	@Override
 	public URIPath getNavigationPath() {
 		return getNavigationModel().getNavigationPath();
 	}
 
-	/** {@inheritDoc} */
+	@Override
 	public void setNavigationPath(final URIPath newNavigationPath) {
 		getNavigationModel().setNavigationPath(newNavigationPath);
 	}

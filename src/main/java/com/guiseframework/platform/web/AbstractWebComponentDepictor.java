@@ -144,7 +144,10 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * <p>
 	 * Orchestrates the entire depiction process for the given component.
+	 * </p>
 	 * <p>
 	 * Updating child views is delayed until {@link #depictBody()}.
 	 * </p>
@@ -152,7 +155,6 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	 * A component for an individual component type should usually not override this method, opting instead to override one of the more fine-grained update view
 	 * methods.
 	 * </p>
-	 * @throws IOException if there is an error updating the depiction.
 	 * @see #depictBegin()
 	 * @see #depictBody()
 	 * @see #depictEnd()

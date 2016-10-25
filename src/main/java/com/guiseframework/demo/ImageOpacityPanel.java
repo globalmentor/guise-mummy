@@ -50,13 +50,15 @@ public class ImageOpacityPanel extends LayoutPanel {
 		sliderModel.setValidator(new DecimalRangeValidator<Float>(0.0f, 1.0f, 0.01f)); //set a range validator for the model
 		sliderModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Float>() { //listen for value changes
 
-					public void propertyChange(GenericPropertyChangeEvent<Float> propertyValueChangeEvent) { //if the opacity value changes
-						final Float newValue = propertyValueChangeEvent.getNewValue(); //get the new value
-						if(newValue != null) { //if there is a new value
-							image.setImageOpacity(newValue.floatValue()); //update the image opacity
-						}
-					}
-				});
+			@Override
+			public void propertyChange(GenericPropertyChangeEvent<Float> propertyValueChangeEvent) { //if the opacity value changes
+				final Float newValue = propertyValueChangeEvent.getNewValue(); //get the new value
+				if(newValue != null) { //if there is a new value
+					image.setImageOpacity(newValue.floatValue()); //update the image opacity
+				}
+			}
+
+		});
 
 		//converter for converting between a float and a percent-styled string
 		final Converter<Float, String> percentConverter = new FloatStringLiteralConverter(NumberStringLiteralConverter.Style.PERCENT);

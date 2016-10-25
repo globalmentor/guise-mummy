@@ -32,28 +32,24 @@ public class ProxyActionPrototype extends AbstractEnableableProxyPrototype<Actio
 		if(repeatActionListener == null) { //if we have not yet created the repeater action listener
 			repeatActionListener = new ActionListener() { //create a listener to listen for an action
 
+				@Override
 				public void actionPerformed(final ActionEvent actionEvent) { //if the action is performed
 					final ActionEvent repeatActionEvent = new ActionEvent(ProxyActionPrototype.this, actionEvent); //copy the action event with this class as its source, but keeping the same target if present
 					fireActionPerformed(actionEvent); //fire the repeated action event
 				}
+
 			};
 		}
 		return repeatActionListener; //return the repeater action listener
 	}
 
-	/**
-	 * Uninstalls listeners from a proxied prototype.
-	 * @param oldProxiedPrototype The old proxied prototype.
-	 */
+	@Override
 	protected void uninstallListeners(final ActionPrototype oldProxiedPrototype) {
 		super.uninstallListeners(oldProxiedPrototype);
 		oldProxiedPrototype.removeActionListener(getRepeatActionListener()); //stop repeating all actions of the proxied prototype
 	}
 
-	/**
-	 * Installs listeners to a proxied prototype.
-	 * @param newProxiedPrototype The new proxied prototype.
-	 */
+	@Override
 	protected void installListeners(final ActionPrototype newProxiedPrototype) {
 		super.installListeners(newProxiedPrototype);
 		newProxiedPrototype.addActionListener(getRepeatActionListener()); //listen and repeat all actions of the proxied prototype
@@ -68,23 +64,17 @@ public class ProxyActionPrototype extends AbstractEnableableProxyPrototype<Actio
 		super(proxiedPrototype);
 	}
 
-	/**
-	 * Adds an action listener.
-	 * @param actionListener The action listener to add.
-	 */
+	@Override
 	public void addActionListener(final ActionListener actionListener) {
 		getEventListenerManager().add(ActionListener.class, actionListener); //add the listener
 	}
 
-	/**
-	 * Removes an action listener.
-	 * @param actionListener The action listener to remove.
-	 */
+	@Override
 	public void removeActionListener(final ActionListener actionListener) {
 		getEventListenerManager().remove(ActionListener.class, actionListener); //remove the listener
 	}
 
-	/** @return all registered action listeners. */
+	@Override
 	public Iterable<ActionListener> getActionListeners() {
 		return getEventListenerManager().getListeners(ActionListener.class); //remove the listener
 	}
@@ -98,13 +88,13 @@ public class ProxyActionPrototype extends AbstractEnableableProxyPrototype<Actio
 	}
 
 	/**
-	 * Performs the action with the given force and option. This implementation calls {@link ActionPrototype#performAction(int, int)} on the proxied prototype to
-	 * perform the actual action. An {@link ActionEvent} is not fired to registered {@link ActionListener}s; the proxied action prototype should fire such an
-	 * event, which we will them repeat.
-	 * @param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
-	 * @param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button
-	 *          click.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation calls {@link ActionPrototype#performAction(int, int)} on the proxied prototype to perform the actual action. An {@link ActionEvent} is
+	 * not fired to registered {@link ActionListener}s; the proxied action prototype should fire such an event, which we will them repeat.
+	 * </p>
 	 */
+	@Override
 	public void performAction(final int force, final int option) {
 		getProxiedPrototype().performAction(force, option); //send the action on to the proxied prototype
 	}

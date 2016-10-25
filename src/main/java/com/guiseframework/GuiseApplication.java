@@ -323,9 +323,7 @@ public interface GuiseApplication extends Resource, PropertyBindable, Concerned 
 	 */
 	public boolean hasDestination(final URIPath path);
 
-	/**
-	 * @return The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed.
-	 */
+	/** @return The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed. */
 	public GuiseContainer getContainer();
 
 	/**

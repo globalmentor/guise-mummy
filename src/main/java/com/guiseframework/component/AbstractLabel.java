@@ -36,11 +36,7 @@ public abstract class AbstractLabel extends AbstractComponent implements LabelCo
 	/** The default export strategy for this component type. */
 	protected static final ExportStrategy<LabelComponent> DEFAULT_EXPORT_STRATEGY = new ExportStrategy<LabelComponent>() {
 
-		/**
-		 * Exports data from the given component.
-		 * @param component The component from which data will be transferred.
-		 * @return The object to be transferred, or <code>null</code> if no data can be transferred.
-		 */
+		@Override
 		public Transferable<LabelComponent> exportTransfer(final LabelComponent component) {
 			return new DefaultTransferable(component); //return a default transferable for this component
 		}
@@ -77,19 +73,17 @@ public abstract class AbstractLabel extends AbstractComponent implements LabelCo
 		}
 
 		/**
-		 * Determines the content types available for this transfer. This implementation returns the content type of the label.
-		 * @return The content types available for this transfer.
+		 * {@inheritDoc}
+		 * <p>
+		 * This implementation returns the content type of the label.
+		 * </p>
 		 */
+		@Override
 		public ContentType[] getContentTypes() {
 			return createArray(getSource().getLabelContentType());
 		}
 
-		/**
-		 * Transfers data using the given content type.
-		 * @param contentType The type of data expected.
-		 * @return The transferred data, which may be <code>null</code>.
-		 * @throws IllegalArgumentException if the given content type is not supported.
-		 */
+		@Override
 		public Object transfer(final ContentType contentType) {
 			final LabelComponent source = getSource(); //get the source of the transfer
 			if(contentType.hasBaseType(source.getLabelContentType())) { //if we have the content type requested

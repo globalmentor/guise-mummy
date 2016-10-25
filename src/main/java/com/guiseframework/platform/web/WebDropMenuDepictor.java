@@ -78,9 +78,12 @@ public class WebDropMenuDepictor<C extends Menu> extends AbstractWebMenuDepictor
 	}
 
 	/**
-	 * Retrieves the styles for the body element of the component. This version correctly positions the menu body for non-root menus using absolute positioning.
-	 * @return The styles for the body element of the component, mapped to CSS property names.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version correctly positions the menu body for non-root menus using absolute positioning.
+	 * </p>
 	 */
+	@Override
 	protected Map<String, Object> getBodyStyles() {
 		final Map<String, Object> styles = super.getBodyStyles(); //get the default body styles
 		final C component = getDepictedObject(); //get the component
@@ -105,10 +108,12 @@ public class WebDropMenuDepictor<C extends Menu> extends AbstractWebMenuDepictor
 	}
 
 	/**
-	 * Begins the rendering process. This version wraps the component in a decorator element.
-	 * @throws IOException if there is an error rendering the component.
-	 * @throws IllegalArgumentException if the given value control represents a value type this controller doesn't support.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version wraps the component in a decorator element.
+	 * </p>
 	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
@@ -158,9 +163,12 @@ public class WebDropMenuDepictor<C extends Menu> extends AbstractWebMenuDepictor
 	}
 
 	/**
-	 * Ends the rendering process. This version closes the decorator elements.
-	 * @throws IOException if there is an error rendering the component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version closes the decorator elements.
+	 * </p>
 	 */
+	@Override
 	protected void depictEnd() throws IOException {
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV); //</xhtml:div> (component-body)

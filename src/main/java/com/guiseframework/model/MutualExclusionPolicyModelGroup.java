@@ -59,10 +59,7 @@ public final class MutualExclusionPolicyModelGroup extends ValuePolicyModelGroup
 		return selectedModel;
 	}
 
-	/**
-	 * Called when the boolean model value is changed.
-	 * @param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
-	 */
+	@Override
 	public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent) {
 		if(Boolean.TRUE.equals(propertyChangeEvent.getNewValue())) { //if this model is changing to true, change the other models to false
 			final ValueModel<Boolean> source = (ValueModel<Boolean>)propertyChangeEvent.getSource(); //see which model changed TODO verify, improve cast

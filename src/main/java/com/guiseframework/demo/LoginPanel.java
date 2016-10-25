@@ -65,25 +65,27 @@ public class LoginPanel extends LayoutPanel {
 		loginButton.setLabel("Log in"); //set the button label
 		loginButton.addActionListener(new ActionListener() { //when the login button is pressed
 
-					public void actionPerformed(ActionEvent actionEvent) { //get the user, verify the password, and set the new session user
-						if(isValid()) { //if the form information is valid
-							final char[] password = passwordControl.getValue(); //get the password entered by the user
-							passwordControl.resetValue(); //reset the password value so that it won't be available on subsequent accesses
-							final DemoApplication demoApplication = (DemoApplication)getSession().getApplication(); //get a reference to the demo application
-							final DemoUser user = demoApplication.getPrincipal(idControl.getValue()); //get the user by ID
-							if(user != null) { //if a valid user was entered
-								if(Arrays.equals(user.getPassword(), password)) { //if the entered password matches that of the user
-									getSession().setPrincipal(user); //log in the user
-									getSession().navigate(DemoApplication.RESTRICTED_PANEL_NAVIGATION_PATH); //navigate to the restricted panel
-								} else { //if the password doesn't match
-									idControl.setNotification(new Notification("Invalid password.", Notification.Severity.ERROR)); //indicate that the ID control has a validation error
-								}
-							} else { //if the user ID is not valid
-								idControl.setNotification(new Notification("Invalid user ID.", Notification.Severity.ERROR)); //indicate that the ID control has a validation exception
-							}
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) { //get the user, verify the password, and set the new session user
+				if(isValid()) { //if the form information is valid
+					final char[] password = passwordControl.getValue(); //get the password entered by the user
+					passwordControl.resetValue(); //reset the password value so that it won't be available on subsequent accesses
+					final DemoApplication demoApplication = (DemoApplication)getSession().getApplication(); //get a reference to the demo application
+					final DemoUser user = demoApplication.getPrincipal(idControl.getValue()); //get the user by ID
+					if(user != null) { //if a valid user was entered
+						if(Arrays.equals(user.getPassword(), password)) { //if the entered password matches that of the user
+							getSession().setPrincipal(user); //log in the user
+							getSession().navigate(DemoApplication.RESTRICTED_PANEL_NAVIGATION_PATH); //navigate to the restricted panel
+						} else { //if the password doesn't match
+							idControl.setNotification(new Notification("Invalid password.", Notification.Severity.ERROR)); //indicate that the ID control has a validation error
 						}
+					} else { //if the user ID is not valid
+						idControl.setNotification(new Notification("Invalid user ID.", Notification.Severity.ERROR)); //indicate that the ID control has a validation exception
 					}
-				});
+				}
+			}
+
+		});
 		loginPanel.add(loginButton); //add the button to the panel
 
 		add(loginPanel); //add the panel to the panel in the default center

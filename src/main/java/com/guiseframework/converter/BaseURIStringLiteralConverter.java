@@ -46,12 +46,13 @@ public class BaseURIStringLiteralConverter extends AbstractURIStringLiteralConve
 	}
 
 	/**
-	 * Resolves a converted URI if needed. If the URI is already absolute, no action occurs. If the URI is relative, this implementation resolves the URI against
-	 * the URI returned by {@link #getBaseURI()}.
-	 * @param uri The URI to resolve.
-	 * @return The URI resolved as needed and as appropriate.
+	 * {@inheritDoc}
+	 * <p>
+	 * If the URI is relative, this implementation resolves the URI against the URI returned by {@link #getBaseURI()}.
+	 * </p>
 	 * @see #getBaseURI()
 	 */
+	@Override
 	protected URI resolveURI(URI uri) {
 		return uri.isAbsolute() ? uri : resolve(getBaseURI(), uri); //if the URI is relative, resolve it against the base URI
 	}

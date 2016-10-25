@@ -84,10 +84,7 @@ public class WebFlashDepictor<C extends Flash> extends AbstractSimpleWebComponen
 		super(XHTML_NAMESPACE_URI, ELEMENT_OBJECT); //represent <xhtml:object>
 	}
 
-	/**
-	 * Renders the body of the component.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictBody() throws IOException {
 		super.depictBody(); //render the default main part of the component
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context

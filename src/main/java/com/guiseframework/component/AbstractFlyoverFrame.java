@@ -63,19 +63,12 @@ public abstract class AbstractFlyoverFrame extends AbstractFrame implements Flyo
 	/** The bearing of the tether in relation to the frame. */
 	private BigDecimal tetherBearing = CompassPoint.NORTHWEST_BY_WEST.getBearing();
 
-	/** @return The bearing of the tether in relation to the frame. */
+	@Override
 	public BigDecimal getTetherBearing() {
 		return tetherBearing;
 	}
 
-	/**
-	 * Sets the bearing of the tether in relation to the frame. This implementation changes the bearing to that of the nearest supported tether bearing compass
-	 * point. This is a bound property.
-	 * @param newTetherBearing The new bearing of the tether in relation to the frame.
-	 * @see FlyoverFrame#TETHER_BEARING_PROPERTY
-	 * @throws NullPointerException if the given bearing is <code>null</code>.
-	 * @throws IllegalArgumentException if the given bearing is greater than 360.
-	 */
+	@Override
 	public void setTetherBearing(BigDecimal newTetherBearing) {
 		//TODO del Log.trace("setting flyover tether bearing to", newTetherBearing);
 		checkInstance(newTetherBearing, "Tether bearing cannot be null.");
@@ -113,17 +106,12 @@ public abstract class AbstractFlyoverFrame extends AbstractFrame implements Flyo
 	/** The compass points supported for tether bearing. */
 	private Set<CompassPoint> tetherBearingCompassPoints;
 
-	/** @return The bearing of the tether in relation to the frame. */
+	@Override
 	public Set<CompassPoint> getTetherBearingCompassPoints() {
 		return tetherBearingCompassPoints;
 	}
 
-	/**
-	 * Sets the compass points supported for tether bearing. This is a bound property.
-	 * @param newTetherBearingCompassPoints The new set of compass points supported for tether bearing.
-	 * @see FlyoverFrame#TETHER_BEARING_COMPASS_POINTS_PROPERTY
-	 * @throws NullPointerException if the given set is <code>null</code>.
-	 */
+	@Override
 	public void setTetherBearingCompassPoints(final Set<CompassPoint> newTetherBearingCompassPoints) {
 		if(tetherBearing != tetherBearingCompassPoints) { //if the value is really changing
 			final Set<CompassPoint> oldTetherBearingCompassPoints = tetherBearingCompassPoints; //get the current value
@@ -135,16 +123,12 @@ public abstract class AbstractFlyoverFrame extends AbstractFrame implements Flyo
 	/** The tether image URI, which may be a resource URI, or <code>null</code> if there is no tether image URI. */
 	private URI tetherImage = TETHER_IMAGE_RESOURCE_URI;
 
-	/** @return The tether image URI, which may be a resource URI, or <code>null</code> if there is no tether image URI. */
+	@Override
 	public URI getTetherImage() {
 		return tetherImage;
 	}
 
-	/**
-	 * Sets the URI of the tether image. This is a bound property of type <code>URI</code>.
-	 * @param newTetherImage The new URI of the image, which may be a resource URI.
-	 * @see FlyoverFrame#TETHER_IMAGE_PROPERTY
-	 */
+	@Override
 	public void setTetherImage(final URI newTetherImage) {
 		if(!Objects.equals(tetherImage, newTetherImage)) { //if the value is really changing
 			final URI oldTetherImage = tetherImage; //get the old value

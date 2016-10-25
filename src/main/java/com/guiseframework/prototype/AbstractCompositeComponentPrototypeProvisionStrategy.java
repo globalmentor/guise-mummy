@@ -47,10 +47,7 @@ public abstract class AbstractCompositeComponentPrototypeProvisionStrategy exten
 	 */
 	private final CompositeComponentListener compositeComponentListener = new CompositeComponentListener() {
 
-		/**
-		 * Called when a child component is added to a composite component.
-		 * @param childComponentEvent The event indicating the added child component and the target parent composite component.
-		 */
+		@Override
 		public void childComponentAdded(final ComponentEvent childComponentEvent) {
 			boolean modifiedPrototypeProviders = false; //keep track of whether we modified prototype providers; if so, we'll need to reprocess the prototype provisions
 			Component component = childComponentEvent.getComponent(); //get the added component
@@ -79,10 +76,7 @@ public abstract class AbstractCompositeComponentPrototypeProvisionStrategy exten
 			}
 		}
 
-		/**
-		 * Called when a child component is removed from a composite component.
-		 * @param childComponentEvent The event indicating the removed child component and the target parent composite component.
-		 */
+		@Override
 		public void childComponentRemoved(final ComponentEvent childComponentEvent) {
 			boolean modifiedPrototypeProviders = false; //keep track of whether we modified prototype providers; if so, we'll need to reprocess the prototype provisions
 			final Object component = childComponentEvent.getComponent(); //get the removed component

@@ -27,7 +27,7 @@ import com.guiseframework.component.*;
 import com.guiseframework.model.*;
 
 /**
- * Coupler that assocates a {@link ListSelectControl} with a card in a {@link CardControl}.
+ * Coupler that associates a {@link ListSelectControl} with a card in a {@link CardControl}.
  * @param <V> The type of values to select. When the specified value is selected, the first displayed and enabled specified card within the card control will be
  *          selected. When any of the the associated cards are selected, the specified value is selected. If the card's constraints implement
  *          {@link Displayable}, the list selected value will be displayed based upon the card constraints' displayed status. If the card's constraints
@@ -48,10 +48,11 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler {
 	/** The property change listener to listen for the value property of the list select control changing. */
 	private final PropertyChangeListener listSelectValueChangeListener = new AbstractGenericPropertyChangeListener<V>() {
 
+		@Override
 		public void propertyChange(final GenericPropertyChangeEvent<V> propertyChangeEvent) { //if the list select value changed
 			final V newValue = propertyChangeEvent.getNewValue(); //get the new selected value
 			if(newValue != null && Objects.equals(newValue, getValue())) { //if the connected value was selected
-			//TODO del				Log.trace("tab changed to", getListSelect().indexOf(newValue), " trying to select new card to match; is reverting list select?", isRevertingListSelect);
+				//TODO del				Log.trace("tab changed to", getListSelect().indexOf(newValue), " trying to select new card to match; is reverting list select?", isRevertingListSelect);
 				try {
 					selectCard(); //select a connected card
 				} catch(final PropertyVetoException propertyVetoException) { //if the value can't be selected
@@ -70,6 +71,7 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler {
 				}
 			}
 		}
+
 	};
 
 	/** The list select control to connect to the cards, or <code>null</code> if there is no control coupled with the cards. */
@@ -149,10 +151,13 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler {
 	}
 
 	/**
-	 * Updates the current displayed status. This implementation updates the list select control's displayed status of the connected value. If no list select
-	 * control or no value is connected, no action occurs.
-	 * @param displayed The new displayed status.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation updates the list select control's displayed status of the connected value. If no list select control or no value is connected, no
+	 * action occurs.
+	 * </p>
 	 */
+	@Override
 	protected void updateDisplayed(final boolean displayed) {
 		final ListSelectControl<V> listSelect = getListSelect(); //get the list select control
 		final V value = getValue(); //get the specified value
@@ -162,10 +167,13 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler {
 	}
 
 	/**
-	 * Updates the current enabled status. This implementation updates the list select control's enabled status of the connected value. If no list select control
-	 * or no value is connected, no action occurs.
-	 * @param enabled The new enabled status.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation updates the list select control's enabled status of the connected value. If no list select control or no value is connected, no action
+	 * occurs.
+	 * </p>
 	 */
+	@Override
 	protected void updateEnabled(final boolean enabled) {
 		final ListSelectControl<V> listSelect = getListSelect(); //get the list select control
 		final V value = getValue(); //get the specified value
@@ -175,10 +183,13 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler {
 	}
 
 	/**
-	 * Updates the current selected status. This implementation selects the connected value in the conntected list select control if the new selected state is
-	 * selected. If no list select control or no value is connected, no action occurs.
-	 * @param selected The new selected status.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation selects the connected value in the connected list select control if the new selected state is selected. If no list select control or no
+	 * value is connected, no action occurs.
+	 * </p>
 	 */
+	@Override
 	protected void updateSelected(final boolean selected) {
 		if(selected) { //if one of the connected cards is selected
 			final ListSelectControl<V> listSelect = getListSelect(); //get the list select control

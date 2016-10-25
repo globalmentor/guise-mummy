@@ -46,16 +46,11 @@ public class URFProcessPanel extends LayoutPanel {
 
 	/** Instructions for the this demo. */
 	protected static final String INSTRUCTIONS = "<?xml version='1.0'?>"
-			+ "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>"
-			+ "<html xmlns='http://www.w3.org/1999/xhtml'>"
-			+ "<head><title>Instructions</title></head>"
-			+ "<body>"
+			+ "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>" + "<html xmlns='http://www.w3.org/1999/xhtml'>"
+			+ "<head><title>Instructions</title></head>" + "<body>"
 			+ "	<p>This is a Guise\u2122 demonstration of the <a href=\"http://www.urf.name/\">Uniform Resource Framework (URF)</a>.</p>"
-			+ "	<p>Input one of the following and select \"Process\":</p>"
-			+ "	<ul>"
-			+ "	  <li>TURF (beginning with \"`URF\")</li>"
-			+ "	  <li>RDF/XML (beginning with \"&lt;XML\")</li>"
-			+ "	</ul>"
+			+ "	<p>Input one of the following and select \"Process\":</p>" + "	<ul>" + "	  <li>TURF (beginning with \"`URF\")</li>"
+			+ "	  <li>RDF/XML (beginning with \"&lt;XML\")</li>" + "	</ul>"
 			+ "	<p>The resulting assertions will be listed, along with a TURF representation of the URF instance. The tree control will allow you to dynamically explore the URF graph.</p>"
 			+ "</body>" + "</html>";
 
@@ -102,6 +97,7 @@ public class URFProcessPanel extends LayoutPanel {
 
 		processButton.addActionListener(new ActionListener() {
 
+			@Override
 			public void actionPerformed(final ActionEvent actionEvent) {
 				assertionOutputTextControl.clearValue(); //clear the assertions
 				turfOutputTextControl.clearValue(); //clear the TURF
@@ -148,6 +144,7 @@ public class URFProcessPanel extends LayoutPanel {
 					getSession().notify(new Notification("There is no input to process.")); //notify the user of the lack of input							
 				}
 			}
+
 		});
 
 		add(mainPanel, new RegionConstraints(Region.CENTER)); //add the main panel to the center

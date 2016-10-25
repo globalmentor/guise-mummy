@@ -48,24 +48,23 @@ public class WebFrameDepictor<C extends Frame> extends AbstractWebFrameDepictor<
 	}
 
 	/**
-	 * Called when the depictor is installed in a component. This implementation listens for changes in the session and in response marks the view as needing
-	 * updated.
-	 * @param component The component into which this view is being installed.
-	 * @throws NullPointerException if the given component is <code>null</code>.
-	 * @throws IllegalStateException if this view is already installed in a component.
-	 * @see #getDepictedPropertyChangeListener()
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation listens for changes in the session and in response marks the view as needing updated.
+	 * </p>
 	 */
+	@Override
 	public void installed(final C component) {
 		super.installed(component); //install ourselves normally
 	}
 
 	/**
-	 * Called when the depictor is uninstalled from a component. This implementation stops listening for session changes.
-	 * @param component The component from which this view is being uninstalled.
-	 * @throws NullPointerException if the given component is <code>null</code>.
-	 * @throws IllegalStateException if this view is not installed in a component.
-	 * @see #getDepictedPropertyChangeListener()
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation stops listening for session changes.
+	 * </p>
 	 */
+	@Override
 	public void uninstalled(final C component) {
 		super.uninstalled(component); //uninstall ourselves normally
 	}
@@ -81,10 +80,7 @@ public class WebFrameDepictor<C extends Frame> extends AbstractWebFrameDepictor<
 		return outerStyles; //return the combined styles		
 	}
 
-	/**
-	 * Begins the rendering process.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		final GuiseSession session = getSession(); //get the session
@@ -183,9 +179,12 @@ public class WebFrameDepictor<C extends Frame> extends AbstractWebFrameDepictor<
 	}
 
 	/**
-	 * Ends the rendering process. This version closes the decorator elements.
-	 * @throws IOException if there is an error rendering the component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version closes the decorator elements.
+	 * </p>
 	 */
+	@Override
 	public void depictEnd() throws IOException {
 		getDepictContext().writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV); //</xhtml:div> (component-body)
 		writeErrorMessage(); //write the error message, if any

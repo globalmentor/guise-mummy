@@ -31,7 +31,7 @@ public abstract class AbstractReferenceDestination extends AbstractDestination i
 	/** The referenced destination. */
 	private final Destination destination;
 
-	/** @return The referenced destination. */
+	@Override
 	public Destination getDestination() {
 		return destination;
 	}

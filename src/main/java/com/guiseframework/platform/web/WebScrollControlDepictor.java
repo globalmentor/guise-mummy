@@ -39,11 +39,13 @@ public class WebScrollControlDepictor<GC extends WebDepictContext, C extends Scr
 	}
 
 	/**
-	 * Retrieves the styles for the outer element of the component. This version combines the body styles with the outer styles. This version adds CSS scroll
-	 * properties.
-	 * @return The styles for the outer element of the component, mapped to CSS property names.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version combines the body styles with the outer styles. This version adds CSS scroll properties.
+	 * </p>
 	 * @see AbstractWebComponentDepictor#getBodyStyles()
 	 */
+	@Override
 	protected Map<String, Object> getOuterStyles() {
 		final Map<String, Object> outerStyles = super.getOuterStyles(); //get the default outer styles
 		outerStyles.putAll(getBodyStyles()); //add the styles for the body

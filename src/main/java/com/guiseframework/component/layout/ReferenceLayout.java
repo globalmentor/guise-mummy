@@ -37,18 +37,18 @@ public class ReferenceLayout extends AbstractLayout<ReferenceConstraints> {
 		return referenceIDComponentMap; //return the map of components keyed to IDs
 	}
 
-	/** @return The class representing the type of constraints appropriate for this layout. */
+	@Override
 	public Class<? extends ReferenceConstraints> getConstraintsClass() {
 		return ReferenceConstraints.class;
 	}
 
 	/**
-	 * Indicates that the constraints for a component have changed. This method is also called when the component is first added to the layout. This version adds
-	 * or removes the component reference ID to the map.
-	 * @param component The component for which constraints have changed.
-	 * @param oldConstraints The old component constraints, or <code>null</code> if there were no constraints previously.
-	 * @param newConstraints The new component constraints, or <code>null</code> if the component now has no constraints.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version adds or removes the component reference ID to the map.
+	 * </p>
 	 */
+	@Override
 	protected void componentConstraintsChanged(final Component component, final Constraints oldConstraints, final Constraints newConstraints) {
 		final Class<? extends ReferenceConstraints> constraintsClass = getConstraintsClass(); //get the type of constraints we expect
 		if(constraintsClass.isInstance(oldConstraints)) { //if the old constraints is of the type of we expect
@@ -59,11 +59,7 @@ public class ReferenceLayout extends AbstractLayout<ReferenceConstraints> {
 		}
 	}
 
-	/**
-	 * Creates default constraints for the container.
-	 * @return New default constraints for the container.
-	 * @throws IllegalStateException if this layout does not support default constraints.
-	 */
+	@Override
 	public ReferenceConstraints createDefaultConstraints() {
 		throw new IllegalStateException("Component cannot have default constraints; it must be bound to some ID.");
 	}

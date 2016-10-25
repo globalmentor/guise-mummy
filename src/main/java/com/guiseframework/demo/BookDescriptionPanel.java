@@ -28,7 +28,7 @@ import com.guiseframework.geometry.Unit;
  * Drop Details Guise demonstration panel. Copyright © 2005 GlobalMentor, Inc. Demonstrates image description visibility, flyover frames, preferred widths and
  * heights, extents, and units.
  * <p>
- * Contextual flyover tethers can be specified using the following resource keys, each of which indicates an application-relateive URI of an image:
+ * Contextual flyover tethers can be specified using the following resource keys, each of which indicates an application-relative URI of an image:
  * </p>
  * <ul>
  * <li><code>flyover.frame.tether.image.NEbN</code></li>

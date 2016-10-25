@@ -38,17 +38,12 @@ public abstract class AbstractActionControl extends AbstractControl implements A
 	/** Whether the icon is displayed. */
 	private boolean iconDisplayed = true;
 
-	/** @return Whether the icon is displayed. */
+	@Override
 	public boolean isIconDisplayed() {
 		return iconDisplayed;
 	}
 
-	/**
-	 * Sets whether the icon is displayed. This is a bound property of type <code>Boolean</code>.
-	 * @param newIconDisplayed <code>true</code> if the icon should be displayed, else <code>false</code> if the icon should not be displayed and take up no
-	 *          space.
-	 * @see #ICON_DISPLAYED_PROPERTY
-	 */
+	@Override
 	public void setIconDisplayed(final boolean newIconDisplayed) {
 		if(iconDisplayed != newIconDisplayed) { //if the value is really changing
 			final boolean oldIconDisplayed = iconDisplayed; //get the current value
@@ -60,17 +55,12 @@ public abstract class AbstractActionControl extends AbstractControl implements A
 	/** Whether the label is displayed. */
 	private boolean labelDisplayed = true;
 
-	/** @return Whether the label is displayed. */
+	@Override
 	public boolean isLabelDisplayed() {
 		return labelDisplayed;
 	}
 
-	/**
-	 * Sets whether the label is displayed. This is a bound property of type <code>Boolean</code>.
-	 * @param newLabelDisplayed <code>true</code> if the label should be displayed, else <code>false</code> if the label should not be displayed and take up no
-	 *          space.
-	 * @see #LABEL_DISPLAYED_PROPERTY
-	 */
+	@Override
 	public void setLabelDisplayed(final boolean newLabelDisplayed) {
 		if(labelDisplayed != newLabelDisplayed) { //if the value is really changing
 			final boolean oldLabelDisplayed = labelDisplayed; //get the current value
@@ -82,16 +72,12 @@ public abstract class AbstractActionControl extends AbstractControl implements A
 	/** Whether the component is in a rollover state. */
 	private boolean rollover = false;
 
-	/** @return Whether the component is in a rollover state. */
+	@Override
 	public boolean isRollover() {
 		return rollover;
 	}
 
-	/**
-	 * Sets whether the component is in a rollover state. This is a bound property of type <code>Boolean</code>.
-	 * @param newRollover <code>true</code> if the component should be in a rollover state, else <code>false</code>.
-	 * @see Menu#ROLLOVER_PROPERTY
-	 */
+	@Override
 	public void setRollover(final boolean newRollover) {
 		if(rollover != newRollover) { //if the value is really changing
 			final boolean oldRollover = rollover; //get the current value
@@ -112,48 +98,36 @@ public abstract class AbstractActionControl extends AbstractControl implements A
 		this.actionModel = checkInstance(actionModel, "Action model cannot be null."); //save the action model
 		this.actionModel.addActionListener(new ActionListener() { //create an action repeater to forward events to this component's listeners
 
-					public void actionPerformed(final ActionEvent actionEvent) { //if the action is performed
-						final ActionEvent repeatActionEvent = new ActionEvent(AbstractActionControl.this, actionEvent); //copy the action event with this class as its source
-						fireActionPerformed(repeatActionEvent); //fire the repeated action
-					}
-				});
+			@Override
+			public void actionPerformed(final ActionEvent actionEvent) { //if the action is performed
+				final ActionEvent repeatActionEvent = new ActionEvent(AbstractActionControl.this, actionEvent); //copy the action event with this class as its source
+				fireActionPerformed(repeatActionEvent); //fire the repeated action
+			}
+
+		});
 	}
 
-	/**
-	 * Adds an action listener.
-	 * @param actionListener The action listener to add.
-	 */
+	@Override
 	public void addActionListener(final ActionListener actionListener) {
 		getEventListenerManager().add(ActionListener.class, actionListener); //add the listener
 	}
 
-	/**
-	 * Removes an action listener.
-	 * @param actionListener The action listener to remove.
-	 */
+	@Override
 	public void removeActionListener(final ActionListener actionListener) {
 		getEventListenerManager().remove(ActionListener.class, actionListener); //remove the listener
 	}
 
-	/** @return all registered action listeners. */
+	@Override
 	public Iterable<ActionListener> getActionListeners() {
 		return getEventListenerManager().getListeners(ActionListener.class);
 	}
 
-	/**
-	 * Performs the action with default force and default option. An {@link ActionEvent} is fired to all registered {@link ActionListener}s. This method delegates
-	 * to {@link #performAction(int, int)}.
-	 */
+	@Override
 	public void performAction() {
-		getActionModel().performAction(); //delegate to the installed action model, which will fire an event which we will catch and queue for refiring
+		getActionModel().performAction(); //delegate to the installed action model, which will fire an event which we will catch and queue for refering
 	}
 
-	/**
-	 * Performs the action with the given force and option. An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
-	 * @param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
-	 * @param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button
-	 *          click.
-	 */
+	@Override
 	public void performAction(final int force, final int option) {
 		getActionModel().performAction(force, option); //delegate to the installed action model, which will fire an event which we will catch and refire
 	}
@@ -161,7 +135,7 @@ public abstract class AbstractActionControl extends AbstractControl implements A
 	/**
 	 * Fires an action event to all registered action listeners. This method delegates to {@link #fireActionPerformed(ActionEvent)}.
 	 * @param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
-	 * @param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button
+	 * @param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiated by a mouse right button
 	 *          click.
 	 * @see ActionListener
 	 * @see ActionEvent

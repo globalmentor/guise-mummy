@@ -30,7 +30,7 @@ public abstract class AbstractValuedPanel<V> extends AbstractPanel implements Va
 	/** The class representing the type of value displayed within the component. */
 	private final Class<V> valueClass;
 
-	/** @return The class representing the type of value displayed within the component. */
+	@Override
 	public Class<V> getValueClass() {
 		return valueClass;
 	}

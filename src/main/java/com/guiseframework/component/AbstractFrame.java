@@ -53,7 +53,7 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	/** The state of the frame. */
 	private State state = State.CLOSED;
 
-	/** @return The state of the frame. */
+	@Override
 	public State getState() {
 		return state;
 	}
@@ -76,16 +76,12 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	/** Whether the frame is modal if and when it is open. */
 	private boolean modal = false;
 
-	/** @return Whether the frame is modal if and when it is open. */
+	@Override
 	public boolean isModal() {
 		return modal;
 	}
 
-	/**
-	 * Sets whether the frame is modal if and when it is open. This is a bound property of type <code>Boolean</code>.
-	 * @param newModal <code>true</code> if the frame should be modal, else <code>false</code>.
-	 * @see Frame#MODAL_PROPERTY
-	 */
+	@Override
 	public void setModal(final boolean newModal) {
 		if(modal != newModal) { //if the value is really changing
 			final boolean oldModal = modal; //get the current value
@@ -98,16 +94,12 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	/** The current mode of interaction, or <code>null</code> if the component is in a modeless state. */
 	private Mode mode = null;
 
-	/** @return The current mode of interaction, or <code>null</code> if the component is in a modeless state. */
+	@Override
 	public Mode getMode() {
 		return mode;
 	}
 
-	/**
-	 * Sets the mode of interaction. This is a bound property.
-	 * @param newMode The new mode of component interaction.
-	 * @see ModalComponent#MODE_PROPERTY
-	 */
+	@Override
 	public void setMode(final Mode newMode) {
 		if(mode != newMode) { //if the value is really changing
 			final Mode oldMode = mode; //get the old value
@@ -119,16 +111,12 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	/** Whether the frame is movable. */
 	private boolean movable = true;
 
-	/** @return Whether the frame is movable. */
+	@Override
 	public boolean isMovable() {
 		return movable;
 	}
 
-	/**
-	 * Sets whether the frame is movable. This is a bound property of type <code>Boolean</code>.
-	 * @param newMovable <code>true</code> if the frame should be movable, else <code>false</code>.
-	 * @see Frame#MOVABLE_PROPERTY
-	 */
+	@Override
 	public void setMovable(final boolean newMovable) {
 		if(movable != newMovable) { //if the value is really changing
 			final boolean oldMovable = movable; //get the current value
@@ -140,16 +128,12 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	/** Whether the frame can be resized. */
 	private boolean resizable = true;
 
-	/** @return Whether the frame can be resized. */
+	@Override
 	public boolean isResizable() {
 		return resizable;
 	}
 
-	/**
-	 * Sets whether the frame can be resized. This is a bound property of type <code>Boolean</code>.
-	 * @param newResizable <code>true</code> if the frame can be resized, else <code>false</code>.
-	 * @see Frame#RESIZABLE_PROPERTY
-	 */
+	@Override
 	public void setResizable(final boolean newResizable) {
 		if(resizable != newResizable) { //if the value is really changing
 			final boolean oldResizable = resizable; //get the current value
@@ -161,16 +145,12 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	/** The related component such as a popup source, or <code>null</code> if the frame is not related to another component. */
 	private Component relatedComponent = null;
 
-	/** @return The related component such as a popup source, or <code>null</code> if the frame is not related to another component. */
+	@Override
 	public Component getRelatedComponent() {
 		return relatedComponent;
 	}
 
-	/**
-	 * Sets the related component. This is a bound property.
-	 * @param newRelatedComponent The new related component, or <code>null</code> if the frame is not related to another component.
-	 * @see Frame#RELATED_COMPONENT_PROPERTY
-	 */
+	@Override
 	public void setRelatedComponent(final Component newRelatedComponent) {
 		if(relatedComponent != newRelatedComponent) { //if the value is really changing
 			final Component oldRelatedComponent = relatedComponent; //get the old value
@@ -182,16 +162,12 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	/** The background color of the title, or <code>null</code> if no background color is specified for the title. */
 	private Color titleBackgroundColor = null;
 
-	/** @return The background color of the title, or <code>null</code> if no background color is specified for the title. */
+	@Override
 	public Color getTitleBackgroundColor() {
 		return titleBackgroundColor;
 	}
 
-	/**
-	 * Sets the background color of the title. This is a bound property.
-	 * @param newTitleBackgroundColor The background color of the title, or <code>null</code> if the default background color should be used.
-	 * @see #TITLE_BACKGROUND_COLOR_PROPERTY
-	 */
+	@Override
 	public void setTitleBackgroundColor(final Color newTitleBackgroundColor) {
 		if(!Objects.equals(titleBackgroundColor, newTitleBackgroundColor)) { //if the value is really changing
 			final Color oldTitleBackgroundColor = titleBackgroundColor; //get the old value
@@ -203,16 +179,12 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	/** Whether the title bar is visible. */
 	private boolean titleVisible = true;
 
-	/** @return Whether the title bar is visible. */
+	@Override
 	public boolean isTitleVisible() {
 		return titleVisible;
 	}
 
-	/**
-	 * Sets whether the title bar is visible. This is a bound property of type <code>Boolean</code>.
-	 * @param newTitleVisible <code>true</code> if the title bar should be visible, else <code>false</code>.
-	 * @see Frame#TITLE_VISIBLE_PROPERTY
-	 */
+	@Override
 	public void setTitleVisible(final boolean newTitleVisible) {
 		if(titleVisible != newTitleVisible) { //if the value is really changing
 			final boolean oldTitleVisible = titleVisible; //get the current value
@@ -224,16 +196,12 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	/** The effect used for opening the frame, or <code>null</code> if there is no open effect. */
 	private Effect openEffect = null;
 
-	/** @return The effect used for opening the frame, or <code>null</code> if there is no open effect. */
+	@Override
 	public Effect getOpenEffect() {
 		return openEffect;
 	}
 
-	/**
-	 * Sets the effect used for opening the frame. This is a bound property.
-	 * @param newOpenEffect The new effect used for opening the frame, or <code>null</code> if there should be no open effect.
-	 * @see Frame#OPEN_EFFECT_PROPERTY
-	 */
+	@Override
 	public void setOpenEffect(final Effect newOpenEffect) {
 		if(openEffect != newOpenEffect) { //if the value is really changing
 			final Effect oldOpenEffect = openEffect; //get the old value
@@ -242,20 +210,12 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 		}
 	}
 
-	/**
-	 * @return The content child component, or <code>null</code> if this frame does not have a content child component.
-	 * @see FrameComponent#CONTENT_COMPONENT
-	 */
+	@Override
 	public Component getContent() {
 		return getComponent(FrameComponent.CONTENT_COMPONENT);
 	}
 
-	/**
-	 * Sets the content child component. This is a bound property.
-	 * @param newContent The content child component, or <code>null</code> if this frame does not have a content child component.
-	 * @see FrameComponent#CONTENT_COMPONENT
-	 * @see ContentComponent#CONTENT_PROPERTY
-	 */
+	@Override
 	public void setContent(final Component newContent) {
 		final Component oldContent = setComponent(FrameComponent.CONTENT_COMPONENT, newContent); //set the component
 		if(oldContent != newContent) { //if the component really changed
@@ -263,20 +223,12 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 		}
 	}
 
-	/**
-	 * @return The frame menu, or <code>null</code> if this frame does not have a menu.
-	 * @see FrameComponent#MENU_COMPONENT
-	 */
+	@Override
 	public Menu getMenu() {
 		return (Menu)getComponent(FrameComponent.MENU_COMPONENT);
 	}
 
-	/**
-	 * Sets the frame menu. This is a bound property.
-	 * @param newMenu The frame menu, or <code>null</code> if this frame does not have a menu.
-	 * @see FrameComponent#MENU_COMPONENT
-	 * @see #MENU_PROPERTY
-	 */
+	@Override
 	public void setMenu(final Menu newMenu) {
 		final Menu oldMenu = (Menu)setComponent(FrameComponent.MENU_COMPONENT, newMenu); //set the component
 		if(oldMenu != newMenu) { //if the component really changed
@@ -285,20 +237,12 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 		}
 	}
 
-	/**
-	 * @return The frame toolbar, or <code>null</code> if this frame does not have a toolbar.
-	 * @see FrameComponent#TOOLBAR_COMPONENT
-	 */
+	@Override
 	public Toolbar getToolbar() {
 		return (Toolbar)getComponent(FrameComponent.TOOLBAR_COMPONENT);
 	}
 
-	/**
-	 * Sets the frame toolbar. This is a bound property.
-	 * @param newToolbar The frame toolbar, or <code>null</code> if this frame does not have a toolbar.
-	 * @see FrameComponent#TOOLBAR_COMPONENT
-	 * @see #TOOLBAR_PROPERTY
-	 */
+	@Override
 	public void setToolbar(final Toolbar newToolbar) {
 		final Toolbar oldToolbar = (Toolbar)setComponent(FrameComponent.TOOLBAR_COMPONENT, newToolbar); //set the component
 		if(oldToolbar != newToolbar) { //if the component really changed
@@ -311,7 +255,8 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	private final DefaultPrototypeProvider defaultPrototypeProvider = new DefaultPrototypeProvider();
 
 	/** The strategy for processing prototypes provisions from child prototype providers, along with this frame's prototype provisions. */
-	private final FrameMenuToolPrototypeProvisionStrategy prototypeProvisionStrategy = new FrameMenuToolPrototypeProvisionStrategy(this, defaultPrototypeProvider);
+	private final FrameMenuToolPrototypeProvisionStrategy prototypeProvisionStrategy = new FrameMenuToolPrototypeProvisionStrategy(this,
+			defaultPrototypeProvider);
 
 	/** @return The strategy for processing prototypes provisions from child prototype providers, along with this frame's prototype provisions. */
 	protected FrameMenuToolPrototypeProvisionStrategy getPrototypeProvisionStrategy() {
@@ -321,20 +266,12 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	/** The action listener for closing the frame. */
 	private final ActionListener closeActionListener;
 
-	/**
-	 * @return The action control for closing the frame, or <code>null</code> if this frame does not have a close action control.
-	 * @see FrameComponent#CLOSE_ACTION_CONTROL
-	 */
+	@Override
 	public ActionControl getCloseActionControl() {
 		return (ActionControl)getComponent(FrameComponent.CLOSE_ACTION_CONTROL);
 	}
 
-	/**
-	 * Sets the action control for closing the frame. This is a bound property.
-	 * @param newCloseActionControl The action control for closing the frame, or <code>null</code> if this frame does not have a close action control.
-	 * @see FrameComponent#CLOSE_ACTION_CONTROL
-	 * @see Frame#CLOSE_ACTION_CONTROL_PROPERTY
-	 */
+	@Override
 	public void setCloseActionControl(final ActionControl newCloseActionControl) {
 		final ActionControl oldCloseActionControl = (ActionControl)setComponent(FrameComponent.CLOSE_ACTION_CONTROL, newCloseActionControl); //set the component
 		if(oldCloseActionControl != newCloseActionControl) { //if the component really changed
@@ -351,17 +288,12 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	/** The input focus strategy for this input focus group. */
 	private InputFocusStrategy inputFocusStrategy = new DefaultInputFocusStrategy();
 
-	/** @return The input focus strategy for this input focus group. */
+	@Override
 	public InputFocusStrategy getInputFocusStrategy() {
 		return inputFocusStrategy;
 	}
 
-	/**
-	 * Sets the input focus strategy. This is a bound property
-	 * @param newInputFocusStrategy The input focus strategy for this group.
-	 * @throws NullPointerException if the given input focus strategy is <code>null</code>.
-	 * @see #INPUT_FOCUS_STRATEGY_PROPERTY
-	 */
+	@Override
 	public void setInputFocusStrategy(final InputFocusStrategy newInputFocusStrategy) {
 		if(!inputFocusStrategy.equals(newInputFocusStrategy)) { //if the value is really changing
 			final InputFocusStrategy oldInputFocusStrategy = inputFocusStrategy; //get the old value
@@ -373,23 +305,12 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	/** The component within this group that has the input focus, or <code>null</code> if no component currently has the input focus. */
 	private InputFocusableComponent inputFocusedComponent = null;
 
-	/**
-	 * Indicates the component within this group that has the input focus. The focused component may be another {@link InputFocusGroupComponent}, which in turn
-	 * will have its own focused component.
-	 * @return The component within this group that has the input focus, or <code>null</code> if no component currently has the input focus.
-	 */
+	@Override
 	public InputFocusableComponent getInputFocusedComponent() {
 		return inputFocusedComponent;
 	}
 
-	/**
-	 * Sets the focused component within this input focus group. This is a bound property.
-	 * @param newInputFocusedComponent The component to receive the input focus.
-	 * @throws PropertyVetoException if the given component is not a focusable component within this input focus group, the component cannot receive the input
-	 *           focus, or the input focus change has otherwise been vetoed.
-	 * @see #getInputFocusStrategy()
-	 * @see #INPUT_FOCUSED_COMPONENT_PROPERTY
-	 */
+	@Override
 	public void setInputFocusedComponent(final InputFocusableComponent newInputFocusedComponent) throws PropertyVetoException {
 		if(!Objects.equals(inputFocusedComponent, newInputFocusedComponent)) { //if the value is really changing
 			final InputFocusStrategy oldInputFocusedComponent = inputFocusStrategy; //get the old value
@@ -401,7 +322,7 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	/** The action prototype for closing the frame. */
 	private final ActionPrototype closeActionPrototype;
 
-	/** @return The action prototype for closing the frame. */
+	@Override
 	public ActionPrototype getCloseActionPrototype() {
 		return closeActionPrototype;
 	}
@@ -414,9 +335,11 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 		super(FrameComponent.values()); //construct the parent class
 		closeActionListener = new ActionListener() { //create an action listener for closing
 
+			@Override
 			public void actionPerformed(final ActionEvent actionEvent) { //if the close action is initiated
 				close(); //close the frame
 			}
+
 		};
 
 		//close action prototype
@@ -435,12 +358,7 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 		updateDefaultPrototypeProvisions(); //update the prototype provisions
 	}
 
-	/**
-	 * Opens the frame with the currently set modality. Opening the frame registers the frame with the application frame. If the frame is already open, no action
-	 * occurs.
-	 * @see #getState()
-	 * @see Frame#STATE_PROPERTY
-	 */
+	@Override
 	public void open() {
 		if(getState() == State.CLOSED) { //if the state is closed
 			final ApplicationFrame applicationFrame = getSession().getApplicationFrame(); //get the application frame
@@ -451,44 +369,24 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 		}
 	}
 
-	/**
-	 * Opens the frame, specifying modality. Opening the frame registers the frame with the session. If the frame is already open, no action occurs.
-	 * @param modal <code>true</code> if the frame should be opened as a modal frame, else <code>false</code>.
-	 * @see #getState()
-	 * @see Frame#STATE_PROPERTY
-	 */
+	@Override
 	public void open(final boolean modal) {
 		setModal(modal); //update the modality
 		open(); //open the frame normally
 	}
 
-	/**
-	 * Opens the frame as modal and installs the given property change listener to listen for the mode changing. This is a convenience method that adds the
-	 * {@link ModalComponent#MODE_PROPERTY} change listener using {@link #addPropertyChangeListener(String, PropertyChangeListener)} and then calls
-	 * {@link #open(boolean)} with a value of <code>true</code>.
-	 * @param modeChangeListener The mode property change listener to add.
-	 * @see ModalComponent#MODE_PROPERTY
-	 */
+	@Override
 	public void open(final GenericPropertyChangeListener<Mode> modeChangeListener) {
 		addPropertyChangeListener(MODE_PROPERTY, modeChangeListener); //add the mode property change listener
 		open(true); //open modally
 	}
 
-	/**
-	 * Determines whether the frame should be allowed to close. This implementation returns <code>true</code>. This method is called from {@link #close()}.
-	 * @return <code>true</code> if the frame should be allowed to close.
-	 */
+	@Override
 	public boolean canClose() {
 		return true; //by default always allow the frame to be closed
 	}
 
-	/**
-	 * Closes the frame. Closing the frame unregisters the frame with the session. If the frame is already closed, no action occurs. This method calls
-	 * {@link #canClose()} and only performs closing functionality if that method returns <code>true</code>. This method delegates actual closing to
-	 * {@link #closeImpl()}, and that method should be overridden rather than this one.
-	 * @see #getState()
-	 * @see Frame#STATE_PROPERTY
-	 */
+	@Override
 	public final void close() {
 		if(getState() != State.CLOSED) { //if the frame is not already closed
 			if(canClose()) { //if the frame can close
@@ -507,11 +405,7 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 		setState(State.CLOSED); //change the state
 	}
 
-	/**
-	 * Validates the user input of this component and all child components. The component will be updated with error information. The user is also notified of any
-	 * error, using this component's notification, the first notification in the content component, or a default message.
-	 * @return The current state of {@link #isValid()} as a convenience.
-	 */
+	@Override
 	public boolean validate() {
 		if(!super.validate()) { //validate the component normally; if the component does not validate
 			Notification notification = getNotification(); //see if this panel has any notification
@@ -555,12 +449,7 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	 */
 	protected class DefaultPrototypeProvider extends AbstractPrototypeProvider {
 
-		/**
-		 * Provides prototype provisions. This method is usually used internally to provide prototype provisions to be set using
-		 * {@link #setPrototypeProvisions(Set)}. Subclasses may override this method to add or modify the provided prototype provisions. This method delegates to
-		 * {@link AbstractFrame#provideDefaultPrototypes()}.
-		 * @return A mutable set of prototype provisions.
-		 */
+		@Override
 		protected Set<PrototypeProvision<?>> providePrototypes() {
 			return provideDefaultPrototypes(); //return the frame's default prototypes
 		}

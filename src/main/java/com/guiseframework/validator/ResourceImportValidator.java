@@ -220,14 +220,15 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 	}
 
 	/**
-	 * Determines whether a given resource import meets the provided criteria. This version delgates to the super class version to determine whether
-	 * <code>null</code> values are allowed.
-	 * @param resourceImport The resource import to validate, which may be <code>null</code>.
-	 * @throws ValidationException if the provided value is not valid.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version delegates to the super class version to determine whether <code>null</code> values are allowed.
+	 * </p>
 	 * @see #getAcceptedContentTypes()
 	 * @see #getAcceptedExtensions()
 	 * @see #getMaxContentLength()
 	 */
+	@Override
 	public void validate(final ResourceImport resourceImport) throws ValidationException {
 		Log.trace("ready to validate resource import", resourceImport);
 		super.validate(resourceImport); //do the default validation
@@ -271,11 +272,12 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 	}
 
 	/**
-	 * Retrieves a string representation of the given value appropriate for error messages. This version returns the resource import name, if present; otherwise
-	 * the simple name of the class instance.
-	 * @param resourceImport The value for which a string representation should be returned.
-	 * @return A string representation of the given value.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version returns the resource import name, if present; otherwise the simple name of the class instance.
+	 * </p>
 	 */
+	@Override
 	protected String toString(final ResourceImport resourceImport) {
 		final String name = resourceImport.getName(); //get the name of the resource to be imported
 		return name != null ? name : getSimpleName(resourceImport.getClass()); //return the name of the resource or the simple name of the class if the resource has no name

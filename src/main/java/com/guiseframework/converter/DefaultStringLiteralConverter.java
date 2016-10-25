@@ -50,13 +50,14 @@ public class DefaultStringLiteralConverter<V> extends AbstractStringLiteralConve
 	}
 
 	/**
-	 * Converts a literal representation of a value from the lexical space into a value in the value space. This implementation converts from a string literal to
-	 * an object using a string constructor, or if one is not present, the first constructor with a single parameter that is type-compatible with {@link String},
-	 * such as {@link CharSequence}. If there is no string-compatible constructor, a {@link ConversionException} is thrown.
-	 * @param literal The literal value in the lexical space to convert.
-	 * @return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
-	 * @throws ConversionException if the literal value cannot be converted.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation converts from a string literal to an object using a string constructor, or if one is not present, the first constructor with a single
+	 * parameter that is type-compatible with {@link String}, such as {@link CharSequence}. If there is no string-compatible constructor, a
+	 * {@link ConversionException} is thrown.
+	 * </p>
 	 */
+	@Override
 	public V convertLiteral(final String literal) throws ConversionException {
 		if(literal == null) { //if the literal is null
 			return null; //the value is null

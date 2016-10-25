@@ -49,10 +49,7 @@ public class WebCustomButtonDepictor<C extends ActionControl> extends AbstractWe
 		super(XHTML_NAMESPACE_URI, ELEMENT_A); //represent <xhtml:a>
 	}
 
-	/**
-	 * Begins the rendering process.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context

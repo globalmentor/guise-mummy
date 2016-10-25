@@ -59,10 +59,13 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 	}
 
 	/**
-	 * Determines the local name of the body XML element. This version returns the local name of the XHTML <code>&lt;input&gt;</code> element if exactly one row
-	 * is specified, otherwise the local name of the XHTML <code>&lt;textarea&gt;</code>.
-	 * @return The local name of the element with no prefix, or <code>null</code> if this component should not be rendered as an element.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version returns the local name of the XHTML <code>&lt;input&gt;</code> element if exactly one row is specified, otherwise the local name of the XHTML
+	 * <code>&lt;textarea&gt;</code>.
+	 * </p>
 	 */
+	@Override
 	public String getBodyLocalName() {
 		final C component = getDepictedObject(); //get the component being depicted
 		/*TODO XStandard
@@ -74,11 +77,13 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 	}
 
 	/**
-	 * Determines whether an empty body element can be created if there is no content. This version returns <code>true</code> for <code>&lt;input&gt;</code> and
-	 * <code>false</code> for <code>&lt;textarea&gt;</code>.
-	 * @return Whether an empty body element can be created if there is no content.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version returns <code>true</code> for <code>&lt;input&gt;</code> and <code>false</code> for <code>&lt;textarea&gt;</code>.
+	 * </p>
 	 * @see #getBodyLocalName()
 	 */
+	@Override
 	public boolean isEmptyBodyElementAllowed() {
 		return ELEMENT_INPUT.equals(getBodyLocalName()); //only allow an empty element for <xhtml:input> (IE6 and IE7 breaks on an empty <textarea> element)
 	}
@@ -91,11 +96,7 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 		return getDepictedObject().isMasked() ? INPUT_TYPE_PASSWORD : INPUT_TYPE_TEXT; //if this is a masked component, use a password input 
 	}
 
-	/**
-	 * Processes an event from the platform.
-	 * @param event The event to be processed.
-	 * @throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
-	 */
+	@Override
 	public void processEvent(final PlatformEvent event) {
 		if(event instanceof WebChangeDepictEvent) { //if a property changed
 			final WebChangeDepictEvent webChangeEvent = (WebChangeDepictEvent)event; //get the web change event
@@ -154,10 +155,7 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 		super.processEvent(event); //do the default event processing
 	}
 
-	/**
-	 * Begins the rendering process.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
@@ -237,10 +235,7 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 		//TODO del Log.trace("*****getting ready to update text input view; modified properties are:", getModifiedProperties());
 	}
 
-	/**
-	 * Renders the body of the component.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictBody() throws IOException {
 		super.depictBody(); //render the default main part of the component
 		final String bodyLocalName = getBodyLocalName(); //see which type of element we are rendering
@@ -254,10 +249,13 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 	}
 
 	/**
-	 * Writes the ending part of the outer decorator element. This version writes a dummy element for rich text editing if needed
-	 * @throws IOException if there is an error rendering the component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version writes a dummy element for rich text editing if needed.
+	 * </p>
 	 * @see #writeErrorMessage()
 	 */
+	@Override
 	protected void writeDecoratorEnd() throws IOException {
 		if(isHTML(getDepictedObject().getValueContentType())) { //if the content is HTML, create the dummy elements needed by the client-side editor
 			final WebDepictContext depictContext = getDepictContext(); //get the depict context

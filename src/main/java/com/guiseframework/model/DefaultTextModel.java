@@ -32,16 +32,12 @@ public class DefaultTextModel extends AbstractModel implements TextModel {
 	/** The text, which may include a resource reference, or <code>null</code> if there is no text. */
 	private String text;
 
-	/** @return The text, which may include a resource reference, or <code>null</code> if there is no text. */
+	@Override
 	public String getText() {
 		return text;
 	}
 
-	/**
-	 * Sets the text. This is a bound property.
-	 * @param newText The new text, which may include a resource reference.
-	 * @see #TEXT_PROPERTY
-	 */
+	@Override
 	public void setText(final String newText) {
 		if(!Objects.equals(text, newText)) { //if the value is really changing
 			final String oldText = text; //get the old value
@@ -53,18 +49,12 @@ public class DefaultTextModel extends AbstractModel implements TextModel {
 	/** The content type of the text. */
 	private ContentType textContentType;
 
-	/** @return The content type of the text. */
+	@Override
 	public ContentType getTextContentType() {
 		return textContentType;
 	}
 
-	/**
-	 * Sets the content type of the text. This is a bound property.
-	 * @param newTextContentType The new text content type.
-	 * @throws NullPointerException if the given content type is <code>null</code>.
-	 * @throws IllegalArgumentException if the given content type is not a text content type.
-	 * @see #TEXT_CONTENT_TYPE_PROPERTY
-	 */
+	@Override
 	public void setTextContentType(final ContentType newTextContentType) {
 		checkInstance(newTextContentType, "Content type cannot be null.");
 		if(textContentType != newTextContentType) { //if the value is really changing

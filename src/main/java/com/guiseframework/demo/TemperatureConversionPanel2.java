@@ -38,15 +38,17 @@ public class TemperatureConversionPanel2 extends LayoutPanel {
 	private CheckControl celsiusCheckControl;
 	private CheckControl fahrenheitCheckControl;
 
-	/** Initializes the component after construction. */
+	@Override
 	public void initialize() {
 		temperatureInput = (TextControl<Double>)AbstractComponent.getComponentByName(this, "temperatureInput"); //get a reference to the temperature input
 		temperatureInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Double>() { //listen for temperature changes
 
-					public void propertyChange(final GenericPropertyChangeEvent<Double> propertyChangeEvent) { //if the input temperature changes
-						convertTemperature(); //convert the temperature						
-					}
-				});
+			@Override
+			public void propertyChange(final GenericPropertyChangeEvent<Double> propertyChangeEvent) { //if the input temperature changes
+				convertTemperature(); //convert the temperature						
+			}
+
+		});
 		temperatureOutput = (TextControl<Double>)AbstractComponent.getComponentByName(this, "temperatureOutput"); //get a reference to the temperature output for displaying results
 		celsiusCheckControl = (CheckControl)AbstractComponent.getComponentByName(this, "celsiusCheckControl"); //get the check control for the Celsius scale
 		try {
@@ -60,11 +62,13 @@ public class TemperatureConversionPanel2 extends LayoutPanel {
 		//create a listener to listen for check control changes and update the temperature immediately (e.g. with AJAX on the web platform)
 		final GenericPropertyChangeListener<Boolean> checkControlListener = new AbstractGenericPropertyChangeListener<Boolean>() {
 
+			@Override
 			public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent) {
 				if(propertyChangeEvent.getNewValue()) { //if this check control was selected
 					convertTemperature(); //convert the temperature							
 				}
 			}
+
 		};
 		celsiusCheckControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, checkControlListener); //listen for the Celsius control changing
 		fahrenheitCheckControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, checkControlListener); //listen for the Fahrenheit control changing
@@ -72,10 +76,12 @@ public class TemperatureConversionPanel2 extends LayoutPanel {
 		final Button convertButton = (Button)AbstractComponent.getComponentByName(this, "conversionButton"); //get the button for initiating the conversion
 		convertButton.addActionListener(new ActionListener() { //when the convert button is pressed
 
-					public void actionPerformed(ActionEvent actionEvent) { //convert the temperature in the input field and place the result in the output field
-						convertTemperature(); //convert the temperature
-					}
-				});
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) { //convert the temperature in the input field and place the result in the output field
+				convertTemperature(); //convert the temperature
+			}
+
+		});
 	}
 
 	/** Converts the temperature based upon the current UI values. */

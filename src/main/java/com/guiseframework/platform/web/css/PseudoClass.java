@@ -42,31 +42,29 @@ public class PseudoClass implements SimpleSelector, Comparable<PseudoClass> {
 		this.pseudoClassName = checkInstance(pseudoClassName, "Pseudo class name cannot be null.");
 	}
 
-	/** @return A hash code for this object. */
+	@Override
 	public int hashCode() {
 		return getPseudoClassName().hashCode();
 	}
 
-	/**
-	 * Determines whether this object is equivalent to another object.
-	 * @param object The object to compare with this object.
-	 * @return <code>true</code> if this object is equivalent to the given object.
-	 */
+	@Override
 	public boolean equals(final Object object) {
 		return object instanceof PseudoClass && getPseudoClassName().equals(((PseudoClass)object).getPseudoClassName());
 	}
 
-	/** @return A string representation of this object. */
+	@Override
 	public String toString() {
 		return new StringBuilder().append(PSEUDO_CLASS_DELIMITER).append(getPseudoClassName()).toString();
 	}
 
 	/**
-	 * Compares this object with the specified object for order. This implementation compares pseudo-class names. Returns a negative integer, zero, or a positive
-	 * integer as this object is less than, equal to, or greater than the specified object.
-	 * @param object The object to be compared.
-	 * @return A negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation compares pseudo-class names. Returns a negative integer, zero, or a positive integer as this object is less than, equal to, or greater
+	 * than the specified object.
+	 * </p>
 	 */
+	@Override
 	public int compareTo(final PseudoClass object) {
 		return getPseudoClassName().compareTo(object.getPseudoClassName()); //compare pseudo-class names
 	}

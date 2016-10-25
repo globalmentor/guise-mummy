@@ -45,24 +45,24 @@ public class CalendarStringLiteralConverter extends AbstractDateStringLiteralCon
 	}
 
 	/**
-	 * Converts a value from the value space to a literal value in the lexical space. This implementation converts the value using the date format object. This
-	 * implementation synchronizes on the {@link DateFormat} instance.
-	 * @param value The value in the value space to convert.
-	 * @return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>.
-	 * @throws ConversionException if the value cannot be converted.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation converts the value using the date format object. This implementation synchronizes on the {@link DateFormat} instance.
+	 * </p>
 	 * @see #getDateFormat()
 	 */
+	@Override
 	public String convertValue(final Calendar value) throws ConversionException {
 		return value != null ? convertDateValue(value.getTime()) : null; //convert the value from the calendar's time
 	}
 
 	/**
-	 * Converts a literal representation of a value from the lexical space into a value in the value space. This implementation converts the empty string to a
-	 * <code>null</code> value.
-	 * @param literal The literal value in the lexical space to convert.
-	 * @return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
-	 * @throws ConversionException if the literal value cannot be converted.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation converts the empty string to a <code>null</code> value.
+	 * </p>
 	 */
+	@Override
 	public Calendar convertLiteral(final String literal) throws ConversionException {
 		final Date date = convertDateLiteral(literal); //convert the literal to a date
 		if(date != null) { //if there is a date

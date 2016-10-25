@@ -74,7 +74,10 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 	}
 
 	/**
-	 * {@inheritDoc} This method does appropriate layout based upon the container's layout definition.
+	 * {@inheritDoc}
+	 * <p>
+	 * This method does appropriate layout based upon the container's layout definition.
+	 * </p>
 	 * @see Container#getLayout()
 	 */
 	@Override

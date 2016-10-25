@@ -132,11 +132,7 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 		}
 	*/
 
-	/**
-	 * Processes an event from the platform.
-	 * @param event The event to be processed.
-	 * @throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
-	 */
+	@Override
 	public void processEvent(final PlatformEvent event) {
 		if(event instanceof WebActionDepictEvent) { //if this is an action control event
 			final WebActionDepictEvent webActionEvent = (WebActionDepictEvent)event; //get the action control event
@@ -195,10 +191,6 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 		return styleIDs; //return the style IDs
 	}
 
-	/**
-	 * Updates the views of any children.
-	 * @throws IOException if there is an error updating the child views.
-	 */
 	protected void depictChildren() throws IOException {
 		//TODO add "root" class
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context

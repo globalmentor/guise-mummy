@@ -41,9 +41,12 @@ public class WebPictureDepictor<C extends Picture> extends AbstractWebComponentD
 	}
 
 	/**
-	 * Retrieves the styles for the body element of the component. This version sets the opacity if necessary, and adds layout fixes for images within tables.
-	 * @return The styles for the body element of the component, mapped to CSS property names.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version sets the opacity if necessary, and adds layout fixes for images within tables.
+	 * </p>
 	 */
+	@Override
 	protected Map<String, Object> getBodyStyles() {
 		final Map<String, Object> styles = super.getBodyStyles(); //get the default body styles
 		final double opacity = getDepictedObject().getImageOpacity(); //get the image opacity
@@ -54,9 +57,12 @@ public class WebPictureDepictor<C extends Picture> extends AbstractWebComponentD
 	}
 
 	/**
-	 * Begins the rendering process. This version wraps the component in a decorator element.
-	 * @throws IOException if there is an error rendering the component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version wraps the component in a decorator element.
+	 * </p>
 	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		final GuiseSession session = getSession(); //get the session
@@ -82,9 +88,12 @@ public class WebPictureDepictor<C extends Picture> extends AbstractWebComponentD
 	}
 
 	/**
-	 * Ends the rendering process. This version renders the caption, if any, and closes the decorator elements.
-	 * @throws IOException if there is an error rendering the component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version renders the caption, if any, and closes the decorator elements.
+	 * </p>
 	 */
+	@Override
 	protected void depictEnd() throws IOException {
 		final GuiseSession session = getSession(); //get the session
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context

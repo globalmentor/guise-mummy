@@ -49,10 +49,13 @@ public class DefaultListSelectEditor<V> extends AbstractListSelectEditor<V> {
 	}
 
 	/**
-	 * Creates a new value to add to the list. This implementation instantiates a default instance of the list select model's value class.
-	 * @return A new default value to add.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation instantiates a default instance of the list select model's value class.
+	 * </p>
 	 * @see ListSelectModel#getValueClass()
 	 */
+	@Override
 	protected V createValue() {
 		try {
 			return getListSelectModel().getValueClass().newInstance(); //return a new instance of the list select model's value class
@@ -64,10 +67,13 @@ public class DefaultListSelectEditor<V> extends AbstractListSelectEditor<V> {
 	}
 
 	/**
-	 * Creates a component for editing a value. This version creates a new valued component from the valued component class.
-	 * @return A component for editing the value.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version creates a new valued component from the valued component class.
+	 * </p>
 	 * @see #getValuedComponentClass()
 	 */
+	@Override
 	protected ValuedComponent<V> createValuedComponent() {
 		try {
 			return getValuedComponentClass().newInstance(); //return a new instance of the valued component class

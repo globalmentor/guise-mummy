@@ -44,7 +44,12 @@ public class WebPanelDepictor<C extends Panel> extends WebLayoutComponentDepicto
 		getIgnoredProperties().add(Panel.LABEL_PROPERTY); //ignore Panel.label by default, because panels are large objects with many children but most do not show labels
 	}
 
-	/** {@inheritDoc} This version returns special section elements if the component is a {@link SectionComponent} with a non-<code>null</code> section type. */
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This version returns special section elements if the component is a {@link SectionComponent} with a non-<code>null</code> section type.
+	 * </p>
+	 */
 	@Override
 	public String getLocalName() {
 		final C component = getDepictedObject(); //get the component

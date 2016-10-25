@@ -38,17 +38,12 @@ public class Toolbar extends AbstractPanel implements LabelDisplayableComponent 
 	/** Whether the icon is displayed. */
 	private boolean iconDisplayed = true;
 
-	/** @return Whether the icon is displayed. */
+	@Override
 	public boolean isIconDisplayed() {
 		return iconDisplayed;
 	}
 
-	/**
-	 * Sets whether the icon is displayed. This is a bound property of type <code>Boolean</code>.
-	 * @param newIconDisplayed <code>true</code> if the icon should be displayed, else <code>false</code> if the icon should not be displayed and take up no
-	 *          space.
-	 * @see #ICON_DISPLAYED_PROPERTY
-	 */
+	@Override
 	public void setIconDisplayed(final boolean newIconDisplayed) {
 		if(iconDisplayed != newIconDisplayed) { //if the value is really changing
 			final boolean oldIconDisplayed = iconDisplayed; //get the current value
@@ -60,17 +55,12 @@ public class Toolbar extends AbstractPanel implements LabelDisplayableComponent 
 	/** Whether the label is displayed. */
 	private boolean labelDisplayed = false;
 
-	/** @return Whether the label is displayed. */
+	@Override
 	public boolean isLabelDisplayed() {
 		return labelDisplayed;
 	}
 
-	/**
-	 * Sets whether the label is displayed. This is a bound property of type <code>Boolean</code>.
-	 * @param newLabelDisplayed <code>true</code> if the label should be displayed, else <code>false</code> if the label should not be displayed and take up no
-	 *          space.
-	 * @see #LABEL_DISPLAYED_PROPERTY
-	 */
+	@Override
 	public void setLabelDisplayed(final boolean newLabelDisplayed) {
 		if(labelDisplayed != newLabelDisplayed) { //if the value is really changing
 			final boolean oldLabelDisplayed = labelDisplayed; //get the current value
@@ -103,6 +93,7 @@ public class Toolbar extends AbstractPanel implements LabelDisplayableComponent 
 					}
 				}
 			}
+
 		};
 		//update the child components' icon/label displayed status when the toolbar's icon and/or label displayed status changes
 		addPropertyChangeListener(ICON_DISPLAYED_PROPERTY, labelDisplayedPropertyChangeListener);
@@ -110,19 +101,22 @@ public class Toolbar extends AbstractPanel implements LabelDisplayableComponent 
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * <p>
 	 * Creates a component appropriate for the context of this component from the given prototype. This version creates the following components, in order of
 	 * priority:
+	 * </p>
 	 * <dl>
 	 * <dt>{@link ActionPrototype}</dt>
 	 * <dd>{@link ToolButton}</dd>
 	 * <dt>{@link TogglePrototype}</dt>
 	 * <dd>{@link BooleanSelectToolButton}</dd>
 	 * </dl>
+	 * <p>
 	 * After creating a component, this version displays or hides the label as appropriate.
-	 * @param prototype The prototype of the component to create.
-	 * @return A new component based upon the given prototype.
-	 * @throws IllegalArgumentException if no component can be created from the given prototype
+	 * </p>
 	 */
+	@Override
 	public Component createComponent(final Prototype prototype) {
 		final Component component;
 		if(prototype instanceof ActionPrototype) { //action prototypes

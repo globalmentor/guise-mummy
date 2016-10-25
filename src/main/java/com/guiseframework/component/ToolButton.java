@@ -73,21 +73,16 @@ public class ToolButton extends AbstractButtonControl implements ToolButtonContr
 		this(actionPrototype, actionPrototype, actionPrototype); //use the action prototype as every needed model
 		addMouseListener(new MouseAdapter() { //listen for the mouse over the control TODO eventually promote this (with modified logic for menus) to the tops of all action control hierarchy, as we already ignore rollover change unless needed
 
-			/**
-			 * Called when the mouse enters the target.
-			 * @param mouseEvent The event providing mouse information
-			 */
+			@Override
 			public void mouseEntered(final MouseEnterEvent mouseEvent) {
 				setRollover(true); //turn on the rollover state
 			}
 
-			/**
-			 * Called when the mouse exits the target.
-			 * @param mouseEvent The event providing mouse information
-			 */
+			@Override
 			public void mouseExited(final MouseExitEvent mouseEvent) {
 				setRollover(false); //turn off the rollover state
 			}
+
 		});
 	}
 

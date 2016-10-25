@@ -41,10 +41,13 @@ public abstract class DynamicTreeNodeModel<V> extends DefaultTreeNodeModel<V> { 
 	private Boolean isLeaf = null;
 
 	/**
-	 * Returns whether this node could be considered a leaf node. //TODO comment This implementation <code>true</code> if child nodes are not loaded and this is
-	 * not a predictive dynamic tree node.
-	 * @return <code>true</code> if this is a leaf node, else <code>false</code> if this node should not be considered a leaf.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation <code>true</code> if child nodes are not loaded and this is not a predictive dynamic tree node.
+	 * </p>
+	 * TODO comment
 	 */
+	@Override
 	public boolean isLeaf() {
 		synchronized(this) { //synchronize access to the isLeaf variable
 			if(isLeaf == null) { //if we haven't yet determined if this resource has children
@@ -54,13 +57,7 @@ public abstract class DynamicTreeNodeModel<V> extends DefaultTreeNodeModel<V> { 
 		return isLeaf.booleanValue(); //return the leaf determination
 	}
 
-	/**
-	 * Sets whether the node is expanded, showing its children, if any. This version ensures that child nodes are loaded or unloaded before expansion or
-	 * collapsing occurs. This version updates the cached leaf determination if children are loaded in this method. This is a bound property of type
-	 * <code>Boolean</code>.
-	 * @param newExpanded <code>true</code> if the node is expanded
-	 * @see #EXPANDED_PROPERTY
-	 */
+	@Override
 	public void setExpanded(final boolean newExpanded) {
 		synchronized(this) { //synchronize access to the dynamic variables variable
 			if(newExpanded != isExpanded())
@@ -124,8 +121,12 @@ public abstract class DynamicTreeNodeModel<V> extends DefaultTreeNodeModel<V> { 
 	*/
 
 	/**
-	 * Removes all of the child tree nodes from this tree node. This version resets the children determined status.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version resets the children determined status.
+	 * </p>
 	 */
+	@Override
 	public void clear() {
 		synchronized(this) { //make thread-safe our dynamic variable access
 			super.clear(); //clear the model

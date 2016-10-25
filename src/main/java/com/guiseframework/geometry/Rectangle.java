@@ -131,17 +131,18 @@ public class Rectangle {
 		}
 	}
 
-	/** @return A hash code value for the object. */
+	@Override
 	public int hashCode() {
 		return Objects.getHashCode(getPosition(), getSize()); //determine the hash code
 	}
 
 	/**
-	 * Indicates whether some other object is "equal to" this one. This implementation returns whether the object is another rectangle with equivalent position
-	 * and size.
-	 * @param object The reference object with which to compare.
-	 * @return <code>true</code> if this object is equivalent to the given object.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation returns whether the object is another rectangle with equivalent position and size.
+	 * </p>
 	 */
+	@Override
 	public boolean equals(final Object object) {
 		if(object instanceof Rectangle) { //if the object is an rectangle
 			final Rectangle rectangle = (Rectangle)object; //get the object as a rectangle
@@ -150,7 +151,7 @@ public class Rectangle {
 		return false; //the object did not match this point
 	}
 
-	/** @return A string representation of the object. */
+	@Override
 	public final String toString() {
 		return "{" + getPosition() + ", " + getSize() + "}"; //"{[x, y, z], [width, depth, height]}"
 	}

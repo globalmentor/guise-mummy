@@ -27,16 +27,18 @@ import com.guiseframework.component.*;
  */
 public class EventWizardPanel2 extends LayoutPanel {
 
-	/** Initializes the component after construction. */
+	@Override
 	public void initialize() {
 		final SequenceCardPanel wizardCardPanel = (SequenceCardPanel)getComponentByName(this, "wizardCardPanel");
 		final Panel personalAgePanel = (Panel)getComponentByName(this, "personalAgePanel");
 		final CheckControl ageCheckControl = (CheckControl)getComponentByName(this, "ageCheckControl");
 		ageCheckControl.addPropertyChangeListener(CheckControl.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>() {
 
+			@Override
 			public void propertyChange(GenericPropertyChangeEvent<Boolean> propertyChangeEvent) { //if the age checkbox changes
 				wizardCardPanel.setDisplayed(personalAgePanel, propertyChangeEvent.getNewValue()); //show or hide the age panel based upon the state of the age checkbox
 			}
+
 		});
 		final LayoutPanel wizardButtonPanel = (LayoutPanel)getComponentByName(this, "wizardButtonPanel");
 		final Button previousButton = new Button(wizardCardPanel.getPreviousActionPrototype());

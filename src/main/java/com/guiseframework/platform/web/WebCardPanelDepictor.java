@@ -36,11 +36,12 @@ public class WebCardPanelDepictor<C extends AbstractCardPanel> extends AbstractW
 	}
 
 	/**
-	 * Begins the rendering process. This version wraps the component in a decorator element and writes tabs. Each tab link is given an href of
-	 * "?<var>tabbedPaneID</var>=<var>tabID</var>".
-	 * @throws IOException if there is an error rendering the component.
-	 * @throws IllegalArgumentException if the given value control represents a value type this controller doesn't support.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version wraps the component in a decorator element and writes tabs. Each tab link is given an href of "?<var>tabbedPaneID</var>=<var>tabID</var>".
+	 * </p>
 	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		writeIDClassAttributes(null, null); //write the ID and class attributes with no prefixes or suffixes
@@ -50,9 +51,12 @@ public class WebCardPanelDepictor<C extends AbstractCardPanel> extends AbstractW
 	}
 
 	/**
-	 * Ends the rendering process. This version closes the decorator elements.
-	 * @throws IOException if there is an error rendering the component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version closes the decorator elements.
+	 * </p>
 	 */
+	@Override
 	protected void depictEnd() throws IOException {
 		getDepictContext().writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV); //</xhtml:div> (component-body)
 		writeErrorMessage(); //write the error message, if any

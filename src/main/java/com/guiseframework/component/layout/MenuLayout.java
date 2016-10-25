@@ -22,7 +22,7 @@ package com.guiseframework.component.layout;
  */
 public class MenuLayout extends AbstractFlowLayout<MenuConstraints> { //TODO probably move this into the menu class
 
-	/** @return The class representing the type of constraints appropriate for this layout. */
+	@Override
 	public Class<? extends MenuConstraints> getConstraintsClass() {
 		return MenuConstraints.class;
 	}
@@ -36,11 +36,7 @@ public class MenuLayout extends AbstractFlowLayout<MenuConstraints> { //TODO pro
 		super(flow, false); //construct the parent class, specifying no wrapping
 	}
 
-	/**
-	 * Creates default constraints for the container.
-	 * @return New default constraints for the container.
-	 * @throws IllegalStateException if this layout does not support default constraints.
-	 */
+	@Override
 	public MenuConstraints createDefaultConstraints() {
 		return new MenuConstraints(); //return a default constraints object
 	}

@@ -41,7 +41,7 @@ public abstract class AbstractLayoutControl extends AbstractLayoutComponent impl
 	/** The status of the current user input, or <code>null</code> if there is no status to report. */
 	private Status status = null;
 
-	/** @return The status of the current user input, or <code>null</code> if there is no status to report. */
+	@Override
 	public Status getStatus() {
 		return status;
 	}
@@ -87,20 +87,19 @@ public abstract class AbstractLayoutControl extends AbstractLayoutComponent impl
 	}
 
 	/**
-	 * Rechecks user input validity of this component and all child components, and updates the valid state. This version also updates the status.
-	 * @see #setValid(boolean)
+	 * {@inheritDoc}
+	 * <p>
+	 * This version also updates the status.
+	 * </p>
 	 * @see #updateStatus()
 	 */
+	@Override
 	protected void updateValid() {
 		super.updateValid(); //update validity normally
 		updateStatus(); //update user input status
 	}
 
-	/**
-	 * Sets the component notification. This version updates the component status if the notification changes. This is a bound property.
-	 * @param newNotification The notification for the component, or <code>null</code> if no notification is associated with this component.
-	 * @see #NOTIFICATION_PROPERTY
-	 */
+	@Override
 	public void setNotification(final Notification newNotification) {
 		final Notification oldNotification = getNotification(); //get the old notification
 		super.setNotification(newNotification); //update the old notification normally
@@ -110,9 +109,13 @@ public abstract class AbstractLayoutControl extends AbstractLayoutComponent impl
 	}
 
 	/**
-	 * Resets the control to its default value. This version clears any notification.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version clears any notification.
+	 * </p>
 	 * @see #setNotification(Notification)
 	 */
+	@Override
 	public void reset() {
 		setNotification(null); //clear any notification
 	}
@@ -141,11 +144,14 @@ public abstract class AbstractLayoutControl extends AbstractLayoutComponent impl
 		}
 		addPropertyChangeListener(ENABLED_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>() { //listen for the "enabled" property changing
 
-					public void propertyChange(final GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent) { //if the "enabled" property changes
-						assert genericPropertyChangeEvent.getOldValue() != null && genericPropertyChangeEvent.getNewValue() != null : "The enabled property does not support null.";
-						enabledPropertyChange(genericPropertyChangeEvent.getOldValue().booleanValue(), genericPropertyChangeEvent.getNewValue().booleanValue()); //delegate to our enabled property change method
-					}
-				});
+			@Override
+			public void propertyChange(final GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent) { //if the "enabled" property changes
+				assert genericPropertyChangeEvent.getOldValue() != null
+						&& genericPropertyChangeEvent.getNewValue() != null : "The enabled property does not support null.";
+				enabledPropertyChange(genericPropertyChangeEvent.getOldValue().booleanValue(), genericPropertyChangeEvent.getNewValue().booleanValue()); //delegate to our enabled property change method
+			}
+
+		});
 	}
 
 	/**
@@ -162,16 +168,12 @@ public abstract class AbstractLayoutControl extends AbstractLayoutComponent impl
 
 	//Enableable delegations
 
-	/** @return Whether the control is enabled and can receive user input. */
+	@Override
 	public boolean isEnabled() {
 		return enableable.isEnabled();
 	}
 
-	/**
-	 * Sets whether the control is enabled and and can receive user input. This is a bound property of type <code>Boolean</code>.
-	 * @param newEnabled <code>true</code> if the control should indicate and accept user input.
-	 * @see Enableable#ENABLED_PROPERTY
-	 */
+	@Override
 	public void setEnabled(final boolean newEnabled) {
 		enableable.setEnabled(newEnabled);
 	}

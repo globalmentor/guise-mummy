@@ -41,7 +41,7 @@ public abstract class AbstractObjectTransferable<S> implements Transferable<S> {
 	/** The source of the transferable data. */
 	private final S source;
 
-	/** @return The source of the transferable data. */
+	@Override
 	public S getSource() {
 		return source;
 	}
@@ -89,22 +89,24 @@ public abstract class AbstractObjectTransferable<S> implements Transferable<S> {
 	}
 
 	/**
-	 * Determines whether this transferable can transfer data with the given content type. This implementation matches a content type against the
-	 * {@value ContentType#APPLICATION_PRIMARY_TYPE} primary type and {@value ContentType#X_JAVA_OBJECT} subtype, with a "class" parameter indicating the given
-	 * object class.
-	 * @param contentType The type of data requested, which may include wildcards.
-	 * @return <code>true</code> if this object can transfer data with the requested content type.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation matches a content type against the {@value ContentType#APPLICATION_PRIMARY_TYPE} primary type and {@value ContentType#X_JAVA_OBJECT}
+	 * subtype, with a "class" parameter indicating the given object class.
+	 * </p>
 	 */
+	@Override
 	public boolean canTransfer(final ContentType contentType) {
 		return getClass(contentType) != null; //see if there is a class that matches
 	}
 
 	/**
-	 * Transfers data using the given content type. This implementation delegates to {@link #transfer(Class)}.
-	 * @param contentType The type of data expected.
-	 * @return The transferred data, which may be <code>null</code>.
-	 * @throws IllegalArgumentException if the given content type is not supported.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation delegates to {@link #transfer(Class)}.
+	 * </p>
 	 */
+	@Override
 	public Object transfer(final ContentType contentType) {
 		final Class<?> objectClass = getClass(contentType); //return the class indicated by this content type
 		if(objectClass != null) { //if there is a class for this content type
@@ -115,10 +117,12 @@ public abstract class AbstractObjectTransferable<S> implements Transferable<S> {
 	}
 
 	/**
-	 * Determines the content types available for this transfer. This implementation returns content types in the form
-	 * <code>application/x-java-object;class=<var>package.Class</var></code>.
-	 * @return The content types available for this transfer.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation returns content types in the form <code>application/x-java-object;class=<var>package.Class</var></code>.
+	 * </p>
 	 */
+	@Override
 	public ContentType[] getContentTypes() {
 		return contentTypes; //return the available content types
 	}

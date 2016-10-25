@@ -42,7 +42,7 @@ public abstract class AbstractDepictedObject extends GuiseBoundPropertyObject im
 	/** The object depiction identifier */
 	private final long depictID;
 
-	/** @return The object depiction identifier. */
+	@Override
 	public long getDepictID() {
 		return depictID;
 	}
@@ -50,28 +50,17 @@ public abstract class AbstractDepictedObject extends GuiseBoundPropertyObject im
 	/** The depictor for this object. */
 	private final Depictor<? extends DepictedObject> depictor;
 
-	/** @return The depictor for this object. */
+	@Override
 	public Depictor<? extends DepictedObject> getDepictor() {
 		return depictor;
 	}
 
-	/**
-	 * Processes an event from the platform. This method delegates to the currently installed depictor.
-	 * @param event The event to be processed.
-	 * @throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
-	 * @see #getDepictor()
-	 * @see Depictor#processEvent(PlatformEvent)
-	 */
+	@Override
 	public void processEvent(final PlatformEvent event) {
 		getDepictor().processEvent(event); //ask the depictor to process the event
 	}
 
-	/**
-	 * Updates the depiction of the object. The depiction will be marked as updated. This method delegates to the currently installed depictor.
-	 * @throws IOException if there is an error updating the depiction.
-	 * @see #getDepictor()
-	 * @see Depictor#depict()
-	 */
+	@Override
 	public void depict() throws IOException {
 		getDepictor().depict(); //ask the depictor to depict the object
 	}
@@ -103,30 +92,28 @@ public abstract class AbstractDepictedObject extends GuiseBoundPropertyObject im
 		depictor.installed((O)this); //tell the depictor it has been installed		
 	}
 
-	/**
-	 * Exports data from the depicted object. This version returns <code>null</code>. Each export strategy, from last to first added, will be asked to export
-	 * data, until one is successful.
-	 * @return The object to be transferred, or <code>null</code> if no data can be transferred.
-	 */
+	@Override
 	public Transferable<?> exportTransfer() {
 		return null; //indicate that no data could be exported
 	}
 
-	/** @return A hash code value for the object. */
+	@Override
 	public int hashCode() {
 		return Longs.hashCode(getDepictID()); //return the hash code of the ID
 	}
 
 	/**
-	 * Indicates whether some other object is "equal to" this one. This implementation returns whether the object is a depicted object with the same ID.
-	 * @param object The reference object with which to compare.
-	 * @return <code>true</code> if this object is equivalent to the given object.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation returns whether the object is a depicted object with the same ID.
+	 * </p>
 	 */
+	@Override
 	public boolean equals(final Object object) {
 		return object instanceof DepictedObject && getDepictID() == ((DepictedObject)object).getDepictID(); //see if the other object is a depicted object with the same ID
 	}
 
-	/** @return A string representation of this depicted object. */
+	@Override
 	public String toString() {
 		final StringBuilder stringBuilder = new StringBuilder(super.toString()); //create a string builder for constructing the string
 		stringBuilder.append(' ').append('[').append(getDepictID()).append(']'); //append the ID

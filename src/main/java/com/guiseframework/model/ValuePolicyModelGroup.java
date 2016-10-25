@@ -30,30 +30,31 @@ import com.globalmentor.beans.*;
 public abstract class ValuePolicyModelGroup<V> extends AbstractModelGroup<ValueModel<V>> implements GenericPropertyChangeListener<V> {
 
 	/**
-	 * Actual implementation of adding a model to the group. This version adds this class instance as a listener to the model's value changing.
-	 * @param valueModel The model to add to the group.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version adds this class instance as a listener to the model's value changing.
+	 * </p>
 	 */
+	@Override
 	protected void addImpl(final ValueModel<V> valueModel) {
 		super.addImpl(valueModel); //add the model normally
 		valueModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, this); //listen for value changes
 	}
 
 	/**
-	 * Actual implementation of removing a model from the group. This version removes this class instance as a listener to the model's value changing.
-	 * @param valueModel The model to remove from the group.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version removes this class instance as a listener to the model's value changing.
+	 * </p>
 	 */
+	@Override
 	protected void removeImpl(final ValueModel<V> valueModel) {
 		valueModel.removePropertyChangeListener(ValueModel.VALUE_PROPERTY, this); //stop listening for value changes
 		super.removeImpl(valueModel); //remove the model normally
 	}
 
-	/**
-	 * Called when a bound property is changed. This not-generics version calls the generic version, creating a new event if necessary. No checks are made at
-	 * compile time to ensure the given event actually supports the given generic type.
-	 * @param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
-	 * @see GenericPropertyChangeListener#propertyChange(GenericPropertyChangeEvent)
-	 */
 	@SuppressWarnings("unchecked")
+	@Override
 	public final void propertyChange(final PropertyChangeEvent propertyChangeEvent) {
 		final GenericPropertyChangeEvent<V> guisePropertyChangeEvent = AbstractGenericPropertyChangeListener.getGenericPropertyChangeEvent(propertyChangeEvent); //create a genericized event object
 		propertyChange(guisePropertyChangeEvent); //call the generic version of the method with the genericized event object

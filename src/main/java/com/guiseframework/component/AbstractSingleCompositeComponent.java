@@ -60,7 +60,7 @@ public abstract class AbstractSingleCompositeComponent extends AbstractComposite
 		}
 	}
 
-	/** @return Whether this component has children. */
+	@Override
 	public boolean hasChildComponents() {
 		return component != null;
 	}

@@ -236,11 +236,7 @@ public class Orientation {
 		return LEFT_TO_RIGHT_TOP_TO_BOTTOM; //default to left-to-right, top-to-bottom
 	}
 
-	/**
-	 * Determines whether the given object is equal to this object.
-	 * @param object The object to compare to this object.
-	 * @return <code>true</code> if the given object is another orientation with the same line and page directions.
-	 */
+	@Override
 	public boolean equals(final Object object) {
 		if(!(object instanceof Orientation)) { //if the object is not an orientation
 			return false; //the objects aren't equal
@@ -254,7 +250,7 @@ public class Orientation {
 		return true; //the objects passed all the tests
 	}
 
-	/** @return A hash code for the cell. */
+	@Override
 	public int hashCode() {
 		return Objects.getHashCode((Object[])orientations); //generate a hash code
 	}

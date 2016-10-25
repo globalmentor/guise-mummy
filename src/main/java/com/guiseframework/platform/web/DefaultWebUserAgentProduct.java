@@ -34,26 +34,17 @@ public class DefaultWebUserAgentProduct extends AbstractBrandedProduct<WebUserAg
 	/** The content types accepted by the client. */
 	private final Iterable<ContentType> acceptedContentTypes;
 
-	/** @return The content types accepted by the client. */
+	@Override
 	public Iterable<ContentType> getAcceptedContentTypes() {
 		return acceptedContentTypes;
 	}
 
-	/**
-	 * Determines if the client accepts the given content type. Wildcard content types are correctly matched.
-	 * @param contentType The content type to check.
-	 * @return <code>true</code> if the client accepts the given content type.
-	 */
+	@Override
 	public boolean isAcceptedContentType(final ContentType contentType) {
 		return isAcceptedContentType(contentType, true); //check accepted content types, matching wildcards
 	}
 
-	/**
-	 * Determines if the client accepts the given content type.
-	 * @param contentType The content type to check.
-	 * @param matchWildcards <code>true</code> if the content type should be matched against wildcard sequences, as is normal.
-	 * @return <code>true</code> if the client accepts the given content type.
-	 */
+	@Override
 	public boolean isAcceptedContentType(final ContentType contentType, final boolean matchWildcards) {
 		final Iterator<ContentType> contentTypeIterator = getAcceptedContentTypes().iterator(); //get an iterator to the accepted content types
 		if(!contentTypeIterator.hasNext()) { //if no content types are listed as being accepted, then everything is accepted
@@ -77,7 +68,7 @@ public class DefaultWebUserAgentProduct extends AbstractBrandedProduct<WebUserAg
 	/** The languages accepted by the client. */
 	private final Iterable<Locale> acceptedLanguages;
 
-	/** @return The languages accepted by the client. */
+	@Override
 	public Iterable<Locale> getClientAcceptedLanguages() {
 		return acceptedLanguages;
 	}

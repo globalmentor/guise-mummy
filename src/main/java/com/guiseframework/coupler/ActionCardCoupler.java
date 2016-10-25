@@ -45,12 +45,14 @@ public class ActionCardCoupler extends AbstractCardCoupler //TODO now that const
 	/** The action listener to listen for the action event. */
 	private final ActionListener actionListener = new ActionListener() {
 
+		@Override
 		public void actionPerformed(final ActionEvent actionEvent) { //if the action occurs
 			try {
 				selectCard(); //select a connected card
 			} catch(final PropertyVetoException propertyVetoException) { //if the card can't be selected, just ignore the error and assume that the card control reported the error
 			}
 		}
+
 	};
 
 	/** The action to connect to the card, or <code>null</code> if the action is not coupled with a card. */
@@ -104,9 +106,12 @@ public class ActionCardCoupler extends AbstractCardCoupler //TODO now that const
 	}
 
 	/**
-	 * Updates the current displayed status. This implementation updates the action's displayed status. If no action is connected, no action occurs.
-	 * @param displayed The new displayed status.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation updates the action's displayed status. If no action is connected, no action occurs.
+	 * </p>
 	 */
+	@Override
 	protected void updateDisplayed(final boolean displayed) {
 		final ActionControl action = getAction(); //get the action
 		if(action != null) { //if there is an action
@@ -115,9 +120,12 @@ public class ActionCardCoupler extends AbstractCardCoupler //TODO now that const
 	}
 
 	/**
-	 * Updates the current enabled status. This implementation updates the action's enabled status. If no action is connected, no action occurs.
-	 * @param enabled The new enabled status.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation updates the action's enabled status. If no action is connected, no action occurs.
+	 * </p>
 	 */
+	@Override
 	protected void updateEnabled(final boolean enabled) {
 		final ActionControl action = getAction(); //get the action
 		if(action != null) { //if there is an action
@@ -125,12 +133,8 @@ public class ActionCardCoupler extends AbstractCardCoupler //TODO now that const
 		}
 	}
 
-	/**
-	 * Updates the current task state. If there is a connected action that implements {@link ActionValueControl} containing a {@link TaskState} value, the
-	 * action's value will be updated. If no action is connected, no action occurs.
-	 * @param taskState The new task state, or <code>null</code> if there is no task state.
-	 */
 	@SuppressWarnings("unchecked")
+	@Override
 	//we check the type of value class contained in any ActionValueControl, so our cast is logically correct
 	protected void updateTaskState(final TaskState taskState) {
 		final ActionControl action = getAction(); //get the action
@@ -146,11 +150,7 @@ public class ActionCardCoupler extends AbstractCardCoupler //TODO now that const
 		}
 	}
 
-	/**
-	 * Updates the current selected status. If there is a connected action that implements {@link Selectable}, its selected status will be updated. If no action
-	 * is connected, no action occurs.
-	 * @param selected The new selected status.
-	 */
+	@Override
 	protected void updateSelected(final boolean selected) {
 		final ActionControl action = getAction(); //get the action
 		if(action instanceof Selectable) { //if the action is selectable

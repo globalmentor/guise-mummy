@@ -28,7 +28,7 @@ import com.guiseframework.platform.*;
  */
 public abstract class AbstractWebDepictor<O extends DepictedObject> extends AbstractDepictor<O> {
 
-	/** @return The web platform on which this depictor is depicting ojects. */
+	@Override
 	public WebPlatform getPlatform() {
 		return (WebPlatform)super.getPlatform();
 	}

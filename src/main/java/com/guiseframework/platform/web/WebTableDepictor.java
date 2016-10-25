@@ -45,20 +45,20 @@ public class WebTableDepictor<C extends Table> extends AbstractWebComponentDepic
 	}
 
 	/**
-	 * Retrieves the styles for the outer element of the component. This version combines the body styles with the outer styles.
-	 * @return The styles for the outer element of the component, mapped to CSS property names.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version combines the body styles with the outer styles.
+	 * </p>
 	 * @see AbstractWebComponentDepictor#getBodyStyles()
 	 */
+	@Override
 	protected Map<String, Object> getOuterStyles() {
 		final Map<String, Object> outerStyles = super.getOuterStyles(); //get the default outer styles
 		outerStyles.putAll(getBodyStyles()); //add the styles for the body
 		return outerStyles; //return the combined styles		
 	}
 
-	/**
-	 * Begins the rendering process.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
@@ -82,10 +82,7 @@ public class WebTableDepictor<C extends Table> extends AbstractWebComponentDepic
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_THEAD); //</xhtml:thead>
 	}
 
-	/**
-	 * Renders the body of the component.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictBody() throws IOException {
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TBODY); //<xhtml:tbody>		
@@ -95,10 +92,7 @@ public class WebTableDepictor<C extends Table> extends AbstractWebComponentDepic
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TBODY); //</xhtml:tbody>
 	}
 
-	/**
-	 * Updates the views of any children.
-	 * @throws IOException if there is an error updating the child views.
-	 */
+	@Override
 	protected void depictChildren() throws IOException {
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
 		final C component = getDepictedObject(); //get the component
@@ -139,12 +133,12 @@ public class WebTableDepictor<C extends Table> extends AbstractWebComponentDepic
 	}
 
 	/**
-	 * Retrieves the styles for the label of the component. This method will be used both for the table caption and for each column header, distinguished by the
-	 * UI model passed. If a column is being rendered, this version adds border styles.
-	 * @param labelModel The label model containing the label content.
-	 * @param uiModel The model containing the label style information.
-	 * @return The styles for the label of the component, mapped to CSS property names.
+	 * {@inheritDoc}
+	 * <p>
+	 * If a column is being rendered, this version adds border styles.
+	 * </p>
 	 */
+	@Override
 	protected Map<String, Object> getLabelStyles(final LabelModel labelModel, final PresentationModel uiModel) {
 		final Map<String, Object> labelStyles = super.getLabelStyles(labelModel, uiModel); //get the default label styles
 		final WebPlatform platform = getPlatform(); //get the platform
@@ -261,10 +255,7 @@ public class WebTableDepictor<C extends Table> extends AbstractWebComponentDepic
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TD); //</xhtml:td>
 	}
 
-	/**
-	 * Ends the rendering process.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictEnd() throws IOException {
 		super.depictEnd(); //do the default ending rendering
 	}

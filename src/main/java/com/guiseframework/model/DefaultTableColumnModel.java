@@ -31,7 +31,7 @@ public class DefaultTableColumnModel<V> extends DefaultInfoModel implements Tabl
 	/** The class representing the type of values this model can hold. */
 	private final Class<V> valueClass;
 
-	/** @return The class representing the type of values this model can hold. */
+	@Override
 	public Class<V> getValueClass() {
 		return valueClass;
 	}
@@ -39,17 +39,12 @@ public class DefaultTableColumnModel<V> extends DefaultInfoModel implements Tabl
 	/** Whether the cells in this table column model are editable and will allow the the user to change their values. */
 	private boolean editable = false;
 
-	/** @return Whether the cells in this table column model are editable and will allow the the user to change their values. */
+	@Override
 	public boolean isEditable() {
 		return editable;
 	}
 
-	/**
-	 * Sets whether the cells in this table column model are editable and will allow the the user to change their values. This is a bound property of type
-	 * <code>Boolean</code>.
-	 * @param newEditable <code>true</code> if the table column cells should allow the user to change their values.
-	 * @see EditComponent#EDITABLE_PROPERTY
-	 */
+	@Override
 	public void setEditable(final boolean newEditable) {
 		if(editable != newEditable) { //if the value is really changing
 			final boolean oldEditable = editable; //get the old value
@@ -61,16 +56,12 @@ public class DefaultTableColumnModel<V> extends DefaultInfoModel implements Tabl
 	/** The style identifier, or <code>null</code> if there is no style ID. */
 	private String styleID = null;
 
-	/** @return The style identifier, or <code>null</code> if there is no style ID. */
+	@Override
 	public String getStyleID() {
 		return styleID;
 	}
 
-	/**
-	 * Identifies the style for the column. This is a bound property.
-	 * @param newStyleID The style identifier, or <code>null</code> if there is no style ID.
-	 * @see TableColumnModel#STYLE_ID_PROPERTY
-	 */
+	@Override
 	public void setStyleID(final String newStyleID) {
 		if(styleID != newStyleID) { //if the value is really changing
 			final String oldStyleID = styleID; //get the current value
@@ -82,16 +73,12 @@ public class DefaultTableColumnModel<V> extends DefaultInfoModel implements Tabl
 	/** The validator for cells in this column, or <code>null</code> if no validator is installed. */
 	private Validator<V> validator;
 
-	/** @return The validator for cells in this column, or <code>null</code> if no validator is installed. */
+	@Override
 	public Validator<V> getValidator() {
 		return validator;
 	}
 
-	/**
-	 * Sets the validator. This is a bound property
-	 * @param newValidator The validator for cells in this column, or <code>null</code> if no validator should be used.
-	 * @see TableColumnModel#VALIDATOR_PROPERTY
-	 */
+	@Override
 	public void setValidator(final Validator<V> newValidator) {
 		if(validator != newValidator) { //if the value is really changing
 			final Validator<V> oldValidator = validator; //get the old value
@@ -103,16 +90,12 @@ public class DefaultTableColumnModel<V> extends DefaultInfoModel implements Tabl
 	/** Whether the column is visible. */
 	private boolean visible = true;
 
-	/** @return Whether the column is visible. */
+	@Override
 	public boolean isVisible() {
 		return visible;
 	}
 
-	/**
-	 * Sets whether the column is visible. This is a bound property of type <code>Boolean</code>.
-	 * @param newVisible <code>true</code> if the column should be visible, else <code>false</code>.
-	 * @see TableColumnModel#VISIBLE_PROPERTY
-	 */
+	@Override
 	public void setVisible(final boolean newVisible) {
 		if(visible != newVisible) { //if the value is really changing
 			final boolean oldVisible = visible; //get the current value

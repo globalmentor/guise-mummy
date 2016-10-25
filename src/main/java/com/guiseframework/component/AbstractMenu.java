@@ -29,7 +29,7 @@ import com.guiseframework.prototype.*;
  */
 public abstract class AbstractMenu extends AbstractContainerControl implements Menu {
 
-	/** @return The layout definition for the menu. */
+	@Override
 	public MenuLayout getLayout() {
 		return (MenuLayout)super.getLayout();
 	} //a menu can only have a menu layout
@@ -45,17 +45,12 @@ public abstract class AbstractMenu extends AbstractContainerControl implements M
 	/** Whether the icon is displayed. */
 	private boolean iconDisplayed = true;
 
-	/** @return Whether the icon is displayed. */
+	@Override
 	public boolean isIconDisplayed() {
 		return iconDisplayed;
 	}
 
-	/**
-	 * Sets whether the icon is displayed. This is a bound property of type <code>Boolean</code>.
-	 * @param newIconDisplayed <code>true</code> if the icon should be displayed, else <code>false</code> if the icon should not be displayed and take up no
-	 *          space.
-	 * @see #ICON_DISPLAYED_PROPERTY
-	 */
+	@Override
 	public void setIconDisplayed(final boolean newIconDisplayed) {
 		if(iconDisplayed != newIconDisplayed) { //if the value is really changing
 			final boolean oldIconDisplayed = iconDisplayed; //get the current value
@@ -67,17 +62,12 @@ public abstract class AbstractMenu extends AbstractContainerControl implements M
 	/** Whether the label is displayed. */
 	private boolean labelDisplayed = true;
 
-	/** @return Whether the label is displayed. */
+	@Override
 	public boolean isLabelDisplayed() {
 		return labelDisplayed;
 	}
 
-	/**
-	 * Sets whether the label is displayed. This is a bound property of type <code>Boolean</code>.
-	 * @param newLabelDisplayed <code>true</code> if the label should be displayed, else <code>false</code> if the label should not be displayed and take up no
-	 *          space.
-	 * @see #LABEL_DISPLAYED_PROPERTY
-	 */
+	@Override
 	public void setLabelDisplayed(final boolean newLabelDisplayed) {
 		if(labelDisplayed != newLabelDisplayed) { //if the value is really changing
 			final boolean oldLabelDisplayed = labelDisplayed; //get the current value
@@ -89,16 +79,12 @@ public abstract class AbstractMenu extends AbstractContainerControl implements M
 	/** Whether the menu is open. */
 	private boolean open = true;
 
-	/** @return Whether the menu is open. */
+	@Override
 	public boolean isOpen() {
 		return open;
 	}
 
-	/**
-	 * Sets whether the menu is open. This is a bound property of type <code>Boolean</code>.
-	 * @param newOpen <code>true</code> if the menu should be open.
-	 * @see #OPEN_PROPERTY
-	 */
+	@Override
 	public void setOpen(final boolean newOpen) {
 		if(open != newOpen) { //if the value is really changing
 			final boolean oldOpen = open; //get the old value
@@ -110,16 +96,12 @@ public abstract class AbstractMenu extends AbstractContainerControl implements M
 	/** Whether the component is in a rollover state. */
 	private boolean rollover = false;
 
-	/** @return Whether the component is in a rollover state. */
+	@Override
 	public boolean isRollover() {
 		return rollover;
 	}
 
-	/**
-	 * Sets whether the component is in a rollover state. This is a bound property of type <code>Boolean</code>.
-	 * @param newRollover <code>true</code> if the component should be in a rollover state, else <code>false</code>.
-	 * @see Menu#ROLLOVER_PROPERTY
-	 */
+	@Override
 	public void setRollover(final boolean newRollover) {
 		if(rollover != newRollover) { //if the value is really changing
 			final boolean oldRollover = rollover; //get the current value
@@ -131,17 +113,12 @@ public abstract class AbstractMenu extends AbstractContainerControl implements M
 	/** Whether the menu children will be shown during rollover. */
 	private boolean rolloverOpenEnabled = false;
 
-	/** @return Whether the menu children will be shown during rollover. */
+	@Override
 	public boolean isRolloverOpenEnabled() {
 		return rolloverOpenEnabled;
 	}
 
-	/**
-	 * Sets whether the menu children will be shown during rollover. If rollover open is enabled, the open state will not actually be changed during rollover.
-	 * This is a bound property of type <code>Boolean</code>.
-	 * @param newRolloverOpenEnabled <code>true</code> if the component should allow display during rollover, else <code>false</code>.
-	 * @see Menu#ROLLOVER_OPEN_ENABLED_PROPERTY
-	 */
+	@Override
 	public void setRolloverOpenEnabled(final boolean newRolloverOpenEnabled) {
 		if(rolloverOpenEnabled != newRolloverOpenEnabled) { //if the value is really changing
 			final boolean oldRolloverOpenEnabled = rolloverOpenEnabled; //get the current value
@@ -169,20 +146,14 @@ public abstract class AbstractMenu extends AbstractContainerControl implements M
 				});
 		addMouseListener(new MouseAdapter() { //listen for the mouse over the control
 
-			/**
-			 * Called when the mouse enters the target.
-			 * @param mouseEvent The event providing mouse information
-			 */
+			@Override
 			public void mouseEntered(final MouseEnterEvent mouseEvent) {
 				if(getParent() instanceof Menu) {
 					setRollover(true); //turn on the rollover state
 				}
 			}
 
-			/**
-			 * Called when the mouse exits the target.
-			 * @param mouseEvent The event providing mouse information
-			 */
+			@Override
 			public void mouseExited(final MouseExitEvent mouseEvent) {
 				if(getParent() instanceof Menu) {
 					setRollover(false); //turn off the rollover state
@@ -191,41 +162,27 @@ public abstract class AbstractMenu extends AbstractContainerControl implements M
 		});
 	}
 
-	/**
-	 * Adds an action listener.
-	 * @param actionListener The action listener to add.
-	 */
+	@Override
 	public void addActionListener(final ActionListener actionListener) {
 		getEventListenerManager().add(ActionListener.class, actionListener); //add the listener
 	}
 
-	/**
-	 * Removes an action listener.
-	 * @param actionListener The action listener to remove.
-	 */
+	@Override
 	public void removeActionListener(final ActionListener actionListener) {
 		getEventListenerManager().remove(ActionListener.class, actionListener); //remove the listener
 	}
 
-	/** @return all registered action listeners. */
+	@Override
 	public Iterable<ActionListener> getActionListeners() {
 		return getEventListenerManager().getListeners(ActionListener.class); //remove the listener
 	}
 
-	/**
-	 * Performs the action with default force and default option. An {@link ActionEvent} is fired to all registered {@link ActionListener}s. This method delegates
-	 * to {@link #performAction(int, int)}.
-	 */
+	@Override
 	public void performAction() {
 		getActionModel().performAction(); //delegate to the installed action model, which will fire an event which we will catch and queue for refiring
 	}
 
-	/**
-	 * Performs the action with the given force and option. An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
-	 * @param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
-	 * @param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button
-	 *          click.
-	 */
+	@Override
 	public void performAction(final int force, final int option) {
 		getActionModel().performAction(force, option); //delegate to the installed action model, which will fire an event which we will catch and queue for refiring
 	}
@@ -254,14 +211,7 @@ public abstract class AbstractMenu extends AbstractContainerControl implements M
 		}
 	}
 
-	/**
-	 * Adds a child component at the specified index. If this component is itself a menu, this version closes that menu. Any class that overrides this method must
-	 * call this version.
-	 * @param index The index at which the component should be added.
-	 * @param childComponent The component to add to this component.
-	 * @throws IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
-	 * @throws IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
-	 */
+	@Override
 	protected void addComponent(final int index, final Component childComponent) {
 		super.addComponent(index, childComponent); //do the default adding
 		if(childComponent instanceof Menu) { //if the component is a menu
@@ -270,16 +220,17 @@ public abstract class AbstractMenu extends AbstractContainerControl implements M
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * <p>
 	 * Creates a component appropriate for the context of this component from the given prototype. This implementation creates the following components, in order
 	 * of priority:
+	 * </p>
 	 * <dl>
 	 * <dt>{@link ActionPrototype}</dt>
 	 * <dd>{@link Link}</dd>
 	 * </dl>
-	 * @param prototype The prototype of the component to create.
-	 * @return A new component based upon the given prototype.
-	 * @throws IllegalArgumentException if no component can be created from the given prototype
 	 */
+	@Override
 	public Component createComponent(final Prototype prototype) {
 		if(prototype instanceof ActionPrototype && !(prototype instanceof MenuPrototype)) { //action prototypes (don't create a link for menus, even though they are also action prototypes)
 			return new Link((ActionPrototype)prototype);

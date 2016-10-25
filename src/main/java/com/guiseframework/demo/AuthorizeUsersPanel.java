@@ -67,13 +67,14 @@ public class AuthorizeUsersPanel extends LayoutPanel {
 		applyButton.setLabel("Apply"); //set the button label
 		applyButton.addActionListener(new ActionListener() { //listen for the apply button
 
-					public void actionPerformed(ActionEvent actionEvent) {
-						final Notification notification = new Notification(
-								"The use of AJAX in Guise makes the \"Apply\" button unnecessary, because changes take place live. "
-										+ "This button would only be useful if AJAX were disabled."); //create a new notification
-						getSession().notify(notification); //tell the session to notify the user
-					}
-				});
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				final Notification notification = new Notification("The use of AJAX in Guise makes the \"Apply\" button unnecessary, because changes take place live. "
+						+ "This button would only be useful if AJAX were disabled."); //create a new notification
+				getSession().notify(notification); //tell the session to notify the user
+			}
+
+		});
 		add(applyButton); //add the apply button to the panel
 	}
 
@@ -109,16 +110,7 @@ public class AuthorizeUsersPanel extends LayoutPanel {
 			super(DemoUser.class, columns); //construct the parent class with the class representing users
 		}
 
-		/**
-		 * Returns the value's property for the given column.
-		 * @param <C> The type of cell values in the given column.
-		 * @param user The value in this list select model.
-		 * @param rowIndex The zero-based row index of the value.
-		 * @param column The column for which a value should be returned.
-		 * @return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
-		 * @throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-		 * @throws IllegalArgumentException if the given column is not one of this table's columns.
-		 */
+		@Override
 		protected <C> C getCellValue(final DemoUser user, final int rowIndex, final TableColumnModel<C> column) {
 			if(column == idColumn) { //ID
 				return column.getValueClass().cast(user.getID()); //cast and return the value	
@@ -135,16 +127,7 @@ public class AuthorizeUsersPanel extends LayoutPanel {
 			}
 		}
 
-		/**
-		 * Sets the value's property for the given column.
-		 * @param <C> The type of cell values in the given column.
-		 * @param user The value in this list select model.
-		 * @param rowIndex The zero-based row index of the value.
-		 * @param column The column for which a value should be returned.
-		 * @param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-		 * @throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-		 * @throws IllegalArgumentException if the given column is not one of this table's columns.
-		 */
+		@Override
 		protected <C> void setCellValue(final DemoUser user, final int rowIndex, final TableColumnModel<C> column, final C newCellValue) {
 			if(column == emailColumn) { //email
 				user.setEmail((String)newCellValue); //cast and set the value
