@@ -103,7 +103,7 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 		treeNodeIDMap = new DecoratorReadWriteLockMap<TreeNodeModel<?>, Long>(new WeakHashMap<TreeNodeModel<?>, Long>(), idTreeNodeMap); //TODO switch to a safer implementation of a weak hash map, which has problems
 	}
 
-	/**
+	/*
 	 * Called when the view is installed in a component. This implementation listens for {@link TreeNodePropertyChangeEvent}s fired from the control and marks the
 	 * view as needing updated.
 	 * @param component The component into which this view is being installed.
@@ -118,7 +118,7 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 		}
 	*/
 
-	/**
+	/*
 	 * Called when the view is uninstalled from a component. This implementation stops listening for {@link TreeNodePropertyChangeEvent}s fired from the control.
 	 * @param component The component from which this view is being uninstalled.
 	 * @throws NullPointerException if the given component is <code>null</code>.

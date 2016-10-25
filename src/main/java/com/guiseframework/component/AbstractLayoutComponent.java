@@ -37,7 +37,7 @@ public abstract class AbstractLayoutComponent extends AbstractListCompositeCompo
 		getLayout().addComponent(childComponent); //add the component to the layout
 	}
 
-	/**
+	/*
 	 * Adds a component to the container along with constraints. This is a convenience method that first set the constraints of the component.
 	 * @param component The component to add.
 	 * @param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.

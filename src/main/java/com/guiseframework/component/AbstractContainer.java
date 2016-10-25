@@ -196,7 +196,7 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 		}
 	}
 
-	/**
+	/*
 	 * Creates a component appropriate for the context of this component from the given prototype. This implementation creates the following components, in order
 	 * of priority:
 	 * <dl>

@@ -400,7 +400,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		}
 	}
 
-	/**
+	/*
 	 * A tree node representation strategy for a message model, generating a message component.
 	 * @see Message
 	 * @author Garret Wilson
@@ -410,7 +410,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		{
 	*/
 
-	/**
+	/*
 	 * Session constructor.
 	 * @param session The Guise session that owns this representation strategy.
 	 * @throws NullPointerException if the given session is <code>null</code>.
@@ -422,7 +422,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 			}
 	*/
 
-	/**
+	/*
 	 * Creates a message to represent the given tree node.
 	 * @param treeControl The component containing the model.
 	 * @param model The model containing the value.

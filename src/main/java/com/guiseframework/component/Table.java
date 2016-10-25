@@ -1181,26 +1181,26 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 			this.cell = cell;
 		}
 
-		/**
+		/*
 		 * @return Whether the model's value is editable and the corresponding control will allow the the user to change the value. This version returns
 		 *         <code>true</code> if the model and column are both editable.
 		 */
 		//TODO important fix		public boolean isEditable() {return getModel().isEditable() && getCell().getColumn().isEditable();}
 
-		/**
+		/*
 		 * Sets whether the model's value is editable and the corresponding control will allow the the user to change the value. This version throws an exception,
 		 * as the editable status is read-only.
 		 * @param newEditable <code>true</code> if the corresponding control should allow the user to change the value.
 		 */
 		//TODO important fix		public void setEditable(final boolean newEditable) {throw new UnsupportedOperationException("Editable is read-only.");}
 
-		/**
+		/*
 		 * @return Whether the model is enabled and and the corresponding control can receive user input. This version returns <code>true</code> if the model and
 		 *         column are both enabled.
 		 */
 		//TODO update once enabled is moved		public boolean isEnabled() {return getModel().isEnabled() && getCell().getColumn().isEnabled();}
 
-		/**
+		/*
 		 * Sets whether the model is enabled and and the corresponding control can receive user input. This version throws an exception, as the enabled status is
 		 * read-only.
 		 * @param newEnabled <code>true</code> if the corresponding control should indicate and accept user input.

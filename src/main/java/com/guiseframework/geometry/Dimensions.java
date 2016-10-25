@@ -184,7 +184,7 @@ public class Dimensions {
 
 	/**
 	 * {@inheritDoc}
-	 * </p>
+	 * <p>
 	 * This implementation returns whether the object is another dimensions with identical width, height, and depth.
 	 * </p>
 	 */

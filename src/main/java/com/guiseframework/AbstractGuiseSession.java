@@ -1044,7 +1044,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		return getApplication().createTempAsset(baseName, extension, this); //delegate to the application with a reference to this session
 	}
 
-	/**
+	/*
 	 * Reports that a bound property has changed. This implementation delegates to the Guise session to fire or postpone the property change event.
 	 * @param propertyChangeEvent The event to fire.
 	 * @see GuiseSession#queueEvent(com.globalmentor.event.PostponedEvent)

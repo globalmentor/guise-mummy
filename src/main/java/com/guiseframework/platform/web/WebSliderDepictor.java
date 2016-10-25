@@ -170,7 +170,7 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 		return baseStyleIDs; //return the new style IDs
 	}
 
-	/**
+	/*
 	 * Retrieves the styles for the outer element of the component.
 	 * @param context Guise context information.
 	 * @param component The component for which styles should be retrieved.

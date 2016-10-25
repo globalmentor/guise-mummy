@@ -128,7 +128,7 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel //TODO 
 
 	//TODO replace tree node property change stuff with special targeted property change information 
 
-	/**
+	/*
 	 * Adds a tree node property change listener.
 	 * @param treeNodePropertyChangeListener The tree node property change listener to add.
 	 */
@@ -139,7 +139,7 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel //TODO 
 		}
 	*/
 
-	/**
+	/*
 	 * Removes a tree node property change listener.
 	 * @param treeNodePropertyChangeListener The tree node property change listener to remove.
 	 */
@@ -150,7 +150,7 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel //TODO 
 		}
 	*/
 
-	/**
+	/*
 	 * Fires a tree node property change event to all registered tree node property change listeners.
 	 * @param propertyChangeEvent The property change event representing the property change of the tree node.
 	 * @see TreeNodePropertyChangeListener
