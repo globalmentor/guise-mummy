@@ -143,6 +143,12 @@ public class DemoUser implements Principal, Comparable<DemoUser> {
 				user.getLastName() + user.getFirstName() + user.getMiddleName() + user.getID()); //compare names
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @return <code>true</code> if the given object is another user with the same ID.
+	 * @see #getID()
+	 */
 	@Override
 	public boolean equals(final Object object) {
 		return object instanceof DemoUser && getID().equals(((DemoUser)object).getID()); //see if the other object is a user with the same ID
@@ -153,6 +159,9 @@ public class DemoUser implements Principal, Comparable<DemoUser> {
 	 * <p>
 	 * This implementation returns the hash code of the ID.
 	 * </p>
+	 * 
+	 * @return The hash code for this user.
+	 * @see #getID()
 	 */
 	@Override
 	public int hashCode() {

@@ -1329,6 +1329,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			return getTempFile().hashCode(); //return the file's hash code
 		}
 
+		/** {@inheritDoc} @return <code>true</code> if the other object is another info object for the same temporary file */
 		@Override
 		public boolean equals(final Object object) {
 			return object instanceof TempFileInfo && getTempFile().equals(((TempFileInfo)object).getTempFile()); //see if the other object is a temp file info object for the same file
@@ -1376,6 +1377,13 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			return getGuiseSession().hashCode(); //return the session's hash code
 		}
 
+		/**
+		 * {inheritDoc}
+		 * <p>
+		 * This version considers two object equal if they are both {@link GuiseSessionInfo} objects with the same session.
+		 * <p>
+		 * @see GuiseSessionInfo#getGuiseSession()
+		 */
 		@Override
 		public boolean equals(final Object object) {
 			return object instanceof GuiseSessionInfo && getGuiseSession().equals(((GuiseSessionInfo)object).getGuiseSession()); //see if the other object is a Guise session info object for the same Guise session

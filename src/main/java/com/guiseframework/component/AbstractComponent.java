@@ -1162,6 +1162,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		return Longs.hashCode(getDepictID()); //return the hash code of the ID
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation returns whether the object is a component with the same ID.
+	 * </p>
+	 */
 	@Override
 	public boolean equals(final Object object) {
 		return object instanceof Component && getDepictID() == ((Component)object).getDepictID(); //see if the other object is a component with the same ID

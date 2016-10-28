@@ -236,6 +236,7 @@ public class Orientation {
 		return LEFT_TO_RIGHT_TOP_TO_BOTTOM; //default to left-to-right, top-to-bottom
 	}
 
+	/** {@inheritDoc} @return <code>true</code> if the given object is another orientation with the same line and page directions. */
 	@Override
 	public boolean equals(final Object object) {
 		if(!(object instanceof Orientation)) { //if the object is not an orientation

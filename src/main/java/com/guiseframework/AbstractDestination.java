@@ -140,6 +140,12 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 		return Objects.getHashCode(getPath(), getPathPattern()); //construct a hash code from the path and path pattern
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation considers destinations of identical types with identical paths and path patterns to be equivalent.
+	 * </p>
+	 */
 	@Override
 	public boolean equals(final Object object) {
 		if(getClass().isInstance(object)) { //if the given object is an instance of this object's class
