@@ -31,9 +31,12 @@ import com.guiseframework.component.*;
 public class WebSelectLinkDepictor<C extends SelectActionControl> extends WebLinkDepictor<C> {
 
 	/**
-	 * Writes the supplementary icons. If no supplementary icons are present, no action occurs. This version writes the selected icon, if available.
-	 * @throws IOException if there is an error writing the icon.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version writes the selected icon, if available.
+	 * </p>
 	 */
+	@Override
 	protected void writeSupplementaryIcons() throws IOException {
 		super.writeSupplementaryIcons(); //write the default suppementary icons TODO i18n direction
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context

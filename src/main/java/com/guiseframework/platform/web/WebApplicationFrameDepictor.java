@@ -128,9 +128,12 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 	}
 
 	/**
-	 * Begins the rendering process. This version renders an outer html element.
-	 * @throws IOException if there is an error rendering the component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version renders an outer html element.
+	 * </p>
 	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		final WebPlatform platform = getPlatform(); //get the platform
 		final WebUserAgentProduct userAgent = platform.getClientProduct(); //get the user agent
@@ -426,10 +429,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		}
 	}
 
-	/**
-	 * Ends the rendering process. This version ends the outer html element and the inner form element.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictEnd() throws IOException {
 		final GuiseSession session = getSession(); //get the session
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context

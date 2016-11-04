@@ -32,9 +32,12 @@ import static com.globalmentor.w3c.spec.HTML.*;
 public class WebValueSelectLinkDepictor<V, C extends SelectActionControl & ActionValueControl<V>> extends WebSelectLinkDepictor<C> {
 
 	/**
-	 * Writes the supplementary icons. If no supplementary icons are present, no action occurs. This version writes the value icon, if available.
-	 * @throws IOException if there is an error writing the icon.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version writes the value icon, if available.
+	 * </p>
 	 */
+	@Override
 	protected void writeSupplementaryIcons() throws IOException {
 		super.writeSupplementaryIcons(); //write the default suppementary icons
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context

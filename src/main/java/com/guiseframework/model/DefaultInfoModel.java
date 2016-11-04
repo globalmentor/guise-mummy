@@ -34,16 +34,12 @@ public class DefaultInfoModel extends DefaultLabelModel implements InfoModel {
 	/** The description text, such as might appear in a flyover, or <code>null</code> if there is no description. */
 	private String description = null;
 
-	/** @return The description text, such as might appear in a flyover, or <code>null</code> if there is no description. */
+	@Override
 	public String getDescription() {
 		return description;
 	}
 
-	/**
-	 * Sets the description text, such as might appear in a flyover. This is a bound property.
-	 * @param newDescription The new text of the description, such as might appear in a flyover.
-	 * @see #DESCRIPTION_PROPERTY
-	 */
+	@Override
 	public void setDescription(final String newDescription) {
 		if(!Objects.equals(description, newDescription)) { //if the value is really changing
 			final String oldDescription = description; //get the old value
@@ -55,18 +51,12 @@ public class DefaultInfoModel extends DefaultLabelModel implements InfoModel {
 	/** The content type of the description text. */
 	private ContentType descriptionContentType = Text.PLAIN_CONTENT_TYPE;
 
-	/** @return The content type of the description text. */
+	@Override
 	public ContentType getDescriptionContentType() {
 		return descriptionContentType;
 	}
 
-	/**
-	 * Sets the content type of the description text. This is a bound property.
-	 * @param newDescriptionContentType The new description text content type.
-	 * @throws NullPointerException if the given content type is <code>null</code>.
-	 * @throws IllegalArgumentException if the given content type is not a text content type.
-	 * @see #DESCRIPTION_CONTENT_TYPE_PROPERTY
-	 */
+	@Override
 	public void setDescriptionContentType(final ContentType newDescriptionContentType) {
 		checkInstance(newDescriptionContentType, "Content type cannot be null.");
 		if(descriptionContentType != newDescriptionContentType) { //if the value is really changing
@@ -82,16 +72,12 @@ public class DefaultInfoModel extends DefaultLabelModel implements InfoModel {
 	/** The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information. */
 	private String info = null;
 
-	/** @return The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information. */
+	@Override
 	public String getInfo() {
 		return info;
 	}
 
-	/**
-	 * Sets the advisory information text, such as might appear in a tooltip. This is a bound property.
-	 * @param newInfo The new text of the advisory information, such as might appear in a tooltip.
-	 * @see #INFO_PROPERTY
-	 */
+	@Override
 	public void setInfo(final String newInfo) {
 		if(!Objects.equals(info, newInfo)) { //if the value is really changing
 			final String oldInfo = info; //get the old value
@@ -103,18 +89,12 @@ public class DefaultInfoModel extends DefaultLabelModel implements InfoModel {
 	/** The content type of the advisory information text. */
 	private ContentType infoContentType = Text.PLAIN_CONTENT_TYPE;
 
-	/** @return The content type of the advisory information text. */
+	@Override
 	public ContentType getInfoContentType() {
 		return infoContentType;
 	}
 
-	/**
-	 * Sets the content type of the advisory information text. This is a bound property.
-	 * @param newInfoContentType The new advisory information text content type.
-	 * @throws NullPointerException if the given content type is <code>null</code>.
-	 * @throws IllegalArgumentException if the given content type is not a text content type.
-	 * @see #INFO_CONTENT_TYPE_PROPERTY
-	 */
+	@Override
 	public void setInfoContentType(final ContentType newInfoContentType) {
 		checkInstance(newInfoContentType, "Content type cannot be null.");
 		if(infoContentType != newInfoContentType) { //if the value is really changing

@@ -169,12 +169,7 @@ public class RGBColor extends AbstractModeledColor<RGBColor.Component> {
 		return (int)getAbsoluteComponent(Component.ALPHA, 8); //return the absolute alpha component at 8 bits
 	}
 
-	/**
-	 * Converts this RGB color to an HSL color.
-	 * @return The color in the HSL color space.
-	 * @see <a href="http://en.wikipedia.org/wiki/HSL_color_space">HSL color space: Converting to RGB</a>
-	 * @see <a href="http://www.easyrgb.com/math.php?MATH=M18#text18">EasyRGB RGB-&gt;HSL</a>
-	 */
+	@Override
 	public HSLColor asHSL() {
 		final double red = getRed(); //get the RGB values
 		final double green = getGreen();
@@ -213,7 +208,7 @@ public class RGBColor extends AbstractModeledColor<RGBColor.Component> {
 		return new HSLColor(hue, saturation, lightness); //return the HSL color	
 	}
 
-	/** @return The color in the RGB color space. */
+	@Override
 	public RGBColor asRGB() {
 		return this; //this color object is already an RGB color
 	}

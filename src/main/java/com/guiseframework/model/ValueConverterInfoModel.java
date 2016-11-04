@@ -56,12 +56,7 @@ public class ValueConverterInfoModel<V> extends DefaultInfoModel {
 		this.converter = checkInstance(converter, "Converter cannot be null."); //save the converter		
 	}
 
-	/**
-	 * Determines the text of the label. This implementation converts the value if no label is explicitly specified.
-	 * @return The label text, or <code>null</code> if there is no label text.
-	 * @see #getLabel()
-	 * @see #getValue()
-	 */
+	@Override
 	public String getLabel() {
 		String label = super.getLabel(); //get the specified label
 		if(label == null) { //if no label is specified

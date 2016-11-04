@@ -33,8 +33,11 @@ public class WebHeadingDepictor<C extends LabelComponent> extends WebLabelDepict
 	protected static final String[] HEADING_LOCAL_NAMES = new String[] { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3, ELEMENT_H4, ELEMENT_H5, ELEMENT_H6 };
 
 	/**
-	 * {@inheritDoc} This version returns one of the XHTML heading element local names if the component is a {@link HeadingComponent} and a valid level is
-	 * specified, otherwise the default local name is returned.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version returns one of the XHTML heading element local names if the component is a {@link HeadingComponent} and a valid level is specified, otherwise
+	 * the default local name is returned.
+	 * </p>
 	 * @see Heading#getLevel()
 	 * @see #getHeadingLocalName(int)
 	 */

@@ -22,17 +22,11 @@ package com.guiseframework.event;
  */
 public class ModalNavigationAdapter implements ModalNavigationListener {
 
-	/**
-	 * Called when an a modal frame Begins its modality.
-	 * @param modalEvent The event indicating the frame beginning modality and the modal value.
-	 */
+	@Override
 	public void modalBegan(final ModalEvent modalEvent) {
 	}
 
-	/**
-	 * Called when an a modal frame ends its modality.
-	 * @param modalEvent The event indicating the frame ending modality and the modal value.
-	 */
+	@Override
 	public void modalEnded(final ModalEvent modalEvent) {
 	}
 

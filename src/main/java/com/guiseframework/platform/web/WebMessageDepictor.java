@@ -34,10 +34,7 @@ public class WebMessageDepictor<C extends Message> extends AbstractDecoratedWebC
 		super(XHTML_NAMESPACE_URI, ELEMENT_DIV); //represent <xhtml:div>
 	}
 
-	/**
-	 * Renders the body of the component.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictBody() throws IOException {
 		super.depictBody(); //render the default main part of the component
 		final C component = getDepictedObject(); //get the component

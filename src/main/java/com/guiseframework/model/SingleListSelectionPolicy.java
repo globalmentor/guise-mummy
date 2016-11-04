@@ -27,21 +27,23 @@ package com.guiseframework.model;
 public final class SingleListSelectionPolicy<V> extends AbstractListSelectionPolicy<V> {
 
 	/**
-	 * Determines which requested indices may be set as the selection. This implementation only allows the first index to be set.
-	 * @param selectModel The model containing the values to be selected.
-	 * @param indices The requested indices to set as the selection.
-	 * @return The indices that can be set as the selection.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation only allows the first index to be set.
+	 * </p>
 	 */
+	@Override
 	public int[] getSetSelectedIndices(final ListSelectModel<V> selectModel, final int[] indices) {
 		return indices.length <= 1 ? indices : new int[] { indices[0] }; //if there is more than one index requested, only use the first
 	}
 
 	/**
-	 * Determines which requested indices may be added to the selection. This implementation allows the addition of all requested indices.
-	 * @param selectModel The model containing the values to be selected.
-	 * @param indices The requested indices to add to the selection.
-	 * @return The indices that can be added to the selection.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation allows the addition of all requested indices.
+	 * </p>
 	 */
+	@Override
 	public int[] getAddSelectedIndices(final ListSelectModel<V> selectModel, final int[] indices) {
 		if(selectModel.isEmpty()) { //if the model is empty
 			return indices.length <= 1 ? indices : new int[] { indices[0] }; //allow at most one index to be set			

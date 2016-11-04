@@ -23,7 +23,7 @@ import com.guiseframework.component.ModalNavigationPanel;
  */
 public class ModalEvent extends AbstractGuiseEvent {
 
-	/** @return The source of the event. */
+	@Override
 	public ModalNavigationPanel<?> getSource() {
 		return (ModalNavigationPanel<?>)super.getSource(); //cast the event to the appropriate type
 	}

@@ -30,16 +30,12 @@ public abstract class AbstractEditValueControl<V> extends AbstractValueControl<V
 	/** Whether the value is editable and the control will allow the the user to change the value. */
 	private boolean editable = true;
 
-	/** @return Whether the value is editable and the control will allow the the user to change the value. */
+	@Override
 	public boolean isEditable() {
 		return editable;
 	}
 
-	/**
-	 * Sets whether the value is editable and the control will allow the the user to change the value. This is a bound property of type <code>Boolean</code>.
-	 * @param newEditable <code>true</code> if the control should allow the user to change the value.
-	 * @see EditComponent#EDITABLE_PROPERTY
-	 */
+	@Override
 	public void setEditable(final boolean newEditable) {
 		if(editable != newEditable) { //if the value is really changing
 			final boolean oldEditable = editable; //get the old value
@@ -59,26 +55,22 @@ public abstract class AbstractEditValueControl<V> extends AbstractValueControl<V
 		super(infoModel, valueModel, enableable); //construct the parent class
 		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<V>() { //listen for the value changing, and when the value changes fire an edit event
 
-					public void propertyChange(final GenericPropertyChangeEvent<V> propertyChangeEvent) { //when the value changes
-						fireEdited(); //indicate that editing has occurred
-					}
-				});
+			@Override
+			public void propertyChange(final GenericPropertyChangeEvent<V> propertyChangeEvent) { //when the value changes
+				fireEdited(); //indicate that editing has occurred
+			}
+
+		});
 	}
 
 	//EditComponent implementation
 
-	/**
-	 * Adds an edit listener.
-	 * @param editListener The edit listener to add.
-	 */
+	@Override
 	public void addEditListener(final EditListener editListener) {
 		getEventListenerManager().add(EditListener.class, editListener); //add the listener
 	}
 
-	/**
-	 * Removes an edit listener.
-	 * @param editListener The edit listener to remove.
-	 */
+	@Override
 	public void removeEditListener(final EditListener editListener) {
 		getEventListenerManager().remove(EditListener.class, editListener); //remove the listener
 	}

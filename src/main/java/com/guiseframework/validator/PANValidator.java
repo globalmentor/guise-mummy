@@ -101,11 +101,12 @@ public class PANValidator extends AbstractValidator<PAN> { //TODO add http://www
 	}
 
 	/**
-	 * Checks whether a given value is valid, and throws an exception if not. This version determines whether a given PAN represents one of the supported products
-	 * and is the correct length.
-	 * @param value The value to validate.
-	 * @throws ValidationException if the provided value is not valid.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version determines whether a given PAN represents one of the supported products and is the correct length.
+	 * </p>
 	 */
+	@Override
 	public void validate(final PAN value) throws ValidationException {
 		super.validate(value); //do the default validation
 		if(value != null) { //if the value passed default validation checks and isn't null

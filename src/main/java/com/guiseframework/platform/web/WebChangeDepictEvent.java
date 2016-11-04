@@ -63,7 +63,7 @@ public class WebChangeDepictEvent extends AbstractWebDepictEvent {
 		this.properties = unmodifiableMap(new HashMap<String, Object>(checkInstance(properties, "Properties cannot be null.")));
 	}
 
-	/** @return A string representation of this event. */
+	@Override
 	public String toString() {
 		return super.toString() + JSON.serialize(getProperties());
 	}

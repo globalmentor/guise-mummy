@@ -93,13 +93,7 @@ public class IntegerRangeValidator extends AbstractComparableRangeValidator<Inte
 		super(minimum, maximum, step, valueRequired); //construct the parent class
 	}
 
-	/**
-	 * Determines whether the given value falls on the correct step amount relative to the base value.
-	 * @param value The value to validate.
-	 * @param step The step value.
-	 * @param base The base (either the minimum or maximum value), or <code>null</code> if zero should be used as a base.
-	 * @return <code>true</code> if the value is a valid step away from the given base.
-	 */
+	@Override
 	protected boolean isValidStep(final Integer value, final Integer step, final Integer base) {
 		final int baseInt = base != null ? base.intValue() : 0; //get the primitive base value
 		return (value.intValue() - baseInt) % step.intValue() == 0; //normalize the value to the base and see if the step divides the result evenly

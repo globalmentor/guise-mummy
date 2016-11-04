@@ -40,7 +40,7 @@ public abstract class AbstractDepictContext extends BoundPropertyObject implemen
 	/** The Guise user session of which this context is a part. */
 	private final GuiseSession session;
 
-	/** @return The Guise user session of which this context is a part. */
+	@Override
 	public GuiseSession getSession() {
 		return session;
 	}
@@ -48,7 +48,7 @@ public abstract class AbstractDepictContext extends BoundPropertyObject implemen
 	/** The platform on which Guise objects are depicted. */
 	private final Platform platform;
 
-	/** @return The platform on which Guise objects are depicted. */
+	@Override
 	public Platform getPlatform() {
 		return platform;
 	}
@@ -56,7 +56,7 @@ public abstract class AbstractDepictContext extends BoundPropertyObject implemen
 	/** The destination with which this context is associated. */
 	private final Destination destination;
 
-	/** @return The destination with which this context is associated. */
+	@Override
 	public Destination getDestination() {
 		return destination;
 	}
@@ -64,15 +64,7 @@ public abstract class AbstractDepictContext extends BoundPropertyObject implemen
 	/** The URIs of the styles for this context, in order. */
 	private final Iterable<URI> styles;
 
-	/**
-	 * Retrieves styles for this context. Styles appear in the following order:
-	 * <ol>
-	 * <li>theme styles (from most distant parent to current theme)</li>
-	 * <li>application style</li>
-	 * <li>destination style</li>
-	 * </ol>
-	 * @return The URIs of the styles for this context, in order.
-	 */
+	@Override
 	public Iterable<URI> getStyles() {
 		return styles;
 	}
@@ -116,12 +108,12 @@ public abstract class AbstractDepictContext extends BoundPropertyObject implemen
 		this.styles = unmodifiableList(styleURIs); //save an unmodifiable version of the style URIs
 	}
 
-	/** {@inheritDoc} */
+	@Override
 	public URI getDepictionURI(final URIPath navigationPath, final String... suffixes) {
 		return getSession().getDepictionURI(navigationPath, suffixes); //ask the session for the depiction URI
 	}
 
-	/** {@inheritDoc} */
+	@Override
 	public URI getDepictionURI(final URI navigationURI, final String... suffixes) {
 		return getSession().getDepictionURI(navigationURI, suffixes); //ask the session for the depiction URI
 	}

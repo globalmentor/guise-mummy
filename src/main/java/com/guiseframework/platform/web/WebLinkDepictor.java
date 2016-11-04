@@ -39,9 +39,12 @@ public class WebLinkDepictor<C extends ActionControl> extends AbstractWebActionC
 	}
 
 	/**
-	 * Begins the rendering process. This version renders any component info as a link title.
-	 * @throws IOException if there is an error rendering the component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version renders any component info as a link title.
+	 * </p>
 	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
@@ -81,9 +84,12 @@ public class WebLinkDepictor<C extends ActionControl> extends AbstractWebActionC
 	}
 
 	/**
-	 * Renders the body of the component. This version renders any label information.
-	 * @throws IOException if there is an error rendering the component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version renders any label information.
+	 * </p>
 	 */
+	@Override
 	protected void depictBody() throws IOException {
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
 		final C component = getDepictedObject(); //get the component

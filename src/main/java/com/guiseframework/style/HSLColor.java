@@ -83,17 +83,12 @@ public class HSLColor extends AbstractModeledColor<HSLColor.Component> {
 		return getComponent(Component.LIGHTNESS); //return the lightness component
 	}
 
-	/** @return The color in the HSL color space. */
+	@Override
 	public HSLColor asHSL() {
 		return this; //this color object is already an HSL color
 	}
 
-	/**
-	 * Converts this HSL color to an RGB color.
-	 * @return The color in the RGB color space.
-	 * @see <a href="http://en.wikipedia.org/wiki/HSL_color_space">HSL color space: Converting to RGB</a>
-	 * @see <a href="http://www.easyrgb.com/math.php?MATH=M19#text19">EasyRGB HSL-&gt;RGB</a>
-	 */
+	@Override
 	public RGBColor asRGB() {
 		final double hue = getHue(); //get the HSL values
 		final double saturation = getSaturation();

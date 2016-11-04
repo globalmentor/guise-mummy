@@ -38,13 +38,13 @@ public abstract class AbstractURIStringLiteralConverter extends AbstractStringLi
 	protected abstract URI resolveURI(final URI uri);
 
 	/**
-	 * Converts a literal representation of a value from the lexical space into a value in the value space. This version resolves any URI using
-	 * {@link #resolveURI(URI)}.
-	 * @param literal The literal value in the lexical space to convert.
-	 * @return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
-	 * @throws ConversionException if the literal value cannot be converted.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version resolves any URI using {@link #resolveURI(URI)}.
+	 * </p>
 	 * @see #resolveURI(URI)
 	 */
+	@Override
 	public URI convertLiteral(final String literal) throws ConversionException {
 		try {
 			return literal != null && literal.length() > 0 ? resolveURI(new URI(literal)) : null; //if there is a literal, convert it to a URI and resolve it

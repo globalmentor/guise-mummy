@@ -170,6 +170,7 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 	/** The progress listener that updates the overall status label in response to the overall platform file transfer task. */
 	private final ProgressListener<Long> overallProgressListener = new ProgressListener<Long>() {
 
+		@Override
 		public void progressed(final ProgressEvent<Long> progressEvent) { //when progress occurs
 			final TaskState state = progressEvent.getTaskState(); //get the current overall transfer status
 			if(state == TaskState.COMPLETE || state == TaskState.CANCELED || state == TaskState.ERROR) { //if the overall transfer ends
@@ -180,6 +181,7 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 			updateComponents(); //update the components							
 			fireProgressed(progressEvent); //pass along the progress event unmodified
 		}
+
 	};
 
 	/**
@@ -231,17 +233,19 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 			protected void action(final int force, final int option) {
 				getSession().getPlatform().selectPlatformFiles(true, new ValueSelectListener<Collection<PlatformFile>>() { //select platform files, listening for the selection to occur
 
-							public void valueSelected(final ValueEvent<Collection<PlatformFile>> valueEvent) { //when files are selected
-								final Collection<PlatformFile> platformFiles = valueEvent.getValue(); //get the new platform files
-								platformFileListControl.clear(); //remove the currently displayed platform files
-								platformFileListControl.addAll(platformFiles); //add all the new platform files to the list
-								for(final PlatformFile platformFile : platformFiles) { //for each platform file
-									platformFile.removeProgressListener(platformFileProgressListener); //make sure we're not already listening for progress on this platform file
-									platformFile.addProgressListener(platformFileProgressListener); //start listening for progress on this platform file
-								}
-								updateComponents(); //update the components
-							}
-						});
+					@Override
+					public void valueSelected(final ValueEvent<Collection<PlatformFile>> valueEvent) { //when files are selected
+						final Collection<PlatformFile> platformFiles = valueEvent.getValue(); //get the new platform files
+						platformFileListControl.clear(); //remove the currently displayed platform files
+						platformFileListControl.addAll(platformFiles); //add all the new platform files to the list
+						for(final PlatformFile platformFile : platformFiles) { //for each platform file
+							platformFile.removeProgressListener(platformFileProgressListener); //make sure we're not already listening for progress on this platform file
+							platformFile.addProgressListener(platformFileProgressListener); //start listening for progress on this platform file
+						}
+						updateComponents(); //update the components
+					}
+
+				});
 			}
 		};
 		controlPanel.add(browseActionPrototype);
@@ -361,18 +365,12 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 		overallStatusLabel.setLabel(statusStringBuilder.toString()); //update the status
 	}
 
-	/**
-	 * Adds a progress listener.
-	 * @param progressListener The progress listener to add.
-	 */
+	@Override
 	public void addProgressListener(final ProgressListener<Long> progressListener) {
 		getEventListenerManager().add(ProgressListener.class, progressListener); //add the listener
 	}
 
-	/**
-	 * Removes an progress listener.
-	 * @param progressListener The progress listener to remove.
-	 */
+	@Override
 	public void removeProgressListener(final ProgressListener<Long> progressListener) {
 		getEventListenerManager().remove(ProgressListener.class, progressListener); //remove the listener
 	}

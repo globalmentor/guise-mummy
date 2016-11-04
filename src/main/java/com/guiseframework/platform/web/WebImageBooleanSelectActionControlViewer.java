@@ -39,13 +39,15 @@ import com.guiseframework.event.NavigateActionListener;
 public class WebImageBooleanSelectActionControlViewer<C extends ImageBooleanSelectActionControl> extends WebImageActionControlDepictor<C> {
 
 	/**
-	 * Determines the image URI to use for this component. This implementation returns the selected image if the component is selected and there is a selected
-	 * image.
-	 * @return The image to use for the component, or <code>null</code> if there should not be an image.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation returns the selected image if the component is selected and there is a selected image.
+	 * </p>
 	 * @see ImageComponent#getImageURI()
 	 * @see ImageBooleanSelectActionControl#isSelected()
 	 * @see ImageBooleanSelectActionControl#getRolloverImageURI()
 	 */
+	@Override
 	protected URI getImageURI() {
 		final C component = getDepictedObject(); //get the component
 		URI image = null; //we'll determine the image
@@ -63,18 +65,18 @@ public class WebImageBooleanSelectActionControlViewer<C extends ImageBooleanSele
 	}
 
 	/**
-	 * Determines the rollover image URI to use for this component. This implementation returns the component's rollover image.
-	 * @return The rollover image to use for the component, or <code>null</code> if there should be no rollover image.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation returns the component's rollover image.
+	 * </p>
 	 * @see ImageBooleanSelectActionControl#getRolloverImageURI()
 	 */
+	@Override
 	protected URI getRolloverImageURI() {
 		return getDepictedObject().getRolloverImageURI(); //get the component rollover image
 	}
 
-	/**
-	 * Begins the rendering process.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		//TODO del		context.writeAttribute(null, "hidefocus", "true");	//hidefocus="true"	//TODO add to DTD; put in JavaScript to do this dynamically

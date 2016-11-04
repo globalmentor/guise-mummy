@@ -46,12 +46,7 @@ public class KeyReleaseEvent extends AbstractKeyboardEvent {
 		this(source, keyReleaseEvent.getKey(), keyReleaseEvent.getKeys().toArray(new Key[keyReleaseEvent.getKeys().size()])); //construct the class with the specified source		
 	}
 
-	/**
-	 * Returns the key input associated with this event.
-	 * @return The input associated with this event, or <code>null</code> if there is no input associated with this event. This version returns <code>null</code>,
-	 *         as a key release, unlike a key press, produces no input.
-	 * @see KeyPressEvent#getInput()
-	 */
+	@Override
 	public KeystrokeInput getInput() {
 		return null; //key presses don't produce input
 	}

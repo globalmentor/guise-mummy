@@ -53,10 +53,12 @@ public class WebAccordionMenuDepictor<C extends Menu> extends AbstractWebMenuDep
 	*/
 
 	/**
-	 * Begins the rendering process. This version wraps the component in a decorator element.
-	 * @throws IOException if there is an error rendering the component.
-	 * @throws IllegalArgumentException if the given value control represents a value type this controller doesn't support.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version wraps the component in a decorator element.
+	 * </p>
 	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
@@ -100,10 +102,7 @@ public class WebAccordionMenuDepictor<C extends Menu> extends AbstractWebMenuDep
 		writeIDClassAttributes(null, COMPONENT_CHILDREN_CLASS_SUFFIX); //write the ID and class attributes for the children		
 	}
 
-	/**
-	 * Updates the views of any children.
-	 * @throws IOException if there is an error updating the child views.
-	 */
+	@Override
 	protected void depictChildren() throws IOException {
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
 		depictContext.write("\n"); //format the output
@@ -132,10 +131,7 @@ public class WebAccordionMenuDepictor<C extends Menu> extends AbstractWebMenuDep
 		}
 	}
 
-	/**
-	 * Ends the rendering process. This version closes the decorator elements.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictEnd() throws IOException {
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_OL); //</xhtml:ol> (component-children)

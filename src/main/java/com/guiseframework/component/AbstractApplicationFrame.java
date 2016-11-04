@@ -43,17 +43,12 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 	/** The list of child frames according to z-order; this will not be initialized with a non-null value until the constructor is finished. */
 	private final List<Frame> frameList;
 
-	/** @return An iterable to all child frames. */
+	@Override
 	public Iterable<Frame> getChildFrames() {
 		return unmodifiableList(frameList);
 	}
 
-	/**
-	 * Adds a frame to the list of child frames. This method should usually only be called by the frames themselves.
-	 * @param frame The frame to add.
-	 * @throws NullPointerException if the given frame is <code>null</code>.
-	 * @throws IllegalArgumentException if the given frame is this frame.
-	 */
+	@Override
 	public void addChildFrame(final Frame frame) {
 		if(checkInstance(frame, "Frame cannot be null.") == this) {
 			throw new IllegalArgumentException("A frame cannot be its own child frame.");
@@ -66,12 +61,7 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 		}
 	}
 
-	/**
-	 * Removes a frame from the list of child frames. This method should usually only be called by the frames themselves.
-	 * @param frame The frame to remove.
-	 * @throws NullPointerException if the given frame is <code>null</code>.
-	 * @throws IllegalArgumentException if the given frame is the application frame.
-	 */
+	@Override
 	public void removeChildFrame(final Frame frame) {
 		if(checkInstance(frame, "Frame cannot be null.") == this) {
 			throw new IllegalArgumentException("A frame cannot be its own child frame.");
@@ -96,6 +86,7 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 	 */
 	private final PropertyChangeListener contentLabelChangeUpdateLabelListener = new AbstractGenericPropertyChangeListener<String>() {
 
+		@Override
 		public void propertyChange(final GenericPropertyChangeEvent<String> genericPropertyChangeEvent) { //if the content title changes
 			updateLabel(); //update the label
 		};
@@ -115,9 +106,12 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 	}
 
 	/**
-	 * Sets the content child component. This is a bound property. This version updates the frame label by calling {@link #updateLabel()}.
-	 * @param newContent The content child component, or <code>null</code> if this frame does not have a content child component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version updates the frame label by calling {@link #updateLabel()}.
+	 * </p>
 	 */
+	@Override
 	public void setContent(final Component newContent) {
 		final Component oldContent = getContent(); //set the previous content
 		if(oldContent != newContent) { //if the content will really change
@@ -188,19 +182,18 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 		setLabelContentType(labelContentType); //set the application frame label content type
 	}
 
-	/**
-	 * Determines whether the frame should be allowed to close. This implementation returns <code>false</code>. This method is called from {@link #close()}.
-	 * @return <code>true</code> if the frame should be allowed to close.
-	 */
+	@Override
 	public boolean canClose() {
 		return false; //don't allow application frames to be closed
 	}
 
 	/**
-	 * Retrieves a list of all child components. This version adds all this frame's child frames to the list.
-	 * @return A list of child components.
-	 * @see #getChildFrames()
+	 * {@inheritDoc}
+	 * <p>
+	 * This version adds all this frame's child frames to the list.
+	 * </p>
 	 */
+	@Override
 	protected List<Component> getChildList() {
 		final List<Component> childList = super.getChildList(); //get the default list of children
 		if(frameList != null) { //if the frame list has been initialized (getChildList() can be called by an ancestor class during construction, before the frame list has been initialized)
@@ -210,10 +203,12 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 	}
 
 	/**
-	 * Determines whether this component has children. This version also checks to see whether there are child frames.
-	 * @return Whether this component has children.
-	 * @see #getChildFrames()
+	 * {@inheritDoc}
+	 * <p>
+	 * This version also checks to see whether there are child frames.
+	 * </p>
 	 */
+	@Override
 	public boolean hasChildComponents() {
 		return super.hasChildComponents() || !frameList.isEmpty(); //see if we have normal children and/or frames
 	}

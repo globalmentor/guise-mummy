@@ -30,7 +30,9 @@ import com.guiseframework.event.*;
 public class DefaultTreeModel extends AbstractModel implements TreeModel //TODO why not descend from DefaultActionModel?
 {
 
-	/** A listener to listen for changes in properties of tree nodes that have bubbled up the hierarchy and refire them as {@link TreeNodePropertyChangeEvent}s. */
+	/**
+	 * A listener to listen for changes in properties of tree nodes that have bubbled up the hierarchy and refire them as {@link TreeNodePropertyChangeEvent}s.
+	 */
 	/*TODO del when works
 		private final PropertyChangeListener treeNodePropertyChangeListener=new PropertyChangeListener() {	//TODO update this to match the repeat action listener
 				public void propertyChange(final PropertyChangeEvent propertyChangeEvent) {	//if a tree node property changes
@@ -42,10 +44,12 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel //TODO 
 	/** An action listener to repeat copies of events received, using this component as the source. */
 	private ActionListener repeatActionListener = new ActionListener() {
 
+		@Override
 		public void actionPerformed(final ActionEvent actionEvent) { //if an action was performed
 			final ActionEvent repeatActionEvent = new ActionEvent(DefaultTreeModel.this, actionEvent); //copy the action event with this class as its source, but keeping the same target if present
 			fireActionPerformed(repeatActionEvent); //fire the repeated action
 		}
+
 	};
 
 	/** @return An action listener to repeat copies of events received, using this component as the source. */
@@ -54,17 +58,12 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel //TODO 
 	/** The rot node of the tree model. */
 	private TreeNodeModel<?> rootNode;
 
-	/** @return The root node of the tree model. */
+	@Override
 	public TreeNodeModel<?> getRootNode() {
 		return rootNode;
 	}
 
-	/**
-	 * Sets the root node of the tree model. This is a bound property.
-	 * @param newRootNode The new root node of the tree model.
-	 * @throws NullPointerException if the given root node is <code>null</code>.
-	 * @see #ROOT_NODE_PROPERTY
-	 */
+	@Override
 	public void setRootNode(final TreeNodeModel<?> newRootNode) {
 		if(!Objects.equals(rootNode, checkInstance(newRootNode, "Root node cannot be null."))) { //if the value is really changing
 			final TreeNodeModel<?> oldRootNode = rootNode; //get the old value
@@ -122,17 +121,14 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel //TODO 
 		}
 	}
 
-	/**
-	 * Sets whether all tree nodes are expanded. This method delegates to the root node {@link TreeNodeModel#setAllExpanded(boolean)}.
-	 * @param newAllExpanded <code>true</code> if all the nodes should be expanded, or <code>false</code> if they should be collapsed.
-	 */
+	@Override
 	public void setAllExpanded(final boolean newAllExpanded) {
 		getRootNode().setAllExpanded(newAllExpanded); //tell the root node to expand or collapse all its children
 	}
 
 	//TODO replace tree node property change stuff with special targeted property change information 
 
-	/**
+	/*
 	 * Adds a tree node property change listener.
 	 * @param treeNodePropertyChangeListener The tree node property change listener to add.
 	 */
@@ -143,7 +139,7 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel //TODO 
 		}
 	*/
 
-	/**
+	/*
 	 * Removes a tree node property change listener.
 	 * @param treeNodePropertyChangeListener The tree node property change listener to remove.
 	 */
@@ -154,7 +150,7 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel //TODO 
 		}
 	*/
 
-	/**
+	/*
 	 * Fires a tree node property change event to all registered tree node property change listeners.
 	 * @param propertyChangeEvent The property change event representing the property change of the tree node.
 	 * @see TreeNodePropertyChangeListener
@@ -175,41 +171,27 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel //TODO 
 
 	//ActionModel support
 
-	/**
-	 * Adds an action listener.
-	 * @param actionListener The action listener to add.
-	 */
+	@Override
 	public void addActionListener(final ActionListener actionListener) {
 		getEventListenerManager().add(ActionListener.class, actionListener); //add the listener
 	}
 
-	/**
-	 * Removes an action listener.
-	 * @param actionListener The action listener to remove.
-	 */
+	@Override
 	public void removeActionListener(final ActionListener actionListener) {
 		getEventListenerManager().remove(ActionListener.class, actionListener); //remove the listener
 	}
 
-	/** @return all registered action listeners. */
+	@Override
 	public Iterable<ActionListener> getActionListeners() {
 		return getEventListenerManager().getListeners(ActionListener.class); //remove the listener
 	}
 
-	/**
-	 * Performs the action with default force and default option. An {@link ActionEvent} is fired to all registered {@link ActionListener}s. This method delegates
-	 * to {@link #performAction(int, int)}.
-	 */
+	@Override
 	public void performAction() {
 		performAction(1, 0); //fire an event saying that the action has been performed with the default force and option
 	}
 
-	/**
-	 * Performs the action with the given force and option. An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
-	 * @param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
-	 * @param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button
-	 *          click.
-	 */
+	@Override
 	public void performAction(final int force, final int option) {
 		fireActionPerformed(force, option); //fire an event saying that the action has been performed with the given force and option
 	}

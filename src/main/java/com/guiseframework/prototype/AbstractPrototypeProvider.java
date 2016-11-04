@@ -32,11 +32,7 @@ public abstract class AbstractPrototypeProvider extends BoundPropertyObject impl
 	/** The prototype provisions currently provided by this provider. */
 	private Set<PrototypeProvision<?>> prototypeProvisions = emptySet();
 
-	/**
-	 * Returns the prototypes currentl provisions provided by this provider. This is a read-only bound property.
-	 * @return The prototype provisions currently provided by this provider.
-	 * @see #PROTOTYPE_PROVISIONS_PROPERTY
-	 */
+	@Override
 	public Set<PrototypeProvision<?>> getPrototypeProvisions() {
 		return prototypeProvisions;
 	}

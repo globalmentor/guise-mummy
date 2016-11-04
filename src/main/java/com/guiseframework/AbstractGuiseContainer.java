@@ -40,10 +40,7 @@ public abstract class AbstractGuiseContainer implements GuiseContainer {
 	/** The base URI of the container. */
 	private URI baseURI = null;
 
-	/**
-	 * Reports the base URI of the container. The base URI is an absolute URI that ends with the base path, which ends with a slash ('/').
-	 * @return The base URI representing the Guise container.
-	 */
+	@Override
 	public URI getBaseURI() {
 		return baseURI;
 	}
@@ -51,11 +48,7 @@ public abstract class AbstractGuiseContainer implements GuiseContainer {
 	/** The base path of the container. */
 	private URIPath basePath = null;
 
-	/**
-	 * Reports the base path of the container. The base path is an absolute path that ends with a slash ('/'), indicating the base path of the application base
-	 * paths.
-	 * @return The base path representing the Guise container.
-	 */
+	@Override
 	public URIPath getBasePath() {
 		return basePath;
 	}
@@ -63,9 +56,9 @@ public abstract class AbstractGuiseContainer implements GuiseContainer {
 	/** The thread-safe map of Guise applications keyed to application base URIs. */
 	private final Map<URI, AbstractGuiseApplication> applicationMap = new ConcurrentHashMap<URI, AbstractGuiseApplication>();
 
-	/** @return The applications currently installed in this container. */
+	@Override
 	public Collection<GuiseApplication> getApplications() {
-		return Collections.<GuiseApplication> unmodifiableCollection(applicationMap.values());
+		return Collections.<GuiseApplication>unmodifiableCollection(applicationMap.values());
 	}
 
 	/**
@@ -82,10 +75,12 @@ public abstract class AbstractGuiseContainer implements GuiseContainer {
 		final GuiseSessionThreadGroup guiseSessionThreadGroup = guise.getThreadGroup(guiseSession); //get the thread group for this session
 		call(guiseSessionThreadGroup, new Runnable() { //initialize the Guise session in its own thread group
 
-					public void run() {
-						guiseSession.initialize(); //let the Guise session know it's being initialized so that it can listen to the application
-					}
-				});
+			@Override
+			public void run() {
+				guiseSession.initialize(); //let the Guise session know it's being initialized so that it can listen to the application
+			}
+
+		});
 	}
 
 	/**
@@ -100,10 +95,12 @@ public abstract class AbstractGuiseContainer implements GuiseContainer {
 		final GuiseSessionThreadGroup guiseSessionThreadGroup = guise.getThreadGroup(guiseSession); //get the thread group for this session
 		call(guiseSessionThreadGroup, new Runnable() { //destroy the Guise session in its own thread group
 
-					public void run() {
-						guiseSession.destroy(); //let the Guise session know it's being destroyed so that it can clean up and release references to the application
-					}
-				});
+			@Override
+			public void run() {
+				guiseSession.destroy(); //let the Guise session know it's being destroyed so that it can clean up and release references to the application
+			}
+
+		});
 		guiseSession.getApplication().unregisterSession(guiseSession); //unregister the session from the application
 		guise.removeGuiseSession(guiseSession); //remove the Guise session from Guise
 	}
@@ -179,31 +176,12 @@ public abstract class AbstractGuiseContainer implements GuiseContainer {
 		}
 	}
 
-	/**
-	 * Resolves a relative or absolute path against the container base path. Relative paths will be resolved relative to the container base path. Absolute paths
-	 * will be be considered already resolved. For a container base path "/path/to/container/", resolving "relative/path" will yield
-	 * "/path/to/container/relative/path", while resolving "/absolute/path" will yield "/absolute/path".
-	 * @param path The path to be resolved.
-	 * @return The path resolved against the container base path.
-	 * @throws NullPointerException if the given path is <code>null</code>.
-	 * @throws IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case
-	 *           {@link #resolveURI(URI)} should be used instead).
-	 * @see #getBasePath()
-	 */
+	@Override
 	public URIPath resolvePath(final URIPath path) {
 		return getBasePath().resolve(path); //resolve the path against the base path
 	}
 
-	/**
-	 * Resolves URI against the container base path. Relative paths will be resolved relative to the container base path. Absolute paths will be considered
-	 * already resolved, as will absolute URIs. For a container base path "/path/to/container/", resolving "relative/path" will yield
-	 * "/path/to/container/relative/path", while resolving "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield
-	 * "http://example.com/path".
-	 * @param uri The URI to be resolved.
-	 * @return The uri resolved against the container base path.
-	 * @throws NullPointerException if the given URI is <code>null</code>.
-	 * @see #getBasePath()
-	 */
+	@Override
 	public URI resolveURI(final URI uri) {
 		return getBasePath().resolve(checkInstance(uri, "URI cannot be null.")); //create a URI from the container base path and resolve the given path against it
 	}

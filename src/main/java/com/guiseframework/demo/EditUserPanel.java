@@ -94,6 +94,7 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser> {
 		okButton.setLabel("OK"); //set the text of the OK button
 		okButton.addActionListener(new ActionListener() { //if the OK button was pressed
 
+			@Override
 					public void actionPerformed(ActionEvent actionEvent) {
 						if(validate()) { //validate the form, showing errors; if the form validates
 							endModal(getUser()); //end the panel modality with the edited user only if the form validates
@@ -105,6 +106,7 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser> {
 		cancelButton.setLabel("Cancel"); //set the text of the cancel button
 		cancelButton.addActionListener(new ActionListener() { //if the cancel button was pressed
 
+			@Override
 					public void actionPerformed(ActionEvent actionEvent) {
 						endModal(null); //end the panel modality with no user
 					}
@@ -124,18 +126,23 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser> {
 	}
 
 	/**
-	 * Checks the state of the component for validity. This version ensures the entered passwords match.
-	 * @return <code>true</code> if the component and all children passes all validity tests, else <code>false</code>.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version ensures the entered passwords match.
+	 * </p>
 	 */
+	@Override
 	protected boolean determineValid() {
 		return super.determineValid() && isPasswordMatch(); //add a check for password validity
 	}
 
 	/**
-	 * Validates the user input of this component and all child components. The component will be updated with error information. This version adds errors for
-	 * non-matching passwords.
-	 * @return The current state of {@link #isValid()} as a convenience.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version adds errors for non-matching passwords.
+	 * </p>
 	 */
+	@Override
 	public boolean validate() {
 		super.validate(); //validate the component normally
 		if(!isPasswordMatch()) { //if the password isn't valid

@@ -35,8 +35,8 @@ public class WebCommandDepictEvent<C extends Enum<C> & WebPlatformCommand> exten
 	/** The command. */
 	private final WebPlatformCommand command;
 
-	/** @return The command. */
 	@SuppressWarnings("unchecked")
+	@Override
 	public C getCommand() {
 		return (C)command;
 	}
@@ -44,7 +44,7 @@ public class WebCommandDepictEvent<C extends Enum<C> & WebPlatformCommand> exten
 	/** The read-only map of parameters, which will be encoded in JavaScript Object Notation (JSON). */
 	private final Map<String, Object> parameters;
 
-	/** @return The read-only map of parameters, which will be encoded in JavaScript Object Notation (JSON). */
+	@Override
 	public Map<String, Object> getParameters() {
 		return parameters;
 	}

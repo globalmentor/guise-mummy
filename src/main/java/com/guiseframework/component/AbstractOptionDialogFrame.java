@@ -32,11 +32,7 @@ import com.guiseframework.model.ValueModel;
  */
 public abstract class AbstractOptionDialogFrame<O> extends AbstractDialogFrame<O> implements OptionDialogFrame<O> {
 
-	/**
-	 * Sets the single child component. This implementation throws an exception because the frame content is not allowed to be changed.
-	 * @param newContent The single child component, or <code>null</code> if this frame does not have a child component.
-	 * @throws IllegalArgumentException if any different content is provided.
-	 */
+	@Override
 	public void setContent(final Component newContent) {
 		if(newContent != getContent()) { //if the content is changing
 			throw new IllegalArgumentException("Option dialog frame content cannot be changed.");
@@ -48,15 +44,18 @@ public abstract class AbstractOptionDialogFrame<O> extends AbstractDialogFrame<O
 		return (Container)super.getContent();
 	}
 
-	/** @return The component representing option contents, or <code>null</code> if this frame does not have an option contents component. */
+	@Override
 	public Component getOptionContent() {
 		return ((RegionLayout)getContentContainer().getLayout()).getComponent(Region.CENTER); //return the center component, if there is one
 	}
 
 	/**
-	 * Sets the component representing option contents. This implementation adds the option content component to the center region of the child container.
-	 * @param newOptionContent The single option contents component, or <code>null</code> if this frame does not have an option contents component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation adds the option content component to the center region of the child container.
+	 * </p>
 	 */
+	@Override
 	public void setOptionContent(final Component newOptionContent) {
 		final Component oldOptionContents = getOptionContent(); //get the current component
 		if(oldOptionContents != newOptionContent) { //if the value is really changing
@@ -73,7 +72,7 @@ public abstract class AbstractOptionDialogFrame<O> extends AbstractDialogFrame<O
 	/** The container containing the options. */
 	private final Container optionContainer;
 
-	/** @return The container containing the options. */
+	@Override
 	public Container getOptionContainer() {
 		return optionContainer;
 	}
@@ -81,7 +80,7 @@ public abstract class AbstractOptionDialogFrame<O> extends AbstractDialogFrame<O
 	/** The read-only list of available options in order. */
 	private final List<O> options;
 
-	/** @return The read-only list of available options in order. */
+	@Override
 	public List<O> getOptions() {
 		return options;
 	}
@@ -89,11 +88,7 @@ public abstract class AbstractOptionDialogFrame<O> extends AbstractDialogFrame<O
 	/** The map of components representing options. */
 	private final Map<O, Component> optionComponentMap = new ConcurrentHashMap<O, Component>();
 
-	/**
-	 * Returns the component that represents the specified option.
-	 * @param option The option for which a component should be returned.
-	 * @return The component, such as a button, that represents the given option, or <code>null</code> if there is no component that represents the given option.
-	 */
+	@Override
 	public Component getOptionComponent(final O option) {
 		return optionComponentMap.get(option);
 	}

@@ -44,11 +44,7 @@ public class WebTabbedPanelDepictor<C extends AbstractCardPanel> extends Abstrac
 		super(XHTML_NAMESPACE_URI, ELEMENT_DIV); //represent <xhtml:div>
 	}
 
-	/**
-	 * Processes an event from the platform.
-	 * @param event The event to be processed.
-	 * @throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
-	 */
+	@Override
 	public void processEvent(final PlatformEvent event) {
 		if(event instanceof WebActionDepictEvent) { //if this is an action event
 			final WebActionDepictEvent webActionEvent = (WebActionDepictEvent)event; //get the web action event
@@ -110,11 +106,12 @@ public class WebTabbedPanelDepictor<C extends AbstractCardPanel> extends Abstrac
 	}
 
 	/**
-	 * Begins the rendering process. This version wraps the component in a decorator element and writes tabs. Each tab link is given an href of
-	 * "?<var>tabbedPaneID</var>=<var>tabID</var>".
-	 * @throws IOException if there is an error rendering the component.
-	 * @throws IllegalArgumentException if the given value control represents a value type this controller doesn't support.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version wraps the component in a decorator element and writes tabs. Each tab link is given an href of "?<var>tabbedPaneID</var>=<var>tabID</var>".
+	 * </p>
 	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
@@ -165,9 +162,12 @@ public class WebTabbedPanelDepictor<C extends AbstractCardPanel> extends Abstrac
 	}
 
 	/**
-	 * Ends the rendering process. This version closes the decorator elements.
-	 * @throws IOException if there is an error rendering the component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version closes the decorator elements.
+	 * </p>
 	 */
+	@Override
 	protected void depictEnd() throws IOException {
 		getDepictContext().writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV); //</xhtml:div> (component-body)
 		writeErrorMessage(); //write the error message, if any

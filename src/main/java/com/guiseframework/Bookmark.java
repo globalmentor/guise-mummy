@@ -158,7 +158,7 @@ public class Bookmark implements Cloneable {
 		return newBookmark; //return our modified clone
 	}
 
-	/** @return A shallow clone of this object. */
+	@Override
 	@SuppressWarnings("unchecked")
 	//we clone our internal hash map, so we know the generic return type
 	public Object clone() {
@@ -171,17 +171,18 @@ public class Bookmark implements Cloneable {
 		}
 	}
 
-	/** @return A hash code value for the object. */
+	@Override
 	public int hashCode() {
 		return parameterMap.hashCode(); //return the hash code of the parameter map
 	}
 
 	/**
-	 * Indicates whether some other object is "equal to" this one. This implementation returns whether the given object is a bookmark with the same ID and
-	 * parameters.
-	 * @param object The reference object with which to compare.
-	 * @return <code>true</code> if this object is equivalent to the given object.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation returns whether the given object is a bookmark with the same ID and parameters.
+	 * </p>
 	 */
+	@Override
 	public boolean equals(final Object object) {
 		if(object instanceof Bookmark) { //if the given object is a bookmark
 			return parameterMap.equals(((Bookmark)object).parameterMap); //compare parameter maps
@@ -190,12 +191,7 @@ public class Bookmark implements Cloneable {
 		}
 	}
 
-	/**
-	 * Returns a string representation of the bookmark. The string is suitable for use as a URI query, in the form
-	 * "?<var>parameter1Name</var>=<var>parameter1Value</var>&amp;<var>parameter2Name</var>=<var>parameter2Value</var>&hellip;". Each name and value will be
-	 * percent-encoded as appropriate for URIs.
-	 * @return A string representation of the bookmark suitable for use as a URI query.
-	 */
+	@Override
 	public String toString() {
 		final StringBuilder bookmarkQueryStringBuilder = new StringBuilder(); //create a new string builder
 		if(!parameterMap.isEmpty()) { //if there are parameters

@@ -83,17 +83,7 @@ public class BindingInputStrategy extends AbstractInputStrategy {
 		super(parent); //construct the parent class
 	}
 
-	/**
-	 * Processes input, returning whether the input was consumed. If the input is not consumed by this input strategy, it is sent to the parent input strategy, if
-	 * any, for processing. If input is bound to the given input, the input is delegated to {@link GuiseSession#input(Input)} and considered to be consumed. If an
-	 * action is bound to the given input, the action is performed and the input is considered to be consumed. If a bound action implements {@link Enableable} and
-	 * is not enabled, the action is not performed and the input is not considered to be consumed.
-	 * @param input The input to process.
-	 * @return <code>true</code> if the input was consumed and should not be processed further.
-	 * @throws NullPointerException if the given input is <code>null</code>.
-	 * @see GuiseSession#input(Input)
-	 * @see ActionModel#performAction()
-	 */
+	@Override
 	public boolean input(final Input input) {
 		final Object boundObject = bindings.get(input); //get the object bound to this input
 		if(boundObject != null) { //if there is a bound object

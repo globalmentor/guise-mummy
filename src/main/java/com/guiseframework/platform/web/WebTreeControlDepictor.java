@@ -103,7 +103,7 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 		treeNodeIDMap = new DecoratorReadWriteLockMap<TreeNodeModel<?>, Long>(new WeakHashMap<TreeNodeModel<?>, Long>(), idTreeNodeMap); //TODO switch to a safer implementation of a weak hash map, which has problems
 	}
 
-	/**
+	/*
 	 * Called when the view is installed in a component. This implementation listens for {@link TreeNodePropertyChangeEvent}s fired from the control and marks the
 	 * view as needing updated.
 	 * @param component The component into which this view is being installed.
@@ -118,7 +118,7 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 		}
 	*/
 
-	/**
+	/*
 	 * Called when the view is uninstalled from a component. This implementation stops listening for {@link TreeNodePropertyChangeEvent}s fired from the control.
 	 * @param component The component from which this view is being uninstalled.
 	 * @throws NullPointerException if the given component is <code>null</code>.
@@ -132,11 +132,7 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 		}
 	*/
 
-	/**
-	 * Processes an event from the platform.
-	 * @param event The event to be processed.
-	 * @throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
-	 */
+	@Override
 	public void processEvent(final PlatformEvent event) {
 		if(event instanceof WebActionDepictEvent) { //if this is an action control event
 			final WebActionDepictEvent webActionEvent = (WebActionDepictEvent)event; //get the action control event
@@ -195,10 +191,6 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 		return styleIDs; //return the style IDs
 	}
 
-	/**
-	 * Updates the views of any children.
-	 * @throws IOException if there is an error updating the child views.
-	 */
 	protected void depictChildren() throws IOException {
 		//TODO add "root" class
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context

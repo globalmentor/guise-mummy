@@ -41,31 +41,29 @@ public class TypeSelector implements SimpleSelector, Comparable<TypeSelector> {
 		this.typeName = checkInstance(typeName, "Type name cannot be null.");
 	}
 
-	/** @return A hash code for this object. */
+	@Override
 	public int hashCode() {
 		return getTypeName().hashCode();
 	}
 
-	/**
-	 * Determines whether this object is equivalent to another object.
-	 * @param object The object to compare with this object.
-	 * @return <code>true</code> if this object is equivalent to the given object.
-	 */
+	@Override
 	public boolean equals(final Object object) {
 		return object instanceof TypeSelector && getTypeName().equals(((TypeSelector)object).getTypeName());
 	}
 
-	/** @return A string representation of this object. */
+	@Override
 	public String toString() {
 		return getTypeName();
 	}
 
 	/**
-	 * Compares this object with the specified object for order. This implementation compares type names. Returns a negative integer, zero, or a positive integer
-	 * as this object is less than, equal to, or greater than the specified object.
-	 * @param object The object to be compared.
-	 * @return A negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation compares type names. Returns a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the
+	 * specified object.
+	 * </p>
 	 */
+	@Override
 	public int compareTo(final TypeSelector object) {
 		return getTypeName().compareTo(object.getTypeName()); //compare type names
 	}

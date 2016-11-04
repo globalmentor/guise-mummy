@@ -48,9 +48,12 @@ public final class NavigateModalActionListener extends AbstractNavigateModalActi
 	}
 
 	/**
-	 * Called when an action is initiated. This implementation requests modal navigation from the session.
-	 * @param actionEvent The event indicating the source of the action.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation requests modal navigation from the session.
+	 * </p>
 	 */
+	@Override
 	public void actionPerformed(final ActionEvent actionEvent) {
 		actionEvent.getSession().navigateModal(getNavigationURI(), getModelListener()); //request that the session navigate modally to the configured URI
 	}

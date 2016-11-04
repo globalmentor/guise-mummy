@@ -55,10 +55,7 @@ public class LocaleInfoModel extends DefaultInfoModel {
 		this.locale = checkInstance(locale, "Locale cannot be null"); //save the locale
 	}
 
-	/**
-	 * Determines the text of the label. This version returns the localized version of the locale if the value has not been explicitly set.
-	 * @return The label text, or <code>null</code> if there is no label text.
-	 */
+	@Override
 	public String getLabel() {
 		final String label = super.getLabel(); //get the default label
 		return label != null ? label : getLocale().getDisplayName(getSession().getLocale()); //return the localized name of the locale based upon the current session locale, if no locale was explicitly set 

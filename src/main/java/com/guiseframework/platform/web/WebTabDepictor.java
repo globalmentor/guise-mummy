@@ -42,11 +42,7 @@ public class WebTabDepictor<V, C extends ListSelectControl<V>> extends AbstractD
 		super(XHTML_NAMESPACE_URI, ELEMENT_OL); //represent <xhtml:ol>
 	}
 
-	/**
-	 * Processes an event from the platform.
-	 * @param event The event to be processed.
-	 * @throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
-	 */
+	@Override
 	public void processEvent(final PlatformEvent event) {
 		if(event instanceof WebActionDepictEvent) { //if this is an action event
 			final WebActionDepictEvent webActionEvent = (WebActionDepictEvent)event; //get the web action event
@@ -79,12 +75,13 @@ public class WebTabDepictor<V, C extends ListSelectControl<V>> extends AbstractD
 	}
 
 	/**
-	 * Retrieves the base style IDs for the given component. This version adds attributes based upon the tab control axis and orientation.
-	 * @param prefix The prefix that needs to be added to each, or <code>null</code> if there is no prefix to add.
-	 * @param suffix The suffix that needs to be added to each, or <code>null</code> if there is no suffix to add.
-	 * @return The base style IDs for the component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version adds attributes based upon the tab control axis and orientation.
+	 * </p>
 	 * @see AbstractWebComponentDepictor#addFlowStyleIDs(Set, Flow)
 	 */
+	@Override
 	protected Set<String> getBaseStyleIDs(final String prefix, final String suffix) {
 		final Set<String> baseStyleIDs = super.getBaseStyleIDs(prefix, suffix); //get the default base style IDs
 		final Flow flow; //we'll determine the flow TODO eventually create some sort of parent class or interface that returns the axis rather than special-casing the component type
@@ -100,10 +97,7 @@ public class WebTabDepictor<V, C extends ListSelectControl<V>> extends AbstractD
 		return baseStyleIDs; //return the new style IDs
 	}
 
-	/**
-	 * Renders the body of the component.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictBody() throws IOException {
 		super.depictBody(); //render the default main part of the component
 		writeDirectionAttribute(); //write the component direction, if this component specifies a direction
@@ -154,10 +148,13 @@ public class WebTabDepictor<V, C extends ListSelectControl<V>> extends AbstractD
 	}
 
 	/**
-	 * Updates the views of any children. This version does nothing, because if a tab control is a composite component the child controls have already been
-	 * rendered as values in {@link #depictBody()}.
-	 * @throws IOException if there is an error updating the child views.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version does nothing, because if a tab control is a composite component the child controls have already been rendered as values in
+	 * {@link #depictBody()}.
+	 * </p>
 	 */
+	@Override
 	protected void depictChildren() throws IOException {
 	}
 

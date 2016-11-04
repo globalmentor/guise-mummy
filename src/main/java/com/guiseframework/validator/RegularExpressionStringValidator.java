@@ -65,10 +65,12 @@ public class RegularExpressionStringValidator extends AbstractRegularExpressionV
 	}
 
 	/**
-	 * Returns a string representation of the given value so that it may be validated against the regular expression. This version returns the value itself.
-	 * @param value The value being validated.
-	 * @return A string representation of the given value, or <code>null</code> if the value is <code>null</code>.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version returns the value itself.
+	 * </p>
 	 */
+	@Override
 	protected String toString(final String value) {
 		return value; //return the value, which is already a string
 	}

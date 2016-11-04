@@ -40,12 +40,12 @@ public class DefaultNavigationModel extends AbstractModel implements NavigationM
 		this.navigationPath = navigationPath;
 	}
 
-	/** {@inheritDoc} */
+	@Override
 	public URIPath getNavigationPath() {
 		return navigationPath;
 	}
 
-	/** {@inheritDoc} */
+	@Override
 	public void setNavigationPath(final URIPath newNavigationPath) {
 		if(!Objects.equals(navigationPath, newNavigationPath)) { //if the value is really changing
 			final URIPath oldNavigationPath = navigationPath; //get the old value
@@ -54,7 +54,7 @@ public class DefaultNavigationModel extends AbstractModel implements NavigationM
 		}
 	}
 
-	/** @return A string representation of this navigation model. */
+	@Override
 	public String toString() {
 		final URIPath navigationPath = getNavigationPath(); //get the navigation path, if any
 		return navigationPath != null ? getClass().getName() + ": " + navigationPath : super.toString(); //return the class and navigation path, or the default string if there is no navigation path

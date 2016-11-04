@@ -41,14 +41,12 @@ public class RDFLiteralTreeNodeRepresentationStrategy extends AbstractRDFObjectT
 	}
 
 	/**
-	 * Builds the label to be used for a tree node. This version appends information about the literal.
-	 * @param stringBuilder The string builder to hold the label text.
-	 * @param treeControl The component containing the model.
-	 * @param model The model containing the value.
-	 * @param treeNode The node containing the value.
-	 * @param value The value contained in the node.
-	 * @return The string builder used to construct the label.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version appends information about the literal.
+	 * </p>
 	 */
+	@Override
 	//TODO fix	protected <N extends RDFLiteral> StringBuilder buildLabelText(final StringBuilder stringBuilder, final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final N value)
 	protected StringBuilder buildLabelText(final StringBuilder stringBuilder, final TreeControl treeControl, final TreeModel model,
 			final TreeNodeModel<? extends RDFLiteral> treeNode, final RDFLiteral value) { //TODO later put this method hierarchy in a custom label model

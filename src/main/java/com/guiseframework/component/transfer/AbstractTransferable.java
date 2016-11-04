@@ -31,16 +31,18 @@ public abstract class AbstractTransferable<S> implements Transferable<S> {
 	/** The source of the transferable data. */
 	private final S source;
 
-	/** @return The source of the transferable data. */
+	@Override
 	public S getSource() {
 		return source;
 	}
 
 	/**
-	 * Determines whether this transferable can transfer data with the given content type. This implementation calls {@link #getContentTypes()}.
-	 * @param contentType The type of data requested, which may include wildcards.
-	 * @return <code>true</code> if this object can transfer data with the requested content type.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation calls {@link #getContentTypes()}.
+	 * </p>
 	 */
+	@Override
 	public boolean canTransfer(final ContentType contentType) {
 		for(final ContentType transferContentType : getContentTypes()) { //for each content type
 			if(contentType.hasBaseType(transferContentType)) { //if this content type matches
@@ -51,12 +53,12 @@ public abstract class AbstractTransferable<S> implements Transferable<S> {
 	}
 
 	/**
-	 * Transfers data of the given class. This implementation delegates to {@link #transfer(ContentType)}.
-	 * @param <T> The type of object to be transferred.
-	 * @param objectClass The class of object to return.
-	 * @return The transferred data object, which may be <code>null</code>.
-	 * @throws IllegalArgumentException if the given class is not supported.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation delegates to {@link #transfer(ContentType)}.
+	 * </p>
 	 */
+	@Override
 	public <T> T transfer(final Class<T> objectClass) {
 		return objectClass.cast(transfer(getObjectContentType(objectClass))); //transfer the object based upon the content type and cast it to the class type
 	}

@@ -57,7 +57,7 @@ public class TextBox extends AbstractContainer implements TextModel, SectionComp
 		return textModel;
 	}
 
-	/** @return The layout definition for the text. */
+	@Override
 	public ReferenceLayout getLayout() {
 		return (ReferenceLayout)super.getLayout(); //a text component can only have a reference layout
 	}
@@ -117,32 +117,22 @@ public class TextBox extends AbstractContainer implements TextModel, SectionComp
 
 	//TextModel delegates 
 
-	/** @return The text, which may include a resource reference, or <code>null</code> if there is no text. */
+	@Override
 	public String getText() {
 		return getTextModel().getText();
 	}
 
-	/**
-	 * Sets the text. This is a bound property.
-	 * @param newText The new text, which may include a resource reference.
-	 * @see #TEXT_PROPERTY
-	 */
+	@Override
 	public void setText(final String newText) {
 		getTextModel().setText(newText);
 	}
 
-	/** @return The content type of the text. */
+	@Override
 	public ContentType getTextContentType() {
 		return getTextModel().getTextContentType();
 	}
 
-	/**
-	 * Sets the content type of the text. This is a bound property.
-	 * @param newTextContentType The new text content type.
-	 * @throws NullPointerException if the given content type is <code>null</code>.
-	 * @throws IllegalArgumentException if the given content type is not a text content type.
-	 * @see #TEXT_CONTENT_TYPE_PROPERTY
-	 */
+	@Override
 	public void setTextContentType(final ContentType newTextContentType) {
 		getTextModel().setTextContentType(newTextContentType);
 	}

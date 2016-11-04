@@ -65,10 +65,12 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 	/** The listener that listens for the change of a child's property, such as a value model's value, and marks the view as dirty. */
 	protected final PropertyChangeListener childPropertyChangeListener = new PropertyChangeListener() { //TODO only create this if needed
 
+		@Override
 		public void propertyChange(final PropertyChangeEvent propertyChangeEvent) { //if a property changes
 			//TODO del Log.trace("hey, a value property", propertyChangeEvent.getPropertyName(), "just changed!");
 			setDepicted(false); //show that we need general updates TODO improve to only indicate that the relevant property, such as VALUE_PROPERTY, changed			
 		}
+
 	};
 
 	/** Default constructor. */
@@ -77,7 +79,12 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 		getIgnoredProperties().add(Component.VALID_PROPERTY); //ignore Component.valid, because we don't want to mark composite components as dirty just because a child does not have valid input
 	}
 
-	/** {@inheritDoc} If the component is a container, this version listens for container events and marks the view as needing updated. */
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * If the component is a container, this version listens for container events and marks the view as needing updated.
+	 * </p>
+	 */
 	@Override
 	public void installed(final C component) {
 		super.installed(component); //perform the default installation
@@ -99,7 +106,12 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 		}
 	}
 
-	/** {@inheritDoc} If the component is a container, this version stops listening for container events. */
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * If the component is a container, this version stops listening for container events.
+	 * </p>
+	 */
 	@Override
 	public void uninstalled(final C component) {
 		super.uninstalled(component); //perform the default uninstallation
@@ -121,7 +133,12 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 		}
 	}
 
-	/** {@inheritDoc} This implementation handles {@link PlatformFocusEvent}. */
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation handles {@link PlatformFocusEvent}.
+	 * </p>
+	 */
 	@Override
 	public void processEvent(final PlatformEvent event) {
 		if(event instanceof PlatformDropEvent) { //if this is a drop event
@@ -165,7 +182,10 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 	}
 
 	/**
-	 * {@inheritDoc} This implementation updates child components, if any.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation updates child components, if any.
+	 * </p>
 	 * @see #depictChildren()
 	 */
 	@Override
@@ -227,7 +247,12 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 		}
 	}
 
-	/** {@inheritDoc} This implementation marks the property as being modified if the property is not an ignored property. */
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation marks the property as being modified if the property is not an ignored property.
+	 * </p>
+	 */
 	@Override
 	protected void depictedObjectPropertyChange(final PropertyChangeEvent propertyChangeEvent) {
 		super.depictedObjectPropertyChange(propertyChangeEvent); //do the default property change functionality
@@ -276,6 +301,7 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 				setDepicted(false); //show that we need general updates
 			}
 		}
+
 	};
 
 }

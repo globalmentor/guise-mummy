@@ -221,17 +221,17 @@ public class DateTimeFieldsControl extends AbstractLayoutValueControl<Date> { //
 		yearPropertyChangeListener = new AbstractGenericPropertyChangeListener<Integer>() { //create a property change listener to listen for the year changing
 
 			public void propertyChange(final GenericPropertyChangeEvent<Integer> propertyChangeEvent) { //if the selected year changed
-			/*TODO fix
-									final Integer newYear=propertyChangeEvent.getNewValue();	//get the new selected year
-									if(newYear!=null) {	//if a new year was selected (a null value can be sent when the model is cleared)
-										final Calendar calendar=Calendar.getInstance(getSession().getLocale());	//create a new calendar
-										calendar.setTime(getDate());	//set the calendar date to our currently displayed date
-										if(calendar.get(Calendar.YEAR)!=newYear) {	//if the currently visible date is in another year
-											calendar.set(Calendar.YEAR, newYear);	//change to the given year
-											setDate(calendar.getTime());	//change the date to the given month, which will update the calenders TODO make sure that going from a 31-day month, for example, to a 28-day month will be OK, if the day is day 31
+				/*TODO fix
+										final Integer newYear=propertyChangeEvent.getNewValue();	//get the new selected year
+										if(newYear!=null) {	//if a new year was selected (a null value can be sent when the model is cleared)
+											final Calendar calendar=Calendar.getInstance(getSession().getLocale());	//create a new calendar
+											calendar.setTime(getDate());	//set the calendar date to our currently displayed date
+											if(calendar.get(Calendar.YEAR)!=newYear) {	//if the currently visible date is in another year
+												calendar.set(Calendar.YEAR, newYear);	//change to the given year
+												setDate(calendar.getTime());	//change the date to the given month, which will update the calenders TODO make sure that going from a 31-day month, for example, to a 28-day month will be OK, if the day is day 31
+											}
 										}
-									}
-			*/
+				*/
 			}
 		};
 		updateYearControl(); //create and install an appropriate year control
@@ -245,10 +245,12 @@ public class DateTimeFieldsControl extends AbstractLayoutValueControl<Date> { //
 		addPropertyChangeListener(VALUE_PROPERTY, updateDateControlsPropertyChangeListener); //update the calendars if the selected date changes
 		addPropertyChangeListener(VALIDATOR_PROPERTY, new AbstractGenericPropertyChangeListener<Validator<Date>>() { //create a property change listener to listen for our validator changing, so that we can update the date control if needed
 
-					public void propertyChange(final GenericPropertyChangeEvent<Validator<Date>> propertyChangeEvent) { //if the model's validator changed
-						updateYearControl(); //update the year control (e.g. a drop-down list) to match the new validator (e.g. a range validator), if any
-					}
-				});
+			@Override
+			public void propertyChange(final GenericPropertyChangeEvent<Validator<Date>> propertyChangeEvent) { //if the model's validator changed
+				updateYearControl(); //update the year control (e.g. a drop-down list) to match the new validator (e.g. a range validator), if any
+			}
+
+		});
 	}
 
 	/**

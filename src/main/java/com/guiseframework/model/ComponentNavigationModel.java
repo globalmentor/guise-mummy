@@ -43,7 +43,7 @@ public class ComponentNavigationModel extends AbstractModel implements Navigatio
 		this.component = checkInstance(component);
 	}
 
-	/** {@inheritDoc} */
+	@Override
 	public URIPath getNavigationPath() {
 		return Components.getNavigationPath(component); //retrieve the navigation path from the component
 	}
@@ -55,6 +55,7 @@ public class ComponentNavigationModel extends AbstractModel implements Navigatio
 	 * </p>
 	 * @throws UnsupportedOperationException because the content cannot be changed.
 	 */
+	@Override
 	public void setNavigationPath(final URIPath newNavigationPath) {
 		throw new UnsupportedOperationException("Component navigation models do not allow the navigation path to be set.");
 	}

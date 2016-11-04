@@ -65,7 +65,7 @@ public class CalendarMonthTableModel extends AbstractTableModel //TODO set the m
 	/** The number of rows in this table. */
 	private int rowCount = 0;
 
-	/** @return The number of rows in this table. */
+	@Override
 	public int getRowCount() {
 		return rowCount;
 	}
@@ -167,8 +167,8 @@ public class CalendarMonthTableModel extends AbstractTableModel //TODO set the m
 	 * @see #getColumnLabelDateStyle()
 	 */
 	protected void updateColumnLabelDateFormat() {
-		columnLabelDateFormat = AbstractDateStringLiteralConverter.createDateFormat(getColumnLabelDateStyle(), null, getSession().getLocale(), getSession()
-				.getTimeZone()); //create a new date format based upon the style, locale, and time zone		
+		columnLabelDateFormat = AbstractDateStringLiteralConverter.createDateFormat(getColumnLabelDateStyle(), null, getSession().getLocale(),
+				getSession().getTimeZone()); //create a new date format based upon the style, locale, and time zone		
 	}
 
 	/** Default constructor for current month using the current date. */
@@ -191,21 +191,15 @@ public class CalendarMonthTableModel extends AbstractTableModel //TODO set the m
 		//TODO important: this is a memory leak---make sure we uninstall the listener when the session goes away
 		getSession().addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGenericPropertyChangeListener<Locale>() { //listen for the session locale changing
 
-					public void propertyChange(final GenericPropertyChangeEvent<Locale> propertyChangeEvent) { //if the locale changes
-						updateModel(); //update the model based upon the new locale
-					}
-				});
+			@Override
+			public void propertyChange(final GenericPropertyChangeEvent<Locale> propertyChangeEvent) { //if the locale changes
+				updateModel(); //update the model based upon the new locale
+			}
+
+		});
 	}
 
-	/**
-	 * Returns the cell value at the given row and column.
-	 * @param <C> The type of cell values in the given column.
-	 * @param rowIndex The zero-based row index.
-	 * @param column The column for which a value should be returned.
-	 * @return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
-	 * @throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	 * @throws IllegalArgumentException if the given column is not one of this table's columns.
-	 */
+	@Override
 	public <C> C getCellValue(final int rowIndex, final TableColumnModel<C> column) {
 		final int columnIndex = getColumnIndex(column); //get the index of this column
 		if(columnIndex < 0) { //if this column isn't in this table
@@ -217,15 +211,7 @@ public class CalendarMonthTableModel extends AbstractTableModel //TODO set the m
 		return column.getValueClass().cast(cellCalendar.getTime()); //return the calendar time representing the date of the cell
 	}
 
-	/**
-	 * Sets the cell value at the given row and column.
-	 * @param <C> The type of cell values in the given column.
-	 * @param rowIndex The zero-based row index.
-	 * @param column The column for which a value should be returned.
-	 * @param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	 * @throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	 * @throws IllegalArgumentException if the given column is not one of this table's columns.
-	 */
+	@Override
 	public <C> void setCellValue(final int rowIndex, final TableColumnModel<C> column, final C newCellValue) {
 		throw new UnsupportedOperationException("Calendar days are read-only.");
 	}
@@ -245,9 +231,12 @@ public class CalendarMonthTableModel extends AbstractTableModel //TODO set the m
 		}
 
 		/**
-		 * Determines the text of the label. This version returns a representation of the day of the week if no label is specified.
-		 * @return The label text, or <code>null</code> if there is no label text.
+		 * {@inheritDoc}
+		 * <p>
+		 * This version returns a representation of the day of the week if no label is specified.
+		 * </p>
 		 */
+		@Override
 		public String getLabel() {
 			String label = super.getLabel(); //get the specified label
 			if(label == null) { //if no label is specified

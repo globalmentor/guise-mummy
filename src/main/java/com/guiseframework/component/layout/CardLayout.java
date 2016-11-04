@@ -26,15 +26,12 @@ import com.guiseframework.model.*;
  */
 public class CardLayout extends AbstractValueLayout<CardConstraints> {
 
-	/** @return The class representing the type of constraints appropriate for this layout. */
+	@Override
 	public Class<? extends CardConstraints> getConstraintsClass() {
 		return CardConstraints.class;
 	}
 
-	/**
-	 * Creates default constraints for the container.
-	 * @return New default constraints for the container.
-	 */
+	@Override
 	public CardConstraints createDefaultConstraints() {
 		return new CardConstraints(); //create constraints with a default label model
 	}

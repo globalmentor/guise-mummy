@@ -37,9 +37,12 @@ public class DemoUser implements Principal, Comparable<DemoUser> {
 	}
 
 	/**
-	 * @return the name of this principal. This implementation returns the user ID. This method is provided to implement the {@link Principal} interface.
-	 * @see #getID()
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation returns the user ID.
+	 * </p>
 	 */
+	@Override
 	public String getName() {
 		return getID();
 	}
@@ -134,33 +137,39 @@ public class DemoUser implements Principal, Comparable<DemoUser> {
 		this.email = email;
 	}
 
-	/**
-	 * Compares users based upon lastName+firstName+middleName+ID. A more internationalized
-	 * @param user The user with which to compare.
-	 * @return A value indicating whether the first user is alphabetically less than, equal to, or greater than the second.
-	 */
+	@Override
 	public int compareTo(final DemoUser user) {
 		return COLLATOR.compare(getLastName() + getFirstName() + getMiddleName() + getID(),
 				user.getLastName() + user.getFirstName() + user.getMiddleName() + user.getID()); //compare names
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * 
 	 * @return <code>true</code> if the given object is another user with the same ID.
 	 * @see #getID()
 	 */
+	@Override
 	public boolean equals(final Object object) {
 		return object instanceof DemoUser && getID().equals(((DemoUser)object).getID()); //see if the other object is a user with the same ID
 	}
 
 	/**
-	 * @return The hash code for this user. This implementation returns the hash code of the ID.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation returns the hash code of the ID.
+	 * </p>
+	 * 
+	 * @return The hash code for this user.
 	 * @see #getID()
 	 */
+	@Override
 	public int hashCode() {
 		return getID().hashCode(); //return the hash code of the ID, as the ID should be unique
 	}
 
 	/** @return A string representation of this user in the form "(<var>id</var>) <var>lastName</var>, <var>firstName</var> <var>middleName</var>" */
+	@Override
 	public String toString() {
 		final StringBuilder stringBuilder = new StringBuilder(); //create a new string builder
 		stringBuilder.append('(').append(getID()).append(')').append(' '); //(id) 

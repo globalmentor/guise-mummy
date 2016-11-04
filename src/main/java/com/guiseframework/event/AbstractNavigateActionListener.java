@@ -76,9 +76,12 @@ public abstract class AbstractNavigateActionListener implements ActionListener {
 	}
 
 	/**
-	 * Called when an action is initiated. This implementation requests navigation from the session.
-	 * @param actionEvent The event indicating the source of the action.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation requests navigation from the session.
+	 * </p>
 	 */
+	@Override
 	public void actionPerformed(final ActionEvent actionEvent) {
 		actionEvent.getSession().navigate(getNavigationURI(), getViewportID()); //request that the session navigate to the configured URI in the identified viewport, if any
 	}

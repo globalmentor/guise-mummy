@@ -267,7 +267,7 @@ public class Notification extends DefaultLabelModel {
 		this.options = unmodifiableList(optionList); //save the list of options without duplicates
 	}
 
-	/** @return A string representation of this notification. */
+	@Override
 	public String toString() {
 		return getSeverity() + ": " + AbstractModel.getPlainText(Guise.getInstance().getGuiseSession().dereferenceString(getMessage()), getMessageContentType()); //severity: message (resolve the message and get its plain text form)
 	}

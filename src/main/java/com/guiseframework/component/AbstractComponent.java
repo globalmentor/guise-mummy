@@ -72,43 +72,22 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/** The thread-safe set of properties saved and loaded as preferences. */
 	private final Set<String> preferenceProperties = new CopyOnWriteArraySet<String>();
 
-	/**
-	 * Adds a property to be saved and loaded as a preference.
-	 * @param propertyName The property to store as a preference.
-	 * @see #loadPreferences(boolean)
-	 * @see #savePreferences(boolean)
-	 */
+	@Override
 	public void addPreferenceProperty(final String propertyName) {
 		preferenceProperties.add(propertyName);
 	}
 
-	/**
-	 * Determines whether the given property is saved and loaded as a preference.
-	 * @param propertyName The property to determine if it is stored as a preference.
-	 * @return <code>true</code> if the given property is saved and loaded as a preference.
-	 * @see #loadPreferences(boolean)
-	 * @see #savePreferences(boolean)
-	 */
+	@Override
 	public boolean isPreferenceProperty(final String propertyName) {
 		return preferenceProperties.contains(propertyName);
 	}
 
-	/**
-	 * Returns all properties stored as preferences.
-	 * @return An iterable of all properties saved and loaded as preferences.
-	 * @see #loadPreferences(boolean)
-	 * @see #savePreferences(boolean)
-	 */
+	@Override
 	public Iterable<String> getPreferenceProperties() {
 		return preferenceProperties;
 	}
 
-	/**
-	 * Removes a property from being saved and loaded as preferences.
-	 * @param propertyName The property that should no longer be stored as a preference.
-	 * @see #loadPreferences(boolean)
-	 * @see #savePreferences(boolean)
-	 */
+	@Override
 	public void removePreferenceProperty(final String propertyName) {
 		preferenceProperties.remove(propertyName);
 	}
@@ -127,20 +106,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	 */
 	private String name = null;
 
-	/**
-	 * @return The name of the component, not guaranteed to be unique (but guaranteed not to be the empty string) and useful only for searching for components
-	 *         within a component sub-hierarchy, or <code>null</code> if the component has no name.
-	 */
+	@Override
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * Sets the name of the component. This is a bound property.
-	 * @param newName The new name of the component, or <code>null</code> if the component should have no name.
-	 * @throws IllegalArgumentException if the given name is the empty string.
-	 * @see #NAME_PROPERTY
-	 */
+	@Override
 	public void setName(final String newName) {
 		if(!Objects.equals(name, newName)) { //if the value is really changing
 			if(newName != null && newName.length() == 0) { //if the empty string was passed
@@ -152,117 +123,82 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		}
 	}
 
-	/** @return The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI. */
+	@Override
 	public URI getGlyphURI() {
 		return getInfoModel().getGlyphURI();
 	}
 
-	/**
-	 * Sets the URI of the icon. This is a bound property of type <code>URI</code>.
-	 * @param newLabelIcon The new URI of the icon, which may be a resource URI.
-	 * @see #GLYPH_URI_PROPERTY
-	 */
+	@Override
 	public void setGlyphURI(final URI newLabelIcon) {
 		getInfoModel().setGlyphURI(newLabelIcon);
 	}
 
-	/** @return The label text, which may include a resource reference, or <code>null</code> if there is no label text. */
+	@Override
 	public String getLabel() {
 		return getInfoModel().getLabel();
 	}
 
-	/**
-	 * Sets the text of the label. This is a bound property.
-	 * @param newLabelText The new text of the label, which may include a resource reference.
-	 * @see #LABEL_PROPERTY
-	 */
+	@Override
 	public void setLabel(final String newLabelText) {
 		getInfoModel().setLabel(newLabelText);
 	}
 
-	/** @return The content type of the label text. */
+	@Override
 	public ContentType getLabelContentType() {
 		return getInfoModel().getLabelContentType();
 	}
 
-	/**
-	 * Sets the content type of the label text. This is a bound property.
-	 * @param newLabelTextContentType The new label text content type.
-	 * @throws NullPointerException if the given content type is <code>null</code>.
-	 * @throws IllegalArgumentException if the given content type is not a text content type.
-	 * @see #LABEL_CONTENT_TYPE_PROPERTY
-	 */
+	@Override
 	public void setLabelContentType(final ContentType newLabelTextContentType) {
 		getInfoModel().setLabelContentType(newLabelTextContentType);
 	}
 
-	/** @return The description text, such as might appear in a flyover, or <code>null</code> if there is no description. */
+	@Override
 	public String getDescription() {
 		return getInfoModel().getDescription();
 	}
 
-	/**
-	 * Sets the description text, such as might appear in a flyover. This is a bound property.
-	 * @param newDescription The new text of the description, such as might appear in a flyover.
-	 * @see #DESCRIPTION_PROPERTY
-	 */
+	@Override
 	public void setDescription(final String newDescription) {
 		getInfoModel().setDescription(newDescription);
 	}
 
-	/** @return The content type of the description text. */
+	@Override
 	public ContentType getDescriptionContentType() {
 		return getInfoModel().getDescriptionContentType();
 	}
 
-	/**
-	 * Sets the content type of the description text. This is a bound property.
-	 * @param newDescriptionContentType The new description text content type.
-	 * @throws NullPointerException if the given content type is <code>null</code>.
-	 * @throws IllegalArgumentException if the given content type is not a text content type.
-	 * @see #DESCRIPTION_CONTENT_TYPE_PROPERTY
-	 */
+	@Override
 	public void setDescriptionContentType(final ContentType newDescriptionContentType) {
 		getInfoModel().setDescriptionContentType(newDescriptionContentType);
 	}
 
-	/** @return The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information. */
+	@Override
 	public String getInfo() {
 		return getInfoModel().getInfo();
 	}
 
-	/**
-	 * Sets the advisory information text, such as might appear in a tooltip. This is a bound property.
-	 * @param newInfo The new text of the advisory information, such as might appear in a tooltip.
-	 * @see #INFO_PROPERTY
-	 */
+	@Override
 	public void setInfo(final String newInfo) {
 		getInfoModel().setInfo(newInfo);
 	}
 
-	/** @return The content type of the advisory information text. */
+	@Override
 	public ContentType getInfoContentType() {
 		return getInfoModel().getInfoContentType();
 	}
 
-	/**
-	 * Sets the content type of the advisory information text. This is a bound property.
-	 * @param newInfoContentType The new advisory information text content type.
-	 * @throws NullPointerException if the given content type is <code>null</code>.
-	 * @throws IllegalArgumentException if the given content type is not a text content type.
-	 * @see #INFO_CONTENT_TYPE_PROPERTY
-	 */
+	@Override
 	public void setInfoContentType(final ContentType newInfoContentType) {
 		getInfoModel().setInfoContentType(newInfoContentType);
 	}
 
-	/** The layout constraints describing individual component layout information, or <code>null</code> if no constraints have been specified for this component. */
+	/**
+	 * The layout constraints describing individual component layout information, or <code>null</code> if no constraints have been specified for this component.
+	 */
 	private Constraints constraints = null;
 
-	/**
-	 * @return The layout constraints describing individual component layout information, or <code>null</code> if no constraints have been specified for this
-	 *         component.
-	 */
+	@Override
 	public Constraints getConstraints() {
 		return constraints;
 	}
@@ -290,16 +226,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/** The strategy for processing input, or <code>null</code> if this component has no input strategy. */
 	private InputStrategy inputStrategy = null;
 
-	/** @return The strategy for processing input, or <code>null</code> if this component has no input strategy. */
+	@Override
 	public InputStrategy getInputStrategy() {
 		return inputStrategy;
 	}
 
-	/**
-	 * Sets the strategy for processing input. This is a bound property.
-	 * @param newInputStrategy The new strategy for processing input, or <code>null</code> if this component is to have no input strategy.
-	 * @see #INPUT_STRATEGY_PROPERTY
-	 */
+	@Override
 	public void setInputStrategy(final InputStrategy newInputStrategy) {
 		if(!Objects.equals(inputStrategy, newInputStrategy)) { //if the value is really changing
 			final InputStrategy oldInputStrategy = inputStrategy; //get the current value
@@ -311,17 +243,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/** The notification associated with the component, or <code>null</code> if no notification is associated with this component. */
 	private Notification notification = null;
 
-	/** @return The notification associated with the component, or <code>null</code> if no notification is associated with this component. */
+	@Override
 	public Notification getNotification() {
 		return notification;
 	}
 
-	/**
-	 * Sets the component notification. This is a bound property. The notification is also fired as a {@link NotificationEvent} on this component if a new
-	 * notification is given. Parents are expected to refire the notification event up the hierarchy.
-	 * @param newNotification The notification for the component, or <code>null</code> if no notification is associated with this component.
-	 * @see #NOTIFICATION_PROPERTY
-	 */
+	@Override
 	public void setNotification(final Notification newNotification) {
 		if(!Objects.equals(notification, newNotification)) { //if the value is really changing
 			final Notification oldNotification = notification; //get the old value
@@ -353,13 +280,15 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	private Boolean valid = null; //start with an uninitialized valid property
 
 	/**
-	 * Determines whether the state of the component and all child components represents valid user input. This implementation initializes the valid property if
-	 * needed.
-	 * @return Whether the state of the component and all child components represents valid user input.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation initializes the valid property if needed.
+	 * </p>
 	 */
+	@Override
 	public boolean isValid() {
 		if(valid == null) { //if valid is not yet initialized TODO eliminate race condition
-		//TODO del Log.traceStack("ready to call determineValid() for the first time from inside isValid()");
+			//TODO del Log.traceStack("ready to call determineValid() for the first time from inside isValid()");
 			valid = Boolean.TRUE; //initialize valid to an arbitrary value so that if determineValid() calls isValid() there won't be inifinite recursion
 			valid = Boolean.valueOf(determineValid()); //determine validity
 		}
@@ -399,12 +328,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	 */
 	protected void updateValid() {
 		if(valid != null || hasPropertyChangeListeners(VALID_PROPERTY)) { //if valid is initialized or there is a listener for the valid property
-		/*TODO del
-		if(valid==null)
-		{
-			Log.traceStack("ready to call determineValid() for the first time from inside updateValid()");	
-		}
-		*/
+			/*TODO del
+			if(valid==null)
+			{
+				Log.traceStack("ready to call determineValid() for the first time from inside updateValid()");	
+			}
+			*/
 			/*TODO del
 							final boolean newValid=determineValid();
 			Log.trace("ready to set valid in", this, "to", newValid);
@@ -426,7 +355,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/** The depictor for this object; the depictor is lazily installed to allow construction to complete before the depictor is installed. */
 	private final Depictor<? extends Component> depictor;
 
-	/** @return The depictor for this object. */
+	@Override
 	public Depictor<? extends Component> getDepictor() {
 		if(depictor.getDepictedObject() == null) { //if the depictor has not yet been installed TODO fix the race condition
 			notifyDepictorInstalled(depictor); //tell the the depictor it has been installed
@@ -434,23 +363,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		return depictor; //return the depictor
 	}
 
-	/**
-	 * Processes an event from the platform. This method delegates to the currently installed depictor.
-	 * @param event The event to be processed.
-	 * @throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
-	 * @see #getDepictor()
-	 * @see Depictor#processEvent(PlatformEvent)
-	 */
+	@Override
 	public void processEvent(final PlatformEvent event) {
 		getDepictor().processEvent(event); //ask the depictor to process the event
 	}
 
-	/**
-	 * Updates the depiction of the object. The depiction will be marked as updated. This method delegates to the currently installed depictor.
-	 * @throws IOException if there is an error updating the depiction.
-	 * @see #getDepictor()
-	 * @see Depictor#depict()
-	 */
+	@Override
 	public void depict() throws IOException {
 		getDepictor().depict(); //ask the depictor to depict the object
 	}
@@ -458,7 +376,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/** The object depiction identifier */
 	private final long depictID;
 
-	/** @return The object depiction identifier. */
+	@Override
 	public long getDepictID() {
 		return depictID;
 	}
@@ -466,23 +384,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/** The internationalization orientation of the component's contents, or <code>null</code> if the default orientation should be used. */
 	private Orientation orientation = null;
 
-	/**
-	 * Returns this component's requested orientation. To resolve the orientation up the hierarchy, {@link #getComponentOrientation()} should be used.
-	 * @return The internationalization orientation of the component's contents, or <code>null</code> if the default orientation should be used.
-	 * @see #getComponentOrientation()
-	 */
+	@Override
 	public Orientation getOrientation() {
 		return orientation;
 	}
 
-	/**
-	 * Determines the internationalization orientation of the component's contents. This method returns the local orientation value, if there is one. If there is
-	 * no orientation specified for this component, the request is deferred to this component's parent. If there is no parent component, a default orientation is
-	 * retrieved from the current session.
-	 * @return The internationalization orientation of the component's contents.
-	 * @see #getOrientation()
-	 * @see GuiseSession#getOrientation()
-	 */
+	@Override
 	public Orientation getComponentOrientation() {
 		final Orientation orientation = getOrientation(); //get this component's orientation
 		if(orientation != null) { //if an orientation is explicitly set for this component
@@ -497,12 +404,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		}
 	}
 
-	/**
-	 * Sets the orientation. This is a bound property
-	 * @param newOrientation The new internationalization orientation of the component's contents, or <code>null</code> if default orientation should be
-	 *          determined based upon the session's locale.
-	 * @see Component#ORIENTATION_PROPERTY
-	 */
+	@Override
 	public void setOrientation(final Orientation newOrientation) {
 		if(!Objects.equals(orientation, newOrientation)) { //if the value is really changing
 			final Orientation oldOrientation = orientation; //get the old value
@@ -514,17 +416,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/** The parent of this component, or <code>null</code> if this component does not have a parent. */
 	private CompositeComponent parent = null;
 
-	/** @return The parent of this component, or <code>null</code> if this component does not have a parent. */
+	@Override
 	public CompositeComponent getParent() {
 		return parent;
 	}
 
-	/**
-	 * Retrieves the first ancestor of the given type.
-	 * @param <A> The type of ancestor component requested.
-	 * @param ancestorClass The class of ancestor component requested.
-	 * @return The first ancestor component of the given type, or <code>null</code> if this component has no such ancestor.
-	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	//we check to see if the ancestor is of the correct type before casting, so the cast is logically checked, though not syntactically checked
 	public <A extends CompositeComponent> A getAncestor(final Class<A> ancestorClass) {
@@ -536,18 +433,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		}
 	}
 
-	/**
-	 * Sets the parent of this component. This method is managed by containers, and normally should not be called by applications. A component cannot be given a
-	 * parent if it already has a parent. A component's parent cannot be removed if that parent is a container and this component is still a child of that
-	 * container. A container's parent cannot be set to a container unless that container already recognizes this component as one of its children. If a component
-	 * is given the same parent it already has, no action occurs.
-	 * @param newParent The new parent for this component, or <code>null</code> if this component is being removed from a parent.
-	 * @throws IllegalStateException if a parent is provided and this component already has a parent.
-	 * @throws IllegalStateException if no parent is provided and this component's old parent is a container that still recognizes this component as its child.
-	 * @throws IllegalArgumentException if a parent container is provided and the given parent container does not already recognize this component as its child.
-	 * @see Container#add(Component)
-	 * @see Container#remove(Object)
-	 */
+	@Override
 	public void setParent(final CompositeComponent newParent) {
 		final CompositeComponent oldParent = parent; //get the old parent
 		if(oldParent != newParent) { //if the parent is really changing
@@ -570,16 +456,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/** Whether the component has dragging enabled. */
 	private boolean dragEnabled = false;
 
-	/** @return Whether the component has dragging enabled. */
+	@Override
 	public boolean isDragEnabled() {
 		return dragEnabled;
 	}
 
-	/**
-	 * Sets whether the component has dragging enabled. This is a bound property of type {@link Boolean}.
-	 * @param newDragEnabled <code>true</code> if the component should allow dragging, else <code>false</code>.
-	 * @see Component#DRAG_ENABLED_PROPERTY
-	 */
+	@Override
 	public void setDragEnabled(final boolean newDragEnabled) {
 		if(dragEnabled != newDragEnabled) { //if the value is really changing
 			final boolean oldDragEnabled = dragEnabled; //get the current value
@@ -591,16 +473,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/** Whether the component has dropping enabled. */
 	private boolean dropEnabled = false;
 
-	/** @return Whether the component has dropping enabled. */
+	@Override
 	public boolean isDropEnabled() {
 		return dropEnabled;
 	}
 
-	/**
-	 * Sets whether the component has dropping enabled. This is a bound property of type {@link Boolean}.
-	 * @param newDropEnabled <code>true</code> if the component should allow dropping, else <code>false</code>.
-	 * @see Component#DROP_ENABLED_PROPERTY
-	 */
+	@Override
 	public void setDropEnabled(final boolean newDropEnabled) {
 		if(dropEnabled != newDropEnabled) { //if the value is really changing
 			final boolean oldDropEnabled = dropEnabled; //get the current value
@@ -612,7 +490,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/** Whether flyovers are enabled for this component. */
 	private boolean flyoverEnabled = false;
 
-	/** @return Whether flyovers are enabled for this component. */
+	@Override
 	public boolean isFlyoverEnabled() {
 		return flyoverEnabled;
 	}
@@ -621,12 +499,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	private FlyoverStrategy<?> defaultFlyoverStrategy = null;
 
 	/**
-	 * Sets whether flyovers are enabled for this component. Flyovers contain information from the component model's "description" property. This implementation
-	 * adds or removes a default flyover strategy if one is not already installed. This is a bound property of type {@link Boolean}.
-	 * @param newFlyoverEnabled <code>true</code> if the component should display flyovers, else <code>false</code>.
-	 * @see #getDescription()
-	 * @see Component#FLYOVER_ENABLED_PROPERTY
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation adds or removes a default flyover strategy if one is not already installed. This is a bound property of type {@link Boolean}.
+	 * </p>
 	 */
+	@Override
 	public void setFlyoverEnabled(final boolean newFlyoverEnabled) {
 		if(flyoverEnabled != newFlyoverEnabled) { //if the value is really changing
 			final boolean oldFlyoverEnabled = flyoverEnabled; //get the current value
@@ -651,16 +529,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/** The installed flyover strategy, or <code>null</code> if there is no flyover strategy installed. */
 	private FlyoverStrategy<?> flyoverStrategy = null;
 
-	/** @return The installed flyover strategy, or <code>null</code> if there is no flyover strategy installed. */
+	@Override
 	public FlyoverStrategy<?> getFlyoverStrategy() {
 		return flyoverStrategy;
 	}
 
-	/**
-	 * Sets the strategy for controlling flyovers. The flyover strategy will be registered as a mouse listener for this component. This is a bound property.
-	 * @param newFlyoverStrategy The new flyover strategy, or <code>null</code> if there is no flyover strategy installed.
-	 * @see #FLYOVER_STRATEGY_PROPERTY
-	 */
+	@Override
 	public void setFlyoverStrategy(final FlyoverStrategy<?> newFlyoverStrategy) {
 		if(flyoverStrategy != newFlyoverStrategy) { //if the value is really changing
 			final FlyoverStrategy<?> oldFlyoverStrategy = flyoverStrategy; //get the old value
@@ -681,16 +555,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/** Whether a theme has been applied to this component. */
 	private boolean themeApplied = false;
 
-	/** @return Whether a theme has been applied to this component. */
+	@Override
 	public boolean isThemeApplied() {
 		return themeApplied;
 	}
 
-	/**
-	 * Sets whether a theme has been applied to this component. This is a bound property of type {@link Boolean}.
-	 * @param newThemeApplied <code>true</code> if a theme has been applied to this component, else <code>false</code>.
-	 * @see #THEME_APPLIED_PROPERTY
-	 */
+	@Override
 	public void setThemeApplied(final boolean newThemeApplied) {
 		if(themeApplied != newThemeApplied) { //if the value is really changing
 			final boolean oldThemeApplied = themeApplied; //get the current value
@@ -702,26 +572,17 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/** The list of installed export strategies, from most recently added to earliest added. */
 	private List<ExportStrategy<?>> exportStrategyList = new CopyOnWriteArrayList<ExportStrategy<?>>();
 
-	/**
-	 * Adds an export strategy to the component. The export strategy will take precedence over any compatible export strategy previously added.
-	 * @param exportStrategy The export strategy to add.
-	 */
+	@Override
 	public void addExportStrategy(final ExportStrategy<?> exportStrategy) {
 		exportStrategyList.add(0, exportStrategy);
 	} //add the export strategy to the beginning of the list
 
-	/**
-	 * Removes an export strategy from the component.
-	 * @param exportStrategy The export strategy to remove.
-	 */
+	@Override
 	public void removeExportStrategy(final ExportStrategy<?> exportStrategy) {
 		exportStrategyList.remove(exportStrategy);
 	} //remove the export strategy from the list
 
-	/**
-	 * Exports data from the component. Each export strategy, from last to first added, will be asked to export data, until one is successful.
-	 * @return The object to be transferred, or <code>null</code> if no data can be transferred.
-	 */
+	@Override
 	public Transferable<?> exportTransfer() {
 		for(final ExportStrategy<?> exportStrategy : exportStrategyList) { //for each export strategy
 			final Transferable<?> transferable = ((ExportStrategy<Component>)exportStrategy).exportTransfer(this); //ask this export strategy to transfer data
@@ -735,27 +596,17 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/** The list of installed import strategies, from most recently added to earliest added. */
 	private List<ImportStrategy<?>> importStrategyList = new CopyOnWriteArrayList<ImportStrategy<?>>();
 
-	/**
-	 * Adds an import strategy to the component. The import strategy will take prececence over any compatible import strategy previously added.
-	 * @param importStrategy The importstrategy to add.
-	 */
+	@Override
 	public void addImportStrategy(final ImportStrategy<?> importStrategy) {
 		importStrategyList.add(0, importStrategy);
 	} //add the import strategy to the beginning of the list
 
-	/**
-	 * Removes an import strategy from the component.
-	 * @param importStrategy The import strategy to remove.
-	 */
+	@Override
 	public void removeImportStrategy(final ImportStrategy<?> importStrategy) {
 		importStrategyList.remove(importStrategy);
 	} //remove the import strategy from the list
 
-	/**
-	 * Imports data to the component. Each import strategy, from last to first added, will be asked to import data, until one is successful.
-	 * @param transferable The object to be transferred.
-	 * @return <code>true</code> if the given object was be imported.
-	 */
+	@Override
 	public boolean importTransfer(final Transferable<?> transferable) {
 		for(final ImportStrategy<?> importStrategy : importStrategyList) { //for each importstrategy
 			if(((ImportStrategy<Component>)importStrategy).canImportTransfer(this, transferable)) { //if this import strategy can import the data
@@ -812,11 +663,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	/** Whether this component has been initialized. */
 	private boolean initialized = false;
 
-	/**
-	 * Initializes the component after construction. This method can only be called once during the life of a component. Subclasses should call this version. This
-	 * implementation performs no actions.
-	 * @throws IllegalStateException if this method has already been called.
-	 */
+	@Override
 	public void initialize() {
 		if(initialized) { //if this method has already been called
 			throw new IllegalStateException("Component can only be initialized once.");
@@ -832,10 +679,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	}
 
 	/**
-	 * Validates the user input of this component and all child components. The component will be updated with error information. This version clears all
-	 * notifications. This version calls {@link #updateValid()}.
-	 * @return The current state of {@link #isValid()} as a convenience.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version clears all notifications. This version calls {@link #updateValid()}.
+	 * </p>
 	 */
+	@Override
 	public boolean validate() {
 		setNotification(null); //clear any notification
 		updateValid(); //manually update the current component validity
@@ -843,37 +692,28 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	}
 
 	/**
-	 * Dispatches an input event to this component and all child components, if any. If this is a {@link FocusedInputEvent}, the event will be directed towards
-	 * the branch in which lies the focused component of any {@link InputFocusGroupComponent} ancestor of this component (or this component, if it is a focus
-	 * group). If this is instead a {@link TargetedEvent}, the event will be directed towards the branch in which lies the target component of the event.
-	 * Otherwise, the event will be dispatched to all child components. Only after the event has been dispatched to any children will the event be fired to any
-	 * event listeners and then passed to the installed input strategy, if any. Once the event is consumed, no further processing takes place. This version fires
-	 * all events that are not consumed.
-	 * @param inputEvent The input event to dispatch.
-	 * @throws NullPointerException if the given event is <code>null</code>.
-	 * @see TargetedEvent
-	 * @see FocusedInputEvent
-	 * @see InputEvent#isConsumed()
-	 * @see #fireInputEvent(InputEvent)
-	 * @see #getInputStrategy()
-	 * @see InputStrategy#input(Input)
+	 * {@inheritDoc}
+	 * <p>
+	 * This version fires all events that are not consumed.
+	 * </p>
 	 */
+	@Override
 	public void dispatchInputEvent(final InputEvent inputEvent) {
 		//Log.trace("in component", this, "ready to do default dispatching of input event", inputEvent);		
 		if(!inputEvent.isConsumed()) { //if the input has not been consumed
-		//Log.trace("event is not consumed; ready to fire it to listeners");
+			//Log.trace("event is not consumed; ready to fire it to listeners");
 			fireInputEvent(inputEvent); //fire the event to any listeners
 			//Log.trace("firing finised");
 			if(!inputEvent.isConsumed()) { //if the input has still not been consumed
-			//Log.trace("event is not still not consumed; checking input strategy");
+				//Log.trace("event is not still not consumed; checking input strategy");
 				final InputStrategy inputStrategy = getInputStrategy(); //get our input strategy, if any
 				if(inputStrategy != null) { //if we have an input strategy
-				//Log.trace("got input strategy");
+					//Log.trace("got input strategy");
 					final Input input = inputEvent.getInput(); //get the event's input, if any
 					if(input != null) { //if the event has input
-					//Log.trace("got input for this event:", input);
+						//Log.trace("got input for this event:", input);
 						if(inputStrategy.input(input)) { //send the input to the input strategy; if the input was consumed
-						//Log.trace("our input strategy consumed the input");
+							//Log.trace("our input strategy consumed the input");
 							inputEvent.consume(); //mark the event as consumed
 						}
 					}
@@ -882,15 +722,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		}
 	}
 
-	/**
-	 * Fire the given even to all registered listeners, if any. If the event is consumed further processing should cease.
-	 * @param inputEvent The input event to fire.
-	 * @throws NullPointerException if the given event is <code>null</code>.
-	 * @see InputEvent#isConsumed()
-	 * @see CommandEvent
-	 * @see KeyboardEvent
-	 * @see MouseEvent
-	 */
+	@Override
 	public void fireInputEvent(final InputEvent inputEvent) {
 		if(inputEvent instanceof TargetedEvent && !this.equals(((TargetedEvent)inputEvent).getTarget())) { //if this is a targeted event that is not bound for this component TODO document, if it works; later allow for registration of pre/target/post bubble listening
 			return; //don't fire the event
@@ -964,53 +796,30 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	}
 
 	/**
-	 * Returns the theme to apply to this component. If there is no theme to this component, the parent theme will be returned. This version delegates to the
-	 * parent version, if there is a parent component; otherwise, the session theme is returned.
-	 * @return The theme to apply to this component.
-	 * @throws IOException if there is an error loading the theme.
-	 * @see #getParent()
-	 * @see GuiseSession#getTheme()
+	 * {@inheritDoc}
+	 * <p>
+	 * This version delegates to the parent version, if there is a parent component; otherwise, the session theme is returned.
+	 * </p>
 	 */
+	@Override
 	public Theme getTheme() throws IOException {
 		final CompositeComponent parent = getParent(); //get this component's parent, if any
 		return parent != null ? parent.getTheme() : getSession().getTheme(); //if there is no parent, return the session theme
 	}
 
-	/**
-	 * Resets this object's theme. This method sets to <code>false</code> the state of whether a theme has been applied to this object. This method is called for
-	 * any child components resetting its own theme. No new theme is actually loaded. There is normally no need to override this method or to call this method
-	 * directly by applications.
-	 * @see #setThemeApplied(boolean)
-	 */
+	@Override
 	public void resetTheme() {
 		setThemeApplied(false); //indicate that no theme has been applied
 	}
 
-	/**
-	 * Updates this object's theme. This method checks whether a theme has been applied to this object. If a theme has not been applied to this object this method
-	 * calls {@link #applyTheme()}. This method is called for any child components before applying the theme to the component itself, to assure that child theme
-	 * updates have already occured before theme updates occur for this component. There is normally no need to override this method or to call this method
-	 * directly by applications.
-	 * @throws IOException if there was an error loading or applying a theme.
-	 * @see #isThemeApplied()
-	 * @see #applyTheme()
-	 */
+	@Override
 	public void updateTheme() throws IOException {
 		if(!isThemeApplied()) { //if a theme has not been applied to this component
 			applyTheme(); //apply the theme to this component
 		}
 	}
 
-	/**
-	 * Applies the theme to this object. Themes are only applied of the application is themed. This method may be overridden to effectively override theme
-	 * settings by ensuring the state of important properties after the theme has been set. If the theme is successfully applied, this method updates the theme
-	 * applied status.
-	 * @throws IOException if there was an error loading or applying a theme.
-	 * @see GuiseApplication#isThemed()
-	 * @see #getTheme()
-	 * @see #applyTheme(Theme)
-	 * @see #setThemeApplied(boolean)
-	 */
+	@Override
 	public void applyTheme() throws IOException {
 		if(getSession().getApplication().isThemed()) { //if the application applies themes
 			applyTheme(getTheme()); //get the theme and apply it
@@ -1018,22 +827,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		}
 	}
 
-	/**
-	 * Applies a theme and its parents to this object. The theme's rules will be applied to this object and any related objects. Theme application occurs
-	 * unconditionally, regardless of whether themes have been applied to this component before. There is normally no need to call this method directly by
-	 * applications.
-	 * @param theme The theme to apply to the object.
-	 */
+	@Override
 	public void applyTheme(final Theme theme) {
 		theme.apply(this); //apply the theme to this component
 	}
 
-	/**
-	 * Loads the preferences for this component and optionally any descendant components. Any preferences returned from {@link #getPreferenceProperties()} will be
-	 * loaded automatically.
-	 * @param includeDescendants <code>true</code> if preferences of any descendant components should also be loaded, else <code>false</code>.
-	 * @throws IOException if there is an error loading preferences.
-	 */
+	@Override
 	public void loadPreferences(final boolean includeDescendants) throws IOException {
 		final Iterator<String> preferencePropertyIterator = getPreferenceProperties().iterator(); //get an iterator to all preferences properties
 		if(preferencePropertyIterator.hasNext()) { //if there are preference properties
@@ -1054,12 +853,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		}
 	}
 
-	/**
-	 * Saves the preferences for this component and optionally any descendant components. Any preferences returned from {@link #getPreferenceProperties()} will be
-	 * saved automatically.
-	 * @param includeDescendants <code>true</code> if preferences of any descendant components should also be saved, else <code>false</code>.
-	 * @throws IOException if there is an error saving preferences.
-	 */
+	@Override
 	public void savePreferences(final boolean includeDescendants) throws IOException {
 		//Log.trace("ready to save preferences for component", this, "have preference properties", preferenceProperties);
 		final Iterator<String> preferencePropertyIterator = getPreferenceProperties().iterator(); //get an iterator to all preferences properties
@@ -1081,23 +875,17 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		}
 	}
 
-	/**
-	 * Adds a command listener.
-	 * @param commandListener The command listener to add.
-	 */
+	@Override
 	public void addCommandListener(final CommandListener commandListener) {
 		getEventListenerManager().add(CommandListener.class, commandListener); //add the listener
 	}
 
-	/**
-	 * Removes a command listener.
-	 * @param commandListener The command listener to remove.
-	 */
+	@Override
 	public void removeCommandListener(final CommandListener commandListener) {
 		getEventListenerManager().remove(CommandListener.class, commandListener); //remove the listener
 	}
 
-	/** @return <code>true</code> if there is one or more command listeners registered. */
+	@Override
 	public boolean hasCommandListeners() {
 		return getEventListenerManager().hasListeners(CommandListener.class); //return whether there are command listeners registered
 	}
@@ -1107,23 +895,17 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		return getEventListenerManager().getListeners(CommandListener.class); //return the registered listeners
 	}
 
-	/**
-	 * Adds a key listener.
-	 * @param keyListener The key listener to add.
-	 */
+	@Override
 	public void addKeyListener(final KeyboardListener keyListener) {
 		getEventListenerManager().add(KeyboardListener.class, keyListener); //add the listener
 	}
 
-	/**
-	 * Removes a key listener.
-	 * @param keyListener The key listener to remove.
-	 */
+	@Override
 	public void removeKeyListener(final KeyboardListener keyListener) {
 		getEventListenerManager().remove(KeyboardListener.class, keyListener); //remove the listener
 	}
 
-	/** @return <code>true</code> if there is one or more key listeners registered. */
+	@Override
 	public boolean hasKeyListeners() {
 		return getEventListenerManager().hasListeners(KeyboardListener.class); //return whether there are key listeners registered
 	}
@@ -1133,23 +915,17 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		return getEventListenerManager().getListeners(KeyboardListener.class); //return the registered listeners
 	}
 
-	/**
-	 * Adds a mouse listener.
-	 * @param mouseListener The mouse listener to add.
-	 */
+	@Override
 	public void addMouseListener(final MouseListener mouseListener) {
 		getEventListenerManager().add(MouseListener.class, mouseListener); //add the listener
 	}
 
-	/**
-	 * Removes a mouse listener.
-	 * @param mouseListener The mouse listener to remove.
-	 */
+	@Override
 	public void removeMouseListener(final MouseListener mouseListener) {
 		getEventListenerManager().remove(MouseListener.class, mouseListener); //remove the listener
 	}
 
-	/** @return <code>true</code> if there is one or more mouse listeners registered. */
+	@Override
 	public boolean hasMouseListeners() {
 		return getEventListenerManager().hasListeners(MouseListener.class); //return whether there are mouse listeners registered
 	}
@@ -1346,18 +1122,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		return notifications;
 	}
 
-	/**
-	 * Adds a notification listener.
-	 * @param notificationListener The notification listener to add.
-	 */
+	@Override
 	public void addNotificationListener(final NotificationListener notificationListener) {
 		getEventListenerManager().add(NotificationListener.class, notificationListener); //add the listener
 	}
 
-	/**
-	 * Removes a notification listener.
-	 * @param notificationListener The notification listener to remove.
-	 */
+	@Override
 	public void removeNotificationListener(final NotificationListener notificationListener) {
 		getEventListenerManager().remove(NotificationListener.class, notificationListener); //remove the listener
 	}
@@ -1387,32 +1157,30 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		}
 	}
 
-	/** @return A hash code value for the object. */
+	@Override
 	public int hashCode() {
 		return Longs.hashCode(getDepictID()); //return the hash code of the ID
 	}
 
 	/**
-	 * Indicates whether some other object is "equal to" this one. This implementation returns whether the object is a component with the same ID.
-	 * @param object The reference object with which to compare.
-	 * @return <code>true</code> if this object is equivalent to the given object.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation returns whether the object is a component with the same ID.
+	 * </p>
 	 */
+	@Override
 	public boolean equals(final Object object) {
 		return object instanceof Component && getDepictID() == ((Component)object).getDepictID(); //see if the other object is a component with the same ID
 	}
 
-	/** @return A string representation of this depicted object. */
+	@Override
 	public String toString() {
 		final StringBuilder stringBuilder = new StringBuilder(super.toString()); //create a string builder for constructing the string
 		stringBuilder.append(' ').append('[').append(getDepictID()).append(']'); //append the ID
 		return stringBuilder.toString(); //return the string builder
 	}
 
-	/**
-	 * Notifies the user of the given notification information. The notification is stored in this component using {@link #setNotification(Notification)}, which
-	 * fires appropriate notification events. This method calls {@link GuiseSession#notify(Notification...)}.
-	 * @param notification The notification information to relay.
-	 */
+	@Override
 	public void notify(final Notification notification) {
 		setNotification(notification); //store the notification, firing notification events
 		getSession().notify(notification); //notify the user directly
@@ -1445,18 +1213,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 			return extents[flow.ordinal()];
 		}
 
-		/**
-		 * Returns the extent of the line flow. In left-to-right top-to-bottom orientation, this is commonly known as the <dfn>width</dfn>.
-		 * @return The extent of the flow, or <code>null</code> if no preferred extent has been specified
-		 */
+		@Override
 		public Extent getLineExtent() {
 			return getExtent(Flow.LINE);
 		}
 
-		/**
-		 * Returns the extent of the page flow. In left-to-right top-to-bottom orientation, this is commonly known as the <dfn>height</dfn>.
-		 * @return The extent of the flow, or <code>null</code> if no preferred extent has been specified
-		 */
+		@Override
 		public Extent getPageExtent() {
 			return getExtent(Flow.PAGE);
 		}
@@ -1475,18 +1237,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 			}
 		}
 
-		/**
-		 * Sets the extent of the line flow. In left-to-right top-to-bottom orientation, this is commonly known as the <dfn>width</dfn>. This is a bound property.
-		 * @param newExtent The new requested extent of the flyover, or <code>null</code> there is no extent preference.
-		 */
+		@Override
 		public void setLineExtent(final Extent newExtent) {
 			setExtent(Flow.LINE, newExtent);
 		}
 
-		/**
-		 * Sets the extent of the page flow. In left-to-right top-to-bottom orientation, this is commonly known as the <dfn>height</dfn>. This is a bound property.
-		 * @param newExtent The new requested extent of the flyover, or <code>null</code> there is no extent preference.
-		 */
+		@Override
 		public void setPageExtent(final Extent newExtent) {
 			setExtent(Flow.PAGE, newExtent);
 		}
@@ -1494,15 +1250,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		/** The style identifier of the flyover, or <code>null</code> if there is no style ID. */
 		private String styleID = null;
 
-		/** @return The style identifier of the flyover, or <code>null</code> if there is no style ID. */
+		@Override
 		public String getStyleID() {
 			return styleID;
 		}
 
-		/**
-		 * Identifies the style for the flyover component.
-		 * @param newStyleID The style identifier of the flyover, or <code>null</code> if there is no style ID.
-		 */
+		@Override
 		public void setStyleID(final String newStyleID) {
 			if(Objects.equals(styleID, newStyleID)) { //if the value is really changing
 				final String oldStyleID = styleID; //get the current value
@@ -1534,16 +1287,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		/** The effect used for opening the flyover, or <code>null</code> if there is no open effect. */
 		private Effect openEffect = null;
 
-		/** @return The effect used for opening the flyover, or <code>null</code> if there is no open effect. */
+		@Override
 		public Effect getOpenEffect() {
 			return openEffect;
 		}
 
-		/**
-		 * Sets the effect used for opening the flyover.
-		 * @param newOpenEffect The new effect used for opening the flyover, or <code>null</code> if there should be no open effect.
-		 * @see Frame#OPEN_EFFECT_PROPERTY
-		 */
+		@Override
 		public void setOpenEffect(final Effect newOpenEffect) {
 			if(openEffect != newOpenEffect) { //if the value is really changing
 				final Effect oldOpenEffect = openEffect; //get the old value
@@ -1562,10 +1311,13 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		}
 
 		/**
-		 * Called when the mouse enters the target. This implementation opens the flyover.
-		 * @param mouseEvent The event providing mouse information
+		 * {@inheritDoc}
+		 * <p>
+		 * This implementation opens the flyover.
+		 * </p>
 		 * @see #openFlyover()
 		 */
+		@Override
 		public void mouseEntered(final MouseEnterEvent mouseEvent) {
 			/*TODO del when works
 			Log.trace("source bounds:", mouseEvent.getSourceBounds());
@@ -1585,8 +1337,8 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 			final Point mousePosition = mouseEvent.getMousePosition(); //get the mouse position
 			//TODO del Log.trace("mouse position:", mousePosition);
 			//get the mouse position inside the traditional coordinate space with the origin at the center of the viewport
-			final Point traditionalMousePosition = new Point(mousePosition.getX().getValue() - (viewportSize.getWidth().getValue() / 2), -(mousePosition.getY()
-					.getValue() - (viewportSize.getHeight().getValue() / 2)));
+			final Point traditionalMousePosition = new Point(mousePosition.getX().getValue() - (viewportSize.getWidth().getValue() / 2),
+					-(mousePosition.getY().getValue() - (viewportSize.getHeight().getValue() / 2)));
 			//TODO del Log.trace("traditional mouse position:", traditionalMousePosition);
 			//get the angle of the point from the y axis in the range of (-PI, PI)
 			final double atan2 = Math.atan2(traditionalMousePosition.getX().getValue(), traditionalMousePosition.getY().getValue());
@@ -1598,10 +1350,13 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		}
 
 		/**
-		 * Called when the mouse exits the source. This implementation closes any open flyover.
-		 * @param mouseEvent The event providing mouse information
+		 * {@inheritDoc}
+		 * <p>
+		 * This implementation closes any open flyover.
+		 * </p>
 		 * @see #closeFlyover()
 		 */
+		@Override
 		public void mouseExited(final MouseExitEvent mouseEvent) {
 			closeFlyover(); //close the flyover if it is open
 		}
@@ -1628,12 +1383,16 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		}
 
 		/**
-		 * Shows a flyover for the component. This implementation creates a flyover frame if necessary and then opens the frame.
+		 * {@inheritDoc}
+		 * <p>
+		 * This implementation creates a flyover frame if necessary and then opens the frame.
+		 * </p>
 		 * @see #createFrame()
 		 */
+		@Override
 		public void openFlyover() {
 			if(flyoverFrame == null) { //if no flyover frame has been created
-			//TODO del Log.trace("no frame; created");
+				//TODO del Log.trace("no frame; created");
 				flyoverFrame = createFrame(); //create a new frame
 				final String styleID = getStyleID(); //get the styld ID
 				if(styleID != null) { //if there is a style ID
@@ -1655,8 +1414,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		}
 
 		/**
-		 * Closes the flyover for the component. This implementation closes any open flyover frame.
+		 * {@inheritDoc}
+		 * <p>
+		 * This implementation closes any open flyover frame.
+		 * </p>
 		 */
+		@Override
 		public void closeFlyover() {
 			if(flyoverFrame != null) { //if there is a flyover frame
 				flyoverFrame.close(); //close the frame
@@ -1686,7 +1449,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 			//TODO del			setOpenEffect(new OpacityFadeEffect(component.getSession(), 500));	//create a default open effect TODO use a constant
 		}
 
-		/** @return A new frame for displaying flyover information. */
+		@Override
 		protected FlyoverFrame createFrame() {
 			final S component = getComponent(); //get the component
 			final FlyoverFrame frame = new DefaultFlyoverFrame(); //create a default frame

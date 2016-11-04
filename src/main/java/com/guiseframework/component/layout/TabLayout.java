@@ -26,15 +26,12 @@ import com.guiseframework.model.*;
  */
 public class TabLayout extends AbstractValueLayout<ControlConstraints> {
 
-	/** @return The class representing the type of constraints appropriate for this layout. */
+	@Override
 	public Class<? extends ControlConstraints> getConstraintsClass() {
 		return ControlConstraints.class;
 	}
 
-	/**
-	 * Creates default constraints for the container.
-	 * @return New default constraints for the container.
-	 */
+	@Override
 	public ControlConstraints createDefaultConstraints() {
 		return new ControlConstraints(); //create constraints
 	}

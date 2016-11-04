@@ -79,19 +79,23 @@ public class EditComponentTextControl extends AbstractEditComponentTextControl<T
 	}
 
 	/**
-	 * Retrieves the text from the edited component. This version returns the value of {@link TextBox#getText()}
-	 * @param editedComponent The component the text of which is to be edited.
-	 * @return The current text of the edited component
+	 * {@inheritDoc}
+	 * <p>
+	 * This version returns the value of {@link TextBox#getText()}
+	 * </p>
 	 */
+	@Override
 	protected String getText(final TextBox editedComponent) {
 		return editedComponent.getText(); //return the component's text
 	}
 
 	/**
-	 * Updates the text of the edited component. This version updates the text of the component using {@link TextBox#setText(String)}
-	 * @param editedComponent The component the text of which is to be edited.
-	 * @param newText The new text to set in the edited component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version updates the text of the component using {@link TextBox#setText(String)}
+	 * </p>
 	 */
+	@Override
 	protected void setText(final TextBox editedComponent, final String newText) {
 		editedComponent.setText(newText); //set the component's text		
 	}

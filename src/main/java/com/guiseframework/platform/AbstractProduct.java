@@ -25,7 +25,7 @@ public class AbstractProduct implements Product {
 	/** The identifying string of the product. */
 	private final String id;
 
-	/** @return The identifying string of the product. */
+	@Override
 	public String getID() {
 		return id;
 	}
@@ -33,7 +33,7 @@ public class AbstractProduct implements Product {
 	/** The canonical name of the product. */
 	private final String name;
 
-	/** @return The canonical name of the product. */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -41,7 +41,7 @@ public class AbstractProduct implements Product {
 	/** The version string provided by the product, or <code>null</code> if there is no string version of the product. */
 	private final String version;
 
-	/** @return The version string provided by the product, or <code>null</code> if there is no string version of the product. */
+	@Override
 	public String getVersion() {
 		return version;
 	}
@@ -49,7 +49,7 @@ public class AbstractProduct implements Product {
 	/** The version number provided by the product, or {@link Double#NaN} if there is no version number of the product. */
 	private final double versionNumber;
 
-	/** @return The version number provided by the product, or {@link Double#NaN} if there is no version number of the product. */
+	@Override
 	public double getVersionNumber() {
 		return versionNumber;
 	}
@@ -57,7 +57,7 @@ public class AbstractProduct implements Product {
 	/** The version number components provided by the product, or <code>null</code> if there are no version number components of the product. */
 	private final int[] versionNumbers;
 
-	/** @return The version number components provided by the product, or <code>null</code> if there are no version number components of the product. */
+	@Override
 	public int[] getVersionNumbers() {
 		return versionNumbers;
 	}

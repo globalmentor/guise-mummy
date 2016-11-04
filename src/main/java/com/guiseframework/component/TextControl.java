@@ -174,11 +174,7 @@ public class TextControl<V> extends AbstractTextControl<V> {
 	/** The default export strategy for this component type. */
 	protected static final ExportStrategy<TextControl<?>> DEFAULT_EXPORT_STRATEGY = new ExportStrategy<TextControl<?>>() {
 
-		/**
-		 * Exports data from the given component.
-		 * @param component The component from which data will be transferred.
-		 * @return The object to be transferred, or <code>null</code> if no data can be transferred.
-		 */
+		@Override
 		public Transferable<TextControl<?>> exportTransfer(final TextControl<?> component) {
 			return new DefaultTransferable(component); //return a default transferable for this component
 		}
@@ -188,22 +184,23 @@ public class TextControl<V> extends AbstractTextControl<V> {
 	protected static final ImportStrategy<TextControl<?>> DEFAULT_IMPORT_STRATEGY = new ImportStrategy<TextControl<?>>() { //add a new import strategy for this component
 
 		/**
-		 * Determines whether this strategy can import the given transferable object. This implementation accepts all transferables providing <code>text/*</code>
-		 * data.
-		 * @param component The component into which the object will be transferred.
-		 * @param transferable The object to be transferred.
-		 * @return <code>true</code> if the given object can be imported.
+		 * {@inheritDoc}
+		 * <p>
+		 * This implementation accepts all transferables providing <code>text/*</code> data.
+		 * </p>
 		 */
+		@Override
 		public boolean canImportTransfer(final TextControl<?> component, final Transferable<?> transferable) {
 			return transferable.canTransfer(ContentType.create(ContentType.TEXT_PRIMARY_TYPE, ContentType.WILDCARD_SUBTYPE)); //we can import any text
 		}
 
 		/**
-		 * Imports the given data into the given component. This implementation imports the first available <code>text/*</code> data.
-		 * @param component The component into which the object will be transferred.
-		 * @param transferable The object to be transferred.
-		 * @return <code>true</code> if the given object was be imported.
+		 * {@inheritDoc}
+		 * <p>
+		 * This implementation imports the first available <code>text/*</code> data.
+		 * </p>
 		 */
+		@Override
 		public boolean importTransfer(final TextControl<?> component, final Transferable<?> transferable) {
 			boolean imported = false; //we'll assume we didn't import anything
 			Object data = null; //we'll store here any data we retrieve
@@ -447,19 +444,17 @@ public class TextControl<V> extends AbstractTextControl<V> {
 		}
 
 		/**
-		 * Determines the content types available for this transfer. This implementation returns the <code>text/plain</code> content type.
-		 * @return The content types available for this transfer.
+		 * {@inheritDoc}
+		 * <p>
+		 * This implementation returns the <code>text/plain</code> content type.
+		 * </p>
 		 */
+		@Override
 		public ContentType[] getContentTypes() {
 			return new ContentType[] { PLAIN_CONTENT_TYPE };
 		}
 
-		/**
-		 * Transfers data using the given content type.
-		 * @param contentType The type of data expected.
-		 * @return The transferred data, which may be <code>null</code>.
-		 * @throws IllegalArgumentException if the given content type is not supported.
-		 */
+		@Override
 		public Object transfer(final ContentType contentType) {
 			if(contentType.hasBaseType(PLAIN_CONTENT_TYPE)) { //if they request the supported content type
 				return getSource().getText(); //return the current text

@@ -41,11 +41,7 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 	/** The default export strategy for this component type. */
 	protected static final ExportStrategy<ImageComponent> DEFAULT_EXPORT_STRATEGY = new ExportStrategy<ImageComponent>() {
 
-		/**
-		 * Exports data from the given component.
-		 * @param component The component from which data will be transferred.
-		 * @return The object to be transferred, or <code>null</code> if no data can be transferred.
-		 */
+		@Override
 		public Transferable<ImageComponent> exportTransfer(final ImageComponent component) {
 			return new DefaultTransferable(component); //return a default transferable for this component
 		}
@@ -59,16 +55,12 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 		return imageModel;
 	}
 
-	/** @return The image URI, which may be a resource URI, or <code>null</code> if there is no image URI. */
+	@Override
 	public URI getImageURI() {
 		return getImageModel().getImageURI();
 	}
 
-	/**
-	 * Sets the URI of the image. This is a bound property of type <code>URI</code>.
-	 * @param newImageURI The new URI of the image, which may be a resource URI.
-	 * @see #IMAGE_URI_PROPERTY
-	 */
+	@Override
 	public void setImageURI(final URI newImageURI) {
 		getImageModel().setImageURI(newImageURI);
 	}
@@ -104,19 +96,17 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 		}
 
 		/**
-		 * Determines the content types available for this transfer. This implementation returns a URI-list content type and the content type of the label.
-		 * @return The content types available for this transfer.
+		 * {@inheritDoc}
+		 * <p>
+		 * This implementation returns a URI-list content type and the content type of the label.
+		 * </p>
 		 */
+		@Override
 		public ContentType[] getContentTypes() {
 			return createArray(ContentType.create(ContentType.TEXT_PRIMARY_TYPE, URI_LIST_SUBTYPE), getSource().getLabelContentType());
 		} //TODO use a static instance
 
-		/**
-		 * Transfers data using the given content type.
-		 * @param contentType The type of data expected.
-		 * @return The transferred data, which may be <code>null</code>.
-		 * @throws IllegalArgumentException if the given content type is not supported.
-		 */
+		@Override
 		public Object transfer(final ContentType contentType) {
 			final ImageComponent image = getSource(); //get the image
 			if(contentType.match(ContentType.TEXT_PRIMARY_TYPE, URI_LIST_SUBTYPE)) { //if this is a text/uri-list type

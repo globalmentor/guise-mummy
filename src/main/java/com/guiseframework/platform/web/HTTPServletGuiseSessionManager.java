@@ -103,15 +103,15 @@ public class HTTPServletGuiseSessionManager implements HttpSessionListener {
 				}
 			}
 			if(useSpiderSession) { //if this is a spider and we have a spider session
-			//TODO del Debug.info("using spider session for user agent name", userAgentName);
+				//TODO del Debug.info("using spider session for user agent name", userAgentName);
 				httpSession = spiderSession; //use the spider session
 			} else { //if this isn't a spider, we have no existing spider session, or the existing spider session is almost expired, create a session
-			//TODO del Debug.info("creating session for user agent name", userAgentName);
+				//TODO del Debug.info("creating session for user agent name", userAgentName);
 				httpSession = httpRequest.getSession(true); //create a new HTTP session for the HTTP request
 				//TODO is there a race condition here? could two requests requesting the same session happen concurrently?
 				guiseContainerMap.put(httpSession, guiseContainer); //store our Guise container so we'll know with which container this session is associated (this servlet may serve many Guise applications in many Guise containers in the web application)
 				if(isSpider) { //if we just created a session for a spider
-				//TODO del Debug.info("storing this session as a spider session");
+					//TODO del Debug.info("storing this session as a spider session");
 					spiderSession = httpSession; //store the spider session for future sharing
 				}
 			}
@@ -120,18 +120,23 @@ public class HTTPServletGuiseSessionManager implements HttpSessionListener {
 	}
 
 	/**
-	 * Called when an HTTP session is created. This implementation does nothing, as there is no way to tell with which Guise container and Guise application
-	 * application a new Guise application should be associated.
-	 * @param httpSessionEvent Information regarding the created HTTP session.
-	 * @see #getGuiseSession(HTTPServletGuiseContainer, GuiseApplication, HttpServletRequest)
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation does nothing, as there is no way to tell with which Guise container and Guise application application a new Guise application should be
+	 * associated.
+	 * </p>
 	 */
+	@Override
 	public void sessionCreated(final HttpSessionEvent httpSessionEvent) {
 	}
 
 	/**
-	 * Called when an HTTP session is invalidated. This implementation removes the corresponding Guise session.
-	 * @param httpSessionEvent Information regarding the invalidated HTTP session.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation removes the corresponding Guise session.
+	 * </p>
 	 */
+	@Override
 	public void sessionDestroyed(final HttpSessionEvent httpSessionEvent) {
 		synchronized(guiseContainerMap) { //don't allow anyone to modify our map of applications while we access it
 			final HttpSession httpSession = httpSessionEvent.getSession(); //get the HTTP session just invalidated

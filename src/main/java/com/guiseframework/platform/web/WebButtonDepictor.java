@@ -62,9 +62,12 @@ public class WebButtonDepictor<C extends ActionControl> extends AbstractWebActio
 	*/
 
 	/**
-	 * Retrieves the styles for the body element of the component. This version adds special borders for a selected {@link SelectActionControl}.
-	 * @return The styles for the body element of the component, mapped to CSS property names.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version adds special borders for a selected {@link SelectActionControl}.
+	 * </p>
 	 */
+	@Override
 	protected Map<String, Object> getBodyStyles() {
 		final C component = getDepictedObject(); //get the depicted component
 		final GuiseSession session = getSession(); //get the Guise session
@@ -94,10 +97,7 @@ public class WebButtonDepictor<C extends ActionControl> extends AbstractWebActio
 		return styles; //return the styles
 	}
 
-	/**
-	 * Begins the rendering process.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context

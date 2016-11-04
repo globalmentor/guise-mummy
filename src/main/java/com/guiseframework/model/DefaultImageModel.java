@@ -29,16 +29,12 @@ public class DefaultImageModel extends AbstractModel implements ImageModel {
 	/** The image URI, which may be a resource URI, or <code>null</code> if there is no image URI. */
 	private URI imageURI;
 
-	/** @return The image URI, which may be a resource URI, or <code>null</code> if there is no image URI. */
+	@Override
 	public URI getImageURI() {
 		return imageURI;
 	}
 
-	/**
-	 * Sets the URI of the image. This is a bound property.
-	 * @param newImageURI The new URI of the image, which may be a resource URI.
-	 * @see #IMAGE_URI_PROPERTY
-	 */
+	@Override
 	public void setImageURI(final URI newImageURI) {
 		if(!Objects.equals(imageURI, newImageURI)) { //if the value is really changing
 			final URI oldImageURI = imageURI; //get the old value

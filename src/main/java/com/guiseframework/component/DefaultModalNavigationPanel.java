@@ -42,12 +42,7 @@ public class DefaultModalNavigationPanel<R> extends AbstractModalNavigationPanel
 		super(layout); //construct the parent class
 	}
 
-	/**
-	 * Ends this frame's modal interaction and navigates either to the previous modal navigation or to this frame's referring URI, if any.
-	 * @param result The result of this frame's modal interaction, or <code>null</code> if no result is given.
-	 * @see #setResult(Object)
-	 * @see GuiseSession#endModalNavigation(ModalNavigationPanel)
-	 */
+	@Override
 	public void endModal(final R result) {
 		setResult(result); //update the result
 		getSession().endModalNavigation(this); //end modal navigation for this modal frame

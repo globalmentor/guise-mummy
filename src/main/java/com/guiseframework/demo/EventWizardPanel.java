@@ -63,9 +63,11 @@ public class EventWizardPanel extends LayoutPanel {
 		//listen for the age checkbox changing
 		personalNamePanel.getAgeCheckControl().addPropertyChangeListener(CheckControl.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>() {
 
+			@Override
 			public void propertyChange(GenericPropertyChangeEvent<Boolean> propertyChangeEvent) { //if the age checkbox changes
 				wizardCardPanel.setDisplayed(personalAgePanel, propertyChangeEvent.getNewValue()); //show or hide the age panel based upon the state of the age checkbox
 			}
+
 		});
 		final Panel businessNamePanel = new BusinessNamePanel();
 		businessNamePanel.setConstraints(new TaskCardConstraints());

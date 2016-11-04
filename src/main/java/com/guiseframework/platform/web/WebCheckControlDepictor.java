@@ -92,10 +92,12 @@ public class WebCheckControlDepictor<C extends CheckControl> extends AbstractWeb
 	}
 
 	/**
-	 * Retrieves the styles for the outer element of the component. This version combines the body styles with the outer styles.
-	 * @return The styles for the outer element of the component, mapped to CSS property names.
-	 * @see AbstractWebComponentDepictor#getBodyStyles()
+	 * {@inheritDoc}
+	 * <p>
+	 * This version combines the body styles with the outer styles.
+	 * </p>
 	 */
+	@Override
 	protected Map<String, Object> getOuterStyles() {
 		final Map<String, Object> outerStyles = super.getOuterStyles(); //get the default outer styles
 		outerStyles.putAll(getBodyStyles()); //add the styles for the body
@@ -118,11 +120,7 @@ public class WebCheckControlDepictor<C extends CheckControl> extends AbstractWeb
 		return getCheckControlName(getDepictedObject()); //return the name of the check control, taking into account mutual exclusion groups
 	}
 
-	/**
-	 * Processes an event from the platform.
-	 * @param event The event to be processed.
-	 * @throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
-	 */
+	@Override
 	public void processEvent(final PlatformEvent event) {
 		if(event instanceof WebChangeDepictEvent) { //if a property changed
 			final WebChangeDepictEvent webChangeEvent = (WebChangeDepictEvent)event; //get the web change event
@@ -187,11 +185,7 @@ public class WebCheckControlDepictor<C extends CheckControl> extends AbstractWeb
 		}
 	}
 
-	/**
-	 * Begins the rendering process.
-	 * @throws IOException if there is an error rendering the component.
-	 * @throws IllegalArgumentException if the given value control represents a value type this controller doesn't support.
-	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering		
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
@@ -215,10 +209,7 @@ public class WebCheckControlDepictor<C extends CheckControl> extends AbstractWeb
 		}
 	}
 
-	/**
-	 * Ends the rendering process.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictEnd() throws IOException {
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_INPUT); //</xhtml:input>

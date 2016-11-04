@@ -51,17 +51,13 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 	}
 
 	/**
-	 * Creates a component to represent the given tree node. This implementation returns a label with an appropriate string value to represent the RDF object.
-	 * @param <N> The type of value contained in the node.
-	 * @param treeControl The component containing the model.
-	 * @param model The model containing the value.
-	 * @param treeNode The node containing the value.
-	 * @param editable Whether values in this column are editable.
-	 * @param selected <code>true</code> if the value is selected.
-	 * @param focused <code>true</code> if the value has the focus.
-	 * @return A new component to represent the given value.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation returns a label with an appropriate string value to represent the RDF object.
+	 * </p>
 	 */
 	@SuppressWarnings("unchecked")
+	@Override
 	public <N extends V> Label createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable,
 			final boolean selected, final boolean focused) {
 		//TODO improve this entire strategy

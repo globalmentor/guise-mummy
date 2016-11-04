@@ -64,7 +64,7 @@ public class MouseEnterEvent extends AbstractMouseEvent {
 				mouseEnterEvent.getKeys().toArray(new Key[mouseEnterEvent.getKeys().size()])); //construct the class with the same target		
 	}
 
-	/** @return The input associated with this event, or <code>null</code> if there is no input associated with this event. */
+	@Override
 	public MouseInput getInput() {
 		return null; //TODO implement mouse enter input
 	}

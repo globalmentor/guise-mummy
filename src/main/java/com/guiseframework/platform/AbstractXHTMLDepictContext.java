@@ -81,9 +81,12 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 	}
 
 	/**
-	 * {@inheritDoc} If HTML5 data attributes are enabled for all attributes or for the given namespace, this implementation converts non-XHTML-namespace
-	 * attributes into HTML data attribute form. For example, an attribute in the form <code>example:fooBar</code> will be depicted as
-	 * <code>data-example-foobar</code>. {@value XML#XMLNS_NAMESPACE_PREFIX} namespace attribute will never be converted.
+	 * {@inheritDoc}
+	 * <p>
+	 * If HTML5 data attributes are enabled for all attributes or for the given namespace, this implementation converts non-XHTML-namespace attributes into HTML
+	 * data attribute form. For example, an attribute in the form <code>example:fooBar</code> will be depicted as <code>data-example-foobar</code>.
+	 * {@value XML#XMLNS_NAMESPACE_PREFIX} namespace attribute will never be converted.
+	 * </p>
 	 * @see <a href="http://www.w3.org/TR/html5/elements.html#embedding-custom-non-visible-data-with-the-data-attributes">HTML 5 Data Attributes</a>
 	 * @see #isAllDataAttributes()
 	 * @see #isDataAttributeNamespaceURI(URI)
@@ -105,7 +108,6 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 		return super.appendAttributeName(appendable, attributeQualifiedName); //append the attribute name normally
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public ElementState writeJavaScriptElement(final URI javascriptURI) throws IOException {
 		writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT, false); //<xhtml:script> (explicitly don't create an empty <xhtml:script> element, otherwise IE wouldn't recognize it)
@@ -114,7 +116,6 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 		return writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT); //</xhtml:script>	
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public ElementState writeMetaElement(final String property, final String content) throws IOException {
 		writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_META, true); //<xhtml:meta>; allow the <meta> element to be empty
@@ -123,7 +124,6 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 		return writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_META); //</xhtml:meta>
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public ElementState writeMetaElement(final URI propertyNamespaceURI, final String propertyLocalName, final String content) throws IOException {
 		return writeMetaElement(getQualifiedName(propertyNamespaceURI, propertyLocalName), content); //get the qualified name for the property namespace and local name

@@ -49,16 +49,12 @@ public class ImageActionControl extends AbstractImageComponent implements Action
 	/** Whether the component is in a rollover state. */
 	private boolean rollover = false;
 
-	/** @return Whether the component is in a rollover state. */
+	@Override
 	public boolean isRollover() {
 		return rollover;
 	}
 
-	/**
-	 * Sets whether the component is in a rollover state. This is a bound property of type <code>Boolean</code>.
-	 * @param newRollover <code>true</code> if the component should be in a rollover state, else <code>false</code>.
-	 * @see Menu#ROLLOVER_PROPERTY
-	 */
+	@Override
 	public void setRollover(final boolean newRollover) {
 		if(rollover != newRollover) { //if the value is really changing
 			final boolean oldRollover = rollover; //get the current value
@@ -70,7 +66,7 @@ public class ImageActionControl extends AbstractImageComponent implements Action
 	/** The status of the current user input, or <code>null</code> if there is no status to report. */
 	private Status status = null;
 
-	/** @return The status of the current user input, or <code>null</code> if there is no status to report. */
+	@Override
 	public Status getStatus() {
 		return status;
 	}
@@ -118,20 +114,19 @@ public class ImageActionControl extends AbstractImageComponent implements Action
 	}
 
 	/**
-	 * Rechecks user input validity of this component and all child components, and updates the valid state. This version also updates the status.
-	 * @see #setValid(boolean)
+	 * {@inheritDoc}
+	 * <p>
+	 * This version also updates the status.
+	 * </p>
 	 * @see #updateStatus()
 	 */
+	@Override
 	protected void updateValid() {
 		super.updateValid(); //update validity normally
 		updateStatus(); //update user input status
 	}
 
-	/**
-	 * Sets the component notification. This version updates the component status if the notification changes. This is a bound property.
-	 * @param newNotification The notification for the component, or <code>null</code> if no notification is associated with this component.
-	 * @see #NOTIFICATION_PROPERTY
-	 */
+	@Override
 	public void setNotification(final Notification newNotification) {
 		final Notification oldNotification = getNotification(); //get the old notification
 		super.setNotification(newNotification); //update the old notification normally
@@ -141,9 +136,13 @@ public class ImageActionControl extends AbstractImageComponent implements Action
 	}
 
 	/**
-	 * Resets the control to its default value. This version clears any notification.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version clears any notification.
+	 * </p>
 	 * @see #setNotification(Notification)
 	 */
+	@Override
 	public void reset() {
 		setNotification(null); //clear any notification
 	}
@@ -175,11 +174,13 @@ public class ImageActionControl extends AbstractImageComponent implements Action
 		if(actionModel != infoModel && actionModel != imageModel) { //if the action model isn't the same as another model (we don't want to repeat property change events twice) TODO eventually just listen to specific events for each object
 			this.actionModel.addActionListener(new ActionListener() { //create an action repeater to forward events to this component's listeners
 
-						public void actionPerformed(final ActionEvent actionEvent) { //if the action is performed
-							final ActionEvent repeatActionEvent = new ActionEvent(ImageActionControl.this, actionEvent); //copy the action event with this class as its source
-							fireActionPerformed(repeatActionEvent); //fire the repeated action
-						}
-					});
+				@Override
+				public void actionPerformed(final ActionEvent actionEvent) { //if the action is performed
+					final ActionEvent repeatActionEvent = new ActionEvent(ImageActionControl.this, actionEvent); //copy the action event with this class as its source
+					fireActionPerformed(repeatActionEvent); //fire the repeated action
+				}
+
+			});
 		}
 		this.enableable = checkInstance(enableable, "Enableable object cannot be null."); //save the enableable object
 		if(enableable != infoModel) { //if the enableable and the info model are two different objects (we don't want to repeat property change events twice) TODO eventually just listen to specific events for each object
@@ -187,11 +188,13 @@ public class ImageActionControl extends AbstractImageComponent implements Action
 		}
 		addPropertyChangeListener(ENABLED_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>() { //listen for the "enabled" property changing
 
-					public void propertyChange(GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent) { //if the "enabled" property changes
-						setNotification(null); //clear any notification
-						updateValid(); //update the valid status, which depends on the enabled status					
-					}
-				});
+			@Override
+			public void propertyChange(GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent) { //if the "enabled" property changes
+				setNotification(null); //clear any notification
+				updateValid(); //update the valid status, which depends on the enabled status					
+			}
+
+		});
 	}
 
 	/**
@@ -203,41 +206,27 @@ public class ImageActionControl extends AbstractImageComponent implements Action
 		this(actionPrototype, new DefaultImageModel(), actionPrototype, actionPrototype); //use the action prototype as every needed model except the image model TODO see if we need a separate image action prototype
 	}
 
-	/**
-	 * Adds an action listener.
-	 * @param actionListener The action listener to add.
-	 */
+	@Override
 	public void addActionListener(final ActionListener actionListener) {
 		getEventListenerManager().add(ActionListener.class, actionListener); //add the listener
 	}
 
-	/**
-	 * Removes an action listener.
-	 * @param actionListener The action listener to remove.
-	 */
+	@Override
 	public void removeActionListener(final ActionListener actionListener) {
 		getEventListenerManager().remove(ActionListener.class, actionListener); //remove the listener
 	}
 
-	/** @return all registered action listeners. */
+	@Override
 	public Iterable<ActionListener> getActionListeners() {
 		return getEventListenerManager().getListeners(ActionListener.class);
 	}
 
-	/**
-	 * Performs the action with default force and default option. An {@link ActionEvent} is fired to all registered {@link ActionListener}s. This method delegates
-	 * to {@link #performAction(int, int)}.
-	 */
+	@Override
 	public void performAction() {
 		getActionModel().performAction(); //delegate to the installed action model, which will fire an event which we will catch and queue for refiring
 	}
 
-	/**
-	 * Performs the action with the given force and option. An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
-	 * @param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
-	 * @param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button
-	 *          click.
-	 */
+	@Override
 	public void performAction(final int force, final int option) {
 		getActionModel().performAction(force, option); //delegate to the installed action model, which will fire an event which we will catch and refire
 	}
@@ -268,16 +257,12 @@ public class ImageActionControl extends AbstractImageComponent implements Action
 
 	//Enableable delegations
 
-	/** @return Whether the control is enabled and can receive user input. */
+	@Override
 	public boolean isEnabled() {
 		return enableable.isEnabled();
 	}
 
-	/**
-	 * Sets whether the control is enabled and and can receive user input. This is a bound property of type <code>Boolean</code>.
-	 * @param newEnabled <code>true</code> if the control should indicate and accept user input.
-	 * @see Enableable#ENABLED_PROPERTY
-	 */
+	@Override
 	public void setEnabled(final boolean newEnabled) {
 		enableable.setEnabled(newEnabled);
 	}

@@ -30,7 +30,7 @@ import com.guiseframework.model.ValueModel;
  */
 public abstract class SpinnerControl<V> extends AbstractContainer implements ValueControl<V> { //TODO finish  
 
-	/** @return The layout definition for the component. */
+	@Override
 	public FlowLayout getLayout() {
 		return (FlowLayout)super.getLayout();
 	}

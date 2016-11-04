@@ -30,10 +30,7 @@ public abstract class AbstractMouseEvent extends AbstractGestureInputEvent imple
 	/** The target of the event, or <code>null</code> if the event target is not known. */
 	private final Object target;
 
-	/**
-	 * Returns the object to which the event applies. This may be a different than <dfn>source</dfn>, which is the object that generated this event instance.
-	 * @return The target of the event.
-	 */
+	@Override
 	public Object getTarget() {
 		return target;
 	}
@@ -41,7 +38,7 @@ public abstract class AbstractMouseEvent extends AbstractGestureInputEvent imple
 	/** The absolute bounds of the event target. */
 	private final Rectangle targetBounds;
 
-	/** @return The absolute bounds of the event target. */
+	@Override
 	public Rectangle getTargetBounds() {
 		return targetBounds;
 	}
@@ -49,7 +46,7 @@ public abstract class AbstractMouseEvent extends AbstractGestureInputEvent imple
 	/** The absolute bounds of the viewport. */
 	private final Rectangle viewportBounds;
 
-	/** @return The absolute bounds of the viewport. */
+	@Override
 	public Rectangle getViewportBounds() {
 		return viewportBounds;
 	}
@@ -57,7 +54,7 @@ public abstract class AbstractMouseEvent extends AbstractGestureInputEvent imple
 	/** The position of the mouse relative to the viewport. */
 	private final Point mousePosition;
 
-	/** @return The position of the mouse relative to the viewport. */
+	@Override
 	public Point getMousePosition() {
 		return mousePosition;
 	}

@@ -66,8 +66,8 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 
 	}
 
-	/** Requests that the audio start. */
 	@SuppressWarnings("unchecked")
+	@Override
 	public void play() {
 		final Audio audio = getDepictedObject(); //get the audio depicted object
 		final URI audioURI = audio.getAudioURI(); //get the audio URI
@@ -79,22 +79,18 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 		}
 	}
 
-	/** Requests that the audio pause. */
+	@Override
 	public void pause() {
 		getPlatform().getSendMessageQueue().add(new WebCommandDepictEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_PAUSE)); //send an audio pause command to the platform
 	}
 
-	/** Requests that the audio stop. */
+	@Override
 	public void stop() {
 		getPlatform().getSendMessageQueue().add(new WebCommandDepictEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_STOP)); //send an audio stop command to the platform
 	}
 
-	/**
-	 * Requests a new time-based play position.
-	 * @param newTimePosition The new play position in microseconds.
-	 * @throws IllegalArgumentException if the given position is negative.
-	 */
 	@SuppressWarnings("unchecked")
+	@Override
 	public void setTimePosition(final long newTimePosition) {
 		if(newTimePosition < 0) { //if the new time position is negative
 			throw new IllegalArgumentException("Time position cannot be negative: " + newTimePosition);
@@ -104,11 +100,7 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 						AudioCommand.POSITION_PROPERTY, Long.valueOf(newTimePosition / 1000)))); //send an audio position command to the platform, converting the time to milliseconds
 	}
 
-	/**
-	 * Processes an event from the platform.
-	 * @param event The event to be processed.
-	 * @throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
-	 */
+	@Override
 	public void processEvent(final PlatformEvent event) {
 		if(event instanceof WebChangeDepictEvent) { //if a property changed
 			final WebChangeDepictEvent webChangeEvent = (WebChangeDepictEvent)event; //get the web change event

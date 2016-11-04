@@ -54,7 +54,12 @@ import com.guiseframework.style.*;
  */
 public abstract class AbstractWebDepictContext extends AbstractXHTMLDepictContext implements WebDepictContext {
 
-	/** {@inheritDoc} This implementation always returns <code>false</code>. */
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation always returns <code>false</code>.
+	 * </p>
+	 */
 	@Override
 	public boolean isQuirksMode() {
 		return false;

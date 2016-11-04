@@ -79,19 +79,23 @@ public class EditComponentLabelControl extends AbstractEditComponentTextControl<
 	}
 
 	/**
-	 * Retrieves the text from the edited component. This version returns the value of {@link Component#getLabel()}
-	 * @param editedComponent The component the text of which is to be edited.
-	 * @return The current text of the edited component
+	 * {@inheritDoc}
+	 * <p>
+	 * This version returns the value of {@link Component#getLabel()}
+	 * </p>
 	 */
+	@Override
 	protected String getText(final Component editedComponent) {
 		return editedComponent.getLabel(); //return the component's label
 	}
 
 	/**
-	 * Updates the text of the edited component. This version updates the text of the component using {@link Component#setLabel(String)}
-	 * @param editedComponent The component the text of which is to be edited.
-	 * @param newText The new text to set in the edited component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version updates the text of the component using {@link Component#setLabel(String)}
+	 * </p>
 	 */
+	@Override
 	protected void setText(final Component editedComponent, final String newText) {
 		editedComponent.setLabel(newText); //set the component's label		
 	}

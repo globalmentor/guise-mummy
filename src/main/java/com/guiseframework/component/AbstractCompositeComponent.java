@@ -53,11 +53,13 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 		if(validChangeListener == null) { //if there is no valid change listener
 			validChangeListener = new AbstractGenericPropertyChangeListener<Boolean>() { //create a new valid change listener
 
+				@Override
 				public void propertyChange(GenericPropertyChangeEvent<Boolean> propertyChangeEvent) { //if the child component's valid status changes
 					//TODO do we want to update valid here?
-					childComponentValidPropertyChanged((Component)propertyChangeEvent.getSource(), propertyChangeEvent.getOldValue().booleanValue(), propertyChangeEvent
-							.getNewValue().booleanValue()); //notify this component that a child component's valid status changed
+					childComponentValidPropertyChanged((Component)propertyChangeEvent.getSource(), propertyChangeEvent.getOldValue().booleanValue(),
+							propertyChangeEvent.getNewValue().booleanValue()); //notify this component that a child component's valid status changed
 				}
+
 			};
 		}
 		return validChangeListener; //return the valid change listener
@@ -71,10 +73,12 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 		if(displayVisibleChangeListener == null) { //if there is no display/visible change listener
 			displayVisibleChangeListener = new AbstractGenericPropertyChangeListener<Boolean>() { //create a new display/visible change listener
 
+				@Override
 				public void propertyChange(GenericPropertyChangeEvent<Boolean> propertyChangeEvent) { //if the child component's display or visible status changes
 					//TODO maybe add a flag to prevent infinite loops
 					updateValid(); //update this composite component's valid state, because the validity of this component only depends on displayed, visible child components
 				}
+
 			};
 		}
 		return validChangeListener; //return the valid change listener
@@ -96,9 +100,11 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 		if(repeatNotificationListener == null) { //if there is no notification listener
 			repeatNotificationListener = new NotificationListener() { //create a new notification listener
 
+				@Override
 				public void notified(final NotificationEvent notificationEvent) { //if the child component sends a notification
 					fireNotified(new NotificationEvent(this, notificationEvent)); //fire a copy of the notification event to our listeners, keeping the original target						
 				}
+
 			};
 		}
 		return repeatNotificationListener; //return the notification listener
@@ -120,13 +126,16 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 		if(repeatCompositeComponentListener == null) { //if there is no composite component listener
 			repeatCompositeComponentListener = new CompositeComponentListener() { //create a new composite component listener
 
+				@Override
 				public void childComponentAdded(final ComponentEvent childComponentEvent) { //if a child component is added
 					fireChildComponentAdded(new ComponentEvent(AbstractCompositeComponent.this, childComponentEvent)); //fire a copy of the component event to our listeners, keeping the original target
 				}
 
+				@Override
 				public void childComponentRemoved(final ComponentEvent childComponentEvent) { //if a child component is removed
 					fireChildComponentRemoved(new ComponentEvent(AbstractCompositeComponent.this, childComponentEvent)); //fire a copy of the component event to our listeners, keeping the original target
 				}
+
 			};
 		}
 		return repeatCompositeComponentListener; //return the notification listener
@@ -243,9 +252,12 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	*/
 
 	/**
-	 * Checks the state of the component for validity. This version calls {@link #determineChildrenValid()}.
-	 * @return <code>true</code> if the component and all relevant children passes all validity tests, else <code>false</code>.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version calls {@link #determineChildrenValid()}.
+	 * </p>
 	 */
+	@Override
 	protected boolean determineValid() {
 		return super.determineValid() && determineChildrenValid(); //determine if the super class and children are valid
 	}
@@ -258,9 +270,9 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	protected boolean determineChildrenValid() {
 		//TODO fix Log.trace("ready to determine children valid in", this);
 		for(final Component childComponent : getChildComponents()) { //for each child component
-		//TODO del Log.trace("in", this, "child", childComponent, "is valid", childComponent.isValid());			
+			//TODO del Log.trace("in", this, "child", childComponent, "is valid", childComponent.isValid());			
 			if(childComponent.isDisplayed() && childComponent.isVisible() && !childComponent.isValid()) { //if this child component is displayed and visible, but not valid
-			//TODO del Log.trace("in", this, "found non-valid child", childComponent);
+				//TODO del Log.trace("in", this, "found non-valid child", childComponent);
 				return false; //the composite component should not be considered valid
 			}
 		}
@@ -269,10 +281,12 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	}
 
 	/**
-	 * Validates the user input of this component and all child components. The component will be updated with error information. This version first calls
-	 * {@link #validateChildren()} so that all children will be validated before checks are performed on this component.
-	 * @return The current state of {@link #isValid()} as a convenience.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version first calls {@link #validateChildren()} so that all children will be validated before checks are performed on this component.
+	 * </p>
 	 */
+	@Override
 	public boolean validate() {
 		validateChildren(); //validate all children
 		super.validate(); //validate the component normally
@@ -295,12 +309,12 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	}
 
 	/**
-	 * Resets this object's theme. This method sets to <code>false</code> the state of whether a theme has been applied to this object. This method is called for
-	 * any child components resetting its own theme. No new theme is actually loaded. There is normally no need to override this method or to call this method
-	 * directly by applications. This version recursively calls the {@link #resetTheme()} method of all child components before resetting the theme of this
-	 * component.
-	 * @see #setThemeApplied(boolean)
+	 * {@inheritDoc}
+	 * <p>
+	 * This version recursively calls the {@link #resetTheme()} method of all child components before resetting the theme of this component.
+	 * </p>
 	 */
+	@Override
 	public void resetTheme() {
 		for(final Component childComponent : getChildComponents()) { //for each child component
 			childComponent.resetTheme(); //tell the child component to reset its theme
@@ -309,15 +323,12 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	}
 
 	/**
-	 * Updates this object's theme. This method checks whether a theme has been applied to this object. If a theme has not been applied to this object this method
-	 * calls {@link #applyTheme()}. This method is called for any child components before applying the theme to the component itself, to assure that child theme
-	 * updates have already occured before theme updates occur for this component. There is normally no need to override this method or to call this method
-	 * directly by applications. This version recursively calls the {@link #updateTheme()} method of all child components before updating the theme of this
-	 * component.
-	 * @throws IOException if there was an error loading or applying a theme.
-	 * @see #isThemeApplied()
-	 * @see #applyTheme()
+	 * {@inheritDoc}
+	 * <p>
+	 * This version recursively calls the {@link #updateTheme()} method of all child components before updating the theme of this component.
+	 * </p>
 	 */
+	@Override
 	public void updateTheme() throws IOException {
 		for(final Component childComponent : getChildComponents()) { //for each child component
 			childComponent.updateTheme(); //tell the child component to update its theme
@@ -326,11 +337,12 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	}
 
 	/**
-	 * Loads the preferences for this component and optionally any descendant components. Any preferences returned from {@link #getPreferenceProperties()} will be
-	 * loaded automatically. This version loads the preferences of child components if descendants should be included.
-	 * @param includeDescendants <code>true</code> if preferences of any descendant components should also be loaded, else <code>false</code>.
-	 * @throws IOException if there is an error loading preferences.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version loads the preferences of child components if descendants should be included.
+	 * </p>
 	 */
+	@Override
 	public void loadPreferences(final boolean includeDescendants) throws IOException {
 		if(includeDescendants) { //if descendants should be included
 			for(final Component childComponent : getChildComponents()) { //for each child component
@@ -341,11 +353,12 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	}
 
 	/**
-	 * Saves the preferences for this component and optionally any descendant components. Any preferences returned from {@link #getPreferenceProperties()} will be
-	 * saved automatically. This version loads the preferences of child components if descendants should be included.
-	 * @param includeDescendants <code>true</code> if preferences of any descendant components should also be saved, else <code>false</code>.
-	 * @throws IOException if there is an error saving preferences.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version loads the preferences of child components if descendants should be included.
+	 * </p>
 	 */
+	@Override
 	public void savePreferences(final boolean includeDescendants) throws IOException {
 		super.savePreferences(includeDescendants); //save preferences normally
 		if(includeDescendants) { //if descendants should be included
@@ -355,36 +368,20 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 		}
 	}
 
-	/**
-	 * Dispatches an input event to this component and all child components, if any. If this is a {@link FocusedInputEvent}, the event will be directed towards
-	 * the branch in which lies the focused component of any {@link InputFocusGroupComponent} ancestor of this component (or this component, if it is a focus
-	 * group). If this is instead a {@link TargetedEvent}, the event will be directed towards the branch in which lies the target component of the event.
-	 * Otherwise, the event will be dispatched to all child components. Only after the event has been dispatched to any children will the event be fired to any
-	 * event listeners and then passed to the installed input strategy, if any. Once the event is consumed, no further processing takes place. This version
-	 * dispatches the event to child component(s) depending on whether the event is focused, targeted, or neither, and then performs default processing.
-	 * @param inputEvent The input event to dispatch.
-	 * @throws NullPointerException if the given event is <code>null</code>.
-	 * @see TargetedEvent
-	 * @see FocusedInputEvent
-	 * @see #dispatchInputEvent(InputEvent, Component)
-	 * @see InputEvent#isConsumed()
-	 * @see #fireInputEvent(InputEvent)
-	 * @see #getInputStrategy()
-	 * @see InputStrategy#input(Input)
-	 */
+	@Override
 	public void dispatchInputEvent(final InputEvent inputEvent) {
 		//Log.trace("in composite component", this, "ready to do default dispatching of input event", inputEvent);
 		if(!inputEvent.isConsumed()) { //if the input has not been consumed
 			if(inputEvent instanceof FocusedInputEvent) { //if this is a focused input event, the target will be the focused child of the focus group ancestor of this component (or this component, if this component is a focused group)
-			//Log.trace("this is a focused event");
+				//Log.trace("this is a focused event");
 				Component component = this; //start with this component
 				do {
 					if(component instanceof InputFocusGroupComponent) { //if we found a focus group
-					//Log.trace("component", component, "is the focus group");
+						//Log.trace("component", component, "is the focus group");
 						final InputFocusGroupComponent focusGroup = (InputFocusGroupComponent)component; //get the focus group
 						final InputFocusableComponent focusedComponent = focusGroup.getInputFocusedComponent(); //get the focused component
 						if(focusedComponent != null) { //if there is a focused component
-						//Log.trace("ready to dispatch to focused component", focusedComponent);
+							//Log.trace("ready to dispatch to focused component", focusedComponent);
 							dispatchInputEvent(inputEvent, focusedComponent); //dispatch the event to the focused component
 							//Log.trace("done dispatching to focused component", focusedComponent);
 						}
@@ -394,13 +391,13 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 					}
 				} while(component != null); //keep looking until we run out of components
 			} else if(inputEvent instanceof TargetedEvent) { //if this is a targeted event
-			//Log.trace("this is a targeted event");
+				//Log.trace("this is a targeted event");
 				final Object targetObject = ((TargetedEvent)inputEvent).getTarget(); //get the event target
 				if(targetObject instanceof Component) { //if the target is a component other than any focus target we might have used earlier
 					dispatchInputEvent(inputEvent, (Component)targetObject); //dispatch the event to the event target						
 				}
 			} else { //if this wasn't a focused or targeted event, dispatch the event to all child components
-			//Log.trace("this is an unconsumed non-targeted event; ready to send to children");
+				//Log.trace("this is an unconsumed non-targeted event; ready to send to children");
 				for(final Component childComponent : getChildComponents()) { //for each child component
 					if(inputEvent.isConsumed()) { //if the event has been consumed
 						return; //stop further processing
@@ -410,7 +407,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 				//Log.trace("finishing sending event to children");
 			}
 			if(!inputEvent.isConsumed()) { //if the event has not been consumed
-			//Log.trace("event still not consumed, ready to do default dispatching");
+				//Log.trace("event still not consumed, ready to do default dispatching");
 				super.dispatchInputEvent(inputEvent); //do the default dispatching
 			}
 		}
@@ -438,20 +435,12 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 		}
 	}
 
-	/**
-	 * Adds a composite component listener. An event will be fired for each descendant component added or removed, with the event target indicating the parent
-	 * composite component of the change.
-	 * @param compositeComponentListener The composite component listener to add.
-	 */
+	@Override
 	public void addCompositeComponentListener(final CompositeComponentListener compositeComponentListener) {
 		getEventListenerManager().add(CompositeComponentListener.class, compositeComponentListener); //add the listener
 	}
 
-	/**
-	 * Removes a composite component listener. An event will be fired for each descendant component added or removed, with the event target indicating the parent
-	 * composite component of the change.
-	 * @param compositeComponentListener The composite component listener to remove.
-	 */
+	@Override
 	public void removeCompositeComponentListener(final CompositeComponentListener compositeComponentListener) {
 		getEventListenerManager().remove(CompositeComponentListener.class, compositeComponentListener); //remove the listener
 	}

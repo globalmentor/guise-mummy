@@ -39,9 +39,11 @@ public abstract class AbstractEditValuePanel<V> extends AbstractValuedPanel<V> i
 		if(repeatEditListener == null) { //if we have not yet created the repeater listener
 			repeatEditListener = new EditListener() { //create a listener to listen for a edits
 
+				@Override
 				public void edited(final EditEvent editEvent) { //if editing occurs
 					fireEdited(new EditEvent(AbstractEditValuePanel.this, editEvent)); //fire a copy of the event, retaining the original target
 				}
+
 			};
 		}
 		return repeatEditListener; //return the repeater edit listener
@@ -50,16 +52,12 @@ public abstract class AbstractEditValuePanel<V> extends AbstractValuedPanel<V> i
 	/** Whether the value is editable and the component will allow the the user to change the value. */
 	private boolean editable = true;
 
-	/** @return Whether the value is editable and the component will allow the the user to change the value. */
+	@Override
 	public boolean isEditable() {
 		return editable;
 	}
 
-	/**
-	 * Sets whether the value is editable and the component will allow the the user to change the value. This is a bound property of type <code>Boolean</code>.
-	 * @param newEditable <code>true</code> if the component should allow the user to change the value.
-	 * @see EditComponent#EDITABLE_PROPERTY
-	 */
+	@Override
 	public void setEditable(final boolean newEditable) {
 		if(editable != newEditable) { //if the value is really changing
 			final boolean oldEditable = editable; //get the old value
@@ -81,6 +79,7 @@ public abstract class AbstractEditValuePanel<V> extends AbstractValuedPanel<V> i
 		super(valueClass, layout); //construct the parent class
 		addCompositeComponentListener(new CompositeComponentListener() { //listen for components being added or removed anywhere below this component
 
+			@Override
 			public void childComponentAdded(final ComponentEvent childComponentEvent) { //if a descendant component is added
 				for(Component parent = (CompositeComponent)childComponentEvent.getSource(); parent != AbstractEditValuePanel.this; parent = parent.getParent()) { //go up the parent hierarchy of the added component until we reach this component
 					assert parent != null : "Composite component event did not refer to child of this component.";
@@ -94,6 +93,7 @@ public abstract class AbstractEditValuePanel<V> extends AbstractValuedPanel<V> i
 				}
 			}
 
+			@Override
 			public void childComponentRemoved(ComponentEvent childComponentEvent) { //if a descendant component is removed
 				for(Component parent = (CompositeComponent)childComponentEvent.getSource(); parent != AbstractEditValuePanel.this; parent = parent.getParent()) { //go up the parent hierarchy of the removed component until we reach this component TODO refactor into a separate method
 					assert parent != null : "Composite component event did not refer to child of this component.";
@@ -106,23 +106,18 @@ public abstract class AbstractEditValuePanel<V> extends AbstractValuedPanel<V> i
 					removedEditComponent.removeEditListener(getRepeatEditListener()); //stop repeating its edit events to our listeners
 				}
 			}
+
 		});
 	}
 
 	//EditComponent implementation
 
-	/**
-	 * Adds an edit listener.
-	 * @param editListener The edit listener to add.
-	 */
+	@Override
 	public void addEditListener(final EditListener editListener) {
 		getEventListenerManager().add(EditListener.class, editListener); //add the listener
 	}
 
-	/**
-	 * Removes an edit listener.
-	 * @param editListener The edit listener to remove.
-	 */
+	@Override
 	public void removeEditListener(final EditListener editListener) {
 		getEventListenerManager().remove(EditListener.class, editListener); //remove the listener
 	}

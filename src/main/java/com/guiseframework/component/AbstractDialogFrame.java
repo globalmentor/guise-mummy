@@ -47,16 +47,12 @@ public abstract class AbstractDialogFrame<V> extends AbstractFrame implements Di
 	/** Whether the control is enabled and can receive user input. */
 	private boolean enabled = true;
 
-	/** @return Whether the control is enabled and can receive user input. */
+	@Override
 	public boolean isEnabled() {
 		return enabled;
 	}
 
-	/**
-	 * Sets whether the control is enabled and and can receive user input. This is a bound property of type <code>Boolean</code>.
-	 * @param newEnabled <code>true</code> if the control should indicate and accept user input.
-	 * @see Enableable#ENABLED_PROPERTY
-	 */
+	@Override
 	public void setEnabled(final boolean newEnabled) {
 		if(enabled != newEnabled) { //if the value is really changing
 			final boolean oldEnabled = enabled; //get the old value
@@ -70,7 +66,7 @@ public abstract class AbstractDialogFrame<V> extends AbstractFrame implements Di
 	/** The status of the current user input, or <code>null</code> if there is no status to report. */
 	private Status status = null;
 
-	/** @return The status of the current user input, or <code>null</code> if there is no status to report. */
+	@Override
 	public Status getStatus() {
 		return status;
 	}
@@ -116,20 +112,26 @@ public abstract class AbstractDialogFrame<V> extends AbstractFrame implements Di
 	}
 
 	/**
-	 * Rechecks user input validity of this component and all child components, and updates the valid state. This version also updates the status.
-	 * @see #setValid(boolean)
+	 * {@inheritDoc}
+	 * <p>
+	 * This version also updates the status.
+	 * </p>
 	 * @see #updateStatus()
 	 */
+	@Override
 	protected void updateValid() {
 		super.updateValid(); //update validity normally
 		updateStatus(); //update user input status
 	}
 
 	/**
-	 * Sets the component notification. This version updates the component status if the notification changes. This is a bound property.
-	 * @param newNotification The notification for the component, or <code>null</code> if no notification is associated with this component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version updates the component status if the notification changes.
+	 * </p>
 	 * @see #NOTIFICATION_PROPERTY
 	 */
+	@Override
 	public void setNotification(final Notification newNotification) {
 		final Notification oldNotification = getNotification(); //get the old notification
 		super.setNotification(newNotification); //update the old notification normally
@@ -139,10 +141,14 @@ public abstract class AbstractDialogFrame<V> extends AbstractFrame implements Di
 	}
 
 	/**
-	 * Resets the control to its default value. This version clears any notification and resets the control value.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version clears any notification and resets the control value.
+	 * </p>
 	 * @see #setNotification(Notification)
 	 * @see #resetValue()
 	 */
+	@Override
 	public void reset() {
 		setNotification(null); //clear any notification
 		resetValue(); //reset the control value
@@ -168,11 +174,12 @@ public abstract class AbstractDialogFrame<V> extends AbstractFrame implements Di
 	}
 
 	/**
-	 * Reports that a bound property has changed. This version first updates the valid status if the value is reported as being changed.
-	 * @param propertyName The name of the property being changed.
-	 * @param oldValue The old property value.
-	 * @param newValue The new property value.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version first updates the valid status if the value is reported as being changed.
+	 * </p>
 	 */
+	@Override
 	protected <VV> void firePropertyChange(final String propertyName, final VV oldValue, final VV newValue) {
 		if(VALUE_PROPERTY.equals(propertyName) || VALIDATOR_PROPERTY.equals(propertyName)) { //if the value property or the validator property is being reported as changed
 			updateValid(); //update the valid status based upon the new property, so that any listeners will know whether the new property is valid
@@ -181,9 +188,12 @@ public abstract class AbstractDialogFrame<V> extends AbstractFrame implements Di
 	}
 
 	/**
-	 * Checks the state of the component for validity. This version checks the validity of the value model.
-	 * @return <code>true</code> if the component and all children passes all validity tests, else <code>false</code>.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version checks the validity of the value model.
+	 * </p>
 	 */
+	@Override
 	protected boolean determineValid() {
 		if(!super.determineValid()) { //if we don't pass the default validity checks
 			return false; //the component isn't valid
@@ -192,10 +202,12 @@ public abstract class AbstractDialogFrame<V> extends AbstractFrame implements Di
 	}
 
 	/**
-	 * Validates the user input of this component and all child components. The component will be updated with error information. This version validates the
-	 * associated value model.
-	 * @return The current state of {@link #isValid()} as a convenience.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version validates the associated value model.
+	 * </p>
 	 */
+	@Override
 	public boolean validate() {
 		super.validate(); //validate the parent class
 		try {
@@ -206,77 +218,52 @@ public abstract class AbstractDialogFrame<V> extends AbstractFrame implements Di
 		return isValid(); //return the current valid state
 	}
 
-	/** @return The default value. */
+	@Override
 	public V getDefaultValue() {
 		return getValueModel().getDefaultValue();
 	}
 
-	/** @return The input value, or <code>null</code> if there is no input value. */
+	@Override
 	public V getValue() {
 		return getValueModel().getValue();
 	}
 
-	/**
-	 * Sets the input value. This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method. If a
-	 * validator is installed, the value will first be validated before the current value is changed. Validation always occurs if a validator is installed, even
-	 * if the value is not changing. If the value change is vetoed by the installed validator, the validation exception will be accessible via
-	 * {@link PropertyVetoException#getCause()}.
-	 * @param newValue The input value of the model.
-	 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
-	 * @see #getValidator()
-	 * @see #VALUE_PROPERTY
-	 */
+	@Override
 	public void setValue(final V newValue) throws PropertyVetoException {
 		getValueModel().setValue(newValue);
 	}
 
-	/**
-	 * Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators. No validation occurs.
-	 * @see ValueModel#VALUE_PROPERTY
-	 */
+	@Override
 	public void clearValue() {
 		getValueModel().clearValue();
 	}
 
-	/**
-	 * Resets the value to a default value, which may be invalid according to any installed validators. No validation occurs.
-	 * @see #VALUE_PROPERTY
-	 */
+	@Override
 	public void resetValue() {
 		getValueModel().resetValue();
 	}
 
-	/** @return The validator for this model, or <code>null</code> if no validator is installed. */
+	@Override
 	public Validator<V> getValidator() {
 		return getValueModel().getValidator();
 	}
 
-	/**
-	 * Sets the validator. This is a bound property
-	 * @param newValidator The validator for this model, or <code>null</code> if no validator should be used.
-	 * @see #VALIDATOR_PROPERTY
-	 */
+	@Override
 	public void setValidator(final Validator<V> newValidator) {
 		getValueModel().setValidator(newValidator);
 	}
 
-	/**
-	 * Determines whether the value of this model is valid.
-	 * @return Whether the value of this model is valid.
-	 */
+	@Override
 	public boolean isValidValue() {
 		return getValueModel().isValidValue();
 	}
 
-	/**
-	 * Validates the value of this model, throwing an exception if the model is not valid.
-	 * @throws ValidationException if the value of this model is not valid.
-	 */
+	@Override
 	public void validateValue() throws ValidationException {
 		getValueModel().validateValue();
 	}
 
-	/** @return The class representing the type of value this model can hold. */
+	@Override
 	public Class<V> getValueClass() {
 		return getValueModel().getValueClass();
 	}

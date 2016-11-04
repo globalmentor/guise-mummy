@@ -68,7 +68,7 @@ public interface Layout<T extends Constraints> extends PropertyBindable {
 	public void removeComponent(final Component component);
 
 	/**
-	 * Retreives layout constraints associated with a component. If the constraints currently associated with the component are not compatible with this layout,
+	 * Retrieves layout constraints associated with a component. If the constraints currently associated with the component are not compatible with this layout,
 	 * or if no constraints are associated with the given component, default constraints are created and associated with the component.
 	 * @param component The component for which layout metadata is being requested.
 	 * @return The constraints associated with the component.

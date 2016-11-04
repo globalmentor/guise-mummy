@@ -141,11 +141,12 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 	/** The listener that ensures making a card displayed doesn't create an invalid gap in a sequence of valid cards. */
 	private PropertyChangeListener cardDisplayedChangeListener = new AbstractGenericPropertyChangeListener<Boolean>() { //create a new display change listener
 
+		@Override
 		public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent) { //if the child component's display status changes (we're really listening for the constraint's displayable status, which we'll check later)
 			if(isTransitionEnabled() && Boolean.TRUE.equals(propertyChangeEvent.getNewValue())) { //if transitions are turned on and the card is being displayed
 				final Object target = propertyChangeEvent.getTarget(); //get the target of the event
 				if(target instanceof ControlConstraints) { //if this is control constraints changing
-				//TODO del if not needed					final ControlConstraints controlConstraints=(ControlConstraints)target;	//get the control constraints target
+					//TODO del if not needed					final ControlConstraints controlConstraints=(ControlConstraints)target;	//get the control constraints target
 					final int currentIndex = getSelectedIndex(); //get the currently selected index
 					if(currentIndex >= 0) { //if a card is selected
 						final Component card = (Component)propertyChangeEvent.getSource(); //get the card source of the event
@@ -159,6 +160,7 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 				}
 			}
 		}
+
 	};
 
 	/** Default constructor. */
@@ -220,6 +222,7 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 		addVetoableChangeListener(VALUE_PROPERTY, new SequenceCardVetoableChangeListener()); //do validation as needed on card changes
 		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Component>() {
 
+			@Override
 			public void propertyChange(final GenericPropertyChangeEvent<Component> propertyChangeEvent) { //if the selected card changes
 				if(isTransitionEnabled()) { //if transitions are enabled
 					final Component oldCard = propertyChangeEvent.getOldValue();
@@ -263,41 +266,41 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 					continueActionPrototype.setEnabled(finishActionPrototype.isEnabled());
 				}
 			}
+
 		});
 	}
 
 	/**
-	 * Adds a child component at the specified index. This version installs a listener for the component's displayed status. Any class that overrides this method
-	 * must call this version.
-	 * @param index The index at which the component should be added.
-	 * @param childComponent The component to add to this component.
-	 * @throws IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version installs a listener for the component's displayed status.
+	 * </p>
 	 */
+	@Override
 	protected void addComponent(final int index, final Component childComponent) {
 		super.addComponent(index, childComponent); //initialize the child component as needed
 		childComponent.addPropertyChangeListener(DISPLAYED_PROPERTY, cardDisplayedChangeListener); //listen for changes in the component's displayed status and make sure the sequence is disabled as needed
 	}
 
 	/**
-	 * Removes a child component. This version uninstalls a listener for the component's displayed status. Any class that overrides this method must call this
-	 * version.
-	 * @param childComponent The component to remove from this component.
-	 * @throws IllegalArgumentException if the component does not recognize this composite component as its parent or the component is not a member of this
-	 *           composite component.
-	 * @throws IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version uninstalls a listener for the component's displayed status.
+	 * </p>
 	 */
+	@Override
 	protected void removeComponent(final Component childComponent) {
 		childComponent.removePropertyChangeListener(DISPLAYED_PROPERTY, cardDisplayedChangeListener); //stop listening for changes in the component's displayed status
 		super.removeComponent(childComponent); //uninitialize the child component as needed
 	}
 
 	/**
-	 * Called when the {@link Component#VALID_PROPERTY} of a child component changes. This version updates the error status of the child component's contraints if
-	 * those constraints implement {@link TaskCardConstraints}.
-	 * @param childComponent The child component the valid property of which changed.
-	 * @param oldValid The old valid property.
-	 * @param newValid The new valid property.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version updates the error status of the child component's constraints if those constraints implement {@link TaskCardConstraints}.
+	 * </p>
 	 */
+	@Override
 	protected void childComponentValidPropertyChanged(final Component childComponent, final boolean oldValid, final boolean newValid) {
 		super.childComponentValidPropertyChanged(childComponent, oldValid, newValid); //call the parent version
 		final Constraints constraints = childComponent.getConstraints(); //get the child component constraints
@@ -456,7 +459,7 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 			final Component nextCard = getNext(); //get the next card
 			if(nextCard != null) { //if there is a next card
 				if(isTransitionEnabled()) { //if transitions are enabled
-				//				TODO del Log.trace("got next card; ready to get selected card");
+					//				TODO del Log.trace("got next card; ready to get selected card");
 					final Component selectedCard = getSelectedValue(); //get the selected card
 					//TODO del Log.trace("got next card", nextCard, "selected card", selectedCard);
 					assert selectedCard != null : "No card selected, even though getNext() should have returned null if no card is selected.";
@@ -467,15 +470,17 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 						final List<Notification> notifications = getNotifications(selectedCard); //get the notifications from the card
 						final Runnable valueSetter = new Runnable() { //create code for notifying, committing the card and advancing to the next card
 
+							@Override
 							public void run() {
 								try {
 									setValue(nextCard); //select the next card
 								} catch(final PropertyVetoException propertyVetoException) { //if the change is vetoed, don't do anything special
-								//										TODO del Log.warn(propertyVetoException);
+									//										TODO del Log.warn(propertyVetoException);
 								} finally {
 									transition = oldTransition; //restore the old transition (usually null)
 								}
 							}
+
 						};
 						//						TODO del Log.trace("ready to do notify/commit/advance");
 						final int notificationCount = notifications.size(); //see how many notifications there are
@@ -520,6 +525,7 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 					final List<Notification> notifications = getNotifications(selectedCard); //get the notifications from the card
 					final Runnable finisher = new Runnable() { //create code for committing and finishing
 
+						@Override
 						public void run() {
 							try {
 								commit(); //commit this panel
@@ -529,6 +535,7 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 								getSession().notify(new Notification(ioException)); //notify the user
 							}
 						}
+
 					};
 					final int notificationCount = notifications.size(); //see how many notifications there are
 					if(notificationCount > 0) { //if there is at least one notification
@@ -574,13 +581,7 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 		setState(TaskState.INCOMPLETE); //indicate that the sequence is started
 	}
 
-	/**
-	 * Validates the user input of this component and all child components. The component will be updated with error information. If the component doesn't
-	 * validate and there is a selected card the constraints of which implement {@link TaskCardConstraints}, the task status of those constraints will be set to
-	 * {@link TaskState#ERROR}. The user is also notified of any error, using this component's notification, the first notification in the selected card
-	 * hierarchy, or a default message.
-	 * @return The current state of {@link #isValid()} as a convenience.
-	 */
+	@Override
 	public boolean validate() {
 		if(!super.validate()) { //validate the component normally; if the component does not validate
 			Notification notification = getNotification(); //see if this panel has any notification
@@ -630,12 +631,13 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 	}
 
 	/**
-	 * Determines the component for navigation based upon the given bookmark. This version finds the first previous enabled and displayed card, searching
-	 * backwards from the requested card, if the requested card is not enabled and displayed. This version chooses the first card if no card is requested.
-	 * @param bookmark The bookmark for which a component should be returned, or <code>null</code> if no bookmark is available.
-	 * @return The child component indicated by the given bookmark parameter value, or <code>null</code> if the given bookmark represents the <code>null</code>
-	 *         component value.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version finds the first previous enabled and displayed card, searching backwards from the requested card, if the requested card is not enabled and
+	 * displayed. This version chooses the first card if no card is requested.
+	 * </p>
 	 */
+	@Override
 	protected Component getComponent(final Bookmark bookmark) {
 		/*TODO del if not wanted; why did we put this in in the first place? will improving AbstractCardPanel to update the URL help, so that we will always have the correct bookmark?
 					//choose the first card if no card was specified
@@ -669,11 +671,7 @@ public class SequenceCardPanel extends AbstractCardPanel implements ArrangeConta
 	 */
 	protected class SequenceCardVetoableChangeListener extends AbstractGenericVetoableChangeListener<Component> {
 
-		/**
-		 * Called when a constrained property is changed.
-		 * @param genericPropertyChangeEvent An event object describing the event source, the property that is changing, and its old and new values.
-		 * @throws PropertyVetoException if the recipient wishes the property change to be rolled back.
-		 */
+		@Override
 		public void vetoableChange(final GenericPropertyChangeEvent<Component> genericPropertyChangeEvent) throws PropertyVetoException {
 			if(isTransitionEnabled() && genericPropertyChangeEvent.getNewValue() != getValue()) { //if transitions are enabled and the index is really changing (the VetoableChangeListener contract says that if a change is vetoed this method will be called again with a reverse change, and we don't want to validate in those circumstances)
 				//		TODO del Log.trace("validating vetoable change");

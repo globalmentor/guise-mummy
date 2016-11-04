@@ -51,10 +51,12 @@ public class TemperatureConversionPanel extends LayoutPanel {
 		temperatureInput.setValidator(new ValueRequiredValidator<Double>()); //install a validator requiring a value
 		temperatureInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Double>() { //listen for temperature changes
 
-					public void propertyChange(final GenericPropertyChangeEvent<Double> propertyChangeEvent) { //if the input temperature changes
-						convertTemperature(); //convert the temperature						
-					}
-				});
+			@Override
+			public void propertyChange(final GenericPropertyChangeEvent<Double> propertyChangeEvent) { //if the input temperature changes
+				convertTemperature(); //convert the temperature						
+			}
+
+		});
 		inputPanel.add(temperatureInput); //add the input control to the input panel
 		temperatureOutput = new TextControl<Double>(Double.class); //create a text input control to display the result
 		temperatureOutput.setLabel("Output Temperature"); //add a label to the text output control
@@ -85,11 +87,13 @@ public class TemperatureConversionPanel extends LayoutPanel {
 		//create a listener to listen for check control changes and update the temperature immediately (e.g. with AJAX on the web platform)
 		final GenericPropertyChangeListener<Boolean> checkControlListener = new AbstractGenericPropertyChangeListener<Boolean>() {
 
+			@Override
 			public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent) {
 				if(propertyChangeEvent.getNewValue()) { //if this check control was selected
 					convertTemperature(); //convert the temperature							
 				}
 			}
+
 		};
 
 		celsiusCheckControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, checkControlListener); //listen for the Celsius control changing
@@ -100,10 +104,12 @@ public class TemperatureConversionPanel extends LayoutPanel {
 		convertButton.setLabel("Convert"); //set the button label
 		convertButton.addActionListener(new ActionListener() { //when the convert button is pressed
 
-					public void actionPerformed(ActionEvent actionEvent) { //convert the temperature in the input field and place the result in the output field
-						convertTemperature(); //convert the temperature
-					}
-				});
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) { //convert the temperature in the input field and place the result in the output field
+				convertTemperature(); //convert the temperature
+			}
+
+		});
 		conversionPanel.add(convertButton); //add the button to the conversion panel
 
 		add(conversionPanel); //add the conversion panel to the panel

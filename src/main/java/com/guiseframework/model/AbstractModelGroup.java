@@ -36,21 +36,18 @@ public abstract class AbstractModelGroup<M extends Model> implements ModelGroup<
 		return modelSet;
 	}
 
-	/**
-	 * Determines whether this group contains the given model.
-	 * @param model The model being checked for group inclusion.
-	 * @return <code>true</code> if the model is contained in this group, else <code>false</code>.
-	 * @throws NullPointerException if the given model is <code>null</code>.
-	 */
+	@Override
 	public boolean contains(final Model model) {
 		return modelSet.contains(checkInstance(model, "Model cannot be null.")); //see if the set of models contains this model TODO check for class cast exception
 	}
 
 	/**
-	 * Adds a model to the group. If the model is already included in the group, no action occurs. This version delegates to {@link #addImpl(Model)}.
-	 * @param model The model to add to the group.
-	 * @throws NullPointerException if the given model is <code>null</code>.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version delegates to {@link #addImpl(Model)}.
+	 * </p>
 	 */
+	@Override
 	public void add(final M model) {
 		if(!contains(model)) { //if the group doesn't already contain the model
 			addImpl(model); ///actually add the model to the model set
@@ -67,10 +64,12 @@ public abstract class AbstractModelGroup<M extends Model> implements ModelGroup<
 	}
 
 	/**
-	 * Removes a model from the group. If the model is not included in this group, no action occurs. This version delegates to {@link #removeImpl(Model)}.
-	 * @param model The model to remove from the group.
-	 * @throws NullPointerException if the given model is <code>null</code>.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version delegates to {@link #removeImpl(Model)}.
+	 * </p>
 	 */
+	@Override
 	public void remove(final M model) {
 		if(contains(model)) { //if the group contains the model
 			removeImpl(model); ///actually remove the model from the model set

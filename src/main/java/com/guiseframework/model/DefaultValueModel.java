@@ -31,7 +31,7 @@ public class DefaultValueModel<V> extends AbstractValueModel<V> {
 	/** The default value. */
 	private final V defaultValue;
 
-	/** @return The default value. */
+	@Override
 	public V getDefaultValue() {
 		return defaultValue;
 	}
@@ -39,21 +39,12 @@ public class DefaultValueModel<V> extends AbstractValueModel<V> {
 	/** The input value, or <code>null</code> if there is no value. */
 	private V value;
 
-	/** @return The input value, or <code>null</code> if there is no input value. */
+	@Override
 	public V getValue() {
 		return value;
 	}
 
-	/**
-	 * Sets the new value. This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method. If a
-	 * validator is installed, the value will first be validated before the current value is changed. Validation always occurs if a validator is installed, even
-	 * if the value is not changing. If the value change is vetoed by the installed validator, the validation exception will be accessible via
-	 * {@link PropertyVetoException#getCause()}.
-	 * @param newValue The new value.
-	 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
-	 * @see #getValidator()
-	 * @see #VALUE_PROPERTY
-	 */
+	@Override
 	public void setValue(final V newValue) throws PropertyVetoException {
 		final V oldValue = value; //get the old value
 		final Validator<V> validator = getValidator(); //get the currently installed validator, if there is one
@@ -71,10 +62,7 @@ public class DefaultValueModel<V> extends AbstractValueModel<V> {
 		}
 	}
 
-	/**
-	 * Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators. No validation occurs.
-	 * @see ValueModel#VALUE_PROPERTY
-	 */
+	@Override
 	public void clearValue() {
 		if(!Objects.equals(value, null)) { //if the value is really changing (compare their values, rather than identity)
 			final V oldValue = value; //get the old value
@@ -83,10 +71,7 @@ public class DefaultValueModel<V> extends AbstractValueModel<V> {
 		}
 	}
 
-	/**
-	 * Resets the value to a default value, which may be invalid according to any installed validators. No validation occurs.
-	 * @see ValueModel#VALUE_PROPERTY
-	 */
+	@Override
 	public void resetValue() {
 		final V defaultValue = getDefaultValue(); //get the default value
 		if(!Objects.equals(value, defaultValue)) { //if the value is really changing (compare their values, rather than identity)

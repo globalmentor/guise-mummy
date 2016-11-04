@@ -46,11 +46,7 @@ public class WebSelectDepictor<V, C extends ListSelectControl<V>> extends Abstra
 		super(XHTML_NAMESPACE_URI, ELEMENT_SELECT); //represent <xhtml:select>
 	}
 
-	/**
-	 * Processes an event from the platform.
-	 * @param event The event to be processed.
-	 * @throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
-	 */
+	@Override
 	public void processEvent(final PlatformEvent event) {
 		if(event instanceof WebChangeDepictEvent) { //if a property changed
 			final WebChangeDepictEvent webChangeEvent = (WebChangeDepictEvent)event; //get the web change event
@@ -122,10 +118,7 @@ public class WebSelectDepictor<V, C extends ListSelectControl<V>> extends Abstra
 		}
 	}
 
-	/**
-	 * Begins the rendering process.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		//TODO del Log.trace("updating select view");
 		super.depictBegin(); //do the default beginning rendering
@@ -214,10 +207,13 @@ public class WebSelectDepictor<V, C extends ListSelectControl<V>> extends Abstra
 	}
 
 	/**
-	 * Updates the views of any children. This version does nothing, because if a list select control is a composite component the child controls have already
-	 * been rendered as values in {@link #depictBody()}.
-	 * @throws IOException if there is an error updating the child views.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version does nothing, because if a list select control is a composite component the child controls have already been rendered as values in
+	 * {@link #depictBody()}.
+	 * </p>
 	 */
+	@Override
 	protected void depictChildren() throws IOException {
 	}
 

@@ -29,16 +29,12 @@ public abstract class AbstractModalFrame<R> extends AbstractFrame implements Mod
 	/** The result of this frame's modal interaction, or <code>null</code> if no result is given. */
 	private R result = null;
 
-	/** @return The result of this frame's modal interaction, or <code>null</code> if no result is given. */
+	@Override
 	public R getResult() {
 		return result;
 	}
 
-	/**
-	 * Sets the modal result. This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.
-	 * @param newResult The new result of this frame's modal interaction, or <code>null</code> if no result is given.
-	 * @see ModalFrame#RESULT_PROPERTY
-	 */
+	@Override
 	public void setResult(final R newResult) {
 		if(!Objects.equals(result, newResult)) { //if the value is really changing (compare their values, rather than identity)
 			final R oldResult = result; //get the old value

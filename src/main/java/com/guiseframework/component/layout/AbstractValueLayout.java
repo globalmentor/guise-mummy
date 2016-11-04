@@ -101,12 +101,12 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	}
 
 	/**
-	 * Adds a component to the layout. Called immediately after a component is added to the associated container. This method is called by the associated
-	 * container, and should not be called directly by application code. This version selects a component if none is selected. This version updates the new
-	 * component's active status if the component implements {@link Activeable}.
-	 * @param component The component to add to the layout.
-	 * @throws IllegalStateException if this layout has not yet been installed into a container.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version updates the new component's active status if the component implements {@link Activeable}.
+	 * </p>
 	 */
+	@Override
 	public void addComponent(final Component component) {
 		super.addComponent(component); //add the component normally
 		if(getValue() == null) { //if there is no component selected
@@ -121,10 +121,12 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	}
 
 	/**
-	 * Removes a component from the layout. Called immediately before a component is removed from the associated container. This method is called by the
-	 * associated container, and should not be called directly by application code. This implementation updates the selected component if necessary.
-	 * @param component The component to remove from the layout.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation updates the selected component if necessary.
+	 * </p>
 	 */
+	@Override
 	public void removeComponent(final Component component) {
 		super.removeComponent(component); //remove the component normally
 		if(component == getValue()) { //if the selected component was removed
@@ -146,21 +148,12 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 		this.selectedIndex = -1; //always uncache the selected index, because the index of the selected component might have changed
 	}
 
-	/** @return The container that owns this layout, or <code>null</code> if this layout has not been installed into a container. */
+	@Override
 	public Container getOwner() {
 		return (Container)super.getOwner();
 	}
 
-	/**
-	 * Sets the container that owns this layout This method is managed by containers, and normally should not be called by applications. //TODO del A layout
-	 * cannot be given a container if it is already installed in another container. Once a layout is installed in a container, it cannot be uninstalled. A layout
-	 * cannot be given a container if it is already installed in another container. A layout cannot be given a container unless that container already recognizes
-	 * this layout as its layout. If a layout is given the same container it already has, no action occurs.
-	 * @param newOwner The new container for this layout. //TODO del @throws NullPointerException if the given container is <code>null</code>.
-	 * @throws IllegalStateException if a different container is provided and this layout already has a container.
-	 * @throws ClassCastException if the given layout component is not a {@link Container}.
-	 * @throws IllegalArgumentException if a different container is provided and the given container does not already recognize this layout as its layout.
-	 */
+	@Override
 	public void setOwner(final LayoutComponent newOwner) {
 		super.setOwner((Container)newOwner); //make sure the new owner is a container
 	}
@@ -172,12 +165,12 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 		this.valueModel.addVetoableChangeListener(getRepeatVetoableChangeListener()); //listen and repeat all vetoable changes of the value model
 	}
 
-	/** @return The default value. */
+	@Override
 	public Component getDefaultValue() {
 		return getValueModel().getDefaultValue();
 	}
 
-	/** @return The input value, or <code>null</code> if there is no input value. */
+	@Override
 	public Component getValue() {
 		return getValueModel().getValue();
 	}
@@ -186,16 +179,13 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	private boolean isSettingValue = false;
 
 	/**
-	 * Sets the input value. This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method. If a
-	 * validator is installed, the value will first be validated before the current value is changed. Validation always occurs if a validator is installed, even
-	 * if the value is not changing. If the value change is vetoed by the installed validator, the validation exception will be accessible via
-	 * {@link PropertyVetoException#getCause()}. This version makes sure that the given component is contained in the container, and resets the cached selected
-	 * index so that it can be recalculated. This version updates the active status of the old and new components if the implement {@link Activeable}.
-	 * @param newValue The input value of the model.
-	 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
-	 * @see #getValidator()
-	 * @see ValueModel#VALUE_PROPERTY
+	 * {@inheritDoc}
+	 * <p>
+	 * This version makes sure that the given component is contained in the container, and resets the cached selected index so that it can be recalculated. This
+	 * version updates the active status of the old and new components if the implement {@link Activeable}.
+	 * </p>
 	 */
+	@Override
 	public void setValue(final Component newValue) throws PropertyVetoException {
 		final Component oldValue = getValue(); //get the old value
 		if(!Objects.equals(oldValue, newValue)) { //if a new component is given
@@ -205,8 +195,8 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 			}
 			if(newValue != null && !container.contains(newValue)) { //if there is a new component that isn't contained in the container
 				//create a custom validation exception
-				final ValidationException validationException = new ValidationException(format(
-						getSession().dereferenceString(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE_REFERENCE), newValue.toString()), newValue);
+				final ValidationException validationException = new ValidationException(
+						format(getSession().dereferenceString(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE_REFERENCE), newValue.toString()), newValue);
 				throw createPropertyVetoException(this, validationException, VALUE_PROPERTY, oldValue, newValue); //throw a property veto exception representing the validation error
 			}
 			if(oldValue instanceof Activeable) { //if the old value is activable
@@ -226,56 +216,50 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	}
 
 	/**
-	 * Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators. No validation occurs. This version
-	 * resets the cached selected index so that it can be recalculated.
-	 * @see ValueModel#VALUE_PROPERTY
+	 * {@inheritDoc}
+	 * <p>
+	 * This version resets the cached selected index so that it can be recalculated.
+	 * </p>
 	 */
+	@Override
 	public void clearValue() {
 		selectedIndex = -1; //uncache the selected index
 		getValueModel().clearValue();
 	}
 
 	/**
-	 * Resets the value to a default value, which may be invalid according to any installed validators. No validation occurs. This version resets the cached
-	 * selected index so that it can be recalculated.
-	 * @see ValueModel#VALUE_PROPERTY
+	 * {@inheritDoc}
+	 * <p>
+	 * This version resets the cached selected index so that it can be recalculated.
+	 * </p>
 	 */
+	@Override
 	public void resetValue() {
 		selectedIndex = -1; //uncache the selected index
 		getValueModel().resetValue();
 	}
 
-	/** @return The validator for this model, or <code>null</code> if no validator is installed. */
+	@Override
 	public Validator<Component> getValidator() {
 		return getValueModel().getValidator();
 	}
 
-	/**
-	 * Sets the validator. This is a bound property
-	 * @param newValidator The validator for this model, or <code>null</code> if no validator should be used.
-	 * @see #VALIDATOR_PROPERTY
-	 */
+	@Override
 	public void setValidator(final Validator<Component> newValidator) {
 		getValueModel().setValidator(newValidator);
 	}
 
-	/**
-	 * Determines whether the value of this model is valid.
-	 * @return Whether the value of this model is valid.
-	 */
+	@Override
 	public boolean isValidValue() {
 		return getValueModel().isValidValue();
 	}
 
-	/**
-	 * Validates the value of this model, throwing an exception if the model is not valid.
-	 * @throws ValidationException if the value of this model is not valid.
-	 */
+	@Override
 	public void validateValue() throws ValidationException {
 		getValueModel().validateValue();
 	}
 
-	/** @return The class representing the type of value this model can hold. */
+	@Override
 	public Class<Component> getValueClass() {
 		return getValueModel().getValueClass();
 	}

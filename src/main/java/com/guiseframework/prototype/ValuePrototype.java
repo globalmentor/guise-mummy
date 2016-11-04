@@ -36,16 +36,12 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	/** Whether the control is enabled and can receive user input. */
 	private boolean enabled = true;
 
-	/** @return Whether the control is enabled and can receive user input. */
+	@Override
 	public boolean isEnabled() {
 		return enabled;
 	}
 
-	/**
-	 * Sets whether the control is enabled and and can receive user input. This is a bound property of type <code>Boolean</code>.
-	 * @param newEnabled <code>true</code> if the control should indicate and accept user input.
-	 * @see Enableable#ENABLED_PROPERTY
-	 */
+	@Override
 	public void setEnabled(final boolean newEnabled) {
 		if(enabled != newEnabled) { //if the value is really changing
 			final boolean oldEnabled = enabled; //get the old value
@@ -57,16 +53,12 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	/** The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI. */
 	private URI glyphURI = null;
 
-	/** @return The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI. */
+	@Override
 	public URI getGlyphURI() {
 		return glyphURI;
 	}
 
-	/**
-	 * Sets the URI of the icon. This is a bound property of type <code>URI</code>.
-	 * @param newIcon The new URI of the icon, which may be a resource URI.
-	 * @see #GLYPH_URI_PROPERTY
-	 */
+	@Override
 	public void setGlyphURI(final URI newIcon) {
 		if(!Objects.equals(glyphURI, newIcon)) { //if the value is really changing
 			final URI oldGlyphURI = glyphURI; //get the old value
@@ -78,16 +70,12 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	/** The label text, which may include a resource reference, or <code>null</code> if there is no label text. */
 	private String label = null;
 
-	/** @return The label text, which may include a resource reference, or <code>null</code> if there is no label text. */
+	@Override
 	public String getLabel() {
 		return label;
 	}
 
-	/**
-	 * Sets the text of the label. This is a bound property.
-	 * @param newLabelText The new text of the label, which may include a resource reference.
-	 * @see #LABEL_PROPERTY
-	 */
+	@Override
 	public void setLabel(final String newLabelText) {
 		if(!Objects.equals(label, newLabelText)) { //if the value is really changing
 			final String oldLabel = label; //get the old value
@@ -99,18 +87,12 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	/** The content type of the label text. */
 	private ContentType labelContentType = Text.PLAIN_CONTENT_TYPE;
 
-	/** @return The content type of the label text. */
+	@Override
 	public ContentType getLabelContentType() {
 		return labelContentType;
 	}
 
-	/**
-	 * Sets the content type of the label text. This is a bound property.
-	 * @param newLabelTextContentType The new label text content type.
-	 * @throws NullPointerException if the given content type is <code>null</code>.
-	 * @throws IllegalArgumentException if the given content type is not a text content type.
-	 * @see #LABEL_CONTENT_TYPE_PROPERTY
-	 */
+	@Override
 	public void setLabelContentType(final ContentType newLabelTextContentType) {
 		checkInstance(newLabelTextContentType, "Content type cannot be null.");
 		if(labelContentType != newLabelTextContentType) { //if the value is really changing
@@ -126,16 +108,12 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	/** The description text, such as might appear in a flyover, or <code>null</code> if there is no description. */
 	private String description = null;
 
-	/** @return The description text, such as might appear in a flyover, or <code>null</code> if there is no description. */
+	@Override
 	public String getDescription() {
 		return description;
 	}
 
-	/**
-	 * Sets the description text, such as might appear in a flyover. This is a bound property.
-	 * @param newDescription The new text of the description, such as might appear in a flyover.
-	 * @see #DESCRIPTION_PROPERTY
-	 */
+	@Override
 	public void setDescription(final String newDescription) {
 		if(!Objects.equals(description, newDescription)) { //if the value is really changing
 			final String oldDescription = description; //get the old value
@@ -147,18 +125,12 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	/** The content type of the description text. */
 	private ContentType descriptionContentType = Text.PLAIN_CONTENT_TYPE;
 
-	/** @return The content type of the description text. */
+	@Override
 	public ContentType getDescriptionContentType() {
 		return descriptionContentType;
 	}
 
-	/**
-	 * Sets the content type of the description text. This is a bound property.
-	 * @param newDescriptionContentType The new description text content type.
-	 * @throws NullPointerException if the given content type is <code>null</code>.
-	 * @throws IllegalArgumentException if the given content type is not a text content type.
-	 * @see #DESCRIPTION_CONTENT_TYPE_PROPERTY
-	 */
+	@Override
 	public void setDescriptionContentType(final ContentType newDescriptionContentType) {
 		checkInstance(newDescriptionContentType, "Content type cannot be null.");
 		if(descriptionContentType != newDescriptionContentType) { //if the value is really changing
@@ -174,16 +146,12 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	/** The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information. */
 	private String info = null;
 
-	/** @return The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information. */
+	@Override
 	public String getInfo() {
 		return info;
 	}
 
-	/**
-	 * Sets the advisory information text, such as might appear in a tooltip. This is a bound property.
-	 * @param newInfo The new text of the advisory information, such as might appear in a tooltip.
-	 * @see #INFO_PROPERTY
-	 */
+	@Override
 	public void setInfo(final String newInfo) {
 		if(!Objects.equals(info, newInfo)) { //if the value is really changing
 			final String oldInfo = info; //get the old value
@@ -195,18 +163,12 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	/** The content type of the advisory information text. */
 	private ContentType infoContentType = Text.PLAIN_CONTENT_TYPE;
 
-	/** @return The content type of the advisory information text. */
+	@Override
 	public ContentType getInfoContentType() {
 		return infoContentType;
 	}
 
-	/**
-	 * Sets the content type of the advisory information text. This is a bound property.
-	 * @param newInfoContentType The new advisory information text content type.
-	 * @throws NullPointerException if the given content type is <code>null</code>.
-	 * @throws IllegalArgumentException if the given content type is not a text content type.
-	 * @see #INFO_CONTENT_TYPE_PROPERTY
-	 */
+	@Override
 	public void setInfoContentType(final ContentType newInfoContentType) {
 		checkInstance(newInfoContentType, "Content type cannot be null.");
 		if(infoContentType != newInfoContentType) { //if the value is really changing

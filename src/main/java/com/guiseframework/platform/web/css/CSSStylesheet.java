@@ -32,7 +32,7 @@ public class CSSStylesheet {
 		return rules;
 	}
 
-	/** @return A string representation of this object. */
+	@Override
 	public String toString() {
 		final StringBuilder stringBuilder = new StringBuilder();
 		for(final Rule rule : rules) { //for each rule

@@ -84,13 +84,7 @@ public class RDFURIStringLiteralConverter extends DefaultStringLiteralConverter<
 		this.rdfXMLGenerator = checkInstance(rdfXMLGenerator, "RDF XML generator cannot be null.");
 	}
 
-	/**
-	 * Converts a value from the value space to a literal value in the lexical space. If the reference URI has namespace URI and local name, the XML qualified
-	 * name will be returned in <var>namespaceURI</var>:<var>localName</var> format; otherwise, the reference URI itself will be returned.
-	 * @param value The value in the value space to convert.
-	 * @return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>.
-	 * @throws ConversionException if the value cannot be converted.
-	 */
+	@Override
 	public String convertValue(final URI value) throws ConversionException {
 		if(value != null) { //if a value was given
 			final RDFXMLGenerator rdfXMLGenerator = getRDFXMLGenerator(); //get the RDF XML generator

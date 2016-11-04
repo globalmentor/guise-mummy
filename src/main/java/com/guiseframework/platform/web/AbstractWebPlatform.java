@@ -40,13 +40,13 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 	/** The user local environment. */
 	private final Environment environment;
 
-	/** @return The user local environment. */
+	@Override
 	public Environment getEnvironment() {
 		return environment;
 	}
 
-	/** @return The thread-safe queue of messages to be delivered to the platform. */
 	@SuppressWarnings("unchecked")
+	@Override
 	public Queue<WebPlatformMessage> getSendMessageQueue() {
 		return (Queue<WebPlatformMessage>)super.getSendMessageQueue();
 	}
@@ -60,17 +60,13 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 	/** The current polling interval in milliseconds. */
 	private int pollInterval = DEFAULT_POLL_INTERVAL;
 
-	/** @return The current polling interval in milliseconds. */
+	@Override
 	public int getPollInterval() {
 		return pollInterval;
 	}
 
-	/**
-	 * Sets the polling interval in milliseconds.
-	 * @param newPollInterval The polling interval in milliseconds.
-	 * @throws IllegalArgumentException if the given polling interval is less than zero.
-	 */
 	@SuppressWarnings("unchecked")
+	@Override
 	public void setPollInterval(final int newPollInterval) {
 		if(pollInterval != checkArgumentNotNegative(newPollInterval)) { //if the value is really changing
 			pollInterval = newPollInterval; //actually change the value
@@ -80,18 +76,7 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 		}
 	}
 
-	/**
-	 * Requests a polling interval for a given depicted object. The actual polling interval will be updated if the given polling interval is smaller than the
-	 * current actual polling interval.
-	 * @param depictedObject The depicted object requesting a polling interval.
-	 * @param pollInterval The polling interval in milliseconds.
-	 * @return <code>true</code> if the polling interval changed as a result of this request.
-	 * @throws NullPointerException if the given depicted object is <code>null</code>.
-	 * @throws IllegalArgumentException if the value is less than zero.
-	 * @see #discontinuePollInterval(DepictedObject)
-	 * @see #getPollInterval()
-	 * @see #setPollInterval(int)
-	 */
+	@Override
 	public boolean requestPollInterval(final DepictedObject depictedObject, final int pollInterval) {
 		checkArgumentNotNegative(pollInterval);
 		synchronized(requestedPollIntervalMap) { //synchronize to ensure the that race conditions don't cause the actual poll interval to be out of synch with the requested poll intervals
@@ -105,16 +90,7 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 		return false; //indicate that the polling interval did not change
 	}
 
-	/**
-	 * Indicates that a depicted object no longer requests a particular polling interval. The actual polling interval will be updated if the relinquished poll
-	 * interval is less than or equal to the current poll interval.
-	 * @param depictedObject The depicted object that is relinquishing a polling interval.
-	 * @return <code>true</code> if the polling interval changed as a result of this relinquishment.
-	 * @throws NullPointerException if the given depicted object is <code>null</code>.
-	 * @see #requestPollInterval(DepictedObject, int)
-	 * @see #getPollInterval()
-	 * @see #setPollInterval(int)
-	 */
+	@Override
 	public boolean discontinuePollInterval(final DepictedObject depictedObject) {
 		//Log.trace("ready to discontinue poll interval for", depictedObject);
 		synchronized(requestedPollIntervalMap) { //synchronize to ensure the that race conditions don't cause the actual poll interval to be out of synch with the requested poll intervals
@@ -155,13 +131,7 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 		return "id" + Long.toHexString(depictID); //create an ID string from the depict ID
 	}
 
-	/**
-	 * Returns the depicted object ID represented by the given platform-specific ID string.
-	 * @param depictIDString The platform-specific form of the depict ID.
-	 * @return The depict ID the platform-specific form represents.
-	 * @throws NullPointerException if the given string is <code>null</code>.
-	 * @throws IllegalArgumentException if the given string does not represent the correct string form of a depict ID on this platform.
-	 */
+	@Override
 	public long getDepictID(final String depictIDString) {
 		if(!checkInstance(depictIDString, "Depict ID string cannot be null.").startsWith(DEPICT_ID_STRING_PREFIX)) { //if the string does not start with the correct prefix
 			throw new IllegalArgumentException("Depict ID string " + depictIDString + " is not in the correct format for this platform.");

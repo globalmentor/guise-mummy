@@ -29,10 +29,7 @@ import com.guiseframework.model.Displayable;
  */
 public class SynchronizeDisplayedPropertyChangeListener extends AbstractGenericPropertyChangeListener<Boolean> { //TODO turn this into a singleton
 
-	/**
-	 * Called when a bound property is changed.
-	 * @param genericPropertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
-	 */
+	@Override
 	public void propertyChange(final GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent) {
 		final Displayable displayableSource = asInstance(genericPropertyChangeEvent.getSource(), Displayable.class); //get the source as a Displayable
 		if(displayableSource != null) { //if the source is displayable

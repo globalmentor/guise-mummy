@@ -34,25 +34,23 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 	/** An action listener to repeat copies of events received, using this component as the source. */
 	private ActionListener repeatActionListener = new ActionListener() {
 
+		@Override
 		public void actionPerformed(final ActionEvent actionEvent) { //if an action was performed
 			final ActionEvent repeatActionEvent = new ActionEvent(DefaultTreeNodeModel.this, actionEvent); //copy the action event with this class as its source, keeping the same target
 			fireActionPerformed(repeatActionEvent); //fire the repeated action
 		}
+
 	};
 
 	/** Whether the node is expanded, showing its children, if any. */
 	private boolean expanded = false;
 
-	/** @return Whether the node is expanded, showing its children, if any. */
+	@Override
 	public boolean isExpanded() {
 		return expanded;
 	}
 
-	/**
-	 * Sets whether the node is expanded, showing its children, if any. This is a bound property of type <code>Boolean</code>.
-	 * @param newExpanded <code>true</code> if the node is expanded.
-	 * @see #EXPANDED_PROPERTY
-	 */
+	@Override
 	public void setExpanded(final boolean newExpanded) {
 		if(expanded != newExpanded) { //if the value is really changing
 			final boolean oldExpanded = expanded; //get the old value
@@ -61,11 +59,7 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 		}
 	}
 
-	/**
-	 * Sets whether all tree nodes, including this node, are expanded in this subtree.
-	 * @param newAllExpanded <code>true</code> if all the nodes in this tree should be expanded, or <code>false</code> if they should be collapsed.
-	 * @see #setExpanded(boolean)
-	 */
+	@Override
 	public void setAllExpanded(final boolean newAllExpanded) {
 		setExpanded(newAllExpanded); //set this node to be expanded
 		for(final TreeNodeModel<?> childTreeNode : this) { //for each child child tree node
@@ -76,16 +70,12 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 	/** Whether the tree node is selected. */
 	private boolean selected = false;
 
-	/** @return Whether the tree node is selected. */
+	@Override
 	public boolean isSelected() {
 		return selected;
 	}
 
-	/**
-	 * Sets whether the tree node is selected. This is a bound property of type <code>Boolean</code>.
-	 * @param newSelected <code>true</code> if the tree node should be selected, else <code>false</code>.
-	 * @see #SELECTED_PROPERTY
-	 */
+	@Override
 	public void setSelected(final boolean newSelected) {
 		if(selected != newSelected) { //if the value is really changing
 			final boolean oldSelected = selected; //get the current value
@@ -102,40 +92,33 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 		return treeNodeList;
 	}
 
-	/** @return An iterator to contained tree nodes. */
+	@Override
 	public Iterator<TreeNodeModel<?>> iterator() {
 		return treeNodeList.iterator();
 	}
 
-	/**
-	 * Determines whether this node could be considered a leaf node. This method may return <code>false</code> even if it currently has no children, if it intends
-	 * to load them later and there is no way to know ahead of time if there will be children. This implementation returns the opposite value of
-	 * {@link #hasChildren()}.
-	 * @return <code>true</code> if this is a leaf node, else <code>false</code> if this node should not be considered a leaf.
-	 */
+	@Override
 	public boolean isLeaf() {
 		return !hasChildren();
 	}
 
-	/** @return Whether this tree node has children. This implementation delegates to the tree node list. */
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation delegates to the tree node list.
+	 * </p>
+	 */
+	@Override
 	public boolean hasChildren() {
 		return !treeNodeList.isEmpty();
 	}
 
-	/**
-	 * Determines whether this tree node contains the given child tree node.
-	 * @param treeNode The tree node to check.
-	 * @return <code>true</code> if this tree node contains the given tree node.
-	 */
+	@Override
 	public boolean hasChild(final TreeNodeModel<?> treeNode) {
 		return treeNodeList.contains(treeNode);
 	}
 
-	/**
-	 * Adds a child tree node to this tree node.
-	 * @param treeNode The tree node to add.
-	 * @throws IllegalArgumentException if the tree node already has a parent.
-	 */
+	@Override
 	public void add(final TreeNodeModel<?> treeNode) {
 		if(treeNode.getParent() != null) { //if this tree node has already been added to tree node
 			throw new IllegalArgumentException("Tree node " + treeNode + " is already a child of a tree node, " + treeNode.getParent() + ".");
@@ -147,11 +130,7 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 		treeNode.addActionListener(repeatActionListener); //listen and repeat all actions of the tree node		
 	}
 
-	/**
-	 * Removes a child tree node from this tree node.
-	 * @param treeNode The child tree node to remove.
-	 * @throws IllegalArgumentException if the tree node is not a child of this tree node.
-	 */
+	@Override
 	public void remove(final TreeNodeModel<?> treeNode) {
 		if(treeNode.getParent() != this) { //if the tree node is not a child of this tree node
 			throw new IllegalArgumentException("Tree node " + treeNode + " is not child of tree node " + this + ".");
@@ -163,7 +142,7 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 		treeNode.setParent(null); //tell the tree node it no longer has a parent
 	}
 
-	/** Removes all of the child tree nodes from this tree node. */
+	@Override
 	public void clear() {
 		for(final TreeNodeModel<?> treeNode : this) { //for each child tree node
 			remove(treeNode); //remove this tree node
@@ -173,23 +152,12 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 	/** The parent of this node, or <code>null</code> if this node has no parent. */
 	private TreeNodeModel<?> parent;
 
-	/** @return The parent of this node, or <code>null</code> if this node has no parent. */
+	@Override
 	public TreeNodeModel<?> getParent() {
 		return parent;
 	}
 
-	/**
-	 * Sets the parent of this tree node. This method is managed by other tree nodes, and normally should not be called by applications. A tree node cannot be
-	 * given a parent if it already has a parent. A tree node's parent cannot be removed this component is still a child of that parent. A tree node's parent
-	 * cannot be set unless that parent already recognizes this tree node as one of its children. If a tree node is given the same parent it already has, no
-	 * action occurs.
-	 * @param newParent The new parent for this tree node, or <code>null</code> if this tree node is being removed from a parent.
-	 * @throws IllegalStateException if a parent is provided and this tree node already has a parent.
-	 * @throws IllegalStateException if no parent is provided and this tree node's old parent still recognizes this tree node as its child.
-	 * @throws IllegalArgumentException if a parent is provided and the given parent does not already recognize this tree node as its child.
-	 * @see #add(TreeNodeModel)
-	 * @see #remove(TreeNodeModel)
-	 */
+	@Override
 	public void setParent(final TreeNodeModel<?> newParent) {
 		final TreeNodeModel<?> oldParent = parent; //get the old parent
 		if(oldParent != newParent) { //if the parent is really changing
@@ -263,10 +231,7 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 		}
 	}
 
-	/**
-	 * Returns the zero-based depth of the node within in its tree. This result represents the number of levels above this node needed to reach the root node.
-	 * @return The zero-based depth of this node from the root.
-	 */
+	@Override
 	public int getDepth() {
 		final TreeNodeModel<?> parentNode = getParent(); //get the parent node
 		return parentNode != null ? parentNode.getDepth() + 1 : 0; //if there is a parent node, this node's depth is one more than the parent's; otherwise, this is the root node with depth zero
@@ -274,41 +239,27 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 
 	//ActionModel support
 
-	/**
-	 * Adds an action listener.
-	 * @param actionListener The action listener to add.
-	 */
+	@Override
 	public void addActionListener(final ActionListener actionListener) {
 		getEventListenerManager().add(ActionListener.class, actionListener); //add the listener
 	}
 
-	/**
-	 * Removes an action listener.
-	 * @param actionListener The action listener to remove.
-	 */
+	@Override
 	public void removeActionListener(final ActionListener actionListener) {
 		getEventListenerManager().remove(ActionListener.class, actionListener); //remove the listener
 	}
 
-	/** @return all registered action listeners. */
+	@Override
 	public Iterable<ActionListener> getActionListeners() {
 		return getEventListenerManager().getListeners(ActionListener.class); //remove the listener
 	}
 
-	/**
-	 * Performs the action with default force and default option. An {@link ActionEvent} is fired to all registered {@link ActionListener}s. This method delegates
-	 * to {@link #performAction(int, int)}.
-	 */
+	@Override
 	public void performAction() {
 		performAction(1, 0); //fire an event saying that the action has been performed with the default force and option
 	}
 
-	/**
-	 * Performs the action with the given force and option. An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
-	 * @param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
-	 * @param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button
-	 *          click.
-	 */
+	@Override
 	public void performAction(final int force, final int option) {
 		fireActionPerformed(force, option); //fire an event saying that the action has been performed with the given force and option
 	}

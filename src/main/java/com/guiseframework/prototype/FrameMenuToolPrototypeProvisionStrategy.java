@@ -28,17 +28,17 @@ import com.guiseframework.component.*;
  */
 public class FrameMenuToolPrototypeProvisionStrategy extends AbstractMenuToolCompositeComponentPrototypeProvisionStrategy {
 
-	/** @return The frame the top-level prototype provider children of which will be monitored. */
+	@Override
 	protected final Frame getParentComponent() {
 		return (Frame)super.getParentComponent();
 	}
 
-	/** @return The menu being managed, or <code>null</code> if no menu is being managed. */
+	@Override
 	protected Menu getMenu() {
 		return getParentComponent().getMenu();
 	}
 
-	/** @return The toolbar being managed, or <code>null</code> if no toolbar is being managed. */
+	@Override
 	protected Toolbar getToolbar() {
 		return getParentComponent().getToolbar();
 	}

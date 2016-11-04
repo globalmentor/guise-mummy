@@ -66,7 +66,7 @@ public class CommandEvent extends AbstractFocusedInputEvent {
 		this(source, commandEvent.getCommand()); //construct the new event with the specified source
 	}
 
-	/** @return The command input associated with this event. */
+	@Override
 	public CommandInput getInput() {
 		return new CommandInput(getCommand()); //return new command input
 	}

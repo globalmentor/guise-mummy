@@ -154,11 +154,7 @@ public class PrototypeProvision<P extends Prototype> extends AbstractHashObject 
 		this.isTool = isTool;
 	}
 
-	/**
-	 * Compares this object with the specified object for order.
-	 * @param prototypeDescription The object to be compared.
-	 * @return A negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
-	 */
+	@Override
 	public int compareTo(final PrototypeProvision<P> prototypeDescription) {
 		int value = getOrder() - prototypeDescription.getOrder(); //compare the orders
 		if(value == 0 && !equals(prototypeDescription)) { //if the orders were the same but the objects are not equal

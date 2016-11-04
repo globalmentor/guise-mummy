@@ -62,12 +62,7 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 		getIgnoredProperties().add(ResourceCollectControl.RESOURCE_PATHS_PROPERTY); //TODO fix; temporary for development
 	}
 
-	/**
-	 * Requests that resource collection start.
-	 * @param destinationURI The URI representing the destination of the collected resources, relative to the application.
-	 * @param destinationBookmark The bookmark to be used in receiving the resources at the destination path, or <code>null</code> if no bookmark should be used.
-	 * @throws NullPointerException if the given destination URI is <code>null</code>.
-	 */
+	@Override
 	public void receive(URI destinationURI, final Bookmark destinationBookmark) {
 		URI receiveResourceURI = getSession().getApplication().resolveURI(checkInstance(destinationURI, "Destination URI cannot be null.")); //resolve the URI
 		if(destinationBookmark != null) { //if a bookmark was provided
@@ -78,7 +73,7 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 						new NameValuePair<String, Object>(ResourceCollectCommand.DESTINATION_URI_PROPERTY, receiveResourceURI))); //send a command for the control to start receiving		
 	}
 
-	/** Requests that resource collection be canceled. */
+	@Override
 	public void cancel() {
 		final C control = getDepictedObject(); //get the resource collect control
 		getPlatform().getSendMessageQueue().add(
@@ -87,11 +82,7 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 		control.clearResourcePaths(); //clear all the resource paths
 	}
 
-	/**
-	 * Processes an event from the platform.
-	 * @param event The event to be processed.
-	 * @throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
-	 */
+	@Override
 	public void processEvent(final PlatformEvent event) {
 		if(event instanceof WebChangeDepictEvent) { //if a property changed
 			final WebChangeDepictEvent webChangeEvent = (WebChangeDepictEvent)event; //get the web change event
@@ -124,10 +115,12 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 	}
 
 	/**
-	 * Called when a depicted object bound property is changed. This implementation marks the property as being modified if the property is not an ignored
-	 * property.
-	 * @param propertyChangeEvent An event object describing the event source and the property that has changed.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation marks the property as being modified if the property is not an ignored property.
+	 * </p>
 	 */
+	@Override
 	protected void depictedObjectPropertyChange(final PropertyChangeEvent propertyChangeEvent) {
 		super.depictedObjectPropertyChange(propertyChangeEvent); //do the default processing
 		final C control = getDepictedObject(); //get the control
@@ -140,9 +133,12 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 	}
 
 	/**
-	 * Writes the beginning part of the outer decorator element. This version write additional patching attributes.
-	 * @throws IOException if there is an error rendering the component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version write additional patching attributes.
+	 * </p>
 	 */
+	@Override
 	protected void writeDecoratorBegin() throws IOException {
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
 		final C component = getDepictedObject(); //get the component
@@ -150,10 +146,7 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 		super.writeDecoratorBegin(); //write the default decorator beginning
 	}
 
-	/**
-	 * Begins the rendering process.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context

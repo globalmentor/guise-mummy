@@ -67,13 +67,15 @@ public class CalendarsPanel extends LayoutPanel {
 		localeListControl.add(new Locale("ar"));
 		localeListControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Locale>() { //listen for selection changes
 
-					public void propertyChange(final GenericPropertyChangeEvent<Locale> propertyChangeEvent) { //if the locale selection changes
-						final Locale newLocale = propertyChangeEvent.getNewValue(); //get the new locale selected
-						if(newLocale != null) { //if a new locale was selected
-							getSession().setLocale(newLocale); //change to the session locale							
-						}
-					}
-				});
+			@Override
+			public void propertyChange(final GenericPropertyChangeEvent<Locale> propertyChangeEvent) { //if the locale selection changes
+				final Locale newLocale = propertyChangeEvent.getNewValue(); //get the new locale selected
+				if(newLocale != null) { //if a new locale was selected
+					getSession().setLocale(newLocale); //change to the session locale							
+				}
+			}
+
+		});
 		try {
 			localeListControl.setSelectedValues(getSession().getLocale()); //show the session locale selected
 		} catch(final PropertyVetoException propertyVetoException) { //if the change was vetoed, ignore the exception
@@ -91,16 +93,18 @@ public class CalendarsPanel extends LayoutPanel {
 		calendarControlPanel.add(embeddedDateTextControl);
 		calendarControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Date>() { //listen for the calendar control value changing
 
-					public void propertyChange(final GenericPropertyChangeEvent<Date> propertyChangeEvent) { //if the calendar control value changed
-						final Date newDate = propertyChangeEvent.getNewValue(); //get the new date
-						if(newDate != null) { //if a new date was selected
-							try {
-								embeddedDateTextControl.setValue(newDate); //show the date in the text control
-							} catch(final PropertyVetoException propertyVetoException) { //if the change was vetoed, ignore the exception
-							}
-						}
+			@Override
+			public void propertyChange(final GenericPropertyChangeEvent<Date> propertyChangeEvent) { //if the calendar control value changed
+				final Date newDate = propertyChangeEvent.getNewValue(); //get the new date
+				if(newDate != null) { //if a new date was selected
+					try {
+						embeddedDateTextControl.setValue(newDate); //show the date in the text control
+					} catch(final PropertyVetoException propertyVetoException) { //if the change was vetoed, ignore the exception
 					}
-				});
+				}
+			}
+
+		});
 		sidePanel.add(calendarControlPanel);
 		//Popup CalendarControl demonstration
 		final GroupPanel popupCalendarControlPanel = new GroupPanel(new FlowLayout(Flow.PAGE)); //create a group panel flowing horizontally
@@ -114,25 +118,29 @@ public class CalendarsPanel extends LayoutPanel {
 		popupCalendarControlPanel.add(popupDateTextControl);
 		calendarButton.addActionListener(new ActionListener() { //listen for the calendar button being pressed
 
-					public void actionPerformed(final ActionEvent actionEvent) { //if the calendar button is pressed
-						final CalendarDialogFrame calendarDialogFrame = new CalendarDialogFrame(); //create a new calendar popup
-						calendarDialogFrame.setLabel("Select a date");
-						calendarDialogFrame.setRelatedComponent(calendarButton); //associate the popup with the button
-						calendarDialogFrame.open(); //show the calendar popup
-						calendarDialogFrame.open(new AbstractGenericPropertyChangeListener<Frame.Mode>() { //ask for the date to be selected		
+			@Override
+			public void actionPerformed(final ActionEvent actionEvent) { //if the calendar button is pressed
+				final CalendarDialogFrame calendarDialogFrame = new CalendarDialogFrame(); //create a new calendar popup
+				calendarDialogFrame.setLabel("Select a date");
+				calendarDialogFrame.setRelatedComponent(calendarButton); //associate the popup with the button
+				calendarDialogFrame.open(); //show the calendar popup
+				calendarDialogFrame.open(new AbstractGenericPropertyChangeListener<Frame.Mode>() { //ask for the date to be selected		
 
-									public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> propertyChangeEvent) { //when the modal dialog mode changes
-										final Date newDate = calendarDialogFrame.getValue(); //get the value of the frame's model
-										if(newDate != null) { //if a new date was selected (i.e. the calendar dialog frame was not closed without a selection)
-											try {
-												popupDateTextControl.setValue(newDate); //show the date in the text control
-											} catch(final PropertyVetoException propertyVetoException) { //if the change was vetoed, ignore the exception
-											}
-										}
-									}
-								});
+					@Override
+					public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> propertyChangeEvent) { //when the modal dialog mode changes
+						final Date newDate = calendarDialogFrame.getValue(); //get the value of the frame's model
+						if(newDate != null) { //if a new date was selected (i.e. the calendar dialog frame was not closed without a selection)
+							try {
+								popupDateTextControl.setValue(newDate); //show the date in the text control
+							} catch(final PropertyVetoException propertyVetoException) { //if the change was vetoed, ignore the exception
+							}
+						}
 					}
+
 				});
+			}
+
+		});
 		sidePanel.add(popupCalendarControlPanel);
 
 		add(sidePanel, new RegionConstraints(Region.LINE_END)); //add the side panel on the right

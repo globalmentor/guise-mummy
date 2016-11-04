@@ -228,9 +228,11 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V> {
 	/** The property change listener that updates the text in response to a property changing. */
 	private final PropertyChangeListener updateTextPropertyChangeListener = new PropertyChangeListener() { //create a listener to update the text in response to a property changing
 
+		@Override
 		public void propertyChange(final PropertyChangeEvent propertyChangeEvent) { //if the property changes
 			updateText(); //update the text with the new value from the model
 		}
+
 	};
 
 	/**
@@ -292,12 +294,12 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V> {
 	}
 
 	/**
-	 * Checks the state of the component for validity. This version in addition to default functionality checks to make sure the literal text can be converted to
-	 * a valid value. The provisional text is checked for validity, because it represents the latest available input from the user. This version performs no
-	 * additional checks if the control is disabled.
-	 * @return <code>true</code> if the component and all children passes all validity tests, else <code>false</code>.
-	 * @see #getProvisionalText()
+	 * {@inheritDoc}
+	 * <p>
+	 * This version performs no additional checks if the control is disabled.
+	 * </p>
 	 */
+	@Override
 	protected boolean determineValid() {
 		if(!super.determineValid()) { //if we don't pass the default validity checks
 			return false; //the component isn't valid
@@ -319,14 +321,15 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V> {
 	}
 
 	/**
-	 * Checks the user input status of the control. This version checks to see if the provisional literal text can be converted to a valid value. If the
-	 * provisional literal text cannot be converted, the status is determined to be {@link Status#ERROR}. If the provisional literal text can be converted but the
-	 * converted value is invalid, the status is determined to be {@link Status#WARNING} unless the provisional text is the same as the literal text, in which
-	 * case the status is determined to be {@link Status#ERROR}. The default value, even if invalid, is considered valid. If the control is disabled no status is
-	 * given.
-	 * @return The current user input status of the control.
-	 * @see #getProvisionalText()
+	 * {@inheritDoc}
+	 * <p>
+	 * This version checks to see if the provisional literal text can be converted to a valid value. If the provisional literal text cannot be converted, the
+	 * status is determined to be {@link Status#ERROR}. If the provisional literal text can be converted but the converted value is invalid, the status is
+	 * determined to be {@link Status#WARNING} unless the provisional text is the same as the literal text, in which case the status is determined to be
+	 * {@link Status#ERROR}. The default value, even if invalid, is considered valid. If the control is disabled no status is given.
+	 * </p>
 	 */
+	@Override
 	protected Status determineStatus() {
 		Status status = super.determineStatus(); //do the defualt status checks
 		if(status == null && isEnabled()) { //if no status is reported and the control is enabled, check the validity of the text
@@ -353,10 +356,12 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V> {
 	}
 
 	/**
-	 * Validates the user input of this component and all child components. The component will be updated with error information. This version also validates the
-	 * literal text, committing the text to the model if necessary. This version performs no additional checks if the control is disabled.
-	 * @return The current state of {@link #isValid()} as a convenience.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version performs no additional checks if the control is disabled.
+	 * </p>
 	 */
+	@Override
 	public boolean validate() {
 		V newValue = null; //we'll convert the literal value and store it here
 		Notification newValueNotification = null; //if we have any problems converting the literal value, we'll store a notification here
@@ -390,9 +395,13 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V> {
 	}
 
 	/**
-	 * Resets the control to its default value. This version updates the text to match the new value.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version updates the text to match the new value.
+	 * </p>
 	 * @see #updateText()
 	 */
+	@Override
 	public void reset() {
 		super.reset(); //reset normally
 		updateText(); //update the text to match the new value

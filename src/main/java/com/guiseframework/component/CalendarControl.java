@@ -145,6 +145,7 @@ public class CalendarControl extends AbstractLayoutValueControl<Date> {
 		//create a year property change listener before we update the year control
 		yearPropertyChangeListener = new AbstractGenericPropertyChangeListener<Integer>() { //create a property change listener to listen for the year changing
 
+			@Override
 			public void propertyChange(final GenericPropertyChangeEvent<Integer> propertyChangeEvent) { //if the selected year changed
 				final Integer newYear = propertyChangeEvent.getNewValue(); //get the new selected year
 				if(newYear != null) { //if a new year was selected (a null value can be sent when the model is cleared)
@@ -156,25 +157,30 @@ public class CalendarControl extends AbstractLayoutValueControl<Date> {
 					}
 				}
 			}
+
 		};
 		updateYearControl(); //create and install an appropriate year control
 		updateDateControls(); //update the date controls
 		//update the calendars if the selected date changes
 		addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Date>() { //create a property change listener to listen for our value changing, so that we can update the date control if needed
 
-					public void propertyChange(final GenericPropertyChangeEvent<Date> propertyChangeEvent) { //if the value changed
-						final Date newDate = propertyChangeEvent.getNewValue(); //get the new date value
-						if(newDate != null) { //we can't display a null date; if they set the date to null, just continue showing what we were showing
-							setDate(newDate); //update the currently-displayed date
-						}
-					}
-				});
+			@Override
+			public void propertyChange(final GenericPropertyChangeEvent<Date> propertyChangeEvent) { //if the value changed
+				final Date newDate = propertyChangeEvent.getNewValue(); //get the new date value
+				if(newDate != null) { //we can't display a null date; if they set the date to null, just continue showing what we were showing
+					setDate(newDate); //update the currently-displayed date
+				}
+			}
+
+		});
 		addPropertyChangeListener(ValueModel.VALIDATOR_PROPERTY, new AbstractGenericPropertyChangeListener<Validator<Date>>() { //create a property change listener to listen for our validator changing, so that we can update the date control if needed
 
-					public void propertyChange(final GenericPropertyChangeEvent<Validator<Date>> propertyChangeEvent) { //if the model's validator changed
-						updateYearControl(); //update the year control (e.g. a drop-down list) to match the new validator (e.g. a range validator), if any
-					}
-				});
+			@Override
+			public void propertyChange(final GenericPropertyChangeEvent<Validator<Date>> propertyChangeEvent) { //if the model's validator changed
+				updateYearControl(); //update the year control (e.g. a drop-down list) to match the new validator (e.g. a range validator), if any
+			}
+
+		});
 		//TODO important: this is a memory leak---make sure we uninstall the listener when the session goes away
 		/*TODO fix
 				getSession().addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, updateDateControlsPropertyChangeListener);	//update the calendars if the locale changes
@@ -186,21 +192,23 @@ public class CalendarControl extends AbstractLayoutValueControl<Date> {
 		*/
 		monthListControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Date>() { //create a property change listener to listen for the month changing
 
-					public void propertyChange(final GenericPropertyChangeEvent<Date> propertyChangeEvent) { //if the selected month changed
-						final Date newDate = propertyChangeEvent.getNewValue(); //get the new selected date
-						if(newDate != null) { //if a new month was selected (a null value can be sent when the model is cleared)
-							final Calendar newCalendar = Calendar.getInstance(getSession().getTimeZone(), getSession().getLocale()); //create a new calendar
-							newCalendar.setTime(newDate); //set the new calendar date to the newly selected month
-							final int newMonth = newCalendar.get(Calendar.MONTH); //get the new requested month
-							final Calendar calendar = Calendar.getInstance(getSession().getTimeZone(), getSession().getLocale()); //create a new calendar
-							calendar.setTime(getDate()); //set the calendar date to our currently displayed date
-							if(calendar.get(Calendar.MONTH) != newMonth) { //if the currently visible date is in another month
-								calendar.set(Calendar.MONTH, newMonth); //change to the given month
-								setDate(calendar.getTime()); //change the date to the given month, which will update the calenders TODO make sure that going from a 31-day month, for example, to a 28-day month will be OK, if the day is day 31
-							}
-						}
+			@Override
+			public void propertyChange(final GenericPropertyChangeEvent<Date> propertyChangeEvent) { //if the selected month changed
+				final Date newDate = propertyChangeEvent.getNewValue(); //get the new selected date
+				if(newDate != null) { //if a new month was selected (a null value can be sent when the model is cleared)
+					final Calendar newCalendar = Calendar.getInstance(getSession().getTimeZone(), getSession().getLocale()); //create a new calendar
+					newCalendar.setTime(newDate); //set the new calendar date to the newly selected month
+					final int newMonth = newCalendar.get(Calendar.MONTH); //get the new requested month
+					final Calendar calendar = Calendar.getInstance(getSession().getTimeZone(), getSession().getLocale()); //create a new calendar
+					calendar.setTime(getDate()); //set the calendar date to our currently displayed date
+					if(calendar.get(Calendar.MONTH) != newMonth) { //if the currently visible date is in another month
+						calendar.set(Calendar.MONTH, newMonth); //change to the given month
+						setDate(calendar.getTime()); //change the date to the given month, which will update the calenders TODO make sure that going from a 31-day month, for example, to a 28-day month will be OK, if the day is day 31
 					}
-				});
+				}
+			}
+
+		});
 	}
 
 	/**
@@ -362,18 +370,7 @@ public class CalendarControl extends AbstractLayoutValueControl<Date> {
 	 */
 	protected class DayRepresentationStrategy implements CellRepresentationStrategy<Date> {
 
-		/**
-		 * Creates a component for the given cell.
-		 * @param <C> The type of value contained in the column.
-		 * @param table The component containing the model.
-		 * @param model The model containing the value.
-		 * @param rowIndex The zero-based row index of the value.
-		 * @param column The column of the value.
-		 * @param editable Whether values in this column are editable.
-		 * @param selected <code>true</code> if the value is selected.
-		 * @param focused <code>true</code> if the value has the focus.
-		 * @return A new component to represent the given value.
-		 */
+		@Override
 		public <C extends Date> Component createComponent(final Table table, final TableModel model, final int rowIndex, final TableColumnModel<C> column,
 				final boolean editable, final boolean selected, final boolean focused) {
 			final Calendar calendar = Calendar.getInstance(getSession().getTimeZone(), getSession().getLocale()); //create a calendar TODO cache the calendar and only change it if the locale has changed
@@ -390,6 +387,7 @@ public class CalendarControl extends AbstractLayoutValueControl<Date> {
 				if(validator == null || validator.isValid(date)) { //if there is no validator installed, or there is a validator and this is a valid date
 					link.addActionListener(new ActionListener() { //create a listener to listen for calendar actions
 
+						@Override
 						public void actionPerformed(final ActionEvent actionEvent) { //when a day is selected
 							try {
 								CalendarControl.this.setValue(date); //change the control's value to the calendar for this cell
@@ -397,6 +395,7 @@ public class CalendarControl extends AbstractLayoutValueControl<Date> {
 								//TODO fix to store errors or something, because a validator could be installed										throw new AssertionError(validationException);	//TODO fix to store the errors or something, because a validator could very well be installed in the control
 							}
 						}
+
 					});
 				} else { //if there is a validator installed and this is not a valid date
 					link.setEnabled(false); //disable this link

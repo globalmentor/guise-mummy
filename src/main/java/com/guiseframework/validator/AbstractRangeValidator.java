@@ -27,7 +27,7 @@ public abstract class AbstractRangeValidator<V> extends AbstractValidator<V> imp
 	/** The minimum value, inclusive, or <code>null</code> if the range has no lower bound. */
 	private final V minimum;
 
-	/** @return The minimum value, inclusive, or <code>null</code> if the range has no lower bound. */
+	@Override
 	public V getMinimum() {
 		return minimum;
 	}
@@ -35,7 +35,7 @@ public abstract class AbstractRangeValidator<V> extends AbstractValidator<V> imp
 	/** The maximum value, inclusive, or <code>null</code> if the range has no upper bound. */
 	private final V maximum;
 
-	/** @return The maximum value, inclusive, or <code>null</code> if the range has no upper bound. */
+	@Override
 	public V getMaximum() {
 		return maximum;
 	}
@@ -43,7 +43,7 @@ public abstract class AbstractRangeValidator<V> extends AbstractValidator<V> imp
 	/** The step amount, or <code>null</code> if the range has no increment value specified. */
 	private final V step;
 
-	/** @return The step amount, or <code>null</code> if the range has no increment value specified. */
+	@Override
 	public V getStep() {
 		return step;
 	}

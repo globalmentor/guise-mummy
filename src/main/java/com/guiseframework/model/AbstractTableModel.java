@@ -29,7 +29,7 @@ public abstract class AbstractTableModel extends AbstractModel implements TableM
 	/** The list of table column models. */
 	private final List<TableColumnModel<?>> tableColumnModels = new CopyOnWriteArrayList<TableColumnModel<?>>();
 
-	/** @return A read-only list of table columns in physical order. */
+	@Override
 	public List<TableColumnModel<?>> getColumns() {
 		return unmodifiableList(tableColumnModels);
 	}
@@ -37,16 +37,12 @@ public abstract class AbstractTableModel extends AbstractModel implements TableM
 	/** The list of table column models in logical order. */
 	private final List<TableColumnModel<?>> logicalTableColumnModels = new CopyOnWriteArrayList<TableColumnModel<?>>();
 
-	/**
-	 * Determines the logical index of the given table column.
-	 * @param column One of the table columns.
-	 * @return The zero-based logical index of the column within the table, or -1 if the column is not one of the model's columns.
-	 */
+	@Override
 	public int getColumnIndex(final TableColumnModel<?> column) {
 		return logicalTableColumnModels.indexOf(column);
 	}
 
-	/** @return The number of columns in this table. */
+	@Override
 	public int getColumnCount() {
 		return logicalTableColumnModels.size();
 	}
@@ -76,26 +72,12 @@ public abstract class AbstractTableModel extends AbstractModel implements TableM
 		addAll(logicalTableColumnModels, columns); //add all the columns to our logical list of table columns
 	}
 
-	/**
-	 * Returns the cell value for the given cell. This method delegates to {@link #getCellValue(int, TableColumnModel)}.
-	 * @param <C> The type of cell value.
-	 * @param cell The cell containing the row index and column information.
-	 * @return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
-	 * @throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	 * @throws IllegalArgumentException if the given column is not one of this table's columns.
-	 */
+	@Override
 	public <C> C getCellValue(final Cell<C> cell) {
 		return getCellValue(cell.getRowIndex(), cell.getColumn()); //return the cell value for the cell row index and column
 	}
 
-	/**
-	 * Sets the cell value for the given cell. This method delegates to {@link #setCellValue(int, TableColumnModel, Object)}.
-	 * @param <C> The type of cell value.
-	 * @param cell The cell containing the row index and column information.
-	 * @param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	 * @throws IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	 * @throws IllegalArgumentException if the given column is not one of this table's columns.
-	 */
+	@Override
 	public <C> void setCellValue(final Cell<C> cell, final C newCellValue) {
 		setCellValue(cell.getRowIndex(), cell.getColumn(), newCellValue); //set the cell value for the cell row index and column
 	}

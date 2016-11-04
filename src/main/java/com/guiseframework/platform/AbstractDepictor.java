@@ -38,7 +38,7 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	/** The Guise session that owns this object. */
 	private final GuiseSession session;
 
-	/** @return The Guise session that owns this object. */
+	@Override
 	public GuiseSession getSession() {
 		return session;
 	}
@@ -50,7 +50,12 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 		return platform;
 	}
 
-	/** {@inheritDoc} This method delegates to {@link Platform#getDepictContext()}. */
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This method delegates to {@link Platform#getDepictContext()}.
+	 * </p>
+	 */
 	@Override
 	public DepictContext getDepictContext() {
 		return getPlatform().getDepictContext();
@@ -185,7 +190,12 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	public void processEvent(final PlatformEvent event) {
 	}
 
-	/** {@inheritDoc} This implementation marks the depiction as depicted. */
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation marks the depiction as depicted.
+	 * </p>
+	 */
 	@Override
 	public void depict() throws IOException {
 		setDepicted(true); //show that the depiction has been updated
@@ -230,6 +240,7 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 		public void listModified(final ListEvent<Object> listEvent) {
 			setDepicted(false); //show that we need general updates			
 		}
+
 	};
 
 }

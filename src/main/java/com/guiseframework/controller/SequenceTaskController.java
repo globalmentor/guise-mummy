@@ -115,10 +115,10 @@ public class SequenceTaskController extends BoundPropertyObject {
 	public void setConfirmingActionPrototype(final ActionPrototype newConfirmingActionPrototype) {
 		final ActionPrototype oldConfirmingActionPrototype = confirmingActionProtype; //get the action currently waiting for confirmation
 		if(oldConfirmingActionPrototype != newConfirmingActionPrototype) { //if the pending action is really changing
-		//TODO fix				confirmTimer.stop();	//stop any confirmations currently pending
+			//TODO fix				confirmTimer.stop();	//stop any confirmations currently pending
 			confirmingActionProtype = newConfirmingActionPrototype; //update the confirming action prototype
 			if(newConfirmingActionPrototype != null) { //if there is a new action waiting to be confirmed
-			//TODO fix					confirmTimer.restart();	//start the confirmation countdown				
+				//TODO fix					confirmTimer.restart();	//start the confirmation countdown				
 			}
 			//TODO fix				updateStatus();	//update the status to show whether an action is waiting to be confirmed
 		}
@@ -186,7 +186,9 @@ public class SequenceTaskController extends BoundPropertyObject {
 				} else { //if we should confirm this action
 					setConfirmingActionPrototype(previousActionPrototype); //perform this action subject to confirmation
 				}
+
 			};
+
 		};
 		nextActionPrototype = new AbstractActionPrototype(LABEL_NEXT, GLYPH_NEXT) {
 
@@ -202,7 +204,9 @@ public class SequenceTaskController extends BoundPropertyObject {
 				} else { //if we should confirm this action
 					setConfirmingActionPrototype(nextActionPrototype); //perform this action subject to confirmation
 				}
+
 			};
+
 		};
 		finishActionPrototype = new AbstractActionPrototype(LABEL_FINISH, GLYPH_FINISH) {
 
@@ -215,6 +219,7 @@ public class SequenceTaskController extends BoundPropertyObject {
 					setConfirmingActionPrototype(finishActionPrototype); //perform this action subject to confirmation
 				}
 			}
+
 		};
 
 		advanceActionPrototype = new ProxyActionPrototype(startActionPrototype); //the advance action prototype will initially proxy the start action prototype
@@ -224,10 +229,11 @@ public class SequenceTaskController extends BoundPropertyObject {
 			protected void action(final int force, final int option) {
 				final ActionPrototype confirmingActionProtype = getConfirmingActionPrototype(); //see if there is an action waiting to be confirmed
 				if(confirmingActionProtype != null) { //if there is an action waiting to be confirmed
-				//TODO fix							confirmTimer.stop();	//the action is confirmed; suspend waiting for confirmation
+					//TODO fix							confirmTimer.stop();	//the action is confirmed; suspend waiting for confirmation
 					confirmingActionProtype.performAction(); //perform the confirming action
 				}
 			}
+
 		};
 		/*TODO fix
 				confirmTimer=new Timer(CONFIRM_DELAY, new ActionListener() {	//create a new action listener that will remove any confirming action after a delay
@@ -238,16 +244,20 @@ public class SequenceTaskController extends BoundPropertyObject {
 		confirmingActionProtype = null; //there is currently no action being confirmed
 		task.addPropertyChangeListener(Task.STATE_PROPERTY, new AbstractGenericPropertyChangeListener<Task>() { //update the controller when the status changes
 
-					public void propertyChange(final GenericPropertyChangeEvent<Task> genericPropertyChangeEvent) {
-						update();
-					}
-				});
+			@Override
+			public void propertyChange(final GenericPropertyChangeEvent<Task> genericPropertyChangeEvent) {
+				update();
+			}
+
+		});
 		task.addPropertyChangeListener(SequenceTask.SEQUENCE_INDEX_PROPERTY, new AbstractGenericPropertyChangeListener<Integer>() { //update the controller when the sequence index changing
 
-					public void propertyChange(final GenericPropertyChangeEvent<Integer> genericPropertyChangeEvent) {
-						update();
-					}
-				});
+			@Override
+			public void propertyChange(final GenericPropertyChangeEvent<Integer> genericPropertyChangeEvent) {
+				update();
+			}
+
+		});
 		update(); //update the controller with the initial state
 	}
 

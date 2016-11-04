@@ -58,8 +58,8 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	 * @throws NullPointerException if the given notification is <code>null</code>. #see {@link TextBox}
 	 */
 	public NotificationOptionDialogFrame(final Notification notification) {
-		this(notification.getMessage(), notification.getMessageContentType(), notification.getOptions().toArray(
-				new Notification.Option[notification.getOptions().size()])); //create a dialog from the contents of the notification
+		this(notification.getMessage(), notification.getMessageContentType(),
+				notification.getOptions().toArray(new Notification.Option[notification.getOptions().size()])); //create a dialog from the contents of the notification
 	}
 
 	/**
@@ -127,6 +127,7 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	public void open(final Runnable afterNotify) {
 		open(new AbstractGenericPropertyChangeListener<Frame.Mode>() { //open modally
 
+			@Override
 			public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> genericPropertyChangeEvent) { //if the frame modal state changes
 				if(genericPropertyChangeEvent.getNewValue() == null && afterNotify != null) { //if the dialog is now nonmodal and there is logic that should take place after notification
 					final Notification.Option selectedOption = getValue(); //get the selected option, if any
@@ -145,13 +146,17 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 					afterNotify.run(); //run the code that takes place after notification
 				}
 			}
+
 		});
 	}
 
 	/**
-	 * Creates a component to represent the given option. This implementation creates a button for the given option.
-	 * @param option The option for which a component should be created.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation creates a button for the given option.
+	 * </p>
 	 */
+	@Override
 	protected Component createOptionComponent(final Notification.Option option) {
 		if(bindingInputStrategy == null) { //if we haven't yet created our input strategy (we have to use lazy creation because this method is called from the parent constructor)
 			bindingInputStrategy = new BindingInputStrategy(getInputStrategy()); //create a new input strategy based upon the current input strategy (if any)
@@ -162,17 +167,19 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 		button.setGlyphURI(option.getGlyph()); //set the option action icon
 		button.addActionListener(new ActionListener() { //listen for the action being performed
 
-					public void actionPerformed(final ActionEvent actionEvent) { //if the action is performed
-						try {
-							if(option.isFatal() || validate()) { //if this is not a fatal option, first see if the frame validates
-								NotificationOptionDialogFrame.this.setValue(option); //chose this option
-								close(); //close the frame
-							}
-						} catch(final PropertyVetoException propertyVetoException) { //we don't expect a validation exception
-						//TODO fix							throw new AssertionError(validationException);
-						}
+			@Override
+			public void actionPerformed(final ActionEvent actionEvent) { //if the action is performed
+				try {
+					if(option.isFatal() || validate()) { //if this is not a fatal option, first see if the frame validates
+						NotificationOptionDialogFrame.this.setValue(option); //chose this option
+						close(); //close the frame
 					}
-				});
+				} catch(final PropertyVetoException propertyVetoException) { //we don't expect a validation exception
+					//TODO fix							throw new AssertionError(validationException);
+				}
+			}
+
+		});
 
 		final CommandInput continueCommandInput = new CommandInput(ProcessCommand.CONTINUE); //create a command for continue
 		if(!bindingInputStrategy.isBound(continueCommandInput)) { //if the continue command isn't yet bound to anything

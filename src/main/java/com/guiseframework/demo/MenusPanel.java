@@ -81,7 +81,7 @@ public class MenusPanel extends LayoutPanel {
 		//continents menu
 		final AccordionMenu continentsMenu = new AccordionMenu(Flow.PAGE); //the accordion submenu also flows along the page
 		continentsMenu.setLabel("Continents");
-		final String[] continents = new String[] { "Africa", "Asia", "Antarctica", "Australia", "Europe", "North America", "South America" };
+		final String[] continents = new String[] {"Africa", "Asia", "Antarctica", "Australia", "Europe", "North America", "South America"};
 		for(final String continent : continents) { //for each continent
 			final Link continentLink = new Link(); //continents:continent link
 			continentLink.setLabel(continent);
@@ -123,14 +123,16 @@ public class MenusPanel extends LayoutPanel {
 
 		continentsMenu.addActionListener(new ActionListener() { //listen for accordion menu action
 
-					public void actionPerformed(ActionEvent actionEvent) {
-						final int oldClickCount = continentsClickCountControl.getValue().intValue(); //get the old number of clicks
-						try {
-							continentsClickCountControl.setValue(new Integer(oldClickCount + 1)); //update the number of clicks
-						} catch(final PropertyVetoException propertyVetoException) { //if the change was vetoed, ignore the exception
-						}
-					}
-				});
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				final int oldClickCount = continentsClickCountControl.getValue().intValue(); //get the old number of clicks
+				try {
+					continentsClickCountControl.setValue(new Integer(oldClickCount + 1)); //update the number of clicks
+				} catch(final PropertyVetoException propertyVetoException) { //if the change was vetoed, ignore the exception
+				}
+			}
+
+		});
 
 		add(centerPanel, new RegionConstraints(Region.CENTER)); //add the center panel in the center
 	}

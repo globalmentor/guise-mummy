@@ -45,7 +45,7 @@ public class ResourceCollectControl extends AbstractControl {
 	/** The bound property of the state of receiving collected resources. */
 	public static final String STATE_PROPERTY = getPropertyName(ResourceCollectControl.class, "state");
 
-	/** @return The depictor for this object. */
+	@Override
 	@SuppressWarnings("unchecked")
 	public Depictor<? extends ResourceCollectControl> getDepictor() {
 		return (Depictor<? extends ResourceCollectControl>)super.getDepictor();

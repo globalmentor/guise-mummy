@@ -65,11 +65,12 @@ public class RegularExpressionCharArrayValidator extends AbstractRegularExpressi
 	}
 
 	/**
-	 * Returns a string representation of the given value so that it may be validated against the regular expression. This version a string with the given
-	 * characters or <code>null</code> if the character array is <code>null</code>.
-	 * @param value The value being validated.
-	 * @return A string representation of the given value, or <code>null</code> if the value is <code>null</code>.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version a string with the given characters or <code>null</code> if the character array is <code>null</code>.
+	 * </p>
 	 */
+	@Override
 	protected String toString(final char[] value) {
 		return value != null ? new String(value) : null; //return a new string constructed from the character array
 	}

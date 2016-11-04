@@ -34,8 +34,8 @@ public class WebCommandMessage<C extends Enum<C> & WebPlatformCommand> extends A
 	/** The command. */
 	private final WebPlatformCommand command;
 
-	/** @return The command. */
 	@SuppressWarnings("unchecked")
+	@Override
 	public C getCommand() {
 		return (C)command;
 	}
@@ -43,7 +43,7 @@ public class WebCommandMessage<C extends Enum<C> & WebPlatformCommand> extends A
 	/** The read-only map of parameters, which will be encoded in JavaScript Object Notation (JSON). */
 	private final Map<String, Object> parameters;
 
-	/** @return The read-only map of parameters, which will be encoded in JavaScript Object Notation (JSON). */
+	@Override
 	public Map<String, Object> getParameters() {
 		return parameters;
 	}

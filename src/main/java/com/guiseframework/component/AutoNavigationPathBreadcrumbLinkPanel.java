@@ -61,9 +61,12 @@ public class AutoNavigationPathBreadcrumbLinkPanel extends NavigationPathBreadcr
 	}
 
 	/**
-	 * Called when navigation occurs. This implementation changes the breadcrumb navigation path to the new navigation path.
-	 * @param navigationEvent The event indicating navigation details.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation changes the breadcrumb navigation path to the new navigation path.
+	 * </p>
 	 */
+	@Override
 	public void navigated(final NavigationEvent navigationEvent) {
 		setNavigationPath(navigationEvent.getNavigationPath()); //change to the new navigation path
 	}

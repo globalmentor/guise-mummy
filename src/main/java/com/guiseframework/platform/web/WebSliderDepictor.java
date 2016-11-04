@@ -49,11 +49,7 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 		super(XHTML_NAMESPACE_URI, ELEMENT_DIV); //represent <xhtml:div>
 	}
 
-	/**
-	 * Processes an event from the platform.
-	 * @param event The event to be processed.
-	 * @throws IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
-	 */
+	@Override
 	public void processEvent(final PlatformEvent event) {
 		if(event instanceof WebChangeDepictEvent) { //if a property changed
 			final WebChangeDepictEvent webChangeEvent = (WebChangeDepictEvent)event; //get the web change event
@@ -156,14 +152,14 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 	}
 
 	/**
-	 * Retrieves the base style IDs for the given component. This version adds attributes based upon the slider axis and orientation, as well as whether the
-	 * slider is sliding.
-	 * @param prefix The prefix that needs to be added to each, or <code>null</code> if there is no prefix to add.
-	 * @param suffix The suffix that needs to be added to each, or <code>null</code> if there is no suffix to add.
-	 * @return The base style IDs for the component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version adds attributes based upon the slider axis and orientation, as well as whether the slider is sliding.
+	 * </p>
 	 * @see AbstractWebComponentDepictor#addFlowStyleIDs(Set, Flow)
 	 * @see GuiseCSSStyleConstants#SLIDER_SLIDING_CLASS
 	 */
+	@Override
 	protected Set<String> getBaseStyleIDs(final String prefix, final String suffix) {
 		final Set<String> baseStyleIDs = super.getBaseStyleIDs(prefix, suffix); //get the default base style IDs
 		final C component = getDepictedObject(); //get the component
@@ -174,7 +170,7 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 		return baseStyleIDs; //return the new style IDs
 	}
 
-	/**
+	/*
 	 * Retrieves the styles for the outer element of the component.
 	 * @param context Guise context information.
 	 * @param component The component for which styles should be retrieved.
@@ -189,11 +185,7 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 		}
 	*/
 
-	/**
-	 * Begins the rendering process.
-	 * @throws IOException if there is an error rendering the component.
-	 * @throws IllegalArgumentException if the given value control represents a value type this controller doesn't support.
-	 */
+	@Override
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		writeIDClassAttributes(null, null); //write the ID and class attributes with no prefixes or suffixes
@@ -201,10 +193,7 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 		writeLabel(decorateID(getPlatform().getDepictIDString(getDepictedObject().getDepictID()), null, COMPONENT_BODY_CLASS_SUFFIX)); //write the label for the body, if there is a label				
 	}
 
-	/**
-	 * Renders the body of the component.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	protected void depictBody() throws IOException {
 		final GuiseSession session = getSession(); //get the session
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
@@ -363,10 +352,7 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_DIV); //</xhtml:div> (component-body)
 	}
 
-	/**
-	 * Ends the rendering process.
-	 * @throws IOException if there is an error rendering the component.
-	 */
+	@Override
 	public void depictEnd() throws IOException {
 		writeErrorMessage(); //write the error message, if any
 		super.depictEnd(); //do the default ending rendering

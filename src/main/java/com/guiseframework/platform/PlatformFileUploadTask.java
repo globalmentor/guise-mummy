@@ -76,7 +76,7 @@ public class PlatformFileUploadTask extends GuiseBoundPropertyObject implements 
 	/** The state of the task, or <code>null</code> if the task has not been started. */
 	private TaskState state = null;
 
-	/** @return The state of the task, or <code>null</code> if the task has not been started. */
+	@Override
 	public TaskState getState() {
 		return state;
 	}
@@ -133,6 +133,7 @@ public class PlatformFileUploadTask extends GuiseBoundPropertyObject implements 
 	 */
 	private final ProgressListener<Long> platformFileProgressListener = new ProgressListener<Long>() {
 
+		@Override
 		public void progressed(final ProgressEvent<Long> progressEvent) { //when progress is made
 			final TaskState overallState = getState(); //get the overall transfer state
 			final Long progress = progressEvent.getProgress(); //get the current progress
@@ -176,6 +177,7 @@ public class PlatformFileUploadTask extends GuiseBoundPropertyObject implements 
 					throw new IllegalStateException("Unrecognized platform file upload state " + progressEvent.getTaskState());
 			}
 		}
+
 	};
 
 	/**
@@ -236,8 +238,9 @@ public class PlatformFileUploadTask extends GuiseBoundPropertyObject implements 
 		final PlatformFile platformFile = getPlatformFiles().get(platformFileIndex); //get the current platform file
 		platformFile.addProgressListener(platformFileProgressListener); //start listening to the platform file's progress
 		final Bookmark destinationBookmark = getDestinationBookmark();
-		final URI destinationURI = destinationBookmark != null ? URI.create(getDestinationBaseURI() + URIPath.encodeSegment(platformFile.getName())
-				+ destinationBookmark) : resolve(getDestinationBaseURI(), URIPath.encodeSegment(platformFile.getName())); //determine the destination URI, adding a bookmark if one is given
+		final URI destinationURI = destinationBookmark != null
+				? URI.create(getDestinationBaseURI() + URIPath.encodeSegment(platformFile.getName()) + destinationBookmark)
+				: resolve(getDestinationBaseURI(), URIPath.encodeSegment(platformFile.getName())); //determine the destination URI, adding a bookmark if one is given
 		platformFile.upload(destinationURI); //tell the platform file to start uploading		
 	}
 

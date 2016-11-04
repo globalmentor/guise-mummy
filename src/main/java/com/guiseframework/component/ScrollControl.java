@@ -41,20 +41,12 @@ public class ScrollControl extends AbstractEnumCompositeComponent<ScrollControl.
 		return enableable;
 	}
 
-	/**
-	 * @return The content child component, or <code>null</code> if this frame does not have a content child component.
-	 * @see ScrollComponent#CONTENT_COMPONENT
-	 */
+	@Override
 	public Component getContent() {
 		return getComponent(ScrollComponent.CONTENT_COMPONENT);
 	}
 
-	/**
-	 * Sets the content child component. This is a bound property.
-	 * @param newContent The content child component, or <code>null</code> if this frame does not have a content child component.
-	 * @see ScrollComponent#CONTENT_COMPONENT
-	 * @see ContentComponent#CONTENT_PROPERTY
-	 */
+	@Override
 	public void setContent(final Component newContent) {
 		final Component oldContent = setComponent(ScrollComponent.CONTENT_COMPONENT, newContent); //set the component
 		if(oldContent != newContent) { //if the component really changed
@@ -65,7 +57,7 @@ public class ScrollControl extends AbstractEnumCompositeComponent<ScrollControl.
 	/** The status of the current user input, or <code>null</code> if there is no status to report. */
 	private Status status = null;
 
-	/** @return The status of the current user input, or <code>null</code> if there is no status to report. */
+	@Override
 	public Status getStatus() {
 		return status;
 	}
@@ -84,9 +76,13 @@ public class ScrollControl extends AbstractEnumCompositeComponent<ScrollControl.
 	}
 
 	/**
-	 * Resets the control to its default value. This version clears any notification.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version clears any notification.
+	 * </p>
 	 * @see #setNotification(Notification)
 	 */
+	@Override
 	public void reset() {
 		//TODO check; are we missing notification methods?		setNotification(null);	//clear any notification
 	}
@@ -107,25 +103,23 @@ public class ScrollControl extends AbstractEnumCompositeComponent<ScrollControl.
 		this.enableable.addPropertyChangeListener(getRepeatPropertyChangeListener()); //listen and repeat all property changes of the enableable object
 		addPropertyChangeListener(ENABLED_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>() { //listen for the "enabled" property changing
 
+			@Override
 			public void propertyChange(GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent) { //if the "enabled" property changes
 				setNotification(null); //clear any notification
 				updateValid(); //update the valid status, which depends on the enabled status					
 			}
+
 		});
 	}
 
 	//Enableable delegations
 
-	/** @return Whether the control is enabled and can receive user input. */
+	@Override
 	public boolean isEnabled() {
 		return enableable.isEnabled();
 	}
 
-	/**
-	 * Sets whether the control is enabled and and can receive user input. This is a bound property of type <code>Boolean</code>.
-	 * @param newEnabled <code>true</code> if the control should indicate and accept user input.
-	 * @see Enableable#ENABLED_PROPERTY
-	 */
+	@Override
 	public void setEnabled(final boolean newEnabled) {
 		enableable.setEnabled(newEnabled);
 	}

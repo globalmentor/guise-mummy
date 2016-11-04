@@ -46,7 +46,7 @@ public abstract class AbstractRDFResourceTreeNodeModel<V extends RDFResource> ex
 	/** The RDF property of which this RDF object is an object, or <code>null</code> if this object should not be considered the object of any property. */
 	private final RDFResource property;
 
-	/** @return The RDF property of which this RDF object is an object, or <code>null</code> if this object should not be considered the object of any property. */
+	@Override
 	public RDFResource getProperty() {
 		return property;
 	}
@@ -127,6 +127,7 @@ public abstract class AbstractRDFResourceTreeNodeModel<V extends RDFResource> ex
 	 * children are included and there are children. This version ignores RDF type properties and properties of an {@link RDFListResource}.
 	 * @return Whether this node should be considered a leaf with no children.
 	 */
+	@Override
 	protected boolean determineLeaf() {
 		final RDFResource rdfResource = getValue(); //get the resource
 		if(rdfResource != null) { //if we have a resource
@@ -149,9 +150,12 @@ public abstract class AbstractRDFResourceTreeNodeModel<V extends RDFResource> ex
 	}
 
 	/**
-	 * Dynamically determines children. This version ignores RDF type properties and properties of an {@link RDFListResource}.
-	 * @return The dynamically loaded list of children.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version ignores RDF type properties and properties of an {@link RDFListResource}.
+	 * </p>
 	 */
+	@Override
 	protected List<TreeNodeModel<?>> determineChildren() {
 		final List<TreeNodeModel<?>> children = new ArrayList<TreeNodeModel<?>>(); //create a list to hold the children, even if we don't have any here, for child classes may add to this list
 		final RDFResource rdfResource = getValue(); //get the resource

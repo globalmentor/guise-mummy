@@ -169,16 +169,18 @@ public class Point {
 		return translate(dimensions.getWidth(), dimensions.getHeight(), dimensions.getDepth()); //translate the point by the dimension values
 	}
 
-	/** @return A hash code value for the object. */
+	@Override
 	public int hashCode() {
 		return Objects.getHashCode(getX(), getY(), getZ()); //determine the hash code
 	}
 
 	/**
-	 * Indicates whether some other object is "equal to" this one. This implementation returns whether the object is another point with equivalent coordinates.
-	 * @param object The reference object with which to compare.
-	 * @return <code>true</code> if this object is equivalent to the given object.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation returns whether the object is another point with equivalent coordinates.
+	 * </p>
 	 */
+	@Override
 	public boolean equals(final Object object) {
 		if(object instanceof Point) { //if the object is an point
 			final Point point = (Point)object; //get the object as a point
@@ -187,7 +189,7 @@ public class Point {
 		return false; //the object did not match this point
 	}
 
-	/** @return A string representation of the object. */
+	@Override
 	public final String toString() {
 		return "(" + getX().getValue() + ", " + getY().getValue() + ", " + getZ().getValue() + ")"; //"(x, y, z)"
 	}

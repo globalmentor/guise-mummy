@@ -47,14 +47,16 @@ public class HelloUserPanel extends LayoutPanel {
 		greetButton.setLabel("Greet"); //set the button label
 		greetButton.addActionListener(new ActionListener() { //listen for the button being pressed
 
-					public void actionPerformed(final ActionEvent actionEvent) { //if the button is pressed
-						if(HelloUserPanel.this.validate()) { //if our entire panel (including the user input) validates
-							final String user = userInput.getValue(); //get the name the user entered
-							greetingLabel.setLabel("Hello, " + user + "!"); //update the label
-							greetingLabel.setVisible(true); //make the label visible							
-						}
-					}
-				});
+			@Override
+			public void actionPerformed(final ActionEvent actionEvent) { //if the button is pressed
+				if(HelloUserPanel.this.validate()) { //if our entire panel (including the user input) validates
+					final String user = userInput.getValue(); //get the name the user entered
+					greetingLabel.setLabel("Hello, " + user + "!"); //update the label
+					greetingLabel.setVisible(true); //make the label visible							
+				}
+			}
+
+		});
 		add(greetButton); //add the greet button to the panel
 	}
 

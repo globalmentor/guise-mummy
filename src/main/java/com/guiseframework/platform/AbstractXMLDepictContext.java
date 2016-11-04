@@ -104,20 +104,19 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 		}
 	}
 
-	/**
-	 * Clears all data collected for depiction. This version also clears the stack of element states.
-	 */
+	@Override
 	public void clearDepictText() {
 		elementStateStack.clear(); //clear the element states
 		super.clearDepictText(); //do the default clearing, which will clear the root string buffer
 	}
 
 	/**
-	 * The string builder that holds the current content being collected, though not necessarily all the content collected. The string builder returned is
-	 * appropriate for adding content, but may not be a complete representation of all the text collected. This version returns the string builder of the current
-	 * element state, if there is an element state available.
-	 * @return The string builder that holds the current content being collected for depiction.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version returns the string builder of the current element state, if there is an element state available.
+	 * </p>
 	 */
+	@Override
 	public StringBuilder getDepictStringBuilder() {
 		return hasElementState() ? getElementState().getDepictStringBuilder() : super.getDepictStringBuilder(); //if there is an element state, return its string builder; otherwise, return the default string builder
 	}
@@ -126,13 +125,13 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	 * The characters that should be encoded in XML.
 	 * @see #XML_REPLACEMENT_STRINGS
 	 */
-	private static final char[] XML_REPLACE_CHARACTERS = new char[] { '&', '<', '>', '"' };
+	private static final char[] XML_REPLACE_CHARACTERS = new char[] {'&', '<', '>', '"'};
 
 	/**
 	 * The strings that replace the XML replace characters, in order.
 	 * @see #XML_REPLACE_CHARACTERS
 	 */
-	private static final String[] XML_REPLACEMENT_STRINGS = new String[] { "&amp;", "&lt;", "&gt;", "&quot;" };
+	private static final String[] XML_REPLACEMENT_STRINGS = new String[] {"&amp;", "&lt;", "&gt;", "&quot;"};
 
 	/**
 	 * Encodes text information for writing. This version encodes XML characters.
@@ -296,67 +295,29 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	/** Whether a comment has been opened but not closed. */
 	private boolean isCommentOpen = false;
 
-	/**
-	 * Retrieves the qualified name of the given namespace and local name. If the namespace URI is not recognized, a new prefix will be generated for that
-	 * namespace This method therefore works for attributes in the <code>null</code> namespace, but cannot work for elements in the <code>null</code> namespace
-	 * because this would be ambiguous with elements in the the XHTML namespace.
-	 * @param namespaceURI The URI of the XML namespace, or <code>null</code> if there is no namespace and there should be no prefix.
-	 * @param localName The local name of the element or attribute with no prefix.
-	 * @return The XML qualified name.
-	 */
+	@Override
 	public String getQualifiedName(final URI namespaceURI, final String localName) {
 		final String prefix = namespaceURI != null ? getXMLNamespacePrefixManager().getNamespacePrefix(namespaceURI.toString()) : null; //if a namespace was given, look up the prefix
 		return createQName(prefix, localName); //return the qualified name
 	}
 
-	/**
-	 * Writes a doctype along with an optional XML declaration to the string builder and sets the output content type. No system ID or public ID will be written.
-	 * @param writeXMLDeclaration Whether an XML declaration should be included before the doctype.
-	 * @param namespaceURI The URI of the XML namespace of document element, or <code>null</code> if there is no namespace.
-	 * @param localName The local name of the document element with no prefix.
-	 */
+	@Override
 	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName) throws IOException {
 		writeDocType(writeXMLDeclaration, namespaceURI, localName, null, null, null);
 	}
 
-	/**
-	 * Writes a doctype along with an optional XML declaration to the string builder and sets the output content type. No system ID or public ID will be written.
-	 * @param writeXMLDeclaration Whether an XML declaration should be included before the doctype.
-	 * @param namespaceURI The URI of the XML namespace of document element, or <code>null</code> if there is no namespace.
-	 * @param localName The local name of the document element with no prefix.
-	 * @param contentType The specific XML content type.
-	 * @throws NullPointerException if the given content type is <code>null</code>.
-	 */
-	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, final ContentType contentType) throws IOException {
+	@Override
+	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, final ContentType contentType)
+			throws IOException {
 		writeDocType(writeXMLDeclaration, namespaceURI, localName, null, null, checkInstance(contentType, "Content type must be provided in this context."));
 	}
 
-	/**
-	 * Writes a doctype along with an optional XML declaration to the string builder and sets the output content type. The system ID and content type will be
-	 * determined from the given public ID.
-	 * @param writeXMLDeclaration Whether an XML declaration should be included before the doctype.
-	 * @param namespaceURI The URI of the XML namespace of document element, or <code>null</code> if there is no namespace.
-	 * @param localName The local name of the document element with no prefix.
-	 * @param publicID The XML declaration public ID.
-	 * @throws NullPointerException if the given public ID is <code>null</code>.
-	 * @throws IllegalArgumentException if a system ID could not be determined from the given public ID.
-	 */
+	@Override
 	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, final String publicID) throws IOException {
 		writeDocType(writeXMLDeclaration, namespaceURI, localName, checkInstance(publicID, "Null public ID not allowed in this context."), null, null); //check the public ID for null and determine defaults for the other values
 	}
 
-	/**
-	 * Writes a doctype along with an optional XML declaration to the string builder and sets the output content type. If no public ID or system ID is provided,
-	 * no public ID or system ID will be written.
-	 * @param writeXMLDeclaration Whether an XML declaration should be included before the doctype.
-	 * @param namespaceURI The URI of the XML namespace of document element, or <code>null</code> if there is no namespace.
-	 * @param localName The local name of the document element with no prefix.
-	 * @param publicID The XML declaration public ID, or <code>null</code> if none is used.
-	 * @param systemID The XML declaration system ID, or <code>null</code> if one can be determined from the given public ID.
-	 * @param contentType The specific XML content type, or <code>null</code> if a content type should be determined from the public ID; otherwise will default to
-	 *          "text/xml".
-	 * @throws IllegalArgumentException if a system ID was not provided or one could not be determined from the given public ID.
-	 */
+	@Override
 	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, String publicID, String systemID,
 			ContentType contentType) throws IOException {
 		if(contentType == null) { //if no content type was provided
@@ -428,25 +389,12 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 		stringBuilder.append('\n');
 	}
 
-	/**
-	 * Begins an XML element that will not be an empty element, even if it has no content.
-	 * @param namespaceURI The URI of the XML namespace of the element, or <code>null</code> if there is no namespace.
-	 * @param localName The local name of the element with no prefix.
-	 * @return The state of the element being written.
-	 * @throws IOException if there is an error writing the information.
-	 */
+	@Override
 	public ElementState writeElementBegin(final URI namespaceURI, final String localName) throws IOException {
 		return writeElementBegin(namespaceURI, localName, false); //write the beginning of an element that cannot be empty
 	}
 
-	/**
-	 * Begins an XML element, specifying whether an empty element is allowed.
-	 * @param namespaceURI The URI of the XML namespace of the element, or <code>null</code> if there is no namespace.
-	 * @param localName The local name of the element with no prefix.
-	 * @param isEmptyElementAllowed Whether an empty element can be created if there is no content.
-	 * @return The state of the element being written.
-	 * @throws IOException if there is an error writing the information.
-	 */
+	@Override
 	public ElementState writeElementBegin(final URI namespaceURI, final String localName, final boolean isEmptyElementAllowed) throws IOException {
 		final String qname = getQualifiedName(namespaceURI, localName); //get the qualified name for this namespace and local name
 		final ElementState elementState = new ElementState(namespaceURI, qname, isEmptyElementAllowed); //create a new element state
@@ -454,15 +402,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 		return elementState; //return the state of the element we just started
 	}
 
-	/**
-	 * Ends an XML element.
-	 * @param namespaceURI The URI of the XML namespace of the element, or <code>null</code> if there is no namespace.
-	 * @param localName The local name of the element with no prefix.
-	 * @return The state of the element being written.
-	 * @throws NoSuchElementException if the element state stack is empty.
-	 * @throws IllegalStateException if the given namespace URI and/or local name does not match that of the currently open element.
-	 * @throws IOException if there is an error writing the information.
-	 */
+	@Override
 	public ElementState writeElementEnd(final URI namespaceURI, final String localName) throws IOException {
 		final ElementState elementState = popElementState(); //pop the current element state from the stack
 		if(!Objects.equals(elementState.getNamespaceURI(), namespaceURI) || !elementState.getLocalName().equals(localName)) { //if the namespace and/or local name is not what we expect
@@ -473,25 +413,18 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	}
 
 	/**
-	 * Writes an attribute of an XML element. The attribute value will be properly encoded for XML. This implemention only recognizes the null namespace and the
-	 * XML namespace, which is assumed to require a prefix of "xml".
-	 * @param namespaceURI The URI of the XML namespace of the attribute, or <code>null</code> if there is no namespace.
-	 * @param localName The local name of the attribute with no prefix.
-	 * @param value The unencoded value of the attribute.
-	 * @throws NoSuchElementException if the element state stack is empty.
-	 * @throws IOException if there is an error writing the information.
+	 * {@inheritDoc}
+	 * <p>
+	 * This implemention only recognizes the null namespace and the XML namespace, which is assumed to require a prefix of "xml".
+	 * </p>
 	 */
+	@Override
 	public void writeAttribute(final URI namespaceURI, final String localName, final String value) throws IOException {
 		final String qname = getQualifiedName(namespaceURI, localName); //get the qualified name for this namespace and local name
 		getElementState().getAttributeMap().put(new QualifiedName(namespaceURI, qname), value); //store this attribute, keyed to the qualified name
 	}
 
-	/**
-	 * Writes the beginning part of an XML comment.
-	 * @throws IllegalStateException if the comment has already been opened but not closed.
-	 * @throws IOException if there is an error writing the information.
-	 * @see #writeCommentClose()
-	 */
+	@Override
 	public void writeCommentOpen() throws IOException {
 		if(isCommentOpen) { //if a comment is already open
 			throw new IllegalStateException("Comment is already open.");
@@ -501,12 +434,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 		isCommentOpen = true; //show that we opened a comment
 	}
 
-	/**
-	 * Writes the ending part of an XML comment.
-	 * @throws IllegalStateException if the comment has not been opened or has already been closed.
-	 * @throws IOException if there is an error writing the information.
-	 * @see #writeCommentOpen()
-	 */
+	@Override
 	public void writeCommentClose() throws IOException {
 		if(!isCommentOpen) { //if a comment is not open
 			throw new IllegalStateException("No comment is open.");
@@ -519,13 +447,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	/** Encoded hyphens to replaces illegal "--" sequences within a comment. */
 	private static final String XML_COMMENT_ENCODED_HYPHENS = createCharacterReference('-') + createCharacterReference('-');
 
-	/**
-	 * Writes an XML comment. This method ensures that any open beginning tag has been closed.
-	 * @param comment The comment to write.
-	 * @throws IOException if there is an error writing the information.
-	 * @see #writeCommentOpen()
-	 * @see #writeCommentClose()
-	 */
+	@Override
 	public void writeComment(final String comment) throws IOException {
 		/*TODO should we check to see if a comment is already open?
 				if(isBeginTagOpen()) {	//if a beginning tag is open

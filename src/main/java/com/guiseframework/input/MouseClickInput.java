@@ -60,18 +60,23 @@ public class MouseClickInput extends AbstractMouseInput {
 	}
 
 	/**
-	 * Returns the hash code of this object. This version extends the hash code of the underlying objects with the the button and count.
-	 * @return The hash code of this object.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version extends the hash code of the underlying objects with the the button and count.
+	 * </p>
 	 */
+	@Override
 	public int hashCode() {
 		return Objects.getHashCode(super.hashCode(), button, count); //extend the hash code with the button and count
 	}
 
 	/**
-	 * Determines if this object equals another object. Besides the default checks, this version ensures that the buttons are equal.
-	 * @param object The object to compare with this object.
-	 * @return <code>true</code> if the given object is considered equal to this object.
+	 * {@inheritDoc}
+	 * <p>
+	 * Besides the default checks, this version ensures that the buttons are equal.
+	 * </p>
 	 */
+	@Override
 	public boolean equals(final Object object) {
 		if(super.equals(object)) { //if the default checks pass, the object is of the correct type
 			final MouseClickInput mouseClickInput = (MouseClickInput)object; //cast theh object to the correc type
@@ -81,7 +86,7 @@ public class MouseClickInput extends AbstractMouseInput {
 		}
 	}
 
-	/** @return A string representation of this object. */
+	@Override
 	public String toString() {
 		return getButton().toString() + ' ' + getCount() + ' ' + super.toString(); //add the button and count representations to the string
 	}

@@ -53,7 +53,7 @@ public class Rule {
 		addAll(this.selectors, selectors); //add all the given selectors, if any
 	}
 
-	/** @return A string representation of this object. */
+	@Override
 	public String toString() {
 		final StringBuilder stringBuilder = new StringBuilder();
 		for(final Selector selector : selectors) { //for each selector

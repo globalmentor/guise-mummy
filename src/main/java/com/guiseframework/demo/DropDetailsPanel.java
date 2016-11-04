@@ -64,7 +64,7 @@ public class DropDetailsPanel extends LayoutPanel {
 		//label panel
 		final GroupPanel labelPanel = new GroupPanel(new FlowLayout(Flow.LINE)); //create the label panel flowing horizontally
 		labelPanel.setLabel("Drag a Label"); //set the label panel label
-		final String[] partsOfSpeech = new String[] { "Noun", "Verb", "Ajective", "Adverb", "Pronoun", "Preposition", "Conjunction", "Interjection" };
+		final String[] partsOfSpeech = new String[] {"Noun", "Verb", "Ajective", "Adverb", "Pronoun", "Preposition", "Conjunction", "Interjection"};
 		for(final String partOfSpeech : partsOfSpeech) { //for each label string
 			final Label label = new Label(); //create a label label
 			label.setLabel(partOfSpeech); //set the label text
@@ -87,29 +87,31 @@ public class DropDetailsPanel extends LayoutPanel {
 		detailsTextArea.setDropEnabled(true); //allow dropping on the text area
 		detailsTextArea.addImportStrategy(new ImportStrategy<TextControl<String>>() { //add a new import strategy for this component		
 
-					public boolean canImportTransfer(final TextControl<String> component, final Transferable<?> transferable) {
-						return true; //accept all import types
-					}
+			@Override
+			public boolean canImportTransfer(final TextControl<String> component, final Transferable<?> transferable) {
+				return true; //accept all import types
+			}
 
-					public boolean importTransfer(final TextControl<String> component, final Transferable<?> transferable) {
-						final String oldContent = component.getValue(); //get the old text area control content
-						final StringBuilder newContent = new StringBuilder(); //create a string builder to collect our new information
-						if(oldContent != null) { //if there is content already
-							newContent.append(oldContent); //add the old content
-						}
-						newContent.append("Drop Source: ").append(transferable.getSource().getClass().getName()).append('\n');
-						for(final ContentType contentType : transferable.getContentTypes()) { //for each content type
-							newContent.append("* Drop Content Type: ").append(contentType).append('\n');
-							newContent.append("  Drop Data: ").append(transferable.transfer(contentType)).append('\n'); //actually transfer the data
-						}
-						newContent.append('\n');
-						try {
-							component.setValue(newContent.toString()); //update the text area contents
-						} catch(final PropertyVetoException propertyVetoException) { //if the change was vetoed, ignore the exception
-						}
-						return true; //indicate that we imported the information
-					}
-				});
+			@Override
+			public boolean importTransfer(final TextControl<String> component, final Transferable<?> transferable) {
+				final String oldContent = component.getValue(); //get the old text area control content
+				final StringBuilder newContent = new StringBuilder(); //create a string builder to collect our new information
+				if(oldContent != null) { //if there is content already
+					newContent.append(oldContent); //add the old content
+				}
+				newContent.append("Drop Source: ").append(transferable.getSource().getClass().getName()).append('\n');
+				for(final ContentType contentType : transferable.getContentTypes()) { //for each content type
+					newContent.append("* Drop Content Type: ").append(contentType).append('\n');
+					newContent.append("  Drop Data: ").append(transferable.transfer(contentType)).append('\n'); //actually transfer the data
+				}
+				newContent.append('\n');
+				try {
+					component.setValue(newContent.toString()); //update the text area contents
+				} catch(final PropertyVetoException propertyVetoException) { //if the change was vetoed, ignore the exception
+				}
+				return true; //indicate that we imported the information
+			}
+		});
 		add(detailsTextArea); //add the drop details text area control to the panel
 	}
 

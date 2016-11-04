@@ -189,13 +189,13 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	protected final IOOperation<Writer> elffWriterInitializer = new IOOperation<Writer>() {
 
 		/**
-		 * Performs an operation on the indicated object. This implementation writes ELFF directives to the ELFF writer along with the <code>Start-Date</code>
-		 * directive.
-		 * @param writer The ELFF writer to be initialized.
-		 * @throws IOException if there is an error during the operation.
-		 * @see ELFF#START_DATE_DIRECTIVE
+		 * {@inheritDoc}
+		 * <p>
+		 * This implementation writes ELFF directives to the ELFF writer along with the <code>Start-Date</code> directive.
+		 * </p>
 		 */
 		@SuppressWarnings("unchecked")
+		@Override
 		//we use a generic NameValuePair as a vararg
 		public void perform(final Writer writer) throws IOException {
 			writer.write(getELFF().serializeDirectives()); //write the directives to the ELFF writer
@@ -210,11 +210,12 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	protected final IOOperation<Writer> elffWriterUninitializer = new IOOperation<Writer>() {
 
 		/**
-		 * Performs an operation on the indicated object. This implementation writes the <code>End-Date</code> directive to the ELFF writer.
-		 * @param writer The ELFF writer to be uninitialized.
-		 * @throws IOException if there is an error during the operation.
-		 * @see ELFF#END_DATE_DIRECTIVE
+		 * {@inheritDoc}
+		 * <p>
+		 * This implementation writes the <code>End-Date</code> directive to the ELFF writer.
+		 * </p>
 		 */
+		@Override
 		public void perform(final Writer writer) throws IOException {
 			writer.write(getELFF().serializeDirective(ELFF.END_DATE_DIRECTIVE, ELFF.createDateTimeFormat().format(new Date()))); //add the End-Date directive with the current time
 			writer.flush(); //flush the directive to the writer
@@ -235,9 +236,12 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	}
 
 	/**
-	 * {@inheritDoc} This version initializes the Guise application.
-	 * @throws ServletException if there is a problem initializing.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version initializes the Guise application.
+	 * </p>
 	 */
+	@Override
 	public void initialize(ServletConfig servletConfig) throws ServletException, IllegalArgumentException, IllegalStateException {
 		super.initialize(servletConfig); //do the default initialization
 		Log.info("Initializing", Guise.GUISE_NAME, Guise.getVersion(), Guise.getBuildDate());
@@ -333,12 +337,12 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	private Object guiseContainerMutex = new Object();
 
 	/**
-	 * Initializes the servlet upon receipt of the first request. This version initializes the reference to the Guise container. This version installs the
-	 * application into the container.
-	 * @param request The servlet request.
-	 * @throws IllegalStateException if this servlet has already been initialized from a request.
-	 * @throws ServletException if there is a problem initializing.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version installs the application into the container.
+	 * </p>
 	 */
+	@Override
 	public void initialize(final HttpServletRequest request) throws ServletException {
 		//TODO del Log.trace("initializing servlet from request");
 		super.initialize(request); //do the default initialization
@@ -413,13 +417,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 
 	//TODO fix HEAD method servicing, probably by overriding serveResource()
 
-	/**
-	 * Services the GET method.
-	 * @param request The HTTP request.
-	 * @param response The HTTP response.
-	 * @throws ServletException if there is a problem servicing the request.
-	 * @throws IOException if there is an error reading or writing data.
-	 */
+	@Override
 	public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
 		final HTTPServletGuiseContainer guiseContainer = getGuiseContainer(); //get the Guise container
 		final GuiseApplication guiseApplication = getGuiseApplication(); //get the Guise application
@@ -464,6 +462,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 			try {
 				call(guiseSessionThreadGroup, new Runnable() { //call the method in a new thread inside the thread group
 
+					@Override
 					public void run() {
 						try {
 							if(guiseApplication.isDebug()) {
@@ -480,6 +479,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 							throw new UndeclaredThrowableException(ioException); //let it pass to the calling thread
 						}
 					}
+
 				});
 			} catch(final UndeclaredThrowableException undeclaredThrowableException) { //if an exception was thrown
 				final Throwable cause = undeclaredThrowableException.getCause(); //see what exception was thrown
@@ -496,13 +496,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		}
 	}
 
-	/**
-	 * Services the PUT method.
-	 * @param request The HTTP request.
-	 * @param response The HTTP response.
-	 * @throws ServletException if there is a problem servicing the request.
-	 * @throws IOException if there is an error reading or writing data.
-	 */
+	@Override
 	public void doPut(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
 		final HTTPServletGuiseContainer guiseContainer = getGuiseContainer(); //get the Guise container
 		final GuiseApplication guiseApplication = getGuiseApplication(); //get the Guise application
@@ -520,6 +514,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		try {
 			call(guiseSessionThreadGroup, new Runnable() { //call the method in a new thread inside the thread group
 
+				@Override
 				public void run() {
 					try {
 						serviceGuiseResourceWriteDestinationRequest(guiseRequest, response, guiseContainer, guiseApplication, guiseSession,
@@ -528,6 +523,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 						throw new UndeclaredThrowableException(ioException); //let it pass to the calling thread
 					}
 				}
+
 			});
 		} catch(final UndeclaredThrowableException undeclaredThrowableException) { //if an exception was thrown
 			final Throwable cause = undeclaredThrowableException.getCause(); //see what exception was thrown
@@ -639,6 +635,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 									try {
 										final ProgressListener progressListener = new ProgressListener() { //create a progress listener for listening for progress
 
+											@Override
 											public void progressed(ProgressEvent progressEvent) { //when progress has been made
 												//Log.trace("delta: ", progressEvent.getDelta(), "progress:", progressEvent.getValue());
 												synchronized(guiseSession) { //don't allow other session contexts to be active while we dispatch the event
@@ -647,6 +644,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 													}
 												}
 											}
+
 										};
 										final ProgressOutputStream progressOutputStream = new ProgressOutputStream(
 												resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, path, bookmark, referrerURI)); //get an output stream to the destination; don't buffer the output stream (our copy method essentially does this) so that progress events will be accurate
@@ -739,6 +737,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		final String name = URIs.getName(requestURI); //determine a name to use for informational purposes TODO create URIPath.getName() and use on the navigation path
 		final ProgressListener progressListener = new ProgressListener() { //create a progress listener for listening for progress
 
+			@Override
 			public void progressed(ProgressEvent progressEvent) { //when progress has been made
 				//Log.trace("delta: ", progressEvent.getDelta(), "progress:", progressEvent.getValue());
 				synchronized(guiseSession) { //don't allow other session contexts to be active while we dispatch the event
@@ -747,6 +746,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 					}
 				}
 			}
+
 		};
 		OutputStream outputStream = resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, path, bookmark, referrerURI); //get an output stream to the destination; don't buffer the output stream (our copy method essentially does this) so that progress events will be accurate
 		if(progressComponent != null) { //if we know the component that wants to know progress
@@ -1447,22 +1447,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		}
 	}
 
-	/**
-	 * Serves a resource that has been verified to exist.
-	 * <p>
-	 * This version sets the content description and content disposition of {@link ResourceReadDestination}. If there is a query parameter named
-	 * {@value #GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER}, the value will indicate the content disposition through the use of the serialize version of a
-	 * {@link ContentDispositionType} value.
-	 * </p>
-	 * @param request The HTTP request.
-	 * @param response The HTTP response.
-	 * @param resource The resource being served.
-	 * @param serveContent <code>true</code> if the contents of the resource should be returned.
-	 * @throws IllegalArgumentException if the content disposition parameter, if any, is unrecognized.
-	 * @throws ServletException if there is a problem servicing the request.
-	 * @throws IOException if there is an error reading or writing data.
-	 * @see #GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER
-	 */
+	@Override
 	protected void serveResource(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletResource resource,
 			final boolean serveContent) throws ServletException, IOException {
 		if(resource instanceof DestinationResource) { //if the resource is a destination we're reading from
@@ -1839,9 +1824,12 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	}
 
 	/**
-	 * Called by the servlet container to indicate to a servlet that the servlet is being taken out of service. This version uninstalls the Guise application from
-	 * the Guise container.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version uninstalls the Guise application from the Guise container.
+	 * </p>
 	 */
+	@Override
 	public void destroy() {
 		final AbstractGuiseApplication guiseApplication = getGuiseApplication(); //get the Guise application
 		if(guiseApplication.getContainer() != null) { //if the Guise application is installed
@@ -1851,48 +1839,48 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	}
 
 	/**
-	 * Looks up a principal from the given ID. This version delegates to the Guise container.
-	 * @param id The ID of the principal.
-	 * @return The principal corresponding to the given ID, or <code>null</code> if no principal could be determined.
-	 * @throws HTTPInternalServerErrorException if there is an error getting the principal.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version delegates to the Guise container.
+	 * </p>
 	 */
+	@Override
 	protected Principal getPrincipal(final String id) throws HTTPInternalServerErrorException {
 		return getGuiseContainer().getPrincipal(getGuiseApplication(), id); //delegate to the container
 	}
 
 	/**
-	 * Looks up the corresponding password for the given principal. This version delegates to the Guise container.
-	 * @param principal The principal for which a password should be returned.
-	 * @return The password associated with the given principal, or <code>null</code> if no password is associated with the given principal.
-	 * @throws HTTPInternalServerErrorException if there is an error getting the principal's password.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version delegates to the Guise container.
+	 * </p>
 	 */
+	@Override
 	protected char[] getPassword(final Principal principal) throws HTTPInternalServerErrorException {
 		return getGuiseContainer().getPassword(getGuiseApplication(), principal); //delegate to the container
 	}
 
 	/**
-	 * Determines the realm applicable for the resource indicated by the given URI. This version delegates to the container.
-	 * @param resourceURI The URI of the resource requested.
-	 * @return The realm appropriate for the resource, or <code>null</code> if the given resource is not in a known realm.
-	 * @throws HTTPInternalServerErrorException if there is an error getting the realm.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version delegates to the container.
+	 * </p>
 	 */
+	@Override
 	protected String getRealm(final URI resourceURI) throws HTTPInternalServerErrorException {
 		return getGuiseContainer().getRealm(getGuiseApplication(), resourceURI); //delegate to the container
 	}
 
 	/**
-	 * Checks whether the given principal is authorized to invoke the given method on the given resource. This version delegates to the Guise container, using the
-	 * principal of the current Guise session instead of the given principal. This technique allows browser-based authentication to function normally (as
-	 * successful authentication will have already updated the session's principal), and also allows browser-based authentication to work with session-based
-	 * authentication in the even that the session has already authenticated a principal unknown to the browser.
-	 * @param request The HTTP request.
-	 * @param resourceURI The URI of the resource requested.
-	 * @param method The HTTP method requested on the resource.
-	 * @param principal The principal requesting authentication, or <code>null</code> if the principal is not known.
-	 * @param realm The realm with which the resource is associated, or <code>null</code> if the realm is not known.
-	 * @return <code>true</code> if the given principal is authorized to perform the given method on the resource represented by the given URI.
-	 * @throws HTTPInternalServerErrorException if there is an error determining if the principal is authorized.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version delegates to the Guise container, using the principal of the current Guise session instead of the given principal. This technique allows
+	 * browser-based authentication to function normally (as successful authentication will have already updated the session's principal), and also allows
+	 * browser-based authentication to work with session-based authentication in the even that the session has already authenticated a principal unknown to the
+	 * browser.
+	 * </p>
 	 */
+	@Override
 	protected boolean isAuthorized(final HttpServletRequest request, final URI resourceURI, final String method, final Principal principal, final String realm)
 			throws HTTPInternalServerErrorException {
 		final HTTPServletGuiseContainer guiseContainer = getGuiseContainer(); //get the Guise container
@@ -1928,18 +1916,12 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	}
 
 	/**
-	 * Called when a principal has went through authentication and indicates the result of authentication. This version stores the authenticated principal in the
-	 * current Guise session if authentication was successful for valid credentials.
-	 * @param request The HTTP request.
-	 * @param resourceURI The URI of the resource requested.
-	 * @param method The HTTP method requested on the resource.
-	 * @param requestURI The request URI as given in the HTTP request.
-	 * @param principal The principal requesting authentication, or <code>null</code> if the principal is not known.
-	 * @param realm The realm for which the principal was authenticated.
-	 * @param credentials The principal's credentials, or <code>null</code> if no credentials are available.
-	 * @param authenticated <code>true</code> if the principal succeeded in authentication, else <code>false</code>.
-	 * @see GuiseSession#setPrincipal(Principal)
+	 * {@inheritDoc}
+	 * <p>
+	 * This version stores the authenticated principal in the current Guise session if authentication was successful for valid credentials.
+	 * </p>
 	 */
+	@Override
 	protected void authenticated(final HttpServletRequest request, final URI resourceURI, final String method, final String requestURI, final Principal principal,
 			final String realm, final AuthenticateCredentials credentials, final boolean authenticated) {
 		if(authenticated && credentials != null) { //if authentication was successful with credentials (don't change the session principal for no credentials, because this might remove a principal set by the session itself with no knowledge of the browser)
@@ -1971,16 +1953,12 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	*/
 
 	/**
-	 * Determines if another URI can be substituted for the requested URI. This usually occurs when a request for "path/to/collection" should really be to
-	 * "path/to/collection/", the former doesn't exist yet the latter is a collection, and the server wishes to automatically redirect to the latter. Note that it
-	 * may later be determined that redirect should not occur for whatever reason, and the resource at the substitute URI maybe used anyway in the background.
+	 * {@inheritDoc}
+	 * <p>
 	 * This version prevents redirects from a registered Guise destination.
-	 * @param request The HTTP request indicating the requested resource.
-	 * @param requestedResourceURI The requested absolute URI of the resource.
-	 * @param substituteResourceURI The URI to the URI which may be substited for the first URI.
-	 * @return <code>true</code> if the provided URI may be substitued for the requested URI.
-	 * @throws IOException if there is an error checking whether URI substitution can occur.
+	 * </p>
 	 */
+	@Override
 	protected boolean canSubstitute(final HttpServletRequest request, final URI requestedResourceURI, final URI substituteResourceURI) throws IOException {
 		final GuiseApplication guiseApplication = getGuiseApplication(); //get the Guise application
 		final URIPath path = guiseApplication.getNavigationPath(requestedResourceURI); //get the application-relative navigation path
@@ -1991,15 +1969,12 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	}
 
 	/**
-	 * Determines if the resource at a given URI exists. This version adds checks to see if the URI represents a valid application navigation path. This version
-	 * adds support for Guise public resources.
-	 * @param request The HTTP request in response to which which existence of the resource is being determined.
-	 * @param resourceURI The URI of the requested resource.
-	 * @return <code>true</code> if the resource exists, else <code>false</code>.
-	 * @throws IOException if there is an error accessing the resource.
-	 * @see GuiseApplication#hasAsset(URIPath)
-	 * @see GuiseApplication#hasDestination(URIPath)
+	 * {@inheritDoc}
+	 * <p>
+	 * This version adds checks to see if the URI represents a valid application navigation path. This version adds support for Guise public resources.
+	 * </p>
 	 */
+	@Override
 	protected boolean exists(final HttpServletRequest request, final URI resourceURI) throws IOException {
 		Log.trace("checking exists for", resourceURI);
 		final GuiseApplication guiseApplication = getGuiseApplication(); //get the Guise application
@@ -2026,6 +2001,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 			try {
 				call(guiseSessionThreadGroup, new Runnable() { //call the method in a new thread inside the thread group
 
+					@Override
 					public void run() {
 						try {
 							resourceExistsHolder.setObject(Boolean.valueOf(destination.exists(guiseSession, path, bookmark, referrerURI))); //ask the resource destination if the resource exists
@@ -2033,6 +2009,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 							throw new UndeclaredThrowableException(ioException); //let it pass to the calling thread
 						}
 					}
+
 				});
 			} catch(final UndeclaredThrowableException undeclaredThrowableException) { //if an exception was thrown
 				final Throwable cause = undeclaredThrowableException.getCause(); //see what exception was thrown
@@ -2049,16 +2026,12 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	}
 
 	/**
-	 * Determines the requested resource. This version adds support for Guise public and temporary resources; and destination resources.
-	 * @param request The HTTP request in response to which the resource is being retrieved.
-	 * @param resourceURI The URI of the requested resource.
-	 * @return An object providing an encapsulation of the requested resource, but not necessarily the contents of the resource.
-	 * @throws IllegalArgumentException if the given resource URI does not represent a valid resource.
-	 * @throws IOException if there is an error accessing the resource.
-	 * @see GuiseApplication#hasAsset(URIPath)
-	 * @see GuiseApplication#getInputStream(URIPath)
-	 * @see ResourceReadDestination
+	 * {@inheritDoc}
+	 * <p>
+	 * This version adds support for Guise public and temporary resources; and destination resources.
+	 * </p>
 	 */
+	@Override
 	protected HTTPServletResource getResource(final HttpServletRequest request, final URI resourceURI) throws IllegalArgumentException, IOException {
 		//TODO del Log.trace("getting resource for URI: ", resourceURI);
 		final GuiseApplication guiseApplication = getGuiseApplication(); //get the Guise application
@@ -2095,6 +2068,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 				try {
 					call(guiseSessionThreadGroup, new Runnable() { //call the method in a new thread inside the thread group
 
+						@Override
 						public void run() {
 							try {
 								destinationResourceDescriptionHolder.setObject(resourceDestination.getResourceDescription(guiseSession, path, bookmark, referrerURI)); //ask the resource destination for the resource description
@@ -2102,6 +2076,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 								throw new UndeclaredThrowableException(resourceIOException); //let it pass to the calling thread
 							}
 						}
+
 					});
 				} catch(final UndeclaredThrowableException undeclaredThrowableException) { //if an exception was thrown
 					final Throwable cause = undeclaredThrowableException.getCause(); //see what exception was thrown
@@ -2136,19 +2111,14 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		final Bookmark bookmark;
 		final URI referrerURI;
 
-		/**
-		 * Returns an input stream to the resource. This method delegates to {@link ResourceReadDestination#getInputStream(GuiseSession, URIPath, Bookmark, URI)},
-		 * providing the Guise session by running in a separate thread group.
-		 * @param request The HTTP request in response to which the input stream is being retrieved.
-		 * @return The input stream to the resource.
-		 * @throws IOException if there is an error getting an input stream to the resource.
-		 */
+		@Override
 		public InputStream getInputStream(final HttpServletRequest request) throws IOException {
 			final ObjectHolder<InputStream> inputStreamHolder = new ObjectHolder<InputStream>(); //create an object holder to receive the result of asking for the input stream
 			final GuiseSessionThreadGroup guiseSessionThreadGroup = Guise.getInstance().getThreadGroup(guiseSession); //get the thread group for this session
 			try {
 				call(guiseSessionThreadGroup, new Runnable() { //call the method in a new thread inside the thread group
 
+					@Override
 					public void run() {
 						try {
 							inputStreamHolder.setObject(resourceDestination.getInputStream(guiseSession, navigationPath, bookmark, referrerURI)); //ask the resource destination for an input stream to the resource
@@ -2156,6 +2126,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 							throw new UndeclaredThrowableException(resourceIOException); //let it pass to the calling thread
 						}
 					}
+
 				});
 			} catch(final UndeclaredThrowableException undeclaredThrowableException) { //if an exception was thrown
 				final Throwable cause = undeclaredThrowableException.getCause(); //see what exception was thrown

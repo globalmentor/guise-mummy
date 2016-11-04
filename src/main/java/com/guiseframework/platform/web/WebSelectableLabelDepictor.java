@@ -27,19 +27,25 @@ import com.guiseframework.style.Color;
 public class WebSelectableLabelDepictor<C extends SelectableLabel> extends WebLabelDepictor<C> {
 
 	/**
-	 * Determines the color for rendering the component. This version uses the selected color if available and the component is selected.
-	 * @return The color to use for this component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version uses the selected color if available and the component is selected.
+	 * </p>
 	 * @see SelectableLabel#getSelectedBackgroundColor()
 	 */
+	@Override
 	protected Color getColor() {
 		return super.getColor(); //TODO fix
 	}
 
 	/**
-	 * Determines the background color for rendering the component. This version uses the selected background color if available and the component is selected.
-	 * @return The background color to use for this component.
+	 * {@inheritDoc}
+	 * <p>
+	 * This version uses the selected background color if available and the component is selected.
+	 * </p>
 	 * @see SelectableLabel#getSelectedBackgroundColor()
 	 */
+	@Override
 	protected Color getBackgroundColor() {
 		final C component = getDepictedObject(); //get the component
 		if(component.isSelected()) { //if the component is selected

@@ -26,8 +26,8 @@ import com.guiseframework.model.ListSelectModel;
  */
 public class ListSelectionEvent<V> extends SetEvent<Integer> {
 
-	/** @return The source of the event. */
 	@SuppressWarnings("unchecked")
+	@Override
 	public ListSelectModel<V> getSource() {
 		return (ListSelectModel<V>)super.getSource(); //cast the event to the appropriate type
 	}

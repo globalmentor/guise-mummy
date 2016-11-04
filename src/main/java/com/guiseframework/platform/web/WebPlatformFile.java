@@ -61,32 +61,17 @@ public class WebPlatformFile extends AbstractPlatformFile {
 		this.platformFileCollector = checkInstance(fileReferenceList, "File reference list cannot be null.");
 	}
 
-	/**
-	 * Uploads the file from the platform.
-	 * @param destinationURI The URI representing the destination of the platform file, either absolute or relative to the application.
-	 * @throws NullPointerException if the given destination URI is <code>null</code>.
-	 * @throws IllegalStateException the platform file can no longer be uploaded because, for example, other platform files have since been selected.
-	 */
+	@Override
 	public void upload(final URI destinationURI) {
 		getPlatformFileCollector().upload(this, destinationURI); //tell the owner file reference list to upload this file
 	}
 
-	/** Cancels the current upload or download. */
+	@Override
 	public void cancel() {
 		getPlatformFileCollector().cancel(this); //tell the owner file reference list to cancel this file transfer
 	}
 
-	/**
-	 * Fires a progress event to all registered progress listeners. This method delegates to the super version and is present in this class so that it may be
-	 * called from the depictor of {@link PlatformFileCollector}.
-	 * @param state The state of the progress.
-	 * @param transferred The current number of bytes transferred, or <code>-1</code> if not known.
-	 * @param total The total or estimated total bytes to transfer, or <code>-1</code> if not known.
-	 * @throws NullPointerException if the given state is <code>null</code>.
-	 * @see ProgressListener
-	 * @see ProgressEvent
-	 * @see DefaultWebPlatformFileCollectorDepictor
-	 */
+	@Override
 	protected void fireProgressed(final TaskState state, final long transferred, final long total) {
 		super.fireProgressed(state, transferred, total); //delegate to the super version
 	}

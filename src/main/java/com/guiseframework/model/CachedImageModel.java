@@ -110,7 +110,7 @@ public class CachedImageModel<Q, V> extends DefaultImageModel implements Pending
 	/** Whether the current image is in the process of transitioning to some other value. */
 	private boolean imagePending = false;
 
-	/** @return Whether the current image is in the process of transitioning to some other value. */
+	@Override
 	public boolean isImagePending() {
 		return imagePending;
 	}
@@ -183,10 +183,12 @@ public class CachedImageModel<Q, V> extends DefaultImageModel implements Pending
 	 */
 	protected class CachedImageListener implements CacheFetchListener<Q, V> {
 
+		@Override
 		public void fetched(final CacheFetchEvent<Q, V> cacheFetchEvent) { //when the image is fetched
 			setImageURI(getCachedImageURI()); //switch to the cached image URI
 			setImagePending(false); //indicate that the image is no longer pending
 		}
+
 	};
 
 }

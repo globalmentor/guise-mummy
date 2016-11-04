@@ -22,17 +22,11 @@ package com.guiseframework.event;
  */
 public abstract class KeyboardAdapter implements KeyboardListener {
 
-	/**
-	 * Called when a key is pressed.
-	 * @param keyPressEvent The event providing key information
-	 */
+	@Override
 	public void keyPressed(final KeyPressEvent keyPressEvent) {
 	}
 
-	/**
-	 * Called when a key is released.
-	 * @param keyReleaseEvent The event providing key information
-	 */
+	@Override
 	public void keyReleased(final KeyReleaseEvent keyReleaseEvent) {
 	}
 

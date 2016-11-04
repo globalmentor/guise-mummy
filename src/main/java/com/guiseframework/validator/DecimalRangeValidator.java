@@ -82,13 +82,7 @@ public class DecimalRangeValidator<V extends Number & Comparable<V>> extends Abs
 		super(minimum, maximum, step, valueRequired); //construct the parent class
 	}
 
-	/**
-	 * Determines whether the given value falls on the correct step amount relative to the base value.
-	 * @param value The value to validate.
-	 * @param step The step value.
-	 * @param base The base (either the minimum or maximum value), or <code>null</code> if zero should be used as a base.
-	 * @return <code>true</code> if the value is a valid step away from the given base.
-	 */
+	@Override
 	protected boolean isValidStep(final V value, final V step, final V base) {
 		final BigDecimal bigBase = base != null ? toBigDecimal(base) : new BigDecimal(0); //default to zero for the base
 		final double bigFactor = toBigDecimal(value).subtract(bigBase).divide(toBigDecimal(step)).doubleValue(); //get the number of times the step goes into the normalized value

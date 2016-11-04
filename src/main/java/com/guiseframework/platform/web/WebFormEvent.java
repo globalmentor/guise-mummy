@@ -72,7 +72,7 @@ public class WebFormEvent extends AbstractWebPlatformEvent {
 		this.exhaustive = exhaustive;
 	}
 
-	/** @return A string representation of this event. */
+	@Override
 	public String toString() {
 		try {
 			final StringBuilder stringBuilder = new StringBuilder(); //create a string builder for constructing a string
