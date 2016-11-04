@@ -20,7 +20,8 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.util.*;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
+
 import static com.guiseframework.Resources.*;
 import static com.guiseframework.theme.Theme.*;
 
@@ -67,7 +68,7 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	protected void setState(final State newState) {
 		if(state != newState) { //if the value is really changing
 			final State oldState = state; //get the old value
-			state = checkInstance(newState, "State cannot be null."); //actually change the value
+			state = requireNonNull(newState, "State cannot be null."); //actually change the value
 			firePropertyChange(STATE_PROPERTY, oldState, newState); //indicate that the value changed
 			setMode(isModal() && newState != State.CLOSED ? Mode.EXCLUSIVE : null); //set exclusive modal mode if we are open and modal
 		}

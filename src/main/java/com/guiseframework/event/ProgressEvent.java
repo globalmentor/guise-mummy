@@ -16,7 +16,7 @@
 
 package com.guiseframework.event;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.model.TaskState;
 
@@ -128,7 +128,7 @@ public class ProgressEvent<P> extends AbstractGuiseEvent {
 	public ProgressEvent(final Object source, final String task, final TaskState taskState, final P value, final P completion) {
 		super(source); //construct the parent class
 		this.task = task;
-		this.taskState = checkInstance(taskState, "Task state cannot be null.");
+		this.taskState = requireNonNull(taskState, "Task state cannot be null.");
 		this.progress = value;
 		this.completion = completion;
 	}

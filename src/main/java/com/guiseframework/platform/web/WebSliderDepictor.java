@@ -22,6 +22,8 @@ import java.math.*;
 import java.net.URI;
 import java.util.*;
 
+import static java.util.Objects.*;
+
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
@@ -96,7 +98,7 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 	 * @throws NullPointerException if the given control and/or value class is <code>null</code>.
 	 */
 	public static <V extends Number> void processPosition(final SliderControl<V> sliderControl, final double position) {
-		final Validator<V> validator = checkInstance(sliderControl, "Component cannot be null.").getValidator(); //get the model's validator
+		final Validator<V> validator = requireNonNull(sliderControl, "Component cannot be null.").getValidator(); //get the model's validator
 		final Class<V> valueClass = sliderControl.getValueClass(); //see what type of class is represented in the model
 		final RangeValidator<V> rangeValidator = validator instanceof RangeValidator ? (RangeValidator<V>)validator : null; //get the validator as a range validator, if it is one
 		final V rangeMinimum = rangeValidator != null ? rangeValidator.getMinimum() : null; //find the minumum, if there is one

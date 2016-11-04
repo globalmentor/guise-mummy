@@ -18,6 +18,8 @@ package com.guiseframework.component;
 
 import java.net.URI;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.java.Objects;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.converter.AbstractStringLiteralConverter;
@@ -27,7 +29,6 @@ import com.guiseframework.model.*;
 import com.guiseframework.prototype.ValuePrototype;
 
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.theme.Theme.*;
 import com.guiseframework.validator.ValidationException;
 
@@ -68,7 +69,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 	 * @see #FLOW_PROPERTY
 	 */
 	public void setFlow(final Flow newFlow) {
-		if(flow != checkInstance(newFlow, "Flow cannot be null.")) { //if the value is really changing
+		if(flow != requireNonNull(newFlow, "Flow cannot be null.")) { //if the value is really changing
 			final Flow oldAxis = flow; //get the old value
 			flow = newFlow; //actually change the value
 			firePropertyChange(FLOW_PROPERTY, oldAxis, newFlow); //indicate that the value changed
@@ -92,7 +93,7 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 	public void setConverter(final Converter<V, String> newConverter) {
 		if(converter != newConverter) { //if the value is really changing
 			final Converter<V, String> oldConverter = converter; //get the old value
-			converter = checkInstance(newConverter, "Converter cannot be null."); //actually change the value
+			converter = requireNonNull(newConverter, "Converter cannot be null."); //actually change the value
 			firePropertyChange(CONVERTER_PROPERTY, oldConverter, newConverter); //indicate that the value changed
 		}
 	}
@@ -165,9 +166,9 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 	 * @see #THUMB_Y_IMAGE_PROPERTY
 	 */
 	public void setThumbImage(final Axis axis, final URI newThumbImage) {
-		final int axisOrdinal = checkInstance(axis, "Axis cannot be null").ordinal(); //get the ordinal of the axis
+		final int axisOrdinal = requireNonNull(axis, "Axis cannot be null").ordinal(); //get the ordinal of the axis
 		final URI oldThumbImage = axisThumbImages[axisOrdinal]; //get the old value
-		if(!oldThumbImage.equals(checkInstance(newThumbImage, "Thumb image cannot be null."))) { //if the value is really changing
+		if(!oldThumbImage.equals(requireNonNull(newThumbImage, "Thumb image cannot be null."))) { //if the value is really changing
 			axisThumbImages[axisOrdinal] = newThumbImage; //actually change the value
 			firePropertyChange(AXIS_THUMB_IMAGE_PROPERTIES[axisOrdinal], oldThumbImage, newThumbImage); //indicate that the value changed
 		}
@@ -239,9 +240,9 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 	 * @see #TRACK_Y_IMAGE_PROPERTY
 	 */
 	public void setTrackImage(final Axis axis, final URI newTrackImage) {
-		final int axisOrdinal = checkInstance(axis, "Axis cannot be null").ordinal(); //get the ordinal of the axis
+		final int axisOrdinal = requireNonNull(axis, "Axis cannot be null").ordinal(); //get the ordinal of the axis
 		final URI oldTrackImage = axisTrackImages[axisOrdinal]; //get the old value
-		if(!oldTrackImage.equals(checkInstance(newTrackImage, "Track image cannot be null."))) { //if the value is really changing
+		if(!oldTrackImage.equals(requireNonNull(newTrackImage, "Track image cannot be null."))) { //if the value is really changing
 			axisTrackImages[axisOrdinal] = newTrackImage; //actually change the value
 			firePropertyChange(AXIS_TRACK_IMAGE_PROPERTIES[axisOrdinal], oldTrackImage, newTrackImage); //indicate that the value changed
 		}
@@ -329,8 +330,8 @@ public class SliderControl<V extends Number> extends AbstractEditValueControl<V>
 	 */
 	public SliderControl(final ValueModel<V> valueModel, final Converter<V, String> converter, final Flow flow) {
 		super(new DefaultInfoModel(), valueModel, new DefaultEnableable()); //construct the parent class
-		this.converter = checkInstance(converter, "Converter cannot be null"); //save the converter
-		this.flow = checkInstance(flow, "Flow cannot be null.");
+		this.converter = requireNonNull(converter, "Converter cannot be null"); //save the converter
+		this.flow = requireNonNull(flow, "Flow cannot be null.");
 		axisThumbImages = new URI[Axis.values().length]; //create the array of thumb images and fill it with corresponding properties
 		axisThumbImages[Axis.X.ordinal()] = SLIDER_THUMB_X_IMAGE;
 		axisThumbImages[Axis.Y.ordinal()] = SLIDER_THUMB_Y_IMAGE;

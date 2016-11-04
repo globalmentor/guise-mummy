@@ -19,8 +19,9 @@ package com.guiseframework.component;
 import java.util.*;
 import java.util.concurrent.*;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 import com.globalmentor.beans.*;
 import com.globalmentor.event.TargetedEvent;
 
@@ -212,7 +213,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	 * @throws NullPointerException if the given tree model is <code>null</code>.
 	 */
 	public TreeControl(final TreeModel treeModel) {
-		this.treeModel = checkInstance(treeModel, "Tree model cannot be null."); //save the tree model
+		this.treeModel = requireNonNull(treeModel, "Tree model cannot be null."); //save the tree model
 		this.treeModel.addPropertyChangeListener(getRepeatPropertyChangeListener()); //listen and repeat all property changes of the tree model
 		this.treeModel.addVetoableChangeListener(getRepeatVetoableChangeListener()); //listen and repeat all vetoable changes of the tree model
 		this.treeModel.addActionListener(repeatActionListener); //listen and repeat all actions of the tree model
@@ -346,7 +347,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		 * @throws NullPointerException if the given converter is <code>null</code>.
 		 */
 		public DefaultValueRepresentationStrategy(final Converter<V, String> converter) {
-			this.converter = checkInstance(converter, "Converter cannot be null."); //save the converter
+			this.converter = requireNonNull(converter, "Converter cannot be null."); //save the converter
 		}
 
 		/**
@@ -606,7 +607,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		 */
 		public TreeNodeTransferable(final TreeControl source, final TreeNodeModel<V> treeNode) {
 			super(source, treeNode.getClass(), treeNode.getValueClass()); //construct the parent class, indicating support for transferring the tree node itself or the value contained in the tree node
-			this.treeNode = checkInstance(treeNode, "Tree node cannot be null.");
+			this.treeNode = requireNonNull(treeNode, "Tree node cannot be null.");
 		}
 
 		/**

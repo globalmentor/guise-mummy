@@ -18,9 +18,9 @@ package com.guiseframework.prototype;
 
 import java.net.URI;
 
-import com.globalmentor.net.ContentType;
+import static java.util.Objects.*;
 
-import static com.globalmentor.java.Objects.*;
+import com.globalmentor.net.ContentType;
 
 import com.guiseframework.model.*;
 
@@ -48,7 +48,7 @@ public class AbstractProxyPrototype<P extends Prototype & InfoModel> extends Abs
 	 * @see #fireProxiedPrototypeBoundPropertyChanges(Prototype, Prototype)
 	 */
 	public void setProxiedPrototype(final P newProxiedPrototype) {
-		if(proxiedPrototype != checkInstance(newProxiedPrototype, "Proxied prototype cannot be null.")) { //if the proxied prototype is really changing
+		if(proxiedPrototype != requireNonNull(newProxiedPrototype, "Proxied prototype cannot be null.")) { //if the proxied prototype is really changing
 			final P oldProxiedPrototype = proxiedPrototype; //get the current proxied prototype
 			uninstallListeners(oldProxiedPrototype);
 			proxiedPrototype = newProxiedPrototype; //actually change the proxied prototype
@@ -177,7 +177,7 @@ public class AbstractProxyPrototype<P extends Prototype & InfoModel> extends Abs
 	 * @throws NullPointerException if the given proxied prototype is <code>null</code> is <code>null</code>.
 	 */
 	public AbstractProxyPrototype(final P proxiedPrototype) {
-		this.proxiedPrototype = checkInstance(proxiedPrototype, "Proxied prototype cannot be null.");
+		this.proxiedPrototype = requireNonNull(proxiedPrototype, "Proxied prototype cannot be null.");
 		installListeners(proxiedPrototype);
 	}
 

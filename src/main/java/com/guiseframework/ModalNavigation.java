@@ -18,9 +18,9 @@ package com.guiseframework;
 
 import java.net.URI;
 
-import com.guiseframework.event.ModalNavigationListener;
+import static java.util.Objects.*;
 
-import static com.globalmentor.java.Objects.*;
+import com.guiseframework.event.ModalNavigationListener;
 
 /**
  * The encapsulation of a point of modal navigation.
@@ -47,6 +47,6 @@ public class ModalNavigation extends Navigation //TODO del class; if kept, updat
 	 */
 	public ModalNavigation(final URI oldNavigationURI, final URI newNavigationURI, final ModalNavigationListener modalListener) {
 		super(oldNavigationURI, newNavigationURI); //construct the parent class
-		this.modalListener = checkInstance(modalListener, "Modal listener cannot be null.");
+		this.modalListener = requireNonNull(modalListener, "Modal listener cannot be null.");
 	}
 }

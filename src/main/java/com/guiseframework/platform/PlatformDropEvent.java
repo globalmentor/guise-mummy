@@ -16,7 +16,7 @@
 
 package com.guiseframework.platform;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 /**
  * Indicates that a drop action has occurred after a drag on the platform. The drag target serves as the source of the event.
@@ -47,6 +47,6 @@ public class PlatformDropEvent extends AbstractDepictEvent {
 	 */
 	public PlatformDropEvent(final DepictedObject dragSource, final DepictedObject dropTarget) {
 		super(dropTarget); //construct the parent class with the drop target as the source of the event
-		this.dragSource = checkInstance(dragSource, "Drag source cannot be null.");
+		this.dragSource = requireNonNull(dragSource, "Drag source cannot be null.");
 	}
 }

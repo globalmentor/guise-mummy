@@ -16,9 +16,10 @@
 
 package com.guiseframework.component.layout;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Arrays.fill;
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.java.Objects;
 import com.guiseframework.component.Component;
@@ -123,7 +124,7 @@ public class RegionLayout extends AbstractLayout<RegionConstraints> {
 	 * @see RegionConstraints#setAlignment(Flow, double)
 	 */
 	public void setAlignment(final Flow flow, final double newAlignment) {
-		final int flowOrdinal = checkInstance(flow, "Flow cannot be null").ordinal(); //get the ordinal of the flow
+		final int flowOrdinal = requireNonNull(flow, "Flow cannot be null").ordinal(); //get the ordinal of the flow
 		final double oldAlignment = alignments[flowOrdinal]; //get the old value
 		if(oldAlignment != newAlignment) { //if the value is really changing
 			alignments[flowOrdinal] = newAlignment; //actually change the value
@@ -209,7 +210,7 @@ public class RegionLayout extends AbstractLayout<RegionConstraints> {
 	 * @see RegionConstraints#setExtent(Flow, Extent)
 	 */
 	public void setExtent(final Flow flow, final Extent newExtent) {
-		final int flowOrdinal = checkInstance(flow, "Flow cannot be null").ordinal(); //get the ordinal of the flow
+		final int flowOrdinal = requireNonNull(flow, "Flow cannot be null").ordinal(); //get the ordinal of the flow
 		final Extent oldExtent = extents[flowOrdinal]; //get the old value
 		if(!Objects.equals(oldExtent, newExtent)) { //if the value is really changing
 			extents[flowOrdinal] = newExtent; //actually change the value
@@ -311,9 +312,9 @@ public class RegionLayout extends AbstractLayout<RegionConstraints> {
 	 * @see RegionConstraints#setPaddingExtent(Border, Extent)
 	 */
 	public void setPaddingExtent(final Border border, final Extent newPaddingExtent) {
-		final int borderOrdinal = checkInstance(border, "Border cannot be null").ordinal(); //get the ordinal of the border
+		final int borderOrdinal = requireNonNull(border, "Border cannot be null").ordinal(); //get the ordinal of the border
 		final Extent oldPaddingExtent = paddingExtents[borderOrdinal]; //get the old value
-		if(!oldPaddingExtent.equals(checkInstance(newPaddingExtent, "Padding extent cannot be null."))) { //if the value is really changing
+		if(!oldPaddingExtent.equals(requireNonNull(newPaddingExtent, "Padding extent cannot be null."))) { //if the value is really changing
 			paddingExtents[borderOrdinal] = newPaddingExtent; //actually change the value
 			firePropertyChange(PADDING_EXTENT_PROPERTIES[borderOrdinal], oldPaddingExtent, newPaddingExtent); //indicate that the value changed
 		}
@@ -401,7 +402,7 @@ public class RegionLayout extends AbstractLayout<RegionConstraints> {
 	 * @see #SPAN_FLOW_PROPERTY
 	 */
 	public void setSpanFlow(final Flow newSpanFlow) {
-		if(spanFlow != checkInstance(newSpanFlow, "Span flow cannot be null.")) { //if the value is really changing
+		if(spanFlow != requireNonNull(newSpanFlow, "Span flow cannot be null.")) { //if the value is really changing
 			final Flow oldSpanFlow = spanFlow; //get the old value
 			spanFlow = newSpanFlow; //actually change the value
 			firePropertyChange(SPAN_FLOW_PROPERTY, oldSpanFlow, newSpanFlow); //indicate that the value changed
@@ -425,7 +426,7 @@ public class RegionLayout extends AbstractLayout<RegionConstraints> {
 	 */
 	public RegionLayout(final Flow spanFlow) {
 		super(); //construct the parent class
-		this.spanFlow = checkInstance(spanFlow, "Span flow cannot be null.");
+		this.spanFlow = requireNonNull(spanFlow, "Span flow cannot be null.");
 	}
 
 	/**

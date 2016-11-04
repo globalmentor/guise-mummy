@@ -16,7 +16,7 @@
 
 package com.guiseframework.component.rdf;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.rdf.*;
 
@@ -47,7 +47,7 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 	 * @throws NullPointerException if the given RDF XMLifier is <code>null</code>.
 	 */
 	public AbstractRDFObjectTreeNodeRepresentationStrategy(final RDFXMLGenerator rdfXMLifier) {
-		xmlGenerator = checkInstance(rdfXMLifier, "RDF XMLifier cannot be null."); //save the XMLifier we'll use for generating labels
+		xmlGenerator = requireNonNull(rdfXMLifier, "RDF XMLifier cannot be null."); //save the XMLifier we'll use for generating labels
 	}
 
 	/**

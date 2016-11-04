@@ -16,9 +16,9 @@
 
 package com.guiseframework.input;
 
-import com.globalmentor.java.Objects;
+import static java.util.Objects.*;
 
-import static com.globalmentor.java.Objects.*;
+import com.globalmentor.java.Objects;
 
 /**
  * An encapsulation of key stroke input.
@@ -42,7 +42,7 @@ public class KeystrokeInput extends AbstractGestureInput implements KeyboardInpu
 	 */
 	public KeystrokeInput(final Key key, final Key... keys) {
 		super(keys); //construct the parent class
-		this.key = checkInstance(key, "Key cannot be null."); //save the key
+		this.key = requireNonNull(key, "Key cannot be null."); //save the key
 	}
 
 	/**

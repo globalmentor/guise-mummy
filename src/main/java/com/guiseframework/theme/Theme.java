@@ -20,6 +20,8 @@ import java.net.URI;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
+import static java.util.Objects.*;
+
 import org.ploop.graph.PLOOPURFProcessor;
 import org.urframework.*;
 import org.urframework.select.*;
@@ -35,7 +37,6 @@ import com.globalmentor.util.*;
 import com.guiseframework.style.*;
 
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.Resources.*;
 
 /**
@@ -94,7 +95,7 @@ public class Theme extends URFListResource<Rule> {
 	 * @throws NullPointerException if the given object is <code>null</code>.
 	 */
 	public Set<Rule> getClassRules(final Object object) {
-		final Class<?> objectClass = checkInstance(object, "Object cannot be null").getClass(); //get the object's class
+		final Class<?> objectClass = requireNonNull(object, "Object cannot be null").getClass(); //get the object's class
 		Set<Rule> combinedRuleSet = null; //we'll create the rule set only if needed
 		final List<Class<?>> ancestorClasses = getAncestorClasses(objectClass); //get the class ancestor hierarchy of this class TODO cache these
 		for(final Class<?> ancestorClass : ancestorClasses) { //for each ancestor class TODO iterate the list in the correct order; send back the rules in the correct order
@@ -202,8 +203,8 @@ public class Theme extends URFListResource<Rule> {
 	 * @see OperatorSelector#getSelectors()
 	 */
 	protected void updateRules(final Rule rule, final Selector selector) throws ClassNotFoundException {
-		checkInstance(rule, "Rule cannot be null.");
-		checkInstance(selector, "Selector cannot be null.");
+		requireNonNull(rule, "Rule cannot be null.");
+		requireNonNull(selector, "Selector cannot be null.");
 		if(selector instanceof ObjectClassSelector) { //if this is a class selector
 			final Class<?> selectClass = ((ObjectClassSelector)selector).getSelectClass(); //get the class selected by the selector
 			if(selectClass != null) { //if we have a selected class

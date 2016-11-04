@@ -19,6 +19,8 @@ package com.guiseframework.platform.web;
 import java.io.IOException;
 import java.net.URI;
 
+import static java.util.Objects.*;
+
 import javax.servlet.http.*;
 
 import com.globalmentor.log.Log;
@@ -26,7 +28,6 @@ import com.globalmentor.net.ContentType;
 import com.globalmentor.net.URIPath;
 import com.guiseframework.*;
 
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.servlet.http.HTTPServlets.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
@@ -136,8 +137,8 @@ public class HTTPServletGuiseRequest {
 	 */
 	public HTTPServletGuiseRequest(final HttpServletRequest request, /*TODO del final HttpServletResponse response, */final GuiseContainer guiseContainer,
 			final GuiseApplication guiseApplication) throws IOException {
-		this.httpServletRequest = checkInstance(request, "HTTP servlet request cannot be null.");
-		//TODO del		this.httpServletResponse=checkInstance(response, "HTTP servlet request cannot be null.");
+		this.httpServletRequest = requireNonNull(request, "HTTP servlet request cannot be null.");
+		//TODO del		this.httpServletResponse=requireNonNull(response, "HTTP servlet request cannot be null.");
 		depictURI = URI.create(request.getRequestURL().toString()); //get the URI of the current request
 		final String queryString = request.getQueryString(); //get the query string from the request
 		bookmark = queryString != null && queryString.length() > 0 ? new Bookmark(String.valueOf(QUERY_SEPARATOR) + queryString) : null; //create a bookmark if there is a query string (Tomcat 5.5.16 returns an empty string for no query, even though the Java Servlet specification 2.4 says that it should return null; this is fixed in Tomcat 6)

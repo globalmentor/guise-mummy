@@ -16,7 +16,7 @@
 
 package com.guiseframework.platform.web.css;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 /**
  * A type simple selector. This implementation represents the universal selector by an instance of a type selector with the type "*".
@@ -38,7 +38,7 @@ public class TypeSelector implements SimpleSelector, Comparable<TypeSelector> {
 	 * @throws NullPointerException if the given type name is <code>null</code>.
 	 */
 	public TypeSelector(final String typeName) {
-		this.typeName = checkInstance(typeName, "Type name cannot be null.");
+		this.typeName = requireNonNull(typeName, "Type name cannot be null.");
 	}
 
 	@Override

@@ -18,10 +18,10 @@ package com.guiseframework.model;
 
 import java.util.Locale;
 
+import static java.util.Objects.*;
+
 import com.guiseframework.Guise;
 import com.guiseframework.GuiseSession;
-
-import static com.globalmentor.java.Objects.*;
 
 /**
  * An info model that provides a localized version of a locale name.
@@ -52,7 +52,7 @@ public class LocaleInfoModel extends DefaultInfoModel {
 	 */
 	public LocaleInfoModel(final Locale locale) {
 		this.session = Guise.getInstance().getGuiseSession(); //store a reference to the current Guise session
-		this.locale = checkInstance(locale, "Locale cannot be null"); //save the locale
+		this.locale = requireNonNull(locale, "Locale cannot be null"); //save the locale
 	}
 
 	@Override

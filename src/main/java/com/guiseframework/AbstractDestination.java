@@ -19,13 +19,13 @@ package com.guiseframework;
 import java.net.URI;
 import java.util.*;
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 import java.util.regex.Pattern;
 
 import org.urframework.URFResource;
 
 import com.globalmentor.beans.BoundPropertyObject;
 import com.globalmentor.java.Objects;
-import static com.globalmentor.java.Objects.*;
 import com.globalmentor.net.*;
 
 import static com.globalmentor.net.URIs.*;
@@ -79,7 +79,7 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	 * @throws IllegalArgumentException if the provided path is absolute.
 	 */
 	public AbstractDestination(final URIPath path) {
-		this.path = checkInstance(path, "Navigation path cannot be null.").checkRelative(); //store the path, making sure it is relative
+		this.path = requireNonNull(path, "Navigation path cannot be null.").checkRelative(); //store the path, making sure it is relative
 		this.pathPattern = null; //indicate that there is no path pattern
 	}
 
@@ -89,7 +89,7 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	 * @throws NullPointerException if the path pattern is <code>null</code>.
 	 */
 	public AbstractDestination(final Pattern pathPattern) {
-		this.pathPattern = checkInstance(pathPattern, "Navigation path pattern cannot be null.");
+		this.pathPattern = requireNonNull(pathPattern, "Navigation path pattern cannot be null.");
 		this.path = null; //indicate that there is no path
 	}
 

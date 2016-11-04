@@ -21,6 +21,7 @@ import java.util.*;
 
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -92,7 +93,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	 */
 	public HTTPServletWebPlatform(final GuiseApplication application, final HttpSession httpSession, final HttpServletRequest httpRequest) {
 		super(application); //construct the parent class
-		this.httpSession = checkInstance(httpSession, "HTTP session cannot be null.");
+		this.httpSession = requireNonNull(httpSession, "HTTP session cannot be null.");
 		//update the client
 		final String userAgentID = getUserAgent(httpRequest); //get the user agent identification, if any
 		final Map<String, Object> userAgentProperties = getUserAgentProperties(httpRequest); //get other information about the user agent from the request
@@ -196,7 +197,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	@Override
 	public void selectPlatformFiles(final boolean multiple, final ValueSelectListener<Collection<PlatformFile>> platformFileSelectListener) {
 		fileReferenceList = new PlatformFileCollector(); //create a new platform file collector
-		checkInstance(platformFileSelectListener, "Platform file select listener cannot be null.");
+		requireNonNull(platformFileSelectListener, "Platform file select listener cannot be null.");
 		fileReferenceList.addPropertyChangeListener(PlatformFileCollector.PLATFORM_FILES_PROPERTY, new AbstractGenericPropertyChangeListener<List<PlatformFile>>() { //listen for the files changing
 
 			@Override
@@ -233,7 +234,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 					this.destinationBookmark=destinationBookmark;	//save the bookmark
 				
 				fileReferenceList=new FlashFileReferenceList();	//create a new flash file reference list
-				checkInstance(platformFileSelectListener, "Platform file select listener cannot be null.");
+				requireNonNull(platformFileSelectListener, "Platform file select listener cannot be null.");
 				fileReferenceList.addPropertyChangeListener(FlashFileReferenceList.PLATFORM_FILES_PROPERTY, new AbstractGenericPropertyChangeListener<List<PlatformFile>>() {	//listen for the files changing
 							public void propertyChange(final GenericPropertyChangeEvent<List<PlatformFile>> genericPropertyChangeEvent) {	//if the user selects platform files
 								fileReferenceList.removePropertyChangeListener(FlashFileReferenceList.PLATFORM_FILES_PROPERTY, this);	//we don't need to listen for the files anymore
@@ -279,7 +280,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	 * @throws NullPointerException if the given URI is <code>null</code>.
 	 */
 	public void sendResource(final URI resourceURI, final Bookmark bookmark) { //TODO resolve whether resource URI can have bookmark information; currently some code relies on allowing bookmark information in the URI
-		sendResourceURI = checkInstance(resourceURI, "Resource URI cannot be null."); //save the resource; it will be resolved when depicted
+		sendResourceURI = requireNonNull(resourceURI, "Resource URI cannot be null."); //save the resource; it will be resolved when depicted
 		if(bookmark != null) { //if a bookmark was provided
 			sendResourceURI = URI.create(sendResourceURI.toString() + bookmark.toString()); //append the bookmark query
 		}

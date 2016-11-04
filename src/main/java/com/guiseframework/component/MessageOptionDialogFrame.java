@@ -16,7 +16,7 @@
 
 package com.guiseframework.component;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.guiseframework.geometry.Extent;
 import com.guiseframework.geometry.Unit;
@@ -80,7 +80,7 @@ public class MessageOptionDialogFrame extends NotificationOptionDialogFrame //TO
 	 */
 	public MessageOptionDialogFrame(final Message messageComponent, final Notification.Option... options) {
 		super(messageComponent, options); //construct the parent class
-		this.message = checkInstance(messageComponent, "Message component cannot be null");
+		this.message = requireNonNull(messageComponent, "Message component cannot be null");
 		setLineExtent(new Extent(25, Unit.EM)); //set the default preferred size
 		setPageExtent(new Extent(10, Unit.EM));
 	}

@@ -16,13 +16,14 @@
 
 package com.guiseframework.event;
 
-import static java.util.Collections.*;
 import java.util.Set;
+
+import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import com.guiseframework.input.Key;
 
 import static com.globalmentor.java.Enums.*;
-import static com.globalmentor.java.Objects.*;
 
 /**
  * An abstract event providing information on input from a user gesture.
@@ -61,7 +62,7 @@ public abstract class AbstractGestureInputEvent extends AbstractInputEvent imple
 	 */
 	public AbstractGestureInputEvent(final Object source, final Key... keys) {
 		super(source); //construct the parent class
-		this.keys = unmodifiableSet(createEnumSet(Key.class, checkInstance(keys, "Keys cannot be null."))); //save a read-only set of the keys
+		this.keys = unmodifiableSet(createEnumSet(Key.class, requireNonNull(keys, "Keys cannot be null."))); //save a read-only set of the keys
 	}
 
 }

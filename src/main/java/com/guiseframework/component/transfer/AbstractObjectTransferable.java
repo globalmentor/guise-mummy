@@ -16,11 +16,12 @@
 
 package com.guiseframework.component.transfer;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.io.*;
 import com.globalmentor.net.ContentType;
 
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.ContentTypeConstants.*;
 
 /**
@@ -59,8 +60,8 @@ public abstract class AbstractObjectTransferable<S> implements Transferable<S> {
 	 * @throws NullPointerException if the provided source and/or object classes is <code>null</code>.
 	 */
 	public AbstractObjectTransferable(final S source, final Class<?>... objectClasses) {
-		this.source = checkInstance(source, "Source cannot be null.");
-		this.objectClasses = checkInstance(objectClasses, "Object classes cannot be null.");
+		this.source = requireNonNull(source, "Source cannot be null.");
+		this.objectClasses = requireNonNull(objectClasses, "Object classes cannot be null.");
 		final int objectClassCount = objectClasses.length; //find out how many object classes there are
 		contentTypes = new ContentType[objectClassCount]; //create an array of content types
 		for(int i = objectClassCount - 1; i >= 0; --i) { //for each object class

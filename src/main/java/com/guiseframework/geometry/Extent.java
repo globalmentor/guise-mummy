@@ -16,7 +16,7 @@
 
 package com.guiseframework.geometry;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import java.util.Arrays;
 
@@ -92,7 +92,7 @@ public class Extent implements Comparable<Extent> {
 			throw new IllegalArgumentException("Degree must be positive.");
 		}
 		this.value = value; //save the value
-		this.unit = checkInstance(unit, "Unit cannot be null."); //save the unit
+		this.unit = requireNonNull(unit, "Unit cannot be null."); //save the unit
 		this.degree = degree; //save the degree
 	}
 

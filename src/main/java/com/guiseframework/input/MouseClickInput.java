@@ -16,9 +16,9 @@
 
 package com.guiseframework.input;
 
-import com.globalmentor.java.Objects;
+import static java.util.Objects.*;
 
-import static com.globalmentor.java.Objects.*;
+import com.globalmentor.java.Objects;
 
 /**
  * An encapsulation of mouse click input.
@@ -56,7 +56,7 @@ public class MouseClickInput extends AbstractMouseInput {
 			throw new IllegalArgumentException("Mouse click count must be positive.");
 		}
 		this.count = count; //store the count
-		this.button = checkInstance(button, "Button cannot be null."); //save the button
+		this.button = requireNonNull(button, "Button cannot be null."); //save the button
 	}
 
 	/**

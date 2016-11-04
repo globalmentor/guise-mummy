@@ -21,6 +21,8 @@ import java.net.URI;
 import java.security.*;
 import java.util.*;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.java.Objects;
 import com.globalmentor.java.Strings;
 import com.globalmentor.net.ContentType;
@@ -32,7 +34,6 @@ import com.guiseframework.GuiseSession;
 import static com.globalmentor.java.CharSequences.denull;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Strings.*;
 import static com.globalmentor.security.MessageDigests.*;
 import static com.globalmentor.util.Base64.*;
@@ -309,12 +310,12 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	@Override
 	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, final ContentType contentType)
 			throws IOException {
-		writeDocType(writeXMLDeclaration, namespaceURI, localName, null, null, checkInstance(contentType, "Content type must be provided in this context."));
+		writeDocType(writeXMLDeclaration, namespaceURI, localName, null, null, requireNonNull(contentType, "Content type must be provided in this context."));
 	}
 
 	@Override
 	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, final String publicID) throws IOException {
-		writeDocType(writeXMLDeclaration, namespaceURI, localName, checkInstance(publicID, "Null public ID not allowed in this context."), null, null); //check the public ID for null and determine defaults for the other values
+		writeDocType(writeXMLDeclaration, namespaceURI, localName, requireNonNull(publicID, "Null public ID not allowed in this context."), null, null); //check the public ID for null and determine defaults for the other values
 	}
 
 	@Override

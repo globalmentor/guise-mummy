@@ -16,14 +16,13 @@
 
 package com.guiseframework.component;
 
-import static com.globalmentor.java.Objects.*;
-
 import java.io.IOException;
 import java.util.*;
 
 import com.guiseframework.model.InfoModel;
 
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 /**
  * A composite component that represents the state of its child components.
@@ -138,7 +137,7 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 	 * @throws IllegalArgumentException if the given component does not represent any object.
 	 */
 	protected T getObject(final Component component) {
-		checkInstance(component, "Component cannot be null.");
+		requireNonNull(component, "Component cannot be null.");
 		synchronized(componentStateMap) { //don't allow the map to be modified while we access it
 			for(final Map.Entry<T, S> componentStateEntry : componentStateMap.entrySet()) { //for all the map entries
 				if(componentStateEntry.getValue().getComponent() == component) { //if we found the component
@@ -186,7 +185,7 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 		 * @throws NullPointerException if the given component is <code>null</code>.
 		 */
 		public ComponentState(final Component component) {
-			this.component = checkInstance(component, "Component cannot be null.");
+			this.component = requireNonNull(component, "Component cannot be null.");
 		}
 	}
 

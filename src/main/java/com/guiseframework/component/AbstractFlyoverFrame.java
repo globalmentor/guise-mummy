@@ -22,11 +22,11 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.java.Objects;
 import com.guiseframework.geometry.CompassPoint;
 
-import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.Resources.*;
 
 /**
@@ -71,7 +71,7 @@ public abstract class AbstractFlyoverFrame extends AbstractFrame implements Flyo
 	@Override
 	public void setTetherBearing(BigDecimal newTetherBearing) {
 		//TODO del Log.trace("setting flyover tether bearing to", newTetherBearing);
-		checkInstance(newTetherBearing, "Tether bearing cannot be null.");
+		requireNonNull(newTetherBearing, "Tether bearing cannot be null.");
 		final Set<CompassPoint> tetherBearingCompassPoints = getTetherBearingCompassPoints(); //get the tether bearing compass points available
 		if(!tetherBearingCompassPoints.isEmpty()) { //if some tether bearings are supported TOOD fix; right now, if there are no compass points then all bearings are supported
 			CompassPoint compassPoint = CompassPoint.getCompassPoint(newTetherBearing); //get the compass point nearest the bearing
@@ -115,7 +115,7 @@ public abstract class AbstractFlyoverFrame extends AbstractFrame implements Flyo
 	public void setTetherBearingCompassPoints(final Set<CompassPoint> newTetherBearingCompassPoints) {
 		if(tetherBearing != tetherBearingCompassPoints) { //if the value is really changing
 			final Set<CompassPoint> oldTetherBearingCompassPoints = tetherBearingCompassPoints; //get the current value
-			tetherBearingCompassPoints = checkInstance(newTetherBearingCompassPoints, "Tether bearing compass points cannot be null."); //update the value
+			tetherBearingCompassPoints = requireNonNull(newTetherBearingCompassPoints, "Tether bearing compass points cannot be null."); //update the value
 			firePropertyChange(TETHER_BEARING_PROPERTY, oldTetherBearingCompassPoints, newTetherBearingCompassPoints);
 		}
 	}

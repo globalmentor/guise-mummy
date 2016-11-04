@@ -16,8 +16,9 @@
 
 package com.guiseframework.component;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 
 import com.guiseframework.component.layout.Flow;
 import com.guiseframework.component.layout.TabLayout;
@@ -49,7 +50,7 @@ public class TabContainerControl extends AbstractListSelectContainerControl {
 	 * @see #AXIS_PROPERTY
 	 */
 	public void setAxis(final Flow newAxis) {
-		if(axis != checkInstance(newAxis, "Flow axis cannot be null.")) { //if the value is really changing
+		if(axis != requireNonNull(newAxis, "Flow axis cannot be null.")) { //if the value is really changing
 			final Flow oldAxis = axis; //get the old value
 			axis = newAxis; //actually change the value
 			firePropertyChange(AXIS_PROPERTY, oldAxis, newAxis); //indicate that the value changed
@@ -110,7 +111,7 @@ public class TabContainerControl extends AbstractListSelectContainerControl {
 	 */
 	public TabContainerControl(final TabLayout layout, final Flow axis, final int maxTabCount) {
 		super(layout); //construct the parent class, using the card layout's value model
-		this.axis = checkInstance(axis, "Flow axis cannot be null.");
+		this.axis = requireNonNull(axis, "Flow axis cannot be null.");
 		this.maxTabCount = maxTabCount; //save the maximum tab count
 	}
 

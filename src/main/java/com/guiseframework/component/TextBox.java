@@ -16,7 +16,7 @@
 
 package com.guiseframework.component;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.net.ContentType;
 import com.globalmentor.text.Text;
@@ -110,7 +110,7 @@ public class TextBox extends AbstractContainer implements TextModel, SectionComp
 	 */
 	public TextBox(final TextModel textModel) {
 		super(new ReferenceLayout()); //construct the parent class
-		this.textModel = checkInstance(textModel, "Text model cannot be null."); //save the text model
+		this.textModel = requireNonNull(textModel, "Text model cannot be null."); //save the text model
 		this.textModel.addPropertyChangeListener(getRepeatPropertyChangeListener()); //listen and repeat all property changes of the text model
 		this.textModel.addVetoableChangeListener(getRepeatVetoableChangeListener()); //listen and repeat all vetoable changes of the text model
 	}

@@ -19,7 +19,7 @@ package com.guiseframework.component;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.event.TargetedEvent;
@@ -425,7 +425,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	 * @see MouseEvent
 	 */
 	protected void dispatchInputEvent(final InputEvent inputEvent, Component target) {
-		checkInstance(target, "Target cannot be null");
+		requireNonNull(target, "Target cannot be null");
 		while(target != null && target != this) { //keep going until we reach this component or run out of ancestors, the latter of which means that this component is not in the target branch at all
 			final CompositeComponent parent = target.getParent(); //get the target ancestor's parent
 			if(parent == this) { //if we are the target ancestor's immediate parent

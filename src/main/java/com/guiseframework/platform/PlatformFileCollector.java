@@ -18,10 +18,11 @@ package com.guiseframework.platform;
 
 import java.net.URI;
 import java.util.*;
+
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 
 /**
  * Encapsulation of a list of platform files and a way to collect them. The installed depictor must be of the specialized type {@link Depictor}.
@@ -53,7 +54,7 @@ public class PlatformFileCollector extends AbstractDepictedObject {
 	 * @throws NullPointerException if the given platform files is <code>null</code>.
 	 */
 	public void setPlatformFiles(final List<? extends PlatformFile> newPlatformFiles) {
-		if(platformFiles != checkInstance(newPlatformFiles, "Platform files cannot be null.")) {
+		if(platformFiles != requireNonNull(newPlatformFiles, "Platform files cannot be null.")) {
 			final List<? extends PlatformFile> oldPlatformFiles = platformFiles; //get the old value
 			platformFiles = newPlatformFiles; //actually change the value
 			firePropertyChange(PLATFORM_FILES_PROPERTY, oldPlatformFiles, newPlatformFiles); //indicate that the value changed

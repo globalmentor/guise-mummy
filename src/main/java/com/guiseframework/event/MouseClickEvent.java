@@ -16,9 +16,10 @@
 
 package com.guiseframework.event;
 
+import static java.util.Objects.*;
+
 import com.guiseframework.geometry.*;
 
-import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.geometry.Point.*;
 import static com.guiseframework.geometry.Rectangle.*;
 import com.guiseframework.input.*;
@@ -82,7 +83,7 @@ public class MouseClickEvent extends AbstractMouseEvent {
 			throw new IllegalArgumentException("Mouse click count must be positive.");
 		}
 		this.count = count; //store the count
-		this.button = checkInstance(button, "Button cannot be null."); //save the button
+		this.button = requireNonNull(button, "Button cannot be null."); //save the button
 	}
 
 	/**

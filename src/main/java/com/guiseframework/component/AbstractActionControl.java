@@ -16,7 +16,7 @@
 
 package com.guiseframework.component;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
@@ -95,7 +95,7 @@ public abstract class AbstractActionControl extends AbstractControl implements A
 	 */
 	public AbstractActionControl(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable) {
 		super(infoModel, enableable); //construct the parent class
-		this.actionModel = checkInstance(actionModel, "Action model cannot be null."); //save the action model
+		this.actionModel = requireNonNull(actionModel, "Action model cannot be null."); //save the action model
 		this.actionModel.addActionListener(new ActionListener() { //create an action repeater to forward events to this component's listeners
 
 			@Override

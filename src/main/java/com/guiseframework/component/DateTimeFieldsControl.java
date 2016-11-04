@@ -125,7 +125,7 @@ public class DateTimeFieldsControl extends AbstractLayoutValueControl<Date> { //
 	/*TODO del
 			public void setDate(final Date newDate)
 			{
-				if(!date.equals(checkInstance(newDate, "Date cannot be null."))) {	//if the value is really changing
+				if(!date.equals(requireNonNull(newDate, "Date cannot be null."))) {	//if the value is really changing
 					final Date oldDate=date;	//get the old value
 					date=(Date)newDate.clone();	//clone the new date and actually change the value
 					updateDateControls();	//update the date controls based upon the new value

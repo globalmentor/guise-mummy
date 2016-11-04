@@ -16,11 +16,12 @@
 
 package com.guiseframework.model;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.java.Objects;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.text.Text;
 
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.text.Text.*;
 
 /**
@@ -56,7 +57,7 @@ public class DefaultTextModel extends AbstractModel implements TextModel {
 
 	@Override
 	public void setTextContentType(final ContentType newTextContentType) {
-		checkInstance(newTextContentType, "Content type cannot be null.");
+		requireNonNull(newTextContentType, "Content type cannot be null.");
 		if(textContentType != newTextContentType) { //if the value is really changing
 			final ContentType oldTextContentType = textContentType; //get the old value
 			if(!isText(newTextContentType)) { //if the new content type is not a text content type
@@ -89,7 +90,7 @@ public class DefaultTextModel extends AbstractModel implements TextModel {
 	 */
 	public DefaultTextModel(final String text, final ContentType textContentType) {
 		this.text = text; //save the text
-		if(!isText(checkInstance(textContentType, "Content type cannot be null."))) { //if the content type is not a text content type
+		if(!isText(requireNonNull(textContentType, "Content type cannot be null."))) { //if the content type is not a text content type
 			throw new IllegalArgumentException("Content type " + textContentType + " is not a text content type.");
 		}
 		this.textContentType = textContentType; //save the text content type

@@ -19,7 +19,7 @@ package com.guiseframework.model;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 /**
  * An abstract implementation of a group of similar models for providing such functions as communication or mutual exclusion. This class is thread safe.
@@ -38,7 +38,7 @@ public abstract class AbstractModelGroup<M extends Model> implements ModelGroup<
 
 	@Override
 	public boolean contains(final Model model) {
-		return modelSet.contains(checkInstance(model, "Model cannot be null.")); //see if the set of models contains this model TODO check for class cast exception
+		return modelSet.contains(requireNonNull(model, "Model cannot be null.")); //see if the set of models contains this model TODO check for class cast exception
 	}
 
 	/**
@@ -60,7 +60,7 @@ public abstract class AbstractModelGroup<M extends Model> implements ModelGroup<
 	 * @throws NullPointerException if the given model is <code>null</code>.
 	 */
 	protected void addImpl(final M model) {
-		modelSet.add(checkInstance(model, "Model cannot be null.")); //add this model to the model set
+		modelSet.add(requireNonNull(model, "Model cannot be null.")); //add this model to the model set
 	}
 
 	/**
@@ -82,7 +82,7 @@ public abstract class AbstractModelGroup<M extends Model> implements ModelGroup<
 	 * @throws NullPointerException if the given model is <code>null</code>.
 	 */
 	protected void removeImpl(final M model) {
-		modelSet.remove(checkInstance(model, "Model cannot be null.")); //remove this model from the model set
+		modelSet.remove(requireNonNull(model, "Model cannot be null.")); //remove this model from the model set
 	}
 
 	/**

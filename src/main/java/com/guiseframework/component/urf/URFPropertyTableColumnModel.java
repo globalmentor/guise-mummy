@@ -18,9 +18,9 @@ package com.guiseframework.component.urf;
 
 import java.net.URI;
 
-import org.urframework.*;
+import static java.util.Objects.*;
 
-import static com.globalmentor.java.Objects.*;
+import org.urframework.*;
 
 import com.guiseframework.model.DefaultTableColumnModel;
 
@@ -58,7 +58,7 @@ public class URFPropertyTableColumnModel<V extends URFResource> extends DefaultT
 	 */
 	public URFPropertyTableColumnModel(final Class<V> valueClass, final URI propertyURI, final String labelText) {
 		super(valueClass, labelText); //construct the parent class
-		this.propertyURI = checkInstance(propertyURI, "Property URI cannot be null.");
+		this.propertyURI = requireNonNull(propertyURI, "Property URI cannot be null.");
 	}
 
 }

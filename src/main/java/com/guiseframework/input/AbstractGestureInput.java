@@ -16,13 +16,14 @@
 
 package com.guiseframework.input;
 
-import static java.util.Collections.*;
 import java.util.Set;
+
+import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.model.AbstractHashObject;
 
 import static com.globalmentor.java.Enums.*;
-import static com.globalmentor.java.Objects.*;
 
 /**
  * An abstract encapsulation of user input from a gesture.
@@ -60,7 +61,7 @@ public abstract class AbstractGestureInput extends AbstractHashObject implements
 	 */
 	public AbstractGestureInput(final Key... keys) {
 		super((Object[])keys); //construct the parent class
-		this.keys = unmodifiableSet(createEnumSet(Key.class, checkInstance(keys, "Keys cannot be null."))); //save a read-only set of the keys
+		this.keys = unmodifiableSet(createEnumSet(Key.class, requireNonNull(keys, "Keys cannot be null."))); //save a read-only set of the keys
 	}
 
 }

@@ -19,13 +19,13 @@ package com.guiseframework.component;
 import java.beans.*;
 
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.globalmentor.net.ContentType;
 import com.globalmentor.text.Text;
 
-import static com.globalmentor.java.Objects.*;
 import com.globalmentor.beans.*;
 import com.guiseframework.input.*;
 
@@ -50,7 +50,7 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 
 	@Override
 	public void addChildFrame(final Frame frame) {
-		if(checkInstance(frame, "Frame cannot be null.") == this) {
+		if(requireNonNull(frame, "Frame cannot be null.") == this) {
 			throw new IllegalArgumentException("A frame cannot be its own child frame.");
 		}
 		frameList.add(frame); //add this frame to our list
@@ -63,7 +63,7 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 
 	@Override
 	public void removeChildFrame(final Frame frame) {
-		if(checkInstance(frame, "Frame cannot be null.") == this) {
+		if(requireNonNull(frame, "Frame cannot be null.") == this) {
 			throw new IllegalArgumentException("A frame cannot be its own child frame.");
 		}
 		frameList.remove(frame); //remove this frame from the list

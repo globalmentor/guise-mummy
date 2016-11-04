@@ -16,7 +16,8 @@
 
 package com.guiseframework.model;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
+
 import static com.globalmentor.text.Text.*;
 
 import com.globalmentor.net.ContentType;
@@ -50,8 +51,8 @@ public abstract class AbstractModel extends BoundPropertyObject implements Model
 	 * @throws IllegalArgumentException if the given content type is not a text content type.
 	 */
 	public static String getPlainText(final String text, final ContentType contentType) { //TODO del or move
-		checkInstance(text, "Text cannot be null");
-		checkInstance(contentType, "Content Type cannot be null.");
+		requireNonNull(text, "Text cannot be null");
+		requireNonNull(contentType, "Content Type cannot be null.");
 		if(!isText(contentType)) { //if the new content type is not a text content type
 			throw new IllegalArgumentException("Content type " + contentType + " is not a text content type.");
 		}

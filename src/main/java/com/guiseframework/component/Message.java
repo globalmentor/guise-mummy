@@ -16,8 +16,9 @@
 
 package com.guiseframework.component;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.text.Text.*;
 
 import com.globalmentor.java.Objects;
@@ -81,7 +82,7 @@ public class Message extends AbstractComponent //TODO del component if not neede
 	 * @see #MESSAGE_CONTENT_TYPE_PROPERTY
 	 */
 	public void setMessageContentType(final ContentType newMessageContentType) {
-		checkInstance(newMessageContentType, "Content type cannot be null.");
+		requireNonNull(newMessageContentType, "Content type cannot be null.");
 		if(messageContentType != newMessageContentType) { //if the value is really changing
 			final ContentType oldMessageContentType = messageContentType; //get the old value
 			if(!isText(newMessageContentType)) { //if the new content type is not a text content type

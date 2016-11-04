@@ -24,6 +24,8 @@ import java.util.*;
 
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Collections.*;
+import static java.util.Objects.*;
+
 import static org.urframework.content.Content.*;
 import static org.urframework.dcmi.DCMI.*;
 
@@ -2160,11 +2162,11 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 				final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ResourceReadDestination resourceDestination,
 				final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) {
 			super(referenceURI, resourceDescription); //construct the parent class
-			this.guiseContainer = checkInstance(guiseContainer, "Guise container cannot be null.");
-			this.guiseApplication = checkInstance(guiseApplication, "Guise application cannot be null.");
-			this.guiseSession = checkInstance(guiseSession, "Guise session cannot be null.");
-			this.resourceDestination = checkInstance(resourceDestination, "Resource destination cannot be null.");
-			this.navigationPath = checkInstance(navigationPath, "Navigation path cannot be null.");
+			this.guiseContainer = requireNonNull(guiseContainer, "Guise container cannot be null.");
+			this.guiseApplication = requireNonNull(guiseApplication, "Guise application cannot be null.");
+			this.guiseSession = requireNonNull(guiseSession, "Guise session cannot be null.");
+			this.resourceDestination = requireNonNull(resourceDestination, "Resource destination cannot be null.");
+			this.navigationPath = requireNonNull(navigationPath, "Navigation path cannot be null.");
 			this.bookmark = bookmark;
 			this.referrerURI = referrerURI;
 		}

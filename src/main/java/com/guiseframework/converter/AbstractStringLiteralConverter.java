@@ -20,7 +20,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.net.EmailAddress;
@@ -71,7 +71,7 @@ public abstract class AbstractStringLiteralConverter<V> extends AbstractConverte
 	@SuppressWarnings("unchecked")
 	//we check the value class before generic casting
 	public static <VV> Converter<VV, String> getInstance(final Class<VV> valueClass) {
-		checkInstance(valueClass, "Value class cannot be null.");
+		requireNonNull(valueClass, "Value class cannot be null.");
 		if(char[].class.isAssignableFrom(valueClass)) { //char[]
 			return (Converter<VV, String>)new CharArrayStringLiteralConverter();
 		} else if(Boolean.class.isAssignableFrom(valueClass)) { //Boolean

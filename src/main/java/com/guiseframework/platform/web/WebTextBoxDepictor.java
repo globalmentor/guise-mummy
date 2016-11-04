@@ -20,12 +20,13 @@ import java.io.*;
 import java.net.URI;
 import java.util.*;
 
+import static java.util.Objects.*;
+
 import javax.xml.parsers.*;
 
 import com.globalmentor.collections.*;
 import com.globalmentor.net.ContentType;
 
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.CharSequences.*;
 
 import com.globalmentor.log.Log;
@@ -267,8 +268,8 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 		 * @param document The cached XML document.
 		 */
 		public CachedDocument(final String text, final Document document) {
-			this.text = checkInstance(text, "Text cannot be null.");
-			this.document = checkInstance(document, "Document cannot be null.");
+			this.text = requireNonNull(text, "Text cannot be null.");
+			this.document = requireNonNull(document, "Document cannot be null.");
 		}
 	}
 

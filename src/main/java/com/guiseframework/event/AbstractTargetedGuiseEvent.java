@@ -16,7 +16,7 @@
 
 package com.guiseframework.event;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.event.TargetedEvent;
 
@@ -51,7 +51,7 @@ public class AbstractTargetedGuiseEvent extends AbstractGuiseEvent implements Ta
 	 */
 	public AbstractTargetedGuiseEvent(final Object source, final Object target) {
 		super(source); //construct the parent class
-		this.target = checkInstance(target, "Event target object cannot be null."); //save the target
+		this.target = requireNonNull(target, "Event target object cannot be null."); //save the target
 	}
 
 }

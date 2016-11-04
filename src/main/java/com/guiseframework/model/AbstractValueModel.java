@@ -19,10 +19,10 @@ package com.guiseframework.model;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.beans.GenericPropertyChangeEvent;
 import com.guiseframework.validator.*;
-
-import static com.globalmentor.java.Objects.*;
 
 /**
  * An abstract implementation of a model representing a value. A derived class need only implement the value access methods.
@@ -62,7 +62,7 @@ public abstract class AbstractValueModel<V> extends AbstractModel implements Val
 	 * @throws NullPointerException if the given value class is <code>null</code>.
 	 */
 	public AbstractValueModel(final Class<V> valueClass) {
-		this.valueClass = checkInstance(valueClass, "Value class cannot be null."); //store the value class
+		this.valueClass = requireNonNull(valueClass, "Value class cannot be null."); //store the value class
 	}
 
 	/**

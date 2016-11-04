@@ -17,8 +17,9 @@
 package com.guiseframework.validator;
 
 import static java.util.Collections.*;
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 
 import java.util.*;
 
@@ -51,7 +52,7 @@ public class PANValidator extends AbstractValidator<PAN> { //TODO add http://www
 	 * @see #VALID_PRODUCTS_PROPERTY
 	 */
 	public void setValidProducts(final Set<Product> newValidProducts) {
-		if(!validProducts.equals(checkInstance(newValidProducts, "Valid products cannot be null."))) { //if the value is really changing
+		if(!validProducts.equals(requireNonNull(newValidProducts, "Valid products cannot be null."))) { //if the value is really changing
 			final Set<Product> oldValidProducts = validProducts; //get the current value
 			this.validProducts = unmodifiableSet(new HashSet<Product>(newValidProducts)); //create a new unmodifiable copy set of valid products
 			firePropertyChange(VALID_PRODUCTS_PROPERTY, oldValidProducts, validProducts);
@@ -66,7 +67,7 @@ public class PANValidator extends AbstractValidator<PAN> { //TODO add http://www
 	 */
 	public void setValidProducts(final Product... validProducts) {
 		final Set<Product> validProductSet = new HashSet<Product>(); //create a new set of valid products
-		addAll(validProductSet, checkInstance(validProducts, "Valid products cannot be null.")); //add all the specified valid products to our set
+		addAll(validProductSet, requireNonNull(validProducts, "Valid products cannot be null.")); //add all the specified valid products to our set
 		setValidProducts(validProductSet); //set the valid products
 	}
 
@@ -96,7 +97,7 @@ public class PANValidator extends AbstractValidator<PAN> { //TODO add http://www
 	public PANValidator(final boolean valueRequired, final Product... validProducts) {
 		super(valueRequired); //construct the parent class
 		final Set<Product> validProductSet = new HashSet<Product>(); //create a new set of valid products
-		addAll(validProductSet, checkInstance(validProducts, "Valid products cannot be null.")); //add all the specified valid products to our set
+		addAll(validProductSet, requireNonNull(validProducts, "Valid products cannot be null.")); //add all the specified valid products to our set
 		this.validProducts = unmodifiableSet(validProductSet); //save the set of valid products
 	}
 

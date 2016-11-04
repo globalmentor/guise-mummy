@@ -18,13 +18,14 @@ package com.guiseframework.model;
 
 import java.beans.PropertyVetoException;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.beans.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.FlowOrientation;
 import com.guiseframework.event.*;
 import com.guiseframework.prototype.*;
 
-import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.theme.Theme.*;
 
 /**
@@ -89,7 +90,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 	 * @throws NullPointerException if the given list select model is <code>null</code>.
 	 */
 	public AbstractListSelectEditor(final ListSelectModel<V> listSelectModel) {
-		this.listSelectModel = checkInstance(listSelectModel, "List select model cannot be null.");
+		this.listSelectModel = requireNonNull(listSelectModel, "List select model cannot be null.");
 		listSelectModel.addListListener(new ListListener<V>() { //listen to the list being modified
 
 			@Override

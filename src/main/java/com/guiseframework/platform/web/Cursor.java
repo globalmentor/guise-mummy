@@ -18,7 +18,9 @@ package com.guiseframework.platform.web;
 
 import java.net.URI;
 import java.util.*;
+
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.io.Images;
 import com.globalmentor.lex.Identifier;
@@ -30,7 +32,6 @@ import com.guiseframework.GuiseApplication;
 
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Enums.*;
-import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.GuiseApplication.*;
 
 /**
@@ -94,7 +95,7 @@ public enum Cursor implements Identifier {
 	 * @throws NullPointerException if the given CSS cursor is <code>null</code>.
 	 */
 	private Cursor(final CSS.Cursor cssCursor) {
-		this.cssCursor = checkInstance(cssCursor, "CSS cursor cannot be null.");
+		this.cssCursor = requireNonNull(cssCursor, "CSS cursor cannot be null.");
 	}
 
 	/**
@@ -104,7 +105,7 @@ public enum Cursor implements Identifier {
 	 * @throws NullPointerException if the given orientation is <code>null</code>.
 	 */
 	public CSS.Cursor getCSSCursor(final Orientation orientation) {
-		checkInstance(orientation, "Orientation cannot be null.");
+		requireNonNull(orientation, "Orientation cannot be null.");
 		final CompassPoint resizeCompassPoint; //we'll determine a esize compass point if needed
 		switch(this) {
 			case RESIZE_LINE_NEAR:

@@ -16,10 +16,11 @@
 
 package com.guiseframework.component.transfer;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.net.ContentType;
 
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 
 /**
  * An abstract object that can be transferred, such as between components using drag and drop.
@@ -69,6 +70,6 @@ public abstract class AbstractTransferable<S> implements Transferable<S> {
 	 * @throws NullPointerException if the provided source is <code>null</code>.
 	 */
 	public AbstractTransferable(final S source) {
-		this.source = checkInstance(source, "Source cannot be null.");
+		this.source = requireNonNull(source, "Source cannot be null.");
 	}
 }

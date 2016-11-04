@@ -16,7 +16,7 @@
 
 package com.guiseframework.component;
 
-import static com.globalmentor.java.Objects.checkInstance;
+import static java.util.Objects.*;
 
 import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
 import com.globalmentor.beans.GenericPropertyChangeEvent;
@@ -136,7 +136,7 @@ public abstract class AbstractCompositeStateControl<T, S extends AbstractComposi
 	 */
 	public AbstractCompositeStateControl(final InfoModel infoModel, final Enableable enableable) {
 		super(infoModel); //construct the parent class
-		this.enableable = checkInstance(enableable, "Enableable object cannot be null."); //save the enableable object
+		this.enableable = requireNonNull(enableable, "Enableable object cannot be null."); //save the enableable object
 		if(enableable != infoModel) { //if the enableable and the info model are two different objects (we don't want to repeat property change events twice) TODO eventually just listen to specific events for each object
 			this.enableable.addPropertyChangeListener(getRepeatPropertyChangeListener()); //listen and repeat all property changes of the enableable object
 		}

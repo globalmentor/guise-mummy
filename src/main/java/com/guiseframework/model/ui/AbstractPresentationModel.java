@@ -19,6 +19,8 @@ package com.guiseframework.model.ui;
 import java.net.URI;
 import java.util.*;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.java.Objects;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
@@ -29,7 +31,6 @@ import com.guiseframework.style.FontStyle;
 import com.guiseframework.style.LineStyle;
 
 import static com.globalmentor.java.Arrays.*;
-import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.theme.Theme.*;
 
 /**
@@ -99,7 +100,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 
 	@Override
 	public void setBorderColor(final Border border, final Color newBorderColor) {
-		final int borderOrdinal = checkInstance(border, "Border cannot be null").ordinal(); //get the ordinal of the border
+		final int borderOrdinal = requireNonNull(border, "Border cannot be null").ordinal(); //get the ordinal of the border
 		final Color oldBorderColor = borderColors[borderOrdinal]; //get the old value
 		if(!Objects.equals(oldBorderColor, newBorderColor)) { //if the value is really changing
 			borderColors[borderOrdinal] = newBorderColor; //actually change the value
@@ -175,9 +176,9 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 
 	@Override
 	public void setBorderExtent(final Border border, final Extent newBorderExtent) {
-		final int borderOrdinal = checkInstance(border, "Border cannot be null").ordinal(); //get the ordinal of the border
+		final int borderOrdinal = requireNonNull(border, "Border cannot be null").ordinal(); //get the ordinal of the border
 		final Extent oldBorderExtent = borderExtents[borderOrdinal]; //get the old value
-		if(!oldBorderExtent.equals(checkInstance(newBorderExtent, "Border extent cannot be null."))) { //if the value is really changing
+		if(!oldBorderExtent.equals(requireNonNull(newBorderExtent, "Border extent cannot be null."))) { //if the value is really changing
 			borderExtents[borderOrdinal] = newBorderExtent; //actually change the value
 			firePropertyChange(BORDER_EXTENT_PROPERTIES[borderOrdinal], oldBorderExtent, newBorderExtent); //indicate that the value changed
 		}
@@ -251,9 +252,9 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 
 	@Override
 	public void setBorderStyle(final Border border, final LineStyle newBorderStyle) {
-		final int borderOrdinal = checkInstance(border, "Border cannot be null").ordinal(); //get the ordinal of the border
+		final int borderOrdinal = requireNonNull(border, "Border cannot be null").ordinal(); //get the ordinal of the border
 		final LineStyle oldBorderStyle = borderStyles[borderOrdinal]; //get the old value
-		if(oldBorderStyle != checkInstance(newBorderStyle, "Border style cannot be null.")) { //if the value is really changing
+		if(oldBorderStyle != requireNonNull(newBorderStyle, "Border style cannot be null.")) { //if the value is really changing
 			borderStyles[borderOrdinal] = newBorderStyle; //actually change the value
 			firePropertyChange(BORDER_STYLE_PROPERTIES[borderOrdinal], oldBorderStyle, newBorderStyle); //indicate that the value changed
 		}
@@ -327,9 +328,9 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 
 	@Override
 	public void setCornerArcSize(final Corner corner, final Dimensions newCornerArcSize) {
-		final int cornerOrdinal = checkInstance(corner, "Corner cannot be null").ordinal(); //get the ordinal of the corner
+		final int cornerOrdinal = requireNonNull(corner, "Corner cannot be null").ordinal(); //get the ordinal of the corner
 		final Dimensions oldCornerArcSize = cornerArcSizes[cornerOrdinal]; //get the old value
-		if(!Objects.equals(oldCornerArcSize, checkInstance(newCornerArcSize, "Corner arc size cannot be null"))) { //if the value is really changing TODO decide if null dimensions should be accepted
+		if(!Objects.equals(oldCornerArcSize, requireNonNull(newCornerArcSize, "Corner arc size cannot be null"))) { //if the value is really changing TODO decide if null dimensions should be accepted
 			cornerArcSizes[cornerOrdinal] = newCornerArcSize; //actually change the value
 			firePropertyChange(CORNER_ARC_SIZE_PROPERTIES[cornerOrdinal], oldCornerArcSize, newCornerArcSize); //indicate that the value changed
 		}
@@ -372,7 +373,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 
 	@Override
 	public void setCursor(final URI newCursor) {
-		if(!cursor.equals(checkInstance(newCursor, "Cursor URI cannot be null."))) { //if the value is really changing
+		if(!cursor.equals(requireNonNull(newCursor, "Cursor URI cannot be null."))) { //if the value is really changing
 			final URI oldCursor = cursor; //get the old value
 			cursor = newCursor; //actually change the value
 			firePropertyChange(CURSOR_PROPERTY, oldCursor, newCursor); //indicate that the value changed
@@ -408,7 +409,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 
 	@Override
 	public void setExtent(final Flow flow, final Extent newExtent) {
-		final int flowOrdinal = checkInstance(flow, "Flow cannot be null").ordinal(); //get the ordinal of the flow
+		final int flowOrdinal = requireNonNull(flow, "Flow cannot be null").ordinal(); //get the ordinal of the flow
 		final Extent oldExtent = extents[flowOrdinal]; //get the old value
 		if(!Objects.equals(oldExtent, newExtent)) { //if the value is really changing
 			extents[flowOrdinal] = newExtent; //actually change the value
@@ -470,7 +471,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 
 	@Override
 	public void setFontStyle(final FontStyle newFontStyle) {
-		if(fontStyle != checkInstance(newFontStyle, "Font style cannot be null.")) { //if the value is really changing
+		if(fontStyle != requireNonNull(newFontStyle, "Font style cannot be null.")) { //if the value is really changing
 			final FontStyle oldFontStyle = fontStyle; //get the current value
 			fontStyle = newFontStyle; //update the value
 			firePropertyChange(FONT_STYLE_PROPERTY, oldFontStyle, newFontStyle);
@@ -538,7 +539,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 
 	@Override
 	public void setLabelFontStyle(final FontStyle newLabelFontStyle) {
-		if(labelFontStyle != checkInstance(newLabelFontStyle, "Label font style cannot be null.")) { //if the value is really changing
+		if(labelFontStyle != requireNonNull(newLabelFontStyle, "Label font style cannot be null.")) { //if the value is really changing
 			final FontStyle oldLabelFontStyle = labelFontStyle; //get the current value
 			labelFontStyle = newLabelFontStyle; //update the value
 			firePropertyChange(LABEL_FONT_STYLE_PROPERTY, oldLabelFontStyle, newLabelFontStyle);
@@ -620,9 +621,9 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 
 	@Override
 	public void setMarginExtent(final Border border, final Extent newMarginExtent) {
-		final int borderOrdinal = checkInstance(border, "Border cannot be null").ordinal(); //get the ordinal of the border
+		final int borderOrdinal = requireNonNull(border, "Border cannot be null").ordinal(); //get the ordinal of the border
 		final Extent oldMarginExtent = marginExtents[borderOrdinal]; //get the old value
-		if(!oldMarginExtent.equals(checkInstance(newMarginExtent, "margin extent cannot be null."))) { //if the value is really changing
+		if(!oldMarginExtent.equals(requireNonNull(newMarginExtent, "margin extent cannot be null."))) { //if the value is really changing
 			marginExtents[borderOrdinal] = newMarginExtent; //actually change the value
 			firePropertyChange(MARGIN_EXTENT_PROPERTIES[borderOrdinal], oldMarginExtent, newMarginExtent); //indicate that the value changed
 		}
@@ -716,9 +717,9 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 
 	@Override
 	public void setPaddingExtent(final Border border, final Extent newPaddingExtent) {
-		final int borderOrdinal = checkInstance(border, "Border cannot be null").ordinal(); //get the ordinal of the border
+		final int borderOrdinal = requireNonNull(border, "Border cannot be null").ordinal(); //get the ordinal of the border
 		final Extent oldPaddingExtent = paddingExtents[borderOrdinal]; //get the old value
-		if(!oldPaddingExtent.equals(checkInstance(newPaddingExtent, "Padding extent cannot be null."))) { //if the value is really changing
+		if(!oldPaddingExtent.equals(requireNonNull(newPaddingExtent, "Padding extent cannot be null."))) { //if the value is really changing
 			paddingExtents[borderOrdinal] = newPaddingExtent; //actually change the value
 			firePropertyChange(PADDING_EXTENT_PROPERTIES[borderOrdinal], oldPaddingExtent, newPaddingExtent); //indicate that the value changed
 		}

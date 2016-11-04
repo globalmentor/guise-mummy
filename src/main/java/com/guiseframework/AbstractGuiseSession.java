@@ -21,7 +21,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.security.Principal;
 import java.text.Collator;
-import java.text.MessageFormat;
 
 import static java.nio.charset.StandardCharsets.*;
 import static java.text.MessageFormat.*;
@@ -33,6 +32,7 @@ import org.urframework.*;
 import org.urframework.io.AbstractTURFIO;
 
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.collections.DecoratorReadWriteLockMap;
@@ -62,7 +62,6 @@ import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Conditions.unexpected;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.TextFormatter.*;
 import static com.guiseframework.Resources.*;
@@ -148,7 +147,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	@Override
 	public void setLogWriter(final Writer logWriter) {
-		this.logWriter = checkInstance(logWriter, "Log writer cannot be null.");
+		this.logWriter = requireNonNull(logWriter, "Log writer cannot be null.");
 	}
 
 	/** The depiction base URI of the session. */
@@ -206,7 +205,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	@Override
 	public URFResource getPreferences(final Class<?> objectClass) throws IOException {
-		URFResource preferences = classPreferencesMap.get(checkInstance(objectClass, "Class cannot be null.")); //get the preferences stored in the map
+		URFResource preferences = classPreferencesMap.get(requireNonNull(objectClass, "Class cannot be null.")); //get the preferences stored in the map
 		if(preferences == null) { //if no preferences are stored in the map
 			preferences = new DefaultURFResource(); //create a default set of preference properties				
 			/*TODO del if we decide to store resource copies; change map to concurrent map
@@ -230,8 +229,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	@Override
 	public void setPreferences(final Class<?> objectClass, final URFResource preferences) throws IOException {
-		classPreferencesMap.put(checkInstance(objectClass, "Class cannot be null."),
-				new DefaultURFResource(checkInstance(preferences, "Preferences cannot be null."))); //store a copy of the preferences in the map
+		classPreferencesMap.put(requireNonNull(objectClass, "Class cannot be null."),
+				new DefaultURFResource(requireNonNull(preferences, "Preferences cannot be null."))); //store a copy of the preferences in the map
 	}
 
 	/** The platform on which Guise objects are depicted. */
@@ -271,7 +270,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	public void setTimeZone(final TimeZone newTimeZone) {
 		if(!timeZone.equals(newTimeZone)) { //if the value is really changing (compare their values, rather than identity)
 			final TimeZone oldTimeZone = timeZone; //get the old value
-			timeZone = checkInstance(newTimeZone, "Guise session time zone cannot be null."); //actually change the value
+			timeZone = requireNonNull(newTimeZone, "Guise session time zone cannot be null."); //actually change the value
 			firePropertyChange(TIME_ZONE_PROPERTY, oldTimeZone, newTimeZone); //indicate that the value changed
 		}
 	}
@@ -288,7 +287,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	public void setLocale(final Locale newLocale) {
 		if(!Objects.equals(locale, newLocale)) { //if the value is really changing (compare their values, rather than identity) TODO locale should never be null, so no need to use Objects.equals()
 			final Locale oldLocale = locale; //get the old value
-			locale = checkInstance(newLocale, "Guise session locale cannot be null."); //actually change the value
+			locale = requireNonNull(newLocale, "Guise session locale cannot be null."); //actually change the value
 			releaseResourceBundle(); //release the resource bundle, as the new locale may indicate that new resources should be used
 			firePropertyChange(LOCALE_PROPERTY, oldLocale, newLocale); //indicate that the value changed
 			setOrientation(Orientation.getOrientation(locale)); //update the orientation based upon the new locale
@@ -335,7 +334,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@Override
 	public void setOrientation(final Orientation newOrientation) {
 		if(!Objects.equals(orientation, newOrientation)) { //if the value is really changing
-			final Orientation oldOrientation = checkInstance(orientation, "Orientation cannot be null"); //get the old value
+			final Orientation oldOrientation = requireNonNull(orientation, "Orientation cannot be null"); //get the old value
 			orientation = newOrientation; //actually change the value
 			firePropertyChange(ORIENTATION_PROPERTY, oldOrientation, newOrientation); //indicate that the value changed
 		}
@@ -565,7 +564,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	public void setThemeURI(final URI newThemeURI) {
 		if(!Objects.equals(themeURI, newThemeURI)) { //if the value is really changing
 			final URI oldThemeURI = themeURI; //get the old value
-			themeURI = checkInstance(newThemeURI, "Theme URI cannot be null."); //actually change the value
+			themeURI = requireNonNull(newThemeURI, "Theme URI cannot be null."); //actually change the value
 			theme = null; //release our reference to the current theme
 			firePropertyChange(THEME_URI_PROPERTY, oldThemeURI, newThemeURI); //indicate that the value changed
 		}
@@ -588,9 +587,9 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 */
 	public AbstractGuiseSession(final GuiseApplication application, final Platform platform) {
 		this.uuid = UUID.randomUUID(); //create a UUID for the session
-		this.application = checkInstance(application, "Application cannot be null."); //save the application
+		this.application = requireNonNull(application, "Application cannot be null."); //save the application
 		this.depictionBaseURI = resolve(application.getContainer().getBaseURI(), application.getBasePath().toURI()); //default to a base URI calculated from the application base path resolved to the container's base URI TODO fix to convert from navigation to depiction path
-		this.platform = checkInstance(platform, "Platform cannot be null."); //save the platform
+		this.platform = requireNonNull(platform, "Platform cannot be null."); //save the platform
 		this.themeURI = application.getThemeURI(); //default to the application theme
 		this.locale = application.getLocales().get(0); //default to the first application locale
 		this.timeZone = TimeZone.getDefault(); //default to the default time zone
@@ -753,7 +752,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @throws NullPointerException if the given modal navigation is <code>null</code>.
 	 */
 	protected void pushModalNavigation(final ModalNavigation modalNavigation) {
-		modalNavigationStack.add(checkInstance(modalNavigation, "Modal navigation cannot be null.")); //push the modal navigation onto the top of the stack (the end of the list)
+		modalNavigationStack.add(requireNonNull(modalNavigation, "Modal navigation cannot be null.")); //push the modal navigation onto the top of the stack (the end of the list)
 	}
 
 	/** @return The modal navigation on the top of the stack, or <code>null</code> if there are no modal navigations. */
@@ -848,7 +847,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	@Override
 	public void setNavigationPath(final URIPath navigationPath) {
-		if(!Objects.equals(this.navigationPath, checkInstance(navigationPath, "Navigation path cannot be null."))) { //if the navigation path is really changing
+		if(!Objects.equals(this.navigationPath, requireNonNull(navigationPath, "Navigation path cannot be null."))) { //if the navigation path is really changing
 			if(!getApplication().hasDestination(navigationPath)) { //if no destination is associated with the given navigation path
 				throw new IllegalArgumentException("Unknown navigation path: " + navigationPath);
 			}
@@ -962,7 +961,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@Override
 	public void navigate(final URI uri, final String viewportID) {
 		//com.globalmentor.log.Log.info("Navigating: ", uri, viewportID);
-		requestedNavigation = new Navigation(getNavigationPath().toURI(), checkInstance(uri, "URI cannot be null."), viewportID); //create new requested navigation
+		requestedNavigation = new Navigation(getNavigationPath().toURI(), requireNonNull(uri, "URI cannot be null."), viewportID); //create new requested navigation
 	}
 
 	@Override
@@ -979,7 +978,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@Override
 	public void navigateModal(final URI uri, final ModalNavigationListener modalListener) {
 		requestedNavigation = new ModalNavigation(getApplication().resolveURI(getNavigationPath().toURI()),
-				getApplication().resolveURI(checkInstance(uri, "URI cannot be null.")), modalListener); //resolve the URI against the application context path
+				getApplication().resolveURI(requireNonNull(uri, "URI cannot be null.")), modalListener); //resolve the URI against the application context path
 	}
 
 	/**
@@ -1133,7 +1132,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 */
 	@Override
 	public void notify(final Runnable afterNotify, final Notification... notifications) {
-		if(checkInstance(notifications, "Notifications cannot be null.").length == 0) { //if no notifications were given
+		if(requireNonNull(notifications, "Notifications cannot be null.").length == 0) { //if no notifications were given
 			throw new IllegalArgumentException("No notifications were given.");
 		}
 		final Runnable enumerateNotifications = new Runnable() { //create code for notifying all notifications, including the extra one we were given
@@ -1191,7 +1190,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	@Override
 	public void notify(final Runnable afterNotify, final Throwable... errors) {
-		final int errorCount = checkInstance(errors, "Errors cannot be null").length; //see how many errors there are (we'll let the other methods check for a non-empty array)
+		final int errorCount = requireNonNull(errors, "Errors cannot be null").length; //see how many errors there are (we'll let the other methods check for a non-empty array)
 		final Notification[] notifications = new Notification[errorCount]; //create an array of as many notifications as are errors
 		for(int i = 0; i < errorCount; ++i) { //for each error
 			notifications[i] = new Notification(errors[i]); //create a new notification for this error

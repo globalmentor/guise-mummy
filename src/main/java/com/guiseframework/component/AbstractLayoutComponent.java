@@ -18,12 +18,12 @@ package com.guiseframework.component;
 
 import java.io.IOException;
 
+import static java.util.Objects.*;
+
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.model.*;
 import com.guiseframework.theme.Theme;
-
-import static com.globalmentor.java.Objects.*;
 
 /**
  * Abstract implementation of a layout component. Iterating over child components is thread safe.
@@ -81,7 +81,7 @@ public abstract class AbstractLayoutComponent extends AbstractListCompositeCompo
 	 * @see #LAYOUT_PROPERTY
 	 */
 	protected <T extends Constraints> void setLayout(final Layout<T> newLayout) {
-		if(layout != checkInstance(newLayout, "Layout cannot be null.")) { //if the value is really changing
+		if(layout != requireNonNull(newLayout, "Layout cannot be null.")) { //if the value is really changing
 			final Layout<?> oldLayout = layout; //get the old value
 			oldLayout.setOwner(null); //tell the old layout it is no longer installed
 			layout = newLayout; //actually change the value
@@ -128,7 +128,7 @@ public abstract class AbstractLayoutComponent extends AbstractListCompositeCompo
 	 */
 	public AbstractLayoutComponent(final InfoModel infoModel, final Layout<? extends Constraints> layout) {
 		super(infoModel); //construct the parent class
-		this.layout = checkInstance(layout, "Layout cannot be null."); //save the layout
+		this.layout = requireNonNull(layout, "Layout cannot be null."); //save the layout
 		layout.setOwner(this); //tell the layout which container owns it
 	}
 

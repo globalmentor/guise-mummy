@@ -17,8 +17,7 @@
 package com.guiseframework.validator;
 
 import static java.text.MessageFormat.*;
-
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import static com.guiseframework.Resources.*;
 import com.guiseframework.event.GuiseBoundPropertyObject;
@@ -61,7 +60,7 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 
 	@Override
 	public void setInvalidValueMessage(final String newInvalidValueMessage) {
-		if(!invalidValueMessage.equals(checkInstance(newInvalidValueMessage, "Invalid value message cannot be null."))) { //if the value is really changing
+		if(!invalidValueMessage.equals(requireNonNull(newInvalidValueMessage, "Invalid value message cannot be null."))) { //if the value is really changing
 			final String oldInvalidValueMessage = invalidValueMessage; //get the old value
 			invalidValueMessage = newInvalidValueMessage; //actually change the value
 			firePropertyChange(INVALID_VALUE_MESSAGE_PROPERTY, oldInvalidValueMessage, newInvalidValueMessage); //indicate that the value changed
@@ -78,7 +77,7 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 
 	@Override
 	public void setValueRequiredMessage(final String newValueRequiredMessage) {
-		if(!valueRequiredMessage.equals(checkInstance(newValueRequiredMessage, "Value required message cannot be null."))) { //if the value is really changing
+		if(!valueRequiredMessage.equals(requireNonNull(newValueRequiredMessage, "Value required message cannot be null."))) { //if the value is really changing
 			final String oldValueRequiredMessage = valueRequiredMessage; //get the old value
 			valueRequiredMessage = newValueRequiredMessage; //actually change the value
 			firePropertyChange(VALUE_REQUIRED_MESSAGE_PROPERTY, oldValueRequiredMessage, newValueRequiredMessage); //indicate that the value changed

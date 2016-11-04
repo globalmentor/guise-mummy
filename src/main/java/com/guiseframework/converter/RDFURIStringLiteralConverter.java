@@ -18,7 +18,7 @@ package com.guiseframework.converter;
 
 import java.net.URI;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.rdf.RDFName;
 import com.globalmentor.rdf.RDFXMLGenerator;
@@ -81,7 +81,7 @@ public class RDFURIStringLiteralConverter extends DefaultStringLiteralConverter<
 	 */
 	public RDFURIStringLiteralConverter(final RDFXMLGenerator rdfXMLGenerator) {
 		super(URI.class); //construct the parent class
-		this.rdfXMLGenerator = checkInstance(rdfXMLGenerator, "RDF XML generator cannot be null.");
+		this.rdfXMLGenerator = requireNonNull(rdfXMLGenerator, "RDF XML generator cannot be null.");
 	}
 
 	@Override

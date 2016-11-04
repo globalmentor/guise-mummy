@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.model.TaskState;
 import com.guiseframework.Bookmark;
@@ -64,7 +66,7 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 
 	@Override
 	public void receive(URI destinationURI, final Bookmark destinationBookmark) {
-		URI receiveResourceURI = getSession().getApplication().resolveURI(checkInstance(destinationURI, "Destination URI cannot be null.")); //resolve the URI
+		URI receiveResourceURI = getSession().getApplication().resolveURI(requireNonNull(destinationURI, "Destination URI cannot be null.")); //resolve the URI
 		if(destinationBookmark != null) { //if a bookmark was provided
 			receiveResourceURI = URI.create(receiveResourceURI.toString() + destinationBookmark.toString()); //append the bookmark query
 		}

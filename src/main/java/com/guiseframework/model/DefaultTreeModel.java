@@ -16,7 +16,7 @@
 
 package com.guiseframework.model;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.java.Objects;
 import com.guiseframework.event.*;
@@ -65,7 +65,7 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel //TODO 
 
 	@Override
 	public void setRootNode(final TreeNodeModel<?> newRootNode) {
-		if(!Objects.equals(rootNode, checkInstance(newRootNode, "Root node cannot be null."))) { //if the value is really changing
+		if(!Objects.equals(rootNode, requireNonNull(newRootNode, "Root node cannot be null."))) { //if the value is really changing
 			final TreeNodeModel<?> oldRootNode = rootNode; //get the old value
 			//TODO del when works				oldRootNode.removePropertyChangeListener(treeNodePropertyChangeListener);	//stop listening for bubbled property change events from tree nodes in the old hierarchy
 			oldRootNode.removePropertyChangeListener(getRepeatPropertyChangeListener()); //stop listening for bubbled property change events from tree nodes in the old hierarchy
@@ -112,7 +112,7 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel //TODO 
 	 * @throws NullPointerException if the given root node is <code>null</code>.
 	 */
 	public DefaultTreeModel(final TreeNodeModel<?> rootNode) {
-		this.rootNode = checkInstance(rootNode, "Root node cannot be null."); //save the root node
+		this.rootNode = requireNonNull(rootNode, "Root node cannot be null."); //save the root node
 		//TODO del when works		this.rootNode.addPropertyChangeListener(treeNodePropertyChangeListener);	//start listening for bubbled property change events from tree nodes
 		this.rootNode.addPropertyChangeListener(getRepeatPropertyChangeListener()); //start listening for bubbled property change events from tree nodes
 		this.rootNode.addActionListener(repeatActionListener); //start listening for bubbled action events from tree nodes

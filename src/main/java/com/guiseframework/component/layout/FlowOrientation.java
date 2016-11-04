@@ -18,10 +18,11 @@ package com.guiseframework.component.layout;
 
 import java.net.URI;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.util.StringTemplate;
 import com.guiseframework.geometry.*;
 
-import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.Resources.*;
 
 /**
@@ -78,8 +79,8 @@ public enum FlowOrientation {
 	 * @throws NullPointerException if the given axis and/or direction is <code>null</code>.
 	 */
 	private FlowOrientation(final Axis axis, final Flow.Direction direction) {
-		this.axis = checkInstance(axis, "Axis cannot be null.");
-		this.direction = checkInstance(direction, "Direction cannot be null.");
+		this.axis = requireNonNull(axis, "Axis cannot be null.");
+		this.direction = requireNonNull(direction, "Direction cannot be null.");
 		switch(axis) { //see which axis this is
 			case X:
 				switch(direction) { //see which direction this is

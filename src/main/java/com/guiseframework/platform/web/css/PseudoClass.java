@@ -16,7 +16,8 @@
 
 package com.guiseframework.platform.web.css;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
+
 import static com.globalmentor.w3c.spec.CSS.*;
 
 /**
@@ -39,7 +40,7 @@ public class PseudoClass implements SimpleSelector, Comparable<PseudoClass> {
 	 * @throws NullPointerException if the given pseudo class name is <code>null</code>.
 	 */
 	public PseudoClass(final String pseudoClassName) {
-		this.pseudoClassName = checkInstance(pseudoClassName, "Pseudo class name cannot be null.");
+		this.pseudoClassName = requireNonNull(pseudoClassName, "Pseudo class name cannot be null.");
 	}
 
 	@Override

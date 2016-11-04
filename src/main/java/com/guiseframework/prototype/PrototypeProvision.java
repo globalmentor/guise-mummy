@@ -16,7 +16,7 @@
 
 package com.guiseframework.prototype;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.log.Log;
 import com.globalmentor.model.AbstractHashObject;
@@ -143,7 +143,7 @@ public class PrototypeProvision<P extends Prototype> extends AbstractHashObject 
 	 *           inclusive.
 	 */
 	public PrototypeProvision(final PrototypeProvision<?> parentPrototypeProvision, final P prototype, final int order, final boolean isMenu, final boolean isTool) {
-		super(parentPrototypeProvision, checkInstance(prototype, "Prototype cannot be null."), Integer.valueOf(order)); //construct the parent class
+		super(parentPrototypeProvision, requireNonNull(prototype, "Prototype cannot be null."), Integer.valueOf(order)); //construct the parent class
 		if(order != NO_ORDER && (order < MIN_ORDER || order > MAX_ORDER)) { //if the order is invalid
 			throw new IllegalArgumentException("Invalid order: " + order);
 		}

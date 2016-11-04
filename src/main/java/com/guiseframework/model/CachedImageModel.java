@@ -19,8 +19,9 @@ package com.guiseframework.model;
 import java.io.IOException;
 import java.net.URI;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.cache.*;
 import com.globalmentor.java.Objects;
@@ -173,7 +174,7 @@ public class CachedImageModel<Q, V> extends DefaultImageModel implements Pending
 	 * @throws NullPointerException if the given cache is <code>null</code>.
 	 */
 	public CachedImageModel(final Cache<Q, V> cache, final URI cachedImageURI) {
-		this.cache = checkInstance(cache, "Cache cannot be null.");
+		this.cache = requireNonNull(cache, "Cache cannot be null.");
 		this.cachedImageURI = cachedImageURI; //save the cached image URI
 	}
 

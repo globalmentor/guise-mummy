@@ -16,7 +16,7 @@
 
 package com.guiseframework.platform.web;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.guiseframework.input.MouseButton;
 
@@ -53,7 +53,7 @@ public enum Button {
 	 */
 	private Button(final int code, final MouseButton mouseButton) {
 		this.code = code;
-		this.mouseButton = checkInstance(mouseButton, "Mouse button cannot be null.");
+		this.mouseButton = requireNonNull(mouseButton, "Mouse button cannot be null.");
 	}
 
 	/**

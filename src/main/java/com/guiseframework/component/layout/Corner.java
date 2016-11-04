@@ -16,7 +16,7 @@
 
 package com.guiseframework.component.layout;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 /**
  * The four logical flow corners.
@@ -59,8 +59,8 @@ public enum Corner {
 	private Corner(final Border lineBorder, final Border pageBorder) {
 		assert Flow.values().length == 2 : "Corners only support two flows.";
 		borders = new Border[Flow.values().length];
-		borders[Flow.LINE.ordinal()] = checkInstance(lineBorder, "Line border cannot be null.");
-		borders[Flow.PAGE.ordinal()] = checkInstance(pageBorder, "Page border cannot be null.");
+		borders[Flow.LINE.ordinal()] = requireNonNull(lineBorder, "Line border cannot be null.");
+		borders[Flow.PAGE.ordinal()] = requireNonNull(pageBorder, "Page border cannot be null.");
 	}
 
 	/** The corners in [line][page] order. */

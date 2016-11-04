@@ -18,6 +18,7 @@ package com.guiseframework.platform.web;
 
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import java.io.*;
 import java.net.*;
@@ -26,8 +27,6 @@ import java.util.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
-
-import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.collections.DecoratorReadWriteLockCollectionMap;
 import com.globalmentor.collections.DecoratorReadWriteLockMap;
@@ -96,7 +95,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer {
 	 */
 	public HTTPServletGuiseContainer(final URI baseURI, final ServletContext servletContext) {
 		super(baseURI); //construct the parent class
-		this.servletContext = checkInstance(servletContext, "Servlet context cannot be null.");
+		this.servletContext = requireNonNull(servletContext, "Servlet context cannot be null.");
 	}
 
 	/**

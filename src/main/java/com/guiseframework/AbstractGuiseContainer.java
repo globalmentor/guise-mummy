@@ -22,12 +22,13 @@ import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.net.URIPath;
 import com.globalmentor.net.http.HTTPNotFoundException;
 import com.globalmentor.net.http.HTTPResource;
 
 import static com.globalmentor.io.Files.*;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
 import static com.globalmentor.net.URIs.*;
 
@@ -121,7 +122,7 @@ public abstract class AbstractGuiseContainer implements GuiseContainer {
 	 */
 	protected void installApplication(final AbstractGuiseApplication application, final URI baseURI, final File homeDirectory, final File logDirectory,
 			final File tempDirectory) throws IOException {
-		checkInstance(application, "Application cannot be null");
+		requireNonNull(application, "Application cannot be null");
 		checkAbsolute(baseURI);
 		synchronized(applicationMap) { //synchronize installations so that we can check the existence of the base URI in the container
 			if(applicationMap.get(baseURI) != null) { //if there is already an application installed at the given base URI
@@ -142,7 +143,7 @@ public abstract class AbstractGuiseContainer implements GuiseContainer {
 	 * @throws IllegalStateException if the application is not installed in this container.
 	 */
 	protected void uninstallApplication(final AbstractGuiseApplication application) { //TODO add a facility to unregister and remove all sessions associated with the application
-		checkInstance(application, "Application cannot be null");
+		requireNonNull(application, "Application cannot be null");
 		final URI baseURI = application.getBaseURI(); //get the application's base URI
 		if(baseURI == null || application.getContainer() != this) { //if the application has no bsae path or has a different container than this class
 			throw new IllegalStateException("Application installed in a different container.");
@@ -164,13 +165,13 @@ public abstract class AbstractGuiseContainer implements GuiseContainer {
 	 * @throws IllegalArgumentException if the base URI is not absolute or does not end with a slash ('/') character.
 	 */
 	public AbstractGuiseContainer(final URI baseURI) {
-		checkInstance(baseURI, "Application base URI cannot be null");
+		requireNonNull(baseURI, "Application base URI cannot be null");
 		if(!isAbsolutePath(baseURI) || !isCollectionPath(baseURI.getPath())) { //if the base URI isn't absolute and doesn't end with a slash
 			throw new IllegalArgumentException("Container base URI " + baseURI + " is not absolute and does not end with a path separator.");
 		}
 		this.baseURI = baseURI; //store the base URI		
 		basePath = new URIPath(baseURI.getRawPath()); //store the base path
-		checkInstance(basePath, "Application base path cannot be null");
+		requireNonNull(basePath, "Application base path cannot be null");
 		if(!basePath.isAbsolute() || !basePath.isCollection()) { //if the path doesn't begin and end with a slash
 			throw new IllegalArgumentException("Container base path " + basePath + " does not begin and end with a path separator.");
 		}
@@ -183,7 +184,7 @@ public abstract class AbstractGuiseContainer implements GuiseContainer {
 
 	@Override
 	public URI resolveURI(final URI uri) {
-		return getBasePath().resolve(checkInstance(uri, "URI cannot be null.")); //create a URI from the container base path and resolve the given path against it
+		return getBasePath().resolve(requireNonNull(uri, "URI cannot be null.")); //create a URI from the container base path and resolve the given path against it
 	}
 
 	/**

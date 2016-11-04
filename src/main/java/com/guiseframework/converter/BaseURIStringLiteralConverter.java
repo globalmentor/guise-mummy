@@ -18,8 +18,9 @@ package com.guiseframework.converter;
 
 import java.net.URI;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.java.Objects.*;
 
 /**
  * A URI converter that resolves relative URIs to some base URI.
@@ -42,7 +43,7 @@ public class BaseURIStringLiteralConverter extends AbstractURIStringLiteralConve
 	 * @throws NullPointerException if the given base URI is <code>null</code>.
 	 */
 	public BaseURIStringLiteralConverter(final URI baseURI) {
-		this.baseURI = checkInstance(baseURI, "Base URI cannot be null.");
+		this.baseURI = requireNonNull(baseURI, "Base URI cannot be null.");
 	}
 
 	/**

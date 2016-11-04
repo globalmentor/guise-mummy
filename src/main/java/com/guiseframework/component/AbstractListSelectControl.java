@@ -20,8 +20,9 @@ import java.beans.PropertyVetoException;
 import java.lang.reflect.*;
 import java.util.*;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.event.EventListenerManager;
 import com.guiseframework.converter.*;
@@ -59,7 +60,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	public void setValueRepresentationStrategy(final ValueRepresentationStrategy<V> newValueRepresentationStrategy) {
 		if(valueRepresentationStrategy != newValueRepresentationStrategy) { //if the value is really changing
 			final ValueRepresentationStrategy<V> oldValueRepresentationStrategy = valueRepresentationStrategy; //get the old value
-			valueRepresentationStrategy = checkInstance(newValueRepresentationStrategy, "Value representation strategy cannot be null."); //actually change the value
+			valueRepresentationStrategy = requireNonNull(newValueRepresentationStrategy, "Value representation strategy cannot be null."); //actually change the value
 			firePropertyChange(VALUE_REPRESENTATION_STRATEGY_PROPERTY, oldValueRepresentationStrategy, newValueRepresentationStrategy); //indicate that the value changed
 		}
 	}
@@ -90,8 +91,8 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	 * @throws NullPointerException if the given list select model and/or value representation strategy is <code>null</code>.
 	 */
 	public AbstractListSelectControl(final ListSelectModel<V> listSelectModel, final ValueRepresentationStrategy<V> valueRepresentationStrategy) {
-		this.valueRepresentationStrategy = checkInstance(valueRepresentationStrategy, "Value representation strategy cannot be null.");
-		this.listSelectModel = checkInstance(listSelectModel, "List select model cannot be null."); //save the list select model
+		this.valueRepresentationStrategy = requireNonNull(valueRepresentationStrategy, "Value representation strategy cannot be null.");
+		this.listSelectModel = requireNonNull(listSelectModel, "List select model cannot be null."); //save the list select model
 		this.listSelectModel.addPropertyChangeListener(getRepeatPropertyChangeListener()); //listen and repeat all property changes of the list select model
 		this.listSelectModel.addVetoableChangeListener(getRepeatVetoableChangeListener()); //listen and repeat all vetoable changes of the list select model
 		this.listSelectModel.addListListener(new ListListener<V>() { //install a repeater list listener to listen to the decorated model
@@ -563,8 +564,8 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 		 * @throws IllegalArgumentException if the given component class does not have a constructor with a single {@link InfoModel} constructor.
 		 */
 		public ConverterInfoModelValueRepresentationStrategy(final Class<? extends Component> componentClass, final Converter<VV, String> converter) {
-			this.converter = checkInstance(converter, "Converter cannot be null."); //save the converter
-			componentInfoModelConstructor = getCompatiblePublicConstructor(checkInstance(componentClass, "Component class cannot be null."), InfoModel.class); //get the constructor for the component
+			this.converter = requireNonNull(converter, "Converter cannot be null."); //save the converter
+			componentInfoModelConstructor = getCompatiblePublicConstructor(requireNonNull(componentClass, "Component class cannot be null."), InfoModel.class); //get the constructor for the component
 			if(componentInfoModelConstructor == null) { //if there is no appropriate constructor
 				throw new IllegalArgumentException("Component class " + componentClass + " has no constructor with a single info model parameter.");
 			}

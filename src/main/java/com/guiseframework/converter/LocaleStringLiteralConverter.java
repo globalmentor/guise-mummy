@@ -18,7 +18,8 @@ package com.guiseframework.converter;
 
 import java.util.*;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
+
 import static com.globalmentor.model.Locales.*;
 
 /**
@@ -41,7 +42,7 @@ public class LocaleStringLiteralConverter extends AbstractConverter<Locale, Stri
 	 * @throws NullPointerException if the given locale style is <code>null</code>.
 	 */
 	public LocaleStringLiteralConverter(final LocaleStringLiteralStyle style) {
-		this.style = checkInstance(style, "Locale style cannot be null.");
+		this.style = requireNonNull(style, "Locale style cannot be null.");
 	}
 
 	@Override

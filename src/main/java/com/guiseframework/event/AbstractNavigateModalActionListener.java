@@ -18,7 +18,8 @@ package com.guiseframework.event;
 
 import java.net.URI;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
+
 import static com.globalmentor.net.URIs.*;
 
 /**
@@ -55,7 +56,7 @@ public class AbstractNavigateModalActionListener extends AbstractNavigateActionL
 	 */
 	public AbstractNavigateModalActionListener(final URI navigationURI, final ModalNavigationListener modalListener) {
 		super(navigationURI); //construct the parent class
-		this.modalListener = checkInstance(modalListener, "Modal listeners cannot be null");
+		this.modalListener = requireNonNull(modalListener, "Modal listeners cannot be null");
 	}
 
 }

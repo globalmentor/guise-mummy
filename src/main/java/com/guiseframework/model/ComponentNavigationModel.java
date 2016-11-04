@@ -16,7 +16,7 @@
 
 package com.guiseframework.model;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.net.URIPath;
 import com.guiseframework.component.*;
@@ -40,7 +40,7 @@ public class ComponentNavigationModel extends AbstractModel implements Navigatio
 	 * @throws NullPointerException if the given component is <code>null</code>.
 	 */
 	public ComponentNavigationModel(final Component component) {
-		this.component = checkInstance(component);
+		this.component = requireNonNull(component);
 	}
 
 	@Override

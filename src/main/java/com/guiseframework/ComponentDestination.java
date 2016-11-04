@@ -19,8 +19,9 @@ package com.guiseframework;
 import java.net.URI;
 import java.util.regex.Pattern;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.java.Objects;
 import com.globalmentor.net.URIPath;
@@ -85,7 +86,7 @@ public class ComponentDestination extends AbstractDestination {
 	 */
 	public ComponentDestination(final URIPath path, final Class<? extends Component> componentClass, final URI style) {
 		super(path); //construct the parent class
-		this.componentClass = checkInstance(componentClass, "Component class cannot be null."); //store the associated class
+		this.componentClass = requireNonNull(componentClass, "Component class cannot be null."); //store the associated class
 		this.style = style;
 	}
 
@@ -109,7 +110,7 @@ public class ComponentDestination extends AbstractDestination {
 	 */
 	public ComponentDestination(final Pattern pathPattern, final Class<? extends Component> componentClass, final URI style) {
 		super(pathPattern); //construct the parent class
-		this.componentClass = checkInstance(componentClass, "Component class cannot be null."); //store the associated class
+		this.componentClass = requireNonNull(componentClass, "Component class cannot be null."); //store the associated class
 		this.style = style;
 	}
 }

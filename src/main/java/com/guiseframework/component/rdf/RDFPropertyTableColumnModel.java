@@ -18,7 +18,7 @@ package com.guiseframework.component.rdf;
 
 import java.net.URI;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.rdf.*;
 import com.guiseframework.model.DefaultTableColumnModel;
@@ -57,7 +57,7 @@ public class RDFPropertyTableColumnModel<V extends RDFObject> extends DefaultTab
 	 */
 	public RDFPropertyTableColumnModel(final Class<V> valueClass, final URI propertyURI, final String labelText) {
 		super(valueClass, labelText); //construct the parent class
-		this.propertyURI = checkInstance(propertyURI, "Property URI cannot be null.");
+		this.propertyURI = requireNonNull(propertyURI, "Property URI cannot be null.");
 	}
 
 }

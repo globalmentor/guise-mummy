@@ -16,7 +16,7 @@
 
 package com.guiseframework;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import io.csar.*;
 
@@ -46,7 +46,7 @@ public class GuiseSessionThreadGroup extends ThreadGroup implements Concerned {
 	 */
 	public GuiseSessionThreadGroup(final GuiseSession guiseSession) {
 		super("Guise Session Thread Group " + guiseSession.toString()); //construct the parent class TODO improve name
-		this.guiseSession = checkInstance(guiseSession, "Guise session cannot be null.");
+		this.guiseSession = requireNonNull(guiseSession, "Guise session cannot be null.");
 	}
 
 	@Override

@@ -16,8 +16,9 @@
 
 package com.guiseframework.converter;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 import static java.text.MessageFormat.format;
 
 import java.lang.reflect.Constructor;
@@ -46,7 +47,7 @@ public class DefaultStringLiteralConverter<V> extends AbstractStringLiteralConve
 	 * @throws NullPointerException if the given value class is <code>null</code>.
 	 */
 	public DefaultStringLiteralConverter(final Class<V> valueClass) {
-		this.valueClass = checkInstance(valueClass, "Value class cannot be null."); //store the value class
+		this.valueClass = requireNonNull(valueClass, "Value class cannot be null."); //store the value class
 	}
 
 	/**

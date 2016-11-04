@@ -18,7 +18,7 @@ package com.guiseframework.component;
 
 import java.beans.*;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.beans.*;
 import com.guiseframework.component.layout.*;
@@ -112,7 +112,7 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 	/*TODO del if not used; this will require updating the layout
 			public void setLabelComponent(final Component<?> newLabelComponent)
 			{
-				if(labelComponent.equals(checkInstance(newLabelComponent, "Label component cannot be null."))) {	//if the value is really changing
+				if(labelComponent.equals(requireNonNull(newLabelComponent, "Label component cannot be null."))) {	//if the value is really changing
 					final Component<?> oldLabelComponent=labelComponent;	//get the old value
 					labelComponent=newLabelComponent;	//actually change the value
 					firePropertyChange(LABEL_COMPONENT_PROPERTY, oldLabelComponent, newLabelComponent);	//indicate that the value changed
@@ -137,7 +137,7 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 	/*TODO del if not used; this will require updating the layout
 			public void setEditControl(final ValueControl<String, ?> newEditControl)
 			{
-				if(editControl.equals(checkInstance(newEditControl, "Value control cannot be null."))) {	//if the value is really changing
+				if(editControl.equals(requireNonNull(newEditControl, "Value control cannot be null."))) {	//if the value is really changing
 					final ValueControl<String, ?> oldEditControl=editControl;	//get the old value
 					editControl=newEditControl;	//actually change the value
 					firePropertyChange(EDIT_CONTROL_PROPERTY, oldEditControl, newEditControl);	//indicate that the value changed
@@ -187,8 +187,8 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 	 */
 	public AbstractEditComponentTextControl(final EC editedComponent, final String editedProperty, final ValueControl<String> editControl, final Flow flow) {
 		super(new FlowLayout(flow)); //construct the parent class with a flow layout
-		this.editedComponent = checkInstance(editedComponent, "Edited component cannot be null.");
-		this.editControl = checkInstance(editControl, "Edit control cannot be null.");
+		this.editedComponent = requireNonNull(editedComponent, "Edited component cannot be null.");
+		this.editControl = requireNonNull(editControl, "Edit control cannot be null.");
 		this.editedComponent.setDisplayed(true); //display the edited component
 		add(editedComponent); //add the edited component
 		this.editControl.setDisplayed(false); //hide the edit control
@@ -237,7 +237,7 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 			}
 
 		});
-		editedComponent.addPropertyChangeListener(checkInstance(editedProperty, "Edited property cannot be null."), new PropertyChangeListener() { //listen for the edited property changing
+		editedComponent.addPropertyChangeListener(requireNonNull(editedProperty, "Edited property cannot be null."), new PropertyChangeListener() { //listen for the edited property changing
 
 			@Override
 			public void propertyChange(final PropertyChangeEvent propertyChangeEvent) { //if the edited property changes

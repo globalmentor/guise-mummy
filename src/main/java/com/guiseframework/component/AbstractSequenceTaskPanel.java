@@ -16,7 +16,7 @@
 
 package com.guiseframework.component;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.model.SequenceTask;
@@ -134,7 +134,7 @@ public abstract class AbstractSequenceTaskPanel extends AbstractPanel {
 	 */
 	public AbstractSequenceTaskPanel(final SequenceTaskController taskController) {
 		super(new RegionLayout()); //construct the parent class
-		this.taskController = checkInstance(taskController, "Task controller cannot be null.");
+		this.taskController = requireNonNull(taskController, "Task controller cannot be null.");
 		startButton = new Button(taskController.getStartActionPrototype()); //create the buttons
 		previousButton = new Button(taskController.getPreviousActionPrototype());
 		nextButton = new Button(taskController.getNextActionPrototype());

@@ -17,10 +17,11 @@
 package com.guiseframework.platform.web;
 
 import java.util.*;
+
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import static com.globalmentor.collections.Maps.*;
-import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.javascript.JSON;
 import com.globalmentor.model.NameValuePair;
@@ -60,7 +61,7 @@ public class WebChangeDepictEvent extends AbstractWebDepictEvent {
 	 */
 	public WebChangeDepictEvent(final DepictedObject depictedObject, final Map<String, Object> properties) {
 		super(depictedObject); //construct the parent class
-		this.properties = unmodifiableMap(new HashMap<String, Object>(checkInstance(properties, "Properties cannot be null.")));
+		this.properties = unmodifiableMap(new HashMap<String, Object>(requireNonNull(properties, "Properties cannot be null.")));
 	}
 
 	@Override

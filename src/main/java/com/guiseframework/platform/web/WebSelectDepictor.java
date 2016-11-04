@@ -20,6 +20,8 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.*;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Objects.*;
 import com.globalmentor.log.Log;
 
@@ -80,8 +82,8 @@ public class WebSelectDepictor<V, C extends ListSelectControl<V>> extends Abstra
 	 * @throws NullPointerException if the given control and/or selected IDs is <code>null</code>.
 	 */
 	public static <V> void processSelectedIDs(final ListSelectControl<V> selectControl, final String[] selectedIDs) {
-		final WebPlatform platform = (WebPlatform)checkInstance(selectControl, "Component cannot be null.").getSession().getPlatform(); //get the platform
-		checkInstance(selectedIDs, "SelectedIDs cannot be null.");
+		final WebPlatform platform = (WebPlatform)requireNonNull(selectControl, "Component cannot be null.").getSession().getPlatform(); //get the platform
+		requireNonNull(selectedIDs, "SelectedIDs cannot be null.");
 		selectControl.setNotification(null); //clear the component errors; this method may generate new errors
 		final List<Integer> selectedIndexList = new ArrayList<Integer>(selectedIDs.length); //create a list to hold selected indices
 		final ListSelectControl.ValueRepresentationStrategy<V> representationStrategy = selectControl.getValueRepresentationStrategy(); //get the component's value representation strategy

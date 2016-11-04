@@ -18,7 +18,7 @@ package com.guiseframework;
 
 import java.util.regex.Pattern;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.net.URIPath;
 
@@ -45,7 +45,7 @@ public abstract class AbstractReferenceDestination extends AbstractDestination i
 	 */
 	public AbstractReferenceDestination(final URIPath path, final Destination destination) {
 		super(path); //construct the parent class
-		this.destination = checkInstance(destination, "Destination cannot be null.");
+		this.destination = requireNonNull(destination, "Destination cannot be null.");
 	}
 
 	/**
@@ -56,6 +56,6 @@ public abstract class AbstractReferenceDestination extends AbstractDestination i
 	 */
 	public AbstractReferenceDestination(final Pattern pathPattern, final Destination destination) {
 		super(pathPattern); //construct the parent class
-		this.destination = checkInstance(destination, "Destination cannot be null.");
+		this.destination = requireNonNull(destination, "Destination cannot be null.");
 	}
 }

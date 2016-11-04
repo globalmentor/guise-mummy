@@ -17,10 +17,11 @@
 package com.guiseframework.platform.web;
 
 import java.util.*;
+
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import static com.globalmentor.collections.Maps.*;
-import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.model.NameValuePair;
 import com.guiseframework.platform.DepictedObject;
@@ -58,7 +59,7 @@ public class WebCommandDepictEvent<C extends Enum<C> & WebPlatformCommand> exten
 	 */
 	public WebCommandDepictEvent(final DepictedObject depictedObject, final C command, final NameValuePair<String, Object>... parameters) {
 		super(depictedObject); //construct the parent class
-		this.command = checkInstance(command, "Command cannot be null.");
+		this.command = requireNonNull(command, "Command cannot be null.");
 		this.parameters = unmodifiableMap(addAll(new HashMap<String, Object>(parameters.length), parameters)); //add all the parameters to a new map
 	}
 
@@ -71,8 +72,8 @@ public class WebCommandDepictEvent<C extends Enum<C> & WebPlatformCommand> exten
 	 */
 	public WebCommandDepictEvent(final DepictedObject depictedObject, final C command, final Map<String, Object> parameters) {
 		super(depictedObject); //construct the parent class
-		this.command = checkInstance(command, "Command cannot be null.");
-		this.parameters = unmodifiableMap(new HashMap<String, Object>(checkInstance(parameters, "Parameters cannot be null.")));
+		this.command = requireNonNull(command, "Command cannot be null.");
+		this.parameters = unmodifiableMap(new HashMap<String, Object>(requireNonNull(parameters, "Parameters cannot be null.")));
 	}
 
 }

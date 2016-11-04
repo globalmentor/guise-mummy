@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
+import static java.util.Objects.*;
+
 import org.urframework.URFResource;
 
 import static java.util.Collections.*;
@@ -28,8 +30,6 @@ import com.globalmentor.beans.BoundPropertyObject;
 import com.globalmentor.net.URIPath;
 import com.guiseframework.*;
 import com.guiseframework.theme.Theme;
-
-import static com.globalmentor.java.Objects.*;
 
 /**
  * Abstract encapsulation of information related to the current depiction.
@@ -77,8 +77,8 @@ public abstract class AbstractDepictContext extends BoundPropertyObject implemen
 	 * @throws IOException If there was an I/O error loading a needed resource.
 	 */
 	public AbstractDepictContext(final GuiseSession session, final Destination destination) throws IOException {
-		this.session = checkInstance(session, "Session cannot be null."); //save the Guise session
-		this.destination = checkInstance(destination, "Destination cannot be null."); //save the destination
+		this.session = requireNonNull(session, "Session cannot be null."); //save the Guise session
+		this.destination = requireNonNull(destination, "Destination cannot be null."); //save the destination
 		this.platform = session.getPlatform(); //save the platform
 		final GuiseApplication application = session.getApplication(); //get the application
 		final List<URI> styleURIs = new ArrayList<URI>(); //create a new list to hold styles

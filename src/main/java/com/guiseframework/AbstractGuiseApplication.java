@@ -26,6 +26,7 @@ import java.util.*;
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import java.util.concurrent.*;
 
@@ -37,7 +38,6 @@ import org.urframework.*;
 import org.urframework.io.TypedURFResourceTURFIO;
 
 import static com.globalmentor.io.Files.*;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Threads.*;
 import static com.globalmentor.model.Locales.*;
 import static com.globalmentor.net.URIs.*;
@@ -189,7 +189,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	public void setEnvironment(final Environment newEnvironment) {
 		if(!Objects.equals(environment, newEnvironment)) { //if the value is really changing (compare their values, rather than identity)
 			final Environment oldEnvironment = environment; //get the old value
-			environment = checkInstance(newEnvironment, "Guise session environment cannot be null."); //actually change the value
+			environment = requireNonNull(newEnvironment, "Guise session environment cannot be null."); //actually change the value
 			firePropertyChange(ENVIRONMENT_PROPERTY, oldEnvironment, newEnvironment); //indicate that the value changed
 		}
 	}
@@ -208,7 +208,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@Override
 	public void setMailProperties(final Map<?, ?> mailProperties) {
 		checkNotInstalled(); //make sure the application has not been installed
-		this.mailProperties = unmodifiableMap(checkInstance(mailProperties, "Repository cannot be null."));
+		this.mailProperties = unmodifiableMap(requireNonNull(mailProperties, "Repository cannot be null."));
 	}
 
 	/** The mail manager, or <code>null</code> if the application is not installed or there is no mail defined for this application. */
@@ -332,7 +332,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	@Override
 	public GuiseSession getSession(final UUID uuid) {
-		return uuidGuiseSessionMap.get(checkInstance(uuid, "UUID cannot be null.")); //return the Guise session, if any, associted with the given UUID
+		return uuidGuiseSessionMap.get(requireNonNull(uuid, "UUID cannot be null.")); //return the Guise session, if any, associted with the given UUID
 	}
 
 	/**
@@ -492,7 +492,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		 * @throws NullPointerException if the given writer is <code>null</code>.
 		 */
 		public AsynchronousWriterRunnable(final Writer decoratedWriter) {
-			this.decoratedWriter = checkInstance(decoratedWriter, "Decorated writer cannot be null.");
+			this.decoratedWriter = requireNonNull(decoratedWriter, "Decorated writer cannot be null.");
 		}
 
 		@Override
@@ -535,14 +535,14 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 */
 	@Override
 	public void install(final AbstractGuiseContainer container, final URI baseURI, final File homeDirectory, final File logDirectory, final File tempDirectory) {
-		checkInstance(container, "Container cannot be null");
+		requireNonNull(container, "Container cannot be null");
 		checkNotInstalled();
 		Log.info("Installing application", this, "at URI", baseURI);
 		setBaseURI(baseURI); //set the base URI
 		this.container = container; //store the container
-		this.homeDirectory = checkInstance(homeDirectory, "Home directory cannot be null.");
-		this.logDirectory = checkInstance(logDirectory, "Log directory cannot be null.");
-		this.tempDirectory = checkInstance(tempDirectory, "Temporary directory cannot be null.");
+		this.homeDirectory = requireNonNull(homeDirectory, "Home directory cannot be null.");
+		this.logDirectory = requireNonNull(logDirectory, "Log directory cannot be null.");
+		this.tempDirectory = requireNonNull(tempDirectory, "Temporary directory cannot be null.");
 		final DateFormat logFilenameDateFormat = new W3CDateFormat(W3CDateFormat.Style.DATE); //create a formatter for the log filename
 		final String logFilename = addExtension("application-" + logFilenameDateFormat.format(new Date()), Log.NAME_EXTENSION); //create a filename in the form "application-YYYY-MM-DD.log"
 		final File logFile = new File(logDirectory, logFilename); //determine the log file for this application TODO create a custom log configuration that will use rolling log files
@@ -614,7 +614,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	@Override
 	public void setLocales(final List<Locale> newLocales) {
-		checkInstance(newLocales, "Guise application locales cannot be null."); //make sure the list is not null
+		requireNonNull(newLocales, "Guise application locales cannot be null."); //make sure the list is not null
 		if(newLocales.isEmpty()) { //if there are no locales given
 			throw new IllegalArgumentException("Guise application must support at least one locale.");
 		}
@@ -679,7 +679,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	public void setThemeURI(final URI newThemeURI) {
 		if(!Objects.equals(themeURI, newThemeURI)) { //if the value is really changing
 			final URI oldThemeURI = themeURI; //get the old value
-			themeURI = checkInstance(newThemeURI, "Theme URI cannot be null."); //actually change the value
+			themeURI = requireNonNull(newThemeURI, "Theme URI cannot be null."); //actually change the value
 			firePropertyChange(THEME_URI_PROPERTY, oldThemeURI, newThemeURI); //indicate that the value changed
 		}
 	}
@@ -779,7 +779,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	@Override
 	public URIPath resolvePath(final URIPath path) {
-		return getBasePath().resolve(checkInstance(path, "Path cannot be null.")); //resolve the given path against the base path
+		return getBasePath().resolve(requireNonNull(path, "Path cannot be null.")); //resolve the given path against the base path
 	}
 
 	@Override
@@ -787,7 +787,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		if(PATH_SCHEME.equals(uri.getScheme())) { //if this ia a path: URI
 			uri = getPathURIPath(uri).toURI(); //get the URI form of the raw path of the path URI
 		}
-		return getBasePath().resolve(checkInstance(uri, "URI cannot be null.")); //resolve the given URI against the base path
+		return getBasePath().resolve(requireNonNull(uri, "URI cannot be null.")); //resolve the given URI against the base path
 	}
 
 	@Override
@@ -962,7 +962,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	@Override
 	public URIPath createTempAsset(String baseName, final String extension, final GuiseSession restrictionSession) throws IOException {
-		final File tempFile = createTempFile(baseName, checkInstance(extension, "Extension cannot be null."), getTempDirectory(), true); //create a temporary file in the application's temporary directory, specifying that it should be deleted on JVM exit
+		final File tempFile = createTempFile(baseName, requireNonNull(extension, "Extension cannot be null."), getTempDirectory(), true); //create a temporary file in the application's temporary directory, specifying that it should be deleted on JVM exit
 		final String filename = tempFile.getName(); //get the name of the file
 		assert filename.length() > 0 : "Name of generated temporary file is missing.";
 		final TempFileInfo tempFileInfo = new TempFileInfo(tempFile, restrictionSession); //create an object to keep track of the file
@@ -1146,7 +1146,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	@Override
 	public Properties loadProperties(final String propertiesPath) throws IOException {
-		final File propertiesFile = new File(getHomeDirectory(), checkInstance(propertiesPath, "Properties path cannot be null.")); //create the properties file object
+		final File propertiesFile = new File(getHomeDirectory(), requireNonNull(propertiesPath, "Properties path cannot be null.")); //create the properties file object
 		final String extension = getExtension(propertiesFile); //get the extension of the properties file
 		final boolean isXML; //see if this is an XML file
 		if(XML.XML_NAME_EXTENSION.equals(extension)) { //if this is an XML file
@@ -1229,7 +1229,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 */
 	@Override
 	public Set<String> getFacebookAdminIDs(final URIPath navigationPath) {
-		checkInstance(navigationPath);
+		requireNonNull(navigationPath);
 		return getFacebookAdminIDs();
 	}
 
@@ -1252,7 +1252,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 */
 	@Override
 	public String getFacebookAppID(final URIPath navigationPath) {
-		checkInstance(navigationPath);
+		requireNonNull(navigationPath);
 		return getFacebookAppID();
 	}
 
@@ -1285,7 +1285,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		 * @throws NullPointerException if the given writer is <code>null</code>.
 		 */
 		public LogWriterInfo(final Writer writer, final long expireTime) {
-			this.writer = checkInstance(writer, "Writer cannot be null.");
+			this.writer = requireNonNull(writer, "Writer cannot be null.");
 			this.expireTime = expireTime;
 		}
 	}
@@ -1320,7 +1320,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		 * @throws NullPointerException if the given temporary file is <code>null</code>.
 		 */
 		public TempFileInfo(final File tempFile, final GuiseSession restrictionSession) {
-			this.tempFile = checkInstance(tempFile, "Temporary file object cannot be null.");
+			this.tempFile = requireNonNull(tempFile, "Temporary file object cannot be null.");
 			this.restrictionSession = restrictionSession; //save the session, if there is one
 		}
 
@@ -1369,7 +1369,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		 * @throws NullPointerException if the given Guise session is <code>null</code>.
 		 */
 		public GuiseSessionInfo(final GuiseSession guiseSession) {
-			this.guiseSession = checkInstance(guiseSession, "Guise session cannot be null.");
+			this.guiseSession = requireNonNull(guiseSession, "Guise session cannot be null.");
 		}
 
 		@Override

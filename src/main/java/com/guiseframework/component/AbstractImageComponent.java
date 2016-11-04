@@ -18,8 +18,9 @@ package com.guiseframework.component;
 
 import java.net.URI;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Arrays.*;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.ContentTypeConstants.*;
 import static com.globalmentor.net.URIs.*;
 
@@ -73,7 +74,7 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 	 */
 	public AbstractImageComponent(final InfoModel infoModel, final ImageModel imageModel) {
 		super(infoModel); //construct the parent class
-		this.imageModel = checkInstance(imageModel, "Image model cannot be null."); //save the image model
+		this.imageModel = requireNonNull(imageModel, "Image model cannot be null."); //save the image model
 		if(imageModel != infoModel) { //if the models are different (we'll already be listening to the info model)
 			this.imageModel.addPropertyChangeListener(getRepeatPropertyChangeListener()); //listen and repeat all property changes of the image model
 			this.imageModel.addVetoableChangeListener(getRepeatVetoableChangeListener()); //listen and repeat all vetoable changes of the image model

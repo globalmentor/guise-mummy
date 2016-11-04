@@ -18,7 +18,7 @@ package com.guiseframework.event;
 
 import java.net.URI;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.net.URIPath;
 import com.guiseframework.Bookmark;
@@ -64,7 +64,7 @@ public class NavigationEvent extends AbstractGuiseEvent {
 	 */
 	public NavigationEvent(final Object source, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) {
 		super(source); //construct the parent class
-		this.navigationPath = checkInstance(navigationPath, "Navigation path cannot be null.");
+		this.navigationPath = requireNonNull(navigationPath, "Navigation path cannot be null.");
 		this.bookmark = bookmark;
 		this.referrerURI = referrerURI;
 	}

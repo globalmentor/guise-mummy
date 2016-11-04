@@ -16,7 +16,7 @@
 
 package com.guiseframework.model;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.guiseframework.component.*;
 
@@ -45,7 +45,7 @@ public class DefaultListSelectEditor<V> extends AbstractListSelectEditor<V> {
 	 */
 	public DefaultListSelectEditor(final ListSelectModel<V> listSelectModel, final Class<? extends ValuedComponent<V>> valuedComponentClass) {
 		super(listSelectModel); //construct the parent class
-		this.valuedComponentClass = checkInstance(valuedComponentClass, "Valued component class cannot be null.");
+		this.valuedComponentClass = requireNonNull(valuedComponentClass, "Valued component class cannot be null.");
 	}
 
 	/**
