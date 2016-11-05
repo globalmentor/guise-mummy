@@ -16,7 +16,7 @@
 
 package com.guiseframework.geometry;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.java.Objects;
 
@@ -111,9 +111,9 @@ public class Point {
 	 * @throws NullPointerException if one of the given coordinates is <code>null</code>.
 	 */
 	public Point(final Extent x, final Extent y, final Extent z) { //TODO maybe check the degree
-		this.x = checkInstance(x, "X coordinate cannot be null.");
-		this.y = checkInstance(y, "Y coordinate cannot be null.");
-		this.z = checkInstance(z, "Z coordinate cannot be null.");
+		this.x = requireNonNull(x, "X coordinate cannot be null.");
+		this.y = requireNonNull(y, "Y coordinate cannot be null.");
+		this.z = requireNonNull(z, "Z coordinate cannot be null.");
 	}
 
 	/**

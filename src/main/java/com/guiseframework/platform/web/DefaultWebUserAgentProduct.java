@@ -18,9 +18,10 @@ package com.guiseframework.platform.web;
 
 import java.util.*;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.net.ContentType;
 
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.HTTP.*;
 
 import com.guiseframework.platform.AbstractBrandedProduct;
@@ -88,8 +89,8 @@ public class DefaultWebUserAgentProduct extends AbstractBrandedProduct<WebUserAg
 	public DefaultWebUserAgentProduct(final String id, final WebUserAgentProduct.Brand brand, final String name, final String version,
 			final double versionNumber, final int[] versionNumbers, final Iterable<ContentType> acceptedContentTypes, final Iterable<Locale> acceptedLanguages) {
 		super(id, brand, name, version, versionNumber, versionNumbers); //construct the parent class
-		this.acceptedContentTypes = checkInstance(acceptedContentTypes, "Accepted content types cannot be null.");
-		this.acceptedLanguages = checkInstance(acceptedLanguages, "Accepted languages cannot be null.");
+		this.acceptedContentTypes = requireNonNull(acceptedContentTypes, "Accepted content types cannot be null.");
+		this.acceptedLanguages = requireNonNull(acceptedLanguages, "Accepted languages cannot be null.");
 	}
 
 }

@@ -20,6 +20,8 @@ import java.io.*;
 import java.net.URI;
 import java.nio.charset.Charset;
 
+import static java.util.Objects.*;
+
 import javax.servlet.http.HttpServletResponse;
 
 import com.globalmentor.net.ContentType;
@@ -29,7 +31,6 @@ import com.globalmentor.xml.QualifiedName;
 import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 
-import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.platform.web.WebPlatform.*;
 import static java.nio.charset.StandardCharsets.*;
 
@@ -97,8 +98,8 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext {
 	public HTTPServletWebDepictContext(final HTTPServletGuiseRequest guiseRequest, final HttpServletResponse response, final GuiseSession session,
 			final Destination destination) throws IOException {
 		super(session, destination); //construct the parent class
-		this.guiseRequest = checkInstance(guiseRequest, "Guise request cannot be null.");
-		this.response = checkInstance(response, "Response cannot be null.");
+		this.guiseRequest = requireNonNull(guiseRequest, "Guise request cannot be null.");
+		this.response = requireNonNull(response, "Response cannot be null.");
 		//TODO decide if we want this to include parameters or not		this.navigationURI=URI.create(request.getRequestURL().toString());	//create the absolute navigation URI from the HTTP requested URL
 		this.depictURI = HTTPServlets.getRequestURI(guiseRequest.getHTTPServletRequest()); //get the depiction URI, containing any query
 		/*TODO del if not needed

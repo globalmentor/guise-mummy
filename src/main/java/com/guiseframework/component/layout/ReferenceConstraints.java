@@ -16,7 +16,7 @@
 
 package com.guiseframework.component.layout;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 /**
  * Constraints on individual component layout. These constraints specify an identifier to which a component should be bound.
@@ -38,7 +38,7 @@ public class ReferenceConstraints extends AbstractConstraints {
 	 * @throws NullPointerException if the given ID is <code>null</code>.
 	 */
 	public ReferenceConstraints(final String id) {
-		this.id = checkInstance(id, "ID cannot be null"); //save the ID
+		this.id = requireNonNull(id, "ID cannot be null"); //save the ID
 	}
 
 }

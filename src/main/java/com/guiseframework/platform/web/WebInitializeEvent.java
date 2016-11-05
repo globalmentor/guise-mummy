@@ -18,9 +18,9 @@ package com.guiseframework.platform.web;
 
 import java.net.URI;
 
-import com.guiseframework.platform.DepictContext;
+import static java.util.Objects.*;
 
-import static com.globalmentor.java.Objects.*;
+import com.guiseframework.platform.DepictContext;
 
 /**
  * A web platform event indicating that initialization should occur.
@@ -165,7 +165,7 @@ public class WebInitializeEvent extends AbstractWebPlatformEvent {
 		this.utcOffset01 = utcOffset01;
 		this.utcOffset06 = utcOffset06;
 		//TODO del		this.timezone=timezone;
-		this.language = checkInstance(language, "Language cannot be null.");
+		this.language = requireNonNull(language, "Language cannot be null.");
 		this.colorDepth = colorDepth;
 		this.screenWidth = screenWidth;
 		this.screenHeight = screenHeight;

@@ -19,11 +19,11 @@ package com.guiseframework.component;
 import java.net.URI;
 import java.util.*;
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 
 import com.globalmentor.event.EventListenerManager;
@@ -94,7 +94,7 @@ public class ResourceCollectControl extends AbstractControl {
 	 * @see #RESOURCE_PATHS_PROPERTY
 	 */
 	public void addResourcePath(final String resourcePath) {
-		resourcePaths.add(checkInstance(resourcePath, "Resource path cannot be null."));
+		resourcePaths.add(requireNonNull(resourcePath, "Resource path cannot be null."));
 		final List<String> newList = unmodifiableList(new ArrayList<String>(resourcePaths)); //create an unmodifiable copy of the resource paths
 		firePropertyChange(RESOURCE_PATHS_PROPERTY, null, newList); //indicate that the value changed			
 	}
@@ -108,7 +108,7 @@ public class ResourceCollectControl extends AbstractControl {
 	 * @see #RESOURCE_PATHS_PROPERTY
 	 */
 	public void removeResourcePath(final String resourcePath) {
-		resourcePaths.remove(checkInstance(resourcePath, "Resource path cannot be null."));
+		resourcePaths.remove(requireNonNull(resourcePath, "Resource path cannot be null."));
 		final List<String> newList = unmodifiableList(new ArrayList<String>(resourcePaths)); //create an unmodifiable copy of the resource paths
 		firePropertyChange(RESOURCE_PATHS_PROPERTY, null, newList); //indicate that the value changed			
 	}

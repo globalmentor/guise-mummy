@@ -16,7 +16,7 @@
 
 package com.guiseframework.component.facebook;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.net.URIPath;
 import com.guiseframework.component.AbstractComponent;
@@ -68,6 +68,6 @@ public class LikeButton extends AbstractComponent implements NavigationModel {
 	 * @throws NullPointerException if the given navigation model is <code>null</code>.
 	 */
 	public LikeButton(final NavigationModel navigationModel) {
-		this.navigationModel = checkInstance(navigationModel);
+		this.navigationModel = requireNonNull(navigationModel);
 	}
 }

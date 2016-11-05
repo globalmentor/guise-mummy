@@ -20,6 +20,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import static java.util.Objects.*;
+
 import org.urframework.*;
 
 import com.globalmentor.io.IO;
@@ -30,7 +32,6 @@ import com.globalmentor.util.HashMapResourceBundle;
 
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Java.*;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.model.Locales.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.rdf.RDFResources.*;
@@ -78,7 +79,7 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 		 * @throws NullPointerException if the given extension is <code>null</code>.
 		 */
 		private ResourceBundleFormat(final String extension) {
-			this.extension = checkInstance(extension, "Extension cannot be null.");
+			this.extension = requireNonNull(extension, "Extension cannot be null.");
 		}
 	}
 

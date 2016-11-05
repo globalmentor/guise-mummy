@@ -18,11 +18,12 @@ package com.guiseframework.model;
 
 import java.net.URI;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.java.Objects;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.text.Text;
 
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.text.Text.*;
 
 /**
@@ -58,7 +59,7 @@ public class DefaultInfoModel extends DefaultLabelModel implements InfoModel {
 
 	@Override
 	public void setDescriptionContentType(final ContentType newDescriptionContentType) {
-		checkInstance(newDescriptionContentType, "Content type cannot be null.");
+		requireNonNull(newDescriptionContentType, "Content type cannot be null.");
 		if(descriptionContentType != newDescriptionContentType) { //if the value is really changing
 			final ContentType oldDescriptionContentType = descriptionContentType; //get the old value
 			if(!isText(newDescriptionContentType)) { //if the new content type is not a text content type
@@ -96,7 +97,7 @@ public class DefaultInfoModel extends DefaultLabelModel implements InfoModel {
 
 	@Override
 	public void setInfoContentType(final ContentType newInfoContentType) {
-		checkInstance(newInfoContentType, "Content type cannot be null.");
+		requireNonNull(newInfoContentType, "Content type cannot be null.");
 		if(infoContentType != newInfoContentType) { //if the value is really changing
 			final ContentType oldInfoContentType = infoContentType; //get the old value
 			if(!isText(newInfoContentType)) { //if the new content type is not a text content type

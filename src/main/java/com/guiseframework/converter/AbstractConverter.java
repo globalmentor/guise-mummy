@@ -16,10 +16,11 @@
 
 package com.guiseframework.converter;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.java.Objects;
 import com.guiseframework.event.GuiseBoundPropertyObject;
 
-import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.Resources.*;
 
 /**
@@ -40,7 +41,7 @@ public abstract class AbstractConverter<V, L> extends GuiseBoundPropertyObject i
 
 	@Override
 	public void setInvalidValueMessage(final String newInvalidValueMessage) {
-		if(!invalidValueMessage.equals(checkInstance(newInvalidValueMessage, "Invalid value message cannot be null."))) { //if the value is really changing
+		if(!invalidValueMessage.equals(requireNonNull(newInvalidValueMessage, "Invalid value message cannot be null."))) { //if the value is really changing
 			final String oldInvalidValueMessage = invalidValueMessage; //get the old value
 			invalidValueMessage = newInvalidValueMessage; //actually change the value
 			firePropertyChange(INVALID_VALUE_MESSAGE_PROPERTY, oldInvalidValueMessage, newInvalidValueMessage); //indicate that the value changed

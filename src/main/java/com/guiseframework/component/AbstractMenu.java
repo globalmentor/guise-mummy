@@ -16,7 +16,7 @@
 
 package com.guiseframework.component;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
@@ -137,7 +137,7 @@ public abstract class AbstractMenu extends AbstractContainerControl implements M
 	 */
 	public AbstractMenu(final InfoModel infoModel, final ActionModel actionModel, final Enableable enableable, final MenuLayout layout) {
 		super(infoModel, enableable, layout); //construct the parent class
-		this.actionModel = checkInstance(actionModel, "Action model cannot be null."); //save the action model
+		this.actionModel = requireNonNull(actionModel, "Action model cannot be null."); //save the action model
 		this.actionModel.addActionListener(new ActionListener() { //create an action repeater to forward events to this component's listeners TODO create a common method to create a forwarding listener, if we can
 
 					public void actionPerformed(final ActionEvent actionEvent) { //if the action is performed

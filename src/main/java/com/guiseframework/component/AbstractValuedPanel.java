@@ -16,7 +16,7 @@
 
 package com.guiseframework.component;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.guiseframework.component.layout.*;
 
@@ -43,7 +43,7 @@ public abstract class AbstractValuedPanel<V> extends AbstractPanel implements Va
 	 */
 	public AbstractValuedPanel(final Class<V> valueClass, final Layout<? extends Constraints> layout) {
 		super(layout); //construct the parent class
-		this.valueClass = checkInstance(valueClass, "Value class cannot be null."); //store the value class
+		this.valueClass = requireNonNull(valueClass, "Value class cannot be null."); //store the value class
 	}
 
 }

@@ -19,6 +19,8 @@ package com.guiseframework.component;
 import java.beans.*;
 import java.util.regex.Pattern;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.java.Objects;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.text.Text;
@@ -28,7 +30,6 @@ import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.text.Text.*;
 
 /**
@@ -125,7 +126,7 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V> {
 	public void setConverter(final Converter<V, String> newConverter) {
 		if(converter != newConverter) { //if the value is really changing
 			final Converter<V, String> oldConverter = converter; //get the old value
-			converter = checkInstance(newConverter, "Converter cannot be null."); //actually change the value
+			converter = requireNonNull(newConverter, "Converter cannot be null."); //actually change the value
 			firePropertyChange(CONVERTER_PROPERTY, oldConverter, newConverter); //indicate that the value changed
 			updateText(); //update the text, now that we've installed a new converter
 		}
@@ -214,7 +215,7 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V> {
 	 * @see #VALUE_CONTENT_TYPE_PROPERTY
 	 */
 	public void setValueContentType(final ContentType newValueContentType) {
-		checkInstance(newValueContentType, "Content type cannot be null.");
+		requireNonNull(newValueContentType, "Content type cannot be null.");
 		if(valueContentType != newValueContentType) { //if the value is really changing
 			final ContentType oldValueContentType = valueContentType; //get the old value
 			if(!isText(newValueContentType)) { //if the new content type is not a text content type
@@ -262,7 +263,7 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V> {
 	public AbstractTextControl(final ValueModel<V> valueModel, final Converter<V, String> converter) {
 		super(new DefaultInfoModel(), valueModel, new DefaultEnableable()); //construct the parent class
 		this.valueContentType = Text.PLAIN_CONTENT_TYPE;
-		this.converter = checkInstance(converter, "Converter cannot be null"); //save the converter
+		this.converter = requireNonNull(converter, "Converter cannot be null"); //save the converter
 		updateText(); //initialize the text with the literal form of the initial model value
 		addPropertyChangeListener(VALUE_PROPERTY, updateTextPropertyChangeListener); //listen for the value changing, and update the text in response
 		getSession().addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, updateTextPropertyChangeListener); //listen for the session locale changing, in case the converter is locale-dependent TODO allow for unregistration to prevent memory leaks

@@ -16,7 +16,7 @@
 
 package com.guiseframework.platform;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.event.EventListenerManager;
 import com.globalmentor.model.TaskState;
@@ -60,7 +60,7 @@ public abstract class AbstractPlatformFile implements PlatformFile {
 	 * @throws NullPointerException if the given name is <code>null</code>.
 	 */
 	public AbstractPlatformFile(final String name, final long size) {
-		this.name = checkInstance(name, "Name cannot be null.");
+		this.name = requireNonNull(name, "Name cannot be null.");
 		this.size = size;
 	}
 

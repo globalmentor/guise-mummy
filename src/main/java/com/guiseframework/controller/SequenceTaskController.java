@@ -18,10 +18,11 @@ package com.guiseframework.controller;
 
 import java.beans.PropertyVetoException;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.beans.*;
 
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 import com.globalmentor.model.*;
 
 import com.guiseframework.prototype.*;
@@ -159,7 +160,7 @@ public class SequenceTaskController extends BoundPropertyObject {
 	 * @throws NullPointerException if the given task is <code>null</code>.
 	 */
 	public SequenceTaskController(final SequenceTask task) {
-		this.task = checkInstance(task, "Task cannot be null.");
+		this.task = requireNonNull(task, "Task cannot be null.");
 		startActionPrototype = new AbstractActionPrototype(LABEL_START, GLYPH_START) {
 
 			@Override

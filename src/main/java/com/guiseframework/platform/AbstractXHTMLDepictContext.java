@@ -21,10 +21,11 @@ import java.net.URI;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Collections.*;
+import static java.util.Objects.*;
+
 import static com.globalmentor.javascript.JavaScript.*;
 import static com.globalmentor.w3c.spec.HTML.*;
-import static java.util.Collections.*;
 
 import com.globalmentor.text.ASCII;
 import com.globalmentor.w3c.spec.HTML;
@@ -47,7 +48,7 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 
 	@Override
 	public void registerDataAttributeNamespaceURI(final URI namespaceURI) {
-		dataAttributeNamespaceURIs.add(checkInstance(namespaceURI));
+		dataAttributeNamespaceURIs.add(requireNonNull(namespaceURI));
 	}
 
 	@Override

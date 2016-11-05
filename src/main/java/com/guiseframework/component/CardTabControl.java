@@ -16,11 +16,11 @@
 
 package com.guiseframework.component;
 
+import static java.util.Objects.*;
+
 import com.guiseframework.component.layout.CardLayout;
 import com.guiseframework.component.layout.Flow;
 import com.guiseframework.model.*;
-
-import static com.globalmentor.java.Objects.*;
 
 /**
  * Convenience tab control that automatically controls the selected card of a card control.
@@ -96,7 +96,7 @@ public class CardTabControl extends TabControl<Component> {
 		 * @throws NullPointerException if the given card layout is <code>null</code>.
 		 */
 		public CardRepresentationStrategy(final CardLayout cardLayout) {
-			this.cardLayout = checkInstance(cardLayout, "Card layout cannot be null"); //save the card layout
+			this.cardLayout = requireNonNull(cardLayout, "Card layout cannot be null"); //save the card layout
 		}
 
 		/**

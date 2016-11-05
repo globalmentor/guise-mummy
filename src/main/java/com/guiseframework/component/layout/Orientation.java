@@ -18,13 +18,14 @@ package com.guiseframework.component.layout;
 
 import java.util.*;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.java.Objects;
 import com.guiseframework.geometry.Axis;
 import com.guiseframework.geometry.CompassPoint;
 import com.guiseframework.geometry.Side;
 
 import static com.globalmentor.iso.ISO639.*;
-import static com.globalmentor.java.Objects.*;
 
 /**
  * Encapsulates internationalized orientation of objects. Static preinstantiated orientation objects are provided for common orientations.
@@ -177,11 +178,11 @@ public class Orientation {
 	 * @throws IllegalArgumentException if both flow orientations specify the same axis.
 	 */
 	public Orientation(final FlowOrientation lineOrientation, final FlowOrientation pageOrientation) {
-		orientations[Flow.LINE.ordinal()] = checkInstance(lineOrientation, "Line orientation cannot be null.");
+		orientations[Flow.LINE.ordinal()] = requireNonNull(lineOrientation, "Line orientation cannot be null.");
 		if(lineOrientation.getAxis() == Axis.Z) { //if the line is flowing on the Z axis
 			throw new IllegalArgumentException("Lines cannot flow on the Z axis.");
 		}
-		orientations[Flow.PAGE.ordinal()] = checkInstance(pageOrientation, "Page orientation cannot be null.");
+		orientations[Flow.PAGE.ordinal()] = requireNonNull(pageOrientation, "Page orientation cannot be null.");
 		if(pageOrientation.getAxis() == Axis.Z) { //if the page is flowing on the Z axis
 			throw new IllegalArgumentException("Pages cannot flow on the Z axis.");
 		}

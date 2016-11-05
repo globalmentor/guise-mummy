@@ -16,9 +16,9 @@
 
 package com.guiseframework.prototype;
 
-import static com.globalmentor.java.Objects.*;
-
 import java.util.ArrayList;
+
+import static java.util.Objects.*;
 
 import com.guiseframework.component.*;
 import com.guiseframework.event.*;
@@ -107,7 +107,7 @@ public abstract class AbstractCompositeComponentPrototypeProvisionStrategy exten
 	 */
 	public AbstractCompositeComponentPrototypeProvisionStrategy(final CompositeComponent parentComponent, final PrototypeProvider... basePrototypeProviders) {
 		super(basePrototypeProviders); //construct the parent class
-		this.parentComponent = checkInstance(parentComponent, "Parent component cannot be null.");
+		this.parentComponent = requireNonNull(parentComponent, "Parent component cannot be null.");
 		for(final PrototypeProvider prototypeProvider : Components.getChildComponents(parentComponent, PrototypeProvider.class, new ArrayList<PrototypeProvider>(),
 				true, false)) { //get all the top-level descendant prototype provider components of the parent component
 			addPrototypeProvider(prototypeProvider); //manage this prototype provider

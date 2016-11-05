@@ -16,7 +16,7 @@
 
 package com.guiseframework.event;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.guiseframework.input.Key;
 
@@ -43,6 +43,6 @@ public abstract class AbstractKeyboardEvent extends AbstractFocusedGestureInputE
 	 */
 	public AbstractKeyboardEvent(final Object source, final Key key, final Key... keys) {
 		super(source, keys); //construct the parent class
-		this.key = checkInstance(key, "Key cannot be null."); //save the key
+		this.key = requireNonNull(key, "Key cannot be null."); //save the key
 	}
 }

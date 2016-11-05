@@ -16,7 +16,7 @@
 
 package com.guiseframework.geometry;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.java.Objects;
 
@@ -131,9 +131,9 @@ public class Dimensions {
 		if(depth.getDegree() != 1) { //if the depth degree is not one
 			throw new IllegalArgumentException("Depth dimension degree must be 1.");
 		}
-		this.width = checkInstance(width, "Width cannot be null.");
-		this.height = checkInstance(height, "Height cannot be null.");
-		this.depth = checkInstance(depth, "Depth cannot be null.");
+		this.width = requireNonNull(width, "Width cannot be null.");
+		this.height = requireNonNull(height, "Height cannot be null.");
+		this.depth = requireNonNull(depth, "Depth cannot be null.");
 		this.hashCode = Objects.getHashCode(width, height, depth); //precalculate the hash code
 	}
 

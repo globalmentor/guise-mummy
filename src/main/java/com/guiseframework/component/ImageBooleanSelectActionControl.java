@@ -18,8 +18,9 @@ package com.guiseframework.component;
 
 import java.net.URI;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.java.Objects;
 import com.guiseframework.model.*;
@@ -115,7 +116,7 @@ public class ImageBooleanSelectActionControl extends AbstractBooleanSelectAction
 	public ImageBooleanSelectActionControl(final InfoModel infoModel, final ImageModel imageModel, final ActionModel actionModel,
 			final ValueModel<Boolean> valueModel, final Enableable enableable) {
 		super(infoModel, actionModel, valueModel, enableable); //construct the parent class
-		this.imageModel = checkInstance(imageModel, "Image model cannot be null."); //save the image model
+		this.imageModel = requireNonNull(imageModel, "Image model cannot be null."); //save the image model
 		if(imageModel != infoModel && imageModel != actionModel && imageModel != valueModel && imageModel != enableable) { //if the models are different (we'll already be listening to the other models)
 			this.imageModel.addPropertyChangeListener(getRepeatPropertyChangeListener()); //listen and repeat all property changes of the image model
 			this.imageModel.addVetoableChangeListener(getRepeatVetoableChangeListener()); //listen and repeat all vetoable changes of the image model

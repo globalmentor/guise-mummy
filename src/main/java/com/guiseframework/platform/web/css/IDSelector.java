@@ -16,7 +16,8 @@
 
 package com.guiseframework.platform.web.css;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
+
 import static com.globalmentor.w3c.spec.CSS.*;
 
 /**
@@ -39,7 +40,7 @@ public class IDSelector implements SimpleSelector, Comparable<IDSelector> {
 	 * @throws NullPointerException if the given ID is <code>null</code>.
 	 */
 	public IDSelector(final String id) {
-		this.id = checkInstance(id, "ID cannot be null.");
+		this.id = requireNonNull(id, "ID cannot be null.");
 	}
 
 	@Override

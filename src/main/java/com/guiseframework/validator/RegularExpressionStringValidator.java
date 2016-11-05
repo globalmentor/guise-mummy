@@ -18,7 +18,7 @@ package com.guiseframework.validator;
 
 import java.util.regex.Pattern;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 /**
  * A string validator that can validate against regular expressions.
@@ -42,7 +42,7 @@ public class RegularExpressionStringValidator extends AbstractRegularExpressionV
 	 * @throws NullPointerException if the given regular expression is <code>null</code>.
 	 */
 	public RegularExpressionStringValidator(final String regularExpression, final boolean valueRequired) {
-		this(Pattern.compile(checkInstance(regularExpression, "Regular expression cannot be null.")), valueRequired); //compile the regular expression into a pattern and construct the class
+		this(Pattern.compile(requireNonNull(regularExpression, "Regular expression cannot be null.")), valueRequired); //compile the regular expression into a pattern and construct the class
 	}
 
 	/**

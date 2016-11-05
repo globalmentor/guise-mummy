@@ -17,11 +17,10 @@
 package com.guiseframework.converter;
 
 import static java.text.MessageFormat.*;
+import static java.util.Objects.*;
 
 import java.text.*;
 import java.util.*;
-
-import static com.globalmentor.java.Objects.*;
 
 import com.guiseframework.GuiseSession;
 
@@ -160,7 +159,7 @@ public abstract class AbstractDateStringLiteralConverter<V> extends AbstractConv
 				simpleDateFormat.applyPattern(patternBuilder.toString()); //apply the new pattern
 			}
 		}
-		dateFormat.setTimeZone(checkInstance(timeZone, "Time zone cannot be null.")); //show that time zone to use for formatting the date and/or time
+		dateFormat.setTimeZone(requireNonNull(timeZone, "Time zone cannot be null.")); //show that time zone to use for formatting the date and/or time
 		return dateFormat; //return the date format we created
 	}
 

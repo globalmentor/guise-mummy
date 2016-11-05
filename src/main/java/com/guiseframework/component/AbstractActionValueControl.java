@@ -16,7 +16,7 @@
 
 package com.guiseframework.component;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import java.beans.PropertyVetoException;
 import java.net.URI;
@@ -65,7 +65,7 @@ public abstract class AbstractActionValueControl<V> extends AbstractActionContro
 	 */
 	public AbstractActionValueControl(final InfoModel infoModel, final ActionModel actionModel, final ValueModel<V> valueModel, final Enableable enableable) {
 		super(infoModel, actionModel, enableable); //construct the parent class
-		this.valueModel = checkInstance(valueModel, "Value model cannot be null."); //save the table model
+		this.valueModel = requireNonNull(valueModel, "Value model cannot be null."); //save the table model
 		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener()); //listen an repeat all property changes of the value model
 		this.valueModel.addVetoableChangeListener(getRepeatVetoableChangeListener()); //listen and repeat all vetoable changes of the value model
 	}

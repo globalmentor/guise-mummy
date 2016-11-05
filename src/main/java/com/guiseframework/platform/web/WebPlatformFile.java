@@ -16,9 +16,9 @@
 
 package com.guiseframework.platform.web;
 
-import static com.globalmentor.java.Objects.*;
-
 import java.net.URI;
+
+import static java.util.Objects.*;
 
 import com.globalmentor.model.TaskState;
 import com.guiseframework.event.*;
@@ -57,8 +57,8 @@ public class WebPlatformFile extends AbstractPlatformFile {
 	 */
 	public WebPlatformFile(final PlatformFileCollector fileReferenceList, final String id, final String name, final long size) {
 		super(name, size); //construct the parent class
-		this.id = checkInstance(id, "ID cannot be null.");
-		this.platformFileCollector = checkInstance(fileReferenceList, "File reference list cannot be null.");
+		this.id = requireNonNull(id, "ID cannot be null.");
+		this.platformFileCollector = requireNonNull(fileReferenceList, "File reference list cannot be null.");
 	}
 
 	@Override

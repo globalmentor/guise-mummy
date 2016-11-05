@@ -16,7 +16,7 @@
 
 package com.guiseframework.event;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.guiseframework.geometry.*;
 import com.guiseframework.input.Key;
@@ -72,10 +72,10 @@ public abstract class AbstractMouseEvent extends AbstractGestureInputEvent imple
 	public AbstractMouseEvent(final Object source, final Object target, final Rectangle targetBounds, final Rectangle viewportBounds, final Point mousePosition,
 			final Key... keys) {
 		super(source, keys); //construct the parent class
-		this.target = checkInstance(target, "Event target object cannot be null."); //save the target
-		this.targetBounds = checkInstance(targetBounds, "Target bounds cannot be null");
-		this.viewportBounds = checkInstance(viewportBounds, "Viewport bounds cannot be null");
-		this.mousePosition = checkInstance(mousePosition, "Mouse position cannot be null");
+		this.target = requireNonNull(target, "Event target object cannot be null."); //save the target
+		this.targetBounds = requireNonNull(targetBounds, "Target bounds cannot be null");
+		this.viewportBounds = requireNonNull(viewportBounds, "Viewport bounds cannot be null");
+		this.mousePosition = requireNonNull(mousePosition, "Mouse position cannot be null");
 	}
 
 }

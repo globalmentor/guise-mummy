@@ -18,9 +18,9 @@ package com.guiseframework.model;
 
 import java.util.*;
 
-import com.globalmentor.java.Objects;
+import static java.util.Objects.*;
 
-import static com.globalmentor.java.Objects.*;
+import com.globalmentor.java.Objects;
 
 /**
  * A model of a table. The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class.
@@ -118,7 +118,7 @@ public interface TableModel extends Model //TODO maybe specify row count to be a
 		 */
 		public Cell(final int rowIndex, final TableColumnModel<C> column) {
 			this.rowIndex = rowIndex;
-			this.column = checkInstance(column, "Column cannot be null.");
+			this.column = requireNonNull(column, "Column cannot be null.");
 		}
 
 		/**

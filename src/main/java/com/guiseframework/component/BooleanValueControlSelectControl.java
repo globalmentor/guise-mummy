@@ -21,8 +21,9 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Integers.*;
-import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.java.Arrays;
@@ -61,7 +62,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	 * @see #LAYOUT_PROPERTY
 	 */
 	protected <T extends Constraints> void setLayout(final Layout<T> newLayout) {
-		if(layout != checkInstance(newLayout, "Layout cannot be null.")) { //if the value is really changing
+		if(layout != requireNonNull(newLayout, "Layout cannot be null.")) { //if the value is really changing
 			final Layout<? extends Constraints> oldLayout = layout; //get the old value
 			oldLayout.setOwner(null); //tell the old layout it is no longer installed
 			layout = newLayout; //actually change the value
@@ -253,7 +254,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	public BooleanValueControlSelectControl(final ListSelectModel<V> listSelectModel, final Layout<?> layout,
 			final ValueRepresentationStrategy<V> valueRepresentationStrategy) {
 		super(listSelectModel, valueRepresentationStrategy); //construct the parent class
-		this.layout = checkInstance(layout, "Layout cannot be null."); //save the layout
+		this.layout = requireNonNull(layout, "Layout cannot be null."); //save the layout
 		layout.setOwner(this); //tell the layout which composite component owns it
 		valuePolicyModelGroup = getSelectionPolicy() instanceof SingleListSelectionPolicy ? new MutualExclusionPolicyModelGroup() : null; //if we're selecting only one item at a time, use a mutual exclusion policy group model
 		addListSelectionListener(new ListSelectionListener<V>() { //if the list values change, update the components

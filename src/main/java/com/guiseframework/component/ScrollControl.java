@@ -16,7 +16,7 @@
 
 package com.guiseframework.component;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
 import com.globalmentor.beans.GenericPropertyChangeEvent;
@@ -99,7 +99,7 @@ public class ScrollControl extends AbstractEnumCompositeComponent<ScrollControl.
 	public ScrollControl(final Component component) {
 		super(ScrollComponent.values()); //construct the parent class
 		setComponent(ScrollComponent.CONTENT_COMPONENT, component); //set the component directly, because child classes may prevent the setContent() method from changing the component 
-		this.enableable = checkInstance(new DefaultEnableable(), "Enableable object cannot be null."); //save the enableable object TODO later allow this to be passed as an argument
+		this.enableable = requireNonNull(new DefaultEnableable(), "Enableable object cannot be null."); //save the enableable object TODO later allow this to be passed as an argument
 		this.enableable.addPropertyChangeListener(getRepeatPropertyChangeListener()); //listen and repeat all property changes of the enableable object
 		addPropertyChangeListener(ENABLED_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>() { //listen for the "enabled" property changing
 

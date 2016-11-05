@@ -16,7 +16,7 @@
 
 package com.guiseframework.component.layout;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.beans.GenericPropertyChangeEvent;
 import com.guiseframework.component.Component;
@@ -58,8 +58,8 @@ public class LayoutConstraintsPropertyChangeEvent<T extends Constraints, V> exte
 	public LayoutConstraintsPropertyChangeEvent(final Layout<T> source, final Component component, final T constraints, final String propertyName,
 			final V oldValue, V newValue) {
 		super(source, propertyName, oldValue, newValue); //construct the parent class
-		this.component = checkInstance(component, "Component cannot be null."); //TODO remove checkNull(), as this is now checked in the call to getSession()
-		this.constraints = checkInstance(constraints, "Constraints cannot be null.");
+		this.component = requireNonNull(component, "Component cannot be null."); //TODO remove checkNull(), as this is now checked in the call to getSession()
+		this.constraints = requireNonNull(constraints, "Constraints cannot be null.");
 	}
 
 }

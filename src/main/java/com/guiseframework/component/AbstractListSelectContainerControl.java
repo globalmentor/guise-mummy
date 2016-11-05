@@ -16,7 +16,7 @@
 
 package com.guiseframework.component;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -61,7 +61,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	public void setValueRepresentationStrategy(final ValueRepresentationStrategy<Component> newValueRepresentationStrategy) {
 		if(valueRepresentationStrategy != newValueRepresentationStrategy) { //if the value is really changing
 			final ValueRepresentationStrategy<Component> oldValueRepresentationStrategy = valueRepresentationStrategy; //get the old value
-			valueRepresentationStrategy = checkInstance(newValueRepresentationStrategy, "Value representation strategy cannot be null."); //actually change the value
+			valueRepresentationStrategy = requireNonNull(newValueRepresentationStrategy, "Value representation strategy cannot be null."); //actually change the value
 			firePropertyChange(VALUE_REPRESENTATION_STRATEGY_PROPERTY, oldValueRepresentationStrategy, newValueRepresentationStrategy); //indicate that the value changed
 		}
 	}

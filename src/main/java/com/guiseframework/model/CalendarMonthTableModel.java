@@ -19,8 +19,9 @@ package com.guiseframework.model;
 import java.text.DateFormat;
 import java.util.*;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.time.Calendars.*;
 
@@ -93,7 +94,7 @@ public class CalendarMonthTableModel extends AbstractTableModel //TODO set the m
 	 * @see #DATE_PROPERTY
 	 */
 	public void setDate(final Date newDate) {
-		if(!date.equals(checkInstance(newDate, "Date cannot be null."))) { //if the value is really changing
+		if(!date.equals(requireNonNull(newDate, "Date cannot be null."))) { //if the value is really changing
 			final Date oldDate = date; //get the old value
 			date = (Date)newDate.clone(); //clone the new date and actually change the value
 			updateModel(); //update the model based upon the new value
@@ -119,7 +120,7 @@ public class CalendarMonthTableModel extends AbstractTableModel //TODO set the m
 	public void setColumnLabelDateStyle(final DateStringLiteralStyle newColumnLabelStyle) {
 		if(columnLabelDateStyle != newColumnLabelStyle) { //if the value is really changing
 			final DateStringLiteralStyle oldColumnLabelStyle = columnLabelDateStyle; //get the old value
-			columnLabelDateStyle = checkInstance(newColumnLabelStyle, "Column label style cannot be null."); //actually change the value
+			columnLabelDateStyle = requireNonNull(newColumnLabelStyle, "Column label style cannot be null."); //actually change the value
 			updateColumnLabelDateFormat(); //update the column label date format object based upon the new style
 			firePropertyChange(COLUMN_LABEL_DATE_STYLE_PROPERTY, oldColumnLabelStyle, newColumnLabelStyle); //indicate that the value changed
 		}
@@ -186,7 +187,7 @@ public class CalendarMonthTableModel extends AbstractTableModel //TODO set the m
 		for(int i = 0; i < WEEK_DAY_COUNT; ++i) { //for each week day index (the indices are constant, regardless of with which day of the week the locale starts)
 			addColumn(new WeekDayTableColumnModel(i)); //add a new week day table column
 		}
-		this.date = checkInstance(date, "Date cannot be null");
+		this.date = requireNonNull(date, "Date cannot be null");
 		updateModel(); //update the model to match the initial month calendar
 		//TODO important: this is a memory leak---make sure we uninstall the listener when the session goes away
 		getSession().addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGenericPropertyChangeListener<Locale>() { //listen for the session locale changing

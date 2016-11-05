@@ -16,7 +16,7 @@
 
 package com.guiseframework.geometry;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.java.Objects;
 
@@ -124,8 +124,8 @@ public class Rectangle {
 	 * @throws IllegalArgumentException if the size has a non-zero depth.
 	 */
 	public Rectangle(final Point position, final Dimensions size) {
-		this.position = checkInstance(position, "Position cannot be null.");
-		this.size = checkInstance(size, "Size cannot be null.");
+		this.position = requireNonNull(position, "Position cannot be null.");
+		this.size = requireNonNull(size, "Size cannot be null.");
 		if(!size.getDepth().isEmpty()) { //if the depth is not zero
 			throw new IllegalArgumentException("A rectangle cannot have a depth.");
 		}

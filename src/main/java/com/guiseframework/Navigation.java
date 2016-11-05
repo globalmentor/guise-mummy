@@ -18,7 +18,7 @@ package com.guiseframework;
 
 import java.net.URI;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 /**
  * The encapsulation of a point of navigation.
@@ -68,8 +68,8 @@ public class Navigation {
 	 * @throws NullPointerException if one of the navigation URIs is <code>null</code>, or does not contain a path.
 	 */
 	public Navigation(final URI oldNavigationURI, final URI newNavigationURI, final String viewportID) {
-		this.oldNavigationURI = checkInstance(oldNavigationURI, "Old navigation URI cannot be null.");
-		this.newNavigationURI = checkInstance(newNavigationURI, "New navigation URI cannot be null.");
+		this.oldNavigationURI = requireNonNull(oldNavigationURI, "Old navigation URI cannot be null.");
+		this.newNavigationURI = requireNonNull(newNavigationURI, "New navigation URI cannot be null.");
 		this.viewportID = viewportID;
 	}
 }

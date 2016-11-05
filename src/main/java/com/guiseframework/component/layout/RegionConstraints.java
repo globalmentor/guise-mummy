@@ -16,9 +16,10 @@
 
 package com.guiseframework.component.layout;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Arrays.*;
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.java.Objects;
 import com.guiseframework.geometry.Extent;
@@ -94,7 +95,7 @@ public class RegionConstraints extends AbstractConstraints {
 	 * @see #PAGE_ALIGNMENT_PROPERTY
 	 */
 	public void setAlignment(final Flow flow, final double newAlignment) {
-		final int flowOrdinal = checkInstance(flow, "Flow cannot be null").ordinal(); //get the ordinal of the flow
+		final int flowOrdinal = requireNonNull(flow, "Flow cannot be null").ordinal(); //get the ordinal of the flow
 		final double oldAlignment = alignments[flowOrdinal]; //get the old value
 		if(oldAlignment != newAlignment) { //if the value is really changing
 			alignments[flowOrdinal] = newAlignment; //actually change the value
@@ -170,7 +171,7 @@ public class RegionConstraints extends AbstractConstraints {
 	 * @see #PAGE_EXTENT_PROPERTY
 	 */
 	public void setExtent(final Flow flow, final Extent newExtent) {
-		final int flowOrdinal = checkInstance(flow, "Flow cannot be null").ordinal(); //get the ordinal of the flow
+		final int flowOrdinal = requireNonNull(flow, "Flow cannot be null").ordinal(); //get the ordinal of the flow
 		final Extent oldExtent = extents[flowOrdinal]; //get the old value
 		if(!Objects.equals(oldExtent, newExtent)) { //if the value is really changing
 			extents[flowOrdinal] = newExtent; //actually change the value
@@ -262,9 +263,9 @@ public class RegionConstraints extends AbstractConstraints {
 	 * @see #PADDING_PAGE_FAR_EXTENT_PROPERTY
 	 */
 	public void setPaddingExtent(final Border border, final Extent newPaddingExtent) {
-		final int borderOrdinal = checkInstance(border, "Border cannot be null").ordinal(); //get the ordinal of the border
+		final int borderOrdinal = requireNonNull(border, "Border cannot be null").ordinal(); //get the ordinal of the border
 		final Extent oldPaddingExtent = paddingExtents[borderOrdinal]; //get the old value
-		if(!oldPaddingExtent.equals(checkInstance(newPaddingExtent, "Padding extent cannot be null."))) { //if the value is really changing
+		if(!oldPaddingExtent.equals(requireNonNull(newPaddingExtent, "Padding extent cannot be null."))) { //if the value is really changing
 			paddingExtents[borderOrdinal] = newPaddingExtent; //actually change the value
 			firePropertyChange(PADDING_EXTENT_PROPERTIES[borderOrdinal], oldPaddingExtent, newPaddingExtent); //indicate that the value changed
 		}
@@ -332,6 +333,6 @@ public class RegionConstraints extends AbstractConstraints {
 	 * @throws NullPointerException if the given region is <code>null</code>.
 	 */
 	public RegionConstraints(final Region region) {
-		this.region = checkInstance(region, "Region cannot be null.");
+		this.region = requireNonNull(region, "Region cannot be null.");
 	}
 }

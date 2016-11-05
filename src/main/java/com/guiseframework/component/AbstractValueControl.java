@@ -16,7 +16,7 @@
 
 package com.guiseframework.component;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import java.beans.*;
 
@@ -63,7 +63,7 @@ public abstract class AbstractValueControl<V> extends AbstractControl implements
 	 */
 	public AbstractValueControl(final InfoModel infoModel, final ValueModel<V> valueModel, final Enableable enableable) {
 		super(infoModel, enableable); //construct the parent class
-		this.valueModel = checkInstance(valueModel, "Value model cannot be null."); //save the value model
+		this.valueModel = requireNonNull(valueModel, "Value model cannot be null."); //save the value model
 		if(valueModel != infoModel && valueModel != enableable) { //if the value model is not the same as the enableable object and the info model (we don't want to repeat property change events twice) TODO eventually just listen to specific events for each object
 			this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener()); //listen and repeat all property changes of the value model
 		}

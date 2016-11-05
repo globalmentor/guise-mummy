@@ -18,7 +18,8 @@ package com.guiseframework;
 
 import java.net.URI;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
+
 import com.globalmentor.net.URIPath;
 
 import com.guiseframework.model.DefaultInfoModel;
@@ -63,7 +64,7 @@ public class Breadcrumb extends DefaultInfoModel {
 	 */
 	public Breadcrumb(final URIPath navigationPath, final String labelText, final URI glyphURI) {
 		super(labelText, glyphURI); //construct the parent class
-		this.navigationPath = checkInstance(navigationPath, "navigation path cannot be null.");
+		this.navigationPath = requireNonNull(navigationPath, "navigation path cannot be null.");
 	}
 
 }

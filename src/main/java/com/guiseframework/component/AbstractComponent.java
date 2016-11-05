@@ -23,13 +23,14 @@ import java.net.URI;
 import java.util.*;
 import java.util.concurrent.*;
 
+import static java.util.Objects.*;
+
 import org.ploop.*;
 import org.ploop.graph.PLOOPURFGenerator;
 import org.ploop.graph.PLOOPURFProcessor;
 import org.urframework.URFResource;
 
 import static com.globalmentor.java.Arrays.*;
-import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.event.*;
 import com.globalmentor.java.*;
@@ -644,7 +645,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		}
 		//TODO del; lazily installed		notifyDepictorInstalled(depictor);	//tell the the depictor it has been installed
 		platform.registerDepictedObject(this); //register this depicted object with the platform
-		this.infoModel = checkInstance(infoModel, "Info model cannot be null."); //save the info model
+		this.infoModel = requireNonNull(infoModel, "Info model cannot be null."); //save the info model
 		this.infoModel.addPropertyChangeListener(getRepeatPropertyChangeListener()); //listen and repeat all property changes of the info model
 		this.infoModel.addVetoableChangeListener(getRepeatVetoableChangeListener()); //listen and repeat all vetoable changes of the info model
 	}
@@ -998,7 +999,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	 * @throws NullPointerException if the given component and/or ancestor is <code>null</code>.
 	 */
 	public static boolean hasAncestor(Component component, final CompositeComponent ancestor) {
-		checkInstance(ancestor, "Ancestor cannot be null.");
+		requireNonNull(ancestor, "Ancestor cannot be null.");
 		while((component = component.getParent()) != null) { //get the parent; while we're not out of parents
 			if(component == ancestor) { //if this is the ancestor
 				return true; //indicate that the component has the ancestor
@@ -1230,7 +1231,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		 * @throws NullPointerException if the given flow is <code>null</code>.
 		 */
 		public void setExtent(final Flow flow, final Extent newExtent) {
-			final int flowOrdinal = checkInstance(flow, "Flow cannot be null").ordinal(); //get the ordinal of the flow
+			final int flowOrdinal = requireNonNull(flow, "Flow cannot be null").ordinal(); //get the ordinal of the flow
 			final Extent oldExtent = extents[flowOrdinal]; //get the old value
 			if(!Objects.equals(oldExtent, newExtent)) { //if the value is really changing
 				extents[flowOrdinal] = newExtent; //actually change the value
@@ -1278,7 +1279,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		 * @throws IllegalArgumentException if the given bearing is greater than 360.
 		 */
 		public void setTetherBearing(final BigDecimal newTetherBearing) {
-			if(!tetherBearing.equals(checkInstance(newTetherBearing, "Tether bearing cannot be null."))) { //if the value is really changing
+			if(!tetherBearing.equals(requireNonNull(newTetherBearing, "Tether bearing cannot be null."))) { //if the value is really changing
 				final BigDecimal oldTetherBearing = tetherBearing; //get the current value
 				tetherBearing = CompassPoint.checkBearing(newTetherBearing); //update the value
 			}
@@ -1307,7 +1308,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		 * @throws NullPointerException if the given component is <code>null</code>.
 		 */
 		public AbstractFlyoverStrategy(final S component) {
-			this.component = checkInstance(component, "Component cannot be null.");
+			this.component = requireNonNull(component, "Component cannot be null.");
 		}
 
 		/**

@@ -16,7 +16,7 @@
 
 package com.guiseframework.event;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.guiseframework.component.Component;
 
@@ -54,7 +54,7 @@ public class ComponentEvent extends AbstractTargetedGuiseEvent {
 	 */
 	public ComponentEvent(final Object source, final Object target, final Component component) {
 		super(source, target); //construct the parent class
-		this.component = checkInstance(component, "Component cannot be null.");
+		this.component = requireNonNull(component, "Component cannot be null.");
 	}
 
 	/**

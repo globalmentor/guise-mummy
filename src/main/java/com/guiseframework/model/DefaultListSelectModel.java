@@ -19,6 +19,8 @@ package com.guiseframework.model;
 import java.beans.PropertyVetoException;
 import java.util.*;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.collections.SynchronizedListDecorator;
 import com.globalmentor.collections.iterators.DefaultListIterator;
 import com.globalmentor.event.EventListenerManager;
@@ -30,7 +32,6 @@ import com.guiseframework.validator.*;
 
 import static com.globalmentor.java.Arrays.*;
 import static com.globalmentor.java.Integers.*;
-import static com.globalmentor.java.Objects.*;
 
 /**
  * The default implementation of a model for selecting one or more values from a list. The model is thread-safe, synchronized on itself. Any iteration over
@@ -818,7 +819,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 				values=new SynchronizedListDecorator<V>(new ArrayList<V>(), this);	//create a value list synchronized on this object
 				valueStates=new SynchronizedListDecorator<ValueState>(new ArrayList<ValueState>(), this);	//create a value state list synchronized on this object
 		*/
-		this.selectionPolicy = checkInstance(listSelectionStrategy, "Selection policy cannot be null.");
+		this.selectionPolicy = requireNonNull(listSelectionStrategy, "Selection policy cannot be null.");
 	}
 
 	/**

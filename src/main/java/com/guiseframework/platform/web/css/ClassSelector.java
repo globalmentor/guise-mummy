@@ -16,7 +16,8 @@
 
 package com.guiseframework.platform.web.css;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
+
 import static com.globalmentor.w3c.spec.CSS.*;
 
 /**
@@ -39,7 +40,7 @@ public class ClassSelector implements SimpleSelector, Comparable<ClassSelector> 
 	 * @throws NullPointerException if the given class name is <code>null</code>.
 	 */
 	public ClassSelector(final String className) {
-		this.className = checkInstance(className, "Class name cannot be null.");
+		this.className = requireNonNull(className, "Class name cannot be null.");
 	}
 
 	@Override

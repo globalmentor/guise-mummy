@@ -18,10 +18,11 @@ package com.guiseframework.model;
 
 import java.io.*;
 
+import static java.util.Objects.*;
+
 import com.globalmentor.net.ContentType;
 
 import static com.globalmentor.io.Files.*;
-import static com.globalmentor.java.Objects.*;
 
 import org.apache.commons.fileupload.FileItem;
 
@@ -60,7 +61,7 @@ public class FileItemResourceImport implements ResourceImport {
 	 * @throws NullPointerException if the given file item is <code>null</code>.
 	 */
 	public FileItemResourceImport(final FileItem fileItem) {
-		this.fileItem = checkInstance(fileItem, "File item cannot be null.");
+		this.fileItem = requireNonNull(fileItem, "File item cannot be null.");
 		contentType = ContentType.create(fileItem.getContentType()); //create a content type object from the file item
 		String name = fileItem.getName(); //get the name of the item
 		if(name != null) { //if there is a filename

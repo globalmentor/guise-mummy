@@ -21,8 +21,9 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.beans.*;
 import com.guiseframework.GuiseSession;
@@ -103,7 +104,7 @@ public class CalendarControl extends AbstractLayoutValueControl<Date> {
 	 * @see #DATE_PROPERTY
 	 */
 	public void setDate(final Date newDate) {
-		if(!date.equals(checkInstance(newDate, "Date cannot be null."))) { //if the value is really changing
+		if(!date.equals(requireNonNull(newDate, "Date cannot be null."))) { //if the value is really changing
 			final Date oldDate = date; //get the old value
 			date = (Date)newDate.clone(); //clone the new date and actually change the value
 			updateDateControls(); //update the calendars based upon the new value

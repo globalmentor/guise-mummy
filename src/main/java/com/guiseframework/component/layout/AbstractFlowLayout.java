@@ -16,8 +16,9 @@
 
 package com.guiseframework.component.layout;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 
 import com.guiseframework.component.Component;
 import com.guiseframework.component.LayoutComponent;
@@ -92,7 +93,7 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 	 * @see #FLOW_PROPERTY
 	 */
 	public void setFlow(final Flow newFlow) {
-		if(flow != checkInstance(newFlow, "Flow cannot be null.")) { //if the value is really changing
+		if(flow != requireNonNull(newFlow, "Flow cannot be null.")) { //if the value is really changing
 			final Flow oldFlow = flow; //get the old value
 			flow = newFlow; //actually change the value
 			firePropertyChange(FLOW_PROPERTY, oldFlow, newFlow); //indicate that the value changed
@@ -114,7 +115,7 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 	 * @see #GAP_AFTER_PROPERTY
 	 */
 	public void setGapAfter(final Extent newGapAfter) {
-		if(!gapAfter.equals(checkInstance(newGapAfter, "Gap after cannot be null."))) { //if the value is really changing
+		if(!gapAfter.equals(requireNonNull(newGapAfter, "Gap after cannot be null."))) { //if the value is really changing
 			final Extent oldGapAfter = gapAfter; //get the old value
 			gapAfter = newGapAfter; //actually change the value
 			firePropertyChange(GAP_AFTER_PROPERTY, oldGapAfter, newGapAfter); //indicate that the value changed
@@ -136,7 +137,7 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 	 * @see #GAP_BEFORE_PROPERTY
 	 */
 	public void setGapBefore(final Extent newGapBefore) {
-		if(!gapBefore.equals(checkInstance(newGapBefore, "Gap before cannot be null."))) { //if the value is really changing
+		if(!gapBefore.equals(requireNonNull(newGapBefore, "Gap before cannot be null."))) { //if the value is really changing
 			final Extent oldGapBefore = gapBefore; //get the old value
 			gapBefore = newGapBefore; //actually change the value
 			firePropertyChange(GAP_BEFORE_PROPERTY, oldGapBefore, newGapBefore); //indicate that the value changed
@@ -158,7 +159,7 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 	 * @see #GAP_BETWEEN_PROPERTY
 	 */
 	public void setGapBetween(final Extent newGapBetween) {
-		if(!gapBetween.equals(checkInstance(newGapBetween, "Gap between cannot be null."))) { //if the value is really changing
+		if(!gapBetween.equals(requireNonNull(newGapBetween, "Gap between cannot be null."))) { //if the value is really changing
 			final Extent oldGapBetween = gapBetween; //get the old value
 			gapBetween = newGapBetween; //actually change the value
 			firePropertyChange(GAP_BETWEEN_PROPERTY, oldGapBetween, newGapBetween); //indicate that the value changed
@@ -211,7 +212,7 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 	 * @throws NullPointerException if the flow axis is <code>null</code>.
 	 */
 	public AbstractFlowLayout(final Flow flow, final boolean wrapped) {
-		this.flow = checkInstance(flow, "Flow cannot be null."); //store the flow
+		this.flow = requireNonNull(flow, "Flow cannot be null."); //store the flow
 		this.wrapped = wrapped; //set the wrapped state
 	}
 

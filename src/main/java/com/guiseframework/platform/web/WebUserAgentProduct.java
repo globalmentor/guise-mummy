@@ -17,9 +17,10 @@
 package com.guiseframework.platform.web;
 
 import java.util.*;
-import static java.util.Collections.*;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Collections.*;
+import static java.util.Objects.*;
+
 import static com.globalmentor.servlet.http.HTTPServlets.*;
 
 import com.globalmentor.net.HTTP;
@@ -95,7 +96,7 @@ public interface WebUserAgentProduct extends ClientProduct, BrandedProduct<WebUs
 		 * @throws NullPointerException if the given user agent name is <code>null</code>.
 		 */
 		public static Brand getBrand(final String userAgentName) {
-			return nameBrandMap.get(checkInstance(userAgentName, "User agent name cannot be null."));
+			return nameBrandMap.get(requireNonNull(userAgentName, "User agent name cannot be null."));
 		}
 	}
 }

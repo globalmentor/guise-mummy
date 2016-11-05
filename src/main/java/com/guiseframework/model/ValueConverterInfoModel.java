@@ -16,10 +16,10 @@
 
 package com.guiseframework.model;
 
+import static java.util.Objects.*;
+
 import com.guiseframework.converter.ConversionException;
 import com.guiseframework.converter.Converter;
-
-import static com.globalmentor.java.Objects.*;
 
 /**
  * An info model that converts a value to a string for the label. If no label is explicitly set, the label will represent the given value converted to a string
@@ -53,7 +53,7 @@ public class ValueConverterInfoModel<V> extends DefaultInfoModel {
 	 */
 	public ValueConverterInfoModel(final V value, final Converter<V, String> converter) {
 		this.value = value; //save the value
-		this.converter = checkInstance(converter, "Converter cannot be null."); //save the converter		
+		this.converter = requireNonNull(converter, "Converter cannot be null."); //save the converter		
 	}
 
 	@Override

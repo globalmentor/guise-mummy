@@ -18,7 +18,7 @@ package com.guiseframework.component;
 
 import java.beans.PropertyVetoException;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.guiseframework.component.layout.Layout;
 import com.guiseframework.model.*;
@@ -48,7 +48,7 @@ public abstract class AbstractContainerValueControl<V> extends AbstractContainer
 	 */
 	public AbstractContainerValueControl(final Layout<?> layout, final ValueModel<V> valueModel) {
 		super(layout); //construct the parent class
-		this.valueModel = checkInstance(valueModel, "Value model cannot be null."); //save the table model
+		this.valueModel = requireNonNull(valueModel, "Value model cannot be null."); //save the table model
 		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener()); //listen an repeat all property changes of the value model
 		this.valueModel.addVetoableChangeListener(getRepeatVetoableChangeListener()); //listen and repeat all vetoable changes of the value model
 	}

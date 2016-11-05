@@ -16,10 +16,10 @@
 
 package com.guiseframework.style;
 
+import static java.util.Objects.*;
+
 import com.guiseframework.Guise;
 import com.guiseframework.GuiseSession;
-
-import static com.globalmentor.java.Objects.*;
 
 /**
  * A color that retrieves its values from the Guise session resources based upon a resource key. When color-related access methods are called the calling thread
@@ -43,7 +43,7 @@ public class ResourceColor implements Color {
 	 * @throws NullPointerException if the given resource key is <code>null</code>.
 	 */
 	public ResourceColor(final String resourceKey) {
-		this.resourceKey = checkInstance(resourceKey, "Resource key cannot be null.");
+		this.resourceKey = requireNonNull(resourceKey, "Resource key cannot be null.");
 	}
 
 	/**

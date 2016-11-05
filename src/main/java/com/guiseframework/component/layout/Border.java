@@ -16,7 +16,7 @@
 
 package com.guiseframework.component.layout;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 /**
  * The points at which the four logical flows end.
@@ -57,8 +57,8 @@ public enum Border {
 	 * @throws NullPointerException if the given flow and/or end is <code>null</code>.
 	 */
 	private Border(final Flow flow, final Flow.End end) {
-		this.flow = checkInstance(flow, "Flow cannot be null.");
-		this.end = checkInstance(end, "End cannot be null.");
+		this.flow = requireNonNull(flow, "Flow cannot be null.");
+		this.end = requireNonNull(end, "End cannot be null.");
 	}
 
 	/** The borders in [flow][end] order. */

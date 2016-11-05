@@ -16,7 +16,8 @@
 
 package com.guiseframework.model;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
+
 import static com.globalmentor.text.Text.*;
 
 import java.net.URI;
@@ -75,7 +76,7 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel {
 
 	@Override
 	public void setLabelContentType(final ContentType newLabelTextContentType) {
-		checkInstance(newLabelTextContentType, "Content type cannot be null.");
+		requireNonNull(newLabelTextContentType, "Content type cannot be null.");
 		if(labelContentType != newLabelTextContentType) { //if the value is really changing
 			final ContentType oldLabelTextContentType = labelContentType; //get the old value
 			if(!isText(newLabelTextContentType)) { //if the new content type is not a text content type

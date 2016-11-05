@@ -16,7 +16,7 @@
 
 package com.guiseframework.event;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.guiseframework.model.Notification;
 
@@ -54,7 +54,7 @@ public class NotificationEvent extends AbstractTargetedGuiseEvent {
 	 */
 	public NotificationEvent(final Object source, final Object target, final Notification notification) {
 		super(source, target); //construct the parent class
-		this.notification = checkInstance(notification, "Notification must be provided.");
+		this.notification = requireNonNull(notification, "Notification must be provided.");
 	}
 
 	/**

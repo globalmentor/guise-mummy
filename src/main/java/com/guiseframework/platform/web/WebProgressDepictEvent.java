@@ -16,7 +16,7 @@
 
 package com.guiseframework.platform.web;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.model.TaskState;
 import com.guiseframework.platform.DepictedObject;
@@ -83,7 +83,7 @@ public class WebProgressDepictEvent extends AbstractWebDepictEvent {
 	public WebProgressDepictEvent(final DepictedObject depictedObject, final String task, final TaskState taskState, final long progress, final long goal) {
 		super(depictedObject); //construct the parent class
 		this.task = task;
-		this.taskState = checkInstance(taskState, "Task state cannot be null.");
+		this.taskState = requireNonNull(taskState, "Task state cannot be null.");
 		this.progress = progress;
 		this.goal = goal;
 	}

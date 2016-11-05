@@ -20,6 +20,8 @@ import java.net.URI;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
 
@@ -73,7 +75,7 @@ public class AbstractWebPlatformFileCollectorDepictor extends AbstractWebDepicto
 	 * @throws NullPointerException if the given ID is <code>null</code>.
 	 */
 	public WebPlatformFile getPlatformFile(final String id) {
-		return idPlatformFileMap.get(checkInstance(id, "Platform file ID cannot be null."));
+		return idPlatformFileMap.get(requireNonNull(id, "Platform file ID cannot be null."));
 	}
 
 	@SuppressWarnings("unchecked")

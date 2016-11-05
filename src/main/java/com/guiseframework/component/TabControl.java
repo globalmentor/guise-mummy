@@ -16,12 +16,13 @@
 
 package com.guiseframework.component;
 
+import static java.util.Objects.*;
+
 import com.guiseframework.component.layout.Flow;
 import com.guiseframework.converter.AbstractStringLiteralConverter;
 import com.guiseframework.model.*;
 
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 
 /**
  * Control to allow selection of one or more values from a list using a tabbed interface.
@@ -50,7 +51,7 @@ public class TabControl<V> extends AbstractListSelectControl<V> {
 	 * @see #AXIS_PROPERTY
 	 */
 	public void setAxis(final Flow newAxis) {
-		if(axis != checkInstance(newAxis, "Flow axis cannot be null.")) { //if the value is really changing
+		if(axis != requireNonNull(newAxis, "Flow axis cannot be null.")) { //if the value is really changing
 			final Flow oldAxis = axis; //get the old value
 			axis = newAxis; //actually change the value
 			firePropertyChange(AXIS_PROPERTY, oldAxis, newAxis); //indicate that the value changed
@@ -166,7 +167,7 @@ public class TabControl<V> extends AbstractListSelectControl<V> {
 	public TabControl(final ListSelectModel<V> listSelectModel, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final Flow axis,
 			final int maxTabCount) {
 		super(listSelectModel, valueRepresentationStrategy); //construct the parent class
-		this.axis = checkInstance(axis, "Flow axis cannot be null.");
+		this.axis = requireNonNull(axis, "Flow axis cannot be null.");
 		this.maxTabCount = maxTabCount; //save the maximum tab count
 	}
 

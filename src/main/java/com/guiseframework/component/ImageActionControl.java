@@ -16,7 +16,7 @@
 
 package com.guiseframework.component;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.java.Objects;
@@ -170,7 +170,7 @@ public class ImageActionControl extends AbstractImageComponent implements Action
 	 */
 	public ImageActionControl(final InfoModel infoModel, final ImageModel imageModel, final ActionModel actionModel, final Enableable enableable) {
 		super(infoModel, imageModel); //construct the parent class
-		this.actionModel = checkInstance(actionModel, "Action model cannot be null."); //save the action model
+		this.actionModel = requireNonNull(actionModel, "Action model cannot be null."); //save the action model
 		if(actionModel != infoModel && actionModel != imageModel) { //if the action model isn't the same as another model (we don't want to repeat property change events twice) TODO eventually just listen to specific events for each object
 			this.actionModel.addActionListener(new ActionListener() { //create an action repeater to forward events to this component's listeners
 
@@ -182,7 +182,7 @@ public class ImageActionControl extends AbstractImageComponent implements Action
 
 			});
 		}
-		this.enableable = checkInstance(enableable, "Enableable object cannot be null."); //save the enableable object
+		this.enableable = requireNonNull(enableable, "Enableable object cannot be null."); //save the enableable object
 		if(enableable != infoModel) { //if the enableable and the info model are two different objects (we don't want to repeat property change events twice) TODO eventually just listen to specific events for each object
 			this.enableable.addPropertyChangeListener(getRepeatPropertyChangeListener()); //listen and repeat all property changes of the enableable object
 		}

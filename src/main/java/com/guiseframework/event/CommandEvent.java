@@ -16,7 +16,7 @@
 
 package com.guiseframework.event;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.guiseframework.input.Command;
 import com.guiseframework.input.CommandInput;
@@ -43,7 +43,7 @@ public class CommandEvent extends AbstractFocusedInputEvent {
 	 */
 	public CommandEvent(final Object source, final Command command) {
 		super(source); //construct the parent class
-		this.command = checkInstance(command, "Command cannot be null.");
+		this.command = requireNonNull(command, "Command cannot be null.");
 	}
 
 	/**

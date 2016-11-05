@@ -18,13 +18,14 @@ package com.guiseframework;
 
 import java.net.URI;
 
+import static java.util.Objects.*;
+
 import org.urframework.*;
 
 import static com.globalmentor.java.Classes.*;
 
 import com.globalmentor.java.Classes;
 import com.globalmentor.java.Enums;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.Text.*;
 import static org.urframework.URF.*;
@@ -120,7 +121,7 @@ public class Resources extends URFMapResource<URFResource, URFResource> {
 	 * @throws NullPointerException if the given resource key is <code>null</code>.
 	 */
 	public static final URI createURIResourceReference(final String resourceKey) {
-		return createURI(RESOURCE_SCHEME, checkInstance(resourceKey, "Resource key cannot be null."));
+		return createURI(RESOURCE_SCHEME, requireNonNull(resourceKey, "Resource key cannot be null."));
 	}
 
 	/**

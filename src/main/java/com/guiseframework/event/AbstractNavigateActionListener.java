@@ -18,9 +18,9 @@ package com.guiseframework.event;
 
 import java.net.URI;
 
-import com.globalmentor.net.URIPath;
+import static java.util.Objects.*;
 
-import static com.globalmentor.java.Objects.*;
+import com.globalmentor.net.URIPath;
 
 /**
  * An abstract that listens for action events and keeps information for navigating in response.
@@ -71,7 +71,7 @@ public abstract class AbstractNavigateActionListener implements ActionListener {
 	 * @throws NullPointerException if the given navigation URI is <code>null</code>.
 	 */
 	public AbstractNavigateActionListener(final URI navigationURI, final String viewportID) {
-		this.navigationURI = checkInstance(navigationURI, "Navigation URI cannot be null.");
+		this.navigationURI = requireNonNull(navigationURI, "Navigation URI cannot be null.");
 		this.viewportID = viewportID;
 	}
 

@@ -19,12 +19,13 @@ package com.guiseframework.model;
 import java.net.URI;
 import java.text.MessageFormat;
 import java.util.*;
+
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.net.ContentType;
 import com.globalmentor.text.Text;
 
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.text.Text.*;
 
 import com.guiseframework.Guise;
@@ -165,7 +166,7 @@ public class Notification extends DefaultLabelModel {
 	 * @throws NullPointerException if the given error and/or options is <code>null</code>.
 	 */
 	public Notification(final Throwable error, final Option... options) {
-		this(checkInstance(error, "An error must be provided."), error.getMessage() != null ? error.getMessage() : error.toString(), options); //construct the notification with a message from the error
+		this(requireNonNull(error, "An error must be provided."), error.getMessage() != null ? error.getMessage() : error.toString(), options); //construct the notification with a message from the error
 	}
 
 	/**
@@ -248,8 +249,8 @@ public class Notification extends DefaultLabelModel {
 	 * @throws IllegalArgumentException if the given content type is not a text content type.
 	 */
 	public Notification(final String message, final ContentType messageContentType, final Severity severity, final Throwable error, final Option... options) {
-		this.severity = checkInstance(severity, "A severity must be specified.");
-		this.message = checkInstance(message, "A message must be specified.");
+		this.severity = requireNonNull(severity, "A severity must be specified.");
+		this.message = requireNonNull(message, "A message must be specified.");
 		if(!isText(messageContentType)) { //if the new content type is not a text content type
 			throw new IllegalArgumentException("Content type " + messageContentType + " is not a text content type.");
 		}

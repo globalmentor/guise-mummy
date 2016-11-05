@@ -20,8 +20,9 @@ import java.beans.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 import static com.guiseframework.theme.Theme.*;
 
 import com.globalmentor.beans.*;
@@ -327,7 +328,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	 * @throws NullPointerException if the given column is <code>null</code>.
 	 */
 	public ColumnUIModel getColumnUIModel(final TableColumnModel<?> column) { //if we ever allow columns to be removed, automatically remove the corresponding UI model and remove its repeat property change listener
-		checkInstance(column, "Column cannot be null.");
+		requireNonNull(column, "Column cannot be null.");
 		ColumnUIModel columnUIModel; //we'll find a column UI model and store it here
 		columnUIModelMap.readLock().lock(); //get a read lock to the column UI model map
 		try {
@@ -739,7 +740,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	 * @throws NullPointerException if the given table model is <code>null</code>.
 	 */
 	public Table(final TableModel tableModel) {
-		this.tableModel = checkInstance(tableModel, "Table model cannot be null."); //save the table model
+		this.tableModel = requireNonNull(tableModel, "Table model cannot be null."); //save the table model
 		this.tableModel.addPropertyChangeListener(getRepeatPropertyChangeListener()); //listen and repeat all property changes of the table model
 		this.tableModel.addVetoableChangeListener(getRepeatVetoableChangeListener()); //listen and repeat all vetoable changes of the table model
 		//TODO listen to and repeat table model events
@@ -1044,7 +1045,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		 * @throws NullPointerException if the given converter is <code>null</code>.
 		 */
 		public DefaultCellRepresentationStrategy(final Converter<V, String> converter) {
-			this.converter = checkInstance(converter, "Converter cannot be null."); //save the converter
+			this.converter = requireNonNull(converter, "Converter cannot be null."); //save the converter
 		}
 
 		/**
@@ -1117,9 +1118,9 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		 * @throws NullPointerException if the given session, table model and/or cell is <code>null</code>.
 		 */
 		public DefaultCellMessage(final TableModel tableModel, final TableModel.Cell<C> cell, final Converter<? super C, String> converter) {
-			this.tableModel = checkInstance(tableModel, "Table model cannot be null.");
-			this.cell = checkInstance(cell, "Cell cannot be null.");
-			this.converter = checkInstance(converter, "Converter cannot be null.");
+			this.tableModel = requireNonNull(tableModel, "Table model cannot be null.");
+			this.cell = requireNonNull(cell, "Cell cannot be null.");
+			this.converter = requireNonNull(converter, "Converter cannot be null.");
 		}
 
 		/**
@@ -1176,8 +1177,8 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		 * @throws NullPointerException if the given table model and/or cell is <code>null</code>.
 		 */
 		public DefaultCellValueModel(final TableModel model, final TableModel.Cell<C> cell) {
-			super(checkInstance(cell, "Cell cannot be null.").getColumn().getValueClass()); //construct the parent class
-			this.model = checkInstance(model, "Table model cannot be null.");
+			super(requireNonNull(cell, "Cell cannot be null.").getColumn().getValueClass()); //construct the parent class
+			this.model = requireNonNull(model, "Table model cannot be null.");
 			this.cell = cell;
 		}
 

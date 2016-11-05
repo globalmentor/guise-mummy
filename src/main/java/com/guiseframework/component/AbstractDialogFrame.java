@@ -18,7 +18,7 @@ package com.guiseframework.component;
 
 import java.beans.PropertyVetoException;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.java.Objects;
 import com.guiseframework.input.*;
@@ -162,7 +162,7 @@ public abstract class AbstractDialogFrame<V> extends AbstractFrame implements Di
 	 */
 	public AbstractDialogFrame(final ValueModel<V> valueModel, final Component component) {
 		super(component); //construct the parent class
-		this.valueModel = checkInstance(valueModel, "Value model cannot be null."); //save the table model
+		this.valueModel = requireNonNull(valueModel, "Value model cannot be null."); //save the table model
 		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener()); //listen an repeat all property changes of the value model
 		this.valueModel.addVetoableChangeListener(getRepeatVetoableChangeListener()); //listen and repeat all vetoable changes of the value model
 		setModal(true); //default to being a modal frame

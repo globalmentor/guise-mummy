@@ -17,10 +17,11 @@
 package com.guiseframework.platform.web;
 
 import java.util.*;
+
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import static com.globalmentor.java.Maths.*;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.java.Conditions.*;
 
 import com.globalmentor.model.NameValuePair;
@@ -81,7 +82,7 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 		checkArgumentNotNegative(pollInterval);
 		synchronized(requestedPollIntervalMap) { //synchronize to ensure the that race conditions don't cause the actual poll interval to be out of synch with the requested poll intervals
 			final int oldPollInterval = getPollInterval(); //get the current polling interval
-			requestedPollIntervalMap.put(checkInstance(depictedObject, "Depicted object cannot be null."), Integer.valueOf(pollInterval)); //indicate that this depicted object requests a certain poll interval
+			requestedPollIntervalMap.put(requireNonNull(depictedObject, "Depicted object cannot be null."), Integer.valueOf(pollInterval)); //indicate that this depicted object requests a certain poll interval
 			if(pollInterval < oldPollInterval) { //if this poll interval is lower than the current poll interval
 				setPollInterval(pollInterval); //switch to the lower polling interval
 				return true; //indicate that we changed the polling interval
@@ -95,7 +96,7 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 		//Log.trace("ready to discontinue poll interval for", depictedObject);
 		synchronized(requestedPollIntervalMap) { //synchronize to ensure the that race conditions don't cause the actual poll interval to be out of synch with the requested poll intervals
 			final int oldPollInterval = getPollInterval(); //get the current polling interval
-			final Integer relinquishedPollInterval = requestedPollIntervalMap.remove(checkInstance(depictedObject, "Depicted object cannot be null."));
+			final Integer relinquishedPollInterval = requestedPollIntervalMap.remove(requireNonNull(depictedObject, "Depicted object cannot be null."));
 			//Log.trace("got relinquished poll interval", relinquishedPollInterval, "old poll interval", oldPollInterval);
 			if(relinquishedPollInterval != null && relinquishedPollInterval.intValue() <= oldPollInterval) { //if a poll interval was relinquished that was less than or equal to our current poll interval
 			//Log.trace("now there are remaining poll intervals:", requestedPollIntervalMap.size());
@@ -133,7 +134,7 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 
 	@Override
 	public long getDepictID(final String depictIDString) {
-		if(!checkInstance(depictIDString, "Depict ID string cannot be null.").startsWith(DEPICT_ID_STRING_PREFIX)) { //if the string does not start with the correct prefix
+		if(!requireNonNull(depictIDString, "Depict ID string cannot be null.").startsWith(DEPICT_ID_STRING_PREFIX)) { //if the string does not start with the correct prefix
 			throw new IllegalArgumentException("Depict ID string " + depictIDString + " is not in the correct format for this platform.");
 		}
 		return Long.parseLong(depictIDString.substring(DEPICT_ID_STRING_PREFIX.length()), 16); //parse out the actual ID, throwing a NumberFormatException if the ID is not in the correct lexical format

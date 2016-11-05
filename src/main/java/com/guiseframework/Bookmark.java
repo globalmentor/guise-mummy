@@ -17,10 +17,10 @@
 package com.guiseframework;
 
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import java.util.*;
 
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.net.URIs.*;
 
 import com.globalmentor.model.NameValuePair;
@@ -52,7 +52,7 @@ public class Bookmark implements Cloneable {
 	 * @throws NullPointerException if the given name is <code>null</code>.
 	 */
 	public String getParameterValue(final String parameterName) {
-		final Parameter parameter = parameterMap.get(checkInstance(parameterName, "Parameter name cannot be null.")); //get the requested parameter
+		final Parameter parameter = parameterMap.get(requireNonNull(parameterName, "Parameter name cannot be null.")); //get the requested parameter
 		return parameter != null ? parameter.getValue() : null; //return the parameter value, if there was a parameter
 	}
 
@@ -66,7 +66,7 @@ public class Bookmark implements Cloneable {
 	 * @throws ArgumentSyntaxException if the bookmark does not begin with '?' or otherwise is not in the correct format.
 	 */
 	public Bookmark(final CharSequence bookmark) throws ArgumentSyntaxException {
-		final int bookmarkLength = checkInstance(bookmark, "Bookmark string cannot be null.").length(); //get the length of the bookmark
+		final int bookmarkLength = requireNonNull(bookmark, "Bookmark string cannot be null.").length(); //get the length of the bookmark
 		if(bookmarkLength == 0 || bookmark.charAt(0) != QUERY_SEPARATOR) { //if the bookmark string does not begin with '?'
 			throw new ArgumentSyntaxException("Bookmark string " + bookmark + " must being with '?'.");
 		}
@@ -217,7 +217,7 @@ public class Bookmark implements Cloneable {
 		 * @throws NullPointerException if the given name and/or value is <code>null</code>.
 		 */
 		public Parameter(final String name, final String value) {
-			super(checkInstance(name, "Parameter name cannot be null."), checkInstance(value, "Parameter value cannot be null.")); //construct the parent class
+			super(requireNonNull(name, "Parameter name cannot be null."), requireNonNull(value, "Parameter value cannot be null.")); //construct the parent class
 		}
 	}
 }

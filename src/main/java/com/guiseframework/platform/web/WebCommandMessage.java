@@ -17,12 +17,13 @@
 package com.guiseframework.platform.web;
 
 import java.util.*;
+
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.model.NameValuePair;
 
 import static com.globalmentor.collections.Maps.*;
-import static com.globalmentor.java.Objects.*;
 
 /**
  * A command message to or from the web platform.
@@ -55,7 +56,7 @@ public class WebCommandMessage<C extends Enum<C> & WebPlatformCommand> extends A
 	 * @throws NullPointerException if the given command and/or parameters is <code>null</code>.
 	 */
 	public WebCommandMessage(final C command, final NameValuePair<String, Object>... parameters) {
-		this.command = checkInstance(command, "Command cannot be null.");
+		this.command = requireNonNull(command, "Command cannot be null.");
 		this.parameters = unmodifiableMap(addAll(new HashMap<String, Object>(parameters.length), parameters)); //add all the parameters to a new map
 	}
 
@@ -66,8 +67,8 @@ public class WebCommandMessage<C extends Enum<C> & WebPlatformCommand> extends A
 	 * @throws NullPointerException if the given command and/or parameters is <code>null</code>.
 	 */
 	public WebCommandMessage(final C command, final Map<String, Object> parameters) {
-		this.command = checkInstance(command, "Command cannot be null.");
-		this.parameters = unmodifiableMap(new HashMap<String, Object>(checkInstance(parameters, "Parameters cannot be null.")));
+		this.command = requireNonNull(command, "Command cannot be null.");
+		this.parameters = unmodifiableMap(new HashMap<String, Object>(requireNonNull(parameters, "Parameters cannot be null.")));
 	}
 
 }

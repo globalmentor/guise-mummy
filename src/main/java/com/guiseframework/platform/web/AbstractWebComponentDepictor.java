@@ -19,9 +19,11 @@ package com.guiseframework.platform.web;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
-import static java.util.Collections.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.*;
+
+import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.ContentType;
@@ -36,7 +38,6 @@ import com.guiseframework.platform.AbstractComponentDepictor;
 
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Enums.*;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.text.TextFormatter.*;
 import static com.globalmentor.w3c.spec.CSS.*;
 import static com.globalmentor.w3c.spec.HTML.*;
@@ -969,8 +970,8 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	 * @throws NullPointerException if the provided text and/or content type is <code>null</code>.
 	 */
 	protected void writeText(String text, final ContentType contentType) throws IOException { //TODO actually parse and then serialize the content; otherwise, there may be embedded character references that, when sent via AJAX, will cause the XML to be invalid
-		checkInstance(text, "Text cannot be null");
-		checkInstance(contentType, "Content type cannot be null");
+		requireNonNull(text, "Text cannot be null");
+		requireNonNull(contentType, "Content type cannot be null");
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
 		final boolean isXML = XML.isXML(contentType); //see if this is XML
 		final boolean isHTML = isHTML(contentType); //see if this is HTML

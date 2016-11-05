@@ -16,7 +16,7 @@
 
 package com.guiseframework.component;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import java.net.URI;
 
@@ -145,7 +145,7 @@ public abstract class AbstractSelectActionControl extends AbstractActionControl 
 		 * @throws NullPointerException if the given select action control is <code>null</code>.
 		 */
 		public SelectActionListener(final SelectActionControl selectActionControl) {
-			this.selectActionControl = checkInstance(selectActionControl, "Select action control cannot be null.");
+			this.selectActionControl = requireNonNull(selectActionControl, "Select action control cannot be null.");
 		}
 
 		/**

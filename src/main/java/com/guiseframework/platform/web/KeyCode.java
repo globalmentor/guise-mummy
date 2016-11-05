@@ -17,9 +17,9 @@
 package com.guiseframework.platform.web;
 
 import java.util.*;
-import static java.util.Collections.*;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import com.guiseframework.input.Key;
 
@@ -57,7 +57,7 @@ public enum KeyCode {
 	 */
 	private KeyCode(final int code, final Key key) {
 		this.code = code;
-		this.key = checkInstance(key, "Key cannot be null.");
+		this.key = requireNonNull(key, "Key cannot be null.");
 	}
 
 	/** The read-only map of key codes keyed to codes. */

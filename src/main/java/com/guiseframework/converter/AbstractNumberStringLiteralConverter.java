@@ -17,12 +17,12 @@
 package com.guiseframework.converter;
 
 import static java.text.MessageFormat.*;
+import static java.util.Objects.*;
 
 import java.text.*;
 import java.util.*;
 
 import static com.globalmentor.java.Characters.*;
-import static com.globalmentor.java.Objects.*;
 
 /**
  * An abstract implementation an object that can convert a number from and to a string. If the currency style is chosen, care should be taken to indicate a
@@ -81,7 +81,7 @@ public abstract class AbstractNumberStringLiteralConverter<V extends Number> ext
 	 * @throws IllegalArgumentException if a currency is provided for a style other than {@link Style#CURRENCY}.
 	 */
 	public AbstractNumberStringLiteralConverter(final Style style, final Currency currency) {
-		this.style = checkInstance(style, "Style cannot be null"); //save the style
+		this.style = requireNonNull(style, "Style cannot be null"); //save the style
 		if(currency != null && style != Style.CURRENCY) { //if a currency is provided for a non-currency style
 			throw new IllegalArgumentException("A specific currency is only relevant for the currency representation style.");
 		}

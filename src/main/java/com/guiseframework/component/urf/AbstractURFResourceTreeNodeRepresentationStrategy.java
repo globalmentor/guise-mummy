@@ -18,9 +18,10 @@ package com.guiseframework.component.urf;
 
 import java.net.URI;
 
+import static java.util.Objects.*;
+
 import org.urframework.*;
 
-import static com.globalmentor.java.Objects.*;
 import static org.urframework.URF.*;
 
 import com.guiseframework.component.*;
@@ -80,7 +81,7 @@ public abstract class AbstractURFResourceTreeNodeRepresentationStrategy<V extend
 	 * @throws NullPointerException if the given label manager is <code>null</code>.
 	 */
 	public AbstractURFResourceTreeNodeRepresentationStrategy(final TURFNamespaceLabelManager namespaceLabelManager) {
-		this.namespaceLabelManager = checkInstance(namespaceLabelManager, "Namespace label manager cannot be null."); //save the manager we'll use for generating labels
+		this.namespaceLabelManager = requireNonNull(namespaceLabelManager, "Namespace label manager cannot be null."); //save the manager we'll use for generating labels
 	}
 
 	/**

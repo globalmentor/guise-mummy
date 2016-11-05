@@ -21,8 +21,9 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.*;
 
+import static java.util.Objects.*;
+
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.java.Objects.*;
 
 import com.globalmentor.collections.DecoratorReadWriteLockMap;
 import com.globalmentor.collections.PurgeOnWriteWeakValueHashMap;
@@ -123,12 +124,12 @@ public abstract class AbstractPlatform implements Platform {
 
 	@Override
 	public void registerDepictedObject(final DepictedObject depictedObject) {
-		idDepictedObjectMap.put(Long.valueOf(checkInstance(depictedObject, "Depicted object cannot be null.").getDepictID()), depictedObject);
+		idDepictedObjectMap.put(Long.valueOf(requireNonNull(depictedObject, "Depicted object cannot be null.").getDepictID()), depictedObject);
 	}
 
 	@Override
 	public void unregisterDepictedObject(final DepictedObject depictedObject) {
-		idDepictedObjectMap.remove(Long.valueOf(checkInstance(depictedObject, "Depicted object cannot be null.").getDepictID()));
+		idDepictedObjectMap.remove(Long.valueOf(requireNonNull(depictedObject, "Depicted object cannot be null.").getDepictID()));
 	}
 
 	@Override
@@ -158,6 +159,6 @@ public abstract class AbstractPlatform implements Platform {
 	 * @throws NullPointerException if the given application and/or environment is <code>null</code>.
 	 */
 	public AbstractPlatform(final GuiseApplication application) {
-		this.application = checkInstance(application, "Application cannot be null."); //save the application		
+		this.application = requireNonNull(application, "Application cannot be null."); //save the application		
 	}
 }

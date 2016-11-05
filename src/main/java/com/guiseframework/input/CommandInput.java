@@ -16,9 +16,9 @@
 
 package com.guiseframework.input;
 
-import com.globalmentor.model.AbstractHashObject;
+import static java.util.Objects.*;
 
-import static com.globalmentor.java.Objects.*;
+import com.globalmentor.model.AbstractHashObject;
 
 /**
  * User input in the form of a command.
@@ -40,7 +40,7 @@ public class CommandInput extends AbstractHashObject implements Input {
 	 * @throws NullPointerException if the given command is <code>null</code>.
 	 */
 	public CommandInput(final Command command) {
-		super(checkInstance(command, "Command cannot be null.")); //construct the parent class
+		super(requireNonNull(command, "Command cannot be null.")); //construct the parent class
 		this.command = command; //save the command
 	}
 

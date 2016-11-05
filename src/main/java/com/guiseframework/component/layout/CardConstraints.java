@@ -16,7 +16,7 @@
 
 package com.guiseframework.component.layout;
 
-import static com.globalmentor.java.Objects.*;
+import static java.util.Objects.*;
 
 import java.net.URI;
 
@@ -84,7 +84,7 @@ public class CardConstraints extends ControlConstraints implements InfoModel, Di
 	 */
 	public CardConstraints(final InfoModel infoModel, final boolean enabled) {
 		super(enabled); //construct the parent class 
-		this.infoModel = checkInstance(infoModel, "Info model cannot be null."); //save the info model
+		this.infoModel = requireNonNull(infoModel, "Info model cannot be null."); //save the info model
 		this.infoModel.addPropertyChangeListener(getRepeatPropertyChangeListener()); //listen and repeat all property changes of the info model
 		this.infoModel.addVetoableChangeListener(getRepeatVetoableChangeListener()); //listen and repeat all vetoable changes of the info model
 	}
