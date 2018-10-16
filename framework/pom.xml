@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.globalmentor</groupId>
+		<artifactId>guise</artifactId>
+		<version>0.5.1-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>guise-framework</artifactId>
+
+	<name>Guise Framework</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-library</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>6.0</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-country-us</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-iso-idcard</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-itu</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-javascript</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-mail</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-rdf</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-servlet</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-text-elff</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-w3c-spec</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>urframework</artifactId>
+			<version>0.5.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>ploop</artifactId>
+			<version>0.5.0</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/assets</directory>
+			</resource>
+			<resource>
+				<directory>src/main/licenses</directory>
+			</resource>
+			<resource>
+				<directory>src/main/javascript</directory>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+
+			<!--generate build date -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+			</plugin>
+
+			<!--compress Guise JavaScript files to assets directory -->
+			<plugin>
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>yuicompressor-maven-plugin</artifactId>
+				<configuration>
+					<suffix>.min</suffix>
+					<excludes>
+						<exclude>com/guiseframework/assets/javascript/tiny_mce/**/*.*</exclude>
+						<exclude>com/guiseframework/assets/javascript/ckeditor-*/**/*.*</exclude>
+					</excludes>
+					<jswarn>false</jswarn>
+				</configuration>
+			</plugin>
+
+			<!--copy dependency JavaScript files -->
+			<!-- TODO bring back when works on m2e and JavaScript files are moved 
+				back to globalmentor-core -->
+			<!-- <plugin> -->
+			<!-- <groupId>org.apache.maven.plugins</groupId> -->
+			<!-- <artifactId>maven-dependency-plugin</artifactId> -->
+			<!-- <version>2.4</version> -->
+			<!-- <executions> -->
+			<!-- <execution> -->
+			<!-- <id>unpack</id> -->
+			<!-- <phase>process-resources</phase> -->
+			<!-- <goals> -->
+			<!-- <goal>unpack</goal> -->
+			<!-- </goals> -->
+			<!-- <configuration> -->
+			<!-- <artifactItems> -->
+			<!-- <artifactItem> -->
+			<!-- <groupId>com.globalmentor</groupId> -->
+			<!-- <artifactId>globalmentor-core</artifactId> -->
+			<!-- <overWrite>true</overWrite> -->
+			<!-- <outputDirectory>${project.build.outputDirectory}/com/guiseframework/assets/javascript</outputDirectory> -->
+			<!-- <includes>**/*.js</includes> -->
+			<!-- </artifactItem> -->
+			<!-- </artifactItems> -->
+			<!-- </configuration> -->
+			<!-- </execution> -->
+			<!-- </executions> -->
+			<!-- </plugin> -->
+		</plugins>
+	</build>
+</project>

@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.globalmentor</groupId>
-	<artifactId>guiseframework</artifactId>
-	<version>0.5.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<parent>
+		<groupId>com.globalmentor</groupId>
+		<artifactId>globalmentor-parent</artifactId>
+		<version>8.0.0</version>
+	</parent>
 
-	<name>Guise Application Framework</name>
+	<groupId>com.globalmentor</groupId>
+	<artifactId>guise</artifactId>
+	<version>0.5.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>Guise Ecosystem</name>
 	<url>http://www.globalmentor.com/software/</url>
 	<inceptionYear>2005</inceptionYear>
-
-	<licenses>
-		<license>
-			<name>Apache License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
 
 	<organization>
 		<name>GlobalMentor, Inc.</name>
@@ -40,233 +37,97 @@
 		<url>https://bitbucket.org/globalmentor/guiseframework</url>
 	</scm>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+	<modules>
+		<module>framework</module>
+	</modules>
 
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-library</artifactId>
-			<version>1.3</version>
-			<scope>test</scope>
-		</dependency>
+	<dependencyManagement>
+		<dependencies>
 
-		<dependency>
-			<groupId>javax</groupId>
-			<artifactId>javaee-api</artifactId>
-			<version>6.0</version>
-			<scope>provided</scope>
-		</dependency>
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-core</artifactId>
+				<version>0.5.0</version>
+			</dependency>
 
-		<dependency>
-			<groupId>com.google.code.findbugs</groupId>
-			<artifactId>jsr305</artifactId>
-			<version>3.0.2</version>
-			<optional>true</optional>
-		</dependency>
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-country-us</artifactId>
+				<version>0.5.0</version>
+			</dependency>
 
-		<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-			<version>1.2</version>
-		</dependency>
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-iso-idcard</artifactId>
+				<version>0.5.0</version>
+			</dependency>
 
-		<dependency>
-			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-core</artifactId>
-			<version>0.5.0</version>
-		</dependency>
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-itu</artifactId>
+				<version>0.5.0</version>
+			</dependency>
 
-		<dependency>
-			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-country-us</artifactId>
-			<version>0.5.0</version>
-		</dependency>
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-javascript</artifactId>
+				<version>0.5.0</version>
+			</dependency>
 
-		<dependency>
-			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-iso-idcard</artifactId>
-			<version>0.5.0</version>
-		</dependency>
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-mail</artifactId>
+				<version>0.5.0</version>
+			</dependency>
 
-		<dependency>
-			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-itu</artifactId>
-			<version>0.5.0</version>
-		</dependency>
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-rdf</artifactId>
+				<version>0.5.0</version>
+			</dependency>
 
-		<dependency>
-			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-javascript</artifactId>
-			<version>0.5.0</version>
-		</dependency>
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-servlet</artifactId>
+				<version>0.5.0</version>
+			</dependency>
 
-		<dependency>
-			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-mail</artifactId>
-			<version>0.5.0</version>
-		</dependency>
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-text-elff</artifactId>
+				<version>0.5.0</version>
+			</dependency>
 
-		<dependency>
-			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-rdf</artifactId>
-			<version>0.5.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-servlet</artifactId>
-			<version>0.5.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-text-elff</artifactId>
-			<version>0.5.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-w3c-spec</artifactId>
-			<version>0.5.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.globalmentor</groupId>
-			<artifactId>urframework</artifactId>
-			<version>0.5.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.globalmentor</groupId>
-			<artifactId>ploop</artifactId>
-			<version>0.5.0</version>
-		</dependency>
-	</dependencies>
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-w3c-spec</artifactId>
+				<version>0.5.0</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
-		<resources>
-			<resource>
-				<directory>src/main/assets</directory>
-			</resource>
-			<resource>
-				<directory>src/main/licenses</directory>
-			</resource>
-			<resource>
-				<directory>src/main/javascript</directory>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.5.1</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
-
-			<!--generate build date -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>buildnumber-maven-plugin</artifactId>
-				<version>1.2</version>
-				<executions>
-					<execution>
-						<phase>validate</phase>
-						<goals>
-							<goal>create-timestamp</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<timestampFormat>yyyy-MM-dd</timestampFormat>
-					<timestampPropertyName>build.date</timestampPropertyName>
-				</configuration>
-			</plugin>
-
-			<!--compress Guise JavaScript files to assets directory -->
-			<plugin>
-				<groupId>net.alchim31.maven</groupId>
-				<artifactId>yuicompressor-maven-plugin</artifactId>
-				<version>1.1</version>
-				<executions>
-					<execution>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>compress</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<suffix>.min</suffix>
-					<excludes>
-						<exclude>com/guiseframework/assets/javascript/tiny_mce/**/*.*</exclude>
-						<exclude>com/guiseframework/assets/javascript/ckeditor-*/**/*.*</exclude>
-					</excludes>
-					<jswarn>false</jswarn>
-				</configuration>
-			</plugin>
-
-			<!--copy dependency JavaScript files -->
-			<!-- TODO bring back when works on m2e and JavaScript files are moved 
-				back to globalmentor-core -->
-			<!-- <plugin> -->
-			<!-- <groupId>org.apache.maven.plugins</groupId> -->
-			<!-- <artifactId>maven-dependency-plugin</artifactId> -->
-			<!-- <version>2.4</version> -->
-			<!-- <executions> -->
-			<!-- <execution> -->
-			<!-- <id>unpack</id> -->
-			<!-- <phase>process-resources</phase> -->
-			<!-- <goals> -->
-			<!-- <goal>unpack</goal> -->
-			<!-- </goals> -->
-			<!-- <configuration> -->
-			<!-- <artifactItems> -->
-			<!-- <artifactItem> -->
-			<!-- <groupId>com.globalmentor</groupId> -->
-			<!-- <artifactId>globalmentor-core</artifactId> -->
-			<!-- <overWrite>true</overWrite> -->
-			<!-- <outputDirectory>${project.build.outputDirectory}/com/guiseframework/assets/javascript</outputDirectory> -->
-			<!-- <includes>**/*.js</includes> -->
-			<!-- </artifactItem> -->
-			<!-- </artifactItems> -->
-			<!-- </configuration> -->
-			<!-- </execution> -->
-			<!-- </executions> -->
-			<!-- </plugin> -->
-
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.7</version>
-				<extensions>true</extensions>
-				<configuration>
-					<serverId>ossrh</serverId>
-					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-					<autoReleaseAfterClose>true</autoReleaseAfterClose>
-				</configuration>
-			</plugin>
-		</plugins>
-
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>buildnumber-maven-plugin</artifactId>
+					<version>1.4</version>
+					<configuration>
+						<timestampFormat>yyyy-MM-dd</timestampFormat>
+						<timestampPropertyName>build.date</timestampPropertyName>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>net.alchim31.maven</groupId>
+					<artifactId>yuicompressor-maven-plugin</artifactId>
+					<version>1.5.1</version>
+				</plugin>
+
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
+				<!-- TODO is this still needed? -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -325,72 +186,4 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
-
-	<profiles>
-		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>3.0.0</version>
-						<executions>
-							<execution>
-								<id>package-sources</id>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>2.10.4</version>
-						<configuration>
-							<quiet>true</quiet>
-						</configuration>
-						<executions>
-							<execution>
-								<id>package-javadocs</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.6</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-								<configuration>
-									<keyname>software@globalmentor.com</keyname>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>
