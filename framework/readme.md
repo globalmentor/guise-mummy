@@ -1,8 +1,6 @@
 # Guise
 
-The Guise™ Internet application ecosystem.
-
-* Guise Framework
+The Guise™ Internet application framework.
 
 ## Download
 
