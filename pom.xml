@@ -113,10 +113,17 @@
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>buildnumber-maven-plugin</artifactId>
 					<version>1.4</version>
-					<configuration>
-						<timestampFormat>yyyy-MM-dd</timestampFormat>
-						<timestampPropertyName>build.date</timestampPropertyName>
-					</configuration>
+					<executions>
+						<execution>
+							<goals>
+								<goal>create-timestamp</goal>
+							</goals>
+							<configuration>
+								<timestampFormat>yyyy-MM-dd</timestampFormat>
+								<timestampPropertyName>build.date</timestampPropertyName>
+							</configuration>
+						</execution>
+					</executions>
 				</plugin>
 
 				<plugin>
