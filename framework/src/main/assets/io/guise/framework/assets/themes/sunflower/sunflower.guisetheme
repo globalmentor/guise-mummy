@@ -1,0 +1,23 @@
+`URF:
+	"select"~<http://urf.name/select>
+	"xml"~<http://urf.name/xml>
+	"theme"~<https://guise.io/framework/namespaces/theme>
+	"component"~<java:/io/guise/framework/component/>
+	"geometry"~<java:/io/guise/framework/geometry/>
+	"resources"~<https://guise.io/framework/namespaces/resources>
+	"style"~<java:/io/guise/framework/style/>
+	"dc"~<http://purl.org/dc/elements/1.1/>
+;¤
+	*theme.Theme:
+		dc.title="Guise™ Sunflower Theme"
+		dc.description="The experiemental sunflower Guise™ theme."
+		dc.rights="Copyright © 2007 GlobalMentor, Inc."
+		dc.creator="Garret Wilson"
+	
+		theme.parentURI=<path:~guise/assets/themes/basic/basic.guisetheme>
+	
+		xml.style=«sunflower.css»
+	
+		theme.resources=«sunflower.resources.turf»
+	;
+.

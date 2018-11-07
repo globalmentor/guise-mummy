@@ -121,8 +121,8 @@
 				<configuration>
 					<suffix>.min</suffix>
 					<excludes>
-						<exclude>com/guiseframework/assets/javascript/tiny_mce/**/*.*</exclude>
-						<exclude>com/guiseframework/assets/javascript/ckeditor-*/**/*.*</exclude>
+						<exclude>io/guise/framework/assets/javascript/tiny_mce/**/*.*</exclude>
+						<exclude>io/guise/framework/assets/javascript/ckeditor-*/**/*.*</exclude>
 					</excludes>
 					<jswarn>false</jswarn>
 				</configuration>
@@ -148,7 +148,7 @@
 			<!-- <groupId>com.globalmentor</groupId> -->
 			<!-- <artifactId>globalmentor-core</artifactId> -->
 			<!-- <overWrite>true</overWrite> -->
-			<!-- <outputDirectory>${project.build.outputDirectory}/com/guiseframework/assets/javascript</outputDirectory> -->
+			<!-- <outputDirectory>${project.build.outputDirectory}/io/guise/framework/assets/javascript</outputDirectory> -->
 			<!-- <includes>**/*.js</includes> -->
 			<!-- </artifactItem> -->
 			<!-- </artifactItems> -->
