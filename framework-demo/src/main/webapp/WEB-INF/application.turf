@@ -9,7 +9,8 @@
 
 		destinations=[
 			*guise.ComponentDestination("", test.HomePanel)
-			*guise.ComponentDestination("hello-world/", demo.HelloWorldPanel)
+			*guise.ComponentDestination("helloworld/", demo.HelloWorldPanel)
+			*guise.ComponentDestination("temperature/", demo.TemperatureConversionPanel)
 		]
 	;
 .
