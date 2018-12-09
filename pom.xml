@@ -141,7 +141,6 @@
 
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
-				<!-- TODO is this still needed? -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -149,19 +148,6 @@
 					<configuration>
 						<lifecycleMappingMetadata>
 							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>net.alchim31.maven</groupId>
-										<artifactId>yuicompressor-maven-plugin</artifactId>
-										<versionRange>[1.1,)</versionRange>
-										<goals>
-											<goal>compress</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
 								<!-- TODO bring back when works on m2e and JavaScript files are moved 
 									back to globalmentor-core -->
 								<!-- <pluginExecution> -->
