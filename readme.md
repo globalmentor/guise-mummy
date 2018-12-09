@@ -6,7 +6,7 @@ The Guise™ Internet application ecosystem.
 
 ## Download
 
-Guise is available in the Maven Central Repository as [io.guise:guise](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22io.guise%22%20AND%20a%3A%22guise%22).
+Guise is available in the Maven Central Repository as [io.guise:guise](https://search.maven.org/search?q=g:io.guise%20AND%20a:guise).
 
 ## Issues
 

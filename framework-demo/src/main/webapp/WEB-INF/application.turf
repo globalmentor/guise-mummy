@@ -1,0 +1,15 @@
+`URF:
+	"urf"~<http://urf.name/urf/>
+	"guise"~<java:/io/guise/framework/>
+	"demo"~<java:/io/guise/framework/demo/>
+	"test"~<java:/io/guise/framework/test/>
+;¤
+	*demo.DemoApplication:
+		locales=[«*urf.Language("en-US")»]
+
+		destinations=[
+			*guise.ComponentDestination("", test.HomePanel)
+			*guise.ComponentDestination("hello-world/", demo.HelloWorldPanel)
+		]
+	;
+.
