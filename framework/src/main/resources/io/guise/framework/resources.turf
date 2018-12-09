@@ -1,5 +1,5 @@
 `URF:
-	"resources"~<https://guise.io/framework/namespaces/resources>
+	"resources"~<https://guise.io/framework/namespaces/resources/>
 	"dc"~<http://purl.org/dc/elements/1.1/>
 ;¤
 	*resources.Resources:

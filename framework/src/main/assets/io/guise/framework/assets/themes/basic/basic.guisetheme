@@ -1,11 +1,11 @@
 `URF:
-	"select"~<http://urf.name/select>
-	"xml"~<http://urf.name/xml>
-	"theme"~<https://guise.io/framework/namespaces/theme>
+	"select"~<http://urf.name/select/>
+	"xml"~<http://urf.name/xml/>
+	"theme"~<https://guise.io/framework/namespaces/theme/>
 	"component"~<java:/io/guise/framework/component/>
 	"layout"~<java:/io/guise/framework/component/layout/>
 	"geometry"~<java:/io/guise/framework/geometry/>
-	"resources"~<https://guise.io/framework/namespaces/resources>
+	"resources"~<https://guise.io/framework/namespaces/resources/>
 	"style"~<java:/io/guise/framework/style/>
 	"dc"~<http://purl.org/dc/elements/1.1/>
 ;¤
