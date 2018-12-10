@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
+
+	<display-name>Guise Framework Demo</display-name>
+
+	<description>Guise Framework Demo Web Application</description>
+
+	<listener>
+		<description>The class that manages Guise sessions in an HTTP servlet environment.</description>
+		<listener-class>io.guise.framework.platform.web.HTTPServletGuiseSessionManager</listener-class>
+	</listener>
+
+	<servlet>
+		<description>Guise Framework Demo Servlet</description>
+		<servlet-name>demo</servlet-name>
+		<servlet-class>io.guise.framework.platform.web.GuiseHTTPServlet</servlet-class>
+
+		<init-param>
+			<param-name>application</param-name>
+			<param-value>application.turf</param-value>
+		</init-param>
+
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>demo</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
+
+</web-app>
