@@ -38,6 +38,10 @@
 		<url>https://bitbucket.org/globalmentor/guise</url>
 	</scm>
 
+	<properties>
+		<maven.compiler.release>11</maven.compiler.release>
+	</properties>
+
 	<modules>
 		<module>framework</module>
 		<module>framework-demo</module>
@@ -109,6 +113,12 @@
 				<groupId>io.guise</groupId>
 				<artifactId>guise-framework</artifactId>
 				<version>0.6.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>4.0.1</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
