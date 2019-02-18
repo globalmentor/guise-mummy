@@ -22,7 +22,7 @@ import java.util.*;
 
 import static java.util.Objects.*;
 
-import org.ploop.graph.PLOOPURFProcessor;
+import io.ploop.transform.urf.PLOOPURFProcessor;
 import org.urframework.*;
 import org.urframework.select.*;
 import org.urframework.xml.XML;

@@ -21,7 +21,7 @@ import static io.guise.framework.theme.Theme.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
-import org.ploop.graph.PLOOPURFProcessor;
+import io.ploop.transform.urf.PLOOPURFProcessor;
 import org.urframework.AbstractClassTypedURFResource;
 
 import com.globalmentor.util.DataException;

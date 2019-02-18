@@ -26,9 +26,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import static java.util.Objects.*;
 
-import org.ploop.*;
-import org.ploop.graph.PLOOPURFGenerator;
-import org.ploop.graph.PLOOPURFProcessor;
+import io.ploop.transform.urf.PLOOPURFGenerator;
+import io.ploop.transform.urf.PLOOPURFProcessor;
 import org.urframework.URFResource;
 
 import static com.globalmentor.java.Arrays.*;

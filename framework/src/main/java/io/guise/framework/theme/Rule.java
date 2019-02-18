@@ -19,7 +19,7 @@ package io.guise.framework.theme;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
-import org.ploop.graph.PLOOPURFProcessor;
+import io.ploop.transform.urf.PLOOPURFProcessor;
 import org.urframework.AbstractClassTypedURFResource;
 import org.urframework.select.Select;
 import org.urframework.select.Selector;

@@ -27,7 +27,7 @@ import static java.text.MessageFormat.*;
 
 import java.util.*;
 
-import org.ploop.graph.PLOOPURFProcessor;
+import io.ploop.transform.urf.PLOOPURFProcessor;
 import org.urframework.*;
 import org.urframework.io.AbstractTURFIO;
 
