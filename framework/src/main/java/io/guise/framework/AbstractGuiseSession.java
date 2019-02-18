@@ -56,7 +56,7 @@ import io.guise.framework.prototype.*;
 import io.guise.framework.style.*;
 import io.guise.framework.theme.Theme;
 
-import static com.globalmentor.io.Files.*;
+import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Writers.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Characters.*;
@@ -398,7 +398,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		try {
 			return getResource(resourceKey); //retrieve a string from the resource bundle
 		} catch(final MissingResourceException missingResourceException) { //if the resource does not exist
-			if(isPath(resourceKey) && !isAbsolutePath(resourceKey)) { //if the resource key is a relative path
+			if(isPath(resourceKey) && !isPathAbsolute(resourceKey)) { //if the resource key is a relative path
 				final String applicationResourcePath = getApplication().getLocaleResourcePath(resourceKey, getLocale()); //try to get a locale-sensitive path to the resource
 				if(applicationResourcePath != null) { //if there is a path to the resource
 					final InputStream inputStream = getApplication().getResourceInputStream(applicationResourcePath); //get a stream to the resource
@@ -1199,7 +1199,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	}
 
 	/** The set of string reference delimiters, <code>SOS</code> and <code>ST</code>. */
-	private static final Characters STRING_REFERENCE_DELIMITERS = new Characters(START_OF_STRING_CHAR, STRING_TERMINATOR_CHAR);
+	private static final Characters STRING_REFERENCE_DELIMITERS = Characters.of(START_OF_STRING_CHAR, STRING_TERMINATOR_CHAR);
 
 	@Override
 	public String dereferenceString(final String string) throws MissingResourceException {

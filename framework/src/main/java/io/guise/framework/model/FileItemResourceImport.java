@@ -21,8 +21,7 @@ import java.io.*;
 import static java.util.Objects.*;
 
 import com.globalmentor.net.ContentType;
-
-import static com.globalmentor.io.Files.*;
+import com.globalmentor.net.URIs;
 
 import org.apache.commons.fileupload.FileItem;
 
@@ -65,7 +64,7 @@ public class FileItemResourceImport implements ResourceImport {
 		contentType = ContentType.create(fileItem.getContentType()); //create a content type object from the file item
 		String name = fileItem.getName(); //get the name of the item
 		if(name != null) { //if there is a filename
-			name = getFilename(name); //make sure it is only a filename and not a complete path
+			name = URIs.getName(name); //make sure it is only a filename and not a complete path TODO verify that the relevant browsers including path information use forward slashes
 		}
 		simpleName = name; //save the filename
 	}

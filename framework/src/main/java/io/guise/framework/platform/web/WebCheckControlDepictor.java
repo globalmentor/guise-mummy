@@ -39,7 +39,8 @@ import static io.guise.framework.platform.web.GuiseCSSStyleConstants.*;
 public class WebCheckControlDepictor<C extends CheckControl> extends AbstractWebComponentDepictor<C> {
 
 	/** The weak map of IDs for mutual exclusion groups. The map is weak so as not to tie up memory for groups that are no longer used. */
-	private static Map<MutualExclusionPolicyModelGroup, Long> mutualExclusionGroupIDMap = synchronizedMap(new WeakHashMap<MutualExclusionPolicyModelGroup, Long>());
+	private static Map<MutualExclusionPolicyModelGroup, Long> mutualExclusionGroupIDMap = synchronizedMap(
+			new WeakHashMap<MutualExclusionPolicyModelGroup, Long>());
 
 	/**
 	 * Determines the ID for the mutual exclusion group. If no ID has been assigned to the given group, one will be generated and associated with the group.
@@ -129,8 +130,7 @@ public class WebCheckControlDepictor<C extends CheckControl> extends AbstractWeb
 				throw new IllegalArgumentException("Depict event " + event + " meant for depicted object " + webChangeEvent.getDepictedObject());
 			}
 			final Map<String, Object> properties = webChangeEvent.getProperties(); //get the new properties
-			final Boolean value = asInstance(properties.get("value"), Boolean.class); //get the new value TODO use a constant
-			if(value != null) { //if a value was given
+			asInstance(properties.get("value"), Boolean.class).ifPresent(value -> { //get the new value TODO use a constant
 				try {
 					component.setNotification(null); //clear the component errors; this method may generate new errors
 					component.setValue(value); //store the value in the model; this will throw an exception if the value is invalid
@@ -138,7 +138,7 @@ public class WebCheckControlDepictor<C extends CheckControl> extends AbstractWeb
 					final Throwable cause = propertyVetoException.getCause(); //get the cause of the veto, if any
 					component.setNotification(new Notification(cause != null ? cause : propertyVetoException)); //add notification of the error to the component
 				}
-			}
+			});
 		}
 		/*TODO fix for non-AJAX posts
 				if(event instanceof FormControlEvent) {	//if this is a form submission

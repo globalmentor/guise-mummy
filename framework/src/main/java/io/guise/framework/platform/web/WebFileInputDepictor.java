@@ -51,8 +51,7 @@ public class WebFileInputDepictor<C extends ResourceImportControl> extends Abstr
 			final C component = getDepictedObject(); //get the component
 			final String componentName = getDepictName(); //get the component's name
 			if(componentName != null) { //if this component has a name
-				final ResourceImport resourceImport = asInstance(formEvent.getParameterListMap().getItem(componentName), ResourceImport.class); //get the value reported for this component
-				if(resourceImport != null) { //if a resource import was given
+				asInstance(formEvent.getParameterListMap().getItem(componentName), ResourceImport.class).ifPresent(resourceImport -> { //get the value reported for this component; if a resource import was given
 					try {
 						component.setNotification(null); //clear the component errors; this method may generate new errors
 						component.setValue(resourceImport); //store the value in the model
@@ -60,7 +59,7 @@ public class WebFileInputDepictor<C extends ResourceImportControl> extends Abstr
 						final Throwable cause = propertyVetoException.getCause(); //get the cause of the veto, if any
 						component.setNotification(new Notification(cause != null ? cause : propertyVetoException)); //add notification of the error to the component
 					}
-				}
+				});
 			}
 		}
 		super.processEvent(event); //do the default event processing

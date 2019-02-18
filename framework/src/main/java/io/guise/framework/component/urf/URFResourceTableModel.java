@@ -47,8 +47,8 @@ public class URFResourceTableModel extends AbstractListSelectTableModel<URFResou
 	}
 
 	@Override
-	protected <C> C getCellValue(final URFResource resource, final int rowIndex, final TableColumnModel<C> column) {
-		final Class<C> valueClass = column.getValueClass(); //get the type of value for the coloumn
+	protected <C> C getCellValue(final URFResource resource, final int rowIndex, final TableColumnModel<C> column) { //TODO return Optional<>?
+		final Class<C> valueClass = column.getValueClass(); //get the type of value for the column
 		final C value; //we'll determine the value to use
 		if(column instanceof URFResourceURITableColumnModel) { //if this is the reference URI column
 			value = valueClass.cast(resource.getURI()); //use the reference URI
@@ -59,7 +59,7 @@ public class URFResourceTableModel extends AbstractListSelectTableModel<URFResou
 			if(URFResource.class.isAssignableFrom(valueClass)) { //if this is just an URF resource property column
 				value = column.getValueClass().cast(propertyValue); //use the value as-is
 			} else { //if the column expects another type
-				value = asInstance(URF.asObject(propertyValue), valueClass); //try to convert the property value to the correct type
+				value = asInstance(URF.asObject(propertyValue), valueClass).orElse(null); //try to convert the property value to the correct type
 			}
 		}
 		return value; //return the value we determined

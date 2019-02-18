@@ -28,7 +28,6 @@ import static com.globalmentor.java.Objects.*;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.model.TaskState;
 import static com.globalmentor.net.URIs.*;
-import com.globalmentor.util.*;
 
 import io.guise.framework.platform.*;
 
@@ -36,8 +35,8 @@ import io.guise.framework.platform.*;
  * An abstract depictor for a collector of platform files for the web platform.
  * @author Garret Wilson
  */
-public class AbstractWebPlatformFileCollectorDepictor extends AbstractWebDepictor<PlatformFileCollector> implements
-		PlatformFileCollector.Depictor<PlatformFileCollector> {
+public class AbstractWebPlatformFileCollectorDepictor extends AbstractWebDepictor<PlatformFileCollector>
+		implements PlatformFileCollector.Depictor<PlatformFileCollector> {
 
 	/** The web commands for controlling the platform file collector. */
 	public enum WebPlatformFileCollectorCommand implements WebPlatformCommand {
@@ -82,16 +81,15 @@ public class AbstractWebPlatformFileCollectorDepictor extends AbstractWebDepicto
 	@SuppressWarnings("unchecked")
 	@Override
 	public void browse() {
-		getPlatform().getSendMessageQueue().add(
-				new WebCommandDepictEvent<WebPlatformFileCollectorCommand>(getDepictedObject(), WebPlatformFileCollectorCommand.FILE_BROWSE,
-						new NameValuePair<String, Object>(WebPlatformFileCollectorCommand.MULTIPLE_PROPERTY, Boolean.TRUE))); //send a file browse command to the platform TODO fix single/multiple
+		getPlatform().getSendMessageQueue().add(new WebCommandDepictEvent<WebPlatformFileCollectorCommand>(getDepictedObject(),
+				WebPlatformFileCollectorCommand.FILE_BROWSE, new NameValuePair<String, Object>(WebPlatformFileCollectorCommand.MULTIPLE_PROPERTY, Boolean.TRUE))); //send a file browse command to the platform TODO fix single/multiple
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void cancel(final PlatformFile platformFile) {
-		getPlatform().getSendMessageQueue().add(
-				new WebCommandDepictEvent<WebPlatformFileCollectorCommand>(getDepictedObject(), WebPlatformFileCollectorCommand.FILE_CANCEL, //send a file cancel command to the platform
+		getPlatform().getSendMessageQueue()
+				.add(new WebCommandDepictEvent<WebPlatformFileCollectorCommand>(getDepictedObject(), WebPlatformFileCollectorCommand.FILE_CANCEL, //send a file cancel command to the platform
 						new NameValuePair<String, Object>(WebPlatformFileCollectorCommand.ID_PROPERTY, ((WebPlatformFile)platformFile).getID()))); //send the ID of the file
 	}
 
@@ -100,10 +98,10 @@ public class AbstractWebPlatformFileCollectorDepictor extends AbstractWebDepicto
 	public void upload(final PlatformFile platformFile, final URI destinationURI) {
 		final URI resolvedDestinationURI = getSession().getApplication().resolveURI(destinationURI); //resolve the destination URI
 		//add an identification of the Guise session to the URI if needed, as Flash 8 on FireFox sends the wrong HTTP session ID cookie value TODO transfer to a Flash-only version if we can
-		final URI sessionedDestinationURI = appendQueryParameter(resolvedDestinationURI, WebPlatform.GUISE_SESSION_UUID_URI_QUERY_PARAMETER, getSession().getUUID()
-				.toString());
-		getPlatform().getSendMessageQueue().add(
-				new WebCommandDepictEvent<WebPlatformFileCollectorCommand>(getDepictedObject(), WebPlatformFileCollectorCommand.FILE_UPLOAD, //send a file upload command to the platform
+		final URI sessionedDestinationURI = appendQueryParameter(resolvedDestinationURI, WebPlatform.GUISE_SESSION_UUID_URI_QUERY_PARAMETER,
+				getSession().getUUID().toString());
+		getPlatform().getSendMessageQueue()
+				.add(new WebCommandDepictEvent<WebPlatformFileCollectorCommand>(getDepictedObject(), WebPlatformFileCollectorCommand.FILE_UPLOAD, //send a file upload command to the platform
 						new NameValuePair<String, Object>(WebPlatformFileCollectorCommand.ID_PROPERTY, ((WebPlatformFile)platformFile).getID()), //send the ID of the file
 						new NameValuePair<String, Object>(WebPlatformFileCollectorCommand.DESTINATION_URI_PROPERTY, sessionedDestinationURI))); //indicate the destination
 	}
@@ -117,7 +115,8 @@ public class AbstractWebPlatformFileCollectorDepictor extends AbstractWebDepicto
 				throw new IllegalArgumentException("Depict event " + event + " meant for depicted object " + webChangeEvent.getDepictedObject());
 			}
 			final Map<String, Object> properties = webChangeEvent.getProperties(); //get the new properties
-			final List<Map<String, Object>> fileReferences = (List<Map<String, Object>>)asInstance(properties.get("fileReferences"), List.class); //get the new file references, if any
+			@SuppressWarnings("unchecked")
+			final List<Map<String, Object>> fileReferences = (List<Map<String, Object>>)asInstance(properties.get("fileReferences"), List.class).orElse(null); //get the new file references, if any
 			if(fileReferences != null) { //if file references were given
 				idPlatformFileMap.clear(); //clear the map of platform files TODO fix race condition, perhaps by adding read/write locks; it is very unlikely that this class would be used in such as way as to create race conditions, however, as most of the time the file references of a file reference list will be updated at long intervals  
 				final List<WebPlatformFile> platformFileList = new ArrayList<WebPlatformFile>(fileReferences.size()); //create a new list to store the platform files
@@ -130,15 +129,14 @@ public class AbstractWebPlatformFileCollectorDepictor extends AbstractWebDepicto
 				}
 				platformFileCollector.setPlatformFiles(platformFileList); //tell the file reference list which platform files it now has
 			}
-			final String taskStateString = asInstance(properties.get("taskState"), String.class); //get the task state, if reported TODO use a constant
-			final Number transferred = asInstance(properties.get("transferred"), Number.class); //get the bytes transferred, if reported TODO use a constant
-			if(taskStateString != null && transferred != null) { //if we have progress
-				final TaskState taskState = getSerializedEnum(TaskState.class, taskStateString); //get the task state
-				final Number total = asInstance(properties.get("total"), Number.class); //get the total bytes to transfer, if any
-				final String webPlatformFileID = asInstance(properties.get("id"), String.class); //get the ID of the platform file
-				final WebPlatformFile platformFile = webPlatformFileID != null ? getPlatformFile(webPlatformFileID) : null; //get the platform file identified
+			final TaskState taskState = asInstance(properties.get("taskState"), String.class)
+					.map(taskStateString -> getSerializedEnum(TaskState.class, taskStateString)).orElse(null); //get the task state, if reported TODO use a constant
+			final Number transferred = asInstance(properties.get("transferred"), Number.class).orElse(null); //get the bytes transferred, if reported TODO use a constant
+			if(taskState != null && transferred != null) { //if we have progress
+				final Number total = asInstance(properties.get("total"), Number.class).orElse(Long.valueOf(-1)); //get the total bytes to transfer, if any
+				final WebPlatformFile platformFile = asInstance(properties.get("id"), String.class).map(this::getPlatformFile).orElse(null); //get the platform file identified, if any
 				if(platformFile != null) { //if we know the platform file
-					platformFile.fireProgressed(taskState, transferred.longValue(), total != null ? total.longValue() : -1); //update the file progress
+					platformFile.fireProgressed(taskState, transferred.longValue(), total.longValue()); //update the file progress
 				}
 			}
 		}

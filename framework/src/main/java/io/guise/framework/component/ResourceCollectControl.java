@@ -28,6 +28,7 @@ import static com.globalmentor.net.URIs.*;
 
 import com.globalmentor.event.EventListenerManager;
 import com.globalmentor.model.TaskState;
+import com.globalmentor.net.URIs;
 
 import io.guise.framework.*;
 import io.guise.framework.event.*;
@@ -73,7 +74,7 @@ public class ResourceCollectControl extends AbstractControl {
 		}
 	}
 
-	/** The paths of the curently collected resources. */
+	/** The paths of the currently collected resources. */
 	private List<String> resourcePaths = new CopyOnWriteArrayList<String>();
 
 	/**
@@ -234,7 +235,7 @@ public class ResourceCollectControl extends AbstractControl {
 		//TODO put this stuff in a setProgress() method, and keep track of this information locally
 		if(task != null && taskState == TaskState.COMPLETE) { //if we complete a file
 			for(final String resourcePath : resourcePaths) { //look at the resource paths
-				if(getFilename(resourcePath).equals(task)) { //if this resource path just finished TODO create a better way to check; this could result in inconsistencies if multiple paths have the same filename
+				if(URIs.getName(resourcePath).equals(task)) { //if this resource path just finished TODO create a better way to check; this could result in inconsistencies if multiple paths have the same filename
 					removeResourcePath(resourcePath); //remove this resource path
 					break; //stop checking for matches
 				}

@@ -33,8 +33,8 @@ public class EmailAddressStringLiteralConverter extends AbstractStringLiteralCon
 			return null; //the value is null
 		} else { //if the literal is not null
 			try {
-				return new EmailAddress(literal); //construct the email address
-			} catch(final ArgumentSyntaxException argumentSyntaxException) { //if the email addrss is not in the correct syntax
+				return EmailAddress.fromString(literal); //construct the email address
+			} catch(final ArgumentSyntaxException argumentSyntaxException) { //if the email address is not in the correct syntax
 				throw new ConversionException(format(getSession().dereferenceString(getInvalidValueMessage()), literal), literal); //indicate that the value was invalid				
 			}
 		}

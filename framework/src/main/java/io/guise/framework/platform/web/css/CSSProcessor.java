@@ -110,8 +110,8 @@ public class CSSProcessor {
 			//read to the end of a simple selector chain
 			final String simpleSelectorSequenceString = parseReader.readStringUntilChar(COMBINATOR_CHARS + SELECTOR_SEPARATOR_CHAR + RULE_GROUP_START_CHAR + "/"); //the end of each simple selector sequence will either be a combinator, comma, the start of the block of rules, or a comment TODO use a constnat for the start of a comment
 			final List<SimpleSelector> simpleSelectorSequence = new ArrayList<SimpleSelector>(); //create a new list of simple selectors			
-			final ReaderTokenizer simpleSelectorSequenceTokenizer = new ReaderTokenizer(new StringReader(simpleSelectorSequenceString), new Characters(
-					CLASS_SELECTOR_DELIMITER, ID_SELECTOR_DELIMITER, PSEUDO_CLASS_DELIMITER)); //tokenize the simple selector sequence
+			final ReaderTokenizer simpleSelectorSequenceTokenizer = new ReaderTokenizer(new StringReader(simpleSelectorSequenceString),
+					Characters.of(CLASS_SELECTOR_DELIMITER, ID_SELECTOR_DELIMITER, PSEUDO_CLASS_DELIMITER)); //tokenize the simple selector sequence
 			for(final String simpleSelectorString : simpleSelectorSequenceTokenizer) { //for each simple selector string
 				final SimpleSelector simpleSelector; //we'll create the appropriate simple selector
 				final char simpleSelectorDelimiter = simpleSelectorSequenceTokenizer.getLastDelimiter(); //see which delimiter introduced this simple selector
@@ -169,7 +169,7 @@ public class CSSProcessor {
 	 */
 	protected static void parseStylesheetContent(final ParseReader parseReader, final CSSStylesheet stylesheet) throws IOException {
 		//the stylesheet strings we expect; make sure we put the AT_RULE_START after the other at-rule constants, because it represents an unknown at-rule
-		final String[] EXPECTED_STYLESHEET_STRINGS = { MEDIA_RULE_SYMBOL, PAGE_RULE_SYMBOL, FONT_FACE_RULE_SYMBOL, AT_RULE_START, CDO, COMMENT_START, "" };
+		final String[] EXPECTED_STYLESHEET_STRINGS = {MEDIA_RULE_SYMBOL, PAGE_RULE_SYMBOL, FONT_FACE_RULE_SYMBOL, AT_RULE_START, CDO, COMMENT_START, ""};
 		//the indexes of the stylesheet strings in our array
 		final int MEDIA_RULE = 0, PAGE_RULE = 1, FONT_FACE_RULE = 2, UNKNOWN_AT_RULE = 3, XML_COMMENT_START = 4, COMMENT = 5;
 		while(true) { //we'll keep processing rulesets and such until we run out of characters looking for whitespace

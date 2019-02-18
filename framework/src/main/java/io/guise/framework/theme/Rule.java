@@ -55,7 +55,7 @@ public class Rule extends AbstractClassTypedURFResource {
 	 * @see Select#SELECTOR_PROPERTY_URI
 	 */
 	public Selector getSelector() {
-		return asInstance(getPropertyValue(SELECTOR_PROPERTY_URI), Selector.class); //return the select.selector value
+		return asInstance(getPropertyValue(SELECTOR_PROPERTY_URI), Selector.class).orElse(null); //return the select.selector value TODO propagate Optional
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class Rule extends AbstractClassTypedURFResource {
 
 	/** @return This rule's apply declaration, or <code>null</code> if this rule has no <code>theme.apply</code> selector or the value is not a {@link Template}. */
 	public Template getApply() {
-		return asInstance(getPropertyValue(APPLY_PROPERTY_URI), Template.class); //return the theme.apply value if it is a Template
+		return asInstance(getPropertyValue(APPLY_PROPERTY_URI), Template.class).orElse(null); //return the theme.apply value if it is a Template TODO propagate Optional
 	}
 
 	/**

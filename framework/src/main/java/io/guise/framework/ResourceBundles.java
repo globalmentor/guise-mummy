@@ -30,7 +30,7 @@ import com.globalmentor.net.Resource;
 import com.globalmentor.rdf.*;
 import com.globalmentor.util.HashMapResourceBundle;
 
-import static com.globalmentor.io.Files.*;
+import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.Java.*;
 import static com.globalmentor.model.Locales.*;
 import static com.globalmentor.net.URIs.*;

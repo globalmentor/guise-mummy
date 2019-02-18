@@ -65,6 +65,7 @@ import io.guise.framework.platform.*;
 import io.guise.framework.platform.web.WebPlatform.PollCommand;
 import io.guise.framework.platform.web.css.*;
 
+import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Objects.*;
@@ -277,7 +278,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		final String guiseApplicationDescriptionPath = servletConfig.getInitParameter(APPLICATION_INIT_PARAMETER); //get name of the guise application description file
 		if(guiseApplicationDescriptionPath != null) { //if there is a Guise application description file specified
 			final String normalizedGuiseApplicationDescriptionPath = normalizePath(guiseApplicationDescriptionPath); //normalize the path
-			if(isAbsolutePath(normalizedGuiseApplicationDescriptionPath)) { //if the given path is absolute
+			if(isPathAbsolute(normalizedGuiseApplicationDescriptionPath)) { //if the given path is absolute
 				throw new ServletException("Guise application path " + normalizedGuiseApplicationDescriptionPath + " is not a relative path.");
 			}
 			final String absoluteGuiseApplicationDescriptionPath = WEB_INF_DIRECTORY_PATH + normalizedGuiseApplicationDescriptionPath; //determine the context-relative absolute path of the description file
@@ -612,7 +613,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 								if(FILEDATA_FORM_FIELD_NAME.equals(fieldName)) { //if this is a Flash upload
 									progressComponent = null; //there is no progress component; Flash will send its own progress update separately
 								} else { //if this is not a Flash upload
-									progressComponent = asInstance(guisePlatform.getDepictedObject(guisePlatform.getDepictID(fieldName)), Component.class); //get the component by its ID
+									progressComponent = asInstance(guisePlatform.getDepictedObject(guisePlatform.getDepictID(fieldName)), Component.class).orElse(null); //get the component by its ID
 								}
 								if(progressComponent != null && !progressComponents.contains(progressComponent)) { //if there is a transfer component and this is the first transfer for this component
 									progressComponents.add(progressComponent); //add this progress component to our set of progress components so we can send finish events to them later
@@ -629,7 +630,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 										setContentType(resourceDescription, itemContentType); //set the resource's content type
 									}
 								}
-								final String name = getFilename(itemName); //removing any extraneous path information a browser such as IE or Opera might have given
+								final String name = URIs.getName(itemName); //removing any extraneous path information a browser such as IE or Opera might have given TODO verify that the correct slashes are being checked
 								resourceDescription.setName(name); //specify the name provided to us
 
 								try {
@@ -1047,7 +1048,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 							//							TODO fix cs-bytes
 							//							TODO fix cs-version
 							entry.setFieldValue(Field.CLIENT_SERVER_USER_AGENT_HEADER_FIELD, getUserAgent(request));
-							final String webTrendsID = asInstance(guisePlatform.getEnvironment().getProperty(WEBTRENDS_ID_COOKIE_NAME), String.class); //get the WebTrends ID
+							final String webTrendsID = asInstance(guisePlatform.getEnvironment().getProperty(WEBTRENDS_ID_COOKIE_NAME), String.class).orElse(null); //get the WebTrends ID
 							entry.setFieldValue(Field.CLIENT_SERVER_COOKIE_HEADER_FIELD, webTrendsID != null ? WEBTRENDS_ID_COOKIE_NAME + "=" + webTrendsID : null); //store the WebTrends ID cookie as the cookie TODO decide if we want to get general cookies instead of just the WebTrends cookie
 							final URI referrerURI = initControlEvent.getReferrerURI(); //get the initialization referrer URI
 							entry.setFieldValue(Field.CLIENT_SERVER_REFERER_HEADER_FIELD, referrerURI != null ? referrerURI.toString() : null); //store the referrer URI, if any
@@ -1418,18 +1419,17 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 			for(final Cookie cookie : cookies) { //for each cookie in the request
 				final String cookieName = cookie.getName(); //get the name of this cookie
 				if(!SESSION_ID_COOKIE_NAME.equals(cookieName)) { //ignore the session ID
-					final String environmentPropertyValue = asInstance(environment.getProperty(cookieName), String.class); //see if there is a string environment property value for this cookie's name
-					if(environmentPropertyValue != null) { //if a value in the environment matches the cookie's name
+					asInstance(environment.getProperty(cookieName), String.class).ifPresentOrElse(environmentPropertyValue -> { //see if there is a string environment property value for this cookie's name
 						if(!Objects.equals(cookie.getValue(), encode(environmentPropertyValue))) { //if the cookie's value doesn't match the encoded environment property value
 							cookie.setValue(encode(environmentPropertyValue)); //update the cookie's value, making sure the value is encoded
 							response.addCookie(cookie); //add the cookie to the response to change its value
 						}
-					} else { //if there is no such environment property, remove the cookie
+					}, () -> { //if there is no such environment property, remove the cookie
 						cookie.setValue(null); //remove the value now
 						cookie.setPath(applicationBasePathString); //set the cookie path to the application base path, because we'll need the same base path as the one that was set
 						cookie.setMaxAge(0); //tell the cookie to expire immediately
 						response.addCookie(cookie); //add the cookie to the response to delete it
-					}
+					});
 					cookieMap.put(cookieName, cookie); //store the cookie in the map to show that there's no need to copy over the environment variable
 				}
 			}
@@ -1438,13 +1438,12 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		for(final Map.Entry<String, Object> environmentPropertyEntry : environment.getProperties().entrySet()) { //iterate the environment properties so that new cookies can be added as needed
 			final String environmentPropertyName = environmentPropertyEntry.getKey(); //get the name of the environment property value
 			if(!cookieMap.containsKey(environmentPropertyName)) { //if no cookie contains this environment variable
-				final String environmentPropertyValue = asInstance(environmentPropertyEntry.getValue(), String.class); //get the environment property value as a string
-				if(environmentPropertyValue != null) { //if there is a non-null environment property value
+				asInstance(environmentPropertyEntry.getValue(), String.class).ifPresent(environmentPropertyValue -> { //get the environment property value as a string; if there is a property value
 					final Cookie cookie = new Cookie(environmentPropertyName, encode(environmentPropertyValue)); //create a new cookie with the encoded property value
 					cookie.setPath(applicationBasePathString); //set the cookie path to the application base path
 					cookie.setMaxAge(Integer.MAX_VALUE); //don't allow the cookie to expire for a very long time
 					response.addCookie(cookie); //add the cookie to the response
-				}
+				});
 			}
 		}
 	}
@@ -1705,7 +1704,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 									keys.add(Key.SHIFT_LEFT); //note the Shift key
 								}
 								if(componentID != null) { //if there is a component ID TODO add better event handling, to throw an error and send back that error
-									final Component component = asInstance(platform.getDepictedObject(platform.getDepictID(componentID)), Component.class); //get the component by its ID
+									final Component component = asInstance(platform.getDepictedObject(platform.getDepictID(componentID)), Component.class).orElse(null); //get the component by its ID
 									if(component != null && AbstractComponent.hasAncestor(component, guiseSession.getApplicationFrame())) { //if there is a target component in our current hierarchy
 										final MouseEvent mouseEvent;
 										switch(eventType) { //see which type of event this is

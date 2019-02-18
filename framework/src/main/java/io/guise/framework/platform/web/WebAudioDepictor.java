@@ -110,13 +110,10 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 				throw new IllegalArgumentException("Depict event " + event + " meant for depicted object " + webChangeEvent.getDepictedObject());
 			}
 			final Map<String, Object> properties = webChangeEvent.getProperties(); //get the new properties
-			final String stateString = asInstance(properties.get("state"), String.class); //get the new state TODO use a constant
-			if(stateString != null) { //if a state was given
-				audio.setState(getSerializedEnum(TaskState.class, stateString)); //update the state of the audio
-			}
-			final Number position = asInstance(properties.get("position"), Number.class); //get the position, if reported TODO use a constant
+			asInstance(properties.get("state"), String.class).map(stateString -> getSerializedEnum(TaskState.class, stateString)).ifPresent(audio::setState); //update the state of the audio if a state was given TODO use a constant
+			final Number position = asInstance(properties.get("position"), Number.class).orElse(null); //get the position, if reported TODO use a constant
 			if(position != null) { //if we have a position
-				final Number duration = asInstance(properties.get("duration"), Number.class); //get the duration, if reported
+				final Number duration = asInstance(properties.get("duration"), Number.class).orElse(null); //get the duration, if reported
 				audio.updateTimeProgress(position.longValue() * 1000, duration != null ? duration.longValue() * 1000 : -1); //update the audio position, converting from milliseconds to microseconds
 			}
 		}
