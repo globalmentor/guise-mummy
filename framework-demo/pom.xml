@@ -11,7 +11,7 @@
 	<artifactId>guise-framework-demo</artifactId>
 	<packaging>war</packaging>
 
-	<name>Guise Framework-demo</name>
+	<name>Guise Framework Demo</name>
 	<description>Guise™ Internet application framework demonstration.</description>
 
 	<dependencies>
