@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.globalmentor</groupId>
 		<artifactId>globalmentor-parent</artifactId>
-		<version>8.2.0</version>
+		<version>8.4.0-SNAPSHOT</version>
 	</parent>
 
 	<groupId>io.guise</groupId>
@@ -52,7 +52,7 @@
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-core</artifactId>
-				<version>0.5.0</version>
+				<version>0.5.7-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
@@ -113,12 +113,6 @@
 				<groupId>io.guise</groupId>
 				<artifactId>guise-framework</artifactId>
 				<version>0.6.0-SNAPSHOT</version>
-			</dependency>
-
-			<dependency>
-				<groupId>javax.servlet</groupId>
-				<artifactId>javax.servlet-api</artifactId>
-				<version>4.0.1</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
