@@ -11,10 +11,9 @@
 	<artifactId>guise-cli</artifactId>
 
 	<name>Guise CLI</name>
-	<description>Guise Command-Line Interface (CLI) utility program.</description>
+	<description>Guise™ Command-Line Interface (CLI) utility program.</description>
 
 	<properties>
-		<maven.compiler.release>11</maven.compiler.release>
 		<exe.main.class>io.guise.cli.GuiseCli</exe.main.class>
 		<exe.filename>guise.exe</exe.filename>
 	</properties>
@@ -33,6 +32,11 @@
 		<dependency>
 			<groupId>io.confound</groupId>
 			<artifactId>confound-file</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.guise</groupId>
+			<artifactId>guise-mummy</artifactId>
 		</dependency>
 	</dependencies>
 

@@ -1,6 +1,6 @@
 # Guise CLI
 
-Guise  Command-Line Interface (CLI) utility program.
+Guise™ Command-Line Interface (CLI) utility program.
 
 ## Download
 

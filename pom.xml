@@ -47,6 +47,7 @@
 		<module>cli</module>
 		<module>framework</module>
 		<module>framework-demo</module>
+		<module>mummy</module>
 	</modules>
 
 	<dependencyManagement>
@@ -126,6 +127,12 @@
 			<dependency>
 				<groupId>io.guise</groupId>
 				<artifactId>guise-framework</artifactId>
+				<version>0.6.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.guise</groupId>
+				<artifactId>guise-mummy</artifactId>
 				<version>0.6.0-SNAPSHOT</version>
 			</dependency>
 		</dependencies>
