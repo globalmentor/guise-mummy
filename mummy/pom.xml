@@ -18,5 +18,15 @@
 			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-core</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>io.clogr</groupId>
+			<artifactId>clogr</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.zalando</groupId>
+			<artifactId>faux-pas</artifactId>
+		</dependency>
 	</dependencies>
 </project>

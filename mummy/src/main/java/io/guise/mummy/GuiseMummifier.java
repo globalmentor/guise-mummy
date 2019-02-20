@@ -16,22 +16,51 @@
 
 package io.guise.mummy;
 
+import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
 import static java.nio.file.Files.*;
 import static java.util.function.Predicate.*;
+import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.*;
 import java.util.stream.Stream;
 
 import javax.annotation.*;
+
+import io.clogr.Clogged;
 
 /**
  * Guise static site generator.
  * @author Garret Wilson
  */
-public class GuiseMummifier {
+public class GuiseMummifier implements Clogged {
+
+	/** The registered mummifiers by supported extensions. */
+	private final Map<String, ResourceMummifier> mummifiersByExtension = new HashMap<>();
+
+	//TODO document
+	protected Optional<ResourceMummifier> getMummifier(@Nonnull final Path resourcePath) {
+		//TODO create Paths.extensions
+		return extensions(resourcePath.getFileName().toString()).map(mummifiersByExtension::get).filter(Objects::nonNull).findFirst();
+	}
+
+	/**
+	 * Registers a mummify for all its supported filename extensions.
+	 * @param mummifier The mummifier to register.
+	 * @see ResourceMummifier#getSupportedFilenameExtensions()
+	 */
+	public void registerMummifier(@Nonnull final ResourceMummifier mummifier) {
+		mummifier.getSupportedFilenameExtensions().forEach(ext -> mummifiersByExtension.put(ext, mummifier));
+	}
+
+	/** No-args constructor. */
+	public GuiseMummifier() {
+		//register default resource types
+		registerMummifier(new XhtmlMummifier());
+	}
 
 	/**
 	 * Determines whether a path should be ignored during discovery.
@@ -47,18 +76,45 @@ public class GuiseMummifier {
 	}
 
 	/**
-	 * TODO document; The target directory is created if needed.
+	 * TODO document
 	 * @param sourceDirectory
-	 * @param targetDirectory
+	 * @param targetDirectory The root directory of the generated static site; will be created if needed.
 	 * @throws IOException
 	 */
 	public void mummify(@Nonnull final Path sourceDirectory, @Nonnull final Path targetDirectory) throws IOException {
 		checkArgument(isDirectory(sourceDirectory), "Source %s does not exist or is not a directory.");
 		createDirectories(targetDirectory);
-		System.out.println("target: " + targetDirectory);
-		try (final Stream<Path> sourceDirectoryPaths = list(sourceDirectory).filter(not(this::isIgnore))) {
-			sourceDirectoryPaths.forEach(System.out::println);
+
+		final GuiseMummyContext context = new GuiseMummyContext() {}; //TODO testing
+
+		//TODO load `.guiseignore` file for each directory
+
+		final Set<Path> childDirectories = new LinkedHashSet<>();
+
+		try (final Stream<Path> resourcePaths = list(sourceDirectory).filter(not(this::isIgnore))) {
+			resourcePaths.forEach(resourcePath -> {
+
+				final Path targetPath = targetDirectory.resolve(resourcePath.getFileName()); //TODO transfer to some common location; maybe during discovery
+
+				System.out.println(resourcePath);
+				if(isDirectory(resourcePath)) {
+					childDirectories.add(resourcePath);
+				} else if(isRegularFile(resourcePath)) {
+					getMummifier(resourcePath).ifPresent(throwingConsumer(mummifier -> {
+						mummifier.mummify(context, resourcePath, targetPath);
+					}));
+				} else {
+					getLogger().warn("Skipping non-regular file {}.", resourcePath);
+				}
+			});
 		}
+
+		//child directories
+		for(final Path childDirectory : childDirectories) {
+			final Path targetChildDirectory = targetDirectory.resolve(childDirectory.getFileName()); //TODO transfer to some common location; maybe during discovery
+			mummify(childDirectory, targetChildDirectory);
+		}
+
 	}
 
 }
