@@ -101,7 +101,8 @@ public class GuiseMummifier implements Clogged {
 					childDirectories.add(resourcePath);
 				} else if(isRegularFile(resourcePath)) {
 					getMummifier(resourcePath).ifPresent(throwingConsumer(mummifier -> {
-						mummifier.mummify(context, resourcePath, targetPath);
+						final Path outputPath = changeExtension(targetPath, "html"); //switch to generating an HTML file TODO use constant
+						mummifier.mummify(context, resourcePath, outputPath);
 					}));
 				} else {
 					getLogger().warn("Skipping non-regular file {}.", resourcePath);
