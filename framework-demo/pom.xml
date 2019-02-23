@@ -16,6 +16,18 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-core</artifactId>
+			<version>0.5.0</version><!--$NO-MVN-MAN-VER$-->
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-xml</artifactId>
+			<version>0.5.0</version><!--$NO-MVN-MAN-VER$-->
+		</dependency>
+
+		<dependency>
 			<groupId>io.guise</groupId>
 			<artifactId>guise-framework</artifactId>
 		</dependency>

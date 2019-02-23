@@ -77,9 +77,9 @@ public class GuiseMummifier implements Clogged {
 
 	/**
 	 * TODO document
-	 * @param sourceDirectory
+	 * @param sourceDirectory The root of the site to be mummified.
 	 * @param targetDirectory The root directory of the generated static site; will be created if needed.
-	 * @throws IOException
+	 * @throws IOException if there is an I/O error generating the static site.
 	 */
 	public void mummify(@Nonnull final Path sourceDirectory, @Nonnull final Path targetDirectory) throws IOException {
 		checkArgument(isDirectory(sourceDirectory), "Source %s does not exist or is not a directory.");

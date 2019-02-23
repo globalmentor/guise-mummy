@@ -75,6 +75,13 @@
 		<dependency>
 			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-w3c-spec</artifactId>
+			<version>0.5.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-xml</artifactId>
+			<version>0.5.0</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
 
 		<dependency>
