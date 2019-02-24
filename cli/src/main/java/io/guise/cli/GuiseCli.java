@@ -16,10 +16,14 @@
 
 package io.guise.cli;
 
+import java.io.IOException;
+import java.nio.file.Path;
+
 import javax.annotation.*;
 
 import com.globalmentor.application.*;
 
+import io.guise.mummy.GuiseMummifier;
 import picocli.CommandLine.*;
 
 /**
@@ -43,6 +47,19 @@ public class GuiseCli extends BaseCliApplication {
 	 */
 	public static void main(@Nonnull final String[] args) {
 		Application.start(new GuiseCli(args));
+	}
+
+	@Command(description = "Mummifies a site by generating a static version.")
+	public void mummify(
+			@Option(names = "--target", description = "The target directory into which the site will be generated; will be created if needed.", required = true) final Path targetDirectory,
+			@Parameters(paramLabel = "<source-directory>", description = "The root directory of the site to mummify.") @Nonnull final Path sourceDirectory) {
+		final GuiseMummifier mummifier = new GuiseMummifier();
+		try {
+			mummifier.mummify(sourceDirectory, targetDirectory);
+		} catch(final IOException ioException) {
+			getLogger().error("Error mummifying site.", ioException);
+			System.err.println(ioException.getMessage());
+		}
 	}
 
 	/** Strategy for providing version and other information from the configuration. */
