@@ -20,10 +20,6 @@ import java.beans.PropertyVetoException;
 import java.io.*;
 import java.net.URI;
 
-import org.urframework.*;
-import org.urframework.io.DefaultURFRDFXMLIO;
-import org.urframework.io.DefaultURFTURFIO;
-
 import static com.globalmentor.w3c.spec.XML.*;
 import static java.nio.charset.StandardCharsets.*;
 import static org.urframework.TURF.*;
@@ -32,12 +28,10 @@ import com.globalmentor.w3c.spec.HTML;
 
 import io.guise.framework.component.*;
 import io.guise.framework.component.layout.*;
-import io.guise.framework.component.urf.DefaultURFResourceTreeNodeRepresentationStrategy;
 import io.guise.framework.event.*;
 import io.guise.framework.model.DummyTreeNodeModel;
 import io.guise.framework.model.Notification;
 import io.guise.framework.model.Notification.Severity;
-import io.guise.framework.model.urf.URFDynamicTreeNodeModel;
 
 /**
  * URF Process Guise demonstration panel. Copyright © 2007 GlobalMentor, Inc. Demonstrates URF processing and tree controls.
@@ -91,10 +85,12 @@ public class URFProcessPanel extends LayoutPanel {
 		processButton.setLabel("Process"); //set the button label
 		controlPanel.add(processButton); //add the process button to the control panel
 		//tree control
+		/*TODO fix for new URF
 		final TreeControl urfTreeControl = new TreeControl(); //create a tree control in which to place URF resources
 		urfTreeControl.setLabel("URF Resource Tree"); //set the tree control label
 		urfTreeControl.setTreeNodeRepresentationStrategy(URFResource.class, new DefaultURFResourceTreeNodeRepresentationStrategy()); //add a representation strategy for URF resources
 		controlPanel.add(urfTreeControl); //add the tree control to the control panel
+		*/
 
 		processButton.addActionListener(new ActionListener() {
 
@@ -102,9 +98,10 @@ public class URFProcessPanel extends LayoutPanel {
 			public void actionPerformed(final ActionEvent actionEvent) {
 				assertionOutputTextControl.clearValue(); //clear the assertions
 				turfOutputTextControl.clearValue(); //clear the TURF
-				urfTreeControl.setRootNode(new DummyTreeNodeModel()); //clear the tree control
+				//TODO fix for new URF urfTreeControl.setRootNode(new DummyTreeNodeModel()); //clear the tree control
 				final String input = inputTextControl.getValue(); //get the input text
 				if(input != null) { //if there is input
+					/*TODO fix for new URF
 					try {
 						final URI baseURI = URI.create("info:example/"); //use a default base URI
 						final InputStream inputStream = new ByteArrayInputStream(input.getBytes(UTF_8)); //get an input stream to the input string
@@ -141,6 +138,7 @@ public class URFProcessPanel extends LayoutPanel {
 					} catch(final PropertyVetoException propertyVetoException) { //there should never be an error updating the output
 						throw new AssertionError(propertyVetoException);
 					}
+					*/
 				} else { //if there is no input
 					getSession().notify(new Notification("There is no input to process.")); //notify the user of the lack of input							
 				}
