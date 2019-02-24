@@ -23,6 +23,8 @@ import java.util.*;
 import com.globalmentor.net.URIPath;
 
 import io.guise.framework.AbstractGuiseApplication;
+import io.guise.framework.ComponentDestination;
+import io.guise.framework.test.HomePanel;
 
 /**
  * Demonstration Guise application. Copyright © 2005 GlobalMentor, Inc. Demonstrates custom Guise applications, setting application resource bundles, and custom
@@ -63,10 +65,14 @@ public class DemoApplication extends AbstractGuiseApplication {
 	 */
 	public DemoApplication(final URI uri) {
 		super(uri); //construct the parent class
+		setLocales(List.of(Locale.US));
 		setResourceBundleBaseName(getClass().getPackage().getName() + "/resources"); //set the resource bundle
 		users.add(new DemoUser(generateUserID(), "Jane", null, "Smith", "password".toCharArray(), "janesmith@example.com")); //add example users
 		users.add(new DemoUser(generateUserID(), "John", null, "Smith", "password".toCharArray(), "johnsmith@example.com"));
 		users.add(new DemoUser(generateUserID(), "Jill", null, "Jones", "password".toCharArray(), "jilljones@example.com"));
+		setDestinations(
+				List.of(new ComponentDestination(new URIPath(""), HomePanel.class), new ComponentDestination(new URIPath("helloworld/"), HelloWorldPanel.class),
+						new ComponentDestination(new URIPath("temperature/"), TemperatureConversionPanel.class)));
 	}
 
 	/**
