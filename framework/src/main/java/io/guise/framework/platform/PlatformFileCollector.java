@@ -86,8 +86,7 @@ public class PlatformFileCollector extends AbstractDepictedObject {
 
 	/**
 	 * Initiates a platform file upload.
-	 * @param platformFile Thet platform file to upload.
-	 * @param platformFile Thet platform file to upload.
+	 * @param platformFile The platform file to upload.
 	 * @param destinationURI The URI representing the destination of the platform file, either absolute or relative to the application.
 	 * @throws NullPointerException if the given platform file and/or destination URI is <code>null</code>.
 	 * @throws IllegalStateException the specified platform file can no longer be uploaded because, for example, other platform files have since been selected.

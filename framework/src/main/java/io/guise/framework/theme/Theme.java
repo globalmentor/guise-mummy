@@ -180,8 +180,8 @@ public class Theme extends ArrayList<Rule> /*TODO delete legacy URF extends URFL
 	/**
 	 * Updates the internal maps of rules. This method should be called after rules are modified so that rules will be applied correctly in the future.
 	 * @throws ClassNotFoundException if one of the rules selects a class that cannot be found.
-	 * @see PropertySelector#getSelector()
 	 */
+	//TODO fix for new URF	 * @see PropertySelector#getSelector()
 	public void updateRules() throws ClassNotFoundException {
 		/*TODO fix for new URF
 		classRuleMap.clear(); //clear the map of rules
