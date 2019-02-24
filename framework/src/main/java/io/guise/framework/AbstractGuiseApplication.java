@@ -84,11 +84,29 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		this.debug = debug;
 	}
 
-	/** I/O for loading resources. */
-	private static final IO<Resources> resourcesIO = new TypedURFResourceTURFIO<Resources>(Resources.class, RESOURCES_NAMESPACE_URI);
+	/**
+	 * I/O for loading resources.
+	 * @implSpec This temporary implementation loads a map stored as the root resource in a TURF file.
+	 * @implSpec This implementation does not support saving TURF resources.
+	 */
+	private static final IO<Map<Object, Object>> resourcesIO = new IO<>() {
+		@Override
+		public Map<Object, Object> read(final InputStream inputStream, final URI baseURI) throws IOException {
+			return new HashMap<Object, Object>();
+			/*TODO bring back with upgrade to new TURF
+			return new TurfParser<>(new SimpleGraphUrfProcessor()).parseDocument(inputStream).stream().findFirst().filter(Map.class::isInstance).map(Map.class::cast)
+					.orElseThrow(() -> new IOException("TURF resource did not map at root."));
+			*/
+		}
 
-	@Override
-	public IO<Resources> getResourcesIO() {
+		@Override
+		public void write(final OutputStream outputStream, final URI baseURI, final Map<Object, Object> object) throws IOException {
+			throw new UnsupportedOperationException();
+		}
+	};
+
+	/** @return I/O for loading resources. */
+	protected IO<Map<Object, Object>> getResourcesIO() {
 		return resourcesIO;
 	}
 
@@ -1062,19 +1080,21 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			if(resourcesURI != null) { //if there are external resources specified
 				resourceBundle = loadResourceBundle(resourcesURI, resourceBundle); //load the resources and insert it into the chain
 			}
-			if(resourcesResource instanceof Resources) { //if this is a Guise reosurces object
+			/*TODO re-implement loading resources from a theme
+			if(resourcesResource instanceof Resources) { //if this is a Guise resources object
 				final Map<String, Object> resourceMap = ResourceBundles.getResourceValue(resourcesResource); //generate a map from the local resources TODO cache this if possible
 				if(!resourceMap.isEmpty()) { //if any resources are defined locally
 					resourceBundle = new HashMapResourceBundle(resourceMap, resourceBundle); //create a new hash map resource bundle with resources and the given parent and insert it into the chain				
 				}
 			}
+			*/
 		}
 		return resourceBundle; //return the end of the resource bundle chain
 	}
 
 	/** A thread-safe cache of softly-referenced resource maps keyed to resource bundle URIs. */
-	private static final Map<URI, Map<String, Object>> cachedResourceMapMap = new DecoratorReadWriteLockMap<URI, Map<String, Object>>(
-			new PurgeOnWriteSoftValueHashMap<URI, Map<String, Object>>());
+	private static final Map<URI, Map<Object, Object>> cachedResourceMapMap = new DecoratorReadWriteLockMap<URI, Map<Object, Object>>( //TODO restrict this to string keys again
+			new PurgeOnWriteSoftValueHashMap<URI, Map<Object, Object>>());
 
 	/**
 	 * Loads a resource bundle from the given URI.
@@ -1084,14 +1104,13 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @throws IOException if there was an error loading the resource bundle.
 	 */
 	protected ResourceBundle loadResourceBundle(final URI resourceBundleURI, ResourceBundle parentResourceBundle) throws IOException {
-		Map<String, Object> resourceMap = cachedResourceMapMap.get(resourceBundleURI); //see if we already have a map representing the resources in the bundle TODO first check to see if the file has changed
+		Map<Object, Object> resourceMap = cachedResourceMapMap.get(resourceBundleURI); //see if we already have a map representing the resources in the bundle TODO first check to see if the file has changed
 		if(resourceMap == null) { //if there is no cached resource map; don't worry about the benign race condition, which at worst will cause the resource bundle to be loaded more than once; blocking would be less efficient
 			//TODO del Debug.info("resource bundle cache miss for", resourceBundleURI);
 			//TODO make sure this is a TURF file; if not, load the properties from the properties file
 			final InputStream resourcesInputStream = new BufferedInputStream(getInputStream(resourceBundleURI)); //get a buffered input stream to the resources
 			try {
-				final Resources resources = getResourcesIO().read(resourcesInputStream, resourceBundleURI); //load the resources
-				resourceMap = ResourceBundles.getResourceValue(resources); //generate a map from the resources
+				resourceMap = getResourcesIO().read(resourcesInputStream, resourceBundleURI); //load the resources
 				cachedResourceMapMap.put(resourceBundleURI, resourceMap); //cache the map for later
 			} catch(final IOException ioException) { //if there was an error loading the resource bundle
 				throw new IOException("Error loading resource bundle (" + resourceBundleURI + "): " + ioException.getMessage(), ioException);

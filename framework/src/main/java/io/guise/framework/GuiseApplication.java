@@ -98,9 +98,6 @@ public interface GuiseApplication extends Resource, PropertyBindable, Concerned 
 	 */
 	public void setDebug(final boolean debug);
 
-	/** @return I/O for loading resources. */
-	public IO<Resources> getResourcesIO();
-
 	/** @return I/O for loading themes. */
 	public IO<Theme> getThemeIO();
 
