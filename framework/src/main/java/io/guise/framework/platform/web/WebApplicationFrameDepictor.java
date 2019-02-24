@@ -77,7 +77,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 	protected static final String GUISE_FLASH_ID = "guiseFlash";
 
 	/** The available JavaScript versions above 1.0 that could be supported by a browser. */
-	private static final String[] JAVSCRIPT_VERSIONS = new String[] { "1.1", "1.2", "1.3", "1.4", "1.5", "2.0" };
+	private static final String[] JAVSCRIPT_VERSIONS = new String[] {"1.1", "1.2", "1.3", "1.4", "1.5", "2.0"};
 
 	/**
 	 * Determines the ID to be used for the hidden field associated with the given application frame.
@@ -210,8 +210,8 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			}
 			if(iconURI != null) { //if we know an icon
 				depictContext.write('\t'); //og:image (required)
-				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.IMAGE_LOCAL_NAME, session.getDepictionRootURI().resolve(session.resolveURI(iconURI))
-						.toASCIIString());
+				depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.IMAGE_LOCAL_NAME,
+						session.getDepictionRootURI().resolve(session.resolveURI(iconURI)).toASCIIString());
 				depictContext.write('\n');
 			}
 			depictContext.write('\t'); //og:url (required)
@@ -233,6 +233,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		}
 		final List<URI> styleURIs = listOf(depictContext.getStyles()); //get the list of styles for depiction
 		//add in the content component theme's style, if appropriate TODO this will all get changed when we maintain a separate application frame for each navigation path
+		/*TODO re-implement themes
 		final Component contentComponent = component.getContent(); //get the content component
 		if(contentComponent != null) { //if there is a content component
 			final Theme theme = contentComponent.getTheme(); //get the content component's theme
@@ -243,6 +244,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 				}
 			}
 		}
+		*/
 		//<xhtml:link> styles in this order: theme styles (from most distant parent to current theme), application style, destination style
 		for(final URI styleURI : styleURIs) { //for each style URI
 			//TODO del Log.trace("looking at style URI", styleURI);
@@ -472,9 +474,8 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeAttribute(null, ATTRIBUTE_ID, initIFrameID); //id="xxx:initIFrame"		
 		depictContext.writeAttribute(null, ELEMENT_IFRAME_ATTRIBUTE_SRC, application.resolvePath(GUISE_EMPTY_HTML_DOCUMENT_PATH).toString()); //src="guise/documents/empty.html"	(resolved to context) TODO wouldn't it be better to resolve the path to the session, now, as a convenience?
 		depictContext.writeAttribute(null, ELEMENT_IFRAME_ATTRIBUTE_FRAMEBORDER, "0"); //frameborder="0"
-		depictContext
-				.writeAttribute(null, ATTRIBUTE_STYLE,
-						"display:block;position:absolute;top:0px;left:0px;width:100%;height:100%;filter:progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0);z-index:9999;"); //TODO maybe allow this this to be set using CSS
+		depictContext.writeAttribute(null, ATTRIBUTE_STYLE,
+				"display:block;position:absolute;top:0px;left:0px;width:100%;height:100%;filter:progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0);z-index:9999;"); //TODO maybe allow this this to be set using CSS
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IFRAME); //</xhtml:iframe>
 		//<xhtml:script> (internal)
 		//this script sets up the body length property 

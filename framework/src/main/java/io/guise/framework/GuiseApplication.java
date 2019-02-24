@@ -98,9 +98,6 @@ public interface GuiseApplication extends Resource, PropertyBindable, Concerned 
 	 */
 	public void setDebug(final boolean debug);
 
-	/** @return I/O for loading themes. */
-	public IO<Theme> getThemeIO();
-
 	/**
 	 * @return The read-only non-empty list of locales supported by the application, with the first locale the default used if a new session cannot determine the
 	 *         users's preferred locale.
@@ -495,8 +492,7 @@ public interface GuiseApplication extends Resource, PropertyBindable, Concerned 
 	 * order:
 	 * <ol>
 	 * <li><var>resourceBasePath</var> + "_" + <var>language</var> + "_" + <var>country</var> + "_" + <var>variant</var></li>
-	 * <li>
-	 * <var>resourceBasePath</var> + "_" + <var>language</var> + "_" + <var>country</var></li>
+	 * <li><var>resourceBasePath</var> + "_" + <var>language</var> + "_" + <var>country</var></li>
 	 * <li><var>resourceBasePath</var> + "_" + <var>language</var></li>
 	 * </ol>
 	 * @param resourceBasePath An application-relative base path to a resource in the application resource storage area.

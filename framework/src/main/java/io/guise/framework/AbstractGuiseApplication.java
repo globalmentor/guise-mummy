@@ -110,18 +110,6 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		return resourcesIO;
 	}
 
-	/** I/O for loading themes. */
-	private static final IO<Theme> themeIO = new TypedURFResourceTURFIO<Theme>(Theme.class, THEME_NAMESPACE_URI); //create I/O for loading the theme
-
-	static {
-		((TypedURFResourceTURFIO<Theme>)themeIO).registerResourceFactory(RESOURCES_NAMESPACE_URI, new JavaURFResourceFactory(Resources.class.getPackage())); //add support for resource declarations within a theme
-	}
-
-	@Override
-	public IO<Theme> getThemeIO() {
-		return themeIO;
-	}
-
 	/** The manager of configurations for this session. */
 	private final ConcernRegistry configurationManager = new DefaultConcernRegistry();
 
@@ -1075,20 +1063,20 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		if(parentTheme != null) { //if there is a parent theme
 			resourceBundle = loadResourceBundle(parentTheme, locale, parentResourceBundle); //get the parent resource bundle first and use that as the parent
 		}
+		/*TODO re-implement loading resources from a theme
 		for(final URFResource resourcesResource : theme.getResourceResources(locale)) { //for each resources object in the theme
 			final URI resourcesURI = resourcesResource.getURI(); //get the resources reference URI if any
 			if(resourcesURI != null) { //if there are external resources specified
 				resourceBundle = loadResourceBundle(resourcesURI, resourceBundle); //load the resources and insert it into the chain
 			}
-			/*TODO re-implement loading resources from a theme
 			if(resourcesResource instanceof Resources) { //if this is a Guise resources object
 				final Map<String, Object> resourceMap = ResourceBundles.getResourceValue(resourcesResource); //generate a map from the local resources TODO cache this if possible
 				if(!resourceMap.isEmpty()) { //if any resources are defined locally
 					resourceBundle = new HashMapResourceBundle(resourceMap, resourceBundle); //create a new hash map resource bundle with resources and the given parent and insert it into the chain				
 				}
 			}
-			*/
 		}
+			*/
 		return resourceBundle; //return the end of the resource bundle chain
 	}
 
@@ -1128,6 +1116,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	@Override
 	public Theme loadTheme(final URI themeURI) throws IOException {
+		/*TODO re-implement themes
 		final URI resolvedThemeURI = resolveURI(themeURI); //resolve the theme URI against the application path; getInputStream() will do this to, but we will need this resolved URI later in this method
 		final InputStream themeInputStream = getInputStream(resolvedThemeURI); //ask the application to get the input stream, so that the resource can be loaded directly if possible
 		if(themeInputStream == null) { //if there is no such theme
@@ -1158,6 +1147,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			throw new IOException("Error loading theme (" + resolvedThemeURI + "): " + classNotFoundException.getMessage(), classNotFoundException);
 		}
 		return theme; //return the theme
+		*/
+		return new Theme();
 	}
 
 	@Override

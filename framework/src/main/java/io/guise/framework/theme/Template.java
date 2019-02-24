@@ -22,7 +22,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
 import org.ploop.graph.PLOOPURFProcessor;
-import org.urframework.AbstractClassTypedURFResource;
 
 import com.globalmentor.util.DataException;
 
@@ -30,7 +29,7 @@ import com.globalmentor.util.DataException;
  * An application template of a rule.
  * @author Garret Wilson
  */
-public class Template extends AbstractClassTypedURFResource {
+public class Template /*TODO fix for new URF: extends AbstractClassTypedURFResource*/ {
 
 	/** Default constructor. */
 	public Template() {
@@ -42,7 +41,7 @@ public class Template extends AbstractClassTypedURFResource {
 	 * @param referenceURI The reference URI for the new resource.
 	 */
 	public Template(final URI referenceURI) {
-		super(referenceURI, THEME_NAMESPACE_URI); //construct the parent class
+		//TODO fix for new URF: super(referenceURI, THEME_NAMESPACE_URI); //construct the parent class
 	}
 
 	/**
@@ -56,7 +55,7 @@ public class Template extends AbstractClassTypedURFResource {
 	 * @throws InvocationTargetException if a resource indicates a Java class the constructor of which throws an exception.
 	 */
 	public void apply(final Object object, final PLOOPURFProcessor ploopProcessor) throws DataException, InvocationTargetException {
-		ploopProcessor.setObjectProperties(object, this); //initialize the object from the template
+		//TODO fix for new URF: ploopProcessor.setObjectProperties(object, this); //initialize the object from the template
 	}
 
 }
