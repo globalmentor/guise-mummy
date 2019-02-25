@@ -84,24 +84,30 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		this.debug = debug;
 	}
 
-	/** I/O for loading resources. */
-	private static final IO<Resources> resourcesIO = new TypedURFResourceTURFIO<Resources>(Resources.class, RESOURCES_NAMESPACE_URI);
+	/**
+	 * I/O for loading resources.
+	 * @implSpec This temporary implementation loads a map stored as the root resource in a TURF file.
+	 * @implSpec This implementation does not support saving TURF resources.
+	 */
+	private static final IO<Map<Object, Object>> resourcesIO = new IO<>() {
+		@Override
+		public Map<Object, Object> read(final InputStream inputStream, final URI baseURI) throws IOException {
+			return new HashMap<Object, Object>();
+			/*TODO bring back with upgrade to new TURF
+			return new TurfParser<>(new SimpleGraphUrfProcessor()).parseDocument(inputStream).stream().findFirst().filter(Map.class::isInstance).map(Map.class::cast)
+					.orElseThrow(() -> new IOException("TURF resource did not map at root."));
+			*/
+		}
 
-	@Override
-	public IO<Resources> getResourcesIO() {
+		@Override
+		public void write(final OutputStream outputStream, final URI baseURI, final Map<Object, Object> object) throws IOException {
+			throw new UnsupportedOperationException();
+		}
+	};
+
+	/** @return I/O for loading resources. */
+	protected IO<Map<Object, Object>> getResourcesIO() {
 		return resourcesIO;
-	}
-
-	/** I/O for loading themes. */
-	private static final IO<Theme> themeIO = new TypedURFResourceTURFIO<Theme>(Theme.class, THEME_NAMESPACE_URI); //create I/O for loading the theme
-
-	static {
-		((TypedURFResourceTURFIO<Theme>)themeIO).registerResourceFactory(RESOURCES_NAMESPACE_URI, new JavaURFResourceFactory(Resources.class.getPackage())); //add support for resource declarations within a theme
-	}
-
-	@Override
-	public IO<Theme> getThemeIO() {
-		return themeIO;
 	}
 
 	/** The manager of configurations for this session. */
@@ -1057,24 +1063,26 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		if(parentTheme != null) { //if there is a parent theme
 			resourceBundle = loadResourceBundle(parentTheme, locale, parentResourceBundle); //get the parent resource bundle first and use that as the parent
 		}
+		/*TODO re-implement loading resources from a theme
 		for(final URFResource resourcesResource : theme.getResourceResources(locale)) { //for each resources object in the theme
 			final URI resourcesURI = resourcesResource.getURI(); //get the resources reference URI if any
 			if(resourcesURI != null) { //if there are external resources specified
 				resourceBundle = loadResourceBundle(resourcesURI, resourceBundle); //load the resources and insert it into the chain
 			}
-			if(resourcesResource instanceof Resources) { //if this is a Guise reosurces object
+			if(resourcesResource instanceof Resources) { //if this is a Guise resources object
 				final Map<String, Object> resourceMap = ResourceBundles.getResourceValue(resourcesResource); //generate a map from the local resources TODO cache this if possible
 				if(!resourceMap.isEmpty()) { //if any resources are defined locally
 					resourceBundle = new HashMapResourceBundle(resourceMap, resourceBundle); //create a new hash map resource bundle with resources and the given parent and insert it into the chain				
 				}
 			}
 		}
+			*/
 		return resourceBundle; //return the end of the resource bundle chain
 	}
 
 	/** A thread-safe cache of softly-referenced resource maps keyed to resource bundle URIs. */
-	private static final Map<URI, Map<String, Object>> cachedResourceMapMap = new DecoratorReadWriteLockMap<URI, Map<String, Object>>(
-			new PurgeOnWriteSoftValueHashMap<URI, Map<String, Object>>());
+	private static final Map<URI, Map<Object, Object>> cachedResourceMapMap = new DecoratorReadWriteLockMap<URI, Map<Object, Object>>( //TODO restrict this to string keys again
+			new PurgeOnWriteSoftValueHashMap<URI, Map<Object, Object>>());
 
 	/**
 	 * Loads a resource bundle from the given URI.
@@ -1084,14 +1092,13 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @throws IOException if there was an error loading the resource bundle.
 	 */
 	protected ResourceBundle loadResourceBundle(final URI resourceBundleURI, ResourceBundle parentResourceBundle) throws IOException {
-		Map<String, Object> resourceMap = cachedResourceMapMap.get(resourceBundleURI); //see if we already have a map representing the resources in the bundle TODO first check to see if the file has changed
+		Map<Object, Object> resourceMap = cachedResourceMapMap.get(resourceBundleURI); //see if we already have a map representing the resources in the bundle TODO first check to see if the file has changed
 		if(resourceMap == null) { //if there is no cached resource map; don't worry about the benign race condition, which at worst will cause the resource bundle to be loaded more than once; blocking would be less efficient
 			//TODO del Debug.info("resource bundle cache miss for", resourceBundleURI);
 			//TODO make sure this is a TURF file; if not, load the properties from the properties file
 			final InputStream resourcesInputStream = new BufferedInputStream(getInputStream(resourceBundleURI)); //get a buffered input stream to the resources
 			try {
-				final Resources resources = getResourcesIO().read(resourcesInputStream, resourceBundleURI); //load the resources
-				resourceMap = ResourceBundles.getResourceValue(resources); //generate a map from the resources
+				resourceMap = getResourcesIO().read(resourcesInputStream, resourceBundleURI); //load the resources
 				cachedResourceMapMap.put(resourceBundleURI, resourceMap); //cache the map for later
 			} catch(final IOException ioException) { //if there was an error loading the resource bundle
 				throw new IOException("Error loading resource bundle (" + resourceBundleURI + "): " + ioException.getMessage(), ioException);
@@ -1109,6 +1116,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	@Override
 	public Theme loadTheme(final URI themeURI) throws IOException {
+		/*TODO re-implement themes
 		final URI resolvedThemeURI = resolveURI(themeURI); //resolve the theme URI against the application path; getInputStream() will do this to, but we will need this resolved URI later in this method
 		final InputStream themeInputStream = getInputStream(resolvedThemeURI); //ask the application to get the input stream, so that the resource can be loaded directly if possible
 		if(themeInputStream == null) { //if there is no such theme
@@ -1139,6 +1147,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			throw new IOException("Error loading theme (" + resolvedThemeURI + "): " + classNotFoundException.getMessage(), classNotFoundException);
 		}
 		return theme; //return the theme
+		*/
+		return new Theme();
 	}
 
 	@Override

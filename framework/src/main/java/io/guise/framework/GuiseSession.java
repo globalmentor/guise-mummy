@@ -87,7 +87,9 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Concern
 	 * @throws NullPointerException if the given class is <code>null</code>.
 	 * @throws IOException if there was an error retrieving preferences.
 	 */
+	/*TODO re-implement preference
 	public URFResource getPreferences(final Class<?> objectClass) throws IOException;
+	*/
 
 	/**
 	 * Saves preference properties for a given class.
@@ -96,7 +98,9 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Concern
 	 * @throws NullPointerException if the given class and/or preferences is <code>null</code>.
 	 * @throws IOException if there was an error storing preferences.
 	 */
+	/*TODO re-implement preference properties
 	public void setPreferences(final Class<?> objectClass, final URFResource preferences) throws IOException;
+	*/
 
 	/**
 	 * Reports the current depiction root URI of the session. The depiction root URI is an absolute plain root URI. The session depiction root URI may be
@@ -246,8 +250,8 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Concern
 	 * @throws InvocationTargetException if a given resource indicates a Java class the constructor of which throws an exception.
 	 * @see Component#initialize()
 	 */
-	public void initializeComponent(final Component component, final InputStream descriptionInputStream) throws IOException, DataException,
-			InvocationTargetException;
+	public void initializeComponent(final Component component, final InputStream descriptionInputStream)
+			throws IOException, DataException, InvocationTargetException;
 
 	/**
 	 * Retrieves a resource bundle to be used by this session. One of the <code>getXXXResource()</code> should be used in preference to using this method

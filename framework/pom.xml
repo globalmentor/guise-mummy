@@ -28,12 +28,6 @@
 
 		<dependency>
 			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-core</artifactId>
-			<version>0.5.0</version><!--$NO-MVN-MAN-VER$-->
-		</dependency>
-
-		<dependency>
-			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-country-us</artifactId>
 		</dependency>
 
@@ -88,12 +82,6 @@
 			<groupId>com.globalmentor</groupId>
 			<artifactId>urframework</artifactId>
 			<version>0.5.1-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>io.ploop</groupId>
-			<artifactId>ploop-transform-urf</artifactId>
-			<version>0.1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

@@ -20,25 +20,22 @@ import java.net.URI;
 
 import static java.util.Objects.*;
 
-import org.urframework.*;
-
-import static com.globalmentor.java.Classes.*;
-
 import com.globalmentor.java.Classes;
 import com.globalmentor.java.Enums;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.text.Text.*;
-import static org.urframework.URF.*;
 
 /**
- * Guise resources description in URF.
+ * Definitions of Guise resources.
  * @author Garret Wilson
  */
-public class Resources extends URFMapResource<URFResource, URFResource> {
+public class Resources {
 
 	/** The recommended prefix to the resources key ontology namespace. */
+	@Deprecated
 	public static final String RESOURCES_NAMESPACE_PREFIX = "resources";
 	/** The URI to the resource key ontology namespace. */
+	@Deprecated
 	public static final URI RESOURCES_NAMESPACE_URI = URI.create("https://guise.io/framework/namespaces/resources/");
 
 	/** The default base name of the Guise resource bundle. */
@@ -74,23 +71,14 @@ public class Resources extends URFMapResource<URFResource, URFResource> {
 	/** The resource bundle key for a general failed validation message. */
 	public static final String VALIDATION_FALSE_MESSAGE_RESOURCE_REFERENCE = createStringResourceReference("validation.false.message");
 
-	/** Default constructor. */
-	public Resources() {
-		this(null); //construct the class with no reference URI
+	/** This class cannot be publicly instantiated. */
+	private Resources() {
 	}
 
 	/**
-	 * Reference URI constructor.
-	 * @param referenceURI The reference URI for the new resource.
-	 */
-	public Resources(final URI referenceURI) {
-		super(referenceURI, createResourceURI(RESOURCES_NAMESPACE_URI, getLocalName(Resources.class))); //construct the parent class
-	}
-
-	/**
-	 * Creates a string containing a reference to the given string resource key. The string resource reference is a control string according to ECMA-48,
-	 * "Control Functions for Coded Character Sets", Section 5.6, "Control strings". A control string begins with the Start of String control character (U+0098)
-	 * and ends with a String Terminator control character (U+009C). ECMA-48 publication is also approved as ISO/IEC 6429.
+	 * Creates a string containing a reference to the given string resource key. The string resource reference is a control string according to ECMA-48, "Control
+	 * Functions for Coded Character Sets", Section 5.6, "Control strings". A control string begins with the Start of String control character (U+0098) and ends
+	 * with a String Terminator control character (U+009C). ECMA-48 publication is also approved as ISO/IEC 6429.
 	 * @param resourceKey The resource key to a string in the resources which could be retrieved using {@link GuiseSession#getStringResource(String)}.
 	 * @return A string containing a reference to the given resource key, an ECMA-48 control string with the given resource key as its content, which can be
 	 *         resolved using {@link GuiseSession#dereferenceString(String)}.

@@ -17,6 +17,7 @@
 package io.guise.framework.platform.web;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.*;
 import java.security.Principal;
@@ -51,7 +52,6 @@ import com.globalmentor.security.Nonce;
 import com.globalmentor.servlet.Servlets;
 import com.globalmentor.servlet.http.*;
 import com.globalmentor.text.elff.*;
-import com.globalmentor.w3c.spec.HTML;
 import com.globalmentor.w3c.spec.XML;
 import com.globalmentor.xml.xpath.*;
 
@@ -76,7 +76,6 @@ import static com.globalmentor.servlet.Servlets.*;
 import static com.globalmentor.servlet.http.HTTPServlets.*;
 import static com.globalmentor.text.elff.WebTrendsConstants.*;
 import static com.globalmentor.time.TimeZones.*;
-import static com.globalmentor.w3c.spec.CSS.*;
 import static com.globalmentor.w3c.spec.HTML.*;
 import static com.globalmentor.w3c.spec.XML.*;
 import static io.guise.framework.platform.web.WebPlatform.*;
@@ -86,7 +85,6 @@ import static io.guise.framework.platform.web.adobe.Flash.*;
 import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import io.ploop.transform.urf.PLOOPTURFIO;
 import org.urframework.*;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
@@ -121,8 +119,8 @@ import org.xml.sax.SAXException;
  */
 public class GuiseHTTPServlet extends DefaultHTTPServlet {
 
-	/** The init parameter, "application", used to specify the relative path to the application description file. */
-	public static final String APPLICATION_INIT_PARAMETER = "application";
+	/** The init parameter, "applicationClass", used to specify the Guise application to create. */
+	public static final String APPLICATION_CLASS_INIT_PARAMETER = "applicationClass";
 
 	/** The init parameter prefix, "guise-environment:", used to indicate a Guise environment property. */
 	public static final String GUISE_ENVIRONMENT_INIT_PARAMETER_PREFIX = "guise-environment:";
@@ -138,21 +136,6 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 
 	/** The ID of the viewport to use for sending resources. */
 	public static final String SEND_RESOURCE_VIEWPORT_ID = "guiseDownload";
-
-	/** The I/O implementation that reads a Guise application description from TURF. */
-	private static final PLOOPTURFIO<AbstractGuiseApplication> applicationIO;
-
-	/** @return The I/O implementation that reads a Guise application description from TURF. */
-	public static PLOOPTURFIO<AbstractGuiseApplication> getApplicationIO() {
-		return applicationIO;
-	}
-
-	/** The name of the application configuration file in the data directory for supplemental application initialization. */
-	public static final String DATA_APPLICATION_FILENAME = addExtension("application", TURF.NAME_EXTENSION);
-
-	static {
-		applicationIO = new PLOOPTURFIO<AbstractGuiseApplication>(AbstractGuiseApplication.class); //create the Guise application I/O
-	}
 
 	/** The Guise container that owns the applications. */
 	private HTTPServletGuiseContainer guiseContainer = null;
@@ -273,42 +256,17 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	 */
 	protected AbstractGuiseApplication initGuiseApplication(final ServletConfig servletConfig) throws ServletException {
 		final ServletContext servletContext = servletConfig.getServletContext(); //get the servlet context
-		final AbstractGuiseApplication guiseApplication; //create the application and store it here
-		final String guiseApplicationDescriptionPath = servletConfig.getInitParameter(APPLICATION_INIT_PARAMETER); //get name of the guise application description file
-		if(guiseApplicationDescriptionPath != null) { //if there is a Guise application description file specified
-			final String normalizedGuiseApplicationDescriptionPath = normalizePath(guiseApplicationDescriptionPath); //normalize the path
-			if(isPathAbsolute(normalizedGuiseApplicationDescriptionPath)) { //if the given path is absolute
-				throw new ServletException("Guise application path " + normalizedGuiseApplicationDescriptionPath + " is not a relative path.");
-			}
-			final String absoluteGuiseApplicationDescriptionPath = WEB_INF_DIRECTORY_PATH + normalizedGuiseApplicationDescriptionPath; //determine the context-relative absolute path of the description file
-			//		TODO del Log.trace("determined absolute path to application description:", absoluteGuiseApplicationDescriptionPath);
-			final URL guiseApplicationDescriptionURL;
+		final AbstractGuiseApplication guiseApplication; //create the application and store it here TODO why do we require a particular abstract implementation base? 
+		final String guiseApplicationClassInitParameter = servletConfig.getInitParameter(APPLICATION_CLASS_INIT_PARAMETER); //get name of the Guise application class
+		if(guiseApplicationClassInitParameter != null) {
 			try {
-				guiseApplicationDescriptionURL = servletContext.getResource(absoluteGuiseApplicationDescriptionPath); //get the URL to the application description
-			} catch(final MalformedURLException malformedURLException) {
-				throw new ServletException(malformedURLException);
-			}
-			try {
-				//			TODO del Log.trace("found URL to application description", guiseApplicationDescriptionURL);
-				if(guiseApplicationDescriptionURL == null) { //if we can't find the resource
-					throw new ServletException("Missing Guise application resource description at " + absoluteGuiseApplicationDescriptionPath);
-				}
-				final InputStream guiseApplicationDescriptionInputStream = servletContext.getResourceAsStream(absoluteGuiseApplicationDescriptionPath); ////get an input stream to the application description
-				assert guiseApplicationDescriptionInputStream != null : "Could not get an input stream to Guise application description path "
-						+ absoluteGuiseApplicationDescriptionPath + " even though earlier retrieval of URL succeeded.";
-				final InputStream guiseApplicationDescriptionBufferedInputStream = new BufferedInputStream(guiseApplicationDescriptionInputStream); //get a buffered input stream to the application description
-				try {
-					guiseApplication = getApplicationIO().read(guiseApplicationDescriptionBufferedInputStream, guiseApplicationDescriptionURL.toURI()); //read the application description from the PLOOP TURF, using the URI of the application description as the base URI
-				} catch(final URISyntaxException uriSyntaxException) {
-					throw new ServletException(uriSyntaxException);
-				} finally {
-					guiseApplicationDescriptionBufferedInputStream.close(); //always close the input stream
-				}
-			} catch(final IOException ioException) { //if there is an I/O error
-				throw new ServletException("Error in application description (" + guiseApplicationDescriptionURL + "): " + ioException.getMessage(), ioException);
+				guiseApplication = AbstractGuiseApplication.class.cast(Class.forName(guiseApplicationClassInitParameter).getDeclaredConstructor().newInstance());
+			} catch(final ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException
+					| ClassCastException exception) { //TODO these need to be logged
+				throw new ServletException(exception);
 			}
 		} else { //if no application description is specified, indicate an error TODO allow Guise to support overlays in the future with default Guise applications
-			throw new ServletException("web.xml missing Guise application init parameter \"" + APPLICATION_INIT_PARAMETER + "\".");
+			throw new ServletException("web.xml missing Guise application class init parameter \"" + APPLICATION_CLASS_INIT_PARAMETER + "\".");
 		}
 		//TODO del when WebPlatform works		guiseApplication.installComponentKit(new XHTMLComponentKit());	//create and install an XHTML controller kit
 		//install configured environment properties
@@ -376,15 +334,6 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 					if(dataDirectory == null) { //if there is no data directory
 						throw new ServletException(
 								"No data directory available; either deploy servlet as in a file system or define the init parameter " + DATA_DIRECTORY_INIT_PARAMETER + ".");
-					}
-					final File dataApplicationFile = new File(dataDirectory, "guise/" + DATA_APPLICATION_FILENAME); //get the supplemental application description file, if any TODO use a constant
-					if(dataApplicationFile.exists()) { //if there is a supplemental application description
-						final InputStream guiseApplicationDescriptionInputStream = new BufferedInputStream(new FileInputStream(dataApplicationFile)); ////get an input stream to the supplemental application description
-						try {
-							getApplicationIO().merge(guiseApplication, guiseApplicationDescriptionInputStream, Files.toURI(dataApplicationFile)); //merge the application description from the PLOOP TURF, using the URI of the application description as the base URI
-						} finally {
-							guiseApplicationDescriptionInputStream.close(); //always close the input stream
-						}
 					}
 					URI applicationBaseURI = guiseApplication.getBaseURI(); //see if the application already has a preferred base URI
 					if(applicationBaseURI == null) { //if the application has no preferred base URI

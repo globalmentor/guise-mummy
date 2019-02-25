@@ -22,11 +22,8 @@ import java.util.*;
 
 import static java.util.Objects.*;
 
-import org.urframework.*;
-
 import com.globalmentor.io.IO;
 import com.globalmentor.model.Locales;
-import com.globalmentor.net.Resource;
 import com.globalmentor.rdf.*;
 import com.globalmentor.util.HashMapResourceBundle;
 
@@ -41,7 +38,9 @@ import static com.globalmentor.w3c.spec.XML.*;
 /**
  * Utilities for working with resource bundles.
  * @author Garret Wilson
+ * @deprecated Switch to using Rincl.
  */
+@Deprecated
 public class ResourceBundles //TODO moved out of globalmentor-core to allow org.urframework project extraction; refactor to allow flexibility and storage format pluggability
 {
 
@@ -91,7 +90,7 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 	 * @param locale The locale for which a resource bundle is desired.
 	 * @param loader The class loader from which to load the resource bundle.
 	 * @param parent The parent resource bundle, or <code>null</code> if there should be no parent for resolving resources.
-	 * @param urfResourceIO The I/O support for loading resources from a TURF representation, or <code>null</code> if TURF resource bundles are not supported.
+	 * @param turfResourceIO The I/O support for loading resources from a TURF representation, or <code>null</code> if TURF resource bundles are not supported.
 	 * @param rdfResourceIO The I/O support for loading resources from an RDF+XML serialization, or <code>null</code> if RDF resource bundles are not supported.
 	 * @param rdfPropertyNamespaceURI The namespace of the properties to gather, using the property local name as the map entry key, or <code>null</code> if RDF
 	 *          resource bundles are not supported.
@@ -99,8 +98,8 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 	 * @throws MissingResourceException if no resource bundle for the specified base name can be found, or if there is an error loading the resource bundle.
 	 */
 	public static ResourceBundle getResourceBundle(final String baseName, final Locale locale, final ClassLoader loader, final ResourceBundle parent,
-			final IO<? extends URFResource> urfResourceIO, final IO<? extends RDFResource> rdfResourceIO, final URI rdfPropertyNamespaceURI)
-					throws MissingResourceException {
+			final IO<Map<Object, Object>> turfResourceIO, final IO<? extends RDFResource> rdfResourceIO, final URI rdfPropertyNamespaceURI)
+			throws MissingResourceException {
 		final String basePath = baseName.replace(PACKAGE_SEPARATOR, PATH_SEPARATOR); //create a base path from base name
 		final ResourceBundleFormat[] resourceBundleFormats = ResourceBundleFormat.values(); //get the available resource bundle formats
 		final int resourceBundleFormatCount = resourceBundleFormats.length; //see how many resource bundle formats there are
@@ -111,7 +110,7 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 		for(int depth = 3; depth >= 0; --depth) { //try different locales, starting with the most specific, until we find an input stream
 			for(int resourceBundleFormatIndex = 0; resourceBundleFormatIndex < resourceBundleFormatCount; ++resourceBundleFormatIndex) { //for each resource bundle format
 				final ResourceBundleFormat resourceBundleFormat = resourceBundleFormats[resourceBundleFormatIndex]; //get this resource bundle format
-				if(resourceBundleFormat == ResourceBundleFormat.TURF && urfResourceIO == null) { //if this is a TURF file, only use it if we have I/O for the file
+				if(resourceBundleFormat == ResourceBundleFormat.TURF && turfResourceIO == null) { //if this is a TURF file, only use it if we have I/O for the file
 					continue; //don't check for TURF, because we don't have the means to read it
 				}
 				if(resourceBundleFormat == ResourceBundleFormat.RDFXML && (rdfResourceIO == null || rdfPropertyNamespaceURI == null)) { //if this is an RDF+XML file, only use it if we have I/O for the file
@@ -134,8 +133,7 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 								try {
 									switch(resourceBundleFormat) { //see which type of resource bundle we're loading
 										case TURF: {
-											final URFResource urfResource = urfResourceIO.read(inputStream, resourceURL.toURI()); //try to read the resource
-											final Map<String, Object> resourceMap = getResourceValue(urfResource); //generate a map from the resources
+											final Map<Object, Object> resourceMap = turfResourceIO.read(inputStream, resourceURL.toURI()); //try to read the resource
 											return new HashMapResourceBundle(resourceMap, parent); //create a new hash map resource bundle with resources and the given parent and return it
 										}
 										case RDFXML: {
@@ -246,84 +244,6 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 			}
 		}
 		return null; //indicate that no value could be determined
-	}
-
-	/**
-	 * Creates a resource bundle with contents reflecting the properties of a given URF resource.
-	 * @param urfResource The URF resource the properties of which should be turned into a map.
-	 * @param urfPropertyNamespaceURI The namespace of the properties to gather, using the property local name as the map entry key.
-	 * @param parent The parent resource bundle, or <code>null</code> if there should be no parent for resolving resources.
-	 * @return A resource bundle with contents reflecting the property/value pairs, resolving to the given parent.
-	 */
-	public static ResourceBundle toResourceBundle(final URFResource urfResource, final URI urfPropertyNamespaceURI, final ResourceBundle parent) {
-		return new HashMapResourceBundle(toMap(urfResource, urfPropertyNamespaceURI), parent); //create a new hash map resource bundle with the given parent and return it		
-	}
-
-	/**
-	 * Creates a map with contents reflecting the properties of a given URF resource. Resource values are determined according to the algorithm used by
-	 * {@link #getResourceValue(URFResource)}.
-	 * @param urfResource The URF resource the properties of which should be turned into a map.
-	 * @param urfPropertyNamespaceURI The namespace of the properties to gather, using the property local name as the map entry key.
-	 * @return A map with contents reflecting the property/value pairs of the given resource.
-	 */
-	public static Map<String, Object> toMap(final URFResource urfResource, final URI urfPropertyNamespaceURI) {
-		urfResource.readLock().lock(); //get a read lock on the resource
-		try {
-			final HashMap<String, Object> resourceHashMap = new HashMap<String, Object>((int)urfResource.getPropertyValueCount()); //create a new hash map with enough initial room for all properties
-			for(final URI propertyURI : urfResource.getPropertyURIs()) { //look at each resource property URI; we'll only use the first value for each unique property URI
-				if(propertyURI != null && urfPropertyNamespaceURI.equals(URF.getNamespaceURI(propertyURI))) { //if this property is in the requested namespace
-					final String resourceKey = URF.getLocalName(propertyURI); //use the local name as the resource key
-					final Object resourceValue = getResourceValue(urfResource.getPropertyValue(propertyURI)); //look up the property value and determine the resource value from the URF property value
-					resourceHashMap.put(resourceKey, resourceValue); //store the resource key/value pair in the map
-				}
-			}
-			return resourceHashMap; //return the map		
-		} finally {
-			urfResource.readLock().unlock(); //always release the read lock
-		}
-	}
-
-	/**
-	 * Determines the resource value from an URF property value. Resource values are determined as follows:
-	 * <ol>
-	 * <li>If the property value is an {@link URFListResource}, a {@link List} is returned filled with values obtained by using this same algorithm.</li>
-	 * <li>If the property value is an {@link URFSetResource}, a {@link Set} is returned filled with values obtained by using this same algorithm.</li>
-	 * <li>If the property value is an {@link URFMapResource}, a {@link Map} is returned filled with values obtained by using this same algorithm.</li>
-	 * <li>For all other resources, the result of {@link URF#asObject(Resource)}, if any, is returned.</li>
-	 * </ol>
-	 * @param <T> The type of the resource.
-	 * @param urfPropertyValue The URF property value to be converted to a resource value.
-	 * @return An object representing the resource value for the URF property value.
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T getResourceValue(final URFResource urfPropertyValue) {
-		if(urfPropertyValue instanceof URFListResource) { //if the property value is an URF list
-			final URFListResource<?> listResource = (URFListResource<?>)urfPropertyValue; //get the property value as an URF list
-			final List<Object> list = new ArrayList<Object>(); //create a new list
-			for(final URFResource elementResource : listResource) { //for each element in the list resource
-				list.add(getResourceValue(elementResource)); //convert the element resource to a resource value and add it to the list
-			}
-			return (T)list; //return the list
-		} else if(urfPropertyValue instanceof URFSetResource) { //if the property value is an URF set
-			final URFSetResource<?> setResource = (URFSetResource<?>)urfPropertyValue; //get the property value as an URF set
-			final Set<Object> set = new HashSet<Object>(); //create a new set
-			for(final URFResource elementResource : setResource) { //for each element in the set resource
-				set.add(getResourceValue(elementResource)); //convert the element resource to a resource value and add it to the set
-			}
-			return (T)set; //return the set
-		} else if(urfPropertyValue instanceof URFMapResource) { //if the property value is an URF map
-			final URFMapResource<?, ?> mapResource = (URFMapResource<?, ?>)urfPropertyValue; //get the property value as an URF map
-			final Map<Object, Object> map = new HashMap<Object, Object>(); //create a new map
-			for(final Map.Entry<? extends URFResource, ? extends URFResource> mapEntry : mapResource.entrySet()) { //for each entry in the map resource
-				final Object keyObject = getResourceValue(mapEntry.getKey()); //convert the key resource to a resource value
-				final Object valueObject = getResourceValue(mapEntry.getValue()); //convert the value resource to a resource value
-				map.put(keyObject, valueObject); //store the converted objects in the map 
-			}
-			return (T)map; //return the map
-		} else { //for all other values
-			final Object object = URF.asObject(urfPropertyValue); //convert the property value to an object, if possible
-			return object != null ? (T)object : (T)urfPropertyValue; //if we found an object, return it; otherwise, return the URF property value resource as it is
-		}
 	}
 
 }

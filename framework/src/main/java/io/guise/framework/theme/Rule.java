@@ -19,11 +19,6 @@ package io.guise.framework.theme;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
-import io.ploop.transform.urf.PLOOPURFProcessor;
-import org.urframework.AbstractClassTypedURFResource;
-import org.urframework.select.Select;
-import org.urframework.select.Selector;
-
 import com.globalmentor.util.DataException;
 
 import static com.globalmentor.java.Objects.*;
@@ -34,7 +29,7 @@ import static org.urframework.select.Select.*;
  * A rule for specifying part of a theme.
  * @author Garret Wilson
  */
-public class Rule extends AbstractClassTypedURFResource {
+public class Rule /*TODO fix for new URF: extends AbstractClassTypedURFResource*/ {
 
 	/** Default constructor. */
 	public Rule() {
@@ -46,7 +41,7 @@ public class Rule extends AbstractClassTypedURFResource {
 	 * @param referenceURI The reference URI for the new resource.
 	 */
 	public Rule(final URI referenceURI) {
-		super(referenceURI, THEME_NAMESPACE_URI); //construct the parent class
+		//TODO fix for new URF: super(referenceURI, THEME_NAMESPACE_URI); //construct the parent class
 	}
 
 	/**
@@ -54,21 +49,26 @@ public class Rule extends AbstractClassTypedURFResource {
 	 * @return This rule's selector, or <code>null</code> if this rule has no selector property or the value is not a {@link Selector}.
 	 * @see Select#SELECTOR_PROPERTY_URI
 	 */
+	/*TODO fix for new URF
 	public Selector getSelector() {
 		return asInstance(getPropertyValue(SELECTOR_PROPERTY_URI), Selector.class).orElse(null); //return the select.selector value TODO propagate Optional
 	}
+	*/
 
 	/**
 	 * Sets this rule's selector.
 	 * @param selector This rule's selector, or <code>null</code> if this rule should have no selector property.
 	 */
+	/*TODO fix for new URF
 	public void setSelector(final Selector selector) {
 		setPropertyValue(SELECTOR_PROPERTY_URI, selector); //set the select.select property
 	}
+	*/
 
 	/** @return This rule's apply declaration, or <code>null</code> if this rule has no <code>theme.apply</code> selector or the value is not a {@link Template}. */
 	public Template getApply() {
-		return asInstance(getPropertyValue(APPLY_PROPERTY_URI), Template.class).orElse(null); //return the theme.apply value if it is a Template TODO propagate Optional
+		throw new UnsupportedOperationException();
+		//TODO fix for new URF: return asInstance(getPropertyValue(APPLY_PROPERTY_URI), Template.class); //return the theme.apply value if it is a Template
 	}
 
 	/**
@@ -76,7 +76,8 @@ public class Rule extends AbstractClassTypedURFResource {
 	 * @param apply This rule's apply declaration, or <code>null</code> if this rule should have no apply declaration.
 	 */
 	public void setApply(final Template apply) {
-		setPropertyValue(APPLY_PROPERTY_URI, apply); //set the theme.apply property
+		throw new UnsupportedOperationException();
+		//TODO fix for new URF: setPropertyValue(APPLY_PROPERTY_URI, apply); //set the theme.apply property
 	}
 
 	/**
@@ -90,6 +91,7 @@ public class Rule extends AbstractClassTypedURFResource {
 	 * @throws DataException If a particular property could not be accessed.
 	 * @throws InvocationTargetException if a resource indicates a Java class the constructor of which throws an exception.
 	 */
+	/*TODO fix for new URF 
 	public boolean apply(final Object object, final PLOOPURFProcessor ploopProcessor) throws DataException, InvocationTargetException {
 		final Selector selector = getSelector(); //get the selector, if any
 		if(selector != null && selector.selects(object)) { //if this selector selects the object
@@ -101,5 +103,6 @@ public class Rule extends AbstractClassTypedURFResource {
 		}
 		return false; //indicate that the rule didn't apply to the object
 	}
+	*/
 
 }

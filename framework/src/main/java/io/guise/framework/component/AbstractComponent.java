@@ -26,10 +26,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import static java.util.Objects.*;
 
-import io.ploop.transform.urf.PLOOPURFGenerator;
-import io.ploop.transform.urf.PLOOPURFProcessor;
-import org.urframework.URFResource;
-
 import static com.globalmentor.java.Arrays.*;
 
 import com.globalmentor.event.*;
@@ -836,6 +832,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 
 	@Override
 	public void loadPreferences(final boolean includeDescendants) throws IOException {
+		/*TODO re-implement preference properties
 		final Iterator<String> preferencePropertyIterator = getPreferenceProperties().iterator(); //get an iterator to all preferences properties
 		if(preferencePropertyIterator.hasNext()) { //if there are preference properties
 			final URFResource preferences = getSession().getPreferences(getClass()); //get existing preferences for this class
@@ -853,10 +850,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 			} while(preferencePropertyIterator.hasNext()); //keep saving properties while there are more preference properties
 			//Log.trace("loaded preferences; view:", ((ResourceChildrenPanel)this).getView(), "thumbnail size:", ((ResourceChildrenPanel)this).getThumbnailSize());
 		}
+		*/
 	}
 
 	@Override
 	public void savePreferences(final boolean includeDescendants) throws IOException {
+		/*TODO re-implement preference properties
 		//Log.trace("ready to save preferences for component", this, "have preference properties", preferenceProperties);
 		final Iterator<String> preferencePropertyIterator = getPreferenceProperties().iterator(); //get an iterator to all preferences properties
 		if(preferencePropertyIterator.hasNext()) { //if there are preference properties
@@ -875,6 +874,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 			//Log.trace("ready to save preferences; view:", ((ResourceChildrenPanel)this).getView(), "thumbnail size:", ((ResourceChildrenPanel)this).getThumbnailSize(), "preferences", URF.toString(preferences));
 			session.setPreferences(componentClass, preferences); //set the new preferences
 		}
+		*/
 	}
 
 	@Override

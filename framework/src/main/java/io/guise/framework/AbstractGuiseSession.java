@@ -27,9 +27,7 @@ import static java.text.MessageFormat.*;
 
 import java.util.*;
 
-import io.ploop.transform.urf.PLOOPURFProcessor;
-import org.urframework.*;
-import org.urframework.io.AbstractTURFIO;
+import org.urframework.URFResource;
 
 import static java.util.Collections.*;
 import static java.util.Objects.*;
@@ -200,38 +198,39 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * The map of preference resource descriptions keyed to classes. This is a temporary implementation that will later be replaced with a backing store based
 	 * upon the current principal.
 	 */
-	private final ReadWriteLockMap<Class<?>, URFResource> classPreferencesMap = new DecoratorReadWriteLockMap<Class<?>, URFResource>(
-			new HashMap<Class<?>, URFResource>());
-
-	@Override
-	public URFResource getPreferences(final Class<?> objectClass) throws IOException {
-		URFResource preferences = classPreferencesMap.get(requireNonNull(objectClass, "Class cannot be null.")); //get the preferences stored in the map
-		if(preferences == null) { //if no preferences are stored in the map
-			preferences = new DefaultURFResource(); //create a default set of preference properties				
-			/*TODO del if we decide to store resource copies; change map to concurrent map
-							classPreferencesMap.writeLock().lock();	//get a write lock on the preferences map
-							try
-							{
-								preferences=classPreferencesMap.get(objectClass);	//try again to get the preferences stored in the map
-								if(preferences==null) {	//if preferences are still not stored in the map
-									preferences=new DefaultRDFResource();	//create a default set of preference properties
-									classPreferencesMap.put(objectClass, preferences);	//store the preferences in the map
-								}
-							}
-							finally
-							{
-								classPreferencesMap.writeLock().unlock();	//always release the write lock on the preferences map
-							}
-			*/
-		}
-		return preferences; //return the preferences we found for this class
-	}
-
-	@Override
-	public void setPreferences(final Class<?> objectClass, final URFResource preferences) throws IOException {
-		classPreferencesMap.put(requireNonNull(objectClass, "Class cannot be null."),
-				new DefaultURFResource(requireNonNull(preferences, "Preferences cannot be null."))); //store a copy of the preferences in the map
-	}
+	//TODO re-implement preferences
+	//	private final ReadWriteLockMap<Class<?>, URFResource> classPreferencesMap = new DecoratorReadWriteLockMap<Class<?>, URFResource>(
+	//			new HashMap<Class<?>, URFResource>());
+	//
+	//	@Override
+	//	public URFResource getPreferences(final Class<?> objectClass) throws IOException {
+	//		URFResource preferences = classPreferencesMap.get(requireNonNull(objectClass, "Class cannot be null.")); //get the preferences stored in the map
+	//		if(preferences == null) { //if no preferences are stored in the map
+	//			preferences = new DefaultURFResource(); //create a default set of preference properties				
+	//			/*TODO del if we decide to store resource copies; change map to concurrent map
+	//							classPreferencesMap.writeLock().lock();	//get a write lock on the preferences map
+	//							try
+	//							{
+	//								preferences=classPreferencesMap.get(objectClass);	//try again to get the preferences stored in the map
+	//								if(preferences==null) {	//if preferences are still not stored in the map
+	//									preferences=new DefaultRDFResource();	//create a default set of preference properties
+	//									classPreferencesMap.put(objectClass, preferences);	//store the preferences in the map
+	//								}
+	//							}
+	//							finally
+	//							{
+	//								classPreferencesMap.writeLock().unlock();	//always release the write lock on the preferences map
+	//							}
+	//			*/
+	//		}
+	//		return preferences; //return the preferences we found for this class
+	//	}
+	//
+	//	@Override
+	//	public void setPreferences(final Class<?> objectClass, final URFResource preferences) throws IOException {
+	//		classPreferencesMap.put(requireNonNull(objectClass, "Class cannot be null."),
+	//				new DefaultURFResource(requireNonNull(preferences, "Preferences cannot be null."))); //store a copy of the preferences in the map
+	//	}
 
 	/** The platform on which Guise objects are depicted. */
 	private final Platform platform;
@@ -673,6 +672,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	@Override
 	public void initializeComponent(final Component component) {
+		/*TODO re-implement component descriptions
 		final Class<?> componentClass = component.getClass(); //get the class of the component
 		final String descriptionFilename = addExtension(getLocalName(componentClass), TURF.NAME_EXTENSION); //create a name in the form ClassName.turf
 		//TODO del Log.trace("Trying to load description file:", descriptionFilename);
@@ -694,6 +694,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		} else { //if there is no description file
 			component.initialize(); //call the initialize() method manually
 		}
+		*/
 	}
 
 	/**
@@ -718,6 +719,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@Override
 	public void initializeComponent(final Component component, final InputStream descriptionInputStream)
 			throws IOException, DataException, InvocationTargetException {
+		/*TODO re-implement component descriptions
 		final URI BASE_URI = URI.create("guise:/"); //TODO fix
 		final URF urf = AbstractTURFIO.readTURF(new URF(), descriptionInputStream, BASE_URI); //read TURF from the input stream
 		final URI componentResourceTypeURI = createJavaURI(component.getClass()); //create a new URI that indicates the type of the resource description we expect
@@ -730,6 +732,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		} else { //if there is no resource of the appropriate type
 			throw new IllegalArgumentException("No resource description found of type " + componentResourceTypeURI); //TODO do we want to change to DataException?
 		}
+		*/
 	}
 
 	/**
