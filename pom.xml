@@ -40,15 +40,24 @@
 
 	<properties>
 		<maven.compiler.release>11</maven.compiler.release>
+		<confound.version>0.7.0-SNAPSHOT</confound.version>
 	</properties>
 
 	<modules>
+		<module>cli</module>
 		<module>framework</module>
 		<module>framework-demo</module>
+		<module>mummy</module>
 	</modules>
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-application</artifactId>
+				<version>0.6.0-SNAPSHOT</version>
+			</dependency>
+
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-core</artifactId>
@@ -75,8 +84,14 @@
 
 			<dependency>
 				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-html</artifactId>
+				<version>0.6.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-javascript</artifactId>
-				<version>0.5.0</version>
+				<version>0.6.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
@@ -105,13 +120,31 @@
 
 			<dependency>
 				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-w3c-spec</artifactId>
-				<version>0.5.0</version>
+				<artifactId>globalmentor-xml</artifactId>
+				<version>0.6.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.clogr</groupId>
+				<artifactId>clogr</artifactId>
+				<version>0.8.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.confound</groupId>
+				<artifactId>confound-file</artifactId>
+				<version>${confound.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.guise</groupId>
 				<artifactId>guise-framework</artifactId>
+				<version>0.6.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.guise</groupId>
+				<artifactId>guise-mummy</artifactId>
 				<version>0.6.0-SNAPSHOT</version>
 			</dependency>
 		</dependencies>
