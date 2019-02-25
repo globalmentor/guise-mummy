@@ -21,8 +21,6 @@ import static io.guise.framework.theme.Theme.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 
-import org.ploop.graph.PLOOPURFProcessor;
-
 import com.globalmentor.util.DataException;
 
 /**
@@ -54,8 +52,10 @@ public class Template /*TODO fix for new URF: extends AbstractClassTypedURFResou
 	 * @throws DataException If a particular property could not be accessed.
 	 * @throws InvocationTargetException if a resource indicates a Java class the constructor of which throws an exception.
 	 */
+	/*TODO fix for new URF
 	public void apply(final Object object, final PLOOPURFProcessor ploopProcessor) throws DataException, InvocationTargetException {
-		//TODO fix for new URF: ploopProcessor.setObjectProperties(object, this); //initialize the object from the template
+		ploopProcessor.setObjectProperties(object, this); //initialize the object from the template
 	}
+	*/
 
 }
