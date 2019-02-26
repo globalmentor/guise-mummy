@@ -27,10 +27,9 @@ import static java.text.MessageFormat.*;
 
 import java.util.*;
 
-import org.urframework.URFResource;
-
 import static java.util.Collections.*;
 import static java.util.Objects.*;
+import static org.zalando.fauxpas.FauxPas.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.collections.DecoratorReadWriteLockMap;
@@ -53,6 +52,7 @@ import io.guise.framework.platform.Platform;
 import io.guise.framework.prototype.*;
 import io.guise.framework.style.*;
 import io.guise.framework.theme.Theme;
+import io.urf.model.UrfResourceDescription;
 
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Writers.*;
@@ -632,7 +632,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	@Override
 	public Component getNavigationComponent(final URIPath path) {
-		final Destination destination = getApplication().getDestination(path); //get the destination associated with the given path
+		final Destination destination = getApplication().getDestination(path).orElse(null); //get the destination associated with the given path TODO propagate use of Optional
 		if(!(destination instanceof ComponentDestination)) { //if the destination is not a component destination
 			throw new IllegalArgumentException("Navigation path " + path + " does not designate a component destination.");
 		}
@@ -640,13 +640,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	}
 
 	@Override
-	public URFResource getNavigationDescription(final URIPath navigationPath, final Bookmark bookmark) throws IOException {
-		final Destination destination = getApplication().getDestination(navigationPath); //get the destination associated with the given path
-		return destination != null ? destination.getDescription(this, navigationPath, bookmark, null) : null; //delegate to the destination, if any
+	public Optional<UrfResourceDescription> getNavigationDescription(final URIPath navigationPath, final Bookmark bookmark) throws IOException {
+		//delegate to the destination, if any, associated with the path
+		return getApplication().getDestination(navigationPath)
+				.flatMap(throwingFunction(destination -> destination.getDescription(this, navigationPath, bookmark, null)));
 	}
 
 	@Override
-	public URFResource getNavigationDescription() throws IOException {
+	public Optional<UrfResourceDescription> getNavigationDescription() throws IOException {
 		return getNavigationDescription(getNavigationPath(), getBookmark());
 	}
 
@@ -806,7 +807,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		final URIPath navigationPath = getNavigationPath(); //get our current navigation path
 		final GuiseApplication application = getApplication(); //get the application
 		ModalNavigation modalNavigation = null; //if we actually end modal navigation, we'll store the information here
-		final Destination destination = application.getDestination(navigationPath); //get the destination for this path TODO maybe add a GuiseSession.getDestination()
+		final Destination destination = application.getDestination(navigationPath).orElse(null); //get the destination for this path TODO maybe add a GuiseSession.getDestination() TODO improve use of Optional
 		if(destination instanceof ComponentDestination) { //if we're at a component destination
 			final ComponentDestination componentDestination = (ComponentDestination)destination; //get the destination as a component destination
 			URI navigationURI = null; //TODO fix

@@ -22,11 +22,11 @@ import static java.util.Collections.*;
 import static java.util.Objects.*;
 import java.util.regex.Pattern;
 
-import org.urframework.URFResource;
-
 import com.globalmentor.beans.BoundPropertyObject;
 import com.globalmentor.java.Objects;
 import com.globalmentor.net.*;
+
+import io.urf.model.UrfResourceDescription;
 
 import static com.globalmentor.net.URIs.*;
 
@@ -125,14 +125,12 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
-	 * This implementation returns <code>null</code>.
-	 * </p>
+	 * @implSpec This implementation returns an empty description.
 	 */
 	@Override
-	public URFResource getDescription(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI)
-			throws ResourceIOException {
-		return null;
+	public Optional<UrfResourceDescription> getDescription(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark,
+			final URI referrerURI) throws ResourceIOException {
+		return Optional.empty();
 	}
 
 	@Override

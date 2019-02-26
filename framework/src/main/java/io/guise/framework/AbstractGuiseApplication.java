@@ -34,9 +34,6 @@ import javax.mail.Message;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 
-import org.urframework.*;
-import org.urframework.io.TypedURFResourceTURFIO;
-
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Threads.*;
@@ -744,7 +741,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	}
 
 	@Override
-	public Destination getDestination(final URIPath path) {
+	public Optional<Destination> getDestination(final URIPath path) {
 		path.checkRelative(); //make sure the path is relative
 		Destination destination = pathDestinationMap.get(path); //get the destination associated with this path, if any
 		if(destination == null) { //if there is no destination for this exact path
@@ -755,7 +752,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 				}
 			}
 		}
-		return destination; //return the destination we found, if any
+		return Optional.ofNullable(destination); //return the destination we found, if any
 	}
 
 	@Override

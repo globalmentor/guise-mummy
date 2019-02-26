@@ -20,15 +20,14 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.*;
+import java.nio.charset.Charset;
 import java.security.Principal;
+import java.time.Instant;
 import java.util.*;
 
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
-
-import static org.urframework.content.Content.*;
-import static org.urframework.dcmi.DCMI.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -39,6 +38,7 @@ import com.globalmentor.collections.Collections;
 import com.globalmentor.event.ProgressEvent;
 import com.globalmentor.event.ProgressListener;
 import com.globalmentor.io.*;
+import com.globalmentor.iso.datetime.ISODateTime;
 import com.globalmentor.java.Objects;
 import com.globalmentor.javascript.JSON;
 import com.globalmentor.log.Log;
@@ -64,6 +64,9 @@ import io.guise.framework.model.FileItemResourceImport;
 import io.guise.framework.platform.*;
 import io.guise.framework.platform.web.WebPlatform.PollCommand;
 import io.guise.framework.platform.web.css.*;
+import io.urf.Content;
+import io.urf.model.UrfObject;
+import io.urf.model.UrfResourceDescription;
 
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Files.*;
@@ -85,7 +88,6 @@ import static io.guise.framework.platform.web.adobe.Flash.*;
 import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.urframework.*;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
@@ -378,7 +380,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 			return; //don't try to see if there is a navigation path for this path
 		}
 
-		final Destination destination = guiseApplication.getDestination(guiseRequest.getNavigationPath()); //try to get a destination associated with the requested path
+		final Destination destination = guiseApplication.getDestination(guiseRequest.getNavigationPath()).orElse(null); //try to get a destination associated with the requested path TODO improve use of Optional
 		if(destination != null) { //if we have a destination associated with the requested path
 			Log.trace("found destination:", destination);
 			final GuiseSession guiseSession = HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request); //retrieve the Guise session for this container and request
@@ -455,7 +457,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		if(guiseRequest.isRequestPathReserved()) { //if this is a request for a Guise reserved path (e.g. a public resource or a temporary resource)
 			throw new HTTPForbiddenException("Uploading content to " + guiseRequest.getNavigationPath() + " is not allowed.");
 		}
-		final Destination destination = guiseApplication.getDestination(guiseRequest.getNavigationPath()); //try to get a destination associated with the requested path
+		final Destination destination = guiseApplication.getDestination(guiseRequest.getNavigationPath()).orElse(null); //try to get a destination associated with the requested path TODO improve use of Optional
 		if(!(destination instanceof ResourceWriteDestination)) { //if we don't have a write destination associated with the requested path
 			throw new HTTPForbiddenException("Uploading content to " + guiseRequest.getNavigationPath() + " is not supported.");
 		}
@@ -570,16 +572,16 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 										progressComponent.processEvent(new WebProgressDepictEvent(progressComponent, null, TaskState.INCOMPLETE, 0)); //indicate to the component that progress is starting for all transfers
 									}
 								}
-								final URFResource resourceDescription = new DefaultURFResource(); //create a new resource description
+								final UrfObject resourceDescription = new UrfObject(); //create a new resource description
 								final String itemContentTypeString = fileItemStream.getContentType(); //get the item content type, if any
 								if(itemContentTypeString != null) { //if we know the item's content type
 									final ContentType itemContentType = ContentType.create(itemContentTypeString);
 									if(!ContentType.APPLICATION_OCTET_STREAM_CONTENT_TYPE.hasBaseType(itemContentType)) { //if the content type is not just a generic "bunch of bytes" content type
-										setContentType(resourceDescription, itemContentType); //set the resource's content type
+										resourceDescription.setPropertyValue(Content.TYPE_PROPERTY_TAG, itemContentType); //set the resource's content type
 									}
 								}
 								final String name = URIs.getName(itemName); //removing any extraneous path information a browser such as IE or Opera might have given TODO verify that the correct slashes are being checked
-								resourceDescription.setName(name); //specify the name provided to us
+								resourceDescription.setPropertyValueByHandle("info-name", name); //specify the name provided to us TODO determine official approach for specifying URF name
 
 								try {
 									final InputStream inputStream = new BufferedInputStream(fileItemStream.openStream()); //get an input stream to the item
@@ -626,7 +628,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 							}
 						}
 					}
-					for(final Component progressComponent : progressComponents) { //for each component that was notfied of progress
+					for(final Component progressComponent : progressComponents) { //for each component that was notified of progress
 						synchronized(guiseSession) { //don't allow other session contexts to be active while we dispatch the event
 							progressComponent.processEvent(new WebProgressDepictEvent(progressComponent, null, TaskState.COMPLETE, 0)); //indicate to the component that progress is finished for all transfers
 						}
@@ -675,7 +677,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		//TODO del		final boolean isAJAX=contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType);	//see if this is a Guise AJAX request
 		final String requestMethod = guiseRequest.getHTTPServletRequest().getMethod(); //get the request method
 		//TODO del if not needed				final HTTPServletWebDepictContext depictContext=new HTTPServletWebDepictContext(guiseRequest, response, guiseSession, resourceWriteDestination);	//create a new Guise context
-		final URFResource resourceDescription = new DefaultURFResource(); //create a new resource description
+		final UrfResourceDescription resourceDescription = new UrfObject(); //create a new resource description
 		/*TODO del if not needed
 					final String itemContentTypeString=fileItemStream.getContentType();	//get the item content type, if any
 					if(itemContentTypeString!=null) {	//if we know the item's content type
@@ -1417,16 +1419,19 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 								setNoCache(request, response); //turn off caching for downloads
 							}
 						}
-						final URI referenceURI = destinationResource.getResourceDescription().getURI(); //get the reference URI of the description, if any
+						//TODO why was this originally destinationResource.getResourceDescription().getURI()? was that a mistake, confusing the description with the resource
+						final URI referenceURI = destinationResource.getURI(); //get the reference URI of the description, if any
 						//Log.trace("setting content disposition, reference URI", referenceURI);
 						setContentDisposition(response, contentDispositionType, referenceURI != null ? getName(referenceURI) : null); //set the response content disposition, suggesting the resource's decoded name if we can
 					}
 				}
 			}
+			/*TODO fix for DCMI description and/or URF description
 			final String description = getDescription(destinationResource.getResourceDescription()); //get the dc.description
 			if(description != null) { //if this resource provides a description
 				setContentDescription(response, description); //resport the description back to the client
 			}
+			*/
 		}
 		super.serveResource(request, response, resource, serveContent); //serve the resource normally
 	}
@@ -1761,7 +1766,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	 */
 	protected void beginModalNavigation(final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ModalNavigation modalNavigation) {
 		final URIPath navigationPath = guiseApplication.relativizeURI(modalNavigation.getNewNavigationURI()); //get the navigation path for the modal navigation
-		final Destination destination = guiseApplication.getDestination(navigationPath); //get the destination for this path TODO maybe add a GuiseSession.getDestination()
+		final Destination destination = guiseApplication.getDestination(navigationPath).orElse(null); //get the destination for this path TODO maybe add a GuiseSession.getDestination() TODO improve use of Optional
 		if(destination instanceof ComponentDestination) { //if the destination is a component destination
 			final ComponentDestination componentDestination = (ComponentDestination)destination; //get the destination as a component destination
 			final Component destinationComponent = guiseSession.getDestinationComponent(componentDestination); //get the component for this destination
@@ -1933,7 +1938,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		if(guiseApplication.hasAsset(path)) { //if the path represents a valid application asset
 			return true; //the resource exists
 		}
-		final Destination destination = guiseApplication.getDestination(path); //get the destination for the given path
+		final Destination destination = guiseApplication.getDestination(path).orElse(null); //get the destination for the given path TODO improve use of Optional
 		if(destination != null) { //if the URI represents a valid navigation path
 			Log.trace("this is a destination");
 			final HTTPServletGuiseContainer guiseContainer = getGuiseContainer(); //get the Guise container
@@ -2000,7 +2005,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 			}
 			//		TODO del Log.trace("constructed a resource with length:", resource.getContentLength(), "and last modified", resource.getLastModified());
 		} else { //if this is not a Guise asset, see if it is a Guise resource destination
-			final Destination destination = guiseApplication.getDestination(path); //get the destination for the given path
+			final Destination destination = guiseApplication.getDestination(path).orElse(null); //get the destination for the given path TODO improve use of Optional
 			if(destination instanceof ResourceReadDestination) { //if this is a request for a resource destination
 				final ResourceReadDestination resourceDestination = (ResourceReadDestination)destination; //get the resource destination
 				final HTTPServletGuiseContainer guiseContainer = getGuiseContainer(); //get the Guise container
@@ -2012,7 +2017,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 								final String referrer=getReferer(request);	//get the request referrer, if any
 								final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
 				*/
-				final ObjectHolder<URFResource> destinationResourceDescriptionHolder = new ObjectHolder<URFResource>(); //create an object holder to receive the result of asking for the resource description
+				final ObjectHolder<UrfResourceDescription> destinationResourceDescriptionHolder = new ObjectHolder<>(); //create an object holder to receive the result of asking for the resource description
 				final GuiseSessionThreadGroup guiseSessionThreadGroup = Guise.getInstance().getThreadGroup(guiseSession); //get the thread group for this session
 				try {
 					call(guiseSessionThreadGroup, new Runnable() { //call the method in a new thread inside the thread group
@@ -2043,6 +2048,89 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 			}
 		}
 		return resource; //return the resource without extra processing
+	}
+
+	/**
+	 * A resource that has retrieves its properties, if possible, from a given RDF description. Recognized properties are:
+	 * <ul>
+	 * <li>{@link Content#TYPE_PROPERTY_TAG} TODO implement</li>
+	 * <li>{@link Content#LENGTH_PROPERTY_TAG}</li>
+	 * <li>{@link Content#MODIFIED_PROPERTY_TAG}</li>
+	 * </ul>
+	 * @implNote This class originated in the default HTTP servlet class in the GlobalMentor servlet library.
+	 * @author Garret Wilson
+	 */
+	protected abstract static class AbstractDescriptionResource implements HTTPServletResource {
+
+		private final URI uri;
+
+		@Override
+		public URI getURI() {
+			return uri;
+		}
+
+		/** The description of the resource. */
+		private final UrfResourceDescription resourceDescription;
+
+		/** @return The description of the resource. */
+		public UrfResourceDescription getResourceDescription() {
+			return resourceDescription;
+		}
+
+		/**
+		 * Returns the full content type of the resource, including any parameters.
+		 * @param request The HTTP request in response to which the content type is being retrieved.
+		 * @return The full content type of the resource with any parameters, or <code>null</code> if the content type could not be determined.
+		 * @throws IOException if there is an error getting the type of the resource.
+		 */
+		public ContentType getContentType(final HttpServletRequest request) throws IOException {
+			//TODO move to new URF utility methods
+			final ContentType contentType = ContentType.class.cast(getResourceDescription().findPropertyValue(Content.TYPE_PROPERTY_TAG).orElse(null)); //get the content type, if any
+			if(contentType != null) { //if a content type was indicated
+				final Charset charset = Charset.class.cast(getResourceDescription().findPropertyValue(Content.CHARSET_PROPERTY_TAG).orElse(null)); //get the charset, if any
+				if(charset != null) { //if a charset was specified
+					contentType.withParameter(new ContentType.Parameter(ContentType.CHARSET_PARAMETER, charset.name())); //add the charset as the value of the charset parameter
+				}
+			}
+			return contentType; //return the full content type, if any, we constructed
+		}
+
+		/**
+		 * Returns the content length of the resource.
+		 * @param request The HTTP request in response to which the content length is being retrieved.
+		 * @return The content length of the resource, or <code>-1</code> if the content length could not be determined.
+		 * @throws IOException if there is an error getting the length of the resource.
+		 */
+		public long getContentLength(final HttpServletRequest request) throws IOException {
+			//TODO move to new URF utility methods
+			final Number contentLength = Number.class.cast(getResourceDescription().findPropertyValue(Content.LENGTH_PROPERTY_TAG).orElse(null));
+			return contentLength != null ? contentLength.longValue() : -1; //return the content length from the description, if possible
+		}
+
+		/**
+		 * Returns the last modification time of the resource.
+		 * @param request The HTTP request in response to which the last modified time is being retrieved.
+		 * @return The time of last modification as the number of milliseconds since January 1, 1970 GMT, or <code>-1</code> if the last modified date could not be
+		 *         determined.
+		 * @throws IOException if there is an error getting the last modified time.
+		 */
+		public long getLastModified(final HttpServletRequest request) throws IOException {
+			//TODO move to new URF utility methods
+			final Instant lastModified = Instant.class.cast(getResourceDescription().findPropertyValue(Content.MODIFIED_PROPERTY_TAG).orElse(null)); //get the last modified date time from the description, if that property exists
+			return lastModified != null ? lastModified.getEpochSecond() : -1; //return the milliseconds of the time, if the time is available
+		}
+
+		/**
+		 * Constructs a resource with a reference URI and resource description.
+		 * @param referenceURI The reference URI for the new resource.
+		 * @param resourceDescription The description of the resource.
+		 * @throws NullPointerException if the reference URI and/or resource description is <code>null</code>.
+		 */
+		public AbstractDescriptionResource(final URI referenceURI, final UrfResourceDescription resourceDescription) {
+			this.uri = requireNonNull(referenceURI, "HTTP resource reference URI cannot be null.");
+			this.resourceDescription = requireNonNull(resourceDescription, "Resource description cannot be null."); //save the description
+		}
+
 	}
 
 	/**
@@ -2105,7 +2193,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		 * @throws NullPointerException if the reference URI, resource description, Guise container, Guise application, Guise session, resource destination,
 		 *           navigation path, and/or bookmark is <code>null</code>.
 		 */
-		public DestinationResource(final URI referenceURI, final URFResource resourceDescription, final HTTPServletGuiseContainer guiseContainer,
+		public DestinationResource(final URI referenceURI, final UrfResourceDescription resourceDescription, final HTTPServletGuiseContainer guiseContainer,
 				final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ResourceReadDestination resourceDestination,
 				final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) {
 			super(referenceURI, resourceDescription); //construct the parent class

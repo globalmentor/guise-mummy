@@ -24,8 +24,6 @@ import java.text.Collator;
 import java.text.MessageFormat;
 import java.util.*;
 
-import org.urframework.URFResource;
-
 import com.globalmentor.beans.PropertyBindable;
 
 import static com.globalmentor.java.Classes.*;
@@ -43,6 +41,7 @@ import io.guise.framework.platform.Platform;
 import io.guise.framework.prototype.ActionPrototype;
 import io.guise.framework.style.*;
 import io.guise.framework.theme.Theme;
+import io.urf.model.UrfResourceDescription;
 
 /**
  * Represents a session with a user. A Swing-based client application may have only one session, while a web server application will likely have multiple
@@ -526,11 +525,11 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Concern
 	 * @param navigationPath The navigation path relative to the application context path.
 	 * @param bookmark The bookmark for which navigation should occur at this navigation path, or <code>null</code> if there is no bookmark involved in
 	 *          navigation.
-	 * @return A description of the indicated navigation path, or <code>null</code> if nothing exists at the given navigation path.
+	 * @return A description of the indicated navigation path, which will not be present if nothing exists at the given navigation path.
 	 * @throws IOException if there is an error accessing the navigation path.
 	 * @see Destination#getDescription(GuiseSession, URIPath, Bookmark, URI)
 	 */
-	public URFResource getNavigationDescription(final URIPath navigationPath, final Bookmark bookmark) throws IOException;
+	public Optional<UrfResourceDescription> getNavigationDescription(final URIPath navigationPath, final Bookmark bookmark) throws IOException;
 
 	/** @return Whether the session is in a modal navigation state. */
 	public boolean isModalNavigation();
@@ -551,7 +550,7 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Concern
 	 * is called by modal panels and should seldom if ever be called directly. If the current modal state corresponds to the current navigation state, the current
 	 * modal state is removed, the modal state's event is fired, and modal state is handed to the previous modal state, if any. Otherwise, navigation is
 	 * transferred to the modal panel's referring URI, if any. If the given modal panel is not the panel at the current navigation path, the modal state is not
-	 * changed, although navigation and releasal will still occur.
+	 * changed, although navigation and release will still occur.
 	 * @param modalNavigationPanel The panel for which modal navigation state should be ended.
 	 * @return true if modality actually ended for the given panel.
 	 * @see NavigationEvent#getReferrerURI()
@@ -569,13 +568,13 @@ public interface GuiseSession extends PropertyBindable, CollatorFactory, Concern
 	/**
 	 * Returns a description of the resource for the current navigation path and bookmark. This is a convenience method that delegates to the appropriate
 	 * destination for the current navigation path.
-	 * @return A description of the indicated navigation path, or <code>null</code> if nothing exists at the current navigation path.
+	 * @return A description of the current navigation path, which will not be present if nothing exists at the current navigation path.
 	 * @throws IOException if there is an error accessing the navigation path.
 	 * @see #getNavigationPath()
 	 * @see #getBookmark()
 	 * @see #getNavigationDescription(URIPath, Bookmark)
 	 */
-	public URFResource getNavigationDescription() throws IOException;
+	public Optional<UrfResourceDescription> getNavigationDescription() throws IOException;
 
 	/**
 	 * Changes the navigation path of the session. This method does not actually cause navigation to occur. If the given navigation path is the same as the

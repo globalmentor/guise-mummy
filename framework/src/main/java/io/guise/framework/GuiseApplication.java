@@ -295,10 +295,10 @@ public interface GuiseApplication extends Resource, PropertyBindable, Concerned 
 	 * Determines the destination associated with the given application context-relative path. This method first checks for a destination that matches the exact
 	 * path as given; if no matching path is found, all destinations with path patterns are searched for a match.
 	 * @param path The address for which a destination should be retrieved.
-	 * @return The destination associated with the given path, or <code>null</code> if no destination is associated with the path.
+	 * @return The destination associated with the given path, which will not be present if no destination is associated with the path.
 	 * @throws IllegalArgumentException if the provided path is absolute.
 	 */
-	public Destination getDestination(final URIPath path);
+	public Optional<Destination> getDestination(final URIPath path);
 
 	/**
 	 * Returns an iterable of destinations. Any changes to the iterable will not necessarily be reflected in the destinations available to the application.

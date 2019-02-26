@@ -19,11 +19,11 @@ package io.guise.framework;
 import java.io.InputStream;
 import java.net.URI;
 
-import org.urframework.URFResource;
-import org.urframework.content.*;
-
 import com.globalmentor.net.ResourceIOException;
 import com.globalmentor.net.URIPath;
+
+import io.urf.Content;
+import io.urf.model.UrfResourceDescription;
 
 /**
  * A navigation point that retrieves a resource description and/or contents.
@@ -34,9 +34,9 @@ public interface ResourceReadDestination extends Destination {
 	/**
 	 * Returns a description of the resource. The resource should include valid values for the following properties:
 	 * <ul>
-	 * <li>{@link Content#TYPE_PROPERTY_URI}</li>
-	 * <li>{@link Content#LENGTH_PROPERTY_URI}</li>
-	 * <li>{@link Content#MODIFIED_PROPERTY_URI}</li>
+	 * <li>{@link Content#TYPE_PROPERTY_TAG}</li>
+	 * <li>{@link Content#LENGTH_PROPERTY_TAG}</li>
+	 * <li>{@link Content#MODIFIED_PROPERTY_TAG}</li>
 	 * </ul>
 	 * @param session The current Guise Session.
 	 * @param navigationPath The navigation path relative to the application context path.
@@ -47,7 +47,7 @@ public interface ResourceReadDestination extends Destination {
 	 * @throws NullPointerException if the given navigation path is <code>null</code>.
 	 * @throws ResourceIOException if there is an error retrieving the resource description.
 	 */
-	public URFResource getResourceDescription(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI)
+	public UrfResourceDescription getResourceDescription(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI)
 			throws ResourceIOException;
 
 	/**

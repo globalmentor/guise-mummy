@@ -21,9 +21,6 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.util.*;
 
-import org.urframework.URFResource;
-import org.urframework.dcmi.DCMI;
-
 import com.globalmentor.metadata.OpenGraph;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.net.URIPath;
@@ -183,8 +180,9 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TITLE); //</xhtml:title>
 			depictContext.write('\n');
 		}
-		final URFResource navigationDescription = session.getNavigationDescription(); //get a description of our current navigation
-		if(navigationDescription != null) {
+		/*TODO 
+		final UrfResourceDescription navigationDescription = session.getNavigationDescription().orElse(null); //get a description of our current navigation TODO improve use of Optional
+		if(navigationDescription != null) { TODO 
 			//Open Graph meta properties
 			depictContext.write('\t'); //og:title (required)
 			depictContext.writeMetaElement(OpenGraph.NAMESPACE_URI, OpenGraph.TITLE_LOCAL_NAME, navigationDescription.determineLabel());
@@ -231,6 +229,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 				depictContext.write('\n');
 			}
 		}
+		*/
 		final List<URI> styleURIs = listOf(depictContext.getStyles()); //get the list of styles for depiction
 		//add in the content component theme's style, if appropriate TODO this will all get changed when we maintain a separate application frame for each navigation path
 		/*TODO re-implement themes
