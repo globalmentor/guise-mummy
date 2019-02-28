@@ -16,7 +16,7 @@
 
 package io.guise.framework.platform.web;
 
-import static com.globalmentor.w3c.spec.HTML.*;
+import static com.globalmentor.html.spec.HTML.*;
 
 import io.guise.framework.component.*;
 

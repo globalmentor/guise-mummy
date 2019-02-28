@@ -20,8 +20,8 @@ import java.util.Map;
 
 import io.guise.framework.component.*;
 
-import static com.globalmentor.w3c.spec.CSS.*;
-import static com.globalmentor.w3c.spec.HTML.*;
+import static com.globalmentor.css.spec.CSS.*;
+import static com.globalmentor.html.spec.HTML.*;
 
 /**
  * Strategy for rendering a scroll control as an XHTML <code>&lt;div&gt;</code> element.

@@ -16,9 +16,11 @@
 
 package io.guise.framework.platform.web;
 
-import static com.globalmentor.w3c.spec.HTML.*;
+import static com.globalmentor.html.spec.HTML.*;
 
 import javax.annotation.Nonnull;
+
+import com.globalmentor.html.spec.HTML;
 
 import io.guise.framework.component.*;
 import io.guise.framework.component.SectionComponent.SectionType;
@@ -63,7 +65,7 @@ public class WebPanelDepictor<C extends Panel> extends WebLayoutComponentDepicto
 
 	/**
 	 * Determines the appropriate XHTML element local name (e.g. <code>&lt;section&gt;</code>) for the given section type. If there is no specific XHTML element
-	 * appropriate for the given section type, {@value com.globalmentor.w3c.spec.HTML#ELEMENT_DIV} will be returned.
+	 * appropriate for the given section type, {@value HTML#ELEMENT_DIV} will be returned.
 	 * @param sectionType The type of section indicated.
 	 * @return The XHTML element local name for the indicated section type.
 	 * @throws NullPointerException if the given section type is <code>null</code>.

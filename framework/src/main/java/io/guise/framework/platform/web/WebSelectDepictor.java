@@ -30,7 +30,7 @@ import io.guise.framework.model.*;
 import io.guise.framework.platform.*;
 import io.guise.framework.validator.*;
 
-import static com.globalmentor.w3c.spec.HTML.*;
+import static com.globalmentor.html.spec.HTML.*;
 
 /**
  * Strategy for rendering a select control as an XHTML <code>&lt;select&gt;</code> element.

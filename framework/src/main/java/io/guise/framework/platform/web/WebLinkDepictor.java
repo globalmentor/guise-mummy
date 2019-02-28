@@ -22,7 +22,7 @@ import io.guise.framework.component.*;
 import io.guise.framework.event.*;
 import io.guise.framework.model.AbstractModel;
 
-import static com.globalmentor.w3c.spec.HTML.*;
+import static com.globalmentor.html.spec.HTML.*;
 
 /**
  * Strategy for rendering an action model control as an XHTML <code>&lt;a&gt;</code> element. If a link has a {@link NavigateActionListener} as one of its

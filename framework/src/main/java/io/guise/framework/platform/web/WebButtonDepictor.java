@@ -25,7 +25,7 @@ import io.guise.framework.geometry.*;
 import io.guise.framework.style.LineStyle;
 
 import static com.globalmentor.java.Enums.*;
-import static com.globalmentor.w3c.spec.HTML.*;
+import static com.globalmentor.html.spec.HTML.*;
 import static io.guise.framework.platform.XHTMLDepictContext.*;
 import static io.guise.framework.platform.web.GuiseCSSStyleConstants.*;
 

@@ -32,8 +32,8 @@ import static com.globalmentor.javascript.JavaScript.*;
 import static com.globalmentor.model.Locales.*;
 import static com.globalmentor.net.URIs.*;
 
+import com.globalmentor.html.spec.HTML;
 import com.globalmentor.text.TextFormatter;
-import com.globalmentor.w3c.spec.HTML;
 
 import io.guise.framework.*;
 import io.guise.framework.component.*;
@@ -43,9 +43,9 @@ import io.guise.framework.model.*;
 import io.guise.framework.platform.web.facebook.Facebook;
 import io.guise.framework.theme.Theme;
 
-import static com.globalmentor.w3c.spec.CSS.*;
-import static com.globalmentor.w3c.spec.HTML.*;
-import static com.globalmentor.w3c.spec.XML.*;
+import static com.globalmentor.css.spec.CSS.*;
+import static com.globalmentor.html.spec.HTML.*;
+import static com.globalmentor.xml.spec.XML.*;
 import static io.guise.framework.GuiseApplication.*;
 import static io.guise.framework.platform.web.GuiseCSSStyleConstants.*;
 import static io.guise.framework.platform.web.WebPlatform.*;

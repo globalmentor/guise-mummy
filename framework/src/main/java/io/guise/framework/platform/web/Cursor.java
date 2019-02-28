@@ -22,9 +22,9 @@ import java.util.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
 
+import com.globalmentor.css.spec.CSS;
 import com.globalmentor.io.Images;
 import com.globalmentor.lex.Identifier;
-import com.globalmentor.w3c.spec.CSS;
 
 import io.guise.framework.GuiseApplication;
 import io.guise.framework.component.layout.*;

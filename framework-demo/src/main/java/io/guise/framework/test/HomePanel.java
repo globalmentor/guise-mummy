@@ -33,7 +33,7 @@ import com.globalmentor.iso.idcard.Product;
 import com.globalmentor.itu.TelephoneNumber;
 import com.globalmentor.log.Log;
 import com.globalmentor.net.URIPath;
-import com.globalmentor.w3c.spec.HTML;
+import com.globalmentor.html.spec.HTML;
 
 import io.guise.framework.Bookmark;
 import io.guise.framework.GuiseSession;

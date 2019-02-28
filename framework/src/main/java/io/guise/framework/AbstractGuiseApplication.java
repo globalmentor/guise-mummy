@@ -55,7 +55,7 @@ import com.globalmentor.model.ConfigurationException;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.text.W3CDateFormat;
 import com.globalmentor.util.*;
-import com.globalmentor.w3c.spec.XML;
+import com.globalmentor.xml.spec.XML;
 
 import io.csar.*;
 import io.guise.framework.component.*;

@@ -19,7 +19,7 @@ package io.guise.framework.demo;
 import java.beans.PropertyVetoException;
 
 import com.globalmentor.text.Text;
-import com.globalmentor.w3c.spec.HTML;
+import com.globalmentor.html.spec.HTML;
 
 import io.guise.framework.component.*;
 

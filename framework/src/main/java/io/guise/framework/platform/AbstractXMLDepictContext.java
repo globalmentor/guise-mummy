@@ -32,13 +32,13 @@ import com.globalmentor.xml.XMLNamespacePrefixManager;
 import io.guise.framework.Destination;
 import io.guise.framework.GuiseSession;
 
+import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.java.CharSequences.denull;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.java.Strings.*;
 import static com.globalmentor.security.MessageDigests.*;
-import static com.globalmentor.w3c.spec.HTML.*;
-import static com.globalmentor.w3c.spec.XML.*;
+import static com.globalmentor.xml.spec.XML.*;
 import static com.globalmentor.xml.XML.*;
 
 /**

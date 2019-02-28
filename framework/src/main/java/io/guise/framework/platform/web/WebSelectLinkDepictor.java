@@ -21,7 +21,7 @@ import java.net.URI;
 
 import io.guise.framework.component.*;
 
-import static com.globalmentor.w3c.spec.HTML.*;
+import static com.globalmentor.html.spec.HTML.*;
 
 /**
  * Strategy for rendering an action control as an XHTML <code>&lt;a&gt;</code> element that can be selected.

@@ -30,8 +30,8 @@ import io.guise.framework.Bookmark;
 import io.guise.framework.component.*;
 import io.guise.framework.platform.*;
 
+import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.w3c.spec.HTML.*;
 import static io.guise.framework.platform.web.WebPlatform.*;
 
 /**

@@ -22,7 +22,7 @@ import java.net.URI;
 import io.guise.framework.component.Component;
 import io.guise.framework.component.CompositeComponent;
 
-import static com.globalmentor.w3c.spec.HTML.*;
+import static com.globalmentor.html.spec.HTML.*;
 
 /**
  * Strategy for rendering a component as an XHTML <code>&lt;ol&gt;</code> element.

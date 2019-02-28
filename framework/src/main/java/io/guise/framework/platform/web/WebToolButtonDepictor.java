@@ -24,8 +24,8 @@ import io.guise.framework.geometry.*;
 import io.guise.framework.style.Color;
 import io.guise.framework.style.RGBColor;
 
+import static com.globalmentor.css.spec.CSS.*;
 import static com.globalmentor.java.Enums.*;
-import static com.globalmentor.w3c.spec.CSS.*;
 import static io.guise.framework.platform.XHTMLDepictContext.*;
 
 /**

@@ -32,8 +32,8 @@ import io.guise.framework.geometry.Axis;
 import io.guise.framework.geometry.Extent;
 import io.guise.framework.geometry.Unit;
 
-import static com.globalmentor.w3c.spec.CSS.*;
-import static com.globalmentor.w3c.spec.HTML.*;
+import static com.globalmentor.css.spec.CSS.*;
+import static com.globalmentor.html.spec.HTML.*;
 
 /**
  * Strategy for rendering an action control as an XHTML <code>&lt;a&gt;</code> element styled as a button. This view recognizes {@link Button} controls and can

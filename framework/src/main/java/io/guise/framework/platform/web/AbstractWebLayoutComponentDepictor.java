@@ -20,15 +20,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
+import static com.globalmentor.css.spec.CSS.*;
+import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.java.Arrays.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Numbers.*;
-import static com.globalmentor.w3c.spec.CSS.*;
-import static com.globalmentor.w3c.spec.HTML.*;
 import static io.guise.framework.platform.web.GuiseCSSStyleConstants.*;
 
 import com.globalmentor.collections.iterators.ReverseIterator;
-import com.globalmentor.w3c.spec.*;
 
 import io.guise.framework.component.*;
 import io.guise.framework.component.layout.*;
