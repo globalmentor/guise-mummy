@@ -98,12 +98,6 @@ public interface GuiseApplication extends Resource, PropertyBindable, Concerned 
 	 */
 	public void setDebug(final boolean debug);
 
-	/** @return I/O for loading resources. */
-	public IO<Resources> getResourcesIO();
-
-	/** @return I/O for loading themes. */
-	public IO<Theme> getThemeIO();
-
 	/**
 	 * @return The read-only non-empty list of locales supported by the application, with the first locale the default used if a new session cannot determine the
 	 *         users's preferred locale.
@@ -301,10 +295,10 @@ public interface GuiseApplication extends Resource, PropertyBindable, Concerned 
 	 * Determines the destination associated with the given application context-relative path. This method first checks for a destination that matches the exact
 	 * path as given; if no matching path is found, all destinations with path patterns are searched for a match.
 	 * @param path The address for which a destination should be retrieved.
-	 * @return The destination associated with the given path, or <code>null</code> if no destination is associated with the path.
+	 * @return The destination associated with the given path, which will not be present if no destination is associated with the path.
 	 * @throws IllegalArgumentException if the provided path is absolute.
 	 */
-	public Destination getDestination(final URIPath path);
+	public Optional<Destination> getDestination(final URIPath path);
 
 	/**
 	 * Returns an iterable of destinations. Any changes to the iterable will not necessarily be reflected in the destinations available to the application.
@@ -498,8 +492,7 @@ public interface GuiseApplication extends Resource, PropertyBindable, Concerned 
 	 * order:
 	 * <ol>
 	 * <li><var>resourceBasePath</var> + "_" + <var>language</var> + "_" + <var>country</var> + "_" + <var>variant</var></li>
-	 * <li>
-	 * <var>resourceBasePath</var> + "_" + <var>language</var> + "_" + <var>country</var></li>
+	 * <li><var>resourceBasePath</var> + "_" + <var>language</var> + "_" + <var>country</var></li>
 	 * <li><var>resourceBasePath</var> + "_" + <var>language</var></li>
 	 * </ol>
 	 * @param resourceBasePath An application-relative base path to a resource in the application resource storage area.

@@ -22,14 +22,6 @@ import java.util.*;
 
 import static java.util.Objects.*;
 
-import org.ploop.graph.PLOOPURFProcessor;
-import org.urframework.*;
-import org.urframework.select.*;
-import org.urframework.xml.XML;
-
-import static java.util.Collections.*;
-import static org.urframework.URF.*;
-
 import com.globalmentor.collections.CollectionMap;
 import com.globalmentor.collections.HashSetHashMap;
 import com.globalmentor.net.ContentType;
@@ -44,13 +36,13 @@ import static io.guise.framework.Resources.*;
  * Guise theme specification.
  * @author Garret Wilson
  */
-public class Theme extends URFListResource<Rule> {
+public class Theme extends ArrayList<Rule> /*TODO delete legacy URF extends URFListResource<Rule>*/ {
 
 	/** The extension for Guise theme resource names. */
 	public static final String NAME_EXTENSION = "guisetheme";
 	/** The content type for theme resources: <code>application/theme+turf</code>. */
-	public static final ContentType CONTENT_TYPE = ContentType.create(ContentType.APPLICATION_PRIMARY_TYPE, "theme" + ContentType.SUBTYPE_SUFFIX_DELIMITER_CHAR
-			+ TURF.SUBTYPE_SUFFIX);
+	public static final ContentType CONTENT_TYPE = ContentType.create(ContentType.APPLICATION_PRIMARY_TYPE,
+			"theme" + ContentType.SUBTYPE_SUFFIX_DELIMITER_CHAR + "turf"); //TODO TODO use constant for new TURF: TURF.SUBTYPE_SUFFIX
 
 	/** The recommended prefix to the theme ontology namespace. */
 	public static final String THEME_NAMESPACE_PREFIX = "theme";
@@ -59,15 +51,15 @@ public class Theme extends URFListResource<Rule> {
 
 	//classes
 	/** The URI of the template class. */
-	public static final URI TEMPLATE_CLASS_URI = createResourceURI(THEME_NAMESPACE_URI, getLocalName(Template.class));
+	//TODO fix for new URF: public static final URI TEMPLATE_CLASS_URI = createResourceURI(THEME_NAMESPACE_URI, getLocalName(Template.class));
 
 	//properties
 	/** The apply property name. */
-	public static final URI APPLY_PROPERTY_URI = createResourceURI(THEME_NAMESPACE_URI, "apply");
+	//TODO fix for new URF: public static final URI APPLY_PROPERTY_URI = createResourceURI(THEME_NAMESPACE_URI, "apply");
 	/** The property for the URI of the theme's parent. */
-	public static final URI PARENT_URI_PROPERTY_URI = createResourceURI(THEME_NAMESPACE_URI, "parentURI");
+	//TODO fix for new URF: public static final URI PARENT_URI_PROPERTY_URI = createResourceURI(THEME_NAMESPACE_URI, "parentURI");
 	/** The resources property name. */
-	public static final URI RESOURCES_PROPERTY_URI = createResourceURI(THEME_NAMESPACE_URI, "resources");
+	//TODO fix for new URF: public static final URI RESOURCES_PROPERTY_URI = createResourceURI(THEME_NAMESPACE_URI, "resources");
 
 	/** The theme parent, or <code>null</code> if there is no resolving parent. */
 	private Theme parent = null;
@@ -108,7 +100,7 @@ public class Theme extends URFListResource<Rule> {
 				combinedRuleSet.addAll(ruleSet); //add all the rules for the ancestor class to the combined rule set
 			}
 		}
-		return combinedRuleSet != null ? combinedRuleSet : Collections.<Rule> emptySet(); //return the combined set of rules we've found (Java won't allow emptySet() to be used in this context, but a warning here is better than alternate, less-efficient methods)
+		return combinedRuleSet != null ? combinedRuleSet : Collections.<Rule>emptySet(); //return the combined set of rules we've found (Java won't allow emptySet() to be used in this context, but a warning here is better than alternate, less-efficient methods)
 	}
 
 	/** Default constructor. */
@@ -121,7 +113,7 @@ public class Theme extends URFListResource<Rule> {
 	 * @param referenceURI The reference URI for the new resource.
 	 */
 	public Theme(final URI referenceURI) {
-		super(referenceURI, createResourceURI(THEME_NAMESPACE_URI, getLocalName(Theme.class))); //construct the parent class, using a type based upon the name of this class
+		//TODO delete legacy URF		super(referenceURI, createResourceURI(THEME_NAMESPACE_URI, getLocalName(Theme.class))); //construct the parent class, using a type based upon the name of this class
 	}
 
 	/**
@@ -159,7 +151,8 @@ public class Theme extends URFListResource<Rule> {
 	 * @return The URI indicating the parent theme, or <code>null</code> if no parent theme is indicated or the value is not a URI.
 	 */
 	public URI getParentURI() {
-		return asURI(getPropertyValue(PARENT_URI_PROPERTY_URI)); //return the theme.parent property as a URI
+		return null;
+		//TODO fix for new URF: return asURI(getPropertyValue(PARENT_URI_PROPERTY_URI)); //return the theme.parent property as a URI
 	}
 
 	/**
@@ -168,24 +161,29 @@ public class Theme extends URFListResource<Rule> {
 	 * @param locale The locale of the resource to be retrieved.
 	 * @return The list of resources that indicate resources locations and/or contain resource definitions.
 	 */
+	/*TODO fix for new URF
 	public Iterable<URFResource> getResourceResources(final Locale locale) { //TODO use the locale to narrow down the resources
 		return getPropertyValues(RESOURCES_PROPERTY_URI); //return all the theme.resource properties
 	}
+	*/
 
 	/**
 	 * Retrieves an iterable to the XML styles.
 	 * @return The styles.
 	 */
+	/*TODO fix for new URF
 	public Iterable<URFResource> getStyles() {
 		return XML.getStyles(this); //return the styles
 	}
+	*/
 
 	/**
 	 * Updates the internal maps of rules. This method should be called after rules are modified so that rules will be applied correctly in the future.
 	 * @throws ClassNotFoundException if one of the rules selects a class that cannot be found.
-	 * @see PropertySelector#getSelector()
 	 */
+	//TODO fix for new URF	 * @see PropertySelector#getSelector()
 	public void updateRules() throws ClassNotFoundException {
+		/*TODO fix for new URF
 		classRuleMap.clear(); //clear the map of rules
 		for(final Rule rule : this) { //for each rule in this theme
 			final Selector selector = rule.getSelector(); //get what this rule selects
@@ -193,6 +191,7 @@ public class Theme extends URFListResource<Rule> {
 				updateRules(rule, selector); //update the rules with this selector
 			}
 		}
+		*/
 	}
 
 	/**
@@ -203,6 +202,7 @@ public class Theme extends URFListResource<Rule> {
 	 * @throws ClassNotFoundException if one of the selectors selects a class that cannot be found.
 	 * @see OperatorSelector#getSelectors()
 	 */
+	/*TODO fix for new URF
 	protected void updateRules(final Rule rule, final Selector selector) throws ClassNotFoundException {
 		requireNonNull(rule, "Rule cannot be null.");
 		requireNonNull(selector, "Selector cannot be null.");
@@ -211,7 +211,7 @@ public class Theme extends URFListResource<Rule> {
 			if(selectClass != null) { //if we have a selected class
 				classRuleMap.addItem(selectClass, rule); //add this rule to our map
 			} else {
-				throw new IllegalStateException("Objcect class selector missing class selection property.");
+				throw new IllegalStateException("Object class selector missing class selection property.");
 			}
 		} else if(selector instanceof OperatorSelector) { //if this is an operator selector
 			for(final Selector subselector : ((OperatorSelector)selector).getSelectors()) { //for each subselector
@@ -219,6 +219,7 @@ public class Theme extends URFListResource<Rule> {
 			}
 		}
 	}
+	*/
 
 	/**
 	 * Applies this theme to the given object. Any parent theme is first applied to the object before this theme is applied.
@@ -230,6 +231,7 @@ public class Theme extends URFListResource<Rule> {
 	 * @throws IllegalStateException if a resource indicates a Java class the constructor of which throws an exception.
 	 */
 	public void apply(final Object object) {
+		/*TODO fix for new URF
 		try {
 			final Theme parent = getParent(); //get the parent theme
 			if(parent != null) { //if there is a parent theme
@@ -245,6 +247,7 @@ public class Theme extends URFListResource<Rule> {
 		} catch(final InvocationTargetException invocationTargetException) {
 			throw new IllegalStateException(invocationTargetException);
 		}
+		*/
 	}
 
 	//standard colors

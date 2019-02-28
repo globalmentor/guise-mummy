@@ -19,11 +19,11 @@ package io.guise.framework;
 import java.io.OutputStream;
 import java.net.URI;
 
-import org.urframework.*;
-import org.urframework.content.Content;
-
 import com.globalmentor.net.ResourceIOException;
 import com.globalmentor.net.URIPath;
+
+import io.urf.Content;
+import io.urf.model.UrfResourceDescription;
 
 /**
  * A navigation point that sets a resource description and/or contents.
@@ -34,10 +34,10 @@ public interface ResourceWriteDestination extends Destination {
 	/**
 	 * Retrieves an output stream to the resource. The resource may include any of the following properties:
 	 * <ul>
-	 * <li>{@link URF#NAME_PROPERTY_URI}</li>
-	 * <li>{@link Content#TYPE_PROPERTY_URI}</li>
-	 * <li>{@link Content#LENGTH_PROPERTY_URI}</li>
-	 * <li>{@link Content#MODIFIED_PROPERTY_URI}</li>
+	 * <li>TODO add <code>urf-name</code> property to spec</li>
+	 * <li>{@link Content#TYPE_PROPERTY_TAG}</li>
+	 * <li>{@link Content#LENGTH_PROPERTY_TAG}</li>
+	 * <li>{@link Content#MODIFIED_PROPERTY_TAG}</li>
 	 * </ul>
 	 * @param resourceDescription The description of the resource.
 	 * @param session The current Guise Session.
@@ -48,7 +48,7 @@ public interface ResourceWriteDestination extends Destination {
 	 * @throws NullPointerException if the given navigation path is <code>null</code>.
 	 * @throws ResourceIOException Thrown if there is an error writing to the resource.
 	 */
-	public OutputStream getOutputStream(final URFResource resourceDescription, final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark,
-			final URI referrerURI) throws ResourceIOException;
+	public OutputStream getOutputStream(final UrfResourceDescription resourceDescription, final GuiseSession session, final URIPath navigationPath,
+			final Bookmark bookmark, final URI referrerURI) throws ResourceIOException;
 
 }

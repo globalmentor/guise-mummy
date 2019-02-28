@@ -18,12 +18,13 @@ package io.guise.framework;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
-
-import org.urframework.URFResource;
 
 import com.globalmentor.beans.PropertyBindable;
 import com.globalmentor.net.*;
+
+import io.urf.model.UrfResourceDescription;
 
 /**
  * Description of a navigation point, its properties, and its restrictions.
@@ -110,11 +111,11 @@ public interface Destination extends PropertyBindable {
 	 * @param bookmark The bookmark for which navigation should occur at this navigation path, or <code>null</code> if there is no bookmark involved in
 	 *          navigation.
 	 * @param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
-	 * @return A description of the indicated navigation path for this destination, or <code>null</code> if nothing exists at the given navigation path.
+	 * @return A description of the indicated navigation path for this destination, which will not be present if nothing exists at the given navigation path.
 	 * @throws IllegalArgumentException If the given navigation path is not a valid path serviced by this destination.
 	 * @throws ResourceIOException if there is an error accessing the resource.
 	 */
-	public URFResource getDescription(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI)
-			throws ResourceIOException;
+	public Optional<UrfResourceDescription> getDescription(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark,
+			final URI referrerURI) throws ResourceIOException;
 
 }

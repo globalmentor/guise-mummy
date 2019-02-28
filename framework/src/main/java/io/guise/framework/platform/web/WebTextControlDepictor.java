@@ -31,8 +31,7 @@ import io.guise.framework.platform.*;
 import static com.globalmentor.text.Text.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.w3c.spec.HTML.*;
-import static com.globalmentor.xml.xhtml.XHTML.*;
+import static com.globalmentor.html.spec.HTML.*;
 import static io.guise.framework.platform.web.GuiseCSSStyleConstants.*;
 import static io.guise.framework.platform.web.WebPlatform.*;
 
@@ -105,7 +104,7 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 			}
 			final Map<String, Object> properties = webChangeEvent.getProperties(); //get the new properties
 			String valueText = null; //we'll get a new value to use if needed
-			String provisionalText = asInstance(properties.get("provisionalValue"), String.class); //get the provisional value, if any; a provisional value will never be null TODO use a constant
+			String provisionalText = asInstance(properties.get("provisionalValue"), String.class).orElse(null); //get the provisional value, if any; a provisional value will never be null TODO use a constant
 			if(provisionalText != null) { //if there is a provisional value
 				provisionalText = normalizeEOL(provisionalText, LINE_FEED_STRING).toString(); //normalize the provisional text to LF ends of lines
 				final Pattern autoCommitPattern = component.getAutoCommitPattern(); //get the auto-commit pattern, if any
@@ -119,7 +118,7 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 			final boolean valueSpecified = properties.containsKey("value"); //see if a value was specified TODO use a constant
 			if(valueSpecified || valueText != null) { //if a value was specified, or we have a provisional value to commit
 				if(valueSpecified) { //if a value was specified, it will always override any specified provisional value
-					valueText = asInstance(properties.get("value"), String.class); //get the new value; this will incorrectly use a new value of null if the given value isn't a string TODO use a constant					
+					valueText = asInstance(properties.get("value"), String.class).orElse(null); //get the new value; this will incorrectly use a new value of null if the given value isn't a string TODO use a constant					
 					valueText = normalizeEOL(valueText, LINE_FEED_STRING).toString(); //normalize the value text to LF ends of lines
 				}
 				component.setNotification(null); //clear the component errors; this method may generate new errors if the change is not provisional
@@ -137,18 +136,18 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 			final C component = getDepictedObject(); //get the component
 			final String componentName = getDepictName(); //get the component's name
 			if(componentName != null) { //if there is a component name
-				final String text = asInstance(formEvent.getParameterListMap().getItem(componentName), String.class); //get the form value for this control
-				if(text != null) { //if there was a parameter value for this component
-					component.setNotification(null); //clear the component errors; this method may generate new errors if the change is not provisional
-					try {
-						component.setTextValue(text); //update the literal text of the component, which will in turn update the provisional text of the component, and then update the value
-					} catch(final ConversionException conversionException) { //if there is a conversion error
-						component.setNotification(new Notification(conversionException)); //add this error to the component
-					} catch(final PropertyVetoException propertyVetoException) { //if there is a veto
-						final Throwable cause = propertyVetoException.getCause(); //get the cause of the veto, if any
-						component.setNotification(new Notification(cause != null ? cause : propertyVetoException)); //add notification of the error to the component
-					}
-				}
+				asInstance(formEvent.getParameterListMap().getItem(componentName), String.class) //get the form value for this control
+						.ifPresent(text -> { //if there was a parameter value for this component
+							component.setNotification(null); //clear the component errors; this method may generate new errors if the change is not provisional
+							try {
+								component.setTextValue(text); //update the literal text of the component, which will in turn update the provisional text of the component, and then update the value
+							} catch(final ConversionException conversionException) { //if there is a conversion error
+								component.setNotification(new Notification(conversionException)); //add this error to the component
+							} catch(final PropertyVetoException propertyVetoException) { //if there is a veto
+								final Throwable cause = propertyVetoException.getCause(); //get the cause of the veto, if any
+								component.setNotification(new Notification(cause != null ? cause : propertyVetoException)); //add notification of the error to the component
+							}
+						});
 			}
 		}
 		super.processEvent(event); //do the default event processing

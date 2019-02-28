@@ -22,8 +22,6 @@ import java.util.*;
 
 import static java.util.Objects.*;
 
-import org.urframework.URFResource;
-
 import static java.util.Collections.*;
 
 import com.globalmentor.beans.BoundPropertyObject;
@@ -84,6 +82,7 @@ public abstract class AbstractDepictContext extends BoundPropertyObject implemen
 		final GuiseApplication application = session.getApplication(); //get the application
 		final List<URI> styleURIs = new ArrayList<URI>(); //create a new list to hold styles
 		//theme styles
+		/*TODO re-implement loading theme styles.
 		Theme theme = session.getTheme(); //get the current session theme TODO this currently can't be null; finalize the API
 		while(theme != null) { //while there are themes
 			for(final URFResource style : theme.getStyles()) { //get the styles
@@ -94,6 +93,7 @@ public abstract class AbstractDepictContext extends BoundPropertyObject implemen
 			}
 			theme = theme.getParent(); //get the theme's parent, if any
 		}
+		*/
 		//application style
 		final URI applicationStyleURI = application.getStyleURI(); //get the application style
 		if(applicationStyleURI != null) { //if there is a style TODO make sure the style is a CSS style

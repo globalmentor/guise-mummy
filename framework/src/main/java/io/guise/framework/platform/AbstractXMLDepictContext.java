@@ -37,7 +37,6 @@ import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.java.Strings.*;
 import static com.globalmentor.security.MessageDigests.*;
-import static com.globalmentor.util.Base64.*;
 import static com.globalmentor.w3c.spec.HTML.*;
 import static com.globalmentor.w3c.spec.XML.*;
 import static com.globalmentor.xml.XML.*;
@@ -187,14 +186,14 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 				if(generateHashAttributes) { //if we're generating hashes
 					final byte[] digestBytes = messageDigest.digest(); //get the final digest of the attributes
 					stringBuilder.append(' '); //separate attributes
-					appendAttribute(stringBuilder, guiseAttributeHashQualifiedName, encodeBytes(digestBytes)); //guise:contentHash="base64Hex"
+					appendAttribute(stringBuilder, guiseAttributeHashQualifiedName, Base64.getEncoder().withoutPadding().encodeToString(digestBytes)); //guise:contentHash="base64Hex"
 				}
 			}
 			if(generateHashAttributes && elementContent.length() > 0) { //if there is content and we're generating hashes, add a guise:contentHash attribute
 				messageDigest.reset(); //reset the message digest so that we can use it for hashing the content
 				final byte[] digestBytes = digest(messageDigest, elementContent); //create a digest of the element content
 				stringBuilder.append(' '); //separate attributes
-				appendAttribute(stringBuilder, guiseContentHashQualifiedName, encodeBytes(digestBytes)); //guise:contentHash="base64Hex"
+				appendAttribute(stringBuilder, guiseContentHashQualifiedName, Base64.getEncoder().withoutPadding().encodeToString(digestBytes)); //guise:contentHash="base64Hex"
 			}
 		} catch(final IOException ioException) { //we don't expect I/O exceptions appending to a string builder
 			throw unexpected(ioException);

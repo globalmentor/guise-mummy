@@ -30,7 +30,7 @@ import io.guise.framework.GuiseApplication;
 import io.guise.framework.component.layout.*;
 import io.guise.framework.geometry.CompassPoint;
 
-import static com.globalmentor.io.Files.*;
+import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.Enums.*;
 import static io.guise.framework.GuiseApplication.*;
 

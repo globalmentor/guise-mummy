@@ -145,7 +145,7 @@ public class HTTPServletGuiseRequest {
 		bookmark = queryString != null && queryString.length() > 0 ? new Bookmark(String.valueOf(QUERY_SEPARATOR) + queryString) : null; //create a bookmark if there is a query string (Tomcat 5.5.16 returns an empty string for no query, even though the Java Servlet specification 2.4 says that it should return null; this is fixed in Tomcat 6)
 		Log.debug("servicing Guise request with request URI:", depictURI, "bookmark:", bookmark);
 		final String rawPathInfo = getRawPathInfo(request); //get the raw path info
-		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received " + rawPathInfo; //the Java servlet specification says that the path info will start with a '/'
+		assert isPathAbsolute(rawPathInfo) : "Expected absolute path info, received " + rawPathInfo; //the Java servlet specification says that the path info will start with a '/'
 		URI referrerURI = getRefererURI(request); //get the referring URI, if any
 		if(referrerURI != null) { //if there is a referring URI
 			referrerURI = getPlainURI(referrerURI); //make sure the referrer is plain

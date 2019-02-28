@@ -81,8 +81,8 @@ public class WebTabbedPanelDepictor<C extends AbstractCardPanel> extends Abstrac
 			final WebPlatform platform = getPlatform(); //get the platform
 			final C component = getDepictedObject(); //get the component
 			final String componentID = platform.getDepictIDString(component.getDepictID()); //get the component's ID
-			final String tabID = asInstance(formEvent.getParameterListMap().getItem(componentID), String.class); //get the value reported for this component, if there is one
-			if(tabID != null) { //if a tab is indicated TODO maybe indicate "no tab" with an empty string
+			asInstance(formEvent.getParameterListMap().getItem(componentID), String.class).ifPresent(tabID -> { //get the value reported for this component, if there is one
+				//TODO maybe indicate "no tab" with an empty string
 				final long childComponentID = platform.getDepictID(tabID); //get the requested component ID
 				for(final Component tabComponent : component) { //look at each child component
 					if(tabComponent.getDepictID() == childComponentID) { //if this is the identified child component
@@ -101,7 +101,7 @@ public class WebTabbedPanelDepictor<C extends AbstractCardPanel> extends Abstrac
 						}
 					}
 				}
-			}
+			});
 		}
 		super.processEvent(event); //do the default event processing
 	}

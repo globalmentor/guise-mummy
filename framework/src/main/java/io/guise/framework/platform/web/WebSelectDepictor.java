@@ -57,7 +57,7 @@ public class WebSelectDepictor<V, C extends ListSelectControl<V>> extends Abstra
 				throw new IllegalArgumentException("Depict event " + event + " meant for depicted object " + webChangeEvent.getDepictedObject());
 			}
 			final Map<String, Object> properties = webChangeEvent.getProperties(); //get the new properties
-			final List<?> selectedIDObjects = asInstance(properties.get("selectedIDs"), List.class); //get the new selected IDs TODO use a constant
+			final List<?> selectedIDObjects = asInstance(properties.get("selectedIDs"), List.class).orElse(null); //get the new selected IDs TODO use a constant
 			if(selectedIDObjects != null) { //if we have selected IDs
 				processSelectedIDs(component, selectedIDObjects.toArray(new String[selectedIDObjects.size()])); //process the selected IDs as strings				
 			}

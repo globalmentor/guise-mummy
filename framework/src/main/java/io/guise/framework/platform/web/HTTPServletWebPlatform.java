@@ -98,11 +98,11 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 		//update the client
 		final String userAgentID = getUserAgent(httpRequest); //get the user agent identification, if any
 		final Map<String, Object> userAgentProperties = getUserAgentProperties(httpRequest); //get other information about the user agent from the request
-		final String userAgentName = asInstance(userAgentProperties.get(USER_AGENT_NAME_PROPERTY), String.class); //get the user agent name, if any
-		final String userAgentVersion = asInstance(userAgentProperties.get(USER_AGENT_VERSION_PROPERTY), String.class); //get the user string, if any
-		final Number userAgentVersionNumber = asInstance(userAgentProperties.get(USER_AGENT_VERSION_NUMBER_PROPERTY), Number.class); //get the user agent version number, if any
+		final String userAgentName = asInstance(userAgentProperties.get(USER_AGENT_NAME_PROPERTY), String.class).orElse(null); //get the user agent name, if any
+		final String userAgentVersion = asInstance(userAgentProperties.get(USER_AGENT_VERSION_PROPERTY), String.class).orElse(null); //get the user string, if any
+		final Number userAgentVersionNumber = asInstance(userAgentProperties.get(USER_AGENT_VERSION_NUMBER_PROPERTY), Number.class).orElse(null); //get the user agent version number, if any
 		final int[] userAgentVersionNumbers = (int[])userAgentProperties.get(USER_AGENT_VERSION_NUMBERS_PROPERTY); //get the user agent version numbers, if any TODO check why we can't use asArrayInstance() with Integer.TYPE
-		final WebUserAgentProduct.Brand userAgentBrand = WebUserAgentProduct.Brand.getBrand(userAgentName); //get the specific brand of user agent if it's one we recognize
+		final WebUserAgentProduct.Brand userAgentBrand = userAgentName != null ? WebUserAgentProduct.Brand.getBrand(userAgentName) : null; //get the specific brand of user agent if it's one we recognize
 		final ContentType[] clientAcceptedContentTypes = getAcceptedContentTypes(httpRequest); //return the user agent accepted content types from the request
 		final Locale[] clientAcceptedLanguages = getAcceptedLanguages(httpRequest); //return the user agent accepted languages from the request
 		this.clientProduct = new DefaultWebUserAgentProduct(userAgentID, userAgentBrand, userAgentName, userAgentVersion,

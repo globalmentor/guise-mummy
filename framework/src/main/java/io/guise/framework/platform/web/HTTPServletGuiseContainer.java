@@ -333,7 +333,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer {
 	 */
 	protected String getContextAbsoluteResourcePath(final String containerRelativeResourcePath) {
 		final String normalizedPath = normalizePath(containerRelativeResourcePath); //normalize the path
-		if(isAbsolutePath(normalizedPath)) { //if the given path is absolute
+		if(isPathAbsolute(normalizedPath)) { //if the given path is absolute
 			throw new IllegalArgumentException("Resource path " + normalizedPath + " is not a relative path.");
 		}
 		return RESOURCES_DIRECTORY_PATH + normalizedPath; //construct the absolute context-relative path to the resource

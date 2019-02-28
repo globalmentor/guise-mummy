@@ -27,12 +27,9 @@ import static java.text.MessageFormat.*;
 
 import java.util.*;
 
-import org.ploop.graph.PLOOPURFProcessor;
-import org.urframework.*;
-import org.urframework.io.AbstractTURFIO;
-
 import static java.util.Collections.*;
 import static java.util.Objects.*;
+import static org.zalando.fauxpas.FauxPas.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.collections.DecoratorReadWriteLockMap;
@@ -55,8 +52,9 @@ import io.guise.framework.platform.Platform;
 import io.guise.framework.prototype.*;
 import io.guise.framework.style.*;
 import io.guise.framework.theme.Theme;
+import io.urf.model.UrfResourceDescription;
 
-import static com.globalmentor.io.Files.*;
+import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Writers.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Characters.*;
@@ -200,38 +198,39 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * The map of preference resource descriptions keyed to classes. This is a temporary implementation that will later be replaced with a backing store based
 	 * upon the current principal.
 	 */
-	private final ReadWriteLockMap<Class<?>, URFResource> classPreferencesMap = new DecoratorReadWriteLockMap<Class<?>, URFResource>(
-			new HashMap<Class<?>, URFResource>());
-
-	@Override
-	public URFResource getPreferences(final Class<?> objectClass) throws IOException {
-		URFResource preferences = classPreferencesMap.get(requireNonNull(objectClass, "Class cannot be null.")); //get the preferences stored in the map
-		if(preferences == null) { //if no preferences are stored in the map
-			preferences = new DefaultURFResource(); //create a default set of preference properties				
-			/*TODO del if we decide to store resource copies; change map to concurrent map
-							classPreferencesMap.writeLock().lock();	//get a write lock on the preferences map
-							try
-							{
-								preferences=classPreferencesMap.get(objectClass);	//try again to get the preferences stored in the map
-								if(preferences==null) {	//if preferences are still not stored in the map
-									preferences=new DefaultRDFResource();	//create a default set of preference properties
-									classPreferencesMap.put(objectClass, preferences);	//store the preferences in the map
-								}
-							}
-							finally
-							{
-								classPreferencesMap.writeLock().unlock();	//always release the write lock on the preferences map
-							}
-			*/
-		}
-		return preferences; //return the preferences we found for this class
-	}
-
-	@Override
-	public void setPreferences(final Class<?> objectClass, final URFResource preferences) throws IOException {
-		classPreferencesMap.put(requireNonNull(objectClass, "Class cannot be null."),
-				new DefaultURFResource(requireNonNull(preferences, "Preferences cannot be null."))); //store a copy of the preferences in the map
-	}
+	//TODO re-implement preferences
+	//	private final ReadWriteLockMap<Class<?>, URFResource> classPreferencesMap = new DecoratorReadWriteLockMap<Class<?>, URFResource>(
+	//			new HashMap<Class<?>, URFResource>());
+	//
+	//	@Override
+	//	public URFResource getPreferences(final Class<?> objectClass) throws IOException {
+	//		URFResource preferences = classPreferencesMap.get(requireNonNull(objectClass, "Class cannot be null.")); //get the preferences stored in the map
+	//		if(preferences == null) { //if no preferences are stored in the map
+	//			preferences = new DefaultURFResource(); //create a default set of preference properties				
+	//			/*TODO del if we decide to store resource copies; change map to concurrent map
+	//							classPreferencesMap.writeLock().lock();	//get a write lock on the preferences map
+	//							try
+	//							{
+	//								preferences=classPreferencesMap.get(objectClass);	//try again to get the preferences stored in the map
+	//								if(preferences==null) {	//if preferences are still not stored in the map
+	//									preferences=new DefaultRDFResource();	//create a default set of preference properties
+	//									classPreferencesMap.put(objectClass, preferences);	//store the preferences in the map
+	//								}
+	//							}
+	//							finally
+	//							{
+	//								classPreferencesMap.writeLock().unlock();	//always release the write lock on the preferences map
+	//							}
+	//			*/
+	//		}
+	//		return preferences; //return the preferences we found for this class
+	//	}
+	//
+	//	@Override
+	//	public void setPreferences(final Class<?> objectClass, final URFResource preferences) throws IOException {
+	//		classPreferencesMap.put(requireNonNull(objectClass, "Class cannot be null."),
+	//				new DefaultURFResource(requireNonNull(preferences, "Preferences cannot be null."))); //store a copy of the preferences in the map
+	//	}
 
 	/** The platform on which Guise objects are depicted. */
 	private final Platform platform;
@@ -398,7 +397,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		try {
 			return getResource(resourceKey); //retrieve a string from the resource bundle
 		} catch(final MissingResourceException missingResourceException) { //if the resource does not exist
-			if(isPath(resourceKey) && !isAbsolutePath(resourceKey)) { //if the resource key is a relative path
+			if(isPath(resourceKey) && !isPathAbsolute(resourceKey)) { //if the resource key is a relative path
 				final String applicationResourcePath = getApplication().getLocaleResourcePath(resourceKey, getLocale()); //try to get a locale-sensitive path to the resource
 				if(applicationResourcePath != null) { //if there is a path to the resource
 					final InputStream inputStream = getApplication().getResourceInputStream(applicationResourcePath); //get a stream to the resource
@@ -633,7 +632,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	@Override
 	public Component getNavigationComponent(final URIPath path) {
-		final Destination destination = getApplication().getDestination(path); //get the destination associated with the given path
+		final Destination destination = getApplication().getDestination(path).orElse(null); //get the destination associated with the given path TODO propagate use of Optional
 		if(!(destination instanceof ComponentDestination)) { //if the destination is not a component destination
 			throw new IllegalArgumentException("Navigation path " + path + " does not designate a component destination.");
 		}
@@ -641,13 +640,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	}
 
 	@Override
-	public URFResource getNavigationDescription(final URIPath navigationPath, final Bookmark bookmark) throws IOException {
-		final Destination destination = getApplication().getDestination(navigationPath); //get the destination associated with the given path
-		return destination != null ? destination.getDescription(this, navigationPath, bookmark, null) : null; //delegate to the destination, if any
+	public Optional<UrfResourceDescription> getNavigationDescription(final URIPath navigationPath, final Bookmark bookmark) throws IOException {
+		//delegate to the destination, if any, associated with the path
+		return getApplication().getDestination(navigationPath)
+				.flatMap(throwingFunction(destination -> destination.getDescription(this, navigationPath, bookmark, null)));
 	}
 
 	@Override
-	public URFResource getNavigationDescription() throws IOException {
+	public Optional<UrfResourceDescription> getNavigationDescription() throws IOException {
 		return getNavigationDescription(getNavigationPath(), getBookmark());
 	}
 
@@ -673,6 +673,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	@Override
 	public void initializeComponent(final Component component) {
+		/*TODO re-implement component descriptions
 		final Class<?> componentClass = component.getClass(); //get the class of the component
 		final String descriptionFilename = addExtension(getLocalName(componentClass), TURF.NAME_EXTENSION); //create a name in the form ClassName.turf
 		//TODO del Log.trace("Trying to load description file:", descriptionFilename);
@@ -694,6 +695,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		} else { //if there is no description file
 			component.initialize(); //call the initialize() method manually
 		}
+		*/
 	}
 
 	/**
@@ -718,6 +720,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@Override
 	public void initializeComponent(final Component component, final InputStream descriptionInputStream)
 			throws IOException, DataException, InvocationTargetException {
+		/*TODO re-implement component descriptions
 		final URI BASE_URI = URI.create("guise:/"); //TODO fix
 		final URF urf = AbstractTURFIO.readTURF(new URF(), descriptionInputStream, BASE_URI); //read TURF from the input stream
 		final URI componentResourceTypeURI = createJavaURI(component.getClass()); //create a new URI that indicates the type of the resource description we expect
@@ -730,6 +733,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		} else { //if there is no resource of the appropriate type
 			throw new IllegalArgumentException("No resource description found of type " + componentResourceTypeURI); //TODO do we want to change to DataException?
 		}
+		*/
 	}
 
 	/**
@@ -803,7 +807,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		final URIPath navigationPath = getNavigationPath(); //get our current navigation path
 		final GuiseApplication application = getApplication(); //get the application
 		ModalNavigation modalNavigation = null; //if we actually end modal navigation, we'll store the information here
-		final Destination destination = application.getDestination(navigationPath); //get the destination for this path TODO maybe add a GuiseSession.getDestination()
+		final Destination destination = application.getDestination(navigationPath).orElse(null); //get the destination for this path TODO maybe add a GuiseSession.getDestination() TODO improve use of Optional
 		if(destination instanceof ComponentDestination) { //if we're at a component destination
 			final ComponentDestination componentDestination = (ComponentDestination)destination; //get the destination as a component destination
 			URI navigationURI = null; //TODO fix
@@ -1199,7 +1203,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	}
 
 	/** The set of string reference delimiters, <code>SOS</code> and <code>ST</code>. */
-	private static final Characters STRING_REFERENCE_DELIMITERS = new Characters(START_OF_STRING_CHAR, STRING_TERMINATOR_CHAR);
+	private static final Characters STRING_REFERENCE_DELIMITERS = Characters.of(START_OF_STRING_CHAR, STRING_TERMINATOR_CHAR);
 
 	@Override
 	public String dereferenceString(final String string) throws MissingResourceException {

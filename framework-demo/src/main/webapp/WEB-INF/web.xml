@@ -16,8 +16,8 @@
 		<servlet-class>io.guise.framework.platform.web.GuiseHTTPServlet</servlet-class>
 
 		<init-param>
-			<param-name>application</param-name>
-			<param-value>application.turf</param-value>
+			<param-name>applicationClass</param-name>
+			<param-value>io.guise.framework.demo.DemoApplication</param-value>
 		</init-param>
 
 		<load-on-startup>1</load-on-startup>

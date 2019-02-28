@@ -20,8 +20,6 @@ import static com.globalmentor.w3c.spec.HTML.*;
 
 import javax.annotation.Nonnull;
 
-import com.globalmentor.xml.xhtml.XHTML;
-
 import io.guise.framework.component.*;
 import io.guise.framework.component.SectionComponent.SectionType;
 

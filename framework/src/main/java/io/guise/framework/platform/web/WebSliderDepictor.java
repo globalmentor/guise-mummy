@@ -31,6 +31,7 @@ import io.guise.framework.platform.*;
 import io.guise.framework.validator.*;
 
 import static java.util.Objects.*;
+import static java.util.function.Predicate.*;
 import static com.globalmentor.java.Numbers.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.w3c.spec.CSS.*;
@@ -59,18 +60,15 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 				throw new IllegalArgumentException("Depict event " + event + " meant for depicted object " + webChangeEvent.getDepictedObject());
 			}
 			final Map<String, Object> properties = webChangeEvent.getProperties(); //get the new properties
-			final Number position = asInstance(properties.get("position"), Number.class); //get the new position TODO use a constant
-			if(position != null) { //if there was a new position given
-				processPosition(component, position.doubleValue()); //process the new position
-			}
+			asInstance(properties.get("position"), Number.class).ifPresent(position -> processPosition(component, position.doubleValue())); //process the new position TODO use a constant
 		} else if(event instanceof WebFormEvent) { //if this is a form submission
 			final WebFormEvent formEvent = (WebFormEvent)event; //get the form submit event
 			final String componentName = getDepictName(); //get the component's name
 			if(componentName != null) { //if there is a component name
-				final String text = asInstance(formEvent.getParameterListMap().getItem(componentName), String.class); //get the form value for this control
-				if(text != null && text.length() > 0) { //if there was a parameter value for this component
-					processPosition(getDepictedObject(), Double.parseDouble(text)); //process the new position
-				}
+				asInstance(formEvent.getParameterListMap().getItem(componentName), String.class).filter(not(String::isEmpty)) //get the form value for this control
+						.ifPresent(text -> { //if there was a parameter value for this component
+							processPosition(getDepictedObject(), Double.parseDouble(text)); //process the new position
+						});
 			}
 		} else if(event instanceof WebActionDepictEvent) { //if this is an action
 			final WebActionDepictEvent webActionEvent = (WebActionDepictEvent)event; //get the action control event
@@ -244,7 +242,7 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_DIV); //<xhtml:div> (component-track)
 		writeIDClassAttributes(null, SLIDER_TRACK_CLASS_SUFFIX); //write the ID and class attributes for the track
 		/*TODO del
-
+		
 				final Map<String, String> trackStyles=new HashMap<String, String>();	//create a new map of styles
 				final String trackDisplay=axis==Axis.Y ? CSS_DISPLAY_INLINE : CSS_DISPLAY_BLOCK;	//determine if the labels should go under or beside the slider
 				trackStyles.put(CSS_PROP_DISPLAY, trackDisplay);	//set the styles of the track
@@ -289,7 +287,7 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 				//Log.trace("using big interval", bigInterval);
 				/*TODO fix
 								final List<BigDecimal> intervalValues=new ArrayList<BigDecimal>();	//create a list for the interval values
-
+				
 								BigDecimal intervalValue=bigRangeMinimum;	//start out with the minimum value
 								while(intervalValue.compareTo(bigRangeMaximum)<=0) {	//while we haven't overshot the maximum
 									intervalValues.add(intervalValue);	//add this interval value
@@ -322,8 +320,8 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 					depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_DIV); //<xhtml:div> (component-interval-label-wrapper)					
 					//TODO write the class and style					
 					final BigDecimal bigPosition = intervalValue.divide(bigRange); //get the percentage along the slider
-					final BigDecimal bigPercent = flowDirection == Flow.Direction.INCREASING ? bigPosition.multiply(bigDecimal100) : bigDecimal1.subtract(bigPosition)
-							.multiply(bigDecimal100); //get the position along the slider, compensating for flow direction
+					final BigDecimal bigPercent = flowDirection == Flow.Direction.INCREASING ? bigPosition.multiply(bigDecimal100)
+							: bigDecimal1.subtract(bigPosition).multiply(bigDecimal100); //get the position along the slider, compensating for flow direction
 					final String percent = bigPercent.toPlainString() + "%"; //create a percentage string
 
 					final Map<String, Object> intervalWrapperStyles = new HashMap<String, Object>(); //create a new map of styles

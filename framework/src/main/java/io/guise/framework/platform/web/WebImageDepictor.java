@@ -21,10 +21,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
-import static com.globalmentor.w3c.spec.CSS.*;
-import static com.globalmentor.w3c.spec.HTML.*;
-
-import com.globalmentor.xml.xhtml.XHTML;
+import static com.globalmentor.css.spec.CSS.*;
+import static com.globalmentor.html.spec.HTML.*;
 
 import io.guise.framework.GuiseSession;
 import io.guise.framework.component.*;

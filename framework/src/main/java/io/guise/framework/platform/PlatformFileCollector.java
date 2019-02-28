@@ -78,24 +78,23 @@ public class PlatformFileCollector extends AbstractDepictedObject {
 	 */
 	public void cancel(final PlatformFile platformFile) {
 		if(!getPlatformFiles().contains(platformFile)) { //if this list no longer knows about this platform file
-			throw new IllegalStateException("Platform file " + platformFile
-					+ " no longer available for cancel; perhaps other platform files have since been selected.");
+			throw new IllegalStateException(
+					"Platform file " + platformFile + " no longer available for cancel; perhaps other platform files have since been selected.");
 		}
 		getDepictor().cancel(platformFile); //tell the depictor to cancel the platform file
 	}
 
 	/**
 	 * Initiates a platform file upload.
-	 * @param platformFile Thet platform file to upload.
-	 * @param platformFile Thet platform file to upload.
+	 * @param platformFile The platform file to upload.
 	 * @param destinationURI The URI representing the destination of the platform file, either absolute or relative to the application.
 	 * @throws NullPointerException if the given platform file and/or destination URI is <code>null</code>.
 	 * @throws IllegalStateException the specified platform file can no longer be uploaded because, for example, other platform files have since been selected.
 	 */
 	public void upload(final PlatformFile platformFile, final URI destinationURI) {
 		if(!getPlatformFiles().contains(platformFile)) { //if this list no longer knows about this platform file
-			throw new IllegalStateException("Platform file " + platformFile
-					+ " no longer available for upload; perhaps other platform files have since been selected.");
+			throw new IllegalStateException(
+					"Platform file " + platformFile + " no longer available for upload; perhaps other platform files have since been selected.");
 		}
 		getDepictor().upload(platformFile, destinationURI); //tell the depictor to initiate the platform file upload
 	}

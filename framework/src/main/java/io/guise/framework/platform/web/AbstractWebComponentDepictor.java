@@ -39,12 +39,11 @@ import io.guise.framework.platform.AbstractComponentDepictor;
 import io.guise.framework.style.Color;
 import io.guise.framework.style.FontStyle;
 
+import static com.globalmentor.css.spec.CSS.*;
+import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.text.TextFormatter.*;
-import static com.globalmentor.w3c.spec.CSS.*;
-import static com.globalmentor.w3c.spec.HTML.*;
-import static com.globalmentor.xml.xhtml.XHTML.*;
 import static io.guise.framework.model.ui.PresentationModel.*;
 import static io.guise.framework.platform.XHTMLDepictContext.*;
 import static io.guise.framework.platform.web.GuiseCSSStyleConstants.*;

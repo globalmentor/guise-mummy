@@ -25,8 +25,9 @@ import io.guise.framework.GuiseSession;
 import io.guise.framework.model.ResourceImport;
 
 import static com.globalmentor.collections.Collections.*;
-import static com.globalmentor.io.Files.*;
+import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.Classes.*;
+
 import com.globalmentor.log.Log;
 
 /**

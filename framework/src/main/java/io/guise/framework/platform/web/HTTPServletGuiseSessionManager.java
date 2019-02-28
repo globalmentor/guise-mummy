@@ -89,7 +89,7 @@ public class HTTPServletGuiseSessionManager implements HttpSessionListener {
 		HttpSession httpSession = httpRequest.getSession(false); //get the current HTTP session from the HTTP request, if there is a session
 		if(httpSession == null) { //if there is no session yet for this request, we'll create one
 			final Map<String, Object> userAgentProperties = getUserAgentProperties(httpRequest); //get user agent-related properties TODO have the method cache these in the request
-			final String userAgentName = asInstance(userAgentProperties.get(USER_AGENT_NAME_PROPERTY), String.class); //get the user agent name
+			final String userAgentName = asInstance(userAgentProperties.get(USER_AGENT_NAME_PROPERTY), String.class).orElse(null); //get the user agent name
 			final boolean isSpider = UNSESSIONED_SPIDER_USER_AGENT_NAMES.contains(userAgentName); //see if the user agent is a spider that does not support sessions
 			boolean useSpiderSession = isSpider && spiderSession != null; //we'll use the spider session if the user agent is a spider and we have a spider session
 			if(useSpiderSession) { //even if the user agent is a spider, make sure the spider session is valid

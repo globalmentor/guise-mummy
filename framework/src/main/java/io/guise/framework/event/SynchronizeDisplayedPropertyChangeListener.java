@@ -32,7 +32,7 @@ public class SynchronizeDisplayedPropertyChangeListener extends AbstractGenericP
 
 	@Override
 	public void propertyChange(final GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent) {
-		final Displayable displayableSource = asInstance(genericPropertyChangeEvent.getSource(), Displayable.class); //get the source as a Displayable
+		final Displayable displayableSource = asInstance(genericPropertyChangeEvent.getSource(), Displayable.class).orElse(null); //get the source as a Displayable
 		if(displayableSource != null) { //if the source is displayable
 			final Boolean newValue = genericPropertyChangeEvent.getNewValue(); //get the new value
 			if(newValue != null) { //if there is a new value

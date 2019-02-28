@@ -33,7 +33,6 @@ import com.globalmentor.model.ConfigurationException;
 
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.util.PropertiesUtilities.*;
-import static org.urframework.URF.*;
 
 /**
  * The singleton Guise class. There will only be one instance of Guise per JVM.
@@ -86,11 +85,11 @@ public final class Guise {
 	/** The recommended prefix to the Guise ontology namespace. */
 	public static final String NAMESPACE_PREFIX = "guise";
 	/** The URI to the Guise ontology namespace. */
-	public static final URI NAMESPACE_URI = URI.create("https://guise.io/framework/namespaces/guise/");
+	public static final URI NAMESPACE = URI.create("https://guise.io/framework/namespaces/guise/");
 
 	//properties
 	/** The property indicating the URI of the theme of a resource. */
-	public static final URI THEME_URI_PROPERTY_URI = createResourceURI(NAMESPACE_URI, "themeURI");
+	public static final URI THEME_URI_PROPERTY_TAG = NAMESPACE.resolve("themeURI");
 
 	/** The singleton instance of Guise. */
 	private static Guise instance = null;

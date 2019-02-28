@@ -39,8 +39,8 @@ import static io.guise.framework.platform.web.WebPlatform.*;
  * @param <C> The type of component being depicted.
  * @author Garret Wilson
  */
-public class WebResourceCollectDepictor<C extends ResourceCollectControl> extends AbstractDecoratedWebComponentDepictor<C> implements
-		ResourceCollectControl.Depictor<C> {
+public class WebResourceCollectDepictor<C extends ResourceCollectControl> extends AbstractDecoratedWebComponentDepictor<C>
+		implements ResourceCollectControl.Depictor<C> {
 
 	/** The web commands for controlling a resource collect control. */
 	public enum ResourceCollectCommand implements WebPlatformCommand {
@@ -71,16 +71,16 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 		if(destinationBookmark != null) { //if a bookmark was provided
 			receiveResourceURI = URI.create(receiveResourceURI.toString() + destinationBookmark.toString()); //append the bookmark query
 		}
-		getPlatform().getSendMessageQueue().add(
-				new WebCommandDepictEvent<ResourceCollectCommand>(getDepictedObject(), ResourceCollectCommand.RESOURCE_COLLECT_RECEIVE,
+		getPlatform().getSendMessageQueue()
+				.add(new WebCommandDepictEvent<ResourceCollectCommand>(getDepictedObject(), ResourceCollectCommand.RESOURCE_COLLECT_RECEIVE,
 						new NameValuePair<String, Object>(ResourceCollectCommand.DESTINATION_URI_PROPERTY, receiveResourceURI))); //send a command for the control to start receiving		
 	}
 
 	@Override
 	public void cancel() {
 		final C control = getDepictedObject(); //get the resource collect control
-		getPlatform().getSendMessageQueue().add(
-				new WebCommandDepictEvent<ResourceCollectCommand>(getDepictedObject(), ResourceCollectCommand.RESOURCE_COLLECT_CANCEL)); //send a resource collect cancel command to the platform
+		getPlatform().getSendMessageQueue()
+				.add(new WebCommandDepictEvent<ResourceCollectCommand>(getDepictedObject(), ResourceCollectCommand.RESOURCE_COLLECT_CANCEL)); //send a resource collect cancel command to the platform
 		control.setState(TaskState.CANCELED); //tell the control that the transfer has been cancelled
 		control.clearResourcePaths(); //clear all the resource paths
 	}
@@ -94,12 +94,11 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 				throw new IllegalArgumentException("Depict event " + event + " meant for depicted object " + webChangeEvent.getDepictedObject());
 			}
 			final Map<String, Object> properties = webChangeEvent.getProperties(); //get the new properties
-			final String resourcePath = asInstance(properties.get("resourcePath"), String.class); //get the added resource path TODO use a constant
-			if(resourcePath != null) { //if there is a resource path
+			asInstance(properties.get("resourcePath"), String.class).ifPresent(resourcePath -> { //get the added resource path; if there is a resource path TODO use a constant
 				if(component.isEnabled()) { //if the component is enabled
 					component.addResourcePath(resourcePath); //add this resource path to the control
 				}
-			}
+			});
 		} else if(event instanceof WebProgressDepictEvent) { //if this is a progress event
 			final WebProgressDepictEvent webProgressEvent = (WebProgressDepictEvent)event; //get the progress event
 			final C component = getDepictedObject(); //get the depicted object
@@ -130,8 +129,8 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 		if(control == propertyChangeEvent.getSource() //if our control's property changed
 				&& ResourceCollectControl.STATE_PROPERTY.equals(propertyChangeEvent.getPropertyName()) //if the state property changed
 				&& TaskState.COMPLETE == propertyChangeEvent.getNewValue()) { //if the control completed a transfer
-			getPlatform().getSendMessageQueue().add(
-					new WebCommandDepictEvent<ResourceCollectCommand>(getDepictedObject(), ResourceCollectCommand.RESOURCE_COLLECT_COMPLETE)); //send a resource collect complete command to the platform
+			getPlatform().getSendMessageQueue()
+					.add(new WebCommandDepictEvent<ResourceCollectCommand>(getDepictedObject(), ResourceCollectCommand.RESOURCE_COLLECT_COMPLETE)); //send a resource collect complete command to the platform
 		}
 	}
 

@@ -28,12 +28,6 @@
 
 		<dependency>
 			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-core</artifactId>
-			<version>0.5.0</version><!--$NO-MVN-MAN-VER$-->
-		</dependency>
-
-		<dependency>
-			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-country-us</artifactId>
 		</dependency>
 
@@ -74,26 +68,17 @@
 
 		<dependency>
 			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-w3c-spec</artifactId>
-			<version>0.5.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-xml</artifactId>
-			<version>0.5.0</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
 
 		<dependency>
-			<groupId>com.globalmentor</groupId>
-			<artifactId>urframework</artifactId>
-			<version>0.5.0</version>
+			<groupId>io.urf</groupId>
+			<artifactId>turf</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>com.globalmentor</groupId>
-			<artifactId>ploop</artifactId>
-			<version>0.5.0</version>
+			<groupId>org.zalando</groupId>
+			<artifactId>faux-pas</artifactId>
 		</dependency>
 	</dependencies>
 

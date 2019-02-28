@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.globalmentor</groupId>
 		<artifactId>globalmentor-parent</artifactId>
-		<version>8.4.0-SNAPSHOT</version>
+		<version>8.4.0</version>
 	</parent>
 
 	<groupId>io.guise</groupId>
@@ -41,6 +41,8 @@
 	<properties>
 		<maven.compiler.release>11</maven.compiler.release>
 		<confound.version>0.7.0-SNAPSHOT</confound.version>
+		<globalmentor-ee.version>0.6.0-SNAPSHOT</globalmentor-ee.version>
+		<globalmentor-web.version>0.6.0-SNAPSHOT</globalmentor-web.version>
 	</properties>
 
 	<modules>
@@ -61,7 +63,7 @@
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-core</artifactId>
-				<version>0.5.7-SNAPSHOT</version>
+				<version>0.5.7</version>
 			</dependency>
 
 			<dependency>
@@ -85,13 +87,19 @@
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-html</artifactId>
-				<version>0.6.0-SNAPSHOT</version>
+				<version>${globalmentor-web.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-html-spec</artifactId>
+				<version>${globalmentor-web.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-javascript</artifactId>
-				<version>0.6.0-SNAPSHOT</version>
+				<version>${globalmentor-web.version}</version>
 			</dependency>
 
 			<dependency>
@@ -109,19 +117,19 @@
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-servlet</artifactId>
-				<version>0.5.0</version>
+				<version>${globalmentor-ee.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-text-elff</artifactId>
-				<version>0.5.0</version>
+				<version>0.5.1-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-xml</artifactId>
-				<version>0.6.0-SNAPSHOT</version>
+				<version>${globalmentor-web.version}</version>
 			</dependency>
 
 			<dependency>
@@ -146,6 +154,18 @@
 				<groupId>io.guise</groupId>
 				<artifactId>guise-mummy</artifactId>
 				<version>0.6.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.urf</groupId>
+				<artifactId>urf-model</artifactId>
+				<version>0.3.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.urf</groupId>
+				<artifactId>turf</artifactId>
+				<version>0.3.0-SNAPSHOT</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
