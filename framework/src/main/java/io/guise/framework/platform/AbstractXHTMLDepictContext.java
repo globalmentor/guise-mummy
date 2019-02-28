@@ -28,10 +28,9 @@ import static com.globalmentor.javascript.JavaScript.*;
 import static com.globalmentor.w3c.spec.HTML.*;
 
 import com.globalmentor.text.ASCII;
-import com.globalmentor.w3c.spec.HTML;
-import com.globalmentor.w3c.spec.XML;
+import com.globalmentor.html.spec.HTML;
+import com.globalmentor.xml.spec.XML;
 import com.globalmentor.xml.QualifiedName;
-import com.globalmentor.xml.xhtml.XHTML;
 
 import io.guise.framework.*;
 
