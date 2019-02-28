@@ -23,7 +23,6 @@ import com.globalmentor.util.DataException;
 
 import static com.globalmentor.java.Objects.*;
 import static io.guise.framework.theme.Theme.*;
-import static org.urframework.select.Select.*;
 
 /**
  * A rule for specifying part of a theme.
