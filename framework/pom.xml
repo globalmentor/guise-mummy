@@ -53,12 +53,18 @@
 
 		<dependency>
 			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-rdf</artifactId>
+			<artifactId>globalmentor-metadata</artifactId>
 		</dependency>
+
 
 		<dependency>
 			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-servlet</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-text-directory-vcard</artifactId>
 		</dependency>
 
 		<dependency>
