@@ -48,6 +48,11 @@
 
 		<dependency>
 			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-log</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-mail</artifactId>
 		</dependency>
 
