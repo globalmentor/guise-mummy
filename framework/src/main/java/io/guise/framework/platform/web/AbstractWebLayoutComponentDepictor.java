@@ -28,6 +28,8 @@ import static com.globalmentor.java.Numbers.*;
 import static io.guise.framework.platform.web.GuiseCSSStyleConstants.*;
 
 import com.globalmentor.collections.iterators.ReverseIterator;
+import com.globalmentor.css.spec.CSS;
+import com.globalmentor.html.spec.HTML;
 
 import io.guise.framework.component.*;
 import io.guise.framework.component.layout.*;
@@ -44,10 +46,10 @@ import io.guise.framework.platform.XHTMLDepictContext;
 public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutComponent> extends AbstractWebComponentDepictor<C> {
 
 	/** The style classes for each region in a row. */
-	protected static final String ROW_REGION_CLASSES[] = new String[] { LAYOUT_REGION_LEFT_CLASS, LAYOUT_REGION_CENTER_CLASS, LAYOUT_REGION_RIGHT_CLASS };
+	protected static final String ROW_REGION_CLASSES[] = new String[] {LAYOUT_REGION_LEFT_CLASS, LAYOUT_REGION_CENTER_CLASS, LAYOUT_REGION_RIGHT_CLASS};
 
 	/** The style classes for each region in a column. */
-	protected static final String COLUMN_REGION_CLASSES[] = new String[] { LAYOUT_REGION_TOP_CLASS, LAYOUT_REGION_CENTER_CLASS, LAYOUT_REGION_BOTTOM_CLASS };
+	protected static final String COLUMN_REGION_CLASSES[] = new String[] {LAYOUT_REGION_TOP_CLASS, LAYOUT_REGION_CENTER_CLASS, LAYOUT_REGION_BOTTOM_CLASS};
 
 	/** Default constructor with no element representation. */
 	public AbstractWebLayoutComponentDepictor() {
@@ -143,8 +145,8 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 					writeIDAttribute(null, COMPONENT_LAYOUT_CLASS_SUFFIX); //id="id-layout"
 					depictContext.writeAttribute(null, ATTRIBUTE_CLASS, flowAxis == Axis.X ? LAYOUT_FLOW_X_CLASS : LAYOUT_FLOW_Y_CLASS); //class="layout-flow-x/y"
 					writeDirectionAttribute(orientation, flow); //explicitly write the direction ("ltr" or "rtl") for this flow so that the orientation will be taken into account
-					childComponentIterator = flowDirection == Flow.Direction.INCREASING ? component.getChildComponents().iterator() : new ReverseIterator<Component>(
-							component.getChildComponents()); //get an iterator to child components in the correct direction
+					childComponentIterator = flowDirection == Flow.Direction.INCREASING ? component.getChildComponents().iterator()
+							: new ReverseIterator<Component>(component.getChildComponents()); //get an iterator to child components in the correct direction
 					while(childComponentIterator.hasNext()) { //for each visible child component in the container, wrap the component in a span with the correct style
 						final Component childComponent = childComponentIterator.next(); //get the next child component
 						++childIndex; //update the child index
@@ -221,8 +223,8 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 							depictContext.write("\n"); //format the output
 							break;
 						case Y: //vertical flow
-							childComponentIterator = flowDirection == Flow.Direction.INCREASING ? component.getChildComponents().iterator() : new ReverseIterator<Component>(
-									component.getChildComponents()); //get an iterator to child components in the correct direction
+							childComponentIterator = flowDirection == Flow.Direction.INCREASING ? component.getChildComponents().iterator()
+									: new ReverseIterator<Component>(component.getChildComponents()); //get an iterator to child components in the correct direction
 							while(childComponentIterator.hasNext()) { //for each visible child component in the container, wrap the component in a span with the correct style
 								final Component childComponent = childComponentIterator.next(); //get the next child component
 								++childIndex; //update the child index
@@ -423,7 +425,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 							break;
 						case Y: //if we should span the left and right components vertically
 						{
-							final Component[] columnComponents = new Component[] { topComponent, centerComponent, bottomComponent }; //get the column components---even the null ones
+							final Component[] columnComponents = new Component[] {topComponent, centerComponent, bottomComponent}; //get the column components---even the null ones
 							final int columnComponentCount = getInstanceCount(columnComponents); //we'll see how many components are in the column
 							depictContext.write("\n"); //format the output
 							depictContext.writeIndent(); //write an indentation
