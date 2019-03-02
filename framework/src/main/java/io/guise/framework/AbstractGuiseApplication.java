@@ -1032,14 +1032,14 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	public ResourceBundle loadResourceBundle(final Theme theme, final Locale locale) throws IOException {
 		final ClassLoader loader = getClass().getClassLoader(); //get our class loader
 		//default resources
-		ResourceBundle resourceBundle = ResourceBundles.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null, resourcesIO, null, null); //load the default resource bundle
+		ResourceBundle resourceBundle = ResourceBundles.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null, resourcesIO); //load the default resource bundle
 		//theme resources
 		resourceBundle = loadResourceBundle(theme, locale, resourceBundle); //load any resources for this theme and resolving parents
 		//application resources
 		final String resourceBundleBaseName = getResourceBundleBaseName(); //get the specified resource bundle base name
 		//TODO del Log.trace("ready to load application resources; resource bundle base name:", resourceBundleBaseName);
 		if(resourceBundleBaseName != null && !resourceBundleBaseName.equals(DEFAULT_RESOURCE_BUNDLE_BASE_NAME)) { //if a distinct resource bundle base name was specified
-			resourceBundle = ResourceBundles.getResourceBundle(resourceBundleBaseName, locale, loader, resourceBundle, resourcesIO, null, null); //load the new resource bundle, specifying the current resource bundle as the parent					
+			resourceBundle = ResourceBundles.getResourceBundle(resourceBundleBaseName, locale, loader, resourceBundle, resourcesIO); //load the new resource bundle, specifying the current resource bundle as the parent					
 		}
 		return resourceBundle; //return the resource bundle
 	}
