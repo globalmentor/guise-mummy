@@ -19,7 +19,7 @@ package io.guise.framework.platform.web;
 import java.net.URI;
 import java.util.*;
 
-import com.globalmentor.w3c.spec.CSS;
+import com.globalmentor.css.spec.CSS;
 
 import io.guise.framework.component.layout.Orientation;
 import io.guise.framework.geometry.Extent;

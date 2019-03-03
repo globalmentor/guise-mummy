@@ -26,9 +26,9 @@ import io.guise.framework.platform.DepictEvent;
 import io.guise.framework.platform.PlatformEvent;
 
 import static java.util.Collections.*;
+import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.java.Booleans.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.w3c.spec.HTML.*;
 import static io.guise.framework.platform.web.GuiseCSSStyleConstants.*;
 
 /**

@@ -20,9 +20,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
+import com.globalmentor.css.spec.CSS;
 import com.globalmentor.java.Integers;
 import com.globalmentor.metadata.OpenGraph;
-import com.globalmentor.w3c.spec.CSS;
 
 import io.guise.framework.*;
 import io.guise.framework.component.layout.Orientation;
@@ -32,10 +32,10 @@ import io.guise.framework.platform.web.WebPlatform;
 import io.guise.framework.platform.web.facebook.Facebook;
 import io.guise.framework.style.*;
 
+import static com.globalmentor.css.spec.CSS.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.StringBuilders.*;
-import static com.globalmentor.w3c.spec.CSS.*;
 import static io.guise.framework.model.ui.PresentationModel.*;
 import static io.guise.framework.platform.web.WebPlatform.*;
 

@@ -52,7 +52,7 @@ import com.globalmentor.security.Nonce;
 import com.globalmentor.servlet.Servlets;
 import com.globalmentor.servlet.http.*;
 import com.globalmentor.text.elff.*;
-import com.globalmentor.w3c.spec.XML;
+import com.globalmentor.xml.spec.XML;
 import com.globalmentor.xml.xpath.*;
 
 import io.guise.framework.*;
@@ -68,6 +68,7 @@ import io.urf.Content;
 import io.urf.model.UrfObject;
 import io.urf.model.UrfResourceDescription;
 
+import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Enums.*;
@@ -79,8 +80,7 @@ import static com.globalmentor.servlet.Servlets.*;
 import static com.globalmentor.servlet.http.HTTPServlets.*;
 import static com.globalmentor.text.elff.WebTrendsConstants.*;
 import static com.globalmentor.time.TimeZones.*;
-import static com.globalmentor.w3c.spec.HTML.*;
-import static com.globalmentor.w3c.spec.XML.*;
+import static com.globalmentor.xml.spec.XML.*;
 import static io.guise.framework.platform.web.WebPlatform.*;
 import static io.guise.framework.platform.web.WebUserAgentProduct.Brand.*;
 import static io.guise.framework.platform.web.adobe.Flash.*;

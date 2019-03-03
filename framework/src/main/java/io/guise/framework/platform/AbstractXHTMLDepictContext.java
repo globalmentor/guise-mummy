@@ -25,7 +25,7 @@ import static java.util.Collections.*;
 import static java.util.Objects.*;
 
 import static com.globalmentor.javascript.JavaScript.*;
-import static com.globalmentor.w3c.spec.HTML.*;
+import static com.globalmentor.html.spec.HTML.*;
 
 import com.globalmentor.text.ASCII;
 import com.globalmentor.html.spec.HTML;

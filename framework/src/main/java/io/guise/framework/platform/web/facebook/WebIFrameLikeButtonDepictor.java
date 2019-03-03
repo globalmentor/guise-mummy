@@ -29,9 +29,9 @@ import io.guise.framework.platform.web.AbstractSimpleWebComponentDepictor;
 import io.guise.framework.platform.web.WebDepictContext;
 import io.guise.framework.platform.web.WebUserAgentProduct;
 
+import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.net.HTTP.*;
-import static com.globalmentor.w3c.spec.HTML.*;
 import static io.guise.framework.platform.web.facebook.Facebook.*;
 
 /**

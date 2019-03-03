@@ -18,7 +18,7 @@ package io.guise.framework.demo;
 
 import java.net.URI;
 
-import com.globalmentor.w3c.spec.HTML;
+import com.globalmentor.html.spec.HTML;
 
 import io.guise.framework.component.*;
 import io.guise.framework.component.layout.*;

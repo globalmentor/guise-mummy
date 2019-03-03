@@ -21,8 +21,8 @@ import java.io.*;
 import java.util.regex.*;
 
 import com.globalmentor.beans.*;
+import com.globalmentor.html.spec.HTML;
 import com.globalmentor.net.ContentType;
-import com.globalmentor.w3c.spec.HTML;
 
 import io.guise.framework.component.*;
 import io.guise.framework.component.layout.*;

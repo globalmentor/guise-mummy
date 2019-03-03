@@ -24,14 +24,12 @@ import static java.util.Objects.*;
 
 import com.globalmentor.io.IO;
 import com.globalmentor.model.Locales;
-import com.globalmentor.rdf.*;
 import com.globalmentor.util.HashMapResourceBundle;
 
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.Java.*;
 import static com.globalmentor.model.Locales.*;
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.rdf.RDFResources.*;
 import static com.globalmentor.util.PropertiesUtilities.*;
 import static com.globalmentor.xml.spec.XML.*;
 
@@ -51,12 +49,9 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 	 * The format in which a resource bundle is serialized, in order of preference.
 	 * @author Garret Wilson
 	 */
-	private enum ResourceBundleFormat {
+	private enum ResourceBundleFormat { //TODO make these pluggable via Rincl
 		/** The resource bundle is serialized in a TURF file. */
 		TURF("turf"), //TODO bring back reference to definition constant
-
-		/** The resource bundle is serialized in an RDF+XML file. */
-		RDFXML("rdf"), //TODO bring back reference to definition constant 
 
 		/** The resource bundle is serialized in an XML file. */
 		XML(XML_NAME_EXTENSION),
@@ -83,23 +78,19 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 	}
 
 	/**
-	 * Loads a resource bundle for a given base name and locale. This implementation recognizes properties stored in <code>.turf</code>, <code>.rdf</code>,
-	 * <code>.xml</code>, and <code>.properties</code> files, searching in that order. TURF property files are only used if a given TURF resource I/O instance is
-	 * provided for reading from the file. RDF property files are only used if a given RDF resource I/O instance is provided for reading from the file.
+	 * Loads a resource bundle for a given base name and locale. This implementation recognizes properties stored in <code>.turf</code>, <code>.xml</code>, and
+	 * <code>.properties</code> files, searching in that order. TURF property files are only used if a given TURF resource I/O instance is provided for reading
+	 * from the file.
 	 * @param baseName The base name of the resource bundle, which is a fully qualified class name, such as "myProperties".
 	 * @param locale The locale for which a resource bundle is desired.
 	 * @param loader The class loader from which to load the resource bundle.
 	 * @param parent The parent resource bundle, or <code>null</code> if there should be no parent for resolving resources.
 	 * @param turfResourceIO The I/O support for loading resources from a TURF representation, or <code>null</code> if TURF resource bundles are not supported.
-	 * @param rdfResourceIO The I/O support for loading resources from an RDF+XML serialization, or <code>null</code> if RDF resource bundles are not supported.
-	 * @param rdfPropertyNamespaceURI The namespace of the properties to gather, using the property local name as the map entry key, or <code>null</code> if RDF
-	 *          resource bundles are not supported.
 	 * @return A resource bundle for the given base name and locale.
 	 * @throws MissingResourceException if no resource bundle for the specified base name can be found, or if there is an error loading the resource bundle.
 	 */
 	public static ResourceBundle getResourceBundle(final String baseName, final Locale locale, final ClassLoader loader, final ResourceBundle parent,
-			final IO<Map<Object, Object>> turfResourceIO, final IO<? extends RDFResource> rdfResourceIO, final URI rdfPropertyNamespaceURI)
-			throws MissingResourceException {
+			final IO<Map<Object, Object>> turfResourceIO) throws MissingResourceException {
 		final String basePath = baseName.replace(PACKAGE_SEPARATOR, PATH_SEPARATOR); //create a base path from base name
 		final ResourceBundleFormat[] resourceBundleFormats = ResourceBundleFormat.values(); //get the available resource bundle formats
 		final int resourceBundleFormatCount = resourceBundleFormats.length; //see how many resource bundle formats there are
@@ -112,9 +103,6 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 				final ResourceBundleFormat resourceBundleFormat = resourceBundleFormats[resourceBundleFormatIndex]; //get this resource bundle format
 				if(resourceBundleFormat == ResourceBundleFormat.TURF && turfResourceIO == null) { //if this is a TURF file, only use it if we have I/O for the file
 					continue; //don't check for TURF, because we don't have the means to read it
-				}
-				if(resourceBundleFormat == ResourceBundleFormat.RDFXML && (rdfResourceIO == null || rdfPropertyNamespaceURI == null)) { //if this is an RDF+XML file, only use it if we have I/O for the file
-					continue; //don't check for RDF+XML, because we don't have the means to read it
 				}
 				final String resourcePath = getLocaleCandidatePath(paths[resourceBundleFormatIndex], locale, depth); //get a candidate path for the resource bundle at this locale depth, using the path for this resource bundle type
 				if(resourcePath != null) { //if we can generate a candidate path for the locale at this depth
@@ -135,10 +123,6 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 										case TURF: {
 											final Map<Object, Object> resourceMap = turfResourceIO.read(inputStream, resourceURL.toURI()); //try to read the resource
 											return new HashMapResourceBundle(resourceMap, parent); //create a new hash map resource bundle with resources and the given parent and return it
-										}
-										case RDFXML: {
-											final RDFResource rdfResource = rdfResourceIO.read(inputStream, resourceURL.toURI()); //try to read the resource
-											return toResourceBundle(rdfResource, rdfPropertyNamespaceURI, parent); //create and return a resource bundle from the RDF resource
 										}
 										case XML: {
 											final Properties properties = new Properties(); //we'll load a properties file
@@ -170,80 +154,6 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 		}
 		throw new MissingResourceException("Can't find resource bundle for base name " + baseName + ", locale " + locale,
 				baseName + Locales.LOCALE_SEPARATOR + locale, "");
-	}
-
-	/**
-	 * Creates a resource bundle with contents reflecting the properties of a given RDF resource.
-	 * @param rdfResource The RDF resource the properties of which should be turned into a map.
-	 * @param rdfPropertyNamespaceURI The namespace of the properties to gather, using the property local name as the map entry key.
-	 * @param parent The parent resource bundle, or <code>null</code> if there should be no parent for resolving resources.
-	 * @return A resource bundle with contents reflecting the property/value pairs, resolving to the given parent.
-	 */
-	public static ResourceBundle toResourceBundle(final RDFResource rdfResource, final URI rdfPropertyNamespaceURI, final ResourceBundle parent) {
-		return new HashMapResourceBundle(toMap(rdfResource, rdfPropertyNamespaceURI), parent); //create a new hash map resource bundle with the given parent and return it		
-	}
-
-	/**
-	 * Creates a map with contents reflecting the properties of a given RDF resource. Resource values are determined according to the algorithm used by
-	 * {@link #getResourceValue(RDFObject)}.
-	 * @param rdfResource The RDF resource the properties of which should be turned into a map.
-	 * @param rdfPropertyNamespaceURI The namespace of the properties to gather, using the property local name as the map entry key.
-	 * @return A map with contents reflecting the property/value pairs of the given resource.
-	 */
-	public static Map<String, Object> toMap(final RDFResource rdfResource, final URI rdfPropertyNamespaceURI) {
-		final HashMap<String, Object> resourceHashMap = new HashMap<String, Object>(rdfResource.getPropertyCount()); //create a new hash map with enough initial room for all properties
-		for(final RDFPropertyValuePair propertyValuePair : rdfResource.getProperties()) { //for each resource property/value pair
-			final RDFResource property = propertyValuePair.getProperty(); //get the property
-			final URI propertyURI = property.getURI(); //get the property URI
-			if(propertyURI != null && rdfPropertyNamespaceURI.equals(getNamespaceURI(propertyURI))) { //if this property is in the resourceKey namespace
-				final String resourceKey = getLocalName(propertyURI); //use the local name as the resource key
-				final Object resourceValue = getResourceValue(propertyValuePair.getValue()); //determine the resource value from the RDF property value
-				if(resourceValue != null) { //if we found a resource value
-					resourceHashMap.put(resourceKey, resourceValue); //store the resource key/value pair in the map
-				}
-			}
-		}
-		return resourceHashMap; //return the map		
-	}
-
-	/**
-	 * Determines the resource value from an RDF property value. Resource values are determined as follows:
-	 * <ol>
-	 * <li>If the property value is a typed literal, the typed literal {@link Object} data is used.</li>
-	 * <li>If the property value is any other literal, the lexical form {@link String} value is used.</li>
-	 * <li>If the property value is a list, a {@link List} is returned filled with values obtained by using this same algorithm; <code>null</code> values are
-	 * accepted.</li>
-	 * <li>If the value is any other resource with a reference URI, that {@link URI} is used.</li>
-	 * <li>If the value is any other resource with no reference URI but that has a single <code>rdf:value</code>, the value of that value resource is obtained by
-	 * using this same algorithm.</li>
-	 * </ol>
-	 * @param rdfPropertyValue The RDF property value object to be converted to a resource value.
-	 * @return A {@link String}, {@link URI}, or a {@link List} representing the resource value for the RDF property value, or <code>null</code> if no value could
-	 *         be determined.
-	 */
-	public static Object getResourceValue(final RDFObject rdfPropertyValue) {
-		if(rdfPropertyValue instanceof RDFLiteral) { //if the property value is a literal
-			return rdfPropertyValue instanceof RDFTypedLiteral ? ((RDFTypedLiteral<?>)rdfPropertyValue).getValue() : ((RDFLiteral)rdfPropertyValue).getLexicalForm(); //get the typed literal object if this is a typed literal
-		} else if(rdfPropertyValue instanceof RDFListResource) { //if the property value is a list
-			final RDFListResource<?> listResource = (RDFListResource<?>)rdfPropertyValue; //get the property value as a list
-			final List<Object> list = new ArrayList<Object>(listResource.size()); //create a new list
-			for(final RDFObject elementResource : listResource) { //for each element in the list resource
-				list.add(getResourceValue(elementResource)); //convert the element resource to a resource value and add it to the list
-			}
-			return list; //return the list
-		} else if(rdfPropertyValue instanceof RDFResource) { //if the property value is any other resource
-			final RDFResource resource = (RDFResource)rdfPropertyValue; //get the property value as a resource
-			final URI referenceURI = resource.getURI(); //get the reference URI
-			if(referenceURI != null) { //if there is a reference URI
-				return referenceURI; //return the reference URI
-			} else { //if there is no reference URI, see if there is an rdf:value specified
-				final RDFObject rdfValue = getValue(resource); //get the rdf:value specified, if any
-				if(rdfValue != null) { //if there is an rdf:value specified
-					return getResourceValue(rdfValue); //convert the rdf:value to a resource value and return it
-				}
-			}
-		}
-		return null; //indicate that no value could be determined
 	}
 
 }

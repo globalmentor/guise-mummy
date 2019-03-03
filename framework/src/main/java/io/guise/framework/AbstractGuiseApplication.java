@@ -55,7 +55,7 @@ import com.globalmentor.model.ConfigurationException;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.text.W3CDateFormat;
 import com.globalmentor.util.*;
-import com.globalmentor.w3c.spec.XML;
+import com.globalmentor.xml.spec.XML;
 
 import io.csar.*;
 import io.guise.framework.component.*;
@@ -125,7 +125,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @return The configuration previously associated with the same class, or <code>null</code> if there was no previous configuration for that class.
 	 * @throws NullPointerException if the given configuration is <code>null</code>.
 	 */
-	protected <C extends Concern> C setConfiguration(final C configuration) {
+	protected <C extends Concern> Optional<C> setConfiguration(final C configuration) {
 		return configurationManager.registerConcern(configuration);
 	}
 
@@ -136,12 +136,12 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @param configuration The configuration to set.
 	 * @return The configuration previously associated with the given class, or <code>null</code> if there was no previous configuration for that class.
 	 */
-	protected <C extends Concern> C setConfiguration(final Class<C> configurationClass, final C configuration) {
+	protected <C extends Concern> Optional<C> setConfiguration(final Class<C> configurationClass, final C configuration) {
 		return configurationManager.registerConcern(configurationClass, configuration);
 	}
 
 	@Override
-	public <C extends Concern> C getConcern(final Class<C> configurationClass) {
+	public <C extends Concern> Optional<C> getConcern(final Class<C> configurationClass) {
 		return configurationManager.getConcern(configurationClass);
 	}
 
@@ -151,7 +151,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 * @param configurationClass The class with which the configuration is associated.
 	 * @return The configuration previously associated with the given class, or <code>null</code> if there was no previous configuration for that class.
 	 */
-	protected <C extends Concern> C removeConfiguration(final Class<C> configurationClass) {
+	protected <C extends Concern> Optional<C> removeConfiguration(final Class<C> configurationClass) {
 		return configurationManager.unregisterConcern(configurationClass);
 	}
 
@@ -1032,14 +1032,14 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	public ResourceBundle loadResourceBundle(final Theme theme, final Locale locale) throws IOException {
 		final ClassLoader loader = getClass().getClassLoader(); //get our class loader
 		//default resources
-		ResourceBundle resourceBundle = ResourceBundles.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null, resourcesIO, null, null); //load the default resource bundle
+		ResourceBundle resourceBundle = ResourceBundles.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null, resourcesIO); //load the default resource bundle
 		//theme resources
 		resourceBundle = loadResourceBundle(theme, locale, resourceBundle); //load any resources for this theme and resolving parents
 		//application resources
 		final String resourceBundleBaseName = getResourceBundleBaseName(); //get the specified resource bundle base name
 		//TODO del Log.trace("ready to load application resources; resource bundle base name:", resourceBundleBaseName);
 		if(resourceBundleBaseName != null && !resourceBundleBaseName.equals(DEFAULT_RESOURCE_BUNDLE_BASE_NAME)) { //if a distinct resource bundle base name was specified
-			resourceBundle = ResourceBundles.getResourceBundle(resourceBundleBaseName, locale, loader, resourceBundle, resourcesIO, null, null); //load the new resource bundle, specifying the current resource bundle as the parent					
+			resourceBundle = ResourceBundles.getResourceBundle(resourceBundleBaseName, locale, loader, resourceBundle, resourcesIO); //load the new resource bundle, specifying the current resource bundle as the parent					
 		}
 		return resourceBundle; //return the resource bundle
 	}

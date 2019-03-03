@@ -21,7 +21,7 @@ import java.util.*;
 
 import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
 import com.globalmentor.beans.GenericPropertyChangeEvent;
-import com.globalmentor.w3c.spec.HTML;
+import com.globalmentor.html.spec.HTML;
 
 import io.guise.framework.Resources;
 import io.guise.framework.component.*;

@@ -30,7 +30,7 @@ import io.guise.framework.validator.*;
 
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.w3c.spec.HTML.*;
+import static com.globalmentor.html.spec.HTML.*;
 
 /**
  * Strategy for rendering a resource import control as an XHTML <code>&lt;input&gt;</code> element with type="file".

@@ -18,6 +18,8 @@ package io.guise.framework;
 
 import static java.util.Objects.*;
 
+import java.util.Optional;
+
 import io.csar.*;
 
 /**
@@ -50,12 +52,10 @@ public class GuiseSessionThreadGroup extends ThreadGroup implements Concerned {
 	}
 
 	@Override
-	public <C extends Concern> C getConcern(final Class<C> configurationClass) {
-		C configuration = guiseSession.getConcern(configurationClass); //see if the session has the requested configuration
-		if(configuration == null) { //if no such configuration was found in the session
-			configuration = guiseSession.getApplication().getConcern(configurationClass); //see if the application has the requested configuration
-		}
-		return configuration; //return the configuration we found, if any
+	public <C extends Concern> Optional<C> getConcern(final Class<C> configurationClass) {
+		return guiseSession.getConcern(configurationClass) //see if the session has the requested configuration
+				//if no such configuration was found in the session, see if the application has the requested configuration
+				.or(() -> guiseSession.getApplication().getConcern(configurationClass));
 	}
 
 }

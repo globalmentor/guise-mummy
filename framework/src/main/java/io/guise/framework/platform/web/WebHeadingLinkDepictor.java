@@ -21,7 +21,7 @@ import java.io.IOException;
 import io.guise.framework.component.*;
 import io.guise.framework.event.*;
 
-import static com.globalmentor.w3c.spec.HTML.*;
+import static com.globalmentor.html.spec.HTML.*;
 
 /**
  * Strategy for rendering an action model control as an XHTML <code>&lt;a&gt;</code> element containing a heading. For the component to be rendered at the

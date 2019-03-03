@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
+import com.globalmentor.html.spec.HTML;
+
 import static com.globalmentor.css.spec.CSS.*;
 import static com.globalmentor.html.spec.HTML.*;
 
@@ -32,7 +34,7 @@ import io.guise.framework.model.AbstractModel;
 
 /**
  * Strategy for rendering an image component an XHTML <code>&lt;img&gt;</code> element. The {@link ImageComponent#getLabel()} or
- * {@link ImageComponent#getDescription()} will be used as the {@value com.globalmentor.w3c.spec.HTML#ELEMENT_IMG_ATTRIBUTE_ALT} attribute if available.
+ * {@link ImageComponent#getDescription()} will be used as the {@value HTML#ELEMENT_IMG_ATTRIBUTE_ALT} attribute if available.
  * <p>
  * This depictor supports {@link PendingImageComponent}.
  * </p>

@@ -31,8 +31,8 @@ import io.guise.framework.style.Color;
 
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.w3c.spec.CSS.*;
-import static com.globalmentor.w3c.spec.HTML.*;
+import static com.globalmentor.css.spec.CSS.*;
+import static com.globalmentor.html.spec.HTML.*;
 import static io.guise.framework.platform.web.GuiseCSSStyleConstants.*;
 
 /**
@@ -128,8 +128,8 @@ public class WebFrameDepictor<C extends Frame> extends AbstractWebFrameDepictor<
 								writeStyleAttribute(context, tetherStyles);	//write the body style
 				*/
 				//look up the tether URI, using the tether compass point abbreviation as a suffix
-				depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, depictContext.getDepictionURI(tetherImage, tetherCompassPoint.getAbbreviation())
-						.toString()); //src="tetherImage.gif"
+				depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC,
+						depictContext.getDepictionURI(tetherImage, tetherCompassPoint.getAbbreviation()).toString()); //src="tetherImage.gif"
 				depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IMG); //</xhtml:img> (component-tether)
 			}
 		}

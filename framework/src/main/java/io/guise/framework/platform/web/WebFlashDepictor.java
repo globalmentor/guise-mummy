@@ -25,9 +25,9 @@ import com.globalmentor.net.HTTP;
 import io.guise.framework.GuiseSession;
 import io.guise.framework.component.Flash;
 
+import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.net.ContentTypeConstants.*;
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.w3c.spec.HTML.*;
 
 /**
  * Strategy for rendering a Flash component as an XHTML <code>&lt;object&gt;</code> element.
