@@ -111,13 +111,6 @@
 		</resources>
 
 		<plugins>
-
-			<!--generate build date -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>buildnumber-maven-plugin</artifactId>
-			</plugin>
-
 			<!--compress Guise JavaScript files to assets directory -->
 			<plugin>
 				<groupId>net.alchim31.maven</groupId>
