@@ -86,10 +86,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * Sets the given configuration, associating it with its class.
 	 * @param <C> The type of configuration being set.
 	 * @param configuration The configuration to set.
-	 * @return The configuration previously associated with the same class, or <code>null</code> if there was no previous configuration for that class.
+	 * @return The configuration previously associated with the same class, if any.
 	 * @throws NullPointerException if the given configuration is <code>null</code>.
 	 */
-	protected <C extends Concern> C setConfiguration(final C configuration) {
+	protected <C extends Concern> Optional<C> setConfiguration(final C configuration) {
 		return configurationManager.registerConcern(configuration);
 	}
 
@@ -98,14 +98,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * @param <C> The type of configuration being set.
 	 * @param configurationClass The class with which to associate the configuration.
 	 * @param configuration The configuration to set.
-	 * @return The configuration previously associated with the given class, or <code>null</code> if there was no previous configuration for that class.
+	 * @return The configuration previously associated with the given class, if any.
 	 */
-	protected <C extends Concern> C setConfiguration(final Class<C> configurationClass, final C configuration) {
+	protected <C extends Concern> Optional<C> setConfiguration(final Class<C> configurationClass, final C configuration) {
 		return configurationManager.registerConcern(configurationClass, configuration);
 	}
 
 	@Override
-	public <C extends Concern> C getConcern(final Class<C> configurationClass) {
+	public <C extends Concern> Optional<C> getConcern(final Class<C> configurationClass) {
 		return configurationManager.getConcern(configurationClass);
 	}
 
@@ -113,9 +113,9 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	 * Removes a configuration of the given type. If no configuration is associated with the specified type, no action occurs.
 	 * @param <C> The type of configuration being removed.
 	 * @param configurationClass The class with which the configuration is associated.
-	 * @return The configuration previously associated with the given class, or <code>null</code> if there was no previous configuration for that class.
+	 * @return The configuration previously associated with the given class, if any.
 	 */
-	protected <C extends Concern> C removeConfiguration(final Class<C> configurationClass) {
+	protected <C extends Concern> Optional<C> removeConfiguration(final Class<C> configurationClass) {
 		return configurationManager.unregisterConcern(configurationClass);
 	}
 
