@@ -180,23 +180,6 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>buildnumber-maven-plugin</artifactId>
-					<version>1.4</version>
-					<executions>
-						<execution>
-							<goals>
-								<goal>create-timestamp</goal>
-							</goals>
-							<configuration>
-								<timestampFormat>yyyy-MM-dd</timestampFormat>
-								<timestampPropertyName>build.date</timestampPropertyName>
-							</configuration>
-						</execution>
-					</executions>
-				</plugin>
-
-				<plugin>
 					<groupId>net.alchim31.maven</groupId>
 					<artifactId>yuicompressor-maven-plugin</artifactId>
 					<version>1.5.1</version>
@@ -226,22 +209,6 @@
 								<!-- <ignore></ignore> -->
 								<!-- </action> -->
 								<!-- </pluginExecution> -->
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.codehaus.mojo</groupId>
-										<artifactId>buildnumber-maven-plugin</artifactId>
-										<versionRange>[1.2,)</versionRange>
-										<goals>
-											<goal>create-timestamp</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<execute>
-											<runOnConfiguration>true</runOnConfiguration>
-											<runOnIncremental>true</runOnIncremental>
-										</execute>
-									</action>
-								</pluginExecution>
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
