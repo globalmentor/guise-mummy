@@ -1,23 +1,16 @@
-`URF:
-	"select"~<http://urf.name/select/>
-	"xml"~<http://urf.name/xml/>
-	"theme"~<https://guise.io/framework/namespaces/theme/>
-	"component"~<java:/io/guise/framework/component/>
-	"geometry"~<java:/io/guise/framework/geometry/>
-	"resources"~<https://guise.io/framework/namespaces/resources/>
-	"style"~<java:/io/guise/framework/style/>
-	"dc"~<http://purl.org/dc/elements/1.1/>
-;¤
-	*theme.Theme:
-		dc.title="Guise™ Sunflower Theme"
-		dc.description="The experimental sunflower Guise™ theme."
-		dc.rights="Copyright © 2007 GlobalMentor, Inc."
-		dc.creator="Garret Wilson"
+\
+	space-theme = <https://guise.io/framework/namespaces/theme/>
+	space-dc = <http://purl.org/dc/elements/1.1/>
+\
+	*theme/Theme:
+		dc/title="Guise™ Sunflower Theme"
+		dc/description="The experimental sunflower Guise™ theme."
+		dc/rights="Copyright © 2007 GlobalMentor, Inc."
+		dc/creator="Garret Wilson"
 	
-		theme.parentURI=<path:~guise/assets/themes/basic/basic.guisetheme>
+		theme/parentURI=<path:~guise/assets/themes/basic/basic.guisetheme>
 	
-		xml.style=«sunflower.css»
+		xml-style=|<path:sunflower.css>|	!TODO add URF support for base and relative paths
 	
-		theme.resources=«sunflower.resources.turf»
+		theme/resources+=|<path:sunflower.resources.turf>| !TODO add support for base and relative paths
 	;
-.
