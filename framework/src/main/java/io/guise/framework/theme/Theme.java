@@ -28,6 +28,7 @@ import com.globalmentor.net.ContentType;
 import com.globalmentor.util.*;
 
 import io.guise.framework.style.*;
+import io.urf.model.UrfResourceDescription;
 
 import static com.globalmentor.java.Classes.*;
 import static io.guise.framework.Resources.*;
@@ -57,9 +58,15 @@ public class Theme extends ArrayList<Rule> /*TODO delete legacy URF extends URFL
 	/** The apply property name. */
 	//TODO fix for new URF: public static final URI APPLY_PROPERTY_URI = createResourceURI(THEME_NAMESPACE_URI, "apply");
 	/** The property for the URI of the theme's parent. */
-	//TODO fix for new URF: public static final URI PARENT_URI_PROPERTY_URI = createResourceURI(THEME_NAMESPACE_URI, "parentURI");
+	public static final URI PARENT_URI_PROPERTY_URI = THEME_NAMESPACE_URI.resolve("parentURI");
 	/** The resources property name. */
-	//TODO fix for new URF: public static final URI RESOURCES_PROPERTY_URI = createResourceURI(THEME_NAMESPACE_URI, "resources");
+	public static final URI RESOURCES_PROPERTY_URI = THEME_NAMESPACE_URI.resolve("resources+");
+
+	private final UrfResourceDescription description; //TODO improve; temporary hack to get legacy Guise working
+
+	public UrfResourceDescription getDescription() {
+		return description;
+	}
 
 	/** The theme parent, or <code>null</code> if there is no resolving parent. */
 	private Theme parent = null;
@@ -104,17 +111,21 @@ public class Theme extends ArrayList<Rule> /*TODO delete legacy URF extends URFL
 	}
 
 	/** Default constructor. */
+	/*TODO delete legacy URF
 	public Theme() {
 		this((URI)null); //construct the class with no reference URI
 	}
+	*/
 
 	/**
 	 * Reference URI constructor.
 	 * @param referenceURI The reference URI for the new resource.
 	 */
+	/*TODO delete legacy URF
 	public Theme(final URI referenceURI) {
-		//TODO delete legacy URF		super(referenceURI, createResourceURI(THEME_NAMESPACE_URI, getLocalName(Theme.class))); //construct the parent class, using a type based upon the name of this class
+		super(referenceURI, createResourceURI(THEME_NAMESPACE_URI, getLocalName(Theme.class))); //construct the parent class, using a type based upon the name of this class
 	}
+	 */
 
 	/**
 	 * Collection constructor with no URI. The elements of the specified collection will be added to this list in the order they are returned by the collection's
@@ -122,9 +133,11 @@ public class Theme extends ArrayList<Rule> /*TODO delete legacy URF extends URFL
 	 * @param collection The collection whose elements are to be placed into this list.
 	 * @throws NullPointerException if the specified collection is <code>null</code>.
 	 */
+	/*TODO delete legacy URF
 	public Theme(final Collection<? extends Rule> collection) {
 		this(null, collection); //construct the class with no URI
 	}
+	 */
 
 	/**
 	 * URI and collection constructor. The elements of the specified collection will be added to this list in the order they are returned by the collection's
@@ -133,39 +146,59 @@ public class Theme extends ArrayList<Rule> /*TODO delete legacy URF extends URFL
 	 * @param collection The collection whose elements are to be placed into this list.
 	 * @throws NullPointerException if the specified collection is <code>null</code>.
 	 */
+	/*TODO delete legacy URF
 	public Theme(final URI uri, final Collection<? extends Rule> collection) {
 		this(uri); //construct the class with the URI
 		addAll(collection); //add all the collection elements to the list
 	}
+	*/
+
+	private final URI uri; //TODO improve; this is a short-term hack to allow loading relative paths from legacy Guise themes
+
+	public URI getURI() {
+		return uri;
+	}
 
 	/**
-	 * Parent theme constructor.
-	 * @param parent The theme to serve as the parent of this theme, or <code>null</code> if this theme should have no parent.
+	 * URI and description constructor.
+	 * @param uri The URI of the theme.
+	 * @param description The theme description, loaded from a legacy Guise theme file.
 	 */
-	public Theme(final Theme parent) {
-		this.parent = parent; //save the parent theme
+	public Theme(final URI uri, final UrfResourceDescription description) {
+		this.uri = requireNonNull(uri);
+		this.description = requireNonNull(description);
 	}
+
+	/**
+	 * Parent theme and description constructor.
+	 * @param parent The theme to serve as the parent of this theme, or <code>null</code> if this theme should have no parent.
+	 * @param description The theme description, loaded from a legacy Guise theme file.
+	 */
+	/*TODO determine if needed
+	public Theme(final Theme parent, final UrfResourceDescription description) {
+		this.parent = parent; //save the parent theme
+		this.description = requireNonNull(description);
+	}
+	*/
 
 	/**
 	 * Retrieves the URI indicating the parent theme.
 	 * @return The URI indicating the parent theme, or <code>null</code> if no parent theme is indicated or the value is not a URI.
 	 */
 	public URI getParentURI() {
-		return null;
-		//TODO fix for new URF: return asURI(getPropertyValue(PARENT_URI_PROPERTY_URI)); //return the theme.parent property as a URI
+		//TODO create utility as() method for Optional
+		return getDescription().findPropertyValue(PARENT_URI_PROPERTY_URI).filter(URI.class::isInstance).map(URI.class::cast).orElse(null); //return the theme.parent property as a URI
 	}
 
 	/**
-	 * Retrieves the resources URF resources. Each resource may indicate an external set of resources to load by providing a reference URI, as well as contain
+	 * Retrieves the resources URF resources. Each resource may indicate an external set of resources to load by providing a reference URI, or be a map of
 	 * resource definitions.
 	 * @param locale The locale of the resource to be retrieved.
 	 * @return The list of resources that indicate resources locations and/or contain resource definitions.
 	 */
-	/*TODO fix for new URF
-	public Iterable<URFResource> getResourceResources(final Locale locale) { //TODO use the locale to narrow down the resources
-		return getPropertyValues(RESOURCES_PROPERTY_URI); //return all the theme.resource properties
+	public Set<Object> getResourceResources(final Locale locale) { //TODO use the locale to narrow down the resources
+		return getDescription().getPropertyValues(RESOURCES_PROPERTY_URI); //return all the theme.resource properties
 	}
-	*/
 
 	/**
 	 * Retrieves an iterable to the XML styles.
