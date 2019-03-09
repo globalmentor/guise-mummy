@@ -40,7 +40,6 @@
 
 	<properties>
 		<maven.compiler.release>11</maven.compiler.release>
-		<confound.version>0.7.0-SNAPSHOT</confound.version>
 		<globalmentor-ee.version>0.6.0-SNAPSHOT</globalmentor-ee.version>
 		<globalmentor-web.version>0.6.0-SNAPSHOT</globalmentor-web.version>
 	</properties>
@@ -136,18 +135,6 @@
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-xml</artifactId>
 				<version>${globalmentor-web.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>io.clogr</groupId>
-				<artifactId>clogr</artifactId>
-				<version>0.8.0-SNAPSHOT</version>
-			</dependency>
-
-			<dependency>
-				<groupId>io.confound</groupId>
-				<artifactId>confound-file</artifactId>
-				<version>${confound.version}</version>
 			</dependency>
 
 			<dependency>
