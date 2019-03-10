@@ -167,8 +167,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	}
 
 	@Override
-	public <C extends Concern> Optional<C> getConcern(final Class<C> configurationClass) {
-		return configurationManager.getConcern(configurationClass);
+	public <C extends Concern> Optional<C> findConcern(final Class<C> configurationClass) {
+		return configurationManager.findConcern(configurationClass);
 	}
 
 	/**

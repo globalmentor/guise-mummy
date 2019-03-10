@@ -26,8 +26,8 @@ import io.csar.*;
  * A thread group allocated to a Guise session. All threads accessing a Guise session should be part of the session's thread group.
  * <p>
  * This thread group also allows access to managed configurations using {@link Concern}. Thread-group-local configurations are retrieved by searching for a
- * configuration first in the Guise session using {@link GuiseSession#getConcern(Class)}, and second in the Guise application using
- * {@link GuiseApplication#getConcern(Class)}.
+ * configuration first in the Guise session using {@link GuiseSession#findConcern(Class)}, and second in the Guise application using
+ * {@link GuiseApplication#findConcern(Class)}.
  * </p>
  * @author Garret Wilson
  */
@@ -52,10 +52,10 @@ public class GuiseSessionThreadGroup extends ThreadGroup implements Concerned {
 	}
 
 	@Override
-	public <C extends Concern> Optional<C> getConcern(final Class<C> configurationClass) {
-		return guiseSession.getConcern(configurationClass) //see if the session has the requested configuration
+	public <C extends Concern> Optional<C> findConcern(final Class<C> configurationClass) {
+		return guiseSession.findConcern(configurationClass) //see if the session has the requested configuration
 				//if no such configuration was found in the session, see if the application has the requested configuration
-				.or(() -> guiseSession.getApplication().getConcern(configurationClass));
+				.or(() -> guiseSession.getApplication().findConcern(configurationClass));
 	}
 
 }
