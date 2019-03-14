@@ -20,6 +20,6 @@ package io.guise.mummy;
  * Provides information about context of static site generation.
  * @author Garret Wilson
  */
-public class GuiseMummyContext {
+public class MummifyContext {
 
 }

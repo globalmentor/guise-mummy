@@ -36,7 +36,7 @@ import io.clogr.Clogged;
  * Guise static site generator.
  * @author Garret Wilson
  */
-public class GuiseMummifier implements Clogged {
+public class GuiseMummy implements Clogged {
 
 	/** The registered mummifiers by supported extensions. */
 	private final Map<String, ResourceMummifier> mummifiersByExtension = new HashMap<>();
@@ -57,7 +57,7 @@ public class GuiseMummifier implements Clogged {
 	}
 
 	/** No-args constructor. */
-	public GuiseMummifier() {
+	public GuiseMummy() {
 		//register default resource types
 		registerMummifier(new XhtmlMummifier());
 	}
@@ -85,7 +85,7 @@ public class GuiseMummifier implements Clogged {
 		checkArgument(isDirectory(sourceDirectory), "Source %s does not exist or is not a directory.");
 		createDirectories(targetDirectory);
 
-		final GuiseMummyContext context = new GuiseMummyContext() {}; //TODO testing
+		final MummifyContext context = new MummifyContext() {}; //TODO testing
 
 		//TODO load `.guiseignore` file for each directory
 

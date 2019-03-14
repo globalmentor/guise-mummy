@@ -41,7 +41,7 @@ public class XhtmlMummifier implements ResourceMummifier {
 	}
 
 	@Override
-	public void mummify(final GuiseMummyContext context, final Path resourcePath, final Path outputPath) throws IOException {
+	public void mummify(final MummifyContext context, final Path resourcePath, final Path outputPath) throws IOException {
 		final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance(); //TODO use shared factory?
 		documentBuilderFactory.setNamespaceAware(true);
 		DocumentBuilder documentBuilder;

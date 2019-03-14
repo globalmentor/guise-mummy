@@ -45,6 +45,6 @@ public interface ResourceMummifier {
 	 * @param outputPath The output path where the mummified version will be stored.
 	 * @throws IOException if there is an I/O error during static site generation.
 	 */
-	public void mummify(@Nonnull final GuiseMummyContext context, @Nonnull final Path resourcePath, @Nonnull final Path outputPath) throws IOException;
+	public void mummify(@Nonnull final MummifyContext context, @Nonnull final Path resourcePath, @Nonnull final Path outputPath) throws IOException;
 
 }
