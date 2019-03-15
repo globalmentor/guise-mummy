@@ -16,10 +16,38 @@
 
 package io.guise.mummy;
 
+import java.net.URI;
+import java.nio.file.Path;
+
 /**
  * Provides information about context of static site generation.
  * @author Garret Wilson
  */
-public class MummifyContext {
+public interface MummifyContext {
+
+	/**
+	 * Returns some URI indicating the root of the current context, that is, the site source directory. All resource context paths are interpreted relative to
+	 * this root.
+	 * @apiNote This method will typically but not necessarily return the URI form of the site source directory.
+	 * @return The URI that represents the root of the current context.
+	 */
+	public default URI getRoot() {
+		return getSiteSourceDirectory().toUri();
+	}
+
+	/**
+	 * Returns the base directory of the entire site source, representing the root of the context.
+	 * @apiNote This is analogous to Maven's <code>${project.basedir}/src/site</code> directory.
+	 * @return The base directory of the site being mummified.
+	 */
+	public Path getSiteSourceDirectory();
+
+	/** @return The absolute URI indicating the root URI of this context, that is, this site. */
+	//TODO decide what to do with this: public URI getRootUri();
+
+	/** @return The current artifact, such as a {@link Page}, being mummified. */
+	public Artifact getArtifact();
+
+	//TODO public UrfObject getResourceDescription(path)
 
 }
