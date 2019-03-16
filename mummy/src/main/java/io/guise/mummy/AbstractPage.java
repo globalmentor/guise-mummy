@@ -27,13 +27,13 @@ import com.globalmentor.net.URIPath;
  * @author Garret Wilson
  */
 public abstract class AbstractPage extends AbstractArtifact implements Page {
-
-	private final boolean isCollection;
-
-	@Override
-	public boolean isCollection() {
-		return isCollection;
-	}
+	//TODO fix 
+	//	private final boolean isCollection;
+	//
+	//	@Override
+	//	public boolean isCollection() {
+	//		return isCollection;
+	//	}
 
 	/**
 	 * Source resource context path constructor.
@@ -42,9 +42,10 @@ public abstract class AbstractPage extends AbstractArtifact implements Page {
 	 * @param outputFile The file where the artifact will be generated.
 	 * @throws IllegalArgumentException if the given context path is not absolute.
 	 */
-	public AbstractPage(@Nonnull final URIPath resourceContextPath, final boolean isCollection, @Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
-		super(resourceContextPath, sourceFile, outputFile);
-		this.isCollection = isCollection;
+	public AbstractPage(/*TODO fix @Nonnull final URIPath resourceContextPath, final boolean isCollection, */ @Nonnull final Path sourceFile,
+			@Nonnull final Path outputFile) {
+		super(/*TODO fix resourceContextPath, */sourceFile, outputFile);
+		//TODO fix this.isCollection = isCollection;
 	}
 
 }

@@ -29,8 +29,8 @@ import com.globalmentor.net.URIPath;
  * @author Garret Wilson
  */
 public abstract class AbstractArtifact implements Artifact {
-
-	private final URIPath resourceContextPath;
+	//TODO fix
+	//	private final URIPath resourceContextPath;
 
 	private final Path sourceFile;
 
@@ -43,16 +43,16 @@ public abstract class AbstractArtifact implements Artifact {
 	 * @param outputFile The file where the artifact will be generated.
 	 * @throws IllegalArgumentException if the given context path is not absolute.
 	 */
-	public AbstractArtifact(@Nonnull final URIPath resourceContextPath, @Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
-		this.resourceContextPath = resourceContextPath.checkAbsolute();
+	public AbstractArtifact(/*TODO fix @Nonnull final URIPath resourceContextPath, */@Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
+		//TODO fix		this.resourceContextPath = resourceContextPath.checkAbsolute();
 		this.sourceFile = requireNonNull(sourceFile);
 		this.outputFile = requireNonNull(outputFile);
 	}
-
-	@Override
-	public URIPath getResourceContextPath() {
-		return resourceContextPath;
-	}
+	//TODO fix
+	//	@Override
+	//	public URIPath getResourceContextPath() {
+	//		return resourceContextPath;
+	//	}
 
 	@Override
 	public Path getSourceFile() {
@@ -70,6 +70,6 @@ public abstract class AbstractArtifact implements Artifact {
 	 */
 	@Override
 	public String toString() {
-		return resourceContextPath.toString() + '(' + getSourceFile() + " -> " + getOutputFile() + ')';
+		return /*TODO fix resourceContextPath.toString()*/"" + '(' + getSourceFile() + " -> " + getOutputFile() + ')';
 	}
 }

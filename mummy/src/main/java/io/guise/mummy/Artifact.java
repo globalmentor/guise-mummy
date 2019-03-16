@@ -36,7 +36,7 @@ public interface Artifact {
 	 * </p>
 	 * @return The absolute path of the source resource relative to the site context.
 	 */
-	public URIPath getResourceContextPath();
+	//TODO fix public URIPath getResourceContextPath();
 
 	/** @return A description of the source resource for this artifact. */
 	//TODO implement public UrfResourceDescription getResourceDescription();

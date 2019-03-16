@@ -32,7 +32,7 @@ public interface Page extends Artifact {
 	//TODO implement public UrfResourceDescription getResourceDescription();
 
 	/** @return Whether this page is allowed to have child pages. */
-	public boolean isCollection();
+	//TODO fix public boolean isCollection();
 
 	/**
 	 * Returns the relative paths to source resources, relative to the current resource.

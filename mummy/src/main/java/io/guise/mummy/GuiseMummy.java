@@ -21,12 +21,14 @@ import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.net.URIs.ROOT_PATH;
 import static java.nio.file.Files.*;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Predicate.*;
 import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
@@ -89,7 +91,21 @@ public class GuiseMummy implements Clogged {
 	 */
 	public void mummify(@Nonnull final Path sourceDirectory, @Nonnull final Path targetDirectory) throws IOException {
 		final Context context = new Context(sourceDirectory);
-		mummify(context, sourceDirectory, targetDirectory);
+		//TODO bring back after describe phase: mummify(context, sourceDirectory, targetDirectory);
+
+		final Set<Artifact> describedArtifacts = new LinkedHashSet<>();
+		final Artifact rootArtifact = describeSourceDirectory(context, sourceDirectory, targetDirectory, describedArtifacts);
+		//TODO the method doesn't add its return value to the set of described artifacts; should it?
+		printArtifactDescription(rootArtifact);
+	}
+
+	private void printArtifactDescription(@Nonnull final Artifact artifact) { //TODO transfer to CLI
+		System.out.println(artifact.getOutputFile());
+		if(artifact instanceof Context.Directory) {
+			for(final Artifact childArtifact : ((Context.Directory)artifact).getChildArtifacts()) {
+				printArtifactDescription(childArtifact);
+			}
+		}
 	}
 
 	/**
@@ -133,7 +149,7 @@ public class GuiseMummy implements Clogged {
 
 						final Path outputFile = changeExtension(targetPath, "html"); //switch to generating an HTML file TODO use constant
 
-						final Page page = new Context.Page(resourceContextPath, isCollection, resourcePath, outputFile);
+						final Page page = new Context.Page(/*TODO fix resourceContextPath, isCollection, */resourcePath, outputFile);
 						context.setArtifact(page); //TODO unset the artifact later?
 
 						System.out.println("*** Ready to mummify: " + page);
@@ -150,6 +166,75 @@ public class GuiseMummy implements Clogged {
 			final Path targetChildDirectory = targetDirectory.resolve(childDirectory.getFileName()); //TODO transfer to some common location; maybe during discovery
 			mummify(context, childDirectory, targetChildDirectory);
 		}
+
+	}
+
+	//TODO fix private final Map<Path, Artifact> artifactsBySourcePath = new HashMap<>();
+
+	protected Optional<Path> discoverSourceDirectoryContentFile(@Nonnull Context context, @Nonnull final Path sourceDirectory) {
+		final Path directoryFile = sourceDirectory.resolve("index.xhtml"); //TODO provide a formal lookup mechanism
+		if(Files.isRegularFile(directoryFile)) {
+			return Optional.of(directoryFile);
+		}
+		return Optional.empty();
+	}
+
+	/**
+	 * Recursively describes a source directory and all its children.
+	 * @param context The current mummification context.
+	 * @param sourceDirectory The root of the site to be mummified.
+	 * @param targetDirectory The root directory of the generated static site; will be created if needed.
+	 * @throws IOException if there is an I/O error generating the static site.
+	 */
+	protected Artifact describeSourceDirectory(@Nonnull Context context, @Nonnull final Path sourceDirectory, @Nonnull final Path targetDirectory,
+			@Nonnull final Set<Artifact> describedArtifacts) throws IOException {
+		final Optional<Path> sourceDirectoryContentFile = discoverSourceDirectoryContentFile(context, sourceDirectory);
+		final Collection<Artifact> childArtifacts = describeSourceDirectoryContents(context, sourceDirectory, sourceDirectoryContentFile, targetDirectory,
+				describedArtifacts);
+		return new Context.Directory(sourceDirectory, targetDirectory, childArtifacts);
+
+	}
+
+	/**
+	 * Discovers and recursively describes the contents of a source directory. All artifacts will be described and collected, even those not returned as child
+	 * artifacts.
+	 * @param context The current mummification context.
+	 * @param sourceDirectory The root of the site to be mummified.
+	 * @param targetDirectory The root directory of the generated static site; will be created if needed.
+	 * @return The artifacts that should be designated as child artifacts of the directory artifact.
+	 * @throws IOException if there is an I/O error generating the static site.
+	 */
+	protected Collection<Artifact> describeSourceDirectoryContents(@Nonnull Context context, @Nonnull final Path sourceDirectory,
+			@Nonnull Optional<Path> sourceDirectoryContentFile, @Nonnull final Path targetDirectory, @Nonnull final Set<Artifact> describedArtifacts)
+			throws IOException {
+
+		final List<Artifact> childArtifacts = new ArrayList<>();
+
+		try (final Stream<Path> childPaths = list(sourceDirectory).filter(not(this::isIgnore))) {
+			childPaths.forEach(throwingConsumer(childSourcePath -> {
+				final Path childTargetPath = targetDirectory.resolve(childSourcePath.getFileName()); //TODO transfer to some common location; maybe during discovery
+				if(isDirectory(childSourcePath)) {
+					final Artifact directoryArtifact = describeSourceDirectory(context, childSourcePath, childTargetPath, describedArtifacts);
+					describedArtifacts.add(directoryArtifact);
+					childArtifacts.add(directoryArtifact);
+				} else if(isRegularFile(childSourcePath)) {
+					final Artifact fileArtifact = describeSourceFile(childSourcePath, childTargetPath);
+					describedArtifacts.add(fileArtifact);
+					if(!childSourcePath.equals(sourceDirectoryContentFile.orElse(null))) { //don't return the directory content file TODO create Optional equals utility method
+						childArtifacts.add(fileArtifact);
+					}
+				} else {
+					getLogger().warn("Skipping non-regular file {}.", childSourcePath);
+				}
+			}));
+		}
+
+		return childArtifacts;
+	}
+
+	protected Artifact describeSourceFile(@Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
+		//TODO in the future probably just pass the source file, and have a strategy that determines that output file, based on the artifact type
+		return new Context.Page(sourceFile, outputFile);
 
 	}
 
@@ -199,8 +284,34 @@ public class GuiseMummy implements Clogged {
 			 * @param outputFile The file where the artifact will be generated.
 			 * @throws IllegalArgumentException if the given context path is not absolute.
 			 */
-			public Page(@Nonnull final URIPath resourceContextPath, final boolean isCollection, @Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
-				super(resourceContextPath, isCollection, sourceFile, outputFile);
+			public Page(/*TODO fix @Nonnull final URIPath resourceContextPath, final boolean isCollection, */@Nonnull final Path sourceFile,
+					@Nonnull final Path outputFile) {
+				super(/*TODO fix resourceContextPath, isCollection, */sourceFile, outputFile);
+			}
+
+		}
+
+		//TODO document
+		protected static class Directory extends AbstractArtifact {
+
+			private final Collection<Artifact> childArtifacts;
+
+			public Collection<Artifact> getChildArtifacts() { //TODO document; move to interface
+				return childArtifacts;
+			}
+
+			/**
+			 * Source resource context path constructor.
+			 * @param resourceContextPath The absolute path of the resource, relative to the site context.
+			 * @param sourceDirectory The file containing the source of this artifact.
+			 * @param outputDirectory The file where the artifact will be generated.
+			 * @throws IllegalArgumentException if the given context path is not absolute.
+			 */
+			public Directory(/*TODO fix @Nonnull final URIPath resourceContextPath, final boolean isCollection, */@Nonnull final Path sourceDirectory,
+					@Nonnull final Path outputDirectory, @Nonnull Collection<Artifact> childArtifacts) {
+				super(/*TODO fix resourceContextPath, isCollection, */sourceDirectory, outputDirectory);
+				//TODO add preconditions to make sure this is a directory?
+				this.childArtifacts = unmodifiableSet(new LinkedHashSet<>(childArtifacts));
 			}
 
 		}
