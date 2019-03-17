@@ -53,10 +53,10 @@ public class DirectoryArtifact extends AbstractArtifact implements CollectionArt
 	 * @param childArtifacts The child artifacts of this artifact.
 	 * @throws IllegalArgumentException if the given context path is not absolute.
 	 */
-	public DirectoryArtifact(/*TODO fix @Nonnull final URIPath resourceContextPath, */@Nonnull final Path sourceFile, @Nonnull final Path outputFile,
-			@Nullable Artifact contentArtifact, @Nonnull Collection<Artifact> childArtifacts) {
+	public DirectoryArtifact(/*TODO fix @Nonnull final URIPath resourceContextPath, */@Nonnull final ResourceMummifier mummifier, @Nonnull final Path sourceFile,
+			@Nonnull final Path outputFile, @Nullable Artifact contentArtifact, @Nonnull Collection<Artifact> childArtifacts) {
 		//TODO add precondition to ensure this is a directory?
-		super(sourceFile, outputFile);
+		super(mummifier, sourceFile, outputFile);
 		this.contentArtifact = contentArtifact;
 		this.childArtifacts = Set.copyOf(childArtifacts);
 	}

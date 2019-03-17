@@ -19,9 +19,9 @@ package io.guise.mummy;
 import static java.nio.file.Files.*;
 
 import java.io.*;
-import java.nio.file.*;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.xml.parsers.*;
 
 import org.w3c.dom.Document;
@@ -41,7 +41,7 @@ public class XhtmlMummifier implements ResourceMummifier {
 	}
 
 	@Override
-	public void mummify(final MummifyContext context, final Path resourcePath, final Path outputPath) throws IOException {
+	public void mummify(final MummifyContext context, @Nonnull Artifact artifact) throws IOException {
 		final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance(); //TODO use shared factory?
 		documentBuilderFactory.setNamespaceAware(true);
 		DocumentBuilder documentBuilder;
@@ -51,7 +51,7 @@ public class XhtmlMummifier implements ResourceMummifier {
 			throw new IOException(parserConfigurationException);
 		}
 		final Document document;
-		try (final InputStream inputStream = new BufferedInputStream(newInputStream(resourcePath))) {
+		try (final InputStream inputStream = new BufferedInputStream(newInputStream(artifact.getSourceFile()))) {
 			try {
 				document = documentBuilder.parse(inputStream);//TODO install appropriate entity resolvers as needed
 			} catch(final SAXException saxException) {
@@ -59,12 +59,12 @@ public class XhtmlMummifier implements ResourceMummifier {
 			}
 		}
 
-		System.out.println("parsed document: " + resourcePath);
-		try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(outputPath))) {
+		System.out.println("parsed document: " + artifact.getSourceFile());
+		try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(artifact.getOutputFile()))) {
 			final HtmlSerializer htmlSerializer = new HtmlSerializer(true);
 			htmlSerializer.serialize(document, outputStream);
 		}
-		System.out.println("generated document: " + outputPath);
+		System.out.println("generated document: " + artifact.getOutputFile());
 
 	}
 

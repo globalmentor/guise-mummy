@@ -33,6 +33,13 @@ public abstract class AbstractArtifact implements Artifact {
 	//TODO fix
 	//	private final URIPath resourceContextPath;
 
+	private final ResourceMummifier mummifier;
+
+	@Override
+	public ResourceMummifier getMummifier() {
+		return mummifier;
+	}
+
 	private final Path sourceFile;
 
 	private final Path outputFile;
@@ -44,8 +51,10 @@ public abstract class AbstractArtifact implements Artifact {
 	 * @param outputFile The file where the artifact will be generated.
 	 * @throws IllegalArgumentException if the given context path is not absolute.
 	 */
-	public AbstractArtifact(/*TODO fix @Nonnull final URIPath resourceContextPath, */@Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
+	public AbstractArtifact(/*TODO fix @Nonnull final URIPath resourceContextPath, */@Nonnull final ResourceMummifier mummifier, @Nonnull final Path sourceFile,
+			@Nonnull final Path outputFile) {
 		//TODO fix		this.resourceContextPath = resourceContextPath.checkAbsolute();
+		this.mummifier = requireNonNull(mummifier);
 		this.sourceFile = requireNonNull(sourceFile);
 		this.outputFile = requireNonNull(outputFile);
 	}

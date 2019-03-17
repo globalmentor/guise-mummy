@@ -42,9 +42,9 @@ public abstract class AbstractPage extends AbstractArtifact implements Page {
 	 * @param outputFile The file where the artifact will be generated.
 	 * @throws IllegalArgumentException if the given context path is not absolute.
 	 */
-	public AbstractPage(/*TODO fix @Nonnull final URIPath resourceContextPath, final boolean isCollection, */ @Nonnull final Path sourceFile,
-			@Nonnull final Path outputFile) {
-		super(/*TODO fix resourceContextPath, */sourceFile, outputFile);
+	public AbstractPage(/*TODO fix @Nonnull final URIPath resourceContextPath, final boolean isCollection, */ @Nonnull final ResourceMummifier mummifier,
+			@Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
+		super(/*TODO fix resourceContextPath, */mummifier, sourceFile, outputFile);
 		//TODO fix this.isCollection = isCollection;
 	}
 

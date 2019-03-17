@@ -31,6 +31,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 import javax.annotation.*;
@@ -50,9 +51,13 @@ public class GuiseMummy implements Clogged {
 	private final Map<String, ResourceMummifier> mummifiersByExtension = new HashMap<>();
 
 	//TODO document
-	protected Optional<ResourceMummifier> getMummifier(@Nonnull final Path resourcePath) {
+	protected Optional<ResourceMummifier> getMummifier(@Nonnull final Path sourcePath) {
+		if(isDirectory(sourcePath)) {
+			return Optional.of(new DirectoryMummifier()); //TODO use a shared directory mummifier
+		}
+
 		//TODO create Paths.extensions
-		return extensions(resourcePath.getFileName().toString()).map(mummifiersByExtension::get).filter(Objects::nonNull).findFirst();
+		return extensions(sourcePath.getFileName().toString()).map(mummifiersByExtension::get).filter(Objects::nonNull).findFirst();
 	}
 
 	/**
@@ -91,10 +96,14 @@ public class GuiseMummy implements Clogged {
 	 */
 	public void mummify(@Nonnull final Path sourceDirectory, @Nonnull final Path targetDirectory) throws IOException {
 		final Context context = new Context(sourceDirectory);
-		//TODO bring back after describe phase: mummify(context, sourceDirectory, targetDirectory);
 
+		//describe phase
 		final Artifact rootArtifact = describeSourceDirectory(context, sourceDirectory, targetDirectory);
 		printArtifactDescription(rootArtifact);
+
+		//mummify phase
+		mummify(context, rootArtifact);
+
 	}
 
 	private void printArtifactDescription(@Nonnull final Artifact artifact) { //TODO transfer to CLI
@@ -113,58 +122,8 @@ public class GuiseMummy implements Clogged {
 	 * @param targetDirectory The root directory of the generated static site; will be created if needed.
 	 * @throws IOException if there is an I/O error generating the static site.
 	 */
-	protected void mummify(@Nonnull Context context, @Nonnull final Path sourceDirectory, @Nonnull final Path targetDirectory) throws IOException {
-		checkArgument(isDirectory(sourceDirectory), "Source %s does not exist or is not a directory.");
-		createDirectories(targetDirectory);
-
-		//TODO use or delete: final URI contextRoot = sourceDirectory.toUri();
-
-		//TODO load `.guiseignore` file for each directory
-
-		final Set<Path> childDirectories = new LinkedHashSet<>();
-
-		try (final Stream<Path> resourcePaths = list(sourceDirectory).filter(not(this::isIgnore))) {
-			resourcePaths.forEach(resourcePath -> {
-
-				final boolean isCollection = resourcePath.getFileName().toString().equals("index.xhtml"); //TODO allow configuration; decide whether to use resource or artifact to determine
-				final URIPath resourceContextPath;
-				{
-					final URI siteSourceUri = context.getSiteSourceDirectory().toUri();
-					final URI resourceUri = resourcePath.toUri();
-					final URI relativeResourcePath = siteSourceUri.relativize(resourceUri);
-					final URIPath nonnormalizedContextPath = new URIPath(ROOT_PATH + relativeResourcePath.toString()); //TODO create URIPath method for context path manipulation
-					//normalize the "index" input resource to be synonymous with its collection
-					resourceContextPath = isCollection ? nonnormalizedContextPath.getCurrentLevel() : nonnormalizedContextPath;
-				}
-
-				final Path targetPath = targetDirectory.resolve(resourcePath.getFileName()); //TODO transfer to some common location; maybe during discovery
-
-				System.out.println(resourcePath);
-				if(isDirectory(resourcePath)) {
-					childDirectories.add(resourcePath);
-				} else if(isRegularFile(resourcePath)) {
-					getMummifier(resourcePath).ifPresent(throwingConsumer(mummifier -> {
-
-						final Path outputFile = changeExtension(targetPath, "html"); //switch to generating an HTML file TODO use constant
-
-						final Page page = new Context.Page(/*TODO fix resourceContextPath, isCollection, */resourcePath, outputFile);
-						context.setArtifact(page); //TODO unset the artifact later?
-
-						System.out.println("*** Ready to mummify: " + page);
-						mummifier.mummify(context, resourcePath, outputFile);
-					}));
-				} else {
-					getLogger().warn("Skipping non-regular file {}.", resourcePath);
-				}
-			});
-		}
-
-		//child directories
-		for(final Path childDirectory : childDirectories) {
-			final Path targetChildDirectory = targetDirectory.resolve(childDirectory.getFileName()); //TODO transfer to some common location; maybe during discovery
-			mummify(context, childDirectory, targetChildDirectory);
-		}
-
+	protected void mummify(@Nonnull Context context, @Nonnull Artifact artifact) throws IOException {
+		artifact.getMummifier().mummify(context, artifact);
 	}
 
 	//TODO fix private final Map<Path, Artifact> artifactsBySourcePath = new HashMap<>();
@@ -186,12 +145,20 @@ public class GuiseMummy implements Clogged {
 	 */
 	protected Artifact describeSourceDirectory(@Nonnull Context context, @Nonnull final Path sourceDirectory, @Nonnull final Path targetDirectory)
 			throws IOException {
+		checkArgument(isDirectory(sourceDirectory), "Source %s does not exist or is not a directory.");
+
+		//TODO probably delegate to the directory mummifier to do the description, allowing special directories with special mummifiers
+		final ResourceMummifier directoryMummifier = getMummifier(sourceDirectory)
+				.orElseThrow(() -> new IllegalStateException("No directory mummifier registered."));
+
 		//discover and describe the directory content file, if present
 		final Optional<Path> contentFile = discoverSourceDirectoryContentFile(context, sourceDirectory);
-		final Artifact contentArtifact = contentFile.map(contentSourceFile -> {
-			final Path contentOutputFile = targetDirectory.resolve(contentSourceFile.getFileName()); //TODO transfer to some common location; maybe during discovery
-			return describeSourceFile(contentSourceFile, contentOutputFile);
-		}).orElse(null);
+		final Artifact contentArtifact = contentFile.map(throwingFunction(contentSourceFile -> {
+			final ResourceMummifier contentMummifier = getMummifier(contentSourceFile).orElseThrow(IllegalStateException::new);
+			final Path contentTargetFile = targetDirectory.resolve(contentSourceFile.getFileName()); //TODO transfer to some common location; maybe during discovery
+			final Path contentOutputFile = changeExtension(contentTargetFile, "html"); //switch to generating an HTML file TODO get from mummifier
+			return describeSourceFile(contentMummifier, contentSourceFile, contentOutputFile);
+		})).orElse(null);
 
 		//discover and describe the child artifacts
 		final List<Artifact> childArtifacts = new ArrayList<>();
@@ -202,20 +169,23 @@ public class GuiseMummy implements Clogged {
 					childArtifacts.add(describeSourceDirectory(context, childSourcePath, childTargetPath));
 				} else if(isRegularFile(childSourcePath)) {
 					if(!childSourcePath.equals(contentFile.orElse(null))) { //don't return the directory content file TODO create Optional equals utility method
-						final Path childOutputFile = changeExtension(childTargetPath, "html"); //switch to generating an HTML file TODO use constant
-						childArtifacts.add(describeSourceFile(childSourcePath, childOutputFile));
+						getMummifier(childSourcePath).ifPresent(throwingConsumer(mummifier -> {
+							final Path childOutputFile = changeExtension(childTargetPath, "html"); //switch to generating an HTML file TODO get from mummifier
+							//TODO probably delegate to the directory mummifier to do the description
+							childArtifacts.add(describeSourceFile(mummifier, childSourcePath, childOutputFile));
+						}));
 					}
 				} else {
 					getLogger().warn("Skipping non-regular file {}.", childSourcePath);
 				}
 			}));
 		}
-		return new DirectoryArtifact(sourceDirectory, targetDirectory, contentArtifact, childArtifacts);
+		return new DirectoryArtifact(directoryMummifier, sourceDirectory, targetDirectory, contentArtifact, childArtifacts);
 	}
 
-	protected Artifact describeSourceFile(@Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
+	protected Artifact describeSourceFile(@Nonnull final ResourceMummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
 		//TODO in the future probably just pass the source file, and have a strategy that determines that output file, based on the artifact type
-		return new Context.Page(sourceFile, outputFile);
+		return new Context.Page(mummifier, sourceFile, outputFile);
 	}
 
 	/**
@@ -264,9 +234,9 @@ public class GuiseMummy implements Clogged {
 			 * @param outputFile The file where the artifact will be generated.
 			 * @throws IllegalArgumentException if the given context path is not absolute.
 			 */
-			public Page(/*TODO fix @Nonnull final URIPath resourceContextPath, final boolean isCollection, */@Nonnull final Path sourceFile,
-					@Nonnull final Path outputFile) {
-				super(/*TODO fix resourceContextPath, isCollection, */sourceFile, outputFile);
+			public Page(/*TODO fix @Nonnull final URIPath resourceContextPath, final boolean isCollection, */@Nonnull final ResourceMummifier mummifier,
+					@Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
+				super(/*TODO fix resourceContextPath, isCollection, */mummifier, sourceFile, outputFile);
 			}
 
 		}

@@ -59,4 +59,6 @@ public interface Artifact {
 	/** @return The actual file generated for this artifact. */
 	public Path getOutputFile();
 
+	/** @return The mummifier responsible for mummifying this artifact. */
+	public ResourceMummifier getMummifier();
 }

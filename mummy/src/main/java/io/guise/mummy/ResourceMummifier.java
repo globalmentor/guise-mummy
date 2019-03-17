@@ -26,7 +26,7 @@ import javax.annotation.*;
  * Processes a resource for mummification.
  * @author Garret Wilson
  */
-public interface ResourceMummifier {
+public interface ResourceMummifier { //TODO probably rename to ArtifactMummifier
 
 	/**
 	 * Retrieves the extensions of files supported by this mummifier.
@@ -45,6 +45,6 @@ public interface ResourceMummifier {
 	 * @param outputPath The output path where the mummified version will be stored.
 	 * @throws IOException if there is an I/O error during static site generation.
 	 */
-	public void mummify(@Nonnull final MummifyContext context, @Nonnull final Path resourcePath, @Nonnull final Path outputPath) throws IOException;
+	public void mummify(@Nonnull final MummifyContext context, @Nonnull Artifact artifact) throws IOException;
 
 }
