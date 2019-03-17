@@ -17,6 +17,7 @@
 package io.guise.mummy;
 
 import java.nio.file.Path;
+import java.util.Set;
 
 import com.globalmentor.net.URIPath;
 
@@ -43,6 +44,17 @@ public interface Artifact {
 
 	/** @return The actual file containing the source of this artifact. */
 	public Path getSourceFile();
+
+	/**
+	 * Retrieves the source files that should be equivalent targets referring to this artifact.
+	 * <p>
+	 * For example, if a directory <code>/foo/</code> has a content source file of <code>/foo/index.xhtml</code>, both <code>/foo/</code> and
+	 * <code>/foo/index.xhtml</code> would refer to this same artifact. In the logical resource model, the <code>/foo/index.xhtml</code> file is an implementation
+	 * detail for storing the contents of the <code>/foo/</code> collection.
+	 * </p>
+	 * @return All source files that, if referred to by source links, identify this same artifact.
+	 */
+	public Set<Path> getReferentSourceFiles();
 
 	/** @return The actual file generated for this artifact. */
 	public Path getOutputFile();

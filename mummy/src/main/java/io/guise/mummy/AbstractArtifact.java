@@ -19,6 +19,7 @@ package io.guise.mummy;
 import static java.util.Objects.*;
 
 import java.nio.file.Path;
+import java.util.Set;
 
 import javax.annotation.*;
 
@@ -57,6 +58,15 @@ public abstract class AbstractArtifact implements Artifact {
 	@Override
 	public Path getSourceFile() {
 		return sourceFile;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This version simply returns the source file, equivalent to {@link #getSourceFile()}.
+	 */
+	@Override
+	public Set<Path> getReferentSourceFiles() {
+		return Set.of(getSourceFile());
 	}
 
 	@Override
