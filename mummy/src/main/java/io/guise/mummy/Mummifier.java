@@ -22,11 +22,13 @@ import java.util.Set;
 
 import javax.annotation.*;
 
+import io.clogr.Clogged;
+
 /**
  * Processes a resource for mummification.
  * @author Garret Wilson
  */
-public interface ResourceMummifier { //TODO probably rename to ArtifactMummifier
+public interface Mummifier extends Clogged {
 
 	/**
 	 * Retrieves the extensions of files supported by this mummifier.
@@ -39,12 +41,20 @@ public interface ResourceMummifier { //TODO probably rename to ArtifactMummifier
 	public @Nonnull Set<String> getSupportedFilenameExtensions();
 
 	/**
+	 * Plans mummification of a source path supported by this mummifier.
+	 * @param context The context of static site generation.
+	 * @param sourcePath The source path to be mummified.
+	 * @return An artifact describing the resource to be mummified.
+	 * @throws IOException if there is an I/O error during planning.
+	 */
+	public Artifact plan(@Nonnull MummyContext context, @Nonnull final Path sourcePath) throws IOException;
+
+	/**
 	 * Mummifies a resource.
 	 * @param context The context of static site generation.
-	 * @param resourcePath The path of the resource to mummify.
-	 * @param outputPath The output path where the mummified version will be stored.
+	 * @param artifact The artifact being generated.
 	 * @throws IOException if there is an I/O error during static site generation.
 	 */
-	public void mummify(@Nonnull final MummifyContext context, @Nonnull Artifact artifact) throws IOException;
+	public void mummify(@Nonnull final MummyContext context, @Nonnull Artifact artifact) throws IOException;
 
 }

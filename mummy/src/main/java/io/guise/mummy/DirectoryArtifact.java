@@ -44,19 +44,18 @@ public class DirectoryArtifact extends AbstractArtifact implements CollectionArt
 	}
 
 	/**
-	 * Source resource context path constructor.
-	 * @param resourceContextPath The absolute path of the resource, relative to the site context.
-	 * @param sourceFile The file containing the source of this artifact.
-	 * @param outputFile The file where the artifact will be generated.
+	 * Constructor.
+	 * @param mummifier The mummifier responsible for generating this artifact.
+	 * @param sourceDirectory The directory serving as the source of this artifact.
+	 * @param targetDirectory The directory where the artifact will be generated.
 	 * @param contentArtifact The internal artifact representing the content of this directory, such as <code>index.xhtml</code>, or <code>null</code> if there is
 	 *          no content artifact.
 	 * @param childArtifacts The child artifacts of this artifact.
-	 * @throws IllegalArgumentException if the given context path is not absolute.
 	 */
-	public DirectoryArtifact(/*TODO fix @Nonnull final URIPath resourceContextPath, */@Nonnull final ResourceMummifier mummifier, @Nonnull final Path sourceFile,
-			@Nonnull final Path outputFile, @Nullable Artifact contentArtifact, @Nonnull Collection<Artifact> childArtifacts) {
+	public DirectoryArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceDirectory, @Nonnull final Path targetDirectory,
+			@Nullable Artifact contentArtifact, @Nonnull Collection<Artifact> childArtifacts) {
 		//TODO add precondition to ensure this is a directory?
-		super(mummifier, sourceFile, outputFile);
+		super(mummifier, sourceDirectory, targetDirectory);
 		this.contentArtifact = contentArtifact;
 		this.childArtifacts = Set.copyOf(childArtifacts);
 	}
@@ -70,7 +69,7 @@ public class DirectoryArtifact extends AbstractArtifact implements CollectionArt
 	public Set<Path> getReferentSourceFiles() {
 		final Set<Path> defaultReferenceSourceFiles = super.getReferentSourceFiles();
 		//add the content artifact to referent source files if present
-		return getContentArtifact().map(contentArtifact -> immutableSetOf(defaultReferenceSourceFiles, contentArtifact.getSourceFile()))
+		return getContentArtifact().map(contentArtifact -> immutableSetOf(defaultReferenceSourceFiles, contentArtifact.getSourcePath()))
 				.orElse(defaultReferenceSourceFiles);
 	}
 

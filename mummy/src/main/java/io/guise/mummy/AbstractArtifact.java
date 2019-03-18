@@ -23,64 +23,52 @@ import java.util.Set;
 
 import javax.annotation.*;
 
-import com.globalmentor.net.URIPath;
-
 /**
  * Abstract implementation of an artifact.
  * @author Garret Wilson
  */
 public abstract class AbstractArtifact implements Artifact {
-	//TODO fix
-	//	private final URIPath resourceContextPath;
 
-	private final ResourceMummifier mummifier;
+	private final Mummifier mummifier;
 
 	@Override
-	public ResourceMummifier getMummifier() {
+	public Mummifier getMummifier() {
 		return mummifier;
 	}
 
-	private final Path sourceFile;
-
-	private final Path outputFile;
-
-	/**
-	 * Source resource context path constructor.
-	 * @param resourceContextPath The absolute path of the resource, relative to the site context.
-	 * @param sourceFile The file containing the source of this artifact.
-	 * @param outputFile The file where the artifact will be generated.
-	 * @throws IllegalArgumentException if the given context path is not absolute.
-	 */
-	public AbstractArtifact(/*TODO fix @Nonnull final URIPath resourceContextPath, */@Nonnull final ResourceMummifier mummifier, @Nonnull final Path sourceFile,
-			@Nonnull final Path outputFile) {
-		//TODO fix		this.resourceContextPath = resourceContextPath.checkAbsolute();
-		this.mummifier = requireNonNull(mummifier);
-		this.sourceFile = requireNonNull(sourceFile);
-		this.outputFile = requireNonNull(outputFile);
-	}
-	//TODO fix
-	//	@Override
-	//	public URIPath getResourceContextPath() {
-	//		return resourceContextPath;
-	//	}
+	private final Path sourcePath;
 
 	@Override
-	public Path getSourceFile() {
-		return sourceFile;
+	public Path getSourcePath() {
+		return sourcePath;
+	}
+
+	private final Path targetPath;
+
+	@Override
+	public Path getTargetPath() {
+		return targetPath;
+	}
+
+	/**
+	 * Constructor
+	 * @param mummifier The mummifier responsible for generating this artifact.
+	 * @param sourcePath The file containing the source of this artifact.
+	 * @param outputPath The file where the artifact will be generated.
+	 */
+	public AbstractArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourcePath, @Nonnull final Path outputPath) {
+		this.mummifier = requireNonNull(mummifier);
+		this.sourcePath = requireNonNull(sourcePath);
+		this.targetPath = requireNonNull(outputPath);
 	}
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This version simply returns the source file, equivalent to {@link #getSourceFile()}.
+	 * @implSpec This version simply returns the source file, equivalent to {@link #getSourcePath()}.
 	 */
 	@Override
 	public Set<Path> getReferentSourceFiles() {
-		return Set.of(getSourceFile());
-	}
-
-	@Override
-	public Path getOutputFile() {
-		return outputFile;
+		return Set.of(getSourcePath());
 	}
 
 	/**
@@ -89,6 +77,6 @@ public abstract class AbstractArtifact implements Artifact {
 	 */
 	@Override
 	public String toString() {
-		return /*TODO fix resourceContextPath.toString()*/"" + '(' + getSourceFile() + " -> " + getOutputFile() + ')';
+		return "(" + getSourcePath() + " -> " + getTargetPath() + ")";
 	}
 }

@@ -20,32 +20,20 @@ import java.nio.file.Path;
 
 import javax.annotation.*;
 
-import com.globalmentor.net.URIPath;
-
 /**
- * Abstract implementation of an artifact.
+ * An artifact representing a generated page.
  * @author Garret Wilson
  */
-public abstract class AbstractPage extends AbstractArtifact implements Page {
-	//TODO fix 
-	//	private final boolean isCollection;
-	//
-	//	@Override
-	//	public boolean isCollection() {
-	//		return isCollection;
-	//	}
+public class PageArtifact extends AbstractArtifact {
 
 	/**
-	 * Source resource context path constructor.
-	 * @param resourceContextPath The absolute path of the resource, relative to the site context.
+	 * Constructor.
+	 * @param mummifier The mummifier responsible for generating this artifact.
 	 * @param sourceFile The file containing the source of this artifact.
 	 * @param outputFile The file where the artifact will be generated.
-	 * @throws IllegalArgumentException if the given context path is not absolute.
 	 */
-	public AbstractPage(/*TODO fix @Nonnull final URIPath resourceContextPath, final boolean isCollection, */ @Nonnull final ResourceMummifier mummifier,
-			@Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
-		super(/*TODO fix resourceContextPath, */mummifier, sourceFile, outputFile);
-		//TODO fix this.isCollection = isCollection;
+	public PageArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
+		super(mummifier, sourceFile, outputFile);
 	}
 
 }
