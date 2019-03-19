@@ -62,15 +62,15 @@ public class DirectoryArtifact extends AbstractArtifact implements CollectionArt
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This version returns the default reference source files and the content artifact, if any.
+	 * @implSpec This version returns the default reference source paths and the source path to the content artifact, if any.
 	 * @see #getContentArtifact()
 	 */
 	@Override
-	public Set<Path> getReferentSourceFiles() {
-		final Set<Path> defaultReferenceSourceFiles = super.getReferentSourceFiles();
-		//add the content artifact to referent source files if present
-		return getContentArtifact().map(contentArtifact -> immutableSetOf(defaultReferenceSourceFiles, contentArtifact.getSourcePath()))
-				.orElse(defaultReferenceSourceFiles);
+	public Set<Path> getReferentSourcePaths() {
+		final Set<Path> defaultReferenceSourcePaths = super.getReferentSourcePaths();
+		//add the content artifact, if present, to the referent source paths
+		return getContentArtifact().map(contentArtifact -> immutableSetOf(defaultReferenceSourcePaths, contentArtifact.getSourcePath()))
+				.orElse(defaultReferenceSourcePaths);
 	}
 
 }

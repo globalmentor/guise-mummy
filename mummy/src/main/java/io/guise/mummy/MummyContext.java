@@ -138,4 +138,17 @@ public interface MummyContext {
 		return artifact instanceof CollectionArtifact ? getChildArtifacts(artifact) : getSiblingArtifacts(artifact);
 	}
 
+	/**
+	 * Retrieves an artifact referred to by a reference source path.
+	 * <p>
+	 * The source path of the returned artifact may not actually be equal to given source path. For example, a referent source path of
+	 * <code>/foo/bar/index.xhtml</code> might return the artifact for the file that exists at the source path <code>/foo/bar/</code>, because any link to
+	 * <code>/foo/bar/index.xhtml</code> is really referring to <code>/foo/bar/</code>; the <code>/foo/bar/index.xhtml</code> file is merely an implementation
+	 * detail for storing the content of <code>/foo/bar/</code>.
+	 * </p>
+	 * @param referenceSourcePath The source path being used as a reference to some artifact.
+	 * @return The artifact referred to by a reference source path.
+	 */
+	public Optional<Artifact> getArtifactBySourceReference(@Nonnull final Path referenceSourcePath);
+
 }

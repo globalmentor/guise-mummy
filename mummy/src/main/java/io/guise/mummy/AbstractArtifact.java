@@ -68,7 +68,7 @@ public abstract class AbstractArtifact implements Artifact {
 	 * @implSpec This version simply returns the source file, equivalent to {@link #getSourcePath()}.
 	 */
 	@Override
-	public Set<Path> getReferentSourceFiles() {
+	public Set<Path> getReferentSourcePaths() {
 		return Set.of(getSourcePath());
 	}
 

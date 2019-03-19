@@ -161,12 +161,20 @@ public class GuiseMummy implements Clogged {
 			return Optional.ofNullable(parentArtifactsByArtifact.get(requireNonNull(artifact)));
 		}
 
+		private final Map<Path, Artifact> artifactsByReferenceSourcePath = new HashMap<>();
+
+		@Override
+		public Optional<Artifact> getArtifactBySourceReference(final Path referenceSourcePath) {
+			return Optional.ofNullable(artifactsByReferenceSourcePath.get(requireNonNull(referenceSourcePath)));
+		}
+
 		/**
 		 * Recursively updates the mummification plan for the given artifact. Parent artifacts are updated in the map, for example.
 		 * @param artifact The artifact the plan of which to update.
 		 */
 		protected void updatePlan(@Nonnull final Artifact artifact) {
 			requireNonNull(artifact);
+			artifact.getReferentSourcePaths().forEach(referenceSourcePath -> artifactsByReferenceSourcePath.put(referenceSourcePath, artifact));
 			if(artifact instanceof CollectionArtifact) {
 				for(final Artifact childArtifact : ((CollectionArtifact)artifact).getChildArtifacts()) {
 					parentArtifactsByArtifact.put(childArtifact, artifact); //map the parent to the child
