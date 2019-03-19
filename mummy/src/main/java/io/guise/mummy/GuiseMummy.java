@@ -74,20 +74,33 @@ public class GuiseMummy implements Clogged {
 	public void mummify(@Nonnull final Path sourceDirectory, @Nonnull final Path targetDirectory) throws IOException {
 		final Context context = new Context(sourceDirectory, targetDirectory);
 
-		//plan phase
-		final Artifact rootArtifact = new DirectoryMummifier().plan(context, sourceDirectory); //TODO create special SiteMummifier extending DirectoryMummifier 
-		printArtifactDescription(rootArtifact);
+		//#plan phase
+		final Artifact rootArtifact = new DirectoryMummifier().plan(context, sourceDirectory); //TODO create special SiteMummifier extending DirectoryMummifier
+		context.updatePlan(rootArtifact);
 
-		//mummify phase
+		printArtifactDescription(context, rootArtifact);
+
+		//#mummify phase
 		rootArtifact.getMummifier().mummify(context, rootArtifact);
 	}
 
 	//TODO document
-	private void printArtifactDescription(@Nonnull final Artifact artifact) { //TODO transfer to CLI
+	private void printArtifactDescription(@Nonnull final MummyContext context, @Nonnull final Artifact artifact) { //TODO transfer to CLI
 		System.out.println(artifact.getTargetPath());
+
+		context.getParentArtifact(artifact).ifPresent(parent -> System.out.println("  parent: " + parent.getTargetPath()));
+		final Collection<Artifact> siblings = context.getSiblingArtifacts(artifact);
+		if(!siblings.isEmpty()) {
+			System.out.println("  siblings: " + siblings);
+		}
+		final Collection<Artifact> children = context.getChildArtifacts(artifact);
+		if(!children.isEmpty()) {
+			System.out.println("  children: " + children);
+		}
+
 		if(artifact instanceof CollectionArtifact) {
 			for(final Artifact childArtifact : ((CollectionArtifact)artifact).getChildArtifacts()) {
-				printArtifactDescription(childArtifact);
+				printArtifactDescription(context, childArtifact);
 			}
 		}
 	}
@@ -131,7 +144,7 @@ public class GuiseMummy implements Clogged {
 		 * {@inheritDoc}
 		 * @implSpec This specification currently ignores dotfiles, for example <code>.git</code> and <code>.gitignore</code>; as well as non-regular files.
 		 */
-		public boolean isIgnore(@Nonnull final Path sourcePath) {
+		public boolean isIgnore(final Path sourcePath) {
 			if(isDotfile(sourcePath)) { //ignore dotfiles
 				return true;
 			}
@@ -139,6 +152,26 @@ public class GuiseMummy implements Clogged {
 				return true;
 			}
 			return false;
+		}
+
+		private final Map<Artifact, Artifact> parentArtifactsByArtifact = new HashMap<>();
+
+		@Override
+		public Optional<Artifact> getParentArtifact(final Artifact artifact) {
+			return Optional.ofNullable(parentArtifactsByArtifact.get(requireNonNull(artifact)));
+		}
+
+		/**
+		 * Recursively updates the mummification plan for the given artifact. Parent artifacts are updated in the map, for example.
+		 * @param artifact The artifact the plan of which to update.
+		 */
+		protected void updatePlan(@Nonnull final Artifact artifact) {
+			requireNonNull(artifact);
+			if(artifact instanceof CollectionArtifact) {
+				for(final Artifact childArtifact : ((CollectionArtifact)artifact).getChildArtifacts()) {
+					parentArtifactsByArtifact.put(childArtifact, artifact); //map the parent to the child
+				}
+			}
 		}
 
 	}

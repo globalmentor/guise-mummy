@@ -17,12 +17,15 @@
 package io.guise.mummy;
 
 import static com.globalmentor.java.Conditions.*;
+import static java.util.Collections.*;
+import static java.util.Objects.*;
 
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Optional;
 
-import javax.annotation.Nonnull;
+import javax.annotation.*;
 
 /**
  * Provides information about context of static site generation.
@@ -84,5 +87,55 @@ public interface MummyContext {
 	 * @return The mummifier for the given source.
 	 */
 	public Optional<Mummifier> getMummifier(@Nonnull final Path sourcePath);
+
+	/**
+	 * Retrieves the artifact that should act as a referent in relation to this artifact.
+	 * <p>
+	 * For example, a <code>/foo/bar/index.html</code> artifact is merely the implementation for storing the content of the <code>/foo/bar/</code>, and other
+	 * resources will refer to <code>/foo/bar/</code>, not <code>/foo/bar/index.html</code>. Therefore <code>/foo/bar/</code> will be the referent artifact of
+	 * <code>/foo/bar/index.html</code>.
+	 * </p>
+	 * @param artifact The artifact for which a referent resource should be retrieved.
+	 * @return The resource for acting as the target of links, which may be the given resource itself.
+	 */
+	//TODO delete public Artifact getReferentArtifact(@Nonnull final Artifact artifact);
+
+	/**
+	 * Determines the parent artifact of some artifact.
+	 * @param artifact The artifact for which a parent is to be determined.
+	 * @return The parent artifact, if any, of the given artifact.
+	 */
+	public Optional<Artifact> getParentArtifact(@Nonnull final Artifact artifact);
+
+	/**
+	 * Determines the child artifacts of some artifact.
+	 * @param artifact The artifact for which children should be returned.
+	 * @return The child artifacts, if any, of the given artifact.
+	 */
+	public default Collection<Artifact> getChildArtifacts(@Nonnull final Artifact artifact) {
+		return requireNonNull(artifact) instanceof CollectionArtifact ? ((CollectionArtifact)artifact).getChildArtifacts() : emptySet();
+	}
+
+	/**
+	 * Determines the artifacts that are siblings to the given artifact. An artifact will not have siblings if it has no parent. If any artifacts are returned,
+	 * the returned artifacts <em>will</em> include the given artifact. This means that a single child artifact will return itself as the single sibling artifact.
+	 * @param artifact The artifact for which siblings should be returned.
+	 * @return The sibling artifacts, if any, of the given artifact, including the given artifact.
+	 */
+	public default Collection<Artifact> getSiblingArtifacts(@Nonnull final Artifact artifact) {
+		return getParentArtifact(artifact).map(this::getChildArtifacts).orElse(emptySet());
+	}
+
+	/**
+	 * Determines the artifacts suitable for direct subsequent navigation from this artifact, <em>excluding</em> the parent artifact. The sibling artifacts are
+	 * returned, they will include the given resource.
+	 * @apiNote This method is equivalent to calling {@link #getChildArtifacts(Artifact)} if the artifact is a {@link CollectionArtifact}, otherwise calling
+	 *          {@link #getSiblingArtifacts(Artifact)}.
+	 * @param artifact The artifact for which navigation artifacts should be returned.
+	 * @return The artifacts for subsequent navigation from this artifact.
+	 */
+	public default Collection<Artifact> getNavigationArtifacts(@Nonnull final Artifact artifact) {
+		return artifact instanceof CollectionArtifact ? getChildArtifacts(artifact) : getSiblingArtifacts(artifact);
+	}
 
 }

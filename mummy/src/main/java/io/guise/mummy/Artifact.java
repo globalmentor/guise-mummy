@@ -21,6 +21,9 @@ import java.util.Set;
 
 /**
  * Provides information about the artifact produced by mummifying a resource.
+ * <p>
+ * Artifact equality is determined by target path as given by {@link #getTargetPath()}.
+ * </p>
  * @author Garret Wilson
  */
 public interface Artifact {
@@ -47,4 +50,5 @@ public interface Artifact {
 
 	/** @return The mummifier responsible for mummifying this artifact. */
 	public Mummifier getMummifier();
+
 }

@@ -76,14 +76,12 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		final List<Artifact> childArtifacts = new ArrayList<>();
 		try (final Stream<Path> childPaths = list(sourcePath).filter(not(context::isIgnore))) {
 			childPaths.forEach(throwingConsumer(childSourcePath -> {
-				if(isRegularFile(sourcePath) || isDirectory(sourcePath)) {
+				if(!childSourcePath.equals(contentFile.orElse(null))) { //skip the content file TODO create an optional comparison utility method
 					final Optional<Mummifier> childMummifier = context.getMummifier(childSourcePath);
 					childMummifier.ifPresent(throwingConsumer(mummifier -> {
 						final Artifact childArtifact = mummifier.plan(context, childSourcePath);
 						childArtifacts.add(childArtifact);
 					}));
-				} else {
-					getLogger().warn("Skipping non-regular file {}.", childSourcePath);
 				}
 			}));
 		}
@@ -92,7 +90,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	}
 
 	@Override
-	public void mummify(final MummyContext context, final Artifact artifact) throws IOException {
+	public void mummify(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
 		checkArgument(artifact instanceof DirectoryArtifact, "Artifact %s is not a directory artifact.");
 		checkArgument(isDirectory(artifact.getSourcePath()), "Source path %s does not exist or is not a directory.");
 
@@ -103,7 +101,8 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		createDirectories(artifact.getTargetPath());
 
 		//mummify the directory content artifact, if present
-		directoryArtifact.getContentArtifact().ifPresent(throwingConsumer(contentArtifact -> contentArtifact.getMummifier().mummify(context, contentArtifact)));
+		directoryArtifact.getContentArtifact()
+				.ifPresent(throwingConsumer(contentArtifact -> contentArtifact.getMummifier().mummify(context, artifact, contentArtifact)));
 
 		//mummify each child artifact
 		for(final Artifact childArtifact : directoryArtifact.getChildArtifacts()) {

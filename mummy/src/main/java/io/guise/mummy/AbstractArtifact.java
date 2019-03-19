@@ -25,6 +25,7 @@ import javax.annotation.*;
 
 /**
  * Abstract implementation of an artifact.
+ * @implSpec This class implements artifact equality.
  * @author Garret Wilson
  */
 public abstract class AbstractArtifact implements Artifact {
@@ -79,4 +80,21 @@ public abstract class AbstractArtifact implements Artifact {
 	public String toString() {
 		return "(" + getSourcePath() + " -> " + getTargetPath() + ")";
 	}
+
+	@Override
+	public int hashCode() {
+		return getTargetPath().hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object object) {
+		if(object == this) {
+			return true;
+		}
+		if(!(object instanceof Artifact)) {
+			return false;
+		}
+		return getTargetPath().equals(((Artifact)object).getTargetPath());
+	}
+
 }

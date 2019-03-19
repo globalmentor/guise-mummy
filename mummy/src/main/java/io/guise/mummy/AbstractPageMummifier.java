@@ -49,7 +49,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	}
 
 	@Override
-	public void mummify(final MummyContext context, final Artifact artifact) throws IOException {
+	public void mummify(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
 
 		final Document document = loadSourceDocument(artifact.getSourcePath());
 

@@ -26,6 +26,12 @@ import io.clogr.Clogged;
 
 /**
  * Processes a resource for mummification.
+ * <p>
+ * During mummification, it is important to determine references such as relative links in relation to the <dfn>context artifact</dfn>. An artifact such as
+ * <code>/foo/bar/index.html</code> may merely be the implementation for storing the content of the <code>/foo/bar/</code>, and other resources will refer to
+ * <code>/foo/bar/</code>, not <code>/foo/bar/index.html</code>. In that case <code>/foo/bar/</code> will be the context artifact, and it should be used when
+ * requesting e.g. child or sibling artifacts from the mummy context.
+ * </p>
  * @author Garret Wilson
  */
 public interface Mummifier extends Clogged {
@@ -51,10 +57,23 @@ public interface Mummifier extends Clogged {
 
 	/**
 	 * Mummifies a resource.
+	 * @apiNote This method should normally not be overridden. Implementations should override {@link #mummify(MummyContext, Artifact, Artifact)} instead.
+	 * @implSpec The default implementation delegates to {@link #mummify(MummyContext, Artifact, Artifact)}.
 	 * @param context The context of static site generation.
 	 * @param artifact The artifact being generated.
 	 * @throws IOException if there is an I/O error during static site generation.
 	 */
-	public void mummify(@Nonnull final MummyContext context, @Nonnull Artifact artifact) throws IOException;
+	public default void mummify(@Nonnull final MummyContext context, @Nonnull Artifact artifact) throws IOException {
+		mummify(context, artifact, artifact);
+	}
+
+	/**
+	 * Mummifies a resource in the presence of a context artifact, which may or may not be the same as the artifact itself.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact being generated
+	 * @throws IOException if there is an I/O error during static site generation.
+	 */
+	public void mummify(@Nonnull final MummyContext context, @Nonnull Artifact contextArtifact, @Nonnull Artifact artifact) throws IOException;
 
 }
