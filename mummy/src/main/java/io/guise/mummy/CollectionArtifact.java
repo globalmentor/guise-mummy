@@ -16,10 +16,15 @@
 
 package io.guise.mummy;
 
+import java.util.Collection;
+
 /**
- * Provides information about context of static site generation.
+ * An artifact such as a directory that has child artifacts.
  * @author Garret Wilson
  */
-public class GuiseMummyContext {
+public interface CollectionArtifact extends Artifact {
+
+	/** @return The child artifacts of this artifact. */
+	public Collection<Artifact> getChildArtifacts();
 
 }

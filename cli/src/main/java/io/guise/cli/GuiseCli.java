@@ -23,7 +23,7 @@ import javax.annotation.*;
 
 import com.globalmentor.application.*;
 
-import io.guise.mummy.GuiseMummifier;
+import io.guise.mummy.GuiseMummy;
 import picocli.CommandLine.*;
 
 /**
@@ -53,7 +53,7 @@ public class GuiseCli extends BaseCliApplication {
 	public void mummify(
 			@Option(names = "--target", description = "The target directory into which the site will be generated; will be created if needed.", required = true) final Path targetDirectory,
 			@Parameters(paramLabel = "<source-directory>", description = "The root directory of the site to mummify.") @Nonnull final Path sourceDirectory) {
-		final GuiseMummifier mummifier = new GuiseMummifier();
+		final GuiseMummy mummifier = new GuiseMummy();
 		try {
 			mummifier.mummify(sourceDirectory, targetDirectory);
 		} catch(final IOException ioException) {

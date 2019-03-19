@@ -19,7 +19,7 @@ package io.guise.mummy;
 import static java.nio.file.Files.*;
 
 import java.io.*;
-import java.nio.file.*;
+import java.nio.file.Path;
 import java.util.Set;
 
 import javax.xml.parsers.*;
@@ -27,21 +27,23 @@ import javax.xml.parsers.*;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import com.globalmentor.html.HtmlSerializer;
-
 /**
  * Mummifier for XHTML documents, such as HTML5 documents stored as XML.
  * @author Garret Wilson
  */
-public class XhtmlMummifier implements ResourceMummifier {
+public class XhtmlPageMummifier extends AbstractPageMummifier {
 
 	@Override
 	public Set<String> getSupportedFilenameExtensions() {
 		return Set.of("xhtml"); //TODO use constant
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This version loads a document in XHTML format.
+	 */
 	@Override
-	public void mummify(final GuiseMummyContext context, final Path resourcePath, final Path outputPath) throws IOException {
+	protected Document loadSourceDocument(Path sourceFile) throws IOException {
 		final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance(); //TODO use shared factory?
 		documentBuilderFactory.setNamespaceAware(true);
 		DocumentBuilder documentBuilder;
@@ -50,22 +52,13 @@ public class XhtmlMummifier implements ResourceMummifier {
 		} catch(final ParserConfigurationException parserConfigurationException) {
 			throw new IOException(parserConfigurationException);
 		}
-		final Document document;
-		try (final InputStream inputStream = new BufferedInputStream(newInputStream(resourcePath))) {
+		try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile))) {
 			try {
-				document = documentBuilder.parse(inputStream);//TODO install appropriate entity resolvers as needed
+				return documentBuilder.parse(inputStream);//TODO install appropriate entity resolvers as needed
 			} catch(final SAXException saxException) {
 				throw new IOException(saxException);
 			}
 		}
-
-		System.out.println("parsed document: " + resourcePath);
-		try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(outputPath))) {
-			final HtmlSerializer htmlSerializer = new HtmlSerializer(true);
-			htmlSerializer.serialize(document, outputStream);
-		}
-		System.out.println("generated document: " + outputPath);
-
 	}
 
 }
