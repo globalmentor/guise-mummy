@@ -22,6 +22,7 @@ import java.io.*;
 import java.nio.file.Path;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.xml.parsers.*;
 
 import org.w3c.dom.Document;
@@ -43,7 +44,8 @@ public class XhtmlPageMummifier extends AbstractPageMummifier {
 	 * @implSpec This version loads a document in XHTML format.
 	 */
 	@Override
-	protected Document loadSourceDocument(Path sourceFile) throws IOException {
+	protected Document loadSourceDocument(@Nonnull MummyContext context, final Artifact contextArtifact, final Artifact artifact, final Path sourceFile)
+			throws IOException {
 		final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance(); //TODO use shared factory?
 		documentBuilderFactory.setNamespaceAware(true);
 		DocumentBuilder documentBuilder;
