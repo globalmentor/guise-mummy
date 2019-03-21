@@ -119,26 +119,18 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 		//TODO transfer to some system of pluggable element processing strategies
 
-		if(XHTML_NAMESPACE_URI.toString().equals(sourceElement.getNamespaceURI())) {
-			if(ELEMENT_OL.equals(sourceElement.getLocalName()) || ELEMENT_UL.equals(sourceElement.getLocalName())) { //<ol> or <ul>
+		if("regenerate".equals(getDefinedAttributeNS(sourceElement, "https://guise.io/name/mummy/", "regenerate"))) { //TODO use constants
 
-				boolean inMummyRegenerateNav = false; //TODO create XML utility method hasParent()
-				Node parentNode = sourceElement.getParentNode();
-				while(!inMummyRegenerateNav && parentNode instanceof Element) {
-					final Element parentElement = (Element)parentNode;
-					if(XHTML_NAMESPACE_URI.toString().equals(parentNode.getNamespaceURI()) && ELEMENT_NAV.equals(parentNode.getLocalName())) { //<nav>
-						//TODO create an Optional findDefinedAttributeNS() method, with true URI variation
-						if("regenerate".equals(getDefinedAttributeNS(parentElement, "https://guise.io/name/mummy/", "regenerate"))) { //TODO use constants
-							inMummyRegenerateNav = true;
-						}
+			//<nav><ol> or <nav><ul>
+			if(XHTML_NAMESPACE_URI.toString().equals(sourceElement.getNamespaceURI())) {
+				if(ELEMENT_OL.equals(sourceElement.getLocalName()) || ELEMENT_UL.equals(sourceElement.getLocalName())) { //<ol> or <ul>
+
+					if(hasAncestorElementNS(sourceElement, XHTML_NAMESPACE_URI.toString(), ELEMENT_NAV)) { //if this is a navigation list
+						return regenerateNavigationList(context, contextArtifact, artifact, sourceElement);
 					}
-					parentNode = parentNode.getParentNode();
-				}
-
-				if(inMummyRegenerateNav) {
-					return regenerateNavigationList(context, contextArtifact, artifact, sourceElement);
 				}
 			}
+
 		}
 
 		processChildElements(context, contextArtifact, artifact, sourceElement);
@@ -217,8 +209,9 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		}).forEach(navigationArtifact -> {
 			final Element liElement = (Element)liTemplate.cloneNode(true);
 			findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI.toString(), ELEMENT_A)).map(Element.class::cast).ifPresent(aElement -> { //find <li><a>
-				aElement.setAttributeNS(XHTML_NAMESPACE_URI.toString(), ELEMENT_A_ATTRIBUTE_HREF, navigationArtifact.getSourcePath().toUri().toString()); //TODO relativize
-				appendText(aElement, Filenames.removeExtension(navigationArtifact.getSourcePath().getFileName().toString())); //TODO create Paths.removeExtension()
+				aElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, navigationArtifact.getSourcePath().toUri().toString()); //TODO relativize
+				//remove all text and add the link label
+				appendText(removeChildren(aElement), Filenames.removeExtension(navigationArtifact.getSourcePath().getFileName().toString())); //TODO create Paths.removeExtension()
 			});
 			navigationListElement.appendChild(liElement);
 			appendText(navigationListElement, System.lineSeparator()); //TODO remove when HTML formatting is fixed
