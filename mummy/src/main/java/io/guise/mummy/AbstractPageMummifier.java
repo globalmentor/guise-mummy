@@ -209,7 +209,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		}).forEach(navigationArtifact -> {
 			final Element liElement = (Element)liTemplate.cloneNode(true);
 			findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI.toString(), ELEMENT_A)).map(Element.class::cast).ifPresent(aElement -> { //find <li><a>
-				aElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, navigationArtifact.getSourcePath().toUri().toString()); //TODO relativize
+				aElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, context.relativizeSourceReference(contextArtifact, navigationArtifact).toString());
 				//remove all text and add the link label
 				appendText(removeChildren(aElement), Filenames.removeExtension(navigationArtifact.getSourcePath().getFileName().toString())); //TODO create Paths.removeExtension()
 			});

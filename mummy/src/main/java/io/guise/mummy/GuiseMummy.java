@@ -165,7 +165,7 @@ public class GuiseMummy implements Clogged {
 
 		@Override
 		public Optional<Artifact> getArtifactBySourceReference(final Path referenceSourcePath) {
-			return Optional.ofNullable(artifactsByReferenceSourcePath.get(requireNonNull(referenceSourcePath)));
+			return Optional.ofNullable(artifactsByReferenceSourcePath.get(checkArgumentAbsolute(referenceSourcePath)));
 		}
 
 		/**
