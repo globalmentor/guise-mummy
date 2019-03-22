@@ -17,7 +17,6 @@
 package io.guise.mummy;
 
 import static com.globalmentor.io.Paths.*;
-import static com.globalmentor.java.Conditions.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
 
@@ -77,10 +76,7 @@ public interface MummyContext {
 	 * @see #getSiteTargetDirectory()
 	 */
 	public default Path getTargetPath(@Nonnull final Path sourcePath) {
-		//TODO create Paths utility method for changing the base
-		final Path relativePath = getSiteSourceDirectory().relativize(sourcePath);
-		checkArgument(!relativePath.isAbsolute(), "Source path %s is not on in the source directory tree %s.", sourcePath, getSiteSourceDirectory());
-		return getSiteTargetDirectory().resolve(relativePath);
+		return changeBase(sourcePath, getSiteSourceDirectory(), getSiteTargetDirectory());
 	}
 
 	/**

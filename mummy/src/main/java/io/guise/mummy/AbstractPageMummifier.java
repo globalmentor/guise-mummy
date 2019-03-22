@@ -176,7 +176,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
-	 * @param sourceElement The source element to process.
+	 * @param navigationListElement The list element to regenerate.
 	 * @return The processed element(s), if any, to replace the source element.
 	 * @throws IOException if there is an error processing the element.
 	 */
@@ -211,7 +211,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI.toString(), ELEMENT_A)).map(Element.class::cast).ifPresent(aElement -> { //find <li><a>
 				aElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, context.relativizeSourceReference(contextArtifact, navigationArtifact).toString());
 				//remove all text and add the link label
-				appendText(removeChildren(aElement), Filenames.removeExtension(navigationArtifact.getSourcePath().getFileName().toString())); //TODO create Paths.removeExtension()
+				appendText(removeChildren(aElement), Filenames.removeExtension(navigationArtifact.getSourcePath().getFileName().toString()));
 			});
 			navigationListElement.appendChild(liElement);
 			appendText(navigationListElement, System.lineSeparator()); //TODO remove when HTML formatting is fixed
