@@ -16,16 +16,17 @@
 
 package io.guise.mummy;
 
-import static com.globalmentor.java.Conditions.*;
+import static com.globalmentor.io.Paths.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
 
 import java.net.URI;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 import javax.annotation.*;
+
+import com.globalmentor.net.URIPath;
 
 /**
  * Provides information about context of static site generation.
@@ -75,10 +76,7 @@ public interface MummyContext {
 	 * @see #getSiteTargetDirectory()
 	 */
 	public default Path getTargetPath(@Nonnull final Path sourcePath) {
-		//TODO create Paths utility method for changing the base
-		final Path relativePath = getSiteSourceDirectory().relativize(sourcePath);
-		checkArgument(!relativePath.isAbsolute(), "Source path %s is not on in the source directory tree %s.", sourcePath, getSiteSourceDirectory());
-		return getSiteTargetDirectory().resolve(relativePath);
+		return changeBase(sourcePath, getSiteSourceDirectory(), getSiteTargetDirectory());
 	}
 
 	/**
@@ -139,16 +137,65 @@ public interface MummyContext {
 	}
 
 	/**
-	 * Retrieves an artifact referred to by a reference source path.
+	 * Retrieves an artifact referred to by a reference source path in the file system.
 	 * <p>
 	 * The source path of the returned artifact may not actually be equal to given source path. For example, a referent source path of
 	 * <code>/foo/bar/index.xhtml</code> might return the artifact for the file that exists at the source path <code>/foo/bar/</code>, because any link to
 	 * <code>/foo/bar/index.xhtml</code> is really referring to <code>/foo/bar/</code>; the <code>/foo/bar/index.xhtml</code> file is merely an implementation
 	 * detail for storing the content of <code>/foo/bar/</code>.
 	 * </p>
-	 * @param referenceSourcePath The source path being used as a reference to some artifact.
+	 * @param referenceSourcePath The absolute source path being used as a reference to some artifact.
 	 * @return The artifact referred to by a reference source path.
+	 * @throws IllegalArgumentException if the given reference path is not absolute.
 	 */
 	public Optional<Artifact> getArtifactBySourceReference(@Nonnull final Path referenceSourcePath);
+
+	//TODO for looking up destinations from existing links	
+	//	public Optional<Artifact> getArtifactBySourceReference(@Nonnull final Artifact contextArtifact, @Nonnull final URIPath referenceRelativeSourcePath) {
+	//		Conditions.checkArgument(referenceRelativeSourcePath.isRelative(), "Absolute references not yet supported.");
+	//	}
+
+	/**
+	 * Relativizes a reference from one artifact to another in the source file system relative to a context artifact. The returned reference will be a URI path
+	 * relative to the given context artifact.
+	 * @param contextArtifact The artifact the reference path should be relativized against.
+	 * @param referentArtifact The artifact being referred to.
+	 * @return The reference path to the referent artifact relative to the context artifact as a URI path.
+	 */
+	public default URIPath relativizeSourceReference(@Nonnull final Artifact contextArtifact, @Nonnull final Artifact referentArtifact) {
+		return relativizeSourceReference(contextArtifact, referentArtifact.getSourcePath());
+	}
+
+	/**
+	 * Relativizes an absolute reference to a source file in the file system relative to a context artifact. The reference must be to a path within the site. The
+	 * returned reference will be a URI path relative to the given artifact.
+	 * @param contextArtifact The artifact the reference path should be relativized against.
+	 * @param referenceSourcePath The absolute reference source path to relativize.
+	 * @return The reference path relative to the context artifact as a URI path.
+	 */
+	public default URIPath relativizeSourceReference(@Nonnull final Artifact contextArtifact, @Nonnull final Path referenceSourcePath) {
+		return relativizeSourceReference(contextArtifact.getSourcePath(), referenceSourcePath);
+	}
+
+	/**
+	 * Relativizes a reference to a source file in the file system against some base path. Both paths must be within the site. The returned reference will be a
+	 * URI path (e.g. appropriate for web references) relative to the base path.
+	 * @implNote This does not yet properly relativize paths that require backtracking, such as siblings; see
+	 *           <a href="https://bugs.java.com/bugdatabase/view_bug.do?bug_id=6226081">JDK-6226081</a>.
+	 * @param baseSourcePath The absolute path against which the reference path with be relativized.
+	 * @param referenceSourcePath The absolute reference source path to relativize.
+	 * @return The reference path relative to the base path as a URI path.
+	 * @throws IllegalArgumentException if the source path and or the base path is not absolute and/or is not within the site.
+	 * @see #getSiteSourceDirectory()
+	 */
+	public default URIPath relativizeSourceReference(@Nonnull final Path baseSourcePath, @Nonnull final Path referenceSourcePath) {
+		checkArgumentSubPath(getSiteSourceDirectory(), checkArgumentAbsolute(baseSourcePath));
+		checkArgumentSubPath(getSiteSourceDirectory(), checkArgumentAbsolute(referenceSourcePath));
+		//relativizing file system paths supports backtracking (`..`, e.g. siblings or parents); see e.g. https://stackoverflow.com/a/705963/421049
+		//TODO fix; this creates a relative path, but toURI() converts it back to an absolute URI using the home path: this final URIPath relativeUriPath = new URIPath(baseSourcePath.relativize(referenceSourcePath).toUri());
+		//TODO fix assert relativeUriPath.isRelative();
+		System.out.println("URI relativization: " + URIPath.relativize(baseSourcePath.toUri(), referenceSourcePath.toUri()));
+		return URIPath.relativize(baseSourcePath.toUri(), referenceSourcePath.toUri());
+	}
 
 }

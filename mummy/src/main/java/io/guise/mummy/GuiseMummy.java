@@ -129,10 +129,12 @@ public class GuiseMummy implements Clogged {
 		 * Site source directory constructor.
 		 * @param siteSourceDirectory The source directory of the entire site.
 		 * @param siteTargetDirectory The base output directory of the site being mummified.
+		 * @throws IllegalArgumentException if the source and target directories overlap.
 		 */
 		public Context(@Nonnull final Path siteSourceDirectory, @Nonnull final Path siteTargetDirectory) {
+			checkArgumentDisjoint(siteSourceDirectory, siteTargetDirectory);
 			this.siteSourceDirectory = requireNonNull(siteSourceDirectory);
-			this.siteTargetDirectory = requireNonNull(siteTargetDirectory); //TODO make sure they don't overlap
+			this.siteTargetDirectory = requireNonNull(siteTargetDirectory);
 		}
 
 		@Override
@@ -165,7 +167,7 @@ public class GuiseMummy implements Clogged {
 
 		@Override
 		public Optional<Artifact> getArtifactBySourceReference(final Path referenceSourcePath) {
-			return Optional.ofNullable(artifactsByReferenceSourcePath.get(requireNonNull(referenceSourcePath)));
+			return Optional.ofNullable(artifactsByReferenceSourcePath.get(checkArgumentAbsolute(referenceSourcePath)));
 		}
 
 		/**
