@@ -22,6 +22,7 @@ import static com.globalmentor.xml.XML.*;
 import static java.nio.file.Files.*;
 
 import java.io.*;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -30,7 +31,9 @@ import javax.annotation.*;
 import org.w3c.dom.*;
 
 import com.globalmentor.html.HtmlSerializer;
+import com.globalmentor.html.spec.HTML;
 import com.globalmentor.io.Filenames;
+import com.globalmentor.net.URIPath;
 
 /**
  * Abstract base mummifier for generating HTML pages.
@@ -55,18 +58,32 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	@Override
 	public void mummify(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
 
-		final Document sourceDocument = loadSourceDocument(context, contextArtifact, artifact, artifact.getSourcePath());
-		System.out.println("loaded source document: " + artifact.getSourcePath());
+		try {
 
-		final Document processedDocument = processDocument(context, contextArtifact, artifact, sourceDocument);
+			//#load source document: get starting content to work with
+			final Document sourceDocument = loadSourceDocument(context, contextArtifact, artifact, artifact.getSourcePath());
+			getLogger().debug("loaded source document: {}", artifact.getSourcePath());
 
-		try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))) {
-			final HtmlSerializer htmlSerializer = new HtmlSerializer(true);
-			htmlSerializer.serialize(processedDocument, outputStream);
+			//#process document: evaluate expressions and perform transformations
+			final Document processedDocument = processDocument(context, contextArtifact, artifact, sourceDocument);
+
+			//#relocate document: translate path references from the source to the target
+			final Document relocatedDocument = relocateDocument(context, contextArtifact, artifact, processedDocument);
+
+			//#save target document
+			try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))) {
+				final HtmlSerializer htmlSerializer = new HtmlSerializer(true);
+				htmlSerializer.serialize(relocatedDocument, outputStream);
+			}
+			getLogger().debug("generated output document: {}", artifact.getTargetPath());
+
+		} catch(final DOMException domException) { //convert XML errors to I/O errors
+			throw new IOException(domException);
 		}
-		System.out.println("generated output document: " + artifact.getTargetPath());
 
 	}
+
+	//#load
 
 	/**
 	 * Loads the source file and returns it as a document to be further refined before being used to generate the artifact.
@@ -82,9 +99,12 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @param sourceFile The file from which to load the document.
 	 * @return A document describing the source content of the artifact to generate.
 	 * @throws IOException if there is an error loading and/or converting the source file contents.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	protected abstract Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull Artifact contextArtifact, @Nonnull Artifact artifact,
-			@Nonnull Path sourceFile) throws IOException;
+			@Nonnull Path sourceFile) throws IOException, DOMException;
+
+	//#process
 
 	/**
 	 * Processes a source document before it is converted to an output document.
@@ -92,11 +112,12 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @param sourceDocument The source document to process.
-	 * @return The processed document ready, which may or may not be the same document supplied as input.
+	 * @return The processed document, which may or may not be the same document supplied as input.
 	 * @throws IOException if there is an error processing the document.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	protected Document processDocument(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Document sourceDocument) throws IOException {
+			@Nonnull final Document sourceDocument) throws IOException, DOMException {
 		processChildElements(context, contextArtifact, artifact, sourceDocument.getDocumentElement()); //process the root children, because the root can't be replaced
 		return sourceDocument;
 	}
@@ -113,9 +134,10 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @param sourceElement The source element to process.
 	 * @return The processed element(s), if any, to replace the source element.
 	 * @throws IOException if there is an error processing the element.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	protected List<Element> processElement(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Element sourceElement) throws IOException {
+			@Nonnull final Element sourceElement) throws IOException, DOMException {
 
 		//TODO transfer to some system of pluggable element processing strategies
 
@@ -146,9 +168,10 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @param artifact The artifact being generated
 	 * @param sourceElement The source element the children of which to process.
 	 * @throws IOException if there is an error processing the child elements.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	protected void processChildElements(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Element sourceElement) throws IOException {
+			@Nonnull final Element sourceElement) throws IOException, DOMException {
 		final NodeList childNodes = sourceElement.getChildNodes();
 		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength();) { //advance the index manually as needed
 			final Node childNode = childNodes.item(childNodeIndex);
@@ -168,7 +191,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	}
 
 	/**
-	 * Processes a source document element.
+	 * Regenerates a navigation list based upon the parent, sibling, and/or child navigation artifacts relative to the context artifact.
 	 * <p>
 	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
 	 * element is removed.
@@ -179,9 +202,10 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @param navigationListElement The list element to regenerate.
 	 * @return The processed element(s), if any, to replace the source element.
 	 * @throws IOException if there is an error processing the element.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	protected List<Element> regenerateNavigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Element navigationListElement) throws IOException {
+			@Nonnull final Element navigationListElement) throws IOException, DOMException {
 
 		//determine the templates
 		Element discoveredLiTemplate = null;
@@ -218,6 +242,122 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		});
 
 		return List.of(navigationListElement);
+	}
+
+	//#relocate
+
+	/**
+	 * Relocates a document by retargeting its references.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact being generated
+	 * @param sourceDocument The source document to relocate.
+	 * @return The relocated document, which may or may not be the same document supplied as input.
+	 * @throws IOException if there is an error relocating the document.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 */
+	protected Document relocateDocument(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
+			@Nonnull final Document sourceDocument) throws IOException, DOMException {
+		relocateChildElements(context, contextArtifact, artifact, sourceDocument.getDocumentElement()); //relocate the root children, because the root can't be replaced
+		return sourceDocument;
+	}
+
+	/**
+	 * Relocates a source document element by retargeting its references.
+	 * <p>
+	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
+	 * element is removed.
+	 * </p>
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact being generated
+	 * @param sourceElement The source element to relocate.
+	 * @return The relocated element(s), if any, to replace the source element.
+	 * @throws IOException if there is an error relocating the element.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 */
+	protected List<Element> relocateElement(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
+			@Nonnull final Element sourceElement) throws IOException, DOMException {
+
+		//TODO transfer to some system of pluggable element relocating strategies
+
+		//<a> TODO add support for other links, such as stylesheet links
+		if(XHTML_NAMESPACE_URI.toString().equals(sourceElement.getNamespaceURI())) {
+			if(ELEMENT_A.equals(sourceElement.getLocalName())) { //<a>
+				return relocateLink(context, contextArtifact, artifact, sourceElement);
+			}
+		}
+
+		relocateChildElements(context, contextArtifact, artifact, sourceElement);
+
+		return List.of(sourceElement);
+	}
+
+	/**
+	 * Relocates child elements of an existing element by retargeting references.
+	 * @implNote This implementation does not yet allow returning different nodes than the one being relocated.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact being generated
+	 * @param sourceElement The source element the children of which to relocate.
+	 * @throws IOException if there is an error relocating the child elements.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 */
+	protected void relocateChildElements(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
+			@Nonnull final Element sourceElement) throws IOException, DOMException {
+		final NodeList childNodes = sourceElement.getChildNodes();
+		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength();) { //advance the index manually as needed
+			final Node childNode = childNodes.item(childNodeIndex);
+			if(!(childNode instanceof Element)) { //skip non-elements
+				childNodeIndex++;
+				continue;
+			}
+			final Element childElement = (Element)childNode;
+			final List<Element> relocatedElements = relocateElement(context, contextArtifact, artifact, childElement);
+			final int relocatedElementCount = relocatedElements.size();
+			childNodeIndex += relocatedElementCount; //manually advance the index based upon the replacement nodes
+			if(relocatedElementCount == 1 && relocatedElements.get(0) == childElement) { //if no structural changes were requested
+				continue;
+			}
+			throw new UnsupportedOperationException("Structural changes not yet supported when relocating individual child elements.");
+		}
+	}
+
+	/**
+	 * Relocates a link element by retargeting its {@value HTML#ELEMENT_A_ATTRIBUTE_HREF} attribute.
+	 * <p>
+	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
+	 * element is removed.
+	 * </p>
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact being generated
+	 * @param linkElement The list element such a {@code <a>} to relocate.
+	 * @return The relocated element(s), if any, to replace the source element.
+	 * @throws IOException if there is an error relocating the element.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 */
+	protected List<Element> relocateLink(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
+			@Nonnull final Element linkElement) throws IOException, DOMException {
+		findAttributeNS(linkElement, null, ELEMENT_A_ATTRIBUTE_HREF).ifPresent(href -> {
+			getLogger().debug("  - found an href: {}", href);
+			//TODO check for the empty string and do something appropriate
+			final URI hrefURI = URI.create(href);
+			if(!hrefURI.isAbsolute()) { //only convert paths
+				final URIPath hrefPath = URIPath.fromURI(hrefURI);
+				if(hrefPath.isRelative()) { //only convert relative paths TODO maybe later support "context paths", rooted at the site root
+					context.findArtifactBySourceRelativeReference(contextArtifact, hrefPath).ifPresentOrElse(referentArtifact -> {
+						getLogger().debug("  -> found referent artifact: {}", referentArtifact);
+						final URIPath relativeTargetReference = context.relativizeTargetReference(contextArtifact, referentArtifact);
+						getLogger().debug("  -> -> mapping to : {}", relativeTargetReference);
+						linkElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, relativeTargetReference.toString());
+					}, () -> getLogger().warn("No target artifact found for source relative reference {}.", hrefPath));
+				}
+			}
+		});
+
+		return List.of(linkElement);
+
 	}
 
 }
