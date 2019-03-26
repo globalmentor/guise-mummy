@@ -818,7 +818,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	@Override
 	public URIPath relativizePath(final URIPath path) {
-		return getBasePath().relativize(path); //get the path relative to the application path 
+		return getBasePath().relativizeChildPath(path); //get the path relative to the application path 
 	}
 
 	@Override
@@ -850,7 +850,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@Override
 	public boolean hasResource(final String resourcePath) {
 		checkInstalled(); //make sure we're installed
-		final URIPath relativeApplicationPath = getContainer().getBasePath().relativize(getBasePath()); //get the application path relative to the container path 
+		final URIPath relativeApplicationPath = getContainer().getBasePath().relativizeChildPath(getBasePath()); //get the application path relative to the container path 
 		return container.hasResource(relativeApplicationPath.toString() + resourcePath); //delegate to the container
 	}
 
@@ -863,7 +863,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@Override
 	public InputStream getResourceInputStream(final String resourcePath) {
 		checkInstalled(); //make sure we're installed
-		final URIPath relativeApplicationPath = getContainer().getBasePath().relativize(getBasePath()); //get the application path relative to the container path 
+		final URIPath relativeApplicationPath = getContainer().getBasePath().relativizeChildPath(getBasePath()); //get the application path relative to the container path 
 		return container.getResourceInputStream(relativeApplicationPath.toString() + resourcePath); //delegate to the container
 	}
 

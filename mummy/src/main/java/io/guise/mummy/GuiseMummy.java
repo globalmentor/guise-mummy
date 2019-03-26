@@ -86,16 +86,18 @@ public class GuiseMummy implements Clogged {
 
 	//TODO document
 	private void printArtifactDescription(@Nonnull final MummyContext context, @Nonnull final Artifact artifact) { //TODO transfer to CLI
-		System.out.println(artifact.getTargetPath());
 
-		context.getParentArtifact(artifact).ifPresent(parent -> System.out.println("  parent: " + parent.getTargetPath()));
+		//TODO remove debug code
+		getLogger().debug("{} ({})", artifact.getTargetPath(), artifact.getTargetPath().toUri());
+
+		context.getParentArtifact(artifact).ifPresent(parent -> getLogger().debug("  parent: {}", parent.getTargetPath()));
 		final Collection<Artifact> siblings = context.getSiblingArtifacts(artifact);
 		if(!siblings.isEmpty()) {
-			System.out.println("  siblings: " + siblings);
+			getLogger().debug("  siblings: {}", siblings);
 		}
 		final Collection<Artifact> children = context.getChildArtifacts(artifact);
 		if(!children.isEmpty()) {
-			System.out.println("  children: " + children);
+			getLogger().debug("  children: {}", children);
 		}
 
 		if(artifact instanceof CollectionArtifact) {
@@ -166,7 +168,7 @@ public class GuiseMummy implements Clogged {
 		private final Map<Path, Artifact> artifactsByReferenceSourcePath = new HashMap<>();
 
 		@Override
-		public Optional<Artifact> getArtifactBySourceReference(final Path referenceSourcePath) {
+		public Optional<Artifact> findArtifactBySourceReference(final Path referenceSourcePath) {
 			return Optional.ofNullable(artifactsByReferenceSourcePath.get(checkArgumentAbsolute(referenceSourcePath)));
 		}
 
@@ -180,6 +182,7 @@ public class GuiseMummy implements Clogged {
 			if(artifact instanceof CollectionArtifact) {
 				for(final Artifact childArtifact : ((CollectionArtifact)artifact).getChildArtifacts()) {
 					parentArtifactsByArtifact.put(childArtifact, artifact); //map the parent to the child
+					updatePlan(childArtifact); //recursively update the plan for the children
 				}
 			}
 		}
