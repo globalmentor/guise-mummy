@@ -68,7 +68,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		//discover and plan the directory content file, if present
 		final Optional<Path> contentFile = discoverSourceDirectoryContentFile(context, sourcePath);
 		final Artifact contentArtifact = contentFile.map(throwingFunction(contentSourceFile -> {
-			final Mummifier contentMummifier = context.getMummifier(contentSourceFile).orElseThrow(IllegalStateException::new); //TODO improve error
+			final Mummifier contentMummifier = context.findMummifier(contentSourceFile).orElseThrow(IllegalStateException::new); //TODO improve error
 			return contentMummifier.plan(context, contentSourceFile);
 		})).orElse(null);
 
@@ -77,7 +77,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		try (final Stream<Path> childPaths = list(sourcePath).filter(not(context::isIgnore))) {
 			childPaths.forEach(throwingConsumer(childSourcePath -> {
 				if(!childSourcePath.equals(contentFile.orElse(null))) { //skip the content file TODO create an optional comparison utility method
-					final Optional<Mummifier> childMummifier = context.getMummifier(childSourcePath);
+					final Optional<Mummifier> childMummifier = context.findMummifier(childSourcePath);
 					childMummifier.ifPresent(throwingConsumer(mummifier -> {
 						final Artifact childArtifact = mummifier.plan(context, childSourcePath);
 						childArtifacts.add(childArtifact);
@@ -85,7 +85,6 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 				}
 			}));
 		}
-		;
 		return new DirectoryArtifact(this, sourcePath, targetDirectory, contentArtifact, childArtifacts);
 	}
 

@@ -17,12 +17,17 @@
 package io.guise.mummy;
 
 import static com.globalmentor.io.Paths.*;
+import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
+import static java.util.function.Predicate.*;
+import static org.zalando.fauxpas.FauxPas.*;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.*;
 import java.util.*;
+import java.util.stream.Stream;
 
 import javax.annotation.*;
 
@@ -80,11 +85,21 @@ public interface MummyContext {
 	}
 
 	/**
+	 * Determines whether the given source path can be mummified. At a minimum a mummifiable path must have an available mummifier.
+	 * @param sourcePath The path of the source to be mummified.
+	 * @return <code>true</code> iff the given source path is supported for mummification.
+	 */
+	@Deprecated //TODO delete if not needed
+	public boolean isMummifiable(@Nonnull final Path sourcePath);
+
+	/**
 	 * Retrieves a mummifier for a particular source path, which may represent a file or a directory.
 	 * @param sourcePath The path of the source to be mummified.
 	 * @return The mummifier for the given source.
 	 */
-	public Optional<Mummifier> getMummifier(@Nonnull final Path sourcePath);
+	public Optional<Mummifier> findMummifier(@Nonnull final Path sourcePath);
+
+	//TODO delete if not needed	public Map<String, Mummifier> getMummifiersBySupportedFilenameExtension(); //TODO
 
 	/**
 	 * Determines the parent artifact of some artifact.
@@ -125,6 +140,39 @@ public interface MummyContext {
 	}
 
 	//source references
+
+	/**
+	 * Searches for a non-directory file in the given source directory that matches the given base filename and which can be mummified into a page. No files are
+	 * ignored in the search.
+	 * @apiNote This method would be useful for finding a <code>.template.*</code> page source file up the hierarchy, for example.
+	 * @param sourceDirectory The directory in the source tree in which to search.
+	 * @param baseFilename The base filename (i.e. with no extension) for which to search.
+	 * @param searchAncestors Whether parent directories should be recursively searched if the file cannot be found in the given source directory.
+	 * @return The first encountered matching file, if any, along with its mummifier.
+	 * @throws IllegalArgumentException if the given source directory is not absolute.
+	 * @throws IllegalArgumentException if the given source directory is not in the site source tree.
+	 * @throws IOException If there is an I/O error searching for a matching file.
+	 */
+	public default Optional<Map.Entry<Path, PageMummifier>> findPageSourceFile(@Nonnull Path sourceDirectory, @Nonnull final String baseFilename,
+			boolean searchAncestors) throws IOException {
+		checkArgumentSubPath(getSiteTargetDirectory(), checkArgumentAbsolute(sourceDirectory));
+		requireNonNull(baseFilename);
+		try (final Stream<Path> sourceFiles = list(sourceDirectory)) {
+			return sourceFiles.filter(not(Files::isDirectory)) //ignore directories
+					.filter(byBaseFilename(baseFilename)) //filter by the base filename
+					.flatMap(sourceFile -> findMummifier(sourceFile).filter(PageMummifier.class::isInstance).map(PageMummifier.class::cast)
+							.map(pageMummifier -> (Map.Entry<Path, PageMummifier>)new AbstractMap.SimpleImmutableEntry<>(sourceFile, pageMummifier)).stream()) //TODO use entry factory
+					.findAny().or(throwingSupplier(() -> {
+						if(searchAncestors) {
+							final Path parentDirectory = sourceDirectory.getParent(); //TODO if create utility Optional-returning parent utility method
+							if(parentDirectory != null) {
+								return findPageSourceFile(parentDirectory, baseFilename, searchAncestors);
+							}
+						}
+						return Optional.empty();
+					}));
+		}
+	}
 
 	/**
 	 * Retrieves an artifact referred to by a reference source path in the file system.

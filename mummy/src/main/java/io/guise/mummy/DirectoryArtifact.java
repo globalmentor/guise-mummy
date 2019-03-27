@@ -29,6 +29,15 @@ import javax.annotation.*;
  */
 public class DirectoryArtifact extends AbstractArtifact implements CollectionArtifact {
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation delegates to {@link #getSourcePath()}.
+	 */
+	@Override
+	public Path getSourceDirectory() {
+		return getSourcePath();
+	}
+
 	private final Artifact contentArtifact;
 
 	/** @return The optional internal artifact representing the content of this directory, such as <code>index.xhtml</code>. */

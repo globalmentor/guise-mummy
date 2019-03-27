@@ -39,7 +39,7 @@ import com.globalmentor.net.URIPath;
  * Abstract base mummifier for generating HTML pages.
  * @author Garret Wilson
  */
-public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier {
+public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier implements PageMummifier {
 
 	/**
 	 * {@inheritDoc}
@@ -64,8 +64,10 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			final Document sourceDocument = loadSourceDocument(context, contextArtifact, artifact, artifact.getSourcePath());
 			getLogger().debug("loaded source document: {}", artifact.getSourcePath());
 
+			final Document templatedocument = applyTemplate(context, contextArtifact, artifact, sourceDocument);
+
 			//#process document: evaluate expressions and perform transformations
-			final Document processedDocument = processDocument(context, contextArtifact, artifact, sourceDocument);
+			final Document processedDocument = processDocument(context, contextArtifact, artifact, templatedocument);
 
 			//#relocate document: translate path references from the source to the target
 			final Document relocatedDocument = relocateDocument(context, contextArtifact, artifact, processedDocument);
@@ -83,26 +85,24 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 	}
 
-	//#load
+	//#apply template
 
 	/**
-	 * Loads the source file and returns it as a document to be further refined before being used to generate the artifact.
-	 * <p>
-	 * The returned document will not yet have been processed. For example, no expressions will have been evaluated and links will still reference source paths.
-	 * </p>
-	 * <p>
-	 * The document must be in XHTML using the HTML namespace.
-	 * </p>
+	 * Applies a template if appropriate to a source document before it is processed.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
-	 * @param sourceFile The file from which to load the document.
-	 * @return A document describing the source content of the artifact to generate.
-	 * @throws IOException if there is an error loading and/or converting the source file contents.
+	 * @param sourceDocument The source document to process.
+	 * @return The document after applying a template, which may or may not be the same document supplied as input.
+	 * @throws IOException if there is an error applying a tmeplate.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	protected abstract Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull Artifact contextArtifact, @Nonnull Artifact artifact,
-			@Nonnull Path sourceFile) throws IOException, DOMException;
+	protected Document applyTemplate(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
+			@Nonnull final Document sourceDocument) throws IOException, DOMException {
+		context.findPageSourceFile(artifact.getSourceDirectory(), ".template", true) //TODO allow base filename to be configurable
+				.ifPresent(template -> getLogger().debug("  {} found template: " + template.getKey())); //TODO implement template application
+		return sourceDocument;
+	}
 
 	//#process
 
