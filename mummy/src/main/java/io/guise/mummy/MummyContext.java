@@ -143,7 +143,7 @@ public interface MummyContext {
 
 	/**
 	 * Searches for a non-directory file in the given source directory that matches the given base filename and which can be mummified into a page. No files are
-	 * ignored in the search.
+	 * ignored in the search. Ancestors are never searched above the source root directory.
 	 * @apiNote This method would be useful for finding a <code>.template.*</code> page source file up the hierarchy, for example.
 	 * @param sourceDirectory The directory in the source tree in which to search.
 	 * @param baseFilename The base filename (i.e. with no extension) for which to search.
@@ -155,7 +155,8 @@ public interface MummyContext {
 	 */
 	public default Optional<Map.Entry<Path, PageMummifier>> findPageSourceFile(@Nonnull Path sourceDirectory, @Nonnull final String baseFilename,
 			boolean searchAncestors) throws IOException {
-		checkArgumentSubPath(getSiteTargetDirectory(), checkArgumentAbsolute(sourceDirectory));
+		final Path siteSourceDirectory = getSiteSourceDirectory();
+		checkArgumentSubPath(siteSourceDirectory, checkArgumentAbsolute(sourceDirectory));
 		requireNonNull(baseFilename);
 		try (final Stream<Path> sourceFiles = list(sourceDirectory)) {
 			return sourceFiles.filter(not(Files::isDirectory)) //ignore directories
@@ -163,7 +164,7 @@ public interface MummyContext {
 					.flatMap(sourceFile -> findMummifier(sourceFile).filter(PageMummifier.class::isInstance).map(PageMummifier.class::cast)
 							.map(pageMummifier -> (Map.Entry<Path, PageMummifier>)new AbstractMap.SimpleImmutableEntry<>(sourceFile, pageMummifier)).stream()) //TODO use entry factory
 					.findAny().or(throwingSupplier(() -> {
-						if(searchAncestors) {
+						if(searchAncestors && !sourceDirectory.equals(siteSourceDirectory)) {
 							final Path parentDirectory = sourceDirectory.getParent(); //TODO if create utility Optional-returning parent utility method
 							if(parentDirectory != null) {
 								return findPageSourceFile(parentDirectory, baseFilename, searchAncestors);
