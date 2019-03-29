@@ -16,15 +16,18 @@
 
 package io.guise.mummy;
 
+import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.xml.XML.*;
 import static java.nio.file.Files.*;
+import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.*;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.*;
 
@@ -94,14 +97,46 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @param artifact The artifact being generated
 	 * @param sourceDocument The source document to process.
 	 * @return The document after applying a template, which may or may not be the same document supplied as input.
-	 * @throws IOException if there is an error applying a tmeplate.
+	 * @throws IOException if there is an error applying a template.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	protected Document applyTemplate(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
 			@Nonnull final Document sourceDocument) throws IOException, DOMException {
-		context.findPageSourceFile(artifact.getSourceDirectory(), ".template", true) //TODO allow base filename to be configurable
-				.ifPresent(template -> getLogger().debug("  {} found template: " + template.getKey())); //TODO implement template application
-		return sourceDocument;
+		return context.findPageSourceFile(artifact.getSourceDirectory(), ".template", true) //look for a template TODO allow base filename to be configurable
+				.flatMap(throwingFunction(templateSource -> { //try to apply the template
+					getLogger().debug("  {} found template: " + templateSource.getKey());
+					final Path templateFile = templateSource.getKey();
+					final PageMummifier templateMummifier = templateSource.getValue();
+					final Document templateDocument = templateMummifier.loadSourceDocument(context, contextArtifact, artifact, templateFile);
+					final Element templateContentElement = findContentElement(templateDocument)
+							.orElseThrow(() -> new IOException(String.format("Template %s has no content insertion point.", templateFile)));
+					findContentElement(sourceDocument).ifPresentOrElse(sourceContentElement -> {
+						getLogger().debug("  {*} applying template: " + templateSource.getKey());
+						removeChildren(templateContentElement);
+						appendImportedChildNodes(templateContentElement, sourceContentElement);
+					}, () -> getLogger().warn("Source file for {} has no content to place in template.", artifact.getSourcePath()));
+					return Optional.of(templateDocument);
+
+				})).orElse(sourceDocument); //return the source document unchanged if we can't find a template
+	}
+
+	/**
+	 * Attempts to determine which element in the source document contains the content of the document, to be inserted into a template, for example.
+	 * @implSpec This implementation finds the content element in the following order:
+	 *           <ol>
+	 *           <li>The {@code <html><body><main>} element, if present.</li>
+	 *           <li>The {@code <html><body>} element, if present.</li>
+	 *           </ol>
+	 * @param sourceDocument The document containing source content.
+	 * @return The element containing content in the source document.
+	 */
+	protected Optional<Element> findContentElement(@Nonnull final Document sourceDocument) {
+		final Optional<Element> htmlBodyElement = findHtmlBodyElement(sourceDocument);
+		final Optional<Element> htmlBodyMainElement = htmlBodyElement
+				.flatMap(htmlElement -> childElementsByNameNS(htmlElement, XHTML_NAMESPACE_URI_STRING, ELEMENT_MAIN).findFirst());
+		//TODO add support for <article>
+		//TODO add support for <mummy:content>
+		return htmlBodyMainElement.or(() -> htmlBodyElement); //<main> gets priority over <body>
 	}
 
 	//#process
