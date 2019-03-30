@@ -27,7 +27,7 @@ import static java.util.Objects.*;
 
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.net.ContentType;
-import com.globalmentor.xml.XML;
+import com.globalmentor.xml.XmlDom;
 
 import io.guise.framework.GuiseSession;
 import io.guise.framework.component.*;
@@ -972,7 +972,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 		requireNonNull(text, "Text cannot be null");
 		requireNonNull(contentType, "Content type cannot be null");
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
-		final boolean isXML = XML.isXML(contentType); //see if this is XML
+		final boolean isXML = XmlDom.isXML(contentType); //see if this is XML
 		final boolean isHTML = isHTML(contentType); //see if this is HTML
 		if(isXML || isHTML) { //if this is XML or HTML
 			if(isHTML(contentType)) { //if this is HTML

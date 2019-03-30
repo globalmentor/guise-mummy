@@ -19,7 +19,7 @@ package io.guise.mummy;
 import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Paths.*;
-import static com.globalmentor.xml.XML.*;
+import static com.globalmentor.xml.XmlDom.*;
 import static java.nio.file.Files.*;
 import static org.zalando.fauxpas.FauxPas.*;
 
@@ -176,7 +176,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 		//TODO transfer to some system of pluggable element processing strategies
 
-		if("regenerate".equals(getDefinedAttributeNS(sourceElement, "https://guise.io/name/mummy/", "regenerate"))) { //TODO use constants
+		if("regenerate".equals(findAttributeNS(sourceElement, "https://guise.io/name/mummy/", "regenerate").orElse(null))) { //TODO use constants; create utility Optional matcher
 
 			//<nav><ol> or <nav><ul>
 			if(XHTML_NAMESPACE_URI.toString().equals(sourceElement.getNamespaceURI())) {
