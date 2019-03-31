@@ -104,14 +104,42 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			@Nonnull final Document sourceDocument) throws IOException, DOMException {
 		return context.findPageSourceFile(artifact.getSourceDirectory(), ".template", true) //look for a template TODO allow base filename to be configurable
 				.flatMap(throwingFunction(templateSource -> { //try to apply the template
-					getLogger().debug("  {} found template: " + templateSource.getKey());
+					getLogger().debug("  {*} found template: {}", templateSource.getKey());
 					final Path templateFile = templateSource.getKey();
 					final PageMummifier templateMummifier = templateSource.getValue();
 					final Document templateDocument = templateMummifier.loadSourceDocument(context, contextArtifact, artifact, templateFile);
+
+					//1. apply title
+
+					//ensure that the template has the correct <html><head><title> structure
+					final Element templateHtmlElement = findHtmlElement(templateDocument)
+							.orElseThrow(() -> new IOException(String.format("Template %s has no root <html> element.", templateFile)));
+					final Element templateHeadElement = findHtmlHeadElement(templateDocument) //add a <html><head> if not present
+							.orElseGet(() -> addFirst(templateHtmlElement, templateDocument.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_HEAD)));
+					final Element templateTitleElement = findHtmlHeadTitleElement(templateDocument) //add a <html><head><title> if not present
+							.orElseGet(() -> addFirst(templateHeadElement, templateDocument.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_TITLE)));
+
+					findHtmlHeadTitleElement(sourceDocument).ifPresentOrElse(sourceTitleElement -> {
+						//TODO get title from artifact description
+						getLogger().debug("  {*} applying source title: {}", sourceTitleElement.getTextContent());
+						removeChildren(templateTitleElement);
+						appendImportedChildNodes(templateTitleElement, sourceTitleElement);
+					}, () -> getLogger().warn("Source file for {} has no title to place in template.", artifact.getSourcePath()));
+
+					//2. apply metadata
+
+					namedMetadata(sourceDocument).filter(meta -> meta.getValue() != null) //ignore any source metadata without a value
+							.forEachOrdered(meta -> { //update the template metadata with the source metadata
+								getLogger().debug("  {*} applying source metadata: {}={} ", meta.getKey(), meta.getValue());
+								setNamedMetata(templateDocument, meta);
+							});
+
+					//3. apply content
+
 					final Element templateContentElement = findContentElement(templateDocument)
 							.orElseThrow(() -> new IOException(String.format("Template %s has no content insertion point.", templateFile)));
 					findContentElement(sourceDocument).ifPresentOrElse(sourceContentElement -> {
-						getLogger().debug("  {*} applying template: " + templateSource.getKey());
+						getLogger().debug("  {*} applying source content");
 						removeChildren(templateContentElement);
 						appendImportedChildNodes(templateContentElement, sourceContentElement);
 					}, () -> getLogger().warn("Source file for {} has no content to place in template.", artifact.getSourcePath()));
