@@ -16,10 +16,11 @@
 
 package io.guise.mummy;
 
+import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
-import static java.util.function.Predicate.not;
+import static java.util.function.Predicate.*;
 import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.*;
@@ -27,11 +28,13 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Stream;
 
-import javax.annotation.Nonnull;
+import javax.annotation.*;
 
 /**
  * Mummifier for directories.
+ * @implSpec This mummifier only works with instances of {@link DirectoryArtifact}.
  * @author Garret Wilson
+ * @see DirectoryArtifact
  */
 public class DirectoryMummifier extends AbstractSourcePathMummifier {
 
@@ -61,14 +64,14 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	 */
 	@Override
 	public Artifact plan(MummyContext context, Path sourcePath) throws IOException {
-		checkArgument(isDirectory(sourcePath), "Source %s does not exist or is not a directory.");
+		checkArgumentDirectory(sourcePath);
 
 		final Path targetDirectory = getArtifactTargetPath(context, sourcePath);
 
 		//discover and plan the directory content file, if present
 		final Optional<Path> contentFile = discoverSourceDirectoryContentFile(context, sourcePath);
 		final Artifact contentArtifact = contentFile.map(throwingFunction(contentSourceFile -> {
-			final Mummifier contentMummifier = context.findMummifier(contentSourceFile).orElseThrow(IllegalStateException::new); //TODO improve error
+			final Mummifier contentMummifier = context.findRegisteredMummifierForSourceFile(contentSourceFile).orElseThrow(IllegalStateException::new); //TODO improve error
 			return contentMummifier.plan(context, contentSourceFile);
 		})).orElse(null);
 
@@ -77,11 +80,9 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		try (final Stream<Path> childPaths = list(sourcePath).filter(not(context::isIgnore))) {
 			childPaths.forEach(throwingConsumer(childSourcePath -> {
 				if(!childSourcePath.equals(contentFile.orElse(null))) { //skip the content file TODO create an optional comparison utility method
-					final Optional<Mummifier> childMummifier = context.findMummifier(childSourcePath);
-					childMummifier.ifPresent(throwingConsumer(mummifier -> {
-						final Artifact childArtifact = mummifier.plan(context, childSourcePath);
-						childArtifacts.add(childArtifact);
-					}));
+					final Mummifier childMummifier = context.getMummifierForSourcePath(childSourcePath);
+					final Artifact childArtifact = childMummifier.plan(context, childSourcePath);
+					childArtifacts.add(childArtifact);
 				}
 			}));
 		}
@@ -91,7 +92,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	@Override
 	public void mummify(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
 		checkArgument(artifact instanceof DirectoryArtifact, "Artifact %s is not a directory artifact.");
-		checkArgument(isDirectory(artifact.getSourcePath()), "Source path %s does not exist or is not a directory.");
+		checkArgumentDirectory(artifact.getSourcePath());
 
 		final DirectoryArtifact directoryArtifact = (DirectoryArtifact)artifact;
 

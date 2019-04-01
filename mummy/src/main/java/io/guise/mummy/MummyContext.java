@@ -84,22 +84,50 @@ public interface MummyContext {
 		return changeBase(sourcePath, getSiteSourceDirectory(), getSiteTargetDirectory());
 	}
 
-	/**
-	 * Determines whether the given source path can be mummified. At a minimum a mummifiable path must have an available mummifier.
-	 * @param sourcePath The path of the source to be mummified.
-	 * @return <code>true</code> iff the given source path is supported for mummification.
-	 */
-	@Deprecated //TODO delete if not needed
-	public boolean isMummifiable(@Nonnull final Path sourcePath);
+	/** @return The default mummifier for source files. */
+	public Mummifier getDefaultSourceFileMummifier();
+
+	/** @return The default mummifier for source directories. */
+	public Mummifier getDefaultSourceDirectoryMummifier();
 
 	/**
-	 * Retrieves a mummifier for a particular source path, which may represent a file or a directory.
-	 * @param sourcePath The path of the source to be mummified.
-	 * @return The mummifier for the given source.
+	 * Retrieves a registered mummifier for a particular source file.
+	 * @param sourceFile The path of the source file to be mummified.
+	 * @return The mummifier, if any, registered for the given source file.
 	 */
-	public Optional<Mummifier> findMummifier(@Nonnull final Path sourcePath);
+	public Optional<Mummifier> findRegisteredMummifierForSourceFile(@Nonnull final Path sourceFile);
 
-	//TODO delete if not needed	public Map<String, Mummifier> getMummifiersBySupportedFilenameExtension(); //TODO
+	/**
+	 * Retrieves a registered mummifier for a particular source directory.
+	 * @param sourceDirectory The path of the source directory to be mummified.
+	 * @return The mummifier, if any, registered for the given source directory.
+	 */
+	public Optional<Mummifier> findRegisteredMummifierForSourceDirectory(@Nonnull final Path sourceDirectory);
+
+	/**
+	 * Retrieves a registered mummifier for a particular source path, which may represent a file or a directory.
+	 * @implSpec The default implementation delegates to {@link #findRegisteredMummifierForSourceFile(Path)} or
+	 *           {@link #findRegisteredMummifierForSourceDirectory(Path)} depending on whether the given source path is a file or a directory.
+	 * @param sourcePath The path of the source to be mummified.
+	 * @return The mummifier, if any, registered for the given source path.
+	 */
+	public default Optional<Mummifier> findRegisteredMummifierForSourcePath(@Nonnull final Path sourcePath) {
+		return isDirectory(sourcePath) ? findRegisteredMummifierForSourceDirectory(sourcePath) : findRegisteredMummifierForSourceFile(sourcePath);
+	}
+
+	/**
+	 * Retrieves a mummifier for a particular source path, which may represent a file or a directory. If no mummifier is registered, a default mummifier is
+	 * returned.
+	 * @implSpec The default implementation delegates to {@link #findRegisteredMummifierForSourcePath(Path)} and if none is present delegates to
+	 *           {@link #getDefaultSourceFileMummifier()} or {@link #getDefaultSourceDirectoryMummifier()} depending on whether the given source path is a file or
+	 *           a directory.
+	 * @param sourcePath The path of the source to be mummified.
+	 * @return The mummifier for the given source path.
+	 */
+	public default Mummifier getMummifierForSourcePath(@Nonnull final Path sourcePath) {
+		return findRegisteredMummifierForSourcePath(sourcePath)
+				.orElseGet(() -> isDirectory(sourcePath) ? getDefaultSourceDirectoryMummifier() : getDefaultSourceFileMummifier());
+	}
 
 	/**
 	 * Determines the parent artifact of some artifact.
@@ -161,7 +189,7 @@ public interface MummyContext {
 		try (final Stream<Path> sourceFiles = list(sourceDirectory)) {
 			return sourceFiles.filter(not(Files::isDirectory)) //ignore directories
 					.filter(byBaseFilename(baseFilename)) //filter by the base filename
-					.flatMap(sourceFile -> findMummifier(sourceFile).filter(PageMummifier.class::isInstance).map(PageMummifier.class::cast)
+					.flatMap(sourceFile -> findRegisteredMummifierForSourceFile(sourceFile).filter(PageMummifier.class::isInstance).map(PageMummifier.class::cast)
 							.map(pageMummifier -> (Map.Entry<Path, PageMummifier>)new AbstractMap.SimpleImmutableEntry<>(sourceFile, pageMummifier)).stream()) //TODO use entry factory
 					.findAny().or(throwingSupplier(() -> {
 						if(searchAncestors && !sourceDirectory.equals(siteSourceDirectory)) {

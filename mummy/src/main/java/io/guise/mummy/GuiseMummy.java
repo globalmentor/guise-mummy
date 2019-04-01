@@ -18,7 +18,6 @@ package io.guise.mummy;
 
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Paths.*;
-import static java.nio.file.Files.*;
 import static java.util.Objects.*;
 
 import java.io.IOException;
@@ -35,34 +34,28 @@ import io.clogr.Clogged;
  */
 public class GuiseMummy implements Clogged {
 
-	/** The registered mummifiers by supported extensions. */
-	private final Map<String, Mummifier> mummifiersByExtension = new HashMap<>();
+	/** The default mummifier for normal files. */
+	private final Mummifier defaultFileMummifier = new OpaqueFileMummifier();
 
-	/**
-	 * Retrieves a mummifier for a particular source path, which may represent a file or a directory.
-	 * @param sourcePath The path of the source to be mummified.
-	 * @return The mummifier for the given source.
-	 */
-	protected Optional<Mummifier> findMummifier(@Nonnull final Path sourcePath) {
-		if(isDirectory(sourcePath)) {
-			return Optional.of(new DirectoryMummifier()); //TODO use a shared directory mummifier
-		}
-		return extensions(sourcePath.getFileName().toString()).map(mummifiersByExtension::get).filter(Objects::nonNull).findFirst();
-	}
+	/** The default mummifier for normal directories. */
+	private final Mummifier defaultDirectoryMummifier = new DirectoryMummifier();
+
+	/** The registered mummifiers by supported extensions. */
+	private final Map<String, Mummifier> fileMummifiersByExtension = new HashMap<>();
 
 	/**
 	 * Registers a mummify for all its supported filename extensions.
 	 * @param mummifier The mummifier to register.
 	 * @see Mummifier#getSupportedFilenameExtensions()
 	 */
-	public void registerMummifier(@Nonnull final Mummifier mummifier) {
-		mummifier.getSupportedFilenameExtensions().forEach(ext -> mummifiersByExtension.put(ext, mummifier));
+	public void registerFileMummifier(@Nonnull final Mummifier mummifier) {
+		mummifier.getSupportedFilenameExtensions().forEach(ext -> fileMummifiersByExtension.put(ext, mummifier));
 	}
 
 	/** No-args constructor. */
 	public GuiseMummy() {
 		//register default resource types
-		registerMummifier(new XhtmlPageMummifier());
+		registerFileMummifier(new XhtmlPageMummifier());
 	}
 
 	/**
@@ -140,8 +133,27 @@ public class GuiseMummy implements Clogged {
 		}
 
 		@Override
-		public Optional<Mummifier> findMummifier(Path sourcePath) {
-			return GuiseMummy.this.findMummifier(sourcePath);
+		public Mummifier getDefaultSourceFileMummifier() {
+			return defaultFileMummifier;
+		}
+
+		@Override
+		public Mummifier getDefaultSourceDirectoryMummifier() {
+			return defaultDirectoryMummifier;
+		}
+
+		@Override
+		public Optional<Mummifier> findRegisteredMummifierForSourceFile(@Nonnull final Path sourceFile) {
+			return extensions(sourceFile.getFileName().toString()).map(fileMummifiersByExtension::get).filter(Objects::nonNull).findFirst();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * @implSpec This implementation doesn't support registered source directory mummifiers, and will always return {@link Optional#empty()}.
+		 */
+		@Override
+		public Optional<Mummifier> findRegisteredMummifierForSourceDirectory(Path sourceDirectory) {
+			return Optional.empty();
 		}
 
 	}

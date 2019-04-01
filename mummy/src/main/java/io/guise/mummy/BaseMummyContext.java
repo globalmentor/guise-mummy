@@ -33,15 +33,6 @@ public abstract class BaseMummyContext implements MummyContext {
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This implementation returns whether there is a mummifier registered for the given source path.
-	 */
-	@Override
-	public boolean isMummifiable(final Path sourcePath) {
-		return findMummifier(sourcePath).isPresent();
-	}
-
-	/**
-	 * {@inheritDoc}
 	 * @implSpec This specification currently ignores dotfiles, for example <code>.git</code> and <code>.gitignore</code>; as well as non-regular files.
 	 */
 	public boolean isIgnore(final Path sourcePath) {
