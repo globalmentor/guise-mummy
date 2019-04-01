@@ -16,15 +16,18 @@
 
 package io.guise.mummy;
 
+import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Paths.*;
-import static com.globalmentor.xml.XML.*;
+import static com.globalmentor.xml.XmlDom.*;
 import static java.nio.file.Files.*;
+import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.*;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.*;
 
@@ -39,7 +42,7 @@ import com.globalmentor.net.URIPath;
  * Abstract base mummifier for generating HTML pages.
  * @author Garret Wilson
  */
-public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier {
+public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier implements PageMummifier {
 
 	/**
 	 * {@inheritDoc}
@@ -64,8 +67,10 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			final Document sourceDocument = loadSourceDocument(context, contextArtifact, artifact, artifact.getSourcePath());
 			getLogger().debug("loaded source document: {}", artifact.getSourcePath());
 
+			final Document templatedocument = applyTemplate(context, contextArtifact, artifact, sourceDocument);
+
 			//#process document: evaluate expressions and perform transformations
-			final Document processedDocument = processDocument(context, contextArtifact, artifact, sourceDocument);
+			final Document processedDocument = processDocument(context, contextArtifact, artifact, templatedocument);
 
 			//#relocate document: translate path references from the source to the target
 			final Document relocatedDocument = relocateDocument(context, contextArtifact, artifact, processedDocument);
@@ -83,26 +88,84 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 	}
 
-	//#load
+	//#apply template
 
 	/**
-	 * Loads the source file and returns it as a document to be further refined before being used to generate the artifact.
-	 * <p>
-	 * The returned document will not yet have been processed. For example, no expressions will have been evaluated and links will still reference source paths.
-	 * </p>
-	 * <p>
-	 * The document must be in XHTML using the HTML namespace.
-	 * </p>
+	 * Applies a template if appropriate to a source document before it is processed.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
-	 * @param sourceFile The file from which to load the document.
-	 * @return A document describing the source content of the artifact to generate.
-	 * @throws IOException if there is an error loading and/or converting the source file contents.
+	 * @param sourceDocument The source document to process.
+	 * @return The document after applying a template, which may or may not be the same document supplied as input.
+	 * @throws IOException if there is an error applying a template.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	protected abstract Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull Artifact contextArtifact, @Nonnull Artifact artifact,
-			@Nonnull Path sourceFile) throws IOException, DOMException;
+	protected Document applyTemplate(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
+			@Nonnull final Document sourceDocument) throws IOException, DOMException {
+		return context.findPageSourceFile(artifact.getSourceDirectory(), ".template", true) //look for a template TODO allow base filename to be configurable
+				.flatMap(throwingFunction(templateSource -> { //try to apply the template
+					getLogger().debug("  {*} found template: {}", templateSource.getKey());
+					final Path templateFile = templateSource.getKey();
+					final PageMummifier templateMummifier = templateSource.getValue();
+					final Document templateDocument = templateMummifier.loadSourceDocument(context, contextArtifact, artifact, templateFile);
+
+					//1. apply title
+
+					//ensure that the template has the correct <html><head><title> structure
+					final Element templateHtmlElement = findHtmlElement(templateDocument)
+							.orElseThrow(() -> new IOException(String.format("Template %s has no root <html> element.", templateFile)));
+					final Element templateHeadElement = findHtmlHeadElement(templateDocument) //add a <html><head> if not present
+							.orElseGet(() -> addFirst(templateHtmlElement, templateDocument.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_HEAD)));
+					final Element templateTitleElement = findHtmlHeadTitleElement(templateDocument) //add a <html><head><title> if not present
+							.orElseGet(() -> addFirst(templateHeadElement, templateDocument.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_TITLE)));
+
+					findHtmlHeadTitleElement(sourceDocument).ifPresentOrElse(sourceTitleElement -> {
+						//TODO get title from artifact description
+						getLogger().debug("  {*} applying source title: {}", sourceTitleElement.getTextContent());
+						removeChildren(templateTitleElement);
+						appendImportedChildNodes(templateTitleElement, sourceTitleElement);
+					}, () -> getLogger().warn("Source file for {} has no title to place in template.", artifact.getSourcePath()));
+
+					//2. apply metadata
+
+					namedMetadata(sourceDocument).filter(meta -> meta.getValue() != null) //ignore any source metadata without a value
+							.forEachOrdered(meta -> { //update the template metadata with the source metadata
+								getLogger().debug("  {*} applying source metadata: {}={} ", meta.getKey(), meta.getValue());
+								setNamedMetata(templateDocument, meta);
+							});
+
+					//3. apply content
+
+					final Element templateContentElement = findContentElement(templateDocument)
+							.orElseThrow(() -> new IOException(String.format("Template %s has no content insertion point.", templateFile)));
+					findContentElement(sourceDocument).ifPresentOrElse(sourceContentElement -> {
+						getLogger().debug("  {*} applying source content");
+						removeChildren(templateContentElement);
+						appendImportedChildNodes(templateContentElement, sourceContentElement);
+					}, () -> getLogger().warn("Source file for {} has no content to place in template.", artifact.getSourcePath()));
+					return Optional.of(templateDocument);
+
+				})).orElse(sourceDocument); //return the source document unchanged if we can't find a template
+	}
+
+	/**
+	 * Attempts to determine which element in the source document contains the content of the document, to be inserted into a template, for example.
+	 * @implSpec This implementation finds the content element in the following order:
+	 *           <ol>
+	 *           <li>The {@code <html><body><main>} element, if present.</li>
+	 *           <li>The {@code <html><body>} element, if present.</li>
+	 *           </ol>
+	 * @param sourceDocument The document containing source content.
+	 * @return The element containing content in the source document.
+	 */
+	protected Optional<Element> findContentElement(@Nonnull final Document sourceDocument) {
+		final Optional<Element> htmlBodyElement = findHtmlBodyElement(sourceDocument);
+		final Optional<Element> htmlBodyMainElement = htmlBodyElement
+				.flatMap(htmlElement -> childElementsByNameNS(htmlElement, XHTML_NAMESPACE_URI_STRING, ELEMENT_MAIN).findFirst());
+		//TODO add support for <article>
+		//TODO add support for <mummy:content>
+		return htmlBodyMainElement.or(() -> htmlBodyElement); //<main> gets priority over <body>
+	}
 
 	//#process
 
@@ -141,7 +204,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 		//TODO transfer to some system of pluggable element processing strategies
 
-		if("regenerate".equals(getDefinedAttributeNS(sourceElement, "https://guise.io/name/mummy/", "regenerate"))) { //TODO use constants
+		if("regenerate".equals(findAttributeNS(sourceElement, "https://guise.io/name/mummy/", "regenerate").orElse(null))) { //TODO use constants; create utility Optional matcher
 
 			//<nav><ol> or <nav><ul>
 			if(XHTML_NAMESPACE_URI.toString().equals(sourceElement.getNamespaceURI())) {

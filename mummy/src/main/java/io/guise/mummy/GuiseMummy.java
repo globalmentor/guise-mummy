@@ -43,7 +43,7 @@ public class GuiseMummy implements Clogged {
 	 * @param sourcePath The path of the source to be mummified.
 	 * @return The mummifier for the given source.
 	 */
-	protected Optional<Mummifier> getMummifier(@Nonnull final Path sourcePath) {
+	protected Optional<Mummifier> findMummifier(@Nonnull final Path sourcePath) {
 		if(isDirectory(sourcePath)) {
 			return Optional.of(new DirectoryMummifier()); //TODO use a shared directory mummifier
 		}
@@ -111,7 +111,7 @@ public class GuiseMummy implements Clogged {
 	 * Mutable mummification context controlled by Guise Mummy.
 	 * @author Garret Wilson
 	 */
-	protected class Context implements MummyContext {
+	protected class Context extends BaseMummyContext {
 
 		private final Path siteSourceDirectory;
 
@@ -140,51 +140,8 @@ public class GuiseMummy implements Clogged {
 		}
 
 		@Override
-		public Optional<Mummifier> getMummifier(Path sourcePath) {
-			return GuiseMummy.this.getMummifier(sourcePath);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 * @implSpec This specification currently ignores dotfiles, for example <code>.git</code> and <code>.gitignore</code>; as well as non-regular files.
-		 */
-		public boolean isIgnore(final Path sourcePath) {
-			if(isDotfile(sourcePath)) { //ignore dotfiles
-				return true;
-			}
-			if(!isRegularFile(sourcePath) && !isDirectory(sourcePath)) { //TODO add option to traverse symbolic links
-				return true;
-			}
-			return false;
-		}
-
-		private final Map<Artifact, Artifact> parentArtifactsByArtifact = new HashMap<>();
-
-		@Override
-		public Optional<Artifact> getParentArtifact(final Artifact artifact) {
-			return Optional.ofNullable(parentArtifactsByArtifact.get(requireNonNull(artifact)));
-		}
-
-		private final Map<Path, Artifact> artifactsByReferenceSourcePath = new HashMap<>();
-
-		@Override
-		public Optional<Artifact> findArtifactBySourceReference(final Path referenceSourcePath) {
-			return Optional.ofNullable(artifactsByReferenceSourcePath.get(checkArgumentAbsolute(referenceSourcePath)));
-		}
-
-		/**
-		 * Recursively updates the mummification plan for the given artifact. Parent artifacts are updated in the map, for example.
-		 * @param artifact The artifact the plan of which to update.
-		 */
-		protected void updatePlan(@Nonnull final Artifact artifact) {
-			requireNonNull(artifact);
-			artifact.getReferentSourcePaths().forEach(referenceSourcePath -> artifactsByReferenceSourcePath.put(referenceSourcePath, artifact));
-			if(artifact instanceof CollectionArtifact) {
-				for(final Artifact childArtifact : ((CollectionArtifact)artifact).getChildArtifacts()) {
-					parentArtifactsByArtifact.put(childArtifact, artifact); //map the parent to the child
-					updatePlan(childArtifact); //recursively update the plan for the children
-				}
-			}
+		public Optional<Mummifier> findMummifier(Path sourcePath) {
+			return GuiseMummy.this.findMummifier(sourcePath);
 		}
 
 	}

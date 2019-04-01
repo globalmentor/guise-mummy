@@ -31,7 +31,15 @@ public interface Artifact {
 	/** @return A description of the source resource for this artifact. */
 	//TODO implement public UrfResourceDescription getResourceDescription();
 
-	/** @return The file containing the source of this artifact. */
+	/**
+	 * Returns the path to the directory containing the artifact source file. If the artifact source path refers to a directory, this method returns the source
+	 * path itself; otherwise this method returns the parent directory.
+	 * @return The source directory of the artifact.
+	 * @see #getSourcePath()
+	 */
+	public Path getSourceDirectory();
+
+	/** @return The path referring to the source of this artifact, wich may be a file or a directory. */
 	public Path getSourcePath();
 
 	/**

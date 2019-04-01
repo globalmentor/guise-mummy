@@ -27,6 +27,17 @@ import javax.annotation.*;
 public class PageArtifact extends AbstractArtifact {
 
 	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation returns the parent directory of the source path.
+	 */
+	@Override
+	public Path getSourceDirectory() {
+		final Path sourceDirectory = getSourcePath().getParent();
+		assert sourceDirectory != null : "There should be no way for an artifact not to have a parent directory.";
+		return sourceDirectory;
+	}
+
+	/**
 	 * Constructor.
 	 * @param mummifier The mummifier responsible for generating this artifact.
 	 * @param sourceFile The file containing the source of this artifact.

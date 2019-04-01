@@ -39,7 +39,7 @@ import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.java.Strings.*;
 import static com.globalmentor.security.MessageDigests.*;
 import static com.globalmentor.xml.spec.XML.*;
-import static com.globalmentor.xml.XML.*;
+import static com.globalmentor.xml.XmlDom.*;
 
 /**
  * Abstract encapsulation of <code>text/xml</code> information related to the current depiction.

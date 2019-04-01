@@ -36,7 +36,7 @@ import com.globalmentor.log.Log;
 
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.xml.spec.XML.*;
-import static com.globalmentor.xml.XML.*;
+import static com.globalmentor.xml.XmlDom.*;
 import static java.nio.charset.StandardCharsets.*;
 
 import org.w3c.dom.*;
