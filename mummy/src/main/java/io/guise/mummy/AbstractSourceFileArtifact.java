@@ -21,10 +21,21 @@ import java.nio.file.Path;
 import javax.annotation.*;
 
 /**
- * An artifact representing a generated page.
+ * An abstract base class for an artifact generated from a source file.
  * @author Garret Wilson
  */
-public class PageArtifact extends AbstractSourceFileArtifact {
+public class AbstractSourceFileArtifact extends AbstractArtifact {
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation returns the parent directory of the source path.
+	 */
+	@Override
+	public Path getSourceDirectory() {
+		final Path sourceDirectory = getSourcePath().getParent();
+		assert sourceDirectory != null : "There should be no way for an artifact not to have a parent directory.";
+		return sourceDirectory;
+	}
 
 	/**
 	 * Constructor.
@@ -32,7 +43,7 @@ public class PageArtifact extends AbstractSourceFileArtifact {
 	 * @param sourceFile The file containing the source of this artifact.
 	 * @param outputFile The file where the artifact will be generated.
 	 */
-	public PageArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
+	public AbstractSourceFileArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
 		super(mummifier, sourceFile, outputFile);
 	}
 

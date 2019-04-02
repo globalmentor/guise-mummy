@@ -21,10 +21,10 @@ import java.nio.file.Path;
 import javax.annotation.*;
 
 /**
- * An artifact representing a generated page.
+ * An artifact representing a file with unknown contents.
  * @author Garret Wilson
  */
-public class PageArtifact extends AbstractSourceFileArtifact {
+public class OpaqueFileArtifact extends AbstractSourceFileArtifact {
 
 	/**
 	 * Constructor.
@@ -32,7 +32,7 @@ public class PageArtifact extends AbstractSourceFileArtifact {
 	 * @param sourceFile The file containing the source of this artifact.
 	 * @param outputFile The file where the artifact will be generated.
 	 */
-	public PageArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
+	public OpaqueFileArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
 		super(mummifier, sourceFile, outputFile);
 	}
 
