@@ -17,6 +17,7 @@
 package io.guise.mummy;
 
 import static com.globalmentor.io.Paths.*;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.Collections.*;
 
 import java.io.*;
@@ -25,7 +26,7 @@ import java.util.*;
 
 /**
  * Mummifier for files with unknown content.
- * @implSpec This implementation merely copies the file during mummification with no further action.
+ * @implSpec This implementation merely copies the file during mummification with no further action. Any existing target file will be replaced.
  * @author Garret Wilson
  */
 public class OpaqueFileMummifier extends AbstractSourcePathMummifier {
@@ -49,7 +50,7 @@ public class OpaqueFileMummifier extends AbstractSourcePathMummifier {
 	public void mummify(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
 		final Path sourceFile = artifact.getSourcePath();
 		checkArgumentRegularFile(sourceFile);
-		Files.copy(sourceFile, artifact.getTargetPath());
+		Files.copy(sourceFile, artifact.getTargetPath(), REPLACE_EXISTING);
 	}
 
 }
