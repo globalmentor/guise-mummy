@@ -18,6 +18,7 @@ package io.guise.mummy;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.util.function.Function;
 
 import javax.annotation.*;
 
@@ -49,5 +50,20 @@ public interface PageMummifier extends Mummifier {
 	 */
 	public Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull Artifact contextArtifact, @Nonnull Artifact artifact, @Nonnull Path sourceFile)
 			throws IOException, DOMException;
+
+	/**
+	 * Relocates a document by retargeting its references relative to a new referrer path location.
+	 * @param context The context of static site generation.
+	 * @param sourceDocument The source document to relocate.
+	 * @param originalReferrerSourcePath The absolute original path of the referrer, e.g. <code>…/foo/page.xhtml</code>.
+	 * @param relocatedReferrerPath The absolute relocated path of the referrer, e.g. <code>…/bar/page.xhtml</code>.
+	 * @param referentArtifactPath The function for determining the path of the determined referent artifact. This function should return either the source path
+	 *          or the destination path of the artifact concordant with the site tree of the relocated referrer.
+	 * @return The relocated document, which may or may not be the same document supplied as input.
+	 * @throws IOException if there is an error relocating the document.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 */
+	public Document relocateDocument(@Nonnull MummyContext context, @Nonnull final Document sourceDocument, @Nonnull final Path originalReferrerSourcePath,
+			@Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) throws IOException, DOMException;
 
 }
