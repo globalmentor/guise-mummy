@@ -106,10 +106,17 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			@Nonnull final Document sourceDocument) throws IOException, DOMException {
 		return context.findPageSourceFile(artifact.getSourceDirectory(), ".template", true) //look for a template TODO allow base filename to be configurable
 				.flatMap(throwingFunction(templateSource -> { //try to apply the template
-					getLogger().debug("  {*} found template: {}", templateSource.getKey());
 					final Path templateFile = templateSource.getKey();
 					final PageMummifier templateMummifier = templateSource.getValue();
-					final Document templateDocument = templateMummifier.loadSourceDocument(context, contextArtifact, artifact, templateFile);
+					getLogger().debug("  {*} found template: {}", templateFile);
+
+					//#load and relocate the template document
+					final Document templateDocument;
+					{
+						final Document sourceTemplateDocument = templateMummifier.loadSourceDocument(context, contextArtifact, artifact, templateFile);
+						//relocate the template links _within the source tree_ as if it were in the place of the artifact source
+						templateDocument = relocateDocument(context, sourceTemplateDocument, templateFile, contextArtifact.getSourcePath(), Artifact::getSourcePath);
+					}
 
 					//1. apply title
 
@@ -312,7 +319,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	//#relocate
 
 	/**
-	 * Relocates a document by retargeting its references.
+	 * Relocates a document by retargeting its references from the artifact source path to the artifact target path.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
@@ -326,18 +333,6 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		return relocateDocument(context, sourceDocument, contextArtifact.getSourcePath(), contextArtifact.getTargetPath(), Artifact::getTargetPath);
 	}
 
-	/**
-	 * Relocates a document by retargeting its references relative to a new referrer path location.
-	 * @param context The context of static site generation.
-	 * @param sourceDocument The source document to relocate.
-	 * @param originalReferrerSourcePath The absolute original path of the referrer, e.g. <code>…/foo/page.xhtml</code>.
-	 * @param relocatedReferrerPath The absolute relocated path of the referrer, e.g. <code>…/bar/page.xhtml</code>.
-	 * @param referentArtifactPath The function for determining the path of the determined referent artifact. This function should return either the source path
-	 *          or the destination path of the artifact concordant with the site tree of the relocated referrer.
-	 * @return The relocated document, which may or may not be the same document supplied as input.
-	 * @throws IOException if there is an error relocating the document.
-	 * @throws DOMException if there is some error manipulating the XML document object model.
-	 */
 	@Override
 	public Document relocateDocument(@Nonnull MummyContext context, @Nonnull final Document sourceDocument, @Nonnull final Path originalReferrerSourcePath,
 			@Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) throws IOException, DOMException {
