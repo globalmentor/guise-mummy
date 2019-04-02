@@ -25,9 +25,9 @@ import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.*;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 import javax.annotation.*;
@@ -35,7 +35,6 @@ import javax.annotation.*;
 import org.w3c.dom.*;
 
 import com.globalmentor.html.HtmlSerializer;
-import com.globalmentor.html.spec.HTML;
 import com.globalmentor.io.Filenames;
 import com.globalmentor.net.URIPath;
 
@@ -44,6 +43,24 @@ import com.globalmentor.net.URIPath;
  * @author Garret Wilson
  */
 public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier implements PageMummifier {
+
+	/**
+	 * A map of local names of HTML elements that can reference other resources (e.g. <code>"img"</code>), along with the attributes of each element that contains
+	 * the actual resource reference path (e.g. (e.g. <code>"src"</code>) for {@code <img src="…">}).
+	 */
+	private final static Map<String, String> HTML_REFERENCE_ELEMENT_ATTRIBUTES = Map.ofEntries( //element local name -> attribute
+			Map.entry(ELEMENT_A, ELEMENT_A_ATTRIBUTE_HREF), //<a href="…">
+			Map.entry(ELEMENT_AREA, ELEMENT_AREA_ATTRIBUTE_HREF), //<area href="…">
+			Map.entry(ELEMENT_AUDIO, ELEMENT_AUDIO_ATTRIBUTE_SRC), //<audio src="…">
+			Map.entry(ELEMENT_EMBED, ELEMENT_EMBED_ATTRIBUTE_SRC), //<embed src="…">
+			Map.entry(ELEMENT_IFRAME, ELEMENT_IFRAME_ATTRIBUTE_SRC), //<iframe src="…">
+			Map.entry(ELEMENT_IMG, ELEMENT_IMG_ATTRIBUTE_SRC), //<img src="…">
+			Map.entry(ELEMENT_LINK, ELEMENT_LINK_ATTRIBUTE_HREF), //<link href="…">
+			Map.entry(ELEMENT_OBJECT, ELEMENT_OBJECT_ATTRIBUTE_DATA), //<object data="…">
+			Map.entry(ELEMENT_SOURCE, ELEMENT_SOURCE_ATTRIBUTE_SRC), //<source src="…">
+			Map.entry(ELEMENT_TRACK, ELEMENT_TRACK_ATTRIBUTE_SRC), //<track src="…">
+			Map.entry(ELEMENT_VIDEO, ELEMENT_VIDEO_ATTRIBUTE_SRC) //<video src="…">
+	);
 
 	/**
 	 * {@inheritDoc}
@@ -346,6 +363,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
 	 * element is removed.
 	 * </p>
+	 * @implSpec This implementation relocates the {@link #HTML_REFERENCE_ELEMENT_ATTRIBUTES} elements and attributes.
 	 * @param context The context of static site generation.
 	 * @param sourceElement The source element to relocate.
 	 * @param originalReferrerSourcePath The absolute original path of the referrer, e.g. <code>…/foo/page.xhtml</code>.
@@ -355,16 +373,18 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @return The relocated element(s), if any, to replace the source element.
 	 * @throws IOException if there is an error relocating the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 * @see #HTML_REFERENCE_ELEMENT_ATTRIBUTES
 	 */
 	protected List<Element> relocateElement(@Nonnull MummyContext context, @Nonnull final Element sourceElement, @Nonnull final Path originalReferrerSourcePath,
 			@Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) throws IOException, DOMException {
 
 		//TODO transfer to some system of pluggable element relocating strategies
-
-		//<a> TODO add support for other links, such as stylesheet links
 		if(XHTML_NAMESPACE_URI.toString().equals(sourceElement.getNamespaceURI())) {
-			if(ELEMENT_A.equals(sourceElement.getLocalName())) { //<a>
-				return relocateLink(context, sourceElement, originalReferrerSourcePath, relocatedReferrerPath, referentArtifactPath);
+			//see if this is a referrer element, and get the attribute doing the referencing
+			final String referenceAttributeName = HTML_REFERENCE_ELEMENT_ATTRIBUTES.get(sourceElement.getLocalName());
+			if(referenceAttributeName != null) {
+				return relocateReferenceElement(context, sourceElement, referenceAttributeName, originalReferrerSourcePath, relocatedReferrerPath,
+						referentArtifactPath);
 			}
 		}
 
@@ -406,13 +426,14 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	}
 
 	/**
-	 * Relocates a link element by retargeting its {@value HTML#ELEMENT_A_ATTRIBUTE_HREF} attribute relative to a new referrer path location.
+	 * Relocates a reference element by retargeting its reference attribute relative to a new referrer path location.
 	 * <p>
 	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
 	 * element is removed.
 	 * </p>
 	 * @param context The context of static site generation.
-	 * @param linkElement The list element such a {@code <a>} to relocate.
+	 * @param referenceElement The reference element such a {@code <a>} to relocate.
+	 * @param referenceAttributeName The name of the reference attribute such a {@code href} to relocate.
 	 * @param originalReferrerSourcePath The absolute original path of the referrer, e.g. <code>…/foo/page.xhtml</code>.
 	 * @param relocatedReferrerPath The absolute relocated path of the referrer, e.g. <code>…/bar/page.xhtml</code>.
 	 * @param referentArtifactPath The function for determining the path of the determined referent artifact. This function should return either the source path
@@ -420,25 +441,33 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @return The relocated element(s), if any, to replace the source element.
 	 * @throws IOException if there is an error relocating the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 * @see #retargetResourceReference(MummyContext, URIPath, Path, Path, Function)
 	 */
-	protected List<Element> relocateLink(@Nonnull MummyContext context, @Nonnull final Element linkElement, @Nonnull final Path originalReferrerSourcePath,
-			@Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) throws IOException, DOMException {
-		findAttributeNS(linkElement, null, ELEMENT_A_ATTRIBUTE_HREF).ifPresent(href -> {
-			getLogger().debug("  - found an href: {}", href);
+	protected List<Element> relocateReferenceElement(@Nonnull MummyContext context, @Nonnull final Element referenceElement,
+			@Nonnull final String referenceAttributeName, @Nonnull final Path originalReferrerSourcePath, @Nonnull final Path relocatedReferrerPath,
+			@Nonnull final Function<Artifact, Path> referentArtifactPath) throws IOException, DOMException {
+		findAttributeNS(referenceElement, null, referenceAttributeName).ifPresent(referenceString -> {
+			getLogger().debug("  - found reference <{} {}=\"{}\" …>", referenceElement.getNodeName(), referenceAttributeName, referenceString);
 			//TODO check for the empty string and do something appropriate
-			final URI hrefURI = URI.create(href);
-			if(!hrefURI.isAbsolute()) { //only convert paths
-				final URIPath hrefPath = URIPath.fromURI(hrefURI);
-				if(hrefPath.isRelative()) { //only convert relative paths TODO maybe later support "context paths", rooted at the site root
-					retargetResourceReference(context, hrefPath, originalReferrerSourcePath, relocatedReferrerPath, referentArtifactPath)
-							.ifPresentOrElse(retargetedHrefPath -> {
-								getLogger().debug("  -> mapping to : {}", retargetedHrefPath);
-								linkElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, retargetedHrefPath.toString());
-							}, () -> getLogger().warn("No target artifact found for source relative reference {}.", hrefPath));
+			final URI referenceURI;
+			try {
+				referenceURI = new URI(referenceString);
+				if(!referenceURI.isAbsolute()) { //only convert paths
+					final URIPath resourceReference = URIPath.fromURI(referenceURI);
+					if(resourceReference.isRelative()) { //only convert relative paths TODO maybe later support "context paths", rooted at the site root
+						retargetResourceReference(context, resourceReference, originalReferrerSourcePath, relocatedReferrerPath, referentArtifactPath)
+								.ifPresentOrElse(retargetedResourceReference -> {
+									getLogger().debug("  -> mapping to : {}", retargetedResourceReference);
+									referenceElement.setAttributeNS(null, referenceAttributeName, retargetedResourceReference.toString());
+								}, () -> getLogger().warn("No target artifact found for source relative reference {}.", resourceReference));
+					}
 				}
+			} catch(final URISyntaxException uriSyntaxException) {
+				getLogger().warn("Invalied reference <{} {}=\"{}\" …>\".", referenceElement.getNodeName(), referenceAttributeName, referenceString, uriSyntaxException);
+				return;
 			}
 		});
-		return List.of(linkElement);
+		return List.of(referenceElement);
 	}
 
 	/**
