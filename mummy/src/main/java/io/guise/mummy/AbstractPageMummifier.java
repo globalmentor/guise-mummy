@@ -133,7 +133,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		final Document sourceDocument = loadSourceDocument(context, sourceFile);
 		//<title>; will override any <code>title</code> metadata property in this same document
 		findTitle(sourceDocument).ifPresent(title -> description.setPropertyValueByHandle(Artifact.PROPERTY_HANDLE_TITLE, title));
-		//<meta>; empty and whitespace-only  
+		//<meta>; skip empty and whitespace-only  
 		namedMetadata(sourceDocument).filter(meta -> !meta.getKey().isBlank()).forEach(meta -> {
 			final String propertyHandle;
 			try {
