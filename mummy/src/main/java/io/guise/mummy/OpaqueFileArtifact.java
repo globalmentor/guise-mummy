@@ -20,11 +20,22 @@ import java.nio.file.Path;
 
 import javax.annotation.*;
 
+import io.urf.model.UrfResourceDescription;
+
 /**
  * An artifact representing a file with unknown contents.
  * @author Garret Wilson
  */
 public class OpaqueFileArtifact extends AbstractSourceFileArtifact {
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation currently returns an empty description.
+	 */
+	@Override
+	public UrfResourceDescription getResourceDescription() {
+		return UrfResourceDescription.EMPTY;
+	}
 
 	/**
 	 * Constructor.

@@ -24,7 +24,7 @@ import javax.annotation.*;
  * An abstract base class for an artifact generated from a source file.
  * @author Garret Wilson
  */
-public class AbstractSourceFileArtifact extends AbstractArtifact {
+public abstract class AbstractSourceFileArtifact extends AbstractArtifact {
 
 	/**
 	 * {@inheritDoc}
