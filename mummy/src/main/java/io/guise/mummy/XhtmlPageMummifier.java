@@ -44,8 +44,7 @@ public class XhtmlPageMummifier extends AbstractPageMummifier {
 	 * @implSpec This version loads a document in XHTML format.
 	 */
 	@Override
-	public Document loadSourceDocument(@Nonnull MummyContext context, final Artifact contextArtifact, final Artifact artifact, final Path sourceFile)
-			throws IOException {
+	public Document loadSourceDocument(@Nonnull MummyContext context, final Path sourceFile) throws IOException {
 		final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance(); //TODO use shared factory?
 		documentBuilderFactory.setNamespaceAware(true);
 		DocumentBuilder documentBuilder;

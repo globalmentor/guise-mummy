@@ -19,6 +19,9 @@ package io.guise.mummy;
 import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Paths.*;
+import static com.globalmentor.java.Characters.*;
+import static com.globalmentor.java.Conditions.*;
+import static com.globalmentor.java.StringBuilders.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static java.nio.file.Files.*;
 import static org.zalando.fauxpas.FauxPas.*;
@@ -37,6 +40,11 @@ import org.w3c.dom.*;
 import com.globalmentor.html.HtmlSerializer;
 import com.globalmentor.io.Filenames;
 import com.globalmentor.net.URIPath;
+import com.globalmentor.xml.spec.XML;
+
+import io.urf.URF;
+import io.urf.model.UrfObject;
+import io.urf.model.UrfResourceDescription;
 
 /**
  * Abstract base mummifier for generating HTML pages.
@@ -72,8 +80,76 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	}
 
 	@Override
-	public Artifact plan(final MummyContext context, final Path sourcePath) throws IOException {
-		return new PageArtifact(this, sourcePath, getArtifactTargetPath(context, sourcePath));
+	public PageArtifact plan(final MummyContext context, final Path sourceFile) throws IOException {
+		final UrfResourceDescription description = loadDescription(context, sourceFile);
+		return new PageArtifact(this, sourceFile, getArtifactTargetPath(context, sourceFile), description);
+	}
+
+	/** The character to use for replacing invalid metadata name characters. */
+	private static final char META_NAME_REPLACMENT_CHAR = '_';
+
+	/**
+	 * Normalizes a metadata property name into an appropriate URF handle.
+	 * <p>
+	 * The following changes are made:
+	 * </p>
+	 * <ul>
+	 * <li>Beginning and ending whitespace is trimmed.</li>
+	 * <li>Any space <code>' '</code> is replaced with underscore <code>'_'</code>.</li>
+	 * <li>The XML QName delimiter <code>':'</code> is replaced with the URF handle segment delimiter <code>'-'</code>.
+	 * </ul>
+	 * @param propertyName The name of a metadata property name, normally retrieved from HTML {@code <meta>} elements.
+	 * @return The property name normalized appropriately to be used for an URF handle.
+	 * @throws IllegalArgumentException if the given property name is empty.
+	 * @throws IllegalArgumentException if the given property name cannot be normalized, e.g. it has successive <code>'-'</code> characters.
+	 * @see URF.Handle#isValid(String)
+	 * @see <a href="http://ogp.me/">The Open Graph protocol</a>
+	 */
+	protected static String normalizePropertyHandle(@Nonnull final String propertyName) {
+		checkArgument(!propertyName.isEmpty(), "Property name may not be empty.");
+		if(URF.Handle.isValid(propertyName)) { //if the property name is already valid, there's nothing to do
+			return propertyName;
+		}
+		final StringBuilder handleBuilder = new StringBuilder(propertyName.trim()); //TODO use a more comprehensive trim method that recognizes Character.isWhiteSpace()
+		replace(handleBuilder, SPACE_CHAR, META_NAME_REPLACMENT_CHAR); //TODO improve to catch all whitespace; consider converting to camelCase
+		replace(handleBuilder, XML.NAMESPACE_DIVIDER, URF.Handle.SEGMENT_DELIMITER); //e.g. "og:type" from Open Graph
+		//TODO convert other invalid characters
+		final String normalizedHandle = handleBuilder.toString();
+		checkArgument(URF.Handle.isValid(normalizedHandle), "Property name %s cannot be normalized.", propertyName);
+		return normalizedHandle;
+	}
+
+	/**
+	 * Determines the description for the given artifact based upon its source file and related files.
+	 * @implSpec This default implementation loads description from metadata in the XHTML document obtained by calling
+	 *           {@link #loadSourceDocument(MummyContext, Path)}.
+	 * @param context The context of static site generation.
+	 * @param sourceFile The source file to be mummified.
+	 * @return An artifact describing the resource to be mummified.
+	 * @throws IOException if there is an I/O error retrieving the description.
+	 */
+	protected UrfResourceDescription loadDescription(@Nonnull MummyContext context, @Nonnull final Path sourceFile) throws IOException {
+		final UrfObject description = new UrfObject();
+		final Document sourceDocument = loadSourceDocument(context, sourceFile);
+		//<title>; will override any <code>title</code> metadata property in this same document
+		findTitle(sourceDocument).ifPresent(title -> description.setPropertyValueByHandle(Artifact.PROPERTY_HANDLE_TITLE, title));
+		//<meta>; skip empty and whitespace-only  
+		namedMetadata(sourceDocument).filter(meta -> !meta.getKey().isBlank()).forEach(meta -> {
+			final String propertyHandle;
+			try {
+				propertyHandle = normalizePropertyHandle(meta.getKey());
+			} catch(final IllegalArgumentException illegalArgumentException) {
+				getLogger().warn("Property name {} for artifact {} is invalid and will not be included in resource description.");
+				return; //skip processing of this property
+			}
+			final String propertyValue = meta.getValue();
+			if(!description.hasPropertyValueByHandle(propertyHandle)) { //the first property wins
+				description.setPropertyValueByHandle(propertyHandle, propertyValue);
+			}
+			//TODO consider parsing out "keywords" in to multiple keyword+ properties for convenience
+		});
+		//TODO load any description sidecar
+		return description; //TODO add a way to make this immutable
 	}
 
 	@Override
@@ -82,7 +158,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		try {
 
 			//#load source document: get starting content to work with
-			final Document sourceDocument = loadSourceDocument(context, contextArtifact, artifact, artifact.getSourcePath());
+			final Document sourceDocument = loadSourceDocument(context, artifact.getSourcePath());
 			getLogger().debug("loaded source document: {}", artifact.getSourcePath());
 
 			//#apply template
@@ -130,7 +206,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 					//#load and relocate the template document
 					final Document templateDocument;
 					{
-						final Document sourceTemplateDocument = templateMummifier.loadSourceDocument(context, contextArtifact, artifact, templateFile);
+						final Document sourceTemplateDocument = templateMummifier.loadSourceDocument(context, templateFile);
 						//relocate the template links _within the source tree_ as if it were in the place of the artifact source
 						templateDocument = relocateDocument(context, sourceTemplateDocument, templateFile, contextArtifact.getSourcePath(), Artifact::getSourcePath);
 					}

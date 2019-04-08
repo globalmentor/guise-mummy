@@ -30,6 +30,12 @@ import org.w3c.dom.*;
  */
 public interface PageMummifier extends Mummifier {
 
+	/**
+	 * {@inheritDoc} A page mummifier will always return a {@link PageArtifact}.
+	 */
+	@Override
+	PageArtifact plan(MummyContext context, Path sourcePath) throws IOException;
+
 	//#load
 
 	/**
@@ -41,15 +47,14 @@ public interface PageMummifier extends Mummifier {
 	 * The document must be in XHTML using the HTML namespace.
 	 * </p>
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
-	 * @param artifact The artifact being generated
 	 * @param sourceFile The file from which to load the document.
 	 * @return A document describing the source content of the artifact to generate.
 	 * @throws IOException if there is an error loading and/or converting the source file contents.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull Artifact contextArtifact, @Nonnull Artifact artifact, @Nonnull Path sourceFile)
-			throws IOException, DOMException;
+	public Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull Path sourceFile) throws IOException, DOMException;
+
+	//#relocate
 
 	/**
 	 * Relocates a document by retargeting its references relative to a new referrer path location.

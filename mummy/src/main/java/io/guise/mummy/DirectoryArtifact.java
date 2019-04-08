@@ -23,6 +23,8 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import io.urf.model.UrfResourceDescription;
+
 /**
  * Abstract implementation of a collection artifact.
  * @author Garret Wilson
@@ -43,6 +45,15 @@ public class DirectoryArtifact extends AbstractArtifact implements CollectionArt
 	/** @return The optional internal artifact representing the content of this directory, such as <code>index.xhtml</code>. */
 	public Optional<Artifact> getContentArtifact() {
 		return Optional.ofNullable(contentArtifact);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation returns the description of the content artifact, if any; otherwise, an empty description.
+	 */
+	@Override
+	public UrfResourceDescription getResourceDescription() {
+		return getContentArtifact().map(Artifact::getResourceDescription).orElse(UrfResourceDescription.EMPTY);
 	}
 
 	private final Collection<Artifact> childArtifacts;

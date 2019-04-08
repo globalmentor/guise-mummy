@@ -27,6 +27,7 @@ import java.util.*;
 import javax.annotation.*;
 
 import io.clogr.Clogged;
+import io.urf.turf.TurfSerializer;
 
 /**
  * Guise static site generator.
@@ -79,9 +80,17 @@ public class GuiseMummy implements Clogged {
 
 	//TODO document
 	private void printArtifactDescription(@Nonnull final MummyContext context, @Nonnull final Artifact artifact) { //TODO transfer to CLI
+		final TurfSerializer turfSerializer = new TurfSerializer();
 
 		//TODO remove debug code
 		getLogger().debug("{} ({})", artifact.getTargetPath(), artifact.getTargetPath().toUri());
+		if(artifact.getResourceDescription().hasProperties()) {
+			try {
+				getLogger().debug("    {}", turfSerializer.serializeDescription(new StringBuilder(), artifact.getResourceDescription()));
+			} catch(final IOException ioException) {
+				getLogger().error("Error debugging resource description.", ioException);
+			}
+		}
 
 		context.getParentArtifact(artifact).ifPresent(parent -> getLogger().debug("  parent: {}", parent.getTargetPath()));
 		final Collection<Artifact> siblings = context.getSiblingArtifacts(artifact);
