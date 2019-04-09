@@ -39,7 +39,7 @@ public interface Artifact {
 	public static final String PROPERTY_HANDLE_NAME = "name";
 	/** The property handle of the string describing the artifact. */
 	public static final String PROPERTY_HANDLE_DESCRIPTION = "description";
-	/** The property handle of the string to use as a label, in link text for example. */
+	/** The property handle of the string to use as a label, in navigation link text for example. */
 	public static final String PROPERTY_HANDLE_LABEL = "label";
 	/** The property handle of the title, such as a page title. */
 	public static final String PROPERTY_HANDLE_TITLE = "title";
@@ -68,17 +68,19 @@ public interface Artifact {
 	 * </p>
 	 * <ol>
 	 * <li>The {@value #PROPERTY_HANDLE_LABEL} property.</li>
+	 * <li>The {@value #PROPERTY_HANDLE_TITLE} property.</li>
 	 * <li>The {@value #PROPERTY_HANDLE_NAME} property.</li>
 	 * <li>The {@link Path#getFileName()} of the target path of this artifact, with no extension.</li>
 	 * </ol>
 	 * @return The label determined to be used for this artifact.
 	 * @see #findLabel()
 	 * @see #findName()
+	 * @see #findTitle()
 	 * @see #getTargetPath()
 	 */
 	public default String determineLabel() {
 		assert getTargetPath().getFileName() != null : "Artifacts are expected always to have filenames.";
-		return findLabel().or(this::findName).orElseGet(() -> removeExtension(getTargetPath().getFileName().toString()));
+		return findLabel().or(this::findName).or(this::findTitle).orElseGet(() -> removeExtension(getTargetPath().getFileName().toString()));
 	}
 
 	/**
