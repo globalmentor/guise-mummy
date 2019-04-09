@@ -52,7 +52,11 @@ public class GuiseCli extends BaseCliApplication {
 	@Command(description = "Mummifies a site by generating a static version.")
 	public void mummify(
 			@Option(names = "--target", description = "The target directory into which the site will be generated; will be created if needed.", required = true) final Path targetDirectory,
-			@Parameters(paramLabel = "<source-directory>", description = "The root directory of the site to mummify.") @Nonnull final Path sourceDirectory) {
+			@Parameters(paramLabel = "<source-directory>", description = "The root directory of the site to mummify.") @Nonnull final Path sourceDirectory,
+			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
+
+		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
+
 		final GuiseMummy mummifier = new GuiseMummy();
 		try {
 			mummifier.mummify(sourceDirectory, targetDirectory);
