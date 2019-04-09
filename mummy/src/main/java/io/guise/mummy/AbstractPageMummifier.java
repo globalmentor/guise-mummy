@@ -38,7 +38,6 @@ import javax.annotation.*;
 import org.w3c.dom.*;
 
 import com.globalmentor.html.HtmlSerializer;
-import com.globalmentor.io.Filenames;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.xml.spec.XML;
 
@@ -400,7 +399,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI.toString(), ELEMENT_A)).map(Element.class::cast).ifPresent(aElement -> { //find <li><a>
 				aElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, context.relativizeSourceReference(contextArtifact, navigationArtifact).toString());
 				//remove all text and add the link label
-				appendText(removeChildren(aElement), Filenames.removeExtension(navigationArtifact.getSourcePath().getFileName().toString()));
+				appendText(removeChildren(aElement), navigationArtifact.determineLabel());
 			});
 			navigationListElement.appendChild(liElement);
 			appendText(navigationListElement, System.lineSeparator()); //TODO remove when HTML formatting is fixed
