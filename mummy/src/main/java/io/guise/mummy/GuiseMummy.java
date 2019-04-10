@@ -18,7 +18,6 @@ package io.guise.mummy;
 
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Paths.*;
-import static java.util.Objects.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -63,6 +62,8 @@ public class GuiseMummy implements Clogged {
 	 * Performs static site generation on a source directory into a target directory.
 	 * @param sourceDirectory The root of the site to be mummified.
 	 * @param targetDirectory The root directory of the generated static site; will be created if needed.
+	 * @throws IllegalArgumentException if the source directory does not exist or is not a directory.
+	 * @throws IllegalArgumentException if the source and target directories overlap.
 	 * @throws IOException if there is an I/O error generating the static site.
 	 */
 	public void mummify(@Nonnull final Path sourceDirectory, @Nonnull final Path targetDirectory) throws IOException {
@@ -133,12 +134,14 @@ public class GuiseMummy implements Clogged {
 		 * Site source directory constructor.
 		 * @param siteSourceDirectory The source directory of the entire site.
 		 * @param siteTargetDirectory The base output directory of the site being mummified.
+		 * @throws IllegalArgumentException if the source directory does not exist or is not a directory.
 		 * @throws IllegalArgumentException if the source and target directories overlap.
 		 */
 		public Context(@Nonnull final Path siteSourceDirectory, @Nonnull final Path siteTargetDirectory) {
+			checkArgumentDirectory(siteSourceDirectory);
 			checkArgumentDisjoint(siteSourceDirectory, siteTargetDirectory);
-			this.siteSourceDirectory = requireNonNull(siteSourceDirectory);
-			this.siteTargetDirectory = requireNonNull(siteTargetDirectory);
+			this.siteSourceDirectory = siteSourceDirectory;
+			this.siteTargetDirectory = siteTargetDirectory;
 		}
 
 		@Override
