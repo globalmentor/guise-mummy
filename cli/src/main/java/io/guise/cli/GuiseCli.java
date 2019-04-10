@@ -59,8 +59,8 @@ public class GuiseCli extends BaseCliApplication {
 
 	@Command(description = "Mummifies a site by generating a static version.")
 	public void mummify(
-			@Option(names = "--source", description = "The root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path sourceDirectory,
-			@Option(names = "--target", description = "The target directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path targetDirectory,
+			@Option(names = "--site-source", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path sourceDirectory,
+			@Option(names = "--site-target", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path targetDirectory,
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path projectDirectory,
 
 			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
