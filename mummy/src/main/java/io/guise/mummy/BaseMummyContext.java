@@ -31,6 +31,9 @@ import javax.annotation.*;
  */
 public abstract class BaseMummyContext implements MummyContext {
 
+	/** The segment prefix that indicates a veiled resource or resource parent. */
+	public static final String VEILED_PATH_SEGMENT_PREFIX = "_";
+
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This specification currently ignores dotfiles, for example <code>.git</code> and <code>.gitignore</code>; as well as non-regular files.
@@ -41,6 +44,26 @@ public abstract class BaseMummyContext implements MummyContext {
 		}
 		if(!isRegularFile(sourcePath) && !isDirectory(sourcePath)) { //TODO add option to traverse symbolic links
 			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This specification currently ignores any artifact the source filename of which, or the filename of any parent source directory of which (within
+	 *           the site), starts with {@value #VEILED_PATH_SEGMENT_PREFIX}. For example both <code>…/_foo/bar.txt</code> and <code>…/foo/_bar.txt</code> would
+	 *           be considered veiled.
+	 */
+	@Override
+	public boolean isVeiled(final Artifact artifact) {
+		final Path siteSourceDirectory = getSiteSourceDirectory();
+		Path sourcePath = artifact.getSourcePath();
+		while(!sourcePath.equals(siteSourceDirectory)) {
+			if(sourcePath.getFileName().toString().startsWith(VEILED_PATH_SEGMENT_PREFIX)) {
+				return true;
+			}
+			sourcePath = sourcePath.getParent();
+			assert sourcePath != null : "Artifact source path is expected to be inside site source directory.";
 		}
 		return false;
 	}

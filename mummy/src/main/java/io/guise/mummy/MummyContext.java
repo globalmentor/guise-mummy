@@ -131,6 +131,13 @@ public interface MummyContext {
 	//hierarchy
 
 	/**
+	 * Indicates whether the given artifact is <dfn>veiled</dfn>; that is, hidden from navigation. The artifact will still be available for direct retrieval.
+	 * @param artifact The artifact to check.
+	 * @return <code>true</code> if the artifact should <em>not</em> be included in normal navigation.
+	 */
+	public boolean isVeiled(@Nonnull final Artifact artifact);
+
+	/**
 	 * Returns the parent artifact of some artifact.
 	 * @param artifact The artifact for which a parent is to be determined.
 	 * @return The parent artifact, if any, of the given artifact.
@@ -154,18 +161,6 @@ public interface MummyContext {
 	 */
 	public default Stream<Artifact> siblingArtifacts(@Nonnull final Artifact artifact) {
 		return findParentArtifact(artifact).map(this::childArtifacts).orElse(Stream.empty());
-	}
-
-	/**
-	 * Provides the artifacts suitable for direct subsequent navigation from this artifact, <em>excluding</em> the parent artifact. The sibling artifacts are
-	 * returned, they will include the given resource.
-	 * @apiNote This method is equivalent to calling {@link #childArtifacts(Artifact)} if the artifact is a {@link CollectionArtifact}, otherwise calling
-	 *          {@link #siblingArtifacts(Artifact)}.
-	 * @param artifact The artifact for which navigation artifacts should be returned.
-	 * @return The artifacts for subsequent navigation from this artifact.
-	 */
-	public default Stream<Artifact> navigationArtifacts(@Nonnull final Artifact artifact) {
-		return artifact instanceof CollectionArtifact ? childArtifacts(artifact) : siblingArtifacts(artifact);
 	}
 
 	//source references
