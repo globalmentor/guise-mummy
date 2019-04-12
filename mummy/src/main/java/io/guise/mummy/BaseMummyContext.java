@@ -48,7 +48,7 @@ public abstract class BaseMummyContext implements MummyContext {
 	private final Map<Artifact, Artifact> parentArtifactsByArtifact = new HashMap<>();
 
 	@Override
-	public Optional<Artifact> getParentArtifact(final Artifact artifact) {
+	public Optional<Artifact> findParentArtifact(final Artifact artifact) {
 		return Optional.ofNullable(parentArtifactsByArtifact.get(requireNonNull(artifact)));
 	}
 

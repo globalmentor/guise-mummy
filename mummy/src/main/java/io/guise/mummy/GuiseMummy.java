@@ -18,6 +18,7 @@ package io.guise.mummy;
 
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Paths.*;
+import static java.util.stream.Collectors.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -93,12 +94,12 @@ public class GuiseMummy implements Clogged {
 			}
 		}
 
-		context.getParentArtifact(artifact).ifPresent(parent -> getLogger().debug("  parent: {}", parent.getTargetPath()));
-		final Collection<Artifact> siblings = context.getSiblingArtifacts(artifact);
+		context.findParentArtifact(artifact).ifPresent(parent -> getLogger().debug("  parent: {}", parent.getTargetPath()));
+		final Collection<Artifact> siblings = context.siblingArtifacts(artifact).collect(toList()); //TODO make debugging calls more efficient, or transfer to describe functionality  
 		if(!siblings.isEmpty()) {
 			getLogger().debug("  siblings: {}", siblings);
 		}
-		final Collection<Artifact> children = context.getChildArtifacts(artifact);
+		final Collection<Artifact> children = context.childArtifacts(artifact).collect(toList());
 		if(!children.isEmpty()) {
 			getLogger().debug("  children: {}", children);
 		}

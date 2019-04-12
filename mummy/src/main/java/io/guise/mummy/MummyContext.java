@@ -18,7 +18,6 @@ package io.guise.mummy;
 
 import static com.globalmentor.io.Paths.*;
 import static java.nio.file.Files.*;
-import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.function.Predicate.*;
 import static org.zalando.fauxpas.FauxPas.*;
@@ -129,42 +128,44 @@ public interface MummyContext {
 				.orElseGet(() -> isDirectory(sourcePath) ? getDefaultSourceDirectoryMummifier() : getDefaultSourceFileMummifier());
 	}
 
+	//hierarchy
+
 	/**
-	 * Determines the parent artifact of some artifact.
+	 * Returns the parent artifact of some artifact.
 	 * @param artifact The artifact for which a parent is to be determined.
 	 * @return The parent artifact, if any, of the given artifact.
 	 */
-	public Optional<Artifact> getParentArtifact(@Nonnull final Artifact artifact);
+	public Optional<Artifact> findParentArtifact(@Nonnull final Artifact artifact);
 
 	/**
-	 * Determines the child artifacts of some artifact.
+	 * Provides the child artifacts of some artifact.
 	 * @param artifact The artifact for which children should be returned.
 	 * @return The child artifacts, if any, of the given artifact.
 	 */
-	public default Collection<Artifact> getChildArtifacts(@Nonnull final Artifact artifact) {
-		return requireNonNull(artifact) instanceof CollectionArtifact ? ((CollectionArtifact)artifact).getChildArtifacts() : emptySet();
+	public default Stream<Artifact> childArtifacts(@Nonnull final Artifact artifact) {
+		return requireNonNull(artifact) instanceof CollectionArtifact ? ((CollectionArtifact)artifact).getChildArtifacts().stream() : Stream.empty();
 	}
 
 	/**
-	 * Determines the artifacts that are siblings to the given artifact. An artifact will not have siblings if it has no parent. If any artifacts are returned,
-	 * the returned artifacts <em>will</em> include the given artifact. This means that a single child artifact will return itself as the single sibling artifact.
+	 * Provides the artifacts that are siblings to the given artifact. An artifact will not have siblings if it has no parent. If any artifacts are returned, the
+	 * returned artifacts <em>will</em> include the given artifact. This means that a single child artifact will return itself as the single sibling artifact.
 	 * @param artifact The artifact for which siblings should be returned.
 	 * @return The sibling artifacts, if any, of the given artifact, including the given artifact.
 	 */
-	public default Collection<Artifact> getSiblingArtifacts(@Nonnull final Artifact artifact) {
-		return getParentArtifact(artifact).map(this::getChildArtifacts).orElse(emptySet());
+	public default Stream<Artifact> siblingArtifacts(@Nonnull final Artifact artifact) {
+		return findParentArtifact(artifact).map(this::childArtifacts).orElse(Stream.empty());
 	}
 
 	/**
-	 * Determines the artifacts suitable for direct subsequent navigation from this artifact, <em>excluding</em> the parent artifact. The sibling artifacts are
+	 * Provides the artifacts suitable for direct subsequent navigation from this artifact, <em>excluding</em> the parent artifact. The sibling artifacts are
 	 * returned, they will include the given resource.
-	 * @apiNote This method is equivalent to calling {@link #getChildArtifacts(Artifact)} if the artifact is a {@link CollectionArtifact}, otherwise calling
-	 *          {@link #getSiblingArtifacts(Artifact)}.
+	 * @apiNote This method is equivalent to calling {@link #childArtifacts(Artifact)} if the artifact is a {@link CollectionArtifact}, otherwise calling
+	 *          {@link #siblingArtifacts(Artifact)}.
 	 * @param artifact The artifact for which navigation artifacts should be returned.
 	 * @return The artifacts for subsequent navigation from this artifact.
 	 */
-	public default Collection<Artifact> getNavigationArtifacts(@Nonnull final Artifact artifact) {
-		return artifact instanceof CollectionArtifact ? getChildArtifacts(artifact) : getSiblingArtifacts(artifact);
+	public default Stream<Artifact> navigationArtifacts(@Nonnull final Artifact artifact) {
+		return artifact instanceof CollectionArtifact ? childArtifacts(artifact) : siblingArtifacts(artifact);
 	}
 
 	//source references

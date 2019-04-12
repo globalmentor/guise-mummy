@@ -391,7 +391,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		removeChildren(navigationListElement); //remove existing links
 
 		//add new links from templates
-		context.getNavigationArtifacts(contextArtifact).stream().filter(navArtifact -> {
+		context.navigationArtifacts(contextArtifact).filter(navArtifact -> {
 			//TODO add facility for designating and skipping assets in navigation
 			return !"css".equals(navArtifact.getSourcePath().getFileName().toString()) && !"js".equals(navArtifact.getSourcePath().getFileName().toString());
 		}).forEach(navigationArtifact -> {
