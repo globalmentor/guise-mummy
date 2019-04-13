@@ -24,6 +24,7 @@ import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.java.StringBuilders.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static java.nio.file.Files.*;
+import static java.util.function.Predicate.*;
 import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.*;
@@ -32,6 +33,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import javax.annotation.*;
 
@@ -76,6 +78,24 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	@Override
 	protected Path getArtifactTargetPath(final MummyContext context, final Path sourceFile) {
 		return changeExtension(super.getArtifactTargetPath(context, sourceFile), "html"); //TODO use constant
+	}
+
+	/**
+	 * Provides the artifacts suitable for direct subsequent navigation from this artifact, <em>excluding</em> the parent artifact. The sibling artifacts are
+	 * returned, they will include the given resource.
+	 * @implSpec This method retrieves candidate resources using {@link MummyContext#childArtifacts(Artifact)} if the artifact is a {@link CollectionArtifact};
+	 *           otherwise it calls {@link MummyContext#siblingArtifacts(Artifact)}. Only artifacts that are not veiled are included.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @return The artifacts for subsequent navigation from this artifact.
+	 * @see MummyContext#childArtifacts(Artifact)
+	 * @see MummyContext#siblingArtifacts(Artifact)
+	 * @see MummyContext#isVeiled(Artifact)
+	 */
+	protected Stream<Artifact> navigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
+		final Stream<Artifact> candidateArtifacts = contextArtifact instanceof CollectionArtifact ? context.childArtifacts(contextArtifact)
+				: context.siblingArtifacts(contextArtifact);
+		return candidateArtifacts.filter(not(context::isVeiled));
 	}
 
 	@Override
@@ -390,11 +410,8 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 		removeChildren(navigationListElement); //remove existing links
 
-		//add new links from templates
-		context.getNavigationArtifacts(contextArtifact).stream().filter(navArtifact -> {
-			//TODO add facility for designating and skipping assets in navigation
-			return !"css".equals(navArtifact.getSourcePath().getFileName().toString()) && !"js".equals(navArtifact.getSourcePath().getFileName().toString());
-		}).forEach(navigationArtifact -> {
+		//add new navigation links from templates
+		navigationArtifacts(context, contextArtifact).forEach(navigationArtifact -> {
 			final Element liElement = (Element)liTemplate.cloneNode(true);
 			findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI.toString(), ELEMENT_A)).map(Element.class::cast).ifPresent(aElement -> { //find <li><a>
 				aElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, context.relativizeSourceReference(contextArtifact, navigationArtifact).toString());
