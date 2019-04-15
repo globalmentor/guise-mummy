@@ -41,6 +41,7 @@ import org.w3c.dom.*;
 
 import com.globalmentor.html.HtmlSerializer;
 import com.globalmentor.net.URIPath;
+import com.globalmentor.net.URIs;
 import com.globalmentor.xml.spec.XML;
 
 import io.urf.URF;
@@ -533,7 +534,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @return The relocated element(s), if any, to replace the source element.
 	 * @throws IOException if there is an error relocating the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
-	 * @see #retargetResourceReference(MummyContext, URIPath, Path, Path, Function)
+	 * @see #retargetResourceReference(MummyContext, URI, Path, Path, Function)
 	 */
 	protected List<Element> relocateReferenceElement(@Nonnull MummyContext context, @Nonnull final Element referenceElement,
 			@Nonnull final String referenceAttributeName, @Nonnull final Path originalReferrerSourcePath, @Nonnull final Path relocatedReferrerPath,
@@ -545,13 +546,13 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			try {
 				referenceURI = new URI(referenceString);
 				if(!referenceURI.isAbsolute()) { //only convert paths
-					final URIPath resourceReference = URIPath.fromURI(referenceURI);
-					if(resourceReference.isRelative()) { //only convert relative paths TODO maybe later support "context paths", rooted at the site root
-						retargetResourceReference(context, resourceReference, originalReferrerSourcePath, relocatedReferrerPath, referentArtifactPath)
+					final String referencePath = referenceURI.getRawPath();
+					if(referencePath != null && !URIs.isPathAbsolute(referencePath)) { //only convert relative paths TODO maybe later support "context paths", rooted at the site root
+						retargetResourceReference(context, referenceURI, originalReferrerSourcePath, relocatedReferrerPath, referentArtifactPath)
 								.ifPresentOrElse(retargetedResourceReference -> {
 									getLogger().debug("  -> mapping to : {}", retargetedResourceReference);
 									referenceElement.setAttributeNS(null, referenceAttributeName, retargetedResourceReference.toString());
-								}, () -> getLogger().warn("No target artifact found for source relative reference {}.", resourceReference));
+								}, () -> getLogger().warn("No target artifact found for source relative reference {}.", referenceURI));
 					}
 				}
 			} catch(final URISyntaxException uriSyntaxException) {
@@ -563,13 +564,42 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	}
 
 	/**
-	 * Retargets a relative resource reference after relocating the referring source path to a new location, base upon the determined path of the referent
+	 * Retargets a relative resource reference after relocating the referring source path to a new location, based upon the determined path of the referent
 	 * artifact.
 	 * <p>
 	 * This method supports relocating within the source tree or from the source tree to the target tree.
 	 * </p>
+	 * @apiNote This method supports non-path-only references, such as <code>example?foo</code>, <code>example#bar</code>, and <code>example?foo#bar</code>.
 	 * @param context The context of static site generation.
-	 * @param resourceReference The relative resource reference, e.g. <code>example/test.txt</code>.
+	 * @param resourceReference The relative resource reference, e.g. <code>example/test.txt?foo#bar</code>.
+	 * @param originalReferrerSourcePath The absolute original path of the referrer, e.g. <code>…/foo/page.xhtml</code>.
+	 * @param relocatedReferrerPath The absolute relocated path of the referrer, e.g. <code>…/bar/page.xhtml</code>.
+	 * @param referentArtifactPath The function for determining the path of the determined referent artifact. This function should return either the source path
+	 *          or the destination path of the artifact concordant with the site tree of the relocated referrer.
+	 * @return The relative reference to the original artifact, now relativized to the relocated referrer path, e.g. <code>../bar/example/test.txt?foo#bar</code>.
+	 * @throws IllegalArgumentException if the given reference has no path or its path is absolute.
+	 * @throws IllegalArgumentException if the original referrer source path is not absolute and/or is not within the site source tree.
+	 * @throws IllegalArgumentException if the relocated referred path is not in the site source or target tree.
+	 * @throws IllegalArgumentException if the referent artifact path is not in the same source/target tree as the relocated referrer path.
+	 */
+	protected Optional<URI> retargetResourceReference(@Nonnull MummyContext context, @Nonnull URI resourceReference,
+			@Nonnull final Path originalReferrerSourcePath, @Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) {
+		final URIPath resourceReferencePath = URIs.getPath(resourceReference);
+		checkArgument(resourceReferencePath != null, "Resource reference %s has no path.");
+		return retargetResourceReferencePath(context, resourceReferencePath, originalReferrerSourcePath, relocatedReferrerPath, referentArtifactPath) //retarget the path separately
+				.map(retargetedResourceReferencePath -> URIs.changePath(resourceReference, retargetedResourceReferencePath)); //switch the path of the original reference
+	}
+
+	/**
+	 * Retargets a relative resource reference path after relocating the referring source path to a new location, based upon the determined path of the referent
+	 * artifact.
+	 * <p>
+	 * This method supports relocating within the source tree or from the source tree to the target tree.
+	 * </p>
+	 * @apiNote This method does <em>not</em> support non-path-only references, such as <code>example?foo</code>, <code>example#bar</code>, and
+	 *          <code>example?foo#bar</code>.
+	 * @param context The context of static site generation.
+	 * @param resourceReferencePath The relative resource reference path, e.g. <code>example/test.txt</code>.
 	 * @param originalReferrerSourcePath The absolute original path of the referrer, e.g. <code>…/foo/page.xhtml</code>.
 	 * @param relocatedReferrerPath The absolute relocated path of the referrer, e.g. <code>…/bar/page.xhtml</code>.
 	 * @param referentArtifactPath The function for determining the path of the determined referent artifact. This function should return either the source path
@@ -580,9 +610,9 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @throws IllegalArgumentException if the relocated referred path is not in the site source or target tree.
 	 * @throws IllegalArgumentException if the referent artifact path is not in the same source/target tree as the relocated referrer path.
 	 */
-	protected Optional<URIPath> retargetResourceReference(@Nonnull MummyContext context, @Nonnull URIPath resourceReference,
+	protected Optional<URIPath> retargetResourceReferencePath(@Nonnull MummyContext context, @Nonnull URIPath resourceReferencePath,
 			@Nonnull final Path originalReferrerSourcePath, @Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) {
-		return context.findArtifactBySourceRelativeReference(originalReferrerSourcePath, resourceReference)
+		return context.findArtifactBySourceRelativeReference(originalReferrerSourcePath, resourceReferencePath)
 				.map(referentArtifact -> context.relativizeResourceReference(relocatedReferrerPath, referentArtifactPath.apply(referentArtifact)));
 	}
 
