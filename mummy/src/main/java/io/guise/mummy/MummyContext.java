@@ -17,6 +17,7 @@
 package io.guise.mummy;
 
 import static com.globalmentor.io.Paths.*;
+import static com.globalmentor.net.URIs.*;
 import static java.nio.file.Files.*;
 import static java.util.Objects.*;
 import static java.util.function.Predicate.*;
@@ -239,6 +240,10 @@ public interface MummyContext {
 	 * <code>/foo/bar/index.xhtml</code> is really referring to <code>/foo/bar/</code>; the <code>/foo/bar/index.xhtml</code> file is merely an implementation
 	 * detail for storing the content of <code>/foo/bar/</code>.
 	 * </p>
+	 * <p>
+	 * This method follows <a href="https://tools.ietf.org/html/rfc3986">RFC 3986</a> and resolves a relative reference of the empty string by using the source
+	 * relative reference e.g. <code>/foo/bar</code>, not as the parent collection <code>/foo/</code>.
+	 * </p>
 	 * @param contextSourcePath The source path the relative reference should be resolved against when finding the referent artifact.
 	 * @param sourceRelativeReference The relative URI path being used as a reference to some artifact.
 	 * @return The artifact referred to by a relative path source reference.
@@ -249,8 +254,11 @@ public interface MummyContext {
 			@Nonnull final URIPath sourceRelativeReference) {
 		checkArgumentSubPath(getSiteSourceDirectory(), checkArgumentAbsolute(contextSourcePath));
 		sourceRelativeReference.checkRelative();
-		//resolve the relative path to the URI form of the context artifact path, and then convert that back to a file system path
-		final Path referenceSourcePath = Paths.get(contextSourcePath.toUri().resolve(sourceRelativeReference.toURI()));
+		//Resolve the relative path to the URI form of the context artifact path, and then convert that back to a file system path.
+		//Follow RFC 3986 by interpreting resolution to "" as returning the context source path itself, not the collection/directory path.
+		final URI sourceRelativeReferenceURI = sourceRelativeReference.toURI();
+		final Path referenceSourcePath = sourceRelativeReferenceURI.equals(EMPTY_PATH_URI) ? contextSourcePath
+				: Paths.get(contextSourcePath.toUri().resolve(sourceRelativeReference.toURI()));
 		return findArtifactBySourceReference(referenceSourcePath);
 	}
 
