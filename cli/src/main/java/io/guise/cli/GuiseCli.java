@@ -16,6 +16,7 @@
 
 package io.guise.cli;
 
+import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.OperatingSystem.*;
 
 import java.io.IOException;
@@ -57,10 +58,39 @@ public class GuiseCli extends BaseCliApplication {
 		Application.start(new GuiseCli(args));
 	}
 
+	@Command(description = "Cleans a site by removing the site target directory.")
+	public void clean(
+			@Option(names = "--site-target", description = "The target root directory to be removed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path siteTargetDirectory,
+			@Parameters(paramLabel = "<project>", description = "The base directory of the project to clean.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path projectDirectory,
+
+			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
+
+		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
+
+		if(projectDirectory == null) {
+			projectDirectory = getWorkingDirectory();
+		}
+
+		if(siteTargetDirectory == null) {
+			siteTargetDirectory = projectDirectory.resolve(DEFAULT_TARGET_RELATIVE_DIR);
+		}
+
+		getLogger().info("Clean...");
+		getLogger().info("Project: {}", projectDirectory);
+		getLogger().info("Site Target: {}", siteTargetDirectory);
+
+		try {
+			deleteFileTree(siteTargetDirectory);
+		} catch(final IOException ioException) {
+			getLogger().error("Error cleaning site target directory {}.", siteTargetDirectory, ioException);
+			System.err.println(ioException.getMessage());
+		}
+	}
+
 	@Command(description = "Mummifies a site by generating a static version.")
 	public void mummify(
-			@Option(names = "--site-source", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path sourceDirectory,
-			@Option(names = "--site-target", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path targetDirectory,
+			@Option(names = "--site-source", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path siteSourceDirectory,
+			@Option(names = "--site-target", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path siteTargetDirectory,
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path projectDirectory,
 
 			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
@@ -71,22 +101,22 @@ public class GuiseCli extends BaseCliApplication {
 			projectDirectory = getWorkingDirectory();
 		}
 
-		if(sourceDirectory == null) {
-			sourceDirectory = projectDirectory.resolve(DEFAULT_SOURCE_RELATIVE_DIR);
+		if(siteSourceDirectory == null) {
+			siteSourceDirectory = projectDirectory.resolve(DEFAULT_SOURCE_RELATIVE_DIR);
 		}
 
-		if(targetDirectory == null) {
-			targetDirectory = projectDirectory.resolve(DEFAULT_TARGET_RELATIVE_DIR);
+		if(siteTargetDirectory == null) {
+			siteTargetDirectory = projectDirectory.resolve(DEFAULT_TARGET_RELATIVE_DIR);
 		}
 
 		getLogger().info("Mummify...");
 		getLogger().info("Project: {}", projectDirectory);
-		getLogger().info("Source: {}", sourceDirectory);
-		getLogger().info("Target: {}", targetDirectory);
+		getLogger().info("Site Source: {}", siteSourceDirectory);
+		getLogger().info("Site Target: {}", siteTargetDirectory);
 
 		final GuiseMummy mummifier = new GuiseMummy();
 		try {
-			mummifier.mummify(sourceDirectory.toAbsolutePath().normalize(), targetDirectory.toAbsolutePath().normalize());
+			mummifier.mummify(siteSourceDirectory.toAbsolutePath().normalize(), siteTargetDirectory.toAbsolutePath().normalize());
 		} catch(final IOException ioException) {
 			getLogger().error("Error mummifying site.", ioException);
 			System.err.println(ioException.getMessage());
