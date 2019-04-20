@@ -32,6 +32,7 @@ import javax.annotation.*;
 
 import org.apache.catalina.*;
 import org.apache.catalina.startup.Tomcat;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.globalmentor.application.*;
 import com.globalmentor.net.URIs;
@@ -61,6 +62,9 @@ public class GuiseCli extends BaseCliApplication {
 	 */
 	public GuiseCli(@Nonnull final String[] args) {
 		super(args);
+		//bridge JUL to SLF4J for Tomcat logging
+		SLF4JBridgeHandler.removeHandlersForRootLogger();
+		SLF4JBridgeHandler.install();
 	}
 
 	/**
