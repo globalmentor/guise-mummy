@@ -17,9 +17,11 @@
 package io.guise.cli;
 
 import static com.globalmentor.io.Files.*;
+import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.java.OperatingSystem.*;
 import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.net.URIs.*;
+import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 
 import java.awt.Desktop;
@@ -157,6 +159,8 @@ public class GuiseCli extends BaseCliApplication {
 		if(siteTargetDirectory == null) {
 			siteTargetDirectory = projectDirectory.resolve(DEFAULT_TARGET_RELATIVE_DIR);
 		}
+
+		checkArgument(isDirectory(siteTargetDirectory), "Site target directory %s does not exist.", siteTargetDirectory); //TODO improve error handling; see https://github.com/remkop/picocli/issues/672
 
 		getLogger().info("Serve...");
 		getLogger().info("Project: {}", projectDirectory);
