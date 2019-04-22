@@ -36,7 +36,6 @@ public class AbstractPageMummifierTest {
 		assertThat(AbstractPageMummifier.normalizePropertyHandle("foo-bar"), is("foo-bar"));
 		assertThat(AbstractPageMummifier.normalizePropertyHandle("foo bar"), is("foo_bar"));
 		assertThat(AbstractPageMummifier.normalizePropertyHandle("foo"), is("foo"));
-		assertThat(AbstractPageMummifier.normalizePropertyHandle("og:type"), is("og-type"));
 	}
 
 }
