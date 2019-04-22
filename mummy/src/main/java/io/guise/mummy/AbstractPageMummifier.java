@@ -24,6 +24,7 @@ import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.java.StringBuilders.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static java.nio.file.Files.*;
+import static java.util.Objects.*;
 import static java.util.function.Predicate.*;
 import static org.zalando.fauxpas.FauxPas.*;
 
@@ -45,6 +46,7 @@ import com.globalmentor.net.URIs;
 import com.globalmentor.xml.spec.XML;
 
 import io.urf.URF;
+import io.urf.URF.Handle;
 import io.urf.model.UrfObject;
 import io.urf.model.UrfResourceDescription;
 
@@ -117,14 +119,12 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * <ul>
 	 * <li>Beginning and ending whitespace is trimmed.</li>
 	 * <li>Any space <code>' '</code> is replaced with underscore <code>'_'</code>.</li>
-	 * <li>The XML QName delimiter <code>':'</code> is replaced with the URF handle segment delimiter <code>'-'</code>.
 	 * </ul>
 	 * @param propertyName The name of a metadata property name, normally retrieved from HTML {@code <meta>} elements.
 	 * @return The property name normalized appropriately to be used for an URF handle.
 	 * @throws IllegalArgumentException if the given property name is empty.
 	 * @throws IllegalArgumentException if the given property name cannot be normalized, e.g. it has successive <code>'-'</code> characters.
 	 * @see URF.Handle#isValid(String)
-	 * @see <a href="http://ogp.me/">The Open Graph protocol</a>
 	 */
 	protected static String normalizePropertyHandle(@Nonnull final String propertyName) {
 		checkArgument(!propertyName.isEmpty(), "Property name may not be empty.");
@@ -133,11 +133,48 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		}
 		final StringBuilder handleBuilder = new StringBuilder(propertyName.trim()); //TODO use a more comprehensive trim method that recognizes Character.isWhiteSpace()
 		replace(handleBuilder, SPACE_CHAR, META_NAME_REPLACMENT_CHAR); //TODO improve to catch all whitespace; consider converting to camelCase
-		replace(handleBuilder, XML.NAMESPACE_DIVIDER, URF.Handle.SEGMENT_DELIMITER); //e.g. "og:type" from Open Graph
 		//TODO convert other invalid characters
 		final String normalizedHandle = handleBuilder.toString();
 		checkArgument(URF.Handle.isValid(normalizedHandle), "Property name %s cannot be normalized.", propertyName);
 		return normalizedHandle;
+	}
+
+	/**
+	 * Converts a property name to a property tag URI.
+	 * <ul>
+	 * <li>If the property name is an RDFa <a href="https://www.w3.org/TR/rdfa-core/#s_curies">CURIE</a> such as the Open Graph <code>og:title</code>, the CURIE
+	 * is combined with its prefix by searching the hierarchy of the given element.</li>
+	 * <li>Otherwise the property name itself is used as a property handle, after normalization.</li>
+	 * </ul>
+	 * @implSpec The current implementation only finds prefixes if they are stored in <code>xmlns:</code> XML namespace prefix declarations, not in HTML5
+	 *           <code>prefix</code> attributes.
+	 * @param contextElement The context element that indicates the hierarchy for retrieving CURIE prefixes.
+	 * @param propertyName The name of a metadata property name, normally retrieved from HTML {@code <meta>} elements.
+	 * @return The URI to be used as an URF property tag.
+	 * @throws IllegalArgumentException if the property name is a CURIE but no prefix has been defined in the element hierarchy.
+	 * @throws IllegalArgumentException if the property name is a CURIE but combined with the IRI leading segment does not result in a valid IRI.
+	 * @throws IllegalArgumentException if the given property name is empty.
+	 * @throws IllegalArgumentException if the given property name cannot be normalized, e.g. it has successive <code>'-'</code> characters.
+	 * @see <a href="https://www.w3.org/TR/rdfa-core/#s_curies">RDFa Core 1.1 - Third Edition § 6. CURIE Syntax Definition</a>.
+	 * @see <a href="http://ogp.me/">The Open Graph protocol</a>
+	 */
+	protected static URI toPropertyTag(@Nonnull Element contextElement, @Nonnull final String propertyName) {
+		requireNonNull(contextElement);
+		checkArgument(!propertyName.isEmpty(), "Property name may not be empty.");
+		final int curieDelimiterIndex = propertyName.indexOf(':'); //TODO use CURIE spec; extract logic into RDFa utility
+		if(curieDelimiterIndex >= 0) { //TODO create single character string splitting utility method
+			final String prefix = propertyName.substring(0, curieDelimiterIndex); //TODO check that this is a value XML name, as per the RDFa CURIE spec
+			final String reference = propertyName.substring(curieDelimiterIndex + 1);
+			String leadingSegment = null;
+			Node currentNode = contextElement;
+			do {
+				leadingSegment = findAttributeNS((Element)currentNode, XML.XMLNS_NAMESPACE_URI_STRING, prefix).orElse(null);
+			} while(leadingSegment == null && (currentNode = currentNode.getParentNode()) instanceof Element); //keep looking while we need to and while there are still parent elements
+			checkArgument(leadingSegment != null, "No IRI leading segment defined for prefix %s of property %s.", prefix, propertyName);
+			return URI.create(leadingSegment + reference); //TODO resolve to base
+		} else {
+			return Handle.toTag(normalizePropertyHandle(propertyName)); //normalize the property name and a tag from the handle
+		}
 	}
 
 	/**
@@ -154,18 +191,12 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		final Document sourceDocument = loadSourceDocument(context, sourceFile);
 		//<title>; will override any <code>title</code> metadata property in this same document
 		findTitle(sourceDocument).ifPresent(title -> description.setPropertyValueByHandle(Artifact.PROPERTY_HANDLE_TITLE, title));
-		//<meta>; skip empty and whitespace-only  
-		namedMetadata(sourceDocument).filter(meta -> !meta.getKey().isBlank()).forEach(meta -> {
-			final String propertyHandle;
-			try {
-				propertyHandle = normalizePropertyHandle(meta.getKey());
-			} catch(final IllegalArgumentException illegalArgumentException) {
-				getLogger().warn("Property name {} for artifact {} is invalid and will not be included in resource description.");
-				return; //skip processing of this property
-			}
+		//<meta> TODO detect and add warnings for invalid properties  
+		namedMetadata(sourceDocument, AbstractPageMummifier::toPropertyTag, (element, value) -> value).forEach(meta -> {
+			final URI propertyTag = meta.getKey();
 			final String propertyValue = meta.getValue();
-			if(!description.hasPropertyValueByHandle(propertyHandle)) { //the first property wins
-				description.setPropertyValueByHandle(propertyHandle, propertyValue);
+			if(!description.hasPropertyValue(propertyTag)) { //the first property wins
+				description.setPropertyValue(propertyTag, propertyValue);
 			}
 			//TODO consider parsing out "keywords" in to multiple keyword+ properties for convenience
 		});
