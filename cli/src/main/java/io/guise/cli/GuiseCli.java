@@ -49,11 +49,24 @@ import picocli.CommandLine.*;
 @Command(name = "guise", description = "Command-line interface for Guise tasks.", versionProvider = GuiseCli.MetadataProvider.class, mixinStandardHelpOptions = true)
 public class GuiseCli extends BaseCliApplication {
 
-	/** The default relative path of the source directory. */
-	private final static Path DEFAULT_SOURCE_RELATIVE_DIR = Paths.get("src", "site"); //TODO define in GuiseMummy
+	/**
+	 * The default relative path of the source directory. Analogous to Maven's <code>${project.basedir}/src/site</code> property.
+	 * @see <a href="https://maven.apache.org/plugins/maven-site-plugin/site-mojo.html#siteDirectory">Apache Maven Site Plugin: site:site
+	 *      &lt;siteDirectory&gt;</a>.
+	 */
+	private final static Path DEFAULT_SITE_SOURCE_RELATIVE_DIR = Paths.get("src", "site"); //TODO define in GuiseMummy
 
-	/** The default relative path of the target directory. */
-	private final static Path DEFAULT_TARGET_RELATIVE_DIR = Paths.get("target", "site"); //TODO define in GuiseMummy
+	/**
+	 * The default relative path of the build directory. Analogous to the default value of Maven's <code>project.build.directory</code> property, which is
+	 * <code>${project.basedir}/target</code>.
+	 */
+	private final static Path DEFAULT_BUILD_RELATIVE_DIR = Paths.get("target"); //TODO define in GuiseMummy
+
+	/**
+	 * The default relative path of the target directory. Analogous to the Maven Site plugin default value of <code>${project.build.directory}/site</code>.
+	 * @see <a href="https://maven.apache.org/guides/mini/guide-site.html">Apache Maven Site Plugin: Creating a site</a>
+	 */
+	private final static Path DEFAULT_SITE_TARGET_RELATIVE_DIR = DEFAULT_BUILD_RELATIVE_DIR.resolve("site"); //TODO define in GuiseMummy
 
 	/** The default server port used by the <code>serve</code> command. */
 	private final static int DEFAULT_SERVE_PORT = 4040;
@@ -91,7 +104,7 @@ public class GuiseCli extends BaseCliApplication {
 		}
 
 		if(siteTargetDirectory == null) {
-			siteTargetDirectory = projectDirectory.resolve(DEFAULT_TARGET_RELATIVE_DIR);
+			siteTargetDirectory = projectDirectory.resolve(DEFAULT_SITE_TARGET_RELATIVE_DIR);
 		}
 
 		getLogger().info("Clean...");
@@ -121,11 +134,11 @@ public class GuiseCli extends BaseCliApplication {
 		}
 
 		if(siteSourceDirectory == null) {
-			siteSourceDirectory = projectDirectory.resolve(DEFAULT_SOURCE_RELATIVE_DIR);
+			siteSourceDirectory = projectDirectory.resolve(DEFAULT_SITE_SOURCE_RELATIVE_DIR);
 		}
 
 		if(siteTargetDirectory == null) {
-			siteTargetDirectory = projectDirectory.resolve(DEFAULT_TARGET_RELATIVE_DIR);
+			siteTargetDirectory = projectDirectory.resolve(DEFAULT_SITE_TARGET_RELATIVE_DIR);
 		}
 
 		getLogger().info("Mummify...");
@@ -156,22 +169,25 @@ public class GuiseCli extends BaseCliApplication {
 			projectDirectory = getWorkingDirectory();
 		}
 
+		final Path buildDirectory = projectDirectory.resolve(DEFAULT_BUILD_RELATIVE_DIR);
+
 		if(siteTargetDirectory == null) {
-			siteTargetDirectory = projectDirectory.resolve(DEFAULT_TARGET_RELATIVE_DIR);
+			siteTargetDirectory = projectDirectory.resolve(DEFAULT_SITE_TARGET_RELATIVE_DIR);
 		}
 
 		checkArgument(isDirectory(siteTargetDirectory), "Site target directory %s does not exist.", siteTargetDirectory); //TODO improve error handling; see https://github.com/remkop/picocli/issues/672
 
 		getLogger().info("Serve...");
 		getLogger().info("Project: {}", projectDirectory);
+		getLogger().info("Build: {}", buildDirectory);
 		getLogger().info("Site: {}", siteTargetDirectory);
 		getLogger().info("Server Port: {}", port);
 
 		final Tomcat tomcat = new Tomcat();
 		tomcat.setPort(port);
-		tomcat.getConnector(); //create a default connector; requiredTODO see https://stackoverflow.com/a/49011424/421049
-		//set the base directory to the project directory (possibly needed in the future for e.g. JSP temporary directory)
-		tomcat.setBaseDir(projectDirectory.toAbsolutePath().toString());
+		//set the base directory to the build directory (possibly needed in the future for e.g. JSP temporary directory; used now as the base for the context temp directory)
+		tomcat.setBaseDir(buildDirectory.toAbsolutePath().toString()); //base directory must be set before creating a connector
+		tomcat.getConnector(); //create a default connector; required; see https://stackoverflow.com/a/49011424/421049
 
 		final Context context = tomcat.addContext("", siteTargetDirectory.toAbsolutePath().toString());
 
