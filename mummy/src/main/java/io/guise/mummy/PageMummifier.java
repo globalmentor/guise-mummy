@@ -30,6 +30,9 @@ import org.w3c.dom.*;
  */
 public interface PageMummifier extends Mummifier {
 
+	/** The attribute for regenerating an element, such as a navigation list. */
+	public static final String ATTRIBUTE_REGENERATE = "regenerate";
+
 	/**
 	 * {@inheritDoc} A page mummifier will always return a {@link PageArtifact}.
 	 */
