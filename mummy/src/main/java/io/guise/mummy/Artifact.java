@@ -17,7 +17,9 @@
 package io.guise.mummy;
 
 import static com.globalmentor.io.Filenames.*;
+import static io.guise.mummy.GuiseMummy.*;
 
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
@@ -43,6 +45,13 @@ public interface Artifact {
 	public static final String PROPERTY_HANDLE_LABEL = "label";
 	/** The property handle of the title, such as a page title. */
 	public static final String PROPERTY_HANDLE_TITLE = "title";
+	/** The property tag of the <code>mummy/order</code> property for indicating e.g. navigation order. */
+	public static final URI PROPERTY_TAG_MUMMY_ORDER = NAMESPACE.resolve("order");
+	/**
+	 * The default Mummy order.
+	 * @see #PROPERTY_TAG_MUMMY_ORDER
+	 */
+	public static final long MUMMY_ORDER_DEFAULT = 0;
 
 	/** @return The properties and their values describing the artifact. */
 	public UrfResourceDescription getResourceDescription();

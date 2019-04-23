@@ -23,6 +23,8 @@ import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.java.StringBuilders.*;
 import static com.globalmentor.xml.XmlDom.*;
+import static io.guise.mummy.Artifact.*;
+import static io.guise.mummy.GuiseMummy.*;
 import static java.nio.file.Files.*;
 import static java.util.Objects.*;
 import static java.util.function.Predicate.*;
@@ -32,6 +34,7 @@ import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
+import java.text.Collator;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -358,7 +361,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 		//TODO transfer to some system of pluggable element processing strategies
 
-		if("regenerate".equals(findAttributeNS(sourceElement, "https://guise.io/name/mummy/", "regenerate").orElse(null))) { //TODO use constants; create utility Optional matcher
+		if(ATTRIBUTE_REGENERATE.equals(findAttributeNS(sourceElement, NAMESPACE_STRING, ATTRIBUTE_REGENERATE).orElse(null))) { //TODO create utility Optional matcher
 
 			//<nav><ol> or <nav><ul>
 			if(XHTML_NAMESPACE_URI.toString().equals(sourceElement.getNamespaceURI())) {
@@ -408,6 +411,23 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	}
 
 	/**
+	 * Returns the given object as a {@link Long}, converting if necessary.
+	 * @implSpec This implementation only supports {@link Long} and {@link String} types, converting the latter using {@link Long#valueOf(String)}.
+	 * @param object The object to return as a {@link Long}.
+	 * @return The object as a {@link Long} instance.
+	 * @throws IllegalArgumentException if the given object cannot be converted to a {@link Long}.
+	 */
+	private static Long toLong(@Nonnull final Object object) { //TODO switch to a general converter system, including number types, e.g. from Ploop
+		if(object instanceof Long) {
+			return (Long)object;
+		} else if(object instanceof String) {
+			return Long.valueOf((String)object);
+		} else {
+			throw new IllegalArgumentException(String.format("Cannot convert object of type %s to type %s.", object.getClass().getName(), Long.class.getName()));
+		}
+	}
+
+	/**
 	 * Regenerates a navigation list based upon the parent, sibling, and/or child navigation artifacts relative to the context artifact.
 	 * <p>
 	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
@@ -443,8 +463,19 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 		removeChildren(navigationListElement); //remove existing links
 
+		//decide how to sort the links
+		final Collator navigationCollator = Collator.getInstance(); //TODO get locale for page, defaulting to site locale
+		navigationCollator.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
+		navigationCollator.setStrength(Collator.PRIMARY); //ignore accents and case
+		final Comparator<Artifact> navigationArtifactOrderComparator = Comparator
+				//compare first by order (defaulting to zero)
+				.<Artifact, Long>comparing(
+						navigationArtifact -> toLong(navigationArtifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ORDER).orElse(MUMMY_ORDER_DEFAULT)))
+				//then compare by alphabetical order
+				.thenComparing(navigationArtifact -> navigationArtifact.determineLabel(), navigationCollator);
+
 		//add new navigation links from templates
-		navigationArtifacts(context, contextArtifact).forEach(navigationArtifact -> {
+		navigationArtifacts(context, contextArtifact).sorted(navigationArtifactOrderComparator).forEach(navigationArtifact -> {
 			final Element liElement = (Element)liTemplate.cloneNode(true);
 			findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI.toString(), ELEMENT_A)).map(Element.class::cast).ifPresent(aElement -> { //find <li><a>
 				aElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, context.relativizeSourceReference(contextArtifact, navigationArtifact).toString());

@@ -21,6 +21,7 @@ import static com.globalmentor.io.Paths.*;
 import static java.util.stream.Collectors.*;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -34,6 +35,12 @@ import io.urf.turf.TurfSerializer;
  * @author Garret Wilson
  */
 public class GuiseMummy implements Clogged {
+
+	/** The string form or namespace of Guise Mummy elements, such as in an XHTML document or as the leading IRI segment of RDFa metadata. */
+	public static final String NAMESPACE_STRING = "https://guise.io/name/mummy/";
+
+	/** The namespace of Guise Mummy elements, such as in an XHTML document or as the leading IRI segment of RDFa metadata. */
+	public static final URI NAMESPACE = URI.create(NAMESPACE_STRING);
 
 	/** The default mummifier for normal files. */
 	private final Mummifier defaultFileMummifier = new OpaqueFileMummifier();
