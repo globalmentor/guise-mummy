@@ -88,8 +88,24 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	}
 
 	/**
-	 * Provides the artifacts suitable for direct subsequent navigation from this artifact, <em>excluding</em> the parent artifact. The sibling artifacts are
+	 * Finds the artifact suitable to serve as parent level navigation for the artifacts at the current level. This will be the context artifact if the context
+	 * artifact has child artifacts.
+	 * @implSpec This method returns the context artifact itself if it is an instance of {@link CollectionArtifact}; otherwise the parent artifact, if any, is
+	 *           returned by calling {@link MummyContext#findParentArtifact(Artifact)}.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @return The artifacts for navigation to the parent of the current navigation level.
+	 * @see MummyContext#findParentArtifact(Artifact)
+	 */
+	protected Optional<Artifact> findParentNavigationArtifact(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
+		return contextArtifact instanceof CollectionArtifact ? Optional.of(contextArtifact) : context.findParentArtifact(contextArtifact);
+	}
+
+	/**
+	 * Provides the artifacts suitable for direct subsequent navigation from this artifact, <em>excluding</em> the parent artifact. If sibling artifacts are
 	 * returned, they will include the given resource.
+	 * @apiNote The returned navigation artifacts are not necessarily children of the context artifact, but rather artifacts at the child level beneath some
+	 *          parent.
 	 * @implSpec This method retrieves candidate resources using {@link MummyContext#childArtifacts(Artifact)} if the artifact is a {@link CollectionArtifact};
 	 *           otherwise it calls {@link MummyContext#siblingArtifacts(Artifact)}. Only artifacts that are not veiled are included.
 	 * @param context The context of static site generation.
@@ -99,7 +115,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @see MummyContext#siblingArtifacts(Artifact)
 	 * @see MummyContext#isVeiled(Artifact)
 	 */
-	protected Stream<Artifact> navigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
+	protected Stream<Artifact> childNavigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
 		final Stream<Artifact> candidateArtifacts = contextArtifact instanceof CollectionArtifact ? context.childArtifacts(contextArtifact)
 				: context.siblingArtifacts(contextArtifact);
 		return candidateArtifacts.filter(not(context::isVeiled));
@@ -498,18 +514,24 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 				.thenComparing(navigationArtifact -> navigationArtifact.determineLabel(), navigationCollator);
 
 		//add new navigation links from templates
-		navigationArtifacts(context, contextArtifact).sorted(navigationArtifactOrderComparator).forEach(navigationArtifact -> {
-			//if the navigation artifact is this artifact, use the template for an active link
-			final Element liTemplate = navigationArtifact.equals(contextArtifact) ? activeLiTemplate : inactiveLiTemplate;
-			final Element liElement = (Element)liTemplate.cloneNode(true);
-			findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A)).map(Element.class::cast).ifPresent(aElement -> { //find <li><a>
-				aElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, context.relativizeSourceReference(contextArtifact, navigationArtifact).toString());
-				//remove all text and add the link label
-				appendText(removeChildren(aElement), navigationArtifact.determineLabel());
-			});
-			navigationListElement.appendChild(liElement);
-			appendText(navigationListElement, System.lineSeparator()); //TODO remove when HTML formatting is fixed
-		});
+		Stream.concat(
+				//put the parent navigation artifact (if any) first
+				findParentNavigationArtifact(context, contextArtifact).stream(),
+				//then include the sorted child navigation artifacts
+				childNavigationArtifacts(context, contextArtifact).sorted(navigationArtifactOrderComparator))
+				//generate navigation elements 
+				.forEach(navigationArtifact -> {
+					//if the navigation artifact is this artifact, use the template for an active link
+					final Element liTemplate = navigationArtifact.equals(contextArtifact) ? activeLiTemplate : inactiveLiTemplate;
+					final Element liElement = (Element)liTemplate.cloneNode(true);
+					findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A)).map(Element.class::cast).ifPresent(aElement -> { //find <li><a>
+						aElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, context.relativizeSourceReference(contextArtifact, navigationArtifact).toString());
+						//remove all text and add the link label
+						appendText(removeChildren(aElement), navigationArtifact.determineLabel());
+					});
+					navigationListElement.appendChild(liElement);
+					appendText(navigationListElement, System.lineSeparator()); //TODO remove when HTML formatting is fixed
+				});
 
 		return List.of(navigationListElement);
 	}
