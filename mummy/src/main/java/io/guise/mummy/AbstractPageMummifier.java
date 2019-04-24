@@ -487,7 +487,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		removeChildren(navigationListElement); //remove existing links
 
 		//decide how to sort the links
-		final Collator navigationCollator = Collator.getInstance(); //TODO get locale for page, defaulting to site locale
+		final Collator navigationCollator = Collator.getInstance(); //TODO i18n: get locale for page, defaulting to site locale
 		navigationCollator.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
 		navigationCollator.setStrength(Collator.PRIMARY); //ignore accents and case
 		final Comparator<Artifact> navigationArtifactOrderComparator = Comparator
