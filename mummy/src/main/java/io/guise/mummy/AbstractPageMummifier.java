@@ -364,10 +364,10 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		if(ATTRIBUTE_REGENERATE.equals(findAttributeNS(sourceElement, NAMESPACE_STRING, ATTRIBUTE_REGENERATE).orElse(null))) { //TODO create utility Optional matcher
 
 			//<nav><ol> or <nav><ul>
-			if(XHTML_NAMESPACE_URI.toString().equals(sourceElement.getNamespaceURI())) {
+			if(XHTML_NAMESPACE_URI_STRING.equals(sourceElement.getNamespaceURI())) {
 				if(ELEMENT_OL.equals(sourceElement.getLocalName()) || ELEMENT_UL.equals(sourceElement.getLocalName())) { //<ol> or <ul>
 
-					if(hasAncestorElementNS(sourceElement, XHTML_NAMESPACE_URI.toString(), ELEMENT_NAV)) { //if this is a navigation list
+					if(hasAncestorElementNS(sourceElement, XHTML_NAMESPACE_URI_STRING, ELEMENT_NAV)) { //if this is a navigation list
 						return regenerateNavigationList(context, contextArtifact, artifact, sourceElement);
 					}
 				}
@@ -445,21 +445,44 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			@Nonnull final Element navigationListElement) throws IOException, DOMException {
 
 		//determine the templates
-		Element discoveredLiTemplate = null;
+		Element discoveredActiveLiTemplate = null;
+		Element discoveredInactiveLiTemplate = null;
 
-		for(final Element liElement : (Iterable<Element>)streamOf(navigationListElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI.toString(), ELEMENT_LI))
+		for(final Element liElement : (Iterable<Element>)streamOf(navigationListElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI))
 				.map(Element.class::cast)::iterator) {
-			discoveredLiTemplate = liElement;
-			break; //TODO do more work to determine styles of active/inactive items and parent/child items
+			//find <li><a href>
+			final Optional<String> href = findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A)).map(Element.class::cast)
+					.flatMap(aElement -> findAttributeNS(aElement, null, ELEMENT_A_ATTRIBUTE_HREF));
+			if(href.isPresent() && href.get().isEmpty()) { //an explicit href="" indicates "this item" (a self link)
+				if(discoveredActiveLiTemplate == null) { //the first example wins
+					discoveredActiveLiTemplate = liElement;
+				}
+			} else {
+				if(discoveredInactiveLiTemplate == null) { //the first example wins
+					discoveredInactiveLiTemplate = liElement;
+				}
+			}
+			if(discoveredActiveLiTemplate != null && discoveredInactiveLiTemplate != null) { //stop searching when we find both templates
+				break;
+			}
 		}
 
-		final Element liTemplate;
-		if(discoveredLiTemplate != null) {
-			liTemplate = discoveredLiTemplate;
+		final Element inactiveLiTemplate;
+		if(discoveredInactiveLiTemplate != null) { //use the discovered inactive template if we found one
+			inactiveLiTemplate = discoveredInactiveLiTemplate;
 		} else {
-			liTemplate = navigationListElement.getOwnerDocument().createElementNS(XHTML_NAMESPACE_URI.toString(), ELEMENT_LI); //<li>
-			liTemplate.appendChild(navigationListElement.getOwnerDocument().createElementNS(XHTML_NAMESPACE_URI.toString(), ELEMENT_A)); //<a>
+			if(discoveredActiveLiTemplate != null) { //use the active template if present
+				inactiveLiTemplate = discoveredActiveLiTemplate;
+			} else { //otherwise create a default inactive template
+				inactiveLiTemplate = navigationListElement.getOwnerDocument().createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI); //<li>
+				inactiveLiTemplate.appendChild(navigationListElement.getOwnerDocument().createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A)); //<a>
+			}
 		}
+		assert inactiveLiTemplate != null;
+
+		//if there is no inactive example, use the inactive template for active links as well
+		final Element activeLiTemplate = discoveredActiveLiTemplate != null ? discoveredActiveLiTemplate : inactiveLiTemplate;
+		assert activeLiTemplate != null;
 
 		removeChildren(navigationListElement); //remove existing links
 
@@ -476,8 +499,16 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 		//add new navigation links from templates
 		navigationArtifacts(context, contextArtifact).sorted(navigationArtifactOrderComparator).forEach(navigationArtifact -> {
+			/*TODO delete
+			final Element liTemplate;	//determine which template to use
+			final URIPath sourceRelativeReference=context.relativizeSourceReference(contextArtifact, navigationArtifact);
+			final Optional<Artifact> referentArtifact=context.findArtifactBySourceRelativeReference(navigationArtifact, sourceRelativeReference);
+			final Element liTemplate=referentArtifact.isPresent() && referentArtifact.get().equals(contextArtifact)
+			*/
+			//if the navigation artifact is this artifact, use the template for an active link
+			final Element liTemplate = navigationArtifact.equals(contextArtifact) ? activeLiTemplate : inactiveLiTemplate;
 			final Element liElement = (Element)liTemplate.cloneNode(true);
-			findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI.toString(), ELEMENT_A)).map(Element.class::cast).ifPresent(aElement -> { //find <li><a>
+			findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A)).map(Element.class::cast).ifPresent(aElement -> { //find <li><a>
 				aElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, context.relativizeSourceReference(contextArtifact, navigationArtifact).toString());
 				//remove all text and add the link label
 				appendText(removeChildren(aElement), navigationArtifact.determineLabel());
@@ -535,7 +566,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			@Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) throws IOException, DOMException {
 
 		//TODO transfer to some system of pluggable element relocating strategies
-		if(XHTML_NAMESPACE_URI.toString().equals(sourceElement.getNamespaceURI())) {
+		if(XHTML_NAMESPACE_URI_STRING.equals(sourceElement.getNamespaceURI())) {
 			//see if this is a referrer element, and get the attribute doing the referencing
 			final String referenceAttributeName = HTML_REFERENCE_ELEMENT_ATTRIBUTES.get(sourceElement.getLocalName());
 			if(referenceAttributeName != null) {
@@ -610,6 +641,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 				referenceURI = new URI(referenceString);
 				if(!referenceURI.isAbsolute()) { //only convert paths
 					final String referencePath = referenceURI.getRawPath();
+					//TODO add explicit check and ignore "" on the basis of it always referring to "self", which in theory is inherently relocated; document
 					if(referencePath != null && !URIs.isPathAbsolute(referencePath)) { //only convert relative paths TODO maybe later support "context paths", rooted at the site root
 						retargetResourceReference(context, referenceURI, originalReferrerSourcePath, relocatedReferrerPath, referentArtifactPath)
 								.ifPresentOrElse(retargetedResourceReference -> {
