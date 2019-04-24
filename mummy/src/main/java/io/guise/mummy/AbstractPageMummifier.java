@@ -499,12 +499,6 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 		//add new navigation links from templates
 		navigationArtifacts(context, contextArtifact).sorted(navigationArtifactOrderComparator).forEach(navigationArtifact -> {
-			/*TODO delete
-			final Element liTemplate;	//determine which template to use
-			final URIPath sourceRelativeReference=context.relativizeSourceReference(contextArtifact, navigationArtifact);
-			final Optional<Artifact> referentArtifact=context.findArtifactBySourceRelativeReference(navigationArtifact, sourceRelativeReference);
-			final Element liTemplate=referentArtifact.isPresent() && referentArtifact.get().equals(contextArtifact)
-			*/
 			//if the navigation artifact is this artifact, use the template for an active link
 			final Element liTemplate = navigationArtifact.equals(contextArtifact) ? activeLiTemplate : inactiveLiTemplate;
 			final Element liElement = (Element)liTemplate.cloneNode(true);
