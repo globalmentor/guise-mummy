@@ -618,6 +618,10 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
 	 * element is removed.
 	 * </p>
+	 * <p>
+	 * A reference to <code>""</code> is considered to be a relative self reference as per RFC 3986, and is never modified during relocation, as it is always
+	 * inherently "relocated" regardless of the resource location.
+	 * </p>
 	 * @param context The context of static site generation.
 	 * @param referenceElement The reference element such a {@code <a>} to relocate.
 	 * @param referenceAttributeName The name of the reference attribute such a {@code href} to relocate.
@@ -641,8 +645,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 				referenceURI = new URI(referenceString);
 				if(!referenceURI.isAbsolute()) { //only convert paths
 					final String referencePath = referenceURI.getRawPath();
-					//TODO add explicit check and ignore "" on the basis of it always referring to "self", which in theory is inherently relocated; document
-					if(referencePath != null && !URIs.isPathAbsolute(referencePath)) { //only convert relative paths TODO maybe later support "context paths", rooted at the site root
+					if(referencePath != null && !referencePath.isEmpty() && !URIs.isPathAbsolute(referencePath)) { //only convert relative paths that are not self-references ("")
 						retargetResourceReference(context, referenceURI, originalReferrerSourcePath, relocatedReferrerPath, referentArtifactPath)
 								.ifPresentOrElse(retargetedResourceReference -> {
 									getLogger().debug("  -> mapping to : {}", retargetedResourceReference);
