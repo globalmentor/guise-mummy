@@ -45,17 +45,10 @@ public class XhtmlPageMummifier extends AbstractPageMummifier {
 	 */
 	@Override
 	public Document loadSourceDocument(@Nonnull MummyContext context, final Path sourceFile) throws IOException {
-		final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance(); //TODO use shared factory?
-		documentBuilderFactory.setNamespaceAware(true);
-		DocumentBuilder documentBuilder;
-		try {
-			documentBuilder = documentBuilderFactory.newDocumentBuilder();
-		} catch(final ParserConfigurationException parserConfigurationException) {
-			throw new IOException(parserConfigurationException);
-		}
+		final DocumentBuilder documentBuilder = context.newPageDocumentBuilder();
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile))) {
 			try {
-				return documentBuilder.parse(inputStream);//TODO install appropriate entity resolvers as needed
+				return documentBuilder.parse(inputStream);
 			} catch(final SAXException saxException) {
 				throw new IOException(saxException);
 			}

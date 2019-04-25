@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 import javax.annotation.*;
+import javax.xml.parsers.*;
 
 /**
  * Abstract base implementation of a mummification context with common default functionality.
@@ -33,6 +34,15 @@ public abstract class BaseMummyContext implements MummyContext {
 
 	/** The segment prefix that indicates a veiled resource or resource parent. */
 	public static final String VEILED_PATH_SEGMENT_PREFIX = "_";
+
+	/** The shared page document builder factory. Use must be synchronized on the factory itself. */
+	private final DocumentBuilderFactory pageDocumentBuilderFactory;
+
+	/** Constructor. */
+	public BaseMummyContext() {
+		pageDocumentBuilderFactory = DocumentBuilderFactory.newInstance();
+		pageDocumentBuilderFactory.setNamespaceAware(true);
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -93,6 +103,23 @@ public abstract class BaseMummyContext implements MummyContext {
 			for(final Artifact childArtifact : ((CollectionArtifact)artifact).getChildArtifacts()) {
 				parentArtifactsByArtifact.put(childArtifact, artifact); //map the parent to the child
 				updatePlan(childArtifact); //recursively update the plan for the children
+			}
+		}
+	}
+
+	//factory methods
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation synchronizes on the internal document builder factory instance.
+	 */
+	@Override
+	public DocumentBuilder newPageDocumentBuilder() {
+		synchronized(pageDocumentBuilderFactory) {
+			try {
+				return pageDocumentBuilderFactory.newDocumentBuilder(); //TODO install appropriate entity resolvers as needed
+			} catch(final ParserConfigurationException parserConfigurationException) {
+				throw new RuntimeException(parserConfigurationException); //TODO switch to Confound configuration exception
 			}
 		}
 	}

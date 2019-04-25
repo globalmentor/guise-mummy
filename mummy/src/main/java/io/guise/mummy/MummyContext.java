@@ -30,6 +30,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import javax.annotation.*;
+import javax.xml.parsers.DocumentBuilder;
 
 import com.globalmentor.net.URIPath;
 
@@ -366,5 +367,14 @@ public interface MummyContext {
 		checkArgumentSubPath(root, checkArgumentAbsolute(referenceTargetPath));
 		return URIPath.relativize(baseTargetPath.toUri(), referenceTargetPath.toUri());
 	}
+
+	//factory methods
+
+	/**
+	 * Creates a new instance of a {@link DocumentBuilder} appropriate for working with Guise Mummy pages.
+	 * @implSpec The returned document builder will be namespace aware.
+	 * @return A new instance of a page document builder.
+	 */
+	public DocumentBuilder newPageDocumentBuilder();
 
 }
