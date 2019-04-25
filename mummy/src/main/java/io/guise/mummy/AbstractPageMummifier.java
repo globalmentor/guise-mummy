@@ -88,8 +88,24 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	}
 
 	/**
-	 * Provides the artifacts suitable for direct subsequent navigation from this artifact, <em>excluding</em> the parent artifact. The sibling artifacts are
+	 * Finds the artifact suitable to serve as parent level navigation for the artifacts at the current level. This will be the context artifact if the context
+	 * artifact has child artifacts.
+	 * @implSpec This method returns the context artifact itself if it is an instance of {@link CollectionArtifact}; otherwise the parent artifact, if any, is
+	 *           returned by calling {@link MummyContext#findParentArtifact(Artifact)}.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @return The artifacts for navigation to the parent of the current navigation level.
+	 * @see MummyContext#findParentArtifact(Artifact)
+	 */
+	protected Optional<Artifact> findParentNavigationArtifact(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
+		return contextArtifact instanceof CollectionArtifact ? Optional.of(contextArtifact) : context.findParentArtifact(contextArtifact);
+	}
+
+	/**
+	 * Provides the artifacts suitable for direct subsequent navigation from this artifact, <em>excluding</em> the parent artifact. If sibling artifacts are
 	 * returned, they will include the given resource.
+	 * @apiNote The returned navigation artifacts are not necessarily children of the context artifact, but rather artifacts at the child level beneath some
+	 *          parent.
 	 * @implSpec This method retrieves candidate resources using {@link MummyContext#childArtifacts(Artifact)} if the artifact is a {@link CollectionArtifact};
 	 *           otherwise it calls {@link MummyContext#siblingArtifacts(Artifact)}. Only artifacts that are not veiled are included.
 	 * @param context The context of static site generation.
@@ -99,7 +115,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @see MummyContext#siblingArtifacts(Artifact)
 	 * @see MummyContext#isVeiled(Artifact)
 	 */
-	protected Stream<Artifact> navigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
+	protected Stream<Artifact> childNavigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
 		final Stream<Artifact> candidateArtifacts = contextArtifact instanceof CollectionArtifact ? context.childArtifacts(contextArtifact)
 				: context.siblingArtifacts(contextArtifact);
 		return candidateArtifacts.filter(not(context::isVeiled));
@@ -364,10 +380,10 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		if(ATTRIBUTE_REGENERATE.equals(findAttributeNS(sourceElement, NAMESPACE_STRING, ATTRIBUTE_REGENERATE).orElse(null))) { //TODO create utility Optional matcher
 
 			//<nav><ol> or <nav><ul>
-			if(XHTML_NAMESPACE_URI.toString().equals(sourceElement.getNamespaceURI())) {
+			if(XHTML_NAMESPACE_URI_STRING.equals(sourceElement.getNamespaceURI())) {
 				if(ELEMENT_OL.equals(sourceElement.getLocalName()) || ELEMENT_UL.equals(sourceElement.getLocalName())) { //<ol> or <ul>
 
-					if(hasAncestorElementNS(sourceElement, XHTML_NAMESPACE_URI.toString(), ELEMENT_NAV)) { //if this is a navigation list
+					if(hasAncestorElementNS(sourceElement, XHTML_NAMESPACE_URI_STRING, ELEMENT_NAV)) { //if this is a navigation list
 						return regenerateNavigationList(context, contextArtifact, artifact, sourceElement);
 					}
 				}
@@ -445,26 +461,49 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			@Nonnull final Element navigationListElement) throws IOException, DOMException {
 
 		//determine the templates
-		Element discoveredLiTemplate = null;
+		Element discoveredActiveLiTemplate = null;
+		Element discoveredInactiveLiTemplate = null;
 
-		for(final Element liElement : (Iterable<Element>)streamOf(navigationListElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI.toString(), ELEMENT_LI))
+		for(final Element liElement : (Iterable<Element>)streamOf(navigationListElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI))
 				.map(Element.class::cast)::iterator) {
-			discoveredLiTemplate = liElement;
-			break; //TODO do more work to determine styles of active/inactive items and parent/child items
+			//find <li><a href>
+			final Optional<String> href = findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A)).map(Element.class::cast)
+					.flatMap(aElement -> findAttributeNS(aElement, null, ELEMENT_A_ATTRIBUTE_HREF));
+			if(href.isPresent() && href.get().isEmpty()) { //an explicit href="" indicates "this item" (a self link)
+				if(discoveredActiveLiTemplate == null) { //the first example wins
+					discoveredActiveLiTemplate = liElement;
+				}
+			} else {
+				if(discoveredInactiveLiTemplate == null) { //the first example wins
+					discoveredInactiveLiTemplate = liElement;
+				}
+			}
+			if(discoveredActiveLiTemplate != null && discoveredInactiveLiTemplate != null) { //stop searching when we find both templates
+				break;
+			}
 		}
 
-		final Element liTemplate;
-		if(discoveredLiTemplate != null) {
-			liTemplate = discoveredLiTemplate;
+		final Element inactiveLiTemplate;
+		if(discoveredInactiveLiTemplate != null) { //use the discovered inactive template if we found one
+			inactiveLiTemplate = discoveredInactiveLiTemplate;
 		} else {
-			liTemplate = navigationListElement.getOwnerDocument().createElementNS(XHTML_NAMESPACE_URI.toString(), ELEMENT_LI); //<li>
-			liTemplate.appendChild(navigationListElement.getOwnerDocument().createElementNS(XHTML_NAMESPACE_URI.toString(), ELEMENT_A)); //<a>
+			if(discoveredActiveLiTemplate != null) { //use the active template if present
+				inactiveLiTemplate = discoveredActiveLiTemplate;
+			} else { //otherwise create a default inactive template
+				inactiveLiTemplate = navigationListElement.getOwnerDocument().createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI); //<li>
+				inactiveLiTemplate.appendChild(navigationListElement.getOwnerDocument().createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A)); //<a>
+			}
 		}
+		assert inactiveLiTemplate != null;
+
+		//if there is no inactive example, use the inactive template for active links as well
+		final Element activeLiTemplate = discoveredActiveLiTemplate != null ? discoveredActiveLiTemplate : inactiveLiTemplate;
+		assert activeLiTemplate != null;
 
 		removeChildren(navigationListElement); //remove existing links
 
 		//decide how to sort the links
-		final Collator navigationCollator = Collator.getInstance(); //TODO get locale for page, defaulting to site locale
+		final Collator navigationCollator = Collator.getInstance(); //TODO i18n: get locale for page, defaulting to site locale
 		navigationCollator.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
 		navigationCollator.setStrength(Collator.PRIMARY); //ignore accents and case
 		final Comparator<Artifact> navigationArtifactOrderComparator = Comparator
@@ -475,16 +514,24 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 				.thenComparing(navigationArtifact -> navigationArtifact.determineLabel(), navigationCollator);
 
 		//add new navigation links from templates
-		navigationArtifacts(context, contextArtifact).sorted(navigationArtifactOrderComparator).forEach(navigationArtifact -> {
-			final Element liElement = (Element)liTemplate.cloneNode(true);
-			findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI.toString(), ELEMENT_A)).map(Element.class::cast).ifPresent(aElement -> { //find <li><a>
-				aElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, context.relativizeSourceReference(contextArtifact, navigationArtifact).toString());
-				//remove all text and add the link label
-				appendText(removeChildren(aElement), navigationArtifact.determineLabel());
-			});
-			navigationListElement.appendChild(liElement);
-			appendText(navigationListElement, System.lineSeparator()); //TODO remove when HTML formatting is fixed
-		});
+		Stream.concat(
+				//put the parent navigation artifact (if any) first
+				findParentNavigationArtifact(context, contextArtifact).stream(),
+				//then include the sorted child navigation artifacts
+				childNavigationArtifacts(context, contextArtifact).sorted(navigationArtifactOrderComparator))
+				//generate navigation elements 
+				.forEach(navigationArtifact -> {
+					//if the navigation artifact is this artifact, use the template for an active link
+					final Element liTemplate = navigationArtifact.equals(contextArtifact) ? activeLiTemplate : inactiveLiTemplate;
+					final Element liElement = (Element)liTemplate.cloneNode(true);
+					findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A)).map(Element.class::cast).ifPresent(aElement -> { //find <li><a>
+						aElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, context.relativizeSourceReference(contextArtifact, navigationArtifact).toString());
+						//remove all text and add the link label
+						appendText(removeChildren(aElement), navigationArtifact.determineLabel());
+					});
+					navigationListElement.appendChild(liElement);
+					appendText(navigationListElement, System.lineSeparator()); //TODO remove when HTML formatting is fixed
+				});
 
 		return List.of(navigationListElement);
 	}
@@ -535,7 +582,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			@Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) throws IOException, DOMException {
 
 		//TODO transfer to some system of pluggable element relocating strategies
-		if(XHTML_NAMESPACE_URI.toString().equals(sourceElement.getNamespaceURI())) {
+		if(XHTML_NAMESPACE_URI_STRING.equals(sourceElement.getNamespaceURI())) {
 			//see if this is a referrer element, and get the attribute doing the referencing
 			final String referenceAttributeName = HTML_REFERENCE_ELEMENT_ATTRIBUTES.get(sourceElement.getLocalName());
 			if(referenceAttributeName != null) {
@@ -587,6 +634,10 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
 	 * element is removed.
 	 * </p>
+	 * <p>
+	 * A reference to <code>""</code> is considered to be a relative self reference as per RFC 3986, and is never modified during relocation, as it is always
+	 * inherently "relocated" regardless of the resource location.
+	 * </p>
 	 * @param context The context of static site generation.
 	 * @param referenceElement The reference element such a {@code <a>} to relocate.
 	 * @param referenceAttributeName The name of the reference attribute such a {@code href} to relocate.
@@ -610,7 +661,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 				referenceURI = new URI(referenceString);
 				if(!referenceURI.isAbsolute()) { //only convert paths
 					final String referencePath = referenceURI.getRawPath();
-					if(referencePath != null && !URIs.isPathAbsolute(referencePath)) { //only convert relative paths TODO maybe later support "context paths", rooted at the site root
+					if(referencePath != null && !referencePath.isEmpty() && !URIs.isPathAbsolute(referencePath)) { //only convert relative paths that are not self-references ("")
 						retargetResourceReference(context, referenceURI, originalReferrerSourcePath, relocatedReferrerPath, referentArtifactPath)
 								.ifPresentOrElse(retargetedResourceReference -> {
 									getLogger().debug("  -> mapping to : {}", retargetedResourceReference);
