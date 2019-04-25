@@ -28,7 +28,7 @@ import io.urf.model.UrfResourceDescription;
  * An artifact representing a generated page.
  * @author Garret Wilson
  */
-public class PageArtifact extends AbstractSourceFileArtifact {
+public class PageArtifact extends BaseCorporealSourceFileArtifact {
 
 	private final UrfResourceDescription description;
 

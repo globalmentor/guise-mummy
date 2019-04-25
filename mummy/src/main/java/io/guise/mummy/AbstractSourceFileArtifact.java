@@ -24,7 +24,7 @@ import javax.annotation.*;
  * An abstract base class for an artifact generated from a source file.
  * @author Garret Wilson
  */
-public abstract class AbstractSourceFileArtifact extends AbstractArtifact {
+public abstract class AbstractSourceFileArtifact extends AbstractArtifact implements SourceFileArtifact {
 
 	/**
 	 * {@inheritDoc}
@@ -40,7 +40,7 @@ public abstract class AbstractSourceFileArtifact extends AbstractArtifact {
 	/**
 	 * Constructor.
 	 * @param mummifier The mummifier responsible for generating this artifact.
-	 * @param sourceFile The file containing the source of this artifact.
+	 * @param sourceFile The location of the artifact in the site source tree.
 	 * @param outputFile The file where the artifact will be generated.
 	 */
 	public AbstractSourceFileArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path outputFile) {

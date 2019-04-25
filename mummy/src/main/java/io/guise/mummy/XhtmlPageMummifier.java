@@ -16,16 +16,12 @@
 
 package io.guise.mummy;
 
-import static java.nio.file.Files.*;
-
 import java.io.*;
-import java.nio.file.Path;
 import java.util.Set;
 
-import javax.annotation.*;
 import javax.xml.parsers.*;
 
-import org.w3c.dom.Document;
+import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 /**
@@ -44,15 +40,12 @@ public class XhtmlPageMummifier extends AbstractPageMummifier {
 	 * @implSpec This version loads a document in XHTML format.
 	 */
 	@Override
-	public Document loadSourceDocument(@Nonnull MummyContext context, final Path sourceFile) throws IOException {
+	public Document loadSourceDocument(final MummyContext context, final InputStream inputStream) throws IOException, DOMException {
 		final DocumentBuilder documentBuilder = context.newPageDocumentBuilder();
-		try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile))) {
-			try {
-				return documentBuilder.parse(inputStream);
-			} catch(final SAXException saxException) {
-				throw new IOException(saxException);
-			}
+		try {
+			return documentBuilder.parse(inputStream);
+		} catch(final SAXException saxException) {
+			throw new IOException(saxException);
 		}
 	}
-
 }

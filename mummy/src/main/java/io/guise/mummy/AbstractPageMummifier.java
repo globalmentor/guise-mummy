@@ -202,7 +202,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 *           {@link #loadSourceDocument(MummyContext, Path)}.
 	 * @param context The context of static site generation.
 	 * @param sourceFile The source file to be mummified.
-	 * @return An artifact describing the resource to be mummified.
+	 * @return A description of the resource being mummified.
 	 * @throws IOException if there is an I/O error retrieving the description.
 	 */
 	protected UrfResourceDescription loadDescription(@Nonnull MummyContext context, @Nonnull final Path sourceFile) throws IOException {
@@ -229,7 +229,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		try {
 
 			//#load source document: get starting content to work with
-			final Document sourceDocument = loadSourceDocument(context, artifact.getSourcePath());
+			final Document sourceDocument = loadSourceDocument(context, (SourceFileArtifact)artifact); //this mummifier requires source file artifacts
 			getLogger().debug("loaded source document: {}", artifact.getSourcePath());
 
 			//#apply template

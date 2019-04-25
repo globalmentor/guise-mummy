@@ -26,7 +26,7 @@ import io.urf.model.UrfResourceDescription;
  * An artifact representing a file with unknown contents.
  * @author Garret Wilson
  */
-public class OpaqueFileArtifact extends AbstractSourceFileArtifact {
+public class OpaqueFileArtifact extends BaseCorporealSourceFileArtifact {
 
 	/**
 	 * {@inheritDoc}
