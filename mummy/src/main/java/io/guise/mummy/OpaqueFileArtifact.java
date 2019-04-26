@@ -29,22 +29,13 @@ import io.urf.model.UrfResourceDescription;
 public class OpaqueFileArtifact extends BaseCorporealSourceFileArtifact {
 
 	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation currently returns an empty description.
-	 */
-	@Override
-	public UrfResourceDescription getResourceDescription() {
-		return UrfResourceDescription.EMPTY;
-	}
-
-	/**
 	 * Constructor.
 	 * @param mummifier The mummifier responsible for generating this artifact.
 	 * @param sourceFile The file containing the source of this artifact.
 	 * @param outputFile The file where the artifact will be generated.
 	 */
 	public OpaqueFileArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
-		super(mummifier, sourceFile, outputFile);
+		super(mummifier, sourceFile, outputFile, UrfResourceDescription.EMPTY);
 	}
 
 }

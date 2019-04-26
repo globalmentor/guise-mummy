@@ -83,7 +83,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @implSpec This version changes the output file extension to <code>html</code>.
 	 */
 	@Override
-	protected Path getArtifactTargetPath(final MummyContext context, final Path sourceFile) {
+	public Path getArtifactTargetPath(final MummyContext context, final Path sourceFile) {
 		return changeExtension(super.getArtifactTargetPath(context, sourceFile), "html"); //TODO use constant
 	}
 

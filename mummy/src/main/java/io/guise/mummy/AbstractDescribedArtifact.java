@@ -16,6 +16,8 @@
 
 package io.guise.mummy;
 
+import static java.util.Objects.*;
+
 import java.nio.file.Path;
 
 import javax.annotation.*;
@@ -23,32 +25,29 @@ import javax.annotation.*;
 import io.urf.model.UrfResourceDescription;
 
 /**
- * An abstract base class for an artifact generated from a source file.
+ * Abstract implementation with a known description.
  * @author Garret Wilson
  */
-public abstract class AbstractSourceFileArtifact extends AbstractDescribedArtifact implements SourceFileArtifact {
+public abstract class AbstractDescribedArtifact extends AbstractArtifact {
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation returns the parent directory of the source path.
-	 */
+	private final UrfResourceDescription description;
+
 	@Override
-	public Path getSourceDirectory() {
-		final Path sourceDirectory = getSourcePath().getParent();
-		assert sourceDirectory != null : "There should be no way for an artifact not to have a parent directory.";
-		return sourceDirectory;
+	public UrfResourceDescription getResourceDescription() {
+		return description;
 	}
 
 	/**
-	 * Constructor.
+	 * Constructor
 	 * @param mummifier The mummifier responsible for generating this artifact.
-	 * @param sourceFile The location of the artifact in the site source tree.
-	 * @param outputFile The file where the artifact will be generated.
+	 * @param sourcePath The file containing the source of this artifact.
+	 * @param outputPath The file where the artifact will be generated.
 	 * @param description The description of the artifact.
 	 */
-	public AbstractSourceFileArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path outputFile,
+	public AbstractDescribedArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourcePath, @Nonnull final Path outputPath,
 			@Nonnull final UrfResourceDescription description) {
-		super(mummifier, sourceFile, outputFile, description);
+		super(mummifier, sourcePath, outputPath);
+		this.description = requireNonNull(description);
 	}
 
 }

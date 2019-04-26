@@ -24,18 +24,14 @@ import javax.annotation.*;
  * Abstract mummifier for generating artifacts based upon a single source file or directory.
  * @author Garret Wilson
  */
-public abstract class AbstractSourcePathMummifier implements Mummifier {
+public abstract class AbstractSourcePathMummifier implements SourcePathMummifier {
 
 	/**
-	 * Determines the output path for an artifact in the site target directory based upon the source path in the site source directory.
+	 * {@inheritDoc}
 	 * @implSpec This version delegates to {@link MummyContext#getTargetPath(Path)}.
-	 * @param context The context of static site generation.
-	 * @param sourcePath The path in the site source directory.
-	 * @return The path in the site target directory to which the given source path should be generated.
-	 * @throws IllegalArgumentException if the given source file is not in the site source tree.
-	 * @see MummyContext#getTargetPath(Path)
 	 */
-	protected Path getArtifactTargetPath(@Nonnull MummyContext context, @Nonnull final Path sourcePath) {
+	@Override
+	public Path getArtifactTargetPath(@Nonnull MummyContext context, @Nonnull final Path sourcePath) {
 		return context.getTargetPath(sourcePath);
 	}
 

@@ -24,6 +24,8 @@ import java.nio.file.Path;
 
 import javax.annotation.*;
 
+import io.urf.model.UrfResourceDescription;
+
 /**
  * A base source file artifact that retrieves its contents from some actual file on the file system.
  * @author Garret Wilson
@@ -42,10 +44,12 @@ public abstract class BaseCorporealSourceFileArtifact extends AbstractSourceFile
 	 * @param mummifier The mummifier responsible for generating this artifact.
 	 * @param sourceFile The location of the artifact in the site source tree.
 	 * @param outputFile The file where the artifact will be generated.
+	 * @param description The description of the artifact.
 	 * @throws IllegalArgumentException if the source file does not exist or is not a regular file.
 	 */
-	public BaseCorporealSourceFileArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
-		this(mummifier, sourceFile, sourceFile, outputFile);
+	public BaseCorporealSourceFileArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path outputFile,
+			@Nonnull final UrfResourceDescription description) {
+		this(mummifier, sourceFile, sourceFile, outputFile, description);
 	}
 
 	/**
@@ -54,11 +58,12 @@ public abstract class BaseCorporealSourceFileArtifact extends AbstractSourceFile
 	 * @param sourceFile The location of the artifact in the site source tree.
 	 * @param corporealSourceFile The file containing the actual source contents of the artifact.
 	 * @param outputFile The file where the artifact will be generated.
+	 * @param description The description of the artifact.
 	 * @throws IllegalArgumentException if the corporeal source file does not exist or is not a regular file.
 	 */
 	public BaseCorporealSourceFileArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path corporealSourceFile,
-			@Nonnull final Path outputFile) {
-		super(mummifier, sourceFile, outputFile);
+			@Nonnull final Path outputFile, @Nonnull final UrfResourceDescription description) {
+		super(mummifier, sourceFile, outputFile, description);
 		checkArgumentRegularFile(corporealSourceFile);
 		this.corporealSourceFile = corporealSourceFile;
 	}
