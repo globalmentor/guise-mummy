@@ -16,8 +16,6 @@
 
 package io.guise.mummy;
 
-import static java.util.Objects.*;
-
 import java.nio.file.Path;
 
 import javax.annotation.*;
@@ -28,14 +26,7 @@ import io.urf.model.UrfResourceDescription;
  * An artifact representing a generated page.
  * @author Garret Wilson
  */
-public class PageArtifact extends AbstractSourceFileArtifact {
-
-	private final UrfResourceDescription description;
-
-	@Override
-	public UrfResourceDescription getResourceDescription() {
-		return description;
-	}
+public class PageArtifact extends BaseCorporealSourceFileArtifact {
 
 	/**
 	 * Constructor.
@@ -46,8 +37,7 @@ public class PageArtifact extends AbstractSourceFileArtifact {
 	 */
 	public PageArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path outputFile,
 			@Nonnull final UrfResourceDescription description) {
-		super(mummifier, sourceFile, outputFile);
-		this.description = requireNonNull(description);
+		super(mummifier, sourceFile, outputFile, description);
 	}
 
 }

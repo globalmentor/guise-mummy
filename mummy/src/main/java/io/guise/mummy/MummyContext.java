@@ -30,6 +30,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import javax.annotation.*;
+import javax.xml.parsers.DocumentBuilder;
 
 import com.globalmentor.net.URIPath;
 
@@ -85,24 +86,24 @@ public interface MummyContext {
 	}
 
 	/** @return The default mummifier for source files. */
-	public Mummifier getDefaultSourceFileMummifier();
+	public SourcePathMummifier getDefaultSourceFileMummifier();
 
 	/** @return The default mummifier for source directories. */
-	public Mummifier getDefaultSourceDirectoryMummifier();
+	public SourcePathMummifier getDefaultSourceDirectoryMummifier();
 
 	/**
 	 * Retrieves a registered mummifier for a particular source file.
 	 * @param sourceFile The path of the source file to be mummified.
 	 * @return The mummifier, if any, registered for the given source file.
 	 */
-	public Optional<Mummifier> findRegisteredMummifierForSourceFile(@Nonnull final Path sourceFile);
+	public Optional<SourcePathMummifier> findRegisteredMummifierForSourceFile(@Nonnull final Path sourceFile);
 
 	/**
 	 * Retrieves a registered mummifier for a particular source directory.
 	 * @param sourceDirectory The path of the source directory to be mummified.
 	 * @return The mummifier, if any, registered for the given source directory.
 	 */
-	public Optional<Mummifier> findRegisteredMummifierForSourceDirectory(@Nonnull final Path sourceDirectory);
+	public Optional<SourcePathMummifier> findRegisteredMummifierForSourceDirectory(@Nonnull final Path sourceDirectory);
 
 	/**
 	 * Retrieves a registered mummifier for a particular source path, which may represent a file or a directory.
@@ -111,7 +112,7 @@ public interface MummyContext {
 	 * @param sourcePath The path of the source to be mummified.
 	 * @return The mummifier, if any, registered for the given source path.
 	 */
-	public default Optional<Mummifier> findRegisteredMummifierForSourcePath(@Nonnull final Path sourcePath) {
+	public default Optional<SourcePathMummifier> findRegisteredMummifierForSourcePath(@Nonnull final Path sourcePath) {
 		return isDirectory(sourcePath) ? findRegisteredMummifierForSourceDirectory(sourcePath) : findRegisteredMummifierForSourceFile(sourcePath);
 	}
 
@@ -124,7 +125,7 @@ public interface MummyContext {
 	 * @param sourcePath The path of the source to be mummified.
 	 * @return The mummifier for the given source path.
 	 */
-	public default Mummifier getMummifierForSourcePath(@Nonnull final Path sourcePath) {
+	public default SourcePathMummifier getMummifierForSourcePath(@Nonnull final Path sourcePath) {
 		return findRegisteredMummifierForSourcePath(sourcePath)
 				.orElseGet(() -> isDirectory(sourcePath) ? getDefaultSourceDirectoryMummifier() : getDefaultSourceFileMummifier());
 	}
@@ -366,5 +367,14 @@ public interface MummyContext {
 		checkArgumentSubPath(root, checkArgumentAbsolute(referenceTargetPath));
 		return URIPath.relativize(baseTargetPath.toUri(), referenceTargetPath.toUri());
 	}
+
+	//factory methods
+
+	/**
+	 * Creates a new instance of a {@link DocumentBuilder} appropriate for working with Guise Mummy pages.
+	 * @implSpec The returned document builder will be namespace aware.
+	 * @return A new instance of a page document builder.
+	 */
+	public DocumentBuilder newPageDocumentBuilder();
 
 }

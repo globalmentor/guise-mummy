@@ -30,9 +30,13 @@ import java.util.stream.Stream;
 
 import javax.annotation.*;
 
+import io.urf.model.UrfResourceDescription;
+
 /**
  * Mummifier for directories.
  * @implSpec This mummifier only works with instances of {@link DirectoryArtifact}.
+ * @implNote Although the current implementation creates a default phantom content file if one is not present, this implementation will work without a known
+ *           content file. This enables future implementations to allow configuration of whether a default content file is used.
  * @author Garret Wilson
  * @see DirectoryArtifact
  */
@@ -71,9 +75,20 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		//discover and plan the directory content file, if present
 		final Optional<Path> contentFile = discoverSourceDirectoryContentFile(context, sourcePath);
 		final Artifact contentArtifact = contentFile.map(throwingFunction(contentSourceFile -> {
-			final Mummifier contentMummifier = context.findRegisteredMummifierForSourceFile(contentSourceFile).orElseThrow(IllegalStateException::new); //TODO improve error
+			final SourcePathMummifier contentMummifier = context.findRegisteredMummifierForSourceFile(contentSourceFile).orElseThrow(IllegalStateException::new); //TODO improve error
 			return contentMummifier.plan(context, contentSourceFile);
-		})).orElse(null);
+		})).orElseGet(() -> {
+			final Path phantomContentSourceFile = sourcePath.resolve("index.xhtml"); //TODO get from configuration
+			final SourcePathMummifier contentMummifier = context.findRegisteredMummifierForSourceFile(phantomContentSourceFile)
+					.orElseThrow(IllegalStateException::new); //TODO improve error
+			//TODO determine a better description for the phantom artifact
+			return new DefaultPhantomArtifact(contentMummifier, phantomContentSourceFile, contentMummifier.getArtifactTargetPath(context, phantomContentSourceFile),
+					UrfResourceDescription.EMPTY);
+			//TODO create a default phantom artifact
+
+		});
+
+		//TODO delete when works				.orElse(null);
 
 		//discover and plan the child artifacts
 		final List<Artifact> childArtifacts = new ArrayList<>();

@@ -16,6 +16,8 @@
 
 package io.guise.mummy;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 
 import javax.annotation.*;
@@ -23,32 +25,29 @@ import javax.annotation.*;
 import io.urf.model.UrfResourceDescription;
 
 /**
- * An abstract base class for an artifact generated from a source file.
+ * A phantom artifact that implemented by a basic, default XHTML document.
  * @author Garret Wilson
  */
-public abstract class AbstractSourceFileArtifact extends AbstractDescribedArtifact implements SourceFileArtifact {
+public class DefaultPhantomArtifact extends AbstractSourceFileArtifact {
+
+	/** The name of the Java resource containing the default XHTML file. */
+	private static final String DEFAULT_RESOURCE_NAME = "default.xhtml";
 
 	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation returns the parent directory of the source path.
-	 */
-	@Override
-	public Path getSourceDirectory() {
-		final Path sourceDirectory = getSourcePath().getParent();
-		assert sourceDirectory != null : "There should be no way for an artifact not to have a parent directory.";
-		return sourceDirectory;
-	}
-
-	/**
-	 * Constructor.
+	 * Constructor
 	 * @param mummifier The mummifier responsible for generating this artifact.
-	 * @param sourceFile The location of the artifact in the site source tree.
-	 * @param outputFile The file where the artifact will be generated.
+	 * @param sourcePath The file containing the source of this artifact.
+	 * @param outputPath The file where the artifact will be generated.
 	 * @param description The description of the artifact.
 	 */
-	public AbstractSourceFileArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path outputFile,
+	public DefaultPhantomArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourcePath, @Nonnull final Path outputPath,
 			@Nonnull final UrfResourceDescription description) {
-		super(mummifier, sourceFile, outputFile, description);
+		super(mummifier, sourcePath, outputPath, description);
+	}
+
+	@Override
+	public InputStream openSource(final MummyContext context) throws IOException {
+		return getClass().getResourceAsStream(DEFAULT_RESOURCE_NAME);
 	}
 
 }

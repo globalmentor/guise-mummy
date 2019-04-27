@@ -43,20 +43,20 @@ public class GuiseMummy implements Clogged {
 	public static final URI NAMESPACE = URI.create(NAMESPACE_STRING);
 
 	/** The default mummifier for normal files. */
-	private final Mummifier defaultFileMummifier = new OpaqueFileMummifier();
+	private final SourcePathMummifier defaultFileMummifier = new OpaqueFileMummifier();
 
 	/** The default mummifier for normal directories. */
-	private final Mummifier defaultDirectoryMummifier = new DirectoryMummifier();
+	private final SourcePathMummifier defaultDirectoryMummifier = new DirectoryMummifier();
 
 	/** The registered mummifiers by supported extensions. */
-	private final Map<String, Mummifier> fileMummifiersByExtension = new HashMap<>();
+	private final Map<String, SourcePathMummifier> fileMummifiersByExtension = new HashMap<>();
 
 	/**
 	 * Registers a mummify for all its supported filename extensions.
 	 * @param mummifier The mummifier to register.
 	 * @see Mummifier#getSupportedFilenameExtensions()
 	 */
-	public void registerFileMummifier(@Nonnull final Mummifier mummifier) {
+	public void registerFileMummifier(@Nonnull final SourcePathMummifier mummifier) {
 		mummifier.getSupportedFilenameExtensions().forEach(ext -> fileMummifiersByExtension.put(ext, mummifier));
 	}
 
@@ -153,17 +153,17 @@ public class GuiseMummy implements Clogged {
 		}
 
 		@Override
-		public Mummifier getDefaultSourceFileMummifier() {
+		public SourcePathMummifier getDefaultSourceFileMummifier() {
 			return defaultFileMummifier;
 		}
 
 		@Override
-		public Mummifier getDefaultSourceDirectoryMummifier() {
+		public SourcePathMummifier getDefaultSourceDirectoryMummifier() {
 			return defaultDirectoryMummifier;
 		}
 
 		@Override
-		public Optional<Mummifier> findRegisteredMummifierForSourceFile(@Nonnull final Path sourceFile) {
+		public Optional<SourcePathMummifier> findRegisteredMummifierForSourceFile(@Nonnull final Path sourceFile) {
 			return extensions(sourceFile.getFileName().toString()).map(fileMummifiersByExtension::get).filter(Objects::nonNull).findFirst();
 		}
 
@@ -172,7 +172,7 @@ public class GuiseMummy implements Clogged {
 		 * @implSpec This implementation doesn't support registered source directory mummifiers, and will always return {@link Optional#empty()}.
 		 */
 		@Override
-		public Optional<Mummifier> findRegisteredMummifierForSourceDirectory(Path sourceDirectory) {
+		public Optional<SourcePathMummifier> findRegisteredMummifierForSourceDirectory(Path sourceDirectory) {
 			return Optional.empty();
 		}
 

@@ -16,6 +16,8 @@
 
 package io.guise.mummy;
 
+import static java.nio.file.Files.newInputStream;
+
 import java.io.*;
 import java.nio.file.Path;
 import java.util.function.Function;
@@ -26,6 +28,8 @@ import org.w3c.dom.*;
 
 /**
  * Mummifier for generating HTML pages.
+ * @implSpec This type of mummifier only works with {@link SourceFileArtifact}s. If some other type of artifact is used, the mummification methods may throw a
+ *           {@link ClassNotFoundException}.
  * @author Garret Wilson
  */
 public interface PageMummifier extends Mummifier {
@@ -34,7 +38,8 @@ public interface PageMummifier extends Mummifier {
 	public static final String ATTRIBUTE_REGENERATE = "regenerate";
 
 	/**
-	 * {@inheritDoc} A page mummifier will always return a {@link PageArtifact}.
+	 * {@inheritDoc}
+	 * @implSpec A page mummifier will always return a {@link PageArtifact}.
 	 */
 	@Override
 	PageArtifact plan(MummyContext context, Path sourcePath) throws IOException;
@@ -49,13 +54,57 @@ public interface PageMummifier extends Mummifier {
 	 * <p>
 	 * The document must be in XHTML using the HTML namespace.
 	 * </p>
+	 * @implSpec The default implementation opens an input stream to the given file and then loads the source document by calling
+	 *           {@link #loadSourceDocument(MummyContext, InputStream)}.
 	 * @param context The context of static site generation.
 	 * @param sourceFile The file from which to load the document.
 	 * @return A document describing the source content of the artifact to generate.
 	 * @throws IOException if there is an error loading and/or converting the source file contents.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull Path sourceFile) throws IOException, DOMException;
+	public default Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull Path sourceFile) throws IOException, DOMException {
+		try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile))) {
+			return loadSourceDocument(context, inputStream);
+		}
+	}
+
+	/**
+	 * Loads the source of some artifact and returns it as a document to be further refined before being used to generate the artifact.
+	 * <p>
+	 * The returned document will not yet have been processed. For example, no expressions will have been evaluated and links will still reference source paths.
+	 * </p>
+	 * <p>
+	 * The document must be in XHTML using the HTML namespace.
+	 * </p>
+	 * @implSpec The default implementation opens an input stream using {@link SourceFileArtifact#openSource(MummyContext)} and then loads the source document by
+	 *           calling {@link #loadSourceDocument(MummyContext, InputStream)}.
+	 * @param context The context of static site generation.
+	 * @param artifact The artifact for which to load the document.
+	 * @return A document describing the source content of the artifact to generate.
+	 * @throws IOException if there is an error loading and/or converting the source file contents.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 */
+	public default Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull SourceFileArtifact artifact) throws IOException, DOMException {
+		try (final InputStream inputStream = new BufferedInputStream(artifact.openSource(context))) {
+			return loadSourceDocument(context, inputStream);
+		}
+	}
+
+	/**
+	 * Loads a source document from the given input stream and returns it as a document to be further refined before being used to generate the artifact.
+	 * <p>
+	 * The returned document will not yet have been processed. For example, no expressions will have been evaluated and links will still reference source paths.
+	 * </p>
+	 * <p>
+	 * The document must be in XHTML using the HTML namespace.
+	 * </p>
+	 * @param context The context of static site generation.
+	 * @param inputStream The input stream from which to to load the document.
+	 * @return A document describing the source content of the artifact to generate.
+	 * @throws IOException if there is an error loading and/or converting the source file contents.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 */
+	public Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull InputStream inputStream) throws IOException, DOMException;
 
 	//#relocate
 

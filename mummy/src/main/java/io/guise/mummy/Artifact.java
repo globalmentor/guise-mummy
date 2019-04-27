@@ -134,7 +134,11 @@ public interface Artifact {
 	 */
 	public Path getSourceDirectory();
 
-	/** @return The path referring to the source of this artifact, wich may be a file or a directory. */
+	/**
+	 * Returns the path to the source of the artifact in the source tree.
+	 * @return The path referring to the source of this artifact, which may be a file or a directory.
+	 * @apiNote Depending on the artifact implementation, the source path is not guaranteed to exist.
+	 */
 	public Path getSourcePath();
 
 	/**
