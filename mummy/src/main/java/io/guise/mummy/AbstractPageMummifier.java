@@ -26,6 +26,7 @@ import static com.globalmentor.xml.XmlDom.*;
 import static io.guise.mummy.Artifact.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static java.nio.file.Files.*;
+import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.function.Predicate.*;
 import static org.zalando.fauxpas.FauxPas.*;
@@ -241,10 +242,13 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			//#relocate document from source to target: translate path references from the source to the target
 			final Document relocatedDocument = relocateSourceDocumentToTarget(context, contextArtifact, artifact, processedDocument);
 
+			//#cleanse document: remove all Guise Mummy related elements and attributes
+			final Document cleansedDocument = cleanseDocument(context, contextArtifact, artifact, relocatedDocument);
+
 			//#save target document
 			try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))) {
 				final HtmlSerializer htmlSerializer = new HtmlSerializer(true);
-				htmlSerializer.serialize(relocatedDocument, outputStream);
+				htmlSerializer.serialize(cleansedDocument, outputStream);
 			}
 			getLogger().debug("generated output document: {}", artifact.getTargetPath());
 
@@ -419,10 +423,13 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			final List<Element> processedElements = processElement(context, contextArtifact, artifact, childElement);
 			final int processedElementCount = processedElements.size();
 			childNodeIndex += processedElementCount; //manually advance the index based upon the replacement nodes
-			if(processedElementCount == 1 && processedElements.get(0) == childElement) { //if no structural changes were requested
+			if(processedElementCount == 0) { //if we should remove the element
+				childElement.getParentNode().removeChild(childElement);
+				continue;
+			} else if(processedElementCount == 1 && processedElements.get(0) == childElement) { //if no structural changes were requested
 				continue;
 			}
-			throw new UnsupportedOperationException("Structural changes not yet supported when processing individual child elements.");
+			throw new UnsupportedOperationException("Structural changes not yet fully supported when processing individual child elements.");
 		}
 	}
 
@@ -728,6 +735,87 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			@Nonnull final Path originalReferrerSourcePath, @Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) {
 		return context.findArtifactBySourceRelativeReference(originalReferrerSourcePath, resourceReferencePath)
 				.map(referentArtifact -> context.relativizeResourceReference(relocatedReferrerPath, referentArtifactPath.apply(referentArtifact)));
+	}
+
+	//#cleanse
+
+	/**
+	 * Cleanses a document before it is saved, removing any mummy-related directives.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact being generated
+	 * @param document The document to cleanse.
+	 * @return The cleansed document, which may or may not be the same document supplied as input.
+	 * @throws IOException if there is an error cleansing the document.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 */
+	protected Document cleanseDocument(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
+			@Nonnull final Document document) throws IOException, DOMException {
+		cleanseChildElements(context, contextArtifact, artifact, document.getDocumentElement()); //cleanse the root children, because the root can't be replaced
+		return document;
+	}
+
+	/**
+	 * Cleanses a document element, removing any mummy-related directives.
+	 * <p>
+	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
+	 * element is removed.
+	 * </p>
+	 * @implSpec This implementation marks for removal any element in the {@link GuiseMummy#NAMESPACE} namespace, and for all other elements removes all
+	 *           attributes in the {@link GuiseMummy#NAMESPACE} namespace.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact being generated
+	 * @param element The element to cleanse.
+	 * @return The cleansed element(s), if any, to replace the source element.
+	 * @throws IOException if there is an error cleansing the element.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 * @see GuiseMummy#NAMESPACE
+	 */
+	protected List<Element> cleanseElement(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
+			@Nonnull final Element element) throws IOException, DOMException {
+
+		//remove the element itself if it is in the Guise Mummy namespace
+		if(GuiseMummy.NAMESPACE_STRING.equals(element.getNamespaceURI())) {
+			return emptyList();
+		}
+
+		cleanseChildElements(context, contextArtifact, artifact, element);
+
+		return List.of(element);
+	}
+
+	/**
+	 * Cleanses child elements of an existing element, removing any mummy-related directives.
+	 * @implNote This implementation does not yet allow returning different nodes than the one being cleansed.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact being generated
+	 * @param element The element the children of which to cleanse.
+	 * @throws IOException if there is an error processing the child elements.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 */
+	protected void cleanseChildElements(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
+			@Nonnull final Element element) throws IOException, DOMException {
+		final NodeList childNodes = element.getChildNodes();
+		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength();) { //advance the index manually as needed
+			final Node childNode = childNodes.item(childNodeIndex);
+			if(!(childNode instanceof Element)) { //skip non-elements
+				childNodeIndex++;
+				continue;
+			}
+			final Element childElement = (Element)childNode;
+			final List<Element> cleansedElements = cleanseElement(context, contextArtifact, artifact, childElement);
+			final int cleansedElementCount = cleansedElements.size();
+			childNodeIndex += cleansedElementCount; //manually advance the index based upon the replacement nodes
+			if(cleansedElementCount == 0) { //if we should remove the element
+				childElement.getParentNode().removeChild(childElement);
+				continue;
+			} else if(cleansedElementCount == 1 && cleansedElements.get(0) == childElement) { //if no structural changes were requested
+				continue;
+			}
+			throw new UnsupportedOperationException("Structural changes not yet fully supported when cleansing individual child elements.");
+		}
 	}
 
 }
