@@ -348,6 +348,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 	/**
 	 * Processes a source document before it is converted to an output document.
+	 * @implSpec This implementation does not allow the document element to be removed or replaced.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
@@ -358,7 +359,10 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 */
 	protected Document processDocument(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
 			@Nonnull final Document sourceDocument) throws IOException, DOMException {
-		processChildElements(context, contextArtifact, artifact, sourceDocument.getDocumentElement()); //process the root children, because the root can't be replaced
+		final List<Element> processedElements = processElement(context, contextArtifact, artifact, sourceDocument.getDocumentElement());
+		if(processedElements.size() != 1 || processedElements.get(0) != sourceDocument.getDocumentElement()) {
+			throw new UnsupportedOperationException("Document element cannot be removed or replaced when processing a document.");
+		}
 		return sourceDocument;
 	}
 
@@ -560,10 +564,18 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		return relocateDocument(context, sourceDocument, contextArtifact.getSourcePath(), contextArtifact.getTargetPath(), Artifact::getTargetPath);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation does not allow the document element to be removed or replaced.
+	 */
 	@Override
 	public Document relocateDocument(@Nonnull MummyContext context, @Nonnull final Document sourceDocument, @Nonnull final Path originalReferrerSourcePath,
 			@Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) throws IOException, DOMException {
-		relocateChildElements(context, sourceDocument.getDocumentElement(), originalReferrerSourcePath, relocatedReferrerPath, referentArtifactPath); //relocate the root children, because the root can't be replaced
+		final List<Element> relocatedElements = relocateElement(context, sourceDocument.getDocumentElement(), originalReferrerSourcePath, relocatedReferrerPath,
+				referentArtifactPath);
+		if(relocatedElements.size() != 1 || relocatedElements.get(0) != sourceDocument.getDocumentElement()) {
+			throw new UnsupportedOperationException("Document element cannot be removed or replaced when relocating a document.");
+		}
 		return sourceDocument;
 	}
 
@@ -741,6 +753,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 	/**
 	 * Cleanses a document before it is saved, removing any mummy-related directives.
+	 * @implSpec This implementation does not allow the document element to be removed or replaced.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
@@ -751,7 +764,10 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 */
 	protected Document cleanseDocument(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
 			@Nonnull final Document document) throws IOException, DOMException {
-		cleanseChildElements(context, contextArtifact, artifact, document.getDocumentElement()); //cleanse the root children, because the root can't be replaced
+		final List<Element> cleansedElements = cleanseElement(context, contextArtifact, artifact, document.getDocumentElement());
+		if(cleansedElements.size() != 1 || cleansedElements.get(0) != document.getDocumentElement()) {
+			throw new UnsupportedOperationException("Document element cannot be removed or replaced when cleansing a document.");
+		}
 		return document;
 	}
 
@@ -776,8 +792,24 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			@Nonnull final Element element) throws IOException, DOMException {
 
 		//remove the element itself if it is in the Guise Mummy namespace
-		if(GuiseMummy.NAMESPACE_STRING.equals(element.getNamespaceURI())) {
+		if(GuiseMummy.NAMESPACE_STRING.equals(element.getNamespaceURI())) { //<mummy:*>
 			return emptyList();
+		}
+
+		//remove all attributes in the Guise Mummy namespace and Guise Mummy namespace declarations
+		final Iterator<Attr> attrIterator = attributesIterator(element);
+		while(attrIterator.hasNext()) {
+			final Attr attr = attrIterator.next();
+
+			if(XML.XMLNS_NAMESPACE_URI_STRING.equals(attr.getNamespaceURI())) { //xmlns:*
+				if(GuiseMummy.NAMESPACE_STRING.equals(attr.getValue())) { //xmlns:mummy
+					attrIterator.remove();
+				}
+			}
+
+			if(GuiseMummy.NAMESPACE_STRING.equals(attr.getNamespaceURI())) { //mummy:*
+				attrIterator.remove();
+			}
 		}
 
 		cleanseChildElements(context, contextArtifact, artifact, element);
