@@ -13,10 +13,6 @@
 	<name>Guise Framework</name>
 	<description>Guise™ Internet application framework.</description>
 
-	<properties>
-		<maven.deploy.skip>true</maven.deploy.skip>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>javax.servlet</groupId>

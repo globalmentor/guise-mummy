@@ -14,10 +14,6 @@
 	<name>Guise Framework Demo</name>
 	<description>Guise™ Internet application framework demonstration.</description>
 
-	<properties>
-		<maven.deploy.skip>true</maven.deploy.skip>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>io.guise</groupId>
