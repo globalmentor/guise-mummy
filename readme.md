@@ -30,7 +30,7 @@ mvn clean install
 This will create all of the projects. _Building all projects is necessary, even if you want to use only one._ The CLI can be invoked using the following (substituting the appropriate version for `x.x.x`):
 
 ```
-java -jar cli\target\guise-cli-x.x.x-exe.jar
+java -jar cli/target/guise-cli-x.x.x-exe.jar
 ```
 
 On Windows the build process creates an executable CLI, which you may copy and use as desired, or execute in place:
