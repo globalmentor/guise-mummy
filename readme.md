@@ -15,7 +15,7 @@ Currently Guise Mummy is functional and can be used with sites using XHTML5 sour
 
 ## Download
 
-Guise is available in the Maven Central Repository as [io.guise:guise](https://search.maven.org/search?q=g:io.guise%20AND%20a:guise).
+The Guise modules are available in the Maven Central Repository with the [io.guise](https://search.maven.org/search?q=g:io.guise) artifact ID. This aggregate parent project is available in the Maven Central Repository as [io.guise:guise](https://search.maven.org/search?q=g:io.guise%20AND%20a:guise).
 
 ## Build
 
