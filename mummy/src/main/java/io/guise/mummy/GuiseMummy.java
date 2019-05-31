@@ -18,9 +18,10 @@ package io.guise.mummy;
 
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Paths.*;
+import static java.nio.file.Files.*;
 import static java.util.stream.Collectors.*;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.*;
@@ -28,6 +29,7 @@ import java.util.*;
 import javax.annotation.*;
 
 import io.clogr.Clogged;
+import io.urf.model.UrfResourceDescription;
 import io.urf.turf.TurfSerializer;
 
 /**
@@ -83,8 +85,47 @@ public class GuiseMummy implements Clogged {
 
 		printArtifactDescription(context, rootArtifact);
 
+		generateSiteDescription(context, rootArtifact);
+
 		//#mummify phase
 		rootArtifact.getMummifier().mummify(context, rootArtifact);
+	}
+
+	/**
+	 * Recursively generates a description file for the indicated artifact and all its comprised artifacts if any.
+	 * @param context The context of static site generation.
+	 * @param artifact The artifact the description of which is being generated.
+	 * @throws IOException if there is an I/O error generating the description.
+	 * @see CompositeArtifact#comprisedArtifacts()
+	 */
+	private void generateSiteDescription(@Nonnull final MummyContext context, @Nonnull final Artifact artifact) throws IOException {
+		final UrfResourceDescription description = artifact.getResourceDescription();
+		if(description.hasProperties()) { //skip empty descriptions
+			final Path targetPath = artifact.getTargetPath();
+			if(isRegularFile(targetPath)) { //skip directories
+				final Path descriptionTargetPath = addExtension(changeBase(targetPath, context.getSiteTargetDirectory(), context.getSiteDescriptionTargetDirectory()),
+						"@.turf"); //TODO use constant
+
+				//create parent directory as needed
+				final Path descriptionTargetParentPath = descriptionTargetPath.getParent();
+				if(descriptionTargetParentPath != null) {
+					createDirectories(descriptionTargetParentPath);
+				}
+
+				//save description
+				final TurfSerializer turfSerializer = new TurfSerializer();
+				turfSerializer.setFormatted(true);
+				try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(descriptionTargetPath))) {
+					turfSerializer.serializeDocument(outputStream, description);
+				}
+			}
+		}
+
+		if(artifact instanceof CompositeArtifact) {
+			for(final Artifact comprisedArtifact : (Iterable<Artifact>)((CompositeArtifact)artifact).comprisedArtifacts()::iterator) {
+				generateSiteDescription(context, comprisedArtifact);
+			}
+		}
 	}
 
 	//TODO document
@@ -136,6 +177,17 @@ public class GuiseMummy implements Clogged {
 		@Override
 		public Path getSiteTargetDirectory() {
 			return siteTargetDirectory;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * @implSpec This version returns a directory <code>../site-description</code> relative to the site target directory. TODO Overhaul configuration approach
+		 *           with defaults based on build (`target`) directory.
+		 * @see #getSiteTargetDirectory()
+		 */
+		@Override
+		public Path getSiteDescriptionTargetDirectory() {
+			return getSiteTargetDirectory().resolve("..").resolve("site-description"); //TODO use constant
 		}
 
 		/**

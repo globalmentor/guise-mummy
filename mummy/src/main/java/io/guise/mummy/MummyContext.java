@@ -58,11 +58,17 @@ public interface MummyContext {
 	public Path getSiteSourceDirectory();
 
 	/**
-	 * Returns the output directory of the entire site source, representing the root of the context.
+	 * Returns the output directory of the entire site, representing the root of the context.
 	 * @apiNote This is analogous to Maven's <code>${project.build.directory}</code> directory.
 	 * @return The base output directory of the site being mummified.
 	 */
 	public Path getSiteTargetDirectory();
+
+	/**
+	 * Returns the output directory of the site description.
+	 * @return The base output directory of the generated site description.
+	 */
+	public Path getSiteDescriptionTargetDirectory();
 
 	//TODO public UrfObject getResourceDescription(path)
 

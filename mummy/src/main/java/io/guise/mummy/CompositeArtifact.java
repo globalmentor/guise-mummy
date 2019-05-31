@@ -16,21 +16,19 @@
 
 package io.guise.mummy;
 
-import java.util.Collection;
+import java.util.stream.Stream;
 
 /**
- * An artifact such as a directory that has child artifacts that are candidates for navigation.
- * @apiNote This is a specialization of a composite artifact; an artifact that is considered a "collection" of child artifacts.
+ * An artifact that is composed of several other artifacts.
+ * @apiNote This artifact is appropriate for traversing an entire tree of artifacts without regard for navigability.
  * @author Garret Wilson
  */
-public interface CollectionArtifact extends CompositeArtifact {
+public interface CompositeArtifact extends Artifact {
 
 	/**
-	 * Returns the child artifacts that make up the collection.
-	 * @apiNote There may be other comprising artifacts not considered children, for example some helper or sidecar files.
-	 * @return The child artifacts of this artifact.
-	 * @see #comprisedArtifacts()
+	 * Returns all the artifacts of which this artifact is composed.
+	 * @return The artifacts comprised by this artifact.
 	 */
-	public Collection<Artifact> getChildArtifacts();
+	public Stream<Artifact> comprisedArtifacts();
 
 }

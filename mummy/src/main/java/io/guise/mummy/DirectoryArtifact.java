@@ -20,6 +20,7 @@ import static com.globalmentor.collections.Sets.*;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Stream;
 
 import javax.annotation.*;
 
@@ -61,6 +62,17 @@ public class DirectoryArtifact extends AbstractArtifact implements CollectionArt
 	@Override
 	public Collection<Artifact> getChildArtifacts() {
 		return childArtifacts;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation returns all the child artifacts along with the content artifact, if any.
+	 * @see #getChildArtifacts()
+	 * @see #getContentArtifact()
+	 */
+	@Override
+	public Stream<Artifact> comprisedArtifacts() {
+		return Stream.concat(getChildArtifacts().stream(), getContentArtifact().stream());
 	}
 
 	/**
