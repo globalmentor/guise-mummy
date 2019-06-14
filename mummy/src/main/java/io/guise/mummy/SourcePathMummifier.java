@@ -18,9 +18,12 @@ package io.guise.mummy;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.*;
+
+import com.globalmentor.net.ContentType;
 
 /**
  * Mummifier for processing resources with a source path.
@@ -53,6 +56,15 @@ public interface SourcePathMummifier extends Mummifier {
 	 * @see MummyContext#getTargetPath(Path)
 	 */
 	public Path getArtifactTargetPath(@Nonnull MummyContext context, @Nonnull Path sourcePath);
+
+	/**
+	 * Determines the media type for an artifact from the given source path
+	 * @param context The context of static site generation.
+	 * @param sourcePath The path in the site source directory; not guaranteed to exist;
+	 * @return The target media type for the generated artifact, if known
+	 * @throws IOException if there is an I/O error determining the media type.
+	 */
+	public Optional<ContentType> getArtifactMediaType(@Nonnull MummyContext context, @Nonnull final Path sourcePath) throws IOException;
 
 	/**
 	 * Plans mummification of a source path supported by this mummifier.

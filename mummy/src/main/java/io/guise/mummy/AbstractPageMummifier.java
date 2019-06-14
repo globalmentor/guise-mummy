@@ -25,6 +25,7 @@ import static com.globalmentor.java.StringBuilders.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static io.guise.mummy.Artifact.*;
 import static io.guise.mummy.GuiseMummy.*;
+import static io.urf.vocab.content.Content.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
@@ -45,6 +46,8 @@ import javax.annotation.*;
 import org.w3c.dom.*;
 
 import com.globalmentor.html.HtmlSerializer;
+import com.globalmentor.html.spec.HTML;
+import com.globalmentor.net.ContentType;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.net.URIs;
 import com.globalmentor.xml.spec.XML;
@@ -57,6 +60,7 @@ import io.urf.model.UrfResourceDescription;
 /**
  * Abstract base mummifier for generating HTML pages.
  * @author Garret Wilson
+ * @see HTML#HTML_NAME_EXTENSION
  */
 public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier implements PageMummifier {
 
@@ -81,11 +85,21 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This version changes the output file extension to <code>html</code>.
+	 * @implSpec This version changes the output file extension to {@value HTML#HTML_NAME_EXTENSION}.
 	 */
 	@Override
 	public Path getArtifactTargetPath(final MummyContext context, final Path sourceFile) {
-		return changeExtension(super.getArtifactTargetPath(context, sourceFile), "html"); //TODO use constant
+		return changeExtension(super.getArtifactTargetPath(context, sourceFile), HTML_NAME_EXTENSION);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This version returns the media type <code>text/html</code> for all pages.
+	 * @see HTML#HTML_CONTENT_TYPE
+	 */
+	@Override
+	public Optional<ContentType> getArtifactMediaType(final MummyContext context, final Path sourcePath) throws IOException {
+		return Optional.of(HTML_CONTENT_TYPE);
 	}
 
 	/**
@@ -221,6 +235,10 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			//TODO consider parsing out "keywords" in to multiple keyword+ properties for convenience
 		});
 		//TODO load any description sidecar
+
+		//add the content type
+		getArtifactMediaType(context, sourceFile).ifPresent(mediaType -> setContentType(description, mediaType));
+
 		return description; //TODO add a way to make this immutable
 	}
 

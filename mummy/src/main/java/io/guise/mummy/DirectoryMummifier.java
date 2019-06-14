@@ -30,6 +30,8 @@ import java.util.stream.Stream;
 
 import javax.annotation.*;
 
+import com.globalmentor.net.ContentType;
+
 import io.urf.model.UrfResourceDescription;
 
 /**
@@ -45,6 +47,15 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	@Override
 	public Set<String> getSupportedFilenameExtensions() {
 		return emptySet();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec Directories have no media types of their own, so this version returns no media type.
+	 */
+	@Override
+	public Optional<ContentType> getArtifactMediaType(final MummyContext context, final Path sourcePath) throws IOException {
+		return Optional.empty();
 	}
 
 	/**
