@@ -22,8 +22,8 @@ import java.net.URI;
 import com.globalmentor.net.ResourceIOException;
 import com.globalmentor.net.URIPath;
 
-import io.urf.Content;
 import io.urf.model.UrfResourceDescription;
+import io.urf.vocab.content.Content;
 
 /**
  * A navigation point that retrieves a resource description and/or contents.

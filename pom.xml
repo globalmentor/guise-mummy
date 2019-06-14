@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.globalmentor</groupId>
 		<artifactId>globalmentor-opensource-parent</artifactId>
-		<version>8.5.1</version>
+		<version>8.5.2-SNAPSHOT</version>
 	</parent>
 
 	<groupId>io.guise</groupId>
@@ -44,6 +44,7 @@
 		<globalmentor-web.version>0.6.0</globalmentor-web.version>
 		<slf4j.version>1.7.25</slf4j.version>
 		<tomcat.version>9.0.20</tomcat.version>
+		<urf.version>0.3.2-SNAPSHOT</urf.version>
 	</properties>
 
 	<modules>
@@ -154,13 +155,19 @@
 			<dependency>
 				<groupId>io.urf</groupId>
 				<artifactId>urf-model</artifactId>
-				<version>0.3.0</version>
+				<version>${urf.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.urf</groupId>
 				<artifactId>turf</artifactId>
-				<version>0.3.0</version>
+				<version>${urf.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.urf</groupId>
+				<artifactId>urf-vocab-content</artifactId>
+				<version>${urf.version}</version>
 			</dependency>
 
 			<dependency>
