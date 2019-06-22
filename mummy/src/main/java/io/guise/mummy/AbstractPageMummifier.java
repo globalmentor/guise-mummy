@@ -47,9 +47,7 @@ import org.w3c.dom.*;
 
 import com.globalmentor.html.HtmlSerializer;
 import com.globalmentor.html.spec.HTML;
-import com.globalmentor.net.ContentType;
-import com.globalmentor.net.URIPath;
-import com.globalmentor.net.URIs;
+import com.globalmentor.net.*;
 import com.globalmentor.xml.spec.XML;
 
 import io.urf.URF;
@@ -63,6 +61,9 @@ import io.urf.model.UrfResourceDescription;
  * @see HTML#HTML_NAME_EXTENSION
  */
 public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier implements PageMummifier {
+
+	/** The standard Internet media types for pages: <code>text/html</code> in UTF-8. */
+	public static final ContentType PAGE_MEDIA_TYPE = HTML_CONTENT_TYPE.withParameter(ContentType.Parameter.CHARSET_UTF_8);
 
 	/**
 	 * A map of local names of HTML elements that can reference other resources (e.g. <code>"img"</code>), along with the attributes of each element that contains
@@ -95,11 +96,11 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This version returns the media type <code>text/html</code> for all pages.
-	 * @see HTML#HTML_CONTENT_TYPE
+	 * @see #PAGE_MEDIA_TYPE
 	 */
 	@Override
 	public Optional<ContentType> getArtifactMediaType(final MummyContext context, final Path sourcePath) throws IOException {
-		return Optional.of(HTML_CONTENT_TYPE);
+		return Optional.of(PAGE_MEDIA_TYPE);
 	}
 
 	/**
