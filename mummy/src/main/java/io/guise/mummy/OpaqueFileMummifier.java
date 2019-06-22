@@ -24,6 +24,8 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 
+import com.globalmentor.net.ContentType;
+
 /**
  * Mummifier for files with unknown content.
  * @implSpec This implementation merely copies the file during mummification with no further action. Any existing target file will be replaced.
@@ -34,6 +36,15 @@ public class OpaqueFileMummifier extends AbstractSourcePathMummifier {
 	@Override
 	public Set<String> getSupportedFilenameExtensions() {
 		return emptySet();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This version returns no media type, because no media type is known for opaque files.
+	 */
+	@Override
+	public Optional<ContentType> getArtifactMediaType(final MummyContext context, final Path sourcePath) throws IOException {
+		return Optional.empty();
 	}
 
 	@Override

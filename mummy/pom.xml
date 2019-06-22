@@ -45,6 +45,11 @@
 		</dependency>
 
 		<dependency>
+			<groupId>io.urf</groupId>
+			<artifactId>urf-vocab-content</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>org.zalando</groupId>
 			<artifactId>faux-pas</artifactId>
 		</dependency>
