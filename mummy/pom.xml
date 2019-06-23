@@ -35,6 +35,16 @@
 		</dependency>
 
 		<dependency>
+			<groupId>io.confound</groupId>
+			<artifactId>config-file</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.urf</groupId>
+			<artifactId>config-file-format-turf-provider</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>io.urf</groupId>
 			<artifactId>urf-model</artifactId>
 		</dependency>

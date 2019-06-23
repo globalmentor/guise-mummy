@@ -34,6 +34,8 @@ import javax.xml.parsers.DocumentBuilder;
 
 import com.globalmentor.net.URIPath;
 
+import io.confound.config.Configuration;
+
 /**
  * Provides information about context of static site generation.
  * @author Garret Wilson
@@ -71,6 +73,9 @@ public interface MummyContext {
 	public Path getSiteDescriptionTargetDirectory();
 
 	//TODO public UrfObject getResourceDescription(path)
+
+	/** @return The configuration options for the site. */
+	public Configuration getSiteConfiguration();
 
 	/**
 	 * Determines whether a path should be ignored during discovery.
