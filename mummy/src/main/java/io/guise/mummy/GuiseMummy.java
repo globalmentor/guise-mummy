@@ -19,6 +19,7 @@ package io.guise.mummy;
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Paths.*;
 import static java.nio.file.Files.*;
+import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 
 import java.io.*;
@@ -29,6 +30,8 @@ import java.util.*;
 import javax.annotation.*;
 
 import io.clogr.Clogged;
+import io.confound.config.Configuration;
+import io.confound.config.file.FileSystemConfigurationManager;
 import io.urf.model.UrfResourceDescription;
 import io.urf.turf.TurfSerializer;
 
@@ -43,6 +46,9 @@ public class GuiseMummy implements Clogged {
 
 	/** The namespace of Guise Mummy elements, such as in an XHTML document or as the leading IRI segment of RDFa metadata. */
 	public static final URI NAMESPACE = URI.create(NAMESPACE_STRING);
+
+	/** The base filename for the site configuration. */
+	public static final String SITE_CONFIG_BASE_FILENAME = ".guise-mummy-site";
 
 	/** The default mummifier for normal files. */
 	private final SourcePathMummifier defaultFileMummifier = new OpaqueFileMummifier();
@@ -77,7 +83,9 @@ public class GuiseMummy implements Clogged {
 	 * @throws IOException if there is an I/O error generating the static site.
 	 */
 	public void mummify(@Nonnull final Path sourceDirectory, @Nonnull final Path targetDirectory) throws IOException {
-		final Context context = new Context(sourceDirectory, targetDirectory);
+
+		//#initialize phase
+		final Context context = initialize(sourceDirectory, targetDirectory);
 
 		//#plan phase
 		final Artifact rootArtifact = new DirectoryMummifier().plan(context, sourceDirectory); //TODO create special SiteMummifier extending DirectoryMummifier
@@ -89,6 +97,24 @@ public class GuiseMummy implements Clogged {
 
 		//#mummify phase
 		rootArtifact.getMummifier().mummify(context, rootArtifact);
+	}
+
+	/**
+	 * Initialize phase; loads the site configuration, if any, and sets up the mummy context.
+	 * @param sourceDirectory The root of the site to be mummified.
+	 * @param targetDirectory The root directory of the generated static site; will be created if needed.
+	 * @throws IllegalArgumentException if the source directory does not exist or is not a directory.
+	 * @throws IllegalArgumentException if the source and target directories overlap.
+	 * @throws IOException if there is an I/O error during initialization, such as when loading the site configuration.
+	 */
+	public Context initialize(@Nonnull final Path sourceDirectory, @Nonnull final Path targetDirectory) throws IOException {
+		checkArgumentDirectory(sourceDirectory);
+
+		//load site configuration
+		final Configuration siteConfiguration = FileSystemConfigurationManager.loadConfigurationForBaseFilename(sourceDirectory, SITE_CONFIG_BASE_FILENAME)
+				.orElse(Configuration.empty());
+
+		return new Context(sourceDirectory, targetDirectory, siteConfiguration);
 	}
 
 	/**
@@ -190,18 +216,27 @@ public class GuiseMummy implements Clogged {
 			return getSiteTargetDirectory().resolve("..").resolve("site-description"); //TODO use constant
 		}
 
+		private final Configuration siteConfiguration;
+
+		@Override
+		public Configuration getSiteConfiguration() {
+			return siteConfiguration;
+		}
+
 		/**
 		 * Site source directory constructor.
 		 * @param siteSourceDirectory The source directory of the entire site.
 		 * @param siteTargetDirectory The base output directory of the site being mummified.
+		 * @param siteConfiguration The configuration for the site.
 		 * @throws IllegalArgumentException if the source directory does not exist or is not a directory.
 		 * @throws IllegalArgumentException if the source and target directories overlap.
 		 */
-		public Context(@Nonnull final Path siteSourceDirectory, @Nonnull final Path siteTargetDirectory) {
+		public Context(@Nonnull final Path siteSourceDirectory, @Nonnull final Path siteTargetDirectory, @Nonnull final Configuration siteConfiguration) {
 			checkArgumentDirectory(siteSourceDirectory);
 			checkArgumentDisjoint(siteSourceDirectory, siteTargetDirectory);
 			this.siteSourceDirectory = siteSourceDirectory;
 			this.siteTargetDirectory = siteTargetDirectory;
+			this.siteConfiguration = requireNonNull(siteConfiguration);
 		}
 
 		@Override

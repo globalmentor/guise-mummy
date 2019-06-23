@@ -154,6 +154,12 @@
 
 			<dependency>
 				<groupId>io.urf</groupId>
+				<artifactId>config-file-format-turf-provider</artifactId>
+				<version>${urf.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.urf</groupId>
 				<artifactId>urf-model</artifactId>
 				<version>${urf.version}</version>
 			</dependency>
