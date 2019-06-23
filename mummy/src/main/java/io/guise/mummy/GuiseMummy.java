@@ -103,6 +103,7 @@ public class GuiseMummy implements Clogged {
 	 * Initialize phase; loads the site configuration, if any, and sets up the mummy context.
 	 * @param sourceDirectory The root of the site to be mummified.
 	 * @param targetDirectory The root directory of the generated static site; will be created if needed.
+	 * @return A context to use during mummification.
 	 * @throws IllegalArgumentException if the source directory does not exist or is not a directory.
 	 * @throws IllegalArgumentException if the source and target directories overlap.
 	 * @throws IOException if there is an I/O error during initialization, such as when loading the site configuration.

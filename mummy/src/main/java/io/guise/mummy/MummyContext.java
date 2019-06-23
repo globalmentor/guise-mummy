@@ -74,7 +74,7 @@ public interface MummyContext {
 
 	//TODO public UrfObject getResourceDescription(path)
 
-	/** The configuration options for the site. */
+	/** @return The configuration options for the site. */
 	public Configuration getSiteConfiguration();
 
 	/**
