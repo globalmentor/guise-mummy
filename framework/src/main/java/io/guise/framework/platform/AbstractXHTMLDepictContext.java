@@ -78,7 +78,7 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 	 */
 	public AbstractXHTMLDepictContext(final GuiseSession session, final Destination destination) throws IOException {
 		super(session, destination); //construct the parent class
-		getXMLNamespacePrefixManager().registerNamespacePrefix(XHTML_NAMESPACE_URI.toString(), null); //don't use any prefix with the XHTML namespace
+		getXMLNamespacePrefixManager().registerNamespacePrefix(XHTML_NAMESPACE_URI_STRING, null); //don't use any prefix with the XHTML namespace
 	}
 
 	/**
