@@ -47,8 +47,12 @@ public class GuiseMummy implements Clogged {
 	/** The namespace of Guise Mummy elements, such as in an XHTML document or as the leading IRI segment of RDFa metadata. */
 	public static final URI NAMESPACE = URI.create(NAMESPACE_STRING);
 
+	//site configuration
+
 	/** The base filename for the site configuration. */
 	public static final String SITE_CONFIG_BASE_FILENAME = ".guise-mummy-site";
+
+	public static final String SITE_CONFIG_KEY_PAGES_NAME_BARE = "pages.nameBare";
 
 	/** The default mummifier for normal files. */
 	private final SourcePathMummifier defaultFileMummifier = new OpaqueFileMummifier();
@@ -129,7 +133,7 @@ public class GuiseMummy implements Clogged {
 		final UrfResourceDescription description = artifact.getResourceDescription();
 		if(description.hasProperties()) { //skip empty descriptions
 			final Path targetPath = artifact.getTargetPath();
-			if(isRegularFile(targetPath)) { //skip directories
+			if(!(artifact instanceof DirectoryArtifact)) { //skip directories TODO delegate to mummifier for description generation
 				final Path descriptionTargetPath = addExtension(changeBase(targetPath, context.getSiteTargetDirectory(), context.getSiteDescriptionTargetDirectory()),
 						"@.turf"); //TODO use constant
 
