@@ -90,7 +90,13 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 */
 	@Override
 	public Path getArtifactTargetPath(final MummyContext context, final Path sourceFile) {
-		return changeExtension(super.getArtifactTargetPath(context, sourceFile), HTML_NAME_EXTENSION);
+		final Path defaultArtifactTargetPath = super.getArtifactTargetPath(context, sourceFile);
+		final boolean isNameBare = context.getSiteConfiguration().findBoolean(SITE_CONFIG_KEY_PAGES_NAME_BARE).orElse(false);
+		if(isNameBare) { //so-called clean URLs
+			return removeExtension(defaultArtifactTargetPath);
+		} else {
+			return changeExtension(defaultArtifactTargetPath, HTML_NAME_EXTENSION);
+		}
 	}
 
 	/**
