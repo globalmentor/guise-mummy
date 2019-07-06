@@ -39,6 +39,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import com.globalmentor.application.*;
 import com.globalmentor.net.URIs;
 
+import io.guise.catalina.webresources.SiteRoot;
 import io.guise.mummy.GuiseMummy;
 import picocli.CommandLine.*;
 
@@ -190,6 +191,7 @@ public class GuiseCli extends BaseCliApplication {
 		tomcat.getConnector(); //create a default connector; required; see https://stackoverflow.com/a/49011424/421049
 
 		final Context context = tomcat.addContext("", siteTargetDirectory.toAbsolutePath().toString());
+		context.setResources(new SiteRoot());
 
 		final Wrapper defaultServlet = context.createWrapper(); //TODO use constants below
 		defaultServlet.setName("default");
