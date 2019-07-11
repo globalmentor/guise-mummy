@@ -16,12 +16,32 @@
 
 package io.guise.catalina.webresources;
 
-import java.io.File;
+import static com.globalmentor.io.Paths.*;
+import static com.globalmentor.net.URIs.*;
+import static io.urf.vocab.content.Content.*;
+import static java.nio.file.Files.*;
+import static java.util.Objects.*;
+
+import java.io.*;
+import java.nio.file.Path;
+import java.util.List;
+
+import javax.annotation.*;
 
 import org.apache.catalina.*;
 import org.apache.catalina.webresources.*;
+import org.apache.juli.logging.*;
+
+import io.urf.model.*;
+import io.urf.turf.TurfParser;
 
 public class SiteDirResourceSet extends DirResourceSet {
+
+	private static final Log log = LogFactory.getLog(SiteDirResourceSet.class);
+
+	private Path baseDir; //set when initialized in initInternal()
+
+	private final Path descriptionBaseDir;
 
 	/**
 	 * A Guise-aware site-based set of resources based upon a site directory.
@@ -31,39 +51,58 @@ public class SiteDirResourceSet extends DirResourceSet {
 	 *          application, the directory would be mounted at <code>"WEB-INF/lib/"</code>.
 	 * @param base The absolute path to the directory on the file system from which the resources will be served.
 	 * @param internalPath The path within this new resource set where resources will be served from.
+	 * @param descriptionBaseDir The root directory of the description metadata tree, which may or may not be the same as the site doc base.
 	 */
-	public SiteDirResourceSet(WebResourceRoot root, String webAppMount, String base, String internalPath) {
+	public SiteDirResourceSet(@Nonnull final WebResourceRoot root, @Nonnull final String webAppMount, @Nonnull final String base,
+			@Nonnull final String internalPath, @Nonnull final Path descriptionBaseDir) {
 		super(root, webAppMount, base, internalPath);
+		this.descriptionBaseDir = requireNonNull(descriptionBaseDir);
+	}
+
+	@Override
+	protected void initInternal() throws LifecycleException {
+		super.initInternal();
+		baseDir = getFileBase().toPath();
 	}
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This version creates a specialized {@link SiteFileResource} which detects Guise metadata and uses it to indicate custom Internet media type
+	 * @implSpec If creating a {@link FileResource}, this detects Guise metadata and uses it to initialize the resource with custom Internet media type
 	 *           information.
-	 * @implNote This implementation duplicates almost all the code from the {@link DirResourceSet#getResource(String)} implementation of this method because the
-	 *           {@link DirResourceSet} implementation provides no way to plug in a file resource factory.
-	 * @see SiteFileResource
 	 */
 	@Override
 	public WebResource getResource(String path) {
 		checkPath(path);
-		String webAppMount = getWebAppMount();
-		WebResourceRoot root = getRoot();
+		final String webAppMount = getWebAppMount();
+		final WebResourceRoot root = getRoot();
 		if(path.startsWith(webAppMount)) {
-			File f = file(path.substring(webAppMount.length()), false);
-			if(f == null) {
-				return new EmptyResource(root, path);
+			final File file = file(path.substring(webAppMount.length()), false);
+			if(file != null && file.exists()) {
+				if(file.isDirectory() && !isCollectionPath(path)) {
+					path += PATH_SEPARATOR;
+				}
+				final FileResource fileResource = new FileResource(root, path, file, isReadOnly(), getManifest());
+
+				//load any description sidecar
+				final Path descriptionFile = addExtension(changeBase(file.toPath(), baseDir, descriptionBaseDir), "@.turf"); //TODO use constant
+				if(isRegularFile(descriptionFile)) {
+					try (final InputStream inputStream = new BufferedInputStream(newInputStream(descriptionFile))) {
+						new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream).stream().filter(UrfResourceDescription.class::isInstance)
+								.map(UrfResourceDescription.class::cast).findFirst().ifPresentOrElse(description -> {
+									//set the MIME type if indicated
+									findContentType(description).ifPresent(contentType -> fileResource.setMimeType(contentType.toString()));
+								}, () -> log.warn(String.format("No description found for resource %s in file %s.", file, descriptionFile)));
+
+					} catch(final IOException ioException) {
+						log.error(String.format("Error loading resource-specific metadata for resource %s from %s.", file, descriptionFile), ioException);
+					}
+				}
+
+				return fileResource;
+
 			}
-			if(!f.exists()) {
-				return new EmptyResource(root, path, f);
-			}
-			if(f.isDirectory() && path.charAt(path.length() - 1) != '/') {
-				path = path + '/';
-			}
-			return new SiteFileResource(root, path, f, isReadOnly(), getManifest());
-		} else {
-			return new EmptyResource(root, path);
 		}
+		return super.getResource(path);
 	}
 
 }

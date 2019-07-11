@@ -16,11 +16,15 @@
 
 package io.guise.catalina.webresources;
 
-import java.io.File;
+import static com.globalmentor.net.URIs.*;
+import static java.util.Objects.*;
 
-import org.apache.catalina.Context;
-import org.apache.catalina.Host;
-import org.apache.catalina.WebResourceSet;
+import java.io.File;
+import java.nio.file.Path;
+
+import javax.annotation.*;
+
+import org.apache.catalina.*;
 import org.apache.catalina.webresources.*;
 
 /**
@@ -28,6 +32,16 @@ import org.apache.catalina.webresources.*;
  * @author Garret Wilson
  */
 public class SiteRoot extends StandardRoot {
+
+	private final Path descriptionBaseDir;
+
+	/**
+	 * Creates the root with a record of the directory used for descriptions of site resources.
+	 * @param descriptionBaseDir The root directory of the description metadata tree, which may or may not be the same as the site doc base.
+	 */
+	public SiteRoot(@Nonnull final Path descriptionBaseDir) {
+		this.descriptionBaseDir = requireNonNull(descriptionBaseDir);
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -43,7 +57,7 @@ public class SiteRoot extends StandardRoot {
 				baseFile = new File(((Host)context.getParent()).getAppBaseFile(), baseFile.getPath());
 			}
 			if(baseFile.isDirectory()) {
-				return new SiteDirResourceSet(this, "/", baseFile.getAbsolutePath(), "/");
+				return new SiteDirResourceSet(this, ROOT_PATH, baseFile.getAbsolutePath(), ROOT_PATH, descriptionBaseDir);
 			}
 		}
 		return super.createMainResourceSet();

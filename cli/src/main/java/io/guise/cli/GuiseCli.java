@@ -191,7 +191,8 @@ public class GuiseCli extends BaseCliApplication {
 		tomcat.getConnector(); //create a default connector; required; see https://stackoverflow.com/a/49011424/421049
 
 		final Context context = tomcat.addContext("", siteTargetDirectory.toAbsolutePath().toString());
-		context.setResources(new SiteRoot());
+		final Path siteDescriptionTargetDirectory = siteTargetDirectory.resolve("..").resolve("site-description"); //TODO revamp configuration approach, along with MummyContext.getSiteDescriptionTargetDirectory()
+		context.setResources(new SiteRoot(siteDescriptionTargetDirectory));
 
 		final Wrapper defaultServlet = context.createWrapper(); //TODO use constants below
 		defaultServlet.setName("default");
