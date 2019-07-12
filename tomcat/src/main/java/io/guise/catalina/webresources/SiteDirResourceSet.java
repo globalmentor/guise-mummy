@@ -35,6 +35,11 @@ import org.apache.juli.logging.*;
 import io.urf.model.*;
 import io.urf.turf.TurfParser;
 
+/**
+ * Tomcat source set for a Guise generated site directory.
+ * @implSpec This version loads Guise generated Internet media type dynamically for retrieved resources.
+ * @author Garret Wilson
+ */
 public class SiteDirResourceSet extends DirResourceSet {
 
 	private static final Log log = LogFactory.getLog(SiteDirResourceSet.class);
