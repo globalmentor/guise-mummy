@@ -43,7 +43,7 @@
 		<globalmentor-ee.version>0.6.1</globalmentor-ee.version>
 		<globalmentor-web.version>0.6.0</globalmentor-web.version>
 		<slf4j.version>1.7.25</slf4j.version>
-		<tomcat.version>9.0.20</tomcat.version>
+		<tomcat.version>9.0.21</tomcat.version>
 		<urf.version>0.3.2-SNAPSHOT</urf.version>
 	</properties>
 
@@ -52,6 +52,7 @@
 		<module>framework</module>
 		<module>framework-demo</module>
 		<module>mummy</module>
+		<module>tomcat</module>
 	</modules>
 
 	<dependencyManagement>
@@ -149,6 +150,12 @@
 			<dependency>
 				<groupId>io.guise</groupId>
 				<artifactId>guise-mummy</artifactId>
+				<version>0.2.0-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.guise</groupId>
+				<artifactId>guise-tomcat</artifactId>
 				<version>0.2.0-SNAPSHOT</version>
 			</dependency>
 

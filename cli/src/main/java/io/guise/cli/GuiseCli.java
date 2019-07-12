@@ -39,6 +39,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import com.globalmentor.application.*;
 import com.globalmentor.net.URIs;
 
+import io.guise.catalina.webresources.SiteRoot;
 import io.guise.mummy.GuiseMummy;
 import picocli.CommandLine.*;
 
@@ -158,7 +159,7 @@ public class GuiseCli extends BaseCliApplication {
 	@Command(description = "Starts a web server for exploring the site in the target directory.")
 	public void serve(
 			@Option(names = "--site-target", description = "The target root directory of the site to be served.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path siteTargetDirectory,
-			@Parameters(paramLabel = "<project>", description = "The base directory of the project to clean.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path projectDirectory,
+			@Parameters(paramLabel = "<project>", description = "The base directory of the project being served.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path projectDirectory,
 			@Option(names = {"--port", "-p"}, description = "Specifies the server port.", defaultValue = "" + DEFAULT_SERVE_PORT) final int port,
 
 			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
@@ -190,6 +191,8 @@ public class GuiseCli extends BaseCliApplication {
 		tomcat.getConnector(); //create a default connector; required; see https://stackoverflow.com/a/49011424/421049
 
 		final Context context = tomcat.addContext("", siteTargetDirectory.toAbsolutePath().toString());
+		final Path siteDescriptionTargetDirectory = siteTargetDirectory.resolve("..").resolve("site-description"); //TODO revamp configuration approach, along with MummyContext.getSiteDescriptionTargetDirectory()
+		context.setResources(new SiteRoot(siteDescriptionTargetDirectory));
 
 		final Wrapper defaultServlet = context.createWrapper(); //TODO use constants below
 		defaultServlet.setName("default");
@@ -202,7 +205,12 @@ public class GuiseCli extends BaseCliApplication {
 		context.addServletMappingDecoded(ROOT_PATH, "default"); //TODO use constant
 		//TODO later add JSP servlet mappings
 		DEFAULT_MIME_TYPES_BY_FILENAME_EXTENSION.forEach((extension, mimeType) -> context.addMimeMapping(extension, mimeType));
+
+		//TODO decide how to determine the welcome file; we can either:
+		//* get from configuration, as with `mummify` command (decide whether the configuration is at the project or site level)
+		//* write some metadata file to the site-description indicating the welcome file
 		context.addWelcomeFile("index.html"); //TODO get from configuration, as with `mummify` command
+		context.addWelcomeFile("index"); //TODO get from configuration, as with `mummify` command
 
 		//start the server
 		try {
