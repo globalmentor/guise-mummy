@@ -32,9 +32,8 @@ import io.guise.mummy.deploy.Deployer;
 import io.urf.vocab.content.Content;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.S3ClientBuilder;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.*;
+import software.amazon.awssdk.services.s3.model.*;
 
 /**
  * Deploys a site to AWS S3.
@@ -87,22 +86,10 @@ public class S3Deployer implements Deployer, Clogged {
 		plan(context, rootArtifact);
 
 		//#put
-		final S3Client s3Client = getS3Client();
-		final String bucket = getBucket();
-		for(final Map.Entry<Artifact, String> artifactKeyEntry : artifactKeys.entrySet()) {
-			final Artifact artifact = artifactKeyEntry.getKey();
-			final String key = artifactKeyEntry.getValue();
-
-			getLogger().debug("Deploying artifact {} to key `{}`.", artifact, key);
-
-			final PutObjectRequest.Builder putBuilder = PutObjectRequest.builder().bucket(bucket).key(key);
-			//set content-type if found
-			Content.findContentType(artifact.getResourceDescription()).map(ContentType::toString).ifPresent(putBuilder::contentType);
-			s3Client.putObject(putBuilder.build(), RequestBody.fromFile(artifact.getTargetPath()));
-		}
+		put(context);
 
 		//#prune
-		//TODO
+		prune(context);
 
 	}
 
@@ -126,7 +113,7 @@ public class S3Deployer implements Deployer, Clogged {
 	protected void plan(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact, @Nonnull Artifact artifact) throws IOException {
 		if(!(artifact instanceof DirectoryArtifact)) { //don't deploy anything for directories TODO improve semantics, especially after the root artifact type changes; maybe use CollectionArtifact
 			final String key = context.relativizeTargetReference(rootArtifact, artifact).toString();
-			getLogger().debug("Planning deployment for artifact {}, key `{}`.", artifact, key);
+			getLogger().debug("Planning deployment for artifact {}, S3 key `{}`.", artifact, key);
 			artifactKeys.put(artifact, key);
 		}
 		if(artifact instanceof CompositeArtifact) {
@@ -134,6 +121,52 @@ public class S3Deployer implements Deployer, Clogged {
 				plan(context, rootArtifact, comprisedArtifact);
 			}
 		}
+	}
+
+	/**
+	 * Transfers content for deployment.
+	 * @apiNote This is the main deployment method, which actually deploys content.
+	 * @param context The context of static site generation.
+	 * @throws IOException if there is an I/O error during putting.
+	 */
+	protected void put(@Nonnull final MummyContext context) throws IOException {
+		final S3Client s3Client = getS3Client();
+		final String bucket = getBucket();
+		for(final Map.Entry<Artifact, String> artifactKeyEntry : artifactKeys.entrySet()) {
+			final Artifact artifact = artifactKeyEntry.getKey();
+			final String key = artifactKeyEntry.getValue();
+			getLogger().debug("Deploying artifact {} to S3 key `{}`.", artifact, key);
+			final PutObjectRequest.Builder putBuilder = PutObjectRequest.builder().bucket(bucket).key(key);
+			//set content-type if found
+			Content.findContentType(artifact.getResourceDescription()).map(ContentType::toString).ifPresent(putBuilder::contentType);
+			s3Client.putObject(putBuilder.build(), RequestBody.fromFile(artifact.getTargetPath()));
+		}
+	}
+
+	/**
+	 * Prunes any objects that don't exist in the site.
+	 * @apiNote This process can occur even when actual putting is being performed concurrently, as existing objects that are in the site are left undisturbed.
+	 *          There is no need to determine if the existing object is out of date, as it will be replaced if it hasn't been already. Only files no longer in the
+	 *          site are removed.
+	 * @param context The context of static site generation.
+	 * @throws IOException if there is an I/O error during pruning.
+	 */
+	protected void prune(@Nonnull final MummyContext context) throws IOException {
+		final S3Client s3Client = getS3Client();
+		final String bucket = getBucket();
+		ListObjectsV2Request listObjectsRequest = ListObjectsV2Request.builder().bucket(bucket).build();
+		ListObjectsV2Response listObjectsResponse;
+		do {
+			listObjectsResponse = s3Client.listObjectsV2(listObjectsRequest);
+			for(final S3Object s3Object : listObjectsResponse.contents()) {
+				final String key = s3Object.key();
+				if(!artifactKeys.containsValue(key)) { //if this object isn't in our site, delete it
+					getLogger().debug("Pruning S3 object `{}`.", key);
+					s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucket).key(key).build());
+				}
+			}
+			listObjectsRequest = ListObjectsV2Request.builder().bucket(bucket).continuationToken(listObjectsResponse.nextContinuationToken()).build();
+		} while(listObjectsResponse.isTruncated());
 	}
 
 }
