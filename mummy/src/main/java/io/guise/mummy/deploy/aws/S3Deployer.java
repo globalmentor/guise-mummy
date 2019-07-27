@@ -41,6 +41,16 @@ import software.amazon.awssdk.services.s3.model.*;
  */
 public class S3Deployer implements Deployer, Clogged {
 
+	public static final String SITE_CONFIG_KEY_DEPLOYMENT_REGION = "deployment.region";
+	public static final String SITE_CONFIG_KEY_DEPLOYMENT_BUCKET = "deployment.bucket";
+
+	private final Region region;
+
+	/** @return The specified region, if any; missing if the default region should be used (usually configured externally). */
+	public Optional<Region> findRegion() {
+		return Optional.ofNullable(region);
+	}
+
 	private final String bucket;
 
 	/** @return The destination S3 bucket for deployment. */
@@ -58,6 +68,15 @@ public class S3Deployer implements Deployer, Clogged {
 	private final ReverseMap<Artifact, String> artifactKeys = new DecoratorReverseMap<>(new LinkedHashMap<>(), new HashMap<>());
 
 	/**
+	 * Context constructor. Retrieves the bucket and optional region from the site configuration.
+	 * @param context The context of static site generation.
+	 */
+	public S3Deployer(@Nonnull final MummyContext context) {
+		this(context.getSiteConfiguration().findString(SITE_CONFIG_KEY_DEPLOYMENT_REGION).map(Region::of).orElse(null),
+				context.getSiteConfiguration().getString(SITE_CONFIG_KEY_DEPLOYMENT_BUCKET));
+	}
+
+	/**
 	 * Bucket constructor. The default region will be used (usually configured externally).
 	 * @param bucket The bucket into which the site should be deployed.
 	 */
@@ -71,6 +90,7 @@ public class S3Deployer implements Deployer, Clogged {
 	 * @param bucket The bucket into which the site should be deployed.
 	 */
 	public S3Deployer(@Nullable final Region region, @Nonnull String bucket) {
+		this.region = region;
 		this.bucket = requireNonNull(bucket);
 		final S3ClientBuilder s3ClientBuilder = S3Client.builder();
 		if(region != null) {
@@ -81,6 +101,8 @@ public class S3Deployer implements Deployer, Clogged {
 
 	@Override
 	public void deploy(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact) throws IOException {
+
+		getLogger().debug("Deploying to AWS region `{}` S3 bucket `{}`.", findRegion(), bucket);
 
 		//#plan
 		plan(context, rootArtifact);

@@ -36,7 +36,6 @@ import io.guise.mummy.deploy.Deployer;
 import io.guise.mummy.deploy.aws.S3Deployer;
 import io.urf.model.UrfResourceDescription;
 import io.urf.turf.TurfSerializer;
-import software.amazon.awssdk.regions.Region;
 
 /**
  * Guise static site generator.
@@ -120,10 +119,7 @@ public class GuiseMummy implements Clogged {
 
 		//#deploy phase
 		if(deploy) {
-			final Region region = context.getSiteConfiguration().findString("deployment.region").map(Region::of).orElse(null); //TODO use constant
-			final String bucket = context.getSiteConfiguration().getString("deployment.bucket"); //TODO use constant
-			getLogger().debug("Deploying to AWS region `{}` S3 bucket `{}`.", region, bucket);
-			final Deployer deployer = new S3Deployer(region, bucket);
+			final Deployer deployer = new S3Deployer(context);
 			deployer.deploy(context, rootArtifact);
 		}
 	}
