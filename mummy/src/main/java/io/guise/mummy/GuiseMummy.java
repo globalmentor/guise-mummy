@@ -32,6 +32,8 @@ import javax.annotation.*;
 import io.clogr.Clogged;
 import io.confound.config.Configuration;
 import io.confound.config.file.FileSystemConfigurationManager;
+import io.guise.mummy.deploy.Deployer;
+import io.guise.mummy.deploy.aws.S3Deployer;
 import io.urf.model.UrfResourceDescription;
 import io.urf.turf.TurfSerializer;
 
@@ -87,6 +89,19 @@ public class GuiseMummy implements Clogged {
 	 * @throws IOException if there is an I/O error generating the static site.
 	 */
 	public void mummify(@Nonnull final Path sourceDirectory, @Nonnull final Path targetDirectory) throws IOException {
+		mummify(sourceDirectory, targetDirectory, false); //TODO consolidate and improve approach to life cycle
+	}
+
+	/**
+	 * Performs static site generation on a source directory into a target directory.
+	 * @param sourceDirectory The root of the site to be mummified.
+	 * @param targetDirectory The root directory of the generated static site; will be created if needed.
+	 * @param deploy Whether the site should also be deployed after mummification.
+	 * @throws IllegalArgumentException if the source directory does not exist or is not a directory.
+	 * @throws IllegalArgumentException if the source and target directories overlap.
+	 * @throws IOException if there is an I/O error generating the static site.
+	 */
+	public void mummify(@Nonnull final Path sourceDirectory, @Nonnull final Path targetDirectory, final boolean deploy) throws IOException {
 
 		//#initialize phase
 		final Context context = initialize(sourceDirectory, targetDirectory);
@@ -101,6 +116,12 @@ public class GuiseMummy implements Clogged {
 
 		//#mummify phase
 		rootArtifact.getMummifier().mummify(context, rootArtifact);
+
+		//#deploy phase
+		if(deploy) {
+			final Deployer deployer = new S3Deployer(context);
+			deployer.deploy(context, rootArtifact);
+		}
 	}
 
 	/**

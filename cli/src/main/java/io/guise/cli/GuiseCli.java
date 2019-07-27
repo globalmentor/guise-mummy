@@ -156,6 +156,42 @@ public class GuiseCli extends BaseCliApplication {
 		}
 	}
 
+	@Command(description = "Deploys a site after generating a static version.")
+	public void deploy(
+			@Option(names = "--site-source", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path siteSourceDirectory,
+			@Option(names = "--site-target", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path siteTargetDirectory,
+			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path projectDirectory,
+
+			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
+
+		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
+
+		if(projectDirectory == null) {
+			projectDirectory = getWorkingDirectory();
+		}
+
+		if(siteSourceDirectory == null) {
+			siteSourceDirectory = projectDirectory.resolve(DEFAULT_SITE_SOURCE_RELATIVE_DIR);
+		}
+
+		if(siteTargetDirectory == null) {
+			siteTargetDirectory = projectDirectory.resolve(DEFAULT_SITE_TARGET_RELATIVE_DIR);
+		}
+
+		getLogger().info("Mummify...");
+		getLogger().info("Project: {}", projectDirectory);
+		getLogger().info("Site Source: {}", siteSourceDirectory);
+		getLogger().info("Site Target: {}", siteTargetDirectory);
+
+		final GuiseMummy mummifier = new GuiseMummy();
+		try {
+			mummifier.mummify(siteSourceDirectory.toAbsolutePath().normalize(), siteTargetDirectory.toAbsolutePath().normalize(), true);
+		} catch(final IOException ioException) {
+			getLogger().error("Error mummifying site.", ioException);
+			System.err.println(ioException.getMessage());
+		}
+	}
+
 	@Command(description = "Starts a web server for exploring the site in the target directory.")
 	public void serve(
 			@Option(names = "--site-target", description = "The target root directory of the site to be served.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path siteTargetDirectory,
