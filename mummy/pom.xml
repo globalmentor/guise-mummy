@@ -30,6 +30,11 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.vladsch.flexmark</groupId>
+			<artifactId>flexmark-all</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>io.clogr</groupId>
 			<artifactId>clogr</artifactId>
 		</dependency>
@@ -67,6 +72,12 @@
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>s3</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>
