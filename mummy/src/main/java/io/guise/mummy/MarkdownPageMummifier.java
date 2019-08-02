@@ -27,6 +27,7 @@ import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import com.globalmentor.io.BOMInputStreamReader;
+import com.globalmentor.io.Filenames;
 import com.globalmentor.text.StringTemplate;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
@@ -72,7 +73,7 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 	 * @implSpec This version loads a document in Markdown format.
 	 */
 	@Override
-	public Document loadSourceDocument(final MummyContext context, final InputStream inputStream) throws IOException, DOMException {
+	public Document loadSourceDocument(final MummyContext context, final InputStream inputStream, final String name) throws IOException, DOMException {
 		//create a Reader to detect the BOM and to throw errors if the encoding is invalid
 		@SuppressWarnings("resource") //we don't manage the underlying input stream
 		final BOMInputStreamReader bomInputStreamReader = new BOMInputStreamReader(new BufferedInputStream(inputStream)); //TODO create utility to ensure mark supported
@@ -86,7 +87,8 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		com.vladsch.flexmark.util.ast.Document document = parser.parse(stringBuilder.toString());
 		final HtmlRenderer renderer = HtmlRenderer.builder().build();
 		final String htmlBodyContent = renderer.render(document);
-		final String xhtmlDocumentString = XHTML_TEMPLATE.apply("", htmlBodyContent); //TODO title
+		final String title = name != null ? Filenames.removeExtension(name) : "";
+		final String xhtmlDocumentString = XHTML_TEMPLATE.apply(title, htmlBodyContent);
 		final DocumentBuilder documentBuilder = context.newPageDocumentBuilder();
 		try {
 			return documentBuilder.parse(new ByteArrayInputStream(xhtmlDocumentString.getBytes(UTF_8)));

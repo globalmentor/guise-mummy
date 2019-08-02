@@ -97,10 +97,10 @@ public class MarkdownPageMummifierTest {
 	public void testSimpleMarkdown() throws IOException {
 		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
 		final Document document;
-		try (final InputStream inputStream = getClass().getResourceAsStream("simple.md")) {
-			document = mummifier.loadSourceDocument(mummyContext, inputStream);
+		try (final InputStream inputStream = getClass().getResourceAsStream(SIMPLE_MARKDOWN_RESOURCE_NAME)) {
+			document = mummifier.loadSourceDocument(mummyContext, inputStream, SIMPLE_MARKDOWN_RESOURCE_NAME);
 		}
-		assertThat(findTitle(document), isPresentAndIs(""));
+		assertThat(findTitle(document), isPresentAndIs("simple"));
 		final Node body = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
 		final List<Element> bodyElements = getChildElements(body);
 		assertThat(bodyElements, hasSize(2));

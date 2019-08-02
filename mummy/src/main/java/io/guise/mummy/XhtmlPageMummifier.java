@@ -42,7 +42,7 @@ public class XhtmlPageMummifier extends AbstractPageMummifier {
 	 * @implSpec This version loads a document in XHTML format.
 	 */
 	@Override
-	public Document loadSourceDocument(final MummyContext context, final InputStream inputStream) throws IOException, DOMException {
+	public Document loadSourceDocument(final MummyContext context, final InputStream inputStream, final String name) throws IOException, DOMException {
 		final DocumentBuilder documentBuilder = context.newPageDocumentBuilder();
 		try {
 			return documentBuilder.parse(inputStream);
