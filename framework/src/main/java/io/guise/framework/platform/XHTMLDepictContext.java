@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import com.globalmentor.util.StringTemplate;
+import com.globalmentor.text.StringTemplate;
 
 import io.guise.framework.geometry.Side;
 

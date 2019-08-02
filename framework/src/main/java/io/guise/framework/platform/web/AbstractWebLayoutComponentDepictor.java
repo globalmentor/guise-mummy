@@ -330,7 +330,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 			final Component leftComponent = rowComponents[0]; //create an alias for the left component in case we need to use it
 			final Component centerComponent = rowComponents[1]; //create an alias for the center component in case we need to use it
 			final Component rightComponent = rowComponents[rowComponents.length - 1]; //create an alias for the right component in case we need to use it
-			final int rowComponentCount = getInstanceCount(rowComponents); //we'll see how many components are in the row
+			final int rowComponentCount = getNonNullCount(rowComponents); //we'll see how many components are in the row
 			final Component bottomComponent = regionLayout.getComponent(Region.getRegion(orientation, Flow.PAGE, Region.FLOW_REGION_COUNT - 1)); //get the component for the bottom
 			if(topComponent != null || rowComponentCount > 0 || bottomComponent != null) { //if there is a component in the layout
 				depictContext.write("\n"); //format the output
@@ -426,7 +426,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 						case Y: //if we should span the left and right components vertically
 						{
 							final Component[] columnComponents = new Component[] {topComponent, centerComponent, bottomComponent}; //get the column components---even the null ones
-							final int columnComponentCount = getInstanceCount(columnComponents); //we'll see how many components are in the column
+							final int columnComponentCount = getNonNullCount(columnComponents); //we'll see how many components are in the column
 							depictContext.write("\n"); //format the output
 							depictContext.writeIndent(); //write an indentation
 							depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TR); //<xhtml:tr>					
