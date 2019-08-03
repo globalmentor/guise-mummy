@@ -40,6 +40,7 @@ import io.confound.config.Configuration;
 public class MarkdownPageMummifierTest {
 
 	public static final String SIMPLE_MARKDOWN_RESOURCE_NAME = "simple.md";
+	public static final String SIMPLE_TITLE_MARKDOWN_RESOURCE_NAME = "simple-title.md";
 
 	private MummyContext mummyContext;
 
@@ -101,6 +102,31 @@ public class MarkdownPageMummifierTest {
 			document = mummifier.loadSourceDocument(mummyContext, inputStream, SIMPLE_MARKDOWN_RESOURCE_NAME);
 		}
 		assertThat(findTitle(document), isPresentAndIs("simple"));
+		final Node body = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final List<Element> bodyElements = getChildElements(body);
+		assertThat(bodyElements, hasSize(2));
+		final Element h1 = bodyElements.get(0);
+		assertThat(h1.getLocalName(), is(ELEMENT_H1));
+		assertThat(h1.getNamespaceURI(), is(XHTML_NAMESPACE_URI_STRING));
+		assertThat(h1.getTextContent(), is("Heading"));
+		final Element p = bodyElements.get(1);
+		assertThat(p.getLocalName(), is(ELEMENT_P));
+		assertThat(p.getNamespaceURI(), is(XHTML_NAMESPACE_URI_STRING));
+		assertThat(p.getTextContent(), is("Body text."));
+	}
+
+	/**
+	 * @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream)
+	 * @see #SIMPLE_TITLE_MARKDOWN_RESOURCE_NAME
+	 */
+	@Test
+	public void testSimpleTitleMarkdown() throws IOException {
+		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
+		final Document document;
+		try (final InputStream inputStream = getClass().getResourceAsStream(SIMPLE_TITLE_MARKDOWN_RESOURCE_NAME)) {
+			document = mummifier.loadSourceDocument(mummyContext, inputStream, SIMPLE_TITLE_MARKDOWN_RESOURCE_NAME);
+		}
+		assertThat(findTitle(document), isPresentAndIs("Simple Page"));
 		final Node body = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
 		final List<Element> bodyElements = getChildElements(body);
 		assertThat(bodyElements, hasSize(2));

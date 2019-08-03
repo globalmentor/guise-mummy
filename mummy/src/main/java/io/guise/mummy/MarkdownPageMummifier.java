@@ -19,18 +19,27 @@ package io.guise.mummy;
 import static java.nio.charset.StandardCharsets.*;
 
 import java.io.*;
-import java.util.Set;
+import java.util.*;
 
 import javax.xml.parsers.*;
 
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
-import com.globalmentor.io.BOMInputStreamReader;
-import com.globalmentor.io.Filenames;
+import com.globalmentor.io.*;
 import com.globalmentor.text.StringTemplate;
+import com.vladsch.flexmark.ext.definition.DefinitionExtension;
+import com.vladsch.flexmark.ext.emoji.EmojiExtension;
+import com.vladsch.flexmark.ext.emoji.EmojiImageType;
+import com.vladsch.flexmark.ext.tables.TablesExtension;
+import com.vladsch.flexmark.ext.typographic.TypographicExtension;
+import com.vladsch.flexmark.ext.yaml.front.matter.AbstractYamlFrontMatterVisitor;
+import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.superscript.SuperscriptExtension;
+import com.vladsch.flexmark.util.data.MutableDataHolder;
+import com.vladsch.flexmark.util.data.MutableDataSet;
 
 /**
  * Mummifier for Markdown documents.
@@ -68,6 +77,39 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		return Set.of("md", "markdown");
 	}
 
+	private final Parser parser;
+
+	/**
+	 * Returns the parser for parsing Markdown.
+	 * @apiNote The Flexmark parser API indicates it can be used by multiple threads.
+	 * @return The parser for parsing Markdown.
+	 */
+	protected Parser getParser() {
+		return parser;
+	}
+
+	private final HtmlRenderer htmlRenderer;
+
+	/** @return The formatter that serializes a Markdown tree as HTML body content. */
+	protected HtmlRenderer getHtmlRenderer() {
+		return htmlRenderer;
+	}
+
+	/** Constructor. */
+	public MarkdownPageMummifier() {
+		final MutableDataHolder parserOptions = new MutableDataSet()
+				//emoji; see https://www.webfx.com/tools/emoji-cheat-sheet/
+				.set(EmojiExtension.USE_IMAGE_TYPE, EmojiImageType.UNICODE_ONLY)
+				//GFM tables
+				.set(TablesExtension.COLUMN_SPANS, false).set(TablesExtension.APPEND_MISSING_COLUMNS, true).set(TablesExtension.DISCARD_EXTRA_COLUMNS, true)
+				.set(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, true)
+				//extensions
+				.set(Parser.EXTENSIONS, List.of(DefinitionExtension.create(), EmojiExtension.create(), SuperscriptExtension.create(), TablesExtension.create(),
+						TypographicExtension.create(), YamlFrontMatterExtension.create()));
+		parser = Parser.builder(parserOptions).build();
+		htmlRenderer = HtmlRenderer.builder().build();
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This version loads a document in Markdown format.
@@ -83,11 +125,18 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		while((charsRead = bomInputStreamReader.read(buffer)) != -1) { //TODO create utility to read all from a reader
 			stringBuilder.append(buffer, 0, charsRead);
 		}
-		final Parser parser = Parser.builder().build();
-		com.vladsch.flexmark.util.ast.Document document = parser.parse(stringBuilder.toString());
-		final HtmlRenderer renderer = HtmlRenderer.builder().build();
-		final String htmlBodyContent = renderer.render(document);
-		final String title = name != null ? Filenames.removeExtension(name) : "";
+		String title = name != null ? Filenames.removeExtension(name) : ""; //default to a title of the filename with no extension
+		com.vladsch.flexmark.util.ast.Document markdownDocument = getParser().parse(stringBuilder.toString());
+		final AbstractYamlFrontMatterVisitor yamlVisitor = new AbstractYamlFrontMatterVisitor();
+		yamlVisitor.visit(markdownDocument);
+		final List<String> frontMatterTitles = yamlVisitor.getData().get("title"); //TODO use a constant from some URF list of standard properties
+		if(frontMatterTitles != null && !frontMatterTitles.isEmpty()) {
+			final String frontMatterTitle = frontMatterTitles.iterator().next();
+			if(frontMatterTitle != null) {
+				title = frontMatterTitle;
+			}
+		}
+		final String htmlBodyContent = getHtmlRenderer().render(markdownDocument);
 		final String xhtmlDocumentString = XHTML_TEMPLATE.apply(title, htmlBodyContent);
 		final DocumentBuilder documentBuilder = context.newPageDocumentBuilder();
 		try {
