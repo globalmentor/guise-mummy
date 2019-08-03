@@ -16,6 +16,7 @@
 
 package io.guise.mummy.deploy.aws;
 
+import static io.guise.mummy.GuiseMummy.*;
 import static java.util.Objects.*;
 
 import java.io.IOException;
@@ -24,12 +25,14 @@ import java.util.*;
 import javax.annotation.*;
 
 import com.globalmentor.collections.*;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.*;
+import com.globalmentor.text.StringTemplate;
 
 import io.clogr.Clogged;
 import io.guise.mummy.*;
 import io.guise.mummy.deploy.Deployer;
 import io.urf.vocab.content.Content;
+import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.*;
@@ -43,6 +46,24 @@ public class S3Deployer implements Deployer, Clogged {
 
 	public static final String SITE_CONFIG_KEY_DEPLOYMENT_REGION = "deployment.region";
 	public static final String SITE_CONFIG_KEY_DEPLOYMENT_BUCKET = "deployment.bucket";
+
+	/**
+	 * The policy template for setting a bucket to public read access. There is one parameter:
+	 * <ol>
+	 * <li>bucket</li>
+	 * </ol>
+	 */
+	protected static final StringTemplate POLICY_TEMPLATE_PUBLIC_READ_GET_OBJECT = StringTemplate.builder().text( //@formatter:off
+			"{" + 
+			"	\"Version\": \"2012-10-17\"," + 
+			"	\"Statement\": [{" + 
+			"		\"Sid\": \"PublicReadGetObject\"," + 
+			"		\"Effect\": \"Allow\"," + 
+			"		\"Principal\": \"*\"," + 
+			"		\"Action\": [\"s3:GetObject\"]," + 
+			"		\"Resource\": [\"arn:aws:s3:::").parameter(StringTemplate.STRING_PARAMETER).text("/*\"]" + 
+			"	}]" + 
+			"}").build();	//@formatter:on
 
 	private final Region region;
 
@@ -100,9 +121,100 @@ public class S3Deployer implements Deployer, Clogged {
 	}
 
 	@Override
+	public void prepare(final MummyContext context) throws IOException {
+		getLogger().info("Preparing to deploy to AWS region `{}` S3 bucket `{}`.", findRegion(), bucket);
+		final S3Client s3Client = getS3Client();
+
+		//create bucket
+		final String bucket = getBucket();
+		final boolean bucketExists = bucketExists(bucket);
+		getLogger().debug("Bucket `{}` exists? {}.", bucket, bucketExists);
+		final boolean bucketHasPolicy;
+		final boolean bucketHasWebsiteConfiguration;
+		if(bucketExists) { //if the bucket exists, see if it has a policy
+			bucketHasPolicy = bucketHasPolicy(bucket);
+			bucketHasWebsiteConfiguration = bucketHasWebsiteConfiguration(bucket);
+		} else { //create the bucket if it doesn't exist
+			getLogger().info("Creating S3 bucket `{}` in AWS region `{}`.", bucket, findRegion().orElse(Region.US_EAST_1)); //default region as per the API
+			final CreateBucketConfiguration.Builder createBucketConfigurationBuilder = CreateBucketConfiguration.builder();
+			findRegion().ifPresent(region -> createBucketConfigurationBuilder.locationConstraint(region.id()));
+			s3Client.createBucket(builder -> builder.bucket(bucket).createBucketConfiguration(createBucketConfigurationBuilder.build()));
+			bucketHasPolicy = false; //the bucket doesn't have a policy yet, as we just created it
+			bucketHasWebsiteConfiguration = false; //the bucket isn't configured for a web site, because it is new
+		}
+
+		//set bucket policy
+		if(!bucketHasPolicy) { //if the bucket doesn't already have a policy (leave any existing policy alone)
+			getLogger().info("Setting policy of S3 bucket `{}` to public.", bucket);
+			s3Client.putBucketPolicy(builder -> builder.bucket(bucket).policy(POLICY_TEMPLATE_PUBLIC_READ_GET_OBJECT.apply(bucket)));
+		}
+
+		//configure bucket for web site
+		if(!bucketHasWebsiteConfiguration) {
+			getLogger().info("Configuring S3 bucket `{}` for web site access.", bucket);
+			//TODO use some separate configuration access for the "content name"
+			final boolean isNameBare = context.getSiteConfiguration().findBoolean(SITE_CONFIG_KEY_PAGES_NAME_BARE).orElse(false);
+			final String indexDocumentSuffix = isNameBare ? "index" : "index.html"; //TODO get from configuration
+			final IndexDocument indexDocument = IndexDocument.builder().suffix(indexDocumentSuffix).build();
+			s3Client.putBucketWebsite(builder -> builder.bucket(bucket).websiteConfiguration(configuration -> configuration.indexDocument(indexDocument).build()));
+		}
+	}
+
+	/**
+	 * Determines whether the bucket exists.
+	 * @param bucket The bucket to check.
+	 * @return <code>true</code> if the bucket exists; otherwise <code>false</code>.
+	 * @throws SdkException if some error occurred, such as insufficient permissions.
+	 */
+	protected boolean bucketExists(@Nonnull final String bucket) throws SdkException {
+		try {
+			getS3Client().headBucket(builder -> builder.bucket(bucket));
+			return true;
+		} catch(final NoSuchBucketException noSuchBucketException) {
+			return false;
+		}
+	}
+
+	/**
+	 * Determines whether a bucket has a policy.
+	 * @param bucket The bucket to check.
+	 * @return <code>true</code> if the bucket has a policy; otherwise <code>false</code>.
+	 * @throws SdkException if some error occurred, such as insufficient permissions.
+	 */
+	protected boolean bucketHasPolicy(@Nonnull final String bucket) throws SdkException {
+		try {
+			getS3Client().getBucketPolicy(builder -> builder.bucket(bucket));
+			return true;
+		} catch(final S3Exception s3Exception) {
+			if(s3Exception.statusCode() == HTTP.SC_NOT_FOUND) {
+				return false;
+			}
+			throw s3Exception;
+		}
+	}
+
+	/**
+	 * Determines whether a bucket has a web site configuration.
+	 * @param bucket The bucket to check.
+	 * @return <code>true</code> if the bucket has a web site configuration; otherwise <code>false</code>.
+	 * @throws SdkException if some error occurred, such as insufficient permissions.
+	 */
+	protected boolean bucketHasWebsiteConfiguration(@Nonnull final String bucket) throws SdkException {
+		try {
+			getS3Client().getBucketWebsite(builder -> builder.bucket(bucket));
+			return true;
+		} catch(final S3Exception s3Exception) {
+			if(s3Exception.statusCode() == HTTP.SC_NOT_FOUND) {
+				return false;
+			}
+			throw s3Exception;
+		}
+	}
+
+	@Override
 	public void deploy(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact) throws IOException {
 
-		getLogger().debug("Deploying to AWS region `{}` S3 bucket `{}`.", findRegion(), bucket);
+		getLogger().info("Deploying to AWS region `{}` S3 bucket `{}`.", findRegion(), bucket);
 
 		//#plan
 		plan(context, rootArtifact);
@@ -113,6 +225,7 @@ public class S3Deployer implements Deployer, Clogged {
 		//#prune
 		prune(context);
 
+		//TODO catch AwsServiceException, SdkClientException, S3Exception; probably in each lower level; rethrow as I/O exception
 	}
 
 	/**
@@ -135,7 +248,7 @@ public class S3Deployer implements Deployer, Clogged {
 	protected void plan(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact, @Nonnull Artifact artifact) throws IOException {
 		if(!(artifact instanceof DirectoryArtifact)) { //don't deploy anything for directories TODO improve semantics, especially after the root artifact type changes; maybe use CollectionArtifact
 			final String key = context.relativizeTargetReference(rootArtifact, artifact).toString();
-			getLogger().debug("Planning deployment for artifact {}, S3 key `{}`.", artifact, key);
+			getLogger().info("Planning deployment for artifact {}, S3 key `{}`.", artifact, key);
 			artifactKeys.put(artifact, key);
 		}
 		if(artifact instanceof CompositeArtifact) {
@@ -157,7 +270,7 @@ public class S3Deployer implements Deployer, Clogged {
 		for(final Map.Entry<Artifact, String> artifactKeyEntry : artifactKeys.entrySet()) {
 			final Artifact artifact = artifactKeyEntry.getKey();
 			final String key = artifactKeyEntry.getValue();
-			getLogger().debug("Deploying artifact {} to S3 key `{}`.", artifact, key);
+			getLogger().info("Deploying artifact {} to S3 key `{}`.", artifact, key);
 			final PutObjectRequest.Builder putBuilder = PutObjectRequest.builder().bucket(bucket).key(key);
 			//set content-type if found
 			Content.findContentType(artifact.getResourceDescription()).map(ContentType::toString).ifPresent(putBuilder::contentType);
@@ -183,8 +296,8 @@ public class S3Deployer implements Deployer, Clogged {
 			for(final S3Object s3Object : listObjectsResponse.contents()) {
 				final String key = s3Object.key();
 				if(!artifactKeys.containsValue(key)) { //if this object isn't in our site, delete it
-					getLogger().debug("Pruning S3 object `{}`.", key);
-					s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucket).key(key).build());
+					getLogger().info("Pruning S3 object `{}`.", key);
+					s3Client.deleteObject(builder -> builder.bucket(bucket).key(key));
 				}
 			}
 			listObjectsRequest = ListObjectsV2Request.builder().bucket(bucket).continuationToken(listObjectsResponse.nextContinuationToken()).build();
