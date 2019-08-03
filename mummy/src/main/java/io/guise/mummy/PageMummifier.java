@@ -55,7 +55,7 @@ public interface PageMummifier extends Mummifier {
 	 * The document must be in XHTML using the HTML namespace.
 	 * </p>
 	 * @implSpec The default implementation opens an input stream to the given file and then loads the source document by calling
-	 *           {@link #loadSourceDocument(MummyContext, InputStream)}.
+	 *           {@link #loadSourceDocument(MummyContext, InputStream, String)}.
 	 * @param context The context of static site generation.
 	 * @param sourceFile The file from which to load the document.
 	 * @return A document describing the source content of the artifact to generate.
@@ -64,7 +64,8 @@ public interface PageMummifier extends Mummifier {
 	 */
 	public default Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull Path sourceFile) throws IOException, DOMException {
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile))) {
-			return loadSourceDocument(context, inputStream);
+			final Path filename = sourceFile.getFileName();
+			return loadSourceDocument(context, inputStream, filename != null ? filename.toString() : null);
 		}
 	}
 
@@ -77,7 +78,7 @@ public interface PageMummifier extends Mummifier {
 	 * The document must be in XHTML using the HTML namespace.
 	 * </p>
 	 * @implSpec The default implementation opens an input stream using {@link SourceFileArtifact#openSource(MummyContext)} and then loads the source document by
-	 *           calling {@link #loadSourceDocument(MummyContext, InputStream)}.
+	 *           calling {@link #loadSourceDocument(MummyContext, InputStream, String)}.
 	 * @param context The context of static site generation.
 	 * @param artifact The artifact for which to load the document.
 	 * @return A document describing the source content of the artifact to generate.
@@ -86,7 +87,8 @@ public interface PageMummifier extends Mummifier {
 	 */
 	public default Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull SourceFileArtifact artifact) throws IOException, DOMException {
 		try (final InputStream inputStream = new BufferedInputStream(artifact.openSource(context))) {
-			return loadSourceDocument(context, inputStream);
+			final Path filename = artifact.getSourcePath().getFileName();
+			return loadSourceDocument(context, inputStream, filename != null ? filename.toString() : null);
 		}
 	}
 
@@ -100,11 +102,13 @@ public interface PageMummifier extends Mummifier {
 	 * </p>
 	 * @param context The context of static site generation.
 	 * @param inputStream The input stream from which to to load the document.
+	 * @param name The optional source name of the document, such as a filename, which may be missing or empty.
 	 * @return A document describing the source content of the artifact to generate.
 	 * @throws IOException if there is an error loading and/or converting the source file contents.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull InputStream inputStream) throws IOException, DOMException;
+	public Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull InputStream inputStream, @Nullable final String name)
+			throws IOException, DOMException;
 
 	//#relocate
 

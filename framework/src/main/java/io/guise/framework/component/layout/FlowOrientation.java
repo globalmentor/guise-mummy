@@ -18,10 +18,10 @@ package io.guise.framework.component.layout;
 
 import java.net.URI;
 
+import com.globalmentor.text.StringTemplate;
+
 import static io.guise.framework.Resources.*;
 import static java.util.Objects.*;
-
-import com.globalmentor.util.StringTemplate;
 
 import io.guise.framework.geometry.*;
 

@@ -16,6 +16,8 @@
 
 package io.guise.mummy;
 
+import static com.globalmentor.html.spec.HTML.XHTML_NAME_EXTENSION;
+
 import java.io.*;
 import java.util.Set;
 
@@ -32,7 +34,7 @@ public class XhtmlPageMummifier extends AbstractPageMummifier {
 
 	@Override
 	public Set<String> getSupportedFilenameExtensions() {
-		return Set.of("xhtml"); //TODO use constant
+		return Set.of(XHTML_NAME_EXTENSION); //TODO use constant
 	}
 
 	/**
@@ -40,7 +42,7 @@ public class XhtmlPageMummifier extends AbstractPageMummifier {
 	 * @implSpec This version loads a document in XHTML format.
 	 */
 	@Override
-	public Document loadSourceDocument(final MummyContext context, final InputStream inputStream) throws IOException, DOMException {
+	public Document loadSourceDocument(final MummyContext context, final InputStream inputStream, final String name) throws IOException, DOMException {
 		final DocumentBuilder documentBuilder = context.newPageDocumentBuilder();
 		try {
 			return documentBuilder.parse(inputStream);

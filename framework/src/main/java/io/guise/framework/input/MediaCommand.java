@@ -20,7 +20,7 @@ import static io.guise.framework.Resources.*;
 
 import java.net.URI;
 
-import com.globalmentor.util.StringTemplate;
+import com.globalmentor.text.StringTemplate;
 
 /**
  * Commands for controlling media.

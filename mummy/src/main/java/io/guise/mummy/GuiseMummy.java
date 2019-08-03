@@ -77,6 +77,7 @@ public class GuiseMummy implements Clogged {
 	/** No-args constructor. */
 	public GuiseMummy() {
 		//register default resource types
+		registerFileMummifier(new MarkdownPageMummifier());
 		registerFileMummifier(new XhtmlPageMummifier());
 	}
 
