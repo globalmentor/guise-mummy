@@ -29,6 +29,13 @@ import io.guise.mummy.*;
 public interface Deployer {
 
 	/**
+	 * Prepares for deploying a site. This may include configuring a server, for example.
+	 * @param context The context of static site generation.
+	 * @throws IOException if there is an I/O error during site deployment preparation.
+	 */
+	public void prepare(@Nonnull final MummyContext context) throws IOException;
+
+	/**
 	 * Deploys a site.
 	 * @param context The context of static site generation.
 	 * @param rootArtifact The root artifact of the site being deployed

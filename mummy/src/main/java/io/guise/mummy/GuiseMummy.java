@@ -121,6 +121,7 @@ public class GuiseMummy implements Clogged {
 		//#deploy phase
 		if(deploy) {
 			final Deployer deployer = new S3Deployer(context);
+			deployer.prepare(context);
 			deployer.deploy(context, rootArtifact);
 		}
 	}
