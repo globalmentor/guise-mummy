@@ -90,6 +90,9 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 			final SourcePathMummifier contentMummifier = context.findRegisteredMummifierForSourceFile(contentSourceFile).orElseThrow(IllegalStateException::new); //TODO improve error
 			return contentMummifier.plan(context, contentSourceFile);
 		})).orElseGet(() -> { //if there is no directory content file, create a phantom page content file
+			if(context.isVeiled(sourcePath)) { //don't generate content files for veiled directories
+				return null;
+			}
 			final Path phantomContentSourceFile = sourcePath.resolve("index.xhtml"); //TODO get from configuration
 			final SourcePathMummifier contentMummifier = context.findRegisteredMummifierForSourceFile(phantomContentSourceFile)
 					.orElseThrow(IllegalStateException::new); //TODO improve error
