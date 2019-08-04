@@ -16,7 +16,8 @@
 
 package io.guise.mummy;
 
-import static java.nio.file.Files.newInputStream;
+import static com.globalmentor.html.spec.HTML.*;
+import static java.nio.file.Files.*;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -26,6 +27,8 @@ import javax.annotation.*;
 
 import org.w3c.dom.*;
 
+import com.globalmentor.net.ContentType;
+
 /**
  * Mummifier for generating HTML pages.
  * @implSpec This type of mummifier only works with {@link SourceFileArtifact}s. If some other type of artifact is used, the mummification methods may throw a
@@ -33,6 +36,9 @@ import org.w3c.dom.*;
  * @author Garret Wilson
  */
 public interface PageMummifier extends Mummifier {
+
+	/** The standard Internet media types for pages: <code>text/html</code> in UTF-8. */
+	public static final ContentType PAGE_MEDIA_TYPE = HTML_CONTENT_TYPE.withParameter(ContentType.Parameter.CHARSET_UTF_8);
 
 	/** The attribute for regenerating an element, such as a navigation list. */
 	public static final String ATTRIBUTE_REGENERATE = "regenerate";

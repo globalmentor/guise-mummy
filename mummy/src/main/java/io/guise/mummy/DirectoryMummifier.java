@@ -18,6 +18,7 @@ package io.guise.mummy;
 
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
+import static io.urf.vocab.content.Content.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.function.Predicate.*;
@@ -32,7 +33,7 @@ import javax.annotation.*;
 
 import com.globalmentor.net.ContentType;
 
-import io.urf.model.UrfResourceDescription;
+import io.urf.model.UrfObject;
 
 /**
  * Mummifier for directories.
@@ -88,18 +89,19 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		final Artifact contentArtifact = contentFile.map(throwingFunction(contentSourceFile -> {
 			final SourcePathMummifier contentMummifier = context.findRegisteredMummifierForSourceFile(contentSourceFile).orElseThrow(IllegalStateException::new); //TODO improve error
 			return contentMummifier.plan(context, contentSourceFile);
-		})).orElseGet(() -> {
+		})).orElseGet(() -> { //if there is no directory content file, create a phantom page content file
 			final Path phantomContentSourceFile = sourcePath.resolve("index.xhtml"); //TODO get from configuration
 			final SourcePathMummifier contentMummifier = context.findRegisteredMummifierForSourceFile(phantomContentSourceFile)
 					.orElseThrow(IllegalStateException::new); //TODO improve error
-			//TODO determine a better description for the phantom artifact
-			return new DefaultPhantomArtifact(contentMummifier, phantomContentSourceFile, contentMummifier.getArtifactTargetPath(context, phantomContentSourceFile),
-					UrfResourceDescription.EMPTY);
-			//TODO create a default phantom artifact
-
+			final UrfObject phantomDescription = new UrfObject();
+			final Path directoryFilename = sourcePath.getFileName();
+			if(directoryFilename != null) { //set the title to match the directory filename, if present
+				phantomDescription.setPropertyValueByHandle(Artifact.PROPERTY_HANDLE_TITLE, directoryFilename.toString());
+			}
+			setContentType(phantomDescription, PageMummifier.PAGE_MEDIA_TYPE);
+			return new DefaultXhtmlPhantomArtifact(contentMummifier, phantomContentSourceFile,
+					contentMummifier.getArtifactTargetPath(context, phantomContentSourceFile), phantomDescription);
 		});
-
-		//TODO delete when works				.orElse(null);
 
 		//discover and plan the child artifacts
 		final List<Artifact> childArtifacts = new ArrayList<>();
