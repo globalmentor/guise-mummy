@@ -62,9 +62,6 @@ import io.urf.model.UrfResourceDescription;
  */
 public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier implements PageMummifier {
 
-	/** The standard Internet media types for pages: <code>text/html</code> in UTF-8. */
-	public static final ContentType PAGE_MEDIA_TYPE = HTML_CONTENT_TYPE.withParameter(ContentType.Parameter.CHARSET_UTF_8);
-
 	/**
 	 * A map of local names of HTML elements that can reference other resources (e.g. <code>"img"</code>), along with the attributes of each element that contains
 	 * the actual resource reference path (e.g. (e.g. <code>"src"</code>) for {@code <img src="…">}).
