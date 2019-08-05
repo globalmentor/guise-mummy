@@ -25,12 +25,13 @@ import static java.util.stream.Collectors.*;
 import java.io.*;
 import java.net.URI;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import javax.annotation.*;
 
 import io.clogr.Clogged;
-import io.confound.config.Configuration;
+import io.confound.config.*;
 import io.confound.config.file.FileSystemConfigurationManager;
 import io.guise.mummy.deploy.Deployer;
 import io.guise.mummy.deploy.aws.S3Deployer;
@@ -211,6 +212,78 @@ public class GuiseMummy implements Clogged {
 				printArtifactDescription(context, childArtifact);
 			}
 		}
+	}
+
+	//project configuration
+
+	/** The base filename for the project configuration. */
+	public static final String PROJECT_CONFIG_BASE_FILENAME = "guise-project";
+
+	/** The default relative path of the project source directory. Analogous to Maven's <code>${project.basedir}/src</code> property. */
+	private final static Path DEFAULT_PROJECT_SOURCE_RELATIVE_DIR = Paths.get("src");
+
+	/**
+	 * The default relative path of the site source directory. Analogous to Maven's <code>${project.basedir}/src/site</code> property.
+	 * @see <a href="https://maven.apache.org/plugins/maven-site-plugin/site-mojo.html#siteDirectory">Apache Maven Site Plugin: site:site
+	 *      &lt;siteDirectory&gt;</a>.
+	 */
+	private final static Path DEFAULT_PROJECT_SITE_SOURCE_RELATIVE_DIR = DEFAULT_PROJECT_SOURCE_RELATIVE_DIR.resolve("site");
+
+	/**
+	 * The default relative path of the build directory. Analogous to the default value of Maven's <code>project.build.directory</code> property, which is
+	 * <code>${project.basedir}/target</code>.
+	 */
+	private final static Path DEFAULT_PROJECT_BUILD_RELATIVE_DIR = Paths.get("target");
+
+	/**
+	 * The default relative path of the site target directory. Similar to the default value of Maven's <code>generatedSiteDirectory</code> property, which is
+	 * <code>${project.build.directory}/generated-site</code>.
+	 * @see <a href="https://maven.apache.org/plugins/maven-site-plugin/site-mojo.html#generatedSiteDirectory">Apache Maven Site Plugin: site:site
+	 *      &lt;generatedSiteDirectory&gt;</a>.
+	 * @see #DEFAULT_PROJECT_SITE_SOURCE_RELATIVE_DIR
+	 */
+	private final static Path DEFAULT_PROJECT_SITE_TARGET_RELATIVE_DIR = DEFAULT_PROJECT_BUILD_RELATIVE_DIR.resolve("site");
+
+	/**
+	 * The default relative path of the site description target directory.
+	 * @see #DEFAULT_PROJECT_SITE_TARGET_RELATIVE_DIR
+	 */
+	private final static Path DEFAULT_PROJECT_SITE_DESCRIPTION_TARGET_RELATIVE_DIR = DEFAULT_PROJECT_BUILD_RELATIVE_DIR.resolve("site-description");
+
+	public static final String PROJECT_CONFIG_KEY_BUILD_SITE_SOURCE_DIRECTORY = "project.build.siteSourceDirectory";
+	public static final String PROJECT_CONFIG_KEY_BUILD_SITE_TARGET_DIRECTORY = "project.build.siteTargetDirectory";
+	public static final String PROJECT_CONFIG_KEY_BUILD_SITE_DESCRIPTION_TARGET_DIRECTORY = "project.build.siteDescriptionTargetDirectory";
+
+	//TODO document
+	public static GuiseProject createProject(@Nonnull Path projectDirectory, @Nullable Path siteSourceDirectory, @Nullable Path siteTargetDirectory,
+			@Nullable Path siteDescriptionTargetDirectory) throws IOException {
+		requireNonNull(projectDirectory);
+
+		//default settings (ultimate fallback)
+		final Map<String, Object> defaultSettings = new HashMap<>();
+		defaultSettings.put(PROJECT_CONFIG_KEY_BUILD_SITE_SOURCE_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_SOURCE_RELATIVE_DIR)); //project.build.siteSourceDirectory=${project.basedir}/src/site
+		defaultSettings.put(PROJECT_CONFIG_KEY_BUILD_SITE_TARGET_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_TARGET_RELATIVE_DIR)); //project.build.siteTargetDirectory=${project.basedir}/target/site
+		defaultSettings.put(PROJECT_CONFIG_KEY_BUILD_SITE_DESCRIPTION_TARGET_DIRECTORY,
+				projectDirectory.resolve(DEFAULT_PROJECT_SITE_DESCRIPTION_TARGET_RELATIVE_DIR)); //project.build.siteTargetDirectory=${project.basedir}/target/site-description
+		final Configuration defaultConfiguration = new ObjectMapConfiguration(defaultSettings);
+
+		//configuration file settings (`guise-project.*`); fall back to the default; if no config file present, just use the default
+		final Configuration fileConfiguration = FileSystemConfigurationManager.loadConfigurationForBaseFilename(projectDirectory, PROJECT_CONFIG_BASE_FILENAME)
+				.map(projectFileConfiguration -> projectFileConfiguration.withFallback(defaultConfiguration)).orElse(defaultConfiguration);
+
+		//user settings (e.g. supplied on the command line); fall back to the file/default
+		final Map<String, Object> userSettings = new HashMap<>();
+		if(siteSourceDirectory != null) {
+			userSettings.put(PROJECT_CONFIG_KEY_BUILD_SITE_SOURCE_DIRECTORY, siteSourceDirectory);
+		}
+		if(siteTargetDirectory != null) {
+			defaultSettings.put(PROJECT_CONFIG_KEY_BUILD_SITE_TARGET_DIRECTORY, siteTargetDirectory);
+		}
+		if(siteDescriptionTargetDirectory != null) {
+			defaultSettings.put(PROJECT_CONFIG_KEY_BUILD_SITE_DESCRIPTION_TARGET_DIRECTORY, siteDescriptionTargetDirectory);
+		}
+		final Configuration projectConfiguration = new ObjectMapConfiguration(userSettings).withFallback(fileConfiguration); //the user settings override even the project file
+		return new DefaultGuiseProject(projectConfiguration);
 	}
 
 	/**
