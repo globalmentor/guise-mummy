@@ -44,8 +44,8 @@ import software.amazon.awssdk.services.s3.model.*;
  */
 public class S3Deployer implements Deployer, Clogged {
 
-	public static final String SITE_CONFIG_KEY_DEPLOYMENT_REGION = "deployment.region";
-	public static final String SITE_CONFIG_KEY_DEPLOYMENT_BUCKET = "deployment.bucket";
+	public static final String SITE_CONFIG_KEY_DEPLOYMENT_REGION = "deploy.target.region";
+	public static final String SITE_CONFIG_KEY_DEPLOYMENT_BUCKET = "deploy.target.bucket";
 
 	/**
 	 * The policy template for setting a bucket to public read access. There is one parameter:
@@ -93,8 +93,8 @@ public class S3Deployer implements Deployer, Clogged {
 	 * @param context The context of static site generation.
 	 */
 	public S3Deployer(@Nonnull final MummyContext context) {
-		this(context.getSiteConfiguration().findString(SITE_CONFIG_KEY_DEPLOYMENT_REGION).map(Region::of).orElse(null),
-				context.getSiteConfiguration().getString(SITE_CONFIG_KEY_DEPLOYMENT_BUCKET));
+		this(context.getConfiguration().findString(SITE_CONFIG_KEY_DEPLOYMENT_REGION).map(Region::of).orElse(null),
+				context.getConfiguration().getString(SITE_CONFIG_KEY_DEPLOYMENT_BUCKET));
 	}
 
 	/**
@@ -153,7 +153,7 @@ public class S3Deployer implements Deployer, Clogged {
 		if(!bucketHasWebsiteConfiguration) {
 			getLogger().info("Configuring S3 bucket `{}` for web site access.", bucket);
 			//TODO use some separate configuration access for the "content name"
-			final boolean isNameBare = context.getSiteConfiguration().findBoolean(SITE_CONFIG_KEY_PAGES_NAME_BARE).orElse(false);
+			final boolean isNameBare = context.getConfiguration().findBoolean(CONFIG_KEY_PAGE_NAMES_BARE).orElse(false);
 			final String indexDocumentSuffix = isNameBare ? "index" : "index.html"; //TODO get from configuration
 			final IndexDocument indexDocument = IndexDocument.builder().suffix(indexDocumentSuffix).build();
 			s3Client.putBucketWebsite(builder -> builder.bucket(bucket).websiteConfiguration(configuration -> configuration.indexDocument(indexDocument).build()));

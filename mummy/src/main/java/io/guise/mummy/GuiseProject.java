@@ -16,6 +16,8 @@
 
 package io.guise.mummy;
 
+import java.nio.file.Path;
+
 import io.confound.config.Configuration;
 
 /**
@@ -23,6 +25,15 @@ import io.confound.config.Configuration;
  * @author Garret Wilson
  */
 public interface GuiseProject {
+
+	/**
+	 * Returns the project directory.
+	 * <p>
+	 * This is usually where the project configuration file (if any) is stored.
+	 * </p>
+	 * @return The project directory,
+	 */
+	public Path getDirectory();
 
 	/**
 	 * Returns the project configuration.

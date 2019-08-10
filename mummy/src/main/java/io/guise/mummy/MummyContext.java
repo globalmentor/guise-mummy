@@ -42,6 +42,9 @@ import io.confound.config.Configuration;
  */
 public interface MummyContext {
 
+	/** @return The Guise project governing mummification. */
+	public GuiseProject getProject();
+
 	/**
 	 * Returns some URI indicating the root of the current context, that is, the site source directory. All resource context paths are interpreted relative to
 	 * this root.
@@ -54,28 +57,48 @@ public interface MummyContext {
 
 	/**
 	 * Returns the base directory of the entire site source, representing the root of the context.
+	 * @implSpec The default implementation retrieves the value for key {@value GuiseMummy#PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY} from the configuration and
+	 *           resolves it against the project directory.
 	 * @apiNote This is analogous to Maven's <code>${project.basedir}/src/site</code> directory.
 	 * @return The base directory of the site being mummified.
+	 * @see GuiseProject#getDirectory()
 	 */
-	public Path getSiteSourceDirectory();
+	public default Path getSiteSourceDirectory() {
+		return getProject().getDirectory().resolve(getConfiguration().getPath(GuiseMummy.PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY));
+	}
 
 	/**
 	 * Returns the output directory of the entire site, representing the root of the context.
+	 * @implSpec The default implementation retrieves the value for key {@value GuiseMummy#PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY} from the configuration and
+	 *           resolves it against the project directory.
 	 * @apiNote This is analogous to Maven's <code>${project.build.directory}</code> directory.
 	 * @return The base output directory of the site being mummified.
+	 * @see GuiseProject#getDirectory()
 	 */
-	public Path getSiteTargetDirectory();
+	public default Path getSiteTargetDirectory() {
+		return getProject().getDirectory().resolve(getConfiguration().getPath(GuiseMummy.PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY));
+	}
 
 	/**
 	 * Returns the output directory of the site description.
+	 * @implSpec The default implementation retrieves the value for key {@value GuiseMummy#PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY} from the
+	 *           configuration and resolves it against the project directory.
 	 * @return The base output directory of the generated site description.
+	 * @see GuiseProject#getDirectory()
 	 */
-	public Path getSiteDescriptionTargetDirectory();
+	public default Path getSiteDescriptionTargetDirectory() {
+		return getProject().getDirectory().resolve(getConfiguration().getPath(GuiseMummy.PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY));
+	}
 
 	//TODO public UrfObject getResourceDescription(path)
 
-	/** @return The configuration options for the site. */
-	public Configuration getSiteConfiguration();
+	/**
+	 * Returns the configuration options for mummification. This configuration may contain local configuration overrides, but ultimately falls back to the project
+	 * configuration.
+	 * @return The configuration options for mummification.
+	 * @see GuiseProject#getConfiguration()
+	 */
+	public Configuration getConfiguration();
 
 	/**
 	 * Determines whether a path should be ignored during discovery.

@@ -16,7 +16,10 @@
 
 package io.guise.mummy;
 
+import static com.globalmentor.io.Paths.*;
 import static java.util.Objects.*;
+
+import java.nio.file.Path;
 
 import javax.annotation.*;
 
@@ -28,6 +31,13 @@ import io.confound.config.Configuration;
  */
 public class DefaultGuiseProject implements GuiseProject {
 
+	private final Path directory;
+
+	@Override
+	public Path getDirectory() {
+		return directory;
+	}
+
 	private final Configuration configuration;
 
 	@Override
@@ -37,9 +47,12 @@ public class DefaultGuiseProject implements GuiseProject {
 
 	/**
 	 * Project constructor.
+	 * @param directory The absolute project directory.
 	 * @param configuration The project configuration.
+	 * @throws IllegalArgumentException if the project directory is not absolute.
 	 */
-	public DefaultGuiseProject(@Nonnull final Configuration configuration) {
+	public DefaultGuiseProject(@Nonnull final Path directory, @Nonnull final Configuration configuration) {
+		this.directory = checkArgumentAbsolute(directory).normalize();
 		this.configuration = requireNonNull(configuration);
 	}
 

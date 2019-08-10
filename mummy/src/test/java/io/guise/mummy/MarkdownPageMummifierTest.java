@@ -19,6 +19,7 @@ package io.guise.mummy;
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
+import static com.globalmentor.java.OperatingSystem.getWorkingDirectory;
 import static com.globalmentor.xml.XmlDom.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
@@ -46,26 +47,12 @@ public class MarkdownPageMummifierTest {
 
 	@BeforeEach
 	protected void setupContext() {
-		mummyContext = new BaseMummyContext() { //TODO move to separate mock context
+		final GuiseProject project = new DefaultGuiseProject(getWorkingDirectory(), Configuration.empty()); //TODO improve mock project
+		mummyContext = new BaseMummyContext(project) { //TODO move to separate mock context
 
 			@Override
-			public Path getSiteTargetDirectory() {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public Path getSiteSourceDirectory() {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public Path getSiteDescriptionTargetDirectory() {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public Configuration getSiteConfiguration() {
-				return Configuration.empty();
+			public Configuration getConfiguration() {
+				return getProject().getConfiguration();
 			}
 
 			@Override

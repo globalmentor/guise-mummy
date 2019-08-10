@@ -50,12 +50,17 @@ public class GuiseMummy implements Clogged {
 	/** The namespace of Guise Mummy elements, such as in an XHTML document or as the leading IRI segment of RDFa metadata. */
 	public static final URI NAMESPACE = URI.create(NAMESPACE_STRING);
 
+	/** The phases of the default Guise Mummy life cycle, in order. */
+	public enum LifeCyclePhase {
+		INITIALIZE, VALIDATE, PLAN, MUMMIFY, PREPARE_DEPLOY, DEPLOY
+	};
+
 	//site configuration
 
-	/** The base filename for the site configuration. */
-	public static final String SITE_CONFIG_BASE_FILENAME = ".guise-mummy-site";
+	/** The base filename for the Mummy configuration. */
+	public static final String MUMMY_CONFIG_BASE_FILENAME = ".guise-mummy";
 
-	public static final String SITE_CONFIG_KEY_PAGES_NAME_BARE = "pages.nameBare";
+	public static final String CONFIG_KEY_PAGE_NAMES_BARE = "mummy.pageNamesBare";
 
 	/** The default mummifier for normal files. */
 	private final SourcePathMummifier defaultFileMummifier = new OpaqueFileMummifier();
@@ -84,66 +89,87 @@ public class GuiseMummy implements Clogged {
 
 	/**
 	 * Performs static site generation on a source directory into a target directory.
-	 * @param sourceDirectory The root of the site to be mummified.
-	 * @param targetDirectory The root directory of the generated static site; will be created if needed.
-	 * @throws IllegalArgumentException if the source directory does not exist or is not a directory.
-	 * @throws IllegalArgumentException if the source and target directories overlap.
+	 * @param project The Guise project governing mummification.
+	 * @param phase The life cycle phase to execute (including all those before it.
+	 * @throws IllegalArgumentException if the configured source directory does not exist or is not a directory.
+	 * @throws IllegalArgumentException if the configured source and target directories overlap.
 	 * @throws IOException if there is an I/O error generating the static site.
 	 */
-	public void mummify(@Nonnull final Path sourceDirectory, @Nonnull final Path targetDirectory) throws IOException {
-		mummify(sourceDirectory, targetDirectory, false); //TODO consolidate and improve approach to life cycle
-	}
-
-	/**
-	 * Performs static site generation on a source directory into a target directory.
-	 * @param sourceDirectory The root of the site to be mummified.
-	 * @param targetDirectory The root directory of the generated static site; will be created if needed.
-	 * @param deploy Whether the site should also be deployed after mummification.
-	 * @throws IllegalArgumentException if the source directory does not exist or is not a directory.
-	 * @throws IllegalArgumentException if the source and target directories overlap.
-	 * @throws IOException if there is an I/O error generating the static site.
-	 */
-	public void mummify(@Nonnull final Path sourceDirectory, @Nonnull final Path targetDirectory, final boolean deploy) throws IOException {
+	public void mummify(@Nonnull final GuiseProject project, @Nonnull final LifeCyclePhase phase) throws IOException {
 
 		//#initialize phase
-		final Context context = initialize(sourceDirectory, targetDirectory);
+		final Context context = initialize(project); //the initialize phase must always occur
+
+		//#validate phase
+		if(phase.compareTo(LifeCyclePhase.VALIDATE) >= 0) {
+			validate(context);
+		}
 
 		//#plan phase
-		final Artifact rootArtifact = new DirectoryMummifier().plan(context, sourceDirectory); //TODO create special SiteMummifier extending DirectoryMummifier
-		context.updatePlan(rootArtifact);
+		if(phase.compareTo(LifeCyclePhase.PLAN) >= 0) {
+			final Artifact rootArtifact = new DirectoryMummifier().plan(context, context.getSiteSourceDirectory()); //TODO create special SiteMummifier extending DirectoryMummifier
+			context.updatePlan(rootArtifact);
 
-		printArtifactDescription(context, rootArtifact);
+			printArtifactDescription(context, rootArtifact);
 
-		generateSiteDescription(context, rootArtifact);
+			//#mummify phase
+			if(phase.compareTo(LifeCyclePhase.MUMMIFY) >= 0) {
+				rootArtifact.getMummifier().mummify(context, rootArtifact);
+				generateSiteDescription(context, rootArtifact);
+			}
 
-		//#mummify phase
-		rootArtifact.getMummifier().mummify(context, rootArtifact);
-
-		//#deploy phase
-		if(deploy) {
-			final Deployer deployer = new S3Deployer(context);
-			deployer.prepare(context);
-			deployer.deploy(context, rootArtifact);
+			//#deploy phase
+			if(phase.compareTo(LifeCyclePhase.PREPARE_DEPLOY) >= 0) {
+				final Deployer deployer = new S3Deployer(context);
+				deployer.prepare(context);
+				if(phase.compareTo(LifeCyclePhase.DEPLOY) >= 0) {
+					deployer.deploy(context, rootArtifact);
+				}
+			}
 		}
 	}
 
 	/**
 	 * Initialize phase; loads the site configuration, if any, and sets up the mummy context.
-	 * @param sourceDirectory The root of the site to be mummified.
-	 * @param targetDirectory The root directory of the generated static site; will be created if needed.
+	 * @param project The project governing site mummification.
 	 * @return A context to use during mummification.
-	 * @throws IllegalArgumentException if the source directory does not exist or is not a directory.
-	 * @throws IllegalArgumentException if the source and target directories overlap.
 	 * @throws IOException if there is an I/O error during initialization, such as when loading the site configuration.
 	 */
-	public Context initialize(@Nonnull final Path sourceDirectory, @Nonnull final Path targetDirectory) throws IOException {
-		checkArgumentDirectory(sourceDirectory);
+	public Context initialize(@Nonnull final GuiseProject project) throws IOException {
+		final Path siteSourceDirectory = project.getDirectory().resolve(project.getConfiguration().getPath(GuiseMummy.PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY));
 
-		//load site configuration
-		final Configuration siteConfiguration = FileSystemConfigurationManager.loadConfigurationForBaseFilename(sourceDirectory, SITE_CONFIG_BASE_FILENAME)
-				.orElse(Configuration.empty());
+		final Configuration mummyConfiguration;
+		if(isDirectory(siteSourceDirectory)) { //leave error generation to validate phase TODO improve Confound not to throw errors if directory doesn't exist?
+			//load Mummy configuration as if it all the keys started with "mummy.", falling back to the project configuration;
+			//or just use the project configuration if there is no Mummy configuration
+			mummyConfiguration = FileSystemConfigurationManager.loadConfigurationForBaseFilename(siteSourceDirectory, MUMMY_CONFIG_BASE_FILENAME)
+					//TODO use constant and document prefix for super configuration
+					.map(config -> config.superConfiguration("mummy")).map(config -> config.withFallback(project.getConfiguration())).orElse(project.getConfiguration());
+		} else {
+			mummyConfiguration = project.getConfiguration();
+		}
 
-		return new Context(sourceDirectory, targetDirectory, siteConfiguration);
+		final Context context = new Context(project, mummyConfiguration);
+
+		getLogger().info("Project directory: {}", context.getProject().getDirectory());
+		getLogger().info("Site source directory: {}", context.getSiteSourceDirectory());
+		getLogger().info("Site target directory: {}", context.getSiteTargetDirectory());
+		getLogger().info("Site description target directory: {}", context.getSiteDescriptionTargetDirectory());
+		getLogger().debug("page names bare: {}", context.getConfiguration().findBoolean(CONFIG_KEY_PAGE_NAMES_BARE));
+
+		return context;
+	}
+
+	/**
+	 * Validate phase; checks directories and other settings.
+	 * @param context The context of static site generation.
+	 * @throws IllegalArgumentException if the configured source directory does not exist or is not a directory.
+	 * @throws IllegalArgumentException if the configured source and target directories overlap.
+	 * @throws IOException if there is an I/O error during validation.
+	 */
+	public void validate(@Nonnull final MummyContext context) throws IOException {
+		checkArgumentDirectory(context.getSiteSourceDirectory());
+		checkArgumentDisjoint(context.getSiteSourceDirectory(), context.getSiteTargetDirectory());
 	}
 
 	/**
@@ -220,20 +246,21 @@ public class GuiseMummy implements Clogged {
 	public static final String PROJECT_CONFIG_BASE_FILENAME = "guise-project";
 
 	/** The default relative path of the project source directory. Analogous to Maven's <code>${project.basedir}/src</code> property. */
-	private final static Path DEFAULT_PROJECT_SOURCE_RELATIVE_DIR = Paths.get("src");
+	public final static Path DEFAULT_PROJECT_SOURCE_RELATIVE_DIR = Paths.get("src");
 
 	/**
-	 * The default relative path of the site source directory. Analogous to Maven's <code>${project.basedir}/src/site</code> property.
+	 * The default relative path of the site source directory. Similar to the default value of Maven's <code>siteDirectory</code> property, which is
+	 * <code>${project.basedir}/src/site</code>..
 	 * @see <a href="https://maven.apache.org/plugins/maven-site-plugin/site-mojo.html#siteDirectory">Apache Maven Site Plugin: site:site
 	 *      &lt;siteDirectory&gt;</a>.
 	 */
-	private final static Path DEFAULT_PROJECT_SITE_SOURCE_RELATIVE_DIR = DEFAULT_PROJECT_SOURCE_RELATIVE_DIR.resolve("site");
+	public final static Path DEFAULT_PROJECT_SITE_SOURCE_RELATIVE_DIR = DEFAULT_PROJECT_SOURCE_RELATIVE_DIR.resolve("site");
 
 	/**
 	 * The default relative path of the build directory. Analogous to the default value of Maven's <code>project.build.directory</code> property, which is
 	 * <code>${project.basedir}/target</code>.
 	 */
-	private final static Path DEFAULT_PROJECT_BUILD_RELATIVE_DIR = Paths.get("target");
+	public final static Path DEFAULT_PROJECT_BUILD_RELATIVE_DIR = Paths.get("target");
 
 	/**
 	 * The default relative path of the site target directory. Similar to the default value of Maven's <code>generatedSiteDirectory</code> property, which is
@@ -242,29 +269,44 @@ public class GuiseMummy implements Clogged {
 	 *      &lt;generatedSiteDirectory&gt;</a>.
 	 * @see #DEFAULT_PROJECT_SITE_SOURCE_RELATIVE_DIR
 	 */
-	private final static Path DEFAULT_PROJECT_SITE_TARGET_RELATIVE_DIR = DEFAULT_PROJECT_BUILD_RELATIVE_DIR.resolve("site");
+	public final static Path DEFAULT_PROJECT_SITE_TARGET_RELATIVE_DIR = DEFAULT_PROJECT_BUILD_RELATIVE_DIR.resolve("site");
 
 	/**
 	 * The default relative path of the site description target directory.
 	 * @see #DEFAULT_PROJECT_SITE_TARGET_RELATIVE_DIR
 	 */
-	private final static Path DEFAULT_PROJECT_SITE_DESCRIPTION_TARGET_RELATIVE_DIR = DEFAULT_PROJECT_BUILD_RELATIVE_DIR.resolve("site-description");
+	public final static Path DEFAULT_PROJECT_SITE_DESCRIPTION_TARGET_RELATIVE_DIR = DEFAULT_PROJECT_BUILD_RELATIVE_DIR.resolve("site-description");
 
-	public static final String PROJECT_CONFIG_KEY_BUILD_SITE_SOURCE_DIRECTORY = "project.build.siteSourceDirectory";
-	public static final String PROJECT_CONFIG_KEY_BUILD_SITE_TARGET_DIRECTORY = "project.build.siteTargetDirectory";
-	public static final String PROJECT_CONFIG_KEY_BUILD_SITE_DESCRIPTION_TARGET_DIRECTORY = "project.build.siteDescriptionTargetDirectory";
+	public static final String PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY = "siteSourceDirectory";
+	public static final String PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY = "siteTargetDirectory";
+	public static final String PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY = "siteDescriptionTargetDirectory";
 
-	//TODO document
-	public static GuiseProject createProject(@Nonnull Path projectDirectory, @Nullable Path siteSourceDirectory, @Nullable Path siteTargetDirectory,
-			@Nullable Path siteDescriptionTargetDirectory) throws IOException {
+	/**
+	 * Creates a Guise Mummy project based upon a project directory and optional explicit directory overrides.
+	 * @apiNote Because the paths other than the project directory may be relative, as may those in the configuration files, when retrieving paths they must be
+	 *          resolved against the project directory.
+	 * @param projectDirectory The required absolute base directory for the project, in which the project file, if any, would be found.
+	 * @param siteSourceDirectory The site source directory, or if <code>null</code> falling back to that specified in the project configuration as
+	 *          {@value #PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY}, defaulting to <code>src/site</code> relative to the project directory.
+	 * @param siteTargetDirectory The site target directory, or if <code>null</code> falling back to that specified in the project configuration as
+	 *          {@value #PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY}, defaulting to <code>target/site</code> relative to the project directory.
+	 * @param siteDescriptionTargetDirectory The site description target directory, or if <code>null</code> falling back to that specified in the project
+	 *          configuration as {@value #PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY}, defaulting to <code>target/site-description</code> relative to
+	 *          the project directory.
+	 * @return The new project.
+	 * @throws IllegalArgumentException if the project directory is not absolute.
+	 * @throws IOException if there is an error determining or loading the project.
+	 */
+	public static GuiseProject createProject(@Nonnull Path projectDirectory, @Nullable final Path siteSourceDirectory, @Nullable final Path siteTargetDirectory,
+			@Nullable final Path siteDescriptionTargetDirectory) throws IOException {
 		requireNonNull(projectDirectory);
+		projectDirectory = projectDirectory.normalize();
 
 		//default settings (ultimate fallback)
 		final Map<String, Object> defaultSettings = new HashMap<>();
-		defaultSettings.put(PROJECT_CONFIG_KEY_BUILD_SITE_SOURCE_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_SOURCE_RELATIVE_DIR)); //project.build.siteSourceDirectory=${project.basedir}/src/site
-		defaultSettings.put(PROJECT_CONFIG_KEY_BUILD_SITE_TARGET_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_TARGET_RELATIVE_DIR)); //project.build.siteTargetDirectory=${project.basedir}/target/site
-		defaultSettings.put(PROJECT_CONFIG_KEY_BUILD_SITE_DESCRIPTION_TARGET_DIRECTORY,
-				projectDirectory.resolve(DEFAULT_PROJECT_SITE_DESCRIPTION_TARGET_RELATIVE_DIR)); //project.build.siteTargetDirectory=${project.basedir}/target/site-description
+		defaultSettings.put(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_SOURCE_RELATIVE_DIR)); //siteDirectory=${project.basedir}/src/site
+		defaultSettings.put(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_TARGET_RELATIVE_DIR)); //siteTargetDirectory=${project.basedir}/target/site
+		defaultSettings.put(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_DESCRIPTION_TARGET_RELATIVE_DIR)); //siteDescriptionTargetDirectory=${project.basedir}/target/site-description
 		final Configuration defaultConfiguration = new ObjectMapConfiguration(defaultSettings);
 
 		//configuration file settings (`guise-project.*`); fall back to the default; if no config file present, just use the default
@@ -274,16 +316,16 @@ public class GuiseMummy implements Clogged {
 		//user settings (e.g. supplied on the command line); fall back to the file/default
 		final Map<String, Object> userSettings = new HashMap<>();
 		if(siteSourceDirectory != null) {
-			userSettings.put(PROJECT_CONFIG_KEY_BUILD_SITE_SOURCE_DIRECTORY, siteSourceDirectory);
+			userSettings.put(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY, siteSourceDirectory);
 		}
 		if(siteTargetDirectory != null) {
-			defaultSettings.put(PROJECT_CONFIG_KEY_BUILD_SITE_TARGET_DIRECTORY, siteTargetDirectory);
+			defaultSettings.put(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY, siteTargetDirectory);
 		}
 		if(siteDescriptionTargetDirectory != null) {
-			defaultSettings.put(PROJECT_CONFIG_KEY_BUILD_SITE_DESCRIPTION_TARGET_DIRECTORY, siteDescriptionTargetDirectory);
+			defaultSettings.put(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY, siteDescriptionTargetDirectory);
 		}
 		final Configuration projectConfiguration = new ObjectMapConfiguration(userSettings).withFallback(fileConfiguration); //the user settings override even the project file
-		return new DefaultGuiseProject(projectConfiguration);
+		return new DefaultGuiseProject(projectDirectory, projectConfiguration);
 	}
 
 	/**
@@ -292,51 +334,21 @@ public class GuiseMummy implements Clogged {
 	 */
 	protected class Context extends BaseMummyContext {
 
-		private final Path siteSourceDirectory;
-
-		@Override
-		public Path getSiteSourceDirectory() {
-			return siteSourceDirectory;
-		}
-
-		private final Path siteTargetDirectory;
-
-		@Override
-		public Path getSiteTargetDirectory() {
-			return siteTargetDirectory;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 * @implSpec This version returns a directory <code>../site-description</code> relative to the site target directory. TODO Overhaul configuration approach
-		 *           with defaults based on build (`target`) directory.
-		 * @see #getSiteTargetDirectory()
-		 */
-		@Override
-		public Path getSiteDescriptionTargetDirectory() {
-			return getSiteTargetDirectory().resolve("..").resolve("site-description"); //TODO use constant
-		}
-
 		private final Configuration siteConfiguration;
 
 		@Override
-		public Configuration getSiteConfiguration() {
+		public Configuration getConfiguration() {
 			return siteConfiguration;
 		}
 
 		/**
 		 * Site source directory constructor.
-		 * @param siteSourceDirectory The source directory of the entire site.
-		 * @param siteTargetDirectory The base output directory of the site being mummified.
+		 * @apiNote No validation is performed to ensure directories are valid.
+		 * @param project The Guise project.
 		 * @param siteConfiguration The configuration for the site.
-		 * @throws IllegalArgumentException if the source directory does not exist or is not a directory.
-		 * @throws IllegalArgumentException if the source and target directories overlap.
 		 */
-		public Context(@Nonnull final Path siteSourceDirectory, @Nonnull final Path siteTargetDirectory, @Nonnull final Configuration siteConfiguration) {
-			checkArgumentDirectory(siteSourceDirectory);
-			checkArgumentDisjoint(siteSourceDirectory, siteTargetDirectory);
-			this.siteSourceDirectory = siteSourceDirectory;
-			this.siteTargetDirectory = siteTargetDirectory;
+		public Context(@Nonnull final GuiseProject project, @Nonnull final Configuration siteConfiguration) {
+			super(project);
 			this.siteConfiguration = requireNonNull(siteConfiguration);
 		}
 
