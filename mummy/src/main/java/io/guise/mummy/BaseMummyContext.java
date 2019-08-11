@@ -35,11 +35,22 @@ public abstract class BaseMummyContext implements MummyContext {
 	/** The segment prefix that indicates a veiled resource or resource parent. */
 	public static final String VEILED_PATH_SEGMENT_PREFIX = "_";
 
+	private final GuiseProject project;
+
+	@Override
+	public GuiseProject getProject() {
+		return project;
+	}
+
 	/** The shared page document builder factory. Use must be synchronized on the factory itself. */
 	private final DocumentBuilderFactory pageDocumentBuilderFactory;
 
-	/** Constructor. */
-	public BaseMummyContext() {
+	/**
+	 * Constructor.
+	 * @param project The Guise project.
+	 */
+	public BaseMummyContext(@Nonnull final GuiseProject project) {
+		this.project = requireNonNull(project);
 		pageDocumentBuilderFactory = DocumentBuilderFactory.newInstance();
 		pageDocumentBuilderFactory.setNamespaceAware(true);
 	}

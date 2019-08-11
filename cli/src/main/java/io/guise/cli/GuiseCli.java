@@ -21,6 +21,7 @@ import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.java.OperatingSystem.*;
 import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.net.URIs.*;
+import static io.guise.mummy.GuiseMummy.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 
@@ -40,7 +41,7 @@ import com.globalmentor.application.*;
 import com.globalmentor.net.URIs;
 
 import io.guise.catalina.webresources.SiteRoot;
-import io.guise.mummy.GuiseMummy;
+import io.guise.mummy.*;
 import picocli.CommandLine.*;
 
 /**
@@ -50,27 +51,11 @@ import picocli.CommandLine.*;
 @Command(name = "guise", description = "Command-line interface for Guise tasks.", versionProvider = GuiseCli.MetadataProvider.class, mixinStandardHelpOptions = true)
 public class GuiseCli extends BaseCliApplication {
 
-	/**
-	 * The default relative path of the source directory. Analogous to Maven's <code>${project.basedir}/src/site</code> property.
-	 * @see <a href="https://maven.apache.org/plugins/maven-site-plugin/site-mojo.html#siteDirectory">Apache Maven Site Plugin: site:site
-	 *      &lt;siteDirectory&gt;</a>.
-	 */
-	private final static Path DEFAULT_SITE_SOURCE_RELATIVE_DIR = Paths.get("src", "site"); //TODO define in GuiseMummy
-
-	/**
-	 * The default relative path of the build directory. Analogous to the default value of Maven's <code>project.build.directory</code> property, which is
-	 * <code>${project.basedir}/target</code>.
-	 */
-	private final static Path DEFAULT_BUILD_RELATIVE_DIR = Paths.get("target"); //TODO define in GuiseMummy
-
-	/**
-	 * The default relative path of the target directory. Analogous to the Maven Site plugin default value of <code>${project.build.directory}/site</code>.
-	 * @see <a href="https://maven.apache.org/guides/mini/guide-site.html">Apache Maven Site Plugin: Creating a site</a>
-	 */
-	private final static Path DEFAULT_SITE_TARGET_RELATIVE_DIR = DEFAULT_BUILD_RELATIVE_DIR.resolve("site"); //TODO define in GuiseMummy
+	public static final String CONFIG_KEY_SERVER_DIRECTORY = "server.directory";
+	public static final String CONFIG_KEY_SERVER_PORT = "server.port";
 
 	/** The default server port used by the <code>serve</code> command. */
-	private final static int DEFAULT_SERVE_PORT = 4040;
+	private final static int DEFAULT_SERVER_PORT = 4040;
 
 	/**
 	 * Constructor.
@@ -93,63 +78,86 @@ public class GuiseCli extends BaseCliApplication {
 
 	@Command(description = "Cleans a site by removing the site target directory.")
 	public void clean(
-			@Option(names = "--site-target", description = "The target root directory to be removed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path siteTargetDirectory,
-			@Parameters(paramLabel = "<project>", description = "The base directory of the project to clean.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path projectDirectory,
-
+			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path argProjectDirectory,
+			@Option(names = "--site-target-dir", description = "The target root directory of the site to be removed; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
+			@Option(names = "--site-description-target-dir", description = "The target root directory of the site description to be removed; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
 			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
 
-		if(projectDirectory == null) {
-			projectDirectory = getWorkingDirectory();
-		}
-
-		if(siteTargetDirectory == null) {
-			siteTargetDirectory = projectDirectory.resolve(DEFAULT_SITE_TARGET_RELATIVE_DIR);
-		}
-
-		getLogger().info("Clean...");
-		getLogger().info("Project: {}", projectDirectory);
-		getLogger().info("Site Target: {}", siteTargetDirectory);
+		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 
 		try {
+			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), null, argSiteTargetDirectory, argSiteDescriptionTargetDirectory);
+			final Path siteTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY);
+
+			getLogger().info("Clean...");
+			getLogger().info("Project directory: {}", projectDirectory);
+			getLogger().info("Site target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY));
+			getLogger().info("Site description target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY));
+
 			deleteFileTree(siteTargetDirectory);
+			//TODO delete other relevant directories; make sure they are indicated above; provide status
 		} catch(final IOException ioException) {
-			getLogger().error("Error cleaning site target directory {}.", siteTargetDirectory, ioException);
+			getLogger().error("Error cleaning site target directory.", ioException); //TODO improve message when cleaning multiple directories
+			System.err.println(ioException.getMessage());
+		}
+	}
+
+	@Command(description = "Validates a Guise project before mummification.")
+	public void validate(
+			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path argProjectDirectory,
+			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
+			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
+			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
+			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
+
+		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
+
+		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
+
+		final GuiseMummy mummifier = new GuiseMummy();
+		try {
+			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
+					argSiteDescriptionTargetDirectory);
+
+			getLogger().info("Validate...");
+			getLogger().info("Project directory: {}", projectDirectory);
+			getLogger().info("Site source directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY));
+			getLogger().info("Site target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY));
+			getLogger().info("Site description target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY));
+
+			mummifier.mummify(project, GuiseMummy.LifeCyclePhase.VALIDATE);
+		} catch(final IOException ioException) {
+			getLogger().error("Error validating project.", ioException);
 			System.err.println(ioException.getMessage());
 		}
 	}
 
 	@Command(description = "Mummifies a site by generating a static version.")
 	public void mummify(
-			@Option(names = "--site-source", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path siteSourceDirectory,
-			@Option(names = "--site-target", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path siteTargetDirectory,
-			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path projectDirectory,
-
+			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path argProjectDirectory,
+			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
+			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
+			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
 			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
 
-		if(projectDirectory == null) {
-			projectDirectory = getWorkingDirectory();
-		}
-
-		if(siteSourceDirectory == null) {
-			siteSourceDirectory = projectDirectory.resolve(DEFAULT_SITE_SOURCE_RELATIVE_DIR);
-		}
-
-		if(siteTargetDirectory == null) {
-			siteTargetDirectory = projectDirectory.resolve(DEFAULT_SITE_TARGET_RELATIVE_DIR);
-		}
-
-		getLogger().info("Mummify...");
-		getLogger().info("Project: {}", projectDirectory);
-		getLogger().info("Site Source: {}", siteSourceDirectory);
-		getLogger().info("Site Target: {}", siteTargetDirectory);
+		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 
 		final GuiseMummy mummifier = new GuiseMummy();
 		try {
-			mummifier.mummify(siteSourceDirectory.toAbsolutePath().normalize(), siteTargetDirectory.toAbsolutePath().normalize());
+			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
+					argSiteDescriptionTargetDirectory);
+
+			getLogger().info("Mummify...");
+			getLogger().info("Project directory: {}", projectDirectory);
+			getLogger().info("Site source directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY));
+			getLogger().info("Site target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY));
+			getLogger().info("Site description target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY));
+
+			mummifier.mummify(project, GuiseMummy.LifeCyclePhase.MUMMIFY);
 		} catch(final IOException ioException) {
 			getLogger().error("Error mummifying site.", ioException);
 			System.err.println(ioException.getMessage());
@@ -158,76 +166,87 @@ public class GuiseCli extends BaseCliApplication {
 
 	@Command(description = "Deploys a site after generating a static version.")
 	public void deploy(
-			@Option(names = "--site-source", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path siteSourceDirectory,
-			@Option(names = "--site-target", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path siteTargetDirectory,
-			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path projectDirectory,
-
+			@Parameters(paramLabel = "<project>", description = "The base directory of the project to deploy.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path argProjectDirectory,
+			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
+			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
+			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
 			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
 
-		if(projectDirectory == null) {
-			projectDirectory = getWorkingDirectory();
-		}
-
-		if(siteSourceDirectory == null) {
-			siteSourceDirectory = projectDirectory.resolve(DEFAULT_SITE_SOURCE_RELATIVE_DIR);
-		}
-
-		if(siteTargetDirectory == null) {
-			siteTargetDirectory = projectDirectory.resolve(DEFAULT_SITE_TARGET_RELATIVE_DIR);
-		}
-
-		getLogger().info("Mummify...");
-		getLogger().info("Project: {}", projectDirectory);
-		getLogger().info("Site Source: {}", siteSourceDirectory);
-		getLogger().info("Site Target: {}", siteTargetDirectory);
+		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 
 		final GuiseMummy mummifier = new GuiseMummy();
 		try {
-			mummifier.mummify(siteSourceDirectory.toAbsolutePath().normalize(), siteTargetDirectory.toAbsolutePath().normalize(), true);
+			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
+					argSiteDescriptionTargetDirectory);
+
+			getLogger().info("Mummify...");
+			getLogger().info("Project directory: {}", projectDirectory);
+			getLogger().info("Site source directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY));
+			getLogger().info("Site target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY));
+			getLogger().info("Site description target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY));
+
+			mummifier.mummify(project, GuiseMummy.LifeCyclePhase.DEPLOY);
 		} catch(final IOException ioException) {
-			getLogger().error("Error mummifying site.", ioException);
+			getLogger().error("Error mummifying and deploying site.", ioException);
 			System.err.println(ioException.getMessage());
 		}
 	}
 
+	/** The relative path of the server base directory; meant to be used in conjunction with the temporary directory. */
+	private static final Path SERVER_RELATIVE_BASE_DIRECTORY = Paths.get("guise", "mummy", "server"); //TODO use constants
+
 	@Command(description = "Starts a web server for exploring the site in the target directory.")
 	public void serve(
-			@Option(names = "--site-target", description = "The target root directory of the site to be served.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path siteTargetDirectory,
-			@Parameters(paramLabel = "<project>", description = "The base directory of the project being served.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path projectDirectory,
-			@Option(names = {"--port", "-p"}, description = "Specifies the server port.", defaultValue = "" + DEFAULT_SERVE_PORT) final int port,
+			@Parameters(paramLabel = "<project>", description = "The base directory of the project being served.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path argProjectDirectory,
+			@Option(names = "--site-target-dir", description = "The target root directory of the site to be served.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
+			@Option(names = "--site-description-target-dir", description = "The target root directory of the description of the site to be served.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
+			@Option(names = {"--port", "-p"}, description = "Specifies the server port.%nDefaults to @|bold " + DEFAULT_SERVER_PORT + "|@.") Integer argPort,
 
 			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
 
-		if(projectDirectory == null) {
-			projectDirectory = getWorkingDirectory();
+		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
+
+		final Path siteTargetDirectory;
+		final Path siteDescriptionTargetDirectory;
+		final Path serverBaseDirectory;
+		final int port;
+		try {
+			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), null, argSiteTargetDirectory, argSiteDescriptionTargetDirectory);
+			siteTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY);
+			siteDescriptionTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY);
+
+			//As per the servlet specification, Tomcat requires a base directory, but currently puts nothing inside it except for a `work` directory.
+			//This implementation therefore uses a common server directory location relative to the system temporary directory.
+			//In the future if Guise takes advantage of more server functionality and the server needs to store things,
+			//perhaps by default a subdirectory within the temp folder could be made to parallel that of the project.
+			serverBaseDirectory = getTempDirectory().resolve(SERVER_RELATIVE_BASE_DIRECTORY);
+			port = argPort != null ? argPort : project.getConfiguration().findInt(CONFIG_KEY_SERVER_PORT).orElse(DEFAULT_SERVER_PORT);
+
+			checkArgument(isDirectory(siteTargetDirectory), "Site target directory %s does not exist.", siteTargetDirectory); //TODO improve error handling; see https://github.com/remkop/picocli/issues/672
+
+			getLogger().info("Serve...");
+			getLogger().info("Project directory: {}", projectDirectory);
+			getLogger().info("Site target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY));
+			getLogger().info("Site description target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY));
+			getLogger().info("Server base directory: {}", serverBaseDirectory);
+			getLogger().info("Server port: {}", port);
+		} catch(final IOException ioException) {
+			getLogger().error("Error serving site.", ioException);
+			System.err.println(ioException.getMessage());
+			return; //TODO improve error handling
 		}
-
-		final Path buildDirectory = projectDirectory.resolve(DEFAULT_BUILD_RELATIVE_DIR);
-
-		if(siteTargetDirectory == null) {
-			siteTargetDirectory = projectDirectory.resolve(DEFAULT_SITE_TARGET_RELATIVE_DIR);
-		}
-
-		checkArgument(isDirectory(siteTargetDirectory), "Site target directory %s does not exist.", siteTargetDirectory); //TODO improve error handling; see https://github.com/remkop/picocli/issues/672
-
-		getLogger().info("Serve...");
-		getLogger().info("Project: {}", projectDirectory);
-		getLogger().info("Build: {}", buildDirectory);
-		getLogger().info("Site: {}", siteTargetDirectory);
-		getLogger().info("Server Port: {}", port);
 
 		final Tomcat tomcat = new Tomcat();
 		tomcat.setPort(port);
 		//set the base directory to the build directory (possibly needed in the future for e.g. JSP temporary directory; used now as the base for the context temp directory)
-		tomcat.setBaseDir(buildDirectory.toAbsolutePath().toString()); //base directory must be set before creating a connector
+		tomcat.setBaseDir(serverBaseDirectory.toAbsolutePath().toString()); //base directory must be set before creating a connector
 		tomcat.getConnector(); //create a default connector; required; see https://stackoverflow.com/a/49011424/421049
 
 		final Context context = tomcat.addContext("", siteTargetDirectory.toAbsolutePath().toString());
-		final Path siteDescriptionTargetDirectory = siteTargetDirectory.resolve("..").resolve("site-description"); //TODO revamp configuration approach, along with MummyContext.getSiteDescriptionTargetDirectory()
 		context.setResources(new SiteRoot(siteDescriptionTargetDirectory));
 
 		final Wrapper defaultServlet = context.createWrapper(); //TODO use constants below
@@ -248,12 +267,12 @@ public class GuiseCli extends BaseCliApplication {
 		context.addWelcomeFile("index.html"); //TODO get from configuration, as with `mummify` command
 		context.addWelcomeFile("index"); //TODO get from configuration, as with `mummify` command
 
-		//start the server
 		try {
-			tomcat.start();
+			tomcat.start(); //start the server
 		} catch(final LifecycleException lifecycleException) {
 			getLogger().error("Error serving site target directory {}.", siteTargetDirectory, lifecycleException);
 			System.err.println(lifecycleException.getMessage());
+			return; //TODO improve error handling
 		}
 
 		//launch the browser; see https://stackoverflow.com/a/5226244/421049
@@ -264,11 +283,11 @@ public class GuiseCli extends BaseCliApplication {
 			} catch(final IOException ioException) {
 				getLogger().error("Error launching browser.", ioException);
 				System.err.println(ioException.getMessage());
+				return; //TODO improve error handling
 			}
 		}
 
 		tomcat.getServer().await();
-
 	}
 
 	/** Strategy for providing version and other information from the configuration. */
