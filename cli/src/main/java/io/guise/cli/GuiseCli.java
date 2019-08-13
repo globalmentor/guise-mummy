@@ -90,14 +90,21 @@ public class GuiseCli extends BaseCliApplication {
 		try {
 			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), null, argSiteTargetDirectory, argSiteDescriptionTargetDirectory);
 			final Path siteTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY);
+			final Path siteDescriptionTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY);
 
 			getLogger().info("Clean...");
 			getLogger().info("Project directory: {}", projectDirectory);
-			getLogger().info("Site target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY));
-			getLogger().info("Site description target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY));
+			getLogger().info("Site target directory: {}", siteTargetDirectory);
+			getLogger().info("Site description target directory: {}", siteDescriptionTargetDirectory);
 
-			deleteFileTree(siteTargetDirectory);
-			//TODO delete other relevant directories; make sure they are indicated above; provide status
+			if(exists(siteTargetDirectory)) {
+				deleteFileTree(siteTargetDirectory);
+			}
+			if(!siteTargetDirectory.equals(siteDescriptionTargetDirectory)) {
+				if(exists(siteDescriptionTargetDirectory)) {
+					deleteFileTree(siteDescriptionTargetDirectory);
+				}
+			}
 		} catch(final IOException ioException) {
 			getLogger().error("Error cleaning site target directory.", ioException); //TODO improve message when cleaning multiple directories
 			System.err.println(ioException.getMessage());
