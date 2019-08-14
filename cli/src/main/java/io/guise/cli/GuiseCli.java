@@ -177,6 +177,7 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
 			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
+			@Option(names = {"--browse", "-b"}, description = "Opens a browser to the site after starting the server.") final boolean browse,
 			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
@@ -199,6 +200,21 @@ public class GuiseCli extends BaseCliApplication {
 			getLogger().error("Error mummifying and deploying site.", ioException);
 			System.err.println(ioException.getMessage());
 		}
+
+		//launch the browser; see https://stackoverflow.com/a/5226244/421049
+		if(browse && Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+
+			mummifier.getDeployUrls().stream().findFirst().ifPresent(deployUrl -> {
+				try {
+					Desktop.getDesktop().browse(deployUrl);
+				} catch(final IOException ioException) {
+					getLogger().error("Error launching browser.", ioException);
+					System.err.println(ioException.getMessage());
+					//TODO improve error handling
+				}
+			});
+		}
+
 	}
 
 	/** The relative path of the server base directory; meant to be used in conjunction with the temporary directory. */
@@ -210,7 +226,7 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-target-dir", description = "The target root directory of the site to be served.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory of the description of the site to be served.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
 			@Option(names = {"--port", "-p"}, description = "Specifies the server port.%nDefaults to @|bold " + DEFAULT_SERVER_PORT + "|@.") Integer argPort,
-
+			@Option(names = {"--browse", "-b"}, description = "Opens a browser to the site after starting the server.") final boolean browse,
 			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
@@ -282,11 +298,13 @@ public class GuiseCli extends BaseCliApplication {
 			return; //TODO improve error handling
 		}
 
+		final URI siteLocalUrl = URIs.createURI(HTTP_URI_SCHEME, null, LOCALHOST_DOMAIN, port, ROOT_PATH, null, null);
+		getLogger().info("Serving site at {}.", "<" + siteLocalUrl + ">");
+
 		//launch the browser; see https://stackoverflow.com/a/5226244/421049
-		if(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-			final URI siteBaseUri = URIs.createURI(HTTP_URI_SCHEME, null, LOCALHOST_DOMAIN, port, ROOT_PATH, null, null);
+		if(browse && Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
 			try {
-				Desktop.getDesktop().browse(siteBaseUri);
+				Desktop.getDesktop().browse(siteLocalUrl);
 			} catch(final IOException ioException) {
 				getLogger().error("Error launching browser.", ioException);
 				System.err.println(ioException.getMessage());

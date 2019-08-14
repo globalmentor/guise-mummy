@@ -17,6 +17,8 @@
 package io.guise.mummy.deploy;
 
 import java.io.IOException;
+import java.net.URI;
+import java.util.Optional;
 
 import javax.annotation.*;
 
@@ -39,8 +41,9 @@ public interface Deployer {
 	 * Deploys a site.
 	 * @param context The context of static site generation.
 	 * @param rootArtifact The root artifact of the site being deployed
+	 * @return The URL for accessing the deployed site, if available.
 	 * @throws IOException if there is an I/O error during site deployment.
 	 */
-	public void deploy(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact) throws IOException;
+	public Optional<URI> deploy(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact) throws IOException;
 
 }
