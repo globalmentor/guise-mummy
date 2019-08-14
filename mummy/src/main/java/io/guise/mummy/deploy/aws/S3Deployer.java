@@ -20,6 +20,7 @@ import static io.guise.mummy.GuiseMummy.*;
 import static java.util.Objects.*;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.*;
 
 import javax.annotation.*;
@@ -34,7 +35,7 @@ import io.guise.mummy.deploy.Deployer;
 import io.urf.vocab.content.Content;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.regions.*;
 import software.amazon.awssdk.services.s3.*;
 import software.amazon.awssdk.services.s3.model.*;
 
@@ -46,6 +47,38 @@ public class S3Deployer implements Deployer, Clogged {
 
 	public static final String SITE_CONFIG_KEY_DEPLOYMENT_REGION = "deploy.target.region";
 	public static final String SITE_CONFIG_KEY_DEPLOYMENT_BUCKET = "deploy.target.bucket";
+
+	/**
+	 * String template for a bucket web site URL, with the following string parameters:
+	 * <ol>
+	 * <li>bucket name</li>
+	 * <li>region ID</li>
+	 * <li>region domain</li>
+	 * <li>
+	 * </ol>
+	 * @implSpec This implementation only uses a dot (<code>.</code>) separator before the region ID.
+	 */
+	private final static StringTemplate BUCKET_WEBSITE_URL_TEMPLATE = StringTemplate.builder().text("http://").parameter(StringTemplate.STRING_PARAMETER)
+			.text(".s3-website.").parameter(StringTemplate.STRING_PARAMETER).text(".").parameter(StringTemplate.STRING_PARAMETER).text("/").build();
+
+	/**
+	 * Returns the URL for static web site hosting for the given bucket in the indicated region.
+	 * 
+	 * @param bucket The name of the bucket.
+	 * @param region The region in which the bucket is located.
+	 * @return A URL for accessing the static web site hosted in the identified bucket.
+	 * @implSpec This implementation only uses a dot (<code>.</code>) separator before the region ID.
+	 * @implNote The <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteEndpoints.html">Website Endpoints</a> documentation indicates that there are
+	 *           two forms based upon region, one using a dash (<code>-</code>) character instead, but the dot form seems to work as well, as some have <a href=
+	 *           "https://stackoverflow.com/questions/46627060/how-to-resolve-aws-s3-url-says-west-bucket-says-east#comment80219601_46627148">indicated</a> that
+	 *           AWS may be standardizing on the dot form.
+	 * @see <a href="https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_website_region_endpoints">Amazon Simple Storage Service Website Endpoints</a>
+	 * @see <a href="https://stackoverflow.com/q/57480708/421049">Get AWS S3 bucket web static site URL programmatically using Java SDK v2</a>
+	 * @see PartitionMetadata#hostname()
+	 */
+	public static URI getBucketWebsiteUrl(@Nonnull final String bucket, @Nonnull final Region region) {
+		return URI.create(BUCKET_WEBSITE_URL_TEMPLATE.apply(bucket, region.id(), region.metadata().domain()));
+	}
 
 	/**
 	 * The policy template for setting a bucket to public read access. There is one parameter:
@@ -120,9 +153,16 @@ public class S3Deployer implements Deployer, Clogged {
 		s3Client = s3ClientBuilder.build();
 	}
 
+	/**
+	 * The default region as per the API when accessing a bucket if no region is specified.*
+	 * @see CreateBucketConfiguration.Builder#locationConstraint(String)
+	 */
+	private static final Region SDK_BUCKET_DEFAULT_REGION = Region.US_EAST_1;
+
 	@Override
 	public void prepare(final MummyContext context) throws IOException {
 		getLogger().info("Preparing to deploy to AWS region `{}` S3 bucket `{}`.", findRegion(), bucket);
+
 		final S3Client s3Client = getS3Client();
 
 		//create bucket
@@ -135,7 +175,7 @@ public class S3Deployer implements Deployer, Clogged {
 			bucketHasPolicy = bucketHasPolicy(bucket);
 			bucketHasWebsiteConfiguration = bucketHasWebsiteConfiguration(bucket);
 		} else { //create the bucket if it doesn't exist
-			getLogger().info("Creating S3 bucket `{}` in AWS region `{}`.", bucket, findRegion().orElse(Region.US_EAST_1)); //default region as per the API
+			getLogger().info("Creating S3 bucket `{}` in AWS region `{}`.", bucket, findRegion().orElse(SDK_BUCKET_DEFAULT_REGION));
 			final CreateBucketConfiguration.Builder createBucketConfigurationBuilder = CreateBucketConfiguration.builder();
 			findRegion().ifPresent(region -> createBucketConfigurationBuilder.locationConstraint(region.id()));
 			s3Client.createBucket(builder -> builder.bucket(bucket).createBucketConfiguration(createBucketConfigurationBuilder.build()));
@@ -212,8 +252,7 @@ public class S3Deployer implements Deployer, Clogged {
 	}
 
 	@Override
-	public void deploy(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact) throws IOException {
-
+	public Optional<URI> deploy(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact) throws IOException {
 		getLogger().info("Deploying to AWS region `{}` S3 bucket `{}`.", findRegion(), bucket);
 
 		//#plan
@@ -226,6 +265,8 @@ public class S3Deployer implements Deployer, Clogged {
 		prune(context);
 
 		//TODO catch AwsServiceException, SdkClientException, S3Exception; probably in each lower level; rethrow as I/O exception
+
+		return Optional.of(getBucketWebsiteUrl(getBucket(), findRegion().orElse(SDK_BUCKET_DEFAULT_REGION)));
 	}
 
 	/**

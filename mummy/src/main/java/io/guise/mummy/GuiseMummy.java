@@ -19,6 +19,7 @@ package io.guise.mummy;
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Paths.*;
 import static java.nio.file.Files.*;
+import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 
@@ -62,6 +63,8 @@ public class GuiseMummy implements Clogged {
 
 	public static final String CONFIG_KEY_PAGE_NAMES_BARE = "mummy.pageNamesBare";
 
+	//mummifier settings
+
 	/** The default mummifier for normal files. */
 	private final SourcePathMummifier defaultFileMummifier = new OpaqueFileMummifier();
 
@@ -70,6 +73,15 @@ public class GuiseMummy implements Clogged {
 
 	/** The registered mummifiers by supported extensions. */
 	private final Map<String, SourcePathMummifier> fileMummifiersByExtension = new HashMap<>();
+
+	//state
+
+	private final List<URI> deployUrls = new ArrayList<>();
+
+	/** @return The URLs of the sites that were successfully deployed. */
+	public List<URI> getDeployUrls() {
+		return unmodifiableList(deployUrls);
+	}
 
 	/**
 	 * Registers a mummify for all its supported filename extensions.
@@ -123,7 +135,9 @@ public class GuiseMummy implements Clogged {
 				final Deployer deployer = new S3Deployer(context);
 				deployer.prepare(context);
 				if(phase.compareTo(LifeCyclePhase.DEPLOY) >= 0) {
-					deployer.deploy(context, rootArtifact);
+					final Optional<URI> deployUrl = deployer.deploy(context, rootArtifact);
+					deployUrl.ifPresent(deployUrls::add);
+					getLogger().info("Successfully deployed site to {}.", deployUrl.map(url -> "<" + url + ">").orElse("target"));
 				}
 			}
 		}
