@@ -48,6 +48,7 @@ import org.w3c.dom.*;
 import com.globalmentor.html.HtmlSerializer;
 import com.globalmentor.html.spec.HTML;
 import com.globalmentor.net.*;
+import com.globalmentor.xml.XmlDom;
 import com.globalmentor.xml.spec.XML;
 
 import io.urf.URF;
@@ -75,7 +76,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			Map.entry(ELEMENT_IMG, ELEMENT_IMG_ATTRIBUTE_SRC), //<img src="…">
 			Map.entry(ELEMENT_LINK, ELEMENT_LINK_ATTRIBUTE_HREF), //<link href="…">
 			Map.entry(ELEMENT_OBJECT, ELEMENT_OBJECT_ATTRIBUTE_DATA), //<object data="…">
-			Map.entry(ELEMENT_SCRIPT, ELEMENT_SOURCE_ATTRIBUTE_SRC), //<source src="…">
+			Map.entry(ELEMENT_SCRIPT, ELEMENT_SOURCE_ATTRIBUTE_SRC), //<script src="…">
 			Map.entry(ELEMENT_SOURCE, ELEMENT_SOURCE_ATTRIBUTE_SRC), //<source src="…">
 			Map.entry(ELEMENT_TRACK, ELEMENT_TRACK_ATTRIBUTE_SRC), //<track src="…">
 			Map.entry(ELEMENT_VIDEO, ELEMENT_VIDEO_ATTRIBUTE_SRC) //<video src="…">
@@ -333,7 +334,10 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 								setNamedMetata(templateDocument, meta);
 							});
 
-					//3. apply content
+					//3. merge head links
+					mergeLinks(templateDocument, sourceDocument);
+
+					//4. apply content
 
 					final Element templateContentElement = findContentElement(templateDocument)
 							.orElseThrow(() -> new IOException(String.format("Template %s has no content insertion point.", templateFile)));
@@ -346,6 +350,64 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 					return Optional.of(templateDocument);
 
 				})).orElse(sourceDocument); //return the source document unchanged if we can't find a template
+	}
+
+	/**
+	 * Merges all {@code <head>} links from the source document into the template document. If a link with the same reference already exists in the template, it
+	 * will not be replaced by that in the source.
+	 * <p>
+	 * This method assumes that the template has been relocated to the perfect location; otherwise, duplicate links will not be detected.
+	 * </p>
+	 * @implSpec This implementation does not allow adding links already present in the template, even if the duplicate link is for a different type of content
+	 *           (e.g. adding the same link as both a script and as a stylesheet).
+	 * @implNote This implementation processes any reference element in {@link #HTML_REFERENCE_ELEMENT_ATTRIBUTES}, even though many of those elements would not
+	 *           normally appear in a document {@code <head>} element.
+	 * @param templateDocument The template into which the source document links are to be merged; must have a {@code <head>} element.
+	 * @param sourceDocument The source document the links of which are being merged.
+	 * @throws IllegalArgumentException if the template does not have a {@code <head>} element.
+	 * @throws IOException if there is an error merging the links.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 */
+	protected void mergeLinks(@Nonnull final Document templateDocument, @Nonnull final Document sourceDocument) throws IOException, DOMException {
+		final Set<URI> links = new HashSet<>(); //keep track of existing template links and added links
+		final Element templateHeadElement = findHtmlHeadElement(templateDocument) //add a <html><head> if not present
+				.orElseThrow(() -> new IllegalArgumentException("Template missing <head> element."));
+
+		//collect existing template <head> links
+		childElementsOf(templateHeadElement).filter(element -> XHTML_NAMESPACE_URI_STRING.equals(element.getNamespaceURI())).forEach(element -> {
+			final String referenceAttributeName = HTML_REFERENCE_ELEMENT_ATTRIBUTES.get(element.getLocalName());
+			if(referenceAttributeName != null) {
+				findAttributeNS(element, null, referenceAttributeName).ifPresent(referenceString -> {
+					try {
+						final URI referenceURI = new URI(referenceString).normalize();
+						links.add(referenceURI);
+					} catch(final URISyntaxException uriSyntaxException) {
+						getLogger().warn("Invalid template <head><{}> reference {}.", element.getLocalName(), referenceString, uriSyntaxException);
+						return;
+					}
+				});
+			}
+		});
+
+		//merge in source document <head> links
+		findHtmlHeadElement(sourceDocument).stream().flatMap(XmlDom::childElementsOf)
+				.filter(element -> XHTML_NAMESPACE_URI_STRING.equals(element.getNamespaceURI())).forEach(element -> {
+					final String referenceAttributeName = HTML_REFERENCE_ELEMENT_ATTRIBUTES.get(element.getLocalName());
+					if(referenceAttributeName != null) {
+						findAttributeNS(element, null, referenceAttributeName).ifPresent(referenceString -> {
+							try {
+								final URI referenceURI = new URI(referenceString).normalize();
+								if(!links.contains(referenceURI)) {
+									templateHeadElement.appendChild(templateDocument.importNode(element, true));
+									links.add(referenceURI); //prevent duplicate source links
+								}
+							} catch(final URISyntaxException uriSyntaxException) {
+								getLogger().warn("Invalid template <head><{}> reference {}.", element.getLocalName(), referenceString, uriSyntaxException);
+								return;
+							}
+						});
+					}
+				});
 	}
 
 	/**
