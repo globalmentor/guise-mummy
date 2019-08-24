@@ -340,6 +340,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 					findContentElement(sourceDocument).ifPresentOrElse(sourceContentElement -> {
 						getLogger().debug("  {*} applying source content");
 						removeChildren(templateContentElement);
+						mergeAttributes(templateContentElement, sourceContentElement);
 						appendImportedChildNodes(templateContentElement, sourceContentElement);
 					}, () -> getLogger().warn("Source file for {} has no content to place in template.", artifact.getSourcePath()));
 					return Optional.of(templateDocument);
