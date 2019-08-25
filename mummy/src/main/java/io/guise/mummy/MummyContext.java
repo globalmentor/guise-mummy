@@ -212,6 +212,19 @@ public interface MummyContext {
 	//source references
 
 	/**
+	 * Checks to ensure that a given path lies in the source directory.
+	 * @param sourcePath The potential source path; must be absolute.
+	 * @return The given source path.
+	 * @throws IllegalArgumentException if the given source path is not absolute.
+	 * @throws IllegalArgumentException if the given source path is not in the site source tree.
+	 * @see #getSiteSourceDirectory()
+	 */
+	public default Path checkArgumentSourcePath(@Nonnull Path sourcePath) {
+		checkArgumentSubPath(getSiteSourceDirectory(), checkArgumentAbsolute(sourcePath));
+		return sourcePath;
+	}
+
+	/**
 	 * Searches for a non-directory file in the given source directory that matches the given base filename and which can be mummified into a page. No files are
 	 * ignored in the search. Ancestors are never searched above the source root directory.
 	 * @apiNote This method would be useful for finding a <code>.template.*</code> page source file up the hierarchy, for example.
@@ -225,8 +238,8 @@ public interface MummyContext {
 	 */
 	public default Optional<Map.Entry<Path, PageMummifier>> findPageSourceFile(@Nonnull Path sourceDirectory, @Nonnull final String baseFilename,
 			boolean searchAncestors) throws IOException {
+		checkArgumentSourcePath(sourceDirectory);
 		final Path siteSourceDirectory = getSiteSourceDirectory();
-		checkArgumentSubPath(siteSourceDirectory, checkArgumentAbsolute(sourceDirectory));
 		requireNonNull(baseFilename);
 		try (final Stream<Path> sourceFiles = list(sourceDirectory)) {
 			return sourceFiles.filter(not(Files::isDirectory)) //ignore directories
@@ -297,7 +310,7 @@ public interface MummyContext {
 	 */
 	public default Optional<Artifact> findArtifactBySourceRelativeReference(@Nonnull final Path contextSourcePath,
 			@Nonnull final URIPath sourceRelativeReference) {
-		checkArgumentSubPath(getSiteSourceDirectory(), checkArgumentAbsolute(contextSourcePath));
+		checkArgumentSourcePath(contextSourcePath);
 		sourceRelativeReference.checkRelative();
 		//Resolve the relative path to the URI form of the context artifact path, and then convert that back to a file system path.
 		//Follow RFC 3986 by interpreting resolution to "" as returning the context source path itself, not the collection/directory path.
@@ -341,8 +354,8 @@ public interface MummyContext {
 	 * @see #getSiteSourceDirectory()
 	 */
 	public default URIPath relativizeSourceReference(@Nonnull final Path baseSourcePath, @Nonnull final Path referenceSourcePath) {
-		checkArgumentSubPath(getSiteSourceDirectory(), checkArgumentAbsolute(baseSourcePath));
-		checkArgumentSubPath(getSiteSourceDirectory(), checkArgumentAbsolute(referenceSourcePath));
+		checkArgumentSourcePath(baseSourcePath);
+		checkArgumentSourcePath(referenceSourcePath);
 		return URIPath.relativize(baseSourcePath.toUri(), referenceSourcePath.toUri());
 	}
 
