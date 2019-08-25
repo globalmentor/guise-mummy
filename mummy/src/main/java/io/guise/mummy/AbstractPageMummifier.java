@@ -295,7 +295,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 */
 	protected Document applyTemplate(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
 			@Nonnull final Document sourceDocument) throws IOException, DOMException {
-		return context.findPageSourceFile(artifact.getSourceDirectory(), ".template", true) //look for a template TODO allow base filename to be configurable
+		return findTemplateSourceFile(context, contextArtifact, artifact, sourceDocument) //determine if there is a specified or appropriate template
 				.flatMap(throwingFunction(templateSource -> { //try to apply the template
 					final Path templateFile = templateSource.getKey();
 					final PageMummifier templateMummifier = templateSource.getValue();
@@ -350,6 +350,47 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 					return Optional.of(templateDocument);
 
 				})).orElse(sourceDocument); //return the source document unchanged if we can't find a template
+	}
+
+	/**
+	 * Finds the source file for a template, if there is one, for the given artifact. The template may be specified in the metadata of the document itself.
+	 * Otherwise a search is made for Searches for a template file in the given artifact directory and ancestor directories.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact being generated
+	 * @param sourceDocument The source document to process.
+	 * @return The template file, if any, along with its mummifier.
+	 * @throws IOException If there is an I/O error searching for a matching file.
+	 * @throws IOException if the document specifies an invalid template file.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 * @see MummyContext#findPageSourceFile(Path, String, boolean)
+	 */
+	protected Optional<Map.Entry<Path, PageMummifier>> findTemplateSourceFile(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact,
+			@Nonnull final Artifact artifact, @Nonnull final Document sourceDocument) throws IOException, DOMException {
+		//determine if a custom template file was specified; throw an exception if not in the source tree
+		final Optional<String> customTemplate = findHtmlHeadMetaElementContent(sourceDocument, META_MUMMY_TEMPLATE);
+		if(customTemplate.isPresent()) { //if a custom template was specified, check it and map it to a mummifier
+			final Path artifactSourcePath = artifact.getSourcePath();
+			try {
+				return customTemplate.map(artifactSourcePath::resolve)//.map(Path::toAbsolutePath).map(context::checkArgumentSourcePath).map(Paths::checkArgumentExists)
+						.flatMap(templateFile -> {
+							if(templateFile.equals(artifactSourcePath)) { //if the artifact specifies itself as a template, that effectively means "no template"
+								return Optional.empty();
+							}
+							if(!isDirectory(templateFile)) {
+								throw new IllegalArgumentException(String.format("Template path %s cannot be a directory.", templateFile));
+							}
+							final Optional<PageMummifier> customTemplateMummifier = (templateFile.equals(artifactSourcePath) ? Optional.of(artifact.getMummifier())
+									: context.findRegisteredMummifierForSourceFile(templateFile)).filter(PageMummifier.class::isInstance).map(PageMummifier.class::cast);
+							return customTemplateMummifier.map(templateMummifier -> Map.entry(templateFile, templateMummifier));
+						});
+			} catch(final IllegalArgumentException illegalArgumentException) {
+				throw new IOException(String.format("Source file %s specified invalid template %s: %s.", artifact.getSourcePath(), customTemplate,
+						illegalArgumentException.getMessage()));
+			}
+		} else { //if no custom template was specified
+			return context.findPageSourceFile(artifact.getSourceDirectory(), ".template", true); //look for a template TODO allow base filename to be configurable
+		}
 	}
 
 	/**
