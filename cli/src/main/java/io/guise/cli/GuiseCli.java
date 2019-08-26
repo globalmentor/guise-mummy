@@ -38,11 +38,13 @@ import org.apache.catalina.*;
 import org.apache.catalina.startup.Tomcat;
 import org.fusesource.jansi.Ansi;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.slf4j.event.Level;
 
 import com.github.dtmo.jfiglet.*;
 import com.globalmentor.application.*;
 import com.globalmentor.net.URIs;
 
+import io.clogr.Clogr;
 import io.confound.config.Configuration;
 import io.confound.config.ConfigurationException;
 import io.confound.config.file.ResourcesConfigurationManager;
@@ -80,6 +82,16 @@ public class GuiseCli extends BaseCliApplication {
 	 */
 	public static void main(@Nonnull final String[] args) {
 		Application.start(new GuiseCli(args));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This version defaults to {@link Level#INFO} log level.
+	 */
+	@Override
+	protected void updateLogLevel() {
+		final Level logLevel = isDebug() ? Level.DEBUG : Level.INFO;
+		Clogr.getLoggingConcern().setLogLevel(logLevel);
 	}
 
 	/**
