@@ -165,10 +165,6 @@ public class GuiseMummy implements Clogged {
 
 		final Context context = new Context(project, mummyConfiguration);
 
-		getLogger().info("Project directory: {}", context.getProject().getDirectory());
-		getLogger().info("Site source directory: {}", context.getSiteSourceDirectory());
-		getLogger().info("Site target directory: {}", context.getSiteTargetDirectory());
-		getLogger().info("Site description target directory: {}", context.getSiteDescriptionTargetDirectory());
 		getLogger().debug("page names bare: {}", context.getConfiguration().findBoolean(CONFIG_KEY_PAGE_NAMES_BARE));
 
 		return context;

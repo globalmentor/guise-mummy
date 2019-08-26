@@ -65,6 +65,11 @@
 			<artifactId>tomcat-embed-core</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.tuxdude.logback.extensions</groupId>
+			<artifactId>logback-colorizer</artifactId>
+			<version>1.0.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -109,7 +109,7 @@ public class GuiseCli extends BaseCliApplication {
 		} catch(final IOException ioException) {
 			throw new ConfigurationException(ioException);
 		}
-		System.out.print(ansi().fg(Ansi.Color.GREEN));
+		System.out.print(ansi().bold().fg(Ansi.Color.GREEN));
 		System.out.print(figletRenderer.renderText("Guise"));
 		System.out.println(ansi().reset());
 		System.out.println(appConfiguration.getString(CONFIG_KEY_NAME) + " " + appConfiguration.getString(CONFIG_KEY_VERSION));
@@ -149,7 +149,7 @@ public class GuiseCli extends BaseCliApplication {
 			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
 					argSiteDescriptionTargetDirectory);
 
-			System.out.println(ansi().fg(Ansi.Color.GREEN).a("Validate...").reset());
+			System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Validate...").reset());
 			logProjectInfo(project);
 
 			mummifier.mummify(project, GuiseMummy.LifeCyclePhase.VALIDATE);
@@ -177,7 +177,7 @@ public class GuiseCli extends BaseCliApplication {
 			final Path siteTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY);
 			final Path siteDescriptionTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY);
 
-			System.out.println(ansi().fg(Ansi.Color.GREEN).a("Clean...").reset());
+			System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Clean...").reset());
 			logProjectInfo(project);
 
 			if(exists(siteTargetDirectory)) {
@@ -213,7 +213,7 @@ public class GuiseCli extends BaseCliApplication {
 			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
 					argSiteDescriptionTargetDirectory);
 
-			System.out.println(ansi().fg(Ansi.Color.GREEN).a("Mummify...").reset());
+			System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Mummify...").reset());
 			logProjectInfo(project);
 
 			mummifier.mummify(project, GuiseMummy.LifeCyclePhase.MUMMIFY);
@@ -243,7 +243,7 @@ public class GuiseCli extends BaseCliApplication {
 			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
 					argSiteDescriptionTargetDirectory);
 
-			System.out.println(ansi().fg(Ansi.Color.GREEN).a("Deploy...").reset());
+			System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Deploy...").reset());
 			logProjectInfo(project);
 
 			mummifier.mummify(project, GuiseMummy.LifeCyclePhase.DEPLOY);
@@ -305,7 +305,7 @@ public class GuiseCli extends BaseCliApplication {
 
 			checkArgument(isDirectory(siteTargetDirectory), "Site target directory %s does not exist.", siteTargetDirectory); //TODO improve error handling; see https://github.com/remkop/picocli/issues/672
 
-			System.out.println(ansi().fg(Ansi.Color.GREEN).a("Serve...").reset());
+			System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Serve...").reset());
 			logProjectInfo(project);
 			getLogger().info("Server base directory: {}", serverBaseDirectory);
 			getLogger().info("Server port: {}", port);
