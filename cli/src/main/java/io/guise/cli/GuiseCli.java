@@ -24,6 +24,7 @@ import static com.globalmentor.net.URIs.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
+import static org.fusesource.jansi.Ansi.*;
 
 import java.awt.Desktop;
 import java.io.IOException;
@@ -35,11 +36,16 @@ import javax.annotation.*;
 
 import org.apache.catalina.*;
 import org.apache.catalina.startup.Tomcat;
+import org.fusesource.jansi.Ansi;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import com.github.dtmo.jfiglet.*;
 import com.globalmentor.application.*;
 import com.globalmentor.net.URIs;
 
+import io.confound.config.Configuration;
+import io.confound.config.ConfigurationException;
+import io.confound.config.file.ResourcesConfigurationManager;
 import io.guise.catalina.webresources.SiteRoot;
 import io.guise.mummy.*;
 import picocli.CommandLine.*;
@@ -76,6 +82,27 @@ public class GuiseCli extends BaseCliApplication {
 		Application.start(new GuiseCli(args));
 	}
 
+	/**
+	 * Prints startup app information, including application banner, name, and version.
+	 * @throws ConfigurationException if some configuration information isn't present.
+	 */
+	protected void printAppInfo() {
+		final FigletRenderer figletRenderer;
+		final Configuration appConfiguration;
+		try {
+			appConfiguration = ResourcesConfigurationManager.loadConfigurationForClass(getClass())
+					.orElseThrow(ResourcesConfigurationManager::createConfigurationNotFoundException);
+			figletRenderer = new FigletRenderer(FigFontResources.loadFigFontResource(FigFontResources.BIG_FLF));
+		} catch(final IOException ioException) {
+			throw new ConfigurationException(ioException);
+		}
+		System.out.print(ansi().fg(Ansi.Color.GREEN));
+		System.out.print(figletRenderer.renderText("Guise"));
+		System.out.println(ansi().reset());
+		System.out.println(appConfiguration.getString(CONFIG_KEY_NAME) + " " + appConfiguration.getString(CONFIG_KEY_VERSION));
+		System.out.println();
+	}
+
 	@Command(description = "Cleans a site by removing the site target directory.")
 	public void clean(
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path argProjectDirectory,
@@ -84,6 +111,8 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
+
+		printAppInfo();
 
 		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 
@@ -121,6 +150,8 @@ public class GuiseCli extends BaseCliApplication {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
 
+		printAppInfo();
+
 		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 
 		final GuiseMummy mummifier = new GuiseMummy();
@@ -150,6 +181,8 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
+
+		printAppInfo();
 
 		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 
@@ -181,6 +214,8 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
+
+		printAppInfo();
 
 		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 
@@ -230,6 +265,8 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
+
+		printAppInfo();
 
 		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 

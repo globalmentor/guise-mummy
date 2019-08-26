@@ -30,6 +30,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.github.dtmo.jfiglet</groupId>
+			<artifactId>jfiglet</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<dependency>
 			<groupId>io.clogr</groupId>
 			<artifactId>clogr-logback-provider</artifactId>
 		</dependency>
@@ -58,6 +64,7 @@
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-core</artifactId>
 		</dependency>
+
 	</dependencies>
 
 	<build>
