@@ -37,6 +37,7 @@ import javax.annotation.*;
 import org.apache.catalina.*;
 import org.apache.catalina.startup.Tomcat;
 import org.fusesource.jansi.Ansi;
+import org.slf4j.Logger;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.slf4j.event.Level;
 
@@ -115,6 +116,20 @@ public class GuiseCli extends BaseCliApplication {
 		System.out.println();
 	}
 
+	/**
+	 * Logs information about the current Guise project.
+	 * @param project The Guise project.
+	 * @see #getLogger()
+	 * @see Level#INFO
+	 */
+	protected void logProjectInfo(@Nonnull final GuiseProject project) {
+		final Logger logger = getLogger();
+		logger.info("Project directory: {}", project.getDirectory());
+		logger.info("Site source directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY));
+		logger.info("Site target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY));
+		logger.info("Site description target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY));
+	}
+
 	@Command(description = "Validates a Guise project before mummification.")
 	public void validate(
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path argProjectDirectory,
@@ -134,11 +149,8 @@ public class GuiseCli extends BaseCliApplication {
 			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
 					argSiteDescriptionTargetDirectory);
 
-			getLogger().info("Validate...");
-			getLogger().info("Project directory: {}", projectDirectory);
-			getLogger().info("Site source directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY));
-			getLogger().info("Site target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY));
-			getLogger().info("Site description target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY));
+			System.out.println(ansi().fg(Ansi.Color.GREEN).a("Validate...").reset());
+			logProjectInfo(project);
 
 			mummifier.mummify(project, GuiseMummy.LifeCyclePhase.VALIDATE);
 		} catch(final IllegalArgumentException | IOException exception) {
@@ -165,10 +177,8 @@ public class GuiseCli extends BaseCliApplication {
 			final Path siteTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY);
 			final Path siteDescriptionTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY);
 
-			getLogger().info("Clean...");
-			getLogger().info("Project directory: {}", projectDirectory);
-			getLogger().info("Site target directory: {}", siteTargetDirectory);
-			getLogger().info("Site description target directory: {}", siteDescriptionTargetDirectory);
+			System.out.println(ansi().fg(Ansi.Color.GREEN).a("Clean...").reset());
+			logProjectInfo(project);
 
 			if(exists(siteTargetDirectory)) {
 				deleteFileTree(siteTargetDirectory);
@@ -203,11 +213,8 @@ public class GuiseCli extends BaseCliApplication {
 			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
 					argSiteDescriptionTargetDirectory);
 
-			getLogger().info("Mummify...");
-			getLogger().info("Project directory: {}", projectDirectory);
-			getLogger().info("Site source directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY));
-			getLogger().info("Site target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY));
-			getLogger().info("Site description target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY));
+			System.out.println(ansi().fg(Ansi.Color.GREEN).a("Mummify...").reset());
+			logProjectInfo(project);
 
 			mummifier.mummify(project, GuiseMummy.LifeCyclePhase.MUMMIFY);
 		} catch(final IllegalArgumentException | IOException exception) {
@@ -236,11 +243,8 @@ public class GuiseCli extends BaseCliApplication {
 			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
 					argSiteDescriptionTargetDirectory);
 
-			getLogger().info("Mummify...");
-			getLogger().info("Project directory: {}", projectDirectory);
-			getLogger().info("Site source directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY));
-			getLogger().info("Site target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY));
-			getLogger().info("Site description target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY));
+			System.out.println(ansi().fg(Ansi.Color.GREEN).a("Deploy...").reset());
+			logProjectInfo(project);
 
 			mummifier.mummify(project, GuiseMummy.LifeCyclePhase.DEPLOY);
 		} catch(final IllegalArgumentException | IOException exception) {
@@ -301,10 +305,8 @@ public class GuiseCli extends BaseCliApplication {
 
 			checkArgument(isDirectory(siteTargetDirectory), "Site target directory %s does not exist.", siteTargetDirectory); //TODO improve error handling; see https://github.com/remkop/picocli/issues/672
 
-			getLogger().info("Serve...");
-			getLogger().info("Project directory: {}", projectDirectory);
-			getLogger().info("Site target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY));
-			getLogger().info("Site description target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY));
+			System.out.println(ansi().fg(Ansi.Color.GREEN).a("Serve...").reset());
+			logProjectInfo(project);
 			getLogger().info("Server base directory: {}", serverBaseDirectory);
 			getLogger().info("Server port: {}", port);
 		} catch(final IllegalArgumentException | IOException exception) {
