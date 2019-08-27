@@ -290,7 +290,7 @@ public class S3Deployer implements Deployer, Clogged {
 	protected void plan(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact, @Nonnull Artifact artifact) throws IOException {
 		if(!(artifact instanceof DirectoryArtifact)) { //don't deploy anything for directories TODO improve semantics, especially after the root artifact type changes; maybe use CollectionArtifact
 			final String key = context.relativizeTargetReference(rootArtifact, artifact).toString();
-			getLogger().info("Planning deployment for artifact {}, S3 key `{}`.", artifact, key);
+			getLogger().debug("Planning deployment for artifact {}, S3 key `{}`.", artifact, key);
 			artifactKeys.put(artifact, key);
 		}
 		if(artifact instanceof CompositeArtifact) {
@@ -312,7 +312,7 @@ public class S3Deployer implements Deployer, Clogged {
 		for(final Map.Entry<Artifact, String> artifactKeyEntry : artifactKeys.entrySet()) {
 			final Artifact artifact = artifactKeyEntry.getKey();
 			final String key = artifactKeyEntry.getValue();
-			getLogger().info("Deploying artifact {} to S3 key `{}`.", artifact, key);
+			getLogger().info("Deploying artifact to S3 key `{}`.", key);
 			final PutObjectRequest.Builder putBuilder = PutObjectRequest.builder().bucket(bucket).key(key);
 			//set content-type if found
 			Content.findContentType(artifact.getResourceDescription()).map(ContentType::toString).ifPresent(putBuilder::contentType);
