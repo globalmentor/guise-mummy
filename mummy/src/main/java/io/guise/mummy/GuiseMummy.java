@@ -34,6 +34,7 @@ import javax.annotation.*;
 import io.clogr.Clogged;
 import io.confound.config.*;
 import io.confound.config.file.FileSystemConfigurationManager;
+import io.confound.config.file.ResourcesConfigurationManager;
 import io.guise.mummy.deploy.Deployer;
 import io.guise.mummy.deploy.aws.S3Deployer;
 import io.urf.model.UrfResourceDescription;
@@ -44,6 +45,29 @@ import io.urf.turf.TurfSerializer;
  * @author Garret Wilson
  */
 public class GuiseMummy implements Clogged {
+
+	/** The official name of Guise Mummy. */
+	public static final String NAME;
+
+	/** The current Guise Mummy version. */
+	public static final String VERSION;
+
+	/** The configuration key containing the name. */
+	private static final String CLASS_CONFIG_KEY_NAME = "name";
+
+	/** The configuration key containing the version. */
+	private static final String CLASS_CONFIG_KEY_VERSION = "version";
+
+	static {
+		try {
+			final Configuration configuration = ResourcesConfigurationManager.loadConfigurationForClass(GuiseMummy.class)
+					.orElseThrow(ResourcesConfigurationManager::createConfigurationNotFoundException);
+			NAME = configuration.getString(CLASS_CONFIG_KEY_NAME);
+			VERSION = configuration.getString(CLASS_CONFIG_KEY_VERSION);
+		} catch(final IOException ioException) {
+			throw new ConfigurationException(ioException);
+		}
+	}
 
 	/** The string form or namespace of Guise Mummy elements, such as in an XHTML document or as the leading IRI segment of RDFa metadata. */
 	public static final String NAMESPACE_STRING = "https://guise.io/name/mummy/";

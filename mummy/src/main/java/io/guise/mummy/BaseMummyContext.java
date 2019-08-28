@@ -35,6 +35,15 @@ public abstract class BaseMummyContext implements MummyContext {
 	/** The segment prefix that indicates a veiled resource or resource parent. */
 	public static final String VEILED_PATH_SEGMENT_PREFIX = "_";
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This version returns a string in the form <code>Guise Mummy <em>version</em></code>.
+	 */
+	@Override
+	public String getMummifierIdentification() {
+		return GuiseMummy.NAME + ' ' + GuiseMummy.VERSION;
+	}
+
 	private final GuiseProject project;
 
 	@Override
