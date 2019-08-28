@@ -42,6 +42,12 @@ import io.confound.config.Configuration;
  */
 public interface MummyContext {
 
+	/**
+	 * Returns a free-form string identifying the program generating the content.
+	 * @return The generator identification string.
+	 */
+	public String getMummifierIdentification();
+
 	/** @return The Guise project governing mummification. */
 	public GuiseProject getProject();
 

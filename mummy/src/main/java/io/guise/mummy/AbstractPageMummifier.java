@@ -268,6 +268,9 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			//#cleanse document: remove all Guise Mummy related elements and attributes
 			final Document cleansedDocument = cleanseDocument(context, contextArtifact, artifact, relocatedDocument);
 
+			//#identify Guise Mummy as the generator
+			setNamedMetata(cleansedDocument, META_NAME_GENERATOR, context.getMummifierIdentification());
+
 			//#save target document
 			try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))) {
 				final HtmlSerializer htmlSerializer = new HtmlSerializer(true);
