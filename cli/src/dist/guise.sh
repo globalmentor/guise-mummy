@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
-# Guise CLI Launcher 0.1.0
-# Copyright (c) 2019 GlobalMentor, Inc. <http://www.globalmentor.com/>
+# ~{project.name} ~{project.version} Launcher
+# Copyright (c) ~{project.inceptionYear}-~{build.year} ~{project.organization.name}
+#
+# This shell script expects to find the executable JAR file
+# in the same directory as the script.
 
 set -o errexit
 set -o pipefail
 set -o nounset
 
 EXE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-java -jar ${EXE_DIR}/guise-cli-0.1.0-exe.jar "$@"
+java -jar ${EXE_DIR}/~{project.artifactId}-~{project.version}-exe.jar "$@"
