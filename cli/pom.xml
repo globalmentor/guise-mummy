@@ -90,6 +90,41 @@
 				<groupId>com.akathist.maven.plugins.launch4j</groupId>
 				<artifactId>launch4j-maven-plugin</artifactId>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>copy-dist-scripts</id>
+						<!--
+							Copy scripts from src/dist/ to target/ using ~{} delimiters,
+							because ${} classes with script variable replacement.
+						 -->
+						<goals>
+							<goal>resources</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/src/dist</directory>
+									<includes>
+										<include>**/*.bat</include>
+										<include>**/*.sh</include>
+									</includes>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+							<useDefaultDelimiters>false</useDefaultDelimiters>
+							<delimiters>
+								<delimiter>~{*}</delimiter>
+							</delimiters>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 </project>
