@@ -1,0 +1,14 @@
+*GuiseProject:
+
+  mummy:
+    !pageNamesBare = true
+  ;
+
+  deploy:
+    target = *S3:
+      region = "us-west-1"
+      bucket = "" !TODO provide bucket name
+    ;
+  ;
+
+;
