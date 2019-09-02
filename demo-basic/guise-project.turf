@@ -1,14 +1,14 @@
 *GuiseProject:
 
   mummy:
-    !pageNamesBare = true
+!    pageNamesBare = true
   ;
 
   deploy:
-    target = *S3:
-      region = "us-west-1"
-      bucket = "" !TODO provide bucket name
-    ;
+!    target = *S3:
+!      region = "" !TODO provide region (optional)
+!      bucket = "" !TODO provide bucket name
+!    ;
   ;
 
 ;
