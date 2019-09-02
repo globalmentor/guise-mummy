@@ -161,7 +161,7 @@ public class S3Deployer implements Deployer, Clogged {
 
 	@Override
 	public void prepare(final MummyContext context) throws IOException {
-		getLogger().info("Preparing to deploy to AWS region `{}` S3 bucket `{}`.", findRegion(), bucket);
+		getLogger().info("Preparing to deploy to AWS region `{}` S3 bucket `{}`.", findRegion().orElse(SDK_BUCKET_DEFAULT_REGION), bucket);
 
 		final S3Client s3Client = getS3Client();
 
@@ -254,7 +254,7 @@ public class S3Deployer implements Deployer, Clogged {
 
 	@Override
 	public Optional<URI> deploy(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact) throws IOException {
-		getLogger().info("Deploying to AWS region `{}` S3 bucket `{}`.", findRegion(), bucket);
+		getLogger().info("Deploying to AWS region `{}` S3 bucket `{}`.", findRegion().orElse(SDK_BUCKET_DEFAULT_REGION), bucket);
 
 		//#plan
 		plan(context, rootArtifact);
