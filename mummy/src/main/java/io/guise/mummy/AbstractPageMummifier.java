@@ -331,6 +331,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 					//2. apply metadata
 
+					//TODO reconcile metadata handling of ignoring null values with "" equivalence of missing values as per the spec
 					namedMetadata(sourceDocument).filter(meta -> meta.getValue() != null) //ignore any source metadata without a value
 							.forEachOrdered(meta -> { //update the template metadata with the source metadata
 								getLogger().debug("  {*} applying source metadata: {}={} ", meta.getKey(), meta.getValue());
