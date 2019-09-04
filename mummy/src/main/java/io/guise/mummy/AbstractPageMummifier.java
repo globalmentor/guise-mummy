@@ -37,6 +37,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.text.Collator;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -270,6 +271,8 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 			//#identify Guise Mummy as the generator
 			setNamedMetata(cleansedDocument, META_NAME_GENERATOR, context.getMummifierIdentification());
+			//#indicate the instant of generation
+			setNamedMetata(cleansedDocument, META_NAME_GENERATED_AT, Instant.now().toString());
 
 			//#save target document
 			try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))) {
