@@ -40,6 +40,9 @@ public interface PageMummifier extends Mummifier {
 	/** The standard Internet media types for pages: <code>text/html</code> in UTF-8. */
 	public static final ContentType PAGE_MEDIA_TYPE = HTML_CONTENT_TYPE.withParameter(ContentType.Parameter.CHARSET_UTF_8);
 
+	/** The HTML {@code <meta>} name for indicating the instant of artifact generation. */
+	public static final String META_NAME_GENERATED_AT = "generatedAt";
+
 	/** The metadata name for specifying a relative template path. */
 	public static final String META_MUMMY_TEMPLATE = "mummy:template"; //TODO switch to real metadata namespace detection
 
