@@ -79,4 +79,9 @@ public class DefaultXhtmlPhantomArtifact extends AbstractSourceFileArtifact {
 		return new ByteArrayInputStream(source.getBytes(StandardCharsets.UTF_8));
 	}
 
+	@Override
+	public boolean isNavigable() {
+		return true;
+	}
+
 }

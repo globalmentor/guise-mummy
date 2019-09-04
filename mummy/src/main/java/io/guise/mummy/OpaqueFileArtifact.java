@@ -38,4 +38,13 @@ public class OpaqueFileArtifact extends BaseCorporealSourceFileArtifact {
 		super(mummifier, sourceFile, outputFile, UrfResourceDescription.EMPTY);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec By default opaque files are not navigable.
+	 */
+	@Override
+	public boolean isNavigable() {
+		return false;
+	}
+
 }

@@ -40,4 +40,9 @@ public class PageArtifact extends BaseCorporealSourceFileArtifact {
 		super(mummifier, sourceFile, outputFile, description);
 	}
 
+	@Override
+	public boolean isNavigable() {
+		return true;
+	}
+
 }
