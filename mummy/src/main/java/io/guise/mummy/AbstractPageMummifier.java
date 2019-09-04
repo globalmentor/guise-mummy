@@ -271,7 +271,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 			//#identify Guise Mummy as the generator
 			setNamedMetata(cleansedDocument, META_NAME_GENERATOR, context.getMummifierIdentification());
-			//#identify the instant of generation
+			//#indicate the instant of generation
 			setNamedMetata(cleansedDocument, META_NAME_GENERATED_AT, Instant.now().toString());
 
 			//#save target document
