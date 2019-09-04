@@ -158,4 +158,13 @@ public interface Artifact {
 	/** @return The mummifier responsible for mummifying this artifact. */
 	public Mummifier getMummifier();
 
+	/**
+	 * Indicates whether the artifact would normally be part of site navigation.
+	 * <p>
+	 * A navigable artifact may still be veiled, however, by filename conventions or other settings.
+	 * </p>
+	 * @return <code>true</code> if the artifact should be part of default navigation.
+	 */
+	public boolean isNavigable();
+
 }

@@ -105,4 +105,9 @@ public class DirectoryArtifact extends AbstractArtifact implements CollectionArt
 				.orElse(defaultReferenceSourcePaths);
 	}
 
+	@Override
+	public boolean isNavigable() {
+		return true;
+	}
+
 }

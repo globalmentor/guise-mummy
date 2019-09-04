@@ -138,7 +138,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	protected Stream<Artifact> childNavigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
 		final Stream<Artifact> candidateArtifacts = contextArtifact instanceof CollectionArtifact ? context.childArtifacts(contextArtifact)
 				: context.siblingArtifacts(contextArtifact);
-		return candidateArtifacts.filter(not(context::isVeiled));
+		return candidateArtifacts.filter(Artifact::isNavigable).filter(not(context::isVeiled));
 	}
 
 	@Override
