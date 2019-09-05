@@ -16,6 +16,9 @@
 
 package io.guise.mummy;
 
+import static com.globalmentor.html.HtmlDom.*;
+import static com.globalmentor.html.spec.HTML.*;
+import static com.globalmentor.xml.XmlDom.*;
 import static java.nio.charset.StandardCharsets.*;
 
 import java.io.*;
@@ -110,6 +113,9 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		htmlRenderer = HtmlRenderer.builder().build();
 	}
 
+	/** The data key for the title retrieved from the front matter. */
+	private static final String FRONT_MATTER_TITLE_DATA_KEY = "title"; //TODO use a constant from some URF list of standard properties
+
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This version loads a document in Markdown format.
@@ -129,20 +135,41 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		com.vladsch.flexmark.util.ast.Document markdownDocument = getParser().parse(stringBuilder.toString());
 		final AbstractYamlFrontMatterVisitor yamlVisitor = new AbstractYamlFrontMatterVisitor();
 		yamlVisitor.visit(markdownDocument);
-		final List<String> frontMatterTitles = yamlVisitor.getData().get("title"); //TODO use a constant from some URF list of standard properties
+
+		//find the title if present in the front matter
+		final List<String> frontMatterTitles = yamlVisitor.getData().get(FRONT_MATTER_TITLE_DATA_KEY);
 		if(frontMatterTitles != null && !frontMatterTitles.isEmpty()) {
 			final String frontMatterTitle = frontMatterTitles.iterator().next();
 			if(frontMatterTitle != null) {
 				title = frontMatterTitle;
 			}
 		}
+
+		//generate XHTML
+		final Document document;
 		final String htmlBodyContent = getHtmlRenderer().render(markdownDocument);
 		final String xhtmlDocumentString = XHTML_TEMPLATE.apply(title, htmlBodyContent);
 		final DocumentBuilder documentBuilder = context.newPageDocumentBuilder();
 		try {
-			return documentBuilder.parse(new ByteArrayInputStream(xhtmlDocumentString.getBytes(UTF_8)));
+			document = documentBuilder.parse(new ByteArrayInputStream(xhtmlDocumentString.getBytes(UTF_8)));
 		} catch(final SAXException saxException) {
 			throw new IOException(saxException);
 		}
+
+		//add additional metadata from the front matter
+		final Element headElement = findHtmlHeadElement(document).orElseThrow(IllegalStateException::new); //our template has a <head>
+		yamlVisitor.getData().forEach((metaName, metaValues) -> {
+			if(FRONT_MATTER_TITLE_DATA_KEY.equals(metaName)) { //ignore the title; we already processed it
+				return;
+			}
+			//multiple front matter values for a name result in multiple <meta> elements as a side effect which may be useful
+			metaValues.forEach(metaValue -> { //TODO add an HtmlDom.addNamedMetata() method
+				final Element metaElement = addLast(headElement, document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_META));
+				metaElement.setAttributeNS(null, ELEMENT_META_ATTRIBUTE_NAME, metaName);
+				metaElement.setAttributeNS(null, ELEMENT_META_ATTRIBUTE_CONTENT, metaValue);
+			});
+		});
+
+		return document;
 	}
 }
