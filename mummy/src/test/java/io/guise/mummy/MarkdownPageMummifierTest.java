@@ -19,7 +19,7 @@ package io.guise.mummy;
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
-import static com.globalmentor.java.OperatingSystem.getWorkingDirectory;
+import static com.globalmentor.java.OperatingSystem.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
+
+import javax.annotation.*;
 
 import org.junit.jupiter.api.*;
 import org.w3c.dom.*;
@@ -42,6 +44,7 @@ public class MarkdownPageMummifierTest {
 
 	public static final String SIMPLE_MARKDOWN_RESOURCE_NAME = "simple.md";
 	public static final String SIMPLE_TITLE_MARKDOWN_RESOURCE_NAME = "simple-title.md";
+	public static final String SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME = "simple-metadata.md";
 
 	private MummyContext mummyContext;
 
@@ -78,17 +81,10 @@ public class MarkdownPageMummifierTest {
 	}
 
 	/**
-	 * @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream)
-	 * @see #SIMPLE_MARKDOWN_RESOURCE_NAME
+	 * Asserts that the body of the given document matches that expected for the "simple-" test files.
+	 * @param document The document to test.
 	 */
-	@Test
-	public void testSimpleMarkdown() throws IOException {
-		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
-		final Document document;
-		try (final InputStream inputStream = getClass().getResourceAsStream(SIMPLE_MARKDOWN_RESOURCE_NAME)) {
-			document = mummifier.loadSourceDocument(mummyContext, inputStream, SIMPLE_MARKDOWN_RESOURCE_NAME);
-		}
-		assertThat(findTitle(document), isPresentAndIs("simple"));
+	protected void assertSimpleBody(@Nonnull final Document document) {
 		final Node body = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
 		final List<Element> bodyElements = getChildElements(body);
 		assertThat(bodyElements, hasSize(2));
@@ -104,7 +100,24 @@ public class MarkdownPageMummifierTest {
 
 	/**
 	 * @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream)
+	 * @see #SIMPLE_MARKDOWN_RESOURCE_NAME
+	 * @see #assertSimpleBody(Document)
+	 */
+	@Test
+	public void testSimpleMarkdown() throws IOException {
+		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
+		final Document document;
+		try (final InputStream inputStream = getClass().getResourceAsStream(SIMPLE_MARKDOWN_RESOURCE_NAME)) {
+			document = mummifier.loadSourceDocument(mummyContext, inputStream, SIMPLE_MARKDOWN_RESOURCE_NAME);
+		}
+		assertThat(findTitle(document), isPresentAndIs("simple"));
+		assertSimpleBody(document);
+	}
+
+	/**
+	 * @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream)
 	 * @see #SIMPLE_TITLE_MARKDOWN_RESOURCE_NAME
+	 * @see #assertSimpleBody(Document)
 	 */
 	@Test
 	public void testSimpleTitleMarkdown() throws IOException {
@@ -114,17 +127,26 @@ public class MarkdownPageMummifierTest {
 			document = mummifier.loadSourceDocument(mummyContext, inputStream, SIMPLE_TITLE_MARKDOWN_RESOURCE_NAME);
 		}
 		assertThat(findTitle(document), isPresentAndIs("Simple Page"));
-		final Node body = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
-		final List<Element> bodyElements = getChildElements(body);
-		assertThat(bodyElements, hasSize(2));
-		final Element h1 = bodyElements.get(0);
-		assertThat(h1.getLocalName(), is(ELEMENT_H1));
-		assertThat(h1.getNamespaceURI(), is(XHTML_NAMESPACE_URI_STRING));
-		assertThat(h1.getTextContent(), is("Heading"));
-		final Element p = bodyElements.get(1);
-		assertThat(p.getLocalName(), is(ELEMENT_P));
-		assertThat(p.getNamespaceURI(), is(XHTML_NAMESPACE_URI_STRING));
-		assertThat(p.getTextContent(), is("Body text."));
+		assertSimpleBody(document);
+	}
+
+	/**
+	 * @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream)
+	 * @see #SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME
+	 * @see #assertSimpleBody(Document)
+	 */
+	@Test
+	public void testSimpleMetadataMarkdown() throws IOException {
+		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
+		final Document document;
+		try (final InputStream inputStream = getClass().getResourceAsStream(SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME)) {
+			document = mummifier.loadSourceDocument(mummyContext, inputStream, SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME);
+		}
+		assertThat(findTitle(document), isPresentAndIs("Simple Page with Other Metadata"));
+		assertThat(findHtmlHeadMetaElementContent(document, "title"), isEmpty()); //make sure we didn't duplicate the title as metadata 
+		assertThat(findHtmlHeadMetaElementContent(document, "label"), isPresentAndIs("Simplicity"));
+		assertThat(findHtmlHeadMetaElementContent(document, "fooBar"), isPresentAndIs("This is a test."));
+		assertSimpleBody(document);
 	}
 
 }
