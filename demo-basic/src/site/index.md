@@ -1,3 +1,8 @@
+---
+title: Guise Basic Demo
+description: A basic demonstration of Guise capabilities.
+author: Garret Wilson
+---
 # Guise Basic Demo Home
 
 Demonstration of Guise basic capabilities.
