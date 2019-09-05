@@ -143,6 +143,7 @@ public class MarkdownPageMummifierTest {
 			document = mummifier.loadSourceDocument(mummyContext, inputStream, SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME);
 		}
 		assertThat(findTitle(document), isPresentAndIs("Simple Page with Other Metadata"));
+		assertThat(findHtmlHeadMetaElementContent(document, "title"), isEmpty()); //make sure we didn't duplicate the title as metadata 
 		assertThat(findHtmlHeadMetaElementContent(document, "label"), isPresentAndIs("Simplicity"));
 		assertThat(findHtmlHeadMetaElementContent(document, "fooBar"), isPresentAndIs("This is a test."));
 		assertSimpleBody(document);

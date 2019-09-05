@@ -139,9 +139,13 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		//find the title if present in the front matter
 		final List<String> frontMatterTitles = yamlVisitor.getData().get(FRONT_MATTER_TITLE_DATA_KEY);
 		if(frontMatterTitles != null && !frontMatterTitles.isEmpty()) {
-			final String frontMatterTitle = frontMatterTitles.iterator().next();
+			final Iterator<String> frontMatterTitlesIterator = frontMatterTitles.iterator();
+			final String frontMatterTitle = frontMatterTitlesIterator.next(); //use the first title given
 			if(frontMatterTitle != null) {
 				title = frontMatterTitle;
+			}
+			while(frontMatterTitlesIterator.hasNext()) {
+				getLogger().warn("Ignoring additional title {} in source Markdown document {}.", frontMatterTitlesIterator.next(), name);
 			}
 		}
 
