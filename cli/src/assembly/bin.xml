@@ -16,7 +16,12 @@
 		<fileSet>
 			<directory>${project.build.directory}/bin</directory>
 			<outputDirectory>bin</outputDirectory>
-			<fileMode>0755</fileMode>
+			<!--
+				Set access permissions to `-rwxrwxr-x`, which corresponds to adding `+x` to a created file.
+				Manually setting permissions files in the archive is necessary for building on Windows,
+				because input files will have lost attributes during the build process.
+			-->
+			<fileMode>0775</fileMode>
 		</fileSet>
 	</fileSets>
 </assembly>
