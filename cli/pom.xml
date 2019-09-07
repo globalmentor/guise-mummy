@@ -96,9 +96,9 @@
 				<artifactId>maven-resources-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>copy-dist-scripts</id>
+						<id>copy-bin</id>
 						<!--
-							Copy scripts from src/dist/ to target/ using ~{} delimiters,
+							Copy scripts from src/bin/ to target/bin/ using ~{} delimiters,
 							because ${} classes with script variable replacement.
 						 -->
 						<goals>
@@ -107,7 +107,7 @@
 						<configuration>
 							<resources>
 								<resource>
-									<directory>${project.basedir}/src/dist</directory>
+									<directory>${project.basedir}/src/bin</directory>
 									<includes>
 										<include>**/*.bat</include>
 										<include>**/*.sh</include>
@@ -119,7 +119,7 @@
 							<delimiters>
 								<delimiter>~{*}</delimiter>
 							</delimiters>
-							<outputDirectory>${project.build.directory}</outputDirectory>
+							<outputDirectory>${project.build.directory}/bin</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
@@ -139,10 +139,10 @@
 						<configuration>
 							<target>
 								<!-- Enable execute permission for the shell scripts. -->
-								<chmod dir="${project.build.directory}" includes="**/*.sh" perm="+x" />
+								<chmod dir="${project.build.directory}/bin" includes="**/*.sh" perm="+x" />
 								<!-- Remove the `.sh` extension from shell scripts. -->
-								<move todir="${project.build.directory}">
-									<fileset dir="${project.build.directory}">
+								<move todir="${project.build.directory}/bin">
+									<fileset dir="${project.build.directory}/bin">
 										<include name="**/*.sh" />
 									</fileset>
 									<mapper type="glob" from="*.sh" to="*" />
