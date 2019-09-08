@@ -6,7 +6,7 @@
 
   deploy:
 !    target = *S3:
-!      region = "" !TODO provide region (optional)
+!      region = "" !TODO provide region
 !      bucket = "" !TODO provide bucket name
 !    ;
   ;
