@@ -374,9 +374,7 @@ public interface MummyContext {
 	 * @param referentArtifact The artifact being referred to.
 	 * @return The reference path to the referent artifact relative to the context artifact as a URI path.
 	 * @see Artifact#getTargetPath()
-	 * @deprecated TODO remove if we only move on a per-path level, possibly within or across trees
 	 */
-	@Deprecated
 	public default URIPath relativizeTargetReference(@Nonnull final Artifact contextArtifact, @Nonnull final Artifact referentArtifact) {
 		return relativizeTargetReference(contextArtifact, referentArtifact.getTargetPath());
 	}
@@ -388,9 +386,7 @@ public interface MummyContext {
 	 * @param referenceTargetPath The absolute reference target path to relativize.
 	 * @return The reference path relative to the context artifact as a URI path.
 	 * @see Artifact#getTargetPath()
-	 * @deprecated TODO remove if we only move on a per-path level, possibly within or across trees
 	 */
-	@Deprecated
 	public default URIPath relativizeTargetReference(@Nonnull final Artifact contextArtifact, @Nonnull final Path referenceTargetPath) {
 		return relativizeTargetReference(contextArtifact.getTargetPath(), referenceTargetPath);
 	}
@@ -403,9 +399,7 @@ public interface MummyContext {
 	 * @return The reference path relative to the base path as a URI path.
 	 * @throws IllegalArgumentException if the target path and or the base path is not absolute and/or is not within the site.
 	 * @see #getSiteTargetDirectory()
-	 * @deprecated TODO remove if we only move on a per-path level, possibly within or across trees
 	 */
-	@Deprecated
 	public default URIPath relativizeTargetReference(@Nonnull final Path baseTargetPath, @Nonnull final Path referenceTargetPath) {
 		checkArgumentSubPath(getSiteTargetDirectory(), checkArgumentAbsolute(baseTargetPath));
 		checkArgumentSubPath(getSiteTargetDirectory(), checkArgumentAbsolute(referenceTargetPath));
