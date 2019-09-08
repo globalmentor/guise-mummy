@@ -45,7 +45,9 @@ import software.amazon.awssdk.services.s3.model.*;
  */
 public class S3Deployer implements Deployer, Clogged {
 
+	/** The key for the required indication of bucket region in the configuration. */
 	public static final String SITE_CONFIG_KEY_DEPLOYMENT_REGION = "deploy.target.region";
+	/** The key for the required bucket name in the configuration. */
 	public static final String SITE_CONFIG_KEY_DEPLOYMENT_BUCKET = "deploy.target.bucket";
 
 	/**
@@ -100,9 +102,9 @@ public class S3Deployer implements Deployer, Clogged {
 
 	private final Region region;
 
-	/** @return The specified region, if any; missing if the default region should be used (usually configured externally). */
-	public Optional<Region> findRegion() {
-		return Optional.ofNullable(region);
+	/** @return The specified region for deployment. */
+	public Region getRegion() {
+		return region;
 	}
 
 	private final String bucket;
@@ -124,9 +126,11 @@ public class S3Deployer implements Deployer, Clogged {
 	/**
 	 * Context constructor. Retrieves the bucket and optional region from the site configuration.
 	 * @param context The context of static site generation.
+	 * @see #SITE_CONFIG_KEY_DEPLOYMENT_REGION
+	 * @see #SITE_CONFIG_KEY_DEPLOYMENT_BUCKET
 	 */
 	public S3Deployer(@Nonnull final MummyContext context) {
-		this(context.getConfiguration().findString(SITE_CONFIG_KEY_DEPLOYMENT_REGION).map(Region::of).orElse(null),
+		this(Region.of(context.getConfiguration().getString(SITE_CONFIG_KEY_DEPLOYMENT_REGION)),
 				context.getConfiguration().getString(SITE_CONFIG_KEY_DEPLOYMENT_BUCKET));
 	}
 
@@ -140,11 +144,11 @@ public class S3Deployer implements Deployer, Clogged {
 
 	/**
 	 * Region and bucket constructor.
-	 * @param region The AWS region, or <code>null</code> if the default region should be used (usually configured externally).
+	 * @param region The AWS region of deployment.
 	 * @param bucket The bucket into which the site should be deployed.
 	 */
-	public S3Deployer(@Nullable final Region region, @Nonnull String bucket) {
-		this.region = region;
+	public S3Deployer(@Nonnull final Region region, @Nonnull String bucket) {
+		this.region = requireNonNull(region);
 		this.bucket = requireNonNull(bucket);
 		final S3ClientBuilder s3ClientBuilder = S3Client.builder();
 		if(region != null) {
@@ -153,15 +157,9 @@ public class S3Deployer implements Deployer, Clogged {
 		s3Client = s3ClientBuilder.build();
 	}
 
-	/**
-	 * The default region as per the API when accessing a bucket if no region is specified.*
-	 * @see CreateBucketConfiguration.Builder#locationConstraint(String)
-	 */
-	private static final Region SDK_BUCKET_DEFAULT_REGION = Region.US_EAST_1;
-
 	@Override
 	public void prepare(final MummyContext context) throws IOException {
-		getLogger().info("Preparing to deploy to AWS region `{}` S3 bucket `{}`.", findRegion().orElse(SDK_BUCKET_DEFAULT_REGION), bucket);
+		getLogger().info("Preparing to deploy to AWS region `{}` S3 bucket `{}`.", getRegion(), bucket);
 
 		final S3Client s3Client = getS3Client();
 
@@ -175,10 +173,9 @@ public class S3Deployer implements Deployer, Clogged {
 			bucketHasPolicy = bucketHasPolicy(bucket);
 			bucketHasWebsiteConfiguration = bucketHasWebsiteConfiguration(bucket);
 		} else { //create the bucket if it doesn't exist
-			getLogger().info("Creating S3 bucket `{}` in AWS region `{}`.", bucket, findRegion().orElse(SDK_BUCKET_DEFAULT_REGION));
-			final CreateBucketConfiguration.Builder createBucketConfigurationBuilder = CreateBucketConfiguration.builder();
-			findRegion().ifPresent(region -> createBucketConfigurationBuilder.locationConstraint(region.id()));
-			s3Client.createBucket(builder -> builder.bucket(bucket).createBucketConfiguration(createBucketConfigurationBuilder.build()));
+			getLogger().info("Creating S3 bucket `{}` in AWS region `{}`.", bucket, getRegion());
+			final CreateBucketConfiguration createBucketConfiguration = CreateBucketConfiguration.builder().locationConstraint(getRegion().id()).build();
+			s3Client.createBucket(builder -> builder.bucket(bucket).createBucketConfiguration(createBucketConfiguration));
 			bucketHasPolicy = false; //the bucket doesn't have a policy yet, as we just created it
 			bucketHasWebsiteConfiguration = false; //the bucket isn't configured for a web site, because it is new
 		}
@@ -254,7 +251,7 @@ public class S3Deployer implements Deployer, Clogged {
 
 	@Override
 	public Optional<URI> deploy(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact) throws IOException {
-		getLogger().info("Deploying to AWS region `{}` S3 bucket `{}`.", findRegion().orElse(SDK_BUCKET_DEFAULT_REGION), bucket);
+		getLogger().info("Deploying to AWS region `{}` S3 bucket `{}`.", getRegion(), bucket);
 
 		//#plan
 		plan(context, rootArtifact);
@@ -267,7 +264,7 @@ public class S3Deployer implements Deployer, Clogged {
 
 		//TODO catch AwsServiceException, SdkClientException, S3Exception; probably in each lower level; rethrow as I/O exception
 
-		return Optional.of(getBucketWebsiteUrl(getBucket(), findRegion().orElse(SDK_BUCKET_DEFAULT_REGION)));
+		return Optional.of(getBucketWebsiteUrl(getBucket(), getRegion()));
 	}
 
 	/**
