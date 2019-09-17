@@ -192,7 +192,7 @@ public class S3Deployer implements Deployer, Clogged {
 			getLogger().debug("S3 bucket `{}` is already configured for web site access; updating configuration.", bucket);
 		}
 		//TODO use some separate configuration access for the "content name"
-		final boolean isNameBare = context.getConfiguration().findBoolean(CONFIG_KEY_PAGE_NAMES_BARE).orElse(false);
+		final boolean isNameBare = context.getConfiguration().findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);
 		final String indexDocumentSuffix = isNameBare ? "index" : "index.html"; //TODO get from configuration
 		final IndexDocument indexDocument = IndexDocument.builder().suffix(indexDocumentSuffix).build();
 		s3Client.putBucketWebsite(builder -> builder.bucket(bucket).websiteConfiguration(configuration -> configuration.indexDocument(indexDocument).build()));
