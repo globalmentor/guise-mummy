@@ -80,12 +80,26 @@ public class GuiseMummy implements Clogged {
 		INITIALIZE, VALIDATE, PLAN, MUMMIFY, PREPARE_DEPLOY, DEPLOY
 	};
 
-	//site configuration
+	//# configuration
 
-	/** The base filename for the Mummy configuration. */
+	//## site configuration
+
+	/** The configuration for the canonical domain name of the site, such as <code>example.com</code> or <code>www.example.com</code>. */
+	public static final String CONFIG_KEY_SITE_DOMAIN = "site.domain";
+
+	/**
+	 * The configuration for the list of alias domain names of the site, such as <code>www.example.com</code> (as an alias for <code>example.com</code>) or
+	 * <code>example.com</code> (if the canonical domain name is <code>www.example.com</code>).
+	 */
+	public static final String CONFIG_KEY_SITE_ALIASES = "site.aliases";
+
+	//## mummy configuration
+
+	/** The base filename for the Mummy configuration within the source tree. */
 	public static final String MUMMY_CONFIG_BASE_FILENAME = ".guise-mummy";
 
-	public static final String CONFIG_KEY_PAGE_NAMES_BARE = "mummy.pageNamesBare";
+	/** The configuration indicating <code>true</code> if extensions should be removed from page names (i.e. clean URLs) during mummification. */
+	public static final String CONFIG_KEY_MUMMY_PAGE_NAMES_BARE = "mummy.pageNamesBare";
 
 	//mummifier settings
 
@@ -189,7 +203,7 @@ public class GuiseMummy implements Clogged {
 
 		final Context context = new Context(project, mummyConfiguration);
 
-		getLogger().debug("page names bare: {}", context.getConfiguration().findBoolean(CONFIG_KEY_PAGE_NAMES_BARE));
+		getLogger().debug("page names bare: {}", context.getConfiguration().findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE));
 
 		return context;
 	}
