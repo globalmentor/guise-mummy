@@ -124,14 +124,16 @@ public class S3Deployer implements Deployer, Clogged {
 	private final ReverseMap<Artifact, String> artifactKeys = new DecoratorReverseMap<>(new LinkedHashMap<>(), new HashMap<>());
 
 	/**
-	 * Context constructor. Retrieves the bucket and optional region from the site configuration.
+	 * Context constructor. The region is retrieved from {@value #SITE_CONFIG_KEY_DEPLOYMENT_REGION} in the configuration. The bucket name is retrieved from
+	 * {@value #SITE_CONFIG_KEY_DEPLOYMENT_BUCKET} in the configuration, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} if not specified.
 	 * @param context The context of static site generation.
 	 * @see #SITE_CONFIG_KEY_DEPLOYMENT_REGION
 	 * @see #SITE_CONFIG_KEY_DEPLOYMENT_BUCKET
+	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
 	 */
 	public S3Deployer(@Nonnull final MummyContext context) {
 		this(Region.of(context.getConfiguration().getString(SITE_CONFIG_KEY_DEPLOYMENT_REGION)),
-				context.getConfiguration().getString(SITE_CONFIG_KEY_DEPLOYMENT_BUCKET));
+				context.getConfiguration().findString(SITE_CONFIG_KEY_DEPLOYMENT_BUCKET).orElseGet(() -> context.getConfiguration().getString(CONFIG_KEY_SITE_DOMAIN)));
 	}
 
 	/**
