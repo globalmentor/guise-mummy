@@ -40,14 +40,14 @@ import software.amazon.awssdk.services.s3.*;
 import software.amazon.awssdk.services.s3.model.*;
 
 /**
- * Deploys a site to AWS S3.
+ * Deploys a site to <a href="https://aws.amazon.com/s3/">AWS S3</a>.
  * @author Garret Wilson
  */
 public class S3Deployer implements Deployer, Clogged {
 
-	/** The key for the required indication of bucket region in the configuration. */
+	/** The required key for the indication of bucket region in the configuration. */
 	public static final String SITE_CONFIG_KEY_DEPLOYMENT_REGION = "deploy.target.region";
-	/** The key for the required bucket name in the configuration. */
+	/** The key for the bucket name in the configuration; defaults to {@link GuiseMummy#CONFIG_KEY_SITE_DOMAIN}. */
 	public static final String SITE_CONFIG_KEY_DEPLOYMENT_BUCKET = "deploy.target.bucket";
 
 	/**
