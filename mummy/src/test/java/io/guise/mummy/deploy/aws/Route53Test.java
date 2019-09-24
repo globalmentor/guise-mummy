@@ -32,22 +32,22 @@ import io.guise.mummy.GuiseMummy;
  */
 public class Route53Test {
 
-	/*** @see Route53#getConfiguredDomain(Configuration, Configuration) */
+	/*** @see Route53#getConfiguredHostedZoneName(Configuration, Configuration) */
 	@Test
 	public void testHostedZoneUsesDomainConfiguredLocally() {
 		final Configuration globalConfiguration = new ObjectMapConfiguration(
 				Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "test.example.com", GuiseMummy.CONFIG_KEY_SITE_ALIASES, List.of("foo.example.com", "bar.example.com")));
-		final Configuration localConfiguration = new StringMapConfiguration(Map.of(Route53.CONFIG_KEY_DOMAIN, "example.net"));
-		assertThat(Route53.getConfiguredDomain(globalConfiguration, localConfiguration), isPresentAndIs("example.net"));
+		final Configuration localConfiguration = new StringMapConfiguration(Map.of(Route53.CONFIG_KEY_HOSTED_ZONE_NAME, "example.net"));
+		assertThat(Route53.getConfiguredHostedZoneName(globalConfiguration, localConfiguration), isPresentAndIs("example.net"));
 	}
 
-	/*** @see Route53#getConfiguredDomain(Configuration, Configuration) */
+	/*** @see Route53#getConfiguredHostedZoneName(Configuration, Configuration) */
 	@Test
 	public void testHostedZoneDefaultsToSiteBaseDomain() {
 		final Configuration globalConfiguration = new ObjectMapConfiguration(
 				Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "test.example.com", GuiseMummy.CONFIG_KEY_SITE_ALIASES, List.of("foo.example.com", "bar.example.com")));
 		final Configuration localConfiguration = Configuration.empty();
-		assertThat(Route53.getConfiguredDomain(globalConfiguration, localConfiguration), isPresentAndIs("example.com"));
+		assertThat(Route53.getConfiguredHostedZoneName(globalConfiguration, localConfiguration), isPresentAndIs("example.com."));
 	}
 
 }
