@@ -22,6 +22,7 @@ import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
+import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.*;
 import java.net.URI;
@@ -33,10 +34,9 @@ import javax.annotation.*;
 
 import io.clogr.Clogged;
 import io.confound.config.*;
-import io.confound.config.file.FileSystemConfigurationManager;
-import io.confound.config.file.ResourcesConfigurationManager;
-import io.guise.mummy.deploy.Deployer;
-import io.guise.mummy.deploy.aws.S3Deployer;
+import io.confound.config.file.*;
+import io.guise.mummy.deploy.*;
+import io.guise.mummy.deploy.aws.*;
 import io.urf.model.UrfResourceDescription;
 import io.urf.turf.TurfSerializer;
 
@@ -100,6 +100,11 @@ public class GuiseMummy implements Clogged {
 
 	/** The configuration indicating <code>true</code> if extensions should be removed from page names (i.e. clean URLs) during mummification. */
 	public static final String CONFIG_KEY_MUMMY_PAGE_NAMES_BARE = "mummy.pageNamesBare";
+
+	//## deploy configuration
+
+	/** The configuration indicating the DNS to use, if any, for deployment. Must be a {@link Section} indicating a {@link Dns}. */
+	public static final String CONFIG_KEY_DEPLOY_DNS = "deploy.dns";
 
 	//mummifier settings
 
@@ -170,6 +175,18 @@ public class GuiseMummy implements Clogged {
 
 			//#deploy phase
 			if(phase.compareTo(LifeCyclePhase.PREPARE_DEPLOY) >= 0) {
+
+				final Optional<Dns> optionalDns = context.getConfiguration().findSection(CONFIG_KEY_DEPLOY_DNS).map(dnsConfiguration -> {
+					final String dnsType = dnsConfiguration.getSectionType().orElseThrow(() -> new ConfigurationException("No DNS type configured."));
+					if(!dnsType.equals(Route53.class.getSimpleName())) {
+						throw new ConfigurationException(String.format("Currently only Route 53 DNS is supported; unknown type `%s`.", dnsType));
+					}
+					return new Route53(context, dnsConfiguration);
+				});
+
+				optionalDns.ifPresent(throwingConsumer(dns -> dns.prepare(context))); //prepare the DNS
+
+				//TODO fix for multiple targets
 				final Deployer deployer = new S3Deployer(context);
 				deployer.prepare(context);
 				if(phase.compareTo(LifeCyclePhase.DEPLOY) >= 0) {
