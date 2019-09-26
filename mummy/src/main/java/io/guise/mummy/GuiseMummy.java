@@ -176,15 +176,17 @@ public class GuiseMummy implements Clogged {
 			//#deploy phase
 			if(phase.compareTo(LifeCyclePhase.PREPARE_DEPLOY) >= 0) {
 
-				final Optional<Dns> optionalDns = context.getConfiguration().findSection(CONFIG_KEY_DEPLOY_DNS).map(dnsConfiguration -> {
+				//configure DNS
+				context.getConfiguration().findSection(CONFIG_KEY_DEPLOY_DNS).map(dnsConfiguration -> {
 					final String dnsType = dnsConfiguration.getSectionType().orElseThrow(() -> new ConfigurationException("No DNS type configured."));
 					if(!dnsType.equals(Route53.class.getSimpleName())) {
 						throw new ConfigurationException(String.format("Currently only Route 53 DNS is supported; unknown type `%s`.", dnsType));
 					}
 					return new Route53(context, dnsConfiguration);
-				});
-
-				optionalDns.ifPresent(throwingConsumer(dns -> dns.prepare(context))); //prepare the DNS
+				}).ifPresent(throwingConsumer(dns -> {
+					dns.prepare(context); //prepare the DNS
+					context.setDeployDns(dns); //store the DNS in the context for later
+				}));
 
 				//TODO fix for multiple targets
 				final Deployer deployer = new S3Deployer(context);
@@ -404,6 +406,23 @@ public class GuiseMummy implements Clogged {
 		@Override
 		public Configuration getConfiguration() {
 			return siteConfiguration;
+		}
+
+		//## deploy
+
+		private Dns deployDns = null;
+
+		/**
+		 * Sets the DNS configured for deployment.
+		 * @param deployDns The DNS to use for deployment.
+		 */
+		protected void setDeployDns(@Nonnull final Dns deployDns) {
+			this.deployDns = requireNonNull(deployDns);
+		}
+
+		@Override
+		public Optional<Dns> getDeployDns() {
+			return Optional.ofNullable(deployDns);
 		}
 
 		/**
