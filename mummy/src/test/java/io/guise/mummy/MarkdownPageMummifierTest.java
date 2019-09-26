@@ -35,6 +35,7 @@ import org.junit.jupiter.api.*;
 import org.w3c.dom.*;
 
 import io.confound.config.Configuration;
+import io.guise.mummy.deploy.Dns;
 
 /**
  * Tests of {@link MarkdownPageMummifier}.
@@ -77,6 +78,12 @@ public class MarkdownPageMummifierTest {
 			public Optional<SourcePathMummifier> findRegisteredMummifierForSourceDirectory(Path sourceDirectory) {
 				return Optional.empty();
 			}
+
+			@Override
+			public Optional<Dns> getDeployDns() {
+				return Optional.empty();
+			}
+
 		};
 	}
 

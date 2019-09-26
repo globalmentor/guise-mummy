@@ -223,6 +223,36 @@ public class GuiseCli extends BaseCliApplication {
 		}
 	}
 
+	@Command(name = "prepare-deploy", description = "Prepares to deploys a site after generating a static version, but does not actually deploy the site.")
+	public void prepareDeploy(
+			@Parameters(paramLabel = "<project>", description = "The base directory of the project to deploy.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path argProjectDirectory,
+			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
+			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
+			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
+			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
+
+		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
+
+		printAppInfo();
+
+		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
+
+		final GuiseMummy mummifier = new GuiseMummy();
+		try {
+			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
+					argSiteDescriptionTargetDirectory);
+
+			System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Prepare Deploy...").reset());
+			logProjectInfo(project);
+
+			mummifier.mummify(project, GuiseMummy.LifeCyclePhase.PREPARE_DEPLOY);
+		} catch(final IllegalArgumentException | IOException exception) {
+			getLogger().error("{}", exception.getMessage());
+			getLogger().debug("{}", exception.getMessage(), exception);
+			return; //TODO improve error handling
+		}
+	}
+
 	@Command(description = "Deploys a site after generating a static version.")
 	public void deploy(
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project to deploy.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path argProjectDirectory,
@@ -266,7 +296,6 @@ public class GuiseCli extends BaseCliApplication {
 				}
 			});
 		}
-
 	}
 
 	/** The relative path of the server base directory; meant to be used in conjunction with the temporary directory. */
