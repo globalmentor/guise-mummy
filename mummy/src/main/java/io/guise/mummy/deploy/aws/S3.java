@@ -31,7 +31,7 @@ import com.globalmentor.text.StringTemplate;
 
 import io.clogr.Clogged;
 import io.guise.mummy.*;
-import io.guise.mummy.deploy.Deployer;
+import io.guise.mummy.deploy.DeployTarget;
 import io.urf.vocab.content.Content;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -43,7 +43,7 @@ import software.amazon.awssdk.services.s3.model.*;
  * Deploys a site to <a href="https://aws.amazon.com/s3/">AWS S3</a>.
  * @author Garret Wilson
  */
-public class S3Deployer implements Deployer, Clogged {
+public class S3 implements DeployTarget, Clogged {
 
 	/** The required key for the indication of bucket region in the configuration. */
 	public static final String SITE_CONFIG_KEY_DEPLOYMENT_REGION = "deploy.target.region";
@@ -131,7 +131,7 @@ public class S3Deployer implements Deployer, Clogged {
 	 * @see #SITE_CONFIG_KEY_DEPLOYMENT_BUCKET
 	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
 	 */
-	public S3Deployer(@Nonnull final MummyContext context) {
+	public S3(@Nonnull final MummyContext context) {
 		this(Region.of(context.getConfiguration().getString(SITE_CONFIG_KEY_DEPLOYMENT_REGION)),
 				context.getConfiguration().findString(SITE_CONFIG_KEY_DEPLOYMENT_BUCKET).orElseGet(() -> context.getConfiguration().getString(CONFIG_KEY_SITE_DOMAIN)));
 	}
@@ -140,7 +140,7 @@ public class S3Deployer implements Deployer, Clogged {
 	 * Bucket constructor. The default region will be used (usually configured externally).
 	 * @param bucket The bucket into which the site should be deployed.
 	 */
-	public S3Deployer(@Nonnull String bucket) {
+	public S3(@Nonnull String bucket) {
 		this(null, bucket);
 	}
 
@@ -149,7 +149,7 @@ public class S3Deployer implements Deployer, Clogged {
 	 * @param region The AWS region of deployment.
 	 * @param bucket The bucket into which the site should be deployed.
 	 */
-	public S3Deployer(@Nonnull final Region region, @Nonnull String bucket) {
+	public S3(@Nonnull final Region region, @Nonnull String bucket) {
 		this.region = requireNonNull(region);
 		this.bucket = requireNonNull(bucket);
 		final S3ClientBuilder s3ClientBuilder = S3Client.builder();

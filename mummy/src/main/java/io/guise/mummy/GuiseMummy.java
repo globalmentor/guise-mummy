@@ -189,7 +189,7 @@ public class GuiseMummy implements Clogged {
 				}));
 
 				//TODO fix for multiple targets
-				final Deployer deployer = new S3Deployer(context);
+				final DeployTarget deployer = new S3(context);
 				deployer.prepare(context);
 				if(phase.compareTo(LifeCyclePhase.DEPLOY) >= 0) {
 					final Optional<URI> deployUrl = deployer.deploy(context, rootArtifact);
