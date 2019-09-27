@@ -48,8 +48,12 @@ public class S3 implements DeployTarget, Clogged {
 
 	/** The section relative key for the indication of bucket region in the configuration. */
 	public static final String CONFIG_KEY_REGION = "region";
-	/** The section relative for the bucket name in the configuration; defaults to {@link GuiseMummy#CONFIG_KEY_SITE_DOMAIN} in the global configuraiton. */
+	/** The section relative key for the bucket name in the configuration; defaults to {@link GuiseMummy#CONFIG_KEY_SITE_DOMAIN} in the global configuration. */
 	public static final String CONFIG_KEY_BUCKET = "bucket";
+	/**
+	 * The section relative key for the bucket aliases in the configuration; defaults to {@link GuiseMummy#CONFIG_KEY_SITE_ALIASES} in the global configuration.
+	 */
+	public static final String CONFIG_KEY_ALIASES = "aliases";
 
 	/**
 	 * String template for a bucket web site URL, with the following string parameters:
@@ -115,6 +119,13 @@ public class S3 implements DeployTarget, Clogged {
 		return bucket;
 	}
 
+	private final Set<String> aliases;
+
+	/** @return The S3 buckets, if any, to serve as aliases and redirect to the primary bucket. */
+	public Set<String> getAliases() {
+		return aliases;
+	}
+
 	private final S3Client s3Client;
 
 	/** @return The client for connecting to S3. */
@@ -128,50 +139,44 @@ public class S3 implements DeployTarget, Clogged {
 	 * Configuration constructor.
 	 * <p>
 	 * The region is retrieved from {@value #CONFIG_KEY_REGION} in the local configuration. The bucket name is retrieved from {@value #CONFIG_KEY_BUCKET} in the
-	 * local configuration, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} in the context configuration if not specified.
+	 * local configuration, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} in the context configuration if not specified. The bucket aliases are
+	 * retrieved from {@value #CONFIG_KEY_ALIASES}, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_ALIASES} in the context configuration if not specified.
 	 * </p>
 	 * @param context The context of static site generation.
 	 * @param localConfiguration The local configuration for this deployment target, which may be a section of the project configuration.
 	 * @see #CONFIG_KEY_REGION
 	 * @see #CONFIG_KEY_BUCKET
+	 * @see #CONFIG_KEY_ALIASES
 	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
+	 * @see GuiseMummy#CONFIG_KEY_SITE_ALIASES
 	 */
 	public S3(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
 		this(Region.of(localConfiguration.getString(CONFIG_KEY_REGION)),
-				localConfiguration.findString(CONFIG_KEY_BUCKET).orElseGet(() -> context.getConfiguration().getString(CONFIG_KEY_SITE_DOMAIN)));
+				localConfiguration.findString(CONFIG_KEY_BUCKET).orElseGet(() -> context.getConfiguration().getString(CONFIG_KEY_SITE_DOMAIN)), localConfiguration
+						.findCollection(CONFIG_KEY_ALIASES, String.class).orElseGet(() -> context.getConfiguration().getCollection(CONFIG_KEY_SITE_ALIASES, String.class)));
 	}
 
 	/**
-	 * Bucket constructor. The default region will be used (usually configured externally).
-	 * @param bucket The bucket into which the site should be deployed.
-	 */
-	public S3(@Nonnull String bucket) {
-		this(null, bucket);
-	}
-
-	/**
-	 * Region and bucket constructor.
+	 * Region, bucket, and aliases constructor. The aliases will be stored as a set.
 	 * @param region The AWS region of deployment.
 	 * @param bucket The bucket into which the site should be deployed.
+	 * @param aliases The bucket aliases, if any, to redirect to the primary bucket.
 	 */
-	public S3(@Nonnull final Region region, @Nonnull String bucket) {
+	public S3(@Nonnull final Region region, @Nonnull String bucket, @Nonnull final Collection<String> aliases) {
 		this.region = requireNonNull(region);
 		this.bucket = requireNonNull(bucket);
-		final S3ClientBuilder s3ClientBuilder = S3Client.builder();
-		if(region != null) {
-			s3ClientBuilder.region(region);
-		}
-		s3Client = s3ClientBuilder.build();
+		this.aliases = new LinkedHashSet<>(aliases); //maintain order to help with reporting and debugging
+		s3Client = S3Client.builder().region(region).build();
 	}
 
 	@Override
 	public void prepare(final MummyContext context) throws IOException {
-		getLogger().info("Preparing to deploy to AWS region `{}` S3 bucket `{}`.", getRegion(), bucket);
-
 		final S3Client s3Client = getS3Client();
 
-		//create bucket
+		//prepare bucket
 		final String bucket = getBucket();
+		final Region region = getRegion();
+		getLogger().info("Preparing AWS S3 bucket `{}` in region `{}` for deployment.", bucket, region);
 		final boolean bucketExists = bucketExists(bucket);
 		getLogger().debug("Bucket `{}` exists? {}.", bucket, bucketExists);
 		final boolean bucketHasPolicy;
@@ -180,9 +185,8 @@ public class S3 implements DeployTarget, Clogged {
 			bucketHasPolicy = bucketHasPolicy(bucket);
 			bucketHasWebsiteConfiguration = bucketHasWebsiteConfiguration(bucket);
 		} else { //create the bucket if it doesn't exist
-			getLogger().info("Creating S3 bucket `{}` in AWS region `{}`.", bucket, getRegion());
-			final CreateBucketConfiguration createBucketConfiguration = CreateBucketConfiguration.builder().locationConstraint(getRegion().id()).build();
-			s3Client.createBucket(builder -> builder.bucket(bucket).createBucketConfiguration(createBucketConfiguration));
+			getLogger().info("Creating S3 bucket `{}` in AWS region `{}`.", bucket, region);
+			s3Client.createBucket(request -> request.bucket(bucket).createBucketConfiguration(config -> config.locationConstraint(region.id())));
 			bucketHasPolicy = false; //the bucket doesn't have a policy yet, as we just created it
 			bucketHasWebsiteConfiguration = false; //the bucket isn't configured for a web site, because it is new
 		}
@@ -190,7 +194,7 @@ public class S3 implements DeployTarget, Clogged {
 		//set bucket policy
 		if(!bucketHasPolicy) { //if the bucket doesn't already have a policy (leave any existing policy alone)
 			getLogger().info("Setting policy of S3 bucket `{}` to public.", bucket);
-			s3Client.putBucketPolicy(builder -> builder.bucket(bucket).policy(POLICY_TEMPLATE_PUBLIC_READ_GET_OBJECT.apply(bucket)));
+			s3Client.putBucketPolicy(request -> request.bucket(bucket).policy(POLICY_TEMPLATE_PUBLIC_READ_GET_OBJECT.apply(bucket)));
 		}
 
 		//configure bucket for web site
@@ -202,7 +206,31 @@ public class S3 implements DeployTarget, Clogged {
 		final boolean isNameBare = context.getConfiguration().findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);
 		final String indexDocumentSuffix = isNameBare ? "index" : "index.html"; //TODO get from configuration
 		final IndexDocument indexDocument = IndexDocument.builder().suffix(indexDocumentSuffix).build();
-		s3Client.putBucketWebsite(builder -> builder.bucket(bucket).websiteConfiguration(configuration -> configuration.indexDocument(indexDocument).build()));
+		s3Client.putBucketWebsite(request -> request.bucket(bucket).websiteConfiguration(config -> config.indexDocument(indexDocument)));
+
+		//prepare alias buckets
+		for(final String alias : getAliases()) {
+			getLogger().info("Preparing AWS S3 bucket `{}` in region `{}` to serve as an alias.", alias, region);
+
+			final boolean aliasBucketExists = bucketExists(alias);
+			getLogger().debug("Alias bucket `{}` exists? {}.", alias, aliasBucketExists);
+			final boolean aliasBucketHasWebsiteConfiguration;
+			if(aliasBucketExists) { //if the bucket exists, see if it has a configuration
+				aliasBucketHasWebsiteConfiguration = bucketHasWebsiteConfiguration(alias);
+			} else { //create the bucket if it doesn't exist
+				getLogger().info("Creating S3 alias bucket `{}` in AWS region `{}`.", alias, region);
+				s3Client.createBucket(request -> request.bucket(alias).createBucketConfiguration(config -> config.locationConstraint(region.id())));
+				aliasBucketHasWebsiteConfiguration = false; //the bucket isn't configured for a web site, because it is new
+			}
+
+			//configure alias bucket for web site
+			getLogger().info("Configuring S3 alias bucket `{}` for web site redirection.", alias);
+			if(aliasBucketHasWebsiteConfiguration) {
+				getLogger().debug("S3 alias bucket `{}` is already configured for web site access; updating configuration.", alias);
+			}
+			s3Client.putBucketWebsite(
+					builder -> builder.bucket(alias).websiteConfiguration(config -> config.redirectAllRequestsTo(redirect -> redirect.hostName(bucket))));
+		}
 	}
 
 	/**
