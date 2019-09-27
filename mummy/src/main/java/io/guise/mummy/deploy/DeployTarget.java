@@ -28,7 +28,7 @@ import io.guise.mummy.*;
  * A strategy for deploying a site to some other location such as a server.
  * @author Garret Wilson
  */
-public interface Deployer {
+public interface DeployTarget {
 
 	/**
 	 * Prepares for deploying a site. This may include configuring a server, for example.

@@ -84,9 +84,10 @@ public class Route53 implements Dns, Clogged {
 	/**
 	 * Configuration constructor.
 	 * <p>
-	 * The hosted zone ID is retrieved from {@value #CONFIG_KEY_HOSTED_ZONE_ID}, if present. The domain is retrieved from {@value #CONFIG_KEY_HOSTED_ZONE_NAME} in
-	 * the local configuration; if not specified it falls back to the greatest common DNS suffix of {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and
-	 * {@value GuiseMummy#CONFIG_KEY_SITE_ALIASES} of the context configuration, with a domain delimiter <code>.</code> appended.
+	 * The hosted zone ID is retrieved from {@value #CONFIG_KEY_HOSTED_ZONE_ID} in the local configuration, if present. The domain is retrieved from
+	 * {@value #CONFIG_KEY_HOSTED_ZONE_NAME} in the local configuration; if not specified it falls back to the greatest common DNS suffix of
+	 * {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and {@value GuiseMummy#CONFIG_KEY_SITE_ALIASES} of the context configuration, with a domain delimiter
+	 * <code>.</code> appended.
 	 * </p>
 	 * @param context The context of static site generation.
 	 * @param localConfiguration The local configuration for the Route 53 DNS, which may be a section of the project configuration.
