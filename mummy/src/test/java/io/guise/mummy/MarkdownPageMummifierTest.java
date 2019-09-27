@@ -24,8 +24,7 @@ import static com.globalmentor.xml.XmlDom.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -35,7 +34,7 @@ import org.junit.jupiter.api.*;
 import org.w3c.dom.*;
 
 import io.confound.config.Configuration;
-import io.guise.mummy.deploy.Dns;
+import io.guise.mummy.deploy.*;
 
 /**
  * Tests of {@link MarkdownPageMummifier}.
@@ -81,6 +80,11 @@ public class MarkdownPageMummifierTest {
 
 			@Override
 			public Optional<Dns> getDeployDns() {
+				return Optional.empty();
+			}
+
+			@Override
+			public Optional<List<DeployTarget>> getDeployTargets() {
 				return Optional.empty();
 			}
 

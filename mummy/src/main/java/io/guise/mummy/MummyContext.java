@@ -35,7 +35,7 @@ import javax.xml.parsers.DocumentBuilder;
 import com.globalmentor.net.URIPath;
 
 import io.confound.config.Configuration;
-import io.guise.mummy.deploy.Dns;
+import io.guise.mummy.deploy.*;
 
 /**
  * Provides information about context of static site generation.
@@ -440,7 +440,14 @@ public interface MummyContext {
 	/**
 	 * Returns the DNS configured for deployment. Any configured DNS will not be available until preparation for deployment, but is guaranteed to be available, if
 	 * configured, before targets are prepared for deployment.
-	 * @return The DNS configured for deployment, if any.
+	 * @return The DNS configured for deployment, if any; will not be present before deployment preparation.
 	 */
 	public Optional<Dns> getDeployDns();
+
+	/**
+	 * Returns the targets configured for deployment. The targets will not be available until preparation for deployment.
+	 * @return The targets configured for deployment, if any; will not be present before deployment preparation.
+	 */
+	public Optional<List<DeployTarget>> getDeployTargets();
+
 }

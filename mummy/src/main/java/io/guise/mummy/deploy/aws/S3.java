@@ -30,6 +30,7 @@ import com.globalmentor.net.*;
 import com.globalmentor.text.StringTemplate;
 
 import io.clogr.Clogged;
+import io.confound.config.Configuration;
 import io.guise.mummy.*;
 import io.guise.mummy.deploy.DeployTarget;
 import io.urf.vocab.content.Content;
@@ -45,10 +46,10 @@ import software.amazon.awssdk.services.s3.model.*;
  */
 public class S3 implements DeployTarget, Clogged {
 
-	/** The required key for the indication of bucket region in the configuration. */
-	public static final String SITE_CONFIG_KEY_DEPLOYMENT_REGION = "deploy.target.region";
-	/** The key for the bucket name in the configuration; defaults to {@link GuiseMummy#CONFIG_KEY_SITE_DOMAIN}. */
-	public static final String SITE_CONFIG_KEY_DEPLOYMENT_BUCKET = "deploy.target.bucket";
+	/** The section relative key for the indication of bucket region in the configuration. */
+	public static final String CONFIG_KEY_REGION = "region";
+	/** The section relative for the bucket name in the configuration; defaults to {@link GuiseMummy#CONFIG_KEY_SITE_DOMAIN} in the global configuraiton. */
+	public static final String CONFIG_KEY_BUCKET = "bucket";
 
 	/**
 	 * String template for a bucket web site URL, with the following string parameters:
@@ -124,16 +125,20 @@ public class S3 implements DeployTarget, Clogged {
 	private final ReverseMap<Artifact, String> artifactKeys = new DecoratorReverseMap<>(new LinkedHashMap<>(), new HashMap<>());
 
 	/**
-	 * Context constructor. The region is retrieved from {@value #SITE_CONFIG_KEY_DEPLOYMENT_REGION} in the configuration. The bucket name is retrieved from
-	 * {@value #SITE_CONFIG_KEY_DEPLOYMENT_BUCKET} in the configuration, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} if not specified.
+	 * Configuration constructor.
+	 * <p>
+	 * The region is retrieved from {@value #CONFIG_KEY_REGION} in the local configuration. The bucket name is retrieved from {@value #CONFIG_KEY_BUCKET} in the
+	 * local configuration, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} in the context configuration if not specified.
+	 * </p>
 	 * @param context The context of static site generation.
-	 * @see #SITE_CONFIG_KEY_DEPLOYMENT_REGION
-	 * @see #SITE_CONFIG_KEY_DEPLOYMENT_BUCKET
+	 * @param localConfiguration The local configuration for this deployment target, which may be a section of the project configuration.
+	 * @see #CONFIG_KEY_REGION
+	 * @see #CONFIG_KEY_BUCKET
 	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
 	 */
-	public S3(@Nonnull final MummyContext context) {
-		this(Region.of(context.getConfiguration().getString(SITE_CONFIG_KEY_DEPLOYMENT_REGION)),
-				context.getConfiguration().findString(SITE_CONFIG_KEY_DEPLOYMENT_BUCKET).orElseGet(() -> context.getConfiguration().getString(CONFIG_KEY_SITE_DOMAIN)));
+	public S3(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
+		this(Region.of(localConfiguration.getString(CONFIG_KEY_REGION)),
+				localConfiguration.findString(CONFIG_KEY_BUCKET).orElseGet(() -> context.getConfiguration().getString(CONFIG_KEY_SITE_DOMAIN)));
 	}
 
 	/**

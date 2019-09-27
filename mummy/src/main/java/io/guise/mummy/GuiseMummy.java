@@ -26,8 +26,7 @@ import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.*;
 import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.*;
 
 import javax.annotation.*;
@@ -105,6 +104,8 @@ public class GuiseMummy implements Clogged {
 
 	/** The configuration indicating the DNS to use, if any, for deployment. Must be a {@link Section} indicating a {@link Dns}. */
 	public static final String CONFIG_KEY_DEPLOY_DNS = "deploy.dns";
+	/** The configuration indicating the deployment targets, if any. Must be a collection of {@link Section} each indicating a {@link DeployTarget}. */
+	public static final String CONFIG_KEY_DEPLOY_TARGETS = "deploy.targets";
 
 	//mummifier settings
 
@@ -152,49 +153,62 @@ public class GuiseMummy implements Clogged {
 	 */
 	public void mummify(@Nonnull final GuiseProject project, @Nonnull final LifeCyclePhase phase) throws IOException {
 
-		//#initialize phase
+		//# initialize phase
 		final Context context = initialize(project); //the initialize phase must always occur
 
-		//#validate phase
+		//# validate phase
 		if(phase.compareTo(LifeCyclePhase.VALIDATE) >= 0) {
 			validate(context);
 		}
 
-		//#plan phase
+		//# plan phase
 		if(phase.compareTo(LifeCyclePhase.PLAN) >= 0) {
 			final Artifact rootArtifact = new DirectoryMummifier().plan(context, context.getSiteSourceDirectory()); //TODO create special SiteMummifier extending DirectoryMummifier
 			context.updatePlan(rootArtifact);
 
 			printArtifactDescription(context, rootArtifact);
 
-			//#mummify phase
+			//# mummify phase
 			if(phase.compareTo(LifeCyclePhase.MUMMIFY) >= 0) {
 				rootArtifact.getMummifier().mummify(context, rootArtifact);
 				generateSiteDescription(context, rootArtifact);
 			}
 
-			//#deploy phase
+			//# prepare-deploy phase
 			if(phase.compareTo(LifeCyclePhase.PREPARE_DEPLOY) >= 0) {
 
-				//configure DNS
-				context.getConfiguration().findSection(CONFIG_KEY_DEPLOY_DNS).map(dnsConfiguration -> {
+				//configured DNS
+				final Optional<Dns> deployDns = context.getConfiguration().findSection(CONFIG_KEY_DEPLOY_DNS).map(dnsConfiguration -> {
 					final String dnsType = dnsConfiguration.getSectionType().orElseThrow(() -> new ConfigurationException("No DNS type configured."));
-					if(!dnsType.equals(Route53.class.getSimpleName())) {
-						throw new ConfigurationException(String.format("Currently only Route 53 DNS is supported; unknown type `%s`.", dnsType));
-					}
+					Configuration.check(dnsType.equals(Route53.class.getSimpleName()), "Currently only Route 53 DNS is supported; unknown type `%s`.", dnsType);
 					return new Route53(context, dnsConfiguration);
-				}).ifPresent(throwingConsumer(dns -> {
-					dns.prepare(context); //prepare the DNS
-					context.setDeployDns(dns); //store the DNS in the context for later
-				}));
+				});
+				deployDns.ifPresent(context::setDeployDns); //store the DNS in the context for later
 
-				//TODO fix for multiple targets
-				final DeployTarget deployer = new S3(context);
-				deployer.prepare(context);
+				//configured targets
+				final List<DeployTarget> deployTargets = context.getConfiguration().findCollection(CONFIG_KEY_DEPLOY_TARGETS, Section.class).map(targetSections -> {
+					return targetSections.stream().map(targetSection -> {
+						final String targetType = targetSection.getSectionType().orElseThrow(() -> new ConfigurationException("Target has no type configured."));
+						Configuration.check(targetType.equals(S3.class.getSimpleName()), "Currently only S3 targets are supported; unknown type `%s`.", targetType);
+						final DeployTarget target = new S3(context, targetSection);
+						return target;
+					}).collect(toList());
+				}).orElse(emptyList());
+				context.setDeployTargets(deployTargets); //store the targets in the context for later
+
+				deployDns.ifPresent(throwingConsumer(dns -> {
+					dns.prepare(context); //prepare the DNS
+				}));
+				deployTargets.forEach(throwingConsumer(target -> target.prepare(context))); //prepare the targets
+
+				//# deploy phase
 				if(phase.compareTo(LifeCyclePhase.DEPLOY) >= 0) {
-					final Optional<URI> deployUrl = deployer.deploy(context, rootArtifact);
-					deployUrl.ifPresent(deployUrls::add);
-					getLogger().info("Successfully deployed site to {}.", deployUrl.map(url -> "<" + url + ">").orElse("target"));
+					for(final DeployTarget target : deployTargets) {
+						final Optional<URI> deployUrl = target.deploy(context, rootArtifact);
+						deployUrl.ifPresent(deployUrls::add);
+						getLogger().info("({}) Successfully deployed site to {}.", target.getClass().getSimpleName(),
+								deployUrl.map(url -> "<" + url + ">").orElse("target"));
+					}
 				}
 			}
 		}
@@ -423,6 +437,21 @@ public class GuiseMummy implements Clogged {
 		@Override
 		public Optional<Dns> getDeployDns() {
 			return Optional.ofNullable(deployDns);
+		}
+
+		private List<DeployTarget> deployTargets = null;
+
+		/**
+		 * Sets the targets configured for deployment.
+		 * @param deployTargets The deployment targets.
+		 */
+		protected void setDeployTargets(@Nonnull final List<DeployTarget> deployTargets) {
+			this.deployTargets = requireNonNull(deployTargets);
+		}
+
+		@Override
+		public Optional<List<DeployTarget>> getDeployTargets() {
+			return Optional.ofNullable(deployTargets);
 		}
 
 		/**
