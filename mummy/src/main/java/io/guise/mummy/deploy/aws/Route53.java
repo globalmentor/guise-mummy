@@ -177,8 +177,8 @@ public class Route53 implements Dns, Clogged {
 				context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALIASES, String.class)
 						.ifPresent(siteAliases -> commentStringBuilder.append(" with aliases ").append(siteAliases)); //i18n
 				commentStringBuilder.append("."); //i18n
-				hostedZone = client.createHostedZone(builder -> builder.name(configuredHostedZoneName).callerReference(UUID.randomUUID().toString())
-						.hostedZoneConfig(configBuilder -> configBuilder.comment(commentStringBuilder.toString()))).hostedZone();
+				hostedZone = client.createHostedZone(request -> request.name(configuredHostedZoneName).callerReference(UUID.randomUUID().toString())
+						.hostedZoneConfig(config -> config.comment(commentStringBuilder.toString()))).hostedZone();
 				logger.debug("Created Route 53 public hosted zone with ID `{}` for name `{}`.", hostedZone.id(), hostedZone.name());
 			}
 		}
@@ -272,13 +272,13 @@ public class Route53 implements Dns, Clogged {
 	protected static Stream<ResourceRecordSet> resourceRecordSets(@Nonnull final Route53Client client, @Nonnull final String hostedZoneId,
 			@Nullable final String startRecordName, @Nullable final RRType startRecordType) {
 		requireNonNull(hostedZoneId);
-		return client.listResourceRecordSetsPaginator(builder -> {
-			builder.hostedZoneId(hostedZoneId);
+		return client.listResourceRecordSetsPaginator(request -> {
+			request.hostedZoneId(hostedZoneId);
 			if(startRecordName != null) {
-				builder.startRecordName(startRecordName);
+				request.startRecordName(startRecordName);
 			}
 			if(startRecordType != null) { //AWS will check if a type is given with no name
-				builder.startRecordType(startRecordType);
+				request.startRecordType(startRecordType);
 			}
 		}).stream().flatMap(response -> response.resourceRecordSets().stream());
 	}
