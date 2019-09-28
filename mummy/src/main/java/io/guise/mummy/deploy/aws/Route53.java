@@ -197,33 +197,31 @@ public class Route53 implements Dns, Clogged {
 	//## hosted zones
 
 	/**
-	 * Retrieves a stream of all hosted zones with a given name.
+	 * Retrieves all hosted zones with a given ID.
 	 * @implSpec This implementation delegates to {@link #hostedZones(Route53Client)}.
 	 * @param client The client to use for retrieving the zones.
 	 * @param id The ID of the hosted zone to retrieve; <em>needs to end with a domain delimiter <code>.</code></em>.
-	 * @return A stream of all hosted zones with the given ID.
+	 * @return A set of all hosted zones with the given ID.
 	 * @see HostedZone#id()
 	 */
 	protected static Set<HostedZone> getHostedZonesById(@Nonnull final Route53Client client, @Nonnull final String id) {
 		requireNonNull(id);
-		try (final Stream<HostedZone> hostedZonesByName = client.listHostedZonesPaginator().stream().flatMap(response -> response.hostedZones().stream())
-				.filter(hostedZone -> hostedZone.id().equals(id))) {
+		try (final Stream<HostedZone> hostedZonesByName = hostedZones(client).filter(hostedZone -> hostedZone.id().equals(id))) {
 			return hostedZonesByName.collect(toSet());
 		}
 	}
 
 	/**
-	 * Retrieves a stream of all hosted zones with a given name.
+	 * Retrieves all hosted zones with a given name.
 	 * @implSpec This implementation delegates to {@link #hostedZones(Route53Client)}.
 	 * @param client The client to use for retrieving the zones.
 	 * @param name The name of the hosted zone to retrieve; <em>needs to end with a domain delimiter <code>.</code></em>.
-	 * @return A stream of all hosted zones with the given name.
+	 * @return A set of all hosted zones with the given name.
 	 * @see HostedZone#name()
 	 */
 	protected static Set<HostedZone> getHostedZonesByName(@Nonnull final Route53Client client, @Nonnull final String name) {
 		requireNonNull(name);
-		try (final Stream<HostedZone> hostedZonesByName = client.listHostedZonesPaginator().stream().flatMap(response -> response.hostedZones().stream())
-				.filter(hostedZone -> hostedZone.name().equals(name))) {
+		try (final Stream<HostedZone> hostedZonesByName = hostedZones(client).filter(hostedZone -> hostedZone.name().equals(name))) {
 			return hostedZonesByName.collect(toSet());
 		}
 	}

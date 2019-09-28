@@ -189,8 +189,14 @@ public class GuiseMummy implements Clogged {
 				final List<DeployTarget> deployTargets = context.getConfiguration().findCollection(CONFIG_KEY_DEPLOY_TARGETS, Section.class).map(targetSections -> {
 					return targetSections.stream().map(targetSection -> {
 						final String targetType = targetSection.getSectionType().orElseThrow(() -> new ConfigurationException("Target has no type configured."));
-						Configuration.check(targetType.equals(S3.class.getSimpleName()), "Currently only S3 targets are supported; unknown type `%s`.", targetType);
-						final DeployTarget target = new S3(context, targetSection);
+						final DeployTarget target;
+						if(targetType.equals(CloudFront.class.getSimpleName())) {
+							target = new CloudFront(context, targetSection);
+						} else if(targetType.equals(S3.class.getSimpleName())) {
+							target = new S3(context, targetSection);
+						} else {
+							throw new ConfigurationException(String.format("Unknown deployment target type: `%s`.", targetType));
+						}
 						return target;
 					}).collect(toList());
 				}).orElse(emptyList());

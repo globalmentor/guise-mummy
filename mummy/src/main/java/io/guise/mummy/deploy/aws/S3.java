@@ -17,6 +17,7 @@
 package io.guise.mummy.deploy.aws;
 
 import static io.guise.mummy.GuiseMummy.*;
+import static java.util.Collections.emptyList;
 import static java.util.Objects.*;
 
 import java.io.IOException;
@@ -152,8 +153,9 @@ public class S3 implements DeployTarget, Clogged {
 	 */
 	public S3(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
 		this(Region.of(localConfiguration.getString(CONFIG_KEY_REGION)),
-				localConfiguration.findString(CONFIG_KEY_BUCKET).orElseGet(() -> context.getConfiguration().getString(CONFIG_KEY_SITE_DOMAIN)), localConfiguration
-						.findCollection(CONFIG_KEY_ALIASES, String.class).orElseGet(() -> context.getConfiguration().getCollection(CONFIG_KEY_SITE_ALIASES, String.class)));
+				localConfiguration.findString(CONFIG_KEY_BUCKET).orElseGet(() -> context.getConfiguration().getString(CONFIG_KEY_SITE_DOMAIN)),
+				localConfiguration.findCollection(CONFIG_KEY_ALIASES, String.class)
+						.or(() -> context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALIASES, String.class)).orElse(emptyList()));
 	}
 
 	/**
@@ -169,6 +171,10 @@ public class S3 implements DeployTarget, Clogged {
 		s3Client = S3Client.builder().region(region).build();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation creates and configures the specified buckets as needed.
+	 */
 	@Override
 	public void prepare(final MummyContext context) throws IOException {
 		final S3Client s3Client = getS3Client();
