@@ -139,8 +139,8 @@ public class Route53 implements Dns, Clogged {
 
 	@Override
 	public void prepare(final MummyContext context) throws IOException {
-		final Route53Client client = getRoute53Client();
 		final Logger logger = getLogger();
+		final Route53Client client = getRoute53Client();
 		if(configuredHostedZoneId != null) {
 			final Set<HostedZone> existingHostedZones = getHostedZonesById(client, configuredHostedZoneId);
 			for(final HostedZone existingHostedZone : existingHostedZones) {
@@ -190,6 +190,20 @@ public class Route53 implements Dns, Clogged {
 			logger.info("Name server: {}", nsRecord.value());
 
 		});
+	}
+
+	@Override
+	public void setResourceRecord(final String type, final String name, final String value) throws IOException {
+		requireNonNull(type);
+		requireNonNull(name);
+		requireNonNull(value);
+		final Route53Client client = getRoute53Client();
+		final HostedZone hostedZone = getHostedZone().orElseThrow(IllegalStateException::new);
+		final ResourceRecord resourceRecord = ResourceRecord.builder().value(value).build();
+		final ResourceRecordSet resourceRecordSet = ResourceRecordSet.builder().type(type).name(name).resourceRecords(resourceRecord).ttl(300L).build(); //TODO double-check TTL; use constant
+		final Change change = Change.builder().resourceRecordSet(resourceRecordSet).action(ChangeAction.UPSERT).build();
+		client.changeResourceRecordSets(request -> request.hostedZoneId(hostedZone.id()).changeBatch(batch -> batch.changes(change)));
+		//TODO catch and rethrow SdkException as IOException, here and elsewhere
 	}
 
 	//Route 53 utility methods; could be removed to separate library

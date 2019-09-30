@@ -29,10 +29,26 @@ import io.guise.mummy.*;
 public interface Dns {
 
 	/**
+	 * Common, known resource record types.
+	 * @apiNote This list is not exhaustive, but provides merely a convenience, type-safe approach for indicating common types.
+	 */
+	public static enum ResourceRecordType {
+		A, CNAME, TXT; //TODO add others
+	}
+
+	/**
 	 * Prepares the DNS for deploying. This may include creating any accounts or record zones, for example.
 	 * @param context The context of static site generation.
 	 * @throws IOException if there is an I/O error during site deployment preparation.
 	 */
 	public void prepare(@Nonnull final MummyContext context) throws IOException;
+
+	//TODO document
+	public default void setResourceRecord(@Nonnull final ResourceRecordType type, @Nonnull final String name, @Nonnull final String value) throws IOException {
+		setResourceRecord(type.toString(), name, value);
+	}
+
+	//TODO document
+	public void setResourceRecord(@Nonnull final String type, @Nonnull final String name, @Nonnull final String value) throws IOException;
 
 }

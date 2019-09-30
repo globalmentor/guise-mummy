@@ -31,8 +31,11 @@ import javax.annotation.*;
 
 import org.slf4j.Logger;
 
+import com.globalmentor.collections.Sets;
+
 import io.clogr.Clogged;
 import io.confound.config.Configuration;
+import io.confound.config.ConfigurationException;
 import io.guise.mummy.*;
 import io.guise.mummy.deploy.DeployTarget;
 import io.guise.mummy.deploy.Dns;
@@ -124,25 +127,50 @@ public class CloudFront implements DeployTarget, Clogged {
 			logger.debug("Certificate with ARN `{}` exists for domain name `{}`.", existingCertificateSummary.certificateArn(),
 					existingCertificateSummary.domainName());
 		}
+		final String certificateArn;
 		if(existingCertificateSummaries.isEmpty()) {
 			//TODO check to ensure we have a DNS specified so that we can use it as the validation method
 			logger.info("Requesting certificate for domain name `{}` and alternative names `{}`.", domain, aliases);
-			//TODO fix to use SHA-256 32-character limited hash final String idempotencyToken = domain.replaceAll("[^\\w]", "_"); //in case we request a certificate for the same domain before the other one registers TODO use constants
-			acmClient.requestCertificate(request -> request.domainName(domain).subjectAlternativeNames(aliases)
-					.validationMethod(ValidationMethod.DNS)/*TODO fix .idempotencyToken(idempotencyToken)*/);
-			//TODO save the ARN?
+			certificateArn = acmClient
+					.requestCertificate(request -> request.domainName(domain).subjectAlternativeNames(aliases).validationMethod(ValidationMethod.DNS)).certificateArn();
 		} else {
 			if(existingCertificateSummaries.size() > 1) {
 				throw new IOException(String.format("Multiple certificates per domain not supported; please remove all but one certificates for domain `%s`.", domain));
 			}
-			final CertificateSummary certificateSummary = getOnly(existingCertificateSummaries);
-			final CertificateDetail certificate = acmClient.describeCertificate(request -> request.certificateArn(certificateSummary.certificateArn())).certificate();
-			if(!Set.copyOf(certificate.subjectAlternativeNames()).equals(aliases)) {
-				logger.warn("Certificate `{}` alternate names `{}` do not match site domain aliases `{}`.", certificate.certificateArn(),
-						certificate.subjectAlternativeNames(), aliases);
-			}
-			//TODO save the ARN?
+			certificateArn = getOnly(existingCertificateSummaries).certificateArn();
 		}
+		final CertificateDetail certificateDetail = acmClient.describeCertificate(request -> request.certificateArn(certificateArn)).certificate();
+		//apparently the domain alternative names _includes_ the domain name itself
+		if(!Set.copyOf(certificateDetail.subjectAlternativeNames()).equals(Sets.immutableSetOf(aliases, domain))) {
+			logger.warn("Certificate `{}` alternate names `{}` do not match site domain {} and aliases `{}`.", certificateArn,
+					List.copyOf(certificateDetail.subjectAlternativeNames()), domain, aliases);
+		}
+
+		//set up domain validation in the DNS
+		for(final DomainValidation domainValidation : certificateDetail.domainValidationOptions()) {
+			switch(domainValidation.validationStatus()) {
+				case SUCCESS: //already validated
+					logger.debug("Certificate `{}` for domain name `{}` has been validated.", certificateArn, domainValidation.domainName());
+					break;
+				case PENDING_VALIDATION:
+					if(domainValidation.validationMethod().equals(ValidationMethod.DNS)) {
+						final ResourceRecord resourceRecord = domainValidation.resourceRecord();
+						final Dns dns = context.getDeployDns().orElseThrow(() -> new ConfigurationException(
+								String.format("DNS must be configured to validate certificate `%s` for domain name `%s`.", certificateArn, domainValidation.domainName())));
+						logger.info("Setting DNS entry (`{}`) `{} = {}` for certificate `{}` validation for domain name `{}`.", resourceRecord.typeAsString(),
+								resourceRecord.name(), resourceRecord.value(), certificateArn, domainValidation.domainName());
+						dns.setResourceRecord(resourceRecord.typeAsString(), resourceRecord.name(), resourceRecord.value());
+					} else {
+						logger.warn("Certificate `{}` specifies an unknown validation method `{}` for domain name `{}` and must be performed manually.", certificateArn,
+								domainValidation.validationMethod(), domainValidation.domainName());
+					}
+					break;
+				default: //includes `FAILED`
+					logger.warn("Unable to validate certificate `{}` for domain name `{}`; validation status already indicates `{}`.", certificateArn,
+							domainValidation.domainName(), domainValidation.validationMethod());
+			}
+		}
+
 	}
 
 	@Override
