@@ -147,12 +147,32 @@ public interface Dns {
 	 */
 	public void prepare(@Nonnull final MummyContext context) throws IOException;
 
-	//TODO document
-	public default void setResourceRecord(@Nonnull final ResourceRecordType type, @Nonnull final String name, @Nonnull final String value) throws IOException {
-		setResourceRecord(type.toString(), name, value);
+	/**
+	 * Sets a resource record. If a resource record with the same type and name does not already exists, it will be added. If a resource record already exists
+	 * with the same type and name, it will be replaced. (This is commonly referred to as <dfn>upsert</dfn>.)
+	 * @implSpec The default implementation delegates to {@link #setResourceRecord(String, String, String, long)}.
+	 * @implNote Implementations should normally only override {@link #setResourceRecord(String, String, String, long)}.
+	 * @param type The type of resource record to set.
+	 * @param name The name of the resource record.
+	 * @param value The value to store in the resource record.
+	 * @param ttl The resource record cache time to live, in seconds.
+	 * @throws IOException If there was an error setting the resource record.
+	 */
+	public default void setResourceRecord(@Nonnull final ResourceRecordType type, @Nonnull final String name, @Nonnull final String value, final long ttl)
+			throws IOException {
+		setResourceRecord(type.toString(), name, value, ttl);
 	}
 
-	//TODO document
-	public void setResourceRecord(@Nonnull final String type, @Nonnull final String name, @Nonnull final String value) throws IOException;
+	/**
+	 * Sets a resource record. If a resource record with the same type and name does not already exists, it will be added. If a resource record already exists
+	 * with the same type and name, it will be replaced. (This is commonly referred to as <dfn>upsert</dfn>.)
+	 * @apiNote Using {@link #setResourceRecord(ResourceRecordType, String, String, long)} for known resource record types is preferred for type and value safety.
+	 * @param type The type of resource record to set.
+	 * @param name The name of the resource record.
+	 * @param value The value to store in the resource record.
+	 * @param ttl The resource record cache time to live, in seconds.
+	 * @throws IOException If there was an error setting the resource record.
+	 */
+	public void setResourceRecord(@Nonnull final String type, @Nonnull final String name, @Nonnull final String value, final long ttl) throws IOException;
 
 }

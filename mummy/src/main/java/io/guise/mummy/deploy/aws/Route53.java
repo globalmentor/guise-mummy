@@ -39,6 +39,7 @@ import io.confound.config.Configuration;
 import io.guise.mummy.GuiseMummy;
 import io.guise.mummy.MummyContext;
 import io.guise.mummy.deploy.Dns;
+import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.route53.*;
 import software.amazon.awssdk.services.route53.model.*;
@@ -193,17 +194,20 @@ public class Route53 implements Dns, Clogged {
 	}
 
 	@Override
-	public void setResourceRecord(final String type, final String name, final String value) throws IOException {
+	public void setResourceRecord(final String type, final String name, final String value, final long ttl) throws IOException {
 		requireNonNull(type);
 		requireNonNull(name);
 		requireNonNull(value);
 		final Route53Client client = getRoute53Client();
 		final HostedZone hostedZone = getHostedZone().orElseThrow(IllegalStateException::new);
-		final ResourceRecord resourceRecord = ResourceRecord.builder().value(value).build();
-		final ResourceRecordSet resourceRecordSet = ResourceRecordSet.builder().type(type).name(name).resourceRecords(resourceRecord).ttl(300L).build(); //TODO double-check TTL; use constant
-		final Change change = Change.builder().resourceRecordSet(resourceRecordSet).action(ChangeAction.UPSERT).build();
-		client.changeResourceRecordSets(request -> request.hostedZoneId(hostedZone.id()).changeBatch(batch -> batch.changes(change)));
-		//TODO catch and rethrow SdkException as IOException, here and elsewhere
+		try {
+			final ResourceRecord resourceRecord = ResourceRecord.builder().value(value).build();
+			final ResourceRecordSet resourceRecordSet = ResourceRecordSet.builder().type(type).name(name).resourceRecords(resourceRecord).ttl(ttl).build();
+			final Change change = Change.builder().resourceRecordSet(resourceRecordSet).action(ChangeAction.UPSERT).build();
+			client.changeResourceRecordSets(request -> request.hostedZoneId(hostedZone.id()).changeBatch(batch -> batch.changes(change)));
+		} catch(final SdkException sdkException) {
+			throw new IOException(sdkException);
+		}
 	}
 
 	//Route 53 utility methods; could be removed to separate library

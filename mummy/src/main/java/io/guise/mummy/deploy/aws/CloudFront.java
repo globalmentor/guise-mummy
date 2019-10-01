@@ -21,6 +21,7 @@ import static io.guise.mummy.GuiseMummy.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
+import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -35,7 +36,6 @@ import com.globalmentor.collections.Sets;
 
 import io.clogr.Clogged;
 import io.confound.config.Configuration;
-import io.confound.config.ConfigurationException;
 import io.guise.mummy.*;
 import io.guise.mummy.deploy.DeployTarget;
 import io.guise.mummy.deploy.Dns;
@@ -110,6 +110,9 @@ public class CloudFront implements DeployTarget, Clogged {
 		acmClient = AcmClient.builder().region(ACM_REGION).build();
 	}
 
+	/** The cache time for the DNS record validating a certificate. */
+	public static final long CERTIFICATE_VALIDATION_DNS_TTL = 300L;
+
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This implementation requests a public certificate with ACM if one does not already exist.
@@ -129,7 +132,6 @@ public class CloudFront implements DeployTarget, Clogged {
 		}
 		final String certificateArn;
 		if(existingCertificateSummaries.isEmpty()) {
-			//TODO check to ensure we have a DNS specified so that we can use it as the validation method
 			logger.info("Requesting certificate for domain name `{}` and alternative names `{}`.", domain, aliases);
 			certificateArn = acmClient
 					.requestCertificate(request -> request.domainName(domain).subjectAlternativeNames(aliases).validationMethod(ValidationMethod.DNS)).certificateArn();
@@ -155,11 +157,13 @@ public class CloudFront implements DeployTarget, Clogged {
 				case PENDING_VALIDATION:
 					if(domainValidation.validationMethod().equals(ValidationMethod.DNS)) {
 						final ResourceRecord resourceRecord = domainValidation.resourceRecord();
-						final Dns dns = context.getDeployDns().orElseThrow(() -> new ConfigurationException(
-								String.format("DNS must be configured to validate certificate `%s` for domain name `%s`.", certificateArn, domainValidation.domainName())));
-						logger.info("Setting DNS entry (`{}`) `{} = {}` for certificate `{}` validation for domain name `{}`.", resourceRecord.typeAsString(),
-								resourceRecord.name(), resourceRecord.value(), certificateArn, domainValidation.domainName());
-						dns.setResourceRecord(resourceRecord.typeAsString(), resourceRecord.name(), resourceRecord.value());
+						context.getDeployDns().ifPresentOrElse(throwingConsumer(dns -> {
+							logger.info("Setting DNS entry (`{}`) `{} = {}` for certificate `{}` validation for domain name `{}`.", resourceRecord.typeAsString(),
+									resourceRecord.name(), resourceRecord.value(), certificateArn, domainValidation.domainName());
+							dns.setResourceRecord(resourceRecord.typeAsString(), resourceRecord.name(), resourceRecord.value(), CERTIFICATE_VALIDATION_DNS_TTL);
+						}), () -> logger.warn(
+								"No DNS configured. To validate certificate `{}` for domain name `{}`, resource record (`{}`) `{} = {}` must be set in the DNS manually.",
+								certificateArn, domainValidation.domainName(), resourceRecord.typeAsString(), resourceRecord.name(), resourceRecord.value()));
 					} else {
 						logger.warn("Certificate `{}` specifies an unknown validation method `{}` for domain name `{}` and must be performed manually.", certificateArn,
 								domainValidation.validationMethod(), domainValidation.domainName());
