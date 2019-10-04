@@ -16,13 +16,17 @@
 
 package io.guise.mummy.deploy.aws;
 
+import static com.globalmentor.net.HTTP.*;
+import static com.globalmentor.net.URIs.*;
 import static io.guise.mummy.GuiseMummy.*;
-import static java.util.Collections.emptyList;
+import static java.util.Collections.*;
 import static java.util.Objects.*;
+import static java.util.stream.Stream.*;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
+import java.util.stream.Stream;
 
 import javax.annotation.*;
 
@@ -57,35 +61,63 @@ public class S3 implements DeployTarget, Clogged {
 	public static final String CONFIG_KEY_ALIASES = "aliases";
 
 	/**
+	 * The regions that use a dash (<code>-</code>) instead of a dot (<code>.</code>) to separate <code>s3-website</code> from the region in the endpoint domain
+	 * string.
+	 */
+	private static final Set<Region> WEBSITE_ENDPOINT_DASH_REGIONS = Set.of(Region.US_EAST_1, Region.US_WEST_1, Region.US_WEST_2, Region.AP_SOUTHEAST_1,
+			Region.AP_SOUTHEAST_2, Region.AP_NORTHEAST_1, Region.EU_WEST_1, Region.SA_EAST_1);
+
+	private static final String ENDPOINT_S3_WEBSITE_REGION_DELIMITER_DASH = String.valueOf('-');
+	private static final String ENDPOINT_S3_WEBSITE_REGION_DELIMITER_DOT = String.valueOf('.');
+
+	/**
 	 * String template for a bucket web site URL, with the following string parameters:
 	 * <ol>
 	 * <li>bucket name</li>
+	 * <li>S3 website region delimiter: dot (<code>.</code>) or dash (<code>-</code>)</li>
 	 * <li>region ID</li>
 	 * <li>region domain</li>
 	 * <li>
 	 * </ol>
-	 * @implSpec This implementation only uses a dot (<code>.</code>) separator before the region ID.
+	 * @implNote The <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteEndpoints.html">Website Endpoints</a> documentation indicates that there are
+	 *           two forms based upon region, one using a dot (<code>.</code>) character and the other using a dash (<code>-</code>) character, but the dot form
+	 *           seems to work as well, as some have <a href=
+	 *           "https://stackoverflow.com/questions/46627060/how-to-resolve-aws-s3-url-says-west-bucket-says-east#comment80219601_46627148">indicated</a> that
+	 *           AWS may be standardizing on the dot form. Nevertheless this implementation distinguishes between the two forms to provide the most correct values
+	 *           as per the documentation.
+	 * @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteEndpoints.html">Website Endpoints</a>
+	 * @see <a href="https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_website_region_endpoints">Amazon Simple Storage Service Website Endpoints</a>
+	 * @see <a href="https://stackoverflow.com/q/57480708/421049">Get AWS S3 bucket web static site URL programmatically using Java SDK v2</a>
 	 */
-	private final static StringTemplate BUCKET_WEBSITE_URL_TEMPLATE = StringTemplate.builder().text("http://").parameter(StringTemplate.STRING_PARAMETER)
-			.text(".s3-website.").parameter(StringTemplate.STRING_PARAMETER).text(".").parameter(StringTemplate.STRING_PARAMETER).text("/").build();
+	private final static StringTemplate BUCKET_WEBSITE_ENDPOINT_TEMPLATE = StringTemplate.builder().parameter(StringTemplate.STRING_PARAMETER).text(".s3-website")
+			.parameter(StringTemplate.STRING_PARAMETER).parameter(StringTemplate.STRING_PARAMETER).text(".").parameter(StringTemplate.STRING_PARAMETER).build();
+
+	/**
+	 * Returns the endpoint domain for static web site hosting for the given bucket in the indicated region.
+	 * @param bucket The name of the bucket.
+	 * @param region The region in which the bucket is located.
+	 * @return A endpoint domain for accessing the static web site hosted in the identified bucket.
+	 * @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteEndpoints.html">Website Endpoints</a>
+	 * @see <a href="https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_website_region_endpoints">Amazon Simple Storage Service Website Endpoints</a>
+	 * @see PartitionMetadata#hostname()
+	 */
+	public static String getBucketWebsiteEndpoint(@Nonnull final String bucket, @Nonnull final Region region) {
+		final String s3WebsiteRegionDelimiter = WEBSITE_ENDPOINT_DASH_REGIONS.contains(region) ? ENDPOINT_S3_WEBSITE_REGION_DELIMITER_DASH
+				: ENDPOINT_S3_WEBSITE_REGION_DELIMITER_DOT;
+		return BUCKET_WEBSITE_ENDPOINT_TEMPLATE.apply(bucket, s3WebsiteRegionDelimiter, region.id(), region.metadata().domain());
+	}
 
 	/**
 	 * Returns the URL for static web site hosting for the given bucket in the indicated region.
-	 * 
 	 * @param bucket The name of the bucket.
 	 * @param region The region in which the bucket is located.
 	 * @return A URL for accessing the static web site hosted in the identified bucket.
-	 * @implSpec This implementation only uses a dot (<code>.</code>) separator before the region ID.
-	 * @implNote The <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteEndpoints.html">Website Endpoints</a> documentation indicates that there are
-	 *           two forms based upon region, one using a dash (<code>-</code>) character instead, but the dot form seems to work as well, as some have <a href=
-	 *           "https://stackoverflow.com/questions/46627060/how-to-resolve-aws-s3-url-says-west-bucket-says-east#comment80219601_46627148">indicated</a> that
-	 *           AWS may be standardizing on the dot form.
+	 * @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteEndpoints.html">Website Endpoints</a>
 	 * @see <a href="https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_website_region_endpoints">Amazon Simple Storage Service Website Endpoints</a>
-	 * @see <a href="https://stackoverflow.com/q/57480708/421049">Get AWS S3 bucket web static site URL programmatically using Java SDK v2</a>
 	 * @see PartitionMetadata#hostname()
 	 */
 	public static URI getBucketWebsiteUrl(@Nonnull final String bucket, @Nonnull final Region region) {
-		return URI.create(BUCKET_WEBSITE_URL_TEMPLATE.apply(bucket, region.id(), region.metadata().domain()));
+		return createURI(HTTP_URI_SCHEME, null, getBucketWebsiteEndpoint(bucket, region), -1, URIs.ROOT_PATH, null, null);
 	}
 
 	/**
@@ -125,6 +157,14 @@ public class S3 implements DeployTarget, Clogged {
 	/** @return The S3 buckets, if any, to serve as aliases and redirect to the primary bucket. */
 	public Set<String> getAliases() {
 		return aliases;
+	}
+
+	/**
+	 * @return A stream of all bucket names, starting with the primary bucket {@link #getBucket()}, followed by the aliases {@link #getAliases()} in no guaranteed
+	 *         order.
+	 */
+	public Stream<String> buckets() {
+		return concat(Stream.of(getBucket()), getAliases().stream());
 	}
 
 	private final S3Client s3Client;
