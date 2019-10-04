@@ -25,6 +25,7 @@ import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -33,23 +34,31 @@ import javax.annotation.*;
 import org.slf4j.Logger;
 
 import com.globalmentor.collections.Sets;
+import com.globalmentor.net.HTTP;
 
 import io.clogr.Clogged;
 import io.confound.config.Configuration;
+import io.confound.config.ConfigurationException;
 import io.guise.mummy.*;
 import io.guise.mummy.deploy.DeployTarget;
 import io.guise.mummy.deploy.Dns;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.acm.AcmClient;
 import software.amazon.awssdk.services.acm.model.*;
+import software.amazon.awssdk.services.cloudfront.CloudFrontClient;
+import software.amazon.awssdk.services.cloudfront.model.*;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 /**
  * Sets up a <a href="https://aws.amazon.com/cloudfront/">CloudFront</a> distribution for the site.
- * @implSpec This implementation requires an {@link S3} deployment to be specified in the configuration before this deployment.
- * @implSpec This implementation expects an existing certificate, if any, to indicate the main site domain as specified in
- *           {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} as the primary domain; otherwise a new certificate will be requested. This implementation does not
- *           support multiple certificates to be specified for the same site domain; all but one must be removed.
- * @implSpec This implementation requires a {@link Dns} to be specified in the configuration if a certificate needs to be requested.
+ * @implSpec This implementation requires an {@link S3} deployment to be specified in the configuration before this deployment. The S3 bucket and aliases (which
+ *           may or may not have been originally determined from the site domain and aliases) will be used as the certificate domain name and alternative names,
+ *           respectively. If there is an existing certificate indicating the main S3 bucket, it will be used. This implementation does not support multiple
+ *           certificates to be specified for the same S3 bucket; all but one must be removed.
+ * @implSpec This implementation should specify a {@link Dns} in the configuration for requesting certificates and for updating the DNS after the CloudFront
+ *           distribution is in place.
  * @author Garret Wilson
  */
 public class CloudFront implements DeployTarget, Clogged {
@@ -62,20 +71,6 @@ public class CloudFront implements DeployTarget, Clogged {
 	 */
 	public static final Region ACM_REGION = Region.US_EAST_1;
 
-	private final String domain;
-
-	/** @return The domain for CloudFront distribution. */
-	public String getDomain() {
-		return domain;
-	}
-
-	private final Set<String> aliases;
-
-	/** @return The domain aliases, if any. */
-	public Set<String> getAliases() {
-		return aliases;
-	}
-
 	private final AcmClient acmClient;
 
 	/** @return The client for connecting to ACM. */
@@ -83,31 +78,42 @@ public class CloudFront implements DeployTarget, Clogged {
 		return acmClient;
 	}
 
+	private final CloudFrontClient cloudFrontClient;
+
+	/** @return The client for connecting to CloudFront. */
+	protected CloudFrontClient getCloudFrontClient() {
+		return cloudFrontClient;
+	}
+
+	private String acmCertificateArn;
+
 	/**
-	 * Configuration constructor.
-	 * <p>
-	 * The site domain is retrieved from {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and the site domain aliases from {@value GuiseMummy#CONFIG_KEY_SITE_ALIASES}
-	 * in the context configuration.
-	 * </p>
-	 * @param context The context of static site generation.
-	 * @param localConfiguration The local configuration for this deployment target, which may be a section of the project configuration.
-	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
-	 * @see GuiseMummy#CONFIG_KEY_SITE_ALIASES
+	 * Returns the ACM-managed certificate to use with the CloudFront distribution. The ACM certificate ARN is guaranteed to be available after successful
+	 * preparation, but will not be available before this.
+	 * @return The ARN of the ACM-managed SSL/TLS certificate
 	 */
-	public CloudFront(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
-		this(context.getConfiguration().getString(CONFIG_KEY_SITE_DOMAIN),
-				context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALIASES, String.class).orElse(emptyList()));
+	public Optional<String> getAcmCertificateArn() {
+		return Optional.of(acmCertificateArn);
 	}
 
 	/**
-	 * Domain and aliases constructor. The aliases will be stored as a set.
-	 * @param domain The site domain.
-	 * @param aliases The site domain aliases, if any.
+	 * Configuration constructor.
+	 * <p>
+	 * The site domain and aliases will be determined later.
+	 * </p>
+	 * @param context The context of static site generation.
+	 * @param localConfiguration The local configuration for this deployment target, which may be a section of the project configuration.
 	 */
-	public CloudFront(@Nonnull String domain, @Nonnull final Collection<String> aliases) {
-		this.domain = requireNonNull(domain);
-		this.aliases = new LinkedHashSet<>(aliases); //maintain order to help with reporting and debugging
+	public CloudFront(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
+		this();
+	}
+
+	/**
+	 * Constructor.
+	 */
+	public CloudFront() {
 		acmClient = AcmClient.builder().region(ACM_REGION).build();
+		cloudFrontClient = CloudFrontClient.builder().region(Region.AWS_GLOBAL).build();
 	}
 
 	/** The cache time for the DNS record validating a certificate. */
@@ -121,8 +127,11 @@ public class CloudFront implements DeployTarget, Clogged {
 	public void prepare(final MummyContext context) throws IOException {
 		final AcmClient acmClient = getAcmClient();
 		final Logger logger = getLogger();
-		final String domain = getDomain();
-		final Set<String> aliases = getAliases();
+
+		final S3 s3 = context.getDeployTargets().orElseThrow(IllegalStateException::new).stream().filter(S3.class::isInstance).map(S3.class::cast).findFirst()
+				.orElseThrow(() -> new ConfigurationException("CloudFront deployement currently requires an S3 target to be configured first."));
+		final String domain = s3.getBucket();
+		final Set<String> aliases = s3.getAliases();
 
 		//request a certificate if needed
 		final Set<CertificateSummary> existingCertificateSummaries = getCertificateSummariesByDomainName(acmClient, domain);
@@ -141,6 +150,8 @@ public class CloudFront implements DeployTarget, Clogged {
 			}
 			certificateArn = getOnly(existingCertificateSummaries).certificateArn();
 		}
+		assert certificateArn != null;
+		this.acmCertificateArn = certificateArn; //save the certificate ARN for other phases
 		final CertificateDetail certificateDetail = acmClient.describeCertificate(request -> request.certificateArn(certificateArn)).certificate();
 		//apparently the domain alternative names _includes_ the domain name itself
 		if(!Set.copyOf(certificateDetail.subjectAlternativeNames()).equals(Sets.immutableSetOf(aliases, domain))) {
@@ -177,12 +188,67 @@ public class CloudFront implements DeployTarget, Clogged {
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation creates a CloudFront distribution if one does not exist, and adds appropriate records to the DNS if a DNS is available. Each
+	 *           S3 bucket name is used as the name of a CloudFront distribution.
+	 */
 	@Override
 	public Optional<URI> deploy(final MummyContext context, final Artifact rootArtifact) throws IOException {
-		return Optional.empty(); //TODO implement
+		final CloudFrontClient cloudFrontClient = getCloudFrontClient();
+		final Logger logger = getLogger();
+
+		final S3 s3 = context.getDeployTargets().orElseThrow(IllegalStateException::new).stream().filter(S3.class::isInstance).map(S3.class::cast).findFirst()
+				.orElseThrow(() -> new ConfigurationException("CloudFront deployement currently requires an S3 target to be configured first."));
+		final Region s3BucketRegion = s3.getRegion();
+		for(final String s3Bucket : (Iterable<String>)s3.buckets()::iterator) {
+
+			//create a distribution if there is none for this bucket
+			final Set<DistributionSummary> existingDistributionSummaries = getDistributionSummariesByAliases(cloudFrontClient, Set.of(s3Bucket));
+			for(final DistributionSummary existingDistributionSummary : existingDistributionSummaries) {
+				logger.debug("Distribution ID `{}` (ARN `{}`) exists for S3 bucket `{}`.", existingDistributionSummary.id(), existingDistributionSummary.arn(),
+						s3Bucket);
+			}
+			//TODO; see what info we need later when updating the DNS			final String distributionId;
+			if(existingDistributionSummaries.isEmpty()) {
+				logger.info("Creating distribution for S3 bucket `{}`.", s3Bucket);
+				final StringBuilder commentBuilder = new StringBuilder(); //TODO add note on max length
+				commentBuilder.append("Created by ").append(context.getMummifierIdentification()); //i18n
+				commentBuilder.append(" on ").append(ZonedDateTime.now()); //i18n
+				commentBuilder.append("."); //i18n
+				final String s3BucketWebsiteEndpoint = S3.getBucketWebsiteEndpoint(s3Bucket, s3BucketRegion);
+				final CustomOriginConfig s3BucketOriginConfig = CustomOriginConfig.builder().httpPort(HTTP.DEFAULT_PORT).httpsPort(HTTP.DEFAULT_SECURE_PORT)
+						.originProtocolPolicy(OriginProtocolPolicy.HTTP_ONLY) //S3 buckets as website endpoints only support HTTP
+						.build();
+				final Origin origin = Origin.builder().id(s3Bucket).domainName(s3BucketWebsiteEndpoint).customOriginConfig(s3BucketOriginConfig).build(); //use the bucket as the ID as a convenience
+				final String callerReference = UUID.randomUUID().toString(); //use a random UUID as the temporary caller reference (required)
+				final String acmCertificateArn = getAcmCertificateArn().orElseThrow(IllegalStateException::new);
+				final ViewerCertificate viewerCertificate = ViewerCertificate.builder() //use our ACM certificate and only allows browser that support SNI (as recommended)
+						.acmCertificateArn(acmCertificateArn).sslSupportMethod(SSLSupportMethod.SNI_ONLY).build();
+				final CookiePreference forwardCookies = CookiePreference.builder().forward(ItemSelection.NONE).build();
+				final boolean forwardQueries = false;
+				final DefaultCacheBehavior redirectToHttps = DefaultCacheBehavior.builder().viewerProtocolPolicy(ViewerProtocolPolicy.REDIRECT_TO_HTTPS)
+						.forwardedValues(forwardedValues -> forwardedValues.queryString(forwardQueries).cookies(forwardCookies)).targetOriginId(origin.id())
+						.trustedSigners(trustedSigners -> trustedSigners.enabled(false).quantity(0)).minTTL(0L).build();
+				final DistributionConfig distributionConfig = DistributionConfig.builder().origins(origins -> origins.items(origin).quantity(1))
+						.defaultCacheBehavior(redirectToHttps).viewerCertificate(viewerCertificate).enabled(true).callerReference(callerReference)
+						.comment(commentBuilder.toString()).build();
+				final Distribution distribution = cloudFrontClient.createDistribution(request -> request.distributionConfig(distributionConfig)).distribution();
+				//TODO what do we do with the distribution?
+			} else {
+				if(existingDistributionSummaries.size() > 1) {
+					throw new IOException(String.format("Multiple distributions found with an alias for bucket `%s`; all but one must be removed.", s3Bucket));
+				}
+				//TODO				distributionId = getOnly(existingDistributionSummaries).certificateArn();
+				//TODO ensure that the existing distribution truly has the correct origin, i.e. to the S3 bucket
+			}
+
+		}
+
+		return Optional.empty(); //TODO improve
 	}
 
-	//ACM utility methods; could be removed to separate library
+	//# ACM utility methods; could be removed to separate library
 
 	//## certificates
 
@@ -196,19 +262,62 @@ public class CloudFront implements DeployTarget, Clogged {
 	 */
 	protected static Set<CertificateSummary> getCertificateSummariesByDomainName(@Nonnull final AcmClient client, @Nonnull final String domainName) {
 		requireNonNull(domainName);
-		try (final Stream<CertificateSummary> certificatesByDomainName = certificateSummaries(client)
+		try (final Stream<CertificateSummary> certificateSummariesByDomainName = certificateSummaries(client)
 				.filter(certificate -> certificate.domainName().equals(domainName))) {
-			return certificatesByDomainName.collect(toSet());
+			return certificateSummariesByDomainName.collect(toSet());
 		}
 	}
 
 	/**
-	 * Retrieves a stream of summaries all certificates.
+	 * Retrieves a stream of summaries of all certificates.
 	 * @param client The client to use for retrieving the certificate summaries.
 	 * @return A stream of summaries of all certificate.
 	 */
 	protected static Stream<CertificateSummary> certificateSummaries(@Nonnull final AcmClient client) {
 		return client.listCertificatesPaginator().stream().flatMap(response -> response.certificateSummaryList().stream());
+	}
+
+	//# CloudFront utility methods; could be removed to separate library
+
+	//## distributions
+
+	/**
+	 * Retrieves summaries of all distributions with the given aliases.
+	 * @implSpec This implementation delegates to {@link #distributionSummaries(CloudFrontClient)}.
+	 * @param client The client to use for retrieving the distribution summaries.
+	 * @param aliases The aliases for which distributions should be returned.
+	 * @return A set of summaries all distributions with the exact aliases, in any order
+	 * @see DistributionSummary#aliases()
+	 * @see Aliases
+	 */
+	protected static Set<DistributionSummary> getDistributionSummariesByAliases(@Nonnull final CloudFrontClient client, @Nonnull final Set<String> aliases) {
+		requireNonNull(aliases);
+		try (final Stream<DistributionSummary> distributionSummariesByAliases = distributionSummaries(client)
+				.filter(distribution -> Set.copyOf(distribution.aliases().items()).equals(aliases))) {
+			return distributionSummariesByAliases.collect(toSet());
+		}
+	}
+
+	/**
+	 * Retrieves a stream of summaries of all distributions.
+	 * @implNote The AWS SDK for CloudFront currently has no streaming methods, so this implementation collects all distribution summaries and returns a stream
+	 *           for consistency with other methods. In the future this could be made more efficient with an iterator.
+	 * @param client The client to use for retrieving the distribution summaries.
+	 * @return A stream of summaries of all distributions.
+	 * @throws SdkException If there is some error retrieving the distribution summaries.
+	 */
+	protected static Stream<DistributionSummary> distributionSummaries(@Nonnull final CloudFrontClient client) {
+		final List<DistributionSummary> distributionSummaries = new ArrayList<>();
+		ListDistributionsRequest request = ListDistributionsRequest.builder().build();
+		ListDistributionsResponse response;
+		DistributionList distributionList;
+		do {
+			response = client.listDistributions(request);
+			distributionList = response.distributionList();
+			distributionSummaries.addAll(distributionList.items());
+			request = ListDistributionsRequest.builder().marker(distributionList.nextMarker()).build();
+		} while(distributionList.isTruncated());
+		return distributionSummaries.stream();
 	}
 
 }
