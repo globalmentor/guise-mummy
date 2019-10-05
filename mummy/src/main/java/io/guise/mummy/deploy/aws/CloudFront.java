@@ -214,16 +214,16 @@ public class CloudFront implements DeployTarget, Clogged {
 				//TODO; see what info we need later when updating the DNS			final String distributionId;
 				if(existingDistributionSummaries.isEmpty()) {
 					logger.info("Creating distribution for S3 bucket `{}`.", s3Bucket);
-					final StringBuilder commentBuilder = new StringBuilder(); //TODO add note on max length
+					final StringBuilder commentBuilder = new StringBuilder(); //CloudFront comments are limited to a little over 120 characters in length
 					commentBuilder.append("Created by ").append(context.getMummifierIdentification()); //i18n
-					commentBuilder.append(" on ").append(OffsetDateTime.now()); //TODO i18n
+					commentBuilder.append(" on ").append(ZonedDateTime.now()); //TODO i18n
 					commentBuilder.append("."); //TODO i18n
 					final String s3BucketWebsiteEndpoint = S3.getBucketWebsiteEndpoint(s3Bucket, s3BucketRegion);
 					final CustomOriginConfig s3BucketOriginConfig = CustomOriginConfig.builder().httpPort(HTTP.DEFAULT_PORT).httpsPort(HTTP.DEFAULT_SECURE_PORT)
 							.originProtocolPolicy(OriginProtocolPolicy.HTTP_ONLY) //S3 buckets as website endpoints only support HTTP
 							.build();
 					final Origin origin = Origin.builder().id(s3Bucket).domainName(s3BucketWebsiteEndpoint).customOriginConfig(s3BucketOriginConfig).build(); //use the bucket as the ID as a convenience
-					final String callerReference = UUID.randomUUID().toString(); //use a random UUID as the temporary caller reference (required)
+					final Aliases aliases = Aliases.builder().items(s3Bucket).quantity(1).build(); //add a CNAME alias to the bucket because that's the domain for serving
 					final String acmCertificateArn = getAcmCertificateArn().orElseThrow(IllegalStateException::new);
 					final ViewerCertificate viewerCertificate = ViewerCertificate.builder() //use our ACM certificate and only allows browser that support SNI (as recommended)
 							.acmCertificateArn(acmCertificateArn).sslSupportMethod(SSLSupportMethod.SNI_ONLY).build();
@@ -232,7 +232,8 @@ public class CloudFront implements DeployTarget, Clogged {
 					final DefaultCacheBehavior redirectToHttps = DefaultCacheBehavior.builder().viewerProtocolPolicy(ViewerProtocolPolicy.REDIRECT_TO_HTTPS)
 							.forwardedValues(forwardedValues -> forwardedValues.queryString(forwardQueries).cookies(forwardCookies)).targetOriginId(origin.id())
 							.trustedSigners(trustedSigners -> trustedSigners.enabled(false).quantity(0)).minTTL(0L).build();
-					final DistributionConfig distributionConfig = DistributionConfig.builder().origins(origins -> origins.items(origin).quantity(1))
+					final String callerReference = UUID.randomUUID().toString(); //use a random UUID as the temporary caller reference (required)
+					final DistributionConfig distributionConfig = DistributionConfig.builder().origins(origins -> origins.items(origin).quantity(1)).aliases(aliases)
 							.defaultCacheBehavior(redirectToHttps).viewerCertificate(viewerCertificate).enabled(true).callerReference(callerReference)
 							.comment(commentBuilder.toString()).build();
 					final Distribution distribution = cloudFrontClient.createDistribution(request -> request.distributionConfig(distributionConfig)).distribution();
