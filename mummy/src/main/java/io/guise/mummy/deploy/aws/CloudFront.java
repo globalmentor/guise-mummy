@@ -17,8 +17,6 @@
 package io.guise.mummy.deploy.aws;
 
 import static com.globalmentor.collections.iterables.Iterables.*;
-import static io.guise.mummy.GuiseMummy.*;
-import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 import static org.zalando.fauxpas.FauxPas.*;
@@ -42,14 +40,12 @@ import io.confound.config.ConfigurationException;
 import io.guise.mummy.*;
 import io.guise.mummy.deploy.DeployTarget;
 import io.guise.mummy.deploy.Dns;
+import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.acm.AcmClient;
 import software.amazon.awssdk.services.acm.model.*;
 import software.amazon.awssdk.services.cloudfront.CloudFrontClient;
 import software.amazon.awssdk.services.cloudfront.model.*;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
-import software.amazon.awssdk.services.s3.model.S3Object;
 
 /**
  * Sets up a <a href="https://aws.amazon.com/cloudfront/">CloudFront</a> distribution for the site.
@@ -125,67 +121,71 @@ public class CloudFront implements DeployTarget, Clogged {
 	 */
 	@Override
 	public void prepare(final MummyContext context) throws IOException {
-		final AcmClient acmClient = getAcmClient();
-		final Logger logger = getLogger();
+		try {
+			final AcmClient acmClient = getAcmClient();
+			final Logger logger = getLogger();
 
-		final S3 s3 = context.getDeployTargets().orElseThrow(IllegalStateException::new).stream().filter(S3.class::isInstance).map(S3.class::cast).findFirst()
-				.orElseThrow(() -> new ConfigurationException("CloudFront deployement currently requires an S3 target to be configured first."));
-		final String domain = s3.getBucket();
-		final Set<String> aliases = s3.getAliases();
+			final S3 s3 = context.getDeployTargets().orElseThrow(IllegalStateException::new).stream().filter(S3.class::isInstance).map(S3.class::cast).findFirst()
+					.orElseThrow(() -> new ConfigurationException("CloudFront deployement currently requires an S3 target to be configured first."));
+			final String domain = s3.getBucket();
+			final Set<String> aliases = s3.getAliases();
 
-		//request a certificate if needed
-		final Set<CertificateSummary> existingCertificateSummaries = getCertificateSummariesByDomainName(acmClient, domain);
-		for(final CertificateSummary existingCertificateSummary : existingCertificateSummaries) {
-			logger.debug("Certificate with ARN `{}` exists for domain name `{}`.", existingCertificateSummary.certificateArn(),
-					existingCertificateSummary.domainName());
-		}
-		final String certificateArn;
-		if(existingCertificateSummaries.isEmpty()) {
-			logger.info("Requesting certificate for domain name `{}` and alternative names `{}`.", domain, aliases);
-			certificateArn = acmClient
-					.requestCertificate(request -> request.domainName(domain).subjectAlternativeNames(aliases).validationMethod(ValidationMethod.DNS)).certificateArn();
-		} else {
-			if(existingCertificateSummaries.size() > 1) {
-				throw new IOException(String.format("Multiple certificates per domain not supported; please remove all but one certificates for domain `%s`.", domain));
+			//request a certificate if needed
+			final Set<CertificateSummary> existingCertificateSummaries = getCertificateSummariesByDomainName(acmClient, domain);
+			for(final CertificateSummary existingCertificateSummary : existingCertificateSummaries) {
+				logger.debug("Certificate with ARN `{}` exists for domain name `{}`.", existingCertificateSummary.certificateArn(),
+						existingCertificateSummary.domainName());
 			}
-			certificateArn = getOnly(existingCertificateSummaries).certificateArn();
-		}
-		assert certificateArn != null;
-		this.acmCertificateArn = certificateArn; //save the certificate ARN for other phases
-		final CertificateDetail certificateDetail = acmClient.describeCertificate(request -> request.certificateArn(certificateArn)).certificate();
-		//apparently the domain alternative names _includes_ the domain name itself
-		if(!Set.copyOf(certificateDetail.subjectAlternativeNames()).equals(Sets.immutableSetOf(aliases, domain))) {
-			logger.warn("Certificate `{}` alternate names `{}` do not match site domain {} and aliases `{}`.", certificateArn,
-					List.copyOf(certificateDetail.subjectAlternativeNames()), domain, aliases);
-		}
-
-		//set up domain validation in the DNS
-		for(final DomainValidation domainValidation : certificateDetail.domainValidationOptions()) {
-			switch(domainValidation.validationStatus()) {
-				case SUCCESS: //already validated
-					logger.debug("Certificate `{}` for domain name `{}` has been validated.", certificateArn, domainValidation.domainName());
-					break;
-				case PENDING_VALIDATION:
-					if(domainValidation.validationMethod().equals(ValidationMethod.DNS)) {
-						final ResourceRecord resourceRecord = domainValidation.resourceRecord();
-						context.getDeployDns().ifPresentOrElse(throwingConsumer(dns -> {
-							logger.info("Setting DNS entry (`{}`) `{} = {}` for certificate `{}` validation for domain name `{}`.", resourceRecord.typeAsString(),
-									resourceRecord.name(), resourceRecord.value(), certificateArn, domainValidation.domainName());
-							dns.setResourceRecord(resourceRecord.typeAsString(), resourceRecord.name(), resourceRecord.value(), CERTIFICATE_VALIDATION_DNS_TTL);
-						}), () -> logger.warn(
-								"No DNS configured. To validate certificate `{}` for domain name `{}`, resource record (`{}`) `{} = {}` must be set in the DNS manually.",
-								certificateArn, domainValidation.domainName(), resourceRecord.typeAsString(), resourceRecord.name(), resourceRecord.value()));
-					} else {
-						logger.warn("Certificate `{}` specifies an unknown validation method `{}` for domain name `{}` and must be performed manually.", certificateArn,
-								domainValidation.validationMethod(), domainValidation.domainName());
-					}
-					break;
-				default: //includes `FAILED`
-					logger.warn("Unable to validate certificate `{}` for domain name `{}`; validation status already indicates `{}`.", certificateArn,
-							domainValidation.domainName(), domainValidation.validationMethod());
+			final String certificateArn;
+			if(existingCertificateSummaries.isEmpty()) {
+				logger.info("Requesting certificate for domain name `{}` and alternative names `{}`.", domain, aliases);
+				certificateArn = acmClient
+						.requestCertificate(request -> request.domainName(domain).subjectAlternativeNames(aliases).validationMethod(ValidationMethod.DNS)).certificateArn();
+			} else {
+				if(existingCertificateSummaries.size() > 1) {
+					throw new IOException(
+							String.format("Multiple certificates per domain not supported; please remove all but one certificates for domain `%s`.", domain));
+				}
+				certificateArn = getOnly(existingCertificateSummaries).certificateArn();
 			}
-		}
+			assert certificateArn != null;
+			this.acmCertificateArn = certificateArn; //save the certificate ARN for other phases
+			final CertificateDetail certificateDetail = acmClient.describeCertificate(request -> request.certificateArn(certificateArn)).certificate();
+			//apparently the domain alternative names _includes_ the domain name itself
+			if(!Set.copyOf(certificateDetail.subjectAlternativeNames()).equals(Sets.immutableSetOf(aliases, domain))) {
+				logger.warn("Certificate `{}` alternate names `{}` do not match site domain {} and aliases `{}`.", certificateArn,
+						List.copyOf(certificateDetail.subjectAlternativeNames()), domain, aliases);
+			}
 
+			//set up domain validation in the DNS
+			for(final DomainValidation domainValidation : certificateDetail.domainValidationOptions()) {
+				switch(domainValidation.validationStatus()) {
+					case SUCCESS: //already validated
+						logger.debug("Certificate `{}` for domain name `{}` has been validated.", certificateArn, domainValidation.domainName());
+						break;
+					case PENDING_VALIDATION:
+						if(domainValidation.validationMethod().equals(ValidationMethod.DNS)) {
+							final ResourceRecord resourceRecord = domainValidation.resourceRecord();
+							context.getDeployDns().ifPresentOrElse(throwingConsumer(dns -> {
+								logger.info("Setting DNS entry (`{}`) `{} = {}` for certificate `{}` validation for domain name `{}`.", resourceRecord.typeAsString(),
+										resourceRecord.name(), resourceRecord.value(), certificateArn, domainValidation.domainName());
+								dns.setResourceRecord(resourceRecord.typeAsString(), resourceRecord.name(), resourceRecord.value(), CERTIFICATE_VALIDATION_DNS_TTL);
+							}), () -> logger.warn(
+									"No DNS configured. To validate certificate `{}` for domain name `{}`, resource record (`{}`) `{} = {}` must be set in the DNS manually.",
+									certificateArn, domainValidation.domainName(), resourceRecord.typeAsString(), resourceRecord.name(), resourceRecord.value()));
+						} else {
+							logger.warn("Certificate `{}` specifies an unknown validation method `{}` for domain name `{}` and must be performed manually.", certificateArn,
+									domainValidation.validationMethod(), domainValidation.domainName());
+						}
+						break;
+					default: //includes `FAILED`
+						logger.warn("Unable to validate certificate `{}` for domain name `{}`; validation status already indicates `{}`.", certificateArn,
+								domainValidation.domainName(), domainValidation.validationMethod());
+				}
+			}
+		} catch(final SdkException sdkException) {
+			throw new IOException(sdkException);
+		}
 	}
 
 	/**
@@ -195,57 +195,61 @@ public class CloudFront implements DeployTarget, Clogged {
 	 */
 	@Override
 	public Optional<URI> deploy(final MummyContext context, final Artifact rootArtifact) throws IOException {
-		final CloudFrontClient cloudFrontClient = getCloudFrontClient();
-		final Logger logger = getLogger();
+		try {
+			final CloudFrontClient cloudFrontClient = getCloudFrontClient();
+			final Logger logger = getLogger();
 
-		final S3 s3 = context.getDeployTargets().orElseThrow(IllegalStateException::new).stream().filter(S3.class::isInstance).map(S3.class::cast).findFirst()
-				.orElseThrow(() -> new ConfigurationException("CloudFront deployement currently requires an S3 target to be configured first."));
-		final Region s3BucketRegion = s3.getRegion();
-		for(final String s3Bucket : (Iterable<String>)s3.buckets()::iterator) {
+			final S3 s3 = context.getDeployTargets().orElseThrow(IllegalStateException::new).stream().filter(S3.class::isInstance).map(S3.class::cast).findFirst()
+					.orElseThrow(() -> new ConfigurationException("CloudFront deployement currently requires an S3 target to be configured first."));
+			final Region s3BucketRegion = s3.getRegion();
+			for(final String s3Bucket : (Iterable<String>)s3.buckets()::iterator) {
 
-			//create a distribution if there is none for this bucket
-			final Set<DistributionSummary> existingDistributionSummaries = getDistributionSummariesByAliases(cloudFrontClient, Set.of(s3Bucket));
-			for(final DistributionSummary existingDistributionSummary : existingDistributionSummaries) {
-				logger.debug("Distribution ID `{}` (ARN `{}`) exists for S3 bucket `{}`.", existingDistributionSummary.id(), existingDistributionSummary.arn(),
-						s3Bucket);
-			}
-			//TODO; see what info we need later when updating the DNS			final String distributionId;
-			if(existingDistributionSummaries.isEmpty()) {
-				logger.info("Creating distribution for S3 bucket `{}`.", s3Bucket);
-				final StringBuilder commentBuilder = new StringBuilder(); //TODO add note on max length
-				commentBuilder.append("Created by ").append(context.getMummifierIdentification()); //i18n
-				commentBuilder.append(" on ").append(ZonedDateTime.now()); //i18n
-				commentBuilder.append("."); //i18n
-				final String s3BucketWebsiteEndpoint = S3.getBucketWebsiteEndpoint(s3Bucket, s3BucketRegion);
-				final CustomOriginConfig s3BucketOriginConfig = CustomOriginConfig.builder().httpPort(HTTP.DEFAULT_PORT).httpsPort(HTTP.DEFAULT_SECURE_PORT)
-						.originProtocolPolicy(OriginProtocolPolicy.HTTP_ONLY) //S3 buckets as website endpoints only support HTTP
-						.build();
-				final Origin origin = Origin.builder().id(s3Bucket).domainName(s3BucketWebsiteEndpoint).customOriginConfig(s3BucketOriginConfig).build(); //use the bucket as the ID as a convenience
-				final String callerReference = UUID.randomUUID().toString(); //use a random UUID as the temporary caller reference (required)
-				final String acmCertificateArn = getAcmCertificateArn().orElseThrow(IllegalStateException::new);
-				final ViewerCertificate viewerCertificate = ViewerCertificate.builder() //use our ACM certificate and only allows browser that support SNI (as recommended)
-						.acmCertificateArn(acmCertificateArn).sslSupportMethod(SSLSupportMethod.SNI_ONLY).build();
-				final CookiePreference forwardCookies = CookiePreference.builder().forward(ItemSelection.NONE).build();
-				final boolean forwardQueries = false;
-				final DefaultCacheBehavior redirectToHttps = DefaultCacheBehavior.builder().viewerProtocolPolicy(ViewerProtocolPolicy.REDIRECT_TO_HTTPS)
-						.forwardedValues(forwardedValues -> forwardedValues.queryString(forwardQueries).cookies(forwardCookies)).targetOriginId(origin.id())
-						.trustedSigners(trustedSigners -> trustedSigners.enabled(false).quantity(0)).minTTL(0L).build();
-				final DistributionConfig distributionConfig = DistributionConfig.builder().origins(origins -> origins.items(origin).quantity(1))
-						.defaultCacheBehavior(redirectToHttps).viewerCertificate(viewerCertificate).enabled(true).callerReference(callerReference)
-						.comment(commentBuilder.toString()).build();
-				final Distribution distribution = cloudFrontClient.createDistribution(request -> request.distributionConfig(distributionConfig)).distribution();
-				//TODO what do we do with the distribution?
-			} else {
-				if(existingDistributionSummaries.size() > 1) {
-					throw new IOException(String.format("Multiple distributions found with an alias for bucket `%s`; all but one must be removed.", s3Bucket));
+				//create a distribution if there is none for this bucket
+				final Set<DistributionSummary> existingDistributionSummaries = getDistributionSummariesByAliases(cloudFrontClient, Set.of(s3Bucket));
+				for(final DistributionSummary existingDistributionSummary : existingDistributionSummaries) {
+					logger.debug("Distribution ID `{}` (ARN `{}`) exists for S3 bucket `{}`.", existingDistributionSummary.id(), existingDistributionSummary.arn(),
+							s3Bucket);
 				}
-				//TODO				distributionId = getOnly(existingDistributionSummaries).certificateArn();
-				//TODO ensure that the existing distribution truly has the correct origin, i.e. to the S3 bucket
+				//TODO; see what info we need later when updating the DNS			final String distributionId;
+				if(existingDistributionSummaries.isEmpty()) {
+					logger.info("Creating distribution for S3 bucket `{}`.", s3Bucket);
+					final StringBuilder commentBuilder = new StringBuilder(); //TODO add note on max length
+					commentBuilder.append("Created by ").append(context.getMummifierIdentification()); //i18n
+					commentBuilder.append(" on ").append(ZonedDateTime.now()); //i18n
+					commentBuilder.append("."); //i18n
+					final String s3BucketWebsiteEndpoint = S3.getBucketWebsiteEndpoint(s3Bucket, s3BucketRegion);
+					final CustomOriginConfig s3BucketOriginConfig = CustomOriginConfig.builder().httpPort(HTTP.DEFAULT_PORT).httpsPort(HTTP.DEFAULT_SECURE_PORT)
+							.originProtocolPolicy(OriginProtocolPolicy.HTTP_ONLY) //S3 buckets as website endpoints only support HTTP
+							.build();
+					final Origin origin = Origin.builder().id(s3Bucket).domainName(s3BucketWebsiteEndpoint).customOriginConfig(s3BucketOriginConfig).build(); //use the bucket as the ID as a convenience
+					final String callerReference = UUID.randomUUID().toString(); //use a random UUID as the temporary caller reference (required)
+					final String acmCertificateArn = getAcmCertificateArn().orElseThrow(IllegalStateException::new);
+					final ViewerCertificate viewerCertificate = ViewerCertificate.builder() //use our ACM certificate and only allows browser that support SNI (as recommended)
+							.acmCertificateArn(acmCertificateArn).sslSupportMethod(SSLSupportMethod.SNI_ONLY).build();
+					final CookiePreference forwardCookies = CookiePreference.builder().forward(ItemSelection.NONE).build();
+					final boolean forwardQueries = false;
+					final DefaultCacheBehavior redirectToHttps = DefaultCacheBehavior.builder().viewerProtocolPolicy(ViewerProtocolPolicy.REDIRECT_TO_HTTPS)
+							.forwardedValues(forwardedValues -> forwardedValues.queryString(forwardQueries).cookies(forwardCookies)).targetOriginId(origin.id())
+							.trustedSigners(trustedSigners -> trustedSigners.enabled(false).quantity(0)).minTTL(0L).build();
+					final DistributionConfig distributionConfig = DistributionConfig.builder().origins(origins -> origins.items(origin).quantity(1))
+							.defaultCacheBehavior(redirectToHttps).viewerCertificate(viewerCertificate).enabled(true).callerReference(callerReference)
+							.comment(commentBuilder.toString()).build();
+					final Distribution distribution = cloudFrontClient.createDistribution(request -> request.distributionConfig(distributionConfig)).distribution();
+					//TODO what do we do with the distribution?
+				} else {
+					if(existingDistributionSummaries.size() > 1) {
+						throw new IOException(String.format("Multiple distributions found with an alias for bucket `%s`; all but one must be removed.", s3Bucket));
+					}
+					//TODO				distributionId = getOnly(existingDistributionSummaries).certificateArn();
+					//TODO ensure that the existing distribution truly has the correct origin, i.e. to the S3 bucket
+				}
+
 			}
 
+			return Optional.empty(); //TODO improve
+		} catch(final SdkException sdkException) {
+			throw new IOException(sdkException);
 		}
-
-		return Optional.empty(); //TODO improve
 	}
 
 	//# ACM utility methods; could be removed to separate library
@@ -258,9 +262,11 @@ public class CloudFront implements DeployTarget, Clogged {
 	 * @param client The client to use for retrieving the certificate summaries.
 	 * @param domainName The main domain name of the certificate.
 	 * @return A set of summaries all certificates for the given domain name.
+	 * @throws SdkException if an error occurs related to AWS.
 	 * @see CertificateSummary#domainName()
 	 */
-	protected static Set<CertificateSummary> getCertificateSummariesByDomainName(@Nonnull final AcmClient client, @Nonnull final String domainName) {
+	protected static Set<CertificateSummary> getCertificateSummariesByDomainName(@Nonnull final AcmClient client, @Nonnull final String domainName)
+			throws SdkException {
 		requireNonNull(domainName);
 		try (final Stream<CertificateSummary> certificateSummariesByDomainName = certificateSummaries(client)
 				.filter(certificate -> certificate.domainName().equals(domainName))) {
@@ -272,8 +278,9 @@ public class CloudFront implements DeployTarget, Clogged {
 	 * Retrieves a stream of summaries of all certificates.
 	 * @param client The client to use for retrieving the certificate summaries.
 	 * @return A stream of summaries of all certificate.
+	 * @throws SdkException if an error occurs related to AWS.
 	 */
-	protected static Stream<CertificateSummary> certificateSummaries(@Nonnull final AcmClient client) {
+	protected static Stream<CertificateSummary> certificateSummaries(@Nonnull final AcmClient client) throws SdkException {
 		return client.listCertificatesPaginator().stream().flatMap(response -> response.certificateSummaryList().stream());
 	}
 
@@ -287,10 +294,12 @@ public class CloudFront implements DeployTarget, Clogged {
 	 * @param client The client to use for retrieving the distribution summaries.
 	 * @param aliases The aliases for which distributions should be returned.
 	 * @return A set of summaries all distributions with the exact aliases, in any order
+	 * @throws SdkException if an error occurs related to AWS.
 	 * @see DistributionSummary#aliases()
 	 * @see Aliases
 	 */
-	protected static Set<DistributionSummary> getDistributionSummariesByAliases(@Nonnull final CloudFrontClient client, @Nonnull final Set<String> aliases) {
+	protected static Set<DistributionSummary> getDistributionSummariesByAliases(@Nonnull final CloudFrontClient client, @Nonnull final Set<String> aliases)
+			throws SdkException {
 		requireNonNull(aliases);
 		try (final Stream<DistributionSummary> distributionSummariesByAliases = distributionSummaries(client)
 				.filter(distribution -> Set.copyOf(distribution.aliases().items()).equals(aliases))) {
@@ -304,9 +313,9 @@ public class CloudFront implements DeployTarget, Clogged {
 	 *           for consistency with other methods. In the future this could be made more efficient with an iterator.
 	 * @param client The client to use for retrieving the distribution summaries.
 	 * @return A stream of summaries of all distributions.
-	 * @throws SdkException If there is some error retrieving the distribution summaries.
+	 * @throws SdkException if an error occurs related to AWS.
 	 */
-	protected static Stream<DistributionSummary> distributionSummaries(@Nonnull final CloudFrontClient client) {
+	protected static Stream<DistributionSummary> distributionSummaries(@Nonnull final CloudFrontClient client) throws SdkException {
 		final List<DistributionSummary> distributionSummaries = new ArrayList<>();
 		ListDistributionsRequest request = ListDistributionsRequest.builder().build();
 		ListDistributionsResponse response;

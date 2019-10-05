@@ -140,56 +140,60 @@ public class Route53 implements Dns, Clogged {
 
 	@Override
 	public void prepare(final MummyContext context) throws IOException {
-		final Logger logger = getLogger();
-		final Route53Client client = getRoute53Client();
-		if(configuredHostedZoneId != null) {
-			final Set<HostedZone> existingHostedZones = getHostedZonesById(client, configuredHostedZoneId);
-			for(final HostedZone existingHostedZone : existingHostedZones) {
-				logger.debug("Hosted zone with ID `{}` exists with name `{}`.", existingHostedZone.id(), existingHostedZone.name());
-			}
-			if(existingHostedZones.isEmpty()) {
-				throw new IOException(String.format("No hosted zone exists with ID `%s`. Please check the ID or provide a hosted zone name so that it can be created.",
-						configuredHostedZoneId));
-			}
-			if(existingHostedZones.size() > 1) { //we don't expect this on AWS
-				throw new IOException(String.format("Multiple hosted zones encountered with the ID `%s`.", configuredHostedZoneId));
-			}
-			hostedZone = getOnly(existingHostedZones);
-		} else {
-			assert configuredHostedZoneName != null : "Either a hosted zone name or a hosted zone ID should have been configured.";
-			final Set<HostedZone> existingHostedZones = getHostedZonesByName(client, configuredHostedZoneName);
-			for(final HostedZone existingHostedZone : existingHostedZones) {
-				logger.debug("Hosted zone with ID `{}` already exists for name `{}`.", existingHostedZone.id(), existingHostedZone.name());
-			}
-			if(!existingHostedZones.isEmpty()) {
-				if(existingHostedZones.size() > 1) {
-					throw new IOException(
-							String.format("Multiple hosted zones already exist with the name `%s`. Please identify the hosted zone by ID or remove the other hosted zones.",
-									configuredHostedZoneName));
+		try {
+			final Logger logger = getLogger();
+			final Route53Client client = getRoute53Client();
+			if(configuredHostedZoneId != null) {
+				final Set<HostedZone> existingHostedZones = getHostedZonesById(client, configuredHostedZoneId);
+				for(final HostedZone existingHostedZone : existingHostedZones) {
+					logger.debug("Hosted zone with ID `{}` exists with name `{}`.", existingHostedZone.id(), existingHostedZone.name());
+				}
+				if(existingHostedZones.isEmpty()) {
+					throw new IOException(String.format(
+							"No hosted zone exists with ID `%s`. Please check the ID or provide a hosted zone name so that it can be created.", configuredHostedZoneId));
+				}
+				if(existingHostedZones.size() > 1) { //we don't expect this on AWS
+					throw new IOException(String.format("Multiple hosted zones encountered with the ID `%s`.", configuredHostedZoneId));
 				}
 				hostedZone = getOnly(existingHostedZones);
-			} else { //create a named hosted zone, using a random UUID as the temporary caller reference (required)
-				logger.info("Creating Route 53 public hosted zone for name `{}`.", configuredHostedZoneName);
-				final StringBuilder commentBuilder = new StringBuilder();
-				commentBuilder.append("Created by ").append(context.getMummifierIdentification()); //i18n
-				commentBuilder.append(" on ").append(ZonedDateTime.now()); //i18n
-				context.getConfiguration().findString(CONFIG_KEY_SITE_DOMAIN).ifPresent(siteDomain -> commentBuilder.append(" for site domain ").append(siteDomain)); //i18n
-				context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALIASES, String.class)
-						.ifPresent(siteAliases -> commentBuilder.append(" with aliases ").append(siteAliases)); //i18n
-				commentBuilder.append("."); //i18n
-				hostedZone = client.createHostedZone(request -> request.name(configuredHostedZoneName).callerReference(UUID.randomUUID().toString())
-						.hostedZoneConfig(config -> config.comment(commentBuilder.toString()))).hostedZone();
-				logger.debug("Created Route 53 public hosted zone with ID `{}` for name `{}`.", hostedZone.id(), hostedZone.name());
+			} else {
+				assert configuredHostedZoneName != null : "Either a hosted zone name or a hosted zone ID should have been configured.";
+				final Set<HostedZone> existingHostedZones = getHostedZonesByName(client, configuredHostedZoneName);
+				for(final HostedZone existingHostedZone : existingHostedZones) {
+					logger.debug("Hosted zone with ID `{}` already exists for name `{}`.", existingHostedZone.id(), existingHostedZone.name());
+				}
+				if(!existingHostedZones.isEmpty()) {
+					if(existingHostedZones.size() > 1) {
+						throw new IOException(
+								String.format("Multiple hosted zones already exist with the name `%s`. Please identify the hosted zone by ID or remove the other hosted zones.",
+										configuredHostedZoneName));
+					}
+					hostedZone = getOnly(existingHostedZones);
+				} else { //create a named hosted zone, using a random UUID as the temporary caller reference (required)
+					logger.info("Creating Route 53 public hosted zone for name `{}`.", configuredHostedZoneName);
+					final StringBuilder commentBuilder = new StringBuilder();
+					commentBuilder.append("Created by ").append(context.getMummifierIdentification()); //i18n
+					commentBuilder.append(" on ").append(ZonedDateTime.now()); //i18n
+					context.getConfiguration().findString(CONFIG_KEY_SITE_DOMAIN).ifPresent(siteDomain -> commentBuilder.append(" for site domain ").append(siteDomain)); //i18n
+					context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALIASES, String.class)
+							.ifPresent(siteAliases -> commentBuilder.append(" with aliases ").append(siteAliases)); //i18n
+					commentBuilder.append("."); //i18n
+					hostedZone = client.createHostedZone(request -> request.name(configuredHostedZoneName).callerReference(UUID.randomUUID().toString())
+							.hostedZoneConfig(config -> config.comment(commentBuilder.toString()))).hostedZone();
+					logger.debug("Created Route 53 public hosted zone with ID `{}` for name `{}`.", hostedZone.id(), hostedZone.name());
+				}
 			}
+
+			assert hostedZone != null;
+
+			//log name servers
+			getNsRecords(client, hostedZone).forEach(nsRecord -> {
+				logger.info("Name server: {}", nsRecord.value());
+
+			});
+		} catch(final SdkException sdkException) {
+			throw new IOException(sdkException);
 		}
-
-		assert hostedZone != null;
-
-		//log name servers
-		getNsRecords(client, hostedZone).forEach(nsRecord -> {
-			logger.info("Name server: {}", nsRecord.value());
-
-		});
 	}
 
 	@Override
@@ -197,9 +201,9 @@ public class Route53 implements Dns, Clogged {
 		requireNonNull(type);
 		requireNonNull(name);
 		requireNonNull(value);
-		final Route53Client client = getRoute53Client();
-		final HostedZone hostedZone = getHostedZone().orElseThrow(IllegalStateException::new);
 		try {
+			final Route53Client client = getRoute53Client();
+			final HostedZone hostedZone = getHostedZone().orElseThrow(IllegalStateException::new);
 			final ResourceRecord resourceRecord = ResourceRecord.builder().value(value).build();
 			final ResourceRecordSet resourceRecordSet = ResourceRecordSet.builder().type(type).name(name).resourceRecords(resourceRecord).ttl(ttl).build();
 			final Change change = Change.builder().resourceRecordSet(resourceRecordSet).action(ChangeAction.UPSERT).build();
@@ -219,9 +223,10 @@ public class Route53 implements Dns, Clogged {
 	 * @param client The client to use for retrieving the zones.
 	 * @param id The ID of the hosted zone to retrieve; <em>needs to end with a domain delimiter <code>.</code></em>.
 	 * @return A set of all hosted zones with the given ID.
+	 * @throws SdkException if an error occurs related to AWS.
 	 * @see HostedZone#id()
 	 */
-	protected static Set<HostedZone> getHostedZonesById(@Nonnull final Route53Client client, @Nonnull final String id) {
+	protected static Set<HostedZone> getHostedZonesById(@Nonnull final Route53Client client, @Nonnull final String id) throws SdkException {
 		requireNonNull(id);
 		try (final Stream<HostedZone> hostedZonesByName = hostedZones(client).filter(hostedZone -> hostedZone.id().equals(id))) {
 			return hostedZonesByName.collect(toSet());
@@ -234,9 +239,10 @@ public class Route53 implements Dns, Clogged {
 	 * @param client The client to use for retrieving the zones.
 	 * @param name The name of the hosted zone to retrieve; <em>needs to end with a domain delimiter <code>.</code></em>.
 	 * @return A set of all hosted zones with the given name.
+	 * @throws SdkException if an error occurs related to AWS.
 	 * @see HostedZone#name()
 	 */
-	protected static Set<HostedZone> getHostedZonesByName(@Nonnull final Route53Client client, @Nonnull final String name) {
+	protected static Set<HostedZone> getHostedZonesByName(@Nonnull final Route53Client client, @Nonnull final String name) throws SdkException {
 		requireNonNull(name);
 		try (final Stream<HostedZone> hostedZonesByName = hostedZones(client).filter(hostedZone -> hostedZone.name().equals(name))) {
 			return hostedZonesByName.collect(toSet());
@@ -247,8 +253,9 @@ public class Route53 implements Dns, Clogged {
 	 * Retrieves a stream of all hosted zones.
 	 * @param client The client to use for retrieving the zones.
 	 * @return A stream of all hosted zones the client knows about.
+	 * @throws SdkException if an error occurs related to AWS.
 	 */
-	protected static Stream<HostedZone> hostedZones(@Nonnull final Route53Client client) {
+	protected static Stream<HostedZone> hostedZones(@Nonnull final Route53Client client) throws SdkException {
 		return client.listHostedZonesPaginator().stream().flatMap(response -> response.hostedZones().stream());
 	}
 
@@ -261,9 +268,11 @@ public class Route53 implements Dns, Clogged {
 	 * @return The NS records for the hosted zone.
 	 * @throws IOException if no NS record set was encountered.
 	 * @throws IOException if more than one NS record set was encountered.
+	 * @throws SdkException if an error occurs related to AWS.
 	 * @see RRType#NS
 	 */
-	protected static List<ResourceRecord> getNsRecords(@Nonnull final Route53Client client, @Nonnull final HostedZone hostedZone) throws IOException {
+	protected static List<ResourceRecord> getNsRecords(@Nonnull final Route53Client client, @Nonnull final HostedZone hostedZone)
+			throws IOException, SdkException {
 		//start listing the record sets at the NS record for efficiency, but we still have to filter the result because there are likely subsequent record sets
 		try (final Stream<ResourceRecordSet> nsRecordSets = resourceRecordSets(client, hostedZone.id(), hostedZone.name(), RRType.NS)
 				.filter(recordSet -> recordSet.name().equals(hostedZone.name()) && recordSet.type().equals(RRType.NS))) {
@@ -283,9 +292,10 @@ public class Route53 implements Dns, Clogged {
 	 * @param startRecordName The name of the resource record set to begin the record listing from, if any.
 	 * @param startRecordType The type of resource record set to begin the record listing from, if any; if present a name must be indicated as well.
 	 * @return A stream of all record sets for the identified hosted zone.
+	 * @throws SdkException if an error occurs related to AWS.
 	 */
 	protected static Stream<ResourceRecordSet> resourceRecordSets(@Nonnull final Route53Client client, @Nonnull final String hostedZoneId,
-			@Nullable final String startRecordName, @Nullable final RRType startRecordType) {
+			@Nullable final String startRecordName, @Nullable final RRType startRecordType) throws SdkException {
 		requireNonNull(hostedZoneId);
 		return client.listResourceRecordSetsPaginator(request -> {
 			request.hostedZoneId(hostedZoneId);
