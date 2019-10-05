@@ -23,7 +23,6 @@ import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.IOException;
 import java.net.URI;
-import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Stream;
@@ -54,8 +53,10 @@ import software.amazon.awssdk.services.cloudfront.model.*;
  *           may or may not have been originally determined from the site domain and aliases) will be used as the certificate domain name and alternative names,
  *           respectively. If there is an existing certificate indicating the main S3 bucket, it will be used. This implementation does not support multiple
  *           certificates to be specified for the same S3 bucket; all but one must be removed.
- * @implSpec This implementation should specify a {@link Dns} in the configuration for requesting certificates and for updating the DNS after the CloudFront
- *           distribution is in place.
+ * @implSpec To use this implementation one should specify a {@link Dns} in the configuration for requesting certificates and for updating the DNS after the
+ *           CloudFront distribution is in place.
+ * @implSpec To use this implementation one should specify a {@link Dns} of type {@link Route53} in the configuration in order to create an alias to the
+ *           CloudFront distribution.
  * @author Garret Wilson
  */
 public class CloudFront implements DeployTarget, Clogged {
@@ -211,7 +212,8 @@ public class CloudFront implements DeployTarget, Clogged {
 					logger.debug("Distribution ID `{}` (ARN `{}`) exists for S3 bucket `{}`.", existingDistributionSummary.id(), existingDistributionSummary.arn(),
 							s3Bucket);
 				}
-				//TODO; see what info we need later when updating the DNS			final String distributionId;
+				final String distributionId;
+				final String distributionDomainName;
 				if(existingDistributionSummaries.isEmpty()) {
 					logger.info("Creating distribution for S3 bucket `{}`.", s3Bucket);
 					final StringBuilder commentBuilder = new StringBuilder(); //CloudFront comments are limited to a little over 120 characters in length
@@ -237,15 +239,26 @@ public class CloudFront implements DeployTarget, Clogged {
 							.defaultCacheBehavior(redirectToHttps).viewerCertificate(viewerCertificate).enabled(true).callerReference(callerReference)
 							.comment(commentBuilder.toString()).build();
 					final Distribution distribution = cloudFrontClient.createDistribution(request -> request.distributionConfig(distributionConfig)).distribution();
-					//TODO what do we do with the distribution?
+					distributionId = distribution.id();
+					distributionDomainName = distribution.domainName();
 				} else {
 					if(existingDistributionSummaries.size() > 1) {
 						throw new IOException(String.format("Multiple distributions found with an alias for bucket `%s`; all but one must be removed.", s3Bucket));
 					}
-					//TODO				distributionId = getOnly(existingDistributionSummaries).certificateArn();
+					final DistributionSummary distributionSummary = getOnly(existingDistributionSummaries);
+					distributionId = distributionSummary.id();
+					distributionDomainName = distributionSummary.domainName();
 					//TODO ensure that the existing distribution truly has the correct origin, i.e. to the S3 bucket
 				}
 
+				//add an alias record to the new distribution if we have a Route 53 DNS
+				context.getDeployDns().filter(Route53.class::isInstance).map(Route53.class::cast).ifPresentOrElse(throwingConsumer(route53 -> {
+					logger.info("Setting DNS alias `A` record for domain name `{}` to CloudFront distribution `{}` domain `{}`.", s3Bucket, distributionId,
+							distributionDomainName);
+					route53.setAliasResourceRecord(Dns.ResourceRecordType.A, s3Bucket, distributionDomainName, Route53.CLOUDFRONT_ALIAS_HOSTED_ZONE_ID);
+				}), () -> logger.warn(
+						"No Route 53 DNS configured; an alias for domain name `{}` to CloudFront distribution `{}` domain `{}` must be set in the Route 53 manually if desired.",
+						s3Bucket, distributionId, distributionDomainName));
 			}
 
 			return Optional.empty(); //TODO improve
