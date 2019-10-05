@@ -172,12 +172,12 @@ public class Route53 implements Dns, Clogged {
 				} else { //create a named hosted zone, using a random UUID as the temporary caller reference (required)
 					logger.info("Creating Route 53 public hosted zone for name `{}`.", configuredHostedZoneName);
 					final StringBuilder commentBuilder = new StringBuilder();
-					commentBuilder.append("Created by ").append(context.getMummifierIdentification()); //i18n
-					commentBuilder.append(" on ").append(ZonedDateTime.now()); //i18n
-					context.getConfiguration().findString(CONFIG_KEY_SITE_DOMAIN).ifPresent(siteDomain -> commentBuilder.append(" for site domain ").append(siteDomain)); //i18n
+					commentBuilder.append("Created by ").append(context.getMummifierIdentification()); //TODO i18n
+					commentBuilder.append(" on ").append(ZonedDateTime.now()); //TODO i18n
+					context.getConfiguration().findString(CONFIG_KEY_SITE_DOMAIN).ifPresent(siteDomain -> commentBuilder.append(" for site domain ").append(siteDomain)); //TODO i18n
 					context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALIASES, String.class)
-							.ifPresent(siteAliases -> commentBuilder.append(" with aliases ").append(siteAliases)); //i18n
-					commentBuilder.append("."); //i18n
+							.ifPresent(siteAliases -> commentBuilder.append(" with aliases ").append(siteAliases)); //TODO i18n
+					commentBuilder.append("."); //TODO i18n
 					hostedZone = client.createHostedZone(request -> request.name(configuredHostedZoneName).callerReference(UUID.randomUUID().toString())
 							.hostedZoneConfig(config -> config.comment(commentBuilder.toString()))).hostedZone();
 					logger.debug("Created Route 53 public hosted zone with ID `{}` for name `{}`.", hostedZone.id(), hostedZone.name());

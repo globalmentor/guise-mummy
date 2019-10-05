@@ -23,6 +23,7 @@ import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Stream;
@@ -215,8 +216,8 @@ public class CloudFront implements DeployTarget, Clogged {
 					logger.info("Creating distribution for S3 bucket `{}`.", s3Bucket);
 					final StringBuilder commentBuilder = new StringBuilder(); //TODO add note on max length
 					commentBuilder.append("Created by ").append(context.getMummifierIdentification()); //i18n
-					commentBuilder.append(" on ").append(ZonedDateTime.now()); //i18n
-					commentBuilder.append("."); //i18n
+					commentBuilder.append(" on ").append(OffsetDateTime.now()); //TODO i18n
+					commentBuilder.append("."); //TODO i18n
 					final String s3BucketWebsiteEndpoint = S3.getBucketWebsiteEndpoint(s3Bucket, s3BucketRegion);
 					final CustomOriginConfig s3BucketOriginConfig = CustomOriginConfig.builder().httpPort(HTTP.DEFAULT_PORT).httpsPort(HTTP.DEFAULT_SECURE_PORT)
 							.originProtocolPolicy(OriginProtocolPolicy.HTTP_ONLY) //S3 buckets as website endpoints only support HTTP
