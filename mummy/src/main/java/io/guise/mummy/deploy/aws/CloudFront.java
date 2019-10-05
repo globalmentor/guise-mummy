@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import javax.annotation.*;
@@ -152,7 +153,37 @@ public class CloudFront implements DeployTarget, Clogged {
 			}
 			assert certificateArn != null;
 			this.acmCertificateArn = certificateArn; //save the certificate ARN for other phases
-			final CertificateDetail certificateDetail = acmClient.describeCertificate(request -> request.certificateArn(certificateArn)).certificate();
+			CertificateDetail certificateDetail = null;
+			//keep polling for the certificate request to be recognized, from a one second to a one minute interval, backing off by doubling the interval
+			for(int pollIntervalSeconds = 1; pollIntervalSeconds <= TimeUnit.MINUTES.toSeconds(1); pollIntervalSeconds *= 2) {
+				final CertificateDetail verifyCertificateDetail = acmClient.describeCertificate(request -> request.certificateArn(certificateArn)).certificate();
+				boolean recognized = true;
+				if(verifyCertificateDetail.domainName() == null) {
+					recognized = false; //as soon as we create a certificate, it doesn't indicate any domain
+				} else { //even after indicating a domain, it may not yet indicate all the DNS validation records needed
+					for(final DomainValidation domainValidation : verifyCertificateDetail.domainValidationOptions()) {
+						if(domainValidation.validationMethod().equals(ValidationMethod.DNS) && domainValidation.resourceRecord() == null) {
+							recognized = false;
+							break;
+						}
+					}
+				}
+				if(recognized) {
+					certificateDetail = verifyCertificateDetail;
+					break;
+				}
+				try { //if the certificate isn't yet recognized, wait and try again
+					logger.info("Waiting for requested certificate `{}` to be recognized...", certificateArn);
+					TimeUnit.SECONDS.sleep(pollIntervalSeconds);
+				} catch(final InterruptedException interruptedException) {
+					//if interrupted while sleeping, just try again and keep backing off
+				}
+			}
+			if(certificateDetail == null) {
+				throw new IOException(String
+						.format("Requested certificate `%s` was never recognized. Correct any problems, perhaps wait a while longer, and deploy again.", certificateArn));
+			}
+
 			//apparently the domain alternative names _includes_ the domain name itself
 			if(!Set.copyOf(certificateDetail.subjectAlternativeNames()).equals(Sets.immutableSetOf(aliases, domain))) {
 				logger.warn("Certificate `{}` alternate names `{}` do not match site domain {} and aliases `{}`.", certificateArn,
@@ -160,7 +191,9 @@ public class CloudFront implements DeployTarget, Clogged {
 			}
 
 			//set up domain validation in the DNS
-			for(final DomainValidation domainValidation : certificateDetail.domainValidationOptions()) {
+			final List<DomainValidation> domainValidations = certificateDetail.domainValidationOptions();
+			final Set<String> pendingValidationDomainNames = new LinkedHashSet<>(domainValidations.size());
+			for(final DomainValidation domainValidation : domainValidations) {
 				switch(domainValidation.validationStatus()) {
 					case SUCCESS: //already validated
 						logger.debug("Certificate `{}` for domain name `{}` has been validated.", certificateArn, domainValidation.domainName());
@@ -179,11 +212,23 @@ public class CloudFront implements DeployTarget, Clogged {
 							logger.warn("Certificate `{}` specifies an unknown validation method `{}` for domain name `{}` and must be performed manually.", certificateArn,
 									domainValidation.validationMethod(), domainValidation.domainName());
 						}
+						//note this pending domain to report later, but continue examining the validations to add other DNS entries as needed before reporting the problem
+						pendingValidationDomainNames.add(domainValidation.domainName());
 						break;
-					default: //includes `FAILED`
-						logger.warn("Unable to validate certificate `{}` for domain name `{}`; validation status already indicates `{}`.", certificateArn,
-								domainValidation.domainName(), domainValidation.validationMethod());
+					case FAILED:
+						throw new IOException(String.format(
+								"Certificate `%s` for domain name `%s` failed validation: `%s`. Please delete the certificate, correct any problems, and deploy again.",
+								certificateArn, domainValidation.domainName(), certificateDetail.failureReason()));
+					default:
+						throw new IOException(String.format(
+								"Unable to validate certificate `%s` for domain name `%s`; validation status indicates `%s`. Please delete the certificate and deploy again.",
+								certificateArn, domainValidation.domainName(), domainValidation.validationStatus()));
 				}
+			}
+			if(!pendingValidationDomainNames.isEmpty()) {
+				throw new IOException(String.format("Certificate `%s` is still pending validation for domain names %s."
+						+ " Make sure your domain is configured with the correct NS records for your DNS, wait for the certificate to finish validating,"
+						+ " and initiate deployment again.", certificateArn, pendingValidationDomainNames));
 			}
 		} catch(final SdkException sdkException) {
 			throw new IOException(sdkException);
