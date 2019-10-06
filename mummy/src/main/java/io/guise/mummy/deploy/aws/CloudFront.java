@@ -17,6 +17,8 @@
 package io.guise.mummy.deploy.aws;
 
 import static com.globalmentor.collections.iterables.Iterables.*;
+import static com.globalmentor.net.HTTP.*;
+import static com.globalmentor.net.URIs.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 import static org.zalando.fauxpas.FauxPas.*;
@@ -33,14 +35,12 @@ import javax.annotation.*;
 import org.slf4j.Logger;
 
 import com.globalmentor.collections.Sets;
-import com.globalmentor.net.HTTP;
+import com.globalmentor.net.*;
 
 import io.clogr.Clogged;
-import io.confound.config.Configuration;
-import io.confound.config.ConfigurationException;
+import io.confound.config.*;
 import io.guise.mummy.*;
-import io.guise.mummy.deploy.DeployTarget;
-import io.guise.mummy.deploy.Dns;
+import io.guise.mummy.deploy.*;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.acm.AcmClient;
@@ -306,7 +306,7 @@ public class CloudFront implements DeployTarget, Clogged {
 						s3Bucket, distributionId, distributionDomainName));
 			}
 
-			return Optional.empty(); //TODO improve
+			return Optional.of(createURI(HTTPS_URI_SCHEME, null, s3.getBucket(), -1, URIs.ROOT_PATH, null, null)); //https://s3-bucket/
 		} catch(final SdkException sdkException) {
 			throw new IOException(sdkException);
 		}
