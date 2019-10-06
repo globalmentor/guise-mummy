@@ -228,7 +228,7 @@ public class Route53 implements Dns, Clogged {
 	/**
 	 * Sets an alias resource record. If a resource record with the same type and name does not already exists, it will be added. If a resource record already
 	 * exists with the same type and name, it will be replaced. (This is commonly referred to as <dfn>upsert</dfn>.)
-	 * @implSpec This implementation delegates to {@link #setAliasResourceRecord(String, String, String, String, long)}.
+	 * @implSpec This implementation delegates to {@link #setAliasResourceRecord(String, String, String, String)}.
 	 * @implNote Alias resource records are specific to Route 53.
 	 * @param type The type of resource record to set.
 	 * @param name The name of the resource record.
@@ -238,7 +238,7 @@ public class Route53 implements Dns, Clogged {
 	 * @see <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-choosing-alias-non-alias.html">Choosing Between Alias and
 	 *      Non-Alias Records</a>
 	 */
-	public void setAliasResourceRecord(@Nonnull final ResourceRecordType type, @Nonnull final String name, @Nonnull final String aliasDnsName,
+	public void setAliasResourceRecord(@Nonnull final Dns.ResourceRecordType type, @Nonnull final String name, @Nonnull final String aliasDnsName,
 			@Nonnull final String aliasHostZoneId) throws IOException {
 		setAliasResourceRecord(type.toString(), name, aliasDnsName, aliasHostZoneId);
 	}
@@ -246,7 +246,7 @@ public class Route53 implements Dns, Clogged {
 	/**
 	 * Sets an alias resource record. If a resource record with the same type and name does not already exists, it will be added. If a resource record already
 	 * exists with the same type and name, it will be replaced. (This is commonly referred to as <dfn>upsert</dfn>.)
-	 * @apiNote Using {@link #setAliasResourceRecord(ResourceRecordType, String, String, String, long)} for known resource record types is preferred for type and
+	 * @apiNote Using {@link #setAliasResourceRecord(Dns.ResourceRecordType, String, String, String)} for known resource record types is preferred for type and
 	 *          value safety.
 	 * @implNote Alias resource records are specific to Route 53.
 	 * @param type The type of resource record to set.
