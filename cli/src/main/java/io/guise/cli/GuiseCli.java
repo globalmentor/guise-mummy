@@ -283,18 +283,21 @@ public class GuiseCli extends BaseCliApplication {
 			return; //TODO improve error handling
 		}
 
-		//launch the browser; see https://stackoverflow.com/a/5226244/421049
+		//launch the browser using the last deploy URL; see https://stackoverflow.com/a/5226244/421049
 		if(browse && Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
 
-			mummifier.getDeployUrls().stream().findFirst().ifPresent(deployUrl -> {
+			final List<URI> deployUrls = mummifier.getDeployUrls();
+			if(!deployUrls.isEmpty()) {
+				final URI lastDeployUrl = deployUrls.get(deployUrls.size() - 1);
 				try {
-					Desktop.getDesktop().browse(deployUrl);
+					Desktop.getDesktop().browse(lastDeployUrl);
 				} catch(final IOException exception) {
 					getLogger().error("{}", exception.getMessage());
 					getLogger().debug("{}", exception.getMessage(), exception);
 					return; //TODO improve error handling
 				}
-			});
+			}
+			;
 		}
 	}
 

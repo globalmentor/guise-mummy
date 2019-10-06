@@ -98,11 +98,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	public AbstractXMLDepictContext(final GuiseSession session, final Destination destination) throws IOException {
 		super(session, destination); //construct the parent class
 		xmlNamespacePrefixManager = new XMLNamespacePrefixManager(); //create a new XML namespace prefix manager
-		try {
-			messageDigest = MessageDigest.getInstance(SHA_ALGORITHM); //get a message digest instance using SHA for creating hashes of element attributes and content
-		} catch(final NoSuchAlgorithmException noSuchAlgorithmException) { //we should always support SHA message digests
-			throw new AssertionError(noSuchAlgorithmException);
-		}
+		messageDigest = SHA_1.getInstance(); //get a message digest instance using SHA-1 for creating hashes of element attributes and content
 	}
 
 	@Override
