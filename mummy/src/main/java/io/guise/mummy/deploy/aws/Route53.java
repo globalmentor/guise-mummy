@@ -21,6 +21,7 @@ import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.util.stream.Streams.*;
 import static io.guise.mummy.GuiseMummy.*;
+import static io.guise.mummy.deploy.aws.AWS.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
@@ -39,6 +40,7 @@ import io.confound.config.Configuration;
 import io.guise.mummy.GuiseMummy;
 import io.guise.mummy.MummyContext;
 import io.guise.mummy.deploy.Dns;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.route53.*;
@@ -76,6 +78,13 @@ public class Route53 implements Dns, Clogged {
 	 */
 	public static final String AWS_GLOBAL_ACCELERATOR_ALIAS_HOSTED_ZONE_ID = "Z2BJ6XQ5FK7U4H";
 
+	private final String profile;
+
+	/** @return The AWS profile if one was set explicitly. */
+	public final Optional<String> getProfile() {
+		return Optional.of(profile);
+	}
+
 	private final String configuredHostedZoneId;
 
 	private final String configuredHostedZoneName;
@@ -104,28 +113,36 @@ public class Route53 implements Dns, Clogged {
 	 * </p>
 	 * @param context The context of static site generation.
 	 * @param localConfiguration The local configuration for the Route 53 DNS, which may be a section of the project configuration.
+	 * @see AWS#CONFIG_KEY_DEPLOY_AWS_PROFILE
 	 * @see #CONFIG_KEY_HOSTED_ZONE_ID
 	 * @see #CONFIG_KEY_HOSTED_ZONE_NAME
 	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
 	 * @see GuiseMummy#CONFIG_KEY_SITE_ALIASES
 	 */
 	public Route53(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
-		this(localConfiguration.findString(CONFIG_KEY_HOSTED_ZONE_ID).orElse(null),
+		this(context.getConfiguration().findString(CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null),
+				localConfiguration.findString(CONFIG_KEY_HOSTED_ZONE_ID).orElse(null),
 				getConfiguredHostedZoneName(context.getConfiguration(), localConfiguration).orElse(null));
 	}
 
 	/**
 	 * Hosted zone ID and domain constructor. Either a hosted zone ID or a domain must be given. If both are given, the domain must match that of the identified
 	 * hosted zone, checked with the DNS is later queried.
+	 * @param profile The name of the AWS profile to use for retrieving credentials, or <code>null</code> if the default credential provider should be used.
 	 * @param hostedZoneId The ID of the hosted zone, or <code>null</code> if not known until created.
 	 * @param domain The domain managed by the hosted zone, or <code>null</code> if a hosted zone already exists for the domain.
 	 * @throws IllegalArgumentException if neither a hosted zone ID nor a domain is specified.
 	 */
-	public Route53(@Nullable final String hostedZoneId, @Nullable final String domain) {
+	public Route53(@Nullable String profile, @Nullable final String hostedZoneId, @Nullable final String domain) {
+		this.profile = profile;
 		checkArgument(hostedZoneId != null || domain != null, "Either a hosted zone ID or a domain must be configured for %s.", getClass().getSimpleName());
 		this.configuredHostedZoneId = hostedZoneId;
 		this.configuredHostedZoneName = domain;
-		route53Client = Route53Client.builder().region(Region.AWS_GLOBAL).build();
+		final Route53ClientBuilder route53ClientBuilder = Route53Client.builder().region(Region.AWS_GLOBAL);
+		if(profile != null) {
+			route53ClientBuilder.credentialsProvider(ProfileCredentialsProvider.create(profile));
+		}
+		route53Client = route53ClientBuilder.build();
 	}
 
 	/**
@@ -155,6 +172,7 @@ public class Route53 implements Dns, Clogged {
 		try {
 			final Logger logger = getLogger();
 			final Route53Client client = getRoute53Client();
+			getProfile().ifPresent(profile -> getLogger().info("Using AWS Route 53 credentials profile `{}`.", profile));
 			if(configuredHostedZoneId != null) {
 				final Set<HostedZone> existingHostedZones = getHostedZonesById(client, configuredHostedZoneId);
 				for(final HostedZone existingHostedZone : existingHostedZones) {
