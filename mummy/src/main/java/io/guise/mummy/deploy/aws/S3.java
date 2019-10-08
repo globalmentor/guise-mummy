@@ -19,6 +19,7 @@ package io.guise.mummy.deploy.aws;
 import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.net.URIs.*;
 import static io.guise.mummy.GuiseMummy.*;
+import static io.guise.mummy.deploy.aws.AWS.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.stream.Stream.*;
@@ -39,6 +40,7 @@ import io.confound.config.Configuration;
 import io.guise.mummy.*;
 import io.guise.mummy.deploy.DeployTarget;
 import io.urf.vocab.content.Content;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.*;
@@ -138,6 +140,13 @@ public class S3 implements DeployTarget, Clogged {
 			"	}]" + 
 			"}").build();	//@formatter:on
 
+	private final String profile;
+
+	/** @return The AWS profile if one was set explicitly. */
+	public final Optional<String> getProfile() {
+		return Optional.of(profile);
+	}
+
 	private final Region region;
 
 	/** @return The specified region for deployment. */
@@ -185,6 +194,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * </p>
 	 * @param context The context of static site generation.
 	 * @param localConfiguration The local configuration for this deployment target, which may be a section of the project configuration.
+	 * @see AWS#CONFIG_KEY_DEPLOY_AWS_PROFILE
 	 * @see #CONFIG_KEY_REGION
 	 * @see #CONFIG_KEY_BUCKET
 	 * @see #CONFIG_KEY_ALIASES
@@ -192,7 +202,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @see GuiseMummy#CONFIG_KEY_SITE_ALIASES
 	 */
 	public S3(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
-		this(Region.of(localConfiguration.getString(CONFIG_KEY_REGION)),
+		this(context.getConfiguration().findString(CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null), Region.of(localConfiguration.getString(CONFIG_KEY_REGION)),
 				localConfiguration.findString(CONFIG_KEY_BUCKET).orElseGet(() -> context.getConfiguration().getString(CONFIG_KEY_SITE_DOMAIN)),
 				localConfiguration.findCollection(CONFIG_KEY_ALIASES, String.class)
 						.or(() -> context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALIASES, String.class)).orElse(emptyList()));
@@ -200,15 +210,21 @@ public class S3 implements DeployTarget, Clogged {
 
 	/**
 	 * Region, bucket, and aliases constructor. The aliases will be stored as a set.
+	 * @param profile The name of the AWS profile to use for retrieving credentials, or <code>null</code> if the default credential provider should be used.
 	 * @param region The AWS region of deployment.
 	 * @param bucket The bucket into which the site should be deployed.
 	 * @param aliases The bucket aliases, if any, to redirect to the primary bucket.
 	 */
-	public S3(@Nonnull final Region region, @Nonnull String bucket, @Nonnull final Collection<String> aliases) {
+	public S3(@Nullable String profile, @Nonnull final Region region, @Nonnull String bucket, @Nonnull final Collection<String> aliases) {
+		this.profile = profile;
 		this.region = requireNonNull(region);
 		this.bucket = requireNonNull(bucket);
 		this.aliases = new LinkedHashSet<>(aliases); //maintain order to help with reporting and debugging
-		s3Client = S3Client.builder().region(region).build();
+		final S3ClientBuilder s3ClientBuilder = S3Client.builder().region(region);
+		if(profile != null) {
+			s3ClientBuilder.credentialsProvider(ProfileCredentialsProvider.create(profile));
+		}
+		s3Client = s3ClientBuilder.build();
 	}
 
 	/**
@@ -223,6 +239,7 @@ public class S3 implements DeployTarget, Clogged {
 			//prepare bucket
 			final String bucket = getBucket();
 			final Region region = getRegion();
+			getProfile().ifPresent(profile -> getLogger().info("Using AWS S3 credentials profile `{}`.", profile));
 			getLogger().info("Preparing AWS S3 bucket `{}` in region `{}` for deployment.", bucket, region);
 			final boolean bucketExists = bucketExists(bucket);
 			getLogger().debug("Bucket `{}` exists? {}.", bucket, bucketExists);

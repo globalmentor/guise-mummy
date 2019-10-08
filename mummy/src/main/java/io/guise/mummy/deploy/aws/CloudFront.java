@@ -19,6 +19,7 @@ package io.guise.mummy.deploy.aws;
 import static com.globalmentor.collections.iterables.Iterables.*;
 import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.net.URIs.*;
+import static io.guise.mummy.deploy.aws.AWS.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 import static org.zalando.fauxpas.FauxPas.*;
@@ -41,11 +42,12 @@ import io.clogr.Clogged;
 import io.confound.config.*;
 import io.guise.mummy.*;
 import io.guise.mummy.deploy.*;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.acm.AcmClient;
+import software.amazon.awssdk.services.acm.*;
 import software.amazon.awssdk.services.acm.model.*;
-import software.amazon.awssdk.services.cloudfront.CloudFrontClient;
+import software.amazon.awssdk.services.cloudfront.*;
 import software.amazon.awssdk.services.cloudfront.model.*;
 
 /**
@@ -69,6 +71,13 @@ public class CloudFront implements DeployTarget, Clogged {
 	 * @see <a href="https://aws.amazon.com/certificate-manager/faqs/">AWS Certificate Manager FAQs</a>
 	 */
 	public static final Region ACM_REGION = Region.US_EAST_1;
+
+	private final String profile;
+
+	/** @return The AWS profile if one was set explicitly. */
+	public final Optional<String> getProfile() {
+		return Optional.of(profile);
+	}
 
 	private final AcmClient acmClient;
 
@@ -102,17 +111,28 @@ public class CloudFront implements DeployTarget, Clogged {
 	 * </p>
 	 * @param context The context of static site generation.
 	 * @param localConfiguration The local configuration for this deployment target, which may be a section of the project configuration.
+	 * @see AWS#CONFIG_KEY_DEPLOY_AWS_PROFILE
 	 */
 	public CloudFront(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
-		this();
+		this(context.getConfiguration().findString(CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null));
 	}
 
 	/**
 	 * Constructor.
+	 * @param profile The name of the AWS profile to use for retrieving credentials, or <code>null</code> if the default credential provider should be used.
 	 */
-	public CloudFront() {
-		acmClient = AcmClient.builder().region(ACM_REGION).build();
-		cloudFrontClient = CloudFrontClient.builder().region(Region.AWS_GLOBAL).build();
+	public CloudFront(@Nullable String profile) {
+		this.profile = profile;
+		final AcmClientBuilder acmClientBuilder = AcmClient.builder().region(ACM_REGION);
+		if(profile != null) {
+			acmClientBuilder.credentialsProvider(ProfileCredentialsProvider.create(profile));
+		}
+		acmClient = acmClientBuilder.build();
+		final CloudFrontClientBuilder cloudFrontClientBuilder = CloudFrontClient.builder().region(Region.AWS_GLOBAL);
+		if(profile != null) {
+			cloudFrontClientBuilder.credentialsProvider(ProfileCredentialsProvider.create(profile));
+		}
+		cloudFrontClient = cloudFrontClientBuilder.build();
 	}
 
 	/** The cache time for the DNS record validating a certificate. */
@@ -246,6 +266,7 @@ public class CloudFront implements DeployTarget, Clogged {
 			final CloudFrontClient cloudFrontClient = getCloudFrontClient();
 			final Logger logger = getLogger();
 
+			getProfile().ifPresent(profile -> getLogger().info("Using AWS CloudFront credentials profile `{}`.", profile));
 			final S3 s3 = context.getDeployTargets().orElseThrow(IllegalStateException::new).stream().filter(S3.class::isInstance).map(S3.class::cast).findFirst()
 					.orElseThrow(() -> new ConfigurationException("CloudFront deployement currently requires an S3 target to be configured first."));
 			final Region s3BucketRegion = s3.getRegion();
