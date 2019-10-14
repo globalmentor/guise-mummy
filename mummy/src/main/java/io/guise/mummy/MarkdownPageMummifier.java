@@ -18,6 +18,7 @@ package io.guise.mummy;
 
 import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
+import static com.globalmentor.lex.CompoundTokenization.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static java.nio.charset.StandardCharsets.*;
 
@@ -169,11 +170,12 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 			//multiple front matter values for a name result in multiple <meta> elements as a side effect which may be useful
 			metaValues.forEach(metaValue -> { //TODO add an HtmlDom.addNamedMetata() method
 				final Element metaElement = addLast(headElement, document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_META));
-				metaElement.setAttributeNS(null, ELEMENT_META_ATTRIBUTE_NAME, metaName);
+				metaElement.setAttributeNS(null, ELEMENT_META_ATTRIBUTE_NAME, CAMEL_CASE.toKebabCase(metaName));
 				metaElement.setAttributeNS(null, ELEMENT_META_ATTRIBUTE_CONTENT, metaValue);
 			});
 		});
 
 		return document;
 	}
+
 }
