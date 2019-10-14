@@ -16,16 +16,20 @@
 
 package io.guise.mummy.deploy.aws;
 
+import static com.globalmentor.java.Conditions.checkState;
 import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.net.URIs.*;
+import static io.guise.mummy.Artifact.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static io.guise.mummy.deploy.aws.AWS.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Stream.*;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -183,7 +187,11 @@ public class S3 implements DeployTarget, Clogged {
 		return s3Client;
 	}
 
+	/** The map of S3 object keys for each artifact. */
 	private final ReverseMap<Artifact, String> artifactKeys = new DecoratorReverseMap<>(new LinkedHashMap<>(), new HashMap<>());
+
+	/** The map of alternative (redirect) keys for artifacts that have redirects. */
+	private final Map<Artifact, String> artifactAltKeys = new LinkedHashMap<>();
 
 	/**
 	 * Configuration constructor.
@@ -244,15 +252,12 @@ public class S3 implements DeployTarget, Clogged {
 			final boolean bucketExists = bucketExists(bucket);
 			getLogger().debug("Bucket `{}` exists? {}.", bucket, bucketExists);
 			final boolean bucketHasPolicy;
-			final boolean bucketHasWebsiteConfiguration;
 			if(bucketExists) { //if the bucket exists, see if it has a policy
 				bucketHasPolicy = bucketHasPolicy(bucket);
-				bucketHasWebsiteConfiguration = bucketHasWebsiteConfiguration(bucket);
 			} else { //create the bucket if it doesn't exist
 				getLogger().info("Creating S3 bucket `{}` in AWS region `{}`.", bucket, region);
 				s3Client.createBucket(request -> request.bucket(bucket).createBucketConfiguration(config -> config.locationConstraint(region.id())));
 				bucketHasPolicy = false; //the bucket doesn't have a policy yet, as we just created it
-				bucketHasWebsiteConfiguration = false; //the bucket isn't configured for a web site, because it is new
 			}
 
 			//set bucket policy
@@ -261,39 +266,16 @@ public class S3 implements DeployTarget, Clogged {
 				s3Client.putBucketPolicy(request -> request.bucket(bucket).policy(POLICY_TEMPLATE_PUBLIC_READ_GET_OBJECT.apply(bucket)));
 			}
 
-			//configure bucket for web site
-			getLogger().info("Configuring S3 bucket `{}` for web site access.", bucket);
-			if(bucketHasWebsiteConfiguration) {
-				getLogger().debug("S3 bucket `{}` is already configured for web site access; updating configuration.", bucket);
-			}
-			//TODO use some separate configuration access for the "content name"
-			final boolean isNameBare = context.getConfiguration().findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);
-			final String indexDocumentSuffix = isNameBare ? "index" : "index.html"; //TODO get from configuration
-			final IndexDocument indexDocument = IndexDocument.builder().suffix(indexDocumentSuffix).build();
-			s3Client.putBucketWebsite(request -> request.bucket(bucket).websiteConfiguration(config -> config.indexDocument(indexDocument)));
-
 			//prepare alias buckets
 			for(final String alias : getAliases()) {
 				getLogger().info("Preparing AWS S3 bucket `{}` in region `{}` to serve as an alias.", alias, region);
-
 				final boolean aliasBucketExists = bucketExists(alias);
 				getLogger().debug("Alias bucket `{}` exists? {}.", alias, aliasBucketExists);
-				final boolean aliasBucketHasWebsiteConfiguration;
-				if(aliasBucketExists) { //if the bucket exists, see if it has a configuration
-					aliasBucketHasWebsiteConfiguration = bucketHasWebsiteConfiguration(alias);
-				} else { //create the bucket if it doesn't exist
+				if(!aliasBucketExists) { //create the bucket if it doesn't exist
 					getLogger().info("Creating S3 alias bucket `{}` in AWS region `{}`.", alias, region);
 					s3Client.createBucket(request -> request.bucket(alias).createBucketConfiguration(config -> config.locationConstraint(region.id())));
-					aliasBucketHasWebsiteConfiguration = false; //the bucket isn't configured for a web site, because it is new
 				}
 
-				//configure alias bucket for web site
-				getLogger().info("Configuring S3 alias bucket `{}` for web site redirection.", alias);
-				if(aliasBucketHasWebsiteConfiguration) {
-					getLogger().debug("S3 alias bucket `{}` is already configured for web site access; updating configuration.", alias);
-				}
-				s3Client.putBucketWebsite(
-						builder -> builder.bucket(alias).websiteConfiguration(config -> config.redirectAllRequestsTo(redirect -> redirect.hostName(bucket))));
 			}
 		} catch(final SdkException sdkException) {
 			throw new IOException(sdkException);
@@ -312,6 +294,43 @@ public class S3 implements DeployTarget, Clogged {
 
 		//#prune
 		prune(context);
+
+		//configure bucket for web site with appropriate redirects
+		try {
+			getLogger().info("Configuring S3 bucket `{}` for web site access.", bucket);
+			//TODO use some separate configuration access for the "content name"
+			final boolean isNameBare = context.getConfiguration().findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);
+			final String indexDocumentSuffix = isNameBare ? "index" : "index.html"; //TODO get from configuration
+			final IndexDocument indexDocument = IndexDocument.builder().suffix(indexDocumentSuffix).build();
+			final Set<RoutingRule> routingRules = artifactAltKeys.entrySet().stream().map(artifactAltKeyEntry -> {
+				final Artifact artifact = artifactAltKeyEntry.getKey();
+				final String altKey = artifactAltKeyEntry.getValue();
+				final String artifactKey = artifactKeys.get(artifact);
+				checkState(artifactKey != null, "An S3 object key should have been determined for artifact %s during planning.", artifact);
+				return RoutingRule.builder().condition(condition -> condition.keyPrefixEquals(altKey)).redirect(redirect -> {
+					//If the artifact (e.g. a directory) can contain other artifacts, we'll replace the entire key prefix
+					//to allow redirects for contained artifacts as well. Otherwise replace the entire key in case an artifact
+					//key matches the prefix of another non-redirected path (not expected to occur frequently in practice).
+					if(artifact instanceof CollectionArtifact) {
+						redirect.replaceKeyPrefixWith(artifactKey);
+					} else {
+						redirect.replaceKeyWith(artifactKey);
+					}
+				}).build();
+			}).collect(toCollection(LinkedHashSet::new)); //maintain order to help with debugging
+			final WebsiteConfiguration websiteConfiguration = WebsiteConfiguration.builder().indexDocument(indexDocument)
+					.routingRules(routingRules.toArray(RoutingRule[]::new)).build();
+			s3Client.putBucketWebsite(request -> request.bucket(bucket).websiteConfiguration(websiteConfiguration));
+
+			//configure alias buckets for web sites
+			for(final String alias : getAliases()) {
+				getLogger().info("Configuring S3 alias bucket `{}` for web site redirection.", alias);
+				s3Client.putBucketWebsite(
+						builder -> builder.bucket(alias).websiteConfiguration(config -> config.redirectAllRequestsTo(redirect -> redirect.hostName(bucket))));
+			}
+		} catch(final SdkException sdkException) {
+			throw new IOException(sdkException);
+		}
 
 		return Optional.of(getBucketWebsiteUrl(getBucket(), getRegion()));
 	}
@@ -335,11 +354,16 @@ public class S3 implements DeployTarget, Clogged {
 	 */
 	protected void plan(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact, @Nonnull Artifact artifact) throws IOException {
 		try {
-			if(!(artifact instanceof DirectoryArtifact)) { //don't deploy anything for directories TODO improve semantics, especially after the root artifact type changes; maybe use CollectionArtifact
-				final String key = context.relativizeTargetReference(rootArtifact, artifact).toString();
-				getLogger().debug("Planning deployment for artifact {}, S3 key `{}`.", artifact, key);
-				artifactKeys.put(artifact, key);
-			}
+			final String key = context.relativizeTargetReference(rootArtifact, artifact).toString();
+			getLogger().debug("Planning deployment for artifact {}, S3 key `{}`.", artifact, key);
+			artifactKeys.put(artifact, key);
+			artifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ALT_NAME).filter(CharSequence.class::isInstance).map(Object::toString)
+					.ifPresent(altName -> {
+						final Path altPath = artifact.getTargetPath().resolveSibling(altName);
+						final String altKey = context.relativizeTargetReference(rootArtifact, altPath).toString();
+						getLogger().debug("Planning deployment redirect for artifact {} from S3 key `{}` to S3 key `{}`.", artifact, altKey, key);
+						artifactAltKeys.put(artifact, altKey);
+					});
 			if(artifact instanceof CompositeArtifact) {
 				for(final Artifact comprisedArtifact : (Iterable<Artifact>)((CompositeArtifact)artifact).comprisedArtifacts()::iterator) {
 					plan(context, rootArtifact, comprisedArtifact);
@@ -352,6 +376,7 @@ public class S3 implements DeployTarget, Clogged {
 
 	/**
 	 * Transfers content for deployment.
+	 * @implSpec This implementation skips directories.
 	 * @apiNote This is the main deployment method, which actually deploys content.
 	 * @param context The context of static site generation.
 	 * @throws IOException if there is an I/O error during putting.
@@ -362,12 +387,14 @@ public class S3 implements DeployTarget, Clogged {
 			final String bucket = getBucket();
 			for(final Map.Entry<Artifact, String> artifactKeyEntry : artifactKeys.entrySet()) {
 				final Artifact artifact = artifactKeyEntry.getKey();
-				final String key = artifactKeyEntry.getValue();
-				getLogger().info("Deploying artifact to S3 key `{}`.", key);
-				final PutObjectRequest.Builder putBuilder = PutObjectRequest.builder().bucket(bucket).key(key);
-				//set content-type if found
-				Content.findContentType(artifact.getResourceDescription()).map(ContentType::toString).ifPresent(putBuilder::contentType);
-				s3Client.putObject(putBuilder.build(), RequestBody.fromFile(artifact.getTargetPath()));
+				if(!(artifact instanceof DirectoryArtifact)) { //don't deploy anything for directories TODO improve semantics, especially after the root artifact type changes; maybe use CollectionArtifact
+					final String key = artifactKeyEntry.getValue();
+					getLogger().info("Deploying artifact to S3 key `{}`.", key);
+					final PutObjectRequest.Builder putBuilder = PutObjectRequest.builder().bucket(bucket).key(key);
+					//set content-type if found
+					Content.findContentType(artifact.getResourceDescription()).map(ContentType::toString).ifPresent(putBuilder::contentType);
+					s3Client.putObject(putBuilder.build(), RequestBody.fromFile(artifact.getTargetPath()));
+				}
 			}
 		} catch(final SdkException sdkException) {
 			throw new IOException(sdkException);

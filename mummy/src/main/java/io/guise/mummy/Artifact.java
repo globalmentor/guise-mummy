@@ -45,6 +45,8 @@ public interface Artifact {
 	public static final String PROPERTY_HANDLE_LABEL = "label";
 	/** The property handle of the title, such as a page title. */
 	public static final String PROPERTY_HANDLE_TITLE = "title";
+	/** The property tag of the <code>mummy/altName</code> property for indicating an alternate (redirect) name. */
+	public static final URI PROPERTY_TAG_MUMMY_ALT_NAME = NAMESPACE.resolve("altName");
 	/** The property tag of the <code>mummy/order</code> property for indicating e.g. navigation order. */
 	public static final URI PROPERTY_TAG_MUMMY_ORDER = NAMESPACE.resolve("order");
 	/**
