@@ -19,9 +19,7 @@ package io.guise.mummy;
 import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Paths.*;
-import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
-import static com.globalmentor.java.StringBuilders.*;
 import static com.globalmentor.lex.CompoundTokenization.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static io.guise.mummy.Artifact.*;
@@ -53,7 +51,6 @@ import com.globalmentor.net.*;
 import com.globalmentor.xml.XmlDom;
 import com.globalmentor.xml.spec.XML;
 
-import io.urf.URF;
 import io.urf.URF.Handle;
 import io.urf.model.UrfObject;
 import io.urf.model.UrfResourceDescription;
