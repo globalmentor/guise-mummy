@@ -156,7 +156,7 @@ public class MarkdownPageMummifierTest {
 		assertThat(findTitle(document), isPresentAndIs("Simple Page with Other Metadata"));
 		assertThat(findHtmlHeadMetaElementContent(document, "title"), isEmpty()); //make sure we didn't duplicate the title as metadata 
 		assertThat(findHtmlHeadMetaElementContent(document, "label"), isPresentAndIs("Simplicity"));
-		assertThat(findHtmlHeadMetaElementContent(document, "fooBar"), isPresentAndIs("This is a test."));
+		assertThat(findHtmlHeadMetaElementContent(document, "foo-bar"), isPresentAndIs("This is a test."));
 		assertSimpleBody(document);
 	}
 
