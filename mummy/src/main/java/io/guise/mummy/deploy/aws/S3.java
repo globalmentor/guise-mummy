@@ -148,7 +148,7 @@ public class S3 implements DeployTarget, Clogged {
 
 	/** @return The AWS profile if one was set explicitly. */
 	public final Optional<String> getProfile() {
-		return Optional.of(profile);
+		return Optional.ofNullable(profile);
 	}
 
 	private final Region region;
