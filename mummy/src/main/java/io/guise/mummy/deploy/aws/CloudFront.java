@@ -151,7 +151,7 @@ public class CloudFront implements DeployTarget, Clogged {
 			final S3 s3 = context.getDeployTargets().orElseThrow(IllegalStateException::new).stream().filter(S3.class::isInstance).map(S3.class::cast).findFirst()
 					.orElseThrow(() -> new ConfigurationException("CloudFront deployement currently requires an S3 target to be configured first."));
 			final String domain = s3.getBucket();
-			final Set<String> aliases = s3.getAliases();
+			final Set<String> aliases = s3.getAltBuckets();
 
 			//request a certificate if needed
 			final Set<CertificateSummary> existingCertificateSummaries = getCertificateSummariesByDomainName(acmClient, domain);

@@ -62,9 +62,10 @@ public class S3 implements DeployTarget, Clogged {
 	/** The section relative key for the bucket name in the configuration; defaults to {@link GuiseMummy#CONFIG_KEY_SITE_DOMAIN} in the global configuration. */
 	public static final String CONFIG_KEY_BUCKET = "bucket";
 	/**
-	 * The section relative key for the bucket aliases in the configuration; defaults to {@link GuiseMummy#CONFIG_KEY_SITE_ALIASES} in the global configuration.
+	 * The section relative key for the alternative buckets in the configuration; defaults to {@link GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} in the global
+	 * configuration.
 	 */
-	public static final String CONFIG_KEY_ALIASES = "aliases";
+	public static final String CONFIG_KEY_ALT_BUCKETS = "altBuckets";
 
 	/**
 	 * The regions that use a dash (<code>-</code>) instead of a dot (<code>.</code>) to separate <code>s3-website</code> from the region in the endpoint domain
@@ -165,19 +166,19 @@ public class S3 implements DeployTarget, Clogged {
 		return bucket;
 	}
 
-	private final Set<String> aliases;
+	private final Set<String> altBuckets;
 
-	/** @return The S3 buckets, if any, to serve as aliases and redirect to the primary bucket. */
-	public Set<String> getAliases() {
-		return aliases;
+	/** @return The S3 buckets, if any, to serve as alternatives and redirect to the primary bucket. */
+	public Set<String> getAltBuckets() {
+		return altBuckets;
 	}
 
 	/**
-	 * @return A stream of all bucket names, starting with the primary bucket {@link #getBucket()}, followed by the aliases {@link #getAliases()} in no guaranteed
-	 *         order.
+	 * @return A stream of all bucket names, starting with the primary bucket {@link #getBucket()}, followed by the alternatives {@link #getAltBuckets()} in no
+	 *         guaranteed order.
 	 */
 	public Stream<String> buckets() {
-		return concat(Stream.of(getBucket()), getAliases().stream());
+		return concat(Stream.of(getBucket()), getAltBuckets().stream());
 	}
 
 	private final S3Client s3Client;
@@ -197,37 +198,38 @@ public class S3 implements DeployTarget, Clogged {
 	 * Configuration constructor.
 	 * <p>
 	 * The region is retrieved from {@value #CONFIG_KEY_REGION} in the local configuration. The bucket name is retrieved from {@value #CONFIG_KEY_BUCKET} in the
-	 * local configuration, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} in the context configuration if not specified. The bucket aliases are
-	 * retrieved from {@value #CONFIG_KEY_ALIASES}, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_ALIASES} in the context configuration if not specified.
+	 * local configuration, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} in the context configuration if not specified. The bucket alternatives are
+	 * retrieved from {@value #CONFIG_KEY_ALT_BUCKETS}, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} in the context configuration if not
+	 * specified.
 	 * </p>
 	 * @param context The context of static site generation.
 	 * @param localConfiguration The local configuration for this deployment target, which may be a section of the project configuration.
 	 * @see AWS#CONFIG_KEY_DEPLOY_AWS_PROFILE
 	 * @see #CONFIG_KEY_REGION
 	 * @see #CONFIG_KEY_BUCKET
-	 * @see #CONFIG_KEY_ALIASES
+	 * @see #CONFIG_KEY_ALT_BUCKETS
 	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
-	 * @see GuiseMummy#CONFIG_KEY_SITE_ALIASES
+	 * @see GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS
 	 */
 	public S3(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
 		this(context.getConfiguration().findString(CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null), Region.of(localConfiguration.getString(CONFIG_KEY_REGION)),
 				localConfiguration.findString(CONFIG_KEY_BUCKET).orElseGet(() -> context.getConfiguration().getString(CONFIG_KEY_SITE_DOMAIN)),
-				localConfiguration.findCollection(CONFIG_KEY_ALIASES, String.class)
-						.or(() -> context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALIASES, String.class)).orElse(emptyList()));
+				localConfiguration.findCollection(CONFIG_KEY_ALT_BUCKETS, String.class)
+						.or(() -> context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class)).orElse(emptyList()));
 	}
 
 	/**
-	 * Region, bucket, and aliases constructor. The aliases will be stored as a set.
+	 * Region, bucket, and alternative buckets constructor. The alternative buckets will be stored as a set.
 	 * @param profile The name of the AWS profile to use for retrieving credentials, or <code>null</code> if the default credential provider should be used.
 	 * @param region The AWS region of deployment.
 	 * @param bucket The bucket into which the site should be deployed.
-	 * @param aliases The bucket aliases, if any, to redirect to the primary bucket.
+	 * @param altBuckets The bucket alternatives, if any, to redirect to the primary bucket.
 	 */
-	public S3(@Nullable String profile, @Nonnull final Region region, @Nonnull String bucket, @Nonnull final Collection<String> aliases) {
+	public S3(@Nullable String profile, @Nonnull final Region region, @Nonnull String bucket, @Nonnull final Collection<String> altBuckets) {
 		this.profile = profile;
 		this.region = requireNonNull(region);
 		this.bucket = requireNonNull(bucket);
-		this.aliases = new LinkedHashSet<>(aliases); //maintain order to help with reporting and debugging
+		this.altBuckets = new LinkedHashSet<>(altBuckets); //maintain order to help with reporting and debugging
 		final S3ClientBuilder s3ClientBuilder = S3Client.builder().region(region);
 		if(profile != null) {
 			s3ClientBuilder.credentialsProvider(ProfileCredentialsProvider.create(profile));
@@ -266,14 +268,14 @@ public class S3 implements DeployTarget, Clogged {
 				s3Client.putBucketPolicy(request -> request.bucket(bucket).policy(POLICY_TEMPLATE_PUBLIC_READ_GET_OBJECT.apply(bucket)));
 			}
 
-			//prepare alias buckets
-			for(final String alias : getAliases()) {
-				getLogger().info("Preparing AWS S3 bucket `{}` in region `{}` to serve as an alias.", alias, region);
-				final boolean aliasBucketExists = bucketExists(alias);
-				getLogger().debug("Alias bucket `{}` exists? {}.", alias, aliasBucketExists);
-				if(!aliasBucketExists) { //create the bucket if it doesn't exist
-					getLogger().info("Creating S3 alias bucket `{}` in AWS region `{}`.", alias, region);
-					s3Client.createBucket(request -> request.bucket(alias).createBucketConfiguration(config -> config.locationConstraint(region.id())));
+			//prepare alternative buckets
+			for(final String altBucket : getAltBuckets()) {
+				getLogger().info("Preparing AWS S3 bucket `{}` in region `{}` to serve as an alternative.", altBucket, region);
+				final boolean altBucketExists = bucketExists(altBucket);
+				getLogger().debug("Alternative bucket `{}` exists? {}.", altBucket, altBucketExists);
+				if(!altBucketExists) { //create the bucket if it doesn't exist
+					getLogger().info("Creating S3 alternative bucket `{}` in AWS region `{}`.", altBucket, region);
+					s3Client.createBucket(request -> request.bucket(altBucket).createBucketConfiguration(config -> config.locationConstraint(region.id())));
 				}
 
 			}
@@ -322,11 +324,11 @@ public class S3 implements DeployTarget, Clogged {
 					.routingRules(routingRules.toArray(RoutingRule[]::new)).build();
 			s3Client.putBucketWebsite(request -> request.bucket(bucket).websiteConfiguration(websiteConfiguration));
 
-			//configure alias buckets for web sites
-			for(final String alias : getAliases()) {
-				getLogger().info("Configuring S3 alias bucket `{}` for web site redirection.", alias);
+			//configure alternative buckets for web sites
+			for(final String altBucket : getAltBuckets()) {
+				getLogger().info("Configuring S3 alternative bucket `{}` for web site redirection.", altBucket);
 				s3Client.putBucketWebsite(
-						builder -> builder.bucket(alias).websiteConfiguration(config -> config.redirectAllRequestsTo(redirect -> redirect.hostName(bucket))));
+						builder -> builder.bucket(altBucket).websiteConfiguration(config -> config.redirectAllRequestsTo(redirect -> redirect.hostName(bucket))));
 			}
 		} catch(final SdkException sdkException) {
 			throw new IOException(sdkException);

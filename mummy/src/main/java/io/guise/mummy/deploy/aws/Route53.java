@@ -62,7 +62,7 @@ public class Route53 implements Dns, Clogged {
 
 	/**
 	 * The DNS section relative key for the hosted zone name; must end with the <code>.</code> domain delimiter; defaults to the common domain suffix of
-	 * {@link GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and {@link GuiseMummy#CONFIG_KEY_SITE_ALIASES}, with a domain delimiter <code>.</code> appended.
+	 * {@link GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and {@link GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS}, with a domain delimiter <code>.</code> appended.
 	 */
 	public static final String CONFIG_KEY_HOSTED_ZONE_NAME = "hostedZoneName";
 
@@ -108,7 +108,7 @@ public class Route53 implements Dns, Clogged {
 	 * <p>
 	 * The hosted zone ID is retrieved from {@value #CONFIG_KEY_HOSTED_ZONE_ID} in the local configuration, if present. The domain is retrieved from
 	 * {@value #CONFIG_KEY_HOSTED_ZONE_NAME} in the local configuration; if not specified it falls back to the greatest common DNS suffix of
-	 * {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and {@value GuiseMummy#CONFIG_KEY_SITE_ALIASES} of the context configuration, with a domain delimiter
+	 * {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} of the context configuration, with a domain delimiter
 	 * <code>.</code> appended.
 	 * </p>
 	 * @param context The context of static site generation.
@@ -117,7 +117,7 @@ public class Route53 implements Dns, Clogged {
 	 * @see #CONFIG_KEY_HOSTED_ZONE_ID
 	 * @see #CONFIG_KEY_HOSTED_ZONE_NAME
 	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
-	 * @see GuiseMummy#CONFIG_KEY_SITE_ALIASES
+	 * @see GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS
 	 */
 	public Route53(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
 		this(context.getConfiguration().findString(CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null),
@@ -149,20 +149,21 @@ public class Route53 implements Dns, Clogged {
 	 * Determines the domain name to use for the hosted zone. This method determines the domain in the following order:
 	 * <ol>
 	 * <li>The key {@link #CONFIG_KEY_HOSTED_ZONE_NAME} relative to the Route 53 configuration.</li>
-	 * <li>The site base domain determined by the longest common domain segment suffix from the site domain {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and aliases
-	 * {@value GuiseMummy#CONFIG_KEY_SITE_ALIASES}, retrieved from the project configuration configuration, with a domain delimiter <code>.</code> appended.</li>
+	 * <li>The site base domain determined by the longest common domain segment suffix from the site domain {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and
+	 * alternative domains {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS}, retrieved from the project configuration configuration, with a domain delimiter
+	 * <code>.</code> appended.</li>
 	 * </ol>
 	 * @param globalConfiguration The configuration containing all the configuration values.
 	 * @param localConfiguration The local configuration for the Route 53 DNS, which may be a section of the project configuration.
 	 * @return domain The domain to be managed by the hosted zone, which will not be present if it is not configured.
 	 * @see #CONFIG_KEY_HOSTED_ZONE_NAME
 	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
-	 * @see GuiseMummy#CONFIG_KEY_SITE_ALIASES
+	 * @see GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS
 	 */
 	static Optional<String> getConfiguredHostedZoneName(@Nonnull final Configuration globalConfiguration, @Nonnull final Configuration localConfiguration) {
 		return localConfiguration.findString(CONFIG_KEY_HOSTED_ZONE_NAME).or(() -> {
 			final List<String> domains = Stream.concat(globalConfiguration.findString(CONFIG_KEY_SITE_DOMAIN).stream(),
-					globalConfiguration.findCollection(CONFIG_KEY_SITE_ALIASES, String.class).orElse(emptyList()).stream()).collect(toList());
+					globalConfiguration.findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class).orElse(emptyList()).stream()).collect(toList());
 			return longestCommonSegmentSuffix(domains, '.').map(domain -> domain + '.'); //append a domain delimiter as expected by hosted zone names TODO use a constant for the domain delimiter
 		});
 	}
@@ -205,8 +206,8 @@ public class Route53 implements Dns, Clogged {
 					commentBuilder.append("Created by ").append(context.getMummifierIdentification()); //TODO i18n
 					commentBuilder.append(" on ").append(ZonedDateTime.now()); //TODO i18n
 					context.getConfiguration().findString(CONFIG_KEY_SITE_DOMAIN).ifPresent(siteDomain -> commentBuilder.append(" for site domain ").append(siteDomain)); //TODO i18n
-					context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALIASES, String.class)
-							.ifPresent(siteAliases -> commentBuilder.append(" with aliases ").append(siteAliases)); //TODO i18n
+					context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class)
+							.ifPresent(siteAltDomains -> commentBuilder.append(" with alternatives ").append(siteAltDomains)); //TODO i18n
 					commentBuilder.append("."); //TODO i18n
 					hostedZone = client.createHostedZone(request -> request.name(configuredHostedZoneName).callerReference(UUID.randomUUID().toString())
 							.hostedZoneConfig(config -> config.comment(commentBuilder.toString()))).hostedZone();
