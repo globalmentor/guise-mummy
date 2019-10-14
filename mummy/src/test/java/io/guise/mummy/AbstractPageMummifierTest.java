@@ -16,26 +16,11 @@
 
 package io.guise.mummy;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
-import org.junit.jupiter.api.*;
-
 /**
  * Tests of {@link AbstractPageMummifier}.
  * @author Garret Wilson
  *
  */
 public class AbstractPageMummifierTest {
-
-	@Test
-	public void testNormalizePropertyHandle() {
-		assertThat(AbstractPageMummifier.normalizePropertyHandle("foo"), is("foo"));
-		assertThat(AbstractPageMummifier.normalizePropertyHandle(" foo"), is("foo"));
-		assertThat(AbstractPageMummifier.normalizePropertyHandle("foo "), is("foo"));
-		assertThat(AbstractPageMummifier.normalizePropertyHandle("  foo   "), is("foo"));
-		assertThat(AbstractPageMummifier.normalizePropertyHandle("foo-bar"), is("foo-bar"));
-		assertThat(AbstractPageMummifier.normalizePropertyHandle("foo bar"), is("foo_bar"));
-		assertThat(AbstractPageMummifier.normalizePropertyHandle("foo"), is("foo"));
-	}
 
 }
