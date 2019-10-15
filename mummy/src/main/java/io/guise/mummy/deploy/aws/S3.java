@@ -320,9 +320,12 @@ public class S3 implements DeployTarget, Clogged {
 					}
 				}).build();
 			}).collect(toCollection(LinkedHashSet::new)); //maintain order to help with debugging
-			final WebsiteConfiguration websiteConfiguration = WebsiteConfiguration.builder().indexDocument(indexDocument)
-					.routingRules(routingRules.toArray(RoutingRule[]::new)).build();
-			s3Client.putBucketWebsite(request -> request.bucket(bucket).websiteConfiguration(websiteConfiguration));
+			final WebsiteConfiguration.Builder websiteConfigurationBuilder = WebsiteConfiguration.builder();
+			websiteConfigurationBuilder.indexDocument(indexDocument);
+			if(!routingRules.isEmpty()) {
+				websiteConfigurationBuilder.routingRules(routingRules.toArray(RoutingRule[]::new));
+			}
+			s3Client.putBucketWebsite(request -> request.bucket(bucket).websiteConfiguration(websiteConfigurationBuilder.build()));
 
 			//configure alternative buckets for web sites
 			for(final String altBucket : getAltBuckets()) {
