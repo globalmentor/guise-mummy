@@ -16,7 +16,7 @@
 
 package io.guise.mummy.deploy.aws;
 
-import static com.globalmentor.java.Conditions.checkState;
+import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.net.URIs.*;
 import static io.guise.mummy.Artifact.*;
@@ -24,12 +24,12 @@ import static io.guise.mummy.GuiseMummy.*;
 import static io.guise.mummy.deploy.aws.AWS.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
-import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.*;
 import static java.util.stream.Stream.*;
+import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -313,6 +313,7 @@ public class S3 implements DeployTarget, Clogged {
 					//If the artifact (e.g. a directory) can contain other artifacts, we'll replace the entire key prefix
 					//to allow redirects for contained artifacts as well. Otherwise replace the entire key in case an artifact
 					//key matches the prefix of another non-redirected path (not expected to occur frequently in practice).
+					//(This applies to a collection `foo/` redirecting to a non-collection `bar` as well.) 
 					if(artifact instanceof CollectionArtifact) {
 						redirect.replaceKeyPrefixWith(artifactKey);
 					} else {
@@ -359,16 +360,22 @@ public class S3 implements DeployTarget, Clogged {
 	 */
 	protected void plan(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact, @Nonnull Artifact artifact) throws IOException {
 		try {
-			final String key = context.relativizeTargetReference(rootArtifact, artifact).toString();
+			final URIPath resourceReference = context.relativizeTargetReference(rootArtifact, artifact);
+			final String key = resourceReference.toString();
 			getLogger().debug("Planning deployment for artifact {}, S3 key `{}`.", artifact, key);
 			artifactKeys.put(artifact, key);
-			artifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ALT_NAME).filter(CharSequence.class::isInstance).map(Object::toString)
-					.ifPresent(altName -> {
-						final Path altPath = artifact.getTargetPath().resolveSibling(altName);
-						final String altKey = context.relativizeTargetReference(rootArtifact, altPath).toString();
+			artifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ALT_LOCATION).filter(CharSequence.class::isInstance).map(Object::toString)
+					.map(URIPath::of).map(altLocationReference -> resolve(artifact.getTargetPath().toUri(), altLocationReference)) //convert to absolute file system URI
+					.map(altLocationUri -> URIPath.relativize(rootArtifact.getTargetPath().toUri(), altLocationUri)) //relativize to the site root
+					.ifPresent(throwingConsumer(altLocationReference -> {
+						if(!altLocationReference.isSubPath()) {
+							throw new IOException(String.format("Artifact for resource %s specifies an alternative location %s which is outside the site boundaries.",
+									resourceReference, altLocationReference));
+						}
+						final String altKey = altLocationReference.toString();
 						getLogger().debug("Planning deployment redirect for artifact {} from S3 key `{}` to S3 key `{}`.", artifact, altKey, key);
 						artifactAltKeys.put(artifact, altKey);
-					});
+					}));
 			if(artifact instanceof CompositeArtifact) {
 				for(final Artifact comprisedArtifact : (Iterable<Artifact>)((CompositeArtifact)artifact).comprisedArtifacts()::iterator) {
 					plan(context, rootArtifact, comprisedArtifact);
