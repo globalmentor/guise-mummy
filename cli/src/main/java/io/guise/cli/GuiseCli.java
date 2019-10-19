@@ -43,6 +43,7 @@ import org.slf4j.event.Level;
 
 import com.github.dtmo.jfiglet.*;
 import com.globalmentor.application.*;
+import com.globalmentor.net.Host;
 import com.globalmentor.net.URIs;
 
 import io.clogr.Clogr;
@@ -382,7 +383,7 @@ public class GuiseCli extends BaseCliApplication {
 			return; //TODO improve error handling
 		}
 
-		final URI siteLocalUrl = URIs.createURI(HTTP_URI_SCHEME, null, LOCALHOST_DOMAIN, port, ROOT_PATH, null, null);
+		final URI siteLocalUrl = URIs.createURI(HTTP_URI_SCHEME, null, Host.LOCALHOST.getName(), port, ROOT_PATH, null, null);
 		getLogger().info("Serving site at {}.", "<" + siteLocalUrl + ">");
 
 		//launch the browser; see https://stackoverflow.com/a/5226244/421049
