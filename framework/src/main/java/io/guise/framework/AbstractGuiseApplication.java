@@ -823,7 +823,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	@Override
 	public URIPath relativizeURI(final URI uri) {
-		return relativizePath(new URIPath(uri.getRawPath())); //relativize the path of the URI TODO make sure the URI is from the correct domain
+		return relativizePath(URIPath.of(uri.getRawPath())); //relativize the path of the URI TODO make sure the URI is from the correct domain
 	}
 
 	@Override

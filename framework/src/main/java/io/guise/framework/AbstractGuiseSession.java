@@ -816,7 +816,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				synchronized(modalNavigationStack) { //don't allow anyone to to access the modal navigation stack while we access it
 					final ModalNavigation currentModalNavigation = peekModalNavigation(); //see which model navigation is on the top of the stack
 					if(currentModalNavigation != null) { //if there is a modal navigation currently in use
-						if(application.resolvePath(navigationPath).equals(new URIPath(currentModalNavigation.getNewNavigationURI().getRawPath()))) { //if we're navigating where we expect to be (if we somehow got to here at something other than the modal navigation path, we wouldn't want to remove the current navigation path)
+						if(application.resolvePath(navigationPath).equals(URIPath.of(currentModalNavigation.getNewNavigationURI().getRawPath()))) { //if we're navigating where we expect to be (if we somehow got to here at something other than the modal navigation path, we wouldn't want to remove the current navigation path)
 							modalNavigation = popModalNavigation(); //end the current modal navigation
 							navigationURI = modalNavigation.getOldNavigationURI(); //we'll return to where the current modal navigation came from---that's a better choice
 							final ModalNavigation oldModalNavigation = peekModalNavigation(); //see which model navigation is next on the stack

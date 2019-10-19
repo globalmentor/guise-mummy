@@ -97,7 +97,7 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	public URIPath getPath(final GuiseSession session, final URIPath path, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException {
 		if(!exists(session, path, bookmark, referrerURI)) { //if this destination doesn't exist	
 			if(!path.isCollection()) { //if a non-collection path was requested
-				final URIPath collectionPath = new URIPath(path.toString() + PATH_SEPARATOR); //create a collection version of the path
+				final URIPath collectionPath = URIPath.of(path.toString() + PATH_SEPARATOR); //create a collection version of the path
 				if(exists(session, collectionPath, bookmark, referrerURI)) { //if the collection form of the path exists
 					return collectionPath; //return the collection path
 				}
