@@ -34,9 +34,9 @@ import io.guise.framework.test.HomePanel;
 public class DemoApplication extends AbstractGuiseApplication {
 
 	/** The application-relative navigation path to the edit user modal panel. */
-	public static final URIPath EDIT_USER_PANEL_NAVIGATION_PATH = new URIPath("edituser");
+	public static final URIPath EDIT_USER_PANEL_NAVIGATION_PATH = URIPath.of("edituser");
 	/** The application-relative navigation path to the restricted panel. */
-	public static final URIPath RESTRICTED_PANEL_NAVIGATION_PATH = new URIPath("restricted");
+	public static final URIPath RESTRICTED_PANEL_NAVIGATION_PATH = URIPath.of("restricted");
 
 	/** The synchronized list of application users. */
 	final private List<DemoUser> users = Collections.synchronizedList(new ArrayList<DemoUser>());
@@ -71,8 +71,8 @@ public class DemoApplication extends AbstractGuiseApplication {
 		users.add(new DemoUser(generateUserID(), "John", null, "Smith", "password".toCharArray(), "johnsmith@example.com"));
 		users.add(new DemoUser(generateUserID(), "Jill", null, "Jones", "password".toCharArray(), "jilljones@example.com"));
 		setDestinations(
-				List.of(new ComponentDestination(new URIPath(""), HomePanel.class), new ComponentDestination(new URIPath("helloworld/"), HelloWorldPanel.class),
-						new ComponentDestination(new URIPath("temperature/"), TemperatureConversionPanel.class)));
+				List.of(new ComponentDestination(URIPath.of(""), HomePanel.class), new ComponentDestination(URIPath.of("helloworld/"), HelloWorldPanel.class),
+						new ComponentDestination(URIPath.of("temperature/"), TemperatureConversionPanel.class)));
 	}
 
 	/**

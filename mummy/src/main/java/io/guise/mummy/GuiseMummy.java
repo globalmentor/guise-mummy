@@ -87,10 +87,10 @@ public class GuiseMummy implements Clogged {
 	public static final String CONFIG_KEY_SITE_DOMAIN = "site.domain";
 
 	/**
-	 * The configuration for the list of alias domain names of the site, such as <code>www.example.com</code> (as an alias for <code>example.com</code>) or
-	 * <code>example.com</code> (if the canonical domain name is <code>www.example.com</code>).
+	 * The configuration for the list of alternative domain names of the site, such as <code>www.example.com</code> (as an alternative for
+	 * <code>example.com</code>) or <code>example.com</code> (if the canonical domain name is <code>www.example.com</code>).
 	 */
-	public static final String CONFIG_KEY_SITE_ALIASES = "site.aliases";
+	public static final String CONFIG_KEY_SITE_ALT_DOMAINS = "site.altDomains";
 
 	//## mummy configuration
 

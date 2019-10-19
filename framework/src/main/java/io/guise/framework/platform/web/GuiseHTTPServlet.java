@@ -315,7 +315,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 				//TODO del				Log.trace("context path", getContextPath());
 				final URI requestURI = URI.create(request.getRequestURL().toString()); //get the URI of the current request
 				//			TODO del	Log.trace("requestURI", requestURI);
-				final URIPath containerBasePath = new URIPath(getContextPath() + PATH_SEPARATOR); //determine the base path of the container TODO important: determine if getContextPath() returns the raw path, as we want; otherwise, this will not work correctly for context paths with encoded path characters
+				final URIPath containerBasePath = URIPath.of(getContextPath() + PATH_SEPARATOR); //determine the base path of the container TODO important: determine if getContextPath() returns the raw path, as we want; otherwise, this will not work correctly for context paths with encoded path characters
 				final URI containerBaseURI = changePath(requestURI, containerBasePath); //determine the container base URI
 				//			TODO del	Log.trace("containerURI", containerBaseURI);
 
@@ -327,7 +327,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 				final AbstractGuiseApplication guiseApplication = getGuiseApplication(); //get the Guise application
 				/*TODO del when works
 										//"/contextPath" or "", "/servletPath" or ""
-								final URIPath guiseApplicationBasePath=new URIPath(request.getContextPath()+request.getServletPath()+PATH_SEPARATOR);	//construct the Guise application base path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
+								final URIPath guiseApplicationBasePath=URIPath.of(request.getContextPath()+request.getServletPath()+PATH_SEPARATOR);	//construct the Guise application base path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
 								final URIPath guiseApplicationRelativePath=containerBasePath.relativize(guiseApplicationBasePath);	//get the application path relative to the container path
 				*/
 
@@ -342,7 +342,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 					if(applicationBaseURI == null) { //if the application has no preferred base URI
 						applicationBaseURI = resolve(containerBaseURI, request.getContextPath() + request.getServletPath() + PATH_SEPARATOR); //get the default Guise application base path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash, and resolve it to the container base path
 					}
-					final URIPath guiseApplicationRelativePath = new URIPath(""); //TODO fix, now that we are using URIs for each application; perhaps use a name for each application, as this ID must remain the same even when deployed in different locations
+					final URIPath guiseApplicationRelativePath = URIPath.EMPTY_URI_PATH; //TODO fix, now that we are using URIs for each application; perhaps use a name for each application, as this ID must remain the same even when deployed in different locations
 					final File guiseApplicationHomeDirectory = getDataDirectory(servletContext, DATA_DIRECTORY_INIT_PARAMETER,
 							"guise/home/" + guiseApplicationRelativePath); //get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
 					final File guiseApplicationLogDirectory = getDataDirectory(servletContext, LOG_DIRECTORY_INIT_PARAMETER,
@@ -521,7 +521,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		/*TODO del
 				final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 				assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
-				URIPath navigationPath=new URIPath(rawPathInfo.substring(1));	//remove the beginning slash to get the navigation path from the path info
+				URIPath navigationPath=URIPath.of(rawPathInfo.substring(1));	//remove the beginning slash to get the navigation path from the path info
 		*/
 		if(!guiseRequest.isAJAX()) { //if this is not an AJAX request, verify existence and permissions
 			if(GET_METHOD.equals(requestMethod) || !(destination instanceof ResourceWriteDestination)) { //if this is not an AJAX request, verify that the destination exists (doing this with AJAX requests would be too costly; we can assume that AJAX requests are for existing destinations) (but don't check if this is a POST to a ResourceWriteDestination, which probably won't exist; TODO clarify exist() semantics for ResourceWriteDestinations)

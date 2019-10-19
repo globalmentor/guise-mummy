@@ -58,7 +58,7 @@ public interface GuiseApplication extends Resource, PropertyBindable, Concerned 
 	public static final String THEMED_PROPERTY = getPropertyName(GuiseApplication.class, "themed");
 
 	/** The base path reserved for exclusive Guise use. */
-	public static final URIPath GUISE_RESERVED_BASE_PATH = new URIPath("~guise/");
+	public static final URIPath GUISE_RESERVED_BASE_PATH = URIPath.of("~guise/");
 	/** The base path to access all Guise assets. */
 	public static final URIPath GUISE_ASSETS_BASE_PATH = GUISE_RESERVED_BASE_PATH.resolve("assets/");
 	/** The base path to access all Guise temporary assets. */

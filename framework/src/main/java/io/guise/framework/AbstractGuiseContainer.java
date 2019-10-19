@@ -170,7 +170,7 @@ public abstract class AbstractGuiseContainer implements GuiseContainer {
 			throw new IllegalArgumentException("Container base URI " + baseURI + " is not absolute and does not end with a path separator.");
 		}
 		this.baseURI = baseURI; //store the base URI		
-		basePath = new URIPath(baseURI.getRawPath()); //store the base path
+		basePath = URIPath.of(baseURI.getRawPath()); //store the base path
 		requireNonNull(basePath, "Application base path cannot be null");
 		if(!basePath.isAbsolute() || !basePath.isCollection()) { //if the path doesn't begin and end with a slash
 			throw new IllegalArgumentException("Container base path " + basePath + " does not begin and end with a path separator.");

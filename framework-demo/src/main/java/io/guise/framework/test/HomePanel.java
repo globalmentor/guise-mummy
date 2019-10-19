@@ -378,7 +378,7 @@ public class HomePanel extends LayoutPanel {
 		testButton.setCornerArcSize(Corner.LINE_FAR_PAGE_NEAR, Component.ROUNDED_CORNER_ARC_SIZE);
 		testButton.setCornerArcSize(Corner.LINE_FAR_PAGE_FAR, Component.ROUNDED_CORNER_ARC_SIZE);
 
-		testButton.addActionListener(new NavigateActionListener(new URIPath("helloworld")));
+		testButton.addActionListener(new NavigateActionListener(URIPath.of("helloworld")));
 		buttonPanel.add(testButton); //add a new button
 
 		final Button testButton2 = new Button();
@@ -458,7 +458,7 @@ public class HomePanel extends LayoutPanel {
 
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
-				getSession().navigateModal(new URIPath("edituser"), new ModalNavigationAdapter() {
+				getSession().navigateModal(URIPath.of("edituser"), new ModalNavigationAdapter() {
 
 					/**
 					 * Called when an a modal panel ends its modality.
@@ -491,7 +491,7 @@ public class HomePanel extends LayoutPanel {
 
 		final Link helloLink = new Link();
 		helloLink.setLabel("More Hello World.");
-		helloLink.addActionListener(new NavigateActionListener(new URIPath("helloworld")));
+		helloLink.addActionListener(new NavigateActionListener(URIPath.of("helloworld")));
 		buttonPanel.add(helloLink); //add the link
 
 		final Link frameLink = new Link();
