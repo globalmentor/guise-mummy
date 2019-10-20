@@ -224,7 +224,8 @@ public class CloudFront implements DeployTarget, Clogged {
 							context.getDeployDns().ifPresentOrElse(throwingConsumer(dns -> {
 								logger.info("Setting DNS entry (`{}`) `{} = {}` for certificate `{}` validation for domain name `{}`.", resourceRecord.typeAsString(),
 										resourceRecord.name(), resourceRecord.value(), certificateArn, domainValidation.domainName());
-								dns.setResourceRecord(resourceRecord.typeAsString(), resourceRecord.name(), resourceRecord.value(), CERTIFICATE_VALIDATION_DNS_TTL);
+								dns.setResourceRecord(resourceRecord.typeAsString(), DomainName.of(resourceRecord.name()), resourceRecord.value(),
+										CERTIFICATE_VALIDATION_DNS_TTL);
 							}), () -> logger.warn(
 									"No DNS configured. To validate certificate `{}` for domain name `{}`, resource record (`{}`) `{} = {}` must be set in the DNS manually.",
 									certificateArn, domainValidation.domainName(), resourceRecord.typeAsString(), resourceRecord.name(), resourceRecord.value()));
@@ -279,7 +280,7 @@ public class CloudFront implements DeployTarget, Clogged {
 							s3Bucket);
 				}
 				final String distributionId;
-				final String distributionDomainName;
+				final DomainName distributionDomainName;
 				if(existingDistributionSummaries.isEmpty()) {
 					logger.info("Creating distribution for S3 bucket `{}`.", s3Bucket);
 					final StringBuilder commentBuilder = new StringBuilder(); //CloudFront comments are limited to a little over 120 characters in length
@@ -306,25 +307,26 @@ public class CloudFront implements DeployTarget, Clogged {
 							.comment(commentBuilder.toString()).build();
 					final Distribution distribution = cloudFrontClient.createDistribution(request -> request.distributionConfig(distributionConfig)).distribution();
 					distributionId = distribution.id();
-					distributionDomainName = distribution.domainName();
+					distributionDomainName = DomainName.of(distribution.domainName());
 				} else {
 					if(existingDistributionSummaries.size() > 1) {
 						throw new IOException(String.format("Multiple distributions found with an alias for bucket `%s`; all but one must be removed.", s3Bucket));
 					}
 					final DistributionSummary distributionSummary = getOnly(existingDistributionSummaries);
 					distributionId = distributionSummary.id();
-					distributionDomainName = distributionSummary.domainName();
+					distributionDomainName = DomainName.of(distributionSummary.domainName());
 					//TODO ensure that the existing distribution truly has the correct origin, i.e. to the S3 bucket
 				}
 
 				//add an alias record to the new distribution if we have a Route 53 DNS
+				final DomainName domainName = DomainName.ROOT.resolve(DomainName.of(s3Bucket)); //the domain name is the S3 bucket (as a relative domain) resolved to `.`
 				context.getDeployDns().filter(Route53.class::isInstance).map(Route53.class::cast).ifPresentOrElse(throwingConsumer(route53 -> {
-					logger.info("Setting DNS alias `A` record for domain name `{}` to CloudFront distribution `{}` domain `{}`.", s3Bucket, distributionId,
+					logger.info("Setting DNS alias `A` record for domain name `{}` to CloudFront distribution `{}` domain `{}`.", domainName, distributionId,
 							distributionDomainName);
-					route53.setAliasResourceRecord(Dns.ResourceRecordType.A, s3Bucket, distributionDomainName, Route53.CLOUDFRONT_ALIAS_HOSTED_ZONE_ID);
+					route53.setAliasResourceRecord(Dns.ResourceRecordType.A, domainName, distributionDomainName.toString(), Route53.CLOUDFRONT_ALIAS_HOSTED_ZONE_ID);
 				}), () -> logger.warn(
 						"No Route 53 DNS configured; an alias for domain name `{}` to CloudFront distribution `{}` domain `{}` must be set in the Route 53 manually if desired.",
-						s3Bucket, distributionId, distributionDomainName));
+						domainName, distributionId, distributionDomainName));
 			}
 
 			return Optional.of(createURI(HTTPS_URI_SCHEME, null, s3.getBucket(), -1, URIs.ROOT_PATH, null, null)); //https://s3-bucket/

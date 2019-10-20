@@ -249,15 +249,15 @@ public class Route53 implements Dns, Clogged {
 	}
 
 	@Override
-	public void setResourceRecord(final String type, final String name, final String value, final long ttl) throws IOException {
+	public void setResourceRecord(final String type, final DomainName name, final String value, final long ttl) throws IOException {
 		requireNonNull(type);
-		requireNonNull(name);
+		name.checkArgumentAbsolute();
 		requireNonNull(value);
 		try {
 			final Route53Client client = getRoute53Client();
 			final HostedZone hostedZone = getHostedZone().orElseThrow(IllegalStateException::new);
 			final ResourceRecord resourceRecord = ResourceRecord.builder().value(value).build();
-			final ResourceRecordSet resourceRecordSet = ResourceRecordSet.builder().type(type).name(name).resourceRecords(resourceRecord).ttl(ttl).build();
+			final ResourceRecordSet resourceRecordSet = ResourceRecordSet.builder().type(type).name(name.toString()).resourceRecords(resourceRecord).ttl(ttl).build();
 			final Change change = Change.builder().action(ChangeAction.UPSERT).resourceRecordSet(resourceRecordSet).build();
 			client.changeResourceRecordSets(request -> request.hostedZoneId(hostedZone.id()).changeBatch(batch -> batch.changes(change)));
 		} catch(final SdkException sdkException) {
@@ -268,17 +268,18 @@ public class Route53 implements Dns, Clogged {
 	/**
 	 * Sets an alias resource record. If a resource record with the same type and name does not already exists, it will be added. If a resource record already
 	 * exists with the same type and name, it will be replaced. (This is commonly referred to as <dfn>upsert</dfn>.)
-	 * @implSpec This implementation delegates to {@link #setAliasResourceRecord(String, String, String, String)}.
+	 * @implSpec This implementation delegates to {@link #setAliasResourceRecord(String, DomainName, String, String)}.
 	 * @implNote Alias resource records are specific to Route 53.
 	 * @param type The type of resource record to set.
-	 * @param name The name of the resource record.
+	 * @param name The fully-qualified domain name of the resource record.
 	 * @param aliasDnsName The DNS name for the alias, such as a domain name assigned to a CloudFront distribution.
 	 * @param aliasHostZoneId An identifier for some hosted zone; may be a predefined constant for known targets such as CloudFront.
+	 * @throws IllegalArgumentException if the given name is not absolute.
 	 * @throws IOException If there was an error setting the resource record.
 	 * @see <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-choosing-alias-non-alias.html">Choosing Between Alias and
 	 *      Non-Alias Records</a>
 	 */
-	public void setAliasResourceRecord(@Nonnull final Dns.ResourceRecordType type, @Nonnull final String name, @Nonnull final String aliasDnsName,
+	public void setAliasResourceRecord(@Nonnull final Dns.ResourceRecordType type, @Nonnull final DomainName name, @Nonnull final String aliasDnsName,
 			@Nonnull final String aliasHostZoneId) throws IOException {
 		setAliasResourceRecord(type.toString(), name, aliasDnsName, aliasHostZoneId);
 	}
@@ -286,34 +287,34 @@ public class Route53 implements Dns, Clogged {
 	/**
 	 * Sets an alias resource record. If a resource record with the same type and name does not already exists, it will be added. If a resource record already
 	 * exists with the same type and name, it will be replaced. (This is commonly referred to as <dfn>upsert</dfn>.)
-	 * @apiNote Using {@link #setAliasResourceRecord(Dns.ResourceRecordType, String, String, String)} for known resource record types is preferred for type and
-	 *          value safety.
+	 * @apiNote Using {@link #setAliasResourceRecord(Dns.ResourceRecordType, DomainName, String, String)} for known resource record types is preferred for type
+	 *          and value safety.
 	 * @implNote Alias resource records are specific to Route 53.
 	 * @param type The type of resource record to set.
-	 * @param name The DNS name of the alias.
+	 * @param name The fully-qualified domain name of the resource record.
 	 * @param aliasDnsName The DNS name for the alias, such as a domain name assigned to a CloudFront distribution.
 	 * @param aliasHostZoneId An identifier for some hosted zone; may be a predefined constant for known targets such as CloudFront.
+	 * @throws IllegalArgumentException if the given name is not absolute.
 	 * @throws IOException If there was an error setting the resource record.
 	 * @see <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-choosing-alias-non-alias.html">Choosing Between Alias and
 	 *      Non-Alias Records</a>
 	 */
-	public void setAliasResourceRecord(@Nonnull final String type, @Nonnull final String name, @Nonnull final String aliasDnsName,
+	public void setAliasResourceRecord(@Nonnull final String type, @Nonnull final DomainName name, @Nonnull final String aliasDnsName,
 			@Nonnull final String aliasHostZoneId) throws IOException {
 		requireNonNull(type);
-		requireNonNull(name);
+		name.checkArgumentAbsolute();
 		requireNonNull(aliasDnsName);
 		requireNonNull(aliasHostZoneId);
 		try {
 			final Route53Client client = getRoute53Client();
 			final HostedZone hostedZone = getHostedZone().orElseThrow(IllegalStateException::new);
 			final AliasTarget aliasTarget = AliasTarget.builder().dnsName(aliasDnsName).hostedZoneId(aliasHostZoneId).evaluateTargetHealth(false).build();
-			final ResourceRecordSet resourceRecordSet = ResourceRecordSet.builder().type(type).name(name).aliasTarget(aliasTarget).build();
+			final ResourceRecordSet resourceRecordSet = ResourceRecordSet.builder().type(type).name(name.toString()).aliasTarget(aliasTarget).build();
 			final Change change = Change.builder().action(ChangeAction.UPSERT).resourceRecordSet(resourceRecordSet).action(ChangeAction.UPSERT).build();
 			client.changeResourceRecordSets(request -> request.hostedZoneId(hostedZone.id()).changeBatch(batch -> batch.changes(change)));
 		} catch(final SdkException sdkException) {
 			throw new IOException(sdkException);
 		}
-
 	}
 
 	//# Route 53 utility methods; could be removed to separate library
