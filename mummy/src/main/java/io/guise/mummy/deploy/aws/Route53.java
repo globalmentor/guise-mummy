@@ -17,7 +17,6 @@
 package io.guise.mummy.deploy.aws;
 
 import static com.globalmentor.collections.iterables.Iterables.*;
-import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.util.stream.Streams.*;
 import static io.guise.mummy.GuiseMummy.*;
@@ -35,8 +34,11 @@ import javax.annotation.*;
 
 import org.slf4j.Logger;
 
+import com.globalmentor.net.DomainName;
+
 import io.clogr.Clogged;
 import io.confound.config.Configuration;
+import io.confound.config.ConfigurationException;
 import io.guise.mummy.GuiseMummy;
 import io.guise.mummy.MummyContext;
 import io.guise.mummy.deploy.Dns;
@@ -61,8 +63,9 @@ public class Route53 implements Dns, Clogged {
 	public static final String CONFIG_KEY_HOSTED_ZONE_ID = "hostedZoneId";
 
 	/**
-	 * The DNS section relative key for the hosted zone name; must end with the <code>.</code> domain delimiter; defaults to the common domain suffix of
-	 * {@link GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and {@link GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS}, with a domain delimiter <code>.</code> appended.
+	 * The DNS section relative key for the hosted zone name. Must be a valid domain name in absolute (FQDN) form, ending with the <code>.</code> domain
+	 * delimiter. Defaults to the project domain {@value GuiseMummy#CONFIG_KEY_DOMAIN}, or if not present the common domain suffix of
+	 * {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS}.
 	 */
 	public static final String CONFIG_KEY_HOSTED_ZONE_NAME = "hostedZoneName";
 
@@ -87,7 +90,7 @@ public class Route53 implements Dns, Clogged {
 
 	private final String configuredHostedZoneId;
 
-	private final String configuredHostedZoneName;
+	private final DomainName configuredHostedZoneName;
 
 	private HostedZone hostedZone;
 
@@ -107,15 +110,16 @@ public class Route53 implements Dns, Clogged {
 	 * Configuration constructor.
 	 * <p>
 	 * The hosted zone ID is retrieved from {@value #CONFIG_KEY_HOSTED_ZONE_ID} in the local configuration, if present. The domain is retrieved from
-	 * {@value #CONFIG_KEY_HOSTED_ZONE_NAME} in the local configuration; if not specified it falls back to the greatest common DNS suffix of
-	 * {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} of the context configuration, with a domain delimiter
-	 * <code>.</code> appended.
+	 * {@value #CONFIG_KEY_HOSTED_ZONE_NAME} in the local configuration; if not specified it falls back {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN}, or if not
+	 * present to the greatest common DNS suffix of {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} of the context
+	 * configuration.
 	 * </p>
 	 * @param context The context of static site generation.
 	 * @param localConfiguration The local configuration for the Route 53 DNS, which may be a section of the project configuration.
 	 * @see AWS#CONFIG_KEY_DEPLOY_AWS_PROFILE
 	 * @see #CONFIG_KEY_HOSTED_ZONE_ID
 	 * @see #CONFIG_KEY_HOSTED_ZONE_NAME
+	 * @see GuiseMummy#CONFIG_KEY_DOMAIN
 	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
 	 * @see GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS
 	 */
@@ -133,7 +137,7 @@ public class Route53 implements Dns, Clogged {
 	 * @param domain The domain managed by the hosted zone, or <code>null</code> if a hosted zone already exists for the domain.
 	 * @throws IllegalArgumentException if neither a hosted zone ID nor a domain is specified.
 	 */
-	public Route53(@Nullable String profile, @Nullable final String hostedZoneId, @Nullable final String domain) {
+	public Route53(@Nullable String profile, @Nullable final String hostedZoneId, @Nullable final DomainName domain) {
 		this.profile = profile;
 		checkArgument(hostedZoneId != null || domain != null, "Either a hosted zone ID or a domain must be configured for %s.", getClass().getSimpleName());
 		this.configuredHostedZoneId = hostedZoneId;
@@ -149,23 +153,39 @@ public class Route53 implements Dns, Clogged {
 	 * Determines the domain name to use for the hosted zone. This method determines the domain in the following order:
 	 * <ol>
 	 * <li>The key {@link #CONFIG_KEY_HOSTED_ZONE_NAME} relative to the Route 53 configuration.</li>
+	 * <li>The key {@link GuiseMummy#CONFIG_KEY_DOMAIN} retrieved from the global configuration.</li>
 	 * <li>The site base domain determined by the longest common domain segment suffix from the site domain {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and
-	 * alternative domains {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS}, retrieved from the project configuration configuration, with a domain delimiter
-	 * <code>.</code> appended.</li>
+	 * alternative domains {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS}, retrieved from the global configuration.</li>
 	 * </ol>
+	 * @implSpec This method calls {@link GuiseMummy#findConfiguredDomain(Configuration)}, {@link GuiseMummy#findConfiguredSiteDomain(Configuration)}, and
+	 *           {@link GuiseMummy#findConfiguredSiteAltDomains(Configuration)}.
 	 * @param globalConfiguration The configuration containing all the configuration values.
 	 * @param localConfiguration The local configuration for the Route 53 DNS, which may be a section of the project configuration.
-	 * @return domain The domain to be managed by the hosted zone, which will not be present if it is not configured.
+	 * @return The domain to be managed by the hosted zone, which will not be present if it is not configured.
 	 * @see #CONFIG_KEY_HOSTED_ZONE_NAME
+	 * @see GuiseMummy#CONFIG_KEY_DOMAIN
 	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
 	 * @see GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS
 	 */
-	static Optional<String> getConfiguredHostedZoneName(@Nonnull final Configuration globalConfiguration, @Nonnull final Configuration localConfiguration) {
-		return localConfiguration.findString(CONFIG_KEY_HOSTED_ZONE_NAME).or(() -> {
-			final List<String> domains = Stream.concat(globalConfiguration.findString(CONFIG_KEY_SITE_DOMAIN).stream(),
-					globalConfiguration.findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class).orElse(emptyList()).stream()).collect(toList());
-			return longestCommonSegmentSuffix(domains, '.').map(domain -> domain + '.'); //append a domain delimiter as expected by hosted zone names TODO use a constant for the domain delimiter
-		});
+	static Optional<DomainName> getConfiguredHostedZoneName(@Nonnull final Configuration globalConfiguration, @Nonnull final Configuration localConfiguration) {
+		//local hosted zone designation
+		return localConfiguration.findString(CONFIG_KEY_HOSTED_ZONE_NAME).map(DomainName::of).map(hostedZoneName -> {
+			if(!hostedZoneName.isAbsolute()) {
+				throw new ConfigurationException(
+						String.format("The Route 53 `%s` configuration `%s` must be a fully-qualified domain name (FQDN), ending in a dot `%s` character.",
+								CONFIG_KEY_HOSTED_ZONE_NAME, hostedZoneName, DomainName.DELIMITER)); //TODO i18n
+			}
+			return hostedZoneName;
+		})
+				//fall back to global site domain configuration
+				.or(() -> findConfiguredDomain(globalConfiguration))
+				//determined base domain
+				.or(() -> {
+					final List<DomainName> domains = Stream
+							.concat(findConfiguredSiteDomain(globalConfiguration).stream(), findConfiguredSiteAltDomains(globalConfiguration).orElse(emptyList()).stream())
+							.collect(toList());
+					return DomainName.findGreatestCommonBase(domains);
+				});
 	}
 
 	@Override
@@ -205,11 +225,12 @@ public class Route53 implements Dns, Clogged {
 					final StringBuilder commentBuilder = new StringBuilder();
 					commentBuilder.append("Created by ").append(context.getMummifierIdentification()); //TODO i18n
 					commentBuilder.append(" on ").append(ZonedDateTime.now()); //TODO i18n
-					context.getConfiguration().findString(CONFIG_KEY_SITE_DOMAIN).ifPresent(siteDomain -> commentBuilder.append(" for site domain ").append(siteDomain)); //TODO i18n
-					context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class)
-							.ifPresent(siteAltDomains -> commentBuilder.append(" with alternatives ").append(siteAltDomains)); //TODO i18n
+					context.getConfiguration().findString(CONFIG_KEY_SITE_DOMAIN)
+							.ifPresent(siteDomain -> commentBuilder.append(" for site domain `").append(siteDomain).append('`')); //TODO i18n
+					context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class).ifPresent(siteAltDomains -> commentBuilder
+							.append(" with alternatives ").append(siteAltDomains.stream().map(siteAltDomain -> "`" + siteAltDomain + "`").collect(toList()))); //TODO i18n
 					commentBuilder.append("."); //TODO i18n
-					hostedZone = client.createHostedZone(request -> request.name(configuredHostedZoneName).callerReference(UUID.randomUUID().toString())
+					hostedZone = client.createHostedZone(request -> request.name(configuredHostedZoneName.toString()).callerReference(UUID.randomUUID().toString())
 							.hostedZoneConfig(config -> config.comment(commentBuilder.toString()))).hostedZone();
 					logger.debug("Created Route 53 public hosted zone with ID `{}` for name `{}`.", hostedZone.id(), hostedZone.name());
 				}
@@ -303,7 +324,7 @@ public class Route53 implements Dns, Clogged {
 	 * Retrieves all hosted zones with a given ID.
 	 * @implSpec This implementation delegates to {@link #hostedZones(Route53Client)}.
 	 * @param client The client to use for retrieving the zones.
-	 * @param id The ID of the hosted zone to retrieve; <em>needs to end with a domain delimiter <code>.</code></em>.
+	 * @param id The ID of the hosted zone to retrieve.
 	 * @return A set of all hosted zones with the given ID.
 	 * @throws SdkException if an error occurs related to AWS.
 	 * @see HostedZone#id()
@@ -319,13 +340,14 @@ public class Route53 implements Dns, Clogged {
 	 * Retrieves all hosted zones with a given name.
 	 * @implSpec This implementation delegates to {@link #hostedZones(Route53Client)}.
 	 * @param client The client to use for retrieving the zones.
-	 * @param name The name of the hosted zone to retrieve; <em>needs to end with a domain delimiter <code>.</code></em>.
+	 * @param hostedZoneName The name of the hosted zone to retrieve; must be an absolute domain name.
 	 * @return A set of all hosted zones with the given name.
 	 * @throws SdkException if an error occurs related to AWS.
 	 * @see HostedZone#name()
+	 * @throws IllegalArgumentException if the given domain name is not absolute.
 	 */
-	protected static Set<HostedZone> getHostedZonesByName(@Nonnull final Route53Client client, @Nonnull final String name) throws SdkException {
-		requireNonNull(name);
+	protected static Set<HostedZone> getHostedZonesByName(@Nonnull final Route53Client client, @Nonnull final DomainName hostedZoneName) throws SdkException {
+		final String name = hostedZoneName.toString();
 		try (final Stream<HostedZone> hostedZonesByName = hostedZones(client).filter(hostedZone -> hostedZone.name().equals(name))) {
 			return hostedZonesByName.collect(toSet());
 		}

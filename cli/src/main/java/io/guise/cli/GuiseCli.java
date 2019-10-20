@@ -154,7 +154,7 @@ public class GuiseCli extends BaseCliApplication {
 			logProjectInfo(project);
 
 			mummifier.mummify(project, GuiseMummy.LifeCyclePhase.VALIDATE);
-		} catch(final IllegalArgumentException | IOException exception) {
+		} catch(final IllegalArgumentException | ConfigurationException | IOException exception) {
 			getLogger().error("{}", exception.getMessage());
 			getLogger().debug("{}", exception.getMessage(), exception);
 		}
@@ -189,7 +189,7 @@ public class GuiseCli extends BaseCliApplication {
 					deleteFileTree(siteDescriptionTargetDirectory);
 				}
 			}
-		} catch(final IllegalArgumentException | IOException exception) {
+		} catch(final IllegalArgumentException | ConfigurationException | IOException exception) {
 			getLogger().error("{}", exception.getMessage());
 			getLogger().debug("{}", exception.getMessage(), exception);
 		}
@@ -218,7 +218,7 @@ public class GuiseCli extends BaseCliApplication {
 			logProjectInfo(project);
 
 			mummifier.mummify(project, GuiseMummy.LifeCyclePhase.MUMMIFY);
-		} catch(final IllegalArgumentException | IOException exception) {
+		} catch(final IllegalArgumentException | ConfigurationException | IOException exception) {
 			getLogger().error("{}", exception.getMessage());
 			getLogger().debug("{}", exception.getMessage(), exception);
 		}
@@ -247,7 +247,7 @@ public class GuiseCli extends BaseCliApplication {
 			logProjectInfo(project);
 
 			mummifier.mummify(project, GuiseMummy.LifeCyclePhase.PREPARE_DEPLOY);
-		} catch(final IllegalArgumentException | IOException exception) {
+		} catch(final IllegalArgumentException | ConfigurationException | IOException exception) {
 			getLogger().error("{}", exception.getMessage());
 			getLogger().debug("{}", exception.getMessage(), exception);
 			return; //TODO improve error handling
@@ -278,7 +278,7 @@ public class GuiseCli extends BaseCliApplication {
 			logProjectInfo(project);
 
 			mummifier.mummify(project, GuiseMummy.LifeCyclePhase.DEPLOY);
-		} catch(final IllegalArgumentException | IOException exception) {
+		} catch(final IllegalArgumentException | ConfigurationException | IOException exception) {
 			getLogger().error("{}", exception.getMessage());
 			getLogger().debug("{}", exception.getMessage(), exception);
 			return; //TODO improve error handling
@@ -342,7 +342,7 @@ public class GuiseCli extends BaseCliApplication {
 			logProjectInfo(project);
 			getLogger().info("Server base directory: {}", serverBaseDirectory);
 			getLogger().info("Server port: {}", port);
-		} catch(final IllegalArgumentException | IOException exception) {
+		} catch(final IllegalArgumentException | ConfigurationException | IOException exception) {
 			getLogger().error("{}", exception.getMessage());
 			getLogger().debug("{}", exception.getMessage(), exception);
 			return; //TODO improve error handling

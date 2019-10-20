@@ -41,7 +41,7 @@
 
 		<dependency>
 			<groupId>io.confound</groupId>
-			<artifactId>config-file</artifactId>
+			<artifactId>confound-file</artifactId>
 		</dependency>
 
 		<dependency>

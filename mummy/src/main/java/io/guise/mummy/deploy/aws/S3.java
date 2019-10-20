@@ -41,6 +41,7 @@ import com.globalmentor.text.StringTemplate;
 
 import io.clogr.Clogged;
 import io.confound.config.Configuration;
+import io.confound.config.ConfigurationException;
 import io.guise.mummy.*;
 import io.guise.mummy.deploy.DeployTarget;
 import io.urf.vocab.content.Content;
@@ -59,11 +60,16 @@ public class S3 implements DeployTarget, Clogged {
 
 	/** The section relative key for the indication of bucket region in the configuration. */
 	public static final String CONFIG_KEY_REGION = "region";
-	/** The section relative key for the bucket name in the configuration; defaults to {@link GuiseMummy#CONFIG_KEY_SITE_DOMAIN} in the global configuration. */
-	public static final String CONFIG_KEY_BUCKET = "bucket";
+
 	/**
-	 * The section relative key for the alternative buckets in the configuration; defaults to {@link GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} in the global
-	 * configuration.
+	 * The section relative key for the bucket name in the configuration; defaults to the root-relative form of {@link GuiseMummy#CONFIG_KEY_SITE_DOMAIN} resolved
+	 * against any {@link GuiseMummy#CONFIG_KEY_DOMAIN} in the global configuration, falling back to {@link GuiseMummy#CONFIG_KEY_DOMAIN} if that is not present..
+	 */
+	public static final String CONFIG_KEY_BUCKET = "bucket";
+
+	/**
+	 * The section relative key for the alternative buckets in the configuration; defaults to the root-relative form of
+	 * {@link GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} resolved against any {@link GuiseMummy#CONFIG_KEY_DOMAIN} in the global configuration.
 	 */
 	public static final String CONFIG_KEY_ALT_BUCKETS = "altBuckets";
 
@@ -198,10 +204,11 @@ public class S3 implements DeployTarget, Clogged {
 	 * Configuration constructor.
 	 * <p>
 	 * The region is retrieved from {@value #CONFIG_KEY_REGION} in the local configuration. The bucket name is retrieved from {@value #CONFIG_KEY_BUCKET} in the
-	 * local configuration, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} in the context configuration if not specified. The bucket alternatives are
-	 * retrieved from {@value #CONFIG_KEY_ALT_BUCKETS}, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} in the context configuration if not
-	 * specified.
+	 * local configuration, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and finally {@value GuiseMummy#CONFIG_KEY_DOMAIN} in the context
+	 * configuration if not specified. The bucket alternatives are retrieved from {@value #CONFIG_KEY_ALT_BUCKETS}, falling back to
+	 * {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} in the context configuration if not specified.
 	 * </p>
+	 * @implSpec This method calls {@link #getConfiguredBucket(Configuration, Configuration)} and {@link #getConfiguredAltBuckets(Configuration, Configuration)}.
 	 * @param context The context of static site generation.
 	 * @param localConfiguration The local configuration for this deployment target, which may be a section of the project configuration.
 	 * @see AWS#CONFIG_KEY_DEPLOY_AWS_PROFILE
@@ -210,12 +217,13 @@ public class S3 implements DeployTarget, Clogged {
 	 * @see #CONFIG_KEY_ALT_BUCKETS
 	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
 	 * @see GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS
+	 * @see GuiseMummy#CONFIG_KEY_DOMAIN
+	 * @see #getConfiguredBucket(Configuration, Configuration)
+	 * @see #getConfiguredAltBuckets(Configuration, Configuration)
 	 */
 	public S3(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
 		this(context.getConfiguration().findString(CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null), Region.of(localConfiguration.getString(CONFIG_KEY_REGION)),
-				localConfiguration.findString(CONFIG_KEY_BUCKET).orElseGet(() -> context.getConfiguration().getString(CONFIG_KEY_SITE_DOMAIN)),
-				localConfiguration.findCollection(CONFIG_KEY_ALT_BUCKETS, String.class)
-						.or(() -> context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class)).orElse(emptyList()));
+				getConfiguredBucket(context.getConfiguration(), localConfiguration), getConfiguredAltBuckets(context.getConfiguration(), localConfiguration));
 	}
 
 	/**
@@ -235,6 +243,50 @@ public class S3 implements DeployTarget, Clogged {
 			s3ClientBuilder.credentialsProvider(ProfileCredentialsProvider.create(profile));
 		}
 		s3Client = s3ClientBuilder.build();
+	}
+
+	/**
+	 * Determines the bucket to use. This method determines the bucket in the following order:
+	 * <ol>
+	 * <li>The key {@link #CONFIG_KEY_BUCKET} relative to the S3 configuration.</li>
+	 * <li>The site domain {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN}, falling back to {@value GuiseMummy#CONFIG_KEY_DOMAIN}, relative to the domain name root
+	 * (i.e. with the ending delimiter removed), retrieved from the global configuration.</li>
+	 * </ol>
+	 * @implSpec This method calls {@link GuiseMummy#findConfiguredSiteDomain(Configuration)}.
+	 * @param globalConfiguration The configuration containing all the configuration values.
+	 * @param localConfiguration The local configuration for S3, which may be a section of the project configuration.
+	 * @return The configured bucket name.
+	 * @see #CONFIG_KEY_BUCKET
+	 * @see GuiseMummy#CONFIG_KEY_DOMAIN
+	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
+	 * @throws ConfigurationException if the bucket name cannot be determined.
+	 */
+	static String getConfiguredBucket(@Nonnull final Configuration globalConfiguration, @Nonnull final Configuration localConfiguration)
+			throws ConfigurationException {
+		return localConfiguration.findString(CONFIG_KEY_BUCKET)
+				.or(() -> findConfiguredSiteDomain(globalConfiguration).map(DomainName.ROOT::relativize).map(DomainName::toString))
+				.orElseThrow(() -> new ConfigurationException("No configured S3 bucket could be determined."));
+	}
+
+	/**
+	 * Determines the alternative buckets to use, if any. This method determines the alternative buckets in the following order:
+	 * <ol>
+	 * <li>The key {@link #CONFIG_KEY_ALT_BUCKETS} relative to the S3 configuration.</li>
+	 * <li>The site domain {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} resolved to any project domain, to the domain name root (i.e. with the ending delimiter
+	 * removed), retrieved from the global configuration.</li>
+	 * </ol>
+	 * @implSpec This method calls {@link GuiseMummy#findConfiguredSiteAltDomains(Configuration)}.
+	 * @param globalConfiguration The configuration containing all the configuration values.
+	 * @param localConfiguration The local configuration for S3, which may be a section of the project configuration.
+	 * @return The configured alternative bucket names, if any.
+	 * @see #CONFIG_KEY_ALT_BUCKETS
+	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
+	 */
+	static Collection<String> getConfiguredAltBuckets(@Nonnull final Configuration globalConfiguration, @Nonnull final Configuration localConfiguration) {
+		return localConfiguration.findCollection(CONFIG_KEY_ALT_BUCKETS, String.class)
+				.or(() -> findConfiguredSiteAltDomains(globalConfiguration)
+						.map(altDomains -> altDomains.stream().map(DomainName.ROOT::relativize).map(DomainName::toString).collect(toCollection(LinkedHashSet::new))))
+				.orElse(emptyList());
 	}
 
 	/**
