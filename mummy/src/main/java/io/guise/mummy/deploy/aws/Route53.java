@@ -170,9 +170,9 @@ public class Route53 implements Dns, Clogged {
 	static Optional<DomainName> getConfiguredHostedZoneName(@Nonnull final Configuration globalConfiguration, @Nonnull final Configuration localConfiguration) {
 		//local hosted zone designation
 		return localConfiguration.findString(CONFIG_KEY_HOSTED_ZONE_NAME).map(DomainName::of).map(hostedZoneName -> {
-			if(!hostedZoneName.isAbsolute()) {
+			if(!hostedZoneName.isAbsolute() || hostedZoneName.isRoot()) {
 				throw new ConfigurationException(
-						String.format("The Route 53 `%s` configuration `%s` must be a fully-qualified domain name (FQDN), ending in a dot `%s` character.",
+						String.format("The Route 53 `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character.",
 								CONFIG_KEY_HOSTED_ZONE_NAME, hostedZoneName, DomainName.DELIMITER)); //TODO i18n
 			}
 			return hostedZoneName;
@@ -347,7 +347,7 @@ public class Route53 implements Dns, Clogged {
 	 * @throws IllegalArgumentException if the given domain name is not absolute.
 	 */
 	protected static Set<HostedZone> getHostedZonesByName(@Nonnull final Route53Client client, @Nonnull final DomainName hostedZoneName) throws SdkException {
-		final String name = hostedZoneName.toString();
+		final String name = hostedZoneName.checkArgumentAbsolute().toString();
 		try (final Stream<HostedZone> hostedZonesByName = hostedZones(client).filter(hostedZone -> hostedZone.name().equals(name))) {
 			return hostedZonesByName.collect(toSet());
 		}

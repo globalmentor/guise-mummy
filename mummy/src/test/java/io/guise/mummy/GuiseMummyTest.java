@@ -60,6 +60,13 @@ public class GuiseMummyTest {
 		assertThrows(ConfigurationException.class, () -> GuiseMummy.findConfiguredDomain(configuration));
 	}
 
+	/** @see GuiseMummy#findConfiguredDomain(Configuration) */
+	@Test
+	public void testFindConfiguredDomainRootThrowsException() {
+		final Configuration configuration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_DOMAIN, "."));
+		assertThrows(ConfigurationException.class, () -> GuiseMummy.findConfiguredDomain(configuration));
+	}
+
 	//## `site.domain`
 
 	/** @see GuiseMummy#findConfiguredSiteDomain(Configuration) */
@@ -98,6 +105,13 @@ public class GuiseMummyTest {
 		assertThrows(ConfigurationException.class, () -> GuiseMummy.findConfiguredSiteDomain(configuration));
 	}
 
+	/** @see GuiseMummy#findConfiguredSiteDomain(Configuration) */
+	@Test
+	public void testFindConfiguredSiteDomainRootThrowsException() {
+		final Configuration configuration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "."));
+		assertThrows(ConfigurationException.class, () -> GuiseMummy.findConfiguredSiteDomain(configuration));
+	}
+
 	//## `site.altDomains`
 
 	/** @see GuiseMummy#findConfiguredSiteAltDomains(Configuration) */
@@ -129,6 +143,14 @@ public class GuiseMummyTest {
 	public void testGetConfiguredSiteAltDomainsNotAbsoluteThrowsException() {
 		final Configuration configuration = new ObjectMapConfiguration(
 				Map.of(GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS, List.of("example.com.", "www.example.com.", "relative.example.com")));
+		assertThrows(ConfigurationException.class, () -> GuiseMummy.findConfiguredSiteAltDomains(configuration));
+	}
+
+	/** @see GuiseMummy#findConfiguredSiteAltDomains(Configuration) */
+	@Test
+	public void testGetConfiguredSiteAltDomainsRootThrowsException() {
+		final Configuration configuration = new ObjectMapConfiguration(
+				Map.of(GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS, List.of("example.com.", "www.example.com.", ".")));
 		assertThrows(ConfigurationException.class, () -> GuiseMummy.findConfiguredSiteAltDomains(configuration));
 	}
 

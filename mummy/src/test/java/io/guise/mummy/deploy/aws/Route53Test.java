@@ -18,6 +18,7 @@ package io.guise.mummy.deploy.aws;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static org.hamcrest.MatcherAssert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
@@ -44,6 +45,26 @@ public class Route53Test {
 				GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS, List.of("foo.example.com.", "bar.example.com.")));
 		final Configuration localConfiguration = new StringMapConfiguration(Map.of(Route53.CONFIG_KEY_HOSTED_ZONE_NAME, "example.net."));
 		assertThat(Route53.getConfiguredHostedZoneName(globalConfiguration, localConfiguration), isPresentAndIs(DomainName.of("example.net.")));
+	}
+
+	/**
+	 * @see Route53#getConfiguredHostedZoneName(Configuration, Configuration)
+	 * @see Route53#CONFIG_KEY_HOSTED_ZONE_NAME
+	 */
+	@Test
+	public void testGetConfiguredHostedZoneNotAbsoluteThrowsException() {
+		final Configuration localConfiguration = new StringMapConfiguration(Map.of(Route53.CONFIG_KEY_HOSTED_ZONE_NAME, "example.net"));
+		assertThrows(ConfigurationException.class, () -> Route53.getConfiguredHostedZoneName(Configuration.empty(), localConfiguration));
+	}
+
+	/**
+	 * @see Route53#getConfiguredHostedZoneName(Configuration, Configuration)
+	 * @see Route53#CONFIG_KEY_HOSTED_ZONE_NAME
+	 */
+	@Test
+	public void testGetConfiguredHostedZoneRootThrowsException() {
+		final Configuration localConfiguration = new StringMapConfiguration(Map.of(Route53.CONFIG_KEY_HOSTED_ZONE_NAME, "."));
+		assertThrows(ConfigurationException.class, () -> Route53.getConfiguredHostedZoneName(Configuration.empty(), localConfiguration));
 	}
 
 	/*** @see Route53#getConfiguredHostedZoneName(Configuration, Configuration) */

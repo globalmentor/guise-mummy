@@ -98,9 +98,10 @@ public class GuiseMummy implements Clogged {
 	 */
 	public static Optional<DomainName> findConfiguredDomain(@Nonnull final Configuration configuration) throws ConfigurationException {
 		return configuration.findString(CONFIG_KEY_DOMAIN).map(DomainName::of).map(domain -> {
-			if(!domain.isAbsolute()) {
-				throw new ConfigurationException(String.format("The `%s` configuration `%s` must be a fully-qualified domain, ending in a dot `%s` character.",
-						CONFIG_KEY_DOMAIN, domain, DomainName.DELIMITER)); //TODO i18n
+			if(!domain.isAbsolute() || domain.isRoot()) {
+				throw new ConfigurationException(
+						String.format("The `%s` configuration `%s` must be a fully-qualified, non-root domain, ending in a dot `%s` character.", CONFIG_KEY_DOMAIN, domain,
+								DomainName.DELIMITER)); //TODO i18n
 			}
 			return domain;
 		});
@@ -123,13 +124,13 @@ public class GuiseMummy implements Clogged {
 	public static Optional<DomainName> findConfiguredSiteDomain(@Nonnull final Configuration configuration) throws ConfigurationException {
 		final Optional<DomainName> configuredDomain = findConfiguredDomain(configuration);
 		final DomainName base = configuredDomain.orElse(DomainName.EMPTY);
-		return configuration.findString(CONFIG_KEY_SITE_DOMAIN).map(DomainName::of).map(base::resolve).or(() -> configuredDomain).map(siteName -> {
-			if(!siteName.isAbsolute()) {
+		return configuration.findString(CONFIG_KEY_SITE_DOMAIN).map(DomainName::of).map(base::resolve).or(() -> configuredDomain).map(siteDomain -> {
+			if(!siteDomain.isAbsolute() || siteDomain.isRoot()) {
 				throw new ConfigurationException(String.format(
-						"The `%s` configuration `%s` must be a fully-qualified domain name (FQDN), ending in a dot `%s` character, or resolve against a `%s` configuration that is a FQDN.",
-						CONFIG_KEY_SITE_DOMAIN, siteName, DomainName.DELIMITER, CONFIG_KEY_DOMAIN));
+						"The `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character; or resolve against a `%s` configuration that is a FQDN.",
+						CONFIG_KEY_SITE_DOMAIN, siteDomain, DomainName.DELIMITER, CONFIG_KEY_DOMAIN));
 			}
-			return siteName;
+			return siteDomain;
 		});
 	}
 
@@ -150,9 +151,9 @@ public class GuiseMummy implements Clogged {
 		final DomainName base = findConfiguredDomain(configuration).orElse(DomainName.EMPTY);
 		return configuration.findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class)
 				.map(names -> names.stream().map(DomainName::of).map(base::resolve).map(siteAltDomain -> {
-					if(!siteAltDomain.isAbsolute()) {
+					if(!siteAltDomain.isAbsolute() || siteAltDomain.isRoot()) {
 						throw new ConfigurationException(String.format(
-								"The `%s` configuration `%s` must be a fully-qualified domain name (FQDN), ending in a dot `%s` character, or resolve against a `%s` configuration that is a FQDN.",
+								"The `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character; or resolve against a `%s` configuration that is a FQDN.",
 								CONFIG_KEY_SITE_ALT_DOMAINS, siteAltDomain, DomainName.DELIMITER, CONFIG_KEY_DOMAIN)); //TODO i18n
 					}
 					return siteAltDomain;
