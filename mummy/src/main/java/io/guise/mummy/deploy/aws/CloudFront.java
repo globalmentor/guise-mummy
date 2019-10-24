@@ -36,7 +36,9 @@ import javax.annotation.*;
 import org.slf4j.Logger;
 
 import com.globalmentor.collections.Sets;
-import com.globalmentor.net.*;
+import com.globalmentor.net.DomainName;
+import com.globalmentor.net.HTTP;
+import com.globalmentor.net.ResourceRecord;
 
 import io.clogr.Clogged;
 import io.confound.config.*;
@@ -220,14 +222,14 @@ public class CloudFront implements DeployTarget, Clogged {
 						break;
 					case PENDING_VALIDATION:
 						if(domainValidation.validationMethod().equals(ValidationMethod.DNS)) {
-							final ResourceRecord resourceRecord = domainValidation.resourceRecord();
+							final software.amazon.awssdk.services.acm.model.ResourceRecord resourceRecord = domainValidation.resourceRecord();
 							context.getDeployDns().ifPresentOrElse(throwingConsumer(dns -> {
-								logger.info("Setting DNS entry (`{}`) `{} = {}` for certificate `{}` validation for domain name `{}`.", resourceRecord.typeAsString(),
+								logger.info("Setting DNS entry [{}] `{}` = `{}` for certificate `{}` validation for domain name `{}`.", resourceRecord.typeAsString(),
 										resourceRecord.name(), resourceRecord.value(), certificateArn, domainValidation.domainName());
 								dns.setResourceRecord(resourceRecord.typeAsString(), DomainName.of(resourceRecord.name()), resourceRecord.value(),
 										CERTIFICATE_VALIDATION_DNS_TTL);
 							}), () -> logger.warn(
-									"No DNS configured. To validate certificate `{}` for domain name `{}`, resource record (`{}`) `{} = {}` must be set in the DNS manually.",
+									"No DNS configured. To validate certificate `{}` for domain name `{}`, resource record [{}] `{}` = `{}` must be set in the DNS manually.",
 									certificateArn, domainValidation.domainName(), resourceRecord.typeAsString(), resourceRecord.name(), resourceRecord.value()));
 						} else {
 							logger.warn("Certificate `{}` specifies an unknown validation method `{}` for domain name `{}` and must be performed manually.", certificateArn,
@@ -321,15 +323,15 @@ public class CloudFront implements DeployTarget, Clogged {
 				//add an alias record to the new distribution if we have a Route 53 DNS
 				final DomainName domainName = DomainName.ROOT.resolve(DomainName.of(s3Bucket)); //the domain name is the S3 bucket (as a relative domain) resolved to `.`
 				context.getDeployDns().filter(Route53.class::isInstance).map(Route53.class::cast).ifPresentOrElse(throwingConsumer(route53 -> {
-					logger.info("Setting DNS alias `A` record for domain name `{}` to CloudFront distribution `{}` domain `{}`.", domainName, distributionId,
+					logger.info("Setting DNS alias [A] record for domain name `{}` to CloudFront distribution `{}` domain `{}`.", domainName, distributionId,
 							distributionDomainName);
-					route53.setAliasResourceRecord(Dns.ResourceRecordType.A, domainName, distributionDomainName.toString(), Route53.CLOUDFRONT_ALIAS_HOSTED_ZONE_ID);
+					route53.setAliasResourceRecord(ResourceRecord.Type.A, domainName, distributionDomainName.toString(), Route53.CLOUDFRONT_ALIAS_HOSTED_ZONE_ID);
 				}), () -> logger.warn(
 						"No Route 53 DNS configured; an alias for domain name `{}` to CloudFront distribution `{}` domain `{}` must be set in the Route 53 manually if desired.",
 						domainName, distributionId, distributionDomainName));
 			}
 
-			return Optional.of(createURI(HTTPS_URI_SCHEME, null, s3.getBucket(), -1, URIs.ROOT_PATH, null, null)); //https://s3-bucket/
+			return Optional.of(createURI(HTTPS_URI_SCHEME, null, s3.getBucket(), -1, ROOT_PATH, null, null)); //https://s3-bucket/
 		} catch(final SdkException sdkException) {
 			throw new IOException(sdkException);
 		}

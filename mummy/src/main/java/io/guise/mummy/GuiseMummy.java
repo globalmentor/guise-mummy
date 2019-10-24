@@ -270,13 +270,20 @@ public class GuiseMummy implements Clogged {
 				}).orElse(emptyList());
 				context.setDeployTargets(deployTargets); //store the targets in the context for later
 
+				//prepare the DNS
 				deployDns.ifPresent(throwingConsumer(dns -> {
-					dns.prepare(context); //prepare the DNS
+					dns.prepare(context);
 				}));
+				//prepare the targets
 				deployTargets.forEach(throwingConsumer(target -> target.prepare(context))); //prepare the targets
 
 				//# deploy phase
 				if(phase.compareTo(LifeCyclePhase.DEPLOY) >= 0) {
+					//deploy the DNS
+					deployDns.ifPresent(throwingConsumer(dns -> {
+						dns.deploy(context, rootArtifact);
+					}));
+					//deploy the targets
 					for(final DeployTarget target : deployTargets) {
 						final Optional<URI> deployUrl = target.deploy(context, rootArtifact);
 						deployUrl.ifPresent(deployUrls::add);

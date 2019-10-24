@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package io.guise.mummy.deploy.aws;
+package io.guise.mummy.deploy;
 
-import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
@@ -30,59 +30,59 @@ import io.confound.config.*;
 import io.guise.mummy.GuiseMummy;
 
 /**
- * Tests of {@link Route53}.
+ * Tests of {@link Dns}.
  * @author Garret Wilson
  */
-public class Route53Test {
+public class DnsTest {
 
 	/**
-	 * @see Route53#getConfiguredHostedZoneName(Configuration, Configuration)
-	 * @see Route53#CONFIG_KEY_HOSTED_ZONE_NAME
+	 * @see Dns#getConfiguredOrigin(Configuration, Configuration)
+	 * @see Dns#CONFIG_KEY_ORIGIN
 	 */
 	@Test
 	public void testGetConfiguredHostedZoneUsesDomainConfiguredLocally() {
 		final Configuration globalConfiguration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "test.example.com.",
 				GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS, List.of("foo.example.com.", "bar.example.com.")));
-		final Configuration localConfiguration = new StringMapConfiguration(Map.of(Route53.CONFIG_KEY_HOSTED_ZONE_NAME, "example.net."));
-		assertThat(Route53.getConfiguredHostedZoneName(globalConfiguration, localConfiguration), isPresentAndIs(DomainName.of("example.net.")));
+		final Configuration localConfiguration = new StringMapConfiguration(Map.of(Dns.CONFIG_KEY_ORIGIN, "example.net."));
+		assertThat(Dns.getConfiguredOrigin(globalConfiguration, localConfiguration), is(DomainName.of("example.net.")));
 	}
 
 	/**
-	 * @see Route53#getConfiguredHostedZoneName(Configuration, Configuration)
-	 * @see Route53#CONFIG_KEY_HOSTED_ZONE_NAME
+	 * @see Dns#getConfiguredOrigin(Configuration, Configuration)
+	 * @see Dns#CONFIG_KEY_ORIGIN
 	 */
 	@Test
 	public void testGetConfiguredHostedZoneNotAbsoluteThrowsException() {
-		final Configuration localConfiguration = new StringMapConfiguration(Map.of(Route53.CONFIG_KEY_HOSTED_ZONE_NAME, "example.net"));
-		assertThrows(ConfigurationException.class, () -> Route53.getConfiguredHostedZoneName(Configuration.empty(), localConfiguration));
+		final Configuration localConfiguration = new StringMapConfiguration(Map.of(Dns.CONFIG_KEY_ORIGIN, "example.net"));
+		assertThrows(ConfigurationException.class, () -> Dns.getConfiguredOrigin(Configuration.empty(), localConfiguration));
 	}
 
 	/**
-	 * @see Route53#getConfiguredHostedZoneName(Configuration, Configuration)
-	 * @see Route53#CONFIG_KEY_HOSTED_ZONE_NAME
+	 * @see Dns#getConfiguredOrigin(Configuration, Configuration)
+	 * @see Dns#CONFIG_KEY_ORIGIN
 	 */
 	@Test
 	public void testGetConfiguredHostedZoneRootThrowsException() {
-		final Configuration localConfiguration = new StringMapConfiguration(Map.of(Route53.CONFIG_KEY_HOSTED_ZONE_NAME, "."));
-		assertThrows(ConfigurationException.class, () -> Route53.getConfiguredHostedZoneName(Configuration.empty(), localConfiguration));
+		final Configuration localConfiguration = new StringMapConfiguration(Map.of(Dns.CONFIG_KEY_ORIGIN, "."));
+		assertThrows(ConfigurationException.class, () -> Dns.getConfiguredOrigin(Configuration.empty(), localConfiguration));
 	}
 
-	/*** @see Route53#getConfiguredHostedZoneName(Configuration, Configuration) */
+	/*** @see Dns#getConfiguredOrigin(Configuration, Configuration) */
 	@Test
 	public void testGetConfiguredHostedZoneDefaultsToProjectDomain() {
 		final Configuration globalConfiguration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_DOMAIN, "example.net.", GuiseMummy.CONFIG_KEY_SITE_DOMAIN,
 				"test.example.com.", GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS, List.of("foo.example.com.", "bar.example.com.")));
 		final Configuration localConfiguration = Configuration.empty();
-		assertThat(Route53.getConfiguredHostedZoneName(globalConfiguration, localConfiguration), isPresentAndIs(DomainName.of("example.net.")));
+		assertThat(Dns.getConfiguredOrigin(globalConfiguration, localConfiguration), is(DomainName.of("example.net.")));
 	}
 
-	/*** @see Route53#getConfiguredHostedZoneName(Configuration, Configuration) */
+	/*** @see Dns#getConfiguredOrigin(Configuration, Configuration) */
 	@Test
 	public void testGetConfiguredHostedZoneFallsBackToSiteBaseDomain() {
 		final Configuration globalConfiguration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "test.example.com.",
 				GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS, List.of("foo.example.com.", "bar.example.com.")));
 		final Configuration localConfiguration = Configuration.empty();
-		assertThat(Route53.getConfiguredHostedZoneName(globalConfiguration, localConfiguration), isPresentAndIs(DomainName.of("example.com.")));
+		assertThat(Dns.getConfiguredOrigin(globalConfiguration, localConfiguration), is(DomainName.of("example.com.")));
 	}
 
 }
