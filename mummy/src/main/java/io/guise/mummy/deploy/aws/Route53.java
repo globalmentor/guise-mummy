@@ -219,23 +219,80 @@ public class Route53 extends AbstractDns {
 		try {
 			final Route53Client client = getRoute53Client();
 			final HostedZone hostedZone = getHostedZone().orElseThrow(IllegalStateException::new);
-			//normalize the configured value if required by Route 53 for recognized resource record types
-			final String normalizedValue = Enums.asEnum(ResourceRecord.Type.class, type).map(resourceRecordType -> {
-				switch(resourceRecordType) {
-					case TXT: //Route 53 prefers all TXT values to be quoted
-						return ResourceRecord.normalizeCharacterString(value, true);
-					default:
-						return value;
-				}
-			}).orElse(value);
 			final software.amazon.awssdk.services.route53.model.ResourceRecord resourceRecord = software.amazon.awssdk.services.route53.model.ResourceRecord.builder()
-					.value(normalizedValue).build();
+					.value(normalizeValueForType(type, value)).build();
 			final ResourceRecordSet resourceRecordSet = ResourceRecordSet.builder().type(type).name(name.toString()).resourceRecords(resourceRecord).ttl(ttl).build();
 			final Change change = Change.builder().action(ChangeAction.UPSERT).resourceRecordSet(resourceRecordSet).build();
 			client.changeResourceRecordSets(request -> request.hostedZoneId(hostedZone.id()).changeBatch(batch -> batch.changes(change)));
 		} catch(final SdkException sdkException) {
 			throw new IOException(sdkException);
 		}
+	}
+
+	/**
+	 * Normalizes a value as expected by Route 53.
+	 * @implSpec This implementation quotes all {@link ResourceRecord.Type#TXT} record types, as the developer guide indicates this is preferred, and moreover
+	 *           some string containing e.g. '=' cause Route 53 errors, even if RFC 1035 doesn't seem to require quoting such values.
+	 * @see <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/ResourceRecordTypes.html#TXTFormat">Supported DNS Record Types: TXT Record Type</a>
+	 * @param type The resource record type.
+	 * @param value The given resource record value.
+	 * @return The value form preferred by Route 53.
+	 */
+	static String normalizeValueForType(@Nonnull final String type, @Nonnull final String value) {
+		return Enums.asEnum(ResourceRecord.Type.class, type).map(resourceRecordType -> {
+			switch(resourceRecordType) {
+				case TXT: //Route 53 prefers all TXT values to be quoted
+					//TODO support multiple long strings in a TXT record; see https://tools.ietf.org/html/rfc7208#section-3.3, which seems to conflict with Route 53
+					return ResourceRecord.normalizeCharacterString(value, true);
+				default:
+					return value;
+			}
+		}).orElse(value);
+	}
+
+	/**
+	 * Transforms a set of resource records to be used for setting.
+	 * @implSpec This implementation groups together the values of records with the same type and resolved name, placing multiple values on different lines of the
+	 *           same record as required by Route 53. The records will be combined in iteration order of the collection. If combined records have different TTL
+	 *           values, it is undefined which TTL value will be used, although if one of the combined records has a TTL value is guaranteed that the combined
+	 *           record will have a TTL value.
+	 * @see <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/ResourceRecordTypes.html#TXTFormat">Supported DNS Record Types: TXT Record Type</a>
+	 * @see <a href="https://forums.aws.amazon.com/thread.jspa?threadID=88634">AWS Forums: Multiple MX records same name</a>
+	 * @param origin The base domain against which the resource records will be resolved.
+	 * @param resourceRecords The resource records that will be used for setting.
+	 * @return The transformed collection of resource records to set.
+	 * @throws IllegalArgumentException if the given origin is not absolute.
+	 */
+	static Collection<ResourceRecord> transformResourceRecordForSet(@Nonnull final DomainName origin, final Collection<ResourceRecord> resourceRecords) {
+		origin.checkArgumentAbsolute();
+		final Map<Map.Entry<String, DomainName>, ResourceRecord> transformedResourceRecords = new LinkedHashMap<>(); //the records combined and grouped by type+name; maintain order to be more user-friendly
+		for(final ResourceRecord resourceRecord : resourceRecords) {
+			final String type = resourceRecord.getType();
+			final DomainName name = origin.resolve(resourceRecord.getName().orElse(DomainName.EMPTY));
+			String value = normalizeValueForType(type, resourceRecord.getValue()); //normalize the value
+			OptionalLong ttl = resourceRecord.getTtl();
+			final Map.Entry<String, DomainName> key = Map.entry(type, name); //group by type+name
+			final ResourceRecord oldResourceRecord = transformedResourceRecords.get(key);
+			if(oldResourceRecord != null) { //combine values if there was a previous resource record
+				value = oldResourceRecord.getValue() + '\n' + value; //the old value will have been normalized when it was first stored in the map
+				if(!ttl.isPresent()) {
+					ttl = oldResourceRecord.getTtl();
+				}
+			}
+			final ResourceRecord newResourceRecord = new ResourceRecord(type, name, value, ttl.orElse(-1));
+			transformedResourceRecords.put(key, newResourceRecord);
+		}
+		return transformedResourceRecords.values();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation groups together the values of records with the same type and resolved name, placing multiple values on different lines of the
+	 *           same record as required by Route 53, by calling {@link #transformResourceRecordForSet(DomainName, Collection)}.
+	 */
+	@Override
+	public void setResourceRecords(final Collection<ResourceRecord> resourceRecords) throws IOException {
+		super.setResourceRecords(transformResourceRecordForSet(getOrigin(), resourceRecords));
 	}
 
 	/**

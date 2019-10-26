@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import com.globalmentor.net.*;
 
 import io.clogr.Clogged;
-import io.confound.config.Configuration;
 import io.guise.mummy.*;
 import io.guise.mummy.deploy.Dns;
 
@@ -41,10 +40,7 @@ public abstract class AbstractDns implements Dns, Clogged {
 
 	private DomainName origin;
 
-	/**
-	 * Returns the origin, or base domain name, for this DNS zone in absolute form.
-	 * @return The fully-qualified domain name serving as the base for this zone.
-	 */
+	@Override
 	public DomainName getOrigin() {
 		return origin;
 	}
@@ -74,27 +70,13 @@ public abstract class AbstractDns implements Dns, Clogged {
 	 */
 	@Override
 	public Optional<URI> deploy(final MummyContext context, final Artifact rootArtifact) throws IOException {
+		final Logger logger = getLogger();
+		for(final ResourceRecord resourceRecord : getResourceRecords()) {
+			logger.info("Deploying DNS resource record [{}] `{}` = `{}` ({}).", resourceRecord.getType(),
+					getOrigin().resolve(resourceRecord.getName().orElse(DomainName.EMPTY)), resourceRecord.getValue(), resourceRecord.getTtl().orElse(DEFAULT_TTL));
+		}
 		setResourceRecords(getResourceRecords());
 		return Optional.empty();
-	}
-
-	/**
-	 * Sets the given resource records in this DNS zone.
-	 * @implSpec This implementation calls {@link #setResourceRecords(Configuration, DomainName, long)}.
-	 * @param resourceRecords The resource records to set.
-	 * @throws IOException If there was an error setting a resource record.
-	 * @see #getOrigin()
-	 * @see Dns#DEFAULT_TTL
-	 */
-	protected void setResourceRecords(@Nonnull final Iterable<ResourceRecord> resourceRecords) throws IOException {
-		final DomainName origin = getOrigin();
-		final Logger logger = getLogger();
-		for(final ResourceRecord resourceRecord : resourceRecords) {
-			final DomainName resolvedName = origin.resolve(resourceRecord.getName().orElse(DomainName.EMPTY));
-			final long ttl = resourceRecord.getTtl().orElse(DEFAULT_TTL);
-			logger.info("Setting DNS resource record [{}] `{}` = `{}` ({}).", resourceRecord.getType(), resolvedName, resourceRecord.getValue(), ttl);
-			setResourceRecord(resourceRecord.getType(), resolvedName, resourceRecord.getValue(), ttl);
-		}
 	}
 
 }

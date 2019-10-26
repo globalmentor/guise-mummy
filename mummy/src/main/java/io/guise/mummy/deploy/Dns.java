@@ -70,6 +70,12 @@ public interface Dns extends DeployTarget {
 	public static final String RECORD_CONFIG_KEY_TTL = "ttl";
 
 	/**
+	 * Returns the origin, or base domain name, for this DNS zone in absolute form.
+	 * @return The fully-qualified domain name serving as the base for this zone.
+	 */
+	public DomainName getOrigin();
+
+	/**
 	 * {@inheritDoc} This may include creating any accounts or record zones, for example.
 	 */
 	@Override
@@ -115,6 +121,42 @@ public interface Dns extends DeployTarget {
 	 */
 	public void setResourceRecord(@Nonnull final String type, @Nonnull final DomainName name, @Nonnull final String value, @Nonnegative final long ttl)
 			throws IOException;
+
+	/**
+	 * Sets a resource record. If a resource record with the same type and name does not already exists, it will be added. If a resource record already exists
+	 * with the same type and name, it will be replaced. (This is commonly referred to as <dfn>upsert</dfn>.)
+	 * <p>
+	 * Resource record names will be resolved against the origin domain name, if any. The value {@value #DEFAULT_TTL} will be used if no TTL is indicated.
+	 * </p>
+	 * @implSpec The default implementation delegates to {@link #setResourceRecord(String, DomainName, String, long)}.
+	 * @param resourceRecord The resource record to set.
+	 * @throws IOException If there was an error setting the resource record.
+	 * @see #getOrigin()
+	 * @see #DEFAULT_TTL
+	 */
+	public default void setResourceRecord(@Nonnull final ResourceRecord resourceRecord) throws IOException {
+		final DomainName origin = getOrigin();
+		final DomainName name = origin.resolve(resourceRecord.getName().orElse(DomainName.EMPTY));
+		final long ttl = resourceRecord.getTtl().orElse(DEFAULT_TTL);
+		setResourceRecord(resourceRecord.getType(), name, resourceRecord.getValue(), ttl);
+	}
+
+	/**
+	 * Sets the given resource records in this DNS zone. If multiple resource records are given with the same type and name, they will both be set.
+	 * <p>
+	 * Resource record names will be resolved against the origin domain name, if any. The value {@value #DEFAULT_TTL} will be used if no TTL is indicated.
+	 * </p>
+	 * @implSpec This implementation delegates to {@link #setResourceRecord(ResourceRecord)}.
+	 * @param resourceRecords The resource records to set.
+	 * @throws IOException If there was an error setting a resource record.
+	 * @see #getOrigin()
+	 * @see #DEFAULT_TTL
+	 */
+	public default void setResourceRecords(@Nonnull final Collection<ResourceRecord> resourceRecords) throws IOException {
+		for(final ResourceRecord resourceRecord : resourceRecords) {
+			setResourceRecord(resourceRecord);
+		}
+	}
 
 	/**
 	 * Determines the domain name to use as the base for the hosted zone. This method determines the domain in the following order:
