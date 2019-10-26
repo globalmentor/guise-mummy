@@ -31,6 +31,8 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import com.globalmentor.net.DomainName;
+
 import io.clogr.Clogged;
 import io.confound.config.*;
 import io.confound.config.file.*;
@@ -81,16 +83,82 @@ public class GuiseMummy implements Clogged {
 
 	//# configuration
 
+	/**
+	 * The configuration for the domain name of the project (e.g. <code>example.com.</code>). May not be the same as the site domain (e.g.
+	 * <code>www.example.com</code>). If present must be in absolute form; that is, ending with a dot <code>.</code> delimiter.
+	 */
+	public static final String CONFIG_KEY_DOMAIN = "domain";
+
+	/**
+	 * Retrieves the configured domain as a FQDN.
+	 * @param configuration The configuration from which to retrieve values.
+	 * @return The absolute domain, if present.
+	 * @see #CONFIG_KEY_DOMAIN
+	 * @throws ConfigurationException if the domain is not absolute.
+	 */
+	public static Optional<DomainName> findConfiguredDomain(@Nonnull final Configuration configuration) throws ConfigurationException {
+		return configuration.findString(CONFIG_KEY_DOMAIN).map(DomainName::of).map(domain -> {
+			if(!domain.isAbsolute() || domain.isRoot()) {
+				throw new ConfigurationException(
+						String.format("The `%s` configuration `%s` must be a fully-qualified, non-root domain, ending in a dot `%s` character.", CONFIG_KEY_DOMAIN, domain,
+								DomainName.DELIMITER)); //TODO i18n
+			}
+			return domain;
+		});
+	}
+
 	//## site configuration
 
 	/** The configuration for the canonical domain name of the site, such as <code>example.com</code> or <code>www.example.com</code>. */
 	public static final String CONFIG_KEY_SITE_DOMAIN = "site.domain";
 
 	/**
+	 * Retrieves the configured site domain as a FQDN. The value of {@value #CONFIG_KEY_SITE_DOMAIN} if any is resolved against the value of
+	 * {@value #CONFIG_KEY_DOMAIN}, if any, defaulting to the value of {@link #CONFIG_KEY_DOMAIN}.
+	 * @param configuration The configuration from which to retrieve values.
+	 * @return The absolute form of the site domain, if present.
+	 * @see #CONFIG_KEY_SITE_DOMAIN
+	 * @see #CONFIG_KEY_DOMAIN
+	 * @throws ConfigurationException if the site domain cannot be resolved to absolute form.
+	 */
+	public static Optional<DomainName> findConfiguredSiteDomain(@Nonnull final Configuration configuration) throws ConfigurationException {
+		final Optional<DomainName> configuredDomain = findConfiguredDomain(configuration);
+		final DomainName base = configuredDomain.orElse(DomainName.EMPTY);
+		return configuration.findString(CONFIG_KEY_SITE_DOMAIN).map(DomainName::of).map(base::resolve).or(() -> configuredDomain).map(siteDomain -> {
+			if(!siteDomain.isAbsolute() || siteDomain.isRoot()) {
+				throw new ConfigurationException(String.format(
+						"The `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character; or resolve against a `%s` configuration that is a FQDN.",
+						CONFIG_KEY_SITE_DOMAIN, siteDomain, DomainName.DELIMITER, CONFIG_KEY_DOMAIN));
+			}
+			return siteDomain;
+		});
+	}
+
+	/**
 	 * The configuration for the list of alternative domain names of the site, such as <code>www.example.com</code> (as an alternative for
 	 * <code>example.com</code>) or <code>example.com</code> (if the canonical domain name is <code>www.example.com</code>).
 	 */
 	public static final String CONFIG_KEY_SITE_ALT_DOMAINS = "site.altDomains";
+
+	/**
+	 * Retrieves the configured alternative site domain as FQDNs.
+	 * @param configuration The configuration from which to retrieve values.
+	 * @return The absolute form of the site alternate domains, if present.
+	 * @see #CONFIG_KEY_SITE_ALT_DOMAINS
+	 * @throws ConfigurationException if one of the site alternate domains cannot be resolved to absolute form.
+	 */
+	public static Optional<Collection<DomainName>> findConfiguredSiteAltDomains(@Nonnull final Configuration configuration) {
+		final DomainName base = findConfiguredDomain(configuration).orElse(DomainName.EMPTY);
+		return configuration.findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class)
+				.map(names -> names.stream().map(DomainName::of).map(base::resolve).map(siteAltDomain -> {
+					if(!siteAltDomain.isAbsolute() || siteAltDomain.isRoot()) {
+						throw new ConfigurationException(String.format(
+								"The `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character; or resolve against a `%s` configuration that is a FQDN.",
+								CONFIG_KEY_SITE_ALT_DOMAINS, siteAltDomain, DomainName.DELIMITER, CONFIG_KEY_DOMAIN)); //TODO i18n
+					}
+					return siteAltDomain;
+				}).collect(toCollection(LinkedHashSet::new)));
+	}
 
 	//## mummy configuration
 
@@ -202,13 +270,20 @@ public class GuiseMummy implements Clogged {
 				}).orElse(emptyList());
 				context.setDeployTargets(deployTargets); //store the targets in the context for later
 
+				//prepare the DNS
 				deployDns.ifPresent(throwingConsumer(dns -> {
-					dns.prepare(context); //prepare the DNS
+					dns.prepare(context);
 				}));
+				//prepare the targets
 				deployTargets.forEach(throwingConsumer(target -> target.prepare(context))); //prepare the targets
 
 				//# deploy phase
 				if(phase.compareTo(LifeCyclePhase.DEPLOY) >= 0) {
+					//deploy the DNS
+					deployDns.ifPresent(throwingConsumer(dns -> {
+						dns.deploy(context, rootArtifact);
+					}));
+					//deploy the targets
 					for(final DeployTarget target : deployTargets) {
 						final Optional<URI> deployUrl = target.deploy(context, rootArtifact);
 						deployUrl.ifPresent(deployUrls::add);
@@ -257,6 +332,11 @@ public class GuiseMummy implements Clogged {
 	public void validate(@Nonnull final MummyContext context) throws IOException {
 		checkArgumentDirectory(context.getSiteSourceDirectory());
 		checkArgumentDisjoint(context.getSiteSourceDirectory(), context.getSiteTargetDirectory());
+		final Configuration configuration = context.getConfiguration();
+		//make sure all the configured domains resolve to FQDNs
+		findConfiguredDomain(configuration);
+		findConfiguredSiteDomain(configuration);
+		findConfiguredSiteAltDomains(configuration);
 	}
 
 	/**

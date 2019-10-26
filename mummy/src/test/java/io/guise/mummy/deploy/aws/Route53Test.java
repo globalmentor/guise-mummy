@@ -16,15 +16,10 @@
 
 package io.guise.mummy.deploy.aws;
 
-import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static org.hamcrest.MatcherAssert.*;
-
-import java.util.*;
+import static org.hamcrest.Matchers.*;
 
 import org.junit.jupiter.api.*;
-
-import io.confound.config.*;
-import io.guise.mummy.GuiseMummy;
 
 /**
  * Tests of {@link Route53}.
@@ -32,22 +27,14 @@ import io.guise.mummy.GuiseMummy;
  */
 public class Route53Test {
 
-	/*** @see Route53#getConfiguredHostedZoneName(Configuration, Configuration) */
+	/** @see Route53#normalizeValueForType(String, String) */
 	@Test
-	public void testHostedZoneUsesDomainConfiguredLocally() {
-		final Configuration globalConfiguration = new ObjectMapConfiguration(
-				Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "test.example.com", GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS, List.of("foo.example.com", "bar.example.com")));
-		final Configuration localConfiguration = new StringMapConfiguration(Map.of(Route53.CONFIG_KEY_HOSTED_ZONE_NAME, "example.net"));
-		assertThat(Route53.getConfiguredHostedZoneName(globalConfiguration, localConfiguration), isPresentAndIs("example.net"));
-	}
-
-	/*** @see Route53#getConfiguredHostedZoneName(Configuration, Configuration) */
-	@Test
-	public void testHostedZoneDefaultsToSiteBaseDomain() {
-		final Configuration globalConfiguration = new ObjectMapConfiguration(
-				Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "test.example.com", GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS, List.of("foo.example.com", "bar.example.com")));
-		final Configuration localConfiguration = Configuration.empty();
-		assertThat(Route53.getConfiguredHostedZoneName(globalConfiguration, localConfiguration), isPresentAndIs("example.com."));
+	public void testNormalizeValueForType() {
+		assertThat(Route53.normalizeValueForType("CNAME", "example.com."), is("example.com."));
+		assertThat(Route53.normalizeValueForType("MX", "10 smtp.example.com."), is("10 smtp.example.com."));
+		assertThat(Route53.normalizeValueForType("TXT", "example.com."), is("\"example.com.\"")); //TXT gets quoted no matter what
+		assertThat(Route53.normalizeValueForType("TXT", "foobar"), is("\"foobar\"")); //TXT gets quoted no matter what
+		assertThat(Route53.normalizeValueForType("TXT", "foo bar"), is("\"foo bar\"")); //TXT gets quoted no matter what
 	}
 
 }

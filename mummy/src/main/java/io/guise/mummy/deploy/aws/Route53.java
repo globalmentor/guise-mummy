@@ -17,12 +17,10 @@
 package io.guise.mummy.deploy.aws;
 
 import static com.globalmentor.collections.iterables.Iterables.*;
-import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.util.stream.Streams.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static io.guise.mummy.deploy.aws.AWS.*;
-import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 
@@ -35,11 +33,14 @@ import javax.annotation.*;
 
 import org.slf4j.Logger;
 
-import io.clogr.Clogged;
+import com.globalmentor.java.Enums;
+import com.globalmentor.net.DomainName;
+import com.globalmentor.net.ResourceRecord;
+
 import io.confound.config.Configuration;
 import io.guise.mummy.GuiseMummy;
 import io.guise.mummy.MummyContext;
-import io.guise.mummy.deploy.Dns;
+import io.guise.mummy.deploy.*;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.regions.Region;
@@ -55,16 +56,10 @@ import software.amazon.awssdk.services.route53.model.*;
  * </p>
  * @author Garret Wilson
  */
-public class Route53 implements Dns, Clogged {
+public class Route53 extends AbstractDns {
 
 	/** The DNS section relative key for the hosted zone ID, if a hosted zone already exists. */
 	public static final String CONFIG_KEY_HOSTED_ZONE_ID = "hostedZoneId";
-
-	/**
-	 * The DNS section relative key for the hosted zone name; must end with the <code>.</code> domain delimiter; defaults to the common domain suffix of
-	 * {@link GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and {@link GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS}, with a domain delimiter <code>.</code> appended.
-	 */
-	public static final String CONFIG_KEY_HOSTED_ZONE_NAME = "hostedZoneName";
 
 	/**
 	 * The predefined hosted zone ID for an alias with a CloudFront target.
@@ -87,8 +82,6 @@ public class Route53 implements Dns, Clogged {
 
 	private final String configuredHostedZoneId;
 
-	private final String configuredHostedZoneName;
-
 	private HostedZone hostedZone;
 
 	/** @return The hosted zone; only available after {@link #prepare(MummyContext)} has been called. */
@@ -106,23 +99,31 @@ public class Route53 implements Dns, Clogged {
 	/**
 	 * Configuration constructor.
 	 * <p>
-	 * The hosted zone ID is retrieved from {@value #CONFIG_KEY_HOSTED_ZONE_ID} in the local configuration, if present. The domain is retrieved from
-	 * {@value #CONFIG_KEY_HOSTED_ZONE_NAME} in the local configuration; if not specified it falls back to the greatest common DNS suffix of
-	 * {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} of the context configuration, with a domain delimiter
-	 * <code>.</code> appended.
+	 * The hosted zone ID is retrieved from {@value #CONFIG_KEY_HOSTED_ZONE_ID} in the local configuration, if present. This method determines the domain in the
+	 * following order:
 	 * </p>
+	 * <ol>
+	 * <li>The key {@value Dns#CONFIG_KEY_ORIGIN} relative to the DNS local configuration.</li>
+	 * <li>The key {@value GuiseMummy#CONFIG_KEY_DOMAIN} retrieved from the global configuration.</li>
+	 * <li>The site base domain determined by the longest common domain segment suffix from the site domain {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and
+	 * alternative domains {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS}, retrieved from the global configuration.</li>
+	 * </ol>
+	 * @implSpec This constructor calls {@link Dns#getConfiguredOrigin(Configuration, Configuration)} and {@link Dns#getConfiguredResourceRecords(Configuration)}.
 	 * @param context The context of static site generation.
 	 * @param localConfiguration The local configuration for the Route 53 DNS, which may be a section of the project configuration.
 	 * @see AWS#CONFIG_KEY_DEPLOY_AWS_PROFILE
 	 * @see #CONFIG_KEY_HOSTED_ZONE_ID
-	 * @see #CONFIG_KEY_HOSTED_ZONE_NAME
+	 * @see Dns#CONFIG_KEY_ORIGIN
+	 * @see GuiseMummy#CONFIG_KEY_DOMAIN
 	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
 	 * @see GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS
+	 * @see Dns#getConfiguredOrigin(Configuration, Configuration)
+	 * @see Dns#getConfiguredResourceRecords(Configuration)
 	 */
 	public Route53(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
 		this(context.getConfiguration().findString(CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null),
-				localConfiguration.findString(CONFIG_KEY_HOSTED_ZONE_ID).orElse(null),
-				getConfiguredHostedZoneName(context.getConfiguration(), localConfiguration).orElse(null));
+				localConfiguration.findString(CONFIG_KEY_HOSTED_ZONE_ID).orElse(null), Dns.getConfiguredOrigin(context.getConfiguration(), localConfiguration),
+				Dns.getConfiguredResourceRecords(localConfiguration));
 	}
 
 	/**
@@ -130,42 +131,20 @@ public class Route53 implements Dns, Clogged {
 	 * hosted zone, checked with the DNS is later queried.
 	 * @param profile The name of the AWS profile to use for retrieving credentials, or <code>null</code> if the default credential provider should be used.
 	 * @param hostedZoneId The ID of the hosted zone, or <code>null</code> if not known until created.
-	 * @param domain The domain managed by the hosted zone, or <code>null</code> if a hosted zone already exists for the domain.
-	 * @throws IllegalArgumentException if neither a hosted zone ID nor a domain is specified.
+	 * @param origin The fully qualified base domain name for the DNS zone.
+	 * @param resourceRecords The resource records to be created during deployment; may be empty.
+	 * @throws IllegalArgumentException if the given origin is not absolute.
 	 */
-	public Route53(@Nullable String profile, @Nullable final String hostedZoneId, @Nullable final String domain) {
+	public Route53(@Nullable String profile, @Nullable final String hostedZoneId, @Nonnull final DomainName origin,
+			@Nonnull final Collection<ResourceRecord> resourceRecords) {
+		super(origin, resourceRecords);
 		this.profile = profile;
-		checkArgument(hostedZoneId != null || domain != null, "Either a hosted zone ID or a domain must be configured for %s.", getClass().getSimpleName());
 		this.configuredHostedZoneId = hostedZoneId;
-		this.configuredHostedZoneName = domain;
 		final Route53ClientBuilder route53ClientBuilder = Route53Client.builder().region(Region.AWS_GLOBAL);
 		if(profile != null) {
 			route53ClientBuilder.credentialsProvider(ProfileCredentialsProvider.create(profile));
 		}
 		route53Client = route53ClientBuilder.build();
-	}
-
-	/**
-	 * Determines the domain name to use for the hosted zone. This method determines the domain in the following order:
-	 * <ol>
-	 * <li>The key {@link #CONFIG_KEY_HOSTED_ZONE_NAME} relative to the Route 53 configuration.</li>
-	 * <li>The site base domain determined by the longest common domain segment suffix from the site domain {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and
-	 * alternative domains {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS}, retrieved from the project configuration configuration, with a domain delimiter
-	 * <code>.</code> appended.</li>
-	 * </ol>
-	 * @param globalConfiguration The configuration containing all the configuration values.
-	 * @param localConfiguration The local configuration for the Route 53 DNS, which may be a section of the project configuration.
-	 * @return domain The domain to be managed by the hosted zone, which will not be present if it is not configured.
-	 * @see #CONFIG_KEY_HOSTED_ZONE_NAME
-	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
-	 * @see GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS
-	 */
-	static Optional<String> getConfiguredHostedZoneName(@Nonnull final Configuration globalConfiguration, @Nonnull final Configuration localConfiguration) {
-		return localConfiguration.findString(CONFIG_KEY_HOSTED_ZONE_NAME).or(() -> {
-			final List<String> domains = Stream.concat(globalConfiguration.findString(CONFIG_KEY_SITE_DOMAIN).stream(),
-					globalConfiguration.findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class).orElse(emptyList()).stream()).collect(toList());
-			return longestCommonSegmentSuffix(domains, '.').map(domain -> domain + '.'); //append a domain delimiter as expected by hosted zone names TODO use a constant for the domain delimiter
-		});
 	}
 
 	@Override
@@ -174,6 +153,7 @@ public class Route53 implements Dns, Clogged {
 			final Logger logger = getLogger();
 			final Route53Client client = getRoute53Client();
 			getProfile().ifPresent(profile -> getLogger().info("Using AWS Route 53 credentials profile `{}`.", profile));
+			final DomainName origin = getOrigin();
 			if(configuredHostedZoneId != null) {
 				final Set<HostedZone> existingHostedZones = getHostedZonesById(client, configuredHostedZoneId);
 				for(final HostedZone existingHostedZone : existingHostedZones) {
@@ -187,29 +167,32 @@ public class Route53 implements Dns, Clogged {
 					throw new IOException(String.format("Multiple hosted zones encountered with the ID `%s`.", configuredHostedZoneId));
 				}
 				hostedZone = getOnly(existingHostedZones);
+				if(!DomainName.of(hostedZone.name()).equals(origin)) {
+					throw new IOException(
+							String.format("Hosted zone with configured ID `%s` does not match the configured DNS zone origin `%s`.", configuredHostedZoneId, origin));
+				}
 			} else {
-				assert configuredHostedZoneName != null : "Either a hosted zone name or a hosted zone ID should have been configured.";
-				final Set<HostedZone> existingHostedZones = getHostedZonesByName(client, configuredHostedZoneName);
+				final Set<HostedZone> existingHostedZones = getHostedZonesByName(client, origin);
 				for(final HostedZone existingHostedZone : existingHostedZones) {
 					logger.debug("Hosted zone with ID `{}` already exists for name `{}`.", existingHostedZone.id(), existingHostedZone.name());
 				}
 				if(!existingHostedZones.isEmpty()) {
 					if(existingHostedZones.size() > 1) {
-						throw new IOException(
-								String.format("Multiple hosted zones already exist with the name `%s`. Please identify the hosted zone by ID or remove the other hosted zones.",
-										configuredHostedZoneName));
+						throw new IOException(String.format(
+								"Multiple hosted zones already exist with the name `%s`. Please identify the hosted zone by ID or remove the other hosted zones.", origin));
 					}
 					hostedZone = getOnly(existingHostedZones);
 				} else { //create a named hosted zone, using a random UUID as the temporary caller reference (required)
-					logger.info("Creating Route 53 public hosted zone for name `{}`.", configuredHostedZoneName);
+					logger.info("Creating Route 53 public hosted zone for name `{}`.", origin);
 					final StringBuilder commentBuilder = new StringBuilder();
 					commentBuilder.append("Created by ").append(context.getMummifierIdentification()); //TODO i18n
 					commentBuilder.append(" on ").append(ZonedDateTime.now()); //TODO i18n
-					context.getConfiguration().findString(CONFIG_KEY_SITE_DOMAIN).ifPresent(siteDomain -> commentBuilder.append(" for site domain ").append(siteDomain)); //TODO i18n
-					context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class)
-							.ifPresent(siteAltDomains -> commentBuilder.append(" with alternatives ").append(siteAltDomains)); //TODO i18n
+					context.getConfiguration().findString(CONFIG_KEY_SITE_DOMAIN)
+							.ifPresent(siteDomain -> commentBuilder.append(" for site domain `").append(siteDomain).append('`')); //TODO i18n
+					context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class).ifPresent(siteAltDomains -> commentBuilder
+							.append(" with alternatives ").append(siteAltDomains.stream().map(siteAltDomain -> "`" + siteAltDomain + "`").collect(toList()))); //TODO i18n
 					commentBuilder.append("."); //TODO i18n
-					hostedZone = client.createHostedZone(request -> request.name(configuredHostedZoneName).callerReference(UUID.randomUUID().toString())
+					hostedZone = client.createHostedZone(request -> request.name(origin.toString()).callerReference(UUID.randomUUID().toString())
 							.hostedZoneConfig(config -> config.comment(commentBuilder.toString()))).hostedZone();
 					logger.debug("Created Route 53 public hosted zone with ID `{}` for name `{}`.", hostedZone.id(), hostedZone.name());
 				}
@@ -227,16 +210,27 @@ public class Route53 implements Dns, Clogged {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation quotes all {@link ResourceRecord.Type#TXT} record types, as the developer guide indicates this is preferred, and moreover
+	 *           some string containing e.g. '=' cause Route 53 errors, even if RFC 1035 doesn't seem to require quoting such values.
+	 * @see <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/ResourceRecordTypes.html#TXTFormat">Supported DNS Record Types: TXT Record Type</a>
+	 */
 	@Override
-	public void setResourceRecord(final String type, final String name, final String value, final long ttl) throws IOException {
+	public void setResourceRecords(final String type, final DomainName name, final Stream<String> values, final long ttl) throws IOException {
 		requireNonNull(type);
-		requireNonNull(name);
-		requireNonNull(value);
+		name.checkArgumentAbsolute();
+		requireNonNull(values);
+		checkArgumentNotNegative(ttl);
 		try {
 			final Route53Client client = getRoute53Client();
 			final HostedZone hostedZone = getHostedZone().orElseThrow(IllegalStateException::new);
-			final ResourceRecord resourceRecord = ResourceRecord.builder().value(value).build();
-			final ResourceRecordSet resourceRecordSet = ResourceRecordSet.builder().type(type).name(name).resourceRecords(resourceRecord).ttl(ttl).build();
+			final List<software.amazon.awssdk.services.route53.model.ResourceRecord> resourceRecords = values
+					.map(value -> software.amazon.awssdk.services.route53.model.ResourceRecord.builder().value(normalizeValueForType(type, value)).build())
+					.collect(toList());
+			checkArgument(!resourceRecords.isEmpty(), "No resource record values given to set for [`%s`] `%s`.", type, name);
+			final ResourceRecordSet resourceRecordSet = ResourceRecordSet.builder().type(type).name(name.toString()).resourceRecords(resourceRecords).ttl(ttl)
+					.build();
 			final Change change = Change.builder().action(ChangeAction.UPSERT).resourceRecordSet(resourceRecordSet).build();
 			client.changeResourceRecordSets(request -> request.hostedZoneId(hostedZone.id()).changeBatch(batch -> batch.changes(change)));
 		} catch(final SdkException sdkException) {
@@ -245,19 +239,41 @@ public class Route53 implements Dns, Clogged {
 	}
 
 	/**
+	 * Normalizes a value as expected by Route 53.
+	 * @implSpec This implementation quotes all {@link ResourceRecord.Type#TXT} record types, as the developer guide indicates this is preferred, and moreover
+	 *           some string containing e.g. '=' cause Route 53 errors, even if RFC 1035 doesn't seem to require quoting such values.
+	 * @see <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/ResourceRecordTypes.html#TXTFormat">Supported DNS Record Types: TXT Record Type</a>
+	 * @param type The resource record type.
+	 * @param value The given resource record value.
+	 * @return The value form preferred by Route 53.
+	 */
+	static String normalizeValueForType(@Nonnull final String type, @Nonnull final String value) {
+		return Enums.asEnum(ResourceRecord.Type.class, type).map(resourceRecordType -> {
+			switch(resourceRecordType) {
+				case TXT: //Route 53 prefers all TXT values to be quoted
+					//TODO support multiple long strings in a TXT record; see https://tools.ietf.org/html/rfc7208#section-3.3, which seems to conflict with Route 53
+					return ResourceRecord.normalizeCharacterString(value, true);
+				default:
+					return value;
+			}
+		}).orElse(value);
+	}
+
+	/**
 	 * Sets an alias resource record. If a resource record with the same type and name does not already exists, it will be added. If a resource record already
 	 * exists with the same type and name, it will be replaced. (This is commonly referred to as <dfn>upsert</dfn>.)
-	 * @implSpec This implementation delegates to {@link #setAliasResourceRecord(String, String, String, String)}.
+	 * @implSpec This implementation delegates to {@link #setAliasResourceRecord(String, DomainName, String, String)}.
 	 * @implNote Alias resource records are specific to Route 53.
 	 * @param type The type of resource record to set.
-	 * @param name The name of the resource record.
+	 * @param name The fully-qualified domain name of the resource record.
 	 * @param aliasDnsName The DNS name for the alias, such as a domain name assigned to a CloudFront distribution.
 	 * @param aliasHostZoneId An identifier for some hosted zone; may be a predefined constant for known targets such as CloudFront.
+	 * @throws IllegalArgumentException if the given name is not absolute.
 	 * @throws IOException If there was an error setting the resource record.
 	 * @see <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-choosing-alias-non-alias.html">Choosing Between Alias and
 	 *      Non-Alias Records</a>
 	 */
-	public void setAliasResourceRecord(@Nonnull final Dns.ResourceRecordType type, @Nonnull final String name, @Nonnull final String aliasDnsName,
+	public void setAliasResourceRecord(@Nonnull final ResourceRecord.Type type, @Nonnull final DomainName name, @Nonnull final String aliasDnsName,
 			@Nonnull final String aliasHostZoneId) throws IOException {
 		setAliasResourceRecord(type.toString(), name, aliasDnsName, aliasHostZoneId);
 	}
@@ -265,34 +281,34 @@ public class Route53 implements Dns, Clogged {
 	/**
 	 * Sets an alias resource record. If a resource record with the same type and name does not already exists, it will be added. If a resource record already
 	 * exists with the same type and name, it will be replaced. (This is commonly referred to as <dfn>upsert</dfn>.)
-	 * @apiNote Using {@link #setAliasResourceRecord(Dns.ResourceRecordType, String, String, String)} for known resource record types is preferred for type and
+	 * @apiNote Using {@link #setAliasResourceRecord(ResourceRecord.Type, DomainName, String, String)} for known resource record types is preferred for type and
 	 *          value safety.
 	 * @implNote Alias resource records are specific to Route 53.
 	 * @param type The type of resource record to set.
-	 * @param name The DNS name of the alias.
+	 * @param name The fully-qualified domain name of the resource record.
 	 * @param aliasDnsName The DNS name for the alias, such as a domain name assigned to a CloudFront distribution.
 	 * @param aliasHostZoneId An identifier for some hosted zone; may be a predefined constant for known targets such as CloudFront.
+	 * @throws IllegalArgumentException if the given name is not absolute.
 	 * @throws IOException If there was an error setting the resource record.
 	 * @see <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-choosing-alias-non-alias.html">Choosing Between Alias and
 	 *      Non-Alias Records</a>
 	 */
-	public void setAliasResourceRecord(@Nonnull final String type, @Nonnull final String name, @Nonnull final String aliasDnsName,
+	public void setAliasResourceRecord(@Nonnull final String type, @Nonnull final DomainName name, @Nonnull final String aliasDnsName,
 			@Nonnull final String aliasHostZoneId) throws IOException {
 		requireNonNull(type);
-		requireNonNull(name);
+		name.checkArgumentAbsolute();
 		requireNonNull(aliasDnsName);
 		requireNonNull(aliasHostZoneId);
 		try {
 			final Route53Client client = getRoute53Client();
 			final HostedZone hostedZone = getHostedZone().orElseThrow(IllegalStateException::new);
 			final AliasTarget aliasTarget = AliasTarget.builder().dnsName(aliasDnsName).hostedZoneId(aliasHostZoneId).evaluateTargetHealth(false).build();
-			final ResourceRecordSet resourceRecordSet = ResourceRecordSet.builder().type(type).name(name).aliasTarget(aliasTarget).build();
+			final ResourceRecordSet resourceRecordSet = ResourceRecordSet.builder().type(type).name(name.toString()).aliasTarget(aliasTarget).build();
 			final Change change = Change.builder().action(ChangeAction.UPSERT).resourceRecordSet(resourceRecordSet).action(ChangeAction.UPSERT).build();
 			client.changeResourceRecordSets(request -> request.hostedZoneId(hostedZone.id()).changeBatch(batch -> batch.changes(change)));
 		} catch(final SdkException sdkException) {
 			throw new IOException(sdkException);
 		}
-
 	}
 
 	//# Route 53 utility methods; could be removed to separate library
@@ -303,7 +319,7 @@ public class Route53 implements Dns, Clogged {
 	 * Retrieves all hosted zones with a given ID.
 	 * @implSpec This implementation delegates to {@link #hostedZones(Route53Client)}.
 	 * @param client The client to use for retrieving the zones.
-	 * @param id The ID of the hosted zone to retrieve; <em>needs to end with a domain delimiter <code>.</code></em>.
+	 * @param id The ID of the hosted zone to retrieve.
 	 * @return A set of all hosted zones with the given ID.
 	 * @throws SdkException if an error occurs related to AWS.
 	 * @see HostedZone#id()
@@ -319,13 +335,14 @@ public class Route53 implements Dns, Clogged {
 	 * Retrieves all hosted zones with a given name.
 	 * @implSpec This implementation delegates to {@link #hostedZones(Route53Client)}.
 	 * @param client The client to use for retrieving the zones.
-	 * @param name The name of the hosted zone to retrieve; <em>needs to end with a domain delimiter <code>.</code></em>.
+	 * @param hostedZoneName The name of the hosted zone to retrieve; must be an absolute domain name.
 	 * @return A set of all hosted zones with the given name.
 	 * @throws SdkException if an error occurs related to AWS.
 	 * @see HostedZone#name()
+	 * @throws IllegalArgumentException if the given domain name is not absolute.
 	 */
-	protected static Set<HostedZone> getHostedZonesByName(@Nonnull final Route53Client client, @Nonnull final String name) throws SdkException {
-		requireNonNull(name);
+	protected static Set<HostedZone> getHostedZonesByName(@Nonnull final Route53Client client, @Nonnull final DomainName hostedZoneName) throws SdkException {
+		final String name = hostedZoneName.checkArgumentAbsolute().toString();
 		try (final Stream<HostedZone> hostedZonesByName = hostedZones(client).filter(hostedZone -> hostedZone.name().equals(name))) {
 			return hostedZonesByName.collect(toSet());
 		}
@@ -344,6 +361,21 @@ public class Route53 implements Dns, Clogged {
 	//## record sets
 
 	/**
+	 * Retrieves all resource records for a hosted zone
+	 * @param client The client to use for retrieving the record sets.
+	 * @param hostedZone The hosted zone for which to retrieve the records.
+	 * @return The resource records for the hosted zone.
+	 * @throws SdkException if an error occurs related to AWS.
+	 */
+	protected static Stream<ResourceRecord> resourceRecords(@Nonnull final Route53Client client, @Nonnull final HostedZone hostedZone) throws SdkException {
+		try (final Stream<ResourceRecordSet> recordSets = resourceRecordSets(client, hostedZone.id())) {
+			return recordSets
+					.flatMap(resourceRecordSet -> resourceRecordSet.resourceRecords().stream().map(resourceRecord -> new ResourceRecord(resourceRecordSet.type().name(),
+							DomainName.of(resourceRecordSet.name()), resourceRecord.value(), resourceRecordSet.ttl())));
+		}
+	}
+
+	/**
 	 * Retrieves the NS records for a hosted zone
 	 * @param client The client to use for retrieving the record sets.
 	 * @param hostedZone The hosted zone for which to retrieve the NS records.
@@ -353,8 +385,8 @@ public class Route53 implements Dns, Clogged {
 	 * @throws SdkException if an error occurs related to AWS.
 	 * @see RRType#NS
 	 */
-	protected static List<ResourceRecord> getNsRecords(@Nonnull final Route53Client client, @Nonnull final HostedZone hostedZone)
-			throws IOException, SdkException {
+	protected static List<software.amazon.awssdk.services.route53.model.ResourceRecord> getNsRecords(@Nonnull final Route53Client client,
+			@Nonnull final HostedZone hostedZone) throws IOException, SdkException {
 		//start listing the record sets at the NS record for efficiency, but we still have to filter the result because there are likely subsequent record sets
 		try (final Stream<ResourceRecordSet> nsRecordSets = resourceRecordSets(client, hostedZone.id(), hostedZone.name(), RRType.NS)
 				.filter(recordSet -> recordSet.name().equals(hostedZone.name()) && recordSet.type().equals(RRType.NS))) {
@@ -365,6 +397,18 @@ public class Route53 implements Dns, Clogged {
 		} catch(final NoSuchElementException | IllegalStateException exception) {
 			throw new IOException(exception);
 		}
+	}
+
+	/**
+	 * Retrieves a stream of all record sets for a hosted zone.
+	 * @implSpec This implementation delegates to {@link #resourceRecordSets(Route53Client, String, String, RRType)}.
+	 * @param client The client to use for retrieving the record sets.
+	 * @param hostedZoneId The ID of the hosted zone for which to retrieve the record sets.
+	 * @return A stream of all record sets for the identified hosted zone.
+	 * @throws SdkException if an error occurs related to AWS.
+	 */
+	protected static Stream<ResourceRecordSet> resourceRecordSets(@Nonnull final Route53Client client, @Nonnull final String hostedZoneId) throws SdkException {
+		return resourceRecordSets(client, hostedZoneId, null, null);
 	}
 
 	/**
