@@ -19,13 +19,11 @@ package io.guise.mummy.deploy;
 import static io.guise.mummy.GuiseMummy.*;
 import static java.util.Collections.*;
 import static java.util.stream.Collectors.*;
+import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalLong;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
@@ -91,8 +89,8 @@ public interface Dns extends DeployTarget {
 	/**
 	 * Sets a resource record. If a resource record with the same type and name does not already exists, it will be added. If a resource record already exists
 	 * with the same type and name, it will be replaced. (This is commonly referred to as <dfn>upsert</dfn>.)
-	 * @implSpec The default implementation delegates to {@link #setResourceRecord(String, DomainName, String, long)}.
-	 * @implNote Implementations should normally only override {@link #setResourceRecord(String, DomainName, String, long)}.
+	 * @implSpec The default implementation delegates to {@link #setResourceRecords(ResourceRecord.Type, DomainName, Stream, long)}.
+	 * @implNote Implementations should normally only override {@link #setResourceRecords(String, DomainName, Stream, long)}.
 	 * @param type The type of resource record to set.
 	 * @param name The fully-qualified domain name of the resource record.
 	 * @param value The value to store in the resource record.
@@ -103,14 +101,16 @@ public interface Dns extends DeployTarget {
 	 */
 	public default void setResourceRecord(@Nonnull final ResourceRecord.Type type, @Nonnull final DomainName name, @Nonnull final String value,
 			@Nonnegative final long ttl) throws IOException {
-		setResourceRecord(type.toString(), name, value, ttl);
+		setResourceRecords(type, name, Stream.of(value), ttl);
 	}
 
 	/**
 	 * Sets a resource record. If a resource record with the same type and name does not already exists, it will be added. If a resource record already exists
 	 * with the same type and name, it will be replaced. (This is commonly referred to as <dfn>upsert</dfn>.)
-	 * @apiNote Using {@link #setResourceRecord(ResourceRecord.Type, DomainName, String, long)} for known resource record types is preferred for type and value
+	 * @apiNote Use {@link #setResourceRecord(ResourceRecord.Type, DomainName, String, long)} for known resource record types is preferred for type and value
 	 *          safety.
+	 * @implSpec The default implementation delegates to {@link #setResourceRecords(String, DomainName, Stream, long)}.
+	 * @implNote Implementations should normally only override {@link #setResourceRecords(String, DomainName, Stream, long)}.
 	 * @param type The type of resource record to set.
 	 * @param name The fully-qualified domain name of the resource record.
 	 * @param value The value to store in the resource record.
@@ -119,14 +119,86 @@ public interface Dns extends DeployTarget {
 	 * @throws IllegalArgumentException if the given TTL is negative.
 	 * @throws IOException If there was an error setting the resource record.
 	 */
-	public void setResourceRecord(@Nonnull final String type, @Nonnull final DomainName name, @Nonnull final String value, @Nonnegative final long ttl)
+	public default void setResourceRecord(@Nonnull final String type, @Nonnull final DomainName name, @Nonnull final String value, @Nonnegative final long ttl)
+			throws IOException {
+		setResourceRecords(type, name, Stream.of(value), ttl);
+	}
+
+	/**
+	 * Sets potentially several resource records with the given type and name, removing all other resource records with the same type and name.
+	 * @implSpec The default implementation delegates to {@link #setResourceRecords(ResourceRecord.Type, DomainName, Stream, long)}.
+	 * @implNote Implementations should normally only override {@link #setResourceRecords(String, DomainName, Stream, long)}.
+	 * @param type The type of resource record to set.
+	 * @param name The fully-qualified domain name of the resource record.
+	 * @param values The values to store in the resource records; there must be at least one value.
+	 * @param ttl The resource record cache time to live, in seconds.
+	 * @throws IllegalArgumentException if the given name is not absolute.
+	 * @throws IllegalArgumentException if no values are given.
+	 * @throws IllegalArgumentException if the given TTL is negative.
+	 * @throws IOException If there was an error setting the resource record values.
+	 */
+	public default void setResourceRecords(@Nonnull final ResourceRecord.Type type, @Nonnull final DomainName name, @Nonnull final Collection<String> values,
+			@Nonnegative final long ttl) throws IOException {
+		setResourceRecords(type, name, values.stream(), ttl);
+	}
+
+	/**
+	 * Sets potentially several resource records with the given type and name, removing all other resource records with the same type and name.
+	 * @implSpec The default implementation delegates to {@link #setResourceRecords(String, DomainName, Stream, long)}.
+	 * @implNote Implementations should normally only override {@link #setResourceRecords(String, DomainName, Stream, long)}.
+	 * @param type The type of resource record to set.
+	 * @param name The fully-qualified domain name of the resource record.
+	 * @param values The values to store in the resource records; there must be at least one value.
+	 * @param ttl The resource record cache time to live, in seconds.
+	 * @throws IllegalArgumentException if the given name is not absolute.
+	 * @throws IllegalArgumentException if no values are given.
+	 * @throws IllegalArgumentException if the given TTL is negative.
+	 * @throws IOException If there was an error setting the resource record values.
+	 */
+	public default void setResourceRecords(@Nonnull final ResourceRecord.Type type, @Nonnull final DomainName name, @Nonnull final Stream<String> values,
+			@Nonnegative final long ttl) throws IOException {
+		setResourceRecords(type.name(), name, values, ttl);
+	}
+
+	/**
+	 * Sets potentially several resource records with the given type and name, removing all other resource records with the same type and name.
+	 * @implSpec The default implementation delegates to {@link #setResourceRecords(String, DomainName, Stream, long)}.
+	 * @implNote Implementations should normally only override {@link #setResourceRecords(String, DomainName, Stream, long)}.
+	 * @param type The type of resource record to set.
+	 * @param name The fully-qualified domain name of the resource record.
+	 * @param values The values to store in the resource records; there must be at least one value.
+	 * @param ttl The resource record cache time to live, in seconds.
+	 * @throws IllegalArgumentException if the given name is not absolute.
+	 * @throws IllegalArgumentException if no values are given.
+	 * @throws IllegalArgumentException if the given TTL is negative.
+	 * @throws IOException If there was an error setting the resource record values.
+	 */
+	public default void setResourceRecords(@Nonnull final String type, @Nonnull final DomainName name, @Nonnull final Collection<String> values,
+			@Nonnegative final long ttl) throws IOException {
+		setResourceRecords(type, name, values.stream(), ttl);
+	}
+
+	/**
+	 * Sets potentially several resource records with the given type and name, removing all other resource records with the same type and name.
+	 * @apiNote Use {@link #setResourceRecords(ResourceRecord.Type, DomainName, Stream, long)} for known resource record types is preferred for type and value
+	 *          safety.
+	 * @param type The type of resource record to set.
+	 * @param name The fully-qualified domain name of the resource record.
+	 * @param values The values to store in the resource records; there must be at least one value.
+	 * @param ttl The resource record cache time to live, in seconds.
+	 * @throws IllegalArgumentException if the given name is not absolute.
+	 * @throws IllegalArgumentException if no values are given.
+	 * @throws IllegalArgumentException if the given TTL is negative.
+	 * @throws IOException If there was an error setting the resource record values.
+	 */
+	public void setResourceRecords(@Nonnull final String type, @Nonnull final DomainName name, @Nonnull final Stream<String> values, @Nonnegative final long ttl)
 			throws IOException;
 
 	/**
 	 * Sets a resource record. If a resource record with the same type and name does not already exists, it will be added. If a resource record already exists
 	 * with the same type and name, it will be replaced. (This is commonly referred to as <dfn>upsert</dfn>.)
 	 * <p>
-	 * Resource record names will be resolved against the origin domain name, if any. The value {@value #DEFAULT_TTL} will be used if no TTL is indicated.
+	 * Resource record names will be resolved against the origin domain name, if any. {@link #DEFAULT_TTL} will be used if no TTL is indicated.
 	 * </p>
 	 * @implSpec The default implementation delegates to {@link #setResourceRecord(String, DomainName, String, long)}.
 	 * @param resourceRecord The resource record to set.
@@ -142,27 +214,56 @@ public interface Dns extends DeployTarget {
 	}
 
 	/**
-	 * Sets the given resource records in this DNS zone. If multiple resource records are given with the same type and name, they will both be set.
+	 * Sets the given resource records in this DNS zone. For each unit type and name in the given group of resource records, all other values not given will be
+	 * removed.
 	 * <p>
-	 * Resource record names will be resolved against the origin domain name, if any. The value {@value #DEFAULT_TTL} will be used if no TTL is indicated.
+	 * Resource record names will be resolved against the origin domain name, if any. {@link #DEFAULT_TTL} will be used if no TTL is indicated. If a set of
+	 * records have different TTL values, it is undefined which TTL value will be used, although if one of the combined records has a TTL value is guaranteed that
+	 * the combined record will have a TTL value.
 	 * </p>
-	 * @implSpec This implementation delegates to {@link #setResourceRecord(ResourceRecord)}.
+	 * @implSpec The default implementation delegates to {@link #setResourceRecords(Stream)}.
 	 * @param resourceRecords The resource records to set.
 	 * @throws IOException If there was an error setting a resource record.
 	 * @see #getOrigin()
 	 * @see #DEFAULT_TTL
 	 */
 	public default void setResourceRecords(@Nonnull final Collection<ResourceRecord> resourceRecords) throws IOException {
-		for(final ResourceRecord resourceRecord : resourceRecords) {
-			setResourceRecord(resourceRecord);
-		}
+		setResourceRecords(resourceRecords.stream());
+	}
+
+	/**
+	 * Sets the given resource records in this DNS zone. For each unit type and name in the given group of resource records, all other values not given will be
+	 * removed.
+	 * <p>
+	 * Resource record names will be resolved against the origin domain name, if any. {@link #DEFAULT_TTL} will be used if no TTL is indicated. If a set of
+	 * records have different TTL values, it is undefined which TTL value will be used, although if one of the combined records has a TTL value is guaranteed that
+	 * the combined record will have a TTL value.
+	 * </p>
+	 * @param resourceRecords The resource records to set.
+	 * @implSpec The default implementation groups together the values of records with the same type and resolved name and delegates to
+	 *           {@link #setResourceRecords(String, DomainName, Stream, long)}.
+	 * @throws IOException If there was an error setting a resource record.
+	 * @see #getOrigin()
+	 * @see #DEFAULT_TTL
+	 */
+	public default void setResourceRecords(@Nonnull final Stream<ResourceRecord> resourceRecords) throws IOException {
+		final DomainName origin = getOrigin();
+		resourceRecords //group by type+name
+				.collect(groupingBy(resourceRecord -> Map.entry(resourceRecord.getType(), origin.resolve(resourceRecord.getName().orElse(DomainName.EMPTY)))))
+				.forEach(throwingBiConsumer((key, resourceRecordGroup) -> {
+					assert !resourceRecordGroup.isEmpty() : "Grouping should not have produced an empty group.";
+					setResourceRecords(key.getKey(), key.getValue(), resourceRecordGroup.stream().map(ResourceRecord::getValue),
+							resourceRecordGroup.stream().filter(resourceRecord -> resourceRecord.getTtl().isPresent()).findAny().map(ResourceRecord::getTtl)
+									.map(OptionalLong::getAsLong).orElse(DEFAULT_TTL));
+
+				}));
 	}
 
 	/**
 	 * Determines the domain name to use as the base for the hosted zone. This method determines the domain in the following order:
 	 * <ol>
-	 * <li>The key {@link #CONFIG_KEY_ORIGIN} relative to the DNS local configuration.</li>
-	 * <li>The key {@link GuiseMummy#CONFIG_KEY_DOMAIN} retrieved from the global configuration.</li>
+	 * <li>The key {@value #CONFIG_KEY_ORIGIN} relative to the DNS local configuration.</li>
+	 * <li>The key {@value GuiseMummy#CONFIG_KEY_DOMAIN} retrieved from the global configuration.</li>
 	 * <li>The site base domain determined by the longest common domain segment suffix from the site domain {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and
 	 * alternative domains {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS}, retrieved from the global configuration.</li>
 	 * </ol>
@@ -202,7 +303,7 @@ public interface Dns extends DeployTarget {
 	/**
 	 * Determines the resource records that have been configured use for the zone section, usually the DNS section itself, of the configuration.
 	 * @implNote This implementation attempts to normalize values to their encoded form for some recognized resource record types such as
-	 *           {@value ResourceRecord.Type#TXT} in case the producer has provided an encoded value, e.g. by copying from configuration documentation.
+	 *           {@link ResourceRecord.Type#TXT} in case the producer has provided an encoded value, e.g. by copying from configuration documentation.
 	 * @param zone The configuration section defining the zone.
 	 * @return The configured resource records.
 	 * @throws ConfigurationException if a resource record has invalid in incomplete information, such as a missing type or a negative TTL.

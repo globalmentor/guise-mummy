@@ -99,20 +99,26 @@ public class Route53 extends AbstractDns {
 	/**
 	 * Configuration constructor.
 	 * <p>
-	 * The hosted zone ID is retrieved from {@value #CONFIG_KEY_HOSTED_ZONE_ID} in the local configuration, if present. The domain is retrieved from
-	 * {@value #CONFIG_KEY_HOSTED_ZONE_NAME} in the local configuration; if not specified it falls back {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN}, or if not
-	 * present to the greatest common DNS suffix of {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} of the context
-	 * configuration.
+	 * The hosted zone ID is retrieved from {@value #CONFIG_KEY_HOSTED_ZONE_ID} in the local configuration, if present. This method determines the domain in the
+	 * following order:
 	 * </p>
+	 * <ol>
+	 * <li>The key {@value Dns#CONFIG_KEY_ORIGIN} relative to the DNS local configuration.</li>
+	 * <li>The key {@value GuiseMummy#CONFIG_KEY_DOMAIN} retrieved from the global configuration.</li>
+	 * <li>The site base domain determined by the longest common domain segment suffix from the site domain {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and
+	 * alternative domains {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS}, retrieved from the global configuration.</li>
+	 * </ol>
 	 * @implSpec This constructor calls {@link Dns#getConfiguredOrigin(Configuration, Configuration)} and {@link Dns#getConfiguredResourceRecords(Configuration)}.
 	 * @param context The context of static site generation.
 	 * @param localConfiguration The local configuration for the Route 53 DNS, which may be a section of the project configuration.
 	 * @see AWS#CONFIG_KEY_DEPLOY_AWS_PROFILE
 	 * @see #CONFIG_KEY_HOSTED_ZONE_ID
-	 * @see #CONFIG_KEY_HOSTED_ZONE_NAME
+	 * @see Dns#CONFIG_KEY_ORIGIN
 	 * @see GuiseMummy#CONFIG_KEY_DOMAIN
 	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
 	 * @see GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS
+	 * @see Dns#getConfiguredOrigin(Configuration, Configuration)
+	 * @see Dns#getConfiguredResourceRecords(Configuration)
 	 */
 	public Route53(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
 		this(context.getConfiguration().findString(CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null),
@@ -211,17 +217,20 @@ public class Route53 extends AbstractDns {
 	 * @see <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/ResourceRecordTypes.html#TXTFormat">Supported DNS Record Types: TXT Record Type</a>
 	 */
 	@Override
-	public void setResourceRecord(final String type, final DomainName name, final String value, final long ttl) throws IOException {
+	public void setResourceRecords(final String type, final DomainName name, final Stream<String> values, final long ttl) throws IOException {
 		requireNonNull(type);
 		name.checkArgumentAbsolute();
-		requireNonNull(value);
+		requireNonNull(values);
 		checkArgumentNotNegative(ttl);
 		try {
 			final Route53Client client = getRoute53Client();
 			final HostedZone hostedZone = getHostedZone().orElseThrow(IllegalStateException::new);
-			final software.amazon.awssdk.services.route53.model.ResourceRecord resourceRecord = software.amazon.awssdk.services.route53.model.ResourceRecord.builder()
-					.value(normalizeValueForType(type, value)).build();
-			final ResourceRecordSet resourceRecordSet = ResourceRecordSet.builder().type(type).name(name.toString()).resourceRecords(resourceRecord).ttl(ttl).build();
+			final List<software.amazon.awssdk.services.route53.model.ResourceRecord> resourceRecords = values
+					.map(value -> software.amazon.awssdk.services.route53.model.ResourceRecord.builder().value(normalizeValueForType(type, value)).build())
+					.collect(toList());
+			checkArgument(!resourceRecords.isEmpty(), "No resource record values given to set for [`%s`] `%s`.", type, name);
+			final ResourceRecordSet resourceRecordSet = ResourceRecordSet.builder().type(type).name(name.toString()).resourceRecords(resourceRecords).ttl(ttl)
+					.build();
 			final Change change = Change.builder().action(ChangeAction.UPSERT).resourceRecordSet(resourceRecordSet).build();
 			client.changeResourceRecordSets(request -> request.hostedZoneId(hostedZone.id()).changeBatch(batch -> batch.changes(change)));
 		} catch(final SdkException sdkException) {
@@ -248,51 +257,6 @@ public class Route53 extends AbstractDns {
 					return value;
 			}
 		}).orElse(value);
-	}
-
-	/**
-	 * Transforms a set of resource records to be used for setting.
-	 * @implSpec This implementation groups together the values of records with the same type and resolved name, placing multiple values on different lines of the
-	 *           same record as required by Route 53. The records will be combined in iteration order of the collection. If combined records have different TTL
-	 *           values, it is undefined which TTL value will be used, although if one of the combined records has a TTL value is guaranteed that the combined
-	 *           record will have a TTL value.
-	 * @see <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/ResourceRecordTypes.html#TXTFormat">Supported DNS Record Types: TXT Record Type</a>
-	 * @see <a href="https://forums.aws.amazon.com/thread.jspa?threadID=88634">AWS Forums: Multiple MX records same name</a>
-	 * @param origin The base domain against which the resource records will be resolved.
-	 * @param resourceRecords The resource records that will be used for setting.
-	 * @return The transformed collection of resource records to set.
-	 * @throws IllegalArgumentException if the given origin is not absolute.
-	 */
-	static Collection<ResourceRecord> transformResourceRecordForSet(@Nonnull final DomainName origin, final Collection<ResourceRecord> resourceRecords) {
-		origin.checkArgumentAbsolute();
-		final Map<Map.Entry<String, DomainName>, ResourceRecord> transformedResourceRecords = new LinkedHashMap<>(); //the records combined and grouped by type+name; maintain order to be more user-friendly
-		for(final ResourceRecord resourceRecord : resourceRecords) {
-			final String type = resourceRecord.getType();
-			final DomainName name = origin.resolve(resourceRecord.getName().orElse(DomainName.EMPTY));
-			String value = normalizeValueForType(type, resourceRecord.getValue()); //normalize the value
-			OptionalLong ttl = resourceRecord.getTtl();
-			final Map.Entry<String, DomainName> key = Map.entry(type, name); //group by type+name
-			final ResourceRecord oldResourceRecord = transformedResourceRecords.get(key);
-			if(oldResourceRecord != null) { //combine values if there was a previous resource record
-				value = oldResourceRecord.getValue() + '\n' + value; //the old value will have been normalized when it was first stored in the map
-				if(!ttl.isPresent()) {
-					ttl = oldResourceRecord.getTtl();
-				}
-			}
-			final ResourceRecord newResourceRecord = new ResourceRecord(type, name, value, ttl.orElse(-1));
-			transformedResourceRecords.put(key, newResourceRecord);
-		}
-		return transformedResourceRecords.values();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation groups together the values of records with the same type and resolved name, placing multiple values on different lines of the
-	 *           same record as required by Route 53, by calling {@link #transformResourceRecordForSet(DomainName, Collection)}.
-	 */
-	@Override
-	public void setResourceRecords(final Collection<ResourceRecord> resourceRecords) throws IOException {
-		super.setResourceRecords(transformResourceRecordForSet(getOrigin(), resourceRecords));
 	}
 
 	/**
@@ -397,6 +361,21 @@ public class Route53 extends AbstractDns {
 	//## record sets
 
 	/**
+	 * Retrieves all resource records for a hosted zone
+	 * @param client The client to use for retrieving the record sets.
+	 * @param hostedZone The hosted zone for which to retrieve the records.
+	 * @return The resource records for the hosted zone.
+	 * @throws SdkException if an error occurs related to AWS.
+	 */
+	protected static Stream<ResourceRecord> resourceRecords(@Nonnull final Route53Client client, @Nonnull final HostedZone hostedZone) throws SdkException {
+		try (final Stream<ResourceRecordSet> recordSets = resourceRecordSets(client, hostedZone.id())) {
+			return recordSets
+					.flatMap(resourceRecordSet -> resourceRecordSet.resourceRecords().stream().map(resourceRecord -> new ResourceRecord(resourceRecordSet.type().name(),
+							DomainName.of(resourceRecordSet.name()), resourceRecord.value(), resourceRecordSet.ttl())));
+		}
+	}
+
+	/**
 	 * Retrieves the NS records for a hosted zone
 	 * @param client The client to use for retrieving the record sets.
 	 * @param hostedZone The hosted zone for which to retrieve the NS records.
@@ -418,6 +397,18 @@ public class Route53 extends AbstractDns {
 		} catch(final NoSuchElementException | IllegalStateException exception) {
 			throw new IOException(exception);
 		}
+	}
+
+	/**
+	 * Retrieves a stream of all record sets for a hosted zone.
+	 * @implSpec This implementation delegates to {@link #resourceRecordSets(Route53Client, String, String, RRType)}.
+	 * @param client The client to use for retrieving the record sets.
+	 * @param hostedZoneId The ID of the hosted zone for which to retrieve the record sets.
+	 * @return A stream of all record sets for the identified hosted zone.
+	 * @throws SdkException if an error occurs related to AWS.
+	 */
+	protected static Stream<ResourceRecordSet> resourceRecordSets(@Nonnull final Route53Client client, @Nonnull final String hostedZoneId) throws SdkException {
+		return resourceRecordSets(client, hostedZoneId, null, null);
 	}
 
 	/**

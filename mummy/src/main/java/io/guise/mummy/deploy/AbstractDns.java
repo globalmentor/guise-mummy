@@ -65,7 +65,7 @@ public abstract class AbstractDns implements Dns, Clogged {
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This implementation sets all resource records defined for the DNS by delegating to {@link #setResourceRecords(Iterable)}.
+	 * @implSpec This implementation sets all resource records defined for the DNS by delegating to {@link #setResourceRecords(Collection)}.
 	 * @see #getResourceRecords()
 	 */
 	@Override
