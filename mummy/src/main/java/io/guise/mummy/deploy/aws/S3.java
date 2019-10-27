@@ -21,7 +21,6 @@ import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.net.URIs.*;
 import static io.guise.mummy.Artifact.*;
 import static io.guise.mummy.GuiseMummy.*;
-import static io.guise.mummy.deploy.aws.AWS.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
@@ -187,6 +186,13 @@ public class S3 implements DeployTarget, Clogged {
 		return concat(Stream.of(getBucket()), getAltBuckets().stream());
 	}
 
+	private final DomainName siteDomain;
+
+	/** @return The explicit site domain if specified, which may be the same or different than the bucket name. */
+	public Optional<DomainName> getSiteDomain() {
+		return Optional.ofNullable(siteDomain);
+	}
+
 	private final S3Client s3Client;
 
 	/** @return The client for connecting to S3. */
@@ -206,9 +212,12 @@ public class S3 implements DeployTarget, Clogged {
 	 * The region is retrieved from {@value #CONFIG_KEY_REGION} in the local configuration. The bucket name is retrieved from {@value #CONFIG_KEY_BUCKET} in the
 	 * local configuration, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and finally {@value GuiseMummy#CONFIG_KEY_DOMAIN} in the context
 	 * configuration if not specified. The bucket alternatives are retrieved from {@value #CONFIG_KEY_ALT_BUCKETS}, falling back to
-	 * {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} in the context configuration if not specified.
+	 * {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} in the context configuration if not specified. The site domain if explicitly set is retrieved from
+	 * {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN}, resolved as appropriate to any project domain.
 	 * </p>
-	 * @implSpec This method calls {@link #getConfiguredBucket(Configuration, Configuration)} and {@link #getConfiguredAltBuckets(Configuration, Configuration)}.
+	 * @implSpec This method calls {@link #getConfiguredBucket(Configuration, Configuration)} and {@link #getConfiguredAltBuckets(Configuration, Configuration)}
+	 *           to determine the bucket and alternative buckets.
+	 * @implSpec This method calls {@link GuiseMummy#findConfiguredSiteDomain(Configuration)} to determine the site domain, if any.
 	 * @param context The context of static site generation.
 	 * @param localConfiguration The local configuration for this deployment target, which may be a section of the project configuration.
 	 * @see AWS#CONFIG_KEY_DEPLOY_AWS_PROFILE
@@ -222,8 +231,9 @@ public class S3 implements DeployTarget, Clogged {
 	 * @see #getConfiguredAltBuckets(Configuration, Configuration)
 	 */
 	public S3(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
-		this(context.getConfiguration().findString(CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null), Region.of(localConfiguration.getString(CONFIG_KEY_REGION)),
-				getConfiguredBucket(context.getConfiguration(), localConfiguration), getConfiguredAltBuckets(context.getConfiguration(), localConfiguration));
+		this(context.getConfiguration().findString(AWS.CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null), Region.of(localConfiguration.getString(CONFIG_KEY_REGION)),
+				getConfiguredBucket(context.getConfiguration(), localConfiguration), getConfiguredAltBuckets(context.getConfiguration(), localConfiguration),
+				findConfiguredSiteDomain(context.getConfiguration()).orElse(null));
 	}
 
 	/**
@@ -232,12 +242,20 @@ public class S3 implements DeployTarget, Clogged {
 	 * @param region The AWS region of deployment.
 	 * @param bucket The bucket into which the site should be deployed.
 	 * @param altBuckets The bucket alternatives, if any, to redirect to the primary bucket.
+	 * @param siteDomain The full-qualified domain name of the site. If specified, it will be used in cases that which a site other than the bucket is to be
+	 *          indicated, such as in redirect hostname, to prevent e.g. a CloudFront distribution redirecting back to the bucket URL.
+	 * @throws IllegalArgumentException if the given site domain is not absolute.
 	 */
-	public S3(@Nullable String profile, @Nonnull final Region region, @Nonnull String bucket, @Nonnull final Collection<String> altBuckets) {
+	public S3(@Nullable String profile, @Nonnull final Region region, @Nonnull String bucket, @Nonnull final Collection<String> altBuckets,
+			@Nullable DomainName siteDomain) {
 		this.profile = profile;
 		this.region = requireNonNull(region);
 		this.bucket = requireNonNull(bucket);
 		this.altBuckets = new LinkedHashSet<>(altBuckets); //maintain order to help with reporting and debugging
+		if(siteDomain != null) {
+			siteDomain.checkArgumentAbsolute();
+		}
+		this.siteDomain = siteDomain;
 		final S3ClientBuilder s3ClientBuilder = S3Client.builder().region(region);
 		if(profile != null) {
 			s3ClientBuilder.credentialsProvider(ProfileCredentialsProvider.create(profile));
@@ -361,6 +379,7 @@ public class S3 implements DeployTarget, Clogged {
 				final String altKey = artifactAltKeyEntry.getValue();
 				final String artifactKey = artifactKeys.get(artifact);
 				checkState(artifactKey != null, "An S3 object key should have been determined for artifact %s during planning.", artifact);
+				final Optional<String> siteHostName = getSiteDomain().map(DomainName.ROOT::relativize).map(DomainName::toString);
 				return RoutingRule.builder().condition(condition -> condition.keyPrefixEquals(altKey)).redirect(redirect -> {
 					//If the artifact (e.g. a directory) can contain other artifacts, we'll replace the entire key prefix
 					//to allow redirects for contained artifacts as well. Otherwise replace the entire key in case an artifact
@@ -371,6 +390,9 @@ public class S3 implements DeployTarget, Clogged {
 					} else {
 						redirect.replaceKeyWith(artifactKey);
 					}
+					//Set the host name if we know the site domain name, to prevent any distribution from redirecting back to the bucket URL.
+					//See https://stackoverflow.com/q/58477877/421049 .
+					siteHostName.ifPresent(redirect::hostName);
 				}).build();
 			}).collect(toCollection(LinkedHashSet::new)); //maintain order to help with debugging
 			final WebsiteConfiguration.Builder websiteConfigurationBuilder = WebsiteConfiguration.builder();
