@@ -21,6 +21,7 @@ import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.java.OperatingSystem.*;
 import static com.globalmentor.xml.XmlDom.*;
+import static java.util.stream.Collectors.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
@@ -35,6 +36,7 @@ import org.w3c.dom.*;
 
 import io.confound.config.Configuration;
 import io.guise.mummy.deploy.*;
+import io.urf.URF.Handle;
 
 /**
  * Tests of {@link MarkdownPageMummifier}.
@@ -131,7 +133,7 @@ public class MarkdownPageMummifierTest {
 	 * @see #assertSimpleBody(Document)
 	 */
 	@Test
-	public void testSimpleTitleMarkdown() throws IOException {
+	public void testSimpleMarkdownDocumentTitle() throws IOException {
 		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
 		final Document document;
 		try (final InputStream inputStream = getClass().getResourceAsStream(SIMPLE_TITLE_MARKDOWN_RESOURCE_NAME)) {
@@ -147,7 +149,7 @@ public class MarkdownPageMummifierTest {
 	 * @see #assertSimpleBody(Document)
 	 */
 	@Test
-	public void testSimpleMetadataMarkdown() throws IOException {
+	public void testSimpleMarkdownDocumentMetadata() throws IOException {
 		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
 		final Document document;
 		try (final InputStream inputStream = getClass().getResourceAsStream(SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME)) {
@@ -158,6 +160,20 @@ public class MarkdownPageMummifierTest {
 		assertThat(findHtmlHeadMetaElementContent(document, "label"), isPresentAndIs("Simplicity"));
 		assertThat(findHtmlHeadMetaElementContent(document, "foo-bar"), isPresentAndIs("This is a test."));
 		assertSimpleBody(document);
+	}
+
+	/**
+	 * @see MarkdownPageMummifier#sourceMetadata(MummyContext, InputStream, String)
+	 * @see #SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME
+	 */
+	@Test
+	public void testSimpleMarkdownMetadata() throws IOException {
+		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
+		try (final InputStream inputStream = getClass().getResourceAsStream(SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME)) {
+			assertThat(mummifier.sourceMetadata(mummyContext, inputStream, SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME).collect(toList()),
+					containsInAnyOrder(Map.entry(Handle.toTag("title"), "Simple Page with Other Metadata"), Map.entry(Handle.toTag("label"), "Simplicity"),
+							Map.entry(Handle.toTag("fooBar"), "This is a test.")));
+		}
 	}
 
 }

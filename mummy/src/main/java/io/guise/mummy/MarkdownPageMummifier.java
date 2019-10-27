@@ -20,11 +20,16 @@ import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.lex.CompoundTokenization.*;
 import static com.globalmentor.xml.XmlDom.*;
+import static io.guise.mummy.Artifact.*;
 import static java.nio.charset.StandardCharsets.*;
 
 import java.io.*;
+import java.net.URI;
 import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Stream;
 
+import javax.annotation.Nonnull;
 import javax.xml.parsers.*;
 
 import org.w3c.dom.*;
@@ -44,6 +49,8 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.superscript.SuperscriptExtension;
 import com.vladsch.flexmark.util.data.MutableDataHolder;
 import com.vladsch.flexmark.util.data.MutableDataSet;
+
+import io.urf.URF.Handle;
 
 /**
  * Mummifier for Markdown documents.
@@ -114,9 +121,6 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		htmlRenderer = HtmlRenderer.builder().build();
 	}
 
-	/** The data key for the title retrieved from the front matter. */
-	private static final String FRONT_MATTER_TITLE_DATA_KEY = "title"; //TODO use a constant from some URF list of standard properties
-
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This version loads a document in Markdown format.
@@ -132,13 +136,16 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		while((charsRead = bomInputStreamReader.read(buffer)) != -1) { //TODO create utility to read all from a reader
 			stringBuilder.append(buffer, 0, charsRead);
 		}
+
+		//TODO delegate to sourceMetadata() to retrieve metadata; forgo storing metadata in the XHTML document; manually add metadata to target document 
+
 		String title = name != null ? Filenames.removeExtension(name) : ""; //default to a title of the filename with no extension
 		com.vladsch.flexmark.util.ast.Document markdownDocument = getParser().parse(stringBuilder.toString());
 		final AbstractYamlFrontMatterVisitor yamlVisitor = new AbstractYamlFrontMatterVisitor();
 		yamlVisitor.visit(markdownDocument);
 
 		//find the title if present in the front matter
-		final List<String> frontMatterTitles = yamlVisitor.getData().get(FRONT_MATTER_TITLE_DATA_KEY);
+		final List<String> frontMatterTitles = yamlVisitor.getData().get(PROPERTY_HANDLE_TITLE);
 		if(frontMatterTitles != null && !frontMatterTitles.isEmpty()) {
 			final Iterator<String> frontMatterTitlesIterator = frontMatterTitles.iterator();
 			final String frontMatterTitle = frontMatterTitlesIterator.next(); //use the first title given
@@ -164,7 +171,7 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		//add additional metadata from the front matter
 		final Element headElement = findHtmlHeadElement(document).orElseThrow(IllegalStateException::new); //our template has a <head>
 		yamlVisitor.getData().forEach((metaName, metaValues) -> {
-			if(FRONT_MATTER_TITLE_DATA_KEY.equals(metaName)) { //ignore the title; we already processed it
+			if(PROPERTY_HANDLE_TITLE.equals(metaName)) { //ignore the title; we already processed it
 				return;
 			}
 			//multiple front matter values for a name result in multiple <meta> elements as a side effect which may be useful
@@ -176,6 +183,55 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		});
 
 		return document;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation loads the source Markdown document and then delegates to
+	 *           {@link #sourceMetadata(MummyContext, com.vladsch.flexmark.util.ast.Document)} to extract the metadata.
+	 */
+	@Override
+	protected Stream<Entry<URI, String>> sourceMetadata(final MummyContext context, final InputStream inputStream, final String name) throws IOException {
+		//create a Reader to detect the BOM and to throw errors if the encoding is invalid
+		@SuppressWarnings("resource") //we don't manage the underlying input stream
+		final BOMInputStreamReader bomInputStreamReader = new BOMInputStreamReader(new BufferedInputStream(inputStream)); //TODO create utility to ensure mark supported
+		final StringBuilder stringBuilder = new StringBuilder();
+		final char[] buffer = new char[64 * 1024];
+		int charsRead;
+		while((charsRead = bomInputStreamReader.read(buffer)) != -1) { //TODO create utility to read all from a reader
+			stringBuilder.append(buffer, 0, charsRead);
+		}
+		com.vladsch.flexmark.util.ast.Document markdownDocument = getParser().parse(stringBuilder.toString());
+		return sourceMetadata(context, markdownDocument);
+	}
+
+	//TODO create map of predefined namespaces, eventually in RDFa class but for the short term in the base class
+
+	/**
+	 * Extracts metadata stored in the source document itself.
+	 * @implSpec The XHTML document {@code <head><title>} will be returned as metadata, using {@value Artifact#PROPERTY_HANDLE_TITLE} as a handle; followed by
+	 *           values in any {@code <head><meta>} elements.
+	 * @param context The context of static site generation.
+	 * @param sourceDocument The source XHTML document being mummified, from which metadata should be extracted.
+	 * @return Metadata stored in the source document being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate
+	 *         names.
+	 * @throws DOMException if there is a problem retrieving metadata.
+	 */
+	protected Stream<Map.Entry<URI, String>> sourceMetadata(@Nonnull MummyContext context, @Nonnull final com.vladsch.flexmark.util.ast.Document sourceDocument)
+			throws DOMException {
+		final AbstractYamlFrontMatterVisitor yamlVisitor = new AbstractYamlFrontMatterVisitor();
+		yamlVisitor.visit(sourceDocument);
+		return yamlVisitor.getData().entrySet().stream().flatMap(frontDataEntry -> {
+			final String name = frontDataEntry.getKey();
+			return frontDataEntry.getValue().stream().map(value -> {
+				final int prefixDelimiterIndex = name.indexOf(':'); //TODO use constant
+				if(prefixDelimiterIndex >= 0) { //TODO create single character string splitting utility method
+					throw new UnsupportedOperationException(); //TODO implement with known namespaces
+				} else {
+					return Map.entry(Handle.toTag(name), value);
+				}
+			});
+		});
 	}
 
 }
