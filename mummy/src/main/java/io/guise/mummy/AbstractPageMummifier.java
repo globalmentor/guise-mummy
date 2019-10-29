@@ -48,6 +48,7 @@ import org.w3c.dom.*;
 import com.globalmentor.html.HtmlSerializer;
 import com.globalmentor.html.spec.HTML;
 import com.globalmentor.net.*;
+import com.globalmentor.rdfa.spec.RDFa;
 import com.globalmentor.xml.XmlDom;
 import com.globalmentor.xml.spec.XML;
 
@@ -66,7 +67,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * A map of local names of HTML elements that can reference other resources (e.g. <code>"img"</code>), along with the attributes of each element that contains
 	 * the actual resource reference path (e.g. (e.g. <code>"src"</code>) for {@code <img src="…">}).
 	 */
-	private final static Map<String, String> HTML_REFERENCE_ELEMENT_ATTRIBUTES = Map.ofEntries( //element local name -> attribute
+	private static final Map<String, String> HTML_REFERENCE_ELEMENT_ATTRIBUTES = Map.ofEntries( //element local name -> attribute
 			Map.entry(ELEMENT_A, ELEMENT_A_ATTRIBUTE_HREF), //<a href="…">
 			Map.entry(ELEMENT_AREA, ELEMENT_AREA_ATTRIBUTE_HREF), //<area href="…">
 			Map.entry(ELEMENT_AUDIO, ELEMENT_AUDIO_ATTRIBUTE_SRC), //<audio src="…">
@@ -80,6 +81,20 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			Map.entry(ELEMENT_TRACK, ELEMENT_TRACK_ATTRIBUTE_SRC), //<track src="…">
 			Map.entry(ELEMENT_VIDEO, ELEMENT_VIDEO_ATTRIBUTE_SRC) //<video src="…">
 	);
+
+	/**
+	 * Vocabulary prefixes that will be recognized in metadata, such as in XHTML @{code <meta>} elements or in YAML, if they have not been associated with a
+	 * different vocabulary.
+	 * @implSpec These prefixes include {@link RDFa.InitialContext#VOCABULARY_PREFIXES}.
+	 * @implSpec These prefixes include {@link GuiseMummy#NAMESPACE_PREFIX} and {@link GuiseMummy#NAMESPACE}.
+	 */
+	protected static final Map<String, URI> PREDEFINED_VOCABULARY_PREFIXES;
+
+	static {
+		final Map<String, URI> predefinedVocabularyPrefixes = new HashMap<>(RDFa.InitialContext.VOCABULARY_PREFIXES);
+		predefinedVocabularyPrefixes.put(GuiseMummy.NAMESPACE_PREFIX, GuiseMummy.NAMESPACE);
+		PREDEFINED_VOCABULARY_PREFIXES = unmodifiableMap(predefinedVocabularyPrefixes);
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -156,6 +171,8 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * </ul>
 	 * @implSpec The current implementation only finds prefixes if they are stored in <code>xmlns:</code> XML namespace prefix declarations, not in HTML5
 	 *           <code>prefix</code> attributes.
+	 * @implSpec This also recognizes all namespace prefixes included in {@link #PREDEFINED_VOCABULARY_PREFIXES} if they are not otherwise defined in the
+	 *           document.
 	 * @param contextElement The context element that indicates the hierarchy for retrieving CURIE prefixes.
 	 * @param metaName The name of a metadata property name, normally retrieved from HTML {@code <meta>} elements.
 	 * @return The URI to be used as an URF property tag.
@@ -179,6 +196,12 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			do {
 				leadingSegment = findAttributeNS((Element)currentNode, XML.XMLNS_NAMESPACE_URI_STRING, prefix).orElse(null);
 			} while(leadingSegment == null && (currentNode = currentNode.getParentNode()) instanceof Element); //keep looking while we need to and while there are still parent elements
+			if(leadingSegment == null) { //see if we have a predefined vocabulary for the prefix
+				final URI predefinedVocabulary = PREDEFINED_VOCABULARY_PREFIXES.get(prefix);
+				if(predefinedVocabulary != null) {
+					leadingSegment = predefinedVocabulary.toString();
+				}
+			}
 			checkArgument(leadingSegment != null, "No IRI leading segment defined for prefix %s of property %s.", prefix, metaName);
 			return URI.create(leadingSegment + reference); //TODO resolve to base
 		} else {
@@ -256,7 +279,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	/**
 	 * Extracts metadata stored in the source document itself.
 	 * @implSpec The XHTML document {@code <head><title>} will be returned as metadata, using {@value Artifact#PROPERTY_HANDLE_TITLE} as a handle; followed by
-	 *           values in any {@code <head><meta>} elements.
+	 *           values in any {@code <head><meta>} elements, converted using {@link #htmlMetaNameToPropertyTag(Element, String)}.
 	 * @param context The context of static site generation.
 	 * @param sourceDocument The source XHTML document being mummified, from which metadata should be extracted.
 	 * @return Metadata stored in the source document being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate

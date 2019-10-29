@@ -22,6 +22,7 @@ import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
 import java.io.*;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -94,7 +95,11 @@ public class XhtmlPageMummifierTest {
 		try (final InputStream inputStream = getClass().getResourceAsStream(SIMPLE_METADATA_XHTML_RESOURCE_NAME)) {
 			assertThat(mummifier.sourceMetadata(mummyContext, inputStream, SIMPLE_METADATA_XHTML_RESOURCE_NAME).collect(toList()),
 					containsInAnyOrder(Map.entry(Handle.toTag("title"), "Simple Page with Other Metadata"), Map.entry(Handle.toTag("label"), "Simplicity"),
-							Map.entry(Handle.toTag("fooBar"), "This is a test.")));
+							Map.entry(Handle.toTag("fooBar"), "This is a test."),
+							//namespace declared on ancestor node
+							Map.entry(Artifact.PROPERTY_TAG_MUMMY_ORDER, "3"),
+							//undeclared yet predefined vocabulary prefix
+							Map.entry(URI.create("http://ogp.me/ns#type"), "website")));
 		}
 	}
 
