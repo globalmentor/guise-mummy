@@ -172,7 +172,13 @@ public class MarkdownPageMummifierTest {
 		try (final InputStream inputStream = getClass().getResourceAsStream(SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME)) {
 			assertThat(mummifier.sourceMetadata(mummyContext, inputStream, SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME).collect(toList()),
 					containsInAnyOrder(Map.entry(Handle.toTag("title"), "Simple Page with Other Metadata"), Map.entry(Handle.toTag("label"), "Simplicity"),
-							Map.entry(Handle.toTag("fooBar"), "This is a test.")));
+							Map.entry(Handle.toTag("fooBar"), "This is a test.")
+					//TODO test prefixed properties once implemented
+					//							//Guise Mummy namespace
+					//							Map.entry(Artifact.PROPERTY_TAG_MUMMY_ORDER, "3"),
+					//							//Open Graph namespace
+					//							Map.entry(URI.create("http://ogp.me/ns#type"), "website")
+					));
 		}
 	}
 

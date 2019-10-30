@@ -205,12 +205,10 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		return sourceMetadata(context, markdownDocument);
 	}
 
-	//TODO create map of predefined namespaces, eventually in RDFa class but for the short term in the base class
-
 	/**
 	 * Extracts metadata stored in the source document itself.
-	 * @implSpec The XHTML document {@code <head><title>} will be returned as metadata, using {@value Artifact#PROPERTY_HANDLE_TITLE} as a handle; followed by
-	 *           values in any {@code <head><meta>} elements.
+	 * @implSpec This implementation currently supports only YAML front matter in <code>camelCase</code>. Vocabulary prefixeses are not yet supported.
+	 * @implSpec This implementation does not yet recognize namespaces.
 	 * @param context The context of static site generation.
 	 * @param sourceDocument The source XHTML document being mummified, from which metadata should be extracted.
 	 * @return Metadata stored in the source document being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate
