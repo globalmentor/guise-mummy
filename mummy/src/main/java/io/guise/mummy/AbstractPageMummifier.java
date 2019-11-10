@@ -49,6 +49,7 @@ import com.globalmentor.html.HtmlSerializer;
 import com.globalmentor.html.spec.HTML;
 import com.globalmentor.net.*;
 import com.globalmentor.rdfa.spec.RDFa;
+import com.globalmentor.vocab.VocabularyRegistry;
 import com.globalmentor.xml.XmlDom;
 import com.globalmentor.xml.spec.XML;
 
@@ -83,18 +84,13 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	);
 
 	/**
-	 * Vocabulary prefixes that will be recognized in metadata, such as in XHTML @{code <meta>} elements or in YAML, if they have not been associated with a
+	 * Vocabulary prefixes that will be recognized in metadata, such as in XHTML {@code <meta>} elements or in YAML, if they have not been associated with a
 	 * different vocabulary.
-	 * @implSpec These prefixes include {@link RDFa.InitialContext#VOCABULARY_PREFIXES}.
-	 * @implSpec These prefixes include {@link GuiseMummy#NAMESPACE_PREFIX} and {@link GuiseMummy#NAMESPACE}.
+	 * @implSpec These prefixes include those in {@link RDFa.InitialContext#VOCABULARIES}.
+	 * @implSpec These prefixes include the prefix {@link GuiseMummy#NAMESPACE_PREFIX} for the namespace {@link GuiseMummy#NAMESPACE}.
 	 */
-	protected static final Map<String, URI> PREDEFINED_VOCABULARY_PREFIXES;
-
-	static {
-		final Map<String, URI> predefinedVocabularyPrefixes = new HashMap<>(RDFa.InitialContext.VOCABULARY_PREFIXES);
-		predefinedVocabularyPrefixes.put(GuiseMummy.NAMESPACE_PREFIX, GuiseMummy.NAMESPACE);
-		PREDEFINED_VOCABULARY_PREFIXES = unmodifiableMap(predefinedVocabularyPrefixes);
-	}
+	protected static final VocabularyRegistry PREDEFINED_VOCABULARIES = VocabularyRegistry.builder(RDFa.InitialContext.VOCABULARIES)
+			.registerPrefix(GuiseMummy.NAMESPACE_PREFIX, GuiseMummy.NAMESPACE).build();
 
 	/**
 	 * {@inheritDoc}
@@ -171,8 +167,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * </ul>
 	 * @implSpec The current implementation only finds prefixes if they are stored in <code>xmlns:</code> XML namespace prefix declarations, not in HTML5
 	 *           <code>prefix</code> attributes.
-	 * @implSpec This also recognizes all namespace prefixes included in {@link #PREDEFINED_VOCABULARY_PREFIXES} if they are not otherwise defined in the
-	 *           document.
+	 * @implSpec This also recognizes all namespace prefixes included in {@link #PREDEFINED_VOCABULARIES} if they are not otherwise defined in the document.
 	 * @param contextElement The context element that indicates the hierarchy for retrieving CURIE prefixes.
 	 * @param metaName The name of a metadata property name, normally retrieved from HTML {@code <meta>} elements.
 	 * @return The URI to be used as an URF property tag.
@@ -197,10 +192,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 				leadingSegment = findAttributeNS((Element)currentNode, XML.XMLNS_NAMESPACE_URI_STRING, prefix).orElse(null);
 			} while(leadingSegment == null && (currentNode = currentNode.getParentNode()) instanceof Element); //keep looking while we need to and while there are still parent elements
 			if(leadingSegment == null) { //see if we have a predefined vocabulary for the prefix
-				final URI predefinedVocabulary = PREDEFINED_VOCABULARY_PREFIXES.get(prefix);
-				if(predefinedVocabulary != null) {
-					leadingSegment = predefinedVocabulary.toString();
-				}
+				leadingSegment = PREDEFINED_VOCABULARIES.findVocabularyByPrefix(prefix).map(URI::toString).orElse(null);
 			}
 			checkArgument(leadingSegment != null, "No IRI leading segment defined for prefix %s of property %s.", prefix, metaName);
 			return URI.create(leadingSegment + reference); //TODO resolve to base
