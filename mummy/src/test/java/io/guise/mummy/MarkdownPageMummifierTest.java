@@ -19,6 +19,7 @@ package io.guise.mummy;
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
+import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.OperatingSystem.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static java.util.stream.Collectors.*;
@@ -139,7 +140,7 @@ public class MarkdownPageMummifierTest {
 		try (final InputStream inputStream = getClass().getResourceAsStream(SIMPLE_TITLE_MARKDOWN_RESOURCE_NAME)) {
 			document = mummifier.loadSourceDocument(mummyContext, inputStream, SIMPLE_TITLE_MARKDOWN_RESOURCE_NAME);
 		}
-		assertThat(findTitle(document), isPresentAndIs("Simple Page"));
+		assertThat(findTitle(document), isPresentAndIs(removeExtension(SIMPLE_TITLE_MARKDOWN_RESOURCE_NAME)));
 		assertSimpleBody(document);
 	}
 
@@ -155,10 +156,9 @@ public class MarkdownPageMummifierTest {
 		try (final InputStream inputStream = getClass().getResourceAsStream(SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME)) {
 			document = mummifier.loadSourceDocument(mummyContext, inputStream, SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME);
 		}
-		assertThat(findTitle(document), isPresentAndIs("Simple Page with Other Metadata"));
-		assertThat(findHtmlHeadMetaElementContent(document, "title"), isEmpty()); //make sure we didn't duplicate the title as metadata 
-		assertThat(findHtmlHeadMetaElementContent(document, "label"), isPresentAndIs("Simplicity"));
-		assertThat(findHtmlHeadMetaElementContent(document, "foo-bar"), isPresentAndIs("This is a test."));
+		assertThat(findTitle(document), isPresentAndIs(removeExtension(SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME)));
+		//we no longer include metadata when loading the source XHTML document; it is loaded separately as part of the description
+		assertThat(htmlHeadMetaElements(document).collect(toList()), empty());
 		assertSimpleBody(document);
 	}
 

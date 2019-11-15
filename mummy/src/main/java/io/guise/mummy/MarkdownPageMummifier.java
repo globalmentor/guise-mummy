@@ -16,11 +16,7 @@
 
 package io.guise.mummy;
 
-import static com.globalmentor.html.HtmlDom.*;
-import static com.globalmentor.html.spec.HTML.*;
-import static com.globalmentor.lex.CompoundTokenization.*;
-import static com.globalmentor.xml.XmlDom.*;
-import static io.guise.mummy.Artifact.*;
+import static com.globalmentor.io.Filenames.*;
 import static java.nio.charset.StandardCharsets.*;
 
 import java.io.*;
@@ -29,7 +25,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Stream;
 
-import javax.annotation.Nonnull;
+import javax.annotation.*;
 import javax.xml.parsers.*;
 
 import org.w3c.dom.*;
@@ -124,6 +120,7 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This version loads a document in Markdown format.
+	 * @implSpec This version uses the filename as a title. It will be replaced later by any title indicated in the metadata during mummification.
 	 */
 	@Override
 	public Document loadSourceDocument(final MummyContext context, final InputStream inputStream, final String name) throws IOException, DOMException {
@@ -137,50 +134,19 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 			stringBuilder.append(buffer, 0, charsRead);
 		}
 
-		//TODO delegate to sourceMetadata() to retrieve metadata; forgo storing metadata in the XHTML document; manually add metadata to target document 
-
-		String title = name != null ? Filenames.removeExtension(name) : ""; //default to a title of the filename with no extension
+		//parse Markdown
 		com.vladsch.flexmark.util.ast.Document markdownDocument = getParser().parse(stringBuilder.toString());
-		final AbstractYamlFrontMatterVisitor yamlVisitor = new AbstractYamlFrontMatterVisitor();
-		yamlVisitor.visit(markdownDocument);
-
-		//find the title if present in the front matter
-		final List<String> frontMatterTitles = yamlVisitor.getData().get(PROPERTY_HANDLE_TITLE);
-		if(frontMatterTitles != null && !frontMatterTitles.isEmpty()) {
-			final Iterator<String> frontMatterTitlesIterator = frontMatterTitles.iterator();
-			final String frontMatterTitle = frontMatterTitlesIterator.next(); //use the first title given
-			if(frontMatterTitle != null) {
-				title = frontMatterTitle;
-			}
-			while(frontMatterTitlesIterator.hasNext()) {
-				getLogger().warn("Ignoring additional title {} in source Markdown document {}.", frontMatterTitlesIterator.next(), name);
-			}
-		}
 
 		//generate XHTML
 		final Document document;
 		final String htmlBodyContent = getHtmlRenderer().render(markdownDocument);
-		final String xhtmlDocumentString = XHTML_TEMPLATE.apply(title, htmlBodyContent);
+		final String xhtmlDocumentString = XHTML_TEMPLATE.apply(removeExtension(name), htmlBodyContent);
 		final DocumentBuilder documentBuilder = context.newPageDocumentBuilder();
 		try {
 			document = documentBuilder.parse(new ByteArrayInputStream(xhtmlDocumentString.getBytes(UTF_8)));
 		} catch(final SAXException saxException) {
 			throw new IOException(saxException);
 		}
-
-		//add additional metadata from the front matter
-		final Element headElement = findHtmlHeadElement(document).orElseThrow(IllegalStateException::new); //our template has a <head>
-		yamlVisitor.getData().forEach((metaName, metaValues) -> {
-			if(PROPERTY_HANDLE_TITLE.equals(metaName)) { //ignore the title; we already processed it
-				return;
-			}
-			//multiple front matter values for a name result in multiple <meta> elements as a side effect which may be useful
-			metaValues.forEach(metaValue -> { //TODO add an HtmlDom.addNamedMetata() method
-				final Element metaElement = addLast(headElement, document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_META));
-				metaElement.setAttributeNS(null, ELEMENT_META_ATTRIBUTE_NAME, CAMEL_CASE.toKebabCase(metaName));
-				metaElement.setAttributeNS(null, ELEMENT_META_ATTRIBUTE_CONTENT, metaValue);
-			});
-		});
 
 		return document;
 	}
