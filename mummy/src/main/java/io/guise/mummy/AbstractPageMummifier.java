@@ -19,12 +19,15 @@ package io.guise.mummy;
 import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Paths.*;
+import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.lex.CompoundTokenization.*;
+import static com.globalmentor.util.Optionals.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static io.guise.mummy.Artifact.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static io.urf.vocab.content.Content.*;
+import static java.lang.System.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
@@ -49,13 +52,16 @@ import com.globalmentor.html.HtmlSerializer;
 import com.globalmentor.html.spec.HTML;
 import com.globalmentor.net.*;
 import com.globalmentor.rdfa.spec.RDFa;
-import com.globalmentor.vocab.VocabularyRegistry;
-import com.globalmentor.xml.XmlDom;
+import com.globalmentor.vocab.Curie;
+import com.globalmentor.vocab.*;
+import com.globalmentor.xml.*;
 import com.globalmentor.xml.spec.XML;
 
+import io.urf.URF;
 import io.urf.URF.Handle;
 import io.urf.model.UrfObject;
 import io.urf.model.UrfResourceDescription;
+import io.urf.vocab.content.Content;
 
 /**
  * Abstract base mummifier for generating HTML pages.
@@ -208,19 +214,23 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @param context The context of static site generation.
 	 * @param sourceFile The source file to be mummified.
 	 * @return A description of the resource being mummified.
-	 * @throws IOException if there is an I/O error retrieving the description.
+	 * @throws IOException if there is an I/O error retrieving the description, including if the metadata is invalid.
 	 */
 	protected UrfResourceDescription loadDescription(@Nonnull MummyContext context, @Nonnull final Path sourceFile) throws IOException {
 		final UrfObject description = new UrfObject();
 
 		//load source metadata
-		sourceMetadata(context, sourceFile).forEach(meta -> {
-			final URI propertyTag = meta.getKey();
-			final String propertyValue = meta.getValue();
-			if(!description.hasPropertyValue(propertyTag)) { //the first property wins
-				description.setPropertyValue(propertyTag, propertyValue);
-			}
-		});
+		try {
+			sourceMetadata(context, sourceFile).forEach(meta -> {
+				final URI propertyTag = meta.getKey();
+				final String propertyValue = meta.getValue();
+				if(!description.hasPropertyValue(propertyTag)) { //the first property wins
+					description.setPropertyValue(propertyTag, propertyValue);
+				}
+			});
+		} catch(final IllegalArgumentException illegalArgumentException) { //TODO include the filename and context
+			throw new IOException(illegalArgumentException);
+		}
 
 		//TODO load any description sidecar
 
@@ -263,8 +273,8 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		final Document sourceDocument = loadSourceDocument(context, inputStream, name);
 		try {
 			return sourceMetadata(context, sourceDocument);
-		} catch(final DOMException domException) {
-			throw new IOException(domException);
+		} catch(final IllegalArgumentException | DOMException exception) { //TODO indicate the file and context
+			throw new IOException(exception);
 		}
 	}
 
@@ -276,6 +286,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @param sourceDocument The source XHTML document being mummified, from which metadata should be extracted.
 	 * @return Metadata stored in the source document being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate
 	 *         names.
+	 * @throws IllegalArgumentException if any of the metadata is invalid.
 	 * @throws DOMException if there is a problem retrieving metadata.
 	 */
 	protected Stream<Map.Entry<URI, String>> sourceMetadata(@Nonnull MummyContext context, @Nonnull final Document sourceDocument) throws DOMException {
@@ -297,11 +308,14 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			final Document sourceDocument = loadSourceDocument(context, (SourceFileArtifact)artifact); //this mummifier requires source file artifacts
 			getLogger().debug("loaded source document: {}", artifact.getSourcePath());
 
+			//#normalize: normalize the DOM and remove metadata
+			final Document normalizedDocument = normalizeDocument(context, contextArtifact, artifact, sourceDocument);
+
 			//#apply template
-			final Document templatedocument = applyTemplate(context, contextArtifact, artifact, sourceDocument);
+			final Document templatedDocument = applyTemplate(context, contextArtifact, artifact, normalizedDocument);
 
 			//#process document: evaluate expressions and perform transformations
-			final Document processedDocument = processDocument(context, contextArtifact, artifact, templatedocument);
+			final Document processedDocument = processDocument(context, contextArtifact, artifact, templatedDocument);
 
 			//#relocate document from source to target: translate path references from the source to the target
 			final Document relocatedDocument = relocateSourceDocumentToTarget(context, contextArtifact, artifact, processedDocument);
@@ -309,22 +323,116 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			//#cleanse document: remove all Guise Mummy related elements and attributes
 			final Document cleansedDocument = cleanseDocument(context, contextArtifact, artifact, relocatedDocument);
 
-			//#identify Guise Mummy as the generator
-			setNamedMetata(cleansedDocument, META_NAME_GENERATOR, context.getMummifierIdentification());
-			//#indicate the instant of generation
-			setNamedMetata(cleansedDocument, META_NAME_GENERATED_AT, Instant.now().toString());
+			//#ascribe document: adds metadata not related to Guise Mummy directives
+			final Document ascribedDocument = ascribeDocument(context, contextArtifact, artifact, cleansedDocument);
 
 			//#save target document
 			try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))) {
 				final HtmlSerializer htmlSerializer = new HtmlSerializer(true);
-				htmlSerializer.serialize(cleansedDocument, outputStream);
+				htmlSerializer.serialize(ascribedDocument, outputStream);
 			}
 			getLogger().debug("generated output document: {}", artifact.getTargetPath());
 
-		} catch(final DOMException domException) { //convert XML errors to I/O errors
-			throw new IOException(domException);
+		} catch(final IllegalArgumentException | DOMException exception) { //convert input errors and XML errors to I/O errors TODO include filename?
+			throw new IOException(exception);
 		}
 
+	}
+
+	//#normalize
+
+	/**
+	 * Normalizes a document after it has been loaded, tidying the structure and removing any named metadata (which will be regenerated).
+	 * @implSpec This implementation does not allow the document element to be removed or replaced.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact being generated
+	 * @param document The document to normalize.
+	 * @return The normalized document, which may or may not be the same document supplied as input.
+	 * @throws IOException if there is an error normalizing the document.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 */
+	protected Document normalizeDocument(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
+			@Nonnull final Document document) throws IOException, DOMException {
+		document.normalizeDocument(); //normalize the XML DOM
+		final List<Element> normalizedElements = normalizeElement(context, contextArtifact, artifact, document.getDocumentElement());
+		if(normalizedElements.size() != 1 || normalizedElements.get(0) != document.getDocumentElement()) {
+			throw new UnsupportedOperationException("Document element cannot be removed or replaced when normalizing a document.");
+		}
+		return document;
+	}
+
+	/**
+	 * Normalizes a document element, removing any named metadata (that is, {@value HTML#ELEMENT_META} elements with a {@value HTML#ELEMENT_META_ATTRIBUTE_NAME}
+	 * attribute).
+	 * <p>
+	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
+	 * element is removed.
+	 * </p>
+	 * @implSpec This implementation marks for removal any {@value HTML#ELEMENT_META} elements with a {@value HTML#ELEMENT_META_ATTRIBUTE_NAME} attribute. It also
+	 *           removes all {@link RDFa#ATTRIBUTE_PREFIX} attributes.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact being generated
+	 * @param element The element to normalized.
+	 * @return The normalized element(s), if any, to replace the source element.
+	 * @throws IOException if there is an error normalizing the element.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 */
+	protected List<Element> normalizeElement(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
+			@Nonnull final Element element) throws IOException, DOMException {
+
+		//remove the element itself if it is named metadata
+		if(HTML.XHTML_NAMESPACE_URI_STRING.equals(element.getNamespaceURI()) && ELEMENT_META.equals(element.getLocalName())
+				&& element.hasAttribute(ELEMENT_META_ATTRIBUTE_NAME)) { //<<meta name="…">
+			return emptyList();
+		}
+
+		//remove all RDFa `prefix` attributes
+		final Iterator<Attr> attrIterator = attributesIterator(element);
+		while(attrIterator.hasNext()) {
+			final Attr attr = attrIterator.next();
+			if(attr.getNamespaceURI() == null && RDFa.ATTRIBUTE_PREFIX.equals(element.getLocalName())) { //prefix=
+				attrIterator.remove();
+			}
+		}
+
+		normalizeChildElements(context, contextArtifact, artifact, element);
+
+		return List.of(element);
+	}
+
+	/**
+	 * Normalizes child elements of an existing element.
+	 * @implNote This implementation does not yet allow returning different nodes than the one being normalized
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact being generated
+	 * @param element The element the children of which to normalize.
+	 * @throws IOException if there is an error processing the child elements.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 */
+	protected void normalizeChildElements(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
+			@Nonnull final Element element) throws IOException, DOMException {
+		final NodeList childNodes = element.getChildNodes();
+		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength();) { //advance the index manually as needed
+			final Node childNode = childNodes.item(childNodeIndex);
+			if(!(childNode instanceof Element)) { //skip non-elements
+				childNodeIndex++;
+				continue;
+			}
+			final Element childElement = (Element)childNode;
+			final List<Element> normalizedElements = normalizeElement(context, contextArtifact, artifact, childElement);
+			final int normalizedElementCount = normalizedElements.size();
+			childNodeIndex += normalizedElementCount; //manually advance the index based upon the replacement nodes
+			if(normalizedElementCount == 0) { //if we should remove the element
+				childElement.getParentNode().removeChild(childElement);
+				continue;
+			} else if(normalizedElementCount == 1 && normalizedElements.get(0) == childElement) { //if no structural changes were requested
+				continue;
+			}
+			throw new UnsupportedOperationException("Structural changes not yet fully supported when normalizing individual child elements.");
+		}
 	}
 
 	//#apply template
@@ -355,36 +463,15 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 						templateDocument = relocateDocument(context, sourceTemplateDocument, templateFile, contextArtifact.getSourcePath(), Artifact::getSourcePath);
 					}
 
-					//1. apply title
+					//1. validate structure
+					findHtmlElement(templateDocument).orElseThrow(() -> new IOException(String.format("Template %s has no root <html> element.", templateFile)));
 
-					//ensure that the template has the correct <html><head><title> structure
-					final Element templateHtmlElement = findHtmlElement(templateDocument)
-							.orElseThrow(() -> new IOException(String.format("Template %s has no root <html> element.", templateFile)));
-					final Element templateHeadElement = findHtmlHeadElement(templateDocument) //add a <html><head> if not present
-							.orElseGet(() -> addFirst(templateHtmlElement, templateDocument.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_HEAD)));
-					final Element templateTitleElement = findHtmlHeadTitleElement(templateDocument) //add a <html><head><title> if not present
-							.orElseGet(() -> addFirst(templateHeadElement, templateDocument.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_TITLE)));
+					// Do _not_ apply metadata. Metadata is now generated semantically from the actual description, which has already been loaded.
 
-					findHtmlHeadTitleElement(sourceDocument).ifPresentOrElse(sourceTitleElement -> {
-						//TODO get title from artifact description
-						getLogger().debug("  {*} applying source title: {}", sourceTitleElement.getTextContent());
-						removeChildren(templateTitleElement);
-						appendImportedChildNodes(templateTitleElement, sourceTitleElement);
-					}, () -> getLogger().warn("Source file for {} has no title to place in template.", artifact.getSourcePath()));
-
-					//2. apply metadata
-
-					//TODO reconcile metadata handling of ignoring null values with "" equivalence of missing values as per the spec
-					namedMetadata(sourceDocument).filter(meta -> meta.getValue() != null) //ignore any source metadata without a value
-							.forEachOrdered(meta -> { //update the template metadata with the source metadata
-								getLogger().debug("  {*} applying source metadata: {}={} ", meta.getKey(), meta.getValue());
-								setNamedMetata(templateDocument, meta);
-							});
-
-					//3. merge head links
+					//2. merge head links
 					mergeLinks(templateDocument, sourceDocument);
 
-					//4. apply content
+					//3. apply content
 
 					final Element templateContentElement = findContentElement(templateDocument)
 							.orElseThrow(() -> new IOException(String.format("Template %s has no content insertion point.", templateFile)));
@@ -925,7 +1012,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	//#cleanse
 
 	/**
-	 * Cleanses a document before it is saved, removing any mummy-related directives.
+	 * Cleanses a document before it is saved, removing any Mummy-related directives.
 	 * @implSpec This implementation does not allow the document element to be removed or replaced.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
@@ -945,7 +1032,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	}
 
 	/**
-	 * Cleanses a document element, removing any mummy-related directives.
+	 * Cleanses a document element, removing any Mummy-related directives.
 	 * <p>
 	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
 	 * element is removed.
@@ -991,7 +1078,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	}
 
 	/**
-	 * Cleanses child elements of an existing element, removing any mummy-related directives.
+	 * Cleanses child elements of an existing element, removing any Mummy-related directives.
 	 * @implNote This implementation does not yet allow returning different nodes than the one being cleansed.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
@@ -1021,6 +1108,97 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			}
 			throw new UnsupportedOperationException("Structural changes not yet fully supported when cleansing individual child elements.");
 		}
+	}
+
+	//#ascribe
+
+	/** Namespaces of metadata that is not added to the document. */
+	private static final Set<URI> UNASCRIBED_NAMESPACES = Set.of(GuiseMummy.NAMESPACE, Content.NAMESPACE);
+
+	/**
+	 * Generates metadata for a document.
+	 * <ul>
+	 * <li>Creates the {@code <html><head>} and {@code <html><head><title>} structure if necessary.</li>
+	 * <li>Sets the title if one is present in the metadata.</li>
+	 * <li>Creates appropriate metadata elements.</li>
+	 * </ul>
+	 * <p>
+	 * Metadata in the Guise Mummy namespace {@link GuiseMummy#NAMESPACE} and other internal namespaces are skipped.
+	 * </p>
+	 * @implSpec This implementation adds additional metadata to identify the generator and indicate the generation time.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact being generated
+	 * @param document The document to ascribe.
+	 * @return The given document with metadata added.
+	 * @throws IllegalArgumentException if the given document does not have an {@code <html>} element.
+	 * @throws IOException if there is an error ascribing the document.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 * @see MummyContext#getMummifierIdentification()
+	 */
+	protected Document ascribeDocument(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
+			@Nonnull final Document document) throws IOException, DOMException {
+
+		//ensure that the document has the correct <html><head><title> structure
+		final Element htmlElement = findHtmlElement(document).orElseThrow(() -> new IllegalArgumentException("Document has no root <html> element."));
+		final Element headElement = findHtmlHeadElement(document) //add a <html><head> if not present
+				.orElseGet(() -> addFirst(htmlElement, document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_HEAD)));
+		final Element titleElement = findHtmlHeadTitleElement(document) //add a <html><head><title> if not present
+				.orElseGet(() -> addFirst(headElement, document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_TITLE)));
+
+		final UrfResourceDescription description = artifact.getResourceDescription();
+
+		//discover the necessary vocabularies, using our predefined vocabularies for preferred prefixes 
+		final VocabularyRegistrar vocabularyRegistrar = new VocabularyManager(XmlVocabularySpecification.INSTANCE, PREDEFINED_VOCABULARIES);
+		vocabularyRegistrar.setDefaultVocabulary(URF.AD_HOC_NAMESPACE); //indicate which properties don't need a namespace
+		for(final Map.Entry<URI, Object> property : description.getProperties()) {
+			final URI tag = property.getKey();
+			final Optional<URI> namespace = URF.Tag.getNamespace(tag);
+			getLogger().debug("({}) Determining prefix for description tag {}.", artifact.getTargetPath(), tag);
+			if(isPresentAndEquals(namespace, URF.AD_HOC_NAMESPACE)) { //skip tags that would have no namespace
+				continue;
+			}
+			if(namespace.filter(UNASCRIBED_NAMESPACES::contains).isPresent()) { //skip tags in the unascribed namespaces
+				continue;
+			}
+			vocabularyRegistrar.determinePrefixForTerm(tag); //make sure the namespace is registered with a prefix
+		}
+
+		//set the correct RDFa prefix associations in the <head> element
+		headElement.setAttribute(RDFa.ATTRIBUTE_PREFIX, RDFa.toPrefixAttributeValue(vocabularyRegistrar));
+
+		//set the title separately
+		final URI titleTag = Handle.toTag(PROPERTY_HANDLE_TITLE);
+		description.findPropertyValue(titleTag).map(Object::toString).ifPresent(title -> setText(titleElement, title));
+
+		//set the other properties as <meta> elements
+		for(final Map.Entry<URI, Object> property : description.getProperties()) {
+			final URI tag = property.getKey();
+			if(tag.equals(titleTag)) { //skip the title property; we already set it as the <title>
+				continue;
+			}
+			if(URF.Tag.getNamespace(tag).filter(UNASCRIBED_NAMESPACES::contains).isPresent()) { //skip tags in the unascribed namespaces
+				continue;
+			}
+			final Object value = property.getValue();
+			final Curie curie;
+			try { //convert the property to a kebab-case CURIE 
+				curie = vocabularyRegistrar.determineCurieForTerm(tag).orElseThrow(IllegalArgumentException::new).mapReference(CAMEL_CASE::toKebabCase);
+				getLogger().debug("({}) Ascribing metadata: `{}`=`{}` ", artifact.getTargetPath(), curie, value);
+				appendText(headElement, CHARACTER_TABULATION_CHAR); //\t	//TODO remove formatting when HTML formatter is improved
+				addNamedMetadata(headElement, curie.toString(), value.toString());
+				appendText(headElement, lineSeparator()); //\n
+			} catch(final IllegalArgumentException illegalArgumentException) {
+				getLogger().warn("Cannot determine CURIE for metadata tag `{}` with value `{}`.", tag, value);
+			}
+		}
+
+		//#identify Guise Mummy as the generator
+		setNamedMetadata(document, META_NAME_GENERATOR, context.getMummifierIdentification());
+		//#indicate the instant of generation
+		setNamedMetadata(document, META_NAME_GENERATED_AT, Instant.now().toString());
+
+		return document;
 	}
 
 }

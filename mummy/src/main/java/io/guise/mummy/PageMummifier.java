@@ -89,6 +89,8 @@ public interface PageMummifier extends Mummifier {
 	 * <p>
 	 * The document must be in XHTML using the HTML namespace.
 	 * </p>
+	 * @apiNote The returned document need not include any named metadata (i.e. {@code <meta name="…"> elements}) unless this mummifier's implementation for
+	 *          loading source metadata for the artifact description delegates to this method.
 	 * @implSpec The default implementation opens an input stream using {@link SourceFileArtifact#openSource(MummyContext)} and then loads the source document by
 	 *           calling {@link #loadSourceDocument(MummyContext, InputStream, String)}.
 	 * @param context The context of static site generation.
@@ -112,6 +114,8 @@ public interface PageMummifier extends Mummifier {
 	 * <p>
 	 * The document must be in XHTML using the HTML namespace.
 	 * </p>
+	 * @apiNote The returned document need not include any named metadata (i.e. {@code <meta name="…"> elements}) unless this mummifier's implementation for
+	 *          loading source metadata for the artifact description delegates to this method.
 	 * @param context The context of static site generation.
 	 * @param inputStream The input stream from which to to load the document.
 	 * @param name The optional source name of the document, such as a filename, which may be missing or empty.
