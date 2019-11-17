@@ -184,14 +184,14 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 *           characters.
 	 * @see <a href="https://www.w3.org/TR/rdfa-core/#s_curies">RDFa Core 1.1 - Third Edition § 6. CURIE Syntax Definition</a>.
 	 * @see <a href="https://ogp.me/">The Open Graph protocol</a>
+	 * @see Curie
 	 */
-	protected static URI htmlMetaNameToPropertyTag(@Nonnull Element contextElement, @Nonnull final String metaName) {
+	protected static URI htmlMetaNameToPropertyTag(@Nonnull final Element contextElement, @Nonnull final String metaName) {
 		requireNonNull(contextElement);
 		checkArgument(!metaName.isEmpty(), "Property name may not be empty.");
-		final int curieDelimiterIndex = metaName.indexOf(':'); //TODO use CURIE spec; extract logic into RDFa utility
-		if(curieDelimiterIndex >= 0) { //TODO create single character string splitting utility method
-			final String prefix = metaName.substring(0, curieDelimiterIndex); //TODO check that this is a value XML name, as per the RDFa CURIE spec
-			final String reference = KEBAB_CASE.toCamelCase(metaName.substring(curieDelimiterIndex + 1));
+		final Curie curie = Curie.parse(metaName).mapReference(KEBAB_CASE::toCamelCase);
+		final String reference = curie.getReference();
+		return curie.getPrefix().map(prefix -> {
 			String leadingSegment = null;
 			Node currentNode = contextElement;
 			do {
@@ -201,10 +201,8 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 				leadingSegment = PREDEFINED_VOCABULARIES.findVocabularyByPrefix(prefix).map(URI::toString).orElse(null);
 			}
 			checkArgument(leadingSegment != null, "No IRI leading segment defined for prefix %s of property %s.", prefix, metaName);
-			return URI.create(leadingSegment + reference); //TODO resolve to base
-		} else {
-			return Handle.toTag(KEBAB_CASE.toCamelCase(metaName)); //convert the meta name to camelCase and create and a tag from the handle
-		}
+			return VocabularyTerm.toURI(URI.create(leadingSegment), reference);
+		}).orElseGet(() -> Handle.toTag(curie.getReference()));
 	}
 
 	/**
