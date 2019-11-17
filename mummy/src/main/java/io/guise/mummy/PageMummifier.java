@@ -43,9 +43,6 @@ public interface PageMummifier extends Mummifier {
 	/** The HTML {@code <meta>} name for indicating the instant of artifact generation. */
 	public static final String META_NAME_GENERATED_AT = "generatedAt";
 
-	/** The metadata name for specifying a relative template path. */
-	public static final String META_MUMMY_TEMPLATE = "mummy:template"; //TODO switch to real metadata namespace detection
-
 	/** The attribute for regenerating an element, such as a navigation list. */
 	public static final String ATTRIBUTE_REGENERATE = "regenerate";
 

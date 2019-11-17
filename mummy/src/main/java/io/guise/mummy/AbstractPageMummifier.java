@@ -487,8 +487,10 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	}
 
 	/**
-	 * Finds the source file for a template, if there is one, for the given artifact. The template may be specified in the metadata of the document itself.
-	 * Otherwise a search is made for Searches for a template file in the given artifact directory and ancestor directories.
+	 * Finds the source file for a template, if there is one, for the given artifact. The template may be specified in the description of the document itself
+	 * using the <code>mummy:template</code> property ({@link Artifact#PROPERTY_TAG_MUMMY_TEMPLATE}). Otherwise a search is made for a template file in the given
+	 * artifact directory and ancestor directories.
+	 * @apiNote The template property is used from the description, because the original {@code <meta>} elements will have been removed during normalization.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
@@ -498,11 +500,12 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @throws IOException if the document specifies an invalid template file.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 * @see MummyContext#findPageSourceFile(Path, String, boolean)
+	 * @see Artifact#PROPERTY_TAG_MUMMY_TEMPLATE
 	 */
 	protected Optional<Map.Entry<Path, PageMummifier>> findTemplateSourceFile(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact,
 			@Nonnull final Artifact artifact, @Nonnull final Document sourceDocument) throws IOException, DOMException {
 		//determine if a custom template file was specified; throw an exception if not in the source tree
-		final Optional<String> customTemplate = findHtmlHeadMetaElementContent(sourceDocument, META_MUMMY_TEMPLATE);
+		final Optional<String> customTemplate = artifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_TEMPLATE).map(Object::toString);
 		if(customTemplate.isPresent()) { //if a custom template was specified, check it and map it to a mummifier
 			final Path artifactSourcePath = artifact.getSourcePath();
 			try {

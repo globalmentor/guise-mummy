@@ -54,6 +54,8 @@ public interface Artifact {
 	 * @see #PROPERTY_TAG_MUMMY_ORDER
 	 */
 	public static final long MUMMY_ORDER_DEFAULT = 0;
+	/** The property tag of the <code>mummy/template</code> for specifying a template path, relative to the source path. */
+	public static final URI PROPERTY_TAG_MUMMY_TEMPLATE = NAMESPACE.resolve("template");
 
 	/** @return The properties and their values describing the artifact. */
 	public UrfResourceDescription getResourceDescription();
