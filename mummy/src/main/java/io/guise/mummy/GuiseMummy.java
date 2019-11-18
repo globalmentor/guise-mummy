@@ -76,6 +76,9 @@ public class GuiseMummy implements Clogged {
 	/** The namespace of Guise Mummy elements, such as in an XHTML document or as the leading IRI segment of RDFa metadata. */
 	public static final URI NAMESPACE = URI.create(NAMESPACE_STRING);
 
+	/** The typical prefix used for the namespace of Guise Mummy elements, such as in an XHTML document or in RDFa metadata. */
+	public static final String NAMESPACE_PREFIX = "mummy";
+
 	/** The phases of the default Guise Mummy life cycle, in order. */
 	public enum LifeCyclePhase {
 		INITIALIZE, VALIDATE, PLAN, MUMMIFY, PREPARE_DEPLOY, DEPLOY

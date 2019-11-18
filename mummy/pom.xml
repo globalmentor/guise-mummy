@@ -26,6 +26,11 @@
 
 		<dependency>
 			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-rdfa-spec</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-xml</artifactId>
 		</dependency>
 
@@ -62,6 +67,11 @@
 		<dependency>
 			<groupId>io.urf</groupId>
 			<artifactId>urf-vocab-content</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.snakeyaml</groupId>
+			<artifactId>snakeyaml-engine</artifactId>
 		</dependency>
 
 		<dependency>

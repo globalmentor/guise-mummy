@@ -16,28 +16,34 @@
 
 package io.guise.mummy;
 
-import static com.globalmentor.html.HtmlDom.*;
-import static com.globalmentor.html.spec.HTML.*;
-import static com.globalmentor.lex.CompoundTokenization.*;
-import static com.globalmentor.xml.XmlDom.*;
+import static com.globalmentor.io.Filenames.*;
+import static com.globalmentor.io.InputStreams.*;
+import static com.globalmentor.io.Readers.*;
+import static com.globalmentor.java.Conditions.*;
 import static java.nio.charset.StandardCharsets.*;
 
 import java.io.*;
+import java.net.URI;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.*;
 
+import org.snakeyaml.engine.v2.api.*;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import com.globalmentor.io.*;
 import com.globalmentor.text.StringTemplate;
+import com.globalmentor.vocab.Curie;
+import com.globalmentor.vocab.VocabularyTerm;
 import com.vladsch.flexmark.ext.definition.DefinitionExtension;
 import com.vladsch.flexmark.ext.emoji.EmojiExtension;
 import com.vladsch.flexmark.ext.emoji.EmojiImageType;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.ext.typographic.TypographicExtension;
-import com.vladsch.flexmark.ext.yaml.front.matter.AbstractYamlFrontMatterVisitor;
 import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
@@ -51,6 +57,16 @@ import com.vladsch.flexmark.util.data.MutableDataSet;
  * @author Garret Wilson
  */
 public class MarkdownPageMummifier extends AbstractPageMummifier {
+
+	/** Pattern for a Markdown document with YAML front matter. */
+	static final Pattern MARKDOWN_WITH_YAML_PATTERN = Pattern.compile("(?:---[\\r\\n]+(.*)---(?:[\\r\\n]+|$))?(.*)", Pattern.DOTALL);
+	/** The matching group for YAML content in a Markdown document with YAML. The value of the group will be <code>null</code> if no YAML is present. */
+	static final int MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP = 1;
+	/**
+	 * The matching group for Markdown content in a Markdown document with YAML. The value of the group may be the empty string but will never be
+	 * <code>null</code>.
+	 */
+	static final int MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP = 2;
 
 	/**
 	 * The template for wrapping an XHTML document around the generated HTML. It has the following parameters:
@@ -114,46 +130,27 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		htmlRenderer = HtmlRenderer.builder().build();
 	}
 
-	/** The data key for the title retrieved from the front matter. */
-	private static final String FRONT_MATTER_TITLE_DATA_KEY = "title"; //TODO use a constant from some URF list of standard properties
-
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This version loads a document in Markdown format.
+	 * @implSpec This version uses the filename as a title. It will be replaced later by any title indicated in the metadata during mummification.
 	 */
 	@Override
 	public Document loadSourceDocument(final MummyContext context, final InputStream inputStream, final String name) throws IOException, DOMException {
-		//create a Reader to detect the BOM and to throw errors if the encoding is invalid
-		@SuppressWarnings("resource") //we don't manage the underlying input stream
-		final BOMInputStreamReader bomInputStreamReader = new BOMInputStreamReader(new BufferedInputStream(inputStream)); //TODO create utility to ensure mark supported
-		final StringBuilder stringBuilder = new StringBuilder();
-		final char[] buffer = new char[64 * 1024];
-		int charsRead;
-		while((charsRead = bomInputStreamReader.read(buffer)) != -1) { //TODO create utility to read all from a reader
-			stringBuilder.append(buffer, 0, charsRead);
+		final String content = readString(new BOMInputStreamReader(toMarkSupportedInputStream(inputStream))); //detect the BOM and to throw errors if the encoding is invalid
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher(content);
+		if(!matcher.matches()) {
+			throw new IOException("Invalid markdown" + (name != null ? String.format(" in `%s`", name) : "") + ".");
 		}
-		String title = name != null ? Filenames.removeExtension(name) : ""; //default to a title of the filename with no extension
-		com.vladsch.flexmark.util.ast.Document markdownDocument = getParser().parse(stringBuilder.toString());
-		final AbstractYamlFrontMatterVisitor yamlVisitor = new AbstractYamlFrontMatterVisitor();
-		yamlVisitor.visit(markdownDocument);
 
-		//find the title if present in the front matter
-		final List<String> frontMatterTitles = yamlVisitor.getData().get(FRONT_MATTER_TITLE_DATA_KEY);
-		if(frontMatterTitles != null && !frontMatterTitles.isEmpty()) {
-			final Iterator<String> frontMatterTitlesIterator = frontMatterTitles.iterator();
-			final String frontMatterTitle = frontMatterTitlesIterator.next(); //use the first title given
-			if(frontMatterTitle != null) {
-				title = frontMatterTitle;
-			}
-			while(frontMatterTitlesIterator.hasNext()) {
-				getLogger().warn("Ignoring additional title {} in source Markdown document {}.", frontMatterTitlesIterator.next(), name);
-			}
-		}
+		//parse Markdown
+		final String markdown = matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP);
+		com.vladsch.flexmark.util.ast.Document markdownDocument = getParser().parse(markdown);
 
 		//generate XHTML
 		final Document document;
 		final String htmlBodyContent = getHtmlRenderer().render(markdownDocument);
-		final String xhtmlDocumentString = XHTML_TEMPLATE.apply(title, htmlBodyContent);
+		final String xhtmlDocumentString = XHTML_TEMPLATE.apply(removeExtension(name), htmlBodyContent);
 		final DocumentBuilder documentBuilder = context.newPageDocumentBuilder();
 		try {
 			document = documentBuilder.parse(new ByteArrayInputStream(xhtmlDocumentString.getBytes(UTF_8)));
@@ -161,21 +158,46 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 			throw new IOException(saxException);
 		}
 
-		//add additional metadata from the front matter
-		final Element headElement = findHtmlHeadElement(document).orElseThrow(IllegalStateException::new); //our template has a <head>
-		yamlVisitor.getData().forEach((metaName, metaValues) -> {
-			if(FRONT_MATTER_TITLE_DATA_KEY.equals(metaName)) { //ignore the title; we already processed it
-				return;
-			}
-			//multiple front matter values for a name result in multiple <meta> elements as a side effect which may be useful
-			metaValues.forEach(metaValue -> { //TODO add an HtmlDom.addNamedMetata() method
-				final Element metaElement = addLast(headElement, document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_META));
-				metaElement.setAttributeNS(null, ELEMENT_META_ATTRIBUTE_NAME, CAMEL_CASE.toKebabCase(metaName));
-				metaElement.setAttributeNS(null, ELEMENT_META_ATTRIBUTE_CONTENT, metaValue);
-			});
-		});
-
 		return document;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation reads the entire document and then parses any YAML front matter using SnakeYAML Engine.
+	 * @implSpec Only YAML mappings (name-value pairs) are supported. Names should be in <code>camelCase</code>. Namespace prefixes of predefined vocabularies in
+	 *           {@link AbstractPageMummifier#PREDEFINED_VOCABULARIES} are supported for names in the form <code>eg:name</code>.
+	 * @see AbstractPageMummifier#PREDEFINED_VOCABULARIES
+	 */
+	@Override
+	protected Stream<Map.Entry<URI, Object>> sourceMetadata(final MummyContext context, final InputStream inputStream, final String name) throws IOException {
+		final String content = readString(new BOMInputStreamReader(toMarkSupportedInputStream(inputStream))); //detect the BOM and to throw errors if the encoding is invalid
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher(content);
+		if(!matcher.matches()) {
+			throw new IOException("Invalid markdown" + (name != null ? String.format(" in `%s`", name) : "") + ".");
+		}
+		final String yaml = matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP);
+		if(yaml == null) { //no YAML front matter present
+			return Stream.empty();
+		}
+		final Object object = new Load(LoadSettings.builder().build()).loadFromString(yaml);
+		if(!(object instanceof Map)) {
+			return Stream.empty();
+		}
+		final Map<?, ?> yamlMap = (Map<?, ?>)object;
+		try {
+			return yamlMap.entrySet().stream().map(mapping -> {
+				final Object key = mapping.getKey();
+				checkArgument(key instanceof CharSequence, "YAML mapping key `%s` of type `%s` not supported.", key, key.getClass().getName());
+				checkArgument(key != null, "YAML key `%s` cannot be mapped to `null`.", key);
+				final Curie curie = Curie.parse((CharSequence)mapping.getKey(), false);
+				final URI tag = PREDEFINED_VOCABULARIES.findVocabularyTerm(curie).map(VocabularyTerm::toURI)
+						.orElseThrow(() -> new IllegalArgumentException(String.format("YAML key `%s` uses unrecognized namespace prefix.", key)));
+				return Map.entry(tag, mapping.getValue());
+			});
+		} catch(final IllegalArgumentException illegalArgumentException) {
+			throw new IOException("Invalid YAML" + (name != null ? String.format(" in `%s`", name) : "") + ": " + illegalArgumentException.getMessage(),
+					illegalArgumentException);
+		}
 	}
 
 }

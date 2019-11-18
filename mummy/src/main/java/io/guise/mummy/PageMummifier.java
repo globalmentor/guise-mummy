@@ -43,9 +43,6 @@ public interface PageMummifier extends Mummifier {
 	/** The HTML {@code <meta>} name for indicating the instant of artifact generation. */
 	public static final String META_NAME_GENERATED_AT = "generatedAt";
 
-	/** The metadata name for specifying a relative template path. */
-	public static final String META_MUMMY_TEMPLATE = "mummy:template"; //TODO switch to real metadata namespace detection
-
 	/** The attribute for regenerating an element, such as a navigation list. */
 	public static final String ATTRIBUTE_REGENERATE = "regenerate";
 
@@ -89,6 +86,8 @@ public interface PageMummifier extends Mummifier {
 	 * <p>
 	 * The document must be in XHTML using the HTML namespace.
 	 * </p>
+	 * @apiNote The returned document need not include any named metadata (i.e. {@code <meta name="…"> elements}) unless this mummifier's implementation for
+	 *          loading source metadata for the artifact description delegates to this method.
 	 * @implSpec The default implementation opens an input stream using {@link SourceFileArtifact#openSource(MummyContext)} and then loads the source document by
 	 *           calling {@link #loadSourceDocument(MummyContext, InputStream, String)}.
 	 * @param context The context of static site generation.
@@ -112,6 +111,8 @@ public interface PageMummifier extends Mummifier {
 	 * <p>
 	 * The document must be in XHTML using the HTML namespace.
 	 * </p>
+	 * @apiNote The returned document need not include any named metadata (i.e. {@code <meta name="…"> elements}) unless this mummifier's implementation for
+	 *          loading source metadata for the artifact description delegates to this method.
 	 * @param context The context of static site generation.
 	 * @param inputStream The input stream from which to to load the document.
 	 * @param name The optional source name of the document, such as a filename, which may be missing or empty.

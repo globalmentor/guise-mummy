@@ -19,14 +19,19 @@ package io.guise.mummy;
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
+import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.OperatingSystem.*;
 import static com.globalmentor.xml.XmlDom.*;
+import static io.guise.mummy.MarkdownPageMummifier.*;
+import static java.util.stream.Collectors.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
 import java.io.*;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.regex.Matcher;
 
 import javax.annotation.*;
 
@@ -35,6 +40,7 @@ import org.w3c.dom.*;
 
 import io.confound.config.Configuration;
 import io.guise.mummy.deploy.*;
+import io.urf.URF.Handle;
 
 /**
  * Tests of {@link MarkdownPageMummifier}.
@@ -91,6 +97,60 @@ public class MarkdownPageMummifierTest {
 		};
 	}
 
+	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
+	@Test
+	public void testMarkdownWithYamlPatternNoYaml() {
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("# Heading\n\nBody text.");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is(nullValue()));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("# Heading\n\nBody text."));
+	}
+
+	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
+	@Test
+	public void testMarkdownWithYamlPatternEmptyYaml() {
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\n---\n# Heading\n\nBody text.");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is(""));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("# Heading\n\nBody text."));
+	}
+
+	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
+	@Test
+	public void testMarkdownWithYamlPatternSingleLineYamlNotRecognized() {
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---foo:bar---\n# Heading\n\nBody text.");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is(nullValue()));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("---foo:bar---\n# Heading\n\nBody text."));
+	}
+
+	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
+	@Test
+	public void testMarkdownWithYamlPattern() {
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\nfoo:bar\nexample:test---\n# Heading\n\nBody text.");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is("foo:bar\nexample:test"));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("# Heading\n\nBody text."));
+	}
+
+	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
+	@Test
+	public void testMarkdownWithYamlPatternNoMarkdown() {
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\nfoo:bar\nexample:test---");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is("foo:bar\nexample:test"));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is(""));
+	}
+
+	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
+	@Test
+	public void testMarkdownWithYamlPatternEmptyLineMarkdown() {
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\nfoo:bar\nexample:test---\n");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is("foo:bar\nexample:test"));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is(""));
+	}
+
 	/**
 	 * Asserts that the body of the given document matches that expected for the "simple-" test files.
 	 * @param document The document to test.
@@ -131,13 +191,13 @@ public class MarkdownPageMummifierTest {
 	 * @see #assertSimpleBody(Document)
 	 */
 	@Test
-	public void testSimpleTitleMarkdown() throws IOException {
+	public void testSimpleMarkdownDocumentTitle() throws IOException {
 		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
 		final Document document;
 		try (final InputStream inputStream = getClass().getResourceAsStream(SIMPLE_TITLE_MARKDOWN_RESOURCE_NAME)) {
 			document = mummifier.loadSourceDocument(mummyContext, inputStream, SIMPLE_TITLE_MARKDOWN_RESOURCE_NAME);
 		}
-		assertThat(findTitle(document), isPresentAndIs("Simple Page"));
+		assertThat(findTitle(document), isPresentAndIs(removeExtension(SIMPLE_TITLE_MARKDOWN_RESOURCE_NAME)));
 		assertSimpleBody(document);
 	}
 
@@ -147,17 +207,34 @@ public class MarkdownPageMummifierTest {
 	 * @see #assertSimpleBody(Document)
 	 */
 	@Test
-	public void testSimpleMetadataMarkdown() throws IOException {
+	public void testSimpleMarkdownDocumentMetadata() throws IOException {
 		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
 		final Document document;
 		try (final InputStream inputStream = getClass().getResourceAsStream(SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME)) {
 			document = mummifier.loadSourceDocument(mummyContext, inputStream, SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME);
 		}
-		assertThat(findTitle(document), isPresentAndIs("Simple Page with Other Metadata"));
-		assertThat(findHtmlHeadMetaElementContent(document, "title"), isEmpty()); //make sure we didn't duplicate the title as metadata 
-		assertThat(findHtmlHeadMetaElementContent(document, "label"), isPresentAndIs("Simplicity"));
-		assertThat(findHtmlHeadMetaElementContent(document, "foo-bar"), isPresentAndIs("This is a test."));
+		assertThat(findTitle(document), isPresentAndIs(removeExtension(SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME)));
+		//we no longer include metadata when loading the source XHTML document; it is loaded separately as part of the description
+		assertThat(htmlHeadMetaElements(document).collect(toList()), empty());
 		assertSimpleBody(document);
+	}
+
+	/**
+	 * @see MarkdownPageMummifier#sourceMetadata(MummyContext, InputStream, String)
+	 * @see #SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME
+	 */
+	@Test
+	public void testSimpleMarkdownMetadata() throws IOException {
+		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
+		try (final InputStream inputStream = getClass().getResourceAsStream(SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME)) {
+			assertThat(mummifier.sourceMetadata(mummyContext, inputStream, SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME).collect(toList()),
+					containsInAnyOrder(Map.entry(Handle.toTag("title"), "Simple Page with Other Metadata"), Map.entry(Handle.toTag("label"), "Simplicity"),
+							Map.entry(Handle.toTag("fooBar"), "This is a test."),
+							//Guise Mummy namespace with integer value
+							Map.entry(Artifact.PROPERTY_TAG_MUMMY_ORDER, 3),
+							//Open Graph namespace
+							Map.entry(URI.create("http://ogp.me/ns#type"), "website")));
+		}
 	}
 
 }
