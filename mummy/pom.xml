@@ -70,6 +70,11 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.snakeyaml</groupId>
+			<artifactId>snakeyaml-engine</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>org.zalando</groupId>
 			<artifactId>faux-pas</artifactId>
 		</dependency>

@@ -91,12 +91,13 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 	/**
 	 * Vocabulary prefixes that will be recognized in metadata, such as in XHTML {@code <meta>} elements or in YAML, if they have not been associated with a
-	 * different vocabulary.
+	 * different vocabulary. The URF ad-hoc namespace {@link URF#AD_HOC_NAMESPACE} is used as the default so that a CURIE with no prefix can be correctly
+	 * converted to a tag.
 	 * @implSpec These prefixes include those in {@link RDFa.InitialContext#VOCABULARIES}.
 	 * @implSpec These prefixes include the prefix {@link GuiseMummy#NAMESPACE_PREFIX} for the namespace {@link GuiseMummy#NAMESPACE}.
 	 */
 	protected static final VocabularyRegistry PREDEFINED_VOCABULARIES = VocabularyRegistry.builder(RDFa.InitialContext.VOCABULARIES)
-			.registerPrefix(GuiseMummy.NAMESPACE_PREFIX, GuiseMummy.NAMESPACE).build();
+			.setDefaultVocabulary(URF.AD_HOC_NAMESPACE).registerPrefix(GuiseMummy.NAMESPACE_PREFIX, GuiseMummy.NAMESPACE).build();
 
 	/**
 	 * {@inheritDoc}
@@ -221,7 +222,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		try {
 			sourceMetadata(context, sourceFile).forEach(meta -> {
 				final URI propertyTag = meta.getKey();
-				final String propertyValue = meta.getValue();
+				final Object propertyValue = meta.getValue();
 				if(!description.hasPropertyValue(propertyTag)) { //the first property wins
 					description.setPropertyValue(propertyTag, propertyValue);
 				}
@@ -248,7 +249,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @return Metadata stored in the source file being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate names.
 	 * @throws IOException if there is an I/O error retrieving the metadata.
 	 */
-	protected Stream<Map.Entry<URI, String>> sourceMetadata(@Nonnull MummyContext context, @Nonnull final Path sourceFile) throws IOException {
+	protected Stream<Map.Entry<URI, Object>> sourceMetadata(@Nonnull MummyContext context, @Nonnull final Path sourceFile) throws IOException {
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile))) {
 			final Path filename = sourceFile.getFileName();
 			return sourceMetadata(context, inputStream, filename != null ? filename.toString() : null);
@@ -266,7 +267,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @return Metadata stored in the source file being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate names.
 	 * @throws IOException if there is an I/O error retrieving the metadata.
 	 */
-	protected Stream<Map.Entry<URI, String>> sourceMetadata(@Nonnull MummyContext context, @Nonnull InputStream inputStream, @Nullable final String name)
+	protected Stream<Map.Entry<URI, Object>> sourceMetadata(@Nonnull MummyContext context, @Nonnull InputStream inputStream, @Nullable final String name)
 			throws IOException {
 		final Document sourceDocument = loadSourceDocument(context, inputStream, name);
 		try {
@@ -287,7 +288,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @throws IllegalArgumentException if any of the metadata is invalid.
 	 * @throws DOMException if there is a problem retrieving metadata.
 	 */
-	protected Stream<Map.Entry<URI, String>> sourceMetadata(@Nonnull MummyContext context, @Nonnull final Document sourceDocument) throws DOMException {
+	protected Stream<Map.Entry<URI, Object>> sourceMetadata(@Nonnull MummyContext context, @Nonnull final Document sourceDocument) throws DOMException {
 		//TODO consider parsing out "keywords" in to multiple keyword+ properties for convenience
 		return Stream.concat(
 				//<title>; will override any <code>title</code> metadata property in this same document
@@ -700,7 +701,8 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 	/**
 	 * Returns the given object as a {@link Long}, converting if necessary.
-	 * @implSpec This implementation only supports {@link Long} and {@link String} types, converting the latter using {@link Long#valueOf(String)}.
+	 * @implSpec This implementation only supports {@link Integer}, {@link Long}, and {@link String} types, converting the latter using
+	 *           {@link Long#valueOf(String)}.
 	 * @param object The object to return as a {@link Long}.
 	 * @return The object as a {@link Long} instance.
 	 * @throws IllegalArgumentException if the given object cannot be converted to a {@link Long}.
@@ -708,6 +710,8 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	private static Long toLong(@Nonnull final Object object) { //TODO switch to a general converter system, including number types, e.g. from Ploop
 		if(object instanceof Long) {
 			return (Long)object;
+		} else if(object instanceof Integer) {
+			return Long.valueOf(((Integer)object).longValue());
 		} else if(object instanceof String) {
 			return Long.valueOf((String)object);
 		} else {
