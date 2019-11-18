@@ -22,6 +22,7 @@ import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.OperatingSystem.*;
 import static com.globalmentor.xml.XmlDom.*;
+import static io.guise.mummy.MarkdownPageMummifier.*;
 import static java.util.stream.Collectors.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
@@ -29,6 +30,7 @@ import static org.hamcrest.Matchers.*;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.regex.Matcher;
 
 import javax.annotation.*;
 
@@ -92,6 +94,60 @@ public class MarkdownPageMummifierTest {
 			}
 
 		};
+	}
+
+	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
+	@Test
+	public void testMarkdownWithYamlPatternNoYaml() {
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("# Heading\n\nBody text.");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is(nullValue()));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("# Heading\n\nBody text."));
+	}
+
+	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
+	@Test
+	public void testMarkdownWithYamlPatternEmptyYaml() {
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\n---\n# Heading\n\nBody text.");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is(""));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("# Heading\n\nBody text."));
+	}
+
+	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
+	@Test
+	public void testMarkdownWithYamlPatternSingleLineYamlNotRecognized() {
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---foo:bar---\n# Heading\n\nBody text.");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is(nullValue()));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("---foo:bar---\n# Heading\n\nBody text."));
+	}
+
+	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
+	@Test
+	public void testMarkdownWithYamlPattern() {
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\nfoo:bar\nexample:test---\n# Heading\n\nBody text.");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is("foo:bar\nexample:test"));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("# Heading\n\nBody text."));
+	}
+
+	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
+	@Test
+	public void testMarkdownWithYamlPatternNoMarkdown() {
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\nfoo:bar\nexample:test---");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is("foo:bar\nexample:test"));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is(""));
+	}
+
+	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
+	@Test
+	public void testMarkdownWithYamlPatternEmptyLineMarkdown() {
+		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\nfoo:bar\nexample:test---\n");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP), is("foo:bar\nexample:test"));
+		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is(""));
 	}
 
 	/**

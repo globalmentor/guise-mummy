@@ -23,6 +23,7 @@ import java.io.*;
 import java.net.URI;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javax.annotation.*;
@@ -54,6 +55,16 @@ import io.urf.URF.Handle;
  * @author Garret Wilson
  */
 public class MarkdownPageMummifier extends AbstractPageMummifier {
+
+	/** Pattern for a Markdown document with YAML front matter. */
+	static final Pattern MARKDOWN_WITH_YAML_PATTERN = Pattern.compile("(?:---[\\r\\n]+(.*)---(?:[\\r\\n]+|$))?(.*)", Pattern.DOTALL);
+	/** The matching group for YAML content in a Markdown document with YAML. The value of the group will be <code>null</code> if no YAML is present. */
+	static final int MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP = 1;
+	/**
+	 * The matching group for Markdown content in a Markdown document with YAML. The value of the group may be the empty string but will never be
+	 * <code>null</code>.
+	 */
+	static final int MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP = 2;
 
 	/**
 	 * The template for wrapping an XHTML document around the generated HTML. It has the following parameters:
