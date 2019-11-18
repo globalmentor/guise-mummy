@@ -609,7 +609,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 												}
 											}
 											progressOutputStream.addProgressListener(progressListener); //start listening for progress events from the output stream
-											Streams.copy(inputStream, progressOutputStream); //copy the uploaded file to the destination
+											IOStreams.copy(inputStream, progressOutputStream); //copy the uploaded file to the destination
 											progressOutputStream.removeProgressListener(progressListener); //stop listening for progress events from the output stream
 											//TODO catch and send errors here
 										} finally {
@@ -715,7 +715,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 			if(outputStream instanceof ProgressOutputStream) {
 				((ProgressOutputStream)outputStream).addProgressListener(progressListener); //start listening for progress events from the output stream
 			}
-			Streams.copy(inputStream, outputStream); //copy the uploaded file to the destination
+			IOStreams.copy(inputStream, outputStream); //copy the uploaded file to the destination
 			if(outputStream instanceof ProgressOutputStream) {
 				((ProgressOutputStream)outputStream).removeProgressListener(progressListener); //stop listening for progress events from the output stream
 			}

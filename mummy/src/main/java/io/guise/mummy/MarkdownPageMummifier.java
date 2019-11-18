@@ -17,6 +17,8 @@
 package io.guise.mummy;
 
 import static com.globalmentor.io.Filenames.*;
+import static com.globalmentor.io.InputStreams.*;
+import static com.globalmentor.io.Readers.*;
 import static com.globalmentor.java.Conditions.*;
 import static java.nio.charset.StandardCharsets.*;
 
@@ -135,17 +137,7 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 	 */
 	@Override
 	public Document loadSourceDocument(final MummyContext context, final InputStream inputStream, final String name) throws IOException, DOMException {
-		//create a Reader to detect the BOM and to throw errors if the encoding is invalid
-		@SuppressWarnings("resource") //we don't manage the underlying input stream
-		final BOMInputStreamReader bomInputStreamReader = new BOMInputStreamReader(new BufferedInputStream(inputStream)); //TODO create utility to ensure mark supported
-		final StringBuilder stringBuilder = new StringBuilder();
-		final char[] buffer = new char[64 * 1024];
-		int charsRead;
-		while((charsRead = bomInputStreamReader.read(buffer)) != -1) { //TODO create utility to read all from a reader
-			stringBuilder.append(buffer, 0, charsRead);
-		}
-
-		final String content = stringBuilder.toString();
+		final String content = readString(new BOMInputStreamReader(toMarkSupportedInputStream(inputStream))); //detect the BOM and to throw errors if the encoding is invalid
 		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher(content);
 		if(!matcher.matches()) {
 			throw new IOException("Invalid markdown" + (name != null ? String.format(" in `%s`", name) : "") + ".");
@@ -178,17 +170,7 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 	 */
 	@Override
 	protected Stream<Map.Entry<URI, Object>> sourceMetadata(final MummyContext context, final InputStream inputStream, final String name) throws IOException {
-		//create a Reader to detect the BOM and to throw errors if the encoding is invalid
-		@SuppressWarnings("resource") //we don't manage the underlying input stream
-		final BOMInputStreamReader bomInputStreamReader = new BOMInputStreamReader(new BufferedInputStream(inputStream)); //TODO create utility to ensure mark supported
-		final StringBuilder stringBuilder = new StringBuilder();
-		final char[] buffer = new char[64 * 1024];
-		int charsRead;
-		while((charsRead = bomInputStreamReader.read(buffer)) != -1) { //TODO create utility to read all from a reader
-			stringBuilder.append(buffer, 0, charsRead);
-		}
-
-		final String content = stringBuilder.toString();
+		final String content = readString(new BOMInputStreamReader(toMarkSupportedInputStream(inputStream))); //detect the BOM and to throw errors if the encoding is invalid
 		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher(content);
 		if(!matcher.matches()) {
 			throw new IOException("Invalid markdown" + (name != null ? String.format(" in `%s`", name) : "") + ".");
