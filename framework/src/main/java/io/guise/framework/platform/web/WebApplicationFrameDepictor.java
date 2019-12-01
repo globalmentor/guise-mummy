@@ -145,7 +145,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeDocType(true, XHTML_NAMESPACE_URI, ELEMENT_HTML, HTML_CONTENT_TYPE); //write the doctype and with an XML declaration, with no system ID to a DTD as per HTML 5: http://www.w3.org/TR/html5/syntax.html#the-doctype (CKEditor only supports text/html)
 		//<xhtml:html>
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_HTML); //<xhtml:html>
-		depictContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString()); //xmlns="http://www.w3.org/1999/xhtml"
+		depictContext.writeAttribute(null, ATTRIBUTE_XMLNS.getLocalName(), XHTML_NAMESPACE_URI.toString()); //xmlns="http://www.w3.org/1999/xhtml"; note that we pass the wrong namespace to get the effectively correct prefix
 		depictContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString()); //xmlns:guise="https://guise.io/framework/id/ml#"
 		depictContext.writeAttribute(XMLNS_NAMESPACE_URI, OpenGraph.NAMESPACE_PREFIX, OpenGraph.NAMESPACE_URI.toString()); //xmlns:og="http://ogp.me/ns#"
 		depictContext.writeAttribute(XMLNS_NAMESPACE_URI, Facebook.NAMESPACE_PREFIX, Facebook.NAMESPACE_URI.toString()); //xmlns:fb="https://www.facebook.com/2008/fbml"

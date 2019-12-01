@@ -1127,7 +1127,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 					final Iterator<Frame> frameIterator = guiseSession.getApplicationFrame().getChildFrames().iterator(); //get an iterator to all the frames
 					if(frameIterator.hasNext()) { //if there are open frames
 						depictContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch"); //<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
-						depictContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString()); //xmlns="http://www.w3.org/1999/xhtml"
+						depictContext.writeAttribute(null, ATTRIBUTE_XMLNS.getLocalName(), XHTML_NAMESPACE_URI.toString()); //xmlns="http://www.w3.org/1999/xhtml"; note that we pass the wrong namespace to get the effectively correct prefix
 						depictContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString()); //xmlns:guise="https://guise.io/framework/id/ml#"
 						do {
 							final Frame frame = frameIterator.next(); //get the next frame
@@ -1165,7 +1165,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 					} else { //if the application frame wasn't affected
 						if(!dirtyComponents.isEmpty()) { //if components were affected by this update cycle
 							depictContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch"); //<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
-							depictContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString()); //xmlns="http://www.w3.org/1999/xhtml"
+							depictContext.writeAttribute(null, ATTRIBUTE_XMLNS.getLocalName(), XHTML_NAMESPACE_URI.toString()); //xmlns="http://www.w3.org/1999/xhtml"; note that we pass the wrong namespace to get the effectively correct prefix
 							depictContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString()); //xmlns:guise="https://guise.io/framework/id/ml#"
 							for(final Component dirtyComponent : dirtyComponents) { //for each component affected by this update cycle
 								//TODO fix							if(dirtyComponent.isVisible())	//if the component is visible

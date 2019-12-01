@@ -201,7 +201,7 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 				final String attributeNamespaceURIString = attribute.getNamespaceURI(); //get the attribute namespace
 				final URI attributeNamespaceURI = attributeNamespaceURIString != null ? URI.create(attributeNamespaceURIString) : null; //get the namespace URI, if there is one
 				final String attributeLocalName = attribute.getLocalName(); //get the attribute local name
-				if(XMLNS_NAMESPACE_URI.equals(attributeNamespaceURI) && ATTRIBUTE_XMLNS.equals(attributeLocalName)) { //don't write xmlns:xmlns attributes TODO fix; this is to keep xmlns:xmlns from being redefined, because apparently the Java parse things xmlns="" is in the XMLNS namespace
+				if(ATTRIBUTE_XMLNS.getNamespaceString().equals(attributeNamespaceURIString) && ATTRIBUTE_XMLNS.getLocalName().equals(attributeLocalName)) { //don't write xmlns:xmlns attributes TODO fix; this is to keep xmlns:xmlns from being redefined, because apparently the Java parse things xmlns="" is in the XMLNS namespace
 					continue;
 				}
 				final String attributeValue = attribute.getNodeValue(); //get the value of the attribute

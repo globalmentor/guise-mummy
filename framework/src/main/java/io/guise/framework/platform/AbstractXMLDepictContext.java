@@ -412,7 +412,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	/**
 	 * {@inheritDoc}
 	 * <p>
-	 * This implemention only recognizes the null namespace and the XML namespace, which is assumed to require a prefix of "xml".
+	 * This implementation only recognizes the null namespace and the XML namespace, which is assumed to require a prefix of "xml".
 	 * </p>
 	 */
 	@Override
