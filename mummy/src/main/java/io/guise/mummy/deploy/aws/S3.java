@@ -16,16 +16,8 @@
 
 package io.guise.mummy.deploy.aws;
 
-import static com.globalmentor.java.Conditions.*;
-import static com.globalmentor.net.HTTP.*;
-import static com.globalmentor.net.URIs.*;
-import static io.guise.mummy.Artifact.*;
 import static io.guise.mummy.GuiseMummy.*;
-import static java.util.Collections.*;
 import static java.util.Objects.*;
-import static java.util.stream.Collectors.*;
-import static java.util.stream.Stream.*;
-import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -67,72 +59,6 @@ public class S3 implements DeployTarget, Clogged {
 	public static final String CONFIG_KEY_BUCKET = "bucket";
 
 	/**
-	 * The section relative key for the alternative buckets in the configuration; defaults to the root-relative form of
-	 * {@link GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} resolved against any {@link GuiseMummy#CONFIG_KEY_DOMAIN} in the global configuration.
-	 */
-	public static final String CONFIG_KEY_ALT_BUCKETS = "altBuckets";
-
-	/**
-	 * The regions that use a dash (<code>-</code>) instead of a dot (<code>.</code>) to separate <code>s3-website</code> from the region in the endpoint domain
-	 * string.
-	 */
-	private static final Set<Region> WEBSITE_ENDPOINT_DASH_REGIONS = Set.of(Region.US_EAST_1, Region.US_WEST_1, Region.US_WEST_2, Region.AP_SOUTHEAST_1,
-			Region.AP_SOUTHEAST_2, Region.AP_NORTHEAST_1, Region.EU_WEST_1, Region.SA_EAST_1);
-
-	private static final String ENDPOINT_S3_WEBSITE_REGION_DELIMITER_DASH = String.valueOf('-');
-	private static final String ENDPOINT_S3_WEBSITE_REGION_DELIMITER_DOT = String.valueOf('.');
-
-	/**
-	 * String template for a bucket web site URL, with the following string parameters:
-	 * <ol>
-	 * <li>bucket name</li>
-	 * <li>S3 website region delimiter: dot (<code>.</code>) or dash (<code>-</code>)</li>
-	 * <li>region ID</li>
-	 * <li>region domain</li>
-	 * <li>
-	 * </ol>
-	 * @implNote The <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteEndpoints.html">Website Endpoints</a> documentation indicates that there are
-	 *           two forms based upon region, one using a dot (<code>.</code>) character and the other using a dash (<code>-</code>) character, but the dot form
-	 *           seems to work as well, as some have <a href=
-	 *           "https://stackoverflow.com/questions/46627060/how-to-resolve-aws-s3-url-says-west-bucket-says-east#comment80219601_46627148">indicated</a> that
-	 *           AWS may be standardizing on the dot form. Nevertheless this implementation distinguishes between the two forms to provide the most correct values
-	 *           as per the documentation.
-	 * @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteEndpoints.html">Website Endpoints</a>
-	 * @see <a href="https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_website_region_endpoints">Amazon Simple Storage Service Website Endpoints</a>
-	 * @see <a href="https://stackoverflow.com/q/57480708/421049">Get AWS S3 bucket web static site URL programmatically using Java SDK v2</a>
-	 */
-	private final static StringTemplate BUCKET_WEBSITE_ENDPOINT_TEMPLATE = StringTemplate.builder().parameter(StringTemplate.STRING_PARAMETER).text(".s3-website")
-			.parameter(StringTemplate.STRING_PARAMETER).parameter(StringTemplate.STRING_PARAMETER).text(".").parameter(StringTemplate.STRING_PARAMETER).build();
-
-	/**
-	 * Returns the endpoint domain for static web site hosting for the given bucket in the indicated region.
-	 * @param bucket The name of the bucket.
-	 * @param region The region in which the bucket is located.
-	 * @return A endpoint domain for accessing the static web site hosted in the identified bucket.
-	 * @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteEndpoints.html">Website Endpoints</a>
-	 * @see <a href="https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_website_region_endpoints">Amazon Simple Storage Service Website Endpoints</a>
-	 * @see PartitionMetadata#hostname()
-	 */
-	public static String getBucketWebsiteEndpoint(@Nonnull final String bucket, @Nonnull final Region region) {
-		final String s3WebsiteRegionDelimiter = WEBSITE_ENDPOINT_DASH_REGIONS.contains(region) ? ENDPOINT_S3_WEBSITE_REGION_DELIMITER_DASH
-				: ENDPOINT_S3_WEBSITE_REGION_DELIMITER_DOT;
-		return BUCKET_WEBSITE_ENDPOINT_TEMPLATE.apply(bucket, s3WebsiteRegionDelimiter, region.id(), region.metadata().domain());
-	}
-
-	/**
-	 * Returns the URL for static web site hosting for the given bucket in the indicated region.
-	 * @param bucket The name of the bucket.
-	 * @param region The region in which the bucket is located.
-	 * @return A URL for accessing the static web site hosted in the identified bucket.
-	 * @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteEndpoints.html">Website Endpoints</a>
-	 * @see <a href="https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_website_region_endpoints">Amazon Simple Storage Service Website Endpoints</a>
-	 * @see PartitionMetadata#hostname()
-	 */
-	public static URI getBucketWebsiteUrl(@Nonnull final String bucket, @Nonnull final Region region) {
-		return createURI(HTTP_URI_SCHEME, null, getBucketWebsiteEndpoint(bucket, region), -1, URIs.ROOT_PATH, null, null);
-	}
-
-	/**
 	 * The policy template for setting a bucket to public read access. There is one parameter:
 	 * <ol>
 	 * <li>bucket</li>
@@ -171,19 +97,9 @@ public class S3 implements DeployTarget, Clogged {
 		return bucket;
 	}
 
-	private final Set<String> altBuckets;
-
-	/** @return The S3 buckets, if any, to serve as alternatives and redirect to the primary bucket. */
-	public Set<String> getAltBuckets() {
-		return altBuckets;
-	}
-
-	/**
-	 * @return A stream of all bucket names, starting with the primary bucket {@link #getBucket()}, followed by the alternatives {@link #getAltBuckets()} in no
-	 *         guaranteed order.
-	 */
+	/** @return A stream of all bucket names, starting with the primary bucket {@link #getBucket()}. */
 	public Stream<String> buckets() {
-		return concat(Stream.of(getBucket()), getAltBuckets().stream());
+		return Stream.of(getBucket());
 	}
 
 	private final DomainName siteDomain;
@@ -200,58 +116,50 @@ public class S3 implements DeployTarget, Clogged {
 		return s3Client;
 	}
 
-	/** The map of S3 object keys for each artifact. */
 	private final ReverseMap<Artifact, String> artifactKeys = new DecoratorReverseMap<>(new LinkedHashMap<>(), new HashMap<>());
 
-	/** The map of alternative (redirect) keys for artifacts that have redirects. */
-	private final Map<Artifact, String> artifactAltKeys = new LinkedHashMap<>();
+	/** @return The map of S3 object keys for each artifact. */
+	protected ReverseMap<Artifact, String> getArtifactKeys() {
+		return artifactKeys;
+	}
 
 	/**
 	 * Configuration constructor.
 	 * <p>
 	 * The region is retrieved from {@value #CONFIG_KEY_REGION} in the local configuration. The bucket name is retrieved from {@value #CONFIG_KEY_BUCKET} in the
 	 * local configuration, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and finally {@value GuiseMummy#CONFIG_KEY_DOMAIN} in the context
-	 * configuration if not specified. The bucket alternatives are retrieved from {@value #CONFIG_KEY_ALT_BUCKETS}, falling back to
-	 * {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} in the context configuration if not specified. The site domain if explicitly set is retrieved from
-	 * {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN}, resolved as appropriate to any project domain.
+	 * configuration if not specified. The site domain if explicitly set is retrieved from {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN}, resolved as appropriate to
+	 * any project domain.
 	 * </p>
-	 * @implSpec This method calls {@link #getConfiguredBucket(Configuration, Configuration)} and {@link #getConfiguredAltBuckets(Configuration, Configuration)}
-	 *           to determine the bucket and alternative buckets.
+	 * @implSpec This method calls {@link #getConfiguredBucket(Configuration, Configuration)} to determine the bucket.
 	 * @implSpec This method calls {@link GuiseMummy#findConfiguredSiteDomain(Configuration)} to determine the site domain, if any.
 	 * @param context The context of static site generation.
 	 * @param localConfiguration The local configuration for this deployment target, which may be a section of the project configuration.
 	 * @see AWS#CONFIG_KEY_DEPLOY_AWS_PROFILE
 	 * @see #CONFIG_KEY_REGION
 	 * @see #CONFIG_KEY_BUCKET
-	 * @see #CONFIG_KEY_ALT_BUCKETS
 	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
-	 * @see GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS
 	 * @see GuiseMummy#CONFIG_KEY_DOMAIN
 	 * @see #getConfiguredBucket(Configuration, Configuration)
-	 * @see #getConfiguredAltBuckets(Configuration, Configuration)
 	 */
 	public S3(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
 		this(context.getConfiguration().findString(AWS.CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null), Region.of(localConfiguration.getString(CONFIG_KEY_REGION)),
-				getConfiguredBucket(context.getConfiguration(), localConfiguration), getConfiguredAltBuckets(context.getConfiguration(), localConfiguration),
-				findConfiguredSiteDomain(context.getConfiguration()).orElse(null));
+				getConfiguredBucket(context.getConfiguration(), localConfiguration), findConfiguredSiteDomain(context.getConfiguration()).orElse(null));
 	}
 
 	/**
-	 * Region, bucket, and alternative buckets constructor. The alternative buckets will be stored as a set.
+	 * Region and bucket constructor.
 	 * @param profile The name of the AWS profile to use for retrieving credentials, or <code>null</code> if the default credential provider should be used.
 	 * @param region The AWS region of deployment.
 	 * @param bucket The bucket into which the site should be deployed.
-	 * @param altBuckets The bucket alternatives, if any, to redirect to the primary bucket.
 	 * @param siteDomain The full-qualified domain name of the site. If specified, it will be used in cases that which a site other than the bucket is to be
 	 *          indicated, such as in redirect hostname, to prevent e.g. a CloudFront distribution redirecting back to the bucket URL.
 	 * @throws IllegalArgumentException if the given site domain is not absolute.
 	 */
-	public S3(@Nullable String profile, @Nonnull final Region region, @Nonnull String bucket, @Nonnull final Collection<String> altBuckets,
-			@Nullable DomainName siteDomain) {
+	public S3(@Nullable String profile, @Nonnull final Region region, @Nonnull String bucket, @Nullable DomainName siteDomain) {
 		this.profile = profile;
 		this.region = requireNonNull(region);
 		this.bucket = requireNonNull(bucket);
-		this.altBuckets = new LinkedHashSet<>(altBuckets); //maintain order to help with reporting and debugging
 		if(siteDomain != null) {
 			siteDomain.checkArgumentAbsolute();
 		}
@@ -279,7 +187,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
 	 * @throws ConfigurationException if the bucket name cannot be determined.
 	 */
-	static String getConfiguredBucket(@Nonnull final Configuration globalConfiguration, @Nonnull final Configuration localConfiguration)
+	protected static String getConfiguredBucket(@Nonnull final Configuration globalConfiguration, @Nonnull final Configuration localConfiguration)
 			throws ConfigurationException {
 		return localConfiguration.findString(CONFIG_KEY_BUCKET)
 				.or(() -> findConfiguredSiteDomain(globalConfiguration).map(DomainName.ROOT::relativize).map(DomainName::toString))
@@ -287,39 +195,17 @@ public class S3 implements DeployTarget, Clogged {
 	}
 
 	/**
-	 * Determines the alternative buckets to use, if any. This method determines the alternative buckets in the following order:
-	 * <ol>
-	 * <li>The key {@link #CONFIG_KEY_ALT_BUCKETS} relative to the S3 configuration.</li>
-	 * <li>The site domain {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} resolved to any project domain, to the domain name root (i.e. with the ending delimiter
-	 * removed), retrieved from the global configuration.</li>
-	 * </ol>
-	 * @implSpec This method calls {@link GuiseMummy#findConfiguredSiteAltDomains(Configuration)}.
-	 * @param globalConfiguration The configuration containing all the configuration values.
-	 * @param localConfiguration The local configuration for S3, which may be a section of the project configuration.
-	 * @return The configured alternative bucket names, if any.
-	 * @see #CONFIG_KEY_ALT_BUCKETS
-	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
-	 */
-	static Collection<String> getConfiguredAltBuckets(@Nonnull final Configuration globalConfiguration, @Nonnull final Configuration localConfiguration) {
-		return localConfiguration.findCollection(CONFIG_KEY_ALT_BUCKETS, String.class)
-				.or(() -> findConfiguredSiteAltDomains(globalConfiguration)
-						.map(altDomains -> altDomains.stream().map(DomainName.ROOT::relativize).map(DomainName::toString).collect(toCollection(LinkedHashSet::new))))
-				.orElse(emptyList());
-	}
-
-	/**
 	 * {@inheritDoc}
-	 * @implSpec This implementation creates and configures the specified buckets as needed.
+	 * @implSpec This implementation creates and configures the specified bucket as needed, calling {@link #setBucketPolicy(String, boolean)}.
 	 */
 	@Override
 	public void prepare(final MummyContext context) throws IOException {
+		getProfile().ifPresent(profile -> getLogger().info("Using AWS S3 credentials profile `{}`.", profile));
+		final S3Client s3Client = getS3Client();
 		try {
-			final S3Client s3Client = getS3Client();
-
-			//prepare bucket
+			//create bucket
 			final String bucket = getBucket();
 			final Region region = getRegion();
-			getProfile().ifPresent(profile -> getLogger().info("Using AWS S3 credentials profile `{}`.", profile));
 			getLogger().info("Preparing AWS S3 bucket `{}` in region `{}` for deployment.", bucket, region);
 			final boolean bucketExists = bucketExists(bucket);
 			getLogger().debug("Bucket `{}` exists? {}.", bucket, bucketExists);
@@ -331,32 +217,31 @@ public class S3 implements DeployTarget, Clogged {
 				s3Client.createBucket(request -> request.bucket(bucket).createBucketConfiguration(config -> config.locationConstraint(region.id())));
 				bucketHasPolicy = false; //the bucket doesn't have a policy yet, as we just created it
 			}
-
 			//set bucket policy
-			if(!bucketHasPolicy) { //if the bucket doesn't already have a policy (leave any existing policy alone)
-				getLogger().info("Setting policy of S3 bucket `{}` to public.", bucket);
-				s3Client.putBucketPolicy(request -> request.bucket(bucket).policy(POLICY_TEMPLATE_PUBLIC_READ_GET_OBJECT.apply(bucket)));
-			}
-
-			//prepare alternative buckets
-			for(final String altBucket : getAltBuckets()) {
-				getLogger().info("Preparing AWS S3 bucket `{}` in region `{}` to serve as an alternative.", altBucket, region);
-				final boolean altBucketExists = bucketExists(altBucket);
-				getLogger().debug("Alternative bucket `{}` exists? {}.", altBucket, altBucketExists);
-				if(!altBucketExists) { //create the bucket if it doesn't exist
-					getLogger().info("Creating S3 alternative bucket `{}` in AWS region `{}`.", altBucket, region);
-					s3Client.createBucket(request -> request.bucket(altBucket).createBucketConfiguration(config -> config.locationConstraint(region.id())));
-				}
-
-			}
+			setBucketPolicy(bucket, bucketHasPolicy); //set the bucket policy if needed
 		} catch(final SdkException sdkException) {
 			throw new IOException(sdkException);
 		}
 	}
 
+	/**
+	 * Sets the policy of a bucket if and as appropriate.
+	 * @implSpec This version does nothing.
+	 * @param bucket The bucket the policy of which to be set.
+	 * @param hasPolicy Whether the bucket already has a policy set.
+	 * @throws IOException if there is an error setting the bucket policy.
+	 */
+	protected void setBucketPolicy(@Nonnull String bucket, final boolean hasPolicy) throws IOException {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation calls {@link #plan(MummyContext, Artifact)}, {@link #put(MummyContext)}, and {@link #prune(MummyContext)}, in that order.
+	 * @return no URL, as a basic S3 deployment does not have a web site configured.
+	 */
 	@Override
 	public Optional<URI> deploy(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact) throws IOException {
-		getLogger().info("Deploying to AWS region `{}` S3 bucket `{}`.", getRegion(), bucket);
+		getLogger().info("Deploying to AWS region `{}` S3 bucket `{}`.", getRegion(), getBucket());
 
 		//#plan
 		plan(context, rootArtifact);
@@ -367,52 +252,7 @@ public class S3 implements DeployTarget, Clogged {
 		//#prune
 		prune(context);
 
-		//configure bucket for web site with appropriate redirects
-		try {
-			getLogger().info("Configuring S3 bucket `{}` for web site access.", bucket);
-			//TODO use some separate configuration access for the "content name"
-			final boolean isNameBare = context.getConfiguration().findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);
-			final String indexDocumentSuffix = isNameBare ? "index" : "index.html"; //TODO get from configuration
-			final IndexDocument indexDocument = IndexDocument.builder().suffix(indexDocumentSuffix).build();
-			final Set<RoutingRule> routingRules = artifactAltKeys.entrySet().stream().map(artifactAltKeyEntry -> {
-				final Artifact artifact = artifactAltKeyEntry.getKey();
-				final String altKey = artifactAltKeyEntry.getValue();
-				final String artifactKey = artifactKeys.get(artifact);
-				checkState(artifactKey != null, "An S3 object key should have been determined for artifact %s during planning.", artifact);
-				final Optional<String> siteHostName = getSiteDomain().map(DomainName.ROOT::relativize).map(DomainName::toString);
-				return RoutingRule.builder().condition(condition -> condition.keyPrefixEquals(altKey)).redirect(redirect -> {
-					//If the artifact (e.g. a directory) can contain other artifacts, we'll replace the entire key prefix
-					//to allow redirects for contained artifacts as well. Otherwise replace the entire key in case an artifact
-					//key matches the prefix of another non-redirected path (not expected to occur frequently in practice).
-					//(This applies to a collection `foo/` redirecting to a non-collection `bar` as well.) 
-					if(artifact instanceof CollectionArtifact) {
-						redirect.replaceKeyPrefixWith(artifactKey);
-					} else {
-						redirect.replaceKeyWith(artifactKey);
-					}
-					//Set the host name if we know the site domain name, to prevent any distribution from redirecting back to the bucket URL.
-					//See https://stackoverflow.com/q/58477877/421049 .
-					siteHostName.ifPresent(redirect::hostName);
-				}).build();
-			}).collect(toCollection(LinkedHashSet::new)); //maintain order to help with debugging
-			final WebsiteConfiguration.Builder websiteConfigurationBuilder = WebsiteConfiguration.builder();
-			websiteConfigurationBuilder.indexDocument(indexDocument);
-			if(!routingRules.isEmpty()) {
-				websiteConfigurationBuilder.routingRules(routingRules.toArray(RoutingRule[]::new));
-			}
-			s3Client.putBucketWebsite(request -> request.bucket(bucket).websiteConfiguration(websiteConfigurationBuilder.build()));
-
-			//configure alternative buckets for web sites
-			for(final String altBucket : getAltBuckets()) {
-				getLogger().info("Configuring S3 alternative bucket `{}` for web site redirection.", altBucket);
-				s3Client.putBucketWebsite(
-						builder -> builder.bucket(altBucket).websiteConfiguration(config -> config.redirectAllRequestsTo(redirect -> redirect.hostName(bucket))));
-			}
-		} catch(final SdkException sdkException) {
-			throw new IOException(sdkException);
-		}
-
-		return Optional.of(getBucketWebsiteUrl(getBucket(), getRegion()));
+		return Optional.empty();
 	}
 
 	/**
@@ -427,37 +267,36 @@ public class S3 implements DeployTarget, Clogged {
 
 	/**
 	 * Plans deployment of a site for an artifact and its comprised artifacts.
+	 * @implSpec For each artifact this method calls {@link #planResource(MummyContext, Artifact, Artifact, URIPath)}.
 	 * @param context The context of static site generation.
 	 * @param rootArtifact The root artifact of the site being deployed.
 	 * @param artifact The current artifact for which deployment is being planned.
 	 * @throws IOException if there is an I/O error during site deployment planning.
 	 */
 	protected void plan(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact, @Nonnull Artifact artifact) throws IOException {
-		try {
-			final URIPath resourceReference = context.relativizeTargetReference(rootArtifact, artifact);
-			final String key = resourceReference.toString();
-			getLogger().debug("Planning deployment for artifact {}, S3 key `{}`.", artifact, key);
-			artifactKeys.put(artifact, key);
-			artifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ALT_LOCATION).filter(CharSequence.class::isInstance).map(Object::toString)
-					.map(URIPath::of).map(altLocationReference -> resolve(artifact.getTargetPath().toUri(), altLocationReference)) //convert to absolute file system URI
-					.map(altLocationUri -> URIPath.relativize(rootArtifact.getTargetPath().toUri(), altLocationUri)) //relativize to the site root
-					.ifPresent(throwingConsumer(altLocationReference -> {
-						if(!altLocationReference.isSubPath()) {
-							throw new IOException(String.format("Artifact for resource %s specifies an alternative location %s which is outside the site boundaries.",
-									resourceReference, altLocationReference));
-						}
-						final String altKey = altLocationReference.toString();
-						getLogger().debug("Planning deployment redirect for artifact {} from S3 key `{}` to S3 key `{}`.", artifact, altKey, key);
-						artifactAltKeys.put(artifact, altKey);
-					}));
-			if(artifact instanceof CompositeArtifact) {
-				for(final Artifact comprisedArtifact : (Iterable<Artifact>)((CompositeArtifact)artifact).comprisedArtifacts()::iterator) {
-					plan(context, rootArtifact, comprisedArtifact);
-				}
+		final URIPath resourceReference = context.relativizeTargetReference(rootArtifact, artifact);
+		planResource(context, rootArtifact, artifact, resourceReference);
+		if(artifact instanceof CompositeArtifact) {
+			for(final Artifact comprisedArtifact : (Iterable<Artifact>)((CompositeArtifact)artifact).comprisedArtifacts()::iterator) {
+				plan(context, rootArtifact, comprisedArtifact);
 			}
-		} catch(final SdkException sdkException) {
-			throw new IOException(sdkException);
 		}
+	}
+
+	/**
+	 * Plans deployment of a single resource.
+	 * @implSpec This version stores an S3 key for the resource in {@link #getArtifactKeys()}.
+	 * @param context The context of static site generation.
+	 * @param rootArtifact The root artifact of the site being deployed.
+	 * @param artifact The current artifact for which deployment is being planned.
+	 * @param resourceReference A URI reference to the resource, relative to the site root.
+	 * @throws IOException if there is an I/O error during site deployment planning.
+	 */
+	protected void planResource(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact, @Nonnull Artifact artifact,
+			@Nonnull final URIPath resourceReference) throws IOException {
+		final String key = resourceReference.toString();
+		getLogger().debug("Planning deployment for artifact {}, S3 key `{}`.", artifact, key);
+		getArtifactKeys().put(artifact, key);
 	}
 
 	/**
@@ -471,7 +310,7 @@ public class S3 implements DeployTarget, Clogged {
 		try {
 			final S3Client s3Client = getS3Client();
 			final String bucket = getBucket();
-			for(final Map.Entry<Artifact, String> artifactKeyEntry : artifactKeys.entrySet()) {
+			for(final Map.Entry<Artifact, String> artifactKeyEntry : getArtifactKeys().entrySet()) {
 				final Artifact artifact = artifactKeyEntry.getKey();
 				if(!(artifact instanceof DirectoryArtifact)) { //don't deploy anything for directories TODO improve semantics, especially after the root artifact type changes; maybe use CollectionArtifact
 					final String key = artifactKeyEntry.getValue();
@@ -499,6 +338,7 @@ public class S3 implements DeployTarget, Clogged {
 		try {
 			final S3Client s3Client = getS3Client();
 			final String bucket = getBucket();
+			final ReverseMap<Artifact, String> artifactKeys = getArtifactKeys();
 			ListObjectsV2Request listObjectsRequest = ListObjectsV2Request.builder().bucket(bucket).build();
 			ListObjectsV2Response listObjectsResponse;
 			do {

@@ -54,14 +54,15 @@ import software.amazon.awssdk.services.cloudfront.model.*;
 
 /**
  * Sets up a <a href="https://aws.amazon.com/cloudfront/">CloudFront</a> distribution for the site.
- * @implSpec This implementation requires an {@link S3} deployment to be specified in the configuration before this deployment. The S3 bucket and aliases (which
- *           may or may not have been originally determined from the site domain and aliases) will be used as the certificate domain name and alternative names,
- *           respectively. If there is an existing certificate indicating the main S3 bucket, it will be used. This implementation does not support multiple
- *           certificates to be specified for the same S3 bucket; all but one must be removed.
+ * @implSpec This implementation requires an {@link S3Website} deployment to be specified in the configuration before this deployment. The S3 website bucket and
+ *           aliases (which may or may not have been originally determined from the site domain and aliases) will be used as the certificate domain name and
+ *           alternative names, respectively. If there is an existing certificate indicating the primary S3 website bucket, it will be used. This implementation
+ *           does not support multiple certificates to be specified for the same S3 website bucket; all but one must be removed.
  * @implSpec To use this implementation one should specify a {@link Dns} in the configuration for requesting certificates and for updating the DNS after the
  *           CloudFront distribution is in place.
  * @implSpec To use this implementation one should specify a {@link Dns} of type {@link Route53} in the configuration in order to create an alias to the
  *           CloudFront distribution.
+ * @see S3Website
  * @author Garret Wilson
  */
 public class CloudFront implements DeployTarget, Clogged {
@@ -150,10 +151,11 @@ public class CloudFront implements DeployTarget, Clogged {
 			final AcmClient acmClient = getAcmClient();
 			final Logger logger = getLogger();
 
-			final S3 s3 = context.getDeployTargets().orElseThrow(IllegalStateException::new).stream().filter(S3.class::isInstance).map(S3.class::cast).findFirst()
+			final S3Website s3Website = context.getDeployTargets().orElseThrow(IllegalStateException::new).stream().filter(S3Website.class::isInstance)
+					.map(S3Website.class::cast).findFirst()
 					.orElseThrow(() -> new ConfigurationException("CloudFront deployement currently requires an S3 target to be configured first."));
-			final String domain = s3.getBucket();
-			final Set<String> aliases = s3.getAltBuckets();
+			final String domain = s3Website.getBucket();
+			final Set<String> aliases = s3Website.getAltBuckets();
 
 			//request a certificate if needed
 			final Set<CertificateSummary> existingCertificateSummaries = getCertificateSummariesByDomainName(acmClient, domain);
@@ -289,7 +291,7 @@ public class CloudFront implements DeployTarget, Clogged {
 					commentBuilder.append("Created by ").append(context.getMummifierIdentification()); //i18n
 					commentBuilder.append(" on ").append(ZonedDateTime.now()); //TODO i18n
 					commentBuilder.append("."); //TODO i18n
-					final String s3BucketWebsiteEndpoint = S3.getBucketWebsiteEndpoint(s3Bucket, s3BucketRegion);
+					final String s3BucketWebsiteEndpoint = S3Website.getBucketWebsiteEndpoint(s3Bucket, s3BucketRegion);
 					final CustomOriginConfig s3BucketOriginConfig = CustomOriginConfig.builder().httpPort(HTTP.DEFAULT_PORT).httpsPort(HTTP.DEFAULT_SECURE_PORT)
 							.originProtocolPolicy(OriginProtocolPolicy.HTTP_ONLY) //S3 buckets as website endpoints only support HTTP
 							.build();
