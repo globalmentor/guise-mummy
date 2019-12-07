@@ -65,7 +65,7 @@ import software.amazon.awssdk.services.cloudfront.model.*;
  * @see S3Website
  * @author Garret Wilson
  */
-public class CloudFront implements DeployTarget, Clogged {
+public class CloudFront implements ContentDeliveryTarget, Clogged {
 
 	/**
 	 * The region to use with ACM to work with CloudFront.
@@ -74,6 +74,19 @@ public class CloudFront implements DeployTarget, Clogged {
 	 * @see <a href="https://aws.amazon.com/certificate-manager/faqs/">AWS Certificate Manager FAQs</a>
 	 */
 	public static final Region ACM_REGION = Region.US_EAST_1;
+
+	/**
+	 * The user agent identification CloudFront uses when retrieving content from the origin.
+	 * @see <a href=
+	 *      "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/RequestAndResponseBehaviorCustomOrigin.html#request-custom-user-agent-header">CloudFront
+	 *      Request and Response Behavior for Custom Origins: User-Agent Header</a>
+	 */
+	public static final String USER_AGENT_IDENTIFICATION = "Amazon CloudFront";
+
+	@Override
+	public Set<String> getUserAgentIdentifications() {
+		return Set.of(USER_AGENT_IDENTIFICATION);
+	}
 
 	private final String profile;
 
@@ -141,6 +154,12 @@ public class CloudFront implements DeployTarget, Clogged {
 	/** The cache time for the DNS record validating a certificate. */
 	public static final long CERTIFICATE_VALIDATION_DNS_TTL = 300L;
 
+	@Override
+	public S3Website getOriginTarget(MummyContext context) throws ConfigurationException {
+		return context.getDeployTargets().orElseThrow(IllegalStateException::new).stream().filter(S3Website.class::isInstance).map(S3Website.class::cast)
+				.findFirst().orElseThrow(() -> new ConfigurationException("CloudFront deployement currently requires an S3 target to be configured first."));
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This implementation requests a public certificate with ACM if one does not already exist.
@@ -151,9 +170,7 @@ public class CloudFront implements DeployTarget, Clogged {
 			final AcmClient acmClient = getAcmClient();
 			final Logger logger = getLogger();
 
-			final S3Website s3Website = context.getDeployTargets().orElseThrow(IllegalStateException::new).stream().filter(S3Website.class::isInstance)
-					.map(S3Website.class::cast).findFirst()
-					.orElseThrow(() -> new ConfigurationException("CloudFront deployement currently requires an S3 target to be configured first."));
+			final S3Website s3Website = getOriginTarget(context);
 			final String domain = s3Website.getBucket();
 			final Set<String> aliases = s3Website.getAltBuckets();
 
