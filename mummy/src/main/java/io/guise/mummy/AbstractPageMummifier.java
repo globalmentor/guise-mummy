@@ -1169,8 +1169,13 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			vocabularyRegistrar.determinePrefixForTerm(tag); //make sure the namespace is registered with a prefix
 		}
 
-		//set the correct RDFa prefix associations in the <head> element
-		headElement.setAttribute(RDFa.ATTRIBUTE_PREFIX, RDFa.toPrefixAttributeValue(vocabularyRegistrar));
+		//set the correct RDFa prefix associations in the <head> element, or remove it if no prefix definitions are required
+		final String prefixAttributeValue = RDFa.toPrefixAttributeValue(vocabularyRegistrar);
+		if(!prefixAttributeValue.isEmpty()) {
+			headElement.setAttributeNS(null, RDFa.ATTRIBUTE_PREFIX, prefixAttributeValue);
+		} else {
+			headElement.removeAttributeNS(null, RDFa.ATTRIBUTE_PREFIX);
+		}
 
 		//set the title separately
 		final URI titleTag = Handle.toTag(PROPERTY_HANDLE_TITLE);
