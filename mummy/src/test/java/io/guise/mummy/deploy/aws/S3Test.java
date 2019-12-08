@@ -33,6 +33,35 @@ import io.guise.mummy.GuiseMummy;
  */
 public class S3Test {
 
+	//# policies
+
+	/*** @see S3#policyConditionRequiringAnyUserAgentOf(Iterable) */
+	@Test
+	public void testPolicyConditionRequiringAnyUserAgentOf() {
+		assertThat(S3.policyConditionRequiringAnyUserAgentOf(List.of()), is("{'StringEquals':{'aws:UserAgent':[]}}".replace('\'', '"')));
+		assertThat(S3.policyConditionRequiringAnyUserAgentOf(List.of("test")), is("{'StringEquals':{'aws:UserAgent':['test']}}".replace('\'', '"')));
+		assertThat(S3.policyConditionRequiringAnyUserAgentOf(List.of("test", "example")),
+				is("{'StringEquals':{'aws:UserAgent':['test','example']}}".replace('\'', '"')));
+		assertThat(S3.policyConditionRequiringAnyUserAgentOf(List.of("test", "example", "foo-bar")),
+				is("{'StringEquals':{'aws:UserAgent':['test','example','foo-bar']}}".replace('\'', '"')));
+	}
+
+	/*** @see S3#policyPublicReadGetForBucket(String) */
+	@Test
+	public void testPolicyPublicReadGetForBucket() {
+		assertThat(S3.policyPublicReadGetForBucket("foo-bar"),
+				is(("{'Version':'2012-10-17','Statement':[{'Sid':'PublicReadGetObject','Effect':'Allow','Principal':'*','Action':['s3:GetObject'],"
+						+ "'Resource':['arn:aws:s3:::foo-bar/*']}]}").replace('\'', '"')));
+	}
+
+	/*** @see S3#policyPublicReadGetForBucketRequiringAnyUserAgentOf(String, Iterable) */
+	@Test
+	public void testPolicyPublicReadGetForBucketRequiringAnyUserAgentOf() {
+		assertThat(S3.policyPublicReadGetForBucketRequiringAnyUserAgentOf("foo-bar", List.of()),
+				is(("{'Version':'2012-10-17','Statement':[{'Sid':'PublicReadGetObject','Effect':'Allow','Principal':'*','Action':['s3:GetObject'],"
+						+ "'Resource':['arn:aws:s3:::foo-bar/*'],'Condition':{'StringEquals':{'aws:UserAgent':[]}}}]}").replace('\'', '"')));
+	}
+
 	//# configuration
 
 	//## `….bucket`

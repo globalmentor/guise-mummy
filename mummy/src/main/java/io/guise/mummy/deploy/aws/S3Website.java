@@ -243,7 +243,7 @@ public class S3Website extends S3 {
 		try {
 			if(!hasPolicy) { //if the bucket doesn't already have a policy (leave any existing policy alone)
 				getLogger().info("Setting policy of S3 bucket `{}` to public.", bucket);
-				getS3Client().putBucketPolicy(request -> request.bucket(bucket).policy(POLICY_TEMPLATE_PUBLIC_READ_GET_OBJECT.apply(bucket)));
+				getS3Client().putBucketPolicy(request -> request.bucket(bucket).policy(policyPublicReadGetForBucket(bucket)));
 			}
 		} catch(final SdkException sdkException) {
 			throw new IOException(sdkException);

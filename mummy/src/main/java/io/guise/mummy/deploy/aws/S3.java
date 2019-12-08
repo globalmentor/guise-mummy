@@ -16,8 +16,12 @@
 
 package io.guise.mummy.deploy.aws;
 
+import static com.globalmentor.java.CharSequences.*;
+import static com.globalmentor.java.Conditions.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static java.util.Objects.*;
+import static java.util.stream.Collectors.*;
+import static java.util.stream.StreamSupport.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -58,23 +62,108 @@ public class S3 implements DeployTarget, Clogged {
 	 */
 	public static final String CONFIG_KEY_BUCKET = "bucket";
 
+	//# policies
+	//TODO rewrite policy code using real JSON serialization
+
+	/** The core content of a policy statement for setting a resource to public read access. No resource or condition is indicated. */
+	protected static final String POLICY_STATEMENT_CONTENT_PUBLIC_READ_GET_OBJECT = //@formatter:off
+			"\"Sid\":\"PublicReadGetObject\"," + 
+			"\"Effect\":\"Allow\"," + 
+			"\"Principal\":\"*\"," + 
+			"\"Action\":[\"s3:GetObject\"],";	//@formatter:on
+
 	/**
 	 * The policy template for setting a bucket to public read access. There is one parameter:
 	 * <ol>
-	 * <li>bucket</li>
+	 * <li>S3 bucket</li>
 	 * </ol>
 	 */
 	protected static final StringTemplate POLICY_TEMPLATE_PUBLIC_READ_GET_OBJECT = StringTemplate.builder().text( //@formatter:off
 			"{" + 
-			"	\"Version\": \"2012-10-17\"," + 
-			"	\"Statement\": [{" + 
-			"		\"Sid\": \"PublicReadGetObject\"," + 
-			"		\"Effect\": \"Allow\"," + 
-			"		\"Principal\": \"*\"," + 
-			"		\"Action\": [\"s3:GetObject\"]," + 
-			"		\"Resource\": [\"arn:aws:s3:::").parameter(StringTemplate.STRING_PARAMETER).text("/*\"]" + 
-			"	}]" + 
+			"\"Version\":\"2012-10-17\"," + 
+			"\"Statement\":[{" + 
+			POLICY_STATEMENT_CONTENT_PUBLIC_READ_GET_OBJECT +
+			"\"Resource\":[\"arn:aws:s3:::").parameter(StringTemplate.STRING_PARAMETER).text("/*\"]" + 
+			"}]" + 
 			"}").build();	//@formatter:on
+
+	/**
+	 * Generates a policy with public read and get access for objects in a bucket.
+	 * @implSpec This method includes {@value #POLICY_STATEMENT_CONTENT_PUBLIC_READ_GET_OBJECT} and adds no whitespace.
+	 * @param bucket The S3 bucket the policy is for.
+	 * @return A policy allowing public read and get access for objects in the indicated bucket.
+	 */
+	public static String policyPublicReadGetForBucket(@Nonnull final String bucket) {
+		return POLICY_TEMPLATE_PUBLIC_READ_GET_OBJECT.apply(bucket);
+	}
+
+	/**
+	 * The policy template for setting a bucket to public read access. There are two parameters:
+	 * <ol>
+	 * <li>S3 bucket</li>
+	 * <li>IAM JSON policy condition value.</li>
+	 * </ol>
+	 * @see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_condition.html">IAM JSON Policy Elements: Condition</a>
+	 * @see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_condition_operators.html">IAM JSON Policy Elements: Condition
+	 *      Operators</a>
+	 * @see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_multi-value-conditions.html">Creating a Condition with Multiple Keys or
+	 *      Values</a>
+	 */
+	protected static final StringTemplate POLICY_TEMPLATE_CONDITIONAL_PUBLIC_READ_GET_OBJECT = StringTemplate.builder().text( //@formatter:off
+			"{" + 
+			"\"Version\":\"2012-10-17\"," + 
+			"\"Statement\":[{" + 
+			POLICY_STATEMENT_CONTENT_PUBLIC_READ_GET_OBJECT +
+			"\"Resource\":[\"arn:aws:s3:::").parameter(StringTemplate.STRING_PARAMETER).text("/*\"]," + 
+			"\"Condition\":").parameter(StringTemplate.STRING_PARAMETER).text("" + 
+			"}]" + 
+			"}").build();	//@formatter:on
+
+	/**
+	 * Generates a policy with public read and get access for objects in a bucket, with a policy condition requiring the <code>aws:UserAgent</code> condition key
+	 * to equal one of the provided user agents.
+	 * @implSpec This method includes {@value #POLICY_STATEMENT_CONTENT_PUBLIC_READ_GET_OBJECT}. The user agents will be serialized as a JSON array in the
+	 *           iteration order of the given iterable. No whitespace will be added.
+	 * @param bucket The S3 bucket the policy is for.
+	 * @param userAgents The user agents, any of which to accept.
+	 * @return A policy allowing public read and get access for objects in the indicated bucket, restricted to the given user agents.
+	 * @see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_condition.html">IAM JSON Policy Elements: Condition</a>
+	 * @see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_condition_operators.html">IAM JSON Policy Elements: Condition
+	 *      Operators</a>
+	 * @see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_multi-value-conditions.html">Creating a Condition with Multiple Keys or
+	 *      Values</a>
+	 * @see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-useragent">AWS Global Condition
+	 *      Context Keys: aws:UserAgent</a>
+	 */
+	public static String policyPublicReadGetForBucketRequiringAnyUserAgentOf(@Nonnull final String bucket, @Nonnull final Iterable<String> userAgents) {
+		return POLICY_TEMPLATE_CONDITIONAL_PUBLIC_READ_GET_OBJECT.apply(bucket, policyConditionRequiringAnyUserAgentOf(userAgents));
+	}
+
+	/**
+	 * The policy condition clause template for setting a bucket to public read access. There is one parameter:
+	 * <ol>
+	 * <li>The values of a JSON array of user agent identification strings (e.g. <code>"foo", "bar"</code>), without the array surrounding brackets.</li>
+	 * </ol>
+	 */
+	protected static final StringTemplate POLICY_HEADER_CONDITION_CLAUSE_TEMPLATE_PUBLIC_READ_GET_OBJECT = StringTemplate.builder()
+			.text("{\"StringEquals\":{\"aws:UserAgent\":[").parameter(StringTemplate.STRING_PARAMETER).text("]}}").build();
+
+	/**
+	 * Generates a policy condition value requiring the <code>aws:UserAgent</code> condition key to equal one of the provided user agents.
+	 * @implSpec The user agents will be serialized as a JSON array in the iteration order of the given iterable. No whitespace will be added.
+	 * @param userAgents The user agents, any of which to accept.
+	 * @return A policy condition value restricting the user agent to one of those specified.
+	 * @see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-useragent">AWS Global Condition
+	 *      Context Keys: aws:UserAgent</a>
+	 * @throws IllegalArgumentException if one of the user agent strings contains the quote <code>'"'</code> character.
+	 */
+	public static String policyConditionRequiringAnyUserAgentOf(@Nonnull final Iterable<String> userAgents) {
+		final String userAgentJsonArrayValues = stream(userAgents.spliterator(), false).map(userAgent -> {
+			checkArgument(!contains(userAgent, '"'), "User agent `%s` cannot contain a quote `\"` character.", userAgent);
+			return userAgent;
+		}).map(userAgent -> "\"" + userAgent + "\"").collect(joining(","));
+		return POLICY_HEADER_CONDITION_CLAUSE_TEMPLATE_PUBLIC_READ_GET_OBJECT.apply(userAgentJsonArrayValues);
+	}
 
 	private final String profile;
 
