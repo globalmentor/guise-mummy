@@ -265,6 +265,8 @@ public class GuiseMummy implements Clogged {
 							target = new CloudFront(context, targetSection);
 						} else if(targetType.equals(S3.class.getSimpleName())) {
 							target = new S3(context, targetSection);
+						} else if(targetType.equals(S3Website.class.getSimpleName())) {
+							target = new S3Website(context, targetSection);
 						} else {
 							throw new ConfigurationException(String.format("Unknown deployment target type: `%s`.", targetType));
 						}

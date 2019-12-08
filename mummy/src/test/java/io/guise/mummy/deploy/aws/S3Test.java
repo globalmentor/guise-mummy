@@ -20,14 +20,12 @@ import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.net.URI;
 import java.util.*;
 
 import org.junit.jupiter.api.*;
 
 import io.confound.config.*;
 import io.guise.mummy.GuiseMummy;
-import software.amazon.awssdk.regions.Region;
 
 /**
  * Tests of {@link S3}.
@@ -35,9 +33,38 @@ import software.amazon.awssdk.regions.Region;
  */
 public class S3Test {
 
+	//# policies
+
+	/*** @see S3#policyConditionRequiringAnyUserAgentOf(Iterable) */
+	@Test
+	public void testPolicyConditionRequiringAnyUserAgentOf() {
+		assertThat(S3.policyConditionRequiringAnyUserAgentOf(List.of()), is("{'StringEquals':{'aws:UserAgent':[]}}".replace('\'', '"')));
+		assertThat(S3.policyConditionRequiringAnyUserAgentOf(List.of("test")), is("{'StringEquals':{'aws:UserAgent':['test']}}".replace('\'', '"')));
+		assertThat(S3.policyConditionRequiringAnyUserAgentOf(List.of("test", "example")),
+				is("{'StringEquals':{'aws:UserAgent':['test','example']}}".replace('\'', '"')));
+		assertThat(S3.policyConditionRequiringAnyUserAgentOf(List.of("test", "example", "foo-bar")),
+				is("{'StringEquals':{'aws:UserAgent':['test','example','foo-bar']}}".replace('\'', '"')));
+	}
+
+	/*** @see S3#policyPublicReadGetForBucket(String) */
+	@Test
+	public void testPolicyPublicReadGetForBucket() {
+		assertThat(S3.policyPublicReadGetForBucket("foo-bar"),
+				is(("{'Version':'2012-10-17','Statement':[{'Sid':'PublicReadGetObject','Effect':'Allow','Principal':'*','Action':['s3:GetObject'],"
+						+ "'Resource':['arn:aws:s3:::foo-bar/*']}]}").replace('\'', '"')));
+	}
+
+	/*** @see S3#policyPublicReadGetForBucketRequiringAnyUserAgentOf(String, Iterable) */
+	@Test
+	public void testPolicyPublicReadGetForBucketRequiringAnyUserAgentOf() {
+		assertThat(S3.policyPublicReadGetForBucketRequiringAnyUserAgentOf("foo-bar", List.of()),
+				is(("{'Version':'2012-10-17','Statement':[{'Sid':'PublicReadGetObject','Effect':'Allow','Principal':'*','Action':['s3:GetObject'],"
+						+ "'Resource':['arn:aws:s3:::foo-bar/*'],'Condition':{'StringEquals':{'aws:UserAgent':[]}}}]}").replace('\'', '"')));
+	}
+
 	//# configuration
 
-	//# `….bucket`
+	//## `….bucket`
 
 	/*** @see S3#getConfiguredBucket(Configuration, Configuration) */
 	@Test
@@ -61,54 +88,6 @@ public class S3Test {
 				GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS, List.of("foo.example.com.", "bar.example.com.")));
 		final Configuration localConfiguration = Configuration.empty();
 		assertThat(S3.getConfiguredBucket(globalConfiguration, localConfiguration), is("test.example.com"));
-	}
-
-	//# `….altBuckets`
-
-	/*** @see S3#getConfiguredAltBuckets(Configuration, Configuration) */
-	@Test
-	public void testGetConfiguredAltBuckets() {
-		final Configuration globalConfiguration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "test.example.com.",
-				GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS, List.of("foo.example.com.", "bar.example.com.")));
-		final Configuration localConfiguration = new ObjectMapConfiguration(Map.of(S3.CONFIG_KEY_ALT_BUCKETS, List.of("foo", "example.net", "bar")));
-		assertThat(S3.getConfiguredAltBuckets(globalConfiguration, localConfiguration), contains("foo", "example.net", "bar"));
-	}
-
-	/*** @see S3#getConfiguredAltBuckets(Configuration, Configuration) */
-	@Test
-	public void testGetConfiguredBucketMissingIsEmptyCollection() {
-		assertThat(S3.getConfiguredAltBuckets(Configuration.empty(), Configuration.empty()), is(empty()));
-	}
-
-	/*** @see S3#getConfiguredAltBuckets(Configuration, Configuration) */
-	@Test
-	public void testGetConfiguredAltBucketsDefaultToSiteAltDomains() {
-		final Configuration globalConfiguration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "test.example.com.",
-				GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS, List.of("foo.example.com.", "bar.example.com.")));
-		final Configuration localConfiguration = Configuration.empty();
-		assertThat(S3.getConfiguredAltBuckets(globalConfiguration, localConfiguration), contains("foo.example.com", "bar.example.com"));
-	}
-
-	/** @see S3#getBucketWebsiteEndpoint(String, Region) */
-	@Test
-	public void testGetBucketWebsiteEndpoint() {
-		assertThat(S3.getBucketWebsiteEndpoint("foobar", Region.US_EAST_1), is("foobar.s3-website-us-east-1.amazonaws.com"));
-		assertThat(S3.getBucketWebsiteEndpoint("foobar", Region.US_EAST_2), is("foobar.s3-website.us-east-2.amazonaws.com"));
-		assertThat(S3.getBucketWebsiteEndpoint("foobar", Region.US_WEST_1), is("foobar.s3-website-us-west-1.amazonaws.com"));
-		assertThat(S3.getBucketWebsiteEndpoint("foobar", Region.US_WEST_2), is("foobar.s3-website-us-west-2.amazonaws.com"));
-		assertThat(S3.getBucketWebsiteEndpoint("foobar", Region.AP_SOUTH_1), is("foobar.s3-website.ap-south-1.amazonaws.com"));
-		assertThat(S3.getBucketWebsiteEndpoint("foobar", Region.SA_EAST_1), is("foobar.s3-website-sa-east-1.amazonaws.com"));
-	}
-
-	/** @see S3#getBucketWebsiteUrl(String, Region) */
-	@Test
-	public void testGetBucketWebsiteUrl() {
-		assertThat(S3.getBucketWebsiteUrl("foobar", Region.US_EAST_1), is(URI.create("http://foobar.s3-website-us-east-1.amazonaws.com/")));
-		assertThat(S3.getBucketWebsiteUrl("foobar", Region.US_EAST_2), is(URI.create("http://foobar.s3-website.us-east-2.amazonaws.com/")));
-		assertThat(S3.getBucketWebsiteUrl("foobar", Region.US_WEST_1), is(URI.create("http://foobar.s3-website-us-west-1.amazonaws.com/")));
-		assertThat(S3.getBucketWebsiteUrl("foobar", Region.US_WEST_2), is(URI.create("http://foobar.s3-website-us-west-2.amazonaws.com/")));
-		assertThat(S3.getBucketWebsiteUrl("foobar", Region.AP_SOUTH_1), is(URI.create("http://foobar.s3-website.ap-south-1.amazonaws.com/")));
-		assertThat(S3.getBucketWebsiteUrl("foobar", Region.SA_EAST_1), is(URI.create("http://foobar.s3-website-sa-east-1.amazonaws.com/")));
 	}
 
 }
