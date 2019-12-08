@@ -285,7 +285,7 @@ public class S3 implements DeployTarget, Clogged {
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This implementation creates and configures the specified bucket as needed, calling {@link #setBucketPolicy(String, boolean)}.
+	 * @implSpec This implementation creates and configures the specified bucket as needed, calling {@link #setBucketPolicy(MummyContext, String, boolean)}.
 	 */
 	@Override
 	public void prepare(final MummyContext context) throws IOException {
@@ -307,7 +307,7 @@ public class S3 implements DeployTarget, Clogged {
 				bucketHasPolicy = false; //the bucket doesn't have a policy yet, as we just created it
 			}
 			//set bucket policy
-			setBucketPolicy(bucket, bucketHasPolicy); //set the bucket policy if needed
+			setBucketPolicy(context, bucket, bucketHasPolicy); //set the bucket policy if needed
 		} catch(final SdkException sdkException) {
 			throw new IOException(sdkException);
 		}
@@ -316,11 +316,12 @@ public class S3 implements DeployTarget, Clogged {
 	/**
 	 * Sets the policy of a bucket if and as appropriate.
 	 * @implSpec This version does nothing.
+	 * @param context The context of static site generation.
 	 * @param bucket The bucket the policy of which to be set.
 	 * @param hasPolicy Whether the bucket already has a policy set.
 	 * @throws IOException if there is an error setting the bucket policy.
 	 */
-	protected void setBucketPolicy(@Nonnull String bucket, final boolean hasPolicy) throws IOException {
+	protected void setBucketPolicy(@Nonnull final MummyContext context, @Nonnull String bucket, final boolean hasPolicy) throws IOException {
 	}
 
 	/**

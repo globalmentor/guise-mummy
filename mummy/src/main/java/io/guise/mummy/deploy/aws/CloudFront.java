@@ -155,7 +155,7 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 	public static final long CERTIFICATE_VALIDATION_DNS_TTL = 300L;
 
 	@Override
-	public S3Website getOriginTarget(MummyContext context) throws ConfigurationException {
+	public S3Website getOriginTarget(final MummyContext context) throws ConfigurationException {
 		return context.getDeployTargets().orElseThrow(IllegalStateException::new).stream().filter(S3Website.class::isInstance).map(S3Website.class::cast)
 				.findFirst().orElseThrow(() -> new ConfigurationException("CloudFront deployement currently requires an S3 target to be configured first."));
 	}

@@ -33,12 +33,15 @@ import java.util.stream.Stream;
 
 import javax.annotation.*;
 
+import org.slf4j.Logger;
+
 import com.globalmentor.collections.*;
 import com.globalmentor.net.*;
 import com.globalmentor.text.StringTemplate;
 
 import io.confound.config.Configuration;
 import io.guise.mummy.*;
+import io.guise.mummy.deploy.ContentDeliveryTarget;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.regions.*;
 import software.amazon.awssdk.services.s3.*;
@@ -235,16 +238,33 @@ public class S3Website extends S3 {
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec If there is no bucket policy, this implementation sets the policy to public; otherwise, no changes are made to an existing bucket policy.
-	 * @see S3#POLICY_TEMPLATE_PUBLIC_READ_GET_OBJECT
+	 * @implSpec This implementation sets the policy to public. If there are any {@link ContentDeliveryTarget} deploy targets that use this target as an origin
+	 *           target, access will be restricted to only those clients which provide one of those user agents.
+	 * @implSpec This implementation sets the bucket policy irrespective of whether a policy already exists.
+	 * @see S3#policyPublicReadGetForBucket(String)
+	 * @see S3#policyPublicReadGetForBucketRequiringAnyUserAgentOf(String, Iterable)
+	 * @see MummyContext#getDeployTargets()
+	 * @see ContentDeliveryTarget#getOriginTarget(MummyContext)
+	 * @see ContentDeliveryTarget#getUserAgentIdentifications()
 	 */
 	@Override
-	protected void setBucketPolicy(final String bucket, final boolean hasPolicy) throws IOException {
+	protected void setBucketPolicy(final MummyContext context, final String bucket, final boolean hasPolicy) throws IOException {
+		final Logger logger = getLogger();
 		try {
-			if(!hasPolicy) { //if the bucket doesn't already have a policy (leave any existing policy alone)
-				getLogger().info("Setting policy of S3 bucket `{}` to public.", bucket);
-				getS3Client().putBucketPolicy(request -> request.bucket(bucket).policy(policyPublicReadGetForBucket(bucket)));
-			}
+			logger.info("Setting policy of S3 bucket `{}` to public.", bucket);
+			final S3Website thisS3Website = this;
+			final Set<String> userAgents = context.getDeployTargets().stream().flatMap(List::stream) //get a stream of deploy targets, if any
+					//only look at deploy targets that are content delivery targets with this S3 website as an origin
+					.filter(ContentDeliveryTarget.class::isInstance).map(ContentDeliveryTarget.class::cast)
+					.filter(target -> target.getOriginTarget(context) == thisS3Website)
+					//collect the possible user agent identifications the content delivery targets will be using, maintaining order to assist in debugging
+					.flatMap(target -> target.getUserAgentIdentifications().stream()).collect(toCollection(LinkedHashSet::new));
+			logger.debug("Found content delivery target user agents: {}.", userAgents);
+			//if the S3 website is serving as the origin for any content delivery targets, restrict the policy to only clients from those targets
+			final String policy = !userAgents.isEmpty() ? policyPublicReadGetForBucketRequiringAnyUserAgentOf(bucket, userAgents)
+					: policyPublicReadGetForBucket(bucket);
+			logger.debug("Using S3 bucket policy: `{}`.", policy);
+			getS3Client().putBucketPolicy(request -> request.bucket(bucket).policy(policy));
 		} catch(final SdkException sdkException) {
 			throw new IOException(sdkException);
 		}
