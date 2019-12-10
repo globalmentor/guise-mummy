@@ -83,44 +83,11 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-			</plugin>
-
-			<plugin>
-				<groupId>com.akathist.maven.plugins.launch4j</groupId>
-				<artifactId>launch4j-maven-plugin</artifactId>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
 				<executions>
 					<execution>
 						<id>copy-bin</id>
-						<!--
-							Copy scripts from src/bin/ to target/bin/ using ~{} delimiters,
-							because ${} classes with script variable replacement.
-						 -->
-						<goals>
-							<goal>resources</goal>
-						</goals>
-						<configuration>
-							<resources>
-								<resource>
-									<directory>${project.basedir}/src/bin</directory>
-									<includes>
-										<include>**/*.bat</include>
-										<include>**/*.sh</include>
-									</includes>
-									<filtering>true</filtering>
-								</resource>
-							</resources>
-							<useDefaultDelimiters>false</useDefaultDelimiters>
-							<delimiters>
-								<delimiter>~{*}</delimiter>
-							</delimiters>
-							<outputDirectory>${project.build.directory}/bin</outputDirectory>
-						</configuration>
+						<phase>process-resources</phase>
 					</execution>
 				</executions>
 			</plugin>
@@ -130,24 +97,34 @@
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>set-scripts-executable</id>
+						<id>set-shell-scripts-executable</id>
 						<phase>process-resources</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<target>
-								<!-- Enable execute permission for the shell scripts. -->
-								<chmod dir="${project.build.directory}/bin" includes="**/*.sh" perm="+x" />
-								<!-- Remove the `.sh` extension from shell scripts. -->
-								<move todir="${project.build.directory}/bin">
-									<fileset dir="${project.build.directory}/bin">
-										<include name="**/*.sh" />
-									</fileset>
-									<mapper type="glob" from="*.sh" to="*" />
-								</move>
-							</target>
-						</configuration>
+					</execution>
+					<execution>
+						<id>remove-shell-script-extensions</id>
+						<phase>process-resources</phase>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-exe-jar</id>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>com.akathist.maven.plugins.launch4j</groupId>
+				<artifactId>launch4j-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-exe</id>
+						<phase>package</phase>
 					</execution>
 				</executions>
 			</plugin>

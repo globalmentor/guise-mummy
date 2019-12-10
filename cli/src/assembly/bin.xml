@@ -13,19 +13,7 @@
 			<outputDirectory>bin</outputDirectory>
 		</fileSet>
 		<fileSet>
-			<directory>${project.build.directory}</directory>
-			<includes>
-				<include>*.exe</include>
-			</includes>
-			<outputDirectory>bin</outputDirectory>
-			<!--
-				Set access permissions to `-rwxrwxr-x` for consistency, because Launch4j uses those
-				permissions when building the executable on Linux.
-			-->
-			<fileMode>0775</fileMode>
-		</fileSet>
-		<fileSet>
-			<directory>${project.build.directory}/bin</directory>
+			<directory>${binOutputDirectory}</directory>
 			<outputDirectory>bin</outputDirectory>
 			<!--
 				Set access permissions to `-rwxrwxr-x`, which corresponds to adding `+x` to a created file.
