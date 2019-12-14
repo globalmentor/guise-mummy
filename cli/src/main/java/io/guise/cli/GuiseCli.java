@@ -131,9 +131,9 @@ public class GuiseCli extends BaseCliApplication {
 		logger.info("Site description target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY));
 	}
 
-	@Command(description = "Validates a Guise project before mummification.")
+	@Command(description = "Validates a Guise project before mummification.", subcommands = {HelpCommand.class})
 	public void validate(
-			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path argProjectDirectory,
+			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
 			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
 			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
@@ -155,9 +155,9 @@ public class GuiseCli extends BaseCliApplication {
 		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.VALIDATE);
 	}
 
-	@Command(description = "Cleans a site by removing the site target directory.")
+	@Command(description = "Cleans a site by removing the site target directory.", subcommands = {HelpCommand.class})
 	public void clean(
-			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path argProjectDirectory,
+			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
 			@Option(names = "--site-target-dir", description = "The target root directory of the site to be removed; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory of the site description to be removed; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
 			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) throws IOException {
@@ -185,9 +185,9 @@ public class GuiseCli extends BaseCliApplication {
 		}
 	}
 
-	@Command(description = "Mummifies a site by generating a static version.")
+	@Command(description = "Mummifies a site by generating a static version.", subcommands = {HelpCommand.class})
 	public void mummify(
-			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path argProjectDirectory,
+			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
 			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
 			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
@@ -209,9 +209,10 @@ public class GuiseCli extends BaseCliApplication {
 		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.MUMMIFY);
 	}
 
-	@Command(name = "prepare-deploy", description = "Prepares to deploys a site after generating a static version, but does not actually deploy the site.")
+	@Command(name = "prepare-deploy", description = "Prepares to deploys a site after generating a static version, but does not actually deploy the site.", subcommands = {
+			HelpCommand.class})
 	public void prepareDeploy(
-			@Parameters(paramLabel = "<project>", description = "The base directory of the project to deploy.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path argProjectDirectory,
+			@Parameters(paramLabel = "<project>", description = "The base directory of the project to deploy.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
 			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
 			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
@@ -233,9 +234,9 @@ public class GuiseCli extends BaseCliApplication {
 		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.PREPARE_DEPLOY);
 	}
 
-	@Command(description = "Deploys a site after generating a static version.")
+	@Command(description = "Deploys a site after generating a static version.", subcommands = {HelpCommand.class})
 	public void deploy(
-			@Parameters(paramLabel = "<project>", description = "The base directory of the project to deploy.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path argProjectDirectory,
+			@Parameters(paramLabel = "<project>", description = "The base directory of the project to deploy.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
 			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
 			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
@@ -270,12 +271,13 @@ public class GuiseCli extends BaseCliApplication {
 	/** The relative path of the server base directory; meant to be used in conjunction with the temporary directory. */
 	private static final Path SERVER_RELATIVE_BASE_DIRECTORY = Paths.get("guise", "mummy", "server"); //TODO use constants
 
-	@Command(description = "Starts a web server for exploring the site in the target directory.")
+	@Command(description = "Starts a web server for exploring the site in the target directory.", subcommands = {HelpCommand.class})
 	public void serve(
-			@Parameters(paramLabel = "<project>", description = "The base directory of the project being served.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path argProjectDirectory,
+			@Parameters(paramLabel = "<project>", description = "The base directory of the project being served.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
 			@Option(names = "--site-target-dir", description = "The target root directory of the site to be served.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory of the description of the site to be served.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
-			@Option(names = {"--port", "-p"}, description = "Specifies the server port.%nDefaults to @|bold " + DEFAULT_SERVER_PORT + "|@.") Integer argPort,
+			@Option(names = {"--port", "-p"}, description = "Specifies the server port.%nDefaults to @|bold ${DEFAULT-VALUE}|@.", defaultValue = ""
+					+ DEFAULT_SERVER_PORT) Integer argPort,
 			@Option(names = {"--browse", "-b"}, description = "Opens a browser to the site after starting the server.") final boolean browse,
 			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) throws IOException, LifecycleException {
 
