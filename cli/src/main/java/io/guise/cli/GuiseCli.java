@@ -137,7 +137,7 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
 			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
-			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
+			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) throws IOException {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
 
@@ -146,18 +146,13 @@ public class GuiseCli extends BaseCliApplication {
 		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 
 		final GuiseMummy mummifier = new GuiseMummy();
-		try {
-			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
-					argSiteDescriptionTargetDirectory);
+		final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
+				argSiteDescriptionTargetDirectory);
 
-			System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Validate...").reset());
-			logProjectInfo(project);
+		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Validate...").reset());
+		logProjectInfo(project);
 
-			mummifier.mummify(project, GuiseMummy.LifeCyclePhase.VALIDATE);
-		} catch(final IllegalArgumentException | ConfigurationException | IOException exception) {
-			getLogger().error("{}", exception.getMessage());
-			getLogger().debug("{}", exception.getMessage(), exception);
-		}
+		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.VALIDATE);
 	}
 
 	@Command(description = "Cleans a site by removing the site target directory.")
@@ -165,7 +160,7 @@ public class GuiseCli extends BaseCliApplication {
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the current working directory.", arity = "0..1") @Nullable Path argProjectDirectory,
 			@Option(names = "--site-target-dir", description = "The target root directory of the site to be removed; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory of the site description to be removed; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
-			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
+			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) throws IOException {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
 
@@ -173,25 +168,20 @@ public class GuiseCli extends BaseCliApplication {
 
 		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 
-		try {
-			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), null, argSiteTargetDirectory, argSiteDescriptionTargetDirectory);
-			final Path siteTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY);
-			final Path siteDescriptionTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY);
+		final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), null, argSiteTargetDirectory, argSiteDescriptionTargetDirectory);
+		final Path siteTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY);
+		final Path siteDescriptionTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY);
 
-			System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Clean...").reset());
-			logProjectInfo(project);
+		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Clean...").reset());
+		logProjectInfo(project);
 
-			if(exists(siteTargetDirectory)) {
-				deleteFileTree(siteTargetDirectory);
+		if(exists(siteTargetDirectory)) {
+			deleteFileTree(siteTargetDirectory);
+		}
+		if(!siteTargetDirectory.equals(siteDescriptionTargetDirectory)) {
+			if(exists(siteDescriptionTargetDirectory)) {
+				deleteFileTree(siteDescriptionTargetDirectory);
 			}
-			if(!siteTargetDirectory.equals(siteDescriptionTargetDirectory)) {
-				if(exists(siteDescriptionTargetDirectory)) {
-					deleteFileTree(siteDescriptionTargetDirectory);
-				}
-			}
-		} catch(final IllegalArgumentException | ConfigurationException | IOException exception) {
-			getLogger().error("{}", exception.getMessage());
-			getLogger().debug("{}", exception.getMessage(), exception);
 		}
 	}
 
@@ -201,7 +191,7 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
 			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
-			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
+			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) throws IOException {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
 
@@ -210,18 +200,13 @@ public class GuiseCli extends BaseCliApplication {
 		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 
 		final GuiseMummy mummifier = new GuiseMummy();
-		try {
-			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
-					argSiteDescriptionTargetDirectory);
+		final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
+				argSiteDescriptionTargetDirectory);
 
-			System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Mummify...").reset());
-			logProjectInfo(project);
+		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Mummify...").reset());
+		logProjectInfo(project);
 
-			mummifier.mummify(project, GuiseMummy.LifeCyclePhase.MUMMIFY);
-		} catch(final IllegalArgumentException | ConfigurationException | IOException exception) {
-			getLogger().error("{}", exception.getMessage());
-			getLogger().debug("{}", exception.getMessage(), exception);
-		}
+		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.MUMMIFY);
 	}
 
 	@Command(name = "prepare-deploy", description = "Prepares to deploys a site after generating a static version, but does not actually deploy the site.")
@@ -230,7 +215,7 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
 			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
-			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
+			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) throws IOException {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
 
@@ -239,19 +224,13 @@ public class GuiseCli extends BaseCliApplication {
 		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 
 		final GuiseMummy mummifier = new GuiseMummy();
-		try {
-			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
-					argSiteDescriptionTargetDirectory);
+		final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
+				argSiteDescriptionTargetDirectory);
 
-			System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Prepare Deploy...").reset());
-			logProjectInfo(project);
+		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Prepare Deploy...").reset());
+		logProjectInfo(project);
 
-			mummifier.mummify(project, GuiseMummy.LifeCyclePhase.PREPARE_DEPLOY);
-		} catch(final IllegalArgumentException | ConfigurationException | IOException exception) {
-			getLogger().error("{}", exception.getMessage());
-			getLogger().debug("{}", exception.getMessage(), exception);
-			return; //TODO improve error handling
-		}
+		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.PREPARE_DEPLOY);
 	}
 
 	@Command(description = "Deploys a site after generating a static version.")
@@ -261,7 +240,7 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
 			@Option(names = {"--browse", "-b"}, description = "Opens a browser to the site after starting the server.") final boolean browse,
-			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
+			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) throws IOException {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
 
@@ -270,35 +249,21 @@ public class GuiseCli extends BaseCliApplication {
 		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 
 		final GuiseMummy mummifier = new GuiseMummy();
-		try {
-			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
-					argSiteDescriptionTargetDirectory);
+		final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
+				argSiteDescriptionTargetDirectory);
 
-			System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Deploy...").reset());
-			logProjectInfo(project);
+		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Deploy...").reset());
+		logProjectInfo(project);
 
-			mummifier.mummify(project, GuiseMummy.LifeCyclePhase.DEPLOY);
-		} catch(final IllegalArgumentException | ConfigurationException | IOException exception) {
-			getLogger().error("{}", exception.getMessage());
-			getLogger().debug("{}", exception.getMessage(), exception);
-			return; //TODO improve error handling
-		}
+		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.DEPLOY);
 
 		//launch the browser using the last deploy URL; see https://stackoverflow.com/a/5226244/421049
 		if(browse && Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-
 			final List<URI> deployUrls = mummifier.getDeployUrls();
 			if(!deployUrls.isEmpty()) {
 				final URI lastDeployUrl = deployUrls.get(deployUrls.size() - 1);
-				try {
-					Desktop.getDesktop().browse(lastDeployUrl);
-				} catch(final IOException exception) {
-					getLogger().error("{}", exception.getMessage());
-					getLogger().debug("{}", exception.getMessage(), exception);
-					return; //TODO improve error handling
-				}
+				Desktop.getDesktop().browse(lastDeployUrl);
 			}
-			;
 		}
 	}
 
@@ -312,7 +277,7 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-description-target-dir", description = "The target root directory of the description of the site to be served.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
 			@Option(names = {"--port", "-p"}, description = "Specifies the server port.%nDefaults to @|bold " + DEFAULT_SERVER_PORT + "|@.") Integer argPort,
 			@Option(names = {"--browse", "-b"}, description = "Opens a browser to the site after starting the server.") final boolean browse,
-			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) {
+			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) throws IOException, LifecycleException {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
 
@@ -324,29 +289,23 @@ public class GuiseCli extends BaseCliApplication {
 		final Path siteDescriptionTargetDirectory;
 		final Path serverBaseDirectory;
 		final int port;
-		try {
-			final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), null, argSiteTargetDirectory, argSiteDescriptionTargetDirectory);
-			siteTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY);
-			siteDescriptionTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY);
+		final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), null, argSiteTargetDirectory, argSiteDescriptionTargetDirectory);
+		siteTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY);
+		siteDescriptionTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY);
 
-			//As per the servlet specification, Tomcat requires a base directory, but currently puts nothing inside it except for a `work` directory.
-			//This implementation therefore uses a common server directory location relative to the system temporary directory.
-			//In the future if Guise takes advantage of more server functionality and the server needs to store things,
-			//perhaps by default a subdirectory within the temp folder could be made to parallel that of the project.
-			serverBaseDirectory = getTempDirectory().resolve(SERVER_RELATIVE_BASE_DIRECTORY);
-			port = argPort != null ? argPort : project.getConfiguration().findInt(CONFIG_KEY_SERVER_PORT).orElse(DEFAULT_SERVER_PORT);
+		//As per the servlet specification, Tomcat requires a base directory, but currently puts nothing inside it except for a `work` directory.
+		//This implementation therefore uses a common server directory location relative to the system temporary directory.
+		//In the future if Guise takes advantage of more server functionality and the server needs to store things,
+		//perhaps by default a subdirectory within the temp folder could be made to parallel that of the project.
+		serverBaseDirectory = getTempDirectory().resolve(SERVER_RELATIVE_BASE_DIRECTORY);
+		port = argPort != null ? argPort : project.getConfiguration().findInt(CONFIG_KEY_SERVER_PORT).orElse(DEFAULT_SERVER_PORT);
 
-			checkArgument(isDirectory(siteTargetDirectory), "Site target directory %s does not exist.", siteTargetDirectory); //TODO improve error handling; see https://github.com/remkop/picocli/issues/672
+		checkArgument(isDirectory(siteTargetDirectory), "Site target directory %s does not exist.", siteTargetDirectory); //TODO improve error handling; see https://github.com/remkop/picocli/issues/672
 
-			System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Serve...").reset());
-			logProjectInfo(project);
-			getLogger().info("Server base directory: {}", serverBaseDirectory);
-			getLogger().info("Server port: {}", port);
-		} catch(final IllegalArgumentException | ConfigurationException | IOException exception) {
-			getLogger().error("{}", exception.getMessage());
-			getLogger().debug("{}", exception.getMessage(), exception);
-			return; //TODO improve error handling
-		}
+		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Serve...").reset());
+		logProjectInfo(project);
+		getLogger().info("Server base directory: {}", serverBaseDirectory);
+		getLogger().info("Server port: {}", port);
 
 		final Tomcat tomcat = new Tomcat();
 		tomcat.setPort(port);
@@ -375,26 +334,14 @@ public class GuiseCli extends BaseCliApplication {
 		context.addWelcomeFile("index.html"); //TODO get from configuration, as with `mummify` command
 		context.addWelcomeFile("index"); //TODO get from configuration, as with `mummify` command
 
-		try {
-			tomcat.start(); //start the server
-		} catch(final LifecycleException lifecycleException) {
-			getLogger().error("{}", lifecycleException.getMessage());
-			getLogger().debug("{}", lifecycleException.getMessage(), lifecycleException);
-			return; //TODO improve error handling
-		}
+		tomcat.start(); //start the server
 
 		final URI siteLocalUrl = URIs.createURI(HTTP_URI_SCHEME, null, Host.LOCALHOST.getName(), port, ROOT_PATH, null, null);
 		getLogger().info("Serving site at {}.", "<" + siteLocalUrl + ">");
 
 		//launch the browser; see https://stackoverflow.com/a/5226244/421049
 		if(browse && Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-			try {
-				Desktop.getDesktop().browse(siteLocalUrl);
-			} catch(final IOException exception) {
-				getLogger().error("{}", exception.getMessage());
-				getLogger().debug("{}", exception.getMessage(), exception);
-				return; //TODO improve error handling
-			}
+			Desktop.getDesktop().browse(siteLocalUrl);
 		}
 
 		tomcat.getServer().await();
