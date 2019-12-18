@@ -19,6 +19,7 @@ package io.guise.mummy;
 import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Paths.*;
+import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.lex.CompoundTokenization.*;
@@ -30,7 +31,6 @@ import static io.urf.vocab.content.Content.*;
 import static java.lang.System.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
-import static java.util.Objects.*;
 import static java.util.function.Predicate.*;
 import static org.zalando.fauxpas.FauxPas.*;
 
@@ -165,45 +165,69 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	}
 
 	/**
-	 * Converts a property name to a property tag URI.
+	 * Converts a metadata element to zero, or more property tag URI and value associations.
 	 * <ul>
-	 * <li>If the property name is an RDFa <a href="https://www.w3.org/TR/rdfa-core/#s_curies">CURIE</a> such as the Open Graph <code>og:title</code> or even the
-	 * Guise Mummy <code>mummy:order</code>, the CURIE is combined with its prefix by searching the hierarchy of the given element. The CURIE reference is
-	 * converted from <code>kebab-case</code> to <code>camelCase</code>.</li>
-	 * <li>Otherwise the meta name itself is used as a property handle, after converting from <code>kebab-case</code> to <code>camelCase</code>.</li>
+	 * <li>Property names in both the {@value HTML#ATTRIBUTE_NAME} and {@value RDFa#ATTRIBUTE_PROPERTY} attributes are recognized. Multiple property names are
+	 * supported in the {@value RDFa#ATTRIBUTE_PROPERTY} attribute.</li>
+	 * <li>If a property name is detected but no {@value HTML#ELEMENT_META_ATTRIBUTE_CONTENT} attribute is present, the empty string is used for the value as per
+	 * <a href="https://www.w3.org/TR/html52/document-metadata.html#the-meta-element">HTML 5.2 § 4.2.5. The meta element</a>.
+	 * <li>If the property name(s) in the {@value RDFa#ATTRIBUTE_PROPERTY} is an RDFa <a href="https://www.w3.org/TR/rdfa-core/#s_curies">CURIE</a> such as the
+	 * Open Graph <code>og:title</code> or even the Guise Mummy <code>mummy:order</code>, the CURIE is combined with its prefix by searching the hierarchy of the
+	 * given element. The CURIE reference is converted from <code>kebab-case</code> to <code>camelCase</code>. Otherwise the meta name itself is used as a
+	 * property handle, after converting from <code>kebab-case</code> to <code>camelCase</code>.</li>
+	 * <li>A property names in the {@value HTML#ATTRIBUTE_NAME} attribute is interpreted as a single non-prefixed name in the {@value RDFa#ATTRIBUTE_PROPERTY}
+	 * attribute.
 	 * </ul>
 	 * @implSpec The current implementation only finds prefixes if they are stored in <code>xmlns:</code> XML namespace prefix declarations, not in HTML5
 	 *           <code>prefix</code> attributes.
-	 * @implSpec This also recognizes all namespace prefixes included in {@link #PREDEFINED_VOCABULARIES} if they are not otherwise defined in the document.
-	 * @param contextElement The context element that indicates the hierarchy for retrieving CURIE prefixes.
-	 * @param metaName The name of a metadata property name, normally retrieved from HTML {@code <meta>} elements.
-	 * @return The URI to be used as an URF property tag.
+	 * @implSpec This implementation also recognizes all namespace prefixes included in {@link #PREDEFINED_VOCABULARIES} if they are not otherwise defined in the
+	 *           document.
+	 * @implSpec This implementation does not yet support a {@value RDFa#ATTRIBUTE_PROPERTY} attribute containing one or more absolute IRIs.
+	 * @param metaElement The {@code <meta>} element potentially representing a property.
+	 * @return A potentially empty stream of property tag IRIs paired with values representing properties.
 	 * @throws IllegalArgumentException if the property name is a CURIE but no prefix has been defined in the element hierarchy.
 	 * @throws IllegalArgumentException if the property name is a CURIE but combined with the IRI leading segment does not result in a valid IRI.
 	 * @throws IllegalArgumentException if the given property name is empty.
 	 * @throws IllegalArgumentException if the given property name cannot be converted to <code>cameCase</code>, e.g. it has successive <code>'-'</code>
 	 *           characters.
+	 * @see <a href="https://www.w3.org/TR/rdfa-core/">RDFa Core 1.1</a>
+	 * @see <a href="https://www.w3.org/TR/rdfa-core/#s_syntax">RDFa Core 1.1, § 5. Attributes and Syntax</a>
+	 * @see <a href="https://www.w3.org/TR/html-rdfa/#extensions-to-the-html5-syntax">HTML+RDFa 1.1, § 4. Extensions to the HTML5 Syntax.</a>
 	 * @see <a href="https://www.w3.org/TR/rdfa-core/#s_curies">RDFa Core 1.1 - Third Edition § 6. CURIE Syntax Definition</a>.
 	 * @see <a href="https://ogp.me/">The Open Graph protocol</a>
 	 * @see Curie
 	 */
-	protected static URI htmlMetaNameToPropertyTag(@Nonnull final Element contextElement, @Nonnull final String metaName) {
-		requireNonNull(contextElement);
-		checkArgument(!metaName.isEmpty(), "Property name may not be empty.");
-		final Curie curie = Curie.parse(metaName).mapReference(KEBAB_CASE::toCamelCase);
-		final String reference = curie.getReference();
-		return curie.getPrefix().map(prefix -> {
-			String leadingSegment = null;
-			Node currentNode = contextElement;
-			do {
-				leadingSegment = findAttributeNS((Element)currentNode, XML.XMLNS_NAMESPACE_URI_STRING, prefix).orElse(null);
-			} while(leadingSegment == null && (currentNode = currentNode.getParentNode()) instanceof Element); //keep looking while we need to and while there are still parent elements
-			if(leadingSegment == null) { //see if we have a predefined vocabulary for the prefix
-				leadingSegment = PREDEFINED_VOCABULARIES.findVocabularyByPrefix(prefix).map(URI::toString).orElse(null);
-			}
-			checkArgument(leadingSegment != null, "No IRI leading segment defined for prefix %s of property %s.", prefix, metaName);
-			return VocabularyTerm.toURI(URI.create(leadingSegment), reference);
-		}).orElseGet(() -> Handle.toTag(curie.getReference()));
+	protected static Stream<Map.Entry<URI, Object>> htmlMetaElementToProperties(@Nonnull final Element metaElement) {
+		final Optional<URI> tagFromNameAttribute = findAttributeNS(metaElement, null, ELEMENT_META_ATTRIBUTE_NAME).map(name -> {
+			checkArgument(!name.isEmpty(), "`<meta>` element `name` attribute must not be the empty string.");
+			checkArgument(!contains(name, Curie.PREFIX_DELIMITER),
+					"Property prefix not allowed `<meta>` element `name` attribute `%s`; consider using `property` attribute instead.", name);
+			return Handle.toTag(KEBAB_CASE.toCamelCase(name));
+		});
+		final Stream<URI> tagsFromPropertyAttribute = findAttributeNS(metaElement, null, RDFa.ATTRIBUTE_PROPERTY).stream().flatMap(properties -> {
+			final List<String> tokens = RDFa.WHITESPACE_CHARACTERS.split(properties);
+			checkArgument(!tokens.isEmpty(), "`<meta>` element `property` attribute must contain at least one property.");
+			return tokens.stream().map(property -> {
+				final Curie curie = Curie.parse(property).mapReference(KEBAB_CASE::toCamelCase);
+				final String reference = curie.getReference();
+				return curie.getPrefix().map(prefix -> {
+					String leadingSegment = null;
+					Node currentNode = metaElement;
+					do {
+						leadingSegment = findAttributeNS((Element)currentNode, XML.XMLNS_NAMESPACE_URI_STRING, prefix).orElse(null);
+					} while(leadingSegment == null && (currentNode = currentNode.getParentNode()) instanceof Element); //keep looking while we need to and while there are still parent elements
+					if(leadingSegment == null) { //see if we have a predefined vocabulary for the prefix
+						leadingSegment = PREDEFINED_VOCABULARIES.findVocabularyByPrefix(prefix).map(URI::toString).orElse(null);
+					}
+					checkArgument(leadingSegment != null, "No IRI leading segment defined for prefix `%s` of property `%s`.", prefix, property);
+					return VocabularyTerm.toURI(URI.create(leadingSegment), reference);
+				}).orElseGet(() -> Handle.toTag(curie.getReference()));
+			});
+		});
+		//TODO add support for Microdata `itemprop`; see https://www.w3.org/TR/microdata/#names:-the-itemprop-attribute
+		//if no content attribute, the value is the empty string as per _HTML 5.2 § 4.2.5. The meta element_
+		final String value = findAttributeNS(metaElement, null, ELEMENT_META_ATTRIBUTE_CONTENT).orElse("");
+		return Stream.concat(tagFromNameAttribute.stream(), tagsFromPropertyAttribute).map(tag -> Map.entry(tag, value));
 	}
 
 	/**
@@ -280,7 +304,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	/**
 	 * Extracts metadata stored in the source document itself.
 	 * @implSpec The XHTML document {@code <head><title>} will be returned as metadata, using {@value Artifact#PROPERTY_HANDLE_TITLE} as a handle; followed by
-	 *           values in any {@code <head><meta>} elements, converted using {@link #htmlMetaNameToPropertyTag(Element, String)}.
+	 *           values in any {@code <head><meta>} elements, converted using {@link #htmlMetaElementToProperties(Element)}.
 	 * @param context The context of static site generation.
 	 * @param sourceDocument The source XHTML document being mummified, from which metadata should be extracted.
 	 * @return Metadata stored in the source document being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate
@@ -293,8 +317,8 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		return Stream.concat(
 				//<title>; will override any <code>title</code> metadata property in this same document
 				findTitle(sourceDocument).stream().map(title -> Map.entry(Handle.toTag(PROPERTY_HANDLE_TITLE), title)),
-				//<meta> TODO detect and add warnings for invalid properties  
-				namedMetadata(sourceDocument, AbstractPageMummifier::htmlMetaNameToPropertyTag, (element, value) -> value));
+				//<meta> TODO detect and add warnings for invalid properties
+				htmlHeadMetaElements(sourceDocument).flatMap(AbstractPageMummifier::htmlMetaElementToProperties));
 		//TODO consider parsing out "keywords" in to multiple keyword+ properties for convenience
 	}
 
