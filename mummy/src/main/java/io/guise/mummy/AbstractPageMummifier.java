@@ -20,7 +20,6 @@ import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.CharSequences.*;
-import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.lex.CompoundTokenization.*;
 import static com.globalmentor.util.Optionals.*;
@@ -28,7 +27,6 @@ import static com.globalmentor.xml.XmlDom.*;
 import static io.guise.mummy.Artifact.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static io.urf.vocab.content.Content.*;
-import static java.lang.System.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.function.Predicate.*;
@@ -385,13 +383,13 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 	/**
 	 * Normalizes a document element, removing any named metadata (that is, {@value HTML#ELEMENT_META} elements with a {@value HTML#ELEMENT_META_ATTRIBUTE_NAME}
-	 * attribute).
+	 * or a {@value RDFa#ATTRIBUTE_PROPERTY} attribute).
 	 * <p>
 	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
 	 * element is removed.
 	 * </p>
-	 * @implSpec This implementation marks for removal any {@value HTML#ELEMENT_META} elements with a {@value HTML#ELEMENT_META_ATTRIBUTE_NAME} attribute. It also
-	 *           removes all {@link RDFa#ATTRIBUTE_PREFIX} attributes.
+	 * @implSpec This implementation marks for removal any {@value HTML#ELEMENT_META} elements with a {@value HTML#ELEMENT_META_ATTRIBUTE_NAME} or a
+	 *           {@value RDFa#ATTRIBUTE_PROPERTY} attribute. It also removes all {@link RDFa#ATTRIBUTE_PREFIX} attributes.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
@@ -405,7 +403,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 		//remove the element itself if it is named metadata
 		if(HTML.XHTML_NAMESPACE_URI_STRING.equals(element.getNamespaceURI()) && ELEMENT_META.equals(element.getLocalName())
-				&& element.hasAttribute(ELEMENT_META_ATTRIBUTE_NAME)) { //<<meta name="…">
+				&& (element.hasAttributeNS(null, ELEMENT_META_ATTRIBUTE_NAME) || element.hasAttributeNS(null, RDFa.ATTRIBUTE_PROPERTY))) { //`<meta name="…">` or `<meta property="…">`
 			return emptyList();
 		}
 
@@ -828,7 +826,6 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 						appendText(removeChildren(aElement), navigationArtifact.determineLabel());
 					});
 					navigationListElement.appendChild(liElement);
-					appendText(navigationListElement, System.lineSeparator()); //TODO remove when HTML formatting is fixed
 				});
 
 		return List.of(navigationListElement);
@@ -1147,7 +1144,14 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * <ul>
 	 * <li>Creates the {@code <html><head>} and {@code <html><head><title>} structure if necessary.</li>
 	 * <li>Sets the title if one is present in the metadata.</li>
-	 * <li>Creates appropriate metadata elements.</li>
+	 * <li>Creates appropriate metadata elements.
+	 * <ul>
+	 * <li>If the property is in the "default" URF ad-hoc namespace {@link URF#AD_HOC_NAMESPACE}, the property is stored as
+	 * {@code <html><head><meta name="foo" content="bar"/>}.
+	 * <li>If the property is in some other namespace, requiring a CURIE with a prefix, the property is stored as
+	 * {@code <html><head><meta property="eg:foo" content="bar"/>}.</li>
+	 * </ul>
+	 * </li>
 	 * </ul>
 	 * <p>
 	 * Metadata in the Guise Mummy namespace {@link GuiseMummy#NAMESPACE} and other internal namespaces are skipped.
@@ -1203,7 +1207,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		final URI titleTag = Handle.toTag(PROPERTY_HANDLE_TITLE);
 		description.findPropertyValue(titleTag).map(Object::toString).ifPresent(title -> setText(titleElement, title));
 
-		//set the other properties as <meta> elements
+		//set the other properties as `<meta>` elements, using either the `name` or `property` attribute depending on namespace
 		for(final Map.Entry<URI, Object> property : description.getProperties()) {
 			final URI tag = property.getKey();
 			if(tag.equals(titleTag)) { //skip the title property; we already set it as the <title>
@@ -1213,13 +1217,16 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 				continue;
 			}
 			final Object value = property.getValue();
-			final Curie curie;
 			try { //convert the property to a kebab-case CURIE 
-				curie = vocabularyRegistrar.determineCurieForTerm(tag).orElseThrow(IllegalArgumentException::new).mapReference(CAMEL_CASE::toKebabCase);
+				final Curie curie = vocabularyRegistrar.determineCurieForTerm(tag).orElseThrow(IllegalArgumentException::new).mapReference(CAMEL_CASE::toKebabCase);
 				getLogger().debug("({}) Ascribing metadata: `{}`=`{}` ", artifact.getTargetPath(), curie, value);
-				appendText(headElement, CHARACTER_TABULATION_CHAR); //\t	//TODO remove formatting when HTML formatter is improved
-				addNamedMetadata(headElement, curie.toString(), value.toString());
-				appendText(headElement, lineSeparator()); //\n
+				if(curie.getPrefix().isPresent()) { //use the `property` attribute for a CURIE with a prefix
+					final Element metaElement = addLast(headElement, headElement.getOwnerDocument().createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_META));
+					metaElement.setAttributeNS(null, RDFa.ATTRIBUTE_PROPERTY, curie.toString()); //TODO create RDFa utility
+					metaElement.setAttributeNS(null, ELEMENT_META_ATTRIBUTE_CONTENT, value.toString());
+				} else { //a non-prefixed CURIE is written to a normal `<meta>` `name` attribute
+					addNamedMetadata(headElement, curie.toString(), value.toString());
+				}
 			} catch(final IllegalArgumentException illegalArgumentException) {
 				getLogger().warn("Cannot determine CURIE for metadata tag `{}` with value `{}`.", tag, value);
 			}
