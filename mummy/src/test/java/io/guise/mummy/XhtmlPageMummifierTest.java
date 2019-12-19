@@ -17,7 +17,6 @@
 package io.guise.mummy;
 
 import static com.globalmentor.java.OperatingSystem.*;
-import static java.util.stream.Collectors.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
@@ -86,14 +85,14 @@ public class XhtmlPageMummifierTest {
 	}
 
 	/**
-	 * @see XhtmlPageMummifier#sourceMetadata(MummyContext, InputStream, String)
+	 * @see XhtmlPageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
 	 * @see #SIMPLE_METADATA_XHTML_RESOURCE_NAME
 	 */
 	@Test
 	public void testSimpleXhtmlMetadata() throws IOException {
 		final XhtmlPageMummifier mummifier = new XhtmlPageMummifier();
 		try (final InputStream inputStream = getClass().getResourceAsStream(SIMPLE_METADATA_XHTML_RESOURCE_NAME)) {
-			assertThat(mummifier.sourceMetadata(mummyContext, inputStream, SIMPLE_METADATA_XHTML_RESOURCE_NAME).collect(toList()),
+			assertThat(mummifier.loadSourceMetadata(mummyContext, inputStream, SIMPLE_METADATA_XHTML_RESOURCE_NAME),
 					containsInAnyOrder(Map.entry(Handle.toTag("title"), "Simple Page with Other Metadata"), Map.entry(Handle.toTag("label"), "Simplicity"),
 							Map.entry(Handle.toTag("fooBar"), "This is a test."),
 							//property defined in `property` attribute with namespace declared on ancestor node

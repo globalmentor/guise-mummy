@@ -220,14 +220,14 @@ public class MarkdownPageMummifierTest {
 	}
 
 	/**
-	 * @see MarkdownPageMummifier#sourceMetadata(MummyContext, InputStream, String)
+	 * @see MarkdownPageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
 	 * @see #SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME
 	 */
 	@Test
 	public void testSimpleMarkdownMetadata() throws IOException {
 		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
 		try (final InputStream inputStream = getClass().getResourceAsStream(SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME)) {
-			assertThat(mummifier.sourceMetadata(mummyContext, inputStream, SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME).collect(toList()),
+			assertThat(mummifier.loadSourceMetadata(mummyContext, inputStream, SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME),
 					containsInAnyOrder(Map.entry(Handle.toTag("title"), "Simple Page with Other Metadata"), Map.entry(Handle.toTag("label"), "Simplicity"),
 							Map.entry(Handle.toTag("fooBar"), "This is a test."),
 							//Guise Mummy namespace with integer value

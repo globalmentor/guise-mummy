@@ -32,6 +32,7 @@ import static java.lang.System.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.function.Predicate.*;
+import static java.util.stream.Collectors.toList;
 import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.*;
@@ -178,6 +179,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * <li>A property names in the {@value HTML#ATTRIBUTE_NAME} attribute is interpreted as a single non-prefixed name in the {@value RDFa#ATTRIBUTE_PROPERTY}
 	 * attribute.
 	 * </ul>
+	 * @apiNote The indicated exceptions can also be thrown during iteration of the stream.
 	 * @implSpec The current implementation only finds prefixes if they are stored in <code>xmlns:</code> XML namespace prefix declarations, not in HTML5
 	 *           <code>prefix</code> attributes.
 	 * @implSpec This implementation also recognizes all namespace prefixes included in {@link #PREDEFINED_VOCABULARIES} if they are not otherwise defined in the
@@ -233,7 +235,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	/**
 	 * Determines the description for the given artifact based upon its source file and related files.
 	 * @implSpec This default implementation loads description from metadata in the XHTML document obtained by calling
-	 *           {@link #sourceMetadata(MummyContext, Path)}.
+	 *           {@link #loadSourceMetadata(MummyContext, Path)}.
 	 * @param context The context of static site generation.
 	 * @param sourceFile The source file to be mummified.
 	 * @return A description of the resource being mummified.
@@ -243,17 +245,13 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		final UrfObject description = new UrfObject();
 
 		//load source metadata
-		try {
-			sourceMetadata(context, sourceFile).forEach(meta -> {
-				final URI propertyTag = meta.getKey();
-				final Object propertyValue = meta.getValue();
-				if(!description.hasPropertyValue(propertyTag)) { //the first property wins
-					description.setPropertyValue(propertyTag, propertyValue);
-				}
-			});
-		} catch(final IllegalArgumentException illegalArgumentException) { //TODO include the filename and context
-			throw new IOException(illegalArgumentException);
-		}
+		loadSourceMetadata(context, sourceFile).forEach(meta -> {
+			final URI propertyTag = meta.getKey();
+			final Object propertyValue = meta.getValue();
+			if(!description.hasPropertyValue(propertyTag)) { //the first property wins
+				description.setPropertyValue(propertyTag, propertyValue);
+			}
+		});
 
 		//TODO load any description sidecar
 
@@ -267,37 +265,37 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * Loads metadata stored in the source file itself.
 	 * @apiNote This method ignores any metadata stored in related files such as sidecar files.
 	 * @implSpec The default implementation opens an input stream to the given file and then extract the source metadata by calling
-	 *           {@link #sourceMetadata(MummyContext, InputStream, String)}.
+	 *           {@link #loadSourceMetadata(MummyContext, InputStream, String)}.
 	 * @param context The context of static site generation.
 	 * @param sourceFile The source file to be mummified.
 	 * @return Metadata stored in the source file being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate names.
 	 * @throws IOException if there is an I/O error retrieving the metadata.
 	 */
-	protected Stream<Map.Entry<URI, Object>> sourceMetadata(@Nonnull MummyContext context, @Nonnull final Path sourceFile) throws IOException {
+	protected List<Map.Entry<URI, Object>> loadSourceMetadata(@Nonnull MummyContext context, @Nonnull final Path sourceFile) throws IOException {
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile))) {
 			final Path filename = sourceFile.getFileName();
-			return sourceMetadata(context, inputStream, filename != null ? filename.toString() : null);
+			return loadSourceMetadata(context, inputStream, filename != null ? filename.toString() : null);
 		}
 	}
 
 	/**
 	 * Loads metadata stored in the source file itself.
 	 * @implSpec This implementation loads description from metadata in the XHTML document obtained by calling
-	 *           {@link #loadSourceDocument(MummyContext, InputStream, String)} and then calls {@link #sourceMetadata(MummyContext, Document)} to extract the
+	 *           {@link #loadSourceDocument(MummyContext, InputStream, String)} and then calls {@link #extractMetadata(MummyContext, Document)} to extract the
 	 *           metadata.
 	 * @param context The context of static site generation.
 	 * @param inputStream The input stream from which to to load the source metadata.
 	 * @param name The optional name of the source, such as a filename, which may be missing or empty.
 	 * @return Metadata stored in the source file being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate names.
-	 * @throws IOException if there is an I/O error retrieving the metadata.
+	 * @throws IOException if there is an I/O error retrieving the metadata, including incorrectly formatted metadata.
 	 */
-	protected Stream<Map.Entry<URI, Object>> sourceMetadata(@Nonnull MummyContext context, @Nonnull InputStream inputStream, @Nullable final String name)
+	protected List<Map.Entry<URI, Object>> loadSourceMetadata(@Nonnull MummyContext context, @Nonnull InputStream inputStream, @Nullable final String name)
 			throws IOException {
 		final Document sourceDocument = loadSourceDocument(context, inputStream, name);
 		try {
-			return sourceMetadata(context, sourceDocument);
-		} catch(final IllegalArgumentException | DOMException exception) { //TODO indicate the file and context
-			throw new IOException(exception);
+			return extractMetadata(context, sourceDocument);
+		} catch(final IllegalArgumentException | DOMException exception) {
+			throw new IOException(String.format("Error processing metadata in `%s`: %s", name != null ? name : "(unknown)", exception.getMessage()), exception); //TODO i18n
 		}
 	}
 
@@ -312,13 +310,13 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @throws IllegalArgumentException if any of the metadata is invalid.
 	 * @throws DOMException if there is a problem retrieving metadata.
 	 */
-	protected Stream<Map.Entry<URI, Object>> sourceMetadata(@Nonnull MummyContext context, @Nonnull final Document sourceDocument) throws DOMException {
+	protected List<Map.Entry<URI, Object>> extractMetadata(@Nonnull MummyContext context, @Nonnull final Document sourceDocument) throws DOMException {
 		//TODO consider parsing out "keywords" in to multiple keyword+ properties for convenience
-		return Stream.concat(
+		return Stream.<Map.Entry<URI, Object>>concat(
 				//<title>; will override any <code>title</code> metadata property in this same document
 				findTitle(sourceDocument).stream().map(title -> Map.entry(Handle.toTag(PROPERTY_HANDLE_TITLE), title)),
 				//<meta> TODO detect and add warnings for invalid properties
-				htmlHeadMetaElements(sourceDocument).flatMap(AbstractPageMummifier::htmlMetaElementToProperties));
+				htmlHeadMetaElements(sourceDocument).flatMap(AbstractPageMummifier::htmlMetaElementToProperties)).collect(toList());
 		//TODO consider parsing out "keywords" in to multiple keyword+ properties for convenience
 	}
 
