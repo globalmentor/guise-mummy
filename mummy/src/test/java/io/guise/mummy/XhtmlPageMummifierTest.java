@@ -17,7 +17,6 @@
 package io.guise.mummy;
 
 import static com.globalmentor.java.OperatingSystem.*;
-import static java.util.stream.Collectors.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
@@ -86,20 +85,26 @@ public class XhtmlPageMummifierTest {
 	}
 
 	/**
-	 * @see XhtmlPageMummifier#sourceMetadata(MummyContext, InputStream, String)
+	 * @see XhtmlPageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
 	 * @see #SIMPLE_METADATA_XHTML_RESOURCE_NAME
 	 */
 	@Test
 	public void testSimpleXhtmlMetadata() throws IOException {
 		final XhtmlPageMummifier mummifier = new XhtmlPageMummifier();
 		try (final InputStream inputStream = getClass().getResourceAsStream(SIMPLE_METADATA_XHTML_RESOURCE_NAME)) {
-			assertThat(mummifier.sourceMetadata(mummyContext, inputStream, SIMPLE_METADATA_XHTML_RESOURCE_NAME).collect(toList()),
+			assertThat(mummifier.loadSourceMetadata(mummyContext, inputStream, SIMPLE_METADATA_XHTML_RESOURCE_NAME),
 					containsInAnyOrder(Map.entry(Handle.toTag("title"), "Simple Page with Other Metadata"), Map.entry(Handle.toTag("label"), "Simplicity"),
 							Map.entry(Handle.toTag("fooBar"), "This is a test."),
-							//namespace declared on ancestor node
+							//property defined in `property` attribute with namespace declared on ancestor node
 							Map.entry(Artifact.PROPERTY_TAG_MUMMY_ORDER, "3"),
-							//undeclared yet predefined vocabulary prefix
-							Map.entry(URI.create("http://ogp.me/ns#type"), "website")));
+							//property defined in `property` attribute with undeclared yet predefined vocabulary prefix
+							Map.entry(URI.create("http://ogp.me/ns#type"), "website"),
+							//two defined in both `name` and `property` attribute on same element
+							Map.entry(Handle.toTag("photo"), "https://example.com/picture.jpg"),
+							Map.entry(URI.create("http://ogp.me/ns#image"), "https://example.com/picture.jpg"),
+							//multiple properties indicated in the same property attribute
+							Map.entry(GuiseMummy.NAMESPACE.resolve("foo"), "foobar test"), Map.entry(GuiseMummy.NAMESPACE.resolve("bar"), "foobar test"),
+							Map.entry(GuiseMummy.NAMESPACE.resolve("test"), "foobar test")));
 		}
 	}
 

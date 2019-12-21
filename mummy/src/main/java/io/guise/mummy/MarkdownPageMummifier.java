@@ -21,13 +21,13 @@ import static com.globalmentor.io.InputStreams.*;
 import static com.globalmentor.io.Readers.*;
 import static com.globalmentor.java.Conditions.*;
 import static java.nio.charset.StandardCharsets.*;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.*;
 
 import java.io.*;
 import java.net.URI;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
+import java.util.regex.*;
 
 import javax.xml.parsers.*;
 
@@ -169,7 +169,7 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 	 * @see AbstractPageMummifier#PREDEFINED_VOCABULARIES
 	 */
 	@Override
-	protected Stream<Map.Entry<URI, Object>> sourceMetadata(final MummyContext context, final InputStream inputStream, final String name) throws IOException {
+	protected List<Map.Entry<URI, Object>> loadSourceMetadata(final MummyContext context, final InputStream inputStream, final String name) throws IOException {
 		final String content = readString(new BOMInputStreamReader(toMarkSupportedInputStream(inputStream))); //detect the BOM and to throw errors if the encoding is invalid
 		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher(content);
 		if(!matcher.matches()) {
@@ -177,23 +177,24 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		}
 		final String yaml = matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP);
 		if(yaml == null) { //no YAML front matter present
-			return Stream.empty();
+			return emptyList();
 		}
 		final Object object = new Load(LoadSettings.builder().build()).loadFromString(yaml);
 		if(!(object instanceof Map)) {
-			return Stream.empty();
+			return emptyList();
 		}
 		final Map<?, ?> yamlMap = (Map<?, ?>)object;
 		try {
 			return yamlMap.entrySet().stream().map(mapping -> {
 				final Object key = mapping.getKey();
+				final Object value = mapping.getValue();
 				checkArgument(key instanceof CharSequence, "YAML mapping key `%s` of type `%s` not supported.", key, key.getClass().getName());
 				checkArgument(key != null, "YAML key `%s` cannot be mapped to `null`.", key);
 				final Curie curie = Curie.parse((CharSequence)mapping.getKey(), false);
 				final URI tag = PREDEFINED_VOCABULARIES.findVocabularyTerm(curie).map(VocabularyTerm::toURI)
 						.orElseThrow(() -> new IllegalArgumentException(String.format("YAML key `%s` uses unrecognized namespace prefix.", key)));
-				return Map.entry(tag, mapping.getValue());
-			});
+				return Map.entry(tag, value);
+			}).collect(toList());
 		} catch(final IllegalArgumentException illegalArgumentException) {
 			throw new IOException("Invalid YAML" + (name != null ? String.format(" in `%s`", name) : "") + ": " + illegalArgumentException.getMessage(),
 					illegalArgumentException);

@@ -19,7 +19,7 @@ package io.guise.mummy;
 import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Paths.*;
-import static com.globalmentor.java.Characters.*;
+import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.lex.CompoundTokenization.*;
 import static com.globalmentor.util.Optionals.*;
@@ -27,11 +27,10 @@ import static com.globalmentor.xml.XmlDom.*;
 import static io.guise.mummy.Artifact.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static io.urf.vocab.content.Content.*;
-import static java.lang.System.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
-import static java.util.Objects.*;
 import static java.util.function.Predicate.*;
+import static java.util.stream.Collectors.toList;
 import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.*;
@@ -48,14 +47,14 @@ import javax.annotation.*;
 
 import org.w3c.dom.*;
 
-import com.globalmentor.html.HtmlSerializer;
+import com.globalmentor.html.*;
 import com.globalmentor.html.spec.HTML;
 import com.globalmentor.net.*;
 import com.globalmentor.rdfa.spec.RDFa;
 import com.globalmentor.vocab.Curie;
 import com.globalmentor.vocab.*;
 import com.globalmentor.xml.*;
-import com.globalmentor.xml.spec.XML;
+import com.globalmentor.xml.spec.*;
 
 import io.urf.URF;
 import io.urf.URF.Handle;
@@ -98,6 +97,42 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 */
 	protected static final VocabularyRegistry PREDEFINED_VOCABULARIES = VocabularyRegistry.builder(RDFa.InitialContext.VOCABULARIES)
 			.setDefaultVocabulary(URF.AD_HOC_NAMESPACE).registerPrefix(GuiseMummy.NAMESPACE_PREFIX, GuiseMummy.NAMESPACE).build();
+
+	/**
+	 * The HTML formatting profile for pages.
+	 * @implSpec Notably this profile manages the order of the RDFa {@value RDFa#ATTRIBUTE_PROPERTY} attribute.
+	 * @author Garret Wilson
+	 */
+	protected static class PageFormatProfile extends DefaultHtmlFormatProfile {
+
+		/** Shared singleton instance. */
+		public final static PageFormatProfile INSTANCE = new PageFormatProfile();
+
+		/** Constructor. */
+		protected PageFormatProfile() {
+		}
+
+		/** The predefined attribute order this implementation uses for all elements. */
+		private static final List<NsName> ATTRIBUTE_ORDER;
+
+		static { //insert the `property` after the `name` attribute, or at the beginning if no `name`
+			final List<NsName> attributeOrder = new ArrayList<>(DefaultHtmlFormatProfile.ATTRIBUTE_ORDER);
+			final int nameIndex = attributeOrder.indexOf(NsName.of(ATTRIBUTE_NAME));
+			assert nameIndex >= -1;
+			attributeOrder.add(nameIndex + 1, NsName.of(RDFa.ATTRIBUTE_PROPERTY));
+			ATTRIBUTE_ORDER = attributeOrder.stream().collect(toList());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * @implSpec This implementation returns the custom {@link #ATTRIBUTE_ORDER} which includes the RDFa {@value RDFa#ATTRIBUTE_PROPERTY} attribute.
+		 */
+		@Override
+		protected List<NsName> getAttributeOrder(final NsName element) {
+			return ATTRIBUTE_ORDER;
+		}
+
+	};
 
 	/**
 	 * {@inheritDoc}
@@ -165,51 +200,76 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	}
 
 	/**
-	 * Converts a property name to a property tag URI.
+	 * Converts a metadata element to zero, or more property tag URI and value associations.
 	 * <ul>
-	 * <li>If the property name is an RDFa <a href="https://www.w3.org/TR/rdfa-core/#s_curies">CURIE</a> such as the Open Graph <code>og:title</code> or even the
-	 * Guise Mummy <code>mummy:order</code>, the CURIE is combined with its prefix by searching the hierarchy of the given element. The CURIE reference is
-	 * converted from <code>kebab-case</code> to <code>camelCase</code>.</li>
-	 * <li>Otherwise the meta name itself is used as a property handle, after converting from <code>kebab-case</code> to <code>camelCase</code>.</li>
+	 * <li>Property names in both the {@value HTML#ATTRIBUTE_NAME} and {@value RDFa#ATTRIBUTE_PROPERTY} attributes are recognized. Multiple property names are
+	 * supported in the {@value RDFa#ATTRIBUTE_PROPERTY} attribute.</li>
+	 * <li>If a property name is detected but no {@value HTML#ELEMENT_META_ATTRIBUTE_CONTENT} attribute is present, the empty string is used for the value as per
+	 * <a href="https://www.w3.org/TR/html52/document-metadata.html#the-meta-element">HTML 5.2 § 4.2.5. The meta element</a>.
+	 * <li>If the property name(s) in the {@value RDFa#ATTRIBUTE_PROPERTY} is an RDFa <a href="https://www.w3.org/TR/rdfa-core/#s_curies">CURIE</a> such as the
+	 * Open Graph <code>og:title</code> or even the Guise Mummy <code>mummy:order</code>, the CURIE is combined with its prefix by searching the hierarchy of the
+	 * given element. The CURIE reference is converted from <code>kebab-case</code> to <code>camelCase</code>. Otherwise the meta name itself is used as a
+	 * property handle, after converting from <code>kebab-case</code> to <code>camelCase</code>.</li>
+	 * <li>A property names in the {@value HTML#ATTRIBUTE_NAME} attribute is interpreted as a single non-prefixed name in the {@value RDFa#ATTRIBUTE_PROPERTY}
+	 * attribute.
 	 * </ul>
+	 * @apiNote The indicated exceptions can also be thrown during iteration of the stream.
 	 * @implSpec The current implementation only finds prefixes if they are stored in <code>xmlns:</code> XML namespace prefix declarations, not in HTML5
 	 *           <code>prefix</code> attributes.
-	 * @implSpec This also recognizes all namespace prefixes included in {@link #PREDEFINED_VOCABULARIES} if they are not otherwise defined in the document.
-	 * @param contextElement The context element that indicates the hierarchy for retrieving CURIE prefixes.
-	 * @param metaName The name of a metadata property name, normally retrieved from HTML {@code <meta>} elements.
-	 * @return The URI to be used as an URF property tag.
+	 * @implSpec This implementation also recognizes all namespace prefixes included in {@link #PREDEFINED_VOCABULARIES} if they are not otherwise defined in the
+	 *           document.
+	 * @implSpec This implementation does not yet support a {@value RDFa#ATTRIBUTE_PROPERTY} attribute containing one or more absolute IRIs.
+	 * @param metaElement The {@code <meta>} element potentially representing a property.
+	 * @return A potentially empty stream of property tag IRIs paired with values representing properties.
 	 * @throws IllegalArgumentException if the property name is a CURIE but no prefix has been defined in the element hierarchy.
 	 * @throws IllegalArgumentException if the property name is a CURIE but combined with the IRI leading segment does not result in a valid IRI.
 	 * @throws IllegalArgumentException if the given property name is empty.
 	 * @throws IllegalArgumentException if the given property name cannot be converted to <code>cameCase</code>, e.g. it has successive <code>'-'</code>
 	 *           characters.
+	 * @see <a href="https://www.w3.org/TR/rdfa-core/">RDFa Core 1.1</a>
+	 * @see <a href="https://www.w3.org/TR/rdfa-core/#s_syntax">RDFa Core 1.1, § 5. Attributes and Syntax</a>
+	 * @see <a href="https://www.w3.org/TR/html-rdfa/#extensions-to-the-html5-syntax">HTML+RDFa 1.1, § 4. Extensions to the HTML5 Syntax.</a>
 	 * @see <a href="https://www.w3.org/TR/rdfa-core/#s_curies">RDFa Core 1.1 - Third Edition § 6. CURIE Syntax Definition</a>.
 	 * @see <a href="https://ogp.me/">The Open Graph protocol</a>
 	 * @see Curie
 	 */
-	protected static URI htmlMetaNameToPropertyTag(@Nonnull final Element contextElement, @Nonnull final String metaName) {
-		requireNonNull(contextElement);
-		checkArgument(!metaName.isEmpty(), "Property name may not be empty.");
-		final Curie curie = Curie.parse(metaName).mapReference(KEBAB_CASE::toCamelCase);
-		final String reference = curie.getReference();
-		return curie.getPrefix().map(prefix -> {
-			String leadingSegment = null;
-			Node currentNode = contextElement;
-			do {
-				leadingSegment = findAttributeNS((Element)currentNode, XML.XMLNS_NAMESPACE_URI_STRING, prefix).orElse(null);
-			} while(leadingSegment == null && (currentNode = currentNode.getParentNode()) instanceof Element); //keep looking while we need to and while there are still parent elements
-			if(leadingSegment == null) { //see if we have a predefined vocabulary for the prefix
-				leadingSegment = PREDEFINED_VOCABULARIES.findVocabularyByPrefix(prefix).map(URI::toString).orElse(null);
-			}
-			checkArgument(leadingSegment != null, "No IRI leading segment defined for prefix %s of property %s.", prefix, metaName);
-			return VocabularyTerm.toURI(URI.create(leadingSegment), reference);
-		}).orElseGet(() -> Handle.toTag(curie.getReference()));
+	protected static Stream<Map.Entry<URI, Object>> htmlMetaElementToProperties(@Nonnull final Element metaElement) {
+		final Optional<URI> tagFromNameAttribute = findAttributeNS(metaElement, null, ELEMENT_META_ATTRIBUTE_NAME).map(name -> {
+			checkArgument(!name.isEmpty(), "`<meta>` element `name` attribute must not be the empty string.");
+			checkArgument(!contains(name, Curie.PREFIX_DELIMITER),
+					"Property prefix not allowed `<meta>` element `name` attribute `%s`; consider using `property` attribute instead.", name);
+			return Handle.toTag(KEBAB_CASE.toCamelCase(name));
+		});
+		final Stream<URI> tagsFromPropertyAttribute = findAttributeNS(metaElement, null, RDFa.ATTRIBUTE_PROPERTY).stream().flatMap(properties -> {
+			final List<String> tokens = RDFa.WHITESPACE_CHARACTERS.split(properties);
+			checkArgument(!tokens.isEmpty(), "`<meta>` element `property` attribute must contain at least one property.");
+			return tokens.stream().map(property -> {
+				final Curie curie = Curie.parse(property).mapReference(KEBAB_CASE::toCamelCase);
+				final String reference = curie.getReference();
+				return curie.getPrefix().map(prefix -> {
+					String leadingSegment = null;
+					Node currentNode = metaElement;
+					do {
+						leadingSegment = findAttributeNS((Element)currentNode, XML.XMLNS_NAMESPACE_URI_STRING, prefix).orElse(null);
+					} while(leadingSegment == null && (currentNode = currentNode.getParentNode()) instanceof Element); //keep looking while we need to and while there are still parent elements
+					if(leadingSegment == null) { //see if we have a predefined vocabulary for the prefix
+						leadingSegment = PREDEFINED_VOCABULARIES.findVocabularyByPrefix(prefix).map(URI::toString).orElse(null);
+					}
+					checkArgument(leadingSegment != null, "No IRI leading segment defined for prefix `%s` of property `%s`.", prefix, property);
+					return VocabularyTerm.toURI(URI.create(leadingSegment), reference);
+				}).orElseGet(() -> Handle.toTag(curie.getReference()));
+			});
+		});
+		//TODO add support for Microdata `itemprop`; see https://www.w3.org/TR/microdata/#names:-the-itemprop-attribute
+		//if no content attribute, the value is the empty string as per _HTML 5.2 § 4.2.5. The meta element_
+		final String value = findAttributeNS(metaElement, null, ELEMENT_META_ATTRIBUTE_CONTENT).orElse("");
+		return Stream.concat(tagFromNameAttribute.stream(), tagsFromPropertyAttribute).map(tag -> Map.entry(tag, value));
 	}
 
 	/**
 	 * Determines the description for the given artifact based upon its source file and related files.
 	 * @implSpec This default implementation loads description from metadata in the XHTML document obtained by calling
-	 *           {@link #sourceMetadata(MummyContext, Path)}.
+	 *           {@link #loadSourceMetadata(MummyContext, Path)}.
 	 * @param context The context of static site generation.
 	 * @param sourceFile The source file to be mummified.
 	 * @return A description of the resource being mummified.
@@ -219,17 +279,13 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		final UrfObject description = new UrfObject();
 
 		//load source metadata
-		try {
-			sourceMetadata(context, sourceFile).forEach(meta -> {
-				final URI propertyTag = meta.getKey();
-				final Object propertyValue = meta.getValue();
-				if(!description.hasPropertyValue(propertyTag)) { //the first property wins
-					description.setPropertyValue(propertyTag, propertyValue);
-				}
-			});
-		} catch(final IllegalArgumentException illegalArgumentException) { //TODO include the filename and context
-			throw new IOException(illegalArgumentException);
-		}
+		loadSourceMetadata(context, sourceFile).forEach(meta -> {
+			final URI propertyTag = meta.getKey();
+			final Object propertyValue = meta.getValue();
+			if(!description.hasPropertyValue(propertyTag)) { //the first property wins
+				description.setPropertyValue(propertyTag, propertyValue);
+			}
+		});
 
 		//TODO load any description sidecar
 
@@ -243,44 +299,44 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * Loads metadata stored in the source file itself.
 	 * @apiNote This method ignores any metadata stored in related files such as sidecar files.
 	 * @implSpec The default implementation opens an input stream to the given file and then extract the source metadata by calling
-	 *           {@link #sourceMetadata(MummyContext, InputStream, String)}.
+	 *           {@link #loadSourceMetadata(MummyContext, InputStream, String)}.
 	 * @param context The context of static site generation.
 	 * @param sourceFile The source file to be mummified.
 	 * @return Metadata stored in the source file being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate names.
 	 * @throws IOException if there is an I/O error retrieving the metadata.
 	 */
-	protected Stream<Map.Entry<URI, Object>> sourceMetadata(@Nonnull MummyContext context, @Nonnull final Path sourceFile) throws IOException {
+	protected List<Map.Entry<URI, Object>> loadSourceMetadata(@Nonnull MummyContext context, @Nonnull final Path sourceFile) throws IOException {
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile))) {
 			final Path filename = sourceFile.getFileName();
-			return sourceMetadata(context, inputStream, filename != null ? filename.toString() : null);
+			return loadSourceMetadata(context, inputStream, filename != null ? filename.toString() : null);
 		}
 	}
 
 	/**
 	 * Loads metadata stored in the source file itself.
 	 * @implSpec This implementation loads description from metadata in the XHTML document obtained by calling
-	 *           {@link #loadSourceDocument(MummyContext, InputStream, String)} and then calls {@link #sourceMetadata(MummyContext, Document)} to extract the
+	 *           {@link #loadSourceDocument(MummyContext, InputStream, String)} and then calls {@link #extractMetadata(MummyContext, Document)} to extract the
 	 *           metadata.
 	 * @param context The context of static site generation.
 	 * @param inputStream The input stream from which to to load the source metadata.
 	 * @param name The optional name of the source, such as a filename, which may be missing or empty.
 	 * @return Metadata stored in the source file being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate names.
-	 * @throws IOException if there is an I/O error retrieving the metadata.
+	 * @throws IOException if there is an I/O error retrieving the metadata, including incorrectly formatted metadata.
 	 */
-	protected Stream<Map.Entry<URI, Object>> sourceMetadata(@Nonnull MummyContext context, @Nonnull InputStream inputStream, @Nullable final String name)
+	protected List<Map.Entry<URI, Object>> loadSourceMetadata(@Nonnull MummyContext context, @Nonnull InputStream inputStream, @Nullable final String name)
 			throws IOException {
 		final Document sourceDocument = loadSourceDocument(context, inputStream, name);
 		try {
-			return sourceMetadata(context, sourceDocument);
-		} catch(final IllegalArgumentException | DOMException exception) { //TODO indicate the file and context
-			throw new IOException(exception);
+			return extractMetadata(context, sourceDocument);
+		} catch(final IllegalArgumentException | DOMException exception) {
+			throw new IOException(String.format("Error processing metadata in `%s`: %s", name != null ? name : "(unknown)", exception.getMessage()), exception); //TODO i18n
 		}
 	}
 
 	/**
 	 * Extracts metadata stored in the source document itself.
 	 * @implSpec The XHTML document {@code <head><title>} will be returned as metadata, using {@value Artifact#PROPERTY_HANDLE_TITLE} as a handle; followed by
-	 *           values in any {@code <head><meta>} elements, converted using {@link #htmlMetaNameToPropertyTag(Element, String)}.
+	 *           values in any {@code <head><meta>} elements, converted using {@link #htmlMetaElementToProperties(Element)}.
 	 * @param context The context of static site generation.
 	 * @param sourceDocument The source XHTML document being mummified, from which metadata should be extracted.
 	 * @return Metadata stored in the source document being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate
@@ -288,13 +344,13 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * @throws IllegalArgumentException if any of the metadata is invalid.
 	 * @throws DOMException if there is a problem retrieving metadata.
 	 */
-	protected Stream<Map.Entry<URI, Object>> sourceMetadata(@Nonnull MummyContext context, @Nonnull final Document sourceDocument) throws DOMException {
+	protected List<Map.Entry<URI, Object>> extractMetadata(@Nonnull MummyContext context, @Nonnull final Document sourceDocument) throws DOMException {
 		//TODO consider parsing out "keywords" in to multiple keyword+ properties for convenience
-		return Stream.concat(
+		return Stream.<Map.Entry<URI, Object>>concat(
 				//<title>; will override any <code>title</code> metadata property in this same document
 				findTitle(sourceDocument).stream().map(title -> Map.entry(Handle.toTag(PROPERTY_HANDLE_TITLE), title)),
-				//<meta> TODO detect and add warnings for invalid properties  
-				namedMetadata(sourceDocument, AbstractPageMummifier::htmlMetaNameToPropertyTag, (element, value) -> value));
+				//<meta> TODO detect and add warnings for invalid properties
+				htmlHeadMetaElements(sourceDocument).flatMap(AbstractPageMummifier::htmlMetaElementToProperties)).collect(toList());
 		//TODO consider parsing out "keywords" in to multiple keyword+ properties for convenience
 	}
 
@@ -327,7 +383,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 			//#save target document
 			try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))) {
-				final HtmlSerializer htmlSerializer = new HtmlSerializer(true);
+				final HtmlSerializer htmlSerializer = new HtmlSerializer(true, PageFormatProfile.INSTANCE);
 				htmlSerializer.serialize(ascribedDocument, outputStream);
 			}
 			getLogger().debug("generated output document: {}", artifact.getTargetPath());
@@ -363,13 +419,13 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 	/**
 	 * Normalizes a document element, removing any named metadata (that is, {@value HTML#ELEMENT_META} elements with a {@value HTML#ELEMENT_META_ATTRIBUTE_NAME}
-	 * attribute).
+	 * or a {@value RDFa#ATTRIBUTE_PROPERTY} attribute).
 	 * <p>
 	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
 	 * element is removed.
 	 * </p>
-	 * @implSpec This implementation marks for removal any {@value HTML#ELEMENT_META} elements with a {@value HTML#ELEMENT_META_ATTRIBUTE_NAME} attribute. It also
-	 *           removes all {@link RDFa#ATTRIBUTE_PREFIX} attributes.
+	 * @implSpec This implementation marks for removal any {@value HTML#ELEMENT_META} elements with a {@value HTML#ELEMENT_META_ATTRIBUTE_NAME} or a
+	 *           {@value RDFa#ATTRIBUTE_PROPERTY} attribute. It also removes all {@link RDFa#ATTRIBUTE_PREFIX} attributes.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
@@ -383,7 +439,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 		//remove the element itself if it is named metadata
 		if(HTML.XHTML_NAMESPACE_URI_STRING.equals(element.getNamespaceURI()) && ELEMENT_META.equals(element.getLocalName())
-				&& element.hasAttribute(ELEMENT_META_ATTRIBUTE_NAME)) { //<<meta name="…">
+				&& (element.hasAttributeNS(null, ELEMENT_META_ATTRIBUTE_NAME) || element.hasAttributeNS(null, RDFa.ATTRIBUTE_PROPERTY))) { //`<meta name="…">` or `<meta property="…">`
 			return emptyList();
 		}
 
@@ -806,7 +862,6 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 						appendText(removeChildren(aElement), navigationArtifact.determineLabel());
 					});
 					navigationListElement.appendChild(liElement);
-					appendText(navigationListElement, System.lineSeparator()); //TODO remove when HTML formatting is fixed
 				});
 
 		return List.of(navigationListElement);
@@ -1125,7 +1180,14 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 * <ul>
 	 * <li>Creates the {@code <html><head>} and {@code <html><head><title>} structure if necessary.</li>
 	 * <li>Sets the title if one is present in the metadata.</li>
-	 * <li>Creates appropriate metadata elements.</li>
+	 * <li>Creates appropriate metadata elements.
+	 * <ul>
+	 * <li>If the property is in the "default" URF ad-hoc namespace {@link URF#AD_HOC_NAMESPACE}, the property is stored as
+	 * {@code <html><head><meta name="foo" content="bar"/>}.
+	 * <li>If the property is in some other namespace, requiring a CURIE with a prefix, the property is stored as
+	 * {@code <html><head><meta property="eg:foo" content="bar"/>}.</li>
+	 * </ul>
+	 * </li>
 	 * </ul>
 	 * <p>
 	 * Metadata in the Guise Mummy namespace {@link GuiseMummy#NAMESPACE} and other internal namespaces are skipped.
@@ -1181,7 +1243,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		final URI titleTag = Handle.toTag(PROPERTY_HANDLE_TITLE);
 		description.findPropertyValue(titleTag).map(Object::toString).ifPresent(title -> setText(titleElement, title));
 
-		//set the other properties as <meta> elements
+		//set the other properties as `<meta>` elements, using either the `name` or `property` attribute depending on namespace
 		for(final Map.Entry<URI, Object> property : description.getProperties()) {
 			final URI tag = property.getKey();
 			if(tag.equals(titleTag)) { //skip the title property; we already set it as the <title>
@@ -1191,13 +1253,16 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 				continue;
 			}
 			final Object value = property.getValue();
-			final Curie curie;
 			try { //convert the property to a kebab-case CURIE 
-				curie = vocabularyRegistrar.determineCurieForTerm(tag).orElseThrow(IllegalArgumentException::new).mapReference(CAMEL_CASE::toKebabCase);
+				final Curie curie = vocabularyRegistrar.determineCurieForTerm(tag).orElseThrow(IllegalArgumentException::new).mapReference(CAMEL_CASE::toKebabCase);
 				getLogger().debug("({}) Ascribing metadata: `{}`=`{}` ", artifact.getTargetPath(), curie, value);
-				appendText(headElement, CHARACTER_TABULATION_CHAR); //\t	//TODO remove formatting when HTML formatter is improved
-				addNamedMetadata(headElement, curie.toString(), value.toString());
-				appendText(headElement, lineSeparator()); //\n
+				if(curie.getPrefix().isPresent()) { //use the `property` attribute for a CURIE with a prefix
+					final Element metaElement = addLast(headElement, headElement.getOwnerDocument().createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_META));
+					metaElement.setAttributeNS(null, RDFa.ATTRIBUTE_PROPERTY, curie.toString()); //TODO create RDFa utility
+					metaElement.setAttributeNS(null, ELEMENT_META_ATTRIBUTE_CONTENT, value.toString());
+				} else { //a non-prefixed CURIE is written to a normal `<meta>` `name` attribute
+					addNamedMetadata(headElement, curie.toString(), value.toString());
+				}
 			} catch(final IllegalArgumentException illegalArgumentException) {
 				getLogger().warn("Cannot determine CURIE for metadata tag `{}` with value `{}`.", tag, value);
 			}
