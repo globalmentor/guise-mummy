@@ -47,14 +47,14 @@ import javax.annotation.*;
 
 import org.w3c.dom.*;
 
-import com.globalmentor.html.HtmlSerializer;
+import com.globalmentor.html.*;
 import com.globalmentor.html.spec.HTML;
 import com.globalmentor.net.*;
 import com.globalmentor.rdfa.spec.RDFa;
 import com.globalmentor.vocab.Curie;
 import com.globalmentor.vocab.*;
 import com.globalmentor.xml.*;
-import com.globalmentor.xml.spec.XML;
+import com.globalmentor.xml.spec.*;
 
 import io.urf.URF;
 import io.urf.URF.Handle;
@@ -97,6 +97,42 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 */
 	protected static final VocabularyRegistry PREDEFINED_VOCABULARIES = VocabularyRegistry.builder(RDFa.InitialContext.VOCABULARIES)
 			.setDefaultVocabulary(URF.AD_HOC_NAMESPACE).registerPrefix(GuiseMummy.NAMESPACE_PREFIX, GuiseMummy.NAMESPACE).build();
+
+	/**
+	 * The HTML formatting profile for pages.
+	 * @implSpec Notably this profile manages the order of the RDFa {@value RDFa#ATTRIBUTE_PROPERTY} attribute.
+	 * @author Garret Wilson
+	 */
+	protected static class PageFormatProfile extends DefaultHtmlFormatProfile {
+
+		/** Shared singleton instance. */
+		public final static PageFormatProfile INSTANCE = new PageFormatProfile();
+
+		/** Constructor. */
+		protected PageFormatProfile() {
+		}
+
+		/** The predefined attribute order this implementation uses for all elements. */
+		private static final List<NsName> ATTRIBUTE_ORDER;
+
+		static { //insert the `property` after the `name` attribute, or at the beginning if no `name`
+			final List<NsName> attributeOrder = new ArrayList<>(DefaultHtmlFormatProfile.ATTRIBUTE_ORDER);
+			final int nameIndex = attributeOrder.indexOf(NsName.of(ATTRIBUTE_NAME));
+			assert nameIndex >= -1;
+			attributeOrder.add(nameIndex + 1, NsName.of(RDFa.ATTRIBUTE_PROPERTY));
+			ATTRIBUTE_ORDER = attributeOrder.stream().collect(toList());
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * @implSpec This implementation returns the custom {@link #ATTRIBUTE_ORDER} which includes the RDFa {@value RDFa#ATTRIBUTE_PROPERTY} attribute.
+		 */
+		@Override
+		protected List<NsName> getAttributeOrder(final NsName element) {
+			return ATTRIBUTE_ORDER;
+		}
+
+	};
 
 	/**
 	 * {@inheritDoc}
@@ -347,7 +383,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 			//#save target document
 			try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))) {
-				final HtmlSerializer htmlSerializer = new HtmlSerializer(true);
+				final HtmlSerializer htmlSerializer = new HtmlSerializer(true, PageFormatProfile.INSTANCE);
 				htmlSerializer.serialize(ascribedDocument, outputStream);
 			}
 			getLogger().debug("generated output document: {}", artifact.getTargetPath());
