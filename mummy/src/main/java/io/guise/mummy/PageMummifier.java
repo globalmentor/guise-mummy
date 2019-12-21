@@ -41,7 +41,7 @@ public interface PageMummifier extends Mummifier {
 	public static final ContentType PAGE_MEDIA_TYPE = HTML_CONTENT_TYPE.withParameter(ContentType.Parameter.CHARSET_UTF_8);
 
 	/** The HTML {@code <meta>} name for indicating the instant of artifact generation. */
-	public static final String META_NAME_GENERATED_AT = "generatedAt";
+	public static final String META_NAME_GENERATED_AT = "generated-at";
 
 	/** The attribute for regenerating an element, such as a navigation list. */
 	public static final String ATTRIBUTE_REGENERATE = "regenerate";
