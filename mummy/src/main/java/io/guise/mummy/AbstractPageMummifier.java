@@ -1009,8 +1009,8 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 					}
 				}
 			} catch(final URISyntaxException uriSyntaxException) {
-				getLogger().warn("Invalied reference <{} {}=\"{}\" …>\".", referenceElement.getNodeName(), referenceAttributeName, referenceString, uriSyntaxException);
-				return;
+				getLogger().warn("Invalid reference `<{} {}=\"{}\" …>` in `{}`: {}", referenceElement.getNodeName(), referenceAttributeName, referenceString,
+						originalReferrerSourcePath, uriSyntaxException.getMessage());
 			}
 		});
 		return List.of(referenceElement);
