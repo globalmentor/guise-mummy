@@ -1005,12 +1005,12 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 								.ifPresentOrElse(retargetedResourceReference -> {
 									getLogger().debug("  -> mapping to : {}", retargetedResourceReference);
 									referenceElement.setAttributeNS(null, referenceAttributeName, retargetedResourceReference.toString());
-								}, () -> getLogger().warn("No target artifact found for source relative reference {}.", referenceURI));
+								}, () -> getLogger().warn("No target artifact found for source relative reference `{}` in `{}`.", referenceURI, originalReferrerSourcePath));
 					}
 				}
 			} catch(final URISyntaxException uriSyntaxException) {
-				getLogger().warn("Invalied reference <{} {}=\"{}\" …>\".", referenceElement.getNodeName(), referenceAttributeName, referenceString, uriSyntaxException);
-				return;
+				getLogger().warn("Invalid reference `<{} {}=\"{}\" …>` in `{}`: {}", referenceElement.getNodeName(), referenceAttributeName, referenceString,
+						originalReferrerSourcePath, uriSyntaxException.getMessage());
 			}
 		});
 		return List.of(referenceElement);
