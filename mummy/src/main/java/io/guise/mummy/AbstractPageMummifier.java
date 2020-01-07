@@ -1005,7 +1005,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 								.ifPresentOrElse(retargetedResourceReference -> {
 									getLogger().debug("  -> mapping to : {}", retargetedResourceReference);
 									referenceElement.setAttributeNS(null, referenceAttributeName, retargetedResourceReference.toString());
-								}, () -> getLogger().warn("No target artifact found for source relative reference {}.", referenceURI));
+								}, () -> getLogger().warn("No target artifact found for source relative reference `{}` in `{}`.", referenceURI, originalReferrerSourcePath));
 					}
 				}
 			} catch(final URISyntaxException uriSyntaxException) {
