@@ -30,7 +30,7 @@ import static io.urf.vocab.content.Content.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.function.Predicate.*;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.*;
@@ -703,7 +703,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 
 		//TODO transfer to some system of pluggable element processing strategies
 
-		if(ATTRIBUTE_REGENERATE.equals(findAttributeNS(sourceElement, NAMESPACE_STRING, ATTRIBUTE_REGENERATE).orElse(null))) { //TODO create utility Optional matcher
+		if(isPresentAndEquals(findAttributeNS(sourceElement, ATTRIBUTE_REGENERATE), ATTRIBUTE_REGENERATE.getLocalName())) {
 
 			//<nav><ol> or <nav><ul>
 			if(XHTML_NAMESPACE_URI_STRING.equals(sourceElement.getNamespaceURI())) {
@@ -776,11 +776,26 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	}
 
 	/**
+	 * The set of <a href="https://fontawesome.com/">Font Awesome</a> icon groups.
+	 * @see <a href="https://fontawesome.com/how-to-use">Font Awesome Basic Use</a>
+	 */
+	private final static Set<String> FONT_AWESOME_ICON_GROUPS = Set.of("fas", "far", "fal", "fad", "fab");
+
+	/**
 	 * Regenerates a navigation list based upon the parent, sibling, and/or child navigation artifacts relative to the context artifact.
 	 * <p>
 	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
 	 * element is removed.
 	 * </p>
+	 * <ul>
+	 * <li>Within each <code>&lt;li&gt;</code> element, the first {@code <i></i>} element is considered to be a placeholder for an icon. If the navigation
+	 * artifact has an {@value Artifact#PROPERTY_HANDLE_ICON} property, it is replaced with a {@code <span></span>}; otherwise it is removed. The icon property
+	 * value is expected to be in the form <code><var>group</var>/<var>name</var></code> form, and based upon the specific group the {@code <span>}
+	 * <code>class</code> attribute and content will be updated appropriately. If the icon identification format isn't recognized, the literal value will be used
+	 * as the text content of the {@code <span>}.</li>
+	 * <li>Within each <code>&lt;li&gt;</code> element, the first {@code <a></a>} element is considered to be a placeholder for the link. All of its text is
+	 * removed (leaving the icon, if any), and the result of {@link Artifact#determineLabel()} will be appended as text for the link label.</li>
+	 * </ul>
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
@@ -856,10 +871,53 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 					//if the navigation artifact is this artifact, use the template for an active link
 					final Element liTemplate = navigationArtifact.equals(contextArtifact) ? activeLiTemplate : inactiveLiTemplate;
 					final Element liElement = (Element)liTemplate.cloneNode(true);
-					findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A)).map(Element.class::cast).ifPresent(aElement -> { //find <li><a>
+					//update the icon: <li><i> (transform to <span></span>)
+					findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_I)).map(Element.class::cast).ifPresent(iElement -> {
+						//if the navigation element has an icon, replace the `<i></i>` with an icon `<span></span>` 
+						navigationArtifact.getResourceDescription().findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_ICON).ifPresentOrElse(icon -> {
+							final String iconClass;
+							final String iconContent;
+							final String iconId = icon.toString();
+							final String[] iconIdParts = iconId.split("/", -1); //TODO use constant
+							if(iconIdParts.length == 2 && !iconIdParts[0].isBlank() && !iconIdParts[1].isBlank()) {
+								final String iconGroup = iconIdParts[0];
+								final String iconName = iconIdParts[1];
+								if(FONT_AWESOME_ICON_GROUPS.contains(iconGroup)) {
+									iconClass = iconGroup + ' ' + iconName; //e.g. `<span class="fas fa-home"></span>` (Font Awesome)
+									iconContent = null;
+								} else {
+									iconClass = iconGroup; //e.g. `<span class="material-icons">home</span>` (Material Icons)
+									iconContent = iconName;
+								}
+							} else { //if the icon name isn't in the format we expect, just use it as the content
+								iconClass = null;
+								iconContent = iconId;
+							}
+							final Element iconElement = iElement.getOwnerDocument().createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_SPAN);
+							if(iconClass != null) {
+								iconElement.setAttributeNS(null, ATTRIBUTE_CLASS, iconClass);
+							}
+							if(iconContent != null) {
+								appendText(iconElement, iconContent);
+							}
+							iElement.getParentNode().replaceChild(iconElement, iElement);
+						}, () -> iElement.getParentNode().removeChild(iElement)); //if the navigation element has no icon, remove the `<i></i>`
+					});
+					//update the link: <li><a>
+					findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A)).map(Element.class::cast).ifPresent(aElement -> {
 						aElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, context.relativizeSourceReference(contextArtifact, navigationArtifact).toString());
-						//remove all text and add the link label
-						appendText(removeChildren(aElement), navigationArtifact.determineLabel());
+						//remove text nodes (leaving the icon or any other element)
+						final Iterator<Node> childNodeIterator = XmlDom.childNodesIterator(aElement);
+						while(childNodeIterator.hasNext()) {
+							final Node childNode = childNodeIterator.next();
+							if(childNode.getNodeType() == Node.TEXT_NODE) {
+								childNodeIterator.remove();
+							}
+						}
+						final String navigationLabel = navigationArtifact.determineLabel();
+						final String linkLabel = aElement.getChildNodes().getLength() > 0 ? " " + navigationLabel : navigationLabel; //add spacing if there are other elements (e.g. an icon)
+						//append the link label
+						appendText(aElement, linkLabel);
 					});
 					navigationListElement.appendChild(liElement);
 				});

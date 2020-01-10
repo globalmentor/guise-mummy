@@ -17,6 +17,7 @@
 package io.guise.mummy;
 
 import static com.globalmentor.html.spec.HTML.*;
+import static io.guise.mummy.GuiseMummy.NAMESPACE_STRING;
 import static java.nio.file.Files.*;
 
 import java.io.*;
@@ -28,6 +29,7 @@ import javax.annotation.*;
 import org.w3c.dom.*;
 
 import com.globalmentor.net.ContentType;
+import com.globalmentor.xml.spec.NsName;
 
 /**
  * Mummifier for generating HTML pages.
@@ -44,7 +46,7 @@ public interface PageMummifier extends Mummifier {
 	public static final String META_NAME_GENERATED_AT = "generated-at";
 
 	/** The attribute for regenerating an element, such as a navigation list. */
-	public static final String ATTRIBUTE_REGENERATE = "regenerate";
+	public static final NsName ATTRIBUTE_REGENERATE = NsName.of(NAMESPACE_STRING, "regenerate");
 
 	/**
 	 * {@inheritDoc}
