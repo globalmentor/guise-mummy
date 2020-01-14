@@ -27,7 +27,7 @@ import javax.annotation.*;
 import io.urf.model.UrfResourceDescription;
 
 /**
- * Abstract implementation of a collection artifact.
+ * Concrete implementation of a collection artifact based upon a file system directory.
  * @author Garret Wilson
  */
 public class DirectoryArtifact extends AbstractArtifact implements CollectionArtifact {
