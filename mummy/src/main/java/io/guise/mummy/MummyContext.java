@@ -412,6 +412,10 @@ public interface MummyContext {
 	/**
 	 * Relativizes a reference to a target file in the file system against some base path. Both paths must be either in the site source directory or in the site
 	 * destination directory. The returned reference will be a resource URI path (e.g. appropriate for web references) relative to the base path.
+	 * @apiNote If the reference target path does not yet exist, this method may not produce a URI path in the correct collection form, as it is impossible to
+	 *          know if the target represents a directory. Use {@link #relativizeResourceReference(Path, Path, boolean)} if it is possible to know whether the
+	 *          target path is meant to be a collection.
+	 * @implSpec This implementation delegates to {@link #relativizeResourceReference(Path, Path, boolean)} without forcing a collection.
 	 * @param baseTargetPath The absolute path against which the reference path with be relativized.
 	 * @param referenceTargetPath The absolute reference path to relativize.
 	 * @return The reference path relative to the base path as a URI path.
@@ -420,10 +424,27 @@ public interface MummyContext {
 	 * @see #getSiteTargetDirectory()
 	 */
 	public default URIPath relativizeResourceReference(@Nonnull final Path baseTargetPath, @Nonnull final Path referenceTargetPath) {
+		return relativizeResourceReference(baseTargetPath, referenceTargetPath, false);
+	}
+
+	/**
+	 * Relativizes a reference to a target file in the file system against some base path. Both paths must be either in the site source directory or in the site
+	 * destination directory. The returned reference will be a resource URI path (e.g. appropriate for web references) relative to the base path.
+	 * @param baseTargetPath The absolute path against which the reference path with be relativized.
+	 * @param referenceTargetPath The absolute reference path to relativize.
+	 * @param forceCollection <code>true</code> if the returned path should be in collection form, ending with a slash, regardless of whether the reference target
+	 *          path is a collection or even exists.
+	 * @return The reference path relative to the base path as a URI path.
+	 * @throws IllegalArgumentException if the target path and or the base path is not absolute and/or is not within the same source/target tree.
+	 * @see #getSiteSourceDirectory()
+	 * @see #getSiteTargetDirectory()
+	 */
+	public default URIPath relativizeResourceReference(@Nonnull final Path baseTargetPath, @Nonnull final Path referenceTargetPath,
+			final boolean forceCollection) {
 		final Path root = isSubPath(getSiteSourceDirectory(), baseTargetPath) ? getSiteSourceDirectory() : getSiteTargetDirectory();
-		checkArgumentSubPath(root, checkArgumentAbsolute(baseTargetPath));
-		checkArgumentSubPath(root, checkArgumentAbsolute(referenceTargetPath));
-		return URIPath.relativize(baseTargetPath.toUri(), referenceTargetPath.toUri());
+		final URI baseTargetUri = checkArgumentSubPath(root, checkArgumentAbsolute(baseTargetPath)).toUri();
+		final URI referenceTargetUri = checkArgumentSubPath(root, checkArgumentAbsolute(referenceTargetPath)).toUri();
+		return URIPath.relativize(baseTargetUri, forceCollection ? toCollectionURI(referenceTargetUri) : referenceTargetUri);
 	}
 
 	//factory methods

@@ -1123,8 +1123,8 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	 */
 	protected Optional<URIPath> retargetResourceReferencePath(@Nonnull MummyContext context, @Nonnull URIPath resourceReferencePath,
 			@Nonnull final Path originalReferrerSourcePath, @Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) {
-		return context.findArtifactBySourceRelativeReference(originalReferrerSourcePath, resourceReferencePath)
-				.map(referentArtifact -> context.relativizeResourceReference(relocatedReferrerPath, referentArtifactPath.apply(referentArtifact)));
+		return context.findArtifactBySourceRelativeReference(originalReferrerSourcePath, resourceReferencePath).map(referentArtifact -> context
+				.relativizeResourceReference(relocatedReferrerPath, referentArtifactPath.apply(referentArtifact), referentArtifact instanceof CollectionArtifact));
 	}
 
 	//#cleanse
