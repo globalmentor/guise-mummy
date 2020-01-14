@@ -41,6 +41,11 @@ public interface Artifact {
 	public static final String PROPERTY_HANDLE_NAME = "name";
 	/** The property handle of the string describing the artifact. */
 	public static final String PROPERTY_HANDLE_DESCRIPTION = "description";
+	/**
+	 * The icon associated with the artifact, used in a navigation link for example, in <code><var>group</var>/<var>name</var></code> form (e.g.
+	 * <code>fas/fa-home</code> or <code>material-icons/home</code>).
+	 */
+	public static final String PROPERTY_HANDLE_ICON = "icon";
 	/** The property handle of the string to use as a label, in navigation link text for example. */
 	public static final String PROPERTY_HANDLE_LABEL = "label";
 	/** The property handle of the title, such as a page title. */
