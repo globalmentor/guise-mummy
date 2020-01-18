@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.globalmentor</groupId>
 		<artifactId>globalmentor-opensource-parent</artifactId>
-		<version>8.5.4</version>
+		<version>8.5.5-SNAPSHOT</version>
 	</parent>
 
 	<groupId>io.guise</groupId>
@@ -41,10 +41,10 @@
 	<properties>
 		<maven.compiler.release>11</maven.compiler.release>
 		<globalmentor-ee.version>0.6.1</globalmentor-ee.version>
-		<globalmentor-web.version>0.6.3</globalmentor-web.version>
+		<globalmentor-web.version>0.6.4-SNAPSHOT</globalmentor-web.version>
 		<slf4j.version>1.7.30</slf4j.version>
 		<tomcat.version>9.0.30</tomcat.version>
-		<urf.version>0.3.3</urf.version>
+		<urf.version>0.4.0-SNAPSHOT</urf.version>
 	</properties>
 
 	<modules>
