@@ -61,7 +61,7 @@ public class FileItemResourceImport implements ResourceImport {
 	 */
 	public FileItemResourceImport(final FileItem fileItem) {
 		this.fileItem = requireNonNull(fileItem, "File item cannot be null.");
-		contentType = ContentType.create(fileItem.getContentType()); //create a content type object from the file item
+		contentType = ContentType.parse(fileItem.getContentType()); //create a content type object from the file item
 		String name = fileItem.getName(); //get the name of the item
 		if(name != null) { //if there is a filename
 			name = URIs.getName(name); //make sure it is only a filename and not a complete path TODO verify that the relevant browsers including path information use forward slashes

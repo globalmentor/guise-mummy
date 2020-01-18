@@ -576,7 +576,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 								final UrfObject resourceDescription = new UrfObject(); //create a new resource description
 								final String itemContentTypeString = fileItemStream.getContentType(); //get the item content type, if any
 								if(itemContentTypeString != null) { //if we know the item's content type
-									final ContentType itemContentType = ContentType.create(itemContentTypeString);
+									final ContentType itemContentType = ContentType.parse(itemContentTypeString);
 									if(!ContentType.APPLICATION_OCTET_STREAM_CONTENT_TYPE.hasBaseType(itemContentType)) { //if the content type is not just a generic "bunch of bytes" content type
 										setContentType(resourceDescription, itemContentType); //set the resource's content type
 									}
