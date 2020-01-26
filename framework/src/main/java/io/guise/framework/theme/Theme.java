@@ -42,7 +42,7 @@ public class Theme extends ArrayList<Rule> /*TODO delete legacy URF extends URFL
 	/** The extension for Guise theme resource names. */
 	public static final String NAME_EXTENSION = "guisetheme";
 	/** The content type for theme resources: <code>application/theme+turf</code>. */
-	public static final ContentType CONTENT_TYPE = ContentType.create(ContentType.APPLICATION_PRIMARY_TYPE,
+	public static final ContentType CONTENT_TYPE = ContentType.of(ContentType.APPLICATION_PRIMARY_TYPE,
 			"theme" + ContentType.SUBTYPE_SUFFIX_DELIMITER_CHAR + "turf"); //TODO TODO use constant for new TURF: TURF.SUBTYPE_SUFFIX
 
 	/** The recommended prefix to the theme ontology namespace. */

@@ -37,7 +37,7 @@ import static com.globalmentor.net.URIs.*;
 public class WebFlashDepictor<C extends Flash> extends AbstractSimpleWebComponentDepictor<C> { //TODO fix to work with new Microsoft activation process; see http://www.jeroenwijering.com/?item=embedding_flash and http://blog.deconcept.com/swfobject/
 
 	/** The content type for Flash objects. */
-	public static final ContentType FLASH_CONTENT_TYPE = ContentType.create(ContentType.APPLICATION_PRIMARY_TYPE, X_SHOCKWAVE_FLASH_SUBTYPE); //TODO move to Flash class
+	public static final ContentType FLASH_CONTENT_TYPE = ContentType.of(ContentType.APPLICATION_PRIMARY_TYPE, X_SHOCKWAVE_FLASH_SUBTYPE); //TODO move to Flash class
 
 	/**
 	 * The "allowScriptAccess" parameter.

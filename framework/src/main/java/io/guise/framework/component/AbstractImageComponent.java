@@ -105,7 +105,7 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 		 */
 		@Override
 		public ContentType[] getContentTypes() {
-			return createArray(ContentType.create(ContentType.TEXT_PRIMARY_TYPE, URI_LIST_SUBTYPE), getSource().getLabelContentType());
+			return createArray(ContentType.of(ContentType.TEXT_PRIMARY_TYPE, URI_LIST_SUBTYPE), getSource().getLabelContentType());
 		} //TODO use a static instance
 
 		@Override

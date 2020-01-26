@@ -192,7 +192,7 @@ public class TextControl<V> extends AbstractTextControl<V> {
 		 */
 		@Override
 		public boolean canImportTransfer(final TextControl<?> component, final Transferable<?> transferable) {
-			return transferable.canTransfer(ContentType.create(ContentType.TEXT_PRIMARY_TYPE, ContentType.WILDCARD_SUBTYPE)); //we can import any text
+			return transferable.canTransfer(ContentType.of(ContentType.TEXT_PRIMARY_TYPE, ContentType.WILDCARD_SUBTYPE)); //we can import any text
 		}
 
 		/**
