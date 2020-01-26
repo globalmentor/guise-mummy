@@ -18,6 +18,7 @@ package io.guise.mummy;
 
 import static com.globalmentor.html.spec.HTML.*;
 import static io.guise.mummy.GuiseMummy.NAMESPACE_STRING;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.Files.*;
 
 import java.io.*;
@@ -40,7 +41,7 @@ import com.globalmentor.xml.spec.NsName;
 public interface PageMummifier extends Mummifier {
 
 	/** The standard Internet media types for pages: <code>text/html</code> in UTF-8. */
-	public static final ContentType PAGE_MEDIA_TYPE = HTML_CONTENT_TYPE.withParameter(ContentType.Parameter.CHARSET_UTF_8);
+	public static final ContentType PAGE_MEDIA_TYPE = HTML_CONTENT_TYPE.withCharset(UTF_8);
 
 	/** The HTML {@code <meta>} name for indicating the instant of artifact generation. */
 	public static final String META_NAME_GENERATED_AT = "generated-at";

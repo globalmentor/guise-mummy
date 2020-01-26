@@ -2090,7 +2090,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 			if(contentType != null) { //if a content type was indicated
 				final Charset charset = Charset.class.cast(getResourceDescription().findPropertyValue(Content.CHARSET_PROPERTY_TAG).orElse(null)); //get the charset, if any
 				if(charset != null) { //if a charset was specified
-					contentType.withParameter(ContentType.Parameter.of(ContentType.CHARSET_PARAMETER, charset.name())); //add the charset as the value of the charset parameter
+					contentType.withCharset(charset); //add the charset as the value of the charset parameter
 				}
 			}
 			return contentType; //return the full content type, if any, we constructed
