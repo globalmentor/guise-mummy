@@ -84,7 +84,6 @@ import static com.globalmentor.xml.spec.XML.*;
 import static io.guise.framework.platform.web.WebPlatform.*;
 import static io.guise.framework.platform.web.WebUserAgentProduct.Brand.*;
 import static io.guise.framework.platform.web.adobe.Flash.*;
-import static io.urf.vocab.content.Content.setContentType;
 
 import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -578,7 +577,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 								if(itemContentTypeString != null) { //if we know the item's content type
 									final ContentType itemContentType = ContentType.parse(itemContentTypeString);
 									if(!ContentType.APPLICATION_OCTET_STREAM_CONTENT_TYPE.hasBaseType(itemContentType)) { //if the content type is not just a generic "bunch of bytes" content type
-										setContentType(resourceDescription, itemContentType); //set the resource's content type
+										resourceDescription.setPropertyValue(Content.TYPE_PROPERTY_TAG, itemContentType); //set the resource's content type
 									}
 								}
 								final String name = URIs.getName(itemName); //removing any extraneous path information a browser such as IE or Opera might have given TODO verify that the correct slashes are being checked

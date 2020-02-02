@@ -407,7 +407,7 @@ public class S3 implements DeployTarget, Clogged {
 					getLogger().info("Deploying artifact to S3 key `{}`.", key);
 					final PutObjectRequest.Builder putBuilder = PutObjectRequest.builder().bucket(bucket).key(key);
 					//set content-type if found
-					Content.findContentType(artifact.getResourceDescription()).map(ContentType::toString).ifPresent(putBuilder::contentType);
+					artifact.getResourceDescription().findPropertyValue(Content.TYPE_PROPERTY_TAG).map(Object::toString).ifPresent(putBuilder::contentType);
 					s3Client.putObject(putBuilder.build(), RequestBody.fromFile(artifact.getTargetPath()));
 				}
 			}

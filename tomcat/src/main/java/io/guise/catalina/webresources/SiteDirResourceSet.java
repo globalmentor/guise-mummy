@@ -18,7 +18,6 @@ package io.guise.catalina.webresources;
 
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.net.URIs.*;
-import static io.urf.vocab.content.Content.*;
 import static java.nio.file.Files.*;
 import static java.util.Objects.*;
 
@@ -34,6 +33,7 @@ import org.apache.juli.logging.*;
 
 import io.urf.model.*;
 import io.urf.turf.TurfParser;
+import io.urf.vocab.content.Content;
 
 /**
  * Tomcat source set for a Guise generated site directory.
@@ -95,7 +95,7 @@ public class SiteDirResourceSet extends DirResourceSet {
 						new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream).stream().filter(UrfResourceDescription.class::isInstance)
 								.map(UrfResourceDescription.class::cast).findFirst().ifPresentOrElse(description -> {
 									//set the MIME type if indicated
-									findContentType(description).ifPresent(contentType -> fileResource.setMimeType(contentType.toString()));
+									description.findPropertyValue(Content.TYPE_PROPERTY_TAG).ifPresent(contentType -> fileResource.setMimeType(contentType.toString()));
 								}, () -> log.warn(String.format("No description found for resource %s in file %s.", file, descriptionFile)));
 
 					} catch(final IOException ioException) {

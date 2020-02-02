@@ -18,7 +18,6 @@ package io.guise.mummy;
 
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
-import static io.urf.vocab.content.Content.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.function.Predicate.*;
@@ -34,6 +33,7 @@ import javax.annotation.*;
 import com.globalmentor.net.ContentType;
 
 import io.urf.model.UrfObject;
+import io.urf.vocab.content.Content;
 
 /**
  * Mummifier for directories.
@@ -101,7 +101,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 			if(directoryFilename != null) { //set the title to match the directory filename, if present
 				phantomDescription.setPropertyValueByHandle(Artifact.PROPERTY_HANDLE_TITLE, directoryFilename.toString());
 			}
-			setContentType(phantomDescription, PageMummifier.PAGE_MEDIA_TYPE);
+			phantomDescription.setPropertyValue(Content.TYPE_PROPERTY_TAG, PageMummifier.PAGE_MEDIA_TYPE);
 			return new DefaultXhtmlPhantomArtifact(contentMummifier, phantomContentSourceFile,
 					contentMummifier.getArtifactTargetPath(context, phantomContentSourceFile), phantomDescription);
 		});

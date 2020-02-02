@@ -26,7 +26,6 @@ import static com.globalmentor.util.Optionals.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static io.guise.mummy.Artifact.*;
 import static io.guise.mummy.GuiseMummy.*;
-import static io.urf.vocab.content.Content.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.function.Predicate.*;
@@ -290,7 +289,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		//TODO load any description sidecar
 
 		//add the content type
-		getArtifactMediaType(context, sourceFile).ifPresent(mediaType -> setContentType(description, mediaType));
+		getArtifactMediaType(context, sourceFile).ifPresent(mediaType -> description.setPropertyValue(Content.TYPE_PROPERTY_TAG, mediaType));
 
 		return description; //TODO add a way to make this immutable
 	}
