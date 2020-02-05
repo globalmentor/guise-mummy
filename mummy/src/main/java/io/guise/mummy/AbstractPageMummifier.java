@@ -1277,7 +1277,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		vocabularyRegistrar.setDefaultVocabulary(URF.AD_HOC_NAMESPACE); //indicate which properties don't need a namespace
 		for(final Map.Entry<URI, Object> property : description.getProperties()) {
 			final URI tag = property.getKey();
-			final Optional<URI> namespace = URF.Tag.getNamespace(tag);
+			final Optional<URI> namespace = URF.Tag.findNamespace(tag);
 			getLogger().debug("({}) Determining prefix for description tag {}.", artifact.getTargetPath(), tag);
 			if(isPresentAndEquals(namespace, URF.AD_HOC_NAMESPACE)) { //skip tags that would have no namespace
 				continue;
@@ -1306,7 +1306,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			if(tag.equals(titleTag)) { //skip the title property; we already set it as the <title>
 				continue;
 			}
-			if(URF.Tag.getNamespace(tag).filter(UNASCRIBED_NAMESPACES::contains).isPresent()) { //skip tags in the unascribed namespaces
+			if(URF.Tag.findNamespace(tag).filter(UNASCRIBED_NAMESPACES::contains).isPresent()) { //skip tags in the unascribed namespaces
 				continue;
 			}
 			final Object value = property.getValue();
