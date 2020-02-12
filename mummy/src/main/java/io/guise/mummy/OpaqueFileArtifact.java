@@ -33,9 +33,11 @@ public class OpaqueFileArtifact extends BaseCorporealSourceFileArtifact {
 	 * @param mummifier The mummifier responsible for generating this artifact.
 	 * @param sourceFile The file containing the source of this artifact.
 	 * @param outputFile The file where the artifact will be generated.
+	 * @param description The description of the artifact.
 	 */
-	public OpaqueFileArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
-		super(mummifier, sourceFile, outputFile, UrfResourceDescription.EMPTY);
+	public OpaqueFileArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path outputFile,
+			@Nonnull final UrfResourceDescription description) {
+		super(mummifier, sourceFile, outputFile, description);
 	}
 
 	/**

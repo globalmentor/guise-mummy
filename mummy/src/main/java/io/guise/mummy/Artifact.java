@@ -21,6 +21,7 @@ import static io.guise.mummy.GuiseMummy.*;
 
 import java.net.URI;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 
@@ -42,6 +43,11 @@ public interface Artifact {
 	/** The property handle of the string describing the artifact. */
 	public static final String PROPERTY_HANDLE_DESCRIPTION = "description";
 	/**
+	 * A {@link Boolean} value indicating whether the content has been changed and needs regenerating. This is a transient property and is not normally persisted.
+	 * @apiNote This property is used for incremental mummification; it is usually not appropriate to use in custom properties.
+	 */
+	public static final URI PROPERTY_TAG_DIRTY = NAMESPACE.resolve("dirty");
+	/**
 	 * The icon associated with the artifact, used in a navigation link for example, in <code><var>group</var>/<var>name</var></code> form (e.g.
 	 * <code>fas/fa-home</code> or <code>material-icons/home</code>).
 	 */
@@ -52,6 +58,11 @@ public interface Artifact {
 	public static final String PROPERTY_HANDLE_TITLE = "title";
 	/** The property tag of the <code>mummy/altLocation</code> property for indicating an alternate (redirect) name. */
 	public static final URI PROPERTY_TAG_MUMMY_ALT_LOCATION = NAMESPACE.resolve("altLocation");
+	/**
+	 * The {@link Instant} the source resource was last modified.
+	 * @apiNote This property is used for incremental mummification; it is usually not appropriate to use in custom properties.
+	 */
+	public static final URI PROPERTY_TAG_SOURCE_MODIFIED_AT = NAMESPACE.resolve("sourceModifiedAt");
 	/** The property tag of the <code>mummy/order</code> property for indicating e.g. navigation order. */
 	public static final URI PROPERTY_TAG_MUMMY_ORDER = NAMESPACE.resolve("order");
 	/**

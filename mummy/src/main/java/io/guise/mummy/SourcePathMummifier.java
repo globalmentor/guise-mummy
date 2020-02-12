@@ -16,10 +16,11 @@
 
 package io.guise.mummy;
 
+import static com.globalmentor.io.Paths.*;
+
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import javax.annotation.*;
 
@@ -53,9 +54,25 @@ public interface SourcePathMummifier extends Mummifier {
 	 * @param sourcePath The path in the site source directory.
 	 * @return The path in the site target directory to which the given source path should be generated.
 	 * @throws IllegalArgumentException if the given source file is not in the site source tree.
+	 * @see MummyContext#getSiteTargetDirectory()
 	 * @see MummyContext#getTargetPath(Path)
 	 */
 	public Path getArtifactTargetPath(@Nonnull MummyContext context, @Nonnull Path sourcePath);
+
+	/**
+	 * Determines the output path for an artifact description in the site description target directory based upon the source path in the site source directory.
+	 * @implSpec The default implementation first determines the target path by delegating to {@link #getArtifactTargetPath(MummyContext, Path)}, and then
+	 *           produces a filename based upon the target path filename, but in the {@link MummyContext#getSiteDescriptionTargetDirectory()} directory.
+	 * @param context The context of static site generation.
+	 * @param sourcePath The path in the site source directory.
+	 * @return The path in the site description target directory to which a description may be generated.
+	 * @throws IllegalArgumentException if the given source file is not in the site source tree.
+	 * @see MummyContext#getSiteDescriptionTargetDirectory()
+	 */
+	public default Path getArtifactDescriptionPath(@Nonnull MummyContext context, @Nonnull Path sourcePath) {
+		final Path targetPath = getArtifactTargetPath(context, sourcePath);
+		return addExtension(changeBase(targetPath, context.getSiteTargetDirectory(), context.getSiteDescriptionTargetDirectory()), "@.turf"); //TODO use constant
+	}
 
 	/**
 	 * Determines the media type for an artifact from the given source path
