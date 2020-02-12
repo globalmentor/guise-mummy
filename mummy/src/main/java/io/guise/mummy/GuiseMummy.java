@@ -386,23 +386,23 @@ public class GuiseMummy implements Clogged {
 		final TurfSerializer turfSerializer = new TurfSerializer();
 
 		//TODO remove debug code
-		getLogger().debug("{} ({})", artifact.getTargetPath(), artifact.getTargetPath().toUri());
+		getLogger().trace("{} ({})", artifact.getTargetPath(), artifact.getTargetPath().toUri());
 		if(artifact.getResourceDescription().hasProperties()) {
 			try {
-				getLogger().debug("    {}", turfSerializer.serializeDescription(new StringBuilder(), artifact.getResourceDescription()));
+				getLogger().trace("    {}", turfSerializer.serializeDescription(new StringBuilder(), artifact.getResourceDescription()));
 			} catch(final IOException ioException) {
 				getLogger().error("Error debugging resource description.", ioException);
 			}
 		}
 
-		context.findParentArtifact(artifact).ifPresent(parent -> getLogger().debug("  parent: {}", parent.getTargetPath()));
+		context.findParentArtifact(artifact).ifPresent(parent -> getLogger().trace("  parent: {}", parent.getTargetPath()));
 		final Collection<Artifact> siblings = context.siblingArtifacts(artifact).collect(toList()); //TODO make debugging calls more efficient, or transfer to describe functionality  
 		if(!siblings.isEmpty()) {
-			getLogger().debug("  siblings: {}", siblings);
+			getLogger().trace("  siblings: {}", siblings);
 		}
 		final Collection<Artifact> children = context.childArtifacts(artifact).collect(toList());
 		if(!children.isEmpty()) {
-			getLogger().debug("  children: {}", children);
+			getLogger().trace("  children: {}", children);
 		}
 
 		if(artifact instanceof CollectionArtifact) {
