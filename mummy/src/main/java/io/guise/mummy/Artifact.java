@@ -36,17 +36,15 @@ import io.urf.model.UrfResourceDescription;
  */
 public interface Artifact {
 
-	//#resource description
+	//# resource description
+
+	//## properties
+	//### general properties
 
 	/** The property handle of the string naming artifact. */
 	public static final String PROPERTY_HANDLE_NAME = "name";
 	/** The property handle of the string describing the artifact. */
 	public static final String PROPERTY_HANDLE_DESCRIPTION = "description";
-	/**
-	 * A {@link Boolean} value indicating whether the content has been changed and needs regenerating. This is a transient property and is not normally persisted.
-	 * @apiNote This property is used for incremental mummification; it is usually not appropriate to use in custom properties.
-	 */
-	public static final URI PROPERTY_TAG_DIRTY = NAMESPACE.resolve("dirty");
 	/**
 	 * The icon associated with the artifact, used in a navigation link for example, in <code><var>group</var>/<var>name</var></code> form (e.g.
 	 * <code>fas/fa-home</code> or <code>material-icons/home</code>).
@@ -56,13 +54,17 @@ public interface Artifact {
 	public static final String PROPERTY_HANDLE_LABEL = "label";
 	/** The property handle of the title, such as a page title. */
 	public static final String PROPERTY_HANDLE_TITLE = "title";
+
+	//### Guise Mummy properties
+
 	/** The property tag of the <code>mummy/altLocation</code> property for indicating an alternate (redirect) name. */
 	public static final URI PROPERTY_TAG_MUMMY_ALT_LOCATION = NAMESPACE.resolve("altLocation");
 	/**
-	 * The {@link Instant} the source resource was last modified.
+	 * A {@link Boolean} value indicating whether the description itself has been changed (or is new) and needs serializing. This is a transient property and is
+	 * not normally persisted.
 	 * @apiNote This property is used for incremental mummification; it is usually not appropriate to use in custom properties.
 	 */
-	public static final URI PROPERTY_TAG_SOURCE_MODIFIED_AT = NAMESPACE.resolve("sourceModifiedAt");
+	public static final URI PROPERTY_TAG_MUMMY_DIRTY = NAMESPACE.resolve("dirty");
 	/** The property tag of the <code>mummy/order</code> property for indicating e.g. navigation order. */
 	public static final URI PROPERTY_TAG_MUMMY_ORDER = NAMESPACE.resolve("order");
 	/**
@@ -70,13 +72,23 @@ public interface Artifact {
 	 * @see #PROPERTY_TAG_MUMMY_ORDER
 	 */
 	public static final long MUMMY_ORDER_DEFAULT = 0;
+	/**
+	 * The {@link Instant} the source resource was last modified.
+	 * @apiNote This property is used for incremental mummification; it is usually not appropriate to use in custom properties.
+	 */
+	public static final URI PROPERTY_TAG_MUMMY_SOURCE_MODIFIED_AT = NAMESPACE.resolve("sourceModifiedAt");
 	/** The property tag of the <code>mummy/template</code> for specifying a template path, relative to the source path. */
 	public static final URI PROPERTY_TAG_MUMMY_TEMPLATE = NAMESPACE.resolve("template");
+	/**
+	 * The {@link Instant} the target resource was last modified.
+	 * @apiNote This property is used for incremental mummification; it is usually not appropriate to use in custom properties.
+	 */
+	public static final URI PROPERTY_TAG_MUMMY_TARGET_MODIFIED_AT = NAMESPACE.resolve("targetModifiedAt");
 
 	/** @return The properties and their values describing the artifact. */
 	public UrfResourceDescription getResourceDescription();
 
-	//##description
+	//## description
 
 	/**
 	 * Looks up the description property in the resource description, returning it as a string if present.
@@ -88,7 +100,7 @@ public interface Artifact {
 		return getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_DESCRIPTION).map(Object::toString);
 	}
 
-	//##label
+	//## label
 
 	/**
 	 * Determines the label to use for the artifact, for example to appear as the text of a link to the artifact.
@@ -122,7 +134,7 @@ public interface Artifact {
 		return getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_LABEL).map(Object::toString);
 	}
 
-	//##name
+	//## name
 
 	/**
 	 * Looks up the name property in the resource description, returning it as a string if present.
@@ -134,7 +146,7 @@ public interface Artifact {
 		return getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_NAME).map(Object::toString);
 	}
 
-	//##title
+	//## title
 
 	/**
 	 * Looks up the title property in the resource description, returning it as a string if present.

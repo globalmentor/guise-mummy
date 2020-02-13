@@ -38,7 +38,6 @@ import io.confound.config.*;
 import io.confound.config.file.*;
 import io.guise.mummy.deploy.*;
 import io.guise.mummy.deploy.aws.*;
-import io.urf.model.UrfResourceDescription;
 import io.urf.turf.TurfSerializer;
 
 /**
@@ -242,7 +241,6 @@ public class GuiseMummy implements Clogged {
 			//# mummify phase
 			if(phase.compareTo(LifeCyclePhase.MUMMIFY) >= 0) {
 				rootArtifact.getMummifier().mummify(context, rootArtifact);
-				generateSiteDescription(context, rootArtifact);
 			}
 
 			//# prepare-deploy phase
@@ -342,43 +340,6 @@ public class GuiseMummy implements Clogged {
 		findConfiguredDomain(configuration);
 		findConfiguredSiteDomain(configuration);
 		findConfiguredSiteAltDomains(configuration);
-	}
-
-	/**
-	 * Recursively generates a description file for the indicated artifact and all its comprised artifacts if any.
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact the description of which is being generated.
-	 * @throws IOException if there is an I/O error generating the description.
-	 * @see CompositeArtifact#comprisedArtifacts()
-	 */
-	private void generateSiteDescription(@Nonnull final MummyContext context, @Nonnull final Artifact artifact) throws IOException {
-		final UrfResourceDescription description = artifact.getResourceDescription();
-		if(description.hasProperties()) { //skip empty descriptions
-			final Path targetPath = artifact.getTargetPath();
-			if(!(artifact instanceof DirectoryArtifact)) { //skip directories TODO delegate to mummifier for description generation
-				final Path descriptionTargetPath = addExtension(changeBase(targetPath, context.getSiteTargetDirectory(), context.getSiteDescriptionTargetDirectory()),
-						"@.turf"); //TODO use constant
-
-				//create parent directory as needed
-				final Path descriptionTargetParentPath = descriptionTargetPath.getParent();
-				if(descriptionTargetParentPath != null) {
-					createDirectories(descriptionTargetParentPath);
-				}
-
-				//save description
-				final TurfSerializer turfSerializer = new TurfSerializer();
-				turfSerializer.setFormatted(true);
-				try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(descriptionTargetPath))) {
-					turfSerializer.serializeDocument(outputStream, description);
-				}
-			}
-		}
-
-		if(artifact instanceof CompositeArtifact) {
-			for(final Artifact comprisedArtifact : (Iterable<Artifact>)((CompositeArtifact)artifact).comprisedArtifacts()::iterator) {
-				generateSiteDescription(context, comprisedArtifact);
-			}
-		}
 	}
 
 	//TODO document

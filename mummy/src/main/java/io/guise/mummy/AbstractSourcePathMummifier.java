@@ -49,10 +49,10 @@ public abstract class AbstractSourcePathMummifier implements SourcePathMummifier
 	 * @throws IllegalArgumentException if the given source file is not in the site source tree.
 	 * @return The generated target description, if present, of the resource being mummified.
 	 * @throws IOException if there is an I/O error retrieving the description, including if the metadata is invalid.
-	 * @see #getArtifactDescriptionPath(MummyContext, Path)
+	 * @see #getArtifactDescriptionFile(MummyContext, Path)
 	 */
 	protected Optional<UrfResourceDescription> loadTargetDescription(@Nonnull MummyContext context, @Nonnull final Path sourcePath) throws IOException {
-		final Path descriptionFile = getArtifactDescriptionPath(context, sourcePath);
+		final Path descriptionFile = getArtifactDescriptionFile(context, sourcePath);
 		if(!isRegularFile(descriptionFile)) {
 			return Optional.empty();
 		}

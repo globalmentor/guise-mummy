@@ -319,7 +319,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	}
 
 	@Override
-	public void mummify(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
+	public void mummifyFile(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
 
 		try {
 

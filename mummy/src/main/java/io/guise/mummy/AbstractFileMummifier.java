@@ -29,8 +29,11 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import com.globalmentor.java.Conditions;
+
 import io.urf.model.*;
 import io.urf.turf.TurfParser;
+import io.urf.turf.TurfSerializer;
 import io.urf.vocab.content.Content;
 
 /**
@@ -46,10 +49,10 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @throws IllegalArgumentException if the given source file is not in the site source tree.
 	 * @return The generated target description, if present, of the resource being mummified.
 	 * @throws IOException if there is an I/O error retrieving the description, including if the metadata is invalid.
-	 * @see #getArtifactDescriptionPath(MummyContext, Path)
+	 * @see #getArtifactDescriptionFile(MummyContext, Path)
 	 */
 	protected Optional<UrfResourceDescription> loadTargetDescription(@Nonnull MummyContext context, @Nonnull final Path sourcePath) throws IOException {
-		final Path descriptionFile = getArtifactDescriptionPath(context, sourcePath);
+		final Path descriptionFile = getArtifactDescriptionFile(context, sourcePath);
 		if(!isRegularFile(descriptionFile)) {
 			return Optional.empty();
 		}
@@ -97,7 +100,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 		//we'll load the target description if we can, and see if we can use it
 		final Optional<UrfResourceDescription> cachedDescription = loadTargetDescription(context, sourceFile).filter(description -> {
 			//check the source content modified timestamp, and discard the target description if the source content has changed at all
-			final boolean sourceContentDirty = description.findPropertyValue(PROPERTY_TAG_SOURCE_MODIFIED_AT)
+			final boolean sourceContentDirty = description.findPropertyValue(PROPERTY_TAG_MUMMY_SOURCE_MODIFIED_AT)
 					//Check the timestamp against the actual file timestamp. We can compare them directly without using a range
 					//because presumably we got both values from the same file, so they should be exactly the same.
 					//Note also that the source modified timestamp may not be present if there is no source file; in that case assume we can't use
@@ -113,7 +116,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 				return false;
 			}
 			//TODO check source description sidecar timestamp
-			getLogger().debug("Using cached target description for source file `{}`.", sourceFile);
+			getLogger().debug("Using previously generated target description to describe source file `{}`.", sourceFile);
 			return true;
 		});
 		return cachedDescription.orElseGet(throwingSupplier(() -> {
@@ -130,8 +133,8 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 			//add the content type
 			getArtifactMediaType(context, sourceFile).ifPresent(mediaType -> description.setPropertyValue(Content.TYPE_PROPERTY_TAG, mediaType));
 			//add the source modification timestamp, if any
-			sourceModifiedAt.ifPresent(instant -> description.setPropertyValue(PROPERTY_TAG_SOURCE_MODIFIED_AT, instant));
-			description.setPropertyValue(PROPERTY_TAG_DIRTY, true); //we created a new description, so the resource needs to be generated
+			sourceModifiedAt.ifPresent(instant -> description.setPropertyValue(PROPERTY_TAG_MUMMY_SOURCE_MODIFIED_AT, instant));
+			description.setPropertyValue(PROPERTY_TAG_MUMMY_DIRTY, true); //we created a new description, so the description needs to be persisted
 			return description;
 		})); //TODO add a way to make this immutable?
 	}
@@ -145,5 +148,88 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @throws IOException if there is an I/O error retrieving the metadata.
 	 */
 	protected abstract List<Map.Entry<URI, Object>> loadSourceMetadata(@Nonnull MummyContext context, @Nonnull final Path sourceFile) throws IOException;
+
+	/**
+	 * {@inheritDoc}
+	 * @apiNote This method cannot be overridden, as it performs necessary checks for incremental mummification. To implement file mummification,
+	 *          {@link #mummifyFile(MummyContext, Artifact, Artifact)} should be overridden instead.
+	 * @implSpec This version checks the the timestamp of the target file if performing an incremental mummification, and delegates to
+	 *           {@link #mummifyFile(MummyContext, Artifact, Artifact)} if the file needs regenerated.
+	 * @see Artifact#PROPERTY_TAG_MUMMY_TARGET_MODIFIED_AT
+	 */
+	@Override
+	public final void mummify(@Nonnull final MummyContext context, @Nonnull Artifact contextArtifact, @Nonnull Artifact artifact) throws IOException {
+		final Path targetFile = artifact.getTargetPath();
+		final Optional<Instant> oldTargetModifiedAt = exists(targetFile) ? Optional.of(getLastModifiedTime(targetFile).toInstant()) : Optional.empty();
+		final UrfResourceDescription description = artifact.getResourceDescription();
+		final boolean targetContentDirty = description.findPropertyValue(PROPERTY_TAG_MUMMY_TARGET_MODIFIED_AT)
+				.map(modifiedAt -> !isPresentAndEquals(oldTargetModifiedAt, modifiedAt))
+				//if there is no timestamp, we consider the content dirty
+				.orElse(true);
+		//produce target file if dirty
+		final Instant newTargetModifiedAt;
+		if(targetContentDirty) {
+			mummifyFile(context, contextArtifact, artifact);
+			Conditions.checkState(exists(targetFile), "Mummification of artifact source file `%s` did not produce target file `%s`.", artifact.getSourcePath(),
+					targetFile);
+			newTargetModifiedAt = getLastModifiedTime(targetFile).toInstant();
+		} else {
+			getLogger().debug("Using previously generated target file `{}`.", targetFile);
+			newTargetModifiedAt = oldTargetModifiedAt
+					.orElseThrow(() -> new AssertionError("If the old target timestamp was not present, the target content should have been marked as dirty."));
+		}
+		//produce description file if dirty
+		final boolean targetDescriptionDirty = targetContentDirty //checking content dirtiness inherently covers a missing or out of date target timestamp
+				//no need to check existence; if the description file didn't exist, the description should have been marked as dirty
+				|| description.hasPropertyValue(PROPERTY_TAG_MUMMY_DIRTY);
+		if(targetDescriptionDirty) {
+			description.setPropertyValue(PROPERTY_TAG_MUMMY_TARGET_MODIFIED_AT, newTargetModifiedAt); //update the target file timestamp
+			description.removeProperty(PROPERTY_TAG_MUMMY_DIRTY); //remove the description dirty flag, if any
+			try {
+				saveTargetDescription(context, artifact);
+			} catch(final IOException ioException) {
+				//If there is any I/O error saving the description, set its dirty flag for completeness
+				//(although its usefulness at this point is questionable).
+				description.setPropertyValue(PROPERTY_TAG_MUMMY_DIRTY, true); //we created a new description, so the description needs to be persisted
+				throw ioException;
+			}
+		} else {
+			getLogger().debug("Using previously generated target description file `{}`.", getArtifactDescriptionFile(context, artifact.getSourcePath()));
+		}
+	}
+
+	/**
+	 * Invariably mummifies a resource to a file in the presence of a context artifact, which may or may not be the same as the artifact itself. Mummification is
+	 * always performed, regardless of the state of metadata.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact being generated
+	 * @throws IOException if there is an I/O error during mummification.
+	 */
+	protected abstract void mummifyFile(@Nonnull final MummyContext context, @Nonnull Artifact contextArtifact, @Nonnull Artifact artifact) throws IOException;
+
+	/**
+	 * Saves an artifact's description as-is with no modifications.
+	 * @param context The context of static site generation.
+	 * @param artifact The artifact being generated
+	 * @throws IOException if there is an I/O error saving the description.
+	 * @see #getArtifactDescriptionFile(MummyContext, Path)
+	 * @see Artifact#PROPERTY_TAG_MUMMY_DIRTY
+	 */
+	protected void saveTargetDescription(@Nonnull final MummyContext context, @Nonnull Artifact artifact) throws IOException {
+		final UrfResourceDescription description = artifact.getResourceDescription();
+		final Path descriptionFile = getArtifactDescriptionFile(context, artifact.getSourcePath());
+		//create parent directory as needed
+		final Path descriptionTargetParentPath = descriptionFile.getParent();
+		if(descriptionTargetParentPath != null) {
+			createDirectories(descriptionTargetParentPath);
+		}
+		//save description
+		final TurfSerializer turfSerializer = new TurfSerializer();
+		turfSerializer.setFormatted(true);
+		try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(descriptionFile))) {
+			turfSerializer.serializeDocument(outputStream, description);
+		}
+	}
 
 }

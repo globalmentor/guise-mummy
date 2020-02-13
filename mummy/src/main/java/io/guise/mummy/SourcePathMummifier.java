@@ -60,7 +60,8 @@ public interface SourcePathMummifier extends Mummifier {
 	public Path getArtifactTargetPath(@Nonnull MummyContext context, @Nonnull Path sourcePath);
 
 	/**
-	 * Determines the output path for an artifact description in the site description target directory based upon the source path in the site source directory.
+	 * Determines the output file path for an artifact description in the site description target directory based upon the source path in the site source
+	 * directory.
 	 * @implSpec The default implementation first determines the target path by delegating to {@link #getArtifactTargetPath(MummyContext, Path)}, and then
 	 *           produces a filename based upon the target path filename, but in the {@link MummyContext#getSiteDescriptionTargetDirectory()} directory.
 	 * @param context The context of static site generation.
@@ -69,7 +70,7 @@ public interface SourcePathMummifier extends Mummifier {
 	 * @throws IllegalArgumentException if the given source file is not in the site source tree.
 	 * @see MummyContext#getSiteDescriptionTargetDirectory()
 	 */
-	public default Path getArtifactDescriptionPath(@Nonnull MummyContext context, @Nonnull Path sourcePath) {
+	public default Path getArtifactDescriptionFile(@Nonnull MummyContext context, @Nonnull Path sourcePath) {
 		final Path targetPath = getArtifactTargetPath(context, sourcePath);
 		return addExtension(changeBase(targetPath, context.getSiteTargetDirectory(), context.getSiteDescriptionTargetDirectory()), "@.turf"); //TODO use constant
 	}
