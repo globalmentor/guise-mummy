@@ -38,7 +38,6 @@ import io.confound.config.*;
 import io.confound.config.file.*;
 import io.guise.mummy.deploy.*;
 import io.guise.mummy.deploy.aws.*;
-import io.urf.model.UrfResourceDescription;
 import io.urf.turf.TurfSerializer;
 
 /**
@@ -189,6 +188,21 @@ public class GuiseMummy implements Clogged {
 	/** The registered mummifiers by supported extensions. */
 	private final Map<String, SourcePathMummifier> fileMummifiersByExtension = new HashMap<>();
 
+	private boolean full = false;
+
+	/** @return <code>true</code> if full mummification is enabled; <code>false</code> if mummification is incremental. */
+	public boolean isFull() {
+		return full;
+	}
+
+	/**
+	 * Enables or disables full mummification.
+	 * @param full <code>true</code> if full mummification should occur; <code>false</code> if mummification should be incremental.
+	 */
+	public void setFull(final boolean full) {
+		this.full = full;
+	}
+
 	//state
 
 	private final List<URI> deployUrls = new ArrayList<>();
@@ -242,7 +256,6 @@ public class GuiseMummy implements Clogged {
 			//# mummify phase
 			if(phase.compareTo(LifeCyclePhase.MUMMIFY) >= 0) {
 				rootArtifact.getMummifier().mummify(context, rootArtifact);
-				generateSiteDescription(context, rootArtifact);
 			}
 
 			//# prepare-deploy phase
@@ -322,7 +335,8 @@ public class GuiseMummy implements Clogged {
 
 		final Context context = new Context(project, mummyConfiguration);
 
-		getLogger().debug("page names bare: {}", context.getConfiguration().findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE));
+		getLogger().debug("Mummification: {}", context.isFull() ? "full" : "incremental"); //TODO i18n
+		getLogger().debug("Configuration: page names bare = `{}`", context.getConfiguration().findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false));
 
 		return context;
 	}
@@ -344,65 +358,28 @@ public class GuiseMummy implements Clogged {
 		findConfiguredSiteAltDomains(configuration);
 	}
 
-	/**
-	 * Recursively generates a description file for the indicated artifact and all its comprised artifacts if any.
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact the description of which is being generated.
-	 * @throws IOException if there is an I/O error generating the description.
-	 * @see CompositeArtifact#comprisedArtifacts()
-	 */
-	private void generateSiteDescription(@Nonnull final MummyContext context, @Nonnull final Artifact artifact) throws IOException {
-		final UrfResourceDescription description = artifact.getResourceDescription();
-		if(description.hasProperties()) { //skip empty descriptions
-			final Path targetPath = artifact.getTargetPath();
-			if(!(artifact instanceof DirectoryArtifact)) { //skip directories TODO delegate to mummifier for description generation
-				final Path descriptionTargetPath = addExtension(changeBase(targetPath, context.getSiteTargetDirectory(), context.getSiteDescriptionTargetDirectory()),
-						"@.turf"); //TODO use constant
-
-				//create parent directory as needed
-				final Path descriptionTargetParentPath = descriptionTargetPath.getParent();
-				if(descriptionTargetParentPath != null) {
-					createDirectories(descriptionTargetParentPath);
-				}
-
-				//save description
-				final TurfSerializer turfSerializer = new TurfSerializer();
-				turfSerializer.setFormatted(true);
-				try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(descriptionTargetPath))) {
-					turfSerializer.serializeDocument(outputStream, description);
-				}
-			}
-		}
-
-		if(artifact instanceof CompositeArtifact) {
-			for(final Artifact comprisedArtifact : (Iterable<Artifact>)((CompositeArtifact)artifact).comprisedArtifacts()::iterator) {
-				generateSiteDescription(context, comprisedArtifact);
-			}
-		}
-	}
-
 	//TODO document
 	private void printArtifactDescription(@Nonnull final MummyContext context, @Nonnull final Artifact artifact) { //TODO transfer to CLI
 		final TurfSerializer turfSerializer = new TurfSerializer();
 
 		//TODO remove debug code
-		getLogger().debug("{} ({})", artifact.getTargetPath(), artifact.getTargetPath().toUri());
+		getLogger().trace("{} ({})", artifact.getTargetPath(), artifact.getTargetPath().toUri());
 		if(artifact.getResourceDescription().hasProperties()) {
 			try {
-				getLogger().debug("    {}", turfSerializer.serializeDescription(new StringBuilder(), artifact.getResourceDescription()));
+				getLogger().trace("    {}", turfSerializer.serializeDescription(new StringBuilder(), artifact.getResourceDescription()));
 			} catch(final IOException ioException) {
 				getLogger().error("Error debugging resource description.", ioException);
 			}
 		}
 
-		context.findParentArtifact(artifact).ifPresent(parent -> getLogger().debug("  parent: {}", parent.getTargetPath()));
+		context.findParentArtifact(artifact).ifPresent(parent -> getLogger().trace("  parent: {}", parent.getTargetPath()));
 		final Collection<Artifact> siblings = context.siblingArtifacts(artifact).collect(toList()); //TODO make debugging calls more efficient, or transfer to describe functionality  
 		if(!siblings.isEmpty()) {
-			getLogger().debug("  siblings: {}", siblings);
+			getLogger().trace("  siblings: {}", siblings);
 		}
 		final Collection<Artifact> children = context.childArtifacts(artifact).collect(toList());
 		if(!children.isEmpty()) {
-			getLogger().debug("  children: {}", children);
+			getLogger().trace("  children: {}", children);
 		}
 
 		if(artifact instanceof CollectionArtifact) {
@@ -511,6 +488,11 @@ public class GuiseMummy implements Clogged {
 		@Override
 		public Configuration getConfiguration() {
 			return siteConfiguration;
+		}
+
+		@Override
+		public boolean isFull() {
+			return GuiseMummy.this.isFull();
 		}
 
 		//## deploy

@@ -191,6 +191,8 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
 			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
+			@Option(names = {"--full",
+					"-f"}, description = "Specifies full instead of incremental mummification. Cached artifacts will be regenerated.", defaultValue = "false") final boolean full,
 			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) throws IOException {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
@@ -202,6 +204,7 @@ public class GuiseCli extends BaseCliApplication {
 		final GuiseMummy mummifier = new GuiseMummy();
 		final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
 				argSiteDescriptionTargetDirectory);
+		mummifier.setFull(full);
 
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Mummify...").reset());
 		logProjectInfo(project);
@@ -216,6 +219,8 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
 			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
+			@Option(names = {"--full",
+					"-f"}, description = "Specifies full instead of incremental mummification. Cached artifacts will be regenerated.", defaultValue = "false") final boolean full,
 			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) throws IOException {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
@@ -227,6 +232,7 @@ public class GuiseCli extends BaseCliApplication {
 		final GuiseMummy mummifier = new GuiseMummy();
 		final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
 				argSiteDescriptionTargetDirectory);
+		mummifier.setFull(full);
 
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Prepare Deploy...").reset());
 		logProjectInfo(project);
@@ -241,6 +247,8 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
 			@Option(names = {"--browse", "-b"}, description = "Opens a browser to the site after starting the server.") final boolean browse,
+			@Option(names = {"--full",
+					"-f"}, description = "Specifies full instead of incremental mummification. Cached artifacts will be regenerated.", defaultValue = "false") final boolean full,
 			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) throws IOException {
 
 		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
@@ -252,6 +260,7 @@ public class GuiseCli extends BaseCliApplication {
 		final GuiseMummy mummifier = new GuiseMummy();
 		final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
 				argSiteDescriptionTargetDirectory);
+		mummifier.setFull(full);
 
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Deploy...").reset());
 		logProjectInfo(project);

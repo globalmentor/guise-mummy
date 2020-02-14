@@ -49,13 +49,6 @@ public interface PageMummifier extends Mummifier {
 	/** The attribute for regenerating an element, such as a navigation list. */
 	public static final NsName ATTRIBUTE_REGENERATE = NsName.of(NAMESPACE_STRING, "regenerate");
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec A page mummifier will always return a {@link PageArtifact}.
-	 */
-	@Override
-	PageArtifact plan(MummyContext context, Path sourcePath) throws IOException;
-
 	//#load
 
 	/**

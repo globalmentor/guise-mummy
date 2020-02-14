@@ -33,6 +33,7 @@ import javax.annotation.*;
 import com.globalmentor.net.ContentType;
 
 import io.urf.model.UrfObject;
+import io.urf.model.UrfResourceDescription;
 import io.urf.vocab.content.Content;
 
 /**
@@ -40,6 +41,7 @@ import io.urf.vocab.content.Content;
  * @implSpec This mummifier only works with instances of {@link DirectoryArtifact}.
  * @implNote Although the current implementation creates a default phantom content file if one is not present, this implementation will work without a known
  *           content file. This enables future implementations to allow configuration of whether a default content file is used.
+ * @implSpec Currently directory artifacts do not themselves have target descriptions, but rather rely on the target descriptions of any content file.
  * @author Garret Wilson
  * @see DirectoryArtifact
  */
@@ -71,6 +73,16 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		if(Files.isRegularFile(directoryFile)) {
 			return Optional.of(directoryFile);
 		}
+		return Optional.empty();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation returns empty; currently directory artifacts do not themselves have target descriptions, but rather rely on the target
+	 *           descriptions of any content file.
+	 */
+	@Override
+	protected Optional<UrfResourceDescription> loadTargetDescription(MummyContext context, Path sourcePath) throws IOException {
 		return Optional.empty();
 	}
 
@@ -127,9 +139,12 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 
 		final DirectoryArtifact directoryArtifact = (DirectoryArtifact)artifact;
 
-		//create the directory
-		getLogger().debug("created directory: {}", directoryArtifact);
-		createDirectories(artifact.getTargetPath());
+		//create the directory if it doesn't exist
+		final Path targetDirectory = artifact.getTargetPath();
+		if(!isDirectory(targetDirectory)) {
+			getLogger().debug("Mummified directory artifact {}.", directoryArtifact);
+			createDirectories(targetDirectory);
+		}
 
 		//mummify the directory content artifact, if present
 		directoryArtifact.getContentArtifact()

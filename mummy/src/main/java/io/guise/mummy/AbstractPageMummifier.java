@@ -57,7 +57,6 @@ import com.globalmentor.xml.spec.*;
 
 import io.urf.URF;
 import io.urf.URF.Handle;
-import io.urf.model.UrfObject;
 import io.urf.model.UrfResourceDescription;
 import io.urf.vocab.content.Content;
 
@@ -66,7 +65,7 @@ import io.urf.vocab.content.Content;
  * @author Garret Wilson
  * @see HTML#HTML_NAME_EXTENSION
  */
-public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier implements PageMummifier {
+public abstract class AbstractPageMummifier extends AbstractFileMummifier implements PageMummifier {
 
 	/**
 	 * A map of local names of HTML elements that can reference other resources (e.g. <code>"img"</code>), along with the attributes of each element that contains
@@ -193,9 +192,8 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	}
 
 	@Override
-	public PageArtifact plan(final MummyContext context, final Path sourceFile) throws IOException {
-		final UrfResourceDescription description = loadDescription(context, sourceFile);
-		return new PageArtifact(this, sourceFile, getArtifactTargetPath(context, sourceFile), description);
+	protected Artifact createArtifact(final Path sourceFile, final Path outputFile, final UrfResourceDescription description) throws IOException {
+		return new PageArtifact(this, sourceFile, outputFile, description);
 	}
 
 	/**
@@ -266,44 +264,11 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	}
 
 	/**
-	 * Determines the description for the given artifact based upon its source file and related files.
-	 * @implSpec This default implementation loads description from metadata in the XHTML document obtained by calling
-	 *           {@link #loadSourceMetadata(MummyContext, Path)}.
-	 * @param context The context of static site generation.
-	 * @param sourceFile The source file to be mummified.
-	 * @return A description of the resource being mummified.
-	 * @throws IOException if there is an I/O error retrieving the description, including if the metadata is invalid.
-	 */
-	protected UrfResourceDescription loadDescription(@Nonnull MummyContext context, @Nonnull final Path sourceFile) throws IOException {
-		final UrfObject description = new UrfObject();
-
-		//load source metadata
-		loadSourceMetadata(context, sourceFile).forEach(meta -> {
-			final URI propertyTag = meta.getKey();
-			final Object propertyValue = meta.getValue();
-			if(!description.hasPropertyValue(propertyTag)) { //the first property wins
-				description.setPropertyValue(propertyTag, propertyValue);
-			}
-		});
-
-		//TODO load any description sidecar
-
-		//add the content type
-		getArtifactMediaType(context, sourceFile).ifPresent(mediaType -> description.setPropertyValue(Content.TYPE_PROPERTY_TAG, mediaType));
-
-		return description; //TODO add a way to make this immutable
-	}
-
-	/**
-	 * Loads metadata stored in the source file itself.
-	 * @apiNote This method ignores any metadata stored in related files such as sidecar files.
-	 * @implSpec The default implementation opens an input stream to the given file and then extract the source metadata by calling
+	 * {@inheritDoc}
+	 * @implSpec This implementation opens an input stream to the given file and then extract the source metadata by calling
 	 *           {@link #loadSourceMetadata(MummyContext, InputStream, String)}.
-	 * @param context The context of static site generation.
-	 * @param sourceFile The source file to be mummified.
-	 * @return Metadata stored in the source file being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate names.
-	 * @throws IOException if there is an I/O error retrieving the metadata.
 	 */
+	@Override
 	protected List<Map.Entry<URI, Object>> loadSourceMetadata(@Nonnull MummyContext context, @Nonnull final Path sourceFile) throws IOException {
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile))) {
 			final Path filename = sourceFile.getFileName();
@@ -354,13 +319,13 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 	}
 
 	@Override
-	public void mummify(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
+	public void mummifyFile(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
 
 		try {
 
 			//#load source document: get starting content to work with
 			final Document sourceDocument = loadSourceDocument(context, (SourceFileArtifact)artifact); //this mummifier requires source file artifacts
-			getLogger().debug("loaded source document: {}", artifact.getSourcePath());
+			getLogger().trace("Loaded page source document `{}`.", artifact.getSourcePath());
 
 			//#normalize: normalize the DOM and remove metadata
 			final Document normalizedDocument = normalizeDocument(context, contextArtifact, artifact, sourceDocument);
@@ -385,7 +350,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 				final HtmlSerializer htmlSerializer = new HtmlSerializer(true, PageFormatProfile.INSTANCE);
 				htmlSerializer.serialize(ascribedDocument, outputStream);
 			}
-			getLogger().debug("generated output document: {}", artifact.getTargetPath());
+			getLogger().trace("Generated page output document `{}`.", artifact.getTargetPath());
 
 		} catch(final IllegalArgumentException | DOMException exception) { //convert input errors and XML errors to I/O errors TODO include filename?
 			throw new IOException(exception);
@@ -507,7 +472,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 				.flatMap(throwingFunction(templateSource -> { //try to apply the template
 					final Path templateFile = templateSource.getKey();
 					final PageMummifier templateMummifier = templateSource.getValue();
-					getLogger().debug("  {*} found template: {}", templateFile);
+					getLogger().trace("  {*} found template: {}", templateFile);
 
 					//#load and relocate the template document
 					final Document templateDocument;
@@ -530,7 +495,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 					final Element templateContentElement = findContentElement(templateDocument)
 							.orElseThrow(() -> new IOException(String.format("Template %s has no content insertion point.", templateFile)));
 					findContentElement(sourceDocument).ifPresentOrElse(sourceContentElement -> {
-						getLogger().debug("  {*} applying source content");
+						getLogger().trace("  {*} applying source content");
 						removeChildren(templateContentElement);
 						mergeAttributes(templateContentElement, sourceContentElement);
 						appendImportedChildNodes(templateContentElement, sourceContentElement);
@@ -1050,7 +1015,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			@Nonnull final String referenceAttributeName, @Nonnull final Path originalReferrerSourcePath, @Nonnull final Path relocatedReferrerPath,
 			@Nonnull final Function<Artifact, Path> referentArtifactPath) throws IOException, DOMException {
 		findAttributeNS(referenceElement, null, referenceAttributeName).ifPresent(referenceString -> {
-			getLogger().debug("  - found reference <{} {}=\"{}\" …>", referenceElement.getNodeName(), referenceAttributeName, referenceString);
+			getLogger().trace("  - found reference <{} {}=\"{}\" …>", referenceElement.getNodeName(), referenceAttributeName, referenceString);
 			//TODO check for the empty string and do something appropriate
 			final URI referenceURI;
 			try {
@@ -1060,7 +1025,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 					if(referencePath != null && !referencePath.isEmpty() && !URIs.isPathAbsolute(referencePath)) { //only convert relative paths that are not self-references ("")
 						retargetResourceReference(context, referenceURI, originalReferrerSourcePath, relocatedReferrerPath, referentArtifactPath)
 								.ifPresentOrElse(retargetedResourceReference -> {
-									getLogger().debug("  -> mapping to : {}", retargetedResourceReference);
+									getLogger().trace("  -> mapping to : {}", retargetedResourceReference);
 									referenceElement.setAttributeNS(null, referenceAttributeName, retargetedResourceReference.toString());
 								}, () -> getLogger().warn("No target artifact found for source relative reference `{}` in `{}`.", referenceURI, originalReferrerSourcePath));
 					}
@@ -1278,7 +1243,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 		for(final Map.Entry<URI, Object> property : description.getProperties()) {
 			final URI tag = property.getKey();
 			final Optional<URI> namespace = URF.Tag.findNamespace(tag);
-			getLogger().debug("({}) Determining prefix for description tag {}.", artifact.getTargetPath(), tag);
+			getLogger().trace("({}) Determining prefix for description tag {}.", artifact.getTargetPath(), tag);
 			if(isPresentAndEquals(namespace, URF.AD_HOC_NAMESPACE)) { //skip tags that would have no namespace
 				continue;
 			}
@@ -1312,7 +1277,7 @@ public abstract class AbstractPageMummifier extends AbstractSourcePathMummifier 
 			final Object value = property.getValue();
 			try { //convert the property to a kebab-case CURIE 
 				final Curie curie = vocabularyRegistrar.determineCurieForTerm(tag).orElseThrow(IllegalArgumentException::new).mapReference(CAMEL_CASE::toKebabCase);
-				getLogger().debug("({}) Ascribing metadata: `{}`=`{}` ", artifact.getTargetPath(), curie, value);
+				getLogger().trace("({}) Ascribing metadata: `{}`=`{}` ", artifact.getTargetPath(), curie, value);
 				if(curie.getPrefix().isPresent()) { //use the `property` attribute for a CURIE with a prefix
 					final Element metaElement = addLast(headElement, headElement.getOwnerDocument().createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_META));
 					metaElement.setAttributeNS(null, RDFa.ATTRIBUTE_PROPERTY, curie.toString()); //TODO create RDFa utility

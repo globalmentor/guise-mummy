@@ -78,7 +78,7 @@ public abstract class AbstractArtifact implements Artifact {
 	 */
 	@Override
 	public String toString() {
-		return "(" + getSourcePath() + " -> " + getTargetPath() + ")";
+		return "(`" + getSourcePath() + "` -> `" + getTargetPath() + "`)";
 	}
 
 	@Override

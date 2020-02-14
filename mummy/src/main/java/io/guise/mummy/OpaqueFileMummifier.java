@@ -21,17 +21,21 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.Collections.*;
 
 import java.io.*;
+import java.net.URI;
 import java.nio.file.*;
 import java.util.*;
+import java.util.Map.Entry;
 
 import com.globalmentor.net.ContentType;
+
+import io.urf.model.UrfResourceDescription;
 
 /**
  * Mummifier for files with unknown content.
  * @implSpec This implementation merely copies the file during mummification with no further action. Any existing target file will be replaced.
  * @author Garret Wilson
  */
-public class OpaqueFileMummifier extends AbstractSourcePathMummifier {
+public class OpaqueFileMummifier extends AbstractFileMummifier {
 
 	@Override
 	public Set<String> getSupportedFilenameExtensions() {
@@ -48,9 +52,17 @@ public class OpaqueFileMummifier extends AbstractSourcePathMummifier {
 	}
 
 	@Override
-	public Artifact plan(MummyContext context, Path sourcePath) throws IOException {
-		checkArgumentRegularFile(sourcePath);
-		return new OpaqueFileArtifact(this, sourcePath, getArtifactTargetPath(context, sourcePath));
+	protected Artifact createArtifact(final Path sourceFile, final Path outputFile, final UrfResourceDescription description) throws IOException {
+		return new OpaqueFileArtifact(this, sourceFile, outputFile, description);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation returns an empty list, as there is no way to know source metadata of an opaque file.
+	 */
+	@Override
+	protected List<Entry<URI, Object>> loadSourceMetadata(MummyContext context, Path sourceFile) throws IOException {
+		return emptyList();
 	}
 
 	/**
@@ -58,7 +70,7 @@ public class OpaqueFileMummifier extends AbstractSourcePathMummifier {
 	 * @implSpec This implementation merely copies the file with no further action.
 	 */
 	@Override
-	public void mummify(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
+	public void mummifyFile(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
 		final Path sourceFile = artifact.getSourcePath();
 		checkArgumentRegularFile(sourceFile);
 		Files.copy(sourceFile, artifact.getTargetPath(), REPLACE_EXISTING);
