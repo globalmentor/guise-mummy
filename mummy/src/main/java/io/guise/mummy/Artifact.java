@@ -59,12 +59,6 @@ public interface Artifact {
 
 	/** The property tag of the <code>mummy/altLocation</code> property for indicating an alternate (redirect) name. */
 	public static final URI PROPERTY_TAG_MUMMY_ALT_LOCATION = NAMESPACE.resolve("altLocation");
-	/**
-	 * A {@link Boolean} value indicating whether the description itself has been changed (or is new) and needs serializing. This is a transient property and is
-	 * not normally persisted.
-	 * @apiNote This property is used for incremental mummification; it is usually not appropriate to use in custom properties.
-	 */
-	public static final URI PROPERTY_TAG_MUMMY_DIRTY = NAMESPACE.resolve("dirty");
 	/** The property tag of the <code>mummy/order</code> property for indicating e.g. navigation order. */
 	public static final URI PROPERTY_TAG_MUMMY_ORDER = NAMESPACE.resolve("order");
 	/**
@@ -77,13 +71,19 @@ public interface Artifact {
 	 * @apiNote This property is used for incremental mummification; it is usually not appropriate to use in custom properties.
 	 */
 	public static final URI PROPERTY_TAG_MUMMY_SOURCE_MODIFIED_AT = NAMESPACE.resolve("sourceModifiedAt");
-	/** The property tag of the <code>mummy/template</code> for specifying a template path, relative to the source path. */
-	public static final URI PROPERTY_TAG_MUMMY_TEMPLATE = NAMESPACE.resolve("template");
+	/**
+	 * A {@link Boolean} value indicating whether the target description itself has been changed (or is new) and needs serializing. This is a transient property
+	 * and is not normally persisted.
+	 * @apiNote This property is used for incremental mummification; it is usually not appropriate to use in custom properties.
+	 */
+	public static final URI PROPERTY_TAG_MUMMY_TARGET_DESCRIPTION_DIRTY = NAMESPACE.resolve("targetDescriptionDirty");
 	/**
 	 * The {@link Instant} the target resource was last modified.
 	 * @apiNote This property is used for incremental mummification; it is usually not appropriate to use in custom properties.
 	 */
 	public static final URI PROPERTY_TAG_MUMMY_TARGET_MODIFIED_AT = NAMESPACE.resolve("targetModifiedAt");
+	/** The property tag of the <code>mummy/template</code> for specifying a template path, relative to the source path. */
+	public static final URI PROPERTY_TAG_MUMMY_TEMPLATE = NAMESPACE.resolve("template");
 
 	/** @return The properties and their values describing the artifact. */
 	public UrfResourceDescription getResourceDescription();
