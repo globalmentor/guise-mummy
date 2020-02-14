@@ -139,9 +139,12 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 
 		final DirectoryArtifact directoryArtifact = (DirectoryArtifact)artifact;
 
-		//create the directory
-		getLogger().debug("created directory: {}", directoryArtifact);
-		createDirectories(artifact.getTargetPath());
+		//create the directory if it doesn't exist
+		final Path targetDirectory = artifact.getTargetPath();
+		if(!isDirectory(targetDirectory)) {
+			getLogger().debug("Mummified directory artifact {}.", directoryArtifact);
+			createDirectories(targetDirectory);
+		}
 
 		//mummify the directory content artifact, if present
 		directoryArtifact.getContentArtifact()

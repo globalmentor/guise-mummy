@@ -325,7 +325,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 			//#load source document: get starting content to work with
 			final Document sourceDocument = loadSourceDocument(context, (SourceFileArtifact)artifact); //this mummifier requires source file artifacts
-			getLogger().debug("loaded source document: {}", artifact.getSourcePath());
+			getLogger().trace("Loaded page source document `{}`.", artifact.getSourcePath());
 
 			//#normalize: normalize the DOM and remove metadata
 			final Document normalizedDocument = normalizeDocument(context, contextArtifact, artifact, sourceDocument);
@@ -350,7 +350,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				final HtmlSerializer htmlSerializer = new HtmlSerializer(true, PageFormatProfile.INSTANCE);
 				htmlSerializer.serialize(ascribedDocument, outputStream);
 			}
-			getLogger().debug("generated output document: {}", artifact.getTargetPath());
+			getLogger().trace("Generated page output document `{}`.", artifact.getTargetPath());
 
 		} catch(final IllegalArgumentException | DOMException exception) { //convert input errors and XML errors to I/O errors TODO include filename?
 			throw new IOException(exception);

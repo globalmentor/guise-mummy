@@ -172,6 +172,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 			mummifyFile(context, contextArtifact, artifact);
 			Conditions.checkState(exists(targetFile), "Mummification of artifact source file `%s` did not produce target file `%s`.", artifact.getSourcePath(),
 					targetFile);
+			getLogger().debug("Mummified file artifact {}.", artifact);
 			newTargetModifiedAt = getLastModifiedTime(targetFile).toInstant();
 		} else {
 			getLogger().debug("Using previously generated target file `{}`.", targetFile);
