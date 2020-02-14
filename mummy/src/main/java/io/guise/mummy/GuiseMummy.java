@@ -188,6 +188,21 @@ public class GuiseMummy implements Clogged {
 	/** The registered mummifiers by supported extensions. */
 	private final Map<String, SourcePathMummifier> fileMummifiersByExtension = new HashMap<>();
 
+	private boolean full = false;
+
+	/** @return <code>true</code> if full mummification is enabled; <code>false</code> if mummification is incremental. */
+	public boolean isFull() {
+		return full;
+	}
+
+	/**
+	 * Enables or disables full mummification.
+	 * @param full <code>true</code> if full mummification should occur; <code>false</code> if mummification should be incremental.
+	 */
+	public void setFull(final boolean full) {
+		this.full = full;
+	}
+
 	//state
 
 	private final List<URI> deployUrls = new ArrayList<>();
@@ -320,7 +335,8 @@ public class GuiseMummy implements Clogged {
 
 		final Context context = new Context(project, mummyConfiguration);
 
-		getLogger().debug("page names bare: {}", context.getConfiguration().findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE));
+		getLogger().debug("Mummification: {}", context.isFull() ? "full" : "incremental"); //TODO i18n
+		getLogger().debug("Configuration: page names bare = `{}`", context.getConfiguration().findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false));
 
 		return context;
 	}
@@ -472,6 +488,11 @@ public class GuiseMummy implements Clogged {
 		@Override
 		public Configuration getConfiguration() {
 			return siteConfiguration;
+		}
+
+		@Override
+		public boolean isFull() {
+			return GuiseMummy.this.isFull();
 		}
 
 		//## deploy

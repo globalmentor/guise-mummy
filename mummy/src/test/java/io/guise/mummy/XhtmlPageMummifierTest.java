@@ -22,13 +22,11 @@ import static org.hamcrest.Matchers.*;
 
 import java.io.*;
 import java.net.URI;
-import java.nio.file.Path;
 import java.util.*;
 
 import org.junit.jupiter.api.*;
 
 import io.confound.config.Configuration;
-import io.guise.mummy.deploy.*;
 import io.urf.URF.Handle;
 
 /**
@@ -43,45 +41,8 @@ public class XhtmlPageMummifierTest {
 
 	@BeforeEach
 	protected void setupContext() {
-		final GuiseProject project = new DefaultGuiseProject(getWorkingDirectory(), Configuration.empty()); //TODO improve mock project
-		mummyContext = new BaseMummyContext(project) { //TODO move to separate mock context
-
-			@Override
-			public Configuration getConfiguration() {
-				return getProject().getConfiguration();
-			}
-
-			@Override
-			public SourcePathMummifier getDefaultSourceFileMummifier() {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public SourcePathMummifier getDefaultSourceDirectoryMummifier() {
-				throw new UnsupportedOperationException();
-			}
-
-			@Override
-			public Optional<SourcePathMummifier> findRegisteredMummifierForSourceFile(Path sourceFile) {
-				return Optional.empty();
-			}
-
-			@Override
-			public Optional<SourcePathMummifier> findRegisteredMummifierForSourceDirectory(Path sourceDirectory) {
-				return Optional.empty();
-			}
-
-			@Override
-			public Optional<Dns> getDeployDns() {
-				return Optional.empty();
-			}
-
-			@Override
-			public Optional<List<DeployTarget>> getDeployTargets() {
-				return Optional.empty();
-			}
-
-		};
+		final GuiseProject project = new DefaultGuiseProject(getWorkingDirectory(), Configuration.empty());
+		mummyContext = new StubMummyContext(project);
 	}
 
 	/**

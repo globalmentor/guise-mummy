@@ -86,39 +86,47 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 
 	/**
 	 * Determines the description for the given artifact based upon its source file and related files.
-	 * @implSpec This default loads the last generated target description as used that unless the source content has been modified, in which case it loads source
-	 *           metadata anew using {@link #loadSourceMetadata(MummyContext, Path)}.
+	 * @implSpec If incremental mummification is enabled via {@link MummyContext#isIncremental()}, this implementation loads the last generated target description
+	 *           and uses that. If full mummification is turned on or the source content has been modified, it loads source metadata anew using
+	 *           {@link #loadSourceMetadata(MummyContext, Path)}.
 	 * @param context The context of static site generation.
 	 * @param sourceFile The file containing the source of this artifact in the site source directory.
 	 * @return A description of the resource being mummified.
 	 * @throws IOException if there is an I/O error retrieving the description, including if the metadata is invalid.
 	 * @see #loadTargetDescription(MummyContext, Path)
 	 * @see #loadSourceMetadata(MummyContext, Path)
+	 * @see MummyContext#isIncremental()
+	 * @see MummyContext#isFull()
 	 */
 	protected UrfResourceDescription loadDescription(@Nonnull MummyContext context, @Nonnull final Path sourceFile) throws IOException {
 		final Optional<Instant> sourceModifiedAt = exists(sourceFile) ? Optional.of(getLastModifiedTime(sourceFile).toInstant()) : Optional.empty();
-		//we'll load the target description if we can, and see if we can use it
-		final Optional<UrfResourceDescription> cachedDescription = loadTargetDescription(context, sourceFile).filter(description -> {
-			//check the source content modified timestamp, and discard the target description if the source content has changed at all
-			final boolean sourceContentDirty = description.findPropertyValue(PROPERTY_TAG_MUMMY_SOURCE_MODIFIED_AT)
-					//Check the timestamp against the actual file timestamp. We can compare them directly without using a range
-					//because presumably we got both values from the same file, so they should be exactly the same.
-					//Note also that the source modified timestamp may not be present if there is no source file; in that case assume we can't use
-					//a cached target description (because we wouldn't know when it is dirty with no way to compare it with the source file).
-					//Thus we will assume that the artifact needs regenerating.
-					//In the future we may have a way for the mummifier to detect if a generated resource needs regenerating, even without a source file.
-					//This will be important for entirely generated artifacts such as blogs. (In those cases, though, a modified mummifier will be needed
-					//to get source from an alternate location, so this logic will need to be further refactored to support that.)
-					.map(modifiedAt -> !isPresentAndEquals(sourceModifiedAt, modifiedAt))
-					//if there is no timestamp, we consider the content dirty
-					.orElse(true);
-			if(sourceContentDirty) {
-				return false;
-			}
-			//TODO check source description sidecar timestamp
-			getLogger().debug("Using previously generated target description to describe source file `{}`.", sourceFile);
-			return true;
-		});
+		final Optional<UrfResourceDescription> cachedDescription;
+		if(context.isIncremental()) {
+			//we'll load the target description if we can, and see if we can use it
+			cachedDescription = loadTargetDescription(context, sourceFile).filter(description -> {
+				//check the source content modified timestamp, and discard the target description if the source content has changed at all
+				final boolean sourceContentDirty = description.findPropertyValue(PROPERTY_TAG_MUMMY_SOURCE_MODIFIED_AT)
+						//Check the timestamp against the actual file timestamp. We can compare them directly without using a range
+						//because presumably we got both values from the same file, so they should be exactly the same.
+						//Note also that the source modified timestamp may not be present if there is no source file; in that case assume we can't use
+						//a cached target description (because we wouldn't know when it is dirty with no way to compare it with the source file).
+						//Thus we will assume that the artifact needs regenerating.
+						//In the future we may have a way for the mummifier to detect if a generated resource needs regenerating, even without a source file.
+						//This will be important for entirely generated artifacts such as blogs. (In those cases, though, a modified mummifier will be needed
+						//to get source from an alternate location, so this logic will need to be further refactored to support that.)
+						.map(modifiedAt -> !isPresentAndEquals(sourceModifiedAt, modifiedAt))
+						//if there is no timestamp, we consider the content dirty
+						.orElse(true);
+				if(sourceContentDirty) {
+					return false;
+				}
+				//TODO check source description sidecar timestamp
+				getLogger().debug("Using previously generated target description to describe source file `{}`.", sourceFile);
+				return true;
+			});
+		} else { //full mummification
+			cachedDescription = Optional.empty();
+		}
 		return cachedDescription.orElseGet(throwingSupplier(() -> {
 			final UrfObject description = new UrfObject();
 			//load source metadata
@@ -153,19 +161,28 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * {@inheritDoc}
 	 * @apiNote This method cannot be overridden, as it performs necessary checks for incremental mummification. To implement file mummification,
 	 *          {@link #mummifyFile(MummyContext, Artifact, Artifact)} should be overridden instead.
-	 * @implSpec This version checks the the timestamp of the target file if performing an incremental mummification, and delegates to
-	 *           {@link #mummifyFile(MummyContext, Artifact, Artifact)} if the file needs regenerated.
+	 * @implSpec If incremental mummification is enabled via {@link MummyContext#isIncremental()}, this version checks the the timestamp of the target file, and
+	 *           delegates to {@link #mummifyFile(MummyContext, Artifact, Artifact)} if the file needs regenerated.
 	 * @see Artifact#PROPERTY_TAG_MUMMY_TARGET_MODIFIED_AT
+	 * @see MummyContext#isIncremental()
+	 * @see MummyContext#isFull()
 	 */
 	@Override
 	public final void mummify(@Nonnull final MummyContext context, @Nonnull Artifact contextArtifact, @Nonnull Artifact artifact) throws IOException {
 		final Path targetFile = artifact.getTargetPath();
-		final Optional<Instant> oldTargetModifiedAt = exists(targetFile) ? Optional.of(getLastModifiedTime(targetFile).toInstant()) : Optional.empty();
 		final UrfResourceDescription description = artifact.getResourceDescription();
-		final boolean targetContentDirty = description.findPropertyValue(PROPERTY_TAG_MUMMY_TARGET_MODIFIED_AT)
-				.map(modifiedAt -> !isPresentAndEquals(oldTargetModifiedAt, modifiedAt))
-				//if there is no timestamp, we consider the content dirty
-				.orElse(true);
+		final Optional<Instant> oldTargetModifiedAt;
+		final boolean targetContentDirty;
+		if(context.isIncremental()) {
+			oldTargetModifiedAt = exists(targetFile) ? Optional.of(getLastModifiedTime(targetFile).toInstant()) : Optional.empty();
+			targetContentDirty = description.findPropertyValue(PROPERTY_TAG_MUMMY_TARGET_MODIFIED_AT)
+					.map(modifiedAt -> !isPresentAndEquals(oldTargetModifiedAt, modifiedAt))
+					//if there is no timestamp, we consider the content dirty
+					.orElse(true);
+		} else { //full mummification
+			targetContentDirty = true;
+			oldTargetModifiedAt = Optional.empty(); //no need to check the old target modification timestamp if we're doing full mummification
+		}
 		//produce target file if dirty
 		final Instant newTargetModifiedAt;
 		if(targetContentDirty) {

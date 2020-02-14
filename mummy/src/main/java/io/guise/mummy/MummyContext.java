@@ -52,6 +52,18 @@ public interface MummyContext {
 	/** @return The Guise project governing mummification. */
 	public GuiseProject getProject();
 
+	/** @return <code>true</code> if full mummification is enabled; <code>false</code> if mummification is incremental. */
+	public boolean isFull();
+
+	/**
+	 * Indicates whether mummification should be incremental.
+	 * @implSpec The default implementation delegates to {@link #isFull()} and returns the opposite value.
+	 * @return <code>true</code> if incremental mummification is enabled.
+	 */
+	public default boolean isIncremental() {
+		return !isFull();
+	}
+
 	/**
 	 * Returns some URI indicating the root of the current context, that is, the site source directory. All resource context paths are interpreted relative to
 	 * this root.
