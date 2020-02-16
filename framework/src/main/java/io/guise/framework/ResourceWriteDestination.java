@@ -37,7 +37,7 @@ public interface ResourceWriteDestination extends Destination {
 	 * <li>TODO add <code>urf-name</code> property to spec</li>
 	 * <li>{@link Content#TYPE_PROPERTY_TAG}</li>
 	 * <li>{@link Content#LENGTH_PROPERTY_TAG}</li>
-	 * <li>{@link Content#MODIFIED_PROPERTY_TAG}</li>
+	 * <li>{@link Content#MODIFIED_AT_PROPERTY_TAG}</li>
 	 * </ul>
 	 * @param resourceDescription The description of the resource.
 	 * @param session The current Guise Session.

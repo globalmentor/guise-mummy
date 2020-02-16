@@ -36,7 +36,7 @@ public interface ResourceReadDestination extends Destination {
 	 * <ul>
 	 * <li>{@link Content#TYPE_PROPERTY_TAG}</li>
 	 * <li>{@link Content#LENGTH_PROPERTY_TAG}</li>
-	 * <li>{@link Content#MODIFIED_PROPERTY_TAG}</li>
+	 * <li>{@link Content#MODIFIED_AT_PROPERTY_TAG}</li>
 	 * </ul>
 	 * @param session The current Guise Session.
 	 * @param navigationPath The navigation path relative to the application context path.
