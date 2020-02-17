@@ -30,6 +30,7 @@ import java.util.*;
 import javax.annotation.*;
 
 import com.globalmentor.java.Conditions;
+import com.globalmentor.security.MessageDigests;
 
 import io.urf.model.*;
 import io.urf.turf.TurfParser;
@@ -41,6 +42,13 @@ import io.urf.vocab.content.Content;
  * @author Garret Wilson
  */
 public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier {
+
+	/**
+	 * The algorithm used for calculating a fingerprint of the generated target artifact.
+	 * @apiNote This algorithm should be set to an algorithm known to be implemented on all supported Java versions.
+	 * @see Content#FINGERPRINT_PROPERTY_TAG
+	 */
+	private static final MessageDigests.Algorithm FINGERPRINT_ALGORITHM = MessageDigests.SHA_256;
 
 	/**
 	 * Loads the generated target description if any of a source file.
@@ -199,9 +207,12 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 		//produce description file if dirty
 		final boolean targetDescriptionDirty = targetContentDirty //checking content dirtiness inherently covers a missing or out of date target timestamp
 				//no need to check existence; if the description file didn't exist, the description should have been marked as dirty
-				|| description.hasPropertyValue(PROPERTY_TAG_MUMMY_TARGET_DESCRIPTION_DIRTY);
+				|| description.hasPropertyValue(PROPERTY_TAG_MUMMY_TARGET_DESCRIPTION_DIRTY)
+				//require a fingerprint property (checking content dirtiness takes care of outdated fingerprint) 
+				|| !description.hasPropertyValue(Content.FINGERPRINT_PROPERTY_TAG);
 		if(targetDescriptionDirty) {
 			description.setPropertyValue(PROPERTY_TAG_MUMMY_TARGET_MODIFIED_AT, newTargetModifiedAt); //update the target file timestamp
+			description.setPropertyValue(Content.FINGERPRINT_PROPERTY_TAG, FINGERPRINT_ALGORITHM.digest(targetFile)); //update the target fingerprint
 			description.removeProperty(PROPERTY_TAG_MUMMY_TARGET_DESCRIPTION_DIRTY); //remove the description dirty flag, if any
 			try {
 				saveTargetDescription(context, artifact);
