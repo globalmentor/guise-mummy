@@ -113,7 +113,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 			//we'll load the target description if we can, and see if we can use it
 			cachedDescription = loadTargetDescription(context, sourceFile).filter(description -> {
 				//check the source content modified timestamp, and discard the target description if the source content has changed at all
-				final boolean sourceContentDirty = description.findPropertyValue(PROPERTY_TAG_MUMMY_SOURCE_MODIFIED_AT)
+				final boolean sourceContentDirty = description.findPropertyValue(PROPERTY_TAG_MUMMY_SOURCE_CONTENT_MODIFIED_AT)
 						//Check the timestamp against the actual file timestamp. We can compare them directly without using a range
 						//because presumably we got both values from the same file, so they should be exactly the same.
 						//Note also that the source modified timestamp may not be present if there is no source file; in that case assume we can't use
@@ -149,8 +149,8 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 			//add the content type
 			getArtifactMediaType(context, sourceFile).ifPresent(mediaType -> description.setPropertyValue(Content.TYPE_PROPERTY_TAG, mediaType));
 			//add the source modification timestamp, if any
-			sourceModifiedAt.ifPresent(instant -> description.setPropertyValue(PROPERTY_TAG_MUMMY_SOURCE_MODIFIED_AT, instant));
-			description.setPropertyValue(PROPERTY_TAG_MUMMY_TARGET_DESCRIPTION_DIRTY, true); //we created a new description, so the description needs to be persisted
+			sourceModifiedAt.ifPresent(instant -> description.setPropertyValue(PROPERTY_TAG_MUMMY_SOURCE_CONTENT_MODIFIED_AT, instant));
+			description.setPropertyValue(PROPERTY_TAG_MUMMY_DESCRIPTION_DIRTY, true); //we created a new description, so the description needs to be persisted
 			return description;
 		})); //TODO add a way to make this immutable?
 	}
@@ -172,6 +172,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @implSpec If incremental mummification is enabled via {@link MummyContext#isIncremental()}, this version checks the the timestamp of the target file, and
 	 *           delegates to {@link #mummifyFile(MummyContext, Artifact, Artifact)} if the file needs regenerated.
 	 * @see Content#MODIFIED_AT_PROPERTY_TAG
+	 * @see Artifact#PROPERTY_TAG_MUMMY_DESCRIPTION_DIRTY
 	 * @see MummyContext#isIncremental()
 	 * @see MummyContext#isFull()
 	 */
@@ -207,19 +208,19 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 		//produce description file if dirty
 		final boolean targetDescriptionDirty = targetContentDirty //checking content dirtiness inherently covers a missing or out of date target timestamp
 				//no need to check existence; if the description file didn't exist, the description should have been marked as dirty
-				|| description.hasPropertyValue(PROPERTY_TAG_MUMMY_TARGET_DESCRIPTION_DIRTY)
+				|| description.hasPropertyValue(PROPERTY_TAG_MUMMY_DESCRIPTION_DIRTY)
 				//require a fingerprint property (checking content dirtiness takes care of outdated fingerprint) 
 				|| !description.hasPropertyValue(Content.FINGERPRINT_PROPERTY_TAG);
 		if(targetDescriptionDirty) {
 			description.setPropertyValue(Content.MODIFIED_AT_PROPERTY_TAG, newTargetModifiedAt); //update the target file timestamp
 			description.setPropertyValue(Content.FINGERPRINT_PROPERTY_TAG, FINGERPRINT_ALGORITHM.digest(targetFile)); //update the target fingerprint
-			description.removeProperty(PROPERTY_TAG_MUMMY_TARGET_DESCRIPTION_DIRTY); //remove the description dirty flag, if any
+			description.removeProperty(PROPERTY_TAG_MUMMY_DESCRIPTION_DIRTY); //remove the description dirty flag, if any
 			try {
 				saveTargetDescription(context, artifact);
 			} catch(final IOException ioException) {
 				//If there is any I/O error saving the description, set its dirty flag for completeness
 				//(although its usefulness at this point is questionable).
-				description.setPropertyValue(PROPERTY_TAG_MUMMY_TARGET_DESCRIPTION_DIRTY, true); //we created a new description, so the description needs to be persisted
+				description.setPropertyValue(PROPERTY_TAG_MUMMY_DESCRIPTION_DIRTY, true); //we created a new description, so the description needs to be persisted
 				throw ioException;
 			}
 		} else {
@@ -243,7 +244,6 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @param artifact The artifact being generated
 	 * @throws IOException if there is an I/O error saving the description.
 	 * @see #getArtifactDescriptionFile(MummyContext, Path)
-	 * @see Artifact#PROPERTY_TAG_MUMMY_TARGET_DESCRIPTION_DIRTY
 	 */
 	protected void saveTargetDescription(@Nonnull final MummyContext context, @Nonnull Artifact artifact) throws IOException {
 		final UrfResourceDescription description = artifact.getResourceDescription();
