@@ -77,11 +77,6 @@ public interface Artifact {
 	 * @apiNote This property is used for incremental mummification; it is usually not appropriate to use in custom properties.
 	 */
 	public static final URI PROPERTY_TAG_MUMMY_TARGET_DESCRIPTION_DIRTY = NAMESPACE.resolve("targetDescriptionDirty");
-	/**
-	 * The {@link Instant} the target resource was last modified.
-	 * @apiNote This property is used for incremental mummification; it is usually not appropriate to use in custom properties.
-	 */
-	public static final URI PROPERTY_TAG_MUMMY_TARGET_MODIFIED_AT = NAMESPACE.resolve("targetModifiedAt");
 	/** The property tag of the <code>mummy/template</code> for specifying a template path, relative to the source path. */
 	public static final URI PROPERTY_TAG_MUMMY_TEMPLATE = NAMESPACE.resolve("template");
 

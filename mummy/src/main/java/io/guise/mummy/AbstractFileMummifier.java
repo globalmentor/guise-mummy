@@ -171,7 +171,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 *          {@link #mummifyFile(MummyContext, Artifact, Artifact)} should be overridden instead.
 	 * @implSpec If incremental mummification is enabled via {@link MummyContext#isIncremental()}, this version checks the the timestamp of the target file, and
 	 *           delegates to {@link #mummifyFile(MummyContext, Artifact, Artifact)} if the file needs regenerated.
-	 * @see Artifact#PROPERTY_TAG_MUMMY_TARGET_MODIFIED_AT
+	 * @see Content#MODIFIED_AT_PROPERTY_TAG
 	 * @see MummyContext#isIncremental()
 	 * @see MummyContext#isFull()
 	 */
@@ -183,7 +183,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 		final boolean targetContentDirty;
 		if(context.isIncremental()) {
 			oldTargetModifiedAt = exists(targetFile) ? Optional.of(getLastModifiedTime(targetFile).toInstant()) : Optional.empty();
-			targetContentDirty = description.findPropertyValue(PROPERTY_TAG_MUMMY_TARGET_MODIFIED_AT)
+			targetContentDirty = description.findPropertyValue(Content.MODIFIED_AT_PROPERTY_TAG)
 					.map(modifiedAt -> !isPresentAndEquals(oldTargetModifiedAt, modifiedAt))
 					//if there is no timestamp, we consider the content dirty
 					.orElse(true);
@@ -211,7 +211,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 				//require a fingerprint property (checking content dirtiness takes care of outdated fingerprint) 
 				|| !description.hasPropertyValue(Content.FINGERPRINT_PROPERTY_TAG);
 		if(targetDescriptionDirty) {
-			description.setPropertyValue(PROPERTY_TAG_MUMMY_TARGET_MODIFIED_AT, newTargetModifiedAt); //update the target file timestamp
+			description.setPropertyValue(Content.MODIFIED_AT_PROPERTY_TAG, newTargetModifiedAt); //update the target file timestamp
 			description.setPropertyValue(Content.FINGERPRINT_PROPERTY_TAG, FINGERPRINT_ALGORITHM.digest(targetFile)); //update the target fingerprint
 			description.removeProperty(PROPERTY_TAG_MUMMY_TARGET_DESCRIPTION_DIRTY); //remove the description dirty flag, if any
 			try {
