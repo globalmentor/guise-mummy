@@ -2055,7 +2055,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	 * <ul>
 	 * <li>{@link Content#TYPE_PROPERTY_TAG} TODO implement</li>
 	 * <li>{@link Content#LENGTH_PROPERTY_TAG}</li>
-	 * <li>{@link Content#MODIFIED_PROPERTY_TAG}</li>
+	 * <li>{@link Content#MODIFIED_AT_PROPERTY_TAG}</li>
 	 * </ul>
 	 * @implNote This class originated in the default HTTP servlet class in the GlobalMentor servlet library.
 	 * @author Garret Wilson
@@ -2116,7 +2116,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		 */
 		public long getLastModified(final HttpServletRequest request) throws IOException {
 			//TODO move to new URF utility methods
-			final Instant lastModified = Instant.class.cast(getResourceDescription().findPropertyValue(Content.MODIFIED_PROPERTY_TAG).orElse(null)); //get the last modified date time from the description, if that property exists
+			final Instant lastModified = Instant.class.cast(getResourceDescription().findPropertyValue(Content.MODIFIED_AT_PROPERTY_TAG).orElse(null)); //get the last modified date time from the description, if that property exists
 			return lastModified != null ? lastModified.getEpochSecond() : -1; //return the milliseconds of the time, if the time is available
 		}
 

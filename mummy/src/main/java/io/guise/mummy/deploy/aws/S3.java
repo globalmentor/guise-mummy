@@ -18,6 +18,7 @@ package io.guise.mummy.deploy.aws;
 
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
+import static com.globalmentor.util.Optionals.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
@@ -39,6 +40,8 @@ import io.confound.config.Configuration;
 import io.confound.config.ConfigurationException;
 import io.guise.mummy.*;
 import io.guise.mummy.deploy.DeployTarget;
+import io.urf.URF.Handle;
+import io.urf.model.UrfResourceDescription;
 import io.urf.vocab.content.Content;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.exception.SdkException;
@@ -389,12 +392,21 @@ public class S3 implements DeployTarget, Clogged {
 		getArtifactKeys().put(artifact, key);
 	}
 
+	/** The handle of the content fingerprint tag as a convenience, used for object metadata. */
+	private final static String METADATA_CONTENT_FINGERPRINT = Handle.findFromTag(Content.FINGERPRINT_PROPERTY_TAG).orElseThrow(AssertionError::new);
+
 	/**
 	 * Transfers content for deployment.
-	 * @implSpec This implementation skips directories.
 	 * @apiNote This is the main deployment method, which actually deploys content.
+	 * @implSpec If incremental mummification is enabled via {@link MummyContext#isIncremental()}, this version skips deploying an artifact if the S3 object
+	 *           fingerprint matches the artifact's fingerprint in its description. The handle form of the {@link Content#FINGERPRINT_PROPERTY_TAG} is used as the
+	 *           S3 object metadata name, with the value being the Base64 encoding of the binary fingerprint value.
+	 * @implSpec This implementation skips directories.
 	 * @param context The context of static site generation.
 	 * @throws IOException if there is an I/O error during putting.
+	 * @see MummyContext#isIncremental()
+	 * @see MummyContext#isFull()
+	 * @see Content#FINGERPRINT_PROPERTY_TAG
 	 */
 	protected void put(@Nonnull final MummyContext context) throws IOException {
 		try {
@@ -404,11 +416,37 @@ public class S3 implements DeployTarget, Clogged {
 				final Artifact artifact = artifactKeyEntry.getKey();
 				if(!(artifact instanceof DirectoryArtifact)) { //don't deploy anything for directories TODO improve semantics, especially after the root artifact type changes; maybe use CollectionArtifact
 					final String key = artifactKeyEntry.getValue();
-					getLogger().info("Deploying artifact to S3 key `{}`.", key);
-					final PutObjectRequest.Builder putBuilder = PutObjectRequest.builder().bucket(bucket).key(key);
-					//set content-type if found
-					artifact.getResourceDescription().findPropertyValue(Content.TYPE_PROPERTY_TAG).map(Object::toString).ifPresent(putBuilder::contentType);
-					s3Client.putObject(putBuilder.build(), RequestBody.fromFile(artifact.getTargetPath()));
+					final UrfResourceDescription description = artifact.getResourceDescription();
+					final Optional<byte[]> fingerprint = asInstance(description.findPropertyValue(Content.FINGERPRINT_PROPERTY_TAG), byte[].class); //TODO improve URF to use immutable byte string
+					final boolean s3ObjectChanged = context.isFull() //for full mummification, short-circuit and don't compare fingerprints
+							|| fingerprint.flatMap(descriptionFingerprint -> {
+								final HeadObjectResponse head = s3Client.headObject(builder -> builder.bucket(bucket).key(key));
+								try {
+									return Optional.ofNullable(head.metadata().get(METADATA_CONTENT_FINGERPRINT)).map(base64 -> Base64.getUrlDecoder().decode(base64))
+											.map(s3ObjectFingerprint -> !Arrays.equals(s3ObjectFingerprint, descriptionFingerprint)); //S3 object changed if the fingerprints do _not_ match
+								} catch(final IllegalArgumentException illegalArgumentException) {
+									getLogger().warn("Invalid S3 object fingerprint metadata `{}` for key `{}`: {}", METADATA_CONTENT_FINGERPRINT, key,
+											illegalArgumentException.getMessage(), illegalArgumentException);
+									return Optional.empty(); //a valid fingerprint was not found
+								}
+							}).orElse(true); //if the description fingerprint and/or S3 object fingerprint is missing, assume the object has changed
+					if(s3ObjectChanged) {
+						getLogger().info("Deploying artifact to S3 key `{}`.", key);
+						final PutObjectRequest.Builder putBuilder = PutObjectRequest.builder().bucket(bucket).key(key);
+						//set content-type if found
+						description.findPropertyValue(Content.TYPE_PROPERTY_TAG).map(Object::toString).ifPresent(putBuilder::contentType);
+						//set other metadata, if any
+						final Map<String, String> metadata = new HashMap<>(); //there will likely always be some metadata 
+						asInstance(description.findPropertyValue(Content.FINGERPRINT_PROPERTY_TAG), byte[].class)
+								.map(bytes -> Base64.getUrlEncoder().withoutPadding().encodeToString(bytes))
+								.ifPresent(base64 -> metadata.put(METADATA_CONTENT_FINGERPRINT, base64));
+						if(!metadata.isEmpty()) {
+							putBuilder.metadata(metadata);
+						}
+						s3Client.putObject(putBuilder.build(), RequestBody.fromFile(artifact.getTargetPath()));
+					} else {
+						getLogger().debug("Keeping previously deployed S3 object for key `{}`.", key);
+					}
 				}
 			}
 		} catch(final SdkException sdkException) {
