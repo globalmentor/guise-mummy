@@ -16,6 +16,7 @@
 
 package io.guise.mummy;
 
+import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.util.Optionals.*;
 import static io.guise.mummy.Artifact.*;
 import static java.nio.file.Files.*;
@@ -26,10 +27,11 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.*;
 
-import com.globalmentor.java.Conditions;
 import com.globalmentor.security.MessageDigests;
 
 import io.urf.model.*;
@@ -49,6 +51,49 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @see Content#FINGERPRINT_PROPERTY_TAG
 	 */
 	private static final MessageDigests.Algorithm FINGERPRINT_ALGORITHM = MessageDigests.SHA_256;
+
+	/**
+	 * The pattern for matching a filename indicating a post, e.g. for a blog.
+	 * @see #POST_FILENAME_PATTERN_DATE_GROUP
+	 * @see #POST_FILENAME_PATTERN_YEAR_GROUP
+	 * @see #POST_FILENAME_PATTERN_MONTH_GROUP
+	 * @see #POST_FILENAME_PATTERN_DAY_GROUP
+	 * @see #POST_FILENAME_PATTERN_FILENAME_GROUP
+	 * @see #POST_FILENAME_PATTERN_SLUG_GROUP
+	 * @see #POST_FILENAME_PATTERN_EXT_GROUP
+	 */
+	static final Pattern POST_FILENAME_PATTERN = Pattern.compile("@((\\d{4})-(\\d{2})-(\\d{2}))-(([^.]+)\\.(.+))");
+	static final int POST_FILENAME_PATTERN_DATE_GROUP = 1;
+	static final int POST_FILENAME_PATTERN_YEAR_GROUP = 2;
+	static final int POST_FILENAME_PATTERN_MONTH_GROUP = 3;
+	static final int POST_FILENAME_PATTERN_DAY_GROUP = 4;
+	static final int POST_FILENAME_PATTERN_FILENAME_GROUP = 5;
+	static final int POST_FILENAME_PATTERN_SLUG_GROUP = 6;
+	static final int POST_FILENAME_PATTERN_EXT_GROUP = 7;
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec In addition to the default functionality, this version recognizes blog posts and adds an appropriate subdirectory structure for them in the
+	 *           target tree path.
+	 * @see #POST_FILENAME_PATTERN
+	 */
+	@Override
+	public Path getArtifactTargetPath(final MummyContext context, final Path sourceFile) {
+		Path targetFile = super.getArtifactTargetPath(context, sourceFile);
+		//check for posts and convert the target path appropriately
+		final Path filename = targetFile.getFileName();
+		if(filename != null) {
+			final Matcher postMatcher = POST_FILENAME_PATTERN.matcher(filename.toString());
+			if(postMatcher.matches()) {
+				final String postYear = postMatcher.group(POST_FILENAME_PATTERN_YEAR_GROUP);
+				final String postMonth = postMatcher.group(POST_FILENAME_PATTERN_MONTH_GROUP);
+				final String postDay = postMatcher.group(POST_FILENAME_PATTERN_DAY_GROUP);
+				final String postFilename = postMatcher.group(POST_FILENAME_PATTERN_FILENAME_GROUP);
+				targetFile = targetFile.resolveSibling(postYear).resolve(postMonth).resolve(postDay).resolve(postFilename);
+			}
+		}
+		return targetFile;
+	}
 
 	/**
 	 * Loads the generated target description if any of a source file.
@@ -195,9 +240,12 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 		//produce target file if dirty
 		final Instant newTargetModifiedAt;
 		if(targetContentDirty) {
+			final Path parentDirectory = targetFile.getParent();
+			if(parentDirectory != null && !exists(parentDirectory)) { //ensure parent directories exist, as artifact children may specify files several layers deep, e.g. blog posts 
+				createDirectories(parentDirectory);
+			}
 			mummifyFile(context, contextArtifact, artifact);
-			Conditions.checkState(exists(targetFile), "Mummification of artifact source file `%s` did not produce target file `%s`.", artifact.getSourcePath(),
-					targetFile);
+			checkState(exists(targetFile), "Mummification of artifact source file `%s` did not produce target file `%s`.", artifact.getSourcePath(), targetFile);
 			getLogger().debug("Mummified file artifact {}.", artifact);
 			newTargetModifiedAt = getLastModifiedTime(targetFile).toInstant();
 		} else {
@@ -232,7 +280,8 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * Invariably mummifies a resource to a file in the presence of a context artifact, which may or may not be the same as the artifact itself. Mummification is
 	 * always performed, regardless of the state of metadata.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated. The
+	 *          parent directories of the file are guaranteed to have been created.
 	 * @param artifact The artifact being generated
 	 * @throws IOException if there is an I/O error during mummification.
 	 */

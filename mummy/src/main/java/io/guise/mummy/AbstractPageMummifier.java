@@ -134,7 +134,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This version changes the output file extension to {@value HTML#HTML_NAME_EXTENSION}.
+	 * @implSpec This version changes the output file extension to {@value HTML#HTML_NAME_EXTENSION}, or leaves if off altogether if bare names were requested.
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_PAGE_NAMES_BARE
 	 */
 	@Override
 	public Path getArtifactTargetPath(final MummyContext context, final Path sourceFile) {
