@@ -54,8 +54,8 @@ public interface SourcePathMummifier extends Mummifier {
 	 * @param sourcePath The path in the site source directory.
 	 * @return The path in the site target directory to which the given source path should be generated.
 	 * @throws IllegalArgumentException if the given source file is not in the site source tree.
+	 * @see MummyContext#getSiteSourceDirectory()
 	 * @see MummyContext#getSiteTargetDirectory()
-	 * @see MummyContext#getTargetPath(Path)
 	 */
 	public Path getArtifactTargetPath(@Nonnull MummyContext context, @Nonnull Path sourcePath);
 
