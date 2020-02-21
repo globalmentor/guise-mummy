@@ -16,6 +16,7 @@
 
 package io.guise.mummy;
 
+import static com.globalmentor.io.Paths.*;
 import static java.nio.file.Files.*;
 
 import java.io.*;
@@ -35,11 +36,13 @@ public abstract class AbstractSourcePathMummifier implements SourcePathMummifier
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This version delegates to {@link MummyContext#getTargetPath(Path)}.
+	 * @implSpec This implementation merely changes the base between source and target directory trees.
+	 * @see MummyContext#getSiteSourceDirectory()
+	 * @see MummyContext#getSiteTargetDirectory()
 	 */
 	@Override
 	public Path getArtifactTargetPath(@Nonnull MummyContext context, @Nonnull final Path sourcePath) {
-		return context.getTargetPath(sourcePath);
+		return changeBase(sourcePath, context.getSiteSourceDirectory(), context.getSiteTargetDirectory());
 	}
 
 	/**

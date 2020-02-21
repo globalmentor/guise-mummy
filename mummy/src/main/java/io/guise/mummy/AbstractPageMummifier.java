@@ -134,7 +134,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This version changes the output file extension to {@value HTML#HTML_NAME_EXTENSION}.
+	 * @implSpec This version changes the output file extension to {@value HTML#HTML_NAME_EXTENSION}, or leaves if off altogether if bare names were requested.
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_PAGE_NAMES_BARE
 	 */
 	@Override
 	public Path getArtifactTargetPath(final MummyContext context, final Path sourceFile) {
@@ -191,8 +192,17 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		return candidateArtifacts.filter(Artifact::isNavigable).filter(not(context::isVeiled));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation creates a {@link PostArtifact} for those artifacts with a source filename matching {@link PostArtifact#FILENAME_PATTERN}.
+	 *           Otherwise it creates a {@link PageArtifact}.
+	 */
 	@Override
 	protected Artifact createArtifact(final Path sourceFile, final Path outputFile, final UrfResourceDescription description) throws IOException {
+		final Path sourceFilename = sourceFile.getFileName();
+		if(sourceFilename != null && PostArtifact.FILENAME_PATTERN.matcher(sourceFilename.toString()).matches()) {
+			return new PostArtifact(this, sourceFile, outputFile, description);
+		}
 		return new PageArtifact(this, sourceFile, outputFile, description);
 	}
 
@@ -829,7 +839,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				//put the parent navigation artifact (if any) first
 				findParentNavigationArtifact(context, contextArtifact).stream(),
 				//then include the sorted child navigation artifacts
-				childNavigationArtifacts(context, contextArtifact).sorted(navigationArtifactOrderComparator))
+				childNavigationArtifacts(context, contextArtifact)
+						//posts shouldn't appear in the normal navigation list TODO create a more semantic means of filtering posts
+						.filter(childArtifact -> !(childArtifact instanceof PostArtifact)).sorted(navigationArtifactOrderComparator))
 				//generate navigation elements 
 				.forEach(navigationArtifact -> {
 					//if the navigation artifact is this artifact, use the template for an active link

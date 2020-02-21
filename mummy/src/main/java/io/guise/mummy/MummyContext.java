@@ -133,18 +133,6 @@ public interface MummyContext {
 	 */
 	public boolean isVeiled(@Nonnull final Path sourcePath);
 
-	/**
-	 * Determines the target path in the site target directory based upon the source path in the site source directory.
-	 * @param sourcePath The path in the site source directory.
-	 * @return The corresponding path in the site target directory.
-	 * @throws IllegalArgumentException if the given source path is not in the site source tree.
-	 * @see #getSiteSourceDirectory()
-	 * @see #getSiteTargetDirectory()
-	 */
-	public default Path getTargetPath(@Nonnull final Path sourcePath) {
-		return changeBase(sourcePath, getSiteSourceDirectory(), getSiteTargetDirectory());
-	}
-
 	/** @return The default mummifier for source files. */
 	public SourcePathMummifier getDefaultSourceFileMummifier();
 
