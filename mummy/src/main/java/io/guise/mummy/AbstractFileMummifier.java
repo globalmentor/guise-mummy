@@ -28,7 +28,6 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.*;
 
@@ -41,6 +40,8 @@ import io.urf.vocab.content.Content;
 
 /**
  * Abstract mummifier for generating artifacts based upon a single source file.
+ * @implSpec This implementation recognizes blog posts and gives them a target subdirectory structure appropriately based upon
+ *           {@link PostArtifact#FILENAME_PATTERN}.
  * @author Garret Wilson
  */
 public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier {
@@ -53,29 +54,10 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	private static final MessageDigests.Algorithm FINGERPRINT_ALGORITHM = MessageDigests.SHA_256;
 
 	/**
-	 * The pattern for matching a filename indicating a post, e.g. for a blog.
-	 * @see #POST_FILENAME_PATTERN_DATE_GROUP
-	 * @see #POST_FILENAME_PATTERN_YEAR_GROUP
-	 * @see #POST_FILENAME_PATTERN_MONTH_GROUP
-	 * @see #POST_FILENAME_PATTERN_DAY_GROUP
-	 * @see #POST_FILENAME_PATTERN_FILENAME_GROUP
-	 * @see #POST_FILENAME_PATTERN_SLUG_GROUP
-	 * @see #POST_FILENAME_PATTERN_EXT_GROUP
-	 */
-	static final Pattern POST_FILENAME_PATTERN = Pattern.compile("@((\\d{4})-(\\d{2})-(\\d{2}))-(([^.]+)\\.(.+))");
-	static final int POST_FILENAME_PATTERN_DATE_GROUP = 1;
-	static final int POST_FILENAME_PATTERN_YEAR_GROUP = 2;
-	static final int POST_FILENAME_PATTERN_MONTH_GROUP = 3;
-	static final int POST_FILENAME_PATTERN_DAY_GROUP = 4;
-	static final int POST_FILENAME_PATTERN_FILENAME_GROUP = 5;
-	static final int POST_FILENAME_PATTERN_SLUG_GROUP = 6;
-	static final int POST_FILENAME_PATTERN_EXT_GROUP = 7;
-
-	/**
 	 * {@inheritDoc}
 	 * @implSpec In addition to the default functionality, this version recognizes blog posts and adds an appropriate subdirectory structure for them in the
 	 *           target tree path.
-	 * @see #POST_FILENAME_PATTERN
+	 * @see PostArtifact#FILENAME_PATTERN
 	 */
 	@Override
 	public Path getArtifactTargetPath(final MummyContext context, final Path sourceFile) {
@@ -83,12 +65,12 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 		//check for posts and convert the target path appropriately
 		final Path filename = targetFile.getFileName();
 		if(filename != null) {
-			final Matcher postMatcher = POST_FILENAME_PATTERN.matcher(filename.toString());
+			final Matcher postMatcher = PostArtifact.FILENAME_PATTERN.matcher(filename.toString());
 			if(postMatcher.matches()) {
-				final String postYear = postMatcher.group(POST_FILENAME_PATTERN_YEAR_GROUP);
-				final String postMonth = postMatcher.group(POST_FILENAME_PATTERN_MONTH_GROUP);
-				final String postDay = postMatcher.group(POST_FILENAME_PATTERN_DAY_GROUP);
-				final String postFilename = postMatcher.group(POST_FILENAME_PATTERN_FILENAME_GROUP);
+				final String postYear = postMatcher.group(PostArtifact.FILENAME_PATTERN_YEAR_GROUP);
+				final String postMonth = postMatcher.group(PostArtifact.FILENAME_PATTERN_MONTH_GROUP);
+				final String postDay = postMatcher.group(PostArtifact.FILENAME_PATTERN_DAY_GROUP);
+				final String postFilename = postMatcher.group(PostArtifact.FILENAME_PATTERN_FILENAME_GROUP);
 				targetFile = targetFile.resolveSibling(postYear).resolve(postMonth).resolve(postDay).resolve(postFilename);
 			}
 		}
