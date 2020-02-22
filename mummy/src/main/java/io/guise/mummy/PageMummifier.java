@@ -50,8 +50,10 @@ public interface PageMummifier extends Mummifier {
 	/** The attribute for regenerating an element, such as a navigation list. */
 	public static final NsName ATTRIBUTE_REGENERATE = NsName.of(NAMESPACE_STRING, "regenerate");
 
-	/** The element indicating a widget element. */
-	public static final NsName WIDGET_ELEMENT_BLOG = NsName.of(NAMESPACE_STRING, "blog");
+	/** The element indicating a post list widget element. */
+	public static final NsName WIDGET_POST_LIST_ELEMENT = NsName.of(NAMESPACE_STRING, "PostList");
+	/** The optional post list widget attribute indicating the label for the "more" link. */
+	public static final NsName WIDGET_POST_LIST_MORE_LABEL_ATTRIBUTE = NsName.of("moreLabel");
 
 	//# load
 

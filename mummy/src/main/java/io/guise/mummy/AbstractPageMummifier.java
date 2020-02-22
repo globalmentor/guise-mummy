@@ -706,8 +706,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 *           <ul>
 	 *           <li>Regeneration of navigation lists using {@link PageMummifier#ATTRIBUTE_REGENERATE} via
 	 *           {@link #regenerateNavigationList(MummyContext, Artifact, Artifact, Element)}.</li>
-	 *           <li>Processing of blog widgets using {@link PageMummifier#WIDGET_ELEMENT_BLOG} via
-	 *           {@link #processBlogWidget(MummyContext, Artifact, Artifact, Element)}.</li>
+	 *           <li>Processing of post list widgets using {@link PageMummifier#WIDGET_POST_LIST_ELEMENT} via
+	 *           {@link #processWidgetPostList(MummyContext, Artifact, Artifact, Element)}.</li>
 	 *           </ul>
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
@@ -723,8 +723,10 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		//TODO transfer to some system of pluggable element processing strategies
 
 		//widgets
-		if(WIDGET_ELEMENT_BLOG.matches(sourceElement)) { //mummy:blog
-			return processBlogWidget(context, contextArtifact, artifact, sourceElement);
+		if(WIDGET_POST_LIST_ELEMENT.matches(sourceElement)) { //mummy:PostList
+			return processWidgetPostList(context, contextArtifact, artifact, sourceElement);
+		} else if(GuiseMummy.NAMESPACE_STRING.equals(sourceElement.getNamespaceURI())) {
+			getLogger().warn("Unrecognized Guise Mummy element `<{}>`.", sourceElement.getNodeName());
 		}
 
 		//navigation list regeneration
@@ -961,7 +963,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	}
 
 	/**
-	 * Generates content for a blog widget.
+	 * Generates content for a post list widget.
 	 * <p>
 	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
 	 * element is removed.
@@ -973,7 +975,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @throws IOException if there is an error processing the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	protected List<Element> processBlogWidget(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
+	protected List<Element> processWidgetPostList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
 			@Nonnull final Element widgetElement) throws IOException, DOMException {
 		final Document document = widgetElement.getOwnerDocument();
 		return childNavigationArtifacts(context, contextArtifact)
@@ -981,7 +983,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				.filter(PostArtifact.class::isInstance).map(PostArtifact.class::cast) //TODO sort
 				//generate content; the first element must be a separator element, which will be ignored for the first post
 				.flatMap(throwingFunction(postArtifact -> {
+					//separator
 					final Element separatorElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_HR); //<hr/>
+					//title
 					final String postHref = context.relativizeSourceReference(contextArtifact, postArtifact).toString();
 					final Element titleElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_H2); //<h2>
 					final Element titleElementLink = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A); //<h2><a>
@@ -989,18 +993,20 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 					appendText(titleElementLink, postArtifact.determineTitle()); //<h2><a>title</a></h2>
 					titleElement.appendChild(titleElementLink);
 					//TODO <h3>Monday, February 2, 2004</h3>
+					//excerpt
 					final Optional<Element> excerptElement = loadSourceExcerpt(context, postArtifact).map(excerpt -> {
 						//Wrap the excerpt in a <div>. The other option would be to import the document fragment children directly into the document,
 						//but wrapping the excerpt may be more semantically correct and more useful for styling in the future.
 						final Element excerptWrapper = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_DIV); //<div>
 						appendImportedChildNodes(excerptWrapper, excerpt); //import the excerpt into the <div>
+						appendText(excerptWrapper, " …"); //add an ellipsis after the excerpt to make it clearer that this is not the full content
 						return excerptWrapper;
 					});
+					//more
+					final String moreLabel = findAttributeNS(widgetElement, WIDGET_POST_LIST_MORE_LABEL_ATTRIBUTE).orElse("…");
 					final Element moreLink = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A); //<a>
 					moreLink.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, postHref);
-					final Element moreLinkStrong = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_STRONG); //<a><strong>
-					appendText(moreLinkStrong, "…"); //<a><strong>…</strong></a>
-					moreLink.appendChild(moreLinkStrong);
+					appendText(moreLink, moreLabel); //<a>…</a>
 					return concat(concat(Stream.of(separatorElement, titleElement), excerptElement.stream()), Stream.of(moreLink));
 				})).skip(1) //skip the first separator so that separators will only appear between posts
 				.collect(toList());
