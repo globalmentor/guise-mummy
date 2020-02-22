@@ -328,6 +328,39 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		//TODO consider parsing out "keywords" in to multiple keyword+ properties for convenience
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation loads the source document using {@link #loadSourceDocument(MummyContext, InputStream, String)} and then extracts the first
+	 *           paragraph.
+	 * @implNote This implementation typically results in loading the source document N+1 times, that is, every time it is requested in addition to the time the
+	 *           source document itself is mummified. Perhaps this won't be too much, though, as it is unlikely many targets would be requesting excerpts of the
+	 *           same source.
+	 */
+	@Override
+	public Optional<DocumentFragment> loadSourceExcerpt(final MummyContext context, final InputStream inputStream, final String name)
+			throws IOException, DOMException {
+		final Document sourceDocument = loadSourceDocument(context, inputStream, name);
+		return findContentElement(sourceDocument).flatMap(this::getExcerpt);
+	}
+
+	private final static NsName XHTML_ELEMENT_P = NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_P);
+
+	/**
+	 * Recursively finds and retrieves an excerpt from the given element.
+	 * @implSpec This implementation uses the first non-empty paragraph encountered depth-first.
+	 * @param element The element for which an excerpt should be returned.
+	 * @return A document fragment containing an excerpt of the given element if one could be located.
+	 * @see HTML#ELEMENT_P
+	 */
+	protected Optional<DocumentFragment> getExcerpt(final Element element) {
+		if(XHTML_ELEMENT_P.matches(element)) { //XHTML `<p>`
+			if(containsNonTrim(element.getTextContent())) { //if this paragraph isn't empty
+				return Optional.of(extractNode(element)); //extract the paragraph
+			}
+		}
+		return childElementsOf(element).map(this::getExcerpt).flatMap(Optional::stream).findFirst();
+	}
+
 	@Override
 	public void mummifyFile(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
 
@@ -622,6 +655,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @implSpec This implementation finds the content element in the following order:
 	 *           <ol>
 	 *           <li>The {@code <html><body><main>} element, if present.</li>
+	 *           <li>The {@code <html><body><article>} element, if present.</li>
 	 *           <li>The {@code <html><body>} element, if present.</li>
 	 *           </ol>
 	 * @param sourceDocument The document containing source content.
@@ -631,9 +665,12 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		final Optional<Element> htmlBodyElement = findHtmlBodyElement(sourceDocument);
 		final Optional<Element> htmlBodyMainElement = htmlBodyElement
 				.flatMap(htmlElement -> childElementsByNameNS(htmlElement, XHTML_NAMESPACE_URI_STRING, ELEMENT_MAIN).findFirst());
-		//TODO add support for <article>
 		//TODO add support for <mummy:content>
-		return htmlBodyMainElement.or(() -> htmlBodyElement); //<main> gets priority over <body>
+		return htmlBodyMainElement //`<html><body><main>` gets priority
+				//then `<html><body><article>`
+				.or(() -> htmlBodyElement.flatMap(htmlElement -> childElementsByNameNS(htmlElement, XHTML_NAMESPACE_URI_STRING, ELEMENT_ARTICLE).findFirst()))
+				//then finally `<html><article>`
+				.or(() -> htmlBodyElement); //<main> gets priority over <body>
 	}
 
 	//#process
