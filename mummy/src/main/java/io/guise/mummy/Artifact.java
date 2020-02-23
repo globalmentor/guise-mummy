@@ -22,6 +22,7 @@ import static io.guise.mummy.GuiseMummy.*;
 import java.net.URI;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
@@ -41,8 +42,6 @@ public interface Artifact {
 	//## properties
 	//### general properties
 
-	/** The property handle of the string naming artifact. */
-	public static final String PROPERTY_HANDLE_NAME = "name";
 	/** The property handle of the string describing the artifact. */
 	public static final String PROPERTY_HANDLE_DESCRIPTION = "description";
 	/**
@@ -52,6 +51,10 @@ public interface Artifact {
 	public static final String PROPERTY_HANDLE_ICON = "icon";
 	/** The property handle of the string to use as a label, in navigation link text for example. */
 	public static final String PROPERTY_HANDLE_LABEL = "label";
+	/** The property handle of the string naming artifact. */
+	public static final String PROPERTY_HANDLE_NAME = "name";
+	/** The property handle specifying the {@link LocalDate} of publication. */
+	public static final String PROPERTY_HANDLE_PUBLISHED_ON = "publishedOn";
 	/** The property handle of the title, such as a page title. */
 	public static final String PROPERTY_HANDLE_TITLE = "title";
 
