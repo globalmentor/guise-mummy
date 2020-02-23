@@ -29,6 +29,7 @@ import static io.guise.mummy.Artifact.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
+import static java.util.Comparator.*;
 import static java.util.function.Predicate.*;
 import static java.util.stream.Collectors.*;
 import static java.util.stream.Stream.*;
@@ -986,7 +987,11 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		final Document document = widgetElement.getOwnerDocument();
 		return childNavigationArtifacts(context, contextArtifact)
 				//only include posts
-				.filter(PostArtifact.class::isInstance).map(PostArtifact.class::cast) //TODO sort
+				.flatMap(asInstances(PostArtifact.class))
+				//sort the posts in reverse order of published-on date (with undated posts last, although there are not expected to be any), secondarily by determined title
+				.sorted(nullsLast(Comparator.<PostArtifact, LocalDate>comparing(postArtifact -> postArtifact.getResourceDescription()
+						.findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON).flatMap(asInstance(LocalDate.class)).orElse(null)).reversed())
+								.thenComparing(PostArtifact::determineTitle))
 				//generate content; the first element must be a separator element, which will be ignored for the first post
 				.flatMap(throwingFunction(postArtifact -> {
 					//separator
