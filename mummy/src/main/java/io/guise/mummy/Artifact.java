@@ -22,6 +22,7 @@ import static io.guise.mummy.GuiseMummy.*;
 import java.net.URI;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
@@ -41,8 +42,6 @@ public interface Artifact {
 	//## properties
 	//### general properties
 
-	/** The property handle of the string naming artifact. */
-	public static final String PROPERTY_HANDLE_NAME = "name";
 	/** The property handle of the string describing the artifact. */
 	public static final String PROPERTY_HANDLE_DESCRIPTION = "description";
 	/**
@@ -52,6 +51,10 @@ public interface Artifact {
 	public static final String PROPERTY_HANDLE_ICON = "icon";
 	/** The property handle of the string to use as a label, in navigation link text for example. */
 	public static final String PROPERTY_HANDLE_LABEL = "label";
+	/** The property handle of the string naming artifact. */
+	public static final String PROPERTY_HANDLE_NAME = "name";
+	/** The property handle specifying the {@link LocalDate} of publication. */
+	public static final String PROPERTY_HANDLE_PUBLISHED_ON = "publishedOn";
 	/** The property handle of the title, such as a page title. */
 	public static final String PROPERTY_HANDLE_TITLE = "title";
 
@@ -104,8 +107,8 @@ public interface Artifact {
 	 * </p>
 	 * <ol>
 	 * <li>The {@value #PROPERTY_HANDLE_LABEL} property.</li>
-	 * <li>The {@value #PROPERTY_HANDLE_TITLE} property.</li>
 	 * <li>The {@value #PROPERTY_HANDLE_NAME} property.</li>
+	 * <li>The {@value #PROPERTY_HANDLE_TITLE} property.</li>
 	 * <li>The {@link Path#getFileName()} of the target path of this artifact, with no extension.</li>
 	 * </ol>
 	 * @return The label determined to be used for this artifact.
@@ -142,6 +145,26 @@ public interface Artifact {
 	}
 
 	//## title
+
+	/**
+	 * Determines the title to use for the artifact.
+	 * <p>
+	 * This method will always return a value, determined in the following order of priority:
+	 * </p>
+	 * <ol>
+	 * <li>The {@value #PROPERTY_HANDLE_TITLE} property.</li>
+	 * <li>The {@value #PROPERTY_HANDLE_NAME} property.</li>
+	 * <li>The {@link Path#getFileName()} of the target path of this artifact, with no extension.</li>
+	 * </ol>
+	 * @return The label determined to be used for this artifact.
+	 * @see #findName()
+	 * @see #findTitle()
+	 * @see #getTargetPath()
+	 */
+	public default String determineTitle() {
+		assert getTargetPath().getFileName() != null : "Artifacts are expected always to have filenames.";
+		return findTitle().or(this::findName).orElseGet(() -> removeExtension(getTargetPath().getFileName().toString()));
+	}
 
 	/**
 	 * Looks up the title property in the resource description, returning it as a string if present.

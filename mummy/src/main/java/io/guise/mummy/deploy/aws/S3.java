@@ -18,6 +18,7 @@ package io.guise.mummy.deploy.aws;
 
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
+import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.util.Optionals.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static java.util.Objects.*;
@@ -417,7 +418,7 @@ public class S3 implements DeployTarget, Clogged {
 				if(!(artifact instanceof DirectoryArtifact)) { //don't deploy anything for directories TODO improve semantics, especially after the root artifact type changes; maybe use CollectionArtifact
 					final String key = artifactKeyEntry.getValue();
 					final UrfResourceDescription description = artifact.getResourceDescription();
-					final Optional<byte[]> fingerprint = asInstance(description.findPropertyValue(Content.FINGERPRINT_PROPERTY_TAG), byte[].class); //TODO improve URF to use immutable byte string
+					final Optional<byte[]> fingerprint = filterAsInstance(description.findPropertyValue(Content.FINGERPRINT_PROPERTY_TAG), byte[].class); //TODO improve URF to use immutable byte string
 					final boolean s3ObjectChanged = context.isFull() //for full mummification, short-circuit and don't compare fingerprints
 							|| fingerprint.flatMap(descriptionFingerprint -> {
 								final HeadObjectResponse head = s3Client.headObject(builder -> builder.bucket(bucket).key(key));
@@ -437,7 +438,7 @@ public class S3 implements DeployTarget, Clogged {
 						description.findPropertyValue(Content.TYPE_PROPERTY_TAG).map(Object::toString).ifPresent(putBuilder::contentType);
 						//set other metadata, if any
 						final Map<String, String> metadata = new HashMap<>(); //there will likely always be some metadata 
-						asInstance(description.findPropertyValue(Content.FINGERPRINT_PROPERTY_TAG), byte[].class)
+						description.findPropertyValue(Content.FINGERPRINT_PROPERTY_TAG).flatMap(asInstance(byte[].class))
 								.map(bytes -> Base64.getUrlEncoder().withoutPadding().encodeToString(bytes))
 								.ifPresent(base64 -> metadata.put(METADATA_CONTENT_FINGERPRINT, base64));
 						if(!metadata.isEmpty()) {

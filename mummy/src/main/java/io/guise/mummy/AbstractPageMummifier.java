@@ -21,6 +21,7 @@ import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
+import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.lex.CompoundTokenization.*;
 import static com.globalmentor.util.Optionals.*;
 import static com.globalmentor.xml.XmlDom.*;
@@ -28,8 +29,10 @@ import static io.guise.mummy.Artifact.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
+import static java.util.Comparator.*;
 import static java.util.function.Predicate.*;
 import static java.util.stream.Collectors.*;
+import static java.util.stream.Stream.*;
 import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.*;
@@ -37,7 +40,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.text.Collator;
-import java.time.Instant;
+import java.time.*;
+import java.time.format.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -326,6 +330,39 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				//<meta> TODO detect and add warnings for invalid properties
 				htmlHeadMetaElements(sourceDocument).flatMap(AbstractPageMummifier::htmlMetaElementToProperties)).collect(toList());
 		//TODO consider parsing out "keywords" in to multiple keyword+ properties for convenience
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation loads the source document using {@link #loadSourceDocument(MummyContext, InputStream, String)} and then extracts the first
+	 *           paragraph.
+	 * @implNote This implementation typically results in loading the source document N+1 times, that is, every time it is requested in addition to the time the
+	 *           source document itself is mummified. Perhaps this won't be too much, though, as it is unlikely many targets would be requesting excerpts of the
+	 *           same source.
+	 */
+	@Override
+	public Optional<DocumentFragment> loadSourceExcerpt(final MummyContext context, final InputStream inputStream, final String name)
+			throws IOException, DOMException {
+		final Document sourceDocument = loadSourceDocument(context, inputStream, name);
+		return findContentElement(sourceDocument).flatMap(this::getExcerpt);
+	}
+
+	private final static NsName XHTML_ELEMENT_P = NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_P);
+
+	/**
+	 * Recursively finds and retrieves an excerpt from the given element.
+	 * @implSpec This implementation uses the first non-empty paragraph encountered depth-first.
+	 * @param element The element for which an excerpt should be returned.
+	 * @return A document fragment containing an excerpt of the given element if one could be located.
+	 * @see HTML#ELEMENT_P
+	 */
+	protected Optional<DocumentFragment> getExcerpt(final Element element) {
+		if(XHTML_ELEMENT_P.matches(element)) { //XHTML `<p>`
+			if(containsNonTrim(element.getTextContent())) { //if this paragraph isn't empty
+				return Optional.of(extractNode(element)); //extract the paragraph
+			}
+		}
+		return childElementsOf(element).map(this::getExcerpt).flatMap(Optional::stream).findFirst();
 	}
 
 	@Override
@@ -622,6 +659,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @implSpec This implementation finds the content element in the following order:
 	 *           <ol>
 	 *           <li>The {@code <html><body><main>} element, if present.</li>
+	 *           <li>The {@code <html><body><article>} element, if present.</li>
 	 *           <li>The {@code <html><body>} element, if present.</li>
 	 *           </ol>
 	 * @param sourceDocument The document containing source content.
@@ -631,9 +669,12 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		final Optional<Element> htmlBodyElement = findHtmlBodyElement(sourceDocument);
 		final Optional<Element> htmlBodyMainElement = htmlBodyElement
 				.flatMap(htmlElement -> childElementsByNameNS(htmlElement, XHTML_NAMESPACE_URI_STRING, ELEMENT_MAIN).findFirst());
-		//TODO add support for <article>
 		//TODO add support for <mummy:content>
-		return htmlBodyMainElement.or(() -> htmlBodyElement); //<main> gets priority over <body>
+		return htmlBodyMainElement //`<html><body><main>` gets priority
+				//then `<html><body><article>`
+				.or(() -> htmlBodyElement.flatMap(htmlElement -> childElementsByNameNS(htmlElement, XHTML_NAMESPACE_URI_STRING, ELEMENT_ARTICLE).findFirst()))
+				//then finally `<html><article>`
+				.or(() -> htmlBodyElement); //<main> gets priority over <body>
 	}
 
 	//#process
@@ -664,6 +705,13 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
 	 * element is removed.
 	 * </p>
+	 * @implSpec This implementation handles:
+	 *           <ul>
+	 *           <li>Regeneration of navigation lists using {@link PageMummifier#ATTRIBUTE_REGENERATE} via
+	 *           {@link #regenerateNavigationList(MummyContext, Artifact, Artifact, Element)}.</li>
+	 *           <li>Processing of post list widgets using {@link PageMummifier#WIDGET_POST_LIST_ELEMENT} via
+	 *           {@link #processWidgetPostList(MummyContext, Artifact, Artifact, Element)}.</li>
+	 *           </ul>
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
@@ -677,6 +725,14 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 		//TODO transfer to some system of pluggable element processing strategies
 
+		//widgets
+		if(WIDGET_POST_LIST_ELEMENT.matches(sourceElement)) { //mummy:PostList
+			return processWidgetPostList(context, contextArtifact, artifact, sourceElement);
+		} else if(GuiseMummy.NAMESPACE_STRING.equals(sourceElement.getNamespaceURI())) {
+			getLogger().warn("Unrecognized Guise Mummy element `<{}>`.", sourceElement.getNodeName());
+		}
+
+		//navigation list regeneration
 		if(isPresentAndEquals(findAttributeNS(sourceElement, ATTRIBUTE_REGENERATE), ATTRIBUTE_REGENERATE.getLocalName())) {
 
 			//<nav><ol> or <nav><ul>
@@ -698,7 +754,6 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	/**
 	 * Processes child elements of an existing element.
-	 * @implNote This implementation does not yet allow returning different nodes than the one being processed.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
@@ -717,15 +772,24 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			}
 			final Element childElement = (Element)childNode;
 			final List<Element> processedElements = processElement(context, contextArtifact, artifact, childElement);
-			final int processedElementCount = processedElements.size();
-			childNodeIndex += processedElementCount; //manually advance the index based upon the replacement nodes
-			if(processedElementCount == 0) { //if we should remove the element
-				childElement.getParentNode().removeChild(childElement);
-				continue;
-			} else if(processedElementCount == 1 && processedElements.get(0) == childElement) { //if no structural changes were requested
-				continue;
+			final int processedElementCount = processedElements.size(); //TODO transfer restructuring logic to XML library
+			if(!(processedElementCount == 1 && processedElements.get(0) == childElement)) { //if structural changes were requested
+				final Node nextSibling = childElement.getNextSibling();
+				final Node parentNode = childElement.getParentNode();
+				parentNode.removeChild(childElement); //remove the current child (which may get added back if it is one of the elements returned)
+				if(nextSibling != null) { //if we're not at the end, do a complicated reverse insert
+					Node refChild = nextSibling; //iterate the processed elements in reverse order, inserting them before the next sibling
+					final ListIterator<Element> reverseProcessedElementIterator = processedElements.listIterator(processedElementCount);
+					while(reverseProcessedElementIterator.hasPrevious()) {
+						final Element processedElement = reverseProcessedElementIterator.previous();
+						parentNode.insertBefore(processedElement, refChild); //insert the processed element in the earlier position
+						refChild = processedElement; //the newly inserted element becomes the new reference for the next insertion
+					}
+				} else { //if we're at the end of the list
+					processedElements.forEach(parentNode::appendChild); //just append the processed elements normally
+				}
 			}
-			throw new UnsupportedOperationException("Structural changes not yet fully supported when processing individual child elements.");
+			childNodeIndex += processedElementCount; //manually advance the index based upon the replacement nodes
 		}
 	}
 
@@ -841,7 +905,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				//then include the sorted child navigation artifacts
 				childNavigationArtifacts(context, contextArtifact)
 						//posts shouldn't appear in the normal navigation list TODO create a more semantic means of filtering posts
-						.filter(childArtifact -> !(childArtifact instanceof PostArtifact)).sorted(navigationArtifactOrderComparator))
+						.filter(not(PostArtifact.class::isInstance)).sorted(navigationArtifactOrderComparator))
 				//generate navigation elements 
 				.forEach(navigationArtifact -> {
 					//if the navigation artifact is this artifact, use the template for an active link
@@ -899,6 +963,69 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				});
 
 		return List.of(navigationListElement);
+	}
+
+	/** The formatter for producing the published on date string. */
+	private static final DateTimeFormatter WIDGET_POST_LIST_PUBLISHED_ON_FORMATTER = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL); //i18n; update to allow project-based locale from mummification context; probably request formatter from mummification context
+
+	/**
+	 * Generates content for a post list widget.
+	 * <p>
+	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
+	 * element is removed.
+	 * </p>
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact being generated
+	 * @param widgetElement The list element to regenerate.
+	 * @return The processed element(s), if any, to replace the widget element.
+	 * @throws IOException if there is an error processing the element.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 */
+	protected List<Element> processWidgetPostList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
+			@Nonnull final Element widgetElement) throws IOException, DOMException {
+		final Document document = widgetElement.getOwnerDocument();
+		return childNavigationArtifacts(context, contextArtifact)
+				//only include posts
+				.flatMap(asInstances(PostArtifact.class))
+				//sort the posts in reverse order of published-on date (with undated posts last, although there are not expected to be any), secondarily by determined title
+				.sorted(nullsLast(Comparator.<PostArtifact, LocalDate>comparing(postArtifact -> postArtifact.getResourceDescription()
+						.findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON).flatMap(asInstance(LocalDate.class)).orElse(null)).reversed())
+								.thenComparing(PostArtifact::determineTitle))
+				//generate content; the first element must be a separator element, which will be ignored for the first post
+				.flatMap(throwingFunction(postArtifact -> {
+					//separator
+					final Element separatorElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_HR); //<hr/>
+					//title
+					final String postHref = context.relativizeSourceReference(contextArtifact, postArtifact).toString();
+					final Element titleElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_H2); //<h2>
+					final Element titleElementLink = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A); //<h2><a>
+					titleElementLink.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, postHref);
+					appendText(titleElementLink, postArtifact.determineTitle()); //<h2><a>title</a></h2>
+					titleElement.appendChild(titleElementLink);
+					//publication date
+					final Optional<Element> publishedOnElement = postArtifact.getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON)
+							.flatMap(asInstance(LocalDate.class)).map(publishedOn -> {
+								final Element element = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_H3); //<h3>
+								appendText(element, WIDGET_POST_LIST_PUBLISHED_ON_FORMATTER.format(publishedOn));
+								return element;
+							});
+					//excerpt
+					final Optional<Element> excerptElement = loadSourceExcerpt(context, postArtifact).map(excerpt -> {
+						//Wrap the excerpt in a <div>. The other option would be to import the document fragment children directly into the document,
+						//but wrapping the excerpt may be more semantically correct and more useful for styling in the future.
+						final Element excerptWrapper = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_DIV); //<div>
+						appendImportedChildNodes(excerptWrapper, excerpt); //import the excerpt into the <div>
+						return excerptWrapper;
+					});
+					//more
+					final String moreLabel = findAttributeNS(widgetElement, WIDGET_POST_LIST_MORE_LABEL_ATTRIBUTE).orElse("…");
+					final Element moreLink = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A); //<a>
+					moreLink.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, postHref);
+					appendText(moreLink, moreLabel); //<a>…</a>
+					return concat(concat(Stream.of(separatorElement, titleElement), publishedOnElement.stream()), concat(excerptElement.stream(), Stream.of(moreLink)));
+				})).skip(1) //skip the first separator so that separators will only appear between posts
+				.collect(toList());
 	}
 
 	//#relocate

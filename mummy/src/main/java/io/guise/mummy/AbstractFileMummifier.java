@@ -26,6 +26,7 @@ import java.io.*;
 import java.net.URI;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 
@@ -173,6 +174,21 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 				}
 			});
 			//TODO load any description sidecar			
+			//add the publication date for posts
+			final Path filename = sourceFile.getFileName();
+			if(filename != null) {
+				final Matcher postMatcher = PostArtifact.FILENAME_PATTERN.matcher(filename.toString());
+				if(postMatcher.matches()) { //if this is a post, add a `publishedOn` property if there isn't one already
+					if(!description.hasPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON)) {
+						final String postYear = postMatcher.group(PostArtifact.FILENAME_PATTERN_YEAR_GROUP);
+						final String postMonth = postMatcher.group(PostArtifact.FILENAME_PATTERN_MONTH_GROUP);
+						final String postDay = postMatcher.group(PostArtifact.FILENAME_PATTERN_DAY_GROUP);
+						//the regex will guarantee that these are paresable as integers 
+						final LocalDate publishedOn = LocalDate.of(Integer.parseInt(postYear), Integer.parseInt(postMonth), Integer.parseInt(postDay));
+						description.setPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON, publishedOn);
+					}
+				}
+			}
 			//add the content type
 			getArtifactMediaType(context, sourceFile).ifPresent(mediaType -> description.setPropertyValue(Content.TYPE_PROPERTY_TAG, mediaType));
 			//add the source modification timestamp, if any

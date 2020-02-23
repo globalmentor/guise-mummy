@@ -23,6 +23,7 @@ import static java.nio.file.Files.*;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.function.Function;
 
 import javax.annotation.*;
@@ -49,7 +50,12 @@ public interface PageMummifier extends Mummifier {
 	/** The attribute for regenerating an element, such as a navigation list. */
 	public static final NsName ATTRIBUTE_REGENERATE = NsName.of(NAMESPACE_STRING, "regenerate");
 
-	//#load
+	/** The element indicating a post list widget element. */
+	public static final NsName WIDGET_POST_LIST_ELEMENT = NsName.of(NAMESPACE_STRING, "PostList");
+	/** The optional post list widget attribute indicating the label for the "more" link. */
+	public static final NsName WIDGET_POST_LIST_MORE_LABEL_ATTRIBUTE = NsName.of("moreLabel");
+
+	//# load
 
 	/**
 	 * Loads the source file and returns it as a document to be further refined before being used to generate the artifact.
@@ -119,7 +125,71 @@ public interface PageMummifier extends Mummifier {
 	public Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull InputStream inputStream, @Nullable final String name)
 			throws IOException, DOMException;
 
-	//#relocate
+	//## load excerpt
+
+	/**
+	 * Loads an excerpt from the given source file and returns it as a document fragment.
+	 * <p>
+	 * The document must be in XHTML using the HTML namespace.
+	 * </p>
+	 * @implSpec The default implementation opens an input stream to the given file and then loads the source document by calling
+	 *           {@link #loadSourceExcerpt(MummyContext, InputStream, String)}.
+	 * @implNote The returned document fragment will not yet have been processed. For example, no expressions will have been evaluated and links will still
+	 *           reference source paths. This will likely be changed or otherwise improved in the future.
+	 * @param context The context of static site generation.
+	 * @param sourceFile The file from which to load the excerpt.
+	 * @return A document fragment providing an excerpt, if available, of the source content of the artifact to generate.
+	 * @throws IOException if there is an error loading and/or converting the source file contents.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 */
+	public default Optional<DocumentFragment> loadSourceExcerpt(@Nonnull MummyContext context, @Nonnull Path sourceFile) throws IOException, DOMException {
+		try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile))) {
+			final Path filename = sourceFile.getFileName();
+			return loadSourceExcerpt(context, inputStream, filename != null ? filename.toString() : null);
+		}
+	}
+
+	/**
+	 * Loads an excerpt of some artifact and returns it as a document fragment.
+	 * <p>
+	 * The document fragment must be in XHTML using the HTML namespace.
+	 * </p>
+	 * @implSpec The default implementation opens an input stream using {@link SourceFileArtifact#openSource(MummyContext)} and then loads the source excerpt by
+	 *           calling {@link #loadSourceExcerpt(MummyContext, InputStream, String)}.
+	 * @implNote The returned document fragment will not yet have been processed. For example, no expressions will have been evaluated and links will still
+	 *           reference source paths. This will likely be changed or otherwise improved in the future.
+	 * @param context The context of static site generation.
+	 * @param artifact The artifact for which to load the excerpt.
+	 * @return A document fragment providing an excerpt, if available, of the source content of the artifact to generate.
+	 * @throws IOException if there is an error loading and/or converting the source file contents.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 */
+	public default Optional<DocumentFragment> loadSourceExcerpt(@Nonnull MummyContext context, @Nonnull SourceFileArtifact artifact)
+			throws IOException, DOMException {
+		try (final InputStream inputStream = new BufferedInputStream(artifact.openSource(context))) {
+			final Path filename = artifact.getSourcePath().getFileName();
+			return loadSourceExcerpt(context, inputStream, filename != null ? filename.toString() : null);
+		}
+	}
+
+	/**
+	 * Loads an excerpt from the given source input stream and returns it as a document fragment.
+	 * <p>
+	 * The document fragment must be in XHTML using the HTML namespace.
+	 * </p>
+	 * @implNote The returned document fragment will not yet have been processed. For example, no expressions will have been evaluated and links will still
+	 *           reference source paths. This will likely be changed or otherwise improved in the future.
+	 * @param context The context of static site generation.
+	 * @param inputStream The input stream from which to to load the excerpt.
+	 * @param name The optional source name of the document, such as a filename, which may be missing or empty.
+	 * @return A document fragment providing an excerpt, if available, of the source content of the artifact to generate.
+	 * @throws IOException if there is an error loading and/or converting the source file contents.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 */
+	public Optional<DocumentFragment> loadSourceExcerpt(@Nonnull MummyContext context, @Nonnull InputStream inputStream, @Nullable final String name)
+			throws IOException, DOMException;
+
+	//# relocate
 
 	/**
 	 * Relocates a document by retargeting its references relative to a new referrer path location.
