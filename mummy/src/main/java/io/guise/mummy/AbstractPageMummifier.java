@@ -21,6 +21,7 @@ import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
+import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.lex.CompoundTokenization.*;
 import static com.globalmentor.util.Optionals.*;
 import static com.globalmentor.xml.XmlDom.*;
@@ -38,7 +39,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.text.Collator;
-import java.time.Instant;
+import java.time.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -968,6 +969,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
 	 * element is removed.
 	 * </p>
+	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @param widgetElement The list element to regenerate.
@@ -992,7 +994,13 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 					titleElementLink.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, postHref);
 					appendText(titleElementLink, postArtifact.determineTitle()); //<h2><a>title</a></h2>
 					titleElement.appendChild(titleElementLink);
-					//TODO <h3>Monday, February 2, 2004</h3>
+					//publication date
+					final Optional<Element> publishedOnElement = postArtifact.getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON)
+							.flatMap(ifInstance(LocalDate.class)).map(publishedOn -> {
+								final Element element = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_H3); //<h3>
+								appendText(element, publishedOn.toString()); //TODO improve format
+								return element;
+							});
 					//excerpt
 					final Optional<Element> excerptElement = loadSourceExcerpt(context, postArtifact).map(excerpt -> {
 						//Wrap the excerpt in a <div>. The other option would be to import the document fragment children directly into the document,
@@ -1007,7 +1015,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 					final Element moreLink = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A); //<a>
 					moreLink.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, postHref);
 					appendText(moreLink, moreLabel); //<a>…</a>
-					return concat(concat(Stream.of(separatorElement, titleElement), excerptElement.stream()), Stream.of(moreLink));
+					return concat(concat(Stream.of(separatorElement, titleElement), publishedOnElement.stream()), concat(excerptElement.stream(), Stream.of(moreLink)));
 				})).skip(1) //skip the first separator so that separators will only appear between posts
 				.collect(toList());
 	}
