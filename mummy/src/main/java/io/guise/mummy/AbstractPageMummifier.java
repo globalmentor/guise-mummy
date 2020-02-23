@@ -40,6 +40,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.text.Collator;
 import java.time.*;
+import java.time.format.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -963,6 +964,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		return List.of(navigationListElement);
 	}
 
+	/** The formatter for producing the published on date string. */
+	private static final DateTimeFormatter WIDGET_POST_LIST_PUBLISHED_ON_FORMATTER = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL); //i18n; update to allow project-based locale from mummification context; probably request formatter from mummification context
+
 	/**
 	 * Generates content for a post list widget.
 	 * <p>
@@ -998,7 +1002,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 					final Optional<Element> publishedOnElement = postArtifact.getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON)
 							.flatMap(asInstance(LocalDate.class)).map(publishedOn -> {
 								final Element element = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_H3); //<h3>
-								appendText(element, publishedOn.toString()); //TODO improve format
+								appendText(element, WIDGET_POST_LIST_PUBLISHED_ON_FORMATTER.format(publishedOn));
 								return element;
 							});
 					//excerpt
