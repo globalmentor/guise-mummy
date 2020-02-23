@@ -996,7 +996,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 					titleElement.appendChild(titleElementLink);
 					//publication date
 					final Optional<Element> publishedOnElement = postArtifact.getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON)
-							.flatMap(ifInstance(LocalDate.class)).map(publishedOn -> {
+							.flatMap(asInstance(LocalDate.class)).map(publishedOn -> {
 								final Element element = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_H3); //<h3>
 								appendText(element, publishedOn.toString()); //TODO improve format
 								return element;
