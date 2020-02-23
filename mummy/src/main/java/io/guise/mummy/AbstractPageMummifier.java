@@ -1011,7 +1011,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 						//but wrapping the excerpt may be more semantically correct and more useful for styling in the future.
 						final Element excerptWrapper = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_DIV); //<div>
 						appendImportedChildNodes(excerptWrapper, excerpt); //import the excerpt into the <div>
-						appendText(excerptWrapper, " …"); //add an ellipsis after the excerpt to make it clearer that this is not the full content
+						//add an ellipsis after the text of last element of the excerpt (if it is a paragraph), to make it clearer that this is not the full content
+						findLastChild(excerptWrapper).flatMap(asInstance(Element.class)).filter(XHTML_ELEMENT_P::matches).ifPresent(p -> appendText(p, " …"));
 						return excerptWrapper;
 					});
 					//more
