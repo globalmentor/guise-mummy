@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.guise.mummy;
+package io.guise.mummy.mummify.page;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static com.globalmentor.html.HtmlDom.*;
@@ -22,7 +22,7 @@ import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.OperatingSystem.*;
 import static com.globalmentor.xml.XmlDom.*;
-import static io.guise.mummy.MarkdownPageMummifier.*;
+import static io.guise.mummy.mummify.page.MarkdownPageMummifier.*;
 import static java.util.stream.Collectors.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
@@ -38,6 +38,8 @@ import org.junit.jupiter.api.*;
 import org.w3c.dom.*;
 
 import io.confound.config.Configuration;
+import io.guise.mummy.*;
+import io.guise.mummy.mummify.page.MarkdownPageMummifier;
 import io.urf.URF.Handle;
 
 /**

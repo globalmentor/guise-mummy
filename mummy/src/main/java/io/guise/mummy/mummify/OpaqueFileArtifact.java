@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package io.guise.mummy;
+package io.guise.mummy.mummify;
 
 import java.nio.file.Path;
 
 import javax.annotation.*;
 
+import io.guise.mummy.BaseCorporealSourceFileArtifact;
 import io.urf.model.UrfResourceDescription;
 
 /**

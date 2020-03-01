@@ -23,6 +23,8 @@ import java.util.Set;
 
 import javax.annotation.*;
 
+import io.guise.mummy.mummify.Mummifier;
+
 /**
  * Abstract implementation of an artifact.
  * @implSpec This class implements artifact equality.

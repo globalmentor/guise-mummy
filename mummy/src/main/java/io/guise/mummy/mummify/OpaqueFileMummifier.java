@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.guise.mummy;
+package io.guise.mummy.mummify;
 
 import static com.globalmentor.io.Paths.*;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 
 import com.globalmentor.net.ContentType;
 
+import io.guise.mummy.*;
 import io.urf.model.UrfResourceDescription;
 
 /**

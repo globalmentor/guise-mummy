@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.guise.mummy;
+package io.guise.mummy.mummify.page;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -24,6 +24,8 @@ import javax.annotation.*;
 
 import com.globalmentor.text.StringTemplate;
 
+import io.guise.mummy.*;
+import io.guise.mummy.mummify.Mummifier;
 import io.urf.model.UrfResourceDescription;
 
 /**

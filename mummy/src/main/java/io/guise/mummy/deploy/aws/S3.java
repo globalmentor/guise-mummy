@@ -41,6 +41,7 @@ import io.confound.config.Configuration;
 import io.confound.config.ConfigurationException;
 import io.guise.mummy.*;
 import io.guise.mummy.deploy.DeployTarget;
+import io.guise.mummy.mummify.collection.DirectoryArtifact;
 import io.urf.URF.Handle;
 import io.urf.model.UrfResourceDescription;
 import io.urf.vocab.content.Content;

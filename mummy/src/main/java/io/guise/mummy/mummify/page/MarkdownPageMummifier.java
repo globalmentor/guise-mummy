@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.guise.mummy;
+package io.guise.mummy.mummify.page;
 
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.InputStreams.*;
@@ -50,6 +50,8 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.superscript.SuperscriptExtension;
 import com.vladsch.flexmark.util.data.MutableDataHolder;
 import com.vladsch.flexmark.util.data.MutableDataSet;
+
+import io.guise.mummy.MummyContext;
 
 /**
  * Mummifier for Markdown documents.

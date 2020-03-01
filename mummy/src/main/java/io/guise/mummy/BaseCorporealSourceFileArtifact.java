@@ -24,6 +24,7 @@ import java.nio.file.Path;
 
 import javax.annotation.*;
 
+import io.guise.mummy.mummify.Mummifier;
 import io.urf.model.UrfResourceDescription;
 
 /**

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.guise.mummy;
+package io.guise.mummy.mummify.page;
 
 import static com.globalmentor.html.spec.HTML.*;
 
@@ -25,6 +25,8 @@ import javax.xml.parsers.*;
 
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
+
+import io.guise.mummy.MummyContext;
 
 /**
  * Mummifier for XHTML documents, such as HTML5 documents stored as XML.

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.guise.mummy;
+package io.guise.mummy.mummify;
 
 import static com.globalmentor.io.Paths.*;
 
@@ -25,6 +25,8 @@ import java.util.*;
 import javax.annotation.*;
 
 import com.globalmentor.net.ContentType;
+
+import io.guise.mummy.*;
 
 /**
  * Mummifier for processing resources with a source path.

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.guise.mummy;
+package io.guise.mummy.mummify.page;
 
 import static com.globalmentor.java.OperatingSystem.*;
 import static org.hamcrest.MatcherAssert.*;
@@ -27,6 +27,8 @@ import java.util.*;
 import org.junit.jupiter.api.*;
 
 import io.confound.config.Configuration;
+import io.guise.mummy.*;
+import io.guise.mummy.mummify.page.XhtmlPageMummifier;
 import io.urf.URF.Handle;
 
 /**

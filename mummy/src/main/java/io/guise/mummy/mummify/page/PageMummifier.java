@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.guise.mummy;
+package io.guise.mummy.mummify.page;
 
 import static com.globalmentor.html.spec.HTML.*;
 import static io.guise.mummy.GuiseMummy.NAMESPACE_STRING;
@@ -32,6 +32,9 @@ import org.w3c.dom.*;
 
 import com.globalmentor.net.ContentType;
 import com.globalmentor.xml.spec.NsName;
+
+import io.guise.mummy.*;
+import io.guise.mummy.mummify.Mummifier;
 
 /**
  * Mummifier for generating HTML pages.
