@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.guise.mummy;
+package io.guise.mummy.mummify;
 
 import static com.globalmentor.io.Paths.*;
 import static java.nio.file.Files.*;
@@ -25,6 +25,7 @@ import java.util.*;
 
 import javax.annotation.*;
 
+import io.guise.mummy.MummyContext;
 import io.urf.model.*;
 import io.urf.turf.TurfParser;
 

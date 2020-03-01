@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.guise.mummy;
+package io.guise.mummy.mummify;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -23,6 +23,7 @@ import java.util.Set;
 import javax.annotation.*;
 
 import io.clogr.Clogged;
+import io.guise.mummy.*;
 
 /**
  * Processes a resource for mummification.

@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
+import io.guise.mummy.mummify.Mummifier;
 import io.urf.model.UrfResourceDescription;
 
 /**

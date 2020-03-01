@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package io.guise.mummy;
+package io.guise.mummy.mummify.page;
 
 import java.nio.file.Path;
 import java.util.regex.Pattern;
 
 import javax.annotation.*;
 
+import io.guise.mummy.mummify.Mummifier;
 import io.urf.model.UrfResourceDescription;
 
 /**

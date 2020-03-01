@@ -36,6 +36,8 @@ import com.globalmentor.net.URIPath;
 
 import io.confound.config.Configuration;
 import io.guise.mummy.deploy.*;
+import io.guise.mummy.mummify.SourcePathMummifier;
+import io.guise.mummy.mummify.page.PageMummifier;
 
 /**
  * Provides information about context of static site generation.

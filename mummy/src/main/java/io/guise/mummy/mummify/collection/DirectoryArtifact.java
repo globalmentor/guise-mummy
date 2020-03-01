@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.guise.mummy;
+package io.guise.mummy.mummify.collection;
 
 import static com.globalmentor.collections.Sets.*;
 
@@ -24,6 +24,8 @@ import java.util.stream.Stream;
 
 import javax.annotation.*;
 
+import io.guise.mummy.*;
+import io.guise.mummy.mummify.Mummifier;
 import io.urf.model.UrfResourceDescription;
 
 /**

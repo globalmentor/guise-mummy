@@ -23,6 +23,7 @@ import javax.annotation.*;
 
 import io.confound.config.Configuration;
 import io.guise.mummy.deploy.*;
+import io.guise.mummy.mummify.SourcePathMummifier;
 
 /**
  * Stub implementation a mummification context with minimal functionality for testing.

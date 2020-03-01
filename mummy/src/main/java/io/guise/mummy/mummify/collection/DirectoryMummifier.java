@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.guise.mummy;
+package io.guise.mummy.mummify.collection;
 
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
@@ -32,6 +32,9 @@ import javax.annotation.*;
 
 import com.globalmentor.net.ContentType;
 
+import io.guise.mummy.*;
+import io.guise.mummy.mummify.*;
+import io.guise.mummy.mummify.page.*;
 import io.urf.model.UrfObject;
 import io.urf.model.UrfResourceDescription;
 import io.urf.vocab.content.Content;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.guise.mummy;
+package io.guise.mummy.mummify;
 
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.util.Optionals.*;
@@ -34,6 +34,8 @@ import javax.annotation.*;
 
 import com.globalmentor.security.MessageDigests;
 
+import io.guise.mummy.*;
+import io.guise.mummy.mummify.page.PostArtifact;
 import io.urf.model.*;
 import io.urf.turf.TurfParser;
 import io.urf.turf.TurfSerializer;

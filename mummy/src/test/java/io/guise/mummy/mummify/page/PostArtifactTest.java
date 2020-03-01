@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.guise.mummy;
+package io.guise.mummy.mummify.page;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
@@ -22,6 +22,8 @@ import static org.hamcrest.Matchers.*;
 import java.util.regex.Matcher;
 
 import org.junit.jupiter.api.*;
+
+import io.guise.mummy.mummify.page.PostArtifact;
 
 /**
  * Tests of {@link PostArtifact}.

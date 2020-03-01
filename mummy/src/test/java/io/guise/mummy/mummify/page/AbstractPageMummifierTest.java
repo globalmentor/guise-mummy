@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package io.guise.mummy;
+package io.guise.mummy.mummify.page;
+
+import io.guise.mummy.mummify.page.AbstractPageMummifier;
 
 /**
  * Tests of {@link AbstractPageMummifier}.

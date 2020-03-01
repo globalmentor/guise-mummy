@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.guise.mummy;
+package io.guise.mummy.mummify.page;
 
 import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
@@ -59,6 +59,8 @@ import com.globalmentor.vocab.*;
 import com.globalmentor.xml.*;
 import com.globalmentor.xml.spec.*;
 
+import io.guise.mummy.*;
+import io.guise.mummy.mummify.AbstractFileMummifier;
 import io.urf.URF;
 import io.urf.URF.Handle;
 import io.urf.model.UrfResourceDescription;
