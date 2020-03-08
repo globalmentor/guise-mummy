@@ -306,6 +306,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			@Nonnull final String name)
 			throws IOException {
 		final Document sourceDocument = loadSourceDocument(context, inputStream, name);
+		sourceDocument.normalize(); //**Do not call `document.normalizeDocument()`**; see note in `normalizeDocument()` below.
 		try {
 			return extractMetadata(context, sourceDocument);
 		} catch(final IllegalArgumentException | DOMException exception) {
@@ -422,7 +423,10 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 */
 	protected Document normalizeDocument(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
 			@Nonnull final Document document) throws IOException, DOMException {
-		document.normalizeDocument(); //normalize the XML DOM
+		//**Do not call `document.normalizeDocument()`**, as it apparently tries to look up entities without using the document factory entity resolver,
+		//causing the method to pause and potentially print error messages if entities cannot be found.
+		//See note about `resource-resolver` parameter in `DOMConfiguration` if this needs to be investigated further.
+		document.normalize(); //normalize the XML DOM
 		final List<Element> normalizedElements = normalizeElement(context, contextArtifact, artifact, document.getDocumentElement());
 		if(normalizedElements.size() != 1 || normalizedElements.get(0) != document.getDocumentElement()) {
 			throw new UnsupportedOperationException("Document element cannot be removed or replaced when normalizing a document.");
