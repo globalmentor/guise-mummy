@@ -26,6 +26,10 @@ import java.util.*;
 import javax.annotation.*;
 import javax.xml.parsers.*;
 
+import com.globalmentor.xml.DefaultEntityResolver;
+
+import io.confound.config.ConfigurationException;
+
 /**
  * Abstract base implementation of a mummification context with common default functionality.
  * @author Garret Wilson
@@ -130,15 +134,19 @@ public abstract class BaseMummyContext implements MummyContext {
 
 	/**
 	 * {@inheritDoc}
+	 * @implSpec This implementation returns a document builder using {@link DefaultEntityResolver} so that preloaded versions of frequently-used XHTML-related
+	 *           DTDs and other entities will be used instead of downloading them from external sources.
 	 * @implSpec This implementation synchronizes on the internal document builder factory instance.
 	 */
 	@Override
 	public DocumentBuilder newPageDocumentBuilder() {
 		synchronized(pageDocumentBuilderFactory) {
 			try {
-				return pageDocumentBuilderFactory.newDocumentBuilder(); //TODO install appropriate entity resolvers as needed
+				final DocumentBuilder documentBuilder = pageDocumentBuilderFactory.newDocumentBuilder();
+				documentBuilder.setEntityResolver(DefaultEntityResolver.getInstance()); //install an entity resolver that knows about many XHTML-related entities
+				return documentBuilder;
 			} catch(final ParserConfigurationException parserConfigurationException) {
-				throw new RuntimeException(parserConfigurationException); //TODO switch to Confound configuration exception
+				throw new ConfigurationException(parserConfigurationException);
 			}
 		}
 	}
