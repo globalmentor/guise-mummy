@@ -35,9 +35,10 @@ import io.guise.mummy.MummyContext;
 
 /**
  * Mummifier for general HTML documents.
- * @implSpec This implementation supports general HTML documents such as HTML5 using lenient HTML parsing rules. If the document begins with the XML declaration
+ * @implSpec This mummifier supports general HTML documents such as HTML5 using lenient HTML parsing rules. If the document begins with the XML declaration
  *           {@value XML#XML_DECL_START}, the document is parsed ax XHTML using the stricter XML parsing rules, delegating to {@link XhtmlPageMummifier} for
  *           parsing.
+ * @implSpec General HTML mummification has not yet been implemented.
  * @author Garret Wilson
  */
 public class HtmlPageMummifier extends XhtmlPageMummifier {
