@@ -34,7 +34,7 @@ import javax.xml.parsers.DocumentBuilder;
 
 import com.globalmentor.net.URIPath;
 
-import io.confound.config.Configuration;
+import io.confound.config.*;
 import io.guise.mummy.deploy.*;
 import io.guise.mummy.mummify.SourcePathMummifier;
 import io.guise.mummy.mummify.page.PageMummifier;
@@ -455,6 +455,7 @@ public interface MummyContext {
 	 * Creates a new instance of a {@link DocumentBuilder} appropriate for working with Guise Mummy pages.
 	 * @implSpec The returned document builder will be namespace aware.
 	 * @return A new instance of a page document builder.
+	 * @throws ConfigurationException if there is a problem creating a document builder.
 	 */
 	public DocumentBuilder newPageDocumentBuilder();
 

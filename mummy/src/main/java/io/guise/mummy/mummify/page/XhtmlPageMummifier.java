@@ -25,11 +25,13 @@ import javax.xml.parsers.*;
 
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import io.guise.mummy.MummyContext;
 
 /**
  * Mummifier for XHTML documents, such as HTML5 documents stored as XML.
+ * @implNote This mummifier only works with XHTML documents.
  * @author Garret Wilson
  */
 public class XhtmlPageMummifier extends AbstractPageMummifier {
@@ -49,7 +51,36 @@ public class XhtmlPageMummifier extends AbstractPageMummifier {
 		try {
 			return documentBuilder.parse(inputStream);
 		} catch(final SAXException saxException) {
-			throw new IOException(saxException);
+			final StringBuilder messageBuilder = new StringBuilder("XML error parsing `").append(name).append('`'); //TODO i18n
+			if(saxException instanceof SAXParseException) { //get more parse state information if we can
+				final SAXParseException saxParseException = (SAXParseException)saxException;
+				final String publicId = saxParseException.getPublicId();
+				final String systemId = saxParseException.getSystemId();
+				final int line = saxParseException.getLineNumber();
+				final int column = saxParseException.getColumnNumber();
+				if(publicId != null || systemId != null || line >= 0 || column >= 0) { //if we have any informational values
+					if(publicId != null) {
+						messageBuilder.append(", public ID `").append(publicId).append('`'); //TODO i18n
+					}
+					if(systemId != null) {
+						messageBuilder.append(", system ID `").append(systemId).append('`'); //TODO i18n
+					}
+					if(line >= 0) {
+						messageBuilder.append(", line ").append(line); //TODO i18n
+					}
+					if(column >= 0) {
+						messageBuilder.append(", column ").append(column); //TODO i18n
+					}
+				}
+			}
+			final String saxMessage = saxException.getLocalizedMessage();
+			if(saxMessage != null) {
+				messageBuilder.append(": ").append(saxMessage); //always tack on the original SAX exception message
+			} else {
+				messageBuilder.append('.'); //TODO i18n
+			}
+			throw new IOException(messageBuilder.toString(), saxException);
 		}
 	}
+
 }

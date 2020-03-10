@@ -287,8 +287,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	@Override
 	protected List<Map.Entry<URI, Object>> loadSourceMetadata(@Nonnull MummyContext context, @Nonnull final Path sourceFile) throws IOException {
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile))) {
-			final Path filename = sourceFile.getFileName();
-			return loadSourceMetadata(context, inputStream, filename != null ? filename.toString() : null);
+			return loadSourceMetadata(context, inputStream, sourceFile.toString());
 		}
 	}
 
@@ -299,17 +298,19 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 *           metadata.
 	 * @param context The context of static site generation.
 	 * @param inputStream The input stream from which to to load the source metadata.
-	 * @param name The optional name of the source, such as a filename, which may be missing or empty.
+	 * @param name The full identifier of the source, such as a path or URL.
 	 * @return Metadata stored in the source file being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate names.
 	 * @throws IOException if there is an I/O error retrieving the metadata, including incorrectly formatted metadata.
 	 */
-	protected List<Map.Entry<URI, Object>> loadSourceMetadata(@Nonnull MummyContext context, @Nonnull InputStream inputStream, @Nullable final String name)
+	protected List<Map.Entry<URI, Object>> loadSourceMetadata(@Nonnull MummyContext context, @Nonnull InputStream inputStream,
+			@Nonnull final String name)
 			throws IOException {
 		final Document sourceDocument = loadSourceDocument(context, inputStream, name);
+		sourceDocument.normalize(); //**Do not call `document.normalizeDocument()`**; see note in `normalizeDocument()` below.
 		try {
 			return extractMetadata(context, sourceDocument);
 		} catch(final IllegalArgumentException | DOMException exception) {
-			throw new IOException(String.format("Error processing metadata in `%s`: %s", name != null ? name : "(unknown)", exception.getMessage()), exception); //TODO i18n
+			throw new IOException(String.format("Error processing metadata in `%s`: %s", name, exception.getLocalizedMessage()), exception); //TODO i18n
 		}
 	}
 
@@ -422,7 +423,10 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 */
 	protected Document normalizeDocument(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
 			@Nonnull final Document document) throws IOException, DOMException {
-		document.normalizeDocument(); //normalize the XML DOM
+		//**Do not call `document.normalizeDocument()`**, as it apparently tries to look up entities without using the document factory entity resolver,
+		//causing the method to pause and potentially print error messages if entities cannot be found.
+		//See note about `resource-resolver` parameter in `DOMConfiguration` if this needs to be investigated further.
+		document.normalize(); //normalize the XML DOM
 		final List<Element> normalizedElements = normalizeElement(context, contextArtifact, artifact, document.getDocumentElement());
 		if(normalizedElements.size() != 1 || normalizedElements.get(0) != document.getDocumentElement()) {
 			throw new UnsupportedOperationException("Document element cannot be removed or replaced when normalizing a document.");
@@ -591,7 +595,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 						});
 			} catch(final IllegalArgumentException illegalArgumentException) {
 				throw new IOException(String.format("Source file %s specified invalid template %s: %s.", artifact.getSourcePath(), customTemplate,
-						illegalArgumentException.getMessage()));
+						illegalArgumentException.getLocalizedMessage()), illegalArgumentException); //TODO i18n
 			}
 		} else { //if no custom template was specified
 			return context.findPageSourceFile(artifact.getSourceDirectory(), ".template", true); //look for a template TODO allow base filename to be configurable
@@ -1173,7 +1177,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				}
 			} catch(final URISyntaxException uriSyntaxException) {
 				getLogger().warn("Invalid reference `<{} {}=\"{}\" …>` in `{}`: {}", referenceElement.getNodeName(), referenceAttributeName, referenceString,
-						originalReferrerSourcePath, uriSyntaxException.getMessage());
+						originalReferrerSourcePath, uriSyntaxException.getLocalizedMessage()); //TODO i18n
 			}
 		});
 		return List.of(referenceElement);

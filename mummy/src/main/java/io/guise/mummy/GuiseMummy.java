@@ -40,6 +40,7 @@ import io.guise.mummy.deploy.*;
 import io.guise.mummy.deploy.aws.*;
 import io.guise.mummy.mummify.*;
 import io.guise.mummy.mummify.collection.DirectoryMummifier;
+import io.guise.mummy.mummify.page.HtmlPageMummifier;
 import io.guise.mummy.mummify.page.MarkdownPageMummifier;
 import io.guise.mummy.mummify.page.XhtmlPageMummifier;
 import io.urf.turf.TurfSerializer;
@@ -230,6 +231,7 @@ public class GuiseMummy implements Clogged {
 		//register default resource types
 		registerFileMummifier(new MarkdownPageMummifier());
 		registerFileMummifier(new XhtmlPageMummifier());
+		registerFileMummifier(new HtmlPageMummifier());
 	}
 
 	/**

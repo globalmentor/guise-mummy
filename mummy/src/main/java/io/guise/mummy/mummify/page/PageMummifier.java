@@ -78,8 +78,7 @@ public interface PageMummifier extends Mummifier {
 	 */
 	public default Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull Path sourceFile) throws IOException, DOMException {
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile))) {
-			final Path filename = sourceFile.getFileName();
-			return loadSourceDocument(context, inputStream, filename != null ? filename.toString() : null);
+			return loadSourceDocument(context, inputStream, sourceFile.toString());
 		}
 	}
 
@@ -103,8 +102,7 @@ public interface PageMummifier extends Mummifier {
 	 */
 	public default Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull SourceFileArtifact artifact) throws IOException, DOMException {
 		try (final InputStream inputStream = new BufferedInputStream(artifact.openSource(context))) {
-			final Path filename = artifact.getSourcePath().getFileName();
-			return loadSourceDocument(context, inputStream, filename != null ? filename.toString() : null);
+			return loadSourceDocument(context, inputStream, artifact.getSourcePath().toString());
 		}
 	}
 
@@ -120,12 +118,12 @@ public interface PageMummifier extends Mummifier {
 	 *          loading source metadata for the artifact description delegates to this method.
 	 * @param context The context of static site generation.
 	 * @param inputStream The input stream from which to to load the document.
-	 * @param name The optional source name of the document, such as a filename, which may be missing or empty.
+	 * @param name The full source identifier of the document, such as a path or URL.
 	 * @return A document describing the source content of the artifact to generate.
 	 * @throws IOException if there is an error loading and/or converting the source file contents.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull InputStream inputStream, @Nullable final String name)
+	public Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull InputStream inputStream, @Nonnull final String name)
 			throws IOException, DOMException;
 
 	//## load excerpt
@@ -147,8 +145,7 @@ public interface PageMummifier extends Mummifier {
 	 */
 	public default Optional<DocumentFragment> loadSourceExcerpt(@Nonnull MummyContext context, @Nonnull Path sourceFile) throws IOException, DOMException {
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile))) {
-			final Path filename = sourceFile.getFileName();
-			return loadSourceExcerpt(context, inputStream, filename != null ? filename.toString() : null);
+			return loadSourceExcerpt(context, inputStream, sourceFile.toString());
 		}
 	}
 
@@ -170,8 +167,7 @@ public interface PageMummifier extends Mummifier {
 	public default Optional<DocumentFragment> loadSourceExcerpt(@Nonnull MummyContext context, @Nonnull SourceFileArtifact artifact)
 			throws IOException, DOMException {
 		try (final InputStream inputStream = new BufferedInputStream(artifact.openSource(context))) {
-			final Path filename = artifact.getSourcePath().getFileName();
-			return loadSourceExcerpt(context, inputStream, filename != null ? filename.toString() : null);
+			return loadSourceExcerpt(context, inputStream, artifact.getSourcePath().toString());
 		}
 	}
 
@@ -184,12 +180,13 @@ public interface PageMummifier extends Mummifier {
 	 *           reference source paths. This will likely be changed or otherwise improved in the future.
 	 * @param context The context of static site generation.
 	 * @param inputStream The input stream from which to to load the excerpt.
-	 * @param name The optional source name of the document, such as a filename, which may be missing or empty.
+	 * @param name The full source identifier of the document, such as a path or URL.
 	 * @return A document fragment providing an excerpt, if available, of the source content of the artifact to generate.
 	 * @throws IOException if there is an error loading and/or converting the source file contents.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public Optional<DocumentFragment> loadSourceExcerpt(@Nonnull MummyContext context, @Nonnull InputStream inputStream, @Nullable final String name)
+	public Optional<DocumentFragment> loadSourceExcerpt(@Nonnull MummyContext context, @Nonnull InputStream inputStream,
+			@Nonnull final String name)
 			throws IOException, DOMException;
 
 	//# relocate

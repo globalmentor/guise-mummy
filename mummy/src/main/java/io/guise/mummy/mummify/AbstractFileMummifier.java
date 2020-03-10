@@ -107,6 +107,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 */
 	@Override
 	public Artifact plan(final MummyContext context, final Path sourceFile) throws IOException {
+		getLogger().trace("Planning artifact for source file `{}` ...", sourceFile);
 		final UrfResourceDescription description = loadDescription(context, sourceFile);
 		return createArtifact(sourceFile, getArtifactTargetPath(context, sourceFile), description);
 	}
@@ -223,6 +224,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 */
 	@Override
 	public final void mummify(@Nonnull final MummyContext context, @Nonnull Artifact contextArtifact, @Nonnull Artifact artifact) throws IOException {
+		getLogger().trace("Mummifying file artifact {} ...", artifact);
 		final Path targetFile = artifact.getTargetPath();
 		final UrfResourceDescription description = artifact.getResourceDescription();
 		final Optional<Instant> oldTargetModifiedAt;

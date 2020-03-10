@@ -77,7 +77,8 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 	 * <li>Page {@code <body>} content.</li>
 	 * </ol>
 	 */
-	private static final StringTemplate XHTML_TEMPLATE = StringTemplate.builder() //@formatter:off
+	private static final StringTemplate XHTML_TEMPLATE = StringTemplate
+			.builder() //@formatter:off
 					.text("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").newline()
 					.text("<!DOCTYPE html>").newline()
 					.text("<html xmlns=\"http://www.w3.org/1999/xhtml\">").newline() 
@@ -142,7 +143,7 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		final String content = readString(new BOMInputStreamReader(toMarkSupportedInputStream(inputStream))); //detect the BOM and to throw errors if the encoding is invalid
 		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher(content);
 		if(!matcher.matches()) {
-			throw new IOException("Invalid markdown" + (name != null ? String.format(" in `%s`", name) : "") + ".");
+			throw new IOException(String.format("Invalid markdown in `%s`.", name));
 		}
 
 		//parse Markdown
@@ -156,8 +157,8 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		final DocumentBuilder documentBuilder = context.newPageDocumentBuilder();
 		try {
 			document = documentBuilder.parse(new ByteArrayInputStream(xhtmlDocumentString.getBytes(UTF_8)));
-		} catch(final SAXException saxException) {
-			throw new IOException(saxException);
+		} catch(final SAXException saxException) { //we don't expect this error, so checking for the locations using SAXParseException isn't that useful
+			throw new IOException(String.format("Error parsing generated XHTML for `%s`: %s.", name, saxException.getLocalizedMessage()), saxException); //TODO i18n
 		}
 
 		return document;
@@ -175,7 +176,7 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		final String content = readString(new BOMInputStreamReader(toMarkSupportedInputStream(inputStream))); //detect the BOM and to throw errors if the encoding is invalid
 		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher(content);
 		if(!matcher.matches()) {
-			throw new IOException("Invalid markdown" + (name != null ? String.format(" in `%s`", name) : "") + ".");
+			throw new IOException(String.format("Invalid markdown in `%s`.", name));
 		}
 		final String yaml = matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP);
 		if(yaml == null) { //no YAML front matter present
@@ -198,8 +199,7 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 				return Map.entry(tag, value);
 			}).collect(toList());
 		} catch(final IllegalArgumentException illegalArgumentException) {
-			throw new IOException("Invalid YAML" + (name != null ? String.format(" in `%s`", name) : "") + ": " + illegalArgumentException.getMessage(),
-					illegalArgumentException);
+			throw new IOException(String.format("Invalid YAML in `%s`: %s", name, illegalArgumentException.getLocalizedMessage()), illegalArgumentException); //TODO i18n
 		}
 	}
 
