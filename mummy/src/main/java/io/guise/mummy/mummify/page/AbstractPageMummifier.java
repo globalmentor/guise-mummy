@@ -398,7 +398,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			//#save target document
 			try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))) {
 				final HtmlSerializer htmlSerializer = new HtmlSerializer(true, PageFormatProfile.INSTANCE);
-				htmlSerializer.serialize(ascribedDocument, outputStream);
+				htmlSerializer.serialize(ascribedDocument, null, null, outputStream); //serialize using the HTML5 doctype (with no public or system ID)
 			}
 			getLogger().trace("Generated page output document `{}`.", artifact.getTargetPath());
 
