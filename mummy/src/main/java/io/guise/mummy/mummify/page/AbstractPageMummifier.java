@@ -411,7 +411,11 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	//#normalize
 
 	/**
-	 * Normalizes a document after it has been loaded, tidying the structure and removing any named metadata (which will be regenerated).
+	 * Normalizes a document after it has been loaded, which includes the following:
+	 * <ul>
+	 * <li>Tidies the structure.</li>
+	 * <li>Removes any named metadata; they will be regenerated later during mummification.</li>
+	 * </ul>
 	 * @implSpec This implementation does not allow the document element to be removed or replaced.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
@@ -426,9 +430,10 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		//**Do not call `document.normalizeDocument()`**, as it apparently tries to look up entities without using the document factory entity resolver,
 		//causing the method to pause and potentially print error messages if entities cannot be found.
 		//See note about `resource-resolver` parameter in `DOMConfiguration` if this needs to be investigated further.
-		document.normalize(); //normalize the XML DOM
-		final List<Element> normalizedElements = normalizeElement(context, contextArtifact, artifact, document.getDocumentElement());
-		if(normalizedElements.size() != 1 || normalizedElements.get(0) != document.getDocumentElement()) {
+		document.normalize();
+		final Element documentElement = document.getDocumentElement();
+		final List<Element> normalizedElements = normalizeElement(context, contextArtifact, artifact, documentElement);
+		if(normalizedElements.size() != 1 || normalizedElements.get(0) != documentElement) {
 			throw new UnsupportedOperationException("Document element cannot be removed or replaced when normalizing a document.");
 		}
 		return document;
