@@ -235,6 +235,24 @@ public interface MummyContext {
 
 	/**
 	 * Searches for a non-directory file in the given source directory that matches the given base filename and which can be mummified into a page. No files are
+	 * ignored in the search.
+	 * @apiNote Ancestors are <em>not</em> searched. To search ancestors, use the {@link #findPageSourceFile(Path, String, boolean)} variation.
+	 * @apiNote This method would be useful for finding an <code>index.*</code> page source file ins a single directory, for example.
+	 * @implSpec The default version delegates to {@link #findPageSourceFile(Path, String, boolean)}.
+	 * @param sourceDirectory The directory in the source tree in which to search.
+	 * @param baseFilename The base filename (i.e. with no extension) for which to search.
+	 * @return The first encountered matching file, if any, along with its mummifier.
+	 * @throws IllegalArgumentException if the given source directory is not absolute.
+	 * @throws IllegalArgumentException if the given source directory is not in the site source tree.
+	 * @throws IOException If there is an I/O error searching for a matching file.
+	 */
+	public default Optional<Map.Entry<Path, PageMummifier>> findPageSourceFile(@Nonnull Path sourceDirectory, @Nonnull final String baseFilename)
+			throws IOException {
+		return findPageSourceFile(sourceDirectory, baseFilename, false);
+	}
+
+	/**
+	 * Searches for a non-directory file in the given source directory that matches the given base filename and which can be mummified into a page. No files are
 	 * ignored in the search. Ancestors are never searched above the source root directory.
 	 * @apiNote This method would be useful for finding a <code>.template.*</code> page source file up the hierarchy, for example.
 	 * @param sourceDirectory The directory in the source tree in which to search.
