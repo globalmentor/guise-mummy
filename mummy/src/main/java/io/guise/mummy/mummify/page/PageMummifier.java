@@ -44,8 +44,11 @@ import io.guise.mummy.mummify.Mummifier;
  */
 public interface PageMummifier extends Mummifier {
 
-	/** The standard Internet media types for pages: <code>text/html</code> in UTF-8. */
+	/** The standard Internet media types for generated pages: <code>text/html</code> in UTF-8. */
 	public static final ContentType PAGE_MEDIA_TYPE = HTML_CONTENT_TYPE.withCharset(UTF_8);
+
+	/** The extension to use for generated page filenames, unless bare names are enabled. */
+	public static String PAGE_NAME_EXTENSION = HTML_NAME_EXTENSION;
 
 	/** The HTML {@code <meta>} name for indicating the instant of artifact generation. */
 	public static final String META_NAME_GENERATED_AT = "generated-at";

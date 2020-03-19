@@ -69,7 +69,6 @@ import io.urf.vocab.content.Content;
 /**
  * Abstract base mummifier for generating HTML pages.
  * @author Garret Wilson
- * @see HTML#HTML_NAME_EXTENSION
  */
 public abstract class AbstractPageMummifier extends AbstractFileMummifier implements PageMummifier {
 
@@ -140,7 +139,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This version changes the output file extension to {@value HTML#HTML_NAME_EXTENSION}, or leaves if off altogether if bare names were requested.
+	 * @implSpec This version changes the output file extension to {@value PageMummifier#PAGE_NAME_EXTENSION}, or leaves if off altogether if bare names were
+	 *           requested.
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_PAGE_NAMES_BARE
 	 */
 	@Override
@@ -150,7 +150,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		if(isNameBare) { //so-called clean URLs
 			return removeExtension(defaultArtifactTargetPath);
 		} else {
-			return changeExtension(defaultArtifactTargetPath, HTML_NAME_EXTENSION);
+			return changeExtension(defaultArtifactTargetPath, PAGE_NAME_EXTENSION);
 		}
 	}
 

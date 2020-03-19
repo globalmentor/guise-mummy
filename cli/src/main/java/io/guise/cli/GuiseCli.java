@@ -16,6 +16,7 @@
 
 package io.guise.cli;
 
+import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.java.OperatingSystem.*;
@@ -52,6 +53,7 @@ import io.confound.config.ConfigurationException;
 import io.confound.config.file.ResourcesConfigurationManager;
 import io.guise.catalina.webresources.SiteRoot;
 import io.guise.mummy.*;
+import io.guise.mummy.mummify.page.PageMummifier;
 import picocli.CommandLine.*;
 
 /**
@@ -125,10 +127,11 @@ public class GuiseCli extends BaseCliApplication {
 	 */
 	protected void logProjectInfo(@Nonnull final GuiseProject project) {
 		final Logger logger = getLogger();
+		final Configuration projectConfiguration = project.getConfiguration();
 		logger.info("Project directory: {}", project.getDirectory());
-		logger.info("Site source directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY));
-		logger.info("Site target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY));
-		logger.info("Site description target directory: {}", project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY));
+		logger.info("Site source directory: {}", projectConfiguration.getPath(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY));
+		logger.info("Site target directory: {}", projectConfiguration.getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY));
+		logger.info("Site description target directory: {}", projectConfiguration.getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY));
 	}
 
 	@Command(description = "Validates a Guise project before mummification.", subcommands = {HelpCommand.class})
@@ -169,8 +172,9 @@ public class GuiseCli extends BaseCliApplication {
 		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 
 		final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), null, argSiteTargetDirectory, argSiteDescriptionTargetDirectory);
-		final Path siteTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY);
-		final Path siteDescriptionTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY);
+		final Configuration projectConfiguration = project.getConfiguration();
+		final Path siteTargetDirectory = projectConfiguration.getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY);
+		final Path siteDescriptionTargetDirectory = projectConfiguration.getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY);
 
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Clean...").reset());
 		logProjectInfo(project);
@@ -301,15 +305,16 @@ public class GuiseCli extends BaseCliApplication {
 		final Path serverBaseDirectory;
 		final int port;
 		final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), null, argSiteTargetDirectory, argSiteDescriptionTargetDirectory);
-		siteTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY);
-		siteDescriptionTargetDirectory = project.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY);
+		final Configuration projectConfiguration = project.getConfiguration();
+		siteTargetDirectory = projectConfiguration.getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY);
+		siteDescriptionTargetDirectory = projectConfiguration.getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY);
 
 		//As per the servlet specification, Tomcat requires a base directory, but currently puts nothing inside it except for a `work` directory.
 		//This implementation therefore uses a common server directory location relative to the system temporary directory.
 		//In the future if Guise takes advantage of more server functionality and the server needs to store things,
 		//perhaps by default a subdirectory within the temp folder could be made to parallel that of the project.
 		serverBaseDirectory = getTempDirectory().resolve(SERVER_RELATIVE_BASE_DIRECTORY);
-		port = argPort != null ? argPort : project.getConfiguration().findInt(CONFIG_KEY_SERVER_PORT).orElse(DEFAULT_SERVER_PORT);
+		port = argPort != null ? argPort : projectConfiguration.findInt(CONFIG_KEY_SERVER_PORT).orElse(DEFAULT_SERVER_PORT);
 
 		checkArgument(isDirectory(siteTargetDirectory), "Site target directory %s does not exist.", siteTargetDirectory); //TODO improve error handling; see https://github.com/remkop/picocli/issues/672
 
@@ -339,11 +344,13 @@ public class GuiseCli extends BaseCliApplication {
 		//TODO later add JSP servlet mappings
 		DEFAULT_MIME_TYPES_BY_FILENAME_EXTENSION.forEach((extension, mimeType) -> context.addMimeMapping(extension, mimeType));
 
-		//TODO decide how to determine the welcome file; we can either:
-		//* get from configuration, as with `mummify` command (decide whether the configuration is at the project or site level)
-		//* write some metadata file to the site-description indicating the welcome file
-		context.addWelcomeFile("index.html"); //TODO get from configuration, as with `mummify` command
-		context.addWelcomeFile("index"); //TODO get from configuration, as with `mummify` command
+		//set up the collection content filenames (i.e "welcome files") such as `index`/`index.html`
+		final boolean isPageNameBare = projectConfiguration.findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);
+		projectConfiguration.getCollection(CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES, String.class).stream()
+				.map(baseName -> isPageNameBare ? baseName
+						: addExtension(baseName,
+								PageMummifier.PAGE_NAME_EXTENSION)) //e.g. "index" or "index.html"
+				.forEach(context::addWelcomeFile);
 
 		tomcat.start(); //start the server
 
