@@ -104,14 +104,18 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 
 		//discover and plan the directory content file, if present
 		final Optional<Path> contentFile = discoverSourceDirectoryContentFile(context, sourcePath);
-		final Artifact contentArtifact = contentFile.map(throwingFunction(contentSourceFile -> {
+		final Artifact contentArtifact = contentFile.map(throwingFunction(contentSourceFile -> { //nullable
 			final SourcePathMummifier contentMummifier = context.findRegisteredMummifierForSourceFile(contentSourceFile).orElseThrow(IllegalStateException::new); //TODO improve error
 			return contentMummifier.plan(context, contentSourceFile);
 		})).orElseGet(() -> { //if there is no directory content file, create a phantom page content file
 			if(context.isVeiled(sourcePath)) { //don't generate content files for veiled directories
 				return null;
 			}
-			final String phantomContentBaseName = context.getConfiguration().getCollection(CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES, String.class).iterator().next(); //e.g. "index"
+			final Collection<String> collectionContentBaseNames = context.getConfiguration().getCollection(CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES, String.class);
+			if(collectionContentBaseNames.isEmpty()) { //if there are no collection content base names, there can be no no content file
+				return null;
+			}
+			final String phantomContentBaseName = collectionContentBaseNames.iterator().next(); //e.g. "index"
 			final String phantomContentFilename = addExtension(phantomContentBaseName, HTML.XHTML_NAME_EXTENSION); //e.g. "index.xhtml"
 			final Path phantomContentSourceFile = sourcePath.resolve(phantomContentFilename);
 			final SourcePathMummifier contentMummifier = context.findRegisteredMummifierForSourceFile(phantomContentSourceFile)
