@@ -16,8 +16,10 @@
 
 package io.guise.mummy.mummify.collection;
 
+import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
+import static io.guise.mummy.GuiseMummy.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.function.Predicate.*;
@@ -30,6 +32,7 @@ import java.util.stream.Stream;
 
 import javax.annotation.*;
 
+import com.globalmentor.html.spec.HTML;
 import com.globalmentor.net.ContentType;
 
 import io.guise.mummy.*;
@@ -70,13 +73,12 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	 * @param context The context of static site generation.
 	 * @param sourceDirectory The source directory to be mummified.
 	 * @return The path of a source file, if any, to be used as the directory content file.
+	 * @see GuiseMummy#CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES
 	 */
 	protected Optional<Path> discoverSourceDirectoryContentFile(@Nonnull MummyContext context, @Nonnull final Path sourceDirectory) {
-		final Path directoryFile = sourceDirectory.resolve("index.xhtml"); //TODO provide a formal lookup mechanism
-		if(Files.isRegularFile(directoryFile)) {
-			return Optional.of(directoryFile);
-		}
-		return Optional.empty();
+		return context.getConfiguration().getCollection(CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES, String.class).stream() //look at each base name
+				.flatMap(throwingFunction(baseName -> context.findPageSourceFile(sourceDirectory, baseName).stream())) //try to find a page source file for that name
+				.map(Map.Entry::getKey).findFirst(); //for the first one found, return its path
 	}
 
 	/**
@@ -92,6 +94,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This implementation recursively discovers and describes an artifacts for all its children.
+	 * @see GuiseMummy#CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES
 	 */
 	@Override
 	public Artifact plan(MummyContext context, Path sourcePath) throws IOException {
@@ -101,14 +104,20 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 
 		//discover and plan the directory content file, if present
 		final Optional<Path> contentFile = discoverSourceDirectoryContentFile(context, sourcePath);
-		final Artifact contentArtifact = contentFile.map(throwingFunction(contentSourceFile -> {
+		final Artifact contentArtifact = contentFile.map(throwingFunction(contentSourceFile -> { //nullable
 			final SourcePathMummifier contentMummifier = context.findRegisteredMummifierForSourceFile(contentSourceFile).orElseThrow(IllegalStateException::new); //TODO improve error
 			return contentMummifier.plan(context, contentSourceFile);
 		})).orElseGet(() -> { //if there is no directory content file, create a phantom page content file
 			if(context.isVeiled(sourcePath)) { //don't generate content files for veiled directories
 				return null;
 			}
-			final Path phantomContentSourceFile = sourcePath.resolve("index.xhtml"); //TODO get from configuration
+			final Collection<String> collectionContentBaseNames = context.getConfiguration().getCollection(CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES, String.class);
+			if(collectionContentBaseNames.isEmpty()) { //if there are no collection content base names, there can be no no content file
+				return null;
+			}
+			final String phantomContentBaseName = collectionContentBaseNames.iterator().next(); //e.g. "index"
+			final String phantomContentFilename = addExtension(phantomContentBaseName, HTML.XHTML_NAME_EXTENSION); //e.g. "index.xhtml"
+			final Path phantomContentSourceFile = sourcePath.resolve(phantomContentFilename);
 			final SourcePathMummifier contentMummifier = context.findRegisteredMummifierForSourceFile(phantomContentSourceFile)
 					.orElseThrow(IllegalStateException::new); //TODO improve error
 			final UrfObject phantomDescription = new UrfObject();

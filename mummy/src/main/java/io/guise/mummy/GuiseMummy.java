@@ -172,6 +172,12 @@ public class GuiseMummy implements Clogged {
 	/** The base filename for the Mummy configuration within the source tree. */
 	public static final String MUMMY_CONFIG_BASE_FILENAME = ".guise-mummy";
 
+	/**
+	 * The configuration for the list of base filenames of files, in order of priority, that serve as content for a collection; defaults to <code>["index"]</code>
+	 * @implNote Currently not all deployment targets support multiple collection content names; for the meantime only one collection content base name should be
+	 *           used.
+	 */
+	public static final String CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES = "mummy.collectionContentBaseNames";
 	/** The configuration indicating <code>true</code> if extensions should be removed from page names (i.e. clean URLs) during mummification. */
 	public static final String CONFIG_KEY_MUMMY_PAGE_NAMES_BARE = "mummy.pageNamesBare";
 
@@ -462,6 +468,7 @@ public class GuiseMummy implements Clogged {
 		defaultSettings.put(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_SOURCE_RELATIVE_DIR)); //siteDirectory=${project.basedir}/src/site
 		defaultSettings.put(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_TARGET_RELATIVE_DIR)); //siteTargetDirectory=${project.basedir}/target/site
 		defaultSettings.put(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_DESCRIPTION_TARGET_RELATIVE_DIR)); //siteDescriptionTargetDirectory=${project.basedir}/target/site-description
+		defaultSettings.put(CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES, List.of("index"));
 		final Configuration defaultConfiguration = new ObjectMapConfiguration(defaultSettings);
 
 		//configuration file settings (`guise-project.*`); fall back to the default; if no config file present, just use the default
