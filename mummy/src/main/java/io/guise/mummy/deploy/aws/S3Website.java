@@ -16,11 +16,13 @@
 
 package io.guise.mummy.deploy.aws;
 
+import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.net.URIs.*;
 import static io.guise.mummy.Artifact.*;
 import static io.guise.mummy.GuiseMummy.*;
+import static io.guise.mummy.mummify.page.PageMummifier.PAGE_NAME_EXTENSION;
 import static java.util.Collections.*;
 import static java.util.stream.Collectors.*;
 import static java.util.stream.Stream.*;
@@ -282,9 +284,14 @@ public class S3Website extends S3 {
 		final String bucket = getBucket();
 		try { //configure bucket for web site with appropriate redirects
 			getLogger().info("Configuring S3 bucket `{}` for web site access.", bucket);
-			//TODO use some separate configuration access for the "content name"
-			final boolean isNameBare = context.getConfiguration().findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);
-			final String indexDocumentSuffix = isNameBare ? "index" : "index.html"; //TODO get from configuration
+			final Configuration configuration = context.getConfiguration();
+			final Collection<String> collectionContentBaseNames = configuration.getCollection(CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES, String.class);
+			final String indexDocumentBaseName = collectionContentBaseNames.iterator().next(); //e.g. "index"
+			final boolean isNameBare = configuration.findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);
+			final String indexDocumentSuffix = isNameBare ? indexDocumentBaseName : addExtension(indexDocumentBaseName, PAGE_NAME_EXTENSION);
+			if(collectionContentBaseNames.size() > 0) {
+				getLogger().warn("Multiple collection content base names configured, but AWS S3 supports only one index document; using `{}`.", indexDocumentSuffix);
+			}
 			final IndexDocument indexDocument = IndexDocument.builder().suffix(indexDocumentSuffix).build();
 			final ReverseMap<Artifact, String> artifactKeys = getArtifactKeys();
 			final Map<Artifact, String> artifactAltKeys = getArtifactAltKeys();

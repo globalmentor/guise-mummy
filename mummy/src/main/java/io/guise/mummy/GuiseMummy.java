@@ -174,6 +174,8 @@ public class GuiseMummy implements Clogged {
 
 	/**
 	 * The configuration for the list of base filenames of files, in order of priority, that serve as content for a collection; defaults to <code>["index"]</code>
+	 * @implNote Currently not all deployment targets support multiple collection content names; for the meantime only one collection content base name should be
+	 *           used.
 	 */
 	public static final String CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES = "mummy.collectionContentBaseNames";
 	/** The configuration indicating <code>true</code> if extensions should be removed from page names (i.e. clean URLs) during mummification. */
