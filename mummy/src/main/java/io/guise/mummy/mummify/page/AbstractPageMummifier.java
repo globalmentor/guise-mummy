@@ -91,6 +91,11 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			Map.entry(ELEMENT_VIDEO, ELEMENT_VIDEO_ATTRIBUTE_SRC) //<video src="…">
 	);
 
+	//some namespace-identified XHTML elements for easier matching; will switch to GlobalMentor HTML constants when available 
+	private final static NsName XHTML_ELEMENT_P = NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_P);
+	private final static NsName XHTML_ELEMENT_SCRIPT = NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_SCRIPT);
+	private final static NsName XHTML_ELEMENT_SCRIPT_ATTRIBUTE_SRC = NsName.of(ELEMENT_SOURCE_ATTRIBUTE_SRC);
+
 	/**
 	 * Vocabulary prefixes that will be recognized in metadata, such as in XHTML {@code <meta>} elements or in YAML, if they have not been associated with a
 	 * different vocabulary. The URF ad-hoc namespace {@link URF#AD_HOC_NAMESPACE} is used as the default so that a CURIE with no prefix can be correctly
@@ -302,8 +307,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @return Metadata stored in the source file being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate names.
 	 * @throws IOException if there is an I/O error retrieving the metadata, including incorrectly formatted metadata.
 	 */
-	protected List<Map.Entry<URI, Object>> loadSourceMetadata(@Nonnull MummyContext context, @Nonnull InputStream inputStream,
-			@Nonnull final String name)
+	protected List<Map.Entry<URI, Object>> loadSourceMetadata(@Nonnull MummyContext context, @Nonnull InputStream inputStream, @Nonnull final String name)
 			throws IOException {
 		final Document sourceDocument = loadSourceDocument(context, inputStream, name);
 		sourceDocument.normalize(); //**Do not call `document.normalizeDocument()`**; see note in `normalizeDocument()` below.
@@ -349,8 +353,6 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		final Document sourceDocument = loadSourceDocument(context, inputStream, name);
 		return findContentElement(sourceDocument).flatMap(this::getExcerpt);
 	}
-
-	private final static NsName XHTML_ELEMENT_P = NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_P);
 
 	/**
 	 * Recursively finds and retrieves an excerpt from the given element.
@@ -545,11 +547,11 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 					// Do _not_ apply metadata. Metadata is now generated semantically from the actual description, which has already been loaded.
 
-					//2. merge head links
-					mergeLinks(templateDocument, sourceDocument);
+					//2. import/merge head information
+					mergeHeadLinks(templateDocument, sourceDocument);
+					importHeadScripts(templateDocument, sourceDocument);
 
 					//3. apply content
-
 					final Element templateContentElement = findContentElement(templateDocument)
 							.orElseThrow(() -> new IOException(String.format("Template %s has no content insertion point.", templateFile)));
 					findContentElement(sourceDocument).ifPresentOrElse(sourceContentElement -> {
@@ -613,6 +615,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * <p>
 	 * This method assumes that the template has been relocated to the perfect location; otherwise, duplicate links will not be detected.
 	 * </p>
+	 * @apiNote The <a href="https://www.w3.org/TR/html52/semantics-scripting.html#the-script-element">HTML 5 specification</a> precludes a script element from
+	 *          having both a link and content.
 	 * @implSpec This implementation does not allow adding links already present in the template, even if the duplicate link is for a different type of content
 	 *           (e.g. adding the same link as both a script and as a stylesheet).
 	 * @implNote This implementation processes any reference element in {@link #HTML_REFERENCE_ELEMENT_ATTRIBUTES}, even though many of those elements would not
@@ -623,9 +627,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @throws IOException if there is an error merging the links.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	protected void mergeLinks(@Nonnull final Document templateDocument, @Nonnull final Document sourceDocument) throws IOException, DOMException {
+	protected void mergeHeadLinks(@Nonnull final Document templateDocument, @Nonnull final Document sourceDocument) throws IOException, DOMException {
 		final Set<URI> links = new HashSet<>(); //keep track of existing template links and added links
-		final Element templateHeadElement = findHtmlHeadElement(templateDocument) //add a <html><head> if not present
+		final Element templateHeadElement = findHtmlHeadElement(templateDocument)
 				.orElseThrow(() -> new IllegalArgumentException("Template missing <head> element."));
 
 		//collect existing template <head> links
@@ -663,6 +667,26 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 						});
 					}
 				});
+	}
+
+	/**
+	 * Imports all {@code <head><script>} elements that contain inline scripts (not links) from the source document into the template document. No checks are made
+	 * for duplicate content.
+	 * @apiNote The <a href="https://www.w3.org/TR/html52/semantics-scripting.html#the-script-element">HTML 5 specification</a> precludes a script element from
+	 *          having both a link and content.
+	 * @param templateDocument The template into which the source document scripts are to be merged; must have a {@code <head>} element.
+	 * @param sourceDocument The source document from which the scripts are being imported.
+	 * @throws IllegalArgumentException if the template does not have a {@code <head>} element.
+	 * @throws IOException if there is an error importing the scripts.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 * @see <a href="https://www.w3.org/TR/html52/semantics-scripting.html#the-script-element">HTML 5.2 § 4.12.1. The script element</a>
+	 */
+	protected void importHeadScripts(@Nonnull final Document templateDocument, @Nonnull final Document sourceDocument) throws IOException, DOMException {
+		final Element templateHeadElement = findHtmlHeadElement(templateDocument)
+				.orElseThrow(() -> new IllegalArgumentException("Template missing <head> element."));
+		findHtmlHeadElement(sourceDocument).stream().flatMap(XmlDom::childElementsOf).filter(XHTML_ELEMENT_SCRIPT::matches) //find all <script> elements
+				.filter(element -> !XmlDom.hasAttributeNS(element, XHTML_ELEMENT_SCRIPT_ATTRIBUTE_SRC)) //don't include scripts with `src` attributes
+				.forEach(element -> templateHeadElement.appendChild(templateDocument.importNode(element, true)));
 	}
 
 	/**
