@@ -81,6 +81,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			Map.entry(ELEMENT_AREA, ELEMENT_AREA_ATTRIBUTE_HREF), //<area href="…">
 			Map.entry(ELEMENT_AUDIO, ELEMENT_AUDIO_ATTRIBUTE_SRC), //<audio src="…">
 			Map.entry(ELEMENT_EMBED, ELEMENT_EMBED_ATTRIBUTE_SRC), //<embed src="…">
+			Map.entry(ELEMENT_FRAME, ELEMENT_FRAME_ATTRIBUTE_SRC), //<frame src="…">
 			Map.entry(ELEMENT_IFRAME, ELEMENT_IFRAME_ATTRIBUTE_SRC), //<iframe src="…">
 			Map.entry(ELEMENT_IMG, ELEMENT_IMG_ATTRIBUTE_SRC), //<img src="…">
 			Map.entry(ELEMENT_LINK, ELEMENT_LINK_ATTRIBUTE_HREF), //<link href="…">
@@ -92,6 +93,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	);
 
 	//some namespace-identified XHTML elements for easier matching; will switch to GlobalMentor HTML constants when available 
+	private final static NsName XHTML_ELEMENT_FRAMESET = NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_FRAMESET);
 	private final static NsName XHTML_ELEMENT_P = NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_P);
 	private final static NsName XHTML_ELEMENT_SCRIPT = NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_SCRIPT);
 	private final static NsName XHTML_ELEMENT_SCRIPT_ATTRIBUTE_SRC = NsName.of(ELEMENT_SOURCE_ATTRIBUTE_SRC);
@@ -543,7 +545,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 					}
 
 					//1. validate structure
-					findHtmlElement(templateDocument).orElseThrow(() -> new IOException(String.format("Template %s has no root <html> element.", templateFile)));
+					findHtmlElement(templateDocument).orElseThrow(() -> new IOException(String.format("Template `%s` has no root `<html>` element.", templateFile)));
 
 					// Do _not_ apply metadata. Metadata is now generated semantically from the actual description, which has already been loaded.
 
@@ -552,14 +554,30 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 					importHeadScripts(templateDocument, sourceDocument);
 
 					//3. apply content
-					final Element templateContentElement = findContentElement(templateDocument)
-							.orElseThrow(() -> new IOException(String.format("Template %s has no content insertion point.", templateFile)));
-					findContentElement(sourceDocument).ifPresentOrElse(sourceContentElement -> {
+
+					final Element templateContentElement;
+					final Optional<Element> foundSourceContentElement = findContentElement(sourceDocument);
+					//if the content element is <frameset>, convert the template <body> element to <frameset>; <frameset> support may be removed in the future
+					if(foundSourceContentElement.map(XHTML_ELEMENT_FRAMESET::matches).orElse(false)) {
+						getLogger().warn("Source file `{}` uses obsolete, non-conforming `<frameset>`; may not be supported in the future.", artifact.getSourcePath());
+						final Element templateBodyElement = findHtmlBodyElement(templateDocument)
+								.orElseThrow(() -> new IOException(String.format("Template `%s` requires `<body>` element for applying `<frameset>`.", templateFile)));
+						templateContentElement = templateDocument.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_FRAMESET); //substitute a <frameset> element for <body> in the template
+						mergeAttributes(templateContentElement, templateBodyElement); //copy over the original template <body> attributes to the new <frameset>
+						templateBodyElement.getParentNode().replaceChild(templateContentElement, templateBodyElement); //replace the template <body> with <frameset>
+					} else { //in normal (non-frameset) cases we just use the template content element
+						templateContentElement = findContentElement(templateDocument)
+								.orElseThrow(() -> new IOException(String.format("Template `%s` has no content insertion point.", templateFile)));
+						if(XHTML_ELEMENT_FRAMESET.matches(templateContentElement)) {
+							throw new IOException(String.format("Template `%s` does not support `<frameset>`.", templateFile));
+						}
+					}
+					foundSourceContentElement.ifPresentOrElse(sourceContentElement -> {
 						getLogger().trace("  {*} applying source content");
 						removeChildren(templateContentElement);
 						mergeAttributes(templateContentElement, sourceContentElement);
 						appendImportedChildNodes(templateContentElement, sourceContentElement);
-					}, () -> getLogger().warn("Source file for {} has no content to place in template.", artifact.getSourcePath()));
+					}, () -> getLogger().warn("Source file `{}` has no content to place in template.", artifact.getSourcePath()));
 					return Optional.of(templateDocument);
 
 				})).orElse(sourceDocument); //return the source document unchanged if we can't find a template
@@ -601,7 +619,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 							return customTemplateMummifier.map(templateMummifier -> Map.entry(templateFile, templateMummifier));
 						});
 			} catch(final IllegalArgumentException illegalArgumentException) {
-				throw new IOException(String.format("Source file %s specified invalid template %s: %s.", artifact.getSourcePath(), customTemplate,
+				throw new IOException(String.format("Source file `%s` specified invalid template `%s`: %s.", artifact.getSourcePath(), customTemplate,
 						illegalArgumentException.getLocalizedMessage()), illegalArgumentException); //TODO i18n
 			}
 		} else { //if no custom template was specified
@@ -696,20 +714,25 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 *           <li>The {@code <html><body><main>} element, if present.</li>
 	 *           <li>The {@code <html><body><article>} element, if present.</li>
 	 *           <li>The {@code <html><body>} element, if present.</li>
+	 *           <li>The {@code <html><frameset>} element, if present.</li>
 	 *           </ol>
+	 * @implNote This method may return the {@code <frameset>} element, which is obsolete and should no longer be used in content. This element is not guaranteed
+	 *           to work in all contexts for which a content element might be used; it is up to the caller to check and provide the appropriate warning or error
+	 *           if it does not support {@code <frameset>}. See <a href="https://www.w3.org/TR/html52/obsolete.html#frames">HTML 5.2 § 11.3.3. Frames</a>.
 	 * @param sourceDocument The document containing source content.
 	 * @return The element containing content in the source document.
 	 */
 	protected Optional<Element> findContentElement(@Nonnull final Document sourceDocument) {
 		final Optional<Element> htmlBodyElement = findHtmlBodyElement(sourceDocument);
-		final Optional<Element> htmlBodyMainElement = htmlBodyElement
-				.flatMap(htmlElement -> childElementsByNameNS(htmlElement, XHTML_NAMESPACE_URI_STRING, ELEMENT_MAIN).findFirst());
 		//TODO add support for <mummy:content>
-		return htmlBodyMainElement //`<html><body><main>` gets priority
+		return htmlBodyElement.flatMap(htmlElement -> findFirstChildElementByNameNS(htmlElement, XHTML_NAMESPACE_URI_STRING, ELEMENT_MAIN)) //`<html><body><main>` gets priority
 				//then `<html><body><article>`
-				.or(() -> htmlBodyElement.flatMap(htmlElement -> childElementsByNameNS(htmlElement, XHTML_NAMESPACE_URI_STRING, ELEMENT_ARTICLE).findFirst()))
-				//then finally `<html><article>`
-				.or(() -> htmlBodyElement); //<main> gets priority over <body>
+				.or(() -> htmlBodyElement.flatMap(htmlElement -> findFirstChildElementByNameNS(htmlElement, XHTML_NAMESPACE_URI_STRING, ELEMENT_ARTICLE)))
+				//then `<html><body>`
+				.or(() -> htmlBodyElement)
+				//then finally the obsolete `<html><frameset>`
+				.or(() -> findHtmlElement(sourceDocument)
+						.flatMap(htmlElement -> findFirstChildElementByNameNS(htmlElement, XHTML_NAMESPACE_URI_STRING, ELEMENT_FRAMESET)));
 	}
 
 	//#process
