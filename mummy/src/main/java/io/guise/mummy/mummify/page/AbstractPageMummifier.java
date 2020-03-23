@@ -130,7 +130,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			final int nameIndex = attributeOrder.indexOf(NsName.of(ATTRIBUTE_NAME));
 			assert nameIndex >= -1;
 			attributeOrder.add(nameIndex + 1, NsName.of(RDFa.ATTRIBUTE_PROPERTY));
-			ATTRIBUTE_ORDER = attributeOrder.stream().collect(toList());
+			ATTRIBUTE_ORDER = attributeOrder.stream().collect(toUnmodifiableList());
 		}
 
 		/**
