@@ -19,15 +19,13 @@ package io.guise.mummy.mummify;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.util.Optionals.*;
 import static io.guise.mummy.Artifact.*;
-import static io.guise.mummy.GuiseMummy.*;
 import static java.nio.file.Files.*;
 import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.*;
 import java.net.URI;
 import java.nio.file.Path;
-import java.time.Instant;
-import java.time.LocalDate;
+import java.time.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -35,7 +33,6 @@ import javax.annotation.*;
 
 import com.globalmentor.security.MessageDigests;
 
-import io.confound.config.*;
 import io.guise.mummy.*;
 import io.guise.mummy.mummify.page.PostArtifact;
 import io.urf.model.*;
@@ -59,40 +56,16 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This version also recognizes veiled artifacts and renames them as necessary according to the veil name pattern configured with the key
-	 *           {@value GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN}.
-	 * @implSpec This version also recognizes blog posts and adds an appropriate subdirectory structure for them in the target tree path.
-	 * @see GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN
+	 * @implSpec This version additionally recognizes blog posts and adds an appropriate subdirectory structure for them in the target tree path.
 	 * @see PostArtifact#FILENAME_PATTERN
-	 * @throws ConfigurationException if the given veil name pattern specifies more than one matching group.
 	 */
 	@Override
 	public Path getArtifactTargetPath(final MummyContext context, final Path sourceFile) {
 		Path targetFile = super.getArtifactTargetPath(context, sourceFile);
-
-		//check for posts and convert the target path appropriately
+		//perform path transformations
 		final Path filename = targetFile.getFileName();
 		if(filename != null) {
 			final String filenameString = filename.toString();
-
-			//veiled artifacts
-			final Pattern veilPattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.class);
-			final Matcher veilMatcher = veilPattern.matcher(filenameString);
-			if(veilMatcher.matches()) {
-				Configuration.check(veilMatcher.groupCount() <= 1, "Veil name pattern /%s/ configured with key `%s` can have at most one matching group.", veilPattern,
-						CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN);
-				if(veilMatcher.groupCount() > 0) {
-					final String newFilename = veilMatcher.group(1);
-					if(newFilename != null) { //rename the file as indicated by the match
-						//TODO add more appropriate checks and don't use literals; see https://stackoverflow.com/q/60834114/421049
-						Configuration.check(!newFilename.equals(".") && !newFilename.equals(".."),
-								"Veil name pattern /%s/ configured with key `%s` when applied `%s` resulted in forbidden, special name `%s`.", veilPattern,
-								CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, filenameString, newFilename);
-						targetFile = targetFile.resolveSibling(newFilename);
-					}
-				}
-			}
-
 			//posts
 			final Matcher postMatcher = PostArtifact.FILENAME_PATTERN.matcher(filenameString);
 			if(postMatcher.matches()) {

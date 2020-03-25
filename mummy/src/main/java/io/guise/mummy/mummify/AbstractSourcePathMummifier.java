@@ -17,14 +17,19 @@
 package io.guise.mummy.mummify;
 
 import static com.globalmentor.io.Paths.*;
+import static io.guise.mummy.GuiseMummy.*;
 import static java.nio.file.Files.*;
 
 import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.*;
 
+import io.confound.config.*;
+import io.guise.mummy.GuiseMummy;
 import io.guise.mummy.MummyContext;
 import io.urf.model.*;
 import io.urf.turf.TurfParser;
@@ -38,12 +43,40 @@ public abstract class AbstractSourcePathMummifier implements SourcePathMummifier
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This implementation merely changes the base between source and target directory trees.
+	 * @implSpec This version also recognizes veiled artifacts and renames them as necessary according to the veil name pattern configured with the key
+	 *           {@value GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN}, both for files and for directories.
+	 * @throws ConfigurationException if the given veil name pattern specifies more than one matching group.
 	 * @see MummyContext#getSiteSourceDirectory()
 	 * @see MummyContext#getSiteTargetDirectory()
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN
 	 */
 	@Override
 	public Path getArtifactTargetPath(@Nonnull MummyContext context, @Nonnull final Path sourcePath) {
-		return changeBase(sourcePath, context.getSiteSourceDirectory(), context.getSiteTargetDirectory());
+		//switch from source to target
+		Path targetPath = changeBase(sourcePath, context.getSiteSourceDirectory(), context.getSiteTargetDirectory());
+		//perform path transformations
+		final Path filename = targetPath.getFileName();
+		if(filename != null) {
+			final String filenameString = filename.toString();
+			//veiled artifacts
+			final Pattern veilPattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.class);
+			final Matcher veilMatcher = veilPattern.matcher(filenameString);
+			if(veilMatcher.matches()) {
+				Configuration.check(veilMatcher.groupCount() <= 1, "Veil name pattern /%s/ configured with key `%s` can have at most one matching group.", veilPattern,
+						CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN);
+				if(veilMatcher.groupCount() > 0) {
+					final String newFilename = veilMatcher.group(1);
+					if(newFilename != null) { //rename the file as indicated by the match
+						//TODO add more appropriate checks and don't use literals; see https://stackoverflow.com/q/60834114/421049
+						Configuration.check(!newFilename.equals(".") && !newFilename.equals(".."),
+								"Veil name pattern /%s/ configured with key `%s` when applied `%s` resulted in forbidden, special name `%s`.", veilPattern,
+								CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, filenameString, newFilename);
+						targetPath = targetPath.resolveSibling(newFilename);
+					}
+				}
+			}
+		}
+		return targetPath;
 	}
 
 	/**
