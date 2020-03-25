@@ -19,12 +19,14 @@ package io.guise.mummy;
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
+import static io.guise.mummy.GuiseMummy.CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN;
 import static java.nio.file.Files.*;
 import static java.util.Objects.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import javax.annotation.*;
 import javax.xml.parsers.*;
@@ -41,9 +43,6 @@ import io.confound.config.ConfigurationException;
  * @author Garret Wilson
  */
 public abstract class BaseMummyContext implements MummyContext {
-
-	/** The segment prefix that indicates a veiled resource or resource parent. */
-	public static final String VEILED_PATH_SEGMENT_PREFIX = "_";
 
 	/**
 	 * {@inheritDoc}
@@ -91,14 +90,16 @@ public abstract class BaseMummyContext implements MummyContext {
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This implementation considers veiled any source path the source filename of which, or the filename of any parent source directory of which
-	 *           (within the site), starts with {@value #VEILED_PATH_SEGMENT_PREFIX}. For example both <code>…/_foo/bar.txt</code> and <code>…/foo/_bar.txt</code>
-	 *           would be considered veiled.
+	 *           (within the site), matches the pattern configured under the {@value GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN} key. For example with a
+	 *           pattern of <code>/_(.+)/</code> both <code>…/_foo/bar.txt</code> and <code>…/foo/_bar.txt</code> would be considered veiled.
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN
 	 */
 	@Override
 	public boolean isVeiled(Path sourcePath) {
+		final Pattern veilPattern = getConfiguration().getObject(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.class);
 		final Path siteSourceDirectory = getSiteSourceDirectory();
 		while(!sourcePath.equals(siteSourceDirectory)) {
-			if(sourcePath.getFileName().toString().startsWith(VEILED_PATH_SEGMENT_PREFIX)) {
+			if(veilPattern.matcher(sourcePath.getFileName().toString()).matches()) {
 				return true;
 			}
 			sourcePath = sourcePath.getParent();
