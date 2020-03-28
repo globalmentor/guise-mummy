@@ -128,13 +128,6 @@ public interface MummyContext {
 	 */
 	public boolean isIgnore(@Nonnull final Path sourcePath);
 
-	/**
-	 * Indicates whether the given source path is <dfn>veiled</dfn>; that is, part of a directory tree that is hidden from navigation.
-	 * @param sourcePath The source path to check.
-	 * @return <code>true</code> if the source path should <em>not</em> be included in normal navigation.
-	 */
-	public boolean isVeiled(@Nonnull final Path sourcePath);
-
 	/** @return The default mummifier for source files. */
 	public SourcePathMummifier getDefaultSourceFileMummifier();
 
@@ -181,16 +174,6 @@ public interface MummyContext {
 	}
 
 	//hierarchy
-
-	/**
-	 * Indicates whether the given artifact is <dfn>veiled</dfn>; that is, hidden from navigation. The artifact will still be available for direct retrieval.
-	 * @implSpec The default implementation delegates to {@link #isVeiled(Path)} using the source path of the artifact.
-	 * @param artifact The artifact to check.
-	 * @return <code>true</code> if the artifact should <em>not</em> be included in normal navigation.
-	 */
-	public default boolean isVeiled(@Nonnull final Artifact artifact) {
-		return isVeiled(artifact.getSourcePath());
-	}
 
 	/**
 	 * Returns the parent artifact of some artifact.

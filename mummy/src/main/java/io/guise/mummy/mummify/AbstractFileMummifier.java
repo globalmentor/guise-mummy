@@ -25,10 +25,9 @@ import static org.zalando.fauxpas.FauxPas.*;
 import java.io.*;
 import java.net.URI;
 import java.nio.file.Path;
-import java.time.Instant;
-import java.time.LocalDate;
+import java.time.*;
 import java.util.*;
-import java.util.regex.Matcher;
+import java.util.regex.*;
 
 import javax.annotation.*;
 
@@ -37,8 +36,7 @@ import com.globalmentor.security.MessageDigests;
 import io.guise.mummy.*;
 import io.guise.mummy.mummify.page.PostArtifact;
 import io.urf.model.*;
-import io.urf.turf.TurfParser;
-import io.urf.turf.TurfSerializer;
+import io.urf.turf.*;
 import io.urf.vocab.content.Content;
 
 /**
@@ -58,58 +56,14 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec In addition to the default functionality, this version recognizes blog posts and adds an appropriate subdirectory structure for them in the
-	 *           target tree path.
-	 * @see PostArtifact#FILENAME_PATTERN
-	 */
-	@Override
-	public Path getArtifactTargetPath(final MummyContext context, final Path sourceFile) {
-		Path targetFile = super.getArtifactTargetPath(context, sourceFile);
-		//check for posts and convert the target path appropriately
-		final Path filename = targetFile.getFileName();
-		if(filename != null) {
-			final Matcher postMatcher = PostArtifact.FILENAME_PATTERN.matcher(filename.toString());
-			if(postMatcher.matches()) {
-				final String postYear = postMatcher.group(PostArtifact.FILENAME_PATTERN_YEAR_GROUP);
-				final String postMonth = postMatcher.group(PostArtifact.FILENAME_PATTERN_MONTH_GROUP);
-				final String postDay = postMatcher.group(PostArtifact.FILENAME_PATTERN_DAY_GROUP);
-				final String postFilename = postMatcher.group(PostArtifact.FILENAME_PATTERN_FILENAME_GROUP);
-				targetFile = targetFile.resolveSibling(postYear).resolve(postMonth).resolve(postDay).resolve(postFilename);
-			}
-		}
-		return targetFile;
-	}
-
-	/**
-	 * Loads the generated target description if any of a source file.
-	 * @param context The context of static site generation.
-	 * @param sourcePath The path in the site source directory.
-	 * @throws IllegalArgumentException if the given source file is not in the site source tree.
-	 * @return The generated target description, if present, of the resource being mummified.
-	 * @throws IOException if there is an I/O error retrieving the description, including if the metadata is invalid.
-	 * @see #getArtifactDescriptionFile(MummyContext, Path)
-	 */
-	protected Optional<UrfResourceDescription> loadTargetDescription(@Nonnull MummyContext context, @Nonnull final Path sourcePath) throws IOException {
-		final Path descriptionFile = getArtifactDescriptionFile(context, sourcePath);
-		if(!isRegularFile(descriptionFile)) {
-			return Optional.empty();
-		}
-		try (final InputStream inputStream = new BufferedInputStream(newInputStream(descriptionFile))) {
-			return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream).stream().filter(UrfResourceDescription.class::isInstance)
-					.map(UrfResourceDescription.class::cast).findFirst();
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation loads the description using {@link #loadDescription(MummyContext, Path)} and then creates a new artifact using
+	 * @implSpec This implementation loads the description using {@link #loadDescription(MummyContext, Path, Path)} and then creates a new artifact using
 	 *           {@link #createArtifact(Path, Path, UrfResourceDescription)}.
 	 */
 	@Override
-	public Artifact plan(final MummyContext context, final Path sourceFile) throws IOException {
+	public Artifact plan(final MummyContext context, final Path sourceFile, final Path targetFile) throws IOException {
 		getLogger().trace("Planning artifact for source file `{}` ...", sourceFile);
-		final UrfResourceDescription description = loadDescription(context, sourceFile);
-		return createArtifact(sourceFile, getArtifactTargetPath(context, sourceFile), description);
+		final UrfResourceDescription description = loadDescription(context, sourceFile, targetFile);
+		return createArtifact(sourceFile, targetFile, description);
 	}
 
 	/**
@@ -130,6 +84,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 *           {@link #loadSourceMetadata(MummyContext, Path)}.
 	 * @param context The context of static site generation.
 	 * @param sourceFile The file containing the source of this artifact in the site source directory.
+	 * @param targetFile The target path in the site target directory for the artifact.
 	 * @return A description of the resource being mummified.
 	 * @throws IOException if there is an I/O error retrieving the description, including if the metadata is invalid.
 	 * @see #loadTargetDescription(MummyContext, Path)
@@ -137,12 +92,13 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @see MummyContext#isIncremental()
 	 * @see MummyContext#isFull()
 	 */
-	protected UrfResourceDescription loadDescription(@Nonnull MummyContext context, @Nonnull final Path sourceFile) throws IOException {
+	protected UrfResourceDescription loadDescription(@Nonnull MummyContext context, @Nonnull final Path sourceFile, @Nonnull final Path targetFile)
+			throws IOException {
 		final Optional<Instant> sourceModifiedAt = exists(sourceFile) ? Optional.of(getLastModifiedTime(sourceFile).toInstant()) : Optional.empty();
 		final Optional<UrfResourceDescription> cachedDescription;
 		if(context.isIncremental()) {
 			//we'll load the target description if we can, and see if we can use it
-			cachedDescription = loadTargetDescription(context, sourceFile).filter(description -> {
+			cachedDescription = loadTargetDescription(context, targetFile).filter(description -> {
 				//check the source content modified timestamp, and discard the target description if the source content has changed at all
 				final boolean sourceContentDirty = description.findPropertyValue(PROPERTY_TAG_MUMMY_SOURCE_CONTENT_MODIFIED_AT)
 						//Check the timestamp against the actual file timestamp. We can compare them directly without using a range
@@ -274,7 +230,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 				throw ioException;
 			}
 		} else {
-			getLogger().debug("Using previously generated target description file `{}`.", getArtifactDescriptionFile(context, artifact.getSourcePath()));
+			getLogger().debug("Using previously generated target description file `{}`.", getArtifactDescriptionFile(context, artifact));
 		}
 	}
 
@@ -294,11 +250,11 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @param context The context of static site generation.
 	 * @param artifact The artifact being generated
 	 * @throws IOException if there is an I/O error saving the description.
-	 * @see #getArtifactDescriptionFile(MummyContext, Path)
+	 * @see #getArtifactDescriptionFile(MummyContext, Artifact)
 	 */
 	protected void saveTargetDescription(@Nonnull final MummyContext context, @Nonnull Artifact artifact) throws IOException {
 		final UrfResourceDescription description = artifact.getResourceDescription();
-		final Path descriptionFile = getArtifactDescriptionFile(context, artifact.getSourcePath());
+		final Path descriptionFile = getArtifactDescriptionFile(context, artifact);
 		//create parent directory as needed
 		final Path descriptionTargetParentPath = descriptionFile.getParent();
 		if(descriptionTargetParentPath != null) {

@@ -42,9 +42,6 @@ import io.confound.config.ConfigurationException;
  */
 public abstract class BaseMummyContext implements MummyContext {
 
-	/** The segment prefix that indicates a veiled resource or resource parent. */
-	public static final String VEILED_PATH_SEGMENT_PREFIX = "_";
-
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This version returns a string in the form <code>Guise Mummy <em>version</em></code>.
@@ -84,25 +81,6 @@ public abstract class BaseMummyContext implements MummyContext {
 		}
 		if(!isRegularFile(sourcePath) && !isDirectory(sourcePath)) { //TODO add option to traverse symbolic links
 			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation considers veiled any source path the source filename of which, or the filename of any parent source directory of which
-	 *           (within the site), starts with {@value #VEILED_PATH_SEGMENT_PREFIX}. For example both <code>…/_foo/bar.txt</code> and <code>…/foo/_bar.txt</code>
-	 *           would be considered veiled.
-	 */
-	@Override
-	public boolean isVeiled(Path sourcePath) {
-		final Path siteSourceDirectory = getSiteSourceDirectory();
-		while(!sourcePath.equals(siteSourceDirectory)) {
-			if(sourcePath.getFileName().toString().startsWith(VEILED_PATH_SEGMENT_PREFIX)) {
-				return true;
-			}
-			sourcePath = sourcePath.getParent();
-			assert sourcePath != null : "Source path is expected to be inside site source directory.";
 		}
 		return false;
 	}

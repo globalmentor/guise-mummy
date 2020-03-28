@@ -18,7 +18,7 @@ package io.guise.mummy.mummify.page;
 
 import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
-import static com.globalmentor.io.Paths.*;
+import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.java.Objects.*;
@@ -44,6 +44,7 @@ import java.time.*;
 import java.time.format.*;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javax.annotation.*;
@@ -151,13 +152,13 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_PAGE_NAMES_BARE
 	 */
 	@Override
-	public Path getArtifactTargetPath(final MummyContext context, final Path sourceFile) {
-		final Path defaultArtifactTargetPath = super.getArtifactTargetPath(context, sourceFile);
+	public String planArtifactTargetFilename(final MummyContext context, final String filename) {
+		final String targetFilename = super.planArtifactTargetFilename(context, filename);
 		final boolean isNameBare = context.getConfiguration().findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);
 		if(isNameBare) { //so-called clean URLs
-			return removeExtension(defaultArtifactTargetPath);
+			return removeExtension(targetFilename);
 		} else {
-			return changeExtension(defaultArtifactTargetPath, PAGE_NAME_EXTENSION);
+			return changeExtension(targetFilename, PAGE_NAME_EXTENSION);
 		}
 	}
 
@@ -186,6 +187,23 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	}
 
 	/**
+	 * Determines whether the given artifact is <dfn>veiled</dfn>; that is, hidden from navigation. The artifact will still be available for direct retrieval.
+	 * @implSpec This implementation considers veiled any artifact with a source path the source filename of which matches the pattern configured under the
+	 *           {@value GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN} key. Veiled parent directories are not considered, as veiling only affects a single level.
+	 *           For example with a pattern of <code>/_(.+)/</code> <code>…/foo/_bar.txt</code> would be considered veiled but <code>…/_foo/bar.txt</code> would
+	 *           not.
+	 * @param context The context of static site generation.
+	 * @param artifact The artifact to check.
+	 * @return <code>true</code> if the artifact should <em>not</em> be included in normal navigation.
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN
+	 */
+	protected boolean isVeiled(@Nonnull MummyContext context, @Nonnull final Artifact artifact) {
+		final Pattern veilPattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.class);
+		final Path artifactPath = artifact.getSourcePath().getFileName();
+		return artifactPath != null && veilPattern.matcher(artifactPath.toString()).matches();
+	}
+
+	/**
 	 * Provides the artifacts suitable for direct subsequent navigation from this artifact, <em>excluding</em> the parent artifact. If sibling artifacts are
 	 * returned, they will include the given resource.
 	 * @apiNote The returned navigation artifacts are not necessarily children of the context artifact, but rather artifacts at the child level beneath some
@@ -197,12 +215,12 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @return The artifacts for subsequent navigation from this artifact.
 	 * @see MummyContext#childArtifacts(Artifact)
 	 * @see MummyContext#siblingArtifacts(Artifact)
-	 * @see MummyContext#isVeiled(Artifact)
+	 * @see #isVeiled(MummyContext, Artifact)
 	 */
 	protected Stream<Artifact> childNavigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
 		final Stream<Artifact> candidateArtifacts = contextArtifact instanceof CollectionArtifact ? context.childArtifacts(contextArtifact)
 				: context.siblingArtifacts(contextArtifact);
-		return candidateArtifacts.filter(Artifact::isNavigable).filter(not(context::isVeiled));
+		return candidateArtifacts.filter(Artifact::isNavigable).filter(artifact -> !isVeiled(context, artifact));
 	}
 
 	/**
@@ -1212,7 +1230,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			@Nonnull final String referenceAttributeName, @Nonnull final Path originalReferrerSourcePath, @Nonnull final Path relocatedReferrerPath,
 			@Nonnull final Function<Artifact, Path> referentArtifactPath) throws IOException, DOMException {
 		findAttributeNS(referenceElement, null, referenceAttributeName).ifPresent(referenceString -> {
-			getLogger().trace("  - found reference <{} {}=\"{}\" …>", referenceElement.getNodeName(), referenceAttributeName, referenceString);
+			getLogger().trace("  - found reference <{} {}=\"{}\" ...>", referenceElement.getNodeName(), referenceAttributeName, referenceString);
 			//TODO check for the empty string and do something appropriate
 			final URI referenceURI;
 			try {
@@ -1228,7 +1246,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 					}
 				}
 			} catch(final URISyntaxException uriSyntaxException) {
-				getLogger().warn("Invalid reference `<{} {}=\"{}\" …>` in `{}`: {}", referenceElement.getNodeName(), referenceAttributeName, referenceString,
+				getLogger().warn("Invalid reference `<{} {}=\"{}\" ...>` in `{}`: {}", referenceElement.getNodeName(), referenceAttributeName, referenceString,
 						originalReferrerSourcePath, uriSyntaxException.getLocalizedMessage()); //TODO i18n
 			}
 		});
