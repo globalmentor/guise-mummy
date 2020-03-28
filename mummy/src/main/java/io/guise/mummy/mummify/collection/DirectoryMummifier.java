@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 import javax.annotation.*;
 
 import com.globalmentor.html.spec.HTML;
+import com.globalmentor.io.Filenames;
 import com.globalmentor.net.ContentType;
 
 import io.confound.config.*;
@@ -194,8 +195,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 			if(veilMatcher.groupCount() > 0) {
 				final String newFilename = veilMatcher.group(1);
 				if(newFilename != null) { //rename the file as indicated by the match
-					//TODO add more appropriate checks and don't use literals; see https://stackoverflow.com/q/60834114/421049
-					Configuration.check(!newFilename.equals(".") && !newFilename.equals(".."),
+					Configuration.check(!Filenames.isSpecialName(newFilename),
 							"Veil name pattern /%s/ configured with key `%s` when applied `%s` resulted in forbidden, special name `%s`.", veilPattern,
 							CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, childTargetFilename, newFilename);
 					childTargetFilename = newFilename;
