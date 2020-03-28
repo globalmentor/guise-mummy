@@ -1230,7 +1230,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			@Nonnull final String referenceAttributeName, @Nonnull final Path originalReferrerSourcePath, @Nonnull final Path relocatedReferrerPath,
 			@Nonnull final Function<Artifact, Path> referentArtifactPath) throws IOException, DOMException {
 		findAttributeNS(referenceElement, null, referenceAttributeName).ifPresent(referenceString -> {
-			getLogger().trace("  - found reference <{} {}=\"{}\" …>", referenceElement.getNodeName(), referenceAttributeName, referenceString);
+			getLogger().trace("  - found reference <{} {}=\"{}\" ...>", referenceElement.getNodeName(), referenceAttributeName, referenceString);
 			//TODO check for the empty string and do something appropriate
 			final URI referenceURI;
 			try {
@@ -1246,7 +1246,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 					}
 				}
 			} catch(final URISyntaxException uriSyntaxException) {
-				getLogger().warn("Invalid reference `<{} {}=\"{}\" …>` in `{}`: {}", referenceElement.getNodeName(), referenceAttributeName, referenceString,
+				getLogger().warn("Invalid reference `<{} {}=\"{}\" ...>` in `{}`: {}", referenceElement.getNodeName(), referenceAttributeName, referenceString,
 						originalReferrerSourcePath, uriSyntaxException.getLocalizedMessage()); //TODO i18n
 			}
 		});
