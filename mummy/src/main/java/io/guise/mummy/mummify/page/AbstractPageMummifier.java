@@ -44,6 +44,7 @@ import java.time.*;
 import java.time.format.*;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javax.annotation.*;
@@ -186,6 +187,23 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	}
 
 	/**
+	 * Determines whether the given artifact is <dfn>veiled</dfn>; that is, hidden from navigation. The artifact will still be available for direct retrieval.
+	 * @implSpec This implementation considers veiled any artifact with a source path the source filename of which matches the pattern configured under the
+	 *           {@value GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN} key. Veiled parent directories are not considered, as veiling only affects a single level.
+	 *           For example with a pattern of <code>/_(.+)/</code> <code>…/foo/_bar.txt</code> would be considered veiled but <code>…/_foo/bar.txt</code> would
+	 *           not.
+	 * @param context The context of static site generation.
+	 * @param artifact The artifact to check.
+	 * @return <code>true</code> if the artifact should <em>not</em> be included in normal navigation.
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN
+	 */
+	protected boolean isVeiled(@Nonnull MummyContext context, @Nonnull final Artifact artifact) {
+		final Pattern veilPattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.class);
+		final Path artifactPath = artifact.getSourcePath().getFileName();
+		return artifactPath != null && veilPattern.matcher(artifactPath.toString()).matches();
+	}
+
+	/**
 	 * Provides the artifacts suitable for direct subsequent navigation from this artifact, <em>excluding</em> the parent artifact. If sibling artifacts are
 	 * returned, they will include the given resource.
 	 * @apiNote The returned navigation artifacts are not necessarily children of the context artifact, but rather artifacts at the child level beneath some
@@ -197,12 +215,12 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @return The artifacts for subsequent navigation from this artifact.
 	 * @see MummyContext#childArtifacts(Artifact)
 	 * @see MummyContext#siblingArtifacts(Artifact)
-	 * @see MummyContext#isVeiled(Artifact)
+	 * @see #isVeiled(MummyContext, Artifact)
 	 */
 	protected Stream<Artifact> childNavigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
 		final Stream<Artifact> candidateArtifacts = contextArtifact instanceof CollectionArtifact ? context.childArtifacts(contextArtifact)
 				: context.siblingArtifacts(contextArtifact);
-		return candidateArtifacts.filter(Artifact::isNavigable).filter(not(context::isVeiled));
+		return candidateArtifacts.filter(Artifact::isNavigable).filter(artifact -> !isVeiled(context, artifact));
 	}
 
 	/**

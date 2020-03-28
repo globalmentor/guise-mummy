@@ -19,14 +19,12 @@ package io.guise.mummy;
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
-import static io.guise.mummy.GuiseMummy.CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN;
 import static java.nio.file.Files.*;
 import static java.util.Objects.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.regex.Pattern;
 
 import javax.annotation.*;
 import javax.xml.parsers.*;
@@ -83,27 +81,6 @@ public abstract class BaseMummyContext implements MummyContext {
 		}
 		if(!isRegularFile(sourcePath) && !isDirectory(sourcePath)) { //TODO add option to traverse symbolic links
 			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation considers veiled any source path the source filename of which, or the filename of any parent source directory of which
-	 *           (within the site), matches the pattern configured under the {@value GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN} key. For example with a
-	 *           pattern of <code>/_(.+)/</code> both <code>…/_foo/bar.txt</code> and <code>…/foo/_bar.txt</code> would be considered veiled.
-	 * @see GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN
-	 */
-	@Override
-	public boolean isVeiled(Path sourcePath) {
-		final Pattern veilPattern = getConfiguration().getObject(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.class);
-		final Path siteSourceDirectory = getSiteSourceDirectory();
-		while(!sourcePath.equals(siteSourceDirectory)) {
-			if(veilPattern.matcher(sourcePath.getFileName().toString()).matches()) {
-				return true;
-			}
-			sourcePath = sourcePath.getParent();
-			assert sourcePath != null : "Source path is expected to be inside site source directory.";
 		}
 		return false;
 	}
