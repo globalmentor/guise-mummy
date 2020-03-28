@@ -132,7 +132,9 @@ public interface MummyContext {
 	 * Indicates whether the given source path is <dfn>veiled</dfn>; that is, part of a directory tree that is hidden from navigation.
 	 * @param sourcePath The source path to check.
 	 * @return <code>true</code> if the source path should <em>not</em> be included in normal navigation.
+	 * @deprecated To be removed in favor of artifact-level veil detection, eventually based upon attributes.
 	 */
+	@Deprecated
 	public boolean isVeiled(@Nonnull final Path sourcePath);
 
 	/** @return The default mummifier for source files. */

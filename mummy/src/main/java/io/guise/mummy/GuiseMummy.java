@@ -269,7 +269,7 @@ public class GuiseMummy implements Clogged {
 
 		//# plan phase
 		if(phase.compareTo(LifeCyclePhase.PLAN) >= 0) {
-			final Artifact rootArtifact = new DirectoryMummifier().plan(context, context.getSiteSourceDirectory()); //TODO create special SiteMummifier extending DirectoryMummifier
+			final Artifact rootArtifact = new DirectoryMummifier().plan(context, context.getSiteSourceDirectory(), context.getSiteTargetDirectory()); //TODO create special SiteMummifier extending DirectoryMummifier
 			context.updatePlan(rootArtifact);
 
 			printArtifactDescription(context, rootArtifact);

@@ -16,8 +16,6 @@
 
 package io.guise.mummy.mummify;
 
-import static com.globalmentor.io.Paths.*;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
@@ -51,33 +49,6 @@ public interface SourcePathMummifier extends Mummifier {
 	public @Nonnull Set<String> getSupportedFilenameExtensions();
 
 	/**
-	 * Determines the output path for an artifact in the site target directory based upon the source path in the site source directory.
-	 * @param context The context of static site generation.
-	 * @param sourcePath The path in the site source directory.
-	 * @return The path in the site target directory to which the given source path should be generated.
-	 * @throws IllegalArgumentException if the given source file is not in the site source tree.
-	 * @see MummyContext#getSiteSourceDirectory()
-	 * @see MummyContext#getSiteTargetDirectory()
-	 */
-	public Path getArtifactTargetPath(@Nonnull MummyContext context, @Nonnull Path sourcePath);
-
-	/**
-	 * Determines the output file path for an artifact description in the site description target directory based upon the source path in the site source
-	 * directory.
-	 * @implSpec The default implementation first determines the target path by delegating to {@link #getArtifactTargetPath(MummyContext, Path)}, and then
-	 *           produces a filename based upon the target path filename, but in the {@link MummyContext#getSiteDescriptionTargetDirectory()} directory.
-	 * @param context The context of static site generation.
-	 * @param sourcePath The path in the site source directory.
-	 * @return The path in the site description target directory to which a description may be generated.
-	 * @throws IllegalArgumentException if the given source file is not in the site source tree.
-	 * @see MummyContext#getSiteDescriptionTargetDirectory()
-	 */
-	public default Path getArtifactDescriptionFile(@Nonnull MummyContext context, @Nonnull Path sourcePath) {
-		final Path targetPath = getArtifactTargetPath(context, sourcePath);
-		return addExtension(changeBase(targetPath, context.getSiteTargetDirectory(), context.getSiteDescriptionTargetDirectory()), "@.turf"); //TODO use constant
-	}
-
-	/**
 	 * Determines the media type for an artifact from the given source path
 	 * @param context The context of static site generation.
 	 * @param sourcePath The path in the site source directory; not guaranteed to exist;
@@ -90,9 +61,10 @@ public interface SourcePathMummifier extends Mummifier {
 	 * Plans mummification of a source path supported by this mummifier.
 	 * @param context The context of static site generation.
 	 * @param sourcePath The source path to be mummified.
+	 * @param targetPath The target path in the site target directory for the artifact.
 	 * @return An artifact describing the resource to be mummified.
 	 * @throws IOException if there is an I/O error during planning.
 	 */
-	public Artifact plan(@Nonnull MummyContext context, @Nonnull Path sourcePath) throws IOException;
+	public Artifact plan(@Nonnull MummyContext context, @Nonnull Path sourcePath, @Nonnull Path targetPath) throws IOException;
 
 }

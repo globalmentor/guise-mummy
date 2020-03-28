@@ -18,7 +18,7 @@ package io.guise.mummy.mummify.page;
 
 import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
-import static com.globalmentor.io.Paths.*;
+import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.java.Objects.*;
@@ -151,13 +151,13 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_PAGE_NAMES_BARE
 	 */
 	@Override
-	public Path getArtifactTargetPath(final MummyContext context, final Path sourceFile) {
-		final Path defaultArtifactTargetPath = super.getArtifactTargetPath(context, sourceFile);
+	public String planArtifactTargetFilename(final MummyContext context, final String filename) {
+		final String targetFilename = super.planArtifactTargetFilename(context, filename);
 		final boolean isNameBare = context.getConfiguration().findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);
 		if(isNameBare) { //so-called clean URLs
-			return removeExtension(defaultArtifactTargetPath);
+			return removeExtension(targetFilename);
 		} else {
-			return changeExtension(defaultArtifactTargetPath, PAGE_NAME_EXTENSION);
+			return changeExtension(targetFilename, PAGE_NAME_EXTENSION);
 		}
 	}
 

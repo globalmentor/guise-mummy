@@ -17,7 +17,6 @@
 package io.guise.mummy.mummify;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Set;
 
 import javax.annotation.*;
@@ -48,13 +47,14 @@ public interface Mummifier extends Clogged {
 	public @Nonnull Set<String> getSupportedFilenameExtensions();
 
 	/**
-	 * Plans mummification of a source path supported by this mummifier.
+	 * Determines the preferred target filename for an artifact given the indicated source filename.
+	 * @apiNote This is normally called by some other mummifier before an artifact is planned so that this mummifier may decide on exactly what filename it would
+	 *          prefer. Nevertheless there is no guarantee that this method will be called before this mummifier is requested to plan an artifact.
 	 * @param context The context of static site generation.
-	 * @param sourcePath The source path to be mummified.
-	 * @return An artifact describing the resource to be mummified.
-	 * @throws IOException if there is an I/O error during planning.
+	 * @param filename A suggested filename, such as from the path in the site source directory.
+	 * @return The filename this mummifier would prefer to use for the generated target file.
 	 */
-	public Artifact plan(@Nonnull MummyContext context, @Nonnull final Path sourcePath) throws IOException;
+	public String planArtifactTargetFilename(@Nonnull MummyContext context, @Nonnull String filename);
 
 	/**
 	 * Mummifies a resource.
