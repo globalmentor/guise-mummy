@@ -311,7 +311,7 @@ public class S3Website extends S3 {
 			final WebsiteConfiguration.Builder websiteConfigurationBuilder = WebsiteConfiguration.builder();
 
 			//set the index document, if any, based upon the collection content base name
-			final Collection<String> collectionContentBaseNames = configuration.getCollection(CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES, String.class);
+			final Collection<String> collectionContentBaseNames = configuration.getCollection(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, String.class);
 			if(!collectionContentBaseNames.isEmpty()) {
 				final String indexDocumentBaseName = collectionContentBaseNames.iterator().next(); //e.g. "index"
 				final boolean isNameBare = configuration.findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);

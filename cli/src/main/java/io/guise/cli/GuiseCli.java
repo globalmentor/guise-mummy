@@ -346,7 +346,7 @@ public class GuiseCli extends BaseCliApplication {
 
 		//set up the collection content filenames (i.e "welcome files") such as `index`/`index.html`
 		final boolean isPageNameBare = projectConfiguration.findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);
-		projectConfiguration.getCollection(CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES, String.class).stream()
+		projectConfiguration.getCollection(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, String.class).stream()
 				.map(baseName -> isPageNameBare ? baseName
 						: addExtension(baseName,
 								PageMummifier.PAGE_NAME_EXTENSION)) //e.g. "index" or "index.html"

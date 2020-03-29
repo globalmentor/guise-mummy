@@ -76,10 +76,10 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	 * @param context The context of static site generation.
 	 * @param sourceDirectory The source directory to be mummified.
 	 * @return The path of a source file, if any, to be used as the directory content file.
-	 * @see GuiseMummy#CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES
 	 */
 	protected Optional<Path> discoverSourceDirectoryContentFile(@Nonnull MummyContext context, @Nonnull final Path sourceDirectory) {
-		return context.getConfiguration().getCollection(CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES, String.class).stream() //look at each base name
+		return context.getConfiguration().getCollection(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, String.class).stream() //look at each base name
 				.flatMap(throwingFunction(baseName -> context.findPageSourceFile(sourceDirectory, baseName).stream())) //try to find a page source file for that name
 				.map(Map.Entry::getKey).findFirst(); //for the first one found, return its path
 	}
@@ -97,7 +97,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This implementation recursively discovers and describes an artifacts for all its children.
-	 * @see GuiseMummy#CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES
 	 */
 	@Override
 	public Artifact plan(final MummyContext context, final Path sourceDirectory, final Path targetDirectory) throws IOException {
@@ -118,7 +118,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 				return null;
 			}
 			*/
-			final Collection<String> collectionContentBaseNames = context.getConfiguration().getCollection(CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES, String.class);
+			final Collection<String> collectionContentBaseNames = context.getConfiguration().getCollection(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, String.class);
 			if(collectionContentBaseNames.isEmpty()) { //if there are no collection content base names, there can be no no content file
 				return null;
 			}

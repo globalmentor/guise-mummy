@@ -178,7 +178,7 @@ public class GuiseMummy implements Clogged {
 	 * @implNote Currently not all deployment targets support multiple collection content names; for the meantime only one collection content base name should be
 	 *           used.
 	 */
-	public static final String CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES = "mummy.collectionContentBaseNames";
+	public static final String CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES = "mummy.collectionContentBaseNames";
 	/** The configuration indicating <code>true</code> if extensions should be removed from page names (i.e. clean URLs) during mummification. */
 	public static final String CONFIG_KEY_MUMMY_PAGE_NAMES_BARE = "mummy.pageNamesBare";
 	/**
@@ -477,7 +477,7 @@ public class GuiseMummy implements Clogged {
 		defaultSettings.put(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_SOURCE_RELATIVE_DIR)); //siteDirectory=${project.basedir}/src/site
 		defaultSettings.put(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_TARGET_RELATIVE_DIR)); //siteTargetDirectory=${project.basedir}/target/site
 		defaultSettings.put(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_DESCRIPTION_TARGET_RELATIVE_DIR)); //siteDescriptionTargetDirectory=${project.basedir}/target/site-description
-		defaultSettings.put(CONFIG_KEY_COLLECTION_CONTENT_BASE_NAMES, List.of("index"));
+		defaultSettings.put(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, List.of("index"));
 		defaultSettings.put(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.compile("_(.*)"));
 		final Configuration defaultConfiguration = new ObjectMapConfiguration(defaultSettings);
 
