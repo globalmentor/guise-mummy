@@ -174,6 +174,14 @@ public class GuiseMummy implements Clogged {
 	public static final String MUMMY_CONFIG_BASE_FILENAME = ".guise-mummy";
 
 	/**
+	 * The regular expression indicating if an artifact should be considered an <dfn>asset</dfn> if its name matches. The regular expression may have at most one
+	 * matching group. If there is a matching group and it provides a match, the artifact will be renamed to the value of the matched group. If there is no
+	 * matching group, the artifact will not have a separate asset name. In either case, the artifact may still be subject to other renaming rules, such as
+	 * extension removal for bare names.
+	 * @see #CONFIG_KEY_MUMMY_PAGE_NAMES_BARE
+	 */
+	public static final String CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN = "mummy.assetNamePattern";
+	/**
 	 * The configuration for the list of base filenames of files, in order of priority, that serve as content for a collection; defaults to <code>["index"]</code>
 	 * @implNote Currently not all deployment targets support multiple collection content names; for the meantime only one collection content base name should be
 	 *           used.
@@ -184,7 +192,7 @@ public class GuiseMummy implements Clogged {
 	/**
 	 * The regular expression indicating if an artifact should be considered <dfn>veiled</dfn> if its name matches. The regular expression may have at most one
 	 * matching group. If there is a matching group and it provides a match, the artifact will be renamed to the value of the matched group. If there is no
-	 * matching group, the artifact will not have a separate veiled name. In either case, the artifact may still be subject to other renaming rules, such as
+	 * matching group, the artifact will not have a separate unveiled name. In either case, the artifact may still be subject to other renaming rules, such as
 	 * extension removal for bare names.
 	 * @see #CONFIG_KEY_MUMMY_PAGE_NAMES_BARE
 	 */
@@ -477,6 +485,7 @@ public class GuiseMummy implements Clogged {
 		defaultSettings.put(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_SOURCE_RELATIVE_DIR)); //siteDirectory=${project.basedir}/src/site
 		defaultSettings.put(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_TARGET_RELATIVE_DIR)); //siteTargetDirectory=${project.basedir}/target/site
 		defaultSettings.put(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_DESCRIPTION_TARGET_RELATIVE_DIR)); //siteDescriptionTargetDirectory=${project.basedir}/target/site-description
+		defaultSettings.put(CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN, Pattern.compile("\\$(.*)"));
 		defaultSettings.put(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, List.of("index"));
 		defaultSettings.put(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.compile("_(.*)"));
 		final Configuration defaultConfiguration = new ObjectMapConfiguration(defaultSettings);

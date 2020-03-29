@@ -19,6 +19,7 @@ package io.guise.mummy.mummify.collection;
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
+import static com.globalmentor.util.Optionals.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
@@ -102,6 +103,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	@Override
 	public Artifact plan(final MummyContext context, final Path sourceDirectory, final Path targetDirectory) throws IOException {
 		checkArgumentDirectory(sourceDirectory);
+		final boolean isAssetSourceDirectoryTree = isAssetSourcePath(context, sourceDirectory, true); //see if this subtree is for assets
 
 		//discover and plan the directory content file, if present
 		final Optional<Path> contentFile = discoverSourceDirectoryContentFile(context, sourceDirectory);
@@ -113,12 +115,11 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 			final Path contentTargetFile = targetDirectory.resolve(contentTargetFilename);
 			return contentMummifier.plan(context, contentSourceFile, contentTargetFile);
 		})).orElseGet(() -> { //if there is no directory content file, create a phantom page content file
-			/*TODO replace with check for assets subtree
-			if(context.isVeiled(sourceDirectory)) { //don't generate content files for veiled directories
+			if(isAssetSourceDirectoryTree) { //don't generate content files for asset trees
 				return null;
 			}
-			*/
-			final Collection<String> collectionContentBaseNames = context.getConfiguration().getCollection(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, String.class);
+			final Collection<String> collectionContentBaseNames = context.getConfiguration().getCollection(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES,
+					String.class);
 			if(collectionContentBaseNames.isEmpty()) { //if there are no collection content base names, there can be no no content file
 				return null;
 			}
@@ -139,13 +140,22 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		});
 
 		//discover and plan the child artifacts
+		final Pattern assetNamePattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN, Pattern.class);
 		final List<Artifact> childArtifacts = new ArrayList<>();
 		try (final Stream<Path> childPaths = list(sourceDirectory).filter(not(context::isIgnore))) {
 			childPaths.forEach(throwingConsumer(childSourcePath -> {
-				if(!childSourcePath.equals(contentFile.orElse(null))) { //skip the content file TODO create an optional comparison utility method
-					final SourcePathMummifier childMummifier = context.getMummifierForSourcePath(childSourcePath);
+				if(!isPresentAndEquals(contentFile, childSourcePath)) { //skip the content file, if any
+					final SourcePathMummifier registeredChildMummifier = context.getMummifierForSourcePath(childSourcePath);
 					assert childSourcePath.getFileName() != null;
-					final Path childTargetPath = planChildArtifactTargetPath(context, targetDirectory, childSourcePath.getFileName().toString(), childMummifier);
+					final String childSourceFilename = childSourcePath.getFileName().toString();
+					//for assets or paths an an asset tree, don't mummify any pages
+					final SourcePathMummifier childMummifier;
+					if((registeredChildMummifier instanceof PageMummifier) && (isAssetSourceDirectoryTree || assetNamePattern.matcher(childSourceFilename).matches())) {
+						childMummifier = context.getDefaultSourcePathMummifier(childSourcePath);
+					} else {
+						childMummifier = registeredChildMummifier;
+					}
+					final Path childTargetPath = planChildArtifactTargetPath(context, targetDirectory, childSourceFilename, childMummifier, isAssetSourceDirectoryTree);
 					final Artifact childArtifact = childMummifier.plan(context, childSourcePath, childTargetPath);
 					childArtifacts.add(childArtifact);
 				}
@@ -155,50 +165,134 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	}
 
 	/**
+	 * Indicates whether the given source path is an <dfn>asset</dfn> for which no page should be generated. Ancestor paths are not checked.
+	 * @implSpec This implementation delegates to {@link #isAssetSourcePath(MummyContext, Path, boolean)} without checking for ancestors.
+	 * @param context The context of static site generation.
+	 * @param sourcePath The source path to check.
+	 * @return <code>true</code> if the source path is an asset.
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN
+	 * @deprecated To be deleted if not needed
+	 */
+	@Deprecated
+	protected boolean isAssetSourcePath(@Nonnull final MummyContext context, @Nonnull final Path sourcePath) {
+		return isAssetSourcePath(context, sourcePath, false);
+	}
+
+	/**
+	 * Indicates whether the given source path is an <dfn>asset</dfn> for which no page should be generated.
+	 * @implSpec This implementation considers an asset any source path the source filename of which, or if <var>checkAncestors</var> is enabled the filename of
+	 *           any parent source directory of which (within the site), matches the pattern configured under the
+	 *           {@value GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN} key. For example with a pattern of <code>/\$(.+)/</code>, both
+	 *           <code>…/$foo/bar.txt</code> and <code>…/foo/$bar.txt</code> would be considered assets.
+	 * @param context The context of static site generation.
+	 * @param sourcePath The source path to check.
+	 * @param checkAncestors Indicates whether parent paths should also be checked, up to the site source path.
+	 * @return <code>true</code> if the source path is an asset.
+	 * @throws IllegalArgumentException if the given source path is not inside the site source directory when checking ancestors.
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN
+	 */
+	protected boolean isAssetSourcePath(@Nonnull final MummyContext context, @Nonnull final Path sourcePath, final boolean checkAncestors) {
+		final Pattern assetNamePattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN, Pattern.class);
+		final Path siteSourceDirectory = context.getSiteSourceDirectory();
+		Path currentSourcePath = sourcePath;
+		while(!currentSourcePath.equals(siteSourceDirectory)) {
+			if(assetNamePattern.matcher(currentSourcePath.getFileName().toString()).matches()) {
+				return true;
+			}
+			if(!checkAncestors) {
+				break;
+			}
+			currentSourcePath = currentSourcePath.getParent();
+			checkArgument(currentSourcePath != null, "Source path `%s` was not inside site source directory `%s`.", sourcePath, siteSourceDirectory);
+		}
+		return false;
+	}
+
+	/**
+	 * Indicates whether the given source name is an <dfn>asset</dfn> for which no page should be generated.
+	 * @param context The context of static site generation.
+	 * @param sourceName The source name to check.
+	 * @return <code>true</code> if the source name is an asset.
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN
+	 * @deprecated To be deleted if not needed
+	 */
+	@Deprecated
+	protected boolean isAssetSourceName(@Nonnull final MummyContext context, @Nonnull final String sourceName) {
+		final Pattern assetNamePattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN, Pattern.class);
+		return assetNamePattern.matcher(sourceName).matches();
+	}
+
+	/**
 	 * Determines the output path for an artifact in the site target directory based upon the source path in the site source directory.
 	 * @implSpec This implementation recognizes blog posts and adds an appropriate subdirectory structure for them in the target tree path.
-	 * @implSpec This version also recognizes veiled artifacts and renames ("unveils") them as necessary according to the veil name pattern configured with the
-	 *           key {@value GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN}, both for files and for directories.
+	 * @implSpec This version recognizes asset artifacts and renames them as necessary according to the asset name pattern configured with the key
+	 *           {@value GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN}, both for files and for directories. If the source directory is in an asset tree, or if
+	 *           the child filename itself indicates an asset, no hierarchy-related filename changes (e.g. unveiling or post renaming) will be made, except an
+	 *           asset in a non-asset tree will be renamed.
+	 * @implSpec This version recognizes veiled artifacts and renames ("unveils") them as necessary according to the veil name pattern configured with the key
+	 *           {@value GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN}, both for files and for directories.
 	 * @implSpec This implementation delegates to {@link Mummifier#planArtifactTargetFilename(MummyContext, String)} to finalize the filename being used.
 	 * @param context The context of static site generation.
 	 * @param targetDirectory The target directory of the main artifact this mummifier is mummifying.
 	 * @param childSourceFilename A suggested filename; normally the filename of the child file or directory.
 	 * @param childMummifier The mummifier that will be used to create the artifact.
+	 * @param isAssetSourceDirectoryTree Whether the source directory is an asset or is in an asset tree.
 	 * @return The path in the site target directory to which the child artifact should be generated.
 	 * @throws ConfigurationException if the given veil name pattern specifies more than one matching group.
 	 * @see Mummifier#planArtifactTargetFilename(MummyContext, String)
 	 * @see PostArtifact#FILENAME_PATTERN
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN
 	 */
 	protected Path planChildArtifactTargetPath(@Nonnull final MummyContext context, @Nonnull Path targetDirectory, @Nonnull final String childSourceFilename,
-			@Nonnull final Mummifier childMummifier) {
+			@Nonnull final Mummifier childMummifier, final boolean isAssetSourceDirectoryTree) {
 		//both the target directory and the child target filename will change as it gets processed
 		String childTargetFilename = childSourceFilename;
+		if(!isAssetSourceDirectoryTree) { //don't make hierarchy-related filename changes in an assets tree
 
-		//posts
-		final Matcher postMatcher = PostArtifact.FILENAME_PATTERN.matcher(childTargetFilename);
-		if(postMatcher.matches()) {
-			final String postYear = postMatcher.group(PostArtifact.FILENAME_PATTERN_YEAR_GROUP);
-			final String postMonth = postMatcher.group(PostArtifact.FILENAME_PATTERN_MONTH_GROUP);
-			final String postDay = postMatcher.group(PostArtifact.FILENAME_PATTERN_DAY_GROUP);
-			final String postFilename = postMatcher.group(PostArtifact.FILENAME_PATTERN_FILENAME_GROUP);
-			targetDirectory = targetDirectory.resolve(postYear).resolve(postMonth).resolve(postDay); //YYYY/DD/MM
-			childTargetFilename = postFilename;
-		}
+			//assets
+			final Pattern assetPattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN, Pattern.class);
+			final Matcher assetMatcher = assetPattern.matcher(childTargetFilename);
+			if(assetMatcher.matches()) {
+				Configuration.check(assetMatcher.groupCount() <= 1, "Asset name pattern /%s/ configured with key `%s` can have at most one matching group.",
+						assetPattern, CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN);
+				if(assetMatcher.groupCount() > 0) {
+					final String newFilename = assetMatcher.group(1);
+					if(newFilename != null) { //rename the file as indicated by the match
+						Configuration.check(!Filenames.isSpecialName(newFilename),
+								"Asset name pattern /%s/ configured with key `%s` when applied `%s` resulted in forbidden, special name `%s`.", assetPattern,
+								CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN, childTargetFilename, newFilename);
+						childTargetFilename = newFilename;
+					}
+				}
+			} else { //assets don't get any further filename hierarchy-related filename changes
 
-		//veiled artifacts
-		final Pattern veilPattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.class);
-		final Matcher veilMatcher = veilPattern.matcher(childTargetFilename);
-		if(veilMatcher.matches()) {
-			Configuration.check(veilMatcher.groupCount() <= 1, "Veil name pattern /%s/ configured with key `%s` can have at most one matching group.", veilPattern,
-					CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN);
-			if(veilMatcher.groupCount() > 0) {
-				final String newFilename = veilMatcher.group(1);
-				if(newFilename != null) { //rename the file as indicated by the match
-					Configuration.check(!Filenames.isSpecialName(newFilename),
-							"Veil name pattern /%s/ configured with key `%s` when applied `%s` resulted in forbidden, special name `%s`.", veilPattern,
-							CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, childTargetFilename, newFilename);
-					childTargetFilename = newFilename;
+				//posts
+				final Matcher postMatcher = PostArtifact.FILENAME_PATTERN.matcher(childTargetFilename);
+				if(postMatcher.matches()) {
+					final String postYear = postMatcher.group(PostArtifact.FILENAME_PATTERN_YEAR_GROUP);
+					final String postMonth = postMatcher.group(PostArtifact.FILENAME_PATTERN_MONTH_GROUP);
+					final String postDay = postMatcher.group(PostArtifact.FILENAME_PATTERN_DAY_GROUP);
+					final String postFilename = postMatcher.group(PostArtifact.FILENAME_PATTERN_FILENAME_GROUP);
+					targetDirectory = targetDirectory.resolve(postYear).resolve(postMonth).resolve(postDay); //YYYY/DD/MM
+					childTargetFilename = postFilename;
+				}
+
+				//veiled artifacts
+				final Pattern veilPattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.class);
+				final Matcher veilMatcher = veilPattern.matcher(childTargetFilename);
+				if(veilMatcher.matches()) {
+					Configuration.check(veilMatcher.groupCount() <= 1, "Veil name pattern /%s/ configured with key `%s` can have at most one matching group.",
+							veilPattern, CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN);
+					if(veilMatcher.groupCount() > 0) {
+						final String newFilename = veilMatcher.group(1);
+						if(newFilename != null) { //rename the file as indicated by the match
+							Configuration.check(!Filenames.isSpecialName(newFilename),
+									"Veil name pattern /%s/ configured with key `%s` when applied `%s` resulted in forbidden, special name `%s`.", veilPattern,
+									CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, childTargetFilename, newFilename);
+							childTargetFilename = newFilename;
+						}
+					}
 				}
 			}
 		}

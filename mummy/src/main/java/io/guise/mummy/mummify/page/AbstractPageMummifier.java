@@ -198,9 +198,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN
 	 */
 	protected boolean isVeiled(@Nonnull MummyContext context, @Nonnull final Artifact artifact) {
-		final Pattern veilPattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.class);
+		final Pattern veilNamePattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.class);
 		final Path artifactPath = artifact.getSourcePath().getFileName();
-		return artifactPath != null && veilPattern.matcher(artifactPath.toString()).matches();
+		return artifactPath != null && veilNamePattern.matcher(artifactPath.toString()).matches();
 	}
 
 	/**
