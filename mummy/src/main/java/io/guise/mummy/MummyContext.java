@@ -135,6 +135,19 @@ public interface MummyContext {
 	public SourcePathMummifier getDefaultSourceDirectoryMummifier();
 
 	/**
+	 * Retrieves the default mummifier for a given source path, based upon whether it is a file or a directory.
+	 * @apiNote This method should only be called in special cases. Normally it is desired to look up the <code>registered</code> mummifier for a source path
+	 *          using {@link #findRegisteredMummifierForSourcePath(Path)}.
+	 * @implSpec The default implementation delegates to {@link #getDefaultSourceFileMummifier()} or {@link #getDefaultSourceDirectoryMummifier()} based upon the
+	 *           result of {@link Files#isDirectory(Path, LinkOption...)}.
+	 * @param sourcePath The path of the source to be mummified.
+	 * @return The default mummifier for the source path.
+	 */
+	public default SourcePathMummifier getDefaultSourcePathMummifier(@Nonnull final Path sourcePath) {
+		return isDirectory(sourcePath) ? getDefaultSourceDirectoryMummifier() : getDefaultSourceFileMummifier();
+	}
+
+	/**
 	 * Retrieves a registered mummifier for a particular source file.
 	 * @param sourceFile The path of the source file to be mummified.
 	 * @return The mummifier, if any, registered for the given source file.
@@ -163,14 +176,12 @@ public interface MummyContext {
 	 * Retrieves a mummifier for a particular source path, which may represent a file or a directory. If no mummifier is registered, a default mummifier is
 	 * returned.
 	 * @implSpec The default implementation delegates to {@link #findRegisteredMummifierForSourcePath(Path)} and if none is present delegates to
-	 *           {@link #getDefaultSourceFileMummifier()} or {@link #getDefaultSourceDirectoryMummifier()} depending on whether the given source path is a file or
-	 *           a directory.
+	 *           {@link #getDefaultSourcePathMummifier(Path)}.
 	 * @param sourcePath The path of the source to be mummified.
 	 * @return The mummifier for the given source path.
 	 */
 	public default SourcePathMummifier getMummifierForSourcePath(@Nonnull final Path sourcePath) {
-		return findRegisteredMummifierForSourcePath(sourcePath)
-				.orElseGet(() -> isDirectory(sourcePath) ? getDefaultSourceDirectoryMummifier() : getDefaultSourceFileMummifier());
+		return findRegisteredMummifierForSourcePath(sourcePath).orElseGet(() -> getDefaultSourcePathMummifier(sourcePath));
 	}
 
 	//hierarchy

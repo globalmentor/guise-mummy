@@ -187,6 +187,23 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	}
 
 	/**
+	 * Determines whether the given artifact is marked as an <dfn>asset</dfn>.
+	 * @implSpec This implementation considers an asset any artifact with a source path the source filename of which matches the pattern configured under the
+	 *           {@value GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN} key. Asset parent directories are not considered, as an asset directory would normally
+	 *           not be mummifying pages within that tree anyway. For example with a pattern of <code>/\$(.+)/</code> <code>…/foo/$bar.html</code> would be
+	 *           considered an asset but <code>…/$foo/bar.html</code> would not.
+	 * @param context The context of static site generation.
+	 * @param artifact The artifact to check.
+	 * @return <code>true</code> if the artifact should <em>not</em> be included in normal navigation.
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN
+	 */
+	protected boolean isAsset(@Nonnull MummyContext context, @Nonnull final Artifact artifact) {
+		final Pattern assetNamePattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN, Pattern.class);
+		final Path artifactPath = artifact.getSourcePath().getFileName();
+		return artifactPath != null && assetNamePattern.matcher(artifactPath.toString()).matches();
+	}
+
+	/**
 	 * Determines whether the given artifact is <dfn>veiled</dfn>; that is, hidden from navigation. The artifact will still be available for direct retrieval.
 	 * @implSpec This implementation considers veiled any artifact with a source path the source filename of which matches the pattern configured under the
 	 *           {@value GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN} key. Veiled parent directories are not considered, as veiling only affects a single level.
@@ -198,9 +215,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN
 	 */
 	protected boolean isVeiled(@Nonnull MummyContext context, @Nonnull final Artifact artifact) {
-		final Pattern veilPattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.class);
+		final Pattern veilNamePattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.class);
 		final Path artifactPath = artifact.getSourcePath().getFileName();
-		return artifactPath != null && veilPattern.matcher(artifactPath.toString()).matches();
+		return artifactPath != null && veilNamePattern.matcher(artifactPath.toString()).matches();
 	}
 
 	/**
@@ -209,18 +226,19 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @apiNote The returned navigation artifacts are not necessarily children of the context artifact, but rather artifacts at the child level beneath some
 	 *          parent.
 	 * @implSpec This method retrieves candidate resources using {@link MummyContext#childArtifacts(Artifact)} if the artifact is a {@link CollectionArtifact};
-	 *           otherwise it calls {@link MummyContext#siblingArtifacts(Artifact)}. Only artifacts that are not veiled are included.
+	 *           otherwise it calls {@link MummyContext#siblingArtifacts(Artifact)}. Only artifacts that are not assets and are not veiled are included.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @return The artifacts for subsequent navigation from this artifact.
 	 * @see MummyContext#childArtifacts(Artifact)
 	 * @see MummyContext#siblingArtifacts(Artifact)
+	 * @see #isAsset(MummyContext, Artifact)
 	 * @see #isVeiled(MummyContext, Artifact)
 	 */
 	protected Stream<Artifact> childNavigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
 		final Stream<Artifact> candidateArtifacts = contextArtifact instanceof CollectionArtifact ? context.childArtifacts(contextArtifact)
 				: context.siblingArtifacts(contextArtifact);
-		return candidateArtifacts.filter(Artifact::isNavigable).filter(artifact -> !isVeiled(context, artifact));
+		return candidateArtifacts.filter(Artifact::isNavigable).filter(artifact -> !isAsset(context, artifact)).filter(artifact -> !isVeiled(context, artifact));
 	}
 
 	/**
