@@ -77,8 +77,7 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 	 * <li>Page {@code <body>} content.</li>
 	 * </ol>
 	 */
-	private static final StringTemplate XHTML_TEMPLATE = StringTemplate
-			.builder() //@formatter:off
+	private static final StringTemplate XHTML_TEMPLATE = StringTemplate.builder() //@formatter:off
 					.text("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").newline()
 					.text("<!DOCTYPE html>").newline()
 					.text("<html xmlns=\"http://www.w3.org/1999/xhtml\">").newline() 
@@ -169,6 +168,8 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 	 * @implSpec This implementation reads the entire document and then parses any YAML front matter using SnakeYAML Engine.
 	 * @implSpec Only YAML mappings (name-value pairs) are supported. Names should be in <code>camelCase</code>. Namespace prefixes of predefined vocabularies in
 	 *           {@link AbstractPageMummifier#PREDEFINED_VOCABULARIES} are supported for names in the form <code>eg:name</code>.
+	 * @implSpec If the value is a string, this implementation delegates to {@link #parseMetadataPropertyValue(URI, CharSequence)} to determine the final value,
+	 *           inferring the property type based upon the property tag if possible.
 	 * @see AbstractPageMummifier#PREDEFINED_VOCABULARIES
 	 */
 	@Override
@@ -189,13 +190,15 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		final Map<?, ?> yamlMap = (Map<?, ?>)object;
 		try {
 			return yamlMap.entrySet().stream().map(mapping -> {
-				final Object key = mapping.getKey();
-				final Object value = mapping.getValue();
-				checkArgument(key instanceof CharSequence, "YAML mapping key `%s` of type `%s` not supported.", key, key.getClass().getName());
-				checkArgument(key != null, "YAML key `%s` cannot be mapped to `null`.", key);
+				final Object yamlKey = mapping.getKey();
+				final Object yamlValue = mapping.getValue();
+				checkArgument(yamlKey instanceof CharSequence, "YAML mapping key `%s` of type `%s` not supported.", yamlKey, yamlKey.getClass().getName());
+				checkArgument(yamlKey != null, "YAML key `%s` cannot be mapped to `null`.", yamlKey);
 				final Curie curie = Curie.parse((CharSequence)mapping.getKey(), false);
 				final URI tag = PREDEFINED_VOCABULARIES.findVocabularyTerm(curie).map(VocabularyTerm::toURI)
-						.orElseThrow(() -> new IllegalArgumentException(String.format("YAML key `%s` uses unrecognized namespace prefix.", key)));
+						.orElseThrow(() -> new IllegalArgumentException(String.format("YAML key `%s` uses unrecognized namespace prefix.", yamlKey)));
+				//if the YAML value is a string, perform further processing to infer type as appropriate
+				final Object value = yamlValue instanceof String ? parseMetadataPropertyValue(tag, (String)yamlValue) : yamlValue;
 				return Map.entry(tag, value);
 			}).collect(toList());
 		} catch(final IllegalArgumentException illegalArgumentException) {

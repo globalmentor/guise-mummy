@@ -257,6 +257,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	/**
 	 * Converts a metadata element to zero, or more property tag URI and value associations.
+	 * <p>
+	 * Property names are determined as follows:
+	 * </p>
 	 * <ul>
 	 * <li>Property names in both the {@value HTML#ATTRIBUTE_NAME} and {@value RDFa#ATTRIBUTE_PROPERTY} attributes are recognized. Multiple property names are
 	 * supported in the {@value RDFa#ATTRIBUTE_PROPERTY} attribute.</li>
@@ -269,12 +272,17 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * <li>A property names in the {@value HTML#ATTRIBUTE_NAME} attribute is interpreted as a single non-prefixed name in the {@value RDFa#ATTRIBUTE_PROPERTY}
 	 * attribute.
 	 * </ul>
+	 * <p>
+	 * Property values types are inferred from the resulting property tag if possible.
+	 * </p>
 	 * @apiNote The indicated exceptions can also be thrown during iteration of the stream.
 	 * @implSpec The current implementation only finds prefixes if they are stored in <code>xmlns:</code> XML namespace prefix declarations, not in HTML5
 	 *           <code>prefix</code> attributes.
 	 * @implSpec This implementation also recognizes all namespace prefixes included in {@link #PREDEFINED_VOCABULARIES} if they are not otherwise defined in the
 	 *           document.
 	 * @implSpec This implementation does not yet support a {@value RDFa#ATTRIBUTE_PROPERTY} attribute containing one or more absolute IRIs.
+	 * @implSpec This implementation delegates to {@link #parseMetadataPropertyValue(URI, CharSequence)} to determine the final value, inferring the property type
+	 *           based upon the property tag if possible.
 	 * @param metaElement The {@code <meta>} element potentially representing a property.
 	 * @return A potentially empty stream of property tag IRIs paired with values representing properties.
 	 * @throws IllegalArgumentException if the property name is a CURIE but no prefix has been defined in the element hierarchy.
@@ -318,8 +326,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		});
 		//TODO add support for Microdata `itemprop`; see https://www.w3.org/TR/microdata/#names:-the-itemprop-attribute
 		//if no content attribute, the value is the empty string as per _HTML 5.2 § 4.2.5. The meta element_
-		final String value = findAttributeNS(metaElement, null, ELEMENT_META_ATTRIBUTE_CONTENT).orElse("");
-		return Stream.concat(tagFromNameAttribute.stream(), tagsFromPropertyAttribute).map(tag -> Map.entry(tag, value));
+		final String lexicalValue = findAttributeNS(metaElement, null, ELEMENT_META_ATTRIBUTE_CONTENT).orElse("");
+		return Stream.concat(tagFromNameAttribute.stream(), tagsFromPropertyAttribute).map(tag -> Map.entry(tag, parseMetadataPropertyValue(tag, lexicalValue)));
 	}
 
 	/**

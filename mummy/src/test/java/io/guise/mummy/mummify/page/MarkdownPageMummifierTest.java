@@ -29,6 +29,7 @@ import static org.hamcrest.Matchers.*;
 
 import java.io.*;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 
@@ -193,6 +194,8 @@ public class MarkdownPageMummifierTest {
 			assertThat(mummifier.loadSourceMetadata(mummyContext, inputStream, SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME),
 					containsInAnyOrder(Map.entry(Handle.toTag("title"), "Simple Page with Other Metadata"), Map.entry(Handle.toTag("label"), "Simplicity"),
 							Map.entry(Handle.toTag("fooBar"), "This is a test."),
+							//string property inferred to be a local date from its name pattern
+							Map.entry(Handle.toTag("publishedOn"), LocalDate.of(2001, 2, 3)),
 							//Guise Mummy namespace with integer value
 							Map.entry(Artifact.PROPERTY_TAG_MUMMY_ORDER, 3),
 							//Open Graph namespace
