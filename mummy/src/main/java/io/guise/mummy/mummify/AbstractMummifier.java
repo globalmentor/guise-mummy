@@ -113,8 +113,9 @@ public abstract class AbstractMummifier implements Mummifier {
 	 * source, while ensuring that unrecognized lexical values are still stored as strings.
 	 * </p>
 	 * @apiNote This method is appropriate if the underlying format, such as HTML, exposes metadata values only in string format. If the underlying format
-	 *          provides rich metadata value types, such as YAML embedded in Markdown, property value type inference such as provided by this method should not be
-	 *          used.
+	 *          provides rich metadata value types (such as TURF embedded in Markdown), property value type inference such as provided by this method should
+	 *          normally not be used unless the format's type system provides insufficient types (such as YAML embedded in Markdown); in this case this method
+	 *          should be called on the properties with string values.
 	 * @implSpec If the property is in the URF ad-hoc namespace, the property value type is inferred from the property name by convention, as defined by the
 	 *           following regular expressions:
 	 *           <dl>
