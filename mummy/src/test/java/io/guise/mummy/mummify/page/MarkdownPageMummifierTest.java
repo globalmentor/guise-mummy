@@ -195,7 +195,7 @@ public class MarkdownPageMummifierTest {
 					containsInAnyOrder(Map.entry(Handle.toTag("title"), "Simple Page with Other Metadata"), Map.entry(Handle.toTag("label"), "Simplicity"),
 							Map.entry(Handle.toTag("fooBar"), "This is a test."),
 							//string property inferred to be a local date from its name pattern
-							Map.entry(Handle.toTag("publishedOn"), LocalDate.of(2001, 2, 3)),
+							Map.entry(Handle.toTag(Artifact.PROPERTY_HANDLE_PUBLISHED_ON), LocalDate.of(2001, 2, 3)),
 							//Guise Mummy namespace with integer value
 							Map.entry(Artifact.PROPERTY_TAG_MUMMY_ORDER, 3),
 							//Open Graph namespace

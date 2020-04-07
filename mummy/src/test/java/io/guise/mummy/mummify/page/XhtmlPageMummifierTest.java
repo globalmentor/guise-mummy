@@ -60,7 +60,7 @@ public class XhtmlPageMummifierTest {
 					containsInAnyOrder(Map.entry(Handle.toTag("title"), "Simple Page with Other Metadata"), Map.entry(Handle.toTag("label"), "Simplicity"),
 							Map.entry(Handle.toTag("fooBar"), "This is a test."),
 							//property defined in `property` attribute, inferred to be a local date from its name pattern
-							Map.entry(Handle.toTag("publishedOn"), LocalDate.of(2001, 2, 3)),
+							Map.entry(Handle.toTag(Artifact.PROPERTY_HANDLE_PUBLISHED_ON), LocalDate.of(2001, 2, 3)),
 							//property defined in `property` attribute with namespace declared on ancestor node
 							Map.entry(Artifact.PROPERTY_TAG_MUMMY_ORDER, "3"),
 							//property defined in `property` attribute with undeclared yet predefined vocabulary prefix
