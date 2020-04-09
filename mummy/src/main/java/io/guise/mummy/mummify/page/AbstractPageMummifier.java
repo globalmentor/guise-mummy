@@ -49,6 +49,7 @@ import org.w3c.dom.*;
 
 import com.globalmentor.html.*;
 import com.globalmentor.html.spec.HTML;
+import com.globalmentor.io.IllegalDataException;
 import com.globalmentor.net.*;
 import com.globalmentor.rdfa.spec.RDFa;
 import com.globalmentor.vocab.Curie;
@@ -306,7 +307,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		sourceDocument.normalize(); //**Do not call `document.normalizeDocument()`**; see note in `normalizeDocument()` below.
 		try {
 			return extractMetadata(context, sourceDocument);
-		} catch(final IllegalArgumentException | DOMException exception) {
+		} catch(final IllegalArgumentException | IllegalDataException | DOMException exception) {
 			throw new IOException(String.format("Error processing metadata in `%s`: %s", name, exception.getLocalizedMessage()), exception); //TODO i18n
 		}
 	}
@@ -397,8 +398,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			}
 			getLogger().trace("Generated page output document `{}`.", artifact.getTargetPath());
 
-		} catch(final IllegalArgumentException | DOMException exception) { //convert input errors and XML errors to I/O errors TODO include filename?
-			throw new IOException(exception);
+		} catch(final IllegalArgumentException | IllegalDataException | DOMException exception) { //convert input errors and XML errors to I/O errors
+			throw new IOException(String.format("Error mummifying page `%s`: %s", artifact.getSourcePath(), exception.getLocalizedMessage()), exception); //TODO i18n
 		}
 
 	}
@@ -610,7 +611,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 							return customTemplateMummifier.map(templateMummifier -> Map.entry(templateFile, templateMummifier));
 						});
 			} catch(final IllegalArgumentException illegalArgumentException) {
-				throw new IOException(String.format("Source file `%s` specified invalid template `%s`: %s.", artifact.getSourcePath(), customTemplate,
+				throw new IOException(String.format("Source file `%s` specified invalid template `%s`: %s", artifact.getSourcePath(), customTemplate,
 						illegalArgumentException.getLocalizedMessage()), illegalArgumentException); //TODO i18n
 			}
 		} else { //if no custom template was specified
@@ -776,7 +777,12 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		//widgets
 		final Widget widget = WIDGETS_BY_ELEMENT_NAME.get(NsName.ofNode(sourceElement));
 		if(widget != null) {
-			return widget.processElement(this, context, contextArtifact, artifact, sourceElement);
+			try {
+				return widget.processElement(this, context, contextArtifact, artifact, sourceElement);
+			} catch(final IllegalDataException illegalDataException) { //make widget illegal argument errors more useful
+				throw new IOException(String.format("Invalid data for widget `%s` in `%s`: %s", widget.getWidgetElementName(), artifact.getSourceDirectory(),
+						illegalDataException.getLocalizedMessage()), illegalDataException); //TODO i18n
+			}
 		}
 
 		if(GuiseMummy.NAMESPACE_STRING.equals(sourceElement.getNamespaceURI())) {
@@ -1413,7 +1419,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 					addNamedMetadata(headElement, curie.toString(), value.toString());
 				}
 			} catch(final IllegalArgumentException illegalArgumentException) {
-				getLogger().warn("Cannot determine CURIE for metadata tag `{}` with value `{}`.", tag, value);
+				getLogger().warn("Cannot determine CURIE for metadata tag `{}` with value `{}` in `{}`.", tag, value, artifact.getSourcePath());
 			}
 		}
 
