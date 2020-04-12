@@ -118,7 +118,8 @@ public class DirectoryWidget implements Widget {
 									item -> item.getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON).flatMap(asInstance(LocalDate.class))));
 							final Stream<Map.Entry<Optional<LocalDate>, List<Artifact>>> groups = itemsByFoundPublicationDate.entrySet().stream();
 							final Stream<Map.Entry<Optional<LocalDate>, List<Artifact>>> sortedGroups = foundSortOrder.map(sortOrder -> sortOrder //sort by date, nulls first, reversing if necessary
-									.applyTo(Comparator.<Map.Entry<Optional<LocalDate>, List<Artifact>>>nullsFirst(comparing(entry -> entry.getKey().orElse(null)))))
+									.applyTo(Comparator.<Map.Entry<Optional<LocalDate>, List<Artifact>>, LocalDate>comparing(entry -> entry.getKey().orElse(null),
+											nullsFirst(naturalOrder()))))
 									.map(groups::sorted).orElse(groups);
 							sortedGroups.forEach(throwingConsumer(itemsForFoundPublicationDate -> {
 								final Optional<LocalDate> foundPublicationDate = itemsForFoundPublicationDate.getKey();
@@ -136,7 +137,8 @@ public class DirectoryWidget implements Widget {
 									.findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON).flatMap(asInstance(LocalDate.class)).map(Year::from)));
 							final Stream<Map.Entry<Optional<Year>, List<Artifact>>> groups = itemsByFoundPublicationYear.entrySet().stream();
 							final Stream<Map.Entry<Optional<Year>, List<Artifact>>> sortedGroups = foundSortOrder.map(sortOrder -> sortOrder //sort by year, nulls first, reversing if necessary
-									.applyTo(Comparator.<Map.Entry<Optional<Year>, List<Artifact>>>nullsFirst(comparing(entry -> entry.getKey().orElse(null)))))
+									.applyTo(
+											Comparator.<Map.Entry<Optional<Year>, List<Artifact>>, Year>comparing(entry -> entry.getKey().orElse(null), nullsFirst(naturalOrder()))))
 									.map(groups::sorted).orElse(groups);
 							sortedGroups.forEach(throwingConsumer(itemsForFoundPublicationYear -> {
 								final Optional<Year> foundPublicationYear = itemsForFoundPublicationYear.getKey();
@@ -189,8 +191,10 @@ public class DirectoryWidget implements Widget {
 										String.format("Attribute `%s` not allowed with attribute `%s` value `%s`.", ATTRIBUTE_GROUP_BY, ATTRIBUTE_ARCHETYPE, archetype));
 							}
 							return items.sorted( //sort the items in reverse order of (published-on date followed by undated artifacts), secondarily by determined title
-									Comparator.<Artifact>nullsFirst(comparing(item -> item.getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON)
-											.flatMap(asInstance(LocalDate.class)).orElse(null))).reversed().thenComparing(Artifact::determineTitle, titleCollator))
+									Comparator
+											.<Artifact, LocalDate>comparing(item -> item.getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON)
+													.flatMap(asInstance(LocalDate.class)).orElse(null), nullsFirst(naturalOrder()))
+											.reversed().thenComparing(Artifact::determineTitle, titleCollator))
 									.flatMap(item -> {
 										//separator (will be ignored for the first item)
 										final Element separatorElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_HR); //<hr/>
