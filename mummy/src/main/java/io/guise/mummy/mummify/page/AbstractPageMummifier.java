@@ -21,7 +21,6 @@ import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
-import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.lex.CompoundTokenization.*;
 import static com.globalmentor.util.Optionals.*;
 import static com.globalmentor.xml.XmlDom.*;
@@ -29,10 +28,9 @@ import static io.guise.mummy.Artifact.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
-import static java.util.Comparator.*;
+import static java.util.function.Function.identity;
 import static java.util.function.Predicate.*;
 import static java.util.stream.Collectors.*;
-import static java.util.stream.Stream.*;
 import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.*;
@@ -41,10 +39,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.text.Collator;
 import java.time.*;
-import java.time.format.*;
 import java.util.*;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javax.annotation.*;
@@ -53,6 +49,7 @@ import org.w3c.dom.*;
 
 import com.globalmentor.html.*;
 import com.globalmentor.html.spec.HTML;
+import com.globalmentor.io.IllegalDataException;
 import com.globalmentor.net.*;
 import com.globalmentor.rdfa.spec.RDFa;
 import com.globalmentor.vocab.Curie;
@@ -62,6 +59,8 @@ import com.globalmentor.xml.spec.*;
 
 import io.guise.mummy.*;
 import io.guise.mummy.mummify.AbstractFileMummifier;
+import io.guise.mummy.mummify.page.widget.Widget;
+import io.guise.mummy.mummify.page.widget.directory.DirectoryWidget;
 import io.urf.URF;
 import io.urf.URF.Handle;
 import io.urf.model.UrfResourceDescription;
@@ -72,6 +71,10 @@ import io.urf.vocab.content.Content;
  * @author Garret Wilson
  */
 public abstract class AbstractPageMummifier extends AbstractFileMummifier implements PageMummifier {
+
+	/** The supported widgets, mapped to their XHTML element names. */
+	private static final Map<NsName, Widget> WIDGETS_BY_ELEMENT_NAME = Stream.of(new DirectoryWidget())
+			.collect(toUnmodifiableMap(Widget::getWidgetElementName, identity()));
 
 	/**
 	 * A map of local names of HTML elements that can reference other resources (e.g. <code>"img"</code>), along with the attributes of each element that contains
@@ -184,61 +187,6 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 */
 	protected Optional<Artifact> findParentNavigationArtifact(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
 		return contextArtifact instanceof CollectionArtifact ? Optional.of(contextArtifact) : context.findParentArtifact(contextArtifact);
-	}
-
-	/**
-	 * Determines whether the given artifact is marked as an <dfn>asset</dfn>.
-	 * @implSpec This implementation considers an asset any artifact with a source path the source filename of which matches the pattern configured under the
-	 *           {@value GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN} key. Asset parent directories are not considered, as an asset directory would normally
-	 *           not be mummifying pages within that tree anyway. For example with a pattern of <code>/\$(.+)/</code> <code>…/foo/$bar.html</code> would be
-	 *           considered an asset but <code>…/$foo/bar.html</code> would not.
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact to check.
-	 * @return <code>true</code> if the artifact should <em>not</em> be included in normal navigation.
-	 * @see GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN
-	 */
-	protected boolean isAsset(@Nonnull MummyContext context, @Nonnull final Artifact artifact) {
-		final Pattern assetNamePattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN, Pattern.class);
-		final Path artifactPath = artifact.getSourcePath().getFileName();
-		return artifactPath != null && assetNamePattern.matcher(artifactPath.toString()).matches();
-	}
-
-	/**
-	 * Determines whether the given artifact is <dfn>veiled</dfn>; that is, hidden from navigation. The artifact will still be available for direct retrieval.
-	 * @implSpec This implementation considers veiled any artifact with a source path the source filename of which matches the pattern configured under the
-	 *           {@value GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN} key. Veiled parent directories are not considered, as veiling only affects a single level.
-	 *           For example with a pattern of <code>/_(.+)/</code> <code>…/foo/_bar.txt</code> would be considered veiled but <code>…/_foo/bar.txt</code> would
-	 *           not.
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact to check.
-	 * @return <code>true</code> if the artifact should <em>not</em> be included in normal navigation.
-	 * @see GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN
-	 */
-	protected boolean isVeiled(@Nonnull MummyContext context, @Nonnull final Artifact artifact) {
-		final Pattern veilNamePattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.class);
-		final Path artifactPath = artifact.getSourcePath().getFileName();
-		return artifactPath != null && veilNamePattern.matcher(artifactPath.toString()).matches();
-	}
-
-	/**
-	 * Provides the artifacts suitable for direct subsequent navigation from this artifact, <em>excluding</em> the parent artifact. If sibling artifacts are
-	 * returned, they will include the given resource.
-	 * @apiNote The returned navigation artifacts are not necessarily children of the context artifact, but rather artifacts at the child level beneath some
-	 *          parent.
-	 * @implSpec This method retrieves candidate resources using {@link MummyContext#childArtifacts(Artifact)} if the artifact is a {@link CollectionArtifact};
-	 *           otherwise it calls {@link MummyContext#siblingArtifacts(Artifact)}. Only artifacts that are not assets and are not veiled are included.
-	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
-	 * @return The artifacts for subsequent navigation from this artifact.
-	 * @see MummyContext#childArtifacts(Artifact)
-	 * @see MummyContext#siblingArtifacts(Artifact)
-	 * @see #isAsset(MummyContext, Artifact)
-	 * @see #isVeiled(MummyContext, Artifact)
-	 */
-	protected Stream<Artifact> childNavigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
-		final Stream<Artifact> candidateArtifacts = contextArtifact instanceof CollectionArtifact ? context.childArtifacts(contextArtifact)
-				: context.siblingArtifacts(contextArtifact);
-		return candidateArtifacts.filter(Artifact::isNavigable).filter(artifact -> !isAsset(context, artifact)).filter(artifact -> !isVeiled(context, artifact));
 	}
 
 	/**
@@ -359,7 +307,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		sourceDocument.normalize(); //**Do not call `document.normalizeDocument()`**; see note in `normalizeDocument()` below.
 		try {
 			return extractMetadata(context, sourceDocument);
-		} catch(final IllegalArgumentException | DOMException exception) {
+		} catch(final IllegalArgumentException | IllegalDataException | DOMException exception) {
 			throw new IOException(String.format("Error processing metadata in `%s`: %s", name, exception.getLocalizedMessage()), exception); //TODO i18n
 		}
 	}
@@ -450,8 +398,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			}
 			getLogger().trace("Generated page output document `{}`.", artifact.getTargetPath());
 
-		} catch(final IllegalArgumentException | DOMException exception) { //convert input errors and XML errors to I/O errors TODO include filename?
-			throw new IOException(exception);
+		} catch(final IllegalArgumentException | IllegalDataException | DOMException exception) { //convert input errors and XML errors to I/O errors
+			throw new IOException(String.format("Error mummifying page `%s`: %s", artifact.getSourcePath(), exception.getLocalizedMessage()), exception); //TODO i18n
 		}
 
 	}
@@ -663,7 +611,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 							return customTemplateMummifier.map(templateMummifier -> Map.entry(templateFile, templateMummifier));
 						});
 			} catch(final IllegalArgumentException illegalArgumentException) {
-				throw new IOException(String.format("Source file `%s` specified invalid template `%s`: %s.", artifact.getSourcePath(), customTemplate,
+				throw new IOException(String.format("Source file `%s` specified invalid template `%s`: %s", artifact.getSourcePath(), customTemplate,
 						illegalArgumentException.getLocalizedMessage()), illegalArgumentException); //TODO i18n
 			}
 		} else { //if no custom template was specified
@@ -809,10 +757,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * </p>
 	 * @implSpec This implementation handles:
 	 *           <ul>
+	 *           <li>Processing of registered widgets.</li>
 	 *           <li>Regeneration of navigation lists using {@link PageMummifier#ATTRIBUTE_REGENERATE} via
 	 *           {@link #regenerateNavigationList(MummyContext, Artifact, Artifact, Element)}.</li>
-	 *           <li>Processing of post list widgets using {@link PageMummifier#WIDGET_POST_LIST_ELEMENT} via
-	 *           {@link #processWidgetPostList(MummyContext, Artifact, Artifact, Element)}.</li>
 	 *           </ul>
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
@@ -828,9 +775,17 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		//TODO transfer to some system of pluggable element processing strategies
 
 		//widgets
-		if(WIDGET_POST_LIST_ELEMENT.matches(sourceElement)) { //mummy:PostList
-			return processWidgetPostList(context, contextArtifact, artifact, sourceElement);
-		} else if(GuiseMummy.NAMESPACE_STRING.equals(sourceElement.getNamespaceURI())) {
+		final Widget widget = WIDGETS_BY_ELEMENT_NAME.get(NsName.ofNode(sourceElement));
+		if(widget != null) {
+			try {
+				return widget.processElement(this, context, contextArtifact, artifact, sourceElement);
+			} catch(final IllegalDataException illegalDataException) { //make widget illegal argument errors more useful
+				throw new IOException(String.format("Invalid data for widget `%s` in `%s`: %s", widget.getWidgetElementName(), artifact.getSourceDirectory(),
+						illegalDataException.getLocalizedMessage()), illegalDataException); //TODO i18n
+			}
+		}
+
+		if(GuiseMummy.NAMESPACE_STRING.equals(sourceElement.getNamespaceURI())) {
 			getLogger().warn("Unrecognized Guise Mummy element `<{}>`.", sourceElement.getNodeName());
 		}
 
@@ -1065,69 +1020,6 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				});
 
 		return List.of(navigationListElement);
-	}
-
-	/** The formatter for producing the published on date string. */
-	private static final DateTimeFormatter WIDGET_POST_LIST_PUBLISHED_ON_FORMATTER = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL); //i18n; update to allow project-based locale from mummification context; probably request formatter from mummification context
-
-	/**
-	 * Generates content for a post list widget.
-	 * <p>
-	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
-	 * element is removed.
-	 * </p>
-	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
-	 * @param artifact The artifact being generated
-	 * @param widgetElement The list element to regenerate.
-	 * @return The processed element(s), if any, to replace the widget element.
-	 * @throws IOException if there is an error processing the element.
-	 * @throws DOMException if there is some error manipulating the XML document object model.
-	 */
-	protected List<Element> processWidgetPostList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Element widgetElement) throws IOException, DOMException {
-		final Document document = widgetElement.getOwnerDocument();
-		return childNavigationArtifacts(context, contextArtifact)
-				//only include posts
-				.flatMap(asInstances(PostArtifact.class))
-				//sort the posts in reverse order of published-on date (with undated posts last, although there are not expected to be any), secondarily by determined title
-				.sorted(nullsLast(Comparator.<PostArtifact, LocalDate>comparing(postArtifact -> postArtifact.getResourceDescription()
-						.findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON).flatMap(asInstance(LocalDate.class)).orElse(null)).reversed())
-								.thenComparing(PostArtifact::determineTitle))
-				//generate content; the first element must be a separator element, which will be ignored for the first post
-				.flatMap(throwingFunction(postArtifact -> {
-					//separator
-					final Element separatorElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_HR); //<hr/>
-					//title
-					final String postHref = context.relativizeSourceReference(contextArtifact, postArtifact).toString();
-					final Element titleElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_H2); //<h2>
-					final Element titleElementLink = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A); //<h2><a>
-					titleElementLink.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, postHref);
-					appendText(titleElementLink, postArtifact.determineTitle()); //<h2><a>title</a></h2>
-					titleElement.appendChild(titleElementLink);
-					//publication date
-					final Optional<Element> publishedOnElement = postArtifact.getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON)
-							.flatMap(asInstance(LocalDate.class)).map(publishedOn -> {
-								final Element element = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_H3); //<h3>
-								appendText(element, WIDGET_POST_LIST_PUBLISHED_ON_FORMATTER.format(publishedOn));
-								return element;
-							});
-					//excerpt
-					final Optional<Element> excerptElement = loadSourceExcerpt(context, postArtifact).map(excerpt -> {
-						//Wrap the excerpt in a <div>. The other option would be to import the document fragment children directly into the document,
-						//but wrapping the excerpt may be more semantically correct and more useful for styling in the future.
-						final Element excerptWrapper = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_DIV); //<div>
-						appendImportedChildNodes(excerptWrapper, excerpt); //import the excerpt into the <div>
-						return excerptWrapper;
-					});
-					//more
-					final String moreLabel = findAttributeNS(widgetElement, WIDGET_POST_LIST_MORE_LABEL_ATTRIBUTE).orElse("…");
-					final Element moreLink = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A); //<a>
-					moreLink.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, postHref);
-					appendText(moreLink, moreLabel); //<a>…</a>
-					return concat(concat(Stream.of(separatorElement, titleElement), publishedOnElement.stream()), concat(excerptElement.stream(), Stream.of(moreLink)));
-				})).skip(1) //skip the first separator so that separators will only appear between posts
-				.collect(toList());
 	}
 
 	//#relocate
@@ -1527,7 +1419,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 					addNamedMetadata(headElement, curie.toString(), value.toString());
 				}
 			} catch(final IllegalArgumentException illegalArgumentException) {
-				getLogger().warn("Cannot determine CURIE for metadata tag `{}` with value `{}`.", tag, value);
+				getLogger().warn("Cannot determine CURIE for metadata tag `{}` with value `{}` in `{}`.", tag, value, artifact.getSourcePath());
 			}
 		}
 
