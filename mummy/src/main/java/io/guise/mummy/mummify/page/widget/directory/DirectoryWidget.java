@@ -54,9 +54,9 @@ import io.guise.mummy.mummify.page.widget.Widget;
  * </p>
  * <dl>
  * <dt>{@code <mummy:directory />}
- * <dd>A simple list if pages, sorted by title.</dd>
+ * <dd>A simple list if pages, sorted by publication date and then by title, both in ascending order.</dd>
  * <dt>{@code <mummy:directory group-by="-publication-year"/>}
- * <dd>A simple list of pages, grouped by year in reverse publication year, and sorted by title within each group.</dd>
+ * <dd>A simple list of pages, grouped by year in reverse publication year, and sorted by publication date and title within each group.</dd>
  * <dt>{@code <mummy:directory archetype="blog" more-label="Read More"/>}
  * <dd>A series of blog entries summaries and excerpts, sorted in reverse-order by publication date and title, with trailing "Read More" link (in addition to
  * the title link).</dd>
@@ -64,12 +64,12 @@ import io.guise.mummy.mummify.page.widget.Widget;
  * @apiNote This widget would typically be found in the content historically found in an <code>index.html</code> file. Rather than providing a reverse lookup
  *          based on content as a book index normally does, instead this widget provides a listing of artifacts by name or title, as the directory of a building
  *          might show or as a console <code>dir</code> DOS command might display.
- * @implSpec This implementation supports an <code>archetype</code> attribute of <code>blog</code>, which causes the items to be sorted in reverse order of
- *           publication date, and then by title. Each item will result in a title, date, extract, and other information. A <code>more-label</code> value can be
- *           specified for the text of the trailing link to the blog post.
- * @implSpec If no archetype is specified, the items are presented in a simple list, currently ordered by title. A <code>group-by</code> attribute may be
- *           specified with either of the values <code>publication-date</code> or <code>publication-year</code>, optionally prepended with <code>+</code> or
- *           <code>-</code> to indicate if the groupings should be corted in ascending or descending order.
+ * @implSpec This implementation supports an <code>archetype</code> attribute of <code>blog</code>, which causes the items to be sorted in descending order of
+ *           publication date, and then ascending by title. Each item will result in a title, date, extract, and other information. A <code>more-label</code>
+ *           value can be specified for the text of the trailing link to the blog post.
+ * @implSpec If no archetype is specified, the items are presented in a simple list, ordered by publication and then by title, both in ascending order. A
+ *           <code>group-by</code> attribute may be specified with either of the values <code>publication-date</code> or <code>publication-year</code>,
+ *           optionally prepended with <code>+</code> or <code>-</code> to indicate if the groupings should be sorted in ascending or descending order.
  * @author Garret Wilson
  */
 public class DirectoryWidget implements Widget {
@@ -235,15 +235,18 @@ public class DirectoryWidget implements Widget {
 					}
 				}).orElseGet(() -> { //no archetype
 					final Element ulElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_UL); //<ul>
-					items.sorted(comparing(Artifact::determineTitle, titleCollator)).map(item -> { //map each item to `<li><a>title</a></li>`
-						final Element liElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI); //<li>
-						final String postHref = context.relativizeSourceReference(contextArtifact, item).toString();
-						final Element liElementLink = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A); //<li><a>
-						liElementLink.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, postHref);
-						appendText(liElementLink, item.determineTitle()); //<li><a>title</a></li>
-						liElement.appendChild(liElementLink);
-						return liElement;
-					}).forEach(ulElement::appendChild);
+					items.sorted(Comparator //sort the items in order of published-on date followed by undated artifacts;, secondarily by determined title
+							.<Artifact, LocalDate>comparing(item -> item.getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON)
+									.flatMap(asInstance(LocalDate.class)).orElse(null), nullsLast(naturalOrder()))
+							.thenComparing(Artifact::determineTitle, titleCollator)).map(item -> { //map each item to `<li><a>title</a></li>`
+								final Element liElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI); //<li>
+								final String postHref = context.relativizeSourceReference(contextArtifact, item).toString();
+								final Element liElementLink = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A); //<li><a>
+								liElementLink.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, postHref);
+								appendText(liElementLink, item.determineTitle()); //<li><a>title</a></li>
+								liElement.appendChild(liElementLink);
+								return liElement;
+							}).forEach(ulElement::appendChild);
 					return List.of(ulElement);
 				});
 	}
