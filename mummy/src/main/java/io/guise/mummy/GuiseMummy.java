@@ -187,6 +187,8 @@ public class GuiseMummy implements Clogged {
 	 *           used.
 	 */
 	public static final String CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES = "mummy.collectionContentBaseNames";
+	/** The configuration for the filename of a navigation list; defaults to <code>.navigation.lst</code>. */
+	public static final String CONFIG_KEY_MUMMY_NAVIGATION_LIST_NAME = "mummy.navigationListName";
 	/** The configuration indicating <code>true</code> if extensions should be removed from page names (i.e. clean URLs) during mummification. */
 	public static final String CONFIG_KEY_MUMMY_PAGE_NAMES_BARE = "mummy.pageNamesBare";
 	/** The configuration for the base filename of a template; defaults to <code>.template</code>. */
@@ -489,6 +491,7 @@ public class GuiseMummy implements Clogged {
 		defaultSettings.put(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_DESCRIPTION_TARGET_RELATIVE_DIR)); //siteDescriptionTargetDirectory=${project.basedir}/target/site-description
 		defaultSettings.put(CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN, Pattern.compile("\\$(.*)"));
 		defaultSettings.put(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, List.of("index"));
+		defaultSettings.put(CONFIG_KEY_MUMMY_NAVIGATION_LIST_NAME, ".navigation.lst");
 		defaultSettings.put(CONFIG_KEY_MUMMY_TEMPLATE_BASE_NAME, ".template");
 		defaultSettings.put(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.compile("_(.*)"));
 		final Configuration defaultConfiguration = new ObjectMapConfiguration(defaultSettings);

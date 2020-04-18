@@ -176,20 +176,6 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	}
 
 	/**
-	 * Finds the artifact suitable to serve as parent level navigation for the artifacts at the current level. This will be the context artifact if the context
-	 * artifact has child artifacts.
-	 * @implSpec This method returns the context artifact itself if it is an instance of {@link CollectionArtifact}; otherwise the parent artifact, if any, is
-	 *           returned by calling {@link MummyContext#findParentArtifact(Artifact)}.
-	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
-	 * @return The artifacts for navigation to the parent of the current navigation level.
-	 * @see MummyContext#findParentArtifact(Artifact)
-	 */
-	protected Optional<Artifact> findParentNavigationArtifact(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
-		return contextArtifact instanceof CollectionArtifact ? Optional.of(contextArtifact) : context.findParentArtifact(contextArtifact);
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * @implSpec This implementation creates a {@link PostArtifact} for those artifacts with a source filename matching {@link PostArtifact#FILENAME_PATTERN}.
 	 *           Otherwise it creates a {@link PageArtifact}.
@@ -201,6 +187,34 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			return new PostArtifact(this, sourceFile, outputFile, description);
 		}
 		return new PageArtifact(this, sourceFile, outputFile, description);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec If no <code>.navigation.list</code> is provided, this implementation returns the parent navigation artifact returned by
+	 *           {@link #findParentNavigationArtifact(MummyContext, Artifact)}, followed by the child navigation artifacts returned by
+	 *           {@link #childNavigationArtifacts(MummyContext, Artifact)} sorted by given order and then by label alphabetical order.
+	 * @implSpec This implementation currently filters out post artifacts.
+	 */
+	@Override
+	public Stream<Artifact> navigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
+		//decide how to sort the links
+		final Collator navigationCollator = Collator.getInstance(); //TODO i18n: get locale for page, defaulting to site locale
+		navigationCollator.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
+		navigationCollator.setStrength(Collator.PRIMARY); //ignore accents and case
+		final Comparator<Artifact> navigationArtifactOrderComparator = Comparator
+				//compare first by order (defaulting to zero)
+				.<Artifact, Long>comparing(
+						navigationArtifact -> toLong(navigationArtifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ORDER).orElse(MUMMY_ORDER_DEFAULT)))
+				//then compare by label alphabetical order
+				.thenComparing(navigationArtifact -> navigationArtifact.determineLabel(), navigationCollator);
+		return Stream.concat(
+				//put the parent navigation artifact (if any) first
+				findParentNavigationArtifact(context, contextArtifact).stream(),
+				//then include the sorted child navigation artifacts
+				childNavigationArtifacts(context, contextArtifact)
+						//posts shouldn't appear in the normal navigation list TODO create a more semantic means of filtering posts
+						.filter(not(PostArtifact.class::isInstance)).sorted(navigationArtifactOrderComparator));
 	}
 
 	/**
@@ -900,6 +914,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @return The processed element(s), if any, to replace the source element.
 	 * @throws IOException if there is an error processing the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 * @see #navigationArtifacts(MummyContext, Artifact)
 	 */
 	protected List<Element> regenerateNavigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
 			@Nonnull final Element navigationListElement) throws IOException, DOMException {
@@ -946,25 +961,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 		removeChildren(navigationListElement); //remove existing links
 
-		//decide how to sort the links
-		final Collator navigationCollator = Collator.getInstance(); //TODO i18n: get locale for page, defaulting to site locale
-		navigationCollator.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
-		navigationCollator.setStrength(Collator.PRIMARY); //ignore accents and case
-		final Comparator<Artifact> navigationArtifactOrderComparator = Comparator
-				//compare first by order (defaulting to zero)
-				.<Artifact, Long>comparing(
-						navigationArtifact -> toLong(navigationArtifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ORDER).orElse(MUMMY_ORDER_DEFAULT)))
-				//then compare by alphabetical order
-				.thenComparing(navigationArtifact -> navigationArtifact.determineLabel(), navigationCollator);
-
 		//add new navigation links from templates
-		Stream.concat(
-				//put the parent navigation artifact (if any) first
-				findParentNavigationArtifact(context, contextArtifact).stream(),
-				//then include the sorted child navigation artifacts
-				childNavigationArtifacts(context, contextArtifact)
-						//posts shouldn't appear in the normal navigation list TODO create a more semantic means of filtering posts
-						.filter(not(PostArtifact.class::isInstance)).sorted(navigationArtifactOrderComparator))
+		navigationArtifacts(context, contextArtifact)
 				//generate navigation elements 
 				.forEach(navigationArtifact -> {
 					//if the navigation artifact is this artifact, use the template for an active link
