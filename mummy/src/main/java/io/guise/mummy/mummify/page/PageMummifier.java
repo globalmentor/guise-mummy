@@ -143,11 +143,12 @@ public interface PageMummifier extends Mummifier {
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @return The artifacts, in order, that constitute the official list of possible navigation destinations from this artifact.
+	 * @throws IOException If there is an I/O error determining the navigation list.
 	 * @see #findParentNavigationArtifact(MummyContext, Artifact)
 	 * @see #childNavigationArtifacts(MummyContext, Artifact)
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_NAVIGATION_LIST_NAME
 	 */
-	public Stream<Artifact> navigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact);
+	public Stream<Artifact> navigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) throws IOException;
 
 	//# load
 

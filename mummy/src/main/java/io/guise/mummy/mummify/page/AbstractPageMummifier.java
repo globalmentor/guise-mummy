@@ -19,6 +19,7 @@ package io.guise.mummy.mummify.page;
 import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Filenames.*;
+import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.lex.CompoundTokenization.*;
@@ -26,9 +27,10 @@ import static com.globalmentor.util.Optionals.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static io.guise.mummy.Artifact.*;
 import static io.guise.mummy.GuiseMummy.*;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
-import static java.util.function.Function.identity;
+import static java.util.function.Function.*;
 import static java.util.function.Predicate.*;
 import static java.util.stream.Collectors.*;
 import static org.zalando.fauxpas.FauxPas.*;
@@ -36,6 +38,7 @@ import static org.zalando.fauxpas.FauxPas.*;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.Collator;
 import java.time.*;
@@ -197,24 +200,53 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @implSpec This implementation currently filters out post artifacts.
 	 */
 	@Override
-	public Stream<Artifact> navigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
-		//decide how to sort the links
-		final Collator navigationCollator = Collator.getInstance(); //TODO i18n: get locale for page, defaulting to site locale
-		navigationCollator.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
-		navigationCollator.setStrength(Collator.PRIMARY); //ignore accents and case
-		final Comparator<Artifact> navigationArtifactOrderComparator = Comparator
-				//compare first by order (defaulting to zero)
-				.<Artifact, Long>comparing(
-						navigationArtifact -> toLong(navigationArtifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ORDER).orElse(MUMMY_ORDER_DEFAULT)))
-				//then compare by label alphabetical order
-				.thenComparing(navigationArtifact -> navigationArtifact.determineLabel(), navigationCollator);
-		return Stream.concat(
-				//put the parent navigation artifact (if any) first
-				findParentNavigationArtifact(context, contextArtifact).stream(),
-				//then include the sorted child navigation artifacts
-				childNavigationArtifacts(context, contextArtifact)
-						//posts shouldn't appear in the normal navigation list TODO create a more semantic means of filtering posts
-						.filter(not(PostArtifact.class::isInstance)).sorted(navigationArtifactOrderComparator));
+	public Stream<Artifact> navigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) throws IOException {
+		final String navigationListFilename = context.getConfiguration().getString(CONFIG_KEY_MUMMY_NAVIGATION_LIST_NAME);
+		return findAncestorFileByName(contextArtifact.getSourceDirectory(), navigationListFilename, Files::isRegularFile, context.getSiteSourceDirectory())
+				//if a navigation list file such as `.navigation.lst` was found 
+				.map(throwingFunction(navigationListFile -> {
+					final Path navigationListFileParent = navigationListFile.getParent(); //each line reference is relative to the directory of the navigation file
+					checkState(navigationListFileParent != null, "Navigation list file `%s` has no parent.", navigationListFile);
+
+					try (final Stream<String> lines = lines(navigationListFile, UTF_8)) { //trailing empty lines are ignored, as desired
+						return lines.<Artifact>flatMap(line -> { //map lines to Optional<Artifact>, warning if there is no artifact for a reference 
+							final URIPath referencePath;
+							try {
+								referencePath = URIPath.of(line); //assume each line is a path reference _relative to the navigation list file_
+							} catch(final IllegalArgumentException illegalArgumentException) {
+								throw new UncheckedIOException(
+										new IOException(String.format("Invalid reference path `%s` in navigation file `%s`.", line, navigationListFile)));
+							}
+							final Optional<Artifact> navigationArtifact = context.findArtifactBySourceRelativeReference(navigationListFileParent, referencePath);
+							if(!navigationArtifact.isPresent()) {
+								getLogger().warn("No target artifact found for relative reference `{}` in navigation file `{}`.", referencePath, navigationListFile);
+							}
+							return navigationArtifact.stream();
+						}).collect(toList()).stream(); //(important) collect the artifacts to a list to prevent any exceptions upon stream iteration after method return
+					} catch(final UncheckedIOException uncheckedIOException) { //both the the lines() stream and our own checks can throw an unchecked I/O exception
+						throw uncheckedIOException.getCause();
+					}
+				}))
+				//otherwise determine the default navigation list
+				.orElseGet(() -> {
+					//decide how to sort the links
+					final Collator navigationCollator = Collator.getInstance(); //TODO i18n: get locale for page, defaulting to site locale
+					navigationCollator.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
+					navigationCollator.setStrength(Collator.PRIMARY); //ignore accents and case
+					final Comparator<Artifact> navigationArtifactOrderComparator = Comparator
+							//compare first by order (defaulting to zero)
+							.<Artifact, Long>comparing(navigationArtifact -> toLong(
+									navigationArtifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ORDER).orElse(MUMMY_ORDER_DEFAULT)))
+							//then compare by label alphabetical order
+							.thenComparing(navigationArtifact -> navigationArtifact.determineLabel(), navigationCollator);
+					return Stream.concat(
+							//put the parent navigation artifact (if any) first
+							findParentNavigationArtifact(context, contextArtifact).stream(),
+							//then include the sorted child navigation artifacts
+							childNavigationArtifacts(context, contextArtifact)
+									//posts shouldn't appear in the normal navigation list TODO create a more semantic means of filtering posts
+									.filter(not(PostArtifact.class::isInstance)).sorted(navigationArtifactOrderComparator));
+				});
 	}
 
 	/**
