@@ -197,7 +197,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @implSpec This implementation currently filters out post artifacts.
 	 */
 	@Override
-	public Stream<Artifact> navigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
+	public Stream<Artifact> navigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
 		//decide how to sort the links
 		final Collator navigationCollator = Collator.getInstance(); //TODO i18n: get locale for page, defaulting to site locale
 		navigationCollator.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
@@ -914,7 +914,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @return The processed element(s), if any, to replace the source element.
 	 * @throws IOException if there is an error processing the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
-	 * @see #navigationArtifacts(MummyContext, Artifact)
+	 * @see #navigationList(MummyContext, Artifact)
 	 */
 	protected List<Element> regenerateNavigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
 			@Nonnull final Element navigationListElement) throws IOException, DOMException {
@@ -962,7 +962,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		removeChildren(navigationListElement); //remove existing links
 
 		//add new navigation links from templates
-		navigationArtifacts(context, contextArtifact)
+		navigationList(context, contextArtifact)
 				//generate navigation elements 
 				.forEach(navigationArtifact -> {
 					//if the navigation artifact is this artifact, use the template for an active link

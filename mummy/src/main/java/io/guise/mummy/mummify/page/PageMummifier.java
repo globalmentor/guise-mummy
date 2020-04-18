@@ -137,6 +137,9 @@ public interface PageMummifier extends Mummifier {
 	 * Provides the the official list of artifacts suitable for direct navigation from this artifact. The list may include the parent artifact, sibling artifacts,
 	 * and/or the given resource itself. This official list may be overridden by the user through the use of a <code>.navigation.list</code> file or other
 	 * configured file.
+	 * @apiNote The "list" in the method name does not refer to a Java type being returned; rather it indicates that it returns the official, ordered listing of
+	 *          navigation artifacts to use for example in menus (typically implemented by HTML <code>&lt;ul&gt;</code> unordered list elements), and optionally
+	 *          specified explicitly in a <code>.navigation.list</code> file.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @return The artifacts, in order, that constitute the official list of possible navigation destinations from this artifact.
@@ -144,7 +147,7 @@ public interface PageMummifier extends Mummifier {
 	 * @see #childNavigationArtifacts(MummyContext, Artifact)
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_NAVIGATION_LIST_NAME
 	 */
-	public Stream<Artifact> navigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact);
+	public Stream<Artifact> navigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact);
 
 	//# load
 
