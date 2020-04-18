@@ -189,6 +189,8 @@ public class GuiseMummy implements Clogged {
 	public static final String CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES = "mummy.collectionContentBaseNames";
 	/** The configuration indicating <code>true</code> if extensions should be removed from page names (i.e. clean URLs) during mummification. */
 	public static final String CONFIG_KEY_MUMMY_PAGE_NAMES_BARE = "mummy.pageNamesBare";
+	/** The configuration for the base filename of a template; defaults to <code>.template</code>. */
+	public static final String CONFIG_KEY_MUMMY_TEMPLATE_BASE_NAME = "mummy.templateBaseName";
 	/**
 	 * The regular expression indicating if an artifact should be considered <dfn>veiled</dfn> if its name matches. The regular expression may have at most one
 	 * matching group. If there is a matching group and it provides a match, the artifact will be renamed to the value of the matched group. If there is no
@@ -487,6 +489,7 @@ public class GuiseMummy implements Clogged {
 		defaultSettings.put(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_DESCRIPTION_TARGET_RELATIVE_DIR)); //siteDescriptionTargetDirectory=${project.basedir}/target/site-description
 		defaultSettings.put(CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN, Pattern.compile("\\$(.*)"));
 		defaultSettings.put(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, List.of("index"));
+		defaultSettings.put(CONFIG_KEY_MUMMY_TEMPLATE_BASE_NAME, ".template");
 		defaultSettings.put(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.compile("_(.*)"));
 		final Configuration defaultConfiguration = new ObjectMapConfiguration(defaultSettings);
 

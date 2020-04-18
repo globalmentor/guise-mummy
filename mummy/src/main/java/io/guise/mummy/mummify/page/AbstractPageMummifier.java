@@ -590,6 +590,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 * @see MummyContext#findPageSourceFile(Path, String, boolean)
 	 * @see Artifact#PROPERTY_TAG_MUMMY_TEMPLATE
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_TEMPLATE_BASE_NAME
 	 */
 	protected Optional<Map.Entry<Path, PageMummifier>> findTemplateSourceFile(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact,
 			@Nonnull final Artifact artifact, @Nonnull final Document sourceDocument) throws IOException, DOMException {
@@ -615,7 +616,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 						illegalArgumentException.getLocalizedMessage()), illegalArgumentException); //TODO i18n
 			}
 		} else { //if no custom template was specified
-			return context.findPageSourceFile(artifact.getSourceDirectory(), ".template", true); //look for a template TODO allow base filename to be configurable
+			final String templateBaseName = context.getConfiguration().getString(CONFIG_KEY_MUMMY_TEMPLATE_BASE_NAME);
+			return context.findPageSourceFile(artifact.getSourceDirectory(), templateBaseName, true); //look for a template
 		}
 	}
 
