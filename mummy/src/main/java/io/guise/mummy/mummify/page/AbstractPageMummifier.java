@@ -19,6 +19,7 @@ package io.guise.mummy.mummify.page;
 import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Filenames.*;
+import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.lex.CompoundTokenization.*;
@@ -26,9 +27,10 @@ import static com.globalmentor.util.Optionals.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static io.guise.mummy.Artifact.*;
 import static io.guise.mummy.GuiseMummy.*;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
-import static java.util.function.Function.identity;
+import static java.util.function.Function.*;
 import static java.util.function.Predicate.*;
 import static java.util.stream.Collectors.*;
 import static org.zalando.fauxpas.FauxPas.*;
@@ -36,6 +38,7 @@ import static org.zalando.fauxpas.FauxPas.*;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.Collator;
 import java.time.*;
@@ -176,20 +179,6 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	}
 
 	/**
-	 * Finds the artifact suitable to serve as parent level navigation for the artifacts at the current level. This will be the context artifact if the context
-	 * artifact has child artifacts.
-	 * @implSpec This method returns the context artifact itself if it is an instance of {@link CollectionArtifact}; otherwise the parent artifact, if any, is
-	 *           returned by calling {@link MummyContext#findParentArtifact(Artifact)}.
-	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
-	 * @return The artifacts for navigation to the parent of the current navigation level.
-	 * @see MummyContext#findParentArtifact(Artifact)
-	 */
-	protected Optional<Artifact> findParentNavigationArtifact(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
-		return contextArtifact instanceof CollectionArtifact ? Optional.of(contextArtifact) : context.findParentArtifact(contextArtifact);
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * @implSpec This implementation creates a {@link PostArtifact} for those artifacts with a source filename matching {@link PostArtifact#FILENAME_PATTERN}.
 	 *           Otherwise it creates a {@link PageArtifact}.
@@ -201,6 +190,63 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			return new PostArtifact(this, sourceFile, outputFile, description);
 		}
 		return new PageArtifact(this, sourceFile, outputFile, description);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec If no <code>.navigation.list</code> is provided, this implementation returns the parent navigation artifact returned by
+	 *           {@link #findParentNavigationArtifact(MummyContext, Artifact)}, followed by the child navigation artifacts returned by
+	 *           {@link #childNavigationArtifacts(MummyContext, Artifact)} sorted by given order and then by label alphabetical order.
+	 * @implSpec This implementation currently filters out post artifacts.
+	 */
+	@Override
+	public Stream<Artifact> navigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) throws IOException {
+		final String navigationListFilename = context.getConfiguration().getString(CONFIG_KEY_MUMMY_NAVIGATION_LIST_NAME);
+		return findAncestorFileByName(contextArtifact.getSourceDirectory(), navigationListFilename, Files::isRegularFile, context.getSiteSourceDirectory())
+				//if a navigation list file such as `.navigation.lst` was found 
+				.map(throwingFunction(navigationListFile -> {
+					final Path navigationListFileParent = navigationListFile.getParent(); //each line reference is relative to the directory of the navigation file
+					checkState(navigationListFileParent != null, "Navigation list file `%s` has no parent.", navigationListFile);
+
+					try (final Stream<String> lines = lines(navigationListFile, UTF_8)) { //trailing empty lines are ignored, as desired
+						return lines.<Artifact>flatMap(line -> { //map lines to Optional<Artifact>, warning if there is no artifact for a reference 
+							final URIPath referencePath;
+							try {
+								referencePath = URIPath.of(line); //assume each line is a path reference _relative to the navigation list file_
+							} catch(final IllegalArgumentException illegalArgumentException) {
+								throw new UncheckedIOException(
+										new IOException(String.format("Invalid reference path `%s` in navigation file `%s`.", line, navigationListFile)));
+							}
+							final Optional<Artifact> navigationArtifact = context.findArtifactBySourceRelativeReference(navigationListFileParent, referencePath);
+							if(!navigationArtifact.isPresent()) {
+								getLogger().warn("No target artifact found for relative reference `{}` in navigation file `{}`.", referencePath, navigationListFile);
+							}
+							return navigationArtifact.stream();
+						}).collect(toList()).stream(); //(important) collect the artifacts to a list to prevent any exceptions upon stream iteration after method return
+					} catch(final UncheckedIOException uncheckedIOException) { //both the the lines() stream and our own checks can throw an unchecked I/O exception
+						throw uncheckedIOException.getCause();
+					}
+				}))
+				//otherwise determine the default navigation list
+				.orElseGet(() -> {
+					//decide how to sort the links
+					final Collator navigationCollator = Collator.getInstance(); //TODO i18n: get locale for page, defaulting to site locale
+					navigationCollator.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
+					navigationCollator.setStrength(Collator.PRIMARY); //ignore accents and case
+					final Comparator<Artifact> navigationArtifactOrderComparator = Comparator
+							//compare first by order (defaulting to zero)
+							.<Artifact, Long>comparing(navigationArtifact -> toLong(
+									navigationArtifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ORDER).orElse(MUMMY_ORDER_DEFAULT)))
+							//then compare by label alphabetical order
+							.thenComparing(navigationArtifact -> navigationArtifact.determineLabel(), navigationCollator);
+					return Stream.concat(
+							//put the parent navigation artifact (if any) first
+							findParentNavigationArtifact(context, contextArtifact).stream(),
+							//then include the sorted child navigation artifacts
+							childNavigationArtifacts(context, contextArtifact)
+									//posts shouldn't appear in the normal navigation list TODO create a more semantic means of filtering posts
+									.filter(not(PostArtifact.class::isInstance)).sorted(navigationArtifactOrderComparator));
+				});
 	}
 
 	/**
@@ -590,6 +636,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 * @see MummyContext#findPageSourceFile(Path, String, boolean)
 	 * @see Artifact#PROPERTY_TAG_MUMMY_TEMPLATE
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_TEMPLATE_BASE_NAME
 	 */
 	protected Optional<Map.Entry<Path, PageMummifier>> findTemplateSourceFile(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact,
 			@Nonnull final Artifact artifact, @Nonnull final Document sourceDocument) throws IOException, DOMException {
@@ -615,7 +662,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 						illegalArgumentException.getLocalizedMessage()), illegalArgumentException); //TODO i18n
 			}
 		} else { //if no custom template was specified
-			return context.findPageSourceFile(artifact.getSourceDirectory(), ".template", true); //look for a template TODO allow base filename to be configurable
+			final String templateBaseName = context.getConfiguration().getString(CONFIG_KEY_MUMMY_TEMPLATE_BASE_NAME);
+			return context.findPageSourceFile(artifact.getSourceDirectory(), templateBaseName, true); //look for a template
 		}
 	}
 
@@ -898,6 +946,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @return The processed element(s), if any, to replace the source element.
 	 * @throws IOException if there is an error processing the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 * @see #navigationList(MummyContext, Artifact)
 	 */
 	protected List<Element> regenerateNavigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
 			@Nonnull final Element navigationListElement) throws IOException, DOMException {
@@ -944,25 +993,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 		removeChildren(navigationListElement); //remove existing links
 
-		//decide how to sort the links
-		final Collator navigationCollator = Collator.getInstance(); //TODO i18n: get locale for page, defaulting to site locale
-		navigationCollator.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
-		navigationCollator.setStrength(Collator.PRIMARY); //ignore accents and case
-		final Comparator<Artifact> navigationArtifactOrderComparator = Comparator
-				//compare first by order (defaulting to zero)
-				.<Artifact, Long>comparing(
-						navigationArtifact -> toLong(navigationArtifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ORDER).orElse(MUMMY_ORDER_DEFAULT)))
-				//then compare by alphabetical order
-				.thenComparing(navigationArtifact -> navigationArtifact.determineLabel(), navigationCollator);
-
 		//add new navigation links from templates
-		Stream.concat(
-				//put the parent navigation artifact (if any) first
-				findParentNavigationArtifact(context, contextArtifact).stream(),
-				//then include the sorted child navigation artifacts
-				childNavigationArtifacts(context, contextArtifact)
-						//posts shouldn't appear in the normal navigation list TODO create a more semantic means of filtering posts
-						.filter(not(PostArtifact.class::isInstance)).sorted(navigationArtifactOrderComparator))
+		navigationList(context, contextArtifact)
 				//generate navigation elements 
 				.forEach(navigationArtifact -> {
 					//if the navigation artifact is this artifact, use the template for an active link

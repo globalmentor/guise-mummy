@@ -93,16 +93,35 @@ public interface PageMummifier extends Mummifier {
 	}
 
 	/**
+	 * Finds the artifact suitable to serve as parent level navigation for the artifacts at the current level. This will be the context artifact if the context
+	 * artifact has child artifacts.
+	 * @apiNote This method finds the parent navigation artifact independent of any <code>.navigation.lst</code> file.
+	 * @implSpec The default implementation returns the context artifact itself if it is an instance of {@link CollectionArtifact}; otherwise the parent artifact,
+	 *           if any, is returned by calling {@link MummyContext#findParentArtifact(Artifact)}.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @return The artifacts for navigation to the parent of the current navigation level.
+	 * @see #childNavigationArtifacts(MummyContext, Artifact)
+	 * @see MummyContext#findParentArtifact(Artifact)
+	 */
+	public default Optional<Artifact> findParentNavigationArtifact(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
+		return contextArtifact instanceof CollectionArtifact ? Optional.of(contextArtifact) : context.findParentArtifact(contextArtifact);
+	}
+
+	/**
 	 * Provides the artifacts suitable for direct subsequent navigation from this artifact, <em>excluding</em> the parent artifact. If sibling artifacts are
 	 * returned, they will include the given resource.
 	 * @apiNote The returned navigation artifacts are not necessarily children of the context artifact, but rather artifacts at the child level beneath some
 	 *          parent.
+	 * @apiNote This method allows access to child navigation artifacts independent of any explicit navigation list override defined by the user. It is thus
+	 *          appropriate for access by a directory widget, for example, to provide custom navigation independent of any <code>.navigation.lst</code> file.
 	 * @implSpec The default implementation retrieves candidate resources using {@link MummyContext#childArtifacts(Artifact)} if the artifact is a
 	 *           {@link CollectionArtifact}; otherwise it calls {@link MummyContext#siblingArtifacts(Artifact)}. Only artifacts that are not assets and are not
 	 *           veiled are included.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @return The artifacts for subsequent navigation from this artifact.
+	 * @see #findParentNavigationArtifact(MummyContext, Artifact)
 	 * @see MummyContext#childArtifacts(Artifact)
 	 * @see MummyContext#siblingArtifacts(Artifact)
 	 * @see #isAsset(MummyContext, Artifact)
@@ -113,6 +132,23 @@ public interface PageMummifier extends Mummifier {
 				: context.siblingArtifacts(contextArtifact);
 		return candidateArtifacts.filter(Artifact::isNavigable).filter(artifact -> !isAsset(context, artifact)).filter(artifact -> !isVeiled(context, artifact));
 	}
+
+	/**
+	 * Provides the the official list of artifacts suitable for direct navigation from this artifact. The list may include the parent artifact, sibling artifacts,
+	 * and/or the given resource itself. This official list may be overridden by the user through the use of a <code>.navigation.list</code> file or other
+	 * configured file.
+	 * @apiNote The "list" in the method name does not refer to a Java type being returned; rather it indicates that it returns the official, ordered listing of
+	 *          navigation artifacts to use for example in menus (typically implemented by HTML <code>&lt;ul&gt;</code> unordered list elements), and optionally
+	 *          specified explicitly in a <code>.navigation.list</code> file.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @return The artifacts, in order, that constitute the official list of possible navigation destinations from this artifact.
+	 * @throws IOException If there is an I/O error determining the navigation list.
+	 * @see #findParentNavigationArtifact(MummyContext, Artifact)
+	 * @see #childNavigationArtifacts(MummyContext, Artifact)
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_NAVIGATION_LIST_NAME
+	 */
+	public Stream<Artifact> navigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) throws IOException;
 
 	//# load
 
