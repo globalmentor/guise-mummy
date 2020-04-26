@@ -42,6 +42,8 @@ import io.urf.vocab.content.Content;
  * Abstract mummifier for generating artifacts based upon a single source file.
  * @implSpec This implementation recognizes blog posts and gives them a target subdirectory structure appropriately based upon
  *           {@link PostArtifact#FILENAME_PATTERN}.
+ * @implNote This implementation does not yet support source description files using {@link #getArtifactSourceDescriptionFile(MummyContext, Artifact)} or
+ *           {@link #getArtifactSourceDescriptionFile(MummyContext, Path)}.
  * @author Garret Wilson
  */
 public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier {
@@ -55,13 +57,13 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This implementation loads the description using {@link #loadDescription(MummyContext, Path, Path)} and then creates a new artifact using
+	 * @implSpec This implementation loads the description using {@link #loadArtifactDescription(MummyContext, Path, Path)} and then creates a new artifact using
 	 *           {@link #createArtifact(Path, Path, UrfResourceDescription)}.
 	 */
 	@Override
 	public Artifact plan(final MummyContext context, final Path sourceFile, final Path targetFile) throws IOException {
 		getLogger().trace("Planning artifact for source file `{}` ...", sourceFile);
-		final UrfResourceDescription description = loadDescription(context, sourceFile, targetFile);
+		final UrfResourceDescription description = loadArtifactDescription(context, sourceFile, targetFile);
 		return createArtifact(sourceFile, targetFile, description);
 	}
 
@@ -91,7 +93,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @see MummyContext#isIncremental()
 	 * @see MummyContext#isFull()
 	 */
-	protected UrfResourceDescription loadDescription(@Nonnull MummyContext context, @Nonnull final Path sourceFile, @Nonnull final Path targetFile)
+	protected UrfResourceDescription loadArtifactDescription(@Nonnull MummyContext context, @Nonnull final Path sourceFile, @Nonnull final Path targetFile)
 			throws IOException {
 		final Optional<Instant> sourceModifiedAt = exists(sourceFile) ? Optional.of(getLastModifiedTime(sourceFile).toInstant()) : Optional.empty();
 		final Optional<UrfResourceDescription> cachedDescription;

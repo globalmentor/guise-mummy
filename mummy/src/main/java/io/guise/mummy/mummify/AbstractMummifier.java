@@ -17,6 +17,7 @@
 package io.guise.mummy.mummify;
 
 import static com.globalmentor.io.Paths.*;
+import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.util.Optionals.*;
 import static java.nio.file.Files.*;
 import static java.util.Objects.*;
@@ -57,9 +58,8 @@ public abstract class AbstractMummifier implements Mummifier {
 	 * Determines the output file path for an artifact description in the site description target directory for the given artifact.
 	 * @implSpec This implementation delegates to {@link #getArtifactTargetDescriptionFile(MummyContext, Path)} using {@link Artifact#getTargetPath()}.
 	 * @param context The context of static site generation.
-	 * @param artifact The artifact for which a description file should be returned.
+	 * @param artifact The artifact for which a target description file should be returned.
 	 * @return The path in the site description target directory to which a description may be generated.
-	 * @throws IllegalArgumentException if the given source file is not in the target source tree.
 	 * @see Artifact#getTargetPath()
 	 */
 	protected Path getArtifactTargetDescriptionFile(final @Nonnull MummyContext context, final @Nonnull Artifact artifact) {
@@ -69,12 +69,12 @@ public abstract class AbstractMummifier implements Mummifier {
 	/**
 	 * Determines the output file path for an artifact description in the site description target directory based upon the target path in the site target
 	 * directory.
-	 * @implSpec The default implementation produces a filename based upon the target path filename, but in the
-	 *           {@link MummyContext#getSiteDescriptionTargetDirectory()} directory.
+	 * @implSpec The default implementation produces a filename based upon the target path filename with the {@link Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION}
+	 *           added, but in the {@link MummyContext#getSiteDescriptionTargetDirectory()} directory.
 	 * @param context The context of static site generation.
-	 * @param targetPath The path in the site source directory.
+	 * @param targetPath The path in the site target directory.
 	 * @return The path in the site description target directory to which a description may be generated.
-	 * @throws IllegalArgumentException if the given source file is not in the target source tree.
+	 * @throws IllegalArgumentException if the given target path is not in the target source tree.
 	 * @see MummyContext#getSiteDescriptionTargetDirectory()
 	 * @see Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION
 	 */
@@ -87,7 +87,7 @@ public abstract class AbstractMummifier implements Mummifier {
 	 * Loads the generated target description of an artifact based upon its target path.
 	 * @param context The context of static site generation.
 	 * @param targetPath The path in the site target directory (not the path of the target description itself).
-	 * @throws IllegalArgumentException if the given source file is not in the site source tree.
+	 * @throws IllegalArgumentException if the given target path is not in the site target tree.
 	 * @return The generated target description, if present, of the resource being mummified.
 	 * @throws IOException if there is an I/O error retrieving the description, including if the metadata is invalid.
 	 * @see #getArtifactTargetDescriptionFile(MummyContext, Path)
@@ -99,7 +99,7 @@ public abstract class AbstractMummifier implements Mummifier {
 		}
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(descriptionFile))) {
 			return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream, TURF.PROPERTIES_CONTENT_TYPE).stream()
-					.filter(UrfResourceDescription.class::isInstance).map(UrfResourceDescription.class::cast).findFirst();
+					.flatMap(asInstances(UrfResourceDescription.class)).findFirst();
 		}
 	}
 
