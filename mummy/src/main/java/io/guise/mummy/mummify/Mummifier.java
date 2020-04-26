@@ -50,7 +50,7 @@ public interface Mummifier extends Clogged {
 	 * metadata extension.
 	 * @apiNote This extension is used both for source metadata sidecar descriptions and for target description sidecar files.
 	 */
-	public static final String DESCRIPTION_FILE_SIDECAR_EXTENSION = addExtension(DESCRIPTION_FILE_SIDECAR_EXTENSION_SEGMENT, TURF.FILENAME_EXTENSION);
+	public static final String DESCRIPTION_FILE_SIDECAR_EXTENSION = addExtension(DESCRIPTION_FILE_SIDECAR_EXTENSION_SEGMENT, TURF.PROPERTIES_FILENAME_EXTENSION);
 
 	/**
 	 * Retrieves the extensions of files supported by this mummifier.

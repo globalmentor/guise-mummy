@@ -98,8 +98,8 @@ public abstract class AbstractMummifier implements Mummifier {
 			return Optional.empty();
 		}
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(descriptionFile))) {
-			return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream).stream().filter(UrfResourceDescription.class::isInstance)
-					.map(UrfResourceDescription.class::cast).findFirst();
+			return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream, TURF.PROPERTIES_CONTENT_TYPE).stream()
+					.filter(UrfResourceDescription.class::isInstance).map(UrfResourceDescription.class::cast).findFirst();
 		}
 	}
 
@@ -122,7 +122,7 @@ public abstract class AbstractMummifier implements Mummifier {
 		final TurfSerializer turfSerializer = new TurfSerializer();
 		turfSerializer.setFormatted(true);
 		try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(descriptionFile))) {
-			turfSerializer.serializeDocument(outputStream, description);
+			turfSerializer.serializeDocument(outputStream, TURF.PROPERTIES_CONTENT_TYPE, description);
 		}
 	}
 
