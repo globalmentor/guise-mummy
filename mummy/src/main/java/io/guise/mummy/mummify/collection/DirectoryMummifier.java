@@ -43,7 +43,6 @@ import io.guise.mummy.*;
 import io.guise.mummy.mummify.*;
 import io.guise.mummy.mummify.page.*;
 import io.urf.model.UrfObject;
-import io.urf.model.UrfResourceDescription;
 import io.urf.vocab.content.Content;
 
 /**
@@ -87,12 +86,12 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This implementation returns empty; currently directory artifacts do not themselves have target descriptions, but rather rely on the target
-	 *           descriptions of any content file.
+	 * @implSpec This implementation returns the {@link Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION} itself as the filename, inside the target path but in the
+	 *           {@link MummyContext#getSiteDescriptionTargetDirectory()} directory.
 	 */
 	@Override
-	protected Optional<UrfResourceDescription> loadTargetDescription(final MummyContext context, final Path targetDirectory) throws IOException {
-		return Optional.empty();
+	protected Path getArtifactTargetDescriptionFile(final @Nonnull MummyContext context, final @Nonnull Path targetPath) {
+		return changeBase(targetPath, context.getSiteTargetDirectory(), context.getSiteDescriptionTargetDirectory()).resolve(DESCRIPTION_FILE_SIDECAR_EXTENSION);
 	}
 
 	/**
@@ -302,6 +301,10 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		return targetDirectory.resolve(childTargetFilename);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation saves the description description if modified by calling {@link #saveTargetDescription(MummyContext, Artifact)}.
+	 */
 	@Override
 	public void mummify(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
 		checkArgument(artifact instanceof DirectoryArtifact, "Artifact %s is not a directory artifact.");
@@ -317,8 +320,12 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		}
 
 		//mummify the directory content artifact, if present
-		directoryArtifact.getContentArtifact()
-				.ifPresent(throwingConsumer(contentArtifact -> contentArtifact.getMummifier().mummify(context, artifact, contentArtifact)));
+		directoryArtifact.getContentArtifact().ifPresentOrElse(throwingConsumer(contentArtifact -> {
+			contentArtifact.getMummifier().mummify(context, artifact, contentArtifact);
+			//TODO delete any target description file for the directory itself
+		}), () -> {
+			//TODO save any target description file, or delete it if there are no properties
+		});
 
 		//mummify each child artifact
 		for(final Artifact childArtifact : directoryArtifact.getChildArtifacts()) {

@@ -16,6 +16,8 @@
 
 package io.guise.mummy.mummify;
 
+import static com.globalmentor.io.Filenames.*;
+
 import java.io.IOException;
 import java.util.Set;
 
@@ -23,6 +25,7 @@ import javax.annotation.*;
 
 import io.clogr.Clogged;
 import io.guise.mummy.*;
+import io.urf.turf.TURF;
 
 /**
  * Processes a resource for mummification.
@@ -35,6 +38,19 @@ import io.guise.mummy.*;
  * @author Garret Wilson
  */
 public interface Mummifier extends Clogged {
+
+	/**
+	 * The extension segment for identifying a description sidecar; the <code>-</code> in <code>filename.ext.-.props</code>, where <var>props</var> is some
+	 * metadata extension.
+	 */
+	public static final String DESCRIPTION_FILE_SIDECAR_EXTENSION_SEGMENT = "-";
+
+	/**
+	 * The extension segment for identifying a description sidecar; the <code>-.props</code> in <code>filename.ext.-.props</code>, where <var>props</var> is some
+	 * metadata extension.
+	 * @apiNote This extension is used both for source metadata sidecar descriptions and for target description sidecar files.
+	 */
+	public static final String DESCRIPTION_FILE_SIDECAR_EXTENSION = addExtension(DESCRIPTION_FILE_SIDECAR_EXTENSION_SEGMENT, TURF.FILENAME_EXTENSION);
 
 	/**
 	 * Retrieves the extensions of files supported by this mummifier.

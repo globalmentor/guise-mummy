@@ -36,7 +36,6 @@ import com.globalmentor.security.MessageDigests;
 import io.guise.mummy.*;
 import io.guise.mummy.mummify.page.PostArtifact;
 import io.urf.model.*;
-import io.urf.turf.*;
 import io.urf.vocab.content.Content;
 
 /**
@@ -87,7 +86,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @param targetFile The target path in the site target directory for the artifact.
 	 * @return A description of the resource being mummified.
 	 * @throws IOException if there is an I/O error retrieving the description, including if the metadata is invalid.
-	 * @see #loadTargetDescription(MummyContext, Path)
+	 * @see #loadArtifactTargetDescription(MummyContext, Path)
 	 * @see #loadSourceMetadata(MummyContext, Path)
 	 * @see MummyContext#isIncremental()
 	 * @see MummyContext#isFull()
@@ -98,7 +97,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 		final Optional<UrfResourceDescription> cachedDescription;
 		if(context.isIncremental()) {
 			//we'll load the target description if we can, and see if we can use it
-			cachedDescription = loadTargetDescription(context, targetFile).filter(description -> {
+			cachedDescription = loadArtifactTargetDescription(context, targetFile).filter(description -> {
 				//check the source content modified timestamp, and discard the target description if the source content has changed at all
 				final boolean sourceContentDirty = description.findPropertyValue(PROPERTY_TAG_MUMMY_SOURCE_CONTENT_MODIFIED_AT)
 						//Check the timestamp against the actual file timestamp. We can compare them directly without using a range
@@ -173,6 +172,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 *          {@link #mummifyFile(MummyContext, Artifact, Artifact)} should be overridden instead.
 	 * @implSpec If incremental mummification is enabled via {@link MummyContext#isIncremental()}, this version checks the the timestamp of the target file, and
 	 *           delegates to {@link #mummifyFile(MummyContext, Artifact, Artifact)} if the file needs regenerated.
+	 * @implSpec This implementation saves the description description if modified by calling {@link #saveTargetDescription(MummyContext, Artifact)}.
 	 * @see Content#MODIFIED_AT_PROPERTY_TAG
 	 * @see Artifact#PROPERTY_TAG_MUMMY_DESCRIPTION_DIRTY
 	 * @see MummyContext#isIncremental()
@@ -226,11 +226,11 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 			} catch(final IOException ioException) {
 				//If there is any I/O error saving the description, set its dirty flag for completeness
 				//(although its usefulness at this point is questionable).
-				description.setPropertyValue(PROPERTY_TAG_MUMMY_DESCRIPTION_DIRTY, true); //we created a new description, so the description needs to be persisted
+				description.setPropertyValue(PROPERTY_TAG_MUMMY_DESCRIPTION_DIRTY, true);
 				throw ioException;
 			}
 		} else {
-			getLogger().debug("Using previously generated target description file `{}`.", getArtifactDescriptionFile(context, artifact));
+			getLogger().debug("Using previously generated target description file `{}`.", getArtifactTargetDescriptionFile(context, artifact));
 		}
 	}
 
@@ -244,28 +244,5 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @throws IOException if there is an I/O error during mummification.
 	 */
 	protected abstract void mummifyFile(@Nonnull final MummyContext context, @Nonnull Artifact contextArtifact, @Nonnull Artifact artifact) throws IOException;
-
-	/**
-	 * Saves an artifact's description as-is with no modifications.
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact being generated
-	 * @throws IOException if there is an I/O error saving the description.
-	 * @see #getArtifactDescriptionFile(MummyContext, Artifact)
-	 */
-	protected void saveTargetDescription(@Nonnull final MummyContext context, @Nonnull Artifact artifact) throws IOException {
-		final UrfResourceDescription description = artifact.getResourceDescription();
-		final Path descriptionFile = getArtifactDescriptionFile(context, artifact);
-		//create parent directory as needed
-		final Path descriptionTargetParentPath = descriptionFile.getParent();
-		if(descriptionTargetParentPath != null) {
-			createDirectories(descriptionTargetParentPath);
-		}
-		//save description
-		final TurfSerializer turfSerializer = new TurfSerializer();
-		turfSerializer.setFormatted(true);
-		try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(descriptionFile))) {
-			turfSerializer.serializeDocument(outputStream, description);
-		}
-	}
 
 }
