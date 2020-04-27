@@ -250,7 +250,7 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 		}
 		final Set<String> acceptedExtensions = getAcceptedExtensions(); //get the accepted extensions
 		if(acceptedExtensions != null) { //if we need to check the extensions
-			final String resourceExtension = getExtension(resourceImport.getName()); //get the extension of the resource import filename
+			final String resourceExtension = findExtension(resourceImport.getName()).orElse(null); //get the extension of the resource import filename
 			boolean isExtensionMatch = false; //see if we match an extension
 			for(final String extension : acceptedExtensions) { //look at all the accepted extensions
 				if((extension == null && resourceExtension == null) //if this is a null extension and the resource import extension is also null
