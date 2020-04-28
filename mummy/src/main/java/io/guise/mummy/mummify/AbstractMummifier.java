@@ -17,6 +17,7 @@
 package io.guise.mummy.mummify;
 
 import static com.globalmentor.io.Paths.*;
+import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.util.Optionals.*;
 import static java.nio.file.Files.*;
 import static java.util.Objects.*;
@@ -36,7 +37,7 @@ import io.guise.mummy.Artifact;
 import io.guise.mummy.MummyContext;
 import io.urf.URF;
 import io.urf.model.*;
-import io.urf.turf.TurfParser;
+import io.urf.turf.*;
 
 /**
  * An abstract mummifier to serve as a base class for mummifiers generally.
@@ -55,49 +56,73 @@ public abstract class AbstractMummifier implements Mummifier {
 
 	/**
 	 * Determines the output file path for an artifact description in the site description target directory for the given artifact.
-	 * @implSpec This implementation delegates to {@link #getArtifactDescriptionFile(MummyContext, Path)} using {@link Artifact#getTargetPath()}.
+	 * @implSpec This implementation delegates to {@link #getArtifactTargetDescriptionFile(MummyContext, Path)} using {@link Artifact#getTargetPath()}.
 	 * @param context The context of static site generation.
-	 * @param artifact The artifact for which a description file should be returned.
+	 * @param artifact The artifact for which a target description file should be returned.
 	 * @return The path in the site description target directory to which a description may be generated.
-	 * @throws IllegalArgumentException if the given source file is not in the target source tree.
 	 * @see Artifact#getTargetPath()
 	 */
-	protected Path getArtifactDescriptionFile(final @Nonnull MummyContext context, final @Nonnull Artifact artifact) {
-		return getArtifactDescriptionFile(context, artifact.getTargetPath());
+	protected Path getArtifactTargetDescriptionFile(final @Nonnull MummyContext context, final @Nonnull Artifact artifact) {
+		return getArtifactTargetDescriptionFile(context, artifact.getTargetPath());
 	}
 
 	/**
 	 * Determines the output file path for an artifact description in the site description target directory based upon the target path in the site target
 	 * directory.
-	 * @implSpec The default implementation produces a filename based upon the target path filename, but in the
-	 *           {@link MummyContext#getSiteDescriptionTargetDirectory()} directory.
+	 * @implSpec The default implementation produces a filename based upon the target path filename with the {@link Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION}
+	 *           added, but in the {@link MummyContext#getSiteDescriptionTargetDirectory()} directory.
 	 * @param context The context of static site generation.
-	 * @param targetPath The path in the site source directory.
+	 * @param targetPath The path in the site target directory.
 	 * @return The path in the site description target directory to which a description may be generated.
-	 * @throws IllegalArgumentException if the given source file is not in the target source tree.
+	 * @throws IllegalArgumentException if the given target path is not in the target source tree.
 	 * @see MummyContext#getSiteDescriptionTargetDirectory()
+	 * @see Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION
 	 */
-	protected Path getArtifactDescriptionFile(final @Nonnull MummyContext context, final @Nonnull Path targetPath) {
-		return addExtension(changeBase(targetPath, context.getSiteTargetDirectory(), context.getSiteDescriptionTargetDirectory()), "@.turf"); //TODO use constant
+	protected Path getArtifactTargetDescriptionFile(final @Nonnull MummyContext context, final @Nonnull Path targetPath) {
+		return addExtension(changeBase(targetPath, context.getSiteTargetDirectory(), context.getSiteDescriptionTargetDirectory()),
+				DESCRIPTION_FILE_SIDECAR_EXTENSION);
 	}
 
 	/**
-	 * Loads the generated target description if any of a source file.
+	 * Loads the generated target description of an artifact based upon its target path.
 	 * @param context The context of static site generation.
-	 * @param targetPath The path in the site target directory.
-	 * @throws IllegalArgumentException if the given source file is not in the site source tree.
+	 * @param targetPath The path in the site target directory (not the path of the target description itself).
+	 * @throws IllegalArgumentException if the given target path is not in the site target tree.
 	 * @return The generated target description, if present, of the resource being mummified.
 	 * @throws IOException if there is an I/O error retrieving the description, including if the metadata is invalid.
-	 * @see #getArtifactDescriptionFile(MummyContext, Path)
+	 * @see #getArtifactTargetDescriptionFile(MummyContext, Path)
 	 */
-	protected Optional<UrfResourceDescription> loadTargetDescription(@Nonnull MummyContext context, @Nonnull final Path targetPath) throws IOException {
-		final Path descriptionFile = getArtifactDescriptionFile(context, targetPath);
+	protected Optional<UrfResourceDescription> loadArtifactTargetDescription(@Nonnull MummyContext context, @Nonnull final Path targetPath) throws IOException {
+		final Path descriptionFile = getArtifactTargetDescriptionFile(context, targetPath);
 		if(!isRegularFile(descriptionFile)) {
 			return Optional.empty();
 		}
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(descriptionFile))) {
-			return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream).stream().filter(UrfResourceDescription.class::isInstance)
-					.map(UrfResourceDescription.class::cast).findFirst();
+			return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream, TURF.PROPERTIES_CONTENT_TYPE).stream()
+					.flatMap(asInstances(UrfResourceDescription.class)).findFirst();
+		}
+	}
+
+	/**
+	 * Saves an artifact's description as-is with no modifications.
+	 * @param context The context of static site generation.
+	 * @param artifact The artifact being generated
+	 * @throws IOException if there is an I/O error saving the description.
+	 * @see #getArtifactTargetDescriptionFile(MummyContext, Artifact)
+	 */
+	protected void saveTargetDescription(@Nonnull final MummyContext context, @Nonnull Artifact artifact) throws IOException {
+		final UrfResourceDescription description = artifact.getResourceDescription();
+		final Path descriptionFile = getArtifactTargetDescriptionFile(context, artifact);
+		//create parent directory as needed
+		final Path descriptionTargetParentPath = descriptionFile.getParent();
+		if(descriptionTargetParentPath != null) {
+			createDirectories(descriptionTargetParentPath);
+		}
+		//save description
+		final TurfSerializer turfSerializer = new TurfSerializer();
+		turfSerializer.setFormatted(true);
+		try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(descriptionFile))) {
+			turfSerializer.serializeDocument(outputStream, TURF.PROPERTIES_CONTENT_TYPE, description);
 		}
 	}
 

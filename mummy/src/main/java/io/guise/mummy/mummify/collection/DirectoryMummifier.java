@@ -20,6 +20,7 @@ import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.util.Optionals.*;
+import static io.guise.mummy.Artifact.PROPERTY_HANDLE_TITLE;
 import static io.guise.mummy.GuiseMummy.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
@@ -42,8 +43,7 @@ import io.confound.config.*;
 import io.guise.mummy.*;
 import io.guise.mummy.mummify.*;
 import io.guise.mummy.mummify.page.*;
-import io.urf.model.UrfObject;
-import io.urf.model.UrfResourceDescription;
+import io.urf.model.*;
 import io.urf.vocab.content.Content;
 
 /**
@@ -51,6 +51,11 @@ import io.urf.vocab.content.Content;
  * @implSpec This mummifier only works with instances of {@link DirectoryArtifact}.
  * @implNote Although the current implementation creates a default phantom content file if one is not present, this implementation will work without a known
  *           content file. This enables future implementations to allow configuration of whether a default content file is used.
+ * @implNote This implementation does not have a means for determining if a phantom content file (currently hard-coded in {@link DefaultXhtmlPhantomArtifact})
+ *           or its description (loaded from {@link #getArtifactSourceDescriptionFile(MummyContext, Path)}) has changed; therefore the target description file
+ *           for a phantom content file is always written.
+ * @implNote This implementation does not currently generate a target description file using {@link #getArtifactTargetDescriptionFile(MummyContext, Artifact)}
+ *           or {@link #getArtifactTargetDescriptionFile(MummyContext, Path)}, relying instead on the description file for the content file, if any.
  * @implSpec Currently directory artifacts do not themselves have target descriptions, but rather rely on the target descriptions of any content file.
  * @author Garret Wilson
  * @see DirectoryArtifact
@@ -87,12 +92,23 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This implementation returns empty; currently directory artifacts do not themselves have target descriptions, but rather rely on the target
-	 *           descriptions of any content file.
+	 * @implSpec This implementation returns the {@link Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION} itself as the filename but in the form of a dotfile, inside
+	 *           the directory being mummified.
 	 */
 	@Override
-	protected Optional<UrfResourceDescription> loadTargetDescription(final MummyContext context, final Path targetDirectory) throws IOException {
-		return Optional.empty();
+	protected Path getArtifactSourceDescriptionFile(final MummyContext context, final Path sourceDirectory) {
+		return sourceDirectory.resolve(DOTFILE_PREFIX + DESCRIPTION_FILE_SIDECAR_EXTENSION);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation returns the {@link Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION} itself as the filename, inside the target path but in the
+	 *           {@link MummyContext#getSiteDescriptionTargetDirectory()} directory.
+	 */
+	@Override
+	protected Path getArtifactTargetDescriptionFile(final MummyContext context, final Path targetDirectory) {
+		return changeBase(targetDirectory, context.getSiteTargetDirectory(), context.getSiteDescriptionTargetDirectory())
+				.resolve(DESCRIPTION_FILE_SIDECAR_EXTENSION);
 	}
 
 	/**
@@ -108,13 +124,18 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		//discover and plan the directory content file, if present
 		final Optional<Path> contentFile = discoverSourceDirectoryContentFile(context, sourceDirectory);
 		final Artifact contentArtifact = contentFile.map(throwingFunction(contentSourceFile -> { //nullable
+			final Path sourceDescriptionFile = getArtifactSourceDescriptionFile(context, sourceDirectory); //find out where to look for a source description
+			if(exists(sourceDescriptionFile)) {
+				getLogger().warn("Directory `{}` will use description of its content file `{}`; the source description file `{}` will be ignored.", sourceDirectory,
+						contentSourceFile, sourceDescriptionFile);
+			}
 			final SourcePathMummifier contentMummifier = context.findRegisteredMummifierForSourceFile(contentSourceFile).orElseThrow(IllegalStateException::new); //TODO improve error
 			//TODO normalize content filename
 			assert contentSourceFile.getFileName() != null;
 			final String contentTargetFilename = contentMummifier.planArtifactTargetFilename(context, contentSourceFile.getFileName().toString());
 			final Path contentTargetFile = targetDirectory.resolve(contentTargetFilename);
 			return contentMummifier.plan(context, contentSourceFile, contentTargetFile);
-		})).orElseGet(() -> { //if there is no directory content file, create a phantom page content file
+		})).orElseGet(throwingSupplier(() -> { //if there is no directory content file, create a phantom page content file
 			if(isAssetSourceDirectoryTree) { //don't generate content files for asset trees
 				return null;
 			}
@@ -130,14 +151,17 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 					.orElseThrow(IllegalStateException::new); //TODO improve error
 			final String phantomContentTargetFilename = phantomContentMummifier.planArtifactTargetFilename(context, phantomContentSourceFilename);
 			final Path phantomContentTargetFile = targetDirectory.resolve(phantomContentTargetFilename);
-			final UrfObject phantomDescription = new UrfObject();
-			final Path directoryFilename = sourceDirectory.getFileName();
-			if(directoryFilename != null) { //set the title to match the directory filename, if present
-				phantomDescription.setPropertyValueByHandle(Artifact.PROPERTY_HANDLE_TITLE, directoryFilename.toString());
+			final UrfResourceDescription phantomDescription = loadArtifactSourceDescription(context, sourceDirectory).orElseGet(() -> new UrfObject());
+			if(!phantomDescription.hasPropertyValueByHandle(PROPERTY_HANDLE_TITLE)) { //if any source description did not contain a title, add a default one
+				final Path directoryFilename = sourceDirectory.getFileName();
+				if(directoryFilename != null) { //set the title to match the directory filename, if present
+					phantomDescription.setPropertyValueByHandle(Artifact.PROPERTY_HANDLE_TITLE, directoryFilename.toString());
+				}
 			}
 			phantomDescription.setPropertyValue(Content.TYPE_PROPERTY_TAG, PageMummifier.PAGE_MEDIA_TYPE);
+			//TODO do we need to set the description dirty so that the description will get serialized?
 			return new DefaultXhtmlPhantomArtifact(phantomContentMummifier, phantomContentSourceFile, phantomContentTargetFile, phantomDescription);
-		});
+		}));
 
 		//discover and plan the child artifacts
 		final Pattern assetNamePattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN, Pattern.class);
@@ -302,6 +326,10 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		return targetDirectory.resolve(childTargetFilename);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation saves the description description if modified by calling {@link #saveTargetDescription(MummyContext, Artifact)}.
+	 */
 	@Override
 	public void mummify(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
 		checkArgument(artifact instanceof DirectoryArtifact, "Artifact %s is not a directory artifact.");
@@ -317,8 +345,13 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		}
 
 		//mummify the directory content artifact, if present
-		directoryArtifact.getContentArtifact()
-				.ifPresent(throwingConsumer(contentArtifact -> contentArtifact.getMummifier().mummify(context, artifact, contentArtifact)));
+		directoryArtifact.getContentArtifact().ifPresent(throwingConsumer(contentArtifact -> {
+			contentArtifact.getMummifier().mummify(context, artifact, contentArtifact);
+			//Note that if a content file was once but no longer present, an orphaned content file
+			//description would be left, but the ways these circumstances could come about are
+			//largely theoretical (e.g. converting a source directory to an assets tree and
+			//renaming the target tree to match). 
+		}));
 
 		//mummify each child artifact
 		for(final Artifact childArtifact : directoryArtifact.getChildArtifacts()) {
