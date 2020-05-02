@@ -71,6 +71,8 @@ import io.urf.vocab.content.Content;
 
 /**
  * Abstract base mummifier for generating HTML pages.
+ * @implSpec This mummifier generates pages using the string configured for {@value GuiseMummy#CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR} as the newline
+ *           sequence in order to provide consistent, repeatable build across platforms.
  * @author Garret Wilson
  */
 public abstract class AbstractPageMummifier extends AbstractFileMummifier implements PageMummifier {
@@ -410,6 +412,10 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		return childElementsOf(element).map(this::getExcerpt).flatMap(Optional::stream).findFirst();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR
+	 */
 	@Override
 	public void mummifyFile(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
 
@@ -440,6 +446,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			//#save target document
 			try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))) {
 				final HtmlSerializer htmlSerializer = new HtmlSerializer(true, PageFormatProfile.INSTANCE);
+				htmlSerializer.setLineSeparator(context.getConfiguration().getString(CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR));
 				htmlSerializer.serialize(ascribedDocument, null, null, outputStream); //serialize using the HTML5 doctype (with no public or system ID)
 			}
 			getLogger().trace("Generated page output document `{}`.", artifact.getTargetPath());

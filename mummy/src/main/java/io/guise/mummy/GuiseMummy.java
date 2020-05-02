@@ -194,6 +194,11 @@ public class GuiseMummy implements Clogged {
 	/** The configuration for the base filename of a template; defaults to <code>.template</code>. */
 	public static final String CONFIG_KEY_MUMMY_TEMPLATE_BASE_NAME = "mummy.templateBaseName";
 	/**
+	 * The configuration specifying the newline character sequence to use. Defaults to <code>LF</code> (<code>U+000A</code>) in order to have repeatable builds
+	 * across platforms.
+	 */
+	public static final String CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR = "mummy.textOutputLineSeparator";
+	/**
 	 * The regular expression indicating if an artifact should be considered <dfn>veiled</dfn> if its name matches. The regular expression may have at most one
 	 * matching group. If there is a matching group and it provides a match, the artifact will be renamed to the value of the matched group. If there is no
 	 * matching group, the artifact will not have a separate unveiled name. In either case, the artifact may still be subject to other renaming rules, such as
@@ -493,6 +498,7 @@ public class GuiseMummy implements Clogged {
 		defaultSettings.put(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, List.of("index"));
 		defaultSettings.put(CONFIG_KEY_MUMMY_NAVIGATION_LIST_NAME, ".navigation.lst");
 		defaultSettings.put(CONFIG_KEY_MUMMY_TEMPLATE_BASE_NAME, ".template");
+		defaultSettings.put(CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR, "\n");
 		defaultSettings.put(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.compile("_(.*)"));
 		final Configuration defaultConfiguration = new ObjectMapConfiguration(defaultSettings);
 
