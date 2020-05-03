@@ -422,14 +422,16 @@ public class S3 implements DeployTarget, Clogged {
 					final Optional<byte[]> fingerprint = filterAsInstance(description.findPropertyValue(Content.FINGERPRINT_PROPERTY_TAG), byte[].class); //TODO improve URF to use immutable byte string
 					final boolean s3ObjectChanged = context.isFull() //for full mummification, short-circuit and don't compare fingerprints
 							|| fingerprint.flatMap(descriptionFingerprint -> {
-								final HeadObjectResponse head = s3Client.headObject(builder -> builder.bucket(bucket).key(key));
 								try {
+									final HeadObjectResponse head = s3Client.headObject(builder -> builder.bucket(bucket).key(key));
 									return Optional.ofNullable(head.metadata().get(METADATA_CONTENT_FINGERPRINT)).map(base64 -> Base64.getUrlDecoder().decode(base64))
 											.map(s3ObjectFingerprint -> !Arrays.equals(s3ObjectFingerprint, descriptionFingerprint)); //S3 object changed if the fingerprints do _not_ match
-								} catch(final IllegalArgumentException illegalArgumentException) {
+								} catch(final IllegalArgumentException illegalArgumentException) { //if there was some problem decoding the fingerprint value
 									getLogger().warn("Invalid S3 object fingerprint metadata `{}` for key `{}`: {}", METADATA_CONTENT_FINGERPRINT, key,
 											illegalArgumentException.getMessage(), illegalArgumentException);
 									return Optional.empty(); //a valid fingerprint was not found
+								} catch(final NoSuchKeyException noSuchKeyException) { //if the object doesn't even exist on S3
+									return Optional.empty();
 								}
 							}).orElse(true); //if the description fingerprint and/or S3 object fingerprint is missing, assume the object has changed
 					if(s3ObjectChanged) {
