@@ -19,6 +19,7 @@ package io.guise.mummy.mummify;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.util.Optionals.*;
+import static io.guise.mummy.GuiseMummy.*;
 import static java.nio.file.Files.*;
 import static java.util.Objects.*;
 
@@ -33,14 +34,15 @@ import java.util.regex.Pattern;
 import javax.annotation.*;
 
 import io.clogr.Clogr;
-import io.guise.mummy.Artifact;
-import io.guise.mummy.MummyContext;
+import io.guise.mummy.*;
 import io.urf.URF;
 import io.urf.model.*;
 import io.urf.turf.*;
 
 /**
  * An abstract mummifier to serve as a base class for mummifiers generally.
+ * @implSpec This mummifier generates description files using the string configured for {@value GuiseMummy#CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR} as the
+ *           newline sequence in order to provide consistent, repeatable build across platforms.
  * @author Garret Wilson
  */
 public abstract class AbstractMummifier implements Mummifier {
@@ -109,6 +111,7 @@ public abstract class AbstractMummifier implements Mummifier {
 	 * @param artifact The artifact being generated
 	 * @throws IOException if there is an I/O error saving the description.
 	 * @see #getArtifactTargetDescriptionFile(MummyContext, Artifact)
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR
 	 */
 	protected void saveTargetDescription(@Nonnull final MummyContext context, @Nonnull Artifact artifact) throws IOException {
 		final UrfResourceDescription description = artifact.getResourceDescription();
@@ -121,6 +124,7 @@ public abstract class AbstractMummifier implements Mummifier {
 		//save description
 		final TurfSerializer turfSerializer = new TurfSerializer();
 		turfSerializer.setFormatted(true);
+		turfSerializer.setLineSeparator(context.getConfiguration().getString(CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR));
 		try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(descriptionFile))) {
 			turfSerializer.serializeDocument(outputStream, TURF.PROPERTIES_CONTENT_TYPE, description);
 		}
