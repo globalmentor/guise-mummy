@@ -285,13 +285,19 @@ public class S3Website extends S3 {
 			final Configuration configuration = context.getConfiguration();
 			final Set<RoutingRule> routingRules = getRoutingRuleRedirectObjects().stream().map(redirectObject -> {
 				final Optional<String> siteHostName = getSiteDomain().map(DomainName.ROOT::relativize).map(DomainName::toString);
-				return RoutingRule.builder().condition(condition -> condition.keyPrefixEquals(redirectObject.getKey())).redirect(redirect -> {
+				final String redirectKey = redirectObject.getKey();
+				return RoutingRule.builder().condition(condition -> condition.keyPrefixEquals(redirectKey)).redirect(redirect -> {
 					final String redirectTargetKey = redirectObject.getRedirectTargetKey();
-					//If the artifact (e.g. a directory) can contain other artifacts, we'll replace the entire key prefix
+					//If both the redirect key (e.g. `foo/`) is a collection, and the target artifact can contain other artifacts
+					//((e.g. a directory, which basically means it is a collection as well), we'll replace the entire key prefix
 					//to allow redirects for contained artifacts as well. Otherwise replace the entire key in case an artifact
-					//key matches the prefix of another non-redirected path (not expected to occur frequently in practice).
-					//(This applies to a collection `foo/` redirecting to a non-collection `bar` as well.) 
-					if(redirectObject.getTargetArtifact() instanceof CollectionArtifact) {
+					//key matches the prefix of another non-redirected path (not expected to occur frequently in practice). Examples:
+					//* `foo/index.xhtml` to `foo/index.html`: Replace entire key. 
+					//* `foo/index.html` to `foo/`: Replace entire key. 
+					//* `foo/` to `foo`: Replace entire key. 
+					//* `foo/` to `bar`: Replace entire key. 
+					//* `foo/` to `bar/`: Replace key prefix. 
+					if(isCollectionPath(redirectKey) && redirectObject.getTargetArtifact() instanceof CollectionArtifact) {
 						redirect.replaceKeyPrefixWith(redirectTargetKey);
 					} else {
 						redirect.replaceKeyWith(redirectTargetKey);
