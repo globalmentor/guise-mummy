@@ -18,8 +18,6 @@ package io.guise.mummy.deploy.aws;
 
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
-import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.util.Optionals.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
@@ -32,7 +30,6 @@ import java.util.stream.Stream;
 
 import javax.annotation.*;
 
-import com.globalmentor.collections.*;
 import com.globalmentor.net.*;
 import com.globalmentor.text.StringTemplate;
 
@@ -41,9 +38,7 @@ import io.confound.config.Configuration;
 import io.confound.config.ConfigurationException;
 import io.guise.mummy.*;
 import io.guise.mummy.deploy.DeployTarget;
-import io.guise.mummy.mummify.collection.DirectoryArtifact;
 import io.urf.URF.Handle;
-import io.urf.model.UrfResourceDescription;
 import io.urf.vocab.content.Content;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.exception.SdkException;
@@ -210,11 +205,11 @@ public class S3 implements DeployTarget, Clogged {
 		return s3Client;
 	}
 
-	private final ReverseMap<Artifact, String> artifactKeys = new DecoratorReverseMap<>(new LinkedHashMap<>(), new HashMap<>());
+	private final Map<String, S3DeployObject> deployObjectsByKey = new LinkedHashMap<>();
 
-	/** @return The map of S3 object keys for each artifact. */
-	protected ReverseMap<Artifact, String> getArtifactKeys() {
-		return artifactKeys;
+	/** @return The map of S3 objects to deploy, associated with their bucket keys. */
+	protected Map<String, S3DeployObject> getDeployObjectsByKey() {
+		return deployObjectsByKey;
 	}
 
 	/**
@@ -380,7 +375,8 @@ public class S3 implements DeployTarget, Clogged {
 
 	/**
 	 * Plans deployment of a single resource.
-	 * @implSpec This version stores an S3 key for the resource in {@link #getArtifactKeys()}.
+	 * @implSpec This version stores an S3 key and deploy object for the resource in {@link #getDeployObjectsByKey()}.
+	 * @implSpec This implementation does not add a deploy object for a {@link CollectionArtifact}.
 	 * @param context The context of static site generation.
 	 * @param rootArtifact The root artifact of the site being deployed.
 	 * @param artifact The current artifact for which deployment is being planned.
@@ -391,7 +387,9 @@ public class S3 implements DeployTarget, Clogged {
 			@Nonnull final URIPath resourceReference) throws IOException {
 		final String key = resourceReference.toString();
 		getLogger().debug("Planning deployment for artifact {}, S3 key `{}`.", artifact, key);
-		getArtifactKeys().put(artifact, key);
+		if(!(artifact instanceof CollectionArtifact)) { //don't deploy an S3 object for collection artifacts (e.g. directories)
+			getDeployObjectsByKey().put(key, new S3ArtifactDeployObject(key, artifact));
+		}
 	}
 
 	/** The handle of the content fingerprint tag as a convenience, used for object metadata. */
@@ -414,43 +412,34 @@ public class S3 implements DeployTarget, Clogged {
 		try {
 			final S3Client s3Client = getS3Client();
 			final String bucket = getBucket();
-			for(final Map.Entry<Artifact, String> artifactKeyEntry : getArtifactKeys().entrySet()) {
-				final Artifact artifact = artifactKeyEntry.getKey();
-				if(!(artifact instanceof DirectoryArtifact)) { //don't deploy anything for directories TODO improve semantics, especially after the root artifact type changes; maybe use CollectionArtifact
-					final String key = artifactKeyEntry.getValue();
-					final UrfResourceDescription description = artifact.getResourceDescription();
-					final Optional<byte[]> fingerprint = filterAsInstance(description.findPropertyValue(Content.FINGERPRINT_PROPERTY_TAG), byte[].class); //TODO improve URF to use immutable byte string
-					final boolean s3ObjectChanged = context.isFull() //for full mummification, short-circuit and don't compare fingerprints
-							|| fingerprint.flatMap(descriptionFingerprint -> {
-								try {
-									final HeadObjectResponse head = s3Client.headObject(builder -> builder.bucket(bucket).key(key));
-									return Optional.ofNullable(head.metadata().get(METADATA_CONTENT_FINGERPRINT)).map(base64 -> Base64.getUrlDecoder().decode(base64))
-											.map(s3ObjectFingerprint -> !Arrays.equals(s3ObjectFingerprint, descriptionFingerprint)); //S3 object changed if the fingerprints do _not_ match
-								} catch(final IllegalArgumentException illegalArgumentException) { //if there was some problem decoding the fingerprint value
-									getLogger().warn("Invalid S3 object fingerprint metadata `{}` for key `{}`: {}", METADATA_CONTENT_FINGERPRINT, key,
-											illegalArgumentException.getMessage(), illegalArgumentException);
-									return Optional.empty(); //a valid fingerprint was not found
-								} catch(final NoSuchKeyException noSuchKeyException) { //if the object doesn't even exist on S3
-									return Optional.empty();
-								}
-							}).orElse(true); //if the description fingerprint and/or S3 object fingerprint is missing, assume the object has changed
-					if(s3ObjectChanged) {
-						getLogger().info("Deploying artifact to S3 key `{}`.", key);
-						final PutObjectRequest.Builder putBuilder = PutObjectRequest.builder().bucket(bucket).key(key);
-						//set content-type if found
-						description.findPropertyValue(Content.TYPE_PROPERTY_TAG).map(Object::toString).ifPresent(putBuilder::contentType);
-						//set other metadata, if any
-						final Map<String, String> metadata = new HashMap<>(); //there will likely always be some metadata 
-						description.findPropertyValue(Content.FINGERPRINT_PROPERTY_TAG).flatMap(asInstance(byte[].class))
-								.map(bytes -> Base64.getUrlEncoder().withoutPadding().encodeToString(bytes))
-								.ifPresent(base64 -> metadata.put(METADATA_CONTENT_FINGERPRINT, base64));
-						if(!metadata.isEmpty()) {
-							putBuilder.metadata(metadata);
-						}
-						s3Client.putObject(putBuilder.build(), RequestBody.fromFile(artifact.getTargetPath()));
-					} else {
-						getLogger().debug("Keeping previously deployed S3 object for key `{}`.", key);
+			for(final S3DeployObject deployObject : getDeployObjectsByKey().values()) {
+				final String key = deployObject.getKey();
+				final Optional<byte[]> foundFingerprint = deployObject.findFingerprint();
+				final boolean s3ObjectChanged = context.isFull() //for full mummification, short-circuit and don't compare fingerprints
+						|| foundFingerprint.flatMap(deployObjectFingerprint -> {
+							try {
+								final HeadObjectResponse head = s3Client.headObject(builder -> builder.bucket(bucket).key(key));
+								return Optional.ofNullable(head.metadata().get(METADATA_CONTENT_FINGERPRINT)).map(base64 -> Base64.getUrlDecoder().decode(base64))
+										.map(s3ObjectFingerprint -> !Arrays.equals(s3ObjectFingerprint, deployObjectFingerprint)); //S3 object changed if the fingerprints do _not_ match
+							} catch(final IllegalArgumentException illegalArgumentException) { //if there was some problem decoding the fingerprint value
+								getLogger().warn("Invalid S3 object fingerprint metadata `{}` for key `{}`: {}", METADATA_CONTENT_FINGERPRINT, key,
+										illegalArgumentException.getMessage(), illegalArgumentException);
+								return Optional.empty(); //a valid fingerprint was not found
+							} catch(final NoSuchKeyException noSuchKeyException) { //if the object doesn't even exist on S3
+								return Optional.empty();
+							}
+						}).orElse(true); //if the description fingerprint and/or S3 object fingerprint is missing, assume the object has changed
+				if(s3ObjectChanged) {
+					getLogger().info("Deploying object to S3 key `{}`.", key);
+					final PutObjectRequest.Builder putBuilder = PutObjectRequest.builder().bucket(bucket).key(key).contentType(deployObject.getContentType());
+					final Map<String, String> metadata = deployObject.getMetadata(); //set other metadata, if any 
+					if(!metadata.isEmpty()) {
+						putBuilder.metadata(metadata);
 					}
+					s3Client.putObject(putBuilder.build(),
+							RequestBody.fromContentProvider(deployObject.createContentStreamProvider(), deployObject.getContentLength(), deployObject.getContentType()));
+				} else {
+					getLogger().debug("Keeping previously deployed S3 object for key `{}`.", key);
 				}
 			}
 		} catch(final SdkException sdkException) {
@@ -470,14 +459,14 @@ public class S3 implements DeployTarget, Clogged {
 		try {
 			final S3Client s3Client = getS3Client();
 			final String bucket = getBucket();
-			final ReverseMap<Artifact, String> artifactKeys = getArtifactKeys();
+			final Map<String, S3DeployObject> deployObjectsByKey = getDeployObjectsByKey();
 			ListObjectsV2Request listObjectsRequest = ListObjectsV2Request.builder().bucket(bucket).build();
 			ListObjectsV2Response listObjectsResponse;
 			do {
 				listObjectsResponse = s3Client.listObjectsV2(listObjectsRequest);
 				for(final S3Object s3Object : listObjectsResponse.contents()) {
 					final String key = s3Object.key();
-					if(!artifactKeys.containsValue(key)) { //if this object isn't in our site, delete it
+					if(!deployObjectsByKey.containsKey(key)) { //if this object isn't in our site, delete it
 						getLogger().info("Pruning S3 object `{}`.", key);
 						s3Client.deleteObject(builder -> builder.bucket(bucket).key(key));
 					}

@@ -17,7 +17,6 @@
 package io.guise.mummy.deploy.aws;
 
 import static com.globalmentor.io.Filenames.*;
-import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.net.URIs.*;
 import static io.guise.mummy.Artifact.*;
@@ -37,7 +36,6 @@ import javax.annotation.*;
 
 import org.slf4j.Logger;
 
-import com.globalmentor.collections.*;
 import com.globalmentor.net.*;
 import com.globalmentor.text.StringTemplate;
 
@@ -138,11 +136,11 @@ public class S3Website extends S3 {
 		return concat(super.buckets(), getAltBuckets().stream());
 	}
 
-	private final Map<Artifact, String> artifactAltKeys = new LinkedHashMap<>();
+	private final Set<S3ArtifactRedirectDeployObject> routingRuleRedirectObjects = new LinkedHashSet<>();
 
-	/** @return The map of alternative (redirect) keys for artifacts that have redirects. */
-	protected Map<Artifact, String> getArtifactAltKeys() {
-		return artifactAltKeys;
+	/** @return The map of redirects to be implemented using routing rules. */
+	protected Set<S3ArtifactRedirectDeployObject> getRoutingRuleRedirectObjects() {
+		return routingRuleRedirectObjects;
 	}
 
 	/**
@@ -285,23 +283,18 @@ public class S3Website extends S3 {
 		try { //configure bucket for web site with appropriate redirects
 			getLogger().info("Configuring S3 bucket `{}` for web site access.", bucket);
 			final Configuration configuration = context.getConfiguration();
-			final ReverseMap<Artifact, String> artifactKeys = getArtifactKeys();
-			final Map<Artifact, String> artifactAltKeys = getArtifactAltKeys();
-			final Set<RoutingRule> routingRules = artifactAltKeys.entrySet().stream().map(artifactAltKeyEntry -> {
-				final Artifact artifact = artifactAltKeyEntry.getKey();
-				final String altKey = artifactAltKeyEntry.getValue();
-				final String artifactKey = artifactKeys.get(artifact);
-				checkState(artifactKey != null, "An S3 object key should have been determined for artifact %s during planning.", artifact);
+			final Set<RoutingRule> routingRules = getRoutingRuleRedirectObjects().stream().map(redirectObject -> {
 				final Optional<String> siteHostName = getSiteDomain().map(DomainName.ROOT::relativize).map(DomainName::toString);
-				return RoutingRule.builder().condition(condition -> condition.keyPrefixEquals(altKey)).redirect(redirect -> {
+				return RoutingRule.builder().condition(condition -> condition.keyPrefixEquals(redirectObject.getKey())).redirect(redirect -> {
+					final String redirectTargetKey = redirectObject.getRedirectTargetKey();
 					//If the artifact (e.g. a directory) can contain other artifacts, we'll replace the entire key prefix
 					//to allow redirects for contained artifacts as well. Otherwise replace the entire key in case an artifact
 					//key matches the prefix of another non-redirected path (not expected to occur frequently in practice).
 					//(This applies to a collection `foo/` redirecting to a non-collection `bar` as well.) 
-					if(artifact instanceof CollectionArtifact) {
-						redirect.replaceKeyPrefixWith(artifactKey);
+					if(redirectObject.getTargetArtifact() instanceof CollectionArtifact) {
+						redirect.replaceKeyPrefixWith(redirectTargetKey);
 					} else {
-						redirect.replaceKeyWith(artifactKey);
+						redirect.replaceKeyWith(redirectTargetKey);
 					}
 					//Set the host name if we know the site domain name, to prevent any distribution from redirecting back to the bucket URL.
 					//See https://stackoverflow.com/q/58477877/421049 .
@@ -342,7 +335,7 @@ public class S3Website extends S3 {
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This version additionally stores S3 keys for any alt locations {@link #getArtifactAltKeys()}.
+	 * @implSpec This version additionally stores S3 redirect deploy objects for any alt locations in {@link #getRoutingRuleRedirectObjects()}.
 	 * @see Artifact#PROPERTY_TAG_MUMMY_ALT_LOCATION
 	 */
 	@Override
@@ -358,8 +351,9 @@ public class S3Website extends S3 {
 								resourceReference, altLocationReference));
 					}
 					final String altKey = altLocationReference.toString();
-					getLogger().debug("Planning deployment redirect for artifact {} from S3 key `{}` to S3 key `{}`.", artifact, altKey, resourceReference.toString());
-					getArtifactAltKeys().put(artifact, altKey);
+					final String artifactKey = resourceReference.toString();
+					getLogger().debug("Planning deployment redirect for artifact {} from S3 key `{}` to S3 key `{}`.", artifact, altKey, artifactKey);
+					getRoutingRuleRedirectObjects().add(new S3ArtifactRedirectDeployObject(altKey, artifactKey, artifact));
 				}));
 	}
 
