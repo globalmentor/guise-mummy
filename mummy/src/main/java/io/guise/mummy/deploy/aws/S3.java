@@ -191,13 +191,6 @@ public class S3 implements DeployTarget, Clogged {
 		return Stream.of(getBucket());
 	}
 
-	private final DomainName siteDomain;
-
-	/** @return The explicit site domain if specified, which may be the same or different than the bucket name. */
-	public Optional<DomainName> getSiteDomain() {
-		return Optional.ofNullable(siteDomain);
-	}
-
 	private final S3Client s3Client;
 
 	/** @return The client for connecting to S3. */
@@ -217,11 +210,9 @@ public class S3 implements DeployTarget, Clogged {
 	 * <p>
 	 * The region is retrieved from {@value #CONFIG_KEY_REGION} in the local configuration. The bucket name is retrieved from {@value #CONFIG_KEY_BUCKET} in the
 	 * local configuration, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and finally {@value GuiseMummy#CONFIG_KEY_DOMAIN} in the context
-	 * configuration if not specified. The site domain if explicitly set is retrieved from {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN}, resolved as appropriate to
-	 * any project domain.
+	 * configuration if not specified.
 	 * </p>
 	 * @implSpec This method calls {@link #getConfiguredBucket(Configuration, Configuration)} to determine the bucket.
-	 * @implSpec This method calls {@link GuiseMummy#findConfiguredSiteDomain(Configuration)} to determine the site domain, if any.
 	 * @param context The context of static site generation.
 	 * @param localConfiguration The local configuration for this deployment target, which may be a section of the project configuration.
 	 * @see AWS#CONFIG_KEY_DEPLOY_AWS_PROFILE
@@ -233,7 +224,7 @@ public class S3 implements DeployTarget, Clogged {
 	 */
 	public S3(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
 		this(context.getConfiguration().findString(AWS.CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null), Region.of(localConfiguration.getString(CONFIG_KEY_REGION)),
-				getConfiguredBucket(context.getConfiguration(), localConfiguration), findConfiguredSiteDomain(context.getConfiguration()).orElse(null));
+				getConfiguredBucket(context.getConfiguration(), localConfiguration));
 	}
 
 	/**
@@ -241,18 +232,11 @@ public class S3 implements DeployTarget, Clogged {
 	 * @param profile The name of the AWS profile to use for retrieving credentials, or <code>null</code> if the default credential provider should be used.
 	 * @param region The AWS region of deployment.
 	 * @param bucket The bucket into which the site should be deployed.
-	 * @param siteDomain The full-qualified domain name of the site. If specified, it will be used in cases that which a site other than the bucket is to be
-	 *          indicated, such as in redirect hostname, to prevent e.g. a CloudFront distribution redirecting back to the bucket URL.
-	 * @throws IllegalArgumentException if the given site domain is not absolute.
 	 */
-	public S3(@Nullable String profile, @Nonnull final Region region, @Nonnull String bucket, @Nullable DomainName siteDomain) {
+	public S3(@Nullable String profile, @Nonnull final Region region, @Nonnull String bucket) {
 		this.profile = profile;
 		this.region = requireNonNull(region);
 		this.bucket = requireNonNull(bucket);
-		if(siteDomain != null) {
-			siteDomain.checkArgumentAbsolute();
-		}
-		this.siteDomain = siteDomain;
 		final S3ClientBuilder s3ClientBuilder = S3Client.builder().region(region);
 		if(profile != null) {
 			s3ClientBuilder.credentialsProvider(ProfileCredentialsProvider.create(profile));

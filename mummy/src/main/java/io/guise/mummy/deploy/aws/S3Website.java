@@ -136,6 +136,13 @@ public class S3Website extends S3 {
 		return concat(super.buckets(), getAltBuckets().stream());
 	}
 
+	private final DomainName siteDomain;
+
+	/** @return The explicit site domain if specified, which may be the same or different than the bucket name. */
+	public Optional<DomainName> getSiteDomain() {
+		return Optional.ofNullable(siteDomain);
+	}
+
 	private final Set<S3ArtifactRedirectDeployObject> routingRuleRedirectObjects = new LinkedHashSet<>();
 
 	/** @return The map of redirects to be implemented using routing rules. */
@@ -185,8 +192,12 @@ public class S3Website extends S3 {
 	 */
 	public S3Website(@Nullable String profile, @Nonnull final Region region, @Nonnull String bucket, @Nonnull final Collection<String> altBuckets,
 			@Nullable DomainName siteDomain) {
-		super(profile, region, bucket, siteDomain);
+		super(profile, region, bucket);
 		this.altBuckets = new LinkedHashSet<>(altBuckets); //maintain order to help with reporting and debugging
+		if(siteDomain != null) {
+			siteDomain.checkArgumentAbsolute();
+		}
+		this.siteDomain = siteDomain;
 	}
 
 	/**
