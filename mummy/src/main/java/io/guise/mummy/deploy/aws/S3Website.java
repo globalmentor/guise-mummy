@@ -17,12 +17,15 @@
 package io.guise.mummy.deploy.aws;
 
 import static com.globalmentor.io.Filenames.*;
+import static com.globalmentor.java.Conditions.*;
+import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.net.URIs.*;
 import static io.guise.mummy.Artifact.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static io.guise.mummy.mummify.page.PageMummifier.PAGE_NAME_EXTENSION;
 import static java.util.Collections.*;
+import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 import static java.util.stream.Stream.*;
 import static org.zalando.fauxpas.FauxPas.*;
@@ -36,6 +39,7 @@ import javax.annotation.*;
 
 import org.slf4j.Logger;
 
+import com.globalmentor.lex.Identifier;
 import com.globalmentor.net.*;
 import com.globalmentor.text.StringTemplate;
 
@@ -58,6 +62,53 @@ public class S3Website extends S3 {
 	 * {@link GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} resolved against any {@link GuiseMummy#CONFIG_KEY_DOMAIN} in the global configuration.
 	 */
 	public static final String CONFIG_KEY_ALT_BUCKETS = "altBuckets";
+
+	/**
+	 * The section relative key for the approach to be used for implementing redirects for resource alt locations on S3 websites. The value is the lowercase,
+	 * kebab-case form of {@link RedirectMeans} (e.g. <code>routing-rule</code>).
+	 */
+	public static final String CONFIG_KEY_REDIRECT_MEANS = "redirectMeans";
+
+	/**
+	 * The default value to use for the means of redirection if none is specified in the configuration.
+	 * @see #CONFIG_KEY_REDIRECT_MEANS
+	 */
+	public static final RedirectMeans DEFAULT_REDIRECT_MEANS = RedirectMeans.OPTIMAL;
+
+	/**
+	 * The section relative key for the number of redirects required to switch to using object-redirects for non-collection alt locations.
+	 * @apiNote This number must not be greater than <code>50</code>, because as of May 2020 AWS S3 does not allow more than this number of routing rule-based
+	 *          redirects; otherwise the following error will occur:
+	 *          <blockquote><code>software.amazon.awssdk.services.s3.model.S3Exception: … routing rules provided,
+	 *           the number of routing rules in a website configuration is limited to 50. (Service: S3, Status Code: 400, Request ID: …)</code></blockquote>
+	 */
+	public static final String CONFIG_KEY_REDIRECT_COUNT_OPTIMAL_THRESHOLD = "redirectCountOptimalThreshold";
+
+	/**
+	 * The default number of redirects required to switch to using object-redirects for non-collection alt locations.
+	 * @apiNote This redirect count optimal threshold must not be greater than <code>50</code>, because as of May 2020 AWS S3 does not allow more than this number
+	 *          of routing rule-based redirects; otherwise the following error will occur:
+	 *          <blockquote><code>software.amazon.awssdk.services.s3.model.S3Exception: … routing rules provided,
+	 *           the number of routing rules in a website configuration is limited to 50. (Service: S3, Status Code: 400, Request ID: …)</code></blockquote>
+	 * @see #CONFIG_KEY_REDIRECT_COUNT_OPTIMAL_THRESHOLD
+	 */
+	public static final int DEFAULT_REDIRECT_COUNT_OPTIMAL_OPTIMAL_THRESHOLD = 30;
+
+	/** The S3 website means to be used for effecting redirects. */
+	public enum RedirectMeans implements Identifier {
+
+		/** All redirects use objects. */
+		OBJECT,
+		/** All redirects use routing rules. */
+		ROUTING_RULE,
+		/** Redirects use objects, except for collection-to-collection redirects, which use routing rules. */
+		AUTO,
+		/**
+		 * Functions like {@link #ROUTING_RULE} if the total number of redirects is below the optimal threshold
+		 * {@link S3Website#getRedirectCountOptimalThreshold()}; otherwise functions like {@link #AUTO}.
+		 */
+		OPTIMAL;
+	}
 
 	/**
 	 * The regions that use a dash (<code>-</code>) instead of a dot (<code>.</code>) to separate <code>s3-website</code> from the region in the endpoint domain
@@ -143,6 +194,20 @@ public class S3Website extends S3 {
 		return Optional.ofNullable(siteDomain);
 	}
 
+	private final RedirectMeans redirectMeans;
+
+	/** @return The S3 website means to be used for effecting redirects. */
+	public RedirectMeans getRedirectMeans() {
+		return redirectMeans;
+	}
+
+	private final int redirectCountOptimalThreshold;
+
+	/** @return The number of redirects required to switch to using object-redirects for non-collection alt locations. */
+	public int getRedirectCountOptimalThreshold() {
+		return redirectCountOptimalThreshold;
+	}
+
 	private final Set<S3ArtifactRedirectDeployObject> routingRuleRedirectObjects = new LinkedHashSet<>();
 
 	/** @return The map of redirects to be implemented using routing rules. */
@@ -157,7 +222,10 @@ public class S3Website extends S3 {
 	 * local configuration, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and finally {@value GuiseMummy#CONFIG_KEY_DOMAIN} in the context
 	 * configuration if not specified. The bucket alternatives are retrieved from {@value #CONFIG_KEY_ALT_BUCKETS}, falling back to
 	 * {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} in the context configuration if not specified. The site domain if explicitly set is retrieved from
-	 * {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN}, resolved as appropriate to any project domain.
+	 * {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN}, resolved as appropriate to any project domain. The redirect means is retrieved from
+	 * {@value #CONFIG_KEY_REDIRECT_MEANS} in the local configuration, defaulting to {value #DEFAULT_REDIRECT_MEANS}. The threshold for optimal redirects is
+	 * retrieved from {@value #CONFIG_KEY_REDIRECT_COUNT_OPTIMAL_THRESHOLD} in the local configuration, defaulting to
+	 * {@value #DEFAULT_REDIRECT_COUNT_OPTIMAL_OPTIMAL_THRESHOLD}.
 	 * </p>
 	 * @implSpec This method calls {@link #getConfiguredBucket(Configuration, Configuration)} and {@link #getConfiguredAltBuckets(Configuration, Configuration)}
 	 *           to determine the bucket and alternative buckets.
@@ -177,27 +245,37 @@ public class S3Website extends S3 {
 	public S3Website(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
 		this(context.getConfiguration().findString(AWS.CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null), Region.of(localConfiguration.getString(CONFIG_KEY_REGION)),
 				getConfiguredBucket(context.getConfiguration(), localConfiguration), getConfiguredAltBuckets(context.getConfiguration(), localConfiguration),
-				findConfiguredSiteDomain(context.getConfiguration()).orElse(null));
+				findConfiguredSiteDomain(context.getConfiguration()).orElse(null),
+				localConfiguration.findString(CONFIG_KEY_REDIRECT_MEANS).map(fromSerializionOf(RedirectMeans.class)).orElse(DEFAULT_REDIRECT_MEANS),
+				localConfiguration.findInt(CONFIG_KEY_REDIRECT_COUNT_OPTIMAL_THRESHOLD).orElse(DEFAULT_REDIRECT_COUNT_OPTIMAL_OPTIMAL_THRESHOLD));
 	}
 
 	/**
 	 * Region, bucket, and alternative buckets constructor. The alternative buckets will be stored as a set.
+	 * @apiNote This redirect count optimal threshold must not be greater than <code>50</code>, because as of May 2020 AWS S3 does not allow more than this number
+	 *          of routing rule-based redirects; otherwise the following error will occur:
+	 *          <blockquote><code>software.amazon.awssdk.services.s3.model.S3Exception: … routing rules provided,
+	 *           the number of routing rules in a website configuration is limited to 50. (Service: S3, Status Code: 400, Request ID: …)</code></blockquote>
 	 * @param profile The name of the AWS profile to use for retrieving credentials, or <code>null</code> if the default credential provider should be used.
 	 * @param region The AWS region of deployment.
 	 * @param bucket The bucket into which the site should be deployed.
 	 * @param altBuckets The bucket alternatives, if any, to redirect to the primary bucket.
 	 * @param siteDomain The full-qualified domain name of the site. If specified, it will be used in cases that which a site other than the bucket is to be
 	 *          indicated, such as in redirect hostname, to prevent e.g. a CloudFront distribution redirecting back to the bucket URL.
+	 * @param redirectMeans The S3 website means to be used for effecting redirects.
+	 * @param redirectCountOptimalThreshold The number of redirects required to switch to using object-redirects for non-collection alt locations.
 	 * @throws IllegalArgumentException if the given site domain is not absolute.
 	 */
 	public S3Website(@Nullable String profile, @Nonnull final Region region, @Nonnull String bucket, @Nonnull final Collection<String> altBuckets,
-			@Nullable DomainName siteDomain) {
+			@Nullable DomainName siteDomain, @Nonnull final RedirectMeans redirectMeans, @Nonnegative final int redirectCountOptimalThreshold) {
 		super(profile, region, bucket);
 		this.altBuckets = new LinkedHashSet<>(altBuckets); //maintain order to help with reporting and debugging
 		if(siteDomain != null) {
 			siteDomain.checkArgumentAbsolute();
 		}
 		this.siteDomain = siteDomain;
+		this.redirectMeans = requireNonNull(redirectMeans);
+		this.redirectCountOptimalThreshold = checkArgumentNotNegative(redirectCountOptimalThreshold);
 	}
 
 	/**
@@ -294,11 +372,14 @@ public class S3Website extends S3 {
 		try { //configure bucket for web site with appropriate redirects
 			getLogger().info("Configuring S3 bucket `{}` for web site access.", bucket);
 			final Configuration configuration = context.getConfiguration();
-			final Set<RoutingRule> routingRules = getRoutingRuleRedirectObjects().stream().map(redirectObject -> {
+			final Set<S3ArtifactRedirectDeployObject> routingRuleRedirectObjects = getRoutingRuleRedirectObjects();
+			if(!routingRuleRedirectObjects.isEmpty()) {
+				getLogger().info("Configuring {} redirect routing rule(s).", routingRuleRedirectObjects.size());
+			}
+			final Set<RoutingRule> routingRules = routingRuleRedirectObjects.stream().map(redirectObject -> {
 				final Optional<String> siteHostName = getSiteDomain().map(DomainName.ROOT::relativize).map(DomainName::toString);
 				final String redirectKey = redirectObject.getKey();
 				return RoutingRule.builder().condition(condition -> condition.keyPrefixEquals(redirectKey)).redirect(redirect -> {
-					final String redirectTargetKey = redirectObject.getRedirectTargetKey();
 					//If both the redirect key (e.g. `foo/`) is a collection, and the target artifact can contain other artifacts
 					//((e.g. a directory, which basically means it is a collection as well), we'll replace the entire key prefix
 					//to allow redirects for contained artifacts as well. Otherwise replace the entire key in case an artifact
@@ -308,6 +389,7 @@ public class S3Website extends S3 {
 					//* `foo/` to `foo`: Replace entire key. 
 					//* `foo/` to `bar`: Replace entire key. 
 					//* `foo/` to `bar/`: Replace key prefix. 
+					final String redirectTargetKey = redirectObject.getRedirectTargetKey();
 					if(isCollectionPath(redirectKey) && redirectObject.getTargetArtifact() instanceof CollectionArtifact) {
 						redirect.replaceKeyPrefixWith(redirectTargetKey);
 					} else {
@@ -352,7 +434,64 @@ public class S3Website extends S3 {
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This version additionally stores S3 redirect deploy objects for any alt locations in {@link #getRoutingRuleRedirectObjects()}.
+	 * @implSpec This implementation plans the entire site categorizing redirect objects in {@link #getDeployObjectsByKey()} or
+	 *           {@link #getRoutingRuleRedirectObjects()} as if {@link RedirectMeans#AUTO} were specified, and then moves objects between the two appropriately as
+	 *           specified by {@link #getRedirectMeans()}.
+	 */
+	@Override
+	protected void plan(MummyContext context, Artifact rootArtifact) throws IOException {
+		super.plan(context, rootArtifact); //start with the default planning
+		final RedirectMeans redirectMeans = getRedirectMeans();
+		getLogger().debug("Using redirect means `{}`.", redirectMeans);
+		switch(redirectMeans) {
+			case AUTO:
+				break; //redirection was already configured for auto mode during planning
+			case OPTIMAL:
+				{
+					//subtract the existing routing rule redirects to see how many we have left to meet the threshold; this could be negative
+					final int threshold = getRedirectCountOptimalThreshold();
+					final int routingRuleRedirectCount = getRoutingRuleRedirectObjects().size();
+					getLogger().debug("Redirect optimal threshold {}; already have {} routing rule redirects.", threshold, routingRuleRedirectCount);
+					final int remainingThreshold = getRedirectCountOptimalThreshold() - routingRuleRedirectCount;
+					//if we have a positive remaining threshold and the number of object redirects meet that threshold (the limit operation will never go above the threshold by definition)
+					if(remainingThreshold <= 0 || getDeployObjectsByKey().values().stream().filter(S3ArtifactRedirectDeployObject.class::isInstance)
+							.limit(remainingThreshold).count() == remainingThreshold) {
+						break; //use the current configuration, which has already been set up for AUTO
+					}
+				}
+			//if we didn't hit the redirect count threshold, we can fall through and optimize using routing rules
+			case ROUTING_RULE:
+				{
+					//reconfigure all redirect objects to be routing rules by moving them to the routing rule set
+					final Set<S3ArtifactRedirectDeployObject> routingRuleRedirectObjects = getRoutingRuleRedirectObjects();
+					final Iterator<S3DeployObject> deployObjectIterator = getDeployObjectsByKey().values().iterator();
+					while(deployObjectIterator.hasNext()) {
+						final S3DeployObject deployObject = deployObjectIterator.next();
+						if(deployObject instanceof S3ArtifactRedirectDeployObject) {
+							routingRuleRedirectObjects.add((S3ArtifactRedirectDeployObject)deployObject);
+							deployObjectIterator.remove();
+						}
+					}
+				}
+				break;
+			case OBJECT:
+				{
+					//reconfigure all routing rule redirects to be objects by moving them to to the deploy objects map
+					final Map<String, S3DeployObject> deployObjectsByKey = getDeployObjectsByKey();
+					getRoutingRuleRedirectObjects().forEach(redirectObject -> deployObjectsByKey.put(redirectObject.getKey(), redirectObject));
+					getRoutingRuleRedirectObjects().clear();
+				}
+				break;
+			default:
+				throw new AssertionError(String.format("Unrecognized redirect means `%s`.", redirectMeans));
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This version additionally stores S3 redirect deploy objects for any alt locations as if {@link RedirectMeans#AUTO} were specified: those
+	 *           redirects that redirect one collection to another are stored in {@link #getRoutingRuleRedirectObjects()}, and all others are stored in
+	 *           {@link #getDeployObjectsByKey()}.
 	 * @see Artifact#PROPERTY_TAG_MUMMY_ALT_LOCATION
 	 */
 	@Override
@@ -370,8 +509,43 @@ public class S3Website extends S3 {
 					final String altKey = altLocationReference.toString();
 					final String artifactKey = resourceReference.toString();
 					getLogger().debug("Planning deployment redirect for artifact {} from S3 key `{}` to S3 key `{}`.", artifact, altKey, artifactKey);
-					getRoutingRuleRedirectObjects().add(new S3ArtifactRedirectDeployObject(altKey, artifactKey, artifact));
+					final S3ArtifactRedirectDeployObject redirectDeployObject = new S3ArtifactRedirectDeployObject(altKey, artifactKey, artifact);
+					if(redirectDeployObject.isRoutingRuleRequired()) { //set up the redirect initialize as if `auto` redirect means were specified
+						getRoutingRuleRedirectObjects().add(redirectDeployObject);
+					} else {
+						getDeployObjectsByKey().put(altKey, redirectDeployObject);
+					}
 				}));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This version adds an object redirect as appropriate for redirect deploy objects.
+	 * @see S3ArtifactRedirectDeployObject
+	 * @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/how-to-page-redirect.html">AWS S3 configuring a webpage redirect</a>
+	 */
+	@Override
+	protected PutObjectRequest.Builder preparePutObject(final MummyContext context, final S3DeployObject deployObject) {
+		final PutObjectRequest.Builder builder = super.preparePutObject(context, deployObject);
+		if(deployObject instanceof S3ArtifactRedirectDeployObject) {
+			final S3ArtifactRedirectDeployObject redirectDeployObject = (S3ArtifactRedirectDeployObject)deployObject;
+			builder.websiteRedirectLocation(ROOT_PATH + redirectDeployObject.getRedirectTargetKey()); //the documentation implies that the redirect path must be absolute
+		}
+		return builder;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This version returns redirect information for redirect deploy objects.
+	 * @see S3ArtifactRedirectDeployObject
+	 */
+	@Override
+	protected Optional<String> findDetailLabel(final S3DeployObject deployObject) {
+		if(deployObject instanceof S3ArtifactRedirectDeployObject) {
+			final S3ArtifactRedirectDeployObject redirectDeployObject = (S3ArtifactRedirectDeployObject)deployObject;
+			return Optional.of(String.format("redirect: `%s`", redirectDeployObject.getRedirectTargetKey())); //redirect: `foo/bar`
+		}
+		return super.findDetailLabel(deployObject);
 	}
 
 }

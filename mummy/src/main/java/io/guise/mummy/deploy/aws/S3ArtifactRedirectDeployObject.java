@@ -16,6 +16,7 @@
 
 package io.guise.mummy.deploy.aws;
 
+import static com.globalmentor.net.URIs.*;
 import static java.util.Objects.*;
 
 import java.io.*;
@@ -50,7 +51,16 @@ public class S3ArtifactRedirectDeployObject extends AbstractS3DeployObject {
 		return redirectTargetArtifact;
 	}
 
-	//TODO implement ` x-amz-website-redirect-location` metadata
+	/**
+	 * Determines if this object redirect is one that requires a routing rule.
+	 * @implSpec A routing rule is required if the key to redirect is a collection, for two reasons: first, depending on the target, the entire key prefix may
+	 *           need to be replaced (which can only be done via routing rules); and secondly (most importantly), S3 does not handle object redirects for
+	 *           collections (ending in a slash, e.g. <code>foo/bar/</code>) anyway.
+	 * @return <code>true</code> if this redirect can only be specified properly using a routing rule.
+	 */
+	public boolean isRoutingRuleRequired() {
+		return isCollectionPath(getKey());
+	}
 
 	/**
 	 * Constructor.
@@ -65,13 +75,23 @@ public class S3ArtifactRedirectDeployObject extends AbstractS3DeployObject {
 	}
 
 	/**
+	 * The metadata key indicating the website redirect location for redirect objects.
+	 * @apiNote This key is provided here to serve as part of the fingerprint; actual designation of the redirect that ultimately results in this key being set
+	 *          for an object is performed elsewhere.
+	 * @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/how-to-page-redirect.html">AWS S3 configuring a webpage redirect</a>
+	 */
+	private static final String METADATA_AMAZON_WEBSITE_REDIRECT_LOCATION = "x-amz-website-redirect-location";
+
+	/**
 	 * {@inheritDoc}
-	 * @implSpec This implementation includes returns a fingerprint of the redirect target key.
+	 * @implSpec This implementation includes returns a fingerprint including the redirect target key.
 	 * @see Mummifier#FINGERPRINT_ALGORITHM
 	 */
 	@Override
 	public Optional<byte[]> findFingerprint() {
-		return Optional.of(Mummifier.FINGERPRINT_ALGORITHM.digest(getRedirectTargetKey()));
+		//Along with the redirect target key (most important), include the class name and the redirect header in the digest (arbitrary extra information)
+		//so as to lower the (already extremely low) risk of some text file containing the same content.
+		return Optional.of(Mummifier.FINGERPRINT_ALGORITHM.digest(getClass().getName(), METADATA_AMAZON_WEBSITE_REDIRECT_LOCATION, getRedirectTargetKey()));
 	}
 
 	/**

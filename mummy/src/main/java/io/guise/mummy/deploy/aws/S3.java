@@ -331,6 +331,7 @@ public class S3 implements DeployTarget, Clogged {
 
 	/**
 	 * Plans deployment of a site.
+	 * @implSpec This implementation calls {@link #plan(MummyContext, Artifact, Artifact)} for each artifact.
 	 * @param context The context of static site generation.
 	 * @param rootArtifact The root artifact of the site being deployed.
 	 * @throws IOException if there is an I/O error during site deployment planning.
@@ -385,6 +386,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @implSpec If incremental mummification is enabled via {@link MummyContext#isIncremental()}, this version skips deploying an artifact if the S3 object
 	 *           fingerprint matches the artifact's fingerprint in its description. The handle form of the {@link Content#FINGERPRINT_PROPERTY_TAG} is used as the
 	 *           S3 object metadata name, with the value being the Base64 encoding of the binary fingerprint value.
+	 * @implSpec This method calls {@link #preparePutObject(MummyContext, S3DeployObject)} to prepare the put request for each object.
 	 * @implSpec This implementation skips directories.
 	 * @param context The context of static site generation.
 	 * @throws IOException if there is an I/O error during putting.
@@ -414,12 +416,8 @@ public class S3 implements DeployTarget, Clogged {
 							}
 						}).orElse(true); //if the description fingerprint and/or S3 object fingerprint is missing, assume the object has changed
 				if(s3ObjectChanged) {
-					getLogger().info("Deploying object to S3 key `{}`.", key);
-					final PutObjectRequest.Builder putBuilder = PutObjectRequest.builder().bucket(bucket).key(key).contentType(deployObject.getContentType());
-					final Map<String, String> metadata = deployObject.getMetadata(); //set other metadata, if any 
-					if(!metadata.isEmpty()) {
-						putBuilder.metadata(metadata);
-					}
+					getLogger().info("Deploying object to S3 key `{}`{}.", key, findDetailLabel(deployObject).map(label -> " (" + label + ")").orElse(""));
+					final PutObjectRequest.Builder putBuilder = preparePutObject(context, deployObject);
 					s3Client.putObject(putBuilder.build(),
 							RequestBody.fromContentProvider(deployObject.createContentStreamProvider(), deployObject.getContentLength(), deployObject.getContentType()));
 				} else {
@@ -429,6 +427,38 @@ public class S3 implements DeployTarget, Clogged {
 		} catch(final SdkException sdkException) {
 			throw new IOException(sdkException);
 		}
+	}
+
+	/**
+	 * Prepares a request for putting a deploy object to S3.
+	 * @implSpec This version sets up the put builder for the bucket, key, and content type; and configures any metadata.
+	 * @param context The context of static site generation.
+	 * @param deployObject The object to be deployed.
+	 * @return A configured builder for the put request.
+	 * @throws SdkException if some error occurred preparing the put request.
+	 * @see #getBucket()
+	 * @see S3DeployObject#getKey()
+	 * @see S3DeployObject#getContentType()
+	 */
+	protected PutObjectRequest.Builder preparePutObject(@Nonnull final MummyContext context, @Nonnull final S3DeployObject deployObject) {
+		final PutObjectRequest.Builder putBuilder = PutObjectRequest.builder().bucket(getBucket()).key(deployObject.getKey())
+				.contentType(deployObject.getContentType());
+		final Map<String, String> metadata = deployObject.getMetadata(); //set other metadata, if any 
+		if(!metadata.isEmpty()) {
+			putBuilder.metadata(metadata);
+		}
+		return putBuilder;
+	}
+
+	/**
+	 * Returns any detail related to an object being deployed.
+	 * @apiNote The detail should be terse but human-readable, preferably less than a sentence with no punctuation.
+	 * @implSpec This default version returns an empty value.
+	 * @param deployObject The object to be deployed.
+	 * @return Any further detail if present.
+	 */
+	protected Optional<String> findDetailLabel(@Nonnull final S3DeployObject deployObject) {
+		return Optional.empty();
 	}
 
 	/**
