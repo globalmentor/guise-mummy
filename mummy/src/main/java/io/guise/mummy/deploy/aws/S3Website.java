@@ -97,15 +97,13 @@ public class S3Website extends S3 {
 	/** The S3 website means to be used for effecting redirects. */
 	public enum RedirectMeans implements Identifier {
 
-		/** All redirects use objects. */
+		/** All redirects use objects except for those that require routing rules (notably collection redirects). */
 		OBJECT,
 		/** All redirects use routing rules. */
 		ROUTING_RULE,
-		/** Redirects use objects, except for collection-to-collection redirects, which use routing rules. */
-		AUTO,
 		/**
 		 * Functions like {@link #ROUTING_RULE} if the total number of redirects is below the optimal threshold
-		 * {@link S3Website#getRedirectCountOptimalThreshold()}; otherwise functions like {@link #AUTO}.
+		 * {@link S3Website#getRedirectCountOptimalThreshold()}; otherwise functions like {@link #OBJECT}.
 		 */
 		OPTIMAL;
 	}
@@ -435,8 +433,8 @@ public class S3Website extends S3 {
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This implementation plans the entire site categorizing redirect objects in {@link #getDeployObjectsByKey()} or
-	 *           {@link #getRoutingRuleRedirectObjects()} as if {@link RedirectMeans#AUTO} were specified, and then moves objects between the two appropriately as
-	 *           specified by {@link #getRedirectMeans()}.
+	 *           {@link #getRoutingRuleRedirectObjects()} as if {@link RedirectMeans#OBJECT} were specified, and then moves objects between the two appropriately
+	 *           as specified by {@link #getRedirectMeans()}.
 	 */
 	@Override
 	protected void plan(MummyContext context, Artifact rootArtifact) throws IOException {
@@ -444,8 +442,8 @@ public class S3Website extends S3 {
 		final RedirectMeans redirectMeans = getRedirectMeans();
 		getLogger().debug("Using redirect means `{}`.", redirectMeans);
 		switch(redirectMeans) {
-			case AUTO:
-				break; //redirection was already configured for auto mode during planning
+			case OBJECT:
+				break; //redirection was already configured for object mode during planning
 			case OPTIMAL:
 				{
 					//subtract the existing routing rule redirects to see how many we have left to meet the threshold; this could be negative
@@ -456,7 +454,7 @@ public class S3Website extends S3 {
 					//if we have a positive remaining threshold and the number of object redirects meet that threshold (the limit operation will never go above the threshold by definition)
 					if(remainingThreshold <= 0 || getDeployObjectsByKey().values().stream().filter(S3ArtifactRedirectDeployObject.class::isInstance)
 							.limit(remainingThreshold).count() == remainingThreshold) {
-						break; //use the current configuration, which has already been set up for AUTO
+						break; //use the current configuration, which has already been set up for OBJECT
 					}
 				}
 			//if we didn't hit the redirect count threshold, we can fall through and optimize using routing rules
@@ -474,14 +472,6 @@ public class S3Website extends S3 {
 					}
 				}
 				break;
-			case OBJECT:
-				{
-					//reconfigure all routing rule redirects to be objects by moving them to to the deploy objects map
-					final Map<String, S3DeployObject> deployObjectsByKey = getDeployObjectsByKey();
-					getRoutingRuleRedirectObjects().forEach(redirectObject -> deployObjectsByKey.put(redirectObject.getKey(), redirectObject));
-					getRoutingRuleRedirectObjects().clear();
-				}
-				break;
 			default:
 				throw new AssertionError(String.format("Unrecognized redirect means `%s`.", redirectMeans));
 		}
@@ -489,8 +479,8 @@ public class S3Website extends S3 {
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This version additionally stores S3 redirect deploy objects for any alt locations as if {@link RedirectMeans#AUTO} were specified: those
-	 *           redirects that redirect one collection to another are stored in {@link #getRoutingRuleRedirectObjects()}, and all others are stored in
+	 * @implSpec This version additionally stores S3 redirect deploy objects for any alt locations as if {@link RedirectMeans#OBJECT} were specified: those
+	 *           redirects that require routing rules are stored in {@link #getRoutingRuleRedirectObjects()}, and all others are stored in
 	 *           {@link #getDeployObjectsByKey()}.
 	 * @see Artifact#PROPERTY_TAG_MUMMY_ALT_LOCATION
 	 */
@@ -510,7 +500,7 @@ public class S3Website extends S3 {
 					final String artifactKey = resourceReference.toString();
 					getLogger().debug("Planning deployment redirect for artifact {} from S3 key `{}` to S3 key `{}`.", artifact, altKey, artifactKey);
 					final S3ArtifactRedirectDeployObject redirectDeployObject = new S3ArtifactRedirectDeployObject(altKey, artifactKey, artifact);
-					if(redirectDeployObject.isRoutingRuleRequired()) { //set up the redirect initialize as if `auto` redirect means were specified
+					if(redirectDeployObject.isRoutingRuleRequired()) { //set up the redirect initialize as if `object` redirect means were specified
 						getRoutingRuleRedirectObjects().add(redirectDeployObject);
 					} else {
 						getDeployObjectsByKey().put(altKey, redirectDeployObject);
