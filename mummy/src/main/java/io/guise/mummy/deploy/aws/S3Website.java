@@ -433,8 +433,12 @@ public class S3Website extends S3 {
 			//configure alternative buckets for web sites
 			for(final String altBucket : getAltBuckets()) {
 				getLogger().info("Configuring S3 alternative bucket `{}` for web site redirection.", altBucket);
-				s3Client.putBucketWebsite(
-						builder -> builder.bucket(altBucket).websiteConfiguration(config -> config.redirectAllRequestsTo(redirect -> redirect.hostName(bucket))));
+				s3Client.putBucketWebsite(builder -> builder.bucket(altBucket).websiteConfiguration(config -> config.redirectAllRequestsTo(redirect -> {
+					redirect.hostName(bucket);
+					if(isHttpsSupported) { //redirect directly to HTTPS if we know we support it; compare routing rule redirects above
+						redirect.protocol(Protocol.HTTPS);
+					}
+				})));
 			}
 		} catch(final SdkException sdkException) {
 			throw new IOException(sdkException);
