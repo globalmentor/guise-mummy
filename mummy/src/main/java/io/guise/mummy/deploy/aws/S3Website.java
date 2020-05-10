@@ -532,7 +532,9 @@ public class S3Website extends S3 {
 		final PutObjectRequest.Builder builder = super.preparePutObject(context, deployObject);
 		if(deployObject instanceof S3ArtifactRedirectDeployObject) {
 			final S3ArtifactRedirectDeployObject redirectDeployObject = (S3ArtifactRedirectDeployObject)deployObject;
-			builder.websiteRedirectLocation(ROOT_PATH + redirectDeployObject.getRedirectTargetKey()); //the documentation implies that the redirect path must be absolute
+			//The redirect path must be absolute, and the must be encoded, presumably because this is the literal HTTP `Location` header content.
+			//See https://tools.ietf.org/html/rfc7231#section-7.1.2 .
+			builder.websiteRedirectLocation(URIPath.encode(ROOT_PATH + redirectDeployObject.getRedirectTargetKey()));
 		}
 		return builder;
 	}
