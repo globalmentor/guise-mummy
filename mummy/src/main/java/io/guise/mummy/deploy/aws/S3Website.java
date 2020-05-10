@@ -168,6 +168,15 @@ public class S3Website extends S3 {
 		return createURI(HTTP_URI_SCHEME, null, getBucketWebsiteEndpoint(bucket, region), -1, URIs.ROOT_PATH, null, null);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation returns a set of just {@value HTTP#HTTP_URI_SCHEME}, as S3 websites support only HTTP (not HTTPS) access.
+	 */
+	@Override
+	public Set<String> getSupportedProtocols() {
+		return Set.of(HTTP_URI_SCHEME);
+	}
+
 	private final Set<String> altBuckets;
 
 	/** @return The S3 buckets, if any, to serve as alternatives and redirect to the primary bucket. */
@@ -339,11 +348,7 @@ public class S3Website extends S3 {
 		final Logger logger = getLogger();
 		try {
 			logger.info("Setting policy of S3 bucket `{}` to public.", bucket);
-			final S3Website thisS3Website = this;
-			final Set<String> userAgents = context.getDeployTargets().stream().flatMap(List::stream) //get a stream of deploy targets, if any
-					//only look at deploy targets that are content delivery targets with this S3 website as an origin
-					.filter(ContentDeliveryTarget.class::isInstance).map(ContentDeliveryTarget.class::cast)
-					.filter(target -> target.getOriginTarget(context) == thisS3Website)
+			final Set<String> userAgents = contentDeliveryTargets(context)
 					//collect the possible user agent identifications the content delivery targets will be using, maintaining order to assist in debugging
 					.flatMap(target -> target.getUserAgentIdentifications().stream()).collect(toCollection(LinkedHashSet::new));
 			logger.debug("Found content delivery target user agents: {}.", userAgents);
@@ -374,8 +379,11 @@ public class S3Website extends S3 {
 			if(!routingRuleRedirectObjects.isEmpty()) {
 				getLogger().info("Configuring {} redirect routing rule(s).", routingRuleRedirectObjects.size());
 			}
+			final Optional<String> foundSiteHostName = getSiteDomain().map(DomainName.ROOT::relativize).map(DomainName::toString);
+			//we support HTTPS either this deploy target (S3 websites usually don't) or one of our content delivery targets (e.g. CloudFront usually does) supports HTTPS
+			final boolean isHttpsSupported = concat(Stream.of(this), contentDeliveryTargets(context))
+					.filter(deployTarget -> deployTarget.getSupportedProtocols().contains(HTTPS_URI_SCHEME)).findAny().isPresent();
 			final Set<RoutingRule> routingRules = routingRuleRedirectObjects.stream().map(redirectObject -> {
-				final Optional<String> siteHostName = getSiteDomain().map(DomainName.ROOT::relativize).map(DomainName::toString);
 				final String redirectKey = redirectObject.getKey();
 				return RoutingRule.builder().condition(condition -> condition.keyPrefixEquals(redirectKey)).redirect(redirect -> {
 					//If both the redirect key (e.g. `foo/`) is a collection, and the target artifact can contain other artifacts
@@ -395,7 +403,12 @@ public class S3Website extends S3 {
 					}
 					//Set the host name if we know the site domain name, to prevent any distribution from redirecting back to the bucket URL.
 					//See https://stackoverflow.com/q/58477877/421049 .
-					siteHostName.ifPresent(redirect::hostName);
+					foundSiteHostName.ifPresent(redirect::hostName);
+					//If we know we support HTTPS, set the "protocol" so that redirection will occur directly to HTTPS with no intermediate HTTP redirect.
+					//See https://stackoverflow.com/q/61705411/421049 .
+					if(isHttpsSupported) {
+						redirect.protocol(Protocol.HTTPS);
+					}
 				}).build();
 			}).collect(toCollection(LinkedHashSet::new)); //maintain order to help with debugging
 			final WebsiteConfiguration.Builder websiteConfigurationBuilder = WebsiteConfiguration.builder();

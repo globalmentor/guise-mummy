@@ -83,6 +83,16 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 	 */
 	public static final String USER_AGENT_IDENTIFICATION = "Amazon CloudFront";
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation returns a set of just {@value HTTP#HTTPS_URI_SCHEME}, as the current implementation requires that a CloudFront distribution
+	 *           use HTTPS.
+	 */
+	@Override
+	public Set<String> getSupportedProtocols() {
+		return Set.of(HTTPS_URI_SCHEME);
+	}
+
 	@Override
 	public Set<String> getUserAgentIdentifications() {
 		return Set.of(USER_AGENT_IDENTIFICATION);

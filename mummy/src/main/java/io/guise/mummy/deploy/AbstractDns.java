@@ -38,6 +38,16 @@ import io.guise.mummy.deploy.Dns;
  */
 public abstract class AbstractDns implements Dns, Clogged {
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation returns a set containing only <code>dns</code>, indicating the DNS protocol.
+	 * @see <a href="https://tools.ietf.org/html/rfc4501">RFC 4501: Domain Name System Uniform Resource Identifiers</a>
+	 */
+	@Override
+	public Set<String> getSupportedProtocols() {
+		return Set.of("dns"); //TODO use a constant
+	}
+
 	private DomainName origin;
 
 	@Override

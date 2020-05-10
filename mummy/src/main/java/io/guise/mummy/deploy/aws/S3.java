@@ -19,6 +19,7 @@ package io.guise.mummy.deploy.aws;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
 import static io.guise.mummy.GuiseMummy.*;
+import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 import static java.util.stream.StreamSupport.*;
@@ -163,6 +164,15 @@ public class S3 implements DeployTarget, Clogged {
 			return userAgent;
 		}).map(userAgent -> "\"" + userAgent + "\"").collect(joining(","));
 		return POLICY_HEADER_CONDITION_CLAUSE_TEMPLATE_PUBLIC_READ_GET_OBJECT.apply(userAgentJsonArrayValues);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation returns an empty set, as S3 on its own does not support any protocol.
+	 */
+	@Override
+	public Set<String> getSupportedProtocols() {
+		return emptySet();
 	}
 
 	private final String profile;
