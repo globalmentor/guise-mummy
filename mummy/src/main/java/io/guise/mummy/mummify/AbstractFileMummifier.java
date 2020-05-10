@@ -31,8 +31,6 @@ import java.util.regex.*;
 
 import javax.annotation.*;
 
-import com.globalmentor.security.MessageDigests;
-
 import io.guise.mummy.*;
 import io.guise.mummy.mummify.page.PostArtifact;
 import io.urf.model.*;
@@ -47,13 +45,6 @@ import io.urf.vocab.content.Content;
  * @author Garret Wilson
  */
 public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier {
-
-	/**
-	 * The algorithm used for calculating a fingerprint of the generated target artifact.
-	 * @apiNote This algorithm should be set to an algorithm known to be implemented on all supported Java versions.
-	 * @see Content#FINGERPRINT_PROPERTY_TAG
-	 */
-	private static final MessageDigests.Algorithm FINGERPRINT_ALGORITHM = MessageDigests.SHA_256;
 
 	/**
 	 * {@inheritDoc}

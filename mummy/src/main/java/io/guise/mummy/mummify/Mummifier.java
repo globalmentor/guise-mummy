@@ -23,9 +23,12 @@ import java.util.Set;
 
 import javax.annotation.*;
 
+import com.globalmentor.security.MessageDigests;
+
 import io.clogr.Clogged;
 import io.guise.mummy.*;
 import io.urf.turf.TURF;
+import io.urf.vocab.content.Content;
 
 /**
  * Processes a resource for mummification.
@@ -38,6 +41,13 @@ import io.urf.turf.TURF;
  * @author Garret Wilson
  */
 public interface Mummifier extends Clogged {
+
+	/**
+	 * The recommended algorithm for calculating a fingerprint of the generated target artifact.
+	 * @apiNote This algorithm should be set to an algorithm known to be implemented on all supported Java versions.
+	 * @see Content#FINGERPRINT_PROPERTY_TAG
+	 */
+	public static final MessageDigests.Algorithm FINGERPRINT_ALGORITHM = MessageDigests.SHA_256;
 
 	/**
 	 * The extension segment for identifying a description sidecar; the <code>-</code> in <code>filename.ext.-.props</code>, where <var>props</var> is some

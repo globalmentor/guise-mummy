@@ -18,9 +18,8 @@ package io.guise.mummy.deploy.aws;
 
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
-import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.util.Optionals.*;
 import static io.guise.mummy.GuiseMummy.*;
+import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 import static java.util.stream.StreamSupport.*;
@@ -32,7 +31,6 @@ import java.util.stream.Stream;
 
 import javax.annotation.*;
 
-import com.globalmentor.collections.*;
 import com.globalmentor.net.*;
 import com.globalmentor.text.StringTemplate;
 
@@ -41,9 +39,7 @@ import io.confound.config.Configuration;
 import io.confound.config.ConfigurationException;
 import io.guise.mummy.*;
 import io.guise.mummy.deploy.DeployTarget;
-import io.guise.mummy.mummify.collection.DirectoryArtifact;
 import io.urf.URF.Handle;
-import io.urf.model.UrfResourceDescription;
 import io.urf.vocab.content.Content;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.exception.SdkException;
@@ -170,6 +166,15 @@ public class S3 implements DeployTarget, Clogged {
 		return POLICY_HEADER_CONDITION_CLAUSE_TEMPLATE_PUBLIC_READ_GET_OBJECT.apply(userAgentJsonArrayValues);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation returns an empty set, as S3 on its own does not support any protocol.
+	 */
+	@Override
+	public Set<String> getSupportedProtocols() {
+		return emptySet();
+	}
+
 	private final String profile;
 
 	/** @return The AWS profile if one was set explicitly. */
@@ -196,13 +201,6 @@ public class S3 implements DeployTarget, Clogged {
 		return Stream.of(getBucket());
 	}
 
-	private final DomainName siteDomain;
-
-	/** @return The explicit site domain if specified, which may be the same or different than the bucket name. */
-	public Optional<DomainName> getSiteDomain() {
-		return Optional.ofNullable(siteDomain);
-	}
-
 	private final S3Client s3Client;
 
 	/** @return The client for connecting to S3. */
@@ -210,11 +208,11 @@ public class S3 implements DeployTarget, Clogged {
 		return s3Client;
 	}
 
-	private final ReverseMap<Artifact, String> artifactKeys = new DecoratorReverseMap<>(new LinkedHashMap<>(), new HashMap<>());
+	private final Map<String, S3DeployObject> deployObjectsByKey = new LinkedHashMap<>();
 
-	/** @return The map of S3 object keys for each artifact. */
-	protected ReverseMap<Artifact, String> getArtifactKeys() {
-		return artifactKeys;
+	/** @return The map of S3 objects to deploy, associated with their bucket keys. */
+	protected Map<String, S3DeployObject> getDeployObjectsByKey() {
+		return deployObjectsByKey;
 	}
 
 	/**
@@ -222,11 +220,9 @@ public class S3 implements DeployTarget, Clogged {
 	 * <p>
 	 * The region is retrieved from {@value #CONFIG_KEY_REGION} in the local configuration. The bucket name is retrieved from {@value #CONFIG_KEY_BUCKET} in the
 	 * local configuration, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and finally {@value GuiseMummy#CONFIG_KEY_DOMAIN} in the context
-	 * configuration if not specified. The site domain if explicitly set is retrieved from {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN}, resolved as appropriate to
-	 * any project domain.
+	 * configuration if not specified.
 	 * </p>
 	 * @implSpec This method calls {@link #getConfiguredBucket(Configuration, Configuration)} to determine the bucket.
-	 * @implSpec This method calls {@link GuiseMummy#findConfiguredSiteDomain(Configuration)} to determine the site domain, if any.
 	 * @param context The context of static site generation.
 	 * @param localConfiguration The local configuration for this deployment target, which may be a section of the project configuration.
 	 * @see AWS#CONFIG_KEY_DEPLOY_AWS_PROFILE
@@ -238,7 +234,7 @@ public class S3 implements DeployTarget, Clogged {
 	 */
 	public S3(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
 		this(context.getConfiguration().findString(AWS.CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null), Region.of(localConfiguration.getString(CONFIG_KEY_REGION)),
-				getConfiguredBucket(context.getConfiguration(), localConfiguration), findConfiguredSiteDomain(context.getConfiguration()).orElse(null));
+				getConfiguredBucket(context.getConfiguration(), localConfiguration));
 	}
 
 	/**
@@ -246,18 +242,11 @@ public class S3 implements DeployTarget, Clogged {
 	 * @param profile The name of the AWS profile to use for retrieving credentials, or <code>null</code> if the default credential provider should be used.
 	 * @param region The AWS region of deployment.
 	 * @param bucket The bucket into which the site should be deployed.
-	 * @param siteDomain The full-qualified domain name of the site. If specified, it will be used in cases that which a site other than the bucket is to be
-	 *          indicated, such as in redirect hostname, to prevent e.g. a CloudFront distribution redirecting back to the bucket URL.
-	 * @throws IllegalArgumentException if the given site domain is not absolute.
 	 */
-	public S3(@Nullable String profile, @Nonnull final Region region, @Nonnull String bucket, @Nullable DomainName siteDomain) {
+	public S3(@Nullable String profile, @Nonnull final Region region, @Nonnull String bucket) {
 		this.profile = profile;
 		this.region = requireNonNull(region);
 		this.bucket = requireNonNull(bucket);
-		if(siteDomain != null) {
-			siteDomain.checkArgumentAbsolute();
-		}
-		this.siteDomain = siteDomain;
 		final S3ClientBuilder s3ClientBuilder = S3Client.builder().region(region);
 		if(profile != null) {
 			s3ClientBuilder.credentialsProvider(ProfileCredentialsProvider.create(profile));
@@ -352,6 +341,7 @@ public class S3 implements DeployTarget, Clogged {
 
 	/**
 	 * Plans deployment of a site.
+	 * @implSpec This implementation calls {@link #plan(MummyContext, Artifact, Artifact)} for each artifact.
 	 * @param context The context of static site generation.
 	 * @param rootArtifact The root artifact of the site being deployed.
 	 * @throws IOException if there is an I/O error during site deployment planning.
@@ -380,7 +370,8 @@ public class S3 implements DeployTarget, Clogged {
 
 	/**
 	 * Plans deployment of a single resource.
-	 * @implSpec This version stores an S3 key for the resource in {@link #getArtifactKeys()}.
+	 * @implSpec This version stores an S3 key and deploy object for the resource in {@link #getDeployObjectsByKey()}.
+	 * @implSpec This implementation does not add a deploy object for a {@link CollectionArtifact}.
 	 * @param context The context of static site generation.
 	 * @param rootArtifact The root artifact of the site being deployed.
 	 * @param artifact The current artifact for which deployment is being planned.
@@ -391,7 +382,9 @@ public class S3 implements DeployTarget, Clogged {
 			@Nonnull final URIPath resourceReference) throws IOException {
 		final String key = resourceReference.toString();
 		getLogger().debug("Planning deployment for artifact {}, S3 key `{}`.", artifact, key);
-		getArtifactKeys().put(artifact, key);
+		if(!(artifact instanceof CollectionArtifact)) { //don't deploy an S3 object for collection artifacts (e.g. directories)
+			getDeployObjectsByKey().put(key, new S3ArtifactDeployObject(key, artifact));
+		}
 	}
 
 	/** The handle of the content fingerprint tag as a convenience, used for object metadata. */
@@ -403,6 +396,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @implSpec If incremental mummification is enabled via {@link MummyContext#isIncremental()}, this version skips deploying an artifact if the S3 object
 	 *           fingerprint matches the artifact's fingerprint in its description. The handle form of the {@link Content#FINGERPRINT_PROPERTY_TAG} is used as the
 	 *           S3 object metadata name, with the value being the Base64 encoding of the binary fingerprint value.
+	 * @implSpec This method calls {@link #preparePutObject(MummyContext, S3DeployObject)} to prepare the put request for each object.
 	 * @implSpec This implementation skips directories.
 	 * @param context The context of static site generation.
 	 * @throws IOException if there is an I/O error during putting.
@@ -414,48 +408,67 @@ public class S3 implements DeployTarget, Clogged {
 		try {
 			final S3Client s3Client = getS3Client();
 			final String bucket = getBucket();
-			for(final Map.Entry<Artifact, String> artifactKeyEntry : getArtifactKeys().entrySet()) {
-				final Artifact artifact = artifactKeyEntry.getKey();
-				if(!(artifact instanceof DirectoryArtifact)) { //don't deploy anything for directories TODO improve semantics, especially after the root artifact type changes; maybe use CollectionArtifact
-					final String key = artifactKeyEntry.getValue();
-					final UrfResourceDescription description = artifact.getResourceDescription();
-					final Optional<byte[]> fingerprint = filterAsInstance(description.findPropertyValue(Content.FINGERPRINT_PROPERTY_TAG), byte[].class); //TODO improve URF to use immutable byte string
-					final boolean s3ObjectChanged = context.isFull() //for full mummification, short-circuit and don't compare fingerprints
-							|| fingerprint.flatMap(descriptionFingerprint -> {
-								try {
-									final HeadObjectResponse head = s3Client.headObject(builder -> builder.bucket(bucket).key(key));
-									return Optional.ofNullable(head.metadata().get(METADATA_CONTENT_FINGERPRINT)).map(base64 -> Base64.getUrlDecoder().decode(base64))
-											.map(s3ObjectFingerprint -> !Arrays.equals(s3ObjectFingerprint, descriptionFingerprint)); //S3 object changed if the fingerprints do _not_ match
-								} catch(final IllegalArgumentException illegalArgumentException) { //if there was some problem decoding the fingerprint value
-									getLogger().warn("Invalid S3 object fingerprint metadata `{}` for key `{}`: {}", METADATA_CONTENT_FINGERPRINT, key,
-											illegalArgumentException.getMessage(), illegalArgumentException);
-									return Optional.empty(); //a valid fingerprint was not found
-								} catch(final NoSuchKeyException noSuchKeyException) { //if the object doesn't even exist on S3
-									return Optional.empty();
-								}
-							}).orElse(true); //if the description fingerprint and/or S3 object fingerprint is missing, assume the object has changed
-					if(s3ObjectChanged) {
-						getLogger().info("Deploying artifact to S3 key `{}`.", key);
-						final PutObjectRequest.Builder putBuilder = PutObjectRequest.builder().bucket(bucket).key(key);
-						//set content-type if found
-						description.findPropertyValue(Content.TYPE_PROPERTY_TAG).map(Object::toString).ifPresent(putBuilder::contentType);
-						//set other metadata, if any
-						final Map<String, String> metadata = new HashMap<>(); //there will likely always be some metadata 
-						description.findPropertyValue(Content.FINGERPRINT_PROPERTY_TAG).flatMap(asInstance(byte[].class))
-								.map(bytes -> Base64.getUrlEncoder().withoutPadding().encodeToString(bytes))
-								.ifPresent(base64 -> metadata.put(METADATA_CONTENT_FINGERPRINT, base64));
-						if(!metadata.isEmpty()) {
-							putBuilder.metadata(metadata);
-						}
-						s3Client.putObject(putBuilder.build(), RequestBody.fromFile(artifact.getTargetPath()));
-					} else {
-						getLogger().debug("Keeping previously deployed S3 object for key `{}`.", key);
-					}
+			for(final S3DeployObject deployObject : getDeployObjectsByKey().values()) {
+				final String key = deployObject.getKey();
+				final Optional<byte[]> foundFingerprint = deployObject.findFingerprint();
+				final boolean s3ObjectChanged = context.isFull() //for full mummification, short-circuit and don't compare fingerprints
+						|| foundFingerprint.flatMap(deployObjectFingerprint -> {
+							try {
+								final HeadObjectResponse head = s3Client.headObject(builder -> builder.bucket(bucket).key(key));
+								return Optional.ofNullable(head.metadata().get(METADATA_CONTENT_FINGERPRINT)).map(base64 -> Base64.getUrlDecoder().decode(base64))
+										.map(s3ObjectFingerprint -> !Arrays.equals(s3ObjectFingerprint, deployObjectFingerprint)); //S3 object changed if the fingerprints do _not_ match
+							} catch(final IllegalArgumentException illegalArgumentException) { //if there was some problem decoding the fingerprint value
+								getLogger().warn("Invalid S3 object fingerprint metadata `{}` for key `{}`: {}", METADATA_CONTENT_FINGERPRINT, key,
+										illegalArgumentException.getMessage(), illegalArgumentException);
+								return Optional.empty(); //a valid fingerprint was not found
+							} catch(final NoSuchKeyException noSuchKeyException) { //if the object doesn't even exist on S3
+								return Optional.empty();
+							}
+						}).orElse(true); //if the description fingerprint and/or S3 object fingerprint is missing, assume the object has changed
+				if(s3ObjectChanged) {
+					getLogger().info("Deploying object to S3 key `{}`{}.", key, findDetailLabel(deployObject).map(label -> " (" + label + ")").orElse(""));
+					final PutObjectRequest.Builder putBuilder = preparePutObject(context, deployObject);
+					s3Client.putObject(putBuilder.build(),
+							RequestBody.fromContentProvider(deployObject.createContentStreamProvider(), deployObject.getContentLength(), deployObject.getContentType()));
+				} else {
+					getLogger().debug("Keeping previously deployed S3 object for key `{}`.", key);
 				}
 			}
 		} catch(final SdkException sdkException) {
 			throw new IOException(sdkException);
 		}
+	}
+
+	/**
+	 * Prepares a request for putting a deploy object to S3.
+	 * @implSpec This version sets up the put builder for the bucket, key, and content type; and configures any metadata.
+	 * @param context The context of static site generation.
+	 * @param deployObject The object to be deployed.
+	 * @return A configured builder for the put request.
+	 * @throws SdkException if some error occurred preparing the put request.
+	 * @see #getBucket()
+	 * @see S3DeployObject#getKey()
+	 * @see S3DeployObject#getContentType()
+	 */
+	protected PutObjectRequest.Builder preparePutObject(@Nonnull final MummyContext context, @Nonnull final S3DeployObject deployObject) {
+		final PutObjectRequest.Builder putBuilder = PutObjectRequest.builder().bucket(getBucket()).key(deployObject.getKey())
+				.contentType(deployObject.getContentType());
+		final Map<String, String> metadata = deployObject.getMetadata(); //set other metadata, if any 
+		if(!metadata.isEmpty()) {
+			putBuilder.metadata(metadata);
+		}
+		return putBuilder;
+	}
+
+	/**
+	 * Returns any detail related to an object being deployed.
+	 * @apiNote The detail should be terse but human-readable, preferably less than a sentence with no punctuation.
+	 * @implSpec This default version returns an empty value.
+	 * @param deployObject The object to be deployed.
+	 * @return Any further detail if present.
+	 */
+	protected Optional<String> findDetailLabel(@Nonnull final S3DeployObject deployObject) {
+		return Optional.empty();
 	}
 
 	/**
@@ -470,14 +483,14 @@ public class S3 implements DeployTarget, Clogged {
 		try {
 			final S3Client s3Client = getS3Client();
 			final String bucket = getBucket();
-			final ReverseMap<Artifact, String> artifactKeys = getArtifactKeys();
+			final Map<String, S3DeployObject> deployObjectsByKey = getDeployObjectsByKey();
 			ListObjectsV2Request listObjectsRequest = ListObjectsV2Request.builder().bucket(bucket).build();
 			ListObjectsV2Response listObjectsResponse;
 			do {
 				listObjectsResponse = s3Client.listObjectsV2(listObjectsRequest);
 				for(final S3Object s3Object : listObjectsResponse.contents()) {
 					final String key = s3Object.key();
-					if(!artifactKeys.containsValue(key)) { //if this object isn't in our site, delete it
+					if(!deployObjectsByKey.containsKey(key)) { //if this object isn't in our site, delete it
 						getLogger().info("Pruning S3 object `{}`.", key);
 						s3Client.deleteObject(builder -> builder.bucket(bucket).key(key));
 					}
