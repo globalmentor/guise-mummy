@@ -26,7 +26,7 @@ import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.IOException;
 import java.net.URI;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -316,7 +316,7 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 					logger.info("Creating distribution for S3 bucket `{}`.", s3Bucket);
 					final StringBuilder commentBuilder = new StringBuilder(); //CloudFront comments are limited to a little over 120 characters in length
 					commentBuilder.append("Created by ").append(context.getMummifierIdentification()); //i18n
-					commentBuilder.append(" on ").append(ZonedDateTime.now()); //TODO i18n
+					commentBuilder.append(" on ").append(LocalDate.now()); //TODO i18n
 					commentBuilder.append("."); //TODO i18n
 					final String s3BucketWebsiteEndpoint = S3Website.getBucketWebsiteEndpoint(s3Bucket, s3BucketRegion);
 					final CustomOriginConfig s3BucketOriginConfig = CustomOriginConfig.builder().httpPort(HTTP.DEFAULT_PORT).httpsPort(HTTP.DEFAULT_SECURE_PORT)

@@ -25,7 +25,7 @@ import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 
 import java.io.IOException;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -186,7 +186,7 @@ public class Route53 extends AbstractDns {
 					logger.info("Creating Route 53 public hosted zone for name `{}`.", origin);
 					final StringBuilder commentBuilder = new StringBuilder();
 					commentBuilder.append("Created by ").append(context.getMummifierIdentification()); //TODO i18n
-					commentBuilder.append(" on ").append(ZonedDateTime.now()); //TODO i18n
+					commentBuilder.append(" on ").append(LocalDate.now()); //TODO i18n
 					context.getConfiguration().findString(CONFIG_KEY_SITE_DOMAIN)
 							.ifPresent(siteDomain -> commentBuilder.append(" for site domain `").append(siteDomain).append('`')); //TODO i18n
 					context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class).ifPresent(siteAltDomains -> commentBuilder
