@@ -60,7 +60,7 @@ import picocli.CommandLine.*;
  * Command-line interface for Guise tasks.
  * @author Garret Wilson
  */
-@Command(name = "guise", description = "Command-line interface for Guise tasks.", versionProvider = GuiseCli.MetadataProvider.class, mixinStandardHelpOptions = true)
+@Command(name = "guise", description = "Command-line interface for Guise tasks.")
 public class GuiseCli extends BaseCliApplication {
 
 	public static final String CONFIG_KEY_SERVER_DIRECTORY = "server.directory";
@@ -347,9 +347,7 @@ public class GuiseCli extends BaseCliApplication {
 		//set up the collection content filenames (i.e "welcome files") such as `index`/`index.html`
 		final boolean isPageNameBare = projectConfiguration.findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);
 		projectConfiguration.getCollection(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, String.class).stream()
-				.map(baseName -> isPageNameBare ? baseName
-						: addExtension(baseName,
-								PageMummifier.PAGE_NAME_EXTENSION)) //e.g. "index" or "index.html"
+				.map(baseName -> isPageNameBare ? baseName : addExtension(baseName, PageMummifier.PAGE_NAME_EXTENSION)) //e.g. "index" or "index.html"
 				.forEach(context::addWelcomeFile);
 
 		tomcat.start(); //start the server
@@ -363,13 +361,6 @@ public class GuiseCli extends BaseCliApplication {
 		}
 
 		tomcat.getServer().await();
-	}
-
-	/** Strategy for providing version and other information from the configuration. */
-	static class MetadataProvider extends AbstractMetadataProvider {
-		public MetadataProvider() {
-			super(GuiseCli.class);
-		}
 	}
 
 	/**
