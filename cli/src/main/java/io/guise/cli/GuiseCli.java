@@ -47,7 +47,6 @@ import com.globalmentor.application.*;
 import com.globalmentor.net.Host;
 import com.globalmentor.net.URIs;
 
-import io.clogr.Clogr;
 import io.confound.config.Configuration;
 import io.confound.config.ConfigurationException;
 import io.confound.config.file.ResourcesConfigurationManager;
@@ -74,7 +73,7 @@ public class GuiseCli extends BaseCliApplication {
 	 * @param args The command line arguments.
 	 */
 	public GuiseCli(@Nonnull final String[] args) {
-		super(args);
+		super(args, Level.INFO);
 		//bridge JUL to SLF4J for Tomcat logging
 		SLF4JBridgeHandler.removeHandlersForRootLogger();
 		SLF4JBridgeHandler.install();
@@ -86,16 +85,6 @@ public class GuiseCli extends BaseCliApplication {
 	 */
 	public static void main(@Nonnull final String[] args) {
 		Application.start(new GuiseCli(args));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version defaults to {@link Level#INFO} log level.
-	 */
-	@Override
-	protected void updateLogLevel() {
-		final Level logLevel = isDebug() ? Level.DEBUG : Level.INFO;
-		Clogr.getLoggingConcern().setLogLevel(logLevel);
 	}
 
 	/**
@@ -139,10 +128,8 @@ public class GuiseCli extends BaseCliApplication {
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
 			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
 			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
-			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
-			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) throws IOException {
-
-		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
+			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory)
+			throws IOException {
 
 		printAppInfo();
 
@@ -162,10 +149,8 @@ public class GuiseCli extends BaseCliApplication {
 	public void clean(
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
 			@Option(names = "--site-target-dir", description = "The target root directory of the site to be removed; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
-			@Option(names = "--site-description-target-dir", description = "The target root directory of the site description to be removed; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
-			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) throws IOException {
-
-		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
+			@Option(names = "--site-description-target-dir", description = "The target root directory of the site description to be removed; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory)
+			throws IOException {
 
 		printAppInfo();
 
@@ -196,10 +181,8 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
 			@Option(names = {"--full",
-					"-f"}, description = "Specifies full instead of incremental mummification.%nCached artifacts will be regenerated.", defaultValue = "false") final boolean full,
-			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) throws IOException {
-
-		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
+					"-f"}, description = "Specifies full instead of incremental mummification.%nCached artifacts will be regenerated.", defaultValue = "false") final boolean full)
+			throws IOException {
 
 		printAppInfo();
 
@@ -224,10 +207,8 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
 			@Option(names = {"--full",
-					"-f"}, description = "Specifies full instead of incremental mummification.%nCached artifacts will be regenerated.", defaultValue = "false") final boolean full,
-			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) throws IOException {
-
-		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
+					"-f"}, description = "Specifies full instead of incremental mummification.%nCached artifacts will be regenerated.", defaultValue = "false") final boolean full)
+			throws IOException {
 
 		printAppInfo();
 
@@ -252,10 +233,8 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
 			@Option(names = {"--browse", "-b"}, description = "Opens a browser to the site after starting the server.") final boolean browse,
 			@Option(names = {"--full",
-					"-f"}, description = "Specifies full instead of incremental mummification and deployment.%nCached artifacts will be regenerated and all artifacts will be redeployed.", defaultValue = "false") final boolean full,
-			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) throws IOException {
-
-		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
+					"-f"}, description = "Specifies full instead of incremental mummification and deployment.%nCached artifacts will be regenerated and all artifacts will be redeployed.", defaultValue = "false") final boolean full)
+			throws IOException {
 
 		printAppInfo();
 
@@ -291,10 +270,8 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-description-target-dir", description = "The target root directory of the description of the site to be served.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
 			@Option(names = {"--port", "-p"}, description = "Specifies the server port.%nDefaults to @|bold ${DEFAULT-VALUE}|@.", defaultValue = ""
 					+ DEFAULT_SERVER_PORT) Integer argPort,
-			@Option(names = {"--browse", "-b"}, description = "Opens a browser to the site after starting the server.") final boolean browse,
-			@Option(names = {"--debug", "-d"}, description = "Turns on debug level logging.") final boolean debug) throws IOException, LifecycleException {
-
-		setDebug(debug); //TODO inherit from base class; see https://github.com/remkop/picocli/issues/649
+			@Option(names = {"--browse", "-b"}, description = "Opens a browser to the site after starting the server.") final boolean browse)
+			throws IOException, LifecycleException {
 
 		printAppInfo();
 
@@ -335,7 +312,7 @@ public class GuiseCli extends BaseCliApplication {
 		final Wrapper defaultServlet = context.createWrapper(); //TODO use constants below
 		defaultServlet.setName("default");
 		defaultServlet.setServletClass("org.apache.catalina.servlets.DefaultServlet");
-		defaultServlet.addInitParameter("debug", debug ? "11" : "0"); //TODO use constant; see https://tomcat.apache.org/tomcat-9.0-doc/default-servlet.html
+		defaultServlet.addInitParameter("debug", isDebug() ? "11" : "0"); //TODO use constant; see https://tomcat.apache.org/tomcat-9.0-doc/default-servlet.html
 		defaultServlet.addInitParameter("listings", Boolean.FALSE.toString()); //TODO use constant
 		defaultServlet.setLoadOnStartup(1);
 
