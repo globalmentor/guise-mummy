@@ -47,7 +47,6 @@ import com.globalmentor.application.*;
 import com.globalmentor.net.Host;
 import com.globalmentor.net.URIs;
 
-import io.clogr.Clogr;
 import io.confound.config.Configuration;
 import io.confound.config.ConfigurationException;
 import io.confound.config.file.ResourcesConfigurationManager;
@@ -74,7 +73,7 @@ public class GuiseCli extends BaseCliApplication {
 	 * @param args The command line arguments.
 	 */
 	public GuiseCli(@Nonnull final String[] args) {
-		super(args);
+		super(args, Level.INFO);
 		//bridge JUL to SLF4J for Tomcat logging
 		SLF4JBridgeHandler.removeHandlersForRootLogger();
 		SLF4JBridgeHandler.install();
@@ -86,16 +85,6 @@ public class GuiseCli extends BaseCliApplication {
 	 */
 	public static void main(@Nonnull final String[] args) {
 		Application.start(new GuiseCli(args));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version defaults to {@link Level#INFO} log level.
-	 */
-	@Override
-	protected void updateLogLevel() {
-		final Level logLevel = isDebug() ? Level.DEBUG : Level.INFO;
-		Clogr.getLoggingConcern().setLogLevel(logLevel);
 	}
 
 	/**
