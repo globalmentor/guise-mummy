@@ -193,8 +193,13 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 			final String certificateArn;
 			if(existingCertificateSummaries.isEmpty()) {
 				logger.info("Requesting certificate for domain name `{}` and alternative names `{}`.", domain, aliases);
-				certificateArn = acmClient
-						.requestCertificate(request -> request.domainName(domain).subjectAlternativeNames(aliases).validationMethod(ValidationMethod.DNS)).certificateArn();
+				certificateArn = acmClient.requestCertificate(request -> {
+					request.domainName(domain);
+					if(!aliases.isEmpty()) { //ACM doesn't allow an empty set of subject alternative names to be requested
+						request.subjectAlternativeNames(aliases);
+					}
+					request.validationMethod(ValidationMethod.DNS);
+				}).certificateArn();
 			} else {
 				if(existingCertificateSummaries.size() > 1) {
 					throw new IOException(
