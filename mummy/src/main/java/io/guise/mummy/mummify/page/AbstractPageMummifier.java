@@ -27,7 +27,6 @@ import static com.globalmentor.util.Optionals.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static io.guise.mummy.Artifact.*;
 import static io.guise.mummy.GuiseMummy.*;
-import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.function.Function.*;
@@ -153,6 +152,13 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	};
 
+	private final NavigationManager navigationManager = new NavigationManager();
+
+	/** @return The strategy for loading and working with navigation. */
+	protected NavigationManager getNavigationManager() {
+		return navigationManager;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This version changes the output file extension to {@value PageMummifier#PAGE_NAME_EXTENSION}, or leaves if off altogether if bare names were
@@ -196,38 +202,18 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec If no <code>.navigation.list</code> is provided, this implementation returns the parent navigation artifact returned by
+	 * @implSpec If no <code>.navigation.lst</code> is provided, this implementation returns the parent navigation artifact returned by
 	 *           {@link #findParentNavigationArtifact(MummyContext, Artifact)}, followed by the child navigation artifacts returned by
 	 *           {@link #childNavigationArtifacts(MummyContext, Artifact)} sorted by given order and then by label alphabetical order.
 	 * @implSpec This implementation currently filters out post artifacts.
 	 */
 	@Override
-	public Stream<Artifact> navigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) throws IOException {
+	public Stream<NavigationItem> navigation(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) throws IOException {
 		final String navigationListFilename = context.getConfiguration().getString(CONFIG_KEY_MUMMY_NAVIGATION_LIST_NAME);
 		return findAncestorFileByName(contextArtifact.getSourceDirectory(), navigationListFilename, Files::isRegularFile, context.getSiteSourceDirectory())
 				//if a navigation list file such as `.navigation.lst` was found 
 				.map(throwingFunction(navigationListFile -> {
-					final Path navigationListFileParent = navigationListFile.getParent(); //each line reference is relative to the directory of the navigation file
-					checkState(navigationListFileParent != null, "Navigation list file `%s` has no parent.", navigationListFile);
-
-					try (final Stream<String> lines = lines(navigationListFile, UTF_8)) { //trailing empty lines are ignored, as desired
-						return lines.<Artifact>flatMap(line -> { //map lines to Optional<Artifact>, warning if there is no artifact for a reference 
-							final URIPath referencePath;
-							try {
-								referencePath = URIPath.of(line); //assume each line is a path reference _relative to the navigation list file_
-							} catch(final IllegalArgumentException illegalArgumentException) {
-								throw new UncheckedIOException(
-										new IOException(String.format("Invalid reference path `%s` in navigation file `%s`.", line, navigationListFile)));
-							}
-							final Optional<Artifact> navigationArtifact = context.findArtifactBySourceRelativeReference(navigationListFileParent, referencePath);
-							if(!navigationArtifact.isPresent()) {
-								getLogger().warn("No target artifact found for relative reference `{}` in navigation file `{}`.", referencePath, navigationListFile);
-							}
-							return navigationArtifact.stream();
-						}).collect(toList()).stream(); //(important) collect the artifacts to a list to prevent any exceptions upon stream iteration after method return
-					} catch(final UncheckedIOException uncheckedIOException) { //both the the lines() stream and our own checks can throw an unchecked I/O exception
-						throw uncheckedIOException.getCause();
-					}
+					return getNavigationManager().loadNavigationList(context, contextArtifact, navigationListFile);
 				}))
 				//otherwise determine the default navigation list
 				.orElseGet(() -> {
@@ -247,7 +233,12 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 							//then include the sorted child navigation artifacts
 							childNavigationArtifacts(context, contextArtifact)
 									//posts shouldn't appear in the normal navigation list TODO create a more semantic means of filtering posts
-									.filter(not(PostArtifact.class::isInstance)).sorted(navigationArtifactOrderComparator));
+									.filter(not(PostArtifact.class::isInstance)).sorted(navigationArtifactOrderComparator))
+							//map navigation artifacts to their navigation items
+							.map(navigationArtifact -> {
+								final String href = context.relativizeSourceReference(contextArtifact, navigationArtifact).toString();
+								return DefaultNavigationItem.forHrefTargetingArtifact(href, navigationArtifact);
+							});
 				});
 	}
 
@@ -953,7 +944,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @return The processed element(s), if any, to replace the source element.
 	 * @throws IOException if there is an error processing the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
-	 * @see #navigationList(MummyContext, Artifact)
+	 * @see #navigation(MummyContext, Artifact)
 	 */
 	protected List<Element> regenerateNavigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
 			@Nonnull final Element navigationListElement) throws IOException, DOMException {
@@ -1001,19 +992,21 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		removeChildren(navigationListElement); //remove existing links
 
 		//add new navigation links from templates
-		navigationList(context, contextArtifact)
+		navigation(context, contextArtifact)
 				//generate navigation elements 
-				.forEach(navigationArtifact -> {
-					//if the navigation artifact is this artifact, use the template for an active link
-					final Element liTemplate = navigationArtifact.equals(contextArtifact) ? activeLiTemplate : inactiveLiTemplate;
+				.forEach(navigationItem -> {
+					//see if the href is a relative link back to this artifact, and if so use the template for an active link
+					final boolean isSelfHref = navigationItem.findHref().map(URI::create).filter(not(URI::isAbsolute)).flatMap(URIs::findURIPath)
+							.flatMap(relativeReference -> context.findArtifactBySourceRelativeReference(contextArtifact, relativeReference)).map(contextArtifact::equals)
+							.orElse(false);
+					final Element liTemplate = isSelfHref ? activeLiTemplate : inactiveLiTemplate;
 					final Element liElement = (Element)liTemplate.cloneNode(true);
 					//update the icon: <li><i> (transform to <span></span>)
 					findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_I)).map(Element.class::cast).ifPresent(iElement -> {
 						//if the navigation element has an icon, replace the `<i></i>` with an icon `<span></span>` 
-						navigationArtifact.getResourceDescription().findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_ICON).ifPresentOrElse(icon -> {
+						navigationItem.findIconId().ifPresentOrElse(iconId -> {
 							final String iconClass;
 							final String iconContent;
-							final String iconId = icon.toString();
 							final String[] iconIdParts = iconId.split("/", -1); //TODO use constant
 							if(iconIdParts.length == 2 && !iconIdParts[0].isBlank() && !iconIdParts[1].isBlank()) {
 								final String iconGroup = iconIdParts[0];
@@ -1041,7 +1034,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 					});
 					//update the link: <li><a>
 					findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A)).map(Element.class::cast).ifPresent(aElement -> {
-						aElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, context.relativizeSourceReference(contextArtifact, navigationArtifact).toString());
+						navigationItem.findHref().ifPresentOrElse(href -> aElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, href),
+								() -> aElement.removeAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF));
 						//remove text nodes (leaving the icon or any other element)
 						final Iterator<Node> childNodeIterator = XmlDom.childNodesIterator(aElement);
 						while(childNodeIterator.hasNext()) {
@@ -1050,7 +1044,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 								childNodeIterator.remove();
 							}
 						}
-						final String navigationLabel = navigationArtifact.determineLabel();
+						final String navigationLabel = navigationItem.getLabel();
 						final String linkLabel = aElement.getChildNodes().getLength() > 0 ? " " + navigationLabel : navigationLabel; //add spacing if there are other elements (e.g. an icon)
 						//append the link label
 						appendText(aElement, linkLabel);
