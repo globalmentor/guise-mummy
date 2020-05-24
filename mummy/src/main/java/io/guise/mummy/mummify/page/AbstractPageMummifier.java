@@ -19,7 +19,6 @@ package io.guise.mummy.mummify.page;
 import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.io.Filenames.*;
-import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.lex.CompoundTokenization.*;
@@ -37,7 +36,6 @@ import static org.zalando.fauxpas.FauxPas.*;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.Collator;
 import java.time.*;
@@ -202,44 +200,59 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec If no <code>.navigation.lst</code> is provided, this implementation returns the parent navigation artifact returned by
-	 *           {@link #findParentNavigationArtifact(MummyContext, Artifact)}, followed by the child navigation artifacts returned by
-	 *           {@link #childNavigationArtifacts(MummyContext, Artifact)} sorted by given order and then by label alphabetical order.
-	 * @implSpec This implementation currently filters out post artifacts.
+	 * @implSpec This implementation delegates to {@link NavigationManager#loadNavigation(MummyContext, Artifact)}. Otherwise if no navigation file is provided,
+	 *           this implementation delegates to {@link #defaultNavigation(MummyContext, Artifact)}.
 	 */
 	@Override
 	public Stream<NavigationItem> navigation(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) throws IOException {
-		final String navigationListFilename = context.getConfiguration().getString(CONFIG_KEY_MUMMY_NAVIGATION_LIST_NAME);
-		return findAncestorFileByName(contextArtifact.getSourceDirectory(), navigationListFilename, Files::isRegularFile, context.getSiteSourceDirectory())
-				//if a navigation list file such as `.navigation.lst` was found 
-				.map(throwingFunction(navigationListFile -> {
-					return getNavigationManager().loadNavigationList(context, contextArtifact, navigationListFile);
-				}))
-				//otherwise determine the default navigation list
-				.orElseGet(() -> {
-					//decide how to sort the links
-					final Collator navigationCollator = Collator.getInstance(); //TODO i18n: get locale for page, defaulting to site locale
-					navigationCollator.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
-					navigationCollator.setStrength(Collator.PRIMARY); //ignore accents and case
-					final Comparator<Artifact> navigationArtifactOrderComparator = Comparator
-							//compare first by order (defaulting to zero)
-							.<Artifact, Long>comparing(navigationArtifact -> toLong(
-									navigationArtifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ORDER).orElse(MUMMY_ORDER_DEFAULT)))
-							//then compare by label alphabetical order
-							.thenComparing(navigationArtifact -> navigationArtifact.determineLabel(), navigationCollator);
-					return Stream.concat(
-							//put the parent navigation artifact (if any) first
-							findParentNavigationArtifact(context, contextArtifact).stream(),
-							//then include the sorted child navigation artifacts
-							childNavigationArtifacts(context, contextArtifact)
-									//posts shouldn't appear in the normal navigation list TODO create a more semantic means of filtering posts
-									.filter(not(PostArtifact.class::isInstance)).sorted(navigationArtifactOrderComparator))
-							//map navigation artifacts to their navigation items
-							.map(navigationArtifact -> {
-								final String href = context.relativizeSourceReference(contextArtifact, navigationArtifact).toString();
-								return DefaultNavigationItem.forHrefTargetingArtifact(href, navigationArtifact);
-							});
-				});
+		return getNavigationManager().loadNavigation(context, contextArtifact).orElseGet(() -> defaultNavigation(context, contextArtifact));
+	}
+
+	/**
+	 * Provides the default tree of items suitable for direct navigation from this artifact. The may include the parent artifact, sibling artifacts, and/or the
+	 * given resource itself. This official list may be overridden by the user through the use of a <code>.navigation.list</code> file or other configured file.
+	 * @apiNote These artifacts represent a default fallback. It is not usually appropriate to override this method.
+	 * @implSpec This implementation calls {@link #defaultNavigationArtifacts(MummyContext, Artifact)}.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @return The navigation items, in order, that constitute the official possible navigation destinations from this artifact.
+	 */
+	protected Stream<NavigationItem> defaultNavigation(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
+		return defaultNavigationArtifacts(context, contextArtifact).map(navigationArtifact -> { //map navigation artifacts to their navigation items
+			final String href = context.relativizeSourceReference(contextArtifact, navigationArtifact).toString();
+			return DefaultNavigationItem.forArtifactReference(href, navigationArtifact);
+		});
+	}
+
+	/**
+	 * Provides the the default artifacts suitable for direct navigation from this artifact. These may include the parent artifact, sibling artifacts, and/or the
+	 * given resource itself.
+	 * @apiNote These artifacts represent a default fallback. It is not usually appropriate to override this method.
+	 * @implSpec This implementation currently filters out post artifacts.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @return The artifacts, in order, that constitute the official possible navigation destinations from this artifact.
+	 * @see #findParentNavigationArtifact(MummyContext, Artifact)
+	 * @see #childNavigationArtifacts(MummyContext, Artifact)
+	 */
+	protected Stream<Artifact> defaultNavigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
+		//decide how to sort the links
+		final Collator navigationCollator = Collator.getInstance(); //TODO i18n: get locale for page, defaulting to site locale
+		navigationCollator.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
+		navigationCollator.setStrength(Collator.PRIMARY); //ignore accents and case
+		final Comparator<Artifact> navigationArtifactOrderComparator = Comparator
+				//compare first by order (defaulting to zero)
+				.<Artifact, Long>comparing(
+						navigationArtifact -> toLong(navigationArtifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ORDER).orElse(MUMMY_ORDER_DEFAULT)))
+				//then compare by label alphabetical order
+				.thenComparing(navigationArtifact -> navigationArtifact.determineLabel(), navigationCollator);
+		return Stream.concat(
+				//put the parent navigation artifact (if any) first
+				findParentNavigationArtifact(context, contextArtifact).stream(),
+				//then include the sorted child navigation artifacts
+				childNavigationArtifacts(context, contextArtifact)
+						//posts shouldn't appear in the normal navigation list TODO create a more semantic means of filtering posts
+						.filter(not(PostArtifact.class::isInstance)).sorted(navigationArtifactOrderComparator));
 	}
 
 	/**

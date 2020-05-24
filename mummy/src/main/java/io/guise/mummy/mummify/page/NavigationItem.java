@@ -16,7 +16,7 @@
 
 package io.guise.mummy.mummify.page;
 
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Encapsulates information about a point of navigation.
@@ -26,6 +26,8 @@ public interface NavigationItem {
 
 	/** The property handle of the href indicating the target of navigation. */
 	public static final String PROPERTY_HANDLE_HREF = "href";
+	/** The property handle of the list of child navigation items. */
+	public static final String PROPERTY_HANDLE_NAVIGATION = "navigation";
 
 	/** @return A label for navigation. */
 	public String getLabel();
@@ -39,5 +41,8 @@ public interface NavigationItem {
 	 * @return The hypertext reference to use for the link, which will not be present if there should be no link.
 	 */
 	public Optional<String> findHref();
+
+	/** @return The navigation subordinate to this navigation item; may be empty. */
+	public List<NavigationItem> getNavigation();
 
 }
