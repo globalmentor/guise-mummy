@@ -1008,10 +1008,11 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		navigation(context, contextArtifact)
 				//generate navigation elements 
 				.forEach(navigationItem -> {
-					//see if the href is a relative link back to this artifact, and if so use the template for an active link
-					final boolean isSelfHref = navigationItem.findHref().map(URI::create).filter(not(URI::isAbsolute)).flatMap(URIs::findURIPath)
-							.flatMap(relativeReference -> context.findArtifactBySourceRelativeReference(contextArtifact, relativeReference)).map(contextArtifact::equals)
-							.orElse(false);
+					//see if the href is a relative link back to this artifact, and if so use the template for an active link;
+					final boolean isSelfHref = navigationItem.findHref().map(URI::create).filter(not(URI::isAbsolute)) //assume absolute (external) URIs do not reference this artifact
+							.filter(not(uri -> uri.getRawFragment() != null)) //ignore fragment references; the static page doesn't know when/if the browser includes the fragment
+							.flatMap(URIs::findURIPath).flatMap(relativeReference -> context.findArtifactBySourceRelativeReference(contextArtifact, relativeReference))
+							.map(contextArtifact::equals).orElse(false);
 					final Element liTemplate = isSelfHref ? activeLiTemplate : inactiveLiTemplate;
 					final Element liElement = (Element)liTemplate.cloneNode(true);
 					//update the icon: <li><i> (transform to <span></span>)
