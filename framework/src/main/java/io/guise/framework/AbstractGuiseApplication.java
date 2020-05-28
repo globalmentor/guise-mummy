@@ -398,7 +398,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	 */
 	public void setBaseURI(final URI baseURI) {
 		checkNotInstalled();
-		this.basePath = getPath(checkAbsolute(baseURI)).checkAbsolute().checkCollection();
+		this.basePath = findURIPath(checkAbsolute(baseURI)).map(URIPath::checkAbsolute).map(URIPath::checkCollection)
+				.orElseThrow(() -> new IllegalArgumentException(String.format("Base URI <%s> has no path.", baseURI)));
 		this.baseURI = baseURI;
 	}
 

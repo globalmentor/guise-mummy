@@ -89,7 +89,7 @@ public class SiteDirResourceSet extends DirResourceSet {
 				final FileResource fileResource = new FileResource(root, path, file, isReadOnly(), getManifest());
 
 				//load any description sidecar
-				final Path descriptionFile = addExtension(changeBase(file.toPath(), baseDir, descriptionBaseDir), "@.turf"); //TODO use constant
+				final Path descriptionFile = addFilenameExtension(changeBase(file.toPath(), baseDir, descriptionBaseDir), "@.turf"); //TODO use constant
 				if(isRegularFile(descriptionFile)) {
 					try (final InputStream inputStream = new BufferedInputStream(newInputStream(descriptionFile))) {
 						new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream).stream().filter(UrfResourceDescription.class::isInstance)

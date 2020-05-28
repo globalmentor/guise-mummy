@@ -63,7 +63,7 @@ public abstract class AbstractSourcePathMummifier extends AbstractMummifier impl
 	 * @see Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION
 	 */
 	protected Path getArtifactSourceDescriptionFile(final @Nonnull MummyContext context, final @Nonnull Path sourcePath) {
-		return addExtension(sourcePath, DESCRIPTION_FILE_SIDECAR_EXTENSION);
+		return addFilenameExtension(sourcePath, DESCRIPTION_FILE_SIDECAR_EXTENSION);
 	}
 
 	/**

@@ -1239,8 +1239,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 */
 	protected Optional<URI> retargetResourceReference(@Nonnull MummyContext context, @Nonnull URI resourceReference,
 			@Nonnull final Path originalReferrerSourcePath, @Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) {
-		final URIPath resourceReferencePath = URIs.getPath(resourceReference);
-		checkArgument(resourceReferencePath != null, "Resource reference %s has no path.");
+		final URIPath resourceReferencePath = URIs.findURIPath(resourceReference)
+				.orElseThrow(() -> new IllegalArgumentException(String.format("Resource reference %s has no path.", resourceReference)));
 		return retargetResourceReferencePath(context, resourceReferencePath, originalReferrerSourcePath, relocatedReferrerPath, referentArtifactPath) //retarget the path separately
 				.map(retargetedResourceReferencePath -> URIs.changePath(resourceReference, retargetedResourceReferencePath)); //switch the path of the original reference
 	}
