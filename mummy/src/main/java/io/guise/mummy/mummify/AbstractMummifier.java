@@ -81,7 +81,7 @@ public abstract class AbstractMummifier implements Mummifier {
 	 * @see Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION
 	 */
 	protected Path getArtifactTargetDescriptionFile(final @Nonnull MummyContext context, final @Nonnull Path targetPath) {
-		return addExtension(changeBase(targetPath, context.getSiteTargetDirectory(), context.getSiteDescriptionTargetDirectory()),
+		return addFilenameExtension(changeBase(targetPath, context.getSiteTargetDirectory(), context.getSiteDescriptionTargetDirectory()),
 				DESCRIPTION_FILE_SIDECAR_EXTENSION);
 	}
 

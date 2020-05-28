@@ -687,7 +687,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 						}
 					}
 		*/
-		final String name = URIs.getName(requestURI); //determine a name to use for informational purposes TODO create URIPath.getName() and use on the navigation path
+		final String name = URIs.findName(requestURI).orElse(null); //determine a name to use for informational purposes TODO create URIPath.getName() and use on the navigation path
 		final ProgressListener progressListener = new ProgressListener() { //create a progress listener for listening for progress
 
 			@Override
@@ -1422,7 +1422,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 						//TODO why was this originally destinationResource.getResourceDescription().getURI()? was that a mistake, confusing the description with the resource
 						final URI referenceURI = destinationResource.getURI(); //get the reference URI of the description, if any
 						//Log.trace("setting content disposition, reference URI", referenceURI);
-						setContentDisposition(response, contentDispositionType, referenceURI != null ? getName(referenceURI) : null); //set the response content disposition, suggesting the resource's decoded name if we can
+						setContentDisposition(response, contentDispositionType, referenceURI != null ? findName(referenceURI).orElse(null) : null); //set the response content disposition, suggesting the resource's decoded name if we can
 					}
 				}
 			}

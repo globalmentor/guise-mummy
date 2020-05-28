@@ -1009,7 +1009,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@Override
 	public Breadcrumb getBreadcrumb(final URIPath navigationPath) {
 		final URI depictionURI = getDepictionURI(navigationPath); //get the depiction URI to show
-		return new Breadcrumb(navigationPath, URIs.getName(depictionURI)); //create a default breadcrumb with the decoded depiction name of this navigation path
+		return new Breadcrumb(navigationPath, URIs.findName(depictionURI).orElse(null)); //create a default breadcrumb with the decoded depiction name of this navigation path
 	}
 
 	/**
