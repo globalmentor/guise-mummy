@@ -941,15 +941,13 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
 	 * element is removed.
 	 * </p>
-	 * <ul>
-	 * <li>Within each <code>&lt;li&gt;</code> element, the first {@code <i></i>} element is considered to be a placeholder for an icon. If the navigation
-	 * artifact has an {@value Artifact#PROPERTY_HANDLE_ICON} property, it is replaced with a {@code <span></span>}; otherwise it is removed. The icon property
-	 * value is expected to be in the form <code><var>group</var>/<var>name</var></code> form, and based upon the specific group the {@code <span>}
-	 * <code>class</code> attribute and content will be updated appropriately. If the icon identification format isn't recognized, the literal value will be used
-	 * as the text content of the {@code <span>}.</li>
-	 * <li>Within each <code>&lt;li&gt;</code> element, the first {@code <a></a>} element is considered to be a placeholder for the link. All of its text is
-	 * removed (leaving the icon, if any), and the result of {@link Artifact#determineLabel()} will be appended as text for the link label.</li>
-	 * </ul>
+	 * <p>
+	 * This method discovers a link to serve as the template for the generated links. If the link has a reference to the template itself (preferably by simply
+	 * using <code>href=""</code>), the link is used as the template for active links; that is, self-links. Any other link (which is not ever required to have an
+	 * <code>href</code> attribute) is used as the template for all other links.
+	 * </p>
+	 * @implSpec This implementation calls {@link #generateNavigationList(MummyContext, Artifact, Artifact, Element, Element, Stream)} for each menu level. See
+	 *           that method for a specification of how link templates work.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
@@ -958,6 +956,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @throws IOException if there is an error processing the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 * @see #navigation(MummyContext, Artifact)
+	 * @see #generateNavigationList(MummyContext, Artifact, Artifact, Element, Element, Stream)
 	 */
 	protected List<Element> regenerateNavigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
 			@Nonnull final Element navigationListElement) throws IOException, DOMException {
@@ -1004,69 +1003,103 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 		removeChildren(navigationListElement); //remove existing links
 
-		//add new navigation links from templates
-		navigation(context, contextArtifact)
-				//generate navigation elements 
-				.forEach(navigationItem -> {
-					//see if the href is a relative link back to this artifact, and if so use the template for an active link;
-					final boolean isSelfHref = navigationItem.findHref().map(URI::create).filter(not(URI::isAbsolute)) //assume absolute (external) URIs do not reference this artifact
-							.filter(not(uri -> uri.getRawFragment() != null)) //ignore fragment references; the static page doesn't know when/if the browser includes the fragment
-							.flatMap(URIs::findURIPath).flatMap(relativeReference -> context.findArtifactBySourceRelativeReference(contextArtifact, relativeReference))
-							.map(contextArtifact::equals).orElse(false);
-					final Element liTemplate = isSelfHref ? activeLiTemplate : inactiveLiTemplate;
-					final Element liElement = (Element)liTemplate.cloneNode(true);
-					//update the icon: <li><i> (transform to <span></span>)
-					findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_I)).map(Element.class::cast).ifPresent(iElement -> {
-						//if the navigation element has an icon, replace the `<i></i>` with an icon `<span></span>` 
-						navigationItem.findIconId().ifPresentOrElse(iconId -> {
-							final String iconClass;
-							final String iconContent;
-							final String[] iconIdParts = iconId.split("/", -1); //TODO use constant
-							if(iconIdParts.length == 2 && !iconIdParts[0].isBlank() && !iconIdParts[1].isBlank()) {
-								final String iconGroup = iconIdParts[0];
-								final String iconName = iconIdParts[1];
-								if(FONT_AWESOME_ICON_GROUPS.contains(iconGroup)) {
-									iconClass = iconGroup + ' ' + iconName; //e.g. `<span class="fas fa-home"></span>` (Font Awesome)
-									iconContent = null;
-								} else {
-									iconClass = iconGroup; //e.g. `<span class="material-icons">home</span>` (Material Icons)
-									iconContent = iconName;
-								}
-							} else { //if the icon name isn't in the format we expect, just use it as the content
-								iconClass = null;
-								iconContent = iconId;
-							}
-							final Element iconElement = iElement.getOwnerDocument().createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_SPAN);
-							if(iconClass != null) {
-								iconElement.setAttributeNS(null, ATTRIBUTE_CLASS, iconClass);
-							}
-							if(iconContent != null) {
-								appendText(iconElement, iconContent);
-							}
-							iElement.getParentNode().replaceChild(iconElement, iElement);
-						}, () -> iElement.getParentNode().removeChild(iElement)); //if the navigation element has no icon, remove the `<i></i>`
-					});
-					//update the link: <li><a>
-					findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A)).map(Element.class::cast).ifPresent(aElement -> {
-						navigationItem.findHref().ifPresentOrElse(href -> aElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, href),
-								() -> aElement.removeAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF));
-						//remove text nodes (leaving the icon or any other element)
-						final Iterator<Node> childNodeIterator = XmlDom.childNodesIterator(aElement);
-						while(childNodeIterator.hasNext()) {
-							final Node childNode = childNodeIterator.next();
-							if(childNode.getNodeType() == Node.TEXT_NODE) {
-								childNodeIterator.remove();
-							}
-						}
-						final String navigationLabel = navigationItem.getLabel();
-						final String linkLabel = aElement.getChildNodes().getLength() > 0 ? " " + navigationLabel : navigationLabel; //add spacing if there are other elements (e.g. an icon)
-						//append the link label
-						appendText(aElement, linkLabel);
-					});
-					navigationListElement.appendChild(liElement);
-				});
+		//regenerate the list and add the new list elements to the navigation list element
+		generateNavigationList(context, contextArtifact, artifact, inactiveLiTemplate, activeLiTemplate, navigation(context, contextArtifact))
+				.forEach(navigationListElement::appendChild);
 
 		return List.of(navigationListElement);
+	}
+
+	/**
+	 * Recursively regenerates a navigation list for the given navigation items based following the the given link templates.
+	 * <ul>
+	 * <li>Within each <code>&lt;li&gt;</code> element, the first {@code <i></i>} element is considered to be a placeholder for an icon. If the navigation
+	 * artifact has an {@value Artifact#PROPERTY_HANDLE_ICON} property, it is replaced with a {@code <span></span>}; otherwise it is removed. The icon property
+	 * value is expected to be in the form <code><var>group</var>/<var>name</var></code> form, and based upon the specific group the {@code <span>}
+	 * <code>class</code> attribute and content will be updated appropriately. If the icon identification format isn't recognized, the literal value will be used
+	 * as the text content of the {@code <span>}.</li>
+	 * <li>Within each <code>&lt;li&gt;</code> element, the first {@code <a></a>} element is considered to be a placeholder for the link. All of its text is
+	 * removed (leaving the icon, if any), and the result of {@link Artifact#determineLabel()} will be appended as text for the link label.</li>
+	 * </ul>
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact being generated
+	 * @param inactiveLiTemplate The element to serve as a template for generating "normal", non-active items.
+	 * @param activeLiTemplate The element to serve as a template for generating active items, those item that reference the context artifact.
+	 * @param navigation The navigation items for which to generate list item elements.
+	 * @return The elements generated for the list items.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 */
+	protected Stream<Element> generateNavigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
+			@Nonnull final Element inactiveLiTemplate, @Nonnull final Element activeLiTemplate, @Nonnull final Stream<NavigationItem> navigation)
+			throws DOMException {
+		return navigation.map(navigationItem -> { //generate navigation elements 
+			//see if the href is a relative link back to this artifact, and if so use the template for an active link;
+			final boolean isSelfHref = navigationItem.findHref().map(URI::create).filter(not(URI::isAbsolute)) //assume absolute (external) URIs do not reference this artifact
+					.filter(not(uri -> uri.getRawFragment() != null)) //ignore fragment references; the static page doesn't know when/if the browser includes the fragment
+					.flatMap(URIs::findURIPath).flatMap(relativeReference -> context.findArtifactBySourceRelativeReference(contextArtifact, relativeReference))
+					.map(contextArtifact::equals).orElse(false);
+			final Element liTemplate = isSelfHref ? activeLiTemplate : inactiveLiTemplate;
+			final Element liElement = (Element)liTemplate.cloneNode(true);
+			//update the icon: <li><i> (transform to <span></span>)
+			findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_I)).map(Element.class::cast).ifPresent(iElement -> {
+				//if the navigation element has an icon, replace the `<i></i>` with an icon `<span></span>` 
+				navigationItem.findIconId().ifPresentOrElse(iconId -> {
+					final String iconClass;
+					final String iconContent;
+					final String[] iconIdParts = iconId.split("/", -1); //TODO use constant
+					if(iconIdParts.length == 2 && !iconIdParts[0].isBlank() && !iconIdParts[1].isBlank()) {
+						final String iconGroup = iconIdParts[0];
+						final String iconName = iconIdParts[1];
+						if(FONT_AWESOME_ICON_GROUPS.contains(iconGroup)) {
+							iconClass = iconGroup + ' ' + iconName; //e.g. `<span class="fas fa-home"></span>` (Font Awesome)
+							iconContent = null;
+						} else {
+							iconClass = iconGroup; //e.g. `<span class="material-icons">home</span>` (Material Icons)
+							iconContent = iconName;
+						}
+					} else { //if the icon name isn't in the format we expect, just use it as the content
+						iconClass = null;
+						iconContent = iconId;
+					}
+					final Element iconElement = iElement.getOwnerDocument().createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_SPAN);
+					if(iconClass != null) {
+						iconElement.setAttributeNS(null, ATTRIBUTE_CLASS, iconClass);
+					}
+					if(iconContent != null) {
+						appendText(iconElement, iconContent);
+					}
+					iElement.getParentNode().replaceChild(iconElement, iElement);
+				}, () -> iElement.getParentNode().removeChild(iElement)); //if the navigation element has no icon, remove the `<i></i>`
+			});
+			//update the link: <li><a>
+			findFirst(liElement.getElementsByTagNameNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A)).map(Element.class::cast).ifPresent(aElement -> {
+				navigationItem.findHref().ifPresentOrElse(href -> aElement.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, href),
+						() -> aElement.removeAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF));
+				//remove text nodes (leaving the icon or any other element)
+				final Iterator<Node> childNodeIterator = XmlDom.childNodesIterator(aElement);
+				while(childNodeIterator.hasNext()) {
+					final Node childNode = childNodeIterator.next();
+					if(childNode.getNodeType() == Node.TEXT_NODE) {
+						childNodeIterator.remove();
+					}
+				}
+				final String navigationLabel = navigationItem.getLabel();
+				final String linkLabel = aElement.getChildNodes().getLength() > 0 ? " " + navigationLabel : navigationLabel; //add spacing if there are other elements (e.g. an icon)
+				//append the link label
+				appendText(aElement, linkLabel);
+			});
+			//recursively add child lists as needed: <li><ul>
+			final List<NavigationItem> childNavigation = navigationItem.getNavigation();
+			if(!childNavigation.isEmpty()) { //don't even add a sublist if there are no child navigation items
+				final Element ulElement = liElement.getOwnerDocument().createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_UL);
+				//generate navigation list elements and add them to the sublist element
+				generateNavigationList(context, contextArtifact, artifact, inactiveLiTemplate, activeLiTemplate, childNavigation.stream())
+						.forEach(ulElement::appendChild);
+				liElement.appendChild(ulElement);
+			}
+			return liElement;
+		});
 	}
 
 	//#relocate

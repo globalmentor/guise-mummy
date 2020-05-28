@@ -70,7 +70,7 @@ public class NavigationManager implements Clogged {
 	 *           </ul>
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
-	 * @return The navigation items loaded from the file.
+	 * @return The navigation items loaded from the file. The stream will not throw an {@link IOException} during iteration.
 	 * @throws IOException if there is an I/O error loading the navigation list file.
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME
 	 */
@@ -97,7 +97,7 @@ public class NavigationManager implements Clogged {
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param navigationFile The path to the file containing the navigation list.
-	 * @return The navigation items loaded from the file.
+	 * @return The navigation items loaded from the file. The stream will not throw an {@link IOException} during iteration.
 	 * @throws IOException if there is an I/O error loading the navigation list file.
 	 */
 	public Stream<NavigationItem> loadNavigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Path navigationFile)
@@ -232,7 +232,7 @@ public class NavigationManager implements Clogged {
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param navigationFile The path to the file containing the navigation definition.
-	 * @return The navigation items loaded from the file.
+	 * @return The navigation items loaded from the file. The stream will not throw an {@link IOException} during iteration.
 	 * @throws IOException if there is an I/O error loading the navigation file.
 	 */
 	public Stream<NavigationItem> loadNavigationTurf(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Path navigationFile)
