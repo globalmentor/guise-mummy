@@ -574,11 +574,12 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param artifact The artifact being generated
 	 * @param sourceDocument The source document to process.
 	 * @return The document after applying a template, which may or may not be the same document supplied as input.
+	 * @throws IllegalDataException if there is an error in the template or the source document preventing the template from being applied.
 	 * @throws IOException if there is an error applying a template.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	protected Document applyTemplate(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Document sourceDocument) throws IOException, DOMException {
+			@Nonnull final Document sourceDocument) throws IOException, IllegalDataException, DOMException {
 		return findTemplateSourceFile(context, contextArtifact, artifact, sourceDocument) //determine if there is a specified or appropriate template
 				.flatMap(throwingFunction(templateSource -> { //try to apply the template
 					final Path templateFile = templateSource.getKey();
@@ -693,49 +694,83 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param templateDocument The template into which the source document links are to be merged; must have a {@code <head>} element.
 	 * @param sourceDocument The source document the links of which are being merged.
 	 * @throws IllegalArgumentException if the template does not have a {@code <head>} element.
-	 * @throws IOException if there is an error merging the links.
+	 * @throws IllegalDataException if there is an error with the links being merged.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	protected void mergeHeadLinks(@Nonnull final Document templateDocument, @Nonnull final Document sourceDocument) throws IOException, DOMException {
-		final Set<URI> links = new HashSet<>(); //keep track of existing template links and added links
+	protected void mergeHeadLinks(@Nonnull final Document templateDocument, @Nonnull final Document sourceDocument) throws IllegalDataException, DOMException {
+		//find all the source document head link elements and map them to the links, but still maintain order
+		final Map<URI, Element> sourceDocumentHeadLinkElementsByLink = findHtmlHeadElement(sourceDocument).stream().flatMap(XmlDom::childElementsOf)
+				.filter(element -> XHTML_NAMESPACE_URI_STRING.equals(element.getNamespaceURI())).flatMap(element -> { //only look at HTML elements
+					return Optional.ofNullable(HTML_REFERENCE_ELEMENT_ATTRIBUTES.get(element.getLocalName())) //see if it is a reference element and get its reference attribute name
+							.flatMap(referenceAttributeName -> findAttributeNS(element, null, referenceAttributeName).flatMap(referenceString -> {
+								try { //convert any reference to a URI and normalize it
+									final URI referenceURI = new URI(referenceString).normalize();
+									return Optional.of(Map.entry(referenceURI, element));
+								} catch(final URISyntaxException uriSyntaxException) {
+									getLogger().warn("Invalid page `<head><{}>` reference {}: {}", element.getLocalName(), referenceString,
+											uriSyntaxException.getLocalizedMessage());
+									return Optional.empty();
+								}
+							})).stream();
+				}).collect(toMap(Map.Entry::getKey, Map.Entry::getValue, (first, duplicate) -> {
+					getLogger().warn("Ignoring duplicate page `<head>` reference `{}`.", duplicate);
+					return first;
+				}, LinkedHashMap::new));
+
+		//consider the page links already "encountered" as they have already been deduped and we already know we will use them
+		final Set<URI> encounteredLinks = new HashSet<>(sourceDocumentHeadLinkElementsByLink.keySet());
+
+		//merge in our gathered source document links
 		final Element templateHeadElement = findHtmlHeadElement(templateDocument)
 				.orElseThrow(() -> new IllegalArgumentException("Template missing <head> element."));
-
-		//collect existing template <head> links
-		childElementsOf(templateHeadElement).filter(element -> XHTML_NAMESPACE_URI_STRING.equals(element.getNamespaceURI())).forEach(element -> {
-			final String referenceAttributeName = HTML_REFERENCE_ELEMENT_ATTRIBUTES.get(element.getLocalName());
-			if(referenceAttributeName != null) {
-				findAttributeNS(element, null, referenceAttributeName).ifPresent(referenceString -> {
-					try {
-						final URI referenceURI = new URI(referenceString).normalize();
-						links.add(referenceURI);
-					} catch(final URISyntaxException uriSyntaxException) {
-						getLogger().warn("Invalid template <head><{}> reference {}.", element.getLocalName(), referenceString, uriSyntaxException);
-						return;
-					}
-				});
-			}
-		});
-
-		//merge in source document <head> links
-		findHtmlHeadElement(sourceDocument).stream().flatMap(XmlDom::childElementsOf)
-				.filter(element -> XHTML_NAMESPACE_URI_STRING.equals(element.getNamespaceURI())).forEach(element -> {
-					final String referenceAttributeName = HTML_REFERENCE_ELEMENT_ATTRIBUTES.get(element.getLocalName());
+		Node templateHeadChildNode = templateHeadElement.getFirstChild(); //this acts as a cursor through the children
+		while(templateHeadChildNode != null) {
+			if(templateHeadChildNode instanceof Element) {
+				final Element templateHeadChildElement = (Element)templateHeadChildNode;
+				if(XHTML_NAMESPACE_URI_STRING.equals(templateHeadChildElement.getNamespaceURI())) {
+					final String referenceAttributeName = HTML_REFERENCE_ELEMENT_ATTRIBUTES.get(templateHeadChildElement.getLocalName());
 					if(referenceAttributeName != null) {
-						findAttributeNS(element, null, referenceAttributeName).ifPresent(referenceString -> {
+						final String referenceString = findAttributeNS(templateHeadChildElement, null, referenceAttributeName).orElse(null);
+						if(referenceString != null) {
+							final URI referenceURI;
 							try {
-								final URI referenceURI = new URI(referenceString).normalize();
-								if(!links.contains(referenceURI)) {
-									templateHeadElement.appendChild(templateDocument.importNode(element, true));
-									links.add(referenceURI); //prevent duplicate source links
-								}
+								referenceURI = new URI(referenceString).normalize();
 							} catch(final URISyntaxException uriSyntaxException) {
-								getLogger().warn("Invalid template <head><{}> reference {}.", element.getLocalName(), referenceString, uriSyntaxException);
-								return;
+								throw new IllegalDataException(String.format("Invalid template <head><%s> reference %s: %s", templateHeadChildElement.getLocalName(),
+										referenceString, uriSyntaxException.getLocalizedMessage()));
 							}
-						});
+							//we'll eventually remove this element if it's a template duplicate or if it is present in the source document
+							final boolean isToRemove = encounteredLinks.contains(referenceURI);
+							encounteredLinks.add(referenceURI); //make note of the link for future deduping
+							if(sourceDocumentHeadLinkElementsByLink.containsKey(referenceURI)) { //if the source document has this link
+								//merge in all source links up to and including this link
+								final Iterator<Map.Entry<URI, Element>> sourceLinkEntryIterator = sourceDocumentHeadLinkElementsByLink.entrySet().iterator();
+								while(sourceLinkEntryIterator.hasNext()) {
+									final Map.Entry<URI, Element> sourceLinkEntry = sourceLinkEntryIterator.next();
+									final Element sourceLinkElement = sourceLinkEntry.getValue();
+									//import an insert the link before this link
+									templateHeadElement.insertBefore(templateDocument.importNode(sourceLinkElement, true), templateHeadChildElement);
+									sourceLinkEntryIterator.remove(); //remove the record of the source link so we won't use it again
+									if(sourceLinkEntry.getKey().equals(referenceURI)) { //stop when we get to the same source document link as this one
+										break;
+									}
+								}
+							}
+							if(isToRemove) { //remove the template head element if marked for removal
+								final Node remainingNode = templateHeadChildNode.getPreviousSibling();
+								//if we are removing a node, it was duplicated in the template or we added in source document links before it
+								assert remainingNode != null : "No remaining previous node when removing duplicate template link after merge.";
+								templateHeadElement.removeChild(templateHeadChildNode);
+								templateHeadChildNode = remainingNode; //place the "cursor" on a valid node
+							}
+						}
 					}
-				});
+				}
+			}
+			templateHeadChildNode = templateHeadChildNode.getNextSibling();
+		}
+		//add any remaining source document links that weren't merged in
+		sourceDocumentHeadLinkElementsByLink.values().forEach(element -> templateHeadElement.appendChild(templateDocument.importNode(element, true)));
 	}
 
 	/**
@@ -746,11 +781,11 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param templateDocument The template into which the source document scripts are to be merged; must have a {@code <head>} element.
 	 * @param sourceDocument The source document from which the scripts are being imported.
 	 * @throws IllegalArgumentException if the template does not have a {@code <head>} element.
-	 * @throws IOException if there is an error importing the scripts.
+	 * @throws IllegalDataException if there is an error importing the scripts.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 * @see <a href="https://www.w3.org/TR/html52/semantics-scripting.html#the-script-element">HTML 5.2 § 4.12.1. The script element</a>
 	 */
-	protected void importHeadScripts(@Nonnull final Document templateDocument, @Nonnull final Document sourceDocument) throws IOException, DOMException {
+	protected void importHeadScripts(@Nonnull final Document templateDocument, @Nonnull final Document sourceDocument) throws IllegalDataException, DOMException {
 		final Element templateHeadElement = findHtmlHeadElement(templateDocument)
 				.orElseThrow(() -> new IllegalArgumentException("Template missing <head> element."));
 		findHtmlHeadElement(sourceDocument).stream().flatMap(XmlDom::childElementsOf).filter(XHTML_ELEMENT_SCRIPT::matches) //find all <script> elements
