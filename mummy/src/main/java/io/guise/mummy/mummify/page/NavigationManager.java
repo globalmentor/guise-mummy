@@ -59,20 +59,26 @@ public class NavigationManager implements Clogged {
 			.collect(collectingAndThen(toCollection(LinkedHashSet::new), Collections::unmodifiableSet));
 
 	/**
-	 * Loads a a supported text navigation file such as <code>.navigation.lst</code>.
-	 * <p>
-	 * This method searches up the directory hierarchy and loads the first supported navigation definition file with the configured navigation base filename.
-	 * </p>
-	 * @implSpec This implementation currently supports the following navigation definition formats:
-	 *           <ul>
-	 *           <li>Text list.</li>
-	 *           <li>TURF</li>
-	 *           </ul>
+	 * The suffix to add to the navigation base name for additive navigation files.
+	 * @see GuiseMummy#CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME
+	 */
+	public static final String NAVIGATION_ADD_NAME_SUFFIX = "+";
+
+	/**
+	 * Loads a supported navigation by discovering and loading the appropriate navigation files <code>.navigation.lst</code>.
+	 * <ul>
+	 * <li>This method searches up the directory hierarchy and loads the first supported navigation definition file with the configured navigation base
+	 * filename.</li>
+	 * <li>Then in reverse order, starting at the directory of the navigation file and ascending back to the context artifact source directory, the navigation
+	 * from any additive navigation file (following the same rules as the main navigation definition file, except that its base name ends in
+	 * {@value #NAVIGATION_ADD_NAME_SUFFIX}) is loaded and appended to the original defined navigation.</li>
+	 * </ul>
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
-	 * @return The navigation items loaded from the file. The stream will not throw an {@link IOException} during iteration.
+	 * @return The navigation items loaded from the appropriate file(s). The stream will not throw an {@link IOException} during iteration.
 	 * @throws IOException if there is an I/O error loading the navigation list file.
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME
+	 * @see #NAVIGATION_ADD_NAME_SUFFIX
 	 */
 	public Optional<Stream<NavigationItem>> loadNavigation(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) throws IOException {
 		final String navigationBaseName = context.getConfiguration().getString(CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME);
@@ -80,15 +86,47 @@ public class NavigationManager implements Clogged {
 				.collect(collectingAndThen(toCollection(LinkedHashSet::new), Collections::unmodifiableSet));
 		return findAncestorFileByName(contextArtifact.getSourceDirectory(), navigationFilenames, Files::isRegularFile, context.getSiteSourceDirectory())
 				.map(throwingFunction(navigationFile -> {
-					switch(findFilenameExtension(navigationFile).orElseThrow(IllegalStateException::new)) {
-						case Text.LST_NAME_EXTENSION:
-							return loadNavigationList(context, contextArtifact, navigationFile);
-						case TURF.FILENAME_EXTENSION:
-							return loadNavigationTurf(context, contextArtifact, navigationFile);
-						default:
-							throw new AssertionError(String.format("Unrecognized navigation file type: `%s`.", navigationFile));
+					final Stream<NavigationItem> navigation = loadNavigationFile(context, contextArtifact, navigationFile);
+					final String navigationAddBaseName = navigationBaseName + NAVIGATION_ADD_NAME_SUFFIX;
+					final Set<String> navigationAddFilenames = SUPPORTED_NAVIGATION_FILE_EXTENSIONS.stream().map(ext -> addExtension(navigationAddBaseName, ext))
+							.collect(collectingAndThen(toCollection(LinkedHashSet::new), Collections::unmodifiableSet));
+					final LinkedList<Path> addNavigationFiles = new LinkedList<>();
+					for(Path directory = contextArtifact.getSourceDirectory(); !directory.equals(context.getSiteSourceDirectory()); directory = directory.getParent()) {
+						assert directory != null : "Unexpectedly ran out of directories between the artifact source directory and the ancestor navigation file directory.";
+						//search for an "ancestor" additive navigation file but only at this level in the hierarchy, pushing onto the stack to produce reverse order
+						findAncestorFileByName(directory, navigationAddFilenames, Files::isRegularFile, directory).ifPresent(addNavigationFiles::push);
 					}
+					final Stream<NavigationItem> addNavigation = addNavigationFiles.stream()
+							.flatMap(throwingFunction(navigationAddFile -> loadNavigationFile(context, contextArtifact, navigationAddFile)));
+					return Stream.concat(navigation, addNavigation); //tack all the added navigation items on the end of the original defined navigation
 				}));
+	}
+
+	/**
+	 * Loads a single navigation file such as <code>.navigation.lst</code>.
+	 * @implSpec This implementation currently supports the following navigation definition formats:
+	 *           <ul>
+	 *           <li>Text list.</li>
+	 *           <li>TURF</li>
+	 *           </ul>
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param navigationFile The file to load.
+	 * @return The navigation items loaded from the file. The stream will not throw an {@link IOException} during iteration.
+	 * @throws IllegalArgumentException if the navigation file has no filename extension.
+	 * @throws IOException if there is an I/O error loading the navigation list file.
+	 */
+	protected Stream<NavigationItem> loadNavigationFile(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact,
+			@Nonnull final Path navigationFile) throws IOException {
+		switch(findFilenameExtension(navigationFile)
+				.orElseThrow(() -> new IllegalArgumentException(String.format("Navigation file `%s` has no extension.", navigationFile)))) {
+			case Text.LST_NAME_EXTENSION:
+				return loadNavigationFileList(context, contextArtifact, navigationFile);
+			case TURF.FILENAME_EXTENSION:
+				return loadNavigationFileTurf(context, contextArtifact, navigationFile);
+			default:
+				throw new AssertionError(String.format("Unrecognized navigation file type: `%s`.", navigationFile));
+		}
 	}
 
 	/**
@@ -100,8 +138,8 @@ public class NavigationManager implements Clogged {
 	 * @return The navigation items loaded from the file. The stream will not throw an {@link IOException} during iteration.
 	 * @throws IOException if there is an I/O error loading the navigation list file.
 	 */
-	public Stream<NavigationItem> loadNavigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Path navigationFile)
-			throws IOException {
+	public Stream<NavigationItem> loadNavigationFileList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact,
+			@Nonnull final Path navigationFile) throws IOException {
 		final Path navigationListFileParent = navigationFile.getParent(); //each line reference is relative to the directory of the navigation file
 		checkState(navigationListFileParent != null, "Navigation list file `%s` has no parent.", navigationFile);
 		try (final Stream<String> lines = lines(navigationFile, UTF_8)) { //trailing empty lines are ignored, as desired
@@ -194,11 +232,11 @@ public class NavigationManager implements Clogged {
 	 * Loads a navigation definition file in TURF format (e.g. <code>.navigation.turf</code>). Each item can be one of the following:
 	 * <ul>
 	 * <li>A string, in which case the value is interpreted as a reference to an artifact, relative to the navigation file, identical to
-	 * {@link #loadNavigationList(MummyContext, Artifact, Path)}.</li>
+	 * {@link #loadNavigationFileList(MummyContext, Artifact, Path)}.</li>
 	 * <li>An object description which supports, in addition to {@value NavigationItem#PROPERTY_HANDLE_HREF}, the same descriptive properties an artifact would:
 	 * <ul>
-	 * <li>{@value NavigationItem#PROPERTY_HANDLE_HREF}: Either a string path to an artifact as in {@link #loadNavigationList(MummyContext, Artifact, Path)}, or a
-	 * URL link to an external page.</li>
+	 * <li>{@value NavigationItem#PROPERTY_HANDLE_HREF}: Either a string path to an artifact as in {@link #loadNavigationFileList(MummyContext, Artifact, Path)},
+	 * or a URL link to an external page.</li>
 	 * <li>{@value Artifact#PROPERTY_HANDLE_LABEL}: The label for the navigation item, overriding any of the artifact.</li>
 	 * <li>{@value Artifact#PROPERTY_HANDLE_ICON}: The icon of the navigation item, overriding any of the artifact.</li>
 	 * <li>{@value NavigationItem#PROPERTY_HANDLE_NAVIGATION}: A property containing a nested navigation list.</li>
@@ -235,8 +273,8 @@ public class NavigationManager implements Clogged {
 	 * @return The navigation items loaded from the file. The stream will not throw an {@link IOException} during iteration.
 	 * @throws IOException if there is an I/O error loading the navigation file.
 	 */
-	public Stream<NavigationItem> loadNavigationTurf(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Path navigationFile)
-			throws IOException {
+	public Stream<NavigationItem> loadNavigationFileTurf(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact,
+			@Nonnull final Path navigationFile) throws IOException {
 		final List<?> navigationObjects;
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(navigationFile))) {
 			navigationObjects = new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream).stream()
@@ -258,7 +296,7 @@ public class NavigationManager implements Clogged {
 
 	/**
 	 * Converts a list of objects from a TURF graph to navigation items. The objects adhere to the model described in
-	 * {@link #loadNavigationTurf(MummyContext, Artifact, Path)}.
+	 * {@link #loadNavigationFileTurf(MummyContext, Artifact, Path)}.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param navigationFile The path to the file containing the navigation definition.
