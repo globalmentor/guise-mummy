@@ -43,6 +43,15 @@ public class DirectoryArtifact extends AbstractArtifact implements CollectionArt
 		return getSourcePath();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation always returns <code>false</code>.
+	 */
+	@Override
+	public final boolean isSourcePathFile() {
+		return false;
+	}
+
 	private final Artifact contentArtifact;
 
 	/** @return The optional internal artifact representing the content of this directory, such as <code>index.xhtml</code>. */

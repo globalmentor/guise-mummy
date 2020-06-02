@@ -75,31 +75,59 @@ public class NavigationManager implements Clogged {
 	 * </ul>
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact being generated
 	 * @return The navigation items loaded from the appropriate file(s). The stream will not throw an {@link IOException} during iteration.
 	 * @throws IOException if there is an I/O error loading the navigation list file.
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME
 	 * @see #NAVIGATION_ADD_NAME_SUFFIX
 	 */
-	public Optional<Stream<NavigationItem>> loadNavigation(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) throws IOException {
+	public Optional<Stream<NavigationItem>> loadNavigation(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact,
+			@Nonnull final Artifact artifact) throws IOException {
 		final String navigationBaseName = context.getConfiguration().getString(CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME);
-		final Set<String> navigationFilenames = SUPPORTED_NAVIGATION_FILE_EXTENSIONS.stream().map(ext -> addExtension(navigationBaseName, ext))
-				.collect(collectingAndThen(toCollection(LinkedHashSet::new), Collections::unmodifiableSet));
-		return findAncestorFileByName(contextArtifact.getSourceDirectory(), navigationFilenames, Files::isRegularFile, context.getSiteSourceDirectory())
-				.map(throwingFunction(navigationFile -> {
-					final Stream<NavigationItem> navigation = loadNavigationFile(context, contextArtifact, navigationFile);
-					final String navigationAddBaseName = navigationBaseName + NAVIGATION_ADD_NAME_SUFFIX;
-					final Set<String> navigationAddFilenames = SUPPORTED_NAVIGATION_FILE_EXTENSIONS.stream().map(ext -> addExtension(navigationAddBaseName, ext))
-							.collect(collectingAndThen(toCollection(LinkedHashSet::new), Collections::unmodifiableSet));
-					final LinkedList<Path> addNavigationFiles = new LinkedList<>();
-					for(Path directory = contextArtifact.getSourceDirectory(); !directory.equals(context.getSiteSourceDirectory()); directory = directory.getParent()) {
-						assert directory != null : "Unexpectedly ran out of directories between the artifact source directory and the ancestor navigation file directory.";
-						//search for an "ancestor" additive navigation file but only at this level in the hierarchy, pushing onto the stack to produce reverse order
-						findAncestorFileByName(directory, navigationAddFilenames, Files::isRegularFile, directory).ifPresent(addNavigationFiles::push);
-					}
-					final Stream<NavigationItem> addNavigation = addNavigationFiles.stream()
-							.flatMap(throwingFunction(navigationAddFile -> loadNavigationFile(context, contextArtifact, navigationAddFile)));
-					return Stream.concat(navigation, addNavigation); //tack all the added navigation items on the end of the original defined navigation
-				}));
+		final String navigationAddBaseName = navigationBaseName + NAVIGATION_ADD_NAME_SUFFIX;
+		final Path sourceDirectory = contextArtifact.getSourceDirectory();
+		final Optional<String> pageFilename = artifact.isSourcePathFile() ? findFilename(artifact.getSourcePath()) : Optional.empty();
+
+		//look for a per-page navigation definition file in the form `.filename.ext.navigation.*`
+		final Optional<Stream<NavigationItem>> pageNavigationDefinition = pageFilename.flatMap(throwingFunction(filename -> {
+			final Set<String> navigationFilenames = SUPPORTED_NAVIGATION_FILE_EXTENSIONS.stream()
+					.map(ext -> addExtension(DOTFILE_PREFIX + filename + navigationBaseName, ext)).collect(toCollection(LinkedHashSet::new));
+			return findAncestorFileByName(sourceDirectory, navigationFilenames, Files::isRegularFile, sourceDirectory)
+					.map(throwingFunction(file -> loadNavigationFile(context, contextArtifact, file)));
+		}));
+
+		//if there is no per-page definition, look for a general definition `.navigation.*` up the hierarchy, with any additions `.navigation+.*`
+		final Optional<Stream<NavigationItem>> navigationDefinition = pageNavigationDefinition.or(throwingSupplier(() -> {
+			final Set<String> navigationFilenames = SUPPORTED_NAVIGATION_FILE_EXTENSIONS.stream().map(ext -> addExtension(navigationBaseName, ext))
+					.collect(toCollection(LinkedHashSet::new));
+			return findAncestorFileByName(sourceDirectory, navigationFilenames, Files::isRegularFile, context.getSiteSourceDirectory())
+					.map(throwingFunction(navigationFile -> {
+						final Stream<NavigationItem> navigation = loadNavigationFile(context, contextArtifact, navigationFile);
+						final Set<String> navigationAddFilenames = SUPPORTED_NAVIGATION_FILE_EXTENSIONS.stream().map(ext -> addExtension(navigationAddBaseName, ext))
+								.collect(toCollection(LinkedHashSet::new));
+						final LinkedList<Path> addNavigationFiles = new LinkedList<>();
+						for(Path directory = sourceDirectory; !directory.equals(context.getSiteSourceDirectory()); directory = directory.getParent()) {
+							assert directory != null : "Unexpectedly ran out of directories between the artifact source directory and the ancestor navigation file directory.";
+							//search for an "ancestor" additive navigation file but only at this level in the hierarchy, pushing onto the stack to produce reverse order
+							findAncestorFileByName(directory, navigationAddFilenames, Files::isRegularFile, directory).ifPresent(addNavigationFiles::push);
+						}
+						final Stream<NavigationItem> addNavigation = addNavigationFiles.stream()
+								.flatMap(throwingFunction(navigationAddFile -> loadNavigationFile(context, contextArtifact, navigationAddFile)));
+						return Stream.concat(navigation, addNavigation); //tack all the added navigation items on the end of the original defined navigation
+					}));
+		}));
+
+		//finally if we found a navigation definition, append any per-page navigation addition file in the form `.filename.ext.navigation+.*`
+		return navigationDefinition.flatMap(navigation -> {
+			return pageFilename.flatMap(throwingFunction(filename -> {
+				final Set<String> navigationAddFilenames = SUPPORTED_NAVIGATION_FILE_EXTENSIONS.stream()
+						.map(ext -> addExtension(DOTFILE_PREFIX + filename + navigationAddBaseName, ext)).collect(toCollection(LinkedHashSet::new));
+				return findAncestorFileByName(sourceDirectory, navigationAddFilenames, Files::isRegularFile, sourceDirectory)
+						.map(throwingFunction(file -> loadNavigationFile(context, contextArtifact, file))) //load the navigation addition file
+						.map(addNavigation -> Stream.concat(navigation, addNavigation)); //tack all the added navigation items on the end of the original defined navigation 
+
+			})).or(() -> navigationDefinition);
+		});
 	}
 
 	/**
