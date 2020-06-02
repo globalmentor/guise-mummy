@@ -93,28 +93,32 @@ public class NavigationManager implements Clogged {
 			final Set<String> navigationFilenames = SUPPORTED_NAVIGATION_FILE_EXTENSIONS.stream()
 					.map(ext -> addExtension(DOTFILE_PREFIX + filename + navigationBaseName, ext)).collect(toCollection(LinkedHashSet::new));
 			return findAncestorFileByName(sourceDirectory, navigationFilenames, Files::isRegularFile, sourceDirectory)
-					.map(throwingFunction(file -> loadNavigationFile(context, contextArtifact, file)));
+					.map(file -> loadNavigationFileUnchecked(context, contextArtifact, file));
 		}));
 
 		//if there is no per-page definition, look for a general definition `.navigation.*` up the hierarchy, with any additions `.navigation+.*`
 		final Optional<Stream<NavigationItem>> navigationDefinition = pageNavigationDefinition.or(throwingSupplier(() -> {
 			final Set<String> navigationFilenames = SUPPORTED_NAVIGATION_FILE_EXTENSIONS.stream().map(ext -> addExtension(navigationBaseName, ext))
 					.collect(toCollection(LinkedHashSet::new));
-			return findAncestorFileByName(sourceDirectory, navigationFilenames, Files::isRegularFile, context.getSiteSourceDirectory())
-					.map(throwingFunction(navigationFile -> {
-						final Stream<NavigationItem> navigation = loadNavigationFile(context, contextArtifact, navigationFile);
-						final Set<String> navigationAddFilenames = SUPPORTED_NAVIGATION_FILE_EXTENSIONS.stream().map(ext -> addExtension(navigationAddBaseName, ext))
-								.collect(toCollection(LinkedHashSet::new));
-						final LinkedList<Path> addNavigationFiles = new LinkedList<>();
-						for(Path directory = sourceDirectory; !directory.equals(context.getSiteSourceDirectory()); directory = directory.getParent()) {
-							assert directory != null : "Unexpectedly ran out of directories between the artifact source directory and the ancestor navigation file directory.";
-							//search for an "ancestor" additive navigation file but only at this level in the hierarchy, pushing onto the stack to produce reverse order
-							findAncestorFileByName(directory, navigationAddFilenames, Files::isRegularFile, directory).ifPresent(addNavigationFiles::push);
-						}
-						final Stream<NavigationItem> addNavigation = addNavigationFiles.stream()
-								.flatMap(throwingFunction(navigationAddFile -> loadNavigationFile(context, contextArtifact, navigationAddFile)));
-						return Stream.concat(navigation, addNavigation); //tack all the added navigation items on the end of the original defined navigation
-					}));
+			return findAncestorFileByName(sourceDirectory, navigationFilenames, Files::isRegularFile, context.getSiteSourceDirectory()).map(navigationFile -> {
+				final Stream<NavigationItem> navigation = loadNavigationFileUnchecked(context, contextArtifact, navigationFile);
+				final Set<String> navigationAddFilenames = SUPPORTED_NAVIGATION_FILE_EXTENSIONS.stream().map(ext -> addExtension(navigationAddBaseName, ext))
+						.collect(toCollection(LinkedHashSet::new));
+				final LinkedList<Path> addNavigationFiles = new LinkedList<>();
+				for(Path directory = sourceDirectory; !directory.equals(context.getSiteSourceDirectory()); directory = directory.getParent()) {
+					assert directory != null : "Unexpectedly ran out of directories between the artifact source directory and the ancestor navigation file directory.";
+					//search for an "ancestor" additive navigation file but only at this level in the hierarchy, pushing onto the stack to produce reverse order
+					try {
+						findAncestorFileByName(directory, navigationAddFilenames, Files::isRegularFile, directory).ifPresent(addNavigationFiles::push);
+					} catch(final IOException ioException) {
+						//TODO replace with FauxPas.throwingFunction() when OpenJDK supports it; see https://github.com/zalando/faux-pas/issues/144
+						throw new UncheckedIOException(ioException);
+					}
+				}
+				final Stream<NavigationItem> addNavigation = addNavigationFiles.stream()
+						.flatMap(throwingFunction(navigationAddFile -> loadNavigationFileUnchecked(context, contextArtifact, navigationAddFile)));
+				return Stream.concat(navigation, addNavigation); //tack all the added navigation items on the end of the original defined navigation
+			});
 		}));
 
 		//finally if we found a navigation definition, append any per-page navigation addition file in the form `.filename.ext.navigation+.*`
@@ -128,6 +132,30 @@ public class NavigationManager implements Clogged {
 
 			})).or(() -> navigationDefinition);
 		});
+	}
+
+	/**
+	 * Loads a single navigation file such as <code>.navigation.lst</code>.
+	 * @apiNote This is a convenience method for calling {@link #loadNavigationFile(MummyContext, Artifact, Path)} and wraps any {@link IOException} in an
+	 *          {@link UncheckedIOException}; see that method for a more complete explanation of functionality. <em>The caller should detect the
+	 *          {@link UncheckedIOException} and convert it back to an {@link IOException}.</em> This method was added because of problems compiling on OpenJDK
+	 *          11.0.5 using Faux Pas inside nested streams and lambdas, as explained in <a href="https://github.com/zalando/faux-pas/issues/144">Faux Pas Issue
+	 *          #144</a>.
+	 * @implSpec This implementation delegates to {@link #loadNavigationFile(MummyContext, Artifact, Path)}.
+	 * @param context The context of static site generation.
+	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param navigationFile The file to load.
+	 * @return The navigation items loaded from the file. The stream will not throw an {@link IOException} during iteration.
+	 * @throws IllegalArgumentException if the navigation file has no filename extension.
+	 * @throws UncheckedIOException if there is an I/O error loading the navigation list file.
+	 */
+	protected final Stream<NavigationItem> loadNavigationFileUnchecked(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact,
+			@Nonnull final Path navigationFile) throws UncheckedIOException {
+		try {
+			return loadNavigationFile(context, contextArtifact, navigationFile);
+		} catch(final IOException ioException) {
+			throw new UncheckedIOException(ioException);
+		}
 	}
 
 	/**
