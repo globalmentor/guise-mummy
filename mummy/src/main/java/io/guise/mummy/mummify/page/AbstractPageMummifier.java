@@ -200,12 +200,12 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This implementation delegates to {@link NavigationManager#loadNavigation(MummyContext, Artifact)}. Otherwise if no navigation file is provided,
-	 *           this implementation delegates to {@link #defaultNavigation(MummyContext, Artifact)}.
+	 * @implSpec This implementation delegates to {@link NavigationManager#loadNavigation(MummyContext, Artifact, Artifact)}. Otherwise if no navigation file is
+	 *           provided, this implementation delegates to {@link #defaultNavigation(MummyContext, Artifact)}.
 	 */
 	@Override
-	public Stream<NavigationItem> navigation(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) throws IOException {
-		return getNavigationManager().loadNavigation(context, contextArtifact).orElseGet(() -> defaultNavigation(context, contextArtifact));
+	public Stream<NavigationItem> navigation(@Nonnull MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
+		return getNavigationManager().loadNavigation(context, contextArtifact, artifact).orElseGet(() -> defaultNavigation(context, contextArtifact));
 	}
 
 	/**
@@ -990,7 +990,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @return The processed element(s), if any, to replace the source element.
 	 * @throws IOException if there is an error processing the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
-	 * @see #navigation(MummyContext, Artifact)
+	 * @see #navigation(MummyContext, Artifact, Artifact)
 	 * @see #generateNavigationList(MummyContext, Artifact, Artifact, Element, Element, Stream)
 	 */
 	protected List<Element> regenerateNavigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
@@ -1039,7 +1039,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		removeChildren(navigationListElement); //remove existing links
 
 		//regenerate the list and add the new list elements to the navigation list element
-		generateNavigationList(context, contextArtifact, artifact, inactiveLiTemplate, activeLiTemplate, navigation(context, contextArtifact))
+		generateNavigationList(context, contextArtifact, artifact, inactiveLiTemplate, activeLiTemplate, navigation(context, contextArtifact, artifact))
 				.forEach(navigationListElement::appendChild);
 
 		return List.of(navigationListElement);

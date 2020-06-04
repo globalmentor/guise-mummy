@@ -187,10 +187,20 @@ public interface Artifact {
 
 	/**
 	 * Returns the path to the source of the artifact in the source tree.
-	 * @return The path referring to the source of this artifact, which may be a file or a directory.
 	 * @apiNote Depending on the artifact implementation, the source path is not guaranteed to exist.
+	 * @return The path referring to the source of this artifact, which may be a file or a directory.
 	 */
 	public Path getSourcePath();
+
+	/**
+	 * Indicates whether the source path refers to a file as opposed to a directory. This implies that its source path is distinct from the source directory and
+	 * that its source path will provide some independent filename.
+	 * @apiNote This method is useful during mummification because a source path may not actually exist, making it difficult to ascertain the status.
+	 * @return <code>true</code> if the source path represents a file and not a directory.
+	 * @see #getSourcePath()
+	 * @see #getSourceDirectory()
+	 */
+	public boolean isSourcePathFile();
 
 	/**
 	 * Retrieves the source paths that should be equivalent targets referring to this artifact.

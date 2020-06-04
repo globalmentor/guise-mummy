@@ -138,6 +138,7 @@ public interface PageMummifier extends Mummifier {
 	 * resource itself. This official list may be overridden by the user through the use of a <code>.navigation.lst</code> file or other configured file.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact being generated
 	 * @return The navigation items, in order, that constitute the official possible navigation destinations from this artifact. The stream must <em>not</em>
 	 *         throw an {@link IOException} during iteration.
 	 * @throws IOException If there is an I/O error determining the navigation.
@@ -145,7 +146,8 @@ public interface PageMummifier extends Mummifier {
 	 * @see #childNavigationArtifacts(MummyContext, Artifact)
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME
 	 */
-	public Stream<NavigationItem> navigation(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) throws IOException;
+	public Stream<NavigationItem> navigation(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact)
+			throws IOException;
 
 	//# load
 

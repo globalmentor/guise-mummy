@@ -41,6 +41,15 @@ public abstract class AbstractSourceFileArtifact extends AbstractDescribedArtifa
 	}
 
 	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation always returns <code>true</code>.
+	 */
+	@Override
+	public final boolean isSourcePathFile() {
+		return true;
+	}
+
+	/**
 	 * Constructor.
 	 * @param mummifier The mummifier responsible for generating this artifact.
 	 * @param sourceFile The location of the artifact in the site source tree.
