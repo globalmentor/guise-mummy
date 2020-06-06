@@ -21,7 +21,6 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.util.*;
 
-import com.globalmentor.metadata.OpenGraph;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.net.URIPath;
 
@@ -34,6 +33,7 @@ import static com.globalmentor.net.URIs.*;
 
 import com.globalmentor.html.spec.HTML;
 import com.globalmentor.text.TextFormatter;
+import com.globalmentor.vocab.ogp.OpenGraph;
 
 import io.guise.framework.*;
 import io.guise.framework.component.*;

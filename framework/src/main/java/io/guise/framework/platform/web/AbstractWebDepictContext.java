@@ -22,7 +22,7 @@ import java.util.*;
 
 import com.globalmentor.css.spec.CSS;
 import com.globalmentor.java.Integers;
-import com.globalmentor.metadata.OpenGraph;
+import com.globalmentor.vocab.ogp.OpenGraph;
 
 import io.guise.framework.*;
 import io.guise.framework.component.layout.Orientation;

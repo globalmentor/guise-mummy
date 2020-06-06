@@ -113,12 +113,6 @@
 
 			<dependency>
 				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-metadata</artifactId>
-				<version>0.6.1</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-rdfa-spec</artifactId>
 				<version>0.6.1-SNAPSHOT</version>
 			</dependency>
@@ -139,6 +133,12 @@
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-text-elff</artifactId>
 				<version>0.6.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-vocab-ogp</artifactId>
+				<version>${globalmentor-web.version}</version>
 			</dependency>
 
 			<dependency>

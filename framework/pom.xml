@@ -58,12 +58,6 @@
 
 		<dependency>
 			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-metadata</artifactId>
-		</dependency>
-
-
-		<dependency>
-			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-servlet</artifactId>
 		</dependency>
 
@@ -75,6 +69,11 @@
 		<dependency>
 			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-text-elff</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-vocab-ogp</artifactId>
 		</dependency>
 
 		<dependency>
