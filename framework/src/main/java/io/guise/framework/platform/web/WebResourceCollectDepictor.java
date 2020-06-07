@@ -171,7 +171,7 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 							if(acceptStringBuilder.length()>0) {	//if this is not the first accepted content type
 								acceptStringBuilder.append(COMMA_CHAR);	//separate the accepted content types
 							}
-							acceptStringBuilder.append(contentType.getBaseType());	//append the base accepted content type
+							acceptStringBuilder.append(contentType.toBaseTypeString());	//append the base accepted content type
 						}
 						context.writeAttribute(null, ELEMENT_INPUT_ATTRIBUTE_ACCEPT, acceptStringBuilder.toString());	//accept="acceptedContentTypes"							
 					}

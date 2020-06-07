@@ -201,7 +201,7 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 			final boolean multiline = component.isMultiline(); //see if we should allow multiple lines of input
 			depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ELEMENT_TEXTAREA_ATTRIBUTE_MULTILINE, Boolean.toString(multiline)); //guise:multiline="true|false"
 			final ContentType valueContentType = component.getValueContentType(); //get the content type of the value
-			depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_CONTENT_TYPE, valueContentType.getBaseType()); //guise:contentType="valueContentType"
+			depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_CONTENT_TYPE, valueContentType.toBaseTypeString()); //guise:contentType="valueContentType"
 			if(isHTML(valueContentType)) { //if the content is HTML
 				depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_PATCH_TYPE, ATTRIBUTE_PATCH_TYPE_NONE); //don't do any patching on the text area itself; rely on events instead
 			}
