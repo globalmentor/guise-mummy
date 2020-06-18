@@ -16,6 +16,7 @@
 
 package io.guise.catalina.webresources;
 
+import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.net.URIs.*;
 import static java.nio.file.Files.*;
@@ -31,13 +32,21 @@ import org.apache.catalina.*;
 import org.apache.catalina.webresources.*;
 import org.apache.juli.logging.*;
 
+import com.globalmentor.io.Filenames;
+import com.globalmentor.io.Paths;
+import com.globalmentor.java.Objects;
+
 import io.urf.model.*;
+import io.urf.turf.TURF;
 import io.urf.turf.TurfParser;
 import io.urf.vocab.content.Content;
 
 /**
- * Tomcat source set for a Guise generated site directory.
- * @implSpec This version loads Guise generated Internet media type dynamically for retrieved resources.
+ * Tomcat resource set for a Guise generated site directory.
+ * @implSpec This implementation loads the Internet media type dynamically for retrieved resources, stored in metadata in an optional sidecar file for each
+ *           file. The sidecar metadata file must be in TURF Properties format. By default it is expected to be stored in a file with the same name in the
+ *           description base directory, but with a <code>-.tupr</code> extension added to whatever extension the filename already has. Determination of the
+ *           sidecar is configurable using {@link #setDescriptionFileSidecarPrefix(String)} and {@link #setDescriptionFileSidecarExtension(String)}.
  * @author Garret Wilson
  */
 public class SiteDirResourceSet extends DirResourceSet {
@@ -47,6 +56,50 @@ public class SiteDirResourceSet extends DirResourceSet {
 	private Path baseDir; //set when initialized in initInternal()
 
 	private final Path descriptionBaseDir;
+
+	private String descriptionFileSidecarPrefix = "";
+
+	/**
+	 * Retrieves the filename prefix to add to a file to discover its description sidecar file, if any.
+	 * @implSpec Defaults to the empty string (i.e. no prefix).
+	 * @return The description file sidecar filename prefix.
+	 * @see #getDescriptionFileSidecarExtension()
+	 */
+	public String getDescriptionFileSidecarPrefix() {
+		return descriptionFileSidecarPrefix;
+	}
+
+	/**
+	 * Sets the filename prefix to add to a file to discover its description sidecar file, if any.
+	 * @implSpec Defaults to the empty string (i.e. no prefix).
+	 * @param prefix The filename prefix to use to discover description sidecar files.
+	 * @see #setDescriptionFileSidecarExtension(String)
+	 */
+	public void setDescriptionFileSidecarPrefix(@Nonnull final String prefix) {
+		descriptionFileSidecarPrefix = requireNonNull(prefix);
+	}
+
+	private String descriptionFileSidecarExtension = addExtension("-", TURF.PROPERTIES_FILENAME_EXTENSION);
+
+	/**
+	 * Retrieves the filename prefix to use to discover a file's description sidecar file, if any.
+	 * @implSpec Defaults to <code>-.tupr</code>.
+	 * @return The description file sidecar filename extension.
+	 * @see #getDescriptionFileSidecarPrefix()
+	 */
+	public String getDescriptionFileSidecarExtension() {
+		return descriptionFileSidecarExtension;
+	}
+
+	/**
+	 * Sets the filename prefix to use to discover a file's description sidecar file, if any.
+	 * @implSpec Defaults to <code>-.tupr</code>.
+	 * @param extension The filename extension to use to discover description sidecar files.
+	 * @see #setDescriptionFileSidecarPrefix(String)
+	 */
+	public void setDescriptionFileSidecarExtension(@Nonnull final String extension) {
+		descriptionFileSidecarExtension = requireNonNull(extension);
+	}
 
 	/**
 	 * A Guise-aware site-based set of resources based upon a site directory.
@@ -89,11 +142,15 @@ public class SiteDirResourceSet extends DirResourceSet {
 				final FileResource fileResource = new FileResource(root, path, file, isReadOnly(), getManifest());
 
 				//load any description sidecar
-				final Path descriptionFile = addFilenameExtension(changeBase(file.toPath(), baseDir, descriptionBaseDir), "@.turf"); //TODO use constant
+				final Path filePath = file.toPath();
+				final String filename = Paths.findFilename(filePath)
+						.orElseThrow(() -> new IllegalArgumentException(String.format("Path %s has no filename.", filePath)));
+				final String descriptionFilename = Filenames.addExtension(getDescriptionFileSidecarPrefix() + filename, getDescriptionFileSidecarExtension()); //e.g. `filename.ext.-.tupr`
+				final Path descriptionFile = changeBase(filePath.resolveSibling(descriptionFilename), baseDir, descriptionBaseDir);
 				if(isRegularFile(descriptionFile)) {
 					try (final InputStream inputStream = new BufferedInputStream(newInputStream(descriptionFile))) {
-						new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream).stream().filter(UrfResourceDescription.class::isInstance)
-								.map(UrfResourceDescription.class::cast).findFirst().ifPresentOrElse(description -> {
+						new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream, TURF.PROPERTIES_CONTENT_TYPE).stream()
+								.flatMap(Objects.asInstances(UrfResourceDescription.class)).findFirst().ifPresentOrElse(description -> {
 									//set the MIME type if indicated
 									description.findPropertyValue(Content.TYPE_PROPERTY_TAG).ifPresent(contentType -> fileResource.setMimeType(contentType.toString()));
 								}, () -> log.warn(String.format("No description found for resource %s in file %s.", file, descriptionFile)));
