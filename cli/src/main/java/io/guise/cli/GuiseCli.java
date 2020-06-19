@@ -308,7 +308,7 @@ public class GuiseCli extends BaseCliApplication {
 		tomcat.getConnector(); //create a default connector; required; see https://stackoverflow.com/a/49011424/421049
 
 		final Context context = tomcat.addContext("", siteTargetDirectory.toAbsolutePath().toString());
-		final SiteRoot siteRoot = new SiteRoot(siteDescriptionTargetDirectory);
+		final SiteRoot siteRoot = new SiteRoot(siteDescriptionTargetDirectory.toAbsolutePath().toString());
 		siteRoot.setDescriptionFileSidecarExtension(Mummifier.DESCRIPTION_FILE_SIDECAR_EXTENSION);
 		context.setResources(siteRoot);
 

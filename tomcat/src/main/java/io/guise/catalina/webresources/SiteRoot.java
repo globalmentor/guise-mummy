@@ -21,7 +21,7 @@ import static com.globalmentor.net.URIs.*;
 import static java.util.Objects.*;
 
 import java.io.File;
-import java.nio.file.Path;
+import java.util.Optional;
 
 import javax.annotation.*;
 
@@ -41,7 +41,63 @@ import io.urf.turf.TURF;
  */
 public class SiteRoot extends StandardRoot {
 
-	private final Path descriptionBaseDir;
+	/**
+	 * Returns The context document base as a {@link File}, resolved to the {@link Host} app base as necessary.
+	 * @return The current document base if any.
+	 * @see Context#getDocBase()
+	 * @see Host#getAppBaseFile()
+	 */
+	protected Optional<File> findDocBaseFile() {
+		final Context context = getContext();
+		return Optional.ofNullable(context.getDocBase()).map(docBase -> { //resolve to host app base as necessary
+			File docBaseFile = new File(docBase);
+			if(!docBaseFile.isAbsolute()) {
+				docBaseFile = new File(((Host)context.getParent()).getAppBaseFile(), docBaseFile.getPath());
+			}
+			return docBaseFile;
+		});
+	}
+
+	@Nullable
+	private String descriptionBase;
+
+	/**
+	 * Returns the defined root directory of the description metadata tree, which may or may not be the same as the site doc base.
+	 * @return The root directory of the description metadata tree, either an absolute pathname or a relative to the {@link Host} app base pathname, or
+	 *         <code>null</code> if not defined, indicating that the context doc base should be used.
+	 * @see Context#getDocBase()
+	 */
+	public String getDescriptionBase() {
+		return descriptionBase;
+	}
+
+	/**
+	 * Sets the root directory of the description metadata tree.
+	 * @param descriptionBase The root directory of the description metadata tree, either an absolute pathname or a relative to the {@link Host} app base
+	 *          pathname.
+	 */
+	public void setDescriptionBase(@Nonnull final String descriptionBase) {
+		this.descriptionBase = requireNonNull(descriptionBase);
+	}
+
+	/**
+	 * Returns the root directory of the description metadata tree as a {@link File}, which may or may not be the same as the site doc base; or the site doc base
+	 * if not defined. The file will be resolved to the {@link Host} app base as necessary.
+	 * @implSpec Defaults to the which site doc base.
+	 * @return The root directory of the description metadata tree.
+	 * @see Host#getAppBaseFile()
+	 * @see #findDocBaseFile()
+	 */
+	public Optional<File> findDescriptionBaseFile() {
+		final Context context = getContext();
+		return Optional.ofNullable(getDescriptionBase()).map(descriptionBase -> { //resolve to host app base as necessary
+			File descriptionBaseFile = new File(descriptionBase);
+			if(!descriptionBaseFile.isAbsolute()) {
+				descriptionBaseFile = new File(((Host)context.getParent()).getAppBaseFile(), descriptionBaseFile.getPath());
+			}
+			return descriptionBaseFile;
+		}).or(this::findDocBaseFile);
+	}
 
 	private String descriptionFileSidecarPrefix = "";
 
@@ -87,35 +143,37 @@ public class SiteRoot extends StandardRoot {
 		descriptionFileSidecarExtension = requireNonNull(extension);
 	}
 
+	/** Creates the root using the context doc base as the directory for site resources descriptions. */
+	public SiteRoot() {
+		this((String)null);
+	}
+
 	/**
 	 * Creates the root with a record of the directory used for descriptions of site resources.
-	 * @param descriptionBaseDir The root directory of the description metadata tree, which may or may not be the same as the site doc base.
+	 * @apiNote The description base which may or may not be the same as the site doc base.
+	 * @param descriptionBase The root directory of the description metadata tree, either an absolute pathname or a relative to the {@link Host} app base
+	 *          pathname, or <code>null</code> if the the site doc base. should be used.
 	 */
-	public SiteRoot(@Nonnull final Path descriptionBaseDir) {
-		this.descriptionBaseDir = requireNonNull(descriptionBaseDir);
+	public SiteRoot(@Nullable final String descriptionBase) {
+		this.descriptionBase = descriptionBase;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This implementation returns a specialized {@link SiteDirResourceSet} to serve as a factory for creating specialized Guise-aware file resources.
+	 * @see #getDescriptionBase()
 	 */
 	@Override
 	protected WebResourceSet createMainResourceSet() {
-		final Context context = getContext();
-		final String docBase = context.getDocBase();
-		if(docBase != null) {
-			File baseFile = new File(docBase);
-			if(!baseFile.isAbsolute()) {
-				baseFile = new File(((Host)context.getParent()).getAppBaseFile(), baseFile.getPath());
-			}
-			if(baseFile.isDirectory()) {
-				final SiteDirResourceSet siteDirResourceSet = new SiteDirResourceSet(this, ROOT_PATH, baseFile.getAbsolutePath(), ROOT_PATH, descriptionBaseDir);
+		return findDocBaseFile().filter(File::isDirectory).<WebResourceSet>flatMap(docBaseFile -> {
+			return findDescriptionBaseFile().map(descriptionBaseFile -> {
+				final SiteDirResourceSet siteDirResourceSet = new SiteDirResourceSet(this, ROOT_PATH, docBaseFile.getAbsolutePath(), ROOT_PATH,
+						descriptionBaseFile.getAbsolutePath());
 				siteDirResourceSet.setDescriptionFileSidecarPrefix(getDescriptionFileSidecarPrefix());
 				siteDirResourceSet.setDescriptionFileSidecarExtension(getDescriptionFileSidecarExtension());
 				return siteDirResourceSet;
-			}
-		}
-		return super.createMainResourceSet();
+			});
+		}).orElseGet(super::createMainResourceSet);
 	}
 
 }

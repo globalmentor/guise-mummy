@@ -31,6 +31,7 @@ import javax.annotation.*;
 import org.apache.catalina.*;
 import org.apache.catalina.webresources.*;
 import org.apache.juli.logging.*;
+import org.apache.tomcat.util.digester.Digester;
 
 import com.globalmentor.io.Filenames;
 import com.globalmentor.io.Paths;
@@ -53,9 +54,41 @@ public class SiteDirResourceSet extends DirResourceSet {
 
 	private static final Log log = LogFactory.getLog(SiteDirResourceSet.class);
 
-	private Path baseDir; //set when initialized in initInternal()
+	private File descriptionFileBase; //set when initialized in initInternal()
 
-	private final Path descriptionBaseDir;
+	/**
+	 * Returns the absolute complete path to the base of the description file tree as a {@link File}. Includes the configured description base and the internal
+	 * path.
+	 * @implNote This method is analogous to {@link #getFileBase()}, but for the description sidecar files.
+	 * @return The absolute complete path to the base of the description file tree as a {@link File}; includes the configured description base and the internal
+	 *         path.
+	 * @see #getDescriptionBase()
+	 * @see #getInternalPath()
+	 */
+	protected final File getDescriptionFileBase() {
+		return descriptionFileBase;
+	}
+
+	@Nullable
+	private String descriptionBase = null;
+
+	/**
+	 * Returns the root directory of the description metadata tree, which may or may not be the same as the resource set base.
+	 * @return The absolute path of the root directory of the description metadata tree, or <code>null</code> if not defined, indicating that resource set base
+	 *         should be used.
+	 * @see #getBase()
+	 */
+	public String getDescriptionBase() {
+		return descriptionBase;
+	}
+
+	/**
+	 * Sets the root directory of the description metadata tree.
+	 * @param descriptionBase The absolute path of the root directory of the description metadata tree.
+	 */
+	public void setDescriptionBase(@Nonnull final String descriptionBase) {
+		this.descriptionBase = requireNonNull(descriptionBase);
+	}
 
 	private String descriptionFileSidecarPrefix = "";
 
@@ -102,25 +135,36 @@ public class SiteDirResourceSet extends DirResourceSet {
 	}
 
 	/**
+	 * No-arguments constructor. The description base directory, if not changed before initialization, will be assumed to be be the same as the site base.
+	 * @apiNote This constructor is necessary if used with the {@link Digester}.
+	 */
+	public SiteDirResourceSet() {
+		super();
+	}
+
+	/**
 	 * A Guise-aware site-based set of resources based upon a site directory.
-	 *
 	 * @param root The {@link WebResourceRoot} this new resource set will be added to.
 	 * @param webAppMount The path within the web application at which this resource set will be mounted. For example, to add a directory of JARs to a web
 	 *          application, the directory would be mounted at <code>"WEB-INF/lib/"</code>.
 	 * @param base The absolute path to the directory on the file system from which the resources will be served.
 	 * @param internalPath The path within this new resource set where resources will be served from.
-	 * @param descriptionBaseDir The root directory of the description metadata tree, which may or may not be the same as the site doc base.
+	 * @param descriptionBase The absolute path of the root directory of the description metadata tree, which may or may not be the same as the resource set base.
+	 *          The internal path will be appended to this path as it is to the base path for the served resources.
 	 */
 	public SiteDirResourceSet(@Nonnull final WebResourceRoot root, @Nonnull final String webAppMount, @Nonnull final String base,
-			@Nonnull final String internalPath, @Nonnull final Path descriptionBaseDir) {
+			@Nonnull final String internalPath, @Nonnull final String descriptionBase) {
 		super(root, webAppMount, base, internalPath);
-		this.descriptionBaseDir = requireNonNull(descriptionBaseDir);
+		this.descriptionBase = requireNonNull(descriptionBase);
 	}
 
 	@Override
 	protected void initInternal() throws LifecycleException {
 		super.initInternal();
-		baseDir = getFileBase().toPath();
+		final String descriptionBaset = getDescriptionBase();
+		//default to the file base if there is no custom description base set
+		descriptionFileBase = descriptionBaset != null ? new File(getDescriptionBase(), getInternalPath()) : getFileBase();
+		checkType(descriptionFileBase);
 	}
 
 	/**
@@ -146,7 +190,7 @@ public class SiteDirResourceSet extends DirResourceSet {
 				final String filename = Paths.findFilename(filePath)
 						.orElseThrow(() -> new IllegalArgumentException(String.format("Path %s has no filename.", filePath)));
 				final String descriptionFilename = Filenames.addExtension(getDescriptionFileSidecarPrefix() + filename, getDescriptionFileSidecarExtension()); //e.g. `filename.ext.-.tupr`
-				final Path descriptionFile = changeBase(filePath.resolveSibling(descriptionFilename), baseDir, descriptionBaseDir);
+				final Path descriptionFile = changeBase(filePath.resolveSibling(descriptionFilename), getFileBase().toPath(), getDescriptionFileBase().toPath());
 				if(isRegularFile(descriptionFile)) {
 					try (final InputStream inputStream = new BufferedInputStream(newInputStream(descriptionFile))) {
 						new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream, TURF.PROPERTIES_CONTENT_TYPE).stream()
