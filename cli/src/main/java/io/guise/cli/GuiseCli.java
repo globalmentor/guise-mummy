@@ -52,6 +52,7 @@ import io.confound.config.ConfigurationException;
 import io.confound.config.file.ResourcesConfigurationManager;
 import io.guise.catalina.webresources.SiteRoot;
 import io.guise.mummy.*;
+import io.guise.mummy.mummify.Mummifier;
 import io.guise.mummy.mummify.page.PageMummifier;
 import picocli.CommandLine.*;
 
@@ -307,7 +308,9 @@ public class GuiseCli extends BaseCliApplication {
 		tomcat.getConnector(); //create a default connector; required; see https://stackoverflow.com/a/49011424/421049
 
 		final Context context = tomcat.addContext("", siteTargetDirectory.toAbsolutePath().toString());
-		context.setResources(new SiteRoot(siteDescriptionTargetDirectory));
+		final SiteRoot siteRoot = new SiteRoot(siteDescriptionTargetDirectory.toAbsolutePath().toString());
+		siteRoot.setDescriptionFileSidecarExtension(Mummifier.DESCRIPTION_FILE_SIDECAR_EXTENSION);
+		context.setResources(siteRoot);
 
 		final Wrapper defaultServlet = context.createWrapper(); //TODO use constants below
 		defaultServlet.setName("default");
