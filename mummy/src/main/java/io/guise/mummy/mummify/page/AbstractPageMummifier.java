@@ -103,6 +103,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	private final static NsName XHTML_ELEMENT_P = NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_P);
 	private final static NsName XHTML_ELEMENT_SCRIPT = NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_SCRIPT);
 	private final static NsName XHTML_ELEMENT_SCRIPT_ATTRIBUTE_SRC = NsName.of(ELEMENT_SOURCE_ATTRIBUTE_SRC);
+	private final static NsName XHTML_ELEMENT_STYLE = NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_STYLE);
 
 	/**
 	 * Vocabulary prefixes that will be recognized in metadata, such as in XHTML {@code <meta>} elements or in YAML, if they have not been associated with a
@@ -602,6 +603,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 					//2. import/merge head information
 					mergeHeadLinks(templateDocument, sourceDocument);
 					importHeadScripts(templateDocument, sourceDocument);
+					importHeadStyles(templateDocument, sourceDocument);
 
 					//3. apply content
 
@@ -774,8 +776,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	}
 
 	/**
-	 * Imports all {@code <head><script>} elements that contain inline scripts (not links) from the source document into the template document. No checks are made
-	 * for duplicate content.
+	 * Imports all {@code <head><script>} elements that contain internal scripts (not links) from the source document into the template document. No checks are
+	 * made for duplicate content.
 	 * @apiNote The <a href="https://www.w3.org/TR/html52/semantics-scripting.html#the-script-element">HTML 5 specification</a> precludes a script element from
 	 *          having both a link and content.
 	 * @param templateDocument The template into which the source document scripts are to be merged; must have a {@code <head>} element.
@@ -790,6 +792,23 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				.orElseThrow(() -> new IllegalArgumentException("Template missing <head> element."));
 		findHtmlHeadElement(sourceDocument).stream().flatMap(XmlDom::childElementsOf).filter(XHTML_ELEMENT_SCRIPT::matches) //find all <script> elements
 				.filter(element -> !XmlDom.hasAttributeNS(element, XHTML_ELEMENT_SCRIPT_ATTRIBUTE_SRC)) //don't include scripts with `src` attributes
+				.forEach(element -> templateHeadElement.appendChild(templateDocument.importNode(element, true)));
+	}
+
+	/**
+	 * Imports all {@code <head><style>} elements that contain internal styles from the source document into the template document. No checks are made for
+	 * duplicate content.
+	 * @param templateDocument The template into which the source document styles are to be merged; must have a {@code <head>} element.
+	 * @param sourceDocument The source document from which the styles are being imported.
+	 * @throws IllegalArgumentException if the template does not have a {@code <head>} element.
+	 * @throws IllegalDataException if there is an error importing the styles.
+	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 * @see <a href="https://www.w3.org/TR/html52/document-metadata.html#the-style-element">HTML 5.2 § 4.2.6. The style element</a>
+	 */
+	protected void importHeadStyles(@Nonnull final Document templateDocument, @Nonnull final Document sourceDocument) throws IllegalDataException, DOMException {
+		final Element templateHeadElement = findHtmlHeadElement(templateDocument)
+				.orElseThrow(() -> new IllegalArgumentException("Template missing <head> element."));
+		findHtmlHeadElement(sourceDocument).stream().flatMap(XmlDom::childElementsOf).filter(XHTML_ELEMENT_STYLE::matches) //find all <style> elements
 				.forEach(element -> templateHeadElement.appendChild(templateDocument.importNode(element, true)));
 	}
 
