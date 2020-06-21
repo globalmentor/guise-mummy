@@ -466,7 +466,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 				}
 				final File logDirectory = getLogDirectory(); //get the application log directory
 				final DateFormat logFilenameDateFormat = new W3CDateFormat(W3CDateFormat.Style.DATE); //create a formatter for the log filename
-				final String logFilename = appendBaseFilename(baseFilename, "-" + logFilenameDateFormat.format(new Date())); //create a filename in the form "baseFilename-date.ext"
+				final String logFilename = appendBase(baseFilename, "-" + logFilenameDateFormat.format(new Date())); //create a filename in the form "baseFilename-date.ext"
 				final File logFile = new File(logDirectory, logFilename); //create a log file object
 				//TODO add a way to let the initializer know if this is a new log file or just a new writer				final boolean isNewLogFile=!logFile.exists();	//see if this is a new log file
 				try {
