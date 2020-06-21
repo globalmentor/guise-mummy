@@ -1175,7 +1175,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@Override
 	public Properties loadProperties(final String propertiesPath) throws IOException {
 		final File propertiesFile = new File(getHomeDirectory(), requireNonNull(propertiesPath, "Properties path cannot be null.")); //create the properties file object
-		final String extension = findExtension(propertiesFile).orElse(null); //get the extension of the properties file
+		final String extension = findNameExtension(propertiesFile).orElse(null); //get the extension of the properties file
 		final boolean isXML; //see if this is an XML file
 		if(XML.XML_NAME_EXTENSION.equals(extension)) { //if this is an XML file
 			isXML = true; //indicate that we should load XML
