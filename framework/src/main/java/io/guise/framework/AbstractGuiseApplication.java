@@ -466,7 +466,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 				}
 				final File logDirectory = getLogDirectory(); //get the application log directory
 				final DateFormat logFilenameDateFormat = new W3CDateFormat(W3CDateFormat.Style.DATE); //create a formatter for the log filename
-				final String logFilename = appendBaseFilename(baseFilename, "-" + logFilenameDateFormat.format(new Date())); //create a filename in the form "baseFilename-date.ext"
+				final String logFilename = appendBase(baseFilename, "-" + logFilenameDateFormat.format(new Date())); //create a filename in the form "baseFilename-date.ext"
 				final File logFile = new File(logDirectory, logFilename); //create a log file object
 				//TODO add a way to let the initializer know if this is a new log file or just a new writer				final boolean isNewLogFile=!logFile.exists();	//see if this is a new log file
 				try {
@@ -1175,7 +1175,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@Override
 	public Properties loadProperties(final String propertiesPath) throws IOException {
 		final File propertiesFile = new File(getHomeDirectory(), requireNonNull(propertiesPath, "Properties path cannot be null.")); //create the properties file object
-		final String extension = findExtension(propertiesFile).orElse(null); //get the extension of the properties file
+		final String extension = findNameExtension(propertiesFile).orElse(null); //get the extension of the properties file
 		final boolean isXML; //see if this is an XML file
 		if(XML.XML_NAME_EXTENSION.equals(extension)) { //if this is an XML file
 			isXML = true; //indicate that we should load XML

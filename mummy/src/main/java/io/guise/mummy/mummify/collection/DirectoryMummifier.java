@@ -122,17 +122,19 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		final boolean isAssetSourceDirectoryTree = isAssetSourcePath(context, sourceDirectory, true); //see if this subtree is for assets
 
 		//discover and plan the directory content file, if present
-		final Optional<Path> contentFile = discoverSourceDirectoryContentFile(context, sourceDirectory);
-		final Artifact contentArtifact = contentFile.map(throwingFunction(contentSourceFile -> { //nullable
+		final Optional<Path> discoveredContentFile = discoverSourceDirectoryContentFile(context, sourceDirectory);
+		final Artifact contentArtifact = discoveredContentFile.map(throwingFunction(contentSourceFile -> { //nullable
 			final Path sourceDescriptionFile = getArtifactSourceDescriptionFile(context, sourceDirectory); //find out where to look for a source description
 			if(exists(sourceDescriptionFile)) {
 				getLogger().warn("Directory `{}` will use description of its content file `{}`; the source description file `{}` will be ignored.", sourceDirectory,
 						contentSourceFile, sourceDescriptionFile);
 			}
 			final SourcePathMummifier contentMummifier = context.findRegisteredMummifierForSourceFile(contentSourceFile).orElseThrow(IllegalStateException::new); //TODO improve error
-			//TODO normalize content filename
-			assert contentSourceFile.getFileName() != null;
-			final String contentTargetFilename = contentMummifier.planArtifactTargetFilename(context, contentSourceFile.getFileName().toString());
+			final String contentSourceFilename = findFilename(contentSourceFile).orElseThrow(IllegalStateException::new);
+			//normalize the content filename to the first of the recognized base names
+			final String normalizedContentFilename = context.getConfiguration().getCollection(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, String.class).stream()
+					.findFirst().map(contentBaseName -> Filenames.changeBase(contentSourceFilename, contentBaseName)).orElse(contentSourceFilename);
+			final String contentTargetFilename = contentMummifier.planArtifactTargetFilename(context, normalizedContentFilename);
 			final Path contentTargetFile = targetDirectory.resolve(contentTargetFilename);
 			return contentMummifier.plan(context, contentSourceFile, contentTargetFile);
 		})).orElseGet(throwingSupplier(() -> { //if there is no directory content file, create a phantom page content file
@@ -168,7 +170,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		final List<Artifact> childArtifacts = new ArrayList<>();
 		try (final Stream<Path> childPaths = list(sourceDirectory).filter(not(context::isIgnore))) {
 			childPaths.forEach(throwingConsumer(childSourcePath -> {
-				if(!isPresentAndEquals(contentFile, childSourcePath)) { //skip the content file, if any
+				if(!isPresentAndEquals(discoveredContentFile, childSourcePath)) { //skip the content file, if any
 					final SourcePathMummifier registeredChildMummifier = context.getMummifierForSourcePath(childSourcePath);
 					assert childSourcePath.getFileName() != null;
 					final String childSourceFilename = childSourcePath.getFileName().toString();

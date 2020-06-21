@@ -182,9 +182,8 @@ public class GuiseMummy implements Clogged {
 	 */
 	public static final String CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN = "mummy.assetNamePattern";
 	/**
-	 * The configuration for the list of base filenames of files, in order of priority, that serve as content for a collection; defaults to <code>["index"]</code>
-	 * @implNote Currently not all deployment targets support multiple collection content names; for the meantime only one collection content base name should be
-	 *           used.
+	 * The configuration for the list of base filenames of files, in order of priority, that serve as content for a collection; defaults to
+	 * <code>["index"]</code>. During mummification, any content file discovered will be normalized (renamed if needed) to the first of these base filenames.
 	 */
 	public static final String CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES = "mummy.collectionContentBaseNames";
 	/** The configuration for the base filename for navigation definition; defaults to <code>.navigation</code>. */
