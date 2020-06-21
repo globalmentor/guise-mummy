@@ -416,12 +416,9 @@ public class S3Website extends S3 {
 			//set the index document, if any, based upon the collection content base name
 			final Collection<String> collectionContentBaseNames = configuration.getCollection(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, String.class);
 			if(!collectionContentBaseNames.isEmpty()) {
-				final String indexDocumentBaseName = collectionContentBaseNames.iterator().next(); //e.g. "index"
+				final String indexDocumentBaseName = collectionContentBaseNames.iterator().next(); //e.g. "index" (mummification should have normalized to use the first one)
 				final boolean isNameBare = configuration.findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);
 				final String indexDocumentSuffix = isNameBare ? indexDocumentBaseName : addExtension(indexDocumentBaseName, PAGE_NAME_EXTENSION);
-				if(collectionContentBaseNames.size() > 0) {
-					getLogger().warn("Multiple collection content base names configured, but AWS S3 supports only one index document; using `{}`.", indexDocumentSuffix);
-				}
 				final IndexDocument indexDocument = IndexDocument.builder().suffix(indexDocumentSuffix).build();
 				websiteConfigurationBuilder.indexDocument(indexDocument);
 			}
