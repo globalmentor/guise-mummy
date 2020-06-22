@@ -276,15 +276,18 @@ public class GuiseMummy implements Clogged {
 	public void mummify(@Nonnull final GuiseProject project, @Nonnull final LifeCyclePhase phase) throws IOException {
 
 		//# initialize phase
+		getLogger().info("Mummify phase: {}", LifeCyclePhase.INITIALIZE); //TODO i18n
 		final Context context = initialize(project); //the initialize phase must always occur
 
 		//# validate phase
 		if(phase.compareTo(LifeCyclePhase.VALIDATE) >= 0) {
+			getLogger().info("Mummify phase: {}", LifeCyclePhase.VALIDATE); //TODO i18n
 			validate(context);
 		}
 
 		//# plan phase
 		if(phase.compareTo(LifeCyclePhase.PLAN) >= 0) {
+			getLogger().info("Mummify phase: {}", LifeCyclePhase.PLAN); //TODO i18n
 			final Artifact rootArtifact = new DirectoryMummifier().plan(context, context.getSiteSourceDirectory(), context.getSiteTargetDirectory()); //TODO create special SiteMummifier extending DirectoryMummifier
 			context.updatePlan(rootArtifact);
 
@@ -292,11 +295,13 @@ public class GuiseMummy implements Clogged {
 
 			//# mummify phase
 			if(phase.compareTo(LifeCyclePhase.MUMMIFY) >= 0) {
+				getLogger().info("Mummify phase: {}", LifeCyclePhase.MUMMIFY); //TODO i18n
 				rootArtifact.getMummifier().mummify(context, rootArtifact);
 			}
 
 			//# prepare-deploy phase
 			if(phase.compareTo(LifeCyclePhase.PREPARE_DEPLOY) >= 0) {
+				getLogger().info("Mummify phase: {}", LifeCyclePhase.PREPARE_DEPLOY); //TODO i18n
 
 				//configured DNS
 				final Optional<Dns> deployDns = context.getConfiguration().findSection(CONFIG_KEY_DEPLOY_DNS).map(dnsConfiguration -> {
@@ -334,6 +339,7 @@ public class GuiseMummy implements Clogged {
 
 				//# deploy phase
 				if(phase.compareTo(LifeCyclePhase.DEPLOY) >= 0) {
+					getLogger().info("Mummify phase: {}", LifeCyclePhase.DEPLOY); //TODO i18n
 					//deploy the DNS
 					deployDns.ifPresent(throwingConsumer(dns -> {
 						dns.deploy(context, rootArtifact);

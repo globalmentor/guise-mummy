@@ -144,6 +144,8 @@ public class GuiseCli extends BaseCliApplication {
 		logProjectInfo(project);
 
 		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.VALIDATE);
+
+		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Done.").reset());
 	}
 
 	@Command(description = "Cleans a site by removing the site target directory.", subcommands = {HelpCommand.class})
@@ -173,6 +175,8 @@ public class GuiseCli extends BaseCliApplication {
 				deleteFileTree(siteDescriptionTargetDirectory);
 			}
 		}
+
+		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Done.").reset());
 	}
 
 	@Command(description = "Mummifies a site by generating a static version.", subcommands = {HelpCommand.class})
@@ -198,6 +202,8 @@ public class GuiseCli extends BaseCliApplication {
 		logProjectInfo(project);
 
 		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.MUMMIFY);
+
+		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Done.").reset());
 	}
 
 	@Command(name = "prepare-deploy", description = "Prepares to deploys a site after generating a static version, but does not actually deploy the site.", subcommands = {
@@ -224,6 +230,8 @@ public class GuiseCli extends BaseCliApplication {
 		logProjectInfo(project);
 
 		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.PREPARE_DEPLOY);
+
+		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Done.").reset());
 	}
 
 	@Command(description = "Deploys a site after generating a static version.", subcommands = {HelpCommand.class})
@@ -250,6 +258,8 @@ public class GuiseCli extends BaseCliApplication {
 		logProjectInfo(project);
 
 		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.DEPLOY);
+
+		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Done.").reset());
 
 		//launch the browser using the last deploy URL; see https://stackoverflow.com/a/5226244/421049
 		if(browse && Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
