@@ -35,8 +35,6 @@ import org.w3c.dom.*;
 import com.globalmentor.html.spec.HTML;
 import com.globalmentor.xml.spec.NsName;
 
-import io.guise.mummy.mummify.page.AbstractPageMummifier;
-
 /**
  * Tests of {@link AbstractPageMummifier}.
  * @author Garret Wilson

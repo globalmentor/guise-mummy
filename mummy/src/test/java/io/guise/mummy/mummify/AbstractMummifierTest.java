@@ -18,12 +18,14 @@ package io.guise.mummy.mummify;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.URI;
 import java.time.LocalDate;
 
 import org.junit.jupiter.api.*;
 
+import io.guise.mummy.Artifact;
 import io.urf.URF;
 
 /**
@@ -31,6 +33,8 @@ import io.urf.URF;
  * @author Garret Wilson
  */
 public class AbstractMummifierTest {
+
+	//ad-hoc namespace
 
 	/**
 	 * @implNote Because the matched name is assumed to be a valid URF name, no checks are performed for strings such as <code>published-On</code>, which would
@@ -71,4 +75,24 @@ public class AbstractMummifierTest {
 		assertThat(AbstractMummifier.parseMetadataPropertyValue(URF.Handle.toTag("publishedOn"), "2001-02-03"), is(LocalDate.of(2001, 2, 3)));
 	}
 
+	//mummy/ namespace
+
+	/**
+	 * @see AbstractMummifier#parseMetadataPropertyValue(URI, CharSequence)
+	 * @see Artifact#PROPERTY_TAG_MUMMY_ORDER
+	 */
+	@Test
+	public void testParseMetadataPropertyValueMummyOrder() {
+		assertThat(AbstractMummifier.parseMetadataPropertyValue(Artifact.PROPERTY_TAG_MUMMY_ORDER, "0"), is(0L));
+		assertThat(AbstractMummifier.parseMetadataPropertyValue(Artifact.PROPERTY_TAG_MUMMY_ORDER, "-1"), is(-1L));
+		assertThat(AbstractMummifier.parseMetadataPropertyValue(Artifact.PROPERTY_TAG_MUMMY_ORDER, "-123"), is(-123L));
+		assertThat(AbstractMummifier.parseMetadataPropertyValue(Artifact.PROPERTY_TAG_MUMMY_ORDER, "-123456789"), is(-123456789L));
+		assertThat(AbstractMummifier.parseMetadataPropertyValue(Artifact.PROPERTY_TAG_MUMMY_ORDER, "-1234567891011"), is(-1234567891011L));
+		assertThat(AbstractMummifier.parseMetadataPropertyValue(Artifact.PROPERTY_TAG_MUMMY_ORDER, "1"), is(1L));
+		assertThat(AbstractMummifier.parseMetadataPropertyValue(Artifact.PROPERTY_TAG_MUMMY_ORDER, "123"), is(123L));
+		assertThat(AbstractMummifier.parseMetadataPropertyValue(Artifact.PROPERTY_TAG_MUMMY_ORDER, "123456789"), is(123456789L));
+		assertThat(AbstractMummifier.parseMetadataPropertyValue(Artifact.PROPERTY_TAG_MUMMY_ORDER, "1234567891011"), is(1234567891011L));
+		assertThrows(IllegalArgumentException.class, () -> AbstractMummifier.parseMetadataPropertyValue(Artifact.PROPERTY_TAG_MUMMY_ORDER, ""));
+		assertThrows(IllegalArgumentException.class, () -> AbstractMummifier.parseMetadataPropertyValue(Artifact.PROPERTY_TAG_MUMMY_ORDER, "foobar"));
+	}
 }

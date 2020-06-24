@@ -23,8 +23,6 @@ import java.util.regex.Matcher;
 
 import org.junit.jupiter.api.*;
 
-import io.guise.mummy.mummify.page.PostArtifact;
-
 /**
  * Tests of {@link PostArtifact}.
  * @author Garret Wilson

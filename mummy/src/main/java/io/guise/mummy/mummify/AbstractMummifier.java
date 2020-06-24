@@ -18,7 +18,6 @@ package io.guise.mummy.mummify;
 
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Objects.*;
-import static com.globalmentor.util.Optionals.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static java.nio.file.Files.*;
 import static java.util.Objects.*;
@@ -146,7 +145,7 @@ public abstract class AbstractMummifier implements Mummifier {
 	 *          normally not be used unless the format's type system provides insufficient types (such as YAML embedded in Markdown); in this case this method
 	 *          should be called on the properties with string values.
 	 * @implSpec If the property is in the URF ad-hoc namespace, the property value type is inferred from the property name by convention, as defined by the
-	 *           following regular expressions:
+	 *           following regular expressions. Any value that cannot be parsed will result in a warning and not an error.
 	 *           <dl>
 	 *           <dt><code>/.+On/</code> (e.g. <code>publishedOn</code> or <code>fromAtoZOn</code>)</dt>
 	 *           <dd>{@link LocalDate}</dd>
@@ -158,22 +157,32 @@ public abstract class AbstractMummifier implements Mummifier {
 	 * @throws IllegalArgumentException if a property value cannot be parsed conforming to ontology rules.
 	 */
 	protected static Object parseMetadataPropertyValue(@Nonnull final URI propertyTag, @Nonnull final CharSequence propertyLexicalValue) {
-		if(isPresentAndEquals(URF.Tag.findNamespace(propertyTag), URF.AD_HOC_NAMESPACE)) {
-			final String propertyName = URF.Tag.findName(propertyTag).orElse(null);
-			if(propertyName != null) {
-				if(AD_HOC_PROPERTY_LOCAL_DATE_NAME_PATTERN.matcher(propertyName).matches()) { //`xxxOn` - LocalDate
+		return URF.Tag.findNamespace(propertyTag).<Object>flatMap(namespace -> { //map based on namespace
+			if(namespace.equals(URF.AD_HOC_NAMESPACE)) { //ad-hoc (default) namespace
+				return URF.Tag.findName(propertyTag).flatMap(propertyName -> {
+					if(AD_HOC_PROPERTY_LOCAL_DATE_NAME_PATTERN.matcher(propertyName).matches()) { //`xxxOn` - LocalDate
+						try {
+							return Optional.of(LocalDate.parse(propertyLexicalValue));
+						} catch(final DateTimeParseException dateTimeParseException) {
+							Clogr.getLogger(AbstractMummifier.class).warn("Property `{}` value `{}` cannot be parsed as a local date: {}.", propertyName,
+									propertyLexicalValue, dateTimeParseException.getLocalizedMessage());
+						}
+					}
+					return Optional.empty(); //unrecognized ad-hoc local name
+				});
+			} else if(namespace.equals(GuiseMummy.NAMESPACE)) { //mummy/ namespace
+				if(propertyTag.equals(Artifact.PROPERTY_TAG_MUMMY_ORDER)) { //mummy/order
 					try {
-						return LocalDate.parse(propertyLexicalValue);
-					} catch(final DateTimeParseException dateTimeParseException) {
-						Clogr.getLogger(AbstractMummifier.class).warn("Property `{}` value `{}` cannot be parsed as a local date: {}.", propertyName, propertyLexicalValue,
-								dateTimeParseException.getLocalizedMessage());
+						return Optional.of(Long.valueOf(propertyLexicalValue.toString()));
+					} catch(final NumberFormatException numberFormatException) {
+						throw new IllegalArgumentException(String.format("Property tag <%s> value `%s` cannot be parsed as an integer: %s.", propertyTag,
+								propertyLexicalValue, numberFormatException.getLocalizedMessage()), numberFormatException);
 					}
 				}
 			}
-		} else {
 			//TODO add support for custom namespaces with defined ontologies
-		}
-		return propertyLexicalValue.toString(); //default to the string form of the lexical value
+			return Optional.empty(); //unrecognized namespace
+		}).orElseGet(propertyLexicalValue::toString); //default to the string form of the lexical value
 	}
 
 }

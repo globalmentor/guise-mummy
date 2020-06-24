@@ -141,6 +141,7 @@ public interface PageMummifier extends Mummifier {
 	 * @param artifact The artifact being generated
 	 * @return The navigation items, in order, that constitute the official possible navigation destinations from this artifact. The stream must <em>not</em>
 	 *         throw an {@link IOException} during iteration.
+	 * @throws IllegalArgumentException if the information of the navigation artifacts prevent them from being ordered.
 	 * @throws IOException If there is an I/O error determining the navigation.
 	 * @see #findParentNavigationArtifact(MummyContext, Artifact)
 	 * @see #childNavigationArtifacts(MummyContext, Artifact)

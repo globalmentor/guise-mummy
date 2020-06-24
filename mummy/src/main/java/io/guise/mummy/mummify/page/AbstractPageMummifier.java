@@ -217,6 +217,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @return The navigation items, in order, that constitute the official possible navigation destinations from this artifact.
+	 * @throws IllegalArgumentException if the information of the navigation artifacts prevent them from being ordered.
 	 */
 	protected Stream<NavigationItem> defaultNavigation(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
 		return defaultNavigationArtifacts(context, contextArtifact).map(navigationArtifact -> { //map navigation artifacts to their navigation items
@@ -233,6 +234,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @return The artifacts, in order, that constitute the official possible navigation destinations from this artifact.
+	 * @throws IllegalArgumentException if the information of the navigation artifacts prevent them from being ordered.
 	 * @see #findParentNavigationArtifact(MummyContext, Artifact)
 	 * @see #childNavigationArtifacts(MummyContext, Artifact)
 	 */
@@ -243,8 +245,15 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		navigationCollator.setStrength(Collator.PRIMARY); //ignore accents and case
 		final Comparator<Artifact> navigationArtifactOrderComparator = Comparator
 				//compare first by order (defaulting to zero)
-				.<Artifact, Long>comparing(
-						navigationArtifact -> toLong(navigationArtifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ORDER).orElse(MUMMY_ORDER_DEFAULT)))
+				.<Artifact, Long>comparing(navigationArtifact -> {
+					try {
+						return toLong(navigationArtifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ORDER).orElse(MUMMY_ORDER_DEFAULT));
+					} catch(final IllegalArgumentException illegalArgumentException) {
+						throw new IllegalArgumentException(
+								String.format("Invalid property <%s> value: %s", PROPERTY_TAG_MUMMY_ORDER, illegalArgumentException.getLocalizedMessage()),
+								illegalArgumentException);
+					}
+				})
 				//then compare by label alphabetical order
 				.thenComparing(navigationArtifact -> navigationArtifact.determineLabel(), navigationCollator);
 		return Stream.concat(
@@ -850,6 +859,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param artifact The artifact being generated
 	 * @param sourceDocument The source document to process.
 	 * @return The processed document, which may or may not be the same document supplied as input.
+	 * @throws IllegalArgumentException if the elements have some information that cannot be processed.
 	 * @throws IOException if there is an error processing the document.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
@@ -879,6 +889,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param artifact The artifact being generated
 	 * @param sourceElement The source element to process.
 	 * @return The processed element(s), if any, to replace the source element.
+	 * @throws IllegalArgumentException if the element has some information that cannot be processed.
 	 * @throws IOException if there is an error processing the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
@@ -928,6 +939,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @param sourceElement The source element the children of which to process.
+	 * @throws IllegalArgumentException if the elements have some information that cannot be processed.
 	 * @throws IOException if there is an error processing the child elements.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
@@ -965,8 +977,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	/**
 	 * Returns the given object as a {@link Long}, converting if necessary.
-	 * @implSpec This implementation only supports {@link Integer}, {@link Long}, and {@link String} types, converting the latter using
-	 *           {@link Long#valueOf(String)}.
+	 * @apiNote This conversion is necessary because for Markdown+YAML may encode e.g. the {@link Artifact#PROPERTY_TAG_MUMMY_ORDER} property as an
+	 *          {@link Integer} value, while parsing the same property from XHTML with knowledge of the Mummy ontology may result in a {@link Long} value.
+	 * @implSpec This implementation only supports {@link Integer} and {@link Long} types.
 	 * @param object The object to return as a {@link Long}.
 	 * @return The object as a {@link Long} instance.
 	 * @throws IllegalArgumentException if the given object cannot be converted to a {@link Long}.
@@ -976,10 +989,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			return (Long)object;
 		} else if(object instanceof Integer) {
 			return Long.valueOf(((Integer)object).longValue());
-		} else if(object instanceof String) {
-			return Long.valueOf((String)object);
 		} else {
-			throw new IllegalArgumentException(String.format("Cannot convert object of type %s to type %s.", object.getClass().getName(), Long.class.getName()));
+			throw new IllegalArgumentException(
+					String.format("Cannot convert object %s of type %s to type %s.", object, object.getClass().getSimpleName(), Long.class.getSimpleName()));
 		}
 	}
 
@@ -1007,6 +1019,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param artifact The artifact being generated
 	 * @param navigationListElement The list element to regenerate.
 	 * @return The processed element(s), if any, to replace the source element.
+	 * @throws IllegalArgumentException if the information of the navigation artifacts prevent them from being ordered.
 	 * @throws IOException if there is an error processing the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 * @see #navigation(MummyContext, Artifact, Artifact)

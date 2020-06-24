@@ -29,7 +29,6 @@ import org.junit.jupiter.api.*;
 
 import io.confound.config.Configuration;
 import io.guise.mummy.*;
-import io.guise.mummy.mummify.page.XhtmlPageMummifier;
 import io.urf.URF.Handle;
 
 /**
@@ -62,7 +61,7 @@ public class XhtmlPageMummifierTest {
 							//property defined in `property` attribute, inferred to be a local date from its name pattern
 							Map.entry(Handle.toTag(Artifact.PROPERTY_HANDLE_PUBLISHED_ON), LocalDate.of(2001, 2, 3)),
 							//property defined in `property` attribute with namespace declared on ancestor node
-							Map.entry(Artifact.PROPERTY_TAG_MUMMY_ORDER, "3"),
+							Map.entry(Artifact.PROPERTY_TAG_MUMMY_ORDER, 3L),
 							//property defined in `property` attribute with undeclared yet predefined vocabulary prefix
 							Map.entry(URI.create("http://ogp.me/ns#type"), "website"),
 							//two defined in both `name` and `property` attribute on same element
