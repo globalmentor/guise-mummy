@@ -40,7 +40,6 @@ import org.w3c.dom.*;
 
 import io.confound.config.Configuration;
 import io.guise.mummy.*;
-import io.guise.mummy.mummify.page.MarkdownPageMummifier;
 import io.urf.URF.Handle;
 
 /**
