@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>com.globalmentor</groupId>
 		<artifactId>globalmentor-opensource-parent</artifactId>
-		<version>8.5.5-SNAPSHOT</version>
+		<version>8.5.5</version>
 	</parent>
 
 	<groupId>io.guise</groupId>
 	<artifactId>guise</artifactId>
-	<version>0.4.0-SNAPSHOT</version>
+	<version>0.4.0</version>
 	<packaging>pom</packaging>
 
 	<name>Guise Ecosystem</name>
@@ -40,11 +40,11 @@
 
 	<properties>
 		<maven.compiler.release>11</maven.compiler.release>
-		<globalmentor-ee.version>0.6.2-SNAPSHOT</globalmentor-ee.version>
-		<globalmentor-web.version>0.6.4-SNAPSHOT</globalmentor-web.version>
+		<globalmentor-ee.version>0.6.2</globalmentor-ee.version>
+		<globalmentor-web.version>0.6.4</globalmentor-web.version>
 		<slf4j.version>1.7.30</slf4j.version>
-		<tomcat.version>9.0.30</tomcat.version>
-		<urf.version>0.4.0-SNAPSHOT</urf.version>
+		<tomcat.version>9.0.36</tomcat.version>
+		<urf.version>0.4.0</urf.version>
 	</properties>
 
 	<modules>
@@ -60,7 +60,7 @@
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-application</artifactId>
-				<version>0.7.5-SNAPSHOT</version>
+				<version>0.7.5</version>
 			</dependency>
 
 			<dependency>
@@ -114,7 +114,7 @@
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-rdfa-spec</artifactId>
-				<version>0.6.1-SNAPSHOT</version>
+				<version>0.6.1</version>
 			</dependency>
 
 			<dependency>
@@ -150,25 +150,25 @@
 			<dependency>
 				<groupId>com.vladsch.flexmark</groupId>
 				<artifactId>flexmark-all</artifactId>
-				<version>0.50.46</version>
+				<version>0.50.50</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.guise</groupId>
 				<artifactId>guise-framework</artifactId>
-				<version>0.4.0-SNAPSHOT</version>
+				<version>0.4.0</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.guise</groupId>
 				<artifactId>guise-mummy</artifactId>
-				<version>0.4.0-SNAPSHOT</version>
+				<version>0.4.0</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.guise</groupId>
 				<artifactId>guise-tomcat</artifactId>
-				<version>0.4.0-SNAPSHOT</version>
+				<version>0.4.0</version>
 			</dependency>
 
 			<dependency>
@@ -198,7 +198,7 @@
 			<dependency>
 				<groupId>org.snakeyaml</groupId>
 				<artifactId>snakeyaml-engine</artifactId>
-				<version>2.0</version>
+				<version>2.1</version>
 			</dependency>
 
 			<dependency>
@@ -216,7 +216,7 @@
 			<dependency>
 				<groupId>software.amazon.awssdk</groupId>
 				<artifactId>bom</artifactId>
-				<version>2.13.8</version>
+				<version>2.13.50</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
