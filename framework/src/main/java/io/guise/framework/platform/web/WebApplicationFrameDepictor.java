@@ -142,7 +142,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		final String resourceTag = Guise.getVersion() + '-' + Guise.getBuildDate(); //create a suffix for preventing caching of previous resource versions
 		//XML declaration and doctype
 		//TODO bring back when CKEditor supports application/xhtml+xml: depictContext.writeDocType(true, XHTML_NAMESPACE_URI, ELEMENT_HTML, XHTML_CONTENT_TYPE); //write the doctype and with an XML declaration, with no system ID to a DTD as per HTML 5: http://www.w3.org/TR/html5/syntax.html#the-doctype
-		depictContext.writeDocType(true, XHTML_NAMESPACE_URI, ELEMENT_HTML, HTML_CONTENT_TYPE); //write the doctype and with an XML declaration, with no system ID to a DTD as per HTML 5: http://www.w3.org/TR/html5/syntax.html#the-doctype (CKEditor only supports text/html)
+		depictContext.writeDocType(true, XHTML_NAMESPACE_URI, ELEMENT_HTML, HTML_MEDIA_TYPE); //write the doctype and with an XML declaration, with no system ID to a DTD as per HTML 5: http://www.w3.org/TR/html5/syntax.html#the-doctype (CKEditor only supports text/html)
 		//<xhtml:html>
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_HTML); //<xhtml:html>
 		depictContext.writeAttribute(null, ATTRIBUTE_XMLNS.getLocalName(), XHTML_NAMESPACE_URI.toString()); //xmlns="http://www.w3.org/1999/xhtml"; note that we pass the wrong namespace to get the effectively correct prefix
@@ -250,7 +250,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			depictContext.write('\t');
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_LINK); //<xhtml:link>
 			depictContext.writeAttribute(null, ELEMENT_LINK_ATTRIBUTE_REL, LINK_REL_STYLESHEET); //rel="stylesheet"
-			depictContext.writeAttribute(null, ELEMENT_LINK_ATTRIBUTE_TYPE, TEXT_CSS_CONTENT_TYPE.toString()); //type="text/css"
+			depictContext.writeAttribute(null, ELEMENT_LINK_ATTRIBUTE_TYPE, TEXT_CSS_MEDIA_TYPE.toString()); //type="text/css"
 			depictContext.writeAttribute(null, ELEMENT_LINK_ATTRIBUTE_HREF, depictContext.getDepictionURI(styleURI).toString()); //href="styleURI"
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_LINK); //</xhtml:link>		
 			depictContext.write('\n');
@@ -259,7 +259,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		//this script sets up the extended navigator properties, as well as the initial JavaScript version indicator 
 		depictContext.write("\t");
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT, false); //<xhtml:script> (explicitly don't create an empty <xhtml:script> element, otherwise IE wouldn't recognize it)
-		depictContext.writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_TYPE, JAVASCRIPT_OBSOLETE_CONTENT_TYPE.toString()); //type="text/javascript"
+		depictContext.writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_TYPE, OBSOLETE_MEDIA_TYPE.toString()); //type="text/javascript"
 		depictContext.write('\n');
 		depictContext.write("\t\t");
 		depictContext.writeLiteral("navigator.userAgentName=\"" + userAgent.getName() + "\";"); //navigator.userAgentName=USER_AGENT_NAME TODO use a constant for the variable name
@@ -400,7 +400,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_FORM); //<xhtml:form>
 		depictContext.writeAttribute(null, ATTRIBUTE_ID, WebApplicationFrameDepictor.getFormID(component.getSession().getApplicationFrame())); //write the form ID in the HTML id attribute 
 		depictContext.writeAttribute(null, ELEMENT_FORM_ATTRIBUTE_METHOD, FORM_METHOD_POST); //method="post"
-		final ContentType encodingType = hasResourceImportControl(component) ? MULTIPART_FORM_DATA_CONTENT_TYPE : APPLICATION_X_WWW_FORM_URLENCODED_CONTENT_TYPE; //if we have a file upload component, use a multipart form data content type; otherwise, use the default
+		final ContentType encodingType = hasResourceImportControl(component) ? MULTIPART_FORM_DATA_MEDIA_TYPE : APPLICATION_X_WWW_FORM_URLENCODED_MEDIA_TYPE; //if we have a file upload component, use a multipart form data content type; otherwise, use the default
 		depictContext.writeAttribute(null, ELEMENT_FORM_ATTRIBUTE_ENCTYPE, encodingType.toString()); //enctype="application/x-www-form-urlencoded" (default) or "multipart/form-data" (for file uploads)
 		depictContext.writeAttribute(null, ELEMENT_FORM_ATTRIBUTE_ACTION, depictContext.getDepictionURI().getRawPath()); //action="navigationURIPath" (submit to same path)
 		writeStyleAttribute(getBodyStyles()); //write the component's body styles
@@ -481,7 +481,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		final int bodyLength = depictContext.getDepictStringBuilder().length(); //get the length of the body
 		depictContext.write("\t");
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT, false); //<xhtml:script> (explicitly don't create an empty <xhtml:script> element, otherwise IE wouldn't recognize it)
-		depictContext.writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_TYPE, JAVASCRIPT_OBSOLETE_CONTENT_TYPE.toString()); //type="text/javascript"
+		depictContext.writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_TYPE, OBSOLETE_MEDIA_TYPE.toString()); //type="text/javascript"
 		depictContext.write('\n');
 		depictContext.write("\t\t");
 		depictContext.writeLiteral("document.bodyLength=" + bodyLength + ";"); //document.bodyLength=bodyLength TODO use a constant for the variable name

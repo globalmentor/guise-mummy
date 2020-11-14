@@ -87,7 +87,7 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	}
 
 	/** The content type of the label text. */
-	private ContentType labelContentType = Text.PLAIN_CONTENT_TYPE;
+	private ContentType labelContentType = Text.PLAIN_MEDIA_TYPE;
 
 	@Override
 	public ContentType getLabelContentType() {
@@ -125,7 +125,7 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	}
 
 	/** The content type of the description text. */
-	private ContentType descriptionContentType = Text.PLAIN_CONTENT_TYPE;
+	private ContentType descriptionContentType = Text.PLAIN_MEDIA_TYPE;
 
 	@Override
 	public ContentType getDescriptionContentType() {
@@ -163,7 +163,7 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	}
 
 	/** The content type of the advisory information text. */
-	private ContentType infoContentType = Text.PLAIN_CONTENT_TYPE;
+	private ContentType infoContentType = Text.PLAIN_MEDIA_TYPE;
 
 	@Override
 	public ContentType getInfoContentType() {

@@ -24,11 +24,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
 
-import static com.globalmentor.javascript.JavaScript.*;
 import static com.globalmentor.html.spec.HTML.*;
 
 import com.globalmentor.text.ASCII;
 import com.globalmentor.html.spec.HTML;
+import com.globalmentor.javascript.JavaScript;
 import com.globalmentor.xml.spec.XML;
 import com.globalmentor.xml.QualifiedName;
 
@@ -112,7 +112,7 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 	@Override
 	public ElementState writeJavaScriptElement(final URI javascriptURI) throws IOException {
 		writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT, false); //<xhtml:script> (explicitly don't create an empty <xhtml:script> element, otherwise IE wouldn't recognize it)
-		writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_TYPE, JAVASCRIPT_OBSOLETE_CONTENT_TYPE.toString()); //type="text/javascript"
+		writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_TYPE, JavaScript.OBSOLETE_MEDIA_TYPE.toString()); //type="text/javascript"
 		writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_SRC, getDepictionURI(javascriptURI).toString()); //src="javascript.js"
 		return writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT); //</xhtml:script>	
 	}

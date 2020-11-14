@@ -35,8 +35,8 @@ import static com.globalmentor.net.URIs.*;
  */
 public class WebFlashDepictor<C extends Flash> extends AbstractSimpleWebComponentDepictor<C> { //TODO fix to work with new Microsoft activation process; see http://www.jeroenwijering.com/?item=embedding_flash and http://blog.deconcept.com/swfobject/
 
-	/** The content type for Flash objects. */
-	public static final ContentType FLASH_CONTENT_TYPE = ContentType.of(ContentType.APPLICATION_PRIMARY_TYPE, "x-shockwave-flash"); //TODO move to Flash class
+	/** The media type for Flash objects. */
+	public static final ContentType FLASH_MEDIA_TYPE = ContentType.of(ContentType.APPLICATION_PRIMARY_TYPE, "x-shockwave-flash"); //TODO move to Flash class
 
 	/**
 	 * The "allowScriptAccess" parameter.
@@ -97,7 +97,7 @@ public class WebFlashDepictor<C extends Flash> extends AbstractSimpleWebComponen
 			depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CODEBASE,
 					getSWFlashCabURI("6,0,40,0", HTTP.HTTPS_URI_SCHEME.equals(depictContext.getDepictionURI().getScheme())).toString()); //codebase="http[s]://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0" TODO allow version to be specified
 		} else { //if the user agent is not IE, specify the object content type
-			depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_TYPE, FLASH_CONTENT_TYPE.toString()); //type="application/x-shockwave-flash"; don't write the type Type attribute in IE, because this will prevent IE from loading the Flash movie 			
+			depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_TYPE, FLASH_MEDIA_TYPE.toString()); //type="application/x-shockwave-flash"; don't write the type Type attribute in IE, because this will prevent IE from loading the Flash movie 			
 			if(flashDepictURI != null) { //if there is a flash URI
 				depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_DATA, flashDepictURI.toString()); //data="flashURI"; don't write the data attribute in IE, because it will prevent the Flash movie from showing its preloader
 			}

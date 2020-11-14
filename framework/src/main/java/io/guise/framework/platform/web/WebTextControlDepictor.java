@@ -45,8 +45,8 @@ import static io.guise.framework.platform.web.WebPlatform.*;
  */
 public class WebTextControlDepictor<V, C extends TextControl<V>> extends AbstractDecoratedWebComponentDepictor<C> {
 
-	/** The content type for XStandard objects. */
-	public static final ContentType XSTANDARD_CONTENT_TYPE = ContentType.of(ContentType.APPLICATION_PRIMARY_TYPE, "x-xstandard");
+	/** The media type for XStandard objects. */
+	public static final ContentType XSTANDARD_MEDIA_TYPE = ContentType.of(ContentType.APPLICATION_PRIMARY_TYPE, "x-xstandard");
 
 	/** The XStandard class ID. */
 	public static final String XSTANDARD_CLASS_ID = "clsid:0EED7206-1661-11D7-84A3-00606744831D";

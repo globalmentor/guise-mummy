@@ -204,8 +204,8 @@ public class TextControl<V> extends AbstractTextControl<V> {
 		public boolean importTransfer(final TextControl<?> component, final Transferable<?> transferable) {
 			boolean imported = false; //we'll assume we didn't import anything
 			Object data = null; //we'll store here any data we retrieve
-			if(transferable.canTransfer(PLAIN_CONTENT_TYPE)) { //text/plain is our favorite type; if we can import it
-				data = transferable.transfer(PLAIN_CONTENT_TYPE); //transfer the data
+			if(transferable.canTransfer(PLAIN_MEDIA_TYPE)) { //text/plain is our favorite type; if we can import it
+				data = transferable.transfer(PLAIN_MEDIA_TYPE); //transfer the data
 				imported = true; //indicate that we transported data
 			} else { //otherwise, check for text/* types
 				for(final ContentType contentType : transferable.getContentTypes()) { //for each available content type
@@ -451,12 +451,12 @@ public class TextControl<V> extends AbstractTextControl<V> {
 		 */
 		@Override
 		public ContentType[] getContentTypes() {
-			return new ContentType[] { PLAIN_CONTENT_TYPE };
+			return new ContentType[] { PLAIN_MEDIA_TYPE };
 		}
 
 		@Override
 		public Object transfer(final ContentType contentType) {
-			if(contentType.hasBaseType(PLAIN_CONTENT_TYPE)) { //if they request the supported content type
+			if(contentType.hasBaseType(PLAIN_MEDIA_TYPE)) { //if they request the supported content type
 				return getSource().getText(); //return the current text
 			} else { //if we don't support this content type
 				throw new IllegalArgumentException("Content type not supported: " + contentType);

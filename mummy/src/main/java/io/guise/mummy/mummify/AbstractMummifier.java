@@ -99,7 +99,7 @@ public abstract class AbstractMummifier implements Mummifier {
 			return Optional.empty();
 		}
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(descriptionFile))) {
-			return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream, TURF.PROPERTIES_CONTENT_TYPE).stream()
+			return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream, TURF.PROPERTIES_MEDIA_TYPE).stream()
 					.flatMap(asInstances(UrfResourceDescription.class)).findFirst();
 		}
 	}
@@ -125,7 +125,7 @@ public abstract class AbstractMummifier implements Mummifier {
 		turfSerializer.setFormatted(true);
 		turfSerializer.setLineSeparator(context.getConfiguration().getString(CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR));
 		try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(descriptionFile))) {
-			turfSerializer.serializeDocument(outputStream, TURF.PROPERTIES_CONTENT_TYPE, description);
+			turfSerializer.serializeDocument(outputStream, TURF.PROPERTIES_MEDIA_TYPE, description);
 		}
 	}
 

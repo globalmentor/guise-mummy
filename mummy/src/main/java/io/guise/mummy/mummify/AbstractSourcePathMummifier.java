@@ -81,7 +81,7 @@ public abstract class AbstractSourcePathMummifier extends AbstractMummifier impl
 			return Optional.empty();
 		}
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(descriptionFile))) {
-			return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream, TURF.PROPERTIES_CONTENT_TYPE).stream()
+			return new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream, TURF.PROPERTIES_MEDIA_TYPE).stream()
 					.flatMap(Objects.asInstances(UrfResourceDescription.class)).findFirst();
 		}
 	}

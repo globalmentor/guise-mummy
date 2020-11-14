@@ -156,7 +156,7 @@ public class HTTPServletGuiseRequest {
 		navigationPath = guiseApplication.getNavigationPath(depictURI); //get the logical version of the the path
 		final String contentTypeString = request.getContentType(); //get the request content type
 		requestContentType = contentTypeString != null ? ContentType.parse(contentTypeString) : null; //create a content type object from the request content type, if there is one
-		ajax = requestContentType != null && GUISE_AJAX_REQUEST_CONTENT_TYPE.hasBaseType(requestContentType); //see if this is a Guise AJAX request
+		ajax = requestContentType != null && GUISE_AJAX_REQUEST_MEDIA_TYPE.hasBaseType(requestContentType); //see if this is a Guise AJAX request
 	}
 
 	@Override

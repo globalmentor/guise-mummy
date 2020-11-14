@@ -50,7 +50,7 @@ public class DefaultInfoModel extends DefaultLabelModel implements InfoModel {
 	}
 
 	/** The content type of the description text. */
-	private ContentType descriptionContentType = Text.PLAIN_CONTENT_TYPE;
+	private ContentType descriptionContentType = Text.PLAIN_MEDIA_TYPE;
 
 	@Override
 	public ContentType getDescriptionContentType() {
@@ -88,7 +88,7 @@ public class DefaultInfoModel extends DefaultLabelModel implements InfoModel {
 	}
 
 	/** The content type of the advisory information text. */
-	private ContentType infoContentType = Text.PLAIN_CONTENT_TYPE;
+	private ContentType infoContentType = Text.PLAIN_MEDIA_TYPE;
 
 	@Override
 	public ContentType getInfoContentType() {

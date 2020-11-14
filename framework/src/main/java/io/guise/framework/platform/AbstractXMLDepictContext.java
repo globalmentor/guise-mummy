@@ -322,16 +322,16 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 				contentType = getContentTypeForPublicID(publicID); //get the content type for this doctype public ID
 			}
 			if(contentType == null) { //if we still couldn't find a content type
-				contentType = CONTENT_TYPE; //use the generic "text/xml" content type
+				contentType = MEDIA_TYPE; //use the generic "text/xml" content type
 			}
 		}
 		//set the content type
 		if(contentType != null) { //if a content type is specified
 			//TODO del Log.trace("content type specified: ", contentType);
-			if(contentType.hasBaseType(XHTML_CONTENT_TYPE)) { //if the preferred content type is "application/xhtml+xml"
+			if(contentType.hasBaseType(XHTML_MEDIA_TYPE)) { //if the preferred content type is "application/xhtml+xml"
 				//if the client doesn't accept "application/xhtml+xml" exactly
-				if(!getPlatform().getClientProduct().isAcceptedContentType(XHTML_CONTENT_TYPE, false)) {
-					contentType = HTML_CONTENT_TYPE; //step down to "text/html"
+				if(!getPlatform().getClientProduct().isAcceptedContentType(XHTML_MEDIA_TYPE, false)) {
+					contentType = HTML_MEDIA_TYPE; //step down to "text/html"
 					//TODO del Log.trace("stepping down to: ", contentType);
 				}
 			}
