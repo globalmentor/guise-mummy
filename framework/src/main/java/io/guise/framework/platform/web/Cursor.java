@@ -80,7 +80,7 @@ public enum Cursor implements Identifier {
 
 	/** @return The URI of the predefined cursor relative to the application. */
 	public URI getURI() {
-		return URI.create(addExtension(GUISE_ROOT_THEME_CURSORS_PATH + getSerializationName(this), Images.PNG_NAME_EXTENSION));
+		return URI.create(addExtension(GUISE_ROOT_THEME_CURSORS_PATH + getSerializationName(this), Images.PNG_FILENAME_EXTENSION));
 	}
 
 	/**

@@ -19,7 +19,6 @@ package io.guise.framework.component;
 import java.beans.PropertyVetoException;
 
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.net.ContentTypeConstants.*;
 
 import com.globalmentor.io.*;
 import com.globalmentor.net.ContentType;

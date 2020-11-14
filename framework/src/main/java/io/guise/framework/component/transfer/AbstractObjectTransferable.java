@@ -22,7 +22,6 @@ import com.globalmentor.io.*;
 import com.globalmentor.net.ContentType;
 
 import static com.globalmentor.java.Classes.*;
-import static com.globalmentor.net.ContentTypeConstants.*;
 
 /**
  * A abstract transferable that carries one or more Java objects. A subclass must implement {@link #transfer(Class)}.
