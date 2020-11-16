@@ -50,9 +50,13 @@ public interface SourcePathMummifier extends Mummifier {
 
 	/**
 	 * Determines the media type for an artifact from the given source path
+	 * <p>
+	 * A mummifier must not return an unsupported media type. If a mummifier only supports a single media type, it may assume that the given path is of the
+	 * supported type and return that media type.
+	 * </p>
 	 * @param context The context of static site generation.
 	 * @param sourcePath The path in the site source directory; not guaranteed to exist;
-	 * @return The target media type for the generated artifact, if known
+	 * @return The target media type for the generated artifact, if known; will not be present if unknown or unsupported.
 	 * @throws IOException if there is an I/O error determining the media type.
 	 */
 	public Optional<ContentType> getArtifactMediaType(@Nonnull MummyContext context, @Nonnull final Path sourcePath) throws IOException;

@@ -67,7 +67,7 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel {
 	}
 
 	/** The content type of the label text. */
-	private ContentType labelContentType = Text.PLAIN_CONTENT_TYPE;
+	private ContentType labelContentType = Text.PLAIN_MEDIA_TYPE;
 
 	@Override
 	public ContentType getLabelContentType() {

@@ -67,7 +67,7 @@ public class Message extends AbstractComponent //TODO del component if not neede
 	}
 
 	/** The content type of the message text. */
-	private ContentType messageContentType = Text.PLAIN_CONTENT_TYPE;
+	private ContentType messageContentType = Text.PLAIN_MEDIA_TYPE;
 
 	/** @return The content type of the message text. */
 	public ContentType getMessageContentType() {

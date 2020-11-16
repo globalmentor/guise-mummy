@@ -109,7 +109,7 @@ public class S3ArtifactRedirectDeployObject extends AbstractS3DeployObject {
 	 */
 	@Override
 	public String getContentType() {
-		return ContentType.APPLICATION_OCTET_STREAM_CONTENT_TYPE.toString();
+		return ContentType.APPLICATION_OCTET_STREAM_MEDIA_TYPE.toString();
 	}
 
 	/**

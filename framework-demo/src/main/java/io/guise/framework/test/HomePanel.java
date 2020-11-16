@@ -352,7 +352,7 @@ public class HomePanel extends LayoutPanel {
 		*/
 
 		final TextBox testText = new TextBox();
-		testText.setTextContentType(HTML.XHTML_FRAGMENT_CONTENT_TYPE);
+		testText.setTextContentType(HTML.XHTML_FRAGMENT_MEDIA_TYPE);
 		//TODO bring back		testText.getModel().setTextResourceKey("test.html");
 		testText.setText("this is <strong>good</strong> stuff");
 

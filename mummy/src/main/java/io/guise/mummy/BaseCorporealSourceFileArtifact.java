@@ -16,7 +16,7 @@
 
 package io.guise.mummy;
 
-import static com.globalmentor.io.Paths.*;
+import static com.globalmentor.io.Files.*;
 import static java.nio.file.Files.*;
 
 import java.io.*;

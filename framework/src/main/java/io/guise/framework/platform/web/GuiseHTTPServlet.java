@@ -576,7 +576,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 								final String itemContentTypeString = fileItemStream.getContentType(); //get the item content type, if any
 								if(itemContentTypeString != null) { //if we know the item's content type
 									final ContentType itemContentType = ContentType.parse(itemContentTypeString);
-									if(!ContentType.APPLICATION_OCTET_STREAM_CONTENT_TYPE.hasBaseType(itemContentType)) { //if the content type is not just a generic "bunch of bytes" content type
+									if(!ContentType.APPLICATION_OCTET_STREAM_MEDIA_TYPE.hasBaseType(itemContentType)) { //if the content type is not just a generic "bunch of bytes" content type
 										resourceDescription.setPropertyValue(Content.TYPE_PROPERTY_TAG, itemContentType); //set the resource's content type
 									}
 								}
@@ -801,7 +801,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 				//see if there is non-Guise HTTP POST data, and if so, set that bookmark navigation temporarily
 				//a non-Guise form HTTP POST, get the servlet parameters (which will include the URL query information)
 				if(POST_METHOD.equals(guiseRequest.getHTTPServletRequest().getMethod()) && contentType != null
-						&& APPLICATION_X_WWW_FORM_URLENCODED_CONTENT_TYPE.hasBaseType(contentType) && !isGuisePOST) {
+						&& APPLICATION_X_WWW_FORM_URLENCODED_MEDIA_TYPE.hasBaseType(contentType) && !isGuisePOST) {
 					//TODO del Log.trace("using servlet parameter methods");
 					final List<Bookmark.Parameter> bookmarkParameterList = new ArrayList<Bookmark.Parameter>(); //create a new list of bookmark parameters
 					final Iterator<Map.Entry<String, String[]>> parameterEntryIterator = (Iterator<Map.Entry<String, String[]>>)guiseRequest.getHTTPServletRequest()
@@ -1219,7 +1219,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 
 			String text = depictContext.getDepictText(); //get the text to output
 			if(isAJAX) { //if this is an AJAX request
-				depictContext.setOutputContentType(XML.CONTENT_TYPE); //switch to the "text/xml" content type TODO verify UTF-8 in a consistent, elegant way
+				depictContext.setOutputContentType(XML.MEDIA_TYPE); //switch to the "text/xml" content type TODO verify UTF-8 in a consistent, elegant way
 				text = "<response>" + text + "</response>"; //wrap the text in a response element
 			}
 			//			Log.debug("response length:", text.length());

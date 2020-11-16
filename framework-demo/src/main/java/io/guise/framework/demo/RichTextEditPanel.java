@@ -40,7 +40,7 @@ public class RichTextEditPanel extends LayoutPanel {
 		xhtmlTextControl.setLabel("XHTML"); //set the label for the text control
 		try {
 			xhtmlTextControl.setValue(SAMPLE_TEXT); //set the sample text in the rich text control
-			xhtmlTextControl.setValueContentType(HTML.XHTML_FRAGMENT_CONTENT_TYPE); //indicate that the text is an XHTML fragment
+			xhtmlTextControl.setValueContentType(HTML.XHTML_FRAGMENT_MEDIA_TYPE); //indicate that the text is an XHTML fragment
 		} catch(final PropertyVetoException propertyVetoException) { //we don't have a validator installed, so there should be no problems setting the value 
 			throw new AssertionError(propertyVetoException);
 		}
@@ -50,7 +50,7 @@ public class RichTextEditPanel extends LayoutPanel {
 		//the source text control will use the HTML text control as its text model, but will use a different content type
 		final TextControl<String> sourceTextControl = new TextControl<String>(xhtmlTextControl, 10, 80);
 		sourceTextControl.setLabel("Source"); //set the label for the text control
-		sourceTextControl.setValueContentType(Text.PLAIN_CONTENT_TYPE); //indicate that source text is just plain text
+		sourceTextControl.setValueContentType(Text.PLAIN_MEDIA_TYPE); //indicate that source text is just plain text
 		sourceTextControl.setEditable(false); //don't allow the source to be edited
 		add(sourceTextControl); //add the source text control
 	}

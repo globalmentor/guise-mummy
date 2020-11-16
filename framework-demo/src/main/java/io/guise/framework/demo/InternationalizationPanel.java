@@ -100,7 +100,7 @@ public class InternationalizationPanel extends LayoutPanel {
 
 		//localized text
 		final TextBox text = new TextBox(); //create a text component
-		text.setTextContentType(HTML.XHTML_CONTENT_TYPE); //use application/xhtml+xml content
+		text.setTextContentType(HTML.XHTML_MEDIA_TYPE); //use application/xhtml+xml content
 		text.setText(Resources.createStringResourceReference(UN_CHARTER_PREAMBLE_RESOURCE_KEY)); //use the UN Charter Preamble resource, appropriately localized
 
 		add(text, new RegionConstraints(Region.CENTER)); //add the text in the center of the panel

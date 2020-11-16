@@ -49,12 +49,12 @@ public interface WebPlatform extends Platform {
 	/** The URI query parameter used to indicate the Guise version to prevent caching between versions. */
 	public static final String GUISE_VERSION_URI_QUERY_PARAMETER = "guiseVersion";
 
-	/** The content type of a Guise AJAX request, <code>application/x-guise-ajax-request</code>. */
-	public static final ContentType GUISE_AJAX_REQUEST_CONTENT_TYPE = ContentType.of(ContentType.APPLICATION_PRIMARY_TYPE,
+	/** The media type of a Guise AJAX request, <code>application/x-guise-ajax-request</code>. */
+	public static final ContentType GUISE_AJAX_REQUEST_MEDIA_TYPE = ContentType.of(ContentType.APPLICATION_PRIMARY_TYPE,
 			ContentType.SUBTYPE_EXTENSION_PREFIX + "guise-ajax-request" + ContentType.SUBTYPE_SUFFIX_DELIMITER_CHAR + XML_SUBTYPE_SUFFIX);
 
-	/** The content type of a Guise AJAX response, <code>application/x-guise-ajax-response</code>. */
-	public static final ContentType GUISE_AJAX_RESPONSE_CONTENT_TYPE = ContentType.of(ContentType.APPLICATION_PRIMARY_TYPE,
+	/** The media type of a Guise AJAX response, <code>application/x-guise-ajax-response</code>. */
+	public static final ContentType GUISE_AJAX_RESPONSE_MEDIA_TYPE = ContentType.of(ContentType.APPLICATION_PRIMARY_TYPE,
 			ContentType.SUBTYPE_EXTENSION_PREFIX + "guise-ajax-response" + ContentType.SUBTYPE_SUFFIX_DELIMITER_CHAR + XML_SUBTYPE_SUFFIX);
 
 	/** The types of JavaScript-based HTML editors available. */

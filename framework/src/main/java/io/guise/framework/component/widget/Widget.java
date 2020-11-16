@@ -31,8 +31,8 @@ import io.guise.framework.component.Component;
  */
 public interface Widget extends Component {
 
-	/** The MIME type of a Guise widget. */
-	public static final ContentType WIDGET_CONTENT_TYPE = ContentType.of(ContentType.APPLICATION_PRIMARY_TYPE,
+	/** The media type of a Guise widget. */
+	public static final ContentType WIDGET_MEDIA_TYPE = ContentType.of(ContentType.APPLICATION_PRIMARY_TYPE,
 			ContentType.SUBTYPE_EXTENSION_PREFIX + "guise-widget");
 
 	/**

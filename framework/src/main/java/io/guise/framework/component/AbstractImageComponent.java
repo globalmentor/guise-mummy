@@ -21,11 +21,11 @@ import java.net.URI;
 import static java.util.Objects.*;
 
 import static com.globalmentor.java.Arrays.*;
-import static com.globalmentor.net.ContentTypeConstants.*;
 import static com.globalmentor.net.URIs.*;
 
 import com.globalmentor.io.*;
 import com.globalmentor.net.ContentType;
+import com.globalmentor.net.URIs;
 
 import io.guise.framework.component.transfer.*;
 import io.guise.framework.model.*;
@@ -105,13 +105,13 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 		 */
 		@Override
 		public ContentType[] getContentTypes() {
-			return createArray(ContentType.of(ContentType.TEXT_PRIMARY_TYPE, URI_LIST_SUBTYPE), getSource().getLabelContentType());
-		} //TODO use a static instance
+			return new ContentType[] {URI_LIST_MEDIA_TYPE, getSource().getLabelContentType()};
+		}
 
 		@Override
 		public Object transfer(final ContentType contentType) {
 			final ImageComponent image = getSource(); //get the image
-			if(contentType.match(ContentType.TEXT_PRIMARY_TYPE, URI_LIST_SUBTYPE)) { //if this is a text/uri-list type
+			if(contentType.hasBaseType(URI_LIST_MEDIA_TYPE)) { //if this is a text/uri-list type
 				final URI imageURI = image.getImageURI(); //get the image URI
 				return imageURI != null ? createURIList(image.getSession().resolveURI(imageURI)) : null; //return the image URI, if there is one
 			} else if(contentType.hasBaseType(image.getLabelContentType())) { //if the label has the content type requested

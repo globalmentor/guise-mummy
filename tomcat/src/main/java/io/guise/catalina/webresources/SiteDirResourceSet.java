@@ -193,7 +193,7 @@ public class SiteDirResourceSet extends DirResourceSet {
 				final Path descriptionFile = changeBase(filePath.resolveSibling(descriptionFilename), getFileBase().toPath(), getDescriptionFileBase().toPath());
 				if(isRegularFile(descriptionFile)) {
 					try (final InputStream inputStream = new BufferedInputStream(newInputStream(descriptionFile))) {
-						new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream, TURF.PROPERTIES_CONTENT_TYPE).stream()
+						new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream, TURF.PROPERTIES_MEDIA_TYPE).stream()
 								.flatMap(Objects.asInstances(UrfResourceDescription.class)).findFirst().ifPresentOrElse(description -> {
 									//set the MIME type if indicated
 									description.findPropertyValue(Content.TYPE_PROPERTY_TAG).ifPresent(contentType -> fileResource.setMimeType(contentType.toString()));

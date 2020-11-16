@@ -86,11 +86,11 @@ public class TextBox extends AbstractContainer implements TextModel, SectionComp
 	}
 
 	/**
-	 * Text constructor with a default {@link Text#PLAIN_CONTENT_TYPE} content type.
+	 * Text constructor with a default {@link Text#PLAIN_MEDIA_TYPE} content type.
 	 * @param text The text, which may include a resource reference, or <code>null</code> if there is no text.
 	 */
 	public TextBox(final String text) {
-		this(text, Text.PLAIN_CONTENT_TYPE); //construct the class with a plain text content type
+		this(text, Text.PLAIN_MEDIA_TYPE); //construct the class with a plain text content type
 	}
 
 	/**

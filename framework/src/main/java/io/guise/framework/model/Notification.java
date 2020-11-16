@@ -210,7 +210,7 @@ public class Notification extends DefaultLabelModel {
 	 * @throws NullPointerException if the given message, severity, and/or options is <code>null</code>.
 	 */
 	public Notification(final String message, final Severity severity, final Throwable error, final Option... options) {
-		this(message, Text.PLAIN_CONTENT_TYPE, severity, error, options); //construct the notification with a plain text message
+		this(message, Text.PLAIN_MEDIA_TYPE, severity, error, options); //construct the notification with a plain text message
 	}
 
 	/**

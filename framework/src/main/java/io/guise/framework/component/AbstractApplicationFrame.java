@@ -152,7 +152,7 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 		if(content != null) { //if we have content
 			final String contentLabel = content.getLabel(); //get the content label, if any
 			final ContentType contentLabelContentType = content.getLabelContentType(); //get the content label content type
-			if(contentLabel == null || Text.PLAIN_CONTENT_TYPE.hasBaseType(contentLabelContentType) || contentLabel == null) { //if there is no content label or the content label is plain text, we can use plain text for the entire label
+			if(contentLabel == null || Text.PLAIN_MEDIA_TYPE.hasBaseType(contentLabelContentType) || contentLabel == null) { //if there is no content label or the content label is plain text, we can use plain text for the entire label
 				final String basePlainLabel = getBasePlainLabel(); //see if there is a base label
 				if(basePlainLabel != null || contentLabel != null) { //if we have a base label or content label
 					final StringBuilder labelStringBuilder = new StringBuilder();
@@ -166,7 +166,7 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 						labelStringBuilder.append(contentLabel); //append the content label
 					}
 					label = labelStringBuilder.toString(); //use the label we constructed
-					labelContentType = Text.PLAIN_CONTENT_TYPE; //we'll use plain text for the label
+					labelContentType = Text.PLAIN_MEDIA_TYPE; //we'll use plain text for the label
 				} else { //if we have no label text at all
 					label = null; //don't use a label
 					labelContentType = getLabelContentType(); //stay with the current content type
