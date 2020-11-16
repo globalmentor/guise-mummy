@@ -17,6 +17,7 @@
 package io.guise.mummy.mummify.collection;
 
 import static com.globalmentor.io.Filenames.*;
+import static com.globalmentor.io.Files.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.util.Optionals.*;
@@ -183,6 +184,9 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 					}
 					final Path childTargetPath = planChildArtifactTargetPath(context, targetDirectory, childSourceFilename, childMummifier, isAssetSourceDirectoryTree);
 					final Artifact childArtifact = childMummifier.plan(context, childSourcePath, childTargetPath);
+
+					//TODO add error handling here with a better error
+
 					childArtifacts.add(childArtifact);
 				}
 			}));

@@ -17,6 +17,7 @@
 package io.guise.mummy;
 
 import static com.globalmentor.io.Filenames.*;
+import static com.globalmentor.io.Files.*;
 import static com.globalmentor.io.Paths.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
@@ -41,6 +42,7 @@ import io.guise.mummy.deploy.*;
 import io.guise.mummy.deploy.aws.*;
 import io.guise.mummy.mummify.*;
 import io.guise.mummy.mummify.collection.DirectoryMummifier;
+import io.guise.mummy.mummify.image.DefaultImageMummifier;
 import io.guise.mummy.mummify.page.HtmlPageMummifier;
 import io.guise.mummy.mummify.page.MarkdownPageMummifier;
 import io.guise.mummy.mummify.page.XhtmlPageMummifier;
@@ -263,6 +265,7 @@ public class GuiseMummy implements Clogged {
 		registerFileMummifier(new MarkdownPageMummifier());
 		registerFileMummifier(new XhtmlPageMummifier());
 		registerFileMummifier(new HtmlPageMummifier());
+		registerFileMummifier(new DefaultImageMummifier());
 	}
 
 	/**
