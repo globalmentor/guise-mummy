@@ -53,10 +53,15 @@ public class DefaultImageMummifierTest {
 	@Test
 	public void testGetArtifactMediaType() throws IOException {
 		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.bmp")), isEmpty());
+		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.BMP")), isEmpty());
 		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.gif")), isPresentAndIs(GIF_MEDIA_TYPE));
+		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.GIF")), isPresentAndIs(GIF_MEDIA_TYPE));
 		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.jpg")), isPresentAndIs(JPEG_MEDIA_TYPE));
+		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.JPG")), isPresentAndIs(JPEG_MEDIA_TYPE));
 		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.jpeg")), isPresentAndIs(JPEG_MEDIA_TYPE));
+		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.JPEG")), isPresentAndIs(JPEG_MEDIA_TYPE));
 		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.png")), isPresentAndIs(PNG_MEDIA_TYPE));
+		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.PNG")), isPresentAndIs(PNG_MEDIA_TYPE));
 	}
 
 }

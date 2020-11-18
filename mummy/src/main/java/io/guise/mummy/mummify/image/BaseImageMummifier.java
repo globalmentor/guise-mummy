@@ -80,7 +80,8 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier {
 	 */
 	@Override
 	public Optional<ContentType> getArtifactMediaType(final MummyContext context, final Path sourceFile) throws IOException {
-		return findFilenameExtension(sourceFile).filter(getSupportedFilenameExtensions()::contains).map(MEDIA_TYPES_BY_FILENAME_EXTENSION::get);
+		return findFilenameExtension(sourceFile).map(Filenames.Extensions::normalize).filter(getSupportedFilenameExtensions()::contains)
+				.map(MEDIA_TYPES_BY_FILENAME_EXTENSION::get); //the media type filename extensions are already in normal form
 	}
 
 	/**
