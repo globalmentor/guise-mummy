@@ -16,7 +16,6 @@
 
 package io.guise.mummy;
 
-import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.io.Paths.*;
 import static java.nio.file.Files.*;
@@ -33,6 +32,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.*;
 
+import com.globalmentor.io.Filenames;
 import com.globalmentor.net.DomainName;
 
 import io.clogr.Clogged;
@@ -223,7 +223,7 @@ public class GuiseMummy implements Clogged {
 	/** The default mummifier for normal directories. */
 	private final SourcePathMummifier defaultDirectoryMummifier = new DirectoryMummifier();
 
-	/** The registered mummifiers by supported extensions. */
+	/** The registered mummifiers by supported extensions. These extensions are in canonical (lowercase) form. */
 	private final Map<String, SourcePathMummifier> fileMummifiersByExtension = new HashMap<>();
 
 	private boolean full = false;
@@ -256,7 +256,9 @@ public class GuiseMummy implements Clogged {
 	 * @see Mummifier#getSupportedFilenameExtensions()
 	 */
 	public void registerFileMummifier(@Nonnull final SourcePathMummifier mummifier) {
-		mummifier.getSupportedFilenameExtensions().forEach(ext -> fileMummifiersByExtension.put(ext, mummifier));
+		mummifier.getSupportedFilenameExtensions().stream()
+				//normalize extensions so we can look up without regard to case
+				.map(Filenames.Extensions::normalize).forEach(ext -> fileMummifiersByExtension.put(ext, mummifier));
 	}
 
 	/** No-args constructor. */
@@ -600,9 +602,13 @@ public class GuiseMummy implements Clogged {
 			return defaultDirectoryMummifier;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 * @implSpec This implementation finds a registered mummifier based upon the normalized filename extension (without regard to case).
+		 */
 		@Override
 		public Optional<SourcePathMummifier> findRegisteredMummifierForSourceFile(@Nonnull final Path sourceFile) {
-			return extensions(sourceFile.getFileName().toString()).map(fileMummifiersByExtension::get).filter(Objects::nonNull).findFirst();
+			return filenameExtensions(sourceFile).map(Filenames.Extensions::normalize).map(fileMummifiersByExtension::get).filter(Objects::nonNull).findFirst();
 		}
 
 		/**

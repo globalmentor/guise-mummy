@@ -28,7 +28,6 @@ import org.junit.jupiter.api.*;
 import com.globalmentor.net.DomainName;
 
 import io.confound.config.*;
-import io.guise.mummy.GuiseMummy;
 
 /**
  * Tests of {@link GuiseMummy}.
