@@ -117,8 +117,7 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 						final URL resourceURL = loader.getResource(resourcePath); //see if this resource bundle exists
 						if(resourceURL != null) { //if we found an existing resource bundle
 							try {
-								final InputStream inputStream = resourceURL.openConnection().getInputStream(); //open an input stream to the resource URL
-								try {
+								try (final InputStream inputStream = resourceURL.openConnection().getInputStream()) { //open an input stream to the resource URL
 									switch(resourceBundleFormat) { //see which type of resource bundle we're loading
 										case TURF: {
 											final Map<Object, Object> resourceMap = turfResourceIO.read(inputStream, resourceURL.toURI()); //try to read the resource
@@ -137,8 +136,6 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 										default:
 											throw new AssertionError("Unrecognized resource bundle format: " + resourceBundleFormat);
 									}
-								} finally {
-									inputStream.close(); //always close the input stream
 								}
 							} catch(final URISyntaxException uriSyntaxException) { //if the resource URL wasn't strictly in compliance with URI syntax								
 								throw (MissingResourceException)new MissingResourceException(uriSyntaxException.getMessage(), baseName + Locales.LOCALE_SEPARATOR + locale, "")

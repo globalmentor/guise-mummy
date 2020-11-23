@@ -92,8 +92,7 @@ public class TextSearchPanel extends LayoutPanel {
 					final ResourceImport resourceImport = propertyChangeEvent.getNewValue(); //get the new resource import
 					final String searchResults; //we'll store the search results here
 					if(resourceImport != null && searchRegExControl.isValid()) { //if we have a new resource to import and the search expression is valid
-						final Reader reader = new InputStreamReader(resourceImport.getInputStream()); //get an input stream to the resource, assuming the text file uses the default character encoding
-						try {
+						try (final Reader reader = new InputStreamReader(resourceImport.getInputStream())) { //get an input stream to the resource, assuming the text file uses the default character encoding
 							final char[] buffer = new char[1024]; //create a 1K buffer
 							final StringBuilder inputStringBuilder = new StringBuilder(); //create a string builder to hold the input
 							int readCount; //keep track of the number of characters read
@@ -113,8 +112,6 @@ public class TextSearchPanel extends LayoutPanel {
 							} else { //if there was no regular expression
 								searchResults = inputStringBuilder.toString(); //use the input string unmodified										
 							}
-						} finally {
-							reader.close(); //always close the reader to the resource
 						}
 					} else { //if we don't have a new resource import
 						searchResults = null; //show that we don't have any search results

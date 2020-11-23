@@ -1120,14 +1120,11 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		if(resourceMap == null) { //if there is no cached resource map; don't worry about the benign race condition, which at worst will cause the resource bundle to be loaded more than once; blocking would be less efficient
 			//TODO del Debug.info("resource bundle cache miss for", resourceBundleURI);
 			//TODO make sure this is a TURF file; if not, load the properties from the properties file
-			final InputStream resourcesInputStream = new BufferedInputStream(getInputStream(resourceBundleURI)); //get a buffered input stream to the resources
-			try {
+			try (final InputStream resourcesInputStream = new BufferedInputStream(getInputStream(resourceBundleURI))) { //get a buffered input stream to the resources
 				resourceMap = getResourcesIO().read(resourcesInputStream, resourceBundleURI); //load the resources
 				cachedResourceMapMap.put(resourceBundleURI, resourceMap); //cache the map for later
 			} catch(final IOException ioException) { //if there was an error loading the resource bundle
 				throw new IOException("Error loading resource bundle (" + resourceBundleURI + "): " + ioException.getMessage(), ioException);
-			} finally {
-				resourcesInputStream.close(); //always close the resources input stream
 			}
 		}
 		/*TODO del
@@ -1146,13 +1143,10 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			throw new FileNotFoundException("Missing theme resource: " + resolvedThemeURI); //indicate that the theme cannot be found
 		}
 		final Theme theme;
-		final InputStream bufferedThemeInputStream = new BufferedInputStream(themeInputStream); //get a buffered input stream to the theme
-		try {
+		try (final InputStream bufferedThemeInputStream = new BufferedInputStream(themeInputStream)) { //get a buffered input stream to the theme
 			theme = getThemeIO().read(bufferedThemeInputStream, resolvedThemeURI); //read this theme
 		} catch(final IOException ioException) { //if there was an error loading the theme
 			throw new IOException("Error loading theme (" + resolvedThemeURI + "): " + ioException.getMessage(), ioException);
-		} finally {
-			bufferedThemeInputStream.close(); //always close the theme input stream
 		}
 		final URI rootThemeURI = GUISE_ROOT_THEME_PATH.toURI(); //get the application-relative URI to the root theme
 		final URI resolvedRootThemeURI = resolveURI(rootThemeURI); //get the resolved path URI to the root theme
@@ -1185,16 +1179,13 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			throw new IllegalArgumentException("Unrecognized properties file type: " + propertiesPath);
 		}
 		final Properties properties = new Properties(); //create a properties file
-		final InputStream inputStream = new BufferedInputStream(new FileInputStream(propertiesFile)); //get an input stream to the file
-		try {
+		try (final InputStream inputStream = new BufferedInputStream(new FileInputStream(propertiesFile))) { //get an input stream to the file
 			if(isXML) { //if we're loading XML
 				properties.loadFromXML(inputStream); //load the properties file from the XML				
 			} else { //if we're loading a traditional properties file
 				properties.load(inputStream); //load the traditional properties file				
 			}
 			return properties; //return the properties we loaded
-		} finally {
-			inputStream.close(); //always close the input stream
 		}
 	}
 
