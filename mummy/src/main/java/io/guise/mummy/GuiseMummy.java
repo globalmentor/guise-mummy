@@ -273,7 +273,7 @@ public class GuiseMummy implements Clogged {
 	/**
 	 * Performs static site generation on a source directory into a target directory.
 	 * @param project The Guise project governing mummification.
-	 * @param phase The life cycle phase to execute (including all those before it.
+	 * @param phase The life cycle phase to execute (including all those before it).
 	 * @throws IllegalArgumentException if the configured source directory does not exist or is not a directory.
 	 * @throws IllegalArgumentException if the configured source and target directories overlap.
 	 * @throws IOException if there is an I/O error generating the static site.
@@ -367,7 +367,7 @@ public class GuiseMummy implements Clogged {
 	 * @return A context to use during mummification.
 	 * @throws IOException if there is an I/O error during initialization, such as when loading the site configuration.
 	 */
-	public Context initialize(@Nonnull final GuiseProject project) throws IOException {
+	protected Context initialize(@Nonnull final GuiseProject project) throws IOException {
 		final Path siteSourceDirectory = project.getDirectory().resolve(project.getConfiguration().getPath(GuiseMummy.PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY));
 
 		final Configuration mummyConfiguration;
@@ -482,6 +482,7 @@ public class GuiseMummy implements Clogged {
 	 * Creates a Guise Mummy project based upon a project directory and optional explicit directory overrides.
 	 * @apiNote Because the paths other than the project directory may be relative, as may those in the configuration files, when retrieving paths they must be
 	 *          resolved against the project directory.
+	 * @implSpec This implementation ultimately falls back to the default configuration returned by {@link #getDefaultConfiguration(Path)}.
 	 * @param projectDirectory The required absolute base directory for the project, in which the project file, if any, would be found.
 	 * @param siteSourceDirectory The site source directory, or if <code>null</code> falling back to that specified in the project configuration as
 	 *          {@value #PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY}, defaulting to <code>src/site</code> relative to the project directory.
@@ -491,15 +492,43 @@ public class GuiseMummy implements Clogged {
 	 *          configuration as {@value #PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY}, defaulting to <code>target/site-description</code> relative to
 	 *          the project directory.
 	 * @return The new project.
-	 * @throws IllegalArgumentException if the project directory is not absolute.
+	 * @throws IllegalArgumentException if one of the given directories is not absolute.
 	 * @throws IOException if there is an error determining or loading the project.
 	 */
 	public static GuiseProject createProject(@Nonnull Path projectDirectory, @Nullable final Path siteSourceDirectory, @Nullable final Path siteTargetDirectory,
 			@Nullable final Path siteDescriptionTargetDirectory) throws IOException {
-		requireNonNull(projectDirectory);
-		projectDirectory = projectDirectory.normalize();
+		projectDirectory = checkArgumentAbsolute(projectDirectory).normalize();
 
 		//default settings (ultimate fallback)
+		final Configuration defaultConfiguration = getDefaultConfiguration(projectDirectory);
+
+		//configuration file settings (`guise-project.*`); fall back to the default; if no config file present, just use the default
+		final Configuration fileConfiguration = FileSystemConfigurationManager.loadConfigurationForBaseFilename(projectDirectory, PROJECT_CONFIG_BASE_FILENAME)
+				.map(projectFileConfiguration -> projectFileConfiguration.withFallback(defaultConfiguration)).orElse(defaultConfiguration);
+
+		//user settings (e.g. supplied on the command line); fall back to the file/default
+		final Map<String, Object> userSettings = new HashMap<>();
+		if(siteSourceDirectory != null) {
+			userSettings.put(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY, checkArgumentAbsolute(siteSourceDirectory).normalize());
+		}
+		if(siteTargetDirectory != null) {
+			userSettings.put(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY, checkArgumentAbsolute(siteTargetDirectory).normalize());
+		}
+		if(siteDescriptionTargetDirectory != null) {
+			userSettings.put(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY, checkArgumentAbsolute(siteDescriptionTargetDirectory).normalize());
+		}
+		final Configuration projectConfiguration = new ObjectMapConfiguration(unmodifiableMap(userSettings)).withFallback(fileConfiguration); //the user settings override even the project file
+		return new DefaultGuiseProject(projectDirectory, projectConfiguration);
+	}
+
+	/**
+	 * Returns the default fallback configuration values for Guise Mummy. The configuration may not be mutable.
+	 * @param projectDirectory The required absolute base directory for the project.
+	 * @return The default Guise Mummy settings configuration.
+	 * @throws IllegalArgumentException if the project directory is not absolute.
+	 */
+	public static Configuration getDefaultConfiguration(@Nonnull Path projectDirectory) {
+		projectDirectory = checkArgumentAbsolute(projectDirectory).normalize();
 		final Map<String, Object> defaultSettings = new HashMap<>();
 		defaultSettings.put(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_SOURCE_RELATIVE_DIR)); //siteDirectory=${project.basedir}/src/site
 		defaultSettings.put(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_TARGET_RELATIVE_DIR)); //siteTargetDirectory=${project.basedir}/target/site
@@ -510,29 +539,11 @@ public class GuiseMummy implements Clogged {
 		defaultSettings.put(CONFIG_KEY_MUMMY_TEMPLATE_BASE_NAME, ".template");
 		defaultSettings.put(CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR, "\n");
 		defaultSettings.put(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.compile("_(.*)"));
-		final Configuration defaultConfiguration = new ObjectMapConfiguration(defaultSettings);
-
-		//configuration file settings (`guise-project.*`); fall back to the default; if no config file present, just use the default
-		final Configuration fileConfiguration = FileSystemConfigurationManager.loadConfigurationForBaseFilename(projectDirectory, PROJECT_CONFIG_BASE_FILENAME)
-				.map(projectFileConfiguration -> projectFileConfiguration.withFallback(defaultConfiguration)).orElse(defaultConfiguration);
-
-		//user settings (e.g. supplied on the command line); fall back to the file/default
-		final Map<String, Object> userSettings = new HashMap<>();
-		if(siteSourceDirectory != null) {
-			userSettings.put(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY, siteSourceDirectory);
-		}
-		if(siteTargetDirectory != null) {
-			defaultSettings.put(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY, siteTargetDirectory);
-		}
-		if(siteDescriptionTargetDirectory != null) {
-			defaultSettings.put(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY, siteDescriptionTargetDirectory);
-		}
-		final Configuration projectConfiguration = new ObjectMapConfiguration(userSettings).withFallback(fileConfiguration); //the user settings override even the project file
-		return new DefaultGuiseProject(projectDirectory, projectConfiguration);
+		return new ObjectMapConfiguration(unmodifiableMap(defaultSettings));
 	}
 
 	/**
-	 * Mutable mummification context controlled by Guise Mummy.
+	 * Mutable mummification context controlled by Guise Mummy itself.
 	 * @author Garret Wilson
 	 */
 	protected class Context extends BaseMummyContext {

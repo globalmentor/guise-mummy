@@ -36,6 +36,8 @@ import io.guise.mummy.*;
  */
 public class BaseImageMummifierTest {
 
+	public static final String GATE_TURRET_REDUCED_JPEG_RESOURCE_NAME = "gate-turret-reduced.jpg";
+
 	private MummyContext fixtureContext;
 
 	@BeforeEach
