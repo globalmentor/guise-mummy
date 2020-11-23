@@ -400,22 +400,17 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			if(isPath(resourceKey) && !isPathAbsolute(resourceKey)) { //if the resource key is a relative path
 				final String applicationResourcePath = getApplication().getLocaleResourcePath(resourceKey, getLocale()); //try to get a locale-sensitive path to the resource
 				if(applicationResourcePath != null) { //if there is a path to the resource
-					final InputStream inputStream = getApplication().getResourceInputStream(applicationResourcePath); //get a stream to the resource
-					if(inputStream != null) { //if we got a stream to the resource (we always should, as we already checked to see which path represents an existing resource)
-						try {
-							try {
-								final StringWriter stringWriter = new StringWriter(); //create a new string writer to receive the resource contents
-								//TODO do better checking of XML encoding type by prereading
-								final Reader resourceReader = new BOMInputStreamReader(new BufferedInputStream(inputStream), UTF_8); //get an input reader to the file, defaulting to UTF-8 if we don't know its encoding
-								write(resourceReader, stringWriter); //copy the resource to the string
-								return stringWriter.toString(); //return the string read from the resource
-							} finally {
-								inputStream.close(); //always close the input stream
-							}
-						} catch(final IOException ioException) { //if there is an I/O error, convert it to a missing resource exception
-							throw (MissingResourceException)new MissingResourceException(ioException.getMessage(), missingResourceException.getClassName(),
-									missingResourceException.getKey()).initCause(ioException);
+					try (final InputStream inputStream = getApplication().getResourceInputStream(applicationResourcePath)) { //get a stream to the resource
+						if(inputStream != null) { //if we got a stream to the resource (we always should, as we already checked to see which path represents an existing resource)
+							final StringWriter stringWriter = new StringWriter(); //create a new string writer to receive the resource contents
+							//TODO do better checking of XML encoding type by prereading
+							final Reader resourceReader = new BOMInputStreamReader(new BufferedInputStream(inputStream), UTF_8); //get an input reader to the file, defaulting to UTF-8 if we don't know its encoding
+							write(resourceReader, stringWriter); //copy the resource to the string
+							return stringWriter.toString(); //return the string read from the resource
 						}
+					} catch(final IOException ioException) { //if there is an I/O error, convert it to a missing resource exception
+						throw (MissingResourceException)new MissingResourceException(ioException.getMessage(), missingResourceException.getClassName(),
+								missingResourceException.getKey()).initCause(ioException);
 					}
 				}
 			}

@@ -84,11 +84,8 @@ public class GenerateContentPanel extends LayoutPanel {
 								//	we could call the convenience method getSession().createTempPublicResource("generated-text", "txt")
 								final URIPath tempPath = getSession().getApplication().createTempAsset("generated-text", "txt", sessionRestricted ? getSession() : null);
 								//get a UTF-8 writer to the application-relative path to the temporary public resource
-								final Writer tempWriter = new BufferedWriter(new OutputStreamWriter(getSession().getApplication().getOutputStream(tempPath), "UTF-8"));
-								try {
-									tempWriter.write(textInput.getValue()); //write the provided text to the temporary file
-								} finally {
-									tempWriter.close(); //always close the writer, which will flush the buffered contents
+								try (final Writer tempWriter = new BufferedWriter(new OutputStreamWriter(getSession().getApplication().getOutputStream(tempPath), "UTF-8"))) {
+									tempWriter.write(textInput.getValue()); //write the provided text to the temporary file; closing will flush the buffered contents
 								}
 								getSession().navigate(tempPath, "generatedContentViewport"); //navigate to the generated content in a separate viewpoert
 							} catch(final IOException ioException) { //if there was an error generating the content

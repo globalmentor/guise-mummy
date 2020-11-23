@@ -584,8 +584,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 								resourceDescription.setPropertyValueByHandle("info-name", name); //specify the name provided to us TODO determine official approach for specifying URF name
 
 								try {
-									final InputStream inputStream = new BufferedInputStream(fileItemStream.openStream()); //get an input stream to the item
-									try {
+									try (final InputStream inputStream = new BufferedInputStream(fileItemStream.openStream())) { //get an input stream to the item
 										final ProgressListener progressListener = new ProgressListener() { //create a progress listener for listening for progress
 
 											@Override
@@ -599,9 +598,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 											}
 
 										};
-										final ProgressOutputStream progressOutputStream = new ProgressOutputStream(
-												resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, path, bookmark, referrerURI)); //get an output stream to the destination; don't buffer the output stream (our copy method essentially does this) so that progress events will be accurate
-										try {
+										try (final ProgressOutputStream progressOutputStream = new ProgressOutputStream(
+												resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, path, bookmark, referrerURI))) { //get an output stream to the destination; don't buffer the output stream (our copy method essentially does this) so that progress events will be accurate
 											if(progressComponent != null) { //if we know the component that wants to know progress
 												synchronized(guiseSession) { //don't allow other session contexts to be active while we dispatch the event
 													progressComponent.processEvent(new WebProgressDepictEvent(progressComponent, name, TaskState.INCOMPLETE, 0)); //indicate to the component that progress is starting for this file
@@ -611,16 +609,12 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 											IOStreams.copy(inputStream, progressOutputStream); //copy the uploaded file to the destination
 											progressOutputStream.removeProgressListener(progressListener); //stop listening for progress events from the output stream
 											//TODO catch and send errors here
-										} finally {
-											progressOutputStream.close(); //always close the output stream
 										}
 										if(progressComponent != null) { //if we know the component that wants to know progress (send the progress event after the output stream is closed, because the output stream may buffer contents)
 											synchronized(guiseSession) { //don't allow other session contexts to be active while we dispatch the event
 												progressComponent.processEvent(new WebProgressDepictEvent(progressComponent, name, TaskState.COMPLETE, 0)); //indicate to the component that progress is finished for this file
 											}
 										}
-									} finally {
-										inputStream.close(); //always close the input stream
 									}
 								} finally {
 									servletFileUpload.setProgressListener(null); //always stop listening for progress
@@ -701,11 +695,11 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 			}
 
 		};
-		OutputStream outputStream = resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, path, bookmark, referrerURI); //get an output stream to the destination; don't buffer the output stream (our copy method essentially does this) so that progress events will be accurate
-		if(progressComponent != null) { //if we know the component that wants to know progress
-			outputStream = new ProgressOutputStream(outputStream); //create a wrapper that will give us progress so that we can send it back manually
-		}
-		try {
+		try (
+				//get an output stream to the destination; don't buffer the output stream (our copy method essentially does this) so that progress events will be accurate
+				final OutputStream resourceOutputStream = resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, path, bookmark, referrerURI);
+				//if we know the component that wants to know progress, create a wrapper that will give us progress so that we can send it back manually
+				final OutputStream outputStream = progressComponent != null ? new ProgressOutputStream(resourceOutputStream) : resourceOutputStream) {
 			if(progressComponent != null) { //if we know the component that wants to know progress
 				synchronized(guiseSession) { //don't allow other session contexts to be active while we dispatch the event
 					progressComponent.processEvent(new WebProgressDepictEvent(progressComponent, name, TaskState.INCOMPLETE, 0)); //indicate to the component that progress is starting for this file
@@ -719,8 +713,6 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 				((ProgressOutputStream)outputStream).removeProgressListener(progressListener); //stop listening for progress events from the output stream
 			}
 			//TODO catch and send errors here
-		} finally {
-			outputStream.close(); //always close the output stream
 		}
 		if(progressComponent != null) { //if we know the component that wants to know progress (send the progress event after the output stream is closed, because the output stream may buffer contents)
 			synchronized(guiseSession) { //don't allow other session contexts to be active while we dispatch the event
@@ -1499,198 +1491,210 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 							Log.debug("AJAX event:", eventType);
 						}
 						switch(eventType) { //see which type of event this is
-							case ACTION: {
-								final String depictedObjectID = eventElement.getAttribute("objectID"); //get the ID of the depicted object TODO use a constant
-								if(depictedObjectID.length() > 0) { //if there is an object TODO add better event handling, to throw an error and send back that error
-									final DepictedObject depictedObject = platform.getDepictedObject(platform.getDepictID(depictedObjectID)); //look up the depicted object
-									if(depictedObject != null) { //if we know the depicted object
-										final String targetID = eventElement.getAttribute("targetID"); //get the ID of the target element TODO use a constant
-										final String actionID = eventElement.getAttribute("actionID"); //get the action identifier TODO use a constant
-										final int option = Integer.parseInt(eventElement.getAttribute("option")); //TODO tidy; improve; check for errors; comment
-										requestEventList.add(new WebActionDepictEvent(depictedObject, targetID, actionID, option)); //create and add the event to the list
-									}
-								}
-							}
-								break;
-							case CHANGE: {
-								final String depictedObjectID = eventElement.getAttribute("objectID"); //get the ID of the depicted object TODO use a constant
-								if(depictedObjectID.length() > 0) { //if there is an object TODO add better event handling, to throw an error and send back that error
-									final DepictedObject depictedObject = platform.getDepictedObject(platform.getDepictID(depictedObjectID)); //look up the depicted object
-									if(depictedObject != null) { //if we know the depicted object
-										final Map<String, Object> properties = new HashMap<String, Object>(); //create a map of properties
-										final NodeList propertyElementList = eventElement.getElementsByTagName("property"); //get a list of property elements
-										for(int propertyIndex = propertyElementList.getLength() - 1; propertyIndex >= 0; --propertyIndex) { //for each property element
-											final Element propertyElement = (Element)propertyElementList.item(propertyIndex); //get this property element
-											final String propertyName = propertyElement.getAttribute("name"); //get the name of the property TODO use a constant
-											final Object propertyValue = JSON.parseValue(propertyElement.getTextContent()); //get the value of the property
-											properties.put(propertyName, propertyValue); //add this property name and value to the event
+							case ACTION:
+								{
+									final String depictedObjectID = eventElement.getAttribute("objectID"); //get the ID of the depicted object TODO use a constant
+									if(depictedObjectID.length() > 0) { //if there is an object TODO add better event handling, to throw an error and send back that error
+										final DepictedObject depictedObject = platform.getDepictedObject(platform.getDepictID(depictedObjectID)); //look up the depicted object
+										if(depictedObject != null) { //if we know the depicted object
+											final String targetID = eventElement.getAttribute("targetID"); //get the ID of the target element TODO use a constant
+											final String actionID = eventElement.getAttribute("actionID"); //get the action identifier TODO use a constant
+											final int option = Integer.parseInt(eventElement.getAttribute("option")); //TODO tidy; improve; check for errors; comment
+											requestEventList.add(new WebActionDepictEvent(depictedObject, targetID, actionID, option)); //create and add the event to the list
 										}
-										requestEventList.add(new WebChangeDepictEvent(depictedObject, properties)); //create and add a change event to the list
 									}
 								}
-							}
 								break;
-							case DROP: {
-								final String dropTargetID = eventElement.getAttribute("objectID"); //get the ID of the depicted object TODO use a constant
-								final String dragSourceID = eventElement.getAttribute("dragSourceID"); //get the ID of the drag source TODO use a constant
-								if(dropTargetID.length() > 0 && dragSourceID.length() > 0) { //if there is a drag source and a drop target TODO add better event handling, to throw an error and send back that error
-									final DepictedObject dragSource = platform.getDepictedObject(platform.getDepictID(dragSourceID)); //look up the drag srouce
-									final DepictedObject dropTarget = platform.getDepictedObject(platform.getDepictID(dropTargetID)); //look up the drop target
-									if(dragSource != null && dropTarget != null) { //if we know the drag source and the drop target
-										requestEventList.add(new PlatformDropEvent(dragSource, dropTarget)); //create and add a drop event to the list
+							case CHANGE:
+								{
+									final String depictedObjectID = eventElement.getAttribute("objectID"); //get the ID of the depicted object TODO use a constant
+									if(depictedObjectID.length() > 0) { //if there is an object TODO add better event handling, to throw an error and send back that error
+										final DepictedObject depictedObject = platform.getDepictedObject(platform.getDepictID(depictedObjectID)); //look up the depicted object
+										if(depictedObject != null) { //if we know the depicted object
+											final Map<String, Object> properties = new HashMap<String, Object>(); //create a map of properties
+											final NodeList propertyElementList = eventElement.getElementsByTagName("property"); //get a list of property elements
+											for(int propertyIndex = propertyElementList.getLength() - 1; propertyIndex >= 0; --propertyIndex) { //for each property element
+												final Element propertyElement = (Element)propertyElementList.item(propertyIndex); //get this property element
+												final String propertyName = propertyElement.getAttribute("name"); //get the name of the property TODO use a constant
+												final Object propertyValue = JSON.parseValue(propertyElement.getTextContent()); //get the value of the property
+												properties.put(propertyName, propertyValue); //add this property name and value to the event
+											}
+											requestEventList.add(new WebChangeDepictEvent(depictedObject, properties)); //create and add a change event to the list
+										}
 									}
 								}
-							}
 								break;
-							case FOCUS: {
-								final String depictedObjectID = eventElement.getAttribute("objectID"); //get the ID of the depicted object TODO use a constant
-								if(depictedObjectID.length() > 0) { //if there is an object TODO add better event handling, to throw an error and send back that error
-									final DepictedObject depictedObject = platform.getDepictedObject(platform.getDepictID(depictedObjectID)); //look up the depicted object
-									if(depictedObject != null) { //if we know the depicted object
-										requestEventList.add(new PlatformFocusEvent(depictedObject)); //create and add a focus event to the list
+							case DROP:
+								{
+									final String dropTargetID = eventElement.getAttribute("objectID"); //get the ID of the depicted object TODO use a constant
+									final String dragSourceID = eventElement.getAttribute("dragSourceID"); //get the ID of the drag source TODO use a constant
+									if(dropTargetID.length() > 0 && dragSourceID.length() > 0) { //if there is a drag source and a drop target TODO add better event handling, to throw an error and send back that error
+										final DepictedObject dragSource = platform.getDepictedObject(platform.getDepictID(dragSourceID)); //look up the drag srouce
+										final DepictedObject dropTarget = platform.getDepictedObject(platform.getDepictID(dropTargetID)); //look up the drop target
+										if(dragSource != null && dropTarget != null) { //if we know the drag source and the drop target
+											requestEventList.add(new PlatformDropEvent(dragSource, dropTarget)); //create and add a drop event to the list
+										}
 									}
 								}
-							}
 								break;
-							case INIT: {
-								final String hour = eventElement.getAttribute("hour");
-								final String utcOffset = eventElement.getAttribute("utcOffset");
-								final String utcOffset01 = eventElement.getAttribute("utcOffset01");
-								final String utcOffset06 = eventElement.getAttribute("utcOffset06");
-								final String timezone = eventElement.getAttribute("timezone");
-								final String language = eventElement.getAttribute("language");
-								final String colorDepth = eventElement.getAttribute("colorDepth");
-								final String screenWidth = eventElement.getAttribute("screenWidth");
-								final String screenHeight = eventElement.getAttribute("screenHeight");
-								final String browserWidth = eventElement.getAttribute("browserWidth");
-								final String browserHeight = eventElement.getAttribute("browserHeight");
-								final String javascriptVersion = eventElement.getAttribute("javascriptVersion"); //get the JavaScript version TODO use a constant
-								final String javaEnabled = eventElement.getAttribute("javaEnabled");
-								final String referrer = eventElement.getAttribute("referrer");
-								URI referrerURI = null; //assume we can't get a referrer URI
-								if(referrer.length() > 0) { //if there is a referrer
-									try {
-										referrerURI = new URI(referrer); //create a URI object from the referrer string
-									} catch(final URISyntaxException uriSyntaxException) { //if there is a problem with the URI syntax
-										Log.warn("Invalid referrer URI syntax: " + referrer);
+							case FOCUS:
+								{
+									final String depictedObjectID = eventElement.getAttribute("objectID"); //get the ID of the depicted object TODO use a constant
+									if(depictedObjectID.length() > 0) { //if there is an object TODO add better event handling, to throw an error and send back that error
+										final DepictedObject depictedObject = platform.getDepictedObject(platform.getDepictID(depictedObjectID)); //look up the depicted object
+										if(depictedObject != null) { //if we know the depicted object
+											requestEventList.add(new PlatformFocusEvent(depictedObject)); //create and add a focus event to the list
+										}
 									}
 								}
-								final WebInitializeEvent initEvent = new WebInitializeEvent(depictContext,
-										hour.length() > 0 ? Integer.parseInt(hour) : 0, /*TODO del timezone.length()>0 ? Integer.parseInt(timezone) : 0,*/
-										utcOffset.length() > 0 ? Integer.parseInt(utcOffset) : 0, utcOffset.length() > 0 ? Integer.parseInt(utcOffset01) : 0,
-										utcOffset06.length() > 0 ? Integer.parseInt(utcOffset06) : 0, language.length() > 0 ? language : "en-US",
-										colorDepth.length() > 0 ? Integer.parseInt(colorDepth) : 24, screenWidth.length() > 0 ? Integer.parseInt(screenWidth) : 1024,
-										screenHeight.length() > 0 ? Integer.parseInt(screenHeight) : 768, browserWidth.length() > 0 ? Integer.parseInt(browserWidth) : 1024,
-										browserHeight.length() > 0 ? Integer.parseInt(browserHeight) : 768, javascriptVersion.length() > 0 ? javascriptVersion : null,
-										javaEnabled.length() > 0 ? Boolean.valueOf(javaEnabled) : false, referrerURI); //create a new initialization event TODO check for NumberFormatException
-								requestEventList.add(initEvent); //add the event to the list
-							}
+								break;
+							case INIT:
+								{
+									final String hour = eventElement.getAttribute("hour");
+									final String utcOffset = eventElement.getAttribute("utcOffset");
+									final String utcOffset01 = eventElement.getAttribute("utcOffset01");
+									final String utcOffset06 = eventElement.getAttribute("utcOffset06");
+									final String timezone = eventElement.getAttribute("timezone");
+									final String language = eventElement.getAttribute("language");
+									final String colorDepth = eventElement.getAttribute("colorDepth");
+									final String screenWidth = eventElement.getAttribute("screenWidth");
+									final String screenHeight = eventElement.getAttribute("screenHeight");
+									final String browserWidth = eventElement.getAttribute("browserWidth");
+									final String browserHeight = eventElement.getAttribute("browserHeight");
+									final String javascriptVersion = eventElement.getAttribute("javascriptVersion"); //get the JavaScript version TODO use a constant
+									final String javaEnabled = eventElement.getAttribute("javaEnabled");
+									final String referrer = eventElement.getAttribute("referrer");
+									URI referrerURI = null; //assume we can't get a referrer URI
+									if(referrer.length() > 0) { //if there is a referrer
+										try {
+											referrerURI = new URI(referrer); //create a URI object from the referrer string
+										} catch(final URISyntaxException uriSyntaxException) { //if there is a problem with the URI syntax
+											Log.warn("Invalid referrer URI syntax: " + referrer);
+										}
+									}
+									final WebInitializeEvent initEvent = new WebInitializeEvent(depictContext,
+											hour.length() > 0 ? Integer.parseInt(hour) : 0, /*TODO del timezone.length()>0 ? Integer.parseInt(timezone) : 0,*/
+											utcOffset.length() > 0 ? Integer.parseInt(utcOffset) : 0, utcOffset.length() > 0 ? Integer.parseInt(utcOffset01) : 0,
+											utcOffset06.length() > 0 ? Integer.parseInt(utcOffset06) : 0, language.length() > 0 ? language : "en-US",
+											colorDepth.length() > 0 ? Integer.parseInt(colorDepth) : 24, screenWidth.length() > 0 ? Integer.parseInt(screenWidth) : 1024,
+											screenHeight.length() > 0 ? Integer.parseInt(screenHeight) : 768, browserWidth.length() > 0 ? Integer.parseInt(browserWidth) : 1024,
+											browserHeight.length() > 0 ? Integer.parseInt(browserHeight) : 768, javascriptVersion.length() > 0 ? javascriptVersion : null,
+											javaEnabled.length() > 0 ? Boolean.valueOf(javaEnabled) : false, referrerURI); //create a new initialization event TODO check for NumberFormatException
+									requestEventList.add(initEvent); //add the event to the list
+								}
 								break;
 							case KEYPRESS:
-							case KEYRELEASE: {
-								final int code = Integer.parseInt(eventElement.getAttribute("code")); //get the key code TODO use a constant
-								final Set<Key> keys = EnumSet.noneOf(Key.class); //we'll find any keys that were pressed
-								if(Boolean.valueOf(eventElement.getAttribute("altKey")).booleanValue()) { //if Alt was pressed TODO use a constant
-									keys.add(Key.ALT_LEFT); //note the Alt key
+							case KEYRELEASE:
+								{
+									final int code = Integer.parseInt(eventElement.getAttribute("code")); //get the key code TODO use a constant
+									final Set<Key> keys = EnumSet.noneOf(Key.class); //we'll find any keys that were pressed
+									if(Boolean.valueOf(eventElement.getAttribute("altKey")).booleanValue()) { //if Alt was pressed TODO use a constant
+										keys.add(Key.ALT_LEFT); //note the Alt key
+									}
+									if(Boolean.valueOf(eventElement.getAttribute("controlKey")).booleanValue()) { //if Control was pressed TODO use a constant
+										keys.add(Key.CONTROL_LEFT); //note the Control key
+									}
+									if(Boolean.valueOf(eventElement.getAttribute("shiftKey")).booleanValue()) { //if Shiftwas pressed TODO use a constant
+										keys.add(Key.SHIFT_LEFT); //note the Shift key
+									}
+									final KeyboardEvent keyEvent;
+									switch(eventType) { //see which type of keypress this is
+										case KEYPRESS:
+											keyEvent = new KeyPressEvent(platform, KeyCode.valueOf(code).getKey(), keys.toArray(new Key[keys.size()])); //create a new key press event
+											break;
+										case KEYRELEASE:
+											keyEvent = new KeyReleaseEvent(platform, KeyCode.valueOf(code).getKey(), keys.toArray(new Key[keys.size()])); //create a new key release event
+											break;
+										default:
+											throw new AssertionError("Unrecognized key event type: " + eventType);
+									}
+									requestEventList.add(keyEvent); //add the event to the list
 								}
-								if(Boolean.valueOf(eventElement.getAttribute("controlKey")).booleanValue()) { //if Control was pressed TODO use a constant
-									keys.add(Key.CONTROL_LEFT); //note the Control key
-								}
-								if(Boolean.valueOf(eventElement.getAttribute("shiftKey")).booleanValue()) { //if Shiftwas pressed TODO use a constant
-									keys.add(Key.SHIFT_LEFT); //note the Shift key
-								}
-								final KeyboardEvent keyEvent;
-								switch(eventType) { //see which type of keypress this is
-									case KEYPRESS:
-										keyEvent = new KeyPressEvent(platform, KeyCode.valueOf(code).getKey(), keys.toArray(new Key[keys.size()])); //create a new key press event
-										break;
-									case KEYRELEASE:
-										keyEvent = new KeyReleaseEvent(platform, KeyCode.valueOf(code).getKey(), keys.toArray(new Key[keys.size()])); //create a new key release event
-										break;
-									default:
-										throw new AssertionError("Unrecognized key event type: " + eventType);
-								}
-								requestEventList.add(keyEvent); //add the event to the list
-							}
 								break;
-							case LOG: {
-								final Log.Level logLevel = getSerializedEnum(Log.Level.class, eventElement.getAttribute("level")); //get the log level
-								final String text = eventElement.getTextContent(); //get the log text
-								Log.log(logLevel, "Guise AJAX:", text); //log this information
-							}
+							case LOG:
+								{
+									final Log.Level logLevel = getSerializedEnum(Log.Level.class, eventElement.getAttribute("level")); //get the log level
+									final String text = eventElement.getTextContent(); //get the log text
+									Log.log(logLevel, "Guise AJAX:", text); //log this information
+								}
 								break;
 							case MOUSECLICK:
 							case MOUSEENTER:
-							case MOUSEEXIT: {
-								final Node componentNode = XPath.getNode(eventNode, AJAX_REQUEST_COMPONENT_XPATH_EXPRESSION); //get the component node
-								final String componentID = ((Element)componentNode).getAttribute("id"); //TODO tidy; improve; comment
-								final int componentX = Integer.parseInt(((Element)componentNode).getAttribute("x")); //TODO tidy; improve; check for errors; comment
-								final int componentY = Integer.parseInt(((Element)componentNode).getAttribute("y")); //TODO tidy; improve; check for errors; comment
-								final int componentWidth = Integer.parseInt(((Element)componentNode).getAttribute("width")); //TODO tidy; improve; check for errors; comment
-								final int componentHeight = Integer.parseInt(((Element)componentNode).getAttribute("height")); //TODO tidy; improve; check for errors; comment
+							case MOUSEEXIT:
+								{
+									final Node componentNode = XPath.getNode(eventNode, AJAX_REQUEST_COMPONENT_XPATH_EXPRESSION); //get the component node
+									final String componentID = ((Element)componentNode).getAttribute("id"); //TODO tidy; improve; comment
+									final int componentX = Integer.parseInt(((Element)componentNode).getAttribute("x")); //TODO tidy; improve; check for errors; comment
+									final int componentY = Integer.parseInt(((Element)componentNode).getAttribute("y")); //TODO tidy; improve; check for errors; comment
+									final int componentWidth = Integer.parseInt(((Element)componentNode).getAttribute("width")); //TODO tidy; improve; check for errors; comment
+									final int componentHeight = Integer.parseInt(((Element)componentNode).getAttribute("height")); //TODO tidy; improve; check for errors; comment
 
-								final Node targetNode = XPath.getNode(eventNode, AJAX_REQUEST_TARGET_XPATH_EXPRESSION); //get the target node
-								final String targetID = ((Element)targetNode).getAttribute("id"); //TODO tidy; improve; comment
-								final int targetX = Integer.parseInt(((Element)targetNode).getAttribute("x")); //TODO tidy; improve; check for errors; comment
-								final int targetY = Integer.parseInt(((Element)targetNode).getAttribute("y")); //TODO tidy; improve; check for errors; comment
-								final int targetWidth = Integer.parseInt(((Element)targetNode).getAttribute("width")); //TODO tidy; improve; check for errors; comment
-								final int targetHeight = Integer.parseInt(((Element)targetNode).getAttribute("height")); //TODO tidy; improve; check for errors; comment
+									final Node targetNode = XPath.getNode(eventNode, AJAX_REQUEST_TARGET_XPATH_EXPRESSION); //get the target node
+									final String targetID = ((Element)targetNode).getAttribute("id"); //TODO tidy; improve; comment
+									final int targetX = Integer.parseInt(((Element)targetNode).getAttribute("x")); //TODO tidy; improve; check for errors; comment
+									final int targetY = Integer.parseInt(((Element)targetNode).getAttribute("y")); //TODO tidy; improve; check for errors; comment
+									final int targetWidth = Integer.parseInt(((Element)targetNode).getAttribute("width")); //TODO tidy; improve; check for errors; comment
+									final int targetHeight = Integer.parseInt(((Element)targetNode).getAttribute("height")); //TODO tidy; improve; check for errors; comment
 
-								final Node viewportNode = XPath.getNode(eventNode, AJAX_REQUEST_VIEWPORT_XPATH_EXPRESSION); //get the viewport node
-								final int viewportX = Integer.parseInt(((Element)viewportNode).getAttribute("x")); //TODO tidy; improve; check for errors; comment
-								final int viewportY = Integer.parseInt(((Element)viewportNode).getAttribute("y")); //TODO tidy; improve; check for errors; comment
-								final int viewportWidth = Integer.parseInt(((Element)viewportNode).getAttribute("width")); //TODO tidy; improve; check for errors; comment
-								final int viewportHeight = Integer.parseInt(((Element)viewportNode).getAttribute("height")); //TODO tidy; improve; check for errors; comment
+									final Node viewportNode = XPath.getNode(eventNode, AJAX_REQUEST_VIEWPORT_XPATH_EXPRESSION); //get the viewport node
+									final int viewportX = Integer.parseInt(((Element)viewportNode).getAttribute("x")); //TODO tidy; improve; check for errors; comment
+									final int viewportY = Integer.parseInt(((Element)viewportNode).getAttribute("y")); //TODO tidy; improve; check for errors; comment
+									final int viewportWidth = Integer.parseInt(((Element)viewportNode).getAttribute("width")); //TODO tidy; improve; check for errors; comment
+									final int viewportHeight = Integer.parseInt(((Element)viewportNode).getAttribute("height")); //TODO tidy; improve; check for errors; comment
 
-								final Node mouseNode = XPath.getNode(eventNode, AJAX_REQUEST_MOUSE_XPATH_EXPRESSION); //get the mouse node
-								final int mouseX = Integer.parseInt(((Element)mouseNode).getAttribute("x")); //TODO tidy; improve; check for errors; comment
-								final int mouseY = Integer.parseInt(((Element)mouseNode).getAttribute("y")); //TODO tidy; improve; check for errors; comment
+									final Node mouseNode = XPath.getNode(eventNode, AJAX_REQUEST_MOUSE_XPATH_EXPRESSION); //get the mouse node
+									final int mouseX = Integer.parseInt(((Element)mouseNode).getAttribute("x")); //TODO tidy; improve; check for errors; comment
+									final int mouseY = Integer.parseInt(((Element)mouseNode).getAttribute("y")); //TODO tidy; improve; check for errors; comment
 
-								final Set<Key> keys = EnumSet.noneOf(Key.class); //we'll find any keys that were pressed
-								if(Boolean.valueOf(eventElement.getAttribute("altKey")).booleanValue()) { //if Alt was pressed TODO use a constant
-									keys.add(Key.ALT_LEFT); //note the Alt key
-								}
-								if(Boolean.valueOf(eventElement.getAttribute("controlKey")).booleanValue()) { //if Control was pressed TODO use a constant
-									keys.add(Key.CONTROL_LEFT); //note the Control key
-								}
-								if(Boolean.valueOf(eventElement.getAttribute("shiftKey")).booleanValue()) { //if Shiftwas pressed TODO use a constant
-									keys.add(Key.SHIFT_LEFT); //note the Shift key
-								}
-								if(componentID != null) { //if there is a component ID TODO add better event handling, to throw an error and send back that error
-									final Component component = asInstance(platform.getDepictedObject(platform.getDepictID(componentID)), Component.class).orElse(null); //get the component by its ID
-									if(component != null && AbstractComponent.hasAncestor(component, guiseSession.getApplicationFrame())) { //if there is a target component in our current hierarchy
-										final MouseEvent mouseEvent;
-										switch(eventType) { //see which type of event this is
-											case MOUSECLICK: {
-												final int buttonCode = Integer.parseInt(eventElement.getAttribute("button")); //get the button code TODO use a constant
-												final int clickCount = Integer.parseInt(eventElement.getAttribute("clickCount")); //get the click count TODO use a constant
-												mouseEvent = new MouseClickEvent(platform, component, new Rectangle(componentX, componentY, componentWidth, componentHeight),
-														new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight), new Point(mouseX, mouseY),
-														Button.valueOf(buttonCode).getMouseButton(), clickCount, keys.toArray(new Key[keys.size()])); //create a new mouse enter event
+									final Set<Key> keys = EnumSet.noneOf(Key.class); //we'll find any keys that were pressed
+									if(Boolean.valueOf(eventElement.getAttribute("altKey")).booleanValue()) { //if Alt was pressed TODO use a constant
+										keys.add(Key.ALT_LEFT); //note the Alt key
+									}
+									if(Boolean.valueOf(eventElement.getAttribute("controlKey")).booleanValue()) { //if Control was pressed TODO use a constant
+										keys.add(Key.CONTROL_LEFT); //note the Control key
+									}
+									if(Boolean.valueOf(eventElement.getAttribute("shiftKey")).booleanValue()) { //if Shiftwas pressed TODO use a constant
+										keys.add(Key.SHIFT_LEFT); //note the Shift key
+									}
+									if(componentID != null) { //if there is a component ID TODO add better event handling, to throw an error and send back that error
+										final Component component = asInstance(platform.getDepictedObject(platform.getDepictID(componentID)), Component.class).orElse(null); //get the component by its ID
+										if(component != null && AbstractComponent.hasAncestor(component, guiseSession.getApplicationFrame())) { //if there is a target component in our current hierarchy
+											final MouseEvent mouseEvent;
+											switch(eventType) { //see which type of event this is
+												case MOUSECLICK:
+													{
+														final int buttonCode = Integer.parseInt(eventElement.getAttribute("button")); //get the button code TODO use a constant
+														final int clickCount = Integer.parseInt(eventElement.getAttribute("clickCount")); //get the click count TODO use a constant
+														mouseEvent = new MouseClickEvent(platform, component, new Rectangle(componentX, componentY, componentWidth, componentHeight),
+																new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight), new Point(mouseX, mouseY),
+																Button.valueOf(buttonCode).getMouseButton(), clickCount, keys.toArray(new Key[keys.size()])); //create a new mouse enter event
+													}
+													break;
+												case MOUSEENTER:
+													mouseEvent = new MouseEnterEvent(platform, component, new Rectangle(componentX, componentY, componentWidth, componentHeight),
+															new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight), new Point(mouseX, mouseY),
+															keys.toArray(new Key[keys.size()])); //create a new mouse enter event
+													break;
+												case MOUSEEXIT:
+													mouseEvent = new MouseExitEvent(platform, component, new Rectangle(componentX, componentY, componentWidth, componentHeight),
+															new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight), new Point(mouseX, mouseY),
+															keys.toArray(new Key[keys.size()])); //create a new mouse exit event
+													break;
+												default:
+													throw new AssertionError("Unrecognized mouse event type: " + eventType);
 											}
-												break;
-											case MOUSEENTER:
-												mouseEvent = new MouseEnterEvent(platform, component, new Rectangle(componentX, componentY, componentWidth, componentHeight),
-														new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight), new Point(mouseX, mouseY), keys.toArray(new Key[keys.size()])); //create a new mouse enter event
-												break;
-											case MOUSEEXIT:
-												mouseEvent = new MouseExitEvent(platform, component, new Rectangle(componentX, componentY, componentWidth, componentHeight),
-														new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight), new Point(mouseX, mouseY), keys.toArray(new Key[keys.size()])); //create a new mouse exit event
-												break;
-											default:
-												throw new AssertionError("Unrecognized mouse event type: " + eventType);
+											//Log.trace("mouse event bound for component", ((Component<?>)mouseEvent.getTarget()).getID());
+											requestEventList.add(mouseEvent); //add the event to the list
+											//Log.trace("mouse event; targetXY:", targetX, targetY, "viewportXY:", viewportX, viewportY, "mouseXY:", mouseX, mouseY);
 										}
-										//Log.trace("mouse event bound for component", ((Component<?>)mouseEvent.getTarget()).getID());
-										requestEventList.add(mouseEvent); //add the event to the list
-										//Log.trace("mouse event; targetXY:", targetX, targetY, "viewportXY:", viewportX, viewportY, "mouseXY:", mouseX, mouseY);
 									}
 								}
-							}
 								break;
-							case POLL: {
-								final WebPollEvent pollEvent = new WebPollEvent(platform); //create a new poll event
-								requestEventList.add(pollEvent); //add the event to the list
-							}
+							case POLL:
+								{
+									final WebPollEvent pollEvent = new WebPollEvent(platform); //create a new poll event
+									requestEventList.add(pollEvent); //add the event to the list
+								}
 								break;
 							default:
 								throw new IllegalArgumentException("Unrecognized event type: " + eventType);
