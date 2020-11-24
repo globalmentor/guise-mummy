@@ -132,7 +132,7 @@ public final class Guise {
 		if(asset == null) { //if we haven't yet loaded the asset, or it has been dereferenced
 			final InputStream assetInputStream = getClass().getResourceAsStream(key); //get an input stream to the asset
 			if(assetInputStream != null) { //if we got an input stream to the asset
-				asset = getBytes(assetInputStream); //load the asset
+				asset = readBytes(assetInputStream); //load the asset
 				assetMap.put(key, new SoftReference<byte[]>(asset)); //cache the asset
 			}
 		}
