@@ -134,7 +134,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 						final String postYear = postMatcher.group(PostArtifact.FILENAME_PATTERN_YEAR_GROUP);
 						final String postMonth = postMatcher.group(PostArtifact.FILENAME_PATTERN_MONTH_GROUP);
 						final String postDay = postMatcher.group(PostArtifact.FILENAME_PATTERN_DAY_GROUP);
-						//the regex will guarantee that these are paresable as integers 
+						//the regex will guarantee that these are parsable as integers 
 						final LocalDate publishedOn = LocalDate.of(Integer.parseInt(postYear), Integer.parseInt(postMonth), Integer.parseInt(postDay));
 						description.setPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON, publishedOn);
 					}
@@ -157,7 +157,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @return Metadata stored in the source file being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate names.
 	 * @throws IOException if there is an I/O error retrieving the metadata.
 	 */
-	protected abstract List<Map.Entry<URI, Object>> loadSourceMetadata(@Nonnull MummyContext context, @Nonnull final Path sourceFile) throws IOException;
+	protected abstract List<Map.Entry<URI, Object>> loadSourceMetadata(@Nonnull MummyContext context, @Nonnull Path sourceFile) throws IOException;
 
 	/**
 	 * {@inheritDoc}
