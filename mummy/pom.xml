@@ -21,6 +21,11 @@
 
 		<dependency>
 			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-awt</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-core</artifactId>
 		</dependency>
 

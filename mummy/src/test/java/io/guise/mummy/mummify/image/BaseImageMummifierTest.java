@@ -46,6 +46,9 @@ public class BaseImageMummifierTest {
 
 	/** A sample JPEG image. */
 	public static final String GATE_TURRET_REDUCED_JPEG_RESOURCE_NAME = "gate-turret-reduced.jpg";
+	public static final long GATE_TURRET_REDUCED_JPEG_FILE_SIZE = 83052;
+	public static final int GATE_TURRET_REDUCED_JPEG_WIDTH = 972;
+	public static final int GATE_TURRET_REDUCED_JPEG_HEIGHT = 648;
 
 	/**
 	 * A sample JPEG image with only Exif metadata, including:

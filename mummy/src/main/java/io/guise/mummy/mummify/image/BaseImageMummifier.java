@@ -52,7 +52,7 @@ import io.urf.model.UrfResourceDescription;
  *          common base class.
  * @author Garret Wilson
  */
-public abstract class BaseImageMummifier extends AbstractFileMummifier {
+public abstract class BaseImageMummifier extends AbstractFileMummifier implements ImageMummifier {
 
 	private final Set<ContentType> supportedMediaTypes;
 
