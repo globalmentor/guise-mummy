@@ -21,11 +21,16 @@ import static java.nio.file.Files.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.*;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
+
+import io.confound.config.Configuration;
+import io.confound.config.ObjectMapConfiguration;
 
 /**
  * A base integration test for providing end-to-end testing of Guise Mummy.
@@ -44,12 +49,66 @@ public abstract class BaseEndToEndIT {
 		return fixtureProject;
 	}
 
+	private Map<String, Object> settings;
+
+	/**
+	 * Provides access to the settings overriding the fixture project configuration.
+	 * @apiNote This method allows individual tests to override the configuration dynamically on a test-by-test basis.
+	 * @return The settings for fixture project, falling back to the defaults.
+	 */
+	protected Map<String, Object> getFixtureProjectSettings() {
+		return settings;
+	}
+
+	/**
+	 * @return Returns the fixture project site source directory.
+	 * @apiNote This is a convenience method to retrieve the path from the project configuration.
+	 * @see GuiseMummy#PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY
+	 */
+	protected Path getSiteSourceDirectory() {
+		return getFixtureProject().getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY);
+	}
+
+	/**
+	 * @return Returns the fixture project site target directory.
+	 * @apiNote This is a convenience method to retrieve the path from the project configuration.
+	 * @see GuiseMummy#PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY
+	 */
+	protected Path getSiteTargetDirectory() {
+		return getFixtureProject().getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY);
+	}
+
+	/**
+	 * Sets up the fixture project.
+	 * @implSpec This method calls {@link #configure(Map)} to set test-specific configuration settings.
+	 * @implSpec This method calls {@link #populateSiteSourceDirectory(Path)} to copy files into the test site source directory in preparation for testing.
+	 * @param tempDir The temporary directory used for the integration test.
+	 * @throws IOException If there was an I/O error during setup.
+	 * @see #getFixtureProject()
+	 */
 	@BeforeEach
 	protected void setupFixture(@TempDir final Path tempDir) throws IOException {
-		fixtureProject = new DefaultGuiseProject(tempDir, getDefaultConfiguration(tempDir));
+		//create a custom configuration falling back to the default configuration
+		final Configuration defaultConfiguration = getDefaultConfiguration(tempDir);
+		settings = new HashMap<>();
+		configure(settings);
+		final Configuration fixtureConfiguration = new ObjectMapConfiguration(settings).withFallback(defaultConfiguration);
+		//create the fixture project
+		fixtureProject = new DefaultGuiseProject(tempDir, fixtureConfiguration);
+		//populate the site source directory
 		final Path siteSourceDirectory = fixtureProject.getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY);
 		createDirectories(siteSourceDirectory);
 		populateSiteSourceDirectory(siteSourceDirectory);
+	}
+
+	/**
+	 * Adds settings to the project configuration override.
+	 * @apiNote These settings are later available via {@link #getFixtureProjectSettings()}.
+	 * @implSpec This implementation does nothing.
+	 * @param settings The settings to override the default project settings.
+	 * @see #getFixtureProjectSettings()
+	 */
+	protected void configure(@Nonnull final Map<String, Object> settings) {
 	}
 
 	/**

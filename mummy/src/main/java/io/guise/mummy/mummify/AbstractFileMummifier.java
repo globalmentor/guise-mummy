@@ -233,7 +233,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated. The
 	 *          parent directories of the file are guaranteed to have been created.
-	 * @param artifact The artifact being generated
+	 * @param artifact The artifact being generated.
 	 * @throws IOException if there is an I/O error during mummification.
 	 */
 	protected abstract void mummifyFile(@Nonnull final MummyContext context, @Nonnull Artifact contextArtifact, @Nonnull Artifact artifact) throws IOException;

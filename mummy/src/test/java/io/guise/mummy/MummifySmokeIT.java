@@ -65,15 +65,14 @@ public class MummifySmokeIT extends BaseEndToEndIT {
 	@Test
 	public void smokeTest() throws IOException {
 		mummify(LifeCyclePhase.MUMMIFY);
-		final Path siteTargetDirectory = getFixtureProject().getConfiguration().getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY);
 		//…/target/site/simple.html
-		assertThat(exists(siteTargetDirectory.resolve(changeExtension(MarkdownPageMummifierTest.SIMPLE_MARKDOWN_RESOURCE_NAME, "html"))), is(true));
+		assertThat(exists(getSiteTargetDirectory().resolve(changeExtension(MarkdownPageMummifierTest.SIMPLE_MARKDOWN_RESOURCE_NAME, "html"))), is(true));
 		//…/target/site/random.bin
-		final Path targetRandomBinFile = siteTargetDirectory.resolve("random.bin");
+		final Path targetRandomBinFile = getSiteTargetDirectory().resolve("random.bin");
 		assertThat(exists(targetRandomBinFile), is(true));
 		assertThat(readAllBytes(targetRandomBinFile), is(randomBinContent));
 		//…/target/site/assets/images/gate-turret-reduced.jpg
-		final Path targetGateTurretJpegFile = resolve(siteTargetDirectory, "assets", "images", BaseImageMummifierTest.GATE_TURRET_REDUCED_JPEG_RESOURCE_NAME);
+		final Path targetGateTurretJpegFile = resolve(getSiteTargetDirectory(), "assets", "images", BaseImageMummifierTest.GATE_TURRET_REDUCED_JPEG_RESOURCE_NAME);
 		assertThat(exists(targetGateTurretJpegFile), is(true));
 		assertThat(readAllBytes(targetGateTurretJpegFile),
 				is(readBytes(BaseImageMummifierTest.class, BaseImageMummifierTest.GATE_TURRET_REDUCED_JPEG_RESOURCE_NAME)));
