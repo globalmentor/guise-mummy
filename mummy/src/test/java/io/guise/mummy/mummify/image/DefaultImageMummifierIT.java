@@ -47,7 +47,7 @@ public class DefaultImageMummifierIT extends BaseEndToEndIT {
 	}
 
 	@Test
-	public void shouldScaleImageOverThresholdFileSize() throws IOException {
+	public void shouldScaleImageOverProcessThresholdFileSize() throws IOException {
 		//…/src/site/gate-turret-reduced.jpg
 		final Path sourceImageFile = getSiteSourceDirectory().resolve(GATE_TURRET_REDUCED_JPEG_RESOURCE_NAME);
 		assertThat(size(sourceImageFile), is(GATE_TURRET_REDUCED_JPEG_FILE_SIZE));
@@ -55,7 +55,7 @@ public class DefaultImageMummifierIT extends BaseEndToEndIT {
 		assertThat(sourceImage.getWidth(), is(GATE_TURRET_REDUCED_JPEG_WIDTH));
 		assertThat(sourceImage.getHeight(), is(GATE_TURRET_REDUCED_JPEG_HEIGHT));
 
-		getFixtureProjectSettings().put(DefaultImageMummifier.CONFIG_KEY_MUMMY_IMAGE_SCALE_THRESHOLD_FILE_SIZE, 70_000);
+		getFixtureProjectSettings().put(DefaultImageMummifier.CONFIG_KEY_MUMMY_IMAGE_PROCESS_THRESHOLD_FILE_SIZE, 70_000);
 		getFixtureProjectSettings().put(DefaultImageMummifier.CONFIG_KEY_MUMMY_IMAGE_SCALE_MAX_LENGTH, 600);
 		getFixtureProjectSettings().put(DefaultImageMummifier.CONFIG_KEY_MUMMY_IMAGE_SCALE_COMPRESSION_QUALITY, 0.5);
 		mummify(LifeCyclePhase.MUMMIFY);

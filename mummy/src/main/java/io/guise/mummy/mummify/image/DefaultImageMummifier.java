@@ -54,7 +54,7 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 	/** @see #CONFIG_KEY_MUMMY_IMAGE_SCALE_MAX_LENGTH */
 	public static final int DEFAULT_SCALE_MAX_LENGTH = 2560;
 
-	/** @see #CONFIG_KEY_MUMMY_IMAGE_SCALE_THRESHOLD_FILE_SIZE */
+	/** @see #CONFIG_KEY_MUMMY_IMAGE_PROCESS_THRESHOLD_FILE_SIZE */
 	public static final long DEFAULT_SCALE_THRESHOLD_FILE_SIZE = 1_000_000;
 
 	/** No-args constructor. */
@@ -70,7 +70,7 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 	@Override
 	public void mummifyFile(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
 		final Path sourceFile = artifact.getSourcePath();
-		final long imageScaleThresholdSize = context.getConfiguration().findLong(CONFIG_KEY_MUMMY_IMAGE_SCALE_THRESHOLD_FILE_SIZE)
+		final long imageScaleThresholdSize = context.getConfiguration().findLong(CONFIG_KEY_MUMMY_IMAGE_PROCESS_THRESHOLD_FILE_SIZE)
 				.orElse(DEFAULT_SCALE_THRESHOLD_FILE_SIZE);
 		if(size(sourceFile) > imageScaleThresholdSize) { //if the size of the image source file goes over our threshold for scaling
 			try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile));
