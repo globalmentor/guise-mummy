@@ -57,6 +57,7 @@ import com.globalmentor.vocab.*;
 import com.globalmentor.xml.*;
 import com.globalmentor.xml.spec.*;
 
+import io.guise.mesh.*;
 import io.guise.mummy.*;
 import io.guise.mummy.mummify.AbstractFileMummifier;
 import io.guise.mummy.mummify.page.widget.Widget;
@@ -156,6 +157,13 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	/** @return The strategy for loading and working with navigation. */
 	protected NavigationManager getNavigationManager() {
 		return navigationManager;
+	}
+
+	private final GuiseMesh guiseMesh = new GuiseMesh();
+
+	/** @return The strategy for transformation a document based upon Mesh Expression Language (MEXL) expressions. */
+	protected GuiseMesh getGuiseMesh() {
+		return guiseMesh;
 	}
 
 	/**
@@ -445,8 +453,14 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			//#apply template
 			final Document templatedDocument = applyTemplate(context, contextArtifact, artifact, normalizedDocument);
 
-			//#process document: evaluate expressions and perform transformations
-			final Document processedDocument = processDocument(context, contextArtifact, artifact, templatedDocument);
+			//#mesh document: evaluate MEXL expressions and perform transformations
+			final MeshContext meshContext = new MapMeshContext();
+			meshContext.setVariable(MESH_CONTEXT_VARIABLE_ARTIFACT, artifact);
+			meshContext.setVariable(MESH_CONTEXT_VARIABLE_PAGE, artifact.getResourceDescription());
+			final Document meshedDocument = getGuiseMesh().meshDocument(meshContext, templatedDocument);
+
+			//#process document: evaluate Guise Mummy directives and widgets; and perform transformations
+			final Document processedDocument = processDocument(context, contextArtifact, artifact, meshedDocument);
 
 			//#relocate document from source to target: translate path references from the source to the target
 			final Document relocatedDocument = relocateSourceDocumentToTarget(context, contextArtifact, artifact, processedDocument);

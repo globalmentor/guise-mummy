@@ -18,5 +18,15 @@
 			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-core</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>io.urf</groupId>
+			<artifactId>urf-model</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-jexl3</artifactId>
+		</dependency>
 	</dependencies>
 </project>
