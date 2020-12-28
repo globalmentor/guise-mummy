@@ -78,6 +78,12 @@
 
 			<dependency>
 				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-css-spec</artifactId>
+				<version>${globalmentor-web.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-country-us</artifactId>
 				<version>0.6.1</version>
 			</dependency>

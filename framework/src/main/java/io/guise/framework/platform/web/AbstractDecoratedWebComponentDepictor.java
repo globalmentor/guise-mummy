@@ -136,7 +136,7 @@ public abstract class AbstractDecoratedWebComponentDepictor<C extends Component>
 	@Override
 	protected void depictEnd() throws IOException {
 		if(bodyElementState != null && bodyElementState.isOpen()) { //if the body element is open
-			getDepictContext().writeElementEnd(bodyElementState.getNamespaceURI(), bodyElementState.getLocalName()); //end the element
+			getDepictContext().writeElementEnd(bodyElementState.getElementName().getNamespaceUri(), bodyElementState.getElementName().getLocalName()); //end the element
 		}
 		bodyElementState = null; //release the element state
 		writeDecoratorEnd(); //write the decorator ending elements

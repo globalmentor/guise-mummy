@@ -21,7 +21,7 @@ import java.net.URI;
 import java.util.*;
 
 import com.globalmentor.net.ContentType;
-import com.globalmentor.xml.QualifiedName;
+import com.globalmentor.xml.spec.NsQualifiedName;
 
 /**
  * Encapsulation of text/xml information related to the current depiction.
@@ -156,13 +156,20 @@ public interface XMLDepictContext extends TextDepictContext {
 	 * The state of rendering for a particular element.
 	 * @author Garret Wilson
 	 */
-	public static class ElementState extends QualifiedName {
+	public static class ElementState {
+
+		private final NsQualifiedName elementName;
+
+		/** @return The namespace and qualified name of the element. */
+		public NsQualifiedName getElementName() {
+			return elementName;
+		}
 
 		/** The map of attribute values keyed to attribute qualified names. */
-		private final Map<QualifiedName, String> attributeMap = new HashMap<QualifiedName, String>();
+		private final Map<NsQualifiedName, String> attributeMap = new HashMap<NsQualifiedName, String>();
 
 		/** @return The map of attribute values keyed to attribute qualified names. */
-		public Map<QualifiedName, String> getAttributeMap() {
+		public Map<NsQualifiedName, String> getAttributeMap() {
 			return attributeMap;
 		}
 
@@ -197,7 +204,7 @@ public interface XMLDepictContext extends TextDepictContext {
 		 * @param isEmptyElementAllowed Whether an empty element can be created if there is no content.
 		 */
 		public ElementState(final URI namespaceURI, final String qname, final boolean isEmptyElementAllowed) {
-			super(namespaceURI, qname); //construct the parent class
+			this.elementName = NsQualifiedName.of(namespaceURI, qname);
 			this.emptyElementAllowed = isEmptyElementAllowed;
 		}
 	}

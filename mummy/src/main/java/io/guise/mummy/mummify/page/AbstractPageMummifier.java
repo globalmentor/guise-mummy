@@ -814,7 +814,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		final Element templateHeadElement = findHtmlHeadElement(templateDocument)
 				.orElseThrow(() -> new IllegalArgumentException("Template missing <head> element."));
 		findHtmlHeadElement(sourceDocument).stream().flatMap(XmlDom::childElementsOf).filter(XHTML_ELEMENT_SCRIPT::matches) //find all <script> elements
-				.filter(element -> !XmlDom.hasAttributeNS(element, XHTML_ELEMENT_SCRIPT_ATTRIBUTE_SRC)) //don't include scripts with `src` attributes
+				.filter(element -> !XmlDom.hasAttribute(element, XHTML_ELEMENT_SCRIPT_ATTRIBUTE_SRC)) //don't include scripts with `src` attributes
 				.forEach(element -> templateHeadElement.appendChild(templateDocument.importNode(element, true)));
 	}
 
@@ -928,7 +928,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		}
 
 		//navigation list regeneration
-		if(isPresentAndEquals(findAttributeNS(sourceElement, ATTRIBUTE_REGENERATE), ATTRIBUTE_REGENERATE.getLocalName())) {
+		if(isPresentAndEquals(findAttribute(sourceElement, ATTRIBUTE_REGENERATE), ATTRIBUTE_REGENERATE.getLocalName())) {
 
 			//<nav><ol> or <nav><ul>
 			if(XHTML_NAMESPACE_URI_STRING.equals(sourceElement.getNamespaceURI())) {
