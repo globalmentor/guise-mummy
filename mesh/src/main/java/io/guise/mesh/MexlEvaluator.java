@@ -27,7 +27,7 @@ import javax.annotation.*;
 public interface MexlEvaluator {
 
 	/**
-	 * Evaluates an expression in the current meshing context.
+	 * Evaluates an expression using the given meshing context.
 	 * @param context The context of meshing.
 	 * @param expression The expression to evaluate.
 	 * @return The result of the expression.

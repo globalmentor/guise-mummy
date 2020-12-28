@@ -16,6 +16,7 @@
 
 package io.guise.mesh;
 
+import static com.globalmentor.xml.XmlDom.*;
 import static java.util.Objects.*;
 
 import java.io.IOException;
@@ -25,6 +26,8 @@ import java.util.*;
 import javax.annotation.*;
 
 import org.w3c.dom.*;
+
+import com.globalmentor.xml.spec.NsName;
 
 /**
  * Guise template transformation engine.
@@ -41,11 +44,31 @@ public class GuiseMesh {
 	/** The typical prefix used for the namespace of Guise Mesh elements, such as in an XHTML document or in RDFa metadata. */
 	public static final String NAMESPACE_PREFIX = "mx";
 
+	/** The attribute <code>mx:text</code> for text replacement. */
+	public static final NsName ATTRIBUTE_TEXT = NsName.of(NAMESPACE_STRING, "text");
+
 	private final MexlEvaluator evaluator;
 
 	/** @return The strategy for evaluating Mesh Expression Language (MEXL) expressions. */
 	protected MexlEvaluator getEvaluator() {
 		return evaluator;
+	}
+
+	/**
+	 * Evaluates an expression using the given meshing context and returns the result as an optional value. If the expression evaluates to an instance of
+	 * {@link Optional}, that instance will be returned.
+	 * @apiNote This is a convenience method for evaluating an expression and returning an optional value. It will never return <code>null</code>. However it will
+	 *          not wrap a resulting {@link Optional} instance in another {@link Optional}. Thus this method functions analogously to
+	 *          {@link Optional#flatMap(java.util.function.Function)}.
+	 * @param context The context of meshing.
+	 * @param expression The expression to evaluate.
+	 * @return The result of the expression, which will be empty if the expression evaluated to <code>null</code>.
+	 */
+	protected Optional<Object> findResult(@Nonnull final MeshContext context, @Nonnull final String expression) { //TODO add expression evaluation exception
+		final Object result = getEvaluator().evaluate(context, expression);
+		@SuppressWarnings("unchecked")
+		final Optional<Object> optionalResult = result instanceof Optional ? (Optional<Object>)result : Optional.ofNullable(result);
+		return optionalResult;
 	}
 
 	/**
@@ -96,7 +119,22 @@ public class GuiseMesh {
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	public List<Element> meshElement(@Nonnull MeshContext context, @Nonnull final Element element) throws IOException, DOMException {
+		//TODO iteration
+		//TODO conditions
+		//TODO general attributes
+		//TODO specific attributes
+
+		//text
+		findAttribute(element, ATTRIBUTE_TEXT).ifPresent(text -> {
+			final Optional<Object> foundResult = findResult(context, text);
+			element.setTextContent(foundResult.map(Object::toString).orElse(""));
+			removeAttribute(element, ATTRIBUTE_TEXT);
+		});
+
 		meshChildElements(context, element);
+
+		//TODO remove mx-related attributes
+
 		return List.of(element);
 	}
 
