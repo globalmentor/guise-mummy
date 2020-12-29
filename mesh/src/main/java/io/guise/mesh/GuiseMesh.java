@@ -63,8 +63,9 @@ public class GuiseMesh {
 	 * @param context The context of meshing.
 	 * @param expression The expression to evaluate.
 	 * @return The result of the expression, which will be empty if the expression evaluated to <code>null</code>.
+	 * @throws MexlException if there was an error parsing or otherwise processing the expression.
 	 */
-	protected Optional<Object> findResult(@Nonnull final MeshContext context, @Nonnull final String expression) { //TODO add expression evaluation exception
+	protected Optional<Object> findResult(@Nonnull final MeshContext context, @Nonnull final String expression) throws MexlException {
 		final Object result = getEvaluator().evaluate(context, expression);
 		@SuppressWarnings("unchecked")
 		final Optional<Object> optionalResult = result instanceof Optional ? (Optional<Object>)result : Optional.ofNullable(result);
@@ -95,9 +96,10 @@ public class GuiseMesh {
 	 * @return The meshed document, which may or may not be the same document supplied as input.
 	 * @throws IllegalArgumentException if the elements have some information that cannot be meshed.
 	 * @throws IOException if there is an error meshing the document.
+	 * @throws MeshException if there was an error directly related to meshing the document, such as parsing an expression.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public Document meshDocument(@Nonnull MeshContext context, @Nonnull final Document document) throws IOException, DOMException {
+	public Document meshDocument(@Nonnull MeshContext context, @Nonnull final Document document) throws IOException, MeshException, DOMException {
 		final List<Element> meshedElements = meshElement(context, document.getDocumentElement());
 		if(meshedElements.size() != 1 || meshedElements.get(0) != document.getDocumentElement()) {
 			throw new UnsupportedOperationException("Document element cannot be removed or replaced when meshing a document.");
@@ -112,9 +114,10 @@ public class GuiseMesh {
 	 * @return The meshed element(s), if any, to replace the original element.
 	 * @throws IllegalArgumentException if the element has some information that cannot be meshed.
 	 * @throws IOException if there is an error meshing the element.
+	 * @throws MeshException if there was an error directly related to meshing the document, such as parsing an expression.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public List<Element> meshElement(@Nonnull MeshContext context, @Nonnull final Element element) throws IOException, DOMException {
+	public List<Element> meshElement(@Nonnull MeshContext context, @Nonnull final Element element) throws IOException, MeshException, DOMException {
 		//TODO iteration
 		//TODO conditions
 		//TODO general attributes
@@ -142,9 +145,10 @@ public class GuiseMesh {
 	 * @param element The element the children of which to mesh.
 	 * @throws IllegalArgumentException if the elements have some information that cannot be meshed.
 	 * @throws IOException if there is an error meshing the child elements.
+	 * @throws MeshException if there was an error directly related to meshing the document, such as parsing an expression.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public void meshChildElements(@Nonnull MeshContext context, @Nonnull final Element element) throws IOException, DOMException {
+	public void meshChildElements(@Nonnull MeshContext context, @Nonnull final Element element) throws IOException, MeshException, DOMException {
 		final NodeList childNodes = element.getChildNodes();
 		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength();) { //advance the index manually as needed
 			final Node childNode = childNodes.item(childNodeIndex);

@@ -31,7 +31,8 @@ public interface MexlEvaluator {
 	 * @param context The context of meshing.
 	 * @param expression The expression to evaluate.
 	 * @return The result of the expression.
+	 * @throws MexlException if there was an error parsing or otherwise processing the expression.
 	 */
-	public Object evaluate(@Nonnull final MeshContext context, @Nonnull final String expression);
+	public Object evaluate(@Nonnull final MeshContext context, @Nonnull final String expression) throws MexlException;
 
 }

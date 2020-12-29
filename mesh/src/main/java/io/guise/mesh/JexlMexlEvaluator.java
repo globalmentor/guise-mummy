@@ -87,8 +87,12 @@ public class JexlMexlEvaluator implements MexlEvaluator {
 	}
 
 	@Override
-	public Object evaluate(final MeshContext context, final String expression) {
-		return jexl.createExpression(expression).evaluate(new MeshJexlContext(context));
+	public Object evaluate(final MeshContext context, final String expression) throws MexlException {
+		try {
+			return jexl.createExpression(expression).evaluate(new MeshJexlContext(context));
+		} catch(final JexlException jexlException) {
+			throw new MexlException(jexlException.getMessage(), jexlException);
+		}
 	}
 
 	/**

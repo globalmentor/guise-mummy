@@ -479,7 +479,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			}
 			getLogger().trace("Generated page output document `{}`.", artifact.getTargetPath());
 
-		} catch(final IllegalArgumentException | IllegalDataException | DOMException exception) { //convert input errors and XML errors to I/O errors
+		} catch(final IllegalArgumentException | IllegalDataException | MeshException | DOMException exception) { //convert input errors and XML errors to I/O errors
 			throw new IOException(String.format("Error mummifying page `%s`: %s", artifact.getSourcePath(), exception.getLocalizedMessage()), exception); //TODO i18n
 		}
 
