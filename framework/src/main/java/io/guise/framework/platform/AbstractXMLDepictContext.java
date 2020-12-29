@@ -26,8 +26,8 @@ import static java.util.Objects.*;
 import com.globalmentor.java.Objects;
 import com.globalmentor.java.Strings;
 import com.globalmentor.net.ContentType;
-import com.globalmentor.xml.QualifiedName;
 import com.globalmentor.xml.XMLNamespacePrefixManager;
+import com.globalmentor.xml.spec.NsQualifiedName;
 
 import io.guise.framework.Destination;
 import io.guise.framework.GuiseSession;
@@ -83,10 +83,10 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	}
 
 	/** @return The qualified name to use for the attribute hash attribute. */
-	protected abstract QualifiedName getAttributeHashAttributeQualifiedName();
+	protected abstract NsQualifiedName getAttributeHashAttributeQualifiedName();
 
 	/** @return The qualified name to use for the content hash attribute. */
-	protected abstract QualifiedName getContentHashAttributeQualifiedName();
+	protected abstract NsQualifiedName getContentHashAttributeQualifiedName();
 
 	/**
 	 * Guise session constructor.
@@ -156,27 +156,27 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 		final ElementState elementState = elementStateStack.removeLast(); //remove the top element state from the stack, as we finished the element
 		elementState.open = false; //show that this element is no longer open TODO maybe remove this entire facility, because no views seem to close the elements early in order to write other content
 		final boolean generateHashAttributes = isHashAttributesGenerated(); //see if we should generate hash attributes
-		final String qname = elementState.getQName(); //get the element qname in prefix:localName form
+		final String qname = elementState.getElementName().getQualifiedName(); //get the element qname in prefix:localName form
 		final String elementContent = elementState.getDepictStringBuilder().toString(); //get the content of the element
 		final StringBuilder stringBuilder = getDepictStringBuilder(); //get the remaining string builder, which is either the string builder from the next open element or the root string builder
 		stringBuilder.append(TAG_START); //<
 		stringBuilder.append(qname); //prefix:localName
-		final QualifiedName guiseAttributeHashQualifiedName = getAttributeHashAttributeQualifiedName(); //determine the qualified name to be used for the attribute hash attribute
-		final QualifiedName guiseContentHashQualifiedName = getContentHashAttributeQualifiedName(); //determine the qualified name to be used for the content hash attribute
+		final NsQualifiedName guiseAttributeHashQualifiedName = getAttributeHashAttributeQualifiedName(); //determine the qualified name to be used for the attribute hash attribute
+		final NsQualifiedName guiseContentHashQualifiedName = getContentHashAttributeQualifiedName(); //determine the qualified name to be used for the content hash attribute
 		final MessageDigest messageDigest = getMessageDigest(); //get the message digest
-		final Map<QualifiedName, String> attributeMap = elementState.getAttributeMap(); //get the element attributes
+		final Map<NsQualifiedName, String> attributeMap = elementState.getAttributeMap(); //get the element attributes
 		try {
 			if(!attributeMap.isEmpty()) { //if there are attributes, write them and generate a hash for them
 				if(generateHashAttributes) { //if we're generating hashes
 					messageDigest.reset(); //reset the message digest so that we can use it for hashing the attributes
 				}
-				for(final Map.Entry<QualifiedName, String> attribute : attributeMap.entrySet()) { //for each attribute
-					final QualifiedName attributeQualifiedName = attribute.getKey(); //get the attribute qualified name
-					final String attributeValue = getAttributeValue(elementState, attributeQualifiedName, attribute.getValue()); //get the attribute value, modifying it if needed
+				for(final Map.Entry<NsQualifiedName, String> attribute : attributeMap.entrySet()) { //for each attribute
+					final NsQualifiedName attributeQualifiedName = attribute.getKey(); //get the attribute qualified name
+					final String attributeValue = getAttributeValue(elementState.getElementName(), attributeQualifiedName, attribute.getValue()); //get the attribute value, modifying it if needed
 					stringBuilder.append(' '); //separate attributes
 					appendAttribute(stringBuilder, attributeQualifiedName, attributeValue); //append this attribute
 					if(generateHashAttributes) { //if we're generating hashes
-						update(messageDigest, denull(attributeQualifiedName.getPrefix()), attributeQualifiedName.getLocalName(), attributeValue); //update our message digest with the attribute prefix, local name and value
+						update(messageDigest, attributeQualifiedName.findPrefix().orElse(""), attributeQualifiedName.getLocalName(), attributeValue); //update our message digest with the attribute prefix, local name and value
 					}
 				}
 				if(generateHashAttributes) { //if we're generating hashes
@@ -216,7 +216,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	 * @return The given appendable.
 	 * @throws IOException if there is a problem appending the attribute information.
 	 */
-	protected <A extends Appendable> A appendAttribute(final A appendable, final QualifiedName attributeQualifiedName, final String attributeValue)
+	protected <A extends Appendable> A appendAttribute(final A appendable, final NsQualifiedName attributeQualifiedName, final String attributeValue)
 			throws IOException {
 		appendAttributeName(appendable, attributeQualifiedName); //name
 		appendable.append(EQUAL_CHAR); //=
@@ -236,10 +236,10 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	 * @param attributeQualifiedName The qualified name of the attribute.
 	 * @return The given appendable.
 	 * @throws IOException if there is a problem appending the attribute information.
-	 * @see QualifiedName#getQName()
+	 * @see NsQualifiedName#getQualifiedName()
 	 */
-	protected <A extends Appendable> A appendAttributeName(final A appendable, final QualifiedName attributeQualifiedName) throws IOException {
-		appendable.append(attributeQualifiedName.getQName()); //prefix:localName
+	protected <A extends Appendable> A appendAttributeName(final A appendable, final NsQualifiedName attributeQualifiedName) throws IOException {
+		appendable.append(attributeQualifiedName.getQualifiedName()); //prefix:localName
 		return appendable;
 	}
 
@@ -268,7 +268,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	 * @param attributeValue The default value of the attribute.
 	 * @return The value of the attribute.
 	 */
-	protected String getAttributeValue(final QualifiedName elementQualifiedName, final QualifiedName attributeQualifiedName, final String attributeValue) { //TODO move code from HTTPServletGuiseContext
+	protected String getAttributeValue(final NsQualifiedName elementQualifiedName, final NsQualifiedName attributeQualifiedName, final String attributeValue) { //TODO move code from HTTPServletGuiseContext
 		return attributeValue; //return the attribute value with no modifications
 	}
 
@@ -295,7 +295,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	@Override
 	public String getQualifiedName(final URI namespaceURI, final String localName) {
 		final String prefix = namespaceURI != null ? getXMLNamespacePrefixManager().getNamespacePrefix(namespaceURI.toString()) : null; //if a namespace was given, look up the prefix
-		return createQName(prefix, localName); //return the qualified name
+		return createQualifiedName(prefix, localName); //return the qualified name
 	}
 
 	@Override
@@ -402,9 +402,10 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	@Override
 	public ElementState writeElementEnd(final URI namespaceURI, final String localName) throws IOException {
 		final ElementState elementState = popElementState(); //pop the current element state from the stack
-		if(!Objects.equals(elementState.getNamespaceURI(), namespaceURI) || !elementState.getLocalName().equals(localName)) { //if the namespace and/or local name is not what we expect
+		if(!Objects.equals(elementState.getElementName().getNamespaceUri(), namespaceURI) || !elementState.getElementName().getLocalName().equals(localName)) { //if the namespace and/or local name is not what we expect
 			throw new IllegalStateException("Ending namespace " + namespaceURI + " and local name " + localName
-					+ " do not match currently open element with namespace " + elementState.getNamespaceURI() + " and local name " + elementState.getLocalName());
+					+ " do not match currently open element with namespace " + elementState.getElementName().getNamespaceUri() + " and local name "
+					+ elementState.getElementName().getLocalName());
 		}
 		return elementState; //return the element state
 	}
@@ -418,7 +419,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	@Override
 	public void writeAttribute(final URI namespaceURI, final String localName, final String value) throws IOException {
 		final String qname = getQualifiedName(namespaceURI, localName); //get the qualified name for this namespace and local name
-		getElementState().getAttributeMap().put(new QualifiedName(namespaceURI, qname), value); //store this attribute, keyed to the qualified name
+		getElementState().getAttributeMap().put(new NsQualifiedName(namespaceURI, qname), value); //store this attribute, keyed to the qualified name
 	}
 
 	@Override

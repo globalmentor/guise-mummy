@@ -105,7 +105,7 @@ public class DirectoryWidget implements Widget {
 			final Element widgetElement) throws IOException, DOMException {
 		final Document document = widgetElement.getOwnerDocument();
 		final Stream<Artifact> items = mummifier.childNavigationArtifacts(context, contextArtifact);
-		return findAttributeNS(widgetElement, ATTRIBUTE_GROUP_BY) //group-by
+		return findAttribute(widgetElement, ATTRIBUTE_GROUP_BY) //group-by
 				.map(groupBy -> {
 					final List<Element> groupedItemElements = new ArrayList<>();
 					//determine the sort order, if any, by the prefix
@@ -113,43 +113,45 @@ public class DirectoryWidget implements Widget {
 					//strip off the sort order if needed
 					final String groupByValue = foundSortOrder.map(sortOrder -> groupBy.substring(1)).orElse(groupBy);
 					switch(groupByValue) {
-						case GROUP_BY_PUBLICATION_DATE: {
-							final Map<Optional<LocalDate>, List<Artifact>> itemsByFoundPublicationDate = items.collect(groupingBy(
-									item -> item.getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON).flatMap(asInstance(LocalDate.class))));
-							final Stream<Map.Entry<Optional<LocalDate>, List<Artifact>>> groups = itemsByFoundPublicationDate.entrySet().stream();
-							final Stream<Map.Entry<Optional<LocalDate>, List<Artifact>>> sortedGroups = foundSortOrder.map(sortOrder -> sortOrder //sort by date, nulls first, reversing if necessary
-									.applyTo(Comparator.<Map.Entry<Optional<LocalDate>, List<Artifact>>, LocalDate>comparing(entry -> entry.getKey().orElse(null),
-											nullsFirst(naturalOrder()))))
-									.map(groups::sorted).orElse(groups);
-							sortedGroups.forEach(throwingConsumer(itemsForFoundPublicationDate -> {
-								final Optional<LocalDate> foundPublicationDate = itemsForFoundPublicationDate.getKey();
-								final Element groupHeadingElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_H2); //<h2>
-								final String publicationDateText = foundPublicationDate.map(PUBLISHED_ON_FORMATTER::format).orElse("?"); //TODO fix text
-								appendText(groupHeadingElement, publicationDateText);
-								groupedItemElements.add(groupHeadingElement);
-								groupedItemElements.addAll(
-										generateItemElements(mummifier, context, contextArtifact, artifact, widgetElement, 3, itemsForFoundPublicationDate.getValue().stream()));
-							}));
-						}
+						case GROUP_BY_PUBLICATION_DATE:
+							{
+								final Map<Optional<LocalDate>, List<Artifact>> itemsByFoundPublicationDate = items.collect(groupingBy(
+										item -> item.getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON).flatMap(asInstance(LocalDate.class))));
+								final Stream<Map.Entry<Optional<LocalDate>, List<Artifact>>> groups = itemsByFoundPublicationDate.entrySet().stream();
+								final Stream<Map.Entry<Optional<LocalDate>, List<Artifact>>> sortedGroups = foundSortOrder.map(sortOrder -> sortOrder //sort by date, nulls first, reversing if necessary
+										.applyTo(Comparator.<Map.Entry<Optional<LocalDate>, List<Artifact>>, LocalDate>comparing(entry -> entry.getKey().orElse(null),
+												nullsFirst(naturalOrder()))))
+										.map(groups::sorted).orElse(groups);
+								sortedGroups.forEach(throwingConsumer(itemsForFoundPublicationDate -> {
+									final Optional<LocalDate> foundPublicationDate = itemsForFoundPublicationDate.getKey();
+									final Element groupHeadingElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_H2); //<h2>
+									final String publicationDateText = foundPublicationDate.map(PUBLISHED_ON_FORMATTER::format).orElse("?"); //TODO fix text
+									appendText(groupHeadingElement, publicationDateText);
+									groupedItemElements.add(groupHeadingElement);
+									groupedItemElements.addAll(
+											generateItemElements(mummifier, context, contextArtifact, artifact, widgetElement, 3, itemsForFoundPublicationDate.getValue().stream()));
+								}));
+							}
 							break;
-						case GROUP_BY_PUBLICATION_YEAR: {
-							final Map<Optional<Year>, List<Artifact>> itemsByFoundPublicationYear = items.collect(groupingBy(item -> item.getResourceDescription()
-									.findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON).flatMap(asInstance(LocalDate.class)).map(Year::from)));
-							final Stream<Map.Entry<Optional<Year>, List<Artifact>>> groups = itemsByFoundPublicationYear.entrySet().stream();
-							final Stream<Map.Entry<Optional<Year>, List<Artifact>>> sortedGroups = foundSortOrder.map(sortOrder -> sortOrder //sort by year, nulls first, reversing if necessary
-									.applyTo(
-											Comparator.<Map.Entry<Optional<Year>, List<Artifact>>, Year>comparing(entry -> entry.getKey().orElse(null), nullsFirst(naturalOrder()))))
-									.map(groups::sorted).orElse(groups);
-							sortedGroups.forEach(throwingConsumer(itemsForFoundPublicationYear -> {
-								final Optional<Year> foundPublicationYear = itemsForFoundPublicationYear.getKey();
-								final Element groupHeadingElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_H2); //<h2>
-								final String publicationYear = foundPublicationYear.map(Year::toString).orElse("?"); //TODO fix text
-								appendText(groupHeadingElement, publicationYear);
-								groupedItemElements.add(groupHeadingElement);
-								groupedItemElements.addAll(
-										generateItemElements(mummifier, context, contextArtifact, artifact, widgetElement, 3, itemsForFoundPublicationYear.getValue().stream()));
-							}));
-						}
+						case GROUP_BY_PUBLICATION_YEAR:
+							{
+								final Map<Optional<Year>, List<Artifact>> itemsByFoundPublicationYear = items.collect(groupingBy(item -> item.getResourceDescription()
+										.findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON).flatMap(asInstance(LocalDate.class)).map(Year::from)));
+								final Stream<Map.Entry<Optional<Year>, List<Artifact>>> groups = itemsByFoundPublicationYear.entrySet().stream();
+								final Stream<Map.Entry<Optional<Year>, List<Artifact>>> sortedGroups = foundSortOrder.map(sortOrder -> sortOrder //sort by year, nulls first, reversing if necessary
+										.applyTo(Comparator.<Map.Entry<Optional<Year>, List<Artifact>>, Year>comparing(entry -> entry.getKey().orElse(null),
+												nullsFirst(naturalOrder()))))
+										.map(groups::sorted).orElse(groups);
+								sortedGroups.forEach(throwingConsumer(itemsForFoundPublicationYear -> {
+									final Optional<Year> foundPublicationYear = itemsForFoundPublicationYear.getKey();
+									final Element groupHeadingElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_H2); //<h2>
+									final String publicationYear = foundPublicationYear.map(Year::toString).orElse("?"); //TODO fix text
+									appendText(groupHeadingElement, publicationYear);
+									groupedItemElements.add(groupHeadingElement);
+									groupedItemElements.addAll(
+											generateItemElements(mummifier, context, contextArtifact, artifact, widgetElement, 3, itemsForFoundPublicationYear.getValue().stream()));
+								}));
+							}
 							break;
 						default:
 							throw new IllegalDataException(String.format("Unrecognized `%s` attribute value `%s`.", ATTRIBUTE_GROUP_BY, groupBy));
@@ -182,11 +184,11 @@ public class DirectoryWidget implements Widget {
 		final Collator titleCollator = Collator.getInstance(); //TODO i18n: get locale for page, defaulting to site locale
 		titleCollator.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
 		titleCollator.setStrength(Collator.PRIMARY); //ignore accents and case
-		return findAttributeNS(widgetElement, ATTRIBUTE_ARCHETYPE) //archetype
+		return findAttribute(widgetElement, ATTRIBUTE_ARCHETYPE) //archetype
 				.map(archetype -> {
 					switch(archetype) {
 						case ARCHETYPE_BLOG:
-							if(findAttributeNS(widgetElement, ATTRIBUTE_GROUP_BY).isPresent()) {
+							if(findAttribute(widgetElement, ATTRIBUTE_GROUP_BY).isPresent()) {
 								throw new IllegalDataException(
 										String.format("Attribute `%s` not allowed with attribute `%s` value `%s`.", ATTRIBUTE_GROUP_BY, ATTRIBUTE_ARCHETYPE, archetype));
 							}
@@ -200,7 +202,7 @@ public class DirectoryWidget implements Widget {
 										final Element separatorElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_HR); //<hr/>
 										//title
 										final String postHref = context.relativizeSourceReference(contextArtifact, item).toString();
-										final Element titleElement = createElementNS(document, ELEMENT_H(headingLevel)); //<h1>
+										final Element titleElement = createElement(document, ELEMENT_H(headingLevel)); //<h1>
 										final Element titleElementLink = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A); //<h1><a>
 										titleElementLink.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, postHref);
 										appendText(titleElementLink, item.determineTitle()); //<h1><a>title</a></h1>
@@ -208,7 +210,7 @@ public class DirectoryWidget implements Widget {
 										//publication date
 										final Optional<Element> publishedOnElement = item.getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON)
 												.flatMap(asInstance(LocalDate.class)).map(publishedOn -> {
-													final Element element = createElementNS(document, ELEMENT_H(headingLevel + 1)); //<h2>
+													final Element element = createElement(document, ELEMENT_H(headingLevel + 1)); //<h2>
 													appendText(element, PUBLISHED_ON_FORMATTER.format(publishedOn));
 													return element;
 												});
@@ -222,7 +224,7 @@ public class DirectoryWidget implements Widget {
 													return excerptWrapper;
 												});
 										//more
-										final String moreLabel = findAttributeNS(widgetElement, ATTRIBUTE_MORE_LABEL).orElse("…");
+										final String moreLabel = findAttribute(widgetElement, ATTRIBUTE_MORE_LABEL).orElse("…");
 										final Element moreLink = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A); //<a>
 										moreLink.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, postHref);
 										appendText(moreLink, moreLabel); //<a>…</a>

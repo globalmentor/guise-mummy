@@ -29,8 +29,8 @@ import static com.globalmentor.html.spec.HTML.*;
 import com.globalmentor.text.ASCII;
 import com.globalmentor.html.spec.HTML;
 import com.globalmentor.javascript.JavaScript;
+import com.globalmentor.xml.spec.NsQualifiedName;
 import com.globalmentor.xml.spec.XML;
-import com.globalmentor.xml.QualifiedName;
 
 import io.guise.framework.*;
 
@@ -93,11 +93,11 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 	 * @see #isDataAttributeNamespaceURI(URI)
 	 */
 	@Override
-	protected <A extends Appendable> A appendAttributeName(final A appendable, final QualifiedName attributeQualifiedName) throws IOException {
-		final URI namespaceURI = attributeQualifiedName.getNamespaceURI();
+	protected <A extends Appendable> A appendAttributeName(final A appendable, final NsQualifiedName attributeQualifiedName) throws IOException {
+		final URI namespaceURI = attributeQualifiedName.getNamespaceUri();
 		if(isAllDataAttributes() || (namespaceURI != null && isDataAttributeNamespaceURI(namespaceURI))) { //if we should use data attributes
 			if(!XML.XMLNS_NAMESPACE_URI.equals(namespaceURI)) { //if this isn't the XMLNS namespace
-				final String prefix = attributeQualifiedName.getPrefix();
+				final String prefix = attributeQualifiedName.findPrefix().orElse(null);
 				if(prefix != null) { //we're technically only generating attributes for prefixed attributes (although all attributes in a namespace should have a prefix)
 					appendable.append(DATA_ATTRIBUTE_ID).append(ATTRIBUTE_DELIMITER_CHAR); //data-
 					appendable.append(ASCII.toLowerCase(prefix)).append(ATTRIBUTE_DELIMITER_CHAR); //prefix-

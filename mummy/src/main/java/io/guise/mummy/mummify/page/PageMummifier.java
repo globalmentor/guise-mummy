@@ -58,6 +58,15 @@ public interface PageMummifier extends Mummifier {
 	/** The attribute for regenerating an element, such as a navigation list. */
 	public static final NsName ATTRIBUTE_REGENERATE = NsName.of(NAMESPACE_STRING, "regenerate");
 
+	/** The Guise Mesh context variable name for exposing the current artifact. */
+	public static final String MESH_CONTEXT_VARIABLE_ARTIFACT = "artifact";
+
+	/**
+	 * The Guise Mesh context variable name for exposing the current page resource description.
+	 * @see Artifact#getResourceDescription()
+	 */
+	public static final String MESH_CONTEXT_VARIABLE_PAGE = "page";
+
 	/**
 	 * Determines whether the given artifact is marked as an <dfn>asset</dfn>.
 	 * @implSpec The default implementation considers an asset any artifact with a source path the source filename of which matches the pattern configured under

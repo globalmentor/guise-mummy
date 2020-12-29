@@ -1,15 +1,17 @@
 # Guise
 
-The Guise™ Internet application ecosystem comprises three main products and related utilities:
+The Guise™ Internet application ecosystem comprises several products and related utilities:
 
 * Guise™ Skeleton
 : Simple, semantic, bare-bones CSS framework. _Guise Skeleton is not yet included in this distribution._
 * **[Guise™ Mummy](mummy/)**
 : Static site generator.
+* [Guise™ Mesh](mesh/)
+: Template transformation engine used in Guise Mummy.
 * [Guise™ Framework](framework/)
 : Maintainable and scalable Internet application framework. _Guise Framework is being updated from its legacy implementation and is not ready for production use._
 * [Guise™ CLI](cli/)
-: The command-line interface for invoking and working with the three products.
+: The command-line interface for invoking and working with the various products.
 
 Currently Guise Mummy is functional and can be used with sites using XHTML5 source.
 

@@ -57,6 +57,7 @@ import com.globalmentor.vocab.*;
 import com.globalmentor.xml.*;
 import com.globalmentor.xml.spec.*;
 
+import io.guise.mesh.*;
 import io.guise.mummy.*;
 import io.guise.mummy.mummify.AbstractFileMummifier;
 import io.guise.mummy.mummify.page.widget.Widget;
@@ -156,6 +157,13 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	/** @return The strategy for loading and working with navigation. */
 	protected NavigationManager getNavigationManager() {
 		return navigationManager;
+	}
+
+	private final GuiseMesh guiseMesh = new GuiseMesh();
+
+	/** @return The strategy for transformation a document based upon Mesh Expression Language (MEXL) expressions. */
+	protected GuiseMesh getGuiseMesh() {
+		return guiseMesh;
 	}
 
 	/**
@@ -445,8 +453,14 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			//#apply template
 			final Document templatedDocument = applyTemplate(context, contextArtifact, artifact, normalizedDocument);
 
-			//#process document: evaluate expressions and perform transformations
-			final Document processedDocument = processDocument(context, contextArtifact, artifact, templatedDocument);
+			//#mesh document: evaluate MEXL expressions and perform transformations
+			final MeshContext meshContext = new MapMeshContext();
+			meshContext.setVariable(MESH_CONTEXT_VARIABLE_ARTIFACT, artifact);
+			meshContext.setVariable(MESH_CONTEXT_VARIABLE_PAGE, artifact.getResourceDescription());
+			final Document meshedDocument = getGuiseMesh().meshDocument(meshContext, templatedDocument);
+
+			//#process document: evaluate Guise Mummy directives and widgets; and perform transformations
+			final Document processedDocument = processDocument(context, contextArtifact, artifact, meshedDocument);
 
 			//#relocate document from source to target: translate path references from the source to the target
 			final Document relocatedDocument = relocateSourceDocumentToTarget(context, contextArtifact, artifact, processedDocument);
@@ -465,7 +479,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			}
 			getLogger().trace("Generated page output document `{}`.", artifact.getTargetPath());
 
-		} catch(final IllegalArgumentException | IllegalDataException | DOMException exception) { //convert input errors and XML errors to I/O errors
+		} catch(final IllegalArgumentException | IllegalDataException | MeshException | DOMException exception) { //convert input errors and XML errors to I/O errors
 			throw new IOException(String.format("Error mummifying page `%s`: %s", artifact.getSourcePath(), exception.getLocalizedMessage()), exception); //TODO i18n
 		}
 
@@ -505,10 +519,6 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	/**
 	 * Normalizes a document element, removing any named metadata (that is, {@value HTML#ELEMENT_META} elements with a {@value HTML#ELEMENT_META_ATTRIBUTE_NAME}
 	 * or a {@value RDFa#ATTRIBUTE_PROPERTY} attribute).
-	 * <p>
-	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
-	 * element is removed.
-	 * </p>
 	 * @implSpec This implementation marks for removal any {@value HTML#ELEMENT_META} elements with a {@value HTML#ELEMENT_META_ATTRIBUTE_NAME} or a
 	 *           {@value RDFa#ATTRIBUTE_PROPERTY} attribute. It also removes all {@link RDFa#ATTRIBUTE_PREFIX} attributes.
 	 * @param context The context of static site generation.
@@ -544,7 +554,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	/**
 	 * Normalizes child elements of an existing element.
-	 * @implNote This implementation does not yet allow returning different nodes than the one being normalized
+	 * @implSpec Each child element is replaced with the normalized elements returned from calling
+	 *           {@link #normalizeElement(MummyContext, Artifact, Artifact, Element)}. If only the same element is returned, no replacement is made. If no element
+	 *           is returned, the source element is removed.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
@@ -563,15 +575,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			}
 			final Element childElement = (Element)childNode;
 			final List<Element> normalizedElements = normalizeElement(context, contextArtifact, artifact, childElement);
-			final int normalizedElementCount = normalizedElements.size();
-			childNodeIndex += normalizedElementCount; //manually advance the index based upon the replacement nodes
-			if(normalizedElementCount == 0) { //if we should remove the element
-				childElement.getParentNode().removeChild(childElement);
-				continue;
-			} else if(normalizedElementCount == 1 && normalizedElements.get(0) == childElement) { //if no structural changes were requested
-				continue;
-			}
-			throw new UnsupportedOperationException("Structural changes not yet fully supported when normalizing individual child elements.");
+			replaceChild(element, childElement, normalizedElements);
+			childNodeIndex += normalizedElements.size(); //manually advance the index based upon the replacement nodes
 		}
 	}
 
@@ -800,7 +805,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		final Element templateHeadElement = findHtmlHeadElement(templateDocument)
 				.orElseThrow(() -> new IllegalArgumentException("Template missing <head> element."));
 		findHtmlHeadElement(sourceDocument).stream().flatMap(XmlDom::childElementsOf).filter(XHTML_ELEMENT_SCRIPT::matches) //find all <script> elements
-				.filter(element -> !XmlDom.hasAttributeNS(element, XHTML_ELEMENT_SCRIPT_ATTRIBUTE_SRC)) //don't include scripts with `src` attributes
+				.filter(element -> !XmlDom.hasAttribute(element, XHTML_ELEMENT_SCRIPT_ATTRIBUTE_SRC)) //don't include scripts with `src` attributes
 				.forEach(element -> templateHeadElement.appendChild(templateDocument.importNode(element, true)));
 	}
 
@@ -873,11 +878,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	}
 
 	/**
-	 * Processes a source document element.
-	 * <p>
-	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
-	 * element is removed.
-	 * </p>
+	 * Processes an element in the source document.
 	 * @implSpec This implementation handles:
 	 *           <ul>
 	 *           <li>Processing of registered widgets.</li>
@@ -914,7 +915,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		}
 
 		//navigation list regeneration
-		if(isPresentAndEquals(findAttributeNS(sourceElement, ATTRIBUTE_REGENERATE), ATTRIBUTE_REGENERATE.getLocalName())) {
+		if(isPresentAndEquals(findAttribute(sourceElement, ATTRIBUTE_REGENERATE), ATTRIBUTE_REGENERATE.getLocalName())) {
 
 			//<nav><ol> or <nav><ul>
 			if(XHTML_NAMESPACE_URI_STRING.equals(sourceElement.getNamespaceURI())) {
@@ -935,6 +936,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	/**
 	 * Processes child elements of an existing element.
+	 * @implSpec Each child element is replaced with the processed elements returned from calling
+	 *           {@link #processElement(MummyContext, Artifact, Artifact, Element)}. If only the same element is returned, no replacement is made. If no element
+	 *           is returned, the source element is removed.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
@@ -954,24 +958,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			}
 			final Element childElement = (Element)childNode;
 			final List<Element> processedElements = processElement(context, contextArtifact, artifact, childElement);
-			final int processedElementCount = processedElements.size(); //TODO transfer restructuring logic to XML library
-			if(!(processedElementCount == 1 && processedElements.get(0) == childElement)) { //if structural changes were requested
-				final Node nextSibling = childElement.getNextSibling();
-				final Node parentNode = childElement.getParentNode();
-				parentNode.removeChild(childElement); //remove the current child (which may get added back if it is one of the elements returned)
-				if(nextSibling != null) { //if we're not at the end, do a complicated reverse insert
-					Node refChild = nextSibling; //iterate the processed elements in reverse order, inserting them before the next sibling
-					final ListIterator<Element> reverseProcessedElementIterator = processedElements.listIterator(processedElementCount);
-					while(reverseProcessedElementIterator.hasPrevious()) {
-						final Element processedElement = reverseProcessedElementIterator.previous();
-						parentNode.insertBefore(processedElement, refChild); //insert the processed element in the earlier position
-						refChild = processedElement; //the newly inserted element becomes the new reference for the next insertion
-					}
-				} else { //if we're at the end of the list
-					processedElements.forEach(parentNode::appendChild); //just append the processed elements normally
-				}
-			}
-			childNodeIndex += processedElementCount; //manually advance the index based upon the replacement nodes
+			replaceChild(sourceElement, childElement, processedElements);
+			childNodeIndex += processedElements.size(); //manually advance the index based upon the replacement nodes
 		}
 	}
 
@@ -1003,10 +991,6 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	/**
 	 * Regenerates a navigation list based upon the parent, sibling, and/or child navigation artifacts relative to the context artifact.
-	 * <p>
-	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
-	 * element is removed.
-	 * </p>
 	 * <p>
 	 * This method discovers a link to serve as the template for the generated links. If the link has a reference to the template itself (preferably by simply
 	 * using <code>href=""</code>), the link is used as the template for active links; that is, self-links. Any other link (which is not ever required to have an
@@ -1203,10 +1187,6 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	/**
 	 * Relocates a source document element by retargeting its references relative to a new referrer path location.
-	 * <p>
-	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
-	 * element is removed.
-	 * </p>
 	 * @implSpec This implementation relocates the {@link #HTML_REFERENCE_ELEMENT_ATTRIBUTES} elements and attributes.
 	 * @param context The context of static site generation.
 	 * @param sourceElement The source element to relocate.
@@ -1239,7 +1219,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	/**
 	 * Relocates child elements of an existing element by retargeting references relative to a new referrer path location.
-	 * @implNote This implementation does not yet allow returning different nodes than the one being relocated.
+	 * @implSpec Each child element is replaced with the relocated elements returned from calling
+	 *           {@link #relocateElement(MummyContext, Element, Path, Path, Function)}. If only the same element is returned, no replacement is made. If no
+	 *           element is returned, the source element is removed.
 	 * @param context The context of static site generation.
 	 * @param sourceElement The source element the children of which to relocate.
 	 * @param originalReferrerSourcePath The absolute original path of the referrer, e.g. <code>…/foo/page.xhtml</code>.
@@ -1260,21 +1242,13 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			}
 			final Element childElement = (Element)childNode;
 			final List<Element> relocatedElements = relocateElement(context, childElement, originalReferrerSourcePath, relocatedReferrerPath, referentArtifactPath);
-			final int relocatedElementCount = relocatedElements.size();
-			childNodeIndex += relocatedElementCount; //manually advance the index based upon the replacement nodes
-			if(relocatedElementCount == 1 && relocatedElements.get(0) == childElement) { //if no structural changes were requested
-				continue;
-			}
-			throw new UnsupportedOperationException("Structural changes not yet supported when relocating individual child elements.");
+			replaceChild(sourceElement, childElement, relocatedElements);
+			childNodeIndex += relocatedElements.size(); //manually advance the index based upon the replacement nodes
 		}
 	}
 
 	/**
 	 * Relocates a reference element by retargeting its reference attribute relative to a new referrer path location.
-	 * <p>
-	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
-	 * element is removed.
-	 * </p>
 	 * <p>
 	 * A reference to <code>""</code> is considered to be a relative self reference as per RFC 3986, and is never modified during relocation, as it is always
 	 * inherently "relocated" regardless of the resource location.
@@ -1395,10 +1369,6 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	/**
 	 * Cleanses a document element, removing any Mummy-related directives.
-	 * <p>
-	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
-	 * element is removed.
-	 * </p>
 	 * @implSpec This implementation marks for removal any element in the {@link GuiseMummy#NAMESPACE} namespace, and for all other elements removes all
 	 *           attributes in the {@link GuiseMummy#NAMESPACE} namespace.
 	 * @param context The context of static site generation.
@@ -1441,7 +1411,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	/**
 	 * Cleanses child elements of an existing element, removing any Mummy-related directives.
-	 * @implNote This implementation does not yet allow returning different nodes than the one being cleansed.
+	 * @implSpec Each child element is replaced with the cleansed elements returned from calling
+	 *           {@link #cleanseElement(MummyContext, Artifact, Artifact, Element)}. If only the same element is returned, no replacement is made. If no element
+	 *           is returned, the source element is removed.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
@@ -1460,15 +1432,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			}
 			final Element childElement = (Element)childNode;
 			final List<Element> cleansedElements = cleanseElement(context, contextArtifact, artifact, childElement);
-			final int cleansedElementCount = cleansedElements.size();
-			childNodeIndex += cleansedElementCount; //manually advance the index based upon the replacement nodes
-			if(cleansedElementCount == 0) { //if we should remove the element
-				childElement.getParentNode().removeChild(childElement);
-				continue;
-			} else if(cleansedElementCount == 1 && cleansedElements.get(0) == childElement) { //if no structural changes were requested
-				continue;
-			}
-			throw new UnsupportedOperationException("Structural changes not yet fully supported when cleansing individual child elements.");
+			replaceChild(element, childElement, cleansedElements);
+			childNodeIndex += cleansedElements.size(); //manually advance the index based upon the replacement nodes
 		}
 	}
 

@@ -6,7 +6,7 @@ _Guise Framework is being updated from its legacy implementation and is not read
 
 ## Download
 
-Guise Framework is available in the Maven Central Repository as [io.guise:guise](https://search.maven.org/search?q=g:io.guise%20AND%20a:guise-framework).
+Guise Framework is available in the Maven Central Repository as [io.guise:guise-framework](https://search.maven.org/search?q=g:io.guise%20AND%20a:guise-framework).
 
 ## Issues
 

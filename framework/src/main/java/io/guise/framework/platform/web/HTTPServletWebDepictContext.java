@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.globalmentor.net.ContentType;
 import com.globalmentor.servlet.http.HTTPServlets;
 import com.globalmentor.text.Text;
-import com.globalmentor.xml.QualifiedName;
+import com.globalmentor.xml.spec.NsQualifiedName;
 
 import io.guise.framework.Destination;
 import io.guise.framework.GuiseSession;
@@ -72,18 +72,18 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext {
 	private ContentType outputContentType = ContentType.of(ContentType.TEXT_PRIMARY_TYPE, Text.PLAIN_SUBTYPE); //default to text/plain
 
 	/** The qualified name to use for the attribute hash attribute. */
-	private final QualifiedName attributeHashAttributeQualifiedName;
+	private final NsQualifiedName attributeHashAttributeQualifiedName;
 
 	@Override
-	protected QualifiedName getAttributeHashAttributeQualifiedName() {
+	protected NsQualifiedName getAttributeHashAttributeQualifiedName() {
 		return attributeHashAttributeQualifiedName;
 	}
 
 	/** The qualified name to use for the content hash attribute. */
-	private final QualifiedName contentHashAttributeQualifiedName;
+	private final NsQualifiedName contentHashAttributeQualifiedName;
 
 	@Override
-	protected QualifiedName getContentHashAttributeQualifiedName() {
+	protected NsQualifiedName getContentHashAttributeQualifiedName() {
 		return contentHashAttributeQualifiedName;
 	}
 
@@ -111,8 +111,8 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext {
 				final String contentTypeString=request.getContentType();	//get the request content type
 				final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
 		*/
-		attributeHashAttributeQualifiedName = new QualifiedName(GUISE_ML_NAMESPACE_URI, getQualifiedName(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_ATTRIBUTE_HASH));
-		contentHashAttributeQualifiedName = new QualifiedName(GUISE_ML_NAMESPACE_URI, getQualifiedName(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_CONTENT_HASH));
+		attributeHashAttributeQualifiedName = new NsQualifiedName(GUISE_ML_NAMESPACE_URI, getQualifiedName(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_ATTRIBUTE_HASH));
+		contentHashAttributeQualifiedName = new NsQualifiedName(GUISE_ML_NAMESPACE_URI, getQualifiedName(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_CONTENT_HASH));
 		setHashAttributesGenerated(true); //always generate hash attributes
 		final ContentType defaultContentType = ContentType.of(outputContentType.getPrimaryType(), outputContentType.getSubType(),
 				ContentType.Parameter.of(ContentType.CHARSET_PARAMETER, UTF_8.name())); //default to text/plain encoded in UTF-8

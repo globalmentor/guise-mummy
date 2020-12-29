@@ -231,7 +231,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	 */
 	protected void depictEnd() throws IOException {
 		if(elementState != null && elementState.isOpen()) { //if the element is open
-			getDepictContext().writeElementEnd(elementState.getNamespaceURI(), elementState.getLocalName()); //end the element
+			getDepictContext().writeElementEnd(elementState.getElementName().getNamespaceUri(), elementState.getElementName().getLocalName()); //end the element
 		}
 		elementState = null; //release the element state
 	}

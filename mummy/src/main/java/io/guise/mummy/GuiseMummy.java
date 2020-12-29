@@ -77,7 +77,7 @@ public class GuiseMummy implements Clogged {
 		}
 	}
 
-	/** The string form or namespace of Guise Mummy elements, such as in an XHTML document or as the leading IRI segment of RDFa metadata. */
+	/** The string form of the namespace of Guise Mummy elements, such as in an XHTML document or as the leading IRI segment of RDFa metadata. */
 	public static final String NAMESPACE_STRING = "https://guise.io/name/mummy/";
 
 	/** The namespace of Guise Mummy elements, such as in an XHTML document or as the leading IRI segment of RDFa metadata. */
