@@ -20,6 +20,7 @@ import static com.globalmentor.io.ClassResources.*;
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Paths.*;
 import static io.guise.mummy.GuiseMummy.*;
+import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.Files.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
@@ -39,6 +40,8 @@ import io.guise.mummy.mummify.page.MarkdownPageMummifierTest;
  */
 public class MummifySmokeIT extends BaseEndToEndIT {
 
+	public static final String SMOKE_MESH_XHTML_RESOURCE_NAME = "smoke-mesh.xhtml";
+
 	/** Predefined seed for reproducible tests. */
 	private static final long RANDOM_SEED = 20201122;
 
@@ -55,6 +58,8 @@ public class MummifySmokeIT extends BaseEndToEndIT {
 		super.populateSiteSourceDirectory(siteSourceDirectory);
 		//…/src/site/simple.md
 		copy(MarkdownPageMummifierTest.class, siteSourceDirectory, MarkdownPageMummifierTest.SIMPLE_MARKDOWN_RESOURCE_NAME);
+		//…/src/site/mesh.xhtml
+		copy(getClass(), SMOKE_MESH_XHTML_RESOURCE_NAME, siteSourceDirectory.resolve("mesh.xhtml"));
 		//…/src/site/random.bin
 		write(siteSourceDirectory.resolve("random.bin"), randomBinContent);
 		//…/src/site/$assets/images/gate-turret-reduced.jpg
@@ -66,15 +71,20 @@ public class MummifySmokeIT extends BaseEndToEndIT {
 	public void smokeTest() throws IOException {
 		mummify(LifeCyclePhase.MUMMIFY);
 		//…/target/site/simple.html
-		assertThat(exists(getSiteTargetDirectory().resolve(changeExtension(MarkdownPageMummifierTest.SIMPLE_MARKDOWN_RESOURCE_NAME, "html"))), is(true));
+		assertThat("Markdown files are being converted to HTML.",
+				exists(getSiteTargetDirectory().resolve(changeExtension(MarkdownPageMummifierTest.SIMPLE_MARKDOWN_RESOURCE_NAME, "html"))), is(true));
+		//…/target/site/mesh.html
+		final Path targetMeshFile = getSiteTargetDirectory().resolve("mesh.html");
+		assertThat(exists(targetMeshFile), is(true));
+		assertThat("XHTML files are being meshed.", readString(targetMeshFile, UTF_8), containsString("<h1>Mesh Test</h1>"));
 		//…/target/site/random.bin
 		final Path targetRandomBinFile = getSiteTargetDirectory().resolve("random.bin");
-		assertThat(exists(targetRandomBinFile), is(true));
-		assertThat(readAllBytes(targetRandomBinFile), is(randomBinContent));
+		assertThat("Opaque files are being copied to the target.", exists(targetRandomBinFile), is(true));
+		assertThat("Target opaque files contain correct data.", readAllBytes(targetRandomBinFile), is(randomBinContent));
 		//…/target/site/assets/images/gate-turret-reduced.jpg
 		final Path targetGateTurretJpegFile = resolve(getSiteTargetDirectory(), "assets", "images", BaseImageMummifierTest.GATE_TURRET_REDUCED_JPEG_RESOURCE_NAME);
-		assertThat(exists(targetGateTurretJpegFile), is(true));
-		assertThat(readAllBytes(targetGateTurretJpegFile),
+		assertThat("Image files are being mumified.", exists(targetGateTurretJpegFile), is(true));
+		assertThat("Small target image files contain correct data.", readAllBytes(targetGateTurretJpegFile),
 				is(readBytes(BaseImageMummifierTest.class, BaseImageMummifierTest.GATE_TURRET_REDUCED_JPEG_RESOURCE_NAME)));
 	}
 
