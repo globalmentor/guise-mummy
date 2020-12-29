@@ -107,10 +107,6 @@ public class GuiseMesh {
 
 	/**
 	 * Evaluates and transforms a document element.
-	 * <p>
-	 * The element is replaced with the returned elements. If only the same element is returned, no replacement is made. If no element is returned, the source
-	 * element is removed.
-	 * </p>
 	 * @param context The context of meshing.
 	 * @param element The element to mesh.
 	 * @return The meshed element(s), if any, to replace the original element.
@@ -140,6 +136,8 @@ public class GuiseMesh {
 
 	/**
 	 * Evaluates and transforms child elements of an existing element.
+	 * @implSpec Each child element is replaced with the normalized elements returned from calling {@link #meshElement(MeshContext, Element)}. If only the same
+	 *           element is returned, no replacement is made. If no element is returned, the source element is removed.
 	 * @param context The context of meshing.
 	 * @param element The element the children of which to mesh.
 	 * @throws IllegalArgumentException if the elements have some information that cannot be meshed.
@@ -155,25 +153,9 @@ public class GuiseMesh {
 				continue;
 			}
 			final Element childElement = (Element)childNode;
-			final List<Element> processedElements = meshElement(context, childElement);
-			final int processedElementCount = processedElements.size(); //TODO transfer restructuring logic to XML library
-			if(!(processedElementCount == 1 && processedElements.get(0) == childElement)) { //if structural changes were requested
-				final Node nextSibling = childElement.getNextSibling();
-				final Node parentNode = childElement.getParentNode();
-				parentNode.removeChild(childElement); //remove the current child (which may get added back if it is one of the elements returned)
-				if(nextSibling != null) { //if we're not at the end, do a complicated reverse insert
-					Node refChild = nextSibling; //iterate the processed elements in reverse order, inserting them before the next sibling
-					final ListIterator<Element> reverseProcessedElementIterator = processedElements.listIterator(processedElementCount);
-					while(reverseProcessedElementIterator.hasPrevious()) {
-						final Element processedElement = reverseProcessedElementIterator.previous();
-						parentNode.insertBefore(processedElement, refChild); //insert the processed element in the earlier position
-						refChild = processedElement; //the newly inserted element becomes the new reference for the next insertion
-					}
-				} else { //if we're at the end of the list
-					processedElements.forEach(parentNode::appendChild); //just append the processed elements normally
-				}
-			}
-			childNodeIndex += processedElementCount; //manually advance the index based upon the replacement nodes
+			final List<Element> meshedElements = meshElement(context, childElement);
+			replaceChild(element, childElement, meshedElements);
+			childNodeIndex += meshedElements.size(); //manually advance the index based upon the replacement nodes
 		}
 	}
 
