@@ -16,16 +16,15 @@
 
 package io.guise.mesh;
 
+import static com.globalmentor.io.IO.*;
 import static com.globalmentor.xml.XmlDom.*;
-import static java.lang.String.format;
-import static java.util.Arrays.*;
 import static java.util.Objects.*;
 import static org.zalando.fauxpas.FauxPas.*;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
-import java.util.stream.Stream;
 
 import javax.annotation.*;
 
@@ -52,12 +51,15 @@ public class GuiseMesh {
 
 	/** The attribute <code>mx:each</code> for iteration source. */
 	public static final NsName ATTRIBUTE_EACH = NsName.of(NAMESPACE_STRING, "each");
+
 	/** The attribute <code>mx:index-var</code> for identifying the index variable for iteration. */
-
 	public static final NsName ATTRIBUTE_INDEX_VAR = NsName.of(NAMESPACE_STRING, "index-var");
-	/** The attribute <code>mx:item-var</code> for identifying the item variable for iteration. */
 
+	/** The attribute <code>mx:item-var</code> for identifying the item variable for iteration. */
 	public static final NsName ATTRIBUTE_ITEM_VAR = NsName.of(NAMESPACE_STRING, "item-var");
+
+	/** The attribute <code>mx:iter-var</code> for identifying the state of iteration. */
+	public static final NsName ATTRIBUTE_ITER_VAR = NsName.of(NAMESPACE_STRING, "iter-var");
 
 	/** The attribute <code>mx:text</code> for text replacement. */
 	public static final NsName ATTRIBUTE_TEXT = NsName.of(NAMESPACE_STRING, "text");
@@ -69,6 +71,12 @@ public class GuiseMesh {
 	 * @see #ATTRIBUTE_ITEM_VAR
 	 */
 	public static final String DEFAULT_ITEM_VAR = "it";
+
+	/**
+	 * The default variable name for the state of iteration.
+	 * @see #ATTRIBUTE_ITER_VAR
+	 */
+	public static final String DEFAULT_ITER_VAR = "iter";
 
 	/**
 	 * The default variable name for an iteration index.
@@ -148,24 +156,32 @@ public class GuiseMesh {
 	 */
 	public List<Element> meshElement(@Nonnull MeshContext context, @Nonnull final Element element) throws IOException, MeshException, DOMException {
 		//# iteration
-		final Optional<List<Element>> iteration = exciseAttribute(element, ATTRIBUTE_EACH).map(throwingFunction(each -> { //mx:each
-			final Iterator<?> iterator = findExpressionResult(context, each).map(GuiseMesh::toIterator)
-					.orElseThrow(() -> new MeshException(format("Mesh each expression `%s` does not yield anything iterable.", each)));
-			final String itemVar = exciseAttribute(element, ATTRIBUTE_ITEM_VAR).orElse(DEFAULT_ITEM_VAR); //mx:item-var
-			final String indexVar = exciseAttribute(element, ATTRIBUTE_INDEX_VAR).orElse(DEFAULT_INDEX_VAR); //mx:index-var
-			final List<Element> result = new ArrayList<>();
-			//TODO enter scope
-			for(int index = 0; iterator.hasNext(); index++) {
-				final Object item = iterator.next();
-				context.setVariable(indexVar, index);
-				context.setVariable(itemVar, item);
-				final Element eachElement = (Element)element.cloneNode(true); //mesh a clone of this element; iteration attribute have been removed
-				result.addAll(meshElement(context, eachElement));
-			}
-			//TODO exit scope
-			return result;
-
-		}));
+		final Optional<List<Element>> iteration = exciseAttribute(element, ATTRIBUTE_EACH) //mx:each
+				.flatMap(each -> findExpressionResult(context, each)).map(throwingFunction(iterationSource -> {
+					try (final Closeable iterationSourceCleanup = toCloseable(iterationSource)) { //ensure the iteration source is closed, in case it uses resource e.g. a directory listing
+						final MeshIterator iterator;
+						try {
+							iterator = MeshIterator.fromIterationSource(iterationSource);
+						} catch(final IllegalArgumentException illegalArgumentException) {
+							throw new MeshException(illegalArgumentException.getMessage(), illegalArgumentException);
+						}
+						final String iterVar = exciseAttribute(element, ATTRIBUTE_ITER_VAR).orElse(DEFAULT_ITER_VAR); //mx:iter-var
+						final String itemVar = exciseAttribute(element, ATTRIBUTE_ITEM_VAR).orElse(DEFAULT_ITEM_VAR); //mx:item-var
+						final String indexVar = exciseAttribute(element, ATTRIBUTE_INDEX_VAR).orElse(DEFAULT_INDEX_VAR); //mx:index-var
+						final List<Element> result = new ArrayList<>();
+						//TODO enter scope
+						context.setVariable(iterVar, iterator);
+						while(iterator.hasNext()) {
+							final Object item = iterator.next();
+							context.setVariable(itemVar, item);
+							context.setVariable(indexVar, iterator.getIndex());
+							final Element eachElement = (Element)element.cloneNode(true); //mesh a clone of this element; iteration attribute have been removed
+							result.addAll(meshElement(context, eachElement));
+						}
+						//TODO exit scope
+						return result;
+					}
+				}));
 		if(iteration.isPresent()) { //if iteration occurred, the iterated items have already been recursively processed; return them
 			return iteration.get();
 		}
@@ -185,55 +201,6 @@ public class GuiseMesh {
 		//TODO remove all mx-related attributes
 
 		return List.of(element);
-	}
-
-	/**
-	 * Converts an iteration source object to an {@link Iterable}.
-	 * @apiNote Although a general conversion method would normally throw an {@link IllegalArgumentException}, this method throws a {@link MeshException} for
-	 *          convenience to the caller.
-	 * @implSpec This implementation supports the following source types:
-	 *           <ul>
-	 *           <li><code>Object[]</code> (of any non-primitive type)</li>
-	 *           <li><code>int[]</code></li>
-	 *           <li><code>long[]</code></li>
-	 *           <li><code>double[]</code></li>
-	 *           <li><code>{@link Iterable}</code></li>
-	 *           <li><code>{@link Iterator}</code></li>
-	 *           <li><code>{@link Enumeration}</code></li>
-	 *           <li><code>{@link Stream}</code></li>
-	 *           <li><code>{@link Map}</code> (returns iteration of {@link Entry}</li>
-	 *           <li><code>{@link Object}</code> (returns iteration of single object)</li>
-	 *           </ul>
-	 * @param object The iteration source object.
-	 * @return An iterator to the items in the iteration source.
-	 * @throws MeshException if the object is an array to an unsupported primitive type.
-	 */
-	protected static Iterator<?> toIterator(@Nonnull final Object object) throws MeshException {
-		if(object.getClass().isArray()) {
-			if(object instanceof Object[]) {
-				return asList((Object[])object).iterator();
-			} else if(object instanceof int[]) {
-				return stream((int[])object).iterator();
-			} else if(object instanceof long[]) {
-				return stream((long[])object).iterator();
-			} else if(object instanceof double[]) {
-				return stream((double[])object).iterator();
-			} else {
-				throw new MeshException(format("Iteration not supported on array of type %s: %s.", object.getClass().getComponentType().getName(), object));
-			}
-		} else if(object instanceof Iterable) {
-			return ((Iterable<?>)object).iterator();
-		} else if(object instanceof Iterator) {
-			return (Iterator<?>)object;
-		} else if(object instanceof Enumeration) {
-			return ((Enumeration<?>)object).asIterator();
-		} else if(object instanceof Stream) {
-			return ((Stream<?>)object).iterator();
-		} else if(object instanceof Map) {
-			return ((Map<?, ?>)object).entrySet().iterator();
-		} else {
-			return Set.of(object).iterator();
-		}
 	}
 
 	/**
