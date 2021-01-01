@@ -89,6 +89,29 @@ public class GuiseMeshTest {
 		}
 	}
 
+	/** <code>mx:each</code> */
+	@Test
+	void testMxEachNested() throws IOException {
+		for(final Optional<String> itemVarAttribute : List.of(Optional.<String>empty(), Optional.of("item"))) { //test both default and explicit item variable
+			final Document document = createXHTMLDocument("Test");
+			final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+			final Element outerUlElement = appendElement(bodyElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_UL));
+			final Element outerLiElement = appendElement(outerUlElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI));
+			setAttribute(outerLiElement, ATTRIBUTE_EACH.withPrefix(NAMESPACE_PREFIX), "outerList");
+			itemVarAttribute.ifPresent(itemVar -> setAttribute(outerLiElement, ATTRIBUTE_ITEM_VAR.withPrefix(NAMESPACE_PREFIX), itemVar));
+			//TODO improve to set outer text somewhere besides body content: setAttribute(outerLiElement, ATTRIBUTE_TEXT.withPrefix(NAMESPACE_PREFIX), itemVarAttribute.orElse(DEFAULT_ITEM_VAR));
+			final Element innerUlElement = appendElement(outerLiElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_UL));
+			final Element innerLiElement = appendElement(innerUlElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI));
+			setAttribute(innerLiElement, ATTRIBUTE_EACH.withPrefix(NAMESPACE_PREFIX), "innerList");
+			itemVarAttribute.ifPresent(itemVar -> setAttribute(innerLiElement, ATTRIBUTE_ITEM_VAR.withPrefix(NAMESPACE_PREFIX), itemVar));
+			setAttribute(innerLiElement, ATTRIBUTE_TEXT.withPrefix(NAMESPACE_PREFIX), itemVarAttribute.orElse(DEFAULT_ITEM_VAR));
+			new GuiseMesh().meshDocument(MeshContext.create(Map.of("outerList", List.of("1", "2"), "innerList", List.of("A", "B"))), document);
+			assertThat("TODO Outer item variable is shadowed but returns after nested inner iteration.", new HtmlSerializer().serialize(document),
+					is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test</title></head><body><ul><li><ul><li>A</li><li>B</li></ul></li>"
+							+ "<li><ul><li>A</li><li>B</li></ul></li></ul></body></html>"));
+		}
+	}
+
 	/** <code>mx:text</code> */
 	@Test
 	void testMxText() throws IOException {
