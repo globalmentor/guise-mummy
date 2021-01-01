@@ -454,7 +454,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			final Document templatedDocument = applyTemplate(context, contextArtifact, artifact, normalizedDocument);
 
 			//#mesh document: evaluate MEXL expressions and perform transformations
-			final MeshContext meshContext = new MapMeshContext();
+			final MeshContext meshContext = new DefaultMeshContext();
 			meshContext.setVariable(MESH_CONTEXT_VARIABLE_ARTIFACT, artifact);
 			meshContext.setVariable(MESH_CONTEXT_VARIABLE_PAGE, artifact.getResourceDescription());
 			final Document meshedDocument = getGuiseMesh().meshDocument(meshContext, templatedDocument);

@@ -16,38 +16,66 @@
 
 package io.guise.mesh;
 
-import java.util.Optional;
+import java.util.*;
 
 import javax.annotation.*;
 
 /**
- * Provides information about context of DOM meshing, including variable lookup. <code>null</code> variable values are not permitted.
+ * Provides information about context of DOM meshing, including variable lookup.
+ * <p>
+ * As a Mesh scope, a Mesh context allows lookup of variables all the way up the scope chain, resolving variables across nested scopes.
+ * </p>
  * @author Garret Wilson
  */
-public interface MeshContext {
+public interface MeshContext extends MeshScope {
 
 	/**
-	 * Looks up a named variable in the current context.
-	 * @param name The name of the variable to find.
-	 * @return The value of the variable if present.
+	 * {@inheritDoc} The context will search for the variable up the nested scope chain, returning the first variable it finds.
 	 */
+	@Override
 	public Optional<Object> findVariable(@Nonnull String name);
 
 	/**
-	 * Determines whether a variable with the given name exists in the given context.
-	 * @implSpec The default implementation delegates to {@link #findVariable(String)}.
-	 * @param name The name of the variable to check for.
-	 * @return <code>true</code> if the named variable exists.
+	 * {@inheritDoc} The context will search for the variable up the nested scope chain.
 	 */
-	public default boolean hasVariable(@Nonnull final String name) {
-		return findVariable(name).isPresent();
+	@Override
+	public boolean hasVariable(@Nonnull final String name);
+
+	/**
+	 * {@inheritDoc} The context sets the variable in the current context scope in the nested scope chain.
+	 */
+	@Override
+	public void setVariable(@Nonnull String name, @Nonnull Object value);
+
+	/**
+	 * Creates a new default context with the given variables.
+	 * @implSpec A {@link DefaultMeshContext} will be created.
+	 * @param map The map of variables with which to initialize the root scope.
+	 * @return A new context with the given variables in the root scope.
+	 * @see MeshScope#create(Map)
+	 */
+	public static MeshContext create(@Nonnull final Map<String, Object> map) {
+		return new DefaultMeshContext(MeshScope.create(map));
 	}
 
 	/**
-	 * Sets a variable in the context. If the variable already exists, its previous value will be lost.
-	 * @param name The name of the variable to set.
-	 * @param value The new variable value, which must not be <code>null</code>.
+	 * Creates and adds a new nested scope to the scope chain.
+	 * @return An encapsulation of the nested scope, allowing scope closure and removal.
 	 */
-	public void setVariable(@Nonnull String name, @Nonnull Object value);
+	public ScopeNesting nestScope();
+
+	public interface ScopeNesting extends AutoCloseable {
+
+		/** @return The nested scope. */
+		public MeshScope getScope();
+
+		/**
+		 * Closes and discards the scope and all its nested scopes. The context scope will revert to the parent scope.
+		 * @throws IllegalStateException if the scope one of its parents has already been closed.
+		 */
+		@Override
+		public void close();
+
+	}
 
 }

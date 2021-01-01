@@ -49,10 +49,7 @@ public class GuiseMeshTest {
 			setAttribute(liElement, ATTRIBUTE_EACH.withPrefix(NAMESPACE_PREFIX), "list");
 			indexVarAttribute.ifPresent(indexVar -> setAttribute(liElement, ATTRIBUTE_INDEX_VAR.withPrefix(NAMESPACE_PREFIX), indexVar));
 			setAttribute(liElement, ATTRIBUTE_TEXT.withPrefix(NAMESPACE_PREFIX), indexVarAttribute.orElse(DEFAULT_INDEX_VAR)); //mx:text for updating value
-			final GuiseMesh guiseMesh = new GuiseMesh();
-			final MeshContext meshContext = new MapMeshContext();
-			meshContext.setVariable("list", List.of("foo", "bar"));
-			guiseMesh.meshDocument(meshContext, document);
+			new GuiseMesh().meshDocument(MeshContext.create(Map.of("list", List.of("foo", "bar"))), document);
 			assertThat(new HtmlSerializer().serialize(document),
 					is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test</title></head><body><ul><li>0</li><li>1</li></ul></body></html>"));
 		}
@@ -69,10 +66,7 @@ public class GuiseMeshTest {
 			setAttribute(liElement, ATTRIBUTE_EACH.withPrefix(NAMESPACE_PREFIX), "list");
 			itemVarAttribute.ifPresent(itemVar -> setAttribute(liElement, ATTRIBUTE_ITEM_VAR.withPrefix(NAMESPACE_PREFIX), itemVar));
 			setAttribute(liElement, ATTRIBUTE_TEXT.withPrefix(NAMESPACE_PREFIX), itemVarAttribute.orElse(DEFAULT_ITEM_VAR)); //mx:text for updating value
-			final GuiseMesh guiseMesh = new GuiseMesh();
-			final MeshContext meshContext = new MapMeshContext();
-			meshContext.setVariable("list", List.of("foo", "bar"));
-			guiseMesh.meshDocument(meshContext, document);
+			new GuiseMesh().meshDocument(MeshContext.create(Map.of("list", List.of("foo", "bar"))), document);
 			assertThat(new HtmlSerializer().serialize(document),
 					is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test</title></head><body><ul><li>foo</li><li>bar</li></ul></body></html>"));
 		}
@@ -89,10 +83,7 @@ public class GuiseMeshTest {
 			setAttribute(liElement, ATTRIBUTE_EACH.withPrefix(NAMESPACE_PREFIX), "list");
 			iterVarAttribute.ifPresent(iterVar -> setAttribute(liElement, ATTRIBUTE_ITER_VAR.withPrefix(NAMESPACE_PREFIX), iterVar));
 			setAttribute(liElement, ATTRIBUTE_TEXT.withPrefix(NAMESPACE_PREFIX), iterVarAttribute.orElse(DEFAULT_ITER_VAR) + ".current"); //mx:text for updating value
-			final GuiseMesh guiseMesh = new GuiseMesh();
-			final MeshContext meshContext = new MapMeshContext();
-			meshContext.setVariable("list", List.of("foo", "bar"));
-			guiseMesh.meshDocument(meshContext, document);
+			new GuiseMesh().meshDocument(MeshContext.create(Map.of("list", List.of("foo", "bar"))), document);
 			assertThat(new HtmlSerializer().serialize(document),
 					is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test</title></head><body><ul><li>foo</li><li>bar</li></ul></body></html>"));
 		}
@@ -105,9 +96,7 @@ public class GuiseMeshTest {
 		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
 		final Element h1Element = appendElement(bodyElement, ELEMENT_H(1), "Dummy Heading");
 		setAttribute(h1Element, ATTRIBUTE_TEXT.withPrefix(NAMESPACE_PREFIX), "'Result: '+foo.bar");
-		final GuiseMesh guiseMesh = new GuiseMesh();
-		final MeshContext meshContext = new MapMeshContext(Map.of("foo", Map.of("bar", "Success")));
-		guiseMesh.meshDocument(meshContext, document);
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("foo", Map.of("bar", "Success"))), document);
 		assertThat(h1Element.getTextContent(), is("Result: Success"));
 		assertThat(hasAttribute(h1Element, ATTRIBUTE_TEXT), is(false));
 		assertThat(new HtmlSerializer().serialize(document),

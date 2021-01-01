@@ -169,16 +169,16 @@ public class GuiseMesh {
 						final String itemVar = exciseAttribute(element, ATTRIBUTE_ITEM_VAR).orElse(DEFAULT_ITEM_VAR); //mx:item-var
 						final String indexVar = exciseAttribute(element, ATTRIBUTE_INDEX_VAR).orElse(DEFAULT_INDEX_VAR); //mx:index-var
 						final List<Element> result = new ArrayList<>();
-						//TODO enter scope
-						context.setVariable(iterVar, iterator);
-						while(iterator.hasNext()) {
-							final Object item = iterator.next();
-							context.setVariable(itemVar, item);
-							context.setVariable(indexVar, iterator.getIndex());
-							final Element eachElement = (Element)element.cloneNode(true); //mesh a clone of this element; iteration attribute have been removed
-							result.addAll(meshElement(context, eachElement));
+						try (final MeshContext.ScopeNesting scopeNesting = context.nestScope()) {
+							context.setVariable(iterVar, iterator);
+							while(iterator.hasNext()) {
+								final Object item = iterator.next();
+								context.setVariable(itemVar, item);
+								context.setVariable(indexVar, iterator.getIndex());
+								final Element eachElement = (Element)element.cloneNode(true); //mesh a clone of this element; iteration attribute have been removed
+								result.addAll(meshElement(context, eachElement));
+							}
 						}
-						//TODO exit scope
 						return result;
 					}
 				}));
