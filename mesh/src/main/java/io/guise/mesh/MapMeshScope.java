@@ -23,10 +23,11 @@ import java.util.*;
 import javax.annotation.*;
 
 /**
- * A simple mesh context using a {@link Map} to back variable storage.
+ * A simple mesh scope using a {@link Map} to back variable storage.
+ * @implNote This implementation is not thread safe.
  * @author Garret Wilson
  */
-public class MapMeshContext implements MeshContext {
+public class MapMeshScope implements MeshScope {
 
 	private final Map<String, Object> map;
 
@@ -34,7 +35,7 @@ public class MapMeshContext implements MeshContext {
 	 * Default map constructor
 	 * @implSpec A default {@link HashMap} is used.
 	 */
-	public MapMeshContext() {
+	public MapMeshScope() {
 		this(new HashMap<>());
 	}
 
@@ -42,7 +43,7 @@ public class MapMeshContext implements MeshContext {
 	 * Map constructor.
 	 * @param map The map to be used to back variable storage.
 	 */
-	public MapMeshContext(@Nonnull final Map<String, Object> map) {
+	public MapMeshScope(@Nonnull final Map<String, Object> map) {
 		this.map = requireNonNull(map);
 	}
 

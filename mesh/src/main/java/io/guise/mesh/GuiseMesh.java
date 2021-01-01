@@ -16,9 +16,12 @@
 
 package io.guise.mesh;
 
+import static com.globalmentor.io.IO.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static java.util.Objects.*;
+import static org.zalando.fauxpas.FauxPas.*;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
@@ -44,8 +47,42 @@ public class GuiseMesh {
 	/** The typical prefix used for the namespace of Guise Mesh elements, such as in an XHTML document or in RDFa metadata. */
 	public static final String NAMESPACE_PREFIX = "mx";
 
+	//# attributes
+
+	/** The attribute <code>mx:each</code> for iteration source. */
+	public static final NsName ATTRIBUTE_EACH = NsName.of(NAMESPACE_STRING, "each");
+
+	/** The attribute <code>mx:index-var</code> for identifying the index variable for iteration. */
+	public static final NsName ATTRIBUTE_INDEX_VAR = NsName.of(NAMESPACE_STRING, "index-var");
+
+	/** The attribute <code>mx:item-var</code> for identifying the item variable for iteration. */
+	public static final NsName ATTRIBUTE_ITEM_VAR = NsName.of(NAMESPACE_STRING, "item-var");
+
+	/** The attribute <code>mx:iter-var</code> for identifying the state of iteration. */
+	public static final NsName ATTRIBUTE_ITER_VAR = NsName.of(NAMESPACE_STRING, "iter-var");
+
 	/** The attribute <code>mx:text</code> for text replacement. */
 	public static final NsName ATTRIBUTE_TEXT = NsName.of(NAMESPACE_STRING, "text");
+
+	//## attribute default values
+
+	/**
+	 * The default variable name for an iteration item.
+	 * @see #ATTRIBUTE_ITEM_VAR
+	 */
+	public static final String DEFAULT_ITEM_VAR = "it";
+
+	/**
+	 * The default variable name for the state of iteration.
+	 * @see #ATTRIBUTE_ITER_VAR
+	 */
+	public static final String DEFAULT_ITER_VAR = "iter";
+
+	/**
+	 * The default variable name for an iteration index.
+	 * @see #ATTRIBUTE_INDEX_VAR
+	 */
+	public static final String DEFAULT_INDEX_VAR = "i";
 
 	private final MexlEvaluator evaluator;
 
@@ -65,7 +102,7 @@ public class GuiseMesh {
 	 * @return The result of the expression, which will be empty if the expression evaluated to <code>null</code>.
 	 * @throws MexlException if there was an error parsing or otherwise processing the expression.
 	 */
-	protected Optional<Object> findResult(@Nonnull final MeshContext context, @Nonnull final String expression) throws MexlException {
+	protected Optional<Object> findExpressionResult(@Nonnull final MeshContext context, @Nonnull final String expression) throws MexlException {
 		final Object result = getEvaluator().evaluate(context, expression);
 		@SuppressWarnings("unchecked")
 		final Optional<Object> optionalResult = result instanceof Optional ? (Optional<Object>)result : Optional.ofNullable(result);
@@ -118,21 +155,50 @@ public class GuiseMesh {
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	public List<Element> meshElement(@Nonnull MeshContext context, @Nonnull final Element element) throws IOException, MeshException, DOMException {
-		//TODO iteration
+		//# iteration
+		final Optional<List<Element>> iteration = exciseAttribute(element, ATTRIBUTE_EACH) //mx:each
+				.flatMap(each -> findExpressionResult(context, each)).map(throwingFunction(iterationSource -> {
+					try (final Closeable iterationSourceCleanup = toCloseable(iterationSource)) { //ensure the iteration source is closed, in case it uses resource e.g. a directory listing
+						final MeshIterator iterator;
+						try {
+							iterator = MeshIterator.fromIterationSource(iterationSource);
+						} catch(final IllegalArgumentException illegalArgumentException) {
+							throw new MeshException(illegalArgumentException.getMessage(), illegalArgumentException);
+						}
+						final String iterVar = exciseAttribute(element, ATTRIBUTE_ITER_VAR).orElse(DEFAULT_ITER_VAR); //mx:iter-var
+						final String itemVar = exciseAttribute(element, ATTRIBUTE_ITEM_VAR).orElse(DEFAULT_ITEM_VAR); //mx:item-var
+						final String indexVar = exciseAttribute(element, ATTRIBUTE_INDEX_VAR).orElse(DEFAULT_INDEX_VAR); //mx:index-var
+						final List<Element> result = new ArrayList<>();
+						try (final MeshContext.ScopeNesting scopeNesting = context.nestScope()) {
+							context.setVariable(iterVar, iterator);
+							while(iterator.hasNext()) {
+								final Object item = iterator.next();
+								context.setVariable(itemVar, item);
+								context.setVariable(indexVar, iterator.getIndex());
+								final Element eachElement = (Element)element.cloneNode(true); //mesh a clone of this element; iteration attribute have been removed
+								result.addAll(meshElement(context, eachElement));
+							}
+						}
+						return result;
+					}
+				}));
+		if(iteration.isPresent()) { //if iteration occurred, the iterated items have already been recursively processed; return them
+			return iteration.get();
+		}
+
 		//TODO conditions
 		//TODO general attributes
 		//TODO specific attributes
 
-		//text
-		findAttribute(element, ATTRIBUTE_TEXT).ifPresent(text -> {
-			final Optional<Object> foundResult = findResult(context, text);
+		//# text
+		exciseAttribute(element, ATTRIBUTE_TEXT).ifPresent(text -> { //mx:text
+			final Optional<Object> foundResult = findExpressionResult(context, text);
 			element.setTextContent(foundResult.map(Object::toString).orElse(""));
-			removeAttribute(element, ATTRIBUTE_TEXT);
 		});
 
 		meshChildElements(context, element);
 
-		//TODO remove mx-related attributes
+		//TODO remove all mx-related attributes
 
 		return List.of(element);
 	}
