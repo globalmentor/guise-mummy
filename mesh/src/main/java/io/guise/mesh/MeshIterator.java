@@ -131,7 +131,7 @@ public class MeshIterator implements Iterator<Object> {
 	 *           <li><code>{@link Iterator}</code></li>
 	 *           <li><code>{@link Enumeration}</code></li>
 	 *           <li><code>{@link Stream}</code></li>
-	 *           <li><code>{@link Map}</code> (returns iteration of {@link Map.Entry}</li>
+	 *           <li><code>{@link Map}</code> (returns iteration of {@link Map.Entry})</li>
 	 *           <li><code>{@link Object}</code> (returns iteration of single object)</li>
 	 *           </ul>
 	 * @param source The source of iteration.
@@ -154,7 +154,7 @@ public class MeshIterator implements Iterator<Object> {
 	 *           <li><code>{@link Iterator}</code></li>
 	 *           <li><code>{@link Enumeration}</code></li>
 	 *           <li><code>{@link Stream}</code></li>
-	 *           <li><code>{@link Map}</code> (returns iteration of {@link Map.Entry}</li>
+	 *           <li><code>{@link Map}</code> (returns iteration of {@link Map.Entry})</li>
 	 *           <li><code>{@link Object}</code> (returns iteration of single object)</li>
 	 *           </ul>
 	 * @param object The iteration source object.
