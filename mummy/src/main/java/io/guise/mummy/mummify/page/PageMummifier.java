@@ -58,6 +58,8 @@ public interface PageMummifier extends Mummifier {
 	/** The attribute for regenerating an element, such as a navigation list. */
 	public static final NsName ATTRIBUTE_REGENERATE = NsName.of(NAMESPACE_STRING, "regenerate");
 
+	//Guise Mesh context variables
+
 	/** The Guise Mesh context variable name for exposing the current artifact. */
 	public static final String MESH_CONTEXT_VARIABLE_ARTIFACT = "artifact";
 
@@ -66,6 +68,12 @@ public interface PageMummifier extends Mummifier {
 	 * @see Artifact#getResourceDescription()
 	 */
 	public static final String MESH_CONTEXT_VARIABLE_PAGE = "page";
+
+	/**
+	 * The Guise Mesh context variable name for exposing the site plan.
+	 * @see MummyContext#getPlan()
+	 */
+	public static final String MESH_CONTEXT_VARIABLE_PLAN = "plan";
 
 	/**
 	 * Determines whether the given artifact is marked as an <dfn>asset</dfn>.
@@ -106,15 +114,15 @@ public interface PageMummifier extends Mummifier {
 	 * artifact has child artifacts.
 	 * @apiNote This method finds the parent navigation artifact independent of any <code>.navigation.lst</code> file.
 	 * @implSpec The default implementation returns the context artifact itself if it is an instance of {@link CollectionArtifact}; otherwise the parent artifact,
-	 *           if any, is returned by calling {@link MummyContext#findParentArtifact(Artifact)}.
+	 *           if any, is returned by calling {@link MummyPlan#findParentArtifact(Artifact)}.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @return The artifacts for navigation to the parent of the current navigation level.
 	 * @see #childNavigationArtifacts(MummyContext, Artifact)
-	 * @see MummyContext#findParentArtifact(Artifact)
+	 * @see MummyPlan#findParentArtifact(Artifact)
 	 */
 	public default Optional<Artifact> findParentNavigationArtifact(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
-		return contextArtifact instanceof CollectionArtifact ? Optional.of(contextArtifact) : context.findParentArtifact(contextArtifact);
+		return contextArtifact instanceof CollectionArtifact ? Optional.of(contextArtifact) : context.getPlan().findParentArtifact(contextArtifact);
 	}
 
 	/**
@@ -124,21 +132,21 @@ public interface PageMummifier extends Mummifier {
 	 *          parent.
 	 * @apiNote This method allows access to child navigation artifacts independent of any explicit navigation list override defined by the user. It is thus
 	 *          appropriate for access by a directory widget, for example, to provide custom navigation independent of any <code>.navigation.lst</code> file.
-	 * @implSpec The default implementation retrieves candidate resources using {@link MummyContext#childArtifacts(Artifact)} if the artifact is a
-	 *           {@link CollectionArtifact}; otherwise it calls {@link MummyContext#siblingArtifacts(Artifact)}. Only artifacts that are not assets and are not
+	 * @implSpec The default implementation retrieves candidate resources using {@link MummyPlan#childArtifacts(Artifact)} if the artifact is a
+	 *           {@link CollectionArtifact}; otherwise it calls {@link MummyPlan#siblingArtifacts(Artifact)}. Only artifacts that are not assets and are not
 	 *           veiled are included.
 	 * @param context The context of static site generation.
 	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @return The artifacts for subsequent navigation from this artifact.
 	 * @see #findParentNavigationArtifact(MummyContext, Artifact)
-	 * @see MummyContext#childArtifacts(Artifact)
-	 * @see MummyContext#siblingArtifacts(Artifact)
+	 * @see MummyPlan#childArtifacts(Artifact)
+	 * @see MummyPlan#siblingArtifacts(Artifact)
 	 * @see #isAsset(MummyContext, Artifact)
 	 * @see #isVeiled(MummyContext, Artifact)
 	 */
 	public default Stream<Artifact> childNavigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
-		final Stream<Artifact> candidateArtifacts = contextArtifact instanceof CollectionArtifact ? context.childArtifacts(contextArtifact)
-				: context.siblingArtifacts(contextArtifact);
+		final Stream<Artifact> candidateArtifacts = contextArtifact instanceof CollectionArtifact ? context.getPlan().childArtifacts(contextArtifact)
+				: context.getPlan().siblingArtifacts(contextArtifact);
 		return candidateArtifacts.filter(Artifact::isNavigable).filter(artifact -> !isAsset(context, artifact)).filter(artifact -> !isVeiled(context, artifact));
 	}
 

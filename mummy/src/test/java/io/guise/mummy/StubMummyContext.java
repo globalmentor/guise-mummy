@@ -45,6 +45,11 @@ public class StubMummyContext extends BaseMummyContext {
 	}
 
 	@Override
+	public MummyPlan getPlan() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public boolean isFull() {
 		return true;
 	}

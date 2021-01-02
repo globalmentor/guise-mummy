@@ -24,7 +24,6 @@ import static java.util.Objects.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
 
 import javax.annotation.*;
 import javax.xml.parsers.*;
@@ -83,35 +82,6 @@ public abstract class BaseMummyContext implements MummyContext {
 			return true;
 		}
 		return false;
-	}
-
-	private final Map<Artifact, Artifact> parentArtifactsByArtifact = new HashMap<>();
-
-	@Override
-	public Optional<Artifact> findParentArtifact(final Artifact artifact) {
-		return Optional.ofNullable(parentArtifactsByArtifact.get(requireNonNull(artifact)));
-	}
-
-	private final Map<Path, Artifact> artifactsByReferenceSourcePath = new HashMap<>();
-
-	@Override
-	public Optional<Artifact> findArtifactBySourceReference(final Path referenceSourcePath) {
-		return Optional.ofNullable(artifactsByReferenceSourcePath.get(checkArgumentAbsolute(referenceSourcePath)));
-	}
-
-	/**
-	 * Recursively updates the mummification plan for the given artifact. Parent artifacts are updated in the map, for example.
-	 * @param artifact The artifact the plan of which to update.
-	 */
-	protected void updatePlan(@Nonnull final Artifact artifact) {
-		requireNonNull(artifact);
-		artifact.getReferentSourcePaths().forEach(referenceSourcePath -> artifactsByReferenceSourcePath.put(referenceSourcePath, artifact));
-		if(artifact instanceof CollectionArtifact) {
-			for(final Artifact childArtifact : ((CollectionArtifact)artifact).getChildArtifacts()) {
-				parentArtifactsByArtifact.put(childArtifact, artifact); //map the parent to the child
-				updatePlan(childArtifact); //recursively update the plan for the children
-			}
-		}
 	}
 
 	//factory methods
