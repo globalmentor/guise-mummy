@@ -28,6 +28,8 @@ import javax.annotation.*;
  */
 public interface ArtifactQuery extends Iterable<Artifact> {
 
+	//from
+
 	/**
 	 * Initially queries children of a given artifact.
 	 * @param artifact The artifact for which children should be queried.
@@ -51,5 +53,24 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	 * @return This artifact query.
 	 */
 	public ArtifactQuery fromLevelOf(@Nonnull Artifact artifact);
+
+	//order by
+
+	/**
+	 * Indicates that artifacts should be returned in ascending order of their target filenames, in addition to previously specified orders if any.
+	 * @apiNote This filename ordering is irrespective of target path; that is, only the filename itself will be examined.
+	 * @return This artifact query.
+	 * @see Artifact#getTargetPath()
+	 */
+	public ArtifactQuery orderByName();
+
+	/**
+	 * Reverses the last specified ordering.
+	 * @apiNote Calling this method multiple times will switch the ordering each time. For example calling this method twice subsequently will result in the same
+	 *          ordering as before the calls.
+	 * @throws IllegalStateException if no ordering has been indicated previously.
+	 * @return This artifact query.
+	 */
+	public ArtifactQuery reversedOrder();
 
 }

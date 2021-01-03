@@ -16,13 +16,16 @@
 
 package io.guise.mummy;
 
+import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
 import static java.util.Objects.*;
 
-import java.util.Iterator;
+import java.util.*;
 import java.util.stream.Stream;
 
 import javax.annotation.*;
+
+import com.globalmentor.io.Filenames;
 
 /**
  * Base functionality for implementing an artifact query.
@@ -31,6 +34,8 @@ import javax.annotation.*;
 public abstract class BaseArtifactQuery implements ArtifactQuery {
 
 	private Stream<Artifact> stream = null;
+
+	private Comparator<Artifact> comparator;
 
 	/**
 	 * Sets the stream to provide the source of artifacts for later filtering an other operations. The stream can only be set once for the query.
@@ -50,7 +55,41 @@ public abstract class BaseArtifactQuery implements ArtifactQuery {
 	@Override
 	public Iterator<Artifact> iterator() {
 		checkState(this.stream != null, "Query has not been initialized by calling a `fromXXX()` method.");
+		//from
+		Stream<Artifact> stream = this.stream;
+		//order by
+		if(comparator != null) {
+			stream = stream.sorted(comparator);
+		}
 		return stream.iterator();
+	}
+
+	//order by
+
+	/**
+	 * Sets or adds a sorting order to the artifacts to be returned by the query. If no sorting has been specified, the given comparator indicates the order. If a
+	 * sorting has already been specified, the given comparator indicates the subordinate (e.g. secondary) ordering.
+	 * @param comparator The comparator specifying the sort ordering of the artifacts.
+	 */
+	@SuppressWarnings("unchecked")
+	protected void addComparator(@Nonnull final Comparator<? super Artifact> comparator) {
+		this.comparator = this.comparator == null ? (Comparator<Artifact>)requireNonNull(comparator) : this.comparator.thenComparing(comparator);
+	}
+
+	@Override
+	public ArtifactQuery orderByName() {
+		addComparator(Comparator.comparing(artifact -> findFilename(artifact.getTargetPath()).orElse(""), Filenames.comparator()));
+		return this;
+	}
+
+	/**
+	 * {@inheritDoc} This implementation adds a comparator using {@link #addComparator(Comparator)}.
+	 */
+	@Override
+	public ArtifactQuery reversedOrder() {
+		checkState(this.comparator != null, "Cannot reverse the order, as no order has been specified.");
+		addComparator(this.comparator.reversed());
+		return this;
 	}
 
 }
