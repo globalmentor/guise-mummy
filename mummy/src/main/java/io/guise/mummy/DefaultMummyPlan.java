@@ -91,7 +91,7 @@ public class DefaultMummyPlan implements MummyPlan {
 		 * @implNote This implementation does not currently work with a detail artifact of a main context artifact, such as an index file of a directory.
 		 */
 		@Override
-		public ArtifactQuery childrenOf(final Artifact artifact) {
+		public ArtifactQuery fromChildrenOf(final Artifact artifact) {
 			setStream(childArtifacts(artifact));
 			return this;
 		}
@@ -101,13 +101,13 @@ public class DefaultMummyPlan implements MummyPlan {
 		 * @implNote This implementation does not currently work with a detail artifact of a main context artifact, such as an index file of a directory.
 		 */
 		@Override
-		public ArtifactQuery siblingsOf(final Artifact artifact) {
+		public ArtifactQuery fromSiblingsOf(final Artifact artifact) {
 			setStream(siblingArtifacts(artifact));
 			return this;
 		}
 
 		@Override
-		public ArtifactQuery atLevelOf(final Artifact artifact) {
+		public ArtifactQuery fromLevelOf(final Artifact artifact) {
 			//return the children of the artifact for this artifact's source directory (either its parent directory or itself if it represents a directory)
 			setStream(findArtifactBySourceReference(artifact.getSourceDirectory()).map(DefaultMummyPlan.this::childArtifacts).orElse(Stream.empty()));
 			return this;

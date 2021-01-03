@@ -49,7 +49,7 @@ public abstract class BaseArtifactQuery implements ArtifactQuery {
 	 */
 	@Override
 	public Iterator<Artifact> iterator() {
-		checkState(this.stream != null, "Query not initialized with an artifact source stream.");
+		checkState(this.stream != null, "Query has not been initialized by calling a `fromXXX()` method.");
 		return stream.iterator();
 	}
 

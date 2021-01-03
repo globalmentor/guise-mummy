@@ -20,6 +20,9 @@ import javax.annotation.*;
 
 /**
  * A means for querying artifacts.
+ * <p>
+ * A query requires an initial specification of the source of annotations by using a <code>from…()</code> method such as {@link #fromLevelOf(Artifact)}.
+ * </p>
  * @apiNote An artifact query could be considered a query builder; its methods mutate the query, and a call to {@link #iterator()} actually performs the query.
  * @author Garret Wilson
  */
@@ -30,7 +33,7 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	 * @param artifact The artifact for which children should be queried.
 	 * @return This artifact query.
 	 */
-	public ArtifactQuery childrenOf(@Nonnull Artifact artifact);
+	public ArtifactQuery fromChildrenOf(@Nonnull Artifact artifact);
 
 	/**
 	 * Initially queries siblings of a given artifact. An artifact will not have siblings if it has no parent. If any artifacts are included, the returned
@@ -38,7 +41,7 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	 * @param artifact The artifact for which siblings should be queried.
 	 * @return This artifact query.
 	 */
-	public ArtifactQuery siblingsOf(@Nonnull Artifact artifact);
+	public ArtifactQuery fromSiblingsOf(@Nonnull Artifact artifact);
 
 	/**
 	 * Initially queries artifacts at the same level of the given artifact. The given artifact itself may be included, depending on whether the artifact is a
@@ -47,6 +50,6 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	 * @param artifact The artifact for which artifacts at the same level should be queried.
 	 * @return This artifact query.
 	 */
-	public ArtifactQuery atLevelOf(@Nonnull Artifact artifact);
+	public ArtifactQuery fromLevelOf(@Nonnull Artifact artifact);
 
 }
