@@ -130,4 +130,10 @@ public interface MummyPlan {
 		return findArtifactBySourceReference(referenceSourcePath);
 	}
 
+	/**
+	 * Creates a general query for artifacts in the plan.
+	 * @return An artifact query for subsequent configuration and execution.
+	 */
+	public ArtifactQuery queryArtifacts();
+
 }

@@ -16,13 +16,12 @@
 
 package io.guise.mummy;
 
-import static com.globalmentor.io.Paths.checkArgumentAbsolute;
+import static com.globalmentor.io.Paths.*;
 import static java.util.Objects.*;
 
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Stream;
 
 import javax.annotation.*;
 
@@ -75,6 +74,45 @@ public class DefaultMummyPlan implements MummyPlan {
 	public DefaultMummyPlan(@Nonnull final Artifact rootArtifact) {
 		this.rootArtifact = requireNonNull(rootArtifact);
 		initialize(rootArtifact);
+	}
+
+	@Override
+	public ArtifactQuery queryArtifacts() {
+		return new DefaultArtifactQuery();
+	}
+
+	/**
+	 * Artifact query implementation using this plan.
+	 */
+	protected class DefaultArtifactQuery extends BaseArtifactQuery {
+
+		/**
+		 * {@inheritDoc}
+		 * @implNote This implementation does not currently work with a detail artifact of a main context artifact, such as an index file of a directory.
+		 */
+		@Override
+		public ArtifactQuery childrenOf(final Artifact artifact) {
+			setStream(childArtifacts(artifact));
+			return this;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 * @implNote This implementation does not currently work with a detail artifact of a main context artifact, such as an index file of a directory.
+		 */
+		@Override
+		public ArtifactQuery siblingsOf(final Artifact artifact) {
+			setStream(siblingArtifacts(artifact));
+			return this;
+		}
+
+		@Override
+		public ArtifactQuery atLevelOf(final Artifact artifact) {
+			//return the children of the artifact for this artifact's source directory (either its parent directory or itself if it represents a directory)
+			setStream(findArtifactBySourceReference(artifact.getSourceDirectory()).map(DefaultMummyPlan.this::childArtifacts).orElse(Stream.empty()));
+			return this;
+		}
+
 	}
 
 }
