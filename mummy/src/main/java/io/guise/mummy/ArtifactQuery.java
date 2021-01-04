@@ -54,6 +54,17 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	 */
 	public ArtifactQuery fromLevelOf(@Nonnull Artifact artifact);
 
+	//filter
+
+	/**
+	 * Filters artifacts by base content type.
+	 * @param contentTypeMatch A base content type matching string, supporting the wildcard <code>*</code> character for the subtype, such as
+	 *          <code>image/jpeg</code> or <code>image/*</code>.
+	 * @return This artifact query.
+	 * @throws IllegalStateException if the query has not yet been initialized with an artifact source.
+	 */
+	public ArtifactQuery filterContentType(@Nonnull final CharSequence contentTypeMatch);
+
 	//order by
 
 	/**

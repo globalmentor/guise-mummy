@@ -18,14 +18,19 @@ package io.guise.mummy;
 
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
+import static com.globalmentor.java.Objects.*;
 import static java.util.Objects.*;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import javax.annotation.*;
 
 import com.globalmentor.io.Filenames;
+import com.globalmentor.net.ContentType;
+
+import io.urf.vocab.content.Content;
 
 /**
  * Base functionality for implementing an artifact query.
@@ -62,6 +67,30 @@ public abstract class BaseArtifactQuery implements ArtifactQuery {
 			stream = stream.sorted(comparator);
 		}
 		return stream.iterator();
+	}
+
+	//filter
+
+	/**
+	 * Adds an additional filtering of artifacts.
+	 * @param predicate A predicate with which to filter the artifacts.
+	 * @throws IllegalStateException if the query has not yet been initialized with an artifact source stream.
+	 */
+	protected void addFilter(@Nonnull final Predicate<? super Artifact> predicate) {
+		checkState(this.stream != null, "Query has not been initialized by calling a `fromXXX()` method.");
+		this.stream = this.stream.filter(predicate);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation checks the artifact resource property from {@link Artifact#getResourceDescription()} using the property
+	 *           {@link Content#TYPE_PROPERTY_TAG}.
+	 */
+	@Override
+	public ArtifactQuery filterContentType(final CharSequence contentTypeMatch) {
+		addFilter(artifact -> artifact.getResourceDescription().findPropertyValue(Content.TYPE_PROPERTY_TAG).flatMap(asInstance(ContentType.class))
+				.map(mediaType -> mediaType.matches(contentTypeMatch)).orElse(false));
+		return this;
 	}
 
 	//order by
