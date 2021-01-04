@@ -269,7 +269,8 @@ public class NavigationManager implements Clogged {
 		//internal reference
 		final URIPath navigationReferencePath = URIs.findURIPath(navigationReference)
 				.orElseThrow(() -> new IllegalArgumentException(String.format("Navigation reference <%s> does not have a path.", navigationReference)));
-		final Optional<Artifact> foundNavigationArtifact = context.findArtifactBySourceRelativeReference(navigationListFileParent, navigationReferencePath);
+		final Optional<Artifact> foundNavigationArtifact = context.getPlan().findArtifactBySourceRelativeReference(navigationListFileParent,
+				navigationReferencePath);
 		if(!foundNavigationArtifact.isPresent()) {
 			getLogger().warn("No target artifact found for relative reference `{}`.", navigationReferencePath);
 		}

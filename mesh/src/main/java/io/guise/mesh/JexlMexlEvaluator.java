@@ -16,6 +16,7 @@
 
 package io.guise.mesh;
 
+import static java.lang.String.format;
 import static java.util.Objects.*;
 
 import java.util.*;
@@ -91,7 +92,7 @@ public class JexlMexlEvaluator implements MexlEvaluator {
 		try {
 			return jexl.createExpression(expression).evaluate(new MeshJexlContext(context));
 		} catch(final JexlException jexlException) {
-			throw new MexlException(jexlException.getMessage(), jexlException);
+			throw new MexlException(format("Error in MEXL expression `%s`: %s", expression, jexlException.getMessage()), jexlException);
 		}
 	}
 

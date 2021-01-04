@@ -18,6 +18,7 @@ package io.guise.mummy;
 
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.io.Paths.*;
+import static com.globalmentor.java.Conditions.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
@@ -294,7 +295,8 @@ public class GuiseMummy implements Clogged {
 		if(phase.compareTo(LifeCyclePhase.PLAN) >= 0) {
 			getLogger().info("Mummify phase: {}", LifeCyclePhase.PLAN); //TODO i18n
 			final Artifact rootArtifact = new DirectoryMummifier().plan(context, context.getSiteSourceDirectory(), context.getSiteTargetDirectory()); //TODO create special SiteMummifier extending DirectoryMummifier
-			context.updatePlan(rootArtifact);
+			final MummyPlan plan = new DefaultMummyPlan(rootArtifact);
+			context.setPlan(plan);
 
 			printArtifactDescription(context, rootArtifact);
 
@@ -420,12 +422,12 @@ public class GuiseMummy implements Clogged {
 			}
 		}
 
-		context.findParentArtifact(artifact).ifPresent(parent -> getLogger().trace("  parent: {}", parent.getTargetPath()));
-		final Collection<Artifact> siblings = context.siblingArtifacts(artifact).collect(toList()); //TODO make debugging calls more efficient, or transfer to describe functionality  
+		context.getPlan().findParentArtifact(artifact).ifPresent(parent -> getLogger().trace("  parent: {}", parent.getTargetPath()));
+		final Collection<Artifact> siblings = context.getPlan().siblingArtifacts(artifact).collect(toList()); //TODO make debugging calls more efficient, or transfer to describe functionality  
 		if(!siblings.isEmpty()) {
 			getLogger().trace("  siblings: {}", siblings);
 		}
-		final Collection<Artifact> children = context.childArtifacts(artifact).collect(toList());
+		final Collection<Artifact> children = context.getPlan().childArtifacts(artifact).collect(toList());
 		if(!children.isEmpty()) {
 			getLogger().trace("  children: {}", children);
 		}
@@ -558,6 +560,22 @@ public class GuiseMummy implements Clogged {
 		@Override
 		public boolean isFull() {
 			return GuiseMummy.this.isFull();
+		}
+
+		private MummyPlan plan = null;
+
+		@Override
+		public MummyPlan getPlan() {
+			checkState(plan != null, "Cannot retrieve plan before site has not yet been planned.");
+			return plan;
+		}
+
+		/**
+		 * Sets the site plan.
+		 * @param plan The plan for the site.
+		 */
+		protected void setPlan(@Nonnull final MummyPlan plan) {
+			this.plan = requireNonNull(plan);
 		}
 
 		//## deploy

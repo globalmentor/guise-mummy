@@ -455,6 +455,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 			//#mesh document: evaluate MEXL expressions and perform transformations
 			final MeshContext meshContext = new DefaultMeshContext();
+			meshContext.setVariable(MESH_CONTEXT_VARIABLE_PLAN, context.getPlan());
 			meshContext.setVariable(MESH_CONTEXT_VARIABLE_ARTIFACT, artifact);
 			meshContext.setVariable(MESH_CONTEXT_VARIABLE_PAGE, artifact.getResourceDescription());
 			final Document meshedDocument = getGuiseMesh().meshDocument(meshContext, templatedDocument);
@@ -1088,7 +1089,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			//see if the href is a relative link back to this artifact, and if so use the template for an active link;
 			final boolean isSelfHref = navigationItem.findHref().map(URI::create).filter(not(URI::isAbsolute)) //assume absolute (external) URIs do not reference this artifact
 					.filter(not(uri -> uri.getRawFragment() != null)) //ignore fragment references; the static page doesn't know when/if the browser includes the fragment
-					.flatMap(URIs::findURIPath).flatMap(relativeReference -> context.findArtifactBySourceRelativeReference(contextArtifact, relativeReference))
+					.flatMap(URIs::findURIPath).flatMap(relativeReference -> context.getPlan().findArtifactBySourceRelativeReference(contextArtifact, relativeReference))
 					.map(contextArtifact::equals).orElse(false);
 			final Element liTemplate = isSelfHref ? activeLiTemplate : inactiveLiTemplate;
 			final Element liElement = (Element)liTemplate.cloneNode(true);
@@ -1341,8 +1342,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 */
 	protected Optional<URIPath> retargetResourceReferencePath(@Nonnull MummyContext context, @Nonnull URIPath resourceReferencePath,
 			@Nonnull final Path originalReferrerSourcePath, @Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) {
-		return context.findArtifactBySourceRelativeReference(originalReferrerSourcePath, resourceReferencePath).map(referentArtifact -> context
-				.relativizeResourceReference(relocatedReferrerPath, referentArtifactPath.apply(referentArtifact), referentArtifact instanceof CollectionArtifact));
+		return context.getPlan().findArtifactBySourceRelativeReference(context.checkArgumentSourcePath(originalReferrerSourcePath), resourceReferencePath)
+				.map(referentArtifact -> context.relativizeResourceReference(relocatedReferrerPath, referentArtifactPath.apply(referentArtifact),
+						referentArtifact instanceof CollectionArtifact));
 	}
 
 	//#cleanse
