@@ -209,7 +209,7 @@ public class TextControl<V> extends AbstractTextControl<V> {
 				imported = true; //indicate that we transported data
 			} else { //otherwise, check for text/* types
 				for(final ContentType contentType : transferable.getContentTypes()) { //for each available content type
-					if(contentType.match(ContentType.TEXT_PRIMARY_TYPE, ContentType.WILDCARD_SUBTYPE)) { //if this is a text content type
+					if(contentType.matches(ContentType.TEXT_PRIMARY_TYPE, ContentType.WILDCARD_SUBTYPE)) { //if this is a text content type
 						data = transferable.transfer(contentType); //transfer the data
 						imported = true; //indicate that we transported data
 						break; //stop looking for a match

@@ -75,7 +75,7 @@ public abstract class AbstractObjectTransferable<S> implements Transferable<S> {
 	 * @return The matching class, or <code>null</code> if no supported class matches the requested content type.
 	 */
 	protected Class<?> getClass(final ContentType contentType) {
-		if(contentType.match(ContentType.APPLICATION_PRIMARY_TYPE, ContentType.X_JAVA_OBJECT)) { //if this is an application/x-java-object type
+		if(contentType.matches(ContentType.APPLICATION_PRIMARY_TYPE, ContentType.X_JAVA_OBJECT)) { //if this is an application/x-java-object type
 			final String className = contentType.getParameter("class"); //get the class parameter TODO use a constant
 			if(className != null) { //if a class name was given
 				for(final Class<?> objectClass : objectClasses) { //for each supported class
