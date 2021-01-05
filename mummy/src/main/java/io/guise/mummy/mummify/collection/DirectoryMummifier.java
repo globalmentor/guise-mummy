@@ -351,7 +351,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		}
 
 		//mummify the directory content artifact, if present
-		directoryArtifact.getContentArtifact().ifPresent(throwingConsumer(contentArtifact -> {
+		directoryArtifact.findContentArtifact().ifPresent(throwingConsumer(contentArtifact -> {
 			contentArtifact.getMummifier().mummify(context, artifact, contentArtifact);
 			//Note that if a content file was once but no longer present, an orphaned content file
 			//description would be left, but the ways these circumstances could come about are

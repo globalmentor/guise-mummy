@@ -41,16 +41,28 @@ public interface MummyPlan {
 	//# artifact lookup
 
 	/**
+	 * Returns the principal artifact for an artifact.
+	 * @apiNote The principal artifact is almost always the artifact itself, unless the artifact is a subsumed artifact (e.g. the "index" content file for a
+	 *          directory), in which case the principal artifact will be the artifact it has been subsumed into.
+	 * @param artifact The artifact for which the principal artifact is to be determined.
+	 * @return The principal artifact of record for the given artifact.
+	 */
+	public Artifact getPrincipalArtifact(@Nonnull final Artifact artifact);
+
+	/**
 	 * Returns the parent artifact of some artifact.
-	 * @param artifact The artifact for which a parent is to be determined.
+	 * @apiNote Normally the parent artifact will be a {@link CollectionArtifact}.
+	 * @param artifact The artifact for which a parent is to be found.
 	 * @return The parent artifact, if any, of the given artifact.
 	 */
 	public Optional<Artifact> findParentArtifact(@Nonnull final Artifact artifact);
 
 	/**
 	 * Provides the child artifacts of some artifact.
+	 * @implSpec The default implementation returns the child artifacts of the artifact if it is a {@link CollectionArtifact}.
 	 * @param artifact The artifact for which children should be returned.
 	 * @return The child artifacts, if any, of the given artifact.
+	 * @see CollectionArtifact#getChildArtifacts()
 	 */
 	public default Stream<Artifact> childArtifacts(@Nonnull final Artifact artifact) {
 		return requireNonNull(artifact) instanceof CollectionArtifact ? ((CollectionArtifact)artifact).getChildArtifacts().stream() : Stream.empty();

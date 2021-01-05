@@ -38,6 +38,13 @@ public class DefaultMummyPlan implements MummyPlan {
 		return rootArtifact;
 	}
 
+	private final Map<Artifact, Artifact> principalArtifactsBySubsumedArtifacts = new HashMap<>();
+
+	@Override
+	public Artifact getPrincipalArtifact(final Artifact artifact) {
+		return principalArtifactsBySubsumedArtifacts.getOrDefault(requireNonNull(artifact), artifact);
+	}
+
 	private final Map<Artifact, Artifact> parentArtifactsByArtifact = new HashMap<>();
 
 	@Override
@@ -59,10 +66,13 @@ public class DefaultMummyPlan implements MummyPlan {
 	private void initialize(@Nonnull final Artifact artifact) {
 		requireNonNull(artifact);
 		artifact.getReferentSourcePaths().forEach(referenceSourcePath -> artifactsByReferenceSourcePath.put(referenceSourcePath, artifact));
-		if(artifact instanceof CollectionArtifact) {
-			for(final Artifact childArtifact : ((CollectionArtifact)artifact).getChildArtifacts()) {
-				parentArtifactsByArtifact.put(childArtifact, artifact); //map the parent to the child
-				initialize(childArtifact); //recursively update the plan for the children
+		if(artifact instanceof CompositeArtifact) {
+			((CompositeArtifact)artifact).getSubsumedArtifacts().forEach(subsumedArtifact -> principalArtifactsBySubsumedArtifacts.put(subsumedArtifact, artifact));
+			if(artifact instanceof CollectionArtifact) {
+				for(final Artifact childArtifact : ((CollectionArtifact)artifact).getChildArtifacts()) {
+					parentArtifactsByArtifact.put(childArtifact, artifact); //map the parent to the child
+					initialize(childArtifact); //recursively update the plan for the children
+				}
 			}
 		}
 	}
