@@ -209,12 +209,12 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This implementation delegates to {@link NavigationManager#loadNavigation(MummyContext, Artifact, Artifact)}. Otherwise if no navigation file is
-	 *           provided, this implementation delegates to {@link #defaultNavigation(MummyContext, Artifact)}.
+	 * @implSpec This implementation delegates to {@link NavigationManager#loadNavigation(MummyContext, Artifact)}. Otherwise if no navigation file is provided,
+	 *           this implementation delegates to {@link #defaultNavigation(MummyContext, Artifact)}.
 	 */
 	@Override
 	public Stream<NavigationItem> navigation(@Nonnull MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
-		return getNavigationManager().loadNavigation(context, contextArtifact, artifact).orElseGet(() -> defaultNavigation(context, contextArtifact));
+		return getNavigationManager().loadNavigation(context, artifact).orElseGet(() -> defaultNavigation(context, contextArtifact));
 	}
 
 	/**
