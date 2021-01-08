@@ -35,10 +35,10 @@ import com.globalmentor.net.URIPath;
  */
 public interface MummyPlan {
 
+	//# artifact lookup
+
 	/** @return The root artifact of the site, representing the root directory. */
 	public Artifact getRootArtifact();
-
-	//# artifact lookup
 
 	/**
 	 * Returns the principal artifact for an artifact.
@@ -147,5 +147,52 @@ public interface MummyPlan {
 	 * @return An artifact query for subsequent configuration and execution.
 	 */
 	public ArtifactQuery queryArtifacts();
+
+	//# generation
+
+	/**
+	 * Returns a resource reference from one artifact to another in the source tree. The returned reference will be a relative URI path appropriate to be used as
+	 * a web reference.
+	 * <p>
+	 * This method ensures that the reference link is calculated against the principal resource of the given artifact, which may not be the given artifact itself.
+	 * This allows links from <code>/foo/index.html</code> to be calculated against <code>/foo/</code>, for example.
+	 * </p>
+	 * @param fromArtifact The artifact the reference path should be relativized against.
+	 * @param toArtifact The artifact being referred to.
+	 * @return The resource reference path from the first given artifact to the second given artifact in the terms of the source tree.
+	 * @see #getPrincipalArtifact(Artifact)
+	 * @see Artifact#getSourcePath()
+	 */
+	public URIPath referenceInSource(@Nonnull final Artifact fromArtifact, @Nonnull final Artifact toArtifact);
+
+	/**
+	 * Returns a resource reference from one artifact to another in the target tree. The returned reference will be a relative URI path appropriate to be used as
+	 * a web reference.
+	 * <p>
+	 * This method ensures that the reference link is calculated against the principal resource of the given artifact, which may not be the given artifact itself.
+	 * This allows links from <code>/foo/index.html</code> to be calculated against <code>/foo/</code>, for example.
+	 * </p>
+	 * @param fromArtifact The artifact the reference path should be relativized against.
+	 * @param toArtifact The artifact being referred to.
+	 * @return The resource reference path from the first given artifact to the second given artifact in the terms of the target tree.
+	 * @see #getPrincipalArtifact(Artifact)
+	 * @see Artifact#getTargetPath()
+	 */
+	public URIPath referenceInTarget(@Nonnull final Artifact fromArtifact, @Nonnull final Artifact toArtifact);
+
+	//# MEXL
+
+	/**
+	 * Returns a resource reference from one artifact to another in the source tree. The returned reference will be a relative URI path appropriate to be used as
+	 * a web reference.
+	 * @apiNote This is a MEXL convenience method that functions identically to {@link #referenceInSource(Artifact, Artifact)}.
+	 * @param fromArtifact The artifact the reference path should be relativized against.
+	 * @param toArtifact The artifact being referred to.
+	 * @return The resource reference path from the first given artifact to the second given artifact in the terms of the source tree.
+	 * @see #referenceInSource(Artifact, Artifact)
+	 */
+	public default URIPath reference(@Nonnull final Artifact fromArtifact, @Nonnull final Artifact toArtifact) {
+		return referenceInSource(fromArtifact, toArtifact);
+	}
 
 }

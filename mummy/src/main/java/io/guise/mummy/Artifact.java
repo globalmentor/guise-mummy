@@ -52,7 +52,7 @@ import io.urf.model.UrfResourceDescription;
  * <dd>An artifact that retrieves its contents from some actual file in the source tree. e.g. {@link BaseCorporealSourceFileArtifact}.</dd>
  * <dt><dfn>phantom artifact</dfn></dt>
  * <dd>An artifact that is generated or loaded from resource during mummification, and for which a source file does not exist in the source tree; the opposite
- * of <dfn>corporeal artifact</dfn>. e.g. {@link io.guise.mummy.mummify.page.DefaultXhtmlPhantomArtifact.DefaultXhtmlPhantomArtifact}</dd>
+ * of <dfn>corporeal artifact</dfn>. e.g. {@link io.guise.mummy.mummify.page.DefaultXhtmlPhantomArtifact}</dd>
  * <dt><dfn>principal artifact</dfn></dt>
  * <dd>An artifact that should be used as the canonical source and target for IRI path references. An artifact is normally its own principal artifact unless it
  * is a <dfn>subsumed artifact</dfn> in which case the principal artifact is the one it is subsumed into and which should be used for IRI path references.</dd>

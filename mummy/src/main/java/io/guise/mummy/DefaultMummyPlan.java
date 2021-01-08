@@ -29,14 +29,7 @@ import javax.annotation.*;
  * Default plan for mummifying a site.
  * @author Garret Wilson
  */
-public class DefaultMummyPlan implements MummyPlan {
-
-	private final Artifact rootArtifact;
-
-	@Override
-	public Artifact getRootArtifact() {
-		return rootArtifact;
-	}
+public class DefaultMummyPlan extends AbstractMummyPlan {
 
 	private final Map<Artifact, Artifact> principalArtifactsBySubsumedArtifacts = new HashMap<>();
 
@@ -82,7 +75,7 @@ public class DefaultMummyPlan implements MummyPlan {
 	 * @param rootArtifact The root artifact of the site, representing the root directory.
 	 */
 	public DefaultMummyPlan(@Nonnull final Artifact rootArtifact) {
-		this.rootArtifact = requireNonNull(rootArtifact);
+		super(rootArtifact);
 		initialize(rootArtifact);
 	}
 
