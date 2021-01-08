@@ -33,6 +33,7 @@ import javax.annotation.*;
 import org.w3c.dom.*;
 
 import com.globalmentor.net.ContentType;
+import com.globalmentor.net.URIPath;
 import com.globalmentor.xml.spec.NsName;
 
 import io.guise.mummy.*;
@@ -304,14 +305,12 @@ public interface PageMummifier extends Mummifier {
 	 * @param context The context of static site generation.
 	 * @param sourceDocument The source document to relocate.
 	 * @param originalReferrerSourcePath The absolute original path of the referrer, e.g. <code>…/foo/page.xhtml</code>.
-	 * @param relocatedReferrerPath The absolute relocated path of the referrer, e.g. <code>…/bar/page.xhtml</code>.
-	 * @param referentArtifactPath The function for determining the path of the determined referent artifact. This function should return either the source path
-	 *          or the destination path of the artifact concordant with the site tree of the relocated referrer.
+	 * @param referenceGenerator The function for generating a reference to the artifact indicated by the reference path resolved to the original path.
 	 * @return The relocated document, which may or may not be the same document supplied as input.
 	 * @throws IOException if there is an error relocating the document.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	public Document relocateDocument(@Nonnull MummyContext context, @Nonnull final Document sourceDocument, @Nonnull final Path originalReferrerSourcePath,
-			@Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) throws IOException, DOMException;
+			@Nonnull final Function<Artifact, URIPath> referenceGenerator) throws IOException, DOMException;
 
 }

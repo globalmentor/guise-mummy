@@ -607,7 +607,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 					{
 						final Document sourceTemplateDocument = templateMummifier.loadSourceDocument(context, templateFile);
 						//relocate the template links _within the source tree_ as if it were in the place of the artifact source
-						templateDocument = relocateDocument(context, sourceTemplateDocument, templateFile, contextArtifact.getSourcePath(), Artifact::getSourcePath);
+						templateDocument = relocateDocument(context, sourceTemplateDocument, templateFile,
+								referentArtifact -> context.getPlan().referenceInSource(artifact, referentArtifact));
 					}
 
 					//1. validate structure
@@ -1168,7 +1169,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 */
 	protected Document relocateSourceDocumentToTarget(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
 			@Nonnull final Document sourceDocument) throws IOException, DOMException {
-		return relocateDocument(context, sourceDocument, contextArtifact.getSourcePath(), contextArtifact.getTargetPath(), Artifact::getTargetPath);
+		return relocateDocument(context, sourceDocument, contextArtifact.getSourcePath(),
+				referentArtifact -> context.getPlan().referenceInTarget(artifact, referentArtifact));
 	}
 
 	/**
@@ -1177,9 +1179,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 */
 	@Override
 	public Document relocateDocument(@Nonnull MummyContext context, @Nonnull final Document sourceDocument, @Nonnull final Path originalReferrerSourcePath,
-			@Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) throws IOException, DOMException {
-		final List<Element> relocatedElements = relocateElement(context, sourceDocument.getDocumentElement(), originalReferrerSourcePath, relocatedReferrerPath,
-				referentArtifactPath);
+			final Function<Artifact, URIPath> referenceGenerator) throws IOException, DOMException {
+		final List<Element> relocatedElements = relocateElement(context, sourceDocument.getDocumentElement(), originalReferrerSourcePath, referenceGenerator);
 		if(relocatedElements.size() != 1 || relocatedElements.get(0) != sourceDocument.getDocumentElement()) {
 			throw new UnsupportedOperationException("Document element cannot be removed or replaced when relocating a document.");
 		}
@@ -1192,48 +1193,42 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param context The context of static site generation.
 	 * @param sourceElement The source element to relocate.
 	 * @param originalReferrerSourcePath The absolute original path of the referrer, e.g. <code>…/foo/page.xhtml</code>.
-	 * @param relocatedReferrerPath The absolute relocated path of the referrer, e.g. <code>…/bar/page.xhtml</code>.
-	 * @param referentArtifactPath The function for determining the path of the determined referent artifact. This function should return either the source path
-	 *          or the destination path of the artifact concordant with the site tree of the relocated referrer.
+	 * @param referenceGenerator The function for generating a reference to the artifact indicated by the reference path resolved to the original path.
 	 * @return The relocated element(s), if any, to replace the source element.
 	 * @throws IOException if there is an error relocating the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 * @see #HTML_REFERENCE_ELEMENT_ATTRIBUTES
 	 */
 	protected List<Element> relocateElement(@Nonnull MummyContext context, @Nonnull final Element sourceElement, @Nonnull final Path originalReferrerSourcePath,
-			@Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) throws IOException, DOMException {
+			final Function<Artifact, URIPath> referenceGenerator) throws IOException, DOMException {
 
 		//TODO transfer to some system of pluggable element relocating strategies
 		if(XHTML_NAMESPACE_URI_STRING.equals(sourceElement.getNamespaceURI())) {
 			//see if this is a referrer element, and get the attribute doing the referencing
 			final String referenceAttributeName = HTML_REFERENCE_ELEMENT_ATTRIBUTES.get(sourceElement.getLocalName());
 			if(referenceAttributeName != null) {
-				return relocateReferenceElement(context, sourceElement, referenceAttributeName, originalReferrerSourcePath, relocatedReferrerPath,
-						referentArtifactPath);
+				return relocateReferenceElement(context, sourceElement, referenceAttributeName, originalReferrerSourcePath, referenceGenerator);
 			}
 		}
 
-		relocateChildElements(context, sourceElement, originalReferrerSourcePath, relocatedReferrerPath, referentArtifactPath);
+		relocateChildElements(context, sourceElement, originalReferrerSourcePath, referenceGenerator);
 
 		return List.of(sourceElement);
 	}
 
 	/**
 	 * Relocates child elements of an existing element by retargeting references relative to a new referrer path location.
-	 * @implSpec Each child element is replaced with the relocated elements returned from calling
-	 *           {@link #relocateElement(MummyContext, Element, Path, Path, Function)}. If only the same element is returned, no replacement is made. If no
-	 *           element is returned, the source element is removed.
+	 * @implSpec Each child element is replaced with the relocated elements returned from calling {@link #relocateElement(MummyContext, Element, Path, Function)}.
+	 *           If only the same element is returned, no replacement is made. If no element is returned, the source element is removed.
 	 * @param context The context of static site generation.
 	 * @param sourceElement The source element the children of which to relocate.
 	 * @param originalReferrerSourcePath The absolute original path of the referrer, e.g. <code>…/foo/page.xhtml</code>.
-	 * @param relocatedReferrerPath The absolute relocated path of the referrer, e.g. <code>…/bar/page.xhtml</code>.
-	 * @param referentArtifactPath The function for determining the path of the determined referent artifact. This function should return either the source path
-	 *          or the destination path of the artifact concordant with the site tree of the relocated referrer.
+	 * @param referenceGenerator The function for generating a reference to the artifact indicated by the reference path resolved to the original path.
 	 * @throws IOException if there is an error relocating the child elements.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	protected void relocateChildElements(@Nonnull MummyContext context, @Nonnull final Element sourceElement, @Nonnull final Path originalReferrerSourcePath,
-			@Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) throws IOException, DOMException {
+			final Function<Artifact, URIPath> referenceGenerator) throws IOException, DOMException {
 		final NodeList childNodes = sourceElement.getChildNodes();
 		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength();) { //advance the index manually as needed
 			final Node childNode = childNodes.item(childNodeIndex);
@@ -1242,7 +1237,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				continue;
 			}
 			final Element childElement = (Element)childNode;
-			final List<Element> relocatedElements = relocateElement(context, childElement, originalReferrerSourcePath, relocatedReferrerPath, referentArtifactPath);
+			final List<Element> relocatedElements = relocateElement(context, childElement, originalReferrerSourcePath, referenceGenerator);
 			replaceChild(sourceElement, childElement, relocatedElements);
 			childNodeIndex += relocatedElements.size(); //manually advance the index based upon the replacement nodes
 		}
@@ -1258,17 +1253,15 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param referenceElement The reference element such a {@code <a>} to relocate.
 	 * @param referenceAttributeName The name of the reference attribute such a {@code href} to relocate.
 	 * @param originalReferrerSourcePath The absolute original path of the referrer, e.g. <code>…/foo/page.xhtml</code>.
-	 * @param relocatedReferrerPath The absolute relocated path of the referrer, e.g. <code>…/bar/page.xhtml</code>.
-	 * @param referentArtifactPath The function for determining the path of the determined referent artifact. This function should return either the source path
-	 *          or the destination path of the artifact concordant with the site tree of the relocated referrer.
+	 * @param referenceGenerator The function for generating a reference to the artifact indicated by the reference path resolved to the original path.
 	 * @return The relocated element(s), if any, to replace the source element.
 	 * @throws IOException if there is an error relocating the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
-	 * @see #retargetResourceReference(MummyContext, URI, Path, Path, Function)
+	 * @see #retargetResourceReference(MummyContext, URI, Path, Function)
 	 */
 	protected List<Element> relocateReferenceElement(@Nonnull MummyContext context, @Nonnull final Element referenceElement,
-			@Nonnull final String referenceAttributeName, @Nonnull final Path originalReferrerSourcePath, @Nonnull final Path relocatedReferrerPath,
-			@Nonnull final Function<Artifact, Path> referentArtifactPath) throws IOException, DOMException {
+			@Nonnull final String referenceAttributeName, @Nonnull final Path originalReferrerSourcePath, final Function<Artifact, URIPath> referenceGenerator)
+			throws IOException, DOMException {
 		findAttributeNS(referenceElement, null, referenceAttributeName).ifPresent(referenceString -> {
 			getLogger().trace("  - found reference <{} {}=\"{}\" ...>", referenceElement.getNodeName(), referenceAttributeName, referenceString);
 			//TODO check for the empty string and do something appropriate
@@ -1278,11 +1271,10 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				if(!referenceURI.isAbsolute()) { //only convert paths
 					final String referencePath = referenceURI.getRawPath();
 					if(referencePath != null && !referencePath.isEmpty() && !URIs.isPathAbsolute(referencePath)) { //only convert relative paths that are not self-references ("")
-						retargetResourceReference(context, referenceURI, originalReferrerSourcePath, relocatedReferrerPath, referentArtifactPath)
-								.ifPresentOrElse(retargetedResourceReference -> {
-									getLogger().trace("  -> mapping to : {}", retargetedResourceReference);
-									referenceElement.setAttributeNS(null, referenceAttributeName, retargetedResourceReference.toString());
-								}, () -> getLogger().warn("No target artifact found for source relative reference `{}` in `{}`.", referenceURI, originalReferrerSourcePath));
+						retargetResourceReference(context, referenceURI, originalReferrerSourcePath, referenceGenerator).ifPresentOrElse(retargetedResourceReference -> {
+							getLogger().trace("  -> mapping to : {}", retargetedResourceReference);
+							referenceElement.setAttributeNS(null, referenceAttributeName, retargetedResourceReference.toString());
+						}, () -> getLogger().warn("No target artifact found for source relative reference `{}` in `{}`.", referenceURI, originalReferrerSourcePath));
 					}
 				}
 			} catch(final URISyntaxException uriSyntaxException) {
@@ -1303,9 +1295,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param context The context of static site generation.
 	 * @param resourceReference The relative resource reference, e.g. <code>example/test.txt?foo#bar</code>.
 	 * @param originalReferrerSourcePath The absolute original path of the referrer, e.g. <code>…/foo/page.xhtml</code>.
-	 * @param relocatedReferrerPath The absolute relocated path of the referrer, e.g. <code>…/bar/page.xhtml</code>.
-	 * @param referentArtifactPath The function for determining the path of the determined referent artifact. This function should return either the source path
-	 *          or the destination path of the artifact concordant with the site tree of the relocated referrer.
+	 * @param referenceGenerator The function for generating a reference to the artifact indicated by the reference path resolved to the original path.
 	 * @return The relative reference to the original artifact, now relativized to the relocated referrer path, e.g. <code>../bar/example/test.txt?foo#bar</code>.
 	 * @throws IllegalArgumentException if the given reference has no path or its path is absolute.
 	 * @throws IllegalArgumentException if the original referrer source path is not absolute and/or is not within the site source tree.
@@ -1313,10 +1303,10 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @throws IllegalArgumentException if the referent artifact path is not in the same source/target tree as the relocated referrer path.
 	 */
 	protected Optional<URI> retargetResourceReference(@Nonnull MummyContext context, @Nonnull URI resourceReference,
-			@Nonnull final Path originalReferrerSourcePath, @Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) {
+			@Nonnull final Path originalReferrerSourcePath, final Function<Artifact, URIPath> referenceGenerator) {
 		final URIPath resourceReferencePath = URIs.findURIPath(resourceReference)
 				.orElseThrow(() -> new IllegalArgumentException(String.format("Resource reference %s has no path.", resourceReference)));
-		return retargetResourceReferencePath(context, resourceReferencePath, originalReferrerSourcePath, relocatedReferrerPath, referentArtifactPath) //retarget the path separately
+		return retargetResourceReferencePath(context, resourceReferencePath, originalReferrerSourcePath, referenceGenerator) //retarget the path separately
 				.map(retargetedResourceReferencePath -> URIs.changePath(resourceReference, retargetedResourceReferencePath)); //switch the path of the original reference
 	}
 
@@ -1331,9 +1321,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param context The context of static site generation.
 	 * @param resourceReferencePath The relative resource reference path, e.g. <code>example/test.txt</code>.
 	 * @param originalReferrerSourcePath The absolute original path of the referrer, e.g. <code>…/foo/page.xhtml</code>.
-	 * @param relocatedReferrerPath The absolute relocated path of the referrer, e.g. <code>…/bar/page.xhtml</code>.
-	 * @param referentArtifactPath The function for determining the path of the determined referent artifact. This function should return either the source path
-	 *          or the destination path of the artifact concordant with the site tree of the relocated referrer.
+	 * @param referenceGenerator The function for generating a reference to the artifact indicated by the reference path resolved to the original path.
 	 * @return The relative path to the original artifact, now relativized to the relocated referrer path, e.g. <code>../bar/example/test.txt</code>.
 	 * @throws IllegalArgumentException if the given reference path is absolute.
 	 * @throws IllegalArgumentException if the original referrer source path is not absolute and/or is not within the site source tree.
@@ -1341,10 +1329,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @throws IllegalArgumentException if the referent artifact path is not in the same source/target tree as the relocated referrer path.
 	 */
 	protected Optional<URIPath> retargetResourceReferencePath(@Nonnull MummyContext context, @Nonnull URIPath resourceReferencePath,
-			@Nonnull final Path originalReferrerSourcePath, @Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) {
+			@Nonnull final Path originalReferrerSourcePath, final Function<Artifact, URIPath> referenceGenerator) {
 		return context.getPlan().findArtifactBySourceRelativeReference(context.checkArgumentSourcePath(originalReferrerSourcePath), resourceReferencePath)
-				.map(referentArtifact -> context.relativizeResourceReference(relocatedReferrerPath, referentArtifactPath.apply(referentArtifact),
-						referentArtifact instanceof CollectionArtifact));
+				.map(referenceGenerator::apply);
 	}
 
 	//#cleanse
