@@ -229,7 +229,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 */
 	protected Stream<NavigationItem> defaultNavigation(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
 		return defaultNavigationArtifacts(context, contextArtifact).map(navigationArtifact -> { //map navigation artifacts to their navigation items
-			final String href = context.relativizeSourceReference(contextArtifact, navigationArtifact).toString();
+			final String href = context.getPlan().referenceInSource(contextArtifact, navigationArtifact).toString();
 			return DefaultNavigationItem.forArtifactReference(href, navigationArtifact);
 		});
 	}
