@@ -201,7 +201,7 @@ public class DirectoryWidget implements Widget {
 										//separator (will be ignored for the first item)
 										final Element separatorElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_HR); //<hr/>
 										//title
-										final String postHref = context.relativizeSourceReference(contextArtifact, item).toString();
+										final String postHref = context.getPlan().referenceInSource(contextArtifact, item).toString();
 										final Element titleElement = createElement(document, ELEMENT_H(headingLevel)); //<h1>
 										final Element titleElementLink = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A); //<h1><a>
 										titleElementLink.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, postHref);
@@ -242,7 +242,7 @@ public class DirectoryWidget implements Widget {
 									.flatMap(asInstance(LocalDate.class)).orElse(null), nullsLast(naturalOrder()))
 							.thenComparing(Artifact::determineTitle, titleCollator)).map(item -> { //map each item to `<li><a>title</a></li>`
 								final Element liElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI); //<li>
-								final String postHref = context.relativizeSourceReference(contextArtifact, item).toString();
+								final String postHref = context.getPlan().referenceInSource(contextArtifact, item).toString();
 								final Element liElementLink = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A); //<li><a>
 								liElementLink.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, postHref);
 								appendText(liElementLink, item.determineTitle()); //<li><a>title</a></li>
