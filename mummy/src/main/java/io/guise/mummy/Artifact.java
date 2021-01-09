@@ -34,6 +34,35 @@ import io.urf.model.UrfResourceDescription;
  * <p>
  * Artifact equality is determined by target path as given by {@link #getTargetPath()}.
  * </p>
+ * <p>
+ * There are several semantic categories of artifacts:
+ * </p>
+ * <dl>
+ * <dt><dfn>assets</dfn></dt>
+ * <dd>A set of artifacts that have been designated as <dfn>veiled</dfn> and which additionally will not result in pages generated.</dd>
+ * <dt><dfn>composite artifact</dfn></dt>
+ * <dd>An artifact potentially composed of other artifacts.</dd>
+ * <dt><dfn>collection artifact</dfn></dt>
+ * <dd>A type of <dfn>composite artifact</dfn> with a collection IRI path reference, i.e. one ending in a forward slash such as <code>…/widgets/</code>. The
+ * archetypal collection artifact implementation is a directory.</dd>
+ * <dt><dfn>content artifact</dfn></dt>
+ * <dd>A special <dfn>subsumed artifact</dfn> of a directory that serves to represent its content. Historically the content artifact was
+ * <code>index.html</code>. Note that a content artifact is <em>not</em> a <dfn>child artifact</dfn> of its directory.</dd>
+ * <dt><dfn>corporeal artifact</dfn></dt>
+ * <dd>An artifact that retrieves its contents from some actual file in the source tree. e.g. {@link BaseCorporealSourceFileArtifact}.</dd>
+ * <dt><dfn>phantom artifact</dfn></dt>
+ * <dd>An artifact that is generated or loaded from resource during mummification, and for which a source file does not exist in the source tree; the opposite
+ * of <dfn>corporeal artifact</dfn>. e.g. {@link io.guise.mummy.mummify.page.DefaultXhtmlPhantomArtifact}</dd>
+ * <dt><dfn>principal artifact</dfn></dt>
+ * <dd>An artifact that should be used as the canonical source and target for IRI path references. An artifact is normally its own principal artifact unless it
+ * is a <dfn>subsumed artifact</dfn> in which case the principal artifact is the one it is subsumed into and which should be used for IRI path references.</dd>
+ * <dt><dfn>subsumed artifact</dfn></dt>
+ * <dd>An artifact that has been subsumed into another one one and should not be visible as separate IRI path references. The archetypal subsumed artifact is
+ * the <dfn>content artifact</dfn> (historically <code>index.html</code>) of a directory.</dd>
+ * <dt><dfn>veiled artifact</dfn></dt>
+ * <dd>A resource that is available to be served to the user agent if access directly, but is not part of the normal navigation tree. Veiled artifacts are
+ * usually designated by some indication in the source filename, such as an underscore prefix.</dd>
+ * </dl>
  * @author Garret Wilson
  */
 public interface Artifact {

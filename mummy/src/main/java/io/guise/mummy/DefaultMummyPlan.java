@@ -29,20 +29,20 @@ import javax.annotation.*;
  * Default plan for mummifying a site.
  * @author Garret Wilson
  */
-public class DefaultMummyPlan implements MummyPlan {
+public class DefaultMummyPlan extends AbstractMummyPlan {
 
-	private final Artifact rootArtifact;
+	private final Map<Artifact, Artifact> principalArtifactsBySubsumedArtifacts = new HashMap<>();
 
 	@Override
-	public Artifact getRootArtifact() {
-		return rootArtifact;
+	public Artifact getPrincipalArtifact(final Artifact artifact) {
+		return principalArtifactsBySubsumedArtifacts.getOrDefault(requireNonNull(artifact), artifact);
 	}
 
 	private final Map<Artifact, Artifact> parentArtifactsByArtifact = new HashMap<>();
 
 	@Override
 	public Optional<Artifact> findParentArtifact(final Artifact artifact) {
-		return Optional.ofNullable(parentArtifactsByArtifact.get(requireNonNull(artifact)));
+		return Optional.ofNullable(parentArtifactsByArtifact.get(getPrincipalArtifact(artifact)));
 	}
 
 	private final Map<Path, Artifact> artifactsByReferenceSourcePath = new HashMap<>();
@@ -59,10 +59,13 @@ public class DefaultMummyPlan implements MummyPlan {
 	private void initialize(@Nonnull final Artifact artifact) {
 		requireNonNull(artifact);
 		artifact.getReferentSourcePaths().forEach(referenceSourcePath -> artifactsByReferenceSourcePath.put(referenceSourcePath, artifact));
-		if(artifact instanceof CollectionArtifact) {
-			for(final Artifact childArtifact : ((CollectionArtifact)artifact).getChildArtifacts()) {
-				parentArtifactsByArtifact.put(childArtifact, artifact); //map the parent to the child
-				initialize(childArtifact); //recursively update the plan for the children
+		if(artifact instanceof CompositeArtifact) {
+			((CompositeArtifact)artifact).getSubsumedArtifacts().forEach(subsumedArtifact -> principalArtifactsBySubsumedArtifacts.put(subsumedArtifact, artifact));
+			if(artifact instanceof CollectionArtifact) {
+				for(final Artifact childArtifact : ((CollectionArtifact)artifact).getChildArtifacts()) {
+					parentArtifactsByArtifact.put(childArtifact, artifact); //map the parent to the child
+					initialize(childArtifact); //recursively update the plan for the children
+				}
 			}
 		}
 	}
@@ -72,7 +75,7 @@ public class DefaultMummyPlan implements MummyPlan {
 	 * @param rootArtifact The root artifact of the site, representing the root directory.
 	 */
 	public DefaultMummyPlan(@Nonnull final Artifact rootArtifact) {
-		this.rootArtifact = requireNonNull(rootArtifact);
+		super(rootArtifact);
 		initialize(rootArtifact);
 	}
 
@@ -86,20 +89,12 @@ public class DefaultMummyPlan implements MummyPlan {
 	 */
 	protected class DefaultArtifactQuery extends BaseArtifactQuery {
 
-		/**
-		 * {@inheritDoc}
-		 * @implNote This implementation does not currently work with a detail artifact of a main context artifact, such as an index file of a directory.
-		 */
 		@Override
 		public ArtifactQuery fromChildrenOf(final Artifact artifact) {
 			setStream(childArtifacts(artifact));
 			return this;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 * @implNote This implementation does not currently work with a detail artifact of a main context artifact, such as an index file of a directory.
-		 */
 		@Override
 		public ArtifactQuery fromSiblingsOf(final Artifact artifact) {
 			setStream(siblingArtifacts(artifact));

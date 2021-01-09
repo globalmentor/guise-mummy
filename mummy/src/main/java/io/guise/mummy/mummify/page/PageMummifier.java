@@ -33,6 +33,7 @@ import javax.annotation.*;
 import org.w3c.dom.*;
 
 import com.globalmentor.net.ContentType;
+import com.globalmentor.net.URIPath;
 import com.globalmentor.xml.spec.NsName;
 
 import io.guise.mummy.*;
@@ -110,33 +111,38 @@ public interface PageMummifier extends Mummifier {
 	}
 
 	/**
-	 * Finds the artifact suitable to serve as parent level navigation for the artifacts at the current level. This will be the context artifact if the context
-	 * artifact has child artifacts.
+	 * Finds the artifact suitable to serve as parent level navigation for the artifacts at the current level. The determination will be made in relation to the
+	 * principal artifact, such as <code>foo/</code> for the artifact <code>foo/index.html</code>. The artifact returned will be the principal artifact itself if
+	 * the principal artifact is a collection artifact.
 	 * @apiNote This method finds the parent navigation artifact independent of any <code>.navigation.lst</code> file.
-	 * @implSpec The default implementation returns the context artifact itself if it is an instance of {@link CollectionArtifact}; otherwise the parent artifact,
-	 *           if any, is returned by calling {@link MummyPlan#findParentArtifact(Artifact)}.
+	 * @implSpec The default implementation returns the principal artifact itself if it is an instance of {@link CollectionArtifact}; otherwise the parent
+	 *           artifact, if any, is returned by calling {@link MummyPlan#findParentArtifact(Artifact)}.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact for which navigation artifacts should be found.
 	 * @return The artifacts for navigation to the parent of the current navigation level.
 	 * @see #childNavigationArtifacts(MummyContext, Artifact)
+	 * @see MummyPlan#getPrincipalArtifact(Artifact)
 	 * @see MummyPlan#findParentArtifact(Artifact)
 	 */
-	public default Optional<Artifact> findParentNavigationArtifact(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
-		return contextArtifact instanceof CollectionArtifact ? Optional.of(contextArtifact) : context.getPlan().findParentArtifact(contextArtifact);
+	public default Optional<Artifact> findParentNavigationArtifact(@Nonnull MummyContext context, @Nonnull final Artifact artifact) {
+		final MummyPlan plan = context.getPlan();
+		final Artifact principalArtifact = plan.getPrincipalArtifact(artifact);
+		return principalArtifact instanceof CollectionArtifact ? Optional.of(principalArtifact) : plan.findParentArtifact(principalArtifact);
 	}
 
 	/**
-	 * Provides the artifacts suitable for direct subsequent navigation from this artifact, <em>excluding</em> the parent artifact. If sibling artifacts are
-	 * returned, they will include the given resource.
-	 * @apiNote The returned navigation artifacts are not necessarily children of the context artifact, but rather artifacts at the child level beneath some
-	 *          parent.
+	 * Provides the artifacts suitable for direct subsequent navigation from this artifact, <em>excluding</em> the parent artifact. The determination will be made
+	 * in relation to the principal artifact, such as <code>foo/</code> for the artifact <code>foo/index.html</code>. If sibling artifacts are returned, they will
+	 * include the given resource if it is not a subsumed resource.
+	 * @apiNote The returned navigation artifacts are not necessarily children of the given artifact,unless the given artifact is subsumed into some principal
+	 *          artifact, but rather artifacts at the child level beneath some parent.
 	 * @apiNote This method allows access to child navigation artifacts independent of any explicit navigation list override defined by the user. It is thus
 	 *          appropriate for access by a directory widget, for example, to provide custom navigation independent of any <code>.navigation.lst</code> file.
 	 * @implSpec The default implementation retrieves candidate resources using {@link MummyPlan#childArtifacts(Artifact)} if the artifact is a
 	 *           {@link CollectionArtifact}; otherwise it calls {@link MummyPlan#siblingArtifacts(Artifact)}. Only artifacts that are not assets and are not
 	 *           veiled are included.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact for which child navigation artifacts should be found.
 	 * @return The artifacts for subsequent navigation from this artifact.
 	 * @see #findParentNavigationArtifact(MummyContext, Artifact)
 	 * @see MummyPlan#childArtifacts(Artifact)
@@ -144,17 +150,19 @@ public interface PageMummifier extends Mummifier {
 	 * @see #isAsset(MummyContext, Artifact)
 	 * @see #isVeiled(MummyContext, Artifact)
 	 */
-	public default Stream<Artifact> childNavigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
-		final Stream<Artifact> candidateArtifacts = contextArtifact instanceof CollectionArtifact ? context.getPlan().childArtifacts(contextArtifact)
-				: context.getPlan().siblingArtifacts(contextArtifact);
-		return candidateArtifacts.filter(Artifact::isNavigable).filter(artifact -> !isAsset(context, artifact)).filter(artifact -> !isVeiled(context, artifact));
+	public default Stream<Artifact> childNavigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact artifact) {
+		final MummyPlan plan = context.getPlan();
+		final Artifact principalArtifact = plan.getPrincipalArtifact(artifact);
+		final Stream<Artifact> candidateArtifacts = principalArtifact instanceof CollectionArtifact ? plan.childArtifacts(principalArtifact)
+				: plan.siblingArtifacts(principalArtifact);
+		return candidateArtifacts.filter(Artifact::isNavigable).filter(candidateArtifact -> !isAsset(context, candidateArtifact))
+				.filter(candidateArtifact -> !isVeiled(context, candidateArtifact));
 	}
 
 	/**
 	 * Provides the tree of items suitable for direct navigation from this artifact. The may include the parent artifact, sibling artifacts, and/or the given
 	 * resource itself. This official list may be overridden by the user through the use of a <code>.navigation.lst</code> file or other configured file.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @return The navigation items, in order, that constitute the official possible navigation destinations from this artifact. The stream must <em>not</em>
 	 *         throw an {@link IOException} during iteration.
@@ -164,8 +172,7 @@ public interface PageMummifier extends Mummifier {
 	 * @see #childNavigationArtifacts(MummyContext, Artifact)
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME
 	 */
-	public Stream<NavigationItem> navigation(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact)
-			throws IOException;
+	public Stream<NavigationItem> navigation(@Nonnull MummyContext context, @Nonnull final Artifact artifact) throws IOException;
 
 	//# load
 
@@ -304,14 +311,12 @@ public interface PageMummifier extends Mummifier {
 	 * @param context The context of static site generation.
 	 * @param sourceDocument The source document to relocate.
 	 * @param originalReferrerSourcePath The absolute original path of the referrer, e.g. <code>…/foo/page.xhtml</code>.
-	 * @param relocatedReferrerPath The absolute relocated path of the referrer, e.g. <code>…/bar/page.xhtml</code>.
-	 * @param referentArtifactPath The function for determining the path of the determined referent artifact. This function should return either the source path
-	 *          or the destination path of the artifact concordant with the site tree of the relocated referrer.
+	 * @param referenceGenerator The function for generating a reference to the artifact indicated by the reference path resolved to the original path.
 	 * @return The relocated document, which may or may not be the same document supplied as input.
 	 * @throws IOException if there is an error relocating the document.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	public Document relocateDocument(@Nonnull MummyContext context, @Nonnull final Document sourceDocument, @Nonnull final Path originalReferrerSourcePath,
-			@Nonnull final Path relocatedReferrerPath, @Nonnull final Function<Artifact, Path> referentArtifactPath) throws IOException, DOMException;
+			@Nonnull final Function<Artifact, URIPath> referenceGenerator) throws IOException, DOMException;
 
 }

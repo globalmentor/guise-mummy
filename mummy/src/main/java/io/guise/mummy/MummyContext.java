@@ -17,7 +17,6 @@
 package io.guise.mummy;
 
 import static com.globalmentor.io.Paths.*;
-import static com.globalmentor.net.URIs.*;
 import static java.nio.file.Files.*;
 import static java.util.Objects.*;
 import static java.util.function.Predicate.*;
@@ -31,8 +30,6 @@ import java.util.stream.Stream;
 
 import javax.annotation.*;
 import javax.xml.parsers.DocumentBuilder;
-
-import com.globalmentor.net.URIPath;
 
 import io.confound.config.*;
 import io.guise.mummy.deploy.*;
@@ -194,7 +191,7 @@ public interface MummyContext {
 	 */
 	public MummyPlan getPlan();
 
-	//source references
+	//source paths
 
 	/**
 	 * Checks to ensure that a given path lies in the source directory.
@@ -259,126 +256,6 @@ public interface MummyContext {
 						return Optional.empty();
 					}));
 		}
-	}
-
-	/**
-	 * Relativizes a reference from one artifact to another in the source file system tree relative to a context artifact. The returned reference will be a URI
-	 * path relative to the given context artifact.
-	 * @param contextArtifact The artifact the reference path should be relativized against.
-	 * @param referentArtifact The artifact being referred to.
-	 * @return The reference path to the referent artifact relative to the context artifact as a URI path.
-	 * @see Artifact#getSourcePath()
-	 */
-	public default URIPath relativizeSourceReference(@Nonnull final Artifact contextArtifact, @Nonnull final Artifact referentArtifact) {
-		return relativizeSourceReference(contextArtifact, referentArtifact.getSourcePath());
-	}
-
-	/**
-	 * Relativizes an absolute reference to a source file in the file system relative to a context artifact. The reference must be to a path within the site. The
-	 * returned reference will be a URI path relative to the given artifact.
-	 * @param contextArtifact The artifact the reference path should be relativized against.
-	 * @param referenceSourcePath The absolute reference source path to relativize.
-	 * @return The reference path relative to the context artifact as a URI path.
-	 * @see Artifact#getSourcePath()
-	 */
-	public default URIPath relativizeSourceReference(@Nonnull final Artifact contextArtifact, @Nonnull final Path referenceSourcePath) {
-		return relativizeSourceReference(contextArtifact.getSourcePath(), referenceSourcePath);
-	}
-
-	/**
-	 * Relativizes a reference to a source file in the file system against some base path. Both paths must be within the site. The returned reference will be a
-	 * URI path (e.g. appropriate for web references) relative to the base path.
-	 * @param baseSourcePath The absolute path against which the reference path with be relativized.
-	 * @param referenceSourcePath The absolute reference source path to relativize.
-	 * @return The reference path relative to the base path as a URI path.
-	 * @throws IllegalArgumentException if the source path and or the base path is not absolute and/or is not within the site.
-	 * @see #getSiteSourceDirectory()
-	 */
-	public default URIPath relativizeSourceReference(@Nonnull final Path baseSourcePath, @Nonnull final Path referenceSourcePath) {
-		checkArgumentSourcePath(baseSourcePath);
-		checkArgumentSourcePath(referenceSourcePath);
-		return URIPath.relativize(baseSourcePath.toUri(), referenceSourcePath.toUri());
-	}
-
-	//target references
-
-	/**
-	 * Relativizes a reference from one artifact to another in the target file system tree relative to a context artifact. The returned reference will be a URI
-	 * path relative to the given context artifact.
-	 * @param contextArtifact The artifact the reference path should be relativized against.
-	 * @param referentArtifact The artifact being referred to.
-	 * @return The reference path to the referent artifact relative to the context artifact as a URI path.
-	 * @see Artifact#getTargetPath()
-	 */
-	public default URIPath relativizeTargetReference(@Nonnull final Artifact contextArtifact, @Nonnull final Artifact referentArtifact) {
-		return relativizeTargetReference(contextArtifact, referentArtifact.getTargetPath());
-	}
-
-	/**
-	 * Relativizes an absolute reference to a target file in the file system relative to a context artifact. The reference must be to a path within the site. The
-	 * returned reference will be a URI path relative to the given artifact.
-	 * @param contextArtifact The artifact the reference path should be relativized against.
-	 * @param referenceTargetPath The absolute reference target path to relativize.
-	 * @return The reference path relative to the context artifact as a URI path.
-	 * @see Artifact#getTargetPath()
-	 */
-	public default URIPath relativizeTargetReference(@Nonnull final Artifact contextArtifact, @Nonnull final Path referenceTargetPath) {
-		return relativizeTargetReference(contextArtifact.getTargetPath(), referenceTargetPath);
-	}
-
-	/**
-	 * Relativizes a reference to a target file in the file system against some base path. Both paths must be within the site. The returned reference will be a
-	 * URI path (e.g. appropriate for web references) relative to the base path.
-	 * @param baseTargetPath The absolute path against which the reference path with be relativized.
-	 * @param referenceTargetPath The absolute reference target path to relativize.
-	 * @return The reference path relative to the base path as a URI path.
-	 * @throws IllegalArgumentException if the target path and or the base path is not absolute and/or is not within the site.
-	 * @see #getSiteTargetDirectory()
-	 */
-	public default URIPath relativizeTargetReference(@Nonnull final Path baseTargetPath, @Nonnull final Path referenceTargetPath) {
-		checkArgumentSubPath(getSiteTargetDirectory(), checkArgumentAbsolute(baseTargetPath));
-		checkArgumentSubPath(getSiteTargetDirectory(), checkArgumentAbsolute(referenceTargetPath));
-		return URIPath.relativize(baseTargetPath.toUri(), referenceTargetPath.toUri());
-	}
-
-	//resource references (in URI path form)
-
-	/**
-	 * Relativizes a reference to a target file in the file system against some base path. Both paths must be either in the site source directory or in the site
-	 * destination directory. The returned reference will be a resource URI path (e.g. appropriate for web references) relative to the base path.
-	 * @apiNote If the reference target path does not yet exist, this method may not produce a URI path in the correct collection form, as it is impossible to
-	 *          know if the target represents a directory. Use {@link #relativizeResourceReference(Path, Path, boolean)} if it is possible to know whether the
-	 *          target path is meant to be a collection.
-	 * @implSpec This implementation delegates to {@link #relativizeResourceReference(Path, Path, boolean)} without forcing a collection.
-	 * @param baseTargetPath The absolute path against which the reference path with be relativized.
-	 * @param referenceTargetPath The absolute reference path to relativize.
-	 * @return The reference path relative to the base path as a URI path.
-	 * @throws IllegalArgumentException if the target path and or the base path is not absolute and/or is not within the same source/target tree.
-	 * @see #getSiteSourceDirectory()
-	 * @see #getSiteTargetDirectory()
-	 */
-	public default URIPath relativizeResourceReference(@Nonnull final Path baseTargetPath, @Nonnull final Path referenceTargetPath) {
-		return relativizeResourceReference(baseTargetPath, referenceTargetPath, false);
-	}
-
-	/**
-	 * Relativizes a reference to a target file in the file system against some base path. Both paths must be either in the site source directory or in the site
-	 * destination directory. The returned reference will be a resource URI path (e.g. appropriate for web references) relative to the base path.
-	 * @param baseTargetPath The absolute path against which the reference path with be relativized.
-	 * @param referenceTargetPath The absolute reference path to relativize.
-	 * @param forceCollection <code>true</code> if the returned path should be in collection form, ending with a slash, regardless of whether the reference target
-	 *          path is a collection or even exists.
-	 * @return The reference path relative to the base path as a URI path.
-	 * @throws IllegalArgumentException if the target path and or the base path is not absolute and/or is not within the same source/target tree.
-	 * @see #getSiteSourceDirectory()
-	 * @see #getSiteTargetDirectory()
-	 */
-	public default URIPath relativizeResourceReference(@Nonnull final Path baseTargetPath, @Nonnull final Path referenceTargetPath,
-			final boolean forceCollection) {
-		final Path root = isSubPath(getSiteSourceDirectory(), baseTargetPath) ? getSiteSourceDirectory() : getSiteTargetDirectory();
-		final URI baseTargetUri = checkArgumentSubPath(root, checkArgumentAbsolute(baseTargetPath)).toUri();
-		final URI referenceTargetUri = checkArgumentSubPath(root, checkArgumentAbsolute(referenceTargetPath)).toUri();
-		return URIPath.relativize(baseTargetUri, forceCollection ? toCollectionURI(referenceTargetUri) : referenceTargetUri);
 	}
 
 	//factory methods

@@ -18,6 +18,7 @@ package io.guise.mummy.deploy.aws;
 
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
+import static com.globalmentor.net.URIs.toCollectionURI;
 import static io.guise.mummy.GuiseMummy.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
@@ -79,7 +80,8 @@ public class S3 implements DeployTarget, Clogged {
 	 * <li>S3 bucket</li>
 	 * </ol>
 	 */
-	protected static final StringTemplate POLICY_TEMPLATE_PUBLIC_READ_GET_OBJECT = StringTemplate.builder().text( //@formatter:off
+	protected static final StringTemplate POLICY_TEMPLATE_PUBLIC_READ_GET_OBJECT = StringTemplate.builder()
+			.text( //@formatter:off
 			"{" + 
 			"\"Version\":\"2012-10-17\"," + 
 			"\"Statement\":[{" + 
@@ -110,7 +112,8 @@ public class S3 implements DeployTarget, Clogged {
 	 * @see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_multi-value-conditions.html">Creating a Condition with Multiple Keys or
 	 *      Values</a>
 	 */
-	protected static final StringTemplate POLICY_TEMPLATE_CONDITIONAL_PUBLIC_READ_GET_OBJECT = StringTemplate.builder().text( //@formatter:off
+	protected static final StringTemplate POLICY_TEMPLATE_CONDITIONAL_PUBLIC_READ_GET_OBJECT = StringTemplate.builder()
+			.text( //@formatter:off
 			"{" + 
 			"\"Version\":\"2012-10-17\"," + 
 			"\"Statement\":[{" + 
@@ -341,29 +344,31 @@ public class S3 implements DeployTarget, Clogged {
 
 	/**
 	 * Plans deployment of a site.
-	 * @implSpec This implementation calls {@link #plan(MummyContext, Artifact, Artifact)} for each artifact.
+	 * @implSpec This implementation calls {@link #plan(MummyContext, URI, Artifact)} for each artifact.
 	 * @param context The context of static site generation.
 	 * @param rootArtifact The root artifact of the site being deployed.
 	 * @throws IOException if there is an I/O error during site deployment planning.
 	 */
 	protected void plan(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact) throws IOException {
-		plan(context, rootArtifact, rootArtifact);
+		plan(context, rootArtifact.getTargetPath().toUri(), rootArtifact);
 	}
 
 	/**
 	 * Plans deployment of a site for an artifact and its comprised artifacts.
-	 * @implSpec For each artifact this method calls {@link #planResource(MummyContext, Artifact, Artifact, URIPath)}.
+	 * @implSpec For each artifact this method calls {@link #planResource(MummyContext, URI, Artifact, URIPath)}.
 	 * @param context The context of static site generation.
-	 * @param rootArtifact The root artifact of the site being deployed.
+	 * @param rootTargetPathUri The URI form of the root artifact target path of the site being deployed.
 	 * @param artifact The current artifact for which deployment is being planned.
 	 * @throws IOException if there is an I/O error during site deployment planning.
 	 */
-	protected void plan(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact, @Nonnull Artifact artifact) throws IOException {
-		final URIPath resourceReference = context.relativizeTargetReference(rootArtifact, artifact);
-		planResource(context, rootArtifact, artifact, resourceReference);
+	protected void plan(@Nonnull final MummyContext context, @Nonnull final URI rootTargetPathUri, @Nonnull Artifact artifact) throws IOException {
+		final URI artifactTargetPathUri = artifact.getTargetPath().toUri();
+		final URIPath resourceReference = URIPath.relativize(rootTargetPathUri,
+				artifact instanceof CollectionArtifact ? toCollectionURI(artifactTargetPathUri) : artifactTargetPathUri);
+		planResource(context, rootTargetPathUri, artifact, resourceReference);
 		if(artifact instanceof CompositeArtifact) {
 			for(final Artifact comprisedArtifact : (Iterable<Artifact>)((CompositeArtifact)artifact).comprisedArtifacts()::iterator) {
-				plan(context, rootArtifact, comprisedArtifact);
+				plan(context, rootTargetPathUri, comprisedArtifact);
 			}
 		}
 	}
@@ -373,12 +378,12 @@ public class S3 implements DeployTarget, Clogged {
 	 * @implSpec This version stores an S3 key and deploy object for the resource in {@link #getDeployObjectsByKey()}.
 	 * @implSpec This implementation does not add a deploy object for a {@link CollectionArtifact}.
 	 * @param context The context of static site generation.
-	 * @param rootArtifact The root artifact of the site being deployed.
+	 * @param rootTargetPathUri The URI form of the root artifact target path of the site being deployed.
 	 * @param artifact The current artifact for which deployment is being planned.
 	 * @param resourceReference A URI reference to the resource, relative to the site root.
 	 * @throws IOException if there is an I/O error during site deployment planning.
 	 */
-	protected void planResource(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact, @Nonnull Artifact artifact,
+	protected void planResource(@Nonnull final MummyContext context, @Nonnull final URI rootTargetPathUri, @Nonnull Artifact artifact,
 			@Nonnull final URIPath resourceReference) throws IOException {
 		final String key = resourceReference.toString();
 		getLogger().debug("Planning deployment for artifact {}, S3 key `{}`.", artifact, key);

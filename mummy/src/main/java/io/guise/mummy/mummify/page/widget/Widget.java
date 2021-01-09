@@ -47,7 +47,6 @@ public interface Widget {
 	 * </p>
 	 * @param mummifier The mummifier processing the page on which this widget appears.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated.
 	 * @param widgetElement The list element to regenerate.
 	 * @return The processed element(s), if any, to replace the widget source element.
@@ -55,7 +54,7 @@ public interface Widget {
 	 * @throws IllegalDataException if the information in the widget element is not appropriate for the widget.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public List<Element> processElement(@Nonnull PageMummifier mummifier, @Nonnull MummyContext context, @Nonnull Artifact contextArtifact,
-			@Nonnull Artifact artifact, @Nonnull Element widgetElement) throws IOException, IllegalDataException, DOMException;
+	public List<Element> processElement(@Nonnull PageMummifier mummifier, @Nonnull MummyContext context, @Nonnull Artifact artifact,
+			@Nonnull Element widgetElement) throws IOException, IllegalDataException, DOMException;
 
 }

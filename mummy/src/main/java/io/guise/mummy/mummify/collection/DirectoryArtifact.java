@@ -17,6 +17,7 @@
 package io.guise.mummy.mummify.collection;
 
 import static com.globalmentor.collections.Sets.*;
+import static java.util.Collections.*;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -55,7 +56,7 @@ public class DirectoryArtifact extends AbstractArtifact implements CollectionArt
 	private final Artifact contentArtifact;
 
 	/** @return The optional internal artifact representing the content of this directory, such as <code>index.xhtml</code>. */
-	public Optional<Artifact> getContentArtifact() {
+	public Optional<Artifact> findContentArtifact() {
 		return Optional.ofNullable(contentArtifact);
 	}
 
@@ -65,7 +66,7 @@ public class DirectoryArtifact extends AbstractArtifact implements CollectionArt
 	 */
 	@Override
 	public UrfResourceDescription getResourceDescription() {
-		return getContentArtifact().map(Artifact::getResourceDescription).orElse(UrfResourceDescription.EMPTY);
+		return findContentArtifact().map(Artifact::getResourceDescription).orElse(UrfResourceDescription.EMPTY);
 	}
 
 	private final Collection<Artifact> childArtifacts;
@@ -79,11 +80,21 @@ public class DirectoryArtifact extends AbstractArtifact implements CollectionArt
 	 * {@inheritDoc}
 	 * @implSpec This implementation returns all the child artifacts along with the content artifact, if any.
 	 * @see #getChildArtifacts()
-	 * @see #getContentArtifact()
+	 * @see #findContentArtifact()
 	 */
 	@Override
 	public Stream<Artifact> comprisedArtifacts() {
-		return Stream.concat(getChildArtifacts().stream(), getContentArtifact().stream());
+		return Stream.concat(getChildArtifacts().stream(), findContentArtifact().stream());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation returns the content artifact, if any.
+	 * @see #findContentArtifact()
+	 */
+	@Override
+	public Collection<Artifact> getSubsumedArtifacts() {
+		return findContentArtifact().map(Set::of).orElse(emptySet());
 	}
 
 	/**
@@ -106,13 +117,13 @@ public class DirectoryArtifact extends AbstractArtifact implements CollectionArt
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This version returns the default reference source paths and the source path to the content artifact, if any.
-	 * @see #getContentArtifact()
+	 * @see #findContentArtifact()
 	 */
 	@Override
 	public Set<Path> getReferentSourcePaths() {
 		final Set<Path> defaultReferenceSourcePaths = super.getReferentSourcePaths();
 		//add the content artifact, if present, to the referent source paths
-		return getContentArtifact().map(contentArtifact -> immutableSetOf(defaultReferenceSourcePaths, contentArtifact.getSourcePath()))
+		return findContentArtifact().map(contentArtifact -> immutableSetOf(defaultReferenceSourcePaths, contentArtifact.getSourcePath()))
 				.orElse(defaultReferenceSourcePaths);
 	}
 
