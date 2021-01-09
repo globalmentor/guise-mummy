@@ -42,7 +42,7 @@ public class DefaultMummyPlan extends AbstractMummyPlan {
 
 	@Override
 	public Optional<Artifact> findParentArtifact(final Artifact artifact) {
-		return Optional.ofNullable(parentArtifactsByArtifact.get(requireNonNull(artifact)));
+		return Optional.ofNullable(parentArtifactsByArtifact.get(getPrincipalArtifact(artifact)));
 	}
 
 	private final Map<Path, Artifact> artifactsByReferenceSourcePath = new HashMap<>();
@@ -89,20 +89,12 @@ public class DefaultMummyPlan extends AbstractMummyPlan {
 	 */
 	protected class DefaultArtifactQuery extends BaseArtifactQuery {
 
-		/**
-		 * {@inheritDoc}
-		 * @implNote This implementation does not currently work with a detail artifact of a main context artifact, such as an index file of a directory.
-		 */
 		@Override
 		public ArtifactQuery fromChildrenOf(final Artifact artifact) {
 			setStream(childArtifacts(artifact));
 			return this;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 * @implNote This implementation does not currently work with a detail artifact of a main context artifact, such as an index file of a directory.
-		 */
 		@Override
 		public ArtifactQuery fromSiblingsOf(final Artifact artifact) {
 			setStream(siblingArtifacts(artifact));

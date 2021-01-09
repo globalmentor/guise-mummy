@@ -83,24 +83,11 @@ public interface Mummifier extends Clogged {
 	public String planArtifactTargetFilename(@Nonnull MummyContext context, @Nonnull String filename);
 
 	/**
-	 * Mummifies a resource.
-	 * @apiNote This method should normally not be overridden. Implementations should override {@link #mummify(MummyContext, Artifact, Artifact)} instead.
-	 * @implSpec The default implementation delegates to {@link #mummify(MummyContext, Artifact, Artifact)}.
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact being generated.
-	 * @throws IOException if there is an I/O error during static site generation.
-	 */
-	public default void mummify(@Nonnull final MummyContext context, @Nonnull Artifact artifact) throws IOException {
-		mummify(context, artifact, artifact);
-	}
-
-	/**
 	 * Mummifies a resource in the presence of a context artifact, which may or may not be the same as the artifact itself.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @throws IOException if there is an I/O error during static site generation.
 	 */
-	public void mummify(@Nonnull final MummyContext context, @Nonnull Artifact contextArtifact, @Nonnull Artifact artifact) throws IOException;
+	public void mummify(@Nonnull final MummyContext context, @Nonnull Artifact artifact) throws IOException;
 
 }

@@ -101,10 +101,10 @@ public class DirectoryWidget implements Widget {
 	}
 
 	@Override
-	public List<Element> processElement(final PageMummifier mummifier, final MummyContext context, final Artifact contextArtifact, final Artifact artifact,
-			final Element widgetElement) throws IOException, DOMException {
+	public List<Element> processElement(final PageMummifier mummifier, final MummyContext context, final Artifact artifact, final Element widgetElement)
+			throws IOException, DOMException {
 		final Document document = widgetElement.getOwnerDocument();
-		final Stream<Artifact> items = mummifier.childNavigationArtifacts(context, contextArtifact);
+		final Stream<Artifact> items = mummifier.childNavigationArtifacts(context, artifact);
 		return findAttribute(widgetElement, ATTRIBUTE_GROUP_BY) //group-by
 				.map(groupBy -> {
 					final List<Element> groupedItemElements = new ArrayList<>();
@@ -128,8 +128,8 @@ public class DirectoryWidget implements Widget {
 									final String publicationDateText = foundPublicationDate.map(PUBLISHED_ON_FORMATTER::format).orElse("?"); //TODO fix text
 									appendText(groupHeadingElement, publicationDateText);
 									groupedItemElements.add(groupHeadingElement);
-									groupedItemElements.addAll(
-											generateItemElements(mummifier, context, contextArtifact, artifact, widgetElement, 3, itemsForFoundPublicationDate.getValue().stream()));
+									groupedItemElements
+											.addAll(generateItemElements(mummifier, context, artifact, widgetElement, 3, itemsForFoundPublicationDate.getValue().stream()));
 								}));
 							}
 							break;
@@ -148,8 +148,8 @@ public class DirectoryWidget implements Widget {
 									final String publicationYear = foundPublicationYear.map(Year::toString).orElse("?"); //TODO fix text
 									appendText(groupHeadingElement, publicationYear);
 									groupedItemElements.add(groupHeadingElement);
-									groupedItemElements.addAll(
-											generateItemElements(mummifier, context, contextArtifact, artifact, widgetElement, 3, itemsForFoundPublicationYear.getValue().stream()));
+									groupedItemElements
+											.addAll(generateItemElements(mummifier, context, artifact, widgetElement, 3, itemsForFoundPublicationYear.getValue().stream()));
 								}));
 							}
 							break;
@@ -159,14 +159,13 @@ public class DirectoryWidget implements Widget {
 					return groupedItemElements;
 				})
 				//no grouping
-				.orElseGet(throwingSupplier(() -> generateItemElements(mummifier, context, contextArtifact, artifact, widgetElement, 2, items)));
+				.orElseGet(throwingSupplier(() -> generateItemElements(mummifier, context, artifact, widgetElement, 2, items)));
 	}
 
 	/**
 	 * Generates elements to represent the items in the directory.
 	 * @param mummifier The mummifier processing the page on which this widget appears.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated.
 	 * @param widgetElement The list element to regenerate.
 	 * @param headingLevel The one-based heading level (with <code>&lt;h1&gt;</code> being the first heading level) with which to start when generating headings;
@@ -177,9 +176,9 @@ public class DirectoryWidget implements Widget {
 	 * @throws IllegalDataException if the information in the widget element is not appropriate for the widget.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public List<Element> generateItemElements(@Nonnull final PageMummifier mummifier, @Nonnull final MummyContext context,
-			@Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact, @Nonnull final Element widgetElement, @Nonnegative final int headingLevel,
-			Stream<Artifact> items) throws IOException, IllegalDataException, DOMException {
+	public List<Element> generateItemElements(@Nonnull final PageMummifier mummifier, @Nonnull final MummyContext context, @Nonnull final Artifact artifact,
+			@Nonnull final Element widgetElement, @Nonnegative final int headingLevel, Stream<Artifact> items)
+			throws IOException, IllegalDataException, DOMException {
 		final Document document = widgetElement.getOwnerDocument();
 		final Collator titleCollator = Collator.getInstance(); //TODO i18n: get locale for page, defaulting to site locale
 		titleCollator.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
@@ -201,7 +200,7 @@ public class DirectoryWidget implements Widget {
 										//separator (will be ignored for the first item)
 										final Element separatorElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_HR); //<hr/>
 										//title
-										final String postHref = context.getPlan().referenceInSource(contextArtifact, item).toString();
+										final String postHref = context.getPlan().referenceInSource(artifact, item).toString();
 										final Element titleElement = createElement(document, ELEMENT_H(headingLevel)); //<h1>
 										final Element titleElementLink = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A); //<h1><a>
 										titleElementLink.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, postHref);
@@ -242,7 +241,7 @@ public class DirectoryWidget implements Widget {
 									.flatMap(asInstance(LocalDate.class)).orElse(null), nullsLast(naturalOrder()))
 							.thenComparing(Artifact::determineTitle, titleCollator)).map(item -> { //map each item to `<li><a>title</a></li>`
 								final Element liElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI); //<li>
-								final String postHref = context.getPlan().referenceInSource(contextArtifact, item).toString();
+								final String postHref = context.getPlan().referenceInSource(artifact, item).toString();
 								final Element liElementLink = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_A); //<li><a>
 								liElementLink.setAttributeNS(null, ELEMENT_A_ATTRIBUTE_HREF, postHref);
 								appendText(liElementLink, item.determineTitle()); //<li><a>title</a></li>

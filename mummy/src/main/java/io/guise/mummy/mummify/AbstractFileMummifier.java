@@ -162,9 +162,9 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	/**
 	 * {@inheritDoc}
 	 * @apiNote This method cannot be overridden, as it performs necessary checks for incremental mummification. To implement file mummification,
-	 *          {@link #mummifyFile(MummyContext, Artifact, Artifact)} should be overridden instead.
+	 *          {@link #mummifyFile(MummyContext, Artifact)} should be overridden instead.
 	 * @implSpec If incremental mummification is enabled via {@link MummyContext#isIncremental()}, this version checks the the timestamp of the target file, and
-	 *           delegates to {@link #mummifyFile(MummyContext, Artifact, Artifact)} if the file needs regenerated.
+	 *           delegates to {@link #mummifyFile(MummyContext, Artifact)} if the file needs regenerated.
 	 * @implSpec This implementation saves the description description if modified by calling {@link #saveTargetDescription(MummyContext, Artifact)}.
 	 * @see Content#MODIFIED_AT_PROPERTY_TAG
 	 * @see Artifact#PROPERTY_TAG_MUMMY_DESCRIPTION_DIRTY
@@ -172,7 +172,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @see MummyContext#isFull()
 	 */
 	@Override
-	public final void mummify(@Nonnull final MummyContext context, @Nonnull Artifact contextArtifact, @Nonnull Artifact artifact) throws IOException {
+	public final void mummify(@Nonnull final MummyContext context, @Nonnull Artifact artifact) throws IOException {
 		getLogger().trace("Mummifying file artifact {} ...", artifact);
 		final Path targetFile = artifact.getTargetPath();
 		final UrfResourceDescription description = artifact.getResourceDescription();
@@ -195,7 +195,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 			if(parentDirectory != null && !exists(parentDirectory)) { //ensure parent directories exist, as artifact children may specify files several layers deep, e.g. blog posts 
 				createDirectories(parentDirectory);
 			}
-			mummifyFile(context, contextArtifact, artifact);
+			mummifyFile(context, artifact);
 			checkState(exists(targetFile), "Mummification of artifact source file `%s` did not produce target file `%s`.", artifact.getSourcePath(), targetFile);
 			getLogger().debug("Mummified file artifact {}.", artifact);
 			newTargetModifiedAt = getLastModifiedTime(targetFile).toInstant();
@@ -231,11 +231,9 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * Invariably mummifies a resource to a file in the presence of a context artifact, which may or may not be the same as the artifact itself. Mummification is
 	 * always performed, regardless of the state of metadata.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated. The
-	 *          parent directories of the file are guaranteed to have been created.
 	 * @param artifact The artifact being generated.
 	 * @throws IOException if there is an I/O error during mummification.
 	 */
-	protected abstract void mummifyFile(@Nonnull final MummyContext context, @Nonnull Artifact contextArtifact, @Nonnull Artifact artifact) throws IOException;
+	protected abstract void mummifyFile(@Nonnull final MummyContext context, @Nonnull Artifact artifact) throws IOException;
 
 }

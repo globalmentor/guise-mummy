@@ -56,14 +56,26 @@ public class DefaultMummyPlanTest {
 	void testFindParentArtifact() {
 		final Path sourceDirectory = getTempDirectory().resolve("source"); //used only for identification; no I/O
 		final Path targetDirectory = getTempDirectory().resolve("target");
+		final Path fooDirectory = sourceDirectory.resolve("foo");
 		final Mummifier mummifier = mock(Mummifier.class);
-		final Artifact indexArtifact = new DummyArtifact(mummifier, sourceDirectory.resolve("index.html"), targetDirectory.resolve("index.html"));
-		final Artifact childArtifact = new DummyArtifact(mummifier, sourceDirectory.resolve("test.html"), targetDirectory.resolve("test.html"));
-		final DirectoryArtifact directoryArtifact = new DirectoryArtifact(mummifier, sourceDirectory, targetDirectory, indexArtifact, Set.of(childArtifact));
-		final MummyPlan plan = new DefaultMummyPlan(directoryArtifact);
-		assertThat("Root artifact has no parent artifact.", plan.findParentArtifact(directoryArtifact), isEmpty());
-		assertThat("Directory content artifact has no parent artifact.", plan.findParentArtifact(indexArtifact), isEmpty());
-		assertThat("Directory artifact is parent artifact of child artifact.", plan.findParentArtifact(childArtifact), isPresentAndIs(directoryArtifact));
+		final Artifact indexArtifact = new DummyArtifact(mummifier, sourceDirectory.resolve("index.html"), targetDirectory.resolve("index.html")); //index.html
+		final Artifact childArtifact = new DummyArtifact(mummifier, sourceDirectory.resolve("test.html"), targetDirectory.resolve("test.html")); //test.html
+		final Artifact fooIndexArtifact = new DummyArtifact(mummifier, fooDirectory.resolve("index.html"), targetDirectory.resolve("foo").resolve("index.html")); ///foo/index.html
+		final Artifact fooBarArtifact = new DummyArtifact(mummifier, fooDirectory.resolve("bar.html"), targetDirectory.resolve("foo").resolve("test.html")); //foo/bar.html
+		final DirectoryArtifact fooDirectoryArtifact = new DirectoryArtifact(mummifier, fooDirectory, targetDirectory.resolve("foo"), fooIndexArtifact,
+				Set.of(fooBarArtifact)); //foo/
+		final DirectoryArtifact rootDirectoryArtifact = new DirectoryArtifact(mummifier, sourceDirectory, targetDirectory, indexArtifact,
+				Set.of(childArtifact, fooDirectoryArtifact));
+		final MummyPlan plan = new DefaultMummyPlan(rootDirectoryArtifact);
+		assertThat("Root artifact has no parent artifact.", plan.findParentArtifact(rootDirectoryArtifact), isEmpty());
+		assertThat("Root directory content artifact has no parent artifact.", plan.findParentArtifact(indexArtifact), isEmpty());
+		assertThat("Root directory artifact is parent artifact of child artifact.", plan.findParentArtifact(childArtifact), isPresentAndIs(rootDirectoryArtifact));
+		assertThat("Root directory artifact is parent artifact of child `foo` directory.", plan.findParentArtifact(fooDirectoryArtifact),
+				isPresentAndIs(rootDirectoryArtifact));
+		assertThat("Root directory artifact is parent artifact of child `foo` directory content artifact.", plan.findParentArtifact(fooIndexArtifact),
+				isPresentAndIs(rootDirectoryArtifact));
+		assertThat("`foo` directory is parent artifact `foo/bar.html` child artifact.", plan.findParentArtifact(fooBarArtifact),
+				isPresentAndIs(fooDirectoryArtifact));
 	}
 
 }

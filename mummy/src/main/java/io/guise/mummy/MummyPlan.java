@@ -18,7 +18,6 @@ package io.guise.mummy;
 
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.net.URIs.*;
-import static java.util.Objects.*;
 
 import java.net.URI;
 import java.nio.file.*;
@@ -51,28 +50,44 @@ public interface MummyPlan {
 
 	/**
 	 * Returns the parent artifact of some artifact.
+	 * <p>
+	 * The determination is made in terms of the principal artifact of that given. For example, if <code>foo/index.html</code> is given, the parent artifact of
+	 * <code>foo/</code> will be returned.
+	 * </p>
 	 * @apiNote Normally the parent artifact will be a {@link CollectionArtifact}.
 	 * @param artifact The artifact for which a parent is to be found.
 	 * @return The parent artifact, if any, of the given artifact.
+	 * @see #getPrincipalArtifact(Artifact)
 	 */
 	public Optional<Artifact> findParentArtifact(@Nonnull final Artifact artifact);
 
 	/**
 	 * Provides the child artifacts of some artifact.
+	 * <p>
+	 * The determination is made in terms of the principal artifact of that given. For example, if <code>foo/index.html</code> is given, the child artifacts of
+	 * <code>foo/</code> will be returned.
+	 * </p>
 	 * @implSpec The default implementation returns the child artifacts of the artifact if it is a {@link CollectionArtifact}.
 	 * @param artifact The artifact for which children should be returned.
 	 * @return The child artifacts, if any, of the given artifact.
+	 * @see #getPrincipalArtifact(Artifact)
 	 * @see CollectionArtifact#getChildArtifacts()
 	 */
 	public default Stream<Artifact> childArtifacts(@Nonnull final Artifact artifact) {
-		return requireNonNull(artifact) instanceof CollectionArtifact ? ((CollectionArtifact)artifact).getChildArtifacts().stream() : Stream.empty();
+		final Artifact principalArtifact = getPrincipalArtifact(artifact);
+		return principalArtifact instanceof CollectionArtifact ? ((CollectionArtifact)principalArtifact).getChildArtifacts().stream() : Stream.empty();
 	}
 
 	/**
 	 * Provides the artifacts that are siblings to the given artifact. An artifact will not have siblings if it has no parent. If any artifacts are returned, the
 	 * returned artifacts <em>will</em> include the given artifact. This means that a single child artifact will return itself as the single sibling artifact.
+	 * <p>
+	 * The determination is made in terms of the principal artifact of that given. For example, if <code>foo/index.html</code> is given, the sibling artifacts of
+	 * <code>foo/</code> will be returned.
+	 * </p>
 	 * @param artifact The artifact for which siblings should be returned.
-	 * @return The sibling artifacts, if any, of the given artifact, including the given artifact.
+	 * @return The sibling artifacts, if any, of the given artifact, including the principal artifact of that given.
+	 * @see #getPrincipalArtifact(Artifact)
 	 */
 	public default Stream<Artifact> siblingArtifacts(@Nonnull final Artifact artifact) {
 		return findParentArtifact(artifact).map(this::childArtifacts).orElse(Stream.empty());
@@ -95,35 +110,41 @@ public interface MummyPlan {
 	public Optional<Artifact> findArtifactBySourceReference(@Nonnull final Path referenceSourcePath);
 
 	/**
-	 * Retrieves an artifact referred to by a URI path source reference relative to some context artifact.
+	 * Retrieves an artifact referred to by a URI path source reference relative to some artifact.
 	 * <p>
-	 * The source path of the returned artifact may not actually be equal to given source path. For example, a referent source path of
-	 * <code>/foo/bar/index.xhtml</code> might return the artifact for the file that exists at the source path <code>/foo/bar/</code>, because any link to
-	 * <code>/foo/bar/index.xhtml</code> is really referring to <code>/foo/bar/</code>; the <code>/foo/bar/index.xhtml</code> file is merely an implementation
-	 * detail for storing the content of <code>/foo/bar/</code>.
+	 * The returned artifact will always be a principal artifact. Thus the source path of the returned artifact may not actually be equal to given source path.
+	 * For example, a referent source path of <code>/foo/bar/index.xhtml</code> might return the artifact for the file that exists at the source path
+	 * <code>/foo/bar/</code>, because any link to <code>/foo/bar/index.xhtml</code> is really referring to <code>/foo/bar/</code>; the
+	 * <code>/foo/bar/index.xhtml</code> file is merely an implementation detail for storing the content of <code>/foo/bar/</code>.
 	 * </p>
-	 * @param contextArtifact The artifact the relative reference should be resolved against when finding the referent artifact.
+	 * <p>
+	 * This method ensures that the reference link is calculated against the principal resource of the given artifact, which may not be the given artifact itself.
+	 * This allows links from <code>/foo/index.html</code> to be calculated against <code>/foo/</code>, for example.
+	 * </p>
+	 * @param artifact The artifact the relative reference should be resolved against when finding the referent artifact.
 	 * @param sourceRelativeReference The relative URI path being used as a reference to some artifact.
 	 * @return The artifact referred to by a relative path source reference.
 	 * @throws IllegalArgumentException if the given reference path is absolute.
+	 * @see #getPrincipalArtifact(Artifact)
 	 */
-	public default Optional<Artifact> findArtifactBySourceRelativeReference(@Nonnull final Artifact contextArtifact,
-			@Nonnull final URIPath sourceRelativeReference) {
-		return findArtifactBySourceRelativeReference(contextArtifact.getSourcePath(), sourceRelativeReference);
+	public default Optional<Artifact> findArtifactBySourceRelativeReference(@Nonnull final Artifact artifact, @Nonnull final URIPath sourceRelativeReference) {
+		return findArtifactBySourceRelativeReference(getPrincipalArtifact(artifact).getSourcePath(), sourceRelativeReference);
 	}
 
 	/**
-	 * Retrieves an artifact referred to by a URI path source reference relative to some context source path.
+	 * Retrieves an artifact referred to by a URI path source reference relative to some source path.
 	 * <p>
-	 * The source path of the returned artifact may not actually be equal to given source path. For example, a referent source path of
-	 * <code>/foo/bar/index.xhtml</code> might return the artifact for the file that exists at the source path <code>/foo/bar/</code>, because any link to
-	 * <code>/foo/bar/index.xhtml</code> is really referring to <code>/foo/bar/</code>; the <code>/foo/bar/index.xhtml</code> file is merely an implementation
-	 * detail for storing the content of <code>/foo/bar/</code>.
+	 * The returned artifact will always be a principal artifact. Thus the source path of the returned artifact may not actually be equal to given source path.
+	 * For example, a referent source path of <code>/foo/bar/index.xhtml</code> might return the artifact for the file that exists at the source path
+	 * <code>/foo/bar/</code>, because any link to <code>/foo/bar/index.xhtml</code> is really referring to <code>/foo/bar/</code>; the
+	 * <code>/foo/bar/index.xhtml</code> file is merely an implementation detail for storing the content of <code>/foo/bar/</code>.
 	 * </p>
 	 * <p>
 	 * This method follows <a href="https://tools.ietf.org/html/rfc3986">RFC 3986</a> and resolves a relative reference of the empty string by using the source
 	 * relative reference e.g. <code>/foo/bar</code>, not as the parent collection <code>/foo/</code>.
 	 * </p>
+	 * @apiNote If possible {@link #findArtifactBySourceRelativeReference(Artifact, URIPath)} should be used to ensure that the reference is calculated from the
+	 *          principal artifact as the referring artifact.
 	 * @param contextSourcePath The source path the relative reference should be resolved against when finding the referent artifact.
 	 * @param sourceRelativeReference The relative URI path being used as a reference to some artifact.
 	 * @return The artifact referred to by a relative path source reference.

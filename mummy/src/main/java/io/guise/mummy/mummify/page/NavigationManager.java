@@ -274,7 +274,7 @@ public class NavigationManager implements Clogged {
 		return foundNavigationArtifact.map(navigationArtifact -> {
 			//get the correct relative path to the artifact from this artifact (the plan will determine the principal artifact)
 			final URIPath artifactRelativeReferencePath = context.getPlan().referenceInSource(artifact, navigationArtifact);
-			//change the reference path to get the appropriate href relative to the context artifact
+			//change the reference path to get the appropriate href relative to the artifact
 			final String href = URIs.changePath(navigationReference, artifactRelativeReferencePath).toString();
 			return description != null ? DefaultNavigationItem.forArtifactReference(href, description, navigationArtifact, navigation)
 					: DefaultNavigationItem.forArtifactReference(href, navigationArtifact, navigation);

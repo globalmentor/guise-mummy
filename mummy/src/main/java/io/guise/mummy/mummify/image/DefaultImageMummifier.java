@@ -65,17 +65,17 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This implementation scales the image in an attempt to reduce the file size if the file size is above a certain threshold.
-	 * @implSpec This implementation delegates to {@link #processImage(MummyContext, Artifact, Artifact, InputStream, OutputStream)} for scaling.
+	 * @implSpec This implementation delegates to {@link #processImage(MummyContext, Artifact, InputStream, OutputStream)} for scaling.
 	 */
 	@Override
-	public void mummifyFile(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
+	public void mummifyFile(final MummyContext context, final Artifact artifact) throws IOException {
 		final Path sourceFile = artifact.getSourcePath();
 		final long imageScaleThresholdSize = context.getConfiguration().findLong(CONFIG_KEY_MUMMY_IMAGE_PROCESS_THRESHOLD_FILE_SIZE)
 				.orElse(DEFAULT_SCALE_THRESHOLD_FILE_SIZE);
 		if(size(sourceFile) > imageScaleThresholdSize) { //if the size of the image source file goes over our threshold for scaling
 			try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile));
 					final OutputStream outputStream = new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))) {
-				processImage(context, contextArtifact, artifact, inputStream, outputStream);
+				processImage(context, artifact, inputStream, outputStream);
 				return;
 			} catch(final IOException ioException) { //provide more context to I/O errors
 				throw new IOException(format("Error processing image `%s`: %s", artifact.getSourcePath(), ioException.getLocalizedMessage()), ioException); //TODO i18n
@@ -89,8 +89,6 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 	 * Processes an image from the given input stream and writes the processed image to the given output stream.
 	 * @implSpec This implementation scales an image using the AWT to draw on a scaled image using bicubic interpolation and quality-biased rendering.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated. The
-	 *          parent directories of the file are guaranteed to have been created.
 	 * @param artifact The artifact being generated.
 	 * @param inputStream The input stream for reading the source image.
 	 * @param outputStream The output stream for writing the target image.
@@ -99,8 +97,8 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 	 * @see <a href="https://www.universalwebservices.net/web-programming-resources/java/adjust-jpeg-image-compression-quality-when-saving-images-in-java/">Adjust
 	 *      JPEG image compression quality when saving images in Java</a>
 	 */
-	protected void processImage(@Nonnull final MummyContext context, @Nonnull Artifact contextArtifact, @Nonnull Artifact artifact, final InputStream inputStream,
-			final OutputStream outputStream) throws IOException {
+	protected void processImage(@Nonnull final MummyContext context, @Nonnull Artifact artifact, final InputStream inputStream, final OutputStream outputStream)
+			throws IOException {
 		//load
 		final ImageInputStream imageInputStream = createImageInputStream(inputStream); //this stream will not be closed in this method, as it wraps a stream provided by the caller
 		if(imageInputStream == null) {

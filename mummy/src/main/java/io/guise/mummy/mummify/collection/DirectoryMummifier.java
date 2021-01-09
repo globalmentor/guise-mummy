@@ -337,7 +337,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	 * @implSpec This implementation saves the description description if modified by calling {@link #saveTargetDescription(MummyContext, Artifact)}.
 	 */
 	@Override
-	public void mummify(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
+	public void mummify(final MummyContext context, final Artifact artifact) throws IOException {
 		checkArgument(artifact instanceof DirectoryArtifact, "Artifact %s is not a directory artifact.");
 		checkArgumentDirectory(artifact.getSourcePath());
 
@@ -352,7 +352,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 
 		//mummify the directory content artifact, if present
 		directoryArtifact.findContentArtifact().ifPresent(throwingConsumer(contentArtifact -> {
-			contentArtifact.getMummifier().mummify(context, artifact, contentArtifact);
+			contentArtifact.getMummifier().mummify(context, contentArtifact);
 			//Note that if a content file was once but no longer present, an orphaned content file
 			//description would be left, but the ways these circumstances could come about are
 			//largely theoretical (e.g. converting a source directory to an assets tree and

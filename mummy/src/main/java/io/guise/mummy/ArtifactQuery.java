@@ -49,6 +49,8 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	 * Initially queries artifacts at the same level of the given artifact. The given artifact itself may be included, depending on whether the artifact is a
 	 * stand-in for the main resource (e.g. as the index artifact is for a directory), in which case it will not be included. If the artifact itself represents a
 	 * level such as a directory, it children will be returned.
+	 * @apiNote This method allows querying of artifacts at a certain level without needing to worry whether the given artifact is subsumed, such as
+	 *          <code>index.html</code>, and standing in for the collection.
 	 * @param artifact The artifact for which artifacts at the same level should be queried.
 	 * @return This artifact query.
 	 */

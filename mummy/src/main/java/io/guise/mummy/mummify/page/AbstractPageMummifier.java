@@ -213,8 +213,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 *           this implementation delegates to {@link #defaultNavigation(MummyContext, Artifact)}.
 	 */
 	@Override
-	public Stream<NavigationItem> navigation(@Nonnull MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
-		return getNavigationManager().loadNavigation(context, artifact).orElseGet(() -> defaultNavigation(context, contextArtifact));
+	public Stream<NavigationItem> navigation(@Nonnull MummyContext context, final Artifact artifact) throws IOException {
+		return getNavigationManager().loadNavigation(context, artifact).orElseGet(() -> defaultNavigation(context, artifact));
 	}
 
 	/**
@@ -223,13 +223,13 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @apiNote These artifacts represent a default fallback. It is not usually appropriate to override this method.
 	 * @implSpec This implementation calls {@link #defaultNavigationArtifacts(MummyContext, Artifact)}.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact for which navigation information should be produced.
 	 * @return The navigation items, in order, that constitute the official possible navigation destinations from this artifact.
 	 * @throws IllegalArgumentException if the information of the navigation artifacts prevent them from being ordered.
 	 */
-	protected Stream<NavigationItem> defaultNavigation(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
-		return defaultNavigationArtifacts(context, contextArtifact).map(navigationArtifact -> { //map navigation artifacts to their navigation items
-			final String href = context.getPlan().referenceInSource(contextArtifact, navigationArtifact).toString();
+	protected Stream<NavigationItem> defaultNavigation(@Nonnull MummyContext context, @Nonnull final Artifact artifact) {
+		return defaultNavigationArtifacts(context, artifact).map(navigationArtifact -> { //map navigation artifacts to their navigation items
+			final String href = context.getPlan().referenceInSource(artifact, navigationArtifact).toString();
 			return DefaultNavigationItem.forArtifactReference(href, navigationArtifact);
 		});
 	}
@@ -240,13 +240,13 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @apiNote These artifacts represent a default fallback. It is not usually appropriate to override this method.
 	 * @implSpec This implementation currently filters out post artifacts.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
+	 * @param artifact The artifact for which navigation information should be produced.
 	 * @return The artifacts, in order, that constitute the official possible navigation destinations from this artifact.
 	 * @throws IllegalArgumentException if the information of the navigation artifacts prevent them from being ordered.
 	 * @see #findParentNavigationArtifact(MummyContext, Artifact)
 	 * @see #childNavigationArtifacts(MummyContext, Artifact)
 	 */
-	protected Stream<Artifact> defaultNavigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact) {
+	protected Stream<Artifact> defaultNavigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact artifact) {
 		//decide how to sort the links
 		final Collator navigationCollator = Collator.getInstance(); //TODO i18n: get locale for page, defaulting to site locale
 		navigationCollator.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
@@ -266,9 +266,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				.thenComparing(navigationArtifact -> navigationArtifact.determineLabel(), navigationCollator);
 		return Stream.concat(
 				//put the parent navigation artifact (if any) first
-				findParentNavigationArtifact(context, contextArtifact).stream(),
+				findParentNavigationArtifact(context, artifact).stream(),
 				//then include the sorted child navigation artifacts
-				childNavigationArtifacts(context, contextArtifact)
+				childNavigationArtifacts(context, artifact)
 						//posts shouldn't appear in the normal navigation list TODO create a more semantic means of filtering posts
 						.filter(not(PostArtifact.class::isInstance)).sorted(navigationArtifactOrderComparator));
 	}
@@ -439,7 +439,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR
 	 */
 	@Override
-	public void mummifyFile(final MummyContext context, final Artifact contextArtifact, final Artifact artifact) throws IOException {
+	public void mummifyFile(final MummyContext context, final Artifact artifact) throws IOException {
 
 		try {
 
@@ -448,10 +448,10 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			getLogger().trace("Loaded page source document `{}`.", artifact.getSourcePath());
 
 			//#normalize: normalize the DOM and remove metadata
-			final Document normalizedDocument = normalizeDocument(context, contextArtifact, artifact, sourceDocument);
+			final Document normalizedDocument = normalizeDocument(context, artifact, sourceDocument);
 
 			//#apply template
-			final Document templatedDocument = applyTemplate(context, contextArtifact, artifact, normalizedDocument);
+			final Document templatedDocument = applyTemplate(context, artifact, normalizedDocument);
 
 			//#mesh document: evaluate MEXL expressions and perform transformations
 			final MeshContext meshContext = new DefaultMeshContext();
@@ -461,16 +461,16 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			final Document meshedDocument = getGuiseMesh().meshDocument(meshContext, templatedDocument);
 
 			//#process document: evaluate Guise Mummy directives and widgets; and perform transformations
-			final Document processedDocument = processDocument(context, contextArtifact, artifact, meshedDocument);
+			final Document processedDocument = processDocument(context, artifact, meshedDocument);
 
 			//#relocate document from source to target: translate path references from the source to the target
-			final Document relocatedDocument = relocateSourceDocumentToTarget(context, contextArtifact, artifact, processedDocument);
+			final Document relocatedDocument = relocateSourceDocumentToTarget(context, artifact, processedDocument);
 
 			//#cleanse document: remove all Guise Mummy related elements and attributes
-			final Document cleansedDocument = cleanseDocument(context, contextArtifact, artifact, relocatedDocument);
+			final Document cleansedDocument = cleanseDocument(context, artifact, relocatedDocument);
 
 			//#ascribe document: adds metadata not related to Guise Mummy directives
-			final Document ascribedDocument = ascribeDocument(context, contextArtifact, artifact, cleansedDocument);
+			final Document ascribedDocument = ascribeDocument(context, artifact, cleansedDocument);
 
 			//#save target document
 			try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))) {
@@ -496,21 +496,20 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * </ul>
 	 * @implSpec This implementation does not allow the document element to be removed or replaced.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @param document The document to normalize.
 	 * @return The normalized document, which may or may not be the same document supplied as input.
 	 * @throws IOException if there is an error normalizing the document.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	protected Document normalizeDocument(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Document document) throws IOException, DOMException {
+	protected Document normalizeDocument(@Nonnull MummyContext context, @Nonnull final Artifact artifact, @Nonnull final Document document)
+			throws IOException, DOMException {
 		//**Do not call `document.normalizeDocument()`**, as it apparently tries to look up entities without using the document factory entity resolver,
 		//causing the method to pause and potentially print error messages if entities cannot be found.
 		//See note about `resource-resolver` parameter in `DOMConfiguration` if this needs to be investigated further.
 		document.normalize();
 		final Element documentElement = document.getDocumentElement();
-		final List<Element> normalizedElements = normalizeElement(context, contextArtifact, artifact, documentElement);
+		final List<Element> normalizedElements = normalizeElement(context, artifact, documentElement);
 		if(normalizedElements.size() != 1 || normalizedElements.get(0) != documentElement) {
 			throw new UnsupportedOperationException("Document element cannot be removed or replaced when normalizing a document.");
 		}
@@ -523,15 +522,14 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @implSpec This implementation marks for removal any {@value HTML#ELEMENT_META} elements with a {@value HTML#ELEMENT_META_ATTRIBUTE_NAME} or a
 	 *           {@value RDFa#ATTRIBUTE_PROPERTY} attribute. It also removes all {@link RDFa#ATTRIBUTE_PREFIX} attributes.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @param element The element to normalized.
 	 * @return The normalized element(s), if any, to replace the source element.
 	 * @throws IOException if there is an error normalizing the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	protected List<Element> normalizeElement(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Element element) throws IOException, DOMException {
+	protected List<Element> normalizeElement(@Nonnull MummyContext context, @Nonnull final Artifact artifact, @Nonnull final Element element)
+			throws IOException, DOMException {
 
 		//remove the element itself if it is named metadata
 		if(HTML.XHTML_NAMESPACE_URI_STRING.equals(element.getNamespaceURI()) && ELEMENT_META.equals(element.getLocalName())
@@ -548,25 +546,23 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			}
 		}
 
-		normalizeChildElements(context, contextArtifact, artifact, element);
+		normalizeChildElements(context, artifact, element);
 
 		return List.of(element);
 	}
 
 	/**
 	 * Normalizes child elements of an existing element.
-	 * @implSpec Each child element is replaced with the normalized elements returned from calling
-	 *           {@link #normalizeElement(MummyContext, Artifact, Artifact, Element)}. If only the same element is returned, no replacement is made. If no element
-	 *           is returned, the source element is removed.
+	 * @implSpec Each child element is replaced with the normalized elements returned from calling {@link #normalizeElement(MummyContext, Artifact, Element)}. If
+	 *           only the same element is returned, no replacement is made. If no element is returned, the source element is removed.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @param element The element the children of which to normalize.
 	 * @throws IOException if there is an error processing the child elements.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	protected void normalizeChildElements(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Element element) throws IOException, DOMException {
+	protected void normalizeChildElements(@Nonnull MummyContext context, @Nonnull final Artifact artifact, @Nonnull final Element element)
+			throws IOException, DOMException {
 		final NodeList childNodes = element.getChildNodes();
 		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength();) { //advance the index manually as needed
 			final Node childNode = childNodes.item(childNodeIndex);
@@ -575,7 +571,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				continue;
 			}
 			final Element childElement = (Element)childNode;
-			final List<Element> normalizedElements = normalizeElement(context, contextArtifact, artifact, childElement);
+			final List<Element> normalizedElements = normalizeElement(context, artifact, childElement);
 			replaceChild(element, childElement, normalizedElements);
 			childNodeIndex += normalizedElements.size(); //manually advance the index based upon the replacement nodes
 		}
@@ -586,7 +582,6 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	/**
 	 * Applies a template if appropriate to a source document before it is processed.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @param sourceDocument The source document to process.
 	 * @return The document after applying a template, which may or may not be the same document supplied as input.
@@ -594,9 +589,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @throws IOException if there is an error applying a template.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	protected Document applyTemplate(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Document sourceDocument) throws IOException, IllegalDataException, DOMException {
-		return findTemplateSourceFile(context, contextArtifact, artifact, sourceDocument) //determine if there is a specified or appropriate template
+	protected Document applyTemplate(@Nonnull MummyContext context, @Nonnull final Artifact artifact, @Nonnull final Document sourceDocument)
+			throws IOException, IllegalDataException, DOMException {
+		return findTemplateSourceFile(context, artifact, sourceDocument) //determine if there is a specified or appropriate template
 				.flatMap(throwingFunction(templateSource -> { //try to apply the template
 					final Path templateFile = templateSource.getKey();
 					final PageMummifier templateMummifier = templateSource.getValue();
@@ -657,7 +652,6 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * artifact directory and ancestor directories.
 	 * @apiNote The template property is used from the description, because the original {@code <meta>} elements will have been removed during normalization.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @param sourceDocument The source document to process.
 	 * @return The template file, if any, along with its mummifier.
@@ -668,8 +662,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @see Artifact#PROPERTY_TAG_MUMMY_TEMPLATE
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_TEMPLATE_BASE_NAME
 	 */
-	protected Optional<Map.Entry<Path, PageMummifier>> findTemplateSourceFile(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact,
-			@Nonnull final Artifact artifact, @Nonnull final Document sourceDocument) throws IOException, DOMException {
+	protected Optional<Map.Entry<Path, PageMummifier>> findTemplateSourceFile(@Nonnull MummyContext context, @Nonnull final Artifact artifact,
+			@Nonnull final Document sourceDocument) throws IOException, DOMException {
 		//determine if a custom template file was specified; throw an exception if not in the source tree
 		final Optional<String> customTemplate = artifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_TEMPLATE).map(Object::toString);
 		if(customTemplate.isPresent()) { //if a custom template was specified, check it and map it to a mummifier
@@ -862,7 +856,6 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * Processes a source document before it is converted to an output document.
 	 * @implSpec This implementation does not allow the document element to be removed or replaced.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @param sourceDocument The source document to process.
 	 * @return The processed document, which may or may not be the same document supplied as input.
@@ -870,9 +863,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @throws IOException if there is an error processing the document.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	protected Document processDocument(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Document sourceDocument) throws IOException, DOMException {
-		final List<Element> processedElements = processElement(context, contextArtifact, artifact, sourceDocument.getDocumentElement());
+	protected Document processDocument(@Nonnull MummyContext context, @Nonnull final Artifact artifact, @Nonnull final Document sourceDocument)
+			throws IOException, DOMException {
+		final List<Element> processedElements = processElement(context, artifact, sourceDocument.getDocumentElement());
 		if(processedElements.size() != 1 || processedElements.get(0) != sourceDocument.getDocumentElement()) {
 			throw new UnsupportedOperationException("Document element cannot be removed or replaced when processing a document.");
 		}
@@ -885,10 +878,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 *           <ul>
 	 *           <li>Processing of registered widgets.</li>
 	 *           <li>Regeneration of navigation lists using {@link PageMummifier#ATTRIBUTE_REGENERATE} via
-	 *           {@link #regenerateNavigationList(MummyContext, Artifact, Artifact, Element)}.</li>
+	 *           {@link #regenerateNavigationList(MummyContext, Artifact, Element)}.</li>
 	 *           </ul>
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @param sourceElement The source element to process.
 	 * @return The processed element(s), if any, to replace the source element.
@@ -896,8 +888,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @throws IOException if there is an error processing the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	protected List<Element> processElement(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Element sourceElement) throws IOException, DOMException {
+	protected List<Element> processElement(@Nonnull MummyContext context, @Nonnull final Artifact artifact, @Nonnull final Element sourceElement)
+			throws IOException, DOMException {
 
 		//TODO transfer to some system of pluggable element processing strategies
 
@@ -905,7 +897,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		final Widget widget = WIDGETS_BY_ELEMENT_NAME.get(NsName.ofNode(sourceElement));
 		if(widget != null) {
 			try {
-				return widget.processElement(this, context, contextArtifact, artifact, sourceElement);
+				return widget.processElement(this, context, artifact, sourceElement);
 			} catch(final IllegalDataException illegalDataException) { //make widget illegal argument errors more useful
 				throw new IOException(String.format("Invalid data for widget `%s` in `%s`: %s", widget.getWidgetElementName(), artifact.getSourceDirectory(),
 						illegalDataException.getLocalizedMessage()), illegalDataException); //TODO i18n
@@ -924,33 +916,31 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				if(ELEMENT_OL.equals(sourceElement.getLocalName()) || ELEMENT_UL.equals(sourceElement.getLocalName())) { //<ol> or <ul>
 
 					if(hasAncestorElementNS(sourceElement, XHTML_NAMESPACE_URI_STRING, ELEMENT_NAV)) { //if this is a navigation list
-						return regenerateNavigationList(context, contextArtifact, artifact, sourceElement);
+						return regenerateNavigationList(context, artifact, sourceElement);
 					}
 				}
 			}
 
 		}
 
-		processChildElements(context, contextArtifact, artifact, sourceElement);
+		processChildElements(context, artifact, sourceElement);
 
 		return List.of(sourceElement);
 	}
 
 	/**
 	 * Processes child elements of an existing element.
-	 * @implSpec Each child element is replaced with the processed elements returned from calling
-	 *           {@link #processElement(MummyContext, Artifact, Artifact, Element)}. If only the same element is returned, no replacement is made. If no element
-	 *           is returned, the source element is removed.
+	 * @implSpec Each child element is replaced with the processed elements returned from calling {@link #processElement(MummyContext, Artifact, Element)}. If
+	 *           only the same element is returned, no replacement is made. If no element is returned, the source element is removed.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @param sourceElement The source element the children of which to process.
 	 * @throws IllegalArgumentException if the elements have some information that cannot be processed.
 	 * @throws IOException if there is an error processing the child elements.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	protected void processChildElements(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Element sourceElement) throws IOException, DOMException {
+	protected void processChildElements(@Nonnull MummyContext context, @Nonnull final Artifact artifact, @Nonnull final Element sourceElement)
+			throws IOException, DOMException {
 		final NodeList childNodes = sourceElement.getChildNodes();
 		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength();) { //advance the index manually as needed
 			final Node childNode = childNodes.item(childNodeIndex);
@@ -959,7 +949,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				continue;
 			}
 			final Element childElement = (Element)childNode;
-			final List<Element> processedElements = processElement(context, contextArtifact, artifact, childElement);
+			final List<Element> processedElements = processElement(context, artifact, childElement);
 			replaceChild(sourceElement, childElement, processedElements);
 			childNodeIndex += processedElements.size(); //manually advance the index based upon the replacement nodes
 		}
@@ -992,26 +982,25 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	private final static Set<String> FONT_AWESOME_ICON_GROUPS = Set.of("fas", "far", "fal", "fad", "fab");
 
 	/**
-	 * Regenerates a navigation list based upon the parent, sibling, and/or child navigation artifacts relative to the context artifact.
+	 * Regenerates a navigation list based upon the parent, sibling, and/or child navigation artifacts relative to the artifact.
 	 * <p>
 	 * This method discovers a link to serve as the template for the generated links. If the link has a reference to the template itself (preferably by simply
 	 * using <code>href=""</code>), the link is used as the template for active links; that is, self-links. Any other link (which is not ever required to have an
 	 * <code>href</code> attribute) is used as the template for all other links.
 	 * </p>
-	 * @implSpec This implementation calls {@link #generateNavigationList(MummyContext, Artifact, Artifact, Element, Element, Stream)} for each menu level. See
-	 *           that method for a specification of how link templates work.
+	 * @implSpec This implementation calls {@link #generateNavigationList(MummyContext, Artifact, Element, Element, Stream)} for each menu level. See that method
+	 *           for a specification of how link templates work.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @param navigationListElement The list element to regenerate.
 	 * @return The processed element(s), if any, to replace the source element.
 	 * @throws IllegalArgumentException if the information of the navigation artifacts prevent them from being ordered.
 	 * @throws IOException if there is an error processing the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
-	 * @see #navigation(MummyContext, Artifact, Artifact)
-	 * @see #generateNavigationList(MummyContext, Artifact, Artifact, Element, Element, Stream)
+	 * @see #navigation(MummyContext, Artifact)
+	 * @see #generateNavigationList(MummyContext, Artifact, Element, Element, Stream)
 	 */
-	protected List<Element> regenerateNavigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
+	protected List<Element> regenerateNavigationList(@Nonnull MummyContext context, @Nonnull final Artifact artifact,
 			@Nonnull final Element navigationListElement) throws IOException, DOMException {
 
 		//determine the templates
@@ -1057,8 +1046,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		removeChildren(navigationListElement); //remove existing links
 
 		//regenerate the list and add the new list elements to the navigation list element
-		generateNavigationList(context, contextArtifact, artifact, inactiveLiTemplate, activeLiTemplate, navigation(context, contextArtifact, artifact))
-				.forEach(navigationListElement::appendChild);
+		generateNavigationList(context, artifact, inactiveLiTemplate, activeLiTemplate, navigation(context, artifact)).forEach(navigationListElement::appendChild);
 
 		return List.of(navigationListElement);
 	}
@@ -1075,23 +1063,22 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * removed (leaving the icon, if any), and the result of {@link Artifact#determineLabel()} will be appended as text for the link label.</li>
 	 * </ul>
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @param inactiveLiTemplate The element to serve as a template for generating "normal", non-active items.
-	 * @param activeLiTemplate The element to serve as a template for generating active items, those item that reference the context artifact.
+	 * @param activeLiTemplate The element to serve as a template for generating active items, those item that reference the principal artifact of that given.
 	 * @param navigation The navigation items for which to generate list item elements.
 	 * @return The elements generated for the list items.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	protected Stream<Element> generateNavigationList(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Element inactiveLiTemplate, @Nonnull final Element activeLiTemplate, @Nonnull final Stream<NavigationItem> navigation)
-			throws DOMException {
+	protected Stream<Element> generateNavigationList(@Nonnull MummyContext context, @Nonnull final Artifact artifact, @Nonnull final Element inactiveLiTemplate,
+			@Nonnull final Element activeLiTemplate, @Nonnull final Stream<NavigationItem> navigation) throws DOMException {
+		final Artifact principalArtifact = context.getPlan().getPrincipalArtifact(artifact); //for comparing the normalizes link target with this artifact
 		return navigation.map(navigationItem -> { //generate navigation elements 
 			//see if the href is a relative link back to this artifact, and if so use the template for an active link;
 			final boolean isSelfHref = navigationItem.findHref().map(URI::create).filter(not(URI::isAbsolute)) //assume absolute (external) URIs do not reference this artifact
 					.filter(not(uri -> uri.getRawFragment() != null)) //ignore fragment references; the static page doesn't know when/if the browser includes the fragment
-					.flatMap(URIs::findURIPath).flatMap(relativeReference -> context.getPlan().findArtifactBySourceRelativeReference(contextArtifact, relativeReference))
-					.map(contextArtifact::equals).orElse(false);
+					.flatMap(URIs::findURIPath).flatMap(relativeReference -> context.getPlan().findArtifactBySourceRelativeReference(artifact, relativeReference))
+					.map(principalArtifact::equals).orElse(false); //the link target is normalized to the principal artifact, which is what we use to compare
 			final Element liTemplate = isSelfHref ? activeLiTemplate : inactiveLiTemplate;
 			final Element liElement = (Element)liTemplate.cloneNode(true);
 			//update the icon: <li><i> (transform to <span></span>)
@@ -1147,8 +1134,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			if(!childNavigation.isEmpty()) { //don't even add a sublist if there are no child navigation items
 				final Element ulElement = liElement.getOwnerDocument().createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_UL);
 				//generate navigation list elements and add them to the sublist element
-				generateNavigationList(context, contextArtifact, artifact, inactiveLiTemplate, activeLiTemplate, childNavigation.stream())
-						.forEach(ulElement::appendChild);
+				generateNavigationList(context, artifact, inactiveLiTemplate, activeLiTemplate, childNavigation.stream()).forEach(ulElement::appendChild);
 				liElement.appendChild(ulElement);
 			}
 			return liElement;
@@ -1160,16 +1146,15 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	/**
 	 * Relocates a document by retargeting its references from the artifact source path to the artifact target path.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @param sourceDocument The source document to relocate.
 	 * @return The relocated document, which may or may not be the same document supplied as input.
 	 * @throws IOException if there is an error relocating the document.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	protected Document relocateSourceDocumentToTarget(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Document sourceDocument) throws IOException, DOMException {
-		return relocateDocument(context, sourceDocument, contextArtifact.getSourcePath(),
+	protected Document relocateSourceDocumentToTarget(@Nonnull MummyContext context, @Nonnull final Artifact artifact, @Nonnull final Document sourceDocument)
+			throws IOException, DOMException {
+		return relocateDocument(context, sourceDocument, context.getPlan().getPrincipalArtifact(artifact).getSourcePath(), //e.g. consider `foo/` to be the source of `foo/index.html` for reference relocation
 				referentArtifact -> context.getPlan().referenceInTarget(artifact, referentArtifact));
 	}
 
@@ -1340,16 +1325,15 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * Cleanses a document before it is saved, removing any Mummy-related directives.
 	 * @implSpec This implementation does not allow the document element to be removed or replaced.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @param document The document to cleanse.
 	 * @return The cleansed document, which may or may not be the same document supplied as input.
 	 * @throws IOException if there is an error cleansing the document.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	protected Document cleanseDocument(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Document document) throws IOException, DOMException {
-		final List<Element> cleansedElements = cleanseElement(context, contextArtifact, artifact, document.getDocumentElement());
+	protected Document cleanseDocument(@Nonnull MummyContext context, @Nonnull final Artifact artifact, @Nonnull final Document document)
+			throws IOException, DOMException {
+		final List<Element> cleansedElements = cleanseElement(context, artifact, document.getDocumentElement());
 		if(cleansedElements.size() != 1 || cleansedElements.get(0) != document.getDocumentElement()) {
 			throw new UnsupportedOperationException("Document element cannot be removed or replaced when cleansing a document.");
 		}
@@ -1361,7 +1345,6 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @implSpec This implementation marks for removal any element in the {@link GuiseMummy#NAMESPACE} namespace, and for all other elements removes all
 	 *           attributes in the {@link GuiseMummy#NAMESPACE} namespace.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @param element The element to cleanse.
 	 * @return The cleansed element(s), if any, to replace the source element.
@@ -1369,8 +1352,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 * @see GuiseMummy#NAMESPACE
 	 */
-	protected List<Element> cleanseElement(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Element element) throws IOException, DOMException {
+	protected List<Element> cleanseElement(@Nonnull MummyContext context, @Nonnull final Artifact artifact, @Nonnull final Element element)
+			throws IOException, DOMException {
 
 		//remove the element itself if it is in the Guise Mummy namespace
 		if(GuiseMummy.NAMESPACE_STRING.equals(element.getNamespaceURI())) { //<mummy:*>
@@ -1393,25 +1376,23 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			}
 		}
 
-		cleanseChildElements(context, contextArtifact, artifact, element);
+		cleanseChildElements(context, artifact, element);
 
 		return List.of(element);
 	}
 
 	/**
 	 * Cleanses child elements of an existing element, removing any Mummy-related directives.
-	 * @implSpec Each child element is replaced with the cleansed elements returned from calling
-	 *           {@link #cleanseElement(MummyContext, Artifact, Artifact, Element)}. If only the same element is returned, no replacement is made. If no element
-	 *           is returned, the source element is removed.
+	 * @implSpec Each child element is replaced with the cleansed elements returned from calling {@link #cleanseElement(MummyContext, Artifact, Element)}. If only
+	 *           the same element is returned, no replacement is made. If no element is returned, the source element is removed.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @param element The element the children of which to cleanse.
 	 * @throws IOException if there is an error processing the child elements.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	protected void cleanseChildElements(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Element element) throws IOException, DOMException {
+	protected void cleanseChildElements(@Nonnull MummyContext context, @Nonnull final Artifact artifact, @Nonnull final Element element)
+			throws IOException, DOMException {
 		final NodeList childNodes = element.getChildNodes();
 		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength();) { //advance the index manually as needed
 			final Node childNode = childNodes.item(childNodeIndex);
@@ -1420,7 +1401,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				continue;
 			}
 			final Element childElement = (Element)childNode;
-			final List<Element> cleansedElements = cleanseElement(context, contextArtifact, artifact, childElement);
+			final List<Element> cleansedElements = cleanseElement(context, artifact, childElement);
 			replaceChild(element, childElement, cleansedElements);
 			childNodeIndex += cleansedElements.size(); //manually advance the index based upon the replacement nodes
 		}
@@ -1450,7 +1431,6 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * </p>
 	 * @implSpec This implementation adds additional metadata to identify the generator and indicate the generation time.
 	 * @param context The context of static site generation.
-	 * @param contextArtifact The artifact in which context the artifact is being generated, which may or may not be the same as the artifact being generated.
 	 * @param artifact The artifact being generated
 	 * @param document The document to ascribe.
 	 * @return The given document with metadata added.
@@ -1459,8 +1439,8 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 * @see MummyContext#getMummifierIdentification()
 	 */
-	protected Document ascribeDocument(@Nonnull MummyContext context, @Nonnull final Artifact contextArtifact, @Nonnull final Artifact artifact,
-			@Nonnull final Document document) throws IOException, DOMException {
+	protected Document ascribeDocument(@Nonnull MummyContext context, @Nonnull final Artifact artifact, @Nonnull final Document document)
+			throws IOException, DOMException {
 
 		//ensure that the document has the correct <html><head><title> structure
 		final Element htmlElement = findHtmlElement(document).orElseThrow(() -> new IllegalArgumentException("Document has no root <html> element."));
