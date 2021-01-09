@@ -499,12 +499,12 @@ public class S3Website extends S3 {
 	 * @see Artifact#PROPERTY_TAG_MUMMY_ALT_LOCATION
 	 */
 	@Override
-	protected void planResource(final MummyContext context, final Artifact rootArtifact, final Artifact artifact, final URIPath resourceReference)
+	protected void planResource(final MummyContext context, final URI rootTargetPathUri, final Artifact artifact, final URIPath resourceReference)
 			throws IOException {
-		super.planResource(context, rootArtifact, artifact, resourceReference);
+		super.planResource(context, rootTargetPathUri, artifact, resourceReference);
 		artifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ALT_LOCATION).filter(CharSequence.class::isInstance).map(Object::toString)
 				.map(URIPath::of).map(altLocationReference -> resolve(artifact.getTargetPath().toUri(), altLocationReference)) //convert to absolute file system URI
-				.map(altLocationUri -> URIPath.relativize(rootArtifact.getTargetPath().toUri(), altLocationUri)) //relativize to the site root
+				.map(altLocationUri -> URIPath.relativize(rootTargetPathUri, altLocationUri)) //relativize to the site root
 				.ifPresent(throwingConsumer(altLocationReference -> {
 					if(!altLocationReference.isSubPath()) {
 						throw new IOException(String.format("Artifact for resource %s specifies an alternative location %s which is outside the site boundaries.",
