@@ -19,6 +19,7 @@ package io.guise.framework;
 import java.io.*;
 import java.lang.ref.*;
 import java.net.*;
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,7 +28,6 @@ import static com.globalmentor.io.InputStreams.*;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
 
-import com.globalmentor.iso.datetime.ISODate;
 import com.globalmentor.java.Threads;
 import com.globalmentor.model.ConfigurationException;
 
@@ -45,13 +45,13 @@ public final class Guise {
 
 	//properties keys for the properties resources
 	private static final String VERSION_PROPERTIES_KEY = "version"; //String
-	private static final String BUILD_DATE_PROPERTIES_KEY = "build.date"; //ISODate
+	private static final String BUILD_DATE_PROPERTIES_KEY = "build.date"; //LocalDate
 
 	static {
 		try {
 			final Properties properties = loadPropertiesResource(Guise.class);
 			version = checkConfigurationNotNull(properties.getProperty(VERSION_PROPERTIES_KEY));
-			buildDate = ISODate.valueOf(checkConfigurationNotNull(properties.getProperty(BUILD_DATE_PROPERTIES_KEY)));
+			buildDate = LocalDate.parse(checkConfigurationNotNull(properties.getProperty(BUILD_DATE_PROPERTIES_KEY)));
 		} catch(final IOException ioException) {
 			throw new ConfigurationException(ioException);
 		}
@@ -64,10 +64,10 @@ public final class Guise {
 		return version;
 	}
 
-	private static final ISODate buildDate;
+	private static final LocalDate buildDate;
 
 	/** @return The build date of Guise. */
-	public static ISODate getBuildDate() {
+	public static LocalDate getBuildDate() {
 		return buildDate;
 	}
 
