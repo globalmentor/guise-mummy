@@ -92,24 +92,6 @@ public class GuiseMesh {
 	}
 
 	/**
-	 * Evaluates an expression using the given meshing context and returns the result as an optional value. If the expression evaluates to an instance of
-	 * {@link Optional}, that instance will be returned.
-	 * @apiNote This is a convenience method for evaluating an expression and returning an optional value. It will never return <code>null</code>. However it will
-	 *          not wrap a resulting {@link Optional} instance in another {@link Optional}. Thus this method functions analogously to
-	 *          {@link Optional#flatMap(java.util.function.Function)}.
-	 * @param context The context of meshing.
-	 * @param expression The expression to evaluate.
-	 * @return The result of the expression, which will be empty if the expression evaluated to <code>null</code>.
-	 * @throws MexlException if there was an error parsing or otherwise processing the expression.
-	 */
-	protected Optional<Object> findExpressionResult(@Nonnull final MeshContext context, @Nonnull final String expression) throws MexlException {
-		final Object result = getEvaluator().evaluate(context, expression);
-		@SuppressWarnings("unchecked")
-		final Optional<Object> optionalResult = result instanceof Optional ? (Optional<Object>)result : Optional.ofNullable(result);
-		return optionalResult;
-	}
-
-	/**
 	 * Default Mesh Expression Language (MEXL) evaluator constructor.
 	 * @implSpec This implementation uses an instance of the {@link JexlMexlEvaluator}.
 	 */
@@ -157,7 +139,7 @@ public class GuiseMesh {
 	public List<Element> meshElement(@Nonnull MeshContext context, @Nonnull final Element element) throws IOException, MeshException, DOMException {
 		//# iteration
 		final Optional<List<Element>> iteration = exciseAttribute(element, ATTRIBUTE_EACH) //mx:each
-				.flatMap(each -> findExpressionResult(context, each)).map(throwingFunction(iterationSource -> {
+				.flatMap(each -> getEvaluator().findExpressionResult(context, each)).map(throwingFunction(iterationSource -> {
 					try (final Closeable iterationSourceCleanup = toCloseable(iterationSource)) { //ensure the iteration source is closed, in case it uses resource e.g. a directory listing
 						final MeshIterator iterator;
 						try {
@@ -192,7 +174,7 @@ public class GuiseMesh {
 
 		//# text
 		exciseAttribute(element, ATTRIBUTE_TEXT).ifPresent(text -> { //mx:text
-			final Optional<Object> foundResult = findExpressionResult(context, text);
+			final Optional<Object> foundResult = getEvaluator().findExpressionResult(context, text);
 			element.setTextContent(foundResult.map(Object::toString).orElse(""));
 		});
 
