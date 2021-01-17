@@ -91,20 +91,29 @@ public class GuiseMesh {
 		return evaluator;
 	}
 
+	private final MeshInterpolator interpolator;
+
+	/** @return The strategy for interpolating strings. */
+	protected MeshInterpolator getInterpolator() {
+		return interpolator;
+	}
+
 	/**
 	 * Default Mesh Expression Language (MEXL) evaluator constructor.
-	 * @implSpec This implementation uses an instance of the {@link JexlMexlEvaluator}.
+	 * @implSpec This implementation uses an instance of the {@link JexlMexlEvaluator} as evaluator and {@link DefaultMeshInterpolator} as evaluator.
 	 */
 	public GuiseMesh() {
-		this(JexlMexlEvaluator.INSTANCE);
+		this(JexlMexlEvaluator.INSTANCE, DefaultMeshInterpolator.INSTANCE);
 	}
 
 	/**
 	 * Mesh Expression Language (MEXL) evaluator constructor.
 	 * @param evaluator The strategy for evaluating MEXL expressions.
+	 * @param interpolator The strategy for interpolating strings.
 	 */
-	public GuiseMesh(@Nonnull final MexlEvaluator evaluator) {
+	public GuiseMesh(@Nonnull final MexlEvaluator evaluator, @Nonnull final MeshInterpolator interpolator) {
 		this.evaluator = requireNonNull(evaluator);
+		this.interpolator = requireNonNull(interpolator);
 	}
 
 	/**
@@ -137,9 +146,11 @@ public class GuiseMesh {
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	public List<Element> meshElement(@Nonnull MeshContext context, @Nonnull final Element element) throws IOException, MeshException, DOMException {
+		final MexlEvaluator evaluator = getEvaluator();
+
 		//# iteration
 		final Optional<List<Element>> iteration = exciseAttribute(element, ATTRIBUTE_EACH) //mx:each
-				.flatMap(each -> getEvaluator().findExpressionResult(context, each)).map(throwingFunction(iterationSource -> {
+				.flatMap(each -> evaluator.findExpressionResult(context, each)).map(throwingFunction(iterationSource -> {
 					try (final Closeable iterationSourceCleanup = toCloseable(iterationSource)) { //ensure the iteration source is closed, in case it uses resource e.g. a directory listing
 						final MeshIterator iterator;
 						try {
@@ -174,11 +185,21 @@ public class GuiseMesh {
 
 		//# text
 		exciseAttribute(element, ATTRIBUTE_TEXT).ifPresent(text -> { //mx:text
-			final Optional<Object> foundResult = getEvaluator().findExpressionResult(context, text);
+			final Optional<Object> foundResult = evaluator.findExpressionResult(context, text);
 			element.setTextContent(foundResult.map(Object::toString).orElse(""));
 		});
 
 		meshChildElements(context, element);
+
+		//# attribute interpolation
+		final MeshInterpolator interpolator = getInterpolator();
+		final Iterator<Attr> attributeIterator = attributesIterator(element);
+		while(attributeIterator.hasNext()) {
+			final Attr attribute = attributeIterator.next();
+			if(!NAMESPACE_STRING.equals(attribute.getNamespaceURI())) { //ignore mx: attributes
+				interpolator.findInterpolation(context, attribute.getValue(), evaluator).map(Object::toString).ifPresent(attribute::setValue);
+			}
+		}
 
 		//TODO remove all mx-related attributes
 

@@ -32,10 +32,25 @@ import javax.annotation.*;
  */
 public class DefaultMeshInterpolator implements MeshInterpolator {
 
+	/** The default Guise Mesh left interpolation expression delimiter. */
+	public static final String LEFT_EXPRESSION_DELIMITER = "^{";
+
+	/** The default Guise Mesh right interpolation expression delimiter. */
+	public static final String RIGHT_EXPRESSION_DELIMITER = "}";
+
+	/** Singleton shared instance. */
+	public static final DefaultMeshInterpolator INSTANCE = new DefaultMeshInterpolator();
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec To evaluate expressions this implementation delegates to {@link MexlEvaluator#findExpressionResult(MeshContext, CharSequence)} and uses the
+	 *           {@link Object#toString()} value of the returned result, or the empty string if no result is returned.
+	 */
 	@Override
 	public Optional<CharSequence> findInterpolation(final MeshContext context, final CharSequence text, final MexlEvaluator evaluator)
 			throws MeshInterpolationException, MexlException {
-		throw new UnsupportedOperationException("TODO");
+		return findInterpolation(text, LEFT_EXPRESSION_DELIMITER, RIGHT_EXPRESSION_DELIMITER,
+				expression -> evaluator.findExpressionResult(context, expression).map(Object::toString).orElse(""));
 	}
 
 	/**
