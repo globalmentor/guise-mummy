@@ -189,8 +189,6 @@ public class GuiseMesh {
 			element.setTextContent(foundResult.map(Object::toString).orElse(""));
 		});
 
-		meshChildElements(context, element);
-
 		//# attribute interpolation
 		final MeshInterpolator interpolator = getInterpolator();
 		final Iterator<Attr> attributeIterator = attributesIterator(element);
@@ -201,13 +199,19 @@ public class GuiseMesh {
 			}
 		}
 
+		meshChildNodes(context, element);
+
 		//TODO remove all mx-related attributes
 
 		return List.of(element);
 	}
 
 	/**
-	 * Evaluates and transforms child elements of an existing element.
+	 * Evaluates and transforms child nodes of an existing element.
+	 * <ul>
+	 * <li>Interpolates each child text, CDATA, and comment node.</li>
+	 * <li>Recursively meshes each child element</li>
+	 * </ul>
 	 * @implSpec Each child element is replaced with the normalized elements returned from calling {@link #meshElement(MeshContext, Element)}. If only the same
 	 *           element is returned, no replacement is made. If no element is returned, the source element is removed.
 	 * @param context The context of meshing.
@@ -216,19 +220,24 @@ public class GuiseMesh {
 	 * @throws IOException if there is an error meshing the child elements.
 	 * @throws MeshException if there was an error directly related to meshing the document, such as parsing an expression.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 * @see #getInterpolator()
+	 * @see #getEvaluator()
 	 */
-	public void meshChildElements(@Nonnull MeshContext context, @Nonnull final Element element) throws IOException, MeshException, DOMException {
+	public void meshChildNodes(@Nonnull MeshContext context, @Nonnull final Element element) throws IOException, MeshException, DOMException {
+		final MeshInterpolator interpolator = getInterpolator();
+		final MexlEvaluator evaluator = getEvaluator();
 		final NodeList childNodes = element.getChildNodes();
-		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength();) { //advance the index manually as needed
+		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength(); childNodeIndex++) {
 			final Node childNode = childNodes.item(childNodeIndex);
-			if(!(childNode instanceof Element)) { //skip non-elements
-				childNodeIndex++;
-				continue;
+			if(childNode instanceof CharacterData) { //Text, Comment, or CDATA
+				final CharacterData childCharacterData = (CharacterData)childNode;
+				interpolator.findInterpolation(context, childCharacterData.getData(), evaluator).map(Object::toString).ifPresent(childCharacterData::setData);
+			} else if(childNode instanceof Element) {
+				final Element childElement = (Element)childNode;
+				final List<Element> meshedElements = meshElement(context, childElement);
+				replaceChild(element, childElement, meshedElements);
+				childNodeIndex += meshedElements.size() - 1; //adjust the index based upon the number of replaced elements (by default the loop advances by one)
 			}
-			final Element childElement = (Element)childNode;
-			final List<Element> meshedElements = meshElement(context, childElement);
-			replaceChild(element, childElement, meshedElements);
-			childNodeIndex += meshedElements.size(); //manually advance the index based upon the replacement nodes
 		}
 	}
 

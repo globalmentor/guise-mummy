@@ -142,4 +142,39 @@ public class GuiseMeshTest {
 				"<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test Document</title></head><body><h1 title=\"Result: Success\">Dummy Heading</h1></body></html>"));
 	}
 
+	@Test
+	void testTextInterpolation() throws IOException {
+		final Document document = createXHTMLDocument("Test Document");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element h1Element = appendElement(bodyElement, ELEMENT_H(1), "Result: ^{foo.bar}");
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("foo", Map.of("bar", "Success"))), document);
+		assertThat(h1Element.getTextContent(), is("Result: Success"));
+		assertThat(new HtmlSerializer().serialize(document),
+				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test Document</title></head><body><h1>Result: Success</h1></body></html>"));
+	}
+
+	@Test
+	void testCDATAInterpolation() throws IOException {
+		final Document document = createXHTMLDocument("Test Document");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final CDATASection cdataSection = document.createCDATASection("Result: ^{foo.bar}");
+		bodyElement.appendChild(cdataSection);
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("foo", Map.of("bar", "Success"))), document);
+		assertThat(cdataSection.getData(), is("Result: Success"));
+		assertThat(new HtmlSerializer().serialize(document),
+				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test Document</title></head><body><![CDATA[Result: Success]]></body></html>"));
+	}
+
+	@Test
+	void testCommentInterpolation() throws IOException {
+		final Document document = createXHTMLDocument("Test Document");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Comment comment = document.createComment("Result: ^{foo.bar}");
+		bodyElement.appendChild(comment);
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("foo", Map.of("bar", "Success"))), document);
+		assertThat(comment.getData(), is("Result: Success"));
+		assertThat(new HtmlSerializer().serialize(document),
+				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test Document</title></head><body><!--Result: Success--></body></html>"));
+	}
+
 }
