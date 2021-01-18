@@ -20,6 +20,7 @@ import static com.globalmentor.html.HtmlDom.*;
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static io.guise.mesh.GuiseMesh.*;
+import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
@@ -99,7 +100,7 @@ public class GuiseMeshTest {
 			final Element outerLiElement = appendElement(outerUlElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI));
 			setAttribute(outerLiElement, ATTRIBUTE_EACH.withPrefix(NAMESPACE_PREFIX), "outerList");
 			itemVarAttribute.ifPresent(itemVar -> setAttribute(outerLiElement, ATTRIBUTE_ITEM_VAR.withPrefix(NAMESPACE_PREFIX), itemVar));
-			//TODO improve to set outer text somewhere besides body content: setAttribute(outerLiElement, ATTRIBUTE_TEXT.withPrefix(NAMESPACE_PREFIX), itemVarAttribute.orElse(DEFAULT_ITEM_VAR));
+			outerLiElement.setAttributeNS(null, ATTRIBUTE_TITLE, format("^{%s}", itemVarAttribute.orElse(DEFAULT_ITEM_VAR))); //<li title="N"> 
 			final Element innerUlElement = appendElement(outerLiElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_UL));
 			final Element innerLiElement = appendElement(innerUlElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI));
 			setAttribute(innerLiElement, ATTRIBUTE_EACH.withPrefix(NAMESPACE_PREFIX), "innerList");
@@ -107,8 +108,8 @@ public class GuiseMeshTest {
 			setAttribute(innerLiElement, ATTRIBUTE_TEXT.withPrefix(NAMESPACE_PREFIX), itemVarAttribute.orElse(DEFAULT_ITEM_VAR));
 			new GuiseMesh().meshDocument(MeshContext.create(Map.of("outerList", List.of("1", "2"), "innerList", List.of("A", "B"))), document);
 			assertThat("TODO Outer item variable is shadowed but returns after nested inner iteration.", new HtmlSerializer().serialize(document),
-					is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test</title></head><body><ul><li><ul><li>A</li><li>B</li></ul></li>"
-							+ "<li><ul><li>A</li><li>B</li></ul></li></ul></body></html>"));
+					is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test</title></head><body><ul><li title=\"1\"><ul><li>A</li><li>B</li></ul></li>"
+							+ "<li title=\"2\"><ul><li>A</li><li>B</li></ul></li></ul></body></html>"));
 		}
 	}
 
@@ -124,6 +125,56 @@ public class GuiseMeshTest {
 		assertThat(hasAttribute(h1Element, ATTRIBUTE_TEXT), is(false));
 		assertThat(new HtmlSerializer().serialize(document),
 				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test Document</title></head><body><h1>Result: Success</h1></body></html>"));
+	}
+
+	//interpolation
+
+	@Test
+	void testAttributeInterpolation() throws IOException {
+		final Document document = createXHTMLDocument("Test Document");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element h1Element = appendElement(bodyElement, ELEMENT_H(1), "Dummy Heading");
+		h1Element.setAttributeNS(null, ATTRIBUTE_TITLE, "Result: ^{foo.bar}");
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("foo", Map.of("bar", "Success"))), document);
+		assertThat(h1Element.getTextContent(), is("Dummy Heading"));
+		assertThat(h1Element.getAttributeNS(null, ATTRIBUTE_TITLE), is("Result: Success"));
+		assertThat(new HtmlSerializer().serialize(document), is(
+				"<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test Document</title></head><body><h1 title=\"Result: Success\">Dummy Heading</h1></body></html>"));
+	}
+
+	@Test
+	void testTextInterpolation() throws IOException {
+		final Document document = createXHTMLDocument("Test Document");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element h1Element = appendElement(bodyElement, ELEMENT_H(1), "Result: ^{foo.bar}");
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("foo", Map.of("bar", "Success"))), document);
+		assertThat(h1Element.getTextContent(), is("Result: Success"));
+		assertThat(new HtmlSerializer().serialize(document),
+				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test Document</title></head><body><h1>Result: Success</h1></body></html>"));
+	}
+
+	@Test
+	void testCDATAInterpolation() throws IOException {
+		final Document document = createXHTMLDocument("Test Document");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final CDATASection cdataSection = document.createCDATASection("Result: ^{foo.bar}");
+		bodyElement.appendChild(cdataSection);
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("foo", Map.of("bar", "Success"))), document);
+		assertThat(cdataSection.getData(), is("Result: Success"));
+		assertThat(new HtmlSerializer().serialize(document),
+				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test Document</title></head><body><![CDATA[Result: Success]]></body></html>"));
+	}
+
+	@Test
+	void testCommentInterpolation() throws IOException {
+		final Document document = createXHTMLDocument("Test Document");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Comment comment = document.createComment("Result: ^{foo.bar}");
+		bodyElement.appendChild(comment);
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("foo", Map.of("bar", "Success"))), document);
+		assertThat(comment.getData(), is("Result: Success"));
+		assertThat(new HtmlSerializer().serialize(document),
+				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test Document</title></head><body><!--Result: Success--></body></html>"));
 	}
 
 }

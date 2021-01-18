@@ -91,38 +91,29 @@ public class GuiseMesh {
 		return evaluator;
 	}
 
-	/**
-	 * Evaluates an expression using the given meshing context and returns the result as an optional value. If the expression evaluates to an instance of
-	 * {@link Optional}, that instance will be returned.
-	 * @apiNote This is a convenience method for evaluating an expression and returning an optional value. It will never return <code>null</code>. However it will
-	 *          not wrap a resulting {@link Optional} instance in another {@link Optional}. Thus this method functions analogously to
-	 *          {@link Optional#flatMap(java.util.function.Function)}.
-	 * @param context The context of meshing.
-	 * @param expression The expression to evaluate.
-	 * @return The result of the expression, which will be empty if the expression evaluated to <code>null</code>.
-	 * @throws MexlException if there was an error parsing or otherwise processing the expression.
-	 */
-	protected Optional<Object> findExpressionResult(@Nonnull final MeshContext context, @Nonnull final String expression) throws MexlException {
-		final Object result = getEvaluator().evaluate(context, expression);
-		@SuppressWarnings("unchecked")
-		final Optional<Object> optionalResult = result instanceof Optional ? (Optional<Object>)result : Optional.ofNullable(result);
-		return optionalResult;
+	private final MeshInterpolator interpolator;
+
+	/** @return The strategy for interpolating strings. */
+	protected MeshInterpolator getInterpolator() {
+		return interpolator;
 	}
 
 	/**
 	 * Default Mesh Expression Language (MEXL) evaluator constructor.
-	 * @implSpec This implementation uses an instance of the {@link JexlMexlEvaluator}.
+	 * @implSpec This implementation uses an instance of the {@link JexlMexlEvaluator} as evaluator and {@link DefaultMeshInterpolator} as evaluator.
 	 */
 	public GuiseMesh() {
-		this(JexlMexlEvaluator.INSTANCE);
+		this(JexlMexlEvaluator.INSTANCE, DefaultMeshInterpolator.INSTANCE);
 	}
 
 	/**
 	 * Mesh Expression Language (MEXL) evaluator constructor.
 	 * @param evaluator The strategy for evaluating MEXL expressions.
+	 * @param interpolator The strategy for interpolating strings.
 	 */
-	public GuiseMesh(@Nonnull final MexlEvaluator evaluator) {
+	public GuiseMesh(@Nonnull final MexlEvaluator evaluator, @Nonnull final MeshInterpolator interpolator) {
 		this.evaluator = requireNonNull(evaluator);
+		this.interpolator = requireNonNull(interpolator);
 	}
 
 	/**
@@ -155,9 +146,11 @@ public class GuiseMesh {
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	public List<Element> meshElement(@Nonnull MeshContext context, @Nonnull final Element element) throws IOException, MeshException, DOMException {
+		final MexlEvaluator evaluator = getEvaluator();
+
 		//# iteration
 		final Optional<List<Element>> iteration = exciseAttribute(element, ATTRIBUTE_EACH) //mx:each
-				.flatMap(each -> findExpressionResult(context, each)).map(throwingFunction(iterationSource -> {
+				.flatMap(each -> evaluator.findExpressionResult(context, each)).map(throwingFunction(iterationSource -> {
 					try (final Closeable iterationSourceCleanup = toCloseable(iterationSource)) { //ensure the iteration source is closed, in case it uses resource e.g. a directory listing
 						final MeshIterator iterator;
 						try {
@@ -192,11 +185,21 @@ public class GuiseMesh {
 
 		//# text
 		exciseAttribute(element, ATTRIBUTE_TEXT).ifPresent(text -> { //mx:text
-			final Optional<Object> foundResult = findExpressionResult(context, text);
+			final Optional<Object> foundResult = evaluator.findExpressionResult(context, text);
 			element.setTextContent(foundResult.map(Object::toString).orElse(""));
 		});
 
-		meshChildElements(context, element);
+		//# attribute interpolation
+		final MeshInterpolator interpolator = getInterpolator();
+		final Iterator<Attr> attributeIterator = attributesIterator(element);
+		while(attributeIterator.hasNext()) {
+			final Attr attribute = attributeIterator.next();
+			if(!NAMESPACE_STRING.equals(attribute.getNamespaceURI())) { //ignore mx: attributes
+				interpolator.findInterpolation(context, attribute.getValue(), evaluator).map(Object::toString).ifPresent(attribute::setValue);
+			}
+		}
+
+		meshChildNodes(context, element);
 
 		//TODO remove all mx-related attributes
 
@@ -204,7 +207,11 @@ public class GuiseMesh {
 	}
 
 	/**
-	 * Evaluates and transforms child elements of an existing element.
+	 * Evaluates and transforms child nodes of an existing element.
+	 * <ul>
+	 * <li>Interpolates each child text, CDATA, and comment node.</li>
+	 * <li>Recursively meshes each child element</li>
+	 * </ul>
 	 * @implSpec Each child element is replaced with the normalized elements returned from calling {@link #meshElement(MeshContext, Element)}. If only the same
 	 *           element is returned, no replacement is made. If no element is returned, the source element is removed.
 	 * @param context The context of meshing.
@@ -213,19 +220,24 @@ public class GuiseMesh {
 	 * @throws IOException if there is an error meshing the child elements.
 	 * @throws MeshException if there was an error directly related to meshing the document, such as parsing an expression.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
+	 * @see #getInterpolator()
+	 * @see #getEvaluator()
 	 */
-	public void meshChildElements(@Nonnull MeshContext context, @Nonnull final Element element) throws IOException, MeshException, DOMException {
+	public void meshChildNodes(@Nonnull MeshContext context, @Nonnull final Element element) throws IOException, MeshException, DOMException {
+		final MeshInterpolator interpolator = getInterpolator();
+		final MexlEvaluator evaluator = getEvaluator();
 		final NodeList childNodes = element.getChildNodes();
-		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength();) { //advance the index manually as needed
+		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength(); childNodeIndex++) {
 			final Node childNode = childNodes.item(childNodeIndex);
-			if(!(childNode instanceof Element)) { //skip non-elements
-				childNodeIndex++;
-				continue;
+			if(childNode instanceof CharacterData) { //Text, Comment, or CDATA
+				final CharacterData childCharacterData = (CharacterData)childNode;
+				interpolator.findInterpolation(context, childCharacterData.getData(), evaluator).map(Object::toString).ifPresent(childCharacterData::setData);
+			} else if(childNode instanceof Element) {
+				final Element childElement = (Element)childNode;
+				final List<Element> meshedElements = meshElement(context, childElement);
+				replaceChild(element, childElement, meshedElements);
+				childNodeIndex += meshedElements.size() - 1; //adjust the index based upon the number of replaced elements (by default the loop advances by one)
 			}
-			final Element childElement = (Element)childNode;
-			final List<Element> meshedElements = meshElement(context, childElement);
-			replaceChild(element, childElement, meshedElements);
-			childNodeIndex += meshedElements.size(); //manually advance the index based upon the replacement nodes
 		}
 	}
 
