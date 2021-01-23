@@ -32,14 +32,13 @@ import java.util.regex.*;
 import javax.annotation.*;
 
 import io.guise.mummy.*;
-import io.guise.mummy.mummify.page.PostArtifact;
 import io.urf.model.*;
 import io.urf.vocab.content.Content;
 
 /**
  * Abstract mummifier for generating artifacts based upon a single source file.
  * @implSpec This implementation recognizes blog posts and gives them a target subdirectory structure appropriately based upon
- *           {@link PostArtifact#FILENAME_PATTERN}.
+ *           {@link SourcePathArtifact#POST_FILENAME_PATTERN}.
  * @implNote This implementation does not yet support source description files using {@link #getArtifactSourceDescriptionFile(MummyContext, Artifact)} or
  *           {@link #getArtifactSourceDescriptionFile(MummyContext, Path)}.
  * @author Garret Wilson
@@ -128,12 +127,12 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 			//add the publication date for posts
 			final Path filename = sourceFile.getFileName();
 			if(filename != null) {
-				final Matcher postMatcher = PostArtifact.FILENAME_PATTERN.matcher(filename.toString());
+				final Matcher postMatcher = SourcePathArtifact.POST_FILENAME_PATTERN.matcher(filename.toString());
 				if(postMatcher.matches()) { //if this is a post, add a `publishedOn` property if there isn't one already
 					if(!description.hasPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON)) {
-						final String postYear = postMatcher.group(PostArtifact.FILENAME_PATTERN_YEAR_GROUP);
-						final String postMonth = postMatcher.group(PostArtifact.FILENAME_PATTERN_MONTH_GROUP);
-						final String postDay = postMatcher.group(PostArtifact.FILENAME_PATTERN_DAY_GROUP);
+						final String postYear = postMatcher.group(SourcePathArtifact.POST_FILENAME_PATTERN_YEAR_GROUP);
+						final String postMonth = postMatcher.group(SourcePathArtifact.POST_FILENAME_PATTERN_MONTH_GROUP);
+						final String postDay = postMatcher.group(SourcePathArtifact.POST_FILENAME_PATTERN_DAY_GROUP);
 						//the regex will guarantee that these are parsable as integers 
 						final LocalDate publishedOn = LocalDate.of(Integer.parseInt(postYear), Integer.parseInt(postMonth), Integer.parseInt(postDay));
 						description.setPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON, publishedOn);

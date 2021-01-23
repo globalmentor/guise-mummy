@@ -52,7 +52,14 @@ public abstract class AbstractSourceFileArtifact extends AbstractDescribedArtifa
 		return true;
 	}
 
-	private final boolean navigable;
+	private final boolean isPost;
+
+	@Override
+	public boolean isPost() {
+		return isPost;
+	}
+
+	private final boolean isNavigable;
 
 	/**
 	 * {@inheritDoc}
@@ -60,37 +67,44 @@ public abstract class AbstractSourceFileArtifact extends AbstractDescribedArtifa
 	 */
 	@Override
 	public boolean isNavigable() {
-		return navigable;
+		return isNavigable;
 	}
 
 	/**
 	 * Constructor.
+	 * @implSpec Whether the artifact is a post is determined by whether the source filename, if any, matches {@link SourcePathArtifact#POST_FILENAME_PATTERN}.
 	 * @implSpec The artifact is created to be non-navigable.
 	 * @param mummifier The mummifier responsible for generating this artifact.
 	 * @param sourceFile The location of the artifact in the site source tree.
 	 * @param targetFile The file where the artifact will be generated.
 	 * @param description The description of the artifact.
+	 * @see SourcePathArtifact#hasPostFilename(Path)
 	 */
 	public AbstractSourceFileArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path targetFile,
 			@Nonnull final UrfResourceDescription description) {
 		super(mummifier, sourceFile, targetFile, description);
-		this.navigable = false;
+		this.isPost = SourcePathArtifact.hasPostFilename(sourceFile);
+		this.isNavigable = false;
 	}
 
 	/**
 	 * Builder constructor.
+	 * @implSpec Whether the artifact is a post is determined by whether the source filename, if any, matches {@link SourcePathArtifact#POST_FILENAME_PATTERN}.
 	 * @param builder The builder specifying the construction parameters.
+	 * @see SourcePathArtifact#hasPostFilename(Path)
 	 */
 	protected AbstractSourceFileArtifact(@Nonnull final Builder<?> builder) {
-		super(builder.mummifier, builder.sourceFile, builder.targetFile, builder.description != null ? builder.description : new UrfObject());
-		this.navigable = builder.navigable;
+		super(builder.mummifier, builder.sourceFile, builder.targetFile, builder.description);
+		this.isPost = SourcePathArtifact.hasPostFilename(builder.sourceFile);
+		this.isNavigable = builder.navigable;
 	}
 
 	/**
 	 * Factory for creating an artifact with optional parameters.
+	 * @implSpec This implementation requires a description to be set using {@link #withDescription(UrfResourceDescription)}
 	 * @param <B> The concrete type of builder subclass.
 	 */
-	protected abstract static class Builder<B extends Builder<B>> {
+	public abstract static class Builder<B extends Builder<B>> {
 
 		private final Mummifier mummifier;
 		private final Path sourceFile;
@@ -106,7 +120,6 @@ public abstract class AbstractSourceFileArtifact extends AbstractDescribedArtifa
 			this.mummifier = requireNonNull(mummifier);
 			this.sourceFile = requireNonNull(sourceFile);
 			this.targetFile = requireNonNull(targetFile);
-
 		}
 
 		/** @return This builder itself. */
@@ -117,24 +130,38 @@ public abstract class AbstractSourceFileArtifact extends AbstractDescribedArtifa
 
 		/**
 		 * Builds a new source file artifact from the current builder state.
+		 * @implNote Implementations should call {@link #validate()} before actually creating an artifact to ensure the builder provides sufficient and valid
+		 *           information.
 		 * @return A new source file artifact.
+		 * @throws IllegalStateException if the builder is not completely configured to define a valid artifact.
+		 * @see #validate()
 		 */
-		protected abstract SourceFileArtifact build();
+		public abstract SourceFileArtifact build();
 
-		private UrfResourceDescription description = null; //a default description will be created if none is specified
+		private UrfResourceDescription description = null;
 
 		/**
 		 * Sets the description for the artifact.
-		 * @apiNote If this method is not called, a default empty description will be used when building.
 		 * @param description The artifact description.
 		 * @return This builder.
-		 * @throws IllegalStateException if this method is called twice on a builder.
+		 * @throws IllegalStateException if a description-setting method is called twice on a builder.
 		 * @see Artifact#getResourceDescription()
 		 */
 		public B withDescription(@Nonnull final UrfResourceDescription description) {
 			checkState(this.description == null, "Description already set.");
 			this.description = requireNonNull(description);
 			return self();
+		}
+
+		/**
+		 * Sets an empty description for the artifact.
+		 * @implSpec This implementation delegates to {@link #withDescription(UrfResourceDescription)} with an empty description.
+		 * @return This builder.
+		 * @throws IllegalStateException if a description-setting method is called twice on a builder.
+		 * @see Artifact#getResourceDescription()
+		 */
+		public B withEmptyDescription() {
+			return withDescription(new UrfObject());
 		}
 
 		private boolean navigable = false;
@@ -148,6 +175,16 @@ public abstract class AbstractSourceFileArtifact extends AbstractDescribedArtifa
 		 */
 		public B setNavigable(final boolean navigable) {
 			this.navigable = navigable;
+			return self();
+		}
+
+		/**
+		 * Checks the state of this builder to ensure it has been set up correctly.
+		 * @return This builder.
+		 * @throws IllegalStateException if the builder is not completely configured to define a valid artifact.
+		 */
+		protected B validate() {
+			checkState(this.description != null, "Artifact description must be set before building.");
 			return self();
 		}
 

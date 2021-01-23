@@ -50,6 +50,7 @@ import io.urf.vocab.content.Content;
 /**
  * Mummifier for directories.
  * @implSpec This mummifier only works with instances of {@link DirectoryArtifact}.
+ * @implSpec Currently directory artifacts do not themselves have target descriptions, but rather rely on the target descriptions of any content file.
  * @implNote Although the current implementation creates a default phantom content file if one is not present, this implementation will work without a known
  *           content file. This enables future implementations to allow configuration of whether a default content file is used.
  * @implNote This implementation does not have a means for determining if a phantom content file (currently hard-coded in {@link DefaultXhtmlPhantomArtifact})
@@ -57,7 +58,6 @@ import io.urf.vocab.content.Content;
  *           for a phantom content file is always written.
  * @implNote This implementation does not currently generate a target description file using {@link #getArtifactTargetDescriptionFile(MummyContext, Artifact)}
  *           or {@link #getArtifactTargetDescriptionFile(MummyContext, Path)}, relying instead on the description file for the content file, if any.
- * @implSpec Currently directory artifacts do not themselves have target descriptions, but rather rely on the target descriptions of any content file.
  * @author Garret Wilson
  * @see DirectoryArtifact
  */
@@ -270,7 +270,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	 * @return The path in the site target directory to which the child artifact should be generated.
 	 * @throws ConfigurationException if the given veil name pattern specifies more than one matching group.
 	 * @see Mummifier#planArtifactTargetFilename(MummyContext, String)
-	 * @see PostArtifact#FILENAME_PATTERN
+	 * @see SourcePathArtifact#POST_FILENAME_PATTERN
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN
 	 */
@@ -298,12 +298,12 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 			} else { //assets don't get any further filename hierarchy-related filename changes
 
 				//posts
-				final Matcher postMatcher = PostArtifact.FILENAME_PATTERN.matcher(childTargetFilename);
+				final Matcher postMatcher = SourcePathArtifact.POST_FILENAME_PATTERN.matcher(childTargetFilename);
 				if(postMatcher.matches()) {
-					final String postYear = postMatcher.group(PostArtifact.FILENAME_PATTERN_YEAR_GROUP);
-					final String postMonth = postMatcher.group(PostArtifact.FILENAME_PATTERN_MONTH_GROUP);
-					final String postDay = postMatcher.group(PostArtifact.FILENAME_PATTERN_DAY_GROUP);
-					final String postFilename = postMatcher.group(PostArtifact.FILENAME_PATTERN_FILENAME_GROUP);
+					final String postYear = postMatcher.group(SourcePathArtifact.POST_FILENAME_PATTERN_YEAR_GROUP);
+					final String postMonth = postMatcher.group(SourcePathArtifact.POST_FILENAME_PATTERN_MONTH_GROUP);
+					final String postDay = postMatcher.group(SourcePathArtifact.POST_FILENAME_PATTERN_DAY_GROUP);
+					final String postFilename = postMatcher.group(SourcePathArtifact.POST_FILENAME_PATTERN_FILENAME_GROUP);
 					targetDirectory = targetDirectory.resolve(postYear).resolve(postMonth).resolve(postDay); //YYYY/DD/MM
 					childTargetFilename = postFilename;
 				}

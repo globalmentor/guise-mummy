@@ -252,6 +252,12 @@ public interface Artifact {
 	public Mummifier getMummifier();
 
 	/**
+	 * Indicates whether the artifact represents that something was "posted" or published on some date, with a hierarchical URI path indicating the post date.
+	 * @return <code>true</code> if this artifact is a post.
+	 */
+	public boolean isPost();
+
+	/**
 	 * Indicates whether the artifact would normally be part of site navigation.
 	 * <p>
 	 * A navigable artifact may still be veiled, however, by filename conventions or other settings.

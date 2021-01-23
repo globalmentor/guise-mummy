@@ -193,18 +193,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		return Optional.of(PAGE_MEDIA_TYPE);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation creates a {@link PostArtifact} for those artifacts with a source filename matching {@link PostArtifact#FILENAME_PATTERN}.
-	 *           Otherwise it creates a {@link PageArtifact}.
-	 */
 	@Override
-	protected Artifact createArtifact(final Path sourceFile, final Path outputFile, final UrfResourceDescription description) throws IOException {
-		final Path sourceFilename = sourceFile.getFileName();
-		if(sourceFilename != null && PostArtifact.FILENAME_PATTERN.matcher(sourceFilename.toString()).matches()) {
-			return new PostArtifact(this, sourceFile, outputFile, description);
-		}
-		return new PageArtifact(this, sourceFile, outputFile, description);
+	protected Artifact createArtifact(final Path sourceFile, final Path targetFile, final UrfResourceDescription description) throws IOException {
+		return CorporealSourceFileArtifact.builder(this, sourceFile, targetFile).withDescription(description).setNavigable(true).build(); //pages are navigable
 	}
 
 	/**
@@ -269,8 +260,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				findParentNavigationArtifact(context, artifact).stream(),
 				//then include the sorted child navigation artifacts
 				childNavigationArtifacts(context, artifact)
-						//posts shouldn't appear in the normal navigation list TODO create a more semantic means of filtering posts
-						.filter(not(PostArtifact.class::isInstance)).sorted(navigationArtifactOrderComparator));
+						//posts shouldn't appear in the normal navigation list
+						.filter(not(navArtifact -> navArtifact instanceof SourcePathArtifact && ((SourcePathArtifact)navArtifact).isPost()))
+						.sorted(navigationArtifactOrderComparator));
 	}
 
 	/**

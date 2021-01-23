@@ -17,9 +17,9 @@
 package io.guise.mummy;
 
 import static com.globalmentor.io.Files.*;
-import static com.globalmentor.java.Conditions.checkState;
+import static com.globalmentor.java.Conditions.*;
 import static java.nio.file.Files.*;
-import static java.util.Objects.requireNonNull;
+import static java.util.Objects.*;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -93,7 +93,7 @@ public class CorporealSourceFileArtifact extends AbstractSourceFileArtifact {
 	 * Factory for creating an artifact with optional parameters.
 	 * @param <B> The concrete type of builder subclass.
 	 */
-	protected static class Builder<B extends Builder<B>> extends AbstractSourceFileArtifact.Builder<B> {
+	public static class Builder<B extends Builder<B>> extends AbstractSourceFileArtifact.Builder<B> {
 
 		/**
 		 * Constructor.
@@ -122,8 +122,8 @@ public class CorporealSourceFileArtifact extends AbstractSourceFileArtifact {
 		}
 
 		@Override
-		protected CorporealSourceFileArtifact build() {
-			return new CorporealSourceFileArtifact(this);
+		public CorporealSourceFileArtifact build() {
+			return new CorporealSourceFileArtifact(validate());
 		}
 
 	}
