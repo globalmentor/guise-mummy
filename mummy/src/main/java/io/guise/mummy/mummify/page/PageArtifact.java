@@ -20,7 +20,7 @@ import java.nio.file.Path;
 
 import javax.annotation.*;
 
-import io.guise.mummy.BaseCorporealSourceFileArtifact;
+import io.guise.mummy.CorporealSourceFileArtifact;
 import io.guise.mummy.mummify.Mummifier;
 import io.urf.model.UrfResourceDescription;
 
@@ -28,7 +28,7 @@ import io.urf.model.UrfResourceDescription;
  * An artifact representing a generated page.
  * @author Garret Wilson
  */
-public class PageArtifact extends BaseCorporealSourceFileArtifact {
+public class PageArtifact extends CorporealSourceFileArtifact {
 
 	/**
 	 * Constructor.

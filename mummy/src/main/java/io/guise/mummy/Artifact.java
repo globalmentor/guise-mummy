@@ -49,7 +49,7 @@ import io.urf.model.UrfResourceDescription;
  * <dd>A special <dfn>subsumed artifact</dfn> of a directory that serves to represent its content. Historically the content artifact was
  * <code>index.html</code>. Note that a content artifact is <em>not</em> a <dfn>child artifact</dfn> of its directory.</dd>
  * <dt><dfn>corporeal artifact</dfn></dt>
- * <dd>An artifact that retrieves its contents from some actual file in the source tree. e.g. {@link BaseCorporealSourceFileArtifact}.</dd>
+ * <dd>An artifact that retrieves its contents from some actual file in the source tree. e.g. {@link CorporealSourceFileArtifact}.</dd>
  * <dt><dfn>phantom artifact</dfn></dt>
  * <dd>An artifact that is generated or loaded from resource during mummification, and for which a source file does not exist in the source tree; the opposite
  * of <dfn>corporeal artifact</dfn>. e.g. {@link io.guise.mummy.mummify.page.DefaultXhtmlPhantomArtifact}</dd>

@@ -94,13 +94,9 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 				.map(MEDIA_TYPES_BY_FILENAME_EXTENSION::get); //the media type filename extensions are already in normal form
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation returns a simple {@link OpaqueFileArtifact}.
-	 */
 	@Override
 	protected Artifact createArtifact(final Path sourceFile, final Path outputFile, final UrfResourceDescription description) throws IOException {
-		return new OpaqueFileArtifact(this, sourceFile, outputFile, description);
+		return new CorporealSourceFileArtifact(this, sourceFile, outputFile, description);
 	}
 
 	/**

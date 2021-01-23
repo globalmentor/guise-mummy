@@ -54,7 +54,7 @@ public class OpaqueFileMummifier extends AbstractFileMummifier {
 
 	@Override
 	protected Artifact createArtifact(final Path sourceFile, final Path outputFile, final UrfResourceDescription description) throws IOException {
-		return new OpaqueFileArtifact(this, sourceFile, outputFile, description);
+		return new CorporealSourceFileArtifact(this, sourceFile, outputFile, description);
 	}
 
 	/**
