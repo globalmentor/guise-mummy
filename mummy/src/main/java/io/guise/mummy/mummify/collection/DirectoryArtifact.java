@@ -33,7 +33,7 @@ import io.urf.model.UrfResourceDescription;
  * Concrete implementation of a collection artifact based upon a file system directory.
  * @author Garret Wilson
  */
-public class DirectoryArtifact extends AbstractArtifact implements CollectionArtifact {
+public class DirectoryArtifact extends AbstractArtifact implements SourcePathArtifact, CollectionArtifact {
 
 	/**
 	 * {@inheritDoc}

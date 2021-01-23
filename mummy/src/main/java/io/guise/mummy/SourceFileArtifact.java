@@ -27,7 +27,7 @@ import javax.annotation.*;
  *          than opening the source file directly.
  * @author Garret Wilson
  */
-public interface SourceFileArtifact extends Artifact {
+public interface SourceFileArtifact extends SourcePathArtifact {
 
 	/**
 	 * Opens an input stream to the source file of this artifact.

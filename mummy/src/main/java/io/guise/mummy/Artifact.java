@@ -219,6 +219,7 @@ public interface Artifact {
 	/**
 	 * Returns the path to the source of the artifact in the source tree.
 	 * @apiNote Depending on the artifact implementation, the source path is not guaranteed to exist.
+	 * @apiNote This method and all methods in this interface related to a source path in a file system may be moved eventually to {@link SourcePathArtifact}.
 	 * @return The path referring to the source of this artifact, which may be a file or a directory.
 	 */
 	public Path getSourcePath();
