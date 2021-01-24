@@ -92,6 +92,11 @@ public interface Artifact {
 
 	//### Guise Mummy properties
 
+	/**
+	 * The property tag of the <code>mummy/aspect</code> property for indicating that the artifact is an aspect (e.g. <code>"preview"</code>) of the resource.
+	 * @see AspectualArtifact
+	 */
+	public static final URI PROPERTY_TAG_MUMMY_ASPECT = NAMESPACE.resolve("aspect");
 	/** The property tag of the <code>mummy/altLocation</code> property for indicating an alternate (redirect) name. */
 	public static final URI PROPERTY_TAG_MUMMY_ALT_LOCATION = NAMESPACE.resolve("altLocation");
 	/** The property tag of the <code>mummy/order</code> property for indicating e.g. navigation order. */

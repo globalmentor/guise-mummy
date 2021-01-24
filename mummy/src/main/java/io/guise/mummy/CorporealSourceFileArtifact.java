@@ -23,6 +23,7 @@ import static java.util.Objects.*;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.util.Set;
 
 import javax.annotation.*;
 
@@ -121,9 +122,30 @@ public class CorporealSourceFileArtifact extends AbstractSourceFileArtifact {
 			return self();
 		}
 
+		private Set<String> aspectIds = null;
+
+		/**
+		 * Indicates that an aspectual artifact should be created with the identified aspects.
+		 * @apiNote If no aspect IDs are provided, an aspectual artifact will be created but with no aspects.
+		 * @param aspectIds The IDs of the aspects that should be added.
+		 * @return This builder.
+		 * @throws IllegalStateException if this method is called twice on a builder.
+		 * @see AspectualArtifact
+		 */
+		public B withAspects(@Nonnull String... aspectIds) {
+			checkState(this.aspectIds == null, "Aspects already set.");
+			this.aspectIds = Set.of(aspectIds);
+			return self();
+		}
+
+		/**
+		 * {@inheritDoc} This implementation creates an {@link AspectualCorporealSourceFileArtifact} if aspects are indicated; otherwise it creates a
+		 * {@link CorporealSourceFileArtifact}.
+		 */
 		@Override
 		public CorporealSourceFileArtifact build() {
-			return new CorporealSourceFileArtifact(validate());
+			validate();
+			return aspectIds != null ? new AspectualCorporealSourceFileArtifact(this, aspectIds) : new CorporealSourceFileArtifact(this);
 		}
 
 	}
