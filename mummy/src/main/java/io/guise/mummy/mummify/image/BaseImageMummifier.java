@@ -43,7 +43,6 @@ import com.globalmentor.vocab.dcmi.DCMES;
 import io.guise.mummy.*;
 import io.guise.mummy.mummify.*;
 import io.urf.URF.Handle;
-import io.urf.model.UrfResourceDescription;
 
 /**
  * Base image mummifier that handles common image needs such as metadata extraction.
@@ -92,11 +91,6 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	public Optional<ContentType> getArtifactMediaType(final MummyContext context, final Path sourceFile) throws IOException {
 		return findFilenameExtension(sourceFile).map(Filenames.Extensions::normalize).filter(getSupportedFilenameExtensions()::contains)
 				.map(MEDIA_TYPES_BY_FILENAME_EXTENSION::get); //the media type filename extensions are already in normal form
-	}
-
-	@Override
-	protected Artifact createArtifact(final Path sourceFile, final Path outputFile, final UrfResourceDescription description) throws IOException {
-		return new CorporealSourceFileArtifact(this, sourceFile, outputFile, description);
 	}
 
 	/**

@@ -51,6 +51,8 @@ import io.urf.vocab.content.Content;
  * Mummifier for directories.
  * @implSpec This mummifier only works with instances of {@link DirectoryArtifact}.
  * @implSpec Currently directory artifacts do not themselves have target descriptions, but rather rely on the target descriptions of any content file.
+ * @implSpec This implementation recognizes posts and gives them a target subdirectory structure appropriately based upon
+ *           {@link SourcePathArtifact#POST_FILENAME_PATTERN}.
  * @implNote Although the current implementation creates a default phantom content file if one is not present, this implementation will work without a known
  *           content file. This enables future implementations to allow configuration of whether a default content file is used.
  * @implNote This implementation does not have a means for determining if a phantom content file (currently hard-coded in {@link DefaultXhtmlPhantomArtifact})
@@ -254,7 +256,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 
 	/**
 	 * Determines the output path for an artifact in the site target directory based upon the source path in the site source directory.
-	 * @implSpec This implementation recognizes blog posts and adds an appropriate subdirectory structure for them in the target tree path.
+	 * @implSpec This implementation recognizes posts and adds an appropriate subdirectory structure for them in the target tree path.
 	 * @implSpec This version recognizes asset artifacts and renames them as necessary according to the asset name pattern configured with the key
 	 *           {@value GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN}, both for files and for directories. If the source directory is in an asset tree, or if
 	 *           the child filename itself indicates an asset, no hierarchy-related filename changes (e.g. unveiling or post renaming) will be made, except an

@@ -29,7 +29,6 @@ import java.util.Map.Entry;
 import com.globalmentor.net.ContentType;
 
 import io.guise.mummy.*;
-import io.urf.model.UrfResourceDescription;
 
 /**
  * Mummifier for files with unknown content.
@@ -50,11 +49,6 @@ public class OpaqueFileMummifier extends AbstractFileMummifier {
 	@Override
 	public Optional<ContentType> getArtifactMediaType(final MummyContext context, final Path sourcePath) throws IOException {
 		return Optional.empty();
-	}
-
-	@Override
-	protected Artifact createArtifact(final Path sourceFile, final Path outputFile, final UrfResourceDescription description) throws IOException {
-		return new CorporealSourceFileArtifact(this, sourceFile, outputFile, description);
 	}
 
 	/**

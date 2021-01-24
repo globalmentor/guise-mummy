@@ -193,8 +193,13 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		return Optional.of(PAGE_MEDIA_TYPE);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation returns a navigable artifact.
+	 */
 	@Override
-	protected Artifact createArtifact(final Path sourceFile, final Path targetFile, final UrfResourceDescription description) throws IOException {
+	protected Artifact createArtifact(final MummyContext context, final Path sourceFile, final Path targetFile, final UrfResourceDescription description)
+			throws IOException {
 		return CorporealSourceFileArtifact.builder(this, sourceFile, targetFile).withDescription(description).setNavigable(true).build(); //pages are navigable
 	}
 

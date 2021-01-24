@@ -42,6 +42,7 @@ import io.guise.mummy.*;
 /**
  * General image mummifier.
  * @implSpec This implementation supports GIF, JPEG, and PNG files.
+ * @implSpec This implementation supports configured image aspects.
  * @implSpec This implementation uses <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/javax/imageio/package-summary.html">Java Image
  *           I/O</a> for image processing.
  * @author Garret Wilson
