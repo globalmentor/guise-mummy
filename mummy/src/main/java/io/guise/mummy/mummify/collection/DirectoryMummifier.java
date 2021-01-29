@@ -55,7 +55,7 @@ import io.urf.vocab.content.Content;
  *           {@link SourcePathArtifact#POST_FILENAME_PATTERN}.
  * @implNote Although the current implementation creates a default phantom content file if one is not present, this implementation will work without a known
  *           content file. This enables future implementations to allow configuration of whether a default content file is used.
- * @implNote This implementation does not have a means for determining if a phantom content file (currently hard-coded in {@link DefaultXhtmlPhantomArtifact})
+ * @implNote This implementation does not have a means for determining if a phantom content file (currently hard-coded in {@link SimpleGeneratedXhtmlArtifact})
  *           or its description (loaded from {@link #getArtifactSourceDescriptionFile(MummyContext, Path)}) has changed; therefore the target description file
  *           for a phantom content file is always written.
  * @implNote This implementation does not currently generate a target description file using {@link #getArtifactTargetDescriptionFile(MummyContext, Artifact)}
@@ -165,7 +165,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 			}
 			phantomDescription.setPropertyValue(Content.TYPE_PROPERTY_TAG, PageMummifier.PAGE_MEDIA_TYPE);
 			//TODO do we need to set the description dirty so that the description will get serialized?
-			return new DefaultXhtmlPhantomArtifact(phantomContentMummifier, phantomContentSourceFile, phantomContentTargetFile, phantomDescription);
+			return new SimpleGeneratedXhtmlArtifact(phantomContentMummifier, phantomContentSourceFile, phantomContentTargetFile, phantomDescription);
 		}));
 
 		//discover and plan the child artifacts

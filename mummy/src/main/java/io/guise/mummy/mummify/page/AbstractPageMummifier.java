@@ -200,7 +200,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	@Override
 	protected Artifact createArtifact(final MummyContext context, final Path sourceFile, final Path targetFile, final UrfResourceDescription description)
 			throws IOException {
-		return CorporealSourceFileArtifact.builder(this, sourceFile, targetFile).withDescription(description).setNavigable(true).build(); //pages are navigable
+		return DefaultSourceFileArtifact.builder(this, sourceFile, targetFile).withDescription(description).setNavigable(true).build(); //pages are navigable
 	}
 
 	/**
@@ -441,7 +441,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		try {
 
 			//#load source document: get starting content to work with
-			final Document sourceDocument = loadSourceDocument(context, (SourceFileArtifact)artifact); //this mummifier requires source file artifacts
+			final Document sourceDocument = loadSourceDocument(context, (CorporealSourceArtifact)artifact); //this mummifier requires corporeal file artifacts
 			getLogger().trace("Loaded page source document `{}`.", artifact.getSourcePath());
 
 			//#normalize: normalize the DOM and remove metadata

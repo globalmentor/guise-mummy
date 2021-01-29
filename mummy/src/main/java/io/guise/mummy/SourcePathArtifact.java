@@ -25,6 +25,9 @@ import javax.annotation.*;
 
 /**
  * Artifact that conceptually originates from a source path in a file system.
+ * @apiNote The artifact's source file as returned by {@link #getSourcePath()} is not guaranteed to actually exist in the source tree. The artifact may load
+ *          content from another source or even generate content. Thus to access the source content {@link CorporealSourceArtifact#openSource(MummyContext)}
+ *          should be called rather than opening the source file directly.
  * @apiNote Eventually all information in {@link Artifact} related to a source path in a file system will be moved to this interface.
  * @author Garret Wilson
  */

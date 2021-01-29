@@ -30,7 +30,7 @@ import io.urf.model.*;
  * An abstract base class for an artifact generated from a source file.
  * @author Garret Wilson
  */
-public abstract class AbstractSourceFileArtifact extends AbstractDescribedArtifact implements SourceFileArtifact {
+public abstract class AbstractSourceFileArtifact extends AbstractDescribedArtifact implements SourcePathArtifact, CorporealSourceArtifact {
 
 	/**
 	 * {@inheritDoc}
@@ -136,7 +136,7 @@ public abstract class AbstractSourceFileArtifact extends AbstractDescribedArtifa
 		 * @throws IllegalStateException if the builder is not completely configured to define a valid artifact.
 		 * @see #validate()
 		 */
-		public abstract SourceFileArtifact build();
+		public abstract CorporealSourceArtifact build();
 
 		private UrfResourceDescription description = null;
 

@@ -34,7 +34,7 @@ import io.urf.model.UrfResourceDescription;
  * A source file artifact that retrieves its contents from some actual file on the file system.
  * @author Garret Wilson
  */
-public class CorporealSourceFileArtifact extends AbstractSourceFileArtifact {
+public class DefaultSourceFileArtifact extends AbstractSourceFileArtifact {
 
 	private final Path corporealSourceFile;
 
@@ -53,7 +53,7 @@ public class CorporealSourceFileArtifact extends AbstractSourceFileArtifact {
 	 * @param description The description of the artifact.
 	 * @throws IllegalArgumentException if the source file does not exist or is not a regular file.
 	 */
-	public CorporealSourceFileArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path targetFile,
+	public DefaultSourceFileArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path targetFile,
 			@Nonnull final UrfResourceDescription description) {
 		super(mummifier, sourceFile, targetFile, description);
 		this.corporealSourceFile = checkArgumentRegularFile(sourceFile);
@@ -65,7 +65,7 @@ public class CorporealSourceFileArtifact extends AbstractSourceFileArtifact {
 	 * @param builder The builder specifying the construction parameters.
 	 * @throws IllegalArgumentException if the corporeal source file does not exist or is not a regular file.
 	 */
-	protected CorporealSourceFileArtifact(@Nonnull final Builder<?> builder) {
+	protected DefaultSourceFileArtifact(@Nonnull final Builder<?> builder) {
 		super(builder);
 		this.corporealSourceFile = checkArgumentRegularFile(builder.corporealSourceFile != null ? builder.corporealSourceFile : getSourcePath());
 	}
@@ -114,7 +114,7 @@ public class CorporealSourceFileArtifact extends AbstractSourceFileArtifact {
 		 * @param corporealSourceFile The file from which to retrieve the artifact contents.
 		 * @return This builder.
 		 * @throws IllegalStateException if this method is called twice on a builder.
-		 * @see CorporealSourceFileArtifact#getCorporealSourceFile()
+		 * @see DefaultSourceFileArtifact#getCorporealSourceFile()
 		 */
 		public B setCorporealSourceFile(@Nonnull Path corporealSourceFile) {
 			checkState(this.corporealSourceFile == null, "Corporeal source file already set.");
@@ -139,13 +139,13 @@ public class CorporealSourceFileArtifact extends AbstractSourceFileArtifact {
 		}
 
 		/**
-		 * {@inheritDoc} This implementation creates an {@link AspectualCorporealSourceFileArtifact} if aspects are indicated; otherwise it creates a
-		 * {@link CorporealSourceFileArtifact}.
+		 * {@inheritDoc} This implementation creates an {@link DefaultAspectualSourceFileArtifact} if aspects are indicated; otherwise it creates a
+		 * {@link DefaultSourceFileArtifact}.
 		 */
 		@Override
-		public CorporealSourceFileArtifact build() {
+		public DefaultSourceFileArtifact build() {
 			validate();
-			return aspectIds != null ? new AspectualCorporealSourceFileArtifact(this, aspectIds) : new CorporealSourceFileArtifact(this);
+			return aspectIds != null ? new DefaultAspectualSourceFileArtifact(this, aspectIds) : new DefaultSourceFileArtifact(this);
 		}
 
 	}

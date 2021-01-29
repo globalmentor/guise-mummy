@@ -21,20 +21,17 @@ import java.io.*;
 import javax.annotation.*;
 
 /**
- * Artifact that conceptually originates from some source file (as opposed to a directory) in the site source tree.
- * @apiNote The artifact's source file as returned by {@link #getSourcePath()} is not guaranteed to actually exist in the source tree. The artifact may load
- *          content from another source or even generate content. Thus to access the source content {@link #openSource(MummyContext)} should be called rather
- *          than opening the source file directly.
+ * Artifact that conceptually originates from some source that provides content (e.g. a source file as opposed to a directory in the site source tree).
  * @author Garret Wilson
  */
-public interface SourceFileArtifact extends SourcePathArtifact {
+public interface CorporealSourceArtifact extends Artifact {
 
 	/**
-	 * Opens an input stream to the source file of this artifact.
+	 * Opens an input stream to the source content of this artifact.
 	 * @apiNote The input stream may not necessarily return a stream to file indicated by the source path.
 	 * @param context The context of static site generation.
-	 * @return An input stream to the source file contents.
-	 * @throws IOException if there is an error opening the source file contents.
+	 * @return An input stream to the source contents.
+	 * @throws IOException if there is an error opening the source contents.
 	 */
 	public InputStream openSource(@Nonnull MummyContext context) throws IOException;
 

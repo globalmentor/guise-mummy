@@ -29,10 +29,10 @@ import io.guise.mummy.mummify.Mummifier;
 import io.urf.model.UrfResourceDescription;
 
 /**
- * A phantom artifact that implemented by a basic, default XHTML document.
+ * An artifact that generates a basic, default XHTML document.
  * @author Garret Wilson
  */
-public class DefaultXhtmlPhantomArtifact extends AbstractSourceFileArtifact {
+public class SimpleGeneratedXhtmlArtifact extends AbstractSourceFileArtifact {
 
 	/**
 	 * The template for an XHTML default document. The template has a single parameter:
@@ -62,7 +62,7 @@ public class DefaultXhtmlPhantomArtifact extends AbstractSourceFileArtifact {
 	 * @param description The description of the artifact; will be used to update the content with the title, if present.
 	 * @see Artifact#PROPERTY_HANDLE_TITLE
 	 */
-	public DefaultXhtmlPhantomArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourcePath, @Nonnull final Path outputPath,
+	public SimpleGeneratedXhtmlArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourcePath, @Nonnull final Path outputPath,
 			@Nonnull final UrfResourceDescription description) {
 		super(mummifier, sourcePath, outputPath, description);
 	}

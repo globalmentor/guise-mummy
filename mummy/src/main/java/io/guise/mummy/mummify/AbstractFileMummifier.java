@@ -59,7 +59,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 
 	/**
 	 * Creates an artifact of the appropriate type for this mummifier.
-	 * @implSpec The default implementation returns an instance of {@link CorporealSourceFileArtifact}.
+	 * @implSpec The default implementation returns an instance of {@link DefaultSourceFileArtifact}.
 	 * @param context The context of static site generation.
 	 * @param sourceFile The file containing the source of this artifact.
 	 * @param outputFile The file where the artifact will be generated.
@@ -69,7 +69,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 */
 	protected Artifact createArtifact(@Nonnull final MummyContext context, @Nonnull final Path sourceFile, @Nonnull final Path outputFile,
 			@Nonnull final UrfResourceDescription description) throws IOException {
-		return new CorporealSourceFileArtifact(this, sourceFile, outputFile, description);
+		return new DefaultSourceFileArtifact(this, sourceFile, outputFile, description);
 	}
 
 	/**

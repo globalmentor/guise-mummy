@@ -33,10 +33,10 @@ import javax.annotation.*;
 import io.urf.model.*;
 
 /**
- * A corporeal source file artifact supporting aspects.
+ * A default source file artifact supporting aspects.
  * @author Garret Wilson
  */
-class AspectualCorporealSourceFileArtifact extends CorporealSourceFileArtifact implements AspectualArtifact {
+class DefaultAspectualSourceFileArtifact extends DefaultSourceFileArtifact implements AspectualArtifact {
 
 	/** The delimiter for appending an aspect ID to a filename. */
 	private static final char FILENAME_ASPECT_DELIMITER = '-';
@@ -82,7 +82,7 @@ class AspectualCorporealSourceFileArtifact extends CorporealSourceFileArtifact i
 	 * @param aspectIds The IDs of the aspects that should be added.
 	 * @throws IllegalArgumentException if the corporeal source file does not exist or is not a regular file.
 	 */
-	protected AspectualCorporealSourceFileArtifact(@Nonnull final Builder<?> builder, @Nonnull final Set<String> aspectIds) {
+	protected DefaultAspectualSourceFileArtifact(@Nonnull final Builder<?> builder, @Nonnull final Set<String> aspectIds) {
 		super(builder);
 		final Path targetFile = getTargetPath();
 		final String targetFilename = findFilename(targetFile)
@@ -94,7 +94,7 @@ class AspectualCorporealSourceFileArtifact extends CorporealSourceFileArtifact i
 				aspectResourceDescription.addPropertyValue(property.getKey(), property.getValue());
 			}
 			aspectResourceDescription.setPropertyValue(PROPERTY_TAG_MUMMY_ASPECT, aspectId); //e.g. mummy/aspect="preview"
-			return CorporealSourceFileArtifact.builder(getMummifier(), getSourcePath(), aspectTargetPath).setCorporealSourceFile(getCorporealSourceFile())
+			return DefaultSourceFileArtifact.builder(getMummifier(), getSourcePath(), aspectTargetPath).setCorporealSourceFile(getCorporealSourceFile())
 					.withDescription(aspectResourceDescription).build(); //TODO set aspect ID
 		}));
 	}
