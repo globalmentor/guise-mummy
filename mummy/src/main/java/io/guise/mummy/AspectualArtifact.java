@@ -41,12 +41,13 @@ public interface AspectualArtifact extends CompositeArtifact {
 
 	/**
 	 * Retrieves an aspect by its ID.
-	 * @apiNote This method is provided primarily for MEXL expression and may be removed when MEXL has native support for {@link Optional}.
+	 * @apiNote This method is provided primarily for MEXL expression and may be removed when MEXL has native support for {@link Optional} and the
+	 *          <code>findXXX()</code> pattern.
 	 * @implSpec The default implementation delegates to {@link #findAspect(String)}.
 	 * @param aspectId The ID of the aspect to return.
 	 * @return The identified aspect, or <code>null</code> if no aspect with that ID is found.
 	 */
-	public default Artifact getAspect(@Nonnull final String aspectId) {
+	public default Artifact aspect(@Nonnull final String aspectId) {
 		return findAspect(aspectId).orElse(null);
 	}
 
