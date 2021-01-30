@@ -52,15 +52,15 @@ class DefaultAspectualSourceFileArtifact extends DefaultSourceFileArtifact imple
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This implementation delegates to {@link #getAspect(String)}.
+	 * @implSpec This implementation delegates to {@link #aspect(String)}.
 	 */
 	@Override
 	public Optional<Artifact> findAspect(final String aspectId) {
-		return Optional.ofNullable(getAspect(aspectId));
+		return Optional.ofNullable(aspect(aspectId));
 	}
 
 	@Override
-	public Artifact getAspect(final String aspectId) {
+	public Artifact aspect(final String aspectId) {
 		return aspectsById.get(requireNonNull(aspectId));
 	}
 
