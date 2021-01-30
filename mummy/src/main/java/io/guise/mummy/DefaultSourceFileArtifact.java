@@ -19,11 +19,12 @@ package io.guise.mummy;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Conditions.*;
 import static java.nio.file.Files.*;
+import static java.util.Arrays.*;
 import static java.util.Objects.*;
 
 import java.io.*;
 import java.nio.file.Path;
-import java.util.Set;
+import java.util.*;
 
 import javax.annotation.*;
 
@@ -135,26 +136,37 @@ public class DefaultSourceFileArtifact extends AbstractSourceFileArtifact {
 
 		/**
 		 * Indicates that an aspectual artifact should be created with the identified aspects.
-		 * @apiNote If no aspect IDs are provided, an aspectual artifact will be created but with no aspects.
+		 * @implSpec This implementation delegates to {@link #withAspects(Collection)}.
 		 * @param aspectIds The IDs of the aspects that should be added.
 		 * @return This builder.
 		 * @throws IllegalStateException if this method is called twice on a builder.
 		 * @see AspectualArtifact
 		 */
 		public B withAspects(@Nonnull String... aspectIds) {
+			return withAspects(asList(aspectIds));
+		}
+
+		/**
+		 * Indicates that an aspectual artifact should be created with the identified aspects.
+		 * @param aspectIds The IDs of the aspects that should be added.
+		 * @return This builder.
+		 * @throws IllegalStateException if this method is called twice on a builder.
+		 * @see AspectualArtifact
+		 */
+		public B withAspects(@Nonnull Collection<String> aspectIds) {
 			checkState(this.aspectIds == null, "Aspects already set.");
-			this.aspectIds = Set.of(aspectIds);
+			this.aspectIds = Set.copyOf(aspectIds);
 			return self();
 		}
 
 		/**
-		 * {@inheritDoc} This implementation creates an {@link DefaultAspectualSourceFileArtifact} if aspects are indicated; otherwise it creates a
-		 * {@link DefaultSourceFileArtifact}.
+		 * {@inheritDoc} This implementation creates an {@link DefaultAspectualSourceFileArtifact} if a non-zero number of aspects are indicated; otherwise it
+		 * creates a {@link DefaultSourceFileArtifact}.
 		 */
 		@Override
 		public DefaultSourceFileArtifact build() {
 			validate();
-			return aspectIds != null ? new DefaultAspectualSourceFileArtifact(this, aspectIds) : new DefaultSourceFileArtifact(this);
+			return aspectIds != null && !aspectIds.isEmpty() ? new DefaultAspectualSourceFileArtifact(this, aspectIds) : new DefaultSourceFileArtifact(this);
 		}
 
 	}

@@ -73,6 +73,7 @@ public class SimpleGeneratedXhtmlArtifact extends AbstractSourceFileArtifact {
 	 * @param context The context of static site generation.
 	 * @implSpec This version returns the bytes of a default XHTML artifact with the appropriate title, if any is provided in the description.
 	 * @return The generated source contents.
+	 * @throws IOException if there is an error generating the source.
 	 * @see #getResourceDescription()
 	 * @see Artifact#PROPERTY_HANDLE_TITLE
 	 */

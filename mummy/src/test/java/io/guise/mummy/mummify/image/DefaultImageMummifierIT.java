@@ -57,7 +57,7 @@ public class DefaultImageMummifierIT extends BaseEndToEndIT {
 
 		getFixtureProjectSettings().put(DefaultImageMummifier.CONFIG_KEY_MUMMY_IMAGE_PROCESS_THRESHOLD_FILE_SIZE, 70_000);
 		getFixtureProjectSettings().put(DefaultImageMummifier.CONFIG_KEY_MUMMY_IMAGE_SCALE_MAX_LENGTH, 600);
-		getFixtureProjectSettings().put(DefaultImageMummifier.CONFIG_KEY_MUMMY_IMAGE_SCALE_COMPRESSION_QUALITY, 0.5);
+		getFixtureProjectSettings().put(DefaultImageMummifier.CONFIG_KEY_MUMMY_IMAGE_COMPRESSION_QUALITY, 0.5);
 		mummify(LifeCyclePhase.MUMMIFY);
 
 		//…/target/site/gate-turret-reduced.jpg

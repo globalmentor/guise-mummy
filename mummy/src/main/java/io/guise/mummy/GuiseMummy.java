@@ -19,6 +19,7 @@ package io.guise.mummy;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
+import static java.lang.String.format;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
@@ -44,6 +45,7 @@ import io.guise.mummy.deploy.aws.*;
 import io.guise.mummy.mummify.*;
 import io.guise.mummy.mummify.collection.DirectoryMummifier;
 import io.guise.mummy.mummify.image.DefaultImageMummifier;
+import io.guise.mummy.mummify.image.ImageMummifier;
 import io.guise.mummy.mummify.page.HtmlPageMummifier;
 import io.guise.mummy.mummify.page.MarkdownPageMummifier;
 import io.guise.mummy.mummify.page.XhtmlPageMummifier;
@@ -110,9 +112,8 @@ public class GuiseMummy implements Clogged {
 	public static Optional<DomainName> findConfiguredDomain(@Nonnull final Configuration configuration) throws ConfigurationException {
 		return configuration.findString(CONFIG_KEY_DOMAIN).map(DomainName::of).map(domain -> {
 			if(!domain.isAbsolute() || domain.isRoot()) {
-				throw new ConfigurationException(
-						String.format("The `%s` configuration `%s` must be a fully-qualified, non-root domain, ending in a dot `%s` character.", CONFIG_KEY_DOMAIN, domain,
-								DomainName.DELIMITER)); //TODO i18n
+				throw new ConfigurationException(format("The `%s` configuration `%s` must be a fully-qualified, non-root domain, ending in a dot `%s` character.",
+						CONFIG_KEY_DOMAIN, domain, DomainName.DELIMITER)); //TODO i18n
 			}
 			return domain;
 		});
@@ -137,7 +138,7 @@ public class GuiseMummy implements Clogged {
 		final DomainName base = configuredDomain.orElse(DomainName.EMPTY);
 		return configuration.findString(CONFIG_KEY_SITE_DOMAIN).map(DomainName::of).map(base::resolve).or(() -> configuredDomain).map(siteDomain -> {
 			if(!siteDomain.isAbsolute() || siteDomain.isRoot()) {
-				throw new ConfigurationException(String.format(
+				throw new ConfigurationException(format(
 						"The `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character; or resolve against a `%s` configuration that is a FQDN.",
 						CONFIG_KEY_SITE_DOMAIN, siteDomain, DomainName.DELIMITER, CONFIG_KEY_DOMAIN));
 			}
@@ -163,7 +164,7 @@ public class GuiseMummy implements Clogged {
 		return configuration.findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class)
 				.map(names -> names.stream().map(DomainName::of).map(base::resolve).map(siteAltDomain -> {
 					if(!siteAltDomain.isAbsolute() || siteAltDomain.isRoot()) {
-						throw new ConfigurationException(String.format(
+						throw new ConfigurationException(format(
 								"The `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character; or resolve against a `%s` configuration that is a FQDN.",
 								CONFIG_KEY_SITE_ALT_DOMAINS, siteAltDomain, DomainName.DELIMITER, CONFIG_KEY_DOMAIN)); //TODO i18n
 					}
@@ -330,7 +331,7 @@ public class GuiseMummy implements Clogged {
 						} else if(targetType.equals(S3Website.class.getSimpleName())) {
 							target = new S3Website(context, targetSection);
 						} else {
-							throw new ConfigurationException(String.format("Unknown deployment target type: `%s`.", targetType));
+							throw new ConfigurationException(format("Unknown deployment target type: `%s`.", targetType));
 						}
 						return target;
 					}).collect(toList());
@@ -541,6 +542,11 @@ public class GuiseMummy implements Clogged {
 		defaultSettings.put(CONFIG_KEY_MUMMY_TEMPLATE_BASE_NAME, ".template");
 		defaultSettings.put(CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR, "\n");
 		defaultSettings.put(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.compile("_(.*)"));
+		//TODO create facility for mummifiers (and later plugins) to contribute default settings
+		defaultSettings.put(format(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___SCALE_MAX_LENGTH, "preview"), 600);
+		defaultSettings.put(format(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___COMPRESSION_QUALITY, "preview"), 0.6);
+		defaultSettings.put(format(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___SCALE_MAX_LENGTH, "thumbnail"), 300);
+		defaultSettings.put(format(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___COMPRESSION_QUALITY, "thumbnail"), 0.6);
 		return new ObjectMapConfiguration(unmodifiableMap(defaultSettings));
 	}
 

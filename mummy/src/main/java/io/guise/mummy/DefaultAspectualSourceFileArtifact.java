@@ -30,10 +30,17 @@ import java.util.stream.Stream;
 
 import javax.annotation.*;
 
+import com.globalmentor.io.Filenames;
+
 import io.urf.model.*;
 
 /**
  * A default source file artifact supporting aspects.
+ * @implSpec The current implementation creates aspects duplicating the description of the main artifact.
+ * @implNote The main artifact description may have been cached after mummification, so duplicating it for the aspect may result in irrelevant or incorrect
+ *           properties. The mummifier will need to take this into consideration, by forcing the description to be set dirty for example. Under the current
+ *           implementation, this may be done by removing any {@link io.urf.vocab.content.Content#MODIFIED_AT_PROPERTY_TAG} property when the mummifier knows
+ *           for sure that the main artifact needs mummification (assuming aspects generation are controlled solely by the main artifact generation).
  * @author Garret Wilson
  */
 class DefaultAspectualSourceFileArtifact extends DefaultSourceFileArtifact implements AspectualArtifact {
@@ -85,13 +92,13 @@ class DefaultAspectualSourceFileArtifact extends DefaultSourceFileArtifact imple
 	protected DefaultAspectualSourceFileArtifact(@Nonnull final Builder<?> builder, @Nonnull final Set<String> aspectIds) {
 		super(builder);
 		final Path targetFile = getTargetPath();
-		final String targetFilename = findFilename(targetFile)
+		final String targetFilenameBase = findFilename(targetFile).map(Filenames::getBase)
 				.orElseThrow(() -> new IllegalArgumentException(format("Aspectual source file `%s` has no filename.", targetFile)));
 		aspectsById = aspectIds.stream().collect(toUnmodifiableMap(identity(), aspectId -> { //create aspects for each aspect ID
-			final Path aspectTargetPath = changeFilenameBase(targetFile, targetFilename + FILENAME_ASPECT_DELIMITER + requireNonNull(aspectId)); //e.g. `foo-bar.jpg` -> `foo-bar-preview.jpg`
+			final Path aspectTargetPath = changeFilenameBase(targetFile, targetFilenameBase + FILENAME_ASPECT_DELIMITER + requireNonNull(aspectId)); //e.g. `foo-bar.jpg` -> `foo-bar-preview.jpg`
 			final UrfResourceDescription aspectResourceDescription = new UrfObject(); //TODO create description copy constructor
-			for(final Map.Entry<URI, Object> property : getResourceDescription().getProperties()) {
-				aspectResourceDescription.addPropertyValue(property.getKey(), property.getValue());
+			for(final Map.Entry<URI, Object> property : getResourceDescription().getProperties()) { //TODO fix description caching for artifacts somehow; the current logic will set wrong fingerprints, for example
+				aspectResourceDescription.setPropertyValue(property.getKey(), property.getValue());
 			}
 			aspectResourceDescription.setPropertyValue(PROPERTY_TAG_MUMMY_ASPECT, aspectId); //e.g. mummy/aspect="preview"
 			return DefaultSourceFileArtifact.builder(getMummifier(), getSourcePath(), aspectTargetPath).setCorporealSourceFile(getCorporealSourceFile())
