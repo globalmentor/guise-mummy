@@ -83,6 +83,15 @@ public class DefaultSourceFileArtifact extends AbstractSourceFileArtifact {
 
 	/**
 	 * {@inheritDoc}
+	 * @implSpec This implementation returns the size of {@link #getCorporealSourceFile()}.
+	 */
+	@Override
+	public long getSourceSize(final MummyContext context) throws IOException {
+		return size(getCorporealSourceFile());
+	}
+
+	/**
+	 * {@inheritDoc}
 	 * @implSpec This implementation opens a simple, unbuffered input stream to {@link #getCorporealSourceFile()}.
 	 */
 	@Override

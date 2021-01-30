@@ -69,11 +69,11 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 	 * @implSpec This implementation delegates to {@link #processImage(MummyContext, Artifact, InputStream, OutputStream)} for scaling.
 	 */
 	@Override
-	public void mummifyFile(final MummyContext context, final Artifact artifact) throws IOException {
+	public void mummifyFile(final MummyContext context, final CorporealSourceArtifact artifact) throws IOException {
 		final Path sourceFile = artifact.getSourcePath();
 		final long imageScaleThresholdSize = context.getConfiguration().findLong(CONFIG_KEY_MUMMY_IMAGE_PROCESS_THRESHOLD_FILE_SIZE)
 				.orElse(DEFAULT_SCALE_THRESHOLD_FILE_SIZE);
-		if(size(sourceFile) > imageScaleThresholdSize) { //if the size of the image source file goes over our threshold for scaling
+		if(artifact.getSourceSize(context) > imageScaleThresholdSize) { //if the size of the image source file goes over our threshold for scaling
 			try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile));
 					final OutputStream outputStream = new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))) {
 				processImage(context, artifact, inputStream, outputStream);

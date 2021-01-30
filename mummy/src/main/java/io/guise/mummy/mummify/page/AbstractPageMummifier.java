@@ -436,12 +436,12 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR
 	 */
 	@Override
-	public void mummifyFile(final MummyContext context, final Artifact artifact) throws IOException {
+	public void mummifyFile(final MummyContext context, final CorporealSourceArtifact artifact) throws IOException {
 
 		try {
 
 			//#load source document: get starting content to work with
-			final Document sourceDocument = loadSourceDocument(context, (CorporealSourceArtifact)artifact); //this mummifier requires corporeal file artifacts
+			final Document sourceDocument = loadSourceDocument(context, artifact);
 			getLogger().trace("Loaded page source document `{}`.", artifact.getSourcePath());
 
 			//#normalize: normalize the DOM and remove metadata

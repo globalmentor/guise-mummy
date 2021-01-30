@@ -42,7 +42,8 @@ public class SimpleGeneratedXhtmlArtifact extends AbstractSourceFileArtifact {
 	 * @implNote Once an expression language is implemented that replaces expressions in the document, the implementation might switch back to storing the default
 	 *           XHTML file in resources with an expression in the title to be replaced in a later phase with the title from the description.
 	 */
-	private static final StringTemplate TEMPLATE = StringTemplate.builder().text( //@formatter:off
+	private static final StringTemplate TEMPLATE = StringTemplate.builder()
+			.text( //@formatter:off
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +	//no newlines are needed; this will be parsed immediately 
 			"<!DOCTYPE html>" + 
 			"<html xmlns=\"http://www.w3.org/1999/xhtml\">" + 
@@ -68,17 +69,36 @@ public class SimpleGeneratedXhtmlArtifact extends AbstractSourceFileArtifact {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Generates the source content of the artifact.
+	 * @param context The context of static site generation.
 	 * @implSpec This version returns the bytes of a default XHTML artifact with the appropriate title, if any is provided in the description.
+	 * @return The generated source contents.
 	 * @see #getResourceDescription()
 	 * @see Artifact#PROPERTY_HANDLE_TITLE
 	 */
-	@Override
-	public InputStream openSource(final MummyContext context) throws IOException {
+	protected byte[] generateSource(final MummyContext context) throws IOException {
 		//get the title, if any, from the description
 		final String title = getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_TITLE).map(Object::toString).orElse("");
 		final String source = TEMPLATE.apply(title);
-		return new ByteArrayInputStream(source.getBytes(StandardCharsets.UTF_8));
+		return source.getBytes(StandardCharsets.UTF_8);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This version delegates to {@link #generateSource(MummyContext)}.
+	 */
+	@Override
+	public long getSourceSize(MummyContext context) throws IOException {
+		return generateSource(context).length;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This version delegates to {@link #generateSource(MummyContext)}.
+	 */
+	@Override
+	public InputStream openSource(final MummyContext context) throws IOException {
+		return new ByteArrayInputStream(generateSource(context));
 	}
 
 	@Override

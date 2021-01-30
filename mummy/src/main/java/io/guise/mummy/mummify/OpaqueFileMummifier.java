@@ -65,7 +65,7 @@ public class OpaqueFileMummifier extends AbstractFileMummifier {
 	 * @implSpec This implementation merely copies the file with no further action.
 	 */
 	@Override
-	public void mummifyFile(final MummyContext context, final Artifact artifact) throws IOException {
+	public void mummifyFile(final MummyContext context, final CorporealSourceArtifact artifact) throws IOException {
 		final Path sourceFile = artifact.getSourcePath();
 		checkArgumentRegularFile(sourceFile);
 		Files.copy(sourceFile, artifact.getTargetPath(), REPLACE_EXISTING);

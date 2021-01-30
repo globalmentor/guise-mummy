@@ -37,6 +37,8 @@ import io.urf.vocab.content.Content;
 
 /**
  * Abstract mummifier for generating artifacts based upon a single source file.
+ * @implSpec This type of mummifier only works with {@link CorporealSourceArtifact}s. If some other type of artifact is used, some mummification methods will
+ *           throw a {@link ClassCastException}.
  * @implSpec This implementation recognizes posts based upon {@link SourcePathArtifact#POST_FILENAME_PATTERN} and adds an appropriate
  *           {@link Artifact#PROPERTY_HANDLE_PUBLISHED_ON} property to the description.
  * @implNote This implementation does not yet support source description files using {@link #getArtifactSourceDescriptionFile(MummyContext, Artifact)} or
@@ -165,10 +167,11 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	/**
 	 * {@inheritDoc}
 	 * @apiNote This method cannot be overridden, as it performs necessary checks for incremental mummification. To implement file mummification,
-	 *          {@link #mummifyFile(MummyContext, Artifact)} should be overridden instead.
+	 *          {@link #mummifyFile(MummyContext, CorporealSourceArtifact)} should be overridden instead.
 	 * @implSpec If incremental mummification is enabled via {@link MummyContext#isIncremental()}, this version checks the the timestamp of the target file, and
-	 *           delegates to {@link #mummifyFile(MummyContext, Artifact)} if the file needs regenerated.
+	 *           delegates to {@link #mummifyFile(MummyContext, CorporealSourceArtifact)} if the file needs regenerated.
 	 * @implSpec This implementation saves the description description if modified by calling {@link #saveTargetDescription(MummyContext, Artifact)}.
+	 * @throws ClassCastException if the given artifact is not an instance of {@link CorporealSourceArtifact}.
 	 * @see Content#MODIFIED_AT_PROPERTY_TAG
 	 * @see Artifact#PROPERTY_TAG_MUMMY_DESCRIPTION_DIRTY
 	 * @see MummyContext#isIncremental()
@@ -198,7 +201,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 			if(parentDirectory != null && !exists(parentDirectory)) { //ensure parent directories exist, as artifact children may specify files several layers deep, e.g. blog posts 
 				createDirectories(parentDirectory);
 			}
-			mummifyFile(context, artifact);
+			mummifyFile(context, (CorporealSourceArtifact)artifact);
 			checkState(exists(targetFile), "Mummification of artifact source file `%s` did not produce target file `%s`.", artifact.getSourcePath(), targetFile);
 			getLogger().debug("Mummified file artifact {}.", artifact);
 			newTargetModifiedAt = getLastModifiedTime(targetFile).toInstant();
@@ -237,6 +240,6 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @param artifact The artifact being generated.
 	 * @throws IOException if there is an I/O error during mummification.
 	 */
-	protected abstract void mummifyFile(@Nonnull final MummyContext context, @Nonnull Artifact artifact) throws IOException;
+	protected abstract void mummifyFile(@Nonnull final MummyContext context, @Nonnull CorporealSourceArtifact artifact) throws IOException;
 
 }
