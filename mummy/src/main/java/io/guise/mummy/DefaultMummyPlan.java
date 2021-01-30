@@ -60,13 +60,14 @@ public class DefaultMummyPlan extends AbstractMummyPlan {
 		requireNonNull(artifact);
 		artifact.getReferentSourcePaths().forEach(referenceSourcePath -> artifactsByReferenceSourcePath.put(referenceSourcePath, artifact));
 		if(artifact instanceof CompositeArtifact) {
-			((CompositeArtifact)artifact).getSubsumedArtifacts().forEach(subsumedArtifact -> principalArtifactsBySubsumedArtifacts.put(subsumedArtifact, artifact));
+			final CompositeArtifact compositeArtifact = (CompositeArtifact)artifact;
+			compositeArtifact.getSubsumedArtifacts().forEach(subsumedArtifact -> principalArtifactsBySubsumedArtifacts.put(subsumedArtifact, artifact));
 			if(artifact instanceof CollectionArtifact) {
 				for(final Artifact childArtifact : ((CollectionArtifact)artifact).getChildArtifacts()) {
 					parentArtifactsByArtifact.put(childArtifact, artifact); //map the parent to the child
-					initialize(childArtifact); //recursively update the plan for the children
 				}
 			}
+			compositeArtifact.comprisedArtifacts().forEach(this::initialize);//recursively update the plan for the comprised artifacts
 		}
 	}
 

@@ -91,17 +91,21 @@ class DefaultAspectualSourceFileArtifact extends DefaultSourceFileArtifact imple
 	 */
 	protected DefaultAspectualSourceFileArtifact(@Nonnull final Builder<?> builder, @Nonnull final Set<String> aspectIds) {
 		super(builder);
+		final Path sourceFile = getSourcePath();
+		final String sourceFilenameBase = findFilename(sourceFile).map(Filenames::getBase)
+				.orElseThrow(() -> new IllegalArgumentException(format("Aspectual source file `%s` has no filename.", sourceFile)));
 		final Path targetFile = getTargetPath();
 		final String targetFilenameBase = findFilename(targetFile).map(Filenames::getBase)
-				.orElseThrow(() -> new IllegalArgumentException(format("Aspectual source file `%s` has no filename.", targetFile)));
+				.orElseThrow(() -> new IllegalArgumentException(format("Aspectual target file `%s` has no filename.", targetFile)));
 		aspectsById = aspectIds.stream().collect(toUnmodifiableMap(identity(), aspectId -> { //create aspects for each aspect ID
+			final Path aspectSourcePath = changeFilenameBase(sourceFile, sourceFilenameBase + FILENAME_ASPECT_DELIMITER + requireNonNull(aspectId)); //e.g. `foo-bar.jpg` -> `foo-bar-preview.jpg`
 			final Path aspectTargetPath = changeFilenameBase(targetFile, targetFilenameBase + FILENAME_ASPECT_DELIMITER + requireNonNull(aspectId)); //e.g. `foo-bar.jpg` -> `foo-bar-preview.jpg`
 			final UrfResourceDescription aspectResourceDescription = new UrfObject(); //TODO create description copy constructor
 			for(final Map.Entry<URI, Object> property : getResourceDescription().getProperties()) { //TODO fix description caching for artifacts somehow; the current logic will set wrong fingerprints, for example
 				aspectResourceDescription.setPropertyValue(property.getKey(), property.getValue());
 			}
 			aspectResourceDescription.setPropertyValue(PROPERTY_TAG_MUMMY_ASPECT, aspectId); //e.g. mummy/aspect="preview"
-			return DefaultSourceFileArtifact.builder(getMummifier(), getSourcePath(), aspectTargetPath).setCorporealSourceFile(getCorporealSourceFile())
+			return DefaultSourceFileArtifact.builder(getMummifier(), aspectSourcePath, aspectTargetPath).setCorporealSourceFile(getCorporealSourceFile())
 					.withDescription(aspectResourceDescription).build(); //TODO set aspect ID
 		}));
 	}
