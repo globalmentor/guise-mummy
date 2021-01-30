@@ -113,7 +113,7 @@ public class BaseImageMummifierTest {
 		testMummifier = new BaseImageMummifier(Set.of(JPEG_MEDIA_TYPE)) {
 
 			@Override
-			protected void mummifyFile(MummyContext context, Artifact artifact) throws IOException {
+			protected void mummifyFile(MummyContext context, CorporealSourceArtifact artifact) throws IOException {
 				throw new AssertionError();
 			}
 		};

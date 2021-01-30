@@ -33,7 +33,7 @@ import io.urf.model.UrfResourceDescription;
  * Concrete implementation of a collection artifact based upon a file system directory.
  * @author Garret Wilson
  */
-public class DirectoryArtifact extends AbstractArtifact implements CollectionArtifact {
+public class DirectoryArtifact extends AbstractArtifact implements SourcePathArtifact, CollectionArtifact {
 
 	/**
 	 * {@inheritDoc}
@@ -51,6 +51,13 @@ public class DirectoryArtifact extends AbstractArtifact implements CollectionArt
 	@Override
 	public final boolean isSourcePathFile() {
 		return false;
+	}
+
+	private final boolean isPost;
+
+	@Override
+	public boolean isPost() {
+		return isPost;
 	}
 
 	private final Artifact contentArtifact;
@@ -99,6 +106,7 @@ public class DirectoryArtifact extends AbstractArtifact implements CollectionArt
 
 	/**
 	 * Constructor.
+	 * @implSpec Whether the artifact is a post is determined by whether the source filename, if any, matches {@link SourcePathArtifact#POST_FILENAME_PATTERN}.
 	 * @param mummifier The mummifier responsible for generating this artifact.
 	 * @param sourceDirectory The directory serving as the source of this artifact.
 	 * @param targetDirectory The directory where the artifact will be generated.
@@ -110,6 +118,7 @@ public class DirectoryArtifact extends AbstractArtifact implements CollectionArt
 			@Nullable Artifact contentArtifact, @Nonnull Collection<Artifact> childArtifacts) {
 		//TODO add precondition to ensure this is a directory?
 		super(mummifier, sourceDirectory, targetDirectory);
+		this.isPost = SourcePathArtifact.hasPostFilename(sourceDirectory);
 		this.contentArtifact = contentArtifact;
 		this.childArtifacts = Set.copyOf(childArtifacts);
 	}

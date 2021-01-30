@@ -57,6 +57,16 @@ public class DummyArtifact extends AbstractSourceFileArtifact {
 	 * @throws UnsupportedOperationException invariably.
 	 */
 	@Override
+	public long getSourceSize(final MummyContext context) throws IOException {
+		throw new UnsupportedOperationException("Cannot get the source size of a dummy artifact.");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This method is not implemented.
+	 * @throws UnsupportedOperationException invariably.
+	 */
+	@Override
 	public InputStream openSource(final MummyContext context) throws IOException {
 		throw new UnsupportedOperationException("Cannot open source of dummy artifact.");
 	}

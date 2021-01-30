@@ -43,7 +43,7 @@ import com.globalmentor.xml.spec.NsName;
 import io.guise.mummy.Artifact;
 import io.guise.mummy.GuiseMummy;
 import io.guise.mummy.MummyContext;
-import io.guise.mummy.SourceFileArtifact;
+import io.guise.mummy.CorporealSourceArtifact;
 import io.guise.mummy.mummify.page.PageMummifier;
 import io.guise.mummy.mummify.page.widget.Widget;
 
@@ -213,8 +213,8 @@ public class DirectoryWidget implements Widget {
 													appendText(element, PUBLISHED_ON_FORMATTER.format(publishedOn));
 													return element;
 												});
-										//excerpt; only included if the item is a source file artifact
-										final Optional<Element> excerptElement = asInstance(item, SourceFileArtifact.class)
+										//excerpt; only included if the item is a corporeal source artifact
+										final Optional<Element> excerptElement = asInstance(item, CorporealSourceArtifact.class)
 												.flatMap(throwingFunction(sourceFileItem -> mummifier.loadSourceExcerpt(context, sourceFileItem))).map(excerpt -> {
 													//Wrap the excerpt in a <div>. The other option would be to import the document fragment children directly into the document,
 													//but wrapping the excerpt may be more semantically correct and more useful for styling in the future.

@@ -195,16 +195,12 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This implementation creates a {@link PostArtifact} for those artifacts with a source filename matching {@link PostArtifact#FILENAME_PATTERN}.
-	 *           Otherwise it creates a {@link PageArtifact}.
+	 * @implSpec This implementation returns a navigable artifact.
 	 */
 	@Override
-	protected Artifact createArtifact(final Path sourceFile, final Path outputFile, final UrfResourceDescription description) throws IOException {
-		final Path sourceFilename = sourceFile.getFileName();
-		if(sourceFilename != null && PostArtifact.FILENAME_PATTERN.matcher(sourceFilename.toString()).matches()) {
-			return new PostArtifact(this, sourceFile, outputFile, description);
-		}
-		return new PageArtifact(this, sourceFile, outputFile, description);
+	protected Artifact createArtifact(final MummyContext context, final Path sourceFile, final Path targetFile, final UrfResourceDescription description)
+			throws IOException {
+		return DefaultSourceFileArtifact.builder(this, sourceFile, targetFile).withDescription(description).setNavigable(true).build(); //pages are navigable
 	}
 
 	/**
@@ -269,8 +265,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				findParentNavigationArtifact(context, artifact).stream(),
 				//then include the sorted child navigation artifacts
 				childNavigationArtifacts(context, artifact)
-						//posts shouldn't appear in the normal navigation list TODO create a more semantic means of filtering posts
-						.filter(not(PostArtifact.class::isInstance)).sorted(navigationArtifactOrderComparator));
+						//posts shouldn't appear in the normal navigation list
+						.filter(not(navArtifact -> navArtifact instanceof SourcePathArtifact && ((SourcePathArtifact)navArtifact).isPost()))
+						.sorted(navigationArtifactOrderComparator));
 	}
 
 	/**
@@ -439,12 +436,12 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR
 	 */
 	@Override
-	public void mummifyFile(final MummyContext context, final Artifact artifact) throws IOException {
+	public void mummifyFile(final MummyContext context, final CorporealSourceArtifact artifact) throws IOException {
 
 		try {
 
 			//#load source document: get starting content to work with
-			final Document sourceDocument = loadSourceDocument(context, (SourceFileArtifact)artifact); //this mummifier requires source file artifacts
+			final Document sourceDocument = loadSourceDocument(context, artifact);
 			getLogger().trace("Loaded page source document `{}`.", artifact.getSourcePath());
 
 			//#normalize: normalize the DOM and remove metadata

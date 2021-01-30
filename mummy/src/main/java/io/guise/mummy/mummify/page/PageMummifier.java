@@ -41,8 +41,8 @@ import io.guise.mummy.mummify.Mummifier;
 
 /**
  * Mummifier for generating HTML pages.
- * @implSpec This type of mummifier only works with {@link SourceFileArtifact}s. If some other type of artifact is used, the mummification methods may throw a
- *           {@link ClassNotFoundException}.
+ * @implSpec This type of mummifier only works with {@link CorporealSourceArtifact}s. If some other type of artifact is used, the mummification methods may
+ *           throw a {@link ClassCastException}.
  * @author Garret Wilson
  */
 public interface PageMummifier extends Mummifier {
@@ -208,15 +208,15 @@ public interface PageMummifier extends Mummifier {
 	 * </p>
 	 * @apiNote The returned document need not include any named metadata (i.e. {@code <meta name="…"> elements}) unless this mummifier's implementation for
 	 *          loading source metadata for the artifact description delegates to this method.
-	 * @implSpec The default implementation opens an input stream using {@link SourceFileArtifact#openSource(MummyContext)} and then loads the source document by
-	 *           calling {@link #loadSourceDocument(MummyContext, InputStream, String)}.
+	 * @implSpec The default implementation opens an input stream using {@link CorporealSourceArtifact#openSource(MummyContext)} and then loads the source
+	 *           document by calling {@link #loadSourceDocument(MummyContext, InputStream, String)}.
 	 * @param context The context of static site generation.
 	 * @param artifact The artifact for which to load the document.
 	 * @return A document describing the source content of the artifact to generate.
 	 * @throws IOException if there is an error loading and/or converting the source file contents.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public default Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull SourceFileArtifact artifact) throws IOException, DOMException {
+	public default Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull CorporealSourceArtifact artifact) throws IOException, DOMException {
 		try (final InputStream inputStream = new BufferedInputStream(artifact.openSource(context))) {
 			return loadSourceDocument(context, inputStream, artifact.getSourcePath().toString());
 		}
@@ -270,8 +270,8 @@ public interface PageMummifier extends Mummifier {
 	 * <p>
 	 * The document fragment must be in XHTML using the HTML namespace.
 	 * </p>
-	 * @implSpec The default implementation opens an input stream using {@link SourceFileArtifact#openSource(MummyContext)} and then loads the source excerpt by
-	 *           calling {@link #loadSourceExcerpt(MummyContext, InputStream, String)}.
+	 * @implSpec The default implementation opens an input stream using {@link CorporealSourceArtifact#openSource(MummyContext)} and then loads the source excerpt
+	 *           by calling {@link #loadSourceExcerpt(MummyContext, InputStream, String)}.
 	 * @implNote The returned document fragment will not yet have been processed. For example, no expressions will have been evaluated and links will still
 	 *           reference source paths. This will likely be changed or otherwise improved in the future.
 	 * @param context The context of static site generation.
@@ -280,7 +280,7 @@ public interface PageMummifier extends Mummifier {
 	 * @throws IOException if there is an error loading and/or converting the source file contents.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public default Optional<DocumentFragment> loadSourceExcerpt(@Nonnull MummyContext context, @Nonnull SourceFileArtifact artifact)
+	public default Optional<DocumentFragment> loadSourceExcerpt(@Nonnull MummyContext context, @Nonnull CorporealSourceArtifact artifact)
 			throws IOException, DOMException {
 		try (final InputStream inputStream = new BufferedInputStream(artifact.openSource(context))) {
 			return loadSourceExcerpt(context, inputStream, artifact.getSourcePath().toString());

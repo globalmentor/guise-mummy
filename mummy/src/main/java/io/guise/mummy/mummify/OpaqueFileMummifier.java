@@ -29,7 +29,6 @@ import java.util.Map.Entry;
 import com.globalmentor.net.ContentType;
 
 import io.guise.mummy.*;
-import io.urf.model.UrfResourceDescription;
 
 /**
  * Mummifier for files with unknown content.
@@ -52,11 +51,6 @@ public class OpaqueFileMummifier extends AbstractFileMummifier {
 		return Optional.empty();
 	}
 
-	@Override
-	protected Artifact createArtifact(final Path sourceFile, final Path outputFile, final UrfResourceDescription description) throws IOException {
-		return new OpaqueFileArtifact(this, sourceFile, outputFile, description);
-	}
-
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This implementation returns an empty list, as there is no way to know source metadata of an opaque file.
@@ -71,7 +65,7 @@ public class OpaqueFileMummifier extends AbstractFileMummifier {
 	 * @implSpec This implementation merely copies the file with no further action.
 	 */
 	@Override
-	public void mummifyFile(final MummyContext context, final Artifact artifact) throws IOException {
+	public void mummifyFile(final MummyContext context, final CorporealSourceArtifact artifact) throws IOException {
 		final Path sourceFile = artifact.getSourcePath();
 		checkArgumentRegularFile(sourceFile);
 		Files.copy(sourceFile, artifact.getTargetPath(), REPLACE_EXISTING);

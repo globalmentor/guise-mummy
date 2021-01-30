@@ -32,14 +32,15 @@ import java.util.regex.*;
 import javax.annotation.*;
 
 import io.guise.mummy.*;
-import io.guise.mummy.mummify.page.PostArtifact;
 import io.urf.model.*;
 import io.urf.vocab.content.Content;
 
 /**
  * Abstract mummifier for generating artifacts based upon a single source file.
- * @implSpec This implementation recognizes blog posts and gives them a target subdirectory structure appropriately based upon
- *           {@link PostArtifact#FILENAME_PATTERN}.
+ * @implSpec This type of mummifier only works with {@link CorporealSourceArtifact}s. If some other type of artifact is used, some mummification methods will
+ *           throw a {@link ClassCastException}.
+ * @implSpec This implementation recognizes posts based upon {@link SourcePathArtifact#POST_FILENAME_PATTERN} and adds an appropriate
+ *           {@link Artifact#PROPERTY_HANDLE_PUBLISHED_ON} property to the description.
  * @implNote This implementation does not yet support source description files using {@link #getArtifactSourceDescriptionFile(MummyContext, Artifact)} or
  *           {@link #getArtifactSourceDescriptionFile(MummyContext, Path)}.
  * @author Garret Wilson
@@ -49,25 +50,29 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This implementation loads the description using {@link #loadArtifactDescription(MummyContext, Path, Path)} and then creates a new artifact using
-	 *           {@link #createArtifact(Path, Path, UrfResourceDescription)}.
+	 *           {@link #createArtifact(MummyContext, Path, Path, UrfResourceDescription)}.
 	 */
 	@Override
 	public Artifact plan(final MummyContext context, final Path sourceFile, final Path targetFile) throws IOException {
 		getLogger().trace("Planning artifact for source file `{}` ...", sourceFile);
 		final UrfResourceDescription description = loadArtifactDescription(context, sourceFile, targetFile);
-		return createArtifact(sourceFile, targetFile, description);
+		return createArtifact(context, sourceFile, targetFile, description);
 	}
 
 	/**
 	 * Creates an artifact of the appropriate type for this mummifier.
+	 * @implSpec The default implementation returns an instance of {@link DefaultSourceFileArtifact}.
+	 * @param context The context of static site generation.
 	 * @param sourceFile The file containing the source of this artifact.
 	 * @param outputFile The file where the artifact will be generated.
 	 * @param description The description of the artifact.
 	 * @return An artifact describing the resource to be mummified.
 	 * @throws IOException if there is an I/O error during planning.
 	 */
-	protected abstract Artifact createArtifact(@Nonnull final Path sourceFile, @Nonnull final Path outputFile, @Nonnull final UrfResourceDescription description)
-			throws IOException;
+	protected Artifact createArtifact(@Nonnull final MummyContext context, @Nonnull final Path sourceFile, @Nonnull final Path outputFile,
+			@Nonnull final UrfResourceDescription description) throws IOException {
+		return new DefaultSourceFileArtifact(this, sourceFile, outputFile, description);
+	}
 
 	/**
 	 * Determines the description for the given artifact based upon its source file and related files.
@@ -128,12 +133,12 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 			//add the publication date for posts
 			final Path filename = sourceFile.getFileName();
 			if(filename != null) {
-				final Matcher postMatcher = PostArtifact.FILENAME_PATTERN.matcher(filename.toString());
+				final Matcher postMatcher = SourcePathArtifact.POST_FILENAME_PATTERN.matcher(filename.toString());
 				if(postMatcher.matches()) { //if this is a post, add a `publishedOn` property if there isn't one already
 					if(!description.hasPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON)) {
-						final String postYear = postMatcher.group(PostArtifact.FILENAME_PATTERN_YEAR_GROUP);
-						final String postMonth = postMatcher.group(PostArtifact.FILENAME_PATTERN_MONTH_GROUP);
-						final String postDay = postMatcher.group(PostArtifact.FILENAME_PATTERN_DAY_GROUP);
+						final String postYear = postMatcher.group(SourcePathArtifact.POST_FILENAME_PATTERN_YEAR_GROUP);
+						final String postMonth = postMatcher.group(SourcePathArtifact.POST_FILENAME_PATTERN_MONTH_GROUP);
+						final String postDay = postMatcher.group(SourcePathArtifact.POST_FILENAME_PATTERN_DAY_GROUP);
 						//the regex will guarantee that these are parsable as integers 
 						final LocalDate publishedOn = LocalDate.of(Integer.parseInt(postYear), Integer.parseInt(postMonth), Integer.parseInt(postDay));
 						description.setPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON, publishedOn);
@@ -162,10 +167,11 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	/**
 	 * {@inheritDoc}
 	 * @apiNote This method cannot be overridden, as it performs necessary checks for incremental mummification. To implement file mummification,
-	 *          {@link #mummifyFile(MummyContext, Artifact)} should be overridden instead.
+	 *          {@link #mummifyFile(MummyContext, CorporealSourceArtifact)} should be overridden instead.
 	 * @implSpec If incremental mummification is enabled via {@link MummyContext#isIncremental()}, this version checks the the timestamp of the target file, and
-	 *           delegates to {@link #mummifyFile(MummyContext, Artifact)} if the file needs regenerated.
+	 *           delegates to {@link #mummifyFile(MummyContext, CorporealSourceArtifact)} if the file needs regenerated.
 	 * @implSpec This implementation saves the description description if modified by calling {@link #saveTargetDescription(MummyContext, Artifact)}.
+	 * @throws ClassCastException if the given artifact is not an instance of {@link CorporealSourceArtifact}.
 	 * @see Content#MODIFIED_AT_PROPERTY_TAG
 	 * @see Artifact#PROPERTY_TAG_MUMMY_DESCRIPTION_DIRTY
 	 * @see MummyContext#isIncremental()
@@ -195,7 +201,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 			if(parentDirectory != null && !exists(parentDirectory)) { //ensure parent directories exist, as artifact children may specify files several layers deep, e.g. blog posts 
 				createDirectories(parentDirectory);
 			}
-			mummifyFile(context, artifact);
+			mummifyFile(context, (CorporealSourceArtifact)artifact);
 			checkState(exists(targetFile), "Mummification of artifact source file `%s` did not produce target file `%s`.", artifact.getSourcePath(), targetFile);
 			getLogger().debug("Mummified file artifact {}.", artifact);
 			newTargetModifiedAt = getLastModifiedTime(targetFile).toInstant();
@@ -234,6 +240,6 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @param artifact The artifact being generated.
 	 * @throws IOException if there is an I/O error during mummification.
 	 */
-	protected abstract void mummifyFile(@Nonnull final MummyContext context, @Nonnull Artifact artifact) throws IOException;
+	protected abstract void mummifyFile(@Nonnull final MummyContext context, @Nonnull CorporealSourceArtifact artifact) throws IOException;
 
 }

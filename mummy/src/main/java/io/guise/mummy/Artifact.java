@@ -49,10 +49,7 @@ import io.urf.model.UrfResourceDescription;
  * <dd>A special <dfn>subsumed artifact</dfn> of a directory that serves to represent its content. Historically the content artifact was
  * <code>index.html</code>. Note that a content artifact is <em>not</em> a <dfn>child artifact</dfn> of its directory.</dd>
  * <dt><dfn>corporeal artifact</dfn></dt>
- * <dd>An artifact that retrieves its contents from some actual file in the source tree. e.g. {@link BaseCorporealSourceFileArtifact}.</dd>
- * <dt><dfn>phantom artifact</dfn></dt>
- * <dd>An artifact that is generated or loaded from resource during mummification, and for which a source file does not exist in the source tree; the opposite
- * of <dfn>corporeal artifact</dfn>. e.g. {@link io.guise.mummy.mummify.page.DefaultXhtmlPhantomArtifact}</dd>
+ * <dd>An artifact that potentially contains content, such as a {@link CorporealSourceArtifact}.</dd>
  * <dt><dfn>principal artifact</dfn></dt>
  * <dd>An artifact that should be used as the canonical source and target for IRI path references. An artifact is normally its own principal artifact unless it
  * is a <dfn>subsumed artifact</dfn> in which case the principal artifact is the one it is subsumed into and which should be used for IRI path references.</dd>
@@ -92,6 +89,11 @@ public interface Artifact {
 
 	//### Guise Mummy properties
 
+	/**
+	 * The property tag of the <code>mummy/aspect</code> property for indicating that the artifact is an aspect (e.g. <code>"preview"</code>) of the resource.
+	 * @see AspectualArtifact
+	 */
+	public static final URI PROPERTY_TAG_MUMMY_ASPECT = NAMESPACE.resolve("aspect");
 	/** The property tag of the <code>mummy/altLocation</code> property for indicating an alternate (redirect) name. */
 	public static final URI PROPERTY_TAG_MUMMY_ALT_LOCATION = NAMESPACE.resolve("altLocation");
 	/** The property tag of the <code>mummy/order</code> property for indicating e.g. navigation order. */
@@ -219,6 +221,7 @@ public interface Artifact {
 	/**
 	 * Returns the path to the source of the artifact in the source tree.
 	 * @apiNote Depending on the artifact implementation, the source path is not guaranteed to exist.
+	 * @apiNote This method and all methods in this interface related to a source path in a file system may be moved eventually to {@link SourcePathArtifact}.
 	 * @return The path referring to the source of this artifact, which may be a file or a directory.
 	 */
 	public Path getSourcePath();
@@ -249,6 +252,12 @@ public interface Artifact {
 
 	/** @return The mummifier responsible for mummifying this artifact. */
 	public Mummifier getMummifier();
+
+	/**
+	 * Indicates whether the artifact represents that something was "posted" or published on some date, with a hierarchical URI path indicating the post date.
+	 * @return <code>true</code> if this artifact is a post.
+	 */
+	public boolean isPost();
 
 	/**
 	 * Indicates whether the artifact would normally be part of site navigation.
