@@ -38,6 +38,9 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.*;
 
 import com.globalmentor.awt.geom.ImmutableDimension2D;
+import com.globalmentor.io.Images;
+import com.globalmentor.java.Objects;
+import com.globalmentor.net.ContentType;
 
 import io.confound.config.Configuration;
 import io.guise.mummy.*;
@@ -46,10 +49,12 @@ import io.urf.vocab.content.Content;
 
 /**
  * General image mummifier.
- * @implSpec This implementation supports GIF, JPEG, and PNG files.
+ * @implSpec This implementation supports GIF, JPEG, and PNG files. Reading metadata is supported from XMP, IPTC, and Exif, but writing metadata currently only
+ *           supports Exif and only for JPEG images. When processing images all other metadata, including ICC profiles, will be dicarded.
  * @implSpec This implementation supports configured image aspects.
  * @implSpec This implementation uses <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/javax/imageio/package-summary.html">Java Image
  *           I/O</a> for image processing.
+ * @implSpec This implementation uses <a href="https://commons.apache.org/proper/commons-imaging/">Apache Commons Imaging</a> for adding Exif image metadata.
  * @implSpec This mummifier orchestrates mummification of any aspectual image artifacts, and generation of aspects is determined wholly by whether the main
  *           image artifact is being generated.
  * @author Garret Wilson
@@ -101,12 +106,33 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 		final long imageScaleThresholdSize = context.getConfiguration().findLong(CONFIG_KEY_MUMMY_IMAGE_PROCESS_THRESHOLD_FILE_SIZE)
 				.orElse(DEFAULT_SCALE_THRESHOLD_FILE_SIZE);
 		if(artifact.getSourceSize(context) > imageScaleThresholdSize) { //if the size of the image source file goes over our threshold for scaling
-			try (final InputStream inputStream = new BufferedInputStream(artifact.openSource(context));
-					final OutputStream outputStream = new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))) {
-				processImage(context, artifact, inputStream, outputStream);
+
+			final boolean isImageJpeg = artifact.getResourceDescription().findPropertyValue(Content.TYPE_PROPERTY_TAG).flatMap(Objects.asInstance(ContentType.class))
+					.<Boolean>map(Images.JPEG_MEDIA_TYPE::hasBaseType).orElse(false);
+			//TODO bring back when Apache Common Imaging IMAGING-281 is fixed: final boolean isPostProcessWriteMetadataSupported = isImageJpeg; //currently only JPEG image data is supported for writing metadata
+			final boolean isPostProcessWriteMetadataSupported = false;
+			final boolean isProcessTerminal = !isPostProcessWriteMetadataSupported; //	//if we don't support writing metadata, we'll write directly to the file
+
+			//process image
+			final OutputStream processOutputStream; //remember the stream used for output (even though it will be closed) 
+			try (final InputStream inputStream = new BufferedInputStream(artifact.openSource(context)); //use a TempOutputStream for later use if processing isn't terminal
+					final OutputStream outputStream = (processOutputStream = isProcessTerminal ? new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))
+							: new TempOutputStream())) {
+				processImage(context, artifact, inputStream, processOutputStream);
 			} catch(final IOException ioException) { //provide more context to I/O errors
 				throw new IOException(format("Error processing image `%s`: %s", artifact.getSourcePath(), ioException.getLocalizedMessage()), ioException); //TODO i18n
 			}
+
+			//add metadata and stream to output file (if supported)
+			if(isPostProcessWriteMetadataSupported) {
+				final TempOutputStream tempOutputStream = (TempOutputStream)processOutputStream;
+				try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))) {
+					addImageMetadata(artifact.getResourceDescription(), tempOutputStream.toByteSource(), outputStream);
+				} catch(final IOException ioException) { //provide more context to I/O errors
+					throw new IOException(format("Error processing image `%s`: %s", artifact.getSourcePath(), ioException.getLocalizedMessage()), ioException); //TODO i18n
+				}
+			}
+
 		} else {
 			copy(artifact.getSourcePath(), artifact.getTargetPath(), REPLACE_EXISTING); //TODO abstract the copy, here and in OpaqueFileMummifier
 		}
@@ -123,6 +149,7 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 	 * Processes an image from the given input stream and writes the processed image to the given output stream. Image aspect are recognized and processed
 	 * accordingly.
 	 * @implSpec This implementation scales an image using the AWT to draw on a scaled image using bicubic interpolation and quality-biased rendering.
+	 * @implSpec This implementation preserves no metadata.
 	 * @param context The context of static site generation.
 	 * @param artifact The artifact being generated.
 	 * @param inputStream The input stream for reading the source image.
@@ -150,7 +177,7 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 		final ImageReader imageReader = findNext(getImageReaders(imageInputStream)) //use the first available image reader
 				.orElseThrow(() -> new IOException("No service provider image reader available."));
 		final ImageReadParam imageReadParam = imageReader.getDefaultReadParam();
-		imageReader.setInput(imageInputStream, true, true); //tell the image reader to read from the image input stream
+		imageReader.setInput(imageInputStream, true, true); //tell the image reader to read from the image input stream; ignore metadata
 		final BufferedImage oldImage; //read the first of the images
 		try {
 			oldImage = imageReader.read(0, imageReadParam); //tell the image reader to read the image
@@ -188,7 +215,8 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 		}
 
 		//write
-		final ImageWriter imageWriter = getImageWriter(imageReader); //get an image writer that corresponds to the reader; this will hopefully conserve the metadata as well
+		final ImageWriter imageWriter = getImageWriter(imageReader); //get an image writer that corresponds to the reader
+
 		try {
 			final ImageWriteParam imageWriteParam = imageWriter.getDefaultWriteParam(); //get default parameters for writing the image
 			if(imageWriteParam.canWriteCompressed()) { //if the writer can compress images (if we don't do this check, an exception will be thrown if the image writer doesn't support compression, e.g. for PNG files)
@@ -204,7 +232,7 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 				throw new IOException("No suitable image output stream service provider found.");
 			}
 			imageWriter.setOutput(imageOutputStream); //tell the image writer to write to the image output stream
-			final IIOImage iioImage = new IIOImage(newImage, null, null); //write no thumbnails TODO fix to preserving the metadata, if any, we got from the original file
+			final IIOImage iioImage = new IIOImage(newImage, null, null); //write with no thumbnails and no metadata
 			imageWriter.write(null, iioImage, imageWriteParam); //tell the image writer to read the image using the custom parameters
 		} finally {
 			imageWriter.dispose(); //tell the image writer we don't need it any more

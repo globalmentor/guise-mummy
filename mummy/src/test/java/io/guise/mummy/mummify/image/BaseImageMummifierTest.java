@@ -28,11 +28,21 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.imaging.common.bytesource.ByteSourceInputStream;
 import org.junit.jupiter.api.*;
+
+import com.drew.imaging.*;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.exif.*;
+import com.drew.metadata.iptc.IptcDirectory;
+import com.drew.metadata.xmp.XmpDirectory;
 
 import io.confound.config.Configuration;
 import io.guise.mummy.*;
+import io.guise.mummy.mummify.image.BaseImageMummifier.TempOutputStream;
 import io.urf.URF.Handle;
+import io.urf.model.UrfObject;
+import io.urf.model.UrfResourceDescription;
 
 /**
  * Tests of {@link BaseImageMummifier}.
@@ -49,6 +59,9 @@ public class BaseImageMummifierTest {
 	public static final long GATE_TURRET_REDUCED_JPEG_FILE_SIZE = 83052;
 	public static final int GATE_TURRET_REDUCED_JPEG_WIDTH = 972;
 	public static final int GATE_TURRET_REDUCED_JPEG_HEIGHT = 648;
+
+	/** A sample JPEG image with no metadata at all. */
+	public static final String GATE_TURRET_REDUCED_NO_METADATA_JPEG_RESOURCE_NAME = "gate-turret-reduced-no-metadata.jpg";
 
 	/**
 	 * A sample JPEG image with only Exif metadata, including:
@@ -121,7 +134,7 @@ public class BaseImageMummifierTest {
 
 	/** @see BaseImageMummifier#getArtifactMediaType(MummyContext, java.nio.file.Path) */
 	@Test
-	public void testGetArtifactMediaType() throws IOException {
+	void testGetArtifactMediaType() throws IOException {
 		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.jpg")), isPresentAndIs(JPEG_MEDIA_TYPE));
 		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.JPG")), isPresentAndIs(JPEG_MEDIA_TYPE));
 		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.jpeg")), isPresentAndIs(JPEG_MEDIA_TYPE));
@@ -133,7 +146,7 @@ public class BaseImageMummifierTest {
 	 * @see #GATE_TURRET_REDUCED_EXIF_JPEG_RESOURCE_NAME
 	 */
 	@Test
-	public void testLoadSourceMetadataExif() throws IOException {
+	void testLoadSourceMetadataExif() throws IOException {
 		final Map<URI, Object> metadata;
 		try (final InputStream inputStream = getClass().getResourceAsStream(GATE_TURRET_REDUCED_EXIF_JPEG_RESOURCE_NAME)) {
 			metadata = testMummifier.loadSourceMetadata(fixtureContext, inputStream, GATE_TURRET_REDUCED_EXIF_JPEG_RESOURCE_NAME).stream()
@@ -150,7 +163,7 @@ public class BaseImageMummifierTest {
 	 * @see #GATE_TURRET_REDUCED_EXIF_IPTC_JPEG_RESOURCE_NAME
 	 */
 	@Test
-	public void testLoadSourceMetadataExifIptc() throws IOException {
+	void testLoadSourceMetadataExifIptc() throws IOException {
 		final Map<URI, Object> metadata;
 		try (final InputStream inputStream = getClass().getResourceAsStream(GATE_TURRET_REDUCED_EXIF_IPTC_JPEG_RESOURCE_NAME)) {
 			metadata = testMummifier.loadSourceMetadata(fixtureContext, inputStream, GATE_TURRET_REDUCED_EXIF_IPTC_JPEG_RESOURCE_NAME).stream()
@@ -167,7 +180,7 @@ public class BaseImageMummifierTest {
 	 * @see #GATE_TURRET_REDUCED_EXIF_XMP_JPEG_RESOURCE_NAME
 	 */
 	@Test
-	public void testLoadSourceMetadataExifXmp() throws IOException {
+	void testLoadSourceMetadataExifXmp() throws IOException {
 		final Map<URI, Object> metadata;
 		try (final InputStream inputStream = getClass().getResourceAsStream(GATE_TURRET_REDUCED_EXIF_XMP_JPEG_RESOURCE_NAME)) {
 			metadata = testMummifier.loadSourceMetadata(fixtureContext, inputStream, GATE_TURRET_REDUCED_EXIF_XMP_JPEG_RESOURCE_NAME).stream()
@@ -176,6 +189,32 @@ public class BaseImageMummifierTest {
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_TITLE)), is("Gate and Turret"));
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_DESCRIPTION)), is("Castle turret viewed through a gate."));
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT)), is("Copyright © 2009 Garret Wilson"));
+	}
+
+	/** @see BaseImageMummifier#addImageMetadata(UrfResourceDescription, org.apache.commons.imaging.common.bytesource.ByteSource, OutputStream) */
+	@Disabled("Apache Commons Imaging corrupts XPTItle; see IMAGING-281.")
+	@Test
+	void testAddImageMetadata() throws IOException, ImageProcessingException {
+		try (final InputStream inputStream = getClass().getResourceAsStream(GATE_TURRET_REDUCED_NO_METADATA_JPEG_RESOURCE_NAME);
+				final TempOutputStream tempOutputStream = new TempOutputStream()) {
+			//add image metadata
+			final UrfResourceDescription metadata = new UrfObject();
+			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_TITLE), "Test Title");
+			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_DESCRIPTION), "Touché");
+			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT), "Copyright © 2021 GlobalMentor, Inc.");
+			BaseImageMummifier.addImageMetadata(metadata, new ByteSourceInputStream(inputStream, null), tempOutputStream);
+			//extract and verify added metadata using metadata-extractor
+			final Metadata extractedMetadata = ImageMetadataReader.readMetadata(tempOutputStream.toInputStream());
+			final ExifIFD0Directory ifd0Directory = extractedMetadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
+			assertThat("Exif metadata was added.", ifd0Directory, is(not(nullValue())));
+			final ExifIFD0Descriptor exifIFD0Descriptor = new ExifIFD0Descriptor(ifd0Directory);
+			assertThat("Exif IFD0 metadata was added.", exifIFD0Descriptor, is(not(nullValue())));
+			assertThat(exifIFD0Descriptor.getWindowsTitleDescription(), is("Test Title")); //XPTitle
+			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION), is("Touché")); //ImageDescription
+			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_COPYRIGHT), is("Copyright © 2021 GlobalMentor, Inc.")); //Copyright
+			assertThat("No XMP metadata was added.", extractedMetadata.getFirstDirectoryOfType(XmpDirectory.class), is(nullValue()));
+			assertThat("No IPTC metadata was added.", extractedMetadata.getFirstDirectoryOfType(IptcDirectory.class), is(nullValue()));
+		}
 	}
 
 }
