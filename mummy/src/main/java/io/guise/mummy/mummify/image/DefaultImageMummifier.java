@@ -35,6 +35,8 @@ import java.util.*;
 import javax.annotation.*;
 import javax.imageio.*;
 import javax.imageio.ImageWriter;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.*;
 
 import com.globalmentor.awt.geom.ImmutableDimension2D;
@@ -49,8 +51,9 @@ import io.urf.vocab.content.Content;
 
 /**
  * General image mummifier.
- * @implSpec This implementation supports GIF, JPEG, and PNG files. Reading metadata is supported from XMP, IPTC, and Exif, but writing metadata currently only
- *           supports Exif and only for JPEG images. When processing images all other metadata, including ICC profiles, will be dicarded.
+ * @implSpec This implementation supports GIF, JPEG, and PNG files. Reading metadata is supported from XMP, IPTC, and Exif. When processing a primary image, all
+ *           metadata will be retained if possible. When processing an image aspect, in order to reduce file size all image metadata will be discarded; a small
+ *           subset of normalized Exif metadata will then be added back, but only for JPEG images.
  * @implSpec This implementation supports configured image aspects.
  * @implSpec This implementation uses <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/javax/imageio/package-summary.html">Java Image
  *           I/O</a> for image processing.
@@ -99,7 +102,7 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This implementation scales the image in an attempt to reduce the file size if the file size is above a certain threshold.
-	 * @implSpec This implementation delegates to {@link #processImage(MummyContext, Artifact, InputStream, OutputStream)} for scaling.
+	 * @implSpec This implementation delegates to {@link #processImage(MummyContext, Artifact, InputStream, OutputStream, boolean)} for scaling.
 	 */
 	@Override
 	public void mummifyFile(final MummyContext context, final CorporealSourceArtifact artifact) throws IOException {
@@ -109,16 +112,16 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 
 			final boolean isImageJpeg = artifact.getResourceDescription().findPropertyValue(Content.TYPE_PROPERTY_TAG).flatMap(Objects.asInstance(ContentType.class))
 					.<Boolean>map(Images.JPEG_MEDIA_TYPE::hasBaseType).orElse(false);
-			//TODO bring back when Apache Common Imaging IMAGING-281 is fixed: final boolean isPostProcessWriteMetadataSupported = isImageJpeg; //currently only JPEG image data is supported for writing metadata
-			final boolean isPostProcessWriteMetadataSupported = false;
-			final boolean isProcessTerminal = !isPostProcessWriteMetadataSupported; //	//if we don't support writing metadata, we'll write directly to the file
-
+			final boolean isImageAspect = artifact.getResourceDescription().hasPropertyValue(AspectualArtifact.PROPERTY_TAG_MUMMY_ASPECT); //e.g. preview or thumbnail
+			final boolean isKeepProcessMetadata = !isImageAspect; //to keep file size down, discard metadata during processing for image aspects (but add back a tiny bit later) 
+			final boolean isPostProcessWriteMetadataSupported = isImageJpeg && !isKeepProcessMetadata; //if we are discarding metadata during processing, write some basic metadata later for JPEG images
+			final boolean isProcessTerminal = !isPostProcessWriteMetadataSupported; //	//if we don't support writing metadata post-processing, we'll write directly to the file when processing
 			//process image
 			final OutputStream processOutputStream; //remember the stream used for output (even though it will be closed) 
 			try (final InputStream inputStream = new BufferedInputStream(artifact.openSource(context)); //use a TempOutputStream for later use if processing isn't terminal
 					final OutputStream outputStream = (processOutputStream = isProcessTerminal ? new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))
 							: new TempOutputStream())) {
-				processImage(context, artifact, inputStream, processOutputStream);
+				processImage(context, artifact, inputStream, processOutputStream, isKeepProcessMetadata);
 			} catch(final IOException ioException) { //provide more context to I/O errors
 				throw new IOException(format("Error processing image `%s`: %s", artifact.getSourcePath(), ioException.getLocalizedMessage()), ioException); //TODO i18n
 			}
@@ -154,20 +157,24 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 	 * @param artifact The artifact being generated.
 	 * @param inputStream The input stream for reading the source image.
 	 * @param outputStream The output stream for writing the target image.
+	 * @param keepMetadata <code>true</code> if the metadata in the original image should be maintained, or <code>false</code> if all metadata should be discarded
+	 *          during processing.
 	 * @throws IOException if there is an I/O error during image processing.
 	 * @see <a href="http://www.hanhuy.com/pfn/java-image-thumbnail-comparison">A comparison of Java image thumbnailing techniques</a>
 	 * @see <a href="https://www.universalwebservices.net/web-programming-resources/java/adjust-jpeg-image-compression-quality-when-saving-images-in-java/">Adjust
 	 *      JPEG image compression quality when saving images in Java</a>
 	 * @see AspectualArtifact#PROPERTY_TAG_MUMMY_ASPECT
 	 */
-	protected void processImage(@Nonnull final MummyContext context, @Nonnull Artifact artifact, final InputStream inputStream, final OutputStream outputStream)
-			throws IOException {
+	protected void processImage(@Nonnull final MummyContext context, @Nonnull Artifact artifact, final InputStream inputStream, final OutputStream outputStream,
+			final boolean keepMetadata) throws IOException {
 		final Optional<String> foundAspect = artifact.getResourceDescription().findPropertyValue(AspectualArtifact.PROPERTY_TAG_MUMMY_ASPECT).map(Object::toString);
 		//determine the correct configuration keys based upon the aspect, if any
 		final String configKeyScaleMaxLength = foundAspect.map(aspect -> format(CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___SCALE_MAX_LENGTH, aspect))
 				.orElse(CONFIG_KEY_MUMMY_IMAGE_SCALE_MAX_LENGTH);
 		final String configKeyCompressionQuality = foundAspect.map(aspect -> format(CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___COMPRESSION_QUALITY, aspect))
 				.orElse(CONFIG_KEY_MUMMY_IMAGE_COMPRESSION_QUALITY);
+
+		final int imageIndex = 0; //this processing logic assumes that that the first image is the one being processed
 
 		//load
 		final ImageInputStream imageInputStream = createImageInputStream(inputStream); //this stream will not be closed in this method, as it wraps a stream provided by the caller
@@ -177,10 +184,10 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 		final ImageReader imageReader = findNext(getImageReaders(imageInputStream)) //use the first available image reader
 				.orElseThrow(() -> new IOException("No service provider image reader available."));
 		final ImageReadParam imageReadParam = imageReader.getDefaultReadParam();
-		imageReader.setInput(imageInputStream, true, true); //tell the image reader to read from the image input stream; ignore metadata
+		imageReader.setInput(imageInputStream, true, !keepMetadata); //tell the image reader to read from the image input stream, ignoring metadata if we shouldn't keep metadata
 		final BufferedImage oldImage; //read the first of the images
 		try {
-			oldImage = imageReader.read(0, imageReadParam); //tell the image reader to read the image
+			oldImage = imageReader.read(imageIndex, imageReadParam); //tell the image reader to read the image
 		} finally {
 			imageReader.dispose(); //tell the image reader we don't need it any more
 		}
@@ -226,13 +233,20 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 					imageWriteParam.setCompressionType(compressionTypes[0]); //use the first available compression type
 				}
 				imageWriteParam.setCompressionQuality((float)context.getConfiguration().findDouble(configKeyCompressionQuality).orElse(DEFAULT_COMPRESSION_QUALITY));
+				if(imageWriteParam instanceof JPEGImageWriteParam) {
+					//Important: Optimize the Huffman tables (guaranteeing Huffman tables) as a workaround to avoid a
+					//"javax.imageio.IIOException: Missing Huffman code table entry" inside JPEGImageWriter.writeImage()
+					//for some images; see https://stackoverflow.com/a/62240696 .
+					((JPEGImageWriteParam)imageWriteParam).setOptimizeHuffmanTables(true);
+				}
 			}
 			final ImageOutputStream imageOutputStream = createImageOutputStream(outputStream); //this stream will not be closed in this method, as it wraps a stream provided by the caller
 			if(imageOutputStream == null) {
 				throw new IOException("No suitable image output stream service provider found.");
 			}
 			imageWriter.setOutput(imageOutputStream); //tell the image writer to write to the image output stream
-			final IIOImage iioImage = new IIOImage(newImage, null, null); //write with no thumbnails and no metadata
+			final IIOMetadata imageMetadata = keepMetadata ? imageReader.getImageMetadata(imageIndex) : null; //get any metadata associated with the image if we have been asked to keep it
+			final IIOImage iioImage = new IIOImage(newImage, null, imageMetadata); //write with no thumbnails, but try to keep metadata (if we read any)
 			imageWriter.write(null, iioImage, imageWriteParam); //tell the image writer to read the image using the custom parameters
 		} finally {
 			imageWriter.dispose(); //tell the image writer we don't need it any more

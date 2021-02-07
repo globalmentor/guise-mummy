@@ -209,14 +209,15 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 		return sourceMetadata;
 	}
 
+	@SuppressWarnings("unused")
 	private static final TagInfoAscii EXIF_XP_TITLE_TAG_INFO = new TagInfoAscii("XPTitle", 0x9C9B, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //XPTitle (0x9C9B)
 	private static final TagInfoAscii EXIF_IMAGE_DESCRIPTION_TAG_INFO = new TagInfoAscii("ImageDescription", 0x010E, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //ImageDescription (270, 0x010E)
 	private static final TagInfoAscii EXIF_COPYRIGHT_TAG_INFO = new TagInfoAscii("Copyright", 0x8298, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //Copyright (33432, 0x8298)
 
 	/**
 	 * Adds appropriate metadata to an existing image. Any exiting metadata is replaced.
-	 * @implSpec This implementation is currently broken; see <a href="https://issues.apache.org/jira/browse/IMAGING-281">IMAGING-281: Simple Exif XPTitle
-	 *           corrupted.</a>
+	 * @implNote This implementation ignores the {@link Artifact#PROPERTY_HANDLE_TITLE} property because Apache Commons Imaging writes corrupted
+	 *           <code>XPTitle</code> values; see <a href="https://issues.apache.org/jira/browse/IMAGING-281">IMAGING-281: Simple Exif XPTitle corrupted.</a>
 	 * @implSpec This implementation only supports writing Exif metadata to JPEG images.
 	 * @implSpec This implementation uses <a href="https://commons.apache.org/proper/commons-imaging/">Apache Commons Imaging</a>.
 	 * @param metadata The description containing the metadata to add.
@@ -233,8 +234,9 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 			final TiffOutputSet tiffOutputSet = new TiffOutputSet();
 			final TiffOutputDirectory exifDirectory = tiffOutputSet.getOrCreateRootDirectory(); //getOrCreateExifDirectory() prevents metadata-extractor from seeing values
 			//XPTitle (0x9C9B)
-			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_TITLE)
-					.ifPresent(throwingConsumer(title -> exifDirectory.add(EXIF_XP_TITLE_TAG_INFO, title.toString())));
+			//TODO bring back when IMAGING-281 is fixed
+			//			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_TITLE)
+			//					.ifPresent(throwingConsumer(title -> exifDirectory.add(EXIF_XP_TITLE_TAG_INFO, title.toString())));
 			//ImageDescription (270, 0x010E)
 			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_DESCRIPTION)
 					.ifPresent(throwingConsumer(description -> exifDirectory.add(EXIF_IMAGE_DESCRIPTION_TAG_INFO, description.toString())));

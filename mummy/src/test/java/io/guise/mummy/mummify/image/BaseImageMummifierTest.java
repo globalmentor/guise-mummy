@@ -78,6 +78,20 @@ public class BaseImageMummifierTest {
 	public static final String GATE_TURRET_REDUCED_EXIF_JPEG_RESOURCE_NAME = "gate-turret-reduced-exif.jpg";
 
 	/**
+	 * A sample JPEG image with only Exif metadata encoded in UTF-8, including:
+	 * <dl>
+	 * <dt><code>XPTitle</code> (Exif <code>0x9C9B</code>)</dt>
+	 * <dd>Gate and Turret</dd>
+	 * <dt><code>ImageDescription</code> (Exif <code>0x010E</code>)</dt>
+	 * <dd>Castle turret viewed through a gate.</dd>
+	 * <dt><code>Copyright</code> (Exif <code>0x8298</code>)</dt>
+	 * <dd>Copyright © 2009 Garret Wilson</dd>
+	 * <dd>
+	 * </dl>
+	 */
+	public static final String GATE_TURRET_REDUCED_EXIF_UTF_8_JPEG_RESOURCE_NAME = "gate-turret-reduced-exif-utf-8.jpg";
+
+	/**
 	 * A sample JPEG image with Exif and IPTC metadata, including:
 	 * <dl>
 	 * <dt><code>ObjectName</code> (IIM <code>2:05</code>, <code>0x205</code>)</dt>
@@ -158,6 +172,23 @@ public class BaseImageMummifierTest {
 	}
 
 	/**
+	 * @see BaseImageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
+	 * @see #GATE_TURRET_REDUCED_EXIF_UTF_8_JPEG_RESOURCE_NAME
+	 */
+	@Disabled("Reenable when metadata-extractor bug #270 is fixed.")
+	@Test
+	void testLoadSourceMetadataExifUtf8() throws IOException {
+		final Map<URI, Object> metadata;
+		try (final InputStream inputStream = getClass().getResourceAsStream(GATE_TURRET_REDUCED_EXIF_UTF_8_JPEG_RESOURCE_NAME)) {
+			metadata = testMummifier.loadSourceMetadata(fixtureContext, inputStream, GATE_TURRET_REDUCED_EXIF_UTF_8_JPEG_RESOURCE_NAME).stream()
+					.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+		}
+		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_TITLE)), is("Gate and Turret"));
+		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_DESCRIPTION)), is("Castle turret viewed through a gate."));
+		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT)), is("Copyright © 2009 Garret Wilson"));
+	}
+
+	/**
 	 * IPTC metadata should override Exif metadata
 	 * @see BaseImageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
 	 * @see #GATE_TURRET_REDUCED_EXIF_IPTC_JPEG_RESOURCE_NAME
@@ -192,16 +223,19 @@ public class BaseImageMummifierTest {
 	}
 
 	/** @see BaseImageMummifier#addImageMetadata(UrfResourceDescription, org.apache.commons.imaging.common.bytesource.ByteSource, OutputStream) */
-	@Disabled("Apache Commons Imaging corrupts XPTItle; see IMAGING-281.")
 	@Test
 	void testAddImageMetadata() throws IOException, ImageProcessingException {
 		try (final InputStream inputStream = getClass().getResourceAsStream(GATE_TURRET_REDUCED_NO_METADATA_JPEG_RESOURCE_NAME);
 				final TempOutputStream tempOutputStream = new TempOutputStream()) {
 			//add image metadata
 			final UrfResourceDescription metadata = new UrfObject();
-			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_TITLE), "Test Title");
-			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_DESCRIPTION), "Touché");
-			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT), "Copyright © 2021 GlobalMentor, Inc.");
+			//TODO bring back when [IMAGING-281](https://issues.apache.org/jira/browse/IMAGING-281) is fixed
+			//			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_TITLE), "Test Title");
+			//TODO bring back when metadata-extractor [#270](https://github.com/drewnoakes/metadata-extractor/issues/270) is fixed
+			//			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_DESCRIPTION), "Touché");
+			//			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT), "Copyright © 2021 GlobalMentor, Inc.");
+			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_DESCRIPTION), "This is a test image.");
+			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT), "Copyright (C) 2021 GlobalMentor, Inc.");
 			BaseImageMummifier.addImageMetadata(metadata, new ByteSourceInputStream(inputStream, null), tempOutputStream);
 			//extract and verify added metadata using metadata-extractor
 			final Metadata extractedMetadata = ImageMetadataReader.readMetadata(tempOutputStream.toInputStream());
@@ -209,9 +243,13 @@ public class BaseImageMummifierTest {
 			assertThat("Exif metadata was added.", ifd0Directory, is(not(nullValue())));
 			final ExifIFD0Descriptor exifIFD0Descriptor = new ExifIFD0Descriptor(ifd0Directory);
 			assertThat("Exif IFD0 metadata was added.", exifIFD0Descriptor, is(not(nullValue())));
-			assertThat(exifIFD0Descriptor.getWindowsTitleDescription(), is("Test Title")); //XPTitle
-			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION), is("Touché")); //ImageDescription
-			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_COPYRIGHT), is("Copyright © 2021 GlobalMentor, Inc.")); //Copyright
+			//TODO bring back when [IMAGING-281](https://issues.apache.org/jira/browse/IMAGING-281) is fixed
+			//			assertThat(exifIFD0Descriptor.getWindowsTitleDescription(), is("Test Title")); //XPTitle
+			//TODO bring back when metadata-extractor [#270](https://github.com/drewnoakes/metadata-extractor/issues/270) is fixed
+			//			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION), is("Touché")); //ImageDescription
+			//			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_COPYRIGHT), is("Copyright © 2021 GlobalMentor, Inc.")); //Copyright
+			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION), is("This is a test image.")); //ImageDescription
+			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_COPYRIGHT), is("Copyright (C) 2021 GlobalMentor, Inc.")); //Copyright
 			assertThat("No XMP metadata was added.", extractedMetadata.getFirstDirectoryOfType(XmpDirectory.class), is(nullValue()));
 			assertThat("No IPTC metadata was added.", extractedMetadata.getFirstDirectoryOfType(IptcDirectory.class), is(nullValue()));
 		}
