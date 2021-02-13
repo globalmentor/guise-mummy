@@ -46,10 +46,8 @@ import io.urf.model.UrfResourceDescription;
 
 /**
  * Tests of {@link BaseImageMummifier}.
- * <p>
- * Currently there are no tests to ensure that XMP metadata overrides IPTC metadata. Concentration is on XMP as the canonical metadata, and Exif as the
- * ubiquitous metadata.
- * </p>
+ * @implNote Currently there are no tests to ensure that XMP metadata overrides IPTC metadata. Concentration is on XMP as the canonical metadata, and Exif as
+ *           the ubiquitous metadata.
  * @author Garret Wilson
  */
 public class BaseImageMummifierTest {
@@ -85,6 +83,8 @@ public class BaseImageMummifierTest {
 	 * <dd>Gate and Turret</dd>
 	 * <dt><code>ImageDescription</code> (Exif <code>0x010E</code>)</dt>
 	 * <dd>Castle turret viewed through a gate.</dd>
+	 * <dt><code>Artist</code> (Exif <code>0x010E</code>)</dt>
+	 * <dd>Garret Wilson</dd>
 	 * <dt><code>Copyright</code> (Exif <code>0x8298</code>)</dt>
 	 * <dd>Copyright (C) 2009 Garret Wilson</dd>
 	 * <dt><code>Make</code> (Exif <code>0x010F</code>)</dt>
@@ -200,6 +200,7 @@ public class BaseImageMummifierTest {
 		}
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_TITLE)), is("Gate and Turret"));
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_DESCRIPTION)), is("Castle turret viewed through a gate."));
+		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_ARTIST)), is("Garret Wilson"));
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT)), is("Copyright (C) 2009 Garret Wilson"));
 	}
 
@@ -251,6 +252,7 @@ public class BaseImageMummifierTest {
 		}
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_TITLE)), is("Gate and Turret"));
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_DESCRIPTION)), is("Castle turret viewed through a gate."));
+		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_ARTIST)), is("Garret Wilson"));
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT)), is("Copyright © 2009 Garret Wilson"));
 	}
 

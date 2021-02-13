@@ -132,6 +132,7 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 			@Nonnull final String name) throws IOException {
 		String title = null;
 		String description = null;
+		String artist = null;
 		String copyright = null;
 		final Metadata imageMetadata;
 		try {
@@ -139,7 +140,8 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 		} catch(final ImageProcessingException imageProcessingException) {
 			throw new IOException(imageProcessingException.getMessage(), imageProcessingException);
 		}
-		//XMP
+		//XMP; see _XMP Specification Part 1 § 8.3 Dublin Core namespace_
+		//XMP arrays are 1-based and do not throw an exception if the array index if invalid.
 		final XmpDirectory xmpDirectory = imageMetadata.getFirstDirectoryOfType(XmpDirectory.class);
 		if(xmpDirectory != null) {
 			final XMPMeta xmpMeta = xmpDirectory.getXMPMeta();
@@ -153,6 +155,11 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 				final XMPProperty dcDescription = xmpMeta.getLocalizedText(NS_DC, DCMES.TERM_DESCRIPTION.getName(), null, X_DEFAULT);
 				if(dcDescription != null) {
 					description = dcDescription.getValue();
+				}
+				//dc:creator
+				final XMPProperty dcCreator = xmpMeta.getArrayItem(NS_DC, DCMES.TERM_CREATOR.getName(), 1); //first name is highest precedence
+				if(dcCreator != null) {
+					artist = dcCreator.getValue();
 				}
 				//dc:rights
 				final XMPProperty dcRights = xmpMeta.getLocalizedText(NS_DC, DCMES.TERM_RIGHTS.getName(), null, X_DEFAULT);
@@ -175,6 +182,10 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 			if(description == null) {
 				description = iptcDescriptor.getCaptionDescription();
 			}
+			//By-line (IIM 2:80, 0x0250)
+			if(artist == null) {
+				artist = iptcDescriptor.getByLineDescription();
+			}
 			//CopyrightNotice (IIM 2:116, 0x0274)
 			if(copyright == null) {
 				copyright = iptcDescriptor.getCopyrightNoticeDescription();
@@ -192,6 +203,10 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 			if(description == null) {
 				description = ifd0Directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION);
 			}
+			//Artist (315, 0x013B)
+			if(artist == null) {
+				artist = ifd0Directory.getString(ExifIFD0Directory.TAG_ARTIST);
+			}
 			//Copyright (33432, 0x8298)
 			if(copyright == null) {
 				copyright = ifd0Directory.getString(ExifIFD0Directory.TAG_COPYRIGHT);
@@ -204,16 +219,20 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 		if(description != null) {
 			sourceMetadata.add(Map.entry(Handle.toTag(Artifact.PROPERTY_HANDLE_DESCRIPTION), description));
 		}
+		if(artist != null) {
+			sourceMetadata.add(Map.entry(Handle.toTag(Artifact.PROPERTY_HANDLE_ARTIST), artist));
+		}
 		if(copyright != null) {
 			sourceMetadata.add(Map.entry(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT), copyright));
 		}
 		return sourceMetadata;
 	}
 
+	private static final TagInfoAscii EXIF_TAG_ARTIST = new TagInfoAscii("Copyright", 0x013B, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //Artist (315, 0x013B)
+	private static final TagInfoAscii EXIF_TAG_COPYRIGHT = new TagInfoAscii("Copyright", 0x8298, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //Copyright (33432, 0x8298)
+	private static final TagInfoAscii EXIF_TAG_IMAGE_DESCRIPTION = new TagInfoAscii("ImageDescription", 0x010E, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //ImageDescription (270, 0x010E)
 	@SuppressWarnings("unused")
 	private static final TagInfoAscii EXIF_TAG_XP_TITLE = new TagInfoAscii("XPTitle", 0x9C9B, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //XPTitle (0x9C9B)
-	private static final TagInfoAscii EXIF_TAG_IMAGE_DESCRIPTION = new TagInfoAscii("ImageDescription", 0x010E, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //ImageDescription (270, 0x010E)
-	private static final TagInfoAscii EXIF_TAG_COPYRIGHT = new TagInfoAscii("Copyright", 0x8298, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //Copyright (33432, 0x8298)
 
 	/**
 	 * Adds appropriate metadata to an existing image. Any exiting metadata is replaced.
@@ -243,6 +262,9 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 			//ImageDescription (270, 0x010E)
 			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_DESCRIPTION)
 					.ifPresent(throwingConsumer(description -> exifDirectory.add(EXIF_TAG_IMAGE_DESCRIPTION, description.toString())));
+			//Artist (315, 0x013B)
+			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_ARTIST)
+					.ifPresent(throwingConsumer(artist -> exifDirectory.add(EXIF_TAG_ARTIST, artist.toString())));
 			//Copyright (33432, 0x8298)
 			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_COPYRIGHT)
 					.ifPresent(throwingConsumer(copyright -> exifDirectory.add(EXIF_TAG_COPYRIGHT, copyright.toString())));

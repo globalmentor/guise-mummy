@@ -69,6 +69,10 @@ public interface Artifact {
 	//## properties
 	//### general properties
 
+	/** The property handle of the artist identifier, such as "Jane Doe". Typically used for images. */
+	public static final String PROPERTY_HANDLE_ARTIST = "artist";
+	/** The property handle of the author identifier, such as "Jane Doe". Typically used for pages. */
+	public static final String PROPERTY_HANDLE_AUTHOR = "author";
 	/** The property handle of the copyright message, such as "Copyright © 2020 GlobalMentor, Inc. All Rights Reserved.". */
 	public static final String PROPERTY_HANDLE_COPYRIGHT = "copyright";
 	/** The property handle of the string describing the artifact. */
