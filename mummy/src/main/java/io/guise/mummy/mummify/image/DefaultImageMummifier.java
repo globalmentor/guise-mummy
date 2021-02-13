@@ -53,7 +53,8 @@ import io.urf.vocab.content.Content;
  * General image mummifier.
  * @implSpec This implementation supports GIF, JPEG, and PNG files. Reading metadata is supported from XMP, IPTC, and Exif. When processing a primary image, all
  *           metadata will be retained if possible. When processing an image aspect, in order to reduce file size all image metadata will be discarded; a small
- *           subset of normalized Exif metadata will then be added back, but only for JPEG images.
+ *           subset of normalized Exif metadata will then be added back, but only for JPEG images. This subset will include the Guise software information from
+ *           {@link MummyContext#getMummifierIdentification()}.
  * @implSpec This implementation supports configured image aspects.
  * @implSpec This implementation uses <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/javax/imageio/package-summary.html">Java Image
  *           I/O</a> for image processing.
@@ -130,7 +131,7 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 			if(isPostProcessWriteMetadataSupported) {
 				final TempOutputStream tempOutputStream = (TempOutputStream)processOutputStream;
 				try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))) {
-					addImageMetadata(artifact.getResourceDescription(), tempOutputStream.toByteSource(), outputStream);
+					addImageMetadata(artifact.getResourceDescription(), tempOutputStream.toByteSource(), outputStream, context.getMummifierIdentification());
 				} catch(final IOException ioException) { //provide more context to I/O errors
 					throw new IOException(format("Error processing image `%s`: %s", artifact.getSourcePath(), ioException.getLocalizedMessage()), ioException); //TODO i18n
 				}

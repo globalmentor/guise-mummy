@@ -43,11 +43,11 @@ public abstract class BaseMummyContext implements MummyContext {
 
 	/**
 	 * {@inheritDoc}
-	 * @implSpec This version returns a string in the form <code>Guise Mummy <em>version</em></code>.
+	 * @implSpec This version returns {@link GuiseMummy#LABEL}, usually a string in the form <code>Guise Mummy <var>version</var></code>.
 	 */
 	@Override
 	public String getMummifierIdentification() {
-		return GuiseMummy.NAME + ' ' + GuiseMummy.VERSION;
+		return GuiseMummy.LABEL;
 	}
 
 	private final GuiseProject project;

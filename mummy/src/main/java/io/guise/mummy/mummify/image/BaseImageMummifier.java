@@ -21,6 +21,7 @@ import static com.globalmentor.io.Images.*;
 import static com.globalmentor.io.Paths.*;
 import static java.nio.file.Files.*;
 import static java.util.stream.Collectors.*;
+import static org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants.*;
 import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.*;
@@ -210,12 +211,13 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	}
 
 	@SuppressWarnings("unused")
-	private static final TagInfoAscii EXIF_XP_TITLE_TAG_INFO = new TagInfoAscii("XPTitle", 0x9C9B, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //XPTitle (0x9C9B)
-	private static final TagInfoAscii EXIF_IMAGE_DESCRIPTION_TAG_INFO = new TagInfoAscii("ImageDescription", 0x010E, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //ImageDescription (270, 0x010E)
-	private static final TagInfoAscii EXIF_COPYRIGHT_TAG_INFO = new TagInfoAscii("Copyright", 0x8298, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //Copyright (33432, 0x8298)
+	private static final TagInfoAscii EXIF_TAG_XP_TITLE = new TagInfoAscii("XPTitle", 0x9C9B, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //XPTitle (0x9C9B)
+	private static final TagInfoAscii EXIF_TAG_IMAGE_DESCRIPTION = new TagInfoAscii("ImageDescription", 0x010E, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //ImageDescription (270, 0x010E)
+	private static final TagInfoAscii EXIF_TAG_COPYRIGHT = new TagInfoAscii("Copyright", 0x8298, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //Copyright (33432, 0x8298)
 
 	/**
 	 * Adds appropriate metadata to an existing image. Any exiting metadata is replaced.
+	 * @implSpec If software identification is given, it is added as an Exif <code>Software</code> (<code>0x0131</code>) tag.
 	 * @implNote This implementation ignores the {@link Artifact#PROPERTY_HANDLE_TITLE} property because Apache Commons Imaging writes corrupted
 	 *           <code>XPTitle</code> values; see <a href="https://issues.apache.org/jira/browse/IMAGING-281">IMAGING-281: Simple Exif XPTitle corrupted.</a>
 	 * @implSpec This implementation only supports writing Exif metadata to JPEG images.
@@ -223,13 +225,14 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	 * @param metadata The description containing the metadata to add.
 	 * @param byteSource The byte source containing the processed image.
 	 * @param outputStream The output stream for writing the image with added metadata.
+	 * @param software A string identifying the software generating or updating the image, or <code>null</code> if no software information should be added.
 	 * @throws IOException if there is an I/O error adding the metadata.
 	 * @see <a href="http://www.hanhuy.com/pfn/java-image-thumbnail-comparison">A comparison of Java image thumbnailing techniques</a>
 	 * @see <a href="https://www.universalwebservices.net/web-programming-resources/java/adjust-jpeg-image-compression-quality-when-saving-images-in-java/">Adjust
 	 *      JPEG image compression quality when saving images in Java</a>
 	 */
-	protected static void addImageMetadata(@Nonnull final UrfResourceDescription metadata, final ByteSource byteSource, final OutputStream outputStream)
-			throws IOException {
+	protected static void addImageMetadata(@Nonnull final UrfResourceDescription metadata, @Nonnull final ByteSource byteSource,
+			@Nonnull final OutputStream outputStream, @Nullable final String software) throws IOException {
 		try {
 			final TiffOutputSet tiffOutputSet = new TiffOutputSet();
 			final TiffOutputDirectory exifDirectory = tiffOutputSet.getOrCreateRootDirectory(); //getOrCreateExifDirectory() prevents metadata-extractor from seeing values
@@ -239,10 +242,14 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 			//					.ifPresent(throwingConsumer(title -> exifDirectory.add(EXIF_XP_TITLE_TAG_INFO, title.toString())));
 			//ImageDescription (270, 0x010E)
 			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_DESCRIPTION)
-					.ifPresent(throwingConsumer(description -> exifDirectory.add(EXIF_IMAGE_DESCRIPTION_TAG_INFO, description.toString())));
+					.ifPresent(throwingConsumer(description -> exifDirectory.add(EXIF_TAG_IMAGE_DESCRIPTION, description.toString())));
 			//Copyright (33432, 0x8298)
 			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_COPYRIGHT)
-					.ifPresent(throwingConsumer(copyright -> exifDirectory.add(EXIF_COPYRIGHT_TAG_INFO, copyright.toString())));
+					.ifPresent(throwingConsumer(copyright -> exifDirectory.add(EXIF_TAG_COPYRIGHT, copyright.toString())));
+			//Software (0x0131)
+			if(software != null) {
+				exifDirectory.add(EXIF_TAG_SOFTWARE, software);
+			}
 			new ExifRewriter().updateExifMetadataLossy(byteSource, outputStream, tiffOutputSet);
 		} catch(final ImageReadException | ImageWriteException imageIOException) {
 			throw new IOException(imageIOException.getMessage(), imageIOException);

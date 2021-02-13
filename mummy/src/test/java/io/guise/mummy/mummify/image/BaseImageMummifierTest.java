@@ -61,6 +61,8 @@ public class BaseImageMummifierTest {
 	 * <dd>Copyright (C) 2009 Garret Wilson</dd>
 	 * <dt><code>Make</code> (Exif <code>0x010F</code>)</dt>
 	 * <dd>Canon</dd>
+	 * <dt><code>Software</code> (Exif <code>0x0131</code>)</dt>
+	 * <dd>paint.net 4.2.14</dd>
 	 * <dt><code>dc:Creator</code> (XMP)</dt>
 	 * <dd>Garret Wilson</dd>
 	 * <dt><code>dc:Rights</code> (XMP)</dt>
@@ -87,6 +89,8 @@ public class BaseImageMummifierTest {
 	 * <dd>Copyright (C) 2009 Garret Wilson</dd>
 	 * <dt><code>Make</code> (Exif <code>0x010F</code>)</dt>
 	 * <dd>Canon</dd>
+	 * <dt><code>Software</code> (Exif <code>0x0131</code>)</dt>
+	 * <dd>paint.net 4.2.14</dd>
 	 * <dd>
 	 * </dl>
 	 */
@@ -103,6 +107,8 @@ public class BaseImageMummifierTest {
 	 * <dd>Copyright © 2009 Garret Wilson</dd>
 	 * <dt><code>Make</code> (Exif <code>0x010F</code>)</dt>
 	 * <dd>Canon</dd>
+	 * <dt><code>Software</code> (Exif <code>0x0131</code>)</dt>
+	 * <dd>paint.net 4.2.14</dd>
 	 * <dd>
 	 * </dl>
 	 */
@@ -115,6 +121,8 @@ public class BaseImageMummifierTest {
 	 * <dd>Copyright (C) 2009 Garret Wilson</dd>
 	 * <dt><code>Make</code> (Exif <code>0x010F</code>)</dt>
 	 * <dd>Canon</dd>
+	 * <dt><code>Software</code> (Exif <code>0x0131</code>)</dt>
+	 * <dd>paint.net 4.2.14</dd>
 	 * <dt><code>ObjectName</code> (IIM <code>2:05</code>, <code>0x205</code>)</dt>
 	 * <dd>Gate and Turret</dd>
 	 * <dt><code>Caption</code> (IIM <code>2:120</code>, <code>0x0278</code>)</dt>
@@ -133,6 +141,8 @@ public class BaseImageMummifierTest {
 	 * <dd>Copyright (C) 2009 Garret Wilson</dd>
 	 * <dt><code>Make</code> (Exif <code>0x010F</code>)</dt>
 	 * <dd>Canon</dd>
+	 * <dt><code>Software</code> (Exif <code>0x0131</code>)</dt>
+	 * <dd>paint.net 4.2.14</dd>
 	 * <dt><code>dc:Title</code> (XMP)</dt>
 	 * <dd>Gate and Turret</dd>
 	 * <dt><code>dc:Description</code> (XMP)</dt>
@@ -258,7 +268,7 @@ public class BaseImageMummifierTest {
 			//			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT), "Copyright © 2021 GlobalMentor, Inc.");
 			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_DESCRIPTION), "This is a test image.");
 			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT), "Copyright (C) 2021 GlobalMentor, Inc.");
-			BaseImageMummifier.addImageMetadata(metadata, new ByteSourceInputStream(inputStream, null), tempOutputStream);
+			BaseImageMummifier.addImageMetadata(metadata, new ByteSourceInputStream(inputStream, null), tempOutputStream, "Foo App");
 			//extract and verify added metadata using metadata-extractor
 			final Metadata extractedMetadata = ImageMetadataReader.readMetadata(tempOutputStream.toInputStream());
 			final ExifIFD0Directory ifd0Directory = extractedMetadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
@@ -272,6 +282,7 @@ public class BaseImageMummifierTest {
 			//			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_COPYRIGHT), is("Copyright © 2021 GlobalMentor, Inc.")); //Copyright
 			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION), is("This is a test image.")); //ImageDescription
 			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_COPYRIGHT), is("Copyright (C) 2021 GlobalMentor, Inc.")); //Copyright
+			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_SOFTWARE), is("Foo App")); //Software
 			assertThat("No XMP metadata was added.", extractedMetadata.getFirstDirectoryOfType(XmpDirectory.class), is(nullValue()));
 			assertThat("No IPTC metadata was added.", extractedMetadata.getFirstDirectoryOfType(IptcDirectory.class), is(nullValue()));
 		}

@@ -63,6 +63,12 @@ public class GuiseMummy implements Clogged {
 	/** The current Guise Mummy version. */
 	public static final String VERSION;
 
+	/**
+	 * The Guise Mummifier software identifier in human-readable format, including of the name and version.
+	 * @implSpec the label is in the form <code>Guise Mummy <var>version</var></code>.
+	 */
+	public static final String LABEL;
+
 	/** The configuration key containing the name. */
 	private static final String CLASS_CONFIG_KEY_NAME = "name";
 
@@ -75,6 +81,7 @@ public class GuiseMummy implements Clogged {
 					.orElseThrow(ResourcesConfigurationManager::createConfigurationNotFoundException);
 			NAME = configuration.getString(CLASS_CONFIG_KEY_NAME);
 			VERSION = configuration.getString(CLASS_CONFIG_KEY_VERSION);
+			LABEL = NAME + ' ' + VERSION;
 		} catch(final IOException ioException) {
 			throw new ConfigurationException(ioException);
 		}
