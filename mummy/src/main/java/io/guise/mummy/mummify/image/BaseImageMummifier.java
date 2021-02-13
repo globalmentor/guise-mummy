@@ -21,6 +21,8 @@ import static com.globalmentor.io.Images.*;
 import static com.globalmentor.io.Paths.*;
 import static java.nio.file.Files.*;
 import static java.util.stream.Collectors.*;
+import static org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants.*;
+import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.*;
 import java.net.URI;
@@ -28,6 +30,13 @@ import java.nio.file.*;
 import java.util.*;
 
 import javax.annotation.*;
+
+import org.apache.commons.imaging.*;
+import org.apache.commons.imaging.common.bytesource.ByteSource;
+import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
+import org.apache.commons.imaging.formats.tiff.constants.TiffDirectoryType;
+import org.apache.commons.imaging.formats.tiff.taginfos.TagInfoAscii;
+import org.apache.commons.imaging.formats.tiff.write.*;
 
 import com.adobe.internal.xmp.*;
 import com.adobe.internal.xmp.properties.XMPProperty;
@@ -43,10 +52,14 @@ import com.globalmentor.vocab.dcmi.DCMES;
 import io.guise.mummy.*;
 import io.guise.mummy.mummify.*;
 import io.urf.URF.Handle;
+import io.urf.model.UrfResourceDescription;
 
 /**
  * Base image mummifier that handles common image needs such as metadata extraction.
  * @implSpec This implementation uses the filename extensions and image media types defined in {@link Images#MEDIA_TYPES_BY_FILENAME_EXTENSION}.
+ * @implSpec This implementation uses the <a href="https://github.com/drewnoakes/metadata-extractor">metadata-extractor</a> library for reading metadata.
+ * @implSpec This implementation provides a way to write metadata to an image using the <a href="https://commons.apache.org/proper/commons-imaging/">Apache
+ *           Commons Imaging</a> library.
  * @apiNote Metadata support is potentially available for more images types than are supported for processing, so metadata-related logic is placed in this
  *          common base class.
  * @author Garret Wilson
@@ -195,6 +208,132 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 			sourceMetadata.add(Map.entry(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT), copyright));
 		}
 		return sourceMetadata;
+	}
+
+	@SuppressWarnings("unused")
+	private static final TagInfoAscii EXIF_TAG_XP_TITLE = new TagInfoAscii("XPTitle", 0x9C9B, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //XPTitle (0x9C9B)
+	private static final TagInfoAscii EXIF_TAG_IMAGE_DESCRIPTION = new TagInfoAscii("ImageDescription", 0x010E, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //ImageDescription (270, 0x010E)
+	private static final TagInfoAscii EXIF_TAG_COPYRIGHT = new TagInfoAscii("Copyright", 0x8298, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //Copyright (33432, 0x8298)
+
+	/**
+	 * Adds appropriate metadata to an existing image. Any exiting metadata is replaced.
+	 * @implSpec If software identification is given, it is added as an Exif <code>Software</code> (<code>0x0131</code>) tag.
+	 * @implNote This implementation ignores the {@link Artifact#PROPERTY_HANDLE_TITLE} property because Apache Commons Imaging writes corrupted
+	 *           <code>XPTitle</code> values; see <a href="https://issues.apache.org/jira/browse/IMAGING-281">IMAGING-281: Simple Exif XPTitle corrupted.</a>
+	 * @implSpec This implementation only supports writing Exif metadata to JPEG images.
+	 * @implSpec This implementation uses <a href="https://commons.apache.org/proper/commons-imaging/">Apache Commons Imaging</a>.
+	 * @param metadata The description containing the metadata to add.
+	 * @param byteSource The byte source containing the processed image.
+	 * @param outputStream The output stream for writing the image with added metadata.
+	 * @param software A string identifying the software generating or updating the image, or <code>null</code> if no software information should be added.
+	 * @throws IOException if there is an I/O error adding the metadata.
+	 * @see <a href="http://www.hanhuy.com/pfn/java-image-thumbnail-comparison">A comparison of Java image thumbnailing techniques</a>
+	 * @see <a href="https://www.universalwebservices.net/web-programming-resources/java/adjust-jpeg-image-compression-quality-when-saving-images-in-java/">Adjust
+	 *      JPEG image compression quality when saving images in Java</a>
+	 */
+	protected static void addImageMetadata(@Nonnull final UrfResourceDescription metadata, @Nonnull final ByteSource byteSource,
+			@Nonnull final OutputStream outputStream, @Nullable final String software) throws IOException {
+		try {
+			final TiffOutputSet tiffOutputSet = new TiffOutputSet();
+			final TiffOutputDirectory exifDirectory = tiffOutputSet.getOrCreateRootDirectory(); //getOrCreateExifDirectory() prevents metadata-extractor from seeing values
+			//XPTitle (0x9C9B)
+			//TODO bring back when IMAGING-281 is fixed
+			//			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_TITLE)
+			//					.ifPresent(throwingConsumer(title -> exifDirectory.add(EXIF_XP_TITLE_TAG_INFO, title.toString())));
+			//ImageDescription (270, 0x010E)
+			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_DESCRIPTION)
+					.ifPresent(throwingConsumer(description -> exifDirectory.add(EXIF_TAG_IMAGE_DESCRIPTION, description.toString())));
+			//Copyright (33432, 0x8298)
+			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_COPYRIGHT)
+					.ifPresent(throwingConsumer(copyright -> exifDirectory.add(EXIF_TAG_COPYRIGHT, copyright.toString())));
+			//Software (0x0131)
+			if(software != null) {
+				exifDirectory.add(EXIF_TAG_SOFTWARE, software);
+			}
+			new ExifRewriter().updateExifMetadataLossy(byteSource, outputStream, tiffOutputSet);
+		} catch(final ImageReadException | ImageWriteException imageIOException) {
+			throw new IOException(imageIOException.getMessage(), imageIOException);
+		}
+	}
+
+	/**
+	 * Temporary output stream that collects content temporarily in memory and allows easy conversion to an output stream, as well as to an Apache Commons Imaging
+	 * {@link ByteSource}.
+	 * @apiNote This class is necessary because {@link ByteArrayOutputStream} does not provide a way to get an input stream without copying all the collected
+	 *          bytes.
+	 * @implNote This implementation out of necessity accesses the protected variables <code>buf</code> and <code>count</code> in the parent
+	 *           {@link ByteArrayOutputStream}.
+	 * @author Garret Wilson
+	 * @see <a href="https://stackoverflow.com/q/1225909">Most efficient way to create InputStream from OutputStream</a>
+	 * @see #toByteArray()
+	 * @see #toByteSource()
+	 */
+	protected static class TempOutputStream extends ByteArrayOutputStream {
+
+		/**
+		 * Returns an input stream to the collected byte content. The returned input stream must not be used concurrently with this output stream.
+		 * @return An input stream to the temporary content.
+		 */
+		public synchronized InputStream toInputStream() {
+			return new ByteArrayInputStream(this.buf, 0, this.count);
+		}
+
+		/**
+		 * Returns a byte source to the collected byte content. The returned byte source must not be used concurrently with this output stream.
+		 * @return An byte source to the temporary content.
+		 */
+		public synchronized ByteSource toByteSource() {
+			return new BufByteSource();
+		}
+
+		/**
+		 * A specialized byte source created directly from the temporary byte array <code>buf</code> in the parent {@link ByteArrayOutputStream}.
+		 * @apiNote This implementation is needed because the current implementation of {@link org.apache.commons.imaging.common.bytesource.ByteSourceArray} does
+		 *          not provide a constructor that specifies the byte length, assuming the entire byte array is used.
+		 * @implNote Code in implementation modified from that in <code>org.apache.commons.imaging.common.bytesource.ByteSourceArray</code>.
+		 * @author Garret Wilson
+		 * @see <a href="https://issues.apache.org/jira/browse/IMAGING-280">IMAGING-280: Length specifier for ByteSourceArray.</a>
+		 */
+		private class BufByteSource extends ByteSource {
+
+			public BufByteSource() {
+				super(null);
+			}
+
+			@Override
+			public InputStream getInputStream() {
+				return TempOutputStream.this.toInputStream();
+			}
+
+			@Override
+			public byte[] getBlock(final long startLong, final int length) throws IOException {
+				final int start = (int)startLong;
+				if((start < 0) || (length < 0) || (start + length < 0) || (start + length > TempOutputStream.this.count)) {
+					throw new IOException(
+							"Could not read block (block start: " + start + ", block length: " + length + ", data length: " + TempOutputStream.this.count + ").");
+				}
+				final byte[] result = new byte[length];
+				System.arraycopy(TempOutputStream.this.buf, start, result, 0, length);
+				return result;
+			}
+
+			@Override
+			public long getLength() {
+				return TempOutputStream.this.count;
+			}
+
+			@Override
+			public byte[] getAll() throws IOException {
+				return TempOutputStream.this.toByteArray(); //copying is required because a standalone array is requested
+			}
+
+			@Override
+			public String getDescription() {
+				return TempOutputStream.this.count + " byte array";
+			}
+
+		}
+
 	}
 
 }

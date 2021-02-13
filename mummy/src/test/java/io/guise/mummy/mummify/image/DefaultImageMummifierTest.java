@@ -43,15 +43,16 @@ public class DefaultImageMummifierTest {
 		fixtureContext = new StubMummyContext(project);
 	}
 
-	private BaseImageMummifier testMummifier;
+	private DefaultImageMummifier testMummifier;
 
 	@BeforeEach
 	private void setupTestMummifier() throws IOException {
 		testMummifier = new DefaultImageMummifier();
 	}
 
+	/** @see DefaultImageMummifier#getArtifactMediaType(MummyContext, java.nio.file.Path) */
 	@Test
-	public void testGetArtifactMediaType() throws IOException {
+	void testGetArtifactMediaType() throws IOException {
 		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.bmp")), isEmpty());
 		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.BMP")), isEmpty());
 		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.gif")), isPresentAndIs(GIF_MEDIA_TYPE));
