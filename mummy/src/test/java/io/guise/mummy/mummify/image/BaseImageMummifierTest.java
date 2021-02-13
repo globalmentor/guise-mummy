@@ -54,7 +54,20 @@ import io.urf.model.UrfResourceDescription;
  */
 public class BaseImageMummifierTest {
 
-	/** A sample JPEG image. */
+	/**
+	 * A sample JPEG image with a mix of Exif and XMP metadata, including:
+	 * <dl>
+	 * <dt><code>Copyright</code> (Exif <code>0x8298</code>)</dt>
+	 * <dd>Copyright (C) 2009 Garret Wilson</dd>
+	 * <dt><code>Make</code> (Exif <code>0x010F</code>)</dt>
+	 * <dd>Canon</dd>
+	 * <dt><code>dc:Creator</code> (XMP)</dt>
+	 * <dd>Garret Wilson</dd>
+	 * <dt><code>dc:Rights</code> (XMP)</dt>
+	 * <dd>Copyright © 2009 Garret Wilson</dd>
+	 * <dd>
+	 * </dl>
+	 */
 	public static final String GATE_TURRET_REDUCED_JPEG_RESOURCE_NAME = "gate-turret-reduced.jpg";
 	public static final long GATE_TURRET_REDUCED_JPEG_FILE_SIZE = 83052;
 	public static final int GATE_TURRET_REDUCED_JPEG_WIDTH = 972;
@@ -72,6 +85,8 @@ public class BaseImageMummifierTest {
 	 * <dd>Castle turret viewed through a gate.</dd>
 	 * <dt><code>Copyright</code> (Exif <code>0x8298</code>)</dt>
 	 * <dd>Copyright (C) 2009 Garret Wilson</dd>
+	 * <dt><code>Make</code> (Exif <code>0x010F</code>)</dt>
+	 * <dd>Canon</dd>
 	 * <dd>
 	 * </dl>
 	 */
@@ -86,6 +101,8 @@ public class BaseImageMummifierTest {
 	 * <dd>Castle turret viewed through a gate.</dd>
 	 * <dt><code>Copyright</code> (Exif <code>0x8298</code>)</dt>
 	 * <dd>Copyright © 2009 Garret Wilson</dd>
+	 * <dt><code>Make</code> (Exif <code>0x010F</code>)</dt>
+	 * <dd>Canon</dd>
 	 * <dd>
 	 * </dl>
 	 */
@@ -94,14 +111,16 @@ public class BaseImageMummifierTest {
 	/**
 	 * A sample JPEG image with Exif and IPTC metadata, including:
 	 * <dl>
+	 * <dt><code>Copyright</code> (Exif <code>0x8298</code>)</dt>
+	 * <dd>Copyright (C) 2009 Garret Wilson</dd>
+	 * <dt><code>Make</code> (Exif <code>0x010F</code>)</dt>
+	 * <dd>Canon</dd>
 	 * <dt><code>ObjectName</code> (IIM <code>2:05</code>, <code>0x205</code>)</dt>
 	 * <dd>Gate and Turret</dd>
 	 * <dt><code>Caption</code> (IIM <code>2:120</code>, <code>0x0278</code>)</dt>
 	 * <dd>Castle turret viewed through a gate.</dd>
 	 * <dt><code>CopyrightNotice</code> (IIM <code>2:116</code>, <code>0x0274</code>)</dt>
 	 * <dd>Copyright © 2009 Garret Wilson</dd>
-	 * <dt><code>Copyright</code> (Exif <code>0x8298</code>)</dt>
-	 * <dd>Copyright (C) 2009 Garret Wilson</dd>
 	 * <dd>
 	 * </dl>
 	 */
@@ -110,6 +129,10 @@ public class BaseImageMummifierTest {
 	/**
 	 * A sample JPEG image with Exif and XMP metadata, including:
 	 * <dl>
+	 * <dt><code>Copyright</code> (Exif <code>0x8298</code>)</dt>
+	 * <dd>Copyright (C) 2009 Garret Wilson</dd>
+	 * <dt><code>Make</code> (Exif <code>0x010F</code>)</dt>
+	 * <dd>Canon</dd>
 	 * <dt><code>dc:Title</code> (XMP)</dt>
 	 * <dd>Gate and Turret</dd>
 	 * <dt><code>dc:Description</code> (XMP)</dt>
@@ -118,12 +141,11 @@ public class BaseImageMummifierTest {
 	 * <dd>Copyright © 2009 Garret Wilson</dd>
 	 * <dt><code>dc:Creator</code> (XMP)</dt>
 	 * <dd>Garret Wilson</dd>
-	 * <dt><code>Copyright</code> (Exif <code>0x8298</code>)</dt>
-	 * <dd>Copyright (C) 2009 Garret Wilson</dd>
 	 * <dd>
 	 * </dl>
 	 */
 	public static final String GATE_TURRET_REDUCED_EXIF_XMP_JPEG_RESOURCE_NAME = "gate-turret-reduced-exif-xmp.jpg";
+	public static final long GATE_TURRET_REDUCED_EXIF_XMP_JPEG_FILE_SIZE = 83309;
 
 	private MummyContext fixtureContext;
 

@@ -17,7 +17,6 @@
 package io.guise.mummy;
 
 import static com.globalmentor.io.Paths.*;
-import static java.lang.String.format;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.function.Function.*;
@@ -29,8 +28,6 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import javax.annotation.*;
-
-import com.globalmentor.io.Filenames;
 
 import io.urf.model.*;
 
@@ -91,15 +88,9 @@ class DefaultAspectualSourceFileArtifact extends DefaultSourceFileArtifact imple
 	 */
 	protected DefaultAspectualSourceFileArtifact(@Nonnull final Builder<?> builder, @Nonnull final Set<String> aspectIds) {
 		super(builder);
-		final Path sourceFile = getSourcePath();
-		final String sourceFilenameBase = findFilename(sourceFile).map(Filenames::getBase)
-				.orElseThrow(() -> new IllegalArgumentException(format("Aspectual source file `%s` has no filename.", sourceFile)));
-		final Path targetFile = getTargetPath();
-		final String targetFilenameBase = findFilename(targetFile).map(Filenames::getBase)
-				.orElseThrow(() -> new IllegalArgumentException(format("Aspectual target file `%s` has no filename.", targetFile)));
 		aspectsById = aspectIds.stream().collect(toUnmodifiableMap(identity(), aspectId -> { //create aspects for each aspect ID
-			final Path aspectSourcePath = changeFilenameBase(sourceFile, sourceFilenameBase + FILENAME_ASPECT_DELIMITER + requireNonNull(aspectId)); //e.g. `foo-bar.jpg` -> `foo-bar-preview.jpg`
-			final Path aspectTargetPath = changeFilenameBase(targetFile, targetFilenameBase + FILENAME_ASPECT_DELIMITER + requireNonNull(aspectId)); //e.g. `foo-bar.jpg` -> `foo-bar-preview.jpg`
+			final Path aspectSourcePath = appendFilenameBase(getSourcePath(), FILENAME_ASPECT_DELIMITER + requireNonNull(aspectId)); //e.g. `foo-bar.jpg` -> `foo-bar-preview.jpg`
+			final Path aspectTargetPath = appendFilenameBase(getTargetPath(), FILENAME_ASPECT_DELIMITER + requireNonNull(aspectId)); //e.g. `foo-bar.jpg` -> `foo-bar-preview.jpg`
 			final UrfResourceDescription aspectResourceDescription = new UrfObject(); //TODO create description copy constructor
 			for(final Map.Entry<URI, Object> property : getResourceDescription().getProperties()) { //TODO fix description caching for artifacts somehow; the current logic will set wrong fingerprints, for example
 				aspectResourceDescription.setPropertyValue(property.getKey(), property.getValue());
