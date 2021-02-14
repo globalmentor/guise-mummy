@@ -27,6 +27,7 @@ import static org.zalando.fauxpas.FauxPas.*;
 import java.io.*;
 import java.net.URI;
 import java.nio.file.*;
+import java.time.*;
 import java.util.*;
 
 import javax.annotation.*;
@@ -47,6 +48,7 @@ import com.drew.metadata.iptc.*;
 import com.drew.metadata.xmp.XmpDirectory;
 import com.globalmentor.io.*;
 import com.globalmentor.net.ContentType;
+import com.globalmentor.time.TimeZones;
 import com.globalmentor.vocab.dcmi.DCMES;
 
 import io.guise.mummy.*;
@@ -118,6 +120,9 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 		}
 	}
 
+	private static final String XMP_CREATE_DATE_PROPERTY_NAME = "CreateDate";
+	private static final String PHOTOSHOP_DATE_CREATED_PROPERTY_NAME = "DateCreated";
+
 	/**
 	 * Loads metadata stored in the source file itself.
 	 * @implSpec This implementation loads metadata using {@link ImageMetadataReader}.
@@ -132,14 +137,17 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 			@Nonnull final String name) throws IOException {
 		String title = null;
 		String description = null;
+		String artist = null;
 		String copyright = null;
+		Instant createdAt = null;
 		final Metadata imageMetadata;
 		try {
 			imageMetadata = ImageMetadataReader.readMetadata(inputStream);
 		} catch(final ImageProcessingException imageProcessingException) {
 			throw new IOException(imageProcessingException.getMessage(), imageProcessingException);
 		}
-		//XMP
+		//XMP; see _XMP Specification Part 1 § 8.3 Dublin Core namespace_
+		//XMP arrays are 1-based and do not throw an exception if the array index if invalid.
 		final XmpDirectory xmpDirectory = imageMetadata.getFirstDirectoryOfType(XmpDirectory.class);
 		if(xmpDirectory != null) {
 			final XMPMeta xmpMeta = xmpDirectory.getXMPMeta();
@@ -154,10 +162,26 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 				if(dcDescription != null) {
 					description = dcDescription.getValue();
 				}
+				//dc:creator
+				final XMPProperty dcCreator = xmpMeta.getArrayItem(NS_DC, DCMES.TERM_CREATOR.getName(), 1); //first name is highest precedence
+				if(dcCreator != null) {
+					artist = dcCreator.getValue();
+				}
 				//dc:rights
 				final XMPProperty dcRights = xmpMeta.getLocalizedText(NS_DC, DCMES.TERM_RIGHTS.getName(), null, X_DEFAULT);
 				if(dcRights != null) {
 					copyright = dcRights.getValue();
+				}
+				//photoshop:DateCreated
+				final XMPDateTime photoshopDateCreated = xmpMeta.getPropertyDate(NS_PHOTOSHOP, PHOTOSHOP_DATE_CREATED_PROPERTY_NAME);
+				if(photoshopDateCreated != null && photoshopDateCreated.hasDate()) { //ignore creation times without an indicated date
+					createdAt = photoshopDateCreated.getCalendar().toInstant();
+				} else {
+					//xmp:CreateDate
+					final XMPDateTime xmpCreateDate = xmpMeta.getPropertyDate(NS_XMP, XMP_CREATE_DATE_PROPERTY_NAME);
+					if(xmpCreateDate != null && xmpCreateDate.hasDate()) { //ignore creation times without an indicated date
+						createdAt = xmpCreateDate.getCalendar().toInstant();
+					}
 				}
 			} catch(final XMPException xmpException) {
 				throw new IOException(xmpException.getMessage(), xmpException);
@@ -175,9 +199,20 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 			if(description == null) {
 				description = iptcDescriptor.getCaptionDescription();
 			}
+			//By-line (IIM 2:80, 0x0250)
+			if(artist == null) {
+				artist = iptcDescriptor.getByLineDescription();
+			}
 			//CopyrightNotice (IIM 2:116, 0x0274)
 			if(copyright == null) {
 				copyright = iptcDescriptor.getCopyrightNoticeDescription();
+			}
+			//DateCreated (IIM 2:55, 0x0237), TimeCreated (IIM 2:60, 0x023C)
+			if(createdAt == null) {
+				final Date dateTimeCreated = iptcDirectory.getDateCreated();
+				if(dateTimeCreated != null) {
+					createdAt = dateTimeCreated.toInstant();
+				}
 			}
 		}
 		//Exif
@@ -192,9 +227,23 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 			if(description == null) {
 				description = ifd0Directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION);
 			}
+			//Artist (315, 0x013B)
+			if(artist == null) {
+				artist = ifd0Directory.getString(ExifIFD0Directory.TAG_ARTIST);
+			}
 			//Copyright (33432, 0x8298)
 			if(copyright == null) {
 				copyright = ifd0Directory.getString(ExifIFD0Directory.TAG_COPYRIGHT);
+			}
+			final ExifSubIFDDirectory subIFDDirectory = imageMetadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
+			if(subIFDDirectory != null) {
+				//DateTimeOriginal (36867, 0x9003), SubSecTimeOriginal (37521, 0x9291), TimeZoneOffset (0x882a) 
+				if(createdAt == null) {
+					final Date dateOriginal = subIFDDirectory.getDateOriginal(TimeZones.UTC);
+					if(dateOriginal != null) {
+						createdAt = dateOriginal.toInstant();
+					}
+				}
 			}
 		}
 		final List<Map.Entry<URI, Object>> sourceMetadata = new ArrayList<>();
@@ -204,16 +253,23 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 		if(description != null) {
 			sourceMetadata.add(Map.entry(Handle.toTag(Artifact.PROPERTY_HANDLE_DESCRIPTION), description));
 		}
+		if(artist != null) {
+			sourceMetadata.add(Map.entry(Handle.toTag(Artifact.PROPERTY_HANDLE_ARTIST), artist));
+		}
 		if(copyright != null) {
 			sourceMetadata.add(Map.entry(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT), copyright));
+		}
+		if(createdAt != null) {
+			sourceMetadata.add(Map.entry(Handle.toTag(Artifact.PROPERTY_HANDLE_CREATED_AT), createdAt));
 		}
 		return sourceMetadata;
 	}
 
+	private static final TagInfoAscii EXIF_TAG_ARTIST = new TagInfoAscii("Copyright", 0x013B, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //Artist (315, 0x013B)
+	private static final TagInfoAscii EXIF_TAG_COPYRIGHT = new TagInfoAscii("Copyright", 0x8298, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //Copyright (33432, 0x8298)
+	private static final TagInfoAscii EXIF_TAG_IMAGE_DESCRIPTION = new TagInfoAscii("ImageDescription", 0x010E, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //ImageDescription (270, 0x010E)
 	@SuppressWarnings("unused")
 	private static final TagInfoAscii EXIF_TAG_XP_TITLE = new TagInfoAscii("XPTitle", 0x9C9B, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //XPTitle (0x9C9B)
-	private static final TagInfoAscii EXIF_TAG_IMAGE_DESCRIPTION = new TagInfoAscii("ImageDescription", 0x010E, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //ImageDescription (270, 0x010E)
-	private static final TagInfoAscii EXIF_TAG_COPYRIGHT = new TagInfoAscii("Copyright", 0x8298, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //Copyright (33432, 0x8298)
 
 	/**
 	 * Adds appropriate metadata to an existing image. Any exiting metadata is replaced.
@@ -243,9 +299,14 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 			//ImageDescription (270, 0x010E)
 			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_DESCRIPTION)
 					.ifPresent(throwingConsumer(description -> exifDirectory.add(EXIF_TAG_IMAGE_DESCRIPTION, description.toString())));
+			//Artist (315, 0x013B)
+			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_ARTIST)
+					.ifPresent(throwingConsumer(artist -> exifDirectory.add(EXIF_TAG_ARTIST, artist.toString())));
 			//Copyright (33432, 0x8298)
 			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_COPYRIGHT)
 					.ifPresent(throwingConsumer(copyright -> exifDirectory.add(EXIF_TAG_COPYRIGHT, copyright.toString())));
+			//DateTimeOriginal (36867, 0x9003), SubSecTimeOriginal (37521, 0x9291), TimeZoneOffset (0x882a)
+			//TODO GUISE-181
 			//Software (0x0131)
 			if(software != null) {
 				exifDirectory.add(EXIF_TAG_SOFTWARE, software);

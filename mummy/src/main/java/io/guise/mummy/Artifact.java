@@ -21,8 +21,6 @@ import static io.guise.mummy.GuiseMummy.*;
 
 import java.net.URI;
 import java.nio.file.Path;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Set;
 
@@ -69,6 +67,15 @@ public interface Artifact {
 	//## properties
 	//### general properties
 
+	/** The property handle of the artist identifier, such as "Jane Doe". Typically used for images. */
+	public static final String PROPERTY_HANDLE_ARTIST = "artist";
+	/** The property handle of the author identifier, such as "Jane Doe". Typically used for pages. */
+	public static final String PROPERTY_HANDLE_AUTHOR = "author";
+	/**
+	 * The property handle of the {@link java.time.Instant} the work was originally created, but not necessarily published. For images this would be the time the
+	 * original photo was taken.
+	 */
+	public static final String PROPERTY_HANDLE_CREATED_AT = "createdAt";
 	/** The property handle of the copyright message, such as "Copyright © 2020 GlobalMentor, Inc. All Rights Reserved.". */
 	public static final String PROPERTY_HANDLE_COPYRIGHT = "copyright";
 	/** The property handle of the string describing the artifact. */
@@ -82,7 +89,7 @@ public interface Artifact {
 	public static final String PROPERTY_HANDLE_LABEL = "label";
 	/** The property handle of the string naming artifact. */
 	public static final String PROPERTY_HANDLE_NAME = "name";
-	/** The property handle specifying the {@link LocalDate} of publication. */
+	/** The property handle specifying the {@link java.time.LocalDate} of publication. */
 	public static final String PROPERTY_HANDLE_PUBLISHED_ON = "publishedOn";
 	/** The property handle of the title, such as a page title. */
 	public static final String PROPERTY_HANDLE_TITLE = "title";
@@ -110,7 +117,7 @@ public interface Artifact {
 	 */
 	public static final URI PROPERTY_TAG_MUMMY_DESCRIPTION_DIRTY = NAMESPACE.resolve("descriptionDirty");
 	/**
-	 * The {@link Instant} the source content was last modified.
+	 * The {@link java.time.Instant} the source content was last modified.
 	 * @apiNote This property is used for incremental mummification; it is usually not appropriate to use in custom properties.
 	 */
 	public static final URI PROPERTY_TAG_MUMMY_SOURCE_CONTENT_MODIFIED_AT = NAMESPACE.resolve("sourceContentModifiedAt");
