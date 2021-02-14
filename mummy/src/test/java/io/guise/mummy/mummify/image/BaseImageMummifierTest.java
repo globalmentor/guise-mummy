@@ -166,6 +166,24 @@ public class BaseImageMummifierTest {
 	public static final String GATE_TURRET_REDUCED_EXIF_XMP_JPEG_RESOURCE_NAME = "gate-turret-reduced-exif-xmp.jpg";
 	public static final long GATE_TURRET_REDUCED_EXIF_XMP_JPEG_FILE_SIZE = 83309;
 
+	/**
+	 * A sample JPEG image with only XMP metadata, including:
+	 * <dl>
+	 * <dt><code>dc:Title</code> (XMP)</dt>
+	 * <dd>Gate and Turret</dd>
+	 * <dt><code>dc:Description</code> (XMP)</dt>
+	 * <dd>Castle turret viewed through a gate.</dd>
+	 * <dt><code>dc:Rights</code> (XMP)</dt>
+	 * <dd>Copyright © 2009 Garret Wilson</dd>
+	 * <dt><code>dc:Creator</code> (XMP)</dt>
+	 * <dd>Garret Wilson</dd>
+	 * <dt><code>xmp:CreateDate</code> (XMP)</dt>
+	 * <dd><code>2009:08:29 16:51:21.00-07:00</code></dd>
+	 * <dd>
+	 * </dl>
+	 */
+	public static final String GATE_TURRET_REDUCED_XMP_JPEG_RESOURCE_NAME = "gate-turret-reduced-xmp.jpg";
+
 	private MummyContext fixtureContext;
 
 	@BeforeEach
@@ -260,6 +278,25 @@ public class BaseImageMummifierTest {
 		final Map<URI, Object> metadata;
 		try (final InputStream inputStream = getClass().getResourceAsStream(GATE_TURRET_REDUCED_EXIF_XMP_JPEG_RESOURCE_NAME)) {
 			metadata = testMummifier.loadSourceMetadata(fixtureContext, inputStream, GATE_TURRET_REDUCED_EXIF_XMP_JPEG_RESOURCE_NAME).stream()
+					.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+		}
+		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_TITLE)), is("Gate and Turret"));
+		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_DESCRIPTION)), is("Castle turret viewed through a gate."));
+		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_ARTIST)), is("Garret Wilson"));
+		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT)), is("Copyright © 2009 Garret Wilson"));
+		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_CREATED_AT)),
+				is(ZonedDateTime.of(2009, 8, 29, 16, 51, 21, 0, ZoneOffset.ofHours(-7)).toInstant()));
+	}
+
+	/**
+	 * @see BaseImageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
+	 * @see #GATE_TURRET_REDUCED_XMP_JPEG_RESOURCE_NAME
+	 */
+	@Test
+	void testLoadSourceMetadataXmp() throws IOException {
+		final Map<URI, Object> metadata;
+		try (final InputStream inputStream = getClass().getResourceAsStream(GATE_TURRET_REDUCED_XMP_JPEG_RESOURCE_NAME)) {
+			metadata = testMummifier.loadSourceMetadata(fixtureContext, inputStream, GATE_TURRET_REDUCED_XMP_JPEG_RESOURCE_NAME).stream()
 					.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 		}
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_TITLE)), is("Gate and Turret"));
