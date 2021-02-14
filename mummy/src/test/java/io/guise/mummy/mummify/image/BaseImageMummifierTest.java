@@ -25,6 +25,7 @@ import static org.hamcrest.Matchers.*;
 import java.io.*;
 import java.net.URI;
 import java.nio.file.Paths;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,6 +66,8 @@ public class BaseImageMummifierTest {
 	 * <dd>Garret Wilson</dd>
 	 * <dt><code>dc:Rights</code> (XMP)</dt>
 	 * <dd>Copyright © 2009 Garret Wilson</dd>
+	 * <dt><code>xmp:CreateDate</code> (XMP)</dt>
+	 * <dd><code>2009:08:29 16:51:21.00-07:00</code></dd>
 	 * <dd>
 	 * </dl>
 	 */
@@ -123,12 +126,16 @@ public class BaseImageMummifierTest {
 	 * <dd>Canon</dd>
 	 * <dt><code>Software</code> (Exif <code>0x0131</code>)</dt>
 	 * <dd>paint.net 4.2.14</dd>
-	 * <dt><code>ObjectName</code> (IIM <code>2:05</code>, <code>0x205</code>)</dt>
+	 * <dt><code>ObjectName</code> (IPTC-IIM <code>2:05</code>, <code>0x205</code>)</dt>
 	 * <dd>Gate and Turret</dd>
-	 * <dt><code>Caption</code> (IIM <code>2:120</code>, <code>0x0278</code>)</dt>
+	 * <dt><code>Caption</code> (IPTC-IIM <code>2:120</code>, <code>0x0278</code>)</dt>
 	 * <dd>Castle turret viewed through a gate.</dd>
-	 * <dt><code>CopyrightNotice</code> (IIM <code>2:116</code>, <code>0x0274</code>)</dt>
+	 * <dt><code>CopyrightNotice</code> (IPTC-IIM <code>2:116</code>, <code>0x0274</code>)</dt>
 	 * <dd>Copyright © 2009 Garret Wilson</dd>
+	 * <dt><code>DateCreated</code> (IPTC-IIM <code>2:55</code>, <code>0x0237</code>)</dt>
+	 * <dd><code>2009:08:29</code></dd>
+	 * <dt><code>TimeCreated</code> (IPTC-IIM <code>2:60</code>, <code>0x023C</code>)</dt>
+	 * <dd><code>16:51:21-07:00</code></dd>
 	 * <dd>
 	 * </dl>
 	 */
@@ -151,6 +158,8 @@ public class BaseImageMummifierTest {
 	 * <dd>Copyright © 2009 Garret Wilson</dd>
 	 * <dt><code>dc:Creator</code> (XMP)</dt>
 	 * <dd>Garret Wilson</dd>
+	 * <dt><code>xmp:CreateDate</code> (XMP)</dt>
+	 * <dd><code>2009:08:29 16:51:21.00-07:00</code></dd>
 	 * <dd>
 	 * </dl>
 	 */
@@ -202,6 +211,7 @@ public class BaseImageMummifierTest {
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_DESCRIPTION)), is("Castle turret viewed through a gate."));
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_ARTIST)), is("Garret Wilson"));
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT)), is("Copyright (C) 2009 Garret Wilson"));
+		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_CREATED_AT)), is(ZonedDateTime.of(2009, 8, 29, 16, 51, 21, 0, ZoneOffset.UTC).toInstant()));
 	}
 
 	/**
@@ -236,6 +246,8 @@ public class BaseImageMummifierTest {
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_TITLE)), is("Gate and Turret"));
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_DESCRIPTION)), is("Castle turret viewed through a gate."));
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT)), is("Copyright © 2009 Garret Wilson"));
+		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_CREATED_AT)),
+				is(ZonedDateTime.of(2009, 8, 29, 16, 51, 21, 0, ZoneOffset.ofHours(-7)).toInstant()));
 	}
 
 	/**
@@ -254,6 +266,8 @@ public class BaseImageMummifierTest {
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_DESCRIPTION)), is("Castle turret viewed through a gate."));
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_ARTIST)), is("Garret Wilson"));
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT)), is("Copyright © 2009 Garret Wilson"));
+		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_CREATED_AT)),
+				is(ZonedDateTime.of(2009, 8, 29, 16, 51, 21, 0, ZoneOffset.ofHours(-7)).toInstant()));
 	}
 
 	/** @see BaseImageMummifier#addImageMetadata(UrfResourceDescription, org.apache.commons.imaging.common.bytesource.ByteSource, OutputStream) */
