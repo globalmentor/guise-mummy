@@ -182,15 +182,21 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 		if(imageInputStream == null) {
 			throw new IOException("No suitable image input stream service provider found.");
 		}
-		final ImageReader imageReader = findNext(getImageReaders(imageInputStream)) //use the first available image reader
-				.orElseThrow(() -> new IOException("No service provider image reader available."));
-		final ImageReadParam imageReadParam = imageReader.getDefaultReadParam();
-		imageReader.setInput(imageInputStream, true, !keepMetadata); //tell the image reader to read from the image input stream, ignoring metadata if we shouldn't keep metadata
 		final BufferedImage oldImage; //read the first of the images
-		try {
-			oldImage = imageReader.read(imageIndex, imageReadParam); //tell the image reader to read the image
-		} finally {
-			imageReader.dispose(); //tell the image reader we don't need it any more
+		final IIOMetadata oldImageMetadata;
+		final ImageWriter imageWriter; //determine the writer based on the reader, so we do that while the reader is still valid
+		{ //use the reader in a separate scope to keep it from being accidentally used after it is disposed
+			final ImageReader imageReader = findNext(getImageReaders(imageInputStream)) //use the first available image reader
+					.orElseThrow(() -> new IOException("No service provider image reader available."));
+			try {
+				final ImageReadParam imageReadParam = imageReader.getDefaultReadParam();
+				imageReader.setInput(imageInputStream, true, !keepMetadata); //tell the image reader to read from the image input stream, ignoring metadata if we shouldn't keep metadata
+				oldImage = imageReader.read(imageIndex, imageReadParam); //tell the image reader to read the image
+				oldImageMetadata = keepMetadata ? imageReader.getImageMetadata(imageIndex) : null; //get any metadata associated with the image if we have been asked to keep it
+				imageWriter = getImageWriter(imageReader); //get an image writer that corresponds to the reader
+			} finally {
+				imageReader.dispose(); //tell the image reader we don't need it any more
+			}
 		}
 
 		//scale
@@ -223,8 +229,6 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 		}
 
 		//write
-		final ImageWriter imageWriter = getImageWriter(imageReader); //get an image writer that corresponds to the reader
-
 		try {
 			final ImageWriteParam imageWriteParam = imageWriter.getDefaultWriteParam(); //get default parameters for writing the image
 			if(imageWriteParam.canWriteCompressed()) { //if the writer can compress images (if we don't do this check, an exception will be thrown if the image writer doesn't support compression, e.g. for PNG files)
@@ -246,8 +250,7 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 				throw new IOException("No suitable image output stream service provider found.");
 			}
 			imageWriter.setOutput(imageOutputStream); //tell the image writer to write to the image output stream
-			final IIOMetadata imageMetadata = keepMetadata ? imageReader.getImageMetadata(imageIndex) : null; //get any metadata associated with the image if we have been asked to keep it
-			final IIOImage iioImage = new IIOImage(newImage, null, imageMetadata); //write with no thumbnails, but try to keep metadata (if we read any)
+			final IIOImage iioImage = new IIOImage(newImage, null, oldImageMetadata); //write with no thumbnails, but try to keep metadata (if we read and kept any)
 			imageWriter.write(null, iioImage, imageWriteParam); //tell the image writer to read the image using the custom parameters
 		} finally {
 			imageWriter.dispose(); //tell the image writer we don't need it any more
