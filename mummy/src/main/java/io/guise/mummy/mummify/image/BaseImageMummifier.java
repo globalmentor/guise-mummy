@@ -293,8 +293,10 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 
 	private static final TagInfoAscii EXIF_TAG_ARTIST = new TagInfoAscii("Artist", 0x013B, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
 	private static final TagInfoAscii EXIF_TAG_COPYRIGHT = new TagInfoAscii("Copyright", 0x8298, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
-	public static final TagInfoAscii EXIF_TAG_OFFSET_TIME_ORIGINAL = new TagInfoAscii("OffsetTimeOriginal", 0x9011, 7, TiffDirectoryType.EXIF_DIRECTORY_EXIF_IFD);
+	public static final TagInfoAscii EXIF_TAG_DATE_TIME = new TagInfoAscii("DateTime", 0x0132, 20, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //in IDFD0 unlike its other components
 	private static final TagInfoAscii EXIF_TAG_IMAGE_DESCRIPTION = new TagInfoAscii("ImageDescription", 0x010E, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
+	public static final TagInfoAscii EXIF_TAG_OFFSET_TIME = new TagInfoAscii("OffsetTimeOriginal", 0x9010, 7, TiffDirectoryType.EXIF_DIRECTORY_EXIF_IFD);
+	public static final TagInfoAscii EXIF_TAG_OFFSET_TIME_ORIGINAL = new TagInfoAscii("OffsetTimeOriginal", 0x9011, 7, TiffDirectoryType.EXIF_DIRECTORY_EXIF_IFD);
 	@SuppressWarnings("unused")
 	private static final TagInfoAscii EXIF_TAG_XP_TITLE = new TagInfoAscii("XPTitle", 0x9C9B, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
 
@@ -317,6 +319,8 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	 * @implSpec This implementation uses a resolution of three digits for <code>SubSecTime</code> (<code>0x9290</code>) and <code>SubSecTimeOriginal</code>
 	 *           (<code>0x9291</code>).
 	 * @implSpec If software identification is given, it is added as an Exif <code>Software</code> (<code>0x0131</code>) tag.
+	 * @implSpec If a modification instant is given, it is added as an Exif <code>DateTime</code> (<code>0x0132</code>), <code>SubSecTime</code>
+	 *           (<code>0x9290</code>), and <code>OffsetTime</code> (<code>0x9010</code>) tags.
 	 * @implSpec This implementation only supports writing Exif metadata to JPEG images.
 	 * @implSpec This implementation uses <a href="https://commons.apache.org/proper/commons-imaging/">Apache Commons Imaging</a>.
 	 * @implNote This implementation currently ignores the {@link Artifact#PROPERTY_HANDLE_TITLE} property because Apache Commons Imaging writes corrupted
@@ -325,13 +329,14 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	 * @param byteSource The byte source containing the processed image.
 	 * @param outputStream The output stream for writing the image with added metadata.
 	 * @param software A string identifying the software generating or updating the image, or <code>null</code> if no software information should be added.
+	 * @param modifiedAt The value to use the instant the image was modified, or <code>null</code> if no modification timestamp should be added.
 	 * @throws IOException if there is an I/O error adding the metadata.
 	 * @see <a href="http://www.hanhuy.com/pfn/java-image-thumbnail-comparison">A comparison of Java image thumbnailing techniques</a>
 	 * @see <a href="https://www.universalwebservices.net/web-programming-resources/java/adjust-jpeg-image-compression-quality-when-saving-images-in-java/">Adjust
 	 *      JPEG image compression quality when saving images in Java</a>
 	 */
 	protected static void addImageMetadata(@Nonnull final UrfResourceDescription metadata, @Nonnull final ByteSource byteSource,
-			@Nonnull final OutputStream outputStream, @Nullable final String software) throws IOException {
+			@Nonnull final OutputStream outputStream, @Nullable final String software, @Nullable final Instant modifiedAt) throws IOException {
 		try {
 			final TiffOutputSet tiffOutputSet = new TiffOutputSet();
 			final TiffOutputDirectory exifDirectory = tiffOutputSet.getOrCreateRootDirectory(); //getOrCreateExifDirectory() prevents metadata-extractor from seeing values
@@ -358,6 +363,12 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 			//Software (0x0131)
 			if(software != null) {
 				exifDirectory.add(EXIF_TAG_SOFTWARE, software);
+			}
+			//DateTime (0x0132), SubSecTime (0x9290), OffsetTime (0x9010)
+			if(modifiedAt != null) { //note that DateTime goes in IFD0, while SubSecTime and OffsetTime go in the SubIFD
+				exifDirectory.add(EXIF_TAG_DATE_TIME, EXIF_DATE_TIME_FORMATTER.format(modifiedAt.atOffset(UTC))); //resolve the time to UTC
+				subExifDirectory.add(EXIF_TAG_SUB_SEC_TIME, EXIF_SUB_SEC_TIME_FORMATTER.format(modifiedAt.atOffset(UTC))); //resolve the subseconds to UTC
+				subExifDirectory.add(EXIF_TAG_OFFSET_TIME, EXIF_OFFSET_TIME_UTC); //indicate that the time is in UTC
 			}
 			new ExifRewriter().updateExifMetadataLossy(byteSource, outputStream, tiffOutputSet);
 		} catch(final ImageReadException | ImageWriteException imageIOException) {

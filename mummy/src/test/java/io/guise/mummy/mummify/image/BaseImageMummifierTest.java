@@ -335,7 +335,9 @@ public class BaseImageMummifierTest {
 				.format(ZonedDateTime.of(2009, 8, 29, 16, 51, 21, (int)MILLISECONDS.toNanos(789), UTC).toInstant().atOffset(UTC)), is("789"));
 	}
 
-	/** @see BaseImageMummifier#addImageMetadata(UrfResourceDescription, org.apache.commons.imaging.common.bytesource.ByteSource, OutputStream) */
+	/**
+	 * @see BaseImageMummifier#addImageMetadata(UrfResourceDescription, org.apache.commons.imaging.common.bytesource.ByteSource, OutputStream, String, Instant)
+	 */
 	@Test
 	void testAddImageMetadata() throws IOException, ImageProcessingException {
 		try (final InputStream inputStream = getClass().getResourceAsStream(GATE_TURRET_REDUCED_NO_METADATA_JPEG_RESOURCE_NAME);
@@ -350,8 +352,9 @@ public class BaseImageMummifierTest {
 			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_DESCRIPTION), "This is a test image.");
 			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT), "Copyright (C) 2021 GlobalMentor, Inc.");
 			final Instant createdAt = ZonedDateTime.of(2021, 2, 15, 16, 34, 8, (int)MILLISECONDS.toNanos(789), UTC).toInstant();
+			final Instant modifiedAt = ZonedDateTime.of(2021, 2, 16, 6, 34, 57, (int)MILLISECONDS.toNanos(321), UTC).toInstant();
 			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_CREATED_AT), createdAt);
-			BaseImageMummifier.addImageMetadata(metadata, new ByteSourceInputStream(inputStream, null), tempOutputStream, "Foo App");
+			BaseImageMummifier.addImageMetadata(metadata, new ByteSourceInputStream(inputStream, null), tempOutputStream, "Foo App", modifiedAt);
 			//extract and verify added metadata using metadata-extractor
 			final Metadata extractedMetadata = ImageMetadataReader.readMetadata(tempOutputStream.toInputStream());
 			final ExifIFD0Directory ifd0Directory = extractedMetadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
@@ -367,7 +370,10 @@ public class BaseImageMummifierTest {
 			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_SOFTWARE), is("Foo App")); //Software
 			final ExifSubIFDDirectory subIFDDirectory = extractedMetadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
 			assertThat("Exif SubIFD metadata was added.", subIFDDirectory, is(not(nullValue())));
-			assertThat(Optional.ofNullable(subIFDDirectory.getDateOriginal(TimeZones.UTC)).map(Date::toInstant), isPresentAndIs(createdAt));
+			assertThat("Exif original date/time tags were added.", Optional.ofNullable(subIFDDirectory.getDateOriginal(TimeZones.UTC)).map(Date::toInstant),
+					isPresentAndIs(createdAt));
+			assertThat("Exif modified date/time tags were added.", Optional.ofNullable(subIFDDirectory.getDateModified(TimeZones.UTC)).map(Date::toInstant),
+					isPresentAndIs(modifiedAt));
 			assertThat("No XMP metadata was added.", extractedMetadata.getFirstDirectoryOfType(XmpDirectory.class), is(nullValue()));
 			assertThat("No IPTC metadata was added.", extractedMetadata.getFirstDirectoryOfType(IptcDirectory.class), is(nullValue()));
 		}
