@@ -39,7 +39,7 @@ import org.apache.commons.imaging.*;
 import org.apache.commons.imaging.common.bytesource.ByteSource;
 import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
 import org.apache.commons.imaging.formats.tiff.constants.TiffDirectoryType;
-import org.apache.commons.imaging.formats.tiff.taginfos.TagInfoAscii;
+import org.apache.commons.imaging.formats.tiff.taginfos.*;
 import org.apache.commons.imaging.formats.tiff.write.*;
 
 import com.adobe.internal.xmp.*;
@@ -268,6 +268,20 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 		return sourceMetadata;
 	}
 
+	private static final TagInfoAscii EXIF_TAG_ARTIST = new TagInfoAscii("Artist", 0x013B, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
+	private static final TagInfoShort EXIF_TAG_COLOR_SPACE = new TagInfoShort("ColorSpace", 0xA001, TiffDirectoryType.EXIF_DIRECTORY_EXIF_IFD);
+	private static final TagInfoAscii EXIF_TAG_COPYRIGHT = new TagInfoAscii("Copyright", 0x8298, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
+	private static final TagInfoAscii EXIF_TAG_DATE_TIME = new TagInfoAscii("DateTime", 0x0132, 20, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //in IDFD0 unlike its other components
+	private static final TagInfoAscii EXIF_TAG_IMAGE_DESCRIPTION = new TagInfoAscii("ImageDescription", 0x010E, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
+	private static final TagInfoAscii EXIF_TAG_OFFSET_TIME = new TagInfoAscii("OffsetTimeOriginal", 0x9010, 7, TiffDirectoryType.EXIF_DIRECTORY_EXIF_IFD);
+	private static final TagInfoAscii EXIF_TAG_OFFSET_TIME_ORIGINAL = new TagInfoAscii("OffsetTimeOriginal", 0x9011, 7,
+			TiffDirectoryType.EXIF_DIRECTORY_EXIF_IFD);
+	@SuppressWarnings("unused")
+	private static final TagInfoAscii EXIF_TAG_XP_TITLE = new TagInfoAscii("XPTitle", 0x9C9B, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
+
+	/** The value for the Exif <code>ColorSpace</code> (<code>0xA001</code>) indicating the sRGB color space. */
+	private final static short EXIF_COLOR_SPACE_SRGB = 1;
+
 	/**
 	 * The formatter for writing the Exif <code>DateTime</code> (<code>0x0132</code>) and <code>DateTimeOriginal</code> (<code>0x9003</code>) instant value as
 	 * prescribed in <cite>Exif 2.3.2 § 4.6.5 Exif IFD Attribute Information</cite>.
@@ -291,15 +305,6 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	 */
 	static final String EXIF_OFFSET_TIME_UTC = "+00:00";
 
-	private static final TagInfoAscii EXIF_TAG_ARTIST = new TagInfoAscii("Artist", 0x013B, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
-	private static final TagInfoAscii EXIF_TAG_COPYRIGHT = new TagInfoAscii("Copyright", 0x8298, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
-	public static final TagInfoAscii EXIF_TAG_DATE_TIME = new TagInfoAscii("DateTime", 0x0132, 20, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //in IDFD0 unlike its other components
-	private static final TagInfoAscii EXIF_TAG_IMAGE_DESCRIPTION = new TagInfoAscii("ImageDescription", 0x010E, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
-	public static final TagInfoAscii EXIF_TAG_OFFSET_TIME = new TagInfoAscii("OffsetTimeOriginal", 0x9010, 7, TiffDirectoryType.EXIF_DIRECTORY_EXIF_IFD);
-	public static final TagInfoAscii EXIF_TAG_OFFSET_TIME_ORIGINAL = new TagInfoAscii("OffsetTimeOriginal", 0x9011, 7, TiffDirectoryType.EXIF_DIRECTORY_EXIF_IFD);
-	@SuppressWarnings("unused")
-	private static final TagInfoAscii EXIF_TAG_XP_TITLE = new TagInfoAscii("XPTitle", 0x9C9B, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
-
 	/**
 	 * Adds appropriate metadata to an existing image. Any exiting metadata is replaced.
 	 * @implSpec This implementation supports the following Exif metadata:
@@ -318,6 +323,8 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	 *           </dl>
 	 * @implSpec This implementation uses a resolution of three digits for <code>SubSecTime</code> (<code>0x9290</code>) and <code>SubSecTimeOriginal</code>
 	 *           (<code>0x9291</code>).
+	 * @implSpec If the sRGB color space is requested, it is added as an Exif <code>ColorSpace</code> (<code>0xA001</code>) tag with the value
+	 *           {@value #EXIF_COLOR_SPACE_SRGB}.
 	 * @implSpec If software identification is given, it is added as an Exif <code>Software</code> (<code>0x0131</code>) tag.
 	 * @implSpec If a modification instant is given, it is added as an Exif <code>DateTime</code> (<code>0x0132</code>), <code>SubSecTime</code>
 	 *           (<code>0x9290</code>), and <code>OffsetTime</code> (<code>0x9010</code>) tags.
@@ -325,9 +332,10 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	 * @implSpec This implementation uses <a href="https://commons.apache.org/proper/commons-imaging/">Apache Commons Imaging</a>.
 	 * @implNote This implementation currently ignores the {@link Artifact#PROPERTY_HANDLE_TITLE} property because Apache Commons Imaging writes corrupted
 	 *           <code>XPTitle</code> values; see <a href="https://issues.apache.org/jira/browse/IMAGING-281">IMAGING-281: Simple Exif XPTitle corrupted.</a>
-	 * @param metadata The description containing the metadata to add.
 	 * @param byteSource The byte source containing the processed image.
 	 * @param outputStream The output stream for writing the image with added metadata.
+	 * @param metadata The description containing the metadata to add.
+	 * @param sRGB Whether the added metadata should indicate the sRGB color space.
 	 * @param software A string identifying the software generating or updating the image, or <code>null</code> if no software information should be added.
 	 * @param modifiedAt The value to use the instant the image was modified, or <code>null</code> if no modification timestamp should be added.
 	 * @throws IOException if there is an I/O error adding the metadata.
@@ -335,8 +343,9 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	 * @see <a href="https://www.universalwebservices.net/web-programming-resources/java/adjust-jpeg-image-compression-quality-when-saving-images-in-java/">Adjust
 	 *      JPEG image compression quality when saving images in Java</a>
 	 */
-	protected static void addImageMetadata(@Nonnull final UrfResourceDescription metadata, @Nonnull final ByteSource byteSource,
-			@Nonnull final OutputStream outputStream, @Nullable final String software, @Nullable final Instant modifiedAt) throws IOException {
+	protected static void addImageMetadata(@Nonnull final ByteSource byteSource, @Nonnull final OutputStream outputStream,
+			@Nonnull final UrfResourceDescription metadata, final boolean sRGB, @Nullable final String software, @Nullable final Instant modifiedAt)
+			throws IOException {
 		try {
 			final TiffOutputSet tiffOutputSet = new TiffOutputSet();
 			final TiffOutputDirectory exifDirectory = tiffOutputSet.getOrCreateRootDirectory(); //getOrCreateExifDirectory() prevents metadata-extractor from seeing values
@@ -360,6 +369,10 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 				subExifDirectory.add(EXIF_TAG_SUB_SEC_TIME_ORIGINAL, EXIF_SUB_SEC_TIME_FORMATTER.format(createdAt.atOffset(UTC))); //resolve the subseconds to UTC
 				subExifDirectory.add(EXIF_TAG_OFFSET_TIME_ORIGINAL, EXIF_OFFSET_TIME_UTC); //indicate that the time is in UTC
 			}));
+			//ColorSpace (0xA001)
+			if(sRGB) {
+				subExifDirectory.add(EXIF_TAG_COLOR_SPACE, EXIF_COLOR_SPACE_SRGB);
+			}
 			//Software (0x0131)
 			if(software != null) {
 				exifDirectory.add(EXIF_TAG_SOFTWARE, software);

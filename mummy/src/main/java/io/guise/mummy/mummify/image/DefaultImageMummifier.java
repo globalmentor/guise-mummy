@@ -106,8 +106,8 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 	 * @implSpec This implementation scales the image in an attempt to reduce the file size if the file size is above a certain threshold.
 	 * @implSpec This implementation delegates to {@link #processImage(MummyContext, Artifact, InputStream, OutputStream, boolean)} for scaling.
 	 * @implSpec This implementation delegates to
-	 *           {@link #addImageMetadata(UrfResourceDescription, org.apache.commons.imaging.common.bytesource.ByteSource, OutputStream, String, Instant)} to add
-	 *           metadata to the image after processing.
+	 *           {@link #addImageMetadata(org.apache.commons.imaging.common.bytesource.ByteSource, OutputStream, UrfResourceDescription, boolean, String, Instant)}
+	 *           to add metadata to the image after processing.
 	 */
 	@Override
 	public void mummifyFile(final MummyContext context, final CorporealSourceArtifact artifact) throws IOException {
@@ -133,9 +133,10 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 
 			//add metadata and stream to output file (if supported)
 			if(isPostProcessWriteMetadataSupported) {
+				final boolean sRGB = true; //processing the image with Java Image I/O converts it to sRGB if it wasn't already
 				final TempOutputStream tempOutputStream = (TempOutputStream)processOutputStream;
 				try (final OutputStream outputStream = new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))) {
-					addImageMetadata(artifact.getResourceDescription(), tempOutputStream.toByteSource(), outputStream, context.getMummifierIdentification(),
+					addImageMetadata(tempOutputStream.toByteSource(), outputStream, artifact.getResourceDescription(), sRGB, context.getMummifierIdentification(),
 							Instant.now());
 				} catch(final IOException ioException) { //provide more context to I/O errors
 					throw new IOException(format("Error processing image `%s`: %s", artifact.getSourcePath(), ioException.getLocalizedMessage()), ioException); //TODO i18n

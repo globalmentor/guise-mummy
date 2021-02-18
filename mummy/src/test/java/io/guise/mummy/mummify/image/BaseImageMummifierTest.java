@@ -35,7 +35,7 @@ import org.apache.commons.imaging.common.bytesource.ByteSourceInputStream;
 import org.junit.jupiter.api.*;
 
 import com.drew.imaging.*;
-import com.drew.metadata.Metadata;
+import com.drew.metadata.*;
 import com.drew.metadata.exif.*;
 import com.drew.metadata.iptc.IptcDirectory;
 import com.drew.metadata.xmp.XmpDirectory;
@@ -336,10 +336,11 @@ public class BaseImageMummifierTest {
 	}
 
 	/**
-	 * @see BaseImageMummifier#addImageMetadata(UrfResourceDescription, org.apache.commons.imaging.common.bytesource.ByteSource, OutputStream, String, Instant)
+	 * @see BaseImageMummifier#addImageMetadata(org.apache.commons.imaging.common.bytesource.ByteSource, OutputStream, UrfResourceDescription, boolean, String,
+	 *      Instant)
 	 */
 	@Test
-	void testAddImageMetadata() throws IOException, ImageProcessingException {
+	void testAddImageMetadata() throws IOException, ImageProcessingException, MetadataException {
 		try (final InputStream inputStream = getClass().getResourceAsStream(GATE_TURRET_REDUCED_NO_METADATA_JPEG_RESOURCE_NAME);
 				final TempOutputStream tempOutputStream = new TempOutputStream()) {
 			//add image metadata
@@ -354,7 +355,7 @@ public class BaseImageMummifierTest {
 			final Instant createdAt = ZonedDateTime.of(2021, 2, 15, 16, 34, 8, (int)MILLISECONDS.toNanos(789), UTC).toInstant();
 			final Instant modifiedAt = ZonedDateTime.of(2021, 2, 16, 6, 34, 57, (int)MILLISECONDS.toNanos(321), UTC).toInstant();
 			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_CREATED_AT), createdAt);
-			BaseImageMummifier.addImageMetadata(metadata, new ByteSourceInputStream(inputStream, null), tempOutputStream, "Foo App", modifiedAt);
+			BaseImageMummifier.addImageMetadata(new ByteSourceInputStream(inputStream, null), tempOutputStream, metadata, true, "Foo App", modifiedAt);
 			//extract and verify added metadata using metadata-extractor
 			final Metadata extractedMetadata = ImageMetadataReader.readMetadata(tempOutputStream.toInputStream());
 			final ExifIFD0Directory ifd0Directory = extractedMetadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
@@ -365,15 +366,16 @@ public class BaseImageMummifierTest {
 			//TODO bring back when metadata-extractor [#270](https://github.com/drewnoakes/metadata-extractor/issues/270) is fixed
 			//			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION), is("Touché")); //ImageDescription
 			//			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_COPYRIGHT), is("Copyright © 2021 GlobalMentor, Inc.")); //Copyright
-			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION), is("This is a test image.")); //ImageDescription
-			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_COPYRIGHT), is("Copyright (C) 2021 GlobalMentor, Inc.")); //Copyright
-			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_SOFTWARE), is("Foo App")); //Software
+			assertThat("Exif image description was added.", ifd0Directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION), is("This is a test image.")); //ImageDescription
+			assertThat("Exif copyright was added.", ifd0Directory.getString(ExifIFD0Directory.TAG_COPYRIGHT), is("Copyright (C) 2021 GlobalMentor, Inc.")); //Copyright
+			assertThat("Exif software identification was added.", ifd0Directory.getString(ExifIFD0Directory.TAG_SOFTWARE), is("Foo App")); //Software
 			final ExifSubIFDDirectory subIFDDirectory = extractedMetadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
 			assertThat("Exif SubIFD metadata was added.", subIFDDirectory, is(not(nullValue())));
 			assertThat("Exif original date/time tags were added.", Optional.ofNullable(subIFDDirectory.getDateOriginal(TimeZones.UTC)).map(Date::toInstant),
 					isPresentAndIs(createdAt));
 			assertThat("Exif modified date/time tags were added.", Optional.ofNullable(subIFDDirectory.getDateModified(TimeZones.UTC)).map(Date::toInstant),
 					isPresentAndIs(modifiedAt));
+			assertThat("Exif color space designator for sRGB was added.", subIFDDirectory.getInt(ExifSubIFDDirectory.TAG_COLOR_SPACE), is(1)); //ColorSpace
 			assertThat("No XMP metadata was added.", extractedMetadata.getFirstDirectoryOfType(XmpDirectory.class), is(nullValue()));
 			assertThat("No IPTC metadata was added.", extractedMetadata.getFirstDirectoryOfType(IptcDirectory.class), is(nullValue()));
 		}
