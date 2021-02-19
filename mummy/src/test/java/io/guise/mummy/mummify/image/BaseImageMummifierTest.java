@@ -45,8 +45,7 @@ import io.confound.config.Configuration;
 import io.guise.mummy.*;
 import io.guise.mummy.mummify.image.BaseImageMummifier.TempOutputStream;
 import io.urf.URF.Handle;
-import io.urf.model.UrfObject;
-import io.urf.model.UrfResourceDescription;
+import io.urf.model.*;
 
 /**
  * Tests of {@link BaseImageMummifier}.
@@ -345,8 +344,7 @@ public class BaseImageMummifierTest {
 				final TempOutputStream tempOutputStream = new TempOutputStream()) {
 			//add image metadata
 			final UrfResourceDescription metadata = new UrfObject();
-			//TODO bring back when [IMAGING-281](https://issues.apache.org/jira/browse/IMAGING-281) is fixed
-			//			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_TITLE), "Test Title");
+			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_TITLE), "Too Touché");
 			//TODO bring back when metadata-extractor [#270](https://github.com/drewnoakes/metadata-extractor/issues/270) is fixed
 			//			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_DESCRIPTION), "Touché");
 			//			metadata.setPropertyValue(Handle.toTag(Artifact.PROPERTY_HANDLE_COPYRIGHT), "Copyright © 2021 GlobalMentor, Inc.");
@@ -360,11 +358,10 @@ public class BaseImageMummifierTest {
 			final Metadata extractedMetadata = ImageMetadataReader.readMetadata(tempOutputStream.toInputStream());
 			final ExifIFD0Directory ifd0Directory = extractedMetadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
 			assertThat("Exif IFD0 metadata was added.", ifd0Directory, is(not(nullValue())));
-			//TODO bring back when [IMAGING-281](https://issues.apache.org/jira/browse/IMAGING-281) is fixed
-			//			final ExifIFD0Descriptor exifIFD0Descriptor = new ExifIFD0Descriptor(ifd0Directory);
-			//			assertThat(exifIFD0Descriptor.getWindowsTitleDescription(), is("Test Title")); //XPTitle
+			final ExifIFD0Descriptor exifIFD0Descriptor = new ExifIFD0Descriptor(ifd0Directory);
+			assertThat(exifIFD0Descriptor.getWindowsTitleDescription(), is("Too Touché")); //XPTitle
 			//TODO bring back when metadata-extractor [#270](https://github.com/drewnoakes/metadata-extractor/issues/270) is fixed
-			//			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION), is("Touché")); //ImageDescription
+			//			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION), is("Touché is a word, too.")); //ImageDescription
 			//			assertThat(ifd0Directory.getString(ExifIFD0Directory.TAG_COPYRIGHT), is("Copyright © 2021 GlobalMentor, Inc.")); //Copyright
 			assertThat("Exif image description was added.", ifd0Directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION), is("This is a test image.")); //ImageDescription
 			assertThat("Exif copyright was added.", ifd0Directory.getString(ExifIFD0Directory.TAG_COPYRIGHT), is("Copyright (C) 2021 GlobalMentor, Inc.")); //Copyright

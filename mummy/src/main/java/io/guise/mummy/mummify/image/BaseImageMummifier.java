@@ -276,8 +276,7 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	private static final TagInfoAscii EXIF_TAG_OFFSET_TIME = new TagInfoAscii("OffsetTimeOriginal", 0x9010, 7, TiffDirectoryType.EXIF_DIRECTORY_EXIF_IFD);
 	private static final TagInfoAscii EXIF_TAG_OFFSET_TIME_ORIGINAL = new TagInfoAscii("OffsetTimeOriginal", 0x9011, 7,
 			TiffDirectoryType.EXIF_DIRECTORY_EXIF_IFD);
-	@SuppressWarnings("unused")
-	private static final TagInfoAscii EXIF_TAG_XP_TITLE = new TagInfoAscii("XPTitle", 0x9C9B, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
+	private static final TagInfoXpString EXIF_TAG_XP_TITLE = new TagInfoXpString("XPTitle", 0x9C9B, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
 
 	/** The value for the Exif <code>ColorSpace</code> (<code>0xA001</code>) indicating the sRGB color space. */
 	private final static short EXIF_COLOR_SPACE_SRGB = 1;
@@ -330,8 +329,6 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	 *           (<code>0x9290</code>), and <code>OffsetTime</code> (<code>0x9010</code>) tags.
 	 * @implSpec This implementation only supports writing Exif metadata to JPEG images.
 	 * @implSpec This implementation uses <a href="https://commons.apache.org/proper/commons-imaging/">Apache Commons Imaging</a>.
-	 * @implNote This implementation currently ignores the {@link Artifact#PROPERTY_HANDLE_TITLE} property because Apache Commons Imaging writes corrupted
-	 *           <code>XPTitle</code> values; see <a href="https://issues.apache.org/jira/browse/IMAGING-281">IMAGING-281: Simple Exif XPTitle corrupted.</a>
 	 * @param byteSource The byte source containing the processed image.
 	 * @param outputStream The output stream for writing the image with added metadata.
 	 * @param metadata The description containing the metadata to add.
@@ -350,9 +347,8 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 			final TiffOutputSet tiffOutputSet = new TiffOutputSet();
 			final TiffOutputDirectory exifDirectory = tiffOutputSet.getOrCreateRootDirectory(); //getOrCreateExifDirectory() prevents metadata-extractor from seeing values
 			//XPTitle (0x9C9B)
-			//TODO bring back when IMAGING-281 is fixed
-			//			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_TITLE)
-			//					.ifPresent(throwingConsumer(title -> exifDirectory.add(EXIF_XP_TITLE_TAG_INFO, title.toString())));
+			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_TITLE)
+					.ifPresent(throwingConsumer(title -> exifDirectory.add(EXIF_TAG_XP_TITLE, title.toString())));
 			//ImageDescription (0x010E)
 			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_DESCRIPTION)
 					.ifPresent(throwingConsumer(description -> exifDirectory.add(EXIF_TAG_IMAGE_DESCRIPTION, description.toString())));
