@@ -19,7 +19,9 @@ package io.guise.mummy.mummify.image;
 import static com.adobe.internal.xmp.XMPConst.*;
 import static com.globalmentor.io.Images.*;
 import static com.globalmentor.io.Paths.*;
+import static com.globalmentor.java.Objects.*;
 import static java.nio.file.Files.*;
+import static java.time.ZoneOffset.UTC;
 import static java.util.stream.Collectors.*;
 import static org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants.*;
 import static org.zalando.fauxpas.FauxPas.*;
@@ -28,6 +30,7 @@ import java.io.*;
 import java.net.URI;
 import java.nio.file.*;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import javax.annotation.*;
@@ -36,7 +39,7 @@ import org.apache.commons.imaging.*;
 import org.apache.commons.imaging.common.bytesource.ByteSource;
 import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
 import org.apache.commons.imaging.formats.tiff.constants.TiffDirectoryType;
-import org.apache.commons.imaging.formats.tiff.taginfos.TagInfoAscii;
+import org.apache.commons.imaging.formats.tiff.taginfos.*;
 import org.apache.commons.imaging.formats.tiff.write.*;
 
 import com.adobe.internal.xmp.*;
@@ -223,21 +226,21 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 			if(title == null) {
 				title = exifIFD0Descriptor.getWindowsTitleDescription();
 			}
-			//ImageDescription (270, 0x010E)
+			//ImageDescription (0x010E)
 			if(description == null) {
 				description = ifd0Directory.getString(ExifIFD0Directory.TAG_IMAGE_DESCRIPTION);
 			}
-			//Artist (315, 0x013B)
+			//Artist (0x013B)
 			if(artist == null) {
 				artist = ifd0Directory.getString(ExifIFD0Directory.TAG_ARTIST);
 			}
-			//Copyright (33432, 0x8298)
+			//Copyright (0x8298)
 			if(copyright == null) {
 				copyright = ifd0Directory.getString(ExifIFD0Directory.TAG_COPYRIGHT);
 			}
 			final ExifSubIFDDirectory subIFDDirectory = imageMetadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
 			if(subIFDDirectory != null) {
-				//DateTimeOriginal (36867, 0x9003), SubSecTimeOriginal (37521, 0x9291), TimeZoneOffset (0x882a) 
+				//DateTimeOriginal (0x9003), SubSecTimeOriginal (0x9291), OffsetTimeOriginal (0x9011) 
 				if(createdAt == null) {
 					final Date dateOriginal = subIFDDirectory.getDateOriginal(TimeZones.UTC);
 					if(dateOriginal != null) {
@@ -265,51 +268,116 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 		return sourceMetadata;
 	}
 
-	private static final TagInfoAscii EXIF_TAG_ARTIST = new TagInfoAscii("Copyright", 0x013B, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //Artist (315, 0x013B)
-	private static final TagInfoAscii EXIF_TAG_COPYRIGHT = new TagInfoAscii("Copyright", 0x8298, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //Copyright (33432, 0x8298)
-	private static final TagInfoAscii EXIF_TAG_IMAGE_DESCRIPTION = new TagInfoAscii("ImageDescription", 0x010E, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //ImageDescription (270, 0x010E)
-	@SuppressWarnings("unused")
-	private static final TagInfoAscii EXIF_TAG_XP_TITLE = new TagInfoAscii("XPTitle", 0x9C9B, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //XPTitle (0x9C9B)
+	private static final TagInfoAscii EXIF_TAG_ARTIST = new TagInfoAscii("Artist", 0x013B, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
+	private static final TagInfoShort EXIF_TAG_COLOR_SPACE = new TagInfoShort("ColorSpace", 0xA001, TiffDirectoryType.EXIF_DIRECTORY_EXIF_IFD);
+	private static final TagInfoAscii EXIF_TAG_COPYRIGHT = new TagInfoAscii("Copyright", 0x8298, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
+	private static final TagInfoAscii EXIF_TAG_DATE_TIME = new TagInfoAscii("DateTime", 0x0132, 20, TiffDirectoryType.EXIF_DIRECTORY_IFD0); //in IDFD0 unlike its other components
+	private static final TagInfoAscii EXIF_TAG_IMAGE_DESCRIPTION = new TagInfoAscii("ImageDescription", 0x010E, -1, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
+	private static final TagInfoAscii EXIF_TAG_OFFSET_TIME = new TagInfoAscii("OffsetTimeOriginal", 0x9010, 7, TiffDirectoryType.EXIF_DIRECTORY_EXIF_IFD);
+	private static final TagInfoAscii EXIF_TAG_OFFSET_TIME_ORIGINAL = new TagInfoAscii("OffsetTimeOriginal", 0x9011, 7,
+			TiffDirectoryType.EXIF_DIRECTORY_EXIF_IFD);
+	private static final TagInfoXpString EXIF_TAG_XP_TITLE = new TagInfoXpString("XPTitle", 0x9C9B, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
+
+	/** The value for the Exif <code>ColorSpace</code> (<code>0xA001</code>) indicating the sRGB color space. */
+	private final static short EXIF_COLOR_SPACE_SRGB = 1;
+
+	/**
+	 * The formatter for writing the Exif <code>DateTime</code> (<code>0x0132</code>) and <code>DateTimeOriginal</code> (<code>0x9003</code>) instant value as
+	 * prescribed in <cite>Exif 2.3.2 § 4.6.5 Exif IFD Attribute Information</cite>.
+	 * <p>
+	 * Note that this formatter does not assume any time zone, so the value being used for formatting must have already been resolved to some time zone.
+	 * </p>
+	 */
+	static final DateTimeFormatter EXIF_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
+
+	/**
+	 * The formatter for writing the Exif <code>SubSecTime</code> (<code>0x9290</code>) and <code>SubSecTimeOriginal</code> (<code>0x9291</code>) subseconds value
+	 * as prescribed in <cite>Exif 2.3.2 § 4.6.5 Exif IFD Attribute Information</cite>.
+	 * @implNote This implementation truncates the value to a resolution of three digits as per the example in the specification, even though the prose seems to
+	 *           indicate that more digits are allowed.
+	 */
+	static final DateTimeFormatter EXIF_SUB_SEC_TIME_FORMATTER = DateTimeFormatter.ofPattern("SSS");
+
+	/**
+	 * The string for representing UTC in the Exif <code>OffsetTime</code> (<code>0x9010</code>) <code>OffsetTimeOriginal</code> (<code>0x9011</code>) tag as
+	 * prescribed in <cite>Exif 2.3.2 § 4.6.5 Exif IFD Attribute Information</cite>.
+	 */
+	static final String EXIF_OFFSET_TIME_UTC = "+00:00";
 
 	/**
 	 * Adds appropriate metadata to an existing image. Any exiting metadata is replaced.
+	 * @implSpec This implementation supports the following Exif metadata:
+	 *           <dl>
+	 *           <dt>{@link Artifact#PROPERTY_HANDLE_TITLE}</dt>
+	 *           <dd><code>XPTitle</code> (<code>0x9C9B</code>)</dd>
+	 *           <dt>{@link Artifact#PROPERTY_HANDLE_DESCRIPTION}</dt>
+	 *           <dd><code>ImageDescription</code> (<code>0x010E</code>)</dd>
+	 *           <dt>{@link Artifact#PROPERTY_HANDLE_ARTIST}</dt>
+	 *           <dd><code>Artist</code> (<code>0x013B</code>)</dd>
+	 *           <dt>{@link Artifact#PROPERTY_HANDLE_COPYRIGHT}</dt>
+	 *           <dd><code>Copyright</code> (<code>0x8298</code>)</dd>
+	 *           <dt>{@link Artifact#PROPERTY_HANDLE_CREATED_AT}</dt>
+	 *           <dd><code>DateTimeOriginal</code> (<code>0x9003</code>), <code>SubSecTimeOriginal</code> (<code>0x9291</code>), <code>OffsetTimeOriginal</code>
+	 *           (<code>0x9011</code>)</dd>
+	 *           </dl>
+	 * @implSpec This implementation uses a resolution of three digits for <code>SubSecTime</code> (<code>0x9290</code>) and <code>SubSecTimeOriginal</code>
+	 *           (<code>0x9291</code>).
+	 * @implSpec If the sRGB color space is requested, it is added as an Exif <code>ColorSpace</code> (<code>0xA001</code>) tag with the value
+	 *           {@value #EXIF_COLOR_SPACE_SRGB}.
 	 * @implSpec If software identification is given, it is added as an Exif <code>Software</code> (<code>0x0131</code>) tag.
-	 * @implNote This implementation ignores the {@link Artifact#PROPERTY_HANDLE_TITLE} property because Apache Commons Imaging writes corrupted
-	 *           <code>XPTitle</code> values; see <a href="https://issues.apache.org/jira/browse/IMAGING-281">IMAGING-281: Simple Exif XPTitle corrupted.</a>
+	 * @implSpec If a modification instant is given, it is added as an Exif <code>DateTime</code> (<code>0x0132</code>), <code>SubSecTime</code>
+	 *           (<code>0x9290</code>), and <code>OffsetTime</code> (<code>0x9010</code>) tags.
 	 * @implSpec This implementation only supports writing Exif metadata to JPEG images.
 	 * @implSpec This implementation uses <a href="https://commons.apache.org/proper/commons-imaging/">Apache Commons Imaging</a>.
-	 * @param metadata The description containing the metadata to add.
 	 * @param byteSource The byte source containing the processed image.
 	 * @param outputStream The output stream for writing the image with added metadata.
+	 * @param metadata The description containing the metadata to add.
+	 * @param sRGB Whether the added metadata should indicate the sRGB color space.
 	 * @param software A string identifying the software generating or updating the image, or <code>null</code> if no software information should be added.
+	 * @param modifiedAt The value to use the instant the image was modified, or <code>null</code> if no modification timestamp should be added.
 	 * @throws IOException if there is an I/O error adding the metadata.
 	 * @see <a href="http://www.hanhuy.com/pfn/java-image-thumbnail-comparison">A comparison of Java image thumbnailing techniques</a>
 	 * @see <a href="https://www.universalwebservices.net/web-programming-resources/java/adjust-jpeg-image-compression-quality-when-saving-images-in-java/">Adjust
 	 *      JPEG image compression quality when saving images in Java</a>
 	 */
-	protected static void addImageMetadata(@Nonnull final UrfResourceDescription metadata, @Nonnull final ByteSource byteSource,
-			@Nonnull final OutputStream outputStream, @Nullable final String software) throws IOException {
+	protected static void addImageMetadata(@Nonnull final ByteSource byteSource, @Nonnull final OutputStream outputStream,
+			@Nonnull final UrfResourceDescription metadata, final boolean sRGB, @Nullable final String software, @Nullable final Instant modifiedAt)
+			throws IOException {
 		try {
 			final TiffOutputSet tiffOutputSet = new TiffOutputSet();
 			final TiffOutputDirectory exifDirectory = tiffOutputSet.getOrCreateRootDirectory(); //getOrCreateExifDirectory() prevents metadata-extractor from seeing values
 			//XPTitle (0x9C9B)
-			//TODO bring back when IMAGING-281 is fixed
-			//			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_TITLE)
-			//					.ifPresent(throwingConsumer(title -> exifDirectory.add(EXIF_XP_TITLE_TAG_INFO, title.toString())));
-			//ImageDescription (270, 0x010E)
+			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_TITLE)
+					.ifPresent(throwingConsumer(title -> exifDirectory.add(EXIF_TAG_XP_TITLE, title.toString())));
+			//ImageDescription (0x010E)
 			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_DESCRIPTION)
 					.ifPresent(throwingConsumer(description -> exifDirectory.add(EXIF_TAG_IMAGE_DESCRIPTION, description.toString())));
-			//Artist (315, 0x013B)
+			//Artist (0x013B)
 			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_ARTIST)
 					.ifPresent(throwingConsumer(artist -> exifDirectory.add(EXIF_TAG_ARTIST, artist.toString())));
-			//Copyright (33432, 0x8298)
+			//Copyright (0x8298)
 			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_COPYRIGHT)
 					.ifPresent(throwingConsumer(copyright -> exifDirectory.add(EXIF_TAG_COPYRIGHT, copyright.toString())));
-			//DateTimeOriginal (36867, 0x9003), SubSecTimeOriginal (37521, 0x9291), TimeZoneOffset (0x882a)
-			//TODO GUISE-181
+			//DateTimeOriginal (0x9003), SubSecTimeOriginal (0x9291), OffsetTimeOriginal (0x9011)
+			final TiffOutputDirectory subExifDirectory = tiffOutputSet.getOrCreateExifDirectory();
+			metadata.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_CREATED_AT).flatMap(asInstance(Instant.class)).ifPresent(throwingConsumer(createdAt -> {
+				subExifDirectory.add(EXIF_TAG_DATE_TIME_ORIGINAL, EXIF_DATE_TIME_FORMATTER.format(createdAt.atOffset(UTC))); //resolve the time to UTC
+				subExifDirectory.add(EXIF_TAG_SUB_SEC_TIME_ORIGINAL, EXIF_SUB_SEC_TIME_FORMATTER.format(createdAt.atOffset(UTC))); //resolve the subseconds to UTC
+				subExifDirectory.add(EXIF_TAG_OFFSET_TIME_ORIGINAL, EXIF_OFFSET_TIME_UTC); //indicate that the time is in UTC
+			}));
+			//ColorSpace (0xA001)
+			if(sRGB) {
+				subExifDirectory.add(EXIF_TAG_COLOR_SPACE, EXIF_COLOR_SPACE_SRGB);
+			}
 			//Software (0x0131)
 			if(software != null) {
 				exifDirectory.add(EXIF_TAG_SOFTWARE, software);
+			}
+			//DateTime (0x0132), SubSecTime (0x9290), OffsetTime (0x9010)
+			if(modifiedAt != null) { //note that DateTime goes in IFD0, while SubSecTime and OffsetTime go in the SubIFD
+				exifDirectory.add(EXIF_TAG_DATE_TIME, EXIF_DATE_TIME_FORMATTER.format(modifiedAt.atOffset(UTC))); //resolve the time to UTC
+				subExifDirectory.add(EXIF_TAG_SUB_SEC_TIME, EXIF_SUB_SEC_TIME_FORMATTER.format(modifiedAt.atOffset(UTC))); //resolve the subseconds to UTC
+				subExifDirectory.add(EXIF_TAG_OFFSET_TIME, EXIF_OFFSET_TIME_UTC); //indicate that the time is in UTC
 			}
 			new ExifRewriter().updateExifMetadataLossy(byteSource, outputStream, tiffOutputSet);
 		} catch(final ImageReadException | ImageWriteException imageIOException) {
