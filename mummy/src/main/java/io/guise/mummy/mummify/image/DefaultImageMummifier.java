@@ -52,10 +52,9 @@ import io.urf.vocab.content.Content;
 
 /**
  * General image mummifier.
- * @implSpec This implementation supports GIF, JPEG, and PNG files. Reading metadata is supported from XMP, IPTC, and Exif. When processing a primary image, all
- *           metadata will be retained if possible. When processing an image aspect, in order to reduce file size all image metadata will be discarded; a small
- *           subset of normalized Exif metadata will then be added back, but only for JPEG images. This subset will include the Guise software information from
- *           {@link MummyContext#getMummifierIdentification()}.
+ * @implSpec This implementation supports GIF, JPEG, and PNG files. Reading metadata is supported from XMP, IPTC, and Exif. When processing an image, all image
+ *           metadata will be discarded; a small subset of normalized Exif metadata will then be added back, but only for JPEG images. This subset will include
+ *           the Guise software information from {@link MummyContext#getMummifierIdentification()}.
  * @implSpec This implementation supports configured image aspects.
  * @implSpec This implementation uses <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/javax/imageio/package-summary.html">Java Image
  *           I/O</a> for image processing.
@@ -114,13 +113,12 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 		final long imageScaleThresholdSize = context.getConfiguration().findLong(CONFIG_KEY_MUMMY_IMAGE_PROCESS_THRESHOLD_FILE_SIZE)
 				.orElse(DEFAULT_SCALE_THRESHOLD_FILE_SIZE);
 		if(artifact.getSourceSize(context) > imageScaleThresholdSize) { //if the size of the image source file goes over our threshold for scaling
-
 			final boolean isImageJpeg = artifact.getResourceDescription().findPropertyValue(Content.TYPE_PROPERTY_TAG).flatMap(Objects.asInstance(ContentType.class))
 					.<Boolean>map(Images.JPEG_MEDIA_TYPE::hasBaseType).orElse(false);
-			final boolean isImageAspect = artifact.getResourceDescription().hasPropertyValue(AspectualArtifact.PROPERTY_TAG_MUMMY_ASPECT); //e.g. preview or thumbnail
-			final boolean isKeepProcessMetadata = !isImageAspect; //to keep file size down, discard metadata during processing for image aspects (but add back a tiny bit later) 
+			final boolean isKeepProcessMetadata = false; //discard all metadata during processing for all images (but add back a tiny bit later if we can) 
 			final boolean isPostProcessWriteMetadataSupported = isImageJpeg && !isKeepProcessMetadata; //if we are discarding metadata during processing, write some basic metadata later for JPEG images
 			final boolean isProcessTerminal = !isPostProcessWriteMetadataSupported; //	//if we don't support writing metadata post-processing, we'll write directly to the file when processing
+
 			//process image
 			final OutputStream processOutputStream; //remember the stream used for output (even though it will be closed) 
 			try (final InputStream inputStream = new BufferedInputStream(artifact.openSource(context)); //use a TempOutputStream for later use if processing isn't terminal
@@ -142,7 +140,6 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 					throw new IOException(format("Error processing image `%s`: %s", artifact.getSourcePath(), ioException.getLocalizedMessage()), ioException); //TODO i18n
 				}
 			}
-
 		} else {
 			copy(artifact.getSourcePath(), artifact.getTargetPath(), REPLACE_EXISTING); //TODO abstract the copy, here and in OpaqueFileMummifier
 		}

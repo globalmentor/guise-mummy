@@ -16,7 +16,6 @@
 
 package io.guise.mummy.mummify.image;
 
-import static com.adobe.internal.xmp.XMPConst.*;
 import static com.globalmentor.io.ClassResources.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static io.guise.mummy.mummify.image.BaseImageMummifierTest.*;
@@ -41,7 +40,6 @@ import com.drew.metadata.exif.*;
 import com.drew.metadata.iptc.IptcDirectory;
 import com.drew.metadata.xmp.XmpDirectory;
 import com.globalmentor.io.Paths;
-import com.globalmentor.vocab.dcmi.DCMES;
 
 import io.guise.mummy.*;
 
@@ -103,17 +101,15 @@ public class DefaultImageMummifierIT extends BaseEndToEndIT {
 			assertThat("Primary image Exif metadata is still present.", ifd0Directory, is(not(nullValue())));
 			final ExifIFD0Descriptor exifIFD0Descriptor = new ExifIFD0Descriptor(ifd0Directory);
 			assertThat("Primary image Exif IFD0 metadata is still present.", exifIFD0Descriptor, is(not(nullValue())));
-			assertThat("Primary image Exif IFD0 metadata appears to be correct.", ifd0Directory.getString(ExifIFD0Directory.TAG_COPYRIGHT),
-					is("Copyright (C) 2009 Garret Wilson")); //Copyright (as representative example)
-			assertThat("Primary image Exif IFD0 metadata contains camera make.", ifd0Directory.getString(ExifIFD0Directory.TAG_MAKE), is("Canon")); //Make (as representative of metadata potentially removed)
-			assertThat("Primary image Exif IFD0 metadata contains software identifier.", ifd0Directory.getString(ExifIFD0Directory.TAG_SOFTWARE),
-					is("paint.net 4.2.14")); //Software (as representative of metadata potentially updated)
+			//TODO bring back when metadata-extractor [#270](https://github.com/drewnoakes/metadata-extractor/issues/270) is fixed
+			//			assertThat("Primary image Exif IFD0 existing metadata appears to have been updated correctly.", ifd0Directory.getString(ExifIFD0Directory.TAG_COPYRIGHT),
+			//					is("Copyright © 2009 Garret Wilson")); //Copyright (was only ASCII in original Exif metadata)
+			assertThat("Primary image Exif IFD0 metadata has had camera make removed.", ifd0Directory.getString(ExifIFD0Directory.TAG_MAKE), is(nullValue())); //Make (as representative of metadata removed)
+			assertThat("Primary image Exif IFD0 metadata has had software identifier updated.", ifd0Directory.getString(ExifIFD0Directory.TAG_SOFTWARE),
+					is(GuiseMummy.LABEL)); //Software (as representative of metadata updated)
 			assertThat("No IPTC metadata was added.", extractedMetadata.getFirstDirectoryOfType(IptcDirectory.class), is(nullValue()));
 			final XmpDirectory xmpDirectory = extractedMetadata.getFirstDirectoryOfType(XmpDirectory.class);
-			assertThat("Primary image XMP metadata still present.", xmpDirectory, is(not(nullValue())));
-			assertThat("Primary image XMP metadata appears to be correct.",
-					xmpDirectory.getXMPMeta().getLocalizedText(NS_DC, DCMES.TERM_DESCRIPTION.getName(), null, X_DEFAULT).getValue(),
-					is("Castle turret viewed through a gate.")); //dc:description (as representative example)
+			assertThat("Primary image XMP metadata was removed.", xmpDirectory, is(nullValue()));
 		}
 
 		//…/target/site/gate-turret-reduced-thumbnail.jpg
