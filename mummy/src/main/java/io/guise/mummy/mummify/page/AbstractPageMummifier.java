@@ -600,7 +600,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 						final Document sourceTemplateDocument = templateMummifier.loadSourceDocument(context, templateFile);
 						//relocate the template links _within the source tree_ as if it were in the place of the artifact source
 						templateDocument = relocateDocument(context, sourceTemplateDocument, templateFile,
-								referentArtifact -> context.getPlan().referenceInSource(artifact, referentArtifact));
+								referentArtifact -> context.getPlan().referenceInSource(artifact, referentArtifact), true); //ignore interpolations
 					}
 
 					//1. validate structure
@@ -1152,7 +1152,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	protected Document relocateSourceDocumentToTarget(@Nonnull MummyContext context, @Nonnull final Artifact artifact, @Nonnull final Document sourceDocument)
 			throws IOException, DOMException {
 		return relocateDocument(context, sourceDocument, context.getPlan().getPrincipalArtifact(artifact).getSourcePath(), //e.g. consider `foo/` to be the source of `foo/index.html` for reference relocation
-				referentArtifact -> context.getPlan().referenceInTarget(artifact, referentArtifact));
+				referentArtifact -> context.getPlan().referenceInTarget(artifact, referentArtifact), false);
 	}
 
 	/**
@@ -1161,8 +1161,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 */
 	@Override
 	public Document relocateDocument(@Nonnull MummyContext context, @Nonnull final Document sourceDocument, @Nonnull final Path originalReferrerSourcePath,
-			final Function<Artifact, URIPath> referenceGenerator) throws IOException, DOMException {
-		final List<Element> relocatedElements = relocateElement(context, sourceDocument.getDocumentElement(), originalReferrerSourcePath, referenceGenerator);
+			final Function<Artifact, URIPath> referenceGenerator, final boolean ignoreInterpolation) throws IOException, DOMException {
+		final List<Element> relocatedElements = relocateElement(context, sourceDocument.getDocumentElement(), originalReferrerSourcePath, referenceGenerator,
+				ignoreInterpolation);
 		if(relocatedElements.size() != 1 || relocatedElements.get(0) != sourceDocument.getDocumentElement()) {
 			throw new UnsupportedOperationException("Document element cannot be removed or replaced when relocating a document.");
 		}
@@ -1176,41 +1177,44 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param sourceElement The source element to relocate.
 	 * @param originalReferrerSourcePath The absolute original path of the referrer, e.g. <code>…/foo/page.xhtml</code>.
 	 * @param referenceGenerator The function for generating a reference to the artifact indicated by the reference path resolved to the original path.
+	 * @param ignoreInterpolation <code>true</code> if any reference containing a MEXL interpolation should be ignored and left as is.
 	 * @return The relocated element(s), if any, to replace the source element.
 	 * @throws IOException if there is an error relocating the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 * @see #HTML_REFERENCE_ELEMENT_ATTRIBUTES
 	 */
 	protected List<Element> relocateElement(@Nonnull MummyContext context, @Nonnull final Element sourceElement, @Nonnull final Path originalReferrerSourcePath,
-			final Function<Artifact, URIPath> referenceGenerator) throws IOException, DOMException {
+			final Function<Artifact, URIPath> referenceGenerator, final boolean ignoreInterpolation) throws IOException, DOMException {
 
 		//TODO transfer to some system of pluggable element relocating strategies
 		if(XHTML_NAMESPACE_URI_STRING.equals(sourceElement.getNamespaceURI())) {
 			//see if this is a referrer element, and get the attribute doing the referencing
 			final String referenceAttributeName = HTML_REFERENCE_ELEMENT_ATTRIBUTES.get(sourceElement.getLocalName());
 			if(referenceAttributeName != null) {
-				return relocateReferenceElement(context, sourceElement, referenceAttributeName, originalReferrerSourcePath, referenceGenerator);
+				return relocateReferenceElement(context, sourceElement, referenceAttributeName, originalReferrerSourcePath, referenceGenerator, ignoreInterpolation);
 			}
 		}
 
-		relocateChildElements(context, sourceElement, originalReferrerSourcePath, referenceGenerator);
+		relocateChildElements(context, sourceElement, originalReferrerSourcePath, referenceGenerator, ignoreInterpolation);
 
 		return List.of(sourceElement);
 	}
 
 	/**
 	 * Relocates child elements of an existing element by retargeting references relative to a new referrer path location.
-	 * @implSpec Each child element is replaced with the relocated elements returned from calling {@link #relocateElement(MummyContext, Element, Path, Function)}.
-	 *           If only the same element is returned, no replacement is made. If no element is returned, the source element is removed.
+	 * @implSpec Each child element is replaced with the relocated elements returned from calling
+	 *           {@link #relocateElement(MummyContext, Element, Path, Function, boolean)}. If only the same element is returned, no replacement is made. If no
+	 *           element is returned, the source element is removed.
 	 * @param context The context of static site generation.
 	 * @param sourceElement The source element the children of which to relocate.
 	 * @param originalReferrerSourcePath The absolute original path of the referrer, e.g. <code>…/foo/page.xhtml</code>.
 	 * @param referenceGenerator The function for generating a reference to the artifact indicated by the reference path resolved to the original path.
+	 * @param ignoreInterpolation <code>true</code> if any reference containing a MEXL interpolation should be ignored and left as is.
 	 * @throws IOException if there is an error relocating the child elements.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	protected void relocateChildElements(@Nonnull MummyContext context, @Nonnull final Element sourceElement, @Nonnull final Path originalReferrerSourcePath,
-			final Function<Artifact, URIPath> referenceGenerator) throws IOException, DOMException {
+			final Function<Artifact, URIPath> referenceGenerator, final boolean ignoreInterpolation) throws IOException, DOMException {
 		final NodeList childNodes = sourceElement.getChildNodes();
 		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength();) { //advance the index manually as needed
 			final Node childNode = childNodes.item(childNodeIndex);
@@ -1219,7 +1223,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				continue;
 			}
 			final Element childElement = (Element)childNode;
-			final List<Element> relocatedElements = relocateElement(context, childElement, originalReferrerSourcePath, referenceGenerator);
+			final List<Element> relocatedElements = relocateElement(context, childElement, originalReferrerSourcePath, referenceGenerator, ignoreInterpolation);
 			replaceChild(sourceElement, childElement, relocatedElements);
 			childNodeIndex += relocatedElements.size(); //manually advance the index based upon the replacement nodes
 		}
@@ -1236,17 +1240,21 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param referenceAttributeName The name of the reference attribute such a {@code href} to relocate.
 	 * @param originalReferrerSourcePath The absolute original path of the referrer, e.g. <code>…/foo/page.xhtml</code>.
 	 * @param referenceGenerator The function for generating a reference to the artifact indicated by the reference path resolved to the original path.
+	 * @param ignoreInterpolation <code>true</code> if any reference containing a MEXL interpolation should be ignored and left as is.
 	 * @return The relocated element(s), if any, to replace the source element.
 	 * @throws IOException if there is an error relocating the element.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 * @see #retargetResourceReference(MummyContext, URI, Path, Function)
 	 */
 	protected List<Element> relocateReferenceElement(@Nonnull MummyContext context, @Nonnull final Element referenceElement,
-			@Nonnull final String referenceAttributeName, @Nonnull final Path originalReferrerSourcePath, final Function<Artifact, URIPath> referenceGenerator)
-			throws IOException, DOMException {
+			@Nonnull final String referenceAttributeName, @Nonnull final Path originalReferrerSourcePath, final Function<Artifact, URIPath> referenceGenerator,
+			final boolean ignoreInterpolation) throws IOException, DOMException {
 		findAttributeNS(referenceElement, null, referenceAttributeName).ifPresent(referenceString -> {
 			getLogger().trace("  - found reference <{} {}=\"{}\" ...>", referenceElement.getNodeName(), referenceAttributeName, referenceString);
 			//TODO check for the empty string and do something appropriate
+			if(ignoreInterpolation && getGuiseMesh().getInterpolator().hasInterpolation(referenceString)) {
+				return;
+			}
 			final URI referenceURI;
 			try {
 				referenceURI = new URI(referenceString);

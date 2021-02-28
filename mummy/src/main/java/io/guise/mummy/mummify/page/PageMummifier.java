@@ -312,11 +312,12 @@ public interface PageMummifier extends Mummifier {
 	 * @param sourceDocument The source document to relocate.
 	 * @param originalReferrerSourcePath The absolute original path of the referrer, e.g. <code>…/foo/page.xhtml</code>.
 	 * @param referenceGenerator The function for generating a reference to the artifact indicated by the reference path resolved to the original path.
+	 * @param ignoreInterpolation <code>true</code> if any reference containing a MEXL interpolation should be ignored and left as is.
 	 * @return The relocated document, which may or may not be the same document supplied as input.
 	 * @throws IOException if there is an error relocating the document.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	public Document relocateDocument(@Nonnull MummyContext context, @Nonnull final Document sourceDocument, @Nonnull final Path originalReferrerSourcePath,
-			@Nonnull final Function<Artifact, URIPath> referenceGenerator) throws IOException, DOMException;
+			@Nonnull final Function<Artifact, URIPath> referenceGenerator, boolean ignoreInterpolation) throws IOException, DOMException;
 
 }
