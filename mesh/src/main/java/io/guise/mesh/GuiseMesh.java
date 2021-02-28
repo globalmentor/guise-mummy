@@ -94,7 +94,7 @@ public class GuiseMesh {
 	private final MeshInterpolator interpolator;
 
 	/** @return The strategy for interpolating strings. */
-	protected MeshInterpolator getInterpolator() {
+	public MeshInterpolator getInterpolator() {
 		return interpolator;
 	}
 

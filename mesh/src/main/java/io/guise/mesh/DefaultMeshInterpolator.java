@@ -41,6 +41,48 @@ public class DefaultMeshInterpolator implements MeshInterpolator {
 	/** Singleton shared instance. */
 	public static final DefaultMeshInterpolator INSTANCE = new DefaultMeshInterpolator();
 
+	@Override
+	public boolean hasInterpolation(@Nonnull final CharSequence text) throws MeshInterpolationException {
+		return hasInterpolation(text, LEFT_EXPRESSION_DELIMITER, RIGHT_EXPRESSION_DELIMITER);
+	}
+
+	/**
+	 * Determines if the given text has one or more expressions to interpolate. No evaluations are performed, and syntax is not guaranteed to be fully or even
+	 * partially validated.
+	 * @implSpec This current implementation only supports a left delimiter of exactly two characters and a right delimiter of exactly one character.
+	 * @implSpec This implementation does not support nested delimiters.
+	 * @implSpec This implementation does not fully support surrogate characters as expression delimiters.
+	 * @param text The text being considered for interpolation.
+	 * @param leftExpressionDelimiter The string demarcating the left side of an interpolation expression.
+	 * @param rightExpressionDelimiter The string demarcating the right side of an interpolation expression.
+	 * @return <code>true</code> if the text has expressions to be interpolated
+	 * @throws MeshInterpolationException if the interpolation syntax of the given text is incorrect.
+	 */
+	protected static boolean hasInterpolation(@Nonnull CharSequence text, final String leftExpressionDelimiter, final String rightExpressionDelimiter)
+			throws MeshInterpolationException {
+		checkArgument(leftExpressionDelimiter.length() == 2,
+				"Interpolation left expression delimiter `%s` not supported; currently only a left delimiter of exactly two characters is supported.",
+				leftExpressionDelimiter);
+		checkArgument(rightExpressionDelimiter.length() == 1,
+				"Interpolation right expression delimiter `%s` not supported; currently only a right delimiter of exactly one character is supported.",
+				leftExpressionDelimiter);
+		final char signalChar = leftExpressionDelimiter.charAt(0);
+		final char leftDelimiterChar = leftExpressionDelimiter.charAt(1);
+		final int length = text.length();
+		for(int index = 0; index < length;) {
+			final int signalIndex = indexOf(text, signalChar, index);
+			if(signalIndex == -1) { //if no signal was found
+				return false; //short-circuit
+			}
+			if(signalIndex == length - 1 || text.charAt(signalIndex + 1) != leftDelimiterChar) { //false signal (signal at end of string, or not followed by a delimiter)
+				index = signalIndex + 1;
+				continue;
+			}
+			return true;
+		}
+		return false; //no more characters
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * @implSpec To evaluate expressions this implementation delegates to {@link MexlEvaluator#findExpressionResult(MeshContext, CharSequence)} and uses the
@@ -68,7 +110,7 @@ public class DefaultMeshInterpolator implements MeshInterpolator {
 	 * @throws MexlException if there was an error parsing or otherwise processing an expression.
 	 */
 	protected static Optional<CharSequence> findInterpolation(@Nonnull final CharSequence text, final String leftExpressionDelimiter,
-			final String rightExpressionDelimiter, @Nonnull final Function<CharSequence, CharSequence> evaluator) throws MeshInterpolationException {
+			final String rightExpressionDelimiter, @Nonnull final Function<CharSequence, CharSequence> evaluator) throws MeshInterpolationException, MexlException {
 		checkArgument(leftExpressionDelimiter.length() == 2,
 				"Interpolation left expression delimiter `%s` not supported; currently only a left delimiter of exactly two characters is supported.",
 				leftExpressionDelimiter);
@@ -81,7 +123,6 @@ public class DefaultMeshInterpolator implements MeshInterpolator {
 		final char rightDelimiterChar = rightExpressionDelimiter.charAt(0);
 		StringBuilder interpolationBuilder = null; //we may not need to interpolate
 		final int length = text.length();
-		//		int index = 0; //start at the beginning of the character sequence
 		for(int index = 0; index < length;) {
 			final int signalIndex = indexOf(text, signalChar, index);
 			if(signalIndex == -1) { //if no signal was found

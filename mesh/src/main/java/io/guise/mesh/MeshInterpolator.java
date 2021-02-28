@@ -27,7 +27,24 @@ import javax.annotation.*;
 public interface MeshInterpolator {
 
 	/**
+	 * Determines if the given text has one or more expressions to interpolate. No evaluations are performed, and syntax is not guaranteed to be fully or even
+	 * partially validated.
+	 * <p>
+	 * The result of this method must be consistent with the presence of a result from {@link #findInterpolation(MeshContext, CharSequence, MexlEvaluator)} for
+	 * the same valid input text. For example, if {@link #findInterpolation(MeshContext, CharSequence, MexlEvaluator)} returns a value for which
+	 * {@link Optional#isPresent()} is <code>false</code>, this method must also return <code>false</code> for the same input text.
+	 * </p>
+	 * @param text The text being considered for interpolation.
+	 * @return <code>true</code> if the text has expressions to be interpolated
+	 * @throws MeshInterpolationException if the interpolation syntax of the given text is incorrect.
+	 */
+	public boolean hasInterpolation(@Nonnull CharSequence text) throws MeshInterpolationException;
+
+	/**
 	 * Interpolates the given text and returns the interpolated result if there was a change.
+	 * <p>
+	 * The presence of a result must be consistent with {@link #hasInterpolation(CharSequence)} for the same input text.
+	 * </p>
 	 * @param context The context of meshing.
 	 * @param text The text to interpolate.
 	 * @param evaluator The strategy for evaluating Mesh Expression Language (MEXL) expressions.
