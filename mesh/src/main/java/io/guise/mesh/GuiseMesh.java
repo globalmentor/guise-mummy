@@ -19,12 +19,14 @@ package io.guise.mesh;
 import static com.globalmentor.io.IO.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static java.util.Objects.*;
+import static java.util.function.Predicate.*;
 import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
+import java.util.regex.*;
 
 import javax.annotation.*;
 
@@ -63,6 +65,17 @@ public class GuiseMesh {
 
 	/** The attribute <code>mx:text</code> for text replacement. */
 	public static final NsName ATTRIBUTE_TEXT = NsName.of(NAMESPACE_STRING, "text");
+
+	//# attribute mutations
+
+	/**
+	 * The Mesh attribute name pattern for indicating attributes to mutate. The one matching group is the local name of the attribute to mutate, in no namespace.
+	 * @see #ATTRIBUTE_MUTATION_NAME_PATTERN_NAME_GROUP
+	 */
+	static final Pattern ATTRIBUTE_MUTATION_NAME_PATTERN = Pattern.compile("attr-([A-Za-z][\\w-]*)");
+
+	/** The matching group group for name of the attribute to mutate. */
+	static final int ATTRIBUTE_MUTATION_NAME_PATTERN_NAME_GROUP = 1;
 
 	//## attribute default values
 
@@ -180,24 +193,53 @@ public class GuiseMesh {
 		}
 
 		//TODO conditions
-		//TODO general attributes
-		//TODO specific attributes
+
+		//# attribute interpolation
+		final MeshInterpolator interpolator = getInterpolator();
+		final Iterator<Attr> attributeInterpolationIterator = attributesIterator(element);
+		while(attributeInterpolationIterator.hasNext()) {
+			final Attr attribute = attributeInterpolationIterator.next();
+			if(!NAMESPACE_STRING.equals(attribute.getNamespaceURI())) { //ignore mx: attributes
+				interpolator.findInterpolation(context, attribute.getValue(), evaluator).map(Object::toString).ifPresent(attribute::setValue);
+			}
+		}
+
+		//# attribute mutation
+		//## gather and remove attribute mutation definition attributes
+		Map<NsName, String> lazyAttributeUpdates = null; //unevaluated expressions keyed to attributes to mutate; lazily created in case there are no mutations
+		final Iterator<Attr> attributeMutationIterator = attributesIterator(element);
+		while(attributeMutationIterator.hasNext()) {
+			final Attr attribute = attributeMutationIterator.next();
+			if(NAMESPACE_STRING.equals(attribute.getNamespaceURI())) { //mx:
+				final Matcher attributeMutationMatcher = ATTRIBUTE_MUTATION_NAME_PATTERN.matcher(attribute.getLocalName());
+				if(attributeMutationMatcher.matches()) { //mx:attr-foo-bar
+					final String attrMutationLocalName = attributeMutationMatcher.group(ATTRIBUTE_MUTATION_NAME_PATTERN_NAME_GROUP);
+					final String attrMutationValue = attribute.getValue();
+					if(lazyAttributeUpdates == null) { //lazily create the map of attribute mutations
+						lazyAttributeUpdates = new HashMap<>();
+					}
+					lazyAttributeUpdates.put(NsName.of(attrMutationLocalName), attrMutationValue);
+					attributeMutationIterator.remove(); //remove the Mesh attribute mutation attribute
+				}
+			}
+		}
+		//## apply attribute mutations (apply separately so as not to interfere with attribute iteration)
+		if(lazyAttributeUpdates != null) {
+			lazyAttributeUpdates.forEach((name, expression) -> {
+				final Optional<Object> foundResult = evaluator.findExpressionResult(context, expression);
+				foundResult.filter(not(Boolean.FALSE::equals)).ifPresentOrElse(result -> {
+					//Boolean results use special XHTML values (or result in attribute removal)  
+					final String value = Boolean.TRUE.equals(result) ? name.getLocalName() : result.toString();
+					setAttribute(element, name, value);
+				}, () -> removeAttribute(element, name)); //if no result, or a result of `false`, remove attribute
+			});
+		}
 
 		//# text
 		exciseAttribute(element, ATTRIBUTE_TEXT).ifPresent(text -> { //mx:text
 			final Optional<Object> foundResult = evaluator.findExpressionResult(context, text);
 			element.setTextContent(foundResult.map(Object::toString).orElse(""));
 		});
-
-		//# attribute interpolation
-		final MeshInterpolator interpolator = getInterpolator();
-		final Iterator<Attr> attributeIterator = attributesIterator(element);
-		while(attributeIterator.hasNext()) {
-			final Attr attribute = attributeIterator.next();
-			if(!NAMESPACE_STRING.equals(attribute.getNamespaceURI())) { //ignore mx: attributes
-				interpolator.findInterpolation(context, attribute.getValue(), evaluator).map(Object::toString).ifPresent(attribute::setValue);
-			}
-		}
 
 		meshChildNodes(context, element);
 
