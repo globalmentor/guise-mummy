@@ -26,6 +26,7 @@ import static org.hamcrest.Matchers.*;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.*;
 
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.*;
@@ -38,6 +39,104 @@ import com.globalmentor.xml.spec.NsName;
  * @author Garret Wilson
  */
 public class GuiseMeshTest {
+
+	/**
+	 * @see GuiseMesh#ATTRIBUTE_MUTATION_NAME_PATTERN
+	 * @see GuiseMesh#ATTRIBUTE_MUTATION_NAME_PATTERN_NAME_GROUP
+	 */
+	@Test
+	void testAttributeMutationNamePattern() {
+		assertThat(GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN.matcher("").matches(), is(false));
+		assertThat(GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN.matcher("x").matches(), is(false));
+		assertThat(GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN.matcher("foo").matches(), is(false));
+		assertThat(GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN.matcher("attr").matches(), is(false));
+		assertThat(GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN.matcher("attr-").matches(), is(false));
+		assertThat(GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN.matcher("attr-9").matches(), is(false));
+		assertThat(GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN.matcher("attr-x").matches(), is(true));
+		assertThat(GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN.matcher("attr-x7").matches(), is(true));
+		assertThat(GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN.matcher("attr-foo").matches(), is(true));
+		assertThat(GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN.matcher("attr-foo5").matches(), is(true));
+		assertThat(GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN.matcher("attr-foo$").matches(), is(false));
+		assertThat(GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN.matcher("attr-fooBar").matches(), is(true));
+		assertThat(GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN.matcher("attr-foo-bar").matches(), is(true));
+		assertThat(GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN.matcher("attr-foo_bar").matches(), is(true));
+	}
+
+	/**
+	 * @see GuiseMesh#ATTRIBUTE_MUTATION_NAME_PATTERN
+	 * @see GuiseMesh#ATTRIBUTE_MUTATION_NAME_PATTERN_NAME_GROUP
+	 */
+	@Test
+	void testAttributeMutationNamePatternGroups() {
+		final Matcher matcher = GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN.matcher("attr-foo-bar");
+		assertThat(matcher.matches(), is(true));
+		assertThat(matcher.group(GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN_NAME_GROUP), is("foo-bar"));
+	}
+
+	/** <code>mx:attr-*</code> */
+	@Test
+	void testAttributeMutation() throws IOException {
+		final Document document = createXHTMLDocument("Test Document");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element h1Element = appendElement(bodyElement, ELEMENT_H(1), "Dummy Heading");
+		h1Element.setAttributeNS(null, ATTRIBUTE_TITLE, "Dummy Title");
+		setAttribute(h1Element, NsName.of(NAMESPACE_STRING, "attr-title"), "'Result: '+foo.bar");
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("foo", Map.of("bar", "Success"))), document);
+		assertThat(h1Element.getTextContent(), is("Dummy Heading"));
+		assertThat(h1Element.getAttributeNS(null, ATTRIBUTE_TITLE), is("Result: Success"));
+		assertThat(h1Element.hasAttributeNS(NAMESPACE_STRING, "attr-title"), is(false));
+		assertThat(new HtmlSerializer().serialize(document), is(
+				"<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test Document</title></head><body><h1 title=\"Result: Success\">Dummy Heading</h1></body></html>"));
+	}
+
+	/** <code>mx:attr-*</code> */
+	@Test
+	void verifyAttributeMutationNullRemovesAttribute() throws IOException {
+		final Document document = createXHTMLDocument("Test Document");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element h1Element = appendElement(bodyElement, ELEMENT_H(1), "Dummy Heading");
+		h1Element.setAttributeNS(null, ATTRIBUTE_TITLE, "Dummy Title");
+		//Object.class.getSuperclass() is guaranteed to return null as per the API
+		setAttribute(h1Element, NsName.of(NAMESPACE_STRING, "attr-title"), "foo.superclass");
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("foo", Object.class)), document);
+		assertThat(h1Element.getTextContent(), is("Dummy Heading"));
+		assertThat(h1Element.hasAttributeNS(null, ATTRIBUTE_TITLE), is(false));
+		assertThat(h1Element.hasAttributeNS(NAMESPACE_STRING, "attr-title"), is(false));
+		assertThat(new HtmlSerializer().serialize(document),
+				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test Document</title></head><body><h1>Dummy Heading</h1></body></html>"));
+	}
+
+	/** <code>mx:attr-*</code> */
+	@Test
+	void verifyAttributeMutationBooleanTrueSetsFlagValue() throws IOException {
+		final Document document = createXHTMLDocument("Test Document");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element h1Element = appendElement(bodyElement, ELEMENT_H(1), "Dummy Heading");
+		h1Element.setAttributeNS(null, "flag", "Dummy Flag");
+		setAttribute(h1Element, NsName.of(NAMESPACE_STRING, "attr-flag"), "foo");
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("foo", true)), document);
+		assertThat(h1Element.getTextContent(), is("Dummy Heading"));
+		assertThat(h1Element.getAttributeNS(null, "flag"), is("flag"));
+		assertThat(h1Element.hasAttributeNS(NAMESPACE_STRING, "attr-flag"), is(false));
+		assertThat(new HtmlSerializer().serialize(document),
+				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test Document</title></head><body><h1 flag>Dummy Heading</h1></body></html>"));
+	}
+
+	/** <code>mx:attr-*</code> */
+	@Test
+	void verifyAttributeMutationBooleanFalseRemovesAttribute() throws IOException {
+		final Document document = createXHTMLDocument("Test Document");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element h1Element = appendElement(bodyElement, ELEMENT_H(1), "Dummy Heading");
+		h1Element.setAttributeNS(null, "flag", "Dummy Flag");
+		setAttribute(h1Element, NsName.of(NAMESPACE_STRING, "attr-flag"), "foo");
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("foo", false)), document);
+		assertThat(h1Element.getTextContent(), is("Dummy Heading"));
+		assertThat(h1Element.hasAttributeNS(null, "flag"), is(false));
+		assertThat(h1Element.hasAttributeNS(NAMESPACE_STRING, "attr-flag"), is(false));
+		assertThat(new HtmlSerializer().serialize(document),
+				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test Document</title></head><body><h1>Dummy Heading</h1></body></html>"));
+	}
 
 	/** <code>mx:each</code> */
 	@Test
