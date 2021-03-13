@@ -170,7 +170,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * {@inheritDoc}
 	 * @implSpec This version changes the output file extension to {@value PageMummifier#PAGE_NAME_EXTENSION}, or leaves if off altogether if bare names were
 	 *           requested.
-	 * @see GuiseMummy#CONFIG_KEY_MUMMY_PAGE_NAMES_BARE
+	 * @see PageMummifier#CONFIG_KEY_MUMMY_PAGE_NAMES_BARE
 	 */
 	@Override
 	public String planArtifactTargetFilename(final MummyContext context, final String filename) {

@@ -47,6 +47,16 @@ import io.guise.mummy.mummify.Mummifier;
  */
 public interface PageMummifier extends Mummifier {
 
+	/** The configuration indicating <code>true</code> if extensions should be removed from page names (i.e. clean URLs) during mummification. */
+	public static final String CONFIG_KEY_MUMMY_PAGE_NAMES_BARE = "mummy.page.namesBare";
+
+	/**
+	 * The obsolete configuration indicating <code>true</code> if extensions should be removed from page names (i.e. clean URLs) during mummification.
+	 * @deprecated to be removed.
+	 */
+	@Deprecated
+	public static final String OBSOLETE_CONFIG_KEY_MUMMY_PAGE_NAMES_BARE = "mummy.pageNamesBare";
+
 	/** The standard Internet media types for generated pages: <code>text/html</code> in UTF-8. */
 	public static final ContentType PAGE_MEDIA_TYPE = HTML_MEDIA_TYPE.withCharset(UTF_8);
 

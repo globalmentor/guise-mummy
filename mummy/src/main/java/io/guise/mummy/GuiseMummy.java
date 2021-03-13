@@ -48,6 +48,7 @@ import io.guise.mummy.mummify.image.DefaultImageMummifier;
 import io.guise.mummy.mummify.image.ImageMummifier;
 import io.guise.mummy.mummify.page.HtmlPageMummifier;
 import io.guise.mummy.mummify.page.MarkdownPageMummifier;
+import io.guise.mummy.mummify.page.PageMummifier;
 import io.guise.mummy.mummify.page.XhtmlPageMummifier;
 import io.urf.turf.TurfSerializer;
 
@@ -189,7 +190,7 @@ public class GuiseMummy implements Clogged {
 	 * matching group. If there is a matching group and it provides a match, the artifact will be renamed to the value of the matched group. If there is no
 	 * matching group, the artifact will not have a separate asset name. In either case, the artifact may still be subject to other renaming rules, such as
 	 * extension removal for bare names.
-	 * @see #CONFIG_KEY_MUMMY_PAGE_NAMES_BARE
+	 * @see PageMummifier#CONFIG_KEY_MUMMY_PAGE_NAMES_BARE
 	 */
 	public static final String CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN = "mummy.assetNamePattern";
 	/**
@@ -199,8 +200,6 @@ public class GuiseMummy implements Clogged {
 	public static final String CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES = "mummy.collectionContentBaseNames";
 	/** The configuration for the base filename for navigation definition; defaults to <code>.navigation</code>. */
 	public static final String CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME = "mummy.navigationBaseName";
-	/** The configuration indicating <code>true</code> if extensions should be removed from page names (i.e. clean URLs) during mummification. */
-	public static final String CONFIG_KEY_MUMMY_PAGE_NAMES_BARE = "mummy.pageNamesBare";
 	/** The configuration for the base filename of a template; defaults to <code>.template</code>. */
 	public static final String CONFIG_KEY_MUMMY_TEMPLATE_BASE_NAME = "mummy.templateBaseName";
 	/**
@@ -213,7 +212,7 @@ public class GuiseMummy implements Clogged {
 	 * matching group. If there is a matching group and it provides a match, the artifact will be renamed to the value of the matched group. If there is no
 	 * matching group, the artifact will not have a separate unveiled name. In either case, the artifact may still be subject to other renaming rules, such as
 	 * extension removal for bare names.
-	 * @see #CONFIG_KEY_MUMMY_PAGE_NAMES_BARE
+	 * @see PageMummifier#CONFIG_KEY_MUMMY_PAGE_NAMES_BARE
 	 */
 	public static final String CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN = "mummy.veilNamePattern";
 
@@ -394,22 +393,44 @@ public class GuiseMummy implements Clogged {
 		final Context context = new Context(project, mummyConfiguration);
 
 		getLogger().debug("Mummification: {}", context.isFull() ? "full" : "incremental"); //TODO i18n
-		getLogger().debug("Configuration: page names bare = `{}`", context.getConfiguration().findBoolean(CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false));
+		getLogger().debug("Configuration: page names bare = `{}`",
+				context.getConfiguration().findBoolean(PageMummifier.CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false));
 
 		return context;
 	}
 
 	/**
+	 * The set of deprecated config keys which, if detected during validation, will generate a warning.
+	 * @apiNote These will probably eventually be relocated the mummifier API or to a system of plugins.
+	 */
+	private static final Set<String> DEPRECATED_CONFIG_KEYS = Set.of();
+
+	/**
+	 * The set of obsolete config keys which, if detected during validation, will generate an error.
+	 * @apiNote These will probably eventually be relocated the mummifier API or to a system of plugins.
+	 */
+	@SuppressWarnings("deprecation")
+	private static final Set<String> OBSOLETE_CONFIG_KEYS = Set.of(PageMummifier.OBSOLETE_CONFIG_KEY_MUMMY_PAGE_NAMES_BARE);
+
+	/**
 	 * Validate phase; checks directories and other settings.
+	 * @implSpec For each deprecated configuration key used, a warning will be generated. If an obsolete configuration key is used, a configuration exception will
+	 *           be thrown.
 	 * @param context The context of static site generation.
 	 * @throws IllegalArgumentException if the configured source directory does not exist or is not a directory.
 	 * @throws IllegalArgumentException if the configured source and target directories overlap.
+	 * @throws ConfigurationException if the configuration is invalid.
 	 * @throws IOException if there is an I/O error during validation.
 	 */
 	public void validate(@Nonnull final MummyContext context) throws IOException {
 		checkArgumentDirectory(context.getSiteSourceDirectory());
 		checkArgumentDisjoint(context.getSiteSourceDirectory(), context.getSiteTargetDirectory());
 		final Configuration configuration = context.getConfiguration();
+		DEPRECATED_CONFIG_KEYS.stream().filter(configuration::hasConfigurationValue)
+				.forEach(deprecatedConfigKey -> getLogger().warn("The configuration key `{}` is deprecated and may be removed in the future.", deprecatedConfigKey));
+		OBSOLETE_CONFIG_KEYS.stream().filter(configuration::hasConfigurationValue).findAny().ifPresent(obsoleteConfigKey -> {
+			throw new ConfigurationException(format("The configuration key `%s` is obsolete and must not be used.", obsoleteConfigKey));
+		});
 		//make sure all the configured domains resolve to FQDNs
 		findConfiguredDomain(configuration);
 		findConfiguredSiteDomain(configuration);

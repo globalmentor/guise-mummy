@@ -1,7 +1,9 @@
 *GuiseProject:
 
   mummy:
-!    pageNamesBare = true
+    page:
+!      namesBare = true
+    ;
   ;
 
   deploy:
