@@ -72,7 +72,7 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 	public static final double DEFAULT_COMPRESSION_QUALITY = 0.8;
 
 	/** @see #CONFIG_KEY_MUMMY_IMAGE_SCALE_MAX_LENGTH */
-	public static final int DEFAULT_SCALE_MAX_LENGTH = 2560;
+	public static final int DEFAULT_SCALE_MAX_LENGTH = 1920;
 
 	/** @see #CONFIG_KEY_MUMMY_IMAGE_PROCESS_THRESHOLD_FILE_SIZE */
 	public static final long DEFAULT_SCALE_THRESHOLD_FILE_SIZE = 800_000;
