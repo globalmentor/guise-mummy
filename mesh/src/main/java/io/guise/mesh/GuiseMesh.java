@@ -163,7 +163,8 @@ public class GuiseMesh {
 
 		//# iteration
 		final Optional<List<Element>> iteration = exciseAttribute(element, ATTRIBUTE_EACH) //mx:each
-				.flatMap(each -> evaluator.findExpressionResult(context, each)).map(throwingFunction(iterationSource -> {
+				.map(each -> evaluator.findExpressionResult(context, each)).map(foundResult -> foundResult.orElseGet(Collections::emptyList)) //consider a null/empty expression to be an empty iteration source
+				.map(throwingFunction(iterationSource -> {
 					try (final Closeable iterationSourceCleanup = toCloseable(iterationSource)) { //ensure the iteration source is closed, in case it uses resource e.g. a directory listing
 						final MeshIterator iterator;
 						try {
