@@ -26,6 +26,7 @@ import static org.hamcrest.Matchers.*;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.*;
 
 import org.junit.jupiter.api.Test;
@@ -187,6 +188,34 @@ public class GuiseMeshTest {
 			assertThat(new HtmlSerializer().serialize(document),
 					is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test</title></head><body><ul><li>foo</li><li>bar</li></ul></body></html>"));
 		}
+	}
+
+	/** <code>mx:each</code> */
+	@Test
+	void verifyMxEachEmptyIterableRemovesIterationElement() throws IOException {
+		final Document document = createXHTMLDocument("Test");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element ulElement = appendElement(bodyElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_UL));
+		final Element liElement = appendElement(ulElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI));
+		setAttribute(liElement, ATTRIBUTE_EACH.withPrefix(NAMESPACE_PREFIX), "list");
+		setAttribute(liElement, ATTRIBUTE_TEXT.withPrefix(NAMESPACE_PREFIX), DEFAULT_ITEM_VAR); //mx:text for updating value
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("list", List.of())), document);
+		assertThat(new HtmlSerializer().serialize(document),
+				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test</title></head><body><ul></ul></body></html>"));
+	}
+
+	/** <code>mx:each</code> */
+	@Test
+	void verifyMxEachNullExpressionResultRemovesIterationElement() throws IOException {
+		final Document document = createXHTMLDocument("Test");
+		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final Element ulElement = appendElement(bodyElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_UL));
+		final Element liElement = appendElement(ulElement, NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_LI));
+		setAttribute(liElement, ATTRIBUTE_EACH.withPrefix(NAMESPACE_PREFIX), "ref.get()");
+		setAttribute(liElement, ATTRIBUTE_TEXT.withPrefix(NAMESPACE_PREFIX), DEFAULT_ITEM_VAR); //mx:text for updating value
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("ref", new AtomicReference<>(null))), document);
+		assertThat(new HtmlSerializer().serialize(document),
+				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test</title></head><body><ul></ul></body></html>"));
 	}
 
 	/** <code>mx:each</code> */
