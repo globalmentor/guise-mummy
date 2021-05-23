@@ -38,7 +38,7 @@ public class XhtmlPageMummifier extends AbstractPageMummifier {
 
 	@Override
 	public Set<String> getSupportedFilenameExtensions() {
-		return Set.of(XHTML_NAME_EXTENSION);
+		return Set.of(XHTML_FILENAME_EXTENSION);
 	}
 
 	/**

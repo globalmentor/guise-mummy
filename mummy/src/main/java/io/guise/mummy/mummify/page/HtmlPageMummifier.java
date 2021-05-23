@@ -45,7 +45,7 @@ public class HtmlPageMummifier extends XhtmlPageMummifier {
 
 	@Override
 	public Set<String> getSupportedFilenameExtensions() {
-		return Set.of(HTML_NAME_EXTENSION, HTM_NAME_EXTENSION);
+		return Set.of(HTML_FILENAME_EXTENSION, HTM_FILENAME_EXTENSION);
 	}
 
 	/**

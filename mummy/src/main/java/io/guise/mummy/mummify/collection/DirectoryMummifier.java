@@ -150,7 +150,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 				return null;
 			}
 			final String phantomContentBaseName = collectionContentBaseNames.iterator().next(); //e.g. "index"
-			final String phantomContentSourceFilename = addExtension(phantomContentBaseName, HTML.XHTML_NAME_EXTENSION); //e.g. "index.xhtml"
+			final String phantomContentSourceFilename = addExtension(phantomContentBaseName, HTML.XHTML_FILENAME_EXTENSION); //e.g. "index.xhtml"
 			final Path phantomContentSourceFile = sourceDirectory.resolve(phantomContentSourceFilename);
 			final SourcePathMummifier phantomContentMummifier = context.findRegisteredMummifierForSourceFile(phantomContentSourceFile)
 					.orElseThrow(IllegalStateException::new); //TODO improve error

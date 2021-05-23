@@ -61,7 +61,7 @@ public interface PageMummifier extends Mummifier {
 	public static final ContentType PAGE_MEDIA_TYPE = HTML_MEDIA_TYPE.withCharset(UTF_8);
 
 	/** The extension to use for generated page filenames, unless bare names are enabled. */
-	public static String PAGE_NAME_EXTENSION = HTML_NAME_EXTENSION;
+	public static String PAGE_FILENAME_EXTENSION = HTML_FILENAME_EXTENSION;
 
 	/** The HTML {@code <meta>} name for indicating the instant of artifact generation. */
 	public static final String META_NAME_GENERATED_AT = "generated-at";

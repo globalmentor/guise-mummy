@@ -55,7 +55,7 @@ import io.urf.turf.TurfParser;
 public class NavigationManager implements Clogged {
 
 	/** The set of filename extensions for supported navigation files, in order of precedence. */
-	private static final Set<String> SUPPORTED_NAVIGATION_FILE_EXTENSIONS = Stream.of(TURF.FILENAME_EXTENSION, Text.LST_NAME_EXTENSION)
+	private static final Set<String> SUPPORTED_NAVIGATION_FILE_EXTENSIONS = Stream.of(TURF.FILENAME_EXTENSION, Text.LST_FILENAME_EXTENSION)
 			.collect(collectingAndThen(toCollection(LinkedHashSet::new), Collections::unmodifiableSet));
 
 	/**
@@ -174,7 +174,7 @@ public class NavigationManager implements Clogged {
 			throws IOException {
 		switch(findFilenameExtension(navigationFile)
 				.orElseThrow(() -> new IllegalArgumentException(String.format("Navigation file `%s` has no extension.", navigationFile)))) {
-			case Text.LST_NAME_EXTENSION:
+			case Text.LST_FILENAME_EXTENSION:
 				return loadNavigationFileList(context, artifact, navigationFile);
 			case TURF.FILENAME_EXTENSION:
 				return loadNavigationFileTurf(context, artifact, navigationFile);

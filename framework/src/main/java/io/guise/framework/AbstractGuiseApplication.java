@@ -571,7 +571,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		this.logDirectory = requireNonNull(logDirectory, "Log directory cannot be null.");
 		this.tempDirectory = requireNonNull(tempDirectory, "Temporary directory cannot be null.");
 		final DateFormat logFilenameDateFormat = new W3CDateFormat(W3CDateFormat.Style.DATE); //create a formatter for the log filename
-		final String logFilename = addExtension("application-" + logFilenameDateFormat.format(new Date()), Log.NAME_EXTENSION); //create a filename in the form "application-YYYY-MM-DD.log"
+		final String logFilename = addExtension("application-" + logFilenameDateFormat.format(new Date()), Log.FILENAME_EXTENSION); //create a filename in the form "application-YYYY-MM-DD.log"
 		final File logFile = new File(logDirectory, logFilename); //determine the log file for this application TODO create a custom log configuration that will use rolling log files
 		logConfiguration.setFile(logFile); //set the log file for our log configuration
 		logConfiguration.setStandardOutput(isDebug()); //if we are debugging, turn on logging to the standard output
@@ -1171,7 +1171,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		final File propertiesFile = new File(getHomeDirectory(), requireNonNull(propertiesPath, "Properties path cannot be null.")); //create the properties file object
 		final String extension = findNameExtension(propertiesFile).orElse(null); //get the extension of the properties file
 		final boolean isXML; //see if this is an XML file
-		if(XML.XML_NAME_EXTENSION.equals(extension)) { //if this is an XML file
+		if(XML.FILENAME_EXTENSION.equals(extension)) { //if this is an XML file
 			isXML = true; //indicate that we should load XML
 		} else if(PropertiesUtilities.PROPERTIES_NAME_EXTENSION.equals(extension)) { //if this is a properties file
 			isXML = false; //indicate that we should load normal properties

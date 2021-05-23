@@ -31,7 +31,6 @@ import static com.globalmentor.java.Java.*;
 import static com.globalmentor.model.Locales.*;
 import static com.globalmentor.net.URIs.*;
 import static com.globalmentor.util.PropertiesUtilities.*;
-import static com.globalmentor.xml.spec.XML.*;
 
 /**
  * Utilities for working with resource bundles.
@@ -54,7 +53,7 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 		TURF("turf"), //TODO bring back reference to definition constant
 
 		/** The resource bundle is serialized in an XML file. */
-		XML(XML_NAME_EXTENSION),
+		XML(com.globalmentor.xml.spec.XML.FILENAME_EXTENSION),
 
 		/** The resource bundle is serialized in a properties file. */
 		PROPERTIES(PROPERTIES_NAME_EXTENSION);

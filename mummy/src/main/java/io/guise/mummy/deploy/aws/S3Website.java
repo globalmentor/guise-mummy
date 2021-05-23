@@ -23,7 +23,7 @@ import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.net.URIs.*;
 import static io.guise.mummy.Artifact.*;
 import static io.guise.mummy.GuiseMummy.*;
-import static io.guise.mummy.mummify.page.PageMummifier.PAGE_NAME_EXTENSION;
+import static io.guise.mummy.mummify.page.PageMummifier.PAGE_FILENAME_EXTENSION;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
@@ -419,7 +419,7 @@ public class S3Website extends S3 {
 			if(!collectionContentBaseNames.isEmpty()) {
 				final String indexDocumentBaseName = collectionContentBaseNames.iterator().next(); //e.g. "index" (mummification should have normalized to use the first one)
 				final boolean isNameBare = configuration.findBoolean(PageMummifier.CONFIG_KEY_MUMMY_PAGE_NAMES_BARE).orElse(false);
-				final String indexDocumentSuffix = isNameBare ? indexDocumentBaseName : addExtension(indexDocumentBaseName, PAGE_NAME_EXTENSION);
+				final String indexDocumentSuffix = isNameBare ? indexDocumentBaseName : addExtension(indexDocumentBaseName, PAGE_FILENAME_EXTENSION);
 				final IndexDocument indexDocument = IndexDocument.builder().suffix(indexDocumentSuffix).build();
 				websiteConfigurationBuilder.indexDocument(indexDocument);
 			}
