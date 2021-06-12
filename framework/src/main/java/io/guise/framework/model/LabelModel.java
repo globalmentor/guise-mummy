@@ -18,7 +18,7 @@ package io.guise.framework.model;
 
 import java.net.URI;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import static com.globalmentor.java.Classes.*;
 
@@ -56,7 +56,7 @@ public interface LabelModel extends Model {
 	public void setLabel(final String newLabelText);
 
 	/** @return The content type of the label text. */
-	public ContentType getLabelContentType();
+	public MediaType getLabelContentType();
 
 	/**
 	 * Sets the content type of the label text. This is a bound property.
@@ -65,6 +65,6 @@ public interface LabelModel extends Model {
 	 * @throws IllegalArgumentException if the given content type is not a text content type.
 	 * @see #LABEL_CONTENT_TYPE_PROPERTY
 	 */
-	public void setLabelContentType(final ContentType newLabelTextContentType);
+	public void setLabelContentType(final MediaType newLabelTextContentType);
 
 }

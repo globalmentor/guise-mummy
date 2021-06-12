@@ -38,7 +38,7 @@ import javax.annotation.*;
 
 import com.globalmentor.html.spec.HTML;
 import com.globalmentor.io.Filenames;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.confound.config.*;
 import io.guise.mummy.*;
@@ -75,7 +75,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	 * @implSpec Directories have no media types of their own, so this version returns no media type.
 	 */
 	@Override
-	public Optional<ContentType> getArtifactMediaType(final MummyContext context, final Path sourcePath) throws IOException {
+	public Optional<MediaType> getArtifactMediaType(final MummyContext context, final Path sourcePath) throws IOException {
 		return Optional.empty();
 	}
 

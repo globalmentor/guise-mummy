@@ -20,7 +20,7 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.*;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.guise.framework.component.*;
 import io.guise.framework.model.*;
@@ -80,10 +80,10 @@ public class WebFileInputDepictor<C extends ResourceImportControl> extends Abstr
 		}
 		final Validator<ResourceImport> validator = component.getValidator(); //get the component's validator
 		if(validator instanceof ResourceImportValidator) { //if the validator is a resource import validator
-			final Set<ContentType> acceptedContentTypes = ((ResourceImportValidator)validator).getAcceptedContentTypes(); //get the accepted content types
+			final Set<MediaType> acceptedContentTypes = ((ResourceImportValidator)validator).getAcceptedContentTypes(); //get the accepted content types
 			if(acceptedContentTypes != null) { //if accepted content types are specified
 				final StringBuilder acceptStringBuilder = new StringBuilder(); //create a string builder for constructing the accept string
-				for(final ContentType contentType : acceptedContentTypes) { //for each accepted content type
+				for(final MediaType contentType : acceptedContentTypes) { //for each accepted content type
 					if(acceptStringBuilder.length() > 0) { //if this is not the first accepted content type
 						acceptStringBuilder.append(COMMA_CHAR); //separate the accepted content types
 					}

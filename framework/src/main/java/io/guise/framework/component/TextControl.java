@@ -21,7 +21,7 @@ import java.beans.PropertyVetoException;
 import static com.globalmentor.java.Classes.*;
 
 import com.globalmentor.io.*;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.guise.framework.component.transfer.*;
 import io.guise.framework.converter.*;
@@ -191,7 +191,7 @@ public class TextControl<V> extends AbstractTextControl<V> {
 		 */
 		@Override
 		public boolean canImportTransfer(final TextControl<?> component, final Transferable<?> transferable) {
-			return transferable.canTransfer(ContentType.of(ContentType.TEXT_PRIMARY_TYPE, ContentType.WILDCARD_SUBTYPE)); //we can import any text
+			return transferable.canTransfer(MediaType.of(MediaType.TEXT_PRIMARY_TYPE, MediaType.WILDCARD_SUBTYPE)); //we can import any text
 		}
 
 		/**
@@ -208,8 +208,8 @@ public class TextControl<V> extends AbstractTextControl<V> {
 				data = transferable.transfer(PLAIN_MEDIA_TYPE); //transfer the data
 				imported = true; //indicate that we transported data
 			} else { //otherwise, check for text/* types
-				for(final ContentType contentType : transferable.getContentTypes()) { //for each available content type
-					if(contentType.matches(ContentType.TEXT_PRIMARY_TYPE, ContentType.WILDCARD_SUBTYPE)) { //if this is a text content type
+				for(final MediaType contentType : transferable.getContentTypes()) { //for each available content type
+					if(contentType.matches(MediaType.TEXT_PRIMARY_TYPE, MediaType.WILDCARD_SUBTYPE)) { //if this is a text content type
 						data = transferable.transfer(contentType); //transfer the data
 						imported = true; //indicate that we transported data
 						break; //stop looking for a match
@@ -450,12 +450,12 @@ public class TextControl<V> extends AbstractTextControl<V> {
 		 * </p>
 		 */
 		@Override
-		public ContentType[] getContentTypes() {
-			return new ContentType[] { PLAIN_MEDIA_TYPE };
+		public MediaType[] getContentTypes() {
+			return new MediaType[] { PLAIN_MEDIA_TYPE };
 		}
 
 		@Override
-		public Object transfer(final ContentType contentType) {
+		public Object transfer(final MediaType contentType) {
 			if(contentType.hasBaseType(PLAIN_MEDIA_TYPE)) { //if they request the supported content type
 				return getSource().getText(); //return the current text
 			} else { //if we don't support this content type

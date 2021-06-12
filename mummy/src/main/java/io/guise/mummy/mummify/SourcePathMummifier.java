@@ -22,7 +22,7 @@ import java.util.*;
 
 import javax.annotation.*;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.guise.mummy.*;
 
@@ -59,7 +59,7 @@ public interface SourcePathMummifier extends Mummifier {
 	 * @return The target media type for the generated artifact, if known; will not be present if unknown or unsupported.
 	 * @throws IOException if there is an I/O error determining the media type.
 	 */
-	public Optional<ContentType> getArtifactMediaType(@Nonnull MummyContext context, @Nonnull final Path sourcePath) throws IOException;
+	public Optional<MediaType> getArtifactMediaType(@Nonnull MummyContext context, @Nonnull final Path sourcePath) throws IOException;
 
 	/**
 	 * Plans mummification of a source path supported by this mummifier.

@@ -23,7 +23,7 @@ import static java.util.Objects.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.text.Text;
 
 import io.guise.framework.input.*;
@@ -143,15 +143,15 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 	 * @see #getContent()
 	 * @see #getBasePlainLabel()
 	 * @see #setLabel(String)
-	 * @see #setLabelContentType(ContentType)
+	 * @see #setLabelContentType(MediaType)
 	 */
 	protected void updateLabel() {
 		final Component content = getContent(); //set the content, if any
 		final String label;
-		final ContentType labelContentType;
+		final MediaType labelContentType;
 		if(content != null) { //if we have content
 			final String contentLabel = content.getLabel(); //get the content label, if any
-			final ContentType contentLabelContentType = content.getLabelContentType(); //get the content label content type
+			final MediaType contentLabelContentType = content.getLabelContentType(); //get the content label content type
 			if(contentLabel == null || Text.PLAIN_MEDIA_TYPE.hasBaseType(contentLabelContentType) || contentLabel == null) { //if there is no content label or the content label is plain text, we can use plain text for the entire label
 				final String basePlainLabel = getBasePlainLabel(); //see if there is a base label
 				if(basePlainLabel != null || contentLabel != null) { //if we have a base label or content label

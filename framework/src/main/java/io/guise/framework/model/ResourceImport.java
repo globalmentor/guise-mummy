@@ -18,7 +18,7 @@ package io.guise.framework.model;
 
 import java.io.*;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 /**
  * An interface to a resource being imported, such as a web file upload. All resource access methods must be synchronized on the resource import instance.
@@ -40,7 +40,7 @@ public interface ResourceImport {
 	public String getSimpleName();
 
 	/** @return The content type of the resource to be imported, or <code>null</code> if the content type of the resource is not known. */
-	public ContentType getContentType();
+	public MediaType getContentType();
 
 	/** @return The length of the resource to be imported, or -1 if the length of the resource is not known. */
 	public long getContentLength();

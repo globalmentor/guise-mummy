@@ -19,7 +19,7 @@ package io.guise.framework.component.transfer;
 import static java.util.Objects.*;
 
 import com.globalmentor.io.*;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import static com.globalmentor.java.Classes.*;
 
@@ -50,7 +50,7 @@ public abstract class AbstractObjectTransferable<S> implements Transferable<S> {
 	private final Class<?>[] objectClasses;
 
 	/** The content types supported by this transferable. */
-	private final ContentType[] contentTypes;
+	private final MediaType[] contentTypes;
 
 	/**
 	 * Source and object esclass constructor.
@@ -62,20 +62,20 @@ public abstract class AbstractObjectTransferable<S> implements Transferable<S> {
 		this.source = requireNonNull(source, "Source cannot be null.");
 		this.objectClasses = requireNonNull(objectClasses, "Object classes cannot be null.");
 		final int objectClassCount = objectClasses.length; //find out how many object classes there are
-		contentTypes = new ContentType[objectClassCount]; //create an array of content types
+		contentTypes = new MediaType[objectClassCount]; //create an array of content types
 		for(int i = objectClassCount - 1; i >= 0; --i) { //for each object class
-			contentTypes[i] = getObjectContentType(objectClasses[i]); //create a content type for this object
+			contentTypes[i] = getObjectMediaType(objectClasses[i]); //create a content type for this object
 		}
 	}
 
 	/**
-	 * Determines the class this content type matches. This method matches a content type against the {@value ContentType#APPLICATION_PRIMARY_TYPE} primary type
-	 * and {@value ContentType#X_JAVA_OBJECT} subtype, with a "class" parameter indicating the given object class.
+	 * Determines the class this content type matches. This method matches a content type against the {@value MediaType#APPLICATION_PRIMARY_TYPE} primary type
+	 * and {@value MediaType#X_JAVA_OBJECT} subtype, with a "class" parameter indicating the given object class.
 	 * @param contentType The type of data requested, which may include wildcards.
 	 * @return The matching class, or <code>null</code> if no supported class matches the requested content type.
 	 */
-	protected Class<?> getClass(final ContentType contentType) {
-		if(contentType.matches(ContentType.APPLICATION_PRIMARY_TYPE, ContentType.X_JAVA_OBJECT)) { //if this is an application/x-java-object type
+	protected Class<?> getClass(final MediaType contentType) {
+		if(contentType.matches(MediaType.APPLICATION_PRIMARY_TYPE, MediaType.X_JAVA_OBJECT)) { //if this is an application/x-java-object type
 			final String className = contentType.getParameter("class"); //get the class parameter TODO use a constant
 			if(className != null) { //if a class name was given
 				for(final Class<?> objectClass : objectClasses) { //for each supported class
@@ -91,12 +91,12 @@ public abstract class AbstractObjectTransferable<S> implements Transferable<S> {
 	/**
 	 * {@inheritDoc}
 	 * <p>
-	 * This implementation matches a content type against the {@value ContentType#APPLICATION_PRIMARY_TYPE} primary type and {@value ContentType#X_JAVA_OBJECT}
+	 * This implementation matches a content type against the {@value MediaType#APPLICATION_PRIMARY_TYPE} primary type and {@value MediaType#X_JAVA_OBJECT}
 	 * subtype, with a "class" parameter indicating the given object class.
 	 * </p>
 	 */
 	@Override
-	public boolean canTransfer(final ContentType contentType) {
+	public boolean canTransfer(final MediaType contentType) {
 		return getClass(contentType) != null; //see if there is a class that matches
 	}
 
@@ -107,7 +107,7 @@ public abstract class AbstractObjectTransferable<S> implements Transferable<S> {
 	 * </p>
 	 */
 	@Override
-	public Object transfer(final ContentType contentType) {
+	public Object transfer(final MediaType contentType) {
 		final Class<?> objectClass = getClass(contentType); //return the class indicated by this content type
 		if(objectClass != null) { //if there is a class for this content type
 			return transfer(objectClass); //transfer based upon the class
@@ -123,7 +123,7 @@ public abstract class AbstractObjectTransferable<S> implements Transferable<S> {
 	 * </p>
 	 */
 	@Override
-	public ContentType[] getContentTypes() {
+	public MediaType[] getContentTypes() {
 		return contentTypes; //return the available content types
 	}
 }

@@ -18,7 +18,7 @@ package io.guise.framework.component;
 
 import java.beans.PropertyVetoException;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.text.Text;
 
 import io.guise.framework.event.*;
@@ -82,7 +82,7 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	 * @throws NullPointerException if the given content type and/or options is <code>null</code>.
 	 * @throws IllegalArgumentException if the given content type is not a text content type. #see {@link TextBox}
 	 */
-	public NotificationOptionDialogFrame(final String text, final ContentType textContentType, final Notification.Option... options) {
+	public NotificationOptionDialogFrame(final String text, final MediaType textContentType, final Notification.Option... options) {
 		this(new TextBox(text, textContentType), options); //create a dialog using a Text component created from the given text and content type
 	}
 

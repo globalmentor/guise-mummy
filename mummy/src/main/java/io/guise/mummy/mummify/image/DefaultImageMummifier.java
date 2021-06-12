@@ -43,7 +43,7 @@ import javax.imageio.stream.*;
 import com.globalmentor.awt.geom.ImmutableDimension2D;
 import com.globalmentor.io.Images;
 import com.globalmentor.java.Objects;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.confound.config.Configuration;
 import io.guise.mummy.*;
@@ -113,7 +113,7 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 		final long imageScaleThresholdSize = context.getConfiguration().findLong(CONFIG_KEY_MUMMY_IMAGE_PROCESS_THRESHOLD_FILE_SIZE)
 				.orElse(DEFAULT_SCALE_THRESHOLD_FILE_SIZE);
 		if(artifact.getSourceSize(context) > imageScaleThresholdSize) { //if the size of the image source file goes over our threshold for scaling
-			final boolean isImageJpeg = artifact.getResourceDescription().findPropertyValue(Content.TYPE_PROPERTY_TAG).flatMap(Objects.asInstance(ContentType.class))
+			final boolean isImageJpeg = artifact.getResourceDescription().findPropertyValue(Content.TYPE_PROPERTY_TAG).flatMap(Objects.asInstance(MediaType.class))
 					.<Boolean>map(Images.JPEG_MEDIA_TYPE::hasBaseType).orElse(false);
 			final boolean isKeepProcessMetadata = false; //discard all metadata during processing for all images (but add back a tiny bit later if we can) 
 			final boolean isPostProcessWriteMetadataSupported = isImageJpeg && !isKeepProcessMetadata; //if we are discarding metadata during processing, write some basic metadata later for JPEG images

@@ -20,7 +20,7 @@ import static java.util.Objects.*;
 
 import static com.globalmentor.text.Text.*;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.beans.*;
 import com.globalmentor.event.EventListenerManager;
 
@@ -50,7 +50,7 @@ public abstract class AbstractModel extends BoundPropertyObject implements Model
 	 * @throws NullPointerException if the given text and/or content type is <code>null</code>.
 	 * @throws IllegalArgumentException if the given content type is not a text content type.
 	 */
-	public static String getPlainText(final String text, final ContentType contentType) { //TODO del or move
+	public static String getPlainText(final String text, final MediaType contentType) { //TODO del or move
 		requireNonNull(text, "Text cannot be null");
 		requireNonNull(contentType, "Content Type cannot be null.");
 		if(!isText(contentType)) { //if the new content type is not a text content type

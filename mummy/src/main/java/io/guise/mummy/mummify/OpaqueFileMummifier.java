@@ -26,7 +26,7 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.Map.Entry;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.guise.mummy.*;
 
@@ -47,7 +47,7 @@ public class OpaqueFileMummifier extends AbstractFileMummifier {
 	 * @implSpec This version returns no media type, because no media type is known for opaque files.
 	 */
 	@Override
-	public Optional<ContentType> getArtifactMediaType(final MummyContext context, final Path sourcePath) throws IOException {
+	public Optional<MediaType> getArtifactMediaType(final MummyContext context, final Path sourcePath) throws IOException {
 		return Optional.empty();
 	}
 

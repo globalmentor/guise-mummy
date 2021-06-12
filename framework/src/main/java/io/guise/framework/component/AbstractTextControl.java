@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 import static java.util.Objects.*;
 
 import com.globalmentor.java.Objects;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.text.Text;
 
 import io.guise.framework.GuiseSession;
@@ -201,10 +201,10 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V> {
 	}
 
 	/** The content type of the value. */
-	private ContentType valueContentType;
+	private MediaType valueContentType;
 
 	/** @return The content type of the value. */
-	public ContentType getValueContentType() {
+	public MediaType getValueContentType() {
 		return valueContentType;
 	}
 
@@ -215,10 +215,10 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V> {
 	 * @throws IllegalArgumentException if the given content type is not a text content type.
 	 * @see #VALUE_CONTENT_TYPE_PROPERTY
 	 */
-	public void setValueContentType(final ContentType newValueContentType) {
+	public void setValueContentType(final MediaType newValueContentType) {
 		requireNonNull(newValueContentType, "Content type cannot be null.");
 		if(valueContentType != newValueContentType) { //if the value is really changing
-			final ContentType oldValueContentType = valueContentType; //get the old value
+			final MediaType oldValueContentType = valueContentType; //get the old value
 			if(!isText(newValueContentType)) { //if the new content type is not a text content type
 				throw new IllegalArgumentException("Content type " + newValueContentType + " is not a text content type.");
 			}

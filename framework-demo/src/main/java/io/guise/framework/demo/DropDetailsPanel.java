@@ -19,7 +19,7 @@ package io.guise.framework.demo;
 import java.beans.PropertyVetoException;
 import java.net.URI;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.guise.framework.component.*;
 import io.guise.framework.component.layout.*;
@@ -101,7 +101,7 @@ public class DropDetailsPanel extends LayoutPanel {
 					newContent.append(oldContent); //add the old content
 				}
 				newContent.append("Drop Source: ").append(transferable.getSource().getClass().getName()).append('\n');
-				for(final ContentType contentType : transferable.getContentTypes()) { //for each content type
+				for(final MediaType contentType : transferable.getContentTypes()) { //for each content type
 					newContent.append("* Drop Content Type: ").append(contentType).append('\n');
 					newContent.append("  Drop Data: ").append(transferable.transfer(contentType)).append('\n'); //actually transfer the data
 				}

@@ -19,7 +19,7 @@ package io.guise.framework.platform.web;
 import java.io.IOException;
 import java.net.URI;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.net.HTTP;
 
 import io.guise.framework.GuiseSession;
@@ -36,7 +36,7 @@ import static com.globalmentor.net.URIs.*;
 public class WebFlashDepictor<C extends Flash> extends AbstractSimpleWebComponentDepictor<C> { //TODO fix to work with new Microsoft activation process; see http://www.jeroenwijering.com/?item=embedding_flash and http://blog.deconcept.com/swfobject/
 
 	/** The media type for Flash objects. */
-	public static final ContentType FLASH_MEDIA_TYPE = ContentType.of(ContentType.APPLICATION_PRIMARY_TYPE, "x-shockwave-flash"); //TODO move to Flash class
+	public static final MediaType FLASH_MEDIA_TYPE = MediaType.of(MediaType.APPLICATION_PRIMARY_TYPE, "x-shockwave-flash"); //TODO move to Flash class
 
 	/**
 	 * The "allowScriptAccess" parameter.

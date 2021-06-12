@@ -23,7 +23,7 @@ import static com.globalmentor.text.Text.*;
 import java.net.URI;
 
 import com.globalmentor.java.Objects;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.text.Text;
 
 /**
@@ -67,18 +67,18 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel {
 	}
 
 	/** The content type of the label text. */
-	private ContentType labelContentType = Text.PLAIN_MEDIA_TYPE;
+	private MediaType labelContentType = Text.PLAIN_MEDIA_TYPE;
 
 	@Override
-	public ContentType getLabelContentType() {
+	public MediaType getLabelContentType() {
 		return labelContentType;
 	}
 
 	@Override
-	public void setLabelContentType(final ContentType newLabelTextContentType) {
+	public void setLabelContentType(final MediaType newLabelTextContentType) {
 		requireNonNull(newLabelTextContentType, "Content type cannot be null.");
 		if(labelContentType != newLabelTextContentType) { //if the value is really changing
-			final ContentType oldLabelTextContentType = labelContentType; //get the old value
+			final MediaType oldLabelTextContentType = labelContentType; //get the old value
 			if(!isText(newLabelTextContentType)) { //if the new content type is not a text content type
 				throw new IllegalArgumentException("Content type " + newLabelTextContentType + " is not a text content type.");
 			}

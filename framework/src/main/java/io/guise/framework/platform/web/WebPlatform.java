@@ -21,7 +21,7 @@ import java.util.Queue;
 
 import static com.globalmentor.xml.spec.XML.*;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.net.URIPath;
 
 import io.guise.framework.GuiseApplication;
@@ -50,12 +50,12 @@ public interface WebPlatform extends Platform {
 	public static final String GUISE_VERSION_URI_QUERY_PARAMETER = "guiseVersion";
 
 	/** The media type of a Guise AJAX request, <code>application/x-guise-ajax-request</code>. */
-	public static final ContentType GUISE_AJAX_REQUEST_MEDIA_TYPE = ContentType.of(ContentType.APPLICATION_PRIMARY_TYPE,
-			ContentType.SUBTYPE_EXTENSION_PREFIX + "guise-ajax-request" + ContentType.SUBTYPE_SUFFIX_DELIMITER_CHAR + XML_SUBTYPE_SUFFIX);
+	public static final MediaType GUISE_AJAX_REQUEST_MEDIA_TYPE = MediaType.of(MediaType.APPLICATION_PRIMARY_TYPE,
+			MediaType.SUBTYPE_EXTENSION_PREFIX + "guise-ajax-request" + MediaType.SUBTYPE_SUFFIX_DELIMITER_CHAR + XML_SUBTYPE_SUFFIX);
 
 	/** The media type of a Guise AJAX response, <code>application/x-guise-ajax-response</code>. */
-	public static final ContentType GUISE_AJAX_RESPONSE_MEDIA_TYPE = ContentType.of(ContentType.APPLICATION_PRIMARY_TYPE,
-			ContentType.SUBTYPE_EXTENSION_PREFIX + "guise-ajax-response" + ContentType.SUBTYPE_SUFFIX_DELIMITER_CHAR + XML_SUBTYPE_SUFFIX);
+	public static final MediaType GUISE_AJAX_RESPONSE_MEDIA_TYPE = MediaType.of(MediaType.APPLICATION_PRIMARY_TYPE,
+			MediaType.SUBTYPE_EXTENSION_PREFIX + "guise-ajax-response" + MediaType.SUBTYPE_SUFFIX_DELIMITER_CHAR + XML_SUBTYPE_SUFFIX);
 
 	/** The types of JavaScript-based HTML editors available. */
 	public enum HTMLEditor {

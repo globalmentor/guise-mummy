@@ -16,7 +16,7 @@
 
 package io.guise.framework.component.transfer;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 /**
  * An object that can be transferred, such as between components using drag and drop.
@@ -29,14 +29,14 @@ public interface Transferable<S> {
 	public S getSource();
 
 	/** @return The content types available for this transfer. */
-	public ContentType[] getContentTypes();
+	public MediaType[] getContentTypes();
 
 	/**
 	 * Determines whether this transferable can transfer data with the given content type.
 	 * @param contentType The type of data requested, which may include wildcards.
 	 * @return <code>true</code> if this object can transfer data with the requested content type.
 	 */
-	public boolean canTransfer(final ContentType contentType);
+	public boolean canTransfer(final MediaType contentType);
 
 	/**
 	 * Transfers data using the given content type.
@@ -44,7 +44,7 @@ public interface Transferable<S> {
 	 * @return The transferred data, which may be <code>null</code>.
 	 * @throws IllegalArgumentException if the given content type is not supported.
 	 */
-	public Object transfer(final ContentType contentType);
+	public Object transfer(final MediaType contentType);
 
 	/**
 	 * Transfers data of the given class.

@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 import javax.annotation.*;
 
 import com.globalmentor.io.Filenames;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.urf.vocab.content.Content;
 
@@ -88,7 +88,7 @@ public abstract class BaseArtifactQuery implements ArtifactQuery {
 	 */
 	@Override
 	public ArtifactQuery filterContentType(final CharSequence contentTypeMatch) {
-		addFilter(artifact -> artifact.getResourceDescription().findPropertyValue(Content.TYPE_PROPERTY_TAG).flatMap(asInstance(ContentType.class))
+		addFilter(artifact -> artifact.getResourceDescription().findPropertyValue(Content.TYPE_PROPERTY_TAG).flatMap(asInstance(MediaType.class))
 				.map(mediaType -> mediaType.matches(contentTypeMatch)).orElse(false));
 		return this;
 	}

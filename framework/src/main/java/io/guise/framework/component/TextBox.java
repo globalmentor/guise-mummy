@@ -18,7 +18,7 @@ package io.guise.framework.component;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.text.Text;
 
 import io.guise.framework.component.layout.*;
@@ -100,7 +100,7 @@ public class TextBox extends AbstractContainer implements TextModel, SectionComp
 	 * @throws NullPointerException if the given content type is <code>null</code>.
 	 * @throws IllegalArgumentException if the given content type is not a text content type.
 	 */
-	public TextBox(final String text, final ContentType textContentType) {
+	public TextBox(final String text, final MediaType textContentType) {
 		this(new DefaultTextModel(text, textContentType)); //construct the class with a default text model using the given values
 	}
 
@@ -129,12 +129,12 @@ public class TextBox extends AbstractContainer implements TextModel, SectionComp
 	}
 
 	@Override
-	public ContentType getTextContentType() {
+	public MediaType getTextContentType() {
 		return getTextModel().getTextContentType();
 	}
 
 	@Override
-	public void setTextContentType(final ContentType newTextContentType) {
+	public void setTextContentType(final MediaType newTextContentType) {
 		getTextModel().setTextContentType(newTextContentType);
 	}
 

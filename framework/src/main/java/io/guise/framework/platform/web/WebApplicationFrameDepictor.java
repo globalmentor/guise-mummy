@@ -21,7 +21,7 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.util.*;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.net.URIPath;
 
 import static com.globalmentor.collections.Lists.*;
@@ -400,7 +400,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_FORM); //<xhtml:form>
 		depictContext.writeAttribute(null, ATTRIBUTE_ID, WebApplicationFrameDepictor.getFormID(component.getSession().getApplicationFrame())); //write the form ID in the HTML id attribute 
 		depictContext.writeAttribute(null, ELEMENT_FORM_ATTRIBUTE_METHOD, FORM_METHOD_POST); //method="post"
-		final ContentType encodingType = hasResourceImportControl(component) ? MULTIPART_FORM_DATA_MEDIA_TYPE : APPLICATION_X_WWW_FORM_URLENCODED_MEDIA_TYPE; //if we have a file upload component, use a multipart form data content type; otherwise, use the default
+		final MediaType encodingType = hasResourceImportControl(component) ? MULTIPART_FORM_DATA_MEDIA_TYPE : APPLICATION_X_WWW_FORM_URLENCODED_MEDIA_TYPE; //if we have a file upload component, use a multipart form data content type; otherwise, use the default
 		depictContext.writeAttribute(null, ELEMENT_FORM_ATTRIBUTE_ENCTYPE, encodingType.toString()); //enctype="application/x-www-form-urlencoded" (default) or "multipart/form-data" (for file uploads)
 		depictContext.writeAttribute(null, ELEMENT_FORM_ATTRIBUTE_ACTION, depictContext.getDepictionURI().getRawPath()); //action="navigationURIPath" (submit to same path)
 		writeStyleAttribute(getBodyStyles()); //write the component's body styles

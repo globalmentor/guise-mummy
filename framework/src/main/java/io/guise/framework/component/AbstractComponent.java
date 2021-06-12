@@ -31,7 +31,7 @@ import static com.globalmentor.java.Arrays.*;
 import com.globalmentor.event.*;
 import com.globalmentor.java.*;
 import com.globalmentor.java.Objects;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.util.*;
 
 import io.guise.framework.*;
@@ -142,12 +142,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	}
 
 	@Override
-	public ContentType getLabelContentType() {
+	public MediaType getLabelContentType() {
 		return getInfoModel().getLabelContentType();
 	}
 
 	@Override
-	public void setLabelContentType(final ContentType newLabelTextContentType) {
+	public void setLabelContentType(final MediaType newLabelTextContentType) {
 		getInfoModel().setLabelContentType(newLabelTextContentType);
 	}
 
@@ -162,12 +162,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	}
 
 	@Override
-	public ContentType getDescriptionContentType() {
+	public MediaType getDescriptionContentType() {
 		return getInfoModel().getDescriptionContentType();
 	}
 
 	@Override
-	public void setDescriptionContentType(final ContentType newDescriptionContentType) {
+	public void setDescriptionContentType(final MediaType newDescriptionContentType) {
 		getInfoModel().setDescriptionContentType(newDescriptionContentType);
 	}
 
@@ -182,12 +182,12 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	}
 
 	@Override
-	public ContentType getInfoContentType() {
+	public MediaType getInfoContentType() {
 		return getInfoModel().getInfoContentType();
 	}
 
 	@Override
-	public void setInfoContentType(final ContentType newInfoContentType) {
+	public void setInfoContentType(final MediaType newInfoContentType) {
 		getInfoModel().setInfoContentType(newInfoContentType);
 	}
 

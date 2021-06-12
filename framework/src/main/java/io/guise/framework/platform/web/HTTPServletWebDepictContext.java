@@ -24,7 +24,7 @@ import static java.util.Objects.*;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.servlet.http.HTTPServlets;
 import com.globalmentor.text.Text;
 import com.globalmentor.xml.spec.NsQualifiedName;
@@ -69,7 +69,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext {
 	}
 
 	/** The current content type of the output. */
-	private ContentType outputContentType = ContentType.of(ContentType.TEXT_PRIMARY_TYPE, Text.PLAIN_SUBTYPE); //default to text/plain
+	private MediaType outputContentType = MediaType.of(MediaType.TEXT_PRIMARY_TYPE, Text.PLAIN_SUBTYPE); //default to text/plain
 
 	/** The qualified name to use for the attribute hash attribute. */
 	private final NsQualifiedName attributeHashAttributeQualifiedName;
@@ -114,8 +114,8 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext {
 		attributeHashAttributeQualifiedName = new NsQualifiedName(GUISE_ML_NAMESPACE_URI, getQualifiedName(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_ATTRIBUTE_HASH));
 		contentHashAttributeQualifiedName = new NsQualifiedName(GUISE_ML_NAMESPACE_URI, getQualifiedName(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_CONTENT_HASH));
 		setHashAttributesGenerated(true); //always generate hash attributes
-		final ContentType defaultContentType = ContentType.of(outputContentType.getPrimaryType(), outputContentType.getSubType(),
-				ContentType.Parameter.of(ContentType.CHARSET_PARAMETER, UTF_8.name())); //default to text/plain encoded in UTF-8
+		final MediaType defaultContentType = MediaType.of(outputContentType.getPrimaryType(), outputContentType.getSubType(),
+				MediaType.Parameter.of(MediaType.CHARSET_PARAMETER, UTF_8.name())); //default to text/plain encoded in UTF-8
 		response.setContentType(defaultContentType.toString()); //initialize the default content type and encoding
 		HTTPServlets.setContentLanguage(response, session.getLocale()); //set the response content language
 	}
@@ -126,7 +126,7 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext {
 	}
 
 	@Override
-	public ContentType getOutputContentType() {
+	public MediaType getOutputContentType() {
 		return outputContentType;
 	}
 
@@ -137,10 +137,10 @@ public class HTTPServletWebDepictContext extends AbstractWebDepictContext {
 	 * </p>
 	 */
 	@Override
-	public void setOutputContentType(final ContentType contentType) {
+	public void setOutputContentType(final MediaType contentType) {
 		//TODO change to really just replace one parameter, instead of removing all others
-		this.outputContentType = ContentType.of(contentType.getPrimaryType(), contentType.getSubType(),
-				ContentType.Parameter.of(ContentType.CHARSET_PARAMETER, getOutputCharset().name()));
+		this.outputContentType = MediaType.of(contentType.getPrimaryType(), contentType.getSubType(),
+				MediaType.Parameter.of(MediaType.CHARSET_PARAMETER, getOutputCharset().name()));
 		getResponse().setContentType(this.outputContentType.toString()); //set the content type of the response, including the current character set
 	}
 

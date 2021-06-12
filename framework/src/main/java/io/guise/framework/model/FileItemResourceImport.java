@@ -20,7 +20,7 @@ import java.io.*;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.net.URIs;
 
 import org.apache.commons.fileupload.FileItem;
@@ -41,7 +41,7 @@ public class FileItemResourceImport implements ResourceImport {
 	}
 
 	/** The content type of the resource to be imported. */
-	private final ContentType contentType;
+	private final MediaType contentType;
 
 	/** The simple name of the resource, or <code>null</code> if the name is not known. */
 	private final String simpleName;
@@ -61,7 +61,7 @@ public class FileItemResourceImport implements ResourceImport {
 	 */
 	public FileItemResourceImport(final FileItem fileItem) {
 		this.fileItem = requireNonNull(fileItem, "File item cannot be null.");
-		contentType = ContentType.parse(fileItem.getContentType()); //create a content type object from the file item
+		contentType = MediaType.parse(fileItem.getContentType()); //create a content type object from the file item
 		String name = fileItem.getName(); //get the name of the item
 		if(name != null) { //if there is a filename
 			name = URIs.getName(name); //make sure it is only a filename and not a complete path TODO verify that the relevant browsers including path information use forward slashes
@@ -80,7 +80,7 @@ public class FileItemResourceImport implements ResourceImport {
 	}
 
 	@Override
-	public ContentType getContentType() {
+	public MediaType getContentType() {
 		return contentType; //return the pre-made content type
 	}
 
@@ -119,7 +119,7 @@ public class FileItemResourceImport implements ResourceImport {
 			stringBuilder.append(' '); //separate the information
 			stringBuilder.append(name); //append the name
 		}
-		final ContentType contentType = getContentType(); //get the content type
+		final MediaType contentType = getContentType(); //get the content type
 		if(contentType != null) { //if a content type is given
 			stringBuilder.append(' '); //separate the information
 			stringBuilder.append('(').append(contentType).append(')'); //(contentType)

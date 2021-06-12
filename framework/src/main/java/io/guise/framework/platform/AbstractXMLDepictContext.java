@@ -25,7 +25,7 @@ import static java.util.Objects.*;
 
 import com.globalmentor.java.Objects;
 import com.globalmentor.java.Strings;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.xml.XMLNamespacePrefixManager;
 import com.globalmentor.xml.spec.NsQualifiedName;
 
@@ -304,7 +304,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	}
 
 	@Override
-	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, final ContentType contentType)
+	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, final MediaType contentType)
 			throws IOException {
 		writeDocType(writeXMLDeclaration, namespaceURI, localName, null, null, requireNonNull(contentType, "Content type must be provided in this context."));
 	}
@@ -316,10 +316,10 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 
 	@Override
 	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, String publicID, String systemID,
-			ContentType contentType) throws IOException {
+			MediaType contentType) throws IOException {
 		if(contentType == null) { //if no content type was provided
 			if(publicID != null) { //if there is a document type public ID
-				contentType = getContentTypeForPublicID(publicID); //get the content type for this doctype public ID
+				contentType = getMediaTypeForPublicID(publicID); //get the content type for this doctype public ID
 			}
 			if(contentType == null) { //if we still couldn't find a content type
 				contentType = MEDIA_TYPE; //use the generic "text/xml" content type

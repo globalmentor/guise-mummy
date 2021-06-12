@@ -33,7 +33,7 @@ import static com.globalmentor.servlet.http.HTTPServlets.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.event.ProgressListener;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.net.URIPath;
 
 import io.guise.framework.Bookmark;
@@ -103,7 +103,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 		final Number userAgentVersionNumber = asInstance(userAgentProperties.get(USER_AGENT_VERSION_NUMBER_PROPERTY), Number.class).orElse(null); //get the user agent version number, if any
 		final int[] userAgentVersionNumbers = (int[])userAgentProperties.get(USER_AGENT_VERSION_NUMBERS_PROPERTY); //get the user agent version numbers, if any TODO check why we can't use asArrayInstance() with Integer.TYPE
 		final WebUserAgentProduct.Brand userAgentBrand = userAgentName != null ? WebUserAgentProduct.Brand.getBrand(userAgentName) : null; //get the specific brand of user agent if it's one we recognize
-		final ContentType[] clientAcceptedContentTypes = getAcceptedContentTypes(httpRequest); //return the user agent accepted content types from the request
+		final MediaType[] clientAcceptedContentTypes = getAcceptedContentTypes(httpRequest); //return the user agent accepted content types from the request
 		final Locale[] clientAcceptedLanguages = getAcceptedLanguages(httpRequest); //return the user agent accepted languages from the request
 		this.clientProduct = new DefaultWebUserAgentProduct(userAgentID, userAgentBrand, userAgentName, userAgentVersion,
 				userAgentVersionNumber != null ? userAgentVersionNumber.doubleValue() : Double.NaN, userAgentVersionNumbers,

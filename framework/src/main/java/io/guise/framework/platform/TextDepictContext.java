@@ -19,7 +19,7 @@ package io.guise.framework.platform;
 import java.io.*;
 import java.nio.charset.Charset;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 /**
  * Encapsulation of text information related to the current depiction. Text is collected in a {@link StringBuilder} until it is ready to be depicted. The text
@@ -79,13 +79,13 @@ public interface TextDepictContext extends DepictContext {
 	public Charset getOutputCharset();
 
 	/** @return The current content type of the text output. */
-	public ContentType getOutputContentType();
+	public MediaType getOutputContentType();
 
 	/**
 	 * Sets the content type of the text output.
 	 * @param contentType The content type of the text output.
 	 */
-	public void setOutputContentType(final ContentType contentType);
+	public void setOutputContentType(final MediaType contentType);
 
 	/**
 	 * Writes literal text with no encoding. All writing by the controller should use this method.

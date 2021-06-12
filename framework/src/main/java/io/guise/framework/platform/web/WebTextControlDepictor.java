@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.guise.framework.component.*;
 import io.guise.framework.converter.*;
@@ -46,7 +46,7 @@ import static io.guise.framework.platform.web.WebPlatform.*;
 public class WebTextControlDepictor<V, C extends TextControl<V>> extends AbstractDecoratedWebComponentDepictor<C> {
 
 	/** The media type for XStandard objects. */
-	public static final ContentType XSTANDARD_MEDIA_TYPE = ContentType.of(ContentType.APPLICATION_PRIMARY_TYPE, "x-xstandard");
+	public static final MediaType XSTANDARD_MEDIA_TYPE = MediaType.of(MediaType.APPLICATION_PRIMARY_TYPE, "x-xstandard");
 
 	/** The XStandard class ID. */
 	public static final String XSTANDARD_CLASS_ID = "clsid:0EED7206-1661-11D7-84A3-00606744831D";
@@ -200,7 +200,7 @@ public class WebTextControlDepictor<V, C extends TextControl<V>> extends Abstrac
 			depictContext.writeAttribute(null, ELEMENT_TEXTAREA_ATTRIBUTE_WRAP, lineWrap ? TEXTAREA_WRAP_SOFT : TEXTAREA_WRAP_OFF); //wrap="soft|off"
 			final boolean multiline = component.isMultiline(); //see if we should allow multiple lines of input
 			depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ELEMENT_TEXTAREA_ATTRIBUTE_MULTILINE, Boolean.toString(multiline)); //guise:multiline="true|false"
-			final ContentType valueContentType = component.getValueContentType(); //get the content type of the value
+			final MediaType valueContentType = component.getValueContentType(); //get the content type of the value
 			depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_CONTENT_TYPE, valueContentType.toBaseTypeString()); //guise:contentType="valueContentType"
 			if(isHTML(valueContentType)) { //if the content is HTML
 				depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_PATCH_TYPE, ATTRIBUTE_PATCH_TYPE_NONE); //don't do any patching on the text area itself; rely on events instead

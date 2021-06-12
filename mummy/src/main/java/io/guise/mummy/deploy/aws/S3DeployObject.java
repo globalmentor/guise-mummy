@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.urf.URF.Handle;
 import io.urf.vocab.content.Content;
@@ -63,7 +63,7 @@ public interface S3DeployObject {
 
 	/**
 	 * Returns the full Internet media type of the object to be deployed for the purposes of S3.
-	 * @apiNote If a suitable content type cannot be determined, this method returns the string form of {@link ContentType#APPLICATION_OCTET_STREAM_MEDIA_TYPE}.
+	 * @apiNote If a suitable content type cannot be determined, this method returns the string form of {@link MediaType#APPLICATION_OCTET_STREAM_MEDIA_TYPE}.
 	 * @return The content type of the object as a string for deployment to S3.
 	 */
 	public String getContentType();

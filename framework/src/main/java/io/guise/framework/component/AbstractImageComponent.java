@@ -24,7 +24,7 @@ import static com.globalmentor.java.Arrays.*;
 import static com.globalmentor.net.URIs.*;
 
 import com.globalmentor.io.*;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.net.URIs;
 
 import io.guise.framework.component.transfer.*;
@@ -104,12 +104,12 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 		 * </p>
 		 */
 		@Override
-		public ContentType[] getContentTypes() {
-			return new ContentType[] {URI_LIST_MEDIA_TYPE, getSource().getLabelContentType()};
+		public MediaType[] getContentTypes() {
+			return new MediaType[] {URI_LIST_MEDIA_TYPE, getSource().getLabelContentType()};
 		}
 
 		@Override
-		public Object transfer(final ContentType contentType) {
+		public Object transfer(final MediaType contentType) {
 			final ImageComponent image = getSource(); //get the image
 			if(contentType.hasBaseType(URI_LIST_MEDIA_TYPE)) { //if this is a text/uri-list type
 				final URI imageURI = image.getImageURI(); //get the image URI

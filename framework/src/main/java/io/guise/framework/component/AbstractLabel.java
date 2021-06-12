@@ -16,7 +16,7 @@
 
 package io.guise.framework.component;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.guise.framework.component.transfer.*;
 import io.guise.framework.model.*;
@@ -79,12 +79,12 @@ public abstract class AbstractLabel extends AbstractComponent implements LabelCo
 		 * </p>
 		 */
 		@Override
-		public ContentType[] getContentTypes() {
+		public MediaType[] getContentTypes() {
 			return createArray(getSource().getLabelContentType());
 		}
 
 		@Override
-		public Object transfer(final ContentType contentType) {
+		public Object transfer(final MediaType contentType) {
 			final LabelComponent source = getSource(); //get the source of the transfer
 			if(contentType.hasBaseType(source.getLabelContentType())) { //if we have the content type requested
 				final String label = source.getLabel(); //get the label

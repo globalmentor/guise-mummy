@@ -50,7 +50,7 @@ import com.drew.metadata.exif.*;
 import com.drew.metadata.iptc.*;
 import com.drew.metadata.xmp.XmpDirectory;
 import com.globalmentor.io.*;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.time.TimeZones;
 import com.globalmentor.vocab.dcmi.DCMES;
 
@@ -71,10 +71,10 @@ import io.urf.model.UrfResourceDescription;
  */
 public abstract class BaseImageMummifier extends AbstractFileMummifier implements ImageMummifier {
 
-	private final Set<ContentType> supportedMediaTypes;
+	private final Set<MediaType> supportedMediaTypes;
 
 	/** @return The image media types supported by this mummifier. */
-	protected Set<ContentType> getSupportedMediaTypes() {
+	protected Set<MediaType> getSupportedMediaTypes() {
 		return supportedMediaTypes;
 	}
 
@@ -94,7 +94,7 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	 * Constructor.
 	 * @param supportedMediaTypes The supported image media types; only base types (i.e. without parameters) are supported).
 	 */
-	public BaseImageMummifier(@Nonnull final Set<ContentType> supportedMediaTypes) {
+	public BaseImageMummifier(@Nonnull final Set<MediaType> supportedMediaTypes) {
 		this.supportedMediaTypes = Set.copyOf(supportedMediaTypes);
 		this.supportedFilenameExtensions = Images.MEDIA_TYPES_BY_FILENAME_EXTENSION.entrySet().stream()
 				.filter(entry -> this.supportedMediaTypes.contains(entry.getValue())).map(Map.Entry::getKey).collect(toUnmodifiableSet());
@@ -106,7 +106,7 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	 * @throws IllegalArgumentException if the file of the source file is not supported.
 	 */
 	@Override
-	public Optional<ContentType> getArtifactMediaType(final MummyContext context, final Path sourceFile) throws IOException {
+	public Optional<MediaType> getArtifactMediaType(final MummyContext context, final Path sourceFile) throws IOException {
 		return findFilenameExtension(sourceFile).map(Filenames.Extensions::normalize).filter(getSupportedFilenameExtensions()::contains)
 				.map(MEDIA_TYPES_BY_FILENAME_EXTENSION::get); //the media type filename extensions are already in normal form
 	}

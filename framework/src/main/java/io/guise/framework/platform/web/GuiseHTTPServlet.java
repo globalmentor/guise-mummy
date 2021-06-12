@@ -506,7 +506,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		Log.trace("servicing Guise request with request", guiseRequest);
 		final WebPlatform guisePlatform = (WebPlatform)guiseSession.getPlatform(); //get the web platform
 		final URI requestURI = guiseRequest.getDepictURI(); //get the request URI
-		final ContentType contentType = guiseRequest.getRequestContentType(); //get the request content type
+		final MediaType contentType = guiseRequest.getRequestContentType(); //get the request content type
 		final URIPath path = guiseRequest.getNavigationPath(); //get the path
 		final Bookmark bookmark = guiseRequest.getBookmark(); //get the bookmark, if any
 		final URI referrerURI = guiseRequest.getReferrerURI(); //get the referrer URI, if any
@@ -574,8 +574,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 								final UrfObject resourceDescription = new UrfObject(); //create a new resource description
 								final String itemContentTypeString = fileItemStream.getContentType(); //get the item content type, if any
 								if(itemContentTypeString != null) { //if we know the item's content type
-									final ContentType itemContentType = ContentType.parse(itemContentTypeString);
-									if(!ContentType.APPLICATION_OCTET_STREAM_MEDIA_TYPE.hasBaseType(itemContentType)) { //if the content type is not just a generic "bunch of bytes" content type
+									final MediaType itemContentType = MediaType.parse(itemContentTypeString);
+									if(!MediaType.APPLICATION_OCTET_STREAM_MEDIA_TYPE.hasBaseType(itemContentType)) { //if the content type is not just a generic "bunch of bytes" content type
 										resourceDescription.setPropertyValue(Content.TYPE_PROPERTY_TAG, itemContentType); //set the resource's content type
 									}
 								}
@@ -663,7 +663,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		Log.trace("servicing Guise request with request", guiseRequest);
 		final WebPlatform guisePlatform = (WebPlatform)guiseSession.getPlatform(); //get the web platform
 		final URI requestURI = guiseRequest.getDepictURI(); //get the request URI
-		final ContentType contentType = guiseRequest.getRequestContentType(); //get the request content type
+		final MediaType contentType = guiseRequest.getRequestContentType(); //get the request content type
 		final URIPath path = guiseRequest.getNavigationPath(); //get the path
 		final Bookmark bookmark = guiseRequest.getBookmark(); //get the bookmark, if any
 		final URI referrerURI = guiseRequest.getReferrerURI(); //get the referrer URI, if any
@@ -788,7 +788,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 								final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
 				*/
 				final URI referrerURI = guiseRequest.getReferrerURI(); //get the referrer URI, if any
-				final ContentType contentType = guiseRequest.getRequestContentType(); //get the request content type
+				final MediaType contentType = guiseRequest.getRequestContentType(); //get the request content type
 				//see if there is non-Guise HTTP POST data, and if so, set that bookmark navigation temporarily
 				//a non-Guise form HTTP POST, get the servlet parameters (which will include the URL query information)
 				if(POST_METHOD.equals(guiseRequest.getHTTPServletRequest().getMethod()) && contentType != null
@@ -2086,9 +2086,9 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		 * @return The full content type of the resource with any parameters, or <code>null</code> if the content type could not be determined.
 		 * @throws IOException if there is an error getting the type of the resource.
 		 */
-		public ContentType getContentType(final HttpServletRequest request) throws IOException {
+		public MediaType getContentType(final HttpServletRequest request) throws IOException {
 			//TODO move to new URF utility methods
-			final ContentType contentType = ContentType.class.cast(getResourceDescription().findPropertyValue(Content.TYPE_PROPERTY_TAG).orElse(null)); //get the content type, if any
+			final MediaType contentType = MediaType.class.cast(getResourceDescription().findPropertyValue(Content.TYPE_PROPERTY_TAG).orElse(null)); //get the content type, if any
 			if(contentType != null) { //if a content type was indicated
 				final Charset charset = Charset.class.cast(getResourceDescription().findPropertyValue(Content.CHARSET_PROPERTY_TAG).orElse(null)); //get the charset, if any
 				if(charset != null) { //if a charset was specified

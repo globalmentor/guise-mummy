@@ -20,7 +20,7 @@ import java.util.*;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.guise.framework.platform.AbstractBrandedProduct;
 
@@ -33,26 +33,26 @@ import static com.globalmentor.net.HTTP.*;
 public class DefaultWebUserAgentProduct extends AbstractBrandedProduct<WebUserAgentProduct.Brand> implements WebUserAgentProduct {
 
 	/** The content types accepted by the client. */
-	private final Iterable<ContentType> acceptedContentTypes;
+	private final Iterable<MediaType> acceptedContentTypes;
 
 	@Override
-	public Iterable<ContentType> getAcceptedContentTypes() {
+	public Iterable<MediaType> getAcceptedContentTypes() {
 		return acceptedContentTypes;
 	}
 
 	@Override
-	public boolean isAcceptedContentType(final ContentType contentType) {
+	public boolean isAcceptedContentType(final MediaType contentType) {
 		return isAcceptedContentType(contentType, true); //check accepted content types, matching wildcards
 	}
 
 	@Override
-	public boolean isAcceptedContentType(final ContentType contentType, final boolean matchWildcards) {
-		final Iterator<ContentType> contentTypeIterator = getAcceptedContentTypes().iterator(); //get an iterator to the accepted content types
+	public boolean isAcceptedContentType(final MediaType contentType, final boolean matchWildcards) {
+		final Iterator<MediaType> contentTypeIterator = getAcceptedContentTypes().iterator(); //get an iterator to the accepted content types
 		if(!contentTypeIterator.hasNext()) { //if no content types are listed as being accepted, then everything is accepted
 			return true; //this content type (and all other content types) is accepted
 		}
 		do { //for each content type
-			final ContentType acceptedContentType = contentTypeIterator.next(); //get the next accepted content type
+			final MediaType acceptedContentType = contentTypeIterator.next(); //get the next accepted content type
 			if(matchWildcards || acceptedContentType.toBaseTypeString().indexOf(WILDCARD_CHAR) < 0) { //only match wildcards if we were asked to
 				if(contentType.hasBaseType(acceptedContentType)) { //if our content type matches an accepted content type (make sure we match to the accepted content type, which can have wildcards)
 					return true; //show that we found a match
@@ -87,7 +87,7 @@ public class DefaultWebUserAgentProduct extends AbstractBrandedProduct<WebUserAg
 	 * @throws NullPointerException if the given ID, name, accepted content types, and/or accepted languages is <code>null</code>.
 	 */
 	public DefaultWebUserAgentProduct(final String id, final WebUserAgentProduct.Brand brand, final String name, final String version,
-			final double versionNumber, final int[] versionNumbers, final Iterable<ContentType> acceptedContentTypes, final Iterable<Locale> acceptedLanguages) {
+			final double versionNumber, final int[] versionNumbers, final Iterable<MediaType> acceptedContentTypes, final Iterable<Locale> acceptedLanguages) {
 		super(id, brand, name, version, versionNumber, versionNumbers); //construct the parent class
 		this.acceptedContentTypes = requireNonNull(acceptedContentTypes, "Accepted content types cannot be null.");
 		this.acceptedLanguages = requireNonNull(acceptedLanguages, "Accepted languages cannot be null.");

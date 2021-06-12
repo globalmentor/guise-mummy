@@ -16,7 +16,7 @@
 
 package io.guise.framework.model;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import static com.globalmentor.java.Classes.*;
 
@@ -46,7 +46,7 @@ public interface InfoModel extends LabelModel {
 	public void setDescription(final String newDescription);
 
 	/** @return The content type of the description text. */
-	public ContentType getDescriptionContentType();
+	public MediaType getDescriptionContentType();
 
 	/**
 	 * Sets the content type of the description text. This is a bound property.
@@ -55,7 +55,7 @@ public interface InfoModel extends LabelModel {
 	 * @throws IllegalArgumentException if the given content type is not a text content type.
 	 * @see #DESCRIPTION_CONTENT_TYPE_PROPERTY
 	 */
-	public void setDescriptionContentType(final ContentType newDescriptionContentType);
+	public void setDescriptionContentType(final MediaType newDescriptionContentType);
 
 	/** @return The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information. */
 	public String getInfo();
@@ -68,7 +68,7 @@ public interface InfoModel extends LabelModel {
 	public void setInfo(final String newInfo);
 
 	/** @return The content type of the advisory information text. */
-	public ContentType getInfoContentType();
+	public MediaType getInfoContentType();
 
 	/**
 	 * Sets the content type of the advisory information text. This is a bound property.
@@ -77,6 +77,6 @@ public interface InfoModel extends LabelModel {
 	 * @throws IllegalArgumentException if the given content type is not a text content type.
 	 * @see #INFO_CONTENT_TYPE_PROPERTY
 	 */
-	public void setInfoContentType(final ContentType newInfoContentType);
+	public void setInfoContentType(final MediaType newInfoContentType);
 
 }

@@ -22,7 +22,7 @@ import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.text.Text.*;
 
 import com.globalmentor.java.Objects;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.text.Text;
 
 /**
@@ -67,10 +67,10 @@ public class Message extends AbstractComponent //TODO del component if not neede
 	}
 
 	/** The content type of the message text. */
-	private ContentType messageContentType = Text.PLAIN_MEDIA_TYPE;
+	private MediaType messageContentType = Text.PLAIN_MEDIA_TYPE;
 
 	/** @return The content type of the message text. */
-	public ContentType getMessageContentType() {
+	public MediaType getMessageContentType() {
 		return messageContentType;
 	}
 
@@ -81,10 +81,10 @@ public class Message extends AbstractComponent //TODO del component if not neede
 	 * @throws IllegalArgumentException if the given content type is not a text content type.
 	 * @see #MESSAGE_CONTENT_TYPE_PROPERTY
 	 */
-	public void setMessageContentType(final ContentType newMessageContentType) {
+	public void setMessageContentType(final MediaType newMessageContentType) {
 		requireNonNull(newMessageContentType, "Content type cannot be null.");
 		if(messageContentType != newMessageContentType) { //if the value is really changing
-			final ContentType oldMessageContentType = messageContentType; //get the old value
+			final MediaType oldMessageContentType = messageContentType; //get the old value
 			if(!isText(newMessageContentType)) { //if the new content type is not a text content type
 				throw new IllegalArgumentException("Content type " + newMessageContentType + " is not a text content type.");
 			}

@@ -18,7 +18,7 @@ package io.guise.framework.component.transfer;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import static com.globalmentor.java.Classes.*;
 
@@ -44,8 +44,8 @@ public abstract class AbstractTransferable<S> implements Transferable<S> {
 	 * </p>
 	 */
 	@Override
-	public boolean canTransfer(final ContentType contentType) {
-		for(final ContentType transferContentType : getContentTypes()) { //for each content type
+	public boolean canTransfer(final MediaType contentType) {
+		for(final MediaType transferContentType : getContentTypes()) { //for each content type
 			if(contentType.hasBaseType(transferContentType)) { //if this content type matches
 				return true; //indicate that we found a match
 			}
@@ -56,12 +56,12 @@ public abstract class AbstractTransferable<S> implements Transferable<S> {
 	/**
 	 * {@inheritDoc}
 	 * <p>
-	 * This implementation delegates to {@link #transfer(ContentType)}.
+	 * This implementation delegates to {@link #transfer(MediaType)}.
 	 * </p>
 	 */
 	@Override
 	public <T> T transfer(final Class<T> objectClass) {
-		return objectClass.cast(transfer(getObjectContentType(objectClass))); //transfer the object based upon the content type and cast it to the class type
+		return objectClass.cast(transfer(getObjectMediaType(objectClass))); //transfer the object based upon the content type and cast it to the class type
 	}
 
 	/**

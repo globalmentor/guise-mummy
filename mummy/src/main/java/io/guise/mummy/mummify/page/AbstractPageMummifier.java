@@ -189,7 +189,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @see #PAGE_MEDIA_TYPE
 	 */
 	@Override
-	public Optional<ContentType> getArtifactMediaType(final MummyContext context, final Path sourcePath) throws IOException {
+	public Optional<MediaType> getArtifactMediaType(final MummyContext context, final Path sourcePath) throws IOException {
 		return Optional.of(PAGE_MEDIA_TYPE);
 	}
 

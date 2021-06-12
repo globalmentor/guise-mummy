@@ -23,7 +23,7 @@ import java.net.URI;
 import static java.util.Objects.*;
 
 import com.globalmentor.java.Objects;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.text.Text;
 
 import io.guise.framework.model.*;
@@ -87,18 +87,18 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	}
 
 	/** The content type of the label text. */
-	private ContentType labelContentType = Text.PLAIN_MEDIA_TYPE;
+	private MediaType labelContentType = Text.PLAIN_MEDIA_TYPE;
 
 	@Override
-	public ContentType getLabelContentType() {
+	public MediaType getLabelContentType() {
 		return labelContentType;
 	}
 
 	@Override
-	public void setLabelContentType(final ContentType newLabelTextContentType) {
+	public void setLabelContentType(final MediaType newLabelTextContentType) {
 		requireNonNull(newLabelTextContentType, "Content type cannot be null.");
 		if(labelContentType != newLabelTextContentType) { //if the value is really changing
-			final ContentType oldLabelTextContentType = labelContentType; //get the old value
+			final MediaType oldLabelTextContentType = labelContentType; //get the old value
 			if(!isText(newLabelTextContentType)) { //if the new content type is not a text content type
 				throw new IllegalArgumentException("Content type " + newLabelTextContentType + " is not a text content type.");
 			}
@@ -125,18 +125,18 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	}
 
 	/** The content type of the description text. */
-	private ContentType descriptionContentType = Text.PLAIN_MEDIA_TYPE;
+	private MediaType descriptionContentType = Text.PLAIN_MEDIA_TYPE;
 
 	@Override
-	public ContentType getDescriptionContentType() {
+	public MediaType getDescriptionContentType() {
 		return descriptionContentType;
 	}
 
 	@Override
-	public void setDescriptionContentType(final ContentType newDescriptionContentType) {
+	public void setDescriptionContentType(final MediaType newDescriptionContentType) {
 		requireNonNull(newDescriptionContentType, "Content type cannot be null.");
 		if(descriptionContentType != newDescriptionContentType) { //if the value is really changing
-			final ContentType oldDescriptionContentType = descriptionContentType; //get the old value
+			final MediaType oldDescriptionContentType = descriptionContentType; //get the old value
 			if(!isText(newDescriptionContentType)) { //if the new content type is not a text content type
 				throw new IllegalArgumentException("Content type " + newDescriptionContentType + " is not a text content type.");
 			}
@@ -163,18 +163,18 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	}
 
 	/** The content type of the advisory information text. */
-	private ContentType infoContentType = Text.PLAIN_MEDIA_TYPE;
+	private MediaType infoContentType = Text.PLAIN_MEDIA_TYPE;
 
 	@Override
-	public ContentType getInfoContentType() {
+	public MediaType getInfoContentType() {
 		return infoContentType;
 	}
 
 	@Override
-	public void setInfoContentType(final ContentType newInfoContentType) {
+	public void setInfoContentType(final MediaType newInfoContentType) {
 		requireNonNull(newInfoContentType, "Content type cannot be null.");
 		if(infoContentType != newInfoContentType) { //if the value is really changing
-			final ContentType oldInfoContentType = infoContentType; //get the old value
+			final MediaType oldInfoContentType = infoContentType; //get the old value
 			if(!isText(newInfoContentType)) { //if the new content type is not a text content type
 				throw new IllegalArgumentException("Content type " + newInfoContentType + " is not a text content type.");
 			}

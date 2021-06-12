@@ -20,7 +20,7 @@ import static java.util.Objects.*;
 
 import java.net.URI;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.guise.framework.model.*;
 
@@ -113,12 +113,12 @@ public class CardConstraints extends ControlConstraints implements InfoModel, Di
 	}
 
 	@Override
-	public ContentType getLabelContentType() {
+	public MediaType getLabelContentType() {
 		return getInfoModel().getLabelContentType();
 	}
 
 	@Override
-	public void setLabelContentType(final ContentType newLabelTextContentType) {
+	public void setLabelContentType(final MediaType newLabelTextContentType) {
 		getInfoModel().setLabelContentType(newLabelTextContentType);
 	}
 
@@ -133,12 +133,12 @@ public class CardConstraints extends ControlConstraints implements InfoModel, Di
 	}
 
 	@Override
-	public ContentType getDescriptionContentType() {
+	public MediaType getDescriptionContentType() {
 		return getInfoModel().getDescriptionContentType();
 	}
 
 	@Override
-	public void setDescriptionContentType(final ContentType newDescriptionContentType) {
+	public void setDescriptionContentType(final MediaType newDescriptionContentType) {
 		getInfoModel().setDescriptionContentType(newDescriptionContentType);
 	}
 
@@ -153,12 +153,12 @@ public class CardConstraints extends ControlConstraints implements InfoModel, Di
 	}
 
 	@Override
-	public ContentType getInfoContentType() {
+	public MediaType getInfoContentType() {
 		return getInfoModel().getInfoContentType();
 	}
 
 	@Override
-	public void setInfoContentType(final ContentType newInfoContentType) {
+	public void setInfoContentType(final MediaType newInfoContentType) {
 		getInfoModel().setInfoContentType(newInfoContentType);
 	}
 

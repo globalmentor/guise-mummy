@@ -23,7 +23,7 @@ import java.util.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.text.Text;
 
 import io.guise.framework.Guise;
@@ -151,10 +151,10 @@ public class Notification extends DefaultLabelModel {
 	}
 
 	/** The content type of the message text. */
-	private final ContentType messageContentType;
+	private final MediaType messageContentType;
 
 	/** @return The content type of the message text. */
-	public ContentType getMessageContentType() {
+	public MediaType getMessageContentType() {
 		return messageContentType;
 	}
 
@@ -221,7 +221,7 @@ public class Notification extends DefaultLabelModel {
 	 * @throws NullPointerException if the given message, severity, and/or options is <code>null</code>.
 	 * @throws IllegalArgumentException if the given content type is not a text content type.
 	 */
-	public Notification(final String message, final ContentType messageContentType, final Option... options) {
+	public Notification(final String message, final MediaType messageContentType, final Option... options) {
 		this(message, messageContentType, Severity.INFO, options); //construct the notification with INFO severity
 	}
 
@@ -234,7 +234,7 @@ public class Notification extends DefaultLabelModel {
 	 * @throws NullPointerException if the given message, severity, and/or options is <code>null</code>.
 	 * @throws IllegalArgumentException if the given content type is not a text content type.
 	 */
-	public Notification(final String message, final ContentType messageContentType, final Severity severity, final Option... options) {
+	public Notification(final String message, final MediaType messageContentType, final Severity severity, final Option... options) {
 		this(message, messageContentType, severity, null, options); //construct the notification with no error
 	}
 
@@ -248,7 +248,7 @@ public class Notification extends DefaultLabelModel {
 	 * @throws NullPointerException if the given message and/or options is <code>null</code>.
 	 * @throws IllegalArgumentException if the given content type is not a text content type.
 	 */
-	public Notification(final String message, final ContentType messageContentType, final Severity severity, final Throwable error, final Option... options) {
+	public Notification(final String message, final MediaType messageContentType, final Severity severity, final Throwable error, final Option... options) {
 		this.severity = requireNonNull(severity, "A severity must be specified.");
 		this.message = requireNonNull(message, "A message must be specified.");
 		if(!isText(messageContentType)) { //if the new content type is not a text content type

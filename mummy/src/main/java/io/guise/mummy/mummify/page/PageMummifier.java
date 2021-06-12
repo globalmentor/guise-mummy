@@ -32,7 +32,7 @@ import javax.annotation.*;
 
 import org.w3c.dom.*;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.xml.spec.NsName;
 
@@ -58,7 +58,7 @@ public interface PageMummifier extends Mummifier {
 	public static final String OBSOLETE_CONFIG_KEY_MUMMY_PAGE_NAMES_BARE = "mummy.pageNamesBare";
 
 	/** The standard Internet media types for generated pages: <code>text/html</code> in UTF-8. */
-	public static final ContentType PAGE_MEDIA_TYPE = HTML_MEDIA_TYPE.withCharset(UTF_8);
+	public static final MediaType PAGE_MEDIA_TYPE = HTML_MEDIA_TYPE.withCharset(UTF_8);
 
 	/** The extension to use for generated page filenames, unless bare names are enabled. */
 	public static String PAGE_FILENAME_EXTENSION = HTML_FILENAME_EXTENSION;

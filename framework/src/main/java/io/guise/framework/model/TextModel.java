@@ -16,7 +16,7 @@
 
 package io.guise.framework.model;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import static com.globalmentor.java.Classes.*;
 
@@ -50,7 +50,7 @@ public interface TextModel extends Model {
 	public void setText(final String newText);
 
 	/** @return The content type of the text. */
-	public ContentType getTextContentType();
+	public MediaType getTextContentType();
 
 	/**
 	 * Sets the content type of the text. This is a bound property.
@@ -59,5 +59,5 @@ public interface TextModel extends Model {
 	 * @throws IllegalArgumentException if the given content type is not a text content type.
 	 * @see #TEXT_CONTENT_TYPE_PROPERTY
 	 */
-	public void setTextContentType(final ContentType newTextContentType);
+	public void setTextContentType(final MediaType newTextContentType);
 }

@@ -25,7 +25,7 @@ import static java.util.Objects.*;
 import javax.xml.parsers.*;
 
 import com.globalmentor.collections.*;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.guise.framework.component.*;
 import io.guise.framework.component.SectionComponent.SectionType;
@@ -97,7 +97,7 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 		//TODO del Log.trace("text loaded");
 		if(text != null) { //if the component has text
 			final String resolvedText = component.getSession().dereferenceString(text); //resolve the text
-			final ContentType contentType = component.getTextContentType(); //get the content type of the text
+			final MediaType contentType = component.getTextContentType(); //get the content type of the text
 			final boolean isXML = isXML(contentType); //see if the content type is for XML
 			final boolean isXMLExternalParsedEntity = isXMLExternalParsedEntity(contentType); //see if the content type is for an XML external parsed entity
 			if(isXML || isXMLExternalParsedEntity) { //if the text is XML or an XML external parsed entity

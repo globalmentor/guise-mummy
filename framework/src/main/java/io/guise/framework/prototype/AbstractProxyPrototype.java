@@ -20,7 +20,7 @@ import java.net.URI;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.guise.framework.model.*;
 
@@ -122,12 +122,12 @@ public class AbstractProxyPrototype<P extends Prototype & InfoModel> extends Abs
 	}
 
 	@Override
-	public ContentType getLabelContentType() {
+	public MediaType getLabelContentType() {
 		return getProxiedPrototype().getLabelContentType();
 	}
 
 	@Override
-	public void setLabelContentType(final ContentType newLabelTextContentType) {
+	public void setLabelContentType(final MediaType newLabelTextContentType) {
 		getProxiedPrototype().setLabelContentType(newLabelTextContentType);
 	}
 
@@ -142,12 +142,12 @@ public class AbstractProxyPrototype<P extends Prototype & InfoModel> extends Abs
 	}
 
 	@Override
-	public ContentType getDescriptionContentType() {
+	public MediaType getDescriptionContentType() {
 		return getProxiedPrototype().getDescriptionContentType();
 	}
 
 	@Override
-	public void setDescriptionContentType(final ContentType newDescriptionContentType) {
+	public void setDescriptionContentType(final MediaType newDescriptionContentType) {
 		getProxiedPrototype().setDescriptionContentType(newDescriptionContentType);
 	}
 
@@ -162,12 +162,12 @@ public class AbstractProxyPrototype<P extends Prototype & InfoModel> extends Abs
 	}
 
 	@Override
-	public ContentType getInfoContentType() {
+	public MediaType getInfoContentType() {
 		return getProxiedPrototype().getInfoContentType();
 	}
 
 	@Override
-	public void setInfoContentType(final ContentType newInfoContentType) {
+	public void setInfoContentType(final MediaType newInfoContentType) {
 		getProxiedPrototype().setInfoContentType(newInfoContentType);
 	}
 

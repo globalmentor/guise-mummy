@@ -19,7 +19,7 @@ package io.guise.framework.component.widget;
 import java.net.URI;
 import java.util.Set;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.guise.framework.component.Component;
 
@@ -32,8 +32,8 @@ import io.guise.framework.component.Component;
 public interface Widget extends Component {
 
 	/** The media type of a Guise widget. */
-	public static final ContentType WIDGET_MEDIA_TYPE = ContentType.of(ContentType.APPLICATION_PRIMARY_TYPE,
-			ContentType.SUBTYPE_EXTENSION_PREFIX + "guise-widget");
+	public static final MediaType WIDGET_MEDIA_TYPE = MediaType.of(MediaType.APPLICATION_PRIMARY_TYPE,
+			MediaType.SUBTYPE_EXTENSION_PREFIX + "guise-widget");
 
 	/**
 	 * Returns the base URI where the widget is embedded.

@@ -24,7 +24,7 @@ import static java.util.Objects.*;
 import javax.servlet.http.*;
 
 import com.globalmentor.log.Log;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.net.URIPath;
 
 import io.guise.framework.*;
@@ -78,10 +78,10 @@ public class HTTPServletGuiseRequest {
 	}
 
 	/** The content type of the request, or <code>null</code> if not known. */
-	private final ContentType requestContentType;
+	private final MediaType requestContentType;
 
 	/** @return The content type of the request, or <code>null</code> if not known. */
-	public ContentType getRequestContentType() {
+	public MediaType getRequestContentType() {
 		return requestContentType;
 	}
 
@@ -155,7 +155,7 @@ public class HTTPServletGuiseRequest {
 		requestPathReserved = requestPath.toString().startsWith(GuiseApplication.GUISE_RESERVED_BASE_PATH.toString()); //see if this is a request for a Guise reserved path (e.g. a public resource or a temporary resource)
 		navigationPath = guiseApplication.getNavigationPath(depictURI); //get the logical version of the the path
 		final String contentTypeString = request.getContentType(); //get the request content type
-		requestContentType = contentTypeString != null ? ContentType.parse(contentTypeString) : null; //create a content type object from the request content type, if there is one
+		requestContentType = contentTypeString != null ? MediaType.parse(contentTypeString) : null; //create a content type object from the request content type, if there is one
 		ajax = requestContentType != null && GUISE_AJAX_REQUEST_MEDIA_TYPE.hasBaseType(requestContentType); //see if this is a Guise AJAX request
 	}
 

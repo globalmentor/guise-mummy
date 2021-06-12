@@ -19,7 +19,7 @@ package io.guise.framework.validator;
 import java.util.*;
 import static java.util.Collections.*;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.guise.framework.GuiseSession;
 import io.guise.framework.model.ResourceImport;
@@ -45,13 +45,13 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 	 * The read-only set of accepted content types, each of which can have the special wildcard ("*") subtype, or <code>null</code> if all content types are
 	 * accepted.
 	 */
-	private final Set<ContentType> acceptedContentTypes; //TODO fix content type set, as ContentType does not correctly implement equals()
+	private final Set<MediaType> acceptedContentTypes; //TODO fix content type set, as ContentType does not correctly implement equals()
 
 	/**
 	 * @return The read-only set of accepted content types, each of which can have the special wildcard ("*") subtype, or <code>null</code> if all content types
 	 *         are accepted.
 	 */
-	public Set<ContentType> getAcceptedContentTypes() {
+	public Set<MediaType> getAcceptedContentTypes() {
 		return acceptedContentTypes;
 	}
 
@@ -101,7 +101,7 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 	 * @param acceptedContentTypes The accepted content types, each of which can have the special wildcard ("*") subtype, or <code>null</code> if all content
 	 *          types are accepted.
 	 */
-	public ResourceImportValidator(final Set<ContentType> acceptedContentTypes) {
+	public ResourceImportValidator(final Set<MediaType> acceptedContentTypes) {
 		this(acceptedContentTypes, false); //don't require a value
 	}
 
@@ -109,7 +109,7 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 	 * Accepted content type constructor.
 	 * @param acceptedContentType The single accepted content types.
 	 */
-	public ResourceImportValidator(final ContentType acceptedContentType) {
+	public ResourceImportValidator(final MediaType acceptedContentType) {
 		this(acceptedContentType, false); //don't require a value
 	}
 
@@ -118,7 +118,7 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 	 * @param acceptedContentType The single accepted content types.
 	 * @param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
 	 */
-	public ResourceImportValidator(final ContentType acceptedContentType, final boolean valueRequired) {
+	public ResourceImportValidator(final MediaType acceptedContentType, final boolean valueRequired) {
 		this(createHashSet(acceptedContentType), valueRequired); //pass a hash set with the single accepted content type
 	}
 
@@ -128,7 +128,7 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 	 *          types are accepted.
 	 * @param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
 	 */
-	public ResourceImportValidator(final Set<ContentType> acceptedContentTypes, final boolean valueRequired) {
+	public ResourceImportValidator(final Set<MediaType> acceptedContentTypes, final boolean valueRequired) {
 		this(acceptedContentTypes, -1, valueRequired); //accept any content length
 	}
 
@@ -138,7 +138,7 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 	 *          types are accepted.
 	 * @param maxContentLength The maximum content length to accept, or -1 if there is no limit to the content length.
 	 */
-	public ResourceImportValidator(final Set<ContentType> acceptedContentTypes, final long maxContentLength) {
+	public ResourceImportValidator(final Set<MediaType> acceptedContentTypes, final long maxContentLength) {
 		this(acceptedContentTypes, null, maxContentLength, false); //accept any content types and don't require a value		
 	}
 
@@ -147,7 +147,7 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 	 * @param acceptedContentType The single accepted content type.
 	 * @param maxContentLength The maximum content length to accept, or -1 if there is no limit to the content length.
 	 */
-	public ResourceImportValidator(final ContentType acceptedContentType, final long maxContentLength) {
+	public ResourceImportValidator(final MediaType acceptedContentType, final long maxContentLength) {
 		this(acceptedContentType, maxContentLength, false); //don't require a value
 	}
 
@@ -157,7 +157,7 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 	 * @param maxContentLength The maximum content length to accept, or -1 if there is no limit to the content length.
 	 * @param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
 	 */
-	public ResourceImportValidator(final ContentType acceptedContentType, final long maxContentLength, final boolean valueRequired) {
+	public ResourceImportValidator(final MediaType acceptedContentType, final long maxContentLength, final boolean valueRequired) {
 		this(createHashSet(acceptedContentType), maxContentLength, valueRequired); //pass a hash set with the single accepted content type
 	}
 
@@ -168,7 +168,7 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 	 * @param maxContentLength The maximum content length to accept, or -1 if there is no limit to the content length.
 	 * @param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
 	 */
-	public ResourceImportValidator(final Set<ContentType> acceptedContentTypes, final long maxContentLength, final boolean valueRequired) {
+	public ResourceImportValidator(final Set<MediaType> acceptedContentTypes, final long maxContentLength, final boolean valueRequired) {
 		this(acceptedContentTypes, null, maxContentLength, valueRequired); //accept any content types
 	}
 
@@ -178,7 +178,7 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 	 *          types are accepted.
 	 * @param acceptedExtensions The accepted filename extensions, or <code>null</code> if all filename extensions are accepted.
 	 */
-	public ResourceImportValidator(final Set<ContentType> acceptedContentTypes, final Set<String> acceptedExtensions) {
+	public ResourceImportValidator(final Set<MediaType> acceptedContentTypes, final Set<String> acceptedExtensions) {
 		this(acceptedContentTypes, acceptedExtensions, false); //accept any content length and don't require a value
 	}
 
@@ -189,7 +189,7 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 	 * @param acceptedExtensions The accepted filename extensions, or <code>null</code> if all filename extensions are accepted.
 	 * @param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
 	 */
-	public ResourceImportValidator(final Set<ContentType> acceptedContentTypes, final Set<String> acceptedExtensions, final boolean valueRequired) {
+	public ResourceImportValidator(final Set<MediaType> acceptedContentTypes, final Set<String> acceptedExtensions, final boolean valueRequired) {
 		this(acceptedContentTypes, acceptedExtensions, -1, valueRequired); //accept any content length
 	}
 
@@ -200,7 +200,7 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 	 * @param acceptedExtensions The accepted filename extensions, or <code>null</code> if all filename extensions are accepted.
 	 * @param maxContentLength The maximum content length to accept, or -1 if there is no limit to the content length.
 	 */
-	public ResourceImportValidator(final Set<ContentType> acceptedContentTypes, final Set<String> acceptedExtensions, final long maxContentLength) {
+	public ResourceImportValidator(final Set<MediaType> acceptedContentTypes, final Set<String> acceptedExtensions, final long maxContentLength) {
 		this(acceptedContentTypes, acceptedExtensions, maxContentLength, false); //don't require a value
 	}
 
@@ -212,10 +212,10 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 	 * @param maxContentLength The maximum content length to accept, or -1 if there is no limit to the content length.
 	 * @param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
 	 */
-	public ResourceImportValidator(final Set<ContentType> acceptedContentTypes, final Set<String> acceptedExtensions, final long maxContentLength,
+	public ResourceImportValidator(final Set<MediaType> acceptedContentTypes, final Set<String> acceptedExtensions, final long maxContentLength,
 			final boolean valueRequired) {
 		super(valueRequired); //construct the parent class
-		this.acceptedContentTypes = acceptedContentTypes != null ? unmodifiableSet(new HashSet<ContentType>(acceptedContentTypes)) : null; //create a read-only copy of the content types passed
+		this.acceptedContentTypes = acceptedContentTypes != null ? unmodifiableSet(new HashSet<MediaType>(acceptedContentTypes)) : null; //create a read-only copy of the content types passed
 		this.acceptedExtensions = acceptedExtensions != null ? unmodifiableSet(new HashSet<String>(acceptedExtensions)) : null; //create a read-only copy of the extensions passed
 		this.maxContentLength = maxContentLength;
 	}
@@ -233,11 +233,11 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 	public void validate(final ResourceImport resourceImport) throws ValidationException {
 		Log.trace("ready to validate resource import", resourceImport);
 		super.validate(resourceImport); //do the default validation
-		final Set<ContentType> acceptedContentTypes = getAcceptedContentTypes(); //get the accepted content types
+		final Set<MediaType> acceptedContentTypes = getAcceptedContentTypes(); //get the accepted content types
 		if(acceptedContentTypes != null) { //if we need to check the content types
-			final ContentType resourceContentType = resourceImport.getContentType(); //get the content type of the resource import
+			final MediaType resourceContentType = resourceImport.getContentType(); //get the content type of the resource import
 			boolean isContentTypeMatch = false; //see if we match a content type
-			for(final ContentType contentType : acceptedContentTypes) { //look at all the accepted content types
+			for(final MediaType contentType : acceptedContentTypes) { //look at all the accepted content types
 				if((contentType == null && resourceContentType == null) //if this is a null content type and the resource import content type is also null
 						|| (contentType != null && resourceContentType != null && contentType.hasBaseType(resourceContentType))) { //if this content type is not null and the resource content type matches it
 					isContentTypeMatch = true; //show that the resource content type matches one of the accepted content types

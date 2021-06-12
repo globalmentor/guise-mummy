@@ -26,7 +26,7 @@ import static java.util.Collections.*;
 import static java.util.Objects.*;
 
 import com.globalmentor.model.NameValuePair;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.xml.XmlDom;
 
 import io.guise.framework.GuiseSession;
@@ -186,7 +186,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 			writeStyleAttribute(getOuterStyles()); //write the component's outer styles
 			if(component.isTooltipEnabled()) { //if tooltips are enabled for this component
 				String info = component.getInfo(); //get advisory information about the component
-				ContentType infoContentType = component.getInfoContentType(); //get the info content type
+				MediaType infoContentType = component.getInfoContentType(); //get the info content type
 				if(info == null && component instanceof LabelDisplayableComponent && !((LabelDisplayableComponent)component).isLabelDisplayed()) { //if there is no info but this component's label is hidden
 					info = component.getLabel(); //use the label, if any
 					infoContentType = component.getLabelContentType(); //use the label content type
@@ -816,7 +816,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	 * Writes the label content of the given label model, taking into account the label's content type. Label styles will be written if needed. If no label
 	 * content is present, no action occurs.
 	 * <p>
-	 * This method delegates to {@link #writeText(String, ContentType)}.
+	 * This method delegates to {@link #writeText(String, MediaType)}.
 	 * </p>
 	 * @param labelModel The label model containing the label content.
 	 * @param includeIcon <code>true</code> if the icon should be considered for label content.
@@ -831,7 +831,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	 * Writes the label content of the given label model, taking into account the label's content type. Label styles will be written if needed. If no label
 	 * content is present, no action occurs.
 	 * <p>
-	 * This method delegates to {@link #writeText(String, ContentType)}.
+	 * This method delegates to {@link #writeText(String, MediaType)}.
 	 * </p>
 	 * @param labelModel The label model containing the label information.
 	 * @param uiModel The UI model containing the label style information.
@@ -840,7 +840,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	 * @throws IOException if there is an error writing the label.
 	 * @see #hasLabelContent(LabelModel, boolean, boolean)
 	 * @see #getLabelStyles(LabelModel, PresentationModel)
-	 * @see #writeText(String, ContentType)
+	 * @see #writeText(String, MediaType)
 	 */
 	protected void writeLabelContent(final LabelModel labelModel, final PresentationModel uiModel, final boolean includeIcon, final boolean includeLabel)
 			throws IOException {
@@ -850,7 +850,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 			final GuiseSession session = getSession(); //get the session
 			final String label = labelModel.getLabel(); //determine the label text, if there is any
 			final String resolvedLabel = label != null ? session.dereferenceString(label) : null; //resolve the label, if there is a label
-			final ContentType labelContentType = labelModel.getLabelContentType(); //get the label content type
+			final MediaType labelContentType = labelModel.getLabelContentType(); //get the label content type
 			final URI icon = labelModel.getGlyphURI(); //get the label icon, if any
 			if(includeIcon && icon != null) { //if there is an icon
 				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IMG, true); //<xhtml:img>
@@ -968,7 +968,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	 * @throws IOException if there is an error writing the text.
 	 * @throws NullPointerException if the provided text and/or content type is <code>null</code>.
 	 */
-	protected void writeText(String text, final ContentType contentType) throws IOException { //TODO actually parse and then serialize the content; otherwise, there may be embedded character references that, when sent via AJAX, will cause the XML to be invalid
+	protected void writeText(String text, final MediaType contentType) throws IOException { //TODO actually parse and then serialize the content; otherwise, there may be embedded character references that, when sent via AJAX, will cause the XML to be invalid
 		requireNonNull(text, "Text cannot be null");
 		requireNonNull(contentType, "Content type cannot be null");
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context

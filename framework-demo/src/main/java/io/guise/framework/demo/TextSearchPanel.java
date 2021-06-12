@@ -22,7 +22,7 @@ import java.util.regex.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.html.spec.HTML;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.guise.framework.component.*;
 import io.guise.framework.component.layout.*;
@@ -70,7 +70,7 @@ public class TextSearchPanel extends LayoutPanel {
 		final ResourceImportControl resourceImportControl = new ResourceImportControl(); //create the file upload control
 		resourceImportControl.setLabel("Input Text File"); //give the file upload control a label	
 		//create a validator only allowing text files (files of type text/*) not greater than 64K to be uploaded, and require a value
-		final ResourceImportValidator textImportValidator = new ResourceImportValidator(ContentType.of("text", "*"), 1024 * 64, true);
+		final ResourceImportValidator textImportValidator = new ResourceImportValidator(MediaType.of("text", "*"), 1024 * 64, true);
 		resourceImportControl.setValidator(textImportValidator); //assign the validator to the the file upload control model		
 		inputPanel.add(resourceImportControl); //add the file upload control to the input panel
 		//search button

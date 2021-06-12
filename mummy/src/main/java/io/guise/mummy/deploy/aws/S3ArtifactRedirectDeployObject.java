@@ -25,7 +25,7 @@ import java.util.*;
 import javax.annotation.*;
 
 import com.globalmentor.io.EmptyInputStream;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.guise.mummy.Artifact;
 import io.guise.mummy.mummify.Mummifier;
@@ -109,7 +109,7 @@ public class S3ArtifactRedirectDeployObject extends AbstractS3DeployObject {
 	 */
 	@Override
 	public String getContentType() {
-		return ContentType.APPLICATION_OCTET_STREAM_MEDIA_TYPE.toString();
+		return MediaType.APPLICATION_OCTET_STREAM_MEDIA_TYPE.toString();
 	}
 
 	/**

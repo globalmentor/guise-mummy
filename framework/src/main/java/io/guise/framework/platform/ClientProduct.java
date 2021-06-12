@@ -18,7 +18,7 @@ package io.guise.framework.platform;
 
 import java.util.Locale;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 /**
  * The identification of the client software accessing Guise on the platform.
@@ -27,14 +27,14 @@ import com.globalmentor.net.ContentType;
 public interface ClientProduct extends Product {
 
 	/** @return The content types accepted by the client. */
-	public Iterable<ContentType> getAcceptedContentTypes();
+	public Iterable<MediaType> getAcceptedContentTypes();
 
 	/**
 	 * Determines if the client accepts the given content type. Wildcard content types are correctly matched.
 	 * @param contentType The content type to check.
 	 * @return <code>true</code> if the client accepts the given content type.
 	 */
-	public boolean isAcceptedContentType(final ContentType contentType);
+	public boolean isAcceptedContentType(final MediaType contentType);
 
 	/**
 	 * Determines if the client accepts the given content type.
@@ -42,7 +42,7 @@ public interface ClientProduct extends Product {
 	 * @param matchWildcards <code>true</code> if the content type should be matched against wildcard sequences, as is normal.
 	 * @return <code>true</code> if the client accepts the given content type.
 	 */
-	public boolean isAcceptedContentType(final ContentType contentType, final boolean matchWildcards);
+	public boolean isAcceptedContentType(final MediaType contentType, final boolean matchWildcards);
 
 	/** @return The languages accepted by the client. */
 	public Iterable<Locale> getClientAcceptedLanguages();

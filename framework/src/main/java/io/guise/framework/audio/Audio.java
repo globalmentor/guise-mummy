@@ -22,7 +22,7 @@ import static com.globalmentor.java.Classes.*;
 
 import com.globalmentor.java.Objects;
 import com.globalmentor.model.TaskState;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 
 import io.guise.framework.event.*;
 import io.guise.framework.platform.AbstractDepictedObject;
@@ -36,7 +36,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	/** The bound property of the audio URI. */
 	public static final String AUDIO_URI_PROPERTY = getPropertyName(Audio.class, "audioURI");
 	/** The bound property of the audio content type. */
-	public static final String AUDIO_CONTENT_TYPE_PROPERTY = getPropertyName(Audio.class, "audioContentType");
+	public static final String AUDIO_MEDIA_TYPE_PROPERTY = getPropertyName(Audio.class, "audioContentType");
 	/** The bound property of the state. */
 	public static final String STATE_PROPERTY = getPropertyName(Audio.class, "state");
 	/** The bound property of the play duration using microseconds. */
@@ -75,24 +75,24 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	}
 
 	/** The audio content type, or <code>null</code> if there is no audio URI or the content type is not known. */
-	private ContentType audioContentType = null;
+	private MediaType audioContentType = null;
 
 	/** @return The audio content type, or <code>null</code> if there is no audio URI or the content type is not known. */
-	public ContentType getAudioContentType() {
+	public MediaType getAudioContentType() {
 		return audioContentType;
 	}
 
 	/**
-	 * Sets the content type of the audio. This is a bound property of type {@link ContentType}.
+	 * Sets the content type of the audio. This is a bound property of type {@link MediaType}.
 	 * @param newAudioContentType The new content type of the audio, or <code>null</code> if there is no audio URI or the content type is not known.
-	 * @see #AUDIO_CONTENT_TYPE_PROPERTY
+	 * @see #AUDIO_MEDIA_TYPE_PROPERTY
 	 */
-	public void setAudioContentType(final ContentType newAudioContentType) {
+	public void setAudioContentType(final MediaType newAudioContentType) {
 		if(!Objects.equals(audioContentType, newAudioContentType)) { //if the value is really changing
 			stop(); //make sure the current audio is stopped
-			final ContentType oldAudioContentType = audioContentType; //get the old value
+			final MediaType oldAudioContentType = audioContentType; //get the old value
 			audioContentType = newAudioContentType; //actually change the value
-			firePropertyChange(AUDIO_CONTENT_TYPE_PROPERTY, oldAudioContentType, newAudioContentType); //indicate that the value changed
+			firePropertyChange(AUDIO_MEDIA_TYPE_PROPERTY, oldAudioContentType, newAudioContentType); //indicate that the value changed
 			updateTimePosition(0); //show that we're at the beginning of this audio
 			updateTimeLength(-1); //show that we don't know how long this audio is
 		}
@@ -189,7 +189,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	 * @param audioURI The new URI of the audio, which may be a resource URI, or <code>null</code> if there is no audio URI.
 	 * @param contentType The new content type of the audio, or <code>null</code> if there is no audio URI or the content type is not known.
 	 */
-	public Audio(final URI audioURI, final ContentType contentType) {
+	public Audio(final URI audioURI, final MediaType contentType) {
 		this.audioURI = audioURI;
 		this.audioContentType = contentType;
 	}

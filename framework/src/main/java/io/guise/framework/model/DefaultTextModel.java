@@ -19,7 +19,7 @@ package io.guise.framework.model;
 import static java.util.Objects.*;
 
 import com.globalmentor.java.Objects;
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.text.Text;
 
 import static com.globalmentor.text.Text.*;
@@ -48,18 +48,18 @@ public class DefaultTextModel extends AbstractModel implements TextModel {
 	}
 
 	/** The content type of the text. */
-	private ContentType textContentType;
+	private MediaType textContentType;
 
 	@Override
-	public ContentType getTextContentType() {
+	public MediaType getTextContentType() {
 		return textContentType;
 	}
 
 	@Override
-	public void setTextContentType(final ContentType newTextContentType) {
+	public void setTextContentType(final MediaType newTextContentType) {
 		requireNonNull(newTextContentType, "Content type cannot be null.");
 		if(textContentType != newTextContentType) { //if the value is really changing
-			final ContentType oldTextContentType = textContentType; //get the old value
+			final MediaType oldTextContentType = textContentType; //get the old value
 			if(!isText(newTextContentType)) { //if the new content type is not a text content type
 				throw new IllegalArgumentException("Content type " + newTextContentType + " is not a text content type.");
 			}
@@ -88,7 +88,7 @@ public class DefaultTextModel extends AbstractModel implements TextModel {
 	 * @throws NullPointerException if the given content type is <code>null</code>.
 	 * @throws IllegalArgumentException if the given content type is not a text content type.
 	 */
-	public DefaultTextModel(final String text, final ContentType textContentType) {
+	public DefaultTextModel(final String text, final MediaType textContentType) {
 		this.text = text; //save the text
 		if(!isText(requireNonNull(textContentType, "Content type cannot be null."))) { //if the content type is not a text content type
 			throw new IllegalArgumentException("Content type " + textContentType + " is not a text content type.");

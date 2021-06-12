@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import com.globalmentor.net.ContentType;
+import com.globalmentor.net.MediaType;
 import com.globalmentor.xml.spec.NsQualifiedName;
 
 /**
@@ -57,7 +57,7 @@ public interface XMLDepictContext extends TextDepictContext {
 	 * @throws NullPointerException if the given content type is <code>null</code>.
 	 * @throws IOException if there is an error writing the information.
 	 */
-	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, final ContentType contentType) throws IOException;
+	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, final MediaType contentType) throws IOException;
 
 	/**
 	 * Writes a doctype along with an optional XML declaration to the string builder and sets the output content type. The system ID and content type will be
@@ -85,7 +85,7 @@ public interface XMLDepictContext extends TextDepictContext {
 	 * @throws IOException if there is an error writing the information.
 	 */
 	public void writeDocType(final boolean writeXMLDeclaration, final URI namespaceURI, final String localName, String publicID, String systemID,
-			ContentType contentType) throws IOException;
+			MediaType contentType) throws IOException;
 
 	/**
 	 * Begins an XML element that will not be an empty element, even if it has no content.
