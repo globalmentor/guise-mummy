@@ -25,6 +25,8 @@ import java.util.stream.Stream;
 
 import javax.annotation.*;
 
+import com.globalmentor.net.URIPath;
+
 /**
  * Default plan for mummifying a site.
  * @author Garret Wilson
@@ -97,8 +99,20 @@ public class DefaultMummyPlan extends AbstractMummyPlan {
 		}
 
 		@Override
+		public ArtifactQuery fromChildrenOf(final Artifact artifact, final URIPath sourceRelativeReference) {
+			findArtifactBySourceRelativeReference(artifact, sourceRelativeReference).ifPresentOrElse(this::fromChildrenOf, () -> setStream(Stream.empty()));
+			return this;
+		}
+
+		@Override
 		public ArtifactQuery fromSiblingsOf(final Artifact artifact) {
 			setStream(siblingArtifacts(artifact));
+			return this;
+		}
+
+		@Override
+		public ArtifactQuery fromSiblingsOf(final Artifact artifact, final URIPath sourceRelativeReference) {
+			findArtifactBySourceRelativeReference(artifact, sourceRelativeReference).ifPresentOrElse(this::fromSiblingsOf, () -> setStream(Stream.empty()));
 			return this;
 		}
 
@@ -106,6 +120,12 @@ public class DefaultMummyPlan extends AbstractMummyPlan {
 		public ArtifactQuery fromLevelOf(final Artifact artifact) {
 			//return the children of the artifact for this artifact's source directory (either its parent directory or itself if it represents a directory)
 			setStream(findArtifactBySourceReference(artifact.getSourceDirectory()).map(DefaultMummyPlan.this::childArtifacts).orElse(Stream.empty()));
+			return this;
+		}
+
+		@Override
+		public ArtifactQuery fromLevelOf(final Artifact artifact, final URIPath sourceRelativeReference) {
+			findArtifactBySourceRelativeReference(artifact, sourceRelativeReference).ifPresentOrElse(this::fromLevelOf, () -> setStream(Stream.empty()));
 			return this;
 		}
 
