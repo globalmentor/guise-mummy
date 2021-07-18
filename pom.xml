@@ -40,8 +40,8 @@
 
 	<properties>
 		<maven.compiler.release>11</maven.compiler.release>
-		<globalmentor-ee.version>0.6.3-SNAPSHOT</globalmentor-ee.version>
-		<globalmentor-web.version>0.6.5-SNAPSHOT</globalmentor-web.version>
+		<globalmentor-ee.version>0.6.3</globalmentor-ee.version>
+		<globalmentor-web.version>0.6.5</globalmentor-web.version>
 		<slf4j.version>1.7.30</slf4j.version>
 		<tomcat.version>9.0.36</tomcat.version>
 		<urf.version>0.5.0-SNAPSHOT</urf.version>
