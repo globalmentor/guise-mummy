@@ -41,7 +41,6 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 
 	/**
 	 * Initially queries children of an artifact referred to by a URI path source reference relative to some other artifact.
-	 * @param artifact The artifact for which children should be queried.
 	 * @param artifact The artifact the relative reference should be resolved against when finding the referent artifact.
 	 * @param sourceRelativeReference The relative URI path being used as a reference to some artifact.
 	 * @throws IllegalArgumentException if the given reference path is absolute.
