@@ -51,6 +51,28 @@ public class DefaultMummyPlanTest {
 		assertThat("Child artifact is its own principal artifact.", plan.getPrincipalArtifact(childArtifact), is(childArtifact));
 	}
 
+	/** @see MummyPlan#findArtifactBySourceReference(Path) */
+	@Test
+	void testFindArtifactBySourceReferenceForSubsumedArtifact() {
+		final Path sourceDirectory = getTempDirectory().resolve("source"); //used only for identification; no I/O
+		final Path sourceSubdirectory = sourceDirectory.resolve("sub");
+		final Path targetDirectory = getTempDirectory().resolve("target");
+		final Path targetSubdirectory = targetDirectory.resolve("sub");
+		final Mummifier mummifier = mock(Mummifier.class);
+		final Artifact subdirectoryIndexArtifact = new DummyArtifact(mummifier, sourceSubdirectory.resolve("index.html"), targetSubdirectory.resolve("index.html"));
+		final Artifact subdirectoryChildArtifact = new DummyArtifact(mummifier, sourceSubdirectory.resolve("test.html"), sourceSubdirectory.resolve("test.html"));
+		final DirectoryArtifact subdirectoryArtifact = new DirectoryArtifact(mummifier, sourceSubdirectory, targetSubdirectory, subdirectoryIndexArtifact,
+				Set.of(subdirectoryChildArtifact));
+		final DirectoryArtifact rootDirectoryArtifact = new DirectoryArtifact(mummifier, sourceDirectory, targetDirectory, null, Set.of(subdirectoryArtifact));
+		final MummyPlan plan = new DefaultMummyPlan(rootDirectoryArtifact);
+		assertThat("Subdirectory path retrieves subdirectory artifact.", plan.findArtifactBySourceReference(sourceSubdirectory),
+				isPresentAndIs(subdirectoryArtifact));
+		assertThat("Subdirectory child path retrieves subdirectory child artifact.", plan.findArtifactBySourceReference(sourceSubdirectory.resolve("test.html")),
+				isPresentAndIs(subdirectoryChildArtifact));
+		assertThat("Subdirectory index (subsumed artifact) path retrieves subdirectory (principal) artifact.",
+				plan.findArtifactBySourceReference(sourceSubdirectory.resolve("index.html")), isPresentAndIs(subdirectoryArtifact));
+	}
+
 	/** @see MummyPlan#findParentArtifact(Artifact) */
 	@Test
 	void testFindParentArtifact() {
