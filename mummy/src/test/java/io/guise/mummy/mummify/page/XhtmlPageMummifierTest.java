@@ -44,7 +44,7 @@ public class XhtmlPageMummifierTest {
 	@BeforeEach
 	protected void setupContext() {
 		final GuiseProject project = new DefaultGuiseProject(getWorkingDirectory(), Configuration.empty());
-		mummyContext = new StubMummyContext(project);
+		mummyContext = new FakeMummyContext(project);
 	}
 
 	/**

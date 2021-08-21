@@ -1,5 +1,5 @@
 /*
- * Copyright © 2020 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2021 GlobalMentor, Inc. <http://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,16 +26,13 @@ import javax.xml.parsers.DocumentBuilder;
 
 import io.confound.config.Configuration;
 import io.guise.mummy.deploy.*;
-import io.guise.mummy.mummify.OpaqueFileMummifier;
 import io.guise.mummy.mummify.SourcePathMummifier;
-import io.guise.mummy.mummify.collection.DirectoryMummifier;
 
 /**
- * Stub implementation of a mummification context with minimal functionality for testing.
- * @implSpec This implementation does not support {@link #getPlan()}.
+ * Dummy implementation of a mummification context with no real functionality; used for testing.
  * @author Garret Wilson
  */
-public class StubMummyContext implements MummyContext {
+public class DummyMummyContext implements MummyContext {
 
 	/**
 	 * {@inheritDoc}
@@ -45,9 +42,6 @@ public class StubMummyContext implements MummyContext {
 	public String getMummifierIdentification() {
 		return GuiseMummy.LABEL;
 	}
-
-	private final SourcePathMummifier fileMummifier = new OpaqueFileMummifier();
-	private final SourcePathMummifier directoryMummifier = new DirectoryMummifier();
 
 	private final GuiseProject project;
 
@@ -60,7 +54,7 @@ public class StubMummyContext implements MummyContext {
 	 * Constructor.
 	 * @param project The Guise project.
 	 */
-	public StubMummyContext(@Nonnull final GuiseProject project) {
+	public DummyMummyContext(@Nonnull final GuiseProject project) {
 		this.project = requireNonNull(project);
 	}
 
@@ -86,22 +80,22 @@ public class StubMummyContext implements MummyContext {
 
 	@Override
 	public SourcePathMummifier getDefaultSourceFileMummifier() {
-		return fileMummifier;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public SourcePathMummifier getDefaultSourceDirectoryMummifier() {
-		return directoryMummifier;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Optional<SourcePathMummifier> findRegisteredMummifierForSourceFile(Path sourceFile) {
-		return Optional.of(getDefaultSourceFileMummifier());
+		return Optional.empty();
 	}
 
 	@Override
 	public Optional<SourcePathMummifier> findRegisteredMummifierForSourceDirectory(Path sourceDirectory) {
-		return Optional.of(getDefaultSourceDirectoryMummifier());
+		return Optional.empty();
 	}
 
 	@Override

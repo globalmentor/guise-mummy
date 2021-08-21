@@ -201,7 +201,7 @@ public class BaseImageMummifierTest {
 	@BeforeEach
 	protected void setupFixture() {
 		final GuiseProject project = new DefaultGuiseProject(getWorkingDirectory(), Configuration.empty());
-		fixtureContext = new StubMummyContext(project);
+		fixtureContext = new DummyMummyContext(project);
 	}
 
 	private BaseImageMummifier testMummifier;
