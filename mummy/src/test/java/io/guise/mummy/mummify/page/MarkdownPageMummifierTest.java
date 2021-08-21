@@ -57,7 +57,7 @@ public class MarkdownPageMummifierTest {
 	@BeforeEach
 	protected void setupContext() {
 		final GuiseProject project = new DefaultGuiseProject(getWorkingDirectory(), Configuration.empty());
-		mummyContext = new StubMummyContext(project);
+		mummyContext = new FakeMummyContext(project);
 	}
 
 	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */

@@ -23,6 +23,7 @@ import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.util.Optionals.*;
 import static io.guise.mummy.Artifact.PROPERTY_HANDLE_TITLE;
 import static io.guise.mummy.GuiseMummy.*;
+import static java.lang.String.format;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.function.Predicate.*;
@@ -120,7 +121,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES
 	 */
 	@Override
-	public Artifact plan(final MummyContext context, final Path sourceDirectory, final Path targetDirectory) throws IOException {
+	public DirectoryArtifact plan(final MummyContext context, final Path sourceDirectory, final Path targetDirectory) throws IOException {
 		checkArgumentDirectory(sourceDirectory);
 		final boolean isAssetSourceDirectoryTree = isAssetSourcePath(context, sourceDirectory, true); //see if this subtree is for assets
 
@@ -228,7 +229,11 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		final Path siteSourceDirectory = context.getSiteSourceDirectory();
 		Path currentSourcePath = sourcePath;
 		while(!currentSourcePath.equals(siteSourceDirectory)) {
-			if(assetNamePattern.matcher(currentSourcePath.getFileName().toString()).matches()) {
+			final Path ancestorPath = currentSourcePath;
+			final String currentSourcePathFilename = findFilename(currentSourcePath).orElseThrow(
+					() -> new IllegalArgumentException(format("Source path `%s` ancestor `%s` has no filename; may not be inside site source directory `%s`.", sourcePath,
+							ancestorPath, siteSourceDirectory)));
+			if(assetNamePattern.matcher(currentSourcePathFilename).matches()) {
 				return true;
 			}
 			if(!checkAncestors) {

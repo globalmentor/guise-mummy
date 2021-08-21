@@ -24,6 +24,7 @@ import static java.util.Objects.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.*;
 
 import javax.annotation.*;
 import javax.xml.parsers.*;
@@ -31,15 +32,47 @@ import javax.xml.parsers.*;
 import org.xml.sax.*;
 
 import com.globalmentor.html.spec.HTML;
+import com.globalmentor.io.Filenames;
 import com.globalmentor.xml.DefaultEntityResolver;
 
 import io.confound.config.ConfigurationException;
+import io.guise.mummy.mummify.Mummifier;
+import io.guise.mummy.mummify.OpaqueFileMummifier;
+import io.guise.mummy.mummify.SourcePathMummifier;
+import io.guise.mummy.mummify.collection.DirectoryMummifier;
+import io.guise.mummy.mummify.image.DefaultImageMummifier;
+import io.guise.mummy.mummify.page.HtmlPageMummifier;
+import io.guise.mummy.mummify.page.MarkdownPageMummifier;
+import io.guise.mummy.mummify.page.XhtmlPageMummifier;
 
 /**
  * Abstract base implementation of a mummification context with common default functionality.
+ * @implSpec This implementation uses an {@link OpaqueFileMummifier} as the default file mummifier and a {@link DirectoryMummifier} as the default directory
+ *           mummifier.
+ * @implSpec This implementation registers common mummifiers by default; they can be overridden using {@link #registerFileMummifier(SourcePathMummifier)}.
  * @author Garret Wilson
  */
 public abstract class BaseMummyContext implements MummyContext {
+
+	/** The default mummifier for normal files. */
+	private final SourcePathMummifier defaultFileMummifier = new OpaqueFileMummifier();
+
+	/** The default mummifier for normal directories. */
+	private final SourcePathMummifier defaultDirectoryMummifier = new DirectoryMummifier();
+
+	/** The registered mummifiers by supported extensions. These extensions are in canonical (lowercase) form. */
+	private final Map<String, SourcePathMummifier> fileMummifiersByExtension = new HashMap<>();
+
+	/**
+	 * Registers a mummify for all its supported filename extensions. If an extension is already registered with another mummifier, it will be overridden.
+	 * @param mummifier The mummifier to register.
+	 * @see Mummifier#getSupportedFilenameExtensions()
+	 */
+	protected void registerFileMummifier(@Nonnull final SourcePathMummifier mummifier) {
+		mummifier.getSupportedFilenameExtensions().stream()
+				//normalize extensions so we can look up without regard to case
+				.map(Filenames.Extensions::normalize).forEach(ext -> fileMummifiersByExtension.put(ext, mummifier));
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -68,6 +101,10 @@ public abstract class BaseMummyContext implements MummyContext {
 		this.project = requireNonNull(project);
 		pageDocumentBuilderFactory = DocumentBuilderFactory.newInstance();
 		pageDocumentBuilderFactory.setNamespaceAware(true);
+		registerFileMummifier(new MarkdownPageMummifier());
+		registerFileMummifier(new XhtmlPageMummifier());
+		registerFileMummifier(new HtmlPageMummifier());
+		registerFileMummifier(new DefaultImageMummifier());
 	}
 
 	/**
@@ -82,6 +119,34 @@ public abstract class BaseMummyContext implements MummyContext {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public SourcePathMummifier getDefaultSourceFileMummifier() {
+		return defaultFileMummifier;
+	}
+
+	@Override
+	public SourcePathMummifier getDefaultSourceDirectoryMummifier() {
+		return defaultDirectoryMummifier;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation finds a registered mummifier based upon the normalized filename extension (without regard to case).
+	 */
+	@Override
+	public Optional<SourcePathMummifier> findRegisteredMummifierForSourceFile(@Nonnull final Path sourceFile) {
+		return filenameExtensions(sourceFile).map(Filenames.Extensions::normalize).map(fileMummifiersByExtension::get).filter(Objects::nonNull).findFirst();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @implSpec This implementation doesn't support registered source directory mummifiers, and will always return {@link Optional#empty()}.
+	 */
+	@Override
+	public Optional<SourcePathMummifier> findRegisteredMummifierForSourceDirectory(Path sourceDirectory) {
+		return Optional.empty();
 	}
 
 	//factory methods

@@ -60,7 +60,6 @@ public class DefaultMummyPlan extends AbstractMummyPlan {
 	 */
 	private void initialize(@Nonnull final Artifact artifact) {
 		requireNonNull(artifact);
-		artifact.getReferentSourcePaths().forEach(referenceSourcePath -> artifactsByReferenceSourcePath.put(referenceSourcePath, artifact));
 		if(artifact instanceof CompositeArtifact) {
 			final CompositeArtifact compositeArtifact = (CompositeArtifact)artifact;
 			compositeArtifact.getSubsumedArtifacts().forEach(subsumedArtifact -> principalArtifactsBySubsumedArtifacts.put(subsumedArtifact, artifact));
@@ -71,6 +70,11 @@ public class DefaultMummyPlan extends AbstractMummyPlan {
 			}
 			compositeArtifact.comprisedArtifacts().forEach(this::initialize);//recursively update the plan for the comprised artifacts
 		}
+		//Update the referent source paths for this artifact after initializing
+		//comprised artifacts, because those of the principal artifact will override
+		//those of subsumed artifacts. (e.g. `…/foo/index.html` must be updated
+		//to map to `…/foo/`.)
+		artifact.getReferentSourcePaths().forEach(referenceSourcePath -> artifactsByReferenceSourcePath.put(referenceSourcePath, artifact));
 	}
 
 	/**

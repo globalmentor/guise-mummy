@@ -27,6 +27,7 @@ import static java.util.stream.Collectors.*;
 import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.nio.file.*;
 import java.util.*;
@@ -34,7 +35,6 @@ import java.util.regex.Pattern;
 
 import javax.annotation.*;
 
-import com.globalmentor.io.Filenames;
 import com.globalmentor.net.DomainName;
 
 import io.clogr.Clogged;
@@ -44,12 +44,8 @@ import io.guise.mummy.deploy.*;
 import io.guise.mummy.deploy.aws.*;
 import io.guise.mummy.mummify.*;
 import io.guise.mummy.mummify.collection.DirectoryMummifier;
-import io.guise.mummy.mummify.image.DefaultImageMummifier;
 import io.guise.mummy.mummify.image.ImageMummifier;
-import io.guise.mummy.mummify.page.HtmlPageMummifier;
-import io.guise.mummy.mummify.page.MarkdownPageMummifier;
 import io.guise.mummy.mummify.page.PageMummifier;
-import io.guise.mummy.mummify.page.XhtmlPageMummifier;
 import io.urf.turf.TurfSerializer;
 
 /**
@@ -223,17 +219,6 @@ public class GuiseMummy implements Clogged {
 	/** The configuration indicating the deployment targets, if any. Must be a collection of {@link Section} each indicating a {@link DeployTarget}. */
 	public static final String CONFIG_KEY_DEPLOY_TARGETS = "deploy.targets";
 
-	//mummifier settings
-
-	/** The default mummifier for normal files. */
-	private final SourcePathMummifier defaultFileMummifier = new OpaqueFileMummifier();
-
-	/** The default mummifier for normal directories. */
-	private final SourcePathMummifier defaultDirectoryMummifier = new DirectoryMummifier();
-
-	/** The registered mummifiers by supported extensions. These extensions are in canonical (lowercase) form. */
-	private final Map<String, SourcePathMummifier> fileMummifiersByExtension = new HashMap<>();
-
 	private boolean full = false;
 
 	/** @return <code>true</code> if full mummification is enabled; <code>false</code> if mummification is incremental. */
@@ -258,24 +243,26 @@ public class GuiseMummy implements Clogged {
 		return unmodifiableList(deployUrls);
 	}
 
+	//mummifier settings
+
+	private Set<Class<? extends SourcePathMummifier>> fileMummifierTypes = new HashSet<>();
+
 	/**
-	 * Registers a mummify for all its supported filename extensions.
-	 * @param mummifier The mummifier to register.
-	 * @see Mummifier#getSupportedFilenameExtensions()
+	 * Adds a mummifier type. If that type has already been added, no action occurs.
+	 * @param mummifierClass The class representing the type of mummifier to add
+	 * @throws IllegalArgumentException if the mummifier class does not have a no-args constructor.
 	 */
-	public void registerFileMummifier(@Nonnull final SourcePathMummifier mummifier) {
-		mummifier.getSupportedFilenameExtensions().stream()
-				//normalize extensions so we can look up without regard to case
-				.map(Filenames.Extensions::normalize).forEach(ext -> fileMummifiersByExtension.put(ext, mummifier));
+	public void addFileMummifierType(@Nonnull final Class<? extends SourcePathMummifier> mummifierClass) {
+		try {
+			mummifierClass.getDeclaredConstructor();
+		} catch(final NoSuchMethodException noSuchMethodException) {
+			throw new IllegalArgumentException(format("Mummifier type %s does not declare a no-args constructor.", mummifierClass.getName()));
+		}
+		fileMummifierTypes.add(mummifierClass);
 	}
 
 	/** No-args constructor. */
 	public GuiseMummy() {
-		//register default resource types
-		registerFileMummifier(new MarkdownPageMummifier());
-		registerFileMummifier(new XhtmlPageMummifier());
-		registerFileMummifier(new HtmlPageMummifier());
-		registerFileMummifier(new DefaultImageMummifier());
 	}
 
 	/**
@@ -391,6 +378,16 @@ public class GuiseMummy implements Clogged {
 		}
 
 		final Context context = new Context(project, mummyConfiguration);
+		for(final Class<? extends SourcePathMummifier> mummifierClass : fileMummifierTypes) { //register any additional mummifiers
+			SourcePathMummifier fileMummifier;
+			try {
+				fileMummifier = mummifierClass.getDeclaredConstructor().newInstance();
+			} catch(InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+					| SecurityException instantiationException) {
+				throw new RuntimeException(format("Error instantiating mummifier %s.", mummifierClass.getName()), instantiationException);
+			}
+			context.registerFileMummifier(fileMummifier);
+		}
 
 		getLogger().debug("Mummification: {}", context.isFull() ? "full" : "incremental"); //TODO i18n
 		getLogger().debug("Configuration: page names bare = `{}`",
@@ -653,34 +650,6 @@ public class GuiseMummy implements Clogged {
 		public Context(@Nonnull final GuiseProject project, @Nonnull final Configuration siteConfiguration) {
 			super(project);
 			this.siteConfiguration = requireNonNull(siteConfiguration);
-		}
-
-		@Override
-		public SourcePathMummifier getDefaultSourceFileMummifier() {
-			return defaultFileMummifier;
-		}
-
-		@Override
-		public SourcePathMummifier getDefaultSourceDirectoryMummifier() {
-			return defaultDirectoryMummifier;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 * @implSpec This implementation finds a registered mummifier based upon the normalized filename extension (without regard to case).
-		 */
-		@Override
-		public Optional<SourcePathMummifier> findRegisteredMummifierForSourceFile(@Nonnull final Path sourceFile) {
-			return filenameExtensions(sourceFile).map(Filenames.Extensions::normalize).map(fileMummifiersByExtension::get).filter(Objects::nonNull).findFirst();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 * @implSpec This implementation doesn't support registered source directory mummifiers, and will always return {@link Optional#empty()}.
-		 */
-		@Override
-		public Optional<SourcePathMummifier> findRegisteredMummifierForSourceDirectory(Path sourceDirectory) {
-			return Optional.empty();
 		}
 
 	}
