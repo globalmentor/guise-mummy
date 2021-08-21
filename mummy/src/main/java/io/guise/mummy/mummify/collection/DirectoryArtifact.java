@@ -78,6 +78,11 @@ public class DirectoryArtifact extends AbstractArtifact implements SourcePathArt
 
 	private final Collection<Artifact> childArtifacts;
 
+	/**
+	 * {@inheritDoc}
+	 * @apiNote A directory's child artifacts do <em>not</em> include any content artifact.
+	 * @see #findContentArtifact()
+	 */
 	@Override
 	public Collection<Artifact> getChildArtifacts() {
 		return childArtifacts;
