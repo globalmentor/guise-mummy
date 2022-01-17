@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>io.guise</groupId>
 		<artifactId>guise</artifactId>
-		<version>0.5.1</version>
+		<version>0.5.2</version>
 	</parent>
 
 	<artifactId>guise-cli</artifactId>
