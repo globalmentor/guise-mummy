@@ -106,7 +106,7 @@ public class MultiplicationTablePanel extends LayoutPanel {
 		final Integer[][] multiplicationTableData = new Integer[maxFactor + 1][maxFactor + 1]; //create the table data array
 		for(int rowIndex = maxFactor; rowIndex >= 0; --rowIndex) { //for each row
 			for(int columnIndex = maxFactor; columnIndex >= 0; --columnIndex) { //for each column
-				multiplicationTableData[rowIndex][columnIndex] = new Integer(rowIndex * columnIndex); //fill this cell with data
+				multiplicationTableData[rowIndex][columnIndex] = rowIndex * columnIndex; //fill this cell with data
 			}
 		}
 		final String[] columnNames = new String[maxFactor + 1]; //create the array of column names

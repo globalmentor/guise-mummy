@@ -308,7 +308,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 				for(final Component component : getChildComponents()) { //look at all the child components
 					if(component instanceof ValueControl && ((ValueControl<?>)component).getValueClass().equals(Boolean.class)
 							&& Boolean.TRUE.equals(((ValueControl<Boolean>)component).getValue())) { //if the component is a Boolean value control set to TRUE
-						selectedIndexes.add(new Integer(i)); //add this index to the set of selected indexes
+						selectedIndexes.add(i); //add this index to the set of selected indexes
 					}
 					++i; //go to the next index
 				}

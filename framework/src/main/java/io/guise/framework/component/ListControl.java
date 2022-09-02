@@ -48,7 +48,7 @@ public class ListControl<V> extends AbstractListSelectControl<V> {
 		if(rowCount != newRowCount) { //if the value is really changing
 			final int oldRowCount = rowCount; //get the old value
 			rowCount = newRowCount; //actually change the value
-			firePropertyChange(ROW_COUNT_PROPERTY, new Integer(oldRowCount), new Integer(newRowCount)); //indicate that the value changed
+			firePropertyChange(ROW_COUNT_PROPERTY, oldRowCount, newRowCount); //indicate that the value changed
 		}
 	}
 

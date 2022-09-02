@@ -74,7 +74,7 @@ public class TabContainerControl extends AbstractListSelectContainerControl {
 		if(maxTabCount != newMaxTabCount) { //if the value is really changing
 			final int oldMaxTabCount = maxTabCount; //get the old value
 			maxTabCount = newMaxTabCount; //actually change the value
-			firePropertyChange(MAX_TAB_COUNT_PROPERTY, new Integer(oldMaxTabCount), new Integer(newMaxTabCount)); //indicate that the value changed
+			firePropertyChange(MAX_TAB_COUNT_PROPERTY, oldMaxTabCount, newMaxTabCount); //indicate that the value changed
 		}
 	}
 

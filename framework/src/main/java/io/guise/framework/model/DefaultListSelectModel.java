@@ -434,7 +434,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 			int index = 0; //start at the first index
 			for(final ValueState valueState : valueStateList) { //for each value state
 				if(valueState.isSelected()) { //if this value is selected
-					selectedIndexes.add(new Integer(index)); //add this index to our list of selected indexes
+					selectedIndexes.add(index); //add this index to our list of selected indexes
 				}
 				++index; //go to the next index
 			}

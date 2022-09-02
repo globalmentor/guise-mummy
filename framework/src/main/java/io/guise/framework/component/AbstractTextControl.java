@@ -106,7 +106,7 @@ public class AbstractTextControl<V> extends AbstractEditValueControl<V> {
 		if(columnCount != newColumnCount) { //if the value is really changing
 			final int oldColumnCount = columnCount; //get the old value
 			columnCount = newColumnCount; //actually change the value
-			firePropertyChange(COLUMN_COUNT_PROPERTY, new Integer(oldColumnCount), new Integer(newColumnCount)); //indicate that the value changed
+			firePropertyChange(COLUMN_COUNT_PROPERTY, oldColumnCount, newColumnCount); //indicate that the value changed
 		}
 	}
 

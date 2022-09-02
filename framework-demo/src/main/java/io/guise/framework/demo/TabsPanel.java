@@ -81,9 +81,9 @@ public class TabsPanel extends LayoutPanel {
 		tabControlPanel.setLabel("Standalone TabControl.");
 		//TabControl
 		final TabControl<Integer> tabControl = new TabControl<Integer>(Integer.class, Flow.LINE); //create a horizontal
-		tabControl.add(new Integer(5));
-		tabControl.add(new Integer(10));
-		tabControl.add(new Integer(15));
+		tabControl.add(5);
+		tabControl.add(10);
+		tabControl.add(15);
 		tabControlPanel.add(tabControl);
 		add(tabControlPanel);
 	}

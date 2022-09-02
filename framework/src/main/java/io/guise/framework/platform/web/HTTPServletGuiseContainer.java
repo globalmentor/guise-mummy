@@ -198,7 +198,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer {
 						logParameters.put("creationTime", new Date(httpSession.getCreationTime()));	//session creation time
 						logParameters.put("isNew", Boolean.valueOf(httpSession.isNew()));	//session is new
 						logParameters.put("lastAccessedTime", new Date(httpSession.getLastAccessedTime()));	//session last accessed time
-						logParameters.put("maxInactiveInterval", new Integer(httpSession.getMaxInactiveInterval()));	//session max inactive interval
+						logParameters.put("maxInactiveInterval", httpSession.getMaxInactiveInterval());	//session max inactive interval
 						Log.log(logWriter, InformationLevel.LOG, null, null, "guise-session-create", null, logParameters, null);	//TODO improve; use a constant
 						logWriter.flush();	//flush the log information
 					}
@@ -264,7 +264,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer {
 		logParameters.put("creationTime", new Date(httpSession.getCreationTime()));	//session creation time
 		logParameters.put("isNew", Boolean.valueOf(httpSession.isNew()));	//session is new
 		logParameters.put("lastAccessedTime", new Date(httpSession.getLastAccessedTime()));	//session last accessed time
-		logParameters.put("maxInactiveInterval", new Integer(httpSession.getMaxInactiveInterval()));	//session max inactive interval
+		logParameters.put("maxInactiveInterval", httpSession.getMaxInactiveInterval());	//session max inactive interval
 		try
 		{
 			Log.log(guiseSession.getLogWriter(), InformationLevel.LOG, null, null, "guise-session-destroy", null, logParameters, null);	//TODO improve; use a constant

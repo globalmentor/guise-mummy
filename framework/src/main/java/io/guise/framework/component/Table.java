@@ -114,7 +114,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		if(displayRowCount != newDisplayRowCount) { //if the value is really changing
 			final int oldDisplayRowCount = displayRowCount; //get the old value
 			displayRowCount = newDisplayRowCount; //actually change the value
-			firePropertyChange(DISPLAY_ROW_COUNT_PROPERTY, new Integer(oldDisplayRowCount), new Integer(newDisplayRowCount)); //indicate that the value changed
+			firePropertyChange(DISPLAY_ROW_COUNT_PROPERTY, oldDisplayRowCount, newDisplayRowCount); //indicate that the value changed
 		}
 	}
 
@@ -139,7 +139,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		if(displayRowStartIndex != newDisplayRowStartIndex) { //if the value is really changing
 			final int oldDisplayRowStartIndex = displayRowStartIndex; //get the old value
 			displayRowStartIndex = newDisplayRowStartIndex; //actually change the value
-			firePropertyChange(DISPLAY_ROW_START_INDEX_PROPERTY, new Integer(oldDisplayRowStartIndex), new Integer(newDisplayRowStartIndex)); //indicate that the value changed
+			firePropertyChange(DISPLAY_ROW_START_INDEX_PROPERTY, oldDisplayRowStartIndex, newDisplayRowStartIndex); //indicate that the value changed
 		}
 	}
 

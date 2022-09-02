@@ -984,7 +984,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 							//TODO del entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, request.getQueryString());
 
 							//							TODO fix				entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, request.getQueryString());
-							entry.setFieldValue(Field.SERVER_CLIENT_STATUS_FIELD, new Integer(200)); //TODO fix with real HTTP status
+							entry.setFieldValue(Field.SERVER_CLIENT_STATUS_FIELD, 200); //TODO fix with real HTTP status
 							//							TODO fix cs-status
 							//							TODO fix cs-bytes
 							//							TODO fix cs-version

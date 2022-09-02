@@ -393,7 +393,7 @@ public class HomePanel extends LayoutPanel {
 										final Integer[][] multiplicationTableData=new Integer[MAX_FACTOR+1][MAX_FACTOR+1];	//create the table data array
 										for(int rowIndex=MAX_FACTOR; rowIndex>=0; --rowIndex) {	//for each row
 											for(int columnIndex=MAX_FACTOR; columnIndex>=0; --columnIndex) {	//for each column
-												multiplicationTableData[rowIndex][columnIndex]=new Integer(rowIndex*columnIndex);	//fill this cell with data
+												multiplicationTableData[rowIndex][columnIndex]=rowIndex*columnIndex;	//fill this cell with data
 											}
 										}
 										final String[] columnNames=new String[MAX_FACTOR+1];	//create the array of column names
@@ -547,7 +547,7 @@ public class HomePanel extends LayoutPanel {
 		testTableData = new Integer[rowCount][columnCount];
 		for(int rowIndex = 0; rowIndex < rowCount; ++rowIndex) {
 			for(int columnIndex = 0; columnIndex < columnCount; ++columnIndex) {
-				testTableData[rowIndex][columnIndex] = new Integer(rowIndex);
+				testTableData[rowIndex][columnIndex] = rowIndex;
 			}
 		}
 		final Table pagedTable = new Table(Integer.class, testTableData, "Column1", "Column2", "Column3");
@@ -814,7 +814,7 @@ public class HomePanel extends LayoutPanel {
 		final Integer[][] multiplicationTableData = new Integer[2][2];
 		for(int row = 0; row < 2; ++row) {
 			for(int column = 0; column < 2; ++column) {
-				multiplicationTableData[row][column] = new Integer(row * column);
+				multiplicationTableData[row][column] = row * column;
 			}
 		}
 		final Table multiplicationTable = new Table(Integer.class, multiplicationTableData, "0", "1");

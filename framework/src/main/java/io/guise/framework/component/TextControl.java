@@ -104,7 +104,7 @@ public class TextControl<V> extends AbstractTextControl<V> {
 		if(maximumLength != newMaximumLength) { //if the value is really changing
 			final int oldMaximumLength = maximumLength; //get the old value
 			maximumLength = newMaximumLength; //actually change the value
-			firePropertyChange(MAXIMUM_LENGTH_PROPERTY, new Integer(oldMaximumLength), new Integer(newMaximumLength)); //indicate that the value changed
+			firePropertyChange(MAXIMUM_LENGTH_PROPERTY, oldMaximumLength, newMaximumLength); //indicate that the value changed
 		}
 	}
 
@@ -167,7 +167,7 @@ public class TextControl<V> extends AbstractTextControl<V> {
 		if(rowCount != newRowCount) { //if the value is really changing
 			final int oldRowCount = rowCount; //get the old value
 			rowCount = newRowCount; //actually change the value
-			firePropertyChange(ROW_COUNT_PROPERTY, new Integer(oldRowCount), new Integer(newRowCount)); //indicate that the value changed
+			firePropertyChange(ROW_COUNT_PROPERTY, oldRowCount, newRowCount); //indicate that the value changed
 		}
 	}
 

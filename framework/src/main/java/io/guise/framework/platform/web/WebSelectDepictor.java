@@ -97,7 +97,7 @@ public class WebSelectDepictor<V, C extends ListSelectControl<V>> extends Abstra
 					++selectedIDIndex; //indicate that we're looking at the next selected ID index
 					if(valueID.equals(selectedID)) { //if we found the value the ID matches
 						if(selectControl.isIndexEnabled(valueIndex)) { //if this index is enabled
-							selectedIndexList.add(new Integer(valueIndex)); //store the index of the value it represents
+							selectedIndexList.add(valueIndex); //store the index of the value it represents
 						}
 					}
 				}

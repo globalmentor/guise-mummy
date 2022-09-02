@@ -116,7 +116,7 @@ public class MenusPanel extends LayoutPanel {
 		});
 		accordionMenuPanel.add(rolloverOpenCheckbox);
 		//create a text input control to indicate the number of continents clicks, and set its model's default to zero
-		final TextControl<Integer> continentsClickCountControl = new TextControl<Integer>(new DefaultValueModel<Integer>(Integer.class, new Integer(0)));
+		final TextControl<Integer> continentsClickCountControl = new TextControl<Integer>(new DefaultValueModel<Integer>(Integer.class, 0));
 		continentsClickCountControl.setLabel("Number of clicks on the \"Continents\" accordion menu."); //add a label to the input control
 		continentsClickCountControl.setEditable(false); //don't allow the control to be edited
 		accordionMenuPanel.add(continentsClickCountControl);
@@ -128,7 +128,7 @@ public class MenusPanel extends LayoutPanel {
 			public void actionPerformed(ActionEvent actionEvent) {
 				final int oldClickCount = continentsClickCountControl.getValue().intValue(); //get the old number of clicks
 				try {
-					continentsClickCountControl.setValue(new Integer(oldClickCount + 1)); //update the number of clicks
+					continentsClickCountControl.setValue(oldClickCount + 1); //update the number of clicks
 				} catch(final PropertyVetoException propertyVetoException) { //if the change was vetoed, ignore the exception
 				}
 			}

@@ -41,7 +41,7 @@ public abstract class AbstractEffect extends GuiseBoundPropertyObject implements
 		if(delay != newDelay) { //if the value is really changing
 			final int oldDelay = delay; //get the current value
 			delay = newDelay; //update the value
-			firePropertyChange(DELAY_PROPERTY, new Integer(oldDelay), new Integer(newDelay));
+			firePropertyChange(DELAY_PROPERTY, oldDelay, newDelay);
 		}
 	}
 

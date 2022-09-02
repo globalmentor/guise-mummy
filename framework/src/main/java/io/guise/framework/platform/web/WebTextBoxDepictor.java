@@ -112,7 +112,7 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 					xmlText = resolvedText; //just use the text as-is
 				}
 				try {
-					final Integer xmlTextHash = new Integer(xmlText.hashCode()); //get the hash code of the string
+					final Integer xmlTextHash = xmlText.hashCode(); //get the hash code of the string
 					//TODO del					CachedDocument cachedDocument=null;	//we'll see if we can find a cached document for the XML text
 					//don't synchronize on the cache, which would cause delays when blocking to load new documents
 					//the race condition is benign; at the worse, a document might be loaded several times during initial caching
