@@ -41,7 +41,7 @@
 	<properties>
 		<maven.compiler.release>11</maven.compiler.release>
 		<globalmentor-ee.version>0.6.3</globalmentor-ee.version>
-		<globalmentor-web.version>0.6.5</globalmentor-web.version>
+		<globalmentor-web.version>0.6.6-SNAPSHOT</globalmentor-web.version>
 		<slf4j.version>1.7.30</slf4j.version>
 		<tomcat.version>9.0.50</tomcat.version>
 		<urf.version>0.4.1</urf.version>
@@ -133,7 +133,7 @@
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-rdfa-spec</artifactId>
-				<version>0.6.3</version>
+				<version>${globalmentor-web.version}</version>
 			</dependency>
 
 			<dependency>
