@@ -278,23 +278,6 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable<
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * <p>
-	 * This implementation makes sure the audio is stopped.
-	 * </p>
-	 */
-	@Override
-	protected void finalize() throws Throwable {
-		try {
-			stop(); //stop the audio
-		} finally
-		//always do the default finalization
-		{
-			super.finalize();
-		}
-	}
-
-	/**
 	 * The custom depictor type for audio.
 	 * @author Garret Wilson
 	 * @param <A> The type of audio to be depicted.
