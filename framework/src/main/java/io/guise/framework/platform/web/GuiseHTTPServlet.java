@@ -1480,7 +1480,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 				final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder(); //create a new document builder
 				final Document document = documentBuilder.parse(guiseRequest.getHTTPServletRequest().getInputStream()); //read the document from the request
 				//Log.trace("request XML:", XMLUtilities.toString(document));
-				final List<Node> eventNodes = (List<Node>)XPath.evaluatePathExpression(document, AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION); //get all the events
+				@SuppressWarnings("unchecked")
+				final List<Node> eventNodes = (List<Node>)XPathDom.evaluatePathExpression(document, AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION); //get all the events
 				for(final Node eventNode : eventNodes) { //for each event node
 					if(eventNode.getNodeType() == Node.ELEMENT_NODE) { //if this is an event element
 						final Element eventElement = (Element)eventNode; //cast the node to an element
@@ -1621,27 +1622,27 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 							case MOUSEENTER:
 							case MOUSEEXIT:
 								{
-									final Node componentNode = XPath.getNode(eventNode, AJAX_REQUEST_COMPONENT_XPATH_EXPRESSION); //get the component node
+									final Node componentNode = XPathDom.getNode(eventNode, AJAX_REQUEST_COMPONENT_XPATH_EXPRESSION); //get the component node
 									final String componentID = ((Element)componentNode).getAttribute("id"); //TODO tidy; improve; comment
 									final int componentX = Integer.parseInt(((Element)componentNode).getAttribute("x")); //TODO tidy; improve; check for errors; comment
 									final int componentY = Integer.parseInt(((Element)componentNode).getAttribute("y")); //TODO tidy; improve; check for errors; comment
 									final int componentWidth = Integer.parseInt(((Element)componentNode).getAttribute("width")); //TODO tidy; improve; check for errors; comment
 									final int componentHeight = Integer.parseInt(((Element)componentNode).getAttribute("height")); //TODO tidy; improve; check for errors; comment
 
-									final Node targetNode = XPath.getNode(eventNode, AJAX_REQUEST_TARGET_XPATH_EXPRESSION); //get the target node
+									final Node targetNode = XPathDom.getNode(eventNode, AJAX_REQUEST_TARGET_XPATH_EXPRESSION); //get the target node
 									final String targetID = ((Element)targetNode).getAttribute("id"); //TODO tidy; improve; comment
 									final int targetX = Integer.parseInt(((Element)targetNode).getAttribute("x")); //TODO tidy; improve; check for errors; comment
 									final int targetY = Integer.parseInt(((Element)targetNode).getAttribute("y")); //TODO tidy; improve; check for errors; comment
 									final int targetWidth = Integer.parseInt(((Element)targetNode).getAttribute("width")); //TODO tidy; improve; check for errors; comment
 									final int targetHeight = Integer.parseInt(((Element)targetNode).getAttribute("height")); //TODO tidy; improve; check for errors; comment
 
-									final Node viewportNode = XPath.getNode(eventNode, AJAX_REQUEST_VIEWPORT_XPATH_EXPRESSION); //get the viewport node
+									final Node viewportNode = XPathDom.getNode(eventNode, AJAX_REQUEST_VIEWPORT_XPATH_EXPRESSION); //get the viewport node
 									final int viewportX = Integer.parseInt(((Element)viewportNode).getAttribute("x")); //TODO tidy; improve; check for errors; comment
 									final int viewportY = Integer.parseInt(((Element)viewportNode).getAttribute("y")); //TODO tidy; improve; check for errors; comment
 									final int viewportWidth = Integer.parseInt(((Element)viewportNode).getAttribute("width")); //TODO tidy; improve; check for errors; comment
 									final int viewportHeight = Integer.parseInt(((Element)viewportNode).getAttribute("height")); //TODO tidy; improve; check for errors; comment
 
-									final Node mouseNode = XPath.getNode(eventNode, AJAX_REQUEST_MOUSE_XPATH_EXPRESSION); //get the mouse node
+									final Node mouseNode = XPathDom.getNode(eventNode, AJAX_REQUEST_MOUSE_XPATH_EXPRESSION); //get the mouse node
 									final int mouseX = Integer.parseInt(((Element)mouseNode).getAttribute("x")); //TODO tidy; improve; check for errors; comment
 									final int mouseY = Integer.parseInt(((Element)mouseNode).getAttribute("y")); //TODO tidy; improve; check for errors; comment
 
