@@ -46,7 +46,7 @@ public class DefaultImageMummifierTest {
 	private DefaultImageMummifier testMummifier;
 
 	@BeforeEach
-	private void setupTestMummifier() throws IOException {
+	void setupTestMummifier() throws IOException {
 		testMummifier = new DefaultImageMummifier();
 	}
 

@@ -4,8 +4,8 @@
 
 	<parent>
 		<groupId>com.globalmentor</groupId>
-		<artifactId>globalmentor-opensource-parent</artifactId>
-		<version>8.6.0</version>
+		<artifactId>globalmentor-base</artifactId>
+		<version>0.7.3-SNAPSHOT</version>
 	</parent>
 
 	<groupId>io.guise</groupId>
@@ -32,6 +32,14 @@
 		</developer>
 	</developers>
 
+	<licenses>
+		<license>
+			<name>Apache-2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
 	<scm>
 		<connection>scm:git:https://bitbucket.org/globalmentor/guise.git</connection>
 		<developerConnection>scm:git:https://bitbucket.org/globalmentor/guise.git</developerConnection>
@@ -41,8 +49,6 @@
 	<properties>
 		<maven.compiler.release>11</maven.compiler.release>
 		<globalmentor-ee.version>0.6.3</globalmentor-ee.version>
-		<globalmentor-web.version>0.6.6-SNAPSHOT</globalmentor-web.version>
-		<slf4j.version>1.7.30</slf4j.version>
 		<tomcat.version>9.0.50</tomcat.version>
 		<urf.version>0.4.1</urf.version>
 	</properties>
@@ -67,19 +73,13 @@
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-application</artifactId>
-				<version>0.7.5</version>
+				<version>0.7.7</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-awt</artifactId>
 				<version>0.6.0</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-css-spec</artifactId>
-				<version>${globalmentor-web.version}</version>
 			</dependency>
 
 			<dependency>
@@ -102,24 +102,6 @@
 
 			<dependency>
 				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-html</artifactId>
-				<version>${globalmentor-web.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-html-spec</artifactId>
-				<version>${globalmentor-web.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-javascript</artifactId>
-				<version>${globalmentor-web.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-log</artifactId>
 				<version>0.6.4</version>
 			</dependency>
@@ -128,12 +110,6 @@
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-mail</artifactId>
 				<version>0.6.0</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-rdfa-spec</artifactId>
-				<version>${globalmentor-web.version}</version>
 			</dependency>
 
 			<dependency>
@@ -156,26 +132,32 @@
 
 			<dependency>
 				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-vocab-ogp</artifactId>
-				<version>${globalmentor-web.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-vocab-dcmi</artifactId>
-				<version>${globalmentor-web.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-xml</artifactId>
-				<version>${globalmentor-web.version}</version>
+				<artifactId>globalmentor-web</artifactId>
+				<version>0.6.6</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 
 			<dependency>
 				<groupId>com.vladsch.flexmark</groupId>
 				<artifactId>flexmark-all</artifactId>
 				<version>0.50.50</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.clogr</groupId>
+				<artifactId>clogr-bom</artifactId>
+				<version>0.8.3</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>io.confound</groupId>
+				<artifactId>confound-bom</artifactId>
+				<version>0.7.3</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 
 			<dependency>
@@ -230,12 +212,6 @@
 				<groupId>org.snakeyaml</groupId>
 				<artifactId>snakeyaml-engine</artifactId>
 				<version>2.1</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>jul-to-slf4j</artifactId>
-				<version>${slf4j.version}</version>
 			</dependency>
 
 			<dependency>

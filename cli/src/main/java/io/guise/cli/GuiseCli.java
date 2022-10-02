@@ -42,14 +42,11 @@ import org.slf4j.Logger;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.slf4j.event.Level;
 
-import com.github.dtmo.jfiglet.*;
 import com.globalmentor.application.*;
 import com.globalmentor.net.Host;
 import com.globalmentor.net.URIs;
 
 import io.confound.config.Configuration;
-import io.confound.config.ConfigurationException;
-import io.confound.config.file.ResourcesConfigurationManager;
 import io.guise.catalina.webresources.SiteRoot;
 import io.guise.mummy.*;
 import io.guise.mummy.mummify.Mummifier;
@@ -89,27 +86,6 @@ public class GuiseCli extends BaseCliApplication {
 	}
 
 	/**
-	 * Prints startup app information, including application banner, name, and version.
-	 * @throws ConfigurationException if some configuration information isn't present.
-	 */
-	protected void printAppInfo() {
-		final FigletRenderer figletRenderer;
-		final Configuration appConfiguration;
-		try {
-			appConfiguration = ResourcesConfigurationManager.loadConfigurationForClass(getClass())
-					.orElseThrow(ResourcesConfigurationManager::createConfigurationNotFoundException);
-			figletRenderer = new FigletRenderer(FigFontResources.loadFigFontResource(FigFontResources.BIG_FLF));
-		} catch(final IOException ioException) {
-			throw new ConfigurationException(ioException);
-		}
-		System.out.print(ansi().bold().fg(Ansi.Color.GREEN));
-		System.out.print(figletRenderer.renderText("Guise"));
-		System.out.println(ansi().reset());
-		System.out.println(appConfiguration.getString(CONFIG_KEY_NAME) + " " + appConfiguration.getString(CONFIG_KEY_VERSION));
-		System.out.println();
-	}
-
-	/**
 	 * Logs information about the current Guise project.
 	 * @param project The Guise project.
 	 * @see #getLogger()
@@ -132,7 +108,7 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory)
 			throws IOException {
 
-		printAppInfo();
+		logAppInfo();
 
 		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 
@@ -155,7 +131,7 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-description-target-dir", description = "The target root directory of the site description to be removed; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory)
 			throws IOException {
 
-		printAppInfo();
+		logAppInfo();
 
 		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 
@@ -189,7 +165,7 @@ public class GuiseCli extends BaseCliApplication {
 					"-f"}, description = "Specifies full instead of incremental mummification.%nCached artifacts will be regenerated.", defaultValue = "false") final boolean full)
 			throws IOException {
 
-		printAppInfo();
+		logAppInfo();
 
 		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 
@@ -217,7 +193,7 @@ public class GuiseCli extends BaseCliApplication {
 					"-f"}, description = "Specifies full instead of incremental mummification.%nCached artifacts will be regenerated.", defaultValue = "false") final boolean full)
 			throws IOException {
 
-		printAppInfo();
+		logAppInfo();
 
 		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 
@@ -245,7 +221,7 @@ public class GuiseCli extends BaseCliApplication {
 					"-f"}, description = "Specifies full instead of incremental mummification and deployment.%nCached artifacts will be regenerated and all artifacts will be redeployed.", defaultValue = "false") final boolean full)
 			throws IOException {
 
-		printAppInfo();
+		logAppInfo();
 
 		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 
@@ -284,7 +260,7 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = {"--browse", "-b"}, description = "Opens a browser to the site after starting the server.") final boolean browse)
 			throws IOException, LifecycleException {
 
-		printAppInfo();
+		logAppInfo();
 
 		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
 

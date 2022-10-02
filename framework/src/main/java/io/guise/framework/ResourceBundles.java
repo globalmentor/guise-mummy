@@ -25,12 +25,12 @@ import static java.util.Objects.*;
 import com.globalmentor.io.IO;
 import com.globalmentor.model.Locales;
 import com.globalmentor.util.HashMapResourceBundle;
+import com.globalmentor.util.PropertiesFiles;
 
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.Java.*;
 import static com.globalmentor.model.Locales.*;
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.util.PropertiesUtilities.*;
 
 /**
  * Utilities for working with resource bundles.
@@ -56,7 +56,7 @@ public class ResourceBundles //TODO moved out of globalmentor-core to allow org.
 		XML(com.globalmentor.xml.spec.XML.FILENAME_EXTENSION),
 
 		/** The resource bundle is serialized in a properties file. */
-		PROPERTIES(PROPERTIES_NAME_EXTENSION);
+		PROPERTIES(PropertiesFiles.FILENAME_EXTENSION);
 
 		/** The extension for this resource bundle file type. */
 		private final String extension;

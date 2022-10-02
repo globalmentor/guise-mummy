@@ -1173,7 +1173,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		final boolean isXML; //see if this is an XML file
 		if(XML.FILENAME_EXTENSION.equals(extension)) { //if this is an XML file
 			isXML = true; //indicate that we should load XML
-		} else if(PropertiesUtilities.PROPERTIES_NAME_EXTENSION.equals(extension)) { //if this is a properties file
+		} else if(PropertiesFiles.FILENAME_EXTENSION.equals(extension)) { //if this is a properties file
 			isXML = false; //indicate that we should load normal properties
 		} else { //if this is neither an XML file nor a traditional properties file
 			throw new IllegalArgumentException("Unrecognized properties file type: " + propertiesPath);
