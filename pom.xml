@@ -14,13 +14,13 @@
 	<packaging>pom</packaging>
 
 	<name>Guise Ecosystem</name>
-	<description>Guise™ Internet application ecosystem.</description>
+	<description>Guise™ Internet application ecosystem and bill of materials.</description>
 	<url>https://guise.io/</url>
 	<inceptionYear>2005</inceptionYear>
 
 	<organization>
 		<name>GlobalMentor, Inc.</name>
-		<url>http://www.globalmentor.com/</url>
+		<url>https://www.globalmentor.com/</url>
 	</organization>
 
 	<developers>
@@ -28,7 +28,7 @@
 			<name>Garret Wilson</name>
 			<email>garret@globalmentor.com</email>
 			<organization>GlobalMentor, Inc.</organization>
-			<organizationUrl>http://www.globalmentor.com/</organizationUrl>
+			<organizationUrl>https://www.globalmentor.com/</organizationUrl>
 		</developer>
 	</developers>
 
@@ -162,7 +162,19 @@
 
 			<dependency>
 				<groupId>io.guise</groupId>
+				<artifactId>guise-cli</artifactId>
+				<version>0.5.3-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.guise</groupId>
 				<artifactId>guise-framework</artifactId>
+				<version>0.5.3-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.guise</groupId>
+				<artifactId>guise-framework-demo</artifactId>
 				<version>0.5.3-SNAPSHOT</version>
 			</dependency>
 
