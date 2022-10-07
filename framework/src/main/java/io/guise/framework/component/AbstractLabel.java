@@ -21,8 +21,6 @@ import com.globalmentor.net.MediaType;
 import io.guise.framework.component.transfer.*;
 import io.guise.framework.model.*;
 
-import static com.globalmentor.java.Arrays.*;
-
 /**
  * A abstract component the label of which comprises the main content of the component. This component installs a default export strategy supporting export of
  * the following content types:
@@ -80,7 +78,7 @@ public abstract class AbstractLabel extends AbstractComponent implements LabelCo
 		 */
 		@Override
 		public MediaType[] getContentTypes() {
-			return createArray(getSource().getLabelContentType());
+			return new MediaType[] {getSource().getLabelContentType()};
 		}
 
 		@Override

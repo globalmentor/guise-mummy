@@ -207,7 +207,7 @@ public class BaseImageMummifierTest {
 	private BaseImageMummifier testMummifier;
 
 	@BeforeEach
-	private void setupTestMummifier() throws IOException {
+	void setupTestMummifier() throws IOException {
 		testMummifier = new BaseImageMummifier(Set.of(JPEG_MEDIA_TYPE)) {
 
 			@Override

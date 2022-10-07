@@ -49,7 +49,7 @@ public class MummifySmokeIT extends BaseEndToEndIT {
 	private static byte[] randomBinContent = new byte[(1 << 10) + 11]; //1024 and a little more
 
 	@BeforeAll
-	private static void generateRandomBinContent() {
+	static void generateRandomBinContent() {
 		new Random(RANDOM_SEED).nextBytes(randomBinContent);
 	}
 

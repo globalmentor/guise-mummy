@@ -610,7 +610,13 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			}
 			baseNameLogWriterInfoMap.clear(); //remove all log writer information
 		}
-		logConfiguration.dispose(); //dispose of our main application log configuration, closing files as necessary
+		try {
+			logConfiguration.close(); //close our main application log configuration, closing files as necessary
+		} catch(final IOException ioException) {
+			System.err.println("Error closing log writer; " + ioException.getMessage());
+			ioException.printStackTrace();
+		}
+
 		this.container = null; //release the container
 		this.basePath = null; //remove the base path
 	}
@@ -1173,7 +1179,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		final boolean isXML; //see if this is an XML file
 		if(XML.FILENAME_EXTENSION.equals(extension)) { //if this is an XML file
 			isXML = true; //indicate that we should load XML
-		} else if(PropertiesUtilities.PROPERTIES_NAME_EXTENSION.equals(extension)) { //if this is a properties file
+		} else if(PropertiesFiles.FILENAME_EXTENSION.equals(extension)) { //if this is a properties file
 			isXML = false; //indicate that we should load normal properties
 		} else { //if this is neither an XML file nor a traditional properties file
 			throw new IllegalArgumentException("Unrecognized properties file type: " + propertiesPath);

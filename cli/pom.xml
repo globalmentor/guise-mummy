@@ -15,7 +15,7 @@
 
 	<properties>
 		<exe.main.class>io.guise.cli.GuiseCli</exe.main.class>
-		<exe.filename>guise.exe</exe.filename>
+		<exe.base.filename>guise</exe.base.filename>
 	</properties>
 
 	<dependencies>
@@ -27,17 +27,6 @@
 		<dependency>
 			<groupId>com.globalmentor</groupId>
 			<artifactId>globalmentor-core</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.github.dtmo.jfiglet</groupId>
-			<artifactId>jfiglet</artifactId>
-			<version>1.0.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>io.clogr</groupId>
-			<artifactId>clogr-logback-provider</artifactId>
 		</dependency>
 
 		<dependency>
@@ -64,12 +53,6 @@
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-core</artifactId>
 		</dependency>
-
-		<dependency>
-			<groupId>org.tuxdude.logback.extensions</groupId>
-			<artifactId>logback-colorizer</artifactId>
-			<version>1.0.1</version>
-		</dependency>
 	</dependencies>
 
 	<build>
@@ -82,34 +65,8 @@
 
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-bin</id>
-						<phase>process-resources</phase>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>set-shell-scripts-executable</id>
-						<phase>process-resources</phase>
-					</execution>
-					<execution>
-						<id>remove-shell-script-extensions</id>
-						<phase>process-resources</phase>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
 				<executions>
 					<execution>
 						<id>generate-exe-jar</id>
@@ -124,6 +81,17 @@
 				<executions>
 					<execution>
 						<id>generate-exe</id>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-exe-jar-as-script</id>
 						<phase>package</phase>
 					</execution>
 				</executions>
@@ -147,6 +115,5 @@
 				</executions>
 			</plugin>
 		</plugins>
-
 	</build>
 </project>

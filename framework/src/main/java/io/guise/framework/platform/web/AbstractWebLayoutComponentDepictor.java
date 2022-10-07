@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
+import static com.globalmentor.collections.Lists.*;
+import static com.globalmentor.collections.iterators.Iterators.*;
 import static com.globalmentor.css.spec.CSS.*;
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.java.Arrays.*;
@@ -27,7 +29,6 @@ import static com.globalmentor.java.Enums.*;
 import static com.globalmentor.java.Numbers.*;
 import static io.guise.framework.platform.web.GuiseCSSStyleConstants.*;
 
-import com.globalmentor.collections.iterators.ReverseIterator;
 import com.globalmentor.css.spec.CSS;
 import com.globalmentor.html.spec.HTML;
 
@@ -146,7 +147,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 					depictContext.writeAttribute(null, ATTRIBUTE_CLASS, flowAxis == Axis.X ? LAYOUT_FLOW_X_CLASS : LAYOUT_FLOW_Y_CLASS); //class="layout-flow-x/y"
 					writeDirectionAttribute(orientation, flow); //explicitly write the direction ("ltr" or "rtl") for this flow so that the orientation will be taken into account
 					childComponentIterator = flowDirection == Flow.Direction.INCREASING ? component.getChildComponents().iterator()
-							: new ReverseIterator<Component>(component.getChildComponents()); //get an iterator to child components in the correct direction
+							: reverse(toList(component.getChildComponents()).listIterator()); //get an iterator to child components in the correct direction TODO make more efficient, taking into account unordered iterables
 					while(childComponentIterator.hasNext()) { //for each visible child component in the container, wrap the component in a span with the correct style
 						final Component childComponent = childComponentIterator.next(); //get the next child component
 						++childIndex; //update the child index
@@ -224,7 +225,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 							break;
 						case Y: //vertical flow
 							childComponentIterator = flowDirection == Flow.Direction.INCREASING ? component.getChildComponents().iterator()
-									: new ReverseIterator<Component>(component.getChildComponents()); //get an iterator to child components in the correct direction
+									: reverse(toList(component.getChildComponents()).listIterator()); //get an iterator to child components in the correct direction TODO make more efficient, taking into account unordered iterables
 							while(childComponentIterator.hasNext()) { //for each visible child component in the container, wrap the component in a span with the correct style
 								final Component childComponent = childComponentIterator.next(); //get the next child component
 								++childIndex; //update the child index
@@ -424,66 +425,66 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 							}
 							break;
 						case Y: //if we should span the left and right components vertically
-						{
-							final Component[] columnComponents = new Component[] {topComponent, centerComponent, bottomComponent}; //get the column components---even the null ones
-							final int columnComponentCount = getNonNullCount(columnComponents); //we'll see how many components are in the column
-							depictContext.write("\n"); //format the output
-							depictContext.writeIndent(); //write an indentation
-							depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TR); //<xhtml:tr>					
-							depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_REGION_CLASS); //class="layout-region"
-							if(leftComponent != null) { //if there is a left component
-								depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TD); //<xhtml:td>
-								depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_REGION_LEFT_CLASS); //class="layout-region-left"
-								if(columnComponentCount > 1) { //if there are more than one row component
-									depictContext.writeAttribute(null, ELEMENT_TD_ATTRIBUTE_ROWSPAN, Integer.toString(columnComponentCount)); //rowspan="columnComponentCount"						
+							{
+								final Component[] columnComponents = new Component[] {topComponent, centerComponent, bottomComponent}; //get the column components---even the null ones
+								final int columnComponentCount = getNonNullCount(columnComponents); //we'll see how many components are in the column
+								depictContext.write("\n"); //format the output
+								depictContext.writeIndent(); //write an indentation
+								depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TR); //<xhtml:tr>					
+								depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_REGION_CLASS); //class="layout-region"
+								if(leftComponent != null) { //if there is a left component
+									depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TD); //<xhtml:td>
+									depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_REGION_LEFT_CLASS); //class="layout-region-left"
+									if(columnComponentCount > 1) { //if there are more than one row component
+										depictContext.writeAttribute(null, ELEMENT_TD_ATTRIBUTE_ROWSPAN, Integer.toString(columnComponentCount)); //rowspan="columnComponentCount"						
+									}
+									beginRegion(regionLayout, regionLayout.getConstraints(leftComponent), orientation); //write the styles for this region
+									leftComponent.depict(); //update the left child view
+									depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TD); //</xhtml:td>
 								}
-								beginRegion(regionLayout, regionLayout.getConstraints(leftComponent), orientation); //write the styles for this region
-								leftComponent.depict(); //update the left child view
-								depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TD); //</xhtml:td>
-							}
-							int centerColumnRowIndex = 0; //keep track of which center row comopnent we're on
-							for(; centerColumnRowIndex < columnComponents.length && columnComponents[centerColumnRowIndex] == null; ++centerColumnRowIndex)
-								; //skip the null center column components
-							if(centerColumnRowIndex < columnComponents.length) { //if there is a center column component
-								final Component columnComponent = columnComponents[centerColumnRowIndex]; //get this column component
-								depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TD); //<xhtml:td>
-								depictContext.writeAttribute(null, ATTRIBUTE_CLASS, COLUMN_REGION_CLASSES[centerColumnRowIndex]); //class="layout-region-top/center/bottom"
-								/*TODO del
-																	if(columnComponentCount>1) {	//if there are more than one row component
-																		depictContext.writeAttribute(null, ELEMENT_TD_ATTRIBUTE_ROWSPAN, Integer.toString(columnComponentCount));	//rowspan="columnComponentCount"						
-																	}
-								*/
-								beginRegion(regionLayout, regionLayout.getConstraints(columnComponent), orientation); //write the styles for this region
-								columnComponent.depict(); //update the child view for the component in this column
-								depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TD); //</xhtml:td>					
-							}
-							if(rightComponent != null) { //if there is a right component
-								depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TD); //<xhtml:td>
-								depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_REGION_RIGHT_CLASS); //class="layout-region-right"
-								if(columnComponentCount > 1) { //if there are more than one row component
-									depictContext.writeAttribute(null, ELEMENT_TD_ATTRIBUTE_ROWSPAN, Integer.toString(columnComponentCount)); //rowspan="columnComponentCount"						
-								}
-								beginRegion(regionLayout, regionLayout.getConstraints(rightComponent), orientation); //write the styles for this region
-								rightComponent.depict(); //update the right child view
-								depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TD); //</xhtml:td>
-							}
-							depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TR); //</xhtml:tr>
-							for(++centerColumnRowIndex; centerColumnRowIndex < columnComponents.length; ++centerColumnRowIndex) { //for each of the remaining center column components (the left and right components will have already been written, and span down the correct number of rows)
-								final Component columnComponent = columnComponents[centerColumnRowIndex]; //get this column component
-								if(columnComponent != null) { //if there is a column component for this row
-									depictContext.write("\n"); //format the output
-									depictContext.writeIndent(); //write an indentation
-									depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TR); //<xhtml:tr>					
-									depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_REGION_CLASS); //class="layout-region"
+								int centerColumnRowIndex = 0; //keep track of which center row comopnent we're on
+								for(; centerColumnRowIndex < columnComponents.length && columnComponents[centerColumnRowIndex] == null; ++centerColumnRowIndex)
+									; //skip the null center column components
+								if(centerColumnRowIndex < columnComponents.length) { //if there is a center column component
+									final Component columnComponent = columnComponents[centerColumnRowIndex]; //get this column component
 									depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TD); //<xhtml:td>
 									depictContext.writeAttribute(null, ATTRIBUTE_CLASS, COLUMN_REGION_CLASSES[centerColumnRowIndex]); //class="layout-region-top/center/bottom"
+									/*TODO del
+																		if(columnComponentCount>1) {	//if there are more than one row component
+																			depictContext.writeAttribute(null, ELEMENT_TD_ATTRIBUTE_ROWSPAN, Integer.toString(columnComponentCount));	//rowspan="columnComponentCount"						
+																		}
+									*/
 									beginRegion(regionLayout, regionLayout.getConstraints(columnComponent), orientation); //write the styles for this region
 									columnComponent.depict(); //update the child view for the component in this column
 									depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TD); //</xhtml:td>					
-									depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TR); //</xhtml:tr>
+								}
+								if(rightComponent != null) { //if there is a right component
+									depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TD); //<xhtml:td>
+									depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_REGION_RIGHT_CLASS); //class="layout-region-right"
+									if(columnComponentCount > 1) { //if there are more than one row component
+										depictContext.writeAttribute(null, ELEMENT_TD_ATTRIBUTE_ROWSPAN, Integer.toString(columnComponentCount)); //rowspan="columnComponentCount"						
+									}
+									beginRegion(regionLayout, regionLayout.getConstraints(rightComponent), orientation); //write the styles for this region
+									rightComponent.depict(); //update the right child view
+									depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TD); //</xhtml:td>
+								}
+								depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TR); //</xhtml:tr>
+								for(++centerColumnRowIndex; centerColumnRowIndex < columnComponents.length; ++centerColumnRowIndex) { //for each of the remaining center column components (the left and right components will have already been written, and span down the correct number of rows)
+									final Component columnComponent = columnComponents[centerColumnRowIndex]; //get this column component
+									if(columnComponent != null) { //if there is a column component for this row
+										depictContext.write("\n"); //format the output
+										depictContext.writeIndent(); //write an indentation
+										depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TR); //<xhtml:tr>					
+										depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_REGION_CLASS); //class="layout-region"
+										depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TD); //<xhtml:td>
+										depictContext.writeAttribute(null, ATTRIBUTE_CLASS, COLUMN_REGION_CLASSES[centerColumnRowIndex]); //class="layout-region-top/center/bottom"
+										beginRegion(regionLayout, regionLayout.getConstraints(columnComponent), orientation); //write the styles for this region
+										columnComponent.depict(); //update the child view for the component in this column
+										depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TD); //</xhtml:td>					
+										depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TR); //</xhtml:tr>
+									}
 								}
 							}
-						}
 							break;
 						default: //if we don't recognize the span axis
 							throw new AssertionError("Unrecognized span axis: " + spanAxis);

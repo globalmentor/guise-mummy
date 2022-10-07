@@ -4,8 +4,8 @@
 
 	<parent>
 		<groupId>com.globalmentor</groupId>
-		<artifactId>globalmentor-opensource-parent</artifactId>
-		<version>8.6.0</version>
+		<artifactId>globalmentor-base</artifactId>
+		<version>0.7.3</version>
 	</parent>
 
 	<groupId>io.guise</groupId>
@@ -14,13 +14,13 @@
 	<packaging>pom</packaging>
 
 	<name>Guise Ecosystem</name>
-	<description>Guise™ Internet application ecosystem.</description>
+	<description>Guise™ Internet application ecosystem and bill of materials.</description>
 	<url>https://guise.io/</url>
 	<inceptionYear>2005</inceptionYear>
 
 	<organization>
 		<name>GlobalMentor, Inc.</name>
-		<url>http://www.globalmentor.com/</url>
+		<url>https://www.globalmentor.com/</url>
 	</organization>
 
 	<developers>
@@ -28,9 +28,17 @@
 			<name>Garret Wilson</name>
 			<email>garret@globalmentor.com</email>
 			<organization>GlobalMentor, Inc.</organization>
-			<organizationUrl>http://www.globalmentor.com/</organizationUrl>
+			<organizationUrl>https://www.globalmentor.com/</organizationUrl>
 		</developer>
 	</developers>
+
+	<licenses>
+		<license>
+			<name>Apache-2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
 	<scm>
 		<connection>scm:git:https://bitbucket.org/globalmentor/guise.git</connection>
@@ -40,9 +48,6 @@
 
 	<properties>
 		<maven.compiler.release>11</maven.compiler.release>
-		<globalmentor-ee.version>0.6.3</globalmentor-ee.version>
-		<globalmentor-web.version>0.6.6-SNAPSHOT</globalmentor-web.version>
-		<slf4j.version>1.7.30</slf4j.version>
 		<tomcat.version>9.0.50</tomcat.version>
 		<urf.version>0.4.1</urf.version>
 	</properties>
@@ -67,109 +72,77 @@
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-application</artifactId>
-				<version>0.7.5</version>
+				<version>0.7.7</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-awt</artifactId>
-				<version>0.6.0</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-css-spec</artifactId>
-				<version>${globalmentor-web.version}</version>
+				<version>0.6.1</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-country-us</artifactId>
-				<version>0.6.1</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-iso-idcard</artifactId>
-				<version>0.6.1</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-itu</artifactId>
-				<version>0.6.0</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-html</artifactId>
-				<version>${globalmentor-web.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-html-spec</artifactId>
-				<version>${globalmentor-web.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-javascript</artifactId>
-				<version>${globalmentor-web.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-log</artifactId>
-				<version>0.6.4</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-mail</artifactId>
-				<version>0.6.0</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-rdfa-spec</artifactId>
-				<version>${globalmentor-web.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-servlet</artifactId>
-				<version>${globalmentor-ee.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-text-directory-vcard</artifactId>
 				<version>0.6.2</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-ee</artifactId>
+				<version>0.6.4</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-iso-idcard</artifactId>
+				<version>0.6.2</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-itu</artifactId>
+				<version>0.6.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-log</artifactId>
+				<version>0.6.5-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-mail</artifactId>
+				<version>0.6.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.sun.mail</groupId>
+				<artifactId>javax.mail</artifactId>
+				<version>1.6.2</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-text-directory-vcard</artifactId>
+				<version>0.6.3</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-text-elff</artifactId>
-				<version>0.6.0</version>
+				<version>0.6.1</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-vocab-ogp</artifactId>
-				<version>${globalmentor-web.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-vocab-dcmi</artifactId>
-				<version>${globalmentor-web.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-xml</artifactId>
-				<version>${globalmentor-web.version}</version>
+				<artifactId>globalmentor-web</artifactId>
+				<version>0.6.6</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 
 			<dependency>
@@ -179,8 +152,36 @@
 			</dependency>
 
 			<dependency>
+				<groupId>io.clogr</groupId>
+				<artifactId>clogr-bom</artifactId>
+				<version>0.8.3</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>io.confound</groupId>
+				<artifactId>confound-bom</artifactId>
+				<version>0.7.3</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>io.guise</groupId>
+				<artifactId>guise-cli</artifactId>
+				<version>0.5.3-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
 				<groupId>io.guise</groupId>
 				<artifactId>guise-framework</artifactId>
+				<version>0.5.3-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.guise</groupId>
+				<artifactId>guise-framework-demo</artifactId>
 				<version>0.5.3-SNAPSHOT</version>
 			</dependency>
 
@@ -230,12 +231,6 @@
 				<groupId>org.snakeyaml</groupId>
 				<artifactId>snakeyaml-engine</artifactId>
 				<version>2.1</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>jul-to-slf4j</artifactId>
-				<version>${slf4j.version}</version>
 			</dependency>
 
 			<dependency>

@@ -21,18 +21,18 @@ import java.lang.ref.*;
 import java.net.*;
 import java.time.LocalDate;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.globalmentor.io.InputStreams.*;
 import static com.globalmentor.java.Characters.*;
-import static com.globalmentor.java.Conditions.*;
 
 import com.globalmentor.java.Threads;
-import com.globalmentor.model.ConfigurationException;
+
+import io.confound.config.Configuration;
+import io.confound.config.ConfigurationException;
+import io.confound.config.file.ResourcesConfigurationManager;
 
 import static com.globalmentor.net.URIs.*;
-import static com.globalmentor.util.PropertiesUtilities.*;
 
 /**
  * The singleton Guise class. There will only be one instance of Guise per JVM.
@@ -49,9 +49,10 @@ public final class Guise {
 
 	static {
 		try {
-			final Properties properties = loadPropertiesResource(Guise.class);
-			version = checkConfigurationNotNull(properties.getProperty(VERSION_PROPERTIES_KEY));
-			buildDate = LocalDate.parse(checkConfigurationNotNull(properties.getProperty(BUILD_DATE_PROPERTIES_KEY)));
+			final Configuration configuration = ResourcesConfigurationManager.loadConfigurationForResourceBaseName(Guise.class, Guise.class.getSimpleName())
+					.orElseThrow(() -> new ConfigurationException("Missing Guise configuration."));
+			version = configuration.getString(VERSION_PROPERTIES_KEY);
+			buildDate = LocalDate.parse(configuration.getString(BUILD_DATE_PROPERTIES_KEY));
 		} catch(final IOException ioException) {
 			throw new ConfigurationException(ioException);
 		}
