@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.globalmentor</groupId>
 		<artifactId>globalmentor-base</artifactId>
-		<version>0.7.3-SNAPSHOT</version>
+		<version>0.7.3</version>
 	</parent>
 
 	<groupId>io.guise</groupId>
@@ -48,7 +48,6 @@
 
 	<properties>
 		<maven.compiler.release>11</maven.compiler.release>
-		<globalmentor-ee.version>0.6.3</globalmentor-ee.version>
 		<tomcat.version>9.0.50</tomcat.version>
 		<urf.version>0.4.1</urf.version>
 	</properties>
@@ -79,55 +78,63 @@
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-awt</artifactId>
-				<version>0.6.0</version>
+				<version>0.6.1</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-country-us</artifactId>
-				<version>0.6.1</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-iso-idcard</artifactId>
-				<version>0.6.1</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-itu</artifactId>
-				<version>0.6.0</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-log</artifactId>
-				<version>0.6.4</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-mail</artifactId>
-				<version>0.6.0</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-servlet</artifactId>
-				<version>${globalmentor-ee.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-text-directory-vcard</artifactId>
 				<version>0.6.2</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-ee</artifactId>
+				<version>0.6.4</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-iso-idcard</artifactId>
+				<version>0.6.2</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-itu</artifactId>
+				<version>0.6.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-log</artifactId>
+				<version>0.6.5-SNAPSHOT</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-mail</artifactId>
+				<version>0.6.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.sun.mail</groupId>
+				<artifactId>javax.mail</artifactId>
+				<version>1.6.2</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-text-directory-vcard</artifactId>
+				<version>0.6.3</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-text-elff</artifactId>
-				<version>0.6.0</version>
+				<version>0.6.1</version>
 			</dependency>
 
 			<dependency>
