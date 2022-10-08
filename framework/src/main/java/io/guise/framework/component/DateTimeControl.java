@@ -21,7 +21,6 @@ import java.util.*;
 
 import com.globalmentor.beans.*;
 import static com.globalmentor.java.Characters.*;
-import com.globalmentor.log.Log;
 
 import io.guise.framework.GuiseSession;
 import io.guise.framework.component.layout.*;
@@ -171,7 +170,7 @@ public class DateTimeControl extends AbstractLayoutValueControl<Date> { //TODO r
 						}
 						setValue(date); //update our value with the date
 					} catch(final PropertyVetoException propertyVetoException) { //the control might have a validator, but currently we can't do much about it at this point
-						Log.warn(propertyVetoException);
+						getLogger().warn("", propertyVetoException);
 					} finally {
 						updatingDateControls = false; //show that we're no longer updating controls
 					}

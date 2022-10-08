@@ -23,8 +23,8 @@ import static java.util.Objects.*;
 
 import com.globalmentor.beans.*;
 import com.globalmentor.event.TargetedEvent;
-import com.globalmentor.log.Log;
 
+import io.clogr.Clogged;
 import io.guise.framework.event.*;
 import io.guise.framework.input.*;
 import io.guise.framework.model.InfoModel;
@@ -37,7 +37,7 @@ import io.guise.framework.model.InfoModel;
  * child components being added or removed and fires a copy of the {@link ComponentEvent}, retaining the original event target.
  * @author Garret Wilson
  */
-public abstract class AbstractCompositeComponent extends AbstractComponent implements CompositeComponent {
+public abstract class AbstractCompositeComponent extends AbstractComponent implements CompositeComponent, Clogged {
 
 	/**
 	 * The lazily-created property change listener to listen for changes in valid status and call
@@ -153,7 +153,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 		try {
 			childComponent.loadPreferences(false); //load preferences for the child component only
 		} catch(final IOException ioException) { //if there was an error loading preferences
-			Log.warn(ioException); //log a warning			
+			getLogger().warn("", ioException); //log a warning			
 		}
 		childComponent.addPropertyChangeListener(DISPLAYED_PROPERTY, getDisplayVisibleChangeListener()); //listen for changes in the component's displayed status and update this component's valid status in response
 		childComponent.addPropertyChangeListener(VALID_PROPERTY, getValidChangeListener()); //listen for changes in the component's valid status and update this component's valid status in response
@@ -176,7 +176,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 		try {
 			childComponent.savePreferences(true); //save preferences for the entire child component tree
 		} catch(final IOException ioException) { //if there was an error saving preferences
-			Log.warn(ioException); //log a warning			
+			getLogger().warn("", ioException); //log a warning			
 		}
 		childComponent.removePropertyChangeListener(DISPLAYED_PROPERTY, getDisplayVisibleChangeListener()); //stop listening for changes in the component's displayed status
 		childComponent.removePropertyChangeListener(VALID_PROPERTY, getValidChangeListener()); //stop listening for changes in the component's valid status

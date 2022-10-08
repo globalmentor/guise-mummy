@@ -40,7 +40,6 @@ import com.globalmentor.event.ProgressListener;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Objects;
 import com.globalmentor.javascript.JSON;
-import com.globalmentor.log.Log;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.model.ObjectHolder;
 import com.globalmentor.model.TaskState;
@@ -54,6 +53,7 @@ import com.globalmentor.text.elff.*;
 import com.globalmentor.xml.spec.XML;
 import com.globalmentor.xml.xpath.*;
 
+import io.clogr.Clogged;
 import io.guise.framework.*;
 import io.guise.framework.component.*;
 import io.guise.framework.event.*;
@@ -87,6 +87,7 @@ import static io.guise.framework.platform.web.adobe.Flash.*;
 import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.slf4j.event.Level;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
@@ -106,7 +107,7 @@ import org.xml.sax.SAXException;
  * <dt>{@link #DEBUG_INIT_PARAMETER}</dt>
  * <dd>Whether the servlet is in debug mode; should be "true" or "false"; sets the log level to debug if not explicitly set.</dd>
  * <dt>{@link #LOG_LEVEL_INIT_PARAMETER}</dt>
- * <dd>The level of logging for the JVM of type {@link Log.Level}. If multiple servlets specify this value, the last one initialized will have precedence.</dd>
+ * <dd>The level of logging for the JVM of type {@link Level}. If multiple servlets specify this value, the last one initialized will have precedence.</dd>
  * <dt>{@link #LOG_HTTP_INIT_PARAMETER}</dt>
  * <dd>Whether HTTP communication is logged.</dd>
  * <dt>{@link #PROFILE_INIT_PARAMETER}</dt>
@@ -118,7 +119,7 @@ import org.xml.sax.SAXException;
  * <blockquote>{@code <Context ...><Parameter name="dataDirectory" value="D:\data"/></Context>}</blockquote>
  * @author Garret Wilson
  */
-public class GuiseHTTPServlet extends DefaultHTTPServlet {
+public class GuiseHTTPServlet extends DefaultHTTPServlet implements Clogged {
 
 	/** The init parameter, "applicationClass", used to specify the Guise application to create. */
 	public static final String APPLICATION_CLASS_INIT_PARAMETER = "applicationClass";
@@ -230,16 +231,16 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	@Override
 	public void initialize(ServletConfig servletConfig) throws ServletException, IllegalArgumentException, IllegalStateException {
 		super.initialize(servletConfig); //do the default initialization
-		Log.info("Initializing", Guise.GUISE_NAME, Guise.getVersion(), Guise.getBuildDate());
+		getLogger().info("Initializing {} {} {}", Guise.GUISE_NAME, Guise.getVersion(), Guise.getBuildDate());
 		setReadOnly(true); //make this servlet read-only
 		//TODO turn off directory listings, and/or fix them
 		try {
 			guiseApplication = initGuiseApplication(servletConfig); //initialize the application and frame bindings
 		} catch(final ServletException servletException) {
-			Log.error(servletException);
+			getLogger().error("", servletException);
 			throw servletException;
 		} catch(final Exception exception) { //if there is any problem initializing the Guise application
-			Log.error(exception);
+			getLogger().error("", exception);
 			throw new ServletException("Error initializing Guise application: " + exception.getMessage(), exception);
 		}
 	}
@@ -284,7 +285,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 						try {
 							environmentPropertyValue = new URI(initParameterValue); //convert the string to a URI, if we can
 						} catch(final URISyntaxException uriSyntaxException) { //if we couldn't parse the value as a URI
-							Log.warn("Unable to process Guise environment property " + environmentPropertyName + " value " + environmentPropertyValue + " as a URI.");
+							getLogger().warn("Unable to process Guise environment property {} {} value {} as a URI.", environmentPropertyName, environmentPropertyValue);
 						}
 					}
 					environment.setProperty(environmentPropertyName, environmentPropertyValue); //store the Guise environment property in the environment
@@ -381,7 +382,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 
 		final Destination destination = guiseApplication.getDestination(guiseRequest.getNavigationPath()).orElse(null); //try to get a destination associated with the requested path TODO improve use of Optional
 		if(destination != null) { //if we have a destination associated with the requested path
-			Log.trace("found destination:", destination);
+			getLogger().trace("found destination: {}", destination);
 			final GuiseSession guiseSession = HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request); //retrieve the Guise session for this container and request
 			//make sure the environment has the WebTrends ID
 			final Environment environment = guiseSession.getPlatform().getEnvironment(); //get the session's environment
@@ -394,9 +395,9 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 				environment.setProperty(WEBTRENDS_ID_COOKIE_NAME, webtrendsIDStringBuilder.toString()); //store the WebTrends ID in the environment, which will be stored in the cookies eventually
 			}
 			final String httpMethod = request.getMethod(); //get the current HTTP method being used
-			Log.trace("method", httpMethod);
-			Log.trace("destination", destination, "is resource read destination?", (destination instanceof ResourceReadDestination));
-			Log.trace("is GET with resource destination?", (destination instanceof ResourceReadDestination && GET_METHOD.equals(httpMethod)));
+			getLogger().trace("method {}", httpMethod);
+			getLogger().trace("destination {} is resource read destination? {}", destination, destination instanceof ResourceReadDestination);
+			getLogger().trace("is GET with resource destination?", (destination instanceof ResourceReadDestination && GET_METHOD.equals(httpMethod)));
 			if(destination instanceof ResourceReadDestination && GET_METHOD.equals(httpMethod)) { //if this is a resource read destination (but only if this is a GET request; the ResourceReadDestination may also be a ResourceWriteDestination)
 				final URIPath path = guiseRequest.getNavigationPath(); //get the path
 				final Bookmark bookmark = guiseRequest.getBookmark(); //get the bookmark, if any
@@ -405,7 +406,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 				if(!newPath.equals(path)) { //if we should use another path
 					redirect(guiseRequest, guiseApplication, newPath.toURI(), bookmark, true); //redirect the user agent to the preferred path
 				}
-				Log.trace("ready to delegate to super");
+				getLogger().trace("ready to delegate to super");
 				super.doGet(request, response); //let the default functionality take over, which will take care of accessing the resource destination by creating a specialized access resource
 				return; //don't service the Guise request normally
 			}
@@ -460,7 +461,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		if(!(destination instanceof ResourceWriteDestination)) { //if we don't have a write destination associated with the requested path
 			throw new HTTPForbiddenException("Uploading content to " + guiseRequest.getNavigationPath() + " is not supported.");
 		}
-		Log.trace("found resource write destination:", destination);
+		getLogger().trace("found resource write destination: {}", destination);
 		final GuiseSession guiseSession = HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request); //retrieve the Guise session for this container and request
 		final GuiseSessionThreadGroup guiseSessionThreadGroup = Guise.getInstance().getThreadGroup(guiseSession); //get the thread group for this session
 		try {
@@ -503,7 +504,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	private void serviceGuiseRequest(final HTTPServletGuiseRequest guiseRequest, final HttpServletResponse response,
 			final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final Destination destination)
 			throws IOException {
-		Log.trace("servicing Guise request with request", guiseRequest);
+		getLogger().trace("servicing Guise request with request {}", guiseRequest);
 		final WebPlatform guisePlatform = (WebPlatform)guiseSession.getPlatform(); //get the web platform
 		final URI requestURI = guiseRequest.getDepictURI(); //get the request URI
 		final MediaType contentType = guiseRequest.getRequestContentType(); //get the request content type
@@ -660,7 +661,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	private void serviceGuiseResourceWriteDestinationRequest(final HTTPServletGuiseRequest guiseRequest, final HttpServletResponse response,
 			final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession,
 			final ResourceWriteDestination resourceWriteDestination, final InputStream inputStream, final Component progressComponent) throws IOException {
-		Log.trace("servicing Guise request with request", guiseRequest);
+		getLogger().trace("servicing Guise request with request {}", guiseRequest);
 		final WebPlatform guisePlatform = (WebPlatform)guiseSession.getPlatform(); //get the web platform
 		final URI requestURI = guiseRequest.getDepictURI(); //get the request URI
 		final MediaType contentType = guiseRequest.getRequestContentType(); //get the request content type
@@ -773,7 +774,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 			final ApplicationFrame applicationFrame = guiseSession.getApplicationFrame(); //get the application frame
 			//TODO del Log.trace("ready to get request events");
 			final List<GuiseEvent> requestEvents = getRequestEvents(guiseRequest, guiseSession, depictContext); //get all events from the request
-			Log.trace("got control events");
+			getLogger().trace("got control events");
 			if(isAJAX) { //if this is an AJAX request
 				/*TODO tidy when stringbuilder context works
 										guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type
@@ -1006,7 +1007,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 						}
 						if(!requestedComponents.isEmpty()) { //if components were requested
 							for(final Component component : requestedComponents) { //for each requested component
-								Log.trace("ready to process event", controlEvent, "for component", component);
+								getLogger().trace("ready to process event {} for component {}", controlEvent, component);
 								component.processEvent(controlEvent); //tell the component to process the event
 							}
 						}
@@ -1097,9 +1098,9 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 					}
 				} catch(final RuntimeException runtimeException) { //if we run into any errors processing events
 					if(isAJAX) { //if this is an AJAX request
-						Log.error(runtimeException); //log the error
+						getLogger().error("AJAX error", runtimeException); //log the error
 						//TODO send back the error
-					} else { //if this is ano an AJAX request
+					} else { //if this is an AJAX request
 						throw runtimeException; //pass the error back to the servlet TODO improve; pass to Guise
 					}
 				}
@@ -1142,9 +1143,9 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 					Collections.removeAll(removedFrames, guiseSession.getApplicationFrame().getChildFrames().iterator()); //remove all the ending frames, leaving us the frames that were removed TODO improve all this
 					//TODO fix					dirtyComponents.addAll(frames);	//add all the frames that were removed
 
-					Log.trace("we now have dirty components:", dirtyComponents.size());
+					getLogger().trace("we now have dirty components: {}", dirtyComponents.size());
 					for(final Component affectedComponent : dirtyComponents) {
-						Log.trace("affected component:", affectedComponent);
+						getLogger().trace("affected component: {}", affectedComponent);
 					}
 					if(dirtyComponents.contains(applicationFrame)) { //if the application frame itself was affected, we might as well reload the page
 						//TODO del Log.trace("dirty because:", CollectionUtilities.toString(((AbstractDepictor)applicationFrame.getDepictor()).getModifiedProperties(), ','));
@@ -1466,7 +1467,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	 */
 	protected List<GuiseEvent> getRequestEvents(/*TODO del final HttpServletRequest request,*/final HTTPServletGuiseRequest guiseRequest,
 			final GuiseSession guiseSession, final DepictContext depictContext) throws IOException {
-		Log.trace("getting request events");
+		getLogger().trace("getting request events");
 		final WebPlatform platform = (WebPlatform)guiseSession.getPlatform(); //get the web platform
 		final List<GuiseEvent> requestEventList = new ArrayList<GuiseEvent>(); //create a new list for storing request events
 		/*TODO del
@@ -1488,7 +1489,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 						final String eventName = eventNode.getNodeName(); //get the event name
 						final WebPlatformEventType eventType = getSerializedEnum(WebPlatformEventType.class, eventName); //get this event type, throwing an IllegalArgumentException if the event type is not recognized
 						if(eventType != WebPlatformEventType.LOG) { //if this is not a log event (there's no use logging a log even)
-							Log.debug("AJAX event:", eventType);
+							getLogger().debug("AJAX event: {}", eventType);
 						}
 						switch(eventType) { //see which type of event this is
 							case ACTION:
@@ -1569,7 +1570,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 										try {
 											referrerURI = new URI(referrer); //create a URI object from the referrer string
 										} catch(final URISyntaxException uriSyntaxException) { //if there is a problem with the URI syntax
-											Log.warn("Invalid referrer URI syntax: " + referrer);
+											getLogger().warn("Invalid referrer URI syntax: {}" + referrer);
 										}
 									}
 									final WebInitializeEvent initEvent = new WebInitializeEvent(depictContext,
@@ -1613,9 +1614,9 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 								break;
 							case LOG:
 								{
-									final Log.Level logLevel = getSerializedEnum(Log.Level.class, eventElement.getAttribute("level")); //get the log level
+									final Level logLevel = getSerializedEnum(Level.class, eventElement.getAttribute("level")); //get the log level
 									final String text = eventElement.getTextContent(); //get the log text
-									Log.log(logLevel, "Guise AJAX:", text); //log this information
+									getLogger().atLevel(logLevel).log("Guise AJAX: {}", text); //log this information
 								}
 								break;
 							case MOUSECLICK:
@@ -1748,9 +1749,9 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 			}
 		}
 		if(requestEventList.size() > 0) { //indicate the parameters
-			Log.debug("Received Request Events:");
+			getLogger().debug("Received Request Events:");
 			for(final GuiseEvent requestEvent : requestEventList) { //for each control event
-				Log.debug("  Event:", requestEvent.getClass(), requestEvent);
+				getLogger().debug("  Event: {} {}", requestEvent.getClass(), requestEvent);
 			}
 		}
 
@@ -1934,7 +1935,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 	 */
 	@Override
 	protected boolean exists(final HttpServletRequest request, final URI resourceURI) throws IOException {
-		Log.trace("checking exists for", resourceURI);
+		getLogger().trace("checking exists for {}", resourceURI);
 		final GuiseApplication guiseApplication = getGuiseApplication(); //get the Guise application
 		final HTTPServletGuiseRequest guiseRequest = new HTTPServletGuiseRequest(request, /*TODO del response, */guiseContainer, guiseApplication); //get Guise request information
 		///TODO del when works  	final URIPath path=guiseRequest.getNavigationPath();	//get the application-relative logical path
@@ -1944,7 +1945,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet {
 		}
 		final Destination destination = guiseApplication.getDestination(path).orElse(null); //get the destination for the given path TODO improve use of Optional
 		if(destination != null) { //if the URI represents a valid navigation path
-			Log.trace("this is a destination");
+			getLogger().trace("this is a destination");
 			final HTTPServletGuiseContainer guiseContainer = getGuiseContainer(); //get the Guise container
 			final GuiseSession guiseSession = HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request); //retrieve the Guise session for this container and request
 			final Bookmark bookmark = guiseRequest.getBookmark(); //get the bookmark, if any

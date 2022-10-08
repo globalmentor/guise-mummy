@@ -21,14 +21,13 @@ import static java.util.Collections.*;
 
 import com.globalmentor.net.MediaType;
 
+import io.clogr.Clogged;
 import io.guise.framework.GuiseSession;
 import io.guise.framework.model.ResourceImport;
 
 import static com.globalmentor.collections.Collections.*;
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.Classes.*;
-
-import com.globalmentor.log.Log;
 
 /**
  * A resource import validator that can validate resource imports against accepted content types, file extensions, and/or maximum size. If accepted content
@@ -39,7 +38,7 @@ import com.globalmentor.log.Log;
  * allow a resource with an undefined content length.
  * @author Garret Wilson
  */
-public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
+public class ResourceImportValidator extends AbstractValidator<ResourceImport> implements Clogged {
 
 	/**
 	 * The read-only set of accepted content types, each of which can have the special wildcard ("*") subtype, or <code>null</code> if all content types are
@@ -231,7 +230,7 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> {
 	 */
 	@Override
 	public void validate(final ResourceImport resourceImport) throws ValidationException {
-		Log.trace("ready to validate resource import", resourceImport);
+		getLogger().trace("ready to validate resource import {}", resourceImport);
 		super.validate(resourceImport); //do the default validation
 		final Set<MediaType> acceptedContentTypes = getAcceptedContentTypes(); //get the accepted content types
 		if(acceptedContentTypes != null) { //if we need to check the content types
