@@ -67,6 +67,7 @@ public interface Frame extends ContentComponent, ModalComponent<Frame.Mode>, Inp
 
 	/** The mode of this component; whether the frame is in exclusive interaction with the user. */
 	public enum Mode implements io.guise.framework.component.Mode {
+		/** Exclusive mode. */
 		EXCLUSIVE;
 	}
 

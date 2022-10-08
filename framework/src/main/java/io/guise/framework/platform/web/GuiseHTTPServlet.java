@@ -1447,15 +1447,15 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet implements Clogged {
 		}
 	}
 
-	private final PathExpression AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION = new PathExpression("request", "events", "*"); //TODO use constants; comment
-	private final PathExpression AJAX_REQUEST_CONTROL_XPATH_EXPRESSION = new PathExpression("control"); //TODO use constants; comment
+	private static final PathExpression AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION = new PathExpression("request", "events", "*"); //TODO use constants; comment
+	private static final PathExpression AJAX_REQUEST_CONTROL_XPATH_EXPRESSION = new PathExpression("control"); //TODO use constants; comment
 	//TODO del	private final PathExpression AJAX_REQUEST_CONTROL_NAME_XPATH_EXPRESSION=new PathExpression("control", "name");	//TODO use constants; comment
 	//TODO del	private final PathExpression AJAX_REQUEST_CONTROL_VALUE_XPATH_EXPRESSION=new PathExpression("control", "value");	//TODO use constants; comment
-	private final PathExpression AJAX_REQUEST_SOURCE_XPATH_EXPRESSION = new PathExpression("source"); //TODO use constants; comment
-	private final PathExpression AJAX_REQUEST_TARGET_XPATH_EXPRESSION = new PathExpression("target"); //TODO use constants; comment
-	private final PathExpression AJAX_REQUEST_COMPONENT_XPATH_EXPRESSION = new PathExpression("component"); //TODO use constants; comment
-	private final PathExpression AJAX_REQUEST_MOUSE_XPATH_EXPRESSION = new PathExpression("mouse"); //TODO use constants; comment
-	private final PathExpression AJAX_REQUEST_VIEWPORT_XPATH_EXPRESSION = new PathExpression("viewport"); //TODO use constants; comment
+	private static final PathExpression AJAX_REQUEST_SOURCE_XPATH_EXPRESSION = new PathExpression("source"); //TODO use constants; comment
+	private static final PathExpression AJAX_REQUEST_TARGET_XPATH_EXPRESSION = new PathExpression("target"); //TODO use constants; comment
+	private static final PathExpression AJAX_REQUEST_COMPONENT_XPATH_EXPRESSION = new PathExpression("component"); //TODO use constants; comment
+	private static final PathExpression AJAX_REQUEST_MOUSE_XPATH_EXPRESSION = new PathExpression("mouse"); //TODO use constants; comment
+	private static final PathExpression AJAX_REQUEST_VIEWPORT_XPATH_EXPRESSION = new PathExpression("viewport"); //TODO use constants; comment
 
 	/**
 	 * Retrieves events from the HTTP request.

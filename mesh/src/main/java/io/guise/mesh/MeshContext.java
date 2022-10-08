@@ -64,6 +64,7 @@ public interface MeshContext extends MeshScope {
 	 */
 	public ScopeNesting nestScope();
 
+	/** A nested level of scope. */
 	public interface ScopeNesting extends AutoCloseable {
 
 		/** @return The nested scope. */

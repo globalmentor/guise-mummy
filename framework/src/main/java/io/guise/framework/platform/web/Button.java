@@ -27,7 +27,13 @@ import io.guise.framework.input.MouseButton;
  * @author Garret Wilson
  */
 public enum Button {
-	LEFT(0, MouseButton.LEFT), MIDDLE(1, MouseButton.MIDDLE), RIGHT(2, MouseButton.RIGHT);
+
+	/** Left button. */
+	LEFT(0, MouseButton.LEFT),
+	/** Middle button. */
+	MIDDLE(1, MouseButton.MIDDLE),
+	/** Right button. */
+	RIGHT(2, MouseButton.RIGHT);
 
 	/** The code reported by the browser. */
 	private final int code;

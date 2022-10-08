@@ -902,7 +902,7 @@ public class HomePanel extends LayoutPanel implements Clogged {
 		add(createAccordionMenu(Flow.PAGE), new RegionConstraints(Region.LINE_START)); //add the menu at the left
 	}
 
-	protected DropMenu createMenu(final Flow flow) {
+	private DropMenu createMenu(final Flow flow) {
 		final DropMenu menu = new DropMenu(flow);
 
 		final DropMenu fileMenu = new DropMenu(Flow.PAGE);
@@ -952,7 +952,7 @@ public class HomePanel extends LayoutPanel implements Clogged {
 		return menu;
 	}
 
-	protected AccordionMenu createAccordionMenu(final Flow flow) {
+	private AccordionMenu createAccordionMenu(final Flow flow) {
 		final AccordionMenu menu = new AccordionMenu(flow);
 
 		final AccordionMenu fileMenu = new AccordionMenu(Flow.PAGE);
@@ -991,10 +991,11 @@ public class HomePanel extends LayoutPanel implements Clogged {
 		return menu;
 	}
 
-	protected static class TestFrame extends DefaultFrame {
+	private static class TestFrame extends DefaultFrame {
 
-		protected final Label label;
+		private final Label label;
 
+		/** Constructor. */
 		public TestFrame() {
 			//TODO del			final LayoutPanel contentPanel=new LayoutPanel(new FlowLayout(Flow.PAGE)); 
 			label = new Label();

@@ -21,5 +21,10 @@ package io.guise.framework.input;
  * @author Garret Wilson
  */
 public enum MouseButton {
-	LEFT, MIDDLE, RIGHT;
+	/** Left button. */
+	LEFT,
+	/** Middle button. */
+	MIDDLE,
+	/** Right button. */
+	RIGHT;
 }

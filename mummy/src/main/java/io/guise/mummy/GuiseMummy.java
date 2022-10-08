@@ -95,7 +95,18 @@ public class GuiseMummy implements Clogged {
 
 	/** The phases of the default Guise Mummy life cycle, in order. */
 	public enum LifeCyclePhase {
-		INITIALIZE, VALIDATE, PLAN, MUMMIFY, PREPARE_DEPLOY, DEPLOY
+		/** Initialize. */
+		INITIALIZE,
+		/** Validate. */
+		VALIDATE,
+		/** Plan. */
+		PLAN,
+		/** Mummify. */
+		MUMMIFY,
+		/** Prepare deploy. */
+		PREPARE_DEPLOY,
+		/** Deploy. */
+		DEPLOY
 	};
 
 	//# configuration
@@ -502,8 +513,11 @@ public class GuiseMummy implements Clogged {
 	 */
 	public final static Path DEFAULT_PROJECT_SITE_DESCRIPTION_TARGET_RELATIVE_DIR = DEFAULT_PROJECT_BUILD_RELATIVE_DIR.resolve("site-description");
 
+	/** The configuration key for the site source directory. */
 	public static final String PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY = "siteSourceDirectory";
+	/** The configuration key for the site target directory. */
 	public static final String PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY = "siteTargetDirectory";
+	/** The configuration key for the site description target directory. */
 	public static final String PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY = "siteDescriptionTargetDirectory";
 
 	/**

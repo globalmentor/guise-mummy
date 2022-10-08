@@ -44,12 +44,19 @@ public interface SourcePathArtifact extends Artifact {
 	 * @see #POST_FILENAME_PATTERN_EXT_GROUP
 	 */
 	public static final Pattern POST_FILENAME_PATTERN = Pattern.compile("@((\\d{4})-(\\d{2})-(\\d{2}))-(([^.]+)\\.(.+))");
+	/** The date matching group of the post filename pattern. */
 	public static final int POST_FILENAME_PATTERN_DATE_GROUP = 1;
+	/** The year matching group of the post filename pattern. */
 	public static final int POST_FILENAME_PATTERN_YEAR_GROUP = 2;
+	/** The month matching group of the post filename pattern. */
 	public static final int POST_FILENAME_PATTERN_MONTH_GROUP = 3;
+	/** The day matching group of the post filename pattern. */
 	public static final int POST_FILENAME_PATTERN_DAY_GROUP = 4;
+	/** The filename matching group of the post filename pattern. */
 	public static final int POST_FILENAME_PATTERN_FILENAME_GROUP = 5;
+	/** The slug matching group of the post filename pattern. */
 	public static final int POST_FILENAME_PATTERN_SLUG_GROUP = 6;
+	/** The extension matching group of the post filename pattern. */
 	public static final int POST_FILENAME_PATTERN_EXT_GROUP = 7;
 
 	/**

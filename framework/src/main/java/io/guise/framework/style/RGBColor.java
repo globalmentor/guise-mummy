@@ -44,7 +44,14 @@ public class RGBColor extends AbstractModeledColor<RGBColor.Component> {
 
 	/** A color component of sRGB. */
 	public enum Component implements ModeledColor.Component {
-		ALPHA, RED, GREEN, BLUE;
+		/** Alpha component. */
+		ALPHA,
+		/** Red component. */
+		RED,
+		/** Green component. */
+		GREEN,
+		/** Blue component. */
+		BLUE;
 	}
 
 	/**
@@ -298,150 +305,294 @@ public class RGBColor extends AbstractModeledColor<RGBColor.Component> {
 		throw new ArgumentSyntaxException("Character sequence " + charSequence + " does not represent an RGB color.");
 	}
 
+	/** Definition of a transparent RGB color. */
 	public static final RGBColor TRANSPARENT = new RGBColor(0x00000000, true);
 
+	/** RGB color definition. */
 	public static final RGBColor ALICE_BLUE = new RGBColor(0xF0F8FF);
+	/** RGB color definition. */
 	public static final RGBColor ANTIQUE_WHITE = new RGBColor(0xFAEBD7);
+	/** RGB color definition. */
 	public static final RGBColor AQUA = new RGBColor(0x00FFFF);
+	/** RGB color definition. */
 	public static final RGBColor AQUA_MARINE = new RGBColor(0x7FFFD4);
+	/** RGB color definition. */
 	public static final RGBColor AZURE = new RGBColor(0xF0FFFF);
+	/** RGB color definition. */
 	public static final RGBColor BEIGE = new RGBColor(0xF5F5DC);
+	/** RGB color definition. */
 	public static final RGBColor BISQUE = new RGBColor(0xFFE4C4);
+	/** RGB color definition. */
 	public static final RGBColor BLACK = new RGBColor(0x000000);
+	/** RGB color definition. */
 	public static final RGBColor BLANCHE_DALMOND = new RGBColor(0xFFEBCD);
+	/** RGB color definition. */
 	public static final RGBColor BLUE = new RGBColor(0x0000FF);
+	/** RGB color definition. */
 	public static final RGBColor BLUE_VIOLET = new RGBColor(0x8A2BE2);
+	/** RGB color definition. */
 	public static final RGBColor BROWN = new RGBColor(0xA52A2A);
+	/** RGB color definition. */
 	public static final RGBColor BURLY_WOOD = new RGBColor(0xDEB887);
+	/** RGB color definition. */
 	public static final RGBColor CADET_BLUE = new RGBColor(0x5F9EA0);
+	/** RGB color definition. */
 	public static final RGBColor CHARTREUSE = new RGBColor(0x7FFF00);
+	/** RGB color definition. */
 	public static final RGBColor CHOCOLATE = new RGBColor(0xD2691E);
+	/** RGB color definition. */
 	public static final RGBColor CORAL = new RGBColor(0xFF7F50);
+	/** RGB color definition. */
 	public static final RGBColor CORNFLOWER_BLUE = new RGBColor(0x6495ED);
+	/** RGB color definition. */
 	public static final RGBColor CORNSILK = new RGBColor(0xFFF8DC);
+	/** RGB color definition. */
 	public static final RGBColor CRIMSON = new RGBColor(0xDC143C);
+	/** RGB color definition. */
 	public static final RGBColor CYAN = new RGBColor(0x00FFFF);
+	/** RGB color definition. */
 	public static final RGBColor DARK_BLUE = new RGBColor(0x00008B);
+	/** RGB color definition. */
 	public static final RGBColor DARK_CYAN = new RGBColor(0x008B8B);
+	/** RGB color definition. */
 	public static final RGBColor DARK_GOLDEN_ROD = new RGBColor(0xB8860B);
+	/** RGB color definition. */
 	public static final RGBColor DARK_GRAY = new RGBColor(0xA9A9A9);
+	/** RGB color definition. */
 	public static final RGBColor DARK_GREEN = new RGBColor(0x006400);
+	/** RGB color definition. */
 	public static final RGBColor DARK_KHAKI = new RGBColor(0xBDB76B);
+	/** RGB color definition. */
 	public static final RGBColor DARK_MAGENTA = new RGBColor(0x8B008B);
+	/** RGB color definition. */
 	public static final RGBColor DARK_OLIVE_GREEN = new RGBColor(0x556B2F);
+	/** RGB color definition. */
 	public static final RGBColor DARK_ORANGE = new RGBColor(0xFF8C00);
+	/** RGB color definition. */
 	public static final RGBColor DARK_ORCHID = new RGBColor(0x9932CC);
+	/** RGB color definition. */
 	public static final RGBColor DARK_RED = new RGBColor(0x8B0000);
+	/** RGB color definition. */
 	public static final RGBColor DARK_SALMON = new RGBColor(0xE9967A);
+	/** RGB color definition. */
 	public static final RGBColor DARK_SEA_GREEN = new RGBColor(0x8FBC8F);
+	/** RGB color definition. */
 	public static final RGBColor DARK_SLATE_BLUE = new RGBColor(0x483D8B);
+	/** RGB color definition. */
 	public static final RGBColor DARK_SLATE_GRAY = new RGBColor(0x2F4F4F);
+	/** RGB color definition. */
 	public static final RGBColor DARK_TURQUOISE = new RGBColor(0x00CED1);
+	/** RGB color definition. */
 	public static final RGBColor DARK_VIOLET = new RGBColor(0x9400D3);
+	/** RGB color definition. */
 	public static final RGBColor DEEP_PINK = new RGBColor(0xFF1493);
+	/** RGB color definition. */
 	public static final RGBColor DEEP_SKY_BLUE = new RGBColor(0x00BFFF);
+	/** RGB color definition. */
 	public static final RGBColor DIM_GRAY = new RGBColor(0x696969);
+	/** RGB color definition. */
 	public static final RGBColor DODGER_BLUE = new RGBColor(0x1E90FF);
+	/** RGB color definition. */
 	public static final RGBColor FELDSPAR = new RGBColor(0xD19275);
+	/** RGB color definition. */
 	public static final RGBColor FIRE_BRICK = new RGBColor(0xB22222);
+	/** RGB color definition. */
 	public static final RGBColor FLORAL_WHITE = new RGBColor(0xFFFAF0);
+	/** RGB color definition. */
 	public static final RGBColor FOREST_GREEN = new RGBColor(0x228B22);
+	/** RGB color definition. */
 	public static final RGBColor FUCHSIA = new RGBColor(0xFF00FF);
+	/** RGB color definition. */
 	public static final RGBColor GAINSBORO = new RGBColor(0xDCDCDC);
+	/** RGB color definition. */
 	public static final RGBColor GHOST_WHITE = new RGBColor(0xF8F8FF);
+	/** RGB color definition. */
 	public static final RGBColor GOLD = new RGBColor(0xFFD700);
+	/** RGB color definition. */
 	public static final RGBColor GOLDEN_ROD = new RGBColor(0xDAA520);
+	/** RGB color definition. */
 	public static final RGBColor GRAY = new RGBColor(0x808080);
+	/** RGB color definition. */
 	public static final RGBColor GREEN = new RGBColor(0x008000);
+	/** RGB color definition. */
 	public static final RGBColor GREEN_YELLOW = new RGBColor(0xADFF2F);
+	/** RGB color definition. */
 	public static final RGBColor HONEY_DEW = new RGBColor(0xF0FFF0);
+	/** RGB color definition. */
 	public static final RGBColor HOT_PINK = new RGBColor(0xFF69B4);
+	/** RGB color definition. */
 	public static final RGBColor INDIAN_RED = new RGBColor(0xCD5C5C);
+	/** RGB color definition. */
 	public static final RGBColor INDIGO = new RGBColor(0x4B0082);
+	/** RGB color definition. */
 	public static final RGBColor IVORY = new RGBColor(0xFFFFF0);
+	/** RGB color definition. */
 	public static final RGBColor KHAKI = new RGBColor(0xF0E68C);
+	/** RGB color definition. */
 	public static final RGBColor LAVENDER = new RGBColor(0xE6E6FA);
+	/** RGB color definition. */
 	public static final RGBColor LAVENDER_BLUSH = new RGBColor(0xFFF0F5);
+	/** RGB color definition. */
 	public static final RGBColor LAWN_GREEN = new RGBColor(0x7CFC00);
+	/** RGB color definition. */
 	public static final RGBColor LEMON_CHIFFON = new RGBColor(0xFFFACD);
+	/** RGB color definition. */
 	public static final RGBColor LIGHT_BLUE = new RGBColor(0xADD8E6);
+	/** RGB color definition. */
 	public static final RGBColor LIGHT_CORAL = new RGBColor(0xF08080);
+	/** RGB color definition. */
 	public static final RGBColor LIGHT_CYAN = new RGBColor(0xE0FFFF);
+	/** RGB color definition. */
 	public static final RGBColor LIGHT_GOLDEN_ROD_YELLOW = new RGBColor(0xFAFAD2);
+	/** RGB color definition. */
 	public static final RGBColor LIGHT_GREY = new RGBColor(0xD3D3D3);
+	/** RGB color definition. */
 	public static final RGBColor LIGHT_GREEN = new RGBColor(0x90EE90);
+	/** RGB color definition. */
 	public static final RGBColor LIGHT_PINK = new RGBColor(0xFFB6C1);
+	/** RGB color definition. */
 	public static final RGBColor LIGHT_SALMON = new RGBColor(0xFFA07A);
+	/** RGB color definition. */
 	public static final RGBColor LIGHT_SEA_GREEN = new RGBColor(0x20B2AA);
+	/** RGB color definition. */
 	public static final RGBColor LIGHT_SKY_BLUE = new RGBColor(0x87CEFA);
+	/** RGB color definition. */
 	public static final RGBColor LIGHT_SLATE_BLUE = new RGBColor(0x8470FF);
+	/** RGB color definition. */
 	public static final RGBColor LIGHT_SLATE_GRAY = new RGBColor(0x778899);
+	/** RGB color definition. */
 	public static final RGBColor LIGHT_STEEL_BLUE = new RGBColor(0xB0C4DE);
+	/** RGB color definition. */
 	public static final RGBColor LIGHT_YELLOW = new RGBColor(0xFFFFE0);
+	/** RGB color definition. */
 	public static final RGBColor LIME = new RGBColor(0x00FF00);
+	/** RGB color definition. */
 	public static final RGBColor LIME_GREEN = new RGBColor(0x32CD32);
+	/** RGB color definition. */
 	public static final RGBColor LINEN = new RGBColor(0xFAF0E6);
+	/** RGB color definition. */
 	public static final RGBColor MAGENTA = new RGBColor(0xFF00FF);
+	/** RGB color definition. */
 	public static final RGBColor MAROON = new RGBColor(0x800000);
+	/** RGB color definition. */
 	public static final RGBColor MEDIUM_AQUA_MARINE = new RGBColor(0x66CDAA);
+	/** RGB color definition. */
 	public static final RGBColor MEDIU_MBLUE = new RGBColor(0x0000CD);
+	/** RGB color definition. */
 	public static final RGBColor MEDIUM_ORCHID = new RGBColor(0xBA55D3);
+	/** RGB color definition. */
 	public static final RGBColor MEDIUM_PURPLE = new RGBColor(0x9370D8);
+	/** RGB color definition. */
 	public static final RGBColor MEDIUM_SEA_GREEN = new RGBColor(0x3CB371);
+	/** RGB color definition. */
 	public static final RGBColor MEDIUM_SLATE_BLUE = new RGBColor(0x7B68EE);
+	/** RGB color definition. */
 	public static final RGBColor MEDIUM_SPRING_GREEN = new RGBColor(0x00FA9A);
+	/** RGB color definition. */
 	public static final RGBColor MEDIUM_TURQUOISE = new RGBColor(0x48D1CC);
+	/** RGB color definition. */
 	public static final RGBColor MEDIUM_VIOLET_RED = new RGBColor(0xC71585);
+	/** RGB color definition. */
 	public static final RGBColor MIDNIGHT_BLUE = new RGBColor(0x191970);
+	/** RGB color definition. */
 	public static final RGBColor MINT_CREAM = new RGBColor(0xF5FFFA);
+	/** RGB color definition. */
 	public static final RGBColor MISTY_ROSE = new RGBColor(0xFFE4E1);
+	/** RGB color definition. */
 	public static final RGBColor MOCCASIN = new RGBColor(0xFFE4B5);
+	/** RGB color definition. */
 	public static final RGBColor NAVAJO_WHITE = new RGBColor(0xFFDEAD);
+	/** RGB color definition. */
 	public static final RGBColor NAVY = new RGBColor(0x000080);
+	/** RGB color definition. */
 	public static final RGBColor OLD_LACE = new RGBColor(0xFDF5E6);
+	/** RGB color definition. */
 	public static final RGBColor OLIVE = new RGBColor(0x808000);
+	/** RGB color definition. */
 	public static final RGBColor OLIVE_DRAB = new RGBColor(0x6B8E23);
+	/** RGB color definition. */
 	public static final RGBColor ORANGE = new RGBColor(0xFFA500);
+	/** RGB color definition. */
 	public static final RGBColor ORANGE_RED = new RGBColor(0xFF4500);
+	/** RGB color definition. */
 	public static final RGBColor ORCHID = new RGBColor(0xDA70D6);
+	/** RGB color definition. */
 	public static final RGBColor PALE_GOLDEN_ROD = new RGBColor(0xEEE8AA);
+	/** RGB color definition. */
 	public static final RGBColor PALE_GREEN = new RGBColor(0x98FB98);
+	/** RGB color definition. */
 	public static final RGBColor PALE_TURQUOISE = new RGBColor(0xAFEEEE);
+	/** RGB color definition. */
 	public static final RGBColor PALE_VIOLET_RED = new RGBColor(0xD87093);
+	/** RGB color definition. */
 	public static final RGBColor PAPAYA_WHIP = new RGBColor(0xFFEFD5);
+	/** RGB color definition. */
 	public static final RGBColor PEACH_PUFF = new RGBColor(0xFFDAB9);
+	/** RGB color definition. */
 	public static final RGBColor PERU = new RGBColor(0xCD853F);
+	/** RGB color definition. */
 	public static final RGBColor PINK = new RGBColor(0xFFC0CB);
+	/** RGB color definition. */
 	public static final RGBColor PLUM = new RGBColor(0xDDA0DD);
+	/** RGB color definition. */
 	public static final RGBColor POWDER_BLUE = new RGBColor(0xB0E0E6);
+	/** RGB color definition. */
 	public static final RGBColor PURPLE = new RGBColor(0x800080);
+	/** RGB color definition. */
 	public static final RGBColor RED = new RGBColor(0xFF0000);
+	/** RGB color definition. */
 	public static final RGBColor ROSY_BROWN = new RGBColor(0xBC8F8F);
+	/** RGB color definition. */
 	public static final RGBColor ROYAL_BLUE = new RGBColor(0x4169E1);
+	/** RGB color definition. */
 	public static final RGBColor SADDLE_BROWN = new RGBColor(0x8B4513);
+	/** RGB color definition. */
 	public static final RGBColor SALMON = new RGBColor(0xFA8072);
+	/** RGB color definition. */
 	public static final RGBColor SANDY_BROWN = new RGBColor(0xF4A460);
+	/** RGB color definition. */
 	public static final RGBColor SEA_GREEN = new RGBColor(0x2E8B57);
+	/** RGB color definition. */
 	public static final RGBColor SEA_SHELL = new RGBColor(0xFFF5EE);
+	/** RGB color definition. */
 	public static final RGBColor SIENNA = new RGBColor(0xA0522D);
+	/** RGB color definition. */
 	public static final RGBColor SILVER = new RGBColor(0xC0C0C0);
+	/** RGB color definition. */
 	public static final RGBColor SKY_BLUE = new RGBColor(0x87CEEB);
+	/** RGB color definition. */
 	public static final RGBColor SLATE_BLUE = new RGBColor(0x6A5ACD);
+	/** RGB color definition. */
 	public static final RGBColor SLATE_GRAY = new RGBColor(0x708090);
+	/** RGB color definition. */
 	public static final RGBColor SNOW = new RGBColor(0xFFFAFA);
+	/** RGB color definition. */
 	public static final RGBColor SPRING_GREEN = new RGBColor(0x00FF7F);
+	/** RGB color definition. */
 	public static final RGBColor STEEL_BLUE = new RGBColor(0x4682B4);
+	/** RGB color definition. */
 	public static final RGBColor TAN = new RGBColor(0xD2B48C);
+	/** RGB color definition. */
 	public static final RGBColor TEAL = new RGBColor(0x008080);
+	/** RGB color definition. */
 	public static final RGBColor THISTLE = new RGBColor(0xD8BFD8);
+	/** RGB color definition. */
 	public static final RGBColor TOMATO = new RGBColor(0xFF6347);
+	/** RGB color definition. */
 	public static final RGBColor TURQUOISE = new RGBColor(0x40E0D0);
+	/** RGB color definition. */
 	public static final RGBColor VIOLET = new RGBColor(0xEE82EE);
+	/** RGB color definition. */
 	public static final RGBColor VIOLET_RED = new RGBColor(0xD02090);
+	/** RGB color definition. */
 	public static final RGBColor WHEAT = new RGBColor(0xF5DEB3);
+	/** RGB color definition. */
 	public static final RGBColor WHITE = new RGBColor(0xFFFFFF);
+	/** RGB color definition. */
 	public static final RGBColor WHITE_SMOKE = new RGBColor(0xF5F5F5);
+	/** RGB color definition. */
 	public static final RGBColor YELLOW = new RGBColor(0xFFFF00);
+	/** RGB color definition. */
 	public static final RGBColor YELLOW_GREEN = new RGBColor(0x9ACD32);
 
 	static {

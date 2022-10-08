@@ -23,7 +23,121 @@ package io.guise.framework.input;
  * @see java.awt.event.KeyEvent
  */
 public enum Key {
-	ALT_LEFT, ALT_RIGHT, BACKSPACE, CANCEL, CAPS_LOCK, CLEAR, CONTEXT_MENU, CONTROL_LEFT, CONTROL_RIGHT, DELETE, DOWN, END, ENTER, ESCAPE, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
+	/** Key definition */
+	ALT_LEFT,
+	/** Key definition */
+	ALT_RIGHT,
+	/** Key definition */
+	BACKSPACE,
+	/** Key definition */
+	CANCEL,
+	/** Key definition */
+	CAPS_LOCK,
+	/** Key definition */
+	CLEAR,
+	/** Key definition */
+	CONTEXT_MENU,
+	/** Key definition */
+	CONTROL_LEFT,
+	/** Key definition */
+	CONTROL_RIGHT,
+	/** Key definition */
+	DELETE,
+	/** Key definition */
+	DOWN,
+	/** Key definition */
+	END,
+	/** Key definition */
+	ENTER,
+	/** Key definition */
+	ESCAPE,
+	/** Key definition */
+	F1,
+	/** Key definition */
+	F2,
+	/** Key definition */
+	F3,
+	/** Key definition */
+	F4,
+	/** Key definition */
+	F5,
+	/** Key definition */
+	F6,
+	/** Key definition */
+	F7,
+	/** Key definition */
+	F8,
+	/** Key definition */
+	F9,
+	/** Key definition */
+	F10,
+	/** Key definition */
+	F11,
+	/** Key definition */
+	F12,
 	//TODO add F13-F24 for IBM 3270 keyboard  
-	HOME, INSERT, LEFT, MULTIPLY, NUMPAD_0, NUMPAD_1, NUMPAD_2, NUMPAD_3, NUMPAD_4, NUMPAD_5, NUMPAD_6, NUMPAD_7, NUMPAD_8, NUMPAD_9, NUMPAD_ADD, NUMPAD_DECIMAL, NUMPAD_DIVIDE, NUMPAD_ENTER, NUMPAD_NUM_LOCK, NUMPAD_SCROLL_LOCK, NUMPAD_SUBTRACT, PAGE_DOWN, PAGE_UP, PAUSE, PRINT_SCREEN, RIGHT, SHIFT_LEFT, SHIFT_RIGHT, SPACE, TAB, UP, WINDOWS;
+	/** Key definition */
+	HOME,
+	/** Key definition */
+	INSERT,
+	/** Key definition */
+	LEFT,
+	/** Key definition */
+	MULTIPLY,
+	/** Key definition */
+	NUMPAD_0,
+	/** Key definition */
+	NUMPAD_1,
+	/** Key definition */
+	NUMPAD_2,
+	/** Key definition */
+	NUMPAD_3,
+	/** Key definition */
+	NUMPAD_4,
+	/** Key definition */
+	NUMPAD_5,
+	/** Key definition */
+	NUMPAD_6,
+	/** Key definition */
+	NUMPAD_7,
+	/** Key definition */
+	NUMPAD_8,
+	/** Key definition */
+	NUMPAD_9,
+	/** Key definition */
+	NUMPAD_ADD,
+	/** Key definition */
+	NUMPAD_DECIMAL,
+	/** Key definition */
+	NUMPAD_DIVIDE,
+	/** Key definition */
+	NUMPAD_ENTER,
+	/** Key definition */
+	NUMPAD_NUM_LOCK,
+	/** Key definition */
+	NUMPAD_SCROLL_LOCK,
+	/** Key definition */
+	NUMPAD_SUBTRACT,
+	/** Key definition */
+	PAGE_DOWN,
+	/** Key definition */
+	PAGE_UP,
+	/** Key definition */
+	PAUSE,
+	/** Key definition */
+	PRINT_SCREEN,
+	/** Key definition */
+	RIGHT,
+	/** Key definition */
+	SHIFT_LEFT,
+	/** Key definition */
+	SHIFT_RIGHT,
+	/** Key definition */
+	SPACE,
+	/** Key definition */
+	TAB,
+	/** Key definition */
+	UP,
+	/** Key definition */
+	WINDOWS;
 }

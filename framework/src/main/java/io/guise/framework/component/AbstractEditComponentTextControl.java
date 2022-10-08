@@ -43,6 +43,7 @@ public abstract class AbstractEditComponentTextControl<EC extends Component> ext
 
 	/** The mode of this component; whether the component is being edited. */
 	public enum Mode implements io.guise.framework.component.Mode {
+		/** Editing mode. */
 		EDIT;
 	}
 

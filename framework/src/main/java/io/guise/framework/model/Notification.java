@@ -88,7 +88,28 @@ public class Notification extends DefaultLabelModel {
 	 * that an action be stopped permanently.
 	 */
 	public enum Option {
-		OK(false), YES(false), YES_ALL(false), NO(true), NO_ALL(true), ABORT(true), RETRY(false), FAIL(true), STOP(true), REMOVE(false), CANCEL(true);
+		/** OK. */
+		OK(false),
+		/** Yes. */
+		YES(false),
+		/** Yes to all. */
+		YES_ALL(false),
+		/** No. */
+		NO(true),
+		/** No to all. */
+		NO_ALL(true),
+		/** Abort. */
+		ABORT(true),
+		/** Retry. */
+		RETRY(false),
+		/** Fail. */
+		FAIL(true),
+		/** Stop. */
+		STOP(true),
+		/** Remove. */
+		REMOVE(false),
+		/** Cancel. */
+		CANCEL(true);
 
 		/** Whether this option is considered fatal. */
 		private final boolean fatal;

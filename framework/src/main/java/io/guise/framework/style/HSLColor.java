@@ -35,7 +35,12 @@ public class HSLColor extends AbstractModeledColor<HSLColor.Component> {
 
 	/** A color component of HSL. */
 	public enum Component implements ModeledColor.Component {
-		HUE, SATURATION, LIGHTNESS;
+		/** Hue component. */
+		HUE,
+		/** Saturation component. */
+		SATURATION,
+		/** Lightness component. */
+		LIGHTNESS;
 	}
 
 	/**

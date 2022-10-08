@@ -118,7 +118,7 @@ public interface PresentationModel extends Model, Displayable {
 	/** The bound property of whether the component is visible. */
 	public static final String VISIBLE_PROPERTY = getPropertyName(PresentationModel.class, "visible");
 
-	/*The constant value representing a general rounded corner.*/
+	/** The constant value representing a general rounded corner. */
 	public static final Dimensions ROUNDED_CORNER_ARC_SIZE = new Dimensions(0.25, 0.25, Unit.EM);
 
 	/**

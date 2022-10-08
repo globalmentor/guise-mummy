@@ -53,11 +53,17 @@ public class Resources {
 	public static final String INFO_PROPERTY_KEY_ASPECT = "info";
 
 	//standard labels
+	/** Label referencing the application name resource. */
 	public static final String APPLICATION_NAME = createStringResourceReference("application.name");
+	/** Label referencing the short application name resource. */
 	public static final String APPLICATION_NAME_SHORT = createStringResourceReference("application.name.short");
+	/** Label referencing the application label resource. */
 	public static final String APPLICATION_LABEL = createStringResourceReference("application.label");
+	/** Label referencing the application description resource. */
 	public static final String APPLICATION_DESCRIPTION = createStringResourceReference("application.description");
+	/** Label referencing the application copyright resource. */
 	public static final String APPLICATION_COPYRIGHT = createStringResourceReference("application.copyright");
+	/** Label referencing the application version resource. */
 	public static final String APPLICATION_VERSION = createStringResourceReference("application.version");
 
 	//converter resources

@@ -28,10 +28,62 @@ import static java.util.Objects.*;
  * @author Garret Wilson
  */
 public enum KeyCode {
-	ALT(18, Key.ALT_LEFT), BACKSPACE(8, Key.BACKSPACE), CONTROL(17, Key.CONTROL_LEFT), DELETE(46, Key.DELETE), DOWN(40, Key.DOWN), END(35, Key.END), ENTER(13,
-			Key.ENTER), ESCAPE(27, Key.ESCAPE), F1(112, Key.F1), F2(113, Key.F2), F3(114, Key.F3), F4(115, Key.F4), F5(116, Key.F5), F6(117, Key.F6), F7(118, Key.F7), F8(
-			119, Key.F8), F9(120, Key.F9), F10(121, Key.F10), F11(122, Key.F11), F12(123, Key.F12), HOME(36, Key.HOME), LEFT(37, Key.LEFT), PAGE_UP(33, Key.PAGE_UP), PAGE_DOWN(
-			34, Key.PAGE_DOWN), RIGHT(39, Key.RIGHT), SHIFT(16, Key.SHIFT_LEFT), TAB(9, Key.TAB), UP(38, Key.UP);
+	/** Key code definition. */
+	ALT(18, Key.ALT_LEFT),
+	/** Key code definition. */
+	BACKSPACE(8, Key.BACKSPACE),
+	/** Key code definition. */
+	CONTROL(17, Key.CONTROL_LEFT),
+	/** Key code definition. */
+	DELETE(46, Key.DELETE),
+	/** Key code definition. */
+	DOWN(40, Key.DOWN),
+	/** Key code definition. */
+	END(35, Key.END),
+	/** Key code definition. */
+	ENTER(13, Key.ENTER),
+	/** Key code definition. */
+	ESCAPE(27, Key.ESCAPE),
+	/** Key code definition. */
+	F1(112, Key.F1),
+	/** Key code definition. */
+	F2(113, Key.F2),
+	/** Key code definition. */
+	F3(114, Key.F3),
+	/** Key code definition. */
+	F4(115, Key.F4),
+	/** Key code definition. */
+	F5(116, Key.F5),
+	/** Key code definition. */
+	F6(117, Key.F6),
+	/** Key code definition. */
+	F7(118, Key.F7),
+	/** Key code definition. */
+	F8(119, Key.F8),
+	/** Key code definition. */
+	F9(120, Key.F9),
+	/** Key code definition. */
+	F10(121, Key.F10),
+	/** Key code definition. */
+	F11(122, Key.F11),
+	/** Key code definition. */
+	F12(123, Key.F12),
+	/** Key code definition. */
+	HOME(36, Key.HOME),
+	/** Key code definition. */
+	LEFT(37, Key.LEFT),
+	/** Key code definition. */
+	PAGE_UP(33, Key.PAGE_UP),
+	/** Key code definition. */
+	PAGE_DOWN(34, Key.PAGE_DOWN),
+	/** Key code definition. */
+	RIGHT(39, Key.RIGHT),
+	/** Key code definition. */
+	SHIFT(16, Key.SHIFT_LEFT),
+	/** Key code definition. */
+	TAB(9, Key.TAB),
+	/** Key code definition. */
+	UP(38, Key.UP);
 
 	/** The code reported by the browser. */
 	private final int code;

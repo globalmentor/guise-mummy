@@ -28,12 +28,16 @@ import static com.globalmentor.java.Characters.TILDE_CHAR;
  */
 public enum Combinator {
 
+	/** Descendant. */
 	DESCENDANT(SPACE_CHAR),
 
+	/** Child. */
 	CHILD(GREATER_THAN_CHAR),
 
+	/** Adjacent sibling. */
 	ADJACENT_SIBLING(PLUS_SIGN_CHAR),
 
+	/** General sibling. */
 	GENERAL_SIBLING(TILDE_CHAR);
 
 	/** The serialized form of the combinator. */

@@ -26,19 +26,70 @@ import java.math.RoundingMode;
  * @see <a href="http://en.wikipedia.org/wiki/Boxing_the_compass">Wikipedia: Boxing the Compass</a>
  */
 public enum CompassPoint {
-	NORTH("N", new BigDecimal("0.00"), true, false), NORTH_BY_EAST("NbE", new BigDecimal("11.25"), false, false), NORTH_NORTHEAST("NNE", new BigDecimal("22.50"),
-			false, false), NORTHEAST_BY_NORTH("NEbN", new BigDecimal("33.75"), false, false), NORTHEAST("NE", new BigDecimal("45.00"), false, true), NORTHEAST_BY_EAST(
-			"NEbE", new BigDecimal("56.25"), false, false), EAST_NORTHEAST("ENE", new BigDecimal("67.50"), false, false), EAST_BY_NORTH("EbN",
-			new BigDecimal("78.75"), false, false), EAST("E", new BigDecimal("90.00"), true, false), EAST_BY_SOUTH("EbS", new BigDecimal("101.25"), false, false), EAST_SOUTHEAST(
-			"ESE", new BigDecimal("112.50"), false, false), SOUTHEAST_BY_EAST("SEbE", new BigDecimal("123.75"), false, false), SOUTHEAST("SE", new BigDecimal(
-			"135.00"), false, true), SOUTHEAST_BY_SOUTH("SEbS", new BigDecimal("146.25"), false, false), SOUTH_SOUTHEAST("SSE", new BigDecimal("157.50"), false,
-			false), SOUTH_BY_EAST("SbE", new BigDecimal("168.75"), false, false), SOUTH("S", new BigDecimal("180.00"), true, false), SOUTH_BY_WEST("SbW",
-			new BigDecimal("191.25"), false, false), SOUTH_SOUTHWEST("SSW", new BigDecimal("202.50"), false, false), SOUTHWEST_BY_SOUTH("SWbS", new BigDecimal(
-			"213.75"), false, false), SOUTHWEST("SW", new BigDecimal("225.00"), false, true), SOUTHWEST_BY_WEST("SWbW", new BigDecimal("236.26"), false, false), WEST_SOUTHWEST(
-			"WSW", new BigDecimal("247.50"), false, false), WEST_BY_SOUTH("WbS", new BigDecimal("258.75"), false, false), WEST("W", new BigDecimal("270.00"), true,
-			false), WEST_BY_NORTH("WbN", new BigDecimal("281.25"), false, false), WEST_NORTHWEST("WNW", new BigDecimal("292.50"), false, false), NORTHWEST_BY_WEST(
-			"NWbW", new BigDecimal("303.75"), false, false), NORTHWEST("NW", new BigDecimal("315.00"), false, true), NORTHWEST_BY_NORTH("NWbN", new BigDecimal(
-			"326.25"), false, false), NORTH_NORTHWEST("NNW", new BigDecimal("337.50"), false, false), NORTHBY_WEST("NbW", new BigDecimal("348.75"), false, false);
+	/** N */
+	NORTH("N", new BigDecimal("0.00"), true, false),
+	/** NbE */
+	NORTH_BY_EAST("NbE", new BigDecimal("11.25"), false, false),
+	/** NNE */
+	NORTH_NORTHEAST("NNE", new BigDecimal("22.50"), false, false),
+	/** NEbN */
+	NORTHEAST_BY_NORTH("NEbN", new BigDecimal("33.75"), false, false),
+	/** NE */
+	NORTHEAST("NE", new BigDecimal("45.00"), false, true),
+	/** NEbE */
+	NORTHEAST_BY_EAST("NEbE", new BigDecimal("56.25"), false, false),
+	/** ENE */
+	EAST_NORTHEAST("ENE", new BigDecimal("67.50"), false, false),
+	/** EbN */
+	EAST_BY_NORTH("EbN", new BigDecimal("78.75"), false, false),
+	/** E */
+	EAST("E", new BigDecimal("90.00"), true, false),
+	/** EbS */
+	EAST_BY_SOUTH("EbS", new BigDecimal("101.25"), false, false),
+	/** ESE */
+	EAST_SOUTHEAST("ESE", new BigDecimal("112.50"), false, false),
+	/** SEbE */
+	SOUTHEAST_BY_EAST("SEbE", new BigDecimal("123.75"), false, false),
+	/** SE */
+	SOUTHEAST("SE", new BigDecimal("135.00"), false, true),
+	/** SEbS */
+	SOUTHEAST_BY_SOUTH("SEbS", new BigDecimal("146.25"), false, false),
+	/** SSE */
+	SOUTH_SOUTHEAST("SSE", new BigDecimal("157.50"), false, false),
+	/** SbE */
+	SOUTH_BY_EAST("SbE", new BigDecimal("168.75"), false, false),
+	/** S */
+	SOUTH("S", new BigDecimal("180.00"), true, false),
+	/** SbW */
+	SOUTH_BY_WEST("SbW", new BigDecimal("191.25"), false, false),
+	/** SSW */
+	SOUTH_SOUTHWEST("SSW", new BigDecimal("202.50"), false, false),
+	/** SWbS */
+	SOUTHWEST_BY_SOUTH("SWbS", new BigDecimal("213.75"), false, false),
+	/** SW */
+	SOUTHWEST("SW", new BigDecimal("225.00"), false, true),
+	/** SWbW */
+	SOUTHWEST_BY_WEST("SWbW", new BigDecimal("236.26"), false, false),
+	/** WSW */
+	WEST_SOUTHWEST("WSW", new BigDecimal("247.50"), false, false),
+	/** WbS */
+	WEST_BY_SOUTH("WbS", new BigDecimal("258.75"), false, false),
+	/** W */
+	WEST("W", new BigDecimal("270.00"), true, false),
+	/** WbN */
+	WEST_BY_NORTH("WbN", new BigDecimal("281.25"), false, false),
+	/** WNW */
+	WEST_NORTHWEST("WNW", new BigDecimal("292.50"), false, false),
+	/** NWbW */
+	NORTHWEST_BY_WEST("NWbW", new BigDecimal("303.75"), false, false),
+	/** NW */
+	NORTHWEST("NW", new BigDecimal("315.00"), false, true),
+	/** NWbN */
+	NORTHWEST_BY_NORTH("NWbN", new BigDecimal("326.25"), false, false),
+	/** NNW */
+	NORTH_NORTHWEST("NNW", new BigDecimal("337.50"), false, false),
+	/** NbW */
+	NORTHBY_WEST("NbW", new BigDecimal("348.75"), false, false);
 
 	/** The maximum bearing available; synonymous with {@link #NORTH}. */
 	public static final BigDecimal MAX_BEARING = new BigDecimal(360);
@@ -104,7 +155,7 @@ public enum CompassPoint {
 	}
 
 	/**
-	 * Returns the ordinal or inter-cardinal compass point corresonding to 45 degrees between the given cardinal latitude and longitude compass points.
+	 * Returns the ordinal or inter-cardinal compass point corresponding to 45 degrees between the given cardinal latitude and longitude compass points.
 	 * @param latitudeCompassPoint The cardinal compass point of the latitude; either {@link CompassPoint#WEST} or {@link CompassPoint#EAST}.
 	 * @param longitudeCompassPoint The cardinal compass point of the longitude; either {@link CompassPoint#NORTH} or {@link CompassPoint#SOUTH}.
 	 * @return The ordinal compass position corresponding to 45 degrees between the given cardinal longitude and latitude compass points.
