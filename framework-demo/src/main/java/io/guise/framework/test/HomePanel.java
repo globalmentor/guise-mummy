@@ -31,10 +31,10 @@ import com.globalmentor.country.us.SSN;
 import com.globalmentor.iso.idcard.PAN;
 import com.globalmentor.iso.idcard.Product;
 import com.globalmentor.itu.TelephoneNumber;
-import com.globalmentor.log.Log;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.html.spec.HTML;
 
+import io.clogr.Clogged;
 import io.guise.framework.Bookmark;
 import io.guise.framework.GuiseSession;
 import io.guise.framework.Resources;
@@ -63,7 +63,7 @@ import io.guise.framework.validator.ValueRequiredValidator;
  * Test panel for a home page.
  * @author Garret Wilson
  */
-public class HomePanel extends LayoutPanel {
+public class HomePanel extends LayoutPanel implements Clogged {
 
 	private TestFrame frame = null;
 	final Label testLabel;
@@ -297,7 +297,7 @@ public class HomePanel extends LayoutPanel {
 			public void propertyChange(final GenericPropertyChangeEvent<Float> propertyChangeEvent) {
 				final Float newValue = propertyChangeEvent.getNewValue(); //get the new value
 				try {
-					Log.trace("list control changed value to", newValue);
+					getLogger().trace("list control changed value to {}", newValue);
 					outputTextControl.setValue(newValue != null ? newValue * 2 : null); //update the value
 				} catch(final PropertyVetoException propertyVetoException) { //if the change was vetoed, ignore the exception
 				}
@@ -509,7 +509,7 @@ public class HomePanel extends LayoutPanel {
 					frame = new TestFrame();
 					frame.setLabel("Test Frame");
 				}
-				Log.trace("ready to set frame visible");
+				getLogger().trace("ready to set frame visible");
 				frame.open();
 			}
 
@@ -883,7 +883,7 @@ public class HomePanel extends LayoutPanel {
 
 				//TODO del						testButton.setVisible(newValue);	//update the button enabled state
 				//TODO bring back						testButton.getModel().setEnabled(newValue);	//update the button enabled state
-				Log.trace("ready to set tabbed panel enabled to", newValue);
+				getLogger().trace("ready to set tabbed panel enabled to", newValue);
 				//TODO del						tabbedPanel.getLayout().getConstraints(helloPanel).setEnabled(newValue);	//TODO testing
 				/*TODO del
 										remoteTabControl.setValueEnabled(helloPanel, newValue);	//TODO testing

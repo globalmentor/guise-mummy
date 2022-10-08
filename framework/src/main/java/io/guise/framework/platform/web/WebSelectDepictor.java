@@ -23,8 +23,8 @@ import java.util.*;
 import static java.util.Objects.*;
 
 import static com.globalmentor.java.Objects.*;
-import com.globalmentor.log.Log;
 
+import io.clogr.Clogr;
 import io.guise.framework.component.*;
 import io.guise.framework.model.*;
 import io.guise.framework.platform.*;
@@ -112,7 +112,7 @@ public class WebSelectDepictor<V, C extends ListSelectControl<V>> extends Abstra
 			}
 		}
 		try {
-			Log.trace("ready to set selected indexes to", Arrays.toString(selectedIndices));
+			Clogr.getLogger(WebSelectDepictor.class).trace("ready to set selected indexes to {}", Arrays.toString(selectedIndices));
 			selectControl.setSelectedIndexes(selectedIndices); //store the decoded value in the model
 		} catch(final PropertyVetoException propertyVetoException) { //if there is a veto
 			final Throwable cause = propertyVetoException.getCause(); //get the cause of the veto, if any

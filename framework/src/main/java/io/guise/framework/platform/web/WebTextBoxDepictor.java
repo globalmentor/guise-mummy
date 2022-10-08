@@ -27,12 +27,11 @@ import javax.xml.parsers.*;
 import com.globalmentor.collections.*;
 import com.globalmentor.net.MediaType;
 
+import io.clogr.Clogged;
 import io.guise.framework.component.*;
 import io.guise.framework.component.SectionComponent.SectionType;
 
 import static com.globalmentor.java.CharSequences.*;
-
-import com.globalmentor.log.Log;
 
 import static com.globalmentor.html.spec.HTML.*;
 import static com.globalmentor.xml.spec.XML.*;
@@ -48,7 +47,7 @@ import org.xml.sax.SAXException;
  * @param <C> The type of component being depicted.
  * @author Garret Wilson
  */
-public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComponentDepictor<C> {
+public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComponentDepictor<C> implements Clogged {
 
 	/** The document prefix to wrap around an XHTML fragment. */
 	private static final String XHTML11_FRAGMENT_DOCUMENT_PREFIX = //TODO fix; this doesn't create valid XHTML; it needs an internal DIV, but we need to then get the contents of the DIV rather than the BODY, which we could do using an ID
@@ -124,10 +123,10 @@ public class WebTextBoxDepictor<C extends TextBox> extends AbstractSimpleWebComp
 					}
 					final Document document; //we'll use the cached document if we can
 					if(cachedDocument != null) { //if we have a cached document for this text
-						Log.debug("cache hit for text", xmlTextHash);
+						getLogger().debug("cache hit for text {}", xmlTextHash);
 						document = cachedDocument.getDocument(); //use the document
 					} else { //if there is no cached document
-						Log.debug("cache miss for text", xmlTextHash);
+						getLogger().debug("cache miss for text {}", xmlTextHash);
 						//				TODO del Log.trace("ready to parse text");
 						//				TODO del Log.trace("creating document builder factory");
 

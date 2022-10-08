@@ -34,6 +34,8 @@ import javax.mail.Message;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 
+import org.slf4j.event.Level;
+
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Threads.*;
@@ -49,7 +51,6 @@ import com.globalmentor.collections.DecoratorReadWriteLockMap;
 import com.globalmentor.collections.PurgeOnWriteSoftValueHashMap;
 import com.globalmentor.io.*;
 import com.globalmentor.java.Objects;
-import com.globalmentor.log.*;
 import com.globalmentor.mail.MailManager;
 import com.globalmentor.model.ConfigurationException;
 import com.globalmentor.net.URIPath;
@@ -57,6 +58,9 @@ import com.globalmentor.text.W3CDateFormat;
 import com.globalmentor.util.*;
 import com.globalmentor.xml.spec.XML;
 
+import io.clogr.Clogged;
+import io.clogr.Clogr;
+import io.clogr.LoggingConcern;
 import io.csar.*;
 import io.guise.framework.component.*;
 import io.guise.framework.platform.*;
@@ -69,7 +73,7 @@ import io.urf.turf.TurfParser;
  * An abstract base class for a Guise application. This implementation only works with Guise containers that descend from {@link AbstractGuiseContainer}.
  * @author Garret Wilson
  */
-public abstract class AbstractGuiseApplication extends BoundPropertyObject implements GuiseApplication {
+public abstract class AbstractGuiseApplication extends BoundPropertyObject implements GuiseApplication, Clogged {
 
 	/** Whether this application is in debug mode. */
 	private boolean debug = false;
@@ -349,7 +353,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 				final File tempFile = tempFileInfo.getTempFile(); //get the temporary file
 				if(tempFile.exists()) { //if this file still exists
 					if(!tempFile.delete()) { //delete the temporary file; if the file could not be deleted
-						Log.warn("Could not delete temporary file " + tempFile + " associated with Guise session " + guiseSession);
+						getLogger().warn("Could not delete temporary file {} associated with Guise session {}", tempFile, guiseSession);
 					}
 				}
 			}
@@ -564,19 +568,21 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	public void install(final AbstractGuiseContainer container, final URI baseURI, final File homeDirectory, final File logDirectory, final File tempDirectory) {
 		requireNonNull(container, "Container cannot be null");
 		checkNotInstalled();
-		Log.info("Installing application", this, "at URI", baseURI);
+		getLogger().info("Installing application {} at URI {}", this, baseURI);
 		setBaseURI(baseURI); //set the base URI
 		this.container = container; //store the container
 		this.homeDirectory = requireNonNull(homeDirectory, "Home directory cannot be null.");
 		this.logDirectory = requireNonNull(logDirectory, "Log directory cannot be null.");
 		this.tempDirectory = requireNonNull(tempDirectory, "Temporary directory cannot be null.");
 		final DateFormat logFilenameDateFormat = new W3CDateFormat(W3CDateFormat.Style.DATE); //create a formatter for the log filename
-		final String logFilename = addExtension("application-" + logFilenameDateFormat.format(new Date()), Log.FILENAME_EXTENSION); //create a filename in the form "application-YYYY-MM-DD.log"
+		final String logFilename = addExtension("application-" + logFilenameDateFormat.format(new Date()), "log"); //create a filename in the form "application-YYYY-MM-DD.log" TODO use constant once it is added to com.globalmentor.text.Text
 		final File logFile = new File(logDirectory, logFilename); //determine the log file for this application TODO create a custom log configuration that will use rolling log files
-		logConfiguration.setFile(logFile); //set the log file for our log configuration
-		logConfiguration.setStandardOutput(isDebug()); //if we are debugging, turn on logging to the standard output
-		setConfiguration(LogConfiguration.class, logConfiguration); //configure logging for this application
-		logConfiguration.getLogger().info("Installing application", this); //inform the application-specific log
+		/* TODO configure logging concern appropriately, to bring back feature parity with legacy log library
+		loggingConcern.setFile(logFile); //set the log file for our log configuration
+		loggingConcern.setStandardOutput(isDebug()); //if we are debugging, turn on logging to the standard output
+		*/
+		setConfiguration(LoggingConcern.class, loggingConcern); //configure logging for this application
+		loggingConcern.getLogger(getClass()).info("Installing application {}", this); //inform the application-specific log
 		if(mailProperties != null) { //if mail properties have been configured
 			try {
 				mailManager = new MailManager(mailProperties); //create a new mail manager from the properties
@@ -584,14 +590,14 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 				throw new ConfigurationException(noSuchProviderException); //indicate that there was a problem configuring the application TODO use a better error; create a ConfigurationStateException
 			}
 		} else { //if there are no mail properties
-			Log.warn("Mail properties not configured."); //warn that mail isn't configured
+			getLogger().warn("Mail properties not configured."); //warn that mail isn't configured
 		}
 	}
 
 	@Override
 	public void uninstall(final GuiseContainer container) {
-		Log.info("Uninstalling application", this, "from URI", baseURI);
-		logConfiguration.getLogger().info("Uninstalling application", this); //inform the application-specific log
+		getLogger().info("Uninstalling application {} from URI {}", this, baseURI);
+		loggingConcern.getLogger(getClass()).info("Uninstalling application {}", this); //inform the application-specific log
 		if(this.container == null) { //if we don't have a container
 			throw new IllegalStateException("Application not installed.");
 		}
@@ -605,17 +611,19 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 				try {
 					logWriterInfo.getWriter().close(); //close this writer
 				} catch(final IOException ioException) { //if there is an error closing the writer
-					Log.warn(ioException); //log the warning and continue
+					getLogger().warn("", ioException); //log the warning and continue
 				}
 			}
 			baseNameLogWriterInfoMap.clear(); //remove all log writer information
 		}
+		/* TODO close logging concern if needed after bringing back back feature parity with legacy log library
 		try {
-			logConfiguration.close(); //close our main application log configuration, closing files as necessary
+			loggingConcern.close(); //close our main application log configuration, closing files as necessary
 		} catch(final IOException ioException) {
 			System.err.println("Error closing log writer; " + ioException.getMessage());
 			ioException.printStackTrace();
 		}
+		*/
 
 		this.container = null; //release the container
 		this.basePath = null; //remove the base path
@@ -718,11 +726,11 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	}
 
 	/** The log configuration for this application. */
-	private final DefaultLogConfiguration logConfiguration;
+	private final LoggingConcern loggingConcern;
 
 	@Override
-	public void setLogLevel(final Log.Level level) {
-		logConfiguration.setLevel(level);
+	public void setLogLevel(final Level level) {
+		loggingConcern.setLogLevel(level);
 	}
 
 	/**
@@ -734,8 +742,11 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		this.uri = uri; //set the URI
 		locales = unmodifiableList(asList(Locale.getDefault())); //create an unmodifiable list of locales including only the default locale of the JVM
 		this.environment = new DefaultEnvironment(); //create a default environment
-		this.logConfiguration = new DefaultLogConfiguration(); //create a default log configuration, which we'll initialize with a log file later
-		this.logConfiguration.setStandardOutput(false); //turn off logging to the standard output; we may turn it on later
+		this.loggingConcern = Clogr.getLoggingConcern();
+		/* TODO wrap default logging concern and configure appropriately, to bring back feature parity with legacy log library
+		this.loggingConcern = new DefaultLogConfiguration(); //create a default log configuration, which we'll initialize with a log file later
+		this.loggingConcern.setStandardOutput(false); //turn off logging to the standard output; we may turn it on later
+		*/
 	}
 
 	/** The concurrent list of destinations which have path patterns specified. */
@@ -882,25 +893,25 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 					return getResourceInputStream(uri.get)
 				}
 		*/
-		//TODO del Log.trace("getting input stream to URI", uri);
+		//TODO del getLogger().trace("getting input stream to URI {}", uri);
 		final GuiseContainer container = getContainer(); //get the container
 		final URI resolvedURI = resolveURI(uri); //resolve the URI to the application
-		//TODO del Log.trace("resolved URI:", resolvedURI);
+		//TODO del getLogger().trace("resolved URI: {}", resolvedURI);
 		final URI absoluteResolvedURI = resolve(container.getBaseURI(), resolvedURI); //resolve the URI against the container base URI
-		//TODO del Log.trace("absolute resolved URI:", absoluteResolvedURI);
+		//TODO del getLogger().trace("absolute resolved URI: {}", absoluteResolvedURI);
 		//check for Guise public resources
 		final URI publicResourcesBaseURI = resolve(container.getBaseURI(), getBasePath().resolve(GUISE_ASSETS_BASE_PATH).toURI()); //get the base URI of Guise public resources
-		//	TODO del Log.trace("publicResourcesBaseURI:", publicResourcesBaseURI);
+		//	TODO del getLogger().trace("publicResourcesBaseURI: {}", publicResourcesBaseURI);
 		final URI publicResourceRelativeURI = publicResourcesBaseURI.relativize(absoluteResolvedURI); //see if the absolute URI is in the application public path
-		//	TODO del Log.trace("resourceURI:", resourceURI);		
+		//	TODO del getLogger().trace("resourceURI: {}", resourceURI);		
 		if(!publicResourceRelativeURI.isAbsolute()) { //if the URI is relative to the application's public resources
 			return Guise.getInstance().getAssetInputStream(GUISE_ASSETS_BASE_KEY + publicResourceRelativeURI.getPath()); //return an input stream to the resource directly, rather than going through the server
 		}
 		//check for Guise public temp resources
 		final URI publicTempBaseURI = resolve(container.getBaseURI(), getBasePath().resolve(GUISE_ASSETS_TEMP_BASE_PATH).toURI()); //get the base URI of Guise public temporary resources
-		//	TODO del Log.trace("publicResourcesBaseURI:", publicResourcesBaseURI);
+		//	TODO del getLogger().trace("publicResourcesBaseURI: {}", publicResourcesBaseURI);
 		final URI publicTempRelativeURI = publicTempBaseURI.relativize(absoluteResolvedURI); //see if the absolute URI is in the application public temporary path
-		//	TODO del Log.trace("resourceURI:", resourceURI);		
+		//	TODO del getLogger().trace("resourceURI: {}", resourceURI);		
 		if(!publicTempRelativeURI.isAbsolute()) { //if the URI is relative to the application's public temp resources
 			final String filename = publicTempRelativeURI.getRawPath(); //get the filename of the temp file
 			final TempFileInfo tempFileInfo = filenameTempFileInfoMap.get(filename); //get the info for this temp file
@@ -953,16 +964,16 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	@Override
 	public OutputStream getOutputStream(final URI uri) throws IOException {
-		//TODO del Log.trace("getting input stream to URI", uri);
+		//TODO del getLogger().trace("getting input stream to URI {}", uri);
 		final GuiseContainer container = getContainer(); //get the container
 		final URI resolvedURI = resolveURI(uri); //resolve the URI to the application
-		//	TODO del Log.trace("resolved URI:", resolvedURI);
+		//	TODO del getLogger().trace("resolved URI: {}", resolvedURI);
 		final URI absoluteResolvedURI = resolve(container.getBaseURI(), resolvedURI); //resolve the URI against the container base URI
-		//	TODO del Log.trace("absolute resolved URI:", absoluteResolvedURI);
+		//	TODO del getLogger().trace("absolute resolved URI: {}", absoluteResolvedURI);
 		final URI publicTempBaseURI = resolve(container.getBaseURI(), getBasePath().resolve(GUISE_ASSETS_TEMP_BASE_PATH).toURI()); //get the base URI of the Guise temp resources
-		//	TODO del Log.trace("publicResourcesBaseURI:", publicResourcesBaseURI);
+		//	TODO del getLogger().trace("publicResourcesBaseURI: {}", publicResourcesBaseURI);
 		final URI publicTempRelativeURI = publicTempBaseURI.relativize(absoluteResolvedURI); //see if the absolute URI is in the application public path
-		//	TODO del Log.trace("resourceURI:", resourceURI);		
+		//	TODO del getLogger().trace("resourceURI: {}", resourceURI);		
 		if(!publicTempRelativeURI.isAbsolute()) { //if the URI is relative to the application's temp resources
 			final String filename = publicTempRelativeURI.getRawPath(); //get the filename of the temp file
 			final TempFileInfo tempFileInfo = filenameTempFileInfoMap.get(filename); //get the info for this temp file
@@ -1070,7 +1081,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		resourceBundle = loadResourceBundle(theme, locale, resourceBundle); //load any resources for this theme and resolving parents
 		//application resources
 		final String resourceBundleBaseName = getResourceBundleBaseName(); //get the specified resource bundle base name
-		//TODO del Log.trace("ready to load application resources; resource bundle base name:", resourceBundleBaseName);
+		//TODO del getLogger().trace("ready to load application resources; resource bundle base name: {}", resourceBundleBaseName);
 		if(resourceBundleBaseName != null && !resourceBundleBaseName.equals(DEFAULT_RESOURCE_BUNDLE_BASE_NAME)) { //if a distinct resource bundle base name was specified
 			resourceBundle = ResourceBundles.getResourceBundle(resourceBundleBaseName, locale, loader, resourceBundle, resourcesIO); //load the new resource bundle, specifying the current resource bundle as the parent					
 		}

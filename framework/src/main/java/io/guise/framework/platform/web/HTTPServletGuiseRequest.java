@@ -23,10 +23,10 @@ import static java.util.Objects.*;
 
 import javax.servlet.http.*;
 
-import com.globalmentor.log.Log;
 import com.globalmentor.net.MediaType;
 import com.globalmentor.net.URIPath;
 
+import io.clogr.Clogged;
 import io.guise.framework.*;
 
 import static com.globalmentor.net.URIs.*;
@@ -37,7 +37,7 @@ import static io.guise.framework.platform.web.WebPlatform.*;
  * Information about the Guise request of an HTTP servlet.
  * @author Garret Wilson
  */
-public class HTTPServletGuiseRequest {
+public class HTTPServletGuiseRequest implements Clogged {
 
 	/** The HTTP servlet request. */
 	private final HttpServletRequest httpServletRequest;
@@ -143,7 +143,7 @@ public class HTTPServletGuiseRequest {
 		depictURI = URI.create(request.getRequestURL().toString()); //get the URI of the current request
 		final String queryString = request.getQueryString(); //get the query string from the request
 		bookmark = queryString != null && queryString.length() > 0 ? new Bookmark(String.valueOf(QUERY_SEPARATOR) + queryString) : null; //create a bookmark if there is a query string (Tomcat 5.5.16 returns an empty string for no query, even though the Java Servlet specification 2.4 says that it should return null; this is fixed in Tomcat 6)
-		Log.debug("servicing Guise request with request URI:", depictURI, "bookmark:", bookmark);
+		getLogger().debug("servicing Guise request with request URI: {} bookmark: {}", depictURI, bookmark);
 		final String rawPathInfo = getRawPathInfo(request); //get the raw path info
 		assert isPathAbsolute(rawPathInfo) : "Expected absolute path info, received " + rawPathInfo; //the Java servlet specification says that the path info will start with a '/'
 		URI referrerURI = getRefererURI(request); //get the referring URI, if any

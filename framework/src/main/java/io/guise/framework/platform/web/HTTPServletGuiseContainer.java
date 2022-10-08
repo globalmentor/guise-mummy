@@ -33,10 +33,10 @@ import com.globalmentor.collections.DecoratorReadWriteLockMap;
 import com.globalmentor.collections.HashSetHashMap;
 import com.globalmentor.collections.ReadWriteLockCollectionMap;
 import com.globalmentor.collections.ReadWriteLockMap;
-import com.globalmentor.log.Log;
 import com.globalmentor.model.AbstractProxyHashObject;
 import com.globalmentor.net.URIPath;
 
+import io.clogr.Clogged;
 import io.guise.framework.*;
 
 import static com.globalmentor.net.URIs.*;
@@ -48,13 +48,14 @@ import static com.globalmentor.servlet.http.HTTPServlets.*;
  * application on a JVM.
  * @author Garret Wilson
  */
-public class HTTPServletGuiseContainer extends AbstractGuiseContainer {
+public class HTTPServletGuiseContainer extends AbstractGuiseContainer implements Clogged {
 
 	/** The absolute path, relative to the servlet context, of the resources directory. */
 	public static final String RESOURCES_DIRECTORY_PATH = WEB_INF_DIRECTORY_PATH + "guise" + PATH_SEPARATOR + "resources" + PATH_SEPARATOR; //TODO use constants; combine with other similar designations for the same path
 
 	/** The static, synchronized map of Guise containers keyed to servlet contexts. */
-	private static final Map<ServletContext, HTTPServletGuiseContainer> servletContextGuiseContainerMap = synchronizedMap(new HashMap<ServletContext, HTTPServletGuiseContainer>());
+	private static final Map<ServletContext, HTTPServletGuiseContainer> servletContextGuiseContainerMap = synchronizedMap(
+			new HashMap<ServletContext, HTTPServletGuiseContainer>());
 
 	/**
 	 * Retrieves the Guise container associated with the given servlet context. Because the Java Servlet architecture does not provide the context path to the
@@ -158,7 +159,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer {
 				isNewGuiseSession = guiseSession == null; //if there is still no Guise session associated with the given HTTP session and Guise application, we'll create a Guise session
 				if(isNewGuiseSession) { //if we should create a new Guise session
 					guiseSession = guiseApplication.createSession(new HTTPServletWebPlatform(guiseApplication, httpSession, httpRequest)); //ask the application to create a new Guise session for the given platform
-					Log.info("Adding Guise session", guiseSession, "associated with HTTP sesssion", httpSession.getId());
+					getLogger().info("Adding Guise session {} associated with HTTP sesssion {}", guiseSession, httpSession.getId());
 					addGuiseSession(guiseSession); //add and initialize the Guise session
 					final Locale[] clientAcceptedLanguages = getAcceptedLanguages(httpRequest); //get all languages accepted by the client
 					guiseSession.requestLocale(asList(clientAcceptedLanguages)); //ask the Guise session to change to one of the accepted locales, if the application supports one
@@ -249,7 +250,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer {
 			}
 		}
 		for(final GuiseSession guiseSession : guiseSessions) { //now that we've updated the relevant maps related to the HTTP session, we can uninitialize the Guise sessions at our leisure without blocking new HTTP requests
-			Log.info("Removing Guise session", guiseSession, "associated with HTTP sesssion", httpSession.getId());
+			getLogger().info("Removing Guise session {} associated with HTTP sesssion {}", guiseSession, httpSession.getId());
 			removeGuiseSession(guiseSession); //remove the Guise session
 		}
 		return guiseSessions; //return the Guise sessions
@@ -319,7 +320,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer {
 		//TODO allow multiple base URIs; as a short-term fix, check HTTP and HTTPS variations 
 
 		if(!relativeURI.isAbsolute()) { //if the URI is relative to the container base URI, we can load it directly
-		//TODO del Log.trace("Loading directly from servlet: "+ROOT_PATH+relativeURI);
+			//TODO del Log.trace("Loading directly from servlet: "+ROOT_PATH+relativeURI);
 			return getServletContext().getResourceAsStream(ROOT_PATH + relativeURI.toString()); //get an input stream through the servlet context (which may be null if there is no such resource)
 		}
 		return super.getInputStream(uri); //if we can't get the resource locally, delegate to the super class

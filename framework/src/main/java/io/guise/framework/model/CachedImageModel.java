@@ -25,7 +25,8 @@ import static com.globalmentor.java.Classes.*;
 
 import com.globalmentor.cache.*;
 import com.globalmentor.java.Objects;
-import com.globalmentor.log.Log;
+
+import io.clogr.Clogged;
 
 /**
  * An image model that can initiate retrieval of an image from a cache and update the image when fetching succeeds.
@@ -35,7 +36,7 @@ import com.globalmentor.log.Log;
  *          image is determined to have been fetched into the cache.
  * @author Garret Wilson
  */
-public class CachedImageModel<Q, V> extends DefaultImageModel implements PendingImageModel {
+public class CachedImageModel<Q, V> extends DefaultImageModel implements PendingImageModel, Clogged {
 
 	/** The cached image query bound property. */
 	public static final String CACHED_IMAGE_QUERY_PROPERTY = getPropertyName(CachedImageModel.class, "cachedImageQuery");
@@ -99,11 +100,11 @@ public class CachedImageModel<Q, V> extends DefaultImageModel implements Pending
 			if(isImagePending()) { //if the image is pending
 				throw new IllegalStateException("Cached image key cannot be changed while the image is pending.");
 			}
-			Log.trace("for cached image", getCachedImageURI(), "changing from cached image key", cachedImageQuery, "to", newCachedImageQuery);
+			getLogger().trace("for cached image {} changing from cached image key {} to {}", getCachedImageURI(), cachedImageQuery, newCachedImageQuery);
 			final Q oldCachedImageQuery = cachedImageQuery; //get the old value
 			cachedImageQuery = newCachedImageQuery; //actually change the value
 			firePropertyChange(CACHED_IMAGE_QUERY_PROPERTY, oldCachedImageQuery, newCachedImageQuery); //indicate that the value changed
-			Log.trace("initiating pending");
+			getLogger().trace("initiating pending");
 			updatePending(); //initiate image retrieval if we can
 		}
 	}
@@ -125,7 +126,7 @@ public class CachedImageModel<Q, V> extends DefaultImageModel implements Pending
 		if(imagePending != newImagePending) { //if the value is really changing
 			final boolean oldImagePending = imagePending; //get the current value
 			imagePending = newImagePending; //update the value
-			Log.trace("pending state changed to", newImagePending, "now adding or removing cache fetch listener");
+			getLogger().trace("pending state changed to", newImagePending, "now adding or removing cache fetch listener");
 			if(newImagePending) { //if the image is now pending
 				getCache().addCacheFetchListener(getCachedImageQuery(), cachedImageListener); //listen for cache fetches before requesting the image in case the fetch occurs before we can check if the image exists
 			} else { //if the image is no longer pending

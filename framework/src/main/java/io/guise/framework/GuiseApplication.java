@@ -23,10 +23,11 @@ import java.util.*;
 import javax.mail.Message;
 import javax.mail.Session;
 
+import org.slf4j.event.Level;
+
 import com.globalmentor.beans.PropertyBindable;
 import com.globalmentor.io.IO;
 import com.globalmentor.io.IOOperation;
-import com.globalmentor.log.Log;
 import com.globalmentor.net.Resource;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.net.URIs;
@@ -143,7 +144,7 @@ public interface GuiseApplication extends Resource, PropertyBindable, Concerned 
 	 * @param level The minimum level to be logged.
 	 * @throws NullPointerException if the given level is <code>null</code>.
 	 */
-	public void setLogLevel(final Log.Level level);
+	public void setLogLevel(final Level level);
 
 	/**
 	 * Returns the properties of the mail manager. This method is guaranteed to return a non-<code>null</code> value after the application is installed.

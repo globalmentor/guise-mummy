@@ -18,8 +18,9 @@ package io.guise.framework.prototype;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.log.Log;
 import com.globalmentor.model.AbstractHashObject;
+
+import io.clogr.Clogged;
 
 /**
  * Prototype provision information indicating order, hierarchy, and location for generated components. This description is usually used to generate components
@@ -27,7 +28,7 @@ import com.globalmentor.model.AbstractHashObject;
  * @param <P> The type of prototype being provided.
  * @author Garret Wilson
  */
-public class PrototypeProvision<P extends Prototype> extends AbstractHashObject implements Comparable<PrototypeProvision<P>> {
+public class PrototypeProvision<P extends Prototype> extends AbstractHashObject implements Comparable<PrototypeProvision<P>>, Clogged {
 
 	/** No order. */
 	public static final int NO_ORDER = -1;
@@ -161,7 +162,7 @@ public class PrototypeProvision<P extends Prototype> extends AbstractHashObject 
 			//TODO compare the labels
 			value = hashCode() - prototypeDescription.hashCode(); //create an arbitrary ordering based upon the hash code
 			if(value == 0) { //if the hash codes are the same but the objects are not equal, the JVM must have assigned two distinct objects identical hash codes; this shouldn't bring down the application, but if it happens frequently this logic should be updated
-				Log.warn("Distinct prototype description not comparing correctly."); //TODO add creation order property to all prototypes to aid in comparison
+				getLogger().warn("Distinct prototype description not comparing correctly."); //TODO add creation order property to all prototypes to aid in comparison
 			}
 		}
 		return value; //return the comparation value

@@ -37,10 +37,10 @@ import com.globalmentor.collections.ReadWriteLockMap;
 import com.globalmentor.io.BOMInputStreamReader;
 import com.globalmentor.java.*;
 import com.globalmentor.java.Objects;
-import com.globalmentor.log.Log;
 import com.globalmentor.net.*;
 import com.globalmentor.util.*;
 
+import io.clogr.Clogged;
 import io.csar.*;
 import io.guise.framework.component.*;
 import io.guise.framework.component.layout.Orientation;
@@ -69,7 +69,7 @@ import static io.guise.framework.theme.Theme.*;
  * An abstract implementation that keeps track of the components of a user session.
  * @author Garret Wilson
  */
-public abstract class AbstractGuiseSession extends BoundPropertyObject implements GuiseSession {
+public abstract class AbstractGuiseSession extends BoundPropertyObject implements GuiseSession, Clogged {
 
 	/** The manager of configurations for this session. */
 	private final ConcernRegistry configurationManager = new DefaultConcernRegistry();
@@ -1162,7 +1162,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		if(severity == Notification.Severity.ERROR) { //if this is an error notification TODO improve to work with all notifications; this will entail adding a general public debug write method and translating between log report levels and notification severities
 			final Throwable throwable = notification.getError(); //get the error, if any
 			if(throwable != null) { //if there is an error
-				Log.error(throwable); //produce a stack trace
+				getLogger().error("", throwable); //produce a stack trace
 			}
 		}
 		final NotificationOptionDialogFrame optionDialogFrame = new NotificationOptionDialogFrame(notification); //create a dialog from the notification

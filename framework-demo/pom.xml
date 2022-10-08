@@ -19,5 +19,10 @@
 			<groupId>io.guise</groupId>
 			<artifactId>guise-framework</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>com.globalmentor</groupId>
+			<artifactId>globalmentor-html-spec</artifactId>
+		</dependency>
 	</dependencies>
 </project>
