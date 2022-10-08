@@ -1,11 +1,11 @@
 /*
- * Copyright © 2005-2012 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2005-2012 GlobalMentor, Inc. <https://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -443,7 +443,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LICENSE_CLASS); //class="license"
 			depictContext.write("XHTML produced by an unlicensed copy of ");
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_A); //<xhtml:a>
-			depictContext.writeAttribute(null, ELEMENT_A_ATTRIBUTE_HREF, Guise.GUISE_WEB_URI.toString()); //href="http://www.guise.io/framework/"
+			depictContext.writeAttribute(null, ELEMENT_A_ATTRIBUTE_HREF, Guise.GUISE_WEB_URI.toString()); //href="https://www.guise.io/framework/"
 			depictContext.write(Guise.GUISE_NAME); //Guise
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_A); //</xhtml:a>			
 			depictContext.write(". Please contact ");

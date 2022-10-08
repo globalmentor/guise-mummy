@@ -1,11 +1,11 @@
 /* Guise™ JavaScript Library
- * Copyright © 2005-2013 GlobalMentor, Inc. <http://www.globalmentor.com/>
+ * Copyright © 2005-2013 GlobalMentor, Inc. <https://www.globalmentor.com/>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -3040,7 +3040,7 @@ io.guise.framework.Guise = function()
 							else
 							//if this is not a Guise control
 							{
-								if(node.getAttribute("rel") == "rendition") //if this is a rendition link, see if we can patch in some special functionality for certain types of renditions; see http://www.globalmentor.com/specs/html-rel-rendition/
+								if(node.getAttribute("rel") == "rendition") //if this is a rendition link, see if we can patch in some special functionality for certain types of renditions; see https://www.globalmentor.com/specs/html-rel-rendition
 								{
 									var href = node.getAttribute("href");
 									var contentType = ContentType.test(node.getAttribute("type")); //see if there is a content type provided
