@@ -17,8 +17,8 @@
 package io.guise.framework.prototype;
 
 import java.net.URI;
+import java.util.Objects;
 
-import com.globalmentor.java.Objects;
 import static com.globalmentor.java.Classes.*;
 import com.globalmentor.net.URIPath;
 

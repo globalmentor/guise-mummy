@@ -56,6 +56,7 @@ public interface SelectModel<V> extends ValueModel<V>, Collection<V> {
 	 * @param values The values to select.
 	 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	 */
+	@SuppressWarnings("unchecked")
 	public void setSelectedValues(final V... values) throws PropertyVetoException;
 
 }

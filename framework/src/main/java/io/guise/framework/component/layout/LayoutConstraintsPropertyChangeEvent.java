@@ -30,6 +30,8 @@ import io.guise.framework.component.Component;
  */
 public class LayoutConstraintsPropertyChangeEvent<T extends Constraints, V> extends GenericPropertyChangeEvent<V> { //TODO maybe cast the source to a layout in the class if needed by a use case
 
+	private static final long serialVersionUID = 5297568761000291693L;
+
 	/** The component for which a constraint value changed. */
 	private final Component component;
 

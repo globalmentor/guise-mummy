@@ -23,6 +23,8 @@ package io.guise.framework.event;
  */
 public class EditEvent extends AbstractTargetedGuiseEvent {
 
+	private static final long serialVersionUID = -5017387891715885066L;
+
 	/**
 	 * Source constructor. The target will be set to be the same as the given source.
 	 * @param source The object on which the event initially occurred.

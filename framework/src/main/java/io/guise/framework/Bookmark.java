@@ -70,10 +70,10 @@ public class Bookmark implements Cloneable {
 		if(bookmarkLength == 0 || bookmark.charAt(0) != QUERY_SEPARATOR) { //if the bookmark string does not begin with '?'
 			throw new ArgumentSyntaxException("Bookmark string " + bookmark + " must being with '?'.");
 		}
-		final NameValuePair<String, String>[] parameters = URIs.getParameters(bookmark.subSequence(1, bookmarkLength).toString()); //get the parameters from the string following the query character
-		final Parameter[] bookmarkParameters = new Parameter[parameters.length]; //create a new array of bookmark parameters
-		for(int i = parameters.length - 1; i >= 0; --i) { //for each parameter
-			final NameValuePair<String, String> parameter = parameters[i]; //get a reference to this parameter
+		final List<NameValuePair<String, String>> parameters = URIs.getQueryParameters(bookmark.subSequence(1, bookmarkLength).toString()); //get the parameters from the string following the query character
+		final Parameter[] bookmarkParameters = new Parameter[parameters.size()]; //create a new array of bookmark parameters
+		for(int i = parameters.size() - 1; i >= 0; --i) { //for each parameter
+			final NameValuePair<String, String> parameter = parameters.get(i); //get a reference to this parameter
 			bookmarkParameters[i] = new Parameter(parameter.getName(), parameter.getValue()); //create a corresponding bookmark parameter
 		}
 		setParameters(bookmarkParameters); //set the parameters

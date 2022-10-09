@@ -24,6 +24,8 @@ import io.guise.framework.event.AbstractGuiseEvent;
  */
 public abstract class AbstractPlatformEvent extends AbstractGuiseEvent implements PlatformEvent {
 
+	private static final long serialVersionUID = 3619895421312433285L;
+
 	/**
 	 * Source constructor.
 	 * @param source The object on which the event initially occurred.

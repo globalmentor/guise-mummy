@@ -17,10 +17,9 @@
 package io.guise.framework.component;
 
 import java.net.URI;
+import java.util.Objects;
 
 import static java.util.Objects.*;
-
-import com.globalmentor.java.Objects;
 
 import io.guise.framework.component.layout.*;
 import io.guise.framework.converter.AbstractStringLiteralConverter;

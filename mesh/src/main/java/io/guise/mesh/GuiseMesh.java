@@ -158,6 +158,7 @@ public class GuiseMesh {
 	 * @throws MeshException if there was an error directly related to meshing the document, such as parsing an expression.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
+	@SuppressWarnings("try")
 	public List<Element> meshElement(@Nonnull MeshContext context, @Nonnull final Element element) throws IOException, MeshException, DOMException {
 		final MexlEvaluator evaluator = getEvaluator();
 
@@ -177,7 +178,7 @@ public class GuiseMesh {
 						final String indexVar = exciseAttribute(element, ATTRIBUTE_INDEX_VAR).orElse(DEFAULT_INDEX_VAR); //mx:index-var
 						final List<Element> result = new ArrayList<>();
 						try (final MeshContext.ScopeNesting scopeNesting = context.nestScope()) {
-							context.setVariable(iterVar, iterator);
+							context.setVariable(iterVar, iterator); //TODO consider providing delegate variable manipulation methods to nesting, if nothing else to avoid unused auto-closeable variable warning (`try`)
 							while(iterator.hasNext()) {
 								final Object item = iterator.next();
 								context.setVariable(itemVar, item);

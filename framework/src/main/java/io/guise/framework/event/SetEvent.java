@@ -24,6 +24,8 @@ package io.guise.framework.event;
  */
 public class SetEvent<E> extends CollectionEvent<E> {
 
+	private static final long serialVersionUID = 4033939627836464361L;
+
 	/**
 	 * Source constructor for general set modification.
 	 * @param source The object on which the event initially occurred.

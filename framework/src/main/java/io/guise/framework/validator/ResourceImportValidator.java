@@ -25,7 +25,6 @@ import io.clogr.Clogged;
 import io.guise.framework.GuiseSession;
 import io.guise.framework.model.ResourceImport;
 
-import static com.globalmentor.collections.Collections.*;
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.Classes.*;
 
@@ -118,7 +117,7 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> i
 	 * @param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
 	 */
 	public ResourceImportValidator(final MediaType acceptedContentType, final boolean valueRequired) {
-		this(createHashSet(acceptedContentType), valueRequired); //pass a hash set with the single accepted content type
+		this(singleton(acceptedContentType), valueRequired); //pass a hash set with the single accepted content type
 	}
 
 	/**
@@ -157,7 +156,7 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport> i
 	 * @param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
 	 */
 	public ResourceImportValidator(final MediaType acceptedContentType, final long maxContentLength, final boolean valueRequired) {
-		this(createHashSet(acceptedContentType), maxContentLength, valueRequired); //pass a hash set with the single accepted content type
+		this(singleton(acceptedContentType), maxContentLength, valueRequired); //pass a hash set with the single accepted content type
 	}
 
 	/**

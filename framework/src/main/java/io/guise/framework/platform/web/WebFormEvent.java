@@ -31,6 +31,8 @@ import com.globalmentor.collections.CollectionMap;
  */
 public class WebFormEvent extends AbstractWebPlatformEvent {
 
+	private static final long serialVersionUID = -8422252705275867431L;
+
 	/** @return The platform on which the event initially occurred. */
 	public WebPlatform getPlatform() {
 		return (WebPlatform)getSource();

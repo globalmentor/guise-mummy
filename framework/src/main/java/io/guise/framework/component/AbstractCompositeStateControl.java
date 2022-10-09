@@ -18,9 +18,10 @@ package io.guise.framework.component;
 
 import static java.util.Objects.*;
 
+import java.util.Objects;
+
 import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
 import com.globalmentor.beans.GenericPropertyChangeEvent;
-import com.globalmentor.java.Objects;
 
 import io.guise.framework.model.*;
 
@@ -77,6 +78,7 @@ public abstract class AbstractCompositeStateControl<T, S extends AbstractComposi
 	 * Otherwise, this version returns <code>null</code>.
 	 * @return The current user input status of the control.
 	 */
+	@SuppressWarnings("incomplete-switch")
 	protected Status determineStatus() {
 		final Notification notification = getNotification(); //get the current notification
 		if(notification != null) { //if there is a notification

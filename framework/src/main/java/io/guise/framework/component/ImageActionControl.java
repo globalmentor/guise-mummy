@@ -18,8 +18,9 @@ package io.guise.framework.component;
 
 import static java.util.Objects.*;
 
+import java.util.Objects;
+
 import com.globalmentor.beans.*;
-import com.globalmentor.java.Objects;
 
 import io.guise.framework.event.*;
 import io.guise.framework.model.*;
@@ -99,6 +100,7 @@ public class ImageActionControl extends AbstractImageComponent implements Action
 	 * Otherwise, this version returns <code>null</code>. If the control is disabled <code>null</code> is returned.
 	 * @return The current user input status of the control.
 	 */
+	@SuppressWarnings("incomplete-switch")
 	protected Status determineStatus() {
 		if(isEnabled()) { //if the control is enabled
 			final Notification notification = getNotification(); //get the current notification

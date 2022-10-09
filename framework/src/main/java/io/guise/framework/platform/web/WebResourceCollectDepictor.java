@@ -66,6 +66,7 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void receive(URI destinationURI, final Bookmark destinationBookmark) {
 		URI receiveResourceURI = getSession().getApplication().resolveURI(requireNonNull(destinationURI, "Destination URI cannot be null.")); //resolve the URI
 		if(destinationBookmark != null) { //if a bookmark was provided
@@ -77,6 +78,7 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void cancel() {
 		final C control = getDepictedObject(); //get the resource collect control
 		getPlatform().getSendMessageQueue()
@@ -123,6 +125,7 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 	 * </p>
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	protected void depictedObjectPropertyChange(final PropertyChangeEvent propertyChangeEvent) {
 		super.depictedObjectPropertyChange(propertyChangeEvent); //do the default processing
 		final C control = getDepictedObject(); //get the control

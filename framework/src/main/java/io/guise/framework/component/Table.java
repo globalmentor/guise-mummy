@@ -282,6 +282,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 			final Class<T> valueClass = column.getValueClass(); //get the value class of the column
 			final Iterator<Class<?>> valueAncestorClassIterator = getAncestorClasses(valueClass).iterator(); //get all the ancestor classes of the value class, in increasing order of distance and abstractness
 			while(cellRepresentationStrategy == null && valueAncestorClassIterator.hasNext()) { //keep iterating until we find a cell representation strategy
+				@SuppressWarnings("unchecked")
 				final Class<? super T> valueAncestorClass = (Class<? super T>)valueAncestorClassIterator.next(); //get the next ancestor class
 				cellRepresentationStrategy = getCellRepresentationStrategy(valueAncestorClass); //see if there is a cell representation strategy registered for the value class ancestor
 			}
@@ -757,6 +758,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 
 		});
 		if(tableModel instanceof ListListenable) { //if this table model allows list listeners TODO improve this; create a table model listener---maybe that will implement ListListener
+			@SuppressWarnings("unchecked")
 			final ListListenable<Object> listListenable = (ListListenable<Object>)tableModel; //get the list listenable
 			listListenable.addListListener(new ListListener<Object>() { //listen for table modifications
 

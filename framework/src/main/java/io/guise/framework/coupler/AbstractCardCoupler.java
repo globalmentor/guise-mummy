@@ -23,12 +23,12 @@ import static java.util.Arrays.*;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static java.util.Collections.*;
 
 import com.globalmentor.beans.*;
-import com.globalmentor.java.Objects;
 import com.globalmentor.model.TaskState;
 
 import io.guise.framework.component.*;

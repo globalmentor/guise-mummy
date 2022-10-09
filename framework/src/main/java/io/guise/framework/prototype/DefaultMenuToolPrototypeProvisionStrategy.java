@@ -28,6 +28,8 @@ import io.guise.framework.component.*;
  */
 public class DefaultMenuToolPrototypeProvisionStrategy extends AbstractMenuToolCompositeComponentPrototypeProvisionStrategy {
 
+	private static final long serialVersionUID = 5934764492231734867L;
+
 	/** The menu being managed, or <code>null</code> if no menu is being managed. */
 	private final Menu menu;
 

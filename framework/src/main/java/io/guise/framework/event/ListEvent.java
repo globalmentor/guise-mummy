@@ -24,6 +24,8 @@ package io.guise.framework.event;
  */
 public class ListEvent<E> extends CollectionEvent<E> {
 
+	private static final long serialVersionUID = -2178242677750861662L;
+
 	/** The index at which an element was added and/or removed, or -1 if the index is unknown. */
 	private final int index;
 

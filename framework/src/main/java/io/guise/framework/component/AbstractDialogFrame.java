@@ -17,10 +17,9 @@
 package io.guise.framework.component;
 
 import java.beans.PropertyVetoException;
+import java.util.Objects;
 
 import static java.util.Objects.*;
-
-import com.globalmentor.java.Objects;
 
 import io.guise.framework.input.*;
 import io.guise.framework.model.*;
@@ -99,6 +98,7 @@ public abstract class AbstractDialogFrame<V> extends AbstractFrame implements Di
 	 * Otherwise, this version returns <code>null</code>.
 	 * @return The current user input status of the control.
 	 */
+	@SuppressWarnings("incomplete-switch")
 	protected Status determineStatus() {
 		final Notification notification = getNotification(); //get the current notification
 		if(notification != null) { //if there is a notification

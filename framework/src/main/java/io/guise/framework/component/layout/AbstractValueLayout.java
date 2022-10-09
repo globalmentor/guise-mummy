@@ -21,8 +21,7 @@ import static io.guise.framework.model.AbstractValueModel.createPropertyVetoExce
 import static java.text.MessageFormat.*;
 
 import java.beans.*;
-
-import com.globalmentor.java.Objects;
+import java.util.Objects;
 
 import io.guise.framework.component.*;
 import io.guise.framework.model.*;

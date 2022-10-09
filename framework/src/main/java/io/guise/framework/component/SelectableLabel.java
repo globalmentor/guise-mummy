@@ -16,14 +16,14 @@
 
 package io.guise.framework.component;
 
-import com.globalmentor.java.Objects;
-
 import io.guise.framework.model.*;
 import io.guise.framework.style.Color;
 import io.guise.framework.theme.Theme;
 
 import static com.globalmentor.java.Classes.*;
 import static io.guise.framework.theme.Theme.*;
+
+import java.util.Objects;
 
 /**
  * A label component that is able to indicate a selected state. This component has no facility for interacting with the user.

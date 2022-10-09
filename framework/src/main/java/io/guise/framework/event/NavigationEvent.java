@@ -30,6 +30,8 @@ import io.guise.framework.Bookmark;
  */
 public class NavigationEvent extends AbstractGuiseEvent {
 
+	private static final long serialVersionUID = -6987956959508417589L;
+
 	/** The navigation path relative to the application context path. */
 	private final URIPath navigationPath;
 

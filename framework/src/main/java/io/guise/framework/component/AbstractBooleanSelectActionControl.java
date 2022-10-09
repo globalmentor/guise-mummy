@@ -20,10 +20,10 @@ import static io.guise.framework.theme.Theme.*;
 
 import java.beans.PropertyVetoException;
 import java.net.URI;
+import java.util.Objects;
 
 import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
 import com.globalmentor.beans.GenericPropertyChangeEvent;
-import com.globalmentor.java.Objects;
 
 import io.guise.framework.model.*;
 import io.guise.framework.theme.Theme;

@@ -90,6 +90,7 @@ public abstract class AbstractModelGroup<M extends Model> implements ModelGroup<
 	 * @param models Zero or more models with which to initially place in the group.
 	 * @throws NullPointerException if one of the models is <code>null</code>.
 	 */
+	@SuppressWarnings("unchecked")
 	public AbstractModelGroup(final M... models) {
 		for(final M model : models) { //for each model
 			add(model); //add this model to the group

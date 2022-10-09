@@ -20,8 +20,6 @@ import java.util.*;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.java.Objects;
-
 import io.guise.framework.geometry.Axis;
 import io.guise.framework.geometry.CompassPoint;
 import io.guise.framework.geometry.Side;
@@ -255,6 +253,6 @@ public class Orientation {
 
 	@Override
 	public int hashCode() {
-		return Objects.getHashCode((Object[])orientations); //generate a hash code
+		return hash((Object[])orientations); //generate a hash code
 	}
 }

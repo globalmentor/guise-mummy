@@ -19,8 +19,7 @@ package io.guise.framework.component;
 import static com.globalmentor.java.Classes.*;
 
 import java.net.URI;
-
-import com.globalmentor.java.Objects;
+import java.util.Objects;
 
 /**
  * A component representing a Macromedia Flash object.

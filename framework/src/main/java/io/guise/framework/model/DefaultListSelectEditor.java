@@ -18,6 +18,8 @@ package io.guise.framework.model;
 
 import static java.util.Objects.*;
 
+import java.lang.reflect.InvocationTargetException;
+
 import io.guise.framework.component.*;
 
 /**
@@ -58,11 +60,15 @@ public class DefaultListSelectEditor<V> extends AbstractListSelectEditor<V> {
 	@Override
 	protected V createValue() {
 		try {
-			return getListSelectModel().getValueClass().newInstance(); //return a new instance of the list select model's value class
+			return getListSelectModel().getValueClass().getDeclaredConstructor().newInstance(); //return a new instance of the list select model's value class
 		} catch(final InstantiationException instantiationException) {
 			throw new AssertionError(instantiationException);
 		} catch(final IllegalAccessException illegalAccessException) {
 			throw new AssertionError(illegalAccessException);
+		} catch(final NoSuchMethodException noSuchMethodException) {
+			throw new AssertionError(noSuchMethodException);
+		} catch(final InvocationTargetException invocationTargetException) {
+			throw new AssertionError(invocationTargetException);
 		}
 	}
 
@@ -76,11 +82,15 @@ public class DefaultListSelectEditor<V> extends AbstractListSelectEditor<V> {
 	@Override
 	protected ValuedComponent<V> createValuedComponent() {
 		try {
-			return getValuedComponentClass().newInstance(); //return a new instance of the valued component class
+			return getValuedComponentClass().getDeclaredConstructor().newInstance(); //return a new instance of the valued component class
 		} catch(final InstantiationException instantiationException) {
 			throw new AssertionError(instantiationException);
 		} catch(final IllegalAccessException illegalAccessException) {
 			throw new AssertionError(illegalAccessException);
+		} catch(final NoSuchMethodException noSuchMethodException) {
+			throw new AssertionError(noSuchMethodException);
+		} catch(final InvocationTargetException invocationTargetException) {
+			throw new AssertionError(invocationTargetException);
 		}
 	}
 

@@ -26,6 +26,8 @@ import io.guise.framework.model.ListSelectModel;
  */
 public class ListSelectionEvent<V> extends SetEvent<Integer> {
 
+	private static final long serialVersionUID = -6588788763101171277L;
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public ListSelectModel<V> getSource() {

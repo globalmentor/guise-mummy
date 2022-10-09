@@ -249,8 +249,6 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	 * @param valueRepresentationStrategy The strategy to create label models to represent this model's values.
 	 * @throws NullPointerException if the given list select model, layout, and/or value representation strategy is <code>null</code>.
 	 */
-	@SuppressWarnings("unchecked")
-	//an empty varargs doesn't need a generics cast, but Java requires one anyway
 	public BooleanValueControlSelectControl(final ListSelectModel<V> listSelectModel, final Layout<?> layout,
 			final ValueRepresentationStrategy<V> valueRepresentationStrategy) {
 		super(listSelectModel, valueRepresentationStrategy); //construct the parent class
@@ -272,6 +270,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 		super.addComponent(childComponent); //add the component normally
 		getLayout().addComponent(childComponent); //add the component to the layout
 		if(childComponent instanceof ValueControl && ((ValueControl<?>)childComponent).getValueClass().equals(Boolean.class)) { //if the component is a Boolean value control
+			@SuppressWarnings("unchecked")
 			final ValueControl<Boolean> booleanValueControl = (ValueControl<Boolean>)childComponent; //get the component as a boolean value control
 			final ValuePolicyModelGroup<Boolean> valuePolicyModelGroup = getValuePolicyModelGroup(); //get the value policy model group, if any
 			if(valuePolicyModelGroup != null) { //if there is a policy group
@@ -285,6 +284,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	protected void removeComponent(final Component childComponent) {
 		//TODO check the order of uninitialization; if an error occurs during removal, this could result in an inconsistent state
 		if(childComponent instanceof ValueControl && ((ValueControl<?>)childComponent).getValueClass().equals(Boolean.class)) { //if the component is a Boolean value control
+			@SuppressWarnings("unchecked")
 			final ValueControl<Boolean> booleanValueControl = (ValueControl<Boolean>)childComponent; //get the component as a boolean value control
 			final ValuePolicyModelGroup<Boolean> valuePolicyModelGroup = getValuePolicyModelGroup(); //get the value policy model group, if any
 			if(valuePolicyModelGroup != null) { //if there is a policy group
@@ -300,6 +300,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	protected final AtomicBoolean synchronizingValuesFlag = new AtomicBoolean(false);
 
 	/** Updates the list selected values based upon the current values of the child controls. */
+	@SuppressWarnings("unchecked")
 	protected void updateListSelectedValues() {
 		if(synchronizingValuesFlag.compareAndSet(false, true)) { //if we can synchronize values
 			try {
@@ -324,6 +325,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	}
 
 	/** Updates the values of child controls based upon the current state of the list selected values. */
+	@SuppressWarnings("unchecked")
 	protected void updateChildControlValues() {
 		if(synchronizingValuesFlag.compareAndSet(false, true)) { //if we can synchronize values
 			try {

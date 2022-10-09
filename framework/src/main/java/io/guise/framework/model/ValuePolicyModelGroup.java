@@ -53,7 +53,6 @@ public abstract class ValuePolicyModelGroup<V> extends AbstractModelGroup<ValueM
 		super.removeImpl(valueModel); //remove the model normally
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public final void propertyChange(final PropertyChangeEvent propertyChangeEvent) {
 		final GenericPropertyChangeEvent<V> guisePropertyChangeEvent = AbstractGenericPropertyChangeListener.getGenericPropertyChangeEvent(propertyChangeEvent); //create a genericized event object
@@ -65,6 +64,7 @@ public abstract class ValuePolicyModelGroup<V> extends AbstractModelGroup<ValueM
 	 * @param models Zero or more models with which to initially place in the group.
 	 * @throws NullPointerException if one of the models is <code>null</code>.
 	 */
+	@SuppressWarnings("unchecked")
 	public ValuePolicyModelGroup(final ValueModel<V>... models) {
 		super(models); //construct the parent class
 	}

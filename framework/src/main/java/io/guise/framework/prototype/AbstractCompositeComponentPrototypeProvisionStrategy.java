@@ -32,6 +32,8 @@ import static java.util.Objects.*;
  */
 public abstract class AbstractCompositeComponentPrototypeProvisionStrategy extends AbstractPrototypeProvisionStrategy {
 
+	private static final long serialVersionUID = 2228957184629387904L;
+
 	/** The composite component the top-level prototype provider children of which will be monitored. */
 	private final CompositeComponent parentComponent;
 

@@ -18,8 +18,6 @@ package io.guise.framework.component;
 
 import java.util.*;
 
-import com.globalmentor.java.*;
-import com.globalmentor.java.Objects;
 import static com.globalmentor.java.Classes.*;
 import com.globalmentor.net.*;
 

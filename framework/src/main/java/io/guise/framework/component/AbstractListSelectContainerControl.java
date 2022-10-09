@@ -46,6 +46,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	//TODO make sure we listen for enabled status changing on the layout and send an index enabled property change, maybe
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public AbstractValueLayout<? extends ControlConstraints> getLayout() {
 		return (AbstractValueLayout<? extends ControlConstraints>)super.getLayout();
 	}
@@ -323,6 +324,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	 * </p>
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	protected void fireChildComponentAdded(final ComponentEvent childComponentEvent) { //TODO it might be better to listen for the composite component events and act accordingly
 		super.fireChildComponentAdded(childComponentEvent); //fire the component added event normally
 		if(getEventListenerManager().hasListeners(ListListener.class)) { //if there are appropriate listeners registered
@@ -339,6 +341,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	 * registered list listeners, if any.
 	 * @param childComponentEvent The child component event to fire.
 	 */
+	@SuppressWarnings("unchecked")
 	protected void fireChildComponentRemoved(final ComponentEvent childComponentEvent) { //TODO it might be better to listen for the composite component events and act accordingly
 		super.fireChildComponentRemoved(childComponentEvent); //fire the component removed event normally
 		if(getEventListenerManager().hasListeners(ListListener.class)) { //if there are appropriate listeners registered
@@ -359,6 +362,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	 * @see ListSelectionListener
 	 * @see ListSelectionEvent
 	 */
+	@SuppressWarnings("unchecked")
 	protected void fireSelectionChanged(final Integer addedIndex, final Integer removedIndex) {
 		final EventListenerManager eventListenerManager = getEventListenerManager(); //get the event listener manager
 		if(eventListenerManager.hasListeners(ListSelectionListener.class)) { //if there are appropriate listeners registered

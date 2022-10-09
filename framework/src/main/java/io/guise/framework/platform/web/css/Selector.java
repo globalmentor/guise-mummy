@@ -28,6 +28,8 @@ import com.globalmentor.model.NameValuePair;
  */
 public class Selector extends ArrayList<NameValuePair<Combinator, List<SimpleSelector>>> {
 
+	private static final long serialVersionUID = -7976466986775632192L;
+
 	//TODO add support for pseudo-elements
 
 	/** Default constructor. */

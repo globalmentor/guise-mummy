@@ -18,13 +18,13 @@ package io.guise.framework.model;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Objects;
 
 import static java.util.Objects.*;
 
 import static com.globalmentor.java.Classes.*;
 
 import com.globalmentor.cache.*;
-import com.globalmentor.java.Objects;
 
 import io.clogr.Clogged;
 

@@ -18,8 +18,6 @@ package io.guise.framework.geometry;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.java.Objects;
-
 /**
  * A measurement of an object's width, height, and depth along the X, Y, and Z dimensions, respectively.
  * <p>
@@ -134,7 +132,7 @@ public class Dimensions {
 		this.width = requireNonNull(width, "Width cannot be null.");
 		this.height = requireNonNull(height, "Height cannot be null.");
 		this.depth = requireNonNull(depth, "Depth cannot be null.");
-		this.hashCode = Objects.getHashCode(width, height, depth); //precalculate the hash code
+		this.hashCode = hash(width, height, depth); //precalculate the hash code
 	}
 
 	/**
@@ -162,7 +160,7 @@ public class Dimensions {
 		if(widthValue <= constrainingWidthValue && heightValue <= constrainingHeightValue) { //if nothing needs to be constrained
 			return this; //return this dimension unchanged
 		}
-		final double relation = (double)widthValue / heightValue; //determine the relationship of the sides
+		final double relation = widthValue / heightValue; //determine the relationship of the sides
 		//TODO del Log.trace("relation of sides is:", relation);
 		double newWidthValue, newHeightValue;
 		newHeightValue = constrainingWidthValue / relation; //get the matching height for a constrained width

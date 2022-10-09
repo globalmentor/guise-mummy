@@ -17,8 +17,7 @@
 package io.guise.framework.model;
 
 import java.beans.PropertyVetoException;
-
-import com.globalmentor.java.Objects;
+import java.util.Objects;
 
 import io.guise.framework.validator.*;
 

@@ -39,6 +39,8 @@ import io.guise.framework.component.*;
  */
 public abstract class AbstractMenuToolCompositeComponentPrototypeProvisionStrategy extends AbstractCompositeComponentPrototypeProvisionStrategy {
 
+	private static final long serialVersionUID = -7931891652832376124L;
+
 	/** @return The menu being managed, or <code>null</code> if no menu is being managed. */
 	protected abstract Menu getMenu();
 

@@ -19,10 +19,12 @@ package io.guise.framework.validator;
 import java.util.*;
 
 /**
- * Validation exception indicating that multiple validation errors occured. This exception can be caught and updated with new validation exceptions.
+ * Validation exception indicating that multiple validation errors occurred. This exception can be caught and updated with new validation exceptions.
  * @author Garret Wilson
  */
 public class ValidationsException extends Exception implements Collection<ValidationException> {
+
+	private static final long serialVersionUID = 6794176555575349572L;
 
 	/** The mutable list of validation exceptions. */
 	private final List<ValidationException> validationExceptionList = new ArrayList<ValidationException>();

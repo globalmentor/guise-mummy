@@ -18,10 +18,10 @@ package io.guise.framework.component.layout;
 
 import static java.util.Objects.*;
 
+import java.util.Objects;
+
 import static com.globalmentor.java.Arrays.fill;
 import static com.globalmentor.java.Classes.*;
-
-import com.globalmentor.java.Objects;
 
 import io.guise.framework.component.Component;
 import io.guise.framework.component.LayoutComponent;
@@ -456,7 +456,7 @@ public class RegionLayout extends AbstractLayout<RegionConstraints> {
 	 */
 	public Component getComponent(final Region region) { //TODO later use reverse maps or something similar for quicker lookup
 		for(final Component childComponent : getOwner().getChildComponents()) { //for each child component in the container
-			final RegionConstraints constraints = (RegionConstraints)getConstraints(childComponent); //get the constraints for this component TODO use covariants on each subclass; update getConstraints() to ensure correct type
+			final RegionConstraints constraints = getConstraints(childComponent); //get the constraints for this component TODO use covariants on each subclass; update getConstraints() to ensure correct type
 			if(constraints.getRegion() == region) { //if this component is in the correct region
 				return childComponent; //return the component
 			}

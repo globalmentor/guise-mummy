@@ -39,6 +39,8 @@ import static io.guise.framework.Resources.*;
  */
 public class Theme extends ArrayList<Rule> /*TODO delete legacy URF extends URFListResource<Rule>*/ {
 
+	private static final long serialVersionUID = 194898499290026009L;
+
 	/** The extension for Guise theme resource names. */
 	public static final String FILENAME_EXTENSION = "guisetheme";
 	/** The media type for theme resources: <code>application/theme+turf</code>. */

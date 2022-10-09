@@ -18,8 +18,6 @@ package io.guise.framework.geometry;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.java.Objects;
-
 /**
  * A rectangle on a plane.
  * @author Garret Wilson
@@ -133,7 +131,7 @@ public class Rectangle {
 
 	@Override
 	public int hashCode() {
-		return Objects.getHashCode(getPosition(), getSize()); //determine the hash code
+		return hash(getPosition(), getSize()); //determine the hash code
 	}
 
 	/**

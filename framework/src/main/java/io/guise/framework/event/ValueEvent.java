@@ -23,6 +23,8 @@ package io.guise.framework.event;
  */
 public class ValueEvent<V> extends AbstractGuiseEvent {
 
+	private static final long serialVersionUID = -6936933121294080439L;
+
 	/** The value being reported. */
 	private final V value;
 

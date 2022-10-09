@@ -27,6 +27,8 @@ import io.guise.framework.input.CommandInput;
  */
 public class CommandEvent extends AbstractFocusedInputEvent {
 
+	private static final long serialVersionUID = -2402177616906756719L;
+
 	/** The command. */
 	private final Command command;
 

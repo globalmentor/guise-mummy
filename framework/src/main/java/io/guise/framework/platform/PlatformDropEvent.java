@@ -24,6 +24,8 @@ import static java.util.Objects.*;
  */
 public class PlatformDropEvent extends AbstractDepictEvent {
 
+	private static final long serialVersionUID = -5986669274694054642L;
+
 	/** The source of the drag-drop gesture. */
 	private final DepictedObject dragSource;
 

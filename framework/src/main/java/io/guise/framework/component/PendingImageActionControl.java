@@ -19,9 +19,9 @@ package io.guise.framework.component;
 import static io.guise.framework.theme.Theme.*;
 
 import java.net.URI;
+import java.util.Objects;
 
 import com.globalmentor.beans.*;
-import com.globalmentor.java.Objects;
 
 import io.guise.framework.model.*;
 

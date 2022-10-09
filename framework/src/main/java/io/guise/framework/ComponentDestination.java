@@ -17,13 +17,13 @@
 package io.guise.framework;
 
 import java.net.URI;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static java.util.Objects.*;
 
 import static com.globalmentor.java.Classes.*;
 
-import com.globalmentor.java.Objects;
 import com.globalmentor.net.URIPath;
 
 import io.guise.framework.component.Component;

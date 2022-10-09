@@ -18,9 +18,10 @@ package io.guise.framework.component;
 
 import static java.util.Objects.*;
 
+import java.util.Objects;
+
 import com.globalmentor.beans.AbstractGenericPropertyChangeListener;
 import com.globalmentor.beans.GenericPropertyChangeEvent;
-import com.globalmentor.java.Objects;
 
 import io.guise.framework.model.*;
 
@@ -73,6 +74,7 @@ public abstract class AbstractControl extends AbstractComponent implements Contr
 	 * Otherwise, this version returns <code>null</code>. If the control is disabled <code>null</code> is returned.
 	 * @return The current user input status of the control.
 	 */
+	@SuppressWarnings("incomplete-switch")
 	protected Status determineStatus() {
 		if(isEnabled()) { //if the control is enabled
 			final Notification notification = getNotification(); //get the current notification

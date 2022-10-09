@@ -24,6 +24,8 @@ import io.guise.framework.platform.*;
  */
 public abstract class AbstractWebDepictEvent extends AbstractDepictEvent implements WebDepictEvent {
 
+	private static final long serialVersionUID = -8729602304471721594L;
+
 	/**
 	 * Depicted object constructor.
 	 * @param depictedObject The depicted object on which the event initially occurred.

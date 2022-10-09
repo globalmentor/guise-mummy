@@ -17,10 +17,10 @@
 package io.guise.framework.model;
 
 import java.net.URI;
+import java.util.Objects;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.java.Objects;
 import com.globalmentor.net.MediaType;
 import com.globalmentor.text.Text;
 

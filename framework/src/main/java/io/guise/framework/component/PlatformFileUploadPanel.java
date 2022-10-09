@@ -18,8 +18,8 @@ package io.guise.framework.component;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.Objects;
 
-import com.globalmentor.java.Objects;
 import com.globalmentor.model.TaskState;
 import com.globalmentor.si.*;
 
@@ -380,6 +380,7 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 	 * Fires a given progress event to all registered progress listeners.
 	 * @param progressEvent The progress event to fire.
 	 */
+	@SuppressWarnings("unchecked")
 	protected void fireProgressed(final ProgressEvent<Long> progressEvent) {
 		for(final ProgressListener<Long> progressListener : getEventListenerManager().getListeners(ProgressListener.class)) { //for each progress listener
 			progressListener.progressed(progressEvent); //dispatch the progress event to the listener

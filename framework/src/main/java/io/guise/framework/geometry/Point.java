@@ -18,8 +18,6 @@ package io.guise.framework.geometry;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.java.Objects;
-
 /**
  * A point in three-dimensional space.
  * @author Garret Wilson
@@ -171,7 +169,7 @@ public class Point {
 
 	@Override
 	public int hashCode() {
-		return Objects.getHashCode(getX(), getY(), getZ()); //determine the hash code
+		return hash(getX(), getY(), getZ()); //determine the hash code
 	}
 
 	/**

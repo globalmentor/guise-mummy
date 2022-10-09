@@ -22,6 +22,8 @@ package io.guise.framework.event;
  */
 public abstract class AbstractFocusedInputEvent extends AbstractInputEvent implements FocusedInputEvent {
 
+	private static final long serialVersionUID = -2001046083520014709L;
+
 	/**
 	 * Source constructor.
 	 * @param source The object on which the event initially occurred.

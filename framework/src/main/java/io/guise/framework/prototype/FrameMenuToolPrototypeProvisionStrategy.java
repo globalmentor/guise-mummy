@@ -28,6 +28,8 @@ import io.guise.framework.component.*;
  */
 public class FrameMenuToolPrototypeProvisionStrategy extends AbstractMenuToolCompositeComponentPrototypeProvisionStrategy {
 
+	private static final long serialVersionUID = 8397199180173775520L;
+
 	@Override
 	protected final Frame getParentComponent() {
 		return (Frame)super.getParentComponent();

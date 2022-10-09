@@ -33,6 +33,8 @@ import com.globalmentor.util.*;
  */
 public abstract class AbstractPrototypeProvisionStrategy extends ReentrantReadWriteLock {
 
+	private static final long serialVersionUID = -1011154677657764896L;
+
 	/** The prototype providers known to this provision strategy. */
 	private final Set<PrototypeProvider> prototypeProviders = new DecoratorReadWriteLockSet<PrototypeProvider>(new HashSet<PrototypeProvider>(), this);
 

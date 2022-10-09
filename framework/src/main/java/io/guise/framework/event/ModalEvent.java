@@ -23,6 +23,8 @@ import io.guise.framework.component.ModalNavigationPanel;
  */
 public class ModalEvent extends AbstractGuiseEvent {
 
+	private static final long serialVersionUID = -2934728082421212219L;
+
 	@Override
 	public ModalNavigationPanel<?> getSource() {
 		return (ModalNavigationPanel<?>)super.getSource(); //cast the event to the appropriate type

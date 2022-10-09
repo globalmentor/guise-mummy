@@ -23,7 +23,6 @@ import java.util.*;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.java.Objects;
 import com.globalmentor.java.Strings;
 import com.globalmentor.net.MediaType;
 import com.globalmentor.xml.XMLNamespacePrefixManager;
@@ -33,7 +32,6 @@ import io.guise.framework.Destination;
 import io.guise.framework.GuiseSession;
 
 import static com.globalmentor.html.spec.HTML.*;
-import static com.globalmentor.java.CharSequences.denull;
 import static com.globalmentor.java.Characters.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.java.Strings.*;
@@ -98,7 +96,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	public AbstractXMLDepictContext(final GuiseSession session, final Destination destination) throws IOException {
 		super(session, destination); //construct the parent class
 		xmlNamespacePrefixManager = new XMLNamespacePrefixManager(); //create a new XML namespace prefix manager
-		messageDigest = SHA_1.getInstance(); //get a message digest instance using SHA-1 for creating hashes of element attributes and content
+		messageDigest = SHA_1.newMessageDigest(); //get a message digest instance using SHA-1 for creating hashes of element attributes and content
 	}
 
 	@Override

@@ -25,6 +25,8 @@ import io.guise.framework.input.*;
  */
 public class MouseEnterEvent extends AbstractMouseEvent {
 
+	private static final long serialVersionUID = -5417524732077616737L;
+
 	/**
 	 * Source constructor. The target will be set to be the same as the given source.
 	 * @param source The object on which the event initially occurred.

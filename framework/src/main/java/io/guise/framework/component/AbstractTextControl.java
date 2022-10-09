@@ -17,11 +17,11 @@
 package io.guise.framework.component;
 
 import java.beans.*;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.java.Objects;
 import com.globalmentor.net.MediaType;
 import com.globalmentor.text.Text;
 

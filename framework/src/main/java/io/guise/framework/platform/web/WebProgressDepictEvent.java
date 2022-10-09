@@ -28,6 +28,8 @@ import io.guise.framework.platform.DepictedObject;
  */
 public class WebProgressDepictEvent extends AbstractWebDepictEvent {
 
+	private static final long serialVersionUID = 2931284923374606382L;
+
 	/** The task being performed, or <code>null</code> if not indicated. */
 	private String task;
 

@@ -25,6 +25,8 @@ import io.guise.framework.input.KeystrokeInput;
  */
 public class KeyReleaseEvent extends AbstractKeyboardEvent {
 
+	private static final long serialVersionUID = 5760260911271119991L;
+
 	/**
 	 * Source constructor.
 	 * @param source The object on which the event initially occurred.

@@ -16,7 +16,6 @@
 
 package io.guise.framework.component;
 
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.util.*;
 
@@ -25,7 +24,6 @@ import static io.guise.framework.theme.Theme.*;
 import static java.util.Objects.*;
 
 import com.globalmentor.beans.GenericPropertyChangeListener;
-import com.globalmentor.java.Objects;
 
 import io.guise.framework.component.effect.Effect;
 import io.guise.framework.event.*;

@@ -17,9 +17,9 @@
 package io.guise.framework.component.layout;
 
 import java.beans.PropertyChangeEvent;
+import java.util.Objects;
 
 import com.globalmentor.beans.*;
-import com.globalmentor.java.Objects;
 
 import io.guise.framework.component.Component;
 import io.guise.framework.component.LayoutComponent;

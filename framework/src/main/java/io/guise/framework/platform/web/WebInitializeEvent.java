@@ -28,6 +28,8 @@ import static java.util.Objects.*;
  */
 public class WebInitializeEvent extends AbstractWebPlatformEvent {
 
+	private static final long serialVersionUID = -2343854086400574284L;
+
 	/** The hour of the browser. */
 	private final int hour;
 

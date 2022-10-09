@@ -27,6 +27,8 @@ import io.guise.framework.model.Notification;
  */
 public class NotificationEvent extends AbstractTargetedGuiseEvent {
 
+	private static final long serialVersionUID = -6891720532397685595L;
+
 	/** The notification information. */
 	private final Notification notification;
 

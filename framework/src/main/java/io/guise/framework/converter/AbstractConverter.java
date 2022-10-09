@@ -19,7 +19,7 @@ package io.guise.framework.converter;
 import static io.guise.framework.Resources.*;
 import static java.util.Objects.*;
 
-import com.globalmentor.java.Objects;
+import java.util.Objects;
 
 import io.guise.framework.event.GuiseBoundPropertyObject;
 

@@ -288,9 +288,9 @@ public class HomePanel extends LayoutPanel implements Clogged {
 		final ListControl<Float> listControl = new ListControl<Float>(Float.class, new SingleListSelectionPolicy<Float>()); //create a list control allowing only single selections
 		listControl.setLabel("Pick a Number"); //set the list control label
 		listControl.setRowCount(5);
-		listControl.add(new Float(10));
-		listControl.add(new Float(20));
-		listControl.add(new Float(30));
+		listControl.add(Float.valueOf(10));
+		listControl.add(Float.valueOf(20));
+		listControl.add(Float.valueOf(30));
 		listControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Float>() {
 
 			@Override

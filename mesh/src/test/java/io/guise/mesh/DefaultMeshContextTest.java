@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 public class DefaultMeshContextTest {
 
 	@Test
+	@SuppressWarnings("try")
 	void testNestedScopes() {
 		final MeshContext context = new DefaultMeshContext(MeshScope.create(Map.of("test", "foo")));
 		assertThat("Root scope variable visible initially.", context.findVariable("test"), isPresentAndIs("foo"));

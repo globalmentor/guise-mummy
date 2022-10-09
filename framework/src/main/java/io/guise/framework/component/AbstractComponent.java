@@ -21,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.*;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -30,7 +31,6 @@ import static com.globalmentor.java.Arrays.*;
 
 import com.globalmentor.event.*;
 import com.globalmentor.java.*;
-import com.globalmentor.java.Objects;
 import com.globalmentor.net.MediaType;
 import com.globalmentor.util.*;
 
@@ -583,6 +583,7 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 	@Override
 	public Transferable<?> exportTransfer() {
 		for(final ExportStrategy<?> exportStrategy : exportStrategyList) { //for each export strategy
+			@SuppressWarnings("unchecked")
 			final Transferable<?> transferable = ((ExportStrategy<Component>)exportStrategy).exportTransfer(this); //ask this export strategy to transfer data
 			if(transferable != null) { //if this export succeeded
 				return transferable; //return this transferable data
@@ -606,9 +607,11 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 
 	@Override
 	public boolean importTransfer(final Transferable<?> transferable) {
-		for(final ImportStrategy<?> importStrategy : importStrategyList) { //for each importstrategy
-			if(((ImportStrategy<Component>)importStrategy).canImportTransfer(this, transferable)) { //if this import strategy can import the data
-				if(((ImportStrategy<Component>)importStrategy).importTransfer(this, transferable)) { //import the data; if we are successful
+		for(final ImportStrategy<?> importStrategy : importStrategyList) { //for each import strategy
+			@SuppressWarnings("unchecked")
+			final ImportStrategy<Component> componentImportStrategy = (ImportStrategy<Component>)importStrategy; 
+			if(componentImportStrategy.canImportTransfer(this, transferable)) { //if this import strategy can import the data
+				if(componentImportStrategy.importTransfer(this, transferable)) { //import the data; if we are successful
 					return true; //stop trying to import data, and indicate we were successful
 				}
 			}

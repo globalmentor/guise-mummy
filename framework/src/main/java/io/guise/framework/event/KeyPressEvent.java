@@ -25,6 +25,8 @@ import io.guise.framework.input.KeystrokeInput;
  */
 public class KeyPressEvent extends AbstractKeyboardEvent {
 
+	private static final long serialVersionUID = -759863991887468519L;
+
 	/**
 	 * Source constructor.
 	 * @param source The object on which the event initially occurred.

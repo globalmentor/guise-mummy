@@ -32,18 +32,18 @@ import io.guise.framework.geometry.Side;
 public interface XHTMLDepictContext extends XMLDepictContext {
 
 	/** The template for "border-?-color". */
-	public static final StringTemplate CSS_PROPERTY_BORDER_X_COLOR_TEMPLATE = new StringTemplate("border-", StringTemplate.STRING_PARAMETER, "-color");
+	public static final StringTemplate CSS_PROPERTY_BORDER_X_COLOR_TEMPLATE = StringTemplate.of("border-", StringTemplate.STRING_PARAMETER, "-color");
 	/** The template for "border-?-?-radius". */
-	public static final StringTemplate CSS_PROPERTY_BORDER_X_Y_RADIUS_TEMPLATE = new StringTemplate("border-", StringTemplate.STRING_PARAMETER, "-",
+	public static final StringTemplate CSS_PROPERTY_BORDER_X_Y_RADIUS_TEMPLATE = StringTemplate.of("border-", StringTemplate.STRING_PARAMETER, "-",
 			StringTemplate.STRING_PARAMETER, "-radius");
 	/** The template for "border-?-style". */
-	public static final StringTemplate CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE = new StringTemplate("border-", StringTemplate.STRING_PARAMETER, "-style");
+	public static final StringTemplate CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE = StringTemplate.of("border-", StringTemplate.STRING_PARAMETER, "-style");
 	/** The template for "border-?-width". */
-	public static final StringTemplate CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE = new StringTemplate("border-", StringTemplate.STRING_PARAMETER, "-width");
+	public static final StringTemplate CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE = StringTemplate.of("border-", StringTemplate.STRING_PARAMETER, "-width");
 	/** The template for "margin-?". */
-	public static final StringTemplate CSS_PROPERTY_MARGIN_X_TEMPLATE = new StringTemplate("margin-", StringTemplate.STRING_PARAMETER);
+	public static final StringTemplate CSS_PROPERTY_MARGIN_X_TEMPLATE = StringTemplate.of("margin-", StringTemplate.STRING_PARAMETER);
 	/** The template for "padding-?". */
-	public static final StringTemplate CSS_PROPERTY_PADDING_X_TEMPLATE = new StringTemplate("padding-", StringTemplate.STRING_PARAMETER);
+	public static final StringTemplate CSS_PROPERTY_PADDING_X_TEMPLATE = StringTemplate.of("padding-", StringTemplate.STRING_PARAMETER);
 
 	/** The sides supported by CSS. */
 	public final Set<Side> CSS_SIDES = EnumSet.of(Side.LEFT, Side.RIGHT, Side.TOP, Side.BOTTOM);

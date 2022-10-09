@@ -60,9 +60,7 @@ public abstract class DynamicTreeNodeModel<V> extends DefaultTreeNodeModel<V> { 
 	@Override
 	public void setExpanded(final boolean newExpanded) {
 		synchronized(this) { //synchronize access to the dynamic variables variable
-			if(newExpanded != isExpanded())
-				; //if the expansion state is changing
-			{
+			if(newExpanded != isExpanded()) { //if the expansion state is changing
 				if(newExpanded) { //if the tree node is expanding
 					if(!isChildrenDetermined) { //if children have not yet been determined
 						final List<TreeNodeModel<?>> children = determineChildren(); //determine the new children

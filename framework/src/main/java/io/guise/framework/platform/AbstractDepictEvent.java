@@ -22,6 +22,8 @@ package io.guise.framework.platform;
  */
 public abstract class AbstractDepictEvent extends AbstractPlatformEvent implements DepictEvent {
 
+	private static final long serialVersionUID = 2023406944924919575L;
+
 	@Override
 	public DepictedObject getDepictedObject() {
 		return (DepictedObject)getSource();

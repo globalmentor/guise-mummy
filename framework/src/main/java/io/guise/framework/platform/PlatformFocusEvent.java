@@ -22,6 +22,8 @@ package io.guise.framework.platform;
  */
 public class PlatformFocusEvent extends AbstractDepictEvent {
 
+	private static final long serialVersionUID = -6662336208667591713L;
+
 	/**
 	 * Constructs a focus control event.
 	 * @param depictedObject The depicted object on which the event initially occurred.

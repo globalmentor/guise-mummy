@@ -18,10 +18,10 @@ package io.guise.framework.component.layout;
 
 import static java.util.Objects.*;
 
+import java.util.Objects;
+
 import static com.globalmentor.java.Arrays.*;
 import static com.globalmentor.java.Classes.*;
-
-import com.globalmentor.java.Objects;
 
 import io.guise.framework.geometry.Extent;
 

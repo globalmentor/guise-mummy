@@ -34,6 +34,8 @@ import io.guise.framework.platform.DepictedObject;
  */
 public class WebCommandDepictEvent<C extends Enum<C> & WebPlatformCommand> extends AbstractWebDepictEvent implements WebPlatformCommandMessage<C> {
 
+	private static final long serialVersionUID = -7436694698184598300L;
+
 	/** The command. */
 	private final WebPlatformCommand command;
 
@@ -58,6 +60,7 @@ public class WebCommandDepictEvent<C extends Enum<C> & WebPlatformCommand> exten
 	 * @param parameters The parameters of the command; parameters with duplicate names replace earlier parameters of the same name.
 	 * @throws NullPointerException if the given depicted object, command, and/or parameters is <code>null</code>.
 	 */
+	@SuppressWarnings("unchecked")
 	public WebCommandDepictEvent(final DepictedObject depictedObject, final C command, final NameValuePair<String, Object>... parameters) {
 		super(depictedObject); //construct the parent class
 		this.command = requireNonNull(command, "Command cannot be null.");

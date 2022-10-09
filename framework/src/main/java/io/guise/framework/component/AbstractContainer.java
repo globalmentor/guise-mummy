@@ -180,9 +180,13 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 			final ValuePrototype<?> valuePrototype = (ValuePrototype<?>)prototype; //get the value prototype
 			final Class<?> valueClass = valuePrototype.getValueClass(); //get the type of value represented
 			if(Boolean.class.isAssignableFrom(valueClass)) { //if a boolean value is represented
-				return new CheckControl((ValuePrototype<Boolean>)prototype);
+				@SuppressWarnings("unchecked")
+				final ValuePrototype<Boolean> booleanValuePrototype = (ValuePrototype<Boolean>)prototype;
+				return new CheckControl(booleanValuePrototype);
 			} else if(Number.class.isAssignableFrom(valueClass) && valuePrototype.getValidator() instanceof RangeValidator) { //if a number range is represented
-				return new SliderControl<Number>((ValuePrototype<Number>)prototype, Flow.LINE);
+				@SuppressWarnings("unchecked")
+				final ValuePrototype<Number> numberValuePrototype = (ValuePrototype<Number>)prototype;
+				return new SliderControl<Number>(numberValuePrototype, Flow.LINE);
 			} else { //if the prototype is unrecognized
 				throw new IllegalArgumentException("Unrecognized prototype: " + prototype.getClass());
 			}

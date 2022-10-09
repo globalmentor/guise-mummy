@@ -17,12 +17,11 @@
 package io.guise.framework.component;
 
 import java.net.URI;
+import java.util.Objects;
 
 import static java.util.Objects.*;
 
 import static com.globalmentor.java.Classes.*;
-
-import com.globalmentor.java.Objects;
 
 import io.guise.framework.model.*;
 import io.guise.framework.prototype.ValuePrototype;

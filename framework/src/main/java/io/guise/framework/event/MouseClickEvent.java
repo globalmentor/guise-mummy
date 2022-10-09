@@ -29,6 +29,8 @@ import io.guise.framework.input.*;
  */
 public class MouseClickEvent extends AbstractMouseEvent {
 
+	private static final long serialVersionUID = -4888979879789094072L;
+
 	/** The button that was clicked. */
 	private final MouseButton button;
 

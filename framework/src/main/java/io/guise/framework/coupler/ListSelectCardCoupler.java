@@ -19,9 +19,9 @@ package io.guise.framework.coupler;
 import static com.globalmentor.java.Classes.*;
 
 import java.beans.*;
+import java.util.Objects;
 
 import com.globalmentor.beans.*;
-import com.globalmentor.java.Objects;
 
 import io.guise.framework.component.*;
 import io.guise.framework.model.*;

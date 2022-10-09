@@ -22,7 +22,6 @@ import static java.util.Collections.*;
 import static java.util.Objects.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static com.globalmentor.io.Files.*;
 import static com.globalmentor.java.Classes.*;
 import static com.globalmentor.net.URIs.*;
 
@@ -209,7 +208,7 @@ public class ResourceCollectControl extends AbstractControl {
 	 * Adds a progress listener.
 	 * @param progressListener The progress listener to add.
 	 */
-	public void addProgressListener(final ProgressListener progressListener) {
+	public void addProgressListener(final ProgressListener<Long> progressListener) {
 		getEventListenerManager().add(ProgressListener.class, progressListener); //add the listener
 	}
 
@@ -217,7 +216,7 @@ public class ResourceCollectControl extends AbstractControl {
 	 * Removes an progress listener.
 	 * @param progressListener The progress listener to remove.
 	 */
-	public void removeProgressListener(final ProgressListener progressListener) {
+	public void removeProgressListener(final ProgressListener<Long> progressListener) {
 		getEventListenerManager().remove(ProgressListener.class, progressListener); //remove the listener
 	}
 
@@ -243,7 +242,7 @@ public class ResourceCollectControl extends AbstractControl {
 		}
 		final EventListenerManager eventListenerManager = getEventListenerManager(); //get event listener support
 		if(eventListenerManager.hasListeners(ProgressListener.class)) { //if there are progress listeners registered
-			fireProgressed(new ProgressEvent(this, task, taskState, value, maximumValue)); //create and fire a new progress event
+			fireProgressed(new ProgressEvent<Long>(this, task, taskState, value, maximumValue)); //create and fire a new progress event
 		}
 	}
 
@@ -251,8 +250,9 @@ public class ResourceCollectControl extends AbstractControl {
 	 * Fires a given progress event to all registered progress listeners.
 	 * @param progressEvent The progress event to fire.
 	 */
-	protected void fireProgressed(final ProgressEvent progressEvent) {
-		for(final ProgressListener progressListener : getEventListenerManager().getListeners(ProgressListener.class)) { //for each progress listener
+	@SuppressWarnings("unchecked")
+	protected void fireProgressed(final ProgressEvent<Long> progressEvent) {
+		for(final ProgressListener<Long> progressListener : getEventListenerManager().getListeners(ProgressListener.class)) { //for each progress listener
 			progressListener.progressed(progressEvent); //dispatch the progress event to the listener
 		}
 	}

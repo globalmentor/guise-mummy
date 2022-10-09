@@ -24,6 +24,8 @@ package io.guise.framework.event;
  */
 public class CollectionEvent<E> extends AbstractGuiseEvent {
 
+	private static final long serialVersionUID = 857542877255183785L;
+
 	/** The element that was added to the collection, or <code>null</code> if no element was added or it is unknown whether or which elements were added. */
 	private E addedElement;
 

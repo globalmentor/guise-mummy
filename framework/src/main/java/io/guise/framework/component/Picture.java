@@ -79,7 +79,7 @@ public class Picture extends AbstractImageComponent {
 		if(imageOpacity != newImageOpacity) { //if the value is really changing
 			final float oldImageOpacity = imageOpacity; //get the old value
 			imageOpacity = newImageOpacity; //actually change the value
-			firePropertyChange(IMAGE_OPACITY_PROPERTY, new Float(oldImageOpacity), new Float(newImageOpacity)); //indicate that the value changed
+			firePropertyChange(IMAGE_OPACITY_PROPERTY, Float.valueOf(oldImageOpacity), Float.valueOf(newImageOpacity)); //indicate that the value changed
 		}
 	}
 

@@ -22,6 +22,8 @@ package io.guise.framework.converter;
  */
 public class ConversionException extends Exception {
 
+	private static final long serialVersionUID = -4164406446655750814L;
+
 	/** The value being converted, which may be of any type, or <code>null</code> if the value being converted is not available. */
 	private final Object value;
 

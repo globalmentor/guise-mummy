@@ -25,6 +25,8 @@ import io.guise.framework.Resources;
  */
 public class ValidationException extends Exception {
 
+	private static final long serialVersionUID = -5597712905158297888L;
+
 	/** The value being validated, which may be of any type, or <code>null</code> if the value being validated is not available. */
 	private final Object value;
 

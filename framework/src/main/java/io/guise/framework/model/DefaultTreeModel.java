@@ -18,7 +18,7 @@ package io.guise.framework.model;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.java.Objects;
+import java.util.Objects;
 
 import io.guise.framework.event.*;
 

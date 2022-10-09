@@ -995,6 +995,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	 * @param parameters The parameters to write.
 	 * @throws IOException if there is an error rendering the component.
 	 */
+	@SuppressWarnings("unchecked")
 	protected void writeParameterInputs(final NameValuePair<String, String>... parameters) throws IOException {
 		final WebDepictContext depictContext = getDepictContext(); //get the depict context
 		for(final NameValuePair<String, String> parameter : parameters) { //for each parameter

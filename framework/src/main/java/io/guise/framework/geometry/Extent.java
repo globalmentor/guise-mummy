@@ -20,8 +20,6 @@ import static java.util.Objects.*;
 
 import java.util.Arrays;
 
-import com.globalmentor.java.Objects;
-
 /**
  * A measurement such as a length, area, or volume. All zero extents are considered equal, regardless of the unit of measurement. For this implementation only
  * extents of the same unit and degree should be compared, although consistent, if inaccurate, values will still be obtained otherwise.
@@ -98,7 +96,7 @@ public class Extent implements Comparable<Extent> {
 
 	@Override
 	public int hashCode() {
-		return Objects.getHashCode(getValue(), getUnit(), getDegree()); //determine the hash code
+		return hash(getValue(), getUnit(), getDegree()); //determine the hash code
 	}
 
 	/**

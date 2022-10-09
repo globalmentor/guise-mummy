@@ -101,6 +101,7 @@ public abstract class AbstractOptionDialogFrame<O> extends AbstractDialogFrame<O
 	 * @param options The available options.
 	 * @throws NullPointerException if the given value model and/or options is <code>null</code>.
 	 */
+	@SuppressWarnings("unchecked")
 	public AbstractOptionDialogFrame(final ValueModel<O> valueModel, final Component component, final O... options) {
 		super(valueModel, new LayoutPanel(new RegionLayout())); //construct the parent class using a layout panel as a container
 		final List<O> optionList = new ArrayList<O>(); //create a list of options

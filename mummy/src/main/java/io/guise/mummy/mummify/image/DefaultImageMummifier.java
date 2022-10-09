@@ -120,11 +120,14 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 			final boolean isProcessTerminal = !isPostProcessWriteMetadataSupported; //	//if we don't support writing metadata post-processing, we'll write directly to the file when processing
 
 			//process image
-			final OutputStream processOutputStream; //remember the stream used for output (even though it will be closed) 
-			try (final InputStream inputStream = new BufferedInputStream(artifact.openSource(context)); //use a TempOutputStream for later use if processing isn't terminal
-					final OutputStream outputStream = (processOutputStream = isProcessTerminal ? new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))
-							: new TempOutputStream())) {
-				processImage(context, artifact, inputStream, processOutputStream, isKeepProcessMetadata);
+			final OutputStream processOutputStream;
+			try (final InputStream inputStream = new BufferedInputStream(artifact.openSource(context))) {
+				processOutputStream = isProcessTerminal //remember the stream used for output (even though it will be closed) 
+						? new BufferedOutputStream(newOutputStream(artifact.getTargetPath()))
+						: new TempOutputStream(); //use a TempOutputStream for later use if processing isn't terminal 
+				try (final OutputStream outputStream = processOutputStream) {
+					processImage(context, artifact, inputStream, outputStream, isKeepProcessMetadata);
+				}
 			} catch(final IOException ioException) { //provide more context to I/O errors
 				throw new IOException(format("Error processing image `%s`: %s", artifact.getSourcePath(), ioException.getLocalizedMessage()), ioException); //TODO i18n
 			}

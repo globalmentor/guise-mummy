@@ -22,6 +22,8 @@ package io.guise.framework.event;
  */
 public abstract class AbstractInputEvent extends AbstractGuiseEvent implements InputEvent {
 
+	private static final long serialVersionUID = -6682615893686165875L;
+
 	/** Whether the input associated with this event has been consumed. */
 	private boolean consumed = false;
 

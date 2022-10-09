@@ -27,6 +27,8 @@ import io.guise.framework.input.Key;
  */
 public abstract class AbstractMouseEvent extends AbstractGestureInputEvent implements MouseEvent {
 
+	private static final long serialVersionUID = -1351065169807483411L;
+
 	/** The target of the event, or <code>null</code> if the event target is not known. */
 	private final Object target;
 

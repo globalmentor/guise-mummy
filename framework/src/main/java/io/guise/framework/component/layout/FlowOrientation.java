@@ -46,7 +46,7 @@ public enum FlowOrientation {
 	//TODO fix when compass point issue is resolved	BACK_TO_FRONT(Axis.Z, Flow.Direction.DECREASING);
 
 	/** The resource key template for each glyph. */
-	private static final StringTemplate GLYPH_RESOURCE_KEY_TEMPLATE = new StringTemplate("flow.orientation.", StringTemplate.STRING_PARAMETER, ".glyph");
+	private static final StringTemplate GLYPH_RESOURCE_KEY_TEMPLATE = StringTemplate.of("flow.orientation.", StringTemplate.STRING_PARAMETER, ".glyph");
 
 	/** @return The resource reference for the glyph, using the session's default orientation. */
 	public URI getGlyph() {

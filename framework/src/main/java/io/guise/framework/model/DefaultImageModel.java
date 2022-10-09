@@ -17,8 +17,7 @@
 package io.guise.framework.model;
 
 import java.net.URI;
-
-import com.globalmentor.java.Objects;
+import java.util.Objects;
 
 /**
  * A default implementation of a model for an image.

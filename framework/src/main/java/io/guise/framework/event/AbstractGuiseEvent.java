@@ -27,6 +27,8 @@ import io.guise.framework.GuiseSession;
  */
 public abstract class AbstractGuiseEvent extends AbstractEvent implements GuiseEvent {
 
+	private static final long serialVersionUID = -2091559666781881024L;
+
 	/** The Guise session in which this event was generated. */
 	private final GuiseSession session;
 

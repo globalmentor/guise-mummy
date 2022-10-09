@@ -452,6 +452,7 @@ public class S3Website extends S3 {
 	 *           as specified by {@link #getRedirectMeans()}.
 	 */
 	@Override
+	@SuppressWarnings("fallthrough")
 	protected void plan(MummyContext context, Artifact rootArtifact) throws IOException {
 		super.plan(context, rootArtifact); //start with the default planning
 		final RedirectMeans redirectMeans = getRedirectMeans();

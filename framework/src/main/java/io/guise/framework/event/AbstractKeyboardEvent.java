@@ -26,6 +26,8 @@ import io.guise.framework.input.Key;
  */
 public abstract class AbstractKeyboardEvent extends AbstractFocusedGestureInputEvent implements KeyboardEvent {
 
+	private static final long serialVersionUID = 4061279921286819096L;
+
 	/** The key that was pressed. */
 	private final Key key;
 

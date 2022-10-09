@@ -18,8 +18,6 @@ package io.guise.framework.input;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.java.Objects;
-
 /**
  * An encapsulation of mouse click input.
  * @author Garret Wilson
@@ -67,7 +65,7 @@ public class MouseClickInput extends AbstractMouseInput {
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.getHashCode(super.hashCode(), button, count); //extend the hash code with the button and count
+		return hash(super.hashCode(), button, count); //extend the hash code with the button and count
 	}
 
 	/**

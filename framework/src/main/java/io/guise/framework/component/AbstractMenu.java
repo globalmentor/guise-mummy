@@ -231,6 +231,7 @@ public abstract class AbstractMenu extends AbstractContainerControl implements M
 	 * </dl>
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public Component createComponent(final Prototype prototype) {
 		if(prototype instanceof ActionPrototype && !(prototype instanceof MenuPrototype)) { //action prototypes (don't create a link for menus, even though they are also action prototypes)
 			return new Link((ActionPrototype)prototype);

@@ -23,12 +23,13 @@ import java.util.concurrent.locks.*;
 
 import static java.util.Objects.*;
 
+import java.lang.reflect.InvocationTargetException;
+
 import static com.globalmentor.java.Classes.*;
 
 import com.globalmentor.collections.DecoratorReadWriteLockMap;
 import com.globalmentor.collections.PurgeOnWriteWeakValueHashMap;
 import com.globalmentor.collections.ReadWriteLockMap;
-import com.globalmentor.util.*;
 
 import io.guise.framework.GuiseApplication;
 
@@ -109,11 +110,15 @@ public abstract class AbstractPlatform implements Platform {
 		final Class<? extends Depictor<? super O>> depictorClass = getDepictorClass(depictedObjectClass); //walk the hierarchy to see if there is a depictor class registered for this component type
 		if(depictorClass != null) { //if we found a depictor class
 			try {
-				return depictorClass.newInstance(); //return a new instance of the class
+				return depictorClass.getDeclaredConstructor().newInstance(); //return a new instance of the class
 			} catch(final InstantiationException instantiationException) {
 				throw new IllegalStateException(instantiationException);
 			} catch(final IllegalAccessException illegalAccessException) {
 				throw new IllegalStateException(illegalAccessException);
+			} catch(final NoSuchMethodException noSuchMethodException) {
+				throw new IllegalStateException(noSuchMethodException);
+			} catch(final InvocationTargetException invocationTargetException) {
+				throw new IllegalStateException(invocationTargetException);
 			}
 		}
 		return null; //show that we could not find a registered depictor

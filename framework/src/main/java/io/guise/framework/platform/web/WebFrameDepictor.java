@@ -82,6 +82,7 @@ public class WebFrameDepictor<C extends Frame> extends AbstractWebFrameDepictor<
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	protected void depictBegin() throws IOException {
 		super.depictBegin(); //do the default beginning rendering
 		final GuiseSession session = getSession(); //get the session

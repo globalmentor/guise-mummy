@@ -39,6 +39,7 @@ public class TemperatureConversionPanel2 extends LayoutPanel {
 	private CheckControl celsiusCheckControl;
 	private CheckControl fahrenheitCheckControl;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void initialize() {
 		temperatureInput = (TextControl<Double>)AbstractComponent.getComponentByName(this, "temperatureInput"); //get a reference to the temperature input

@@ -21,8 +21,6 @@ import java.util.*;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.java.Objects;
-
 import io.guise.framework.component.layout.*;
 import io.guise.framework.event.*;
 import io.guise.framework.geometry.*;

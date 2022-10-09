@@ -24,6 +24,8 @@ import io.guise.framework.input.Key;
  */
 public abstract class AbstractFocusedGestureInputEvent extends AbstractGestureInputEvent implements FocusedInputEvent {
 
+	private static final long serialVersionUID = -3284380952264370702L;
+
 	/**
 	 * Source constructor.
 	 * @param source The object on which the event initially occurred.

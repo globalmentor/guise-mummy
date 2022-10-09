@@ -45,9 +45,9 @@ public enum View {
 	WYSIWYG;
 
 	/** The resource key template for each view label. */
-	private static final StringTemplate LABEL_RESOURCE_KEY_TEMPLATE = new StringTemplate("theme.view.", StringTemplate.STRING_PARAMETER, ".label");
+	private static final StringTemplate LABEL_RESOURCE_KEY_TEMPLATE = StringTemplate.of("theme.view.", StringTemplate.STRING_PARAMETER, ".label");
 	/** The resource key template for each view glyph. */
-	private static final StringTemplate GLYPH_RESOURCE_KEY_TEMPLATE = new StringTemplate("theme.view.", StringTemplate.STRING_PARAMETER, ".glyph");
+	private static final StringTemplate GLYPH_RESOURCE_KEY_TEMPLATE = StringTemplate.of("theme.view.", StringTemplate.STRING_PARAMETER, ".glyph");
 
 	/** @return A resource reference representing a label for no view. */
 	public static String getNoLabel() {

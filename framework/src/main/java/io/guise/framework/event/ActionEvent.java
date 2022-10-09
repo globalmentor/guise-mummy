@@ -23,6 +23,8 @@ package io.guise.framework.event;
  */
 public class ActionEvent extends AbstractTargetedGuiseEvent {
 
+	private static final long serialVersionUID = 6847825349907300093L;
+
 	/** The default action option. */
 	public static final int DEFAULT_OPTION = 0;
 

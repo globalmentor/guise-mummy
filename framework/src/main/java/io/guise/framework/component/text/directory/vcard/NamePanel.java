@@ -91,9 +91,9 @@ public class NamePanel extends AbstractPanel {
 	 */
 	public void setVCardName(final Name name) throws PropertyVetoException {
 		if(name != null) { //if there is a name
-			familyNameControl.setValue(formatList(VALUE_SEPARATOR_CHAR, name.getFamilyNames()));
-			givenNameControl.setValue(formatList(VALUE_SEPARATOR_CHAR, name.getGivenNames()));
-			additionalNameControl.setValue(formatList(VALUE_SEPARATOR_CHAR, name.getAdditionalNames()));
+			familyNameControl.setValue(formatList(VALUE_SEPARATOR_CHAR, (Object[])name.getFamilyNames()));
+			givenNameControl.setValue(formatList(VALUE_SEPARATOR_CHAR, (Object[])name.getGivenNames()));
+			additionalNameControl.setValue(formatList(VALUE_SEPARATOR_CHAR, (Object[])name.getAdditionalNames()));
 			final String[] honorificPrefixes = name.getHonorificPrefixes(); //get the existing values
 			for(final String honorifixPrefix : honorificPrefixes) { //for each existing value
 				if(!honorificPrefixControl.contains(honorifixPrefix)) { //if the list doesn't contain this value

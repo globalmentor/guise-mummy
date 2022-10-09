@@ -18,7 +18,8 @@ package io.guise.framework.model;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.java.Objects;
+import java.util.Objects;
+
 import com.globalmentor.net.MediaType;
 import com.globalmentor.text.Text;
 

@@ -17,6 +17,7 @@
 package io.guise.framework.model;
 
 import java.beans.PropertyVetoException;
+import java.lang.reflect.Array;
 import java.util.*;
 
 import com.globalmentor.beans.GenericPropertyChangeEvent;
@@ -39,7 +40,7 @@ public final class MutualExclusionPolicyModelGroup extends ValuePolicyModelGroup
 	 */
 	@SuppressWarnings("unchecked")
 	public MutualExclusionPolicyModelGroup() {
-		this(new ValueModel[0]);
+		this((ValueModel<Boolean>)Array.newInstance(ValueModel.class, 0));
 	}
 
 	/**
@@ -47,6 +48,7 @@ public final class MutualExclusionPolicyModelGroup extends ValuePolicyModelGroup
 	 * @param models Zero or more models with which to initially place in the group.
 	 * @throws NullPointerException if one of the models is <code>null</code>.
 	 */
+	@SuppressWarnings("unchecked")
 	public MutualExclusionPolicyModelGroup(final ValueModel<Boolean>... models) {
 		super(models); //construct the parent class
 	}
@@ -62,6 +64,7 @@ public final class MutualExclusionPolicyModelGroup extends ValuePolicyModelGroup
 	@Override
 	public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent) {
 		if(Boolean.TRUE.equals(propertyChangeEvent.getNewValue())) { //if this model is changing to true, change the other models to false
+			@SuppressWarnings("unchecked")
 			final ValueModel<Boolean> source = (ValueModel<Boolean>)propertyChangeEvent.getSource(); //see which model changed TODO verify, improve cast
 			selectedModel = source; //update the selected model
 			final Set<ValueModel<Boolean>> modelSet = getModelSet(); //get the set of models in the group

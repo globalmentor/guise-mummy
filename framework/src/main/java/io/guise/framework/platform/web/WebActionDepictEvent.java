@@ -24,6 +24,8 @@ import io.guise.framework.platform.DepictedObject;
  */
 public class WebActionDepictEvent extends AbstractWebDepictEvent {
 
+	private static final long serialVersionUID = 8443132733107398301L;
+
 	/** The ID of the component target site, or <code>null</code> if there was no component target. */
 	private final String targetID;
 

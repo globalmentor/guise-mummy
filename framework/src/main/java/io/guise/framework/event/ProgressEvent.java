@@ -28,6 +28,8 @@ import com.globalmentor.model.TaskState;
  */
 public class ProgressEvent<P> extends AbstractGuiseEvent {
 
+	private static final long serialVersionUID = 6883649106868393410L;
+
 	/** The task being performed, or <code>null</code> if not indicated. */
 	private String task;
 

@@ -38,7 +38,6 @@ import com.globalmentor.collections.Collections;
 import com.globalmentor.event.ProgressEvent;
 import com.globalmentor.event.ProgressListener;
 import com.globalmentor.io.*;
-import com.globalmentor.java.Objects;
 import com.globalmentor.javascript.JSON;
 import com.globalmentor.model.NameValuePair;
 import com.globalmentor.model.ObjectHolder;
@@ -120,6 +119,8 @@ import org.xml.sax.SAXException;
  * @author Garret Wilson
  */
 public class GuiseHTTPServlet extends DefaultHTTPServlet implements Clogged {
+
+	private static final long serialVersionUID = -6977683078902210551L;
 
 	/** The init parameter, "applicationClass", used to specify the Guise application to create. */
 	public static final String APPLICATION_CLASS_INIT_PARAMETER = "applicationClass";
@@ -273,7 +274,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet implements Clogged {
 		//TODO del when WebPlatform works		guiseApplication.installComponentKit(new XHTMLComponentKit());	//create and install an XHTML controller kit
 		//install configured environment properties
 		final Environment environment = guiseApplication.getEnvironment(); //get the application environment
-		final Enumeration<String> initParameterNames = (Enumeration<String>)servletContext.getInitParameterNames(); //get all the init parameter names from the servlet context, allowing all init parameters to be retrieved, even those stored externally
+		final Enumeration<String> initParameterNames = servletContext.getInitParameterNames(); //get all the init parameter names from the servlet context, allowing all init parameters to be retrieved, even those stored externally
 		while(initParameterNames.hasMoreElements()) { //while there are more init parameters
 			final String initParameterName = initParameterNames.nextElement(); //get the next init parameter
 			if(initParameterName.startsWith(GUISE_ENVIRONMENT_INIT_PARAMETER_PREFIX)) { //if this is a Guise parameter specification
@@ -733,6 +734,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet implements Clogged {
 	 * @param navigationPath The navigation path relative to the application base path.
 	 * @throws IOException if there is an error reading or writing data.
 	 */
+	@SuppressWarnings("unchecked")
 	private void serviceGuiseComponentDestinationRequest(/*TODO del final HttpServletRequest request, */final HTTPServletGuiseRequest guiseRequest,
 			final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication,
 			final GuiseSession guiseSession, final ComponentDestination componentDestination/*TODO del , final URI requestURI, final URIPath navigationPath*/)
@@ -796,7 +798,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet implements Clogged {
 						&& APPLICATION_X_WWW_FORM_URLENCODED_MEDIA_TYPE.hasBaseType(contentType) && !isGuisePOST) {
 					//TODO del Log.trace("using servlet parameter methods");
 					final List<Bookmark.Parameter> bookmarkParameterList = new ArrayList<Bookmark.Parameter>(); //create a new list of bookmark parameters
-					final Iterator<Map.Entry<String, String[]>> parameterEntryIterator = (Iterator<Map.Entry<String, String[]>>)guiseRequest.getHTTPServletRequest()
+					final Iterator<Map.Entry<String, String[]>> parameterEntryIterator = guiseRequest.getHTTPServletRequest()
 							.getParameterMap().entrySet().iterator(); //get an iterator to the parameter entries
 					while(parameterEntryIterator.hasNext()) { //while there are more parameter entries
 						final Map.Entry<String, String[]> parameterEntry = parameterEntryIterator.next(); //get the next parameter entry
@@ -1395,11 +1397,11 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet implements Clogged {
 			final boolean serveContent) throws ServletException, IOException {
 		if(resource instanceof DestinationResource) { //if the resource is a destination we're reading from
 			//Log.trace("ready to serve destination resource", request.getRequestURI(), "with query", request.getQueryString());
-			final DestinationResource destinationResource = (DestinationResource)resource; //get the desetination resource
+			final DestinationResource destinationResource = (DestinationResource)resource; //get the destination resource
 			//check for a content-disposition indication
 			final String queryString = request.getQueryString(); //get the query string from the request
 			if(queryString != null && queryString.length() > 0) { //if there is a query string (Tomcat 5.5.16 returns an empty string for no query, even though the Java Servlet specification 2.4 says that it should return null; this is fixed in Tomcat 6)
-				final NameValuePair<String, String>[] parameters = getParameters(queryString); //get the parameters from the query
+				final List<NameValuePair<String, String>> parameters = getQueryParameters(queryString); //get the parameters from the query
 				for(final NameValuePair<String, String> parameter : parameters) { //look at each parameter
 					if(GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER.equals(parameter.getName())) { //if this is a content-disposition parameter
 						final ContentDispositionType contentDispositionType = getSerializedEnum(ContentDispositionType.class, parameter.getValue()); //get the content disposition type
@@ -1720,7 +1722,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet implements Clogged {
 				final ServletFileUpload servletFileUpload = new ServletFileUpload(fileItemFactory); //create a new servlet file upload handler
 				servletFileUpload.setFileSizeMax(-1); //don't reject anything
 				try { //try to parse the file items submitted in the request
-					final List<FileItem> fileItems = (List<FileItem>)servletFileUpload.parseRequest(request); //parse the request
+					final List<FileItem> fileItems = servletFileUpload.parseRequest(request); //parse the request
 					for(final FileItem fileItem : fileItems) { //look at each file item
 						final String parameterKey = fileItem.getFieldName(); //the parameter key will always be the field name
 						final Object parameterValue = fileItem.isFormField() ? fileItem.getString() : new FileItemResourceImport(fileItem); //if this is a form field, store it normally; otherwise, create a file item resource import object
@@ -1735,7 +1737,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet implements Clogged {
 				if(!exhaustive || request.getParameter(WebApplicationFrameDepictor.getActionInputID(guiseSession.getApplicationFrame())) != null) { //if this is a POST, only use the data if it is a Guise POST
 					final WebFormEvent formSubmitEvent = new WebFormEvent(platform, exhaustive); //create a new form submission event
 					final CollectionMap<String, Object, List<Object>> parameterListMap = formSubmitEvent.getParameterListMap(); //get the map of parameter lists
-					final Iterator<Map.Entry<String, String[]>> parameterEntryIterator = ((Map<String, String[]>)request.getParameterMap()).entrySet().iterator(); //get an iterator to the parameter entries
+					final Iterator<Map.Entry<String, String[]>> parameterEntryIterator = request.getParameterMap().entrySet().iterator(); //get an iterator to the parameter entries
 					while(parameterEntryIterator.hasNext()) { //while there are more parameter entries
 						final Map.Entry<String, String[]> parameterEntry = parameterEntryIterator.next(); //get the next parameter entry
 						final String parameterKey = parameterEntry.getKey(); //get the parameter key

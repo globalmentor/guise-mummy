@@ -16,17 +16,15 @@
 
 package io.guise.framework.model;
 
+import static java.util.Objects.*;
+
 import java.beans.PropertyVetoException;
 import java.util.*;
-
-import static java.util.Objects.*;
 
 import com.globalmentor.collections.SynchronizedListDecorator;
 import com.globalmentor.collections.iterators.DefaultListIterator;
 import com.globalmentor.event.EventListenerManager;
 import com.globalmentor.java.Arrays;
-import com.globalmentor.java.Objects;
-import com.globalmentor.util.*;
 
 import io.guise.framework.event.*;
 import io.guise.framework.validator.*;
@@ -62,6 +60,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void setValue(final V newValue) throws PropertyVetoException {
 		final Validator<V> validator = getValidator(); //get the currently installed validator, if there is one
 		if(validator != null) { //if a validator is installed, always validate the value, even if it isn't changing, so that an initial value that may not be valid will throw an error when it's tried to be set to the same, but invalid, value
@@ -563,6 +562,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	 * @throws PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	 * @see #setSelectedIndexes(int[])
 	 */
+	@SuppressWarnings("unchecked")
 	public void setSelectedValues(final V... values) throws PropertyVetoException {
 		if(values.length == 0) { //TODO add more thorough validation throughout; right now we only check for null not being valid
 			final Validator<V> validator = getValidator(); //get the currently installed validator, if there is one
@@ -747,6 +747,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	 * @see ListListener
 	 * @see ListEvent
 	 */
+	@SuppressWarnings("unchecked")
 	protected void fireListModified(final int index, final V addedElement, final V removedElement) {
 		final EventListenerManager eventListenerManager = getEventListenerManager(); //get event listener support
 		if(getEventListenerManager().hasListeners(ListListener.class)) { //if there are appropriate listeners registered
@@ -766,6 +767,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	 * @see ListSelectionListener
 	 * @see ListSelectionEvent
 	 */
+	@SuppressWarnings("unchecked")
 	protected void fireSelectionChanged(final Integer addedIndex, final Integer removedIndex) {
 		final EventListenerManager eventListenerManager = getEventListenerManager(); //get event listener support
 		if(eventListenerManager.hasListeners(ListSelectionListener.class)) { //if there are appropriate listeners registered
@@ -919,7 +921,8 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 		 */
 		@Override
 		public boolean equals(final Object object) {
-			return (object instanceof DefaultListSelectModel.ValueState) && Objects.equals(getValue(), ((DefaultListSelectModel.ValueState)object).getValue());
+			return (object instanceof DefaultListSelectModel.ValueState)
+					&& Objects.equals(getValue(), ((DefaultListSelectModel<?>.ValueState)object).getValue());
 		}
 	}
 }

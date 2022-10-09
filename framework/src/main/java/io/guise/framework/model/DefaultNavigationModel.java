@@ -16,7 +16,8 @@
 
 package io.guise.framework.model;
 
-import com.globalmentor.java.Objects;
+import java.util.Objects;
+
 import com.globalmentor.net.URIPath;
 
 /**

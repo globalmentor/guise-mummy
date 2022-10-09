@@ -30,6 +30,8 @@ import static com.globalmentor.java.Enums.*;
  */
 public abstract class AbstractGestureInputEvent extends AbstractInputEvent implements GestureInputEvent {
 
+	private static final long serialVersionUID = 1535215947301201808L;
+
 	/** The keys that were pressed when this event was generated. */
 	private final Set<Key> keys;
 

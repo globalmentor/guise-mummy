@@ -94,6 +94,7 @@ public abstract class AbstractPlatformFile implements PlatformFile {
 	 * Fires a given progress event to all registered progress listeners.
 	 * @param progressEvent The progress event to fire.
 	 */
+	@SuppressWarnings("unchecked")
 	protected void fireProgressed(final ProgressEvent<Long> progressEvent) {
 		for(final ProgressListener<Long> progressListener : getEventListenerManager().getListeners(ProgressListener.class)) { //for each progress listener
 			progressListener.progressed(progressEvent); //dispatch the progress event to the listener

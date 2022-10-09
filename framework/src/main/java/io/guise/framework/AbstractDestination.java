@@ -23,7 +23,6 @@ import static java.util.Objects.*;
 import java.util.regex.Pattern;
 
 import com.globalmentor.beans.BoundPropertyObject;
-import com.globalmentor.java.Objects;
 import com.globalmentor.net.*;
 
 import io.urf.model.UrfResourceDescription;
@@ -135,7 +134,7 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 
 	@Override
 	public int hashCode() {
-		return Objects.getHashCode(getPath(), getPathPattern()); //construct a hash code from the path and path pattern
+		return hash(getPath(), getPathPattern()); //construct a hash code from the path and path pattern
 	}
 
 	/**

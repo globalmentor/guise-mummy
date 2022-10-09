@@ -35,8 +35,7 @@ import com.globalmentor.beans.*;
 import com.globalmentor.collections.DecoratorReadWriteLockMap;
 import com.globalmentor.collections.ReadWriteLockMap;
 import com.globalmentor.io.BOMInputStreamReader;
-import com.globalmentor.java.*;
-import com.globalmentor.java.Objects;
+import com.globalmentor.java.Characters;
 import com.globalmentor.net.*;
 import com.globalmentor.util.*;
 
@@ -656,11 +655,15 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	protected Component createComponent(final Class<? extends Component> componentClass) {
 		Component component; //we'll store the component here
 		try {
-			component = componentClass.newInstance(); //create a new instance of the component
+			component = componentClass.getDeclaredConstructor().newInstance(); //create a new instance of the component
 		} catch(final IllegalAccessException illegalAccessException) { //if the constructor is not visible
 			throw new IllegalStateException(illegalAccessException);
 		} catch(final InstantiationException instantiationException) { //if the class is an interface or is abstract
 			throw new IllegalStateException(instantiationException);
+		} catch(final NoSuchMethodException noSuchMethodException) {
+			throw new IllegalStateException(noSuchMethodException);
+		} catch(final InvocationTargetException invocationTargetException) {
+			throw new IllegalStateException(invocationTargetException);
 		}
 		initializeComponent(component); //initialize the component from a TURF description, if possible
 		return component; //return the component
@@ -1216,7 +1219,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				int searchStartIndex = stringStartIndex + 1; //start searching after the SOS character
 				int stringEndIndex; //we'll store here the end of the string reference
 				do {
-					stringEndIndex = charIndexOf(string, STRING_REFERENCE_DELIMITERS, searchStartIndex); //search for the end of the string (or the beginning of another reference)
+					stringEndIndex = indexOf(string, STRING_REFERENCE_DELIMITERS, searchStartIndex); //search for the end of the string (or the beginning of another reference)
 					if(stringEndIndex < 0) { //if there is no string delimiter (and therefore no string terminator)
 						throw new IllegalArgumentException("String reference missing String Terminator (U+009C).");
 					}
@@ -1253,7 +1256,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			}
 			String dereferencedString = stringBuilder.toString(); //get the string we constructed
 			if(argumentList != null) { //if we have string value arguments
-				dereferencedString = format(dereferencedString, (Object[])argumentList.toArray()); //use the string as a format pattern, formatted using the collected arguments
+				dereferencedString = format(dereferencedString, argumentList.toArray()); //use the string as a format pattern, formatted using the collected arguments
 			}
 			return dereferencedString; //return the string we dereferenced
 		} else { //if there is no string reference
@@ -1268,7 +1271,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			URI resourceURI = null; //we'll try to determine the resource URI
 			if(suffixes.length > 0) { //if there are suffixes
 				try {
-					final String decoratedResourceKey = formatList(new StringBuilder(resourceKey).append('.'), '.', suffixes).toString(); //append the suffixes
+					final String decoratedResourceKey = formatList(new StringBuilder(resourceKey).append('.'), '.', (Object[])suffixes).toString(); //append the suffixes
 					resourceURI = getURIResource(decoratedResourceKey); //look up the resource using the decorated resource key
 				} catch(final IOException ioException) { //if there is no resource associated with the decorated resource key, ignore the error and try again with the base resource key
 					throw unexpected(ioException);

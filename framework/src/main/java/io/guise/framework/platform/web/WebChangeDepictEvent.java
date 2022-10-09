@@ -35,6 +35,8 @@ import io.guise.framework.platform.DepictedObject;
  */
 public class WebChangeDepictEvent extends AbstractWebDepictEvent {
 
+	private static final long serialVersionUID = -6187566638917814160L;
+
 	/** The read-only map of properties. */
 	private final Map<String, Object> properties;
 
@@ -49,6 +51,7 @@ public class WebChangeDepictEvent extends AbstractWebDepictEvent {
 	 * @param properties The relevant properties; properties with duplicate names replace earlier properties of the same name.
 	 * @throws NullPointerException if the given depicted object and/or properties is <code>null</code>.
 	 */
+	@SuppressWarnings("unchecked")
 	public WebChangeDepictEvent(final DepictedObject depictedObject, final NameValuePair<String, Object>... properties) {
 		super(depictedObject); //construct the parent class
 		this.properties = unmodifiableMap(addAll(new HashMap<String, Object>(properties.length), properties)); //add all the properties to a new map

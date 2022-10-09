@@ -19,13 +19,12 @@ package io.guise.framework.component;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.Set;
 
 import static io.guise.framework.Resources.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
-
-import com.globalmentor.java.Objects;
 
 import io.guise.framework.geometry.CompassPoint;
 

@@ -167,6 +167,7 @@ public class WebCustomButtonDepictor<C extends ActionControl> extends AbstractWe
 			case PAGE: //if the page flows horizontally
 				leftCorner = Corner.getCorner(flowYDirection.getEnd(direction), flowXDirection.getEnd(Flow.Direction.DECREASING));
 				rightCorner = Corner.getCorner(flowYDirection.getEnd(direction), flowXDirection.getEnd(Flow.Direction.INCREASING));
+				break;
 			default:
 				throw new AssertionError("Unrecognized horizontal flow: " + flowX);
 		}

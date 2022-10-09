@@ -27,6 +27,8 @@ import io.guise.framework.component.Component;
  */
 public class ComponentEvent extends AbstractTargetedGuiseEvent {
 
+	private static final long serialVersionUID = 8378842865239710603L;
+
 	/** The component affected by the event. */
 	private final Component component;
 

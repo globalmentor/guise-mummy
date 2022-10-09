@@ -81,11 +81,13 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void pause() {
 		getPlatform().getSendMessageQueue().add(new WebCommandDepictEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_PAUSE)); //send an audio pause command to the platform
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void stop() {
 		getPlatform().getSendMessageQueue().add(new WebCommandDepictEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_STOP)); //send an audio stop command to the platform
 	}

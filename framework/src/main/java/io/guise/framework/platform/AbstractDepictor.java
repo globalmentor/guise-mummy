@@ -150,6 +150,7 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	 * @see #depictedPropertyChangeListener
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public void installed(final O depictedObject) {
 		if(this.depictedObject != null) { //if this depictor is already installed
 			throw new IllegalStateException("Depictor is already installed in a depicted object.");
@@ -174,6 +175,7 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	 * @see #depictedPropertyChangeListener
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public void uninstalled(final O depictedObject) {
 		if(this.depictedObject == null) { //if this depictor is not installed
 			throw new IllegalStateException("Depictor is not installed in a depicted object.");

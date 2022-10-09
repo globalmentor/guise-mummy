@@ -22,6 +22,8 @@ package io.guise.framework.platform.web;
  */
 public class WebPollEvent extends AbstractWebPlatformEvent {
 
+	private static final long serialVersionUID = -1727521607100020977L;
+
 	/**
 	 * Context constructor.
 	 * @param source The context in which this control event was produced.

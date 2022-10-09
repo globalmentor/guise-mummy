@@ -50,9 +50,8 @@ import com.globalmentor.beans.BoundPropertyObject;
 import com.globalmentor.collections.DecoratorReadWriteLockMap;
 import com.globalmentor.collections.PurgeOnWriteSoftValueHashMap;
 import com.globalmentor.io.*;
-import com.globalmentor.java.Objects;
 import com.globalmentor.mail.MailManager;
-import com.globalmentor.model.ConfigurationException;
+import com.globalmentor.model.ConfiguredStateException;
 import com.globalmentor.net.URIPath;
 import com.globalmentor.text.W3CDateFormat;
 import com.globalmentor.util.*;
@@ -230,7 +229,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@Override
 	public Map<?, ?> getMailProperties() {
 		if(isInstalled() && mailProperties == null) { //if the application has been installed but the repositories repository has not yet been set
-			throw new ConfigurationException("Repositories repository has not been configured.");
+			throw new ConfiguredStateException("Repositories repository has not been configured.");
 		}
 		return mailProperties; //return the repository for user repositories
 	}
@@ -249,7 +248,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		checkInstalled(); //make sure the application has been installed (which will set the mail manager if configured)
 		final MailManager mailManager = this.mailManager; //get the mail manager
 		if(mailManager == null) { //if we don't have a mail manager, mail hasn't been configured
-			throw new ConfigurationException("Mail has not been configured for the application.");
+			throw new ConfiguredStateException("Mail has not been configured for the application.");
 		}
 		return mailManager.getSession(); //return the mail manager's session
 	}
@@ -259,7 +258,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		checkInstalled(); //make sure the application has been installed (which will set the mail manager if configured)
 		final MailManager mailManager = this.mailManager; //get the mail manager
 		if(mailManager == null) { //if we don't have a mail manager, mail hasn't been configured
-			throw new ConfigurationException("Mail has not been configured for the application.");
+			throw new ConfiguredStateException("Mail has not been configured for the application.");
 		}
 		return mailManager.getSendQueue(); //return the mail manager's send queue
 	}
@@ -587,7 +586,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			try {
 				mailManager = new MailManager(mailProperties); //create a new mail manager from the properties
 			} catch(final NoSuchProviderException noSuchProviderException) { //if a provider couldn't be found
-				throw new ConfigurationException(noSuchProviderException); //indicate that there was a problem configuring the application TODO use a better error; create a ConfigurationStateException
+				throw new ConfiguredStateException(noSuchProviderException); //indicate that there was a problem configuring the application TODO use a better error; create a ConfigurationStateException
 			}
 		} else { //if there are no mail properties
 			getLogger().warn("Mail properties not configured."); //warn that mail isn't configured

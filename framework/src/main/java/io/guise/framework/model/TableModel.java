@@ -20,14 +20,11 @@ import java.util.*;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.java.Objects;
-
 /**
  * A model of a table. The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class.
  * @author Garret Wilson
  */
-public interface TableModel extends Model //TODO maybe specify row count to be a bound property
-{
+public interface TableModel extends Model { //TODO maybe specify row count to be a bound property
 
 	/**
 	 * Determines the logical index of the given table column.
@@ -128,7 +125,7 @@ public interface TableModel extends Model //TODO maybe specify row count to be a
 		 */
 		public boolean equals(final Object object) {
 			if(object instanceof Cell) { //if the object is a cell
-				final Cell cell = (Cell)object; //cast the object to a cell
+				final Cell<?> cell = (Cell<?>)object; //cast the object to a cell
 				return getRowIndex() == cell.getRowIndex() && getColumn().equals(cell.getColumn()); //compare row index and column
 			} else { //if the object is not a cell
 				return false; //the objects aren't equal
@@ -137,7 +134,7 @@ public interface TableModel extends Model //TODO maybe specify row count to be a
 
 		/** @return A hash code for the cell. */
 		public int hashCode() {
-			return Objects.getHashCode(rowIndex, column); //generate a hash code
+			return hash(rowIndex, column); //generate a hash code
 		}
 
 	}

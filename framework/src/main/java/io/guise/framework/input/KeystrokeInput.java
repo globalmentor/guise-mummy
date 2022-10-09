@@ -18,8 +18,6 @@ package io.guise.framework.input;
 
 import static java.util.Objects.*;
 
-import com.globalmentor.java.Objects;
-
 /**
  * An encapsulation of key stroke input.
  * @author Garret Wilson
@@ -53,7 +51,7 @@ public class KeystrokeInput extends AbstractGestureInput implements KeyboardInpu
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.getHashCode(super.hashCode(), key); //extend the hash code with the key
+		return hash(super.hashCode(), key); //extend the hash code with the key
 	}
 
 	/**

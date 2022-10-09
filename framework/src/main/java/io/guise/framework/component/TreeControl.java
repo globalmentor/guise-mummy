@@ -190,7 +190,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		final Component treeNodeComponent = getTreeNodeRepresentationStrategy(treeNode.getValueClass()).createComponent(this, getTreeModel(), treeNode, editable,
 				false, false); //create a new component for the tree node
 
-		treeNodeComponent.addExportStrategy(new ExportStrategy() { //TODO fix for generics with a separate method 
+		treeNodeComponent.addExportStrategy(new ExportStrategy<Component>() { //TODO fix for generics with a separate method (update: is this comment no longer needed?) 
 
 			@Override
 			public Transferable<Component> exportTransfer(final Component component) {

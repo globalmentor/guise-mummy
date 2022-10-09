@@ -82,6 +82,7 @@ public class TemperatureConversionPanel extends LayoutPanel {
 		fahrenheitCheckControl.setLabel("Fahrenheit"); //set the label of the check to indicate the scale
 		scalePanel.add(fahrenheitCheckControl); //add the Fahrenheit check control to the panel	
 		//create a mutual exclusion policy group and add the Celsius and Fahrenheit check box boolean value models to get radio button functionality
+		@SuppressWarnings("unchecked")
 		final ModelGroup<ValueModel<Boolean>> radioButtonModelGroup = new MutualExclusionPolicyModelGroup(celsiusCheckControl, fahrenheitCheckControl);
 		conversionPanel.add(scalePanel); //add the scale panel to the conversion panel
 

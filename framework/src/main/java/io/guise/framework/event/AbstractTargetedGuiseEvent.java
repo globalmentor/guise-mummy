@@ -26,6 +26,8 @@ import com.globalmentor.event.TargetedEvent;
  */
 public class AbstractTargetedGuiseEvent extends AbstractGuiseEvent implements TargetedEvent {
 
+	private static final long serialVersionUID = -7983147274350541580L;
+
 	/** The target of the event, or <code>null</code> if the event target is not known. */
 	private final Object target;
 

@@ -253,6 +253,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void setSelectedValues(final V... values) throws PropertyVetoException {
 		getListSelectModel().setSelectedValues(values);
 	}
@@ -359,6 +360,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	 * @see ListListener
 	 * @see ListEvent
 	 */
+	@SuppressWarnings("unchecked")
 	protected void fireListModified(final int index, final V addedElement, final V removedElement) {
 		final EventListenerManager eventListenerManager = getEventListenerManager(); //get the event listener manager
 		if(eventListenerManager.hasListeners(ListListener.class)) { //if there are appropriate listeners registered
@@ -378,6 +380,7 @@ public abstract class AbstractListSelectControl<V> extends AbstractCompositeStat
 	 * @see ListSelectionListener
 	 * @see ListSelectionEvent
 	 */
+	@SuppressWarnings("unchecked")
 	protected void fireSelectionChanged(final Integer addedIndex, final Integer removedIndex) {
 		final EventListenerManager eventListenerManager = getEventListenerManager(); //get the event listener manager
 		if(eventListenerManager.hasListeners(ListSelectionListener.class)) { //if there are appropriate listeners registered

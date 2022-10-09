@@ -55,6 +55,7 @@ public class WebCommandMessage<C extends Enum<C> & WebPlatformCommand> extends A
 	 * @param parameters The parameters of the command; parameters with duplicate names replace earlier parameters of the same name.
 	 * @throws NullPointerException if the given command and/or parameters is <code>null</code>.
 	 */
+	@SuppressWarnings("unchecked")
 	public WebCommandMessage(final C command, final NameValuePair<String, Object>... parameters) {
 		this.command = requireNonNull(command, "Command cannot be null.");
 		this.parameters = unmodifiableMap(addAll(new HashMap<String, Object>(parameters.length), parameters)); //add all the parameters to a new map
