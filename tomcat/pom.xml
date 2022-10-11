@@ -34,5 +34,22 @@
 			<artifactId>tomcat-embed-core</artifactId>
 			<scope>provided</scope>
 		</dependency>
+
+		<!--
+			bnd and OSGi annotations needed with Tomcat to prevent linting warnings
+			resulting from missing `ServiceConsumer` and `Requirements` annotations.
+			See [Tomcat Bug 66299](https://bz.apache.org/bugzilla/show_bug.cgi?id=66299).
+		-->
+		<dependency>
+			<groupId>biz.aQute.bnd</groupId>
+			<artifactId>biz.aQute.bnd.annotation</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>osgi.annotation</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 </project>
