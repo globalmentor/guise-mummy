@@ -48,7 +48,6 @@
 
 	<properties>
 		<maven.compiler.release>11</maven.compiler.release>
-		<tomcat.version>9.0.50</tomcat.version>
 		<urf.version>0.4.1</urf.version>
 	</properties>
 
@@ -242,7 +241,19 @@
 			<dependency>
 				<groupId>org.apache.tomcat.embed</groupId>
 				<artifactId>tomcat-embed-core</artifactId>
-				<version>${tomcat.version}</version>
+				<version>10.1.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>biz.aQute.bnd</groupId>
+				<artifactId>biz.aQute.bnd.annotation</artifactId>
+				<version>6.3.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.osgi</groupId>
+				<artifactId>osgi.annotation</artifactId>
+				<version>8.1.0</version>
 			</dependency>
 
 			<dependency>
