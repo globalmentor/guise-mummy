@@ -10,7 +10,7 @@
 
 	<groupId>io.guise</groupId>
 	<artifactId>guise</artifactId>
-	<version>0.5.3-SNAPSHOT</version>
+	<version>0.5.3</version>
 	<packaging>pom</packaging>
 
 	<name>Guise Ecosystem</name>
@@ -169,37 +169,37 @@
 			<dependency>
 				<groupId>io.guise</groupId>
 				<artifactId>guise-cli</artifactId>
-				<version>0.5.3-SNAPSHOT</version>
+				<version>0.5.3</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.guise</groupId>
 				<artifactId>guise-framework</artifactId>
-				<version>0.5.3-SNAPSHOT</version>
+				<version>0.5.3</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.guise</groupId>
 				<artifactId>guise-framework-demo</artifactId>
-				<version>0.5.3-SNAPSHOT</version>
+				<version>0.5.3</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.guise</groupId>
 				<artifactId>guise-mesh</artifactId>
-				<version>0.5.3-SNAPSHOT</version>
+				<version>0.5.3</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.guise</groupId>
 				<artifactId>guise-mummy</artifactId>
-				<version>0.5.3-SNAPSHOT</version>
+				<version>0.5.3</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.guise</groupId>
 				<artifactId>guise-tomcat</artifactId>
-				<version>0.5.3-SNAPSHOT</version>
+				<version>0.5.3</version>
 			</dependency>
 
 			<dependency>
