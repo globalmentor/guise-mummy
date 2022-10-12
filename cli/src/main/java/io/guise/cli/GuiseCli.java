@@ -110,7 +110,7 @@ public class GuiseCli extends BaseCliApplication {
 	 * @param argSiteDescriptionTargetDirectory The target root directory into which the site description will be generated.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	@Command(description = "Validates a Guise project before mummification.", subcommands = {HelpCommand.class})
+	@Command(description = "Validates a Guise project before mummification.", mixinStandardHelpOptions = true)
 	public void validate(
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
 			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
@@ -141,7 +141,7 @@ public class GuiseCli extends BaseCliApplication {
 	 * @param argSiteDescriptionTargetDirectory The target root directory of the site description to be removed.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	@Command(description = "Cleans a site by removing the site target directory.", subcommands = {HelpCommand.class})
+	@Command(description = "Cleans a site by removing the site target directory.", mixinStandardHelpOptions = true)
 	public void clean(
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
 			@Option(names = "--site-target-dir", description = "The target root directory of the site to be removed; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
@@ -181,7 +181,7 @@ public class GuiseCli extends BaseCliApplication {
 	 * @param full Specifies full instead of incremental mummification.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	@Command(description = "Mummifies a site by generating a static version.", subcommands = {HelpCommand.class})
+	@Command(description = "Mummifies a site by generating a static version.", mixinStandardHelpOptions = true)
 	public void mummify(
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
 			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
@@ -217,8 +217,7 @@ public class GuiseCli extends BaseCliApplication {
 	 * @param full Specifies full instead of incremental mummification.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	@Command(name = "prepare-deploy", description = "Prepares to deploys a site after generating a static version, but does not actually deploy the site.", subcommands = {
-			HelpCommand.class})
+	@Command(name = "prepare-deploy", description = "Prepares to deploys a site after generating a static version, but does not actually deploy the site.", mixinStandardHelpOptions = true)
 	public void prepareDeploy(
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project to deploy.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
 			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
@@ -255,7 +254,7 @@ public class GuiseCli extends BaseCliApplication {
 	 * @param full Specifies full instead of incremental mummification and deployment.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	@Command(description = "Deploys a site after generating a static version.", subcommands = {HelpCommand.class})
+	@Command(description = "Deploys a site after generating a static version.", mixinStandardHelpOptions = true)
 	public void deploy(
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project to deploy.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
 			@Option(names = "--site-source-dir", description = "The source root directory of the site to mummify.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
@@ -305,7 +304,7 @@ public class GuiseCli extends BaseCliApplication {
 	 * @throws IOException if an I/O error occurs.
 	 * @throws LifecycleException if there is a problem starting the server.
 	 */
-	@Command(description = "Starts a web server for exploring the site in the target directory.", subcommands = {HelpCommand.class})
+	@Command(description = "Starts a web server for exploring the site in the target directory.", mixinStandardHelpOptions = true)
 	public void serve(
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project being served.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
 			@Option(names = "--site-target-dir", description = "The target root directory of the site to be served.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
