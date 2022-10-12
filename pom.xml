@@ -4,8 +4,8 @@
 
 	<parent>
 		<groupId>com.globalmentor</groupId>
-		<artifactId>globalmentor-base</artifactId>
-		<version>0.7.3</version>
+		<artifactId>globalmentor-root</artifactId>
+		<version>0.8.13</version>
 	</parent>
 
 	<groupId>io.guise</groupId>
@@ -78,6 +78,12 @@
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-awt</artifactId>
 				<version>0.6.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-core</artifactId>
+				<version>0.7.3</version>
 			</dependency>
 
 			<dependency>
