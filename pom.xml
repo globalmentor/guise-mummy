@@ -9,14 +9,14 @@
 	</parent>
 
 	<groupId>io.guise</groupId>
-	<artifactId>guise</artifactId>
-	<version>0.5.3</version>
+	<artifactId>guise-mummy-bom</artifactId>
+	<version>0.6.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>Guise Ecosystem</name>
-	<description>Guise™ Internet application ecosystem and bill of materials.</description>
-	<url>https://guise.io/</url>
-	<inceptionYear>2005</inceptionYear>
+	<name>Guise Mummy BOM</name>
+	<description>Guise™ Mummy static site generator aggregate parent POM and bill of materials.</description>
+	<url>https://guise.io/mummy/</url>
+	<inceptionYear>2019</inceptionYear>
 
 	<organization>
 		<name>GlobalMentor, Inc.</name>
@@ -41,9 +41,9 @@
 	</licenses>
 
 	<scm>
-		<connection>scm:git:https://bitbucket.org/globalmentor/guise.git</connection>
-		<developerConnection>scm:git:https://bitbucket.org/globalmentor/guise.git</developerConnection>
-		<url>https://bitbucket.org/globalmentor/guise</url>
+		<connection>scm:git:https://bitbucket.org/globalmentor/guise-mummy.git</connection>
+		<developerConnection>scm:git:https://bitbucket.org/globalmentor/guise-mummy.git</developerConnection>
+		<url>https://bitbucket.org/globalmentor/guise-mummy</url>
 	</scm>
 
 	<properties>
@@ -53,8 +53,6 @@
 
 	<modules>
 		<module>cli</module>
-		<module>framework</module>
-		<module>framework-demo</module>
 		<module>mesh</module>
 		<module>mummy</module>
 		<module>tomcat</module>
@@ -84,56 +82,6 @@
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-core</artifactId>
 				<version>0.7.3</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-country-us</artifactId>
-				<version>0.6.2</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-ee</artifactId>
-				<version>0.6.4</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-iso-idcard</artifactId>
-				<version>0.6.2</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-itu</artifactId>
-				<version>0.6.1</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-mail</artifactId>
-				<version>0.6.1</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.sun.mail</groupId>
-				<artifactId>javax.mail</artifactId>
-				<version>1.6.2</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-text-directory-vcard</artifactId>
-				<version>0.6.3</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-text-elff</artifactId>
-				<version>0.6.1</version>
 			</dependency>
 
 			<dependency>
@@ -169,37 +117,25 @@
 			<dependency>
 				<groupId>io.guise</groupId>
 				<artifactId>guise-cli</artifactId>
-				<version>0.5.3</version>
-			</dependency>
-
-			<dependency>
-				<groupId>io.guise</groupId>
-				<artifactId>guise-framework</artifactId>
-				<version>0.5.3</version>
-			</dependency>
-
-			<dependency>
-				<groupId>io.guise</groupId>
-				<artifactId>guise-framework-demo</artifactId>
-				<version>0.5.3</version>
+				<version>0.6.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.guise</groupId>
 				<artifactId>guise-mesh</artifactId>
-				<version>0.5.3</version>
+				<version>0.6.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.guise</groupId>
 				<artifactId>guise-mummy</artifactId>
-				<version>0.5.3</version>
+				<version>0.6.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>io.guise</groupId>
 				<artifactId>guise-tomcat</artifactId>
-				<version>0.5.3</version>
+				<version>0.6.0-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
@@ -271,45 +207,4 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>net.alchim31.maven</groupId>
-					<artifactId>yuicompressor-maven-plugin</artifactId>
-					<version>1.5.1</version>
-				</plugin>
-
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<!-- TODO bring back when works on m2e and JavaScript files are moved 
-									back to globalmentor-core -->
-								<!-- <pluginExecution> -->
-								<!-- <pluginExecutionFilter> -->
-								<!-- <groupId>org.apache.maven.plugins</groupId> -->
-								<!-- <artifactId>maven-dependency-plugin</artifactId> -->
-								<!-- <versionRange>[2.4,)</versionRange> -->
-								<!-- <goals> -->
-								<!-- <goal>unpack</goal> -->
-								<!-- </goals> -->
-								<!-- </pluginExecutionFilter> -->
-								<!-- <action> -->
-								<!-- <ignore></ignore> -->
-								<!-- </action> -->
-								<!-- </pluginExecution> -->
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
 </project>

@@ -29,7 +29,7 @@ The initial release of Guise Mummy is completely functional, although the option
 
 ## Download
 
-Guise Mummy is available in the Maven Central Repository as [io.guise:guise-mummy](https://search.maven.org/search?q=g:io.guise%20AND%20a:guise-mummy). For building the entire Guise ecosystem see the documentation for the parent [Guise project](../).
+Guise Mummy is available in the Maven Central Repository as [io.guise:guise-mummy](https://search.maven.org/search?q=g:io.guise%20AND%20a:guise-mummy). For building the entire Guise ecosystem see the documentation for the parent [Guise Mummy project](../).
 
 ## Primer
 
