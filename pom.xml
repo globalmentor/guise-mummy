@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.globalmentor</groupId>
 		<artifactId>globalmentor-root</artifactId>
-		<version>0.8.13</version>
+		<version>0.8.15</version>
 	</parent>
 
 	<groupId>io.guise</groupId>
@@ -48,7 +48,7 @@
 
 	<properties>
 		<maven.compiler.release>11</maven.compiler.release>
-		<urf.version>0.4.1</urf.version>
+		<urf.version>0.4.2</urf.version>
 	</properties>
 
 	<modules>
@@ -69,7 +69,7 @@
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-application</artifactId>
-				<version>0.7.7</version>
+				<version>0.7.9</version>
 			</dependency>
 
 			<dependency>
@@ -85,14 +85,6 @@
 			</dependency>
 
 			<dependency>
-				<groupId>com.globalmentor</groupId>
-				<artifactId>globalmentor-web</artifactId>
-				<version>0.6.6</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-
-			<dependency>
 				<groupId>com.vladsch.flexmark</groupId>
 				<artifactId>flexmark-all</artifactId>
 				<version>0.50.50</version>
@@ -101,7 +93,7 @@
 			<dependency>
 				<groupId>io.clogr</groupId>
 				<artifactId>clogr-bom</artifactId>
-				<version>0.8.3</version>
+				<version>0.8.4</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -109,7 +101,15 @@
 			<dependency>
 				<groupId>io.confound</groupId>
 				<artifactId>confound-bom</artifactId>
-				<version>0.7.3</version>
+				<version>0.7.4</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>com.globalmentor</groupId>
+				<artifactId>globalmentor-web</artifactId>
+				<version>0.6.6</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -183,7 +183,7 @@
 			<dependency>
 				<groupId>org.apache.tomcat.embed</groupId>
 				<artifactId>tomcat-embed-core</artifactId>
-				<version>10.1.1</version>
+				<version>10.1.2</version>
 			</dependency>
 
 			<dependency>
