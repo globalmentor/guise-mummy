@@ -28,6 +28,7 @@ import static java.util.stream.StreamSupport.*;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import javax.annotation.*;
@@ -300,7 +301,7 @@ public class S3 implements DeployTarget, Clogged {
 				bucketHasPolicy = bucketHasPolicy(bucket);
 			} else { //create the bucket if it doesn't exist
 				getLogger().info("Creating S3 bucket `{}` in AWS region `{}`.", bucket, region);
-				s3Client.createBucket(request -> request.bucket(bucket).createBucketConfiguration(config -> config.locationConstraint(region.id())));
+				s3Client.createBucket(request -> request.bucket(bucket).createBucketConfiguration(configuringCreateBucketForRegion(region)));
 				bucketHasPolicy = false; //the bucket doesn't have a policy yet, as we just created it
 			}
 			//set bucket policy
@@ -308,6 +309,24 @@ public class S3 implements DeployTarget, Clogged {
 		} catch(final SdkException sdkException) {
 			throw new IOException(sdkException);
 		}
+	}
+
+	/**
+	 * Creates a configurator to set up the creation of a new bucket in a specific region.
+	 * @implSpec This implementation will not set the configuration location constraint if {@link Region#US_EAST_1} is specified, because this is the API default,
+	 *           and oddly it were explicitly set AWS would throw an exception.
+	 * @param region The region where the bucket will be created.
+	 * @return A configurator for specifying the region of a bucket being created.
+	 * @see CreateBucketConfiguration.Builder#locationConstraint(String)
+	 * @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateBucket.html">CreateBucket API</a>
+	 */
+	protected static Consumer<CreateBucketConfiguration.Builder> configuringCreateBucketForRegion(@Nonnull final Region region) {
+		final String regionId = region.id();
+		return config -> {
+			if(!regionId.equals(Region.US_EAST_1.id())) { //AWS will produce an error if we explicitly indicate the default
+				config.locationConstraint(regionId);
+			}
+		};
 	}
 
 	/**

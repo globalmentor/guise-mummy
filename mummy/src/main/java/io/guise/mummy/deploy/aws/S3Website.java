@@ -325,7 +325,7 @@ public class S3Website extends S3 {
 				getLogger().debug("Alternative bucket `{}` exists? {}.", altBucket, altBucketExists);
 				if(!altBucketExists) { //create the bucket if it doesn't exist
 					getLogger().info("Creating S3 alternative bucket `{}` in AWS region `{}`.", altBucket, region);
-					s3Client.createBucket(request -> request.bucket(altBucket).createBucketConfiguration(config -> config.locationConstraint(region.id())));
+					s3Client.createBucket(request -> request.bucket(altBucket).createBucketConfiguration(configuringCreateBucketForRegion(region)));
 				}
 			}
 		} catch(final SdkException sdkException) {
