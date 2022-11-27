@@ -47,7 +47,7 @@
 	</scm>
 
 	<properties>
-		<maven.compiler.release>11</maven.compiler.release>
+		<maven.compiler.release>17</maven.compiler.release>
 		<urf.version>0.4.2</urf.version>
 	</properties>
 
