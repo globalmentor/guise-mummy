@@ -6,6 +6,7 @@
 		<groupId>com.globalmentor</groupId>
 		<artifactId>globalmentor-root</artifactId>
 		<version>0.8.15</version>
+		<relativePath />
 	</parent>
 
 	<groupId>io.guise</groupId>
