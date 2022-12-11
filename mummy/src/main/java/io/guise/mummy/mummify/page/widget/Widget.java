@@ -24,7 +24,7 @@ import javax.annotation.*;
 import org.w3c.dom.*;
 
 import com.globalmentor.io.IllegalDataException;
-import com.globalmentor.xml.spec.NsName;
+import com.globalmentor.xml.def.NsName;
 
 import io.guise.mummy.*;
 import io.guise.mummy.mummify.page.PageMummifier;

@@ -17,7 +17,7 @@
 package io.guise.mummy.mummify.page;
 
 import static com.globalmentor.html.HtmlDom.*;
-import static com.globalmentor.html.spec.HTML.*;
+import static com.globalmentor.html.def.HTML.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static java.util.stream.Collectors.*;
 import static org.hamcrest.MatcherAssert.*;
@@ -32,8 +32,8 @@ import javax.annotation.*;
 import org.junit.jupiter.api.*;
 import org.w3c.dom.*;
 
-import com.globalmentor.html.spec.HTML;
-import com.globalmentor.xml.spec.NsName;
+import com.globalmentor.html.def.HTML;
+import com.globalmentor.xml.def.NsName;
 
 /**
  * Tests of {@link AbstractPageMummifier}.

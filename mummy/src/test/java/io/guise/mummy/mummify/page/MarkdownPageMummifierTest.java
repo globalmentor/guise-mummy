@@ -18,7 +18,7 @@ package io.guise.mummy.mummify.page;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static com.globalmentor.html.HtmlDom.*;
-import static com.globalmentor.html.spec.HTML.*;
+import static com.globalmentor.html.def.HTML.*;
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.OperatingSystem.*;
 import static com.globalmentor.xml.XmlDom.*;

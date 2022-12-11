@@ -16,7 +16,7 @@
 
 package io.guise.mummy.mummify.page.widget.directory;
 
-import static com.globalmentor.html.spec.HTML.*;
+import static com.globalmentor.html.def.HTML.*;
 import static com.globalmentor.java.Objects.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static io.guise.mummy.Artifact.PROPERTY_HANDLE_PUBLISHED_ON;
@@ -38,7 +38,7 @@ import org.w3c.dom.*;
 
 import com.globalmentor.collections.comparators.SortOrder;
 import com.globalmentor.io.IllegalDataException;
-import com.globalmentor.xml.spec.NsName;
+import com.globalmentor.xml.def.NsName;
 
 import io.guise.mummy.Artifact;
 import io.guise.mummy.GuiseMummy;

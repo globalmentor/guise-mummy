@@ -17,7 +17,7 @@
 package io.guise.mesh;
 
 import static com.globalmentor.html.HtmlDom.*;
-import static com.globalmentor.html.spec.HTML.*;
+import static com.globalmentor.html.def.HTML.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static io.guise.mesh.GuiseMesh.*;
 import static java.lang.String.format;
@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.w3c.dom.*;
 
 import com.globalmentor.html.HtmlSerializer;
-import com.globalmentor.xml.spec.NsName;
+import com.globalmentor.xml.def.NsName;
 
 /**
  * Tests of {@link GuiseMesh}.

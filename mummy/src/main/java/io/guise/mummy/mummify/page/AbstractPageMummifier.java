@@ -17,7 +17,7 @@
 package io.guise.mummy.mummify.page;
 
 import static com.globalmentor.html.HtmlDom.*;
-import static com.globalmentor.html.spec.HTML.*;
+import static com.globalmentor.html.def.HTML.*;
 import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
@@ -48,14 +48,14 @@ import javax.annotation.*;
 import org.w3c.dom.*;
 
 import com.globalmentor.html.*;
-import com.globalmentor.html.spec.HTML;
+import com.globalmentor.html.def.HTML;
 import com.globalmentor.io.IllegalDataException;
 import com.globalmentor.net.*;
-import com.globalmentor.rdfa.spec.RDFa;
+import com.globalmentor.rdfa.def.RDFa;
 import com.globalmentor.vocab.Curie;
 import com.globalmentor.vocab.*;
 import com.globalmentor.xml.*;
-import com.globalmentor.xml.spec.*;
+import com.globalmentor.xml.def.*;
 
 import io.guise.mesh.*;
 import io.guise.mummy.*;

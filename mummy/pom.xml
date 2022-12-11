@@ -36,7 +36,7 @@
 
 		<dependency>
 			<groupId>com.globalmentor</groupId>
-			<artifactId>globalmentor-rdfa-spec</artifactId>
+			<artifactId>globalmentor-rdfa-def</artifactId>
 		</dependency>
 
 		<dependency>

@@ -110,7 +110,7 @@
 			<dependency>
 				<groupId>com.globalmentor</groupId>
 				<artifactId>globalmentor-web</artifactId>
-				<version>0.6.6</version>
+				<version>0.7.0-SNAPSHOT</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>

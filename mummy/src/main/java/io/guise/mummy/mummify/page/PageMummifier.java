@@ -16,7 +16,7 @@
 
 package io.guise.mummy.mummify.page;
 
-import static com.globalmentor.html.spec.HTML.*;
+import static com.globalmentor.html.def.HTML.*;
 import static io.guise.mummy.GuiseMummy.*;
 import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.Files.*;
@@ -34,7 +34,7 @@ import org.w3c.dom.*;
 
 import com.globalmentor.net.MediaType;
 import com.globalmentor.net.URIPath;
-import com.globalmentor.xml.spec.NsName;
+import com.globalmentor.xml.def.NsName;
 
 import io.guise.mummy.*;
 import io.guise.mummy.mummify.Mummifier;

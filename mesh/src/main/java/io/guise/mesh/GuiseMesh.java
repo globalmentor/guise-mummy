@@ -32,7 +32,7 @@ import javax.annotation.*;
 
 import org.w3c.dom.*;
 
-import com.globalmentor.xml.spec.NsName;
+import com.globalmentor.xml.def.NsName;
 
 /**
  * Guise template transformation engine.

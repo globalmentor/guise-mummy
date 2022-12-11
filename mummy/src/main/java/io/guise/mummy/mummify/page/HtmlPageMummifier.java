@@ -16,10 +16,10 @@
 
 package io.guise.mummy.mummify.page;
 
-import static com.globalmentor.html.spec.HTML.*;
+import static com.globalmentor.html.def.HTML.*;
 import static com.globalmentor.io.InputStreams.*;
 import static com.globalmentor.io.Readers.*;
-import static com.globalmentor.xml.spec.XML.*;
+import static com.globalmentor.xml.def.XML.*;
 import static java.nio.charset.StandardCharsets.*;
 
 import java.io.*;
@@ -29,7 +29,7 @@ import java.util.Set;
 import org.w3c.dom.*;
 
 import com.globalmentor.io.*;
-import com.globalmentor.xml.spec.XML;
+import com.globalmentor.xml.def.XML;
 
 import io.guise.mummy.MummyContext;
 

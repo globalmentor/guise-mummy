@@ -37,7 +37,7 @@ import java.util.stream.Stream;
 
 import javax.annotation.*;
 
-import com.globalmentor.html.spec.HTML;
+import com.globalmentor.html.def.HTML;
 import com.globalmentor.io.Filenames;
 import com.globalmentor.net.MediaType;
 

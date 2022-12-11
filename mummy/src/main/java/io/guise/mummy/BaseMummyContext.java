@@ -16,7 +16,7 @@
 
 package io.guise.mummy;
 
-import static com.globalmentor.html.spec.HTML.*;
+import static com.globalmentor.html.def.HTML.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
 import static java.nio.file.Files.*;
@@ -31,7 +31,7 @@ import javax.xml.parsers.*;
 
 import org.xml.sax.*;
 
-import com.globalmentor.html.spec.HTML;
+import com.globalmentor.html.def.HTML;
 import com.globalmentor.io.Filenames;
 import com.globalmentor.xml.DefaultEntityResolver;
 

@@ -16,7 +16,7 @@
 
 package io.guise.mummy.mummify.page;
 
-import static com.globalmentor.html.spec.HTML.*;
+import static com.globalmentor.html.def.HTML.*;
 
 import java.io.*;
 import java.util.Set;
