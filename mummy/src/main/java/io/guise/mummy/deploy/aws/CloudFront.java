@@ -26,7 +26,7 @@ import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.IOException;
 import java.net.URI;
-import java.time.LocalDate;
+import java.time.*;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
@@ -54,6 +54,9 @@ import software.amazon.awssdk.services.cloudfront.model.*;
 
 /**
  * Sets up a <a href="https://aws.amazon.com/cloudfront/">CloudFront</a> distribution for the site.
+ * <p>
+ * If the distribution already exists, an invalidation request will be sent for all the files in the distribution, essentially "refreshing" the distribution.
+ * </p>
  * @implSpec This implementation requires an {@link S3Website} deployment to be specified in the configuration before this deployment. The S3 website bucket and
  *           aliases (which may or may not have been originally determined from the site domain and aliases) will be used as the certificate domain name and
  *           alternative names, respectively. If there is an existing certificate indicating the primary S3 website bucket, it will be used. This implementation
@@ -66,6 +69,12 @@ import software.amazon.awssdk.services.cloudfront.model.*;
  * @author Garret Wilson
  */
 public class CloudFront implements ContentDeliveryTarget, Clogged {
+
+	/**
+	 * The invalidation path to invalidate all the files in a distribution.
+	 * @see <a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html">Invalidating files</a>
+	 */
+	private static final String INVALIDATION_PATH_ALL = "/*";
 
 	/**
 	 * The region to use with ACM to work with CloudFront.
@@ -352,6 +361,18 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 					distributionId = distributionSummary.id();
 					distributionDomainName = DomainName.of(distributionSummary.domainName());
 					//TODO ensure that the existing distribution truly has the correct origin, i.e. to the S3 bucket
+
+					//Invalidate all the files in the existing distribution, so that any changes will take place immediately
+					//rather than waiting for catch expiration (up to 24 hours by default). A wildcard invalidation costs
+					//no more than a single path invalidation; the only drawback seems to be a smaller number of allowed
+					//concurrent invalidations with wildcards, which probably won't often be of consequence for site deployments.
+					final String invalidationBatchCallerReference = Instant.now().toString();
+					try {
+						cloudFrontClient.createInvalidation(request -> request.distributionId(distributionId).invalidationBatch(
+								batch -> batch.callerReference(invalidationBatchCallerReference).paths(paths -> paths.items(INVALIDATION_PATH_ALL).quantity(1))));
+					} catch(final TooManyInvalidationsInProgressException tooManyInvalidationsInProgressException) {
+						logger.warn("Unable to invalidate existing distribution `{}`; too many invalidations are alrady in progress.", distributionId);
+					}
 				}
 
 				//add an alias record to the new distribution if we have a Route 53 DNS
