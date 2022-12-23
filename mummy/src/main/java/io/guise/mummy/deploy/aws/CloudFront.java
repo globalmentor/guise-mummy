@@ -327,7 +327,7 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 				final String distributionId;
 				final DomainName distributionDomainName;
 				if(existingDistributionSummaries.isEmpty()) {
-					logger.info("Creating distribution for S3 bucket `{}`.", s3Bucket);
+					logger.info("Creating CloudFront distribution for S3 bucket `{}`.", s3Bucket);
 					final StringBuilder commentBuilder = new StringBuilder(); //CloudFront comments are limited to a little over 120 characters in length
 					commentBuilder.append("Created by ").append(context.getMummifierIdentification()); //i18n
 					commentBuilder.append(" on ").append(LocalDate.now()); //TODO i18n
@@ -368,8 +368,9 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 					//concurrent invalidations with wildcards, which probably won't often be of consequence for site deployments.
 					final String invalidationBatchCallerReference = Instant.now().toString();
 					try {
-						cloudFrontClient.createInvalidation(request -> request.distributionId(distributionId).invalidationBatch(
+						final CreateInvalidationResponse response = cloudFrontClient.createInvalidation(request -> request.distributionId(distributionId).invalidationBatch(
 								batch -> batch.callerReference(invalidationBatchCallerReference).paths(paths -> paths.items(INVALIDATION_PATH_ALL).quantity(1))));
+						logger.info("Refreshed CloudFront distribution `{}`;  invalidation ID `{}`.", distributionId, response.invalidation().id());
 					} catch(final TooManyInvalidationsInProgressException tooManyInvalidationsInProgressException) {
 						logger.warn("Unable to invalidate existing distribution `{}`; too many invalidations are alrady in progress.", distributionId);
 					}
