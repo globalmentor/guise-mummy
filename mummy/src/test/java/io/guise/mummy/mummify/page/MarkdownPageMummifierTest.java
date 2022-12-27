@@ -48,6 +48,7 @@ import io.urf.URF.Handle;
  */
 public class MarkdownPageMummifierTest {
 
+	public static final String CODE_JAVASCRIPT_MARKDOWN_RESOURCE_NAME = "code-javascript.md";
 	public static final String SIMPLE_MARKDOWN_RESOURCE_NAME = "simple.md";
 	public static final String SIMPLE_TITLE_MARKDOWN_RESOURCE_NAME = "simple-title.md";
 	public static final String SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME = "simple-metadata.md";
@@ -130,6 +131,31 @@ public class MarkdownPageMummifierTest {
 		assertThat(p.getLocalName(), is(ELEMENT_P));
 		assertThat(p.getNamespaceURI(), is(XHTML_NAMESPACE_URI_STRING));
 		assertThat(p.getTextContent(), is("Body text."));
+	}
+
+	/**
+	 * @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream)
+	 * @see #CODE_JAVASCRIPT_MARKDOWN_RESOURCE_NAME
+	 */
+	@Test
+	public void testCodeMarkdownLanguage() throws IOException {
+		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
+		final Document document;
+		try (final InputStream inputStream = getClass().getResourceAsStream(CODE_JAVASCRIPT_MARKDOWN_RESOURCE_NAME)) {
+			document = mummifier.loadSourceDocument(mummyContext, inputStream, CODE_JAVASCRIPT_MARKDOWN_RESOURCE_NAME);
+		}
+		final Node body = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
+		final List<Element> bodyElements = getChildElements(body);
+		assertThat(bodyElements, hasSize(1));
+		final Element pre = bodyElements.get(0);
+		assertThat(pre.getLocalName(), is(ELEMENT_PRE));
+		assertThat(pre.getNamespaceURI(), is(XHTML_NAMESPACE_URI_STRING));
+		final List<Element> preElements = getChildElements(pre);
+		assertThat(preElements, hasSize(1));
+		final Element code = preElements.get(0);
+		assertThat(code.getLocalName(), is(ELEMENT_CODE));
+		assertThat(code.getNamespaceURI(), is(XHTML_NAMESPACE_URI_STRING));
+		assertThat(code.getAttributeNS(null, ATTRIBUTE_CLASS), is("language-javascript"));
 	}
 
 	/**
