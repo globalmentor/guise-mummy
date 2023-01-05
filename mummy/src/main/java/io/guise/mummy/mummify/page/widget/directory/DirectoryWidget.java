@@ -213,9 +213,11 @@ public class DirectoryWidget implements Widget {
 													appendText(element, PUBLISHED_ON_FORMATTER.format(publishedOn));
 													return element;
 												});
-										//excerpt; only included if the item is a corporeal source artifact
+										//excerpt; only included if the item is a corporeal source artifact with a page mummifier
 										final Optional<Element> excerptElement = asInstance(item, CorporealSourceArtifact.class)
-												.flatMap(throwingFunction(sourceFileItem -> mummifier.loadSourceExcerpt(context, sourceFileItem))).map(excerpt -> {
+												.flatMap(sourceFileItem -> asInstance(sourceFileItem.getMummifier(), PageMummifier.class)
+														.<DocumentFragment>flatMap(throwingFunction(pageMummifier -> pageMummifier.loadSourceExcerpt(context, sourceFileItem))))
+												.map(excerpt -> {
 													//Wrap the excerpt in a <div>. The other option would be to import the document fragment children directly into the document,
 													//but wrapping the excerpt may be more semantically correct and more useful for styling in the future.
 													final Element excerptWrapper = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_DIV); //<div>
