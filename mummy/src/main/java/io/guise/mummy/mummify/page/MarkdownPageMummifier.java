@@ -44,7 +44,6 @@ import com.vladsch.flexmark.ext.emoji.EmojiExtension;
 import com.vladsch.flexmark.ext.emoji.EmojiImageType;
 import com.vladsch.flexmark.ext.superscript.SuperscriptExtension;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
-import com.vladsch.flexmark.ext.typographic.TypographicExtension;
 import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
@@ -77,7 +76,8 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 	 * <li>Page {@code <body>} content.</li>
 	 * </ol>
 	 */
-	private static final StringTemplate XHTML_TEMPLATE = StringTemplate.builder() //@formatter:off
+	private static final StringTemplate XHTML_TEMPLATE = StringTemplate
+			.builder() //@formatter:off
 					.text("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").newline()
 					.text("<!DOCTYPE html>").newline()
 					.text("<html xmlns=\"http://www.w3.org/1999/xhtml\">").newline() 
@@ -127,7 +127,7 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 				.set(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, true)
 				//extensions
 				.set(Parser.EXTENSIONS, List.of(DefinitionExtension.create(), EmojiExtension.create(), SuperscriptExtension.create(), TablesExtension.create(),
-						TypographicExtension.create(), YamlFrontMatterExtension.create()));
+						YamlFrontMatterExtension.create()));
 		parser = Parser.builder(parserOptions).build();
 		htmlRenderer = HtmlRenderer.builder().build();
 	}

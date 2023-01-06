@@ -23,6 +23,7 @@ import static com.globalmentor.io.Filenames.*;
 import static com.globalmentor.java.OperatingSystem.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static io.guise.mummy.mummify.page.MarkdownPageMummifier.*;
+import static java.nio.charset.StandardCharsets.*;
 import static java.util.stream.Collectors.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
@@ -59,6 +60,16 @@ public class MarkdownPageMummifierTest {
 	protected void setupContext() {
 		final GuiseProject project = new DefaultGuiseProject(getWorkingDirectory(), Configuration.empty());
 		mummyContext = new FakeMummyContext(project);
+	}
+
+	/**
+	 * Retrieves the text content of the first paragraph in the given document.
+	 * @param document The document from which to retrieve paragraph text.
+	 * @return The text of the first paragraph, which will not be present if there is no body element or paragraph element.
+	 */
+	protected Optional<String> findFirstParagraphText(@Nonnull final Document document) {
+		return findHtmlBodyElement(document).flatMap(bodyElement -> childElementsByNameNS(bodyElement, XHTML_NAMESPACE_URI_STRING, ELEMENT_P).findFirst())
+				.map(Element::getTextContent);
 	}
 
 	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
@@ -226,6 +237,24 @@ public class MarkdownPageMummifierTest {
 							//Open Graph namespace
 							Map.entry(URI.create("http://ogp.me/ns#type"), "website")));
 		}
+	}
+
+	/**
+	 * Tests whether typographic conversions are appropriately being made, such as converting "---" to em dash "—".
+	 * @implSpec Currently typographic conversions are disabled altogether because the Flexmark Typographic Extension seems to be dropping characters altogether
+	 *           (e.g. the apostrophe). These tests will be updated and expanded if the Typographic Extension or something like it is re-enabled, but for now it
+	 *           verifies that certain characters previously modified by the TYpographic Extension are not being dropped.
+	 * @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream)
+	 */
+	@Test
+	public void testTypographicConversions() throws IOException {
+		final String markdown = "it's working --- or not";
+		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
+		final Document document;
+		try (final InputStream inputStream = new ByteArrayInputStream(markdown.getBytes(UTF_8))) {
+			document = mummifier.loadSourceDocument(mummyContext, inputStream, "test");
+		}
+		assertThat(findFirstParagraphText(document), isPresentAndIs("it's working --- or not"));
 	}
 
 }
