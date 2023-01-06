@@ -1184,6 +1184,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	protected List<Element> relocateElement(@Nonnull MummyContext context, @Nonnull final Element sourceElement, @Nonnull final Path originalReferrerSourcePath,
 			final Function<Artifact, URIPath> referenceGenerator) throws IOException, DOMException {
 
+		//always relocate child elements, even if this element is to be relocated, to handle e.g. an image within a link
+		relocateChildElements(context, sourceElement, originalReferrerSourcePath, referenceGenerator);
+
 		//TODO transfer to some system of pluggable element relocating strategies
 		if(XHTML_NAMESPACE_URI_STRING.equals(sourceElement.getNamespaceURI())) {
 			//see if this is a referrer element, and get the attribute doing the referencing
@@ -1192,8 +1195,6 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				return relocateReferenceElement(context, sourceElement, referenceAttributeName, originalReferrerSourcePath, referenceGenerator);
 			}
 		}
-
-		relocateChildElements(context, sourceElement, originalReferrerSourcePath, referenceGenerator);
 
 		return List.of(sourceElement);
 	}
