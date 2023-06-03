@@ -20,6 +20,7 @@ import static com.globalmentor.collections.iterables.Iterables.*;
 import static com.globalmentor.net.HTTP.*;
 import static com.globalmentor.net.URIs.*;
 import static io.guise.mummy.deploy.aws.AWS.*;
+import static io.guise.mummy.deploy.aws.CloudFront.ManagedCachePolicyIds.CACHING_OPTIMIZED;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
 import static org.zalando.fauxpas.FauxPas.*;
@@ -91,6 +92,28 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 	 *      Request and Response Behavior for Custom Origins: User-Agent Header</a>
 	 */
 	public static final String USER_AGENT_IDENTIFICATION = "Amazon CloudFront";
+
+	/**
+	 * Managed cache policy IDs.
+	 * @see <a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html">Using the managed cache policies</a>
+	 */
+	public static final class ManagedCachePolicyIds {
+		/** <code>Amplify</code>: This policy is designed for use with an origin that is an AWS Amplify web app. */
+		public static final UUID AMPLIFY = UUID.fromString("2e54312d-136d-493c-8eb9-b001f22f67d2");
+		/** <code>CachingDisabled</code>: This policy disables caching. This policy is useful for dynamic content and for requests that are not cacheable. */
+		public static final UUID CACHING_DISABLED = UUID.fromString("4135ea2d-6df8-44a3-9df3-4b5a84be39ad");
+		/**
+		 * <code>CachingOptimized</code>: This policy is designed to optimize cache efficiency by minimizing the values that CloudFront includes in the cache key.
+		 */
+		public static final UUID CACHING_OPTIMIZED = UUID.fromString("658327ea-f89d-4fab-a63d-7e88639e58f6");
+		/**
+		 * <code>CachingOptimizedForUncompressedObjects</code>: This policy is designed to optimize cache efficiency by minimizing the values included in the cache
+		 * key.
+		 */
+		public static final UUID CACHING_OPTIMIZED_FOR_UNCOMPRESSED_OBJECTS = UUID.fromString("b2884449-e4de-46a7-ac36-70bc7f1ddd6d");
+		/** <code>Elemental-MediaPackage</code>: This policy is designed for use with an origin that is an AWS Elemental MediaPackage endpoint. */
+		public static final UUID ELEMENTAL_MEDIA_PACKAGE = UUID.fromString("08627262-05a9-4f76-9ded-b50ca2e3a84f");
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -341,11 +364,9 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 					final String acmCertificateArn = getAcmCertificateArn().orElseThrow(IllegalStateException::new);
 					final ViewerCertificate viewerCertificate = ViewerCertificate.builder() //use our ACM certificate and only allows browser that support SNI (as recommended)
 							.acmCertificateArn(acmCertificateArn).sslSupportMethod(SSLSupportMethod.SNI_ONLY).build();
-					final CookiePreference forwardCookies = CookiePreference.builder().forward(ItemSelection.NONE).build();
-					final boolean forwardQueries = false;
 					final DefaultCacheBehavior redirectToHttps = DefaultCacheBehavior.builder().viewerProtocolPolicy(ViewerProtocolPolicy.REDIRECT_TO_HTTPS)
-							.forwardedValues(forwardedValues -> forwardedValues.queryString(forwardQueries).cookies(forwardCookies)).targetOriginId(origin.id())
-							.trustedSigners(trustedSigners -> trustedSigners.enabled(false).quantity(0)).minTTL(0L).build();
+							.cachePolicyId(CACHING_OPTIMIZED.toString()).targetOriginId(origin.id())
+							.trustedSigners(trustedSigners -> trustedSigners.enabled(false).quantity(0)).build();
 					final String callerReference = UUID.randomUUID().toString(); //use a random UUID as the temporary caller reference (required)
 					final DistributionConfig distributionConfig = DistributionConfig.builder().origins(origins -> origins.items(origin).quantity(1)).aliases(aliases)
 							.defaultCacheBehavior(redirectToHttps).viewerCertificate(viewerCertificate).enabled(true).callerReference(callerReference)
