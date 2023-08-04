@@ -160,13 +160,9 @@ public class GuiseCli extends BaseCliApplication {
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Clean...").reset());
 		logProjectInfo(project);
 
-		if(exists(siteTargetDirectory)) {
-			deleteFileTree(siteTargetDirectory);
-		}
+		deleteFileTree(siteTargetDirectory);
 		if(!siteTargetDirectory.equals(siteDescriptionTargetDirectory)) {
-			if(exists(siteDescriptionTargetDirectory)) {
-				deleteFileTree(siteDescriptionTargetDirectory);
-			}
+			deleteFileTree(siteDescriptionTargetDirectory);
 		}
 
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Done.").reset());
