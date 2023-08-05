@@ -16,6 +16,7 @@
 
 package io.guise.mummy.deploy.aws;
 
+import static com.globalmentor.collections.iterables.Iterables.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.net.URIs.toCollectionURI;
@@ -23,7 +24,6 @@ import static io.guise.mummy.GuiseMummy.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
-import static java.util.stream.StreamSupport.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -163,7 +163,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @throws IllegalArgumentException if one of the user agent strings contains the quote <code>'"'</code> character.
 	 */
 	public static String policyConditionRequiringAnyUserAgentOf(@Nonnull final Iterable<String> userAgents) {
-		final String userAgentJsonArrayValues = stream(userAgents.spliterator(), false).map(userAgent -> {
+		final String userAgentJsonArrayValues = toStream(userAgents).map(userAgent -> {
 			checkArgument(!contains(userAgent, '"'), "User agent `%s` cannot contain a quote `\"` character.", userAgent);
 			return userAgent;
 		}).map(userAgent -> "\"" + userAgent + "\"").collect(joining(","));
