@@ -28,6 +28,7 @@ import org.apache.commons.jexl3.introspection.*;
 
 import io.urf.URF;
 import io.urf.model.UrfResourceDescription;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Pluggable strategy for evaluating Mesh Expression Language (MEXL) expressions.
@@ -84,7 +85,7 @@ public class JexlMexlEvaluator implements MexlEvaluator {
 
 	/** This class cannot be publicly instantiated. */
 	private JexlMexlEvaluator() {
-		jexl = new JexlBuilder().strategy(RESOLVER_STRATEGY).create();
+		jexl = new JexlBuilder().logger(LogFactory.getLog(JexlMexlEvaluator.class)).strategy(RESOLVER_STRATEGY).create();
 	}
 
 	@Override
