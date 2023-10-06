@@ -84,7 +84,7 @@ public class JexlMexlEvaluator implements MexlEvaluator {
 
 	/** This class cannot be publicly instantiated. */
 	private JexlMexlEvaluator() {
-		jexl = new JexlBuilder().strategy(RESOLVER_STRATEGY).create();
+		jexl = new JexlBuilder().permissions(JexlPermissions.UNRESTRICTED).strategy(RESOLVER_STRATEGY).create();
 	}
 
 	@Override
