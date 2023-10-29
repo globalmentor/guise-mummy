@@ -16,8 +16,6 @@
 
 package io.guise.mummy.deploy;
 
-import static com.globalmentor.collections.Lists.*;
-
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
@@ -70,7 +68,7 @@ public abstract class AbstractDns implements Dns, Clogged {
 	 */
 	public AbstractDns(@Nonnull final DomainName origin, @Nonnull final Collection<ResourceRecord> resourceRecords) {
 		this.origin = origin.checkArgumentAbsolute();
-		this.resourceRecords = immutableListOf(resourceRecords);
+		this.resourceRecords = List.copyOf(resourceRecords);
 	}
 
 	/**

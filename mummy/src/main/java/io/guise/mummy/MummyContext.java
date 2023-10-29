@@ -245,7 +245,7 @@ public interface MummyContext {
 			return sourceFiles.filter(not(Files::isDirectory)) //ignore directories
 					.filter(byBaseFilename(baseFilename)) //filter by the base filename
 					.flatMap(sourceFile -> findRegisteredMummifierForSourceFile(sourceFile).filter(PageMummifier.class::isInstance).map(PageMummifier.class::cast)
-							.map(pageMummifier -> (Map.Entry<Path, PageMummifier>)new AbstractMap.SimpleImmutableEntry<>(sourceFile, pageMummifier)).stream()) //TODO use entry factory
+							.map(pageMummifier -> Map.entry(sourceFile, pageMummifier)).stream()) //TODO use entry factory
 					.findAny().or(throwingSupplier(() -> {
 						if(searchAncestors && !sourceDirectory.equals(siteSourceDirectory)) {
 							final Path parentDirectory = sourceDirectory.getParent(); //TODO if create utility Optional-returning parent utility method
