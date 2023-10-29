@@ -49,7 +49,6 @@ import org.w3c.dom.*;
 
 import com.globalmentor.html.*;
 import com.globalmentor.html.def.HTML;
-import com.globalmentor.io.IllegalDataException;
 import com.globalmentor.net.*;
 import com.globalmentor.rdfa.def.RDFa;
 import com.globalmentor.vocab.Curie;
@@ -60,6 +59,8 @@ import com.globalmentor.xml.def.*;
 import io.guise.mesh.*;
 import io.guise.mummy.*;
 import io.guise.mummy.mummify.AbstractFileMummifier;
+import io.guise.mummy.mummify.MummifyException;
+import io.guise.mummy.mummify.page.widget.MummifyWidgetException;
 import io.guise.mummy.mummify.page.widget.Widget;
 import io.guise.mummy.mummify.page.widget.directory.DirectoryWidget;
 import io.urf.URF;
@@ -374,7 +375,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		sourceDocument.normalize(); //**Do not call `document.normalizeDocument()`**; see note in `normalizeDocument()` below.
 		try {
 			return extractMetadata(context, sourceDocument);
-		} catch(final IllegalArgumentException | IllegalDataException | DOMException exception) {
+		} catch(final IllegalArgumentException | MummifyException | DOMException exception) { //TODO ensure `MummifyException` can be thrown; see GUISE-225 
 			throw new IOException(String.format("Error processing metadata in `%s`: %s", name, exception.getLocalizedMessage()), exception); //TODO i18n
 		}
 	}
@@ -477,7 +478,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			}
 			getLogger().trace("Generated page output document `{}`.", artifact.getTargetPath());
 
-		} catch(final IllegalArgumentException | IllegalDataException | MeshException | DOMException exception) { //convert input errors and XML errors to I/O errors
+		} catch(final IllegalArgumentException | MummifyException | MeshException | DOMException exception) { //convert input errors and XML errors to I/O errors
 			throw new IOException(String.format("Error mummifying page `%s`: %s", artifact.getSourcePath(), exception.getLocalizedMessage()), exception); //TODO i18n
 		}
 
@@ -582,12 +583,12 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param artifact The artifact being generated
 	 * @param sourceDocument The source document to process.
 	 * @return The document after applying a template, which may or may not be the same document supplied as input.
-	 * @throws IllegalDataException if there is an error in the template or the source document preventing the template from being applied.
+	 * @throws MummifyPageTemplateException if there is an error in the template or the source document preventing the template from being applied.
 	 * @throws IOException if there is an error applying a template.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	protected Document applyTemplate(@Nonnull MummyContext context, @Nonnull final Artifact artifact, @Nonnull final Document sourceDocument)
-			throws IOException, IllegalDataException, DOMException {
+			throws IOException, MummifyPageTemplateException, DOMException {
 		return findTemplateSourceFile(context, artifact, sourceDocument) //determine if there is a specified or appropriate template
 				.flatMap(throwingFunction(templateSource -> { //try to apply the template
 					final Path templateFile = templateSource.getKey();
@@ -703,10 +704,11 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param templateDocument The template into which the source document links are to be merged; must have a {@code <head>} element.
 	 * @param sourceDocument The source document the links of which are being merged.
 	 * @throws IllegalArgumentException if the template does not have a {@code <head>} element.
-	 * @throws IllegalDataException if there is an error with the links being merged.
+	 * @throws MummifyPageTemplateException if there is an error with the links being merged.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	protected void mergeHeadLinks(@Nonnull final Document templateDocument, @Nonnull final Document sourceDocument) throws IllegalDataException, DOMException {
+	protected void mergeHeadLinks(@Nonnull final Document templateDocument, @Nonnull final Document sourceDocument)
+			throws MummifyPageTemplateException, DOMException {
 		//find all the source document head link elements and map them to the links, but still maintain order
 		final Map<URI, Element> sourceDocumentHeadLinkElementsByLink = findHtmlHeadElement(sourceDocument).stream().flatMap(XmlDom::childElementsOf)
 				.filter(element -> XHTML_NAMESPACE_URI_STRING.equals(element.getNamespaceURI())).flatMap(element -> { //only look at HTML elements
@@ -745,7 +747,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 							try {
 								referenceURI = new URI(referenceString).normalize();
 							} catch(final URISyntaxException uriSyntaxException) {
-								throw new IllegalDataException(String.format("Invalid template <head><%s> reference %s: %s", templateHeadChildElement.getLocalName(),
+								throw new MummifyPageTemplateException(String.format("Invalid template <head><%s> reference %s: %s", templateHeadChildElement.getLocalName(),
 										referenceString, uriSyntaxException.getLocalizedMessage()));
 							}
 							//we'll eventually remove this element if it's a template duplicate or if it is present in the source document
@@ -790,11 +792,12 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param templateDocument The template into which the source document scripts are to be merged; must have a {@code <head>} element.
 	 * @param sourceDocument The source document from which the scripts are being imported.
 	 * @throws IllegalArgumentException if the template does not have a {@code <head>} element.
-	 * @throws IllegalDataException if there is an error importing the scripts.
+	 * @throws MummifyPageTemplateException if there is an error importing the scripts.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 * @see <a href="https://www.w3.org/TR/html52/semantics-scripting.html#the-script-element">HTML 5.2 § 4.12.1. The script element</a>
 	 */
-	protected void importHeadScripts(@Nonnull final Document templateDocument, @Nonnull final Document sourceDocument) throws IllegalDataException, DOMException {
+	protected void importHeadScripts(@Nonnull final Document templateDocument, @Nonnull final Document sourceDocument)
+			throws MummifyPageTemplateException, DOMException {
 		final Element templateHeadElement = findHtmlHeadElement(templateDocument)
 				.orElseThrow(() -> new IllegalArgumentException("Template missing <head> element."));
 		findHtmlHeadElement(sourceDocument).stream().flatMap(XmlDom::childElementsOf).filter(XHTML_ELEMENT_SCRIPT::matches) //find all <script> elements
@@ -808,11 +811,12 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	 * @param templateDocument The template into which the source document styles are to be merged; must have a {@code <head>} element.
 	 * @param sourceDocument The source document from which the styles are being imported.
 	 * @throws IllegalArgumentException if the template does not have a {@code <head>} element.
-	 * @throws IllegalDataException if there is an error importing the styles.
+	 * @throws MummifyPageTemplateException if there is an error importing the styles.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 * @see <a href="https://www.w3.org/TR/html52/document-metadata.html#the-style-element">HTML 5.2 § 4.2.6. The style element</a>
 	 */
-	protected void importHeadStyles(@Nonnull final Document templateDocument, @Nonnull final Document sourceDocument) throws IllegalDataException, DOMException {
+	protected void importHeadStyles(@Nonnull final Document templateDocument, @Nonnull final Document sourceDocument)
+			throws MummifyPageTemplateException, DOMException {
 		final Element templateHeadElement = findHtmlHeadElement(templateDocument)
 				.orElseThrow(() -> new IllegalArgumentException("Template missing <head> element."));
 		findHtmlHeadElement(sourceDocument).stream().flatMap(XmlDom::childElementsOf).filter(XHTML_ELEMENT_STYLE::matches) //find all <style> elements
@@ -895,9 +899,9 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		if(widget != null) {
 			try {
 				return widget.processElement(this, context, artifact, sourceElement);
-			} catch(final IllegalDataException illegalDataException) { //make widget illegal argument errors more useful
+			} catch(final MummifyWidgetException widgetException) { //make widget errors more useful TODO consider allowing all `MummifyException`s propagate up; see new exceptions from GUISE-225
 				throw new IOException(String.format("Invalid data for widget `%s` in `%s`: %s", widget.getWidgetElementName(), artifact.getSourceDirectory(),
-						illegalDataException.getLocalizedMessage()), illegalDataException); //TODO i18n
+						widgetException.getLocalizedMessage()), widgetException); //TODO i18n
 			}
 		}
 

@@ -23,7 +23,6 @@ import javax.annotation.*;
 
 import org.w3c.dom.*;
 
-import com.globalmentor.io.IllegalDataException;
 import com.globalmentor.xml.def.NsName;
 
 import io.guise.mummy.*;
@@ -51,10 +50,10 @@ public interface Widget {
 	 * @param widgetElement The list element to regenerate.
 	 * @return The processed element(s), if any, to replace the widget source element.
 	 * @throws IOException if there is an I/O error processing the element.
-	 * @throws IllegalDataException if the information in the widget element is not appropriate for the widget.
+	 * @throws MummifyWidgetException if the information in the widget element is not appropriate for the widget.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	public List<Element> processElement(@Nonnull PageMummifier mummifier, @Nonnull MummyContext context, @Nonnull Artifact artifact,
-			@Nonnull Element widgetElement) throws IOException, IllegalDataException, DOMException;
+			@Nonnull Element widgetElement) throws IOException, MummifyWidgetException, DOMException;
 
 }

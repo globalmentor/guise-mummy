@@ -37,7 +37,6 @@ import javax.annotation.*;
 import org.w3c.dom.*;
 
 import com.globalmentor.collections.comparators.SortOrder;
-import com.globalmentor.io.IllegalDataException;
 import com.globalmentor.xml.def.NsName;
 
 import io.guise.mummy.Artifact;
@@ -45,7 +44,7 @@ import io.guise.mummy.GuiseMummy;
 import io.guise.mummy.MummyContext;
 import io.guise.mummy.CorporealSourceArtifact;
 import io.guise.mummy.mummify.page.PageMummifier;
-import io.guise.mummy.mummify.page.widget.Widget;
+import io.guise.mummy.mummify.page.widget.*;
 
 /**
  * A widget representing a "directory" or "index" of artifacts.
@@ -113,48 +112,46 @@ public class DirectoryWidget implements Widget {
 					//strip off the sort order if needed
 					final String groupByValue = foundSortOrder.map(sortOrder -> groupBy.substring(1)).orElse(groupBy);
 					switch(groupByValue) {
-						case GROUP_BY_PUBLICATION_DATE:
-							{
-								final Map<Optional<LocalDate>, List<Artifact>> itemsByFoundPublicationDate = items.collect(groupingBy(
-										item -> item.getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON).flatMap(asInstance(LocalDate.class))));
-								final Stream<Map.Entry<Optional<LocalDate>, List<Artifact>>> groups = itemsByFoundPublicationDate.entrySet().stream();
-								final Stream<Map.Entry<Optional<LocalDate>, List<Artifact>>> sortedGroups = foundSortOrder.map(sortOrder -> sortOrder //sort by date, nulls first, reversing if necessary
-										.applyTo(Comparator.<Map.Entry<Optional<LocalDate>, List<Artifact>>, LocalDate>comparing(entry -> entry.getKey().orElse(null),
-												nullsFirst(naturalOrder()))))
-										.map(groups::sorted).orElse(groups);
-								sortedGroups.forEach(throwingConsumer(itemsForFoundPublicationDate -> {
-									final Optional<LocalDate> foundPublicationDate = itemsForFoundPublicationDate.getKey();
-									final Element groupHeadingElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_H2); //<h2>
-									final String publicationDateText = foundPublicationDate.map(PUBLISHED_ON_FORMATTER::format).orElse("?"); //TODO fix text
-									appendText(groupHeadingElement, publicationDateText);
-									groupedItemElements.add(groupHeadingElement);
-									groupedItemElements
-											.addAll(generateItemElements(mummifier, context, artifact, widgetElement, 3, itemsForFoundPublicationDate.getValue().stream()));
-								}));
-							}
+						case GROUP_BY_PUBLICATION_DATE: {
+							final Map<Optional<LocalDate>, List<Artifact>> itemsByFoundPublicationDate = items.collect(groupingBy(
+									item -> item.getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON).flatMap(asInstance(LocalDate.class))));
+							final Stream<Map.Entry<Optional<LocalDate>, List<Artifact>>> groups = itemsByFoundPublicationDate.entrySet().stream();
+							final Stream<Map.Entry<Optional<LocalDate>, List<Artifact>>> sortedGroups = foundSortOrder.map(sortOrder -> sortOrder //sort by date, nulls first, reversing if necessary
+									.applyTo(Comparator.<Map.Entry<Optional<LocalDate>, List<Artifact>>, LocalDate>comparing(entry -> entry.getKey().orElse(null),
+											nullsFirst(naturalOrder()))))
+									.map(groups::sorted).orElse(groups);
+							sortedGroups.forEach(throwingConsumer(itemsForFoundPublicationDate -> {
+								final Optional<LocalDate> foundPublicationDate = itemsForFoundPublicationDate.getKey();
+								final Element groupHeadingElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_H2); //<h2>
+								final String publicationDateText = foundPublicationDate.map(PUBLISHED_ON_FORMATTER::format).orElse("?"); //TODO fix text
+								appendText(groupHeadingElement, publicationDateText);
+								groupedItemElements.add(groupHeadingElement);
+								groupedItemElements
+										.addAll(generateItemElements(mummifier, context, artifact, widgetElement, 3, itemsForFoundPublicationDate.getValue().stream()));
+							}));
+						}
 							break;
-						case GROUP_BY_PUBLICATION_YEAR:
-							{
-								final Map<Optional<Year>, List<Artifact>> itemsByFoundPublicationYear = items.collect(groupingBy(item -> item.getResourceDescription()
-										.findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON).flatMap(asInstance(LocalDate.class)).map(Year::from)));
-								final Stream<Map.Entry<Optional<Year>, List<Artifact>>> groups = itemsByFoundPublicationYear.entrySet().stream();
-								final Stream<Map.Entry<Optional<Year>, List<Artifact>>> sortedGroups = foundSortOrder.map(sortOrder -> sortOrder //sort by year, nulls first, reversing if necessary
-										.applyTo(Comparator.<Map.Entry<Optional<Year>, List<Artifact>>, Year>comparing(entry -> entry.getKey().orElse(null),
-												nullsFirst(naturalOrder()))))
-										.map(groups::sorted).orElse(groups);
-								sortedGroups.forEach(throwingConsumer(itemsForFoundPublicationYear -> {
-									final Optional<Year> foundPublicationYear = itemsForFoundPublicationYear.getKey();
-									final Element groupHeadingElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_H2); //<h2>
-									final String publicationYear = foundPublicationYear.map(Year::toString).orElse("?"); //TODO fix text
-									appendText(groupHeadingElement, publicationYear);
-									groupedItemElements.add(groupHeadingElement);
-									groupedItemElements
-											.addAll(generateItemElements(mummifier, context, artifact, widgetElement, 3, itemsForFoundPublicationYear.getValue().stream()));
-								}));
-							}
+						case GROUP_BY_PUBLICATION_YEAR: {
+							final Map<Optional<Year>, List<Artifact>> itemsByFoundPublicationYear = items.collect(groupingBy(item -> item.getResourceDescription()
+									.findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON).flatMap(asInstance(LocalDate.class)).map(Year::from)));
+							final Stream<Map.Entry<Optional<Year>, List<Artifact>>> groups = itemsByFoundPublicationYear.entrySet().stream();
+							final Stream<Map.Entry<Optional<Year>, List<Artifact>>> sortedGroups = foundSortOrder.map(sortOrder -> sortOrder //sort by year, nulls first, reversing if necessary
+									.applyTo(
+											Comparator.<Map.Entry<Optional<Year>, List<Artifact>>, Year>comparing(entry -> entry.getKey().orElse(null), nullsFirst(naturalOrder()))))
+									.map(groups::sorted).orElse(groups);
+							sortedGroups.forEach(throwingConsumer(itemsForFoundPublicationYear -> {
+								final Optional<Year> foundPublicationYear = itemsForFoundPublicationYear.getKey();
+								final Element groupHeadingElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_H2); //<h2>
+								final String publicationYear = foundPublicationYear.map(Year::toString).orElse("?"); //TODO fix text
+								appendText(groupHeadingElement, publicationYear);
+								groupedItemElements.add(groupHeadingElement);
+								groupedItemElements
+										.addAll(generateItemElements(mummifier, context, artifact, widgetElement, 3, itemsForFoundPublicationYear.getValue().stream()));
+							}));
+						}
 							break;
 						default:
-							throw new IllegalDataException(String.format("Unrecognized `%s` attribute value `%s`.", ATTRIBUTE_GROUP_BY, groupBy));
+							throw new MummifyWidgetException(String.format("Unrecognized `%s` attribute value `%s`.", ATTRIBUTE_GROUP_BY, groupBy));
 					}
 					return groupedItemElements;
 				})
@@ -173,12 +170,12 @@ public class DirectoryWidget implements Widget {
 	 * @param items The directory items to process.
 	 * @return The generated items to represent the items. There may not be a one-to-one correspondence between items and generated elements.
 	 * @throws IOException if there is an I/O error processing the element.
-	 * @throws IllegalDataException if the information in the widget element is not appropriate for the widget.
+	 * @throws MummifyWidgetException if the information in the widget element is not appropriate for the widget.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	public List<Element> generateItemElements(@Nonnull final PageMummifier mummifier, @Nonnull final MummyContext context, @Nonnull final Artifact artifact,
 			@Nonnull final Element widgetElement, @Nonnegative final int headingLevel, Stream<Artifact> items)
-			throws IOException, IllegalDataException, DOMException {
+			throws IOException, MummifyWidgetException, DOMException {
 		final Document document = widgetElement.getOwnerDocument();
 		final Collator titleCollator = Collator.getInstance(); //TODO i18n: get locale for page, defaulting to site locale
 		titleCollator.setDecomposition(Collator.CANONICAL_DECOMPOSITION);
@@ -188,7 +185,7 @@ public class DirectoryWidget implements Widget {
 					switch(archetype) {
 						case ARCHETYPE_BLOG:
 							if(findAttribute(widgetElement, ATTRIBUTE_GROUP_BY).isPresent()) {
-								throw new IllegalDataException(
+								throw new MummifyWidgetException(
 										String.format("Attribute `%s` not allowed with attribute `%s` value `%s`.", ATTRIBUTE_GROUP_BY, ATTRIBUTE_ARCHETYPE, archetype));
 							}
 							return items.sorted( //sort the items in reverse order of (published-on date followed by undated artifacts), secondarily by determined title
@@ -234,7 +231,7 @@ public class DirectoryWidget implements Widget {
 									}).skip(1) //skip the first separator so that separators will only appear between posts
 									.collect(toList());
 						default:
-							throw new IllegalDataException(String.format("Unrecognized `%s` attribute value `%s`.", ATTRIBUTE_ARCHETYPE, archetype));
+							throw new MummifyWidgetException(String.format("Unrecognized `%s` attribute value `%s`.", ATTRIBUTE_ARCHETYPE, archetype));
 					}
 				}).orElseGet(() -> { //no archetype
 					final Element ulElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_UL); //<ul>
