@@ -37,9 +37,9 @@ import com.globalmentor.io.Filenames;
 import com.globalmentor.io.Paths;
 import com.globalmentor.java.Objects;
 
+import io.urf.format.turf.TURF;
+import io.urf.format.turf.TurfParser;
 import io.urf.model.*;
-import io.urf.turf.TURF;
-import io.urf.turf.TurfParser;
 import io.urf.vocab.content.Content;
 
 /**

@@ -46,7 +46,7 @@ import io.guise.mummy.mummify.*;
 import io.guise.mummy.mummify.collection.DirectoryMummifier;
 import io.guise.mummy.mummify.image.ImageMummifier;
 import io.guise.mummy.mummify.page.PageMummifier;
-import io.urf.turf.TurfSerializer;
+import io.urf.format.turf.TurfSerializer;
 
 /**
  * Guise static site generator.

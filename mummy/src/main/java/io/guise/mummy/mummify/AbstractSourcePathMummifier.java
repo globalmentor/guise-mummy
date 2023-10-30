@@ -28,8 +28,8 @@ import javax.annotation.*;
 import com.globalmentor.java.Objects;
 
 import io.guise.mummy.*;
+import io.urf.format.turf.*;
 import io.urf.model.*;
-import io.urf.turf.*;
 
 /**
  * Abstract mummifier for generating artifacts based upon a single source file or directory.

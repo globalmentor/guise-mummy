@@ -35,8 +35,8 @@ import javax.annotation.*;
 import io.clogr.Clogr;
 import io.guise.mummy.*;
 import io.urf.URF;
+import io.urf.format.turf.*;
 import io.urf.model.*;
-import io.urf.turf.*;
 
 /**
  * An abstract mummifier to serve as a base class for mummifiers generally.

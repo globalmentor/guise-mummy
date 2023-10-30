@@ -45,8 +45,8 @@ import io.clogr.Clogged;
 import io.guise.mummy.*;
 import io.urf.model.SimpleGraphUrfProcessor;
 import io.urf.model.UrfResourceDescription;
-import io.urf.turf.TURF;
-import io.urf.turf.TurfParser;
+import io.urf.format.turf.TURF;
+import io.urf.format.turf.TurfParser;
 
 /**
  * Strategy for loading and sorting navigation.
