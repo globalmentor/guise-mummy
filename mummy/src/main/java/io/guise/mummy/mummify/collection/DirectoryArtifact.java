@@ -137,7 +137,7 @@ public class DirectoryArtifact extends AbstractArtifact implements SourcePathArt
 	public Set<Path> getReferentSourcePaths() {
 		final Set<Path> defaultReferenceSourcePaths = super.getReferentSourcePaths();
 		//add the content artifact, if present, to the referent source paths
-		return findContentArtifact().map(contentArtifact -> immutableSetOf(defaultReferenceSourcePaths, contentArtifact.getSourcePath()))
+		return findContentArtifact().map(contentArtifact -> unionCopyOf(defaultReferenceSourcePaths, contentArtifact.getSourcePath()))
 				.orElse(defaultReferenceSourcePaths);
 	}
 

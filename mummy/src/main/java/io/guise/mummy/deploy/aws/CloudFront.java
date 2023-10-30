@@ -273,7 +273,7 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 			}
 
 			//apparently the domain alternative names _includes_ the domain name itself
-			if(!Set.copyOf(certificateDetail.subjectAlternativeNames()).equals(Sets.immutableSetOf(aliases, domain))) {
+			if(!Set.copyOf(certificateDetail.subjectAlternativeNames()).equals(Sets.unionCopyOf(aliases, domain))) {
 				logger.warn("Certificate `{}` alternate names `{}` do not match site domain {} and aliases `{}`.", certificateArn,
 						List.copyOf(certificateDetail.subjectAlternativeNames()), domain, aliases);
 			}
