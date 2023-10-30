@@ -21,7 +21,7 @@
 
 		<dependency>
 			<groupId>io.urf</groupId>
-			<artifactId>turf</artifactId>
+			<artifactId>format-turf</artifactId>
 		</dependency>
 
 		<dependency>

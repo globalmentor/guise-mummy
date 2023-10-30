@@ -27,7 +27,7 @@ import com.globalmentor.security.MessageDigests;
 
 import io.clogr.Clogged;
 import io.guise.mummy.*;
-import io.urf.turf.TURF;
+import io.urf.format.turf.TURF;
 import io.urf.vocab.content.Content;
 
 /**
