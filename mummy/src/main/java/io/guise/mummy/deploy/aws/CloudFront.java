@@ -32,7 +32,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import org.slf4j.Logger;
 
@@ -171,7 +171,7 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 	 * @param localConfiguration The local configuration for this deployment target, which may be a section of the project configuration.
 	 * @see AWS#CONFIG_KEY_DEPLOY_AWS_PROFILE
 	 */
-	public CloudFront(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
+	public CloudFront(@NonNull final MummyContext context, @NonNull final Configuration localConfiguration) {
 		this(context.getConfiguration().findString(CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null));
 	}
 
@@ -427,7 +427,7 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 	 * @throws SdkException if an error occurs related to AWS.
 	 * @see CertificateSummary#domainName()
 	 */
-	protected static Set<CertificateSummary> getCertificateSummariesByDomainName(@Nonnull final AcmClient client, @Nonnull final String domainName)
+	protected static Set<CertificateSummary> getCertificateSummariesByDomainName(@NonNull final AcmClient client, @NonNull final String domainName)
 			throws SdkException {
 		requireNonNull(domainName);
 		try (final Stream<CertificateSummary> certificateSummariesByDomainName = certificateSummaries(client)
@@ -442,7 +442,7 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 	 * @return A stream of summaries of all certificate.
 	 * @throws SdkException if an error occurs related to AWS.
 	 */
-	protected static Stream<CertificateSummary> certificateSummaries(@Nonnull final AcmClient client) throws SdkException {
+	protected static Stream<CertificateSummary> certificateSummaries(@NonNull final AcmClient client) throws SdkException {
 		return client.listCertificatesPaginator().stream().flatMap(response -> response.certificateSummaryList().stream());
 	}
 
@@ -460,7 +460,7 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 	 * @see DistributionSummary#aliases()
 	 * @see Aliases
 	 */
-	protected static Set<DistributionSummary> getDistributionSummariesByAliases(@Nonnull final CloudFrontClient client, @Nonnull final Set<String> aliases)
+	protected static Set<DistributionSummary> getDistributionSummariesByAliases(@NonNull final CloudFrontClient client, @NonNull final Set<String> aliases)
 			throws SdkException {
 		requireNonNull(aliases);
 		try (final Stream<DistributionSummary> distributionSummariesByAliases = distributionSummaries(client)
@@ -477,7 +477,7 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 	 * @return A stream of summaries of all distributions.
 	 * @throws SdkException if an error occurs related to AWS.
 	 */
-	protected static Stream<DistributionSummary> distributionSummaries(@Nonnull final CloudFrontClient client) throws SdkException {
+	protected static Stream<DistributionSummary> distributionSummaries(@NonNull final CloudFrontClient client) throws SdkException {
 		final List<DistributionSummary> distributionSummaries = new ArrayList<>();
 		ListDistributionsRequest request = ListDistributionsRequest.builder().build();
 		ListDistributionsResponse response;

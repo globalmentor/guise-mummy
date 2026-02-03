@@ -35,7 +35,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.stream.Stream;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import org.slf4j.Logger;
 
@@ -150,7 +150,7 @@ public class S3Website extends S3 {
 	 * @see <a href="https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_website_region_endpoints">Amazon Simple Storage Service Website Endpoints</a>
 	 * @see PartitionMetadata#hostname()
 	 */
-	public static String getBucketWebsiteEndpoint(@Nonnull final String bucket, @Nonnull final Region region) {
+	public static String getBucketWebsiteEndpoint(@NonNull final String bucket, @NonNull final Region region) {
 		final String s3WebsiteRegionDelimiter = WEBSITE_ENDPOINT_DASH_REGIONS.contains(region) ? ENDPOINT_S3_WEBSITE_REGION_DELIMITER_DASH
 				: ENDPOINT_S3_WEBSITE_REGION_DELIMITER_DOT;
 		return BUCKET_WEBSITE_ENDPOINT_TEMPLATE.apply(bucket, s3WebsiteRegionDelimiter, region.id(), region.metadata().domain());
@@ -165,7 +165,7 @@ public class S3Website extends S3 {
 	 * @see <a href="https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_website_region_endpoints">Amazon Simple Storage Service Website Endpoints</a>
 	 * @see PartitionMetadata#hostname()
 	 */
-	public static URI getBucketWebsiteUrl(@Nonnull final String bucket, @Nonnull final Region region) {
+	public static URI getBucketWebsiteUrl(@NonNull final String bucket, @NonNull final Region region) {
 		return createURI(HTTP_URI_SCHEME, null, getBucketWebsiteEndpoint(bucket, region), -1, URIs.ROOT_PATH, null, null);
 	}
 
@@ -250,7 +250,7 @@ public class S3Website extends S3 {
 	 * @see #getConfiguredBucket(Configuration, Configuration)
 	 * @see #getConfiguredAltBuckets(Configuration, Configuration)
 	 */
-	public S3Website(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
+	public S3Website(@NonNull final MummyContext context, @NonNull final Configuration localConfiguration) {
 		this(context.getConfiguration().findString(AWS.CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null), Region.of(localConfiguration.getString(CONFIG_KEY_REGION)),
 				getConfiguredBucket(context.getConfiguration(), localConfiguration), getConfiguredAltBuckets(context.getConfiguration(), localConfiguration),
 				findConfiguredSiteDomain(context.getConfiguration()).orElse(null),
@@ -274,8 +274,8 @@ public class S3Website extends S3 {
 	 * @param redirectCountOptimalThreshold The number of redirects required to switch to using object-redirects for non-collection alt locations.
 	 * @throws IllegalArgumentException if the given site domain is not absolute.
 	 */
-	public S3Website(@Nullable String profile, @Nonnull final Region region, @Nonnull String bucket, @Nonnull final Collection<String> altBuckets,
-			@Nullable DomainName siteDomain, @Nonnull final RedirectMeans redirectMeans, @Nonnegative final int redirectCountOptimalThreshold) {
+	public S3Website(@Nullable String profile, @NonNull final Region region, @NonNull String bucket, @NonNull final Collection<String> altBuckets,
+			@Nullable DomainName siteDomain, @NonNull final RedirectMeans redirectMeans, final int redirectCountOptimalThreshold) {
 		super(profile, region, bucket);
 		this.altBuckets = new LinkedHashSet<>(altBuckets); //maintain order to help with reporting and debugging
 		if(siteDomain != null) {
@@ -300,8 +300,8 @@ public class S3Website extends S3 {
 	 * @see #CONFIG_KEY_ALT_BUCKETS
 	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
 	 */
-	protected static Collection<String> getConfiguredAltBuckets(@Nonnull final Configuration globalConfiguration,
-			@Nonnull final Configuration localConfiguration) {
+	protected static Collection<String> getConfiguredAltBuckets(@NonNull final Configuration globalConfiguration,
+			@NonNull final Configuration localConfiguration) {
 		return localConfiguration.findCollection(CONFIG_KEY_ALT_BUCKETS, String.class)
 				.or(() -> findConfiguredSiteAltDomains(globalConfiguration)
 						.map(altDomains -> altDomains.stream().map(DomainName.ROOT::relativize).map(DomainName::toString).collect(toCollection(LinkedHashSet::new))))
@@ -369,7 +369,7 @@ public class S3Website extends S3 {
 	 * @return The URL of the primary bucket website.
 	 */
 	@Override
-	public Optional<URI> deploy(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact) throws IOException {
+	public Optional<URI> deploy(@NonNull final MummyContext context, @NonNull Artifact rootArtifact) throws IOException {
 		super.deploy(context, rootArtifact);
 		final S3Client s3Client = getS3Client();
 		final String bucket = getBucket();

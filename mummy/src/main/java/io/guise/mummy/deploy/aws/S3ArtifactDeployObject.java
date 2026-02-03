@@ -23,7 +23,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import io.guise.mummy.Artifact;
 import io.urf.vocab.content.Content;
@@ -49,7 +49,7 @@ public class S3ArtifactDeployObject extends AbstractS3DeployObject {
 	 * @param key The S3 key representing the deployment path of the object in the bucket.
 	 * @param artifact The artifact with the contents to be deployed in the bucket as the object.
 	 */
-	public S3ArtifactDeployObject(@Nonnull final String key, @Nonnull final Artifact artifact) {
+	public S3ArtifactDeployObject(@NonNull final String key, @NonNull final Artifact artifact) {
 		super(key);
 		this.artifact = requireNonNull(artifact);
 	}

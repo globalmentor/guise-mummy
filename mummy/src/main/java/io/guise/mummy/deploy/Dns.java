@@ -27,7 +27,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import com.globalmentor.java.Conditions;
 import com.globalmentor.java.Enums;
@@ -99,8 +99,8 @@ public interface Dns extends DeployTarget {
 	 * @throws IllegalArgumentException if the given TTL is negative.
 	 * @throws IOException If there was an error setting the resource record.
 	 */
-	public default void setResourceRecord(@Nonnull final ResourceRecord.Type type, @Nonnull final DomainName name, @Nonnull final String value,
-			@Nonnegative final long ttl) throws IOException {
+	public default void setResourceRecord(final ResourceRecord.Type type, @NonNull final DomainName name, @NonNull final String value,
+			final long ttl) throws IOException {
 		setResourceRecords(type, name, Stream.of(value), ttl);
 	}
 
@@ -119,7 +119,7 @@ public interface Dns extends DeployTarget {
 	 * @throws IllegalArgumentException if the given TTL is negative.
 	 * @throws IOException If there was an error setting the resource record.
 	 */
-	public default void setResourceRecord(@Nonnull final String type, @Nonnull final DomainName name, @Nonnull final String value, @Nonnegative final long ttl)
+	public default void setResourceRecord(@NonNull final String type, @NonNull final DomainName name, @NonNull final String value, final long ttl)
 			throws IOException {
 		setResourceRecords(type, name, Stream.of(value), ttl);
 	}
@@ -137,8 +137,8 @@ public interface Dns extends DeployTarget {
 	 * @throws IllegalArgumentException if the given TTL is negative.
 	 * @throws IOException If there was an error setting the resource record values.
 	 */
-	public default void setResourceRecords(@Nonnull final ResourceRecord.Type type, @Nonnull final DomainName name, @Nonnull final Collection<String> values,
-			@Nonnegative final long ttl) throws IOException {
+	public default void setResourceRecords(final ResourceRecord.Type type, @NonNull final DomainName name, @NonNull final Collection<String> values,
+			final long ttl) throws IOException {
 		setResourceRecords(type, name, values.stream(), ttl);
 	}
 
@@ -155,8 +155,8 @@ public interface Dns extends DeployTarget {
 	 * @throws IllegalArgumentException if the given TTL is negative.
 	 * @throws IOException If there was an error setting the resource record values.
 	 */
-	public default void setResourceRecords(@Nonnull final ResourceRecord.Type type, @Nonnull final DomainName name, @Nonnull final Stream<String> values,
-			@Nonnegative final long ttl) throws IOException {
+	public default void setResourceRecords(final ResourceRecord.Type type, @NonNull final DomainName name, @NonNull final Stream<String> values,
+			final long ttl) throws IOException {
 		setResourceRecords(type.name(), name, values, ttl);
 	}
 
@@ -173,8 +173,8 @@ public interface Dns extends DeployTarget {
 	 * @throws IllegalArgumentException if the given TTL is negative.
 	 * @throws IOException If there was an error setting the resource record values.
 	 */
-	public default void setResourceRecords(@Nonnull final String type, @Nonnull final DomainName name, @Nonnull final Collection<String> values,
-			@Nonnegative final long ttl) throws IOException {
+	public default void setResourceRecords(@NonNull final String type, @NonNull final DomainName name, @NonNull final Collection<String> values,
+			final long ttl) throws IOException {
 		setResourceRecords(type, name, values.stream(), ttl);
 	}
 
@@ -191,7 +191,7 @@ public interface Dns extends DeployTarget {
 	 * @throws IllegalArgumentException if the given TTL is negative.
 	 * @throws IOException If there was an error setting the resource record values.
 	 */
-	public void setResourceRecords(@Nonnull final String type, @Nonnull final DomainName name, @Nonnull final Stream<String> values, @Nonnegative final long ttl)
+	public void setResourceRecords(@NonNull final String type, @NonNull final DomainName name, @NonNull final Stream<String> values, final long ttl)
 			throws IOException;
 
 	/**
@@ -206,7 +206,7 @@ public interface Dns extends DeployTarget {
 	 * @see #getOrigin()
 	 * @see #DEFAULT_TTL
 	 */
-	public default void setResourceRecord(@Nonnull final ResourceRecord resourceRecord) throws IOException {
+	public default void setResourceRecord(@NonNull final ResourceRecord resourceRecord) throws IOException {
 		final DomainName origin = getOrigin();
 		final DomainName name = origin.resolve(resourceRecord.getName().orElse(DomainName.EMPTY));
 		final long ttl = resourceRecord.getTtl().orElse(DEFAULT_TTL);
@@ -227,7 +227,7 @@ public interface Dns extends DeployTarget {
 	 * @see #getOrigin()
 	 * @see #DEFAULT_TTL
 	 */
-	public default void setResourceRecords(@Nonnull final Collection<ResourceRecord> resourceRecords) throws IOException {
+	public default void setResourceRecords(@NonNull final Collection<ResourceRecord> resourceRecords) throws IOException {
 		setResourceRecords(resourceRecords.stream());
 	}
 
@@ -246,7 +246,7 @@ public interface Dns extends DeployTarget {
 	 * @see #getOrigin()
 	 * @see #DEFAULT_TTL
 	 */
-	public default void setResourceRecords(@Nonnull final Stream<ResourceRecord> resourceRecords) throws IOException {
+	public default void setResourceRecords(@NonNull final Stream<ResourceRecord> resourceRecords) throws IOException {
 		final DomainName origin = getOrigin();
 		resourceRecords //group by type+name
 				.collect(groupingBy(resourceRecord -> Map.entry(resourceRecord.getType(), origin.resolve(resourceRecord.getName().orElse(DomainName.EMPTY)))))
@@ -278,7 +278,7 @@ public interface Dns extends DeployTarget {
 	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
 	 * @see GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS
 	 */
-	static DomainName getConfiguredOrigin(@Nonnull final Configuration globalConfiguration, @Nonnull final Configuration localConfiguration)
+	static DomainName getConfiguredOrigin(@NonNull final Configuration globalConfiguration, @NonNull final Configuration localConfiguration)
 			throws ConfigurationException {
 		//local hosted zone designation
 		return localConfiguration.findString(CONFIG_KEY_ORIGIN).map(DomainName::of).map(hostedZoneName -> {
@@ -313,7 +313,7 @@ public interface Dns extends DeployTarget {
 	 * @see Dns#RECORD_CONFIG_KEY_VALUE
 	 * @see Dns#RECORD_CONFIG_KEY_TTL
 	 */
-	static Collection<ResourceRecord> getConfiguredResourceRecords(@Nonnull final Configuration zone) throws ConfigurationException {
+	static Collection<ResourceRecord> getConfiguredResourceRecords(@NonNull final Configuration zone) throws ConfigurationException {
 		return zone.findCollection(CONFIG_KEY_RECORDS, Section.class).map(records -> {
 			return records.stream().map(record -> {
 				try {

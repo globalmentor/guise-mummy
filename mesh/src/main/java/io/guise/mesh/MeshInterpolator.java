@@ -18,7 +18,7 @@ package io.guise.mesh;
 
 import java.util.Optional;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 /**
  * A pluggable interpolation engine for Guise Mesh.
@@ -38,7 +38,7 @@ public interface MeshInterpolator {
 	 * @return <code>true</code> if the text has expressions to be interpolated
 	 * @throws MeshInterpolationException if the interpolation syntax of the given text is incorrect.
 	 */
-	public boolean hasInterpolation(@Nonnull CharSequence text) throws MeshInterpolationException;
+	public boolean hasInterpolation(@NonNull CharSequence text) throws MeshInterpolationException;
 
 	/**
 	 * Interpolates the given text and returns the interpolated result if there was a change.
@@ -52,7 +52,7 @@ public interface MeshInterpolator {
 	 * @throws MeshInterpolationException if the interpolation syntax of the given text is incorrect.
 	 * @throws MexlException if there was an error parsing or otherwise processing an expression.
 	 */
-	public Optional<CharSequence> findInterpolation(@Nonnull MeshContext context, @Nonnull CharSequence text, @Nonnull MexlEvaluator evaluator)
+	public Optional<CharSequence> findInterpolation(@NonNull MeshContext context, @NonNull CharSequence text, @NonNull MexlEvaluator evaluator)
 			throws MeshInterpolationException, MexlException;
 
 	/**
@@ -67,7 +67,7 @@ public interface MeshInterpolator {
 	 * @throws MeshInterpolationException if the interpolation syntax of the given text is incorrect.
 	 * @throws MexlException if there was an error parsing or otherwise processing an expression.
 	 */
-	public default CharSequence interpolate(@Nonnull final MeshContext context, @Nonnull final CharSequence text, @Nonnull final MexlEvaluator evaluator)
+	public default CharSequence interpolate(@NonNull final MeshContext context, @NonNull final CharSequence text, @NonNull final MexlEvaluator evaluator)
 			throws MeshInterpolationException, MexlException {
 		return findInterpolation(context, text, evaluator).orElse(text);
 	}

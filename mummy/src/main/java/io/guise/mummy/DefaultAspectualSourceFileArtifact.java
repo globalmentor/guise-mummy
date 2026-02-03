@@ -27,7 +27,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import io.urf.model.*;
 
@@ -86,7 +86,7 @@ class DefaultAspectualSourceFileArtifact extends DefaultSourceFileArtifact imple
 	 * @param aspectIds The IDs of the aspects that should be added.
 	 * @throws IllegalArgumentException if the corporeal source file does not exist or is not a regular file.
 	 */
-	protected DefaultAspectualSourceFileArtifact(@Nonnull final Builder<?> builder, @Nonnull final Set<String> aspectIds) {
+	protected DefaultAspectualSourceFileArtifact(@NonNull final Builder<?> builder, @NonNull final Set<String> aspectIds) {
 		super(builder);
 		aspectsById = aspectIds.stream().collect(toUnmodifiableMap(identity(), aspectId -> { //create aspects for each aspect ID
 			final Path aspectSourcePath = appendFilenameBase(getSourcePath(), FILENAME_ASPECT_DELIMITER + requireNonNull(aspectId)); //e.g. `foo-bar.jpg` -> `foo-bar-preview.jpg`

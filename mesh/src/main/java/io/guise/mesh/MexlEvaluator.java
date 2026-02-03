@@ -18,7 +18,7 @@ package io.guise.mesh;
 
 import java.util.Optional;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 /**
  * Pluggable strategy for evaluating Mesh Expression Language (MEXL) expressions.
@@ -35,7 +35,7 @@ public interface MexlEvaluator {
 	 * @return The result of the expression.
 	 * @throws MexlException if there was an error parsing or otherwise processing the expression.
 	 */
-	public Object evaluate(@Nonnull final MeshContext context, @Nonnull final CharSequence expression) throws MexlException;
+	public Object evaluate(@NonNull final MeshContext context, @NonNull final CharSequence expression) throws MexlException;
 
 	/**
 	 * Evaluates an expression using the given meshing context and returns the result as an optional value. If the expression evaluates to an instance of
@@ -49,7 +49,7 @@ public interface MexlEvaluator {
 	 * @return The result of the expression, which will be empty if the expression evaluated to <code>null</code>.
 	 * @throws MexlException if there was an error parsing or otherwise processing the expression.
 	 */
-	public default Optional<Object> findExpressionResult(@Nonnull final MeshContext context, @Nonnull final CharSequence expression) throws MexlException {
+	public default Optional<Object> findExpressionResult(@NonNull final MeshContext context, @NonNull final CharSequence expression) throws MexlException {
 		final Object result = evaluate(context, expression);
 		@SuppressWarnings("unchecked")
 		final Optional<Object> optionalResult = result instanceof Optional ? (Optional<Object>)result : Optional.ofNullable(result);

@@ -21,7 +21,8 @@ import static java.util.Objects.*;
 import java.nio.file.Path;
 import java.util.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
+
 import javax.xml.parsers.DocumentBuilder;
 
 import io.confound.config.Configuration;
@@ -60,7 +61,7 @@ public class StubMummyContext implements MummyContext {
 	 * Constructor.
 	 * @param project The Guise project.
 	 */
-	public StubMummyContext(@Nonnull final GuiseProject project) {
+	public StubMummyContext(@NonNull final GuiseProject project) {
 		this.project = requireNonNull(project);
 	}
 

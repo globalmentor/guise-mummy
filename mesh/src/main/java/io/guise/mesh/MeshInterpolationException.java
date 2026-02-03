@@ -16,7 +16,7 @@
 
 package io.guise.mesh;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 /**
  * An meshing exception indicating a problem with the interpolation syntax (e.g. a missing ending brace) of text being interpolated.

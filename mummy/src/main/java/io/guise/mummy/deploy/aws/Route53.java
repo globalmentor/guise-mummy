@@ -29,7 +29,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Stream;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import org.slf4j.Logger;
 
@@ -120,7 +120,7 @@ public class Route53 extends AbstractDns {
 	 * @see Dns#getConfiguredOrigin(Configuration, Configuration)
 	 * @see Dns#getConfiguredResourceRecords(Configuration)
 	 */
-	public Route53(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
+	public Route53(@NonNull final MummyContext context, @NonNull final Configuration localConfiguration) {
 		this(context.getConfiguration().findString(CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null),
 				localConfiguration.findString(CONFIG_KEY_HOSTED_ZONE_ID).orElse(null), Dns.getConfiguredOrigin(context.getConfiguration(), localConfiguration),
 				Dns.getConfiguredResourceRecords(localConfiguration));
@@ -135,8 +135,8 @@ public class Route53 extends AbstractDns {
 	 * @param resourceRecords The resource records to be created during deployment; may be empty.
 	 * @throws IllegalArgumentException if the given origin is not absolute.
 	 */
-	public Route53(@Nullable String profile, @Nullable final String hostedZoneId, @Nonnull final DomainName origin,
-			@Nonnull final Collection<ResourceRecord> resourceRecords) {
+	public Route53(@Nullable String profile, @Nullable final String hostedZoneId, @NonNull final DomainName origin,
+			@NonNull final Collection<ResourceRecord> resourceRecords) {
 		super(origin, resourceRecords);
 		this.profile = profile;
 		this.configuredHostedZoneId = hostedZoneId;
@@ -247,7 +247,7 @@ public class Route53 extends AbstractDns {
 	 * @param value The given resource record value.
 	 * @return The value form preferred by Route 53.
 	 */
-	static String normalizeValueForType(@Nonnull final String type, @Nonnull final String value) {
+	static String normalizeValueForType(@NonNull final String type, @NonNull final String value) {
 		return Enums.asEnum(ResourceRecord.Type.class, type).map(resourceRecordType -> {
 			switch(resourceRecordType) {
 				case TXT: //Route 53 prefers all TXT values to be quoted
@@ -273,8 +273,8 @@ public class Route53 extends AbstractDns {
 	 * @see <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-choosing-alias-non-alias.html">Choosing Between Alias and
 	 *      Non-Alias Records</a>
 	 */
-	public void setAliasResourceRecord(@Nonnull final ResourceRecord.Type type, @Nonnull final DomainName name, @Nonnull final String aliasDnsName,
-			@Nonnull final String aliasHostZoneId) throws IOException {
+	public void setAliasResourceRecord(final ResourceRecord.Type type, @NonNull final DomainName name, @NonNull final String aliasDnsName,
+			@NonNull final String aliasHostZoneId) throws IOException {
 		setAliasResourceRecord(type.toString(), name, aliasDnsName, aliasHostZoneId);
 	}
 
@@ -293,8 +293,8 @@ public class Route53 extends AbstractDns {
 	 * @see <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resource-record-sets-choosing-alias-non-alias.html">Choosing Between Alias and
 	 *      Non-Alias Records</a>
 	 */
-	public void setAliasResourceRecord(@Nonnull final String type, @Nonnull final DomainName name, @Nonnull final String aliasDnsName,
-			@Nonnull final String aliasHostZoneId) throws IOException {
+	public void setAliasResourceRecord(@NonNull final String type, @NonNull final DomainName name, @NonNull final String aliasDnsName,
+			@NonNull final String aliasHostZoneId) throws IOException {
 		requireNonNull(type);
 		name.checkArgumentAbsolute();
 		requireNonNull(aliasDnsName);
@@ -324,7 +324,7 @@ public class Route53 extends AbstractDns {
 	 * @throws SdkException if an error occurs related to AWS.
 	 * @see HostedZone#id()
 	 */
-	protected static Set<HostedZone> getHostedZonesById(@Nonnull final Route53Client client, @Nonnull final String id) throws SdkException {
+	protected static Set<HostedZone> getHostedZonesById(@NonNull final Route53Client client, @NonNull final String id) throws SdkException {
 		requireNonNull(id);
 		try (final Stream<HostedZone> hostedZonesByName = hostedZones(client).filter(hostedZone -> hostedZone.id().equals(id))) {
 			return hostedZonesByName.collect(toSet());
@@ -341,7 +341,7 @@ public class Route53 extends AbstractDns {
 	 * @see HostedZone#name()
 	 * @throws IllegalArgumentException if the given domain name is not absolute.
 	 */
-	protected static Set<HostedZone> getHostedZonesByName(@Nonnull final Route53Client client, @Nonnull final DomainName hostedZoneName) throws SdkException {
+	protected static Set<HostedZone> getHostedZonesByName(@NonNull final Route53Client client, @NonNull final DomainName hostedZoneName) throws SdkException {
 		final String name = hostedZoneName.checkArgumentAbsolute().toString();
 		try (final Stream<HostedZone> hostedZonesByName = hostedZones(client).filter(hostedZone -> hostedZone.name().equals(name))) {
 			return hostedZonesByName.collect(toSet());
@@ -354,7 +354,7 @@ public class Route53 extends AbstractDns {
 	 * @return A stream of all hosted zones the client knows about.
 	 * @throws SdkException if an error occurs related to AWS.
 	 */
-	protected static Stream<HostedZone> hostedZones(@Nonnull final Route53Client client) throws SdkException {
+	protected static Stream<HostedZone> hostedZones(@NonNull final Route53Client client) throws SdkException {
 		return client.listHostedZonesPaginator().stream().flatMap(response -> response.hostedZones().stream());
 	}
 
@@ -367,7 +367,7 @@ public class Route53 extends AbstractDns {
 	 * @return The resource records for the hosted zone.
 	 * @throws SdkException if an error occurs related to AWS.
 	 */
-	protected static Stream<ResourceRecord> resourceRecords(@Nonnull final Route53Client client, @Nonnull final HostedZone hostedZone) throws SdkException {
+	protected static Stream<ResourceRecord> resourceRecords(@NonNull final Route53Client client, @NonNull final HostedZone hostedZone) throws SdkException {
 		try (final Stream<ResourceRecordSet> recordSets = resourceRecordSets(client, hostedZone.id())) {
 			return recordSets
 					.flatMap(resourceRecordSet -> resourceRecordSet.resourceRecords().stream().map(resourceRecord -> new ResourceRecord(resourceRecordSet.type().name(),
@@ -385,8 +385,8 @@ public class Route53 extends AbstractDns {
 	 * @throws SdkException if an error occurs related to AWS.
 	 * @see RRType#NS
 	 */
-	protected static List<software.amazon.awssdk.services.route53.model.ResourceRecord> getNsRecords(@Nonnull final Route53Client client,
-			@Nonnull final HostedZone hostedZone) throws IOException, SdkException {
+	protected static List<software.amazon.awssdk.services.route53.model.ResourceRecord> getNsRecords(@NonNull final Route53Client client,
+			@NonNull final HostedZone hostedZone) throws IOException, SdkException {
 		//start listing the record sets at the NS record for efficiency, but we still have to filter the result because there are likely subsequent record sets
 		try (final Stream<ResourceRecordSet> nsRecordSets = resourceRecordSets(client, hostedZone.id(), hostedZone.name(), RRType.NS)
 				.filter(recordSet -> recordSet.name().equals(hostedZone.name()) && recordSet.type().equals(RRType.NS))) {
@@ -407,7 +407,7 @@ public class Route53 extends AbstractDns {
 	 * @return A stream of all record sets for the identified hosted zone.
 	 * @throws SdkException if an error occurs related to AWS.
 	 */
-	protected static Stream<ResourceRecordSet> resourceRecordSets(@Nonnull final Route53Client client, @Nonnull final String hostedZoneId) throws SdkException {
+	protected static Stream<ResourceRecordSet> resourceRecordSets(@NonNull final Route53Client client, @NonNull final String hostedZoneId) throws SdkException {
 		return resourceRecordSets(client, hostedZoneId, null, null);
 	}
 
@@ -420,7 +420,7 @@ public class Route53 extends AbstractDns {
 	 * @return A stream of all record sets for the identified hosted zone.
 	 * @throws SdkException if an error occurs related to AWS.
 	 */
-	protected static Stream<ResourceRecordSet> resourceRecordSets(@Nonnull final Route53Client client, @Nonnull final String hostedZoneId,
+	protected static Stream<ResourceRecordSet> resourceRecordSets(@NonNull final Route53Client client, @NonNull final String hostedZoneId,
 			@Nullable final String startRecordName, @Nullable final RRType startRecordType) throws SdkException {
 		requireNonNull(hostedZoneId);
 		return client.listResourceRecordSetsPaginator(request -> {

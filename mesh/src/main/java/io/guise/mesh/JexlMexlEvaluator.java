@@ -21,7 +21,7 @@ import static java.util.Objects.*;
 
 import java.util.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import org.apache.commons.jexl3.*;
 import org.apache.commons.jexl3.introspection.*;
@@ -108,7 +108,7 @@ public class JexlMexlEvaluator implements MexlEvaluator {
 		 * Constructor.
 		 * @param meshContext The meshing context.
 		 */
-		public MeshJexlContext(@Nonnull final MeshContext meshContext) {
+		public MeshJexlContext(@NonNull final MeshContext meshContext) {
 			this.meshContext = requireNonNull(meshContext);
 		}
 
@@ -154,7 +154,7 @@ public class JexlMexlEvaluator implements MexlEvaluator {
 		 * @param propertyHandle The property handle.
 		 * @throws IllegalArgumentException if the given property handle is not a valid URF property handle.
 		 */
-		public UrfResourceDescriptionPropertyGet(@Nonnull final String propertyHandle) {
+		public UrfResourceDescriptionPropertyGet(@NonNull final String propertyHandle) {
 			this.propertyHandle = URF.Handle.checkArgumentValid(propertyHandle);
 		}
 

@@ -16,7 +16,7 @@
 
 package io.guise.mesh;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 /**
  * An meshing exception indicating a problem parsing a Mesh Expression Language (MEXL) expression.

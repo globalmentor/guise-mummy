@@ -23,10 +23,9 @@ import static java.util.Objects.*;
 import java.io.File;
 import java.util.Optional;
 
-import javax.annotation.*;
-
 import org.apache.catalina.*;
 import org.apache.catalina.webresources.*;
+import org.jspecify.annotations.*;
 
 import io.urf.format.turf.TURF;
 
@@ -76,7 +75,7 @@ public class SiteRoot extends StandardRoot {
 	 * @param descriptionBase The root directory of the description metadata tree, either an absolute pathname or a relative to the {@link Host} app base
 	 *          pathname.
 	 */
-	public void setDescriptionBase(@Nonnull final String descriptionBase) {
+	public void setDescriptionBase(@NonNull final String descriptionBase) {
 		this.descriptionBase = requireNonNull(descriptionBase);
 	}
 
@@ -117,7 +116,7 @@ public class SiteRoot extends StandardRoot {
 	 * @param prefix The filename prefix to use to discover description sidecar files.
 	 * @see #setDescriptionFileSidecarExtension(String)
 	 */
-	public void setDescriptionFileSidecarPrefix(@Nonnull final String prefix) {
+	public void setDescriptionFileSidecarPrefix(@NonNull final String prefix) {
 		descriptionFileSidecarPrefix = requireNonNull(prefix);
 	}
 
@@ -139,7 +138,7 @@ public class SiteRoot extends StandardRoot {
 	 * @param extension The filename extension to use to discover description sidecar files.
 	 * @see #setDescriptionFileSidecarPrefix(String)
 	 */
-	public void setDescriptionFileSidecarExtension(@Nonnull final String extension) {
+	public void setDescriptionFileSidecarExtension(@NonNull final String extension) {
 		descriptionFileSidecarExtension = requireNonNull(extension);
 	}
 

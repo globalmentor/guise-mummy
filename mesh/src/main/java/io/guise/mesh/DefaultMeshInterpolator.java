@@ -24,7 +24,7 @@ import static java.util.Objects.*;
 import java.util.Optional;
 import java.util.function.Function;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 /**
  * Default Guise Mesh interpolation implementation.
@@ -42,7 +42,7 @@ public class DefaultMeshInterpolator implements MeshInterpolator {
 	public static final DefaultMeshInterpolator INSTANCE = new DefaultMeshInterpolator();
 
 	@Override
-	public boolean hasInterpolation(@Nonnull final CharSequence text) throws MeshInterpolationException {
+	public boolean hasInterpolation(@NonNull final CharSequence text) throws MeshInterpolationException {
 		return hasInterpolation(text, LEFT_EXPRESSION_DELIMITER, RIGHT_EXPRESSION_DELIMITER);
 	}
 
@@ -58,7 +58,7 @@ public class DefaultMeshInterpolator implements MeshInterpolator {
 	 * @return <code>true</code> if the text has expressions to be interpolated
 	 * @throws MeshInterpolationException if the interpolation syntax of the given text is incorrect.
 	 */
-	protected static boolean hasInterpolation(@Nonnull CharSequence text, final String leftExpressionDelimiter, final String rightExpressionDelimiter)
+	protected static boolean hasInterpolation(@NonNull CharSequence text, final String leftExpressionDelimiter, final String rightExpressionDelimiter)
 			throws MeshInterpolationException {
 		checkArgument(leftExpressionDelimiter.length() == 2,
 				"Interpolation left expression delimiter `%s` not supported; currently only a left delimiter of exactly two characters is supported.",
@@ -109,8 +109,8 @@ public class DefaultMeshInterpolator implements MeshInterpolator {
 	 * @throws MeshInterpolationException if the interpolation syntax of the given text is incorrect.
 	 * @throws MexlException if there was an error parsing or otherwise processing an expression.
 	 */
-	protected static Optional<CharSequence> findInterpolation(@Nonnull final CharSequence text, final String leftExpressionDelimiter,
-			final String rightExpressionDelimiter, @Nonnull final Function<CharSequence, CharSequence> evaluator) throws MeshInterpolationException, MexlException {
+	protected static Optional<CharSequence> findInterpolation(@NonNull final CharSequence text, final String leftExpressionDelimiter,
+			final String rightExpressionDelimiter, @NonNull final Function<CharSequence, CharSequence> evaluator) throws MeshInterpolationException, MexlException {
 		checkArgument(leftExpressionDelimiter.length() == 2,
 				"Interpolation left expression delimiter `%s` not supported; currently only a left delimiter of exactly two characters is supported.",
 				leftExpressionDelimiter);

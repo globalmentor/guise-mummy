@@ -34,7 +34,7 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Stream;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import com.globalmentor.java.Objects;
 import com.globalmentor.net.*;
@@ -80,7 +80,7 @@ public class NavigationManager implements Clogged {
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME
 	 * @see #NAVIGATION_ADD_NAME_SUFFIX
 	 */
-	public Optional<Stream<NavigationItem>> loadNavigation(@Nonnull MummyContext context, @Nonnull final Artifact artifact) throws IOException {
+	public Optional<Stream<NavigationItem>> loadNavigation(@NonNull MummyContext context, @NonNull final Artifact artifact) throws IOException {
 		final String navigationBaseName = context.getConfiguration().getString(CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME);
 		final String navigationAddBaseName = navigationBaseName + NAVIGATION_ADD_NAME_SUFFIX;
 		final Path sourceDirectory = artifact.getSourceDirectory();
@@ -147,8 +147,8 @@ public class NavigationManager implements Clogged {
 	 * @throws IllegalArgumentException if the navigation file has no filename extension.
 	 * @throws UncheckedIOException if there is an I/O error loading the navigation list file.
 	 */
-	protected final Stream<NavigationItem> loadNavigationFileUnchecked(@Nonnull MummyContext context, @Nonnull final Artifact artifact,
-			@Nonnull final Path navigationFile) throws UncheckedIOException {
+	protected final Stream<NavigationItem> loadNavigationFileUnchecked(@NonNull MummyContext context, @NonNull final Artifact artifact,
+			@NonNull final Path navigationFile) throws UncheckedIOException {
 		try {
 			return loadNavigationFile(context, artifact, navigationFile);
 		} catch(final IOException ioException) {
@@ -170,7 +170,7 @@ public class NavigationManager implements Clogged {
 	 * @throws IllegalArgumentException if the navigation file has no filename extension.
 	 * @throws IOException if there is an I/O error loading the navigation list file.
 	 */
-	protected Stream<NavigationItem> loadNavigationFile(@Nonnull MummyContext context, @Nonnull final Artifact artifact, @Nonnull final Path navigationFile)
+	protected Stream<NavigationItem> loadNavigationFile(@NonNull MummyContext context, @NonNull final Artifact artifact, @NonNull final Path navigationFile)
 			throws IOException {
 		switch(findFilenameExtension(navigationFile)
 				.orElseThrow(() -> new IllegalArgumentException(String.format("Navigation file `%s` has no extension.", navigationFile)))) {
@@ -192,7 +192,7 @@ public class NavigationManager implements Clogged {
 	 * @return The navigation items loaded from the file. The stream will not throw an {@link IOException} during iteration.
 	 * @throws IOException if there is an I/O error loading the navigation list file.
 	 */
-	public Stream<NavigationItem> loadNavigationFileList(@Nonnull MummyContext context, @Nonnull final Artifact artifact, @Nonnull final Path navigationFile)
+	public Stream<NavigationItem> loadNavigationFileList(@NonNull MummyContext context, @NonNull final Artifact artifact, @NonNull final Path navigationFile)
 			throws IOException {
 		final Path navigationListFileParent = navigationFile.getParent(); //each line reference is relative to the directory of the navigation file
 		checkState(navigationListFileParent != null, "Navigation list file `%s` has no parent.", navigationFile);
@@ -226,9 +226,9 @@ public class NavigationManager implements Clogged {
 	 * @throws IllegalArgumentException if the reference is an invalid URI or URI reference path.
 	 * @throws IllegalArgumentException if the reference is an absolute URI and there is no description or the description does does not indicate a label.
 	 */
-	protected Optional<NavigationItem> createNavigationItemFromReference(@Nonnull MummyContext context, @Nonnull final Artifact artifact,
-			@Nonnull final Path navigationFile, @Nonnull final String navigationReference, @Nullable UrfResourceDescription description,
-			@Nonnull final List<NavigationItem> navigation) throws IllegalArgumentException {
+	protected Optional<NavigationItem> createNavigationItemFromReference(@NonNull MummyContext context, @NonNull final Artifact artifact,
+			@NonNull final Path navigationFile, @NonNull final String navigationReference, @Nullable UrfResourceDescription description,
+			@NonNull final List<NavigationItem> navigation) throws IllegalArgumentException {
 		final URI navigationReferenceURI;
 		try {
 			navigationReferenceURI = new URI(navigationReference); //assume the reference is _relative to the navigation file_
@@ -253,9 +253,9 @@ public class NavigationManager implements Clogged {
 	 * @throws IllegalArgumentException if the reference is an absolute URI and there is no description or the description does does not indicate a label.
 	 * 
 	 */
-	protected Optional<NavigationItem> createNavigationItemFromReference(@Nonnull MummyContext context, @Nonnull final Artifact artifact,
-			@Nonnull final Path navigationFile, @Nonnull final URI navigationReference, @Nullable UrfResourceDescription description,
-			@Nonnull final List<NavigationItem> navigation) throws IllegalArgumentException {
+	protected Optional<NavigationItem> createNavigationItemFromReference(@NonNull MummyContext context, @NonNull final Artifact artifact,
+			@NonNull final Path navigationFile, @NonNull final URI navigationReference, @Nullable UrfResourceDescription description,
+			@NonNull final List<NavigationItem> navigation) throws IllegalArgumentException {
 		final Path navigationListFileParent = navigationFile.getParent(); //each line reference is relative to the directory of the navigation file
 		checkArgument(navigationListFileParent != null, "Navigation list file `%s` has no parent.", navigationFile);
 		//external reference
@@ -326,7 +326,7 @@ public class NavigationManager implements Clogged {
 	 * @return The navigation items loaded from the file. The stream will not throw an {@link IOException} during iteration.
 	 * @throws IOException if there is an I/O error loading the navigation file.
 	 */
-	public Stream<NavigationItem> loadNavigationFileTurf(@Nonnull MummyContext context, @Nonnull final Artifact artifact, @Nonnull final Path navigationFile)
+	public Stream<NavigationItem> loadNavigationFileTurf(@NonNull MummyContext context, @NonNull final Artifact artifact, @NonNull final Path navigationFile)
 			throws IOException {
 		final List<?> navigationObjects;
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(navigationFile))) {
@@ -357,8 +357,8 @@ public class NavigationManager implements Clogged {
 	 * @return The navigation items loaded from the file.
 	 * @throws IllegalArgumentException if the navigation objects are invalid or incorrect. The error message will not indicate the navigation file.
 	 */
-	protected Stream<NavigationItem> navigationItemsFromUrfList(@Nonnull MummyContext context, @Nonnull final Artifact artifact,
-			@Nonnull final Path navigationFile, @Nonnull final List<?> navigationObjects) throws IllegalArgumentException {
+	protected Stream<NavigationItem> navigationItemsFromUrfList(@NonNull MummyContext context, @NonNull final Artifact artifact,
+			@NonNull final Path navigationFile, @NonNull final List<?> navigationObjects) throws IllegalArgumentException {
 		return navigationObjects.stream().flatMap(navObject -> { //convert the parsed objects to navigation items
 			if(navObject instanceof CharSequence) { //e.g. "about.xhtml#history" or <https://www.example.com/> (currently unsupported) 
 				final Optional<NavigationItem> navItem = createNavigationItemFromReference(context, artifact, navigationFile, navObject.toString(), null, emptyList());

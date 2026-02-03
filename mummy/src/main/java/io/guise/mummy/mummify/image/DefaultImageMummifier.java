@@ -33,7 +33,7 @@ import java.nio.file.*;
 import java.time.Instant;
 import java.util.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 import javax.imageio.*;
 import javax.imageio.ImageWriter;
 import javax.imageio.metadata.IIOMetadata;
@@ -172,7 +172,7 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 	 *      JPEG image compression quality when saving images in Java</a>
 	 * @see AspectualArtifact#PROPERTY_TAG_MUMMY_ASPECT
 	 */
-	protected void processImage(@Nonnull final MummyContext context, @Nonnull Artifact artifact, final InputStream inputStream, final OutputStream outputStream,
+	protected void processImage(@NonNull final MummyContext context, @NonNull Artifact artifact, final InputStream inputStream, final OutputStream outputStream,
 			final boolean keepMetadata) throws IOException {
 		final Optional<String> foundAspect = artifact.getResourceDescription().findPropertyValue(AspectualArtifact.PROPERTY_TAG_MUMMY_ASPECT).map(Object::toString);
 		//determine the correct configuration keys based upon the aspect, if any

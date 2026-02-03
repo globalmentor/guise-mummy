@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import com.globalmentor.io.Filenames;
 import com.globalmentor.net.MediaType;
@@ -47,7 +47,7 @@ public abstract class BaseArtifactQuery implements ArtifactQuery {
 	 * @param stream The stream source of artifacts.
 	 * @throws IllegalStateException if the stream has already been set.
 	 */
-	protected void setStream(@Nonnull final Stream<Artifact> stream) {
+	protected void setStream(@NonNull final Stream<Artifact> stream) {
 		checkState(this.stream == null, "Query already initialized with artifact source stream.");
 		this.stream = requireNonNull(stream);
 	}
@@ -76,7 +76,7 @@ public abstract class BaseArtifactQuery implements ArtifactQuery {
 	 * @param predicate A predicate with which to filter the artifacts.
 	 * @throws IllegalStateException if the query has not yet been initialized with an artifact source stream.
 	 */
-	protected void addFilter(@Nonnull final Predicate<? super Artifact> predicate) {
+	protected void addFilter(@NonNull final Predicate<? super Artifact> predicate) {
 		checkState(this.stream != null, "Query has not been initialized by calling a `fromXXX()` method.");
 		this.stream = this.stream.filter(predicate);
 	}
@@ -101,7 +101,7 @@ public abstract class BaseArtifactQuery implements ArtifactQuery {
 	 * @param comparator The comparator specifying the sort ordering of the artifacts.
 	 */
 	@SuppressWarnings("unchecked")
-	protected void addComparator(@Nonnull final Comparator<? super Artifact> comparator) {
+	protected void addComparator(@NonNull final Comparator<? super Artifact> comparator) {
 		this.comparator = this.comparator == null ? (Comparator<Artifact>)requireNonNull(comparator) : this.comparator.thenComparing(comparator);
 	}
 

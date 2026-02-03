@@ -21,7 +21,7 @@ import static java.util.Objects.*;
 
 import java.util.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import io.guise.mummy.Artifact;
 import io.urf.model.UrfResourceDescription;
@@ -72,8 +72,8 @@ public class DefaultNavigationItem implements NavigationItem {
 	 * @param navigation The navigation subordinate to this navigation item; may be empty.
 	 * @return A navigation item.
 	 */
-	private DefaultNavigationItem(@Nonnull final String label, @Nullable final String iconId, @Nullable final String href,
-			@Nonnull final Collection<NavigationItem> navigation) {
+	private DefaultNavigationItem(@NonNull final String label, @Nullable final String iconId, @Nullable final String href,
+			@NonNull final Collection<NavigationItem> navigation) {
 		this.label = requireNonNull(label);
 		this.iconId = iconId;
 		this.href = href;
@@ -88,7 +88,7 @@ public class DefaultNavigationItem implements NavigationItem {
 	 * @return A navigation item from the href and artifact.
 	 * @see Artifact#determineLabel()
 	 */
-	public static DefaultNavigationItem forArtifactReference(@Nonnull final String href, @Nonnull final Artifact navigationArtifact) {
+	public static DefaultNavigationItem forArtifactReference(@NonNull final String href, @NonNull final Artifact navigationArtifact) {
 		return forArtifactReference(href, navigationArtifact, emptyList());
 	}
 
@@ -100,8 +100,8 @@ public class DefaultNavigationItem implements NavigationItem {
 	 * @return A navigation item from the href and artifact.
 	 * @see Artifact#determineLabel()
 	 */
-	public static DefaultNavigationItem forArtifactReference(@Nonnull final String href, @Nonnull final Artifact navigationArtifact,
-			@Nonnull final List<NavigationItem> navigation) {
+	public static DefaultNavigationItem forArtifactReference(@NonNull final String href, @NonNull final Artifact navigationArtifact,
+			@NonNull final List<NavigationItem> navigation) {
 		return new DefaultNavigationItem(navigationArtifact.determineLabel(),
 				navigationArtifact.getResourceDescription().findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_ICON).map(Object::toString).orElse(null),
 				requireNonNull(href), navigation);
@@ -122,8 +122,8 @@ public class DefaultNavigationItem implements NavigationItem {
 	 * @see Artifact#getResourceDescription()
 	 * @see Artifact#determineLabel()
 	 */
-	public static DefaultNavigationItem forArtifactReference(@Nonnull final String href, @Nullable final UrfResourceDescription description,
-			@Nonnull final Artifact navigationArtifact, @Nonnull final List<NavigationItem> navigation) {
+	public static DefaultNavigationItem forArtifactReference(@NonNull final String href, @Nullable final UrfResourceDescription description,
+			@NonNull final Artifact navigationArtifact, @NonNull final List<NavigationItem> navigation) {
 		requireNonNull(navigationArtifact);
 		return new DefaultNavigationItem(
 				description.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_LABEL).map(Object::toString).orElseGet(navigationArtifact::determineLabel),
@@ -143,8 +143,8 @@ public class DefaultNavigationItem implements NavigationItem {
 	 * @see Artifact#PROPERTY_HANDLE_ICON
 	 * @throws IllegalArgumentException if the description does not indicate a label.
 	 */
-	public static DefaultNavigationItem forReference(@Nonnull final String href, @Nullable final UrfResourceDescription description,
-			@Nonnull final List<NavigationItem> navigation) {
+	public static DefaultNavigationItem forReference(@NonNull final String href, @Nullable final UrfResourceDescription description,
+			@NonNull final List<NavigationItem> navigation) {
 		return new DefaultNavigationItem(
 				description.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_LABEL).map(Object::toString)
 						.orElseThrow(() -> new IllegalArgumentException("Nav item description missing label.")),
@@ -163,7 +163,7 @@ public class DefaultNavigationItem implements NavigationItem {
 	 * @see Artifact#PROPERTY_HANDLE_ICON
 	 * @throws IllegalArgumentException if the description does not indicate a label.
 	 */
-	public static DefaultNavigationItem fromDescription(@Nullable final UrfResourceDescription description, @Nonnull final List<NavigationItem> navigation) {
+	public static DefaultNavigationItem fromDescription(@Nullable final UrfResourceDescription description, @NonNull final List<NavigationItem> navigation) {
 		return new DefaultNavigationItem(
 				description.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_LABEL).map(Object::toString)
 						.orElseThrow(() -> new IllegalArgumentException("Nav item description missing label.")),

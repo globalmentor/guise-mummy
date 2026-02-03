@@ -34,8 +34,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 
-import javax.annotation.*;
-
+import org.jspecify.annotations.*;
 import org.junit.jupiter.api.*;
 import org.w3c.dom.*;
 
@@ -67,7 +66,7 @@ public class MarkdownPageMummifierTest {
 	 * @param document The document from which to retrieve paragraph text.
 	 * @return The text of the first paragraph, which will not be present if there is no body element or paragraph element.
 	 */
-	protected Optional<String> findFirstParagraphText(@Nonnull final Document document) {
+	protected Optional<String> findFirstParagraphText(@NonNull final Document document) {
 		return findHtmlBodyElement(document).flatMap(bodyElement -> childElementsByNameNS(bodyElement, XHTML_NAMESPACE_URI_STRING, ELEMENT_P).findFirst())
 				.map(Element::getTextContent);
 	}
@@ -130,7 +129,7 @@ public class MarkdownPageMummifierTest {
 	 * Asserts that the body of the given document matches that expected for the "simple-" test files.
 	 * @param document The document to test.
 	 */
-	protected void assertSimpleBody(@Nonnull final Document document) {
+	protected void assertSimpleBody(@NonNull final Document document) {
 		final Node body = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
 		final List<Element> bodyElements = getChildElements(body);
 		assertThat(bodyElements, hasSize(2));

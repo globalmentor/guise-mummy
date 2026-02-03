@@ -24,8 +24,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.*;
-
+import org.jspecify.annotations.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -108,7 +107,7 @@ public abstract class BaseEndToEndIT {
 	 * @param settings The settings to override the default project settings.
 	 * @see #getFixtureProjectSettings()
 	 */
-	protected void configure(@Nonnull final Map<String, Object> settings) {
+	protected void configure(@NonNull final Map<String, Object> settings) {
 	}
 
 	/**
@@ -117,7 +116,7 @@ public abstract class BaseEndToEndIT {
 	 * @param siteSourceDirectory The project site source directory.
 	 * @see GuiseMummy#PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY
 	 */
-	protected void populateSiteSourceDirectory(@Nonnull final Path siteSourceDirectory) throws IOException {
+	protected void populateSiteSourceDirectory(@NonNull final Path siteSourceDirectory) throws IOException {
 	}
 
 	/**
@@ -127,7 +126,7 @@ public abstract class BaseEndToEndIT {
 	 * @see #getFixtureProject()
 	 * @see GuiseMummy#mummify(GuiseProject, GuiseMummy.LifeCyclePhase)
 	 */
-	protected void mummify(@Nonnull final GuiseMummy.LifeCyclePhase phase) throws IOException {
+	protected void mummify(final GuiseMummy.LifeCyclePhase phase) throws IOException {
 		final GuiseMummy mummy = new GuiseMummy();
 		mummy.mummify(getFixtureProject(), phase);
 	}

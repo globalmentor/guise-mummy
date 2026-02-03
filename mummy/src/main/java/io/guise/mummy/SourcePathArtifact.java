@@ -21,7 +21,7 @@ import static com.globalmentor.io.Paths.*;
 import java.nio.file.Path;
 import java.util.regex.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 /**
  * Artifact that conceptually originates from a source path in a file system.
@@ -64,7 +64,7 @@ public interface SourcePathArtifact extends Artifact {
 	 * @param path The path to check.
 	 * @return <code>true</code> if the path filename matches the {@link #POST_FILENAME_PATTERN}.
 	 */
-	public static boolean hasPostFilename(@Nonnull final Path path) {
+	public static boolean hasPostFilename(@NonNull final Path path) {
 		return findFilename(path).map(POST_FILENAME_PATTERN::matcher).map(Matcher::matches).orElse(false);
 	}
 

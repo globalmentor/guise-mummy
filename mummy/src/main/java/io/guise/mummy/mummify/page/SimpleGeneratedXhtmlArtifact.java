@@ -20,7 +20,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import com.globalmentor.text.StringTemplate;
 
@@ -63,8 +63,8 @@ public class SimpleGeneratedXhtmlArtifact extends AbstractSourceFileArtifact {
 	 * @param description The description of the artifact; will be used to update the content with the title, if present.
 	 * @see Artifact#PROPERTY_HANDLE_TITLE
 	 */
-	public SimpleGeneratedXhtmlArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourcePath, @Nonnull final Path outputPath,
-			@Nonnull final UrfResourceDescription description) {
+	public SimpleGeneratedXhtmlArtifact(@NonNull final Mummifier mummifier, @NonNull final Path sourcePath, @NonNull final Path outputPath,
+			@NonNull final UrfResourceDescription description) {
 		super(mummifier, sourcePath, outputPath, description);
 	}
 

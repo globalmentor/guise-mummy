@@ -33,7 +33,7 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import com.globalmentor.net.DomainName;
 
@@ -124,7 +124,7 @@ public class GuiseMummy implements Clogged {
 	 * @see #CONFIG_KEY_DOMAIN
 	 * @throws ConfigurationException if the domain is not absolute.
 	 */
-	public static Optional<DomainName> findConfiguredDomain(@Nonnull final Configuration configuration) throws ConfigurationException {
+	public static Optional<DomainName> findConfiguredDomain(@NonNull final Configuration configuration) throws ConfigurationException {
 		return configuration.findString(CONFIG_KEY_DOMAIN).map(DomainName::of).map(domain -> {
 			if(!domain.isAbsolute() || domain.isRoot()) {
 				throw new ConfigurationException(format("The `%s` configuration `%s` must be a fully-qualified, non-root domain, ending in a dot `%s` character.",
@@ -148,7 +148,7 @@ public class GuiseMummy implements Clogged {
 	 * @see #CONFIG_KEY_DOMAIN
 	 * @throws ConfigurationException if the site domain cannot be resolved to absolute form.
 	 */
-	public static Optional<DomainName> findConfiguredSiteDomain(@Nonnull final Configuration configuration) throws ConfigurationException {
+	public static Optional<DomainName> findConfiguredSiteDomain(@NonNull final Configuration configuration) throws ConfigurationException {
 		final Optional<DomainName> configuredDomain = findConfiguredDomain(configuration);
 		final DomainName base = configuredDomain.orElse(DomainName.EMPTY);
 		return configuration.findString(CONFIG_KEY_SITE_DOMAIN).map(DomainName::of).map(base::resolve).or(() -> configuredDomain).map(siteDomain -> {
@@ -174,7 +174,7 @@ public class GuiseMummy implements Clogged {
 	 * @see #CONFIG_KEY_SITE_ALT_DOMAINS
 	 * @throws ConfigurationException if one of the site alternate domains cannot be resolved to absolute form.
 	 */
-	public static Optional<Collection<DomainName>> findConfiguredSiteAltDomains(@Nonnull final Configuration configuration) {
+	public static Optional<Collection<DomainName>> findConfiguredSiteAltDomains(@NonNull final Configuration configuration) {
 		final DomainName base = findConfiguredDomain(configuration).orElse(DomainName.EMPTY);
 		return configuration.findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class)
 				.map(names -> names.stream().map(DomainName::of).map(base::resolve).map(siteAltDomain -> {
@@ -263,7 +263,7 @@ public class GuiseMummy implements Clogged {
 	 * @param mummifierClass The class representing the type of mummifier to add
 	 * @throws IllegalArgumentException if the mummifier class does not have a no-args constructor.
 	 */
-	public void addFileMummifierType(@Nonnull final Class<? extends SourcePathMummifier> mummifierClass) {
+	public void addFileMummifierType(@NonNull final Class<? extends SourcePathMummifier> mummifierClass) {
 		try {
 			mummifierClass.getDeclaredConstructor();
 		} catch(final NoSuchMethodException noSuchMethodException) {
@@ -284,7 +284,7 @@ public class GuiseMummy implements Clogged {
 	 * @throws IllegalArgumentException if the configured source and target directories overlap.
 	 * @throws IOException if there is an I/O error generating the static site.
 	 */
-	public void mummify(@Nonnull final GuiseProject project, @Nonnull final LifeCyclePhase phase) throws IOException {
+	public void mummify(@NonNull final GuiseProject project, @NonNull final LifeCyclePhase phase) throws IOException {
 
 		//# initialize phase
 		getLogger().info("Mummify phase: {}", LifeCyclePhase.INITIALIZE); //TODO i18n
@@ -374,7 +374,7 @@ public class GuiseMummy implements Clogged {
 	 * @return A context to use during mummification.
 	 * @throws IOException if there is an I/O error during initialization, such as when loading the site configuration.
 	 */
-	protected Context initialize(@Nonnull final GuiseProject project) throws IOException {
+	protected Context initialize(@NonNull final GuiseProject project) throws IOException {
 		final Path siteSourceDirectory = project.getDirectory().resolve(project.getConfiguration().getPath(GuiseMummy.PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY));
 
 		final Configuration mummyConfiguration;
@@ -430,7 +430,7 @@ public class GuiseMummy implements Clogged {
 	 * @throws ConfigurationException if the configuration is invalid.
 	 * @throws IOException if there is an I/O error during validation.
 	 */
-	public void validate(@Nonnull final MummyContext context) throws IOException {
+	public void validate(@NonNull final MummyContext context) throws IOException {
 		checkArgumentDirectory(context.getSiteSourceDirectory());
 		checkArgumentDisjoint(context.getSiteSourceDirectory(), context.getSiteTargetDirectory());
 		final Configuration configuration = context.getConfiguration();
@@ -446,7 +446,7 @@ public class GuiseMummy implements Clogged {
 	}
 
 	//TODO document
-	private void printArtifactDescription(@Nonnull final MummyContext context, @Nonnull final Artifact artifact) { //TODO transfer to CLI
+	private void printArtifactDescription(@NonNull final MummyContext context, @NonNull final Artifact artifact) { //TODO transfer to CLI
 		final TurfSerializer turfSerializer = new TurfSerializer();
 
 		//TODO remove debug code
@@ -537,7 +537,7 @@ public class GuiseMummy implements Clogged {
 	 * @throws IllegalArgumentException if one of the given directories is not absolute.
 	 * @throws IOException if there is an error determining or loading the project.
 	 */
-	public static GuiseProject createProject(@Nonnull Path projectDirectory, @Nullable final Path siteSourceDirectory, @Nullable final Path siteTargetDirectory,
+	public static GuiseProject createProject(@NonNull Path projectDirectory, @Nullable final Path siteSourceDirectory, @Nullable final Path siteTargetDirectory,
 			@Nullable final Path siteDescriptionTargetDirectory) throws IOException {
 		projectDirectory = checkArgumentAbsolute(projectDirectory).normalize();
 
@@ -569,7 +569,7 @@ public class GuiseMummy implements Clogged {
 	 * @return The default Guise Mummy settings configuration.
 	 * @throws IllegalArgumentException if the project directory is not absolute.
 	 */
-	public static Configuration getDefaultConfiguration(@Nonnull Path projectDirectory) {
+	public static Configuration getDefaultConfiguration(@NonNull Path projectDirectory) {
 		projectDirectory = checkArgumentAbsolute(projectDirectory).normalize();
 		final Map<String, Object> defaultSettings = new HashMap<>();
 		defaultSettings.put(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY, projectDirectory.resolve(DEFAULT_PROJECT_SITE_SOURCE_RELATIVE_DIR)); //siteDirectory=${project.basedir}/src/site
@@ -619,7 +619,7 @@ public class GuiseMummy implements Clogged {
 		 * Sets the site plan.
 		 * @param plan The plan for the site.
 		 */
-		protected void setPlan(@Nonnull final MummyPlan plan) {
+		protected void setPlan(@NonNull final MummyPlan plan) {
 			this.plan = requireNonNull(plan);
 		}
 
@@ -631,7 +631,7 @@ public class GuiseMummy implements Clogged {
 		 * Sets the DNS configured for deployment.
 		 * @param deployDns The DNS to use for deployment.
 		 */
-		protected void setDeployDns(@Nonnull final Dns deployDns) {
+		protected void setDeployDns(@NonNull final Dns deployDns) {
 			this.deployDns = requireNonNull(deployDns);
 		}
 
@@ -646,7 +646,7 @@ public class GuiseMummy implements Clogged {
 		 * Sets the targets configured for deployment.
 		 * @param deployTargets The deployment targets.
 		 */
-		protected void setDeployTargets(@Nonnull final List<DeployTarget> deployTargets) {
+		protected void setDeployTargets(@NonNull final List<DeployTarget> deployTargets) {
 			this.deployTargets = requireNonNull(deployTargets);
 		}
 
@@ -661,7 +661,7 @@ public class GuiseMummy implements Clogged {
 		 * @param project The Guise project.
 		 * @param siteConfiguration The configuration for the site.
 		 */
-		public Context(@Nonnull final GuiseProject project, @Nonnull final Configuration siteConfiguration) {
+		public Context(@NonNull final GuiseProject project, @NonNull final Configuration siteConfiguration) {
 			super(project);
 			this.siteConfiguration = requireNonNull(siteConfiguration);
 		}

@@ -28,7 +28,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.regex.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import org.w3c.dom.*;
 
@@ -124,7 +124,7 @@ public class GuiseMesh {
 	 * @param evaluator The strategy for evaluating MEXL expressions.
 	 * @param interpolator The strategy for interpolating strings.
 	 */
-	public GuiseMesh(@Nonnull final MexlEvaluator evaluator, @Nonnull final MeshInterpolator interpolator) {
+	public GuiseMesh(@NonNull final MexlEvaluator evaluator, @NonNull final MeshInterpolator interpolator) {
 		this.evaluator = requireNonNull(evaluator);
 		this.interpolator = requireNonNull(interpolator);
 	}
@@ -140,7 +140,7 @@ public class GuiseMesh {
 	 * @throws MeshException if there was an error directly related to meshing the document, such as parsing an expression.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public Document meshDocument(@Nonnull MeshContext context, @Nonnull final Document document) throws IOException, MeshException, DOMException {
+	public Document meshDocument(@NonNull MeshContext context, @NonNull final Document document) throws IOException, MeshException, DOMException {
 		final List<Element> meshedElements = meshElement(context, document.getDocumentElement());
 		if(meshedElements.size() != 1 || meshedElements.get(0) != document.getDocumentElement()) {
 			throw new UnsupportedOperationException("Document element cannot be removed or replaced when meshing a document.");
@@ -159,7 +159,7 @@ public class GuiseMesh {
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
 	@SuppressWarnings("try")
-	public List<Element> meshElement(@Nonnull MeshContext context, @Nonnull final Element element) throws IOException, MeshException, DOMException {
+	public List<Element> meshElement(@NonNull MeshContext context, @NonNull final Element element) throws IOException, MeshException, DOMException {
 		final MexlEvaluator evaluator = getEvaluator();
 
 		//# iteration
@@ -267,7 +267,7 @@ public class GuiseMesh {
 	 * @see #getInterpolator()
 	 * @see #getEvaluator()
 	 */
-	public void meshChildNodes(@Nonnull MeshContext context, @Nonnull final Element element) throws IOException, MeshException, DOMException {
+	public void meshChildNodes(@NonNull MeshContext context, @NonNull final Element element) throws IOException, MeshException, DOMException {
 		final MeshInterpolator interpolator = getInterpolator();
 		final MexlEvaluator evaluator = getEvaluator();
 		final NodeList childNodes = element.getChildNodes();

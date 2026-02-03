@@ -17,14 +17,14 @@
 package io.guise.mummy.deploy.aws;
 
 import static com.globalmentor.net.URIs.*;
+import static java.io.InputStream.*;
 import static java.util.Objects.*;
 
 import java.io.*;
 import java.util.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
-import com.globalmentor.io.EmptyInputStream;
 import com.globalmentor.net.MediaType;
 
 import io.guise.mummy.Artifact;
@@ -68,7 +68,7 @@ public class S3ArtifactRedirectDeployObject extends AbstractS3DeployObject {
 	 * @param redirectTargetKey The S3 key representing the deployment path in the bucket serving as the target of the redirect.
 	 * @param redirectTargetArtifact The target artifact of the redirect.
 	 */
-	public S3ArtifactRedirectDeployObject(@Nonnull final String key, @Nonnull final String redirectTargetKey, @Nonnull final Artifact redirectTargetArtifact) {
+	public S3ArtifactRedirectDeployObject(@NonNull final String key, @NonNull final String redirectTargetKey, @NonNull final Artifact redirectTargetArtifact) {
 		super(key);
 		this.redirectTargetKey = requireNonNull(redirectTargetKey);
 		this.redirectTargetArtifact = requireNonNull(redirectTargetArtifact);
@@ -118,7 +118,7 @@ public class S3ArtifactRedirectDeployObject extends AbstractS3DeployObject {
 	 */
 	@Override
 	protected InputStream createInputStream() throws IOException {
-		return new EmptyInputStream();
+		return nullInputStream();
 	}
 
 }

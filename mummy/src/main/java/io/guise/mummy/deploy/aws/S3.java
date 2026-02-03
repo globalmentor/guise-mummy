@@ -31,7 +31,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import com.globalmentor.net.*;
 import com.globalmentor.text.StringTemplate;
@@ -97,7 +97,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @param bucket The S3 bucket the policy is for.
 	 * @return A policy allowing public read and get access for objects in the indicated bucket.
 	 */
-	public static String policyPublicReadGetForBucket(@Nonnull final String bucket) {
+	public static String policyPublicReadGetForBucket(@NonNull final String bucket) {
 		return POLICY_TEMPLATE_PUBLIC_READ_GET_OBJECT.apply(bucket);
 	}
 
@@ -140,7 +140,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html#condition-keys-useragent">AWS Global Condition
 	 *      Context Keys: aws:UserAgent</a>
 	 */
-	public static String policyPublicReadGetForBucketRequiringAnyUserAgentOf(@Nonnull final String bucket, @Nonnull final Iterable<String> userAgents) {
+	public static String policyPublicReadGetForBucketRequiringAnyUserAgentOf(@NonNull final String bucket, @NonNull final Iterable<String> userAgents) {
 		return POLICY_TEMPLATE_CONDITIONAL_PUBLIC_READ_GET_OBJECT.apply(bucket, policyConditionRequiringAnyUserAgentOf(userAgents));
 	}
 
@@ -162,7 +162,7 @@ public class S3 implements DeployTarget, Clogged {
 	 *      Context Keys: aws:UserAgent</a>
 	 * @throws IllegalArgumentException if one of the user agent strings contains the quote <code>'"'</code> character.
 	 */
-	public static String policyConditionRequiringAnyUserAgentOf(@Nonnull final Iterable<String> userAgents) {
+	public static String policyConditionRequiringAnyUserAgentOf(@NonNull final Iterable<String> userAgents) {
 		final String userAgentJsonArrayValues = toStream(userAgents).map(userAgent -> {
 			checkArgument(!contains(userAgent, '"'), "User agent `%s` cannot contain a quote `\"` character.", userAgent);
 			return userAgent;
@@ -236,7 +236,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @see GuiseMummy#CONFIG_KEY_DOMAIN
 	 * @see #getConfiguredBucket(Configuration, Configuration)
 	 */
-	public S3(@Nonnull final MummyContext context, @Nonnull final Configuration localConfiguration) {
+	public S3(@NonNull final MummyContext context, @NonNull final Configuration localConfiguration) {
 		this(context.getConfiguration().findString(AWS.CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null), Region.of(localConfiguration.getString(CONFIG_KEY_REGION)),
 				getConfiguredBucket(context.getConfiguration(), localConfiguration));
 	}
@@ -247,7 +247,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @param region The AWS region of deployment.
 	 * @param bucket The bucket into which the site should be deployed.
 	 */
-	public S3(@Nullable String profile, @Nonnull final Region region, @Nonnull String bucket) {
+	public S3(@Nullable String profile, @NonNull final Region region, @NonNull String bucket) {
 		this.profile = profile;
 		this.region = requireNonNull(region);
 		this.bucket = requireNonNull(bucket);
@@ -274,7 +274,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
 	 * @throws ConfigurationException if the bucket name cannot be determined.
 	 */
-	protected static String getConfiguredBucket(@Nonnull final Configuration globalConfiguration, @Nonnull final Configuration localConfiguration)
+	protected static String getConfiguredBucket(@NonNull final Configuration globalConfiguration, @NonNull final Configuration localConfiguration)
 			throws ConfigurationException {
 		return localConfiguration.findString(CONFIG_KEY_BUCKET)
 				.or(() -> findConfiguredSiteDomain(globalConfiguration).map(DomainName.ROOT::relativize).map(DomainName::toString))
@@ -320,7 +320,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @see CreateBucketConfiguration.Builder#locationConstraint(String)
 	 * @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/API/API_CreateBucket.html">CreateBucket API</a>
 	 */
-	protected static Consumer<CreateBucketConfiguration.Builder> configuringCreateBucketForRegion(@Nonnull final Region region) {
+	protected static Consumer<CreateBucketConfiguration.Builder> configuringCreateBucketForRegion(@NonNull final Region region) {
 		final String regionId = region.id();
 		return config -> {
 			if(!regionId.equals(Region.US_EAST_1.id())) { //AWS will produce an error if we explicitly indicate the default
@@ -337,7 +337,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @param hasPolicy Whether the bucket already has a policy set.
 	 * @throws IOException if there is an error setting the bucket policy.
 	 */
-	protected void setBucketPolicy(@Nonnull final MummyContext context, @Nonnull String bucket, final boolean hasPolicy) throws IOException {
+	protected void setBucketPolicy(@NonNull final MummyContext context, @NonNull String bucket, final boolean hasPolicy) throws IOException {
 	}
 
 	/**
@@ -346,7 +346,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @return no URL, as a basic S3 deployment does not have a web site configured.
 	 */
 	@Override
-	public Optional<URI> deploy(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact) throws IOException {
+	public Optional<URI> deploy(@NonNull final MummyContext context, @NonNull Artifact rootArtifact) throws IOException {
 		getLogger().info("Deploying to AWS region `{}` S3 bucket `{}`.", getRegion(), getBucket());
 
 		//#plan
@@ -368,7 +368,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @param rootArtifact The root artifact of the site being deployed.
 	 * @throws IOException if there is an I/O error during site deployment planning.
 	 */
-	protected void plan(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact) throws IOException {
+	protected void plan(@NonNull final MummyContext context, @NonNull Artifact rootArtifact) throws IOException {
 		plan(context, rootArtifact.getTargetPath().toUri(), rootArtifact);
 	}
 
@@ -380,7 +380,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @param artifact The current artifact for which deployment is being planned.
 	 * @throws IOException if there is an I/O error during site deployment planning.
 	 */
-	protected void plan(@Nonnull final MummyContext context, @Nonnull final URI rootTargetPathUri, @Nonnull Artifact artifact) throws IOException {
+	protected void plan(@NonNull final MummyContext context, @NonNull final URI rootTargetPathUri, @NonNull Artifact artifact) throws IOException {
 		final URI artifactTargetPathUri = artifact.getTargetPath().toUri();
 		final URIPath resourceReference = URIPath.relativize(rootTargetPathUri,
 				artifact instanceof CollectionArtifact ? toCollectionURI(artifactTargetPathUri) : artifactTargetPathUri);
@@ -402,8 +402,8 @@ public class S3 implements DeployTarget, Clogged {
 	 * @param resourceReference A URI reference to the resource, relative to the site root.
 	 * @throws IOException if there is an I/O error during site deployment planning.
 	 */
-	protected void planResource(@Nonnull final MummyContext context, @Nonnull final URI rootTargetPathUri, @Nonnull Artifact artifact,
-			@Nonnull final URIPath resourceReference) throws IOException {
+	protected void planResource(@NonNull final MummyContext context, @NonNull final URI rootTargetPathUri, @NonNull Artifact artifact,
+			@NonNull final URIPath resourceReference) throws IOException {
 		final String key = resourceReference.toString();
 		getLogger().debug("Planning deployment for artifact {}, S3 key `{}`.", artifact, key);
 		if(!(artifact instanceof CollectionArtifact)) { //don't deploy an S3 object for collection artifacts (e.g. directories)
@@ -428,7 +428,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @see MummyContext#isFull()
 	 * @see Content#FINGERPRINT_PROPERTY_TAG
 	 */
-	protected void put(@Nonnull final MummyContext context) throws IOException {
+	protected void put(@NonNull final MummyContext context) throws IOException {
 		try {
 			final S3Client s3Client = getS3Client();
 			final String bucket = getBucket();
@@ -474,7 +474,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @see S3DeployObject#getKey()
 	 * @see S3DeployObject#getContentType()
 	 */
-	protected PutObjectRequest.Builder preparePutObject(@Nonnull final MummyContext context, @Nonnull final S3DeployObject deployObject) {
+	protected PutObjectRequest.Builder preparePutObject(@NonNull final MummyContext context, @NonNull final S3DeployObject deployObject) {
 		final PutObjectRequest.Builder putBuilder = PutObjectRequest.builder().bucket(getBucket()).key(deployObject.getKey())
 				.contentType(deployObject.getContentType());
 		final Map<String, String> metadata = deployObject.getMetadata(); //set other metadata, if any 
@@ -491,7 +491,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @param deployObject The object to be deployed.
 	 * @return Any further detail if present.
 	 */
-	protected Optional<String> findDetailLabel(@Nonnull final S3DeployObject deployObject) {
+	protected Optional<String> findDetailLabel(@NonNull final S3DeployObject deployObject) {
 		return Optional.empty();
 	}
 
@@ -503,7 +503,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @param context The context of static site generation.
 	 * @throws IOException if there is an I/O error during pruning.
 	 */
-	protected void prune(@Nonnull final MummyContext context) throws IOException {
+	protected void prune(@NonNull final MummyContext context) throws IOException {
 		try {
 			final S3Client s3Client = getS3Client();
 			final String bucket = getBucket();
@@ -536,7 +536,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @return <code>true</code> if the bucket exists; otherwise <code>false</code>.
 	 * @throws SdkException if some error occurred, such as insufficient permissions.
 	 */
-	protected boolean bucketExists(@Nonnull final String bucket) throws SdkException {
+	protected boolean bucketExists(@NonNull final String bucket) throws SdkException {
 		try {
 			getS3Client().headBucket(builder -> builder.bucket(bucket));
 			return true;
@@ -551,7 +551,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @return <code>true</code> if the bucket has a policy; otherwise <code>false</code>.
 	 * @throws SdkException if some error occurred, such as insufficient permissions.
 	 */
-	protected boolean bucketHasPolicy(@Nonnull final String bucket) throws SdkException {
+	protected boolean bucketHasPolicy(@NonNull final String bucket) throws SdkException {
 		try {
 			getS3Client().getBucketPolicy(builder -> builder.bucket(bucket));
 			return true;
@@ -569,7 +569,7 @@ public class S3 implements DeployTarget, Clogged {
 	 * @return <code>true</code> if the bucket has a web site configuration; otherwise <code>false</code>.
 	 * @throws SdkException if some error occurred, such as insufficient permissions.
 	 */
-	protected boolean bucketHasWebsiteConfiguration(@Nonnull final String bucket) throws SdkException {
+	protected boolean bucketHasWebsiteConfiguration(@NonNull final String bucket) throws SdkException {
 		try {
 			getS3Client().getBucketWebsite(builder -> builder.bucket(bucket));
 			return true;

@@ -21,7 +21,7 @@ import static java.util.Objects.*;
 
 import java.nio.file.Path;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import io.confound.config.Configuration;
 
@@ -52,7 +52,7 @@ public class DefaultGuiseProject implements GuiseProject {
 	 * @param directory The absolute project directory.
 	 * @throws IllegalArgumentException if the project directory is not absolute.
 	 */
-	public DefaultGuiseProject(@Nonnull final Path directory) {
+	public DefaultGuiseProject(@NonNull final Path directory) {
 		this(directory, GuiseMummy.getDefaultConfiguration(directory));
 	}
 
@@ -62,7 +62,7 @@ public class DefaultGuiseProject implements GuiseProject {
 	 * @param configuration The project configuration.
 	 * @throws IllegalArgumentException if the project directory is not absolute.
 	 */
-	public DefaultGuiseProject(@Nonnull final Path directory, @Nonnull final Configuration configuration) {
+	public DefaultGuiseProject(@NonNull final Path directory, @NonNull final Configuration configuration) {
 		this.directory = checkArgumentAbsolute(directory).normalize();
 		this.configuration = requireNonNull(configuration);
 	}

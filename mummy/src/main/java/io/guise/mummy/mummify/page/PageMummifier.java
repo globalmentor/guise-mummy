@@ -28,8 +28,7 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import javax.annotation.*;
-
+import org.jspecify.annotations.*;
 import org.w3c.dom.*;
 
 import com.globalmentor.net.MediaType;
@@ -97,7 +96,7 @@ public interface PageMummifier extends Mummifier {
 	 * @return <code>true</code> if the artifact should <em>not</em> be included in normal navigation.
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN
 	 */
-	public default boolean isAsset(@Nonnull MummyContext context, @Nonnull final Artifact artifact) {
+	public default boolean isAsset(@NonNull MummyContext context, @NonNull final Artifact artifact) {
 		final Pattern assetNamePattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN, Pattern.class);
 		final Path artifactPath = artifact.getSourcePath().getFileName();
 		return artifactPath != null && assetNamePattern.matcher(artifactPath.toString()).matches();
@@ -114,7 +113,7 @@ public interface PageMummifier extends Mummifier {
 	 * @return <code>true</code> if the artifact should <em>not</em> be included in normal navigation.
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN
 	 */
-	public default boolean isVeiled(@Nonnull MummyContext context, @Nonnull final Artifact artifact) {
+	public default boolean isVeiled(@NonNull MummyContext context, @NonNull final Artifact artifact) {
 		final Pattern veilNamePattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.class);
 		final Path artifactPath = artifact.getSourcePath().getFileName();
 		return artifactPath != null && veilNamePattern.matcher(artifactPath.toString()).matches();
@@ -134,7 +133,7 @@ public interface PageMummifier extends Mummifier {
 	 * @see MummyPlan#getPrincipalArtifact(Artifact)
 	 * @see MummyPlan#findParentArtifact(Artifact)
 	 */
-	public default Optional<Artifact> findParentNavigationArtifact(@Nonnull MummyContext context, @Nonnull final Artifact artifact) {
+	public default Optional<Artifact> findParentNavigationArtifact(@NonNull MummyContext context, @NonNull final Artifact artifact) {
 		final MummyPlan plan = context.getPlan();
 		final Artifact principalArtifact = plan.getPrincipalArtifact(artifact);
 		return principalArtifact instanceof CollectionArtifact ? Optional.of(principalArtifact) : plan.findParentArtifact(principalArtifact);
@@ -160,7 +159,7 @@ public interface PageMummifier extends Mummifier {
 	 * @see #isAsset(MummyContext, Artifact)
 	 * @see #isVeiled(MummyContext, Artifact)
 	 */
-	public default Stream<Artifact> childNavigationArtifacts(@Nonnull MummyContext context, @Nonnull final Artifact artifact) {
+	public default Stream<Artifact> childNavigationArtifacts(@NonNull MummyContext context, @NonNull final Artifact artifact) {
 		final MummyPlan plan = context.getPlan();
 		final Artifact principalArtifact = plan.getPrincipalArtifact(artifact);
 		final Stream<Artifact> candidateArtifacts = principalArtifact instanceof CollectionArtifact ? plan.childArtifacts(principalArtifact)
@@ -182,7 +181,7 @@ public interface PageMummifier extends Mummifier {
 	 * @see #childNavigationArtifacts(MummyContext, Artifact)
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME
 	 */
-	public Stream<NavigationItem> navigation(@Nonnull MummyContext context, @Nonnull final Artifact artifact) throws IOException;
+	public Stream<NavigationItem> navigation(@NonNull MummyContext context, @NonNull final Artifact artifact) throws IOException;
 
 	//# load
 
@@ -202,7 +201,7 @@ public interface PageMummifier extends Mummifier {
 	 * @throws IOException if there is an error loading and/or converting the source file contents.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public default Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull Path sourceFile) throws IOException, DOMException {
+	public default Document loadSourceDocument(@NonNull MummyContext context, @NonNull Path sourceFile) throws IOException, DOMException {
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile))) {
 			return loadSourceDocument(context, inputStream, sourceFile.toString());
 		}
@@ -226,7 +225,7 @@ public interface PageMummifier extends Mummifier {
 	 * @throws IOException if there is an error loading and/or converting the source file contents.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public default Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull CorporealSourceArtifact artifact) throws IOException, DOMException {
+	public default Document loadSourceDocument(@NonNull MummyContext context, @NonNull CorporealSourceArtifact artifact) throws IOException, DOMException {
 		try (final InputStream inputStream = new BufferedInputStream(artifact.openSource(context))) {
 			return loadSourceDocument(context, inputStream, artifact.getSourcePath().toString());
 		}
@@ -249,7 +248,7 @@ public interface PageMummifier extends Mummifier {
 	 * @throws IOException if there is an error loading and/or converting the source file contents.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public Document loadSourceDocument(@Nonnull MummyContext context, @Nonnull InputStream inputStream, @Nonnull final String name)
+	public Document loadSourceDocument(@NonNull MummyContext context, @NonNull InputStream inputStream, @NonNull final String name)
 			throws IOException, DOMException;
 
 	//## load excerpt
@@ -269,7 +268,7 @@ public interface PageMummifier extends Mummifier {
 	 * @throws IOException if there is an error loading and/or converting the source file contents.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public default Optional<DocumentFragment> loadSourceExcerpt(@Nonnull MummyContext context, @Nonnull Path sourceFile) throws IOException, DOMException {
+	public default Optional<DocumentFragment> loadSourceExcerpt(@NonNull MummyContext context, @NonNull Path sourceFile) throws IOException, DOMException {
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile))) {
 			return loadSourceExcerpt(context, inputStream, sourceFile.toString());
 		}
@@ -290,7 +289,7 @@ public interface PageMummifier extends Mummifier {
 	 * @throws IOException if there is an error loading and/or converting the source file contents.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public default Optional<DocumentFragment> loadSourceExcerpt(@Nonnull MummyContext context, @Nonnull CorporealSourceArtifact artifact)
+	public default Optional<DocumentFragment> loadSourceExcerpt(@NonNull MummyContext context, @NonNull CorporealSourceArtifact artifact)
 			throws IOException, DOMException {
 		try (final InputStream inputStream = new BufferedInputStream(artifact.openSource(context))) {
 			return loadSourceExcerpt(context, inputStream, artifact.getSourcePath().toString());
@@ -311,7 +310,7 @@ public interface PageMummifier extends Mummifier {
 	 * @throws IOException if there is an error loading and/or converting the source file contents.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public Optional<DocumentFragment> loadSourceExcerpt(@Nonnull MummyContext context, @Nonnull InputStream inputStream, @Nonnull final String name)
+	public Optional<DocumentFragment> loadSourceExcerpt(@NonNull MummyContext context, @NonNull InputStream inputStream, @NonNull final String name)
 			throws IOException, DOMException;
 
 	//# relocate
@@ -326,7 +325,7 @@ public interface PageMummifier extends Mummifier {
 	 * @throws IOException if there is an error relocating the document.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public Document relocateDocument(@Nonnull MummyContext context, @Nonnull final Document sourceDocument, @Nonnull final Path originalReferrerSourcePath,
-			@Nonnull final Function<Artifact, URIPath> referenceGenerator) throws IOException, DOMException;
+	public Document relocateDocument(@NonNull MummyContext context, @NonNull final Document sourceDocument, @NonNull final Path originalReferrerSourcePath,
+			@NonNull final Function<Artifact, URIPath> referenceGenerator) throws IOException, DOMException;
 
 }

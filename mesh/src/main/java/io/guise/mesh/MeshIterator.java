@@ -23,7 +23,7 @@ import static java.util.Objects.*;
 import java.util.*;
 import java.util.stream.Stream;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 /**
  * The current state of an ongoing iteration.
@@ -48,7 +48,7 @@ public class MeshIterator implements Iterator<Object> {
 	 * Iterator constructor.
 	 * @param iterator The iterator to provide state for.
 	 */
-	private MeshIterator(@Nonnull final Iterator<?> iterator) {
+	private MeshIterator(@NonNull final Iterator<?> iterator) {
 		this.iterator = requireNonNull(iterator);
 	}
 
@@ -138,7 +138,7 @@ public class MeshIterator implements Iterator<Object> {
 	 * @return A new state ready for iteration.
 	 * @throws IllegalArgumentException if the given object is not supported as a source of iteration.
 	 */
-	public static MeshIterator fromIterationSource(@Nonnull final Object source) {
+	public static MeshIterator fromIterationSource(@NonNull final Object source) {
 		return new MeshIterator(toIterator(source));
 	}
 
@@ -161,7 +161,7 @@ public class MeshIterator implements Iterator<Object> {
 	 * @return An iterator to the items in the iteration source.
 	 * @throws IllegalArgumentException if the object is an array to an unsupported primitive type.
 	 */
-	protected static Iterator<?> toIterator(@Nonnull final Object object) {
+	protected static Iterator<?> toIterator(@NonNull final Object object) {
 		if(object.getClass().isArray()) {
 			if(object instanceof Object[]) {
 				return asList((Object[])object).iterator();
