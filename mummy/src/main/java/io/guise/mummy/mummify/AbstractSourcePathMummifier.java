@@ -37,6 +37,10 @@ import io.urf.model.*;
  */
 public abstract class AbstractSourcePathMummifier extends AbstractMummifier implements SourcePathMummifier {
 
+	/** Constructor. */
+	protected AbstractSourcePathMummifier() {
+	}
+
 	/**
 	 * Determines the path for an artifact source description sidecar for the given artifact.
 	 * @apiNote Whether a source description file is supported depends on the specific mummifier implementation.

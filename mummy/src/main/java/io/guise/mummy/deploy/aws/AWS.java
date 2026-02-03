@@ -22,6 +22,10 @@ package io.guise.mummy.deploy.aws;
  */
 public class AWS {
 
+	/** This class cannot be publicly instantiated. */
+	private AWS() {
+	}
+
 	/**
 	 * The global configuration for the AWS profile to use in deployment.
 	 * @see <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html">Named Profiles</a>

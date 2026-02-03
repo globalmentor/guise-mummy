@@ -38,6 +38,10 @@ import io.urf.vocab.content.Content;
  */
 public abstract class BaseArtifactQuery implements ArtifactQuery {
 
+	/** Constructor. */
+	protected BaseArtifactQuery() {
+	}
+
 	private Stream<Artifact> stream = null;
 
 	private Comparator<Artifact> comparator;

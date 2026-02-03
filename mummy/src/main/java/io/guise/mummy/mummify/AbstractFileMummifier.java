@@ -47,6 +47,10 @@ import io.urf.vocab.content.Content;
  */
 public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier {
 
+	/** Constructor. */
+	protected AbstractFileMummifier() {
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This implementation loads the description using {@link #loadArtifactDescription(MummyContext, Path, Path)} and then creates a new artifact using

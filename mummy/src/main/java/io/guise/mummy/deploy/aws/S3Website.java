@@ -180,7 +180,10 @@ public class S3Website extends S3 {
 
 	private final Set<String> altBuckets;
 
-	/** @return The S3 buckets, if any, to serve as alternatives and redirect to the primary bucket. */
+	/**
+	 * Returns the S3 buckets, if any, to serve as alternatives and redirect to the primary bucket.
+	 * @return The S3 buckets, if any, to serve as alternatives and redirect to the primary bucket.
+	 */
 	public Set<String> getAltBuckets() {
 		return altBuckets;
 	}
@@ -197,28 +200,40 @@ public class S3Website extends S3 {
 
 	private final DomainName siteDomain;
 
-	/** @return The explicit site domain if specified, which may be the same or different than the bucket name. */
+	/**
+	 * Returns the explicit site domain if specified, which may be the same or different than the bucket name.
+	 * @return The explicit site domain if specified, which may be the same or different than the bucket name.
+	 */
 	public Optional<DomainName> getSiteDomain() {
 		return Optional.ofNullable(siteDomain);
 	}
 
 	private final RedirectMeans redirectMeans;
 
-	/** @return The S3 website means to be used for effecting redirects. */
+	/**
+	 * Returns the S3 website means to be used for effecting redirects.
+	 * @return The S3 website means to be used for effecting redirects.
+	 */
 	public RedirectMeans getRedirectMeans() {
 		return redirectMeans;
 	}
 
 	private final int redirectCountOptimalThreshold;
 
-	/** @return The number of redirects required to switch to using object-redirects for non-collection alt locations. */
+	/**
+	 * Returns the number of redirects required to switch to using object-redirects for non-collection alt locations.
+	 * @return The number of redirects required to switch to using object-redirects for non-collection alt locations.
+	 */
 	public int getRedirectCountOptimalThreshold() {
 		return redirectCountOptimalThreshold;
 	}
 
 	private final Set<S3ArtifactRedirectDeployObject> routingRuleRedirectObjects = new LinkedHashSet<>();
 
-	/** @return The map of redirects to be implemented using routing rules. */
+	/**
+	 * Returns the map of redirects to be implemented using routing rules.
+	 * @return The map of redirects to be implemented using routing rules.
+	 */
 	protected Set<S3ArtifactRedirectDeployObject> getRoutingRuleRedirectObjects() {
 		return routingRuleRedirectObjects;
 	}

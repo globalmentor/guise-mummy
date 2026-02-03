@@ -37,6 +37,10 @@ import io.guise.mummy.*;
  */
 public class OpaqueFileMummifier extends AbstractFileMummifier {
 
+	/** Constructor. */
+	public OpaqueFileMummifier() {
+	}
+
 	@Override
 	public Set<String> getSupportedFilenameExtensions() {
 		return emptySet();

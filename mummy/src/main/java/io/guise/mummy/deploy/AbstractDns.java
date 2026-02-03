@@ -55,7 +55,10 @@ public abstract class AbstractDns implements Dns, Clogged {
 
 	private List<ResourceRecord> resourceRecords;
 
-	/** @return The resource records to be created during deployment. */
+	/**
+	 * Returns the resource records to be created during deployment.
+	 * @return The resource records to be created during deployment.
+	 */
 	public List<ResourceRecord> getResourceRecords() {
 		return resourceRecords;
 	}

@@ -65,16 +65,28 @@ import io.urf.vocab.content.Content;
  */
 public class DefaultImageMummifier extends BaseImageMummifier {
 
-	/** @see #CONFIG_KEY_MUMMY_IMAGE_WITH_ASPECTS */
+	/**
+	 * The default image aspect IDs.
+	 * @see #CONFIG_KEY_MUMMY_IMAGE_WITH_ASPECTS
+	 */
 	public static final Set<String> DEFAULT_ASPECT_IDS = emptySet();
 
-	/** @see #CONFIG_KEY_MUMMY_IMAGE_COMPRESSION_QUALITY */
+	/**
+	 * The default image compression quality.
+	 * @see #CONFIG_KEY_MUMMY_IMAGE_COMPRESSION_QUALITY
+	 */
 	public static final double DEFAULT_COMPRESSION_QUALITY = 0.8;
 
-	/** @see #CONFIG_KEY_MUMMY_IMAGE_SCALE_MAX_LENGTH */
+	/**
+	 * The default maximum length for scaling images.
+	 * @see #CONFIG_KEY_MUMMY_IMAGE_SCALE_MAX_LENGTH
+	 */
 	public static final int DEFAULT_SCALE_MAX_LENGTH = 1920;
 
-	/** @see #CONFIG_KEY_MUMMY_IMAGE_PROCESS_THRESHOLD_FILE_SIZE */
+	/**
+	 * The default threshold file size for image processing.
+	 * @see #CONFIG_KEY_MUMMY_IMAGE_PROCESS_THRESHOLD_FILE_SIZE
+	 */
 	public static final long DEFAULT_SCALE_THRESHOLD_FILE_SIZE = 800_000;
 
 	/** No-args constructor. */

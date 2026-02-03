@@ -98,6 +98,11 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 	 * @see <a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html">Using the managed cache policies</a>
 	 */
 	public static final class ManagedCachePolicyIds {
+
+		/** This class cannot be publicly instantiated. */
+		private ManagedCachePolicyIds() {
+		}
+
 		/** <code>Amplify</code>: This policy is designed for use with an origin that is an AWS Amplify web app. */
 		public static final UUID AMPLIFY = UUID.fromString("2e54312d-136d-493c-8eb9-b001f22f67d2");
 		/** <code>CachingDisabled</code>: This policy disables caching. This policy is useful for dynamic content and for requests that are not cacheable. */
@@ -132,21 +137,30 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 
 	private final String profile;
 
-	/** @return The AWS profile if one was set explicitly. */
+	/**
+	 * Returns the AWS profile if one was set explicitly.
+	 * @return The AWS profile if one was set explicitly.
+	 */
 	public final Optional<String> getProfile() {
 		return Optional.of(profile);
 	}
 
 	private final AcmClient acmClient;
 
-	/** @return The client for connecting to ACM. */
+	/**
+	 * Returns the client for connecting to ACM.
+	 * @return The client for connecting to ACM.
+	 */
 	protected AcmClient getAcmClient() {
 		return acmClient;
 	}
 
 	private final CloudFrontClient cloudFrontClient;
 
-	/** @return The client for connecting to CloudFront. */
+	/**
+	 * Returns the client for connecting to CloudFront.
+	 * @return The client for connecting to CloudFront.
+	 */
 	protected CloudFrontClient getCloudFrontClient() {
 		return cloudFrontClient;
 	}

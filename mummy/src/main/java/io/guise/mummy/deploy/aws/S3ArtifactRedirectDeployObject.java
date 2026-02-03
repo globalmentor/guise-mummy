@@ -39,14 +39,20 @@ public class S3ArtifactRedirectDeployObject extends AbstractS3DeployObject {
 
 	private final String redirectTargetKey;
 
-	/** @return The S3 key representing the deployment path in the bucket serving as the target of the redirect. */
+	/**
+	 * Returns the S3 key representing the deployment path in the bucket serving as the target of the redirect.
+	 * @return The S3 key representing the deployment path in the bucket serving as the target of the redirect.
+	 */
 	public String getRedirectTargetKey() {
 		return redirectTargetKey;
 	}
 
 	private final Artifact redirectTargetArtifact;
 
-	/** @return The target artifact of the redirect. */
+	/**
+	 * Returns the target artifact of the redirect.
+	 * @return The target artifact of the redirect.
+	 */
 	public Artifact getTargetArtifact() {
 		return redirectTargetArtifact;
 	}

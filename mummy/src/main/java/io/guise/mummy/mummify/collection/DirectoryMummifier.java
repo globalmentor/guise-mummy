@@ -66,6 +66,10 @@ import io.urf.vocab.content.Content;
  */
 public class DirectoryMummifier extends AbstractSourcePathMummifier {
 
+	/** Constructor. */
+	public DirectoryMummifier() {
+	}
+
 	@Override
 	public Set<String> getSupportedFilenameExtensions() {
 		return emptySet();

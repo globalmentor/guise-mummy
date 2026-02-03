@@ -112,7 +112,10 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 
 	private final HtmlRenderer htmlRenderer;
 
-	/** @return The formatter that serializes a Markdown tree as HTML body content. */
+	/**
+	 * Returns the formatter that serializes a Markdown tree as HTML body content.
+	 * @return The formatter that serializes a Markdown tree as HTML body content.
+	 */
 	protected HtmlRenderer getHtmlRenderer() {
 		return htmlRenderer;
 	}

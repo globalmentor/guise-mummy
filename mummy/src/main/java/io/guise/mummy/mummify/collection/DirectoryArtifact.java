@@ -62,7 +62,10 @@ public class DirectoryArtifact extends AbstractArtifact implements SourcePathArt
 
 	private final Artifact contentArtifact;
 
-	/** @return The optional internal artifact representing the content of this directory, such as <code>index.xhtml</code>. */
+	/**
+	 * Returns the optional internal artifact representing the content of this directory, such as <code>index.xhtml</code>.
+	 * @return The optional internal artifact representing the content of this directory, such as <code>index.xhtml</code>.
+	 */
 	public Optional<Artifact> findContentArtifact() {
 		return Optional.ofNullable(contentArtifact);
 	}

@@ -36,7 +36,10 @@ public interface MummyPlan {
 
 	//# artifact lookup
 
-	/** @return The root artifact of the site, representing the root directory. */
+	/**
+	 * Returns the root artifact of the site, representing the root directory.
+	 * @return The root artifact of the site, representing the root directory.
+	 */
 	public Artifact getRootArtifact();
 
 	/**

@@ -232,7 +232,10 @@ public class GuiseMummy implements Clogged {
 
 	private boolean full = false;
 
-	/** @return <code>true</code> if full mummification is enabled; <code>false</code> if mummification is incremental. */
+	/**
+	 * Indicates whether full mummification is enabled, as opposed to incremental mummification.
+	 * @return <code>true</code> if full mummification is enabled; <code>false</code> if mummification is incremental.
+	 */
 	public boolean isFull() {
 		return full;
 	}
@@ -249,7 +252,10 @@ public class GuiseMummy implements Clogged {
 
 	private final List<URI> deployUrls = new ArrayList<>();
 
-	/** @return The URLs of the sites that were successfully deployed. */
+	/**
+	 * Returns the URLs of the sites that were successfully deployed.
+	 * @return The URLs of the sites that were successfully deployed.
+	 */
 	public List<URI> getDeployUrls() {
 		return unmodifiableList(deployUrls);
 	}

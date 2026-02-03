@@ -96,6 +96,10 @@ public class DefaultMummyPlan extends AbstractMummyPlan {
 	 */
 	protected class DefaultArtifactQuery extends BaseArtifactQuery {
 
+		/** Constructor. */
+		protected DefaultArtifactQuery() {
+		}
+
 		@Override
 		public ArtifactQuery fromChildrenOf(final Artifact artifact) {
 			setStream(childArtifacts(artifact));

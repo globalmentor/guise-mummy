@@ -72,6 +72,10 @@ import io.guise.mummy.mummify.page.widget.*;
  */
 public class DirectoryWidget implements Widget {
 
+	/** Constructor. */
+	public DirectoryWidget() {
+	}
+
 	/** The widget element name. */
 	private static final NsName WIDGET_ELEMENT = NsName.of(GuiseMummy.NAMESPACE_STRING, "directory");
 

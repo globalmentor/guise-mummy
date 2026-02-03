@@ -46,6 +46,10 @@ import io.urf.model.*;
  */
 public abstract class AbstractMummifier implements Mummifier {
 
+	/** Constructor. */
+	protected AbstractMummifier() {
+	}
+
 	/**
 	 * {@inheritDoc}
 	 * @implSpec This version merely returns the given filename unmodified.

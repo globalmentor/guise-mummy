@@ -181,40 +181,58 @@ public class S3 implements DeployTarget, Clogged {
 
 	private final String profile;
 
-	/** @return The AWS profile if one was set explicitly. */
+	/**
+	 * Returns the AWS profile if one was set explicitly.
+	 * @return The AWS profile if one was set explicitly.
+	 */
 	public final Optional<String> getProfile() {
 		return Optional.ofNullable(profile);
 	}
 
 	private final Region region;
 
-	/** @return The specified region for deployment. */
+	/**
+	 * Returns the specified region for deployment.
+	 * @return The specified region for deployment.
+	 */
 	public Region getRegion() {
 		return region;
 	}
 
 	private final String bucket;
 
-	/** @return The destination S3 bucket for deployment. */
+	/**
+	 * Returns the destination S3 bucket for deployment.
+	 * @return The destination S3 bucket for deployment.
+	 */
 	public String getBucket() {
 		return bucket;
 	}
 
-	/** @return A stream of all bucket names, starting with the primary bucket {@link #getBucket()}. */
+	/**
+	 * Returns a stream of all bucket names, starting with the primary bucket {@link #getBucket()}.
+	 * @return A stream of all bucket names, starting with the primary bucket {@link #getBucket()}.
+	 */
 	public Stream<String> buckets() {
 		return Stream.of(getBucket());
 	}
 
 	private final S3Client s3Client;
 
-	/** @return The client for connecting to S3. */
+	/**
+	 * Returns the client for connecting to S3.
+	 * @return The client for connecting to S3.
+	 */
 	protected S3Client getS3Client() {
 		return s3Client;
 	}
 
 	private final Map<String, S3DeployObject> deployObjectsByKey = new LinkedHashMap<>();
 
-	/** @return The map of S3 objects to deploy, associated with their bucket keys. */
+	/**
+	 * Returns the map of S3 objects to deploy, associated with their bucket keys.
+	 * @return The map of S3 objects to deploy, associated with their bucket keys.
+	 */
 	protected Map<String, S3DeployObject> getDeployObjectsByKey() {
 		return deployObjectsByKey;
 	}

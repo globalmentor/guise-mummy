@@ -75,7 +75,10 @@ public class Route53 extends AbstractDns {
 
 	private final String profile;
 
-	/** @return The AWS profile if one was set explicitly. */
+	/**
+	 * Returns the AWS profile if one was set explicitly.
+	 * @return The AWS profile if one was set explicitly.
+	 */
 	public final Optional<String> getProfile() {
 		return Optional.of(profile);
 	}
@@ -84,14 +87,20 @@ public class Route53 extends AbstractDns {
 
 	private HostedZone hostedZone;
 
-	/** @return The hosted zone; only available after {@link #prepare(MummyContext)} has been called. */
+	/**
+	 * Returns the hosted zone; only available after {@link #prepare(MummyContext)} has been called.
+	 * @return The hosted zone; only available after {@link #prepare(MummyContext)} has been called.
+	 */
 	protected Optional<HostedZone> getHostedZone() {
 		return Optional.ofNullable(hostedZone);
 	}
 
 	private final Route53Client route53Client;
 
-	/** @return The client for connecting to Route 53. */
+	/**
+	 * Returns the client for connecting to Route 53.
+	 * @return The client for connecting to Route 53.
+	 */
 	protected Route53Client getRoute53Client() {
 		return route53Client;
 	}

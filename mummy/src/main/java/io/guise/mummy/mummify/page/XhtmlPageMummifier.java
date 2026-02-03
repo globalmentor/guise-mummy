@@ -36,6 +36,10 @@ import io.guise.mummy.MummyContext;
  */
 public class XhtmlPageMummifier extends AbstractPageMummifier {
 
+	/** Constructor. */
+	public XhtmlPageMummifier() {
+	}
+
 	@Override
 	public Set<String> getSupportedFilenameExtensions() {
 		return Set.of(XHTML_FILENAME_EXTENSION);

@@ -99,14 +99,20 @@ public class GuiseMesh {
 
 	private final MexlEvaluator evaluator;
 
-	/** @return The strategy for evaluating Mesh Expression Language (MEXL) expressions. */
+	/**
+	 * Returns the strategy for evaluating Mesh Expression Language (MEXL) expressions.
+	 * @return The strategy for evaluating Mesh Expression Language (MEXL) expressions.
+	 */
 	protected MexlEvaluator getEvaluator() {
 		return evaluator;
 	}
 
 	private final MeshInterpolator interpolator;
 
-	/** @return The strategy for interpolating strings. */
+	/**
+	 * Returns the strategy for interpolating strings.
+	 * @return The strategy for interpolating strings.
+	 */
 	public MeshInterpolator getInterpolator() {
 		return interpolator;
 	}

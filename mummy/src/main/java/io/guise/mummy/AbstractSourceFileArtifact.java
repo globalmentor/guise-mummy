@@ -122,7 +122,10 @@ public abstract class AbstractSourceFileArtifact extends AbstractDescribedArtifa
 			this.targetFile = requireNonNull(targetFile);
 		}
 
-		/** @return This builder itself. */
+		/**
+		 * Returns this builder itself for method chaining.
+		 * @return This builder itself.
+		 */
 		@SuppressWarnings("unchecked")
 		protected B self() {
 			return (B)this;

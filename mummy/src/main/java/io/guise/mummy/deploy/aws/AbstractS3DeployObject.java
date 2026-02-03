@@ -104,6 +104,10 @@ public abstract class AbstractS3DeployObject implements S3DeployObject {
 	 */
 	protected class ContentStreamProvider implements software.amazon.awssdk.http.ContentStreamProvider {
 
+		/** Constructor. */
+		protected ContentStreamProvider() {
+		}
+
 		private InputStream inputStream = null;
 
 		/**

@@ -41,10 +41,16 @@ public interface S3DeployObject {
 	 */
 	public static final String METADATA_CONTENT_FINGERPRINT = Handle.findFromTag(Content.FINGERPRINT_PROPERTY_TAG).orElseThrow(AssertionError::new);
 
-	/** @return The S3 key representing the deployment path of the object in the bucket. */
+	/**
+	 * Returns the S3 key representing the deployment path of the object in the bucket.
+	 * @return The S3 key representing the deployment path of the object in the bucket.
+	 */
 	public String getKey();
 
-	/** @return The S3 metadata to be deployed along with the object; may be empty. */
+	/**
+	 * Returns the S3 metadata to be deployed along with the object.
+	 * @return The S3 metadata to be deployed along with the object; may be empty.
+	 */
 	public Map<String, String> getMetadata();
 
 	/**

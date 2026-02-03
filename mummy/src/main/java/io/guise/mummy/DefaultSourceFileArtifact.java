@@ -39,7 +39,10 @@ public class DefaultSourceFileArtifact extends AbstractSourceFileArtifact {
 
 	private final Path corporealSourceFile;
 
-	/** @return The file containing the actual source contents of the artifact. */
+	/**
+	 * Returns the file containing the actual source contents of the artifact.
+	 * @return The file containing the actual source contents of the artifact.
+	 */
 	public Path getCorporealSourceFile() {
 		return corporealSourceFile;
 	}

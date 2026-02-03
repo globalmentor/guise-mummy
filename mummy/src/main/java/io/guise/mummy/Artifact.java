@@ -124,7 +124,10 @@ public interface Artifact {
 	/** The property tag of the <code>mummy/template</code> for specifying a template path, relative to the source path. */
 	public static final URI PROPERTY_TAG_MUMMY_TEMPLATE = NAMESPACE.resolve("template");
 
-	/** @return The properties and their values describing the artifact. */
+	/**
+	 * Returns the properties and their values describing the artifact.
+	 * @return The properties and their values describing the artifact.
+	 */
 	public UrfResourceDescription getResourceDescription();
 
 	//## description
@@ -254,10 +257,16 @@ public interface Artifact {
 	 */
 	public Set<Path> getReferentSourcePaths();
 
-	/** @return The path to the generated artifact in the target tree. */
+	/**
+	 * Returns the path to the generated artifact in the target tree.
+	 * @return The path to the generated artifact in the target tree.
+	 */
 	public Path getTargetPath();
 
-	/** @return The mummifier responsible for mummifying this artifact. */
+	/**
+	 * Returns the mummifier responsible for mummifying this artifact.
+	 * @return The mummifier responsible for mummifying this artifact.
+	 */
 	public Mummifier getMummifier();
 
 	/**

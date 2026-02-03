@@ -73,7 +73,10 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 
 	private final Set<MediaType> supportedMediaTypes;
 
-	/** @return The image media types supported by this mummifier. */
+	/**
+	 * Returns the image media types supported by this mummifier.
+	 * @return The image media types supported by this mummifier.
+	 */
 	protected Set<MediaType> getSupportedMediaTypes() {
 		return supportedMediaTypes;
 	}
@@ -398,6 +401,10 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	 * @see #toByteSource()
 	 */
 	protected static class TempOutputStream extends ByteArrayOutputStream {
+
+		/** Constructor. */
+		protected TempOutputStream() {
+		}
 
 		/**
 		 * Returns an input stream to the collected byte content. The returned input stream must not be used concurrently with this output stream.

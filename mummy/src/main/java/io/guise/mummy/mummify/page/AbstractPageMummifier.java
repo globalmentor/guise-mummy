@@ -75,6 +75,10 @@ import io.urf.vocab.content.Content;
  */
 public abstract class AbstractPageMummifier extends AbstractFileMummifier implements PageMummifier {
 
+	/** Constructor. */
+	protected AbstractPageMummifier() {
+	}
+
 	/** The supported widgets, mapped to their XHTML element names. */
 	private static final Map<NsName, Widget> WIDGETS_BY_ELEMENT_NAME = Stream.of(new DirectoryWidget())
 			.collect(toUnmodifiableMap(Widget::getWidgetElementName, identity()));
@@ -154,14 +158,20 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 
 	private final NavigationManager navigationManager = new NavigationManager();
 
-	/** @return The strategy for loading and working with navigation. */
+	/**
+	 * Returns the strategy for loading and working with navigation.
+	 * @return The strategy for loading and working with navigation.
+	 */
 	protected NavigationManager getNavigationManager() {
 		return navigationManager;
 	}
 
 	private final GuiseMesh guiseMesh = new GuiseMesh();
 
-	/** @return The strategy for transformation a document based upon Mesh Expression Language (MEXL) expressions. */
+	/**
+	 * Returns the strategy for transformation a document based upon Mesh Expression Language (MEXL) expressions.
+	 * @return The strategy for transformation a document based upon Mesh Expression Language (MEXL) expressions.
+	 */
 	protected GuiseMesh getGuiseMesh() {
 		return guiseMesh;
 	}

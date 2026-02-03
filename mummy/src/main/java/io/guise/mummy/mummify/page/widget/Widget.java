@@ -34,7 +34,10 @@ import io.guise.mummy.mummify.page.PageMummifier;
  */
 public interface Widget {
 
-	/** @return The identification of the XHTML element representing the widget in the source tree. */
+	/**
+	 * Returns the identification of the XHTML element representing the widget in the source tree.
+	 * @return The identification of the XHTML element representing the widget in the source tree.
+	 */
 	public NsName getWidgetElementName();
 
 	/**

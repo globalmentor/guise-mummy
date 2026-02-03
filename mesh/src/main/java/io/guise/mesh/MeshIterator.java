@@ -93,7 +93,10 @@ public class MeshIterator implements Iterator<Object> {
 		return current;
 	}
 
-	/** @return The current index of iteration, or <code>-1</code> if iteration has not started. */
+	/**
+	 * Returns the current index of iteration.
+	 * @return The current index of iteration, or <code>-1</code> if iteration has not started.
+	 */
 	public int getIndex() {
 		return index;
 	}

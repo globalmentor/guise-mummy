@@ -32,6 +32,10 @@ import org.jspecify.annotations.*;
  */
 public class DefaultMeshInterpolator implements MeshInterpolator {
 
+	/** Constructor. */
+	public DefaultMeshInterpolator() {
+	}
+
 	/** The default Guise Mesh left interpolation expression delimiter. */
 	public static final String LEFT_EXPRESSION_DELIMITER = "^{";
 

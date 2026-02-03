@@ -49,10 +49,16 @@ public interface MummyContext {
 	 */
 	public String getMummifierIdentification();
 
-	/** @return The Guise project governing mummification. */
+	/**
+	 * Returns the Guise project governing mummification.
+	 * @return The Guise project governing mummification.
+	 */
 	public GuiseProject getProject();
 
-	/** @return <code>true</code> if full mummification is enabled; <code>false</code> if mummification is incremental. */
+	/**
+	 * Indicates whether full mummification is enabled, as opposed to incremental mummification.
+	 * @return <code>true</code> if full mummification is enabled; <code>false</code> if mummification is incremental.
+	 */
 	public boolean isFull();
 
 	/**
@@ -126,10 +132,16 @@ public interface MummyContext {
 	 */
 	public boolean isIgnore(@NonNull final Path sourcePath);
 
-	/** @return The default mummifier for source files. */
+	/**
+	 * Returns the default mummifier for source files.
+	 * @return The default mummifier for source files.
+	 */
 	public SourcePathMummifier getDefaultSourceFileMummifier();
 
-	/** @return The default mummifier for source directories. */
+	/**
+	 * Returns the default mummifier for source directories.
+	 * @return The default mummifier for source directories.
+	 */
 	public SourcePathMummifier getDefaultSourceDirectoryMummifier();
 
 	/**

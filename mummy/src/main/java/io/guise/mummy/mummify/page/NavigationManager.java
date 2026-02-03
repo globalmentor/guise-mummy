@@ -54,6 +54,10 @@ import io.urf.format.turf.TurfParser;
  */
 public class NavigationManager implements Clogged {
 
+	/** Constructor. */
+	public NavigationManager() {
+	}
+
 	/** The set of filename extensions for supported navigation files, in order of precedence. */
 	private static final Set<String> SUPPORTED_NAVIGATION_FILE_EXTENSIONS = Stream.of(TURF.FILENAME_EXTENSION, Text.LST_FILENAME_EXTENSION)
 			.collect(collectingAndThen(toCollection(LinkedHashSet::new), Collections::unmodifiableSet));

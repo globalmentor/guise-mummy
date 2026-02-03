@@ -39,7 +39,10 @@ public class S3ArtifactDeployObject extends AbstractS3DeployObject {
 
 	private final Artifact artifact;
 
-	/** @return The artifact with the contents to be deployed in the bucket as the object. */
+	/**
+	 * Returns the artifact with the contents to be deployed in the bucket as the object.
+	 * @return The artifact with the contents to be deployed in the bucket as the object.
+	 */
 	public Artifact getArtifact() {
 		return artifact;
 	}

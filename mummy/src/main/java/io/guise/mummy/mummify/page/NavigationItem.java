@@ -29,10 +29,16 @@ public interface NavigationItem {
 	/** The property handle of the list of child navigation items. */
 	public static final String PROPERTY_HANDLE_NAVIGATION = "navigation";
 
-	/** @return A label for navigation. */
+	/**
+	 * Returns a label for navigation.
+	 * @return A label for navigation.
+	 */
 	public String getLabel();
 
-	/** @return The icon identifier string, which will not be present if no icon is identified. */
+	/**
+	 * Returns the icon identifier string, if present.
+	 * @return The icon identifier string, which will not be present if no icon is identified.
+	 */
 	public Optional<String> findIconId();
 
 	/**
@@ -42,7 +48,10 @@ public interface NavigationItem {
 	 */
 	public Optional<String> findHref();
 
-	/** @return The navigation subordinate to this navigation item; may be empty. */
+	/**
+	 * Returns the navigation subordinate to this navigation item.
+	 * @return The navigation subordinate to this navigation item; may be empty.
+	 */
 	public List<NavigationItem> getNavigation();
 
 }
