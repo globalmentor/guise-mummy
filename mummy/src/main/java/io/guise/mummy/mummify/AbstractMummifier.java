@@ -30,7 +30,7 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import io.clogr.Clogr;
 import io.guise.mummy.*;
@@ -63,7 +63,7 @@ public abstract class AbstractMummifier implements Mummifier {
 	 * @return The path in the site description target directory to which a description may be generated.
 	 * @see Artifact#getTargetPath()
 	 */
-	protected Path getArtifactTargetDescriptionFile(final @Nonnull MummyContext context, final @Nonnull Artifact artifact) {
+	protected Path getArtifactTargetDescriptionFile(final @NonNull MummyContext context, final @NonNull Artifact artifact) {
 		return getArtifactTargetDescriptionFile(context, artifact.getTargetPath());
 	}
 
@@ -79,7 +79,7 @@ public abstract class AbstractMummifier implements Mummifier {
 	 * @see MummyContext#getSiteDescriptionTargetDirectory()
 	 * @see Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION
 	 */
-	protected Path getArtifactTargetDescriptionFile(final @Nonnull MummyContext context, final @Nonnull Path targetPath) {
+	protected Path getArtifactTargetDescriptionFile(final @NonNull MummyContext context, final @NonNull Path targetPath) {
 		return addFilenameExtension(changeBase(targetPath, context.getSiteTargetDirectory(), context.getSiteDescriptionTargetDirectory()),
 				DESCRIPTION_FILE_SIDECAR_EXTENSION);
 	}
@@ -93,7 +93,7 @@ public abstract class AbstractMummifier implements Mummifier {
 	 * @throws IOException if there is an I/O error retrieving the description, including if the metadata is invalid.
 	 * @see #getArtifactTargetDescriptionFile(MummyContext, Path)
 	 */
-	protected Optional<UrfResourceDescription> loadArtifactTargetDescription(@Nonnull MummyContext context, @Nonnull final Path targetPath) throws IOException {
+	protected Optional<UrfResourceDescription> loadArtifactTargetDescription(@NonNull MummyContext context, @NonNull final Path targetPath) throws IOException {
 		final Path descriptionFile = getArtifactTargetDescriptionFile(context, targetPath);
 		if(!isRegularFile(descriptionFile)) {
 			return Optional.empty();
@@ -112,7 +112,7 @@ public abstract class AbstractMummifier implements Mummifier {
 	 * @see #getArtifactTargetDescriptionFile(MummyContext, Artifact)
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR
 	 */
-	protected void saveTargetDescription(@Nonnull final MummyContext context, @Nonnull Artifact artifact) throws IOException {
+	protected void saveTargetDescription(@NonNull final MummyContext context, @NonNull Artifact artifact) throws IOException {
 		final UrfResourceDescription description = artifact.getResourceDescription();
 		final Path descriptionFile = getArtifactTargetDescriptionFile(context, artifact);
 		//create parent directory as needed
@@ -156,7 +156,7 @@ public abstract class AbstractMummifier implements Mummifier {
 	 * @return The resulting property value, perhaps in another type.
 	 * @throws IllegalArgumentException if a property value cannot be parsed conforming to ontology rules.
 	 */
-	protected static Object parseMetadataPropertyValue(@Nonnull final URI propertyTag, @Nonnull final CharSequence propertyLexicalValue) {
+	protected static Object parseMetadataPropertyValue(@NonNull final URI propertyTag, @NonNull final CharSequence propertyLexicalValue) {
 		return URF.Tag.findNamespace(propertyTag).<Object>flatMap(namespace -> { //map based on namespace
 			if(namespace.equals(URF.AD_HOC_NAMESPACE)) { //ad-hoc (default) namespace
 				return URF.Tag.findName(propertyTag).flatMap(propertyName -> {

@@ -20,7 +20,7 @@ import static java.util.Objects.*;
 
 import java.nio.file.Path;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import io.guise.mummy.mummify.Mummifier;
 import io.urf.model.UrfResourceDescription;
@@ -45,8 +45,8 @@ public abstract class AbstractDescribedArtifact extends AbstractArtifact {
 	 * @param outputPath The file where the artifact will be generated.
 	 * @param description The description of the artifact.
 	 */
-	public AbstractDescribedArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourcePath, @Nonnull final Path outputPath,
-			@Nonnull final UrfResourceDescription description) {
+	public AbstractDescribedArtifact(@NonNull final Mummifier mummifier, @NonNull final Path sourcePath, @NonNull final Path outputPath,
+			@NonNull final UrfResourceDescription description) {
 		super(mummifier, sourcePath, outputPath);
 		this.description = requireNonNull(description);
 	}

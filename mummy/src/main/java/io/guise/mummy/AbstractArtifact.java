@@ -21,7 +21,7 @@ import static java.util.Objects.*;
 import java.nio.file.Path;
 import java.util.Set;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import io.guise.mummy.mummify.Mummifier;
 
@@ -59,7 +59,7 @@ public abstract class AbstractArtifact implements Artifact {
 	 * @param sourcePath The file containing the source of this artifact.
 	 * @param outputPath The file where the artifact will be generated.
 	 */
-	public AbstractArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourcePath, @Nonnull final Path outputPath) {
+	public AbstractArtifact(@NonNull final Mummifier mummifier, @NonNull final Path sourcePath, @NonNull final Path outputPath) {
 		this.mummifier = requireNonNull(mummifier);
 		this.sourcePath = requireNonNull(sourcePath);
 		this.targetPath = requireNonNull(outputPath);

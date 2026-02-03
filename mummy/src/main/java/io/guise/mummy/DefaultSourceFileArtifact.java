@@ -26,7 +26,7 @@ import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import io.guise.mummy.mummify.Mummifier;
 import io.urf.model.UrfResourceDescription;
@@ -54,8 +54,8 @@ public class DefaultSourceFileArtifact extends AbstractSourceFileArtifact {
 	 * @param description The description of the artifact.
 	 * @throws IllegalArgumentException if the source file does not exist or is not a regular file.
 	 */
-	public DefaultSourceFileArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path targetFile,
-			@Nonnull final UrfResourceDescription description) {
+	public DefaultSourceFileArtifact(@NonNull final Mummifier mummifier, @NonNull final Path sourceFile, @NonNull final Path targetFile,
+			@NonNull final UrfResourceDescription description) {
 		super(mummifier, sourceFile, targetFile, description);
 		this.corporealSourceFile = checkArgumentRegularFile(sourceFile);
 	}
@@ -66,7 +66,7 @@ public class DefaultSourceFileArtifact extends AbstractSourceFileArtifact {
 	 * @param builder The builder specifying the construction parameters.
 	 * @throws IllegalArgumentException if the corporeal source file does not exist or is not a regular file.
 	 */
-	protected DefaultSourceFileArtifact(@Nonnull final Builder<?> builder) {
+	protected DefaultSourceFileArtifact(@NonNull final Builder<?> builder) {
 		super(builder);
 		this.corporealSourceFile = checkArgumentRegularFile(builder.corporealSourceFile != null ? builder.corporealSourceFile : getSourcePath());
 	}
@@ -78,7 +78,7 @@ public class DefaultSourceFileArtifact extends AbstractSourceFileArtifact {
 	 * @param targetFile The file where the artifact will be generated.
 	 * @return A builder for further defining an artifact before construction.
 	 */
-	public static Builder<?> builder(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path targetFile) {
+	public static Builder<?> builder(@NonNull final Mummifier mummifier, @NonNull final Path sourceFile, @NonNull final Path targetFile) {
 		return new Builder<>(mummifier, sourceFile, targetFile);
 	}
 
@@ -112,7 +112,7 @@ public class DefaultSourceFileArtifact extends AbstractSourceFileArtifact {
 		 * @param sourceFile The location of the artifact in the site source tree.
 		 * @param targetFile The file where the artifact will be generated.
 		 */
-		public Builder(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path targetFile) {
+		public Builder(@NonNull final Mummifier mummifier, @NonNull final Path sourceFile, @NonNull final Path targetFile) {
 			super(mummifier, sourceFile, targetFile);
 		}
 
@@ -126,7 +126,7 @@ public class DefaultSourceFileArtifact extends AbstractSourceFileArtifact {
 		 * @throws IllegalStateException if this method is called twice on a builder.
 		 * @see DefaultSourceFileArtifact#getCorporealSourceFile()
 		 */
-		public B setCorporealSourceFile(@Nonnull Path corporealSourceFile) {
+		public B setCorporealSourceFile(@NonNull Path corporealSourceFile) {
 			checkState(this.corporealSourceFile == null, "Corporeal source file already set.");
 			this.corporealSourceFile = requireNonNull(corporealSourceFile);
 			return self();
@@ -142,7 +142,7 @@ public class DefaultSourceFileArtifact extends AbstractSourceFileArtifact {
 		 * @throws IllegalStateException if this method is called twice on a builder.
 		 * @see AspectualArtifact
 		 */
-		public B withAspects(@Nonnull String... aspectIds) {
+		public B withAspects(@NonNull String... aspectIds) {
 			return withAspects(asList(aspectIds));
 		}
 
@@ -153,7 +153,7 @@ public class DefaultSourceFileArtifact extends AbstractSourceFileArtifact {
 		 * @throws IllegalStateException if this method is called twice on a builder.
 		 * @see AspectualArtifact
 		 */
-		public B withAspects(@Nonnull Collection<String> aspectIds) {
+		public B withAspects(@NonNull Collection<String> aspectIds) {
 			checkState(this.aspectIds == null, "Aspects already set.");
 			this.aspectIds = Set.copyOf(aspectIds);
 			return self();

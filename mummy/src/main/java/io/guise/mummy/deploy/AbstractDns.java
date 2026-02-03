@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import org.slf4j.Logger;
 
@@ -66,7 +66,7 @@ public abstract class AbstractDns implements Dns, Clogged {
 	 * @param resourceRecords The resource records to be created during deployment; may be empty.
 	 * @throws IllegalArgumentException if the given origin is not absolute.
 	 */
-	public AbstractDns(@Nonnull final DomainName origin, @Nonnull final Collection<ResourceRecord> resourceRecords) {
+	public AbstractDns(@NonNull final DomainName origin, @NonNull final Collection<ResourceRecord> resourceRecords) {
 		this.origin = origin.checkArgumentAbsolute();
 		this.resourceRecords = List.copyOf(resourceRecords);
 	}

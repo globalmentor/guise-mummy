@@ -35,7 +35,7 @@ import java.util.*;
 import java.util.regex.*;
 import java.util.stream.Stream;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import com.globalmentor.html.def.HTML;
 import com.globalmentor.io.Filenames;
@@ -88,7 +88,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	 * @return The path of a source file, if any, to be used as the directory content file.
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES
 	 */
-	protected Optional<Path> discoverSourceDirectoryContentFile(@Nonnull MummyContext context, @Nonnull final Path sourceDirectory) {
+	protected Optional<Path> discoverSourceDirectoryContentFile(@NonNull MummyContext context, @NonNull final Path sourceDirectory) {
 		return context.getConfiguration().getCollection(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, String.class).stream() //look at each base name
 				.flatMap(throwingFunction(baseName -> context.findPageSourceFile(sourceDirectory, baseName).stream())) //try to find a page source file for that name
 				.map(Map.Entry::getKey).findFirst(); //for the first one found, return its path
@@ -207,7 +207,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	 * @deprecated To be deleted if not needed
 	 */
 	@Deprecated
-	protected boolean isAssetSourcePath(@Nonnull final MummyContext context, @Nonnull final Path sourcePath) {
+	protected boolean isAssetSourcePath(@NonNull final MummyContext context, @NonNull final Path sourcePath) {
 		return isAssetSourcePath(context, sourcePath, false);
 	}
 
@@ -224,7 +224,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	 * @throws IllegalArgumentException if the given source path is not inside the site source directory when checking ancestors.
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN
 	 */
-	protected boolean isAssetSourcePath(@Nonnull final MummyContext context, @Nonnull final Path sourcePath, final boolean checkAncestors) {
+	protected boolean isAssetSourcePath(@NonNull final MummyContext context, @NonNull final Path sourcePath, final boolean checkAncestors) {
 		final Pattern assetNamePattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN, Pattern.class);
 		final Path siteSourceDirectory = context.getSiteSourceDirectory();
 		Path currentSourcePath = sourcePath;
@@ -254,7 +254,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	 * @deprecated To be deleted if not needed
 	 */
 	@Deprecated
-	protected boolean isAssetSourceName(@Nonnull final MummyContext context, @Nonnull final String sourceName) {
+	protected boolean isAssetSourceName(@NonNull final MummyContext context, @NonNull final String sourceName) {
 		final Pattern assetNamePattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN, Pattern.class);
 		return assetNamePattern.matcher(sourceName).matches();
 	}
@@ -281,8 +281,8 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN
 	 * @see GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN
 	 */
-	protected Path planChildArtifactTargetPath(@Nonnull final MummyContext context, @Nonnull Path targetDirectory, @Nonnull final String childSourceFilename,
-			@Nonnull final Mummifier childMummifier, final boolean isAssetSourceDirectoryTree) {
+	protected Path planChildArtifactTargetPath(@NonNull final MummyContext context, @NonNull Path targetDirectory, @NonNull final String childSourceFilename,
+			@NonNull final Mummifier childMummifier, final boolean isAssetSourceDirectoryTree) {
 		//both the target directory and the child target filename will change as it gets processed
 		String childTargetFilename = childSourceFilename;
 		if(!isAssetSourceDirectoryTree) { //don't make hierarchy-related filename changes in an assets tree

@@ -24,7 +24,7 @@ import java.nio.file.*;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import com.globalmentor.net.URIPath;
 
@@ -46,7 +46,7 @@ public interface MummyPlan {
 	 * @param artifact The artifact for which the principal artifact is to be determined.
 	 * @return The principal artifact of record for the given artifact.
 	 */
-	public Artifact getPrincipalArtifact(@Nonnull final Artifact artifact);
+	public Artifact getPrincipalArtifact(@NonNull final Artifact artifact);
 
 	/**
 	 * Returns the parent artifact of some artifact.
@@ -59,7 +59,7 @@ public interface MummyPlan {
 	 * @return The parent artifact, if any, of the given artifact.
 	 * @see #getPrincipalArtifact(Artifact)
 	 */
-	public Optional<Artifact> findParentArtifact(@Nonnull final Artifact artifact);
+	public Optional<Artifact> findParentArtifact(@NonNull final Artifact artifact);
 
 	/**
 	 * Provides the child artifacts of some artifact.
@@ -73,7 +73,7 @@ public interface MummyPlan {
 	 * @see #getPrincipalArtifact(Artifact)
 	 * @see CollectionArtifact#getChildArtifacts()
 	 */
-	public default Stream<Artifact> childArtifacts(@Nonnull final Artifact artifact) {
+	public default Stream<Artifact> childArtifacts(@NonNull final Artifact artifact) {
 		final Artifact principalArtifact = getPrincipalArtifact(artifact);
 		return principalArtifact instanceof CollectionArtifact ? ((CollectionArtifact)principalArtifact).getChildArtifacts().stream() : Stream.empty();
 	}
@@ -89,7 +89,7 @@ public interface MummyPlan {
 	 * @return The sibling artifacts, if any, of the given artifact, including the principal artifact of that given.
 	 * @see #getPrincipalArtifact(Artifact)
 	 */
-	public default Stream<Artifact> siblingArtifacts(@Nonnull final Artifact artifact) {
+	public default Stream<Artifact> siblingArtifacts(@NonNull final Artifact artifact) {
 		return findParentArtifact(artifact).map(this::childArtifacts).orElse(Stream.empty());
 	}
 
@@ -107,7 +107,7 @@ public interface MummyPlan {
 	 * @return The artifact referred to by a reference source path.
 	 * @throws IllegalArgumentException if the given reference path is not absolute.
 	 */
-	public Optional<Artifact> findArtifactBySourceReference(@Nonnull final Path referenceSourcePath);
+	public Optional<Artifact> findArtifactBySourceReference(@NonNull final Path referenceSourcePath);
 
 	/**
 	 * Retrieves an artifact referred to by a URI path source reference relative to some artifact.
@@ -127,7 +127,7 @@ public interface MummyPlan {
 	 * @throws IllegalArgumentException if the given reference path is absolute.
 	 * @see #getPrincipalArtifact(Artifact)
 	 */
-	public default Optional<Artifact> findArtifactBySourceRelativeReference(@Nonnull final Artifact artifact, @Nonnull final URIPath sourceRelativeReference) {
+	public default Optional<Artifact> findArtifactBySourceRelativeReference(@NonNull final Artifact artifact, @NonNull final URIPath sourceRelativeReference) {
 		return findArtifactBySourceRelativeReference(getPrincipalArtifact(artifact).getSourcePath(), sourceRelativeReference);
 	}
 
@@ -151,8 +151,8 @@ public interface MummyPlan {
 	 * @throws IllegalArgumentException if the context source path is not absolute.
 	 * @throws IllegalArgumentException if the given reference path is absolute.
 	 */
-	public default Optional<Artifact> findArtifactBySourceRelativeReference(@Nonnull final Path contextSourcePath,
-			@Nonnull final URIPath sourceRelativeReference) {
+	public default Optional<Artifact> findArtifactBySourceRelativeReference(@NonNull final Path contextSourcePath,
+			@NonNull final URIPath sourceRelativeReference) {
 		checkArgumentAbsolute(contextSourcePath);
 		sourceRelativeReference.checkRelative();
 		//Resolve the relative path to the URI form of the context artifact path, and then convert that back to a file system path.
@@ -184,7 +184,7 @@ public interface MummyPlan {
 	 * @see #getPrincipalArtifact(Artifact)
 	 * @see Artifact#getSourcePath()
 	 */
-	public URIPath referenceInSource(@Nonnull final Artifact fromArtifact, @Nonnull final Artifact toArtifact);
+	public URIPath referenceInSource(@NonNull final Artifact fromArtifact, @NonNull final Artifact toArtifact);
 
 	/**
 	 * Returns a resource reference from one artifact to another in the target tree. The returned reference will be a relative URI path appropriate to be used as
@@ -199,7 +199,7 @@ public interface MummyPlan {
 	 * @see #getPrincipalArtifact(Artifact)
 	 * @see Artifact#getTargetPath()
 	 */
-	public URIPath referenceInTarget(@Nonnull final Artifact fromArtifact, @Nonnull final Artifact toArtifact);
+	public URIPath referenceInTarget(@NonNull final Artifact fromArtifact, @NonNull final Artifact toArtifact);
 
 	//# MEXL
 
@@ -212,7 +212,7 @@ public interface MummyPlan {
 	 * @return The resource reference path from the first given artifact to the second given artifact in the terms of the source tree.
 	 * @see #referenceInSource(Artifact, Artifact)
 	 */
-	public default URIPath reference(@Nonnull final Artifact fromArtifact, @Nonnull final Artifact toArtifact) {
+	public default URIPath reference(@NonNull final Artifact fromArtifact, @NonNull final Artifact toArtifact) {
 		return referenceInSource(fromArtifact, toArtifact);
 	}
 

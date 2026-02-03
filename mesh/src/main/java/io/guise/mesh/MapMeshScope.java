@@ -20,7 +20,7 @@ import static java.util.Objects.*;
 
 import java.util.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 /**
  * A simple mesh scope using a {@link Map} to back variable storage.
@@ -43,7 +43,7 @@ public class MapMeshScope implements MeshScope {
 	 * Map constructor.
 	 * @param map The map to be used to back variable storage.
 	 */
-	public MapMeshScope(@Nonnull final Map<String, Object> map) {
+	public MapMeshScope(@NonNull final Map<String, Object> map) {
 		this.map = requireNonNull(map);
 	}
 

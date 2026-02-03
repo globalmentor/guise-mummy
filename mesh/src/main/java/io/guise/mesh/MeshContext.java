@@ -18,7 +18,7 @@ package io.guise.mesh;
 
 import java.util.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 /**
  * Provides information about context of DOM meshing, including variable lookup.
@@ -33,19 +33,19 @@ public interface MeshContext extends MeshScope {
 	 * {@inheritDoc} The context will search for the variable up the nested scope chain, returning the first variable it finds.
 	 */
 	@Override
-	public Optional<Object> findVariable(@Nonnull String name);
+	public Optional<Object> findVariable(@NonNull String name);
 
 	/**
 	 * {@inheritDoc} The context will search for the variable up the nested scope chain.
 	 */
 	@Override
-	public boolean hasVariable(@Nonnull final String name);
+	public boolean hasVariable(@NonNull final String name);
 
 	/**
 	 * {@inheritDoc} The context sets the variable in the current context scope in the nested scope chain.
 	 */
 	@Override
-	public void setVariable(@Nonnull String name, @Nonnull Object value);
+	public void setVariable(@NonNull String name, @NonNull Object value);
 
 	/**
 	 * Creates a new default context with the given variables.
@@ -54,7 +54,7 @@ public interface MeshContext extends MeshScope {
 	 * @return A new context with the given variables in the root scope.
 	 * @see MeshScope#create(Map)
 	 */
-	public static MeshContext create(@Nonnull final Map<String, Object> map) {
+	public static MeshContext create(@NonNull final Map<String, Object> map) {
 		return new DefaultMeshContext(MeshScope.create(map));
 	}
 

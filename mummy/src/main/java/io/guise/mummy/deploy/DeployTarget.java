@@ -23,7 +23,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.stream.Stream;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import io.guise.mummy.*;
 
@@ -49,7 +49,7 @@ public interface DeployTarget {
 	 * @see MummyContext#getDeployTargets()
 	 * @see ContentDeliveryTarget#getOriginTarget(MummyContext)
 	 */
-	public default Stream<ContentDeliveryTarget> contentDeliveryTargets(@Nonnull final MummyContext context) {
+	public default Stream<ContentDeliveryTarget> contentDeliveryTargets(@NonNull final MummyContext context) {
 		final DeployTarget thisDeployTarget = this;
 		return context.getDeployTargets().stream().flatMap(List::stream) //get a stream of deploy targets, if any
 				//only look at deploy targets that are content delivery targets with this deploy target as an origin
@@ -61,7 +61,7 @@ public interface DeployTarget {
 	 * @param context The context of static site generation.
 	 * @throws IOException if there is an I/O error during site deployment preparation.
 	 */
-	public void prepare(@Nonnull final MummyContext context) throws IOException;
+	public void prepare(@NonNull final MummyContext context) throws IOException;
 
 	/**
 	 * Deploys a site.
@@ -70,6 +70,6 @@ public interface DeployTarget {
 	 * @return The URL for accessing the deployed site, if available.
 	 * @throws IOException if there is an I/O error during site deployment.
 	 */
-	public Optional<URI> deploy(@Nonnull final MummyContext context, @Nonnull Artifact rootArtifact) throws IOException;
+	public Optional<URI> deploy(@NonNull final MummyContext context, @NonNull Artifact rootArtifact) throws IOException;
 
 }

@@ -18,7 +18,7 @@ package io.guise.mummy;
 
 import java.util.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 /**
  * An artifact potentially containing other <dfn>aspects</dfn> such as a preview image, an abridged book, or sound excerpt.
@@ -37,7 +37,7 @@ public interface AspectualArtifact extends CompositeArtifact {
 	 * @param aspectId The ID of the aspect to return.
 	 * @return The identified aspect, if one is found.
 	 */
-	public Optional<Artifact> findAspect(@Nonnull final String aspectId);
+	public Optional<Artifact> findAspect(@NonNull final String aspectId);
 
 	/**
 	 * Retrieves an aspect by its ID.
@@ -47,7 +47,7 @@ public interface AspectualArtifact extends CompositeArtifact {
 	 * @param aspectId The ID of the aspect to return.
 	 * @return The identified aspect, or <code>null</code> if no aspect with that ID is found.
 	 */
-	public default Artifact aspect(@Nonnull final String aspectId) {
+	public default Artifact aspect(@NonNull final String aspectId) {
 		return findAspect(aspectId).orElse(null);
 	}
 

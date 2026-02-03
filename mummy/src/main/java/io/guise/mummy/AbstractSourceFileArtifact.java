@@ -21,7 +21,7 @@ import static java.util.Objects.*;
 
 import java.nio.file.Path;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import io.guise.mummy.mummify.Mummifier;
 import io.urf.model.*;
@@ -80,8 +80,8 @@ public abstract class AbstractSourceFileArtifact extends AbstractDescribedArtifa
 	 * @param description The description of the artifact.
 	 * @see SourcePathArtifact#hasPostFilename(Path)
 	 */
-	public AbstractSourceFileArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path targetFile,
-			@Nonnull final UrfResourceDescription description) {
+	public AbstractSourceFileArtifact(@NonNull final Mummifier mummifier, @NonNull final Path sourceFile, @NonNull final Path targetFile,
+			@NonNull final UrfResourceDescription description) {
 		super(mummifier, sourceFile, targetFile, description);
 		this.isPost = SourcePathArtifact.hasPostFilename(sourceFile);
 		this.isNavigable = false;
@@ -93,7 +93,7 @@ public abstract class AbstractSourceFileArtifact extends AbstractDescribedArtifa
 	 * @param builder The builder specifying the construction parameters.
 	 * @see SourcePathArtifact#hasPostFilename(Path)
 	 */
-	protected AbstractSourceFileArtifact(@Nonnull final Builder<?> builder) {
+	protected AbstractSourceFileArtifact(@NonNull final Builder<?> builder) {
 		super(builder.mummifier, builder.sourceFile, builder.targetFile, builder.description);
 		this.isPost = SourcePathArtifact.hasPostFilename(builder.sourceFile);
 		this.isNavigable = builder.navigable;
@@ -116,7 +116,7 @@ public abstract class AbstractSourceFileArtifact extends AbstractDescribedArtifa
 		 * @param sourceFile The location of the artifact in the site source tree.
 		 * @param targetFile The file where the artifact will be generated.
 		 */
-		public Builder(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path targetFile) {
+		public Builder(@NonNull final Mummifier mummifier, @NonNull final Path sourceFile, @NonNull final Path targetFile) {
 			this.mummifier = requireNonNull(mummifier);
 			this.sourceFile = requireNonNull(sourceFile);
 			this.targetFile = requireNonNull(targetFile);
@@ -147,7 +147,7 @@ public abstract class AbstractSourceFileArtifact extends AbstractDescribedArtifa
 		 * @throws IllegalStateException if a description-setting method is called twice on a builder.
 		 * @see Artifact#getResourceDescription()
 		 */
-		public B withDescription(@Nonnull final UrfResourceDescription description) {
+		public B withDescription(@NonNull final UrfResourceDescription description) {
 			checkState(this.description == null, "Description already set.");
 			this.description = requireNonNull(description);
 			return self();

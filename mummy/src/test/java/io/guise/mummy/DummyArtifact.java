@@ -19,7 +19,7 @@ package io.guise.mummy;
 import java.io.*;
 import java.nio.file.Path;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import io.guise.mummy.mummify.Mummifier;
 import io.urf.model.UrfResourceDescription;
@@ -36,7 +36,7 @@ public class DummyArtifact extends AbstractSourceFileArtifact {
 	 * @param sourceFile The location of the artifact in the site source tree.
 	 * @param outputFile The file where the artifact will be generated.
 	 */
-	public DummyArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path outputFile) {
+	public DummyArtifact(@NonNull final Mummifier mummifier, @NonNull final Path sourceFile, @NonNull final Path outputFile) {
 		this(mummifier, sourceFile, outputFile, UrfResourceDescription.EMPTY);
 	}
 
@@ -46,8 +46,8 @@ public class DummyArtifact extends AbstractSourceFileArtifact {
 	 * @param sourceFile The location of the artifact in the site source tree.
 	 * @param outputFile The file where the artifact will be generated.
 	 */
-	public DummyArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceFile, @Nonnull final Path outputFile,
-			@Nonnull final UrfResourceDescription description) {
+	public DummyArtifact(@NonNull final Mummifier mummifier, @NonNull final Path sourceFile, @NonNull final Path outputFile,
+			@NonNull final UrfResourceDescription description) {
 		super(mummifier, sourceFile, outputFile, description);
 	}
 

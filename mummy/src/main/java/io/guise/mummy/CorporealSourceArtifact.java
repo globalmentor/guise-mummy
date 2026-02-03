@@ -18,7 +18,7 @@ package io.guise.mummy;
 
 import java.io.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 /**
  * Artifact that conceptually originates from some source that provides content (e.g. a source file as opposed to a directory in the site source tree).
@@ -33,7 +33,7 @@ public interface CorporealSourceArtifact extends Artifact {
 	 * @return The size of the artifact source, in byte.
 	 * @throws IOException if there is an error retrieving the source size.
 	 */
-	public long getSourceSize(@Nonnull MummyContext context) throws IOException;
+	public long getSourceSize(@NonNull MummyContext context) throws IOException;
 
 	/**
 	 * Opens an input stream to the source content of this artifact.
@@ -42,6 +42,6 @@ public interface CorporealSourceArtifact extends Artifact {
 	 * @return An input stream to the source contents.
 	 * @throws IOException if there is an error opening the source contents.
 	 */
-	public InputStream openSource(@Nonnull MummyContext context) throws IOException;
+	public InputStream openSource(@NonNull MummyContext context) throws IOException;
 
 }

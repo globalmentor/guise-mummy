@@ -23,7 +23,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import io.guise.mummy.*;
 import io.guise.mummy.mummify.Mummifier;
@@ -119,8 +119,8 @@ public class DirectoryArtifact extends AbstractArtifact implements SourcePathArt
 	 *          no content artifact.
 	 * @param childArtifacts The child artifacts of this artifact.
 	 */
-	public DirectoryArtifact(@Nonnull final Mummifier mummifier, @Nonnull final Path sourceDirectory, @Nonnull final Path targetDirectory,
-			@Nullable Artifact contentArtifact, @Nonnull Collection<Artifact> childArtifacts) {
+	public DirectoryArtifact(@NonNull final Mummifier mummifier, @NonNull final Path sourceDirectory, @NonNull final Path targetDirectory,
+			@Nullable Artifact contentArtifact, @NonNull Collection<Artifact> childArtifacts) {
 		//TODO add precondition to ensure this is a directory?
 		super(mummifier, sourceDirectory, targetDirectory);
 		this.isPost = SourcePathArtifact.hasPostFilename(sourceDirectory);

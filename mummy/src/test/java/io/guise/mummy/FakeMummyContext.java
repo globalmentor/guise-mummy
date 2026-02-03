@@ -18,7 +18,7 @@ package io.guise.mummy;
 
 import java.util.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import io.confound.config.Configuration;
 import io.guise.mummy.deploy.*;
@@ -35,7 +35,7 @@ public class FakeMummyContext extends BaseMummyContext {
 	 * Constructor.
 	 * @param project The Guise project.
 	 */
-	public FakeMummyContext(@Nonnull final GuiseProject project) {
+	public FakeMummyContext(@NonNull final GuiseProject project) {
 		super(project);
 	}
 

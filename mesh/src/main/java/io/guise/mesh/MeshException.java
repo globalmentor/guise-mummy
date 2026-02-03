@@ -16,7 +16,7 @@
 
 package io.guise.mesh;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 /**
  * An unchecked exception indicating an error specifically related to meshing, such as expression evaluation.

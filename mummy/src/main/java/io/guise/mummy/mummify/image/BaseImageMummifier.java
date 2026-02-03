@@ -33,7 +33,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import org.apache.commons.imaging.*;
 import org.apache.commons.imaging.common.bytesource.ByteSource;
@@ -94,7 +94,7 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	 * Constructor.
 	 * @param supportedMediaTypes The supported image media types; only base types (i.e. without parameters) are supported).
 	 */
-	public BaseImageMummifier(@Nonnull final Set<MediaType> supportedMediaTypes) {
+	public BaseImageMummifier(@NonNull final Set<MediaType> supportedMediaTypes) {
 		this.supportedMediaTypes = Set.copyOf(supportedMediaTypes);
 		this.supportedFilenameExtensions = Images.MEDIA_TYPES_BY_FILENAME_EXTENSION.entrySet().stream()
 				.filter(entry -> this.supportedMediaTypes.contains(entry.getValue())).map(Map.Entry::getKey).collect(toUnmodifiableSet());
@@ -117,7 +117,7 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	 *           {@link #loadSourceMetadata(MummyContext, InputStream, String)}.
 	 */
 	@Override
-	protected List<Map.Entry<URI, Object>> loadSourceMetadata(@Nonnull final MummyContext context, @Nonnull final Path sourceFile) throws IOException {
+	protected List<Map.Entry<URI, Object>> loadSourceMetadata(@NonNull final MummyContext context, @NonNull final Path sourceFile) throws IOException {
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile))) {
 			return loadSourceMetadata(context, inputStream, sourceFile.toString());
 		}
@@ -136,8 +136,8 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	 * @return Metadata stored in the source file being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate names.
 	 * @throws IOException if there is an I/O error retrieving the metadata, including incorrectly formatted metadata.
 	 */
-	protected List<Map.Entry<URI, Object>> loadSourceMetadata(@Nonnull final MummyContext context, @Nonnull final InputStream inputStream,
-			@Nonnull final String name) throws IOException {
+	protected List<Map.Entry<URI, Object>> loadSourceMetadata(@NonNull final MummyContext context, @NonNull final InputStream inputStream,
+			@NonNull final String name) throws IOException {
 		String title = null;
 		String description = null;
 		String artist = null;
@@ -340,8 +340,8 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	 * @see <a href="https://www.universalwebservices.net/web-programming-resources/java/adjust-jpeg-image-compression-quality-when-saving-images-in-java/">Adjust
 	 *      JPEG image compression quality when saving images in Java</a>
 	 */
-	protected static void addImageMetadata(@Nonnull final ByteSource byteSource, @Nonnull final OutputStream outputStream,
-			@Nonnull final UrfResourceDescription metadata, final boolean sRGB, @Nullable final String software, @Nullable final Instant modifiedAt)
+	protected static void addImageMetadata(@NonNull final ByteSource byteSource, @NonNull final OutputStream outputStream,
+			@NonNull final UrfResourceDescription metadata, final boolean sRGB, @Nullable final String software, @Nullable final Instant modifiedAt)
 			throws IOException {
 		try {
 			final TiffOutputSet tiffOutputSet = new TiffOutputSet();

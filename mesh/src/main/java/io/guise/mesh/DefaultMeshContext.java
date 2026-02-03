@@ -22,7 +22,7 @@ import static java.util.Objects.*;
 import java.util.*;
 import java.util.function.Supplier;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 /**
  * Default implementation of a Mesh context.
@@ -50,7 +50,7 @@ public class DefaultMeshContext implements MeshContext {
 	 * @implSpec A factory producing instances of {@link MapMeshScope} will be used.
 	 * @param rootScope The root scope of the context.
 	 */
-	public DefaultMeshContext(@Nonnull final MeshScope rootScope) {
+	public DefaultMeshContext(@NonNull final MeshScope rootScope) {
 		this(rootScope, MapMeshScope::new);
 	}
 
@@ -59,7 +59,7 @@ public class DefaultMeshContext implements MeshContext {
 	 * @implSpec A {@link MapMeshScope} will be used for the root scope.
 	 * @param scopeFactory The factory for creating new scopes.
 	 */
-	public DefaultMeshContext(@Nonnull final Supplier<MeshScope> scopeFactory) {
+	public DefaultMeshContext(@NonNull final Supplier<MeshScope> scopeFactory) {
 		this(new MapMeshScope(), scopeFactory);
 	}
 
@@ -68,7 +68,7 @@ public class DefaultMeshContext implements MeshContext {
 	 * @param rootScope The root scope of the context.
 	 * @param scopeFactory The factory for creating new scopes.
 	 */
-	public DefaultMeshContext(@Nonnull final MeshScope rootScope, @Nonnull final Supplier<MeshScope> scopeFactory) {
+	public DefaultMeshContext(@NonNull final MeshScope rootScope, @NonNull final Supplier<MeshScope> scopeFactory) {
 		scopeStack.push(requireNonNull(rootScope));
 		this.scopeFactory = requireNonNull(scopeFactory);
 	}
@@ -121,7 +121,7 @@ public class DefaultMeshContext implements MeshContext {
 		 * Scope constructor.
 		 * @param scope The scope being nested.
 		 */
-		public DefaultScopeNesting(@Nonnull final MeshScope scope) {
+		public DefaultScopeNesting(@NonNull final MeshScope scope) {
 			this.scope = requireNonNull(scope);
 		}
 

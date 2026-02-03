@@ -26,7 +26,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
+
 import javax.xml.parsers.*;
 
 import org.xml.sax.*;
@@ -68,7 +69,7 @@ public abstract class BaseMummyContext implements MummyContext {
 	 * @param mummifier The mummifier to register.
 	 * @see Mummifier#getSupportedFilenameExtensions()
 	 */
-	protected void registerFileMummifier(@Nonnull final SourcePathMummifier mummifier) {
+	protected void registerFileMummifier(@NonNull final SourcePathMummifier mummifier) {
 		mummifier.getSupportedFilenameExtensions().stream()
 				//normalize extensions so we can look up without regard to case
 				.map(Filenames.Extensions::normalize).forEach(ext -> fileMummifiersByExtension.put(ext, mummifier));
@@ -97,7 +98,7 @@ public abstract class BaseMummyContext implements MummyContext {
 	 * Constructor.
 	 * @param project The Guise project.
 	 */
-	public BaseMummyContext(@Nonnull final GuiseProject project) {
+	public BaseMummyContext(@NonNull final GuiseProject project) {
 		this.project = requireNonNull(project);
 		pageDocumentBuilderFactory = DocumentBuilderFactory.newInstance();
 		pageDocumentBuilderFactory.setNamespaceAware(true);
@@ -136,7 +137,7 @@ public abstract class BaseMummyContext implements MummyContext {
 	 * @implSpec This implementation finds a registered mummifier based upon the normalized filename extension (without regard to case).
 	 */
 	@Override
-	public Optional<SourcePathMummifier> findRegisteredMummifierForSourceFile(@Nonnull final Path sourceFile) {
+	public Optional<SourcePathMummifier> findRegisteredMummifierForSourceFile(@NonNull final Path sourceFile) {
 		return filenameExtensions(sourceFile).map(Filenames.Extensions::normalize).map(fileMummifiersByExtension::get).filter(Objects::nonNull).findFirst();
 	}
 

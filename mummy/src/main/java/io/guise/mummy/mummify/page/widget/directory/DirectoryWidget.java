@@ -32,8 +32,7 @@ import java.time.format.*;
 import java.util.*;
 import java.util.stream.Stream;
 
-import javax.annotation.*;
-
+import org.jspecify.annotations.*;
 import org.w3c.dom.*;
 
 import com.globalmentor.collections.comparators.SortOrder;
@@ -173,8 +172,8 @@ public class DirectoryWidget implements Widget {
 	 * @throws MummifyWidgetException if the information in the widget element is not appropriate for the widget.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public List<Element> generateItemElements(@Nonnull final PageMummifier mummifier, @Nonnull final MummyContext context, @Nonnull final Artifact artifact,
-			@Nonnull final Element widgetElement, @Nonnegative final int headingLevel, Stream<Artifact> items)
+	public List<Element> generateItemElements(@NonNull final PageMummifier mummifier, @NonNull final MummyContext context, @NonNull final Artifact artifact,
+			@NonNull final Element widgetElement, final int headingLevel, Stream<Artifact> items)
 			throws IOException, MummifyWidgetException, DOMException {
 		final Document document = widgetElement.getOwnerDocument();
 		final Collator titleCollator = Collator.getInstance(); //TODO i18n: get locale for page, defaulting to site locale

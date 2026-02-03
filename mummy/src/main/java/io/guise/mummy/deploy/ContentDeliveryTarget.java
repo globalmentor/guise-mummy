@@ -18,7 +18,7 @@ package io.guise.mummy.deploy;
 
 import java.util.Set;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import io.confound.config.ConfigurationException;
 import io.guise.mummy.MummyContext;
@@ -44,6 +44,6 @@ public interface ContentDeliveryTarget extends DeployTarget {
 	 * @throws ConfigurationException if the origin target cannot be determined.
 	 * @see MummyContext#getDeployTargets()
 	 */
-	public DeployTarget getOriginTarget(@Nonnull final MummyContext context) throws ConfigurationException;
+	public DeployTarget getOriginTarget(@NonNull final MummyContext context) throws ConfigurationException;
 
 }

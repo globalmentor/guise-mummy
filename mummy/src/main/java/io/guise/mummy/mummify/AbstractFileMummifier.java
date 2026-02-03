@@ -29,7 +29,7 @@ import java.time.*;
 import java.util.*;
 import java.util.regex.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import io.guise.mummy.*;
 import io.urf.model.*;
@@ -69,8 +69,8 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @return An artifact describing the resource to be mummified.
 	 * @throws IOException if there is an I/O error during planning.
 	 */
-	protected Artifact createArtifact(@Nonnull final MummyContext context, @Nonnull final Path sourceFile, @Nonnull final Path outputFile,
-			@Nonnull final UrfResourceDescription description) throws IOException {
+	protected Artifact createArtifact(@NonNull final MummyContext context, @NonNull final Path sourceFile, @NonNull final Path outputFile,
+			@NonNull final UrfResourceDescription description) throws IOException {
 		return new DefaultSourceFileArtifact(this, sourceFile, outputFile, description);
 	}
 
@@ -89,7 +89,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @see MummyContext#isIncremental()
 	 * @see MummyContext#isFull()
 	 */
-	protected UrfResourceDescription loadArtifactDescription(@Nonnull MummyContext context, @Nonnull final Path sourceFile, @Nonnull final Path targetFile)
+	protected UrfResourceDescription loadArtifactDescription(@NonNull MummyContext context, @NonNull final Path sourceFile, @NonNull final Path targetFile)
 			throws IOException {
 		final Optional<Instant> sourceModifiedAt = exists(sourceFile) ? Optional.of(getLastModifiedTime(sourceFile).toInstant()) : Optional.empty();
 		final Optional<UrfResourceDescription> cachedDescription;
@@ -162,7 +162,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @return Metadata stored in the source file being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate names.
 	 * @throws IOException if there is an I/O error retrieving the metadata.
 	 */
-	protected abstract List<Map.Entry<URI, Object>> loadSourceMetadata(@Nonnull MummyContext context, @Nonnull Path sourceFile) throws IOException;
+	protected abstract List<Map.Entry<URI, Object>> loadSourceMetadata(@NonNull MummyContext context, @NonNull Path sourceFile) throws IOException;
 
 	/**
 	 * {@inheritDoc}
@@ -178,7 +178,7 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @see MummyContext#isFull()
 	 */
 	@Override
-	public final void mummify(@Nonnull final MummyContext context, @Nonnull Artifact artifact) throws IOException {
+	public final void mummify(@NonNull final MummyContext context, @NonNull Artifact artifact) throws IOException {
 		getLogger().trace("Mummifying file artifact {} ...", artifact);
 		final Path targetFile = artifact.getTargetPath();
 		final UrfResourceDescription description = artifact.getResourceDescription();
@@ -240,6 +240,6 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 	 * @param artifact The artifact being generated.
 	 * @throws IOException if there is an I/O error during mummification.
 	 */
-	protected abstract void mummifyFile(@Nonnull final MummyContext context, @Nonnull CorporealSourceArtifact artifact) throws IOException;
+	protected abstract void mummifyFile(@NonNull final MummyContext context, @NonNull CorporealSourceArtifact artifact) throws IOException;
 
 }

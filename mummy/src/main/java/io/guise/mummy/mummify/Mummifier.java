@@ -21,7 +21,7 @@ import static com.globalmentor.io.Filenames.*;
 import java.io.IOException;
 import java.util.Set;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import com.globalmentor.security.MessageDigests;
 
@@ -70,7 +70,7 @@ public interface Mummifier extends Clogged {
 	 * </p>
 	 * @return The extensions of filenames for file types supported by this mummifier.
 	 */
-	public @Nonnull Set<String> getSupportedFilenameExtensions();
+	public @NonNull Set<String> getSupportedFilenameExtensions();
 
 	/**
 	 * Determines the preferred target filename for an artifact given the indicated source filename.
@@ -80,7 +80,7 @@ public interface Mummifier extends Clogged {
 	 * @param filename A suggested filename, such as from the path in the site source directory.
 	 * @return The filename this mummifier would prefer to use for the generated target file.
 	 */
-	public String planArtifactTargetFilename(@Nonnull MummyContext context, @Nonnull String filename);
+	public String planArtifactTargetFilename(@NonNull MummyContext context, @NonNull String filename);
 
 	/**
 	 * Mummifies a resource in the presence of a context artifact, which may or may not be the same as the artifact itself.
@@ -88,6 +88,6 @@ public interface Mummifier extends Clogged {
 	 * @param artifact The artifact being generated
 	 * @throws IOException if there is an I/O error during static site generation.
 	 */
-	public void mummify(@Nonnull final MummyContext context, @Nonnull Artifact artifact) throws IOException;
+	public void mummify(@NonNull final MummyContext context, @NonNull Artifact artifact) throws IOException;
 
 }

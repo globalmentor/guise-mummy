@@ -19,8 +19,7 @@ package io.guise.mummy.mummify.page.widget;
 import java.io.IOException;
 import java.util.List;
 
-import javax.annotation.*;
-
+import org.jspecify.annotations.*;
 import org.w3c.dom.*;
 
 import com.globalmentor.xml.def.NsName;
@@ -53,7 +52,7 @@ public interface Widget {
 	 * @throws MummifyWidgetException if the information in the widget element is not appropriate for the widget.
 	 * @throws DOMException if there is some error manipulating the XML document object model.
 	 */
-	public List<Element> processElement(@Nonnull PageMummifier mummifier, @Nonnull MummyContext context, @Nonnull Artifact artifact,
-			@Nonnull Element widgetElement) throws IOException, MummifyWidgetException, DOMException;
+	public List<Element> processElement(@NonNull PageMummifier mummifier, @NonNull MummyContext context, @NonNull Artifact artifact,
+			@NonNull Element widgetElement) throws IOException, MummifyWidgetException, DOMException;
 
 }

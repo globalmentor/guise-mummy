@@ -28,8 +28,9 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Stream;
 
-import javax.annotation.*;
 import javax.xml.parsers.DocumentBuilder;
+
+import org.jspecify.annotations.*;
 
 import io.confound.config.*;
 import io.guise.mummy.deploy.*;
@@ -123,7 +124,7 @@ public interface MummyContext {
 	 * @param sourcePath The source path to check.
 	 * @return <code>true</code> if the source path should be ignored and excluded from processing.
 	 */
-	public boolean isIgnore(@Nonnull final Path sourcePath);
+	public boolean isIgnore(@NonNull final Path sourcePath);
 
 	/** @return The default mummifier for source files. */
 	public SourcePathMummifier getDefaultSourceFileMummifier();
@@ -140,7 +141,7 @@ public interface MummyContext {
 	 * @param sourcePath The path of the source to be mummified.
 	 * @return The default mummifier for the source path.
 	 */
-	public default SourcePathMummifier getDefaultSourcePathMummifier(@Nonnull final Path sourcePath) {
+	public default SourcePathMummifier getDefaultSourcePathMummifier(@NonNull final Path sourcePath) {
 		return isDirectory(sourcePath) ? getDefaultSourceDirectoryMummifier() : getDefaultSourceFileMummifier();
 	}
 
@@ -149,14 +150,14 @@ public interface MummyContext {
 	 * @param sourceFile The path of the source file to be mummified.
 	 * @return The mummifier, if any, registered for the given source file.
 	 */
-	public Optional<SourcePathMummifier> findRegisteredMummifierForSourceFile(@Nonnull final Path sourceFile);
+	public Optional<SourcePathMummifier> findRegisteredMummifierForSourceFile(@NonNull final Path sourceFile);
 
 	/**
 	 * Retrieves a registered mummifier for a particular source directory.
 	 * @param sourceDirectory The path of the source directory to be mummified.
 	 * @return The mummifier, if any, registered for the given source directory.
 	 */
-	public Optional<SourcePathMummifier> findRegisteredMummifierForSourceDirectory(@Nonnull final Path sourceDirectory);
+	public Optional<SourcePathMummifier> findRegisteredMummifierForSourceDirectory(@NonNull final Path sourceDirectory);
 
 	/**
 	 * Retrieves a registered mummifier for a particular source path, which may represent a file or a directory.
@@ -165,7 +166,7 @@ public interface MummyContext {
 	 * @param sourcePath The path of the source to be mummified.
 	 * @return The mummifier, if any, registered for the given source path.
 	 */
-	public default Optional<SourcePathMummifier> findRegisteredMummifierForSourcePath(@Nonnull final Path sourcePath) {
+	public default Optional<SourcePathMummifier> findRegisteredMummifierForSourcePath(@NonNull final Path sourcePath) {
 		return isDirectory(sourcePath) ? findRegisteredMummifierForSourceDirectory(sourcePath) : findRegisteredMummifierForSourceFile(sourcePath);
 	}
 
@@ -177,7 +178,7 @@ public interface MummyContext {
 	 * @param sourcePath The path of the source to be mummified.
 	 * @return The mummifier for the given source path.
 	 */
-	public default SourcePathMummifier getMummifierForSourcePath(@Nonnull final Path sourcePath) {
+	public default SourcePathMummifier getMummifierForSourcePath(@NonNull final Path sourcePath) {
 		return findRegisteredMummifierForSourcePath(sourcePath).orElseGet(() -> getDefaultSourcePathMummifier(sourcePath));
 	}
 
@@ -201,7 +202,7 @@ public interface MummyContext {
 	 * @throws IllegalArgumentException if the given source path is not in the site source tree.
 	 * @see #getSiteSourceDirectory()
 	 */
-	public default Path checkArgumentSourcePath(@Nonnull Path sourcePath) {
+	public default Path checkArgumentSourcePath(@NonNull Path sourcePath) {
 		checkArgumentSubPath(getSiteSourceDirectory(), checkArgumentAbsolute(sourcePath));
 		return sourcePath;
 	}
@@ -219,7 +220,7 @@ public interface MummyContext {
 	 * @throws IllegalArgumentException if the given source directory is not in the site source tree.
 	 * @throws IOException If there is an I/O error searching for a matching file.
 	 */
-	public default Optional<Map.Entry<Path, PageMummifier>> findPageSourceFile(@Nonnull Path sourceDirectory, @Nonnull final String baseFilename)
+	public default Optional<Map.Entry<Path, PageMummifier>> findPageSourceFile(@NonNull Path sourceDirectory, @NonNull final String baseFilename)
 			throws IOException {
 		return findPageSourceFile(sourceDirectory, baseFilename, false);
 	}
@@ -236,7 +237,7 @@ public interface MummyContext {
 	 * @throws IllegalArgumentException if the given source directory is not in the site source tree.
 	 * @throws IOException If there is an I/O error searching for a matching file.
 	 */
-	public default Optional<Map.Entry<Path, PageMummifier>> findPageSourceFile(@Nonnull Path sourceDirectory, @Nonnull final String baseFilename,
+	public default Optional<Map.Entry<Path, PageMummifier>> findPageSourceFile(@NonNull Path sourceDirectory, @NonNull final String baseFilename,
 			boolean searchAncestors) throws IOException {
 		checkArgumentSourcePath(sourceDirectory);
 		final Path siteSourceDirectory = getSiteSourceDirectory();

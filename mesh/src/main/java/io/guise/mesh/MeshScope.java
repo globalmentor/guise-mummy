@@ -18,7 +18,7 @@ package io.guise.mesh;
 
 import java.util.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 /**
  * A scope of variables. <code>null</code> variable values are not permitted.
@@ -33,7 +33,7 @@ public interface MeshScope {
 	 * @param name The name of the variable to find.
 	 * @return The value of the variable if present.
 	 */
-	public Optional<Object> findVariable(@Nonnull String name);
+	public Optional<Object> findVariable(@NonNull String name);
 
 	/**
 	 * Determines whether a variable with the given name exists in the given context.
@@ -41,7 +41,7 @@ public interface MeshScope {
 	 * @param name The name of the variable to check for.
 	 * @return <code>true</code> if the named variable exists.
 	 */
-	public default boolean hasVariable(@Nonnull final String name) {
+	public default boolean hasVariable(@NonNull final String name) {
 		return findVariable(name).isPresent();
 	}
 
@@ -50,7 +50,7 @@ public interface MeshScope {
 	 * @param name The name of the variable to set.
 	 * @param value The new variable value, which must not be <code>null</code>.
 	 */
-	public void setVariable(@Nonnull String name, @Nonnull Object value);
+	public void setVariable(@NonNull String name, @NonNull Object value);
 
 	/**
 	 * Creates a new scope with the given variables.
@@ -58,7 +58,7 @@ public interface MeshScope {
 	 * @param map The map of variables with which to initialize the scope.
 	 * @return A new scope with the given variables.
 	 */
-	public static MeshScope create(@Nonnull final Map<String, Object> map) {
+	public static MeshScope create(@NonNull final Map<String, Object> map) {
 		return new MapMeshScope(new HashMap<>(map)); //make a defensive copy of the variables map
 	}
 

@@ -22,7 +22,7 @@ import static java.util.Objects.*;
 import java.io.*;
 import java.util.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 /**
  * Encapsulation of object, such as a Guise Mummy artifact, to be deployed to S3.
@@ -54,7 +54,7 @@ public abstract class AbstractS3DeployObject implements S3DeployObject {
 	 * Constructor.
 	 * @param key The S3 key representing the deployment path of the object in the bucket.
 	 */
-	public AbstractS3DeployObject(@Nonnull final String key) {
+	public AbstractS3DeployObject(@NonNull final String key) {
 		this.key = requireNonNull(key);
 	}
 

@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import com.globalmentor.net.MediaType;
 
@@ -46,7 +46,7 @@ public interface SourcePathMummifier extends Mummifier {
 	 * </p>
 	 * @return The extensions of filenames for file types supported by this mummifier.
 	 */
-	public @Nonnull Set<String> getSupportedFilenameExtensions();
+	public @NonNull Set<String> getSupportedFilenameExtensions();
 
 	/**
 	 * Determines the media type for an artifact from the given source path
@@ -59,7 +59,7 @@ public interface SourcePathMummifier extends Mummifier {
 	 * @return The target media type for the generated artifact, if known; will not be present if unknown or unsupported.
 	 * @throws IOException if there is an I/O error determining the media type.
 	 */
-	public Optional<MediaType> getArtifactMediaType(@Nonnull MummyContext context, @Nonnull final Path sourcePath) throws IOException;
+	public Optional<MediaType> getArtifactMediaType(@NonNull MummyContext context, @NonNull final Path sourcePath) throws IOException;
 
 	/**
 	 * Plans mummification of a source path supported by this mummifier.
@@ -69,6 +69,6 @@ public interface SourcePathMummifier extends Mummifier {
 	 * @return An artifact describing the resource to be mummified.
 	 * @throws IOException if there is an I/O error during planning.
 	 */
-	public Artifact plan(@Nonnull MummyContext context, @Nonnull Path sourcePath, @Nonnull Path targetPath) throws IOException;
+	public Artifact plan(@NonNull MummyContext context, @NonNull Path sourcePath, @NonNull Path targetPath) throws IOException;
 
 }

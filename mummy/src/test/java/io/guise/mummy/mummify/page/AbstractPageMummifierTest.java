@@ -27,8 +27,7 @@ import static org.mockito.Mockito.*;
 import java.util.*;
 import java.util.stream.Stream;
 
-import javax.annotation.*;
-
+import org.jspecify.annotations.*;
 import org.junit.jupiter.api.*;
 import org.w3c.dom.*;
 
@@ -90,7 +89,7 @@ public class AbstractPageMummifierTest {
 	 * @return The resulting links after merging, associated with the name of the document they are from.
 	 * @see AbstractPageMummifier#mergeHeadLinks(Document, Document)
 	 */
-	protected List<Map.Entry<String, String>> mergeHeadLinks(@Nonnull final Stream<String> templateLinks, @Nonnull final Stream<String> sourceDocumentLinks) {
+	protected List<Map.Entry<String, String>> mergeHeadLinks(@NonNull final Stream<String> templateLinks, @NonNull final Stream<String> sourceDocumentLinks) {
 		final Document templateDocument = createLinksDocument(FROM_TEMPLATE, templateLinks);
 		final Document sourceDocument = createLinksDocument(FROM_SOURCE_DOCUMENT, sourceDocumentLinks);
 		final AbstractPageMummifier mummifier = mock(AbstractPageMummifier.class, CALLS_REAL_METHODS);
@@ -110,7 +109,7 @@ public class AbstractPageMummifierTest {
 	 * @return A fake HTML document with the links.
 	 * @see #LINK_ELEMENT
 	 */
-	protected Document createLinksDocument(@Nonnull final String name, @Nonnull final Stream<String> links) {
+	protected Document createLinksDocument(@NonNull final String name, @NonNull final Stream<String> links) {
 		final Document document = createXHTMLDocument(name);
 		final Element headElement = findHtmlHeadElement(document).orElseThrow(IllegalStateException::new);
 		links.map(link -> {

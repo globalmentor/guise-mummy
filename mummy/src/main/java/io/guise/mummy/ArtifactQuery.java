@@ -16,7 +16,7 @@
 
 package io.guise.mummy;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import com.globalmentor.net.URIPath;
 
@@ -37,7 +37,7 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	 * @param artifact The artifact for which children should be queried.
 	 * @return This artifact query.
 	 */
-	public ArtifactQuery fromChildrenOf(@Nonnull Artifact artifact);
+	public ArtifactQuery fromChildrenOf(@NonNull Artifact artifact);
 
 	/**
 	 * Initially queries children of an artifact referred to by a URI path source reference relative to some other artifact.
@@ -46,7 +46,7 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	 * @throws IllegalArgumentException if the given reference path is absolute.
 	 * @return This artifact query.
 	 */
-	public ArtifactQuery fromChildrenOf(@Nonnull Artifact artifact, @Nonnull final URIPath sourceRelativeReference);
+	public ArtifactQuery fromChildrenOf(@NonNull Artifact artifact, @NonNull final URIPath sourceRelativeReference);
 
 	/**
 	 * Initially queries children of an artifact referred to by a URI path source reference relative to some other artifact.
@@ -57,7 +57,7 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	 * @throws IllegalArgumentException if the given string is not a valid reference path or is absolute.
 	 * @return This artifact query.
 	 */
-	public default ArtifactQuery fromChildrenOf(@Nonnull Artifact artifact, @Nonnull final String sourceRelativeReference) {
+	public default ArtifactQuery fromChildrenOf(@NonNull Artifact artifact, @NonNull final String sourceRelativeReference) {
 		return fromChildrenOf(artifact, URIPath.of(sourceRelativeReference));
 	}
 
@@ -67,7 +67,7 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	 * @param artifact The artifact for which siblings should be queried.
 	 * @return This artifact query.
 	 */
-	public ArtifactQuery fromSiblingsOf(@Nonnull Artifact artifact);
+	public ArtifactQuery fromSiblingsOf(@NonNull Artifact artifact);
 
 	/**
 	 * Initially queries siblings of an artifact referred to by a URI path source reference relative to some other artifact. An artifact will not have siblings if
@@ -78,7 +78,7 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	 * @throws IllegalArgumentException if the given reference path is absolute.
 	 * @return This artifact query.
 	 */
-	public ArtifactQuery fromSiblingsOf(@Nonnull Artifact artifact, @Nonnull final URIPath sourceRelativeReference);
+	public ArtifactQuery fromSiblingsOf(@NonNull Artifact artifact, @NonNull final URIPath sourceRelativeReference);
 
 	/**
 	 * Initially queries siblings of an artifact referred to by a URI path source reference relative to some other artifact. An artifact will not have siblings if
@@ -91,7 +91,7 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	 * @throws IllegalArgumentException if the given string is not a valid reference path or is absolute.
 	 * @return This artifact query.
 	 */
-	public default ArtifactQuery fromSiblingsOf(@Nonnull Artifact artifact, @Nonnull final String sourceRelativeReference) {
+	public default ArtifactQuery fromSiblingsOf(@NonNull Artifact artifact, @NonNull final String sourceRelativeReference) {
 		return fromSiblingsOf(artifact, URIPath.of(sourceRelativeReference));
 	}
 
@@ -104,7 +104,7 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	 * @param artifact The artifact for which artifacts at the same level should be queried.
 	 * @return This artifact query.
 	 */
-	public ArtifactQuery fromLevelOf(@Nonnull Artifact artifact);
+	public ArtifactQuery fromLevelOf(@NonNull Artifact artifact);
 
 	/**
 	 * Initially queries artifacts at the same level of some artifact referred to by a URI path source reference relative to some artifact. The resolved artifact
@@ -117,7 +117,7 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	 * @throws IllegalArgumentException if the given reference path is absolute.
 	 * @return This artifact query.
 	 */
-	public ArtifactQuery fromLevelOf(@Nonnull Artifact artifact, @Nonnull final URIPath sourceRelativeReference);
+	public ArtifactQuery fromLevelOf(@NonNull Artifact artifact, @NonNull final URIPath sourceRelativeReference);
 
 	/**
 	 * Initially queries artifacts at the same level of an artifact referred to by a URI path source reference relative to some other artifact. The resolved
@@ -132,7 +132,7 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	 * @throws IllegalArgumentException if the given string is not a valid reference path or is absolute.
 	 * @return This artifact query.
 	 */
-	public default ArtifactQuery fromLevelOf(@Nonnull Artifact artifact, @Nonnull final String sourceRelativeReference) {
+	public default ArtifactQuery fromLevelOf(@NonNull Artifact artifact, @NonNull final String sourceRelativeReference) {
 		return fromLevelOf(artifact, URIPath.of(sourceRelativeReference));
 	}
 
@@ -145,7 +145,7 @@ public interface ArtifactQuery extends Iterable<Artifact> {
 	 * @return This artifact query.
 	 * @throws IllegalStateException if the query has not yet been initialized with an artifact source.
 	 */
-	public ArtifactQuery filterContentType(@Nonnull final CharSequence contentTypeMatch);
+	public ArtifactQuery filterContentType(@NonNull final CharSequence contentTypeMatch);
 
 	//order by
 

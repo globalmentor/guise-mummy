@@ -23,7 +23,7 @@ import java.io.*;
 import java.nio.file.Path;
 import java.util.*;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import com.globalmentor.java.Objects;
 
@@ -47,7 +47,7 @@ public abstract class AbstractSourcePathMummifier extends AbstractMummifier impl
 	 * @throws IllegalArgumentException if the given source file is not in the target source tree.
 	 * @see Artifact#getSourcePath()
 	 */
-	protected Path getArtifactSourceDescriptionFile(final @Nonnull MummyContext context, final @Nonnull Artifact artifact) {
+	protected Path getArtifactSourceDescriptionFile(final @NonNull MummyContext context, final @NonNull Artifact artifact) {
 		return getArtifactSourceDescriptionFile(context, artifact.getTargetPath());
 	}
 
@@ -62,7 +62,7 @@ public abstract class AbstractSourcePathMummifier extends AbstractMummifier impl
 	 * @throws IllegalArgumentException if the given source file is not in the target source tree.
 	 * @see Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION
 	 */
-	protected Path getArtifactSourceDescriptionFile(final @Nonnull MummyContext context, final @Nonnull Path sourcePath) {
+	protected Path getArtifactSourceDescriptionFile(final @NonNull MummyContext context, final @NonNull Path sourcePath) {
 		return addFilenameExtension(sourcePath, DESCRIPTION_FILE_SIDECAR_EXTENSION);
 	}
 
@@ -75,7 +75,7 @@ public abstract class AbstractSourcePathMummifier extends AbstractMummifier impl
 	 * @throws IOException if there is an I/O error retrieving the description, including if the metadata is invalid.
 	 * @see #getArtifactSourceDescriptionFile(MummyContext, Path)
 	 */
-	protected Optional<UrfResourceDescription> loadArtifactSourceDescription(@Nonnull MummyContext context, @Nonnull final Path sourcePath) throws IOException {
+	protected Optional<UrfResourceDescription> loadArtifactSourceDescription(@NonNull MummyContext context, @NonNull final Path sourcePath) throws IOException {
 		final Path descriptionFile = getArtifactSourceDescriptionFile(context, sourcePath);
 		if(!isRegularFile(descriptionFile)) {
 			return Optional.empty();

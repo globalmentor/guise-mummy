@@ -26,11 +26,10 @@ import java.io.*;
 import java.nio.file.Path;
 import java.util.List;
 
-import javax.annotation.*;
-
 import org.apache.catalina.*;
 import org.apache.catalina.webresources.*;
 import org.apache.juli.logging.*;
+import org.jspecify.annotations.*;
 import org.apache.tomcat.util.digester.Digester;
 
 import com.globalmentor.io.Filenames;
@@ -86,7 +85,7 @@ public class SiteDirResourceSet extends DirResourceSet {
 	 * Sets the root directory of the description metadata tree.
 	 * @param descriptionBase The absolute path of the root directory of the description metadata tree.
 	 */
-	public void setDescriptionBase(@Nonnull final String descriptionBase) {
+	public void setDescriptionBase(@NonNull final String descriptionBase) {
 		this.descriptionBase = requireNonNull(descriptionBase);
 	}
 
@@ -108,7 +107,7 @@ public class SiteDirResourceSet extends DirResourceSet {
 	 * @param prefix The filename prefix to use to discover description sidecar files.
 	 * @see #setDescriptionFileSidecarExtension(String)
 	 */
-	public void setDescriptionFileSidecarPrefix(@Nonnull final String prefix) {
+	public void setDescriptionFileSidecarPrefix(@NonNull final String prefix) {
 		descriptionFileSidecarPrefix = requireNonNull(prefix);
 	}
 
@@ -130,7 +129,7 @@ public class SiteDirResourceSet extends DirResourceSet {
 	 * @param extension The filename extension to use to discover description sidecar files.
 	 * @see #setDescriptionFileSidecarPrefix(String)
 	 */
-	public void setDescriptionFileSidecarExtension(@Nonnull final String extension) {
+	public void setDescriptionFileSidecarExtension(@NonNull final String extension) {
 		descriptionFileSidecarExtension = requireNonNull(extension);
 	}
 
@@ -152,8 +151,8 @@ public class SiteDirResourceSet extends DirResourceSet {
 	 * @param descriptionBase The absolute path of the root directory of the description metadata tree, which may or may not be the same as the resource set base.
 	 *          The internal path will be appended to this path as it is to the base path for the served resources.
 	 */
-	public SiteDirResourceSet(@Nonnull final WebResourceRoot root, @Nonnull final String webAppMount, @Nonnull final String base,
-			@Nonnull final String internalPath, @Nonnull final String descriptionBase) {
+	public SiteDirResourceSet(@NonNull final WebResourceRoot root, @NonNull final String webAppMount, @NonNull final String base,
+			@NonNull final String internalPath, @NonNull final String descriptionBase) {
 		super(root, webAppMount, base, internalPath);
 		this.descriptionBase = requireNonNull(descriptionBase);
 	}

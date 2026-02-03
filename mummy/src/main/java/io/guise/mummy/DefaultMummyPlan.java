@@ -23,7 +23,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import com.globalmentor.net.URIPath;
 
@@ -58,7 +58,7 @@ public class DefaultMummyPlan extends AbstractMummyPlan {
 	 * Recursively initializes the mummification plan for the given artifact. Parent artifacts are updated in the map, for example.
 	 * @param artifact The artifact the plan of which to update.
 	 */
-	private void initialize(@Nonnull final Artifact artifact) {
+	private void initialize(@NonNull final Artifact artifact) {
 		requireNonNull(artifact);
 		if(artifact instanceof CompositeArtifact) {
 			final CompositeArtifact compositeArtifact = (CompositeArtifact)artifact;
@@ -81,7 +81,7 @@ public class DefaultMummyPlan extends AbstractMummyPlan {
 	 * Root artifact constructor.
 	 * @param rootArtifact The root artifact of the site, representing the root directory.
 	 */
-	public DefaultMummyPlan(@Nonnull final Artifact rootArtifact) {
+	public DefaultMummyPlan(@NonNull final Artifact rootArtifact) {
 		super(rootArtifact);
 		initialize(rootArtifact);
 	}

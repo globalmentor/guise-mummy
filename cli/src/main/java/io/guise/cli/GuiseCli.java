@@ -33,11 +33,10 @@ import java.net.URI;
 import java.nio.file.*;
 import java.util.*;
 
-import javax.annotation.*;
-
 import org.apache.catalina.*;
 import org.apache.catalina.startup.Tomcat;
 import org.fusesource.jansi.Ansi;
+import org.jspecify.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.slf4j.event.Level;
@@ -72,7 +71,7 @@ public class GuiseCli extends BaseCliApplication {
 	 * Constructor.
 	 * @param args The command line arguments.
 	 */
-	public GuiseCli(@Nonnull final String[] args) {
+	public GuiseCli(@NonNull final String[] args) {
 		super(args, Level.INFO);
 		//bridge JUL to SLF4J for Tomcat logging
 		SLF4JBridgeHandler.removeHandlersForRootLogger();
@@ -83,7 +82,7 @@ public class GuiseCli extends BaseCliApplication {
 	 * Main program entry method.
 	 * @param args Program arguments.
 	 */
-	public static void main(@Nonnull final String[] args) {
+	public static void main(@NonNull final String[] args) {
 		Application.start(new GuiseCli(args));
 	}
 
@@ -93,7 +92,7 @@ public class GuiseCli extends BaseCliApplication {
 	 * @see #getLogger()
 	 * @see Level#INFO
 	 */
-	protected void logProjectInfo(@Nonnull final GuiseProject project) {
+	protected void logProjectInfo(@NonNull final GuiseProject project) {
 		final Logger logger = getLogger();
 		final Configuration projectConfiguration = project.getConfiguration();
 		logger.info("Project directory: {}", project.getDirectory());

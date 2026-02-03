@@ -23,7 +23,7 @@ import static java.util.Objects.*;
 import java.net.URI;
 import java.nio.file.Path;
 
-import javax.annotation.*;
+import org.jspecify.annotations.*;
 
 import com.globalmentor.net.URIPath;
 
@@ -44,7 +44,7 @@ public abstract class AbstractMummyPlan implements MummyPlan {
 	 * Root artifact constructor.
 	 * @param rootArtifact The root artifact of the site, representing the root directory.
 	 */
-	public AbstractMummyPlan(@Nonnull final Artifact rootArtifact) {
+	public AbstractMummyPlan(@NonNull final Artifact rootArtifact) {
 		this.rootArtifact = requireNonNull(rootArtifact);
 	}
 
@@ -75,7 +75,7 @@ public abstract class AbstractMummyPlan implements MummyPlan {
 	 *           artifact.
 	 * @see #getRootArtifact()
 	 */
-	protected URIPath relativizeResourceReference(@Nonnull final Path basePath, @Nonnull final Path referencePath, final boolean forceCollection) {
+	protected URIPath relativizeResourceReference(@NonNull final Path basePath, @NonNull final Path referencePath, final boolean forceCollection) {
 		final Path root = isSubPath(getRootArtifact().getSourcePath(), basePath) ? getRootArtifact().getSourcePath() : getRootArtifact().getTargetPath();
 		final URI baseTargetUri = checkArgumentSubPath(root, checkArgumentAbsolute(basePath)).toUri();
 		final URI referenceTargetUri = checkArgumentSubPath(root, checkArgumentAbsolute(referencePath)).toUri();
