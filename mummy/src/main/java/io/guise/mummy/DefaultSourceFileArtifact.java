@@ -71,7 +71,7 @@ public class DefaultSourceFileArtifact extends AbstractSourceFileArtifact {
 	 */
 	protected DefaultSourceFileArtifact(@NonNull final Builder<?> builder) {
 		super(builder);
-		this.corporealSourceFile = checkArgumentRegularFile(builder.corporealSourceFile != null ? builder.corporealSourceFile : getSourcePath());
+		this.corporealSourceFile = checkArgumentRegularFile(builder.determineCorporealSourceFile());
 	}
 
 	/**
@@ -119,7 +119,15 @@ public class DefaultSourceFileArtifact extends AbstractSourceFileArtifact {
 			super(mummifier, sourceFile, targetFile);
 		}
 
-		private Path corporealSourceFile = null; //the source file will be used as the corporeal file if none other is specified
+		private Path corporealSourceFile = null;
+
+		/**
+		 * Determines the corporeal source file, defaulting to the source file path if not explicitly set.
+		 * @return The corporeal source file to use for artifact content.
+		 */
+		final Path determineCorporealSourceFile() {
+			return corporealSourceFile != null ? corporealSourceFile : getSourceFile();
+		}
 
 		/**
 		 * Sets the file containing the actual source contents of the artifact.

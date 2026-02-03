@@ -123,6 +123,30 @@ public abstract class AbstractSourceFileArtifact extends AbstractDescribedArtifa
 		}
 
 		/**
+		 * Returns the mummifier responsible for generating this artifact.
+		 * @return The mummifier.
+		 */
+		protected Mummifier getMummifier() {
+			return mummifier;
+		}
+
+		/**
+		 * Returns the location of the artifact in the site source tree.
+		 * @return The source file path.
+		 */
+		protected Path getSourceFile() {
+			return sourceFile;
+		}
+
+		/**
+		 * Returns the file where the artifact will be generated.
+		 * @return The target file path.
+		 */
+		protected Path getTargetFile() {
+			return targetFile;
+		}
+
+		/**
 		 * Returns this builder itself for method chaining.
 		 * @return This builder itself.
 		 */

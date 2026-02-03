@@ -69,7 +69,7 @@ public abstract class BaseMummyContext implements MummyContext {
 	 * @param mummifier The mummifier to register.
 	 * @see Mummifier#getSupportedFilenameExtensions()
 	 */
-	protected void registerFileMummifier(@NonNull final SourcePathMummifier mummifier) {
+	protected final void registerFileMummifier(@NonNull final SourcePathMummifier mummifier) {
 		mummifier.getSupportedFilenameExtensions().stream()
 				//normalize extensions so we can look up without regard to case
 				.map(Filenames.Extensions::normalize).forEach(ext -> fileMummifiersByExtension.put(ext, mummifier));
