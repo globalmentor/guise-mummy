@@ -60,7 +60,7 @@ public class HtmlPageMummifier extends XhtmlPageMummifier {
 	 * <li>Extra padding to keep from going past the end of the buffer.</li>
 	 * </ul>
 	 */
-	private static final int TEST_BUFFER_SIZE = ByteOrderMark.UTF_32BE.getLength() + (XML_DECL_START.length() * ByteOrderMark.MAX_BYTE_COUNT) + 8;
+	private static final int TEST_BUFFER_SIZE = ByteOrderMark.UTF_32BE.length() + (XML_DECL_START.length() * ByteOrderMark.MAX_BYTE_COUNT) + 8;
 
 	/**
 	 * {@inheritDoc}
