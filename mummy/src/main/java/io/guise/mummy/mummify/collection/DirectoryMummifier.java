@@ -326,9 +326,8 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	/// @implSpec This implementation saves the description description if modified by calling [#saveTargetDescription(MummyContext, Artifact)].
 	@Override
 	public void mummify(final MummyContext context, final Artifact artifact) throws IOException {
-		//TODO fix: `%s` placeholder has no corresponding argument
 		final DirectoryArtifact directoryArtifact = checkArgumentIsInstance(artifact, DirectoryArtifact.class,
-				"Artifact %s is not a directory artifact.");
+				"Artifact `%s` is not a directory artifact.", artifact);
 		checkArgumentDirectory(artifact.getSourcePath());
 
 		//create the directory if it doesn't exist

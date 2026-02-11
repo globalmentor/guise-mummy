@@ -319,8 +319,7 @@ public class NavigationManager implements Clogged {
 		try {
 			return navigationItemsFromUrfList(context, artifact, navigationFile, navigationObjects);
 		} catch(final IllegalArgumentException illegalArgumentException) {
-			//TODO fix: missing `navigationFile` argument for first `%s` placeholder
-			throw new IOException("Error in navigation file `%s`: %s".formatted(illegalArgumentException.getLocalizedMessage()), illegalArgumentException);
+			throw new IOException("Error in navigation file `%s`: %s".formatted(navigationFile, illegalArgumentException.getLocalizedMessage()), illegalArgumentException);
 		}
 	}
 
