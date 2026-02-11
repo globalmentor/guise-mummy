@@ -150,16 +150,16 @@ public class Route53 extends AbstractDns {
 					logger.debug("Hosted zone with ID `{}` exists with name `{}`.", existingHostedZone.id(), existingHostedZone.name());
 				}
 				if(existingHostedZones.isEmpty()) {
-					throw new IOException(String.format(
-							"No hosted zone exists with ID `%s`. Please check the ID or provide a hosted zone name so that it can be created.", configuredHostedZoneId));
+					throw new IOException(
+							"No hosted zone exists with ID `%s`. Please check the ID or provide a hosted zone name so that it can be created.".formatted(configuredHostedZoneId));
 				}
 				if(existingHostedZones.size() > 1) { //we don't expect this on AWS
-					throw new IOException(String.format("Multiple hosted zones encountered with the ID `%s`.", configuredHostedZoneId));
+					throw new IOException("Multiple hosted zones encountered with the ID `%s`.".formatted(configuredHostedZoneId));
 				}
 				hostedZone = getOnly(existingHostedZones);
 				if(!DomainName.of(hostedZone.name()).equals(origin)) {
 					throw new IOException(
-							String.format("Hosted zone with configured ID `%s` does not match the configured DNS zone origin `%s`.", configuredHostedZoneId, origin));
+							"Hosted zone with configured ID `%s` does not match the configured DNS zone origin `%s`.".formatted(configuredHostedZoneId, origin));
 				}
 			} else {
 				final Set<HostedZone> existingHostedZones = getHostedZonesByName(client, origin);
@@ -168,8 +168,8 @@ public class Route53 extends AbstractDns {
 				}
 				if(!existingHostedZones.isEmpty()) {
 					if(existingHostedZones.size() > 1) {
-						throw new IOException(String.format(
-								"Multiple hosted zones already exist with the name `%s`. Please identify the hosted zone by ID or remove the other hosted zones.", origin));
+						throw new IOException(
+								"Multiple hosted zones already exist with the name `%s`. Please identify the hosted zone by ID or remove the other hosted zones.".formatted(origin));
 					}
 					hostedZone = getOnly(existingHostedZones);
 				} else { //create a named hosted zone, using a random UUID as the temporary caller reference (required)
@@ -180,7 +180,7 @@ public class Route53 extends AbstractDns {
 					context.getConfiguration().findString(CONFIG_KEY_SITE_DOMAIN)
 							.ifPresent(siteDomain -> commentBuilder.append(" for site domain `").append(siteDomain).append('`')); //TODO i18n
 					context.getConfiguration().findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class).ifPresent(siteAltDomains -> commentBuilder
-							.append(" with alternatives ").append(siteAltDomains.stream().map(siteAltDomain -> "`" + siteAltDomain + "`").collect(toList()))); //TODO i18n
+							.append(" with alternatives ").append(siteAltDomains.stream().map(siteAltDomain -> "`" + siteAltDomain + "`").toList())); //TODO i18n
 					commentBuilder.append("."); //TODO i18n
 					hostedZone = client.createHostedZone(request -> request.name(origin.toString()).callerReference(UUID.randomUUID().toString())
 							.hostedZoneConfig(config -> config.comment(commentBuilder.toString()))).hostedZone();
@@ -215,7 +215,7 @@ public class Route53 extends AbstractDns {
 			final HostedZone hostedZone = getHostedZone().orElseThrow(IllegalStateException::new);
 			final List<software.amazon.awssdk.services.route53.model.ResourceRecord> resourceRecords = values
 					.map(value -> software.amazon.awssdk.services.route53.model.ResourceRecord.builder().value(normalizeValueForType(type, value)).build())
-					.collect(toList());
+					.toList();
 			checkArgument(!resourceRecords.isEmpty(), "No resource record values given to set for [`%s`] `%s`.", type, name);
 			final ResourceRecordSet resourceRecordSet = ResourceRecordSet.builder().type(type).name(name.toString()).resourceRecords(resourceRecords).ttl(ttl)
 					.build();
@@ -235,13 +235,12 @@ public class Route53 extends AbstractDns {
 	/// @return The value form preferred by Route 53.
 	static String normalizeValueForType(@NonNull final String type, @NonNull final String value) {
 		return Enums.asEnum(ResourceRecord.Type.class, type).map(resourceRecordType -> {
-			switch(resourceRecordType) {
-				case TXT: //Route 53 prefers all TXT values to be quoted
+			return switch(resourceRecordType) {
+				case TXT -> //Route 53 prefers all TXT values to be quoted
 					//TODO support multiple long strings in a TXT record; see https://tools.ietf.org/html/rfc7208#section-3.3, which seems to conflict with Route 53
-					return ResourceRecord.normalizeCharacterString(value, true);
-				default:
-					return value;
-			}
+					ResourceRecord.normalizeCharacterString(value, true);
+				default -> value;
+			};
 		}).orElse(value);
 	}
 

@@ -254,11 +254,9 @@ public class GuiseMesh {
 		final NodeList childNodes = element.getChildNodes();
 		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength(); childNodeIndex++) {
 			final Node childNode = childNodes.item(childNodeIndex);
-			if(childNode instanceof CharacterData) { //Text, Comment, or CDATA
-				final CharacterData childCharacterData = (CharacterData)childNode;
+			if(childNode instanceof CharacterData childCharacterData) { //Text, Comment, or CDATA
 				interpolator.findInterpolation(context, childCharacterData.getData(), evaluator).map(Object::toString).ifPresent(childCharacterData::setData);
-			} else if(childNode instanceof Element) {
-				final Element childElement = (Element)childNode;
+			} else if(childNode instanceof Element childElement) {
 				final List<Element> meshedElements = meshElement(context, childElement);
 				replaceChild(element, childElement, meshedElements);
 				childNodeIndex += meshedElements.size() - 1; //adjust the index based upon the number of replaced elements (by default the loop advances by one)

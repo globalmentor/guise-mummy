@@ -52,8 +52,7 @@ public class XhtmlPageMummifier extends AbstractPageMummifier {
 			return documentBuilder.parse(inputStream);
 		} catch(final SAXException saxException) {
 			final StringBuilder messageBuilder = new StringBuilder("XML error parsing `").append(name).append('`'); //TODO i18n
-			if(saxException instanceof SAXParseException) { //get more parse state information if we can
-				final SAXParseException saxParseException = (SAXParseException)saxException;
+			if(saxException instanceof SAXParseException saxParseException) { //get more parse state information if we can
 				final String publicId = saxParseException.getPublicId();
 				final String systemId = saxParseException.getSystemId();
 				final int line = saxParseException.getLineNumber();

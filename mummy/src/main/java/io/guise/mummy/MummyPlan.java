@@ -66,7 +66,7 @@ public interface MummyPlan {
 	/// @see CollectionArtifact#getChildArtifacts()
 	public default Stream<Artifact> childArtifacts(@NonNull final Artifact artifact) {
 		final Artifact principalArtifact = getPrincipalArtifact(artifact);
-		return principalArtifact instanceof CollectionArtifact ? ((CollectionArtifact)principalArtifact).getChildArtifacts().stream() : Stream.empty();
+		return principalArtifact instanceof CollectionArtifact collectionArtifact ? collectionArtifact.getChildArtifacts().stream() : Stream.empty();
 	}
 
 	/// Provides the artifacts that are siblings to the given artifact. An artifact will not have siblings if it has no parent. If any artifacts are returned, the

@@ -22,7 +22,6 @@ import static com.globalmentor.io.Readers.*;
 import static com.globalmentor.java.Conditions.*;
 import static java.nio.charset.StandardCharsets.*;
 import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.*;
 
 import java.io.*;
 import java.net.URI;
@@ -129,7 +128,7 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		final String content = readString(new BOMInputStreamReader(toMarkSupportedInputStream(inputStream))); //detect the BOM and to throw errors if the encoding is invalid
 		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher(content);
 		if(!matcher.matches()) {
-			throw new IOException(String.format("Invalid markdown in `%s`.", name));
+			throw new IOException("Invalid markdown in `%s`.".formatted(name));
 		}
 
 		//parse Markdown
@@ -144,7 +143,7 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		try {
 			document = documentBuilder.parse(new ByteArrayInputStream(xhtmlDocumentString.getBytes(UTF_8)));
 		} catch(final SAXException saxException) { //we don't expect this error, so checking for the locations using SAXParseException isn't that useful
-			throw new IOException(String.format("Error parsing generated XHTML for `%s`: %s.", name, saxException.getLocalizedMessage()), saxException); //TODO i18n
+			throw new IOException("Error parsing generated XHTML for `%s`: %s.".formatted(name, saxException.getLocalizedMessage()), saxException); //TODO i18n
 		}
 
 		return document;
@@ -162,17 +161,16 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		final String content = readString(new BOMInputStreamReader(toMarkSupportedInputStream(inputStream))); //detect the BOM and to throw errors if the encoding is invalid
 		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher(content);
 		if(!matcher.matches()) {
-			throw new IOException(String.format("Invalid markdown in `%s`.", name));
+			throw new IOException("Invalid markdown in `%s`.".formatted(name));
 		}
 		final String yaml = matcher.group(MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP);
 		if(yaml == null) { //no YAML front matter present
 			return emptyList();
 		}
 		final Object object = new Load(LoadSettings.builder().build()).loadFromString(yaml);
-		if(!(object instanceof Map)) {
+		if(!(object instanceof Map<?, ?> yamlMap)) {
 			return emptyList();
 		}
-		final Map<?, ?> yamlMap = (Map<?, ?>)object;
 		try {
 			return yamlMap.entrySet().stream().map(mapping -> {
 				final Object yamlKey = mapping.getKey();
@@ -181,13 +179,13 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 				checkArgument(yamlKey != null, "YAML key `%s` cannot be mapped to `null`.", yamlKey);
 				final Curie curie = Curie.parse((CharSequence)mapping.getKey(), false);
 				final URI tag = PREDEFINED_VOCABULARIES.findVocabularyTerm(curie).map(VocabularyTerm::toURI)
-						.orElseThrow(() -> new IllegalArgumentException(String.format("YAML key `%s` uses unrecognized namespace prefix.", yamlKey)));
+						.orElseThrow(() -> new IllegalArgumentException("YAML key `%s` uses unrecognized namespace prefix.".formatted(yamlKey)));
 				//if the YAML value is a string, perform further processing to infer type as appropriate
 				final Object value = yamlValue instanceof String ? parseMetadataPropertyValue(tag, (String)yamlValue) : yamlValue;
 				return Map.entry(tag, value);
-			}).collect(toList());
+			}).toList();
 		} catch(final IllegalArgumentException illegalArgumentException) {
-			throw new IOException(String.format("Invalid YAML in `%s`: %s", name, illegalArgumentException.getLocalizedMessage()), illegalArgumentException); //TODO i18n
+			throw new IOException("Invalid YAML in `%s`: %s".formatted(name, illegalArgumentException.getLocalizedMessage()), illegalArgumentException); //TODO i18n
 		}
 	}
 

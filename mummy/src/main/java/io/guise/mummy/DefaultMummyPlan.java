@@ -56,11 +56,10 @@ public class DefaultMummyPlan extends AbstractMummyPlan {
 	/// @param artifact The artifact the plan of which to update.
 	private void initialize(@NonNull final Artifact artifact) {
 		requireNonNull(artifact);
-		if(artifact instanceof CompositeArtifact) {
-			final CompositeArtifact compositeArtifact = (CompositeArtifact)artifact;
+		if(artifact instanceof CompositeArtifact compositeArtifact) {
 			compositeArtifact.getSubsumedArtifacts().forEach(subsumedArtifact -> principalArtifactsBySubsumedArtifacts.put(subsumedArtifact, artifact));
-			if(artifact instanceof CollectionArtifact) {
-				for(final Artifact childArtifact : ((CollectionArtifact)artifact).getChildArtifacts()) {
+			if(artifact instanceof CollectionArtifact collectionArtifact) {
+				for(final Artifact childArtifact : collectionArtifact.getChildArtifacts()) {
 					parentArtifactsByArtifact.put(childArtifact, artifact); //map the parent to the child
 				}
 			}

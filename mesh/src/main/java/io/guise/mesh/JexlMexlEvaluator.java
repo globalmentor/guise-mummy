@@ -16,7 +16,6 @@
 
 package io.guise.mesh;
 
-import static java.lang.String.format;
 import static java.util.Objects.*;
 
 import java.util.*;
@@ -84,7 +83,7 @@ public class JexlMexlEvaluator implements MexlEvaluator {
 		try {
 			return jexl.createExpression(expression.toString()).evaluate(new MeshJexlContext(context));
 		} catch(final JexlException jexlException) {
-			throw new MexlException(format("Error in MEXL expression `%s`: %s", expression, jexlException.getMessage()), jexlException);
+			throw new MexlException("Error in MEXL expression `%s`: %s".formatted(expression, jexlException.getMessage()), jexlException);
 		}
 	}
 
@@ -143,8 +142,8 @@ public class JexlMexlEvaluator implements MexlEvaluator {
 
 		@Override
 		public Object tryInvoke(final Object object, final Object key) {
-			if(object instanceof UrfResourceDescription && key instanceof String) {
-				return ((UrfResourceDescription)object).findPropertyValueByHandle(propertyHandle).orElse(null);
+			if(object instanceof UrfResourceDescription urfResourceDescription && key instanceof String) {
+				return urfResourceDescription.findPropertyValueByHandle(propertyHandle).orElse(null);
 			}
 			return JexlEngine.TRY_FAILED;
 		}

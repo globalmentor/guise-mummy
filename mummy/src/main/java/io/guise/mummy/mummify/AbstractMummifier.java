@@ -161,7 +161,7 @@ public abstract class AbstractMummifier implements Mummifier {
 					try {
 						return Optional.of(Long.valueOf(propertyLexicalValue.toString()));
 					} catch(final NumberFormatException numberFormatException) {
-						throw new IllegalArgumentException(String.format("Property tag <%s> value `%s` cannot be parsed as an integer: %s.", propertyTag,
+						throw new IllegalArgumentException("Property tag <%s> value `%s` cannot be parsed as an integer: %s.".formatted(propertyTag,
 								propertyLexicalValue, numberFormatException.getLocalizedMessage()), numberFormatException);
 					}
 				}

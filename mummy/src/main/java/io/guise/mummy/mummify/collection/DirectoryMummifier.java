@@ -23,7 +23,6 @@ import static com.globalmentor.java.Conditions.*;
 import static com.globalmentor.util.Optionals.*;
 import static io.guise.mummy.Artifact.PROPERTY_HANDLE_TITLE;
 import static io.guise.mummy.GuiseMummy.*;
-import static java.lang.String.format;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.function.Predicate.*;
@@ -219,7 +218,7 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		while(!currentSourcePath.equals(siteSourceDirectory)) {
 			final Path ancestorPath = currentSourcePath;
 			final String currentSourcePathFilename = findFilename(currentSourcePath).orElseThrow(
-					() -> new IllegalArgumentException(format("Source path `%s` ancestor `%s` has no filename; may not be inside site source directory `%s`.", sourcePath,
+					() -> new IllegalArgumentException("Source path `%s` ancestor `%s` has no filename; may not be inside site source directory `%s`.".formatted(sourcePath,
 							ancestorPath, siteSourceDirectory)));
 			if(assetNamePattern.matcher(currentSourcePathFilename).matches()) {
 				return true;
@@ -327,10 +326,10 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 	/// @implSpec This implementation saves the description description if modified by calling [#saveTargetDescription(MummyContext, Artifact)].
 	@Override
 	public void mummify(final MummyContext context, final Artifact artifact) throws IOException {
-		checkArgument(artifact instanceof DirectoryArtifact, "Artifact %s is not a directory artifact.");
+		//TODO fix: `%s` placeholder has no corresponding argument
+		final DirectoryArtifact directoryArtifact = checkArgumentIsInstance(artifact, DirectoryArtifact.class,
+				"Artifact %s is not a directory artifact.");
 		checkArgumentDirectory(artifact.getSourcePath());
-
-		final DirectoryArtifact directoryArtifact = (DirectoryArtifact)artifact;
 
 		//create the directory if it doesn't exist
 		final Path targetDirectory = artifact.getTargetPath();

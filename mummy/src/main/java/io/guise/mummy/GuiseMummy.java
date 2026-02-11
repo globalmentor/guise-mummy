@@ -19,7 +19,6 @@ package io.guise.mummy;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
-import static java.lang.String.format;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
@@ -119,7 +118,7 @@ public class GuiseMummy implements Clogged {
 	public static Optional<DomainName> findConfiguredDomain(@NonNull final Configuration configuration) throws ConfigurationException {
 		return configuration.findString(CONFIG_KEY_DOMAIN).map(DomainName::of).map(domain -> {
 			if(!domain.isAbsolute() || domain.isRoot()) {
-				throw new ConfigurationException(format("The `%s` configuration `%s` must be a fully-qualified, non-root domain, ending in a dot `%s` character.",
+				throw new ConfigurationException("The `%s` configuration `%s` must be a fully-qualified, non-root domain, ending in a dot `%s` character.".formatted(
 						CONFIG_KEY_DOMAIN, domain, DomainName.DELIMITER)); //TODO i18n
 			}
 			return domain;
@@ -143,9 +142,9 @@ public class GuiseMummy implements Clogged {
 		final DomainName base = configuredDomain.orElse(DomainName.EMPTY);
 		return configuration.findString(CONFIG_KEY_SITE_DOMAIN).map(DomainName::of).map(base::resolve).or(() -> configuredDomain).map(siteDomain -> {
 			if(!siteDomain.isAbsolute() || siteDomain.isRoot()) {
-				throw new ConfigurationException(format(
-						"The `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character; or resolve against a `%s` configuration that is a FQDN.",
-						CONFIG_KEY_SITE_DOMAIN, siteDomain, DomainName.DELIMITER, CONFIG_KEY_DOMAIN));
+				throw new ConfigurationException(
+						("The `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character; or resolve against a `%s` configuration that is a FQDN."
+						).formatted(CONFIG_KEY_SITE_DOMAIN, siteDomain, DomainName.DELIMITER, CONFIG_KEY_DOMAIN));
 			}
 			return siteDomain;
 		});
@@ -165,9 +164,9 @@ public class GuiseMummy implements Clogged {
 		return configuration.findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class)
 				.map(names -> names.stream().map(DomainName::of).map(base::resolve).map(siteAltDomain -> {
 					if(!siteAltDomain.isAbsolute() || siteAltDomain.isRoot()) {
-						throw new ConfigurationException(format(
-								"The `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character; or resolve against a `%s` configuration that is a FQDN.",
-								CONFIG_KEY_SITE_ALT_DOMAINS, siteAltDomain, DomainName.DELIMITER, CONFIG_KEY_DOMAIN)); //TODO i18n
+						throw new ConfigurationException(
+								("The `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character; or resolve against a `%s` configuration that is a FQDN."
+								).formatted(CONFIG_KEY_SITE_ALT_DOMAINS, siteAltDomain, DomainName.DELIMITER, CONFIG_KEY_DOMAIN)); //TODO i18n
 					}
 					return siteAltDomain;
 				}).collect(toCollection(LinkedHashSet::new)));
@@ -243,7 +242,7 @@ public class GuiseMummy implements Clogged {
 		try {
 			mummifierClass.getDeclaredConstructor();
 		} catch(final NoSuchMethodException noSuchMethodException) {
-			throw new IllegalArgumentException(format("Mummifier type %s does not declare a no-args constructor.", mummifierClass.getName()));
+			throw new IllegalArgumentException("Mummifier type %s does not declare a no-args constructor.".formatted(mummifierClass.getName()));
 		}
 		fileMummifierTypes.add(mummifierClass);
 	}
@@ -309,10 +308,10 @@ public class GuiseMummy implements Clogged {
 						} else if(targetType.equals(S3Website.class.getSimpleName())) {
 							target = new S3Website(context, targetSection);
 						} else {
-							throw new ConfigurationException(format("Unknown deployment target type: `%s`.", targetType));
+							throw new ConfigurationException("Unknown deployment target type: `%s`.".formatted(targetType));
 						}
 						return target;
-					}).collect(toList());
+					}).toList();
 				}).orElse(emptyList());
 				context.setDeployTargets(deployTargets); //store the targets in the context for later
 
@@ -367,7 +366,7 @@ public class GuiseMummy implements Clogged {
 				fileMummifier = mummifierClass.getDeclaredConstructor().newInstance();
 			} catch(InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
 					| SecurityException instantiationException) {
-				throw new RuntimeException(format("Error instantiating mummifier %s.", mummifierClass.getName()), instantiationException);
+				throw new RuntimeException("Error instantiating mummifier %s.".formatted(mummifierClass.getName()), instantiationException);
 			}
 			context.registerFileMummifier(fileMummifier);
 		}
@@ -403,7 +402,7 @@ public class GuiseMummy implements Clogged {
 		DEPRECATED_CONFIG_KEYS.stream().filter(configuration::hasConfigurationValue)
 				.forEach(deprecatedConfigKey -> getLogger().warn("The configuration key `{}` is deprecated and may be removed in the future.", deprecatedConfigKey));
 		OBSOLETE_CONFIG_KEYS.stream().filter(configuration::hasConfigurationValue).findAny().ifPresent(obsoleteConfigKey -> {
-			throw new ConfigurationException(format("The configuration key `%s` is obsolete and must not be used.", obsoleteConfigKey));
+			throw new ConfigurationException("The configuration key `%s` is obsolete and must not be used.".formatted(obsoleteConfigKey));
 		});
 		//make sure all the configured domains resolve to FQDNs
 		findConfiguredDomain(configuration);
@@ -426,17 +425,17 @@ public class GuiseMummy implements Clogged {
 		}
 
 		context.getPlan().findParentArtifact(artifact).ifPresent(parent -> getLogger().trace("  parent: {}", parent.getTargetPath()));
-		final Collection<Artifact> siblings = context.getPlan().siblingArtifacts(artifact).collect(toList()); //TODO make debugging calls more efficient, or transfer to describe functionality  
+		final Collection<Artifact> siblings = context.getPlan().siblingArtifacts(artifact).toList(); //TODO make debugging calls more efficient, or transfer to describe functionality  
 		if(!siblings.isEmpty()) {
 			getLogger().trace("  siblings: {}", siblings);
 		}
-		final Collection<Artifact> children = context.getPlan().childArtifacts(artifact).collect(toList());
+		final Collection<Artifact> children = context.getPlan().childArtifacts(artifact).toList();
 		if(!children.isEmpty()) {
 			getLogger().trace("  children: {}", children);
 		}
 
-		if(artifact instanceof CollectionArtifact) {
-			for(final Artifact childArtifact : ((CollectionArtifact)artifact).getChildArtifacts()) {
+		if(artifact instanceof CollectionArtifact collectionArtifact) {
+			for(final Artifact childArtifact : collectionArtifact.getChildArtifacts()) {
 				printArtifactDescription(context, childArtifact);
 			}
 		}
@@ -536,10 +535,10 @@ public class GuiseMummy implements Clogged {
 		defaultSettings.put(CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR, "\n");
 		defaultSettings.put(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.compile("_(.*)"));
 		//TODO create facility for mummifiers (and later plugins) to contribute default settings
-		defaultSettings.put(format(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___SCALE_MAX_LENGTH, "preview"), 600);
-		defaultSettings.put(format(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___COMPRESSION_QUALITY, "preview"), 0.6);
-		defaultSettings.put(format(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___SCALE_MAX_LENGTH, "thumbnail"), 300);
-		defaultSettings.put(format(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___COMPRESSION_QUALITY, "thumbnail"), 0.6);
+		defaultSettings.put(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___SCALE_MAX_LENGTH.formatted("preview"), 600);
+		defaultSettings.put(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___COMPRESSION_QUALITY.formatted("preview"), 0.6);
+		defaultSettings.put(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___SCALE_MAX_LENGTH.formatted("thumbnail"), 300);
+		defaultSettings.put(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___COMPRESSION_QUALITY.formatted("thumbnail"), 0.6);
 		return new ObjectMapConfiguration(unmodifiableMap(defaultSettings));
 	}
 

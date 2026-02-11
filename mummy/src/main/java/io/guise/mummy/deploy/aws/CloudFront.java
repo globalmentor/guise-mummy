@@ -216,7 +216,7 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 			} else {
 				if(existingCertificateSummaries.size() > 1) {
 					throw new IOException(
-							String.format("Multiple certificates per domain not supported; please remove all but one certificates for domain `%s`.", domain));
+							"Multiple certificates per domain not supported; please remove all but one certificates for domain `%s`.".formatted(domain));
 				}
 				certificateArn = getOnly(existingCertificateSummaries).certificateArn();
 			}
@@ -244,13 +244,13 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 				try { //if the certificate isn't yet recognized, wait and try again
 					logger.info("Waiting for requested certificate `{}` to be recognized...", certificateArn);
 					TimeUnit.SECONDS.sleep(pollIntervalSeconds);
-				} catch(final InterruptedException interruptedException) {
+				} catch(final InterruptedException _) {
 					//if interrupted while sleeping, just try again and keep backing off
 				}
 			}
 			if(certificateDetail == null) {
-				throw new IOException(String
-						.format("Requested certificate `%s` was never recognized. Correct any problems, perhaps wait a while longer, and deploy again.", certificateArn));
+				throw new IOException(
+						"Requested certificate `%s` was never recognized. Correct any problems, perhaps wait a while longer, and deploy again.".formatted(certificateArn));
 			}
 
 			//apparently the domain alternative names _includes_ the domain name itself
@@ -264,10 +264,9 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 			final Set<String> pendingValidationDomainNames = new LinkedHashSet<>(domainValidations.size());
 			for(final DomainValidation domainValidation : domainValidations) {
 				switch(domainValidation.validationStatus()) {
-					case SUCCESS: //already validated
+					case SUCCESS -> //already validated
 						logger.debug("Certificate `{}` for domain name `{}` has been validated.", certificateArn, domainValidation.domainName());
-						break;
-					case PENDING_VALIDATION:
+					case PENDING_VALIDATION -> {
 						if(domainValidation.validationMethod().equals(ValidationMethod.DNS)) {
 							final software.amazon.awssdk.services.acm.model.ResourceRecord resourceRecord = domainValidation.resourceRecord();
 							context.getDeployDns().ifPresentOrElse(throwingConsumer(dns -> {
@@ -284,21 +283,19 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 						}
 						//note this pending domain to report later, but continue examining the validations to add other DNS entries as needed before reporting the problem
 						pendingValidationDomainNames.add(domainValidation.domainName());
-						break;
-					case FAILED:
-						throw new IOException(String.format(
-								"Certificate `%s` for domain name `%s` failed validation: `%s`. Please delete the certificate, correct any problems, and deploy again.",
-								certificateArn, domainValidation.domainName(), certificateDetail.failureReason()));
-					default:
-						throw new IOException(String.format(
-								"Unable to validate certificate `%s` for domain name `%s`; validation status indicates `%s`. Please delete the certificate and deploy again.",
-								certificateArn, domainValidation.domainName(), domainValidation.validationStatus()));
+					}
+					case FAILED -> throw new IOException(
+							"Certificate `%s` for domain name `%s` failed validation: `%s`. Please delete the certificate, correct any problems, and deploy again.".formatted(
+									certificateArn, domainValidation.domainName(), certificateDetail.failureReason()));
+					default -> throw new IOException(
+							"Unable to validate certificate `%s` for domain name `%s`; validation status indicates `%s`. Please delete the certificate and deploy again.".formatted(
+									certificateArn, domainValidation.domainName(), domainValidation.validationStatus()));
 				}
 			}
 			if(!pendingValidationDomainNames.isEmpty()) {
-				throw new IOException(String.format("Certificate `%s` is still pending validation for domain names %s."
+				throw new IOException(("Certificate `%s` is still pending validation for domain names %s."
 						+ " Make sure your domain is configured with the correct NS records for your DNS, wait for the certificate to finish validating,"
-						+ " and initiate deployment again.", certificateArn, pendingValidationDomainNames));
+						+ " and initiate deployment again.").formatted(certificateArn, pendingValidationDomainNames));
 			}
 		} catch(final SdkException sdkException) {
 			throw new IOException(sdkException);
@@ -355,7 +352,7 @@ public class CloudFront implements ContentDeliveryTarget, Clogged {
 					distributionDomainName = DomainName.of(distribution.domainName());
 				} else {
 					if(existingDistributionSummaries.size() > 1) {
-						throw new IOException(String.format("Multiple distributions found with an alias for bucket `%s`; all but one must be removed.", s3Bucket));
+						throw new IOException("Multiple distributions found with an alias for bucket `%s`; all but one must be removed.".formatted(s3Bucket));
 					}
 					final DistributionSummary distributionSummary = getOnly(existingDistributionSummaries);
 					distributionId = distributionSummary.id();

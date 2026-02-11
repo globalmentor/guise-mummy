@@ -164,15 +164,12 @@ public class NavigationManager implements Clogged {
 	/// @throws IOException if there is an I/O error loading the navigation list file.
 	protected Stream<NavigationItem> loadNavigationFile(@NonNull MummyContext context, @NonNull final Artifact artifact, @NonNull final Path navigationFile)
 			throws IOException {
-		switch(findFilenameExtension(navigationFile)
-				.orElseThrow(() -> new IllegalArgumentException(String.format("Navigation file `%s` has no extension.", navigationFile)))) {
-			case Text.LST_FILENAME_EXTENSION:
-				return loadNavigationFileList(context, artifact, navigationFile);
-			case TURF.FILENAME_EXTENSION:
-				return loadNavigationFileTurf(context, artifact, navigationFile);
-			default:
-				throw new AssertionError(String.format("Unrecognized navigation file type: `%s`.", navigationFile));
-		}
+		return switch(findFilenameExtension(navigationFile)
+				.orElseThrow(() -> new IllegalArgumentException("Navigation file `%s` has no extension.".formatted(navigationFile)))) {
+			case Text.LST_FILENAME_EXTENSION -> loadNavigationFileList(context, artifact, navigationFile);
+			case TURF.FILENAME_EXTENSION -> loadNavigationFileTurf(context, artifact, navigationFile);
+			default -> throw new AssertionError("Unrecognized navigation file type: `%s`.".formatted(navigationFile));
+		};
 	}
 
 	/// Loads a text navigation list file (e.g. `.navigation.lst`). Each line is a reference to an artifact, relative to the *directory* of the
@@ -193,7 +190,7 @@ public class NavigationManager implements Clogged {
 					getLogger().warn("No target artifact found for relative reference `{}` in navigation file `{}`.", line, navigationFile);
 				}
 				return foundNavigationItem.stream();
-			}).collect(toList()).stream(); //(important) collect the artifacts to a list to prevent any exceptions upon stream iteration after method return
+			}).toList().stream(); //(important) collect the artifacts to a list to prevent any exceptions upon stream iteration after method return
 		} catch(final IllegalArgumentException illegalArgumentException) {
 			throw new IOException(illegalArgumentException.getLocalizedMessage(), illegalArgumentException);
 		} catch(final UncheckedIOException uncheckedIOException) { //possibly thrown by `lines()`
@@ -221,7 +218,7 @@ public class NavigationManager implements Clogged {
 		try {
 			navigationReferenceURI = new URI(navigationReference); //assume the reference is _relative to the navigation file_
 		} catch(final URISyntaxException uriSyntaxException) {
-			throw new IllegalArgumentException(String.format("Invalid reference <%s> in navigation file `%s`.", navigationReference, navigationFile));
+			throw new IllegalArgumentException("Invalid reference <%s> in navigation file `%s`.".formatted(navigationReference, navigationFile));
 		}
 		return createNavigationItemFromReference(context, artifact, navigationFile, navigationReferenceURI, description, navigation);
 	}
@@ -250,7 +247,7 @@ public class NavigationManager implements Clogged {
 		}
 		//internal reference
 		final URIPath navigationReferencePath = URIs.findURIPath(navigationReference)
-				.orElseThrow(() -> new IllegalArgumentException(String.format("Navigation reference <%s> does not have a path.", navigationReference)));
+				.orElseThrow(() -> new IllegalArgumentException("Navigation reference <%s> does not have a path.".formatted(navigationReference)));
 		final Optional<Artifact> foundNavigationArtifact = context.getPlan().findArtifactBySourceRelativeReference(navigationListFileParent,
 				navigationReferencePath);
 		if(!foundNavigationArtifact.isPresent()) {
@@ -312,17 +309,18 @@ public class NavigationManager implements Clogged {
 			navigationObjects = new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream).stream()
 					//ensure there is only one root object
 					.reduce(Streams.toFindOnly(
-							() -> new UncheckedIOException(new IOException(String.format("Navigation file `%s` cannot contain more than one root object.", navigationFile)))))
+							() -> new UncheckedIOException(new IOException("Navigation file `%s` cannot contain more than one root object.".formatted(navigationFile)))))
 					//make sure the root object is a list
 					.flatMap(Objects.asInstance(List.class)).orElseThrow(() -> new UncheckedIOException(
-							new IOException(String.format("Navigation file `%s` must contain a single list to describe navigation.", navigationFile))));
+							new IOException("Navigation file `%s` must contain a single list to describe navigation.".formatted(navigationFile))));
 		} catch(final UncheckedIOException uncheckedIOException) {
 			throw uncheckedIOException.getCause();
 		}
 		try {
 			return navigationItemsFromUrfList(context, artifact, navigationFile, navigationObjects);
 		} catch(final IllegalArgumentException illegalArgumentException) {
-			throw new IOException(String.format("Error in navigation file `%s`: %s", illegalArgumentException.getLocalizedMessage()), illegalArgumentException);
+			//TODO fix: missing `navigationFile` argument for first `%s` placeholder
+			throw new IOException("Error in navigation file `%s`: %s".formatted(illegalArgumentException.getLocalizedMessage()), illegalArgumentException);
 		}
 	}
 
@@ -370,11 +368,11 @@ public class NavigationManager implements Clogged {
 						}
 						return navItem.stream();
 					} else {
-						throw new IllegalArgumentException(String.format("Unsupported href `%s`.", href));
+						throw new IllegalArgumentException("Unsupported href `%s`.".formatted(href));
 					}
 				}).orElse(Stream.of(DefaultNavigationItem.fromDescription(navDescription, navigation))); //if no reference, just create an item from the description
 			} else {
-				throw new IllegalArgumentException(String.format("Unsupported object `%s`.", navObject));
+				throw new IllegalArgumentException("Unsupported object `%s`.".formatted(navObject));
 			}
 		});
 	}

@@ -85,10 +85,10 @@ public abstract class AbstractArtifact implements Artifact {
 		if(object == this) {
 			return true;
 		}
-		if(!(object instanceof Artifact)) {
+		if(!(object instanceof Artifact artifact)) {
 			return false;
 		}
-		return getTargetPath().equals(((Artifact)object).getTargetPath());
+		return getTargetPath().equals(artifact.getTargetPath());
 	}
 
 }

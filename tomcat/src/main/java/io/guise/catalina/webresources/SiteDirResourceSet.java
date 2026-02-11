@@ -165,7 +165,7 @@ public class SiteDirResourceSet extends DirResourceSet {
 				//load any description sidecar
 				final Path filePath = file.toPath();
 				final String filename = Paths.findFilename(filePath)
-						.orElseThrow(() -> new IllegalArgumentException(String.format("Path %s has no filename.", filePath)));
+						.orElseThrow(() -> new IllegalArgumentException("Path %s has no filename.".formatted(filePath)));
 				final String descriptionFilename = Filenames.addExtension(getDescriptionFileSidecarPrefix() + filename, getDescriptionFileSidecarExtension()); //e.g. `filename.ext.-.tupr`
 				final Path descriptionFile = changeBase(filePath.resolveSibling(descriptionFilename), getFileBase().toPath(), getDescriptionFileBase().toPath());
 				if(isRegularFile(descriptionFile)) {
@@ -174,10 +174,10 @@ public class SiteDirResourceSet extends DirResourceSet {
 								.flatMap(Objects.asInstances(UrfResourceDescription.class)).findFirst().ifPresentOrElse(description -> {
 									//set the MIME type if indicated
 									description.findPropertyValue(Content.TYPE_PROPERTY_TAG).ifPresent(contentType -> fileResource.setMimeType(contentType.toString()));
-								}, () -> log.warn(String.format("No description found for resource %s in file %s.", file, descriptionFile)));
+								}, () -> log.warn("No description found for resource %s in file %s.".formatted(file, descriptionFile)));
 
 					} catch(final IOException ioException) {
-						log.error(String.format("Error loading resource-specific metadata for resource %s from %s.", file, descriptionFile), ioException);
+						log.error("Error loading resource-specific metadata for resource %s from %s.".formatted(file, descriptionFile), ioException);
 					}
 				}
 

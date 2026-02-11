@@ -249,7 +249,7 @@ public interface Dns extends DeployTarget {
 		return localConfiguration.findString(CONFIG_KEY_ORIGIN).map(DomainName::of).map(hostedZoneName -> {
 			if(!hostedZoneName.isAbsolute() || hostedZoneName.isRoot()) {
 				throw new ConfigurationException(
-						String.format("The DNS zone `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character.",
+						"The DNS zone `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character.".formatted(
 								CONFIG_KEY_ORIGIN, hostedZoneName, DomainName.DELIMITER)); //TODO i18n
 			}
 			return hostedZoneName;
@@ -260,7 +260,7 @@ public interface Dns extends DeployTarget {
 				.or(() -> {
 					final List<DomainName> domains = Stream
 							.concat(findConfiguredSiteDomain(globalConfiguration).stream(), findConfiguredSiteAltDomains(globalConfiguration).orElse(emptyList()).stream())
-							.collect(toList());
+						.toList();
 					return DomainName.findGreatestCommonBase(domains);
 				}).orElseThrow(() -> new ConfigurationException("No origin domain could be determined for DNS zone."));
 	}
@@ -285,12 +285,10 @@ public interface Dns extends DeployTarget {
 					final String value = ResourceRecord.decodeCharactString(record.getString(RECORD_CONFIG_KEY_VALUE));
 					//normalize the configured value if possible for recognized resource record types
 					final String normalizedValue = Enums.asEnum(ResourceRecord.Type.class, type).map(resourceRecordType -> {
-						switch(resourceRecordType) {
-							case TXT:
-								return ResourceRecord.normalizeCharacterString(value);
-							default:
-								return value;
-						}
+						return switch(resourceRecordType) {
+							case TXT -> ResourceRecord.normalizeCharacterString(value);
+							default -> value;
+						};
 					}).orElse(value);
 					final OptionalLong configuredTtl = record.findLong(RECORD_CONFIG_KEY_TTL);
 					configuredTtl.ifPresent(Conditions::checkArgumentNotNegative);
@@ -299,7 +297,7 @@ public interface Dns extends DeployTarget {
 				} catch(final IllegalArgumentException illegalArgumentException) {
 					throw new ConfigurationException("Invalid DNS resource record; " + illegalArgumentException.getMessage(), illegalArgumentException);
 				}
-			}).collect(toList());
+			}).toList();
 		}).orElse(emptyList());
 	}
 

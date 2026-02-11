@@ -18,7 +18,6 @@ package io.guise.mesh;
 
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
-import static java.lang.String.format;
 import static java.util.Objects.*;
 
 import java.util.Optional;
@@ -141,7 +140,7 @@ public class DefaultMeshInterpolator implements MeshInterpolator {
 			final int rightDelimiterIndex = indexOf(text, rightDelimiterChar, expressionStartIndex); //search could start at end of string, which is allowed by the API
 			if(rightDelimiterIndex == -1) {
 				throw new MeshInterpolationException(
-						format("Mesh interpolation string `%s` missing ending delimiter for interpolation expression starting at index %d.", text, signalIndex));
+						"Mesh interpolation string `%s` missing ending delimiter for interpolation expression starting at index %d.".formatted(text, signalIndex));
 			}
 			final int expressionEndIndex = rightDelimiterIndex;
 			final CharSequence expression = text.subSequence(expressionStartIndex, expressionEndIndex);

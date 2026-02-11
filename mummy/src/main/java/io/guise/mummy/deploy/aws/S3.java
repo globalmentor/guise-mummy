@@ -350,8 +350,8 @@ public class S3 implements DeployTarget, Clogged {
 		final URIPath resourceReference = URIPath.relativize(rootTargetPathUri,
 				artifact instanceof CollectionArtifact ? toCollectionURI(artifactTargetPathUri) : artifactTargetPathUri);
 		planResource(context, rootTargetPathUri, artifact, resourceReference);
-		if(artifact instanceof CompositeArtifact) {
-			for(final Artifact comprisedArtifact : (Iterable<Artifact>)((CompositeArtifact)artifact).comprisedArtifacts()::iterator) {
+		if(artifact instanceof CompositeArtifact compositeArtifact) {
+			for(final Artifact comprisedArtifact : (Iterable<Artifact>)compositeArtifact.comprisedArtifacts()::iterator) {
 				plan(context, rootTargetPathUri, comprisedArtifact);
 			}
 		}

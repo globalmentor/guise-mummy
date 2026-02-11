@@ -18,7 +18,6 @@ package io.guise.mummy.mummify.image;
 
 import static com.globalmentor.collections.iterators.Iterators.*;
 import static com.globalmentor.io.Images.*;
-import static java.lang.String.format;
 import static java.nio.file.Files.*;
 import static java.nio.file.StandardCopyOption.*;
 import static java.util.Collections.*;
@@ -127,7 +126,7 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 					processImage(context, artifact, inputStream, outputStream, isKeepProcessMetadata);
 				}
 			} catch(final IOException ioException) { //provide more context to I/O errors
-				throw new IOException(format("Error processing image `%s`: %s", artifact.getSourcePath(), ioException.getLocalizedMessage()), ioException); //TODO i18n
+				throw new IOException("Error processing image `%s`: %s".formatted(artifact.getSourcePath(), ioException.getLocalizedMessage()), ioException); //TODO i18n
 			}
 
 			//add metadata and stream to output file (if supported)
@@ -138,15 +137,15 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 					addImageMetadata(tempOutputStream.toByteSource(), outputStream, artifact.getResourceDescription(), sRGB, context.getMummifierIdentification(),
 							Instant.now());
 				} catch(final IOException ioException) { //provide more context to I/O errors
-					throw new IOException(format("Error processing image `%s`: %s", artifact.getSourcePath(), ioException.getLocalizedMessage()), ioException); //TODO i18n
+					throw new IOException("Error processing image `%s`: %s".formatted(artifact.getSourcePath(), ioException.getLocalizedMessage()), ioException); //TODO i18n
 				}
 			}
 		} else {
 			copy(artifact.getSourcePath(), artifact.getTargetPath(), REPLACE_EXISTING); //TODO abstract the copy, here and in OpaqueFileMummifier
 		}
 
-		if(artifact instanceof AspectualArtifact) { //mummify any image aspects TODO generalize within framework
-			for(final Artifact aspectArtifact : ((AspectualArtifact)artifact).getAspects()) {
+		if(artifact instanceof AspectualArtifact aspectualArtifact) { //mummify any image aspects TODO generalize within framework
+			for(final Artifact aspectArtifact : aspectualArtifact.getAspects()) {
 				aspectArtifact.getResourceDescription().removeProperty(Content.MODIFIED_AT_PROPERTY_TAG); //use the absence of the `content/modifiedAt` property as a proxy flag to force writing (force the content to be considered dirty)
 				mummify(context, aspectArtifact);
 			}
@@ -172,9 +171,9 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 			final boolean keepMetadata) throws IOException {
 		final Optional<String> foundAspect = artifact.getResourceDescription().findPropertyValue(AspectualArtifact.PROPERTY_TAG_MUMMY_ASPECT).map(Object::toString);
 		//determine the correct configuration keys based upon the aspect, if any
-		final String configKeyScaleMaxLength = foundAspect.map(aspect -> format(CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___SCALE_MAX_LENGTH, aspect))
+		final String configKeyScaleMaxLength = foundAspect.map(aspect -> CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___SCALE_MAX_LENGTH.formatted(aspect))
 				.orElse(CONFIG_KEY_MUMMY_IMAGE_SCALE_MAX_LENGTH);
-		final String configKeyCompressionQuality = foundAspect.map(aspect -> format(CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___COMPRESSION_QUALITY, aspect))
+		final String configKeyCompressionQuality = foundAspect.map(aspect -> CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___COMPRESSION_QUALITY.formatted(aspect))
 				.orElse(CONFIG_KEY_MUMMY_IMAGE_COMPRESSION_QUALITY);
 
 		final int imageIndex = 0; //this processing logic assumes that that the first image is the one being processed
@@ -240,11 +239,11 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 					imageWriteParam.setCompressionType(compressionTypes[0]); //use the first available compression type
 				}
 				imageWriteParam.setCompressionQuality((float)context.getConfiguration().findDouble(configKeyCompressionQuality).orElse(DEFAULT_COMPRESSION_QUALITY));
-				if(imageWriteParam instanceof JPEGImageWriteParam) {
+				if(imageWriteParam instanceof JPEGImageWriteParam jpegImageWriteParam) {
 					//Important: Optimize the Huffman tables (guaranteeing Huffman tables) as a workaround to avoid a
 					//"javax.imageio.IIOException: Missing Huffman code table entry" inside JPEGImageWriter.writeImage()
 					//for some images; see https://stackoverflow.com/a/62240696 .
-					((JPEGImageWriteParam)imageWriteParam).setOptimizeHuffmanTables(true);
+					jpegImageWriteParam.setOptimizeHuffmanTables(true);
 				}
 			}
 			final ImageOutputStream imageOutputStream = createImageOutputStream(outputStream); //this stream will not be closed in this method, as it wraps a stream provided by the caller

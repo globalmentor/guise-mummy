@@ -75,6 +75,6 @@ public class HtmlPageMummifier extends XhtmlPageMummifier {
 		if(hasXmlDeclaration) {
 			return super.loadSourceDocument(context, markedInputStream, name); //delegate to the XHTML parsing version _passing our stream we marked and reset_
 		}
-		throw new UnsupportedOperationException(String.format("General HTML parsing not yet supported for `%s`.", name));
+		throw new UnsupportedOperationException("General HTML parsing not yet supported for `%s`.".formatted(name));
 	}
 }

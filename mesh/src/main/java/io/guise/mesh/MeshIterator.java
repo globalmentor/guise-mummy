@@ -16,7 +16,6 @@
 
 package io.guise.mesh;
 
-import static java.lang.String.format;
 import static java.util.Arrays.*;
 import static java.util.Objects.*;
 
@@ -139,31 +138,24 @@ public class MeshIterator implements Iterator<Object> {
 	/// @return An iterator to the items in the iteration source.
 	/// @throws IllegalArgumentException if the object is an array to an unsupported primitive type.
 	protected static Iterator<?> toIterator(@NonNull final Object object) {
-		if(object.getClass().isArray()) {
-			if(object instanceof Object[]) {
-				return asList((Object[])object).iterator();
-			} else if(object instanceof int[]) {
-				return stream((int[])object).iterator();
-			} else if(object instanceof long[]) {
-				return stream((long[])object).iterator();
-			} else if(object instanceof double[]) {
-				return stream((double[])object).iterator();
-			} else {
-				throw new IllegalArgumentException(format("Iteration not supported on array of type %s: %s.", object.getClass().getComponentType().getName(), object));
+		return switch(object) {
+			case Object[] array -> asList(array).iterator();
+			case int[] array -> stream(array).iterator();
+			case long[] array -> stream(array).iterator();
+			case double[] array -> stream(array).iterator();
+			case Iterable<?> iterable -> iterable.iterator();
+			case Iterator<?> iterator -> iterator;
+			case Enumeration<?> enumeration -> enumeration.asIterator();
+			case Stream<?> stream -> stream.iterator();
+			case Map<?, ?> map -> map.entrySet().iterator();
+			default -> {
+				if(object.getClass().isArray()) {
+					throw new IllegalArgumentException(
+							"Iteration not supported on array of type %s: %s.".formatted(object.getClass().getComponentType().getName(), object));
+				}
+				yield Set.of(object).iterator();
 			}
-		} else if(object instanceof Iterable) {
-			return ((Iterable<?>)object).iterator();
-		} else if(object instanceof Iterator) {
-			return (Iterator<?>)object;
-		} else if(object instanceof Enumeration) {
-			return ((Enumeration<?>)object).asIterator();
-		} else if(object instanceof Stream) {
-			return ((Stream<?>)object).iterator();
-		} else if(object instanceof Map) {
-			return ((Map<?, ?>)object).entrySet().iterator();
-		} else {
-			return Set.of(object).iterator();
-		}
+		};
 	}
 
 }

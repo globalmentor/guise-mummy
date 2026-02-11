@@ -238,7 +238,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 						return toLong(navigationArtifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ORDER).orElse(MUMMY_ORDER_DEFAULT));
 					} catch(final IllegalArgumentException illegalArgumentException) {
 						throw new IllegalArgumentException(
-								String.format("Invalid property <%s> value: %s", PROPERTY_TAG_MUMMY_ORDER, illegalArgumentException.getLocalizedMessage()),
+								"Invalid property <%s> value: %s".formatted(PROPERTY_TAG_MUMMY_ORDER, illegalArgumentException.getLocalizedMessage()),
 								illegalArgumentException);
 					}
 				})
@@ -250,7 +250,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				//then include the sorted child navigation artifacts
 				childNavigationArtifacts(context, artifact)
 						//posts shouldn't appear in the normal navigation list
-						.filter(not(navArtifact -> navArtifact instanceof SourcePathArtifact && ((SourcePathArtifact)navArtifact).isPost()))
+					.filter(not(navArtifact -> navArtifact instanceof SourcePathArtifact sourcePathArtifact && sourcePathArtifact.isPost()))
 						.sorted(navigationArtifactOrderComparator));
 	}
 
@@ -351,7 +351,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		try {
 			return extractMetadata(context, sourceDocument);
 		} catch(final IllegalArgumentException | MummifyException | DOMException exception) { //TODO ensure `MummifyException` can be thrown; see GUISE-225 
-			throw new IOException(String.format("Error processing metadata in `%s`: %s", name, exception.getLocalizedMessage()), exception); //TODO i18n
+			throw new IOException("Error processing metadata in `%s`: %s".formatted(name, exception.getLocalizedMessage()), exception); //TODO i18n
 		}
 	}
 
@@ -370,7 +370,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				//<title>; will override any <code>title</code> metadata property in this same document
 				findTitle(sourceDocument).stream().map(title -> Map.entry(Handle.toTag(PROPERTY_HANDLE_TITLE), title)),
 				//<meta> TODO detect and add warnings for invalid properties
-				htmlHeadMetaElements(sourceDocument).flatMap(AbstractPageMummifier::htmlMetaElementToProperties)).collect(toList());
+				htmlHeadMetaElements(sourceDocument).flatMap(AbstractPageMummifier::htmlMetaElementToProperties)).toList();
 		//TODO consider parsing out "keywords" in to multiple keyword+ properties for convenience
 	}
 
@@ -446,7 +446,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			getLogger().trace("Generated page output document `{}`.", artifact.getTargetPath());
 
 		} catch(final IllegalArgumentException | MummifyException | MeshException | DOMException exception) { //convert input errors and XML errors to I/O errors
-			throw new IOException(String.format("Error mummifying page `%s`: %s", artifact.getSourcePath(), exception.getLocalizedMessage()), exception); //TODO i18n
+			throw new IOException("Error mummifying page `%s`: %s".formatted(artifact.getSourcePath(), exception.getLocalizedMessage()), exception); //TODO i18n
 		}
 
 	}
@@ -525,11 +525,10 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		final NodeList childNodes = element.getChildNodes();
 		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength();) { //advance the index manually as needed
 			final Node childNode = childNodes.item(childNodeIndex);
-			if(!(childNode instanceof Element)) { //skip non-elements
+			if(!(childNode instanceof Element childElement)) { //skip non-elements
 				childNodeIndex++;
 				continue;
 			}
-			final Element childElement = (Element)childNode;
 			final List<Element> normalizedElements = normalizeElement(context, artifact, childElement);
 			replaceChild(element, childElement, normalizedElements);
 			childNodeIndex += normalizedElements.size(); //manually advance the index based upon the replacement nodes
@@ -564,7 +563,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 					}
 
 					//1. validate structure
-					findHtmlElement(templateDocument).orElseThrow(() -> new IOException(String.format("Template `%s` has no root `<html>` element.", templateFile)));
+					findHtmlElement(templateDocument).orElseThrow(() -> new IOException("Template `%s` has no root `<html>` element.".formatted(templateFile)));
 
 					// Do _not_ apply metadata. Metadata is now generated semantically from the actual description, which has already been loaded.
 
@@ -581,15 +580,15 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 					if(foundSourceContentElement.map(XHTML_ELEMENT_FRAMESET::matches).orElse(false)) {
 						getLogger().warn("Source file `{}` uses obsolete, non-conforming `<frameset>`; may not be supported in the future.", artifact.getSourcePath());
 						final Element templateBodyElement = findHtmlBodyElement(templateDocument)
-								.orElseThrow(() -> new IOException(String.format("Template `%s` requires `<body>` element for applying `<frameset>`.", templateFile)));
+								.orElseThrow(() -> new IOException("Template `%s` requires `<body>` element for applying `<frameset>`.".formatted(templateFile)));
 						templateContentElement = templateDocument.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_FRAMESET); //substitute a <frameset> element for <body> in the template
 						mergeAttributes(templateContentElement, templateBodyElement); //copy over the original template <body> attributes to the new <frameset>
 						templateBodyElement.getParentNode().replaceChild(templateContentElement, templateBodyElement); //replace the template <body> with <frameset>
 					} else { //in normal (non-frameset) cases we just use the template content element
 						templateContentElement = findContentElement(templateDocument)
-								.orElseThrow(() -> new IOException(String.format("Template `%s` has no content insertion point.", templateFile)));
+								.orElseThrow(() -> new IOException("Template `%s` has no content insertion point.".formatted(templateFile)));
 						if(XHTML_ELEMENT_FRAMESET.matches(templateContentElement)) {
-							throw new IOException(String.format("Template `%s` does not support `<frameset>`.", templateFile));
+							throw new IOException("Template `%s` does not support `<frameset>`.".formatted(templateFile));
 						}
 					}
 					foundSourceContentElement.ifPresentOrElse(sourceContentElement -> {
@@ -630,14 +629,14 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 								return Optional.empty();
 							}
 							if(!isDirectory(templateFile)) {
-								throw new IllegalArgumentException(String.format("Template path %s cannot be a directory.", templateFile));
+								throw new IllegalArgumentException("Template path %s cannot be a directory.".formatted(templateFile));
 							}
 							final Optional<PageMummifier> customTemplateMummifier = (templateFile.equals(artifactSourcePath) ? Optional.of(artifact.getMummifier())
 									: context.findRegisteredMummifierForSourceFile(templateFile)).filter(PageMummifier.class::isInstance).map(PageMummifier.class::cast);
 							return customTemplateMummifier.map(templateMummifier -> Map.entry(templateFile, templateMummifier));
 						});
 			} catch(final IllegalArgumentException illegalArgumentException) {
-				throw new IOException(String.format("Source file `%s` specified invalid template `%s`: %s", artifact.getSourcePath(), customTemplate,
+				throw new IOException("Source file `%s` specified invalid template `%s`: %s".formatted(artifact.getSourcePath(), customTemplate,
 						illegalArgumentException.getLocalizedMessage()), illegalArgumentException); //TODO i18n
 			}
 		} else { //if no custom template was specified
@@ -691,8 +690,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				.orElseThrow(() -> new IllegalArgumentException("Template missing <head> element."));
 		Node templateHeadChildNode = templateHeadElement.getFirstChild(); //this acts as a cursor through the children
 		while(templateHeadChildNode != null) {
-			if(templateHeadChildNode instanceof Element) {
-				final Element templateHeadChildElement = (Element)templateHeadChildNode;
+			if(templateHeadChildNode instanceof Element templateHeadChildElement) {
 				if(XHTML_NAMESPACE_URI_STRING.equals(templateHeadChildElement.getNamespaceURI())) {
 					final String referenceAttributeName = HTML_REFERENCE_ELEMENT_ATTRIBUTES.get(templateHeadChildElement.getLocalName());
 					if(referenceAttributeName != null) {
@@ -702,7 +700,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 							try {
 								referenceURI = new URI(referenceString).normalize();
 							} catch(final URISyntaxException uriSyntaxException) {
-								throw new MummifyPageTemplateException(String.format("Invalid template <head><%s> reference %s: %s", templateHeadChildElement.getLocalName(),
+								throw new MummifyPageTemplateException("Invalid template <head><%s> reference %s: %s".formatted(templateHeadChildElement.getLocalName(),
 										referenceString, uriSyntaxException.getLocalizedMessage()));
 							}
 							//we'll eventually remove this element if it's a template duplicate or if it is present in the source document
@@ -845,7 +843,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 			try {
 				return widget.processElement(this, context, artifact, sourceElement);
 			} catch(final MummifyWidgetException widgetException) { //make widget errors more useful TODO consider allowing all `MummifyException`s propagate up; see new exceptions from GUISE-225
-				throw new IOException(String.format("Invalid data for widget `%s` in `%s`: %s", widget.getWidgetElementName(), artifact.getSourceDirectory(),
+				throw new IOException("Invalid data for widget `%s` in `%s`: %s".formatted(widget.getWidgetElementName(), artifact.getSourceDirectory(),
 						widgetException.getLocalizedMessage()), widgetException); //TODO i18n
 			}
 		}
@@ -888,11 +886,10 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		final NodeList childNodes = sourceElement.getChildNodes();
 		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength();) { //advance the index manually as needed
 			final Node childNode = childNodes.item(childNodeIndex);
-			if(!(childNode instanceof Element)) { //skip non-elements
+			if(!(childNode instanceof Element childElement)) { //skip non-elements
 				childNodeIndex++;
 				continue;
 			}
-			final Element childElement = (Element)childNode;
 			final List<Element> processedElements = processElement(context, artifact, childElement);
 			replaceChild(sourceElement, childElement, processedElements);
 			childNodeIndex += processedElements.size(); //manually advance the index based upon the replacement nodes
@@ -907,14 +904,12 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	/// @return The object as a [Long] instance.
 	/// @throws IllegalArgumentException if the given object cannot be converted to a [Long].
 	private static Long toLong(@NonNull final Object object) { //TODO switch to a general converter system, including number types, e.g. from Ploop
-		if(object instanceof Long) {
-			return (Long)object;
-		} else if(object instanceof Integer) {
-			return Long.valueOf(((Integer)object).longValue());
-		} else {
-			throw new IllegalArgumentException(
-					String.format("Cannot convert object %s of type %s to type %s.", object, object.getClass().getSimpleName(), Long.class.getSimpleName()));
-		}
+		return switch(object) {
+			case Long l -> l;
+			case Integer i -> Long.valueOf(i.longValue());
+			default -> throw new IllegalArgumentException(
+					"Cannot convert object %s of type %s to type %s.".formatted(object, object.getClass().getSimpleName(), Long.class.getSimpleName()));
+		};
 	}
 
 	/// The set of [Font Awesome](https://fontawesome.com/) icon groups.
@@ -1146,11 +1141,10 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		final NodeList childNodes = sourceElement.getChildNodes();
 		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength();) { //advance the index manually as needed
 			final Node childNode = childNodes.item(childNodeIndex);
-			if(!(childNode instanceof Element)) { //skip non-elements
+			if(!(childNode instanceof Element childElement)) { //skip non-elements
 				childNodeIndex++;
 				continue;
 			}
-			final Element childElement = (Element)childNode;
 			final List<Element> relocatedElements = relocateElement(context, childElement, originalReferrerSourcePath, referenceGenerator);
 			replaceChild(sourceElement, childElement, relocatedElements);
 			childNodeIndex += relocatedElements.size(); //manually advance the index based upon the replacement nodes
@@ -1215,7 +1209,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	protected Optional<URI> retargetResourceReference(@NonNull MummyContext context, @NonNull URI resourceReference,
 			@NonNull final Path originalReferrerSourcePath, final Function<Artifact, URIPath> referenceGenerator) {
 		final URIPath resourceReferencePath = URIs.findURIPath(resourceReference)
-				.orElseThrow(() -> new IllegalArgumentException(String.format("Resource reference %s has no path.", resourceReference)));
+				.orElseThrow(() -> new IllegalArgumentException("Resource reference %s has no path.".formatted(resourceReference)));
 		return retargetResourceReferencePath(context, resourceReferencePath, originalReferrerSourcePath, referenceGenerator) //retarget the path separately
 				.map(retargetedResourceReferencePath -> URIs.changePath(resourceReference, retargetedResourceReferencePath)); //switch the path of the original reference
 	}
@@ -1313,11 +1307,10 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 		final NodeList childNodes = element.getChildNodes();
 		for(int childNodeIndex = 0; childNodeIndex < childNodes.getLength();) { //advance the index manually as needed
 			final Node childNode = childNodes.item(childNodeIndex);
-			if(!(childNode instanceof Element)) { //skip non-elements
+			if(!(childNode instanceof Element childElement)) { //skip non-elements
 				childNodeIndex++;
 				continue;
 			}
-			final Element childElement = (Element)childNode;
 			final List<Element> cleansedElements = cleanseElement(context, artifact, childElement);
 			replaceChild(element, childElement, cleansedElements);
 			childNodeIndex += cleansedElements.size(); //manually advance the index based upon the replacement nodes

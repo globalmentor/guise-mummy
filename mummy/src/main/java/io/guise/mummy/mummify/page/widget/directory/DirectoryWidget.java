@@ -109,7 +109,7 @@ public class DirectoryWidget implements Widget {
 					//strip off the sort order if needed
 					final String groupByValue = foundSortOrder.map(sortOrder -> groupBy.substring(1)).orElse(groupBy);
 					switch(groupByValue) {
-						case GROUP_BY_PUBLICATION_DATE: {
+						case GROUP_BY_PUBLICATION_DATE -> {
 							final Map<Optional<LocalDate>, List<Artifact>> itemsByFoundPublicationDate = items.collect(groupingBy(
 									item -> item.getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON).flatMap(asInstance(LocalDate.class))));
 							final Stream<Map.Entry<Optional<LocalDate>, List<Artifact>>> groups = itemsByFoundPublicationDate.entrySet().stream();
@@ -127,8 +127,7 @@ public class DirectoryWidget implements Widget {
 										.addAll(generateItemElements(mummifier, context, artifact, widgetElement, 3, itemsForFoundPublicationDate.getValue().stream()));
 							}));
 						}
-							break;
-						case GROUP_BY_PUBLICATION_YEAR: {
+						case GROUP_BY_PUBLICATION_YEAR -> {
 							final Map<Optional<Year>, List<Artifact>> itemsByFoundPublicationYear = items.collect(groupingBy(item -> item.getResourceDescription()
 									.findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON).flatMap(asInstance(LocalDate.class)).map(Year::from)));
 							final Stream<Map.Entry<Optional<Year>, List<Artifact>>> groups = itemsByFoundPublicationYear.entrySet().stream();
@@ -146,9 +145,7 @@ public class DirectoryWidget implements Widget {
 										.addAll(generateItemElements(mummifier, context, artifact, widgetElement, 3, itemsForFoundPublicationYear.getValue().stream()));
 							}));
 						}
-							break;
-						default:
-							throw new MummifyWidgetException(String.format("Unrecognized `%s` attribute value `%s`.", ATTRIBUTE_GROUP_BY, groupBy));
+						default -> throw new MummifyWidgetException("Unrecognized `%s` attribute value `%s`.".formatted(ATTRIBUTE_GROUP_BY, groupBy));
 					}
 					return groupedItemElements;
 				})
@@ -178,10 +175,10 @@ public class DirectoryWidget implements Widget {
 		return findAttribute(widgetElement, ATTRIBUTE_ARCHETYPE) //archetype
 				.map(archetype -> {
 					switch(archetype) {
-						case ARCHETYPE_BLOG:
+						case ARCHETYPE_BLOG -> {
 							if(findAttribute(widgetElement, ATTRIBUTE_GROUP_BY).isPresent()) {
 								throw new MummifyWidgetException(
-										String.format("Attribute `%s` not allowed with attribute `%s` value `%s`.", ATTRIBUTE_GROUP_BY, ATTRIBUTE_ARCHETYPE, archetype));
+										"Attribute `%s` not allowed with attribute `%s` value `%s`.".formatted(ATTRIBUTE_GROUP_BY, ATTRIBUTE_ARCHETYPE, archetype));
 							}
 							return items.sorted( //sort the items in reverse order of (published-on date followed by undated artifacts), secondarily by determined title
 									Comparator
@@ -224,9 +221,9 @@ public class DirectoryWidget implements Widget {
 										return concat(concat(Stream.of(separatorElement, titleElement), publishedOnElement.stream()),
 												concat(excerptElement.stream(), Stream.of(moreLink)));
 									}).skip(1) //skip the first separator so that separators will only appear between posts
-									.collect(toList());
-						default:
-							throw new MummifyWidgetException(String.format("Unrecognized `%s` attribute value `%s`.", ATTRIBUTE_ARCHETYPE, archetype));
+									.toList();
+						}
+						default -> throw new MummifyWidgetException("Unrecognized `%s` attribute value `%s`.".formatted(ATTRIBUTE_ARCHETYPE, archetype));
 					}
 				}).orElseGet(() -> { //no archetype
 					final Element ulElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_UL); //<ul>

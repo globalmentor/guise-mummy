@@ -78,10 +78,10 @@ public abstract class AbstractS3DeployObject implements S3DeployObject {
 		if(this == object) {
 			return true;
 		}
-		if(!(object instanceof S3DeployObject)) {
+		if(!(object instanceof S3DeployObject s3DeployObject)) {
 			return false;
 		}
-		return getKey().equals(((S3DeployObject)object).getKey());
+		return getKey().equals(s3DeployObject.getKey());
 	}
 
 	/// Implementation of an AWS content stream provider for an S3 deploy object.

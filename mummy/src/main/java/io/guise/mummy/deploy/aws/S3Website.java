@@ -439,15 +439,15 @@ public class S3Website extends S3 {
 					final Iterator<S3DeployObject> deployObjectIterator = getDeployObjectsByKey().values().iterator();
 					while(deployObjectIterator.hasNext()) {
 						final S3DeployObject deployObject = deployObjectIterator.next();
-						if(deployObject instanceof S3ArtifactRedirectDeployObject) {
-							routingRuleRedirectObjects.add((S3ArtifactRedirectDeployObject)deployObject);
+						if(deployObject instanceof S3ArtifactRedirectDeployObject redirectDeployObject) {
+							routingRuleRedirectObjects.add(redirectDeployObject);
 							deployObjectIterator.remove();
 						}
 					}
 				}
 				break;
 			default:
-				throw new AssertionError(String.format("Unrecognized redirect means `%s`.", redirectMeans));
+				throw new AssertionError("Unrecognized redirect means `%s`.".formatted(redirectMeans));
 		}
 	}
 
@@ -465,7 +465,7 @@ public class S3Website extends S3 {
 				.map(altLocationUri -> URIPath.relativize(rootTargetPathUri, altLocationUri)) //relativize to the site root
 				.ifPresent(throwingConsumer(altLocationReference -> {
 					if(!altLocationReference.isSubPath()) {
-						throw new IOException(String.format("Artifact for resource %s specifies an alternative location %s which is outside the site boundaries.",
+						throw new IOException("Artifact for resource %s specifies an alternative location %s which is outside the site boundaries.".formatted(
 								resourceReference, altLocationReference));
 					}
 					final String altKey = altLocationReference.toString();
@@ -487,8 +487,7 @@ public class S3Website extends S3 {
 	@Override
 	protected PutObjectRequest.Builder preparePutObject(final MummyContext context, final S3DeployObject deployObject) {
 		final PutObjectRequest.Builder builder = super.preparePutObject(context, deployObject);
-		if(deployObject instanceof S3ArtifactRedirectDeployObject) {
-			final S3ArtifactRedirectDeployObject redirectDeployObject = (S3ArtifactRedirectDeployObject)deployObject;
+		if(deployObject instanceof S3ArtifactRedirectDeployObject redirectDeployObject) {
 			//The redirect path must be absolute, and the must be encoded, presumably because this is the literal HTTP `Location` header content.
 			//See https://tools.ietf.org/html/rfc7231#section-7.1.2 .
 			builder.websiteRedirectLocation(URIPath.encode(ROOT_PATH + redirectDeployObject.getRedirectTargetKey()));
@@ -501,9 +500,8 @@ public class S3Website extends S3 {
 	/// @see S3ArtifactRedirectDeployObject
 	@Override
 	protected Optional<String> findDetailLabel(final S3DeployObject deployObject) {
-		if(deployObject instanceof S3ArtifactRedirectDeployObject) {
-			final S3ArtifactRedirectDeployObject redirectDeployObject = (S3ArtifactRedirectDeployObject)deployObject;
-			return Optional.of(String.format("redirect: `%s`", redirectDeployObject.getRedirectTargetKey())); //redirect: `foo/bar`
+		if(deployObject instanceof S3ArtifactRedirectDeployObject redirectDeployObject) {
+			return Optional.of("redirect: `%s`".formatted(redirectDeployObject.getRedirectTargetKey())); //redirect: `foo/bar`
 		}
 		return super.findDetailLabel(deployObject);
 	}
