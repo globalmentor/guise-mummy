@@ -1,0 +1,9 @@
+## Work Summary for `GUISE-227`: Update to Java 25 with modern language features.
+
+Updated Guise Mummy to Java 25, modernizing the codebase with JEP 467 Markdown Javadoc and contemporary language features across all four modules (mesh, mummy, cli, tomcat).
+
+The work proceeded in phases after initial setup (compiler update, warning fixes). First, all traditional `/** */` Javadoc was converted to JEP 467 Markdown documentation comments (`///`) across 101 files, replacing `{@link}` with `[...]`, `{@code}` with backticks, and HTML with Markdown equivalents while preserving normative tags (`@param`, `@return`, `@throws`, etc.). This large-scale conversion was mechanical but required careful preservation of semantic content.
+
+Next, a comprehensive audit identified opportunities for modern Java idioms. A detailed implementation plan was created and reviewed, catching several internal inconsistencies before execution. The modernization converted ~20 `instanceof` sites to pattern matching, refactored 2 long if-else chains into type-pattern `switch` expressions (`MeshIterator.toIterator()`, `AbstractPageMummifier.toLong()`), converted 7 traditional `switch` statements to arrow-case expressions (eliminating fall-through risk), replaced 11 `.collect(toList())` calls with `.toList()`, and modernized 67 `String.format()` calls to `.formatted()`. The `S3Website.plan()` intentional fall-through switch was correctly preserved with its `@SuppressWarnings("fallthrough")`.
+
+One conversion (`DirectoryMummifier.mummify()`) was adjusted after review to use the existing `checkArgumentIsInstance()` library utility instead of a manual guard clause, aligning with project precondition idioms. During this work, two pre-existing format-argument bugs were discovered (missing arguments for `%s` placeholders in error messages) and fixed in a separate commit. All changes compiled and tested cleanly.
