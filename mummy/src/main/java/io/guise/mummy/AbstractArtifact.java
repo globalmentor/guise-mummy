@@ -25,11 +25,9 @@ import org.jspecify.annotations.*;
 
 import io.guise.mummy.mummify.Mummifier;
 
-/**
- * Abstract implementation of an artifact.
- * @implSpec This class implements artifact equality.
- * @author Garret Wilson
- */
+/// Abstract implementation of an artifact.
+/// @implSpec This class implements artifact equality.
+/// @author Garret Wilson
 public abstract class AbstractArtifact implements Artifact {
 
 	private final Mummifier mummifier;
@@ -53,31 +51,25 @@ public abstract class AbstractArtifact implements Artifact {
 		return targetPath;
 	}
 
-	/**
-	 * Constructor
-	 * @param mummifier The mummifier responsible for generating this artifact.
-	 * @param sourcePath The file containing the source of this artifact.
-	 * @param outputPath The file where the artifact will be generated.
-	 */
+	/// Constructor
+	/// @param mummifier The mummifier responsible for generating this artifact.
+	/// @param sourcePath The file containing the source of this artifact.
+	/// @param outputPath The file where the artifact will be generated.
 	public AbstractArtifact(@NonNull final Mummifier mummifier, @NonNull final Path sourcePath, @NonNull final Path outputPath) {
 		this.mummifier = requireNonNull(mummifier);
 		this.sourcePath = requireNonNull(sourcePath);
 		this.targetPath = requireNonNull(outputPath);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version simply returns the source file, equivalent to {@link #getSourcePath()}.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This version simply returns the source file, equivalent to [#getSourcePath()].
 	@Override
 	public Set<Path> getReferentSourcePaths() {
 		return Set.of(getSourcePath());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version prints the resource context path.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This version prints the resource context path.
 	@Override
 	public String toString() {
 		return "(`" + getSourcePath() + "` -> `" + getTargetPath() + "`)";

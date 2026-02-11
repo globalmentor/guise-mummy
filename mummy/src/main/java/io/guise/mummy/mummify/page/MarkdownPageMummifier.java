@@ -52,30 +52,22 @@ import com.vladsch.flexmark.util.data.MutableDataSet;
 
 import io.guise.mummy.MummyContext;
 
-/**
- * Mummifier for Markdown documents.
- * @implSpec This implementation defaults to UTF-8, producing an error if the encoding isn't valid. Other encodings are supported with the appropriate BOM.
- * @author Garret Wilson
- */
+/// Mummifier for Markdown documents.
+/// @implSpec This implementation defaults to UTF-8, producing an error if the encoding isn't valid. Other encodings are supported with the appropriate BOM.
+/// @author Garret Wilson
 public class MarkdownPageMummifier extends AbstractPageMummifier {
 
-	/** Pattern for a Markdown document with YAML front matter. */
+	/// Pattern for a Markdown document with YAML front matter.
 	static final Pattern MARKDOWN_WITH_YAML_PATTERN = Pattern.compile("(?:---[\\r\\n]+(.*)---(?:[\\r\\n]+|$))?(.*)", Pattern.DOTALL);
-	/** The matching group for YAML content in a Markdown document with YAML. The value of the group will be <code>null</code> if no YAML is present. */
+	/// The matching group for YAML content in a Markdown document with YAML. The value of the group will be `null` if no YAML is present.
 	static final int MARKDOWN_WITH_YAML_PATTERN_YAML_GROUP = 1;
-	/**
-	 * The matching group for Markdown content in a Markdown document with YAML. The value of the group may be the empty string but will never be
-	 * <code>null</code>.
-	 */
+	/// The matching group for Markdown content in a Markdown document with YAML. The value of the group may be the empty string but will never be
+	/// `null`.
 	static final int MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP = 2;
 
-	/**
-	 * The template for wrapping an XHTML document around the generated HTML. It has the following parameters:
-	 * <ol>
-	 * <li>Page {@code <title>} content.</li>
-	 * <li>Page {@code <body>} content.</li>
-	 * </ol>
-	 */
+	/// The template for wrapping an XHTML document around the generated HTML. It has the following parameters:
+	/// 1. Page `<title>` content.
+	/// 2. Page `<body>` content.
 	private static final StringTemplate XHTML_TEMPLATE = StringTemplate
 			.builder() //@formatter:off
 					.text("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").newline()
@@ -89,11 +81,9 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 					.text("</body>")
 					.text("</html>").newline().build();	//@formatter:on
 
-	/**
-	 * {@inheritDoc}
-	 * @implNote The supported extensions follow the two given in <a href="https://tools.ietf.org/html/rfc7763">RFC 7763</a> so as to promote consistency, namely
-	 *           <code>md</code> and <code>markdown</code>, even though there are <a href="https://superuser.com/a/285878/954883">many variations</a> in the wild.
-	 */
+	/// {@inheritDoc}
+	/// @implNote The supported extensions follow the two given in [RFC 7763](https://tools.ietf.org/html/rfc7763) so as to promote consistency, namely
+	///           `md` and `markdown`, even though there are [many variations](https://superuser.com/a/285878/954883) in the wild.
 	@Override
 	public Set<String> getSupportedFilenameExtensions() {
 		return Set.of("md", "markdown");
@@ -101,26 +91,22 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 
 	private final Parser parser;
 
-	/**
-	 * Returns the parser for parsing Markdown.
-	 * @apiNote The Flexmark parser API indicates it can be used by multiple threads.
-	 * @return The parser for parsing Markdown.
-	 */
+	/// Returns the parser for parsing Markdown.
+	/// @apiNote The Flexmark parser API indicates it can be used by multiple threads.
+	/// @return The parser for parsing Markdown.
 	protected Parser getParser() {
 		return parser;
 	}
 
 	private final HtmlRenderer htmlRenderer;
 
-	/**
-	 * Returns the formatter that serializes a Markdown tree as HTML body content.
-	 * @return The formatter that serializes a Markdown tree as HTML body content.
-	 */
+	/// Returns the formatter that serializes a Markdown tree as HTML body content.
+	/// @return The formatter that serializes a Markdown tree as HTML body content.
 	protected HtmlRenderer getHtmlRenderer() {
 		return htmlRenderer;
 	}
 
-	/** Constructor. */
+	/// Constructor.
 	public MarkdownPageMummifier() {
 		final MutableDataHolder parserOptions = new MutableDataSet()
 				//emoji; see https://www.webfx.com/tools/emoji-cheat-sheet/
@@ -135,11 +121,9 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		htmlRenderer = HtmlRenderer.builder().build();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version loads a document in Markdown format.
-	 * @implSpec This version uses the filename as a title. It will be replaced later by any title indicated in the metadata during mummification.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This version loads a document in Markdown format.
+	/// @implSpec This version uses the filename as a title. It will be replaced later by any title indicated in the metadata during mummification.
 	@Override
 	public Document loadSourceDocument(final MummyContext context, final InputStream inputStream, final String name) throws IOException, DOMException {
 		final String content = readString(new BOMInputStreamReader(toMarkSupportedInputStream(inputStream))); //detect the BOM and to throw errors if the encoding is invalid
@@ -166,15 +150,13 @@ public class MarkdownPageMummifier extends AbstractPageMummifier {
 		return document;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation reads the entire document and then parses any YAML front matter using SnakeYAML Engine.
-	 * @implSpec Only YAML mappings (name-value pairs) are supported. Names should be in <code>camelCase</code>. Namespace prefixes of predefined vocabularies in
-	 *           {@link AbstractPageMummifier#PREDEFINED_VOCABULARIES} are supported for names in the form <code>eg:name</code>.
-	 * @implSpec If the value is a string, this implementation delegates to {@link #parseMetadataPropertyValue(URI, CharSequence)} to determine the final value,
-	 *           inferring the property type based upon the property tag if possible.
-	 * @see AbstractPageMummifier#PREDEFINED_VOCABULARIES
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation reads the entire document and then parses any YAML front matter using SnakeYAML Engine.
+	/// @implSpec Only YAML mappings (name-value pairs) are supported. Names should be in `camelCase`. Namespace prefixes of predefined vocabularies in
+	///           [AbstractPageMummifier#PREDEFINED_VOCABULARIES] are supported for names in the form `eg:name`.
+	/// @implSpec If the value is a string, this implementation delegates to [#parseMetadataPropertyValue(URI, CharSequence)] to determine the final value,
+	///           inferring the property type based upon the property tag if possible.
+	/// @see AbstractPageMummifier#PREDEFINED_VOCABULARIES
 	@Override
 	protected List<Map.Entry<URI, Object>> loadSourceMetadata(final MummyContext context, final InputStream inputStream, final String name) throws IOException {
 		final String content = readString(new BOMInputStreamReader(toMarkSupportedInputStream(inputStream))); //detect the BOM and to throw errors if the encoding is invalid

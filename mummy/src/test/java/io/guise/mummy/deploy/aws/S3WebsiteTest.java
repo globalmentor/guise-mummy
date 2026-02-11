@@ -28,17 +28,15 @@ import io.confound.config.*;
 import io.guise.mummy.GuiseMummy;
 import software.amazon.awssdk.regions.Region;
 
-/**
- * Tests of {@link S3Website}.
- * @author Garret Wilson
- */
+/// Tests of [S3Website].
+/// @author Garret Wilson
 public class S3WebsiteTest {
 
 	//# configuration
 
 	//## `….altBuckets`
 
-	/*** @see S3#getConfiguredAltBuckets(Configuration, Configuration) */
+	/// @see S3#getConfiguredAltBuckets(Configuration, Configuration)
 	@Test
 	public void testGetConfiguredAltBuckets() {
 		final Configuration globalConfiguration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "test.example.com.",
@@ -47,13 +45,13 @@ public class S3WebsiteTest {
 		assertThat(S3Website.getConfiguredAltBuckets(globalConfiguration, localConfiguration), contains("foo", "example.net", "bar"));
 	}
 
-	/*** @see S3#getConfiguredAltBuckets(Configuration, Configuration) */
+	/// @see S3#getConfiguredAltBuckets(Configuration, Configuration)
 	@Test
 	public void testGetConfiguredBucketMissingIsEmptyCollection() {
 		assertThat(S3Website.getConfiguredAltBuckets(Configuration.empty(), Configuration.empty()), is(empty()));
 	}
 
-	/*** @see S3#getConfiguredAltBuckets(Configuration, Configuration) */
+	/// @see S3#getConfiguredAltBuckets(Configuration, Configuration)
 	@Test
 	public void testGetConfiguredAltBucketsDefaultToSiteAltDomains() {
 		final Configuration globalConfiguration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "test.example.com.",
@@ -64,7 +62,7 @@ public class S3WebsiteTest {
 
 	//# website
 
-	/** @see S3Website#getBucketWebsiteEndpoint(String, Region) */
+	/// @see S3Website#getBucketWebsiteEndpoint(String, Region)
 	@Test
 	public void testGetBucketWebsiteEndpoint() {
 		assertThat(S3Website.getBucketWebsiteEndpoint("foobar", Region.US_EAST_1), is("foobar.s3-website-us-east-1.amazonaws.com"));
@@ -75,7 +73,7 @@ public class S3WebsiteTest {
 		assertThat(S3Website.getBucketWebsiteEndpoint("foobar", Region.SA_EAST_1), is("foobar.s3-website-sa-east-1.amazonaws.com"));
 	}
 
-	/** @see S3Website#getBucketWebsiteUrl(String, Region) */
+	/// @see S3Website#getBucketWebsiteUrl(String, Region)
 	@Test
 	public void testGetBucketWebsiteUrl() {
 		assertThat(S3Website.getBucketWebsiteUrl("foobar", Region.US_EAST_1), is(URI.create("http://foobar.s3-website-us-east-1.amazonaws.com/")));

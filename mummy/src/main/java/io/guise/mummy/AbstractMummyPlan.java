@@ -27,10 +27,8 @@ import org.jspecify.annotations.*;
 
 import com.globalmentor.net.URIPath;
 
-/**
- * Abstract base plan for mummifying a site.
- * @author Garret Wilson
- */
+/// Abstract base plan for mummifying a site.
+/// @author Garret Wilson
 public abstract class AbstractMummyPlan implements MummyPlan {
 
 	private final Artifact rootArtifact;
@@ -40,10 +38,8 @@ public abstract class AbstractMummyPlan implements MummyPlan {
 		return rootArtifact;
 	}
 
-	/**
-	 * Root artifact constructor.
-	 * @param rootArtifact The root artifact of the site, representing the root directory.
-	 */
+	/// Root artifact constructor.
+	/// @param rootArtifact The root artifact of the site, representing the root directory.
 	public AbstractMummyPlan(@NonNull final Artifact rootArtifact) {
 		this.rootArtifact = requireNonNull(rootArtifact);
 	}
@@ -60,21 +56,19 @@ public abstract class AbstractMummyPlan implements MummyPlan {
 				toArtifact instanceof CollectionArtifact);
 	}
 
-	/**
-	 * Relativizes a reference to a target file in the file system against some base path. As a safety measure both paths must be either a subpath of the root
-	 * artifact source path, or a subpath of the root artifact target path. The returned reference will be a resource URI path (e.g. appropriate for web
-	 * references) relative to the base path.
-	 * @apiNote If the reference target path does not yet exist and a forced collection path is not requested, this method may not produce a URI path in the
-	 *          correct collection form, as it is impossible to know if the target represents a directory.
-	 * @param basePath The absolute path against which the reference path with be relativized.
-	 * @param referencePath The absolute reference path to relativize.
-	 * @param forceCollection <code>true</code> if the returned path should be in collection form, ending with a slash, regardless of whether the reference path
-	 *          is a collection or even exists.
-	 * @return The reference path relative to the base path as a URI path.
-	 * @throws IllegalArgumentException if the target path and or the base path is not absolute and/or is not within the same source/target tree as per the root
-	 *           artifact.
-	 * @see #getRootArtifact()
-	 */
+	/// Relativizes a reference to a target file in the file system against some base path. As a safety measure both paths must be either a subpath of the root
+	/// artifact source path, or a subpath of the root artifact target path. The returned reference will be a resource URI path (e.g. appropriate for web
+	/// references) relative to the base path.
+	/// @apiNote If the reference target path does not yet exist and a forced collection path is not requested, this method may not produce a URI path in the
+	///          correct collection form, as it is impossible to know if the target represents a directory.
+	/// @param basePath The absolute path against which the reference path with be relativized.
+	/// @param referencePath The absolute reference path to relativize.
+	/// @param forceCollection `true` if the returned path should be in collection form, ending with a slash, regardless of whether the reference path
+	///          is a collection or even exists.
+	/// @return The reference path relative to the base path as a URI path.
+	/// @throws IllegalArgumentException if the target path and or the base path is not absolute and/or is not within the same source/target tree as per the root
+	///           artifact.
+	/// @see #getRootArtifact()
 	protected URIPath relativizeResourceReference(@NonNull final Path basePath, @NonNull final Path referencePath, final boolean forceCollection) {
 		final Path root = isSubPath(getRootArtifact().getSourcePath(), basePath) ? getRootArtifact().getSourcePath() : getRootArtifact().getTargetPath();
 		final URI baseTargetUri = checkArgumentSubPath(root, checkArgumentAbsolute(basePath)).toUri();

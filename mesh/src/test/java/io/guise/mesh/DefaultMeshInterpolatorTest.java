@@ -29,10 +29,8 @@ import com.globalmentor.text.ASCII;
 
 public class DefaultMeshInterpolatorTest {
 
-	/**
-	 * Tests the low-level general interpolation implementation that uses an expression evaluation function.
-	 * @see DefaultMeshInterpolator#findInterpolation(CharSequence, String, String, java.util.function.Function)
-	 */
+	/// Tests the low-level general interpolation implementation that uses an expression evaluation function.
+	/// @see DefaultMeshInterpolator#findInterpolation(CharSequence, String, String, java.util.function.Function)
 	@Test
 	void testBaseFindInterpolationMethod() {
 		assertThat("No expressions in empty string.", findInterpolation("", "^{", "}", ASCII::toUpperCase).map(Object::toString), isEmpty());
@@ -64,10 +62,8 @@ public class DefaultMeshInterpolatorTest {
 				"Incomplete expression at end of string.");
 	}
 
-	/**
-	 * Tests the general interpolation detection implementation.
-	 * @see DefaultMeshInterpolator#hasInterpolation(CharSequence, String, String)
-	 */
+	/// Tests the general interpolation detection implementation.
+	/// @see DefaultMeshInterpolator#hasInterpolation(CharSequence, String, String)
 	@Test
 	void testBaseHasInterpolationMethod() {
 		assertThat("No expressions in empty string.", hasInterpolation("", "^{", "}"), is(false));

@@ -29,14 +29,12 @@ import org.xml.sax.SAXParseException;
 
 import io.guise.mummy.MummyContext;
 
-/**
- * Mummifier for XHTML documents, such as HTML5 documents stored as XML.
- * @implNote This mummifier only works with XHTML documents.
- * @author Garret Wilson
- */
+/// Mummifier for XHTML documents, such as HTML5 documents stored as XML.
+/// @implNote This mummifier only works with XHTML documents.
+/// @author Garret Wilson
 public class XhtmlPageMummifier extends AbstractPageMummifier {
 
-	/** Constructor. */
+	/// Constructor.
 	public XhtmlPageMummifier() {
 	}
 
@@ -45,10 +43,8 @@ public class XhtmlPageMummifier extends AbstractPageMummifier {
 		return Set.of(XHTML_FILENAME_EXTENSION);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version loads a document in XHTML format.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This version loads a document in XHTML format.
 	@Override
 	public Document loadSourceDocument(final MummyContext context, final InputStream inputStream, final String name) throws IOException, DOMException {
 		final DocumentBuilder documentBuilder = context.newPageDocumentBuilder();

@@ -38,65 +38,55 @@ import io.urf.URF;
 import io.urf.format.turf.*;
 import io.urf.model.*;
 
-/**
- * An abstract mummifier to serve as a base class for mummifiers generally.
- * @implSpec This mummifier generates description files using the string configured for {@value GuiseMummy#CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR} as the
- *           newline sequence in order to provide consistent, repeatable build across platforms.
- * @author Garret Wilson
- */
+/// An abstract mummifier to serve as a base class for mummifiers generally.
+/// @implSpec This mummifier generates description files using the string configured for [GuiseMummy#CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR] as the
+///           newline sequence in order to provide consistent, repeatable build across platforms.
+/// @author Garret Wilson
 public abstract class AbstractMummifier implements Mummifier {
 
-	/** Constructor. */
+	/// Constructor.
 	protected AbstractMummifier() {
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version merely returns the given filename unmodified.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This version merely returns the given filename unmodified.
 	@Override
 	public String planArtifactTargetFilename(final MummyContext context, final String filename) {
 		return requireNonNull(filename);
 	}
 
-	/**
-	 * Determines the output file path for an artifact description in the site description target directory for the given artifact.
-	 * @implSpec This implementation delegates to {@link #getArtifactTargetDescriptionFile(MummyContext, Path)} using {@link Artifact#getTargetPath()}.
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact for which a target description file should be returned.
-	 * @return The path in the site description target directory to which a description may be generated.
-	 * @see Artifact#getTargetPath()
-	 */
+	/// Determines the output file path for an artifact description in the site description target directory for the given artifact.
+	/// @implSpec This implementation delegates to [#getArtifactTargetDescriptionFile(MummyContext, Path)] using [Artifact#getTargetPath()].
+	/// @param context The context of static site generation.
+	/// @param artifact The artifact for which a target description file should be returned.
+	/// @return The path in the site description target directory to which a description may be generated.
+	/// @see Artifact#getTargetPath()
 	protected Path getArtifactTargetDescriptionFile(final @NonNull MummyContext context, final @NonNull Artifact artifact) {
 		return getArtifactTargetDescriptionFile(context, artifact.getTargetPath());
 	}
 
-	/**
-	 * Determines the output file path for an artifact description in the site description target directory based upon the target path in the site target
-	 * directory.
-	 * @implSpec The default implementation produces a filename based upon the target path filename with the {@link Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION}
-	 *           added, but in the {@link MummyContext#getSiteDescriptionTargetDirectory()} directory.
-	 * @param context The context of static site generation.
-	 * @param targetPath The path in the site target directory.
-	 * @return The path in the site description target directory to which a description may be generated.
-	 * @throws IllegalArgumentException if the given target path is not in the target source tree.
-	 * @see MummyContext#getSiteDescriptionTargetDirectory()
-	 * @see Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION
-	 */
+	/// Determines the output file path for an artifact description in the site description target directory based upon the target path in the site target
+	/// directory.
+	/// @implSpec The default implementation produces a filename based upon the target path filename with the [Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION]
+	///           added, but in the [MummyContext#getSiteDescriptionTargetDirectory()] directory.
+	/// @param context The context of static site generation.
+	/// @param targetPath The path in the site target directory.
+	/// @return The path in the site description target directory to which a description may be generated.
+	/// @throws IllegalArgumentException if the given target path is not in the target source tree.
+	/// @see MummyContext#getSiteDescriptionTargetDirectory()
+	/// @see Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION
 	protected Path getArtifactTargetDescriptionFile(final @NonNull MummyContext context, final @NonNull Path targetPath) {
 		return addFilenameExtension(changeBase(targetPath, context.getSiteTargetDirectory(), context.getSiteDescriptionTargetDirectory()),
 				DESCRIPTION_FILE_SIDECAR_EXTENSION);
 	}
 
-	/**
-	 * Loads the generated target description of an artifact based upon its target path.
-	 * @param context The context of static site generation.
-	 * @param targetPath The path in the site target directory (not the path of the target description itself).
-	 * @throws IllegalArgumentException if the given target path is not in the site target tree.
-	 * @return The generated target description, if present, of the resource being mummified.
-	 * @throws IOException if there is an I/O error retrieving the description, including if the metadata is invalid.
-	 * @see #getArtifactTargetDescriptionFile(MummyContext, Path)
-	 */
+	/// Loads the generated target description of an artifact based upon its target path.
+	/// @param context The context of static site generation.
+	/// @param targetPath The path in the site target directory (not the path of the target description itself).
+	/// @throws IllegalArgumentException if the given target path is not in the site target tree.
+	/// @return The generated target description, if present, of the resource being mummified.
+	/// @throws IOException if there is an I/O error retrieving the description, including if the metadata is invalid.
+	/// @see #getArtifactTargetDescriptionFile(MummyContext, Path)
 	protected Optional<UrfResourceDescription> loadArtifactTargetDescription(@NonNull MummyContext context, @NonNull final Path targetPath) throws IOException {
 		final Path descriptionFile = getArtifactTargetDescriptionFile(context, targetPath);
 		if(!isRegularFile(descriptionFile)) {
@@ -108,14 +98,12 @@ public abstract class AbstractMummifier implements Mummifier {
 		}
 	}
 
-	/**
-	 * Saves an artifact's description as-is with no modifications.
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact being generated
-	 * @throws IOException if there is an I/O error saving the description.
-	 * @see #getArtifactTargetDescriptionFile(MummyContext, Artifact)
-	 * @see GuiseMummy#CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR
-	 */
+	/// Saves an artifact's description as-is with no modifications.
+	/// @param context The context of static site generation.
+	/// @param artifact The artifact being generated
+	/// @throws IOException if there is an I/O error saving the description.
+	/// @see #getArtifactTargetDescriptionFile(MummyContext, Artifact)
+	/// @see GuiseMummy#CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR
 	protected void saveTargetDescription(@NonNull final MummyContext context, @NonNull Artifact artifact) throws IOException {
 		final UrfResourceDescription description = artifact.getResourceDescription();
 		final Path descriptionFile = getArtifactTargetDescriptionFile(context, artifact);
@@ -133,33 +121,27 @@ public abstract class AbstractMummifier implements Mummifier {
 		}
 	}
 
-	/** The pattern describing the ad-hoc property name from which a {@link LocalDate} type will be inferred . */
+	/// The pattern describing the ad-hoc property name from which a [LocalDate] type will be inferred.
 	static final Pattern AD_HOC_PROPERTY_LOCAL_DATE_NAME_PATTERN = Pattern.compile(".+On");
 
-	/**
-	 * Parses a metadata property value from its lexical representation. It allows determination of value type based upon property name conventions, as well as
-	 * defined ontology rules for vocabularies. If a property value does not conform to a defined ontology, an exception will be thrown. If a property value
-	 * cannot be parsed based upon property name conventions, only a warning will be logged.
-	 * <p>
-	 * If no particular type can be determined for a property, the {@link CharSequence} value is converted to a {@link String}. This allows a flexible value
-	 * source, while ensuring that unrecognized lexical values are still stored as strings.
-	 * </p>
-	 * @apiNote This method is appropriate if the underlying format, such as HTML, exposes metadata values only in string format. If the underlying format
-	 *          provides rich metadata value types (such as TURF embedded in Markdown), property value type inference such as provided by this method should
-	 *          normally not be used unless the format's type system provides insufficient types (such as YAML embedded in Markdown); in this case this method
-	 *          should be called on the properties with string values.
-	 * @implSpec If the property is in the URF ad-hoc namespace, the property value type is inferred from the property name by convention, as defined by the
-	 *           following regular expressions. Any value that cannot be parsed will result in a warning and not an error.
-	 *           <dl>
-	 *           <dt><code>/.+On/</code> (e.g. <code>publishedOn</code> or <code>fromAtoZOn</code>)</dt>
-	 *           <dd>{@link LocalDate}</dd>
-	 *           </dl>
-	 * @implSpec This implementation does not yet support ontology definitions for namespaced vocabularies.
-	 * @param propertyTag The tag of the property the value of which is being parsed.
-	 * @param propertyLexicalValue The lexical property value to be parsed; typically a {@link String}.
-	 * @return The resulting property value, perhaps in another type.
-	 * @throws IllegalArgumentException if a property value cannot be parsed conforming to ontology rules.
-	 */
+	/// Parses a metadata property value from its lexical representation. It allows determination of value type based upon property name conventions, as well as
+	/// defined ontology rules for vocabularies. If a property value does not conform to a defined ontology, an exception will be thrown. If a property value
+	/// cannot be parsed based upon property name conventions, only a warning will be logged.
+	///
+	/// If no particular type can be determined for a property, the [CharSequence] value is converted to a [String]. This allows a flexible value
+	/// source, while ensuring that unrecognized lexical values are still stored as strings.
+	/// @apiNote This method is appropriate if the underlying format, such as HTML, exposes metadata values only in string format. If the underlying format
+	///          provides rich metadata value types (such as TURF embedded in Markdown), property value type inference such as provided by this method should
+	///          normally not be used unless the format's type system provides insufficient types (such as YAML embedded in Markdown); in this case this method
+	///          should be called on the properties with string values.
+	/// @implSpec If the property is in the URF ad-hoc namespace, the property value type is inferred from the property name by convention, as defined by the
+	///           following regular expressions. Any value that cannot be parsed will result in a warning and not an error.
+	///           - **`/.+On/`** (e.g. `publishedOn` or `fromAtoZOn`): [LocalDate]
+	/// @implSpec This implementation does not yet support ontology definitions for namespaced vocabularies.
+	/// @param propertyTag The tag of the property the value of which is being parsed.
+	/// @param propertyLexicalValue The lexical property value to be parsed; typically a [String].
+	/// @return The resulting property value, perhaps in another type.
+	/// @throws IllegalArgumentException if a property value cannot be parsed conforming to ontology rules.
 	protected static Object parseMetadataPropertyValue(@NonNull final URI propertyTag, @NonNull final CharSequence propertyLexicalValue) {
 		return URF.Tag.findNamespace(propertyTag).<Object>flatMap(namespace -> { //map based on namespace
 			if(namespace.equals(URF.AD_HOC_NAMESPACE)) { //ad-hoc (default) namespace

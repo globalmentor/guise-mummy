@@ -25,13 +25,11 @@ import static org.hamcrest.Matchers.*;
 
 import org.junit.jupiter.api.*;
 
-/**
- * Tests of {@link MeshIterator}.
- * @author Garret Wilson
- */
+/// Tests of [MeshIterator].
+/// @author Garret Wilson
 public class MeshIteratorTest {
 
-	/** @see MeshIterator#toIterator(Object) */
+	/// @see MeshIterator#toIterator(Object)
 	@Test
 	void testToIteratorSupportsArrays() {
 		assertThat("String[]", stream(spliteratorUnknownSize(MeshIterator.toIterator(new String[] {"one", "two", "three"}), ORDERED), false).collect(toList()),

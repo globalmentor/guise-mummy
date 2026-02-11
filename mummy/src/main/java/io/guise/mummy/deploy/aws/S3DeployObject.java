@@ -26,58 +26,41 @@ import io.urf.URF.Handle;
 import io.urf.vocab.content.Content;
 import software.amazon.awssdk.http.ContentStreamProvider;
 
-/**
- * Encapsulation of an object, such as a Guise Mummy artifact, to be deployed to S3.
- * <p>
- * Equality of deploy objects is determined solely by the value of {@link #getKey()}.
- * </p>
- * @author Garret Wilson
- */
+/// Encapsulation of an object, such as a Guise Mummy artifact, to be deployed to S3.
+///
+/// Equality of deploy objects is determined solely by the value of [#getKey()].
+/// @author Garret Wilson
 public interface S3DeployObject {
 
-	/**
-	 * The handle of the content fingerprint tag used as S3 object metadata.
-	 * @see Content#FINGERPRINT_PROPERTY_TAG
-	 */
+	/// The handle of the content fingerprint tag used as S3 object metadata.
+	/// @see Content#FINGERPRINT_PROPERTY_TAG
 	public static final String METADATA_CONTENT_FINGERPRINT = Handle.findFromTag(Content.FINGERPRINT_PROPERTY_TAG).orElseThrow(AssertionError::new);
 
-	/**
-	 * Returns the S3 key representing the deployment path of the object in the bucket.
-	 * @return The S3 key representing the deployment path of the object in the bucket.
-	 */
+	/// Returns the S3 key representing the deployment path of the object in the bucket.
+	/// @return The S3 key representing the deployment path of the object in the bucket.
 	public String getKey();
 
-	/**
-	 * Returns the S3 metadata to be deployed along with the object.
-	 * @return The S3 metadata to be deployed along with the object; may be empty.
-	 */
+	/// Returns the S3 metadata to be deployed along with the object.
+	/// @return The S3 metadata to be deployed along with the object; may be empty.
 	public Map<String, String> getMetadata();
 
-	/**
-	 * Returns any known fingerprint for the object.
-	 * @apiNote This method is not meant to calculate a fingerprint; it is meant to return any official fingerprint value that has already been calculated.
-	 * @return Any known fingerprint for the object.
-	 */
+	/// Returns any known fingerprint for the object.
+	/// @apiNote This method is not meant to calculate a fingerprint; it is meant to return any official fingerprint value that has already been calculated.
+	/// @return Any known fingerprint for the object.
 	public Optional<byte[]> findFingerprint();
 
-	/**
-	 * Returns the size of the content.
-	 * @return The length of the content to be deployed for this object.
-	 * @throws IOException if there is an I/O error retrieving the content length.
-	 */
+	/// Returns the size of the content.
+	/// @return The length of the content to be deployed for this object.
+	/// @throws IOException if there is an I/O error retrieving the content length.
 	public long getContentLength() throws IOException;
 
-	/**
-	 * Returns the full Internet media type of the object to be deployed for the purposes of S3.
-	 * @apiNote If a suitable content type cannot be determined, this method returns the string form of {@link MediaType#APPLICATION_OCTET_STREAM_MEDIA_TYPE}.
-	 * @return The content type of the object as a string for deployment to S3.
-	 */
+	/// Returns the full Internet media type of the object to be deployed for the purposes of S3.
+	/// @apiNote If a suitable content type cannot be determined, this method returns the string form of [MediaType#APPLICATION_OCTET_STREAM_MEDIA_TYPE].
+	/// @return The content type of the object as a string for deployment to S3.
 	public String getContentType();
 
-	/**
-	 * Creates a new provider for retrieving streams to the object content.
-	 * @return A strategy for retrieving the content of the object to deploy.
-	 */
+	/// Creates a new provider for retrieving streams to the object content.
+	/// @return A strategy for retrieving the content of the object to deploy.
 	public ContentStreamProvider createContentStreamProvider();
 
 }

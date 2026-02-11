@@ -16,21 +16,17 @@
 
 package io.guise.mummy.deploy.aws;
 
-/**
- * Settings and definitions for AWS in general for Guise.
- * @author Garret Wilson
- */
+/// Settings and definitions for AWS in general for Guise.
+/// @author Garret Wilson
 public class AWS {
 
-	/** This class cannot be publicly instantiated. */
+	/// This class cannot be publicly instantiated.
 	private AWS() {
 	}
 
-	/**
-	 * The global configuration for the AWS profile to use in deployment.
-	 * @see <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html">Named Profiles</a>
-	 * @see <a href="https://docs.aws.amazon.com/sdk-for-java/v2/developer-guide/credentials.html">Supplying and Retrieving AWS Credentials</a>
-	 */
+	/// The global configuration for the AWS profile to use in deployment.
+	/// @see <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html">Named Profiles</a>
+	/// @see <a href="https://docs.aws.amazon.com/sdk-for-java/v2/developer-guide/credentials.html">Supplying and Retrieving AWS Credentials</a>
 	public static final String CONFIG_KEY_DEPLOY_AWS_PROFILE = "deploy.aws.profile";
 
 }

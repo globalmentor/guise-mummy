@@ -42,10 +42,8 @@ import io.confound.config.Configuration;
 import io.guise.mummy.*;
 import io.urf.URF.Handle;
 
-/**
- * Tests of {@link MarkdownPageMummifier}.
- * @author Garret Wilson
- */
+/// Tests of [MarkdownPageMummifier].
+/// @author Garret Wilson
 public class MarkdownPageMummifierTest {
 
 	public static final String CODE_JAVASCRIPT_MARKDOWN_RESOURCE_NAME = "code-javascript.md";
@@ -61,17 +59,15 @@ public class MarkdownPageMummifierTest {
 		mummyContext = new FakeMummyContext(project);
 	}
 
-	/**
-	 * Retrieves the text content of the first paragraph in the given document.
-	 * @param document The document from which to retrieve paragraph text.
-	 * @return The text of the first paragraph, which will not be present if there is no body element or paragraph element.
-	 */
+	/// Retrieves the text content of the first paragraph in the given document.
+	/// @param document The document from which to retrieve paragraph text.
+	/// @return The text of the first paragraph, which will not be present if there is no body element or paragraph element.
 	protected Optional<String> findFirstParagraphText(@NonNull final Document document) {
 		return findHtmlBodyElement(document).flatMap(bodyElement -> childElementsByNameNS(bodyElement, XHTML_NAMESPACE_URI_STRING, ELEMENT_P).findFirst())
 				.map(Element::getTextContent);
 	}
 
-	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
+	/// @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN
 	@Test
 	public void testMarkdownWithYamlPatternNoYaml() {
 		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("# Heading\n\nBody text.");
@@ -80,7 +76,7 @@ public class MarkdownPageMummifierTest {
 		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("# Heading\n\nBody text."));
 	}
 
-	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
+	/// @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN
 	@Test
 	public void testMarkdownWithYamlPatternEmptyYaml() {
 		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\n---\n# Heading\n\nBody text.");
@@ -89,7 +85,7 @@ public class MarkdownPageMummifierTest {
 		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("# Heading\n\nBody text."));
 	}
 
-	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
+	/// @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN
 	@Test
 	public void testMarkdownWithYamlPatternSingleLineYamlNotRecognized() {
 		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---foo:bar---\n# Heading\n\nBody text.");
@@ -98,7 +94,7 @@ public class MarkdownPageMummifierTest {
 		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("---foo:bar---\n# Heading\n\nBody text."));
 	}
 
-	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
+	/// @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN
 	@Test
 	public void testMarkdownWithYamlPattern() {
 		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\nfoo:bar\nexample:test---\n# Heading\n\nBody text.");
@@ -107,7 +103,7 @@ public class MarkdownPageMummifierTest {
 		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is("# Heading\n\nBody text."));
 	}
 
-	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
+	/// @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN
 	@Test
 	public void testMarkdownWithYamlPatternNoMarkdown() {
 		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\nfoo:bar\nexample:test---");
@@ -116,7 +112,7 @@ public class MarkdownPageMummifierTest {
 		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is(""));
 	}
 
-	/** @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN */
+	/// @see MarkdownPageMummifier#MARKDOWN_WITH_YAML_PATTERN
 	@Test
 	public void testMarkdownWithYamlPatternEmptyLineMarkdown() {
 		final Matcher matcher = MARKDOWN_WITH_YAML_PATTERN.matcher("---\nfoo:bar\nexample:test---\n");
@@ -125,10 +121,8 @@ public class MarkdownPageMummifierTest {
 		assertThat(matcher.group(MARKDOWN_WITH_YAML_PATTERN_MARKDOWN_GROUP), is(""));
 	}
 
-	/**
-	 * Asserts that the body of the given document matches that expected for the "simple-" test files.
-	 * @param document The document to test.
-	 */
+	/// Asserts that the body of the given document matches that expected for the "simple-" test files.
+	/// @param document The document to test.
 	protected void assertSimpleBody(@NonNull final Document document) {
 		final Node body = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
 		final List<Element> bodyElements = getChildElements(body);
@@ -143,10 +137,8 @@ public class MarkdownPageMummifierTest {
 		assertThat(p.getTextContent(), is("Body text."));
 	}
 
-	/**
-	 * @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream)
-	 * @see #CODE_JAVASCRIPT_MARKDOWN_RESOURCE_NAME
-	 */
+	/// @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream)
+	/// @see #CODE_JAVASCRIPT_MARKDOWN_RESOURCE_NAME
 	@Test
 	public void testCodeMarkdownLanguage() throws IOException {
 		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
@@ -168,11 +160,9 @@ public class MarkdownPageMummifierTest {
 		assertThat(code.getAttributeNS(null, ATTRIBUTE_CLASS), is("language-javascript"));
 	}
 
-	/**
-	 * @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream)
-	 * @see #SIMPLE_MARKDOWN_RESOURCE_NAME
-	 * @see #assertSimpleBody(Document)
-	 */
+	/// @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream)
+	/// @see #SIMPLE_MARKDOWN_RESOURCE_NAME
+	/// @see #assertSimpleBody(Document)
 	@Test
 	public void testSimpleMarkdown() throws IOException {
 		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
@@ -184,11 +174,9 @@ public class MarkdownPageMummifierTest {
 		assertSimpleBody(document);
 	}
 
-	/**
-	 * @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream)
-	 * @see #SIMPLE_TITLE_MARKDOWN_RESOURCE_NAME
-	 * @see #assertSimpleBody(Document)
-	 */
+	/// @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream)
+	/// @see #SIMPLE_TITLE_MARKDOWN_RESOURCE_NAME
+	/// @see #assertSimpleBody(Document)
 	@Test
 	public void testSimpleMarkdownDocumentTitle() throws IOException {
 		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
@@ -200,11 +188,9 @@ public class MarkdownPageMummifierTest {
 		assertSimpleBody(document);
 	}
 
-	/**
-	 * @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream)
-	 * @see #SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME
-	 * @see #assertSimpleBody(Document)
-	 */
+	/// @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream)
+	/// @see #SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME
+	/// @see #assertSimpleBody(Document)
 	@Test
 	public void testSimpleMarkdownDocumentMetadata() throws IOException {
 		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
@@ -218,10 +204,8 @@ public class MarkdownPageMummifierTest {
 		assertSimpleBody(document);
 	}
 
-	/**
-	 * @see MarkdownPageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
-	 * @see #SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME
-	 */
+	/// @see MarkdownPageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
+	/// @see #SIMPLE_METADATA_MARKDOWN_RESOURCE_NAME
 	@Test
 	public void testSimpleMarkdownMetadata() throws IOException {
 		final MarkdownPageMummifier mummifier = new MarkdownPageMummifier();
@@ -238,13 +222,11 @@ public class MarkdownPageMummifierTest {
 		}
 	}
 
-	/**
-	 * Tests whether typographic conversions are appropriately being made, such as converting "---" to em dash "—".
-	 * @implSpec Currently typographic conversions are disabled altogether because the Flexmark Typographic Extension seems to be dropping characters altogether
-	 *           (e.g. the apostrophe). These tests will be updated and expanded if the Typographic Extension or something like it is re-enabled, but for now it
-	 *           verifies that certain characters previously modified by the TYpographic Extension are not being dropped.
-	 * @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream)
-	 */
+	/// Tests whether typographic conversions are appropriately being made, such as converting "---" to em dash "—".
+	/// @implSpec Currently typographic conversions are disabled altogether because the Flexmark Typographic Extension seems to be dropping characters altogether
+	///           (e.g. the apostrophe). These tests will be updated and expanded if the Typographic Extension or something like it is re-enabled, but for now it
+	///           verifies that certain characters previously modified by the TYpographic Extension are not being dropped.
+	/// @see MarkdownPageMummifier#loadSourceDocument(MummyContext, InputStream)
 	@Test
 	public void testTypographicConversions() throws IOException {
 		final String markdown = "it's working --- or not";

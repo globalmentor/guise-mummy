@@ -23,47 +23,41 @@ import java.util.regex.*;
 
 import org.jspecify.annotations.*;
 
-/**
- * Artifact that conceptually originates from a source path in a file system.
- * @apiNote The artifact's source file as returned by {@link #getSourcePath()} is not guaranteed to actually exist in the source tree. The artifact may load
- *          content from another source or even generate content. Thus to access the source content {@link CorporealSourceArtifact#openSource(MummyContext)}
- *          should be called rather than opening the source file directly.
- * @apiNote Eventually all information in {@link Artifact} related to a source path in a file system will be moved to this interface.
- * @author Garret Wilson
- */
+/// Artifact that conceptually originates from a source path in a file system.
+/// @apiNote The artifact's source file as returned by [#getSourcePath()] is not guaranteed to actually exist in the source tree. The artifact may load
+///          content from another source or even generate content. Thus to access the source content [CorporealSourceArtifact#openSource(MummyContext)]
+///          should be called rather than opening the source file directly.
+/// @apiNote Eventually all information in [Artifact] related to a source path in a file system will be moved to this interface.
+/// @author Garret Wilson
 public interface SourcePathArtifact extends Artifact {
 
-	/**
-	 * The pattern for matching a filename indicating a post, e.g. for a blog. Example: <code>@2021-01-23-foo-bar</code>.
-	 * @see #POST_FILENAME_PATTERN_DATE_GROUP
-	 * @see #POST_FILENAME_PATTERN_YEAR_GROUP
-	 * @see #POST_FILENAME_PATTERN_MONTH_GROUP
-	 * @see #POST_FILENAME_PATTERN_DAY_GROUP
-	 * @see #POST_FILENAME_PATTERN_FILENAME_GROUP
-	 * @see #POST_FILENAME_PATTERN_SLUG_GROUP
-	 * @see #POST_FILENAME_PATTERN_EXT_GROUP
-	 */
+	/// The pattern for matching a filename indicating a post, e.g. for a blog. Example: `@2021-01-23-foo-bar`.
+	/// @see #POST_FILENAME_PATTERN_DATE_GROUP
+	/// @see #POST_FILENAME_PATTERN_YEAR_GROUP
+	/// @see #POST_FILENAME_PATTERN_MONTH_GROUP
+	/// @see #POST_FILENAME_PATTERN_DAY_GROUP
+	/// @see #POST_FILENAME_PATTERN_FILENAME_GROUP
+	/// @see #POST_FILENAME_PATTERN_SLUG_GROUP
+	/// @see #POST_FILENAME_PATTERN_EXT_GROUP
 	public static final Pattern POST_FILENAME_PATTERN = Pattern.compile("@((\\d{4})-(\\d{2})-(\\d{2}))-(([^.]+)\\.(.+))");
-	/** The date matching group of the post filename pattern. */
+	/// The date matching group of the post filename pattern.
 	public static final int POST_FILENAME_PATTERN_DATE_GROUP = 1;
-	/** The year matching group of the post filename pattern. */
+	/// The year matching group of the post filename pattern.
 	public static final int POST_FILENAME_PATTERN_YEAR_GROUP = 2;
-	/** The month matching group of the post filename pattern. */
+	/// The month matching group of the post filename pattern.
 	public static final int POST_FILENAME_PATTERN_MONTH_GROUP = 3;
-	/** The day matching group of the post filename pattern. */
+	/// The day matching group of the post filename pattern.
 	public static final int POST_FILENAME_PATTERN_DAY_GROUP = 4;
-	/** The filename matching group of the post filename pattern. */
+	/// The filename matching group of the post filename pattern.
 	public static final int POST_FILENAME_PATTERN_FILENAME_GROUP = 5;
-	/** The slug matching group of the post filename pattern. */
+	/// The slug matching group of the post filename pattern.
 	public static final int POST_FILENAME_PATTERN_SLUG_GROUP = 6;
-	/** The extension matching group of the post filename pattern. */
+	/// The extension matching group of the post filename pattern.
 	public static final int POST_FILENAME_PATTERN_EXT_GROUP = 7;
 
-	/**
-	 * Determines whether a path has a filename recognized as a post.
-	 * @param path The path to check.
-	 * @return <code>true</code> if the path filename matches the {@link #POST_FILENAME_PATTERN}.
-	 */
+	/// Determines whether a path has a filename recognized as a post.
+	/// @param path The path to check.
+	/// @return `true` if the path filename matches the [#POST_FILENAME_PATTERN].
 	public static boolean hasPostFilename(@NonNull final Path path) {
 		return findFilename(path).map(POST_FILENAME_PATTERN::matcher).map(Matcher::matches).orElse(false);
 	}

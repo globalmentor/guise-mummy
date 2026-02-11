@@ -32,18 +32,14 @@ import com.github.npathai.hamcrestopt.OptionalMatchers;
 
 import io.guise.mummy.*;
 
-/**
- * Tests of {@link DirectoryMummifier}.
- * @author Garret Wilson
- */
+/// Tests of [DirectoryMummifier].
+/// @author Garret Wilson
 public class DirectoryMummifierTest {
 
-	/**
-	 * Ensures that directory mummifier planning returns an artifact containing the correct comprised artifacts (e.g. child artifacts, content artifact, etc.).
-	 * Specifically this chicks that the child artifacts do not include any content (e.g. <code>index.*</code>) file.
-	 * @param A temporary directory to serve as the project base directory for the planning test.
-	 * @see DirectoryMummifier#plan(MummyContext, Path, Path)
-	 */
+	/// Ensures that directory mummifier planning returns an artifact containing the correct comprised artifacts (e.g. child artifacts, content artifact, etc.).
+	/// Specifically this chicks that the child artifacts do not include any content (e.g. `index.*`) file.
+	/// @param A temporary directory to serve as the project base directory for the planning test.
+	/// @see DirectoryMummifier#plan(MummyContext, Path, Path)
 	@Test
 	void verifyPlannedComprisedArtifacts(@TempDir final Path tempDir) throws IOException {
 		final GuiseProject project = new DefaultGuiseProject(tempDir);

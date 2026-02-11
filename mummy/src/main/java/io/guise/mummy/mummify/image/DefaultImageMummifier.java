@@ -50,56 +50,44 @@ import io.guise.mummy.*;
 import io.urf.model.UrfResourceDescription;
 import io.urf.vocab.content.Content;
 
-/**
- * General image mummifier.
- * @implSpec This implementation supports GIF, JPEG, and PNG files. Reading metadata is supported from XMP, IPTC, and Exif. When processing an image, all image
- *           metadata will be discarded; a small subset of normalized Exif metadata will then be added back, but only for JPEG images. This subset will include
- *           the Guise software information from {@link MummyContext#getMummifierIdentification()}.
- * @implSpec This implementation supports configured image aspects.
- * @implSpec This implementation uses <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/javax/imageio/package-summary.html">Java Image
- *           I/O</a> for image processing.
- * @implSpec This implementation uses <a href="https://commons.apache.org/proper/commons-imaging/">Apache Commons Imaging</a> for adding Exif image metadata.
- * @implSpec This mummifier orchestrates mummification of any aspectual image artifacts, and generation of aspects is determined wholly by whether the main
- *           image artifact is being generated.
- * @author Garret Wilson
- */
+/// General image mummifier.
+/// @implSpec This implementation supports GIF, JPEG, and PNG files. Reading metadata is supported from XMP, IPTC, and Exif. When processing an image, all image
+///           metadata will be discarded; a small subset of normalized Exif metadata will then be added back, but only for JPEG images. This subset will include
+///           the Guise software information from [MummyContext#getMummifierIdentification()].
+/// @implSpec This implementation supports configured image aspects.
+/// @implSpec This implementation uses [Java Image I/O](https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/javax/imageio/package-summary.html)
+///           for image processing.
+/// @implSpec This implementation uses [Apache Commons Imaging](https://commons.apache.org/proper/commons-imaging/) for adding Exif image metadata.
+/// @implSpec This mummifier orchestrates mummification of any aspectual image artifacts, and generation of aspects is determined wholly by whether the main
+///           image artifact is being generated.
+/// @author Garret Wilson
 public class DefaultImageMummifier extends BaseImageMummifier {
 
-	/**
-	 * The default image aspect IDs.
-	 * @see #CONFIG_KEY_MUMMY_IMAGE_WITH_ASPECTS
-	 */
+	/// The default image aspect IDs.
+	/// @see #CONFIG_KEY_MUMMY_IMAGE_WITH_ASPECTS
 	public static final Set<String> DEFAULT_ASPECT_IDS = emptySet();
 
-	/**
-	 * The default image compression quality.
-	 * @see #CONFIG_KEY_MUMMY_IMAGE_COMPRESSION_QUALITY
-	 */
+	/// The default image compression quality.
+	/// @see #CONFIG_KEY_MUMMY_IMAGE_COMPRESSION_QUALITY
 	public static final double DEFAULT_COMPRESSION_QUALITY = 0.8;
 
-	/**
-	 * The default maximum length for scaling images.
-	 * @see #CONFIG_KEY_MUMMY_IMAGE_SCALE_MAX_LENGTH
-	 */
+	/// The default maximum length for scaling images.
+	/// @see #CONFIG_KEY_MUMMY_IMAGE_SCALE_MAX_LENGTH
 	public static final int DEFAULT_SCALE_MAX_LENGTH = 1920;
 
-	/**
-	 * The default threshold file size for image processing.
-	 * @see #CONFIG_KEY_MUMMY_IMAGE_PROCESS_THRESHOLD_FILE_SIZE
-	 */
+	/// The default threshold file size for image processing.
+	/// @see #CONFIG_KEY_MUMMY_IMAGE_PROCESS_THRESHOLD_FILE_SIZE
 	public static final long DEFAULT_SCALE_THRESHOLD_FILE_SIZE = 800_000;
 
-	/** No-args constructor. */
+	/// No-args constructor.
 	public DefaultImageMummifier() {
 		super(Set.of(GIF_MEDIA_TYPE, JPEG_MEDIA_TYPE, PNG_MEDIA_TYPE));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec If the file size threshold for image processing is passed, this implementation creates an aspectual artifact with configured aspects (e.g.
-	 *           <code>"preview"</code>).
-	 * @see ImageMummifier#CONFIG_KEY_MUMMY_IMAGE_WITH_ASPECTS
-	 */
+	/// {@inheritDoc}
+	/// @implSpec If the file size threshold for image processing is passed, this implementation creates an aspectual artifact with configured aspects (e.g.
+	///           `"preview"`).
+	/// @see ImageMummifier#CONFIG_KEY_MUMMY_IMAGE_WITH_ASPECTS
 	@Override
 	protected Artifact createArtifact(final MummyContext context, final Path sourceFile, final Path outputFile, final UrfResourceDescription description)
 			throws IOException {
@@ -112,14 +100,12 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 		return super.createArtifact(context, sourceFile, outputFile, description);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation scales the image in an attempt to reduce the file size if the file size is above a certain threshold.
-	 * @implSpec This implementation delegates to {@link #processImage(MummyContext, Artifact, InputStream, OutputStream, boolean)} for scaling.
-	 * @implSpec This implementation delegates to
-	 *           {@link #addImageMetadata(org.apache.commons.imaging.common.bytesource.ByteSource, OutputStream, UrfResourceDescription, boolean, String, Instant)}
-	 *           to add metadata to the image after processing.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation scales the image in an attempt to reduce the file size if the file size is above a certain threshold.
+	/// @implSpec This implementation delegates to [#processImage(MummyContext, Artifact, InputStream, OutputStream, boolean)] for scaling.
+	/// @implSpec This implementation delegates to
+	///           [#addImageMetadata(org.apache.commons.imaging.common.bytesource.ByteSource, OutputStream, UrfResourceDescription, boolean, String, Instant)]
+	///           to add metadata to the image after processing.
 	@Override
 	public void mummifyFile(final MummyContext context, final CorporealSourceArtifact artifact) throws IOException {
 		final long imageScaleThresholdSize = context.getConfiguration().findLong(CONFIG_KEY_MUMMY_IMAGE_PROCESS_THRESHOLD_FILE_SIZE)
@@ -167,23 +153,21 @@ public class DefaultImageMummifier extends BaseImageMummifier {
 		}
 	}
 
-	/**
-	 * Processes an image from the given input stream and writes the processed image to the given output stream. Image aspect are recognized and processed
-	 * accordingly.
-	 * @implSpec This implementation scales an image using the AWT to draw on a scaled image using bicubic interpolation and quality-biased rendering.
-	 * @implSpec This implementation preserves no metadata.
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact being generated.
-	 * @param inputStream The input stream for reading the source image.
-	 * @param outputStream The output stream for writing the target image.
-	 * @param keepMetadata <code>true</code> if the metadata in the original image should be maintained, or <code>false</code> if all metadata should be discarded
-	 *          during processing.
-	 * @throws IOException if there is an I/O error during image processing.
-	 * @see <a href="http://www.hanhuy.com/pfn/java-image-thumbnail-comparison">A comparison of Java image thumbnailing techniques</a>
-	 * @see <a href="https://www.universalwebservices.net/web-programming-resources/java/adjust-jpeg-image-compression-quality-when-saving-images-in-java/">Adjust
-	 *      JPEG image compression quality when saving images in Java</a>
-	 * @see AspectualArtifact#PROPERTY_TAG_MUMMY_ASPECT
-	 */
+	/// Processes an image from the given input stream and writes the processed image to the given output stream. Image aspect are recognized and processed
+	/// accordingly.
+	/// @implSpec This implementation scales an image using the AWT to draw on a scaled image using bicubic interpolation and quality-biased rendering.
+	/// @implSpec This implementation preserves no metadata.
+	/// @param context The context of static site generation.
+	/// @param artifact The artifact being generated.
+	/// @param inputStream The input stream for reading the source image.
+	/// @param outputStream The output stream for writing the target image.
+	/// @param keepMetadata `true` if the metadata in the original image should be maintained, or `false` if all metadata should be discarded
+	///          during processing.
+	/// @throws IOException if there is an I/O error during image processing.
+	/// @see <a href="http://www.hanhuy.com/pfn/java-image-thumbnail-comparison">A comparison of Java image thumbnailing techniques</a>
+	/// @see <a href="https://www.universalwebservices.net/web-programming-resources/java/adjust-jpeg-image-compression-quality-when-saving-images-in-java/">Adjust
+	///      JPEG image compression quality when saving images in Java</a>
+	/// @see AspectualArtifact#PROPERTY_TAG_MUMMY_ASPECT
 	protected void processImage(@NonNull final MummyContext context, @NonNull Artifact artifact, final InputStream inputStream, final OutputStream outputStream,
 			final boolean keepMetadata) throws IOException {
 		final Optional<String> foundAspect = artifact.getResourceDescription().findPropertyValue(AspectualArtifact.PROPERTY_TAG_MUMMY_ASPECT).map(Object::toString);

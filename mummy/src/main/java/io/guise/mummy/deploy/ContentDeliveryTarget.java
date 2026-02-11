@@ -23,27 +23,21 @@ import org.jspecify.annotations.*;
 import io.confound.config.ConfigurationException;
 import io.guise.mummy.MummyContext;
 
-/**
- * A deploy target that distributes content to another location. A typical example is a content delivery network (CDN).
- * @author Garret Wilson
- */
+/// A deploy target that distributes content to another location. A typical example is a content delivery network (CDN).
+/// @author Garret Wilson
 public interface ContentDeliveryTarget extends DeployTarget {
 
-	/**
-	 * Returns all the possible user agent identifications this content delivery target might use when retrieving content from the origin target.
-	 * @apiNote Each of these identification strings is usually used as a value of the <code>User-Agent</code> HTTP header.
-	 * @return The set of user agent identifiers, if any, any of which this target may use when retrieving content from the origin.
-	 */
+	/// Returns all the possible user agent identifications this content delivery target might use when retrieving content from the origin target.
+	/// @apiNote Each of these identification strings is usually used as a value of the `User-Agent` HTTP header.
+	/// @return The set of user agent identifiers, if any, any of which this target may use when retrieving content from the origin.
 	public Set<String> getUserAgentIdentifications();
 
-	/**
-	 * Determines the deploy target this target will use for its origin content. The returned deploy target will be one of the deploy target instances recognized
-	 * by the given context.
-	 * @param context The context of static site generation.
-	 * @return The deploy target this target uses for its origin content.
-	 * @throws ConfigurationException if the origin target cannot be determined.
-	 * @see MummyContext#getDeployTargets()
-	 */
+	/// Determines the deploy target this target will use for its origin content. The returned deploy target will be one of the deploy target instances recognized
+	/// by the given context.
+	/// @param context The context of static site generation.
+	/// @return The deploy target this target uses for its origin content.
+	/// @throws ConfigurationException if the origin target cannot be determined.
+	/// @see MummyContext#getDeployTargets()
 	public DeployTarget getOriginTarget(@NonNull final MummyContext context) throws ConfigurationException;
 
 }

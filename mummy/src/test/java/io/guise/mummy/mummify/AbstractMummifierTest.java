@@ -28,19 +28,15 @@ import org.junit.jupiter.api.*;
 import io.guise.mummy.Artifact;
 import io.urf.URF;
 
-/**
- * Tests of {@link AbstractMummifier}.
- * @author Garret Wilson
- */
+/// Tests of [AbstractMummifier].
+/// @author Garret Wilson
 public class AbstractMummifierTest {
 
 	//ad-hoc namespace
 
-	/**
-	 * @implNote Because the matched name is assumed to be a valid URF name, no checks are performed for strings such as <code>published-On</code>, which would
-	 *           match the pattern but would never appear as an URF name.
-	 * @see AbstractMummifier#AD_HOC_PROPERTY_LOCAL_DATE_NAME_PATTERN
-	 */
+	/// @implNote Because the matched name is assumed to be a valid URF name, no checks are performed for strings such as `published-On`, which would
+	///           match the pattern but would never appear as an URF name.
+	/// @see AbstractMummifier#AD_HOC_PROPERTY_LOCAL_DATE_NAME_PATTERN
 	@Test
 	public void testAdHocPropertyLocalDateNamePattern() {
 		assertThat(AbstractMummifier.AD_HOC_PROPERTY_LOCAL_DATE_NAME_PATTERN.matcher("").matches(), is(false));
@@ -59,17 +55,15 @@ public class AbstractMummifierTest {
 		assertThat(AbstractMummifier.AD_HOC_PROPERTY_LOCAL_DATE_NAME_PATTERN.matcher("fromoAtoZOn").matches(), is(true));
 	}
 
-	/** @see AbstractMummifier#parseMetadataPropertyValue(URI, CharSequence) */
+	/// @see AbstractMummifier#parseMetadataPropertyValue(URI, CharSequence)
 	@Test
 	public void testParseMetadataPropertyValueReturnsStringByDefault() {
 		assertThat(AbstractMummifier.parseMetadataPropertyValue(URF.Handle.toTag("foo"), "bar"), is("bar"));
 		assertThat(AbstractMummifier.parseMetadataPropertyValue(URF.Handle.toTag("foo"), new StringBuilder("bar")), is("bar"));
 	}
 
-	/**
-	 * @see AbstractMummifier#parseMetadataPropertyValue(URI, CharSequence)
-	 * @see AbstractMummifier#AD_HOC_PROPERTY_LOCAL_DATE_NAME_PATTERN
-	 */
+	/// @see AbstractMummifier#parseMetadataPropertyValue(URI, CharSequence)
+	/// @see AbstractMummifier#AD_HOC_PROPERTY_LOCAL_DATE_NAME_PATTERN
 	@Test
 	public void testParseMetadataPropertyValueAdHocLocalDate() {
 		assertThat(AbstractMummifier.parseMetadataPropertyValue(URF.Handle.toTag("publishedOn"), "2001-02-03"), is(LocalDate.of(2001, 2, 3)));
@@ -77,10 +71,8 @@ public class AbstractMummifierTest {
 
 	//mummy/ namespace
 
-	/**
-	 * @see AbstractMummifier#parseMetadataPropertyValue(URI, CharSequence)
-	 * @see Artifact#PROPERTY_TAG_MUMMY_ORDER
-	 */
+	/// @see AbstractMummifier#parseMetadataPropertyValue(URI, CharSequence)
+	/// @see Artifact#PROPERTY_TAG_MUMMY_ORDER
 	@Test
 	public void testParseMetadataPropertyValueMummyOrder() {
 		assertThat(AbstractMummifier.parseMetadataPropertyValue(Artifact.PROPERTY_TAG_MUMMY_ORDER, "0"), is(0L));

@@ -30,13 +30,11 @@ import org.junit.jupiter.api.*;
 import io.guise.mummy.mummify.*;
 import io.guise.mummy.mummify.collection.DirectoryArtifact;
 
-/**
- * Tests of {@link DefaultMummyPlan}.
- * @author Garret Wilson
- */
+/// Tests of [DefaultMummyPlan].
+/// @author Garret Wilson
 public class DefaultMummyPlanTest {
 
-	/** @see MummyPlan#getPrincipalArtifact(Artifact) */
+	/// @see MummyPlan#getPrincipalArtifact(Artifact)
 	@Test
 	void testGetPrincipalArtifact() {
 		final Path sourceDirectory = getTempDirectory().resolve("source"); //used only for identification; no I/O
@@ -51,7 +49,7 @@ public class DefaultMummyPlanTest {
 		assertThat("Child artifact is its own principal artifact.", plan.getPrincipalArtifact(childArtifact), is(childArtifact));
 	}
 
-	/** @see MummyPlan#findArtifactBySourceReference(Path) */
+	/// @see MummyPlan#findArtifactBySourceReference(Path)
 	@Test
 	void testFindArtifactBySourceReferenceForSubsumedArtifact() {
 		final Path sourceDirectory = getTempDirectory().resolve("source"); //used only for identification; no I/O
@@ -73,7 +71,7 @@ public class DefaultMummyPlanTest {
 				plan.findArtifactBySourceReference(sourceSubdirectory.resolve("index.html")), isPresentAndIs(subdirectoryArtifact));
 	}
 
-	/** @see MummyPlan#findParentArtifact(Artifact) */
+	/// @see MummyPlan#findParentArtifact(Artifact)
 	@Test
 	void testFindParentArtifact() {
 		final Path sourceDirectory = getTempDirectory().resolve("source"); //used only for identification; no I/O

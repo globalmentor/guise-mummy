@@ -27,34 +27,27 @@ import com.globalmentor.xml.def.NsName;
 import io.guise.mummy.*;
 import io.guise.mummy.mummify.page.PageMummifier;
 
-/**
- * A Guise Mummy widget that can be placed on a page.
- * @apiNote A widget expects to process an XHTML DOM tree, regardless of the original format of the page.
- * @author Garret Wilson
- */
+/// A Guise Mummy widget that can be placed on a page.
+/// @apiNote A widget expects to process an XHTML DOM tree, regardless of the original format of the page.
+/// @author Garret Wilson
 public interface Widget {
 
-	/**
-	 * Returns the identification of the XHTML element representing the widget in the source tree.
-	 * @return The identification of the XHTML element representing the widget in the source tree.
-	 */
+	/// Returns the identification of the XHTML element representing the widget in the source tree.
+	/// @return The identification of the XHTML element representing the widget in the source tree.
 	public NsName getWidgetElementName();
 
-	/**
-	 * Processes a source XHTML element to generate content for the widget.
-	 * <p>
-	 * The given widget element will be replaced in the document tree with the returned element(s). If only the same element is returned, no replacement is made.
-	 * If no element is returned, the source element is removed.
-	 * </p>
-	 * @param mummifier The mummifier processing the page on which this widget appears.
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact being generated.
-	 * @param widgetElement The list element to regenerate.
-	 * @return The processed element(s), if any, to replace the widget source element.
-	 * @throws IOException if there is an I/O error processing the element.
-	 * @throws MummifyWidgetException if the information in the widget element is not appropriate for the widget.
-	 * @throws DOMException if there is some error manipulating the XML document object model.
-	 */
+	/// Processes a source XHTML element to generate content for the widget.
+	///
+	/// The given widget element will be replaced in the document tree with the returned element(s). If only the same element is returned, no replacement is made.
+	/// If no element is returned, the source element is removed.
+	/// @param mummifier The mummifier processing the page on which this widget appears.
+	/// @param context The context of static site generation.
+	/// @param artifact The artifact being generated.
+	/// @param widgetElement The list element to regenerate.
+	/// @return The processed element(s), if any, to replace the widget source element.
+	/// @throws IOException if there is an I/O error processing the element.
+	/// @throws MummifyWidgetException if the information in the widget element is not appropriate for the widget.
+	/// @throws DOMException if there is some error manipulating the XML document object model.
 	public List<Element> processElement(@NonNull PageMummifier mummifier, @NonNull MummyContext context, @NonNull Artifact artifact,
 			@NonNull Element widgetElement) throws IOException, MummifyWidgetException, DOMException;
 

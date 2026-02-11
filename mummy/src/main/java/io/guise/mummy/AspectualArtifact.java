@@ -20,33 +20,25 @@ import java.util.*;
 
 import org.jspecify.annotations.*;
 
-/**
- * An artifact potentially containing other <dfn>aspects</dfn> such as a preview image, an abridged book, or sound excerpt.
- * @author Garret Wilson
- */
+/// An artifact potentially containing other *aspects* such as a preview image, an abridged book, or sound excerpt.
+/// @author Garret Wilson
 public interface AspectualArtifact extends CompositeArtifact {
 
-	/**
-	 * Returns all the aspects of this artifact.
-	 * @return The artifacts representing aspects of this artifact.
-	 */
+	/// Returns all the aspects of this artifact.
+	/// @return The artifacts representing aspects of this artifact.
 	public Collection<Artifact> getAspects();
 
-	/**
-	 * Finds an aspect by its ID.
-	 * @param aspectId The ID of the aspect to return.
-	 * @return The identified aspect, if one is found.
-	 */
+	/// Finds an aspect by its ID.
+	/// @param aspectId The ID of the aspect to return.
+	/// @return The identified aspect, if one is found.
 	public Optional<Artifact> findAspect(@NonNull final String aspectId);
 
-	/**
-	 * Retrieves an aspect by its ID.
-	 * @apiNote This method is provided primarily for MEXL expression and may be removed when MEXL has native support for {@link Optional} and the
-	 *          <code>findXXX()</code> pattern.
-	 * @implSpec The default implementation delegates to {@link #findAspect(String)}.
-	 * @param aspectId The ID of the aspect to return.
-	 * @return The identified aspect, or <code>null</code> if no aspect with that ID is found.
-	 */
+	/// Retrieves an aspect by its ID.
+	/// @apiNote This method is provided primarily for MEXL expression and may be removed when MEXL has native support for [Optional] and the
+	///          `findXXX()` pattern.
+	/// @implSpec The default implementation delegates to [#findAspect(String)].
+	/// @param aspectId The ID of the aspect to return.
+	/// @return The identified aspect, or `null` if no aspect with that ID is found.
 	public default Artifact aspect(@NonNull final String aspectId) {
 		return findAspect(aspectId).orElse(null);
 	}

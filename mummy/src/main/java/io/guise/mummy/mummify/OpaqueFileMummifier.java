@@ -30,14 +30,12 @@ import com.globalmentor.net.MediaType;
 
 import io.guise.mummy.*;
 
-/**
- * Mummifier for files with unknown content.
- * @implSpec This implementation merely copies the file during mummification with no further action. Any existing target file will be replaced.
- * @author Garret Wilson
- */
+/// Mummifier for files with unknown content.
+/// @implSpec This implementation merely copies the file during mummification with no further action. Any existing target file will be replaced.
+/// @author Garret Wilson
 public class OpaqueFileMummifier extends AbstractFileMummifier {
 
-	/** Constructor. */
+	/// Constructor.
 	public OpaqueFileMummifier() {
 	}
 
@@ -46,28 +44,22 @@ public class OpaqueFileMummifier extends AbstractFileMummifier {
 		return emptySet();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version returns no media type, because no media type is known for opaque files.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This version returns no media type, because no media type is known for opaque files.
 	@Override
 	public Optional<MediaType> getArtifactMediaType(final MummyContext context, final Path sourcePath) throws IOException {
 		return Optional.empty();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation returns an empty list, as there is no way to know source metadata of an opaque file.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation returns an empty list, as there is no way to know source metadata of an opaque file.
 	@Override
 	protected List<Entry<URI, Object>> loadSourceMetadata(MummyContext context, Path sourceFile) throws IOException {
 		return emptyList();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation merely copies the file with no further action.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation merely copies the file with no further action.
 	@Override
 	public void mummifyFile(final MummyContext context, final CorporealSourceArtifact artifact) throws IOException {
 		final Path sourceFile = artifact.getSourcePath();

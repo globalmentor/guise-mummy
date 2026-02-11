@@ -48,25 +48,23 @@ import io.guise.mummy.mummify.page.*;
 import io.urf.model.*;
 import io.urf.vocab.content.Content;
 
-/**
- * Mummifier for directories.
- * @implSpec This mummifier only works with instances of {@link DirectoryArtifact}.
- * @implSpec Currently directory artifacts do not themselves have target descriptions, but rather rely on the target descriptions of any content file.
- * @implSpec This implementation recognizes posts and gives them a target subdirectory structure appropriately based upon
- *           {@link SourcePathArtifact#POST_FILENAME_PATTERN}.
- * @implNote Although the current implementation creates a default phantom content file if one is not present, this implementation will work without a known
- *           content file. This enables future implementations to allow configuration of whether a default content file is used.
- * @implNote This implementation does not have a means for determining if a phantom content file (currently hard-coded in {@link SimpleGeneratedXhtmlArtifact})
- *           or its description (loaded from {@link #getArtifactSourceDescriptionFile(MummyContext, Path)}) has changed; therefore the target description file
- *           for a phantom content file is always written.
- * @implNote This implementation does not currently generate a target description file using {@link #getArtifactTargetDescriptionFile(MummyContext, Artifact)}
- *           or {@link #getArtifactTargetDescriptionFile(MummyContext, Path)}, relying instead on the description file for the content file, if any.
- * @author Garret Wilson
- * @see DirectoryArtifact
- */
+/// Mummifier for directories.
+/// @implSpec This mummifier only works with instances of [DirectoryArtifact].
+/// @implSpec Currently directory artifacts do not themselves have target descriptions, but rather rely on the target descriptions of any content file.
+/// @implSpec This implementation recognizes posts and gives them a target subdirectory structure appropriately based upon
+///           [SourcePathArtifact#POST_FILENAME_PATTERN].
+/// @implNote Although the current implementation creates a default phantom content file if one is not present, this implementation will work without a known
+///           content file. This enables future implementations to allow configuration of whether a default content file is used.
+/// @implNote This implementation does not have a means for determining if a phantom content file (currently hard-coded in [SimpleGeneratedXhtmlArtifact])
+///           or its description (loaded from [#getArtifactSourceDescriptionFile(MummyContext, Path)]) has changed; therefore the target description file
+///           for a phantom content file is always written.
+/// @implNote This implementation does not currently generate a target description file using [#getArtifactTargetDescriptionFile(MummyContext, Artifact)]
+///           or [#getArtifactTargetDescriptionFile(MummyContext, Path)], relying instead on the description file for the content file, if any.
+/// @author Garret Wilson
+/// @see DirectoryArtifact
 public class DirectoryMummifier extends AbstractSourcePathMummifier {
 
-	/** Constructor. */
+	/// Constructor.
 	public DirectoryMummifier() {
 	}
 
@@ -75,55 +73,45 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		return emptySet();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec Directories have no media types of their own, so this version returns no media type.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec Directories have no media types of their own, so this version returns no media type.
 	@Override
 	public Optional<MediaType> getArtifactMediaType(final MummyContext context, final Path sourcePath) throws IOException {
 		return Optional.empty();
 	}
 
-	/**
-	 * Attempts to discover a "content file" for a source directory, serving as the default content page for the directory.
-	 * @apiNote Normally this would be <code>index.xhtml</code> or some other "index" file.
-	 * @param context The context of static site generation.
-	 * @param sourceDirectory The source directory to be mummified.
-	 * @return The path of a source file, if any, to be used as the directory content file.
-	 * @see GuiseMummy#CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES
-	 */
+	/// Attempts to discover a "content file" for a source directory, serving as the default content page for the directory.
+	/// @apiNote Normally this would be `index.xhtml` or some other "index" file.
+	/// @param context The context of static site generation.
+	/// @param sourceDirectory The source directory to be mummified.
+	/// @return The path of a source file, if any, to be used as the directory content file.
+	/// @see GuiseMummy#CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES
 	protected Optional<Path> discoverSourceDirectoryContentFile(@NonNull MummyContext context, @NonNull final Path sourceDirectory) {
 		return context.getConfiguration().getCollection(CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES, String.class).stream() //look at each base name
 				.flatMap(throwingFunction(baseName -> context.findPageSourceFile(sourceDirectory, baseName).stream())) //try to find a page source file for that name
 				.map(Map.Entry::getKey).findFirst(); //for the first one found, return its path
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation returns the {@link Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION} itself as the filename but in the form of a dotfile, inside
-	 *           the directory being mummified.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation returns the [Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION] itself as the filename but in the form of a dotfile, inside
+	///           the directory being mummified.
 	@Override
 	protected Path getArtifactSourceDescriptionFile(final MummyContext context, final Path sourceDirectory) {
 		return sourceDirectory.resolve(DOTFILE_PREFIX + DESCRIPTION_FILE_SIDECAR_EXTENSION);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation returns the {@link Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION} itself as the filename, inside the target path but in the
-	 *           {@link MummyContext#getSiteDescriptionTargetDirectory()} directory.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation returns the [Mummifier#DESCRIPTION_FILE_SIDECAR_EXTENSION] itself as the filename, inside the target path but in the
+	///           [MummyContext#getSiteDescriptionTargetDirectory()] directory.
 	@Override
 	protected Path getArtifactTargetDescriptionFile(final MummyContext context, final Path targetDirectory) {
 		return changeBase(targetDirectory, context.getSiteTargetDirectory(), context.getSiteDescriptionTargetDirectory())
 				.resolve(DESCRIPTION_FILE_SIDECAR_EXTENSION);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation recursively discovers and describes an artifacts for all its children.
-	 * @see GuiseMummy#CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation recursively discovers and describes an artifacts for all its children.
+	/// @see GuiseMummy#CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES
 	@Override
 	public DirectoryArtifact plan(final MummyContext context, final Path sourceDirectory, final Path targetDirectory) throws IOException {
 		checkArgumentDirectory(sourceDirectory);
@@ -201,33 +189,29 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		return new DirectoryArtifact(this, sourceDirectory, targetDirectory, contentArtifact, childArtifacts);
 	}
 
-	/**
-	 * Indicates whether the given source path is an <dfn>asset</dfn> for which no page should be generated. Ancestor paths are not checked.
-	 * @implSpec This implementation delegates to {@link #isAssetSourcePath(MummyContext, Path, boolean)} without checking for ancestors.
-	 * @param context The context of static site generation.
-	 * @param sourcePath The source path to check.
-	 * @return <code>true</code> if the source path is an asset.
-	 * @see GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN
-	 * @deprecated To be deleted if not needed
-	 */
+	/// Indicates whether the given source path is an *asset* for which no page should be generated. Ancestor paths are not checked.
+	/// @implSpec This implementation delegates to [#isAssetSourcePath(MummyContext, Path, boolean)] without checking for ancestors.
+	/// @param context The context of static site generation.
+	/// @param sourcePath The source path to check.
+	/// @return `true` if the source path is an asset.
+	/// @see GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN
+	/// @deprecated To be deleted if not needed
 	@Deprecated
 	protected boolean isAssetSourcePath(@NonNull final MummyContext context, @NonNull final Path sourcePath) {
 		return isAssetSourcePath(context, sourcePath, false);
 	}
 
-	/**
-	 * Indicates whether the given source path is an <dfn>asset</dfn> for which no page should be generated.
-	 * @implSpec This implementation considers an asset any source path the source filename of which, or if <var>checkAncestors</var> is enabled the filename of
-	 *           any parent source directory of which (within the site), matches the pattern configured under the
-	 *           {@value GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN} key. For example with a pattern of <code>/\$(.+)/</code>, both
-	 *           <code>…/$foo/bar.txt</code> and <code>…/foo/$bar.txt</code> would be considered assets.
-	 * @param context The context of static site generation.
-	 * @param sourcePath The source path to check.
-	 * @param checkAncestors Indicates whether parent paths should also be checked, up to the site source path.
-	 * @return <code>true</code> if the source path is an asset.
-	 * @throws IllegalArgumentException if the given source path is not inside the site source directory when checking ancestors.
-	 * @see GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN
-	 */
+	/// Indicates whether the given source path is an *asset* for which no page should be generated.
+	/// @implSpec This implementation considers an asset any source path the source filename of which, or if *checkAncestors* is enabled the filename of
+	///           any parent source directory of which (within the site), matches the pattern configured under the
+	///           `mummy-asset-name-pattern` key. For example with a pattern of `/\$(.+)/`, both
+	///           `…/$foo/bar.txt` and `…/foo/$bar.txt` would be considered assets.
+	/// @param context The context of static site generation.
+	/// @param sourcePath The source path to check.
+	/// @param checkAncestors Indicates whether parent paths should also be checked, up to the site source path.
+	/// @return `true` if the source path is an asset.
+	/// @throws IllegalArgumentException if the given source path is not inside the site source directory when checking ancestors.
+	/// @see GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN
 	protected boolean isAssetSourcePath(@NonNull final MummyContext context, @NonNull final Path sourcePath, final boolean checkAncestors) {
 		final Pattern assetNamePattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN, Pattern.class);
 		final Path siteSourceDirectory = context.getSiteSourceDirectory();
@@ -249,42 +233,38 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		return false;
 	}
 
-	/**
-	 * Indicates whether the given source name is an <dfn>asset</dfn> for which no page should be generated.
-	 * @param context The context of static site generation.
-	 * @param sourceName The source name to check.
-	 * @return <code>true</code> if the source name is an asset.
-	 * @see GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN
-	 * @deprecated To be deleted if not needed
-	 */
+	/// Indicates whether the given source name is an *asset* for which no page should be generated.
+	/// @param context The context of static site generation.
+	/// @param sourceName The source name to check.
+	/// @return `true` if the source name is an asset.
+	/// @see GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN
+	/// @deprecated To be deleted if not needed
 	@Deprecated
 	protected boolean isAssetSourceName(@NonNull final MummyContext context, @NonNull final String sourceName) {
 		final Pattern assetNamePattern = context.getConfiguration().getObject(CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN, Pattern.class);
 		return assetNamePattern.matcher(sourceName).matches();
 	}
 
-	/**
-	 * Determines the output path for an artifact in the site target directory based upon the source path in the site source directory.
-	 * @implSpec This implementation recognizes posts and adds an appropriate subdirectory structure for them in the target tree path.
-	 * @implSpec This version recognizes asset artifacts and renames them as necessary according to the asset name pattern configured with the key
-	 *           {@value GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN}, both for files and for directories. If the source directory is in an asset tree, or if
-	 *           the child filename itself indicates an asset, no hierarchy-related filename changes (e.g. unveiling or post renaming) will be made, except an
-	 *           asset in a non-asset tree will be renamed.
-	 * @implSpec This version recognizes veiled artifacts and renames ("unveils") them as necessary according to the veil name pattern configured with the key
-	 *           {@value GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN}, both for files and for directories.
-	 * @implSpec This implementation delegates to {@link Mummifier#planArtifactTargetFilename(MummyContext, String)} to finalize the filename being used.
-	 * @param context The context of static site generation.
-	 * @param targetDirectory The target directory of the main artifact this mummifier is mummifying.
-	 * @param childSourceFilename A suggested filename; normally the filename of the child file or directory.
-	 * @param childMummifier The mummifier that will be used to create the artifact.
-	 * @param isAssetSourceDirectoryTree Whether the source directory is an asset or is in an asset tree.
-	 * @return The path in the site target directory to which the child artifact should be generated.
-	 * @throws ConfigurationException if the given veil name pattern specifies more than one matching group.
-	 * @see Mummifier#planArtifactTargetFilename(MummyContext, String)
-	 * @see SourcePathArtifact#POST_FILENAME_PATTERN
-	 * @see GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN
-	 * @see GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN
-	 */
+	/// Determines the output path for an artifact in the site target directory based upon the source path in the site source directory.
+	/// @implSpec This implementation recognizes posts and adds an appropriate subdirectory structure for them in the target tree path.
+	/// @implSpec This version recognizes asset artifacts and renames them as necessary according to the asset name pattern configured with the key
+	///           `mummy-asset-name-pattern`, both for files and for directories. If the source directory is in an asset tree, or if
+	///           the child filename itself indicates an asset, no hierarchy-related filename changes (e.g. unveiling or post renaming) will be made, except an
+	///           asset in a non-asset tree will be renamed.
+	/// @implSpec This version recognizes veiled artifacts and renames ("unveils") them as necessary according to the veil name pattern configured with the key
+	///           `mummy-veil-name-pattern`, both for files and for directories.
+	/// @implSpec This implementation delegates to [Mummifier#planArtifactTargetFilename(MummyContext, String)] to finalize the filename being used.
+	/// @param context The context of static site generation.
+	/// @param targetDirectory The target directory of the main artifact this mummifier is mummifying.
+	/// @param childSourceFilename A suggested filename; normally the filename of the child file or directory.
+	/// @param childMummifier The mummifier that will be used to create the artifact.
+	/// @param isAssetSourceDirectoryTree Whether the source directory is an asset or is in an asset tree.
+	/// @return The path in the site target directory to which the child artifact should be generated.
+	/// @throws ConfigurationException if the given veil name pattern specifies more than one matching group.
+	/// @see Mummifier#planArtifactTargetFilename(MummyContext, String)
+	/// @see SourcePathArtifact#POST_FILENAME_PATTERN
+	/// @see GuiseMummy#CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN
+	/// @see GuiseMummy#CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN
 	protected Path planChildArtifactTargetPath(@NonNull final MummyContext context, @NonNull Path targetDirectory, @NonNull final String childSourceFilename,
 			@NonNull final Mummifier childMummifier, final boolean isAssetSourceDirectoryTree) {
 		//both the target directory and the child target filename will change as it gets processed
@@ -343,10 +323,8 @@ public class DirectoryMummifier extends AbstractSourcePathMummifier {
 		return targetDirectory.resolve(childTargetFilename);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation saves the description description if modified by calling {@link #saveTargetDescription(MummyContext, Artifact)}.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation saves the description description if modified by calling [#saveTargetDescription(MummyContext, Artifact)].
 	@Override
 	public void mummify(final MummyContext context, final Artifact artifact) throws IOException {
 		checkArgument(artifact instanceof DirectoryArtifact, "Artifact %s is not a directory artifact.");

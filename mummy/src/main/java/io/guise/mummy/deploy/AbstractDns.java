@@ -30,17 +30,13 @@ import io.clogr.Clogged;
 import io.guise.mummy.*;
 import io.guise.mummy.deploy.Dns;
 
-/**
- * Abstract base class for a DNS implementation, including necessary functionality for setting configured zone records.
- * @author Garret Wilson
- */
+/// Abstract base class for a DNS implementation, including necessary functionality for setting configured zone records.
+/// @author Garret Wilson
 public abstract class AbstractDns implements Dns, Clogged {
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation returns a set containing only <code>dns</code>, indicating the DNS protocol.
-	 * @see <a href="https://tools.ietf.org/html/rfc4501">RFC 4501: Domain Name System Uniform Resource Identifiers</a>
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation returns a set containing only `dns`, indicating the DNS protocol.
+	/// @see <a href="https://tools.ietf.org/html/rfc4501">RFC 4501: Domain Name System Uniform Resource Identifiers</a>
 	@Override
 	public Set<String> getSupportedProtocols() {
 		return Set.of("dns"); //TODO use a constant
@@ -55,30 +51,24 @@ public abstract class AbstractDns implements Dns, Clogged {
 
 	private List<ResourceRecord> resourceRecords;
 
-	/**
-	 * Returns the resource records to be created during deployment.
-	 * @return The resource records to be created during deployment.
-	 */
+	/// Returns the resource records to be created during deployment.
+	/// @return The resource records to be created during deployment.
 	public List<ResourceRecord> getResourceRecords() {
 		return resourceRecords;
 	}
 
-	/**
-	 * Origin and resource records constructor.
-	 * @param origin The fully qualified base domain name for the DNS zone.
-	 * @param resourceRecords The resource records to be created during deployment; may be empty.
-	 * @throws IllegalArgumentException if the given origin is not absolute.
-	 */
+	/// Origin and resource records constructor.
+	/// @param origin The fully qualified base domain name for the DNS zone.
+	/// @param resourceRecords The resource records to be created during deployment; may be empty.
+	/// @throws IllegalArgumentException if the given origin is not absolute.
 	public AbstractDns(@NonNull final DomainName origin, @NonNull final Collection<ResourceRecord> resourceRecords) {
 		this.origin = origin.checkArgumentAbsolute();
 		this.resourceRecords = List.copyOf(resourceRecords);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation sets all resource records defined for the DNS by delegating to {@link #setResourceRecords(Collection)}.
-	 * @see #getResourceRecords()
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation sets all resource records defined for the DNS by delegating to [#setResourceRecords(Collection)].
+	/// @see #getResourceRecords()
 	@Override
 	public Optional<URI> deploy(final MummyContext context, final Artifact rootArtifact) throws IOException {
 		final Logger logger = getLogger();

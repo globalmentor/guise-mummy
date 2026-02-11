@@ -24,48 +24,38 @@ import org.jspecify.annotations.*;
 import io.guise.mummy.mummify.Mummifier;
 import io.urf.model.UrfResourceDescription;
 
-/**
- * A dummy artifact used for testing.
- * @author Garret Wilson
- */
+/// A dummy artifact used for testing.
+/// @author Garret Wilson
 public class DummyArtifact extends AbstractSourceFileArtifact {
 
-	/**
-	 * Constructor with no description.
-	 * @param mummifier The mummifier responsible for generating this artifact.
-	 * @param sourceFile The location of the artifact in the site source tree.
-	 * @param outputFile The file where the artifact will be generated.
-	 */
+	/// Constructor with no description.
+	/// @param mummifier The mummifier responsible for generating this artifact.
+	/// @param sourceFile The location of the artifact in the site source tree.
+	/// @param outputFile The file where the artifact will be generated.
 	public DummyArtifact(@NonNull final Mummifier mummifier, @NonNull final Path sourceFile, @NonNull final Path outputFile) {
 		this(mummifier, sourceFile, outputFile, UrfResourceDescription.EMPTY);
 	}
 
-	/**
-	 * Description constructor.
-	 * @param mummifier The mummifier responsible for generating this artifact.
-	 * @param sourceFile The location of the artifact in the site source tree.
-	 * @param outputFile The file where the artifact will be generated.
-	 */
+	/// Description constructor.
+	/// @param mummifier The mummifier responsible for generating this artifact.
+	/// @param sourceFile The location of the artifact in the site source tree.
+	/// @param outputFile The file where the artifact will be generated.
 	public DummyArtifact(@NonNull final Mummifier mummifier, @NonNull final Path sourceFile, @NonNull final Path outputFile,
 			@NonNull final UrfResourceDescription description) {
 		super(mummifier, sourceFile, outputFile, description);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This method is not implemented.
-	 * @throws UnsupportedOperationException invariably.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This method is not implemented.
+	/// @throws UnsupportedOperationException invariably.
 	@Override
 	public long getSourceSize(final MummyContext context) throws IOException {
 		throw new UnsupportedOperationException("Cannot get the source size of a dummy artifact.");
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This method is not implemented.
-	 * @throws UnsupportedOperationException invariably.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This method is not implemented.
+	/// @throws UnsupportedOperationException invariably.
 	@Override
 	public InputStream openSource(final MummyContext context) throws IOException {
 		throw new UnsupportedOperationException("Cannot open source of dummy artifact.");

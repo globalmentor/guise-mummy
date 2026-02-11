@@ -21,13 +21,11 @@ import static org.hamcrest.Matchers.*;
 
 import org.junit.jupiter.api.*;
 
-/**
- * Tests of {@link Route53}.
- * @author Garret Wilson
- */
+/// Tests of [Route53].
+/// @author Garret Wilson
 public class Route53Test {
 
-	/** @see Route53#normalizeValueForType(String, String) */
+	/// @see Route53#normalizeValueForType(String, String)
 	@Test
 	public void testNormalizeValueForType() {
 		assertThat(Route53.normalizeValueForType("CNAME", "example.com."), is("example.com."));

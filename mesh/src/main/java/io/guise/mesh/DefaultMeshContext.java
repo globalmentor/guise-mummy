@@ -24,50 +24,40 @@ import java.util.function.Supplier;
 
 import org.jspecify.annotations.*;
 
-/**
- * Default implementation of a Mesh context.
- * @implNote This implementation is not thread safe.
- * @author Garret Wilson
- */
+/// Default implementation of a Mesh context.
+/// @implNote This implementation is not thread safe.
+/// @author Garret Wilson
 public class DefaultMeshContext implements MeshContext {
 
-	/** The stack of nested scopes. The stack will never to be empty; it will always contain a root scope. */
+	/// The stack of nested scopes. The stack will never to be empty; it will always contain a root scope.
 	private final Deque<MeshScope> scopeStack = new ArrayDeque<>();
 
 	private final Supplier<MeshScope> scopeFactory;
 
-	/**
-	 * No-args constructor.
-	 * @implSpec A {@link MapMeshScope} will be used for the root scope, and a factory producing instances of {@link MapMeshScope} will be used for creating new
-	 *           scopes.
-	 */
+	/// No-args constructor.
+	/// @implSpec A [MapMeshScope] will be used for the root scope, and a factory producing instances of [MapMeshScope] will be used for creating new
+	///           scopes.
 	public DefaultMeshContext() {
 		this(MapMeshScope::new);
 	}
 
-	/**
-	 * Root scope constructor.
-	 * @implSpec A factory producing instances of {@link MapMeshScope} will be used.
-	 * @param rootScope The root scope of the context.
-	 */
+	/// Root scope constructor.
+	/// @implSpec A factory producing instances of [MapMeshScope] will be used.
+	/// @param rootScope The root scope of the context.
 	public DefaultMeshContext(@NonNull final MeshScope rootScope) {
 		this(rootScope, MapMeshScope::new);
 	}
 
-	/**
-	 * Scope factory constructor.
-	 * @implSpec A {@link MapMeshScope} will be used for the root scope.
-	 * @param scopeFactory The factory for creating new scopes.
-	 */
+	/// Scope factory constructor.
+	/// @implSpec A [MapMeshScope] will be used for the root scope.
+	/// @param scopeFactory The factory for creating new scopes.
 	public DefaultMeshContext(@NonNull final Supplier<MeshScope> scopeFactory) {
 		this(new MapMeshScope(), scopeFactory);
 	}
 
-	/**
-	 * Root scope and scope factory constructor.
-	 * @param rootScope The root scope of the context.
-	 * @param scopeFactory The factory for creating new scopes.
-	 */
+	/// Root scope and scope factory constructor.
+	/// @param rootScope The root scope of the context.
+	/// @param scopeFactory The factory for creating new scopes.
 	public DefaultMeshContext(@NonNull final MeshScope rootScope, @NonNull final Supplier<MeshScope> scopeFactory) {
 		scopeStack.push(requireNonNull(rootScope));
 		this.scopeFactory = requireNonNull(scopeFactory);
@@ -107,7 +97,7 @@ public class DefaultMeshContext implements MeshContext {
 		return new DefaultScopeNesting(newScope);
 	}
 
-	/** Default implementation of a scope nesting. */
+	/// Default implementation of a scope nesting.
 	private class DefaultScopeNesting implements ScopeNesting {
 
 		private final MeshScope scope;
@@ -117,10 +107,8 @@ public class DefaultMeshContext implements MeshContext {
 			return scope;
 		}
 
-		/**
-		 * Scope constructor.
-		 * @param scope The scope being nested.
-		 */
+		/// Scope constructor.
+		/// @param scope The scope being nested.
 		public DefaultScopeNesting(@NonNull final MeshScope scope) {
 			this.scope = requireNonNull(scope);
 		}

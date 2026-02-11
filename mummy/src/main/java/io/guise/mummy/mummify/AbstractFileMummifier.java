@@ -35,27 +35,23 @@ import io.guise.mummy.*;
 import io.urf.model.*;
 import io.urf.vocab.content.Content;
 
-/**
- * Abstract mummifier for generating artifacts based upon a single source file.
- * @implSpec This type of mummifier only works with {@link CorporealSourceArtifact}s. If some other type of artifact is used, some mummification methods will
- *           throw a {@link ClassCastException}.
- * @implSpec This implementation recognizes posts based upon {@link SourcePathArtifact#POST_FILENAME_PATTERN} and adds an appropriate
- *           {@link Artifact#PROPERTY_HANDLE_PUBLISHED_ON} property to the description.
- * @implNote This implementation does not yet support source description files using {@link #getArtifactSourceDescriptionFile(MummyContext, Artifact)} or
- *           {@link #getArtifactSourceDescriptionFile(MummyContext, Path)}.
- * @author Garret Wilson
- */
+/// Abstract mummifier for generating artifacts based upon a single source file.
+/// @implSpec This type of mummifier only works with [CorporealSourceArtifact]s. If some other type of artifact is used, some mummification methods will
+///           throw a [ClassCastException].
+/// @implSpec This implementation recognizes posts based upon [SourcePathArtifact#POST_FILENAME_PATTERN] and adds an appropriate
+///           [Artifact#PROPERTY_HANDLE_PUBLISHED_ON] property to the description.
+/// @implNote This implementation does not yet support source description files using [#getArtifactSourceDescriptionFile(MummyContext, Artifact)] or
+///           [#getArtifactSourceDescriptionFile(MummyContext, Path)].
+/// @author Garret Wilson
 public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier {
 
-	/** Constructor. */
+	/// Constructor.
 	protected AbstractFileMummifier() {
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation loads the description using {@link #loadArtifactDescription(MummyContext, Path, Path)} and then creates a new artifact using
-	 *           {@link #createArtifact(MummyContext, Path, Path, UrfResourceDescription)}.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation loads the description using [#loadArtifactDescription(MummyContext, Path, Path)] and then creates a new artifact using
+	///           [#createArtifact(MummyContext, Path, Path, UrfResourceDescription)].
 	@Override
 	public Artifact plan(final MummyContext context, final Path sourceFile, final Path targetFile) throws IOException {
 		getLogger().trace("Planning artifact for source file `{}` ...", sourceFile);
@@ -63,36 +59,32 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 		return createArtifact(context, sourceFile, targetFile, description);
 	}
 
-	/**
-	 * Creates an artifact of the appropriate type for this mummifier.
-	 * @implSpec The default implementation returns an instance of {@link DefaultSourceFileArtifact}.
-	 * @param context The context of static site generation.
-	 * @param sourceFile The file containing the source of this artifact.
-	 * @param outputFile The file where the artifact will be generated.
-	 * @param description The description of the artifact.
-	 * @return An artifact describing the resource to be mummified.
-	 * @throws IOException if there is an I/O error during planning.
-	 */
+	/// Creates an artifact of the appropriate type for this mummifier.
+	/// @implSpec The default implementation returns an instance of [DefaultSourceFileArtifact].
+	/// @param context The context of static site generation.
+	/// @param sourceFile The file containing the source of this artifact.
+	/// @param outputFile The file where the artifact will be generated.
+	/// @param description The description of the artifact.
+	/// @return An artifact describing the resource to be mummified.
+	/// @throws IOException if there is an I/O error during planning.
 	protected Artifact createArtifact(@NonNull final MummyContext context, @NonNull final Path sourceFile, @NonNull final Path outputFile,
 			@NonNull final UrfResourceDescription description) throws IOException {
 		return new DefaultSourceFileArtifact(this, sourceFile, outputFile, description);
 	}
 
-	/**
-	 * Determines the description for the given artifact based upon its source file and related files.
-	 * @implSpec If incremental mummification is enabled via {@link MummyContext#isIncremental()}, this implementation loads the last generated target description
-	 *           and uses that. If full mummification is turned on or the source content has been modified, it loads source metadata anew using
-	 *           {@link #loadSourceMetadata(MummyContext, Path)}.
-	 * @param context The context of static site generation.
-	 * @param sourceFile The file containing the source of this artifact in the site source directory.
-	 * @param targetFile The target path in the site target directory for the artifact.
-	 * @return A description of the resource being mummified.
-	 * @throws IOException if there is an I/O error retrieving the description, including if the metadata is invalid.
-	 * @see #loadArtifactTargetDescription(MummyContext, Path)
-	 * @see #loadSourceMetadata(MummyContext, Path)
-	 * @see MummyContext#isIncremental()
-	 * @see MummyContext#isFull()
-	 */
+	/// Determines the description for the given artifact based upon its source file and related files.
+	/// @implSpec If incremental mummification is enabled via [MummyContext#isIncremental()], this implementation loads the last generated target description
+	///           and uses that. If full mummification is turned on or the source content has been modified, it loads source metadata anew using
+	///           [#loadSourceMetadata(MummyContext, Path)].
+	/// @param context The context of static site generation.
+	/// @param sourceFile The file containing the source of this artifact in the site source directory.
+	/// @param targetFile The target path in the site target directory for the artifact.
+	/// @return A description of the resource being mummified.
+	/// @throws IOException if there is an I/O error retrieving the description, including if the metadata is invalid.
+	/// @see #loadArtifactTargetDescription(MummyContext, Path)
+	/// @see #loadSourceMetadata(MummyContext, Path)
+	/// @see MummyContext#isIncremental()
+	/// @see MummyContext#isFull()
 	protected UrfResourceDescription loadArtifactDescription(@NonNull MummyContext context, @NonNull final Path sourceFile, @NonNull final Path targetFile)
 			throws IOException {
 		final Optional<Instant> sourceModifiedAt = exists(sourceFile) ? Optional.of(getLastModifiedTime(sourceFile).toInstant()) : Optional.empty();
@@ -158,29 +150,25 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 		})); //TODO add a way to make this immutable?
 	}
 
-	/**
-	 * Loads any metadata stored in the source file itself, if applicable.
-	 * @apiNote This method ignores any metadata stored in related files such as sidecar files.
-	 * @param context The context of static site generation.
-	 * @param sourceFile The source file to be mummified.
-	 * @return Metadata stored in the source file being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate names.
-	 * @throws IOException if there is an I/O error retrieving the metadata.
-	 */
+	/// Loads any metadata stored in the source file itself, if applicable.
+	/// @apiNote This method ignores any metadata stored in related files such as sidecar files.
+	/// @param context The context of static site generation.
+	/// @param sourceFile The source file to be mummified.
+	/// @return Metadata stored in the source file being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate names.
+	/// @throws IOException if there is an I/O error retrieving the metadata.
 	protected abstract List<Map.Entry<URI, Object>> loadSourceMetadata(@NonNull MummyContext context, @NonNull Path sourceFile) throws IOException;
 
-	/**
-	 * {@inheritDoc}
-	 * @apiNote This method cannot be overridden, as it performs necessary checks for incremental mummification. To implement file mummification,
-	 *          {@link #mummifyFile(MummyContext, CorporealSourceArtifact)} should be overridden instead.
-	 * @implSpec If incremental mummification is enabled via {@link MummyContext#isIncremental()}, this version checks the the timestamp of the target file, and
-	 *           delegates to {@link #mummifyFile(MummyContext, CorporealSourceArtifact)} if the file needs regenerated.
-	 * @implSpec This implementation saves the description description if modified by calling {@link #saveTargetDescription(MummyContext, Artifact)}.
-	 * @throws ClassCastException if the given artifact is not an instance of {@link CorporealSourceArtifact}.
-	 * @see Content#MODIFIED_AT_PROPERTY_TAG
-	 * @see Artifact#PROPERTY_TAG_MUMMY_DESCRIPTION_DIRTY
-	 * @see MummyContext#isIncremental()
-	 * @see MummyContext#isFull()
-	 */
+	/// {@inheritDoc}
+	/// @apiNote This method cannot be overridden, as it performs necessary checks for incremental mummification. To implement file mummification,
+	///          [#mummifyFile(MummyContext, CorporealSourceArtifact)] should be overridden instead.
+	/// @implSpec If incremental mummification is enabled via [MummyContext#isIncremental()], this version checks the the timestamp of the target file, and
+	///           delegates to [#mummifyFile(MummyContext, CorporealSourceArtifact)] if the file needs regenerated.
+	/// @implSpec This implementation saves the description description if modified by calling [#saveTargetDescription(MummyContext, Artifact)].
+	/// @throws ClassCastException if the given artifact is not an instance of [CorporealSourceArtifact].
+	/// @see Content#MODIFIED_AT_PROPERTY_TAG
+	/// @see Artifact#PROPERTY_TAG_MUMMY_DESCRIPTION_DIRTY
+	/// @see MummyContext#isIncremental()
+	/// @see MummyContext#isFull()
 	@Override
 	public final void mummify(@NonNull final MummyContext context, @NonNull Artifact artifact) throws IOException {
 		getLogger().trace("Mummifying file artifact {} ...", artifact);
@@ -237,13 +225,11 @@ public abstract class AbstractFileMummifier extends AbstractSourcePathMummifier 
 		}
 	}
 
-	/**
-	 * Invariably mummifies a resource to a file in the presence of a context artifact, which may or may not be the same as the artifact itself. Mummification is
-	 * always performed, regardless of the state of metadata.
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact being generated.
-	 * @throws IOException if there is an I/O error during mummification.
-	 */
+	/// Invariably mummifies a resource to a file in the presence of a context artifact, which may or may not be the same as the artifact itself. Mummification is
+	/// always performed, regardless of the state of metadata.
+	/// @param context The context of static site generation.
+	/// @param artifact The artifact being generated.
+	/// @throws IOException if there is an I/O error during mummification.
 	protected abstract void mummifyFile(@NonNull final MummyContext context, @NonNull CorporealSourceArtifact artifact) throws IOException;
 
 }

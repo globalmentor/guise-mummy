@@ -27,28 +27,22 @@ import org.jspecify.annotations.*;
 
 import io.guise.mummy.*;
 
-/**
- * A strategy for deploying a site to some other location such as a server.
- * @author Garret Wilson
- */
+/// A strategy for deploying a site to some other location such as a server.
+/// @author Garret Wilson
 public interface DeployTarget {
 
-	/**
-	 * Retrieves the protocols supported for access by an end-user after deployment.
-	 * @apiNote The term "protocol" is used loosely here; more precisely these identify the supported URL schemes.
-	 * @apiNote These are not the protocols supported for deployment itself.
-	 * @return The supported protocols for end-user access after deployment, in the canonical (lowercase) form of the appropriate URL scheme, such as
-	 *         <code>http</code> or <code>https</code>.
-	 */
+	/// Retrieves the protocols supported for access by an end-user after deployment.
+	/// @apiNote The term "protocol" is used loosely here; more precisely these identify the supported URL schemes.
+	/// @apiNote These are not the protocols supported for deployment itself.
+	/// @return The supported protocols for end-user access after deployment, in the canonical (lowercase) form of the appropriate URL scheme, such as
+	///         `http` or `https`.
 	public Set<String> getSupportedProtocols();
 
-	/**
-	 * Convenience method to retrieve all content delivery targets that deliver content from this deploy target.
-	 * @param context The context of static site generation.
-	 * @return All {@link ContentDeliveryTarget} deploy targets that have their origin target set this deploy target.
-	 * @see MummyContext#getDeployTargets()
-	 * @see ContentDeliveryTarget#getOriginTarget(MummyContext)
-	 */
+	/// Convenience method to retrieve all content delivery targets that deliver content from this deploy target.
+	/// @param context The context of static site generation.
+	/// @return All [ContentDeliveryTarget] deploy targets that have their origin target set this deploy target.
+	/// @see MummyContext#getDeployTargets()
+	/// @see ContentDeliveryTarget#getOriginTarget(MummyContext)
 	public default Stream<ContentDeliveryTarget> contentDeliveryTargets(@NonNull final MummyContext context) {
 		final DeployTarget thisDeployTarget = this;
 		return context.getDeployTargets().stream().flatMap(List::stream) //get a stream of deploy targets, if any
@@ -56,20 +50,16 @@ public interface DeployTarget {
 				.flatMap(asInstances(ContentDeliveryTarget.class)).filter(target -> target.getOriginTarget(context) == thisDeployTarget);
 	}
 
-	/**
-	 * Prepares for deploying a site. This may include configuring a server, for example.
-	 * @param context The context of static site generation.
-	 * @throws IOException if there is an I/O error during site deployment preparation.
-	 */
+	/// Prepares for deploying a site. This may include configuring a server, for example.
+	/// @param context The context of static site generation.
+	/// @throws IOException if there is an I/O error during site deployment preparation.
 	public void prepare(@NonNull final MummyContext context) throws IOException;
 
-	/**
-	 * Deploys a site.
-	 * @param context The context of static site generation.
-	 * @param rootArtifact The root artifact of the site being deployed
-	 * @return The URL for accessing the deployed site, if available.
-	 * @throws IOException if there is an I/O error during site deployment.
-	 */
+	/// Deploys a site.
+	/// @param context The context of static site generation.
+	/// @param rootArtifact The root artifact of the site being deployed
+	/// @return The URL for accessing the deployed site, if available.
+	/// @throws IOException if there is an I/O error during site deployment.
 	public Optional<URI> deploy(@NonNull final MummyContext context, @NonNull Artifact rootArtifact) throws IOException;
 
 }

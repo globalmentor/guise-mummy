@@ -22,27 +22,21 @@ import java.util.*;
 
 import org.jspecify.annotations.*;
 
-/**
- * A simple mesh scope using a {@link Map} to back variable storage.
- * @implNote This implementation is not thread safe.
- * @author Garret Wilson
- */
+/// A simple mesh scope using a [Map] to back variable storage.
+/// @implNote This implementation is not thread safe.
+/// @author Garret Wilson
 public class MapMeshScope implements MeshScope {
 
 	private final Map<String, Object> map;
 
-	/**
-	 * Default map constructor
-	 * @implSpec A default {@link HashMap} is used.
-	 */
+	/// Default map constructor
+	/// @implSpec A default [HashMap] is used.
 	public MapMeshScope() {
 		this(new HashMap<>());
 	}
 
-	/**
-	 * Map constructor.
-	 * @param map The map to be used to back variable storage.
-	 */
+	/// Map constructor.
+	/// @param map The map to be used to back variable storage.
 	public MapMeshScope(@NonNull final Map<String, Object> map) {
 		this.map = requireNonNull(map);
 	}

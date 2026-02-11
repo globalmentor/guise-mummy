@@ -59,66 +59,54 @@ import io.guise.mummy.mummify.*;
 import io.urf.URF.Handle;
 import io.urf.model.UrfResourceDescription;
 
-/**
- * Base image mummifier that handles common image needs such as metadata extraction.
- * @implSpec This implementation uses the filename extensions and image media types defined in {@link Images#MEDIA_TYPES_BY_FILENAME_EXTENSION}.
- * @implSpec This implementation uses the <a href="https://github.com/drewnoakes/metadata-extractor">metadata-extractor</a> library for reading metadata.
- * @implSpec This implementation provides a way to write metadata to an image using the <a href="https://commons.apache.org/proper/commons-imaging/">Apache
- *           Commons Imaging</a> library.
- * @apiNote Metadata support is potentially available for more images types than are supported for processing, so metadata-related logic is placed in this
- *          common base class.
- * @author Garret Wilson
- */
+/// Base image mummifier that handles common image needs such as metadata extraction.
+/// @implSpec This implementation uses the filename extensions and image media types defined in [Images#MEDIA_TYPES_BY_FILENAME_EXTENSION].
+/// @implSpec This implementation uses the [metadata-extractor](https://github.com/drewnoakes/metadata-extractor) library for reading metadata.
+/// @implSpec This implementation provides a way to write metadata to an image using the [Apache Commons Imaging](https://commons.apache.org/proper/commons-imaging/)
+///           library.
+/// @apiNote Metadata support is potentially available for more images types than are supported for processing, so metadata-related logic is placed in this
+///          common base class.
+/// @author Garret Wilson
 public abstract class BaseImageMummifier extends AbstractFileMummifier implements ImageMummifier {
 
 	private final Set<MediaType> supportedMediaTypes;
 
-	/**
-	 * Returns the image media types supported by this mummifier.
-	 * @return The image media types supported by this mummifier.
-	 */
+	/// Returns the image media types supported by this mummifier.
+	/// @return The image media types supported by this mummifier.
 	protected Set<MediaType> getSupportedMediaTypes() {
 		return supportedMediaTypes;
 	}
 
 	private final Set<String> supportedFilenameExtensions;
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation returns the filename extensions from {@link Images#MEDIA_TYPES_BY_FILENAME_EXTENSION} that are mapped to the supported media
-	 *           types.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation returns the filename extensions from [Images#MEDIA_TYPES_BY_FILENAME_EXTENSION] that are mapped to the supported media
+	///           types.
 	@Override
 	public Set<String> getSupportedFilenameExtensions() {
 		return supportedFilenameExtensions;
 	}
 
-	/**
-	 * Constructor.
-	 * @param supportedMediaTypes The supported image media types; only base types (i.e. without parameters) are supported).
-	 */
+	/// Constructor.
+	/// @param supportedMediaTypes The supported image media types; only base types (i.e. without parameters) are supported).
 	public BaseImageMummifier(@NonNull final Set<MediaType> supportedMediaTypes) {
 		this.supportedMediaTypes = Set.copyOf(supportedMediaTypes);
 		this.supportedFilenameExtensions = Images.MEDIA_TYPES_BY_FILENAME_EXTENSION.entrySet().stream()
 				.filter(entry -> this.supportedMediaTypes.contains(entry.getValue())).map(Map.Entry::getKey).collect(toUnmodifiableSet());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation uses the filename extensions to image media types mappings in {@link Images#MEDIA_TYPES_BY_FILENAME_EXTENSION}.
-	 * @throws IllegalArgumentException if the file of the source file is not supported.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation uses the filename extensions to image media types mappings in [Images#MEDIA_TYPES_BY_FILENAME_EXTENSION].
+	/// @throws IllegalArgumentException if the file of the source file is not supported.
 	@Override
 	public Optional<MediaType> getArtifactMediaType(final MummyContext context, final Path sourceFile) throws IOException {
 		return findFilenameExtension(sourceFile).map(Filenames.Extensions::normalize).filter(getSupportedFilenameExtensions()::contains)
 				.map(MEDIA_TYPES_BY_FILENAME_EXTENSION::get); //the media type filename extensions are already in normal form
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation opens an input stream to the given file and then extract the source metadata by calling
-	 *           {@link #loadSourceMetadata(MummyContext, InputStream, String)}.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation opens an input stream to the given file and then extract the source metadata by calling
+	///           [#loadSourceMetadata(MummyContext, InputStream, String)].
 	@Override
 	protected List<Map.Entry<URI, Object>> loadSourceMetadata(@NonNull final MummyContext context, @NonNull final Path sourceFile) throws IOException {
 		try (final InputStream inputStream = new BufferedInputStream(newInputStream(sourceFile))) {
@@ -129,16 +117,14 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 	private static final String XMP_CREATE_DATE_PROPERTY_NAME = "CreateDate";
 	private static final String PHOTOSHOP_DATE_CREATED_PROPERTY_NAME = "DateCreated";
 
-	/**
-	 * Loads metadata stored in the source file itself.
-	 * @implSpec This implementation loads metadata using {@link ImageMetadataReader}.
-	 * @implSpec This implementation does not return entries with duplicate keys.
-	 * @param context The context of static site generation.
-	 * @param inputStream The input stream from which to to load the source metadata.
-	 * @param name The full identifier of the source, such as a path or URL.
-	 * @return Metadata stored in the source file being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate names.
-	 * @throws IOException if there is an I/O error retrieving the metadata, including incorrectly formatted metadata.
-	 */
+	/// Loads metadata stored in the source file itself.
+	/// @implSpec This implementation loads metadata using [ImageMetadataReader].
+	/// @implSpec This implementation does not return entries with duplicate keys.
+	/// @param context The context of static site generation.
+	/// @param inputStream The input stream from which to to load the source metadata.
+	/// @param name The full identifier of the source, such as a path or URL.
+	/// @return Metadata stored in the source file being mummified, consisting of resolved URI tag names and values. The name-value pairs may have duplicate names.
+	/// @throws IOException if there is an I/O error retrieving the metadata, including incorrectly formatted metadata.
 	protected List<Map.Entry<URI, Object>> loadSourceMetadata(@NonNull final MummyContext context, @NonNull final InputStream inputStream,
 			@NonNull final String name) throws IOException {
 		String title = null;
@@ -281,68 +267,49 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 			TiffDirectoryType.EXIF_DIRECTORY_EXIF_IFD);
 	private static final TagInfoXpString EXIF_TAG_XP_TITLE = new TagInfoXpString("XPTitle", 0x9C9B, TiffDirectoryType.EXIF_DIRECTORY_IFD0);
 
-	/** The value for the Exif <code>ColorSpace</code> (<code>0xA001</code>) indicating the sRGB color space. */
+	/// The value for the Exif `ColorSpace` (`0xA001`) indicating the sRGB color space.
 	private final static short EXIF_COLOR_SPACE_SRGB = 1;
 
-	/**
-	 * The formatter for writing the Exif <code>DateTime</code> (<code>0x0132</code>) and <code>DateTimeOriginal</code> (<code>0x9003</code>) instant value as
-	 * prescribed in <cite>Exif 2.3.2 § 4.6.5 Exif IFD Attribute Information</cite>.
-	 * <p>
-	 * Note that this formatter does not assume any time zone, so the value being used for formatting must have already been resolved to some time zone.
-	 * </p>
-	 */
+	/// The formatter for writing the Exif `DateTime` (`0x0132`) and `DateTimeOriginal` (`0x9003`) instant value as
+	/// prescribed in *Exif 2.3.2 § 4.6.5 Exif IFD Attribute Information*.
+	///
+	/// Note that this formatter does not assume any time zone, so the value being used for formatting must have already been resolved to some time zone.
 	static final DateTimeFormatter EXIF_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
 
-	/**
-	 * The formatter for writing the Exif <code>SubSecTime</code> (<code>0x9290</code>) and <code>SubSecTimeOriginal</code> (<code>0x9291</code>) subseconds value
-	 * as prescribed in <cite>Exif 2.3.2 § 4.6.5 Exif IFD Attribute Information</cite>.
-	 * @implNote This implementation truncates the value to a resolution of three digits as per the example in the specification, even though the prose seems to
-	 *           indicate that more digits are allowed.
-	 */
+	/// The formatter for writing the Exif `SubSecTime` (`0x9290`) and `SubSecTimeOriginal` (`0x9291`) subseconds value
+	/// as prescribed in *Exif 2.3.2 § 4.6.5 Exif IFD Attribute Information*.
+	/// @implNote This implementation truncates the value to a resolution of three digits as per the example in the specification, even though the prose seems to
+	///           indicate that more digits are allowed.
 	static final DateTimeFormatter EXIF_SUB_SEC_TIME_FORMATTER = DateTimeFormatter.ofPattern("SSS");
 
-	/**
-	 * The string for representing UTC in the Exif <code>OffsetTime</code> (<code>0x9010</code>) <code>OffsetTimeOriginal</code> (<code>0x9011</code>) tag as
-	 * prescribed in <cite>Exif 2.3.2 § 4.6.5 Exif IFD Attribute Information</cite>.
-	 */
+	/// The string for representing UTC in the Exif `OffsetTime` (`0x9010`) `OffsetTimeOriginal` (`0x9011`) tag as
+	/// prescribed in *Exif 2.3.2 § 4.6.5 Exif IFD Attribute Information*.
 	static final String EXIF_OFFSET_TIME_UTC = "+00:00";
 
-	/**
-	 * Adds appropriate metadata to an existing image. Any exiting metadata is replaced.
-	 * @implSpec This implementation supports the following Exif metadata:
-	 *           <dl>
-	 *           <dt>{@link Artifact#PROPERTY_HANDLE_TITLE}</dt>
-	 *           <dd><code>XPTitle</code> (<code>0x9C9B</code>)</dd>
-	 *           <dt>{@link Artifact#PROPERTY_HANDLE_DESCRIPTION}</dt>
-	 *           <dd><code>ImageDescription</code> (<code>0x010E</code>)</dd>
-	 *           <dt>{@link Artifact#PROPERTY_HANDLE_ARTIST}</dt>
-	 *           <dd><code>Artist</code> (<code>0x013B</code>)</dd>
-	 *           <dt>{@link Artifact#PROPERTY_HANDLE_COPYRIGHT}</dt>
-	 *           <dd><code>Copyright</code> (<code>0x8298</code>)</dd>
-	 *           <dt>{@link Artifact#PROPERTY_HANDLE_CREATED_AT}</dt>
-	 *           <dd><code>DateTimeOriginal</code> (<code>0x9003</code>), <code>SubSecTimeOriginal</code> (<code>0x9291</code>), <code>OffsetTimeOriginal</code>
-	 *           (<code>0x9011</code>)</dd>
-	 *           </dl>
-	 * @implSpec This implementation uses a resolution of three digits for <code>SubSecTime</code> (<code>0x9290</code>) and <code>SubSecTimeOriginal</code>
-	 *           (<code>0x9291</code>).
-	 * @implSpec If the sRGB color space is requested, it is added as an Exif <code>ColorSpace</code> (<code>0xA001</code>) tag with the value
-	 *           {@value #EXIF_COLOR_SPACE_SRGB}.
-	 * @implSpec If software identification is given, it is added as an Exif <code>Software</code> (<code>0x0131</code>) tag.
-	 * @implSpec If a modification instant is given, it is added as an Exif <code>DateTime</code> (<code>0x0132</code>), <code>SubSecTime</code>
-	 *           (<code>0x9290</code>), and <code>OffsetTime</code> (<code>0x9010</code>) tags.
-	 * @implSpec This implementation only supports writing Exif metadata to JPEG images.
-	 * @implSpec This implementation uses <a href="https://commons.apache.org/proper/commons-imaging/">Apache Commons Imaging</a>.
-	 * @param byteSource The byte source containing the processed image.
-	 * @param outputStream The output stream for writing the image with added metadata.
-	 * @param metadata The description containing the metadata to add.
-	 * @param sRGB Whether the added metadata should indicate the sRGB color space.
-	 * @param software A string identifying the software generating or updating the image, or <code>null</code> if no software information should be added.
-	 * @param modifiedAt The value to use the instant the image was modified, or <code>null</code> if no modification timestamp should be added.
-	 * @throws IOException if there is an I/O error adding the metadata.
-	 * @see <a href="http://www.hanhuy.com/pfn/java-image-thumbnail-comparison">A comparison of Java image thumbnailing techniques</a>
-	 * @see <a href="https://www.universalwebservices.net/web-programming-resources/java/adjust-jpeg-image-compression-quality-when-saving-images-in-java/">Adjust
-	 *      JPEG image compression quality when saving images in Java</a>
-	 */
+	/// Adds appropriate metadata to an existing image. Any exiting metadata is replaced.
+	/// @implSpec This implementation supports the following Exif metadata:
+	///
+	/// - **[Artifact#PROPERTY_HANDLE_TITLE]**: `XPTitle` (`0x9C9B`)
+	/// - **[Artifact#PROPERTY_HANDLE_DESCRIPTION]**: `ImageDescription` (`0x010E`)
+	/// - **[Artifact#PROPERTY_HANDLE_ARTIST]**: `Artist` (`0x013B`)
+	/// - **[Artifact#PROPERTY_HANDLE_COPYRIGHT]**: `Copyright` (`0x8298`)
+	/// - **[Artifact#PROPERTY_HANDLE_CREATED_AT]**: `DateTimeOriginal` (`0x9003`), `SubSecTimeOriginal` (`0x9291`), `OffsetTimeOriginal` (`0x9011`)
+	/// @implSpec This implementation uses a resolution of three digits for `SubSecTime` (`0x9290`) and `SubSecTimeOriginal` (`0x9291`).
+	/// @implSpec If the sRGB color space is requested, it is added as an Exif `ColorSpace` (`0xA001`) tag with the value `1`.
+	/// @implSpec If software identification is given, it is added as an Exif `Software` (`0x0131`) tag.
+	/// @implSpec If a modification instant is given, it is added as an Exif `DateTime` (`0x0132`), `SubSecTime` (`0x9290`), and `OffsetTime` (`0x9010`) tags.
+	/// @implSpec This implementation only supports writing Exif metadata to JPEG images.
+	/// @implSpec This implementation uses [Apache Commons Imaging](https://commons.apache.org/proper/commons-imaging/).
+	/// @param byteSource The byte source containing the processed image.
+	/// @param outputStream The output stream for writing the image with added metadata.
+	/// @param metadata The description containing the metadata to add.
+	/// @param sRGB Whether the added metadata should indicate the sRGB color space.
+	/// @param software A string identifying the software generating or updating the image, or `null` if no software information should be added.
+	/// @param modifiedAt The value to use the instant the image was modified, or `null` if no modification timestamp should be added.
+	/// @throws IOException if there is an I/O error adding the metadata.
+	/// @see <a href="http://www.hanhuy.com/pfn/java-image-thumbnail-comparison">A comparison of Java image thumbnailing techniques</a>
+	/// @see <a href="https://www.universalwebservices.net/web-programming-resources/java/adjust-jpeg-image-compression-quality-when-saving-images-in-java/">Adjust
+	///      JPEG image compression quality when saving images in Java</a>
 	protected static void addImageMetadata(@NonNull final ByteSource byteSource, @NonNull final OutputStream outputStream,
 			@NonNull final UrfResourceDescription metadata, final boolean sRGB, @Nullable final String software, @Nullable final Instant modifiedAt)
 			throws IOException {
@@ -388,48 +355,40 @@ public abstract class BaseImageMummifier extends AbstractFileMummifier implement
 		}
 	}
 
-	/**
-	 * Temporary output stream that collects content temporarily in memory and allows easy conversion to an output stream, as well as to an Apache Commons Imaging
-	 * {@link ByteSource}.
-	 * @apiNote This class is necessary because {@link ByteArrayOutputStream} does not provide a way to get an input stream without copying all the collected
-	 *          bytes.
-	 * @implNote This implementation out of necessity accesses the protected variables <code>buf</code> and <code>count</code> in the parent
-	 *           {@link ByteArrayOutputStream}.
-	 * @author Garret Wilson
-	 * @see <a href="https://stackoverflow.com/q/1225909">Most efficient way to create InputStream from OutputStream</a>
-	 * @see #toByteArray()
-	 * @see #toByteSource()
-	 */
+	/// Temporary output stream that collects content temporarily in memory and allows easy conversion to an output stream, as well as to an Apache Commons Imaging
+	/// [ByteSource].
+	/// @apiNote This class is necessary because [ByteArrayOutputStream] does not provide a way to get an input stream without copying all the collected
+	///          bytes.
+	/// @implNote This implementation out of necessity accesses the protected variables `buf` and `count` in the parent
+	///           [ByteArrayOutputStream].
+	/// @author Garret Wilson
+	/// @see <a href="https://stackoverflow.com/q/1225909">Most efficient way to create InputStream from OutputStream</a>
+	/// @see #toByteArray()
+	/// @see #toByteSource()
 	protected static class TempOutputStream extends ByteArrayOutputStream {
 
-		/** Constructor. */
+		/// Constructor.
 		protected TempOutputStream() {
 		}
 
-		/**
-		 * Returns an input stream to the collected byte content. The returned input stream must not be used concurrently with this output stream.
-		 * @return An input stream to the temporary content.
-		 */
+		/// Returns an input stream to the collected byte content. The returned input stream must not be used concurrently with this output stream.
+		/// @return An input stream to the temporary content.
 		public synchronized InputStream toInputStream() {
 			return new ByteArrayInputStream(this.buf, 0, this.count);
 		}
 
-		/**
-		 * Returns a byte source to the collected byte content. The returned byte source must not be used concurrently with this output stream.
-		 * @return An byte source to the temporary content.
-		 */
+		/// Returns a byte source to the collected byte content. The returned byte source must not be used concurrently with this output stream.
+		/// @return An byte source to the temporary content.
 		public synchronized ByteSource toByteSource() {
 			return new BufByteSource();
 		}
 
-		/**
-		 * A specialized byte source created directly from the temporary byte array <code>buf</code> in the parent {@link ByteArrayOutputStream}.
-		 * @apiNote This implementation is needed because the current implementation of {@link org.apache.commons.imaging.common.bytesource.ByteSourceArray} does
-		 *          not provide a constructor that specifies the byte length, assuming the entire byte array is used.
-		 * @implNote Code in implementation modified from that in <code>org.apache.commons.imaging.common.bytesource.ByteSourceArray</code>.
-		 * @author Garret Wilson
-		 * @see <a href="https://issues.apache.org/jira/browse/IMAGING-280">IMAGING-280: Length specifier for ByteSourceArray.</a>
-		 */
+		/// A specialized byte source created directly from the temporary byte array `buf` in the parent [ByteArrayOutputStream].
+		/// @apiNote This implementation is needed because the current implementation of [org.apache.commons.imaging.common.bytesource.ByteSourceArray] does
+		///          not provide a constructor that specifies the byte length, assuming the entire byte array is used.
+		/// @implNote Code in implementation modified from that in `org.apache.commons.imaging.common.bytesource.ByteSourceArray`.
+		/// @author Garret Wilson
+		/// @see <a href="https://issues.apache.org/jira/browse/IMAGING-280">IMAGING-280: Length specifier for ByteSourceArray.</a>
 		private class BufByteSource extends ByteSource {
 
 			public BufByteSource() {
