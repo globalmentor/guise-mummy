@@ -48,38 +48,35 @@ import io.urf.model.UrfResourceDescription;
 import io.urf.format.turf.TURF;
 import io.urf.format.turf.TurfParser;
 
-/**
- * Strategy for loading and sorting navigation.
- * @author Garret Wilson
- */
+/// Strategy for loading and sorting navigation.
+/// @author Garret Wilson
 public class NavigationManager implements Clogged {
 
-	/** The set of filename extensions for supported navigation files, in order of precedence. */
+	/// Constructor.
+	public NavigationManager() {
+	}
+
+	/// The set of filename extensions for supported navigation files, in order of precedence.
 	private static final Set<String> SUPPORTED_NAVIGATION_FILE_EXTENSIONS = Stream.of(TURF.FILENAME_EXTENSION, Text.LST_FILENAME_EXTENSION)
 			.collect(collectingAndThen(toCollection(LinkedHashSet::new), Collections::unmodifiableSet));
 
-	/**
-	 * The suffix to add to the navigation base name for additive navigation files.
-	 * @see GuiseMummy#CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME
-	 */
+	/// The suffix to add to the navigation base name for additive navigation files.
+	/// @see GuiseMummy#CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME
 	public static final String NAVIGATION_ADD_NAME_SUFFIX = "+";
 
-	/**
-	 * Loads a supported navigation by discovering and loading the appropriate navigation files <code>.navigation.lst</code>.
-	 * <ul>
-	 * <li>This method searches up the directory hierarchy and loads the first supported navigation definition file with the configured navigation base
-	 * filename.</li>
-	 * <li>Then in reverse order, starting at the directory of the navigation file and ascending back to the artifact source directory, the navigation from any
-	 * additive navigation file (following the same rules as the main navigation definition file, except that its base name ends in
-	 * {@value #NAVIGATION_ADD_NAME_SUFFIX}) is loaded and appended to the original defined navigation.</li>
-	 * </ul>
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact for which navigation is being managed.
-	 * @return The navigation items loaded from the appropriate file(s). The stream will not throw an {@link IOException} during iteration.
-	 * @throws IOException if there is an I/O error loading the navigation list file.
-	 * @see GuiseMummy#CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME
-	 * @see #NAVIGATION_ADD_NAME_SUFFIX
-	 */
+	/// Loads a supported navigation by discovering and loading the appropriate navigation files `.navigation.lst`.
+	///
+	/// - This method searches up the directory hierarchy and loads the first supported navigation definition file with the configured navigation base
+	///   filename.
+	/// - Then in reverse order, starting at the directory of the navigation file and ascending back to the artifact source directory, the navigation from any
+	///   additive navigation file (following the same rules as the main navigation definition file, except that its base name ends in
+	///   [#NAVIGATION_ADD_NAME_SUFFIX]) is loaded and appended to the original defined navigation.
+	/// @param context The context of static site generation.
+	/// @param artifact The artifact for which navigation is being managed.
+	/// @return The navigation items loaded from the appropriate file(s). The stream will not throw an [IOException] during iteration.
+	/// @throws IOException if there is an I/O error loading the navigation list file.
+	/// @see GuiseMummy#CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME
+	/// @see #NAVIGATION_ADD_NAME_SUFFIX
 	public Optional<Stream<NavigationItem>> loadNavigation(@NonNull MummyContext context, @NonNull final Artifact artifact) throws IOException {
 		final String navigationBaseName = context.getConfiguration().getString(CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME);
 		final String navigationAddBaseName = navigationBaseName + NAVIGATION_ADD_NAME_SUFFIX;
@@ -132,21 +129,19 @@ public class NavigationManager implements Clogged {
 		});
 	}
 
-	/**
-	 * Loads a single navigation file such as <code>.navigation.lst</code>.
-	 * @apiNote This is a convenience method for calling {@link #loadNavigationFile(MummyContext, Artifact, Path)} and wraps any {@link IOException} in an
-	 *          {@link UncheckedIOException}; see that method for a more complete explanation of functionality. <em>The caller should detect the
-	 *          {@link UncheckedIOException} and convert it back to an {@link IOException}.</em> This method was added because of problems compiling on OpenJDK
-	 *          11.0.5 using Faux Pas inside nested streams and lambdas, as explained in <a href="https://github.com/zalando/faux-pas/issues/144">Faux Pas Issue
-	 *          #144</a>.
-	 * @implSpec This implementation delegates to {@link #loadNavigationFile(MummyContext, Artifact, Path)}.
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact for which navigation is being managed.
-	 * @param navigationFile The file to load.
-	 * @return The navigation items loaded from the file. The stream will not throw an {@link IOException} during iteration.
-	 * @throws IllegalArgumentException if the navigation file has no filename extension.
-	 * @throws UncheckedIOException if there is an I/O error loading the navigation list file.
-	 */
+	/// Loads a single navigation file such as `.navigation.lst`.
+	/// @apiNote This is a convenience method for calling [#loadNavigationFile(MummyContext, Artifact, Path)] and wraps any [IOException] in an
+	///          [UncheckedIOException]; see that method for a more complete explanation of functionality. *The caller should detect the
+	///          [UncheckedIOException] and convert it back to an [IOException].* This method was added because of problems compiling on OpenJDK
+	///          11.0.5 using Faux Pas inside nested streams and lambdas, as explained in <a href="https://github.com/zalando/faux-pas/issues/144">Faux Pas Issue
+	///          #144</a>.
+	/// @implSpec This implementation delegates to [#loadNavigationFile(MummyContext, Artifact, Path)].
+	/// @param context The context of static site generation.
+	/// @param artifact The artifact for which navigation is being managed.
+	/// @param navigationFile The file to load.
+	/// @return The navigation items loaded from the file. The stream will not throw an [IOException] during iteration.
+	/// @throws IllegalArgumentException if the navigation file has no filename extension.
+	/// @throws UncheckedIOException if there is an I/O error loading the navigation list file.
 	protected final Stream<NavigationItem> loadNavigationFileUnchecked(@NonNull MummyContext context, @NonNull final Artifact artifact,
 			@NonNull final Path navigationFile) throws UncheckedIOException {
 		try {
@@ -156,42 +151,34 @@ public class NavigationManager implements Clogged {
 		}
 	}
 
-	/**
-	 * Loads a single navigation file such as <code>.navigation.lst</code>.
-	 * @implSpec This implementation currently supports the following navigation definition formats:
-	 *           <ul>
-	 *           <li>Text list.</li>
-	 *           <li>TURF</li>
-	 *           </ul>
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact for which navigation is being managed.
-	 * @param navigationFile The file to load.
-	 * @return The navigation items loaded from the file. The stream will not throw an {@link IOException} during iteration.
-	 * @throws IllegalArgumentException if the navigation file has no filename extension.
-	 * @throws IOException if there is an I/O error loading the navigation list file.
-	 */
+	/// Loads a single navigation file such as `.navigation.lst`.
+	/// @implSpec This implementation currently supports the following navigation definition formats:
+	///
+	/// - Text list.
+	/// - TURF
+	/// @param context The context of static site generation.
+	/// @param artifact The artifact for which navigation is being managed.
+	/// @param navigationFile The file to load.
+	/// @return The navigation items loaded from the file. The stream will not throw an [IOException] during iteration.
+	/// @throws IllegalArgumentException if the navigation file has no filename extension.
+	/// @throws IOException if there is an I/O error loading the navigation list file.
 	protected Stream<NavigationItem> loadNavigationFile(@NonNull MummyContext context, @NonNull final Artifact artifact, @NonNull final Path navigationFile)
 			throws IOException {
-		switch(findFilenameExtension(navigationFile)
-				.orElseThrow(() -> new IllegalArgumentException(String.format("Navigation file `%s` has no extension.", navigationFile)))) {
-			case Text.LST_FILENAME_EXTENSION:
-				return loadNavigationFileList(context, artifact, navigationFile);
-			case TURF.FILENAME_EXTENSION:
-				return loadNavigationFileTurf(context, artifact, navigationFile);
-			default:
-				throw new AssertionError(String.format("Unrecognized navigation file type: `%s`.", navigationFile));
-		}
+		return switch(findFilenameExtension(navigationFile)
+				.orElseThrow(() -> new IllegalArgumentException("Navigation file `%s` has no extension.".formatted(navigationFile)))) {
+			case Text.LST_FILENAME_EXTENSION -> loadNavigationFileList(context, artifact, navigationFile);
+			case TURF.FILENAME_EXTENSION -> loadNavigationFileTurf(context, artifact, navigationFile);
+			default -> throw new AssertionError("Unrecognized navigation file type: `%s`.".formatted(navigationFile));
+		};
 	}
 
-	/**
-	 * Loads a text navigation list file (e.g. <code>.navigation.lst</code>). Each line is a reference to an artifact, relative to the <em>directory</em> of the
-	 * corresponding navigation list file. Fragments and queries are allowed and maintained.
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact for which navigation is being managed.
-	 * @param navigationFile The path to the file containing the navigation list.
-	 * @return The navigation items loaded from the file. The stream will not throw an {@link IOException} during iteration.
-	 * @throws IOException if there is an I/O error loading the navigation list file.
-	 */
+	/// Loads a text navigation list file (e.g. `.navigation.lst`). Each line is a reference to an artifact, relative to the *directory* of the
+	/// corresponding navigation list file. Fragments and queries are allowed and maintained.
+	/// @param context The context of static site generation.
+	/// @param artifact The artifact for which navigation is being managed.
+	/// @param navigationFile The path to the file containing the navigation list.
+	/// @return The navigation items loaded from the file. The stream will not throw an [IOException] during iteration.
+	/// @throws IOException if there is an I/O error loading the navigation list file.
 	public Stream<NavigationItem> loadNavigationFileList(@NonNull MummyContext context, @NonNull final Artifact artifact, @NonNull final Path navigationFile)
 			throws IOException {
 		final Path navigationListFileParent = navigationFile.getParent(); //each line reference is relative to the directory of the navigation file
@@ -203,7 +190,7 @@ public class NavigationManager implements Clogged {
 					getLogger().warn("No target artifact found for relative reference `{}` in navigation file `{}`.", line, navigationFile);
 				}
 				return foundNavigationItem.stream();
-			}).collect(toList()).stream(); //(important) collect the artifacts to a list to prevent any exceptions upon stream iteration after method return
+			}).toList().stream(); //(important) collect the artifacts to a list to prevent any exceptions upon stream iteration after method return
 		} catch(final IllegalArgumentException illegalArgumentException) {
 			throw new IOException(illegalArgumentException.getLocalizedMessage(), illegalArgumentException);
 		} catch(final UncheckedIOException uncheckedIOException) { //possibly thrown by `lines()`
@@ -211,21 +198,19 @@ public class NavigationManager implements Clogged {
 		}
 	}
 
-	/**
-	 * Creates a navigation item from the given reference. If the reference is relative, finds a target navigation artifact from the reference. Relative
-	 * references are considered to be relative relative to the <em>directory</em> of the given navigation file. Fragments and queries are allowed and maintained.
-	 * @implSpec This implementation delegates to {@link #createNavigationItemFromReference(MummyContext, Artifact, Path, URI, UrfResourceDescription, List)}.
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact for which navigation is being managed.
-	 * @param navigationFile The path to the file containing the navigation reference.
-	 * @param navigationReference The navigation reference, which is an absolute URI or a reference to an artifact relative to the navigation file parent.
-	 * @param description The description of the navigation item, or <code>null</code> if no description is available.
-	 * @param navigation The navigation subordinate to this navigation item; may be empty.
-	 * @return A navigation item for the reference, which will be empty if no target artifact could be found for the reference.
-	 * @throws IllegalArgumentException if the given navigation file has no parent.
-	 * @throws IllegalArgumentException if the reference is an invalid URI or URI reference path.
-	 * @throws IllegalArgumentException if the reference is an absolute URI and there is no description or the description does does not indicate a label.
-	 */
+	/// Creates a navigation item from the given reference. If the reference is relative, finds a target navigation artifact from the reference. Relative
+	/// references are considered to be relative relative to the *directory* of the given navigation file. Fragments and queries are allowed and maintained.
+	/// @implSpec This implementation delegates to [#createNavigationItemFromReference(MummyContext, Artifact, Path, URI, UrfResourceDescription, List)].
+	/// @param context The context of static site generation.
+	/// @param artifact The artifact for which navigation is being managed.
+	/// @param navigationFile The path to the file containing the navigation reference.
+	/// @param navigationReference The navigation reference, which is an absolute URI or a reference to an artifact relative to the navigation file parent.
+	/// @param description The description of the navigation item, or `null` if no description is available.
+	/// @param navigation The navigation subordinate to this navigation item; may be empty.
+	/// @return A navigation item for the reference, which will be empty if no target artifact could be found for the reference.
+	/// @throws IllegalArgumentException if the given navigation file has no parent.
+	/// @throws IllegalArgumentException if the reference is an invalid URI or URI reference path.
+	/// @throws IllegalArgumentException if the reference is an absolute URI and there is no description or the description does does not indicate a label.
 	protected Optional<NavigationItem> createNavigationItemFromReference(@NonNull MummyContext context, @NonNull final Artifact artifact,
 			@NonNull final Path navigationFile, @NonNull final String navigationReference, @Nullable UrfResourceDescription description,
 			@NonNull final List<NavigationItem> navigation) throws IllegalArgumentException {
@@ -233,26 +218,23 @@ public class NavigationManager implements Clogged {
 		try {
 			navigationReferenceURI = new URI(navigationReference); //assume the reference is _relative to the navigation file_
 		} catch(final URISyntaxException uriSyntaxException) {
-			throw new IllegalArgumentException(String.format("Invalid reference <%s> in navigation file `%s`.", navigationReference, navigationFile));
+			throw new IllegalArgumentException("Invalid reference <%s> in navigation file `%s`.".formatted(navigationReference, navigationFile));
 		}
 		return createNavigationItemFromReference(context, artifact, navigationFile, navigationReferenceURI, description, navigation);
 	}
 
-	/**
-	 * Creates a navigation item from the given reference. If the reference is relative, finds a target navigation artifact from the reference. Relative
-	 * references are considered to be relative relative to the <em>directory</em> of the given navigation file. Fragments and queries are allowed and maintained.
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact for which navigation is being managed.
-	 * @param navigationFile The path to the file containing the navigation reference.
-	 * @param navigationReference The navigation reference, which is an absolute URI or a reference to an artifact relative to the navigation file parent.
-	 * @param description The description of the navigation item, or <code>null</code> if no description is available.
-	 * @param navigation The navigation subordinate to this navigation item; may be empty.
-	 * @return A navigation item for the reference, which will be empty if no target artifact could be found for the reference.
-	 * @throws IllegalArgumentException if the given navigation file has no parent.
-	 * @throws IllegalArgumentException if the reference is an invalid URI reference path.
-	 * @throws IllegalArgumentException if the reference is an absolute URI and there is no description or the description does does not indicate a label.
-	 * 
-	 */
+	/// Creates a navigation item from the given reference. If the reference is relative, finds a target navigation artifact from the reference. Relative
+	/// references are considered to be relative relative to the *directory* of the given navigation file. Fragments and queries are allowed and maintained.
+	/// @param context The context of static site generation.
+	/// @param artifact The artifact for which navigation is being managed.
+	/// @param navigationFile The path to the file containing the navigation reference.
+	/// @param navigationReference The navigation reference, which is an absolute URI or a reference to an artifact relative to the navigation file parent.
+	/// @param description The description of the navigation item, or `null` if no description is available.
+	/// @param navigation The navigation subordinate to this navigation item; may be empty.
+	/// @return A navigation item for the reference, which will be empty if no target artifact could be found for the reference.
+	/// @throws IllegalArgumentException if the given navigation file has no parent.
+	/// @throws IllegalArgumentException if the reference is an invalid URI reference path.
+	/// @throws IllegalArgumentException if the reference is an absolute URI and there is no description or the description does does not indicate a label.
 	protected Optional<NavigationItem> createNavigationItemFromReference(@NonNull MummyContext context, @NonNull final Artifact artifact,
 			@NonNull final Path navigationFile, @NonNull final URI navigationReference, @Nullable UrfResourceDescription description,
 			@NonNull final List<NavigationItem> navigation) throws IllegalArgumentException {
@@ -265,7 +247,7 @@ public class NavigationManager implements Clogged {
 		}
 		//internal reference
 		final URIPath navigationReferencePath = URIs.findURIPath(navigationReference)
-				.orElseThrow(() -> new IllegalArgumentException(String.format("Navigation reference <%s> does not have a path.", navigationReference)));
+				.orElseThrow(() -> new IllegalArgumentException("Navigation reference <%s> does not have a path.".formatted(navigationReference)));
 		final Optional<Artifact> foundNavigationArtifact = context.getPlan().findArtifactBySourceRelativeReference(navigationListFileParent,
 				navigationReferencePath);
 		if(!foundNavigationArtifact.isPresent()) {
@@ -281,51 +263,45 @@ public class NavigationManager implements Clogged {
 		});
 	}
 
-	/**
-	 * Loads a navigation definition file in TURF format (e.g. <code>.navigation.turf</code>). Each item can be one of the following:
-	 * <ul>
-	 * <li>A string, in which case the value is interpreted as a reference to an artifact, relative to the navigation file, identical to
-	 * {@link #loadNavigationFileList(MummyContext, Artifact, Path)}.</li>
-	 * <li>An object description which supports, in addition to {@value NavigationItem#PROPERTY_HANDLE_HREF}, the same descriptive properties an artifact would:
-	 * <ul>
-	 * <li>{@value NavigationItem#PROPERTY_HANDLE_HREF}: Either a string path to an artifact as in {@link #loadNavigationFileList(MummyContext, Artifact, Path)},
-	 * or a URL link to an external page.</li>
-	 * <li>{@value Artifact#PROPERTY_HANDLE_LABEL}: The label for the navigation item, overriding any of the artifact.</li>
-	 * <li>{@value Artifact#PROPERTY_HANDLE_ICON}: The icon of the navigation item, overriding any of the artifact.</li>
-	 * <li>{@value NavigationItem#PROPERTY_HANDLE_NAVIGATION}: A property containing a nested navigation list.</li>
-	 * </ul>
-	 * </li>
-	 * </ul>
-	 * <p>
-	 * The following is an example navigation definition:
-	 * </p>
-	 * <pre><code>
-	 * [
-	 *   "./"
-	 *   "#quick-start"
-	 *   "about.xhtml"
-	 *   "help/"
-	 *   * :
-	 *     label="Documentation"
-	 *     icon="fas/fa-book"
-	 *     href = "doc/"
-	 *   ;
-	 *   * :
-	 *     label="Source"
-	 *     icon="fas/fa-file-code"
-	 *       navigation=[
-	 *       "foo/"
-	 *       "bar/"
-	 *     ]
-	 *   ;
-	 * ]
-	 * </code></pre>
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact for which navigation is being managed.
-	 * @param navigationFile The path to the file containing the navigation definition.
-	 * @return The navigation items loaded from the file. The stream will not throw an {@link IOException} during iteration.
-	 * @throws IOException if there is an I/O error loading the navigation file.
-	 */
+	/// Loads a navigation definition file in TURF format (e.g. `.navigation.turf`). Each item can be one of the following:
+	///
+	/// - A string, in which case the value is interpreted as a reference to an artifact, relative to the navigation file, identical to
+	///   [#loadNavigationFileList(MummyContext, Artifact, Path)].
+	/// - An object description which supports, in addition to [NavigationItem#PROPERTY_HANDLE_HREF], the same descriptive properties an artifact would:
+	///   - **[NavigationItem#PROPERTY_HANDLE_HREF]**: Either a string path to an artifact as in [#loadNavigationFileList(MummyContext, Artifact, Path)],
+	///     or a URL link to an external page.
+	///   - **[Artifact#PROPERTY_HANDLE_LABEL]**: The label for the navigation item, overriding any of the artifact.
+	///   - **[Artifact#PROPERTY_HANDLE_ICON]**: The icon of the navigation item, overriding any of the artifact.
+	///   - **[NavigationItem#PROPERTY_HANDLE_NAVIGATION]**: A property containing a nested navigation list.
+	///
+	/// The following is an example navigation definition:
+	///
+	/// ```
+	/// [
+	///   "./"
+	///   "#quick-start"
+	///   "about.xhtml"
+	///   "help/"
+	///   * :
+	///     label="Documentation"
+	///     icon="fas/fa-book"
+	///     href = "doc/"
+	///   ;
+	///   * :
+	///     label="Source"
+	///     icon="fas/fa-file-code"
+	///       navigation=[
+	///       "foo/"
+	///       "bar/"
+	///     ]
+	///   ;
+	/// ]
+	/// ```
+	/// @param context The context of static site generation.
+	/// @param artifact The artifact for which navigation is being managed.
+	/// @param navigationFile The path to the file containing the navigation definition.
+	/// @return The navigation items loaded from the file. The stream will not throw an [IOException] during iteration.
+	/// @throws IOException if there is an I/O error loading the navigation file.
 	public Stream<NavigationItem> loadNavigationFileTurf(@NonNull MummyContext context, @NonNull final Artifact artifact, @NonNull final Path navigationFile)
 			throws IOException {
 		final List<?> navigationObjects;
@@ -333,30 +309,28 @@ public class NavigationManager implements Clogged {
 			navigationObjects = new TurfParser<List<Object>>(new SimpleGraphUrfProcessor()).parseDocument(inputStream).stream()
 					//ensure there is only one root object
 					.reduce(Streams.toFindOnly(
-							() -> new UncheckedIOException(new IOException(String.format("Navigation file `%s` cannot contain more than one root object.", navigationFile)))))
+							() -> new UncheckedIOException(new IOException("Navigation file `%s` cannot contain more than one root object.".formatted(navigationFile)))))
 					//make sure the root object is a list
 					.flatMap(Objects.asInstance(List.class)).orElseThrow(() -> new UncheckedIOException(
-							new IOException(String.format("Navigation file `%s` must contain a single list to describe navigation.", navigationFile))));
+							new IOException("Navigation file `%s` must contain a single list to describe navigation.".formatted(navigationFile))));
 		} catch(final UncheckedIOException uncheckedIOException) {
 			throw uncheckedIOException.getCause();
 		}
 		try {
 			return navigationItemsFromUrfList(context, artifact, navigationFile, navigationObjects);
 		} catch(final IllegalArgumentException illegalArgumentException) {
-			throw new IOException(String.format("Error in navigation file `%s`: %s", illegalArgumentException.getLocalizedMessage()), illegalArgumentException);
+			throw new IOException("Error in navigation file `%s`: %s".formatted(navigationFile, illegalArgumentException.getLocalizedMessage()), illegalArgumentException);
 		}
 	}
 
-	/**
-	 * Converts a list of objects from a TURF graph to navigation items. The objects adhere to the model described in
-	 * {@link #loadNavigationFileTurf(MummyContext, Artifact, Path)}.
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact for which navigation is being managed.
-	 * @param navigationFile The path to the file containing the navigation definition.
-	 * @param navigationObjects The list of navigation objects from the URF model.
-	 * @return The navigation items loaded from the file.
-	 * @throws IllegalArgumentException if the navigation objects are invalid or incorrect. The error message will not indicate the navigation file.
-	 */
+	/// Converts a list of objects from a TURF graph to navigation items. The objects adhere to the model described in
+	/// [#loadNavigationFileTurf(MummyContext, Artifact, Path)].
+	/// @param context The context of static site generation.
+	/// @param artifact The artifact for which navigation is being managed.
+	/// @param navigationFile The path to the file containing the navigation definition.
+	/// @param navigationObjects The list of navigation objects from the URF model.
+	/// @return The navigation items loaded from the file.
+	/// @throws IllegalArgumentException if the navigation objects are invalid or incorrect. The error message will not indicate the navigation file.
 	protected Stream<NavigationItem> navigationItemsFromUrfList(@NonNull MummyContext context, @NonNull final Artifact artifact,
 			@NonNull final Path navigationFile, @NonNull final List<?> navigationObjects) throws IllegalArgumentException {
 		return navigationObjects.stream().flatMap(navObject -> { //convert the parsed objects to navigation items
@@ -393,11 +367,11 @@ public class NavigationManager implements Clogged {
 						}
 						return navItem.stream();
 					} else {
-						throw new IllegalArgumentException(String.format("Unsupported href `%s`.", href));
+						throw new IllegalArgumentException("Unsupported href `%s`.".formatted(href));
 					}
 				}).orElse(Stream.of(DefaultNavigationItem.fromDescription(navDescription, navigation))); //if no reference, just create an item from the description
 			} else {
-				throw new IllegalArgumentException(String.format("Unsupported object `%s`.", navObject));
+				throw new IllegalArgumentException("Unsupported object `%s`.".formatted(navObject));
 			}
 		});
 	}

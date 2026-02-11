@@ -34,18 +34,16 @@ import org.junit.jupiter.api.*;
 import io.guise.mummy.mummify.image.BaseImageMummifierTest;
 import io.guise.mummy.mummify.page.MarkdownPageMummifierTest;
 
-/**
- * A Guise Mummy smoke test.
- * @author Garret Wilson
- */
+/// A Guise Mummy smoke test.
+/// @author Garret Wilson
 public class MummifySmokeIT extends BaseEndToEndIT {
 
 	public static final String SMOKE_MESH_XHTML_RESOURCE_NAME = "smoke-mesh.xhtml";
 
-	/** Predefined seed for reproducible tests. */
+	/// Predefined seed for reproducible tests.
 	private static final long RANDOM_SEED = 20201122;
 
-	/** Deterministic random bytes to place in a binary file. */
+	/// Deterministic random bytes to place in a binary file.
 	private static byte[] randomBinContent = new byte[(1 << 10) + 11]; //1024 and a little more
 
 	@BeforeAll
@@ -66,7 +64,7 @@ public class MummifySmokeIT extends BaseEndToEndIT {
 		copy(BaseImageMummifierTest.class, resolve(siteSourceDirectory, "$assets", "images"), BaseImageMummifierTest.GATE_TURRET_REDUCED_JPEG_RESOURCE_NAME);
 	}
 
-	/** Main smoke test. */
+	/// Main smoke test.
 	@Test
 	public void smokeTest() throws IOException {
 		mummify(LifeCyclePhase.MUMMIFY);

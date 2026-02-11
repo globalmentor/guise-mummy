@@ -52,127 +52,99 @@ import software.amazon.awssdk.regions.*;
 import software.amazon.awssdk.services.s3.*;
 import software.amazon.awssdk.services.s3.model.*;
 
-/**
- * Deploys a site to <a href="https://aws.amazon.com/s3/">AWS S3</a>, configured as an S3 bucket website.
- * @author Garret Wilson
- */
+/// Deploys a site to [AWS S3](https://aws.amazon.com/s3/), configured as an S3 bucket website.
+/// @author Garret Wilson
 public class S3Website extends S3 {
 
-	/**
-	 * The section relative key for the alternative buckets in the configuration; defaults to the root-relative form of
-	 * {@link GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} resolved against any {@link GuiseMummy#CONFIG_KEY_DOMAIN} in the global configuration.
-	 */
+	/// The section relative key for the alternative buckets in the configuration; defaults to the root-relative form of
+	/// [GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS] resolved against any [GuiseMummy#CONFIG_KEY_DOMAIN] in the global configuration.
 	public static final String CONFIG_KEY_ALT_BUCKETS = "altBuckets";
 
-	/**
-	 * The section relative key for the approach to be used for implementing redirects for resource alt locations on S3 websites. The value is the lowercase,
-	 * kebab-case form of {@link RedirectMeans} (e.g. <code>routing-rule</code>).
-	 */
+	/// The section relative key for the approach to be used for implementing redirects for resource alt locations on S3 websites. The value is the lowercase,
+	/// kebab-case form of [RedirectMeans] (e.g. `routing-rule`).
 	public static final String CONFIG_KEY_REDIRECT_MEANS = "redirectMeans";
 
-	/**
-	 * The default value to use for the means of redirection if none is specified in the configuration.
-	 * @see #CONFIG_KEY_REDIRECT_MEANS
-	 */
+	/// The default value to use for the means of redirection if none is specified in the configuration.
+	/// @see #CONFIG_KEY_REDIRECT_MEANS
 	public static final RedirectMeans DEFAULT_REDIRECT_MEANS = RedirectMeans.OPTIMAL;
 
-	/**
-	 * The section relative key for the number of redirects required to switch to using object-redirects for non-collection alt locations.
-	 * @apiNote This number must not be greater than <code>50</code>, because as of May 2020 AWS S3 does not allow more than this number of routing rule-based
-	 *          redirects; otherwise the following error will occur:
-	 *          <blockquote><code>software.amazon.awssdk.services.s3.model.S3Exception: … routing rules provided,
-	 *           the number of routing rules in a website configuration is limited to 50. (Service: S3, Status Code: 400, Request ID: …)</code></blockquote>
-	 */
+	/// The section relative key for the number of redirects required to switch to using object-redirects for non-collection alt locations.
+	/// @apiNote This number must not be greater than `50`, because as of May 2020 AWS S3 does not allow more than this number of routing rule-based
+	///          redirects; otherwise the following error will occur:
+	///          `software.amazon.awssdk.services.s3.model.S3Exception: … routing rules provided,
+	///          the number of routing rules in a website configuration is limited to 50. (Service: S3, Status Code: 400, Request ID: …)`
 	public static final String CONFIG_KEY_REDIRECT_COUNT_OPTIMAL_THRESHOLD = "redirectCountOptimalThreshold";
 
-	/**
-	 * The default number of redirects required to switch to using object-redirects for non-collection alt locations.
-	 * @apiNote This redirect count optimal threshold must not be greater than <code>50</code>, because as of May 2020 AWS S3 does not allow more than this number
-	 *          of routing rule-based redirects; otherwise the following error will occur:
-	 *          <blockquote><code>software.amazon.awssdk.services.s3.model.S3Exception: … routing rules provided,
-	 *           the number of routing rules in a website configuration is limited to 50. (Service: S3, Status Code: 400, Request ID: …)</code></blockquote>
-	 * @see #CONFIG_KEY_REDIRECT_COUNT_OPTIMAL_THRESHOLD
-	 */
+	/// The default number of redirects required to switch to using object-redirects for non-collection alt locations.
+	/// @apiNote This redirect count optimal threshold must not be greater than `50`, because as of May 2020 AWS S3 does not allow more than this number
+	///          of routing rule-based redirects; otherwise the following error will occur:
+	///          `software.amazon.awssdk.services.s3.model.S3Exception: … routing rules provided,
+	///          the number of routing rules in a website configuration is limited to 50. (Service: S3, Status Code: 400, Request ID: …)`
+	/// @see #CONFIG_KEY_REDIRECT_COUNT_OPTIMAL_THRESHOLD
 	public static final int DEFAULT_REDIRECT_COUNT_OPTIMAL_OPTIMAL_THRESHOLD = 30;
 
-	/** The S3 website means to be used for effecting redirects. */
+	/// The S3 website means to be used for effecting redirects.
 	public enum RedirectMeans implements Identifier {
 
-		/** All redirects use objects except for those that require routing rules (notably collection redirects). */
+		/// All redirects use objects except for those that require routing rules (notably collection redirects).
 		OBJECT,
-		/** All redirects use routing rules. */
+		/// All redirects use routing rules.
 		ROUTING_RULE,
-		/**
-		 * Functions like {@link #ROUTING_RULE} if the total number of redirects is below the optimal threshold
-		 * {@link S3Website#getRedirectCountOptimalThreshold()}; otherwise functions like {@link #OBJECT}.
-		 */
+		/// Functions like [#ROUTING_RULE] if the total number of redirects is below the optimal threshold
+		/// [S3Website#getRedirectCountOptimalThreshold()]; otherwise functions like [#OBJECT].
 		OPTIMAL;
 	}
 
-	/**
-	 * The regions that use a dash (<code>-</code>) instead of a dot (<code>.</code>) to separate <code>s3-website</code> from the region in the endpoint domain
-	 * string.
-	 */
+	/// The regions that use a dash (`-`) instead of a dot (`.`) to separate `s3-website` from the region in the endpoint domain string.
 	private static final Set<Region> WEBSITE_ENDPOINT_DASH_REGIONS = Set.of(Region.US_EAST_1, Region.US_WEST_1, Region.US_WEST_2, Region.AP_SOUTHEAST_1,
 			Region.AP_SOUTHEAST_2, Region.AP_NORTHEAST_1, Region.EU_WEST_1, Region.SA_EAST_1);
 
 	private static final String ENDPOINT_S3_WEBSITE_REGION_DELIMITER_DASH = String.valueOf('-');
 	private static final String ENDPOINT_S3_WEBSITE_REGION_DELIMITER_DOT = String.valueOf('.');
 
-	/**
-	 * String template for a bucket web site URL, with the following string parameters:
-	 * <ol>
-	 * <li>bucket name</li>
-	 * <li>S3 website region delimiter: dot (<code>.</code>) or dash (<code>-</code>)</li>
-	 * <li>region ID</li>
-	 * <li>region domain</li>
-	 * <li>
-	 * </ol>
-	 * @implNote The <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteEndpoints.html">Website Endpoints</a> documentation indicates that there are
-	 *           two forms based upon region, one using a dot (<code>.</code>) character and the other using a dash (<code>-</code>) character, but the dot form
-	 *           seems to work as well, as some have <a href=
-	 *           "https://stackoverflow.com/questions/46627060/how-to-resolve-aws-s3-url-says-west-bucket-says-east#comment80219601_46627148">indicated</a> that
-	 *           AWS may be standardizing on the dot form. Nevertheless this implementation distinguishes between the two forms to provide the most correct values
-	 *           as per the documentation.
-	 * @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteEndpoints.html">Website Endpoints</a>
-	 * @see <a href="https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_website_region_endpoints">Amazon Simple Storage Service Website Endpoints</a>
-	 * @see <a href="https://stackoverflow.com/q/57480708/421049">Get AWS S3 bucket web static site URL programmatically using Java SDK v2</a>
-	 */
+	/// String template for a bucket web site URL, with the following string parameters:
+	///
+	/// 1. bucket name
+	/// 2. S3 website region delimiter: dot (`.`) or dash (`-`)
+	/// 3. region ID
+	/// 4. region domain
+	/// @implNote The [Website Endpoints](https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteEndpoints.html) documentation indicates that there are
+	///           two forms based upon region, one using a dot (`.`) character and the other using a dash (`-`) character, but the dot form
+	///           seems to work as well, as some have [indicated](https://stackoverflow.com/questions/46627060/how-to-resolve-aws-s3-url-says-west-bucket-says-east#comment80219601_46627148)
+	///           that AWS may be standardizing on the dot form. Nevertheless this implementation distinguishes between the two forms to provide the most correct values
+	///           as per the documentation.
+	/// @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteEndpoints.html">Website Endpoints</a>
+	/// @see <a href="https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_website_region_endpoints">Amazon Simple Storage Service Website Endpoints</a>
+	/// @see <a href="https://stackoverflow.com/q/57480708/421049">Get AWS S3 bucket web static site URL programmatically using Java SDK v2</a>
 	private final static StringTemplate BUCKET_WEBSITE_ENDPOINT_TEMPLATE = StringTemplate.builder().parameter(StringTemplate.STRING_PARAMETER).text(".s3-website")
 			.parameter(StringTemplate.STRING_PARAMETER).parameter(StringTemplate.STRING_PARAMETER).text(".").parameter(StringTemplate.STRING_PARAMETER).build();
 
-	/**
-	 * Returns the endpoint domain for static web site hosting for the given bucket in the indicated region.
-	 * @param bucket The name of the bucket.
-	 * @param region The region in which the bucket is located.
-	 * @return A endpoint domain for accessing the static web site hosted in the identified bucket.
-	 * @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteEndpoints.html">Website Endpoints</a>
-	 * @see <a href="https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_website_region_endpoints">Amazon Simple Storage Service Website Endpoints</a>
-	 * @see PartitionMetadata#hostname()
-	 */
+	/// Returns the endpoint domain for static web site hosting for the given bucket in the indicated region.
+	/// @param bucket The name of the bucket.
+	/// @param region The region in which the bucket is located.
+	/// @return A endpoint domain for accessing the static web site hosted in the identified bucket.
+	/// @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteEndpoints.html">Website Endpoints</a>
+	/// @see <a href="https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_website_region_endpoints">Amazon Simple Storage Service Website Endpoints</a>
+	/// @see PartitionMetadata#hostname()
 	public static String getBucketWebsiteEndpoint(@NonNull final String bucket, @NonNull final Region region) {
 		final String s3WebsiteRegionDelimiter = WEBSITE_ENDPOINT_DASH_REGIONS.contains(region) ? ENDPOINT_S3_WEBSITE_REGION_DELIMITER_DASH
 				: ENDPOINT_S3_WEBSITE_REGION_DELIMITER_DOT;
 		return BUCKET_WEBSITE_ENDPOINT_TEMPLATE.apply(bucket, s3WebsiteRegionDelimiter, region.id(), region.metadata().domain());
 	}
 
-	/**
-	 * Returns the URL for static web site hosting for the given bucket in the indicated region.
-	 * @param bucket The name of the bucket.
-	 * @param region The region in which the bucket is located.
-	 * @return A URL for accessing the static web site hosted in the identified bucket.
-	 * @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteEndpoints.html">Website Endpoints</a>
-	 * @see <a href="https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_website_region_endpoints">Amazon Simple Storage Service Website Endpoints</a>
-	 * @see PartitionMetadata#hostname()
-	 */
+	/// Returns the URL for static web site hosting for the given bucket in the indicated region.
+	/// @param bucket The name of the bucket.
+	/// @param region The region in which the bucket is located.
+	/// @return A URL for accessing the static web site hosted in the identified bucket.
+	/// @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteEndpoints.html">Website Endpoints</a>
+	/// @see <a href="https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_website_region_endpoints">Amazon Simple Storage Service Website Endpoints</a>
+	/// @see PartitionMetadata#hostname()
 	public static URI getBucketWebsiteUrl(@NonNull final String bucket, @NonNull final Region region) {
 		return createURI(HTTP_URI_SCHEME, null, getBucketWebsiteEndpoint(bucket, region), -1, URIs.ROOT_PATH, null, null);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation returns a set of just {@value HTTP#HTTP_URI_SCHEME}, as S3 websites support only HTTP (not HTTPS) access.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation returns a set of just `"http"`, as S3 websites support only HTTP (not HTTPS) access.
 	@Override
 	public Set<String> getSupportedProtocols() {
 		return Set.of(HTTP_URI_SCHEME);
@@ -180,16 +152,15 @@ public class S3Website extends S3 {
 
 	private final Set<String> altBuckets;
 
-	/** @return The S3 buckets, if any, to serve as alternatives and redirect to the primary bucket. */
+	/// Returns the S3 buckets, if any, to serve as alternatives and redirect to the primary bucket.
+	/// @return The S3 buckets, if any, to serve as alternatives and redirect to the primary bucket.
 	public Set<String> getAltBuckets() {
 		return altBuckets;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version returns A stream of all bucket names, starting with the primary bucket {@link #getBucket()}, followed by the alternatives
-	 *           {@link #getAltBuckets()} in no guaranteed order.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This version returns A stream of all bucket names, starting with the primary bucket [#getBucket()], followed by the alternatives
+	///           [#getAltBuckets()] in no guaranteed order.
 	@Override
 	public Stream<String> buckets() {
 		return concat(super.buckets(), getAltBuckets().stream());
@@ -197,59 +168,59 @@ public class S3Website extends S3 {
 
 	private final DomainName siteDomain;
 
-	/** @return The explicit site domain if specified, which may be the same or different than the bucket name. */
+	/// Returns the explicit site domain if specified, which may be the same or different than the bucket name.
+	/// @return The explicit site domain if specified, which may be the same or different than the bucket name.
 	public Optional<DomainName> getSiteDomain() {
 		return Optional.ofNullable(siteDomain);
 	}
 
 	private final RedirectMeans redirectMeans;
 
-	/** @return The S3 website means to be used for effecting redirects. */
+	/// Returns the S3 website means to be used for effecting redirects.
+	/// @return The S3 website means to be used for effecting redirects.
 	public RedirectMeans getRedirectMeans() {
 		return redirectMeans;
 	}
 
 	private final int redirectCountOptimalThreshold;
 
-	/** @return The number of redirects required to switch to using object-redirects for non-collection alt locations. */
+	/// Returns the number of redirects required to switch to using object-redirects for non-collection alt locations.
+	/// @return The number of redirects required to switch to using object-redirects for non-collection alt locations.
 	public int getRedirectCountOptimalThreshold() {
 		return redirectCountOptimalThreshold;
 	}
 
 	private final Set<S3ArtifactRedirectDeployObject> routingRuleRedirectObjects = new LinkedHashSet<>();
 
-	/** @return The map of redirects to be implemented using routing rules. */
+	/// Returns the map of redirects to be implemented using routing rules.
+	/// @return The map of redirects to be implemented using routing rules.
 	protected Set<S3ArtifactRedirectDeployObject> getRoutingRuleRedirectObjects() {
 		return routingRuleRedirectObjects;
 	}
 
-	/**
-	 * Configuration constructor.
-	 * <p>
-	 * The region is retrieved from {@value #CONFIG_KEY_REGION} in the local configuration. The bucket name is retrieved from {@value #CONFIG_KEY_BUCKET} in the
-	 * local configuration, falling back to {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN} and finally {@value GuiseMummy#CONFIG_KEY_DOMAIN} in the context
-	 * configuration if not specified. The bucket alternatives are retrieved from {@value #CONFIG_KEY_ALT_BUCKETS}, falling back to
-	 * {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} in the context configuration if not specified. The site domain if explicitly set is retrieved from
-	 * {@value GuiseMummy#CONFIG_KEY_SITE_DOMAIN}, resolved as appropriate to any project domain. The redirect means is retrieved from
-	 * {@value #CONFIG_KEY_REDIRECT_MEANS} in the local configuration, defaulting to {value #DEFAULT_REDIRECT_MEANS}. The threshold for optimal redirects is
-	 * retrieved from {@value #CONFIG_KEY_REDIRECT_COUNT_OPTIMAL_THRESHOLD} in the local configuration, defaulting to
-	 * {@value #DEFAULT_REDIRECT_COUNT_OPTIMAL_OPTIMAL_THRESHOLD}.
-	 * </p>
-	 * @implSpec This method calls {@link #getConfiguredBucket(Configuration, Configuration)} and {@link #getConfiguredAltBuckets(Configuration, Configuration)}
-	 *           to determine the bucket and alternative buckets.
-	 * @implSpec This method calls {@link GuiseMummy#findConfiguredSiteDomain(Configuration)} to determine the site domain, if any.
-	 * @param context The context of static site generation.
-	 * @param localConfiguration The local configuration for this deployment target, which may be a section of the project configuration.
-	 * @see AWS#CONFIG_KEY_DEPLOY_AWS_PROFILE
-	 * @see #CONFIG_KEY_REGION
-	 * @see #CONFIG_KEY_BUCKET
-	 * @see #CONFIG_KEY_ALT_BUCKETS
-	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
-	 * @see GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS
-	 * @see GuiseMummy#CONFIG_KEY_DOMAIN
-	 * @see #getConfiguredBucket(Configuration, Configuration)
-	 * @see #getConfiguredAltBuckets(Configuration, Configuration)
-	 */
+	/// Configuration constructor.
+	///
+	/// The region is retrieved from `region` in the local configuration. The bucket name is retrieved from `bucket` in the
+	/// local configuration, falling back to `siteDomain` and finally `domain` in the context
+	/// configuration if not specified. The bucket alternatives are retrieved from `altBuckets`, falling back to
+	/// `siteAltDomains` in the context configuration if not specified. The site domain if explicitly set is retrieved from
+	/// `siteDomain`, resolved as appropriate to any project domain. The redirect means is retrieved from
+	/// `redirectMeans` in the local configuration, defaulting to `OPTIMAL`. The threshold for optimal redirects is
+	/// retrieved from `redirectCountOptimalThreshold` in the local configuration, defaulting to `30`.
+	/// @implSpec This method calls [#getConfiguredBucket(Configuration, Configuration)] and [#getConfiguredAltBuckets(Configuration, Configuration)]
+	///           to determine the bucket and alternative buckets.
+	/// @implSpec This method calls [GuiseMummy#findConfiguredSiteDomain(Configuration)] to determine the site domain, if any.
+	/// @param context The context of static site generation.
+	/// @param localConfiguration The local configuration for this deployment target, which may be a section of the project configuration.
+	/// @see AWS#CONFIG_KEY_DEPLOY_AWS_PROFILE
+	/// @see #CONFIG_KEY_REGION
+	/// @see #CONFIG_KEY_BUCKET
+	/// @see #CONFIG_KEY_ALT_BUCKETS
+	/// @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
+	/// @see GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS
+	/// @see GuiseMummy#CONFIG_KEY_DOMAIN
+	/// @see #getConfiguredBucket(Configuration, Configuration)
+	/// @see #getConfiguredAltBuckets(Configuration, Configuration)
 	public S3Website(@NonNull final MummyContext context, @NonNull final Configuration localConfiguration) {
 		this(context.getConfiguration().findString(AWS.CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null), Region.of(localConfiguration.getString(CONFIG_KEY_REGION)),
 				getConfiguredBucket(context.getConfiguration(), localConfiguration), getConfiguredAltBuckets(context.getConfiguration(), localConfiguration),
@@ -258,22 +229,20 @@ public class S3Website extends S3 {
 				localConfiguration.findInt(CONFIG_KEY_REDIRECT_COUNT_OPTIMAL_THRESHOLD).orElse(DEFAULT_REDIRECT_COUNT_OPTIMAL_OPTIMAL_THRESHOLD));
 	}
 
-	/**
-	 * Region, bucket, and alternative buckets constructor. The alternative buckets will be stored as a set.
-	 * @apiNote This redirect count optimal threshold must not be greater than <code>50</code>, because as of May 2020 AWS S3 does not allow more than this number
-	 *          of routing rule-based redirects; otherwise the following error will occur:
-	 *          <blockquote><code>software.amazon.awssdk.services.s3.model.S3Exception: … routing rules provided,
-	 *           the number of routing rules in a website configuration is limited to 50. (Service: S3, Status Code: 400, Request ID: …)</code></blockquote>
-	 * @param profile The name of the AWS profile to use for retrieving credentials, or <code>null</code> if the default credential provider should be used.
-	 * @param region The AWS region of deployment.
-	 * @param bucket The bucket into which the site should be deployed.
-	 * @param altBuckets The bucket alternatives, if any, to redirect to the primary bucket.
-	 * @param siteDomain The full-qualified domain name of the site. If specified, it will be used in cases that which a site other than the bucket is to be
-	 *          indicated, such as in redirect hostname, to prevent e.g. a CloudFront distribution redirecting back to the bucket URL.
-	 * @param redirectMeans The S3 website means to be used for effecting redirects.
-	 * @param redirectCountOptimalThreshold The number of redirects required to switch to using object-redirects for non-collection alt locations.
-	 * @throws IllegalArgumentException if the given site domain is not absolute.
-	 */
+	/// Region, bucket, and alternative buckets constructor. The alternative buckets will be stored as a set.
+	/// @apiNote This redirect count optimal threshold must not be greater than `50`, because as of May 2020 AWS S3 does not allow more than this number
+	///          of routing rule-based redirects; otherwise the following error will occur:
+	///          `software.amazon.awssdk.services.s3.model.S3Exception: … routing rules provided,
+	///          the number of routing rules in a website configuration is limited to 50. (Service: S3, Status Code: 400, Request ID: …)`
+	/// @param profile The name of the AWS profile to use for retrieving credentials, or `null` if the default credential provider should be used.
+	/// @param region The AWS region of deployment.
+	/// @param bucket The bucket into which the site should be deployed.
+	/// @param altBuckets The bucket alternatives, if any, to redirect to the primary bucket.
+	/// @param siteDomain The full-qualified domain name of the site. If specified, it will be used in cases that which a site other than the bucket is to be
+	///          indicated, such as in redirect hostname, to prevent e.g. a CloudFront distribution redirecting back to the bucket URL.
+	/// @param redirectMeans The S3 website means to be used for effecting redirects.
+	/// @param redirectCountOptimalThreshold The number of redirects required to switch to using object-redirects for non-collection alt locations.
+	/// @throws IllegalArgumentException if the given site domain is not absolute.
 	public S3Website(@Nullable String profile, @NonNull final Region region, @NonNull String bucket, @NonNull final Collection<String> altBuckets,
 			@Nullable DomainName siteDomain, @NonNull final RedirectMeans redirectMeans, final int redirectCountOptimalThreshold) {
 		super(profile, region, bucket);
@@ -286,20 +255,17 @@ public class S3Website extends S3 {
 		this.redirectCountOptimalThreshold = checkArgumentNotNegative(redirectCountOptimalThreshold);
 	}
 
-	/**
-	 * Determines the alternative buckets to use, if any. This method determines the alternative buckets in the following order:
-	 * <ol>
-	 * <li>The key {@link #CONFIG_KEY_ALT_BUCKETS} relative to the S3 configuration.</li>
-	 * <li>The site domain {@value GuiseMummy#CONFIG_KEY_SITE_ALT_DOMAINS} resolved to any project domain, to the domain name root (i.e. with the ending delimiter
-	 * removed), retrieved from the global configuration.</li>
-	 * </ol>
-	 * @implSpec This method calls {@link GuiseMummy#findConfiguredSiteAltDomains(Configuration)}.
-	 * @param globalConfiguration The configuration containing all the configuration values.
-	 * @param localConfiguration The local configuration for S3, which may be a section of the project configuration.
-	 * @return The configured alternative bucket names, if any.
-	 * @see #CONFIG_KEY_ALT_BUCKETS
-	 * @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
-	 */
+	/// Determines the alternative buckets to use, if any. This method determines the alternative buckets in the following order:
+	///
+	/// 1. The key [#CONFIG_KEY_ALT_BUCKETS] relative to the S3 configuration.
+	/// 2. The site domain `siteAltDomains` resolved to any project domain, to the domain name root (i.e. with the ending delimiter
+	///    removed), retrieved from the global configuration.
+	/// @implSpec This method calls [GuiseMummy#findConfiguredSiteAltDomains(Configuration)].
+	/// @param globalConfiguration The configuration containing all the configuration values.
+	/// @param localConfiguration The local configuration for S3, which may be a section of the project configuration.
+	/// @return The configured alternative bucket names, if any.
+	/// @see #CONFIG_KEY_ALT_BUCKETS
+	/// @see GuiseMummy#CONFIG_KEY_SITE_DOMAIN
 	protected static Collection<String> getConfiguredAltBuckets(@NonNull final Configuration globalConfiguration,
 			@NonNull final Configuration localConfiguration) {
 		return localConfiguration.findCollection(CONFIG_KEY_ALT_BUCKETS, String.class)
@@ -308,10 +274,8 @@ public class S3Website extends S3 {
 				.orElse(emptyList());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec In addition to creating the main bucket, this implementation creates and configures the alt buckets as needed.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec In addition to creating the main bucket, this implementation creates and configures the alt buckets as needed.
 	@Override
 	public void prepare(final MummyContext context) throws IOException {
 		super.prepare(context);
@@ -333,17 +297,15 @@ public class S3Website extends S3 {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation sets the policy to public. If there are any {@link ContentDeliveryTarget} deploy targets that use this target as an origin
-	 *           target, access will be restricted to only those clients which provide one of those user agents.
-	 * @implSpec This implementation sets the bucket policy irrespective of whether a policy already exists.
-	 * @see S3#policyPublicReadGetForBucket(String)
-	 * @see S3#policyPublicReadGetForBucketRequiringAnyUserAgentOf(String, Iterable)
-	 * @see MummyContext#getDeployTargets()
-	 * @see ContentDeliveryTarget#getOriginTarget(MummyContext)
-	 * @see ContentDeliveryTarget#getUserAgentIdentifications()
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation sets the policy to public. If there are any [ContentDeliveryTarget] deploy targets that use this target as an origin
+	///           target, access will be restricted to only those clients which provide one of those user agents.
+	/// @implSpec This implementation sets the bucket policy irrespective of whether a policy already exists.
+	/// @see S3#policyPublicReadGetForBucket(String)
+	/// @see S3#policyPublicReadGetForBucketRequiringAnyUserAgentOf(String, Iterable)
+	/// @see MummyContext#getDeployTargets()
+	/// @see ContentDeliveryTarget#getOriginTarget(MummyContext)
+	/// @see ContentDeliveryTarget#getUserAgentIdentifications()
 	@Override
 	protected void setBucketPolicy(final MummyContext context, final String bucket, final boolean hasPolicy) throws IOException {
 		final Logger logger = getLogger();
@@ -363,11 +325,9 @@ public class S3Website extends S3 {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec After deployment to the primary bucket, this version configures the primary and alternative buckets for website access.
-	 * @return The URL of the primary bucket website.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec After deployment to the primary bucket, this version configures the primary and alternative buckets for website access.
+	/// @return The URL of the primary bucket website.
 	@Override
 	public Optional<URI> deploy(@NonNull final MummyContext context, @NonNull Artifact rootArtifact) throws IOException {
 		super.deploy(context, rootArtifact);
@@ -445,12 +405,10 @@ public class S3Website extends S3 {
 		return Optional.of(getBucketWebsiteUrl(getBucket(), getRegion()));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation plans the entire site categorizing redirect objects in {@link #getDeployObjectsByKey()} or
-	 *           {@link #getRoutingRuleRedirectObjects()} as if {@link RedirectMeans#OBJECT} were specified, and then moves objects between the two appropriately
-	 *           as specified by {@link #getRedirectMeans()}.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation plans the entire site categorizing redirect objects in [#getDeployObjectsByKey()] or
+	///           [#getRoutingRuleRedirectObjects()] as if [RedirectMeans#OBJECT] were specified, and then moves objects between the two appropriately
+	///           as specified by [#getRedirectMeans()].
 	@Override
 	@SuppressWarnings("fallthrough")
 	protected void plan(MummyContext context, Artifact rootArtifact) throws IOException {
@@ -481,25 +439,23 @@ public class S3Website extends S3 {
 					final Iterator<S3DeployObject> deployObjectIterator = getDeployObjectsByKey().values().iterator();
 					while(deployObjectIterator.hasNext()) {
 						final S3DeployObject deployObject = deployObjectIterator.next();
-						if(deployObject instanceof S3ArtifactRedirectDeployObject) {
-							routingRuleRedirectObjects.add((S3ArtifactRedirectDeployObject)deployObject);
+						if(deployObject instanceof S3ArtifactRedirectDeployObject redirectDeployObject) {
+							routingRuleRedirectObjects.add(redirectDeployObject);
 							deployObjectIterator.remove();
 						}
 					}
 				}
 				break;
 			default:
-				throw new AssertionError(String.format("Unrecognized redirect means `%s`.", redirectMeans));
+				throw new AssertionError("Unrecognized redirect means `%s`.".formatted(redirectMeans));
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version additionally stores S3 redirect deploy objects for any alt locations as if {@link RedirectMeans#OBJECT} were specified: those
-	 *           redirects that require routing rules are stored in {@link #getRoutingRuleRedirectObjects()}, and all others are stored in
-	 *           {@link #getDeployObjectsByKey()}.
-	 * @see Artifact#PROPERTY_TAG_MUMMY_ALT_LOCATION
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This version additionally stores S3 redirect deploy objects for any alt locations as if [RedirectMeans#OBJECT] were specified: those
+	///           redirects that require routing rules are stored in [#getRoutingRuleRedirectObjects()], and all others are stored in
+	///           [#getDeployObjectsByKey()].
+	/// @see Artifact#PROPERTY_TAG_MUMMY_ALT_LOCATION
 	@Override
 	protected void planResource(final MummyContext context, final URI rootTargetPathUri, final Artifact artifact, final URIPath resourceReference)
 			throws IOException {
@@ -509,7 +465,7 @@ public class S3Website extends S3 {
 				.map(altLocationUri -> URIPath.relativize(rootTargetPathUri, altLocationUri)) //relativize to the site root
 				.ifPresent(throwingConsumer(altLocationReference -> {
 					if(!altLocationReference.isSubPath()) {
-						throw new IOException(String.format("Artifact for resource %s specifies an alternative location %s which is outside the site boundaries.",
+						throw new IOException("Artifact for resource %s specifies an alternative location %s which is outside the site boundaries.".formatted(
 								resourceReference, altLocationReference));
 					}
 					final String altKey = altLocationReference.toString();
@@ -524,17 +480,14 @@ public class S3Website extends S3 {
 				}));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version adds an object redirect as appropriate for redirect deploy objects.
-	 * @see S3ArtifactRedirectDeployObject
-	 * @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/how-to-page-redirect.html">AWS S3 configuring a webpage redirect</a>
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This version adds an object redirect as appropriate for redirect deploy objects.
+	/// @see S3ArtifactRedirectDeployObject
+	/// @see <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/how-to-page-redirect.html">AWS S3 configuring a webpage redirect</a>
 	@Override
 	protected PutObjectRequest.Builder preparePutObject(final MummyContext context, final S3DeployObject deployObject) {
 		final PutObjectRequest.Builder builder = super.preparePutObject(context, deployObject);
-		if(deployObject instanceof S3ArtifactRedirectDeployObject) {
-			final S3ArtifactRedirectDeployObject redirectDeployObject = (S3ArtifactRedirectDeployObject)deployObject;
+		if(deployObject instanceof S3ArtifactRedirectDeployObject redirectDeployObject) {
 			//The redirect path must be absolute, and the must be encoded, presumably because this is the literal HTTP `Location` header content.
 			//See https://tools.ietf.org/html/rfc7231#section-7.1.2 .
 			builder.websiteRedirectLocation(URIPath.encode(ROOT_PATH + redirectDeployObject.getRedirectTargetKey()));
@@ -542,16 +495,13 @@ public class S3Website extends S3 {
 		return builder;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version returns redirect information for redirect deploy objects.
-	 * @see S3ArtifactRedirectDeployObject
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This version returns redirect information for redirect deploy objects.
+	/// @see S3ArtifactRedirectDeployObject
 	@Override
 	protected Optional<String> findDetailLabel(final S3DeployObject deployObject) {
-		if(deployObject instanceof S3ArtifactRedirectDeployObject) {
-			final S3ArtifactRedirectDeployObject redirectDeployObject = (S3ArtifactRedirectDeployObject)deployObject;
-			return Optional.of(String.format("redirect: `%s`", redirectDeployObject.getRedirectTargetKey())); //redirect: `foo/bar`
+		if(deployObject instanceof S3ArtifactRedirectDeployObject redirectDeployObject) {
+			return Optional.of("redirect: `%s`".formatted(redirectDeployObject.getRedirectTargetKey())); //redirect: `foo/bar`
 		}
 		return super.findDetailLabel(deployObject);
 	}

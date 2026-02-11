@@ -23,18 +23,14 @@ import org.jspecify.annotations.*;
 import io.confound.config.Configuration;
 import io.guise.mummy.deploy.*;
 
-/**
- * A simple mummy context suitable for planning and mummification with minimal configuration, returning default source source file and source directory
- * mummifiers.
- * @implSpec This implementation does not support {@link #getPlan()}.
- * @author Garret Wilson
- */
+/// A simple mummy context suitable for planning and mummification with minimal configuration, returning default source source file and source directory
+/// mummifiers.
+/// @implSpec This implementation does not support [#getPlan()].
+/// @author Garret Wilson
 public class FakeMummyContext extends BaseMummyContext {
 
-	/**
-	 * Constructor.
-	 * @param project The Guise project.
-	 */
+	/// Constructor.
+	/// @param project The Guise project.
 	public FakeMummyContext(@NonNull final GuiseProject project) {
 		super(project);
 	}

@@ -26,10 +26,8 @@ import org.jspecify.annotations.*;
 import io.guise.mummy.Artifact;
 import io.urf.model.UrfResourceDescription;
 
-/**
- * A default implementation of a point of navigation.
- * @author Garret Wilson
- */
+/// A default implementation of a point of navigation.
+/// @author Garret Wilson
 public class DefaultNavigationItem implements NavigationItem {
 
 	private final String label;
@@ -63,15 +61,13 @@ public class DefaultNavigationItem implements NavigationItem {
 		return navigation;
 	}
 
-	/**
-	 * Constructor.
-	 * @implSpec A defensive copy will be made of the navigation items.
-	 * @param label The label for navigation.
-	 * @param iconId The icon identifier string, or <code>null</code> if there is no icon identified.
-	 * @param href The URI reference for navigation, or <code>null</code> if this navigation item has no target.
-	 * @param navigation The navigation subordinate to this navigation item; may be empty.
-	 * @return A navigation item.
-	 */
+	/// Constructor.
+	/// @implSpec A defensive copy will be made of the navigation items.
+	/// @param label The label for navigation.
+	/// @param iconId The icon identifier string, or `null` if there is no icon identified.
+	/// @param href The URI reference for navigation, or `null` if this navigation item has no target.
+	/// @param navigation The navigation subordinate to this navigation item; may be empty.
+	/// @return A navigation item.
 	private DefaultNavigationItem(@NonNull final String label, @Nullable final String iconId, @Nullable final String href,
 			@NonNull final Collection<NavigationItem> navigation) {
 		this.label = requireNonNull(label);
@@ -80,26 +76,22 @@ public class DefaultNavigationItem implements NavigationItem {
 		this.navigation = List.copyOf(navigation);
 	}
 
-	/**
-	 * Constructs a navigation item for a link, targeting an artifact, with no sub-navigation.
-	 * @implSpec This method delegates to {@link #forArtifactReference(String, Artifact, List)}.
-	 * @param href The URI reference for navigation; normally a relative reference.
-	 * @param navigationArtifact The artifact target of the navigation.
-	 * @return A navigation item from the href and artifact.
-	 * @see Artifact#determineLabel()
-	 */
+	/// Constructs a navigation item for a link, targeting an artifact, with no sub-navigation.
+	/// @implSpec This method delegates to [#forArtifactReference(String, Artifact, List)].
+	/// @param href The URI reference for navigation; normally a relative reference.
+	/// @param navigationArtifact The artifact target of the navigation.
+	/// @return A navigation item from the href and artifact.
+	/// @see Artifact#determineLabel()
 	public static DefaultNavigationItem forArtifactReference(@NonNull final String href, @NonNull final Artifact navigationArtifact) {
 		return forArtifactReference(href, navigationArtifact, emptyList());
 	}
 
-	/**
-	 * Constructs a navigation item for a link, targeting an artifact, with specified sub-navigation.
-	 * @param href The URI reference for navigation; normally a relative reference.
-	 * @param navigationArtifact The artifact target of the navigation.
-	 * @param navigation The navigation subordinate to this navigation item; may be empty.
-	 * @return A navigation item from the href and artifact.
-	 * @see Artifact#determineLabel()
-	 */
+	/// Constructs a navigation item for a link, targeting an artifact, with specified sub-navigation.
+	/// @param href The URI reference for navigation; normally a relative reference.
+	/// @param navigationArtifact The artifact target of the navigation.
+	/// @param navigation The navigation subordinate to this navigation item; may be empty.
+	/// @return A navigation item from the href and artifact.
+	/// @see Artifact#determineLabel()
 	public static DefaultNavigationItem forArtifactReference(@NonNull final String href, @NonNull final Artifact navigationArtifact,
 			@NonNull final List<NavigationItem> navigation) {
 		return new DefaultNavigationItem(navigationArtifact.determineLabel(),
@@ -107,21 +99,19 @@ public class DefaultNavigationItem implements NavigationItem {
 				requireNonNull(href), navigation);
 	}
 
-	/**
-	 * Constructs a navigation item for a link, targeting an artifact. If appropriate information is not available from the given description, it is retrieved
-	 * from the artifact's description.
-	 * @param href The URI reference for navigation; normally a relative reference.
-	 * @param description The description of the navigation item. Any {@value NavigationItem#PROPERTY_HANDLE_HREF} and
-	 *          {@value NavigationItem#PROPERTY_HANDLE_NAVIGATION} properties will be ignored.
-	 * @param navigationArtifact The artifact target of the navigation.
-	 * @param navigation The navigation subordinate to this navigation item; may be empty.
-	 * @return A navigation item from the href and artifact.
-	 * @see Artifact#PROPERTY_HANDLE_LABEL
-	 * @see Artifact#PROPERTY_HANDLE_ICON
-	 * @see NavigationItem#PROPERTY_HANDLE_HREF
-	 * @see Artifact#getResourceDescription()
-	 * @see Artifact#determineLabel()
-	 */
+	/// Constructs a navigation item for a link, targeting an artifact. If appropriate information is not available from the given description, it is retrieved
+	/// from the artifact's description.
+	/// @param href The URI reference for navigation; normally a relative reference.
+	/// @param description The description of the navigation item. Any [NavigationItem#PROPERTY_HANDLE_HREF] and
+	///          [NavigationItem#PROPERTY_HANDLE_NAVIGATION] properties will be ignored.
+	/// @param navigationArtifact The artifact target of the navigation.
+	/// @param navigation The navigation subordinate to this navigation item; may be empty.
+	/// @return A navigation item from the href and artifact.
+	/// @see Artifact#PROPERTY_HANDLE_LABEL
+	/// @see Artifact#PROPERTY_HANDLE_ICON
+	/// @see NavigationItem#PROPERTY_HANDLE_HREF
+	/// @see Artifact#getResourceDescription()
+	/// @see Artifact#determineLabel()
 	public static DefaultNavigationItem forArtifactReference(@NonNull final String href, @Nullable final UrfResourceDescription description,
 			@NonNull final Artifact navigationArtifact, @NonNull final List<NavigationItem> navigation) {
 		requireNonNull(navigationArtifact);
@@ -132,17 +122,15 @@ public class DefaultNavigationItem implements NavigationItem {
 				requireNonNull(href), navigation);
 	}
 
-	/**
-	 * Constructs a navigation item for a link that is not targeting an artifact.
-	 * @param href The URI reference for navigation; normally an absolute URI.
-	 * @param description The description of the navigation item. Any {@value NavigationItem#PROPERTY_HANDLE_HREF} and
-	 *          {@value NavigationItem#PROPERTY_HANDLE_NAVIGATION} properties will be ignored.
-	 * @param navigation The navigation subordinate to this navigation item; may be empty.
-	 * @return A navigation item from the href.
-	 * @see Artifact#PROPERTY_HANDLE_LABEL
-	 * @see Artifact#PROPERTY_HANDLE_ICON
-	 * @throws IllegalArgumentException if the description does not indicate a label.
-	 */
+	/// Constructs a navigation item for a link that is not targeting an artifact.
+	/// @param href The URI reference for navigation; normally an absolute URI.
+	/// @param description The description of the navigation item. Any [NavigationItem#PROPERTY_HANDLE_HREF] and
+	///          [NavigationItem#PROPERTY_HANDLE_NAVIGATION] properties will be ignored.
+	/// @param navigation The navigation subordinate to this navigation item; may be empty.
+	/// @return A navigation item from the href.
+	/// @see Artifact#PROPERTY_HANDLE_LABEL
+	/// @see Artifact#PROPERTY_HANDLE_ICON
+	/// @throws IllegalArgumentException if the description does not indicate a label.
 	public static DefaultNavigationItem forReference(@NonNull final String href, @Nullable final UrfResourceDescription description,
 			@NonNull final List<NavigationItem> navigation) {
 		return new DefaultNavigationItem(
@@ -151,18 +139,16 @@ public class DefaultNavigationItem implements NavigationItem {
 				description.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_ICON).map(Object::toString).orElse(null), requireNonNull(href), navigation);
 	}
 
-	/**
-	 * Constructs a navigation item from a description, with no reference.
-	 * @apiNote If a reference is desired, it should be preprocessed to create the appropriate relative reference, and passed to
-	 *          {@link #forArtifactReference(String, UrfResourceDescription, Artifact, List)}.
-	 * @param description The description of the navigation item. Any {@value NavigationItem#PROPERTY_HANDLE_HREF} and
-	 *          {@value NavigationItem#PROPERTY_HANDLE_NAVIGATION} properties will be ignored.
-	 * @param navigation The navigation subordinate to this navigation item; may be empty.
-	 * @return A navigation item from the description.
-	 * @see Artifact#PROPERTY_HANDLE_LABEL
-	 * @see Artifact#PROPERTY_HANDLE_ICON
-	 * @throws IllegalArgumentException if the description does not indicate a label.
-	 */
+	/// Constructs a navigation item from a description, with no reference.
+	/// @apiNote If a reference is desired, it should be preprocessed to create the appropriate relative reference, and passed to
+	///          [#forArtifactReference(String, UrfResourceDescription, Artifact, List)].
+	/// @param description The description of the navigation item. Any [NavigationItem#PROPERTY_HANDLE_HREF] and
+	///          [NavigationItem#PROPERTY_HANDLE_NAVIGATION] properties will be ignored.
+	/// @param navigation The navigation subordinate to this navigation item; may be empty.
+	/// @return A navigation item from the description.
+	/// @see Artifact#PROPERTY_HANDLE_LABEL
+	/// @see Artifact#PROPERTY_HANDLE_ICON
+	/// @throws IllegalArgumentException if the description does not indicate a label.
 	public static DefaultNavigationItem fromDescription(@Nullable final UrfResourceDescription description, @NonNull final List<NavigationItem> navigation) {
 		return new DefaultNavigationItem(
 				description.findPropertyValueByHandle(Artifact.PROPERTY_HANDLE_LABEL).map(Object::toString)

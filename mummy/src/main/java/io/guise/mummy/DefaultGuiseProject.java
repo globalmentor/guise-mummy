@@ -25,10 +25,8 @@ import org.jspecify.annotations.*;
 
 import io.confound.config.Configuration;
 
-/**
- * Default implementation of a Guise project.
- * @author Garret Wilson
- */
+/// Default implementation of a Guise project.
+/// @author Garret Wilson
 public class DefaultGuiseProject implements GuiseProject {
 
 	private final Path directory;
@@ -45,23 +43,19 @@ public class DefaultGuiseProject implements GuiseProject {
 		return configuration;
 	}
 
-	/**
-	 * Directory constructor with a default configuration.
-	 * @apiNote This constructor is useful for tests; in production code an explicit configuration should usually be given.
-	 * @implSpec The default configuration is retrieved from {@link GuiseMummy#getDefaultConfiguration(Path)}.
-	 * @param directory The absolute project directory.
-	 * @throws IllegalArgumentException if the project directory is not absolute.
-	 */
+	/// Directory constructor with a default configuration.
+	/// @apiNote This constructor is useful for tests; in production code an explicit configuration should usually be given.
+	/// @implSpec The default configuration is retrieved from [GuiseMummy#getDefaultConfiguration(Path)].
+	/// @param directory The absolute project directory.
+	/// @throws IllegalArgumentException if the project directory is not absolute.
 	public DefaultGuiseProject(@NonNull final Path directory) {
 		this(directory, GuiseMummy.getDefaultConfiguration(directory));
 	}
 
-	/**
-	 * Directory and configuration constructor.
-	 * @param directory The absolute project directory.
-	 * @param configuration The project configuration.
-	 * @throws IllegalArgumentException if the project directory is not absolute.
-	 */
+	/// Directory and configuration constructor.
+	/// @param directory The absolute project directory.
+	/// @param configuration The project configuration.
+	/// @throws IllegalArgumentException if the project directory is not absolute.
 	public DefaultGuiseProject(@NonNull final Path directory, @NonNull final Configuration configuration) {
 		this.directory = checkArgumentAbsolute(directory).normalize();
 		this.configuration = requireNonNull(configuration);

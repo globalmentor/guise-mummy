@@ -25,10 +25,8 @@ import org.jspecify.annotations.*;
 import io.guise.mummy.mummify.Mummifier;
 import io.urf.model.UrfResourceDescription;
 
-/**
- * Abstract implementation with a known description.
- * @author Garret Wilson
- */
+/// Abstract implementation with a known description.
+/// @author Garret Wilson
 public abstract class AbstractDescribedArtifact extends AbstractArtifact {
 
 	private final UrfResourceDescription description;
@@ -38,13 +36,11 @@ public abstract class AbstractDescribedArtifact extends AbstractArtifact {
 		return description;
 	}
 
-	/**
-	 * Constructor
-	 * @param mummifier The mummifier responsible for generating this artifact.
-	 * @param sourcePath The file containing the source of this artifact.
-	 * @param outputPath The file where the artifact will be generated.
-	 * @param description The description of the artifact.
-	 */
+	/// Constructor
+	/// @param mummifier The mummifier responsible for generating this artifact.
+	/// @param sourcePath The file containing the source of this artifact.
+	/// @param outputPath The file where the artifact will be generated.
+	/// @param description The description of the artifact.
 	public AbstractDescribedArtifact(@NonNull final Mummifier mummifier, @NonNull final Path sourcePath, @NonNull final Path outputPath,
 			@NonNull final UrfResourceDescription description) {
 		super(mummifier, sourcePath, outputPath);

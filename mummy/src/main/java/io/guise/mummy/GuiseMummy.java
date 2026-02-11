@@ -19,7 +19,6 @@ package io.guise.mummy;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
-import static java.lang.String.format;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
@@ -48,28 +47,24 @@ import io.guise.mummy.mummify.image.ImageMummifier;
 import io.guise.mummy.mummify.page.PageMummifier;
 import io.urf.format.turf.TurfSerializer;
 
-/**
- * Guise static site generator.
- * @author Garret Wilson
- */
+/// Guise static site generator.
+/// @author Garret Wilson
 public class GuiseMummy implements Clogged {
 
-	/** The official name of Guise Mummy. */
+	/// The official name of Guise Mummy.
 	public static final String NAME;
 
-	/** The current Guise Mummy version. */
+	/// The current Guise Mummy version.
 	public static final String VERSION;
 
-	/**
-	 * The Guise Mummifier software identifier in human-readable format, including of the name and version.
-	 * @implSpec the label is in the form <code>Guise Mummy <var>version</var></code>.
-	 */
+	/// The Guise Mummifier software identifier in human-readable format, including of the name and version.
+	/// @implSpec the label is in the form `Guise Mummy version`.
 	public static final String LABEL;
 
-	/** The configuration key containing the name. */
+	/// The configuration key containing the name.
 	private static final String CLASS_CONFIG_KEY_NAME = "name";
 
-	/** The configuration key containing the version. */
+	/// The configuration key containing the version.
 	private static final String CLASS_CONFIG_KEY_VERSION = "version";
 
 	static {
@@ -84,50 +79,46 @@ public class GuiseMummy implements Clogged {
 		}
 	}
 
-	/** The string form of the namespace of Guise Mummy elements, such as in an XHTML document or as the leading IRI segment of RDFa metadata. */
+	/// The string form of the namespace of Guise Mummy elements, such as in an XHTML document or as the leading IRI segment of RDFa metadata.
 	public static final String NAMESPACE_STRING = "https://guise.io/name/mummy/";
 
-	/** The namespace of Guise Mummy elements, such as in an XHTML document or as the leading IRI segment of RDFa metadata. */
+	/// The namespace of Guise Mummy elements, such as in an XHTML document or as the leading IRI segment of RDFa metadata.
 	public static final URI NAMESPACE = URI.create(NAMESPACE_STRING);
 
-	/** The typical prefix used for the namespace of Guise Mummy elements, such as in an XHTML document or in RDFa metadata. */
+	/// The typical prefix used for the namespace of Guise Mummy elements, such as in an XHTML document or in RDFa metadata.
 	public static final String NAMESPACE_PREFIX = "mummy";
 
-	/** The phases of the default Guise Mummy life cycle, in order. */
+	/// The phases of the default Guise Mummy life cycle, in order.
 	public enum LifeCyclePhase {
-		/** Initialize. */
+		/// Initialize.
 		INITIALIZE,
-		/** Validate. */
+		/// Validate.
 		VALIDATE,
-		/** Plan. */
+		/// Plan.
 		PLAN,
-		/** Mummify. */
+		/// Mummify.
 		MUMMIFY,
-		/** Prepare deploy. */
+		/// Prepare deploy.
 		PREPARE_DEPLOY,
-		/** Deploy. */
+		/// Deploy.
 		DEPLOY
 	};
 
 	//# configuration
 
-	/**
-	 * The configuration for the domain name of the project (e.g. <code>example.com.</code>). May not be the same as the site domain (e.g.
-	 * <code>www.example.com</code>). If present must be in absolute form; that is, ending with a dot <code>.</code> delimiter.
-	 */
+	/// The configuration for the domain name of the project (e.g. `example.com.`). May not be the same as the site domain (e.g.
+	/// `www.example.com`). If present must be in absolute form; that is, ending with a dot `.` delimiter.
 	public static final String CONFIG_KEY_DOMAIN = "domain";
 
-	/**
-	 * Retrieves the configured domain as a FQDN.
-	 * @param configuration The configuration from which to retrieve values.
-	 * @return The absolute domain, if present.
-	 * @see #CONFIG_KEY_DOMAIN
-	 * @throws ConfigurationException if the domain is not absolute.
-	 */
+	/// Retrieves the configured domain as a FQDN.
+	/// @param configuration The configuration from which to retrieve values.
+	/// @return The absolute domain, if present.
+	/// @see #CONFIG_KEY_DOMAIN
+	/// @throws ConfigurationException if the domain is not absolute.
 	public static Optional<DomainName> findConfiguredDomain(@NonNull final Configuration configuration) throws ConfigurationException {
 		return configuration.findString(CONFIG_KEY_DOMAIN).map(DomainName::of).map(domain -> {
 			if(!domain.isAbsolute() || domain.isRoot()) {
-				throw new ConfigurationException(format("The `%s` configuration `%s` must be a fully-qualified, non-root domain, ending in a dot `%s` character.",
+				throw new ConfigurationException("The `%s` configuration `%s` must be a fully-qualified, non-root domain, ending in a dot `%s` character.".formatted(
 						CONFIG_KEY_DOMAIN, domain, DomainName.DELIMITER)); //TODO i18n
 			}
 			return domain;
@@ -136,52 +127,46 @@ public class GuiseMummy implements Clogged {
 
 	//## site configuration
 
-	/** The configuration for the canonical domain name of the site, such as <code>example.com</code> or <code>www.example.com</code>. */
+	/// The configuration for the canonical domain name of the site, such as `example.com` or `www.example.com`.
 	public static final String CONFIG_KEY_SITE_DOMAIN = "site.domain";
 
-	/**
-	 * Retrieves the configured site domain as a FQDN. The value of {@value #CONFIG_KEY_SITE_DOMAIN} if any is resolved against the value of
-	 * {@value #CONFIG_KEY_DOMAIN}, if any, defaulting to the value of {@link #CONFIG_KEY_DOMAIN}.
-	 * @param configuration The configuration from which to retrieve values.
-	 * @return The absolute form of the site domain, if present.
-	 * @see #CONFIG_KEY_SITE_DOMAIN
-	 * @see #CONFIG_KEY_DOMAIN
-	 * @throws ConfigurationException if the site domain cannot be resolved to absolute form.
-	 */
+	/// Retrieves the configured site domain as a FQDN. The value of `site.domain` if any is resolved against the value of
+	/// `domain`, if any, defaulting to the value of [#CONFIG_KEY_DOMAIN].
+	/// @param configuration The configuration from which to retrieve values.
+	/// @return The absolute form of the site domain, if present.
+	/// @see #CONFIG_KEY_SITE_DOMAIN
+	/// @see #CONFIG_KEY_DOMAIN
+	/// @throws ConfigurationException if the site domain cannot be resolved to absolute form.
 	public static Optional<DomainName> findConfiguredSiteDomain(@NonNull final Configuration configuration) throws ConfigurationException {
 		final Optional<DomainName> configuredDomain = findConfiguredDomain(configuration);
 		final DomainName base = configuredDomain.orElse(DomainName.EMPTY);
 		return configuration.findString(CONFIG_KEY_SITE_DOMAIN).map(DomainName::of).map(base::resolve).or(() -> configuredDomain).map(siteDomain -> {
 			if(!siteDomain.isAbsolute() || siteDomain.isRoot()) {
-				throw new ConfigurationException(format(
-						"The `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character; or resolve against a `%s` configuration that is a FQDN.",
-						CONFIG_KEY_SITE_DOMAIN, siteDomain, DomainName.DELIMITER, CONFIG_KEY_DOMAIN));
+				throw new ConfigurationException(
+						("The `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character; or resolve against a `%s` configuration that is a FQDN."
+						).formatted(CONFIG_KEY_SITE_DOMAIN, siteDomain, DomainName.DELIMITER, CONFIG_KEY_DOMAIN));
 			}
 			return siteDomain;
 		});
 	}
 
-	/**
-	 * The configuration for the list of alternative domain names of the site, such as <code>www.example.com</code> (as an alternative for
-	 * <code>example.com</code>) or <code>example.com</code> (if the canonical domain name is <code>www.example.com</code>).
-	 */
+	/// The configuration for the list of alternative domain names of the site, such as `www.example.com` (as an alternative for
+	/// `example.com`) or `example.com` (if the canonical domain name is `www.example.com`).
 	public static final String CONFIG_KEY_SITE_ALT_DOMAINS = "site.altDomains";
 
-	/**
-	 * Retrieves the configured alternative site domain as FQDNs.
-	 * @param configuration The configuration from which to retrieve values.
-	 * @return The absolute form of the site alternate domains, if present.
-	 * @see #CONFIG_KEY_SITE_ALT_DOMAINS
-	 * @throws ConfigurationException if one of the site alternate domains cannot be resolved to absolute form.
-	 */
+	/// Retrieves the configured alternative site domain as FQDNs.
+	/// @param configuration The configuration from which to retrieve values.
+	/// @return The absolute form of the site alternate domains, if present.
+	/// @see #CONFIG_KEY_SITE_ALT_DOMAINS
+	/// @throws ConfigurationException if one of the site alternate domains cannot be resolved to absolute form.
 	public static Optional<Collection<DomainName>> findConfiguredSiteAltDomains(@NonNull final Configuration configuration) {
 		final DomainName base = findConfiguredDomain(configuration).orElse(DomainName.EMPTY);
 		return configuration.findCollection(CONFIG_KEY_SITE_ALT_DOMAINS, String.class)
 				.map(names -> names.stream().map(DomainName::of).map(base::resolve).map(siteAltDomain -> {
 					if(!siteAltDomain.isAbsolute() || siteAltDomain.isRoot()) {
-						throw new ConfigurationException(format(
-								"The `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character; or resolve against a `%s` configuration that is a FQDN.",
-								CONFIG_KEY_SITE_ALT_DOMAINS, siteAltDomain, DomainName.DELIMITER, CONFIG_KEY_DOMAIN)); //TODO i18n
+						throw new ConfigurationException(
+								("The `%s` configuration `%s` must be a fully-qualified, non-root domain name (FQDN), ending in a dot `%s` character; or resolve against a `%s` configuration that is a FQDN."
+								).formatted(CONFIG_KEY_SITE_ALT_DOMAINS, siteAltDomain, DomainName.DELIMITER, CONFIG_KEY_DOMAIN)); //TODO i18n
 					}
 					return siteAltDomain;
 				}).collect(toCollection(LinkedHashSet::new)));
@@ -189,58 +174,49 @@ public class GuiseMummy implements Clogged {
 
 	//## mummy configuration
 
-	/** The base filename for the Mummy configuration within the source tree. */
+	/// The base filename for the Mummy configuration within the source tree.
 	public static final String MUMMY_CONFIG_BASE_FILENAME = ".guise-mummy";
 
-	/**
-	 * The regular expression indicating if an artifact should be considered an <dfn>asset</dfn> if its name matches. The regular expression may have at most one
-	 * matching group. If there is a matching group and it provides a match, the artifact will be renamed to the value of the matched group. If there is no
-	 * matching group, the artifact will not have a separate asset name. In either case, the artifact may still be subject to other renaming rules, such as
-	 * extension removal for bare names.
-	 * @see PageMummifier#CONFIG_KEY_MUMMY_PAGE_NAMES_BARE
-	 */
+	/// The regular expression indicating if an artifact should be considered an *asset* if its name matches. The regular expression may have at most one
+	/// matching group. If there is a matching group and it provides a match, the artifact will be renamed to the value of the matched group. If there is no
+	/// matching group, the artifact will not have a separate asset name. In either case, the artifact may still be subject to other renaming rules, such as
+	/// extension removal for bare names.
+	/// @see PageMummifier#CONFIG_KEY_MUMMY_PAGE_NAMES_BARE
 	public static final String CONFIG_KEY_MUMMY_ASSET_NAME_PATTERN = "mummy.assetNamePattern";
-	/**
-	 * The configuration for the list of base filenames of files, in order of priority, that serve as content for a collection; defaults to
-	 * <code>["index"]</code>. During mummification, any content file discovered will be normalized (renamed if needed) to the first of these base filenames.
-	 */
+	/// The configuration for the list of base filenames of files, in order of priority, that serve as content for a collection; defaults to
+	/// `["index"]`. During mummification, any content file discovered will be normalized (renamed if needed) to the first of these base filenames.
 	public static final String CONFIG_KEY_MUMMY_COLLECTION_CONTENT_BASE_NAMES = "mummy.collectionContentBaseNames";
-	/** The configuration for the base filename for navigation definition; defaults to <code>.navigation</code>. */
+	/// The configuration for the base filename for navigation definition; defaults to `.navigation`.
 	public static final String CONFIG_KEY_MUMMY_NAVIGATION_BASE_NAME = "mummy.navigationBaseName";
-	/** The configuration for the base filename of a template; defaults to <code>.template</code>. */
+	/// The configuration for the base filename of a template; defaults to `.template`.
 	public static final String CONFIG_KEY_MUMMY_TEMPLATE_BASE_NAME = "mummy.templateBaseName";
-	/**
-	 * The configuration specifying the newline character sequence to use. Defaults to <code>LF</code> (<code>U+000A</code>) in order to have repeatable builds
-	 * across platforms.
-	 */
+	/// The configuration specifying the newline character sequence to use. Defaults to `LF` (`U+000A`) in order to have repeatable builds
+	/// across platforms.
 	public static final String CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR = "mummy.textOutputLineSeparator";
-	/**
-	 * The regular expression indicating if an artifact should be considered <dfn>veiled</dfn> if its name matches. The regular expression may have at most one
-	 * matching group. If there is a matching group and it provides a match, the artifact will be renamed to the value of the matched group. If there is no
-	 * matching group, the artifact will not have a separate unveiled name. In either case, the artifact may still be subject to other renaming rules, such as
-	 * extension removal for bare names.
-	 * @see PageMummifier#CONFIG_KEY_MUMMY_PAGE_NAMES_BARE
-	 */
+	/// The regular expression indicating if an artifact should be considered *veiled* if its name matches. The regular expression may have at most one
+	/// matching group. If there is a matching group and it provides a match, the artifact will be renamed to the value of the matched group. If there is no
+	/// matching group, the artifact will not have a separate unveiled name. In either case, the artifact may still be subject to other renaming rules, such as
+	/// extension removal for bare names.
+	/// @see PageMummifier#CONFIG_KEY_MUMMY_PAGE_NAMES_BARE
 	public static final String CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN = "mummy.veilNamePattern";
 
 	//## deploy configuration
 
-	/** The configuration indicating the DNS to use, if any, for deployment. Must be a {@link Section} indicating a {@link Dns}. */
+	/// The configuration indicating the DNS to use, if any, for deployment. Must be a [Section] indicating a [Dns].
 	public static final String CONFIG_KEY_DEPLOY_DNS = "deploy.dns";
-	/** The configuration indicating the deployment targets, if any. Must be a collection of {@link Section} each indicating a {@link DeployTarget}. */
+	/// The configuration indicating the deployment targets, if any. Must be a collection of [Section] each indicating a [DeployTarget].
 	public static final String CONFIG_KEY_DEPLOY_TARGETS = "deploy.targets";
 
 	private boolean full = false;
 
-	/** @return <code>true</code> if full mummification is enabled; <code>false</code> if mummification is incremental. */
+	/// Indicates whether full mummification is enabled, as opposed to incremental mummification.
+	/// @return `true` if full mummification is enabled; `false` if mummification is incremental.
 	public boolean isFull() {
 		return full;
 	}
 
-	/**
-	 * Enables or disables full mummification.
-	 * @param full <code>true</code> if full mummification should occur; <code>false</code> if mummification should be incremental.
-	 */
+	/// Enables or disables full mummification.
+	/// @param full `true` if full mummification should occur; `false` if mummification should be incremental.
 	public void setFull(final boolean full) {
 		this.full = full;
 	}
@@ -249,7 +225,8 @@ public class GuiseMummy implements Clogged {
 
 	private final List<URI> deployUrls = new ArrayList<>();
 
-	/** @return The URLs of the sites that were successfully deployed. */
+	/// Returns the URLs of the sites that were successfully deployed.
+	/// @return The URLs of the sites that were successfully deployed.
 	public List<URI> getDeployUrls() {
 		return unmodifiableList(deployUrls);
 	}
@@ -258,32 +235,28 @@ public class GuiseMummy implements Clogged {
 
 	private Set<Class<? extends SourcePathMummifier>> fileMummifierTypes = new HashSet<>();
 
-	/**
-	 * Adds a mummifier type. If that type has already been added, no action occurs.
-	 * @param mummifierClass The class representing the type of mummifier to add
-	 * @throws IllegalArgumentException if the mummifier class does not have a no-args constructor.
-	 */
+	/// Adds a mummifier type. If that type has already been added, no action occurs.
+	/// @param mummifierClass The class representing the type of mummifier to add
+	/// @throws IllegalArgumentException if the mummifier class does not have a no-args constructor.
 	public void addFileMummifierType(@NonNull final Class<? extends SourcePathMummifier> mummifierClass) {
 		try {
 			mummifierClass.getDeclaredConstructor();
 		} catch(final NoSuchMethodException noSuchMethodException) {
-			throw new IllegalArgumentException(format("Mummifier type %s does not declare a no-args constructor.", mummifierClass.getName()));
+			throw new IllegalArgumentException("Mummifier type %s does not declare a no-args constructor.".formatted(mummifierClass.getName()));
 		}
 		fileMummifierTypes.add(mummifierClass);
 	}
 
-	/** No-args constructor. */
+	/// No-args constructor.
 	public GuiseMummy() {
 	}
 
-	/**
-	 * Performs static site generation on a source directory into a target directory.
-	 * @param project The Guise project governing mummification.
-	 * @param phase The life cycle phase to execute (including all those before it).
-	 * @throws IllegalArgumentException if the configured source directory does not exist or is not a directory.
-	 * @throws IllegalArgumentException if the configured source and target directories overlap.
-	 * @throws IOException if there is an I/O error generating the static site.
-	 */
+	/// Performs static site generation on a source directory into a target directory.
+	/// @param project The Guise project governing mummification.
+	/// @param phase The life cycle phase to execute (including all those before it).
+	/// @throws IllegalArgumentException if the configured source directory does not exist or is not a directory.
+	/// @throws IllegalArgumentException if the configured source and target directories overlap.
+	/// @throws IOException if there is an I/O error generating the static site.
 	public void mummify(@NonNull final GuiseProject project, @NonNull final LifeCyclePhase phase) throws IOException {
 
 		//# initialize phase
@@ -335,10 +308,10 @@ public class GuiseMummy implements Clogged {
 						} else if(targetType.equals(S3Website.class.getSimpleName())) {
 							target = new S3Website(context, targetSection);
 						} else {
-							throw new ConfigurationException(format("Unknown deployment target type: `%s`.", targetType));
+							throw new ConfigurationException("Unknown deployment target type: `%s`.".formatted(targetType));
 						}
 						return target;
-					}).collect(toList());
+					}).toList();
 				}).orElse(emptyList());
 				context.setDeployTargets(deployTargets); //store the targets in the context for later
 
@@ -368,12 +341,10 @@ public class GuiseMummy implements Clogged {
 		}
 	}
 
-	/**
-	 * Initialize phase; loads the site configuration, if any, and sets up the mummy context.
-	 * @param project The project governing site mummification.
-	 * @return A context to use during mummification.
-	 * @throws IOException if there is an I/O error during initialization, such as when loading the site configuration.
-	 */
+	/// Initialize phase; loads the site configuration, if any, and sets up the mummy context.
+	/// @param project The project governing site mummification.
+	/// @return A context to use during mummification.
+	/// @throws IOException if there is an I/O error during initialization, such as when loading the site configuration.
 	protected Context initialize(@NonNull final GuiseProject project) throws IOException {
 		final Path siteSourceDirectory = project.getDirectory().resolve(project.getConfiguration().getPath(GuiseMummy.PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY));
 
@@ -395,7 +366,7 @@ public class GuiseMummy implements Clogged {
 				fileMummifier = mummifierClass.getDeclaredConstructor().newInstance();
 			} catch(InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
 					| SecurityException instantiationException) {
-				throw new RuntimeException(format("Error instantiating mummifier %s.", mummifierClass.getName()), instantiationException);
+				throw new RuntimeException("Error instantiating mummifier %s.".formatted(mummifierClass.getName()), instantiationException);
 			}
 			context.registerFileMummifier(fileMummifier);
 		}
@@ -407,29 +378,23 @@ public class GuiseMummy implements Clogged {
 		return context;
 	}
 
-	/**
-	 * The set of deprecated config keys which, if detected during validation, will generate a warning.
-	 * @apiNote These will probably eventually be relocated the mummifier API or to a system of plugins.
-	 */
+	/// The set of deprecated config keys which, if detected during validation, will generate a warning.
+	/// @apiNote These will probably eventually be relocated the mummifier API or to a system of plugins.
 	private static final Set<String> DEPRECATED_CONFIG_KEYS = Set.of();
 
-	/**
-	 * The set of obsolete config keys which, if detected during validation, will generate an error.
-	 * @apiNote These will probably eventually be relocated the mummifier API or to a system of plugins.
-	 */
+	/// The set of obsolete config keys which, if detected during validation, will generate an error.
+	/// @apiNote These will probably eventually be relocated the mummifier API or to a system of plugins.
 	@SuppressWarnings("deprecation")
 	private static final Set<String> OBSOLETE_CONFIG_KEYS = Set.of(PageMummifier.OBSOLETE_CONFIG_KEY_MUMMY_PAGE_NAMES_BARE);
 
-	/**
-	 * Validate phase; checks directories and other settings.
-	 * @implSpec For each deprecated configuration key used, a warning will be generated. If an obsolete configuration key is used, a configuration exception will
-	 *           be thrown.
-	 * @param context The context of static site generation.
-	 * @throws IllegalArgumentException if the configured source directory does not exist or is not a directory.
-	 * @throws IllegalArgumentException if the configured source and target directories overlap.
-	 * @throws ConfigurationException if the configuration is invalid.
-	 * @throws IOException if there is an I/O error during validation.
-	 */
+	/// Validate phase; checks directories and other settings.
+	/// @implSpec For each deprecated configuration key used, a warning will be generated. If an obsolete configuration key is used, a configuration exception will
+	///           be thrown.
+	/// @param context The context of static site generation.
+	/// @throws IllegalArgumentException if the configured source directory does not exist or is not a directory.
+	/// @throws IllegalArgumentException if the configured source and target directories overlap.
+	/// @throws ConfigurationException if the configuration is invalid.
+	/// @throws IOException if there is an I/O error during validation.
 	public void validate(@NonNull final MummyContext context) throws IOException {
 		checkArgumentDirectory(context.getSiteSourceDirectory());
 		checkArgumentDisjoint(context.getSiteSourceDirectory(), context.getSiteTargetDirectory());
@@ -437,7 +402,7 @@ public class GuiseMummy implements Clogged {
 		DEPRECATED_CONFIG_KEYS.stream().filter(configuration::hasConfigurationValue)
 				.forEach(deprecatedConfigKey -> getLogger().warn("The configuration key `{}` is deprecated and may be removed in the future.", deprecatedConfigKey));
 		OBSOLETE_CONFIG_KEYS.stream().filter(configuration::hasConfigurationValue).findAny().ifPresent(obsoleteConfigKey -> {
-			throw new ConfigurationException(format("The configuration key `%s` is obsolete and must not be used.", obsoleteConfigKey));
+			throw new ConfigurationException("The configuration key `%s` is obsolete and must not be used.".formatted(obsoleteConfigKey));
 		});
 		//make sure all the configured domains resolve to FQDNs
 		findConfiguredDomain(configuration);
@@ -460,17 +425,17 @@ public class GuiseMummy implements Clogged {
 		}
 
 		context.getPlan().findParentArtifact(artifact).ifPresent(parent -> getLogger().trace("  parent: {}", parent.getTargetPath()));
-		final Collection<Artifact> siblings = context.getPlan().siblingArtifacts(artifact).collect(toList()); //TODO make debugging calls more efficient, or transfer to describe functionality  
+		final Collection<Artifact> siblings = context.getPlan().siblingArtifacts(artifact).toList(); //TODO make debugging calls more efficient, or transfer to describe functionality  
 		if(!siblings.isEmpty()) {
 			getLogger().trace("  siblings: {}", siblings);
 		}
-		final Collection<Artifact> children = context.getPlan().childArtifacts(artifact).collect(toList());
+		final Collection<Artifact> children = context.getPlan().childArtifacts(artifact).toList();
 		if(!children.isEmpty()) {
 			getLogger().trace("  children: {}", children);
 		}
 
-		if(artifact instanceof CollectionArtifact) {
-			for(final Artifact childArtifact : ((CollectionArtifact)artifact).getChildArtifacts()) {
+		if(artifact instanceof CollectionArtifact collectionArtifact) {
+			for(final Artifact childArtifact : collectionArtifact.getChildArtifacts()) {
 				printArtifactDescription(context, childArtifact);
 			}
 		}
@@ -478,65 +443,55 @@ public class GuiseMummy implements Clogged {
 
 	//project configuration
 
-	/** The base filename for the project configuration. */
+	/// The base filename for the project configuration.
 	public static final String PROJECT_CONFIG_BASE_FILENAME = "guise-project";
 
-	/** The default relative path of the project source directory. Analogous to Maven's <code>${project.basedir}/src</code> property. */
+	/// The default relative path of the project source directory. Analogous to Maven's `${project.basedir}/src` property.
 	public final static Path DEFAULT_PROJECT_SOURCE_RELATIVE_DIR = Paths.get("src");
 
-	/**
-	 * The default relative path of the site source directory. Similar to the default value of Maven's <code>siteDirectory</code> property, which is
-	 * <code>${project.basedir}/src/site</code>..
-	 * @see <a href="https://maven.apache.org/plugins/maven-site-plugin/site-mojo.html#siteDirectory">Apache Maven Site Plugin: site:site
-	 *      &lt;siteDirectory&gt;</a>.
-	 */
+	/// The default relative path of the site source directory. Similar to the default value of Maven's `siteDirectory` property, which is
+	/// `${project.basedir}/src/site`.
+	/// @see <a href="https://maven.apache.org/plugins/maven-site-plugin/site-mojo.html#siteDirectory">Apache Maven Site Plugin: site:site
+	///      &lt;siteDirectory&gt;</a>.
 	public final static Path DEFAULT_PROJECT_SITE_SOURCE_RELATIVE_DIR = DEFAULT_PROJECT_SOURCE_RELATIVE_DIR.resolve("site");
 
-	/**
-	 * The default relative path of the build directory. Analogous to the default value of Maven's <code>project.build.directory</code> property, which is
-	 * <code>${project.basedir}/target</code>.
-	 */
+	/// The default relative path of the build directory. Analogous to the default value of Maven's `project.build.directory` property, which is
+	/// `${project.basedir}/target`.
 	public final static Path DEFAULT_PROJECT_BUILD_RELATIVE_DIR = Paths.get("target");
 
-	/**
-	 * The default relative path of the site target directory. Similar to the default value of Maven's <code>generatedSiteDirectory</code> property, which is
-	 * <code>${project.build.directory}/generated-site</code>.
-	 * @see <a href="https://maven.apache.org/plugins/maven-site-plugin/site-mojo.html#generatedSiteDirectory">Apache Maven Site Plugin: site:site
-	 *      &lt;generatedSiteDirectory&gt;</a>.
-	 * @see #DEFAULT_PROJECT_SITE_SOURCE_RELATIVE_DIR
-	 */
+	/// The default relative path of the site target directory. Similar to the default value of Maven's `generatedSiteDirectory` property, which is
+	/// `${project.build.directory}/generated-site`.
+	/// @see <a href="https://maven.apache.org/plugins/maven-site-plugin/site-mojo.html#generatedSiteDirectory">Apache Maven Site Plugin: site:site
+	///      &lt;generatedSiteDirectory&gt;</a>.
+	/// @see #DEFAULT_PROJECT_SITE_SOURCE_RELATIVE_DIR
 	public final static Path DEFAULT_PROJECT_SITE_TARGET_RELATIVE_DIR = DEFAULT_PROJECT_BUILD_RELATIVE_DIR.resolve("site");
 
-	/**
-	 * The default relative path of the site description target directory.
-	 * @see #DEFAULT_PROJECT_SITE_TARGET_RELATIVE_DIR
-	 */
+	/// The default relative path of the site description target directory.
+	/// @see #DEFAULT_PROJECT_SITE_TARGET_RELATIVE_DIR
 	public final static Path DEFAULT_PROJECT_SITE_DESCRIPTION_TARGET_RELATIVE_DIR = DEFAULT_PROJECT_BUILD_RELATIVE_DIR.resolve("site-description");
 
-	/** The configuration key for the site source directory. */
+	/// The configuration key for the site source directory.
 	public static final String PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY = "siteSourceDirectory";
-	/** The configuration key for the site target directory. */
+	/// The configuration key for the site target directory.
 	public static final String PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY = "siteTargetDirectory";
-	/** The configuration key for the site description target directory. */
+	/// The configuration key for the site description target directory.
 	public static final String PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY = "siteDescriptionTargetDirectory";
 
-	/**
-	 * Creates a Guise Mummy project based upon a project directory and optional explicit directory overrides.
-	 * @apiNote Because the paths other than the project directory may be relative, as may those in the configuration files, when retrieving paths they must be
-	 *          resolved against the project directory.
-	 * @implSpec This implementation ultimately falls back to the default configuration returned by {@link #getDefaultConfiguration(Path)}.
-	 * @param projectDirectory The required absolute base directory for the project, in which the project file, if any, would be found.
-	 * @param siteSourceDirectory The site source directory, or if <code>null</code> falling back to that specified in the project configuration as
-	 *          {@value #PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY}, defaulting to <code>src/site</code> relative to the project directory.
-	 * @param siteTargetDirectory The site target directory, or if <code>null</code> falling back to that specified in the project configuration as
-	 *          {@value #PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY}, defaulting to <code>target/site</code> relative to the project directory.
-	 * @param siteDescriptionTargetDirectory The site description target directory, or if <code>null</code> falling back to that specified in the project
-	 *          configuration as {@value #PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY}, defaulting to <code>target/site-description</code> relative to
-	 *          the project directory.
-	 * @return The new project.
-	 * @throws IllegalArgumentException if one of the given directories is not absolute.
-	 * @throws IOException if there is an error determining or loading the project.
-	 */
+	/// Creates a Guise Mummy project based upon a project directory and optional explicit directory overrides.
+	/// @apiNote Because the paths other than the project directory may be relative, as may those in the configuration files, when retrieving paths they must be
+	///          resolved against the project directory.
+	/// @implSpec This implementation ultimately falls back to the default configuration returned by [#getDefaultConfiguration(Path)].
+	/// @param projectDirectory The required absolute base directory for the project, in which the project file, if any, would be found.
+	/// @param siteSourceDirectory The site source directory, or if `null` falling back to that specified in the project configuration as
+	///          `siteSourceDirectory`, defaulting to `src/site` relative to the project directory.
+	/// @param siteTargetDirectory The site target directory, or if `null` falling back to that specified in the project configuration as
+	///          `siteTargetDirectory`, defaulting to `target/site` relative to the project directory.
+	/// @param siteDescriptionTargetDirectory The site description target directory, or if `null` falling back to that specified in the project
+	///          configuration as `siteDescriptionTargetDirectory`, defaulting to `target/site-description` relative to
+	///          the project directory.
+	/// @return The new project.
+	/// @throws IllegalArgumentException if one of the given directories is not absolute.
+	/// @throws IOException if there is an error determining or loading the project.
 	public static GuiseProject createProject(@NonNull Path projectDirectory, @Nullable final Path siteSourceDirectory, @Nullable final Path siteTargetDirectory,
 			@Nullable final Path siteDescriptionTargetDirectory) throws IOException {
 		projectDirectory = checkArgumentAbsolute(projectDirectory).normalize();
@@ -563,12 +518,10 @@ public class GuiseMummy implements Clogged {
 		return new DefaultGuiseProject(projectDirectory, projectConfiguration);
 	}
 
-	/**
-	 * Returns the default fallback configuration values for Guise Mummy. The configuration may not be mutable.
-	 * @param projectDirectory The required absolute base directory for the project.
-	 * @return The default Guise Mummy settings configuration.
-	 * @throws IllegalArgumentException if the project directory is not absolute.
-	 */
+	/// Returns the default fallback configuration values for Guise Mummy. The configuration may not be mutable.
+	/// @param projectDirectory The required absolute base directory for the project.
+	/// @return The default Guise Mummy settings configuration.
+	/// @throws IllegalArgumentException if the project directory is not absolute.
 	public static Configuration getDefaultConfiguration(@NonNull Path projectDirectory) {
 		projectDirectory = checkArgumentAbsolute(projectDirectory).normalize();
 		final Map<String, Object> defaultSettings = new HashMap<>();
@@ -582,17 +535,15 @@ public class GuiseMummy implements Clogged {
 		defaultSettings.put(CONFIG_KEY_MUMMY_TEXT_OUTPUT_LINE_SEPARATOR, "\n");
 		defaultSettings.put(CONFIG_KEY_MUMMY_VEIL_NAME_PATTERN, Pattern.compile("_(.*)"));
 		//TODO create facility for mummifiers (and later plugins) to contribute default settings
-		defaultSettings.put(format(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___SCALE_MAX_LENGTH, "preview"), 600);
-		defaultSettings.put(format(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___COMPRESSION_QUALITY, "preview"), 0.6);
-		defaultSettings.put(format(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___SCALE_MAX_LENGTH, "thumbnail"), 300);
-		defaultSettings.put(format(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___COMPRESSION_QUALITY, "thumbnail"), 0.6);
+		defaultSettings.put(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___SCALE_MAX_LENGTH.formatted("preview"), 600);
+		defaultSettings.put(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___COMPRESSION_QUALITY.formatted("preview"), 0.6);
+		defaultSettings.put(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___SCALE_MAX_LENGTH.formatted("thumbnail"), 300);
+		defaultSettings.put(ImageMummifier.CONFIG_KEY_FORMAT_MUMMY_IMAGE_ASPECT___COMPRESSION_QUALITY.formatted("thumbnail"), 0.6);
 		return new ObjectMapConfiguration(unmodifiableMap(defaultSettings));
 	}
 
-	/**
-	 * Mutable mummification context controlled by Guise Mummy itself.
-	 * @author Garret Wilson
-	 */
+	/// Mutable mummification context controlled by Guise Mummy itself.
+	/// @author Garret Wilson
 	protected class Context extends BaseMummyContext {
 
 		private final Configuration siteConfiguration;
@@ -615,10 +566,8 @@ public class GuiseMummy implements Clogged {
 			return plan;
 		}
 
-		/**
-		 * Sets the site plan.
-		 * @param plan The plan for the site.
-		 */
+		/// Sets the site plan.
+		/// @param plan The plan for the site.
 		protected void setPlan(@NonNull final MummyPlan plan) {
 			this.plan = requireNonNull(plan);
 		}
@@ -627,10 +576,8 @@ public class GuiseMummy implements Clogged {
 
 		private Dns deployDns = null;
 
-		/**
-		 * Sets the DNS configured for deployment.
-		 * @param deployDns The DNS to use for deployment.
-		 */
+		/// Sets the DNS configured for deployment.
+		/// @param deployDns The DNS to use for deployment.
 		protected void setDeployDns(@NonNull final Dns deployDns) {
 			this.deployDns = requireNonNull(deployDns);
 		}
@@ -642,10 +589,8 @@ public class GuiseMummy implements Clogged {
 
 		private List<DeployTarget> deployTargets = null;
 
-		/**
-		 * Sets the targets configured for deployment.
-		 * @param deployTargets The deployment targets.
-		 */
+		/// Sets the targets configured for deployment.
+		/// @param deployTargets The deployment targets.
 		protected void setDeployTargets(@NonNull final List<DeployTarget> deployTargets) {
 			this.deployTargets = requireNonNull(deployTargets);
 		}
@@ -655,12 +600,10 @@ public class GuiseMummy implements Clogged {
 			return Optional.ofNullable(deployTargets);
 		}
 
-		/**
-		 * Site source directory constructor.
-		 * @apiNote No validation is performed to ensure directories are valid.
-		 * @param project The Guise project.
-		 * @param siteConfiguration The configuration for the site.
-		 */
+		/// Site source directory constructor.
+		/// @apiNote No validation is performed to ensure directories are valid.
+		/// @param project The Guise project.
+		/// @param siteConfiguration The configuration for the site.
 		public Context(@NonNull final GuiseProject project, @NonNull final Configuration siteConfiguration) {
 			super(project);
 			this.siteConfiguration = requireNonNull(siteConfiguration);

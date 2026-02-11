@@ -30,69 +30,58 @@ import io.urf.vocab.content.Content;
 import software.amazon.awssdk.core.internal.util.Mimetype;
 import software.amazon.awssdk.core.sync.RequestBody;
 
-/**
- * An S3 object for deploying a Guise Mummy artifact.
- * @author Garret Wilson
- * @see Artifact
- */
+/// An S3 object for deploying a Guise Mummy artifact.
+/// @author Garret Wilson
+/// @see Artifact
 public class S3ArtifactDeployObject extends AbstractS3DeployObject {
 
 	private final Artifact artifact;
 
-	/** @return The artifact with the contents to be deployed in the bucket as the object. */
+	/// Returns the artifact with the contents to be deployed in the bucket as the object.
+	/// @return The artifact with the contents to be deployed in the bucket as the object.
 	public Artifact getArtifact() {
 		return artifact;
 	}
 
-	/**
-	 * Constructor.
-	 * @param key The S3 key representing the deployment path of the object in the bucket.
-	 * @param artifact The artifact with the contents to be deployed in the bucket as the object.
-	 */
+	/// Constructor.
+	/// @param key The S3 key representing the deployment path of the object in the bucket.
+	/// @param artifact The artifact with the contents to be deployed in the bucket as the object.
 	public S3ArtifactDeployObject(@NonNull final String key, @NonNull final Artifact artifact) {
 		super(key);
 		this.artifact = requireNonNull(artifact);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation includes returns the {@link Content#FINGERPRINT_PROPERTY_TAG} property of the resource description if present.
-	 * @see Content#FINGERPRINT_PROPERTY_TAG
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation includes returns the [Content#FINGERPRINT_PROPERTY_TAG] property of the resource description if present.
+	/// @see Content#FINGERPRINT_PROPERTY_TAG
 	@Override
 	public Optional<byte[]> findFingerprint() {
 		return filterAsInstance(getArtifact().getResourceDescription().findPropertyValue(Content.FINGERPRINT_PROPERTY_TAG), byte[].class); //TODO improve URF to use immutable byte string
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation returns the size of the artifact's target file.
-	 * @see Artifact#getTargetPath()
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation returns the size of the artifact's target file.
+	/// @see Artifact#getTargetPath()
 	@Override
 	public long getContentLength() throws IOException {
 		return Files.size(getArtifact().getTargetPath());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation returns the {@link Content#TYPE_PROPERTY_TAG} property of the artifact resource description if present; otherwise returns
-	 *           {@link Mimetype#getMimetype(Path)}.
-	 * @implNote Retrieving a default content type from {@link Mimetype#getMimetype(Path)} is equivalent to what happens when {@link RequestBody#fromFile(Path)}
-	 *           is called when deploying an object directly from a file.
-	 * @see Content#TYPE_PROPERTY_TAG
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation returns the [Content#TYPE_PROPERTY_TAG] property of the artifact resource description if present; otherwise returns
+	///           [Mimetype#getMimetype(Path)].
+	/// @implNote Retrieving a default content type from [Mimetype#getMimetype(Path)] is equivalent to what happens when [RequestBody#fromFile(Path)]
+	///           is called when deploying an object directly from a file.
+	/// @see Content#TYPE_PROPERTY_TAG
 	@Override
 	public String getContentType() {
 		return getArtifact().getResourceDescription().findPropertyValue(Content.TYPE_PROPERTY_TAG).map(Object::toString)
 				.orElseGet(() -> Mimetype.getInstance().getMimetype(getArtifact().getTargetPath()));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation creates a new input stream to the artifact's target file.
-	 * @see Artifact#getTargetPath()
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation creates a new input stream to the artifact's target file.
+	/// @see Artifact#getTargetPath()
 	@Override
 	protected InputStream createInputStream() throws IOException {
 		return Files.newInputStream(getArtifact().getTargetPath());

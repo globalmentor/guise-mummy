@@ -23,13 +23,11 @@ import java.util.regex.Matcher;
 
 import org.junit.jupiter.api.*;
 
-/**
- * Tests of {@link SourcePathArtifact}.
- * @author Garret Wilson
- */
+/// Tests of [SourcePathArtifact].
+/// @author Garret Wilson
 public class SourcePathArtifactTest {
 
-	/** @see SourcePathArtifact#POST_FILENAME_PATTERN */
+	/// @see SourcePathArtifact#POST_FILENAME_PATTERN
 	@Test
 	public void testPostFilenamePatternSimple() {
 		final Matcher matcher = SourcePathArtifact.POST_FILENAME_PATTERN.matcher("@2010-09-08-foobar.md");
@@ -51,7 +49,7 @@ public class SourcePathArtifactTest {
 		assertThat(SourcePathArtifact.POST_FILENAME_PATTERN.matcher("@2010-09-08foobar.md").matches(), is(false));
 	}
 
-	/** @see SourcePathArtifact#POST_FILENAME_PATTERN */
+	/// @see SourcePathArtifact#POST_FILENAME_PATTERN
 	@Test
 	public void testPostFilenamePatternComplex() {
 		final Matcher matcher = SourcePathArtifact.POST_FILENAME_PATTERN.matcher("@2010-09-08-this-And that@touché ^test.foo.$bar123");

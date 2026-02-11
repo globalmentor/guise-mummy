@@ -32,31 +32,29 @@ import com.globalmentor.net.MediaType;
 
 import io.urf.vocab.content.Content;
 
-/**
- * Base functionality for implementing an artifact query.
- * @author Garret Wilson
- */
+/// Base functionality for implementing an artifact query.
+/// @author Garret Wilson
 public abstract class BaseArtifactQuery implements ArtifactQuery {
+
+	/// Constructor.
+	protected BaseArtifactQuery() {
+	}
 
 	private Stream<Artifact> stream = null;
 
 	private Comparator<Artifact> comparator;
 
-	/**
-	 * Sets the stream to provide the source of artifacts for later filtering an other operations. The stream can only be set once for the query.
-	 * @param stream The stream source of artifacts.
-	 * @throws IllegalStateException if the stream has already been set.
-	 */
+	/// Sets the stream to provide the source of artifacts for later filtering an other operations. The stream can only be set once for the query.
+	/// @param stream The stream source of artifacts.
+	/// @throws IllegalStateException if the stream has already been set.
 	protected void setStream(@NonNull final Stream<Artifact> stream) {
 		checkState(this.stream == null, "Query already initialized with artifact source stream.");
 		this.stream = requireNonNull(stream);
 	}
 
-	/**
-	 * Executes the query and returns an iterator to the artifacts.
-	 * @implSpec This implementation does not yet support querying all artifacts; setting an initial set of artifacts via {@link #setStream(Stream)} is required.
-	 * @throws IllegalStateException if the query has not yet been initialized with an artifact source stream.
-	 */
+	/// Executes the query and returns an iterator to the artifacts.
+	/// @implSpec This implementation does not yet support querying all artifacts; setting an initial set of artifacts via [#setStream(Stream)] is required.
+	/// @throws IllegalStateException if the query has not yet been initialized with an artifact source stream.
 	@Override
 	public Iterator<Artifact> iterator() {
 		checkState(this.stream != null, "Query has not been initialized by calling a `fromXXX()` method.");
@@ -71,21 +69,17 @@ public abstract class BaseArtifactQuery implements ArtifactQuery {
 
 	//filter
 
-	/**
-	 * Adds an additional filtering of artifacts.
-	 * @param predicate A predicate with which to filter the artifacts.
-	 * @throws IllegalStateException if the query has not yet been initialized with an artifact source stream.
-	 */
+	/// Adds an additional filtering of artifacts.
+	/// @param predicate A predicate with which to filter the artifacts.
+	/// @throws IllegalStateException if the query has not yet been initialized with an artifact source stream.
 	protected void addFilter(@NonNull final Predicate<? super Artifact> predicate) {
 		checkState(this.stream != null, "Query has not been initialized by calling a `fromXXX()` method.");
 		this.stream = this.stream.filter(predicate);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation checks the artifact resource property from {@link Artifact#getResourceDescription()} using the property
-	 *           {@link Content#TYPE_PROPERTY_TAG}.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation checks the artifact resource property from [Artifact#getResourceDescription()] using the property
+	///           [Content#TYPE_PROPERTY_TAG].
 	@Override
 	public ArtifactQuery filterContentType(final CharSequence contentTypeMatch) {
 		addFilter(artifact -> artifact.getResourceDescription().findPropertyValue(Content.TYPE_PROPERTY_TAG).flatMap(asInstance(MediaType.class))
@@ -95,11 +89,9 @@ public abstract class BaseArtifactQuery implements ArtifactQuery {
 
 	//order by
 
-	/**
-	 * Sets or adds a sorting order to the artifacts to be returned by the query. If no sorting has been specified, the given comparator indicates the order. If a
-	 * sorting has already been specified, the given comparator indicates the subordinate (e.g. secondary) ordering.
-	 * @param comparator The comparator specifying the sort ordering of the artifacts.
-	 */
+	/// Sets or adds a sorting order to the artifacts to be returned by the query. If no sorting has been specified, the given comparator indicates the order. If a
+	/// sorting has already been specified, the given comparator indicates the subordinate (e.g. secondary) ordering.
+	/// @param comparator The comparator specifying the sort ordering of the artifacts.
 	@SuppressWarnings("unchecked")
 	protected void addComparator(@NonNull final Comparator<? super Artifact> comparator) {
 		this.comparator = this.comparator == null ? (Comparator<Artifact>)requireNonNull(comparator) : this.comparator.thenComparing(comparator);
@@ -111,9 +103,7 @@ public abstract class BaseArtifactQuery implements ArtifactQuery {
 		return this;
 	}
 
-	/**
-	 * {@inheritDoc} This implementation adds a comparator using {@link #addComparator(Comparator)}.
-	 */
+	/// {@inheritDoc} This implementation adds a comparator using [#addComparator(Comparator)].
 	@Override
 	public ArtifactQuery reversedOrder() {
 		checkState(this.comparator != null, "Cannot reverse the order, as no order has been specified.");

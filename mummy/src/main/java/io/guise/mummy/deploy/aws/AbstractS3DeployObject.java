@@ -24,12 +24,10 @@ import java.util.*;
 
 import org.jspecify.annotations.*;
 
-/**
- * Encapsulation of object, such as a Guise Mummy artifact, to be deployed to S3.
- * @implSpec This class provides an implementation of {@link #createContentStreamProvider()} that only requires subclasses to override
- *           {@link #createInputStream()} to retrieve an input stream to the deploy object content.
- * @author Garret Wilson
- */
+/// Encapsulation of object, such as a Guise Mummy artifact, to be deployed to S3.
+/// @implSpec This class provides an implementation of [#createContentStreamProvider()] that only requires subclasses to override
+///           [#createInputStream()] to retrieve an input stream to the deploy object content.
+/// @author Garret Wilson
 public abstract class AbstractS3DeployObject implements S3DeployObject {
 
 	private final String key;
@@ -39,21 +37,17 @@ public abstract class AbstractS3DeployObject implements S3DeployObject {
 		return key;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation includes {@link S3DeployObject#METADATA_CONTENT_FINGERPRINT} metadata as Base64 if a fingerprint is available.
-	 * @see #findFingerprint()
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation includes [S3DeployObject#METADATA_CONTENT_FINGERPRINT] metadata as Base64 if a fingerprint is available.
+	/// @see #findFingerprint()
 	@Override
 	public Map<String, String> getMetadata() {
 		return findFingerprint().map(bytes -> Base64.getUrlEncoder().withoutPadding().encodeToString(bytes))
 				.map(base64 -> Map.of(METADATA_CONTENT_FINGERPRINT, base64)).orElse(emptyMap());
 	}
 
-	/**
-	 * Constructor.
-	 * @param key The S3 key representing the deployment path of the object in the bucket.
-	 */
+	/// Constructor.
+	/// @param key The S3 key representing the deployment path of the object in the bucket.
 	public AbstractS3DeployObject(@NonNull final String key) {
 		this.key = requireNonNull(key);
 	}
@@ -63,55 +57,49 @@ public abstract class AbstractS3DeployObject implements S3DeployObject {
 		return new ContentStreamProvider();
 	}
 
-	/**
-	 * Input stream factory method.
-	 * @return An new input stream to the source content for this object.
-	 * @throws IOException if there is an I/O error creating the input stream.
-	 */
+	/// Input stream factory method.
+	/// @return An new input stream to the source content for this object.
+	/// @throws IOException if there is an I/O error creating the input stream.
 	protected abstract InputStream createInputStream() throws IOException;
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation returns the hash code of the key.
-	 * @see #getKey()
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation returns the hash code of the key.
+	/// @see #getKey()
 	@Override
 	public int hashCode() {
 		return getKey().hashCode();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation determines equality based on the value of the key.
-	 * @see #getKey()
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation determines equality based on the value of the key.
+	/// @see #getKey()
 	@Override
 	public boolean equals(@Nullable final Object object) {
 		if(this == object) {
 			return true;
 		}
-		if(!(object instanceof S3DeployObject)) {
+		if(!(object instanceof S3DeployObject s3DeployObject)) {
 			return false;
 		}
-		return getKey().equals(((S3DeployObject)object).getKey());
+		return getKey().equals(s3DeployObject.getKey());
 	}
 
-	/**
-	 * Implementation of an AWS content stream provider for an S3 deploy object.
-	 * @implSpec This implementation calls {@link AbstractS3DeployObject#createInputStream()} to create new input streams as needed.
-	 * @author Garret Wilson
-	 * @see software.amazon.awssdk.core.internal.sync.FileContentStreamProvider
-	 */
+	/// Implementation of an AWS content stream provider for an S3 deploy object.
+	/// @implSpec This implementation calls [AbstractS3DeployObject#createInputStream()] to create new input streams as needed.
+	/// @author Garret Wilson
+	/// @see software.amazon.awssdk.core.internal.sync.FileContentStreamProvider
 	protected class ContentStreamProvider implements software.amazon.awssdk.http.ContentStreamProvider {
+
+		/// Constructor.
+		protected ContentStreamProvider() {
+		}
 
 		private InputStream inputStream = null;
 
-		/**
-		 * {@inheritDoc}
-		 * @implSpec This implementation closes any previous stream that has been opened by this instance.
-		 * @throws UncheckedIOException if an I/O error occurred closing an existing input stream or opening a new one.
-		 * @see AbstractS3DeployObject#createInputStream()
-		 */
+		/// {@inheritDoc}
+		/// @implSpec This implementation closes any previous stream that has been opened by this instance.
+		/// @throws UncheckedIOException if an I/O error occurred closing an existing input stream or opening a new one.
+		/// @see AbstractS3DeployObject#createInputStream()
 		@Override
 		public final InputStream newStream() {
 			try {

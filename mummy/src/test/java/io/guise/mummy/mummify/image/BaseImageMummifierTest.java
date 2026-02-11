@@ -47,153 +47,84 @@ import io.guise.mummy.mummify.image.BaseImageMummifier.TempOutputStream;
 import io.urf.URF.Handle;
 import io.urf.model.*;
 
-/**
- * Tests of {@link BaseImageMummifier}.
- * @implNote Currently there are no tests to ensure that XMP metadata overrides IPTC metadata. Concentration is on XMP as the canonical metadata, and Exif as
- *           the ubiquitous metadata.
- * @author Garret Wilson
- */
+/// Tests of [BaseImageMummifier].
+/// @implNote Currently there are no tests to ensure that XMP metadata overrides IPTC metadata. Concentration is on XMP as the canonical metadata, and Exif as
+///           the ubiquitous metadata.
+/// @author Garret Wilson
 public class BaseImageMummifierTest {
 
-	/**
-	 * A sample JPEG image with a mix of Exif and XMP metadata, including:
-	 * <dl>
-	 * <dt><code>Copyright</code> (Exif <code>0x8298</code>)</dt>
-	 * <dd>Copyright (C) 2009 Garret Wilson</dd>
-	 * <dt><code>DateTimeOriginal</code> (Exif <code>0x9003</code>)</dt>
-	 * <dd><code>2009:08:29 16:51:21</code></dd>
-	 * <dt><code>Make</code> (Exif <code>0x010F</code>)</dt>
-	 * <dd>Canon</dd>
-	 * <dt><code>Software</code> (Exif <code>0x0131</code>)</dt>
-	 * <dd>paint.net 4.2.14</dd>
-	 * <dt><code>dc:Creator</code> (XMP)</dt>
-	 * <dd>Garret Wilson</dd>
-	 * <dt><code>dc:Rights</code> (XMP)</dt>
-	 * <dd>Copyright © 2009 Garret Wilson</dd>
-	 * <dt><code>xmp:CreateDate</code> (XMP)</dt>
-	 * <dd><code>2009:08:29 16:51:21.00-07:00</code></dd>
-	 * <dd>
-	 * </dl>
-	 */
+	/// A sample JPEG image with a mix of Exif and XMP metadata, including:
+	///
+	/// - **`Copyright` (Exif `0x8298`)**: Copyright (C) 2009 Garret Wilson
+	/// - **`DateTimeOriginal` (Exif `0x9003`)**: `2009:08:29 16:51:21`
+	/// - **`Make` (Exif `0x010F`)**: Canon
+	/// - **`Software` (Exif `0x0131`)**: paint.net 4.2.14
+	/// - **`dc:Creator` (XMP)**: Garret Wilson
+	/// - **`dc:Rights` (XMP)**: Copyright © 2009 Garret Wilson
+	/// - **`xmp:CreateDate` (XMP)**: `2009:08:29 16:51:21.00-07:00`
 	public static final String GATE_TURRET_REDUCED_JPEG_RESOURCE_NAME = "gate-turret-reduced.jpg";
 	public static final long GATE_TURRET_REDUCED_JPEG_FILE_SIZE = 83052;
 	public static final int GATE_TURRET_REDUCED_JPEG_WIDTH = 972;
 	public static final int GATE_TURRET_REDUCED_JPEG_HEIGHT = 648;
 
-	/** A sample JPEG image with no metadata at all. */
+	/// A sample JPEG image with no metadata at all.
 	public static final String GATE_TURRET_REDUCED_NO_METADATA_JPEG_RESOURCE_NAME = "gate-turret-reduced-no-metadata.jpg";
 
-	/**
-	 * A sample JPEG image with only Exif metadata, including:
-	 * <dl>
-	 * <dt><code>XPTitle</code> (Exif <code>0x9C9B</code>)</dt>
-	 * <dd>Gate and Turret</dd>
-	 * <dt><code>ImageDescription</code> (Exif <code>0x010E</code>)</dt>
-	 * <dd>Castle turret viewed through a gate.</dd>
-	 * <dt><code>Artist</code> (Exif <code>0x010E</code>)</dt>
-	 * <dd>Garret Wilson</dd>
-	 * <dt><code>Copyright</code> (Exif <code>0x8298</code>)</dt>
-	 * <dd>Copyright (C) 2009 Garret Wilson</dd>
-	 * <dt><code>DateTimeOriginal</code> (Exif <code>0x9003</code>)</dt>
-	 * <dd><code>2009:08:29 16:51:21</code></dd>
-	 * <dt><code>Make</code> (Exif <code>0x010F</code>)</dt>
-	 * <dd>Canon</dd>
-	 * <dt><code>Software</code> (Exif <code>0x0131</code>)</dt>
-	 * <dd>paint.net 4.2.14</dd>
-	 * <dd>
-	 * </dl>
-	 */
+	/// A sample JPEG image with only Exif metadata, including:
+	///
+	/// - **`XPTitle` (Exif `0x9C9B`)**: Gate and Turret
+	/// - **`ImageDescription` (Exif `0x010E`)**: Castle turret viewed through a gate.
+	/// - **`Artist` (Exif `0x010E`)**: Garret Wilson
+	/// - **`Copyright` (Exif `0x8298`)**: Copyright (C) 2009 Garret Wilson
+	/// - **`DateTimeOriginal` (Exif `0x9003`)**: `2009:08:29 16:51:21`
+	/// - **`Make` (Exif `0x010F`)**: Canon
+	/// - **`Software` (Exif `0x0131`)**: paint.net 4.2.14
 	public static final String GATE_TURRET_REDUCED_EXIF_JPEG_RESOURCE_NAME = "gate-turret-reduced-exif.jpg";
 
-	/**
-	 * A sample JPEG image with only Exif metadata encoded in UTF-8, including:
-	 * <dl>
-	 * <dt><code>XPTitle</code> (Exif <code>0x9C9B</code>)</dt>
-	 * <dd>Gate and Turret</dd>
-	 * <dt><code>ImageDescription</code> (Exif <code>0x010E</code>)</dt>
-	 * <dd>Castle turret viewed through a gate.</dd>
-	 * <dt><code>Copyright</code> (Exif <code>0x8298</code>)</dt>
-	 * <dd>Copyright © 2009 Garret Wilson</dd>
-	 * <dt><code>DateTimeOriginal</code> (Exif <code>0x9003</code>)</dt>
-	 * <dd><code>2009:08:29 16:51:21</code></dd>
-	 * <dt><code>Make</code> (Exif <code>0x010F</code>)</dt>
-	 * <dd>Canon</dd>
-	 * <dt><code>Software</code> (Exif <code>0x0131</code>)</dt>
-	 * <dd>paint.net 4.2.14</dd>
-	 * <dd>
-	 * </dl>
-	 */
+	/// A sample JPEG image with only Exif metadata encoded in UTF-8, including:
+	///
+	/// - **`XPTitle` (Exif `0x9C9B`)**: Gate and Turret
+	/// - **`ImageDescription` (Exif `0x010E`)**: Castle turret viewed through a gate.
+	/// - **`Copyright` (Exif `0x8298`)**: Copyright © 2009 Garret Wilson
+	/// - **`DateTimeOriginal` (Exif `0x9003`)**: `2009:08:29 16:51:21`
+	/// - **`Make` (Exif `0x010F`)**: Canon
+	/// - **`Software` (Exif `0x0131`)**: paint.net 4.2.14
 	public static final String GATE_TURRET_REDUCED_EXIF_UTF_8_JPEG_RESOURCE_NAME = "gate-turret-reduced-exif-utf-8.jpg";
 
-	/**
-	 * A sample JPEG image with Exif and IPTC metadata, including:
-	 * <dl>
-	 * <dt><code>Copyright</code> (Exif <code>0x8298</code>)</dt>
-	 * <dd>Copyright (C) 2009 Garret Wilson</dd>
-	 * <dt><code>DateTimeOriginal</code> (Exif <code>0x9003</code>)</dt>
-	 * <dd><code>2009:08:29 16:51:21</code></dd>
-	 * <dt><code>Make</code> (Exif <code>0x010F</code>)</dt>
-	 * <dd>Canon</dd>
-	 * <dt><code>Software</code> (Exif <code>0x0131</code>)</dt>
-	 * <dd>paint.net 4.2.14</dd>
-	 * <dt><code>ObjectName</code> (IPTC-IIM <code>2:05</code>, <code>0x205</code>)</dt>
-	 * <dd>Gate and Turret</dd>
-	 * <dt><code>Caption</code> (IPTC-IIM <code>2:120</code>, <code>0x0278</code>)</dt>
-	 * <dd>Castle turret viewed through a gate.</dd>
-	 * <dt><code>CopyrightNotice</code> (IPTC-IIM <code>2:116</code>, <code>0x0274</code>)</dt>
-	 * <dd>Copyright © 2009 Garret Wilson</dd>
-	 * <dt><code>DateCreated</code> (IPTC-IIM <code>2:55</code>, <code>0x0237</code>)</dt>
-	 * <dd><code>2009:08:29</code></dd>
-	 * <dt><code>TimeCreated</code> (IPTC-IIM <code>2:60</code>, <code>0x023C</code>)</dt>
-	 * <dd><code>16:51:21-07:00</code></dd>
-	 * <dd>
-	 * </dl>
-	 */
+	/// A sample JPEG image with Exif and IPTC metadata, including:
+	///
+	/// - **`Copyright` (Exif `0x8298`)**: Copyright (C) 2009 Garret Wilson
+	/// - **`DateTimeOriginal` (Exif `0x9003`)**: `2009:08:29 16:51:21`
+	/// - **`Make` (Exif `0x010F`)**: Canon
+	/// - **`Software` (Exif `0x0131`)**: paint.net 4.2.14
+	/// - **`ObjectName` (IPTC-IIM `2:05`, `0x205`)**: Gate and Turret
+	/// - **`Caption` (IPTC-IIM `2:120`, `0x0278`)**: Castle turret viewed through a gate.
+	/// - **`CopyrightNotice` (IPTC-IIM `2:116`, `0x0274`)**: Copyright © 2009 Garret Wilson
+	/// - **`DateCreated` (IPTC-IIM `2:55`, `0x0237`)**: `2009:08:29`
+	/// - **`TimeCreated` (IPTC-IIM `2:60`, `0x023C`)**: `16:51:21-07:00`
 	public static final String GATE_TURRET_REDUCED_EXIF_IPTC_JPEG_RESOURCE_NAME = "gate-turret-reduced-exif-iptc.jpg";
 
-	/**
-	 * A sample JPEG image with Exif and XMP metadata, including:
-	 * <dl>
-	 * <dt><code>Copyright</code> (Exif <code>0x8298</code>)</dt>
-	 * <dd>Copyright (C) 2009 Garret Wilson</dd>
-	 * <dt><code>DateTimeOriginal</code> (Exif <code>0x9003</code>)</dt>
-	 * <dd><code>2009:08:29 16:51:21</code></dd>
-	 * <dt><code>Make</code> (Exif <code>0x010F</code>)</dt>
-	 * <dd>Canon</dd>
-	 * <dt><code>Software</code> (Exif <code>0x0131</code>)</dt>
-	 * <dd>paint.net 4.2.14</dd>
-	 * <dt><code>dc:Title</code> (XMP)</dt>
-	 * <dd>Gate and Turret</dd>
-	 * <dt><code>dc:Description</code> (XMP)</dt>
-	 * <dd>Castle turret viewed through a gate.</dd>
-	 * <dt><code>dc:Rights</code> (XMP)</dt>
-	 * <dd>Copyright © 2009 Garret Wilson</dd>
-	 * <dt><code>dc:Creator</code> (XMP)</dt>
-	 * <dd>Garret Wilson</dd>
-	 * <dt><code>xmp:CreateDate</code> (XMP)</dt>
-	 * <dd><code>2009:08:29 16:51:21.00-07:00</code></dd>
-	 * <dd>
-	 * </dl>
-	 */
+	/// A sample JPEG image with Exif and XMP metadata, including:
+	///
+	/// - **`Copyright` (Exif `0x8298`)**: Copyright (C) 2009 Garret Wilson
+	/// - **`DateTimeOriginal` (Exif `0x9003`)**: `2009:08:29 16:51:21`
+	/// - **`Make` (Exif `0x010F`)**: Canon
+	/// - **`Software` (Exif `0x0131`)**: paint.net 4.2.14
+	/// - **`dc:Title` (XMP)**: Gate and Turret
+	/// - **`dc:Description` (XMP)**: Castle turret viewed through a gate.
+	/// - **`dc:Rights` (XMP)**: Copyright © 2009 Garret Wilson
+	/// - **`dc:Creator` (XMP)**: Garret Wilson
+	/// - **`xmp:CreateDate` (XMP)**: `2009:08:29 16:51:21.00-07:00`
 	public static final String GATE_TURRET_REDUCED_EXIF_XMP_JPEG_RESOURCE_NAME = "gate-turret-reduced-exif-xmp.jpg";
 	public static final long GATE_TURRET_REDUCED_EXIF_XMP_JPEG_FILE_SIZE = 83309;
 
-	/**
-	 * A sample JPEG image with only XMP metadata, including:
-	 * <dl>
-	 * <dt><code>dc:Title</code> (XMP)</dt>
-	 * <dd>Gate and Turret</dd>
-	 * <dt><code>dc:Description</code> (XMP)</dt>
-	 * <dd>Castle turret viewed through a gate.</dd>
-	 * <dt><code>dc:Rights</code> (XMP)</dt>
-	 * <dd>Copyright © 2009 Garret Wilson</dd>
-	 * <dt><code>dc:Creator</code> (XMP)</dt>
-	 * <dd>Garret Wilson</dd>
-	 * <dt><code>xmp:CreateDate</code> (XMP)</dt>
-	 * <dd><code>2009:08:29 16:51:21.00-07:00</code></dd>
-	 * <dd>
-	 * </dl>
-	 */
+	/// A sample JPEG image with only XMP metadata, including:
+	///
+	/// - **`dc:Title` (XMP)**: Gate and Turret
+	/// - **`dc:Description` (XMP)**: Castle turret viewed through a gate.
+	/// - **`dc:Rights` (XMP)**: Copyright © 2009 Garret Wilson
+	/// - **`dc:Creator` (XMP)**: Garret Wilson
+	/// - **`xmp:CreateDate` (XMP)**: `2009:08:29 16:51:21.00-07:00`
 	public static final String GATE_TURRET_REDUCED_XMP_JPEG_RESOURCE_NAME = "gate-turret-reduced-xmp.jpg";
 
 	private MummyContext fixtureContext;
@@ -217,7 +148,7 @@ public class BaseImageMummifierTest {
 		};
 	}
 
-	/** @see BaseImageMummifier#getArtifactMediaType(MummyContext, java.nio.file.Path) */
+	/// @see BaseImageMummifier#getArtifactMediaType(MummyContext, java.nio.file.Path)
 	@Test
 	void testGetArtifactMediaType() throws IOException {
 		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.jpg")), isPresentAndIs(JPEG_MEDIA_TYPE));
@@ -226,10 +157,8 @@ public class BaseImageMummifierTest {
 		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.png")), isEmpty());
 	}
 
-	/**
-	 * @see BaseImageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
-	 * @see #GATE_TURRET_REDUCED_EXIF_JPEG_RESOURCE_NAME
-	 */
+	/// @see BaseImageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
+	/// @see #GATE_TURRET_REDUCED_EXIF_JPEG_RESOURCE_NAME
 	@Test
 	void testLoadSourceMetadataExif() throws IOException {
 		final Map<URI, Object> metadata;
@@ -244,10 +173,8 @@ public class BaseImageMummifierTest {
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_CREATED_AT)), is(ZonedDateTime.of(2009, 8, 29, 16, 51, 21, 0, UTC).toInstant()));
 	}
 
-	/**
-	 * @see BaseImageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
-	 * @see #GATE_TURRET_REDUCED_EXIF_UTF_8_JPEG_RESOURCE_NAME
-	 */
+	/// @see BaseImageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
+	/// @see #GATE_TURRET_REDUCED_EXIF_UTF_8_JPEG_RESOURCE_NAME
 	@Disabled("Reenable when metadata-extractor bug #270 is fixed.")
 	@Test
 	void testLoadSourceMetadataExifUtf8() throws IOException {
@@ -262,11 +189,9 @@ public class BaseImageMummifierTest {
 		assertThat(metadata.get(Handle.toTag(Artifact.PROPERTY_HANDLE_CREATED_AT)), is(ZonedDateTime.of(2009, 8, 29, 16, 51, 21, 0, UTC).toInstant()));
 	}
 
-	/**
-	 * IPTC metadata should override Exif metadata
-	 * @see BaseImageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
-	 * @see #GATE_TURRET_REDUCED_EXIF_IPTC_JPEG_RESOURCE_NAME
-	 */
+	/// IPTC metadata should override Exif metadata
+	/// @see BaseImageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
+	/// @see #GATE_TURRET_REDUCED_EXIF_IPTC_JPEG_RESOURCE_NAME
 	@Test
 	void testLoadSourceMetadataExifIptc() throws IOException {
 		final Map<URI, Object> metadata;
@@ -281,11 +206,9 @@ public class BaseImageMummifierTest {
 				is(ZonedDateTime.of(2009, 8, 29, 16, 51, 21, 0, ZoneOffset.ofHours(-7)).toInstant()));
 	}
 
-	/**
-	 * XMP metadata should override Exif metadata
-	 * @see BaseImageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
-	 * @see #GATE_TURRET_REDUCED_EXIF_XMP_JPEG_RESOURCE_NAME
-	 */
+	/// XMP metadata should override Exif metadata
+	/// @see BaseImageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
+	/// @see #GATE_TURRET_REDUCED_EXIF_XMP_JPEG_RESOURCE_NAME
 	@Test
 	void testLoadSourceMetadataExifXmp() throws IOException {
 		final Map<URI, Object> metadata;
@@ -301,10 +224,8 @@ public class BaseImageMummifierTest {
 				is(ZonedDateTime.of(2009, 8, 29, 16, 51, 21, 0, ZoneOffset.ofHours(-7)).toInstant()));
 	}
 
-	/**
-	 * @see BaseImageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
-	 * @see #GATE_TURRET_REDUCED_XMP_JPEG_RESOURCE_NAME
-	 */
+	/// @see BaseImageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
+	/// @see #GATE_TURRET_REDUCED_XMP_JPEG_RESOURCE_NAME
 	@Test
 	void testLoadSourceMetadataXmp() throws IOException {
 		final Map<URI, Object> metadata;
@@ -320,24 +241,22 @@ public class BaseImageMummifierTest {
 				is(ZonedDateTime.of(2009, 8, 29, 16, 51, 21, 0, ZoneOffset.ofHours(-7)).toInstant()));
 	}
 
-	/** @see BaseImageMummifier#EXIF_DATE_TIME_FORMATTER */
+	/// @see BaseImageMummifier#EXIF_DATE_TIME_FORMATTER
 	@Test
 	void testExifDateTimeOriginalFormatter() {
 		assertThat(BaseImageMummifier.EXIF_DATE_TIME_FORMATTER
 				.format(ZonedDateTime.of(2009, 8, 29, 16, 51, 21, (int)MILLISECONDS.toNanos(789), UTC).toInstant().atOffset(UTC)), is("2009:08:29 16:51:21"));
 	}
 
-	/** @see BaseImageMummifier#EXIF_SUB_SEC_TIME_FORMATTER */
+	/// @see BaseImageMummifier#EXIF_SUB_SEC_TIME_FORMATTER
 	@Test
 	void testExifSubSecTimeOriginalFormatter() {
 		assertThat(BaseImageMummifier.EXIF_SUB_SEC_TIME_FORMATTER
 				.format(ZonedDateTime.of(2009, 8, 29, 16, 51, 21, (int)MILLISECONDS.toNanos(789), UTC).toInstant().atOffset(UTC)), is("789"));
 	}
 
-	/**
-	 * @see BaseImageMummifier#addImageMetadata(org.apache.commons.imaging.common.bytesource.ByteSource, OutputStream, UrfResourceDescription, boolean, String,
-	 *      Instant)
-	 */
+	/// @see BaseImageMummifier#addImageMetadata(org.apache.commons.imaging.common.bytesource.ByteSource, OutputStream, UrfResourceDescription, boolean, String,
+	///      Instant)
 	@Test
 	void testAddImageMetadata() throws IOException, ImageProcessingException, MetadataException {
 		try (final InputStream inputStream = getClass().getResourceAsStream(GATE_TURRET_REDUCED_NO_METADATA_JPEG_RESOURCE_NAME);

@@ -23,10 +23,8 @@ import java.util.*;
 
 import org.junit.jupiter.api.Test;
 
-/**
- * Tests of {@link DefaultMeshContext}.
- * @author Garret Wilson
- */
+/// Tests of [DefaultMeshContext].
+/// @author Garret Wilson
 public class DefaultMeshContextTest {
 
 	@Test

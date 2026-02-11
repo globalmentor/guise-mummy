@@ -16,7 +16,6 @@
 
 package io.guise.mesh;
 
-import static java.lang.String.format;
 import static java.util.Objects.*;
 
 import java.util.*;
@@ -29,20 +28,16 @@ import org.apache.commons.jexl3.introspection.*;
 import io.urf.URF;
 import io.urf.model.UrfResourceDescription;
 
-/**
- * Pluggable strategy for evaluating Mesh Expression Language (MEXL) expressions.
- * @apiNote This strategy is primarily to provide an additional layer of indirection to be able to change expression evaluation libraries or write a new one if
- *          the currently available libraries are insufficient.
- * @implSpec This implementation supports retrieving {@link UrfResourceDescription} properties using an URF property handle.
- * @author Garret Wilson
- */
+/// Pluggable strategy for evaluating Mesh Expression Language (MEXL) expressions.
+/// @apiNote This strategy is primarily to provide an additional layer of indirection to be able to change expression evaluation libraries or write a new one if
+///          the currently available libraries are insufficient.
+/// @implSpec This implementation supports retrieving [UrfResourceDescription] properties using an URF property handle.
+/// @author Garret Wilson
 public class JexlMexlEvaluator implements MexlEvaluator {
 
-	/**
-	 * Custom property resolver for retrieving properties from a {@link UrfResourceDescription} by property handle.
-	 * @implSpec This implementation does not support setting properties.
-	 * @see UrfResourceDescriptionPropertyGet
-	 */
+	/// Custom property resolver for retrieving properties from a [UrfResourceDescription] by property handle.
+	/// @implSpec This implementation does not support setting properties.
+	/// @see UrfResourceDescriptionPropertyGet
 	private static final JexlUberspect.PropertyResolver URF_PROPERTY_RESOLVER = new JexlUberspect.PropertyResolver() {
 		@Override
 		public JexlPropertyGet getPropertyGet(final JexlUberspect uber, final Object object, final Object identifier) {
@@ -59,11 +54,9 @@ public class JexlMexlEvaluator implements MexlEvaluator {
 		}
 	};
 
-	/**
-	 * A custom resolver for handling additional types.
-	 * @implSpec For an instance of {@link UrfResourceDescription}, an {@link #URF_PROPERTY_RESOLVER} is used; otherwise, the default
-	 *           {@link JexlUberspect#JEXL_STRATEGY} is used.
-	 */
+	/// A custom resolver for handling additional types.
+	/// @implSpec For an instance of [UrfResourceDescription], an [#URF_PROPERTY_RESOLVER] is used; otherwise, the default
+	///           [JexlUberspect#JEXL_STRATEGY] is used.
 	private static final JexlUberspect.ResolverStrategy RESOLVER_STRATEGY = new JexlUberspect.ResolverStrategy() {
 		@Override
 		public List<JexlUberspect.PropertyResolver> apply(final JexlOperator operator, final Object object) {
@@ -74,15 +67,13 @@ public class JexlMexlEvaluator implements MexlEvaluator {
 		}
 	};
 
-	/**
-	 * Singleton shared instance.
-	 * @implNote This variable must be initialized after the property resolver and resolver strategy private constant instances.
-	 */
+	/// Singleton shared instance.
+	/// @implNote This variable must be initialized after the property resolver and resolver strategy private constant instances.
 	public static final JexlMexlEvaluator INSTANCE = new JexlMexlEvaluator();
 
 	private final JexlEngine jexl;
 
-	/** This class cannot be publicly instantiated. */
+	/// This class cannot be publicly instantiated.
 	private JexlMexlEvaluator() {
 		jexl = new JexlBuilder().strategy(RESOLVER_STRATEGY).create();
 	}
@@ -92,48 +83,38 @@ public class JexlMexlEvaluator implements MexlEvaluator {
 		try {
 			return jexl.createExpression(expression.toString()).evaluate(new MeshJexlContext(context));
 		} catch(final JexlException jexlException) {
-			throw new MexlException(format("Error in MEXL expression `%s`: %s", expression, jexlException.getMessage()), jexlException);
+			throw new MexlException("Error in MEXL expression `%s`: %s".formatted(expression, jexlException.getMessage()), jexlException);
 		}
 	}
 
-	/**
-	 * A JEXL context that delegates to the meshing context.
-	 * @implSpec This implementation does not support setting variables.
-	 */
+	/// A JEXL context that delegates to the meshing context.
+	/// @implSpec This implementation does not support setting variables.
 	private static class MeshJexlContext implements JexlContext {
 
 		private final MeshContext meshContext;
 
-		/**
-		 * Constructor.
-		 * @param meshContext The meshing context.
-		 */
+		/// Constructor.
+		/// @param meshContext The meshing context.
 		public MeshJexlContext(@NonNull final MeshContext meshContext) {
 			this.meshContext = requireNonNull(meshContext);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 * @implSpec This implementation delegates to {@link MeshContext#hasVariable(String)}.
-		 */
+		/// {@inheritDoc}
+		/// @implSpec This implementation delegates to [MeshContext#hasVariable(String)].
 		@Override
 		public boolean has(final String name) {
 			return meshContext.hasVariable(name);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 * @implSpec This implementation delegates to {@link MeshContext#findVariable(String)} and returns <code>null</code> if the variable is not present.
-		 */
+		/// {@inheritDoc}
+		/// @implSpec This implementation delegates to [MeshContext#findVariable(String)] and returns `null` if the variable is not present.
 		@Override
 		public Object get(final String name) {
 			return meshContext.findVariable(name).orElse(null);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 * @implSpec This implementation delegates to {@link MeshContext#setVariable(String, Object)}.
-		 */
+		/// {@inheritDoc}
+		/// @implSpec This implementation delegates to [MeshContext#setVariable(String, Object)].
 		@Override
 		public void set(final String name, final Object value) {
 			meshContext.setVariable(name, value);
@@ -141,19 +122,15 @@ public class JexlMexlEvaluator implements MexlEvaluator {
 
 	}
 
-	/**
-	 * Strategy for retrieving a property from an {@link UrfResourceDescription} by property handle.
-	 * @see UrfResourceDescription#findPropertyValueByHandle(String)
-	 */
+	/// Strategy for retrieving a property from an [UrfResourceDescription] by property handle.
+	/// @see UrfResourceDescription#findPropertyValueByHandle(String)
 	private static class UrfResourceDescriptionPropertyGet implements JexlPropertyGet {
 
 		private final String propertyHandle;
 
-		/**
-		 * Constructor.
-		 * @param propertyHandle The property handle.
-		 * @throws IllegalArgumentException if the given property handle is not a valid URF property handle.
-		 */
+		/// Constructor.
+		/// @param propertyHandle The property handle.
+		/// @throws IllegalArgumentException if the given property handle is not a valid URF property handle.
 		public UrfResourceDescriptionPropertyGet(@NonNull final String propertyHandle) {
 			this.propertyHandle = URF.Handle.checkArgumentValid(propertyHandle);
 		}
@@ -165,8 +142,8 @@ public class JexlMexlEvaluator implements MexlEvaluator {
 
 		@Override
 		public Object tryInvoke(final Object object, final Object key) {
-			if(object instanceof UrfResourceDescription && key instanceof String) {
-				return ((UrfResourceDescription)object).findPropertyValueByHandle(propertyHandle).orElse(null);
+			if(object instanceof UrfResourceDescription urfResourceDescription && key instanceof String) {
+				return urfResourceDescription.findPropertyValueByHandle(propertyHandle).orElse(null);
 			}
 			return JexlEngine.TRY_FAILED;
 		}

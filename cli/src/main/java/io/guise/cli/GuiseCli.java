@@ -52,25 +52,21 @@ import io.guise.mummy.mummify.Mummifier;
 import io.guise.mummy.mummify.page.PageMummifier;
 import picocli.CommandLine.*;
 
-/**
- * Command-line interface for Guise tasks.
- * @author Garret Wilson
- */
+/// Command-line interface for Guise tasks.
+/// @author Garret Wilson
 @Command(name = "guise", description = "Command-line interface for Guise tasks.")
 public class GuiseCli extends BaseCliApplication {
 
-	/** The server directory configuration key. */
+	/// The server directory configuration key.
 	public static final String CONFIG_KEY_SERVER_DIRECTORY = "server.directory";
-	/** The server port configuration key. */
+	/// The server port configuration key.
 	public static final String CONFIG_KEY_SERVER_PORT = "server.port";
 
-	/** The default server port used by the <code>serve</code> command. */
+	/// The default server port used by the `serve` command.
 	private final static int DEFAULT_SERVER_PORT = 4040;
 
-	/**
-	 * Constructor.
-	 * @param args The command line arguments.
-	 */
+	/// Constructor.
+	/// @param args The command line arguments.
 	public GuiseCli(@NonNull final String[] args) {
 		super(args, Level.INFO);
 		//bridge JUL to SLF4J for Tomcat logging
@@ -78,20 +74,16 @@ public class GuiseCli extends BaseCliApplication {
 		SLF4JBridgeHandler.install();
 	}
 
-	/**
-	 * Main program entry method.
-	 * @param args Program arguments.
-	 */
+	/// Main program entry method.
+	/// @param args Program arguments.
 	public static void main(@NonNull final String[] args) {
 		Application.start(new GuiseCli(args));
 	}
 
-	/**
-	 * Logs information about the current Guise project.
-	 * @param project The Guise project.
-	 * @see #getLogger()
-	 * @see Level#INFO
-	 */
+	/// Logs information about the current Guise project.
+	/// @param project The Guise project.
+	/// @see #getLogger()
+	/// @see Level#INFO
 	protected void logProjectInfo(@NonNull final GuiseProject project) {
 		final Logger logger = getLogger();
 		final Configuration projectConfiguration = project.getConfiguration();
@@ -101,14 +93,12 @@ public class GuiseCli extends BaseCliApplication {
 		logger.info("Site description target directory: {}", projectConfiguration.getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY));
 	}
 
-	/**
-	 * Validates a Guise project before mummification.
-	 * @param argProjectDirectory The base directory of the project to mummify.
-	 * @param argSiteSourceDirectory The source root directory of the site to mummify.
-	 * @param argSiteTargetDirectory The target root directory into which the site will be generated.
-	 * @param argSiteDescriptionTargetDirectory The target root directory into which the site description will be generated.
-	 * @throws IOException if an I/O error occurs.
-	 */
+	/// Validates a Guise project before mummification.
+	/// @param argProjectDirectory The base directory of the project to mummify.
+	/// @param argSiteSourceDirectory The source root directory of the site to mummify.
+	/// @param argSiteTargetDirectory The target root directory into which the site will be generated.
+	/// @param argSiteDescriptionTargetDirectory The target root directory into which the site description will be generated.
+	/// @throws IOException if an I/O error occurs.
 	@Command(description = "Validates a Guise project before mummification.", mixinStandardHelpOptions = true)
 	public void validate(
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
@@ -133,13 +123,11 @@ public class GuiseCli extends BaseCliApplication {
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Done.").reset());
 	}
 
-	/**
-	 * Cleans a site by removing the site target directory.
-	 * @param argProjectDirectory The base directory of the project to mummify.
-	 * @param argSiteTargetDirectory The target root directory of the site to be removed.
-	 * @param argSiteDescriptionTargetDirectory The target root directory of the site description to be removed.
-	 * @throws IOException if an I/O error occurs.
-	 */
+	/// Cleans a site by removing the site target directory.
+	/// @param argProjectDirectory The base directory of the project to mummify.
+	/// @param argSiteTargetDirectory The target root directory of the site to be removed.
+	/// @param argSiteDescriptionTargetDirectory The target root directory of the site description to be removed.
+	/// @throws IOException if an I/O error occurs.
 	@Command(description = "Cleans a site by removing the site target directory.", mixinStandardHelpOptions = true)
 	public void clean(
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
@@ -167,15 +155,13 @@ public class GuiseCli extends BaseCliApplication {
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Done.").reset());
 	}
 
-	/**
-	 * Mummifies a site by generating a static version.
-	 * @param argProjectDirectory The base directory of the project to mummify.
-	 * @param argSiteSourceDirectory The source root directory of the site to mummify.
-	 * @param argSiteTargetDirectory The target root directory into which the site will be generated.
-	 * @param argSiteDescriptionTargetDirectory The target root directory into which the site description will be generated.
-	 * @param full Specifies full instead of incremental mummification.
-	 * @throws IOException if an I/O error occurs.
-	 */
+	/// Mummifies a site by generating a static version.
+	/// @param argProjectDirectory The base directory of the project to mummify.
+	/// @param argSiteSourceDirectory The source root directory of the site to mummify.
+	/// @param argSiteTargetDirectory The target root directory into which the site will be generated.
+	/// @param argSiteDescriptionTargetDirectory The target root directory into which the site description will be generated.
+	/// @param full Specifies full instead of incremental mummification.
+	/// @throws IOException if an I/O error occurs.
 	@Command(description = "Mummifies a site by generating a static version.", mixinStandardHelpOptions = true)
 	public void mummify(
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project to mummify.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
@@ -203,15 +189,13 @@ public class GuiseCli extends BaseCliApplication {
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Done.").reset());
 	}
 
-	/**
-	 * Prepares to deploys a site after generating a static version, but does not actually deploy the site.
-	 * @param argProjectDirectory The base directory of the project to deploy.
-	 * @param argSiteSourceDirectory The source root directory of the site to mummify.
-	 * @param argSiteTargetDirectory The target root directory into which the site will be generated.
-	 * @param argSiteDescriptionTargetDirectory The target root directory into which the site description will be generated.
-	 * @param full Specifies full instead of incremental mummification.
-	 * @throws IOException if an I/O error occurs.
-	 */
+	/// Prepares to deploys a site after generating a static version, but does not actually deploy the site.
+	/// @param argProjectDirectory The base directory of the project to deploy.
+	/// @param argSiteSourceDirectory The source root directory of the site to mummify.
+	/// @param argSiteTargetDirectory The target root directory into which the site will be generated.
+	/// @param argSiteDescriptionTargetDirectory The target root directory into which the site description will be generated.
+	/// @param full Specifies full instead of incremental mummification.
+	/// @throws IOException if an I/O error occurs.
 	@Command(name = "prepare-deploy", description = "Prepares to deploys a site after generating a static version, but does not actually deploy the site.", mixinStandardHelpOptions = true)
 	public void prepareDeploy(
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project to deploy.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
@@ -239,16 +223,14 @@ public class GuiseCli extends BaseCliApplication {
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Done.").reset());
 	}
 
-	/**
-	 * Deploys a site after generating a static version.
-	 * @param argProjectDirectory The base directory of the project to deploy.
-	 * @param argSiteSourceDirectory The source root directory of the site to mummify.
-	 * @param argSiteTargetDirectory The target root directory into which the site will be generated.
-	 * @param argSiteDescriptionTargetDirectory The target root directory into which the site description will be generated.
-	 * @param browse Opens a browser to the site after starting the server.
-	 * @param full Specifies full instead of incremental mummification and deployment.
-	 * @throws IOException if an I/O error occurs.
-	 */
+	/// Deploys a site after generating a static version.
+	/// @param argProjectDirectory The base directory of the project to deploy.
+	/// @param argSiteSourceDirectory The source root directory of the site to mummify.
+	/// @param argSiteTargetDirectory The target root directory into which the site will be generated.
+	/// @param argSiteDescriptionTargetDirectory The target root directory into which the site description will be generated.
+	/// @param browse Opens a browser to the site after starting the server.
+	/// @param full Specifies full instead of incremental mummification and deployment.
+	/// @throws IOException if an I/O error occurs.
 	@Command(description = "Deploys a site after generating a static version.", mixinStandardHelpOptions = true)
 	public void deploy(
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project to deploy.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
@@ -286,19 +268,17 @@ public class GuiseCli extends BaseCliApplication {
 		}
 	}
 
-	/** The relative path of the server base directory; meant to be used in conjunction with the temporary directory. */
+	/// The relative path of the server base directory; meant to be used in conjunction with the temporary directory.
 	private static final Path SERVER_RELATIVE_BASE_DIRECTORY = Paths.get("guise", "mummy", "server"); //TODO use constants
 
-	/**
-	 * Starts a web server for exploring the site in the target directory.
-	 * @param argProjectDirectory The base directory of the project being served.
-	 * @param argSiteTargetDirectory The target root directory of the site to be served.
-	 * @param argSiteDescriptionTargetDirectory The target root directory of the description of the site to be served.
-	 * @param argPort Specifies the server port.
-	 * @param browse Opens a browser to the site after starting the server.
-	 * @throws IOException if an I/O error occurs.
-	 * @throws LifecycleException if there is a problem starting the server.
-	 */
+	/// Starts a web server for exploring the site in the target directory.
+	/// @param argProjectDirectory The base directory of the project being served.
+	/// @param argSiteTargetDirectory The target root directory of the site to be served.
+	/// @param argSiteDescriptionTargetDirectory The target root directory of the description of the site to be served.
+	/// @param argPort Specifies the server port.
+	/// @param browse Opens a browser to the site after starting the server.
+	/// @throws IOException if an I/O error occurs.
+	/// @throws LifecycleException if there is a problem starting the server.
 	@Command(description = "Starts a web server for exploring the site in the target directory.", mixinStandardHelpOptions = true)
 	public void serve(
 			@Parameters(paramLabel = "<project>", description = "The base directory of the project being served.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
@@ -378,10 +358,8 @@ public class GuiseCli extends BaseCliApplication {
 		tomcat.getServer().await();
 	}
 
-	/**
-	 * Default MIME mapping for the server.
-	 * @implNote Taken from the {@link Tomcat} source code.
-	 */
+	/// Default MIME mapping for the server.
+	/// @implNote Taken from the [Tomcat] source code.
 	private static final Map<String, String> DEFAULT_MIME_TYPES_BY_FILENAME_EXTENSION;
 
 	static { //TODO update; switch to use Tomcat map when it becomes public, or transfer to some common resource file

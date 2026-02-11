@@ -28,20 +28,14 @@ import io.guise.mummy.*;
 import io.guise.mummy.mummify.Mummifier;
 import io.urf.model.UrfResourceDescription;
 
-/**
- * An artifact that generates a basic, default XHTML document.
- * @author Garret Wilson
- */
+/// An artifact that generates a basic, default XHTML document.
+/// @author Garret Wilson
 public class SimpleGeneratedXhtmlArtifact extends AbstractSourceFileArtifact {
 
-	/**
-	 * The template for an XHTML default document. The template has a single parameter:
-	 * <ol>
-	 * <li>page title</li>
-	 * </ul>
-	 * @implNote Once an expression language is implemented that replaces expressions in the document, the implementation might switch back to storing the default
-	 *           XHTML file in resources with an expression in the title to be replaced in a later phase with the title from the description.
-	 */
+	/// The template for an XHTML default document. The template has a single parameter:
+	/// 1. page title
+	/// @implNote Once an expression language is implemented that replaces expressions in the document, the implementation might switch back to storing the default
+	///           XHTML file in resources with an expression in the title to be replaced in a later phase with the title from the description.
 	private static final StringTemplate TEMPLATE = StringTemplate.builder()
 			.text( //@formatter:off
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +	//no newlines are needed; this will be parsed immediately 
@@ -55,28 +49,24 @@ public class SimpleGeneratedXhtmlArtifact extends AbstractSourceFileArtifact {
 			"</body>" + 
 			"</html>").build();	//@formatter:on
 
-	/**
-	 * Constructor. The description should include an {@value Artifact#PROPERTY_HANDLE_TITLE} property.
-	 * @param mummifier The mummifier responsible for generating this artifact; must be a mummifier that supports XHTML source artifacts.
-	 * @param sourcePath The file containing the source of this artifact.
-	 * @param outputPath The file where the artifact will be generated.
-	 * @param description The description of the artifact; will be used to update the content with the title, if present.
-	 * @see Artifact#PROPERTY_HANDLE_TITLE
-	 */
+	/// Constructor. The description should include an [Artifact#PROPERTY_HANDLE_TITLE] property.
+	/// @param mummifier The mummifier responsible for generating this artifact; must be a mummifier that supports XHTML source artifacts.
+	/// @param sourcePath The file containing the source of this artifact.
+	/// @param outputPath The file where the artifact will be generated.
+	/// @param description The description of the artifact; will be used to update the content with the title, if present.
+	/// @see Artifact#PROPERTY_HANDLE_TITLE
 	public SimpleGeneratedXhtmlArtifact(@NonNull final Mummifier mummifier, @NonNull final Path sourcePath, @NonNull final Path outputPath,
 			@NonNull final UrfResourceDescription description) {
 		super(mummifier, sourcePath, outputPath, description);
 	}
 
-	/**
-	 * Generates the source content of the artifact.
-	 * @param context The context of static site generation.
-	 * @implSpec This version returns the bytes of a default XHTML artifact with the appropriate title, if any is provided in the description.
-	 * @return The generated source contents.
-	 * @throws IOException if there is an error generating the source.
-	 * @see #getResourceDescription()
-	 * @see Artifact#PROPERTY_HANDLE_TITLE
-	 */
+	/// Generates the source content of the artifact.
+	/// @param context The context of static site generation.
+	/// @implSpec This version returns the bytes of a default XHTML artifact with the appropriate title, if any is provided in the description.
+	/// @return The generated source contents.
+	/// @throws IOException if there is an error generating the source.
+	/// @see #getResourceDescription()
+	/// @see Artifact#PROPERTY_HANDLE_TITLE
 	protected byte[] generateSource(final MummyContext context) throws IOException {
 		//get the title, if any, from the description
 		final String title = getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_TITLE).map(Object::toString).orElse("");
@@ -84,19 +74,15 @@ public class SimpleGeneratedXhtmlArtifact extends AbstractSourceFileArtifact {
 		return source.getBytes(StandardCharsets.UTF_8);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version delegates to {@link #generateSource(MummyContext)}.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This version delegates to [#generateSource(MummyContext)].
 	@Override
 	public long getSourceSize(MummyContext context) throws IOException {
 		return generateSource(context).length;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version delegates to {@link #generateSource(MummyContext)}.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This version delegates to [#generateSource(MummyContext)].
 	@Override
 	public InputStream openSource(final MummyContext context) throws IOException {
 		return new ByteArrayInputStream(generateSource(context));

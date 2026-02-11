@@ -31,26 +31,22 @@ import org.jspecify.annotations.*;
 
 import io.urf.model.*;
 
-/**
- * A default source file artifact supporting aspects.
- * @implSpec The current implementation creates aspects duplicating the description of the main artifact.
- * @implNote The main artifact description may have been cached after mummification, so duplicating it for the aspect may result in irrelevant or incorrect
- *           properties. The mummifier will need to take this into consideration, by forcing the description to be set dirty for example. Under the current
- *           implementation, this may be done by removing any {@link io.urf.vocab.content.Content#MODIFIED_AT_PROPERTY_TAG} property when the mummifier knows
- *           for sure that the main artifact needs mummification (assuming aspects generation are controlled solely by the main artifact generation).
- * @author Garret Wilson
- */
+/// A default source file artifact supporting aspects.
+/// @implSpec The current implementation creates aspects duplicating the description of the main artifact.
+/// @implNote The main artifact description may have been cached after mummification, so duplicating it for the aspect may result in irrelevant or incorrect
+///           properties. The mummifier will need to take this into consideration, by forcing the description to be set dirty for example. Under the current
+///           implementation, this may be done by removing any [io.urf.vocab.content.Content#MODIFIED_AT_PROPERTY_TAG] property when the mummifier knows
+///           for sure that the main artifact needs mummification (assuming aspects generation are controlled solely by the main artifact generation).
+/// @author Garret Wilson
 class DefaultAspectualSourceFileArtifact extends DefaultSourceFileArtifact implements AspectualArtifact {
 
-	/** The delimiter for appending an aspect ID to a filename. */
+	/// The delimiter for appending an aspect ID to a filename.
 	private static final char FILENAME_ASPECT_DELIMITER = '-';
 
 	private final Map<String, Artifact> aspectsById;
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation delegates to {@link #aspect(String)}.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation delegates to [#aspect(String)].
 	@Override
 	public Optional<Artifact> findAspect(final String aspectId) {
 		return Optional.ofNullable(aspect(aspectId));
@@ -66,10 +62,8 @@ class DefaultAspectualSourceFileArtifact extends DefaultSourceFileArtifact imple
 		return aspectsById.values();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation delegates to {@link #getAspects()}, as the only comprised artifacts of this class are the aspect artifacts.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation delegates to [#getAspects()], as the only comprised artifacts of this class are the aspect artifacts.
 	@Override
 	public Stream<Artifact> comprisedArtifacts() {
 		return getAspects().stream();
@@ -80,12 +74,10 @@ class DefaultAspectualSourceFileArtifact extends DefaultSourceFileArtifact imple
 		return emptySet();
 	}
 
-	/**
-	 * Builder constructor.
-	 * @param builder The builder specifying the construction parameters.
-	 * @param aspectIds The IDs of the aspects that should be added.
-	 * @throws IllegalArgumentException if the corporeal source file does not exist or is not a regular file.
-	 */
+	/// Builder constructor.
+	/// @param builder The builder specifying the construction parameters.
+	/// @param aspectIds The IDs of the aspects that should be added.
+	/// @throws IllegalArgumentException if the corporeal source file does not exist or is not a regular file.
 	protected DefaultAspectualSourceFileArtifact(@NonNull final Builder<?> builder, @NonNull final Set<String> aspectIds) {
 		super(builder);
 		aspectsById = aspectIds.stream().collect(toUnmodifiableMap(identity(), aspectId -> { //create aspects for each aspect ID

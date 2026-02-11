@@ -29,25 +29,19 @@ import io.guise.mummy.*;
 import io.guise.mummy.mummify.Mummifier;
 import io.urf.model.UrfResourceDescription;
 
-/**
- * Concrete implementation of a collection artifact based upon a file system directory.
- * @author Garret Wilson
- */
+/// Concrete implementation of a collection artifact based upon a file system directory.
+/// @author Garret Wilson
 public class DirectoryArtifact extends AbstractArtifact implements SourcePathArtifact, CollectionArtifact {
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation delegates to {@link #getSourcePath()}.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation delegates to [#getSourcePath()].
 	@Override
 	public Path getSourceDirectory() {
 		return getSourcePath();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation always returns <code>false</code>.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation always returns `false`.
 	@Override
 	public final boolean isSourcePathFile() {
 		return false;
@@ -62,15 +56,14 @@ public class DirectoryArtifact extends AbstractArtifact implements SourcePathArt
 
 	private final Artifact contentArtifact;
 
-	/** @return The optional internal artifact representing the content of this directory, such as <code>index.xhtml</code>. */
+	/// Returns the optional internal artifact representing the content of this directory, such as `index.xhtml`.
+	/// @return The optional internal artifact representing the content of this directory, such as `index.xhtml`.
 	public Optional<Artifact> findContentArtifact() {
 		return Optional.ofNullable(contentArtifact);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation returns the description of the content artifact, if any; otherwise, an empty description.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation returns the description of the content artifact, if any; otherwise, an empty description.
 	@Override
 	public UrfResourceDescription getResourceDescription() {
 		return findContentArtifact().map(Artifact::getResourceDescription).orElse(UrfResourceDescription.EMPTY);
@@ -78,47 +71,39 @@ public class DirectoryArtifact extends AbstractArtifact implements SourcePathArt
 
 	private final Collection<Artifact> childArtifacts;
 
-	/**
-	 * {@inheritDoc}
-	 * @apiNote A directory's child artifacts do <em>not</em> include any content artifact.
-	 * @see #findContentArtifact()
-	 */
+	/// {@inheritDoc}
+	/// @apiNote A directory's child artifacts do *not* include any content artifact.
+	/// @see #findContentArtifact()
 	@Override
 	public Collection<Artifact> getChildArtifacts() {
 		return childArtifacts;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation returns all the child artifacts along with the content artifact, if any.
-	 * @see #getChildArtifacts()
-	 * @see #findContentArtifact()
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation returns all the child artifacts along with the content artifact, if any.
+	/// @see #getChildArtifacts()
+	/// @see #findContentArtifact()
 	@Override
 	public Stream<Artifact> comprisedArtifacts() {
 		return Stream.concat(getChildArtifacts().stream(), findContentArtifact().stream());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation returns the content artifact, if any.
-	 * @see #findContentArtifact()
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation returns the content artifact, if any.
+	/// @see #findContentArtifact()
 	@Override
 	public Collection<Artifact> getSubsumedArtifacts() {
 		return findContentArtifact().map(Set::of).orElse(emptySet());
 	}
 
-	/**
-	 * Constructor.
-	 * @implSpec Whether the artifact is a post is determined by whether the source filename, if any, matches {@link SourcePathArtifact#POST_FILENAME_PATTERN}.
-	 * @param mummifier The mummifier responsible for generating this artifact.
-	 * @param sourceDirectory The directory serving as the source of this artifact.
-	 * @param targetDirectory The directory where the artifact will be generated.
-	 * @param contentArtifact The internal artifact representing the content of this directory, such as <code>index.xhtml</code>, or <code>null</code> if there is
-	 *          no content artifact.
-	 * @param childArtifacts The child artifacts of this artifact.
-	 */
+	/// Constructor.
+	/// @implSpec Whether the artifact is a post is determined by whether the source filename, if any, matches [SourcePathArtifact#POST_FILENAME_PATTERN].
+	/// @param mummifier The mummifier responsible for generating this artifact.
+	/// @param sourceDirectory The directory serving as the source of this artifact.
+	/// @param targetDirectory The directory where the artifact will be generated.
+	/// @param contentArtifact The internal artifact representing the content of this directory, such as `index.xhtml`, or `null` if there is
+	///          no content artifact.
+	/// @param childArtifacts The child artifacts of this artifact.
 	public DirectoryArtifact(@NonNull final Mummifier mummifier, @NonNull final Path sourceDirectory, @NonNull final Path targetDirectory,
 			@Nullable Artifact contentArtifact, @NonNull Collection<Artifact> childArtifacts) {
 		//TODO add precondition to ensure this is a directory?
@@ -128,11 +113,9 @@ public class DirectoryArtifact extends AbstractArtifact implements SourcePathArt
 		this.childArtifacts = Set.copyOf(childArtifacts);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version returns the default reference source paths and the source path to the content artifact, if any.
-	 * @see #findContentArtifact()
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This version returns the default reference source paths and the source path to the content artifact, if any.
+	/// @see #findContentArtifact()
 	@Override
 	public Set<Path> getReferentSourcePaths() {
 		final Set<Path> defaultReferenceSourcePaths = super.getReferentSourcePaths();

@@ -20,26 +20,19 @@ import java.nio.file.Path;
 
 import io.confound.config.Configuration;
 
-/**
- * A general configured Guise project.
- * @author Garret Wilson
- */
+/// A general configured Guise project.
+/// @author Garret Wilson
 public interface GuiseProject {
 
-	/**
-	 * Returns the project directory.
-	 * <p>
-	 * This is usually where the project configuration file (if any) is stored.
-	 * </p>
-	 * @return The project directory,
-	 */
+	/// Returns the project directory.
+	///
+	/// This is usually where the project configuration file (if any) is stored.
+	/// @return The project directory,
 	public Path getDirectory();
 
-	/**
-	 * Returns the project configuration.
-	 * @apiNote Oftentimes the configuration will have one or more fallback configurations with default settings.
-	 * @return The project configuration.
-	 */
+	/// Returns the project configuration.
+	/// @apiNote Oftentimes the configuration will have one or more fallback configurations with default settings.
+	/// @return The project configuration.
 	public Configuration getConfiguration();
 
 }

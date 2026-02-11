@@ -29,16 +29,12 @@ import io.confound.config.Configuration;
 import io.guise.mummy.deploy.*;
 import io.guise.mummy.mummify.SourcePathMummifier;
 
-/**
- * Dummy implementation of a mummification context with no real functionality; used for testing.
- * @author Garret Wilson
- */
+/// Dummy implementation of a mummification context with no real functionality; used for testing.
+/// @author Garret Wilson
 public class DummyMummyContext implements MummyContext {
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version returns {@link GuiseMummy#LABEL}, usually a string in the form <code>Guise Mummy <var>version</var></code>.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This version returns [GuiseMummy#LABEL], usually a string in the form `Guise Mummy version`.
 	@Override
 	public String getMummifierIdentification() {
 		return GuiseMummy.LABEL;
@@ -51,10 +47,8 @@ public class DummyMummyContext implements MummyContext {
 		return project;
 	}
 
-	/**
-	 * Constructor.
-	 * @param project The Guise project.
-	 */
+	/// Constructor.
+	/// @param project The Guise project.
 	public DummyMummyContext(@NonNull final GuiseProject project) {
 		this.project = requireNonNull(project);
 	}

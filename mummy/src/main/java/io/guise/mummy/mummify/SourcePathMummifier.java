@@ -26,49 +26,38 @@ import com.globalmentor.net.MediaType;
 
 import io.guise.mummy.*;
 
-/**
- * Mummifier for processing resources with a source path.
- * <p>
- * During mummification, it is important to determine references such as relative links in relation to the <dfn>context artifact</dfn>. An artifact such as
- * <code>/foo/bar/index.html</code> may merely be the implementation for storing the content of the <code>/foo/bar/</code>, and other resources will refer to
- * <code>/foo/bar/</code>, not <code>/foo/bar/index.html</code>. In that case <code>/foo/bar/</code> will be the context artifact, and it should be used when
- * requesting e.g. child or sibling artifacts from the mummy context.
- * </p>
- * @author Garret Wilson
- */
+/// Mummifier for processing resources with a source path.
+///
+/// During mummification, it is important to determine references such as relative links in relation to the _context artifact_. An artifact such as
+/// `/foo/bar/index.html` may merely be the implementation for storing the content of the `/foo/bar/`, and other resources will refer to
+/// `/foo/bar/`, not `/foo/bar/index.html`. In that case `/foo/bar/` will be the context artifact, and it should be used when
+/// requesting e.g. child or sibling artifacts from the mummy context.
+/// @author Garret Wilson
 public interface SourcePathMummifier extends Mummifier {
 
-	/**
-	 * Retrieves the extensions of files supported by this mummifier.
-	 * <p>
-	 * An extension may be a simple extension such as <code>foo</code>, or a compound extension such as <code>foo.bar</code>, the latter of which would match a
-	 * file ending in <code>.foo.bar</code>, such as <code>example.foo.bar</code>.
-	 * </p>
-	 * @return The extensions of filenames for file types supported by this mummifier.
-	 */
+	/// Retrieves the extensions of files supported by this mummifier.
+	///
+	/// An extension may be a simple extension such as `foo`, or a compound extension such as `foo.bar`, the latter of which would match a
+	/// file ending in `.foo.bar`, such as `example.foo.bar`.
+	/// @return The extensions of filenames for file types supported by this mummifier.
 	public @NonNull Set<String> getSupportedFilenameExtensions();
 
-	/**
-	 * Determines the media type for an artifact from the given source path
-	 * <p>
-	 * A mummifier must not return an unsupported media type. If a mummifier only supports a single media type, it may assume that the given path is of the
-	 * supported type and return that media type.
-	 * </p>
-	 * @param context The context of static site generation.
-	 * @param sourcePath The path in the site source directory; not guaranteed to exist;
-	 * @return The target media type for the generated artifact, if known; will not be present if unknown or unsupported.
-	 * @throws IOException if there is an I/O error determining the media type.
-	 */
+	/// Determines the media type for an artifact from the given source path.
+	///
+	/// A mummifier must not return an unsupported media type. If a mummifier only supports a single media type, it may assume that the given path is of the
+	/// supported type and return that media type.
+	/// @param context The context of static site generation.
+	/// @param sourcePath The path in the site source directory; not guaranteed to exist;
+	/// @return The target media type for the generated artifact, if known; will not be present if unknown or unsupported.
+	/// @throws IOException if there is an I/O error determining the media type.
 	public Optional<MediaType> getArtifactMediaType(@NonNull MummyContext context, @NonNull final Path sourcePath) throws IOException;
 
-	/**
-	 * Plans mummification of a source path supported by this mummifier.
-	 * @param context The context of static site generation.
-	 * @param sourcePath The source path to be mummified.
-	 * @param targetPath The target path in the site target directory for the artifact.
-	 * @return An artifact describing the resource to be mummified.
-	 * @throws IOException if there is an I/O error during planning.
-	 */
+	/// Plans mummification of a source path supported by this mummifier.
+	/// @param context The context of static site generation.
+	/// @param sourcePath The source path to be mummified.
+	/// @param targetPath The target path in the site target directory for the artifact.
+	/// @return An artifact describing the resource to be mummified.
+	/// @throws IOException if there is an I/O error during planning.
 	public Artifact plan(@NonNull MummyContext context, @NonNull Path sourcePath, @NonNull Path targetPath) throws IOException;
 
 }

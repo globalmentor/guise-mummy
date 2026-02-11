@@ -33,36 +33,32 @@ import com.globalmentor.xml.def.XML;
 
 import io.guise.mummy.MummyContext;
 
-/**
- * Mummifier for general HTML documents.
- * @implSpec This mummifier supports general HTML documents such as HTML5 using lenient HTML parsing rules. If the document begins with the XML declaration
- *           {@value XML#XML_DECL_START}, the document is parsed ax XHTML using the stricter XML parsing rules, delegating to {@link XhtmlPageMummifier} for
- *           parsing.
- * @implSpec General HTML mummification has not yet been implemented.
- * @author Garret Wilson
- */
+/// Mummifier for general HTML documents.
+/// @implSpec This mummifier supports general HTML documents such as HTML5 using lenient HTML parsing rules. If the document begins with the XML declaration
+///           [XML#XML_DECL_START], the document is parsed as XHTML using the stricter XML parsing rules, delegating to [XhtmlPageMummifier] for
+///           parsing.
+/// @implSpec General HTML mummification has not yet been implemented.
+/// @author Garret Wilson
 public class HtmlPageMummifier extends XhtmlPageMummifier {
+
+	/// Constructor.
+	public HtmlPageMummifier() {
+	}
 
 	@Override
 	public Set<String> getSupportedFilenameExtensions() {
 		return Set.of(HTML_FILENAME_EXTENSION, HTM_FILENAME_EXTENSION);
 	}
 
-	/**
-	 * The number of bytes to read and test. This includes:
-	 * <ul>
-	 * <li>Enough room for the byte order mark.</li>
-	 * <li>Enough room for the XML declaration in whatever encoding.</li>
-	 * <li>Extra padding to keep from going past the end of the buffer.</li>
-	 * </ul>
-	 */
-	private static final int TEST_BUFFER_SIZE = ByteOrderMark.UTF_32BE.getLength() + (XML_DECL_START.length() * ByteOrderMark.MAX_BYTE_COUNT) + 8;
+	/// The number of bytes to read and test. This includes:
+	/// - Enough room for the byte order mark.
+	/// - Enough room for the XML declaration in whatever encoding.
+	/// - Extra padding to keep from going past the end of the buffer.
+	private static final int TEST_BUFFER_SIZE = ByteOrderMark.UTF_32BE.length() + (XML_DECL_START.length() * ByteOrderMark.MAX_BYTE_COUNT) + 8;
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version parses the document in HTML format unless it begins with the XML declaration {@value XML#XML_DECL_START}, in which case the document
-	 *           is parsed as XML by delegating to {@link XhtmlPageMummifier#loadSourceDocument(MummyContext, InputStream, String)}.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This version parses the document in HTML format unless it begins with the XML declaration [XML#XML_DECL_START], in which case the document
+	///           is parsed as XML by delegating to [XhtmlPageMummifier#loadSourceDocument(MummyContext, InputStream, String)].
 	@Override
 	public Document loadSourceDocument(final MummyContext context, final InputStream inputStream, final String name) throws IOException, DOMException {
 		final InputStream markedInputStream = toMarkSupportedInputStream(inputStream); //make sure our input stream supports mark/reset
@@ -79,6 +75,6 @@ public class HtmlPageMummifier extends XhtmlPageMummifier {
 		if(hasXmlDeclaration) {
 			return super.loadSourceDocument(context, markedInputStream, name); //delegate to the XHTML parsing version _passing our stream we marked and reset_
 		}
-		throw new UnsupportedOperationException(String.format("General HTML parsing not yet supported for `%s`.", name));
+		throw new UnsupportedOperationException("General HTML parsing not yet supported for `%s`.".formatted(name));
 	}
 }

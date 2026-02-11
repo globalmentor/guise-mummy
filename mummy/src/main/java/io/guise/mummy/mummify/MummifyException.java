@@ -16,42 +16,34 @@
 
 package io.guise.mummy.mummify;
 
-/**
- * Unchecked exception indicating that some error occurred during the mummification process.
- * @author Garret Wilson
- */
+/// Unchecked exception indicating that some error occurred during the mummification process.
+/// @author Garret Wilson
 public class MummifyException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	/** Constructs a new exception with no detail message. */
+	/// Constructs a new exception with no detail message.
 	public MummifyException() {
 		super();
 	}
 
-	/**
-	 * Constructs a new exception with the specified detail message.
-	 * @param message The detail message.
-	 */
+	/// Constructs a new exception with the specified detail message.
+	/// @param message The detail message.
 	public MummifyException(final String message) {
 		super(message);
 	}
 
-	/**
-	 * Constructs a new exception with the specified detail message and cause.
-	 * @param message The detail message (which is saved for later retrieval by the {@link Throwable#getMessage()} method).
-	 * @param cause The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method), or <code>null</code> if the cause is nonexistent or
-	 *          unknown.
-	 */
+	/// Constructs a new exception with the specified detail message and cause.
+	/// @param message The detail message (which is saved for later retrieval by the [Throwable#getMessage()] method).
+	/// @param cause The cause (which is saved for later retrieval by the [Throwable#getCause()] method), or `null` if the cause is nonexistent or
+	///          unknown.
 	public MummifyException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
 
-	/**
-	 * Constructs a new exception with the specified cause and a detail message of <code>(cause==null ? null : cause.toString())</code>.
-	 * @param cause The cause (which is saved for later retrieval by the {@link Throwable#getCause()} method), or <code>null</code> if the cause is nonexistent or
-	 *          unknown.
-	 */
+	/// Constructs a new exception with the specified cause and a detail message of `(cause==null ? null : cause.toString())`.
+	/// @param cause The cause (which is saved for later retrieval by the [Throwable#getCause()] method), or `null` if the cause is nonexistent or
+	///          unknown.
 	public MummifyException(final Throwable cause) {
 		super(cause);
 	}

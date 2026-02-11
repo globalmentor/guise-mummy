@@ -29,16 +29,12 @@ import com.globalmentor.net.DomainName;
 import io.confound.config.*;
 import io.guise.mummy.GuiseMummy;
 
-/**
- * Tests of {@link Dns}.
- * @author Garret Wilson
- */
+/// Tests of [Dns].
+/// @author Garret Wilson
 public class DnsTest {
 
-	/**
-	 * @see Dns#getConfiguredOrigin(Configuration, Configuration)
-	 * @see Dns#CONFIG_KEY_ORIGIN
-	 */
+	/// @see Dns#getConfiguredOrigin(Configuration, Configuration)
+	/// @see Dns#CONFIG_KEY_ORIGIN
 	@Test
 	public void testGetConfiguredHostedZoneUsesDomainConfiguredLocally() {
 		final Configuration globalConfiguration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "test.example.com.",
@@ -47,27 +43,23 @@ public class DnsTest {
 		assertThat(Dns.getConfiguredOrigin(globalConfiguration, localConfiguration), is(DomainName.of("example.net.")));
 	}
 
-	/**
-	 * @see Dns#getConfiguredOrigin(Configuration, Configuration)
-	 * @see Dns#CONFIG_KEY_ORIGIN
-	 */
+	/// @see Dns#getConfiguredOrigin(Configuration, Configuration)
+	/// @see Dns#CONFIG_KEY_ORIGIN
 	@Test
 	public void testGetConfiguredHostedZoneNotAbsoluteThrowsException() {
 		final Configuration localConfiguration = new StringMapConfiguration(Map.of(Dns.CONFIG_KEY_ORIGIN, "example.net"));
 		assertThrows(ConfigurationException.class, () -> Dns.getConfiguredOrigin(Configuration.empty(), localConfiguration));
 	}
 
-	/**
-	 * @see Dns#getConfiguredOrigin(Configuration, Configuration)
-	 * @see Dns#CONFIG_KEY_ORIGIN
-	 */
+	/// @see Dns#getConfiguredOrigin(Configuration, Configuration)
+	/// @see Dns#CONFIG_KEY_ORIGIN
 	@Test
 	public void testGetConfiguredHostedZoneRootThrowsException() {
 		final Configuration localConfiguration = new StringMapConfiguration(Map.of(Dns.CONFIG_KEY_ORIGIN, "."));
 		assertThrows(ConfigurationException.class, () -> Dns.getConfiguredOrigin(Configuration.empty(), localConfiguration));
 	}
 
-	/*** @see Dns#getConfiguredOrigin(Configuration, Configuration) */
+	/// @see Dns#getConfiguredOrigin(Configuration, Configuration)
 	@Test
 	public void testGetConfiguredHostedZoneDefaultsToProjectDomain() {
 		final Configuration globalConfiguration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_DOMAIN, "example.net.", GuiseMummy.CONFIG_KEY_SITE_DOMAIN,
@@ -76,7 +68,7 @@ public class DnsTest {
 		assertThat(Dns.getConfiguredOrigin(globalConfiguration, localConfiguration), is(DomainName.of("example.net.")));
 	}
 
-	/*** @see Dns#getConfiguredOrigin(Configuration, Configuration) */
+	/// @see Dns#getConfiguredOrigin(Configuration, Configuration)
 	@Test
 	public void testGetConfiguredHostedZoneFallsBackToSiteBaseDomain() {
 		final Configuration globalConfiguration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "test.example.com.",

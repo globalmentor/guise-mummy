@@ -45,52 +45,50 @@ import io.guise.mummy.CorporealSourceArtifact;
 import io.guise.mummy.mummify.page.PageMummifier;
 import io.guise.mummy.mummify.page.widget.*;
 
-/**
- * A widget representing a "directory" or "index" of artifacts.
- * <p>
- * Examples
- * </p>
- * <dl>
- * <dt>{@code <mummy:directory />}
- * <dd>A simple list if pages, sorted by publication date and then by title, both in ascending order.</dd>
- * <dt>{@code <mummy:directory group-by="-publication-year"/>}
- * <dd>A simple list of pages, grouped by year in reverse publication year, and sorted by publication date and title within each group.</dd>
- * <dt>{@code <mummy:directory archetype="blog" more-label="Read More"/>}
- * <dd>A series of blog entries summaries and excerpts, sorted in reverse-order by publication date and title, with trailing "Read More" link (in addition to
- * the title link).</dd>
- * </dl>
- * @apiNote This widget would typically be found in the content historically found in an <code>index.html</code> file. Rather than providing a reverse lookup
- *          based on content as a book index normally does, instead this widget provides a listing of artifacts by name or title, as the directory of a building
- *          might show or as a console <code>dir</code> DOS command might display.
- * @implSpec This implementation supports an <code>archetype</code> attribute of <code>blog</code>, which causes the items to be sorted in descending order of
- *           publication date, and then ascending by title. Each item will result in a title, date, extract, and other information. A <code>more-label</code>
- *           value can be specified for the text of the trailing link to the blog post.
- * @implSpec If no archetype is specified, the items are presented in a simple list, ordered by publication and then by title, both in ascending order. A
- *           <code>group-by</code> attribute may be specified with either of the values <code>publication-date</code> or <code>publication-year</code>,
- *           optionally prepended with <code>+</code> or <code>-</code> to indicate if the groupings should be sorted in ascending or descending order.
- * @author Garret Wilson
- */
+/// A widget representing a "directory" or "index" of artifacts.
+///
+/// Examples
+///
+/// - `<mummy:directory />`: A simple list if pages, sorted by publication date and then by title, both in ascending order.
+/// - `<mummy:directory group-by="-publication-year"/>`: A simple list of pages, grouped by year in reverse publication year, and sorted by publication date
+///   and title within each group.
+/// - `<mummy:directory archetype="blog" more-label="Read More"/>`: A series of blog entries summaries and excerpts, sorted in reverse-order by publication
+///   date and title, with trailing "Read More" link (in addition to the title link).
+/// @apiNote This widget would typically be found in the content historically found in an `index.html` file. Rather than providing a reverse lookup
+///          based on content as a book index normally does, instead this widget provides a listing of artifacts by name or title, as the directory of a building
+///          might show or as a console `dir` DOS command might display.
+/// @implSpec This implementation supports an `archetype` attribute of `blog`, which causes the items to be sorted in descending order of
+///           publication date, and then ascending by title. Each item will result in a title, date, extract, and other information. A `more-label`
+///           value can be specified for the text of the trailing link to the blog post.
+/// @implSpec If no archetype is specified, the items are presented in a simple list, ordered by publication and then by title, both in ascending order. A
+///           `group-by` attribute may be specified with either of the values `publication-date` or `publication-year`,
+///           optionally prepended with `+` or `-` to indicate if the groupings should be sorted in ascending or descending order.
+/// @author Garret Wilson
 public class DirectoryWidget implements Widget {
 
-	/** The widget element name. */
+	/// Constructor.
+	public DirectoryWidget() {
+	}
+
+	/// The widget element name.
 	private static final NsName WIDGET_ELEMENT = NsName.of(GuiseMummy.NAMESPACE_STRING, "directory");
 
-	/** The optional attribute indicating some general predefine type of layout. */
+	/// The optional attribute indicating some general predefine type of layout.
 	private static final NsName ATTRIBUTE_ARCHETYPE = NsName.of("archetype");
-	/** The archetype value for a blog layout. */
+	/// The archetype value for a blog layout.
 	private static final String ARCHETYPE_BLOG = "blog";
 
-	/** The optional attribute indicating how the items should be grouped. */
+	/// The optional attribute indicating how the items should be grouped.
 	private static final NsName ATTRIBUTE_GROUP_BY = NsName.of("group-by");
-	/** The group-by value for grouping by publication date. */
+	/// The group-by value for grouping by publication date.
 	private static final String GROUP_BY_PUBLICATION_DATE = "publication-date";
-	/** The group-by value for grouping by publication year. */
+	/// The group-by value for grouping by publication year.
 	private static final String GROUP_BY_PUBLICATION_YEAR = "publication-year";
 
-	/** The optional attribute indicating the label for the "more" link. */
+	/// The optional attribute indicating the label for the "more" link.
 	private static final NsName ATTRIBUTE_MORE_LABEL = NsName.of("more-label");
 
-	/** The formatter for producing the published on date string. */
+	/// The formatter for producing the published on date string.
 	private static final DateTimeFormatter PUBLISHED_ON_FORMATTER = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL); //i18n; update to allow project-based locale from mummification context; probably request formatter from mummification context
 
 	@Override
@@ -111,7 +109,7 @@ public class DirectoryWidget implements Widget {
 					//strip off the sort order if needed
 					final String groupByValue = foundSortOrder.map(sortOrder -> groupBy.substring(1)).orElse(groupBy);
 					switch(groupByValue) {
-						case GROUP_BY_PUBLICATION_DATE: {
+						case GROUP_BY_PUBLICATION_DATE -> {
 							final Map<Optional<LocalDate>, List<Artifact>> itemsByFoundPublicationDate = items.collect(groupingBy(
 									item -> item.getResourceDescription().findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON).flatMap(asInstance(LocalDate.class))));
 							final Stream<Map.Entry<Optional<LocalDate>, List<Artifact>>> groups = itemsByFoundPublicationDate.entrySet().stream();
@@ -129,8 +127,7 @@ public class DirectoryWidget implements Widget {
 										.addAll(generateItemElements(mummifier, context, artifact, widgetElement, 3, itemsForFoundPublicationDate.getValue().stream()));
 							}));
 						}
-							break;
-						case GROUP_BY_PUBLICATION_YEAR: {
+						case GROUP_BY_PUBLICATION_YEAR -> {
 							final Map<Optional<Year>, List<Artifact>> itemsByFoundPublicationYear = items.collect(groupingBy(item -> item.getResourceDescription()
 									.findPropertyValueByHandle(PROPERTY_HANDLE_PUBLISHED_ON).flatMap(asInstance(LocalDate.class)).map(Year::from)));
 							final Stream<Map.Entry<Optional<Year>, List<Artifact>>> groups = itemsByFoundPublicationYear.entrySet().stream();
@@ -148,9 +145,7 @@ public class DirectoryWidget implements Widget {
 										.addAll(generateItemElements(mummifier, context, artifact, widgetElement, 3, itemsForFoundPublicationYear.getValue().stream()));
 							}));
 						}
-							break;
-						default:
-							throw new MummifyWidgetException(String.format("Unrecognized `%s` attribute value `%s`.", ATTRIBUTE_GROUP_BY, groupBy));
+						default -> throw new MummifyWidgetException("Unrecognized `%s` attribute value `%s`.".formatted(ATTRIBUTE_GROUP_BY, groupBy));
 					}
 					return groupedItemElements;
 				})
@@ -158,20 +153,18 @@ public class DirectoryWidget implements Widget {
 				.orElseGet(throwingSupplier(() -> generateItemElements(mummifier, context, artifact, widgetElement, 2, items)));
 	}
 
-	/**
-	 * Generates elements to represent the items in the directory.
-	 * @param mummifier The mummifier processing the page on which this widget appears.
-	 * @param context The context of static site generation.
-	 * @param artifact The artifact being generated.
-	 * @param widgetElement The list element to regenerate.
-	 * @param headingLevel The one-based heading level (with <code>&lt;h1&gt;</code> being the first heading level) with which to start when generating headings;
-	 *          may not apply to all archetypes.
-	 * @param items The directory items to process.
-	 * @return The generated items to represent the items. There may not be a one-to-one correspondence between items and generated elements.
-	 * @throws IOException if there is an I/O error processing the element.
-	 * @throws MummifyWidgetException if the information in the widget element is not appropriate for the widget.
-	 * @throws DOMException if there is some error manipulating the XML document object model.
-	 */
+	/// Generates elements to represent the items in the directory.
+	/// @param mummifier The mummifier processing the page on which this widget appears.
+	/// @param context The context of static site generation.
+	/// @param artifact The artifact being generated.
+	/// @param widgetElement The list element to regenerate.
+	/// @param headingLevel The one-based heading level (with `<h1>` being the first heading level) with which to start when generating headings;
+	///          may not apply to all archetypes.
+	/// @param items The directory items to process.
+	/// @return The generated items to represent the items. There may not be a one-to-one correspondence between items and generated elements.
+	/// @throws IOException if there is an I/O error processing the element.
+	/// @throws MummifyWidgetException if the information in the widget element is not appropriate for the widget.
+	/// @throws DOMException if there is some error manipulating the XML document object model.
 	public List<Element> generateItemElements(@NonNull final PageMummifier mummifier, @NonNull final MummyContext context, @NonNull final Artifact artifact,
 			@NonNull final Element widgetElement, final int headingLevel, Stream<Artifact> items)
 			throws IOException, MummifyWidgetException, DOMException {
@@ -182,10 +175,10 @@ public class DirectoryWidget implements Widget {
 		return findAttribute(widgetElement, ATTRIBUTE_ARCHETYPE) //archetype
 				.map(archetype -> {
 					switch(archetype) {
-						case ARCHETYPE_BLOG:
+						case ARCHETYPE_BLOG -> {
 							if(findAttribute(widgetElement, ATTRIBUTE_GROUP_BY).isPresent()) {
 								throw new MummifyWidgetException(
-										String.format("Attribute `%s` not allowed with attribute `%s` value `%s`.", ATTRIBUTE_GROUP_BY, ATTRIBUTE_ARCHETYPE, archetype));
+										"Attribute `%s` not allowed with attribute `%s` value `%s`.".formatted(ATTRIBUTE_GROUP_BY, ATTRIBUTE_ARCHETYPE, archetype));
 							}
 							return items.sorted( //sort the items in reverse order of (published-on date followed by undated artifacts), secondarily by determined title
 									Comparator
@@ -228,9 +221,9 @@ public class DirectoryWidget implements Widget {
 										return concat(concat(Stream.of(separatorElement, titleElement), publishedOnElement.stream()),
 												concat(excerptElement.stream(), Stream.of(moreLink)));
 									}).skip(1) //skip the first separator so that separators will only appear between posts
-									.collect(toList());
-						default:
-							throw new MummifyWidgetException(String.format("Unrecognized `%s` attribute value `%s`.", ATTRIBUTE_ARCHETYPE, archetype));
+									.toList();
+						}
+						default -> throw new MummifyWidgetException("Unrecognized `%s` attribute value `%s`.".formatted(ATTRIBUTE_ARCHETYPE, archetype));
 					}
 				}).orElseGet(() -> { //no archetype
 					final Element ulElement = document.createElementNS(XHTML_NAMESPACE_URI_STRING, ELEMENT_UL); //<ul>

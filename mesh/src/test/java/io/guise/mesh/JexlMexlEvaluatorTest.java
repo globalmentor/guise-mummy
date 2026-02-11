@@ -25,10 +25,8 @@ import org.junit.jupiter.api.Test;
 
 import io.urf.model.*;
 
-/**
- * Tests of {@link JexlMexlEvaluator}.
- * @author Garret Wilson
- */
+/// Tests of [JexlMexlEvaluator].
+/// @author Garret Wilson
 public class JexlMexlEvaluatorTest {
 
 	@Test
@@ -56,7 +54,7 @@ public class JexlMexlEvaluatorTest {
 		assertThat(JexlMexlEvaluator.INSTANCE.evaluate(context, "foo[\"bar\"]"), is(123));
 	}
 
-	/** @see UrfResourceDescription#getPropertyCount() */
+	/// @see UrfResourceDescription#getPropertyCount()
 	@Test
 	public void shouldNotSeeUrfPojoProperty() {
 		final MeshContext context = new DefaultMeshContext();
@@ -64,7 +62,7 @@ public class JexlMexlEvaluatorTest {
 		assertThat(JexlMexlEvaluator.INSTANCE.evaluate(context, "foo.propertyCount"), is(nullValue()));
 	}
 
-	/** Verifies that our special URF resolver is used only for the URF object, and that it still allows map values to be looked up later in the chain. */
+	/// Verifies that our special URF resolver is used only for the URF object, and that it still allows map values to be looked up later in the chain.
 	@Test
 	public void shouldRetrieveUrfMapKeyValue() {
 		final MeshContext context = new DefaultMeshContext();
@@ -74,7 +72,7 @@ public class JexlMexlEvaluatorTest {
 		assertThat(JexlMexlEvaluator.INSTANCE.evaluate(context, "foo.bar.test"), is(123));
 	}
 
-	/** Verifies that an URF object within a map still has its properties visible (i.e. the map resolver did not prevent URF access later in the chain). */
+	/// Verifies that an URF object within a map still has its properties visible (i.e. the map resolver did not prevent URF access later in the chain).
 	@Test
 	public void shouldRetrieveMapUrfProperty() {
 		final MeshContext context = new DefaultMeshContext();

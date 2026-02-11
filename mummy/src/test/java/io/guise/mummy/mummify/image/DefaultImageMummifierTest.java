@@ -29,10 +29,8 @@ import org.junit.jupiter.api.*;
 import io.confound.config.Configuration;
 import io.guise.mummy.*;
 
-/**
- * Tests of {@link DefaultImageMummifier}.
- * @author Garret Wilson
- */
+/// Tests of [DefaultImageMummifier].
+/// @author Garret Wilson
 public class DefaultImageMummifierTest {
 
 	private MummyContext fixtureContext;
@@ -50,7 +48,7 @@ public class DefaultImageMummifierTest {
 		testMummifier = new DefaultImageMummifier();
 	}
 
-	/** @see DefaultImageMummifier#getArtifactMediaType(MummyContext, java.nio.file.Path) */
+	/// @see DefaultImageMummifier#getArtifactMediaType(MummyContext, java.nio.file.Path)
 	@Test
 	void testGetArtifactMediaType() throws IOException {
 		assertThat(testMummifier.getArtifactMediaType(fixtureContext, Paths.get("test.bmp")), isEmpty());

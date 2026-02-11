@@ -19,24 +19,18 @@ package io.guise.mummy;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-/**
- * An artifact that is composed of several other artifacts.
- * @apiNote This artifact is appropriate for traversing an entire tree of artifacts without regard for navigability.
- * @author Garret Wilson
- */
+/// An artifact that is composed of several other artifacts.
+/// @apiNote This artifact is appropriate for traversing an entire tree of artifacts without regard for navigability.
+/// @author Garret Wilson
 public interface CompositeArtifact extends Artifact {
 
-	/**
-	 * Returns all the artifacts of which this artifact is composed.
-	 * @return The artifacts comprised by this artifact.
-	 */
+	/// Returns all the artifacts of which this artifact is composed.
+	/// @return The artifacts comprised by this artifact.
 	public Stream<Artifact> comprisedArtifacts();
 
-	/**
-	 * Returns any comprised artifacts that have been subsumed into this one and should not be visible as separate references.
-	 * @apiNote the subsumed artifacts returned here will be a subset of those returned from {@link #comprisedArtifacts()}.
-	 * @return The subsumed artifacts, if any, of this artifact.
-	 */
+	/// Returns any comprised artifacts that have been subsumed into this one and should not be visible as separate references.
+	/// @apiNote the subsumed artifacts returned here will be a subset of those returned from [#comprisedArtifacts()].
+	/// @return The subsumed artifacts, if any, of this artifact.
 	public Collection<Artifact> getSubsumedArtifacts();
 
 }

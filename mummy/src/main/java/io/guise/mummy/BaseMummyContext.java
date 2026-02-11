@@ -46,39 +46,33 @@ import io.guise.mummy.mummify.page.HtmlPageMummifier;
 import io.guise.mummy.mummify.page.MarkdownPageMummifier;
 import io.guise.mummy.mummify.page.XhtmlPageMummifier;
 
-/**
- * Abstract base implementation of a mummification context with common default functionality.
- * @implSpec This implementation uses an {@link OpaqueFileMummifier} as the default file mummifier and a {@link DirectoryMummifier} as the default directory
- *           mummifier.
- * @implSpec This implementation registers common mummifiers by default; they can be overridden using {@link #registerFileMummifier(SourcePathMummifier)}.
- * @author Garret Wilson
- */
+/// Abstract base implementation of a mummification context with common default functionality.
+/// @implSpec This implementation uses an [OpaqueFileMummifier] as the default file mummifier and a [DirectoryMummifier] as the default directory
+///           mummifier.
+/// @implSpec This implementation registers common mummifiers by default; they can be overridden using [#registerFileMummifier(SourcePathMummifier)].
+/// @author Garret Wilson
 public abstract class BaseMummyContext implements MummyContext {
 
-	/** The default mummifier for normal files. */
+	/// The default mummifier for normal files.
 	private final SourcePathMummifier defaultFileMummifier = new OpaqueFileMummifier();
 
-	/** The default mummifier for normal directories. */
+	/// The default mummifier for normal directories.
 	private final SourcePathMummifier defaultDirectoryMummifier = new DirectoryMummifier();
 
-	/** The registered mummifiers by supported extensions. These extensions are in canonical (lowercase) form. */
+	/// The registered mummifiers by supported extensions. These extensions are in canonical (lowercase) form.
 	private final Map<String, SourcePathMummifier> fileMummifiersByExtension = new HashMap<>();
 
-	/**
-	 * Registers a mummify for all its supported filename extensions. If an extension is already registered with another mummifier, it will be overridden.
-	 * @param mummifier The mummifier to register.
-	 * @see Mummifier#getSupportedFilenameExtensions()
-	 */
-	protected void registerFileMummifier(@NonNull final SourcePathMummifier mummifier) {
+	/// Registers a mummify for all its supported filename extensions. If an extension is already registered with another mummifier, it will be overridden.
+	/// @param mummifier The mummifier to register.
+	/// @see Mummifier#getSupportedFilenameExtensions()
+	protected final void registerFileMummifier(@NonNull final SourcePathMummifier mummifier) {
 		mummifier.getSupportedFilenameExtensions().stream()
 				//normalize extensions so we can look up without regard to case
 				.map(Filenames.Extensions::normalize).forEach(ext -> fileMummifiersByExtension.put(ext, mummifier));
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version returns {@link GuiseMummy#LABEL}, usually a string in the form <code>Guise Mummy <var>version</var></code>.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This version returns [GuiseMummy#LABEL], usually a string in the form `Guise Mummy version`.
 	@Override
 	public String getMummifierIdentification() {
 		return GuiseMummy.LABEL;
@@ -91,13 +85,11 @@ public abstract class BaseMummyContext implements MummyContext {
 		return project;
 	}
 
-	/** The shared page document builder factory. Use must be synchronized on the factory itself. */
+	/// The shared page document builder factory. Use must be synchronized on the factory itself.
 	private final DocumentBuilderFactory pageDocumentBuilderFactory;
 
-	/**
-	 * Constructor.
-	 * @param project The Guise project.
-	 */
+	/// Constructor.
+	/// @param project The Guise project.
 	public BaseMummyContext(@NonNull final GuiseProject project) {
 		this.project = requireNonNull(project);
 		pageDocumentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -108,10 +100,8 @@ public abstract class BaseMummyContext implements MummyContext {
 		registerFileMummifier(new DefaultImageMummifier());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This specification currently ignores dotfiles, for example <code>.git</code> and <code>.gitignore</code>; as well as non-regular files.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This specification currently ignores dotfiles, for example `.git` and `.gitignore`; as well as non-regular files.
 	public boolean isIgnore(final Path sourcePath) {
 		if(isDotfile(sourcePath)) { //ignore dotfiles
 			return true;
@@ -132,19 +122,15 @@ public abstract class BaseMummyContext implements MummyContext {
 		return defaultDirectoryMummifier;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation finds a registered mummifier based upon the normalized filename extension (without regard to case).
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation finds a registered mummifier based upon the normalized filename extension (without regard to case).
 	@Override
 	public Optional<SourcePathMummifier> findRegisteredMummifierForSourceFile(@NonNull final Path sourceFile) {
 		return filenameExtensions(sourceFile).map(Filenames.Extensions::normalize).map(fileMummifiersByExtension::get).filter(Objects::nonNull).findFirst();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation doesn't support registered source directory mummifiers, and will always return {@link Optional#empty()}.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation doesn't support registered source directory mummifiers, and will always return [Optional#empty()].
 	@Override
 	public Optional<SourcePathMummifier> findRegisteredMummifierForSourceDirectory(Path sourceDirectory) {
 		return Optional.empty();
@@ -152,15 +138,13 @@ public abstract class BaseMummyContext implements MummyContext {
 
 	//factory methods
 
-	/**
-	 * Special Guise Mummy entity resolver with additional capabilities.
-	 * @implSpec This implementation uses preloaded versions of frequently-used XHTML-related DTDs and other entities instead of downloading them from external
-	 *           sources by using {@link DefaultEntityResolver}.
-	 * @implSpec If the {@value HTML#XHTML_1_1_PUBLIC_ID} DTD is requested, the {@value HTML#XHTML_1_0_STRICT_PUBLIC_ID} will be returned instead, which results
-	 *           in faster parsing and does not produce unnecessary and incorrect default attributes. For most XHTML 1.1 documents there will be no effective
-	 *           difference. See <a href="https://stackoverflow.com/q/60603441/421049">Java XML parser adding unnecessary xmlns and xml:space attributes</a> and
-	 *           <a href="https://www.w3.org/TR/xhtml11/changes.html">XHTML 1.1 - Second Edition § A. Changes from XHTML 1.0 Strict</a>.
-	 */
+	/// Special Guise Mummy entity resolver with additional capabilities.
+	/// @implSpec This implementation uses preloaded versions of frequently-used XHTML-related DTDs and other entities instead of downloading them from external
+	///           sources by using [DefaultEntityResolver].
+	/// @implSpec If the {@value HTML#XHTML_1_1_PUBLIC_ID} DTD is requested, the {@value HTML#XHTML_1_0_STRICT_PUBLIC_ID} will be returned instead, which results
+	///           in faster parsing and does not produce unnecessary and incorrect default attributes. For most XHTML 1.1 documents there will be no effective
+	///           difference. See [Java XML parser adding unnecessary xmlns and xml:space attributes](https://stackoverflow.com/q/60603441/421049) and
+	///           [XHTML 1.1 - Second Edition § A. Changes from XHTML 1.0 Strict](https://www.w3.org/TR/xhtml11/changes.html).
 	private static final EntityResolver ENTITY_RESOLVER = new EntityResolver() {
 
 		private final EntityResolver defaultEntityResolver = DefaultEntityResolver.getInstance();
@@ -178,16 +162,13 @@ public abstract class BaseMummyContext implements MummyContext {
 
 	};
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This implementation returns a document builder that uses preloaded versions of frequently-used XHTML-related DTDs and other entities instead of
-	 *           downloading them from external sources. In addition, for any documents using the XHTML 1.1 DTD, the document will actually be parsed using the
-	 *           the XHTML 1.0 Strict DTD instead, which is faster and does not result in unnecessary and incorrect default attributes. For most XHTML 1.1
-	 *           documents there will be no effective difference. See <a href="https://stackoverflow.com/q/60603441/421049">Java XML parser adding unnecessary
-	 *           xmlns and xml:space attributes</a> and <a href="https://www.w3.org/TR/xhtml11/changes.html">XHTML 1.1 - Second Edition § A. Changes from XHTML
-	 *           1.0 Strict</a>.
-	 * @implSpec This implementation synchronizes on the internal document builder factory instance.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This implementation returns a document builder that uses preloaded versions of frequently-used XHTML-related DTDs and other entities instead of
+	///           downloading them from external sources. In addition, for any documents using the XHTML 1.1 DTD, the document will actually be parsed using the
+	///           the XHTML 1.0 Strict DTD instead, which is faster and does not result in unnecessary and incorrect default attributes. For most XHTML 1.1
+	///           documents there will be no effective difference. See [Java XML parser adding unnecessary xmlns and xml:space attributes](https://stackoverflow.com/q/60603441/421049)
+	///           and [XHTML 1.1 - Second Edition § A. Changes from XHTML 1.0 Strict](https://www.w3.org/TR/xhtml11/changes.html).
+	/// @implSpec This implementation synchronizes on the internal document builder factory instance.
 	@Override
 	public DocumentBuilder newPageDocumentBuilder() {
 		synchronized(pageDocumentBuilderFactory) {

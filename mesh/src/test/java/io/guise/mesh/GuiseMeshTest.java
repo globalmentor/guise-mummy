@@ -35,16 +35,12 @@ import org.w3c.dom.*;
 import com.globalmentor.html.HtmlSerializer;
 import com.globalmentor.xml.def.NsName;
 
-/**
- * Tests of {@link GuiseMesh}.
- * @author Garret Wilson
- */
+/// Tests of [GuiseMesh].
+/// @author Garret Wilson
 public class GuiseMeshTest {
 
-	/**
-	 * @see GuiseMesh#ATTRIBUTE_MUTATION_NAME_PATTERN
-	 * @see GuiseMesh#ATTRIBUTE_MUTATION_NAME_PATTERN_NAME_GROUP
-	 */
+	/// @see GuiseMesh#ATTRIBUTE_MUTATION_NAME_PATTERN
+	/// @see GuiseMesh#ATTRIBUTE_MUTATION_NAME_PATTERN_NAME_GROUP
 	@Test
 	void testAttributeMutationNamePattern() {
 		assertThat(GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN.matcher("").matches(), is(false));
@@ -63,10 +59,8 @@ public class GuiseMeshTest {
 		assertThat(GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN.matcher("attr-foo_bar").matches(), is(true));
 	}
 
-	/**
-	 * @see GuiseMesh#ATTRIBUTE_MUTATION_NAME_PATTERN
-	 * @see GuiseMesh#ATTRIBUTE_MUTATION_NAME_PATTERN_NAME_GROUP
-	 */
+	/// @see GuiseMesh#ATTRIBUTE_MUTATION_NAME_PATTERN
+	/// @see GuiseMesh#ATTRIBUTE_MUTATION_NAME_PATTERN_NAME_GROUP
 	@Test
 	void testAttributeMutationNamePatternGroups() {
 		final Matcher matcher = GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN.matcher("attr-foo-bar");
@@ -74,7 +68,7 @@ public class GuiseMeshTest {
 		assertThat(matcher.group(GuiseMesh.ATTRIBUTE_MUTATION_NAME_PATTERN_NAME_GROUP), is("foo-bar"));
 	}
 
-	/** <code>mx:attr-*</code> */
+	/// `mx:attr-*`
 	@Test
 	void testAttributeMutation() throws IOException {
 		final Document document = createXHTMLDocument("Test Document");
@@ -90,7 +84,7 @@ public class GuiseMeshTest {
 				"<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test Document</title></head><body><h1 title=\"Result: Success\">Dummy Heading</h1></body></html>"));
 	}
 
-	/** <code>mx:attr-*</code> */
+	/// `mx:attr-*`
 	@Test
 	void verifyAttributeMutationNullRemovesAttribute() throws IOException {
 		final Document document = createXHTMLDocument("Test Document");
@@ -107,7 +101,7 @@ public class GuiseMeshTest {
 				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test Document</title></head><body><h1>Dummy Heading</h1></body></html>"));
 	}
 
-	/** <code>mx:attr-*</code> */
+	/// `mx:attr-*`
 	@Test
 	void verifyAttributeMutationBooleanTrueSetsFlagValue() throws IOException {
 		final Document document = createXHTMLDocument("Test Document");
@@ -123,7 +117,7 @@ public class GuiseMeshTest {
 				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test Document</title></head><body><h1 flag>Dummy Heading</h1></body></html>"));
 	}
 
-	/** <code>mx:attr-*</code> */
+	/// `mx:attr-*`
 	@Test
 	void verifyAttributeMutationBooleanFalseRemovesAttribute() throws IOException {
 		final Document document = createXHTMLDocument("Test Document");
@@ -139,7 +133,7 @@ public class GuiseMeshTest {
 				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test Document</title></head><body><h1>Dummy Heading</h1></body></html>"));
 	}
 
-	/** <code>mx:each</code> */
+	/// `mx:each`
 	@Test
 	void testMxEachWithIndexVar() throws IOException {
 		for(final Optional<String> indexVarAttribute : List.of(Optional.<String>empty(), Optional.of("index"))) { //test both default and explicit index variable
@@ -156,7 +150,7 @@ public class GuiseMeshTest {
 		}
 	}
 
-	/** <code>mx:each</code> */
+	/// `mx:each`
 	@Test
 	void testMxEachWithItemVar() throws IOException {
 		for(final Optional<String> itemVarAttribute : List.of(Optional.<String>empty(), Optional.of("item"))) { //test both default and explicit item variable
@@ -173,7 +167,7 @@ public class GuiseMeshTest {
 		}
 	}
 
-	/** <code>mx:each</code> */
+	/// `mx:each`
 	@Test
 	void testMxEachWithIterVar() throws IOException {
 		for(final Optional<String> iterVarAttribute : List.of(Optional.<String>empty(), Optional.of("iterState"))) { //test both default and explicit item variable
@@ -190,7 +184,7 @@ public class GuiseMeshTest {
 		}
 	}
 
-	/** <code>mx:each</code> */
+	/// `mx:each`
 	@Test
 	void verifyMxEachEmptyIterableRemovesIterationElement() throws IOException {
 		final Document document = createXHTMLDocument("Test");
@@ -204,7 +198,7 @@ public class GuiseMeshTest {
 				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test</title></head><body><ul></ul></body></html>"));
 	}
 
-	/** <code>mx:each</code> */
+	/// `mx:each`
 	@Test
 	void verifyMxEachNullExpressionResultRemovesIterationElement() throws IOException {
 		final Document document = createXHTMLDocument("Test");
@@ -218,7 +212,7 @@ public class GuiseMeshTest {
 				is("<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>Test</title></head><body><ul></ul></body></html>"));
 	}
 
-	/** <code>mx:each</code> */
+	/// `mx:each`
 	@Test
 	void testMxEachNested() throws IOException {
 		for(final Optional<String> itemVarAttribute : List.of(Optional.<String>empty(), Optional.of("item"))) { //test both default and explicit item variable
@@ -241,7 +235,7 @@ public class GuiseMeshTest {
 		}
 	}
 
-	/** <code>mx:text</code> */
+	/// `mx:text`
 	@Test
 	void testMxText() throws IOException {
 		final Document document = createXHTMLDocument("Test Document");

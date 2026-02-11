@@ -18,19 +18,15 @@ package io.guise.mummy;
 
 import java.util.Collection;
 
-/**
- * An artifact such as a directory that has child artifacts that are candidates for navigation.
- * @apiNote This is a specialization of a composite artifact; an artifact that is considered a "collection" of child artifacts.
- * @author Garret Wilson
- */
+/// An artifact such as a directory that has child artifacts that are candidates for navigation.
+/// @apiNote This is a specialization of a composite artifact; an artifact that is considered a "collection" of child artifacts.
+/// @author Garret Wilson
 public interface CollectionArtifact extends CompositeArtifact {
 
-	/**
-	 * Returns the child artifacts that make up the collection.
-	 * @apiNote There may be other comprising artifacts not considered children, for example some helper or sidecar files.
-	 * @return The child artifacts of this artifact.
-	 * @see #comprisedArtifacts()
-	 */
+	/// Returns the child artifacts that make up the collection.
+	/// @apiNote There may be other comprising artifacts not considered children, for example some helper or sidecar files.
+	/// @return The child artifacts of this artifact.
+	/// @see #comprisedArtifacts()
 	public Collection<Artifact> getChildArtifacts();
 
 }

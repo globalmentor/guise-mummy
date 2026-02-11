@@ -18,40 +18,32 @@ package io.guise.mesh;
 
 import org.jspecify.annotations.*;
 
-/**
- * An meshing exception indicating a problem parsing a Mesh Expression Language (MEXL) expression.
- * @author Garret Wilson
- */
+/// An meshing exception indicating a problem parsing a Mesh Expression Language (MEXL) expression.
+/// @author Garret Wilson
 public class MexlException extends MeshException {
 
 	private static final long serialVersionUID = 1L;
 
-	/** No-argument constructor. */
+	/// No-argument constructor.
 	public MexlException() {
 		this((String)null);
 	}
 
-	/**
-	 * Message constructor.
-	 * @param message An explanation of the error, or <code>null</code> if no message should be used.
-	 */
+	/// Message constructor.
+	/// @param message An explanation of the error, or `null` if no message should be used.
 	public MexlException(@Nullable final String message) {
 		this(message, null);
 	}
 
-	/**
-	 * Cause constructor. The message of the cause will be used if available.
-	 * @param cause The cause of the error or <code>null</code> if the cause is nonexistent or unknown.
-	 */
+	/// Cause constructor. The message of the cause will be used if available.
+	/// @param cause The cause of the error or `null` if the cause is nonexistent or unknown.
 	public MexlException(@Nullable final Throwable cause) {
 		this(cause == null ? null : cause.toString(), cause);
 	}
 
-	/**
-	 * Message and cause constructor.
-	 * @param message An explanation of the error, or <code>null</code> if a no message should be used.
-	 * @param cause The cause of the error or <code>null</code> if the cause is nonexistent or unknown.
-	 */
+	/// Message and cause constructor.
+	/// @param message An explanation of the error, or `null` if a no message should be used.
+	/// @param cause The cause of the error or `null` if the cause is nonexistent or unknown.
 	public MexlException(@Nullable final String message, @Nullable final Throwable cause) {
 		super(message, cause);
 	}

@@ -27,15 +27,13 @@ import org.junit.jupiter.api.*;
 import io.confound.config.*;
 import io.guise.mummy.GuiseMummy;
 
-/**
- * Tests of {@link S3}.
- * @author Garret Wilson
- */
+/// Tests of [S3].
+/// @author Garret Wilson
 public class S3Test {
 
 	//# policies
 
-	/*** @see S3#policyConditionRequiringAnyUserAgentOf(Iterable) */
+	/// @see S3#policyConditionRequiringAnyUserAgentOf(Iterable)
 	@Test
 	public void testPolicyConditionRequiringAnyUserAgentOf() {
 		assertThat(S3.policyConditionRequiringAnyUserAgentOf(List.of()), is("{'StringEquals':{'aws:UserAgent':[]}}".replace('\'', '"')));
@@ -46,7 +44,7 @@ public class S3Test {
 				is("{'StringEquals':{'aws:UserAgent':['test','example','foo-bar']}}".replace('\'', '"')));
 	}
 
-	/*** @see S3#policyPublicReadGetForBucket(String) */
+	/// @see S3#policyPublicReadGetForBucket(String)
 	@Test
 	public void testPolicyPublicReadGetForBucket() {
 		assertThat(S3.policyPublicReadGetForBucket("foo-bar"),
@@ -54,7 +52,7 @@ public class S3Test {
 						+ "'Resource':['arn:aws:s3:::foo-bar/*']}]}").replace('\'', '"')));
 	}
 
-	/*** @see S3#policyPublicReadGetForBucketRequiringAnyUserAgentOf(String, Iterable) */
+	/// @see S3#policyPublicReadGetForBucketRequiringAnyUserAgentOf(String, Iterable)
 	@Test
 	public void testPolicyPublicReadGetForBucketRequiringAnyUserAgentOf() {
 		assertThat(S3.policyPublicReadGetForBucketRequiringAnyUserAgentOf("foo-bar", List.of()),
@@ -66,7 +64,7 @@ public class S3Test {
 
 	//## `….bucket`
 
-	/*** @see S3#getConfiguredBucket(Configuration, Configuration) */
+	/// @see S3#getConfiguredBucket(Configuration, Configuration)
 	@Test
 	public void testGetConfiguredBucket() {
 		final Configuration globalConfiguration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "test.example.com.",
@@ -75,13 +73,13 @@ public class S3Test {
 		assertThat(S3.getConfiguredBucket(globalConfiguration, localConfiguration), is("example.net"));
 	}
 
-	/*** @see S3#getConfiguredBucket(Configuration, Configuration) */
+	/// @see S3#getConfiguredBucket(Configuration, Configuration)
 	@Test
 	public void testGetConfiguredBucketMissingThrowsException() {
 		assertThrows(ConfigurationException.class, () -> S3.getConfiguredBucket(Configuration.empty(), Configuration.empty()));
 	}
 
-	/*** @see S3#getConfiguredBucket(Configuration, Configuration) */
+	/// @see S3#getConfiguredBucket(Configuration, Configuration)
 	@Test
 	public void testGetConfiguredBucketDefaultsToSiteDomain() {
 		final Configuration globalConfiguration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "test.example.com.",

@@ -31,10 +31,8 @@ import io.confound.config.Configuration;
 import io.guise.mummy.*;
 import io.urf.URF.Handle;
 
-/**
- * Tests of {@link XhtmlPageMummifier}.
- * @author Garret Wilson
- */
+/// Tests of [XhtmlPageMummifier].
+/// @author Garret Wilson
 public class XhtmlPageMummifierTest {
 
 	public static final String SIMPLE_METADATA_XHTML_RESOURCE_NAME = "simple-metadata.xhtml";
@@ -47,10 +45,8 @@ public class XhtmlPageMummifierTest {
 		mummyContext = new FakeMummyContext(project);
 	}
 
-	/**
-	 * @see XhtmlPageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
-	 * @see #SIMPLE_METADATA_XHTML_RESOURCE_NAME
-	 */
+	/// @see XhtmlPageMummifier#loadSourceMetadata(MummyContext, InputStream, String)
+	/// @see #SIMPLE_METADATA_XHTML_RESOURCE_NAME
 	@Test
 	public void testSimpleXhtmlMetadata() throws IOException {
 		final XhtmlPageMummifier mummifier = new XhtmlPageMummifier();

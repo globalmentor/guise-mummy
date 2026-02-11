@@ -31,17 +31,13 @@ import io.guise.mummy.mummify.OpaqueFileMummifier;
 import io.guise.mummy.mummify.SourcePathMummifier;
 import io.guise.mummy.mummify.collection.DirectoryMummifier;
 
-/**
- * Stub implementation of a mummification context with minimal functionality for testing.
- * @implSpec This implementation does not support {@link #getPlan()}.
- * @author Garret Wilson
- */
+/// Stub implementation of a mummification context with minimal functionality for testing.
+/// @implSpec This implementation does not support [#getPlan()].
+/// @author Garret Wilson
 public class StubMummyContext implements MummyContext {
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec This version returns {@link GuiseMummy#LABEL}, usually a string in the form <code>Guise Mummy <var>version</var></code>.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec This version returns [GuiseMummy#LABEL], usually a string in the form `Guise Mummy version`.
 	@Override
 	public String getMummifierIdentification() {
 		return GuiseMummy.LABEL;
@@ -57,10 +53,8 @@ public class StubMummyContext implements MummyContext {
 		return project;
 	}
 
-	/**
-	 * Constructor.
-	 * @param project The Guise project.
-	 */
+	/// Constructor.
+	/// @param project The Guise project.
 	public StubMummyContext(@NonNull final GuiseProject project) {
 		this.project = requireNonNull(project);
 	}

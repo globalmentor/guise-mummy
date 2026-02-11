@@ -34,10 +34,8 @@ import org.w3c.dom.*;
 import com.globalmentor.html.def.HTML;
 import com.globalmentor.xml.def.NsName;
 
-/**
- * Tests of {@link AbstractPageMummifier}.
- * @author Garret Wilson
- */
+/// Tests of [AbstractPageMummifier].
+/// @author Garret Wilson
 public class AbstractPageMummifierTest {
 
 	//names for identifying documents as link sources
@@ -78,17 +76,15 @@ public class AbstractPageMummifierTest {
 				Map.entry("b", FROM_SOURCE_DOCUMENT), Map.entry("a", FROM_SOURCE_DOCUMENT), Map.entry("c", FROM_TEMPLATE), Map.entry("y", FROM_SOURCE_DOCUMENT)));
 	}
 
-	/** A convenience encapsulation of the LINK element namespace and local name. */
+	/// A convenience encapsulation of the LINK element namespace and local name.
 	private static final NsName LINK_ELEMENT = NsName.of(XHTML_NAMESPACE_URI_STRING, ELEMENT_LINK);
 
-	/**
-	 * Tests merging links by creating fake HTML documents with the given links, merging the links, and then gathering and returning the merged links for
-	 * verification.
-	 * @param templateLinks The links to use in the template document, in order.
-	 * @param sourceDocumentLinks The links to use in the source document, in order.
-	 * @return The resulting links after merging, associated with the name of the document they are from.
-	 * @see AbstractPageMummifier#mergeHeadLinks(Document, Document)
-	 */
+	/// Tests merging links by creating fake HTML documents with the given links, merging the links, and then gathering and returning the merged links for
+	/// verification.
+	/// @param templateLinks The links to use in the template document, in order.
+	/// @param sourceDocumentLinks The links to use in the source document, in order.
+	/// @return The resulting links after merging, associated with the name of the document they are from.
+	/// @see AbstractPageMummifier#mergeHeadLinks(Document, Document)
 	protected List<Map.Entry<String, String>> mergeHeadLinks(@NonNull final Stream<String> templateLinks, @NonNull final Stream<String> sourceDocumentLinks) {
 		final Document templateDocument = createLinksDocument(FROM_TEMPLATE, templateLinks);
 		final Document sourceDocument = createLinksDocument(FROM_SOURCE_DOCUMENT, sourceDocumentLinks);
@@ -100,15 +96,13 @@ public class AbstractPageMummifierTest {
 				.collect(toList());
 	}
 
-	/**
-	 * Creates a fake HTML document with the given links. The given name will be used as the document title and also as each link {@value HTML#ATTRIBUTE_NAME}
-	 * attribute value.
-	 * @apiNote Adding a supplied value as the {@value HTML#ATTRIBUTE_NAME} attribute allows verifying to see the source of each result link after merging.
-	 * @param name Some name to identify the document.
-	 * @param links The links to use in the document, in order.
-	 * @return A fake HTML document with the links.
-	 * @see #LINK_ELEMENT
-	 */
+	/// Creates a fake HTML document with the given links. The given name will be used as the document title and also as each link `name`
+	/// attribute value.
+	/// @apiNote Adding a supplied value as the `name` attribute allows verifying to see the source of each result link after merging.
+	/// @param name Some name to identify the document.
+	/// @param links The links to use in the document, in order.
+	/// @return A fake HTML document with the links.
+	/// @see #LINK_ELEMENT
 	protected Document createLinksDocument(@NonNull final String name, @NonNull final Stream<String> links) {
 		final Document document = createXHTMLDocument(name);
 		final Element headElement = findHtmlHeadElement(document).orElseThrow(IllegalStateException::new);

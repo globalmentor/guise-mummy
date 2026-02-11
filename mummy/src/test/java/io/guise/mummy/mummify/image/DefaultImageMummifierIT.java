@@ -43,10 +43,8 @@ import com.globalmentor.io.Paths;
 
 import io.guise.mummy.*;
 
-/**
- * A Guise Mummy smoke test.
- * @author Garret Wilson
- */
+/// A Guise Mummy smoke test.
+/// @author Garret Wilson
 public class DefaultImageMummifierIT extends BaseEndToEndIT {
 
 	@Override

@@ -20,28 +20,22 @@ import java.io.*;
 
 import org.jspecify.annotations.*;
 
-/**
- * Artifact that conceptually originates from some source that provides content (e.g. a source file as opposed to a directory in the site source tree).
- * @author Garret Wilson
- */
+/// Artifact that conceptually originates from some source that provides content (e.g. a source file as opposed to a directory in the site source tree).
+/// @author Garret Wilson
 public interface CorporealSourceArtifact extends Artifact {
 
-	/**
-	 * Returns the size of of the source contents in bytes.
-	 * @apiNote The source size may not be the same as the size of the file indicated by the source path, which may not even exist.
-	 * @param context The context of static site generation.
-	 * @return The size of the artifact source, in byte.
-	 * @throws IOException if there is an error retrieving the source size.
-	 */
+	/// Returns the size of of the source contents in bytes.
+	/// @apiNote The source size may not be the same as the size of the file indicated by the source path, which may not even exist.
+	/// @param context The context of static site generation.
+	/// @return The size of the artifact source, in byte.
+	/// @throws IOException if there is an error retrieving the source size.
 	public long getSourceSize(@NonNull MummyContext context) throws IOException;
 
-	/**
-	 * Opens an input stream to the source content of this artifact.
-	 * @apiNote The input stream may not necessarily return a stream to file indicated by the source path.
-	 * @param context The context of static site generation.
-	 * @return An input stream to the source contents.
-	 * @throws IOException if there is an error opening the source contents.
-	 */
+	/// Opens an input stream to the source content of this artifact.
+	/// @apiNote The input stream may not necessarily return a stream to file indicated by the source path.
+	/// @param context The context of static site generation.
+	/// @return An input stream to the source contents.
+	/// @throws IOException if there is an error opening the source contents.
 	public InputStream openSource(@NonNull MummyContext context) throws IOException;
 
 }

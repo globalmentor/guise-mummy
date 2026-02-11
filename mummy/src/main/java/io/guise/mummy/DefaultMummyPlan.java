@@ -27,10 +27,8 @@ import org.jspecify.annotations.*;
 
 import com.globalmentor.net.URIPath;
 
-/**
- * Default plan for mummifying a site.
- * @author Garret Wilson
- */
+/// Default plan for mummifying a site.
+/// @author Garret Wilson
 public class DefaultMummyPlan extends AbstractMummyPlan {
 
 	private final Map<Artifact, Artifact> principalArtifactsBySubsumedArtifacts = new HashMap<>();
@@ -54,17 +52,14 @@ public class DefaultMummyPlan extends AbstractMummyPlan {
 		return Optional.ofNullable(artifactsByReferenceSourcePath.get(checkArgumentAbsolute(referenceSourcePath)));
 	}
 
-	/**
-	 * Recursively initializes the mummification plan for the given artifact. Parent artifacts are updated in the map, for example.
-	 * @param artifact The artifact the plan of which to update.
-	 */
+	/// Recursively initializes the mummification plan for the given artifact. Parent artifacts are updated in the map, for example.
+	/// @param artifact The artifact the plan of which to update.
 	private void initialize(@NonNull final Artifact artifact) {
 		requireNonNull(artifact);
-		if(artifact instanceof CompositeArtifact) {
-			final CompositeArtifact compositeArtifact = (CompositeArtifact)artifact;
+		if(artifact instanceof CompositeArtifact compositeArtifact) {
 			compositeArtifact.getSubsumedArtifacts().forEach(subsumedArtifact -> principalArtifactsBySubsumedArtifacts.put(subsumedArtifact, artifact));
-			if(artifact instanceof CollectionArtifact) {
-				for(final Artifact childArtifact : ((CollectionArtifact)artifact).getChildArtifacts()) {
+			if(artifact instanceof CollectionArtifact collectionArtifact) {
+				for(final Artifact childArtifact : collectionArtifact.getChildArtifacts()) {
 					parentArtifactsByArtifact.put(childArtifact, artifact); //map the parent to the child
 				}
 			}
@@ -77,10 +72,8 @@ public class DefaultMummyPlan extends AbstractMummyPlan {
 		artifact.getReferentSourcePaths().forEach(referenceSourcePath -> artifactsByReferenceSourcePath.put(referenceSourcePath, artifact));
 	}
 
-	/**
-	 * Root artifact constructor.
-	 * @param rootArtifact The root artifact of the site, representing the root directory.
-	 */
+	/// Root artifact constructor.
+	/// @param rootArtifact The root artifact of the site, representing the root directory.
 	public DefaultMummyPlan(@NonNull final Artifact rootArtifact) {
 		super(rootArtifact);
 		initialize(rootArtifact);
@@ -91,10 +84,12 @@ public class DefaultMummyPlan extends AbstractMummyPlan {
 		return new DefaultArtifactQuery();
 	}
 
-	/**
-	 * Artifact query implementation using this plan.
-	 */
+	/// Artifact query implementation using this plan.
 	protected class DefaultArtifactQuery extends BaseArtifactQuery {
+
+		/// Constructor.
+		protected DefaultArtifactQuery() {
+		}
 
 		@Override
 		public ArtifactQuery fromChildrenOf(final Artifact artifact) {

@@ -29,37 +29,35 @@ import com.globalmentor.net.DomainName;
 
 import io.confound.config.*;
 
-/**
- * Tests of {@link GuiseMummy}.
- * @author Garret Wilson
- */
+/// Tests of [GuiseMummy].
+/// @author Garret Wilson
 public class GuiseMummyTest {
 
 	//# configuration
 
 	//## `domain`
 
-	/** @see GuiseMummy#findConfiguredDomain(Configuration) */
+	/// @see GuiseMummy#findConfiguredDomain(Configuration)
 	@Test
 	public void testFindConfiguredDomainEmpty() {
 		assertThat(GuiseMummy.findConfiguredDomain(Configuration.empty()), isEmpty());
 	}
 
-	/** @see GuiseMummy#findConfiguredDomain(Configuration) */
+	/// @see GuiseMummy#findConfiguredDomain(Configuration)
 	@Test
 	public void testFindConfiguredDomain() {
 		final Configuration configuration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_DOMAIN, "example.com."));
 		assertThat(GuiseMummy.findConfiguredDomain(configuration), isPresentAndIs(DomainName.of("example.com.")));
 	}
 
-	/** @see GuiseMummy#findConfiguredDomain(Configuration) */
+	/// @see GuiseMummy#findConfiguredDomain(Configuration)
 	@Test
 	public void testFindConfiguredDomainNotAbsoluteThrowsException() {
 		final Configuration configuration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_DOMAIN, "example.com"));
 		assertThrows(ConfigurationException.class, () -> GuiseMummy.findConfiguredDomain(configuration));
 	}
 
-	/** @see GuiseMummy#findConfiguredDomain(Configuration) */
+	/// @see GuiseMummy#findConfiguredDomain(Configuration)
 	@Test
 	public void testFindConfiguredDomainRootThrowsException() {
 		final Configuration configuration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_DOMAIN, "."));
@@ -68,13 +66,13 @@ public class GuiseMummyTest {
 
 	//## `site.domain`
 
-	/** @see GuiseMummy#findConfiguredSiteDomain(Configuration) */
+	/// @see GuiseMummy#findConfiguredSiteDomain(Configuration)
 	@Test
 	public void testFindConfiguredSiteDomainEmpty() {
 		assertThat(GuiseMummy.findConfiguredSiteDomain(Configuration.empty()), isEmpty());
 	}
 
-	/** @see GuiseMummy#findConfiguredSiteDomain(Configuration) */
+	/// @see GuiseMummy#findConfiguredSiteDomain(Configuration)
 	@Test
 	public void testFindConfiguredSiteDomain() {
 		final Configuration configuration = new ObjectMapConfiguration(
@@ -82,7 +80,7 @@ public class GuiseMummyTest {
 		assertThat(GuiseMummy.findConfiguredSiteDomain(configuration), isPresentAndIs(DomainName.of("www.example.com.")));
 	}
 
-	/** @see GuiseMummy#findConfiguredSiteDomain(Configuration) */
+	/// @see GuiseMummy#findConfiguredSiteDomain(Configuration)
 	@Test
 	public void testFindConfiguredSiteDomainResolvesToDomain() {
 		final Configuration configuration = new ObjectMapConfiguration(
@@ -90,21 +88,21 @@ public class GuiseMummyTest {
 		assertThat(GuiseMummy.findConfiguredSiteDomain(configuration), isPresentAndIs(DomainName.of("www.example.com.")));
 	}
 
-	/** @see GuiseMummy#findConfiguredSiteDomain(Configuration) */
+	/// @see GuiseMummy#findConfiguredSiteDomain(Configuration)
 	@Test
 	public void testFindConfiguredSiteDomainDefaultsToDomain() {
 		final Configuration configuration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_DOMAIN, "www.example.com."));
 		assertThat(GuiseMummy.findConfiguredSiteDomain(configuration), isPresentAndIs(DomainName.of("www.example.com.")));
 	}
 
-	/** @see GuiseMummy#findConfiguredSiteDomain(Configuration) */
+	/// @see GuiseMummy#findConfiguredSiteDomain(Configuration)
 	@Test
 	public void testFindConfiguredSiteDomainNotAbsoluteThrowsException() {
 		final Configuration configuration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "example.com"));
 		assertThrows(ConfigurationException.class, () -> GuiseMummy.findConfiguredSiteDomain(configuration));
 	}
 
-	/** @see GuiseMummy#findConfiguredSiteDomain(Configuration) */
+	/// @see GuiseMummy#findConfiguredSiteDomain(Configuration)
 	@Test
 	public void testFindConfiguredSiteDomainRootThrowsException() {
 		final Configuration configuration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_DOMAIN, "."));
@@ -113,13 +111,13 @@ public class GuiseMummyTest {
 
 	//## `site.altDomains`
 
-	/** @see GuiseMummy#findConfiguredSiteAltDomains(Configuration) */
+	/// @see GuiseMummy#findConfiguredSiteAltDomains(Configuration)
 	@Test
 	public void testGetConfiguredSiteAltDomainsEmpty() {
 		assertThat(GuiseMummy.findConfiguredSiteAltDomains(Configuration.empty()), isEmpty());
 	}
 
-	/** @see GuiseMummy#findConfiguredSiteAltDomains(Configuration) */
+	/// @see GuiseMummy#findConfiguredSiteAltDomains(Configuration)
 	@Test
 	public void testGetConfiguredSiteAltDomains() {
 		final Configuration configuration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS,
@@ -128,7 +126,7 @@ public class GuiseMummyTest {
 				DomainName.of("www.example.com."), DomainName.of("foo.example.com."), DomainName.of("bar.example.net."), DomainName.of("foo.bar.example.com."))));
 	}
 
-	/** @see GuiseMummy#findConfiguredSiteAltDomains(Configuration) */
+	/// @see GuiseMummy#findConfiguredSiteAltDomains(Configuration)
 	@Test
 	public void testGetConfiguredSiteAltDomainsResolveToDomain() {
 		final Configuration configuration = new ObjectMapConfiguration(Map.of(GuiseMummy.CONFIG_KEY_DOMAIN, "example.com.", GuiseMummy.CONFIG_KEY_SITE_ALT_DOMAINS,
@@ -137,7 +135,7 @@ public class GuiseMummyTest {
 				DomainName.of("www.example.com."), DomainName.of("foo.example.com."), DomainName.of("bar.example.net."), DomainName.of("foo.bar.example.com."))));
 	}
 
-	/** @see GuiseMummy#findConfiguredSiteAltDomains(Configuration) */
+	/// @see GuiseMummy#findConfiguredSiteAltDomains(Configuration)
 	@Test
 	public void testGetConfiguredSiteAltDomainsNotAbsoluteThrowsException() {
 		final Configuration configuration = new ObjectMapConfiguration(
@@ -145,7 +143,7 @@ public class GuiseMummyTest {
 		assertThrows(ConfigurationException.class, () -> GuiseMummy.findConfiguredSiteAltDomains(configuration));
 	}
 
-	/** @see GuiseMummy#findConfiguredSiteAltDomains(Configuration) */
+	/// @see GuiseMummy#findConfiguredSiteAltDomains(Configuration)
 	@Test
 	public void testGetConfiguredSiteAltDomainsRootThrowsException() {
 		final Configuration configuration = new ObjectMapConfiguration(

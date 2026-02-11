@@ -18,7 +18,6 @@ package io.guise.mesh;
 
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
-import static java.lang.String.format;
 import static java.util.Objects.*;
 
 import java.util.Optional;
@@ -26,19 +25,21 @@ import java.util.function.Function;
 
 import org.jspecify.annotations.*;
 
-/**
- * Default Guise Mesh interpolation implementation.
- * @author Garret Wilson
- */
+/// Default Guise Mesh interpolation implementation.
+/// @author Garret Wilson
 public class DefaultMeshInterpolator implements MeshInterpolator {
 
-	/** The default Guise Mesh left interpolation expression delimiter. */
+	/// Constructor.
+	public DefaultMeshInterpolator() {
+	}
+
+	/// The default Guise Mesh left interpolation expression delimiter.
 	public static final String LEFT_EXPRESSION_DELIMITER = "^{";
 
-	/** The default Guise Mesh right interpolation expression delimiter. */
+	/// The default Guise Mesh right interpolation expression delimiter.
 	public static final String RIGHT_EXPRESSION_DELIMITER = "}";
 
-	/** Singleton shared instance. */
+	/// Singleton shared instance.
 	public static final DefaultMeshInterpolator INSTANCE = new DefaultMeshInterpolator();
 
 	@Override
@@ -46,18 +47,16 @@ public class DefaultMeshInterpolator implements MeshInterpolator {
 		return hasInterpolation(text, LEFT_EXPRESSION_DELIMITER, RIGHT_EXPRESSION_DELIMITER);
 	}
 
-	/**
-	 * Determines if the given text has one or more expressions to interpolate. No evaluations are performed, and syntax is not guaranteed to be fully or even
-	 * partially validated.
-	 * @implSpec This current implementation only supports a left delimiter of exactly two characters and a right delimiter of exactly one character.
-	 * @implSpec This implementation does not support nested delimiters.
-	 * @implSpec This implementation does not fully support surrogate characters as expression delimiters.
-	 * @param text The text being considered for interpolation.
-	 * @param leftExpressionDelimiter The string demarcating the left side of an interpolation expression.
-	 * @param rightExpressionDelimiter The string demarcating the right side of an interpolation expression.
-	 * @return <code>true</code> if the text has expressions to be interpolated
-	 * @throws MeshInterpolationException if the interpolation syntax of the given text is incorrect.
-	 */
+	/// Determines if the given text has one or more expressions to interpolate. No evaluations are performed, and syntax is not guaranteed to be fully or even
+	/// partially validated.
+	/// @implSpec This current implementation only supports a left delimiter of exactly two characters and a right delimiter of exactly one character.
+	/// @implSpec This implementation does not support nested delimiters.
+	/// @implSpec This implementation does not fully support surrogate characters as expression delimiters.
+	/// @param text The text being considered for interpolation.
+	/// @param leftExpressionDelimiter The string demarcating the left side of an interpolation expression.
+	/// @param rightExpressionDelimiter The string demarcating the right side of an interpolation expression.
+	/// @return `true` if the text has expressions to be interpolated
+	/// @throws MeshInterpolationException if the interpolation syntax of the given text is incorrect.
 	protected static boolean hasInterpolation(@NonNull CharSequence text, final String leftExpressionDelimiter, final String rightExpressionDelimiter)
 			throws MeshInterpolationException {
 		checkArgument(leftExpressionDelimiter.length() == 2,
@@ -83,11 +82,9 @@ public class DefaultMeshInterpolator implements MeshInterpolator {
 		return false; //no more characters
 	}
 
-	/**
-	 * {@inheritDoc}
-	 * @implSpec To evaluate expressions this implementation delegates to {@link MexlEvaluator#findExpressionResult(MeshContext, CharSequence)} and uses the
-	 *           {@link Object#toString()} value of the returned result, or the empty string if no result is returned.
-	 */
+	/// {@inheritDoc}
+	/// @implSpec To evaluate expressions this implementation delegates to [MexlEvaluator#findExpressionResult(MeshContext, CharSequence)] and uses the
+	///           [Object#toString()] value of the returned result, or the empty string if no result is returned.
 	@Override
 	public Optional<CharSequence> findInterpolation(final MeshContext context, final CharSequence text, final MexlEvaluator evaluator)
 			throws MeshInterpolationException, MexlException {
@@ -95,20 +92,18 @@ public class DefaultMeshInterpolator implements MeshInterpolator {
 				expression -> evaluator.findExpressionResult(context, expression).map(Object::toString).orElse(""));
 	}
 
-	/**
-	 * Interpolates the given text and returns the interpolated result if there was a change.
-	 * @implSpec This current implementation only supports a left delimiter of exactly two characters and a right delimiter of exactly one character.
-	 * @implSpec This implementation does not support nested delimiters.
-	 * @implSpec This implementation does not fully support surrogate characters as expression delimiters.
-	 * @param text The text to interpolate.
-	 * @param leftExpressionDelimiter The string demarcating the left side of an interpolation expression.
-	 * @param rightExpressionDelimiter The string demarcating the right side of an interpolation expression.
-	 * @param evaluator The strategy for evaluating the expression and returning a result; a return value of <code>null</code> will be interpolated as the string
-	 *          <code>"null"</code>.
-	 * @return The interpolated text if interpolation actually occurred; will be empty if no changes were made to the text.
-	 * @throws MeshInterpolationException if the interpolation syntax of the given text is incorrect.
-	 * @throws MexlException if there was an error parsing or otherwise processing an expression.
-	 */
+	/// Interpolates the given text and returns the interpolated result if there was a change.
+	/// @implSpec This current implementation only supports a left delimiter of exactly two characters and a right delimiter of exactly one character.
+	/// @implSpec This implementation does not support nested delimiters.
+	/// @implSpec This implementation does not fully support surrogate characters as expression delimiters.
+	/// @param text The text to interpolate.
+	/// @param leftExpressionDelimiter The string demarcating the left side of an interpolation expression.
+	/// @param rightExpressionDelimiter The string demarcating the right side of an interpolation expression.
+	/// @param evaluator The strategy for evaluating the expression and returning a result; a return value of `null` will be interpolated as the string
+	///          `"null"`.
+	/// @return The interpolated text if interpolation actually occurred; will be empty if no changes were made to the text.
+	/// @throws MeshInterpolationException if the interpolation syntax of the given text is incorrect.
+	/// @throws MexlException if there was an error parsing or otherwise processing an expression.
 	protected static Optional<CharSequence> findInterpolation(@NonNull final CharSequence text, final String leftExpressionDelimiter,
 			final String rightExpressionDelimiter, @NonNull final Function<CharSequence, CharSequence> evaluator) throws MeshInterpolationException, MexlException {
 		checkArgument(leftExpressionDelimiter.length() == 2,
@@ -145,7 +140,7 @@ public class DefaultMeshInterpolator implements MeshInterpolator {
 			final int rightDelimiterIndex = indexOf(text, rightDelimiterChar, expressionStartIndex); //search could start at end of string, which is allowed by the API
 			if(rightDelimiterIndex == -1) {
 				throw new MeshInterpolationException(
-						format("Mesh interpolation string `%s` missing ending delimiter for interpolation expression starting at index %d.", text, signalIndex));
+						"Mesh interpolation string `%s` missing ending delimiter for interpolation expression starting at index %d.".formatted(text, signalIndex));
 			}
 			final int expressionEndIndex = rightDelimiterIndex;
 			final CharSequence expression = text.subSequence(expressionStartIndex, expressionEndIndex);
