@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>io.guise</groupId>
+		<groupId>dev.guise</groupId>
 		<artifactId>guise-mummy-bom</artifactId>
 		<version>0.6.0-SNAPSHOT</version>
 	</parent>
@@ -14,7 +14,7 @@
 	<description>Guise™ Command-Line Interface (CLI) utility program.</description>
 
 	<properties>
-		<exe.main.class>io.guise.cli.GuiseCli</exe.main.class>
+		<exe.main.class>dev.guise.cli.GuiseCli</exe.main.class>
 		<exe.base.filename>guise</exe.base.filename>
 	</properties>
 
@@ -35,12 +35,12 @@
 		</dependency>
 
 		<dependency>
-			<groupId>io.guise</groupId>
+			<groupId>dev.guise</groupId>
 			<artifactId>guise-mummy</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>io.guise</groupId>
+			<groupId>dev.guise</groupId>
 			<artifactId>guise-tomcat</artifactId>
 		</dependency>
 
