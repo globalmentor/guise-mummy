@@ -57,4 +57,4 @@ The rename is mechanically straightforward but touches nearly every file. The fo
 - `mummy/src/main/resources/io/guise/` and `mummy/src/test/resources/io/guise/`
 - `tomcat/src/main/java/io/guise/catalina/`
 
-Beyond the Java source tree, the `guise.io` domain also appears in XML namespace URI constants (`GuiseMesh.NAMESPACE_STRING`, `GuiseMummy.NAMESPACE_STRING`), XHTML templates (including the demo project at `demo-basic/src/site/.template.xhtml`), test resource XHTML files, and the Guise Skeleton CSS comment in `demo-basic/`. All of these must be updated to `guise.dev`.
+Beyond the Java source tree, the `guise.io` domain also appears in XML namespace URI constants (`GuiseMesh.NAMESPACE_STRING`, `GuiseMummy.NAMESPACE_STRING`), XHTML templates (including the demo project at `demo-basic/src/site/.template.xhtml`), and test resource XHTML files. All of these must be updated to `guise.dev`. The Guise Skeleton CSS file in `demo-basic/` is a vendored dependency artifact and should not be modified here; it will be updated when Guise Skeleton itself migrates.
