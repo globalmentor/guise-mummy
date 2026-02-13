@@ -119,8 +119,7 @@ public class GuiseMesh {
 	///           `${iter.first}`) in the permitted class set in addition to the caller-supplied classes. It creates a [JexlMexlEvaluator]
 	///           with the combined classes and packages and uses [DefaultMeshInterpolator] for interpolation.
 	public GuiseMesh(final Set<Class<?>> additionalClasses, final Set<Package> additionalPackages) {
-		final var permittedClasses = concat(Stream.of(MeshIterator.class), additionalClasses.stream())
-				.collect(toUnmodifiableSet());
+		final var permittedClasses = concat(Stream.of(MeshIterator.class), additionalClasses.stream()).collect(toUnmodifiableSet());
 		this(new JexlMexlEvaluator(permittedClasses, additionalPackages), DefaultMeshInterpolator.INSTANCE);
 	}
 
@@ -165,7 +164,7 @@ public class GuiseMesh {
 		final Optional<List<Element>> iteration = exciseAttribute(element, ATTRIBUTE_EACH) //mx:each
 				.map(each -> evaluator.findExpressionResult(context, each)).map(foundResult -> foundResult.orElseGet(Collections::emptyList)) //consider a null/empty expression to be an empty iteration source
 				.map(throwingFunction(iterationSource -> {
-					try (final Closeable iterationSourceCleanup = toCloseable(iterationSource)) { //ensure the iteration source is closed, in case it uses resource e.g. a directory listing
+					try (final Closeable _ = toCloseable(iterationSource)) { //ensure the iteration source is closed, in case it uses resource e.g. a directory listing
 						final MeshIterator iterator;
 						try {
 							iterator = MeshIterator.fromIterationSource(iterationSource);
@@ -176,7 +175,7 @@ public class GuiseMesh {
 						final String itemVar = exciseAttribute(element, ATTRIBUTE_ITEM_VAR).orElse(DEFAULT_ITEM_VAR); //mx:item-var
 						final String indexVar = exciseAttribute(element, ATTRIBUTE_INDEX_VAR).orElse(DEFAULT_INDEX_VAR); //mx:index-var
 						final List<Element> result = new ArrayList<>();
-						try (final MeshContext.ScopeNesting scopeNesting = context.nestScope()) {
+						try (final MeshContext.ScopeNesting _ = context.nestScope()) {
 							context.setVariable(iterVar, iterator); //TODO consider providing delegate variable manipulation methods to nesting, if nothing else to avoid unused auto-closeable variable warning (`try`)
 							while(iterator.hasNext()) {
 								final Object item = iterator.next();

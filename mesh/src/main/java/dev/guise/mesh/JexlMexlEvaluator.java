@@ -77,13 +77,8 @@ public class JexlMexlEvaluator implements MexlEvaluator {
 	///           [JexlPermissions#compose(String...)].
 	JexlMexlEvaluator(final Set<Class<?>> permittedClasses, final Set<Package> permittedPackages) {
 		final Class<?>[] classArray = permittedClasses.toArray(Class<?>[]::new);
-		final String[] packageWildcards = permittedPackages.stream()
-			.map(pkg -> pkg.getName() + ".*")
-			.toArray(String[]::new);
-		jexl = new JexlBuilder()
-			.strategy(RESOLVER_STRATEGY)
-			.permissions(new JexlPermissions.ClassPermissions(classArray).compose(packageWildcards))
-			.create();
+		final String[] packageWildcards = permittedPackages.stream().map(pkg -> pkg.getName() + ".*").toArray(String[]::new);
+		jexl = new JexlBuilder().strategy(RESOLVER_STRATEGY).permissions(new JexlPermissions.ClassPermissions(classArray).compose(packageWildcards)).create();
 	}
 
 	@Override

@@ -32,7 +32,7 @@ public class DefaultMeshContextTest {
 	void testNestedScopes() {
 		final MeshContext context = new DefaultMeshContext(MeshScope.create(Map.of("test", "foo")));
 		assertThat("Root scope variable visible initially.", context.findVariable("test"), isPresentAndIs("foo"));
-		try (final MeshContext.ScopeNesting scopeNesting = context.nestScope()) {
+		try (final MeshContext.ScopeNesting _ = context.nestScope()) {
 			context.setVariable("test", "bar");
 			context.setVariable("other", "foobar");
 			assertThat("Nested scope overrides root scope.", context.findVariable("test"), isPresentAndIs("bar"));

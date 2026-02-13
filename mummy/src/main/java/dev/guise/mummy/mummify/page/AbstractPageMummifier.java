@@ -159,9 +159,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 	// `plan` (`MummyPlan`), `artifact` (`Artifact`/`CollectionArtifact`), and `artifact.mummifier` (`Mummifier`).
 	// These are resolved through standard JEXL property introspection,
 	// e.g. `${plan.rootArtifact}`, `${artifact.sourcePath}`, `${artifact.navigable}`.
-	private final GuiseMesh guiseMesh = new GuiseMesh(
-			Set.of(Artifact.class, MummyPlan.class, CollectionArtifact.class, Mummifier.class),
-			Set.of());
+	private final GuiseMesh guiseMesh = new GuiseMesh(Set.of(Artifact.class, MummyPlan.class, CollectionArtifact.class, Mummifier.class), Set.of());
 
 	/// Returns the strategy for transformation a document based upon Mesh Expression Language (MEXL) expressions.
 	/// @return The strategy for transformation a document based upon Mesh Expression Language (MEXL) expressions.
@@ -257,7 +255,7 @@ public abstract class AbstractPageMummifier extends AbstractFileMummifier implem
 				//then include the sorted child navigation artifacts
 				childNavigationArtifacts(context, artifact)
 						//posts shouldn't appear in the normal navigation list
-					.filter(not(navArtifact -> navArtifact instanceof SourcePathArtifact sourcePathArtifact && sourcePathArtifact.isPost()))
+						.filter(not(navArtifact -> navArtifact instanceof SourcePathArtifact sourcePathArtifact && sourcePathArtifact.isPost()))
 						.sorted(navigationArtifactOrderComparator));
 	}
 
