@@ -91,9 +91,9 @@ public class GuiseMeshTest {
 		final Element bodyElement = findHtmlBodyElement(document).orElseThrow(AssertionError::new);
 		final Element h1Element = appendElement(bodyElement, ELEMENT_H(1), "Dummy Heading");
 		h1Element.setAttributeNS(null, ATTRIBUTE_TITLE, "Dummy Title");
-		//Object.class.getSuperclass() is guaranteed to return null as per the API
-		setAttribute(h1Element, NsName.of(NAMESPACE_STRING, "attr-title"), "foo.superclass");
-		new GuiseMesh().meshDocument(MeshContext.create(Map.of("foo", Object.class)), document);
+		// A map lookup for a missing key returns `null` in JEXL.
+		setAttribute(h1Element, NsName.of(NAMESPACE_STRING, "attr-title"), "foo.missing");
+		new GuiseMesh().meshDocument(MeshContext.create(Map.of("foo", Map.of())), document);
 		assertThat(h1Element.getTextContent(), is("Dummy Heading"));
 		assertThat(h1Element.hasAttributeNS(null, ATTRIBUTE_TITLE), is(false));
 		assertThat(h1Element.hasAttributeNS(NAMESPACE_STRING, "attr-title"), is(false));

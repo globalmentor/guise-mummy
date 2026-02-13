@@ -67,15 +67,23 @@ public class JexlMexlEvaluator implements MexlEvaluator {
 		}
 	};
 
-	/// Singleton shared instance.
-	/// @implNote This variable must be initialized after the property resolver and resolver strategy private constant instances.
-	public static final JexlMexlEvaluator INSTANCE = new JexlMexlEvaluator();
-
 	private final JexlEngine jexl;
 
-	/// This class cannot be publicly instantiated.
-	private JexlMexlEvaluator() {
-		jexl = new JexlBuilder().strategy(RESOLVER_STRATEGY).create();
+	/// Constructor.
+	/// @param permittedClasses Classes to permit for JEXL introspection in expressions, matched by exact canonical name.
+	/// @param permittedPackages Packages to permit for JEXL introspection in expressions, each covering all sub-packages.
+	/// @implSpec Classes are permitted via [JexlPermissions.ClassPermissions] for exact matching atop [JexlPermissions#RESTRICTED].
+	///           Packages are mapped to JEXL permission wildcards (`packageName.*`) and applied via
+	///           [JexlPermissions#compose(String...)].
+	JexlMexlEvaluator(final Set<Class<?>> permittedClasses, final Set<Package> permittedPackages) {
+		final Class<?>[] classArray = permittedClasses.toArray(Class<?>[]::new);
+		final String[] packageWildcards = permittedPackages.stream()
+			.map(pkg -> pkg.getName() + ".*")
+			.toArray(String[]::new);
+		jexl = new JexlBuilder()
+			.strategy(RESOLVER_STRATEGY)
+			.permissions(new JexlPermissions.ClassPermissions(classArray).compose(packageWildcards))
+			.create();
 	}
 
 	@Override
@@ -83,7 +91,7 @@ public class JexlMexlEvaluator implements MexlEvaluator {
 		try {
 			return jexl.createExpression(expression.toString()).evaluate(new MeshJexlContext(context));
 		} catch(final JexlException jexlException) {
-			throw new MexlException("Error in MEXL expression `%s`: %s".formatted(expression, jexlException.getMessage()), jexlException);
+			throw new MexlException("Error in MEXL expression `%s`: %s".formatted(expression, jexlException.getDetail()), jexlException);
 		}
 	}
 
