@@ -31,7 +31,6 @@ import org.jspecify.annotations.*;
 import org.junit.jupiter.api.*;
 import org.w3c.dom.*;
 
-import com.globalmentor.html.def.HTML;
 import com.globalmentor.xml.def.NsName;
 
 /// Tests of [AbstractPageMummifier].

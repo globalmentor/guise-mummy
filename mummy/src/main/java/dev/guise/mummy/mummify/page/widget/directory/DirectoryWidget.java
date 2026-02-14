@@ -107,7 +107,7 @@ public class DirectoryWidget implements Widget {
 					//determine the sort order, if any, by the prefix
 					final Optional<SortOrder> foundSortOrder = !groupBy.isEmpty() ? SortOrder.findFromSign(groupBy.charAt(0)) : Optional.empty();
 					//strip off the sort order if needed
-					final String groupByValue = foundSortOrder.map(sortOrder -> groupBy.substring(1)).orElse(groupBy);
+					final String groupByValue = foundSortOrder.map(_ -> groupBy.substring(1)).orElse(groupBy);
 					switch(groupByValue) {
 						case GROUP_BY_PUBLICATION_DATE -> {
 							final Map<Optional<LocalDate>, List<Artifact>> itemsByFoundPublicationDate = items.collect(groupingBy(
@@ -166,8 +166,7 @@ public class DirectoryWidget implements Widget {
 	/// @throws MummifyWidgetException if the information in the widget element is not appropriate for the widget.
 	/// @throws DOMException if there is some error manipulating the XML document object model.
 	public List<Element> generateItemElements(@NonNull final PageMummifier mummifier, @NonNull final MummyContext context, @NonNull final Artifact artifact,
-			@NonNull final Element widgetElement, final int headingLevel, Stream<Artifact> items)
-			throws IOException, MummifyWidgetException, DOMException {
+			@NonNull final Element widgetElement, final int headingLevel, Stream<Artifact> items) throws IOException, MummifyWidgetException, DOMException {
 		final Document document = widgetElement.getOwnerDocument();
 		final Collator titleCollator = Collator.getInstance(); //TODO i18n: get locale for page, defaulting to site locale
 		titleCollator.setDecomposition(Collator.CANONICAL_DECOMPOSITION);

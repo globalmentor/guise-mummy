@@ -19,7 +19,7 @@ package dev.guise.mesh;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
-import java.util.Map;
+import java.util.*;
 
 import org.junit.jupiter.api.Test;
 
@@ -29,11 +29,13 @@ import io.urf.model.*;
 /// @author Garret Wilson
 public class JexlMexlEvaluatorTest {
 
+	private final JexlMexlEvaluator evaluator = new JexlMexlEvaluator(Set.of(), Set.of());
+
 	@Test
 	public void shouldRetrieveMapValue() {
 		final MeshContext context = new DefaultMeshContext();
 		context.setVariable("foo", Map.of("bar", 123));
-		assertThat(JexlMexlEvaluator.INSTANCE.evaluate(context, "foo.bar"), is(123));
+		assertThat(evaluator.evaluate(context, "foo.bar"), is(123));
 	}
 
 	@Test
@@ -42,7 +44,7 @@ public class JexlMexlEvaluatorTest {
 		final UrfObject foo = new UrfObject();
 		foo.setPropertyValueByHandle("bar", 123);
 		context.setVariable("foo", foo);
-		assertThat(JexlMexlEvaluator.INSTANCE.evaluate(context, "foo.bar"), is(123));
+		assertThat(evaluator.evaluate(context, "foo.bar"), is(123));
 	}
 
 	@Test
@@ -51,7 +53,7 @@ public class JexlMexlEvaluatorTest {
 		final UrfObject foo = new UrfObject();
 		foo.setPropertyValueByHandle("bar", 123);
 		context.setVariable("foo", foo);
-		assertThat(JexlMexlEvaluator.INSTANCE.evaluate(context, "foo[\"bar\"]"), is(123));
+		assertThat(evaluator.evaluate(context, "foo[\"bar\"]"), is(123));
 	}
 
 	/// @see UrfResourceDescription#getPropertyCount()
@@ -59,7 +61,7 @@ public class JexlMexlEvaluatorTest {
 	public void shouldNotSeeUrfPojoProperty() {
 		final MeshContext context = new DefaultMeshContext();
 		context.setVariable("foo", new UrfObject());
-		assertThat(JexlMexlEvaluator.INSTANCE.evaluate(context, "foo.propertyCount"), is(nullValue()));
+		assertThat(evaluator.evaluate(context, "foo.propertyCount"), is(nullValue()));
 	}
 
 	/// Verifies that our special URF resolver is used only for the URF object, and that it still allows map values to be looked up later in the chain.
@@ -69,7 +71,7 @@ public class JexlMexlEvaluatorTest {
 		final UrfObject foo = new UrfObject();
 		foo.setPropertyValueByHandle("bar", Map.of("test", 123));
 		context.setVariable("foo", foo);
-		assertThat(JexlMexlEvaluator.INSTANCE.evaluate(context, "foo.bar.test"), is(123));
+		assertThat(evaluator.evaluate(context, "foo.bar.test"), is(123));
 	}
 
 	/// Verifies that an URF object within a map still has its properties visible (i.e. the map resolver did not prevent URF access later in the chain).
@@ -79,7 +81,7 @@ public class JexlMexlEvaluatorTest {
 		final UrfObject bar = new UrfObject();
 		bar.setPropertyValueByHandle("test", 123);
 		context.setVariable("foo", Map.of("bar", bar));
-		assertThat(JexlMexlEvaluator.INSTANCE.evaluate(context, "foo.bar.test"), is(123));
+		assertThat(evaluator.evaluate(context, "foo.bar.test"), is(123));
 	}
 
 }

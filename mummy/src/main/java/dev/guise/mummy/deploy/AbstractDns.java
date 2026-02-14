@@ -28,7 +28,6 @@ import com.globalmentor.net.*;
 
 import io.clogr.Clogged;
 import dev.guise.mummy.*;
-import dev.guise.mummy.deploy.Dns;
 
 /// Abstract base class for a DNS implementation, including necessary functionality for setting configured zone records.
 /// @author Garret Wilson

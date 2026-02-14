@@ -20,6 +20,8 @@ import static com.globalmentor.io.IO.*;
 import static com.globalmentor.xml.XmlDom.*;
 import static java.util.Objects.*;
 import static java.util.function.Predicate.*;
+import static java.util.stream.Collectors.*;
+import static java.util.stream.Stream.*;
 import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.Closeable;
@@ -27,6 +29,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 import java.util.regex.*;
+import java.util.stream.Stream;
 
 import org.jspecify.annotations.*;
 
@@ -103,10 +106,21 @@ public class GuiseMesh {
 		return interpolator;
 	}
 
-	/// Default Mesh Expression Language (MEXL) evaluator constructor.
-	/// @implSpec This implementation uses an instance of the [JexlMexlEvaluator] as evaluator and [DefaultMeshInterpolator] as evaluator.
+	/// No-arg convenience constructor with no additional permissions.
+	/// @implSpec Delegates to [#GuiseMesh(Set, Set)] with empty sets.
 	public GuiseMesh() {
-		this(JexlMexlEvaluator.INSTANCE, DefaultMeshInterpolator.INSTANCE);
+		this(Set.of(), Set.of());
+	}
+
+	/// Convenience constructor with additional classes and packages permitted for introspection in MEXL expressions.
+	/// @param additionalClasses Additional classes to permit for introspection in MEXL expressions, matched by exact class.
+	/// @param additionalPackages Additional packages whose classes should be accessible in MEXL expressions, each covering sub-packages.
+	/// @implSpec This implementation always includes [MeshIterator] (for `mx:each` iteration introspection, e.g. `${iter.current}`,
+	///           `${iter.first}`) in the permitted class set in addition to the caller-supplied classes. It creates a [JexlMexlEvaluator]
+	///           with the combined classes and packages and uses [DefaultMeshInterpolator] for interpolation.
+	public GuiseMesh(final Set<Class<?>> additionalClasses, final Set<Package> additionalPackages) {
+		final var permittedClasses = concat(Stream.of(MeshIterator.class), additionalClasses.stream()).collect(toUnmodifiableSet());
+		this(new JexlMexlEvaluator(permittedClasses, additionalPackages), DefaultMeshInterpolator.INSTANCE);
 	}
 
 	/// Mesh Expression Language (MEXL) evaluator constructor.
@@ -150,7 +164,7 @@ public class GuiseMesh {
 		final Optional<List<Element>> iteration = exciseAttribute(element, ATTRIBUTE_EACH) //mx:each
 				.map(each -> evaluator.findExpressionResult(context, each)).map(foundResult -> foundResult.orElseGet(Collections::emptyList)) //consider a null/empty expression to be an empty iteration source
 				.map(throwingFunction(iterationSource -> {
-					try (final Closeable iterationSourceCleanup = toCloseable(iterationSource)) { //ensure the iteration source is closed, in case it uses resource e.g. a directory listing
+					try (final Closeable _ = toCloseable(iterationSource)) { //ensure the iteration source is closed, in case it uses resource e.g. a directory listing
 						final MeshIterator iterator;
 						try {
 							iterator = MeshIterator.fromIterationSource(iterationSource);
@@ -161,7 +175,7 @@ public class GuiseMesh {
 						final String itemVar = exciseAttribute(element, ATTRIBUTE_ITEM_VAR).orElse(DEFAULT_ITEM_VAR); //mx:item-var
 						final String indexVar = exciseAttribute(element, ATTRIBUTE_INDEX_VAR).orElse(DEFAULT_INDEX_VAR); //mx:index-var
 						final List<Element> result = new ArrayList<>();
-						try (final MeshContext.ScopeNesting scopeNesting = context.nestScope()) {
+						try (final MeshContext.ScopeNesting _ = context.nestScope()) {
 							context.setVariable(iterVar, iterator); //TODO consider providing delegate variable manipulation methods to nesting, if nothing else to avoid unused auto-closeable variable warning (`try`)
 							while(iterator.hasNext()) {
 								final Object item = iterator.next();
