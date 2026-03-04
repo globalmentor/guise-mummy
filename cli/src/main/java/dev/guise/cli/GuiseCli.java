@@ -118,7 +118,7 @@ public class GuiseCli extends BaseCliApplication {
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Validate...").reset());
 		logProjectInfo(project);
 
-		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.VALIDATE);
+		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.VALIDATE, EnumSet.noneOf(GuiseMummy.MummyExecution.class));
 
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Done.").reset());
 	}
@@ -155,12 +155,48 @@ public class GuiseCli extends BaseCliApplication {
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Done.").reset());
 	}
 
+	/// Plans a site by discovering and classifying artifacts.
+	/// @param argProjectDirectory The base directory of the project.
+	/// @param argSiteSourceDirectory The source root directory of the site.
+	/// @param argSiteTargetDirectory The target root directory of the site.
+	/// @param argSiteDescriptionTargetDirectory The target root directory for the site description.
+	/// @param describe Prints a human-readable description of the site plan.
+	/// @throws IOException if an I/O error occurs.
+	@Command(description = "Plans a site by discovering and classifying artifacts.", mixinStandardHelpOptions = true)
+	public void plan(
+			@Parameters(paramLabel = "<project>", description = "The base directory of the project.%nDefaults to the working directory, currently @|bold ${DEFAULT-VALUE}|@.", defaultValue = "${sys:user.dir}", arity = "0..1") @Nullable Path argProjectDirectory,
+			@Option(names = "--site-source-dir", description = "The source root directory of the site.%nDefaults to @|bold src/site/|@ relative to the project base directory.") @Nullable Path argSiteSourceDirectory,
+			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
+			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
+			@Option(names = "--describe", description = "Prints a human-readable description of the site plan.", defaultValue = "true") final boolean describe)
+			throws IOException {
+
+		logAppInfo();
+
+		final Path projectDirectory = argProjectDirectory != null ? argProjectDirectory : getWorkingDirectory();
+
+		final GuiseMummy mummifier = new GuiseMummy();
+		final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
+				argSiteDescriptionTargetDirectory);
+		mummifier.setVerbose(isVerbose());
+
+		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Plan...").reset());
+		logProjectInfo(project);
+
+		final Set<GuiseMummy.MummyExecution> executions = describe ? EnumSet.of(GuiseMummy.MummyExecution.DESCRIBE_PLAN)
+				: EnumSet.noneOf(GuiseMummy.MummyExecution.class);
+		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.PLAN, executions);
+
+		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Done.").reset());
+	}
+
 	/// Mummifies a site by generating a static version.
 	/// @param argProjectDirectory The base directory of the project to mummify.
 	/// @param argSiteSourceDirectory The source root directory of the site to mummify.
 	/// @param argSiteTargetDirectory The target root directory into which the site will be generated.
 	/// @param argSiteDescriptionTargetDirectory The target root directory into which the site description will be generated.
 	/// @param full Specifies full instead of incremental mummification.
+	/// @param describePlan Prints a human-readable description of the site plan.
 	/// @throws IOException if an I/O error occurs.
 	@Command(description = "Mummifies a site by generating a static version.", mixinStandardHelpOptions = true)
 	public void mummify(
@@ -169,7 +205,8 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
 			@Option(names = {"--full",
-					"-f"}, description = "Specifies full instead of incremental mummification.%nCached artifacts will be regenerated.", defaultValue = "false") final boolean full)
+					"-f"}, description = "Specifies full instead of incremental mummification.%nCached artifacts will be regenerated.", defaultValue = "false") final boolean full,
+			@Option(names = "--describe-plan", description = "Prints a human-readable description of the site plan.", defaultValue = "false") final boolean describePlan)
 			throws IOException {
 
 		logAppInfo();
@@ -180,11 +217,14 @@ public class GuiseCli extends BaseCliApplication {
 		final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
 				argSiteDescriptionTargetDirectory);
 		mummifier.setFull(full);
+		mummifier.setVerbose(isVerbose());
 
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Mummify...").reset());
 		logProjectInfo(project);
 
-		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.MUMMIFY);
+		final Set<GuiseMummy.MummyExecution> executions = describePlan ? EnumSet.of(GuiseMummy.MummyExecution.DESCRIBE_PLAN)
+				: EnumSet.noneOf(GuiseMummy.MummyExecution.class);
+		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.MUMMIFY, executions);
 
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Done.").reset());
 	}
@@ -195,6 +235,7 @@ public class GuiseCli extends BaseCliApplication {
 	/// @param argSiteTargetDirectory The target root directory into which the site will be generated.
 	/// @param argSiteDescriptionTargetDirectory The target root directory into which the site description will be generated.
 	/// @param full Specifies full instead of incremental mummification.
+	/// @param describePlan Prints a human-readable description of the site plan.
 	/// @throws IOException if an I/O error occurs.
 	@Command(name = "prepare-deploy", description = "Prepares to deploys a site after generating a static version, but does not actually deploy the site.", mixinStandardHelpOptions = true)
 	public void prepareDeploy(
@@ -203,7 +244,8 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-target-dir", description = "The target root directory into which the site will be generated; will be created if needed.%nDefaults to @|bold target/site/|@ relative to the project base directory.") @Nullable Path argSiteTargetDirectory,
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
 			@Option(names = {"--full",
-					"-f"}, description = "Specifies full instead of incremental mummification.%nCached artifacts will be regenerated.", defaultValue = "false") final boolean full)
+					"-f"}, description = "Specifies full instead of incremental mummification.%nCached artifacts will be regenerated.", defaultValue = "false") final boolean full,
+			@Option(names = "--describe-plan", description = "Prints a human-readable description of the site plan.", defaultValue = "false") final boolean describePlan)
 			throws IOException {
 
 		logAppInfo();
@@ -214,11 +256,14 @@ public class GuiseCli extends BaseCliApplication {
 		final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
 				argSiteDescriptionTargetDirectory);
 		mummifier.setFull(full);
+		mummifier.setVerbose(isVerbose());
 
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Prepare Deploy...").reset());
 		logProjectInfo(project);
 
-		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.PREPARE_DEPLOY);
+		final Set<GuiseMummy.MummyExecution> executions = describePlan ? EnumSet.of(GuiseMummy.MummyExecution.DESCRIBE_PLAN)
+				: EnumSet.noneOf(GuiseMummy.MummyExecution.class);
+		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.PREPARE_DEPLOY, executions);
 
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Done.").reset());
 	}
@@ -230,6 +275,7 @@ public class GuiseCli extends BaseCliApplication {
 	/// @param argSiteDescriptionTargetDirectory The target root directory into which the site description will be generated.
 	/// @param browse Opens a browser to the site after starting the server.
 	/// @param full Specifies full instead of incremental mummification and deployment.
+	/// @param describePlan Prints a human-readable description of the site plan.
 	/// @throws IOException if an I/O error occurs.
 	@Command(description = "Deploys a site after generating a static version.", mixinStandardHelpOptions = true)
 	public void deploy(
@@ -239,7 +285,8 @@ public class GuiseCli extends BaseCliApplication {
 			@Option(names = "--site-description-target-dir", description = "The target root directory into which the site description will be generated; will be created if needed.%nDefaults to @|bold target/site-description/|@ relative to the project base directory.") @Nullable Path argSiteDescriptionTargetDirectory,
 			@Option(names = {"--browse", "-b"}, description = "Opens a browser to the site after starting the server.") final boolean browse,
 			@Option(names = {"--full",
-					"-f"}, description = "Specifies full instead of incremental mummification and deployment.%nCached artifacts will be regenerated and all artifacts will be redeployed.", defaultValue = "false") final boolean full)
+					"-f"}, description = "Specifies full instead of incremental mummification and deployment.%nCached artifacts will be regenerated and all artifacts will be redeployed.", defaultValue = "false") final boolean full,
+			@Option(names = "--describe-plan", description = "Prints a human-readable description of the site plan.", defaultValue = "false") final boolean describePlan)
 			throws IOException {
 
 		logAppInfo();
@@ -250,11 +297,14 @@ public class GuiseCli extends BaseCliApplication {
 		final GuiseProject project = GuiseMummy.createProject(projectDirectory.toAbsolutePath(), argSiteSourceDirectory, argSiteTargetDirectory,
 				argSiteDescriptionTargetDirectory);
 		mummifier.setFull(full);
+		mummifier.setVerbose(isVerbose());
 
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Deploy...").reset());
 		logProjectInfo(project);
 
-		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.DEPLOY);
+		final Set<GuiseMummy.MummyExecution> executions = describePlan ? EnumSet.of(GuiseMummy.MummyExecution.DESCRIBE_PLAN)
+				: EnumSet.noneOf(GuiseMummy.MummyExecution.class);
+		mummifier.mummify(project, GuiseMummy.LifeCyclePhase.DEPLOY, executions);
 
 		System.out.println(ansi().bold().fg(Ansi.Color.BLUE).a("Done.").reset());
 

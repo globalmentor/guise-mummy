@@ -21,8 +21,7 @@ import static java.nio.file.Files.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.jspecify.annotations.*;
 import org.junit.jupiter.api.*;
@@ -108,10 +107,10 @@ public abstract class BaseEndToEndIT {
 	/// @param phase The life cycle phase to execute (including all those before it).
 	/// @throws IOException if there is an I/O error generating the static site.
 	/// @see #getFixtureProject()
-	/// @see GuiseMummy#mummify(GuiseProject, GuiseMummy.LifeCyclePhase)
+	/// @see GuiseMummy#mummify(GuiseProject, GuiseMummy.LifeCyclePhase, Set)
 	protected void mummify(final GuiseMummy.LifeCyclePhase phase) throws IOException {
 		final GuiseMummy mummy = new GuiseMummy();
-		mummy.mummify(getFixtureProject(), phase);
+		mummy.mummify(getFixtureProject(), phase, EnumSet.noneOf(GuiseMummy.MummyExecution.class));
 	}
 
 }

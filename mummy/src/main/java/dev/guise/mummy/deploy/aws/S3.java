@@ -19,7 +19,6 @@ package dev.guise.mummy.deploy.aws;
 import static com.globalmentor.collections.iterables.Iterables.*;
 import static com.globalmentor.java.CharSequences.*;
 import static com.globalmentor.java.Conditions.*;
-import static com.globalmentor.net.URIs.toCollectionURI;
 import static dev.guise.mummy.GuiseMummy.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
@@ -346,9 +345,7 @@ public class S3 implements DeployTarget, Clogged {
 	/// @param artifact The current artifact for which deployment is being planned.
 	/// @throws IOException if there is an I/O error during site deployment planning.
 	protected void plan(@NonNull final MummyContext context, @NonNull final URI rootTargetPathUri, @NonNull Artifact artifact) throws IOException {
-		final URI artifactTargetPathUri = artifact.getTargetPath().toUri();
-		final URIPath resourceReference = URIPath.relativize(rootTargetPathUri,
-				artifact instanceof CollectionArtifact ? toCollectionURI(artifactTargetPathUri) : artifactTargetPathUri);
+		final URIPath resourceReference = Artifact.relativizeResourceReference(rootTargetPathUri, artifact);
 		planResource(context, rootTargetPathUri, artifact, resourceReference);
 		if(artifact instanceof CompositeArtifact compositeArtifact) {
 			for(final Artifact comprisedArtifact : (Iterable<Artifact>)compositeArtifact.comprisedArtifacts()::iterator) {

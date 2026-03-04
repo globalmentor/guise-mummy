@@ -19,6 +19,7 @@ package dev.guise.mummy;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
+import static com.globalmentor.net.URIs.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
@@ -103,6 +104,13 @@ public class GuiseMummy implements Clogged {
 		/// Deploy.
 		DEPLOY
 	};
+
+	/// Optional executions that can be activated during mummification.
+	/// @apiNote Analogous to Maven plugin executions bound to a lifecycle phase.
+	public enum MummyExecution {
+		/// Describe the site plan after the PLAN phase.
+		DESCRIBE_PLAN
+	}
 
 	//# configuration
 
@@ -221,6 +229,20 @@ public class GuiseMummy implements Clogged {
 		this.full = full;
 	}
 
+	private boolean verbose = false;
+
+	/// Indicates whether verbose output is enabled.
+	/// @return `true` if verbose output is enabled.
+	public boolean isVerbose() {
+		return verbose;
+	}
+
+	/// Enables or disables verbose output.
+	/// @param verbose `true` if verbose output should be produced.
+	public void setVerbose(final boolean verbose) {
+		this.verbose = verbose;
+	}
+
 	//state
 
 	private final List<URI> deployUrls = new ArrayList<>();
@@ -254,10 +276,12 @@ public class GuiseMummy implements Clogged {
 	/// Performs static site generation on a source directory into a target directory.
 	/// @param project The Guise project governing mummification.
 	/// @param phase The life cycle phase to execute (including all those before it).
+	/// @param executions Optional executions to activate during mummification.
 	/// @throws IllegalArgumentException if the configured source directory does not exist or is not a directory.
 	/// @throws IllegalArgumentException if the configured source and target directories overlap.
 	/// @throws IOException if there is an I/O error generating the static site.
-	public void mummify(@NonNull final GuiseProject project, @NonNull final LifeCyclePhase phase) throws IOException {
+	public void mummify(@NonNull final GuiseProject project, @NonNull final LifeCyclePhase phase,
+			@NonNull final Set<MummyExecution> executions) throws IOException {
 
 		//# initialize phase
 		getLogger().info("Mummify phase: {}", LifeCyclePhase.INITIALIZE); //TODO i18n
@@ -275,6 +299,11 @@ public class GuiseMummy implements Clogged {
 			final Artifact rootArtifact = new DirectoryMummifier().plan(context, context.getSiteSourceDirectory(), context.getSiteTargetDirectory()); //TODO create special SiteMummifier extending DirectoryMummifier
 			final MummyPlan plan = new DefaultMummyPlan(rootArtifact);
 			context.setPlan(plan);
+
+			if(executions.contains(MummyExecution.DESCRIBE_PLAN)) {
+				new PlanDescriber(plan, toCollectionURI(rootArtifact.getTargetPath().toUri()), context.getSiteSourceDirectory())
+						.describeTo(System.out, isVerbose());
+			}
 
 			printArtifactDescription(context, rootArtifact);
 
