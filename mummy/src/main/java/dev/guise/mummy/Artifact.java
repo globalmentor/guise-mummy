@@ -17,12 +17,16 @@
 package dev.guise.mummy;
 
 import static com.globalmentor.io.Filenames.*;
+import static com.globalmentor.net.URIPath.*;
+import static com.globalmentor.net.URIs.*;
 import static dev.guise.mummy.GuiseMummy.*;
 
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
+
+import com.globalmentor.net.URIPath;
 
 import dev.guise.mummy.mummify.Mummifier;
 import io.urf.model.UrfResourceDescription;
@@ -222,5 +226,25 @@ public interface Artifact {
 	///
 	/// @return `true` if the artifact should be part of default navigation.
 	public boolean isNavigable();
+
+	//# resource references
+
+	/// Relativizes a resource reference URI against a base URI, optionally forcing collection form (trailing slash).
+	/// @param baseUri The base URI to relativize against.
+	/// @param referenceUri The URI to relativize.
+	/// @param forceCollection Whether to force the reference into collection form before relativizing.
+	/// @return The relativized resource reference as a URI path.
+	public static URIPath relativizeResourceReference(final URI baseUri, final URI referenceUri, final boolean forceCollection) { //TODO extract to `URIPath` or `URIs` in globalmentor-core
+		return relativize(baseUri, forceCollection ? toCollectionURI(referenceUri) : referenceUri);
+	}
+
+	/// Returns the resource reference for the given artifact, relativized against a base URI.
+	/// @implSpec Collection artifacts are automatically given collection form (trailing slash) via [com.globalmentor.net.URIs#toCollectionURI(URI)].
+	/// @param baseUri The base URI to relativize against.
+	/// @param artifact The artifact whose resource reference to compute.
+	/// @return The resource reference as a URI path relative to the base URI.
+	public static URIPath relativizeResourceReference(final URI baseUri, final Artifact artifact) {
+		return relativizeResourceReference(baseUri, artifact.getTargetPath().toUri(), artifact instanceof CollectionArtifact);
+	}
 
 }

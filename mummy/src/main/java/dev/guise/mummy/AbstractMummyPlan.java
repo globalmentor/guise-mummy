@@ -17,10 +17,8 @@
 package dev.guise.mummy;
 
 import static com.globalmentor.io.Paths.*;
-import static com.globalmentor.net.URIs.*;
 import static java.util.Objects.*;
 
-import java.net.URI;
 import java.nio.file.Path;
 
 import org.jspecify.annotations.*;
@@ -71,9 +69,8 @@ public abstract class AbstractMummyPlan implements MummyPlan {
 	/// @see #getRootArtifact()
 	protected URIPath relativizeResourceReference(@NonNull final Path basePath, @NonNull final Path referencePath, final boolean forceCollection) {
 		final Path root = isSubPath(getRootArtifact().getSourcePath(), basePath) ? getRootArtifact().getSourcePath() : getRootArtifact().getTargetPath();
-		final URI baseTargetUri = checkArgumentSubPath(root, checkArgumentAbsolute(basePath)).toUri();
-		final URI referenceTargetUri = checkArgumentSubPath(root, checkArgumentAbsolute(referencePath)).toUri();
-		return URIPath.relativize(baseTargetUri, forceCollection ? toCollectionURI(referenceTargetUri) : referenceTargetUri);
+		return Artifact.relativizeResourceReference(checkArgumentSubPath(root, checkArgumentAbsolute(basePath)).toUri(),
+				checkArgumentSubPath(root, checkArgumentAbsolute(referencePath)).toUri(), forceCollection);
 	}
 
 }
