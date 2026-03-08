@@ -7,10 +7,12 @@
   ;
 
   deploy:
-!    target = *S3:
-!      region = "" !TODO provide region
-!      bucket = "" !TODO provide bucket name
-!    ;
+!    targets = [
+!      * S3:
+!        region = "" !TODO provide region
+!        bucket = "" !TODO provide bucket name
+!      ;
+!    ]
   ;
 
 ;

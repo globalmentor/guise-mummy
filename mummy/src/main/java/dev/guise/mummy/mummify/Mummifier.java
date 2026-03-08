@@ -44,12 +44,10 @@ public interface Mummifier extends Clogged {
 	/// @see Content#FINGERPRINT_PROPERTY_TAG
 	public static final MessageDigests.Algorithm FINGERPRINT_ALGORITHM = MessageDigests.SHA_256;
 
-	/// The extension segment for identifying a description sidecar; the `-` in `filename.ext.-.props`, where _props_ is some
-	/// metadata extension.
+	/// The extension segment for identifying a description sidecar; the `-` in `filename.ext.-.tupr`.
 	public static final String DESCRIPTION_FILE_SIDECAR_EXTENSION_SEGMENT = "-";
 
-	/// The extension segment for identifying a description sidecar; the `-.props` in `filename.ext.-.props`, where _props_ is some
-	/// metadata extension.
+	/// The compound extension for identifying a description sidecar; the `-.tupr` in `filename.ext.-.tupr`.
 	/// @apiNote This extension is used both for source metadata sidecar descriptions and for target description sidecar files.
 	public static final String DESCRIPTION_FILE_SIDECAR_EXTENSION = addExtension(DESCRIPTION_FILE_SIDECAR_EXTENSION_SEGMENT, TURF.PROPERTIES_FILENAME_EXTENSION);
 
