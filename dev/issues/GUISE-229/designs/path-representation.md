@@ -145,11 +145,31 @@ Filesystem `Path.toString()` is platform-dependent — backslashes on Windows, f
 
 ## Resource References
 
-A **resource reference** is a relative URI path (`URIPath`) appropriate for use as a web reference — an `href`, `src` attribute, or site-relative path. Resource references are always in the URI domain, never in the filesystem domain.
+A **resource reference** is a relative URI path (`URIPath`) that identifies a resource without any assumption about the absolute location where the site will ultimately be served. Resource references are always in the URI domain, never in the filesystem domain. They never carry a leading `/`.
 
-`MummyPlan.referenceInSource()` and `MummyPlan.referenceInTarget()` produce resource references from one artifact to another. These are the canonical way to compute "the link from page A to page B": the caller provides two artifacts, and the result is a relative `URIPath` suitable for direct use in generated HTML.
+This relativity is a deliberate architectural invariant, not an incidental implementation detail. A Guise Mummy site is a self-contained, portable unit: it might later be deployed at the root of a server (`/`), or under a subpath (`/blog/`, `/company/docs/`). The resource references within the site are the same regardless of deployment location. An absolute path (one beginning with `/`) would bake in an assumption about the deployment mount point that the model intentionally avoids.
 
-The implementation in `AbstractMummyPlan.relativizeResourceReference()`:
+### Two Relativization Contexts
+
+Resource references are always relative, but the _base_ they are relative to depends on the context of use.
+
+#### Artifact-relative references (inter-page links)
+
+`MummyPlan.referenceInSource()` and `MummyPlan.referenceInTarget()` compute the reference from one artifact to another. These references are **relative to the from-artifact** — the result may include `../` segments to backtrack from child to sibling or parent. This is the standard web relative-reference model: a link in `articles/post.html` to `images/photo.jpg` is `../images/photo.jpg`, which works regardless of where on a server the `articles/` directory resides.
+
+`MummyPlan.findArtifactBySourceRelativeReference()` performs the inverse operation: given an artifact and a relative URI reference, it resolves the reference against the artifact's source path (in the URI domain) and looks up the resulting artifact.
+
+Both of these methods resolve against the **principal artifact** of the referring artifact. For example, a link _from_ `foo/index.html` is calculated against `foo/` (the directory artifact), since the `index.html` content artifact has been subsumed into the directory.
+
+#### Site-root-relative references (deployment and display)
+
+`Artifact.relativizeResourceReference(URI baseUri, Artifact artifact)` computes the reference for an artifact **relative to the site root**. When the base URI is the root artifact's target path URI, the result is a site-root-relative path such as `blog/post.html` or `articles/` — no leading `/`, no `../` (for in-site artifacts).
+
+This is used in deployment (`S3.plan()`, `S3Website.planResource()`) and plan description (`PlanDescriber`). These consumers need a consistent key for each resource within the site, independent of which artifact is "looking at" which.
+
+### The implementation
+
+`AbstractMummyPlan.relativizeResourceReference(Path, Path, boolean)` is the shared implementation for both contexts:
 
 1. Takes two absolute filesystem `Path` values (base and reference)
 2. Validates both are subpaths of the same tree (source or target)
@@ -161,23 +181,39 @@ The result is always a `URIPath`, not a `String`.
 
 ### altLocation
 
-The `mummy/altLocation` property is a **URI path reference** (a relative `URIPath`). It specifies an alternate site location that should redirect to the artifact's actual location. The existing code in `S3Website.planResource()` processes it through a well-defined type chain:
+The `mummy/altLocation` property is a **URI path reference** relative to the artifact declaring it (artifact-relative context). It specifies an alternate site location that should redirect to the artifact's actual location.
+
+Processing bridges the two relativization contexts: the artifact-relative input is resolved to an absolute filesystem URI, then re-relativized against the site root to produce a site-root-relative reference. The type chain in `S3Website.planResource()` and `PlanDescriber.collectRedirect()`:
 
 ```
 Object (URF property value)
   → String
-    → URIPath (relative URI reference)
-      → URI (absolute, via resolve against artifact target path URI)
-        → URIPath (site-relative, via relativize against site root URI)
-          → String (S3 key, the final representation)
+    → URIPath (artifact-relative URI reference)
+      → URI (absolute file:/// URI, via resolve against artifact target path URI)
+        → URIPath (site-root-relative, via relativize against site root URI)
+          → String (S3 key or display path)
 ```
 
 Each step uses the correct typed operation:
 - `URIPath::of` — parses the string as a URI path, not a filesystem path
 - `URIs.resolve(artifact.getTargetPath().toUri(), altLocationReference)` — resolves the relative URI reference against the artifact's URI form, producing an absolute `file:///` URI
-- `URIPath.relativize(rootTargetPathUri, altLocationUri)` — relativizes against the site root, producing a site-relative `URIPath`
+- `URIPath.relativize(rootTargetPathUri, altLocationUri)` — relativizes against the site root, producing a site-root-relative `URIPath`
 
 At no point is `altLocation` treated as a filesystem path string.
+
+Both sides of a redirect mapping — the alternate location (source) and the artifact's resource reference (destination) — are stored as site-root-relative `URIPath` values. The model does not support absolute paths or full URLs as redirect destinations; `URIPath.of()` rejects anything with a scheme, authority, query, or fragment.
+
+### Deployment targets and absolute paths
+
+Deployment targets consume site-root-relative resource references and translate them into whatever form the platform requires. The site model itself never produces absolute paths — that is a deployment-target concern resolved at the boundary.
+
+In the S3 deployment:
+- **S3 keys** are the `URIPath.toString()` of the site-root-relative reference — no leading `/`. The S3 bucket key namespace happens to be bucket-root-relative, so the site-root-relative form maps directly.
+- **S3 object redirect** (`x-amz-website-redirect-location`): the target key is prefixed with `/` and encoded in `preparePutObject()`, because this header value is the literal HTTP `Location` header content, which requires an absolute path per RFC 7231 §7.1.2.
+- **S3 routing rules** (`keyPrefixEquals`, `replaceKeyWith`, `replaceKeyPrefixWith`): use the site-root-relative key directly, without a leading `/`, because S3 routing rules match against bucket keys.
+- **`guise serve`** (local development server): maps the servlet context at `/` — a deployment-time decision, not part of the model.
+
+The absolute-path form (with leading `/`) appears _only_ at protocol boundaries that require it. It is never stored in the model.
 
 ## How the Plan is Built
 

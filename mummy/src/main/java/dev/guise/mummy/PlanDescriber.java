@@ -109,10 +109,10 @@ public class PlanDescriber {
 		appendable.append("    %-14s%d%n".formatted("Other:", otherCount));
 		appendable.append("    %-14s%d%n".formatted("Posts:", postCount));
 		appendable.append("  %-14s%d%n".formatted("Redirects:", sortedRedirects.size()));
-		appendable.append("    %-14s%d%n".formatted("Collection:", redirectCollectionCount));
-		appendable.append("    %-14s%d%n".formatted("Page:", redirectPageCount));
+		appendable.append("    %-22s%d%n".formatted("Collection Targets:", redirectCollectionCount));
+		appendable.append("    %-22s%d%n".formatted("Page Targets:", redirectPageCount));
 		if(warningCount > 0) {
-			appendable.append("    %-14s%d [!]%n".formatted("Warnings:", warningCount));
+			appendable.append("    %-22s%d [!]%n".formatted("Warnings:", warningCount));
 		}
 
 		if(verbose && !sortedRedirects.isEmpty()) {
@@ -120,8 +120,8 @@ public class PlanDescriber {
 			appendable.append("  Redirect Details:%n".formatted());
 			for(final RedirectEntry redirect : sortedRedirects) {
 				final String warningMarker = redirect.optionalWarning().map(w -> " " + w.marker()).orElse("");
-				appendable.append("    /%s -> /%s%s%n".formatted(
-						redirect.altLocationReference(), redirect.resourceReference(), warningMarker));
+				appendable.append("    %s -> %s%s%n".formatted(
+						redirect.altLocationReference().toDecodedString(), redirect.resourceReference().toDecodedString(), warningMarker));
 			}
 		}
 
@@ -194,14 +194,14 @@ public class PlanDescriber {
 			requireNonNull(resourceReference);
 			requireNonNull(optionalWarning);
 		}
-		/// @implSpec Collections sort before non-collections; within each group, entries are sorted alphabetically
-		///           by alternate location reference.
+		/// @implSpec Entries are sorted case-insensitively by the decoded form of the alternate location reference.
 		@Override
 		public int compareTo(@NonNull final RedirectEntry other) {
-			if(this.collection != other.collection) {
-				return this.collection ? -1 : 1;
-			}
-			return this.altLocationReference.toString().compareTo(other.altLocationReference.toString());
+			//TODO switch to a segment-by-segment URIPath comparator when available in `globalmentor-core`,
+			// for more logical directory-level grouping (e.g. `a/b/c` before `a-suffix`)
+			return String.CASE_INSENSITIVE_ORDER.compare(
+					this.altLocationReference.toDecodedString(),
+					other.altLocationReference.toDecodedString());
 		}
 	}
 

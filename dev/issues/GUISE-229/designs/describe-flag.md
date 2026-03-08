@@ -75,9 +75,9 @@ Site Plan
     Other:        22
     Posts:        7
   Redirects:    12
-    Collection:   3
-    Page:         9
-    Warnings:     1 [!]
+    Collection Targets:   3
+    Page Targets:         9
+    Warnings:             1 [!]
 
   [!] redirect target is outside the site boundary
 ```
@@ -86,9 +86,9 @@ Design notes:
 
 - **"Site Plan"** heading establishes context. The source directory is shown as the native filesystem path (via `context.getSiteSourceDirectory()`) — it is a filesystem location, not a web reference, so it renders in platform-native form.
 - **Artifact counts** are classified by mummifier type: `PageMummifier` -> Pages, `CollectionArtifact` (via `DirectoryMummifier`) -> Collections, `ImageMummifier` -> Images, everything else -> Other.
-- **Redirect counts** are derived from artifacts with a `PROPERTY_TAG_MUMMY_ALT_LOCATION` property. The distinction between collection and page redirects is determined by `instanceof CollectionArtifact`.
+- **Redirect counts** are derived from artifacts with a `PROPERTY_TAG_MUMMY_ALT_LOCATION` property. The labels "Collection Targets" and "Page Targets" clarify that the count refers to the _type of artifact the redirect points to_, not the type of the alt-location path. The distinction is determined by `instanceof CollectionArtifact`.
 - **Warning count** appears when any redirects have diagnostic warnings (e.g., alt locations that resolve outside the site boundary). A **legend** explaining each warning marker is always appended when warnings exist, regardless of verbose mode.
-- Counts are left-aligned at a consistent column via fixed-width label formatting (`%-14s`). No right-alignment or dynamic width computation.
+- Counts are left-aligned at a consistent column via fixed-width label formatting. The artifact section uses `%-14s`; the redirect subcategory section uses `%-22s` to accommodate the longer labels. No right-alignment or dynamic width computation.
 
 ### Verbose Output (with `--verbose`)
 
@@ -104,17 +104,18 @@ Site Plan
     Other:        22
     Posts:        7
   Redirects:    12
-    Collection:   3
-    Page:         9
-    Warnings:     1 [!]
+    Collection Targets:   3
+    Page Targets:         9
+    Warnings:             1 [!]
 
   Redirect Details:
-    /old-section/ -> /new-section/
-    /legacy/ -> /current/
-    /archive/ -> /blog/
-    /old-page.html -> /new-page
-    /2019/post-one -> /blog/post-one
-    /../../escaped.html -> /page.html [!]
+    2019/post-one -> blog/post-one
+    archive/ -> blog/
+    legacy/ -> current/
+    old-page.html -> new-page
+    old-section/ -> new-section/
+    résumé.html -> cv.html
+    ../../escaped.html -> page.html [!]
     ...
 
   [!] redirect target is outside the site boundary
@@ -123,11 +124,11 @@ Site Plan
 Design notes:
 
 - Redirect details are grouped under a "Redirect Details" subsection.
-- Each line shows the alt location reference (the old path that triggers the redirect, resolved and relativized via the URI domain) and the artifact's resource reference (where the redirect sends the request). Both are site-relative `URIPath` values displayed with a leading `/`.
+- Each line shows the alt location reference (the old path that triggers the redirect, resolved and relativized via the URI domain) and the artifact's resource reference (where the redirect sends the request). Both are site-root-relative `URIPath` values displayed in their natural relative form (no leading `/`), using the **decoded** form (`URIPath.toDecodedString()`) so that percent-encoded sequences appear as human-readable characters (e.g., `résumé.html` rather than `r%C3%A9sum%C3%A9.html`). This faithfully reflects the Guise Mummy model, where all resource references are genuinely relative to the site root — never server-absolute — preserving deployment-location independence.
 - The ASCII `->` arrow is used instead of Unicode `→` for Windows terminal compatibility.
 - If a redirect has a diagnostic warning (e.g., alt location resolves outside the site boundary), the warning marker (e.g., `[!]`) is appended after the target path.
-- Redirect lines are **not column-aligned** — each line is `/%s -> /%s` with no padding. This avoids the problem of one long path forcing excessive whitespace on all other entries. The `->` delimiter is sufficient for scanning.
-- Collection redirects (ending `/`) appear before page redirects, each group sorted alphabetically by alt location reference.
+- Redirect lines are **not column-aligned** — each line is `%s -> %s` with no padding. This avoids the problem of one long path forcing excessive whitespace on all other entries. The `->` delimiter is sufficient for scanning.
+- Redirects are sorted flat by decoded alt-location reference, case-insensitive (`String.CASE_INSENSITIVE_ORDER`). No grouping by collection vs. page.
 - The legend explaining warning markers appears after the redirect details. It is emitted regardless of verbose mode whenever warnings exist.
 - Future `--verbose` expansions (e.g., listing veiled artifacts, posts) can add additional subsections without changing the structure.
 

@@ -152,8 +152,8 @@ public class PlanDescriberTest {
 		planDescriber(plan).describeTo(output, false);
 		final String result = output.toString();
 		assertThat("redirect count", result, containsString("Redirects:    1"));
-		assertThat("page redirect count", result, containsString("Page:         1"));
-		assertThat("collection redirect count", result, containsString("Collection:   0"));
+		assertThat("page redirect count", result, containsString("Page Targets:         1"));
+		assertThat("collection redirect count", result, containsString("Collection Targets:   0"));
 	}
 
 	/// Tests that collection (directory) redirects are counted correctly.
@@ -174,8 +174,8 @@ public class PlanDescriberTest {
 		planDescriber(plan).describeTo(output, false);
 		final String result = output.toString();
 		assertThat("redirect count", result, containsString("Redirects:    1"));
-		assertThat("collection redirect count", result, containsString("Collection:   1"));
-		assertThat("page redirect count", result, containsString("Page:         0"));
+		assertThat("collection redirect count", result, containsString("Collection Targets:   1"));
+		assertThat("page redirect count", result, containsString("Page Targets:         0"));
 	}
 
 	//## verbose output
@@ -196,7 +196,34 @@ public class PlanDescriberTest {
 		planDescriber(plan).describeTo(output, true);
 		final String result = output.toString();
 		assertThat("verbose output includes redirect details header", result, containsString("Redirect Details:"));
-		assertThat("verbose output includes redirect mapping with -> arrow", result, containsString("    /old-page.html -> /new-page.html" + NL));
+		assertThat("verbose output includes redirect mapping with -> arrow", result, containsString("    old-page.html -> new-page.html" + NL));
+	}
+
+	/// Tests that verbose output decodes percent-encoded paths at three UTF-8 encoding boundaries:
+	/// 2-byte (`café.html`), 3-byte (`日記.html`, Japanese for "diary"), and 4-byte (`𝄞.html`, musical G clef U+1D11E).
+	@Test
+	void testDescribeToVerboseDecodesNonAsciiPaths() throws IOException {
+		final Mummifier directoryMummifier = mock(Mummifier.class);
+		final PageMummifier pageMummifier = mock(PageMummifier.class);
+		final UrfObject desc2byte = new UrfObject();
+		desc2byte.setPropertyValue(PROPERTY_TAG_MUMMY_ALT_LOCATION, "caf%C3%A9.html"); // café.html
+		final Artifact page2byte = new DummyArtifact(pageMummifier, SOURCE_DIRECTORY.resolve("new-café.html"), TARGET_DIRECTORY.resolve("new-café.html"),
+				desc2byte);
+		final UrfObject desc3byte = new UrfObject();
+		desc3byte.setPropertyValue(PROPERTY_TAG_MUMMY_ALT_LOCATION, "%E6%97%A5%E8%A8%98.html"); // 日記.html
+		final Artifact page3byte = new DummyArtifact(pageMummifier, SOURCE_DIRECTORY.resolve("新日記.html"), TARGET_DIRECTORY.resolve("新日記.html"), desc3byte);
+		final UrfObject desc4byte = new UrfObject();
+		desc4byte.setPropertyValue(PROPERTY_TAG_MUMMY_ALT_LOCATION, "%F0%9D%84%9E.html"); // 𝄞.html (U+1D11E, musical G clef)
+		final Artifact page4byte = new DummyArtifact(pageMummifier, SOURCE_DIRECTORY.resolve("new-𝄞.html"), TARGET_DIRECTORY.resolve("new-𝄞.html"), desc4byte);
+		final DirectoryArtifact root = new DirectoryArtifact(directoryMummifier, SOURCE_DIRECTORY, TARGET_DIRECTORY, null, Set.of(page2byte, page3byte, page4byte));
+		final MummyPlan plan = new DefaultMummyPlan(root);
+
+		final StringBuilder output = new StringBuilder();
+		planDescriber(plan).describeTo(output, true);
+		final String result = output.toString();
+		assertThat("2-byte UTF-8 decoded (Latin accented)", result, containsString("    caf\u00e9.html -> new-caf\u00e9.html" + NL));
+		assertThat("3-byte UTF-8 decoded (CJK)", result, containsString("    \u65e5\u8a18.html -> \u65b0\u65e5\u8a18.html" + NL));
+		assertThat("4-byte UTF-8 decoded (supplementary, outside BMP)", result, containsString("    \ud834\udd1e.html -> new-\ud834\udd1e.html" + NL));
 	}
 
 	/// Tests that verbose output omits redirect details when there are no redirects.
@@ -245,8 +272,8 @@ public class PlanDescriberTest {
 		final StringBuilder output = new StringBuilder();
 		planDescriber(plan).describeTo(output, true);
 		final String result = output.toString();
-		assertThat("warning count shown in summary", result, containsString("Warnings:     1 [!]"));
-		assertThat("redirect detail shows out-of-site path with warning marker", result, containsString("    /../../outside.html -> /page.html [!]" + NL));
+		assertThat("warning count shown in summary", result, containsString("Warnings:             1 [!]"));
+		assertThat("redirect detail shows out-of-site path with warning marker", result, containsString("    ../../outside.html -> page.html [!]" + NL));
 		assertThat("legend explains [!]", result, containsString("[!] redirect target is outside the site boundary"));
 	}
 
@@ -335,7 +362,7 @@ public class PlanDescriberTest {
 
 	//## `RedirectEntry` sorting
 
-	/// Tests that [PlanDescriber.RedirectEntry] sorts collections before pages, then alphabetically.
+	/// Tests that [PlanDescriber.RedirectEntry] sorts flat by decoded source path, case-insensitive.
 	@Test
 	void testRedirectEntrySorting() {
 		final var collectionB = new PlanDescriber.RedirectEntry(URIPath.of("beta/"), URIPath.of("new-beta/"), true, Optional.empty());
@@ -344,7 +371,7 @@ public class PlanDescriberTest {
 		final var pageA = new PlanDescriber.RedirectEntry(URIPath.of("a-page.html"), URIPath.of("new-a.html"), false, Optional.empty());
 		final var sorted = new ArrayList<>(List.of(pageB, collectionB, pageA, collectionA));
 		Collections.sort(sorted);
-		assertThat("sorted order", sorted, contains(collectionA, collectionB, pageA, pageB));
+		assertThat("sorted flat by decoded source path, case-insensitive", sorted, contains(pageA, collectionA, pageB, collectionB));
 	}
 
 }
