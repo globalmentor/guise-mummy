@@ -18,6 +18,7 @@ package dev.guise.mummy.mummify.collection;
 
 import static java.nio.charset.StandardCharsets.*;
 import static java.nio.file.Files.*;
+import static java.nio.file.LinkOption.*;
 import static java.util.stream.Collectors.*;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
@@ -42,14 +43,16 @@ public class DirectoryMummifierTest {
 	/// @see DirectoryMummifier#plan(MummyContext, Path, Path)
 	@Test
 	void verifyPlannedComprisedArtifacts(@TempDir final Path tempDir) throws IOException {
-		final GuiseProject project = new DefaultGuiseProject(tempDir);
-		final MummyContext mummyContext = new FakeMummyContext(project);
-		final Path sourceDirectory = createDirectories(tempDir.resolve("src").resolve("site"));
+		final Path realTempDir = tempDir.toRealPath(NOFOLLOW_LINKS);
+		final GuiseProject project = new DefaultGuiseProject(realTempDir);
+		final Path sourceDirectory = createDirectories(realTempDir.resolve("src").resolve("site"));
+		final Path targetDirectory = createDirectory(realTempDir.resolve("target"));
+		final MummyContext mummyContext = new FakeMummyContext(project, sourceDirectory, targetDirectory.resolve("site"),
+				targetDirectory.resolve("site-description"));
 		final Path indexFile = writeString(sourceDirectory.resolve("index.md"), "# Index", UTF_8);
 		final Path child1File = writeString(sourceDirectory.resolve("child1.md"), "# Child 1", UTF_8);
 		final Path child2File = writeString(sourceDirectory.resolve("child2.md"), "# Child 2", UTF_8);
 		final Path child3File = writeString(sourceDirectory.resolve("child3.md"), "# Child 3", UTF_8);
-		final Path targetDirectory = createDirectory(tempDir.resolve("target"));
 		final DirectoryMummifier directoryMummifier = new DirectoryMummifier();
 		final DirectoryArtifact directoryArtifact = directoryMummifier.plan(mummyContext, sourceDirectory, targetDirectory);
 		assertThat("Directory artifact should contain the expected comprised artifacts.",

@@ -27,7 +27,9 @@ public interface GuiseProject {
 	/// Returns the project directory.
 	///
 	/// This is usually where the project configuration file (if any) is stored.
-	/// @return The project directory,
+	/// The returned path is absolute and in real-path form: normalized segments
+	/// and filesystem-native case on case-insensitive systems.
+	/// @return The absolute, real-path project directory.
 	public Path getDirectory();
 
 	/// Returns the project configuration.

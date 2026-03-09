@@ -130,7 +130,7 @@ public class BaseImageMummifierTest {
 	private MummyContext fixtureContext;
 
 	@BeforeEach
-	protected void setupFixture() {
+	protected void setupFixture() throws IOException {
 		final GuiseProject project = new DefaultGuiseProject(getWorkingDirectory(), Configuration.empty());
 		fixtureContext = new DummyMummyContext(project);
 	}

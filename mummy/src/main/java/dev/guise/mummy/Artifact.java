@@ -181,14 +181,16 @@ public interface Artifact {
 
 	/// Returns the path to the directory containing the artifact source file. If the artifact source path refers to a directory, this method returns the source
 	/// path itself; otherwise this method returns the parent directory.
-	/// @return The source directory of the artifact.
+	/// @return The absolute, real-path source directory of the artifact.
 	/// @see #getSourcePath()
 	public Path getSourceDirectory();
 
 	/// Returns the path to the source of the artifact in the source tree.
+	///
+	/// The returned path is absolute and in real-path form, with filesystem-native case for all segments.
 	/// @apiNote Depending on the artifact implementation, the source path is not guaranteed to exist.
 	/// @apiNote This method and all methods in this interface related to a source path in a file system may be moved eventually to [SourcePathArtifact].
-	/// @return The path referring to the source of this artifact, which may be a file or a directory.
+	/// @return The absolute, real-path path referring to the source of this artifact, which may be a file or a directory.
 	public Path getSourcePath();
 
 	/// Indicates whether the source path refers to a file as opposed to a directory. This implies that its source path is distinct from the source directory and
@@ -209,7 +211,9 @@ public interface Artifact {
 	public Set<Path> getReferentSourcePaths();
 
 	/// Returns the path to the generated artifact in the target tree.
-	/// @return The path to the generated artifact in the target tree.
+	///
+	/// The returned path is absolute and in real-path form, with filesystem-native case for all segments.
+	/// @return The absolute, real-path path to the generated artifact in the target tree.
 	public Path getTargetPath();
 
 	/// Returns the mummifier responsible for mummifying this artifact.

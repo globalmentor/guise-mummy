@@ -20,7 +20,6 @@ import static com.globalmentor.html.def.HTML.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
 import static java.nio.file.Files.*;
-import static java.util.Objects.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -51,7 +50,7 @@ import dev.guise.mummy.mummify.page.XhtmlPageMummifier;
 ///           mummifier.
 /// @implSpec This implementation registers common mummifiers by default; they can be overridden using [#registerFileMummifier(SourcePathMummifier)].
 /// @author Garret Wilson
-public abstract class BaseMummyContext implements MummyContext {
+public abstract class BaseMummyContext extends AbstractMummyContext {
 
 	/// The default mummifier for normal files.
 	private final SourcePathMummifier defaultFileMummifier = new OpaqueFileMummifier();
@@ -78,20 +77,19 @@ public abstract class BaseMummyContext implements MummyContext {
 		return GuiseMummy.LABEL;
 	}
 
-	private final GuiseProject project;
-
-	@Override
-	public GuiseProject getProject() {
-		return project;
-	}
-
 	/// The shared page document builder factory. Use must be synchronized on the factory itself.
 	private final DocumentBuilderFactory pageDocumentBuilderFactory;
 
 	/// Constructor.
 	/// @param project The Guise project.
-	public BaseMummyContext(@NonNull final GuiseProject project) {
-		this.project = requireNonNull(project);
+	/// @param siteSourceDirectory The base directory of the site source, in real-path form.
+	/// @param siteTargetDirectory The output directory of the site, in real-path form.
+	/// @param siteDescriptionTargetDirectory The output directory of the site description, in real-path form.
+	/// @throws IllegalArgumentException if any directory path is not in real-path form.
+	/// @throws IOException if an I/O error occurs during real-path validation.
+	public BaseMummyContext(@NonNull final GuiseProject project, @NonNull final Path siteSourceDirectory, @NonNull final Path siteTargetDirectory,
+			@NonNull final Path siteDescriptionTargetDirectory) throws IOException {
+		super(project, siteSourceDirectory, siteTargetDirectory, siteDescriptionTargetDirectory);
 		pageDocumentBuilderFactory = DocumentBuilderFactory.newInstance();
 		pageDocumentBuilderFactory.setNamespaceAware(true);
 		registerFileMummifier(new MarkdownPageMummifier());

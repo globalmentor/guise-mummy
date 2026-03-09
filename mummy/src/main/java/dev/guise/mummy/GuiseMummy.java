@@ -19,6 +19,7 @@ package dev.guise.mummy;
 import static com.globalmentor.io.Files.*;
 import static com.globalmentor.io.Paths.*;
 import static com.globalmentor.java.Conditions.*;
+import static java.nio.file.LinkOption.*;
 import static com.globalmentor.net.URIs.*;
 import static java.nio.file.Files.*;
 import static java.util.Collections.*;
@@ -310,6 +311,9 @@ public class GuiseMummy implements Clogged {
 			//# mummify phase
 			if(phase.compareTo(LifeCyclePhase.MUMMIFY) >= 0) {
 				getLogger().info("Mummify phase: {}", LifeCyclePhase.MUMMIFY); //TODO i18n
+				final Path siteTargetDirectory = context.getSiteTargetDirectory();
+				createDirectories(siteTargetDirectory);
+				checkArgumentRealPath(siteTargetDirectory, NOFOLLOW_LINKS); // checking after directory creation catches external creation with wrong case between PLAN and MUMMIFY
 				rootArtifact.getMummifier().mummify(context, rootArtifact);
 			}
 
@@ -375,7 +379,9 @@ public class GuiseMummy implements Clogged {
 	/// @return A context to use during mummification.
 	/// @throws IOException if there is an I/O error during initialization, such as when loading the site configuration.
 	protected Context initialize(@NonNull final GuiseProject project) throws IOException {
-		final Path siteSourceDirectory = project.getDirectory().resolve(project.getConfiguration().getPath(GuiseMummy.PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY));
+		final Path projectDirectory = project.getDirectory();
+		final Path siteSourceDirectory = deriveRealPath(
+				projectDirectory.resolve(project.getConfiguration().getPath(GuiseMummy.PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY)), NOFOLLOW_LINKS);
 
 		final Configuration mummyConfiguration;
 		if(isDirectory(siteSourceDirectory)) { //leave error generation to validate phase TODO improve Confound not to throw errors if directory doesn't exist?
@@ -388,7 +394,11 @@ public class GuiseMummy implements Clogged {
 			mummyConfiguration = project.getConfiguration();
 		}
 
-		final Context context = new Context(project, mummyConfiguration);
+		final Path siteTargetDirectory = deriveRealPath(
+				projectDirectory.resolve(mummyConfiguration.getPath(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY)), NOFOLLOW_LINKS);
+		final Path siteDescriptionTargetDirectory = deriveRealPath(
+				projectDirectory.resolve(mummyConfiguration.getPath(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY)), NOFOLLOW_LINKS);
+		final Context context = new Context(project, mummyConfiguration, siteSourceDirectory, siteTargetDirectory, siteDescriptionTargetDirectory);
 		for(final Class<? extends SourcePathMummifier> mummifierClass : fileMummifierTypes) { //register any additional mummifiers
 			SourcePathMummifier fileMummifier;
 			try {
@@ -523,7 +533,7 @@ public class GuiseMummy implements Clogged {
 	/// @throws IOException if there is an error determining or loading the project.
 	public static GuiseProject createProject(@NonNull Path projectDirectory, @Nullable final Path siteSourceDirectory, @Nullable final Path siteTargetDirectory,
 			@Nullable final Path siteDescriptionTargetDirectory) throws IOException {
-		projectDirectory = checkArgumentAbsolute(projectDirectory).normalize();
+		projectDirectory = deriveRealPath(checkArgumentAbsolute(projectDirectory), NOFOLLOW_LINKS);
 
 		//default settings (ultimate fallback)
 		final Configuration defaultConfiguration = getDefaultConfiguration(projectDirectory);
@@ -535,13 +545,13 @@ public class GuiseMummy implements Clogged {
 		//user settings (e.g. supplied on the command line); fall back to the file/default
 		final Map<String, Object> userSettings = new HashMap<>();
 		if(siteSourceDirectory != null) {
-			userSettings.put(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY, checkArgumentAbsolute(siteSourceDirectory).normalize());
+			userSettings.put(PROJECT_CONFIG_KEY_SITE_SOURCE_DIRECTORY, deriveRealPath(checkArgumentAbsolute(siteSourceDirectory), NOFOLLOW_LINKS));
 		}
 		if(siteTargetDirectory != null) {
-			userSettings.put(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY, checkArgumentAbsolute(siteTargetDirectory).normalize());
+			userSettings.put(PROJECT_CONFIG_KEY_SITE_TARGET_DIRECTORY, deriveRealPath(checkArgumentAbsolute(siteTargetDirectory), NOFOLLOW_LINKS));
 		}
 		if(siteDescriptionTargetDirectory != null) {
-			userSettings.put(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY, checkArgumentAbsolute(siteDescriptionTargetDirectory).normalize());
+			userSettings.put(PROJECT_CONFIG_KEY_SITE_DESCRIPTION_TARGET_DIRECTORY, deriveRealPath(checkArgumentAbsolute(siteDescriptionTargetDirectory), NOFOLLOW_LINKS));
 		}
 		final Configuration projectConfiguration = new ObjectMapConfiguration(unmodifiableMap(userSettings)).withFallback(fileConfiguration); //the user settings override even the project file
 		return new DefaultGuiseProject(projectDirectory, projectConfiguration);
@@ -629,12 +639,17 @@ public class GuiseMummy implements Clogged {
 			return Optional.ofNullable(deployTargets);
 		}
 
-		/// Site source directory constructor.
-		/// @apiNote No validation is performed to ensure directories are valid.
+		/// Context constructor.
 		/// @param project The Guise project.
 		/// @param siteConfiguration The configuration for the site.
-		public Context(@NonNull final GuiseProject project, @NonNull final Configuration siteConfiguration) {
-			super(project);
+		/// @param siteSourceDirectory The base directory of the site source, in real-path form.
+		/// @param siteTargetDirectory The output directory of the site, in real-path form.
+		/// @param siteDescriptionTargetDirectory The output directory of the site description, in real-path form.
+		/// @throws IllegalArgumentException if any directory path is not in real-path form.
+		/// @throws IOException if an I/O error occurs during real-path validation.
+		public Context(@NonNull final GuiseProject project, @NonNull final Configuration siteConfiguration, @NonNull final Path siteSourceDirectory,
+				@NonNull final Path siteTargetDirectory, @NonNull final Path siteDescriptionTargetDirectory) throws IOException {
+			super(project, siteSourceDirectory, siteTargetDirectory, siteDescriptionTargetDirectory);
 			this.siteConfiguration = requireNonNull(siteConfiguration);
 		}
 
