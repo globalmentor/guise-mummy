@@ -32,6 +32,7 @@ import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -255,6 +256,21 @@ public class S3Website extends S3 {
 		this.redirectCountOptimalThreshold = checkArgumentNotNegative(redirectCountOptimalThreshold);
 	}
 
+	/// Injection constructor that accepts a pre-built S3 client with default redirect settings.
+	/// @apiNote The caller is responsible for ensuring that the provided `s3Client` is configured consistently with the
+	///         given `region`. The `S3Client` API does not expose its internal configuration, so this constructor cannot
+	///         validate consistency. This constructor is therefore not part of the public API.
+	/// @param region The AWS region of deployment.
+	/// @param bucket The bucket into which the site should be deployed.
+	/// @param s3Client The pre-built S3 client.
+	S3Website(@NonNull final Region region, @NonNull String bucket, @NonNull final S3Client s3Client) {
+		super(null, region, bucket, s3Client);
+		this.altBuckets = Set.of();
+		this.siteDomain = null;
+		this.redirectMeans = RedirectMeans.OBJECT;
+		this.redirectCountOptimalThreshold = DEFAULT_REDIRECT_COUNT_OPTIMAL_OPTIMAL_THRESHOLD;
+	}
+
 	/// Determines the alternative buckets to use, if any. This method determines the alternative buckets in the following order:
 	///
 	/// 1. The key [#CONFIG_KEY_ALT_BUCKETS] relative to the S3 configuration.
@@ -457,9 +473,9 @@ public class S3Website extends S3 {
 	///           [#getDeployObjectsByKey()].
 	/// @see Artifact#PROPERTY_TAG_MUMMY_ALT_LOCATION
 	@Override
-	protected void planResource(final MummyContext context, final URI rootTargetPathUri, final Artifact artifact, final URIPath resourceReference)
-			throws IOException {
-		super.planResource(context, rootTargetPathUri, artifact, resourceReference);
+	protected void planResource(final MummyContext context, final URI rootTargetPathUri, final Artifact artifact,
+			final URIPath resourceReference, final Path contentFile, final String key) throws IOException {
+		super.planResource(context, rootTargetPathUri, artifact, resourceReference, contentFile, key);
 		artifact.getResourceDescription().findPropertyValue(PROPERTY_TAG_MUMMY_ALT_LOCATION).filter(CharSequence.class::isInstance).map(Object::toString)
 				.map(URIPath::of).map(altLocationReference -> resolve(artifact.getTargetPath().toUri(), altLocationReference)) //convert to absolute file system URI
 				.map(altLocationUri -> URIPath.relativize(rootTargetPathUri, altLocationUri)) //relativize to the site root
@@ -468,8 +484,8 @@ public class S3Website extends S3 {
 						throw new IOException("Artifact for resource %s specifies an alternative location %s which is outside the site boundaries.".formatted(
 								resourceReference, altLocationReference));
 					}
-					final String altKey = altLocationReference.toString();
-					final String artifactKey = resourceReference.toString();
+					final String altKey = altLocationReference.toDecodedString(); // canonical resource name, not URI-encoded
+					final String artifactKey = resourceReference.toDecodedString(); // canonical resource name, not URI-encoded
 					getLogger().debug("Planning deployment redirect for artifact {} from S3 key `{}` to S3 key `{}`.", artifact, altKey, artifactKey);
 					final S3ArtifactRedirectDeployObject redirectDeployObject = new S3ArtifactRedirectDeployObject(altKey, artifactKey, artifact);
 					if(redirectDeployObject.isRoutingRuleRequired()) { //set up the redirect initialize as if `object` redirect means were specified

@@ -55,17 +55,26 @@ Artifact equality is determined by target path.
 
 `Artifact.isSourcePathFile()` indicates whether the source refers to a file rather than a directory. This exists because during planning, the source path may not yet exist on disk, and the type system needs to capture the distinction without checking the filesystem.
 
+### Real-Path Guarantee
+
+All filesystem `Path` values stored in artifacts — `getSourcePath()`, `getTargetPath()`, and `getSourceDirectory()` — are **real paths**: canonical, absolute, with symbolic links resolved. This is enforced at artifact construction time via `Path.toRealPath()` (for paths that exist on disk) or `Path.toAbsolutePath().normalize()` (for target paths during planning, which may not yet exist).
+
+This guarantee ensures that artifact equality (by target path) is not defeated by symbolic links or non-normalized path segments, that tree rebasing via `Paths.changeBase()` produces correct results, and that description file lookup in the description tree finds the correct sidecar regardless of how the original path was obtained.
+
 ### Artifact Categories
 
 The `Artifact` interface defines a precise vocabulary documented in its Javadoc:
 
-- **Composite artifact** — An artifact potentially composed of other artifacts. Provides `comprisedArtifacts()`, which yields _all_ constituent artifacts (for tree traversal).
+- **Composite artifact** (`CompositeArtifact`) — An artifact potentially composed of other artifacts. Provides three methods that partition the constituent artifacts:
+  - **`comprisedArtifacts()`** — _all_ constituent artifacts: the exhaustive set.
+  - **`getSubsumedArtifacts()`** — the subset of comprised artifacts that have been absorbed into the composite and should not appear as separate IRI path references. A subsumed artifact is an implementation detail of its parent; its _principal artifact_ is the composite that subsumed it.
+  - The non-subsumed comprised artifacts — those that remain independently addressable. This set has no dedicated accessor; it is computed as `comprisedArtifacts()` minus `getSubsumedArtifacts()`.
 
-- **Collection artifact** — A composite artifact with a _collection IRI path reference_ (one ending in `/`). The canonical implementation is `DirectoryArtifact`. Provides `getChildArtifacts()`, which yields the navigable members (a subset of comprised artifacts).
+- **Collection artifact** (`CollectionArtifact extends CompositeArtifact`) — A composite artifact with a _collection IRI path reference_ (one ending in `/`). The canonical implementation is `DirectoryArtifact`. Adds `getChildArtifacts()`, which yields the navigable collection members — equivalent to the non-subsumed comprised artifacts for this type.
 
 - **Content artifact** — A subsumed artifact of a directory that represents the directory's content. Historically `index.html`. A content artifact is comprised by its directory but is _not_ a child artifact. In the logical resource model, `foo/index.xhtml` is an implementation detail for storing the content of the `foo/` collection.
 
-- **Subsumed artifact** — An artifact that has been absorbed into another and should not appear as a separate IRI path reference. The content artifact is the archetypal subsumed artifact. A subsumed artifact's _principal artifact_ is the one it has been subsumed into.
+- **Aspectual artifact** (`AspectualArtifact extends CompositeArtifact`) — An artifact with variant forms (aspects), such as an image with a preview or thumbnail. Each aspect shares the same source but produces a distinct target (e.g., `photo.jpg` → `photo-preview.jpg`). All comprised artifacts are non-subsumed independent peers — the subsumption pattern does not apply.
 
 - **Principal artifact** — The canonical artifact for IRI path references. An artifact is normally its own principal artifact; a subsumed artifact's principal artifact is the artifact it was subsumed into. For example, `foo/index.html`'s principal artifact is the `foo/` directory artifact.
 
@@ -75,15 +84,39 @@ The `Artifact` interface defines a precise vocabulary documented in its Javadoc:
 
 - **Corporeal artifact** — An artifact that potentially contains content. The `CorporealSourceArtifact` interface provides `openSource(MummyContext)` for access to the content stream and `getSourceSize(MummyContext)` for the byte length.
 
-The `AspectualArtifact` interface (extending `CompositeArtifact`) is related but not listed among the official categories. It represents an artifact with variant forms (aspects), such as an image with a preview or thumbnail. Each aspect shares the same source but produces a distinct target (e.g., `photo.jpg` → `photo-preview.jpg`).
+### Subsumption and Composite Walks
 
-### Comprised vs. Child Artifacts
+Subsumption is a `CompositeArtifact`-level concept: a subsumed artifact has been absorbed into its parent and should not appear as an independent entity in the site's IRI space. This has direct implications for any code that recursively walks the artifact tree.
 
-These terms are distinct. In `DirectoryArtifact`:
+The three `CompositeArtifact` methods partition comprised artifacts into two sets, and the correct walk method depends on what the walker intends to do with each artifact:
 
-- **`comprisedArtifacts()`** returns child artifacts _plus_ the content artifact (if any). Used for exhaustive tree traversal.
-- **`getChildArtifacts()`** returns only the navigable collection members. Used for navigation.
-- **`getSubsumedArtifacts()`** returns only the content artifact (if any).
+| Method | Returns | Use when… |
+|---|---|---|
+| `comprisedArtifacts()` | All constituent artifacts | Every artifact must be individually processed regardless of identity (e.g., mummification generates a target file for each) |
+| `getSubsumedArtifacts()` | Absorbed implementation details | A composite needs to discover its own content (e.g., a collection finding its content artifact for I/O). Not used for recursion. |
+| comprised − subsumed | Independently addressable artifacts | Recursion should visit only artifacts that exist as separate model entities (e.g., navigation, deployment planning) |
+
+For `CollectionArtifact`, `getChildArtifacts()` is the convenience accessor for "comprised − subsumed". For `AspectualArtifact`, the subsumed set is empty, so `comprisedArtifacts()` and "comprised − subsumed" yield the same result.
+
+### Choosing the Correct Walk
+
+Code that walks the artifact tree must choose between these methods based on intent:
+
+- **Navigation and plan display** (`PlanDescriber`): recurse into non-subsumed comprised artifacts only (`getChildArtifacts()` for collections). Subsumed artifacts are not independently addressable. The collection artifact itself carries the content artifact's description (via delegation), so metadata such as `altLocation` is processed once, at the collection level, with the correct collection resource reference.
+
+- **Deployment content upload** (`S3.plan()`): recurse into non-subsumed comprised artifacts only. For each artifact encountered, the deployer must upload its bytes and process its metadata (redirects, fingerprints). For a `DirectoryArtifact`, the bytes come from its designated content artifact — discovered via `DirectoryArtifact.findContentArtifact()` — while the metadata comes from the directory artifact itself (via description delegation). (Only `DirectoryArtifact` provides content artifact discovery; a non-directory `CollectionArtifact` would have no content to upload.) The deploy object's platform key (e.g. S3 key) is derived from the content artifact's resource reference (e.g. `foo/index`), but the model entity it carries is the collection artifact (e.g. `foo/`). This ensures metadata operations such as `altLocation` redirect resolution use the collection's canonical resource reference as the redirect target, and prevents the content artifact from being processed as an independent entity (which would produce duplicate redirects with incorrect targets).
+
+- **Exhaustive traversal** (mummification): use `comprisedArtifacts()` when every artifact must be individually processed — for example, when each artifact's target file must be generated. This includes subsumed artifacts because they have their own target files even though they are not independently addressable as resources.
+
+### Description Delegation in Collection Artifacts
+
+`DirectoryArtifact.getResourceDescription()` delegates to its content artifact's description (if any); otherwise it returns an empty description. This means the collection artifact and its content artifact share the _same_ `UrfResourceDescription` instance.
+
+This delegation is semantically correct for most properties: `title`, `author`, `publishedOn`, `content-type`, `content-fingerprint`, and other metadata describe the collection resource regardless of whether the content is stored in `index.xhtml` or a database.
+
+However, `altLocation` has **path-relative semantics** that differ depending on the artifact's resource reference. An `altLocation` of `bar` declared on a content artifact at `foo/index.xhtml` means "resolve `bar` relative to `foo/index.xhtml`", yielding `foo/bar`. The same `altLocation` accessed through the collection artifact at `foo/` means "resolve `bar` relative to `foo/`", also yielding `foo/bar`. In this case the resolved alternate location is the same, but the _redirect target_ differs: the collection artifact's resource reference is `foo/` while the content artifact's is `foo/index` (or `foo/index.html`). A deployer that processes the content artifact's `altLocation` independently would produce a redirect to `foo/index` rather than the canonical `foo/`.
+
+This is why deployers must process `altLocation` at the collection artifact level, never at the content artifact level. The collection artifact's resource reference is the canonical form, and the redirect target must match.
 
 ### Referent Source Paths
 
@@ -96,6 +129,45 @@ Artifacts carry metadata through an `UrfResourceDescription` (the URF resource d
 **General properties** (by handle): `title`, `name`, `label`, `description`, `author`, `artist`, `createdAt`, `publishedOn`, `copyright`, `icon`.
 
 **Mummy-specific properties** (by tag URI in the `https://guise.dev/name/mummy/` namespace): `mummy/altLocation` (redirect alternate name), `mummy/order` (navigation order), `mummy/aspect` (variant designation), `mummy/template` (template path), `mummy/descriptionDirty` (incremental mummification flag), `mummy/sourceContentModifiedAt` (source timestamp for incremental detection).
+
+## Collection Paths and the Trailing-Slash Problem
+
+### The Concept
+
+In the web (RFC 3986), a path ending in `/` denotes a _collection_ — a container of other resources. A path without a trailing slash denotes a _non-collection_ — an individual resource. This distinction is semantically significant because URI reference resolution behaves differently:
+
+- Resolving `image.jpg` against `articles/` yields `articles/image.jpg`
+- Resolving `image.jpg` against `articles/page.html` yields `articles/image.jpg` (same parent)
+- Resolving `../other` against `articles/` yields `other` (backs up from the collection)
+
+Guise Mummy models this distinction explicitly. A `CollectionArtifact` corresponds to a collection path (trailing slash); a file artifact corresponds to a non-collection path (no trailing slash).
+
+### The Filesystem Impedance Mismatch
+
+Filesystems do not encode the collection/non-collection distinction in their path representation. A directory path `C:\project\target\site\articles` has no trailing separator. When Java converts this to a URI via `Path.toUri()`, the result may or may not have a trailing slash depending on whether the directory exists on disk. Since artifact paths may refer to directories that don't yet exist (during planning), the filesystem cannot be relied on to add the trailing slash.
+
+The codebase solves this with **explicit type knowledge**: code that needs a correct collection URI checks `artifact instanceof CollectionArtifact` and, if true, forces the URI into collection form:
+
+```java
+artifact instanceof CollectionArtifact ? toCollectionURI(artifactTargetPathUri) : artifactTargetPathUri
+```
+
+`URIs.toCollectionURI(URI)` appends `/` to the URI path if not already present. The corresponding `URIPath` method is `toCollectionURIPath()`.
+
+The `toCollectionURI` compensation is load-bearing during PLAN — target directories do not yet exist, so `Path.toUri()` produces a URI without a trailing slash — and a no-op during DEPLOY, where the MUMMIFY phase has already created the directories and `Path.toUri()` includes the slash. Code that may run in any phase should apply the compensation unconditionally.
+
+This lifecycle dependence explains why different parts of the codebase handle the same concern differently:
+
+| Code | Phase | Uses `toCollectionURI`? | Why |
+|---|---|---|---|
+| `PlanDescriber.collectRedirect()` | PLAN | **Yes** — explicitly | Target dirs don't exist; compensation is required |
+| `AbstractMummyPlan.relativizeResourceReference()` | PLAN | **Yes** — via `forceCollection` parameter | Same reason |
+| `S3Website.planResource()` | DEPLOY | **No** — uses raw `artifact.getTargetPath().toUri()` | Target dirs exist; `Path.toUri()` already correct |
+| `Artifact.relativizeResourceReference()` | Any | **Yes** — defensively | Abstracts over lifecycle; safe to call in any phase |
+
+`Artifact.relativizeResourceReference(URI, Artifact)` is the **preferred API** precisely because it applies `toCollectionURI` unconditionally — callers need not know or care which lifecycle phase they are in. The compensation is harmless when the trailing slash is already present.
+
+Note that S3 object keys for collection artifacts use the content artifact's resource reference (e.g. `foo/index`), not the collection path (e.g. `foo/`). The `toCollectionURI` compensation matters in reference _calculation_ (e.g., resolving `altLocation` against the collection path) but does not appear in the stored S3 key.
 
 ## Mummifiers
 
@@ -225,12 +297,13 @@ Checks preconditions: source directory exists, source and target directories don
 
 ### PLAN
 
-Delegates to `DirectoryMummifier.plan()`, which recursively walks the source tree:
+Delegates to `DirectoryMummifier.plan()`, which recursively walks the source filesystem tree:
 
-1. The site source directory becomes the root `DirectoryArtifact`.
+1. The site source directory becomes the root `DirectoryArtifact`'s source path; the site target directory becomes its target path.
 2. For each child in a directory:
    - A mummifier is selected by filename extension.
-   - The target filename is computed, applying post-date extraction (`@YYYY-MM-DD-slug.ext` → `YYYY/MM/DD/slug.html`), asset/veil renaming, bare-name stripping, and extension changes.
+   - The target filename is computed by `planChildArtifactTargetPath()`, applying post-date extraction (`@YYYY-MM-DD-slug.ext` → `YYYY/MM/DD/slug.html`), asset/veil renaming, bare-name stripping, and extension changes.
+   - The target path is the parent target directory resolved with the computed target filename — entirely a filesystem operation (`Path.resolve()`). URI conversion happens later, at the point of use (link generation, deployment).
    - The child mummifier's `plan()` creates the appropriate `Artifact`.
 3. Content artifacts (e.g., `index.xhtml`) are identified per `mummy.collectionContentBaseNames` and subsumed into their parent directory artifact.
 4. Directories without a content file (that are not asset trees) receive a phantom `SimpleGeneratedXhtmlArtifact`.
@@ -247,6 +320,36 @@ Loads DNS and deployment target configurations from the project configuration. C
 ### DEPLOY
 
 Executes deployment: DNS records are created/updated, then each deploy target uploads content and returns a deployment URL. For S3-based targets, this involves walking the artifact plan, mapping each artifact to an S3 key, and uploading content with appropriate metadata (content type, fingerprint). CloudFront distributions are invalidated after upload.
+
+### Deploy Target State Model
+
+A `DeployTarget` is stateful across lifecycle phases. The state flow is:
+
+1. **Constructor** — receives immutable configuration (profile, region, bucket names, etc.) derived from the project configuration, and constructs API clients. These are stored as `final` fields.
+2. **`prepare()`** — discovers or provisions infrastructure. Results needed in later phases are cached as instance fields. For example, `CloudFront` resolves an ACM certificate ARN in `prepare()` and stores it for `deploy()`. Deploy targets that manage externally provisioned infrastructure (e.g. Flange environments) resolve that infrastructure here rather than in the constructor, because `prepare()` is the phase designated for infrastructure interaction.
+3. **`deploy()`** — consumes cached infrastructure state and reads runtime configuration from `context.getConfiguration()` on demand. Configuration values are not cached from the constructor; the context is the source of truth.
+
+This means deploy targets do **not** re-query infrastructure during `deploy()` for values already resolved in `prepare()` — the cached state is authoritative for the duration of the deployment. Conversely, project configuration (collection content names, page name settings, etc.) is read from `context.getConfiguration()` at the point of use, not stored during construction.
+
+### Mapping Collection Artifacts to Deployment Platforms
+
+A collection artifact (e.g. `foo/`) has no uploadable content of its own — the content lives in a subsumed artifact (e.g. `foo/index.xhtml`). Deployment platforms that store content as objects (S3, blob storage) cannot create an object at a collection path. The deployer must bridge between the Guise Mummy model (where `foo/` is the canonical resource) and the platform model (where content must be stored at a non-collection key like `foo/index`).
+
+The correct approach is:
+
+1. **Walk the artifact tree by model identity.** Process each collection artifact once, using its own resource reference (`foo/`). Do not separately walk or process its subsumed content artifact. This ensures metadata operations (especially `altLocation` redirect resolution) use the collection's canonical resource reference as the redirect target.
+
+2. **Derive the platform storage key from the content artifact.** For a collection with a subsumed content artifact, the S3 key (or equivalent) comes from the content artifact's resource reference (`foo/index`). For a collection with no content artifact (an intermediate directory with no index page), no object is uploaded — the collection exists only as a path prefix.
+
+3. **Obtain content bytes from the content artifact's target path.** The deploy object reads its content stream from the content artifact's filesystem path, not the collection's directory path.
+
+This separates two concerns that were previously conflated:
+- **Model identity** — which artifact the deploy object represents, whose description provides metadata and redirect targets. This is the collection artifact.
+- **Platform storage** — where the content bytes live on disk and at what key they are uploaded. This comes from the subsumed content artifact.
+
+The S3 Website "index document" feature then completes the bridge: when a request arrives for `foo/`, S3 serves the object at `foo/index` (the configured index document suffix). The collection path is never an S3 object — it is a virtual path resolved by S3's index document mechanism.
+
+A collection with no subsumed content artifact (an empty intermediate directory) produces no deploy object. A request for that collection path will result in an HTTP 404 from the platform, which is the correct behavior — there is no content to serve.
 
 ## Context (`MummyContext`)
 
@@ -272,7 +375,7 @@ The codebase never conflates these two systems. Each has its own type, operation
 
 ### Translating Between Coordinate Systems
 
-**Filesystem → URI**: The sole mechanism is `Path.toUri()`, which produces a `file:///` URI. This handles platform-specific separators, drive letters, UNC paths, and percent-encoding correctly.
+**Filesystem → URI**: The sole mechanism is `Path.toUri()`, which produces a `file:///` URI. This handles platform-specific separators, drive letters, and UNC paths correctly. However, its percent-encoding is **inconsistent**: it encodes characters that are syntactically required for URI validity (spaces as `%20`, `#` as `%23`, `?` as `%3F`, `%` as `%25`) but leaves non-ASCII characters as literal code points (e.g., `café` appears literally, not as `caf%C3%A9`). This is because `java.net.URI.create()` silently accepts non-ASCII characters without encoding them. The resulting URI is not fully compliant with RFC 3986. See `designs/s3-key-encoding.md` for empirical verification and implications.
 
 ```java
 final URI artifactTargetPathUri = artifact.getTargetPath().toUri();
@@ -288,40 +391,9 @@ final Path referenceSourcePath = Paths.get(contextSourcePath.toUri().resolve(sou
 
 **Why not string manipulation**: Filesystem `Path.toString()` is platform-dependent — backslashes on Windows, forward slashes on Unix. Converting between the two coordinate systems by replacing separators (`replace('\\', '/')`) would bypass percent-encoding, mishandle edge cases (spaces, special characters, UNC paths), and ignore the collection/non-collection distinction. The codebase avoids this entirely.
 
-## Collection Paths and the Trailing-Slash Problem
-
-### The Concept
-
-In the web (RFC 3986), a path ending in `/` denotes a _collection_ — a container of other resources. A path without a trailing slash denotes a _non-collection_ — an individual resource. This distinction is semantically significant because URI reference resolution behaves differently:
-
-- Resolving `image.jpg` against `articles/` yields `articles/image.jpg`
-- Resolving `image.jpg` against `articles/page.html` yields `articles/image.jpg` (same parent)
-- Resolving `../other` against `articles/` yields `other` (backs up from the collection)
-
-Guise Mummy models this distinction explicitly. A `CollectionArtifact` corresponds to a collection path (trailing slash); a file artifact corresponds to a non-collection path (no trailing slash).
-
-### The Filesystem Impedance Mismatch
-
-Filesystems do not encode the collection/non-collection distinction in their path representation. A directory path `C:\project\target\site\articles` has no trailing separator. When Java converts this to a URI via `Path.toUri()`, the result may or may not have a trailing slash depending on whether the directory exists on disk. Since artifact paths may refer to directories that don't yet exist (during planning), the filesystem cannot be relied on to add the trailing slash.
-
-The codebase solves this with **explicit type knowledge**: wherever a URI is derived from an artifact's filesystem path, the code checks `artifact instanceof CollectionArtifact` and, if true, forces the URI into collection form:
-
-```java
-artifact instanceof CollectionArtifact ? toCollectionURI(artifactTargetPathUri) : artifactTargetPathUri
-```
-
-`URIs.toCollectionURI(URI)` appends `/` to the URI path if not already present. The corresponding `URIPath` method is `toCollectionURIPath()`.
-
-This pattern appears consistently wherever the codebase crosses from filesystem to URI representation:
-- `Artifact.relativizeResourceReference()` — uses `forceCollection` parameter (set from `artifact instanceof CollectionArtifact`)
-- `AbstractMummyPlan.relativizeResourceReference()` — validates tree containment (both paths must be absolute and within the same source or target tree) and applies collection forcing
-- `PlanDescriber.collectRedirect()` — applies `toCollectionURI()` to the artifact target URI when the artifact is a `CollectionArtifact`, before resolving the `altLocation` reference against it
-
-Note that `S3.planResource()` skips collection artifacts entirely — directories have no corresponding S3 object, so no key is generated for them. The collection forcing matters in reference _calculation_, not in key assignment.
-
 ## Resource References
 
-A **resource reference** is a relative URI path (`URIPath`) that identifies a resource without any assumption about the absolute location where the site will ultimately be served. Resource references are always in the URI domain, never in the filesystem domain. They never carry a leading `/`.
+A **resource reference** is a relative URI path (`URIPath`) that identifies a resource without any assumption about the absolute location where the site will ultimately be served. Resource references are always in the URI domain, never in the filesystem domain. They never carry a leading `/`. `URIPath.of()`, which parses resource reference values, rejects anything with a scheme, authority, query, or fragment — resource references are pure path-only values.
 
 This relativity is a deliberate architectural invariant, not an incidental implementation detail. A Guise Mummy site is a self-contained, portable unit: it might later be deployed at the root of a server (`/`), or under a subpath (`/blog/`, `/company/docs/`). The resource references within the site are the same regardless of deployment location. An absolute path (one beginning with `/`) would bake in an assumption about the deployment mount point that the model intentionally avoids.
 
@@ -336,6 +408,8 @@ Resource references are always relative, but the _base_ they are relative to dep
 `MummyPlan.findArtifactBySourceRelativeReference()` performs the inverse operation: given an artifact and a relative URI reference, it resolves the reference against the artifact's source path (in the URI domain) and looks up the resulting artifact.
 
 Both of these methods resolve against the **principal artifact** of the referring artifact. For example, a link _from_ `foo/index.html` is calculated against `foo/` (the directory artifact), since the `index.html` content artifact has been subsumed into the directory.
+
+During mummification, `AbstractPageMummifier.relocateSourceDocumentToTarget()` walks the output document and retargets reference elements (`<a href>`, `<img src>`, `<link href>`, etc.) from the source tree to the target tree. For each relative reference, it resolves the original `href` to a source artifact via `findArtifactBySourceRelativeReference()`, then calls the `referenceInTarget()` generator to compute the retargeted `URIPath`. The resulting URI reference is placed into the HTML attribute in its raw form — preserving the percent-encoding that `Path.toUri()` applied to URI-significant characters (spaces as `%20`, `#` as `%23`, `?` as `%3F`). This is correct for HTML: an `href` value is a URI reference per the [WHATWG URL Standard](https://url.spec.whatwg.org/), and characters with syntactic meaning in URIs must remain percent-encoded to avoid misparse (a literal `#` in an `href` would be interpreted as a fragment delimiter, not a path character). Non-ASCII characters, which `Path.toUri()` leaves unencoded (see §Translating Between Coordinate Systems), appear literally in the attribute value; browsers accept this and percent-encode them before making the HTTP request. The browser ultimately sends a fully percent-encoded request path, which S3 (or any standards-compliant server) decodes to recover the canonical resource name.
 
 #### Site-root-relative references (deployment and display)
 
@@ -375,82 +449,20 @@ Each step uses the correct typed operation:
 
 At no point is `altLocation` treated as a filesystem path string.
 
-Both sides of a redirect mapping — the alternate location (source) and the artifact's resource reference (destination) — are stored as site-root-relative `URIPath` values.
+Both sides of a redirect mapping — the alternate location (source) and the artifact's resource reference (destination) — are stored as site-root-relative `URIPath` values. When these values are used as S3 keys, they must be converted via `toDecodedString()` to obtain the canonical resource name (see §Deployment Targets and Absolute Paths).
 
 ### Deployment Targets and Absolute Paths
 
-Deployment targets consume site-root-relative resource references and translate them into whatever form the platform requires. The site model itself never produces absolute paths — that is a deployment-target concern resolved at the boundary.
+Deployment targets consume site-root-relative resource references and translate them into whatever form the platform requires. The site model itself never produces absolute paths — that is a deployment-target concern resolved at the boundary. The correct string form of a `URIPath` depends on the output context: `toString()` returns the raw URI-encoded form (via `URI.getRawPath()`), which is correct for URI reference contexts such as HTML attributes (see §Artifact-relative references); `toDecodedString()` returns the fully decoded form (via `URI.getPath()`), which recovers the original filesystem characters and is correct for opaque platform identifiers such as S3 object keys.
 
 In the S3 deployment:
-- **S3 keys** are the `URIPath.toString()` of the site-root-relative reference — no leading `/`. The S3 bucket key namespace happens to be bucket-root-relative, so the site-root-relative form maps directly.
+- **S3 keys** are the **canonical resource name** — the actual characters that identify the resource, not a URI-encoded form. An S3 object key is an opaque string stored verbatim by S3 (the AWS SDK handles HTTP-level percent-encoding as a transparent transport concern). The accessor used on a site-root-relative `URIPath` is `toDecodedString()`, which returns `URI.getPath()` — the fully decoded form matching the original filesystem name. See `designs/s3-key-encoding.md` for the encoding analysis and design rationale.
 - **S3 object redirect** (`x-amz-website-redirect-location`): the target key is prefixed with `/` and encoded in `preparePutObject()`, because this header value is the literal HTTP `Location` header content, which requires an absolute path per RFC 7231 §7.1.2.
 - **S3 routing rules** (`keyPrefixEquals`, `replaceKeyWith`, `replaceKeyPrefixWith`): use the site-root-relative key directly, without a leading `/`, because S3 routing rules match against bucket keys.
 - **`guise serve`** (local development server): maps the servlet context at `/` — a deployment-time decision, not part of the model.
 
 The absolute-path form (with leading `/`) appears _only_ at protocol boundaries that require it. It is never stored in the model.
 
-## How the Plan is Built
-
-During the PLAN lifecycle phase, `GuiseMummy` delegates to `DirectoryMummifier.plan()`, which recursively walks the source filesystem tree:
-
-1. The site source directory becomes the root `DirectoryArtifact`'s source path.
-2. The site target directory becomes the root `DirectoryArtifact`'s target path.
-3. For each child in the source directory:
-   - A mummifier is selected based on file extension.
-   - The source path is the actual filesystem path.
-   - The target filename is computed by `planChildArtifactTargetPath()`, which handles post-date extraction, asset/veil renaming, bare-name stripping, and extension changes.
-   - The target path is the parent target directory resolved with the computed target filename.
-
-This is entirely a filesystem operation: `Path.resolve(childTargetFilename)`. URI conversion happens later, at the point of use (link generation, deployment).
-
-## Display and Logging
-
-Throughout the codebase, paths are logged and displayed in their natural representation:
-
-- **Filesystem paths** are displayed as `Path` objects, which render in platform-native form.
-- **URI references** are displayed as `URIPath` objects using their `toString()`, which renders the encoded URI path form.
-
 ## Key Utilities
 
-### `URIPath` (`com.globalmentor.net.URIPath`)
-
-An immutable value type representing a URI path. Key operations:
-
-| Method | Purpose |
-|---|---|
-| `URIPath.of(String)` | Parse an encoded URI path string |
-| `URIPath.relativize(URI, URI)` | Compute a relative path between two URIs with proper backtracking (fixes JDK-6226081) |
-| `URIPath.findRelativePath(URI, URI)` | Like `relativize()`, but returns `Optional` |
-| `resolve(URIPath)` | Resolve a relative path against this one |
-| `isCollection()` | Whether the path ends in `/` |
-| `isSubPath()` | Whether the path is relative and does not backtrack past the origin |
-| `toCollectionURIPath()` | Force a trailing `/` |
-| `checkRelative()` / `checkAbsolute()` | Precondition validation |
-| `normalize()` | Remove `.` and `..` segments |
-| `toString()` | The raw encoded path as it would appear in a URI |
-
-### `URIs` (`com.globalmentor.net.URIs`)
-
-Static utilities for URI operations:
-
-| Method | Purpose |
-|---|---|
-| `toCollectionURI(URI)` | Force a trailing `/` on the URI path |
-| `resolve(URI, URI)` | RFC 3986 resolution (fixes Java's RFC 2396 empty-path behavior and UNC path issues) |
-| `resolve(URI, URIPath)` | Convenience overload |
-| `findRelativePath(URI, URI)` | Compute relative path with backtracking; returns `Optional` |
-
-### `Paths` (`com.globalmentor.io.Paths`)
-
-Static utilities for filesystem `Path` operations:
-
-| Method | Purpose |
-|---|---|
-| `changeBase(Path, Path, Path)` | Rebase a path from one tree root to another |
-| `isSubPath(Path, Path)` | Check containment after normalization |
-| `checkArgumentAbsolute(Path)` | Precondition: path is absolute |
-| `checkArgumentSubPath(Path, Path)` | Precondition: path is under base |
-
-### `Path.toUri()` / `Paths.get(URI)` (JDK)
-
-The bridge between the two coordinate systems. These are the _only_ mechanisms the codebase uses for filesystem↔URI translation.
+The key utility types for path operations are `URIPath` and `URIs` (in `com.globalmentor.net`) for URI-domain work, and `Paths` (in `com.globalmentor.io`) for filesystem-domain work. The sole bridge between the two domains is `Path.toUri()` / `java.nio.file.Paths.get(URI)` — these are the _only_ mechanisms the codebase uses for filesystem↔URI translation. Refer to Javadoc for the full API surface.

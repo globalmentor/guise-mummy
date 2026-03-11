@@ -37,18 +37,32 @@ public class S3ArtifactDeployObject extends AbstractS3DeployObject {
 
 	private final Artifact artifact;
 
-	/// Returns the artifact with the contents to be deployed in the bucket as the object.
-	/// @return The artifact with the contents to be deployed in the bucket as the object.
+	/// Returns the artifact whose description provides metadata for the deployed object.
+	/// @apiNote For collection artifacts, this is the collection artifact itself (e.g. the `DirectoryArtifact`),
+	///          not the subsumed content artifact. Use [#getContentFile()] for the deployable content file.
+	/// @return The artifact providing metadata for this deploy object.
 	public Artifact getArtifact() {
 		return artifact;
 	}
 
+	private final Path contentFile;
+
+	/// Returns the filesystem path to the content to be deployed.
+	/// @apiNote For a collection artifact, this is the subsumed content artifact's target path
+	///          (e.g. `foo/index.html`), not the collection directory path.
+	/// @return The path to the deployable content file.
+	public Path getContentFile() {
+		return contentFile;
+	}
+
 	/// Constructor.
 	/// @param key The S3 key representing the deployment path of the object in the bucket.
-	/// @param artifact The artifact with the contents to be deployed in the bucket as the object.
-	public S3ArtifactDeployObject(@NonNull final String key, @NonNull final Artifact artifact) {
+	/// @param artifact The artifact whose description provides metadata for the deployed object.
+	/// @param contentFile The filesystem path to the content file to be deployed.
+	public S3ArtifactDeployObject(@NonNull final String key, @NonNull final Artifact artifact, @NonNull final Path contentFile) {
 		super(key);
 		this.artifact = requireNonNull(artifact);
+		this.contentFile = requireNonNull(contentFile);
 	}
 
 	/// {@inheritDoc}
@@ -60,31 +74,32 @@ public class S3ArtifactDeployObject extends AbstractS3DeployObject {
 	}
 
 	/// {@inheritDoc}
-	/// @implSpec This implementation returns the size of the artifact's target file.
-	/// @see Artifact#getTargetPath()
+	/// @implSpec This implementation returns the size of the content file.
+	/// @see #getContentFile()
 	@Override
 	public long getContentLength() throws IOException {
-		return Files.size(getArtifact().getTargetPath());
+		return Files.size(contentFile);
 	}
 
 	/// {@inheritDoc}
 	/// @implSpec This implementation returns the [Content#TYPE_PROPERTY_TAG] property of the artifact resource description if present; otherwise returns
-	///           [Mimetype#getMimetype(Path)].
+	///           [Mimetype#getMimetype(Path)] based on the content file.
 	/// @implNote Retrieving a default content type from [Mimetype#getMimetype(Path)] is equivalent to what happens when [RequestBody#fromFile(Path)]
 	///           is called when deploying an object directly from a file.
 	/// @see Content#TYPE_PROPERTY_TAG
+	/// @see #getContentFile()
 	@Override
 	public String getContentType() {
 		return getArtifact().getResourceDescription().findPropertyValue(Content.TYPE_PROPERTY_TAG).map(Object::toString)
-				.orElseGet(() -> Mimetype.getInstance().getMimetype(getArtifact().getTargetPath()));
+				.orElseGet(() -> Mimetype.getInstance().getMimetype(contentFile));
 	}
 
 	/// {@inheritDoc}
-	/// @implSpec This implementation creates a new input stream to the artifact's target file.
-	/// @see Artifact#getTargetPath()
+	/// @implSpec This implementation creates a new input stream to the content file.
+	/// @see #getContentFile()
 	@Override
 	protected InputStream createInputStream() throws IOException {
-		return Files.newInputStream(getArtifact().getTargetPath());
+		return Files.newInputStream(contentFile);
 	}
 
 }

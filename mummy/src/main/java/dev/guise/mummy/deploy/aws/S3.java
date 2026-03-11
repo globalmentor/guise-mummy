@@ -23,9 +23,11 @@ import static dev.guise.mummy.GuiseMummy.*;
 import static java.util.Collections.*;
 import static java.util.Objects.*;
 import static java.util.stream.Collectors.*;
+import static org.zalando.fauxpas.FauxPas.*;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -40,6 +42,7 @@ import io.confound.config.Configuration;
 import io.confound.config.ConfigurationException;
 import dev.guise.mummy.*;
 import dev.guise.mummy.deploy.DeployTarget;
+import dev.guise.mummy.mummify.collection.DirectoryArtifact;
 import io.urf.URF.Handle;
 import io.urf.vocab.content.Content;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
@@ -227,14 +230,26 @@ public class S3 implements DeployTarget, Clogged {
 	/// @param region The AWS region of deployment.
 	/// @param bucket The bucket into which the site should be deployed.
 	public S3(@Nullable String profile, @NonNull final Region region, @NonNull String bucket) {
-		this.profile = profile;
-		this.region = requireNonNull(region);
-		this.bucket = requireNonNull(bucket);
 		final S3ClientBuilder s3ClientBuilder = S3Client.builder().region(region);
 		if(profile != null) {
 			s3ClientBuilder.credentialsProvider(ProfileCredentialsProvider.create(profile));
 		}
-		s3Client = s3ClientBuilder.build();
+		this(profile, region, bucket, s3ClientBuilder.build());
+	}
+
+	/// Injection constructor that accepts a pre-built S3 client.
+	/// @apiNote The caller is responsible for ensuring that the provided `s3Client` is configured consistently with the
+	///         given `region` and `profile`. The `S3Client` API does not expose its internal configuration, so this
+	///         constructor cannot validate consistency. This constructor is therefore not part of the public API.
+	/// @param profile The name of the AWS profile to use for retrieving credentials, or `null` if the default credential provider should be used.
+	/// @param region The AWS region of deployment.
+	/// @param bucket The bucket into which the site should be deployed.
+	/// @param s3Client The pre-built S3 client.
+	S3(@Nullable final String profile, @NonNull final Region region, @NonNull String bucket, @NonNull final S3Client s3Client) {
+		this.profile = profile;
+		this.region = requireNonNull(region);
+		this.bucket = requireNonNull(bucket);
+		this.s3Client = requireNonNull(s3Client);
 	}
 
 	/// Determines the bucket to use. This method determines the bucket in the following order:
@@ -339,36 +354,59 @@ public class S3 implements DeployTarget, Clogged {
 	}
 
 	/// Plans deployment of a site for an artifact and its comprised artifacts.
-	/// @implSpec For each artifact this method calls [#planResource(MummyContext, URI, Artifact, URIPath)].
+	/// @implSpec For each artifact with content this method calls
+	///           [#planResource(MummyContext, URI, Artifact, URIPath, Path, String)].
+	///           For a [DirectoryArtifact], the content is found via its content artifact; for other artifacts, the
+	///           artifact is its own content. Recursion into [CompositeArtifact] children skips subsumed artifacts, which are
+	///           implementation details not independently deployable.
 	/// @param context The context of static site generation.
 	/// @param rootTargetPathUri The URI form of the root artifact target path of the site being deployed.
 	/// @param artifact The current artifact for which deployment is being planned.
 	/// @throws IOException if there is an I/O error during site deployment planning.
 	protected void plan(@NonNull final MummyContext context, @NonNull final URI rootTargetPathUri, @NonNull Artifact artifact) throws IOException {
 		final URIPath resourceReference = Artifact.relativizeResourceReference(rootTargetPathUri, artifact);
-		planResource(context, rootTargetPathUri, artifact, resourceReference);
-		if(artifact instanceof CompositeArtifact compositeArtifact) {
+		// Determine the content artifact: a `DirectoryArtifact` has a designated content artifact (e.g. `index.xhtml`);
+		// other artifacts are their own content. This ties the deployer to the `DirectoryArtifact` implementation type;
+		// in the future `CollectionArtifact` could provide a general abstraction for finding collection content.
+		// We could alternatively look for a single subsumed artifact, but subsumption does not imply content designation.
+		final Optional<Artifact> foundContentArtifact;
+		if(artifact instanceof CollectionArtifact) {
+			if(artifact instanceof DirectoryArtifact directoryArtifact) {
+				foundContentArtifact = directoryArtifact.findContentArtifact();
+			} else { // non-directory collection — no content artifact discovery available
+				getLogger().atWarn().log("Collection artifact `{}` is not a `DirectoryArtifact`; skipping content deployment.", artifact);
+				foundContentArtifact = Optional.empty();
+			}
+		} else {
+			foundContentArtifact = Optional.of(artifact); // by default the artifact provides its own content
+		}
+		foundContentArtifact.ifPresent(throwingConsumer(contentArtifact -> { // on S3, only artifacts with content can be uploaded
+			final String s3Key = Artifact.relativizeResourceReference(rootTargetPathUri, contentArtifact).toDecodedString(); //canonical resource name—decoded form matches filesystem name
+			planResource(context, rootTargetPathUri, artifact, resourceReference, contentArtifact.getTargetPath(), s3Key);
+		}));
+		if(artifact instanceof CompositeArtifact compositeArtifact) { // recurse into non-subsumed comprised artifacts
+			final Set<Artifact> subsumedArtifacts = Set.copyOf(compositeArtifact.getSubsumedArtifacts());
 			for(final Artifact comprisedArtifact : (Iterable<Artifact>)compositeArtifact.comprisedArtifacts()::iterator) {
-				plan(context, rootTargetPathUri, comprisedArtifact);
+				if(!subsumedArtifacts.contains(comprisedArtifact)) { // a directory's content artifact is typically considered subsumed, is thus naturally skipped
+					plan(context, rootTargetPathUri, comprisedArtifact);
+				}
 			}
 		}
 	}
 
 	/// Plans deployment of a single resource.
 	/// @implSpec This version stores an S3 key and deploy object for the resource in [#getDeployObjectsByKey()].
-	/// @implSpec This implementation does not add a deploy object for a [CollectionArtifact].
 	/// @param context The context of static site generation.
 	/// @param rootTargetPathUri The URI form of the root artifact target path of the site being deployed.
-	/// @param artifact The current artifact for which deployment is being planned.
+	/// @param artifact The artifact for which deployment is being planned; provides metadata via its resource description.
 	/// @param resourceReference A URI reference to the resource, relative to the site root.
+	/// @param contentFile The filesystem path to the content file to be deployed.
+	/// @param key The S3 key at which the object (content and metadata) will be stored.
 	/// @throws IOException if there is an I/O error during site deployment planning.
 	protected void planResource(@NonNull final MummyContext context, @NonNull final URI rootTargetPathUri, @NonNull Artifact artifact,
-			@NonNull final URIPath resourceReference) throws IOException {
-		final String key = resourceReference.toString();
+			@NonNull final URIPath resourceReference, @NonNull final Path contentFile, @NonNull final String key) throws IOException {
 		getLogger().debug("Planning deployment for artifact {}, S3 key `{}`.", artifact, key);
-		if(!(artifact instanceof CollectionArtifact)) { //don't deploy an S3 object for collection artifacts (e.g. directories)
-			getDeployObjectsByKey().put(key, new S3ArtifactDeployObject(key, artifact));
-		}
+		getDeployObjectsByKey().put(key, new S3ArtifactDeployObject(key, artifact, contentFile));
 	}
 
 	/// The handle of the content fingerprint tag as a convenience, used for object metadata.

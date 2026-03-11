@@ -24,7 +24,7 @@ Implement `Flange` as a `DeployTarget` within Guise Mummy's existing deployment 
 - MetadataStrategy is a proper class (`ArtifactMetadataStrategy`) wrapping a `Map<Path, Artifact>` lookup from the in-memory plan, not sidecar I/O. Content types are stored as `MediaType` objects in the resource description (not strings).
 - Redirect extraction is factored as a static pure method for direct testing, parallel to `PlanDescriber.collectRedirect()`.
 - Synchronization monitor uses SLF4J logging (equivalent to existing `S3` deploy target reporting). `CliStatus`-based progress is deferred to a future user-feedback overhaul.
-- Deploy URL is derived from `WebSiteUrl` environment output if available.
+- Deploy URL is derived from the `WebSiteUrl` environment output via `FlangePlatformAws.Templates.Exports.WEB_SITE_URL` (transitively available from `flange-env-aws` → `flange-platform-aws`).
 
 ---
 
@@ -68,7 +68,7 @@ Add dependencies (version managed by BOM):
 </dependency>
 ```
 
-`flange-deploy-aws` transitively brings `flange-aws-s3-support` (containing `S3Synchronizer`, `MetadataStrategy`, `Metadata`), `flange-aws-def` (containing `AwsProfile`), `flange-aws-cloudfront-support`, etc. `flange-env-aws` brings `flange-env` (containing `FlangeEnvironment.Name`), `AwsFlangeEnvironment`, and `AwsFlangeEnvironmentManager`.
+`flange-deploy-aws` transitively brings `flange-aws-s3-support` (containing `S3Synchronizer`, `MetadataStrategy`, `Metadata`), `flange-aws-def` (containing `AwsProfile`), `flange-aws-cloudfront-support`, etc. `flange-env-aws` brings `flange-env` (containing `FlangeEnvironment.Name`), `AwsFlangeEnvironment`, `AwsFlangeEnvironmentManager`, and transitively `flange-platform-aws` (containing `FlangePlatformAws.Templates.Exports` with the `WEB_SITE_URL` constant).
 
 ### `cli/pom.xml`
 
@@ -90,15 +90,16 @@ static Map<URIPath, URI> collectRedirects(final Artifact rootArtifact, final URI
 
 ### Logic
 
-Walk the artifact tree recursively (same pattern as `S3.plan()`). For each artifact with a `mummy/altLocation` property:
+Walk the artifact tree recursively using `CompositeArtifact.comprisedArtifacts()` (same traversal pattern as `S3.plan()`). For each artifact with a `mummy/altLocation` property:
 
-1. Parse the value as `URIPath`.
-2. Resolve against the artifact's target path URI (applying `toCollectionURI` for `CollectionArtifact`).
-3. Relativize against the site root URI to get the site-relative alt location `URIPath`.
-4. Compute the artifact's own site-relative resource reference via `Artifact.relativizeResourceReference()`.
-5. Store as `altLocationReference → resourceReference.toURI()` in the result map.
+1. Parse the `altLocation` value as `URIPath`.
+2. Resolve against `artifact.getTargetPath().toUri()` to produce an absolute filesystem URI. No `toCollectionURI` forcing is needed here because `collectRedirects()` runs during DEPLOY, after MUMMIFY has created the target tree — `Path.toUri()` already produces trailing-slash URIs for directories. (This is the same reason `S3Website.planResource()` uses the raw target path URI — both run during DEPLOY. By contrast, `PlanDescriber.collectRedirect()` runs during PLAN when directories don't exist and must apply `toCollectionURI` explicitly. See the architecture document's "Lifecycle Phase and `toCollectionURI`" section.)
+3. Relativize against `rootTargetPathUri` to get the site-relative alt location `URIPath`.
+4. Check `isSubPath()` — skip if outside the site boundary (log a warning, don't throw).
+5. Compute the artifact's own site-relative resource reference via `Artifact.relativizeResourceReference(rootTargetPathUri, artifact)`. This method applies `toCollectionURI` defensively for `CollectionArtifact` instances — a no-op during DEPLOY since the trailing slash is already present, but it makes the API safe to call in any lifecycle phase.
+6. Store as `altLocationReference → resourceReference.toURI()` in the result map.
 
-This parallels the logic in `PlanDescriber.collectRedirect()` and `S3Website.planResource()`, adapted to produce the `Map<URIPath, URI>` that `AwsFlangeDeployer.deploySite()` expects.
+This parallels the logic in `S3Website.planResource()`, adapted to produce the `Map<URIPath, URI>` that `AwsFlangeDeployer.deploySite()` expects. Both run during DEPLOY, so the same lifecycle assumptions apply. The existing code in `S3Website` throws an `IOException` for out-of-boundary alt locations, but since the Flange deployer's `assembleSiteSettings()` performs its own validation, we log a warning and skip instead.
 
 ### Testability
 
@@ -106,12 +107,16 @@ Pure function — takes an artifact tree and a URI, returns a map. Testable with
 
 - Artifact with no `altLocation` → empty map.
 - File artifact with `altLocation` → correct site-relative key and value.
-- Collection artifact with `altLocation` → collection URI forcing applied correctly.
-- `altLocation` outside site boundary → include but log warning (Flange deployer will handle validation).
+- Collection artifact with `altLocation` → redirect target has collection form (trailing slash) via `Artifact.relativizeResourceReference()`.
+- `altLocation` outside site boundary → skipped with warning logged.
 
 ### Design note
 
-The Flange deployer's `assembleSiteSettings()` validates that redirect sources are relative and within KVS quota. We don't need to duplicate that validation. However, we should skip `altLocation` values that resolve outside the site boundary (not a sub-path of the root), logging a warning, consistent with what `PlanDescriber` does. The Flange deployer's `checkArgument(source.checkRelative())` would reject these anyway.
+The Flange deployer's `assembleSiteSettings()` validates that redirect sources are relative and within KVS quota. We don't need to duplicate that validation. We skip `altLocation` values that resolve outside the site boundary (not a sub-path of the root), logging a warning. The Flange deployer's `checkArgument(source.checkRelative())` would reject these anyway.
+
+### Note on artifact traversal
+
+The tree walk uses `CompositeArtifact.comprisedArtifacts()`, not `CollectionArtifact.getChildArtifacts()`. This is the same pattern as `S3.plan()`. The distinction matters: comprised artifacts include subsumed content artifacts (e.g., `index.html` as the content file for a directory), which can carry `altLocation` properties. The `S3.plan()` method calls `planResource()` for every artifact in the comprised tree, including content artifacts, and `S3Website.planResource()` checks each one for `altLocation`. Any discrepancies from the existing `S3` walk pattern should be noted during implementation — the Guise Mummy artifact model may be refinable in this area.
 
 ---
 
@@ -130,8 +135,8 @@ static class ArtifactMetadataStrategy implements S3Synchronizer.MetadataStrategy
 
     private final Map<Path, Artifact> artifactsByTargetPath;
 
-    ArtifactMetadataStrategy(final MummyPlan plan) {
-        this.artifactsByTargetPath = buildArtifactIndex(plan.getRootArtifact());
+    ArtifactMetadataStrategy(final Artifact rootArtifact) {
+        this.artifactsByTargetPath = buildArtifactIndex(rootArtifact);
     }
 
     @Override
@@ -143,9 +148,11 @@ static class ArtifactMetadataStrategy implements S3Synchronizer.MetadataStrategy
 }
 ```
 
+The constructor takes the `rootArtifact` directly (the same `Artifact rootArtifact` passed to `DeployTarget.deploy()`), not the `MummyPlan`.
+
 ### `buildArtifactIndex()`
 
-Static method that walks the artifact tree recursively. For each non-collection artifact, maps `artifact.getTargetPath()` → `artifact`. Returns an unmodifiable `Map<Path, Artifact>`.
+Static method that walks the artifact tree recursively via `CompositeArtifact.comprisedArtifacts()` (same traversal as `S3.plan()`). For each non-collection artifact, maps `artifact.getTargetPath()` → `artifact`. Returns an unmodifiable `Map<Path, Artifact>`.
 
 Guise Mummy guarantees that artifact target paths are real (canonical) paths, so no `toRealPath()` normalization is needed during index construction. `S3Synchronizer` canonicalizes the root directory via `toRealPath()` at entry, and `Files.list()` under that root produces canonical paths, so the paths will match.
 
@@ -172,7 +179,7 @@ The `Map` is built once and never modified. The artifact descriptions are read-o
 
 Both levels are directly unit-testable without a filesystem:
 
-- **`ArtifactMetadataStrategy`**: Construct with a `MummyPlan` containing mock artifacts with known target paths. Call `findMetadata()` with matching and non-matching paths. Verify lookup behavior.
+- **`ArtifactMetadataStrategy`**: Construct with a root `Artifact` containing mock comprised artifacts with known target paths. Call `findMetadata()` with matching and non-matching paths. Verify lookup behavior.
 - **`toMetadata()`**: Construct a mock artifact with known resource description properties. Verify the `MediaType` cast, fingerprint extraction, and `Metadata` record construction.
 
 ---
@@ -266,14 +273,12 @@ public class FlangeDeployment implements DeployTarget, Clogged {
     // configuration key for the Flange environment name (section-local)
     public static final String CONFIG_KEY_ENVIRONMENT = "environment";
 
-    private final String profile;           // from AWS.CONFIG_KEY_DEPLOY_AWS_PROFILE (global)
-    private final FlangeEnvironment.Name envName;  // from local config section
-    private final Configuration globalConfiguration;
+    private final Optional<AwsProfile> optionalAwsProfile; // from AWS.CONFIG_KEY_DEPLOY_AWS_PROFILE (global)
+    private final FlangeEnvironment.Name envName;           // from local config section
 
-    // resolved during prepare()
+    // resolved during prepare(), following the CloudFront.acmCertificateArn precedent
+    // (see DeployTarget state model in architecture.md)
     private AwsFlangeEnvironment flangeEnv;
-    private AwsFlangeEnvironmentManager envManager;
-    private AwsFlangeDeployer deployer;
 }
 ```
 
@@ -281,13 +286,14 @@ public class FlangeDeployment implements DeployTarget, Clogged {
 
 ```java
 public FlangeDeployment(final MummyContext context, final Configuration localConfiguration) {
-    this.profile = context.getConfiguration().findString(AWS.CONFIG_KEY_DEPLOY_AWS_PROFILE).orElse(null);
+    this.optionalAwsProfile = context.getConfiguration()
+            .findString(AWS.CONFIG_KEY_DEPLOY_AWS_PROFILE)
+            .map(AwsProfile::new);
     this.envName = new FlangeEnvironment.Name(localConfiguration.getString(CONFIG_KEY_ENVIRONMENT));
-    this.globalConfiguration = context.getConfiguration();
 }
 ```
 
-Reads the `environment` property from the target section and the AWS profile from the global config (same pattern as `S3`, `S3Website`, `CloudFront`).
+Reads the `environment` property from the target section and the AWS profile from the global config, mapping the profile string to `AwsProfile` from `flange-aws-def`. Configuration values are not cached — they are read from `context.getConfiguration()` at each point of use (following the established `DeployTarget` state model; see `S3Website.deploy()` for the pattern). The existing legacy deploy targets (`S3`, `S3Website`, `CloudFront`) store the profile as a raw `String`; a TODO should be added to those classes to adopt `AwsProfile` in a future pass.
 
 ### `getSupportedProtocols()`
 
@@ -296,34 +302,31 @@ Returns `Set.of("https")` — Flange environments use CloudFront with HTTPS.
 ### `prepare(MummyContext context)`
 
 1. Log the environment name and AWS profile.
-2. Create `AwsFlangeEnvironmentManager.forProfile(optionalAwsProfile)`.
-3. Resolve the environment: `envManager.resolve(envName)`. Throw `ConfigurationException` if not found.
-4. Validate the environment has site infrastructure: `findSiteBucketName()`, `findSiteDistributionId()`, `findSiteKeyValueStoreArn()` — throw if missing.
-5. Create `AwsFlangeDeployer.forProfile(optionalAwsProfile)`.
-6. Emit warnings for incompatible features:
+2. Create `AwsFlangeEnvironmentManager.forProfile(optionalAwsProfile)` within a try-with-resources.
+3. Resolve the environment: `envManager.resolve(envName)`. Throw `ConfiguredStateException` if not found — the Confound configuration is valid (the environment name string was read successfully), but the named environment doesn't exist in AWS infrastructure. This matches `AwsFlangeDeployer.deploySite()`, which throws `ConfiguredStateException` for missing environment outputs.
+4. Validate the environment has site infrastructure: `findSiteBucketName()`, `findSiteDistributionId()`, `findSiteKeyValueStoreArn()` — throw `ConfiguredStateException` if missing (same rationale: infrastructure state mismatch, not a configuration read failure).
+5. Emit warnings for incompatible features:
    - If `deploy.dns` is configured → warn that DNS management is not supported with Flange deployment.
    - If `site.altDomains` is configured → warn that alternative domain redirects are not supported with Flange deployment.
 
 ### `deploy(MummyContext context, Artifact rootArtifact)`
 
-1. Derive `collectionContentResourceName` from configuration (Step 4).
-2. Extract redirects from the artifact plan (Step 2).
-3. Create the metadata strategy: `new ArtifactMetadataStrategy(context.getPlan())`.
-4. Call `deployer.deploySite(siteTargetDirectory, redirects, collectionContentResourceName, flangeEnv, metadataStrategy, LoggingSynchronizationMonitor::new)`.
-5. Return the deploy URL: `flangeEnv.findOutput("WebSiteUrl").map(URI::create)`, or `Optional.empty()` if not available.
+1. Derive `collectionContentResourceName` from `context.getConfiguration()` (Step 4).
+2. Extract redirects from the artifact tree via `collectRedirects(rootArtifact, rootArtifact.getTargetPath().toUri())` (Step 2).
+3. Create the metadata strategy: `new ArtifactMetadataStrategy(rootArtifact)`.
+4. Get `siteTargetDirectory` from `context.getSiteTargetDirectory()`.
+5. Create `AwsFlangeDeployer.forProfile(optionalAwsProfile)` within a try-with-resources.
+6. Call `deployer.deploySite(siteTargetDirectory, redirects, collectionContentResourceName, flangeEnv, metadataStrategy, LoggingSynchronizationMonitor::new)`.
+7. Return the deploy URL: `flangeEnv.findOutput(FlangePlatformAws.Templates.Exports.WEB_SITE_URL).map(URI::create)`, or `Optional.empty()` if not available.
 
 ### `AutoCloseable` consideration
 
 `AwsFlangeDeployer` and `AwsFlangeEnvironmentManager` are `AutoCloseable`. The `FlangeDeployment` target is created in `PREPARE_DEPLOY` and used in `DEPLOY`, then the orchestrator moves on. Currently `DeployTarget` does not extend `AutoCloseable`.
 
-**Approach:** Hold the deployer and env manager as fields. Close them at the end of `deploy()` (the last method called on the target). This isn't perfect (prepare/deploy could be called in different phases with the expectation the object stays alive), but looking at the existing lifecycle in `GuiseMummy.mummify()`, `prepare()` and `deploy()` are called in immediate succession with no intervening operations.
+**Chosen approach:** Create resources locally within try-with-resources in each method. The env manager is only needed during `prepare()` and can be closed there. The deployer is only needed during `deploy()` and can be created and closed there. This keeps resource management tight and doesn't require `DeployTarget` to extend `AutoCloseable`.
 
-Alternatively, use try-with-resources within `deploy()` around the `deploySite()` call. Since we already have the resolved environment from `prepare()`, the only resources needing lifecycle management during `deploy()` are the deployer's AWS clients.
-
-**Chosen approach:** Create the deployer in `deploy()` within a try-with-resources, not as a field. The env manager is only needed during `prepare()` and can be closed there. This keeps resource management tight and doesn't require `DeployTarget` to extend `AutoCloseable`.
-
-Revised structure:
-- `prepare()`: create env manager in try-with-resources, resolve environment, close manager.
+Structure:
+- `prepare()`: create env manager in try-with-resources, resolve environment, store `flangeEnv`, close manager.
 - `deploy()`: create deployer in try-with-resources, call `deploySite()`, close deployer.
 
 ### Testing
@@ -398,7 +401,7 @@ The warning logic in `FlangeDeployment.prepare()` checks the global configuratio
 #### `collectRedirects()`
 - **No alt locations**: artifact tree with no `mummy/altLocation` properties → empty map.
 - **Single file redirect**: artifact with `altLocation = "old-name.html"` → map with correct site-relative URIPath key and URI value.
-- **Collection redirect**: directory artifact with `altLocation = "old-dir/"` → collection URI forcing applied.
+- **Collection redirect**: directory artifact with `altLocation = "old-dir/"` → redirect target has collection form (trailing slash).
 - **Alt location outside site boundary**: `altLocation` resolving outside root → skipped with no entry.
 - **Multiple redirects**: multiple artifacts with `altLocation` → all collected.
 
@@ -434,6 +437,9 @@ The warning logic in `FlangeDeployment.prepare()` checks the global configuratio
 | `mummy/pom.xml` | Add `flange-deploy-aws` and `flange-env-aws` dependencies |
 | `mummy/src/main/java/dev/guise/mummy/deploy/aws/FlangeDeployment.java` | **New** — deploy target implementation |
 | `mummy/src/main/java/dev/guise/mummy/GuiseMummy.java` | Add `"Flange"` branch in deploy target factory switch |
+| `mummy/src/main/java/dev/guise/mummy/deploy/aws/S3.java` | Add TODO to adopt `AwsProfile` from `flange-aws-def` |
+| `mummy/src/main/java/dev/guise/mummy/deploy/aws/S3Website.java` | Add TODO to adopt `AwsProfile` from `flange-aws-def` |
+| `mummy/src/main/java/dev/guise/mummy/deploy/aws/CloudFront.java` | Add TODO to adopt `AwsProfile` from `flange-aws-def` |
 | `mummy/src/test/java/dev/guise/mummy/deploy/aws/FlangeDeploymentTest.java` | **New** — unit tests |
 
 ---
