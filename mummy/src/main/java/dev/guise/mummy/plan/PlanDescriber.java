@@ -59,12 +59,24 @@ public class PlanDescriber {
 	}
 
 	/// Walks the plan's artifact tree and produces a [PlanSummary] with artifact counts and redirect entries.
-	/// @implSpec Subsumed artifacts are skipped for both counting and redirect extraction, maintaining behavioral
-	///           equivalence with the pre-walker traversal that used [CollectionArtifact#getChildArtifacts()].
+	/// @implSpec Delegates to [#summarize(ArtifactTreeWalker.Visitor)] with a no-op additional visitor.
 	/// @return An immutable summary of the plan.
 	public PlanSummary summarize() {
+		return summarize((_, _) -> {});
+	}
+
+	/// Walks the plan's artifact tree and produces a [PlanSummary], invoking an additional visitor alongside
+	/// the summarization logic via [ArtifactTreeWalker.Visitor#andThen].
+	///
+	/// @implSpec Subsumed artifacts are skipped for both counting and redirect extraction, maintaining behavioral
+	///           equivalence with the pre-walker traversal that used [CollectionArtifact#getChildArtifacts()].
+	///           The `additionalVisitor` receives every `(artifact, subsumed)` event independently — it can
+	///           decide on its own whether to skip subsumed artifacts.
+	/// @param additionalVisitor An additional visitor to invoke for each artifact alongside summarization.
+	/// @return An immutable summary of the plan.
+	public PlanSummary summarize(final ArtifactTreeWalker.Visitor additionalVisitor) {
 		final var builder = PlanSummary.builder();
-		plan.walk((artifact, subsumed) -> {
+		plan.walk(((ArtifactTreeWalker.Visitor)(artifact, subsumed) -> {
 			if(subsumed) {
 				return;
 			}
@@ -81,7 +93,7 @@ public class PlanDescriber {
 				builder.incrementPostCount();
 			}
 			findRedirect(rootTargetPathUri, artifact).ifPresent(builder::addRedirect);
-		});
+		}).andThen(additionalVisitor));
 		return builder.build();
 	}
 
@@ -106,8 +118,6 @@ public class PlanDescriber {
 		appendable.append("    %-14s%d%n".formatted("Other:", summary.otherCount()));
 		appendable.append("    %-14s%d%n".formatted("Posts:", summary.postCount()));
 		appendable.append("  %-14s%d%n".formatted("Redirects:", sortedRedirects.size()));
-		appendable.append("    %-22s%d%n".formatted("Collection Targets:", summary.redirectCollectionCount()));
-		appendable.append("    %-22s%d%n".formatted("Page Targets:", summary.redirectPageCount()));
 		if(summary.warningCount() > 0) {
 			appendable.append("    %-22s%d [!]%n".formatted("Warnings:", summary.warningCount()));
 		}
@@ -116,8 +126,7 @@ public class PlanDescriber {
 			appendable.append("  Redirect Details:%n".formatted());
 			for(final RedirectEntry redirect : sortedRedirects) {
 				final String warningMarker = redirect.optionalWarning().map(w -> " " + w.marker()).orElse("");
-				appendable.append(
-						"    %s -> %s%s%n".formatted(redirect.altLocationReference().toDecodedString(), redirect.resourceReference().toDecodedString(), warningMarker));
+				appendable.append("    %s -> %s%s%n".formatted(redirect.sourcePath().toString(), redirect.targetUri().toASCIIString(), warningMarker));
 			}
 		}
 		//## legend
@@ -156,7 +165,7 @@ public class PlanDescriber {
 				}).map(altLocationUri -> URIPath.relativize(rootTargetPathUri, altLocationUri)).map(altLocationReference -> {
 					final URIPath targetReference = Artifact.relativizeResourceReference(rootTargetPathUri, artifact);
 					final Optional<PlanWarning> optionalWarning = altLocationReference.isSubPath() ? Optional.empty() : Optional.of(PlanWarning.REDIRECT_OUTSIDE_SITE);
-					return new RedirectEntry(altLocationReference, targetReference, artifact instanceof CollectionArtifact, optionalWarning);
+					return RedirectEntry.of(altLocationReference, targetReference, optionalWarning);
 				});
 	}
 

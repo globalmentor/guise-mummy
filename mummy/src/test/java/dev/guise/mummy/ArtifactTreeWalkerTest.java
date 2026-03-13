@@ -160,4 +160,28 @@ public class ArtifactTreeWalkerTest {
 		assertThat("both aspects visited", visits.stream().skip(1).map(VisitRecord::artifact).toList(), containsInAnyOrder(aspectA, aspectB));
 	}
 
+	/// Tests that [ArtifactTreeWalker.Visitor#andThen(ArtifactTreeWalker.Visitor)] composes two visitors so both
+	/// receive every event, even if the first visitor short-circuits for subsumed artifacts.
+	@Test
+	void testVisitorAndThenComposesBothVisitors() {
+		final Mummifier mummifier = mock(Mummifier.class);
+		final Artifact content = new DummyArtifact(mummifier, SOURCE_DIRECTORY.resolve("index.html"), TARGET_DIRECTORY.resolve("index.html"));
+		final Artifact child = new DummyArtifact(mummifier, SOURCE_DIRECTORY.resolve("page.html"), TARGET_DIRECTORY.resolve("page.html"));
+		final DirectoryArtifact root = new DirectoryArtifact(mummifier, SOURCE_DIRECTORY, TARGET_DIRECTORY, content, Set.of(child));
+		final List<VisitRecord> firstVisits = new ArrayList<>();
+		final List<VisitRecord> secondVisits = new ArrayList<>();
+		final ArtifactTreeWalker.Visitor first = (artifact, subsumed) -> {
+			if(subsumed) {
+				return;
+			} // short-circuits for subsumed
+			firstVisits.add(new VisitRecord(artifact, subsumed));
+		};
+		final ArtifactTreeWalker.Visitor second = (artifact, subsumed) -> secondVisits.add(new VisitRecord(artifact, subsumed));
+		ArtifactTreeWalker.walk(root, first.andThen(second));
+		assertThat("first visitor skips subsumed content artifact", firstVisits, hasSize(2));
+		assertThat("second visitor receives all events including subsumed", secondVisits, hasSize(3));
+		assertThat("second visitor sees subsumed content artifact", secondVisits.stream().filter(VisitRecord::subsumed).map(VisitRecord::artifact).toList(),
+				contains(content));
+	}
+
 }

@@ -86,7 +86,7 @@ public class PlanDescriberTest {
 		assertThat("post count", summary.postCount(), is(1L));
 		assertThat("total is sum of categories", summary.totalCount(), is(6L));
 		assertThat("one redirect collected", summary.sortedRedirects(), hasSize(1));
-		assertThat("redirect alt location", summary.sortedRedirects().getFirst().altLocationReference().toString(), is("old-page.html"));
+		assertThat("redirect source path", summary.sortedRedirects().getFirst().sourcePath().toString(), is("old-page.html"));
 	}
 
 	/// Tests that [PlanDescriber#summarize()] skips subsumed content artifacts.
@@ -106,6 +106,23 @@ public class PlanDescriberTest {
 		assertThat("total excludes subsumed content artifact", summary.totalCount(), is(2L));
 	}
 
+	/// Tests that [PlanDescriber#summarize(ArtifactTreeWalker.Visitor)] invokes the additional visitor alongside
+	/// summarization, and that each visitor independently controls its subsumed-artifact handling.
+	@Test
+	void testSummarizeWithAdditionalVisitor() {
+		final Mummifier directoryMummifier = mock(Mummifier.class);
+		final PageMummifier pageMummifier = mock(PageMummifier.class);
+		final Artifact contentArtifact = new DummyArtifact(pageMummifier, SOURCE_DIRECTORY.resolve("index.html"), TARGET_DIRECTORY.resolve("index.html"));
+		final Artifact childPage = new DummyArtifact(pageMummifier, SOURCE_DIRECTORY.resolve("about.html"), TARGET_DIRECTORY.resolve("about.html"));
+		final DirectoryArtifact root = new DirectoryArtifact(directoryMummifier, SOURCE_DIRECTORY, TARGET_DIRECTORY, contentArtifact, Set.of(childPage));
+		final MummyPlan plan = new DefaultMummyPlan(root);
+		final List<Artifact> additionalVisited = new ArrayList<>();
+		final PlanSummary summary = planDescriber(plan).summarize((artifact, _) -> additionalVisited.add(artifact));
+		assertThat("summary counts exclude subsumed", summary.totalCount(), is(2L));
+		assertThat("additional visitor receives all artifacts including subsumed", additionalVisited, hasSize(3));
+		assertThat("additional visitor sees the subsumed content artifact", additionalVisited, hasItem(contentArtifact));
+	}
+
 	//## `writeTo()`
 
 	/// Tests that [PlanDescriber#writeTo] formats a pre-constructed [PlanSummary] correctly,
@@ -115,7 +132,7 @@ public class PlanDescriberTest {
 		final Mummifier mummifier = mock(Mummifier.class);
 		final DirectoryArtifact root = new DirectoryArtifact(mummifier, SOURCE_DIRECTORY, TARGET_DIRECTORY, null, Set.of());
 		final MummyPlan plan = new DefaultMummyPlan(root);
-		final var redirect = new RedirectEntry(URIPath.of("old.html"), URIPath.of("new.html"), false, Optional.of(PlanWarning.REDIRECT_OUTSIDE_SITE));
+		final var redirect = new RedirectEntry(URIPath.of("old.html"), URI.create("new.html"), Optional.of(PlanWarning.REDIRECT_OUTSIDE_SITE));
 		final PlanSummary summary = new PlanSummary(5, 2, 3, 1, 1, List.of(redirect));
 		final StringBuilder output = new StringBuilder();
 		planDescriber(plan).writeTo(output, SOURCE_DIRECTORY, summary, true);
@@ -230,8 +247,6 @@ public class PlanDescriberTest {
 		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, false);
 		final String result = output.toString();
 		assertThat("redirect count", result, containsString("Redirects:    1"));
-		assertThat("page redirect count", result, containsString("Page Targets:         1"));
-		assertThat("collection redirect count", result, containsString("Collection Targets:   0"));
 	}
 
 	/// Tests that collection (directory) redirects are counted correctly.
@@ -252,8 +267,6 @@ public class PlanDescriberTest {
 		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, false);
 		final String result = output.toString();
 		assertThat("redirect count", result, containsString("Redirects:    1"));
-		assertThat("collection redirect count", result, containsString("Collection Targets:   1"));
-		assertThat("page redirect count", result, containsString("Page Targets:         0"));
 	}
 
 	//## verbose output
@@ -277,10 +290,11 @@ public class PlanDescriberTest {
 		assertThat("verbose output includes redirect mapping with -> arrow", result, containsString("    old-page.html -> new-page.html" + NL));
 	}
 
-	/// Tests that verbose output decodes percent-encoded paths at three UTF-8 encoding boundaries:
+	/// Tests that verbose output shows percent-encoded paths in their raw encoded form (not decoded).
+	/// Covers three UTF-8 encoding boundaries:
 	/// 2-byte (`café.html`), 3-byte (`日記.html`, Japanese for "diary"), and 4-byte (`𝄞.html`, musical G clef U+1D11E).
 	@Test
-	void testDescribeToVerboseDecodesNonAsciiPaths() throws IOException {
+	void testDescribeToVerboseShowsEncodedNonAsciiPaths() throws IOException {
 		final Mummifier directoryMummifier = mock(Mummifier.class);
 		final PageMummifier pageMummifier = mock(PageMummifier.class);
 		final UrfObject desc2byte = new UrfObject();
@@ -288,7 +302,7 @@ public class PlanDescriberTest {
 		final Artifact page2byte = new DummyArtifact(pageMummifier, SOURCE_DIRECTORY.resolve("new-café.html"), TARGET_DIRECTORY.resolve("new-café.html"),
 				desc2byte);
 		final UrfObject desc3byte = new UrfObject();
-		desc3byte.setPropertyValue(PROPERTY_TAG_MUMMY_ALT_LOCATION, "%E6%97%A5%E8%A8%98.html"); // 日記.html
+		desc3byte.setPropertyValue(PROPERTY_TAG_MUMMY_ALT_LOCATION, "%E6%97%A5%E8%A8%98.html"); // 日記.html (Japanese for "diary")
 		final Artifact page3byte = new DummyArtifact(pageMummifier, SOURCE_DIRECTORY.resolve("新日記.html"), TARGET_DIRECTORY.resolve("新日記.html"), desc3byte);
 		final UrfObject desc4byte = new UrfObject();
 		desc4byte.setPropertyValue(PROPERTY_TAG_MUMMY_ALT_LOCATION, "%F0%9D%84%9E.html"); // 𝄞.html (U+1D11E, musical G clef)
@@ -299,9 +313,9 @@ public class PlanDescriberTest {
 		final StringBuilder output = new StringBuilder();
 		planDescriber(plan).describeTo(output, SOURCE_DIRECTORY, true);
 		final String result = output.toString();
-		assertThat("2-byte UTF-8 decoded (Latin accented)", result, containsString("    caf\u00e9.html -> new-caf\u00e9.html" + NL));
-		assertThat("3-byte UTF-8 decoded (CJK)", result, containsString("    \u65e5\u8a18.html -> \u65b0\u65e5\u8a18.html" + NL));
-		assertThat("4-byte UTF-8 decoded (supplementary, outside BMP)", result, containsString("    \ud834\udd1e.html -> new-\ud834\udd1e.html" + NL));
+		assertThat("2-byte UTF-8 encoded (Latin accented)", result, containsString("    caf%C3%A9.html -> new-caf%C3%A9.html" + NL));
+		assertThat("3-byte UTF-8 encoded (CJK)", result, containsString("    %E6%97%A5%E8%A8%98.html -> %E6%96%B0%E6%97%A5%E8%A8%98.html" + NL));
+		assertThat("4-byte UTF-8 encoded (supplementary, outside BMP)", result, containsString("    %F0%9D%84%9E.html -> new-%F0%9D%84%9E.html" + NL));
 	}
 
 	/// Tests that verbose output omits redirect details when there are no redirects.
@@ -386,9 +400,8 @@ public class PlanDescriberTest {
 		final Optional<RedirectEntry> foundRedirect = PlanDescriber.findRedirect(ROOT_TARGET_PATH_URI, page);
 		assertThat("redirect found", foundRedirect, isPresentAnd(notNullValue()));
 		final var entry = foundRedirect.orElseThrow();
-		assertThat("alt location reference", entry.altLocationReference().toString(), is("old-page.html"));
-		assertThat("resource reference", entry.resourceReference().toString(), is("new-page.html"));
-		assertThat("not a collection redirect", entry.collection(), is(false));
+		assertThat("source path", entry.sourcePath().toString(), is("old-page.html"));
+		assertThat("target URI", entry.targetUri().toString(), is("new-page.html"));
 		assertThat("in-site redirect has no warning", entry.optionalWarning(), is(Optional.empty()));
 	}
 
@@ -407,9 +420,8 @@ public class PlanDescriberTest {
 		final Optional<RedirectEntry> foundRedirect = PlanDescriber.findRedirect(ROOT_TARGET_PATH_URI, dirWithRedirect);
 		assertThat("redirect found", foundRedirect, isPresentAnd(notNullValue()));
 		final var entry = foundRedirect.orElseThrow();
-		assertThat("alt location reference for collection", entry.altLocationReference().toString(), is("old-section"));
-		assertThat("resource reference has trailing slash", entry.resourceReference().toString(), is("new-section/"));
-		assertThat("is a collection redirect", entry.collection(), is(true));
+		assertThat("source path for collection", entry.sourcePath().toString(), is("old-section"));
+		assertThat("target URI has trailing slash", entry.targetUri().toString(), is("new-section/"));
 		assertThat("in-site redirect has no warning", entry.optionalWarning(), is(Optional.empty()));
 	}
 
@@ -439,10 +451,10 @@ public class PlanDescriberTest {
 	/// Tests that [PlanSummary.RedirectEntry] sorts flat by decoded source path, case-insensitive.
 	@Test
 	void testRedirectEntrySorting() {
-		final var collectionB = new RedirectEntry(URIPath.of("beta/"), URIPath.of("new-beta/"), true, Optional.empty());
-		final var collectionA = new RedirectEntry(URIPath.of("alpha/"), URIPath.of("new-alpha/"), true, Optional.empty());
-		final var pageB = new RedirectEntry(URIPath.of("b-page.html"), URIPath.of("new-b.html"), false, Optional.empty());
-		final var pageA = new RedirectEntry(URIPath.of("a-page.html"), URIPath.of("new-a.html"), false, Optional.empty());
+		final var collectionB = new RedirectEntry(URIPath.of("beta/"), URI.create("new-beta/"), Optional.empty());
+		final var collectionA = new RedirectEntry(URIPath.of("alpha/"), URI.create("new-alpha/"), Optional.empty());
+		final var pageB = new RedirectEntry(URIPath.of("b-page.html"), URI.create("new-b.html"), Optional.empty());
+		final var pageA = new RedirectEntry(URIPath.of("a-page.html"), URI.create("new-a.html"), Optional.empty());
 		final var sorted = new ArrayList<>(List.of(pageB, collectionB, pageA, collectionA));
 		Collections.sort(sorted);
 		assertThat("sorted flat by decoded source path, case-insensitive", sorted, contains(pageA, collectionA, pageB, collectionB));

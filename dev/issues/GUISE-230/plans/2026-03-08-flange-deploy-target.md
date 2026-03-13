@@ -4,6 +4,13 @@ Implement `FlangeWebSite` as a `DeployTarget` within Guise Mummy's existing depl
 
 ## Overview
 
+**Chunk 0: Prerequisite** (prepares existing code for reuse by the deploy target)
+
+- Step 0a: Add `Visitor.andThen()` to `ArtifactTreeWalker.Visitor`
+- Step 0b: Refactor `PlanSummary.RedirectEntry` — rename fields to `sourcePath`/`targetUri`, change target type to `URI`, drop `collection` flag, add factory method
+- Step 0c: Update `PlanSummary` — drop `redirectCollectionCount()`/`redirectPageCount()`
+- Step 0d: Update `PlanDescriber` — add `summarize(Visitor)` overload, update `findRedirect()` to produce `URI` target, update `writeTo()` display
+
 **Chunk 1: Foundation** (independent — compiles and tests in isolation)
 
 - Step 1: Add Flange Maven dependencies to BOM and `mummy` module
@@ -21,14 +28,139 @@ Implement `FlangeWebSite` as a `DeployTarget` within Guise Mummy's existing depl
 **Notable decisions:**
 
 - `FlangeWebSite` is a standard `DeployTarget`, configured as `* FlangeWebSite:` in `deploy.targets`. The name follows the Flange convention of "WebSite" (two words), consistent with `FlangePlatformAws.Templates.Exports.WEB_SITE_URL`. Coexists naturally with legacy targets — no special-case orchestration.
-- The artifact tree analysis is reified as a `FlangeWebSite.Manifest` record — a single tree walk producing both the redirect map and the artifact index. This eliminates the duplication of separate `collectRedirects()` and `buildArtifactIndex()` methods, provides a named concept for the aggregate ("what does the deployer need from this artifact tree?"), and shifts the test surface to the manifest composition rather than individual extractions. Parallels `PlanDescriber.describeTo()`, which also performs one walk with multiple accumulators.
+- **Redirect reuse via `PlanDescriber`.** Instead of `Manifest` performing its own tree walk for redirect extraction, the deploy target reuses `PlanDescriber.summarize(Visitor)`, piggybacking on the same walk that produces `PlanSummary`. The `Visitor.andThen()` composition (added to `ArtifactTreeWalker.Visitor`) lets the deploy target's visitor run alongside the summarizer without modifying `PlanDescriber`'s internal logic. The `Manifest` receives the `PlanSummary` at build time and extracts the `Map<URIPath, URI>` redirect map from it (filtering out warning entries), alongside the artifact content path index collected by the piggybacked visitor. This eliminates redundant tree walks and keeps redirect extraction logic in one place (`PlanDescriber.findRedirect()`).
+- **`RedirectEntry` aligned with HTTP redirect semantics.** Renamed from `altLocationReference`/`resourceReference` (Guise Mummy implementation terms) to `sourcePath`/`targetUri` (matching Flange's "source → target" vocabulary). The target type is `URI` rather than `URIPath`, supporting future redirect targets outside the site (e.g. `https://example.com/new-page`). The `collection` flag is dropped — collection-ness is inherent in the target URI path's trailing slash when relevant, and the redirect sub-categorization ("Collection Targets" / "Page Targets") is removed from the plan display as it was misleading and not actionable.
 - `ArtifactMetadataStrategy` receives the pre-built `Map<Path, Artifact>` from the manifest rather than the root artifact — it no longer performs its own tree traversal.
 - Content types are stored as `MediaType` objects in the resource description (not strings). MetadataStrategy is a proper class, not a factory-returning-lambda.
 - Synchronization monitor uses SLF4J logging (equivalent to existing `S3` deploy target reporting). `CliStatus`-based progress is deferred to a future user-feedback overhaul.
 - Deploy URL is derived from the `WebSiteUrl` environment output via `FlangePlatformAws.Templates.Exports.WEB_SITE_URL` (transitively available from `flange-env-aws` → `flange-platform-aws`).
-- The artifact tree walk uses the "comprised − subsumed" pattern per the refactored `S3.plan()`, not the old full `comprisedArtifacts()` walk. This was informed by the double-redirect bug fix (`plans/2026-03-10-s3-collection-artifact-semantics.md`) and the architecture refinements around `DirectoryArtifact.findContentArtifact()`. Content-finding uses `DirectoryArtifact.findContentArtifact()`, not `CollectionArtifact.getSubsumedArtifacts()` — subsumption does not imply content designation.
-- `deploy()` is structured as two explicit subphases: **analyze** (walk the artifact tree, produce a `Manifest`) and **apply** (delegate to `AwsFlangeDeployer.deploySite()`). This aligns with a common deployment pattern observed across all deploy targets: `S3` has `plan()` (analyze) → `put()` + `prune()` (apply); `S3Website` extends both; `CloudFront` and `Route53` follow the same shape implicitly. TODO: converge existing deploy targets toward a common analyze/apply subphase vocabulary.
-- See also `artifact-tree-walking.md` for an analysis of all current tree walks and potential future unification.
+- The artifact tree walk uses `ArtifactTreeWalker` (via `MummyPlan.walk()`), which visits all comprised artifacts including subsumed ones, passing the subsumption status to the visitor. This was informed by the double-redirect bug fix (`plans/2026-03-10-s3-collection-artifact-semantics.md`) and the architecture refinements around `DirectoryArtifact.findContentArtifact()`. Content-finding uses `DirectoryArtifact.findContentArtifact()`, not `CollectionArtifact.getSubsumedArtifacts()` — subsumption does not imply content designation.
+- `deploy()` is structured as two explicit subphases: **analyze** (walk the artifact tree via `PlanDescriber`, produce a `Manifest`) and **apply** (delegate to `AwsFlangeDeployer.deploySite()`). This aligns with a common deployment pattern observed across all deploy targets: `S3` has `plan()` (analyze) → `put()` + `prune()` (apply); `S3Website` extends both; `CloudFront` and `Route53` follow the same shape implicitly. TODO: converge existing deploy targets toward a common analyze/apply subphase vocabulary.
+- **Redirect display.** In `PlanDescriber.writeTo()`, redirect source paths are shown via `toString()` (the raw/encoded form) and redirect targets via `URI.toASCIIString()` (ensuring fully encoded form). This is consistent regardless of whether the target is a site-relative path or a future full URL.
+
+---
+
+## Step 0a: Add `Visitor.andThen()` to `ArtifactTreeWalker.Visitor`
+
+### Location
+
+`mummy/src/main/java/dev/guise/mummy/ArtifactTreeWalker.java`, inside the `Visitor` interface.
+
+### Change
+
+Add a default method for functional composition, following `Consumer.andThen()`:
+
+```java
+default Visitor andThen(final Visitor after) {
+    return (artifact, subsumed) -> {
+        this.visit(artifact, subsumed);
+        after.visit(artifact, subsumed);
+    };
+}
+```
+
+Each visitor receives the raw `(artifact, subsumed)` event independently. If the primary visitor short-circuits (e.g. `if(subsumed) { return; }`), that only exits its own lambda — the `after` visitor still receives the event.
+
+---
+
+## Step 0b: Refactor `PlanSummary.RedirectEntry`
+
+### Location
+
+`mummy/src/main/java/dev/guise/mummy/plan/PlanSummary.java`, the `RedirectEntry` nested record.
+
+### Changes
+
+1. **Rename fields** to align with HTTP redirect semantics and Flange's vocabulary:
+   - `altLocationReference` → `sourcePath` (the site-relative path that triggers the redirect)
+   - `resourceReference` → `targetUri` (the redirect destination)
+
+2. **Change target type** from `URIPath` to `URI`, supporting future redirect targets that may be full URLs.
+
+3. **Drop `collection` flag.** Collection-ness is inherent in the target URI path when relevant. The redirect sub-categorization in plan display is removed.
+
+4. **Add factory method** for convenient construction from a `URIPath` destination:
+
+   ```java
+   public static RedirectEntry of(final URIPath sourcePath, final URIPath targetReference,
+           final Optional<PlanWarning> optionalWarning) {
+       return new RedirectEntry(sourcePath, targetReference.toURI(), optionalWarning);
+   }
+   ```
+
+5. **Update `compareTo()`** — same logic (case-insensitive on decoded source path), but references `sourcePath` instead of `altLocationReference`.
+
+### Resulting record
+
+```java
+public record RedirectEntry(URIPath sourcePath, URI targetUri,
+        Optional<PlanWarning> optionalWarning) implements Comparable<RedirectEntry> {
+    public RedirectEntry {
+        requireNonNull(sourcePath);
+        requireNonNull(targetUri);
+        requireNonNull(optionalWarning);
+    }
+    public static RedirectEntry of(final URIPath sourcePath, final URIPath targetReference,
+            final Optional<PlanWarning> optionalWarning) {
+        return new RedirectEntry(sourcePath, targetReference.toURI(), optionalWarning);
+    }
+    @Override
+    public int compareTo(@NonNull final RedirectEntry other) {
+        return String.CASE_INSENSITIVE_ORDER.compare(
+                this.sourcePath.toDecodedString(),
+                other.sourcePath.toDecodedString());
+    }
+}
+```
+
+---
+
+## Step 0c: Update `PlanSummary`
+
+### Location
+
+`mummy/src/main/java/dev/guise/mummy/plan/PlanSummary.java`.
+
+### Changes
+
+1. **Remove `redirectCollectionCount()` and `redirectPageCount()`.** The redirect sub-categorization is dropped.
+2. The `sortedRedirects` field, `warningCount()`, `Builder`, and `PlanWarning` remain unchanged.
+
+---
+
+## Step 0d: Update `PlanDescriber`
+
+### Location
+
+`mummy/src/main/java/dev/guise/mummy/plan/PlanDescriber.java`.
+
+### Changes
+
+1. **Add `summarize(Visitor)` overload:**
+
+   ```java
+   public PlanSummary summarize(final ArtifactTreeWalker.Visitor additionalVisitor) {
+       final var builder = PlanSummary.builder();
+       plan.walk(((ArtifactTreeWalker.Visitor) (artifact, subsumed) -> {
+           // ... existing summarization logic, unchanged
+       }).andThen(additionalVisitor));
+       return builder.build();
+   }
+   ```
+
+   The existing no-arg `summarize()` delegates: `return summarize((artifact, subsumed) -> { });`.
+
+2. **Update `findRedirect()`** to produce a `URI` target:
+
+   ```java
+   return RedirectEntry.of(altLocationReference, targetReference, optionalWarning);
+   ```
+
+   The `artifact instanceof CollectionArtifact` argument is removed (no more `collection` flag).
+
+3. **Update `writeTo()`:**
+   - Remove the "Collection Targets:" and "Page Targets:" lines.
+   - Update the verbose redirect detail line to use `redirect.sourcePath().toString()` and `redirect.targetUri().toASCIIString()`.
 
 ---
 
@@ -88,50 +220,64 @@ Package-private static nested record inside `FlangeWebSite` (new class in `dev.g
 
 ### Design
 
-The manifest reifies the artifact tree analysis as a single, immutable record — encapsulating everything the deployer needs from the artifact tree in one traversal:
+The manifest reifies the deploy target's artifact tree analysis — encapsulating everything the deployer needs from the artifact tree:
 
 ```java
 record Manifest(Map<URIPath, URI> redirects, Map<Path, Artifact> artifactsByContentPath) {
-    static Manifest of(final Artifact rootArtifact, final URI rootTargetPathUri) { ... }
 }
 ```
 
-`Manifest.of()` performs **one** walk of the artifact tree using the "comprised − subsumed" pattern, populating both maps simultaneously. This replaces the previously separate `collectRedirects()` and `buildArtifactIndex()` methods.
+The manifest does **not** perform its own tree walk. Instead, it is assembled by the deploy target's analyze phase (Step 6), which reuses `PlanDescriber.summarize(Visitor)` to piggyback a manifest-building visitor alongside the `PlanSummary` accumulation. After the walk completes:
 
-### Walk algorithm
+1. The `PlanSummary` is received from `PlanDescriber.summarize()`.
+2. The redirect map (`Map<URIPath, URI>`) is extracted from the `PlanSummary`'s `sortedRedirects`, filtering out entries with warnings (out-of-site-boundary redirects) and mapping `RedirectEntry.sourcePath()` → `RedirectEntry.targetUri()`.
+3. The artifact content path index (`Map<Path, Artifact>`) is built by the piggybacked visitor during the walk.
+4. Both maps are passed to the `Manifest` constructor.
 
-Walk the artifact tree recursively, visiting only non-subsumed comprised artifacts (same walk as the refactored `S3.plan()`; see architecture.md § "Choosing the Correct Walk"). For each artifact:
+### Builder
 
-**Redirect extraction** — If the artifact has a `mummy/altLocation` property (accessed via the artifact's `UrfResourceDescription`):
+A `Manifest.Builder` accumulates the artifact index entries during the walk:
 
-1. Parse the `altLocation` value as `URIPath`.
-2. Resolve against `artifact.getTargetPath().toUri()` to produce an absolute filesystem URI. No `toCollectionURI` forcing is needed here because `Manifest.of()` runs during DEPLOY, after MUMMIFY has created the target tree — `Path.toUri()` already produces trailing-slash URIs for directories. (See the architecture document's "Lifecycle Phase and `toCollectionURI`" section.)
-3. Relativize against `rootTargetPathUri` to get the site-relative alt location `URIPath`.
-4. Check `isSubPath()` — skip if outside the site boundary (log a warning, don't throw).
-5. Compute the artifact's own site-relative resource reference via `Artifact.relativizeResourceReference(rootTargetPathUri, artifact)`. This method applies `toCollectionURI` defensively for `CollectionArtifact` instances — a no-op during DEPLOY since the trailing slash is already present, but it makes the API safe to call in any lifecycle phase.
-6. Store as `altLocationReference → resourceReference.toURI()` in the redirects map.
+```java
+static final class Builder {
+    private final Map<Path, Artifact> artifactsByContentPath = new HashMap<>();
 
-**Artifact index** — For each non-collection artifact, map `artifact.getTargetPath()` → `artifact`. For a `DirectoryArtifact`, map the content artifact's target path (via `DirectoryArtifact.findContentArtifact()`) → the directory artifact itself — because the artifact provides the metadata (via description delegation) while the content artifact provides the storage path. For a non-directory `CollectionArtifact` (if one ever appears), no entry is created — same as the `S3.plan()` behavior. An empty `DirectoryArtifact` (no content artifact) produces no index entry.
+    void addArtifact(final Path contentPath, final Artifact artifact) {
+        artifactsByContentPath.put(requireNonNull(contentPath), requireNonNull(artifact));
+    }
 
-If the artifact is a `CompositeArtifact`, recurse into its non-subsumed comprised artifacts.
+    Manifest build(final PlanSummary summary) {
+        final Map<URIPath, URI> redirects = summary.sortedRedirects().stream()
+                .filter(entry -> entry.optionalWarning().isEmpty())
+                .collect(toUnmodifiableMap(RedirectEntry::sourcePath, RedirectEntry::targetUri));
+        return new Manifest(redirects, Map.copyOf(artifactsByContentPath));
+    }
+}
+```
+
+### Artifact index construction (piggybacked visitor logic)
+
+The visitor passed to `PlanDescriber.summarize(Visitor)` collects the artifact content path index. For each artifact visited:
+
+- **Subsumed artifacts** are skipped (the visitor independently checks the `subsumed` flag).
+- The type dispatch follows `S3.plan()`'s collection-first pattern — check `CollectionArtifact` first, then narrow to `DirectoryArtifact` inside that branch:
+  - **`CollectionArtifact`** → **`DirectoryArtifact`**: map the content artifact's target path (via `DirectoryArtifact.findContentArtifact()`) → the directory artifact itself — because the artifact provides the metadata (via description delegation) while the content artifact provides the storage path. An empty `DirectoryArtifact` (no content artifact) produces no index entry.
+  - **`CollectionArtifact`** → other: log a warning and produce no index entry (same as `S3.plan()`).
+  - **else** (non-collection artifact): map `artifact.getTargetPath()` → `artifact`.
 
 ### Double-redirect avoidance
 
-Because the walk skips subsumed artifacts (e.g. a directory's `index.xhtml`), each `altLocation` is processed exactly once — at the collection artifact level, where `Artifact.relativizeResourceReference()` produces the canonical collection reference (e.g. `foo/`). This avoids the double-redirect bug that was fixed in `S3.plan()` (see `plans/2026-03-10-s3-collection-artifact-semantics.md` § Bug Description): if the walk visited subsumed content artifacts, their `altLocation` (inherited via `DirectoryArtifact` description delegation) would produce a redirect to the content path (e.g. `foo/index`) instead of the canonical collection path.
+Because the walker visits subsumed artifacts with `subsumed=true` and both the `PlanDescriber` visitor and the manifest visitor skip them, each `altLocation` is processed exactly once — at the collection artifact level, where `Artifact.relativizeResourceReference()` produces the canonical collection reference (e.g. `foo/`). This avoids the double-redirect bug fixed in `S3.plan()` (see `plans/2026-03-10-s3-collection-artifact-semantics.md`).
 
 ### Path matching
 
 Guise Mummy guarantees that artifact target paths are real (canonical) paths, so no `toRealPath()` normalization is needed during index construction. `S3Synchronizer` canonicalizes the root directory via `toRealPath()` at entry, and `Files.list()` under that root produces canonical paths, so the paths will match.
 
-### Redirect validation
-
-The Flange deployer's `assembleSiteSettings()` validates that redirect sources are relative and within KVS quota. We don't need to duplicate that validation. We skip `altLocation` values that resolve outside the site boundary (not a sub-path of the root), logging a warning. The Flange deployer's `checkArgument(source.checkRelative())` would reject these anyway.
-
-This parallels the logic in `S3Website.planResource()`, adapted to produce the `Map<URIPath, URI>` that `AwsFlangeDeployer.deploySite()` expects. Both run during DEPLOY, so the same lifecycle assumptions apply. The existing code in `S3Website` throws an `IOException` for out-of-boundary alt locations, but since the Flange deployer's `assembleSiteSettings()` performs its own validation, we log a warning and skip instead.
-
 ### Testability
 
-Pure function — takes an artifact tree and a URI, returns a record with two maps. Testable with mock artifacts. The walk is structural, but the per-artifact logic (URI manipulation for redirects, path mapping for the index) is the interesting part. Test cases are consolidated in Step 8.
+The manifest construction is testable through two surfaces:
+1. The piggybacked visitor logic — directly testable by calling `PlanDescriber.summarize(visitor)` with mock artifacts and inspecting the builder's accumulated state.
+2. `Builder.build(PlanSummary)` — testable with a pre-built `PlanSummary` to verify redirect extraction and filtering.
 
 ---
 
@@ -172,7 +318,7 @@ static S3Synchronizer.Metadata toMetadata(
     final Artifact artifact, final SequencedSet<Algorithm> preferredHashAlgorithms)
 ```
 
-1. Read `Content.TYPE_PROPERTY_TAG` from the artifact's resource description. The value is stored as a `MediaType` object (not a string); cast via `asInstance(MediaType.class)`.
+1. Read `Content.TYPE_PROPERTY_TAG` from the artifact's resource description via `asInstance(MediaType.class)`. (Verified: all mummifiers store the value as a `MediaType` object — `AbstractFileMummifier`, `DirectoryMummifier`, `DefaultImageMummifier` all confirm this.)
 2. Read `Content.FINGERPRINT_PROPERTY_TAG` → if present, wrap as `Hash.of(bytes)` keyed by `MessageDigests.SHA_256` (same algorithm as `Mummifier.FINGERPRINT_ALGORITHM`).
 3. Return `new S3Synchronizer.Metadata(optionalContentType, checksumMap)`.
 
@@ -180,7 +326,7 @@ Pure function — no I/O, no filesystem access.
 
 ### Thread safety
 
-The `Map` is built once (in `Manifest.of()`) and never modified. The artifact descriptions are read-only at this point in the lifecycle. `MetadataStrategy` implementations must be thread-safe per the interface contract; this implementation satisfies that.
+The `Map` is built once (in `Manifest.Builder.build()`) and never modified. The artifact descriptions are read-only at this point in the lifecycle. `MetadataStrategy` implementations must be thread-safe per the interface contract; this implementation satisfies that.
 
 ---
 
@@ -316,8 +462,11 @@ Structured as two subphases — **analyze** and **apply** — following the comm
 **Analyze:**
 
 1. Derive `collectionContentResourceName` from `context.getConfiguration()` (Step 4).
-2. Build the manifest: `analyzeArtifacts(rootArtifact, rootArtifact.getTargetPath().toUri())` (Step 2).
-3. Create the metadata strategy: `new ArtifactMetadataStrategy(manifest.artifactsByContentPath())` (Step 3).
+2. Create a `PlanDescriber` with the plan from `context.getPlan()` and `toCollectionURI(rootArtifact.getTargetPath().toUri())`.
+3. Create a `Manifest.Builder`.
+4. Call `planDescriber.summarize(manifestVisitor)` — the manifest visitor (a lambda that populates the `Manifest.Builder` with artifact content path entries per Step 2) runs alongside `PlanDescriber`'s summarization logic via `Visitor.andThen()`.
+5. Build the manifest: `manifestBuilder.build(planSummary)` — this extracts `Map<URIPath, URI>` redirects from the `PlanSummary` (filtering out warning entries) and combines them with the accumulated artifact index.
+6. Create the metadata strategy: `new ArtifactMetadataStrategy(manifest.artifactsByContentPath())` (Step 3).
 
 **Apply:**
 
@@ -408,19 +557,19 @@ The warning logic in `FlangeWebSite.prepare()` checks the global configuration f
 
 ### Tests
 
-#### `Manifest.of()` (primary test surface)
+#### Manifest construction (via `PlanDescriber.summarize(Visitor)` + `Manifest.Builder`)
 
-The manifest is the single point of artifact tree analysis. Testing the manifest tests both redirect extraction and artifact indexing as a composition.
+The manifest is assembled by piggybacking on `PlanDescriber.summarize()`. Testing verifies the visitor accumulation and the builder's extraction from `PlanSummary`.
 
-**Redirect behavior:**
+**Redirect extraction (via `PlanSummary`):**
 - **No alt locations**: artifact tree with no `mummy/altLocation` properties → `manifest.redirects()` is empty.
 - **Single file redirect**: artifact with `altLocation = "old-name.html"` → `manifest.redirects()` has correct site-relative URIPath key and URI value.
 - **Collection redirect**: directory artifact with `altLocation = "old-dir/"` → redirect target has collection form (trailing slash), not the content artifact path (e.g. `foo/` not `foo/index`).
-- **Alt location outside site boundary**: `altLocation` resolving outside root → skipped with no entry.
-- **Multiple redirects**: multiple artifacts with `altLocation` → all collected.
+- **Alt location outside site boundary**: `altLocation` resolving outside root → entry has warning in `PlanSummary`, filtered out of `manifest.redirects()`.
+- **Multiple redirects**: multiple artifacts with `altLocation` → all non-warned entries collected.
 - **Content artifact altLocation not duplicated**: directory artifact with content artifact sharing `altLocation` via description delegation → exactly one redirect entry at the collection level, not two.
 
-**Index behavior:**
+**Index behavior (via piggybacked visitor):**
 - **File artifact**: indexed by its target path in `manifest.artifactsByContentPath()`.
 - **Directory artifact with content**: content artifact's target path maps to the directory artifact in the index. The directory path itself is not a key.
 - **Directory artifact without content (empty directory)**: no index entry.
@@ -455,12 +604,18 @@ The manifest is the single point of artifact tree analysis. Testing the manifest
 
 | File | Change |
 |---|---|
+| `mummy/src/main/java/dev/guise/mummy/ArtifactTreeWalker.java` | Add `Visitor.andThen()` default method |
+| `mummy/src/main/java/dev/guise/mummy/plan/PlanSummary.java` | Refactor `RedirectEntry` (rename fields, `URI` target, drop `collection`), drop redirect sub-categorization methods |
+| `mummy/src/main/java/dev/guise/mummy/plan/PlanDescriber.java` | Add `summarize(Visitor)` overload, update `findRedirect()` for `URI` target, update `writeTo()` display |
+| `mummy/src/test/java/dev/guise/mummy/plan/PlanSummaryTest.java` | Update for `RedirectEntry` changes |
+| `mummy/src/test/java/dev/guise/mummy/plan/PlanDescriberTest.java` | Update for display output changes, add `summarize(Visitor)` test |
+| `mummy/src/test/java/dev/guise/mummy/ArtifactTreeWalkerTest.java` | Add `andThen()` test |
 | `pom.xml` (root BOM) | Add `flange-deploy-aws` and `flange-env-aws` to `<dependencyManagement>` |
 | `mummy/pom.xml` | Add `flange-deploy-aws` and `flange-env-aws` dependencies |
-| `mummy/src/main/java/dev/guise/mummy/deploy/aws/FlangeWebSite.java` | **New** — deploy target implementation (includes nested `Manifest` record, `ArtifactMetadataStrategy`, `LoggingSynchronizationMonitor`) |
+| `mummy/src/main/java/dev/guise/mummy/deploy/aws/FlangeWebSite.java` | **New** — deploy target implementation (includes nested `Manifest` record + `Builder`, `ArtifactMetadataStrategy`, `LoggingSynchronizationMonitor`) |
 | `mummy/src/main/java/dev/guise/mummy/GuiseMummy.java` | Add `"FlangeWebSite"` branch in deploy target factory switch |
-| `mummy/src/main/java/dev/guise/mummy/deploy/aws/S3.java` | Add TODO to adopt `AwsProfile` from `flange-aws-def` (constructor delegation and encoding fix already applied in prior commit) |
-| `mummy/src/main/java/dev/guise/mummy/deploy/aws/S3Website.java` | Add TODO to adopt `AwsProfile` from `flange-aws-def` (constructor delegation and encoding fix already applied in prior commit) |
+| `mummy/src/main/java/dev/guise/mummy/deploy/aws/S3.java` | Add TODO to adopt `AwsProfile` from `flange-aws-def` |
+| `mummy/src/main/java/dev/guise/mummy/deploy/aws/S3Website.java` | Add TODO to adopt `AwsProfile` from `flange-aws-def` |
 | `mummy/src/main/java/dev/guise/mummy/deploy/aws/CloudFront.java` | Add TODO to adopt `AwsProfile` from `flange-aws-def` |
 | `mummy/src/test/java/dev/guise/mummy/deploy/aws/FlangeWebSiteTest.java` | **New** — unit tests |
 
@@ -490,4 +645,12 @@ The manifest is the single point of artifact tree analysis. Testing the manifest
 
 ### Separate `collectRedirects()` and `buildArtifactIndex()` methods vs. unified `Manifest`
 
-**Rejected:** The original plan factored redirect extraction and artifact indexing as separate static methods with their own tree walks, optimizing for single-responsibility testability. Both walk the same tree with the same "comprised − subsumed" pattern — the only difference is the per-artifact action. A single walk producing a reified `Manifest` record eliminates the duplication, provides a named concept for the aggregate ("what does the deployer need from this artifact tree?"), and shifts the test surface to the composition (the manifest) rather than the individual extractions. The `PlanDescriber.describeTo()` method already demonstrates this pattern — one walk, multiple accumulators.
+**Rejected:** The original plan factored redirect extraction and artifact indexing as separate static methods with their own tree walks, optimizing for single-responsibility testability. Both walk the same tree with the same "comprised − subsumed" pattern — the only difference is the per-artifact action. A single walk producing a reified `Manifest` record eliminates the duplication, provides a named concept for the aggregate ("what does the deployer need from this artifact tree?"), and shifts the test surface to the composition (the manifest) rather than the individual extractions.
+
+### Manifest performs its own tree walk vs. piggybacking on `PlanDescriber`
+
+**Rejected:** The original plan had `Manifest.of()` perform its own `ArtifactTreeWalker.walk()` to extract both redirects and the artifact index simultaneously. This duplicated the redirect extraction logic already present in `PlanDescriber.findRedirect()` — the same URI resolution chain, the same `toCollectionURI` compensation, the same site-boundary check. The revised approach reuses `PlanDescriber.summarize(Visitor)` with `Visitor.andThen()` composition: the summarizer handles redirect extraction (producing `PlanSummary`), while the piggybacked visitor handles the artifact index. The `Manifest.Builder` receives the `PlanSummary` at build time and extracts the redirect map from it. This keeps redirect logic in one place and eliminates a redundant tree walk.
+
+### `RedirectEntry` with `altLocationReference`/`resourceReference` and `collection` flag
+
+**Rejected:** The original `RedirectEntry` was named in terms of the Guise Mummy input that produced it (`altLocation` property → artifact resource reference) rather than the resulting redirect. The `collection` flag existed solely to support a "Collection Targets" / "Page Targets" breakdown in the plan display — a categorization that was misleading (collection content resources blur the line) and not actionable. Renamed to `sourcePath`/`targetUri` to align with HTTP redirect and Flange terminology, changed the target type to `URI` to support future non-site redirect destinations, and dropped the `collection` flag entirely.

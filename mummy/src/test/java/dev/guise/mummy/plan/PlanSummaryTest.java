@@ -20,6 +20,7 @@ import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.net.URI;
 import java.util.*;
 
 import org.junit.jupiter.api.*;
@@ -71,8 +72,8 @@ public class PlanSummaryTest {
 	@Test
 	void testBuilderSortsRedirects() {
 		final var builder = PlanSummary.builder();
-		final var redirectB = new RedirectEntry(URIPath.of("beta.html"), URIPath.of("new-beta.html"), false, Optional.empty());
-		final var redirectA = new RedirectEntry(URIPath.of("alpha.html"), URIPath.of("new-alpha.html"), false, Optional.empty());
+		final var redirectB = new RedirectEntry(URIPath.of("beta.html"), URI.create("new-beta.html"), Optional.empty());
+		final var redirectA = new RedirectEntry(URIPath.of("alpha.html"), URI.create("new-alpha.html"), Optional.empty());
 		builder.addRedirect(redirectB);
 		builder.addRedirect(redirectA);
 		final PlanSummary summary = builder.build();
@@ -81,24 +82,12 @@ public class PlanSummaryTest {
 
 	//## derived accessors
 
-	/// Tests that [PlanSummary#redirectCollectionCount()] and [PlanSummary#redirectPageCount()] partition redirect entries.
-	@Test
-	void testRedirectCollectionAndPageCounts() {
-		final var builder = PlanSummary.builder();
-		builder.addRedirect(new RedirectEntry(URIPath.of("old-dir/"), URIPath.of("new-dir/"), true, Optional.empty()));
-		builder.addRedirect(new RedirectEntry(URIPath.of("old-page.html"), URIPath.of("new-page.html"), false, Optional.empty()));
-		builder.addRedirect(new RedirectEntry(URIPath.of("old-dir2/"), URIPath.of("new-dir2/"), true, Optional.empty()));
-		final PlanSummary summary = builder.build();
-		assertThat("collection redirect count", summary.redirectCollectionCount(), is(2L));
-		assertThat("page redirect count", summary.redirectPageCount(), is(1L));
-	}
-
 	/// Tests that [PlanSummary#warningCount()] counts entries with a present warning.
 	@Test
 	void testWarningCount() {
 		final var builder = PlanSummary.builder();
-		builder.addRedirect(new RedirectEntry(URIPath.of("ok.html"), URIPath.of("new-ok.html"), false, Optional.empty()));
-		builder.addRedirect(new RedirectEntry(URIPath.of("../../outside.html"), URIPath.of("page.html"), false, Optional.of(PlanWarning.REDIRECT_OUTSIDE_SITE)));
+		builder.addRedirect(new RedirectEntry(URIPath.of("ok.html"), URI.create("new-ok.html"), Optional.empty()));
+		builder.addRedirect(new RedirectEntry(URIPath.of("../../outside.html"), URI.create("page.html"), Optional.of(PlanWarning.REDIRECT_OUTSIDE_SITE)));
 		final PlanSummary summary = builder.build();
 		assertThat("warning count", summary.warningCount(), is(1L));
 	}
@@ -118,7 +107,7 @@ public class PlanSummaryTest {
 	/// Tests that the sorted redirects list is defensively copied and immutable.
 	@Test
 	void testSortedRedirectsDefensivelyCopied() {
-		final var redirect = new RedirectEntry(URIPath.of("old.html"), URIPath.of("new.html"), false, Optional.empty());
+		final var redirect = new RedirectEntry(URIPath.of("old.html"), URI.create("new.html"), Optional.empty());
 		final var mutableList = new ArrayList<>(List.of(redirect));
 		final PlanSummary summary = new PlanSummary(0, 0, 0, 0, 0, mutableList);
 		mutableList.clear(); // mutate the source list

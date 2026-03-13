@@ -51,6 +51,21 @@ public final class ArtifactTreeWalker {
 		///        not appear as a separate IRI path reference.
 		void visit(Artifact artifact, boolean subsumed);
 
+		/// Returns a composed visitor that visits with this visitor first, then with `after`.
+		///
+		/// Each visitor receives the raw `(artifact, subsumed)` event independently — if this visitor
+		/// returns early (e.g. skipping subsumed artifacts), the `after` visitor still receives the event.
+		///
+		/// @param after The visitor to invoke after this visitor.
+		/// @return A composed visitor that visits with both visitors in sequence.
+		/// @see java.util.function.Consumer#andThen(java.util.function.Consumer)
+		default Visitor andThen(final Visitor after) {
+			return (artifact, subsumed) -> {
+				this.visit(artifact, subsumed);
+				after.visit(artifact, subsumed);
+			};
+		}
+
 	}
 
 	private ArtifactTreeWalker() { // prevent instantiation

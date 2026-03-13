@@ -19,6 +19,7 @@ package dev.guise.mummy.plan;
 import static com.globalmentor.java.Conditions.*;
 import static java.util.Objects.*;
 
+import java.net.URI;
 import java.util.*;
 
 import org.jspecify.annotations.*;
@@ -55,18 +56,6 @@ public record PlanSummary(long pageCount, long collectionCount, long imageCount,
 		return pageCount + collectionCount + imageCount + otherCount;
 	}
 
-	/// Returns the number of redirects targeting collections.
-	/// @return The collection redirect count.
-	public long redirectCollectionCount() {
-		return sortedRedirects.stream().filter(RedirectEntry::collection).count();
-	}
-
-	/// Returns the number of redirects targeting pages (non-collection redirects).
-	/// @return The page redirect count.
-	public long redirectPageCount() {
-		return sortedRedirects.size() - redirectCollectionCount();
-	}
-
 	/// Returns the number of redirect entries that carry a diagnostic warning.
 	/// @return The warning count.
 	public long warningCount() {
@@ -95,27 +84,36 @@ public record PlanSummary(long pageCount, long collectionCount, long imageCount,
 		String description() { return description; }
 	}
 
-	/// A redirect entry pairing the old alternate location reference with the artifact's current resource reference.
-	/// @param altLocationReference The alternate (old) site-relative resource reference that triggers the redirect.
-	/// @param resourceReference The artifact's current site-relative resource reference where the redirect sends the request.
-	/// @param collection Whether this is a collection (directory) redirect.
+	/// A redirect entry pairing a source path (the old alternate location) with the target URI where the redirect sends the request.
+	///
+	/// @param sourcePath The site-relative path that triggers the redirect.
+	/// @param targetUri The redirect destination URI (site-relative or, in future, an absolute URL).
 	/// @param optionalWarning A diagnostic warning, if any.
-	public record RedirectEntry(URIPath altLocationReference, URIPath resourceReference, boolean collection,
+	public record RedirectEntry(URIPath sourcePath, URI targetUri,
 			Optional<PlanWarning> optionalWarning) implements Comparable<RedirectEntry> {
 		/// Validation constructor.
 		public RedirectEntry {
-			requireNonNull(altLocationReference);
-			requireNonNull(resourceReference);
+			requireNonNull(sourcePath);
+			requireNonNull(targetUri);
 			requireNonNull(optionalWarning);
 		}
-		/// @implSpec Entries are sorted case-insensitively by the decoded form of the alternate location reference.
+		/// Creates a redirect entry from a [URIPath] target reference, converting it to a [URI].
+		/// @param sourcePath The site-relative path that triggers the redirect.
+		/// @param targetReference The artifact's current site-relative resource reference as a [URIPath].
+		/// @param optionalWarning A diagnostic warning, if any.
+		/// @return A new redirect entry.
+		public static RedirectEntry of(final URIPath sourcePath, final URIPath targetReference,
+				final Optional<PlanWarning> optionalWarning) {
+			return new RedirectEntry(sourcePath, targetReference.toURI(), optionalWarning);
+		}
+		/// @implSpec Entries are sorted case-insensitively by the decoded form of the source path.
 		@Override
 		public int compareTo(@NonNull final RedirectEntry other) {
 			//TODO switch to a segment-by-segment URIPath comparator when available in `globalmentor-core`,
 			// for more logical directory-level grouping (e.g. `a/b/c` before `a-suffix`)
 			return String.CASE_INSENSITIVE_ORDER.compare(
-					this.altLocationReference.toDecodedString(),
-					other.altLocationReference.toDecodedString());
+					this.sourcePath.toDecodedString(),
+					other.sourcePath.toDecodedString());
 		}
 	}
 
